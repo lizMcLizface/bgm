@@ -1,0 +1,440 @@
+import React, { useEffect, useRef, useState } from 'react';
+import Generator, { ROLES } from './Generator';
+import { SCALE_FAMILIES, TONIC_NAMES } from './theory';
+import ChordTimeline from './ChordTimeline';
+import { RoleButtons, TrackStrip, useLivePlay } from './Tracks';
+import { defaultSettings, settingsFromLocation, sharePath, shareUrl, exportSettings, importSettingsFile, newSeed } from './settings';
+import SynthEditor from './editor/SynthEditor';
+import PresetPicker from './editor/PresetPicker';
+import PROGRESSIONS from './progressions';
+import { PAD_STYLES, BASS_STYLES, styleShares, OCTAVE_LIMITS, OCTAVE_WANDER } from './arranger';
+import { DRIFT_MODES } from './conductor';
+import { METERS } from './meter';
+
+// One Generator for the page's lifetime; StrictMode's double-mount must
+// not build a second set of instruments.
+// Settings come from a share link when the page was opened with one.
+let generator = null;
+const getGenerator = () => {
+    if (!generator) generator = new Generator(settingsFromLocation(window.location) || defaultSettings());
+    // Dev server only: lets browser scripts drive it (e.g. preset loudness checks).
+    if (import.meta.env.DEV) window.__generator = generator;
+    return generator;
+};
+
+// Keeps the address bar a valid share link for the current settings.
+function useSettingsInUrl(settings) {
+    useEffect(() => {
+        const id = setTimeout(() => {
+            window.history.replaceState(null, '', sharePath(settings));
+        }, 300);
+        return () => clearTimeout(id);
+    }, [settings]);
+}
+
+// Share / export / import / new variation, next to Play.
+const ShareTools = ({ settings, onLoad }) => {
+    const [message, setMessage] = useState('');
+    const fileInput = useRef(null);
+    const flash = (text) => {
+        setMessage(text);
+        setTimeout(() => setMessage(''), 2500);
+    };
+    const copy = async () => {
+        const url = shareUrl(settings);
+        try {
+            await navigator.clipboard.writeText(url);
+            flash('Link copied');
+        } catch (e) {
+            window.prompt('Copy this link', url);
+        }
+    };
+    const importFile = async (e) => {
+        const file = e.target.files[0];
+        e.target.value = '';
+        if (!file) return;
+        try {
+            onLoad(await importSettingsFile(file));
+            flash('Settings loaded');
+        } catch (err) {
+            flash('Could not read that file');
+        }
+    };
+    return (
+        <div className="gen-share">
+            <button type="button" onClick={() => onLoad({ ...settings, seed: newSeed() })} title="Same settings, different random choices">
+                New variation
+            </button>
+            <button type="button" onClick={copy}>Copy link</button>
+            <button type="button" onClick={() => exportSettings(settings)}>Export</button>
+            <button type="button" onClick={() => fileInput.current.click()}>Import</button>
+            <input ref={fileInput} type="file" accept="application/json,.json" hidden onChange={importFile} />
+            <span className="gen-editor-message" role="status">{message}</span>
+        </div>
+    );
+};
+
+const Field = ({ label, children }) => (
+    <label className="gen-field">
+        <span>{label}</span>
+        {children}
+    </label>
+);
+
+// One slider per style; the label shows the style's resulting share of
+// phrases. Setting every other style to 0 makes one style "always".
+const StyleWeights = ({ title, styles, weights, onChange }) => {
+    const shares = styleShares(weights);
+    return (
+        <fieldset className="gen-weights">
+            <legend>{title}</legend>
+            {Object.entries(styles).map(([id, label]) => (
+                <Field key={id} label={`${label} · ${Math.round(shares[id] * 100)}%`}>
+                    <input type="range" min="0" max="100" step="5" value={weights[id]}
+                        onChange={(e) => onChange({ ...weights, [id]: Number(e.target.value) })} />
+                </Field>
+            ))}
+        </fieldset>
+    );
+};
+
+const CHANCES = [
+    ['keyChance', 'Key change'],
+    ['modeChance', 'Mode change'],
+    ['progressionChance', 'Progression change'],
+    ['tempoChance', 'Tempo change'],
+];
+
+// How the music moves over time (conductor.js). Chances are per
+// progression cycle; Off keeps everything at the settings above.
+// Toggle chips for an exclusion list; the home entry is locked on.
+const Chips = ({ legend, items, excluded, locked, onChange }) => (
+    <fieldset className="gen-chips">
+        <legend>{legend}</legend>
+        {items.map(({ id, label }) => {
+            const isLocked = id === locked;
+            const on = isLocked || !excluded.includes(id);
+            return (
+                <button
+                    key={id}
+                    type="button"
+                    className={on ? 'is-on' : ''}
+                    aria-pressed={on}
+                    disabled={isLocked}
+                    title={isLocked ? 'Your setting - always allowed' : undefined}
+                    onClick={() => onChange(on ? [...excluded, id] : excluded.filter((x) => x !== id))}
+                >
+                    {label}
+                </button>
+            );
+        })}
+    </fieldset>
+);
+
+const Evolution = ({ drift, home, onChange }) => {
+    const set = (key, value) => onChange({ ...drift, [key]: value });
+    const family = SCALE_FAMILIES.find((f) => f.modes.some((m) => m.id === home.mode));
+    return (
+        <section className="gen-panel">
+            <h2>Evolution</h2>
+            <Field label="Drift">
+                <select value={drift.mode} onChange={(e) => set('mode', e.target.value)}>
+                    {Object.entries(DRIFT_MODES).map(([id, label]) => <option key={id} value={id}>{label}</option>)}
+                </select>
+            </Field>
+            <fieldset className="gen-weights" disabled={drift.mode === 'off'}>
+                <legend>Chance per progression cycle</legend>
+                {CHANCES.map(([key, label]) => (
+                    <Field key={key} label={`${label} · ${Math.round(drift[key] * 100)}%`}>
+                        <input type="range" min="0" max="1" step="0.05" value={drift[key]}
+                            onChange={(e) => set(key, Number(e.target.value))} />
+                    </Field>
+                ))}
+                {drift.mode === 'centered' && (
+                    <Field label={`Pull toward my settings · ${Math.round(drift.homePull * 100)}%`}>
+                        <input type="range" min="0" max="1" step="0.05" value={drift.homePull}
+                            onChange={(e) => set('homePull', Number(e.target.value))} />
+                    </Field>
+                )}
+                <Field label={`Tempo range ± ${drift.tempoRange} BPM`}>
+                    <input type="range" min="0" max="20" step="1" value={drift.tempoRange}
+                        onChange={(e) => set('tempoRange', Number(e.target.value))} />
+                </Field>
+                <label className="gen-check">
+                    <input type="checkbox" checked={drift.pivot} onChange={(e) => set('pivot', e.target.checked)} />
+                    Prepare key changes with the new key's V chord
+                </label>
+            </fieldset>
+            <fieldset className="gen-weights" disabled={drift.mode === 'off'}>
+                <legend>Where it may go</legend>
+                <Chips
+                    legend="Keys"
+                    items={TONIC_NAMES.map((label, pc) => ({ id: pc, label }))}
+                    excluded={drift.excludedTonics}
+                    locked={home.tonic}
+                    onChange={(list) => set('excludedTonics', list)}
+                />
+                <Chips
+                    legend={`Modes (${family.family} family)`}
+                    items={family.modes.map(({ id, name }) => ({ id, label: name }))}
+                    excluded={drift.excludedModes}
+                    locked={home.mode}
+                    onChange={(list) => set('excludedModes', list)}
+                />
+            </fieldset>
+        </section>
+    );
+};
+
+// What drift is playing right now, polled from the audible bar.
+function useNowPlaying(gen, running) {
+    const [now, setNow] = useState(() => gen.nowPlaying());
+    useEffect(() => {
+        const read = () => setNow((prev) => {
+            const next = gen.nowPlaying();
+            return JSON.stringify(prev) === JSON.stringify(next) ? prev : next;
+        });
+        read();
+        if (!running) return undefined;
+        const id = setInterval(read, 300);
+        return () => clearInterval(id);
+    }, [gen, running]);
+    return now;
+}
+
+// "Now playing" line under the Music settings, shown while drift has moved
+// away from them; differing parts are highlighted.
+const NowPlaying = ({ now, settings, onKeep }) => {
+    const keyDiffers = now.tonic !== settings.tonic || now.mode !== settings.mode;
+    const progressionDiffers = now.progression !== settings.progression;
+    const tempoDiffers = now.bpm !== settings.bpm;
+    if (!keyDiffers && !progressionDiffers && !tempoDiffers) return null;
+    const part = (differs, text) => <span className={differs ? 'gen-differs' : ''}>{text}</span>;
+    return (
+        <div className="gen-nowplaying" role="status">
+            <span>Now playing:</span>
+            {part(keyDiffers, now.keyName)}
+            {part(progressionDiffers, PROGRESSIONS[now.progression].join(' – '))}
+            {part(tempoDiffers, `${now.bpm} BPM`)}
+            <button type="button" onClick={onKeep}>Keep this</button>
+        </div>
+    );
+};
+
+const octaveLabel = (o) => (o === 0 ? 'Default' : `${o > 0 ? '+' : '−'}${Math.abs(o)} octave${Math.abs(o) > 1 ? 's' : ''}`);
+const PAD_NOTES = { 3: 'Triads (3)', 4: 'Sevenths (4)', 5: 'Ninths (5)' };
+
+// Per-role register: home octave, and whether/how it wanders by phrase.
+const VoiceControls = ({ role, voice, onChange }) => {
+    const [lo, hi] = OCTAVE_LIMITS[role];
+    const set = (key, value) => onChange({ ...voice, [key]: value });
+    return (
+        <>
+            <Field label="Octave">
+                <select value={voice.octave} onChange={(e) => set('octave', Number(e.target.value))}>
+                    {Array.from({ length: hi - lo + 1 }, (_, i) => lo + i).map((o) => <option key={o} value={o}>{octaveLabel(o)}</option>)}
+                </select>
+            </Field>
+            <Field label="Octave wander">
+                <select value={voice.wander} onChange={(e) => set('wander', e.target.value)}>
+                    {Object.entries(OCTAVE_WANDER).map(([id, label]) => <option key={id} value={id}>{label}</option>)}
+                </select>
+            </Field>
+            {voice.wander !== 'off' && (
+                <Field label={`Change chance per phrase · ${Math.round(voice.chance * 100)}%`}>
+                    <input type="range" min="0" max="1" step="0.05" value={voice.chance}
+                        onChange={(e) => set('chance', Number(e.target.value))} />
+                </Field>
+            )}
+        </>
+    );
+};
+
+const GenerativeApp = () => {
+    const gen = useRef(getGenerator()).current;
+    const [running, setRunning] = useState(gen.isRunning);
+    const [settings, setSettings] = useState({ ...gen.settings });
+    const [roles, setRoles] = useState(() =>
+        Object.fromEntries(Object.entries(ROLES).map(([role, { preset, volume }]) => [role, { presetName: preset, edited: false, volume }]))
+    );
+    const [editorRole, setEditorRole] = useState(Object.keys(ROLES)[0]);
+    const [mix, setMix] = useState(() => Object.fromEntries(Object.keys(ROLES).map((role) => [role, { mute: false, solo: false }])));
+    const [armed, setArmed] = useState(null);
+    const live = useLivePlay(gen, armed);
+    const changeMix = (role, patch) => {
+        gen.setRoleMix(role, patch);
+        setMix((m) => ({ ...m, [role]: { ...m[role], ...patch } }));
+    };
+    const [editorOpen, setEditorOpen] = useState(false);
+    const editorRef = useRef(null);
+    const editSound = (role) => {
+        setEditorRole(role);
+        setEditorOpen(true);
+        requestAnimationFrame(() => editorRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+    };
+    const now = useNowPlaying(gen, running);
+    useSettingsInUrl(settings);
+    const loadSettings = (next) => {
+        gen.setMany(next);
+        setSettings({ ...gen.settings });
+    };
+    const keepCurrent = () => {
+        gen.keepCurrent();
+        setSettings({ ...gen.settings });
+    };
+    const update = (key, value) => {
+        gen.set(key, value);
+        setSettings((s) => ({ ...s, [key]: value }));
+    };
+    const patchRole = (role, patch) => setRoles((r) => ({ ...r, [role]: { ...r[role], ...patch } }));
+    const setVolume = (role, volume) => {
+        gen.setRoleVolume(role, volume);
+        patchRole(role, { volume });
+    };
+    const presetLoaded = (role, presetName) => patchRole(role, { presetName, edited: false });
+    const loadPreset = (role, name) => {
+        if (gen.loadRolePreset(role, name)) presetLoaded(role, name);
+    };
+    const toggle = async () => {
+        if (gen.isRunning) {
+            gen.stop();
+        } else {
+            await gen.start();
+        }
+        setRunning(gen.isRunning);
+    };
+
+    return (
+        <main className="gen">
+            <header className="gen-header">
+                <h1>bgm <span>calm procedural music</span></h1>
+                <button className="gen-play" onClick={toggle}>{running ? 'Stop' : 'Play'}</button>
+                <ShareTools settings={settings} onLoad={loadSettings} />
+            </header>
+
+            <ChordTimeline
+                generator={gen}
+                tracks={<TrackStrip roles={ROLES} mix={mix} armed={armed} onMix={changeMix} onArm={setArmed} live={live} />}
+            />
+
+            <section className="gen-panel">
+                <h2>Music</h2>
+                <Field label="Key">
+                    <select value={settings.tonic} onChange={(e) => update('tonic', Number(e.target.value))}>
+                        {TONIC_NAMES.map((name, pc) => <option key={name} value={pc}>{name}</option>)}
+                    </select>
+                </Field>
+                <Field label="Scale / mode">
+                    <select value={settings.mode} onChange={(e) => update('mode', e.target.value)}>
+                        {SCALE_FAMILIES.map(({ family, modes }) => (
+                            <optgroup key={family} label={family}>
+                                {modes.map(({ id, name }) => <option key={id} value={id}>{name}</option>)}
+                            </optgroup>
+                        ))}
+                    </select>
+                </Field>
+                <Field label="Progression">
+                    <select value={settings.progression} onChange={(e) => update('progression', Number(e.target.value))}>
+                        {PROGRESSIONS.map((p, i) => <option key={p.join()} value={i}>{p.join(' – ')}</option>)}
+                    </select>
+                </Field>
+                <Field label="Bars per chord">
+                    <select value={settings.barsPerChord} onChange={(e) => update('barsPerChord', Number(e.target.value))}>
+                        {[1, 2, 4].map((n) => <option key={n}>{n}</option>)}
+                    </select>
+                </Field>
+                <NowPlaying now={now} settings={settings} onKeep={keepCurrent} />
+                <Field label="Time signature">
+                    <select value={settings.meter} onChange={(e) => update('meter', e.target.value)}>
+                        {Object.entries(METERS).map(([id, { label }]) => <option key={id} value={id}>{label}</option>)}
+                    </select>
+                </Field>
+                <Field label={`Tempo ${settings.bpm} BPM${METERS[settings.meter].unitsPerBeat > 1 ? ' (♩.)' : ''}`}>
+                    <input type="range" min="50" max="110" value={settings.bpm}
+                        onChange={(e) => update('bpm', Number(e.target.value))} />
+                </Field>
+            </section>
+
+            <Evolution drift={settings.drift} home={{ tonic: settings.tonic, mode: settings.mode }} onChange={(drift) => update('drift', drift)} />
+
+            <section className="gen-panel">
+                <h2>Arrangement</h2>
+                <Field label={`Lead activity ${Math.round(settings.leadActivity * 100)}%`}>
+                    <input type="range" min="0" max="1" step="0.05" value={settings.leadActivity}
+                        onChange={(e) => update('leadActivity', Number(e.target.value))} />
+                </Field>
+                <label className="gen-check">
+                    <input type="checkbox" checked={settings.thinPadUnderLead}
+                        onChange={(e) => update('thinPadUnderLead', e.target.checked)} />
+                    Thin the pad under the lead
+                </label>
+                <StyleWeights title="Rhythm / pad styles" styles={PAD_STYLES} weights={settings.padWeights}
+                    onChange={(w) => update('padWeights', w)} />
+                <StyleWeights title="Bass styles" styles={BASS_STYLES} weights={settings.bassWeights}
+                    onChange={(w) => update('bassWeights', w)} />
+                <fieldset className="gen-weights">
+                    <legend>Feel (random, normally distributed per note)</legend>
+                    <Field label={`Timing ± ${settings.humanize.timing} ms`}>
+                        <input type="range" min="0" max="40" step="1" value={settings.humanize.timing}
+                            onChange={(e) => update('humanize', { ...settings.humanize, timing: Number(e.target.value) })} />
+                    </Field>
+                    <Field label={`Velocity ± ${Math.round(settings.humanize.velocity * 100)}%`}>
+                        <input type="range" min="0" max="0.25" step="0.01" value={settings.humanize.velocity}
+                            onChange={(e) => update('humanize', { ...settings.humanize, velocity: Number(e.target.value) })} />
+                    </Field>
+                    <Field label={`Pitch ± ${settings.humanize.detune} cents`}>
+                        <input type="range" min="0" max="15" step="0.5" value={settings.humanize.detune}
+                            onChange={(e) => update('humanize', { ...settings.humanize, detune: Number(e.target.value) })} />
+                    </Field>
+                </fieldset>
+            </section>
+
+            {Object.entries(ROLES).map(([role, { label }]) => (
+                <section className={`gen-panel gen-panel-role gen-role-${role}`} key={role}>
+                    <h2 className="gen-panel-title">
+                        <i className={`gen-swatch gen-swatch-${role}`} />
+                        {label}
+                        <RoleButtons role={role} label={label} mix={mix[role]} armed={armed === role} onMix={changeMix} onArm={setArmed} />
+                    </h2>
+                    <Field label="Preset">
+                        <PresetPicker value={roles[role].presetName} edited={roles[role].edited} onChange={(name) => loadPreset(role, name)} role={role} />
+                    </Field>
+                    <Field label={`Volume ${Math.round(roles[role].volume * 100)}%`}>
+                        <input type="range" min="0" max="1" step="0.01" value={roles[role].volume}
+                            onChange={(e) => setVolume(role, Number(e.target.value))} />
+                    </Field>
+                    <VoiceControls role={role} voice={settings.voices[role]}
+                        onChange={(voice) => update('voices', { ...settings.voices, [role]: voice })} />
+                    {role === 'pad' && (
+                        <Field label="Chord notes">
+                            <select value={settings.padNotes} onChange={(e) => update('padNotes', Number(e.target.value))}>
+                                {Object.entries(PAD_NOTES).map(([n, label]) => <option key={n} value={n}>{label}</option>)}
+                            </select>
+                        </Field>
+                    )}
+                    <div className="gen-field gen-field-action">
+                        <button type="button" onClick={() => editSound(role)}>
+                            Edit sound
+                        </button>
+                    </div>
+                </section>
+            ))}
+
+            <SynthEditor
+                generator={gen}
+                roles={ROLES}
+                role={editorRole}
+                onRoleChange={setEditorRole}
+                presetName={roles[editorRole].presetName}
+                edited={roles[editorRole].edited}
+                onPresetLoaded={presetLoaded}
+                onEdited={(role) => patchRole(role, { edited: true })}
+                open={editorOpen}
+                onToggle={() => setEditorOpen((o) => !o)}
+                sectionRef={editorRef}
+            />
+        </main>
+    );
+};
+
+export default GenerativeApp;

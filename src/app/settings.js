@@ -1,0 +1,169 @@
+// Generator settings as data: defaults, validation, and the compact form
+// used in share links (?s=...) and exported files. Synth
+// presets are deliberately not part of it.
+//
+// Anything arriving from a link or file is untrusted: sanitizeSettings
+// keeps only known keys, coerces/clamps every value to its valid range,
+// and falls back to the default otherwise. Encoding stores only what
+// differs from the defaults, so typical links stay short.
+
+import { DEFAULT_PAD_WEIGHTS, DEFAULT_BASS_WEIGHTS, DEFAULT_VOICES, OCTAVE_LIMITS, OCTAVE_WANDER } from './arranger';
+import { DEFAULT_DRIFT, DRIFT_MODES, TEMPO_BOUNDS } from './conductor';
+import { METERS, DEFAULT_METER } from './meter';
+import { SCALE_FAMILIES } from './theory';
+import PROGRESSIONS from './progressions';
+
+export const SETTINGS_VERSION = 1;
+
+/** Fresh default settings (a new random seed each call). */
+export function defaultSettings() {
+    return {
+        tonic: 0,
+        mode: 'Major-1', // scale id, as on the main page (theory.js SCALE_FAMILIES)
+        bpm: 72,
+        progression: 0,
+        barsPerChord: 1,
+        meter: DEFAULT_METER, // meter.js
+        leadActivity: 0.6, // chance a 4-bar phrase has lead (arranger.js)
+        padWeights: { ...DEFAULT_PAD_WEIGHTS }, // style shares per phrase
+        bassWeights: { ...DEFAULT_BASS_WEIGHTS },
+        thinPadUnderLead: true,
+        padNotes: 3, // chord size: 3 triads, 4 sevenths, 5 ninths
+        voices: JSON.parse(JSON.stringify(DEFAULT_VOICES)), // per-role octave + wander
+        drift: { ...DEFAULT_DRIFT, excludedTonics: [], excludedModes: [] }, // conductor.js
+        humanize: { timing: 12, velocity: 0.08, detune: 3 }, // ms, fraction, cents
+        seed: newSeed(),
+    };
+}
+
+export const newSeed = () => Math.floor(Math.random() * 2 ** 31);
+
+const MODE_IDS = new Set(SCALE_FAMILIES.flatMap((f) => f.modes.map((m) => m.id)));
+
+const clamp = (lo, hi) => (v) => (Number.isFinite(v) ? Math.min(hi, Math.max(lo, v)) : undefined);
+const int = (lo, hi) => (v) => (Number.isInteger(v) && v >= lo && v <= hi ? v : undefined);
+const oneOf = (allowed) => (v) => (allowed.includes(v) ? v : undefined);
+const bool = (v) => (typeof v === 'boolean' ? v : undefined);
+const listOf = (valid) => (v) => (Array.isArray(v) ? [...new Set(v.filter(valid))] : undefined);
+
+// Validator per key path; nested objects are walked key by key.
+const RULES = {
+    tonic: int(0, 11),
+    mode: (v) => (MODE_IDS.has(v) ? v : undefined),
+    bpm: clamp(TEMPO_BOUNDS[0], TEMPO_BOUNDS[1]),
+    progression: int(0, PROGRESSIONS.length - 1),
+    barsPerChord: oneOf([1, 2, 4]),
+    meter: oneOf(Object.keys(METERS)),
+    leadActivity: clamp(0, 1),
+    padWeights: { sustain: clamp(0, 100), pulse: clamp(0, 100), arpeggio: clamp(0, 100) },
+    bassWeights: { whole: clamp(0, 100), half: clamp(0, 100), walking: clamp(0, 100) },
+    thinPadUnderLead: bool,
+    padNotes: oneOf([3, 4, 5]),
+    voices: Object.fromEntries(Object.entries(OCTAVE_LIMITS).map(([role, [lo, hi]]) => [role, {
+        octave: int(lo, hi),
+        wander: oneOf(Object.keys(OCTAVE_WANDER)),
+        chance: clamp(0, 1),
+    }])),
+    drift: {
+        mode: oneOf(Object.keys(DRIFT_MODES)),
+        keyChance: clamp(0, 1),
+        modeChance: clamp(0, 1),
+        progressionChance: clamp(0, 1),
+        tempoChance: clamp(0, 1),
+        tempoRange: clamp(0, 20),
+        homePull: clamp(0, 1),
+        pivot: bool,
+        excludedTonics: listOf((pc) => Number.isInteger(pc) && pc >= 0 && pc <= 11),
+        excludedModes: listOf((id) => MODE_IDS.has(id)),
+    },
+    humanize: { timing: clamp(0, 40), velocity: clamp(0, 0.25), detune: clamp(0, 15) },
+    seed: int(0, 2 ** 31),
+};
+
+function sanitize(raw, rules, defaults) {
+    const out = {};
+    Object.entries(rules).forEach(([key, rule]) => {
+        const value = raw && typeof raw === 'object' ? raw[key] : undefined;
+        if (typeof rule === 'function') {
+            const valid = value === undefined ? undefined : rule(value);
+            out[key] = valid === undefined ? defaults[key] : valid;
+        } else {
+            out[key] = sanitize(value, rule, defaults[key]);
+        }
+    });
+    return out;
+}
+
+/** Untrusted object -> complete, valid settings (defaults fill the gaps). */
+export function sanitizeSettings(raw, defaults = defaultSettings()) {
+    return sanitize(raw, RULES, defaults);
+}
+
+// Only the parts of `settings` that differ from `defaults`.
+function diff(settings, defaults) {
+    const out = {};
+    Object.entries(settings).forEach(([key, value]) => {
+        const base = defaults[key];
+        if (value && typeof value === 'object' && !Array.isArray(value)) {
+            const nested = diff(value, base);
+            if (Object.keys(nested).length) out[key] = nested;
+        } else if (JSON.stringify(value) !== JSON.stringify(base)) {
+            out[key] = value;
+        }
+    });
+    return out;
+}
+
+const toBase64Url = (text) => btoa(unescape(encodeURIComponent(text))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const fromBase64Url = (code) => decodeURIComponent(escape(atob(code.replace(/-/g, '+').replace(/_/g, '/'))));
+
+/** Settings -> short URL-safe string (seed always included). */
+export function encodeSettings(settings) {
+    const defaults = { ...defaultSettings(), seed: undefined };
+    return toBase64Url(JSON.stringify({ v: SETTINGS_VERSION, ...diff(settings, defaults), seed: settings.seed }));
+}
+
+/** URL-safe string -> valid settings, or null if it can't be read at all. */
+export function decodeSettings(code) {
+    try {
+        return sanitizeSettings(JSON.parse(fromBase64Url(code)));
+    } catch (e) {
+        return null;
+    }
+}
+
+/**
+ * Settings from a share link: the `s` query parameter, or - for links made
+ * while this lived inside unCAGED - the `s` parameter of a #/generative?s=
+ * hash. Null when there is none or it can't be read.
+ */
+export function settingsFromLocation({ search = '', hash = '' }) {
+    const code = new URLSearchParams(search).get('s') || new URLSearchParams(hash.split('?')[1] || '').get('s');
+    return code ? decodeSettings(code) : null;
+}
+
+/** The share link's path + query for the current page. */
+export function sharePath(settings, location = window.location) {
+    return `${location.pathname}?s=${encodeSettings(settings)}`;
+}
+
+/** Full share URL for the current page and settings. */
+export function shareUrl(settings, location = window.location) {
+    return `${location.origin}${sharePath(settings, location)}`;
+}
+
+/** Downloads settings as a .json file. */
+export function exportSettings(settings) {
+    const blob = new Blob([JSON.stringify({ v: SETTINGS_VERSION, ...settings }, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'generative-settings.json';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+/** Reads an exported settings file. */
+export async function importSettingsFile(file) {
+    return sanitizeSettings(JSON.parse(await file.text()));
+}
