@@ -398,7 +398,7 @@ const GenerativeApp = () => {
     const [paused, setPaused] = useState(false);
     const [settings, setSettings] = useState({ ...gen.settings });
     const [roles, setRoles] = useState(() =>
-        Object.fromEntries(Object.entries(ROLES).map(([role, { volume }]) => [role, { presetName: gen.roles[role].presetName, edited: false, volume }]))
+        Object.fromEntries(Object.keys(ROLES).map((role) => [role, { presetName: gen.roles[role].presetName, edited: false }]))
     );
     // What a link can carry: built-in presets as loaded (edits stay local).
     // Generated sounds travel as the role they were made for + their seed.
@@ -461,7 +461,7 @@ const GenerativeApp = () => {
     const patchRole = (role, patch) => setRoles((r) => ({ ...r, [role]: { ...r[role], ...patch } }));
     const setVolume = (role, volume) => {
         gen.setRoleVolume(role, volume);
-        patchRole(role, { volume });
+        setSettings((s) => ({ ...s, volumes: { ...gen.settings.volumes } }));
     };
     const presetLoaded = (role, presetName) => patchRole(role, { presetName, edited: false });
     const loadPreset = (role, name) => {
@@ -774,8 +774,8 @@ const GenerativeApp = () => {
                     <Field label="Preset" onRandom={() => randomizePreset(role)} onGenerate={() => generateForRole(role)} generating={generating[role]} wide>
                         <PresetPicker value={roles[role].presetName} edited={roles[role].edited} onChange={(name) => loadPreset(role, name)} role={role} />
                     </Field>
-                    <Field label={`Volume ${Math.round(roles[role].volume * 100)}%`}>
-                        <input type="range" min="0" max="1" step="0.01" value={roles[role].volume}
+                    <Field label={`Volume ${Math.round(settings.volumes[role] * 100)}%`}>
+                        <input type="range" min="0" max="1" step="0.01" value={settings.volumes[role]}
                             onChange={(e) => setVolume(role, Number(e.target.value))} />
                     </Field>
                 </Panel>

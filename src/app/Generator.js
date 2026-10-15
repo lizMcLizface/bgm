@@ -32,7 +32,7 @@ import { METERS, unitsPerMinute } from './meter';
 import { normal, seeded } from './random';
 import { defaultSettings } from './settings';
 import { findPreset } from './editor/presetStore';
-import { ROLE_PRESETS } from './presets';
+import { ROLE_PRESETS, ROLE_VOLUMES } from './presets';
 import PROGRESSIONS, { progressionsOfLength } from './progressions';
 
 // Stop fades everything out - reverb and echo tails included - with this
@@ -47,17 +47,17 @@ const PLAN_KEEP_BARS = 4;
 // Settings that define "home"; changing one resets drift to it.
 const HOME_KEYS = new Set(['tonic', 'mode', 'progression', 'bpm', 'barsPerChord']);
 // Settings that don't change what is planned.
-const SOUND_KEYS = new Set(['ambience', 'ambienceVolume', 'playMusic', 'playAmbience']);
+const SOUND_KEYS = new Set(['ambience', 'ambienceVolume', 'playMusic', 'playAmbience', 'volumes']);
 
 // Ambience volume slider (0..1) to gain: 0.8, the default, is unity.
 const ambienceGain = (volume) => Math.pow(volume / 0.8, 2);
 
 // In display order.
 export const ROLES = {
-    lead: { label: 'Lead', polyphony: 2, preset: ROLE_PRESETS.lead, volume: 0.7 },
-    counter: { label: 'Second lead', polyphony: 2, preset: ROLE_PRESETS.counter, volume: 0.6 },
-    pad: { label: 'Rhythm / pad', polyphony: 8, preset: ROLE_PRESETS.pad, volume: 0.8 },
-    bass: { label: 'Bass / support', polyphony: 2, preset: ROLE_PRESETS.bass, volume: 0.8 },
+    lead: { label: 'Lead', polyphony: 2, preset: ROLE_PRESETS.lead },
+    counter: { label: 'Second lead', polyphony: 2, preset: ROLE_PRESETS.counter },
+    pad: { label: 'Rhythm / pad', polyphony: 8, preset: ROLE_PRESETS.pad },
+    bass: { label: 'Bass / support', polyphony: 2, preset: ROLE_PRESETS.bass },
 };
 
 class Generator {
@@ -73,7 +73,9 @@ class Generator {
         this.settings = settings;
 
         this.roles = {};
-        Object.entries(ROLES).forEach(([role, { polyphony, preset, volume }]) => {
+        // volumes are settings (they travel in links); mute / solo are not
+        Object.entries(ROLES).forEach(([role, { polyphony, preset }]) => {
+            const volume = (this.settings.volumes && this.settings.volumes[role]) ?? ROLE_VOLUMES[role];
             const instrument = new Instrument({ polyphony, preset: findPreset(preset) });
             const gain = this.AC.createGain();
             gain.gain.value = volume;
@@ -308,6 +310,7 @@ class Generator {
         this.settings[key] = value;
         if (key === 'ambience') this.ambience.setLevels(value);
         if (key === 'ambienceVolume') this.setAmbienceVolume(value);
+        if (key === 'volumes') this.applyVolumes();
         if (SOUND_KEYS.has(key)) return;
         this.replan([key]);
     }
@@ -343,6 +346,7 @@ class Generator {
         Object.assign(this.settings, patch);
         if ('ambience' in patch) this.ambience.setLevels(this.settings.ambience);
         if ('ambienceVolume' in patch) this.setAmbienceVolume(this.settings.ambienceVolume);
+        if ('volumes' in patch) this.applyVolumes();
         if (Object.keys(patch).every((key) => SOUND_KEYS.has(key))) return;
         this.replan(Object.keys(patch), meterChanged);
     }
@@ -358,6 +362,11 @@ class Generator {
     keepCurrent() {
         const { tonic, mode, progression, bpm } = this.nowPlaying();
         this.setMany({ tonic, mode, progression, bpm });
+    }
+
+    applyVolumes() {
+        Object.entries(this.roles).forEach(([role, r]) => { r.volume = this.settings.volumes[role] ?? ROLE_VOLUMES[role]; });
+        this.applyMix();
     }
 
     setAmbienceVolume(volume) {
@@ -421,6 +430,7 @@ class Generator {
 
     setRoleVolume(role, volume) {
         this.roles[role].volume = volume;
+        this.settings.volumes = { ...this.settings.volumes, [role]: volume };
         this.applyMix();
     }
 

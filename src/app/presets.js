@@ -767,5 +767,8 @@ export const GENERATIVE_PRESETS = Object.assign({}, ...Object.values(PRESET_CATE
 /** Each role's preset on a fresh page (and when a link names none). */
 export const ROLE_PRESETS = { lead: 'Glass Lead', pad: 'Soft Pad', bass: 'Warm Bass', counter: 'Soft Flute' };
 
+/** Each role's default mix volume (settings.volumes). */
+export const ROLE_VOLUMES = { lead: 0.7, counter: 0.6, pad: 0.8, bass: 0.8 };
+
 /** The category listed first in each role's preset picker. */
 export const ROLE_CATEGORY = { pad: 'Pads', bass: 'Bass', lead: 'Leads', counter: 'Leads' };

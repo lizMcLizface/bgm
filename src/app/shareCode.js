@@ -146,6 +146,7 @@ const LATER_GROUPS = [
     ],
     [...Object.keys(AMBIENCE_LAYERS).map((id) => [['ambience', id], level]), [['ambienceVolume'], level]],
     [[['playMusic'], bool], [['playAmbience'], bool]],
+    CODE_ROLES.map((role) => [['volumes', role], stepped(0, 1, 0.01)]),
 ];
 
 // The order of a code (append only): version, seed, GROUPS, presets of the

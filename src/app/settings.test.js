@@ -22,9 +22,22 @@ test('round-trips through a share code', () => {
 
 test('codes only carry what differs from the defaults', () => {
     const code = encodeSettings({ ...defaultSettings(), seed: 7 });
+    expect(code.length).toBeLessThanOrEqual(8);
+    expect(decodeSettings(code)).toEqual({ ...defaultSettings(), seed: 7 });
+    expect(encodeSettings({ ...defaultSettings(), seed: 2 ** 31 - 1, tonic: 5 }).length).toBeLessThanOrEqual(12);
+});
+
+test('links read unchanged values against a fixed baseline: sections stay off in older links', () => {
+    expect(defaultSettings().sections.mode).toBe('gentle');
+    const off = { ...defaultSettings(), seed: 7, sections: { mode: 'off', phrases: 4 } };
+    const code = encodeSettings(off);
     expect(code.length).toBeLessThanOrEqual(6);
-    expect(decodeSettings(code).seed).toBe(7);
-    expect(encodeSettings({ ...defaultSettings(), seed: 2 ** 31 - 1, tonic: 5 }).length).toBeLessThanOrEqual(10);
+    expect(decodeSettings(code).sections).toEqual({ mode: 'off', phrases: 4 });
+});
+
+test('voice volumes travel in links', () => {
+    const settings = { ...defaultSettings(), seed: 3, volumes: { lead: 0.42, counter: 0.6, pad: 0.15, bass: 1 } };
+    expect(decodeSettings(encodeSettings(settings)).volumes).toEqual(settings.volumes);
 });
 
 test('fully randomized settings and presets round-trip in a short code', () => {

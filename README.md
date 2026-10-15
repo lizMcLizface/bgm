@@ -60,7 +60,7 @@ synthesised with the Web Audio API; there are no samples.
   once - "within reason" (near the defaults, minor progressions in minor
   modes, lead sounds on the lead) or "full random"
 - Share links: the address bar always holds the current settings, the
-  presets per voice (built-in or generated) and a random seed in a short code (`?s=FWfOUc`
+  presets and volumes per voice (built-in or generated sounds) and a random seed in a short code (`?s=FWfOUc`
   for defaults, ~30 characters fully randomized), so a link plays the same
   piece for whoever opens it
 - An audio-thread load meter with a choice of output buffer size (larger

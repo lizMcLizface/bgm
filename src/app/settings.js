@@ -14,6 +14,7 @@ import {
     DEFAULT_COUNTER, COUNTER_MODES, DEFAULT_SECTIONS, SECTION_MODES, SECTION_LENGTHS,
 } from './arranger';
 import { AMBIENCE_LAYERS, DEFAULT_AMBIENCE } from './engine/ambience';
+import { ROLE_VOLUMES } from './presets';
 import { DEFAULT_DRIFT, DRIFT_MODES, TEMPO_BOUNDS } from './conductor';
 import { METERS, DEFAULT_METER } from './meter';
 import { SCALE_FAMILIES } from './theory';
@@ -38,11 +39,12 @@ export function defaultSettings() {
         drift: { ...DEFAULT_DRIFT, excludedTonics: [], excludedModes: [] }, // conductor.js
         humanize: { timing: 12, velocity: 0.08, detune: 3 }, // ms, fraction, cents
         counter: { ...DEFAULT_COUNTER }, // second lead (arranger.js)
-        sections: { ...DEFAULT_SECTIONS }, // intro / build / full / breakdown
+        sections: { ...DEFAULT_SECTIONS, mode: 'gentle' }, // intro / build / full / breakdown (new visits: gentle, to open with an intro)
         ambience: { ...DEFAULT_AMBIENCE }, // rain, wind, ... levels 0..1 (engine/ambience.js)
         ambienceVolume: 0.8, // the whole bed against the music
         playMusic: true, // what Play starts
         playAmbience: false,
+        volumes: { ...ROLE_VOLUMES }, // per role, 0..1
         seed: newSeed(),
     };
 }
@@ -94,6 +96,7 @@ const RULES = {
     ambienceVolume: clamp(0, 1),
     playMusic: bool,
     playAmbience: bool,
+    volumes: Object.fromEntries(Object.keys(ROLE_VOLUMES).map((role) => [role, clamp(0, 1)])),
     seed: int(0, 2 ** 31),
 };
 
@@ -119,13 +122,20 @@ export function sanitizeSettings(raw, defaults = defaultSettings()) {
 // Links made before shareCode.js: base64url of JSON.
 const fromBase64Url = (code) => decodeURIComponent(escape(atob(code.replace(/-/g, '+').replace(/_/g, '/'))));
 
+// What a link's unchanged values mean. Fixed: when the defaults for new
+// visits change (sections went from off to gentle), links made before
+// must still read the same.
+function linkBaseline() {
+    return { ...defaultSettings(), sections: { ...DEFAULT_SECTIONS } };
+}
+
 /**
  * Settings (+ role -> built-in preset name) -> short URL-safe string.
  * @param {object} settings
  * @param {object} [presets] - names that aren't built-in presets are left out
  */
 export function encodeSettings(settings, presets) {
-    return encodeShareCode(settings, defaultSettings(), presets);
+    return encodeShareCode(settings, linkBaseline(), presets);
 }
 
 /**
@@ -135,7 +145,7 @@ export function encodeSettings(settings, presets) {
 export function decodeShare(code) {
     try {
         if (code.startsWith('eyJ')) return { settings: sanitizeSettings(JSON.parse(fromBase64Url(code))), presets: {} };
-        const { settings, presets } = decodeShareCode(code, defaultSettings());
+        const { settings, presets } = decodeShareCode(code, linkBaseline());
         return { settings: sanitizeSettings(settings), presets };
     } catch (e) {
         return null;
