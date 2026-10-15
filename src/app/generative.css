@@ -1004,3 +1004,10 @@ body {
 .gen-footer a {
     color: var(--gen-accent);
 }
+
+.gen-hint {
+    grid-column: 1 / -1;
+    margin: 0;
+    font-size: 13px;
+    color: var(--gen-muted);
+}

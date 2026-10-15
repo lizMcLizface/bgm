@@ -1,4 +1,4 @@
-import { renderLayer, LAYERS } from './ambienceSynth';
+import { renderLayer, renderParams, LAYERS } from './ambienceSynth';
 
 // a low rate keeps this quick; the sounds scale with the rate
 const RATE = 8000;
@@ -18,4 +18,15 @@ test('thunder: a few variants, quiet at the end', () => {
     const variants = renderLayer('thunder', RATE);
     expect(variants.length).toBe(3);
     variants.forEach(([left]) => expect(Math.abs(left[left.length - 1])).toBeLessThan(0.01));
+});
+
+test('render params: steps of 0.1, defaults filled in; intensity plays louder, the defaults as before', () => {
+    expect(renderParams('rain', { intensity: 0.83, distance: 0.5 })).toEqual({ intensity: 0.8, drops: 0.4 });
+    const level = (params) => { const [l] = renderLayer('rain', RATE, params); return Math.sqrt(l.reduce((s, x) => s + x * x, 0) / l.length); };
+    const soft = level({ intensity: 0.1 });
+    const usual = level({});
+    const heavy = level({ intensity: 0.9 });
+    expect(soft).toBeLessThan(usual);
+    expect(heavy).toBeGreaterThan(usual);
+    expect(usual).toBeCloseTo(LAYERS.rain.level, 2);
 });

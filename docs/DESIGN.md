@@ -397,6 +397,25 @@ booked onto fresh Instruments with the current sounds in an
 
 ## 6b. Ambience
 
+**Shapes (2026-10-16).** Each layer has parameters (`LAYER_PARAMS` in
+ambienceSynth.js) and every layer has distance, pan and width
+(`COMMON_PARAMS`). *Render* parameters (rain intensity / drop size, wind
+speed / gusts, wave length / size, fire crackle / roar, vinyl crackle /
+hiss) change the generated loop: it is re-rendered in the worker 300 ms
+after the last change, in steps of 0.1, and cross-faded in over 1 s; the
+last 12 loops are cached. Loudness is normalised against the layer's
+defaults, so "more intense" plays louder. The rest act live: each layer
+runs through lowpass (distance: 18 kHz down to 600 Hz, a little quieter)
+→ mid/side width matrix → panner → level. Thunder's "how often" sets the
+average gap (2.5 min down to 15 s), intensity its level, and pan / width
+where strikes land.
+
+The rain was reported "annoyingly sharp": its drops were 1-5 ms clicks
+highpassed at 1.8 kHz over a hiss up to 6.5 kHz. Now they rise over
+0.4 ms, sit in 0.9-4 kHz and the hiss stops near 4 kHz. At the same
+loudness, energy above 4 kHz went from 20.7% to 7.8% and the crest factor
+from 11.2 to 5.3.
+
 `src/app/engine/ambience.js`: rain, thunder, wind, waves, fire, vinyl,
 synthesised from noise in `ambienceSynth.js` - no recordings, nothing to
 license. Each layer is rendered once per sample rate into a 17-31 s loop:

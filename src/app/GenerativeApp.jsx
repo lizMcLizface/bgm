@@ -14,12 +14,13 @@ import { DRIFT_MODES } from './conductor';
 import { METERS } from './meter';
 import {
     RANDOM_LEVELS, randomKey, randomProgression, randomConductor, randomVoices, randomField, randomPreset, randomLength,
-    randomArrangement, randomStyleWeights, randomRole, progressionLength, progressionForLength, randomAmbience,
+    randomArrangement, randomStyleWeights, randomRole, progressionLength, progressionForLength, randomAmbience, randomAmbienceShape,
 } from './randomize';
 import { MasterVolume, AudioMeter, SettingsMenu } from './AudioStatus';
 import { SleepTimer, Recorder } from './Playback';
 import { setupMediaSession, updateMediaSession } from './mediaSession';
-import { AMBIENCE_LAYERS } from './engine/ambience';
+import { AMBIENCE_LAYERS, LAYER_PARAMS } from './engine/ambience';
+import { COMMON_PARAMS } from './engine/ambienceSynth';
 import { DiceIcon, SparkIcon } from './icons';
 import { generateSound, newSoundSeed } from './soundGen';
 import { levelPreset } from './engine/loudness';
@@ -331,10 +332,42 @@ const NowPlaying = ({ now, settings, onKeep }) => {
     );
 };
 
+const panLabel = (v) => (Math.abs(v) < 0.05 ? 'centre' : `${v < 0 ? 'left' : 'right'} ${Math.round(Math.abs(v) * 100)}%`);
+// What the common params are called on layers where another word fits.
+const COMMON_LABELS = { wind: { pan: 'Direction' }, thunder: { pan: 'Direction', width: 'Spread' } };
+
+// One layer's shape: its own params (re-rendered: steps of 0.1), then
+// distance, pan and width (live).
+const LayerShape = ({ id, label, shape, onChange }) => {
+    const set = (key, value) => onChange({ ...shape, [key]: value });
+    const names = COMMON_LABELS[id] || {};
+    return (
+        <fieldset className="gen-weights">
+            <legend>{label}</legend>
+            {Object.entries(LAYER_PARAMS[id]).map(([key, spec]) => (
+                <Field key={key} label={`${spec.label} ${Math.round(shape[key] * 100)}%`}>
+                    <input type="range" min="0" max="1" step={spec.render ? 0.1 : 0.05} value={shape[key]} onChange={(e) => set(key, Number(e.target.value))} />
+                </Field>
+            ))}
+            {Object.entries(COMMON_PARAMS).map(([key, spec]) => (
+                <Field key={key} label={`${names[key] || spec.label} ${key === 'pan' ? panLabel(shape.pan) : `${Math.round(shape[key] * 100)}%`}`}>
+                    <input type="range" min={spec.min} max={spec.max} step={key === 'distance' ? 0.05 : 0.1} value={shape[key]} onChange={(e) => set(key, Number(e.target.value))} />
+                </Field>
+            ))}
+        </fieldset>
+    );
+};
+
 // The ambient bed (engine/ambience.js): on / off (as beside Play), a volume
-// for the whole bed against the music, and a slider per layer to balance them.
-const AmbiencePanel = ({ levels, volume, on, onChange, onVolume, onToggle, onRandom }) => (
-    <Panel id="ambience" title="Ambience" onRandom={onRandom} heading={(
+// for the whole bed against the music, and a slider per layer to balance
+// them; under More options, the shape of each layer that is turned up.
+const AmbiencePanel = ({ levels, shape, volume, on, onChange, onShape, onVolume, onToggle, onRandom }) => {
+    const active = Object.entries(AMBIENCE_LAYERS).filter(([id]) => levels[id] > 0);
+    const more = active.length
+        ? active.map(([id, label]) => <LayerShape key={id} id={id} label={label} shape={shape[id]} onChange={(s) => onShape({ ...shape, [id]: s })} />)
+        : <p className="gen-hint">Turn a layer up to shape it: intensity, distance, direction and more.</p>;
+    return (
+    <Panel id="ambience" title="Ambience" onRandom={onRandom} more={more} heading={(
         <>
             Ambience
             <button type="button" className={`gen-part${on ? ' is-on' : ''}`} aria-pressed={on} onClick={onToggle}
@@ -353,7 +386,8 @@ const AmbiencePanel = ({ levels, volume, on, onChange, onVolume, onToggle, onRan
             ))}
         </div>
     </Panel>
-);
+    );
+};
 
 const PART_TITLE = 'Switch on or off: while playing, right away; while stopped, for the next Play. Saved in the link.';
 
@@ -492,6 +526,7 @@ const GenerativeApp = () => {
     // each fits the other's current value; together, the key comes first.
     const randomize = (target, level = randomLevel) => {
         if (target === 'ambience') {
+            update('ambienceShape', randomAmbienceShape(level));
             changeAmbience(randomAmbience(level));
             return;
         }
@@ -739,7 +774,8 @@ const GenerativeApp = () => {
                 </label>
             </Panel>
 
-            <AmbiencePanel levels={settings.ambience} volume={settings.ambienceVolume} on={settings.playAmbience}
+            <AmbiencePanel levels={settings.ambience} shape={settings.ambienceShape} onShape={(s) => update('ambienceShape', s)}
+                volume={settings.ambienceVolume} on={settings.playAmbience}
                 onChange={changeAmbience} onVolume={(v) => update('ambienceVolume', v)} onToggle={() => togglePart('playAmbience')}
                 onRandom={() => randomize('ambience')} />
 

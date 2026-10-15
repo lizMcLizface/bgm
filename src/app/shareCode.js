@@ -2,6 +2,12 @@
 // into bits, then base64url - typically 10-45 characters instead of the
 // hundreds a JSON encoding takes.
 //
+// A link has up to three parts, so its length follows what was changed:
+// m= the music (always: it holds the seed), v= the voices (sounds,
+// volumes, registers), a= the ambience. A part that is all defaults is left
+// out. Links from before the split used a single s= code (version 1,
+// LAYOUT below); they still open.
+//
 // Every value is stored as an index into what its control can show:
 // sliders by their step, selects by option. Values are grouped; a group
 // costs one bit when it is all defaults, and inside a changed group each
@@ -17,6 +23,7 @@ import { METERS } from './meter';
 import { DRIFT_MODES, TEMPO_BOUNDS } from './conductor';
 import { OCTAVE_LIMITS, OCTAVE_WANDER, COUNTER_MODES, SECTION_MODES, SECTION_LENGTHS } from './arranger';
 import { AMBIENCE_LAYERS } from './engine/ambience';
+import { LAYER_PARAMS } from './engine/ambienceSynth';
 import { ROLE_PRESETS } from './presets';
 import { SEED_BITS as SOUND_SEED_BITS } from './soundGen';
 import PROGRESSIONS from './progressions';
@@ -149,13 +156,46 @@ const LATER_GROUPS = [
     CODE_ROLES.map((role) => [['volumes', role], stepped(0, 1, 0.01)]),
 ];
 
-// The order of a code (append only): version, seed, GROUPS, presets of the
-// first three roles, LATER_GROUPS, the second lead's preset.
+// The order of a version 1 (s=) code: version, seed, GROUPS, presets of the
+// first three roles, LATER_GROUPS, the second lead's preset. Frozen: these
+// are only read now.
 const LAYOUT = [
     ['groups', GROUPS],
     ['presets', CODE_ROLES.slice(0, 3)],
     ['groups', LATER_GROUPS],
     ['presets', CODE_ROLES.slice(3)],
+];
+
+// --- version 2: m= / v= / a= ---------------------------------------------
+// Each part is append-only on its own (see top). The music part starts with
+// the version and the seed.
+
+export const PARTS_VERSION = 2;
+const field = (groups, path) => groups.flat().find(([p]) => p.join() === path.join());
+
+const MUSIC_GROUPS = [
+    GROUPS[0], // key, mode, tempo, progression, bars per chord, meter
+    GROUPS[1].filter(([path]) => path[0] !== 'padNotes'), // arrangement
+    GROUPS[3], // drift
+    GROUPS[4], // feel
+    LATER_GROUPS[0].slice(0, 2), // second lead
+    LATER_GROUPS[1], // sections
+];
+const VOICE_GROUPS = [
+    [...voice('pad'), ...voice('bass'), ...voice('lead'), ...voice('counter'), field(GROUPS, ['padNotes'])],
+    LATER_GROUPS[4], // volumes
+];
+const shapeCodec = (key, spec) => {
+    if (key === 'pan') return stepped(-1, 1, 0.1);
+    if (key === 'width' || spec.render) return stepped(0, 1, 0.1);
+    return stepped(0, 1, 0.05);
+};
+const AMBIENCE_GROUPS = [
+    LATER_GROUPS[2], // levels, volume
+    LATER_GROUPS[3], // what Play starts
+    // each layer's shape (engine/ambienceSynth.js): its own params, then distance, pan, width
+    ...Object.keys(AMBIENCE_LAYERS).map((id) => [...Object.entries(LAYER_PARAMS[id]), ['distance', {}], ['pan', {}], ['width', {}]]
+        .map(([key, spec]) => [['ambienceShape', id, key], shapeCodec(key, spec)])),
 ];
 
 class BitWriter {
@@ -297,5 +337,48 @@ export function decodeShareCode(code, defaults) {
     settings.seed = r.read(SEED_BITS);
     const presets = {};
     LAYOUT.forEach(([kind, part]) => (kind === 'groups' ? readGroups(r, part, settings) : readPresets(r, part, presets)));
+    return { settings, presets };
+}
+
+/**
+ * Settings (+ presets, as encodeShareCode) -> { m, v?, a? }: base64url
+ * parts; v and a only when they hold anything but defaults.
+ */
+export function encodeShareParts(settings, defaults, presets = {}) {
+    const m = new BitWriter();
+    m.write(PARTS_VERSION, VERSION_BITS);
+    m.write(settings.seed, SEED_BITS);
+    writeGroups(m, MUSIC_GROUPS, settings, defaults);
+    const v = new BitWriter();
+    writeGroups(v, VOICE_GROUPS, settings, defaults);
+    writePresets(v, CODE_ROLES, presets);
+    const a = new BitWriter();
+    writeGroups(a, AMBIENCE_GROUPS, settings, defaults);
+    const parts = { m: m.toBase64Url() };
+    if (v.toBase64Url()) parts.v = v.toBase64Url();
+    if (a.toBase64Url()) parts.a = a.toBase64Url();
+    return parts;
+}
+
+/**
+ * { m, v, a } (missing parts: defaults) -> { settings, presets } as
+ * decodeShareCode.
+ * @throws on a music part of another version
+ */
+export function decodeShareParts({ m, v, a }, defaults) {
+    const settings = JSON.parse(JSON.stringify(defaults));
+    if (m) {
+        const r = new BitReader(m);
+        if (r.read(VERSION_BITS) !== PARTS_VERSION) throw new Error('Unknown share code version');
+        settings.seed = r.read(SEED_BITS);
+        readGroups(r, MUSIC_GROUPS, settings);
+    }
+    const presets = {};
+    if (v) {
+        const r = new BitReader(v);
+        readGroups(r, VOICE_GROUPS, settings);
+        readPresets(r, CODE_ROLES, presets);
+    }
+    if (a) readGroups(new BitReader(a), AMBIENCE_GROUPS, settings);
     return { settings, presets };
 }

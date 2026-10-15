@@ -1,4 +1,4 @@
-import { randomKey, randomProgression, randomConductor, randomVoices, randomField, randomPreset, randomLength, randomArrangement, randomStyleWeights, randomRole, RANDOM_FIELDS, presetPool, modeQuality, progressionQuality, randomAmbience } from './randomize';
+import { randomKey, randomProgression, randomConductor, randomVoices, randomField, randomPreset, randomLength, randomArrangement, randomStyleWeights, randomRole, RANDOM_FIELDS, presetPool, modeQuality, progressionQuality, randomAmbience, randomAmbienceShape } from './randomize';
 import { defaultSettings, sanitizeSettings } from './settings';
 import { PRESET_CATEGORIES } from './presets';
 import { DEFAULT_DRIFT } from './conductor';
@@ -182,4 +182,17 @@ test('ambience: within reason one or two layers at modest levels, thunder only w
         expect(Object.values(levels).some((v) => v > 0)).toBe(true);
         Object.values(levels).forEach((v) => expect(v).toBeGreaterThanOrEqual(0));
     }
+});
+
+test('ambience shapes: every layer, values in range and on their steps', () => {
+    const rng = seeded(9);
+    ['reason', 'wild'].forEach((level) => {
+        const shape = randomAmbienceShape(level, rng);
+        expect(Object.keys(shape).sort()).toEqual(['fire', 'rain', 'thunder', 'vinyl', 'waves', 'wind']);
+        Object.values(shape).forEach((s) => {
+            expect(s.pan).toBeGreaterThanOrEqual(-1);
+            expect(s.pan).toBeLessThanOrEqual(1);
+            [s.distance, s.width].forEach((v) => { expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
+        });
+    });
 });

@@ -1,7 +1,7 @@
 import { defaultSettings, sanitizeSettings, encodeSettings, decodeSettings, decodeShare, settingsFromLocation, shareFromLocation, shareUrl } from './settings';
 import { randomKey, randomProgression, randomConductor, randomVoices } from './randomize';
 import { PRESET_CATEGORIES, GENERATIVE_PRESETS } from './presets';
-import { SHAREABLE_PRESETS } from './shareCode';
+import { SHAREABLE_PRESETS, encodeShareCode } from './shareCode';
 import presetData from '../util/presetData';
 import { seeded } from './random';
 
@@ -27,12 +27,37 @@ test('codes only carry what differs from the defaults', () => {
     expect(encodeSettings({ ...defaultSettings(), seed: 2 ** 31 - 1, tonic: 5 }).length).toBeLessThanOrEqual(12);
 });
 
-test('links read unchanged values against a fixed baseline: sections stay off in older links', () => {
+test('older s= links read unchanged values against their own baseline: sections stay off', () => {
     expect(defaultSettings().sections.mode).toBe('gentle');
     const off = { ...defaultSettings(), seed: 7, sections: { mode: 'off', phrases: 4 } };
-    const code = encodeSettings(off);
-    expect(code.length).toBeLessThanOrEqual(6);
-    expect(decodeSettings(code).sections).toEqual({ mode: 'off', phrases: 4 });
+    const legacy = encodeShareCode(off, off); // as made before sections defaulted to gentle
+    expect(legacy.length).toBeLessThanOrEqual(6);
+    expect(shareFromLocation({ search: `?s=${legacy}` }).settings.sections).toEqual({ mode: 'off', phrases: 4 });
+});
+
+test('links come in parts: m= always, v= and a= only for what changed', () => {
+    const base = { ...defaultSettings(), seed: 7 };
+    expect(encodeSettings(base)).toMatch(/^m=[\w-]+$/);
+    expect(encodeSettings({ ...base, volumes: { ...base.volumes, pad: 0.3 } })).toMatch(/^m=[\w-]+&v=[\w-]+$/);
+    expect(encodeSettings({ ...base, ambience: { ...base.ambience, rain: 0.5 } })).toMatch(/^m=[\w-]+&a=[\w-]+$/);
+    // the music part doesn't change with the voices or the ambience
+    const music = (code) => code.split('&')[0];
+    expect(music(encodeSettings({ ...base, volumes: { ...base.volumes, pad: 0.3 }, ambience: { ...base.ambience, wind: 0.2 } }))).toBe(music(encodeSettings(base)));
+});
+
+test('ambience shapes travel in the a= part', () => {
+    const base = defaultSettings();
+    const settings = {
+        ...base,
+        seed: 5,
+        ambience: { ...base.ambience, rain: 0.45, thunder: 0.3 },
+        ambienceShape: {
+            ...base.ambienceShape,
+            rain: { ...base.ambienceShape.rain, intensity: 0.8, drops: 0.2, distance: 0.35, pan: -0.4, width: 0.6 },
+            thunder: { ...base.ambienceShape.thunder, frequency: 0.75, intensity: 0.9 },
+        },
+    };
+    expect(decodeSettings(encodeSettings(settings))).toEqual(settings);
 });
 
 test('voice volumes travel in links', () => {
@@ -112,9 +137,10 @@ test('garbage codes are rejected; the query parameter (and legacy hash) is found
     expect(settingsFromLocation({ search: '', hash: `#/generative?s=${code}` }).tonic).toBe(4);
 });
 
-test('share URLs use the page path and an s= query parameter', () => {
+test('share URLs use the page path and the m= (v=, a=) parameters', () => {
     const url = shareUrl({ ...defaultSettings(), seed: 1 }, {}, { origin: 'https://calmbgm.com', pathname: '/' });
-    expect(url).toMatch(/^https:\/\/calmbgm\.com\/\?s=[A-Za-z0-9_-]+$/);
+    expect(url).toMatch(/^https:\/\/calmbgm\.com\/\?m=[A-Za-z0-9_-]+$/);
+    expect(shareFromLocation({ search: url.split('/')[3] }).settings.seed).toBe(1);
 });
 
 test('every built-in preset can be named in a link', () => {
@@ -125,7 +151,7 @@ test('every built-in preset can be named in a link', () => {
 test('links carry generated sounds as role + seed', () => {
     const presets = { lead: { generated: { role: 'lead', seed: 0xabcdef } }, pad: { generated: { role: 'bass', seed: 1 } }, bass: 'Deep Pulse' };
     const code = encodeSettings({ ...defaultSettings(), seed: 9 }, presets);
-    expect(code.length).toBeLessThan(25);
+    expect(code.length).toBeLessThan(30);
     expect(decodeShare(code).presets).toEqual(presets);
 });
 

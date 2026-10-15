@@ -47,7 +47,7 @@ const PLAN_KEEP_BARS = 4;
 // Settings that define "home"; changing one resets drift to it.
 const HOME_KEYS = new Set(['tonic', 'mode', 'progression', 'bpm', 'barsPerChord']);
 // Settings that don't change what is planned.
-const SOUND_KEYS = new Set(['ambience', 'ambienceVolume', 'playMusic', 'playAmbience', 'volumes']);
+const SOUND_KEYS = new Set(['ambience', 'ambienceShape', 'ambienceVolume', 'playMusic', 'playAmbience', 'volumes']);
 
 // Ambience volume slider (0..1) to gain: 0.8, the default, is unity.
 const ambienceGain = (volume) => Math.pow(volume / 0.8, 2);
@@ -98,6 +98,7 @@ class Generator {
         this.ambienceOut.connect(masterBus);
         this.ambience = new Ambience({ context: this.AC, seed: 1 });
         this.ambience.connect(this.ambienceOut);
+        this.ambience.setShape(this.settings.ambienceShape);
         this.ambience.setLevels(this.settings.ambience);
 
         this.reset();
@@ -309,6 +310,7 @@ class Generator {
     set(key, value) {
         this.settings[key] = value;
         if (key === 'ambience') this.ambience.setLevels(value);
+        if (key === 'ambienceShape') this.ambience.setShape(value);
         if (key === 'ambienceVolume') this.setAmbienceVolume(value);
         if (key === 'volumes') this.applyVolumes();
         if (SOUND_KEYS.has(key)) return;
@@ -344,6 +346,7 @@ class Generator {
     setMany(patch) {
         const meterChanged = 'meter' in patch && patch.meter !== this.settings.meter;
         Object.assign(this.settings, patch);
+        if ('ambienceShape' in patch) this.ambience.setShape(this.settings.ambienceShape);
         if ('ambience' in patch) this.ambience.setLevels(this.settings.ambience);
         if ('ambienceVolume' in patch) this.setAmbienceVolume(this.settings.ambienceVolume);
         if ('volumes' in patch) this.applyVolumes();

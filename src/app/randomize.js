@@ -17,6 +17,7 @@ import { PRESET_CATEGORIES, ROLE_CATEGORY } from './presets';
 import { presetGroups } from './editor/presetStore';
 import { chance, pick, weighted } from './random';
 import { AMBIENCE_LAYERS } from './engine/ambience';
+import { LAYER_PARAMS, defaultShape } from './engine/ambienceSynth';
 
 const AMBIENCE_IDS = Object.keys(AMBIENCE_LAYERS);
 
@@ -278,6 +279,26 @@ export function randomAmbience(level, rng = Math.random) {
     }
     if ((levels.rain || levels.wind) && chance(rng, 0.35)) levels.thunder = step(between(rng, 0.3, 0.6), 0.05);
     return levels;
+}
+
+/**
+ * Layer shapes to go with randomAmbience. Within reason each param moves a
+ * little from its default, layers stay fairly close, centred and wide (wind
+ * may blow from a side); full random anything.
+ */
+export function randomAmbienceShape(level, rng = Math.random) {
+    const wild = level === 'wild';
+    return Object.fromEntries(AMBIENCE_IDS.map((id) => {
+        const shape = defaultShape(id);
+        Object.entries(LAYER_PARAMS[id]).forEach(([key, spec]) => {
+            shape[key] = step(wild ? rng() : clamp01(spec.default + between(rng, -0.25, 0.25)), 0.1);
+        });
+        shape.distance = step(wild ? rng() : between(rng, 0, 0.3), 0.05);
+        const side = id === 'wind' ? 0.6 : 0.3;
+        shape.pan = step(wild ? between(rng, -1, 1) : between(rng, -side, side), 0.1);
+        shape.width = step(wild ? rng() : between(rng, 0.7, 1), 0.1);
+        return [id, shape];
+    }));
 }
 
 /** Lead activity, pad thinning, pad and bass styles, feel, second lead and sections. */

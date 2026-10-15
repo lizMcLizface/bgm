@@ -2,8 +2,61 @@
 // from noise. Pure: no Web Audio here, so it runs in a worker
 // (ambience.worker.js) and in tests. Slow movement - gusts, swells,
 // flicker, rolls - is computed every CONTROL samples, not every sample.
+//
+// Each layer has a shape (LAYER_PARAMS): the `render` parameters change
+// what is generated, so they re-render the loop; the others, and the
+// distance / pan / width every layer has (COMMON_PARAMS), act live on the
+// audio. All are 0..1 (pan -1..1), with defaults that make the layer's
+// usual sound. Loudness is normalised against the defaults, so "more
+// intense" does play louder.
 
 import { seeded } from '../random';
+
+/** Per layer: param -> { label, default, render? (re-renders the loop) }. */
+export const LAYER_PARAMS = {
+    rain: {
+        intensity: { label: 'Intensity', default: 0.5, render: true },
+        drops: { label: 'Drop size', default: 0.4, render: true },
+    },
+    thunder: {
+        frequency: { label: 'How often', default: 0.4 },
+        intensity: { label: 'Intensity', default: 0.5 },
+    },
+    wind: {
+        speed: { label: 'Speed', default: 0.4, render: true },
+        gusts: { label: 'Gustiness', default: 0.5, render: true },
+    },
+    waves: {
+        period: { label: 'Wave length', default: 0.5, render: true },
+        size: { label: 'Wave size', default: 0.5, render: true },
+    },
+    fire: {
+        crackle: { label: 'Crackle', default: 0.5, render: true },
+        roar: { label: 'Roar', default: 0.5, render: true },
+    },
+    vinyl: {
+        crackle: { label: 'Crackle', default: 0.4, render: true },
+        hiss: { label: 'Hiss', default: 0.4, render: true },
+    },
+};
+
+/** Every layer, live: how far away (muffled), where, how wide. */
+export const COMMON_PARAMS = {
+    distance: { label: 'Distance', default: 0, min: 0, max: 1 },
+    pan: { label: 'Pan', default: 0, min: -1, max: 1 },
+    width: { label: 'Width', default: 1, min: 0, max: 1 },
+};
+
+/** A layer's full default shape: its own params and the common ones. */
+export function defaultShape(id) {
+    return Object.fromEntries([...Object.entries(LAYER_PARAMS[id]), ...Object.entries(COMMON_PARAMS)].map(([key, { default: d }]) => [key, d]));
+}
+
+/** The params of `shape` that need a re-render, rounded to the 0.1 steps a loop is cached at. */
+export function renderParams(id, shape = {}) {
+    return Object.fromEntries(Object.entries(LAYER_PARAMS[id]).filter(([, spec]) => spec.render)
+        .map(([key, spec]) => [key, Math.round((shape[key] ?? spec.default) * 10) / 10]));
+}
 
 const CROSSFADE = 1; // seconds, across each loop point
 const TWO_PI = 2 * Math.PI;
@@ -75,42 +128,54 @@ function periodicCurve(rng, period, harmonics) {
     return (t) => parts.reduce((sum, p) => sum + p.weight * Math.sin(TWO_PI * p.cycles * t / period + p.phase), 0) / norm;
 }
 
-// Adds a decaying noise burst (a click, a drop, a pop) at sample `at`.
-function addBurst(channel, rng, at, length, amp) {
+// Adds a decaying noise burst (a click, a drop, a pop) at sample `at`,
+// rising over `attack` samples (0: an instant click).
+function addBurst(channel, rng, at, length, amp, attack = 0) {
     const end = Math.min(channel.length, at + length);
     const factor = Math.exp(-4 / Math.max(4, length));
     let level = amp;
     for (let i = at; i < end; i++) {
-        channel[i] += level * white(rng);
+        const rise = attack > 0 && i - at < attack ? (i - at + 1) / attack : 1;
+        channel[i] += level * rise * white(rng);
         level *= factor;
     }
 }
 
 // --- layers ------------------------------------------------------------
 // Each returns [left, right] of `seconds + CROSSFADE` (looped layers) or
-// `seconds` (thunder), at sampleRate.
+// `seconds` (thunder), at sampleRate; `p` is renderParams() of the shape.
 
 export const LAYERS = {
     rain: {
         seconds: 19,
         level: 0.07,
-        render(sampleRate, rng, n) {
+        // A soft hiss and many drops. The drops rise over a fraction of a
+        // millisecond and sit in 0.9-4 kHz (bigger drops lower): patter,
+        // not ticks - the old version's sharp 1.8 kHz-and-up clicks read as
+        // harsh.
+        render(sampleRate, rng, n, period, p) {
+            const perSecond = 260 * (0.25 + 1.5 * p.intensity);
+            const bedLevel = 0.5 * (0.4 + 1.2 * p.intensity);
+            const top = 4200 - 1800 * p.drops;
             return [0, 1].map(() => {
                 const out = new Float32Array(n);
                 const pink = pinkNoise(rng);
-                const hp = onePole(500, sampleRate);
-                const lp1 = onePole(6500, sampleRate);
-                const lp2 = onePole(6500, sampleRate);
-                for (let i = 0; i < n; i++) out[i] = lp2(lp1(hp.high(pink()))) * 0.6;
-                // drops: many tiny ticks, a few closer and louder ones
+                const hp = onePole(400, sampleRate);
+                const lp1 = onePole(4000, sampleRate);
+                const lp2 = onePole(4000, sampleRate);
+                for (let i = 0; i < n; i++) out[i] = lp2(lp1(hp.high(pink()))) * bedLevel;
                 const drops = new Float32Array(n);
-                const count = Math.round(n / sampleRate * 260);
+                const count = Math.round(n / sampleRate * perSecond);
+                const attack = Math.round(sampleRate * 0.0004);
                 for (let k = 0; k < count; k++) {
-                    const amp = 0.04 + 0.6 * Math.pow(rng(), 5);
-                    addBurst(drops, rng, Math.floor(rng() * n), Math.round(sampleRate * (0.0008 + 0.004 * rng())), amp);
+                    const amp = (0.03 + 0.3 * Math.pow(rng(), 6)) * (0.6 + p.drops);
+                    const length = Math.round(sampleRate * (0.001 + 0.005 * (0.3 + p.drops) * rng()));
+                    addBurst(drops, rng, Math.floor(rng() * n), length, amp, attack);
                 }
-                const tick = onePole(1800, sampleRate);
-                for (let i = 0; i < n; i++) out[i] += tick.high(drops[i]);
+                const low = onePole(900, sampleRate);
+                const high1 = onePole(top, sampleRate);
+                const high2 = onePole(top, sampleRate);
+                for (let i = 0; i < n; i++) out[i] += high2(high1(low.high(drops[i]))) * 1.6;
                 return out;
             });
         },
@@ -119,8 +184,13 @@ export const LAYERS = {
     wind: {
         seconds: 29,
         level: 0.06,
-        render(sampleRate, rng, n, period) {
-            const gust = periodicCurve(rng, period, [[2, 1], [5, 0.6], [11, 0.3], [17, 0.15]]);
+        render(sampleRate, rng, n, period, p) {
+            // faster wind: quicker gusts (whole cycles per loop, so it still loops) and a higher whistle
+            const pace = 0.5 + 1.25 * p.speed;
+            const gust = periodicCurve(rng, period, [[2, 1], [5, 0.6], [11, 0.3], [17, 0.15]].map(([c, w]) => [Math.max(1, Math.round(c * pace)), w]));
+            const depth = 0.2 + 0.5 * p.gusts;
+            const pitch = 150 + 200 * p.speed;
+            const sweep = 500 + 600 * p.speed;
             return [0, 0.35].map((lag) => {
                 const out = new Float32Array(n);
                 const pink = pinkNoise(rng);
@@ -131,9 +201,9 @@ export const LAYERS = {
                 let level = 0;
                 for (let i = 0; i < n; i++) {
                     if (i % CONTROL === 0) {
-                        g = Math.max(0.08, 0.55 + 0.45 * gust(i / sampleRate - lag));
+                        g = Math.max(0.08, 0.55 + depth * gust(i / sampleRate - lag));
                         level = Math.pow(g, 1.5) * 2.2;
-                        bp.setCutoff(220 + 750 * g * g);
+                        bp.setCutoff(pitch + sweep * g * g);
                     }
                     out[i] = bp(pink()) * level + rumble(brown()) * 0.5 * g;
                 }
@@ -145,15 +215,18 @@ export const LAYERS = {
     waves: {
         seconds: 31,
         level: 0.1,
-        render(sampleRate, rng, n, period) {
-            // 3-4 waves splitting the loop; each crashes in over ~2 s and
-            // washes out. Wave tails reach into the next loop (k - 1 copy).
-            const count = 3 + Math.floor(rng() * 2);
+        render(sampleRate, rng, n, period, p) {
+            // 2-7 waves splitting the loop (3-4 by default; longer waves,
+            // fewer); each crashes in and washes out. Wave tails reach into
+            // the next loop (k - 1 copy).
+            const count = Math.max(2, Math.round(6 - 6 * p.period + rng() * 0.99));
+            const stretch = 0.6 + 0.8 * p.period;
+            const peak = 0.4 + 1.2 * p.size;
             const cuts = Array.from({ length: count }, () => 0.6 + rng() * 0.8);
             const sum = cuts.reduce((a, b) => a + b, 0);
             let at = rng() * 3;
             const waves = cuts.map((c) => {
-                const wave = { at, rise: 1.4 + rng() * 1.2, decay: 2 + rng() * 2, size: 0.7 + rng() * 0.3 };
+                const wave = { at, rise: (1.4 + rng() * 1.2) * stretch, decay: (2 + rng() * 2) * stretch, size: (0.7 + rng() * 0.3) * peak };
                 at += (c / sum) * period;
                 return wave;
             });
@@ -190,11 +263,11 @@ export const LAYERS = {
     fire: {
         seconds: 23,
         level: 0.05,
-        render(sampleRate, rng, n, period) {
+        render(sampleRate, rng, n, period, p) {
             const flicker = periodicCurve(rng, period, [[3, 1], [7, 0.7], [13, 0.5], [29, 0.3]]);
             const crackles = [new Float32Array(n), new Float32Array(n)];
             // clusters of pops, and now and then a bigger snap
-            const clusters = Math.round(n / sampleRate * 3.5);
+            const clusters = Math.round(n / sampleRate * 7 * p.crackle);
             for (let k = 0; k < clusters; k++) {
                 const start = Math.floor(rng() * n);
                 const pops = 1 + Math.floor(rng() * 6);
@@ -207,7 +280,8 @@ export const LAYERS = {
                     addBurst(crackles[1], rng, at, length, amp * pan * 2);
                 }
             }
-            const snaps = Math.round(n / sampleRate * 0.25);
+            const snaps = Math.round(n / sampleRate * 0.5 * p.crackle);
+            const roarLevel = 2.8 * p.roar;
             for (let k = 0; k < snaps; k++) {
                 const at = Math.floor(rng() * n);
                 const length = Math.round(sampleRate * (0.003 + 0.004 * rng()));
@@ -223,7 +297,7 @@ export const LAYERS = {
                 let f = 0;
                 for (let i = 0; i < n; i++) {
                     if (i % CONTROL === 0) f = 0.65 + 0.35 * flicker(i / sampleRate);
-                    out[i] = roar2(roar(brown())) * 1.4 * f + hiss.high(white(rng)) * 0.015 * f + click.high(crackle[i]);
+                    out[i] = roar2(roar(brown())) * roarLevel * f + hiss.high(white(rng)) * 0.015 * f + click.high(crackle[i]);
                 }
                 return out;
             });
@@ -235,13 +309,15 @@ export const LAYERS = {
         // comes round every turn stays in step across the loop
         seconds: 18,
         level: 0.035,
-        render(sampleRate, rng, n) {
+        render(sampleRate, rng, n, period, p) {
             const clicks = new Float32Array(n);
-            const count = Math.round(n / sampleRate * 28);
+            const amount = p.crackle / 0.4;
+            const count = Math.round(n / sampleRate * 28 * amount);
             for (let k = 0; k < count; k++) {
                 addBurst(clicks, rng, Math.floor(rng() * n), Math.round(sampleRate * (0.0001 + 0.0004 * rng())), 0.03 + 0.25 * Math.pow(rng(), 4));
             }
-            const pops = Math.round(n / sampleRate * 0.7);
+            const pops = Math.round(n / sampleRate * 0.7 * amount);
+            const hissLevel = 0.08 * (p.hiss / 0.4);
             for (let k = 0; k < pops; k++) {
                 addBurst(clicks, rng, Math.floor(rng() * n), Math.round(sampleRate * (0.0006 + 0.001 * rng())), 0.3 + 0.4 * rng());
             }
@@ -251,7 +327,7 @@ export const LAYERS = {
                 const lp = onePole(5000, sampleRate);
                 const hp = onePole(700, sampleRate);
                 const warm = onePole(6000, sampleRate);
-                for (let i = 0; i < n; i++) out[i] = hp.high(lp(white(rng))) * 0.08 + warm(clicks[i]) * (0.9 + 0.2 * rng());
+                for (let i = 0; i < n; i++) out[i] = hp.high(lp(white(rng))) * hissLevel + warm(clicks[i]) * (0.9 + 0.2 * rng());
                 return out;
             });
         },
@@ -322,11 +398,27 @@ function seamless(channels, sampleRate) {
     });
 }
 
+function renderLoop(id, sampleRate, p) {
+    const layer = LAYERS[id];
+    const n = Math.round((layer.seconds + CROSSFADE) * sampleRate);
+    return seamless(layer.render(sampleRate, seeded(id.length * 7919 + 17), n, layer.seconds, p), sampleRate);
+}
+
+// Loudness of each layer at its default shape, per sample rate.
+const references = new Map();
+function referenceRms(id, sampleRate) {
+    const key = `${sampleRate}:${id}`;
+    if (!references.has(key)) references.set(key, rms(renderLoop(id, sampleRate, renderParams(id))));
+    return references.get(key);
+}
+
 /**
- * A layer's samples: [left, right] of a seamless loop, normalised to the
- * layer's level - or for 'thunder', one [left, right] per variant.
+ * A layer's samples: [left, right] of a seamless loop at the layer's
+ * level (as loud as its defaults make it, scaled by what the params change)
+ * - or for 'thunder', one [left, right] per variant.
+ * @param {object} [params] - the layer's shape (only its render params matter)
  */
-export function renderLayer(id, sampleRate) {
+export function renderLayer(id, sampleRate, params = {}) {
     if (id === 'thunder') {
         return Array.from({ length: THUNDER.variants }, (_, v) => {
             const channels = THUNDER.render(sampleRate, seeded(0x7d4 + v), Math.round(THUNDER.seconds * sampleRate));
@@ -335,9 +427,9 @@ export function renderLayer(id, sampleRate) {
             return channels.map((c) => c.map((x) => (x / (peak || 1)) * THUNDER.level));
         });
     }
-    const layer = LAYERS[id];
-    const n = Math.round((layer.seconds + CROSSFADE) * sampleRate);
-    const channels = seamless(layer.render(sampleRate, seeded(id.length * 7919 + 17), n, layer.seconds), sampleRate);
-    const gain = layer.level / rms(channels);
+    const p = renderParams(id, params);
+    const channels = renderLoop(id, sampleRate, p);
+    const isDefault = Object.entries(p).every(([key, v]) => v === renderParams(id)[key]);
+    const gain = LAYERS[id].level / (isDefault ? rms(channels) : referenceRms(id, sampleRate));
     return channels.map((c) => c.map((x) => Math.max(-0.95, Math.min(0.95, x * gain))));
 }

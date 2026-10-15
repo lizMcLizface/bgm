@@ -27,7 +27,11 @@ synthesised with the Web Audio API; there are no samples.
   and breakdown - voices come and go, the lead plays more or less
 - Ambience under the music - rain, distant thunder, wind, waves, a
   fireplace, vinyl crackle - synthesised from noise (no recordings), each
-  with its own level, plus a volume for the whole bed against the music;
+  with its own level, plus a volume for the whole bed against the music.
+  Each layer can be shaped - rain intensity and drop size, how often and
+  how hard it thunders, wind speed and gustiness, wave length and size,
+  fire crackle and roar, vinyl crackle and hiss - and placed: distance,
+  pan (wind and thunder: direction) and stereo width;
   it plays with the music or on its own. "Music" and "Ambience" beside
   Play choose what Play starts (switching live while playing) and are
   part of the link; new visits play music only. Turning a layer up while
@@ -59,10 +63,12 @@ synthesised with the Web Audio API; there are no samples.
 - Randomize key & scale, progression, conductor, voices or everything at
   once - "within reason" (near the defaults, minor progressions in minor
   modes, lead sounds on the lead) or "full random"
-- Share links: the address bar always holds the current settings, the
-  presets and volumes per voice (built-in or generated sounds) and a random seed in a short code (`?s=FWfOUc`
-  for defaults, ~30 characters fully randomized), so a link plays the same
-  piece for whoever opens it
+- Share links: the address bar always holds the current settings in
+  short codes, so a link plays the same piece for whoever opens it. A link
+  has up to three parts, present only when they differ from the defaults:
+  `m=` the music (with the random seed: about 6 characters for the defaults),
+  `v=` the voices (sounds, volumes, registers) and `a=` the ambience.
+  Older `?s=` links still open
 - An audio-thread load meter with a choice of output buffer size (larger
   buffers stop crackling on slow machines), and a light / dark / system
   theme

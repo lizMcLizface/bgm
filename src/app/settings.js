@@ -13,13 +13,14 @@ import {
     DEFAULT_PAD_WEIGHTS, DEFAULT_BASS_WEIGHTS, DEFAULT_VOICES, OCTAVE_LIMITS, OCTAVE_WANDER,
     DEFAULT_COUNTER, COUNTER_MODES, DEFAULT_SECTIONS, SECTION_MODES, SECTION_LENGTHS,
 } from './arranger';
-import { AMBIENCE_LAYERS, DEFAULT_AMBIENCE } from './engine/ambience';
+import { AMBIENCE_LAYERS, DEFAULT_AMBIENCE, defaultAmbienceShape } from './engine/ambience';
+import { LAYER_PARAMS, COMMON_PARAMS } from './engine/ambienceSynth';
 import { ROLE_VOLUMES } from './presets';
 import { DEFAULT_DRIFT, DRIFT_MODES, TEMPO_BOUNDS } from './conductor';
 import { METERS, DEFAULT_METER } from './meter';
 import { SCALE_FAMILIES } from './theory';
 import PROGRESSIONS from './progressions';
-import { encodeShareCode, decodeShareCode } from './shareCode';
+import { decodeShareCode, encodeShareParts, decodeShareParts } from './shareCode';
 
 /** Fresh default settings (a new random seed each call). */
 export function defaultSettings() {
@@ -41,6 +42,7 @@ export function defaultSettings() {
         counter: { ...DEFAULT_COUNTER }, // second lead (arranger.js)
         sections: { ...DEFAULT_SECTIONS, mode: 'gentle' }, // intro / build / full / breakdown (new visits: gentle, to open with an intro)
         ambience: { ...DEFAULT_AMBIENCE }, // rain, wind, ... levels 0..1 (engine/ambience.js)
+        ambienceShape: defaultAmbienceShape(), // per layer: its own params, distance, pan, width (engine/ambienceSynth.js)
         ambienceVolume: 0.8, // the whole bed against the music
         playMusic: true, // what Play starts
         playAmbience: false,
@@ -93,6 +95,10 @@ const RULES = {
     counter: { mode: oneOf(Object.keys(COUNTER_MODES)), activity: clamp(0, 1) },
     sections: { mode: oneOf(Object.keys(SECTION_MODES)), phrases: oneOf(SECTION_LENGTHS) },
     ambience: Object.fromEntries(Object.keys(AMBIENCE_LAYERS).map((id) => [id, clamp(0, 1)])),
+    ambienceShape: Object.fromEntries(Object.keys(AMBIENCE_LAYERS).map((id) => [id, Object.fromEntries([
+        ...Object.keys(LAYER_PARAMS[id]).map((key) => [key, clamp(0, 1)]),
+        ...Object.entries(COMMON_PARAMS).map(([key, { min, max }]) => [key, clamp(min, max)]),
+    ])])),
     ambienceVolume: clamp(0, 1),
     playMusic: bool,
     playAmbience: bool,
@@ -122,12 +128,15 @@ export function sanitizeSettings(raw, defaults = defaultSettings()) {
 // Links made before shareCode.js: base64url of JSON.
 const fromBase64Url = (code) => decodeURIComponent(escape(atob(code.replace(/-/g, '+').replace(/_/g, '/'))));
 
-// What a link's unchanged values mean. Fixed: when the defaults for new
-// visits change (sections went from off to gentle), links made before
-// must still read the same.
-function linkBaseline() {
+// What a link's unchanged values mean. Fixed per format: when the
+// defaults for new visits change, links made before must still read the
+// same. s= links (version 1) predate sections being on by default; m= / v=
+// / a= links (version 2) read against today's defaults - change one, and
+// freeze the old value here.
+function legacyBaseline() {
     return { ...defaultSettings(), sections: { ...DEFAULT_SECTIONS } };
 }
+const PARTS = ['m', 'v', 'a'];
 
 /**
  * Settings (+ role -> built-in preset name) -> short URL-safe string.
@@ -135,7 +144,8 @@ function linkBaseline() {
  * @param {object} [presets] - names that aren't built-in presets are left out
  */
 export function encodeSettings(settings, presets) {
-    return encodeShareCode(settings, linkBaseline(), presets);
+    const parts = encodeShareParts(settings, defaultSettings(), presets);
+    return PARTS.filter((key) => parts[key]).map((key) => `${key}=${parts[key]}`).join('&');
 }
 
 /**
@@ -144,8 +154,13 @@ export function encodeSettings(settings, presets) {
  */
 export function decodeShare(code) {
     try {
+        if (code.includes('=')) {
+            const query = new URLSearchParams(code);
+            const { settings, presets } = decodeShareParts(Object.fromEntries(PARTS.map((key) => [key, query.get(key)])), defaultSettings());
+            return { settings: sanitizeSettings(settings), presets };
+        }
         if (code.startsWith('eyJ')) return { settings: sanitizeSettings(JSON.parse(fromBase64Url(code))), presets: {} };
-        const { settings, presets } = decodeShareCode(code, linkBaseline());
+        const { settings, presets } = decodeShareCode(code, legacyBaseline());
         return { settings: sanitizeSettings(settings), presets };
     } catch (e) {
         return null;
@@ -165,6 +180,8 @@ const codeFromLocation = ({ search = '', hash = '' }) => new URLSearchParams(sea
 
 /** { settings, presets } from a share link, or null when there is none or it can't be read. */
 export function shareFromLocation(location) {
+    const query = new URLSearchParams(location.search || '');
+    if (PARTS.some((key) => query.has(key))) return decodeShare(PARTS.filter((key) => query.has(key)).map((key) => `${key}=${query.get(key)}`).join('&'));
     const code = codeFromLocation(location);
     return code ? decodeShare(code) : null;
 }
@@ -177,7 +194,7 @@ export function settingsFromLocation(location) {
 
 /** The share link's path + query for the current page. */
 export function sharePath(settings, presets, location = window.location) {
-    return `${location.pathname}?s=${encodeSettings(settings, presets)}`;
+    return `${location.pathname}?${encodeSettings(settings, presets)}`;
 }
 
 /** Full share URL for the current page and settings. */

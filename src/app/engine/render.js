@@ -144,6 +144,7 @@ export async function renderWav(gen, seconds, { onProgress = () => {}, signal } 
         }
         if (Object.values(ambience).some((level) => level > 0)) {
             const bed = new Ambience({ context: ctx, seed: 1 });
+            bed.setShape(gen.settings.ambienceShape);
             bed.setLevels(ambience);
             await bed.prepare();
             const volume = ctx.createGain();
