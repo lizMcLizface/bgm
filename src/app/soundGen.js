@@ -135,3 +135,104 @@ export function generateSound(role, seed) {
 }
 
 export const SOUND_ROLES = Object.keys(RECIPES);
+
+// --- ensembles: every voice at once, with a shared character -------------
+// One seed makes a palette - a family of waveforms, how bright, which
+// reverb and how much, a shared modulation effect, how soft the attacks
+// are, echoes and vibrato for the melodic voices. Each role's recipe then
+// runs as usual (with a seed derived from the ensemble's) and takes on the
+// palette, within what suits the role. The voices sound like one band;
+// a single voice's generate (generateSound) is unchanged.
+//
+// As with the recipes: changing what an ensemble seed makes changes every
+// shared ensemble - only together with a new ENSEMBLE_VERSION.
+
+export const ENSEMBLE_VERSION = 1;
+const ENSEMBLE_ROLES = ['pad', 'bass', 'lead', 'counter'];
+
+/** The shared character of an ensemble seed. */
+export function ensemblePalette(seed) {
+    const { range, maybe, pick, weighted } = tools(seeded(seed ^ 0x2545f491));
+    return {
+        family: weighted({ smooth: 3, warm: 3, bright: 2 }),
+        brightness: range(0.6, 1.5),
+        reverbType: pick(['reverb1', 'reverb3', 'reverb4', 'reverb6']),
+        space: range(0.5, 1.6),
+        motion: weighted({ chorus: 3, phaser: 2, none: 2 }),
+        motionRate: range(0.15, 0.7),
+        softness: range(0.7, 1.6),
+        echo: maybe(0.5) ? { time: pick([0.25, 0.33, 0.375, 0.5]), feedback: range(0.2, 0.4) } : null,
+        vibrato: maybe(0.5) ? range(3, 8, 1) : 0,
+    };
+}
+
+const FAMILIES = {
+    smooth: { sine: 3, triangle: 2 },
+    warm: { triangle: 3, square_dc: 2, sine: 1 },
+    bright: { sawtooth: 3, square_dc: 2, triangle: 1 },
+};
+// The recipes' filter ranges per role, [lo, hi] at brightness 0 and their
+// slopes - to re-aim a filter when the waveform changes.
+const FILTER_AIM = { pad: [5000, 3350], bass: [1200, 675], lead: [7500, 4500], counter: [7500, 4500] };
+const aim = (role, wave) => FILTER_AIM[role][0] - FILTER_AIM[role][1] * BRIGHT[wave];
+const MOTION_AMOUNT = { pad: 0.3, bass: 0.08, lead: 0.2, counter: 0.2 };
+const clampTo = (lo, hi) => (v) => Math.min(hi, Math.max(lo, v));
+
+function applyPalette(role, p, pal, { range, weighted }) {
+    const wave = p.vcoType;
+    p.vcoType = weighted(FAMILIES[pal.family]);
+    if (p.vcoType === 'square_dc' && p.vcoDutyCycle === undefined) p.vcoDutyCycle = range(0.25, 0.45);
+    if (p.vcoType !== 'square_dc') delete p.vcoDutyCycle;
+    const top = role === 'bass' ? 1450 : 11000;
+    p.filterFreq = round(clampTo(250, top)(p.filterFreq * (aim(role, p.vcoType) / aim(role, wave)) * pal.brightness), 0);
+
+    if (role !== 'bass' || p.reverbAmount) {
+        p.reverbType = role === 'bass' ? 'reverb1' : pal.reverbType;
+        p.reverbAmount = round(clampTo(0.02, role === 'bass' ? 0.1 : 0.6)((p.reverbAmount || 0.05) * pal.space));
+    }
+
+    ['chorus', 'phaser'].forEach((fx) => Object.keys(p).filter((k) => k.startsWith(fx)).forEach((k) => delete p[k]));
+    if (pal.motion === 'chorus') Object.assign(p, { chorusAmount: MOTION_AMOUNT[role], chorusRate: round(pal.motionRate) });
+    if (pal.motion === 'phaser') Object.assign(p, { phaserAmount: MOTION_AMOUNT[role], phaserRate: round(pal.motionRate * 0.5), phaserDepth: 600 });
+
+    if (role === 'bass') {
+        p.gainRelease = round(clampTo(0.08, 0.5)(p.gainRelease * Math.min(pal.softness, 1.2)));
+    } else {
+        p.gainAttack = round(clampTo(role === 'pad' ? 0.6 : 0.005, role === 'pad' ? 4 : 0.3)(p.gainAttack * pal.softness), 3);
+        p.gainRelease = round(clampTo(0.2, 5)(p.gainRelease * pal.softness));
+    }
+
+    if (role === 'lead' || role === 'counter') {
+        ['delayTime', 'delayFeedback', 'delayAmount'].forEach((k) => delete p[k]);
+        if (pal.echo) Object.assign(p, { delayTime: pal.echo.time, delayFeedback: round(pal.echo.feedback), delayAmount: role === 'lead' ? 0.18 : 0.12 });
+        delete p.vibratoDepth;
+        delete p.vibratoRate;
+        if (pal.vibrato) Object.assign(p, { vibratoDepth: pal.vibrato, vibratoRate: 4.6 });
+    }
+    return p;
+}
+
+// Each voice's own seed in an ensemble.
+const memberSeed = (ensemble, role) => (Math.imul(ensemble ^ 0x9e3779b9, 2654435761) + (ENSEMBLE_ROLES.indexOf(role) + 1) * 0x632be5ab) >>> 8;
+
+/** An ensemble's name for one voice: a shared word and the ensemble's id, the voice's own noun. */
+export function ensembleName(role, ensemble) {
+    const shared = seeded(ensemble ^ 0x5bd1e995);
+    const own = seeded(memberSeed(ensemble, role));
+    const hex = ensemble.toString(16).padStart(6, '0');
+    return `${pick(shared, ADJECTIVES)} ${pick(own, NOUNS)} #${hex.slice(0, 4)}`;
+}
+
+/**
+ * One voice of an ensemble (masterVolume not yet levelled).
+ * @returns {{ name: string, preset: object }}
+ */
+export function generateEnsembleSound(role, ensemble) {
+    const seed = memberSeed(ensemble, role);
+    const preset = applyPalette(role, RECIPES[role](tools(seeded(seed))), ensemblePalette(ensemble), tools(seeded(seed ^ 0x68e31da4)));
+    preset.masterVolume = 0.6;
+    return { name: ensembleName(role, ensemble), preset };
+}
+
+/** A sound from its link info: { role, seed } or { role, ensemble }. */
+export const soundFrom = (info) => (info.ensemble !== undefined ? generateEnsembleSound(info.role, info.ensemble) : generateSound(info.role, info.seed));

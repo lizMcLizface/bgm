@@ -186,3 +186,9 @@ test('the address bar copy leaves the seed out: the settings come back, the piec
     expect(back.seed).not.toBe(4242);
     expect(decodeSettings(encodeSettings(settings)).seed).toBe(4242);
 });
+
+test('links carry ensemble voices as role + the ensemble seed', () => {
+    const presets = { lead: { generated: { role: 'lead', ensemble: 0x123456 } }, pad: { generated: { role: 'pad', ensemble: 0x123456 } }, counter: { generated: { role: 'counter', ensemble: 0x123456 } } };
+    const code = encodeSettings({ ...defaultSettings(), seed: 9 }, presets);
+    expect(decodeShare(code).presets).toEqual(presets);
+});

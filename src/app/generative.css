@@ -1186,3 +1186,9 @@ body {
     max-height: calc(100vh - 90px);
     overflow-y: auto;
 }
+
+.gen button.gen-new-sounds {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}

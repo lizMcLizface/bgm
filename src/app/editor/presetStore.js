@@ -21,18 +21,18 @@ import PRESET_DEFAULTS from '../engine/presetDefaults';
 const USER_KEY = 'Generative-Presets';
 const UNCAGED_KEY = 'PolySynth-CustomPresets';
 
-// name -> { preset, role, seed }
+// name -> { preset, info: { role, seed } or { role, ensemble } }
 const generated = new Map();
 
 /** Registers a generated sound so pickers list it and links can name it. */
-export function addGeneratedPreset(name, preset, { role, seed }) {
-    generated.set(name, { preset, role, seed });
+export function addGeneratedPreset(name, preset, info) {
+    generated.set(name, { preset, info: { ...info } });
 }
 
-/** { role, seed } of a generated sound, or null. */
+/** What made a generated sound ({ role, seed } or { role, ensemble }), or null. */
 export function generatedInfo(name) {
     const entry = generated.get(name);
-    return entry ? { role: entry.role, seed: entry.seed } : null;
+    return entry ? { ...entry.info } : null;
 }
 
 const readJson = (key) => {

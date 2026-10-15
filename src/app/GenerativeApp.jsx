@@ -24,7 +24,7 @@ import { COMMON_PARAMS } from './engine/ambienceSynth';
 import {
     DiceIcon, SparkIcon, PlayIcon, PauseIcon, ToStartIcon, BarBackIcon, BarForwardIcon, ProgressionBackIcon, ProgressionForwardIcon, LoopIcon,
 } from './icons';
-import { generateSound, newSoundSeed } from './soundGen';
+import { soundFrom, newSoundSeed } from './soundGen';
 import { levelPreset } from './engine/loudness';
 import { addGeneratedPreset, generatedInfo } from './editor/presetStore';
 import { readPref, writePref } from './prefs';
@@ -45,7 +45,7 @@ const getGenerator = () => {
         if (share && share.phrase) linkedPhrase = share.phrase;
         if (share) {
             Object.entries(share.presets).forEach(([role, preset]) => {
-                if (preset.generated) linkedSounds.push({ target: role, madeFor: preset.generated.role, seed: preset.generated.seed });
+                if (preset.generated) linkedSounds.push({ target: role, info: preset.generated });
                 else generator.loadRolePreset(role, preset);
             });
         }
@@ -169,7 +169,7 @@ const Panel = ({ id, title, heading, onRandom, more, className = '', children })
 // beside single fields - use.
 // The phrase and New variation, then the randomize buttons with how
 // random they are (a setting, so a select - not more buttons).
-const Randomizer = ({ level, onLevel: setLevel, onRandomize, onNewVariation }) => (
+const Randomizer = ({ level, onLevel: setLevel, onRandomize, onNewVariation, onNewSounds, generating }) => (
     <section className="gen-randomize">
         <div className="gen-randomize-row">
             <span className="gen-randomize-title">Randomize</span>
@@ -179,6 +179,10 @@ const Randomizer = ({ level, onLevel: setLevel, onRandomize, onNewVariation }) =
             {RANDOM_TARGETS.map(([target, label]) => (
                 <button key={target} type="button" onClick={() => onRandomize(target, level)}>{label}</button>
             ))}
+            <button type="button" className="gen-new-sounds" onClick={onNewSounds} disabled={generating}
+                title="Generate new sounds for every voice, made to go together (the Voices button picks presets, registers and chord size)">
+                <SparkIcon /> New sounds
+            </button>
             <label className="gen-random-level">
                 <span>How</span>
                 <select value={level} onChange={(e) => setLevel(e.target.value)} aria-describedby="gen-random-hint">
@@ -562,23 +566,29 @@ const GenerativeApp = () => {
     const randomizeField = (key) => loadSettings(randomField(key, gen.settings, randomLevel));
     const chords = progressionLength(settings.progression);
     const randomizePreset = (role) => loadPreset(role, randomPreset(role, roles[role].presetName, randomLevel));
-    // A procedural sound (soundGen.js) made for `madeFor`, levelled to that
-    // role's default loudness, onto `role`.
-    const loadGeneratedSound = async (role, madeFor, seed) => {
-        setGenerating((g) => ({ ...g, [role]: true }));
+    // A procedural sound (soundGen.js) - info: { role, seed } for one voice,
+    // { role, ensemble } for a voice of an ensemble - levelled to its role's
+    // default loudness, onto `target`.
+    const loadGeneratedSound = async (target, info) => {
+        setGenerating((g) => ({ ...g, [target]: true }));
         try {
-            const { name, preset } = generateSound(madeFor, seed);
-            addGeneratedPreset(name, await levelPreset(preset, madeFor), { role: madeFor, seed });
-            loadPreset(role, name);
+            const { name, preset } = soundFrom(info);
+            addGeneratedPreset(name, await levelPreset(preset, info.role), info);
+            loadPreset(target, name);
         } finally {
-            setGenerating((g) => ({ ...g, [role]: false }));
+            setGenerating((g) => ({ ...g, [target]: false }));
         }
     };
-    const generateForRole = (role) => loadGeneratedSound(role, role, newSoundSeed());
+    const generateForRole = (role) => loadGeneratedSound(role, { role, seed: newSoundSeed() });
+    // New sounds for every voice at once, with a shared character.
+    const generateAll = () => {
+        const ensemble = newSoundSeed();
+        Object.keys(ROLES).forEach((role) => loadGeneratedSound(role, { role, ensemble }));
+    };
     useEffect(() => {
         const sounds = linkedSounds;
         linkedSounds = [];
-        sounds.forEach(({ target, madeFor, seed }) => loadGeneratedSound(target, madeFor, seed));
+        sounds.forEach(({ target, info }) => loadGeneratedSound(target, info));
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
     // Within reason, key and progression are chosen to fit each other: alone,
     // each fits the other's current value; together, the key comes first.
@@ -725,7 +735,8 @@ const GenerativeApp = () => {
                     onRandom={randomizePreset} onGenerate={generateForRole} generating={generating} live={live} />}
             />
 
-            <Randomizer level={randomLevel} onLevel={setRandomLevel} onRandomize={randomize} onNewVariation={newVariation} />
+            <Randomizer level={randomLevel} onLevel={setRandomLevel} onRandomize={randomize} onNewVariation={newVariation}
+                onNewSounds={generateAll} generating={Object.values(generating).some(Boolean)} />
 
             <Panel id="music" title="Music" onRandom={() => randomize('music')}>
                 <div className="gen-row">

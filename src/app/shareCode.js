@@ -53,6 +53,9 @@ const PRESET_BITS = 8;
 // Preset index meaning "a generated sound" (soundGen.js v1): followed by
 // the role it was made for and its seed.
 const GENERATED_V1 = 2 ** PRESET_BITS - 1;
+// ... and a voice of a generated ensemble (soundGen.js, ensemble v1):
+// followed by its role and the ensemble's seed.
+const ENSEMBLE_V1 = 2 ** PRESET_BITS - 2;
 // Fixed role order in codes (independent of the UI's order); also the
 // index a generated sound stores for the role it was made for.
 export const CODE_ROLES = ['pad', 'bass', 'lead', 'counter'];
@@ -295,9 +298,10 @@ function writePresets(w, roles, presets) {
         const index = preset === ROLE_PRESETS[role] ? -1 : SHAREABLE_PRESETS.indexOf(preset);
         w.write(index >= 0 || generated ? 1 : 0, 1);
         if (generated) {
-            w.write(GENERATED_V1, PRESET_BITS);
+            const ensemble = generated.ensemble !== undefined;
+            w.write(ensemble ? ENSEMBLE_V1 : GENERATED_V1, PRESET_BITS);
             w.write(CODE_ROLES.indexOf(generated.role), 2);
-            w.write(generated.seed, SOUND_SEED_BITS);
+            w.write(ensemble ? generated.ensemble : generated.seed, SOUND_SEED_BITS);
         } else if (index >= 0) {
             w.write(index, PRESET_BITS);
         }
@@ -318,10 +322,10 @@ function readPresets(r, roles, presets) {
     roles.forEach((role) => {
         if (!r.read(1)) return;
         const index = r.read(PRESET_BITS);
-        if (index === GENERATED_V1) {
+        if (index === GENERATED_V1 || index === ENSEMBLE_V1) {
             const madeFor = CODE_ROLES[r.read(2)];
             const seed = r.read(SOUND_SEED_BITS);
-            if (madeFor) presets[role] = { generated: { role: madeFor, seed } };
+            if (madeFor) presets[role] = { generated: index === ENSEMBLE_V1 ? { role: madeFor, ensemble: seed } : { role: madeFor, seed } };
         } else if (SHAREABLE_PRESETS[index]) {
             presets[role] = SHAREABLE_PRESETS[index];
         }

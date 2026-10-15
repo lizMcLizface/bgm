@@ -575,3 +575,14 @@ measure (Keys & plucks sit 3-7 dB under when measured as a pad); Muted
 Pick Bass is 2.4 dB under at full volume, like Round Pluck Bass. Over 75
 generated sounds the median error is 0 dB; the few that need more than
 full volume end up at most 2.5 dB quiet.
+
+**Ensembles (2026-10-16).** "New sounds" generates every voice from one
+24-bit seed. `ensemblePalette(seed)` picks a shared character - waveform
+family (smooth / warm / bright), brightness, reverb type and amount,
+chorus / phaser / none and its rate, attack softness, an echo time and
+vibrato for the melodic voices - and each role's recipe runs on a seed
+derived from the ensemble's, then takes on the palette within what suits
+the role (the bass keeps a short attack, a dark filter and little reverb).
+A single voice's generate is untouched. Links carry an ensemble voice as
+preset index 254 + role + the ensemble seed. Levelled, every voice of
+sample ensembles lands within 0.1 dB of its role's default.

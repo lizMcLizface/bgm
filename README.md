@@ -65,7 +65,9 @@ synthesised with the Web Audio API; there are no samples.
 - A full synth editor per voice, 41 built-in presets by category, and your
   own presets (saved in the browser, or exported/imported as JSON)
 - Procedural sounds: a new preset per voice from a random seed, shaped for
-  the role and levelled to its default's loudness; links carry the seed
+  the role and levelled to its default's loudness; or "New sounds" for
+  every voice at once, sharing one character (waveform family,
+  brightness, reverb, modulation, attack, echoes); links carry the seeds
 - Stop fades out within half a second, reverb and echo tails included
   (optional, in the ⚙ menu with the buffer size and theme); master volume
 - Simple by default: each panel shows its main controls, the rest is
