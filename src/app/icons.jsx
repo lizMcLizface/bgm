@@ -2,11 +2,63 @@
 // inconsistently across systems).
 import React from 'react';
 
-const Svg = ({ children }) => (
-    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"
+const Svg = ({ children, size = 14 }) => (
+    <svg width={size} height={size} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"
         strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
         {children}
     </svg>
+);
+
+// Transport: filled shapes, a little larger.
+const solid = { fill: 'currentColor', stroke: 'none' };
+
+export const PlayIcon = () => <Svg size={16}><path d="M4.5 2.5v11l9-5.5z" {...solid} /></Svg>;
+
+export const PauseIcon = () => (
+    <Svg size={16}>
+        <rect x="3.5" y="2.5" width="3" height="11" rx="0.8" {...solid} />
+        <rect x="9.5" y="2.5" width="3" height="11" rx="0.8" {...solid} />
+    </Svg>
+);
+
+export const ToStartIcon = () => (
+    <Svg size={16}>
+        <path d="M3 3v10" strokeWidth="2" />
+        <path d="M13.5 3v10L5 8z" {...solid} />
+    </Svg>
+);
+
+export const BarBackIcon = () => <Svg size={16}><path d="M11 3.5v9L4.5 8z" {...solid} /></Svg>;
+export const BarForwardIcon = () => <Svg size={16}><path d="M5 3.5v9L11.5 8z" {...solid} /></Svg>;
+
+export const ProgressionBackIcon = () => (
+    <Svg size={16}>
+        <path d="M8 3.5v9L1.5 8z" {...solid} />
+        <path d="M14.5 3.5v9L8 8z" {...solid} />
+    </Svg>
+);
+
+export const ProgressionForwardIcon = () => (
+    <Svg size={16}>
+        <path d="M1.5 3.5v9L8 8z" {...solid} />
+        <path d="M8 3.5v9L14.5 8z" {...solid} />
+    </Svg>
+);
+
+export const LoopIcon = () => (
+    <Svg size={16}>
+        <path d="M2.5 9V7.5a3 3 0 0 1 3-3h8" />
+        <path d="M11.5 2.5l2 2-2 2" />
+        <path d="M13.5 7v1.5a3 3 0 0 1-3 3h-8" />
+        <path d="M4.5 13.5l-2-2 2-2" />
+    </Svg>
+);
+
+export const LinkIcon = () => (
+    <Svg>
+        <path d="M6.5 9.5a3 3 0 0 0 4.2 0l2.3-2.3a3 3 0 0 0-4.2-4.2L7.6 4.1" />
+        <path d="M9.5 6.5a3 3 0 0 0-4.2 0L3 8.8a3 3 0 0 0 4.2 4.2l1.1-1.1" />
+    </Svg>
 );
 
 export const DiceIcon = () => (

@@ -13,15 +13,17 @@ import {
 import { DRIFT_MODES } from './conductor';
 import { METERS } from './meter';
 import {
-    RANDOM_LEVELS, randomKey, randomProgression, randomConductor, randomVoices, randomField, randomPreset, randomLength,
+    RANDOM_LEVELS, RANDOM_LEVEL_HINTS, randomKey, randomProgression, randomConductor, randomVoices, randomField, randomPreset, randomLength,
     randomArrangement, randomStyleWeights, randomRole, progressionLength, progressionForLength, randomAmbience, randomAmbienceShape,
 } from './randomize';
-import { MasterVolume, AudioMeter, SettingsMenu } from './AudioStatus';
+import { MasterVolume, SettingsMenu } from './AudioStatus';
 import { SleepTimer, Recorder } from './Playback';
 import { setupMediaSession, updateMediaSession } from './mediaSession';
 import { AMBIENCE_LAYERS, LAYER_PARAMS } from './engine/ambience';
 import { COMMON_PARAMS } from './engine/ambienceSynth';
-import { DiceIcon, SparkIcon } from './icons';
+import {
+    DiceIcon, SparkIcon, PlayIcon, PauseIcon, ToStartIcon, BarBackIcon, BarForwardIcon, ProgressionBackIcon, ProgressionForwardIcon, LoopIcon,
+} from './icons';
 import { generateSound, newSoundSeed } from './soundGen';
 import { levelPreset } from './engine/loudness';
 import { addGeneratedPreset, generatedInfo } from './editor/presetStore';
@@ -105,34 +107,6 @@ const PhraseField = ({ seed, edited, onApply }) => {
     );
 };
 
-// New variation / copy link, next to Play.
-const ShareTools = ({ settings, presets, onNewVariation, phrase }) => {
-    const [message, setMessage] = useState('');
-    const flash = (text) => {
-        setMessage(text);
-        setTimeout(() => setMessage(''), 2500);
-    };
-    const copy = async () => {
-        const url = shareUrl(settings, presets);
-        try {
-            await navigator.clipboard.writeText(url);
-            flash('Link copied');
-        } catch (e) {
-            window.prompt('Copy this link', url);
-        }
-    };
-    return (
-        <div className="gen-share">
-            {phrase}
-            <button type="button" onClick={onNewVariation} title="Same settings, a new phrase: different random choices (media key: next track)">
-                New variation
-            </button>
-            <button type="button" onClick={copy}>Copy link</button>
-            <span className="gen-editor-message" role="status">{message}</span>
-        </div>
-    );
-};
-
 const RANDOM_TARGETS = [
     ['all', 'Everything'],
     ['key', 'Key & scale'],
@@ -184,21 +158,62 @@ const Panel = ({ id, title, heading, onRandom, more, className = '', children })
 
 // Randomize buttons (randomize.js), with the level they - and the dice
 // beside single fields - use.
-const Randomizer = ({ level, onLevel: setLevel, onRandomize }) => {
-    return (
-        <div className="gen-randomize">
+// The phrase and New variation, then the randomize buttons with how
+// random they are (a setting, so a select - not more buttons).
+const Randomizer = ({ level, onLevel: setLevel, onRandomize, phrase, onNewVariation }) => (
+    <section className="gen-randomize">
+        <div className="gen-randomize-row">
+            {phrase}
+            <button type="button" onClick={onNewVariation} title="Same settings, a new phrase - so different random choices (media key: next track)">
+                New variation
+            </button>
+        </div>
+        <div className="gen-randomize-row">
             <span className="gen-randomize-title">Randomize</span>
-            <div className="gen-segmented" role="radiogroup" aria-label="How random">
-                {Object.entries(RANDOM_LEVELS).map(([id, label]) => (
-                    <button key={id} type="button" role="radio" aria-checked={level === id}
-                        className={level === id ? 'is-on' : ''} onClick={() => setLevel(id)}>
-                        {label}
-                    </button>
-                ))}
-            </div>
             {RANDOM_TARGETS.map(([target, label]) => (
                 <button key={target} type="button" onClick={() => onRandomize(target, level)}>{label}</button>
             ))}
+            <label className="gen-random-level">
+                <span>How</span>
+                <select value={level} onChange={(e) => setLevel(e.target.value)} aria-describedby="gen-random-hint">
+                    {Object.entries(RANDOM_LEVELS).map(([id, label]) => <option key={id} value={id}>{label}</option>)}
+                </select>
+            </label>
+            <small id="gen-random-hint" className="gen-random-hint">{RANDOM_LEVEL_HINTS[level]}</small>
+        </div>
+    </section>
+);
+
+const LOOP_NEXT = { off: 'bar', bar: 'progression', progression: 'off' };
+const LOOP_LABELS = { off: 'Loop', bar: 'Loop: bar', progression: 'Loop: progression' };
+
+// Play / pause and moving around the piece: to the start, a progression
+// or a bar back / on, and looping the bar or progression playing.
+const Transport = ({ gen, anyOn, onToggle, onChange }) => {
+    const act = (fn) => async () => {
+        await fn();
+        onChange();
+    };
+    const atStart = gen.hereBar <= gen.earliestBar && !gen.isRunning;
+    const loop = gen.loop ? gen.loop.mode : 'off';
+    const button = (label, icon, onClick, disabled = false) => (
+        <button type="button" className="gen-icon-button" title={label} aria-label={label} onClick={onClick} disabled={disabled}>{icon}</button>
+    );
+    return (
+        <div className="gen-transport" role="toolbar" aria-label="Playback">
+            {button('Back to the start', <ToStartIcon />, act(() => gen.rewind()), atStart && gen.hereBar === 0)}
+            {button('Back one progression', <ProgressionBackIcon />, act(() => gen.stepProgression(-1)), atStart)}
+            {button('Back one bar', <BarBackIcon />, act(() => gen.stepBar(-1)), atStart)}
+            <button type="button" className="gen-play" onClick={onToggle} title={`${anyOn ? 'Pause' : 'Play'} (Space)`} aria-label={anyOn ? 'Pause' : 'Play'}>
+                {anyOn ? <PauseIcon /> : <PlayIcon />}
+            </button>
+            {button('Forward one bar', <BarForwardIcon />, act(() => gen.stepBar(1)))}
+            {button('Forward one progression', <ProgressionForwardIcon />, act(() => gen.stepProgression(1)))}
+            <button type="button" className={`gen-icon-button gen-loop${loop !== 'off' ? ' is-on' : ''}`} aria-pressed={loop !== 'off'}
+                title="Loop the bar playing, then the whole progression, then off" onClick={act(() => gen.setLoop(LOOP_NEXT[loop]))}>
+                <LoopIcon />{loop !== 'off' && <span>{loop === 'bar' ? 'bar' : 'progression'}</span>}
+                <span className="gen-visually-hidden">{LOOP_LABELS[loop]}</span>
+            </button>
         </div>
     );
 };
@@ -465,6 +480,7 @@ const GenerativeApp = () => {
     const anyOn = running || ambienceOn;
     const [paused, setPaused] = useState(false);
     const [, setTick] = useState(0);
+    const [saving, setSaving] = useState(null);
     const [settings, setSettings] = useState({ ...gen.settings });
     const [roles, setRoles] = useState(() =>
         Object.fromEntries(Object.keys(ROLES).map((role) => [role, { presetName: gen.roles[role].presetName, edited: false }]))
@@ -679,9 +695,7 @@ const GenerativeApp = () => {
         <main className="gen">
             <header className="gen-header">
                 <h1>bgm <span>calm procedural music</span></h1>
-                <button className="gen-play" onClick={toggle} title="Play / pause (Space)">{anyOn ? 'Pause' : 'Play'}</button>
-                <button type="button" className="gen-rewind" onClick={() => gen.rewind()} disabled={!running && !paused}
-                    title="Back to the start of the piece" aria-label="Back to the start">⏮</button>
+                <Transport gen={gen} anyOn={anyOn} onToggle={toggle} onChange={() => setTick((n) => n + 1)} />
                 <div className="gen-parts" role="group" aria-label="What Play plays">
                     <button type="button" className={`gen-part${settings.playMusic ? ' is-on' : ''}`} aria-pressed={settings.playMusic}
                         onClick={() => togglePart('playMusic')} title={PART_TITLE}>Music</button>
@@ -689,17 +703,16 @@ const GenerativeApp = () => {
                         onClick={() => togglePart('playAmbience')} title={PART_TITLE}>Ambience</button>
                 </div>
                 <SleepTimer generator={gen} running={anyOn} />
-                <ShareTools settings={settings} presets={linkPresets} onNewVariation={newVariation}
-                    phrase={<PhraseField seed={settings.seed} edited={gen.editedSinceStart} onApply={playPhrase} />} />
                 <div className="gen-header-tools">
                     <MasterVolume />
-                    <AudioMeter />
-                    <Recorder generator={gen} fileName={fileName} />
-                    <SettingsMenu generator={gen} onReload={reloadKeepingSettings} />
+                    <SettingsMenu generator={gen} onReload={reloadKeepingSettings} link={() => shareUrl(gen.settings, linkPresets)} saving={saving}>
+                        <Recorder generator={gen} fileName={fileName} onProgress={setSaving} />
+                    </SettingsMenu>
                 </div>
             </header>
 
-            <Randomizer level={randomLevel} onLevel={setRandomLevel} onRandomize={randomize} />
+            <Randomizer level={randomLevel} onLevel={setRandomLevel} onRandomize={randomize} onNewVariation={newVariation}
+                phrase={<PhraseField seed={settings.seed} edited={gen.editedSinceStart} onApply={playPhrase} />} />
 
             <ChordTimeline
                 generator={gen}

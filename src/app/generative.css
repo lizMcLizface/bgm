@@ -1060,3 +1060,123 @@ body {
         overflow-y: auto;
     }
 }
+
+/* Header: transport, parts, sleep, volume, then the ⚙ menu at the end. */
+.gen-transport {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.gen-transport .gen-play {
+    min-width: 0;
+    width: 52px;
+    height: 36px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 18px;
+}
+
+.gen button.gen-icon-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: 32px;
+    min-width: 32px;
+    padding: 0 7px;
+    justify-content: center;
+}
+
+.gen button.gen-icon-button:disabled {
+    opacity: 0.4;
+}
+
+.gen button.gen-loop.is-on {
+    border-color: var(--gen-accent);
+    color: var(--gen-accent);
+    font-size: 12px;
+}
+
+.gen-header-tools {
+    margin-left: auto;
+}
+
+.gen-visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+/* ⚙ menu sections. */
+.gen-settings-menu {
+    width: 300px;
+}
+
+.gen-menu-section {
+    display: grid;
+    gap: 10px;
+}
+
+.gen-menu-section + .gen-menu-section {
+    padding-top: 12px;
+    border-top: 1px solid var(--gen-border);
+}
+
+.gen-menu-section h3 {
+    margin: 0;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--gen-muted);
+}
+
+.gen button.gen-menu-wide {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+/* Randomize: phrase row, then the buttons and how random they are. */
+.gen-randomize {
+    display: grid;
+    gap: 10px;
+}
+
+.gen-randomize-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.gen-random-level {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 8px;
+    font-size: 12px;
+    color: var(--gen-muted);
+}
+
+.gen-random-level select {
+    font: inherit;
+    font-size: 13px;
+    padding: 5px 6px;
+    color: var(--gen-text);
+    background: var(--gen-bg);
+    border: 1px solid var(--gen-border);
+    border-radius: 6px;
+}
+
+.gen-random-hint {
+    flex-basis: 100%;
+    font-size: 12px;
+    color: var(--gen-muted);
+}

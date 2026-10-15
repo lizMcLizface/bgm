@@ -70,6 +70,16 @@ function draw(ctx, width, gen, pos) {
 
     ctx.clearRect(0, 0, width, HEIGHT);
 
+    // A loop: its bars shaded.
+    if (gen.loop) {
+        const left = x(gen.loop.from * beatsPerBar);
+        const right = x((gen.loop.to + 1) * beatsPerBar);
+        ctx.fillStyle = color.accent;
+        ctx.globalAlpha = 0.1;
+        ctx.fillRect(left, 0, right - left, HEIGHT);
+        ctx.globalAlpha = 1;
+    }
+
     // Bar and beat grid.
     // Beat-group starts (5/4 = 3+2, ...) get a stronger line than units.
     const groupLines = groupStarts(gen.meter);

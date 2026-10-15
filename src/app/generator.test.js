@@ -286,3 +286,44 @@ test('a phrase is a piece: same phrase and settings, same notes from the start -
     expect(edited.editedSinceStart).toBe(false);
     expect(notes(edited)).toBe(first);
 });
+
+test('stepping: by bar and by progression, back plays exactly what was planned', () => {
+    const gen = generator(6, { mode: 'off' }); // 4 chords, 1 bar each
+    play(gen, 20);
+    const notes = (bar) => gen.plan.get(bar).events.map((e) => e.midi).join();
+    const bar5 = notes(5);
+    gen.pause(12 * gen.beatsPerBar);
+    gen.seek(5);
+    expect(gen.hereBar).toBe(5);
+    expect(notes(5)).toBe(bar5);
+    gen.stepProgression(1);
+    expect(gen.hereBar).toBe(8);
+    gen.stepProgression(-1); // in a cycle's first bar: the one before
+    expect(gen.hereBar).toBe(4);
+    gen.stepBar(1);
+    gen.stepProgression(-1); // inside a cycle: its start
+    expect(gen.hereBar).toBe(4);
+    gen.seek(-3);
+    expect(gen.hereBar).toBe(0);
+});
+
+test('looping: a bar or a progression; a settings change re-plans the loop at its next pass', () => {
+    const gen = generator(6, { mode: 'off' });
+    play(gen, 10);
+    gen.pause(5 * gen.beatsPerBar);
+    gen.setLoop('progression');
+    expect(gen.loop).toMatchObject({ from: 4, to: 7 });
+    gen.setLoop('bar');
+    expect(gen.loop).toMatchObject({ from: 6, to: 6 });
+    gen.plan.get(6).events.forEach((e) => { e.booked = true; });
+    const before = gen.plan.get(6).events.map((e) => e.midi).join();
+    gen.loopBack();
+    expect(gen.plan.get(6).events.every((e) => !e.booked)).toBe(true);
+    expect(gen.plan.get(6).events.map((e) => e.midi).join()).toBe(before);
+    gen.set('padNotes', 4);
+    gen.loopBack();
+    expect(gen.plan.get(6).events.filter((e) => e.role === 'pad').length).toBeGreaterThan(0);
+    expect(gen.plan.get(6).state.padVoicing.length).toBe(4);
+    gen.setLoop('off');
+    expect(gen.loop).toBeNull();
+});

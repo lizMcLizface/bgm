@@ -21,7 +21,12 @@ import { LAYER_PARAMS, defaultShape } from './engine/ambienceSynth';
 
 const AMBIENCE_IDS = Object.keys(AMBIENCE_LAYERS);
 
-export const RANDOM_LEVELS = { reason: 'Within reason', wild: 'Full random' };
+export const RANDOM_LEVELS = { reason: 'Musical', wild: 'Anything goes' };
+/** What each level does, in a sentence (shown under the choice). */
+export const RANDOM_LEVEL_HINTS = {
+    reason: 'Stays near the defaults and keeps the parts fitting together: minor progressions in minor keys, lead sounds on the lead.',
+    wild: 'Any value the controls allow, mixed freely. Can get strange.',
+};
 
 const ALL_MODES = SCALE_FAMILIES.flatMap((f) => f.modes.map((m) => m.id));
 

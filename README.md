@@ -46,7 +46,9 @@ synthesised with the Web Audio API; there are no samples.
   always make the same music
 - Pause resumes at the next bar; randomizing or changing settings (time
   signature too) changes what comes next without starting over; ⏮ goes
-  back to the start; Space plays /
+  back to the start, ◀ ▶ step a bar, ◀◀ ▶▶ a progression (back plays
+  exactly what was heard), and loop repeats the bar or progression playing
+  - handy for shaping sounds; Space plays /
   pauses; lock-screen, notification and media-key controls
   (next / previous track = new / previous variation)
 - Drift ("evolution"): related-key and mode changes, progression changes,

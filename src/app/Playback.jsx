@@ -4,7 +4,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { readPref, writePref } from './prefs';
 import { renderWav, wavBytes } from './engine/render';
-import { useDismiss } from './AudioStatus';
 
 const SLEEP_KEY = 'bgm-sleep-minutes';
 const SLEEP_MINUTES = [0, 10, 15, 20, 30, 45, 60, 90, 120];
@@ -72,19 +71,20 @@ function download(blob, name) {
 }
 
 /**
- * "Save audio" menu: a length, then a WAV of the piece from its start -
- * the current settings, sounds, mix and ambience.
+ * "Save audio" (a section of the settings menu): a length, then a WAV of
+ * the piece from its start - the current settings, sounds, mix and
+ * ambience.
  * @param {function} fileName - (minutes) => file name
+ * @param {function} [onProgress] - 0..1 while saving, null when not
  */
-export const Recorder = ({ generator, fileName }) => {
+export const Recorder = ({ generator, fileName, onProgress = () => {} }) => {
     const [minutes, setMinutes] = useState(() => readPref(RECORD_KEY, 5));
     const [progress, setProgress] = useState(null);
     const [message, setMessage] = useState('');
     const [started, setStarted] = useState(0);
     const abort = useRef(null);
-    const menu = useRef(null);
-    useDismiss(menu);
     useEffect(() => writePref(RECORD_KEY, minutes), [minutes]);
+    useEffect(() => onProgress(progress), [progress]); // eslint-disable-line react-hooks/exhaustive-deps
     const megabytes = Math.round(wavBytes(minutes * 60, generator.AC.sampleRate) / 1e6);
     // time left, from the pace so far (once there is a pace to go by)
     const elapsed = (Date.now() - started) / 1000;
@@ -108,11 +108,8 @@ export const Recorder = ({ generator, fileName }) => {
         }
     };
     return (
-        <details className="gen-settings gen-record" ref={menu}>
-            <summary title="Save the music as an audio file">
-                {progress === null ? 'Save audio' : `Saving… ${Math.round(progress * 100)}%`}
-            </summary>
-            <div className="gen-settings-menu">
+        <section className="gen-menu-section gen-record">
+            <h3>Save audio</h3>
                 <label className="gen-field">
                     <span>Length</span>
                     <select value={minutes} disabled={progress !== null} onChange={(e) => setMinutes(Number(e.target.value))}>
@@ -138,7 +135,6 @@ export const Recorder = ({ generator, fileName }) => {
                     </>
                 )}
                 {message && <small role="status">{message}</small>}
-            </div>
-        </details>
+        </section>
     );
 };

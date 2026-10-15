@@ -1,6 +1,7 @@
-// Header audio controls: master volume, how busy the audio thread is (with
-// dropouts where the browser reports them), and the settings menu - output
-// buffer size (src/audio/context.js), quick stop, colour theme.
+// Header audio controls: master volume, and the ⚙ menu - copy link, save
+// audio (Playback.jsx), how busy the audio thread is (with dropouts where
+// the browser reports them), output buffer size (src/audio/context.js),
+// quick stop and colour theme.
 
 import React, { useEffect, useRef, useState } from 'react';
 import { audioContext, storedBufferSeconds, storeBufferSeconds } from '../audio/context';
@@ -8,6 +9,7 @@ import { masterBus } from '../audio/bus';
 import { startLoadMeter } from '../audio/loadMeter';
 import { readPref, writePref } from './prefs';
 import { THEMES, applyTheme, storedTheme } from './theme';
+import { LinkIcon } from './icons';
 
 const VOLUME_KEY = 'bgm-volume';
 const QUICK_STOP_KEY = 'bgm-quick-stop';
@@ -46,8 +48,8 @@ export const AudioMeter = () => {
     const { load, dropouts } = status;
     const percent = load === null ? null : Math.round(load * 100);
     return (
-        <div className="gen-audio" title="Share of the audio thread's time spent rendering. Near 100% the sound drops out; a larger buffer (⚙) rides out spikes.">
-            <span className="gen-audio-label">CPU</span>
+        <div className="gen-audio" title="How much of its time the audio thread spends making sound. Near 100% the sound drops out; a larger buffer (below) helps.">
+            <span className="gen-audio-label">Audio load</span>
             <span className={`gen-meter${load > HIGH_LOAD ? ' is-high' : ''}`} aria-hidden="true">
                 <i style={{ width: `${Math.min(100, percent || 0)}%` }} />
             </span>
@@ -81,7 +83,7 @@ export function useDismiss(menu) {
  * The ⚙ menu. onReload returns false when a buffer change's reload was
  * cancelled.
  */
-export const SettingsMenu = ({ generator, onReload }) => {
+export const SettingsMenu = ({ generator, onReload, link, saving, children }) => {
     const [, refresh] = useState(0);
     const [quickStop, setQuickStop] = useState(() => readPref(QUICK_STOP_KEY, true));
     const [theme, setTheme] = useState(storedTheme);
@@ -104,10 +106,32 @@ export const SettingsMenu = ({ generator, onReload }) => {
         setTheme(e.target.value);
     };
     const actualMs = Math.round((audioContext.baseLatency || 0) * 1000);
+    const [copied, setCopied] = useState('');
+    const copy = async () => {
+        const url = link();
+        try {
+            await navigator.clipboard.writeText(url);
+            setCopied('Link copied.');
+        } catch (e) {
+            window.prompt('Copy this link', url);
+        }
+        setTimeout(() => setCopied(''), 2500);
+    };
     return (
         <details className="gen-settings" ref={menu}>
-            <summary title="Audio and display settings" aria-label="Settings">⚙</summary>
+            <summary title="Share, save audio and settings" aria-label="Share, save audio and settings">
+                ⚙{saving !== null && saving !== undefined ? ` Saving ${Math.round(saving * 100)}%` : ''}
+            </summary>
             <div className="gen-settings-menu">
+                <section className="gen-menu-section">
+                    <h3>Share</h3>
+                    <button type="button" className="gen-menu-wide" onClick={copy}><LinkIcon /> Copy link to this music</button>
+                    {copied && <small role="status">{copied}</small>}
+                </section>
+                {children}
+                <section className="gen-menu-section">
+                    <h3>Audio</h3>
+                    <AudioMeter />
                 <label className="gen-field">
                     <span>Audio buffer (now {actualMs} ms)</span>
                     <select value={storedBufferSeconds() || 0} onChange={changeBuffer}>
@@ -119,12 +143,16 @@ export const SettingsMenu = ({ generator, onReload }) => {
                     <input type="checkbox" checked={quickStop} onChange={(e) => setQuickStop(e.target.checked)} />
                     Stop quickly (cut off reverb and echo tails)
                 </label>
+                </section>
+                <section className="gen-menu-section">
+                    <h3>Display</h3>
                 <label className="gen-field">
                     <span>Theme</span>
                     <select value={theme} onChange={changeTheme}>
                         {THEMES.map((id) => <option key={id} value={id}>{THEME_LABELS[id]}</option>)}
                     </select>
                 </label>
+                </section>
             </div>
         </details>
     );

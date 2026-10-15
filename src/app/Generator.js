@@ -43,6 +43,9 @@ const STOP_FADE_MS = 500;
 // Bars decided ahead of the playhead, and bars kept behind it for display.
 export const PLAN_AHEAD_BARS = 8;
 const PLAN_KEEP_BARS = 4;
+// Bars kept behind the playhead for stepping back: played bars are kept,
+// not re-planned, so going back plays exactly what was heard.
+const HISTORY_BARS = 512;
 
 // Settings that define "home"; changing one resets drift to it.
 const HOME_KEYS = new Set(['tonic', 'mode', 'progression', 'bpm', 'barsPerChord']);
@@ -141,6 +144,7 @@ class Generator {
         // Whether settings changed mid-piece: then what plays is no longer
         // exactly what the seed (phrase) and settings make from the start.
         this.editedSinceStart = false;
+        this.loop = null;
         this.ensurePlanned(0);
     }
 
@@ -326,6 +330,7 @@ class Generator {
     // new time signature starts at that bar too. Otherwise (at the start)
     // the preview is planned afresh. Only rewind() goes back to the start.
     replan(keys, meterChanged = keys.includes('meter')) {
+        if (this.loop) this.loop.dirty = true;
         if (this.isRunning || this.paused) {
             this.editedSinceStart = true;
             const from = this.currentBar + 1;
@@ -478,7 +483,8 @@ class Generator {
 
     /** Planned bars, ascending: { bar, chord, chordStart, events, music, bpm } */
     getPlan() {
-        return [...this.plan.values()].sort((a, b) => a.bar - b.bar);
+        const from = Math.floor(this.position() / this.beatsPerBar) - PLAN_KEEP_BARS;
+        return [...this.plan.values()].filter((planned) => planned.bar >= from).sort((a, b) => a.bar - b.bar);
     }
 
     /**
@@ -622,8 +628,109 @@ class Generator {
                 changed = true;
             }
         }
-        [...this.plan.keys()].filter((bar) => bar < this.currentBar - PLAN_KEEP_BARS).forEach((bar) => this.plan.delete(bar));
+        [...this.plan.keys()].filter((bar) => bar < this.currentBar - HISTORY_BARS).forEach((bar) => this.plan.delete(bar));
         if (changed) this.planListeners.forEach((listener) => listener());
+    }
+
+    // Plans on from the last planned bar up to `last` (seeking ahead of the
+    // usual horizon).
+    planThrough(last) {
+        for (let bar = Math.max(-1, ...this.plan.keys()) + 1; bar <= last; bar++) this.planBar(bar);
+    }
+
+    // --- stepping and looping -------------------------------------------
+
+    /** The bar playing now, or where Play would start. */
+    get hereBar() {
+        return Math.floor(this.position() / this.beatsPerBar);
+    }
+
+    /** The first bar still kept (how far back is possible). */
+    get earliestBar() {
+        return Math.min(...this.plan.keys());
+    }
+
+    // The progression cycle a bar belongs to: { start, end } (end inclusive).
+    cycleOf(bar) {
+        this.planThrough(bar);
+        const start = this.plan.get(bar).music.cycleStart;
+        let end = bar;
+        for (let b = bar + 1; b < bar + 64; b++) {
+            this.planThrough(b);
+            if (this.plan.get(b).music.cycleStart !== start) break;
+            end = b;
+        }
+        return { start, end };
+    }
+
+    /**
+     * Plays on from `bar` (bars already planned, or played, are kept as they
+     * are). While playing, the jump is immediate; paused, Play starts there.
+     * A loop moves along to the new place.
+     */
+    async seek(bar) {
+        const target = Math.max(this.earliestBar, bar);
+        const wasRunning = this.isRunning;
+        if (wasRunning) this.stop();
+        this.planThrough(target + 1);
+        this.resumeBar = target;
+        this.plan.forEach((planned) => {
+            if (planned.bar >= target) planned.events.forEach((ev) => { ev.booked = false; });
+        });
+        this.beatLog = [];
+        this.currentBar = target - 1;
+        this.ensurePlanned(target);
+        if (this.loop) this.setLoop(this.loop.mode, target);
+        this.planListeners.forEach((listener) => listener());
+        if (wasRunning) await this.start();
+        else this.notifyRunning();
+    }
+
+    /** One bar back (-1) or on (+1). */
+    stepBar(direction) {
+        return this.seek(this.hereBar + direction);
+    }
+
+    /**
+     * To the next progression cycle, or back: to the start of this one -
+     * or, within its first bar, of the one before.
+     */
+    stepProgression(direction) {
+        const here = this.hereBar;
+        const { start, end } = this.cycleOf(here);
+        if (direction > 0) return this.seek(end + 1);
+        if (here > start || start === 0) return this.seek(start);
+        return this.seek(this.plan.has(start - 1) ? this.cycleOf(start - 1).start : start);
+    }
+
+    /**
+     * Repeats the bar - or the progression cycle - playing now: 'bar',
+     * 'progression' or 'off'. Each pass plays the same notes; after a
+     * settings change the looped bars are planned again at the next pass.
+     */
+    setLoop(mode, at = this.isRunning ? Math.max(this.currentBar, 0) : this.hereBar) {
+        if (mode === 'off') {
+            this.loop = null;
+        } else {
+            const region = mode === 'bar' ? { start: at, end: at } : this.cycleOf(at);
+            this.planThrough(region.end + 1);
+            this.loop = { mode, from: region.start, to: region.end, dirty: false };
+        }
+        this.planListeners.forEach((listener) => listener());
+    }
+
+    // At the end of a loop pass: the looped bars play again (planned anew
+    // first if settings changed), so their notes may be booked again.
+    loopBack() {
+        const { from, to } = this.loop;
+        if (this.loop.dirty) {
+            for (let bar = from; bar <= to; bar++) this.plan.delete(bar);
+            for (let bar = from; bar <= to; bar++) this.planBar(bar);
+            this.loop.dirty = false;
+            this.planListeners.forEach((listener) => listener());
+        }
+        for (let bar = from; bar <= to; bar++) this.plan.get(bar).events.forEach((ev) => { ev.booked = false; });
+        this.transport.rebase((to + 1) * this.transport.beatsPerBar, from * this.meter.units, this.meter.units);
     }
 
     // Books this beat's slice of the plan at exact audio times.
@@ -648,7 +755,9 @@ class Generator {
 
         // (the transport's bar length: the old one until a new time signature starts)
         if (beatInBar === this.transport.beatsPerBar - 1) {
-            const next = this.plan.get(bar + 1);
+            const looping = this.loop && bar === this.loop.to;
+            if (looping) this.loopBack();
+            const next = this.plan.get(looping ? this.loop.from : bar + 1);
             if (next) {
                 // The next bar's tempo applies from the gap before its downbeat,
                 // and its slightly-early notes are booked from here.
