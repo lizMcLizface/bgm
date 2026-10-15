@@ -5,6 +5,10 @@ class Oscillator {
         this.AC = AC;
         this.WAVEFORMS = ['off', 'sine', 'triangle', 'square', 'sawtooth', 'square_dc'];
         this.node = this.AC.createOscillator();
+        // Detune only carries vibrato: once per 128-frame block is smooth
+        // for a few-Hz LFO and costs half as much as per sample
+        // (docs/DESIGN.md §5). Firefox lacks automationRate; harmless there.
+        this.node.detune.automationRate = 'k-rate';
         this.waveShaper = null;
         
         // Create a stable output buffer node that never changes

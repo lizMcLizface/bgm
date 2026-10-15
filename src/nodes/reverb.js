@@ -15,6 +15,36 @@ export const REVERB_TYPES = ['reverb1', 'reverb2', 'reverb3', 'reverb4', 'reverb
 
 // AudioContext -> Map(type -> Promise<AudioBuffer>)
 const buffers = new WeakMap();
+
+// A convolver's cost grows with its impulse's length, and some impulses
+// carry seconds of tail below hearing (reverb2: 8 s, silent after ~3.8 s).
+// Cut where the energy still to come falls below -80 dB, with a short fade.
+const TAIL_DB = -80;
+const FADE_SECONDS = 0.05;
+export function trimImpulse(AC, buffer) {
+    const channels = Array.from({ length: buffer.numberOfChannels }, (_, c) => buffer.getChannelData(c));
+    const threshold = Math.pow(10, TAIL_DB / 10);
+    let total = 0;
+    channels.forEach((d) => d.forEach((x) => { total += x * x; }));
+    let remaining = total;
+    let end = buffer.length;
+    for (let i = 0; i < buffer.length; i++) {
+        if (remaining < total * threshold) {
+            end = i;
+            break;
+        }
+        channels.forEach((d) => { remaining -= d[i] * d[i]; });
+    }
+    const length = Math.min(buffer.length, end + Math.round(FADE_SECONDS * buffer.sampleRate));
+    if (length >= buffer.length - buffer.sampleRate * 0.1) return buffer;
+    const trimmed = AC.createBuffer(buffer.numberOfChannels, length, buffer.sampleRate);
+    channels.forEach((d, c) => {
+        const out = trimmed.getChannelData(c);
+        out.set(d.subarray(0, length));
+        for (let i = end; i < length; i++) out[i] *= (length - i) / (length - end);
+    });
+    return trimmed;
+}
 function loadImpulse(AC, type) {
     if (!buffers.has(AC)) buffers.set(AC, new Map());
     const cache = buffers.get(AC);
@@ -25,7 +55,8 @@ function loadImpulse(AC, type) {
                 if (!response.ok) throw new Error(`${response.status} for ${url}`);
                 return response.arrayBuffer();
             })
-            .then((data) => AC.decodeAudioData(data));
+            .then((data) => AC.decodeAudioData(data))
+            .then((buffer) => trimImpulse(AC, buffer));
         // a failed load may be retried later (e.g. after a network hiccup)
         load.catch(() => cache.delete(type));
         cache.set(type, load);

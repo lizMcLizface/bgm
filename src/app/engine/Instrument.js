@@ -86,7 +86,10 @@ const PARAM_SETTERS = {
     bitCrushDepth: (inst, v) => inst.bitCrush.setBitDepth(v),
     bitCrushAmount: (inst, v) => inst.bitCrush.setAmount(v),
     vibratoRate: (inst, v) => inst.vibrato.setRate(v),
-    vibratoDepth: (inst, v) => inst.vibrato.setDepth(v),
+    vibratoDepth: (inst, v) => {
+        inst.vibrato.setDepth(v);
+        inst.setVibratoConnected(v > 0);
+    },
     eqLowGain: (inst, v) => inst.eq.setLowGain(v),
     eqHighGain: (inst, v) => inst.eq.setHighGain(v),
     eqLowFreq: (inst, v) => inst.eq.setLowFreq(v),
@@ -174,6 +177,7 @@ class Instrument {
             return synth;
         });
         this.vibrato.start();
+        this.vibratoConnected = true;
 
         // Per voice: when its last booked note (incl. release) goes silent.
         this.busyUntil = new Array(polyphony).fill(0);
@@ -188,6 +192,14 @@ class Instrument {
         // Held (live-played) notes: id -> { index, voiceId }.
         this.held = new Map();
         this.heldIds = 0;
+        // The effects chain sleeps as well (output disconnected, so nothing
+        // in it renders) once every voice is asleep and the effects' tails
+        // have died away: a reverb or delay fed silence costs as much as one
+        // fed music. soundUntil: when the last booked sound (incl. release)
+        // ends. It starts asleep; the first booked note wakes it.
+        this.destinations = [];
+        this.chainAwake = false;
+        this.soundUntil = 0;
 
         this.preset = null;
         this.chainSignature = null;
@@ -195,11 +207,13 @@ class Instrument {
     }
 
     connect(destination) {
-        this.output.connect(destination);
+        this.destinations.push(destination);
+        if (this.chainAwake) this.output.connect(destination);
     }
 
     disconnect() {
         this.output.disconnect();
+        this.destinations = [];
     }
 
     /**
@@ -241,6 +255,35 @@ class Instrument {
             previous = stage.output;
         });
         previous.connect(this.limiter.getNode());
+    }
+
+    // Vibrato is wired to the oscillators only while it has depth: an
+    // oscillator with its detune connected costs several times more.
+    setVibratoConnected(connected) {
+        if (connected === this.vibratoConnected) return;
+        this.vibratoConnected = connected;
+        if (!connected) this.vibrato.getDepthNode().disconnect();
+        this.voices.forEach((synth) => synth.setVibratoEnabled(connected));
+    }
+
+    /**
+     * Seconds the effects keep sounding after the voices stop: the reverb's
+     * impulse plus each delay's echoes dying away to -80 dB, and a margin
+     * for the short modulation effects.
+     */
+    tailSeconds() {
+        const p = { ...PRESET_DEFAULTS, ...this.preset };
+        const echoes = (amount, time, feedback) => {
+            if (!(amount > 0)) return 0;
+            const fb = Math.min(Math.max(feedback, 0.01), 0.95);
+            return time * Math.ceil(Math.log(1e-4) / Math.log(fb));
+        };
+        const impulse = this.reverb.node.buffer;
+        const reverb = p.reverbAmount > 0 ? (impulse ? impulse.duration : 10) : 0;
+        return reverb
+            + echoes(p.delayAmount, p.delayTime, p.delayFeedback)
+            + echoes(p.pingPongAmount, p.pingPongDelayTime, p.pingPongFeedback)
+            + 0.5;
     }
 
     /** Effects currently in the signal path (for diagnostics). */
@@ -317,6 +360,7 @@ class Instrument {
         if (detune) info.freq *= Math.pow(2, detune / 1200);
         this.voices[index].scheduleNote(info, { gainPoints: points, filterEvents, portamentoSpeed }, startTime, steal);
         this.busyUntil[index] = startTime + releaseEnd;
+        this.soundUntil = Math.max(this.soundUntil, startTime + releaseEnd);
         this.wake(index);
     }
 
@@ -358,6 +402,7 @@ class Instrument {
         cancelAndHold(detune, now);
         detune.setTargetAtTime(0, now, Math.max(this.filterEnv.release, minTime));
         this.busyUntil[held.index] = now + points[points.length - 1][0];
+        this.soundUntil = Math.max(this.soundUntil, this.busyUntil[held.index]);
         this.scheduleSleep();
     }
 
@@ -369,12 +414,17 @@ class Instrument {
             gain.setTargetAtTime(0, time, 0.05);
             this.busyUntil[i] = 0;
         });
+        this.soundUntil = time + 0.5; // the fade, to below -80 dB
         this.held.clear();
         if (this.sleepTimer) clearTimeout(this.sleepTimer);
         this.sleepTimer = setTimeout(() => this.sleepIdle(), 300);
     }
 
     wake(index) {
+        if (!this.chainAwake) {
+            this.destinations.forEach((destination) => this.output.connect(destination));
+            this.chainAwake = true;
+        }
         if (!this.awake[index]) {
             this.voices[index].volume.getNode().connect(this.synthMix.getNode());
             this.awake[index] = true;
@@ -383,7 +433,8 @@ class Instrument {
     }
 
     // Disconnects voices whose last note (incl. release) has finished. A
-    // small margin covers effect-free tails inside the voice.
+    // small margin covers effect-free tails inside the voice. Then the
+    // effects chain, once nothing has sounded for its tail time.
     sleepIdle() {
         this.sleepTimer = null;
         const now = this.AC.currentTime;
@@ -393,17 +444,30 @@ class Instrument {
                 this.awake[i] = false;
             }
         });
+        if (this.chainAwake && !this.awake.some(Boolean) && this.soundUntil + this.tailSeconds() < now) {
+            this.output.disconnect();
+            this.chainAwake = false;
+        }
         this.scheduleSleep();
     }
 
-    // One timer for the next voice due to go idle (a late timer only means
-    // a voice stays awake a little longer - harmless).
+    // One timer for the next voice due to go idle, or - all asleep - for
+    // the chain (a late timer only means something stays awake a little
+    // longer - harmless). Held notes keep everything awake.
     scheduleSleep() {
         const due = this.busyUntil.filter((t, i) => this.awake[i] && Number.isFinite(t));
-        if (!due.length) return;
-        const delay = Math.max(0.05, Math.min(...due) + 0.25 - this.AC.currentTime);
+        let at;
+        if (due.length) at = Math.min(...due) + 0.25;
+        else if (this.chainAwake && !this.awake.some(Boolean)) at = this.soundUntil + this.tailSeconds() + 0.25;
+        else return;
+        const delay = Math.max(0.05, at - this.AC.currentTime);
         if (this.sleepTimer) clearTimeout(this.sleepTimer);
         this.sleepTimer = setTimeout(() => this.sleepIdle(), delay * 1000);
+    }
+
+    /** Whether the effects chain is connected right now (for diagnostics). */
+    effectsAwake() {
+        return this.chainAwake;
     }
 
     /** How many voices are connected right now (for diagnostics). */

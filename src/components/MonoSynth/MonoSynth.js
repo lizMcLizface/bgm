@@ -30,7 +30,15 @@ class MonoSynth {
         this.osc2PhaseOffset = 0; // Phase offset in degrees (0-360)
         this.osc2OctaveOffset = 0; // Range: -3 to +3 octaves
         this.osc2Started = false; // Track if osc2 has been started
-        
+        this.subOscOff = false; // waveform 'off' (the type itself is kept)
+        this.osc2Off = false;
+        // Sub and osc2 feed the mix only while they can be heard: a connected
+        // source renders every sample even at gain 0 (docs/DESIGN.md §5).
+        this.pathConnected = { sub: false, osc2: false };
+        // Vibrato reaches the oscillators only while enabled: an oscillator
+        // with anything connected to its detune costs several times more.
+        this.vibratoEnabled = true;
+
         // Primary voice oscillator (always active)
         this.primaryOscillator = new Oscillator(this.AC);
         this.primaryOscillatorPanner = new StereoPanner(this.AC);
@@ -328,15 +336,11 @@ class MonoSynth {
         
         this.oscillatorMixer.connect(this.mainOscillatorMixer.getNode());
         
-        // Connect sub oscillator (always connected but controlled by gain)
+        // Sub oscillator and osc2 (through its phase delay); their gains are
+        // wired into the mix by updateSilentPaths while audible.
         this.subOscillator.connect(this.subOscillatorGain.getNode());
-        // this.subOscillatorPanner.connect(this.subOscillatorGain.getNode());
-        this.subOscillatorGain.connect(this.mainOscillatorMixer.getNode());
-        
-        // Connect second oscillator through delay node (always enabled for phase control)
         this.osc2.connect(this.osc2PhaseDelay);
         this.osc2PhaseDelay.connect(this.osc2Gain.getNode());
-        this.osc2Gain.connect(this.mainOscillatorMixer.getNode());
         
         // Connect main oscillator mixer and combined noise to main mixer
         this.mixer.connectOscillator(this.mainOscillatorMixer.getNode());
@@ -435,6 +439,7 @@ class MonoSynth {
         
         // Mark as initialized
         this.isInitialized = true;
+        this.updateSilentPaths();
         
         // Start auto-resync timer
         this.updateActivityTime();
@@ -495,7 +500,8 @@ class MonoSynth {
     // Connect vibrato LFO to all oscillators
     connectVibratoToAdditional(vibratoLFO) {
         this.vibratoLFO = vibratoLFO; // Store reference for later use
-        
+        if (!this.vibratoEnabled) return;
+
         // Connect to primary oscillator
         // try {
         //     const primaryOscNode = this.primaryOscillator.getOscillatorNode();
@@ -533,7 +539,8 @@ class MonoSynth {
     }
     connectVibratoToAll(vibratoLFO) {
         this.vibratoLFO = vibratoLFO; // Store reference for later use
-        
+        if (!this.vibratoEnabled) return;
+
         // Connect to primary oscillator
         try {
             const primaryOscNode = this.primaryOscillator.getOscillatorNode();
@@ -726,12 +733,13 @@ class MonoSynth {
             this.primaryOscillatorPanner.connect(this.mainOscillatorMixer.getNode());
             
             this.subOscillator.connect(this.subOscillatorGain.getNode());
-            this.subOscillatorGain.connect(this.mainOscillatorMixer.getNode());
-            
             this.osc2.connect(this.osc2PhaseDelay);
             this.osc2PhaseDelay.connect(this.osc2Gain.getNode());
-            this.osc2Gain.connect(this.mainOscillatorMixer.getNode());
-            
+            this.subOscillatorGain.disconnect();
+            this.osc2Gain.disconnect();
+            this.pathConnected = { sub: false, osc2: false };
+            this.updateSilentPaths();
+
         } catch (e) {
             console.error('Error during oscillator configuration:', e);
             return;
@@ -948,9 +956,11 @@ class MonoSynth {
     
     // Sub oscillator waveform control
     setSubOscWaveform = (type) => {
+        this.subOscOff = type === 'off';
         // Handle "off" waveform by setting gain to 0 instead of changing oscillator type
         if (type === 'off') {
             this.subOscillatorGain.setGain(0);
+            this.updateSilentPaths();
             return;
         } else {
             // Restore normal gain when not "off" (but only if sub osc offset is not 0)
@@ -967,6 +977,8 @@ class MonoSynth {
     
     // Second oscillator controls
     setOsc2Waveform = (type) => {
+        this.osc2Off = type === 'off';
+        this.updateSilentPaths();
         // Handle "off" waveform by setting gain to 0 instead of changing oscillator type
         if (type === 'off') {
             this.osc2Gain.setGain(0);
@@ -995,6 +1007,7 @@ class MonoSynth {
     setOsc2Amount = (amount) => {
         this.osc2Amount = clamp(amount, 0, 1);
         this.osc2Gain.setGain(this.osc2Amount);
+        this.updateSilentPaths();
         
         // Note: osc2 is always started during init() with synchronized timing
         // We don't start it here to maintain phase synchronization across all synths
@@ -1605,6 +1618,36 @@ class MonoSynth {
             // Gentle gain reduction to prevent clipping when sub oscillator is active
             const gainReduction = 0.5; // Fixed gain for single sub oscillator
             this.subOscillatorGain.setGain(gainReduction);
+        }
+        this.updateSilentPaths();
+    }
+
+    // Wires the sub oscillator and osc2 into the mix only while they can be
+    // heard (see pathConnected).
+    updateSilentPaths() {
+        if (!this.isInitialized) return;
+        this.setPathConnected('sub', this.subOscillatorGain, this.subOscOctaveOffset !== 0 && !this.subOscOff);
+        this.setPathConnected('osc2', this.osc2Gain, this.osc2Amount > 0 && !this.osc2Off);
+    }
+
+    setPathConnected(path, gain, connected) {
+        if (this.pathConnected[path] === connected) return;
+        this.pathConnected[path] = connected;
+        if (connected) gain.connect(this.mainOscillatorMixer.getNode());
+        else gain.disconnect(this.mainOscillatorMixer.getNode());
+    }
+
+    /**
+     * Turns vibrato on the oscillators on or off. Disabling only stops the
+     * connect methods from wiring it; the owner of the shared LFO
+     * disconnects its output.
+     */
+    setVibratoEnabled(enabled) {
+        if (enabled === this.vibratoEnabled) return;
+        this.vibratoEnabled = enabled;
+        if (enabled && this.vibratoLFO) {
+            this.connectVibratoToAll(this.vibratoLFO);
+            this.connectVibratoToAdditional(this.vibratoLFO);
         }
     }
 
