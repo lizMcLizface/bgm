@@ -456,7 +456,7 @@ const GenerativeApp = () => {
 
             <ChordTimeline
                 generator={gen}
-                tracks={<TrackStrip roles={ROLES} mix={mix} armed={armed} onMix={changeMix} onArm={setArmed} onEdit={editSound}
+                tracks={<TrackStrip roles={ROLES} presets={Object.fromEntries(Object.entries(roles).map(([role, { presetName, edited }]) => [role, { name: presetName, edited }]))} mix={mix} armed={armed} onMix={changeMix} onArm={setArmed} onEdit={editSound}
                     onRandom={randomizePreset} onGenerate={generateForRole} generating={generating} live={live} />}
             />
 

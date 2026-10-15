@@ -131,13 +131,19 @@ export function useLivePlay(generator, armed) {
 }
 
 /** The strip beside the timeline: one row per role, then the keys hint. */
-export const TrackStrip = ({ roles, mix, armed, onMix, onArm, onEdit, onRandom, onGenerate, generating, live }) => (
+/** presets: role -> { name, edited } (shown beside the role's name). */
+export const TrackStrip = ({ roles, presets, mix, armed, onMix, onArm, onEdit, onRandom, onGenerate, generating, live }) => (
     <div className="gen-tracks">
         {Object.entries(roles).map(([role, { label }]) => (
             <div key={role} className="gen-track">
                 <span className="gen-track-name">
                     <i className={`gen-swatch gen-swatch-${role}`} />
                     {label.split(' / ')[0]}
+                    {presets[role] && (
+                        <span className="gen-track-preset" title={presets[role].name}>
+                            {presets[role].name}{presets[role].edited ? ' (edited)' : ''}
+                        </span>
+                    )}
                 </span>
                 <RoleButtons role={role} label={label} mix={mix[role]} armed={armed === role} onMix={onMix} onArm={onArm} onEdit={onEdit}
                     onRandom={onRandom} onGenerate={onGenerate} generating={generating[role]} />
