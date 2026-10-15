@@ -26,3 +26,15 @@ test('other text hashes to a stable seed in range; empty text is none', () => {
     expect(seed).toBeLessThan(2 ** 31);
     expect(phraseToSeed('   ')).toBeNull();
 });
+
+test('three-word phrases for 24-bit seeds (sounds)', () => {
+    const opts = { count: 3, limit: 2 ** 24 };
+    [0, 0xabcdef, 2 ** 24 - 1].forEach((seed) => {
+        const phrase = seedToPhrase(seed, 3);
+        expect(phrase.split('-')).toHaveLength(3);
+        expect(phraseToSeed(phrase, opts)).toBe(seed);
+    });
+    const hashed = phraseToSeed('velvet midnight', opts);
+    expect(hashed).toBe(phraseToSeed('Velvet  Midnight', opts));
+    expect(hashed).toBeLessThan(2 ** 24);
+});

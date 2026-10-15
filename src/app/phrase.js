@@ -35,37 +35,41 @@ const WORDS = `
 const INDEX = new Map(WORDS.map((word, i) => [word, i]));
 const SEED_LIMIT = 2 ** 31;
 
-/** The seed (0 .. 2^31-1) as four words, joined by '-'. */
-export function seedToPhrase(seed) {
+/**
+ * The seed (0 .. 2^31-1) as four words, joined by '-' - or as `count`
+ * words, for smaller seeds (sounds: three words, 24 bits).
+ */
+export function seedToPhrase(seed, count = 4) {
     const s = seed >>> 0;
-    return [24, 16, 8, 0].map((shift) => WORDS[(s >>> shift) & 0xff]).join('-');
+    return Array.from({ length: count }, (_, i) => WORDS[(s >>> (8 * (count - 1 - i))) & 0xff]).join('-');
 }
 
 // The words of a typed phrase: lower case, split on anything else.
 const words = (text) => text.toLowerCase().split(/[^a-z]+/).filter(Boolean);
 
 // FNV-1a over the normalised text, folded into a seed.
-function hashSeed(text) {
+function hashSeed(text, limit) {
     let h = 0x811c9dc5;
     for (const ch of words(text).join(' ')) {
         h ^= ch.charCodeAt(0);
         h = Math.imul(h, 0x01000193);
     }
-    return (h >>> 0) % SEED_LIMIT;
+    return (h >>> 0) % limit;
 }
 
 /**
- * The seed a phrase stands for: four list words read back exactly (what
- * seedToPhrase shows), anything else hashed. null for empty text.
+ * The seed a phrase stands for: `count` list words read back exactly (what
+ * seedToPhrase shows), anything else hashed - below `limit`. null for
+ * empty text.
  */
-export function phraseToSeed(text) {
+export function phraseToSeed(text, { count = 4, limit = SEED_LIMIT } = {}) {
     const list = words(text);
     if (!list.length) return null;
-    if (list.length === 4 && list.every((w) => INDEX.has(w))) {
+    if (list.length === count && list.every((w) => INDEX.has(w))) {
         const value = list.reduce((v, w) => v * 256 + INDEX.get(w), 0);
-        if (value < SEED_LIMIT) return value;
+        if (value < limit) return value;
     }
-    return hashSeed(text);
+    return hashSeed(text, limit);
 }
 
 export const PHRASE_WORDS = WORDS;

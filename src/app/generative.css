@@ -996,9 +996,28 @@ body {
     color: var(--gen-muted);
 }
 
-.gen-footer p {
-    margin: 0 0 8px;
-    max-width: 70ch;
+.gen-footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    margin: 0 0 16px;
+}
+
+/* Short labelled notes, side by side where there is room. */
+.gen-footer-notes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px 24px;
+    margin: 0;
+}
+
+.gen-footer-notes dt {
+    font-weight: 600;
+    color: var(--gen-text);
+}
+
+.gen-footer-notes dd {
+    margin: 2px 0 0;
 }
 
 .gen-footer a {
@@ -1191,4 +1210,16 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 6px;
+}
+
+/* Sounds: above the voice panels. */
+.gen-sounds {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.gen-sounds .gen-phrase {
+    flex: 1 1 320px;
 }

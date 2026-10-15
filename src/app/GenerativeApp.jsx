@@ -169,7 +169,7 @@ const Panel = ({ id, title, heading, onRandom, more, className = '', children })
 // beside single fields - use.
 // The phrase and New variation, then the randomize buttons with how
 // random they are (a setting, so a select - not more buttons).
-const Randomizer = ({ level, onLevel: setLevel, onRandomize, onNewVariation, onNewSounds, generating }) => (
+const Randomizer = ({ level, onLevel: setLevel, onRandomize, onNewVariation }) => (
     <section className="gen-randomize">
         <div className="gen-randomize-row">
             <span className="gen-randomize-title">Randomize</span>
@@ -179,10 +179,6 @@ const Randomizer = ({ level, onLevel: setLevel, onRandomize, onNewVariation, onN
             {RANDOM_TARGETS.map(([target, label]) => (
                 <button key={target} type="button" onClick={() => onRandomize(target, level)}>{label}</button>
             ))}
-            <button type="button" className="gen-new-sounds" onClick={onNewSounds} disabled={generating}
-                title="Generate new sounds for every voice, made to go together (the Voices button picks presets, registers and chord size)">
-                <SparkIcon /> New sounds
-            </button>
             <label className="gen-random-level">
                 <span>How</span>
                 <select value={level} onChange={(e) => setLevel(e.target.value)} aria-describedby="gen-random-hint">
@@ -417,6 +413,44 @@ const LayerShape = ({ id, label, shape, onChange }) => {
     );
 };
 
+// Above the voices: new sounds for every voice at once, sharing one
+// character - at random, or from a phrase (the same words, the same
+// sounds). A random set shows its own three-word phrase.
+const SOUND_SEEDS = { count: 3, limit: 2 ** 24 };
+const SoundsBar = ({ onGenerate, generating }) => {
+    const [text, setText] = useState('');
+    const make = (ensemble, phrase) => {
+        setText(phrase);
+        onGenerate(ensemble);
+    };
+    const random = () => {
+        const ensemble = newSoundSeed();
+        make(ensemble, seedToPhrase(ensemble, SOUND_SEEDS.count));
+    };
+    const fromPhrase = (e) => {
+        e.preventDefault();
+        const ensemble = phraseToSeed(text, SOUND_SEEDS);
+        if (ensemble !== null) make(ensemble, text);
+    };
+    return (
+        <section className="gen-sounds">
+            <span className="gen-randomize-title">Sounds</span>
+            <button type="button" className="gen-new-sounds" onClick={random} disabled={generating}
+                title="New sounds for every voice, made to go together">
+                <SparkIcon /> New sounds
+            </button>
+            <form className="gen-phrase" onSubmit={fromPhrase}>
+                <input type="text" value={text} spellCheck="false" autoComplete="off" placeholder="or type a phrase, e.g. velvet midnight"
+                    onChange={(e) => setText(e.target.value)} aria-label="Phrase to make the sounds from" />
+                <button type="submit" disabled={generating || phraseToSeed(text, SOUND_SEEDS) === null}>Make these sounds</button>
+            </form>
+            <small className="gen-random-hint">
+                Every voice gets a new sound, all sharing one character. The same phrase always makes the same sounds.
+            </small>
+        </section>
+    );
+};
+
 // The ambient bed (engine/ambience.js): on / off (as beside Play), a volume
 // for the whole bed against the music, and a slider per layer to balance
 // them; under More options, the shape of each layer that is turned up.
@@ -581,8 +615,7 @@ const GenerativeApp = () => {
     };
     const generateForRole = (role) => loadGeneratedSound(role, { role, seed: newSoundSeed() });
     // New sounds for every voice at once, with a shared character.
-    const generateAll = () => {
-        const ensemble = newSoundSeed();
+    const generateAll = (ensemble) => {
         Object.keys(ROLES).forEach((role) => loadGeneratedSound(role, { role, ensemble }));
     };
     useEffect(() => {
@@ -735,8 +768,7 @@ const GenerativeApp = () => {
                     onRandom={randomizePreset} onGenerate={generateForRole} generating={generating} live={live} />}
             />
 
-            <Randomizer level={randomLevel} onLevel={setRandomLevel} onRandomize={randomize} onNewVariation={newVariation}
-                onNewSounds={generateAll} generating={Object.values(generating).some(Boolean)} />
+            <Randomizer level={randomLevel} onLevel={setRandomLevel} onRandomize={randomize} onNewVariation={newVariation} />
 
             <Panel id="music" title="Music" onRandom={() => randomize('music')}>
                 <div className="gen-row">
@@ -855,6 +887,8 @@ const GenerativeApp = () => {
                 onChange={changeAmbience} onVolume={(v) => update('ambienceVolume', v)} onToggle={() => togglePart('playAmbience')}
                 onRandom={() => randomize('ambience')} />
 
+            <SoundsBar onGenerate={generateAll} generating={Object.values(generating).some(Boolean)} />
+
             {Object.entries(shownRoles).map(([role, { label }]) => (
                 <Panel
                     key={role}
@@ -908,28 +942,29 @@ const GenerativeApp = () => {
             />
 
             <footer className="gen-footer">
-                <p>
+                <p className="gen-footer-links">
                     <a href="https://github.com/lizMcLizface/bgm" target="_blank" rel="noopener noreferrer">Source code on GitHub</a>
-                    {' · '}MIT licence · made by lizMcLizface
+                    <span>MIT licence</span>
+                    <span>Made by lizMcLizface</span>
                 </p>
-                <p>
-                    The music is yours: it is generated, so no rights are claimed on anything you play, record or
-                    save here - use it however you like, in videos, streams or anything else. A credit
-                    (calmbgm.com) is appreciated, never required.
-                </p>
-                <p>
-                    Every sound is synthesised live in your browser with the Web Audio API - no samples or
-                    recordings, rain and thunder included.
-                </p>
-                <p>
-                    No accounts, cookies, ads or analytics. Your preferences (volume, theme, buffer size, sleep
-                    timer) and any sounds you save stay in this browser&apos;s local storage; a share link carries
-                    the music settings in its address. The site is hosted on GitHub Pages, which keeps the usual
-                    server logs.
-                </p>
-                <p>
-                    Provided as is, without warranty of any kind. Mind your volume, especially with headphones.
-                </p>
+                <dl className="gen-footer-notes">
+                    <div>
+                        <dt>No AI</dt>
+                        <dd>Music, voices and ambience are procedural: rules plus random numbers, synthesised live in your browser. No samples or recordings.</dd>
+                    </div>
+                    <div>
+                        <dt>Free to use</dt>
+                        <dd>No rights are claimed on anything you play, record or save here. A credit (calmbgm.com) is welcome, never required.</dd>
+                    </div>
+                    <div>
+                        <dt>Private</dt>
+                        <dd>No accounts, cookies, ads or tracking. Preferences stay in your browser; share links only hold the music settings. Hosted on GitHub Pages.</dd>
+                    </div>
+                    <div>
+                        <dt>As is</dt>
+                        <dd>No warranty of any kind. Mind your volume, especially on headphones.</dd>
+                    </div>
+                </dl>
             </footer>
         </main>
     );
