@@ -228,3 +228,16 @@ test('a link made by the released version (before drums) still opens unchanged',
     const d = defaultSettings();
     expect([settings.drums, settings.drumKit, settings.muted, settings.swing]).toEqual([d.drums, d.drumKit, d.muted, 0]);
 });
+
+test('pad patterns and movement, and the later drums, travel in links', () => {
+    const settings = {
+        ...defaultSettings(),
+        pulseWeights: { groups: 0, beats: 50, push: 100, split: 5 },
+        arpWeights: { bounce: 10, up: 0, down: 80, broken: 25 },
+        padMotion: { lean: 0.2, fast: 0.75, swell: 0.12 },
+        drums: { style: 'downtempo', activity: 0.4, variation: 0.9 },
+    };
+    settings.drumKit = { ...settings.drumKit, tom: { on: false, level: 1.5, tone: -0.3, decay: 1.2 }, ride: { ...settings.drumKit.ride, level: 0.5 } };
+    const back = decodeSettings(encodeSettings(settings));
+    ['pulseWeights', 'arpWeights', 'padMotion', 'drums', 'drumKit'].forEach((key) => expect(back[key]).toEqual(settings[key]));
+});

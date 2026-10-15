@@ -21,7 +21,9 @@
 import { SCALE_FAMILIES } from './theory';
 import { METERS } from './meter';
 import { DRIFT_MODES, TEMPO_BOUNDS } from './conductor';
-import { OCTAVE_LIMITS, OCTAVE_WANDER, COUNTER_MODES, SECTION_MODES, SECTION_LENGTHS } from './arranger';
+import {
+    OCTAVE_LIMITS, OCTAVE_WANDER, COUNTER_MODES, SECTION_MODES, SECTION_LENGTHS, DEFAULT_PULSE_WEIGHTS, DEFAULT_ARP_WEIGHTS,
+} from './arranger';
 import { AMBIENCE_LAYERS } from './engine/ambience';
 import { LAYER_PARAMS } from './engine/ambienceSynth';
 import { ROLE_PRESETS } from './presets';
@@ -203,6 +205,13 @@ const MUSIC_GROUPS = [
         [['drums', 'activity'], chance],
         [['drums', 'variation'], chance],
     ],
+    [ // how the pad plays its styles
+        ...Object.keys(DEFAULT_PULSE_WEIGHTS).map((id) => [['pulseWeights', id], weight]),
+        ...Object.keys(DEFAULT_ARP_WEIGHTS).map((id) => [['arpWeights', id], weight]),
+        [['padMotion', 'lean'], chance],
+        [['padMotion', 'fast'], chance],
+        [['padMotion', 'swell'], stepped(0, 0.2, 0.01)],
+    ],
 ];
 const VOICE_GROUPS = [
     [...voice('pad'), ...voice('bass'), ...voice('lead'), ...voice('counter'), field(GROUPS, ['padNotes'])],
@@ -211,15 +220,17 @@ const VOICE_GROUPS = [
 // The voice part goes on after the presets: groups, then each role's
 // preset, then these (appended later - inserting them before the presets
 // would move the presets' bits in older links).
+const drumGroup = (name) => [
+    [['drumKit', name, 'on'], bool],
+    ...Object.entries(DRUM_PARAMS).map(([key, { min, max, step }]) => [['drumKit', name, key], stepped(min, max, step)]),
+];
 const VOICE_LATER_GROUPS = [
     [[['volumes', 'perc'], stepped(0, 1, 0.01)], [['drumKit', 'room'], stepped(0, 0.5, 0.05)]], // percussion
-    // the kit, per drum
-    ...DRUMS.map((name) => [
-        [['drumKit', name, 'on'], bool],
-        ...Object.entries(DRUM_PARAMS).map(([key, { min, max, step }]) => [['drumKit', name, key], stepped(min, max, step)]),
-    ]),
+    // the kit, per drum (the first six; later drums come after the mutes)
+    ...DRUMS.slice(0, 6).map(drumGroup),
     // muted voices (solo isn't kept)
     [...CODE_ROLES, 'perc'].map((role) => [['muted', role], bool]),
+    ...DRUMS.slice(6).map(drumGroup),
 ];
 const shapeCodec = (key, spec) => {
     if (key === 'pan') return stepped(-1, 1, 0.1);

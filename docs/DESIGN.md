@@ -149,8 +149,11 @@ Instrument ×3 ── MonoSynth voices + effects chain per role → masterBus
 - **Bass/support:** register ~E1-E3. Root on the downbeat, occasional fifth,
   occasional stepwise approach into the next chord's root. Long notes.
 - **Rhythm/pad:** register ~C3-C5. Inversion chosen to minimize voice
-  movement between chords. No close intervals below ~C3. Sustained pads or a
-  slow arpeggio.
+  movement between chords, leaning a little low or high per phrase so the top
+  voice travels. No close intervals below ~C3. Sustained pads, pulses (per
+  group, per beat, pushed, or low note / upper notes) or an arpeggio
+  (bouncing, up, down, broken; now and then in half units), swelling gently
+  over each phrase.
 - **Lead:** above the pad, sparse (lots of rests). Chord tones on strong
   beats, scale tones between, mostly stepwise. A 2-bar motif that repeats
   and varies, phrased as call and response.
@@ -708,3 +711,23 @@ committed or deployed until it has been listened to.
   the released encoder.
 - Scenes (`scenes.js`): a patch over the defaults plus a preset per role,
   picked in the top row; the sleep timer moved into the ⚙ menu.
+
+### Pad movement and drum colour (2026-10-15)
+
+- The pad sat still without octave wander: voice leading always took the
+  closest voicing. Now each phrase may lean the voicings low or high in
+  the register (`padMotion.lean`), picks a pulse pattern (`pulseWeights`)
+  or an arpeggio pattern (`arpWeights`), may run an arpeggio in half units
+  while the lead rests (`padMotion.fast`) and swells over the phrase
+  (`padMotion.swell`). All in the music part of links, appended.
+- The styles moved to their voice panels (pad, bass) and humanize and
+  swing to a Feel panel, under More options.
+- Drums still sounded the same bar to bar (one dropped hit among eight
+  hats is inaudible). Three drums were added - felt tom, soft clap, soft
+  ride, appended to `DRUMS` (an event's drum is its index; in the voice
+  part of links they come after the mutes, keeping older links' bits) -
+  plus a Downtempo style. Variation now also colours phrases: hats moved
+  to the ride or a shaker, the backbeat to a clap or a rim, a twist on
+  every second bar, a ride opening a phrase; fills fall down the toms now
+  and then. The tom's pitch, like the swish's direction, rides in the
+  event's variation value.

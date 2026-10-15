@@ -9,13 +9,14 @@ import SynthEditor from './editor/SynthEditor';
 import PresetPicker from './editor/PresetPicker';
 import PROGRESSIONS, { PROGRESSION_LENGTHS, progressionsOfLength } from './progressions';
 import {
-    PAD_STYLES, BASS_STYLES, styleShares, OCTAVE_LIMITS, OCTAVE_WANDER, COUNTER_MODES, SECTION_MODES, SECTION_LENGTHS,
+    PAD_STYLES, BASS_STYLES, PULSE_PATTERNS, ARP_PATTERNS, styleShares, OCTAVE_LIMITS, OCTAVE_WANDER, COUNTER_MODES, SECTION_MODES, SECTION_LENGTHS,
 } from './arranger';
 import { DRIFT_MODES } from './conductor';
 import { METERS } from './meter';
 import {
     RANDOM_LEVELS, RANDOM_LEVEL_HINTS, randomKey, randomProgression, randomConductor, randomVoices, randomField, randomPreset, randomLength,
     randomArrangement, randomStyleWeights, randomRole, progressionLength, progressionForLength, randomAmbience, randomAmbienceShape,
+    randomPadMotion, randomSwing,
 } from './randomize';
 import { MasterVolume, SettingsMenu } from './AudioStatus';
 import { SleepTimer, Recorder } from './Playback';
@@ -249,10 +250,10 @@ const Field = ({ label, onRandom, onGenerate, generating, wide, children }) => (
 
 // One slider per style; the label shows the style's resulting share of
 // phrases. Setting every other style to 0 makes one style "always".
-const StyleWeights = ({ title, styles, weights, onChange, onRandom }) => {
+const StyleWeights = ({ title, styles, weights, onChange, onRandom, disabled }) => {
     const shares = styleShares(weights);
     return (
-        <fieldset className="gen-weights">
+        <fieldset className="gen-weights" disabled={disabled}>
             <legend>{title}{onRandom && <DiceButton label={title} onClick={onRandom} className="gen-legend-dice" />}</legend>
             {Object.entries(styles).map(([id, label]) => (
                 <Field key={id} label={`${label} · ${Math.round(shares[id] * 100)}%`}>
@@ -520,10 +521,83 @@ const VoiceControls = ({ role, voice, onChange }) => {
     );
 };
 
+const pct = (v) => `${Math.round(v * 100)}%`;
+
+// The pad's playing (arranger.js): its styles' shares, the patterns each
+// style picks from, and how it moves - all per phrase. A style's patterns
+// are greyed out while that style never plays.
+const PadPlaying = ({ settings, update, level }) => {
+    const motion = settings.padMotion;
+    const setMotion = (key, value) => update('padMotion', { ...motion, [key]: value });
+    return (
+        <>
+            <StyleWeights title="Styles" styles={PAD_STYLES} weights={settings.padWeights}
+                onChange={(w) => update('padWeights', w)} onRandom={() => update('padWeights', randomStyleWeights('pad', level))} />
+            <StyleWeights title="Pulse patterns" styles={PULSE_PATTERNS} weights={settings.pulseWeights}
+                disabled={styleShares(settings.padWeights).pulse === 0}
+                onChange={(w) => update('pulseWeights', w)} onRandom={() => update('pulseWeights', randomStyleWeights('pulse', level))} />
+            <StyleWeights title="Arpeggio patterns" styles={ARP_PATTERNS} weights={settings.arpWeights}
+                disabled={styleShares(settings.padWeights).arpeggio === 0}
+                onChange={(w) => update('arpWeights', w)} onRandom={() => update('arpWeights', randomStyleWeights('arpeggio', level))} />
+            <fieldset className="gen-weights">
+                <legend>
+                    Movement
+                    <DiceButton label="movement" className="gen-legend-dice" onClick={() => update('padMotion', randomPadMotion(level))} />
+                </legend>
+                <Field label={`Register lean per phrase · ${pct(motion.lean)}`}>
+                    <input type="range" min="0" max="1" step="0.05" value={motion.lean}
+                        title="How often the chords move a little lower or higher in the register (inversions; 0: always the middle)"
+                        onChange={(e) => setMotion('lean', Number(e.target.value))} />
+                </Field>
+                <Field label={`Fast arpeggios · ${pct(motion.fast)}`}>
+                    <input type="range" min="0" max="1" step="0.05" value={motion.fast}
+                        title="Chance an arpeggio phrase runs twice as fast while the lead rests (not in 6/8)"
+                        onChange={(e) => setMotion('fast', Number(e.target.value))} />
+                </Field>
+                <Field label={`Phrase swell · ±${pct(motion.swell)}`}>
+                    <input type="range" min="0" max="0.2" step="0.01" value={motion.swell}
+                        title="How much the level rises toward each phrase's third bar and settles after"
+                        onChange={(e) => setMotion('swell', Number(e.target.value))} />
+                </Field>
+            </fieldset>
+        </>
+    );
+};
+
+// Feel (Generator.humanize, meter.js swingEvents): swing up front, the
+// per-note looseness under More options.
+const FeelPanel = ({ humanize, swing, update, onRandomHumanize, onRandom }) => (
+    <Panel id="feel" title="Feel" onRandom={onRandom} more={(
+        <fieldset className="gen-weights">
+            <legend>
+                Looseness (random, normally distributed per note)
+                <DiceButton label="looseness" className="gen-legend-dice" onClick={onRandomHumanize} />
+            </legend>
+            <Field label={`Timing ± ${humanize.timing} ms`}>
+                <input type="range" min="0" max="40" step="1" value={humanize.timing}
+                    onChange={(e) => update('humanize', { ...humanize, timing: Number(e.target.value) })} />
+            </Field>
+            <Field label={`Velocity ± ${Math.round(humanize.velocity * 100)}%`}>
+                <input type="range" min="0" max="0.25" step="0.01" value={humanize.velocity}
+                    onChange={(e) => update('humanize', { ...humanize, velocity: Number(e.target.value) })} />
+            </Field>
+            <Field label={`Pitch ± ${humanize.detune} cents`}>
+                <input type="range" min="0" max="15" step="0.5" value={humanize.detune}
+                    onChange={(e) => update('humanize', { ...humanize, detune: Number(e.target.value) })} />
+            </Field>
+        </fieldset>
+    )}>
+        <Field label={swing ? `Swing ${Math.round(swing * 100)}%` : 'Swing: straight'}>
+            <input type="range" min="0" max="0.6" step="0.05" value={swing}
+                title="Notes on the second half of a beat come late, toward a triplet (not in 6/8)"
+                onChange={(e) => update('swing', Number(e.target.value))} />
+        </Field>
+    </Panel>
+);
+
 // Percussion (percussion.js, engine/drumKit.js): what plays - style,
 // activity, variation - and its level; under More options the room and
 // each drum's sound (on, level, tone, length).
-const pct = (v) => `${Math.round(v * 100)}%`;
 const DRUM_VALUE = { level: pct, tone: (v) => (v === 0 ? 'neutral' : v < 0 ? `darker ${Math.round(-v * 100)}%` : `brighter ${Math.round(v * 100)}%`), decay: (v) => `${v.toFixed(2)}x` };
 const PercussionPanel = ({ drums, kit, volume, mix, armed, onArm, onDrums, onKit, onVolume, onMix, onAudition }) => {
     const on = drums.style !== 'off';
@@ -954,10 +1028,6 @@ const GenerativeApp = () => {
 
             <Panel id="arrangement" title="Arrangement" onRandom={() => randomize('arrangement')} more={(
                 <>
-                    <StyleWeights title="Rhythm / pad styles" styles={PAD_STYLES} weights={settings.padWeights}
-                        onChange={(w) => update('padWeights', w)} onRandom={() => update('padWeights', randomStyleWeights('pad', randomLevel))} />
-                    <StyleWeights title="Bass styles" styles={BASS_STYLES} weights={settings.bassWeights}
-                        onChange={(w) => update('bassWeights', w)} onRandom={() => update('bassWeights', randomStyleWeights('bass', randomLevel))} />
                     <Field label="Section length">
                         <select value={settings.sections.phrases} disabled={settings.sections.mode === 'off'}
                             onChange={(e) => update('sections', { ...settings.sections, phrases: Number(e.target.value) })}>
@@ -970,30 +1040,6 @@ const GenerativeApp = () => {
                                 onChange={(e) => update('counter', { ...settings.counter, activity: Number(e.target.value) })} />
                         </Field>
                     )}
-                    <fieldset className="gen-weights">
-                        <legend>
-                            Feel (random, normally distributed per note)
-                            <DiceButton label="feel" className="gen-legend-dice"
-                                onClick={() => update('humanize', randomArrangement(gen.settings, randomLevel).humanize)} />
-                        </legend>
-                        <Field label={`Timing ± ${settings.humanize.timing} ms`}>
-                            <input type="range" min="0" max="40" step="1" value={settings.humanize.timing}
-                                onChange={(e) => update('humanize', { ...settings.humanize, timing: Number(e.target.value) })} />
-                        </Field>
-                        <Field label={`Velocity ± ${Math.round(settings.humanize.velocity * 100)}%`}>
-                            <input type="range" min="0" max="0.25" step="0.01" value={settings.humanize.velocity}
-                                onChange={(e) => update('humanize', { ...settings.humanize, velocity: Number(e.target.value) })} />
-                        </Field>
-                        <Field label={`Pitch ± ${settings.humanize.detune} cents`}>
-                            <input type="range" min="0" max="15" step="0.5" value={settings.humanize.detune}
-                                onChange={(e) => update('humanize', { ...settings.humanize, detune: Number(e.target.value) })} />
-                        </Field>
-                        <Field label={settings.swing ? `Swing ${Math.round(settings.swing * 100)}%` : 'Swing: straight'}>
-                            <input type="range" min="0" max="0.6" step="0.05" value={settings.swing}
-                                title="Notes on the second half of a beat come late, toward a triplet (not in 6/8)"
-                                onChange={(e) => update('swing', Number(e.target.value))} />
-                        </Field>
-                    </fieldset>
                 </>
             )}>
                 <Field label={`Lead activity ${Math.round(settings.leadActivity * 100)}%`}>
@@ -1023,6 +1069,13 @@ const GenerativeApp = () => {
                 </label>
             </Panel>
 
+            <FeelPanel humanize={settings.humanize} swing={settings.swing} update={update}
+                onRandomHumanize={() => update('humanize', randomArrangement(gen.settings, randomLevel).humanize)}
+                onRandom={() => {
+                    update('humanize', randomArrangement(gen.settings, randomLevel).humanize);
+                    update('swing', randomSwing(randomLevel));
+                }} />
+
             <AmbiencePanel levels={settings.ambience} shape={settings.ambienceShape} onShape={(s) => update('ambienceShape', s)}
                 volume={settings.ambienceVolume} on={settings.playAmbience}
                 onChange={changeAmbience} onVolume={(v) => update('ambienceVolume', v)} onToggle={() => togglePart('playAmbience')}
@@ -1049,11 +1102,18 @@ const GenerativeApp = () => {
                             <VoiceControls role={role} voice={settings.voices[role]}
                                 onChange={(voice) => update('voices', { ...settings.voices, [role]: voice })} />
                             {role === 'pad' && (
-                                <Field label="Chord notes">
-                                    <select value={settings.padNotes} onChange={(e) => update('padNotes', Number(e.target.value))}>
-                                        {Object.entries(PAD_NOTES).map(([n, text]) => <option key={n} value={n}>{text}</option>)}
-                                    </select>
-                                </Field>
+                                <>
+                                    <Field label="Chord notes">
+                                        <select value={settings.padNotes} onChange={(e) => update('padNotes', Number(e.target.value))}>
+                                            {Object.entries(PAD_NOTES).map(([n, text]) => <option key={n} value={n}>{text}</option>)}
+                                        </select>
+                                    </Field>
+                                    <PadPlaying settings={settings} update={update} level={randomLevel} />
+                                </>
+                            )}
+                            {role === 'bass' && (
+                                <StyleWeights title="Styles" styles={BASS_STYLES} weights={settings.bassWeights}
+                                    onChange={(w) => update('bassWeights', w)} onRandom={() => update('bassWeights', randomStyleWeights('bass', randomLevel))} />
                             )}
                         </>
                     )}

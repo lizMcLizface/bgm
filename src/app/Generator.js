@@ -671,7 +671,7 @@ class Generator {
 
     // Decides one bar. Event times/lengths are in beats from the bar start.
     planBar(bar) {
-        const { barsPerChord, leadActivity, padWeights, bassWeights, thinPadUnderLead, drift, humanize, voices, counter, sections, drums, swing } = this.settings;
+        const { barsPerChord, leadActivity, padWeights, bassWeights, pulseWeights, arpWeights, padMotion, thinPadUnderLead, drift, humanize, voices, counter, sections, drums, swing } = this.settings;
         const prev = this.plan.get(bar - 1);
 
         const fresh = !prev || this.resetMusicAt === bar;
@@ -711,7 +711,7 @@ class Generator {
             chordStart,
             barsLeftInChord,
             prev: prev ? prev.state : null,
-            settings: { leadActivity, padWeights, bassWeights, thinPadUnderLead, voices, counter, sections },
+            settings: { leadActivity, padWeights, bassWeights, pulseWeights, arpWeights, padMotion, thinPadUnderLead, voices, counter, sections },
             rng: this.rng,
         });
         // Drums: patterns and looseness from streams of their own (the

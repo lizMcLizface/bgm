@@ -49,11 +49,15 @@ export const RoleButtons = ({ role, label, mix, armed, onMix, onArm, onEdit, onR
  * @returns {{ octave: number, connectMidi: function, midiStatus: string }}
  */
 // Percussion, armed: the home row plays the drums (percussion.js DRUMS order)...
-export const DRUM_KEYS = { KeyA: 0, KeyS: 1, KeyD: 2, KeyF: 3, KeyG: 4, KeyH: 5 };
-export const DRUM_KEY_HINT = 'A kick · S brush · D shaker · F rim · G hat · H swish';
+export const DRUM_KEYS = { KeyA: 0, KeyS: 1, KeyD: 2, KeyF: 3, KeyG: 4, KeyH: 5, KeyJ: 6, KeyK: 7, KeyL: 8 };
+export const DRUM_KEY_HINT = 'A kick · S brush · D shaker · F rim · G hat · H swish · J tom · K clap · L ride';
 // ... and MIDI notes as General MIDI drums: kicks, side stick, snares
-// (brush taps), hi-hats, cabasa / maracas (shaker), cymbals (swish).
-const MIDI_DRUMS = { 35: 0, 36: 0, 37: 3, 38: 1, 40: 1, 39: 1, 42: 4, 44: 4, 46: 4, 69: 2, 70: 2, 49: 5, 51: 5, 57: 5, 59: 5 };
+// (brush taps), clap, hi-hats, cabasa / maracas (shaker), crashes (swish),
+// toms, rides.
+const MIDI_DRUMS = {
+    35: 0, 36: 0, 37: 3, 38: 1, 40: 1, 39: 7, 42: 4, 44: 4, 46: 4, 69: 2, 70: 2, 49: 5, 57: 5,
+    41: 6, 43: 6, 45: 6, 47: 6, 48: 6, 50: 6, 51: 8, 53: 8, 59: 8,
+};
 
 export function useLivePlay(generator, armed) {
     const [octaves, setOctaves] = useState(DEFAULT_KEY_OCTAVES);

@@ -12,6 +12,7 @@
 import {
     DEFAULT_PAD_WEIGHTS, DEFAULT_BASS_WEIGHTS, DEFAULT_VOICES, OCTAVE_LIMITS, OCTAVE_WANDER,
     DEFAULT_COUNTER, COUNTER_MODES, DEFAULT_SECTIONS, SECTION_MODES, SECTION_LENGTHS,
+    DEFAULT_PULSE_WEIGHTS, DEFAULT_ARP_WEIGHTS, DEFAULT_PAD_MOTION,
 } from './arranger';
 import { AMBIENCE_LAYERS, DEFAULT_AMBIENCE, defaultAmbienceShape } from './engine/ambience';
 import { LAYER_PARAMS, COMMON_PARAMS } from './engine/ambienceSynth';
@@ -57,6 +58,9 @@ export function defaultSettings() {
         playMusic: true, // what Play starts
         playAmbience: false,
         volumes: { ...ROLE_VOLUMES }, // per role, 0..1
+        pulseWeights: { ...DEFAULT_PULSE_WEIGHTS }, // how the pad pulses / arpeggiates (arranger.js)
+        arpWeights: { ...DEFAULT_ARP_WEIGHTS },
+        padMotion: { ...DEFAULT_PAD_MOTION }, // register lean, fast arpeggios, swell
         seed: newSeed(),
     };
 }
@@ -124,6 +128,9 @@ const RULES = {
     playMusic: bool,
     playAmbience: bool,
     volumes: Object.fromEntries(Object.keys(ROLE_VOLUMES).map((role) => [role, clamp(0, 1)])),
+    pulseWeights: Object.fromEntries(Object.keys(DEFAULT_PULSE_WEIGHTS).map((id) => [id, clamp(0, 100)])),
+    arpWeights: Object.fromEntries(Object.keys(DEFAULT_ARP_WEIGHTS).map((id) => [id, clamp(0, 100)])),
+    padMotion: { lean: clamp(0, 1), fast: clamp(0, 1), swell: clamp(0, 0.2) },
     seed: int(0, 2 ** 31),
 };
 

@@ -11,6 +11,12 @@
 // weight = always). The bass approaches each new chord stepwise; the pad
 // thins while the lead plays (density budget).
 //
+// The pad also moves within its register: each phrase it may lean its
+// voicings a little lower or higher (inversions, so the top voice travels),
+// pick a pattern for its style (pulse: per group, per beat, pushed, or
+// low note / upper notes; arpeggio: bouncing, up, down, broken, sometimes
+// twice as fast) and swells gently over the phrase.
+//
 // Each role plays in its register shifted by a per-role octave offset. With
 // octave wander on, the offset may move one octave at a phrase start -
 // centered around the role's home octave (and drifting back to it), or
@@ -117,6 +123,43 @@ export function styleShares(weights) {
 
 // All weights at zero means "no preference", not "nothing".
 const pickStyle = (rng, weights) => weighted(rng, total(weights) > 0 ? weights : styleShares(weights));
+
+// How each pad style is played: a pattern per phrase, in proportion to
+// its weight (as the styles).
+export const PULSE_PATTERNS = { groups: 'On the beat groups', beats: 'Every beat', push: 'Pushed (early)', split: 'Low note, then chord' };
+export const ARP_PATTERNS = { bounce: 'Up and down', up: 'Up', down: 'Down', broken: 'Broken (low, top, mid, top)' };
+export const DEFAULT_PULSE_WEIGHTS = { groups: 35, beats: 20, push: 25, split: 20 };
+export const DEFAULT_ARP_WEIGHTS = { bounce: 35, up: 25, down: 15, broken: 25 };
+// lean: chance per phrase the voicings move to another spot in the
+// register (0: always the middle); fast: chance an arpeggio runs in half
+// units while the lead rests; swell: how much the level rises over a phrase.
+export const DEFAULT_PAD_MOTION = { lean: 0.6, fast: 0.3, swell: 0.06 };
+// Where the pad's voicings lean within its register: -1 low .. 1 high,
+// in semitones from the middle per step.
+const PAD_LIFT_STEP = 4.5;
+const padMotionOf = (settings) => ({ ...DEFAULT_PAD_MOTION, ...settings.padMotion });
+// Pad level over the four bars of a phrase: in, up to bar 3, settling.
+const padSwell = (depth, index) => [1 - depth, 1, 1 + depth, 1 - depth / 3][index % PHRASE_BARS];
+
+// Next phrase's lean: one step at most, back from the edges more often.
+function nextPadLift(previous, lean, rng) {
+    if (!lean) return 0;
+    if (previous == null || !chance(rng, lean)) return previous ?? 0;
+    if (previous !== 0) return chance(rng, 0.7) ? 0 : previous;
+    return pick(rng, [-1, 1]);
+}
+
+// The pattern for a pad style (null for sustain), and the arpeggio's step
+// in units: half a unit now and then when nothing else is busy.
+function decidePadPattern(style, meter, leadActive, settings, rng) {
+    if (style === 'pulse') return { pattern: pickStyle(rng, settings.pulseWeights || DEFAULT_PULSE_WEIGHTS), step: 1 };
+    if (style === 'arpeggio') {
+        const pattern = pickStyle(rng, settings.arpWeights || DEFAULT_ARP_WEIGHTS);
+        const fast = !leadActive && meter.unitsPerBeat === 1 && chance(rng, padMotionOf(settings).fast);
+        return { pattern, step: fast ? 0.5 : 1 };
+    }
+    return { pattern: null, step: 1 };
+}
 
 // Lead rhythm cells per beat group, [unit, length] within the group; [] is
 // a rest.
@@ -256,6 +299,9 @@ function decidePhrase(bar, prevPhrase, meter, settings, rng) {
 
     const response = motif ? vary(motif, meter, rng) : null;
     const bassStyle = pickStyle(rng, settings.bassWeights);
+    padStyle = shape.padStyle || padStyle;
+    const { pattern: padPattern, step: padStep } = decidePadPattern(padStyle, meter, leadActive, settings, rng);
+    const padLift = nextPadLift(prevPhrase && prevPhrase.padLift, padMotionOf(settings).lean, rng);
 
     return {
         start: bar,
@@ -264,7 +310,10 @@ function decidePhrase(bar, prevPhrase, meter, settings, rng) {
         leadActive,
         motif,
         response,
-        padStyle: shape.padStyle || padStyle,
+        padStyle,
+        padPattern,
+        padStep,
+        padLift,
         bassStyle: shape.bassStyle || bassStyle,
         bass: shape.bass !== false,
         section,
@@ -282,17 +331,64 @@ const bounce = (i, n) => {
     return k < n ? k : period - k;
 };
 
-function padEvents({ chordStart, barsLeftInChord, meter, voicing, style, thin }) {
-    const base = thin ? 0.48 : 0.6;
+// Alberti-style order over n voices: low, top, next, top, ... (0,2,1,2).
+function brokenOrder(n) {
+    if (n < 3) return [...Array(n).keys()];
+    const order = [0];
+    for (let i = 1; i < n - 1; i++) order.push(n - 1, i);
+    order.push(n - 1);
+    return order;
+}
+
+// Strike times of a pulse pattern, in units.
+function pulseHits(pattern, meter) {
+    const starts = groupStarts(meter);
+    const beats = beatStarts(meter);
+    if (pattern === 'beats' && beats.length > starts.length) return beats;
+    if (pattern === 'push' || pattern === 'beats') {
+        // the downbeat, then each later group anticipated (a single group:
+        // a push into its middle)
+        const early = meter.unitsPerBeat === 1 ? 0.5 : 1;
+        return starts.length > 1 ? [0, ...starts.slice(1).map((at) => at - early)] : [0, meter.units / 2];
+    }
+    return starts;
+}
+
+function padEvents({ chordStart, barsLeftInChord, meter, voicing, style, pattern, step = 1, thin, range, swell = 1 }) {
+    const base = (thin ? 0.48 : 0.6) * swell;
     const ev = (midi, beat, length, velocity) => ({ role: 'pad', midi, beat, length, velocity });
 
     if (style === 'pulse') {
         const starts = groupStarts(meter);
-        return starts.flatMap((at, g) => voicing.map((m) => ev(m, at, meter.groups[g] * 0.95, g === 0 ? base : base * 0.8)));
+        if (pattern === 'split') {
+            // low note on each group start, the upper notes on the units between
+            const [low, ...upper] = voicing;
+            return Array.from({ length: meter.units }, (_, u) => {
+                const g = starts.indexOf(u);
+                if (g >= 0) return [ev(low, u, meter.groups[g] * 0.95, g === 0 ? base : base * 0.85)];
+                return upper.map((m) => ev(m, u, 0.9, base * 0.72));
+            }).flat();
+        }
+        const hits = pulseHits(pattern, meter);
+        return hits.flatMap((at, i) => {
+            const length = ((i + 1 < hits.length ? hits[i + 1] : meter.units) - at) * 0.95;
+            const accent = i === 0 ? 1 : starts.includes(at) ? 0.8 : 0.88;
+            return voicing.map((m) => ev(m, at, length, base * accent));
+        });
     }
     if (style === 'arpeggio') {
-        return Array.from({ length: meter.units }, (_, u) =>
-            ev(voicing[bounce(u, voicing.length)], u, 1.6, base * (u === 0 ? 1 : 0.85)));
+        // the bottom note an octave up as well, where the register allows
+        const top = voicing[0] + 12;
+        const notes = range && top <= range[1] && !voicing.includes(top) ? [...voicing, top] : voicing;
+        const n = notes.length;
+        const broken = brokenOrder(n);
+        const order = {
+            up: (i) => i % n,
+            down: (i) => n - 1 - (i % n),
+            broken: (i) => broken[i % broken.length],
+        }[pattern] || ((i) => bounce(i, n));
+        return Array.from({ length: Math.round(meter.units / step) }, (_, i) =>
+            ev(notes[order(i)], i * step, 1.6 * step, base * (i === 0 ? 1 : (i * step) % 1 ? 0.75 : 0.85)));
     }
     if (!chordStart) return [];
     return voicing.map((m) => ev(m, 0, barsLeftInChord * meter.units * 0.95, base));
@@ -413,7 +509,8 @@ function harmonyEvents(leadNotes, scalePcs, range) {
  * @param {number} args.barsLeftInChord - including this one
  * @param {object|null} args.prev - the previous bar's returned state
  * @param {object} args.settings - { leadActivity 0..1, padWeights, bassWeights,
- *   thinPadUnderLead, voices: { pad|bass|lead|counter: { octave, wander, chance } },
+ *   thinPadUnderLead, pulseWeights, arpWeights, padMotion: { lean, fast, swell },
+ *   voices: { pad|bass|lead|counter: { octave, wander, chance } },
  *   counter: { mode, activity }, sections: { mode, phrases } } (counter and
  *   sections optional: off)
  * @param {function} args.rng
@@ -440,10 +537,24 @@ export function arrangeBar({ bar, meter, chord, nextChord, scalePcs, chordStart,
     // Re-voice on a new chord, or when the pad's register moved (voice
     // leading from the old voicing keeps that move as small as possible).
     const padMoved = prev && prev.padVoicing && prev.padVoicing.some((m) => m < ranges.pad[0] || m > ranges.pad[1]);
+    // The phrase's lean pulls the voicing a little low or high in the range
+    // (not while it follows an octave move - one jump at a time).
+    const padTarget = padMoved ? null : (ranges.pad[0] + ranges.pad[1]) / 2 + (phrase.padLift || 0) * PAD_LIFT_STEP;
     const voicing = chordStart || !prev || padMoved || prev.padVoicing.length !== chord.pitchClasses.length
-        ? voiceLead(chord.pitchClasses, ranges.pad[0], ranges.pad[1], prev && prev.padVoicing.length === chord.pitchClasses.length ? prev.padVoicing : null)
+        ? voiceLead(chord.pitchClasses, ranges.pad[0], ranges.pad[1], prev && prev.padVoicing.length === chord.pitchClasses.length ? prev.padVoicing : null, padTarget)
         : prev.padVoicing;
-    const pad = padEvents({ chordStart: chordStart || !prev || padMoved, barsLeftInChord, meter, voicing, style: phrase.padStyle, thin: phrase.leadActive && settings.thinPadUnderLead });
+    const pad = padEvents({
+        chordStart: chordStart || !prev || padMoved,
+        barsLeftInChord,
+        meter,
+        voicing,
+        style: phrase.padStyle,
+        pattern: phrase.padPattern,
+        step: phrase.padStep,
+        thin: phrase.leadActive && settings.thinPadUnderLead,
+        range: ranges.pad,
+        swell: padSwell(padMotionOf(settings).swell, bar - phrase.start),
+    });
 
     const bass = bassEvents({
         chord,

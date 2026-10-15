@@ -359,7 +359,7 @@ describe('drums, swing and section tone', () => {
 
     test('turning drums on adds hits and leaves every note as it was', () => {
         const plain = withSettings({});
-        ['heartbeat', 'brushes', 'lofi', 'shaker'].forEach((style) => {
+        ['heartbeat', 'brushes', 'lofi', 'shaker', 'downtempo'].forEach((style) => {
             const drummed = withSettings({ drums: { style, activity: 0.8 } });
             expect(notes(drummed)).toEqual(notes(plain));
             const hits = drummed.flatMap((b) => b.events.filter((e) => e.role === 'perc'));
@@ -368,7 +368,7 @@ describe('drums, swing and section tone', () => {
                 expect(e.beat).toBeGreaterThanOrEqual(0);
                 expect(e.beat).toBeLessThan(4.1);
                 expect(e.midi).toBeGreaterThanOrEqual(0);
-                expect(e.midi).toBeLessThan(6);
+                expect(e.midi).toBeLessThan(9);
             });
         });
         expect(plain.flatMap((b) => b.events).some((e) => e.role === 'perc')).toBe(false);

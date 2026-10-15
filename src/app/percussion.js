@@ -12,16 +12,26 @@
 // same. *Activity* adds ghost notes, extra kicks and fills; phrases close
 // with a fill now and then, sections with a bigger one. Sections also thin
 // the kit out: none or a little in an intro, all of it in Full.
+//
+// Variation also colours whole phrases, so a groove doesn't repeat bar for
+// bar: the hats may move to the ride or a shaker and the backbeat to a
+// clap or a rim, every second bar may get a twist (an extra kick, a moved
+// one, an open accent at its end), and a phrase may open on a ride swell.
 
 import { seeded, chance, normal } from './random';
 import { groupStarts, beatStarts } from './meter';
 
 /** The drums, by the index an event carries as its `midi`. */
-export const DRUMS = ['kick', 'brush', 'shaker', 'rim', 'hat', 'swish'];
-export const DRUM_LABELS = { kick: 'Felt kick', brush: 'Brush tap', shaker: 'Shaker', rim: 'Rim click', hat: 'Soft hat', swish: 'Brush swish' };
+// Append only: an event's drum is its index here (and links store the kit
+// in this order).
+export const DRUMS = ['kick', 'brush', 'shaker', 'rim', 'hat', 'swish', 'tom', 'clap', 'ride'];
+export const DRUM_LABELS = {
+    kick: 'Felt kick', brush: 'Brush tap', shaker: 'Shaker', rim: 'Rim click', hat: 'Soft hat', swish: 'Brush swish',
+    tom: 'Felt tom', clap: 'Soft clap', ride: 'Soft ride',
+};
 const DRUM = Object.fromEntries(DRUMS.map((name, i) => [name, i]));
 
-export const DRUM_STYLES = { off: 'Off', heartbeat: 'Heartbeat', brushes: 'Brushes', lofi: 'Lo-fi beat', shaker: 'Shaker' };
+export const DRUM_STYLES = { off: 'Off', heartbeat: 'Heartbeat', brushes: 'Brushes', lofi: 'Lo-fi beat', shaker: 'Shaker', downtempo: 'Downtempo' };
 export const DEFAULT_DRUMS = { style: 'off', activity: 0.5, variation: 0.5 };
 
 // The kit's sound (engine/drumKit.js), per drum: on, level (1 = as made),
@@ -90,6 +100,14 @@ const GROOVES = {
                 g.beats.forEach((at) => chance(rng, 0.3 + activity * 0.5) && hit('shaker', at, 0.18));
             }
         },
+        // lub-dub, answered by a low tom half way
+        ({ g, level, activity, rng, hit }) => {
+            hit('kick', g.first, 0.7);
+            hit('kick', g.first + g.step, 0.4);
+            if (level < 2) return;
+            hit('tom', g.middle, 0.42, 0.25, -0.6);
+            if (chance(rng, activity * 0.6)) hit('tom', g.middle + g.step, 0.26, 0.25, -0.8);
+        },
     ],
 
     // Brushes: the taps carry the groove; sweeps are an occasional colour -
@@ -112,11 +130,11 @@ const GROOVES = {
             g.offbeats.forEach((at) => chance(rng, 0.2 + activity * 0.4) && hit('brush', at, 0.18));
             if (chance(rng, activity)) hit('kick', g.first, 0.34);
         },
-        // a ride: soft hat on every beat and the off-beat before each backbeat
+        // a ride on every beat and the off-beat before each backbeat
         // ("ding, ding-da ding"), taps on the backbeats
         ({ g, level, activity, rng, hit }) => {
-            g.beats.forEach((at) => hit('hat', at, at === g.first ? 0.42 : 0.34));
-            g.backbeats.forEach((at) => at - g.step > g.first && hit('hat', at - g.step, 0.26));
+            g.beats.forEach((at) => hit('ride', at, at === g.first ? 0.42 : 0.34));
+            g.backbeats.forEach((at) => at - g.step > g.first && hit('ride', at - g.step, 0.26));
             if (level < 2) return;
             g.backbeats.forEach((at) => hit('brush', at, 0.48));
             if (chance(rng, 0.3 + activity * 0.4)) hit('kick', g.first, 0.32);
@@ -154,6 +172,50 @@ const GROOVES = {
             if (chance(rng, activity * 0.6)) hit('rim', g.units - g.step, 0.24);
             return undefined;
         },
+        // boom-bap: a clap on the backbeats, a lazy second kick, hats on the beats
+        // and an open one before the bar ends
+        ({ g, level, activity, rng, hit }) => {
+            g.beats.forEach((at) => hit('hat', at, 0.32));
+            hit('hat', g.units - g.step, 0.3);
+            if (level < 2) return g.backbeats.forEach((at) => hit('rim', at, 0.3));
+            hit('kick', g.first, 0.74);
+            hit('kick', g.middle + (chance(rng, 0.5) ? 0 : g.step), 0.5);
+            if (chance(rng, activity * 0.5)) hit('kick', g.first + g.step, 0.36);
+            g.backbeats.forEach((at) => hit('clap', at, 0.5));
+            return undefined;
+        },
+    ],
+
+    // Downtempo: deeper and rounder - kick, clap, ride and toms.
+    downtempo: [
+        // kick one and the and of the middle, clap backbeats, ride eighths
+        ({ g, level, activity, rng, hit }) => {
+            g.grid.forEach((at) => hit('ride', at, g.beats.includes(at) ? 0.3 : 0.2));
+            if (level < 2) return;
+            hit('kick', g.first, 0.72);
+            hit('kick', g.middle + g.step, 0.5);
+            g.backbeats.forEach((at) => hit('clap', at, 0.46));
+            if (chance(rng, activity * 0.5)) hit('tom', g.units - g.step, 0.3, 0.25, -0.3);
+        },
+        // half time: a clap in the middle, toms answering the kick, a shaker on the grid
+        ({ g, level, activity, rng, hit }) => {
+            g.grid.forEach((at) => hit('shaker', at, g.beats.includes(at) ? 0.26 : 0.18));
+            if (level < 2) return;
+            hit('kick', g.first, 0.74);
+            hit('clap', g.middle, 0.5);
+            hit('tom', g.first + g.step * 3 < g.middle ? g.first + g.step * 3 : g.first + g.step, 0.32, 0.25, -0.5);
+            if (chance(rng, 0.3 + activity * 0.5)) hit('kick', g.units - g.step, 0.42);
+        },
+        // broken: kick, rim and clap trading, hats skipping, a ride on the one
+        ({ g, level, activity, rng, hit }) => {
+            hit('ride', g.first, 0.36);
+            g.offbeats.forEach((at) => chance(rng, 0.6 + activity * 0.3) && hit('hat', at, 0.24));
+            if (level < 2) return;
+            hit('kick', g.first, 0.72);
+            hit('kick', g.first + g.step * 3 < g.units ? g.first + g.step * 3 : g.first + g.step, 0.48);
+            g.backbeats.forEach((at, i) => hit(i % 2 ? 'clap' : 'rim', at, i % 2 ? 0.46 : 0.34));
+            if (chance(rng, activity)) hit('rim', g.units - g.step, 0.2);
+        },
     ],
 
     shaker: [
@@ -180,12 +242,47 @@ const GROOVES = {
 };
 
 // Fills, to close a phrase (small) or a section (big): taps over the last
-// beat or two, getting louder.
+// beat or two, getting louder - or, now and then, toms falling in pitch.
 function fill(g, big, rng, hit) {
     const count = big ? Math.min(g.grid.length - 1, 4 + Math.floor(rng() * 3)) : 2 + Math.floor(rng() * 2);
     const tail = g.grid.slice(-count);
-    tail.forEach((at, i) => hit(rng() < 0.75 ? 'brush' : 'rim', at, 0.3 + (0.35 * i) / tail.length));
+    const toms = chance(rng, big ? 0.5 : 0.3);
+    tail.forEach((at, i) => {
+        const velocity = 0.3 + (0.35 * i) / tail.length;
+        if (toms) hit('tom', at, velocity, 0.25, 0.8 - (1.6 * i) / Math.max(1, tail.length - 1));
+        else hit(rng() < 0.75 ? 'brush' : 'rim', at, velocity);
+    });
     if (big) hit('kick', tail[0], 0.5);
+}
+
+// A phrase's colour (variation): which drums stand in for the hats and the
+// backbeat, the twist every second bar gets, and whether it opens on a ride.
+function phraseColour(variation, rng) {
+    const swaps = {};
+    if (chance(rng, variation * 0.45)) swaps.hat = rng() < 0.6 ? 'ride' : 'shaker';
+    if (chance(rng, variation * 0.45)) swaps.brush = rng() < 0.6 ? 'clap' : 'rim';
+    const twists = ['kick', 'push', 'open'];
+    return {
+        swaps,
+        twist: chance(rng, variation * 0.8) ? twists[Math.floor(rng() * twists.length)] : null,
+        opening: chance(rng, variation * 0.5),
+    };
+}
+
+// The twist on a phrase's second and fourth bars.
+function twistBar(twist, g, events, hit) {
+    const kicks = events.filter((e) => e.midi === DRUM.kick);
+    if (twist === 'kick') {
+        // an extra, quieter kick on an off-beat after the middle
+        const at = g.offbeats.find((o) => o > g.middle) ?? g.grid[g.grid.length - 1];
+        hit('kick', at, 0.4);
+    } else if (twist === 'push' && kicks.length > 1) {
+        // the last kick comes a step early
+        kicks[kicks.length - 1].beat = Math.max(g.step, kicks[kicks.length - 1].beat - g.step);
+    } else {
+        // an open accent on the bar's last off-beat
+        hit('ride', g.grid[g.grid.length - 1], 0.34);
+    }
 }
 
 // --- streams --------------------------------------------------------------
@@ -221,6 +318,8 @@ export function drumBar({ bar, meter, drums, section, sectionsMode, sectionBars 
     const phraseRng = stream(0xbb67ae85, seed, phraseStart);
     if (phraseRng() < variation * 0.4) groove = (groove + 1 + Math.floor(phraseRng() * (grooves.length - 1))) % grooves.length;
 
+    const colour = phraseColour(variation, phraseRng);
+
     const rng = stream(0x6a09e667, seed, bar);
     const g = geometry(meter);
     const events = [];
@@ -228,7 +327,7 @@ export function drumBar({ bar, meter, drums, section, sectionsMode, sectionBars 
         if (beat < 0 || beat >= g.units) return;
         events.push({
             role: 'perc',
-            midi: DRUM[drum],
+            midi: DRUM[colour.swaps[drum] || drum],
             beat,
             length,
             velocity,
@@ -237,6 +336,9 @@ export function drumBar({ bar, meter, drums, section, sectionsMode, sectionBars 
         });
     };
     grooves[groove]({ g, level, activity, rng, hit });
+    const index = (bar - phraseStart) % 4;
+    if (level >= 2 && colour.twist && index % 2 === 1) twistBar(colour.twist, g, events, hit);
+    if (level >= 2 && colour.opening && index === 0) hit('ride', g.first, 0.5, 0.25, 0.8);
 
     // Variation from bar to bar: a hit dropped, a ghost added.
     if (events.length > 2 && chance(rng, variation * 0.5)) {
@@ -250,7 +352,7 @@ export function drumBar({ bar, meter, drums, section, sectionsMode, sectionBars 
 
     // Fills: a phrase's last bar now and then; a section's last bar more often and bigger.
     const sectionEnds = section ? (bar + 1 - section.start) % sectionBars === 0 : (bar + 1) % GROOVE_BARS === 0;
-    const phraseEnds = (bar - phraseStart) % 4 === 3;
+    const phraseEnds = index === 3;
     if (level >= 2 && phraseEnds && chance(rng, 0.15 + activity * 0.35 + variation * 0.15)) {
         fill(g, sectionEnds, rng, hit);
     }
@@ -271,7 +373,7 @@ export function loosenDrums(events, { timing, velocity }, unitSeconds, seed, bar
 }
 
 /** A few hits for an audition (the kit on its own while stopped). */
-export const auditionHits = () => ['kick', 'hat', 'brush', 'shaker', 'rim', 'swish'].map((drum, i) => ({ midi: DRUM[drum], beat: i * 0.5, velocity: 0.6, detune: 0 }));
+export const auditionHits = () => ['kick', 'hat', 'brush', 'shaker', 'rim', 'clap', 'tom', 'ride', 'swish'].map((drum, i) => ({ midi: DRUM[drum], beat: i * 0.5, velocity: 0.6, detune: 0 }));
 
 /** Random drum settings: a style, activity and variation. */
 export function randomDrums(rng = Math.random) {

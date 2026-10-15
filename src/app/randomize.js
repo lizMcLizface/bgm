@@ -12,7 +12,10 @@ import { SCALE_FAMILIES, TONIC_NAMES, scaleById, scaleSemitones } from './theory
 import PROGRESSIONS, { PROGRESSION_LENGTHS, progressionsOfLength } from './progressions';
 import { METERS } from './meter';
 import { DEFAULT_DRIFT, DRIFT_MODES, TEMPO_BOUNDS } from './conductor';
-import { OCTAVE_LIMITS, OCTAVE_WANDER, DEFAULT_PAD_WEIGHTS, DEFAULT_BASS_WEIGHTS, COUNTER_MODES, SECTION_MODES, SECTION_LENGTHS } from './arranger';
+import {
+    OCTAVE_LIMITS, OCTAVE_WANDER, DEFAULT_PAD_WEIGHTS, DEFAULT_BASS_WEIGHTS, DEFAULT_PULSE_WEIGHTS, DEFAULT_ARP_WEIGHTS, DEFAULT_PAD_MOTION,
+    COUNTER_MODES, SECTION_MODES, SECTION_LENGTHS,
+} from './arranger';
 import { PRESET_CATEGORIES, ROLE_CATEGORY } from './presets';
 import { presetGroups } from './editor/presetStore';
 import { chance, pick, weighted } from './random';
@@ -235,11 +238,12 @@ export function randomVoices(settings, current, level, rng = Math.random, groups
     return { settings: { voices: { ...settings.voices, ...voices }, padNotes: Number(padNotes) }, presets };
 }
 
-const STYLE_DEFAULTS = { pad: DEFAULT_PAD_WEIGHTS, bass: DEFAULT_BASS_WEIGHTS };
+const STYLE_DEFAULTS = { pad: DEFAULT_PAD_WEIGHTS, bass: DEFAULT_BASS_WEIGHTS, pulse: DEFAULT_PULSE_WEIGHTS, arpeggio: DEFAULT_ARP_WEIGHTS };
 const DEFAULT_HUMANIZE = { timing: 12, velocity: 0.08, detune: 3 };
 
 /**
- * Style weights for the pad or bass (arranger.js PAD_STYLES / BASS_STYLES).
+ * Style weights for the pad or bass (arranger.js PAD_STYLES / BASS_STYLES),
+ * or the pad's pulse / arpeggio patterns (kind 'pulse' / 'arpeggio').
  * Within reason each default share moves by up to half; full random any
  * mix (never all zero).
  */
@@ -250,6 +254,22 @@ export function randomStyleWeights(kind, level, rng = Math.random) {
         : Math.min(100, step(w * between(rng, 0.5, 1.5), 5))]));
     if (!Object.values(weights).some((w) => w > 0)) weights[pick(rng, Object.keys(weights))] = 50;
     return weights;
+}
+
+/** How the pad moves: register lean, fast arpeggios, swell (arranger.js DEFAULT_PAD_MOTION). */
+export function randomPadMotion(level, rng = Math.random) {
+    if (level === 'wild') return { lean: step(rng(), 0.05), fast: step(rng(), 0.05), swell: step(rng() * 0.2, 0.01) };
+    return {
+        lean: step(between(rng, 0.3, 0.8), 0.05),
+        fast: step(between(rng, 0.1, 0.5), 0.05),
+        swell: step(DEFAULT_PAD_MOTION.swell * between(rng, 0.5, 1.6), 0.01),
+    };
+}
+
+/** Swing: within reason mostly straight or light; full random up to the slider's end. */
+export function randomSwing(level, rng = Math.random) {
+    if (level === 'wild') return step(rng() * 0.6, 0.05);
+    return chance(rng, 0.5) ? 0 : step(between(rng, 0.1, 0.4), 0.05);
 }
 
 /** The second lead: within reason mostly off or answering the lead. */
@@ -306,7 +326,7 @@ export function randomAmbienceShape(level, rng = Math.random) {
     }));
 }
 
-/** Lead activity, pad thinning, pad and bass styles, feel, second lead and sections. */
+/** Lead activity, pad thinning, pad and bass styles and patterns, feel, second lead and sections. */
 export function randomArrangement(settings, level, rng = Math.random) {
     const wild = level === 'wild';
     return {
@@ -316,6 +336,9 @@ export function randomArrangement(settings, level, rng = Math.random) {
         thinPadUnderLead: wild ? chance(rng, 0.5) : chance(rng, 0.8),
         padWeights: randomStyleWeights('pad', level, rng),
         bassWeights: randomStyleWeights('bass', level, rng),
+        pulseWeights: randomStyleWeights('pulse', level, rng),
+        arpWeights: randomStyleWeights('arpeggio', level, rng),
+        padMotion: randomPadMotion(level, rng),
         humanize: wild
             ? { timing: Math.round(rng() * 40), velocity: step(rng() * 0.25, 0.01), detune: step(rng() * 15, 0.5) }
             : {

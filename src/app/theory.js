@@ -201,14 +201,18 @@ const movement = (a, b) => a.reduce((sum, note, i) => sum + Math.abs(note - b[i]
 /**
  * Picks the voicing of a chord within [low, high] that moves least from the
  * previous one (smooth voice leading); with no previous chord, the one
- * closest to the middle of the range.
+ * closest to the middle of the range. A `target` (MIDI) leans the choice
+ * toward voicings centered there, so the register can drift on purpose -
+ * an inversion change is worth it once it brings the chord ~4 semitones
+ * closer.
  * @param {number[]} pitchClasses - chord tones as 0..11, root first
  * @param {number} low - lowest allowed MIDI note
  * @param {number} high - highest allowed MIDI note
  * @param {number[]} [previous] - previous voicing, same size
+ * @param {number} [target] - MIDI note the voicing's center leans toward
  * @returns {number[]} MIDI notes, ascending
  */
-export function voiceLead(pitchClasses, low, high, previous = null) {
+export function voiceLead(pitchClasses, low, high, previous = null, target = null) {
     // Big chords (ninths span 13-14 semitones in close position) may not
     // fit a narrow range from every bottom note: widen it a semitone at a
     // time, alternating top and bottom, so they sit as close as possible.
@@ -221,9 +225,11 @@ export function voiceLead(pitchClasses, low, high, previous = null) {
     if (!candidates.length) throw new Error('No voicing fits the range');
 
     const center = (low + high) / 2;
+    const mean = (v) => v.reduce((s, n) => s + n, 0) / v.length;
+    const lean = target === null ? () => 0 : (v) => Math.abs(mean(v) - target) * v.length * 1.25;
     const score = previous && previous.length === pitchClasses.length
-        ? (v) => movement(v, previous)
-        : (v) => Math.abs(v.reduce((s, n) => s + n, 0) / v.length - center);
+        ? (v) => movement(v, previous) + lean(v)
+        : (v) => Math.abs(mean(v) - (target === null ? center : target));
     return candidates.reduce((best, v) => (score(v) < score(best) ? v : best));
 }
 

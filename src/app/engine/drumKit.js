@@ -1,6 +1,7 @@
 // A small synthesised percussion kit (docs/DESIGN.md §9 C4): soft sounds
 // to sit under calm music - a felt kick, a brush tap, a shaker, a rim click,
-// a quiet closed hat and a brush swish - each hit built when it is booked
+// a quiet closed hat, a brush swish, a felt tom, a soft clap and a soft
+// ride - each hit built when it is booked
 // from a sine or a burst of noise, with a touch of room reverb. No samples.
 //
 // It books like an Instrument (scheduleNote with the drum as the "note",
@@ -17,10 +18,11 @@ import { DRUMS, defaultDrumKit } from '../percussion';
 // -6 dB (kick) to -15 dB (hat) - measured; the raw sounds span 18 dB. The
 // swish is a bed under the rest: it lasts a whole beat, so it is kept well
 // below the taps (its RMS about 10 dB under a brush tap's peak level).
-const GAIN = { kick: 1.3, brush: 2.6, shaker: 1.4, rim: 1.45, hat: 2.2, swish: 1.1 };
+// The tom, clap and ride (added later) are set by ear against those.
+const GAIN = { kick: 1.3, brush: 2.6, shaker: 1.4, rim: 1.45, hat: 2.2, swish: 1.1, tom: 1.1, clap: 2.2, ride: 1.6 };
 
 // Where each drum sits, -1 (left) .. 1 (right).
-const PAN = { kick: 0, brush: -0.1, shaker: 0.3, rim: -0.25, hat: 0.2, swish: -0.15 };
+const PAN = { kick: 0, brush: -0.1, shaker: 0.3, rim: -0.25, hat: 0.2, swish: -0.15, tom: 0.15, clap: 0.05, ride: -0.3 };
 
 // White noise, the same every time (renders are reproducible).
 const noiseBuffers = new WeakMap();
@@ -147,6 +149,66 @@ const HITS = {
         pan.pan.linearRampToValueAtTime(0.35 * dir, t + length);
         src.connect(band).connect(soft).connect(gain).connect(pan).connect(out);
         return [src];
+    },
+    // A felt tom: a low sine falling a little in pitch, a soft thump.
+    // Its variation is its pitch, half an octave either way (fills fall
+    // from high to low).
+    tom(kit, { t, v, x, bright, long, out }) {
+        const { AC } = kit;
+        const freq = 105 * Math.pow(bright, 0.3) * Math.pow(2, 0.5 * x);
+        const osc = AC.createOscillator();
+        osc.frequency.setValueAtTime(freq * 1.5, t);
+        osc.frequency.exponentialRampToValueAtTime(freq, t + 0.05);
+        const decay = 0.32 * long;
+        osc.connect(envelope(AC, t, 0.75 * v, 0.004, decay)).connect(out);
+        osc.start(t);
+        osc.stop(t + decay + 0.05);
+        const thump = kit.noise(t, 0.05);
+        const low = AC.createBiquadFilter();
+        low.frequency.value = 900 * bright;
+        thump.connect(low).connect(envelope(AC, t, 0.1 * v, 0.001, 0.03)).connect(out);
+        return [osc, thump];
+    },
+    // A soft clap: three quick bursts of band-passed noise and a short tail.
+    clap(kit, { t, v, x, bright, long, out }) {
+        const { AC } = kit;
+        const decay = 0.13 * long * (1 + 0.2 * x);
+        const src = kit.noise(t, decay + 0.08);
+        const band = AC.createBiquadFilter();
+        band.type = 'bandpass';
+        band.frequency.value = 1400 * bright * Math.pow(2, 0.25 * x);
+        band.Q.value = 0.9;
+        const gain = AC.createGain();
+        const peak = 0.3 * v;
+        gain.gain.setValueAtTime(0, t);
+        [0, 0.011, 0.022].forEach((d) => {
+            gain.gain.setValueAtTime(peak, t + d);
+            gain.gain.exponentialRampToValueAtTime(peak * 0.15, t + d + 0.009);
+        });
+        gain.gain.setValueAtTime(peak * 0.8, t + 0.031);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.031 + decay);
+        src.connect(band).connect(gain).connect(out);
+        return [src];
+    },
+    // A soft ride: high noise and a few inharmonic partials ringing on.
+    ride(kit, { t, v, x, bright, long, out }) {
+        const { AC } = kit;
+        const decay = 0.7 * long * (1 + 0.2 * x);
+        const src = kit.noise(t, decay + 0.05);
+        const band = AC.createBiquadFilter();
+        band.type = 'bandpass';
+        band.frequency.value = Math.min(15000, 7500 * bright * Math.pow(2, 0.2 * x));
+        band.Q.value = 0.6;
+        src.connect(band).connect(envelope(AC, t, 0.09 * v, 0.002, decay)).connect(out);
+        const partials = [3150, 4420, 5890].map((freq) => {
+            const osc = AC.createOscillator();
+            osc.frequency.value = freq * Math.pow(bright, 0.3) * (1 + 0.02 * x);
+            osc.connect(envelope(AC, t, 0.012 * v, 0.002, decay * 0.8)).connect(out);
+            osc.start(t);
+            osc.stop(t + decay + 0.05);
+            return osc;
+        });
+        return [src, ...partials];
     },
 };
 

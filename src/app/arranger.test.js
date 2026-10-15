@@ -129,7 +129,7 @@ test('pad thins under the lead: quieter, and never arpeggiates while other style
 test('fixed styles are respected', () => {
     const arp = run({ settings: { ...AUTO, leadActivity: 0, padWeights: pads('arpeggio'), bassWeights: basses('walking') } });
     arp.forEach((bar) => {
-        expect(byRole(bar, 'pad')).toHaveLength(4);
+        expect(byRole(bar, 'pad')).toHaveLength(4 / bar.state.phrase.padStep);
         expect(byRole(bar, 'bass')).toHaveLength(4);
     });
 });
@@ -187,15 +187,25 @@ describe.each(Object.keys(METERS))('meter %s', (id) => {
         }));
     });
 
-    test('arpeggio plays every unit; walking bass every felt beat; pulse every group', () => {
-        const fixed = (pad, bass) => run({ meter: id, settings: { ...AUTO, leadActivity: 0, padWeights: pads(pad), bassWeights: basses(bass) } });
+    test('arpeggio plays every step; walking bass every felt beat; pulse by its pattern', () => {
+        const fixed = (pad, bass, seed) => run({ seed, meter: id, settings: { ...AUTO, leadActivity: 0, padWeights: pads(pad), bassWeights: basses(bass) } });
         fixed('arpeggio', 'walking').forEach((bar) => {
-            expect(byRole(bar, 'pad').map((e) => e.beat)).toEqual([...Array(meter.units).keys()]);
+            const step = bar.state.phrase.padStep;
+            expect(byRole(bar, 'pad').map((e) => e.beat)).toEqual([...Array(meter.units / step).keys()].map((i) => i * step));
             expect(byRole(bar, 'bass').map((e) => e.beat)).toEqual(beatStarts(meter));
         });
-        fixed('pulse', 'whole').forEach((bar) => {
-            expect([...new Set(byRole(bar, 'pad').map((e) => e.beat))]).toEqual(groupStarts(meter));
-        });
+        const patterns = new Set();
+        SEEDS.forEach((seed) => fixed('pulse', 'whole', seed).forEach((bar) => {
+            const { padPattern } = bar.state.phrase;
+            patterns.add(padPattern);
+            const beats = [...new Set(byRole(bar, 'pad').map((e) => e.beat))];
+            expect(beats[0]).toBe(0);
+            if (padPattern === 'groups') expect(beats).toEqual(groupStarts(meter));
+            if (padPattern === 'split') expect(beats).toEqual([...Array(meter.units).keys()]);
+            // split: only the lowest note on group starts
+            if (padPattern === 'split') groupStarts(meter).forEach((at) => expect(byRole(bar, 'pad').filter((e) => e.beat === at)).toHaveLength(1));
+        }));
+        expect(patterns.size).toBeGreaterThan(2);
     });
 
     test('bass notes never overlap each other', () => {
@@ -261,6 +271,30 @@ describe('octaves', () => {
     });
 });
 
+test('arpeggio patterns vary by phrase and play chord tones in the register', () => {
+    const patterns = new Set();
+    SEEDS.forEach((seed) => run({ seed, settings: { ...AUTO, leadActivity: 0, padWeights: pads('arpeggio') } }).forEach((bar) => {
+        patterns.add(bar.state.phrase.padPattern);
+        byRole(bar, 'pad').forEach((e) => expect(bar.chord.pitchClasses).toContain(pc(e.midi)));
+    }));
+    expect(patterns).toEqual(new Set(['bounce', 'up', 'down', 'broken']));
+});
+
+test("the pad's voicing leans low and high over phrases, staying in its register", () => {
+    const tops = new Set();
+    const lifts = new Set();
+    SEEDS.forEach((seed) => run({ seed, bars: 64, settings: { ...AUTO, padWeights: pads('sustain') } }).forEach((bar) => {
+        lifts.add(bar.state.phrase.padLift);
+        tops.add(bar.state.padVoicing[bar.state.padVoicing.length - 1]);
+        bar.state.padVoicing.forEach((m) => {
+            expect(m).toBeGreaterThanOrEqual(PAD_RANGE[0]);
+            expect(m).toBeLessThanOrEqual(PAD_RANGE[1]);
+        });
+    }));
+    expect(lifts).toEqual(new Set([-1, 0, 1]));
+    expect(Math.max(...tops) - Math.min(...tops)).toBeGreaterThanOrEqual(10);
+});
+
 test('pad plays every note of 4- and 5-note chords', () => {
     [4, 5].forEach((chordSize) => run({ chordSize, settings: { ...AUTO, padWeights: pads('sustain') } }).forEach((bar) => {
         expect(bar.state.padVoicing).toHaveLength(chordSize);
@@ -272,7 +306,7 @@ describe('second lead', () => {
     const counter = (mode, activity = 0.7) => ({ ...AUTO, leadActivity: 0.5, counter: { mode, activity } });
 
     test('off adds nothing and leaves the piece as it was', () => {
-        const before = run({ seed: 3, settings: AUTO });
+        const before = run({ seed: 3, settings: { ...AUTO, leadActivity: 0.5 } });
         const off = run({ seed: 3, settings: counter('off') });
         expect(off.map((b) => b.events)).toEqual(before.map((b) => b.events));
     });
