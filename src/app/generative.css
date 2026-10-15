@@ -9,10 +9,13 @@
     --gen-role-pad: #7b61c4;
     --gen-role-bass: #c7772b;
     --gen-role-lead: #2f9a6a;
+    color-scheme: light;
 }
 
+/* Dark: the system's choice unless the page's theme toggle (theme.js)
+   picked light, or picked dark explicitly. */
 @media (prefers-color-scheme: dark) {
-    :root {
+    :root:not([data-theme='light']) {
         --gen-bg: #15171a;
         --gen-surface: #1e2125;
         --gen-text: #e6e8eb;
@@ -23,7 +26,22 @@
         --gen-role-pad: #a993ea;
         --gen-role-bass: #e9a25d;
         --gen-role-lead: #5cc896;
+        color-scheme: dark;
     }
+}
+
+:root[data-theme='dark'] {
+    --gen-bg: #15171a;
+    --gen-surface: #1e2125;
+    --gen-text: #e6e8eb;
+    --gen-muted: #9aa3ad;
+    --gen-border: #343a41;
+    --gen-accent: #6fa3dc;
+    --gen-accent-text: #0d1117;
+    --gen-role-pad: #a993ea;
+    --gen-role-bass: #e9a25d;
+    --gen-role-lead: #5cc896;
+    color-scheme: dark;
 }
 
 /* unCAGED's index.css sets this globally and the shared panel components
@@ -178,10 +196,6 @@ body {
 .gen button:disabled {
     color: var(--gen-muted);
     cursor: default;
-}
-
-.gen-field-action {
-    align-self: end;
 }
 
 .gen-editor {
@@ -557,6 +571,112 @@ body {
     margin-left: auto;
 }
 
+/* Audio load meter, buffer size and theme, at the header's end. */
+.gen-header-tools {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.gen-audio {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--gen-muted);
+}
+
+.gen-audio-label {
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.gen-meter {
+    position: relative;
+    width: 48px;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--gen-border);
+    overflow: hidden;
+}
+
+.gen-meter i {
+    position: absolute;
+    inset: 0 auto 0 0;
+    background: var(--gen-accent);
+    transition: width 0.3s;
+}
+
+.gen-meter.is-high i {
+    background: var(--gen-role-bass);
+}
+
+.gen-audio-value {
+    min-width: 3.5em;
+    font-variant-numeric: tabular-nums;
+}
+
+.gen-audio-buffer select {
+    padding: 3px 6px;
+    border: 1px solid var(--gen-border);
+    border-radius: 6px;
+    background: var(--gen-bg);
+    color: var(--gen-text);
+    font: inherit;
+    font-size: 12px;
+}
+
+.gen .gen-theme {
+    padding: 4px 10px;
+    font-size: 12px;
+    background: transparent;
+}
+
+.gen-visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+/* A control with a dice button beside it. */
+.gen-field-row {
+    display: flex;
+    gap: 4px;
+    min-width: 0;
+}
+
+.gen-field-row > :first-child {
+    flex: 1;
+    min-width: 0;
+}
+
+.gen-field-row input[type='range'] {
+    align-self: center;
+}
+
+.gen .gen-dice {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: 32px;
+    padding: 0;
+    color: var(--gen-muted);
+    background: transparent;
+}
+
+.gen .gen-dice:hover {
+    color: var(--gen-accent);
+}
+
+.gen .gen-rolebuttons button svg {
+    vertical-align: -2px;
+}
+
 /* Secondary actions: quieter than form controls. */
 .gen .gen-share button,
 .gen .gen-editor-presets button {
@@ -592,14 +712,6 @@ body {
 }
 
 /* Action buttons in field grids keep their natural width. */
-.gen-field-action {
-    justify-items: start;
-}
-
-.gen-field-action button {
-    padding: 6px 14px;
-}
-
 .gen-panel h2,
 .gen-editor-head h2 {
     letter-spacing: 0.06em;
@@ -622,4 +734,44 @@ body {
         margin-left: 0;
         width: 100%;
     }
+}
+
+/* Randomize bar under the header: level switch, then one button per group. */
+.gen-randomize {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.gen-randomize-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--gen-muted);
+}
+
+.gen-segmented {
+    display: inline-flex;
+    margin-right: 8px;
+}
+
+.gen .gen-segmented button {
+    border-radius: 0;
+}
+
+.gen .gen-segmented button:first-child {
+    border-radius: 6px 0 0 6px;
+}
+
+.gen .gen-segmented button:last-child {
+    border-radius: 0 6px 6px 0;
+    margin-left: -1px;
+}
+
+.gen .gen-segmented button.is-on {
+    background: var(--gen-accent);
+    border-color: var(--gen-accent);
+    color: var(--gen-accent-text);
 }

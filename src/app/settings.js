@@ -1,17 +1,20 @@
 // Generator settings as data: defaults, validation, and the compact form
-// used in share links (?s=...) and exported files. Synth
-// presets are deliberately not part of it.
+// used in share links (?s=...) and exported files. Synth presets are not
+// part of the settings; a link carries each role's built-in preset name
+// alongside (shareCode.js), edited or custom sounds stay local.
 //
 // Anything arriving from a link or file is untrusted: sanitizeSettings
 // keeps only known keys, coerces/clamps every value to its valid range,
-// and falls back to the default otherwise. Encoding stores only what
-// differs from the defaults, so typical links stay short.
+// and falls back to the default otherwise. Links are bit-packed
+// (shareCode.js); links made before that (base64 JSON, starting 'eyJ')
+// still open.
 
 import { DEFAULT_PAD_WEIGHTS, DEFAULT_BASS_WEIGHTS, DEFAULT_VOICES, OCTAVE_LIMITS, OCTAVE_WANDER } from './arranger';
 import { DEFAULT_DRIFT, DRIFT_MODES, TEMPO_BOUNDS } from './conductor';
 import { METERS, DEFAULT_METER } from './meter';
 import { SCALE_FAMILIES } from './theory';
 import PROGRESSIONS from './progressions';
+import { encodeShareCode, decodeShareCode } from './shareCode';
 
 export const SETTINGS_VERSION = 1;
 
@@ -99,57 +102,63 @@ export function sanitizeSettings(raw, defaults = defaultSettings()) {
     return sanitize(raw, RULES, defaults);
 }
 
-// Only the parts of `settings` that differ from `defaults`.
-function diff(settings, defaults) {
-    const out = {};
-    Object.entries(settings).forEach(([key, value]) => {
-        const base = defaults[key];
-        if (value && typeof value === 'object' && !Array.isArray(value)) {
-            const nested = diff(value, base);
-            if (Object.keys(nested).length) out[key] = nested;
-        } else if (JSON.stringify(value) !== JSON.stringify(base)) {
-            out[key] = value;
-        }
-    });
-    return out;
-}
-
-const toBase64Url = (text) => btoa(unescape(encodeURIComponent(text))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+// Links made before shareCode.js: base64url of JSON.
 const fromBase64Url = (code) => decodeURIComponent(escape(atob(code.replace(/-/g, '+').replace(/_/g, '/'))));
 
-/** Settings -> short URL-safe string (seed always included). */
-export function encodeSettings(settings) {
-    const defaults = { ...defaultSettings(), seed: undefined };
-    return toBase64Url(JSON.stringify({ v: SETTINGS_VERSION, ...diff(settings, defaults), seed: settings.seed }));
+/**
+ * Settings (+ role -> built-in preset name) -> short URL-safe string.
+ * @param {object} settings
+ * @param {object} [presets] - names that aren't built-in presets are left out
+ */
+export function encodeSettings(settings, presets) {
+    return encodeShareCode(settings, defaultSettings(), presets);
 }
 
-/** URL-safe string -> valid settings, or null if it can't be read at all. */
-export function decodeSettings(code) {
+/**
+ * URL-safe string -> { settings (valid), presets (role -> name) }, or null
+ * if it can't be read at all.
+ */
+export function decodeShare(code) {
     try {
-        return sanitizeSettings(JSON.parse(fromBase64Url(code)));
+        if (code.startsWith('eyJ')) return { settings: sanitizeSettings(JSON.parse(fromBase64Url(code))), presets: {} };
+        const { settings, presets } = decodeShareCode(code, defaultSettings());
+        return { settings: sanitizeSettings(settings), presets };
     } catch (e) {
         return null;
     }
 }
 
-/**
- * Settings from a share link: the `s` query parameter, or - for links made
- * while this lived inside unCAGED - the `s` parameter of a #/generative?s=
- * hash. Null when there is none or it can't be read.
- */
-export function settingsFromLocation({ search = '', hash = '' }) {
-    const code = new URLSearchParams(search).get('s') || new URLSearchParams(hash.split('?')[1] || '').get('s');
-    return code ? decodeSettings(code) : null;
+/** URL-safe string -> valid settings, or null if it can't be read at all. */
+export function decodeSettings(code) {
+    const share = decodeShare(code);
+    return share && share.settings;
+}
+
+// The `s` query parameter, or - for links made while this lived inside
+// unCAGED - the `s` parameter of a #/generative?s= hash.
+const codeFromLocation = ({ search = '', hash = '' }) => new URLSearchParams(search).get('s')
+    || new URLSearchParams(hash.split('?')[1] || '').get('s');
+
+/** { settings, presets } from a share link, or null when there is none or it can't be read. */
+export function shareFromLocation(location) {
+    const code = codeFromLocation(location);
+    return code ? decodeShare(code) : null;
+}
+
+/** Settings from a share link, or null. */
+export function settingsFromLocation(location) {
+    const share = shareFromLocation(location);
+    return share && share.settings;
 }
 
 /** The share link's path + query for the current page. */
-export function sharePath(settings, location = window.location) {
-    return `${location.pathname}?s=${encodeSettings(settings)}`;
+export function sharePath(settings, presets, location = window.location) {
+    return `${location.pathname}?s=${encodeSettings(settings, presets)}`;
 }
 
 /** Full share URL for the current page and settings. */
-export function shareUrl(settings, location = window.location) {
-    return `${location.origin}${sharePath(settings, location)}`;
+export function shareUrl(settings, presets, location = window.location) {
+    return `${location.origin}${sharePath(settings, presets, location)}`;
 }
 
 /** Downloads settings as a .json file. */

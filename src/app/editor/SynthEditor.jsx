@@ -32,10 +32,16 @@ const pageTheme = () => ({
 function usePageTheme() {
     const [theme, setTheme] = useState(pageTheme);
     useEffect(() => {
+        // the system setting, or the page's own theme toggle (theme.js)
         const media = window.matchMedia('(prefers-color-scheme: dark)');
         const update = () => setTheme(pageTheme());
         media.addEventListener('change', update);
-        return () => media.removeEventListener('change', update);
+        const observer = new MutationObserver(update);
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+        return () => {
+            media.removeEventListener('change', update);
+            observer.disconnect();
+        };
     }, []);
     return theme;
 }

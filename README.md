@@ -28,8 +28,16 @@ synthesised with the Web Audio API; there are no samples.
   octave) or from MIDI after clicking "Connect MIDI"
 - A full synth editor per voice, 28 built-in presets by category, and your
   own presets (saved in the browser, or exported/imported as JSON)
-- Share links: the address bar always holds the current settings plus a
-  random seed, so a link plays the same piece for whoever opens it
+- Randomize key & scale, progression, conductor, voices or everything at
+  once - "within reason" (near the defaults, minor progressions in minor
+  modes, lead sounds on the lead) or "full random"
+- Share links: the address bar always holds the current settings, the
+  built-in presets per voice and a random seed in a short code (`?s=FWfOUc`
+  for defaults, ~30 characters fully randomized), so a link plays the same
+  piece for whoever opens it
+- An audio-thread load meter with a choice of output buffer size (larger
+  buffers stop crackling on slow machines), and a light / dark / system
+  theme toggle
 
 ## Development
 
@@ -41,6 +49,11 @@ npm run build     # -> dist/
 npm run preview   # serve dist/ at http://localhost:4173/bgm/
 npm run deploy    # tests + build, then publish dist/ to the gh-pages branch
 ```
+
+Audio performance: with `npm run dev` running, open
+http://localhost:5173/bgm/bench/ (engine load per arrangement, parameters in
+`bench/bench.js`) or `/bgm/bench/nodes.html` (cost per node type); results
+and history are in `docs/DESIGN.md` §5.
 
 The site is a GitHub Pages project site, so it is built with `base: '/bgm/'`
 (see `vite.config.js`); asset and AudioWorklet URLs go through
@@ -60,6 +73,7 @@ src/app/            the application
 src/nodes/          Web Audio building blocks (effects, oscillators, noise)
 src/components/     MonoSynth voice and the knob/select/module UI controls
 public/             AudioWorklet processors (noise, bitcrusher)
+bench/              audio performance benchmark pages (dev server only)
 docs/DESIGN.md      design notes, decisions and performance measurements
 ```
 

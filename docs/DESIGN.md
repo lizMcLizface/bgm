@@ -251,6 +251,120 @@ Loudness of all 28 presets re-measured afterwards: within run-to-run noise
 ~5 dB on Analog Saw Bass). Not done yet: one shared reverb send instead of
 a convolver per role; stopping unused sub/osc2 oscillators per voice.
 
+### Second pass (2026-10-15): where the rest goes
+
+Tooling, kept in the repo this time: `bench/` (served by `npm run dev` at
+`/bgm/bench/`). `index.html` renders a planned arrangement through the
+real Instruments in an `OfflineAudioContext` and times it (load = render
+time / audio duration), with variants that switch one part off to
+attribute cost; runs are deterministic, so `mode=render` output can be
+diffed sample by sample between engine versions. `nodes.html` measures
+one node of each kind. Offline numbers overstate convolvers: Chrome's
+realtime rendering runs the long part of each impulse on a helper thread.
+Realtime load was checked with a Chrome trace as above
+(`RealtimeAudioDestinationHandler::Render`, 8 s windows).
+
+Cost per node, % of one core (offline, 48 kHz):
+
+| node | cost | node | cost |
+|---|---|---|---|
+| gain | 0.01 | oscillator | 0.03 |
+| oscillator, LFO on detune, a-rate | **0.22** | same, k-rate | 0.13 |
+| biquad, static | 0.03 | biquad, envelope on detune, a-rate | 0.20 |
+| delay, LFO-modulated (chorus voice) | 0.12 | compressor | 0.34 |
+| convolver, reverb4 (9.8 s) | **5.8** | convolver, reverb6 (2.0 s) | 1.8 |
+| convolver fed silence | **5.4** | convolver with nothing connected | 0.9 |
+
+What that showed: (1) convolution reverb was ~60% of all load while
+playing and nearly all of it while stopped - a convolver fed silence costs
+as much as one fed music, and the chain behind sleeping voices still fed
+it silence; (2) every oscillator had the vibrato LFO connected to its
+detune, even at depth 0, which makes it ~7x as expensive; (3) sub
+oscillator and osc2 rendered at gain 0 in every awake voice. Changes:
+
+- **Sleeping effects chains** (`Instrument.sleepIdle`, `tailSeconds`):
+  once every voice is asleep and the reverb impulse plus the delays'
+  echoes (to -80 dB) have died away, the instrument's output is
+  disconnected, so nothing in its chain renders; the next booked note
+  reconnects it. Chains start asleep. Covers Stop, rests between lead
+  phrases and roles that sit out.
+- **Vibrato** is wired to the oscillators only while `vibratoDepth > 0`
+  (`Instrument.setVibratoConnected`, `MonoSynth.setVibratoEnabled`), and
+  oscillator detune is k-rate (`src/nodes/oscillator.js`): updated per
+  128-frame block, smooth for a few-Hz LFO.
+- **Sub / osc2** feed the mix only while audible (`MonoSynth.updateSilentPaths`).
+- **Impulses** are trimmed where the energy still to come falls below
+  -80 dB (`trimImpulse` in `src/nodes/reverb.js`; reverb2: 8.0 s -> 3.8 s).
+
+| offline load | stopped | default arrangement | busy |
+|---|---|---|---|
+| before | 10.4% | 23.5% | 24.9% |
+| after | **0.1%** | **13.7%** | **20.5%** |
+
+Realtime audio thread (default / busy arrangement, several runs each -
+traces vary run to run): 20-31% / 23-27% before, 13-19% / 17-23% after;
+worst quantum 2.45 ms -> 1.63 ms of the 2.67 ms budget. Main thread while
+playing: 4% busy (18% at 4x CPU throttling), no task over 9 ms - not the
+bottleneck.
+
+Sound: old and new engine rendered offline and diffed. Default
+arrangement: difference -53 dB below peak. Busy: -36 dB, all of it from
+k-rate vibrato (with a-rate detune restored the difference is -55 dB): it
+lags the lead's 4.5 Hz vibrato by up to one block (1.3 ms) - a phase
+offset, not an audible change.
+
+What is left, playing (offline, default arrangement): reverb ~8 points of
+13.7, voices and other effects ~5.5. In realtime each convolver costs
+~3% of the audio thread regardless of impulse length (the length goes to
+the helper thread), so only fewer convolvers help there.
+
+#### In the page
+
+The header shows the audio thread's load (`public/load-meter-processor.js`:
+a zero-output AudioWorklet fed from the master bus times the gaps between
+its calls inside each render burst with `Date.now()`; within a few points
+of Chrome's trace at 10-100 ms buffers) and Chrome's dropout count
+(`playbackStats`). The buffer size beside it sets the AudioContext's
+`latencyHint` (stored per browser, applied on reload, since a context's
+buffer is fixed at creation).
+
+#### Multi-threading
+
+Web Audio renders a context's whole graph on one realtime thread;
+AudioWorklets run on it too. Ways to use more cores:
+
+- **Already happening:** Chrome renders the tail of every ConvolverNode on
+  a background thread - why trimming impulses barely moves the realtime
+  load.
+- **One AudioContext per role:** Chrome gives each context its own render
+  thread. But clocks are independent (the problem `src/audio/context.js`
+  exists to avoid), each context is a separate output stream, and Firefox
+  renders all contexts of a page on one graph thread anyway. Not worth it.
+- **Pre-rendering** in an `OfflineAudioContext` (its own thread, faster
+  than realtime): possible because notes are planned 8 bars ahead and
+  `scheduleNote` uses no timers. Render each bar's voices (each note
+  rendered whole, tails overlap-added) and play them as buffers into the
+  realtime effects chains. Moves the voices (~5 of the 13.7 points) off
+  the realtime thread; costs a bar of latency for synth-editor changes to
+  be heard in the music (auditioning and live play stay realtime), and
+  care at bar seams (vibrato phase, voice stealing). Worth it only if the
+  remaining load is still too much.
+- **WASM synth in a worker** feeding an AudioWorklet through a
+  SharedArrayBuffer: needs cross-origin isolation (COOP/COEP headers,
+  which GitHub Pages cannot set) and a rewrite of the synth. No.
+
+Further options that change the sound or behaviour slightly, not done:
+
+- **Shared reverb per impulse type** (the default presets use reverb4 on
+  pad and lead: 3 convolvers -> 2). Not exact: each role's limiter
+  (threshold -6 dB, ratio 20) currently acts on dry + wet together; a
+  shared send would leave the wet signal unlimited.
+- **`latencyHint: 'playback'`** for the AudioContext: larger output
+  buffers absorb load spikes on slow machines (the usual cause of
+  crackling), at the cost of keyboard/MIDI latency.
+- k-rate voice filter envelope (0.20 -> 0.06 per voice) - steps fast
+  attack sweeps audibly.
+
 ## 6. Export
 
 - **Quick:** `MediaRecorder` on a `MediaStreamDestination` tapped from

@@ -26,6 +26,7 @@ import { METERS, unitsPerMinute } from './meter';
 import { normal, seeded } from './random';
 import { defaultSettings } from './settings';
 import { findPreset } from './editor/presetStore';
+import { ROLE_PRESETS } from './presets';
 import PROGRESSIONS from './progressions';
 
 // Bars decided ahead of the playhead, and bars kept behind it for display.
@@ -35,10 +36,11 @@ const PLAN_KEEP_BARS = 4;
 // Settings that define "home"; changing one resets drift to it.
 const HOME_KEYS = new Set(['tonic', 'mode', 'progression', 'bpm', 'barsPerChord']);
 
+// In display order.
 export const ROLES = {
-    pad: { label: 'Rhythm / pad', polyphony: 8, preset: 'Soft Pad', volume: 0.8 },
-    bass: { label: 'Bass / support', polyphony: 2, preset: 'Warm Bass', volume: 0.8 },
-    lead: { label: 'Lead', polyphony: 2, preset: 'Glass Lead', volume: 0.7 },
+    lead: { label: 'Lead', polyphony: 2, preset: ROLE_PRESETS.lead, volume: 0.7 },
+    pad: { label: 'Rhythm / pad', polyphony: 8, preset: ROLE_PRESETS.pad, volume: 0.8 },
+    bass: { label: 'Bass / support', polyphony: 2, preset: ROLE_PRESETS.bass, volume: 0.8 },
 };
 
 class Generator {
