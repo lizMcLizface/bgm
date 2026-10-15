@@ -125,7 +125,8 @@ class Generator {
     }
 
     // Fresh plan from bar 0 and no playhead history. While stopped this is
-    // the preview of what Play will start with.
+    // the preview of what Play will start with. (Stop pauses instead: see
+    // stop() - this is "back to the start".)
     reset() {
         this.rng = seeded(this.settings.seed);
         this.transport.beatsPerBar = this.meter.units;
@@ -133,7 +134,36 @@ class Generator {
         this.beatLog = [];
         this.currentBar = -1;
         this.resetMusicAt = 0;
+        this.resumeBar = 0;
         this.ensurePlanned(0);
+    }
+
+    /** Whether Play would continue a piece rather than start it. */
+    get paused() {
+        return !this.isRunning && this.resumeBar > 0;
+    }
+
+    /** Back to the piece's first bar (continuing to play if playing). */
+    async rewind() {
+        const wasRunning = this.isRunning;
+        if (wasRunning) this.stop();
+        this.reset();
+        this.planListeners.forEach((listener) => listener());
+        if (wasRunning) await this.start();
+        else this.notifyRunning();
+    }
+
+    // Stop keeps the plan: Play picks up at the bar after the one heard.
+    // Notes booked beyond it were silenced, so they are booked again.
+    pause(heardBeat) {
+        this.resumeBar = Math.floor(heardBeat / this.beatsPerBar) + 1;
+        this.plan.forEach((planned) => {
+            if (planned.bar >= this.resumeBar) planned.events.forEach((ev) => { ev.booked = false; });
+        });
+        this.beatLog = [];
+        this.currentBar = this.resumeBar - 1;
+        this.ensurePlanned(this.resumeBar);
+        this.planListeners.forEach((listener) => listener());
     }
 
     async start() {
@@ -145,8 +175,9 @@ class Generator {
             await new Promise((resolve) => setTimeout(resolve, 30));
             this.endStopFade();
         }
-        this.transport.setBpm(unitsPerMinute(this.meter, this.plan.get(0).bpm));
-        this.transport.start();
+        this.ensurePlanned(this.resumeBar);
+        this.transport.setBpm(unitsPerMinute(this.meter, this.plan.get(this.resumeBar).bpm));
+        this.transport.start(this.resumeBar * this.beatsPerBar);
         this.notifyRunning();
     }
 
@@ -233,11 +264,12 @@ class Generator {
         }
     }
 
-    // Stops the music (the ambience plays on). With quickStop (the default), Stop doesn't wait for long reverbs and
+    // Stops (pauses) the music; the ambience plays on. With quickStop (the default), Stop doesn't wait for long reverbs and
     // echoes: the output fades out, then the effects' tails are dropped and
     // the output is restored (for auditions and live play). Without it the
     // voices fade and the tails ring out.
     stop() {
+        const heard = this.position();
         this.transport.stop();
         const wasFading = Boolean(this.fadeTimer);
         clearTimeout(this.fadeTimer);
@@ -246,7 +278,7 @@ class Generator {
         if (!this.quickStop) {
             // a sleep fade cut short: back to full level for the tails
             if (wasFading) this.output.gain.setTargetAtTime(1, this.AC.currentTime, 0.05);
-            this.reset();
+            this.pause(heard);
             this.notifyRunning();
             return;
         }
@@ -255,7 +287,7 @@ class Generator {
         gain.setTargetAtTime(0, this.AC.currentTime, STOP_FADE);
         clearTimeout(this.stopFade);
         this.stopFade = setTimeout(() => this.endStopFade(), STOP_FADE_MS);
-        this.reset();
+        this.pause(heard);
         this.notifyRunning();
     }
 
@@ -277,16 +309,26 @@ class Generator {
         if (key === 'ambience') this.ambience.setLevels(value);
         if (key === 'ambienceVolume') this.setAmbienceVolume(value);
         if (SOUND_KEYS.has(key)) return;
-        // Bar numbering and the timeline are per meter: start over in it.
-        if (key === 'meter' && this.isRunning) {
-            this.stop();
-            this.start();
-            return;
-        }
-        if (this.isRunning) {
-            [...this.plan.keys()].filter((bar) => bar > this.currentBar).forEach((bar) => this.plan.delete(bar));
-            if (HOME_KEYS.has(key)) this.resetMusicAt = this.currentBar + 1;
-            this.ensurePlanned(this.currentBar + 1);
+        this.replan([key]);
+    }
+
+    // After a settings change: while playing or paused, everything after
+    // the bar now playing (or from the resume point) is planned again -
+    // from home, if a home setting changed - and the piece carries on. A
+    // new time signature starts at that bar too. Otherwise (at the start)
+    // the preview is planned afresh. Only rewind() goes back to the start.
+    replan(keys, meterChanged = keys.includes('meter')) {
+        if (this.isRunning || this.paused) {
+            const from = this.currentBar + 1;
+            if (meterChanged && this.isRunning) {
+                // the bar playing finishes in its old length
+                this.transport.rebase(from * this.transport.beatsPerBar, from * this.meter.units, this.meter.units);
+            } else if (meterChanged) {
+                this.transport.beatsPerBar = this.meter.units;
+            }
+            [...this.plan.keys()].filter((bar) => bar >= from).forEach((bar) => this.plan.delete(bar));
+            if (keys.some((key) => HOME_KEYS.has(key))) this.resetMusicAt = from;
+            this.ensurePlanned(from);
         } else {
             this.reset();
         }
@@ -302,16 +344,7 @@ class Generator {
         if ('ambience' in patch) this.ambience.setLevels(this.settings.ambience);
         if ('ambienceVolume' in patch) this.setAmbienceVolume(this.settings.ambienceVolume);
         if (Object.keys(patch).every((key) => SOUND_KEYS.has(key))) return;
-        if (this.isRunning && meterChanged) {
-            this.stop();
-            this.start();
-        } else if (this.isRunning) {
-            [...this.plan.keys()].filter((bar) => bar > this.currentBar).forEach((bar) => this.plan.delete(bar));
-            if (Object.keys(patch).some((key) => HOME_KEYS.has(key))) this.resetMusicAt = this.currentBar + 1;
-            this.ensurePlanned(this.currentBar + 1);
-        } else {
-            this.reset();
-        }
+        this.replan(Object.keys(patch), meterChanged);
     }
 
     /** What is audible now: { tonic, mode, progression, bpm, keyName }. */
@@ -437,13 +470,16 @@ class Generator {
      * actually booked at, so it stays right across tempo changes.
      */
     position() {
-        if (!this.isRunning || !this.beatLog.length) return 0;
+        if (!this.isRunning || !this.beatLog.length) return (this.resumeBar || 0) * this.beatsPerBar;
         const now = this.AC.currentTime - (this.AC.outputLatency || this.AC.baseLatency || 0);
         let entry = this.beatLog[0];
         for (const e of this.beatLog) {
             if (e.time <= now) entry = e;
         }
-        return Math.max(0, entry.beat + (now - entry.time) / entry.secondsPerBeat);
+        // in bars, each beat a share of its own bar: smooth across a time
+        // signature change; then in units of the current bar
+        const bars = entry.bar + Math.min(1, (entry.beatInBar + (now - entry.time) / entry.secondsPerBeat) / entry.units);
+        return Math.max(0, bars * this.beatsPerBar);
     }
 
     // A chord on a scale degree of `music`'s key, with display names.
@@ -574,8 +610,8 @@ class Generator {
     }
 
     // Books this beat's slice of the plan at exact audio times.
-    onBeat({ beat, bar, beatInBar, time, secondsPerBeat }) {
-        this.beatLog.push({ beat, time, secondsPerBeat });
+    onBeat({ bar, beatInBar, time, secondsPerBeat }) {
+        this.beatLog.push({ bar, beatInBar, units: this.transport.beatsPerBar, time, secondsPerBeat });
         if (this.beatLog.length > 16) this.beatLog.shift();
 
         if (bar !== this.currentBar) {
@@ -593,7 +629,8 @@ class Generator {
         // Early (humanized) notes a re-plan created after their slot: now.
         if (beatInBar === 0) current.filter((e) => !e.booked && e.beat < 0).forEach((e) => book(e, time));
 
-        if (beatInBar === this.beatsPerBar - 1) {
+        // (the transport's bar length: the old one until a new time signature starts)
+        if (beatInBar === this.transport.beatsPerBar - 1) {
             const next = this.plan.get(bar + 1);
             if (next) {
                 // The next bar's tempo applies from the gap before its downbeat,

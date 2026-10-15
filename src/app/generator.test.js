@@ -246,3 +246,22 @@ test('mute and solo: any solo silences the rest; mute silences only its role', (
     gen.setRoleVolume('pad', 0.5);
     expect(levels()).toEqual({ pad: 0.5, bass: 0, lead: 0.7, counter: 0.6 });
 });
+
+test('stop pauses: Play picks up at the next bar, settings changes keep the place, rewind goes back', () => {
+    const gen = generator(4, { mode: 'off' });
+    play(gen, 12);
+    const notes = (bar) => gen.plan.get(bar).events.map((e) => e.midi).join();
+    const bar11 = notes(11);
+    gen.pause(10 * gen.beatsPerBar + 1.5); // heard: bar 10
+    expect(gen.paused).toBe(true);
+    expect(gen.resumeBar).toBe(11);
+    expect(gen.position()).toBe(11 * gen.beatsPerBar);
+    expect(notes(11)).toBe(bar11);
+    expect(gen.plan.get(11).events.every((e) => !e.booked)).toBe(true);
+    gen.set('leadActivity', 0.2);
+    expect(gen.resumeBar).toBe(11);
+    expect(gen.plan.has(10)).toBe(true);
+    gen.rewind();
+    expect(gen.paused).toBe(false);
+    expect(gen.position()).toBe(0);
+});

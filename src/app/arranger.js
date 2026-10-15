@@ -259,6 +259,7 @@ function decidePhrase(bar, prevPhrase, meter, settings, rng) {
 
     return {
         start: bar,
+        units: meter.units,
         octaves,
         leadActive,
         motif,
@@ -419,7 +420,8 @@ function harmonyEvents(leadNotes, scalePcs, range) {
  * @returns {{ events: object[], state: object }} event beats/lengths in units
  */
 export function arrangeBar({ bar, meter, chord, nextChord, scalePcs, chordStart, barsLeftInChord, prev, settings, rng }) {
-    const phrase = !prev || bar % PHRASE_BARS === 0 || bar - prev.phrase.start >= PHRASE_BARS
+    // a new time signature (mid-phrase, while playing) needs rhythms in it
+    const phrase = !prev || bar % PHRASE_BARS === 0 || bar - prev.phrase.start >= PHRASE_BARS || prev.phrase.units !== meter.units
         ? decidePhrase(bar, prev && prev.phrase, meter, settings, rng)
         : prev.phrase;
 

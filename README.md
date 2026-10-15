@@ -35,7 +35,10 @@ synthesised with the Web Audio API; there are no samples.
 - Sleep timer with a countdown: fades out over the last minute and stops
 - Save audio: renders the piece to a WAV file (1-60 min) faster than real
   time, in chunks so long files stay light on memory
-- Space plays / stops; lock-screen, notification and media-key controls
+- Pause resumes at the next bar; randomizing or changing settings (time
+  signature too) changes what comes next without starting over; ⏮ goes
+  back to the start; Space plays /
+  pauses; lock-screen, notification and media-key controls
   (next / previous track = new / previous variation)
 - Drift ("evolution"): related-key and mode changes, progression changes,
   tempo glides, optional V-chord preparation for key changes; keys and

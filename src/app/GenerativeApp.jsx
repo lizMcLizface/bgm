@@ -395,6 +395,7 @@ const GenerativeApp = () => {
     const [running, setRunning] = useState(gen.isRunning);
     const [ambienceOn, setAmbienceOn] = useState(gen.ambienceRunning);
     const anyOn = running || ambienceOn;
+    const [paused, setPaused] = useState(false);
     const [settings, setSettings] = useState({ ...gen.settings });
     const [roles, setRoles] = useState(() =>
         Object.fromEntries(Object.entries(ROLES).map(([role, { volume }]) => [role, { presetName: gen.roles[role].presetName, edited: false, volume }]))
@@ -432,6 +433,7 @@ const GenerativeApp = () => {
         const sync = () => {
             setRunning(gen.isRunning);
             setAmbienceOn(gen.ambienceRunning);
+            setPaused(gen.paused);
         };
         sync(); // after a hot update the state may describe the old generator
         return gen.onRunningChange(sync);
@@ -539,18 +541,12 @@ const GenerativeApp = () => {
     };
     const stop = () => gen.stopAll();
     const toggle = () => (gen.anyRunning ? stop() : play());
+    // Switching a part off stops it (all off: paused); switching one on
+    // starts it while anything plays, otherwise readies it for Play.
     const setPart = (key, on) => {
-        if (gen.anyRunning) {
-            const partRunning = key === 'playMusic' ? gen.isRunning : gen.ambienceRunning;
-            const othersRunning = key === 'playMusic' ? gen.ambienceRunning : gen.isRunning;
-            // switching off the only part playing: Stop, keeping the choice
-            if (!on && !othersRunning) {
-                stop();
-                return;
-            }
-            if (on && !partRunning) startPart(key);
-            if (!on && partRunning) (key === 'playMusic' ? gen.stop() : gen.stopAmbience());
-        }
+        const partRunning = key === 'playMusic' ? gen.isRunning : gen.ambienceRunning;
+        if (on && !partRunning && gen.anyRunning) startPart(key);
+        if (!on && partRunning) (key === 'playMusic' ? gen.stop() : gen.stopAmbience());
         update(key, on);
     };
     const togglePart = (key) => setPart(key, !gen.settings[key]);
@@ -604,7 +600,9 @@ const GenerativeApp = () => {
         <main className="gen">
             <header className="gen-header">
                 <h1>bgm <span>calm procedural music</span></h1>
-                <button className="gen-play" onClick={toggle} title="Play / stop music and ambience (Space)">{anyOn ? 'Stop' : 'Play'}</button>
+                <button className="gen-play" onClick={toggle} title="Play / pause (Space)">{anyOn ? 'Pause' : 'Play'}</button>
+                <button type="button" className="gen-rewind" onClick={() => gen.rewind()} disabled={!running && !paused}
+                    title="Back to the start of the piece" aria-label="Back to the start">⏮</button>
                 <div className="gen-parts" role="group" aria-label="What Play plays">
                     <button type="button" className={`gen-part${settings.playMusic ? ' is-on' : ''}`} aria-pressed={settings.playMusic}
                         onClick={() => togglePart('playMusic')} title={PART_TITLE}>Music</button>

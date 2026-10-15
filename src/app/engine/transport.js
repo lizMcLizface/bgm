@@ -23,6 +23,7 @@ class Transport {
         this.interval = interval;
         this.listeners = new Set();
         this.timer = null;
+        this.rebaseAt = null;
     }
 
     get secondsPerBeat() {
@@ -48,9 +49,10 @@ class Transport {
         this.bpm = bpm;
     }
 
-    start() {
+    /** @param {number} [fromBeat=0] - the first beat's number (resuming mid-piece) */
+    start(fromBeat = 0) {
         if (this.timer) return;
-        this.beat = 0;
+        this.beat = fromBeat;
         this.nextBeatTime = this.AC.currentTime + 0.1;
         this.tick();
         this.timer = setInterval(() => this.tick(), this.interval);
@@ -59,6 +61,15 @@ class Transport {
     stop() {
         clearInterval(this.timer);
         this.timer = null;
+        this.rebaseAt = null;
+    }
+
+    /**
+     * A new bar length from beat `at` on (a time signature change at a bar
+     * line): that beat is renumbered `to`, so bar numbers carry on.
+     */
+    rebase(at, to, beatsPerBar) {
+        this.rebaseAt = { at, to, beatsPerBar };
     }
 
     tick() {
@@ -73,6 +84,11 @@ class Transport {
             this.listeners.forEach((listener) => listener(event));
             this.nextBeatTime += this.secondsPerBeat;
             this.beat++;
+            if (this.rebaseAt && this.beat === this.rebaseAt.at) {
+                this.beat = this.rebaseAt.to;
+                this.beatsPerBar = this.rebaseAt.beatsPerBar;
+                this.rebaseAt = null;
+            }
         }
     }
 }
