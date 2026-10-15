@@ -1494,6 +1494,8 @@ class MonoSynth {
 
         this.applyNotePitch(noteInfo, portamentoSpeed, attackStart);
 
+        this.scheduleNoteShape(noteInfo.freq, plan, attackStart);
+
         const [[, initial], ...rest] = gainPoints;
         gain.setValueAtTime(initial, attackStart);
         rest.forEach(([t, v]) => gain.linearRampToValueAtTime(v, attackStart + t));
@@ -1503,6 +1505,63 @@ class MonoSynth {
             if (type === 'set') detune.setValueAtTime(value, attackStart + time);
             else detune.setTargetAtTime(value, attackStart + time, timeConstant);
         });
+    }
+
+    // --- FM and pitch envelope (scheduleNote only) -----------------------
+
+    // The main oscillators (the ones FM drives), primary first.
+    mainOscillators() {
+        return [this.primaryOscillator, ...this.additionalOscillators];
+    }
+
+    /**
+     * FM: a sine modulator at `ratio` x the note's frequency driving the
+     * main oscillators' frequency. `index` is the sustained modulation
+     * index, `envAmount` extra index at the note's start that falls away
+     * over `decay` seconds (bells, electric pianos). The modulator is only
+     * wired in while the index can be non-zero.
+     */
+    setFm({ ratio, index, envAmount, decay }) {
+        this.fmParams = { ratio, index, envAmount, decay };
+        const on = index > 0 || envAmount > 0;
+        if (on && !this.fmMod) {
+            this.fmMod = this.AC.createOscillator();
+            this.fmDepth = this.AC.createGain();
+            this.fmDepth.gain.value = 0;
+            this.fmMod.connect(this.fmDepth);
+            this.fmMod.start();
+        }
+        if (on === Boolean(this.fmOn)) return;
+        this.fmOn = on;
+        this.mainOscillators().forEach((osc) => {
+            const freq = osc.getOscillatorNode().frequency;
+            if (on) this.fmDepth.connect(freq);
+            else this.fmDepth.disconnect(freq);
+        });
+    }
+
+    // Per note: the FM modulator follows the pitch, and the oscillators'
+    // detune carries the pitch envelope (on top of vibrato).
+    scheduleNoteShape(freq, plan, start) {
+        if (this.fmOn) {
+            const { ratio, index, envAmount, decay } = this.fmParams;
+            const modFreq = freq * ratio;
+            this.fmMod.frequency.cancelScheduledValues(start);
+            this.fmMod.frequency.setValueAtTime(modFreq, start);
+            const depth = this.fmDepth.gain;
+            depth.cancelScheduledValues(start);
+            depth.setValueAtTime((index + envAmount) * modFreq, start);
+            if (envAmount > 0) depth.setTargetAtTime(index * modFreq, start, Math.max(decay, minTime) / 3);
+        }
+        const env = plan.pitchEnv;
+        if (env && env.amount) {
+            [...this.mainOscillators().slice(0, this.voiceCount), this.subOscillator, this.osc2].forEach((osc) => {
+                const detune = osc.getOscillatorNode().detune;
+                detune.cancelScheduledValues(start);
+                detune.setValueAtTime(env.amount, start);
+                detune.setTargetAtTime(0, start, Math.max(env.decay, minTime) / 3);
+            });
+        }
     }
 
     noteOff = ({ gainEnv, filterEnv }, voiceId = null) => {

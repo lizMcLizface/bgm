@@ -10,6 +10,7 @@
     --gen-role-bass: #c7772b;
     --gen-role-lead: #2f9a6a;
     --gen-role-counter: #2a86b5;
+    --gen-role-perc: #8a8f98;
     color-scheme: light;
 }
 
@@ -28,6 +29,7 @@
         --gen-role-bass: #e9a25d;
         --gen-role-lead: #5cc896;
         --gen-role-counter: #62bde6;
+        --gen-role-perc: #b4bac4;
         color-scheme: dark;
     }
 }
@@ -44,6 +46,7 @@
     --gen-role-bass: #e9a25d;
     --gen-role-lead: #5cc896;
     --gen-role-counter: #62bde6;
+    --gen-role-perc: #b4bac4;
     color-scheme: dark;
 }
 
@@ -140,6 +143,7 @@ body {
 .gen-swatch-bass { background: var(--gen-role-bass); }
 .gen-swatch-lead { background: var(--gen-role-lead); }
 .gen-swatch-counter { background: var(--gen-role-counter); }
+.gen-swatch-perc { background: var(--gen-role-perc); }
 
 .gen-panel {
     background: var(--gen-surface);
@@ -515,6 +519,11 @@ body {
     color: var(--gen-muted);
 }
 
+.gen .gen-keys-button {
+    padding: 4px 10px;
+    font-size: 12px;
+}
+
 .gen .gen-linkbutton {
     padding: 0;
     border: 0;
@@ -728,6 +737,7 @@ body {
 .gen-role-bass { border-left-color: var(--gen-role-bass); }
 .gen-role-lead { border-left-color: var(--gen-role-lead); }
 .gen-role-counter { border-left-color: var(--gen-role-counter); }
+.gen-role-perc { border-left-color: var(--gen-role-perc); }
 
 .gen-panel-title .gen-swatch {
     margin-right: 0;

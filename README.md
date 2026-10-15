@@ -24,7 +24,20 @@ synthesised with the Web Audio API; there are no samples.
 - A second lead that answers the lead, harmonises it a third below, or
   plays its own slow line
 - Sections: every few phrases the piece moves between intro, build, full
-  and breakdown - voices come and go, the lead plays more or less
+  and breakdown - voices come and go, the lead plays more or less, and
+  (optionally) the voices darken in intros and breakdowns and open up in Full
+- Presets in the top row: 24 soundscapes to start from - music with
+  ambience, music only, or ambience only - each setting key, scale, feel,
+  drums, ambience and every voice's sound at once; switched while playing
+- Percussion, in its own panel: soft synthesised drums - heartbeat,
+  brushes, lo-fi beat or shaker, several grooves each - with activity,
+  variation (grooves change between sections and phrases, every hit sounds
+  a little different), volume, mute / solo, a room, and per drum on /
+  level / tone / length; sections bring it in and out, fills close
+  phrases, and turning it on never changes the notes
+- Mutes are kept: they are part of the settings, so a reload or a link
+  keeps them (solo isn't)
+- Swing, from straight to nearly triplet (simple meters)
 - Ambience under the music - rain, distant thunder, wind, waves, a
   fireplace, vinyl crackle - synthesised from noise (no recordings), each
   with its own level, plus a volume for the whole bed against the music.
@@ -36,10 +49,11 @@ synthesised with the Web Audio API; there are no samples.
   Play choose what Play starts (switching live while playing) and are
   part of the link; new visits play music only. Turning a layer up while
   nothing plays starts the ambience alone
-- Sleep timer with a countdown: fades out over the last minute and stops
+- Sleep timer (in the ⚙ menu, its countdown in the header): in the last minute the music comes to an
+  end on the home chord (V, then a held I) and the ambience fades out
 - Save audio: renders the piece to a WAV file (1-60 min) faster than real
   time, in chunks so long files stay light on memory, with live progress,
-  time left and Cancel
+  time left and Cancel; it can end on the home chord instead of fading
 - A pass-phrase per piece (in the ⚙ menu, with a dice to roll a new one):
   every visit - and every reload - starts with a random one, which reads as four words (`amber-tide-lantern-moss`); type
   those - or any words - and press Enter to play that phrase's piece from
@@ -62,12 +76,15 @@ synthesised with the Web Audio API; there are no samples.
   per voice
 - Play any voice from the computer keyboard (A-; and W E T Y U O P, Z/X for
   octave) or from MIDI after clicking "Connect MIDI"
-- A full synth editor per voice, 41 built-in presets by category, and your
-  own presets (saved in the browser, or exported/imported as JSON)
-- Procedural sounds: a new preset per voice from a random seed, shaped for
-  the role and levelled to its default's loudness; or "New sounds" for
-  every voice at once, sharing one character (waveform family,
-  brightness, reverb, modulation, attack, echoes); links carry the seeds
+- A full synth editor per voice - with FM, organ / hollow / choir / glass /
+  reed waveforms, a pitch envelope, filter LFO, key tracking and velocity
+  to brightness, tremolo and auto-pan - 55 built-in presets by category,
+  and your own presets (saved in the browser, or exported/imported as JSON)
+- Procedural sounds: a new preset per voice from a random seed, of a kind
+  you pick or the seed picks (pad, texture or keys; bass or pluck bass;
+  lead, pluck or bell), levelled to the role's default loudness; or "New
+  sounds" for every voice at once, sharing one character (smooth, warm,
+  bright, glassy, organ, lo-fi or dub); links carry the seeds
 - Stop fades out within half a second, reverb and echo tails included
   (optional, in the ⚙ menu with the buffer size and theme); master volume
 - Simple by default: each panel shows its main controls, the rest is

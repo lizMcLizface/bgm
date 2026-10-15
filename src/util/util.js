@@ -59,6 +59,12 @@ export const WAVEFORM = {
     square: 'M 10 32 L 10 18 L 25 18 L 25 32 L 40 32 L 40 18',
     sawtooth: 'M 10 32 L 10 18 L 25 32 L 25 18 L 40 32 L 40 18',
     square_dc: 'M 10 32 L 10 18 L 17 18 L 17 32 L 40 32 L 40 18', // Asymmetric square for duty cycle
+    // PeriodicWave timbres (src/nodes/oscillator.js PERIODIC_WAVES)
+    organ: 'M 14 14 L 14 36 M 20 20 L 20 36 M 26 14 L 26 36 M 32 26 L 32 36 M 38 22 L 38 36', // drawbars
+    hollow: 'M 10 30 Q 10 18 17 18 Q 24 18 24 25 Q 24 32 31 32 Q 40 32 40 20',
+    choir: 'M 14 22 Q 25 12 36 22 Q 25 40 14 22', // an open mouth
+    glass: 'M 25 12 L 35 25 L 25 38 L 15 25 Z',
+    reed: 'M 10 30 L 18 18 Q 20 30 26 30 L 32 18 Q 34 30 40 30',
 };
 
 export const FILTER = {

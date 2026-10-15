@@ -18,6 +18,10 @@ vi.mock('../audio/context', () => ({
             };
             return { connect: () => {}, gain };
         },
+        createBiquadFilter: () => {
+            const param = () => ({ value: 0, setTargetAtTime() {}, setValueAtTime() {}, cancelScheduledValues() {} });
+            return { connect: () => {}, frequency: param(), Q: param() };
+        },
     },
 }));
 vi.mock('../audio/bus', () => ({ masterBus: {} }));
@@ -28,6 +32,16 @@ vi.mock('./engine/Instrument', () => ({ default: class {
     connect() {}
     applyPreset() {}
     scheduleNote(midi, start, duration, velocity, detune) { mockBooked.push({ midi, start, duration, velocity, detune }); }
+    silence() {}
+    flushTails() {}
+} }));
+
+const mockHits = vi.hoisted(() => []);
+vi.mock('./engine/drumKit', () => ({ default: class {
+    constructor() { this.polyphony = 0; this.preset = {}; }
+    setKit() {}
+    connect() {}
+    scheduleNote(drum, start, duration, velocity) { mockHits.push({ drum, start, velocity }); }
     silence() {}
     flushTails() {}
 } }));
@@ -236,15 +250,15 @@ test('mute and solo: any solo silences the rest; mute silences only its role', (
     const gen = generator(1, { mode: 'off' });
     const levels = () => Object.fromEntries(Object.entries(gen.roles).map(([role, r]) => [role, r.gain.gain.value]));
     gen.setRoleMix('bass', { mute: true });
-    expect(levels()).toEqual({ pad: 0.8, bass: 0, lead: 0.7, counter: 0.6 });
+    expect(levels()).toEqual({ pad: 0.8, bass: 0, lead: 0.7, counter: 0.6, perc: 0.7 });
     gen.setRoleMix('lead', { solo: true });
-    expect(levels()).toEqual({ pad: 0, bass: 0, lead: 0.7, counter: 0 });
+    expect(levels()).toEqual({ pad: 0, bass: 0, lead: 0.7, counter: 0, perc: 0 });
     gen.setRoleMix('bass', { solo: true }); // solo beats mute
-    expect(levels()).toEqual({ pad: 0, bass: 0.8, lead: 0.7, counter: 0 });
+    expect(levels()).toEqual({ pad: 0, bass: 0.8, lead: 0.7, counter: 0, perc: 0 });
     gen.setRoleMix('lead', { solo: false });
     gen.setRoleMix('bass', { solo: false });
     gen.setRoleVolume('pad', 0.5);
-    expect(levels()).toEqual({ pad: 0.5, bass: 0, lead: 0.7, counter: 0.6 });
+    expect(levels()).toEqual({ pad: 0.5, bass: 0, lead: 0.7, counter: 0.6, perc: 0.7 });
 });
 
 test('stop pauses: Play picks up at the next bar, settings changes keep the place, rewind goes back', () => {
@@ -332,4 +346,80 @@ test('looping: a bar or a progression; a settings change re-plans the loop at it
     expect(gen.plan.get(6).state.padVoicing.length).toBe(4);
     gen.setLoop('off');
     expect(gen.loop).toBeNull();
+});
+
+describe('drums, swing and section tone', () => {
+    const notes = (bars) => bars.flatMap((b) => b.events.filter((e) => e.role !== 'perc').map(({ role, midi, beat, velocity }) => ({ bar: b.bar, role, midi, beat, velocity })));
+    const withSettings = (patch) => {
+        const gen = generator(31, { mode: 'centered' });
+        Object.assign(gen.settings, patch);
+        gen.reset();
+        return play(gen, 24);
+    };
+
+    test('turning drums on adds hits and leaves every note as it was', () => {
+        const plain = withSettings({});
+        ['heartbeat', 'brushes', 'lofi', 'shaker'].forEach((style) => {
+            const drummed = withSettings({ drums: { style, activity: 0.8 } });
+            expect(notes(drummed)).toEqual(notes(plain));
+            const hits = drummed.flatMap((b) => b.events.filter((e) => e.role === 'perc'));
+            expect(hits.length).toBeGreaterThan(0);
+            hits.forEach((e) => {
+                expect(e.beat).toBeGreaterThanOrEqual(0);
+                expect(e.beat).toBeLessThan(4.1);
+                expect(e.midi).toBeGreaterThanOrEqual(0);
+                expect(e.midi).toBeLessThan(6);
+            });
+        });
+        expect(plain.flatMap((b) => b.events).some((e) => e.role === 'perc')).toBe(false);
+    });
+
+    test('sections thin the drums out: a strong intro has none', () => {
+        const bars = withSettings({ drums: { style: 'lofi', activity: 0.5 }, sections: { mode: 'strong', phrases: 2 } });
+        bars.filter((b) => b.state.phrase.section.type === 'intro').forEach((b) => expect(b.events.some((e) => e.role === 'perc')).toBe(false));
+        expect(bars.some((b) => b.state.phrase.section.type === 'full' && b.events.some((e) => e.role === 'perc'))).toBe(true);
+    });
+
+    test('swing delays only off-beat halves, toward the triplet', () => {
+        const straight = withSettings({ humanize: { timing: 0, velocity: 0, detune: 0 }, drums: { style: 'lofi', activity: 0.5 } });
+        const swung = withSettings({ humanize: { timing: 0, velocity: 0, detune: 0 }, drums: { style: 'lofi', activity: 0.5 }, swing: 0.6 });
+        straight.forEach((b, i) => b.events.forEach((e, j) => {
+            const s = swung[i].events[j];
+            const offBeat = Math.abs(e.beat - Math.floor(e.beat) - 0.5) < 1e-9;
+            expect(s.beat).toBeCloseTo(offBeat ? e.beat + 0.1 : e.beat, 9);
+        }));
+    });
+
+    test('section tone: darker in intros, open in full; open when off', () => {
+        const bars = withSettings({ sectionTone: true, sections: { mode: 'gentle', phrases: 2 } });
+        bars.forEach((b) => {
+            if (b.state.phrase.section.type === 'full') expect(b.tone).toBe(20000);
+            if (b.state.phrase.section.type === 'intro') expect(b.tone).toBeLessThan(5000);
+        });
+        withSettings({ sections: { mode: 'gentle', phrases: 2 } }).forEach((b) => expect(b.tone).toBe(20000));
+    });
+});
+
+test('an ending: V, then a held I, then silence; Stop before the end carries on instead', () => {
+    const gen = generator(12, { mode: 'off' });
+    gen.settings.drums = { style: 'brushes', activity: 0.5 };
+    play(gen, 10);
+    gen.transport.timer = 1;
+    gen.endSoon();
+    const v = gen.plan.get(10);
+    const final = gen.plan.get(11);
+    expect(v.chord.numeral).toMatch(/^V/);
+    expect(final.chord.numeral).toMatch(/^I/);
+    expect(final.chord.keyName).toBe('C Ionian');
+    const pad = final.events.filter((e) => e.role === 'pad');
+    expect(pad.length).toBe(3);
+    pad.forEach((e) => expect(e.length).toBeGreaterThan(gen.beatsPerBar));
+    expect(final.events.filter((e) => e.role === 'bass').length).toBe(1);
+    expect(final.events.filter((e) => e.role === 'perc').length).toBe(1);
+    gen.ensurePlanned(12);
+    expect(gen.plan.get(12).events).toEqual([]);
+    expect(gen.ending).toBe(true);
+    gen.stop();
+    expect(gen.ending).toBe(false);
+    expect([...gen.plan.values()].some((planned) => planned.ending)).toBe(false);
 });

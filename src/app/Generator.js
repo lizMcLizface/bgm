@@ -23,12 +23,14 @@
 import { audioContext } from '../audio/context';
 import { masterBus } from '../audio/bus';
 import Instrument from './engine/Instrument';
+import DrumKit from './engine/drumKit';
 import Ambience from './engine/ambience';
 import Transport from './engine/transport';
-import { scaleById, scaleSemitones, spellScale, romanDegree, diatonicChord, chordSymbol, displayNumeral, noteAtOrAbove } from './theory';
-import { arrangeBar } from './arranger';
+import { scaleById, scaleSemitones, spellScale, romanDegree, diatonicChord, chordSymbol, displayNumeral, noteAtOrAbove, voiceLead } from './theory';
+import { arrangeBar, notesInRange } from './arranger';
 import { nextMusic, glideTempo, scaleDistance } from './conductor';
-import { METERS, unitsPerMinute } from './meter';
+import { METERS, unitsPerMinute, swingEvents } from './meter';
+import { drumBar, loosenDrums, auditionHits } from './percussion';
 import { normal, seeded } from './random';
 import { defaultSettings } from './settings';
 import { findPreset } from './editor/presetStore';
@@ -50,10 +52,29 @@ const HISTORY_BARS = 512;
 // Settings that define "home"; changing one resets drift to it.
 const HOME_KEYS = new Set(['tonic', 'mode', 'progression', 'bpm', 'barsPerChord']);
 // Settings that don't change what is planned.
-const SOUND_KEYS = new Set(['ambience', 'ambienceShape', 'ambienceVolume', 'playMusic', 'playAmbience', 'volumes']);
+const SOUND_KEYS = new Set(['ambience', 'ambienceShape', 'ambienceVolume', 'playMusic', 'playAmbience', 'volumes', 'drumKit', 'muted']);
 
 // Ambience volume slider (0..1) to gain: 0.8, the default, is unity.
 const ambienceGain = (volume) => Math.pow(volume / 0.8, 2);
+
+// Section tone (settings.sectionTone): a lowpass on the melodic voices,
+// darker in intros and breakdowns, open in Full - cutoff in Hz per section.
+export const OPEN_TONE = 20000;
+const SECTION_TONE = {
+    gentle: { intro: 2200, build: 4500, full: OPEN_TONE, breakdown: 2800 },
+    strong: { intro: 1200, build: 3000, full: OPEN_TONE, breakdown: 1600 },
+};
+export const TONE_ROLES = ['pad', 'lead', 'counter'];
+export const sectionTone = (settings, section) =>
+    (settings.sectionTone && section && SECTION_TONE[settings.sections.mode] ? SECTION_TONE[settings.sections.mode][section.type] : OPEN_TONE);
+
+// An ending (endSoon, and rendering with an ending): the bar before it
+// plays the key's V, the final bar a held I; music stops this many bars
+// after the final bar starts, once its chord has rung out.
+const ENDING_RING_BARS = 3;
+
+/** The percussion role (engine/drumKit.js): not a synth, so not in ROLES. */
+export const PERC_ROLE = { perc: { label: 'Percussion' } };
 
 // In display order.
 export const ROLES = {
@@ -82,10 +103,29 @@ class Generator {
             const instrument = new Instrument({ polyphony, preset: findPreset(preset) });
             const gain = this.AC.createGain();
             gain.gain.value = volume;
+            // section tone: open (and inaudible) unless settings.sectionTone
+            const tone = this.AC.createBiquadFilter();
+            tone.frequency.value = OPEN_TONE;
+            tone.Q.value = 0.5;
+            instrument.connect(tone);
+            tone.connect(gain);
+            gain.connect(this.output);
+            this.roles[role] = { instrument, gain, tone, presetName: preset, edited: false, volume, mute: false, solo: false };
+        });
+        {
+            const volume = (this.settings.volumes && this.settings.volumes.perc) ?? ROLE_VOLUMES.perc;
+            const instrument = new DrumKit({ context: this.AC });
+            const gain = this.AC.createGain();
+            gain.gain.value = volume;
             instrument.connect(gain);
             gain.connect(this.output);
-            this.roles[role] = { instrument, gain, presetName: preset, edited: false, volume, mute: false, solo: false };
-        });
+            instrument.setKit(this.settings.drumKit);
+            this.roles.perc = { instrument, gain, presetName: null, edited: false, volume, mute: false, solo: false, drums: true };
+        }
+        // mutes are settings (they persist and travel in links); solo is not
+        Object.entries(this.roles).forEach(([role, r]) => { r.mute = Boolean(this.settings.muted && this.settings.muted[role]); });
+        this.applyMix();
+        this.toneNow = null;
 
         this.transport = new Transport({
             bpm: unitsPerMinute(this.meter, this.settings.bpm),
@@ -145,6 +185,7 @@ class Generator {
         // exactly what the seed (phrase) and settings make from the start.
         this.editedSinceStart = false;
         this.loop = null;
+        this.endBar = null;
         this.ensurePlanned(0);
     }
 
@@ -226,18 +267,19 @@ class Generator {
     }
 
     /**
-     * Fades everything out over `seconds`, then stops (the sleep timer).
-     * Stop in the meantime cancels the fade.
+     * The sleep timer's last `seconds`: the music comes to an end in time
+     * (endSoon - a V, a held I) instead of fading, the ambience fades out,
+     * then everything stops. Stop in the meantime cancels it.
      */
     fadeOut(seconds) {
         if (!this.anyRunning) return;
         const now = this.AC.currentTime;
         if (this.isRunning) {
-            const gain = this.output.gain;
-            gain.cancelScheduledValues(now);
-            gain.setValueAtTime(gain.value, now);
-            // -60 dB at the end
-            gain.setTargetAtTime(0, now, seconds / 7);
+            clearTimeout(this.endTimer);
+            this.endTimer = setTimeout(() => {
+                this.endTimer = null;
+                this.endSoon();
+            }, Math.max(0, seconds - this.endingSeconds() - 2) * 1000);
         }
         // the bed fades the same way and stops at the end
         this.fadeAmbience = this.ambienceRunning;
@@ -264,6 +306,13 @@ class Generator {
         if (!this.fadeTimer) return;
         clearTimeout(this.fadeTimer);
         this.fadeTimer = null;
+        clearTimeout(this.endTimer);
+        this.endTimer = null;
+        // an ending under way: the music carries on instead
+        if (this.ending) {
+            this.endBar = null;
+            this.replan([]);
+        }
         const gain = this.output.gain;
         gain.cancelScheduledValues(this.AC.currentTime);
         gain.setValueAtTime(gain.value, this.AC.currentTime);
@@ -281,14 +330,20 @@ class Generator {
     stop() {
         const heard = this.position();
         this.transport.stop();
+        this.toneNow = null;
+        const ending = this.endBar !== null;
+        this.endBar = null;
         const wasFading = Boolean(this.fadeTimer);
         clearTimeout(this.fadeTimer);
         this.fadeTimer = null;
+        clearTimeout(this.endTimer);
+        this.endTimer = null;
         Object.values(this.roles).forEach(({ instrument }) => instrument.silence());
         if (!this.quickStop) {
             // a sleep fade cut short: back to full level for the tails
             if (wasFading) this.output.gain.setTargetAtTime(1, this.AC.currentTime, 0.05);
             this.pause(heard);
+            if (ending) this.replan([]);
             this.notifyRunning();
             return;
         }
@@ -298,6 +353,47 @@ class Generator {
         clearTimeout(this.stopFade);
         this.stopFade = setTimeout(() => this.endStopFade(), STOP_FADE_MS);
         this.pause(heard);
+        // stopped during an ending: Play carries on with the music instead
+        if (ending) this.replan([]);
+        this.notifyRunning();
+    }
+
+    /**
+     * Brings the piece to an end: the next bar plays the key's V, the one
+     * after a held I, and the music stops once that has rung out (and goes
+     * back to the start). Stop before then cancels it.
+     */
+    endSoon() {
+        if (!this.isRunning || this.endBar !== null) return;
+        const from = this.currentBar + 1;
+        this.loop = null;
+        this.endBar = from + 1;
+        [...this.plan.keys()].filter((bar) => bar >= from).forEach((bar) => this.plan.delete(bar));
+        this.ensurePlanned(from);
+    }
+
+    /** Whether an ending is under way. */
+    get ending() {
+        return this.endBar !== null;
+    }
+
+    /** Seconds an ending takes from endSoon() until the music stops (about). */
+    endingSeconds() {
+        const planned = this.plan.get(Math.max(this.currentBar, 0)) || this.getPlan()[0];
+        const bar = (60 / unitsPerMinute(this.meter, planned.bpm)) * this.beatsPerBar;
+        return bar * (ENDING_RING_BARS + 2);
+    }
+
+    // The ending has rung out: stop (letting the tails ring) and go back to
+    // the start.
+    finishEnding() {
+        const quickStop = this.quickStop;
+        this.quickStop = false;
+        this.endBar = null;
+        this.stop();
+        this.quickStop = quickStop;
+        this.reset();
+        this.planListeners.forEach((listener) => listener());
         this.notifyRunning();
     }
 
@@ -320,6 +416,8 @@ class Generator {
         if (key === 'ambienceShape') this.ambience.setShape(value);
         if (key === 'ambienceVolume') this.setAmbienceVolume(value);
         if (key === 'volumes') this.applyVolumes();
+        if (key === 'drumKit') this.roles.perc.instrument.setKit(value);
+        if (key === 'muted') this.applyMutes();
         if (SOUND_KEYS.has(key)) return;
         this.replan([key]);
     }
@@ -359,6 +457,8 @@ class Generator {
         if ('ambience' in patch) this.ambience.setLevels(this.settings.ambience);
         if ('ambienceVolume' in patch) this.setAmbienceVolume(this.settings.ambienceVolume);
         if ('volumes' in patch) this.applyVolumes();
+        if ('drumKit' in patch) this.roles.perc.instrument.setKit(this.settings.drumKit);
+        if ('muted' in patch) this.applyMutes();
         if (Object.keys(patch).every((key) => SOUND_KEYS.has(key))) return;
         this.replan(Object.keys(patch), meterChanged);
     }
@@ -431,6 +531,11 @@ class Generator {
         const planned = this.plan.get(bar) || this.getPlan()[0];
         const { instrument } = this.roles[role];
         const time = this.AC.currentTime + 0.05;
+        if (role === 'perc') {
+            const beat = 60 / unitsPerMinute(this.meter, planned.bpm);
+            auditionHits().forEach((e) => instrument.scheduleNote(e.midi, time + e.beat * beat, 0.1, e.velocity));
+            return;
+        }
         const notes = {
             bass: [noteAtOrAbove(planned.chord.pitchClasses[0], planned.state.ranges.bass[0] + 5)],
             pad: planned.state.padVoicing,
@@ -446,11 +551,19 @@ class Generator {
         this.applyMix();
     }
 
-    /** Mute / solo, as on a mixer: any solo silences every role not soloed. */
+    /** Mute / solo, as on a mixer: any solo silences every role not soloed. Mutes are kept in the settings. */
     setRoleMix(role, { mute, solo }) {
         const r = this.roles[role];
-        if (mute !== undefined) r.mute = mute;
+        if (mute !== undefined) {
+            r.mute = mute;
+            this.settings.muted = { ...this.settings.muted, [role]: mute };
+        }
         if (solo !== undefined) r.solo = solo;
+        this.applyMix();
+    }
+
+    applyMutes() {
+        Object.entries(this.roles).forEach(([role, r]) => { r.mute = Boolean(this.settings.muted[role]); });
         this.applyMix();
     }
 
@@ -464,14 +577,23 @@ class Generator {
         });
     }
 
-    /** Plays a held note on a role (keyboard / MIDI); returns an id for liveNoteOff. */
+    /**
+     * Plays a held note on a role (keyboard / MIDI); returns an id for
+     * liveNoteOff. For percussion `midi` is the drum (percussion.js DRUMS):
+     * one hit, nothing to release.
+     */
     liveNoteOn(role, midi, velocity = 0.8) {
         if (this.AC.state !== 'running') this.AC.resume();
         this.endStopFade();
+        if (role === 'perc') {
+            this.roles.perc.instrument.scheduleNote(midi, this.AC.currentTime + 0.005, 0.8, velocity, Math.random() * 2 - 1);
+            return null;
+        }
         return this.roles[role].instrument.startNote(midi, velocity);
     }
 
     liveNoteOff(role, id) {
+        if (role === 'perc') return;
         this.roles[role].instrument.stopNote(id);
     }
 
@@ -549,7 +671,7 @@ class Generator {
 
     // Decides one bar. Event times/lengths are in beats from the bar start.
     planBar(bar) {
-        const { barsPerChord, leadActivity, padWeights, bassWeights, thinPadUnderLead, drift, humanize, voices, counter, sections } = this.settings;
+        const { barsPerChord, leadActivity, padWeights, bassWeights, thinPadUnderLead, drift, humanize, voices, counter, sections, drums, swing } = this.settings;
         const prev = this.plan.get(bar - 1);
 
         const fresh = !prev || this.resetMusicAt === bar;
@@ -565,9 +687,15 @@ class Generator {
         const cycleEnd = inCycle === cycleBars - 1;
         const following = cycleEnd ? { ...upcoming, cycleStart: bar + 1 } : music;
 
-        const chord = this.chordFor(bar, music, upcoming);
+        if (this.endBar !== null && bar >= this.endBar) {
+            this.planEnding(bar, prev, music, bpm);
+            return;
+        }
+        const closing = this.endBar !== null && bar === this.endBar - 1;
+        const chord = closing ? this.buildChord(music, 'V') : this.chordFor(bar, music, upcoming);
         // The next bar's chord; a new cycle's first chord is never a pivot.
-        const nextChord = cycleEnd ? this.chordAt(bar + 1, following) : this.chordFor(bar + 1, music, upcoming);
+        const nextChord = closing ? this.buildChord(music, 'I')
+            : cycleEnd ? this.chordAt(bar + 1, following) : this.chordFor(bar + 1, music, upcoming);
 
         // A chord (re)starts on its boundary, or wherever a re-plan changed it.
         const inChord = inCycle % barsPerChord;
@@ -586,8 +714,48 @@ class Generator {
             settings: { leadActivity, padWeights, bassWeights, thinPadUnderLead, voices, counter, sections },
             rng: this.rng,
         });
+        // Drums: patterns and looseness from streams of their own (the
+        // arranger's rng is never touched, so the notes stay the same).
+        const hits = drums && drums.style !== 'off'
+            ? drumBar({ bar, meter: this.meter, drums, section: state.phrase.section, sectionsMode: sections.mode, sectionBars: sections.phrases * 4, phraseStart: state.phrase.start, seed: this.settings.seed })
+            : [];
+        swingEvents(events, this.meter, swing);
+        swingEvents(hits, this.meter, swing);
         this.humanize(events, humanize, bpm, bar);
-        this.plan.set(bar, { bar, chord, chordStart, state, events, music, upcoming, nextMusic: following, bpm });
+        loosenDrums(hits, humanize, 60 / unitsPerMinute(this.meter, bpm), this.settings.seed, bar);
+        events.push(...hits);
+        const tone = sectionTone(this.settings, state.phrase.section);
+        this.plan.set(bar, { bar, chord, chordStart, state, events, music, upcoming, nextMusic: following, bpm, tone });
+    }
+
+    // The final bar of an ending - the key's I, held: the pad voice-led from
+    // the bar before, the bass on the root, the lead (if it was playing)
+    // settling on the tonic, a soft kick under it - and silent bars after.
+    planEnding(bar, prev, music, bpm) {
+        const chord = this.buildChord(music, 'I');
+        const { state } = prev;
+        const final = bar === this.endBar;
+        const events = [];
+        let { padVoicing } = state;
+        if (final) {
+            const units = this.meter.units;
+            const hold = units * 2 * 0.95;
+            const nearest = (notes, target) => notes.reduce((best, m) => (Math.abs(m - target) < Math.abs(best - target) ? m : best));
+            const [root] = chord.pitchClasses;
+            padVoicing = voiceLead(chord.pitchClasses, state.ranges.pad[0], state.ranges.pad[1], state.padVoicing);
+            padVoicing.forEach((midi) => events.push({ role: 'pad', midi, beat: 0, length: hold, velocity: 0.55 }));
+            events.push({ role: 'bass', midi: nearest(notesInRange([root], ...state.ranges.bass), state.bassMidi), beat: 0, length: hold, velocity: 0.7 });
+            const tonics = notesInRange([root], ...state.ranges.lead);
+            if (state.phrase.leadActive && tonics.length) {
+                events.push({ role: 'lead', midi: nearest(tonics, state.leadMidi), beat: 0, length: units * 1.5, velocity: 0.55 });
+            }
+            if (this.settings.drums.style !== 'off') events.push({ role: 'perc', midi: 0, beat: 0, length: 0.25, velocity: 0.5 });
+            events.forEach((e) => { e.detune = 0; });
+        }
+        this.plan.set(bar, {
+            bar, chord, chordStart: final, state: { ...state, padVoicing }, events,
+            music, upcoming: prev.upcoming, nextMusic: music, bpm, tone: prev.tone, ending: true,
+        });
     }
 
     // Normally distributed looseness, decided at plan time (so the timeline
@@ -615,6 +783,7 @@ class Generator {
         copy.plan = new Map();
         copy.currentBar = -1;
         copy.resetMusicAt = 0;
+        copy.endBar = null;
         return copy;
     }
 
@@ -757,6 +926,20 @@ class Generator {
         this.transport.rebase((to + 1) * this.transport.beatsPerBar, from * this.meter.units, this.meter.units);
     }
 
+    // Section tone: glides to a bar's cutoff over that bar (at once when
+    // starting).
+    applyTone(tone, time, barSeconds) {
+        if (tone === this.toneNow) return;
+        const glide = this.toneNow !== null;
+        this.toneNow = tone;
+        TONE_ROLES.forEach((role) => {
+            const freq = this.roles[role].tone.frequency;
+            freq.cancelScheduledValues(time);
+            if (glide) freq.setTargetAtTime(tone, time, barSeconds / 3);
+            else freq.setValueAtTime(tone, time);
+        });
+    }
+
     // Books this beat's slice of the plan at exact audio times.
     onBeat({ bar, beatInBar, time, secondsPerBeat }) {
         this.beatLog.push({ bar, beatInBar, units: this.transport.beatsPerBar, time, secondsPerBeat });
@@ -766,6 +949,11 @@ class Generator {
             this.currentBar = bar;
             this.ensurePlanned(bar);
         }
+        if (beatInBar === 0 && this.endBar !== null && bar >= this.endBar + ENDING_RING_BARS) {
+            this.finishEnding();
+            return;
+        }
+        if (beatInBar === 0) this.applyTone(this.plan.get(bar).tone, time, secondsPerBeat * this.transport.beatsPerBar);
         const book = (e, start) => {
             e.booked = true;
             this.roles[e.role].instrument.scheduleNote(e.midi, Math.max(start, this.AC.currentTime), e.length * secondsPerBeat, e.velocity, e.detune);

@@ -34,6 +34,16 @@ const SYNTH_SCHEMA = [
         ],
     },
     {
+        label: 'FM',
+        columns: 4,
+        controls: [
+            knob('fmRatio', 'Ratio', { modifier: 7.5, offset: 0.5, resetValue: 1, decimalPlaces: 2 }),
+            knob('fmIndex', 'Index', { modifier: 10, resetValue: 0 }),
+            knob('fmEnvAmount', 'Strike', { modifier: 20, resetValue: 0 }),
+            knob('fmDecay', 'Strike Decay', { modifier: 3, resetValue: 0.5 }, (p) => !(p.fmEnvAmount > 0)),
+        ],
+    },
+    {
         label: 'Voices',
         columns: 3,
         controls: [
@@ -78,6 +88,14 @@ const SYNTH_SCHEMA = [
         ],
     },
     {
+        label: 'Pitch Envelope',
+        columns: 2,
+        controls: [
+            knob('pitchEnvAmount', 'Amount', { type: 'B', modifier: 2400, resetValue: 0, decimalPlaces: 0, isRounded: true }),
+            knob('pitchEnvDecay', 'Decay', { modifier: 1, resetValue: 0.05, decimalPlaces: 3 }),
+        ],
+    },
+    {
         label: 'Filter',
         columns: 4,
         controls: [
@@ -92,11 +110,31 @@ const SYNTH_SCHEMA = [
         ],
     },
     {
+        label: 'Filter Motion',
+        columns: 4,
+        controls: [
+            knob('filterLfoRate', 'LFO Rate', { scalingType: 'logarithmic', minValue: 0.01, maxValue: 10, resetValue: 0.2, decimalPlaces: 2 }),
+            knob('filterLfoDepth', 'LFO Depth', { modifier: 2400, resetValue: 0, isRounded: true }),
+            knob('filterKeyTrack', 'Key Track', { modifier: 1, resetValue: 0 }),
+            knob('filterVelocity', 'Velocity', { modifier: 4800, resetValue: 0, isRounded: true }),
+        ],
+    },
+    {
         label: 'Vibrato',
         columns: 2,
         controls: [
             knob('vibratoDepth', 'Depth', { modifier: 200 }),
             knob('vibratoRate', 'Rate', { modifier: 50 }),
+        ],
+    },
+    {
+        label: 'Tremolo / Auto-pan',
+        columns: 4,
+        controls: [
+            knob('tremoloRate', 'Trem Rate', { scalingType: 'logarithmic', minValue: 0.05, maxValue: 12, resetValue: 4, decimalPlaces: 2 }),
+            knob('tremoloDepth', 'Trem Depth', { resetValue: 0 }),
+            knob('autoPanRate', 'Pan Rate', { scalingType: 'logarithmic', minValue: 0.02, maxValue: 5, resetValue: 0.2, decimalPlaces: 2 }),
+            knob('autoPanDepth', 'Pan Depth', { resetValue: 0 }),
         ],
     },
     {

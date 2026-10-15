@@ -17,6 +17,7 @@ import Source from './source';
 import SignalGenerator from './signalGenerator';
 import NoiseGenerator from './noiseGenerator';
 import OscNoiseMixer from './oscNoiseMixer';
+import Motion from './motion';
 
 export {
     Compressor,
@@ -38,4 +39,5 @@ export {
     SignalGenerator,
     NoiseGenerator,
     OscNoiseMixer,
+    Motion,
 };

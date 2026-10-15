@@ -1,0 +1,68 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`version 1 is frozen: v1 links make the sounds they always made 1`] = `
+{
+  "filterFreq": 2545,
+  "filterQ": 0.6,
+  "filterType": "lowpass",
+  "gainAttack": 0.05,
+  "gainDecay": 0.49,
+  "gainRelease": 0.66,
+  "gainSustain": 0.63,
+  "masterVolume": 0.6,
+  "reverbAmount": 0.4,
+  "reverbType": "reverb6",
+  "vcoType": "sawtooth",
+  "vibratoDepth": 9.6,
+  "vibratoRate": 5.3,
+}
+`;
+
+exports[`version 1 is frozen: v1 links make the sounds they always made 2`] = `
+{
+  "detuneSpread": 9,
+  "envelopeAttackExponent": 1,
+  "envelopeAttackShape": "sine",
+  "eqHighGain": -4,
+  "filterFreq": 4110,
+  "filterQ": 1.7,
+  "filterType": "lowpass",
+  "gainAttack": 1.8,
+  "gainDecay": 1.14,
+  "gainRelease": 2.99,
+  "gainSustain": 0.58,
+  "masterVolume": 0.6,
+  "noiseFilterEnabled": true,
+  "noiseFilterQ": 7.9,
+  "noiseMix": 0.08,
+  "noiseType": "brown",
+  "reverbAmount": 0.47,
+  "reverbType": "reverb3",
+  "stereoSpread": 47,
+  "vcoType": "triangle",
+  "vibratoDepth": 4.8,
+  "vibratoRate": 0.22,
+  "voiceCount": 2,
+}
+`;
+
+exports[`version 1 is frozen: v1 links make the sounds they always made 3`] = `
+{
+  "chorusAmount": 0.08,
+  "chorusRate": 0.24,
+  "filterFreq": 598,
+  "filterQ": 2.4,
+  "filterType": "lowpass",
+  "gainAttack": 0.019,
+  "gainDecay": 0.33,
+  "gainRelease": 0.38,
+  "gainSustain": 0.57,
+  "masterVolume": 0.6,
+  "osc2Amount": 0.16,
+  "osc2Type": "sine",
+  "subOscOctaveOffset": -1,
+  "subOscType": "sine",
+  "vcoDutyCycle": 0.3,
+  "vcoType": "square_dc",
+}
+`;

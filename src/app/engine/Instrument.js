@@ -99,11 +99,26 @@ const PARAM_SETTERS = {
     masterLimiterKnee: (inst, v) => inst.limiter.setKnee(v),
     masterLimiterAttack: (inst, v) => inst.limiter.setAttack(v),
     masterLimiterRelease: (inst, v) => inst.limiter.setRelease(v),
+    // motion and modulation (docs/DESIGN.md §9 A)
+    tremoloRate: (inst, v) => inst.motion.setTremoloRate(v),
+    tremoloDepth: (inst, v) => inst.motion.setTremoloDepth(v),
+    autoPanRate: (inst, v) => inst.motion.setAutoPanRate(v),
+    autoPanDepth: (inst, v) => inst.motion.setAutoPanDepth(v),
+    filterLfoRate: (inst, v) => inst.filterLfo.frequency.setValueAtTime(Math.max(0.01, v), inst.AC.currentTime),
+    filterLfoDepth: (inst, v) => {
+        inst.filterLfoDepth.gain.setValueAtTime(v, inst.AC.currentTime);
+        inst.setFilterLfoConnected(v > 0);
+    },
+    fmRatio: (inst) => inst.updateFm(),
+    fmIndex: (inst) => inst.updateFm(),
+    fmEnvAmount: (inst) => inst.updateFm(),
+    fmDecay: (inst) => inst.updateFm(),
 };
 
 // The effect chain, in order, and when each effect actually changes the
 // sound (otherwise it is routed around - see Instrument.updateChain).
 const EFFECT_STAGES = [
+    { key: 'motion', active: (p) => p.tremoloDepth > 0 || p.autoPanDepth > 0 },
     { key: 'distortion', active: (p) => p.distortionAmount > 0 },
     { key: 'flanger', active: (p) => p.flangerAmount > 0 },
     { key: 'chorus', active: (p) => p.chorusAmount > 0 },
@@ -149,6 +164,15 @@ class Instrument {
         this.limiter = new Nodes.Compressor(this.AC);
         this.output = new Nodes.Gain(this.AC);
         this.vibrato = new Nodes.LFO(this.AC);
+        this.motion = new Nodes.Motion(this.AC);
+        // Filter LFO, in cents on every voice's cutoff (wired only while it
+        // has depth - see setFilterLfoConnected).
+        this.filterLfo = this.AC.createOscillator();
+        this.filterLfoDepth = this.AC.createGain();
+        this.filterLfoDepth.gain.value = 0;
+        this.filterLfo.connect(this.filterLfoDepth);
+        this.filterLfo.start();
+        this.filterLfoConnected = false;
 
         // Same order as PolySynth's initSynth. Each effect sits between its
         // own input/output gain nodes, so the chain can route around it.
@@ -269,6 +293,24 @@ class Instrument {
         this.voices.forEach((synth) => synth.setVibratoEnabled(connected));
     }
 
+    // Same for the filter LFO on the voices' cutoff: a filter whose detune
+    // has an input recomputes its coefficients every sample.
+    setFilterLfoConnected(connected) {
+        if (connected === this.filterLfoConnected) return;
+        this.filterLfoConnected = connected;
+        this.voices.forEach((synth) => {
+            const detune = synth.filter.getNode().detune;
+            if (connected) this.filterLfoDepth.connect(detune);
+            else this.filterLfoDepth.disconnect(detune);
+        });
+    }
+
+    updateFm() {
+        const p = { ...PRESET_DEFAULTS, ...this.preset };
+        const fm = { ratio: p.fmRatio, index: p.fmIndex, envAmount: p.fmEnvAmount, decay: p.fmDecay };
+        this.voices.forEach((synth) => synth.setFm(fm));
+    }
+
     /**
      * Seconds the effects keep sounding after the voices stop: the reverb's
      * impulse plus each delay's echoes dying away to -80 dB, and a margin
@@ -344,6 +386,27 @@ class Instrument {
         };
     }
 
+    // Per-note cutoff offset in cents: key tracking (octaves of cutoff per
+    // octave from C4) and velocity (cents per unit of velocity from 0.6).
+    filterOffset(midi, velocity) {
+        const p = this.preset;
+        return (p.filterKeyTrack || 0) * (midi - 60) * 100 + (p.filterVelocity || 0) * (velocity - 0.6);
+    }
+
+    // What MonoSynth.scheduleNote needs besides the gain envelope.
+    notePlan(midi, velocity, duration, gainPoints) {
+        const offset = this.filterOffset(midi, velocity);
+        const filterEvents = filterEnvelopeEvents(this.filterEnv, duration)
+            .map((e) => (offset ? { ...e, value: e.value + offset } : e));
+        return {
+            gainPoints,
+            filterEvents,
+            filterOffset: offset,
+            portamentoSpeed: this.polyphony === 1 ? this.preset.portamentoSpeed : 0,
+            pitchEnv: { amount: this.preset.pitchEnvAmount || 0, decay: this.preset.pitchEnvDecay || 0 },
+        };
+    }
+
     /** MIDI note number -> MonoSynth noteInfo, honouring the preset's microtonal tuning. */
     noteInfo(midi) {
         const pc = ((midi % 12) + 12) % 12;
@@ -380,13 +443,11 @@ class Instrument {
      */
     scheduleNote(midi, startTime, duration, velocity = 0.8, detune = 0) {
         const { points, releaseEnd } = gainEnvelopePoints(this.gainEnv, velocity, duration);
-        const filterEvents = filterEnvelopeEvents(this.filterEnv, duration);
-        const portamentoSpeed = this.polyphony === 1 ? this.preset.portamentoSpeed : 0;
 
         const { index, steal } = this.allocateVoice(startTime);
         const info = this.noteInfo(midi);
         if (detune) info.freq *= Math.pow(2, detune / 1200);
-        this.voices[index].scheduleNote(info, { gainPoints: points, filterEvents, portamentoSpeed }, startTime, steal);
+        this.voices[index].scheduleNote(info, this.notePlan(midi, velocity, duration, points), startTime, steal);
         this.busyUntil[index] = startTime + releaseEnd;
         this.soundUntil = Math.max(this.soundUntil, startTime + releaseEnd);
         this.quietAt = Infinity;
@@ -401,16 +462,15 @@ class Instrument {
     startNote(midi, velocity = 0.8) {
         const now = this.AC.currentTime + 0.005;
         const { points } = gainEnvelopePoints(this.gainEnv, velocity, HELD_SECONDS);
-        const filterEvents = filterEnvelopeEvents(this.filterEnv, HELD_SECONDS);
-        const portamentoSpeed = this.polyphony === 1 ? this.preset.portamentoSpeed : 0;
+        const plan = this.notePlan(midi, velocity, HELD_SECONDS, points);
         const { index, steal } = this.allocateVoice(now);
         const voice = this.voices[index];
-        voice.scheduleNote(this.noteInfo(midi), { gainPoints: points, filterEvents, portamentoSpeed }, now, steal);
+        voice.scheduleNote(this.noteInfo(midi), plan, now, steal);
         this.busyUntil[index] = Infinity;
         this.quietAt = Infinity;
         this.wake(index);
         const id = ++this.heldIds;
-        this.held.set(id, { index, voiceId: voice.voiceId });
+        this.held.set(id, { index, voiceId: voice.voiceId, filterOffset: plan.filterOffset });
         return id;
     }
 
@@ -430,7 +490,7 @@ class Instrument {
         points.slice(1).forEach(([t, v]) => gain.linearRampToValueAtTime(v, now + t));
         const detune = voice.filter.getNode().detune;
         cancelAndHold(detune, now);
-        detune.setTargetAtTime(0, now, Math.max(this.filterEnv.release, minTime));
+        detune.setTargetAtTime(held.filterOffset, now, Math.max(this.filterEnv.release, minTime));
         this.busyUntil[held.index] = now + points[points.length - 1][0];
         this.soundUntil = Math.max(this.soundUntil, this.busyUntil[held.index]);
         this.scheduleSleep();

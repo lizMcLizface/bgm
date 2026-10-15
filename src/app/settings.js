@@ -16,6 +16,7 @@ import {
 import { AMBIENCE_LAYERS, DEFAULT_AMBIENCE, defaultAmbienceShape } from './engine/ambience';
 import { LAYER_PARAMS, COMMON_PARAMS } from './engine/ambienceSynth';
 import { ROLE_VOLUMES } from './presets';
+import { DEFAULT_DRUMS, DRUM_STYLES, DRUMS, DRUM_PARAMS, defaultDrumKit } from './percussion';
 import { DEFAULT_DRIFT, DRIFT_MODES, TEMPO_BOUNDS } from './conductor';
 import { METERS, DEFAULT_METER } from './meter';
 import { SCALE_FAMILIES } from './theory';
@@ -40,6 +41,14 @@ export function defaultSettings() {
         voices: JSON.parse(JSON.stringify(DEFAULT_VOICES)), // per-role octave + wander
         drift: { ...DEFAULT_DRIFT, excludedTonics: [], excludedModes: [] }, // conductor.js
         humanize: { timing: 12, velocity: 0.08, detune: 3 }, // ms, fraction, cents
+        // Added later (docs/DESIGN.md §9 C), off by default: links only
+        // carry what differs from the defaults, so a link made before them
+        // must read them as off.
+        swing: 0, // 0 straight .. 0.6 (1 would be full triplet swing)
+        sectionTone: false, // sections also darken / open the voices
+        drums: { ...DEFAULT_DRUMS }, // percussion.js: style, activity, variation
+        drumKit: defaultDrumKit(), // the kit's sound: room, per drum on / level / tone / decay
+        muted: Object.fromEntries(Object.keys(ROLE_VOLUMES).map((role) => [role, false])), // per role (solo isn't kept)
         counter: { ...DEFAULT_COUNTER }, // second lead (arranger.js)
         sections: { ...DEFAULT_SECTIONS, mode: 'gentle' }, // intro / build / full / breakdown (new visits: gentle, to open with an intro)
         ambience: { ...DEFAULT_AMBIENCE }, // rain, wind, ... levels 0..1 (engine/ambience.js)
@@ -93,6 +102,17 @@ const RULES = {
         excludedModes: listOf((id) => MODE_IDS.has(id)),
     },
     humanize: { timing: clamp(0, 40), velocity: clamp(0, 0.25), detune: clamp(0, 15) },
+    swing: clamp(0, 0.6),
+    sectionTone: bool,
+    drums: { style: oneOf(Object.keys(DRUM_STYLES)), activity: clamp(0, 1), variation: clamp(0, 1) },
+    drumKit: {
+        room: clamp(0, 0.5),
+        ...Object.fromEntries(DRUMS.map((name) => [name, {
+            on: bool,
+            ...Object.fromEntries(Object.entries(DRUM_PARAMS).map(([key, { min, max }]) => [key, clamp(min, max)])),
+        }])),
+    },
+    muted: Object.fromEntries(Object.keys(ROLE_VOLUMES).map((role) => [role, bool])),
     counter: { mode: oneOf(Object.keys(COUNTER_MODES)), activity: clamp(0, 1) },
     sections: { mode: oneOf(Object.keys(SECTION_MODES)), phrases: oneOf(SECTION_LENGTHS) },
     ambience: Object.fromEntries(Object.keys(AMBIENCE_LAYERS).map((id) => [id, clamp(0, 1)])),

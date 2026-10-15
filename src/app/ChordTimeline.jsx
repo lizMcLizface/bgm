@@ -59,6 +59,7 @@ function draw(ctx, width, gen, pos) {
         bass: cssVar(style, '--gen-role-bass'),
         lead: cssVar(style, '--gen-role-lead'),
         counter: cssVar(style, '--gen-role-counter'),
+        perc: cssVar(style, '--gen-role-perc'),
     };
     const beatsPerBar = gen.beatsPerBar;
     const pxPerBeat = width / ((BARS_BEHIND + BARS_AHEAD) * beatsPerBar);
@@ -176,7 +177,13 @@ function draw(ctx, width, gen, pos) {
             ctx.fillStyle = color[e.role] || color.muted;
             const level = end <= pos ? 0.3 : sounding ? 1 : 0.6;
             ctx.globalAlpha = audible[e.role] === false ? level * 0.2 : level;
-            roundRect(ctx, left, y(e.midi) - noteHeight / 2, w, noteHeight, 2);
+            if (e.role === 'perc') {
+                // drum hits: short ticks along the bottom, one row per drum;
+                // a swish (drum 5) as long as it sounds
+                roundRect(ctx, left, rollTop + ROLL_HEIGHT - 3 - e.midi * 3, e.midi === 5 ? w : 3, 2.5, 1);
+            } else {
+                roundRect(ctx, left, y(e.midi) - noteHeight / 2, w, noteHeight, 2);
+            }
             ctx.fill();
         });
     });

@@ -1,9 +1,33 @@
 const MAX_FREQ = 44100;
 
+// Waveforms beyond the built-in four, as harmonic amplitudes (sine terms,
+// fundamental first) - organ drawbars, a hollow clarinet-like odd series, a
+// soft "ah", sparse glassy partials, a reed. Built once per context.
+export const PERIODIC_WAVES = {
+    organ: [1, 0.8, 0.6, 0.5, 0, 0.3, 0, 0.25],
+    hollow: [1, 0, 0.5, 0, 0.3, 0, 0.18, 0, 0.1, 0, 0.05],
+    choir: [1, 0.7, 0.9, 0.5, 0.3, 0.25, 0.15, 0.2, 0.18, 0.1, 0.06, 0.04],
+    glass: [1, 0, 0, 0.35, 0, 0, 0, 0, 0.2, 0, 0, 0, 0.1],
+    reed: Array.from({ length: 16 }, (_, i) => (i % 2 ? 0.7 : 1) / Math.pow(i + 1, 1.3)),
+};
+const periodicCache = new WeakMap();
+function periodicWave(AC, type) {
+    let waves = periodicCache.get(AC);
+    if (!waves) periodicCache.set(AC, (waves = {}));
+    if (!waves[type]) {
+        const amps = PERIODIC_WAVES[type];
+        const real = new Float32Array(amps.length + 1);
+        const imag = new Float32Array(amps.length + 1);
+        amps.forEach((a, i) => { imag[i + 1] = a; });
+        waves[type] = AC.createPeriodicWave(real, imag);
+    }
+    return waves[type];
+}
+
 class Oscillator {
     constructor(AC) {
         this.AC = AC;
-        this.WAVEFORMS = ['off', 'sine', 'triangle', 'square', 'sawtooth', 'square_dc'];
+        this.WAVEFORMS = ['off', 'sine', 'triangle', 'square', 'sawtooth', 'square_dc', ...Object.keys(PERIODIC_WAVES)];
         this.node = this.AC.createOscillator();
         // Detune only carries vibrato: once per 128-frame block is smooth
         // for a few-Hz LFO and costs half as much as per sample
@@ -106,7 +130,8 @@ class Oscillator {
             }
             
             // Set built-in waveform and connect directly to output buffer
-            this.node.type = type;
+            if (PERIODIC_WAVES[type]) this.node.setPeriodicWave(periodicWave(this.AC, type));
+            else this.node.type = type;
             this.node.connect(this.outputBuffer);
         }
     }

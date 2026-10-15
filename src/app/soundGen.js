@@ -234,5 +234,6 @@ export function generateEnsembleSound(role, ensemble) {
     return { name: ensembleName(role, ensemble), preset };
 }
 
-/** A sound from its link info: { role, seed } or { role, ensemble }. */
-export const soundFrom = (info) => (info.ensemble !== undefined ? generateEnsembleSound(info.role, info.ensemble) : generateSound(info.role, info.seed));
+// Shared with version 2 (soundGenV2.js, which also has soundFrom for
+// every version). Exported only: nothing here changes for it.
+export { tools, RECIPES as RECIPES_V1, ADJECTIVES, NOUNS, BRIGHT, round };

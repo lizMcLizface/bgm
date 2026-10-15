@@ -31,5 +31,21 @@ export function beatStarts(meter) {
     return starts;
 }
 
+/**
+ * Swing: in simple meters, notes on the second half of a beat move toward
+ * its last third (amount 1 = triplet swing, 0 = straight), and are
+ * shortened by as much so they don't run into the next. Compound meters
+ * (6/8) already move in threes and are left as they are.
+ */
+export function swingEvents(events, meter, amount) {
+    if (!amount || meter.unitsPerBeat !== 1) return;
+    const delay = amount / 6;
+    events.forEach((e) => {
+        if (Math.abs(e.beat - Math.floor(e.beat) - 0.5) > 1e-6) return;
+        e.beat += delay;
+        e.length = Math.max(0.05, e.length - delay);
+    });
+}
+
 /** Transport pulses per minute for a felt tempo. */
 export const unitsPerMinute = (meter, bpm) => bpm * meter.unitsPerBeat;

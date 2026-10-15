@@ -28,9 +28,11 @@ export const RoleButtons = ({ role, label, mix, armed, onMix, onArm, onEdit, onR
             title="Mute" onClick={() => onMix(role, { mute: !mix.mute })}>M</button>
         <button type="button" className={mix.solo ? 'is-on is-solo' : ''} aria-pressed={mix.solo}
             title="Solo" onClick={() => onMix(role, { solo: !mix.solo })}>S</button>
-        <button type="button" className={armed ? 'is-on is-arm' : ''} aria-pressed={armed}
-            title="Play this voice with the keyboard / MIDI" onClick={() => onArm(armed ? null : role)}>⌨</button>
-        <button type="button" title="Edit sound" aria-label={`Edit ${label} sound`} onClick={() => onEdit(role)}><PencilIcon /></button>
+        {onArm && (
+            <button type="button" className={armed ? 'is-on is-arm' : ''} aria-pressed={armed}
+                title="Play this voice with the keyboard / MIDI" onClick={() => onArm(armed ? null : role)}>⌨</button>
+        )}
+        {onEdit && <button type="button" title="Edit sound" aria-label={`Edit ${label} sound`} onClick={() => onEdit(role)}><PencilIcon /></button>}
         {onRandom && (
             <button type="button" title="Random preset" aria-label={`Random ${label} preset`} onClick={() => onRandom(role)}><DiceIcon /></button>
         )}
@@ -46,6 +48,13 @@ export const RoleButtons = ({ role, label, mix, armed, onMix, onArm, onEdit, onR
  * connected). Z / X shift the octave.
  * @returns {{ octave: number, connectMidi: function, midiStatus: string }}
  */
+// Percussion, armed: the home row plays the drums (percussion.js DRUMS order)...
+export const DRUM_KEYS = { KeyA: 0, KeyS: 1, KeyD: 2, KeyF: 3, KeyG: 4, KeyH: 5 };
+export const DRUM_KEY_HINT = 'A kick · S brush · D shaker · F rim · G hat · H swish';
+// ... and MIDI notes as General MIDI drums: kicks, side stick, snares
+// (brush taps), hi-hats, cabasa / maracas (shaker), cymbals (swish).
+const MIDI_DRUMS = { 35: 0, 36: 0, 37: 3, 38: 1, 40: 1, 39: 1, 42: 4, 44: 4, 46: 4, 69: 2, 70: 2, 49: 5, 51: 5, 57: 5, 59: 5 };
+
 export function useLivePlay(generator, armed) {
     const [octaves, setOctaves] = useState(DEFAULT_KEY_OCTAVES);
     const [midiStatus, setMidiStatus] = useState('');
@@ -65,6 +74,12 @@ export function useLivePlay(generator, armed) {
         if (!armed) return undefined;
         const down = (e) => {
             if (e.repeat || e.ctrlKey || e.metaKey || e.altKey || isTyping(e.target)) return;
+            if (armed === 'perc') {
+                if (DRUM_KEYS[e.code] === undefined) return;
+                e.preventDefault();
+                generator.liveNoteOn('perc', DRUM_KEYS[e.code], 0.75);
+                return;
+            }
             if (e.code === 'KeyZ' || e.code === 'KeyX') {
                 const step = e.code === 'KeyZ' ? -1 : 1;
                 setOctaves((o) => ({ ...o, [armed]: Math.max(OCTAVE_RANGE[0], Math.min(OCTAVE_RANGE[1], o[armed] + step)) }));
@@ -105,7 +120,9 @@ export function useLivePlay(generator, armed) {
                 const command = status & 0xf0;
                 const key = `midi-${note}`;
                 const role = state.current.armed;
-                if (command === 0x90 && velocity > 0) {
+                if (command === 0x90 && velocity > 0 && role === 'perc') {
+                    if (MIDI_DRUMS[note] !== undefined) generator.liveNoteOn('perc', MIDI_DRUMS[note], velocity / 127);
+                } else if (command === 0x90 && velocity > 0) {
                     if (!role || state.current.held.has(key)) return;
                     state.current.held.set(key, { role, id: generator.liveNoteOn(role, note, velocity / 127) });
                 } else if (command === 0x80 || (command === 0x90 && velocity === 0)) {
@@ -145,15 +162,17 @@ export const TrackStrip = ({ roles, presets, mix, armed, onMix, onArm, onEdit, o
                         </span>
                     )}
                 </span>
-                <RoleButtons role={role} label={label} mix={mix[role]} armed={armed === role} onMix={onMix} onArm={onArm} onEdit={onEdit}
-                    onRandom={onRandom} onGenerate={onGenerate} generating={generating[role]} />
+                {role === 'perc'
+                    ? <RoleButtons role={role} label={label} mix={mix[role]} armed={armed === role} onMix={onMix} onArm={onArm} />
+                    : <RoleButtons role={role} label={label} mix={mix[role]} armed={armed === role} onMix={onMix} onArm={onArm} onEdit={onEdit}
+                        onRandom={onRandom} onGenerate={onGenerate} generating={generating[role]} />}
             </div>
         ))}
         <div className="gen-keys-hint">
-            {armed
-                ? <>Keys A–; play {roles[armed].label.split(' / ')[0].toLowerCase()}, Z/X octave (C{live.octave})</>
-                : 'Arm ⌨ to play a voice with your keyboard'}
-            <button type="button" className="gen-linkbutton" onClick={live.connectMidi}>Connect MIDI</button>
+            {armed === 'perc' && <>Keys {DRUM_KEY_HINT}</>}
+            {armed && armed !== 'perc' && <>Keys A–; play {roles[armed].label.split(' / ')[0].toLowerCase()}, Z/X octave (C{live.octave})</>}
+            {!armed && 'Arm ⌨ to play a voice or the drums with your keyboard'}
+            <button type="button" className="gen-keys-button" onClick={live.connectMidi}>Connect MIDI</button>
             {live.midiStatus && <span>{live.midiStatus}</span>}
         </div>
     </div>

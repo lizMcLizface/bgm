@@ -26,7 +26,9 @@ import { AMBIENCE_LAYERS } from './engine/ambience';
 import { LAYER_PARAMS } from './engine/ambienceSynth';
 import { ROLE_PRESETS } from './presets';
 import { SEED_BITS as SOUND_SEED_BITS } from './soundGen';
+import { GENERATOR_V2, KIND_CODES } from './soundGenV2';
 import PROGRESSIONS from './progressions';
+import { DRUM_STYLES, DRUMS, DRUM_PARAMS } from './percussion';
 
 export const CODE_VERSION = 1;
 const VERSION_BITS = 4;
@@ -47,7 +49,9 @@ export const SHAREABLE_PRESETS = [
     'Soft Keys', 'Kalimba Pluck', 'Harp Pluck', 'Music Box', 'Warm Organ', 'Tine Keys', 'Pitched Rain',
     'Wind Pad', 'Bit Haze', 'Dreary', 'Happy Little Squares', 'LoFi Space', 'Growl Bass',
     'Distorted Strings', 'Rain Drops', 'Analog', 'Wavy Flute', 'Crunchy Waves', 'Chimes', 'Broken Toy',
-    'Not Broken Toy',
+    'Not Broken Toy', 'Breathing Pad', 'Choir Ah', 'Hollow Tremolo', 'FM Bass', 'Thump Bass', 'Reed Lead',
+    'Organ Whistle', 'FM Rhodes', 'FM Bell', 'Felt Piano', 'Soft Marimba', 'Glass Mallet', 'Underwater',
+    'Tremolo Organ',
 ];
 const PRESET_BITS = 8;
 // Preset index meaning "a generated sound" (soundGen.js v1): followed by
@@ -56,6 +60,11 @@ const GENERATED_V1 = 2 ** PRESET_BITS - 1;
 // ... and a voice of a generated ensemble (soundGen.js, ensemble v1):
 // followed by its role and the ensemble's seed.
 const ENSEMBLE_V1 = 2 ** PRESET_BITS - 2;
+// Version 2 (soundGenV2.js): a generated sound - role, kind, seed - and a
+// voice of a v2 ensemble - role, ensemble seed.
+const GENERATED_V2 = 2 ** PRESET_BITS - 3;
+const ENSEMBLE_V2 = 2 ** PRESET_BITS - 4;
+const KIND_BITS = 3;
 // Fixed role order in codes (independent of the UI's order); also the
 // index a generated sound stores for the role it was made for.
 export const CODE_ROLES = ['pad', 'bass', 'lead', 'counter'];
@@ -187,10 +196,30 @@ const MUSIC_GROUPS = [
     GROUPS[4], // feel
     LATER_GROUPS[0].slice(0, 2), // second lead
     LATER_GROUPS[1], // sections
+    [ // feel and percussion (docs/DESIGN.md §9 C)
+        [['swing'], stepped(0, 0.6, 0.05)],
+        [['sectionTone'], bool],
+        [['drums', 'style'], options(Object.keys(DRUM_STYLES), 3)],
+        [['drums', 'activity'], chance],
+        [['drums', 'variation'], chance],
+    ],
 ];
 const VOICE_GROUPS = [
     [...voice('pad'), ...voice('bass'), ...voice('lead'), ...voice('counter'), field(GROUPS, ['padNotes'])],
     LATER_GROUPS[4], // volumes
+];
+// The voice part goes on after the presets: groups, then each role's
+// preset, then these (appended later - inserting them before the presets
+// would move the presets' bits in older links).
+const VOICE_LATER_GROUPS = [
+    [[['volumes', 'perc'], stepped(0, 1, 0.01)], [['drumKit', 'room'], stepped(0, 0.5, 0.05)]], // percussion
+    // the kit, per drum
+    ...DRUMS.map((name) => [
+        [['drumKit', name, 'on'], bool],
+        ...Object.entries(DRUM_PARAMS).map(([key, { min, max, step }]) => [['drumKit', name, key], stepped(min, max, step)]),
+    ]),
+    // muted voices (solo isn't kept)
+    [...CODE_ROLES, 'perc'].map((role) => [['muted', role], bool]),
 ];
 const shapeCodec = (key, spec) => {
     if (key === 'pan') return stepped(-1, 1, 0.1);
@@ -299,8 +328,10 @@ function writePresets(w, roles, presets) {
         w.write(index >= 0 || generated ? 1 : 0, 1);
         if (generated) {
             const ensemble = generated.ensemble !== undefined;
-            w.write(ensemble ? ENSEMBLE_V1 : GENERATED_V1, PRESET_BITS);
+            const v2 = generated.version === GENERATOR_V2;
+            w.write(v2 ? (ensemble ? ENSEMBLE_V2 : GENERATED_V2) : (ensemble ? ENSEMBLE_V1 : GENERATED_V1), PRESET_BITS);
             w.write(CODE_ROLES.indexOf(generated.role), 2);
+            if (v2 && !ensemble) w.write(Math.max(0, KIND_CODES.indexOf(generated.kind)), KIND_BITS);
             w.write(ensemble ? generated.ensemble : generated.seed, SOUND_SEED_BITS);
         } else if (index >= 0) {
             w.write(index, PRESET_BITS);
@@ -326,6 +357,17 @@ function readPresets(r, roles, presets) {
             const madeFor = CODE_ROLES[r.read(2)];
             const seed = r.read(SOUND_SEED_BITS);
             if (madeFor) presets[role] = { generated: index === ENSEMBLE_V1 ? { role: madeFor, ensemble: seed } : { role: madeFor, seed } };
+        } else if (index === GENERATED_V2 || index === ENSEMBLE_V2) {
+            const madeFor = CODE_ROLES[r.read(2)];
+            const kind = index === GENERATED_V2 ? KIND_CODES[r.read(KIND_BITS)] : undefined;
+            const seed = r.read(SOUND_SEED_BITS);
+            if (madeFor) {
+                presets[role] = {
+                    generated: index === ENSEMBLE_V2
+                        ? { role: madeFor, ensemble: seed, version: GENERATOR_V2 }
+                        : { role: madeFor, seed, kind, version: GENERATOR_V2 },
+                };
+            }
         } else if (SHAREABLE_PRESETS[index]) {
             presets[role] = SHAREABLE_PRESETS[index];
         }
@@ -361,6 +403,7 @@ export function encodeShareParts(settings, defaults, presets = {}, { seed = true
     const v = new BitWriter();
     writeGroups(v, VOICE_GROUPS, settings, defaults);
     writePresets(v, CODE_ROLES, presets);
+    writeGroups(v, VOICE_LATER_GROUPS, settings, defaults);
     const a = new BitWriter();
     writeGroups(a, AMBIENCE_GROUPS, settings, defaults);
     const parts = { m: m.toBase64Url() };
@@ -389,6 +432,7 @@ export function decodeShareParts({ m, v, a }, defaults) {
         const r = new BitReader(v);
         readGroups(r, VOICE_GROUPS, settings);
         readPresets(r, CODE_ROLES, presets);
+        readGroups(r, VOICE_LATER_GROUPS, settings);
     }
     if (a) readGroups(new BitReader(a), AMBIENCE_GROUPS, settings);
     return { settings, presets };

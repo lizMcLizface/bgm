@@ -586,3 +586,125 @@ the role (the bass keeps a short attack, a dark filter and little reverb).
 A single voice's generate is untouched. Links carry an ensemble voice as
 preset index 254 + role + the ensemble seed. Levelled, every voice of
 sample ensembles lands within 0.1 dB of its role's default.
+
+## 9. Wider sounds and feel (2026-10-16)
+
+Gaps found in review: the sound generator only makes sustained pads,
+basses and leads (no keys, plucks, bells or textures, one filter type,
+several effects never used); the engine has no FM, no custom waveforms, no
+filter LFO, tremolo or auto-pan, no velocity-to-brightness, no filter key
+tracking and no pitch envelope; the music has no percussion, no swing, no
+ending, and sections change which voices play but never how they sound.
+
+Rules that keep old links working:
+
+- **New preset keys default to off**, so every existing preset (built-in,
+  saved, unCAGED's) sounds exactly as before.
+- **soundGen v1 is frozen.** New recipes are version 2, with their own
+  share-code escapes (preset index 253 = generated v2, 252 = ensemble v2,
+  each followed by role, kind and seed). v1 links still make v1 sounds.
+- **New share-code fields are appended** as new groups at the end of
+  their part (never inside an existing group).
+- **New music features draw nothing from the arranger's rng** when off
+  (percussion has its own seeded stream), so existing pieces don't change.
+
+### Phase A - engine (MonoSynth / Instrument), all opt-in per preset
+
+1. Filter motion: `filterLfoRate` / `filterLfoDepth` (cents), one LFO per
+   Instrument into every voice's filter detune, wired only while it has
+   depth (as vibrato). The same input carries a per-instrument brightness
+   offset (used by sections, C2).
+2. Tremolo and auto-pan: `tremoloRate/Depth`, `autoPanRate/Depth`; an
+   effect stage at the head of the chain, routed around when both are 0.
+3. Expression: `filterVelocity` (cents of cutoff per unit velocity away
+   from 0.8) and `filterKeyTrack` (0..1 octaves of cutoff per octave from
+   C4), folded into each note's filter-detune events.
+4. Pitch envelope: `pitchEnvAmount` (cents at note start) and
+   `pitchEnvDecay`, on the oscillators' detune.
+5. FM: a modulator per voice (`fmRatio`, `fmIndex`, `fmEnvAmount`,
+   `fmDecay`) into the main oscillators' frequency, scaled per note so the
+   timbre is the same in every register; connected only when used.
+6. Waveforms beyond the basic four via PeriodicWave: organ, hollow,
+   choir, glass, reed.
+
+Editor modules for all of them, and new built-in presets that use them
+(appended to SHAREABLE_PRESETS, levelled with loudness.js).
+
+### Phase B - sound generator v2
+
+Recipes by *kind*, chosen per role (or by the seed): pad -> pad, texture,
+keys; bass -> bass, pluck bass; lead / second lead -> lead, pluck, bell.
+Uses the phase A features, band-pass / high-pass filters, flanger,
+bit-crush, ping-pong, portamento and envelope shapes. Ensembles v2 add
+characters (lo-fi, glassy, dub, organ). UI: the generate button can pick a
+kind.
+
+### Phase C - music
+
+1. Swing: a feel setting (0 = straight), delaying off-beat subdivisions
+   at plan time (no rng).
+2. Section tone: sections also brighten / darken the voices (intro and
+   breakdown darker, full open) via the brightness offset, ramped over a
+   bar.
+3. Ending: a cadence onto I with a held final chord - used when a WAV
+   render reaches its length and when the sleep timer runs out.
+4. Percussion: a fifth role, a small synthesised kit (felt kick, brush,
+   shaker, rim, soft hat) playing per-section patterns by style (off,
+   heartbeat, brushes, lo-fi, shaker), with its own rng stream, volume,
+   mute / solo, and share-code fields.
+
+Every phase: unit tests, then a check in the dev server; nothing is
+committed or deployed until it has been listened to.
+
+### Built
+
+- **A:** as planned. FM is per voice (a sine modulator into the main
+  oscillators' frequency, depth = index x modulator frequency, scheduled
+  per note); the pitch envelope rides on the oscillators' (k-rate) detune
+  with vibrato. Auto-pan is an equal-power *balance* (splitter, two gains
+  driven through wave-shaper curves), not a StereoPanner, which sums both
+  channels into one side (+6 dB on a centred sound); at centre it passes
+  stereo unchanged. 14 presets added (Breathing Pad, Choir Ah, Hollow
+  Tremolo, FM Bass, Thump Bass, Reed Lead, Organ Whistle, FM Rhodes, FM
+  Bell, Felt Piano, Soft Marimba, Glass Mallet, Underwater, Tremolo Organ),
+  levelled against their role (keys as lead, as before); all within 0.3 dB
+  except Underwater (-0.8 dB at full volume).
+- **B:** `soundGenV2.js`. The v1 recipes run first for pad / bass / lead,
+  then v2 adds colour; keys, texture, pluck and bell are new recipes.
+  Levelled over 16 seeds per role and kind, medians are 0 dB; struck kinds
+  (keys, plucks) are up to ~4 dB quiet at full volume - an RMS measure
+  under-reads them, as noted in §8. Band-pass textures only on harmonic
+  waveforms, centred low: a band-pass over a sine's upper range was 12 dB
+  quiet. v1 output is pinned by snapshot tests.
+- **C:** settings `swing`, `sectionTone`, `drums { style, activity }` and
+  `volumes.perc`, all off by default (links carry only what differs from
+  the defaults, so a default that is on would change older links). Section
+  tone is one lowpass per melodic role after its Instrument (cheap; a
+  per-voice filter offset would have made every voice filter
+  audio-rate-modulated). The drum kit builds each hit from one-shot nodes
+  and sleeps like an Instrument. Endings: `Generator.endSoon()` replans the
+  next bar as V and the one after as a held I, stops three bars later and
+  rewinds; Stop or a cancelled sleep timer during an ending replans the
+  music instead. The WAV render plans its ending so the final chord and
+  its tail fill the end of the file.
+
+### After a first listen (2026-10-16)
+
+- Percussion was too repetitive and too quiet (about -50 dB RMS soloed
+  against a -17 dB mix: the raw hits spanned 18 dB of peak level). Now:
+  three grooves per style, one per section (every 16 bars with sections
+  off) with phrases borrowing another by *variation*; bar-to-bar drops
+  and ghost notes; fills on phrase ends (bigger at a section's end); each
+  hit carries a variation value (in the event's `detune` slot) the kit
+  turns into pitch / brightness / length differences, and swishes sweep
+  over the beat or group they span, alternating direction. 3/4 had no
+  backbeat at all (one beat group) - beats after the first stand in. Per
+  drum gains bring peaks to -6 dB (kick) .. -15 dB (hat).
+- The kit's sound (`drumKit`: room, per drum on / level / tone / decay) and
+  mutes (`muted`) are settings, in the voice part of links. **The voice
+  part's layout is groups, then presets, then later groups**: the first
+  attempt appended groups before the presets, which would have moved the
+  preset bits of every released link; a test now opens a code made by
+  the released encoder.
+- Scenes (`scenes.js`): a patch over the defaults plus a preset per role,
+  picked in the top row; the sleep timer moved into the ⚙ menu.

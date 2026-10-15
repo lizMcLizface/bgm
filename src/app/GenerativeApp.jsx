@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import Generator, { ROLES } from './Generator';
+import Generator, { ROLES, PERC_ROLE } from './Generator';
+import { DRUM_STYLES, DRUMS, DRUM_LABELS, DRUM_PARAMS, randomDrums } from './percussion';
 import { SCALE_FAMILIES, TONIC_NAMES, scaleById } from './theory';
 import ChordTimeline from './ChordTimeline';
-import { RoleButtons, TrackStrip, useLivePlay } from './Tracks';
+import { RoleButtons, TrackStrip, useLivePlay, DRUM_KEY_HINT } from './Tracks';
 import { defaultSettings, shareFromLocation, sharePath, shareUrl, newSeed } from './settings';
 import SynthEditor from './editor/SynthEditor';
 import PresetPicker from './editor/PresetPicker';
@@ -18,13 +19,16 @@ import {
 } from './randomize';
 import { MasterVolume, SettingsMenu } from './AudioStatus';
 import { SleepTimer, Recorder } from './Playback';
+import { SCENES, SCENE_GROUPS, sceneSettings, sceneGroup } from './scenes';
+import { ROLE_PRESETS } from './presets';
 import { setupMediaSession, updateMediaSession } from './mediaSession';
 import { AMBIENCE_LAYERS, LAYER_PARAMS } from './engine/ambience';
 import { COMMON_PARAMS } from './engine/ambienceSynth';
 import {
     DiceIcon, SparkIcon, PlayIcon, PauseIcon, ToStartIcon, BarBackIcon, BarForwardIcon, ProgressionBackIcon, ProgressionForwardIcon, LoopIcon,
 } from './icons';
-import { soundFrom, newSoundSeed } from './soundGen';
+import { newSoundSeed } from './soundGen';
+import { soundFrom, SOUND_KINDS, GENERATOR_V2 } from './soundGenV2';
 import { levelPreset } from './engine/loudness';
 import { addGeneratedPreset, generatedInfo } from './editor/presetStore';
 import { readPref, writePref } from './prefs';
@@ -516,6 +520,96 @@ const VoiceControls = ({ role, voice, onChange }) => {
     );
 };
 
+// Percussion (percussion.js, engine/drumKit.js): what plays - style,
+// activity, variation - and its level; under More options the room and
+// each drum's sound (on, level, tone, length).
+const pct = (v) => `${Math.round(v * 100)}%`;
+const DRUM_VALUE = { level: pct, tone: (v) => (v === 0 ? 'neutral' : v < 0 ? `darker ${Math.round(-v * 100)}%` : `brighter ${Math.round(v * 100)}%`), decay: (v) => `${v.toFixed(2)}x` };
+const PercussionPanel = ({ drums, kit, volume, mix, armed, onArm, onDrums, onKit, onVolume, onMix, onAudition }) => {
+    const on = drums.style !== 'off';
+    const setDrum = (name, patch) => onKit({ ...kit, [name]: { ...kit[name], ...patch } });
+    const more = (
+        <>
+            <Field label={`Room ${pct(kit.room)}`}>
+                <input type="range" min="0" max="0.5" step="0.05" value={kit.room} onChange={(e) => onKit({ ...kit, room: Number(e.target.value) })} />
+            </Field>
+            {DRUMS.map((name) => (
+                <fieldset key={name} className="gen-weights gen-drum">
+                    <legend>
+                        <label className="gen-check">
+                            <input type="checkbox" checked={kit[name].on} onChange={(e) => setDrum(name, { on: e.target.checked })} />
+                            {DRUM_LABELS[name]}
+                        </label>
+                    </legend>
+                    {Object.entries(DRUM_PARAMS).map(([key, { min, max, step, label }]) => (
+                        <Field key={key} label={`${label} ${DRUM_VALUE[key](kit[name][key])}`}>
+                            <input type="range" min={min} max={max} step={step} value={kit[name][key]} disabled={!kit[name].on}
+                                onChange={(e) => setDrum(name, { [key]: Number(e.target.value) })} />
+                        </Field>
+                    ))}
+                </fieldset>
+            ))}
+        </>
+    );
+    return (
+        <Panel
+            id="percussion"
+            title="Percussion"
+            className="gen-panel-role gen-role-perc"
+            heading={(
+                <>
+                    <i className="gen-swatch gen-swatch-perc" />
+                    Percussion
+                    <RoleButtons role="perc" label="Percussion" mix={mix} armed={armed} onMix={onMix} onArm={onArm} />
+                </>
+            )}
+            onRandom={() => onDrums(randomDrums())}
+            more={more}
+        >
+            <Field label="Style">
+                <select value={drums.style} title="Soft synthesised percussion; sections bring it in and out"
+                    onChange={(e) => onDrums({ ...drums, style: e.target.value })}>
+                    {Object.entries(DRUM_STYLES).map(([id, label]) => <option key={id} value={id}>{label}</option>)}
+                </select>
+            </Field>
+            <Field label={`Volume ${pct(volume)}`}>
+                <input type="range" min="0" max="1" step="0.01" value={volume} onChange={(e) => onVolume(Number(e.target.value))} />
+            </Field>
+            <Field label={`Activity ${pct(drums.activity)}`}>
+                <input type="range" min="0" max="1" step="0.05" value={drums.activity} disabled={!on}
+                    title="Ghost notes, extra kicks and fills" onChange={(e) => onDrums({ ...drums, activity: Number(e.target.value) })} />
+            </Field>
+            <Field label={`Variation ${pct(drums.variation)}`}>
+                <input type="range" min="0" max="1" step="0.05" value={drums.variation} disabled={!on}
+                    title="How much the grooves change from phrase to phrase and the hits from one to the next (0: the same every bar)"
+                    onChange={(e) => onDrums({ ...drums, variation: Number(e.target.value) })} />
+            </Field>
+            <div className="gen-field">
+                <button type="button" className="gen-keys-button" onClick={onAudition}>Hear the kit</button>
+                {armed && <small>Keys {DRUM_KEY_HINT}</small>}
+            </div>
+        </Panel>
+    );
+};
+
+// The top row's preset picker (scenes.js): a whole soundscape at once,
+// grouped by what it plays. It shows the one last picked until anything
+// else is changed.
+const ScenePicker = ({ value, onPick }) => (
+    <label className="gen-sleep gen-scene" title="Start from a preset: key, scale, feel, drums, ambience and sounds together">
+        <span className="gen-audio-label">Preset</span>
+        <select value={value} aria-label="Preset"
+            onChange={(e) => onPick(SCENES.find((s) => s.name === e.target.value))}>
+            <option value="" disabled>Pick a preset…</option>
+            {Object.entries(SCENE_GROUPS).map(([group, label]) => (
+                <optgroup key={group} label={label}>
+                    {SCENES.filter((s) => sceneGroup(s) === group).map((s) => <option key={s.name} value={s.name} title={s.blurb}>{s.name}</option>)}
+                </optgroup>
+            ))}
+        </select>
+    </label>
+);
+
 const GenerativeApp = () => {
     const gen = useRef(getGenerator()).current;
     // music / ambience playing (each can play alone)
@@ -540,14 +634,18 @@ const GenerativeApp = () => {
         [roles],
     );
     const [generating, setGenerating] = useState({});
+    // The kind of sound ✦ makes per role ('any': the seed decides).
+    const [soundKinds, setSoundKinds] = useState(() => Object.fromEntries(Object.keys(ROLES).map((role) => [role, 'any'])));
     const [randomLevel, setRandomLevel] = useState('reason');
     const [editorRole, setEditorRole] = useState(Object.keys(ROLES)[0]);
-    const [mix, setMix] = useState(() => Object.fromEntries(Object.keys(ROLES).map((role) => [role, { mute: false, solo: false }])));
+    const [mix, setMix] = useState(() => Object.fromEntries([...Object.keys(ROLES), 'perc'].map((role) => [role, { mute: gen.roles[role].mute, solo: false }])));
     const [armed, setArmed] = useState(null);
     const live = useLivePlay(gen, armed);
+    // mutes are settings (kept in the address bar and links), solo isn't
     const changeMix = (role, patch) => {
         gen.setRoleMix(role, patch);
         setMix((m) => ({ ...m, [role]: { ...m[role], ...patch } }));
+        if (patch.mute !== undefined) setSettings((s) => ({ ...s, muted: { ...gen.settings.muted } }));
     };
     const [editorOpen, setEditorOpen] = useState(false);
     const editorRef = useRef(null);
@@ -576,9 +674,13 @@ const GenerativeApp = () => {
         window.location.reload();
         return true;
     };
+    // The scene last picked (shown in the top row until something changes).
+    const [scene, setScene] = useState('');
+    const [sleepLeft, setSleepLeft] = useState(null);
     const loadSettings = (next) => {
         gen.setMany(next);
         setSettings({ ...gen.settings });
+        setScene('');
     };
     const keepCurrent = () => {
         gen.keepCurrent();
@@ -587,6 +689,7 @@ const GenerativeApp = () => {
     const update = (key, value) => {
         gen.set(key, value);
         setSettings((s) => ({ ...s, [key]: value }));
+        setScene('');
     };
     const patchRole = (role, patch) => setRoles((r) => ({ ...r, [role]: { ...r[role], ...patch } }));
     const setVolume = (role, volume) => {
@@ -600,23 +703,25 @@ const GenerativeApp = () => {
     const randomizeField = (key) => loadSettings(randomField(key, gen.settings, randomLevel));
     const chords = progressionLength(settings.progression);
     const randomizePreset = (role) => loadPreset(role, randomPreset(role, roles[role].presetName, randomLevel));
-    // A procedural sound (soundGen.js) - info: { role, seed } for one voice,
-    // { role, ensemble } for a voice of an ensemble - levelled to its role's
-    // default loudness, onto `target`.
+    // A procedural sound (soundGenV2.js soundFrom) - info: { role, seed } for
+    // one voice, { role, ensemble } for a voice of an ensemble (+ version and
+    // kind for v2) - levelled to its role's default loudness, onto `target`.
     const loadGeneratedSound = async (target, info) => {
         setGenerating((g) => ({ ...g, [target]: true }));
         try {
-            const { name, preset } = soundFrom(info);
-            addGeneratedPreset(name, await levelPreset(preset, info.role), info);
+            const { name, preset, kind } = soundFrom(info);
+            // a v2 sound's link names the kind it turned out as
+            const made = info.version === GENERATOR_V2 && info.seed !== undefined ? { ...info, kind } : info;
+            addGeneratedPreset(name, await levelPreset(preset, info.role), made);
             loadPreset(target, name);
         } finally {
             setGenerating((g) => ({ ...g, [target]: false }));
         }
     };
-    const generateForRole = (role) => loadGeneratedSound(role, { role, seed: newSoundSeed() });
+    const generateForRole = (role) => loadGeneratedSound(role, { role, seed: newSoundSeed(), kind: soundKinds[role], version: GENERATOR_V2 });
     // New sounds for every voice at once, with a shared character.
     const generateAll = (ensemble) => {
-        Object.keys(ROLES).forEach((role) => loadGeneratedSound(role, { role, ensemble }));
+        Object.keys(ROLES).forEach((role) => loadGeneratedSound(role, { role, ensemble, version: GENERATOR_V2 }));
     };
     useEffect(() => {
         const sounds = linkedSounds;
@@ -698,6 +803,27 @@ const GenerativeApp = () => {
         else update('playAmbience', true);
         startPart('playAmbience');
     };
+    // A preset (scene): its settings (a new seed) and sounds. While playing,
+    // the music moves there from the next bar, and what plays follows the
+    // preset - music, ambience or both. An ambience-only preset leaves the
+    // sounds as they are.
+    const applyScene = (picked) => {
+        if (!picked) return;
+        const playing = gen.anyRunning;
+        const next = sceneSettings(picked);
+        loadSettings(next);
+        if (sceneGroup(picked) !== 'ambience') {
+            Object.keys(ROLES).forEach((role) => loadPreset(role, picked.presets[role] || ROLE_PRESETS[role]));
+        }
+        setMix((m) => Object.fromEntries(Object.entries(m).map(([role, v]) => [role, { ...v, mute: gen.roles[role].mute }])));
+        if (playing) {
+            if (next.playAmbience && !gen.ambienceRunning) startPart('playAmbience');
+            if (!next.playAmbience && gen.ambienceRunning) gen.stopAmbience();
+            if (next.playMusic && !gen.isRunning) startPart('playMusic');
+            if (!next.playMusic && gen.isRunning) gen.stop();
+        }
+        setScene(picked.name);
+    };
     // New variation, and back through earlier ones (media keys: next / previous track).
     const seeds = useRef([]);
     const newVariation = () => {
@@ -739,6 +865,9 @@ const GenerativeApp = () => {
     };
     // The second lead's panel and track show only while it plays.
     const shownRoles = Object.fromEntries(Object.entries(ROLES).filter(([role]) => role !== 'counter' || settings.counter.mode !== 'off'));
+    // ... and the drums' track while they play
+    const drumsOn = settings.drums.style !== 'off';
+    const shownTracks = drumsOn ? { ...shownRoles, ...PERC_ROLE } : shownRoles;
 
     return (
         <main className="gen">
@@ -751,11 +880,13 @@ const GenerativeApp = () => {
                     <button type="button" className={`gen-part${settings.playAmbience ? ' is-on' : ''}`} aria-pressed={settings.playAmbience}
                         onClick={() => togglePart('playAmbience')} title={PART_TITLE}>Ambience</button>
                 </div>
-                <SleepTimer generator={gen} running={anyOn} />
+                <ScenePicker value={scene} onPick={applyScene} />
+                {sleepLeft && <span className="gen-sleep gen-sleep-left" role="timer" title="Sleep timer (in the ⚙ menu)">Sleep {sleepLeft}</span>}
                 <div className="gen-header-tools">
                     <MasterVolume />
                     <SettingsMenu generator={gen} onReload={reloadKeepingSettings} link={() => shareUrl(gen.settings, linkPresets)} saving={saving}
                         phrase={<PhraseField seed={settings.seed} edited={gen.editedSinceStart} onApply={playPhrase} onRoll={newVariation} initial={linkedPhrase} />}>
+                        <SleepTimer generator={gen} running={anyOn} onLeft={setSleepLeft} />
                         <Recorder generator={gen} fileName={fileName} onProgress={setSaving} />
                     </SettingsMenu>
                 </div>
@@ -764,7 +895,7 @@ const GenerativeApp = () => {
 
             <ChordTimeline
                 generator={gen}
-                tracks={<TrackStrip roles={shownRoles} presets={Object.fromEntries(Object.entries(roles).map(([role, { presetName, edited }]) => [role, { name: presetName, edited }]))} mix={mix} armed={armed} onMix={changeMix} onArm={setArmed} onEdit={editSound}
+                tracks={<TrackStrip roles={shownTracks} presets={Object.fromEntries(Object.entries(roles).map(([role, { presetName, edited }]) => [role, { name: presetName, edited }]))} mix={mix} armed={armed} onMix={changeMix} onArm={setArmed} onEdit={editSound}
                     onRandom={randomizePreset} onGenerate={generateForRole} generating={generating} live={live} />}
             />
 
@@ -857,6 +988,11 @@ const GenerativeApp = () => {
                             <input type="range" min="0" max="15" step="0.5" value={settings.humanize.detune}
                                 onChange={(e) => update('humanize', { ...settings.humanize, detune: Number(e.target.value) })} />
                         </Field>
+                        <Field label={settings.swing ? `Swing ${Math.round(settings.swing * 100)}%` : 'Swing: straight'}>
+                            <input type="range" min="0" max="0.6" step="0.05" value={settings.swing}
+                                title="Notes on the second half of a beat come late, toward a triplet (not in 6/8)"
+                                onChange={(e) => update('swing', Number(e.target.value))} />
+                        </Field>
                     </fieldset>
                 </>
             )}>
@@ -879,6 +1015,11 @@ const GenerativeApp = () => {
                     <input type="checkbox" checked={settings.thinPadUnderLead}
                         onChange={(e) => update('thinPadUnderLead', e.target.checked)} />
                     Thin the pad under the lead
+                </label>
+                <label className="gen-check" title="Intros and breakdowns sound darker, Full opens up">
+                    <input type="checkbox" checked={settings.sectionTone} disabled={settings.sections.mode === 'off'}
+                        onChange={(e) => update('sectionTone', e.target.checked)} />
+                    Sections change the tone
                 </label>
             </Panel>
 
@@ -920,12 +1061,24 @@ const GenerativeApp = () => {
                     <Field label="Preset" onRandom={() => randomizePreset(role)} onGenerate={() => generateForRole(role)} generating={generating[role]} wide>
                         <PresetPicker value={roles[role].presetName} edited={roles[role].edited} onChange={(name) => loadPreset(role, name)} role={role} />
                     </Field>
+                    <Field label="Kind of new sound">
+                        <select value={soundKinds[role]} title="What the ✦ button makes for this voice"
+                            onChange={(e) => setSoundKinds((k) => ({ ...k, [role]: e.target.value }))}>
+                            <option value="any">Any kind</option>
+                            {Object.entries(SOUND_KINDS[role]).map(([kind, text]) => <option key={kind} value={kind}>{text}</option>)}
+                        </select>
+                    </Field>
                     <Field label={`Volume ${Math.round(settings.volumes[role] * 100)}%`}>
                         <input type="range" min="0" max="1" step="0.01" value={settings.volumes[role]}
                             onChange={(e) => setVolume(role, Number(e.target.value))} />
                     </Field>
                 </Panel>
             ))}
+
+            <PercussionPanel drums={settings.drums} kit={settings.drumKit} volume={settings.volumes.perc} mix={mix.perc}
+                armed={armed === 'perc'} onArm={setArmed}
+                onDrums={(drums) => update('drums', drums)} onKit={(kit) => update('drumKit', kit)}
+                onVolume={(v) => setVolume('perc', v)} onMix={changeMix} onAudition={() => gen.audition('perc')} />
 
             <SynthEditor
                 generator={gen}

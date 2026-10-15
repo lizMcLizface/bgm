@@ -108,6 +108,22 @@ const PRESET_DEFAULTS = {
     filterEnvelopeAttackExponent: 2,
     filterEnvelopeDecayExponent: 2,
     filterEnvelopeReleaseExponent: 2,
+    // bgm only (docs/DESIGN.md §9 A) - all off, so presets made without
+    // them sound as they always did
+    tremoloRate: 4,
+    tremoloDepth: 0,
+    autoPanRate: 0.2,
+    autoPanDepth: 0,
+    filterLfoRate: 0.2,
+    filterLfoDepth: 0,
+    filterVelocity: 0,
+    filterKeyTrack: 0,
+    pitchEnvAmount: 0,
+    pitchEnvDecay: 0.05,
+    fmRatio: 1,
+    fmIndex: 0,
+    fmEnvAmount: 0,
+    fmDecay: 0.5,
 };
 
 export default PRESET_DEFAULTS;

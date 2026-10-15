@@ -1,5 +1,6 @@
-// Next to Play: a sleep timer (fades out and stops after a while) and
-// "Save audio" (renders the piece to a WAV file - engine/render.js).
+// In the settings menu: a sleep timer (ends the music and stops after a
+// while; its countdown shows in the header) and "Save audio" (renders the
+// piece to a WAV file - engine/render.js).
 
 import React, { useEffect, useRef, useState } from 'react';
 import { readPref, writePref } from './prefs';
@@ -7,7 +8,8 @@ import { renderWav, wavBytes } from './engine/render';
 
 const SLEEP_KEY = 'bgm-sleep-minutes';
 const SLEEP_MINUTES = [0, 10, 15, 20, 30, 45, 60, 90, 120];
-// The fade takes the timer's last minute (less on short timers).
+// The ending (music) and fade (ambience) take the timer's last minute
+// (less on short timers).
 const SLEEP_FADE = 60;
 
 const clock = (seconds) => {
@@ -19,10 +21,11 @@ const clock = (seconds) => {
 };
 
 /**
- * Stops the music `minutes` after Play (or after choosing a time while
- * playing), fading out over the last minute. Remembered per browser.
+ * Stops `minutes` after Play (or after choosing a time while playing): in
+ * the last minute the music comes to an end on its home chord and the
+ * ambience fades out. Remembered per browser.
  */
-export const SleepTimer = ({ generator, running }) => {
+export const SleepTimer = ({ generator, running, onLeft = () => {} }) => {
     const [minutes, setMinutes] = useState(() => readPref(SLEEP_KEY, 0));
     const [endsAt, setEndsAt] = useState(null);
     const [now, setNow] = useState(Date.now());
@@ -30,6 +33,8 @@ export const SleepTimer = ({ generator, running }) => {
     useEffect(() => {
         setEndsAt(running && minutes ? Date.now() + minutes * 60000 : null);
     }, [running, minutes]);
+    const left = endsAt ? clock((endsAt - now) / 1000) : null;
+    useEffect(() => onLeft(left), [left]); // eslint-disable-line react-hooks/exhaustive-deps
     useEffect(() => {
         if (!endsAt) return undefined;
         const check = () => {
@@ -46,17 +51,21 @@ export const SleepTimer = ({ generator, running }) => {
         };
     }, [endsAt, generator, minutes]);
     return (
-        <label className="gen-sleep" title="Fade out and stop after a while">
-            <span className="gen-audio-label">Sleep</span>
-            <select value={minutes} onChange={(e) => setMinutes(Number(e.target.value))} aria-label="Sleep timer">
-                {SLEEP_MINUTES.map((m) => <option key={m} value={m}>{m ? `${m} min` : 'Off'}</option>)}
-            </select>
-            {endsAt && <span className="gen-sleep-left" role="timer">{clock((endsAt - now) / 1000)} left</span>}
-        </label>
+        <section className="gen-menu-section">
+            <h3>Sleep timer</h3>
+            <label className="gen-field">
+                <span>Stop after{left ? ` (${left} left)` : ''}</span>
+                <select value={minutes} onChange={(e) => setMinutes(Number(e.target.value))} aria-label="Sleep timer">
+                    {SLEEP_MINUTES.map((m) => <option key={m} value={m}>{m ? `${m} min` : 'Off'}</option>)}
+                </select>
+                <small>In the last minute the music comes to an end on its home chord and the ambience fades out. Counts from Play.</small>
+            </label>
+        </section>
     );
 };
 
 const RECORD_KEY = 'bgm-record-minutes';
+const RECORD_ENDING_KEY = 'bgm-record-ending';
 const RECORD_MINUTES = [1, 2, 5, 10, 15, 30, 60];
 
 function download(blob, name) {
@@ -79,11 +88,13 @@ function download(blob, name) {
  */
 export const Recorder = ({ generator, fileName, onProgress = () => {} }) => {
     const [minutes, setMinutes] = useState(() => readPref(RECORD_KEY, 5));
+    const [ending, setEnding] = useState(() => readPref(RECORD_ENDING_KEY, true));
     const [progress, setProgress] = useState(null);
     const [message, setMessage] = useState('');
     const [started, setStarted] = useState(0);
     const abort = useRef(null);
     useEffect(() => writePref(RECORD_KEY, minutes), [minutes]);
+    useEffect(() => writePref(RECORD_ENDING_KEY, ending), [ending]);
     useEffect(() => onProgress(progress), [progress]); // eslint-disable-line react-hooks/exhaustive-deps
     const megabytes = Math.round(wavBytes(minutes * 60, generator.AC.sampleRate) / 1e6);
     // time left, from the pace so far (once there is a pace to go by)
@@ -97,7 +108,7 @@ export const Recorder = ({ generator, fileName, onProgress = () => {} }) => {
         const begin = Date.now();
         setStarted(begin);
         try {
-            const blob = await renderWav(generator, minutes * 60, { onProgress: setProgress, signal: controller.signal });
+            const blob = await renderWav(generator, minutes * 60, { ending, onProgress: setProgress, signal: controller.signal });
             download(blob, fileName(minutes));
             setMessage(`Saved. That took ${clock((Date.now() - begin) / 1000)}.`);
         } catch (e) {
@@ -120,6 +131,10 @@ export const Recorder = ({ generator, fileName, onProgress = () => {} }) => {
                         mix and ambience you have now. It is usually quicker than listening, and the music keeps
                         playing while it saves.
                     </small>
+                </label>
+                <label className="gen-check">
+                    <input type="checkbox" checked={ending} disabled={progress !== null} onChange={(e) => setEnding(e.target.checked)} />
+                    End on the home chord (instead of fading out)
                 </label>
                 {progress === null ? (
                     <button type="button" onClick={render}>Save</button>

@@ -10,6 +10,8 @@
 // a short cross-fade (modulation effects restart their phase per chunk).
 
 import Instrument from './Instrument';
+import DrumKit from './drumKit';
+import { OPEN_TONE, TONE_ROLES } from '../Generator';
 import Ambience from './ambience';
 import { unitsPerMinute } from '../meter';
 import { noiseReady } from '../../nodes/noiseGenerator';
@@ -22,6 +24,10 @@ const PROGRESS_STEP = 1;
 const MAX_PREROLL = 30;
 const CROSSFADE = 0.25;
 const END_FADE = 4;
+// With an ending, the final chord starts this long (plus its two bars)
+// before the file ends, and only its last moments are faded.
+const ENDING_TAIL = 4;
+const ENDING_FADE = 1.5;
 
 const cancelled = () => new DOMException('Rendering cancelled', 'AbortError');
 
@@ -37,16 +43,24 @@ const until = async (condition, ms) => {
     while (!condition() && Date.now() < end) await new Promise((r) => setTimeout(r, 20));
 };
 
-// Every audible note from bar 0 until `seconds`, in seconds.
-function planNotes(gen, audible, seconds) {
+// Every audible note from bar 0 until `seconds`, in seconds, and the
+// section tone's changes ({ time, tone, glide: seconds of the bar }).
+function planNotes(gen, audible, seconds, ending) {
     const planner = gen.planner();
     const notes = [];
+    const tones = [];
     let time = 0;
     for (let bar = 0; time < seconds; bar++) {
+        // an ending: a V bar, then the final I's two bars and its tail fill the end
+        if (ending && planner.endBar === null && bar > 0) {
+            const barSeconds = (planner.meter.units * 60) / unitsPerMinute(planner.meter, planner.plan.get(bar - 1).bpm);
+            if (time + 3 * barSeconds + ENDING_TAIL >= seconds) planner.endBar = bar + 1;
+        }
         planner.planBar(bar);
         const planned = planner.plan.get(bar);
         planner.plan.delete(bar - 2);
         const unit = 60 / unitsPerMinute(planner.meter, planned.bpm);
+        if (!tones.length || tones[tones.length - 1].tone !== planned.tone) tones.push({ time, tone: planned.tone, glide: planner.meter.units * unit });
         planned.events.forEach((e) => {
             if (audible[e.role]) {
                 notes.push({ role: e.role, midi: e.midi, time: time + e.beat * unit, duration: e.length * unit, velocity: e.velocity, detune: e.detune });
@@ -54,7 +68,20 @@ function planNotes(gen, audible, seconds) {
         });
         time += planner.meter.units * unit;
     }
-    return notes.sort((a, b) => a.time - b.time);
+    return { notes: notes.sort((a, b) => a.time - b.time), tones };
+}
+
+// The section tone's automation for a chunk starting at `from`: as in
+// playback, the first cutoff is set, each change after it glides over a bar.
+function automateTone(param, tones, from) {
+    const past = tones.filter((t) => t.time <= from);
+    let value = OPEN_TONE;
+    past.forEach(({ time, tone, glide }, i) => {
+        const until = i + 1 < past.length ? past[i + 1].time : from;
+        value = i === 0 ? tone : value + (tone - value) * (1 - Math.exp((-3 * (until - time)) / glide));
+    });
+    param.setValueAtTime(value, 0);
+    tones.filter((t) => t.time > from).forEach(({ time, tone, glide }) => param.setTargetAtTime(tone, time - from, glide / 3));
 }
 
 // Over 0.9 a soft knee instead of hard clipping.
@@ -99,17 +126,19 @@ export const wavBytes = (seconds, sampleRate) => 44 + Math.round(seconds * sampl
  * @param {Generator} gen - its settings, sounds and mix are rendered
  * @param {number} seconds
  * @param {object} [options]
+ * @param {boolean} [options.ending] - end on the home chord (V, then a held
+ *   I) instead of fading out mid-phrase
  * @param {function} [options.onProgress] - called with 0..1
  * @param {AbortSignal} [options.signal]
  * @returns {Promise<Blob>} audio/wav
  */
-export async function renderWav(gen, seconds, { onProgress = () => {}, signal } = {}) {
+export async function renderWav(gen, seconds, { ending = false, onProgress = () => {}, signal } = {}) {
     const sampleRate = gen.AC.sampleRate;
     const anySolo = Object.values(gen.roles).some((r) => r.solo);
     const audible = Object.fromEntries(Object.entries(gen.roles).map(([role, r]) => [role, (anySolo ? r.solo : !r.mute) && r.volume > 0]));
     const roles = Object.keys(gen.roles).filter((role) => audible[role]);
-    const presets = Object.fromEntries(roles.map((role) => [role, gen.getRolePreset(role)]));
-    const notes = planNotes(gen, audible, seconds);
+    const presets = Object.fromEntries(roles.filter((role) => role !== 'perc').map((role) => [role, gen.getRolePreset(role)]));
+    const { notes, tones } = planNotes(gen, audible, seconds, ending);
     const ambience = { ...gen.settings.ambience };
 
     const parts = [];
@@ -127,11 +156,22 @@ export async function renderWav(gen, seconds, { onProgress = () => {}, signal } 
         const build = (from) => {
             const ctx = new OfflineAudioContext({ numberOfChannels: 2, length: length(from), sampleRate });
             const instruments = Object.fromEntries(roles.map((role) => {
-                const inst = new Instrument({ polyphony: gen.getRolePolyphony(role), preset: presets[role], context: ctx });
+                const inst = role === 'perc'
+                    ? new DrumKit({ context: ctx })
+                    : new Instrument({ polyphony: gen.getRolePolyphony(role), preset: presets[role], context: ctx });
+                if (role === 'perc') inst.setKit(gen.settings.drumKit);
                 inst.scheduleSleep = () => {}; // no wall-clock timers during the render
                 const gain = ctx.createGain();
                 gain.gain.value = gen.roles[role].volume;
-                inst.connect(gain);
+                if (TONE_ROLES.includes(role)) {
+                    const tone = ctx.createBiquadFilter();
+                    tone.Q.value = 0.5;
+                    automateTone(tone.frequency, tones, from);
+                    inst.connect(tone);
+                    tone.connect(gain);
+                } else {
+                    inst.connect(gain);
+                }
                 gain.connect(ctx.destination);
                 return [role, inst];
             }));
@@ -192,7 +232,7 @@ export async function renderWav(gen, seconds, { onProgress = () => {}, signal } 
         carry = last ? null : { left: left.slice(keep), right: right.slice(keep) };
         if (last) {
             // a gentle fade over the file's last seconds
-            const fade = Math.min(keep, Math.round(END_FADE * sampleRate));
+            const fade = Math.min(keep, Math.round((ending ? ENDING_FADE : END_FADE) * sampleRate));
             for (let i = keep - fade; i < keep; i++) {
                 const g = (keep - i) / fade;
                 left[i] *= g * g;

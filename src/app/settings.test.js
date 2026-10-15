@@ -61,7 +61,7 @@ test('ambience shapes travel in the a= part', () => {
 });
 
 test('voice volumes travel in links', () => {
-    const settings = { ...defaultSettings(), seed: 3, volumes: { lead: 0.42, counter: 0.6, pad: 0.15, bass: 1 } };
+    const settings = { ...defaultSettings(), seed: 3, volumes: { lead: 0.42, counter: 0.6, pad: 0.15, bass: 1, perc: 0.33 } };
     expect(decodeSettings(encodeSettings(settings)).volumes).toEqual(settings.volumes);
 });
 
@@ -191,4 +191,40 @@ test('links carry ensemble voices as role + the ensemble seed', () => {
     const presets = { lead: { generated: { role: 'lead', ensemble: 0x123456 } }, pad: { generated: { role: 'pad', ensemble: 0x123456 } }, counter: { generated: { role: 'counter', ensemble: 0x123456 } } };
     const code = encodeSettings({ ...defaultSettings(), seed: 9 }, presets);
     expect(decodeShare(code).presets).toEqual(presets);
+});
+
+test('links carry v2 sounds: role, kind and seed, or the ensemble seed', () => {
+    const presets = {
+        lead: { generated: { role: 'lead', seed: 0xabcdef, kind: 'bell', version: 2 } },
+        pad: { generated: { role: 'pad', seed: 5, kind: 'texture', version: 2 } },
+        bass: { generated: { role: 'bass', ensemble: 0x123456, version: 2 } },
+        counter: { generated: { role: 'counter', seed: 77 } },
+    };
+    const code = encodeSettings({ ...defaultSettings(), seed: 9 }, presets);
+    expect(decodeShare(code).presets).toEqual(presets);
+});
+
+test('swing, section tone and drums travel in links; links made before read them as off', () => {
+    const kit = defaultSettings().drumKit;
+    const settings = {
+        ...defaultSettings(),
+        seed: 5,
+        swing: 0.35,
+        sectionTone: true,
+        drums: { style: 'lofi', activity: 0.7, variation: 0.85 },
+        drumKit: { ...kit, room: 0.3, hat: { on: false, level: 1, tone: 0, decay: 1 }, swish: { on: true, level: 1.4, tone: -0.6, decay: 1.5 } },
+        muted: { ...defaultSettings().muted, bass: true, perc: true },
+    };
+    expect(decodeSettings(encodeSettings(settings))).toEqual(settings);
+    const before = decodeSettings(encodeSettings({ ...defaultSettings(), seed: 5 }));
+    expect([before.swing, before.sectionTone, before.drums.style]).toEqual([0, false, 'off']);
+});
+
+test('a link made by the released version (before drums) still opens unchanged', () => {
+    // encoded by shareCode.js as of commit 9850eb6
+    const { settings, presets } = decodeShare('m=IAAACbk&v=iACVCUxD_1Xm9_-xI0Vg');
+    expect(presets).toEqual({ pad: 'Dreary', bass: 'Felt Bass', lead: { generated: { role: 'lead', seed: 0xabcdef } }, counter: { generated: { role: 'counter', ensemble: 0x123456 } } });
+    expect([settings.seed, settings.tonic, settings.volumes.lead, settings.voices.bass.octave]).toEqual([77, 2, 0.4, -1]);
+    const d = defaultSettings();
+    expect([settings.drums, settings.drumKit, settings.muted, settings.swing]).toEqual([d.drums, d.drumKit, d.muted, 0]);
 });
