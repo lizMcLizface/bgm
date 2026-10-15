@@ -12,7 +12,7 @@ import { SCALE_FAMILIES, TONIC_NAMES, scaleById, scaleSemitones } from './theory
 import PROGRESSIONS, { PROGRESSION_LENGTHS, progressionsOfLength } from './progressions';
 import { METERS } from './meter';
 import { DEFAULT_DRIFT, DRIFT_MODES, TEMPO_BOUNDS } from './conductor';
-import { OCTAVE_LIMITS, OCTAVE_WANDER } from './arranger';
+import { OCTAVE_LIMITS, OCTAVE_WANDER, DEFAULT_PAD_WEIGHTS, DEFAULT_BASS_WEIGHTS } from './arranger';
 import { PRESET_CATEGORIES, ROLE_CATEGORY } from './presets';
 import { presetGroups } from './editor/presetStore';
 import { chance, pick, weighted } from './random';
@@ -75,13 +75,23 @@ function fittingProgression(settings, length, rng) {
 // possible (a dice button that does nothing would look broken). Within
 // reason, mode and progression suit each other (see modeQuality).
 const others = (list, current) => (list.length > 1 ? list.filter((x) => x !== current) : list);
+// Keys and modes excluded under Evolution's "Allowed keys and modes" are
+// skipped by drift and by these.
+const allowedTonics = (settings) => [...TONIC_NAMES.keys()].filter((pc) => !settings.drift.excludedTonics.includes(pc));
+const allowedMode = (settings) => (id) => !settings.drift.excludedModes.includes(id);
 const FIELDS = {
-    tonic: (settings, level, rng) => pick(rng, others([...TONIC_NAMES.keys()], settings.tonic)),
+    tonic: (settings, level, rng) => {
+        const allowed = allowedTonics(settings);
+        return allowed.length ? pick(rng, others(allowed, settings.tonic)) : settings.tonic;
+    },
     mode: (settings, level, rng, { matchProgression = true } = {}) => {
-        if (level === 'wild') return pick(rng, others(ALL_MODES, settings.mode));
+        if (level === 'wild') {
+            const allowed = ALL_MODES.filter(allowedMode(settings));
+            return allowed.length ? pick(rng, others(allowed, settings.mode)) : settings.mode;
+        }
         const wanted = matchProgression ? progressionQuality(settings.progression) : null;
         const fits = Object.entries(REASONABLE_MODES)
-            .filter(([id]) => id !== settings.mode && (!wanted || [wanted, null].includes(modeQuality(id))));
+            .filter(([id]) => id !== settings.mode && allowedMode(settings)(id) && (!wanted || [wanted, null].includes(modeQuality(id))));
         return fits.length ? weighted(rng, Object.fromEntries(fits)) : settings.mode;
     },
     // within reason: as many chords as now
@@ -214,4 +224,48 @@ export function randomVoices(settings, current, level, rng = Math.random, groups
     }));
     const padNotes = wild ? pick(rng, [3, 4, 5]) : weighted(rng, { 3: 5, 4: 4, 5: 1 });
     return { settings: { voices: { ...settings.voices, ...voices }, padNotes: Number(padNotes) }, presets };
+}
+
+const STYLE_DEFAULTS = { pad: DEFAULT_PAD_WEIGHTS, bass: DEFAULT_BASS_WEIGHTS };
+const DEFAULT_HUMANIZE = { timing: 12, velocity: 0.08, detune: 3 };
+
+/**
+ * Style weights for the pad or bass (arranger.js PAD_STYLES / BASS_STYLES).
+ * Within reason each default share moves by up to half; full random any
+ * mix (never all zero).
+ */
+export function randomStyleWeights(kind, level, rng = Math.random) {
+    const defaults = STYLE_DEFAULTS[kind];
+    const weights = Object.fromEntries(Object.entries(defaults).map(([id, w]) => [id, level === 'wild'
+        ? step(rng() * 100, 5)
+        : Math.min(100, step(w * between(rng, 0.5, 1.5), 5))]));
+    if (!Object.values(weights).some((w) => w > 0)) weights[pick(rng, Object.keys(weights))] = 50;
+    return weights;
+}
+
+/** Lead activity, pad thinning, pad and bass styles, and feel. */
+export function randomArrangement(settings, level, rng = Math.random) {
+    const wild = level === 'wild';
+    return {
+        leadActivity: wild ? step(rng(), 0.05) : step(between(rng, 0.4, 0.8), 0.05),
+        thinPadUnderLead: wild ? chance(rng, 0.5) : chance(rng, 0.8),
+        padWeights: randomStyleWeights('pad', level, rng),
+        bassWeights: randomStyleWeights('bass', level, rng),
+        humanize: wild
+            ? { timing: Math.round(rng() * 40), velocity: step(rng() * 0.25, 0.01), detune: step(rng() * 15, 0.5) }
+            : {
+                timing: Math.round(DEFAULT_HUMANIZE.timing * between(rng, 0.5, 1.5)),
+                velocity: step(DEFAULT_HUMANIZE.velocity * between(rng, 0.5, 1.5), 0.01),
+                detune: step(DEFAULT_HUMANIZE.detune * between(rng, 0.5, 1.5), 0.5),
+            },
+    };
+}
+
+/**
+ * One voice: a preset, its register and (pad) chord size.
+ * @returns {{ settings: object, preset: string }}
+ */
+export function randomRole(role, settings, currentPreset, level, rng = Math.random, groups = presetGroups()) {
+    const { settings: patch, presets } = randomVoices(settings, { [role]: currentPreset }, level, rng, groups);
+    return { settings: role === 'pad' ? patch : { voices: patch.voices }, preset: presets[role] };
 }

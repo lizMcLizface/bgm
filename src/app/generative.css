@@ -808,3 +808,87 @@ body {
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 12px 16px;
 }
+
+/* Panel title: name, then the dice for the whole panel. */
+.gen .gen-panel-dice {
+    height: 26px;
+    width: 28px;
+}
+
+.gen .gen-legend-dice {
+    height: 22px;
+    width: 26px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+/* "More options" under a panel's main controls. */
+.gen button.gen-more {
+    grid-column: 1 / -1;
+    justify-self: start;
+    padding: 2px 0;
+    border: 0;
+    background: none;
+    color: var(--gen-accent);
+    font-size: 13px;
+}
+
+.gen button.gen-more:hover:not(:disabled) {
+    text-decoration: underline;
+}
+
+.gen-volume {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--gen-muted);
+}
+
+.gen-volume input {
+    width: 90px;
+}
+
+/* ⚙ menu: buffer size, quick stop, theme. */
+.gen-settings {
+    position: relative;
+}
+
+.gen-settings summary {
+    list-style: none;
+    padding: 3px 9px;
+    border: 1px solid var(--gen-border);
+    border-radius: 6px;
+    font-size: 15px;
+    line-height: 1.3;
+    color: var(--gen-text);
+    cursor: pointer;
+}
+
+.gen-settings summary::-webkit-details-marker {
+    display: none;
+}
+
+.gen-settings[open] summary {
+    border-color: var(--gen-accent);
+}
+
+.gen-settings-menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 6px);
+    z-index: 30;
+    display: grid;
+    gap: 12px;
+    width: 260px;
+    padding: 12px;
+    border: 1px solid var(--gen-border);
+    border-radius: 8px;
+    background: var(--gen-surface);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+}
+
+.gen-settings-menu small {
+    color: var(--gen-muted);
+    font-size: 11px;
+}

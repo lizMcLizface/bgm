@@ -1,4 +1,4 @@
-import { randomKey, randomProgression, randomConductor, randomVoices, randomField, randomPreset, randomLength, RANDOM_FIELDS, presetPool, modeQuality, progressionQuality } from './randomize';
+import { randomKey, randomProgression, randomConductor, randomVoices, randomField, randomPreset, randomLength, randomArrangement, randomStyleWeights, randomRole, RANDOM_FIELDS, presetPool, modeQuality, progressionQuality } from './randomize';
 import { defaultSettings, sanitizeSettings } from './settings';
 import { PRESET_CATEGORIES } from './presets';
 import { DEFAULT_DRIFT } from './conductor';
@@ -134,4 +134,35 @@ test('progressions: within reason keeps the length, randomLength changes it', ()
         settings = { ...settings, ...patch };
         expectValid(settings);
     }
+});
+
+test('arrangement, style groups and single voices: valid at both levels', () => {
+    const rng = seeded(23);
+    ['reason', 'wild'].forEach((level) => {
+        for (let i = 0; i < 100; i++) {
+            expectValid(randomArrangement(defaultSettings(), level, rng));
+            const weights = randomStyleWeights('bass', level, rng);
+            expect(Object.values(weights).some((w) => w > 0)).toBe(true);
+            const voice = randomRole('lead', defaultSettings(), 'Glass Lead', level, rng, GROUPS);
+            expect(voice.preset).not.toBe('Glass Lead');
+            expect(voice.settings).not.toHaveProperty('padNotes');
+            expectValid(voice.settings);
+        }
+    });
+    const { settings } = randomRole('pad', defaultSettings(), 'Soft Pad', 'reason', rng, GROUPS);
+    expect(settings).toHaveProperty('padNotes');
+});
+
+test('key and scale dice skip excluded keys and modes', () => {
+    const rng = seeded(29);
+    const excludedTonics = [1, 3, 6, 8, 10];
+    const excludedModes = ['Major-2', 'Major-3', 'Major-4', 'Major-5'];
+    const settings = { ...defaultSettings(), drift: { ...defaultSettings().drift, excludedTonics, excludedModes } };
+    ['reason', 'wild'].forEach((level) => {
+        for (let i = 0; i < 100; i++) {
+            const { tonic, mode } = randomKey(settings, level, rng);
+            expect(excludedTonics).not.toContain(tonic);
+            expect(excludedModes).not.toContain(mode);
+        }
+    });
 });

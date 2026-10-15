@@ -1,9 +1,9 @@
 // Generator settings as data: defaults, validation, and the compact form
-// used in share links (?s=...) and exported files. Synth presets are not
+// used in share links (?s=...). Synth presets are not
 // part of the settings; a link carries each role's built-in preset name
 // alongside (shareCode.js), edited or custom sounds stay local.
 //
-// Anything arriving from a link or file is untrusted: sanitizeSettings
+// Anything arriving from a link is untrusted: sanitizeSettings
 // keeps only known keys, coerces/clamps every value to its valid range,
 // and falls back to the default otherwise. Links are bit-packed
 // (shareCode.js); links made before that (base64 JSON, starting 'eyJ')
@@ -15,8 +15,6 @@ import { METERS, DEFAULT_METER } from './meter';
 import { SCALE_FAMILIES } from './theory';
 import PROGRESSIONS from './progressions';
 import { encodeShareCode, decodeShareCode } from './shareCode';
-
-export const SETTINGS_VERSION = 1;
 
 /** Fresh default settings (a new random seed each call). */
 export function defaultSettings() {
@@ -159,20 +157,4 @@ export function sharePath(settings, presets, location = window.location) {
 /** Full share URL for the current page and settings. */
 export function shareUrl(settings, presets, location = window.location) {
     return `${location.origin}${sharePath(settings, presets, location)}`;
-}
-
-/** Downloads settings as a .json file. */
-export function exportSettings(settings) {
-    const blob = new Blob([JSON.stringify({ v: SETTINGS_VERSION, ...settings }, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'generative-settings.json';
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-}
-
-/** Reads an exported settings file. */
-export async function importSettingsFile(file) {
-    return sanitizeSettings(JSON.parse(await file.text()));
 }

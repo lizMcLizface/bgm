@@ -3,20 +3,23 @@ import Generator, { ROLES } from './Generator';
 import { SCALE_FAMILIES, TONIC_NAMES } from './theory';
 import ChordTimeline from './ChordTimeline';
 import { RoleButtons, TrackStrip, useLivePlay } from './Tracks';
-import { defaultSettings, shareFromLocation, sharePath, shareUrl, exportSettings, importSettingsFile, newSeed } from './settings';
+import { defaultSettings, shareFromLocation, sharePath, shareUrl, newSeed } from './settings';
 import SynthEditor from './editor/SynthEditor';
 import PresetPicker from './editor/PresetPicker';
 import PROGRESSIONS, { PROGRESSION_LENGTHS, progressionsOfLength } from './progressions';
 import { PAD_STYLES, BASS_STYLES, styleShares, OCTAVE_LIMITS, OCTAVE_WANDER } from './arranger';
 import { DRIFT_MODES } from './conductor';
 import { METERS } from './meter';
-import { RANDOM_LEVELS, randomKey, randomProgression, randomConductor, randomVoices, randomField, randomPreset, randomLength, progressionLength, progressionForLength } from './randomize';
-import AudioStatus from './AudioStatus';
+import {
+    RANDOM_LEVELS, randomKey, randomProgression, randomConductor, randomVoices, randomField, randomPreset, randomLength,
+    randomArrangement, randomStyleWeights, randomRole, progressionLength, progressionForLength,
+} from './randomize';
+import { MasterVolume, AudioMeter, SettingsMenu } from './AudioStatus';
 import { DiceIcon, SparkIcon } from './icons';
 import { generateSound, newSoundSeed } from './soundGen';
 import { levelPreset } from './engine/loudness';
 import { addGeneratedPreset, generatedInfo } from './editor/presetStore';
-import { THEMES, applyTheme, storedTheme } from './theme';
+import { readPref, writePref } from './prefs';
 
 // One Generator for the page's lifetime; StrictMode's double-mount must
 // not build a second set of instruments.
@@ -51,10 +54,9 @@ function useSettingsInUrl(settings, presets) {
     }, [settings, presets]);
 }
 
-// Share / export / import / new variation, next to Play.
+// New variation / copy link, next to Play.
 const ShareTools = ({ settings, presets, onLoad }) => {
     const [message, setMessage] = useState('');
-    const fileInput = useRef(null);
     const flash = (text) => {
         setMessage(text);
         setTimeout(() => setMessage(''), 2500);
@@ -68,26 +70,12 @@ const ShareTools = ({ settings, presets, onLoad }) => {
             window.prompt('Copy this link', url);
         }
     };
-    const importFile = async (e) => {
-        const file = e.target.files[0];
-        e.target.value = '';
-        if (!file) return;
-        try {
-            onLoad(await importSettingsFile(file));
-            flash('Settings loaded');
-        } catch (err) {
-            flash('Could not read that file');
-        }
-    };
     return (
         <div className="gen-share">
             <button type="button" onClick={() => onLoad({ ...settings, seed: newSeed() })} title="Same settings, different random choices">
                 New variation
             </button>
             <button type="button" onClick={copy}>Copy link</button>
-            <button type="button" onClick={() => exportSettings(settings)}>Export</button>
-            <button type="button" onClick={() => fileInput.current.click()}>Import</button>
-            <input ref={fileInput} type="file" accept="application/json,.json" hidden onChange={importFile} />
             <span className="gen-editor-message" role="status">{message}</span>
         </div>
     );
@@ -97,24 +85,47 @@ const RANDOM_TARGETS = [
     ['all', 'Everything'],
     ['key', 'Key & scale'],
     ['progression', 'Progression'],
-    ['conductor', 'Conductor'],
+    ['arrangement', 'Arrangement'],
+    ['conductor', 'Evolution'],
     ['voices', 'Voices'],
 ];
 
-const THEME_LABELS = { auto: '◐ Auto', light: '☀ Light', dark: '☾ Dark' };
-
-// Cycles the colour theme (theme.js).
-const ThemeToggle = () => {
-    const [theme, setTheme] = useState(storedTheme);
-    const next = () => {
-        const value = THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length];
-        applyTheme(value);
-        setTheme(value);
+// A remembered open/closed state (per browser).
+function useStoredFlag(key, initial) {
+    const [value, setValue] = useState(() => readPref(key, initial));
+    const set = (next) => {
+        setValue(next);
+        writePref(key, next);
     };
+    return [value, set];
+}
+
+const DiceButton = ({ label, onClick, className = '' }) => (
+    <button type="button" className={`gen-dice ${className}`} title={`Randomize ${label.toLowerCase()}`} aria-label={`Random ${label}`}
+        onClick={(e) => { e.preventDefault(); onClick(); }}><DiceIcon /></button>
+);
+
+// A settings panel: its title, a dice for everything in it (onRandom), the
+// main controls, and - behind "More options", remembered per browser -
+// the detailed ones.
+const Panel = ({ id, title, heading, onRandom, more, className = '', children }) => {
+    const [open, setOpen] = useStoredFlag(`bgm-more-${id}`, false);
     return (
-        <button type="button" className="gen-theme" onClick={next} title="Colour theme: follow the system, light or dark">
-            {THEME_LABELS[theme]}
-        </button>
+        <section className={`gen-panel ${className}`}>
+            <h2 className="gen-panel-title">
+                {heading || title}
+                {onRandom && <DiceButton label={title} onClick={onRandom} className="gen-panel-dice" />}
+            </h2>
+            {children}
+            {more && (
+                <>
+                    <button type="button" className="gen-more" aria-expanded={open} onClick={() => setOpen(!open)}>
+                        {open ? 'Fewer options ▴' : 'More options ▾'}
+                    </button>
+                    {open && more}
+                </>
+            )}
+        </section>
     );
 };
 
@@ -160,11 +171,11 @@ const Field = ({ label, onRandom, onGenerate, generating, wide, children }) => (
 
 // One slider per style; the label shows the style's resulting share of
 // phrases. Setting every other style to 0 makes one style "always".
-const StyleWeights = ({ title, styles, weights, onChange }) => {
+const StyleWeights = ({ title, styles, weights, onChange, onRandom }) => {
     const shares = styleShares(weights);
     return (
         <fieldset className="gen-weights">
-            <legend>{title}</legend>
+            <legend>{title}{onRandom && <DiceButton label={title} onClick={onRandom} className="gen-legend-dice" />}</legend>
             {Object.entries(styles).map(([id, label]) => (
                 <Field key={id} label={`${label} · ${Math.round(shares[id] * 100)}%`}>
                     <input type="range" min="0" max="100" step="5" value={weights[id]}
@@ -208,42 +219,45 @@ const Chips = ({ legend, items, excluded, locked, onChange }) => (
     </fieldset>
 );
 
-const Evolution = ({ drift, home, onChange }) => {
+// Allowed keys and modes apply to drift and to the key & scale dice, so
+// they stay usable with drift off.
+const Evolution = ({ drift, home, onChange, onRandom }) => {
     const set = (key, value) => onChange({ ...drift, [key]: value });
     const family = SCALE_FAMILIES.find((f) => f.modes.some((m) => m.id === home.mode));
+    const chances = (
+        <fieldset className="gen-weights" disabled={drift.mode === 'off'}>
+            <legend>Chance per progression cycle</legend>
+            {CHANCES.map(([key, label]) => (
+                <Field key={key} label={`${label} · ${Math.round(drift[key] * 100)}%`}>
+                    <input type="range" min="0" max="1" step="0.05" value={drift[key]}
+                        onChange={(e) => set(key, Number(e.target.value))} />
+                </Field>
+            ))}
+            {drift.mode === 'centered' && (
+                <Field label={`Pull toward my settings · ${Math.round(drift.homePull * 100)}%`}>
+                    <input type="range" min="0" max="1" step="0.05" value={drift.homePull}
+                        onChange={(e) => set('homePull', Number(e.target.value))} />
+                </Field>
+            )}
+            <Field label={`Tempo range ± ${drift.tempoRange} BPM`}>
+                <input type="range" min="0" max="20" step="1" value={drift.tempoRange}
+                    onChange={(e) => set('tempoRange', Number(e.target.value))} />
+            </Field>
+            <label className="gen-check">
+                <input type="checkbox" checked={drift.pivot} onChange={(e) => set('pivot', e.target.checked)} />
+                Prepare key changes with the new key's V chord
+            </label>
+        </fieldset>
+    );
     return (
-        <section className="gen-panel">
-            <h2>Evolution</h2>
+        <Panel id="evolution" title="Evolution" onRandom={onRandom} more={chances}>
             <Field label="Drift">
                 <select value={drift.mode} onChange={(e) => set('mode', e.target.value)}>
                     {Object.entries(DRIFT_MODES).map(([id, label]) => <option key={id} value={id}>{label}</option>)}
                 </select>
             </Field>
-            <fieldset className="gen-weights" disabled={drift.mode === 'off'}>
-                <legend>Chance per progression cycle</legend>
-                {CHANCES.map(([key, label]) => (
-                    <Field key={key} label={`${label} · ${Math.round(drift[key] * 100)}%`}>
-                        <input type="range" min="0" max="1" step="0.05" value={drift[key]}
-                            onChange={(e) => set(key, Number(e.target.value))} />
-                    </Field>
-                ))}
-                {drift.mode === 'centered' && (
-                    <Field label={`Pull toward my settings · ${Math.round(drift.homePull * 100)}%`}>
-                        <input type="range" min="0" max="1" step="0.05" value={drift.homePull}
-                            onChange={(e) => set('homePull', Number(e.target.value))} />
-                    </Field>
-                )}
-                <Field label={`Tempo range ± ${drift.tempoRange} BPM`}>
-                    <input type="range" min="0" max="20" step="1" value={drift.tempoRange}
-                        onChange={(e) => set('tempoRange', Number(e.target.value))} />
-                </Field>
-                <label className="gen-check">
-                    <input type="checkbox" checked={drift.pivot} onChange={(e) => set('pivot', e.target.checked)} />
-                    Prepare key changes with the new key's V chord
-                </label>
-            </fieldset>
-            <fieldset className="gen-weights" disabled={drift.mode === 'off'}>
-                <legend>Where it may go</legend>
+            <fieldset className="gen-weights">
+                <legend>Allowed keys and modes (drift and the key &amp; scale dice)</legend>
                 <Chips
                     legend="Keys"
                     items={TONIC_NAMES.map((label, pc) => ({ id: pc, label }))}
@@ -259,7 +273,7 @@ const Evolution = ({ drift, home, onChange }) => {
                     onChange={(list) => set('excludedModes', list)}
                 />
             </fieldset>
-        </section>
+        </Panel>
     );
 };
 
@@ -416,12 +430,14 @@ const GenerativeApp = () => {
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
     // Within reason, key and progression are chosen to fit each other: alone,
     // each fits the other's current value; together, the key comes first.
-    const randomize = (target, level) => {
+    const randomize = (target, level = randomLevel) => {
         const current = gen.settings;
         const all = target === 'all';
+        const music = all || target === 'music';
         let patch = {};
-        if (all || target === 'key') patch = randomKey(current, level, Math.random, { matchProgression: !all });
-        if (all || target === 'progression') patch = { ...patch, ...randomProgression({ ...current, ...patch }, level) };
+        if (music || target === 'key') patch = randomKey(current, level, Math.random, { matchProgression: !music });
+        if (music || target === 'progression') patch = { ...patch, ...randomProgression({ ...current, ...patch }, level) };
+        if (all || target === 'arrangement') patch = { ...patch, ...randomArrangement(current, level) };
         if (all || target === 'conductor') patch = { ...patch, ...randomConductor(current, level) };
         if (all || target === 'voices') {
             const names = Object.fromEntries(Object.entries(roles).map(([role, { presetName }]) => [role, presetName]));
@@ -429,6 +445,11 @@ const GenerativeApp = () => {
             patch = { ...patch, ...voices.settings };
             Object.entries(voices.presets).forEach(([role, name]) => loadPreset(role, name));
         }
+        loadSettings(patch);
+    };
+    const randomizeRole = (role) => {
+        const { settings: patch, preset } = randomRole(role, gen.settings, roles[role].presetName, randomLevel);
+        loadPreset(role, preset);
         loadSettings(patch);
     };
     const toggle = async () => {
@@ -447,8 +468,9 @@ const GenerativeApp = () => {
                 <button className="gen-play" onClick={toggle}>{running ? 'Stop' : 'Play'}</button>
                 <ShareTools settings={settings} presets={linkPresets} onLoad={loadSettings} />
                 <div className="gen-header-tools">
-                    <AudioStatus onReload={reloadKeepingSettings} />
-                    <ThemeToggle />
+                    <MasterVolume />
+                    <AudioMeter />
+                    <SettingsMenu generator={gen} onReload={reloadKeepingSettings} />
                 </div>
             </header>
 
@@ -460,8 +482,7 @@ const GenerativeApp = () => {
                     onRandom={randomizePreset} onGenerate={generateForRole} generating={generating} live={live} />}
             />
 
-            <section className="gen-panel">
-                <h2>Music</h2>
+            <Panel id="music" title="Music" onRandom={() => randomize('music')}>
                 <div className="gen-row">
                     <Field label="Key" onRandom={() => randomizeField('tonic')}>
                         <select value={settings.tonic} onChange={(e) => update('tonic', Number(e.target.value))}>
@@ -507,12 +528,38 @@ const GenerativeApp = () => {
                     </Field>
                 </div>
                 <NowPlaying now={now} settings={settings} onKeep={keepCurrent} />
-            </section>
+            </Panel>
 
-            <Evolution drift={settings.drift} home={{ tonic: settings.tonic, mode: settings.mode }} onChange={(drift) => update('drift', drift)} />
+            <Evolution drift={settings.drift} home={{ tonic: settings.tonic, mode: settings.mode }} onChange={(drift) => update('drift', drift)}
+                onRandom={() => randomize('conductor')} />
 
-            <section className="gen-panel">
-                <h2>Arrangement</h2>
+            <Panel id="arrangement" title="Arrangement" onRandom={() => randomize('arrangement')} more={(
+                <>
+                    <StyleWeights title="Rhythm / pad styles" styles={PAD_STYLES} weights={settings.padWeights}
+                        onChange={(w) => update('padWeights', w)} onRandom={() => update('padWeights', randomStyleWeights('pad', randomLevel))} />
+                    <StyleWeights title="Bass styles" styles={BASS_STYLES} weights={settings.bassWeights}
+                        onChange={(w) => update('bassWeights', w)} onRandom={() => update('bassWeights', randomStyleWeights('bass', randomLevel))} />
+                    <fieldset className="gen-weights">
+                        <legend>
+                            Feel (random, normally distributed per note)
+                            <DiceButton label="feel" className="gen-legend-dice"
+                                onClick={() => update('humanize', randomArrangement(gen.settings, randomLevel).humanize)} />
+                        </legend>
+                        <Field label={`Timing ± ${settings.humanize.timing} ms`}>
+                            <input type="range" min="0" max="40" step="1" value={settings.humanize.timing}
+                                onChange={(e) => update('humanize', { ...settings.humanize, timing: Number(e.target.value) })} />
+                        </Field>
+                        <Field label={`Velocity ± ${Math.round(settings.humanize.velocity * 100)}%`}>
+                            <input type="range" min="0" max="0.25" step="0.01" value={settings.humanize.velocity}
+                                onChange={(e) => update('humanize', { ...settings.humanize, velocity: Number(e.target.value) })} />
+                        </Field>
+                        <Field label={`Pitch ± ${settings.humanize.detune} cents`}>
+                            <input type="range" min="0" max="15" step="0.5" value={settings.humanize.detune}
+                                onChange={(e) => update('humanize', { ...settings.humanize, detune: Number(e.target.value) })} />
+                        </Field>
+                    </fieldset>
+                </>
+            )}>
                 <Field label={`Lead activity ${Math.round(settings.leadActivity * 100)}%`}>
                     <input type="range" min="0" max="1" step="0.05" value={settings.leadActivity}
                         onChange={(e) => update('leadActivity', Number(e.target.value))} />
@@ -522,34 +569,36 @@ const GenerativeApp = () => {
                         onChange={(e) => update('thinPadUnderLead', e.target.checked)} />
                     Thin the pad under the lead
                 </label>
-                <StyleWeights title="Rhythm / pad styles" styles={PAD_STYLES} weights={settings.padWeights}
-                    onChange={(w) => update('padWeights', w)} />
-                <StyleWeights title="Bass styles" styles={BASS_STYLES} weights={settings.bassWeights}
-                    onChange={(w) => update('bassWeights', w)} />
-                <fieldset className="gen-weights">
-                    <legend>Feel (random, normally distributed per note)</legend>
-                    <Field label={`Timing ± ${settings.humanize.timing} ms`}>
-                        <input type="range" min="0" max="40" step="1" value={settings.humanize.timing}
-                            onChange={(e) => update('humanize', { ...settings.humanize, timing: Number(e.target.value) })} />
-                    </Field>
-                    <Field label={`Velocity ± ${Math.round(settings.humanize.velocity * 100)}%`}>
-                        <input type="range" min="0" max="0.25" step="0.01" value={settings.humanize.velocity}
-                            onChange={(e) => update('humanize', { ...settings.humanize, velocity: Number(e.target.value) })} />
-                    </Field>
-                    <Field label={`Pitch ± ${settings.humanize.detune} cents`}>
-                        <input type="range" min="0" max="15" step="0.5" value={settings.humanize.detune}
-                            onChange={(e) => update('humanize', { ...settings.humanize, detune: Number(e.target.value) })} />
-                    </Field>
-                </fieldset>
-            </section>
+            </Panel>
 
             {Object.entries(ROLES).map(([role, { label }]) => (
-                <section className={`gen-panel gen-panel-role gen-role-${role}`} key={role}>
-                    <h2 className="gen-panel-title">
-                        <i className={`gen-swatch gen-swatch-${role}`} />
-                        {label}
-                        <RoleButtons role={role} label={label} mix={mix[role]} armed={armed === role} onMix={changeMix} onArm={setArmed} onEdit={editSound} />
-                    </h2>
+                <Panel
+                    key={role}
+                    id={`voice-${role}`}
+                    title={label}
+                    className={`gen-panel-role gen-role-${role}`}
+                    heading={(
+                        <>
+                            <i className={`gen-swatch gen-swatch-${role}`} />
+                            {label}
+                            <RoleButtons role={role} label={label} mix={mix[role]} armed={armed === role} onMix={changeMix} onArm={setArmed} onEdit={editSound} />
+                        </>
+                    )}
+                    onRandom={() => randomizeRole(role)}
+                    more={(
+                        <>
+                            <VoiceControls role={role} voice={settings.voices[role]}
+                                onChange={(voice) => update('voices', { ...settings.voices, [role]: voice })} />
+                            {role === 'pad' && (
+                                <Field label="Chord notes">
+                                    <select value={settings.padNotes} onChange={(e) => update('padNotes', Number(e.target.value))}>
+                                        {Object.entries(PAD_NOTES).map(([n, text]) => <option key={n} value={n}>{text}</option>)}
+                                    </select>
+                                </Field>
+                            )}
+                        </>
+                    )}
+                >
                     <Field label="Preset" onRandom={() => randomizePreset(role)} onGenerate={() => generateForRole(role)} generating={generating[role]} wide>
                         <PresetPicker value={roles[role].presetName} edited={roles[role].edited} onChange={(name) => loadPreset(role, name)} role={role} />
                     </Field>
@@ -557,16 +606,7 @@ const GenerativeApp = () => {
                         <input type="range" min="0" max="1" step="0.01" value={roles[role].volume}
                             onChange={(e) => setVolume(role, Number(e.target.value))} />
                     </Field>
-                    <VoiceControls role={role} voice={settings.voices[role]}
-                        onChange={(voice) => update('voices', { ...settings.voices, [role]: voice })} />
-                    {role === 'pad' && (
-                        <Field label="Chord notes">
-                            <select value={settings.padNotes} onChange={(e) => update('padNotes', Number(e.target.value))}>
-                                {Object.entries(PAD_NOTES).map(([n, label]) => <option key={n} value={n}>{label}</option>)}
-                            </select>
-                        </Field>
-                    )}
-                </section>
+                </Panel>
             ))}
 
             <SynthEditor

@@ -32,6 +32,10 @@ synthesised with the Web Audio API; there are no samples.
 - Procedural sounds: a new preset per voice from a random seed, shaped for
   the role and levelled to its default's loudness; links carry the seed
 - Stop fades out within half a second, reverb and echo tails included
+  (optional, in the ⚙ menu with the buffer size and theme); master volume
+- Simple by default: each panel shows its main controls, the rest is
+  behind "More options"; a dice button randomizes a whole panel, a style
+  group or a single field
 - Randomize key & scale, progression, conductor, voices or everything at
   once - "within reason" (near the defaults, minor progressions in minor
   modes, lead sounds on the lead) or "full random"
@@ -41,7 +45,7 @@ synthesised with the Web Audio API; there are no samples.
   piece for whoever opens it
 - An audio-thread load meter with a choice of output buffer size (larger
   buffers stop crackling on slow machines), and a light / dark / system
-  theme toggle
+  theme
 
 ## Development
 

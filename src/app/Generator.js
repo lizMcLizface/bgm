@@ -76,6 +76,7 @@ class Generator {
         });
         this.transport.onBeat((event) => this.onBeat(event));
         this.planListeners = new Set();
+        this.quickStop = true;
 
         this.reset();
     }
@@ -118,12 +119,17 @@ class Generator {
         this.transport.start();
     }
 
-    // Stop doesn't wait for long reverbs and echoes: the output fades out,
-    // then the effects' tails are dropped and the output is restored (for
-    // auditions and live play).
+    // With quickStop (the default), Stop doesn't wait for long reverbs and
+    // echoes: the output fades out, then the effects' tails are dropped and
+    // the output is restored (for auditions and live play). Without it the
+    // voices fade and the tails ring out.
     stop() {
         this.transport.stop();
         Object.values(this.roles).forEach(({ instrument }) => instrument.silence());
+        if (!this.quickStop) {
+            this.reset();
+            return;
+        }
         const gain = this.output.gain;
         gain.cancelScheduledValues(this.AC.currentTime);
         gain.setTargetAtTime(0, this.AC.currentTime, STOP_FADE);

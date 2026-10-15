@@ -330,7 +330,7 @@ buffer is fixed at creation).
 
 #### Stop
 
-Stop fades the generator's output out (time constant 70 ms, -60 dB at
+With "Quick fade on Stop" (⚙ menu, on by default) Stop fades the generator's output out (time constant 70 ms, -60 dB at
 ~0.5 s), then `Instrument.flushTails` drops what the effects still hold -
 reassigning the convolver's buffer resets its state; delay outputs and
 feedback are held at 0 until their lines have emptied - and the output is
