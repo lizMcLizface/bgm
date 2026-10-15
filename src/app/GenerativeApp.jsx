@@ -45,13 +45,11 @@ import Tour, { tourSeen } from './Tour';
 let generator = null;
 let linkedSounds = [];
 let linkedPhrase = null;
-let openedFromLink = false;
 const getGenerator = () => {
     if (!generator) {
         const share = shareFromLocation(window.location);
         generator = new Generator(share ? share.settings : defaultSettings());
         if (share && share.phrase) linkedPhrase = share.phrase;
-        openedFromLink = Boolean(share);
         if (share) {
             Object.entries(share.presets).forEach(([role, preset]) => {
                 if (preset.generated) linkedSounds.push({ target: role, info: preset.generated });
@@ -776,11 +774,11 @@ const GenerativeApp = () => {
         if (patch.mute !== undefined) setSettings((s) => ({ ...s, muted: { ...gen.settings.muted } }));
     };
     const [editorOpen, setEditorOpen] = useState(false);
-    // The guided tour opens by itself on a first visit (not from a shared link), and from the ⚙ menu.
+    // The guided tour opens by itself on a first visit (shared links too), and from the ⚙ menu.
     const [tourOpen, setTourOpen] = useState(false);
     const [helpOpen, setHelpOpen] = useState(false);
     useEffect(() => {
-        if (tourSeen() || openedFromLink) return undefined;
+        if (tourSeen()) return undefined;
         const timer = setTimeout(() => setTourOpen(true), 800);
         return () => clearTimeout(timer);
     }, []);
