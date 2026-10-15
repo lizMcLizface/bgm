@@ -17,6 +17,7 @@ import {
 import { AMBIENCE_LAYERS, DEFAULT_AMBIENCE, defaultAmbienceShape } from './engine/ambience';
 import { LAYER_PARAMS, COMMON_PARAMS } from './engine/ambienceSynth';
 import { ROLE_VOLUMES } from './presets';
+import { defaultWander, WANDER_ROLES, WANDER_LIMITS } from './engine/wander';
 import { DEFAULT_DRUMS, DRUM_STYLES, DRUMS, DRUM_PARAMS, defaultDrumKit } from './percussion';
 import { DEFAULT_DRIFT, DRIFT_MODES, TEMPO_BOUNDS } from './conductor';
 import { METERS, DEFAULT_METER } from './meter';
@@ -61,6 +62,7 @@ export function defaultSettings() {
         pulseWeights: { ...DEFAULT_PULSE_WEIGHTS }, // how the pad pulses / arpeggiates (arranger.js)
         arpWeights: { ...DEFAULT_ARP_WEIGHTS },
         padMotion: { ...DEFAULT_PAD_MOTION }, // register lean, fast arpeggios, swell
+        wander: defaultWander(), // slow pan / volume / filter / pitch drift (engine/wander.js)
         seed: newSeed(),
     };
 }
@@ -108,7 +110,7 @@ const RULES = {
     humanize: { timing: clamp(0, 40), velocity: clamp(0, 0.25), detune: clamp(0, 15) },
     swing: clamp(0, 0.6),
     sectionTone: bool,
-    drums: { style: oneOf(Object.keys(DRUM_STYLES)), activity: clamp(0, 1), variation: clamp(0, 1) },
+    drums: { style: oneOf(Object.keys(DRUM_STYLES)), activity: clamp(0, 1), variation: clamp(0, 1), sprinkle: clamp(0, 1) },
     drumKit: {
         room: clamp(0, 0.5),
         ...Object.fromEntries(DRUMS.map((name) => [name, {
@@ -131,6 +133,14 @@ const RULES = {
     pulseWeights: Object.fromEntries(Object.keys(DEFAULT_PULSE_WEIGHTS).map((id) => [id, clamp(0, 100)])),
     arpWeights: Object.fromEntries(Object.keys(DEFAULT_ARP_WEIGHTS).map((id) => [id, clamp(0, 100)])),
     padMotion: { lean: clamp(0, 1), fast: clamp(0, 1), swell: clamp(0, 0.2) },
+    wander: {
+        period: clamp(WANDER_LIMITS.period.min, WANDER_LIMITS.period.max),
+        pan: { min: clamp(-1, 1), max: clamp(-1, 1) },
+        volume: clamp(WANDER_LIMITS.volume.min, WANDER_LIMITS.volume.max),
+        filter: clamp(WANDER_LIMITS.filter.min, WANDER_LIMITS.filter.max),
+        pitch: clamp(WANDER_LIMITS.pitch.min, WANDER_LIMITS.pitch.max),
+        voices: Object.fromEntries(WANDER_ROLES.map((role) => [role, bool])),
+    },
     seed: int(0, 2 ** 31),
 };
 
@@ -150,7 +160,11 @@ function sanitize(raw, rules, defaults) {
 
 /** Untrusted object -> complete, valid settings (defaults fill the gaps). */
 export function sanitizeSettings(raw, defaults = defaultSettings()) {
-    return sanitize(raw, RULES, defaults);
+    const settings = sanitize(raw, RULES, defaults);
+    // the pan range's ends in order
+    const { min, max } = settings.wander.pan;
+    if (min > max) settings.wander.pan = { min: max, max: min };
+    return settings;
 }
 
 // Links made before shareCode.js: base64url of JSON.

@@ -1,7 +1,7 @@
 // A small synthesised percussion kit (docs/DESIGN.md §9 C4): soft sounds
 // to sit under calm music - a felt kick, a brush tap, a shaker, a rim click,
-// a quiet closed hat, a brush swish, a felt tom, a soft clap and a soft
-// ride - each hit built when it is booked
+// a quiet closed hat, a brush swish, a felt tom, a soft clap, a soft
+// ride, a soft crash and a ride bell - each hit built when it is booked
 // from a sine or a burst of noise, with a touch of room reverb. No samples.
 //
 // It books like an Instrument (scheduleNote with the drum as the "note",
@@ -18,11 +18,11 @@ import { DRUMS, defaultDrumKit } from '../percussion';
 // -6 dB (kick) to -15 dB (hat) - measured; the raw sounds span 18 dB. The
 // swish is a bed under the rest: it lasts a whole beat, so it is kept well
 // below the taps (its RMS about 10 dB under a brush tap's peak level).
-// The tom, clap and ride (added later) are set by ear against those.
-const GAIN = { kick: 1.3, brush: 2.6, shaker: 1.4, rim: 1.45, hat: 2.2, swish: 1.1, tom: 1.1, clap: 2.2, ride: 1.6 };
+// The tom, clap, ride, crash and bell (added later) are set by ear against those.
+const GAIN = { kick: 1.3, brush: 2.6, shaker: 1.4, rim: 1.45, hat: 2.2, swish: 1.1, tom: 1.1, clap: 2.2, ride: 1.6, crash: 1.7, bell: 2 };
 
 // Where each drum sits, -1 (left) .. 1 (right).
-const PAN = { kick: 0, brush: -0.1, shaker: 0.3, rim: -0.25, hat: 0.2, swish: -0.15, tom: 0.15, clap: 0.05, ride: -0.3 };
+const PAN = { kick: 0, brush: -0.1, shaker: 0.3, rim: -0.25, hat: 0.2, swish: -0.15, tom: 0.15, clap: 0.05, ride: -0.3, crash: 0.25, bell: -0.2 };
 
 // White noise, the same every time (renders are reproducible).
 const noiseBuffers = new WeakMap();
@@ -209,6 +209,49 @@ const HITS = {
             return osc;
         });
         return [src, ...partials];
+    },
+    // A soft crash: a wash of high noise swelling in a little, with inharmonic
+    // partials ringing under it; long, and darker as it dies.
+    crash(kit, { t, v, x, bright, long, out }) {
+        const { AC } = kit;
+        const decay = 2.2 * long * (1 + 0.2 * x);
+        const src = kit.noise(t, decay + 0.1);
+        const band = AC.createBiquadFilter();
+        band.type = 'bandpass';
+        band.frequency.setValueAtTime(Math.min(15000, 6500 * bright * Math.pow(2, 0.2 * x)), t);
+        band.frequency.exponentialRampToValueAtTime(Math.min(15000, 3500 * bright), t + decay);
+        band.Q.value = 0.5;
+        src.connect(band).connect(envelope(AC, t, 0.1 * v, 0.012, decay)).connect(out);
+        const partials = [2300, 3410, 4870, 6260].map((freq) => {
+            const osc = AC.createOscillator();
+            osc.frequency.value = freq * Math.pow(bright, 0.3) * (1 + 0.02 * x);
+            osc.connect(envelope(AC, t, 0.01 * v, 0.01, decay * 0.7)).connect(out);
+            osc.start(t);
+            osc.stop(t + decay + 0.1);
+            return osc;
+        });
+        return [src, ...partials];
+    },
+    // A ride bell: a clear, short "ting" of inharmonic partials with a
+    // breath of noise at the start.
+    bell(kit, { t, v, x, bright, long, out }) {
+        const { AC } = kit;
+        const pitch = Math.pow(bright, 0.5) * Math.pow(2, 0.15 * x);
+        const decay = 0.9 * long;
+        const partials = [[1, 0.1, 1], [1.504, 0.06, 0.7], [2.46, 0.04, 0.45], [3.62, 0.02, 0.3]].map(([ratio, level, length]) => {
+            const osc = AC.createOscillator();
+            osc.frequency.value = 1650 * ratio * pitch;
+            osc.connect(envelope(AC, t, level * v, 0.001, decay * length)).connect(out);
+            osc.start(t);
+            osc.stop(t + decay * length + 0.05);
+            return osc;
+        });
+        const tick = kit.noise(t, 0.05);
+        const high = AC.createBiquadFilter();
+        high.type = 'highpass';
+        high.frequency.value = Math.min(16000, 6000 * bright);
+        tick.connect(high).connect(envelope(AC, t, 0.04 * v, 0.001, 0.03)).connect(out);
+        return [tick, ...partials];
     },
 };
 

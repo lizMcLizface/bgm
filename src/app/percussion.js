@@ -17,6 +17,10 @@
 // bar: the hats may move to the ride or a shaker and the backbeat to a
 // clap or a rim, every second bar may get a twist (an extra kick, a moved
 // one, an open accent at its end), and a phrase may open on a ride swell.
+//
+// *Sprinkle* scatters colour over any groove: a crash where a section
+// begins, now and then a bell or a ride tap on an off-beat, a little tom
+// pickup. It draws from a stream of its own, so it never moves the rest.
 
 import { seeded, chance, normal } from './random';
 import { groupStarts, beatStarts } from './meter';
@@ -24,15 +28,15 @@ import { groupStarts, beatStarts } from './meter';
 /** The drums, by the index an event carries as its `midi`. */
 // Append only: an event's drum is its index here (and links store the kit
 // in this order).
-export const DRUMS = ['kick', 'brush', 'shaker', 'rim', 'hat', 'swish', 'tom', 'clap', 'ride'];
+export const DRUMS = ['kick', 'brush', 'shaker', 'rim', 'hat', 'swish', 'tom', 'clap', 'ride', 'crash', 'bell'];
 export const DRUM_LABELS = {
     kick: 'Felt kick', brush: 'Brush tap', shaker: 'Shaker', rim: 'Rim click', hat: 'Soft hat', swish: 'Brush swish',
-    tom: 'Felt tom', clap: 'Soft clap', ride: 'Soft ride',
+    tom: 'Felt tom', clap: 'Soft clap', ride: 'Soft ride', crash: 'Soft crash', bell: 'Ride bell',
 };
 const DRUM = Object.fromEntries(DRUMS.map((name, i) => [name, i]));
 
 export const DRUM_STYLES = { off: 'Off', heartbeat: 'Heartbeat', brushes: 'Brushes', lofi: 'Lo-fi beat', shaker: 'Shaker', downtempo: 'Downtempo' };
-export const DEFAULT_DRUMS = { style: 'off', activity: 0.5, variation: 0.5 };
+export const DEFAULT_DRUMS = { style: 'off', activity: 0.5, variation: 0.5, sprinkle: 0.35 };
 
 // The kit's sound (engine/drumKit.js), per drum: on, level (1 = as made),
 // tone (-1 dark .. 1 bright), decay (x length); and the room's reverb.
@@ -285,6 +289,27 @@ function twistBar(twist, g, events, hit) {
     }
 }
 
+// Colour scattered over the bar (see the top): a crash where a section
+// begins and, rarely, on a phrase's first bar; otherwise now and then one
+// of a bell, a ride tap or a falling tom pickup.
+function sprinkle({ g, amount, activity, atSectionStart, index, rng, hit }) {
+    if (atSectionStart && chance(rng, 0.3 + amount * 0.6)) {
+        hit('crash', g.first, 0.5, 1, (rng() * 2 - 1) * 0.6);
+        return;
+    }
+    if (!chance(rng, amount * (0.12 + activity * 0.25))) return;
+    const pick = rng();
+    const away = g.offbeats.length ? g.offbeats : g.grid.slice(1);
+    const at = away[Math.floor(rng() * away.length)];
+    if (index === 0 && pick < 0.2) hit('crash', g.first, 0.3, 1, (rng() * 2 - 1) * 0.6);
+    else if (pick < 0.55) hit('bell', at, 0.2 + rng() * 0.14, 0.5, rng() * 2 - 1);
+    else if (pick < 0.75) hit('ride', at, 0.2 + rng() * 0.1, 0.25, rng() * 2 - 1);
+    else {
+        const last = g.grid.slice(-2);
+        last.forEach((beat, i) => hit('tom', beat, 0.26 + i * 0.06, 0.25, -0.2 - 0.5 * i));
+    }
+}
+
 // --- streams --------------------------------------------------------------
 // Per bar, per phrase and per groove: streams of their own, from the
 // piece's seed.
@@ -356,6 +381,17 @@ export function drumBar({ bar, meter, drums, section, sectionsMode, sectionBars 
     if (level >= 2 && phraseEnds && chance(rng, 0.15 + activity * 0.35 + variation * 0.15)) {
         fill(g, sectionEnds, rng, hit);
     }
+    if (level >= 2 && drums.sprinkle > 0) {
+        sprinkle({
+            g,
+            amount: drums.sprinkle,
+            activity,
+            atSectionStart: bar > 0 && (section ? bar === section.start : bar % GROOVE_BARS === 0),
+            index,
+            rng: stream(0x1f83d9ab, seed, bar),
+            hit,
+        });
+    }
     return events;
 }
 
@@ -373,7 +409,7 @@ export function loosenDrums(events, { timing, velocity }, unitSeconds, seed, bar
 }
 
 /** A few hits for an audition (the kit on its own while stopped). */
-export const auditionHits = () => ['kick', 'hat', 'brush', 'shaker', 'rim', 'clap', 'tom', 'ride', 'swish'].map((drum, i) => ({ midi: DRUM[drum], beat: i * 0.5, velocity: 0.6, detune: 0 }));
+export const auditionHits = () => ['kick', 'hat', 'brush', 'shaker', 'rim', 'clap', 'tom', 'ride', 'bell', 'crash', 'swish'].map((drum, i) => ({ midi: DRUM[drum], beat: i * 0.5, velocity: 0.6, detune: 0 }));
 
 /** Random drum settings: a style, activity and variation. */
 export function randomDrums(rng = Math.random) {
@@ -382,5 +418,6 @@ export function randomDrums(rng = Math.random) {
         style: styles[Math.floor(rng() * styles.length)],
         activity: Math.round((0.2 + rng() * 0.6) * 20) / 20,
         variation: Math.round((0.2 + rng() * 0.7) * 20) / 20,
+        sprinkle: Math.round((0.1 + rng() * 0.6) * 20) / 20,
     };
 }

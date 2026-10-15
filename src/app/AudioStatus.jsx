@@ -83,7 +83,7 @@ export function useDismiss(menu) {
  * The ⚙ menu. onReload returns false when a buffer change's reload was
  * cancelled.
  */
-export const SettingsMenu = ({ generator, onReload, link, saving, phrase, children }) => {
+export const SettingsMenu = ({ generator, onReload, link, saving, phrase, onTour, children }) => {
     const [, refresh] = useState(0);
     const [quickStop, setQuickStop] = useState(() => readPref(QUICK_STOP_KEY, true));
     const [theme, setTheme] = useState(storedTheme);
@@ -154,6 +154,12 @@ export const SettingsMenu = ({ generator, onReload, link, saving, phrase, childr
                     </select>
                 </label>
                 </section>
+                {onTour && (
+                    <section className="gen-menu-section">
+                        <h3>Help</h3>
+                        <button type="button" className="gen-menu-wide" onClick={() => { menu.current.open = false; onTour(); }}>Take the tour</button>
+                    </section>
+                )}
             </div>
         </details>
     );

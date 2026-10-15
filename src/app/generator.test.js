@@ -18,6 +18,14 @@ vi.mock('../audio/context', () => ({
             };
             return { connect: () => {}, gain };
         },
+        createConstantSource: () => ({ connect: () => {}, disconnect: () => {}, start: () => {}, stop: () => {}, offset: { value: 0, setTargetAtTime() {} } }),
+        createChannelSplitter: () => ({ connect: () => {}, disconnect: () => {} }),
+        createChannelMerger: () => ({ connect: () => {}, disconnect: () => {} }),
+        createWaveShaper: () => ({ connect: () => {}, disconnect: () => {} }),
+        createPeriodicWave: () => ({}),
+        createOscillator: () => ({
+            connect: () => {}, disconnect: () => {}, start: () => {}, stop: () => {}, setPeriodicWave: () => {}, frequency: { value: 0 },
+        }),
         createBiquadFilter: () => {
             const param = () => ({ value: 0, setTargetAtTime() {}, setValueAtTime() {}, cancelScheduledValues() {} });
             return { connect: () => {}, frequency: param(), Q: param() };

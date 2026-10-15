@@ -12,6 +12,7 @@ import { CHROMATIC } from '../../theory/notes';
 import PRESET_DEFAULTS from './presetDefaults';
 import { gainEnvelopePoints, filterEnvelopeEvents, releasePoints, cancelAndHold } from './envelope';
 import { minTime } from '../../util/util';
+import { wanderLfo } from './wander';
 
 // A held note is booked as if it lasted this long; its release replaces
 // the tail when the key comes up.
@@ -173,6 +174,15 @@ class Instrument {
         this.filterLfo.connect(this.filterLfoDepth);
         this.filterLfo.start();
         this.filterLfoConnected = false;
+        // Slow wander (wander.js) in cents on the voices' cutoff and pitch;
+        // each wave is made, and wired, only once it has depth.
+        this.wanderLfos = {};
+        this.filterWanderConnected = false;
+        this.filterWanderOn = false;
+        this.pitchWanderOn = false;
+        this.pitchWanderOut = this.AC.createGain();
+        // What the voices wire to their oscillators' detune: the vibrato and the pitch wander.
+        this.pitchTap = { connect: (destination) => { this.vibrato.connect(destination); this.pitchWanderOut.connect(destination); } };
 
         // Same order as PolySynth's initSynth. Each effect sits between its
         // own input/output gain nodes, so the chain can route around it.
@@ -193,7 +203,7 @@ class Instrument {
         this.voices = Array.from({ length: polyphony }, () => {
             const synth = new MonoSynth(this.AC);
             // Voices start asleep (disconnected); see wake()/sleepIdle().
-            synth.connectVibratoToAll(this.vibrato);
+            synth.connectVibratoToAll(this.pitchTap);
             synth.init(startTime);
             // Auto-resync recreates oscillators after 5s without noteOn
             // activity - a scheduleNote()d pad would trip it mid-note.
@@ -286,10 +296,14 @@ class Instrument {
 
     // Vibrato is wired to the oscillators only while it has depth: an
     // oscillator with its detune connected costs several times more.
-    setVibratoConnected(connected) {
+    setVibratoConnected(wanted) {
+        const connected = wanted || this.pitchWanderOn;
         if (connected === this.vibratoConnected) return;
         this.vibratoConnected = connected;
-        if (!connected) this.vibrato.getDepthNode().disconnect();
+        if (!connected) {
+            this.vibrato.getDepthNode().disconnect();
+            this.pitchWanderOut.disconnect();
+        }
         this.voices.forEach((synth) => synth.setVibratoEnabled(connected));
     }
 
@@ -303,6 +317,54 @@ class Instrument {
             if (connected) this.filterLfoDepth.connect(detune);
             else this.filterLfoDepth.disconnect(detune);
         });
+    }
+
+    // Wires the wander in cents to every voice's cutoff, like the filter LFO.
+    setFilterWanderConnected(connected) {
+        if (connected === this.filterWanderConnected) return;
+        this.filterWanderConnected = connected;
+        const depth = this.wanderLfos.filter.depth;
+        this.voices.forEach((synth) => {
+            const detune = synth.filter.getNode().detune;
+            if (connected) depth.connect(detune);
+            else depth.disconnect(detune);
+        });
+    }
+
+    /**
+     * Slow drift of the cutoff and the pitch (wander.js instrumentWander):
+     * +- `filter` / `pitch` cents on waves of `periods`, from `phases`
+     * (`offset` seconds into them, and `immediate`: no easing in, for
+     * renders). 0 stops a movement.
+     */
+    setWander({ filter = 0, pitch = 0, periods, phases, offset = 0, immediate = false }) {
+        const now = this.AC.currentTime;
+        [['filter', filter], ['pitch', pitch]].forEach(([kind, cents]) => {
+            let lfo = this.wanderLfos[kind];
+            if (!lfo) {
+                if (!cents) return;
+                lfo = wanderLfo(this.AC, { period: periods[kind], phase: phases[kind], offset });
+                this.wanderLfos[kind] = lfo;
+                if (kind === 'pitch') lfo.depth.connect(this.pitchWanderOut);
+            }
+            lfo.setPeriod(periods[kind]);
+            if (immediate) lfo.depth.gain.value = cents;
+            else lfo.depth.gain.setTargetAtTime(cents, now, 0.3);
+        });
+        this.filterWanderOn = filter > 0;
+        this.pitchWanderOn = pitch > 0;
+        if (this.filterWanderOn) this.setFilterWanderConnected(true);
+        if (this.pitchWanderOn) this.setVibratoConnected(this.preset.vibratoDepth > 0);
+        if ((this.wanderLfos.filter && !filter) || (this.wanderLfos.pitch && !pitch)) this.unwireWanderSoon();
+    }
+
+    // Once a stopped movement has eased out, unwires it (a wired detune costs).
+    unwireWanderSoon() {
+        clearTimeout(this.wanderTimer);
+        this.wanderTimer = setTimeout(() => {
+            if (!this.filterWanderOn && this.wanderLfos.filter) this.setFilterWanderConnected(false);
+            if (!this.pitchWanderOn) this.setVibratoConnected(this.preset.vibratoDepth > 0);
+        }, 1500);
     }
 
     updateFm() {
@@ -572,6 +634,8 @@ class Instrument {
 
     dispose() {
         if (this.sleepTimer) clearTimeout(this.sleepTimer);
+        clearTimeout(this.wanderTimer);
+        Object.values(this.wanderLfos).forEach((lfo) => lfo.dispose());
         this.silence();
         this.voices.forEach((synth) => synth.destroy());
         this.output.disconnect();

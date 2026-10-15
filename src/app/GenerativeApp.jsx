@@ -34,6 +34,8 @@ import { levelPreset } from './engine/loudness';
 import { addGeneratedPreset, generatedInfo } from './editor/presetStore';
 import { readPref, writePref } from './prefs';
 import { seedToPhrase, phraseToSeed } from './phrase';
+import { WANDER_ROLES, WANDER_LIMITS } from './engine/wander';
+import Tour, { tourSeen } from './Tour';
 
 // One Generator for the page's lifetime; StrictMode's double-mount must
 // not build a second set of instruments.
@@ -43,11 +45,13 @@ import { seedToPhrase, phraseToSeed } from './phrase';
 let generator = null;
 let linkedSounds = [];
 let linkedPhrase = null;
+let openedFromLink = false;
 const getGenerator = () => {
     if (!generator) {
         const share = shareFromLocation(window.location);
         generator = new Generator(share ? share.settings : defaultSettings());
         if (share && share.phrase) linkedPhrase = share.phrase;
+        openedFromLink = Boolean(share);
         if (share) {
             Object.entries(share.presets).forEach(([role, preset]) => {
                 if (preset.generated) linkedSounds.push({ target: role, info: preset.generated });
@@ -152,7 +156,7 @@ const DiceButton = ({ label, onClick, className = '' }) => (
 const Panel = ({ id, title, heading, onRandom, more, className = '', children }) => {
     const [open, setOpen] = useStoredFlag(`bgm-more-${id}`, false);
     return (
-        <section className={`gen-panel ${className}`}>
+        <section className={`gen-panel ${className}`} data-tour={id}>
             <h2 className="gen-panel-title">
                 {heading || title}
                 {onRandom && <DiceButton label={title} onClick={onRandom} className="gen-panel-dice" />}
@@ -186,11 +190,10 @@ const Randomizer = ({ level, onLevel: setLevel, onRandomize, onNewVariation }) =
             ))}
             <label className="gen-random-level">
                 <span>How</span>
-                <select value={level} onChange={(e) => setLevel(e.target.value)} aria-describedby="gen-random-hint">
+                <select value={level} title={RANDOM_LEVEL_HINTS[level]} onChange={(e) => setLevel(e.target.value)}>
                     {Object.entries(RANDOM_LEVELS).map(([id, label]) => <option key={id} value={id}>{label}</option>)}
                 </select>
             </label>
-            <small id="gen-random-hint" className="gen-random-hint">{RANDOM_LEVEL_HINTS[level]}</small>
         </div>
     </section>
 );
@@ -595,6 +598,52 @@ const FeelPanel = ({ humanize, swing, update, onRandomHumanize, onRandom }) => (
     </Panel>
 );
 
+// Wander (engine/wander.js): each voice's pan, volume, filter and pitch
+// drift on slow waves, a minute or so a round, instead of jumping at
+// progression changes. The pan range is shared; each voice has a switch.
+const WANDER_LABELS = { lead: 'Lead', counter: 'Second lead', pad: 'Rhythm / pad', bass: 'Bass / support', perc: 'Percussion' };
+const panText = (v) => (Math.abs(v) < 0.025 ? 'centre' : `${v < 0 ? 'left' : 'right'} ${Math.round(Math.abs(v) * 100)}%`);
+const WanderPanel = ({ wander, shown, update }) => {
+    const set = (patch) => update('wander', { ...wander, ...patch });
+    const { pan } = wander;
+    return (
+        <Panel id="wander" title="Wander">
+            <Field label={`Round takes ${wander.period < 90 ? `${wander.period} s` : `${(wander.period / 60).toFixed(1)} min`}`}>
+                <input type="range" {...WANDER_LIMITS.period} value={wander.period}
+                    title="Roughly how long a voice takes to drift out and back; each voice and each kind of drift runs a little differently"
+                    onChange={(e) => set({ period: Number(e.target.value) })} />
+            </Field>
+            <Field label={`Pan from ${panText(pan.min)}`}>
+                <input type="range" min={-1} max={1} step={WANDER_LIMITS.pan.step} value={pan.min}
+                    onChange={(e) => { const min = Number(e.target.value); set({ pan: { min, max: Math.max(min, pan.max) } }); }} />
+            </Field>
+            <Field label={`Pan to ${panText(pan.max)}`}>
+                <input type="range" min={-1} max={1} step={WANDER_LIMITS.pan.step} value={pan.max}
+                    onChange={(e) => { const max = Number(e.target.value); set({ pan: { min: Math.min(max, pan.min), max } }); }} />
+            </Field>
+            <Field label={`Volume ± ${pct(wander.volume)}`}>
+                <input type="range" {...WANDER_LIMITS.volume} value={wander.volume} onChange={(e) => set({ volume: Number(e.target.value) })} />
+            </Field>
+            <Field label={`Filter ± ${wander.filter.toFixed(2)} octaves`}>
+                <input type="range" {...WANDER_LIMITS.filter} value={wander.filter} onChange={(e) => set({ filter: Number(e.target.value) })} />
+            </Field>
+            <Field label={`Pitch ± ${wander.pitch} cents`}>
+                <input type="range" {...WANDER_LIMITS.pitch} value={wander.pitch} onChange={(e) => set({ pitch: Number(e.target.value) })} />
+            </Field>
+            <fieldset className="gen-weights">
+                <legend>Voices that wander</legend>
+                {WANDER_ROLES.filter((role) => shown.includes(role)).map((role) => (
+                    <label key={role} className="gen-check">
+                        <input type="checkbox" checked={wander.voices[role]}
+                            onChange={(e) => set({ voices: { ...wander.voices, [role]: e.target.checked } })} />
+                        {WANDER_LABELS[role]}
+                    </label>
+                ))}
+            </fieldset>
+        </Panel>
+    );
+};
+
 // Percussion (percussion.js, engine/drumKit.js): what plays - style,
 // activity, variation - and its level; under More options the room and
 // each drum's sound (on, level, tone, length).
@@ -658,6 +707,11 @@ const PercussionPanel = ({ drums, kit, volume, mix, armed, onArm, onDrums, onKit
                     title="How much the grooves change from phrase to phrase and the hits from one to the next (0: the same every bar)"
                     onChange={(e) => onDrums({ ...drums, variation: Number(e.target.value) })} />
             </Field>
+            <Field label={`Sprinkle ${pct(drums.sprinkle)}`}>
+                <input type="range" min="0" max="1" step="0.05" value={drums.sprinkle} disabled={!on}
+                    title="Crashes where sections begin, and now and then a bell, ride or tom pickup, scattered over any groove"
+                    onChange={(e) => onDrums({ ...drums, sprinkle: Number(e.target.value) })} />
+            </Field>
             <div className="gen-field">
                 <button type="button" className="gen-keys-button" onClick={onAudition}>Hear the kit</button>
                 {armed && <small>Keys {DRUM_KEY_HINT}</small>}
@@ -671,7 +725,7 @@ const PercussionPanel = ({ drums, kit, volume, mix, armed, onArm, onDrums, onKit
 // else is changed.
 const ScenePicker = ({ value, onPick }) => (
     <label className="gen-sleep gen-scene" title="Start from a preset: key, scale, feel, drums, ambience and sounds together">
-        <span className="gen-audio-label">Preset</span>
+        <span className="gen-audio-label gen-visually-hidden">Preset</span>
         <select value={value} aria-label="Preset"
             onChange={(e) => onPick(SCENES.find((s) => s.name === e.target.value))}>
             <option value="" disabled>Pick a preset…</option>
@@ -722,6 +776,14 @@ const GenerativeApp = () => {
         if (patch.mute !== undefined) setSettings((s) => ({ ...s, muted: { ...gen.settings.muted } }));
     };
     const [editorOpen, setEditorOpen] = useState(false);
+    // The guided tour opens by itself on a first visit (not from a shared link), and from the ⚙ menu.
+    const [tourOpen, setTourOpen] = useState(false);
+    const [helpOpen, setHelpOpen] = useState(false);
+    useEffect(() => {
+        if (tourSeen() || openedFromLink) return undefined;
+        const timer = setTimeout(() => setTourOpen(true), 800);
+        return () => clearTimeout(timer);
+    }, []);
     const editorRef = useRef(null);
     const editSound = (role) => {
         setEditorRole(role);
@@ -957,8 +1019,10 @@ const GenerativeApp = () => {
                 <ScenePicker value={scene} onPick={applyScene} />
                 {sleepLeft && <span className="gen-sleep gen-sleep-left" role="timer" title="Sleep timer (in the ⚙ menu)">Sleep {sleepLeft}</span>}
                 <div className="gen-header-tools">
+                    <button type="button" className="gen-help" onClick={() => setHelpOpen(true)} title="Quick reference: hover the parts of the page to see what they do"
+                        aria-label="Quick reference">?</button>
                     <MasterVolume />
-                    <SettingsMenu generator={gen} onReload={reloadKeepingSettings} link={() => shareUrl(gen.settings, linkPresets)} saving={saving}
+                    <SettingsMenu generator={gen} onReload={reloadKeepingSettings} link={() => shareUrl(gen.settings, linkPresets)} saving={saving} onTour={() => setTourOpen(true)}
                         phrase={<PhraseField seed={settings.seed} edited={gen.editedSinceStart} onApply={playPhrase} onRoll={newVariation} initial={linkedPhrase} />}>
                         <SleepTimer generator={gen} running={anyOn} onLeft={setSleepLeft} />
                         <Recorder generator={gen} fileName={fileName} onProgress={setSaving} />
@@ -1076,6 +1140,9 @@ const GenerativeApp = () => {
                     update('swing', randomSwing(randomLevel));
                 }} />
 
+            <WanderPanel wander={settings.wander} update={update}
+                shown={[...Object.keys(shownRoles), ...(drumsOn ? ['perc'] : [])]} />
+
             <AmbiencePanel levels={settings.ambience} shape={settings.ambienceShape} onShape={(s) => update('ambienceShape', s)}
                 volume={settings.ambienceVolume} on={settings.playAmbience}
                 onChange={changeAmbience} onVolume={(v) => update('ambienceVolume', v)} onToggle={() => togglePart('playAmbience')}
@@ -1153,6 +1220,9 @@ const GenerativeApp = () => {
                 onToggle={() => setEditorOpen((o) => !o)}
                 sectionRef={editorRef}
             />
+
+            {tourOpen && <Tour onClose={() => setTourOpen(false)} />}
+            {helpOpen && <Tour reference onClose={() => setHelpOpen(false)} />}
 
             <footer className="gen-footer">
                 <p className="gen-footer-links">

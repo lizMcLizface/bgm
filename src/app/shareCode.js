@@ -31,6 +31,7 @@ import { SEED_BITS as SOUND_SEED_BITS } from './soundGen';
 import { GENERATOR_V2, KIND_CODES } from './soundGenV2';
 import PROGRESSIONS from './progressions';
 import { DRUM_STYLES, DRUMS, DRUM_PARAMS } from './percussion';
+import { WANDER_ROLES, WANDER_LIMITS } from './engine/wander';
 
 export const CODE_VERSION = 1;
 const VERSION_BITS = 4;
@@ -212,6 +213,7 @@ const MUSIC_GROUPS = [
         [['padMotion', 'fast'], chance],
         [['padMotion', 'swell'], stepped(0, 0.2, 0.01)],
     ],
+    [[['drums', 'sprinkle'], chance]], // colour scattered over the drums
 ];
 const VOICE_GROUPS = [
     [...voice('pad'), ...voice('bass'), ...voice('lead'), ...voice('counter'), field(GROUPS, ['padNotes'])],
@@ -231,6 +233,15 @@ const VOICE_LATER_GROUPS = [
     // muted voices (solo isn't kept)
     [...CODE_ROLES, 'perc'].map((role) => [['muted', role], bool]),
     ...DRUMS.slice(6).map(drumGroup),
+    [ // slow wander (engine/wander.js)
+        [['wander', 'period'], stepped(WANDER_LIMITS.period.min, WANDER_LIMITS.period.max, WANDER_LIMITS.period.step)],
+        [['wander', 'pan', 'min'], stepped(-1, 1, WANDER_LIMITS.pan.step)],
+        [['wander', 'pan', 'max'], stepped(-1, 1, WANDER_LIMITS.pan.step)],
+        [['wander', 'volume'], stepped(WANDER_LIMITS.volume.min, WANDER_LIMITS.volume.max, WANDER_LIMITS.volume.step)],
+        [['wander', 'filter'], stepped(WANDER_LIMITS.filter.min, WANDER_LIMITS.filter.max, WANDER_LIMITS.filter.step)],
+        [['wander', 'pitch'], stepped(WANDER_LIMITS.pitch.min, WANDER_LIMITS.pitch.max, WANDER_LIMITS.pitch.step)],
+        ...WANDER_ROLES.map((role) => [['wander', 'voices', role], bool]),
+    ],
 ];
 const shapeCodec = (key, spec) => {
     if (key === 'pan') return stepped(-1, 1, 0.1);

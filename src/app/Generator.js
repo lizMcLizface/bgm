@@ -26,6 +26,7 @@ import Instrument from './engine/Instrument';
 import DrumKit from './engine/drumKit';
 import Ambience from './engine/ambience';
 import Transport from './engine/transport';
+import { RoleWander, instrumentWander } from './engine/wander';
 import { scaleById, scaleSemitones, spellScale, romanDegree, diatonicChord, chordSymbol, displayNumeral, noteAtOrAbove, voiceLead } from './theory';
 import { arrangeBar, notesInRange } from './arranger';
 import { nextMusic, glideTempo, scaleDistance } from './conductor';
@@ -52,7 +53,7 @@ const HISTORY_BARS = 512;
 // Settings that define "home"; changing one resets drift to it.
 const HOME_KEYS = new Set(['tonic', 'mode', 'progression', 'bpm', 'barsPerChord']);
 // Settings that don't change what is planned.
-const SOUND_KEYS = new Set(['ambience', 'ambienceShape', 'ambienceVolume', 'playMusic', 'playAmbience', 'volumes', 'drumKit', 'muted']);
+const SOUND_KEYS = new Set(['ambience', 'ambienceShape', 'ambienceVolume', 'playMusic', 'playAmbience', 'volumes', 'drumKit', 'muted', 'wander']);
 
 // Ambience volume slider (0..1) to gain: 0.8, the default, is unity.
 const ambienceGain = (volume) => Math.pow(volume / 0.8, 2);
@@ -109,8 +110,10 @@ class Generator {
             tone.Q.value = 0.5;
             instrument.connect(tone);
             tone.connect(gain);
-            gain.connect(this.output);
-            this.roles[role] = { instrument, gain, tone, presetName: preset, edited: false, volume, mute: false, solo: false };
+            const wander = new RoleWander(this.AC, role);
+            gain.connect(wander.input);
+            wander.output.connect(this.output);
+            this.roles[role] = { instrument, gain, tone, wander, presetName: preset, edited: false, volume, mute: false, solo: false };
         });
         {
             const volume = (this.settings.volumes && this.settings.volumes.perc) ?? ROLE_VOLUMES.perc;
@@ -118,13 +121,16 @@ class Generator {
             const gain = this.AC.createGain();
             gain.gain.value = volume;
             instrument.connect(gain);
-            gain.connect(this.output);
+            const wander = new RoleWander(this.AC, 'perc');
+            gain.connect(wander.input);
+            wander.output.connect(this.output);
             instrument.setKit(this.settings.drumKit);
-            this.roles.perc = { instrument, gain, presetName: null, edited: false, volume, mute: false, solo: false, drums: true };
+            this.roles.perc = { instrument, gain, wander, presetName: null, edited: false, volume, mute: false, solo: false, drums: true };
         }
         // mutes are settings (they persist and travel in links); solo is not
         Object.entries(this.roles).forEach(([role, r]) => { r.mute = Boolean(this.settings.muted && this.settings.muted[role]); });
         this.applyMix();
+        this.applyWander();
         this.toneNow = null;
 
         this.transport = new Transport({
@@ -418,6 +424,7 @@ class Generator {
         if (key === 'volumes') this.applyVolumes();
         if (key === 'drumKit') this.roles.perc.instrument.setKit(value);
         if (key === 'muted') this.applyMutes();
+        if (key === 'wander') this.applyWander();
         if (SOUND_KEYS.has(key)) return;
         this.replan([key]);
     }
@@ -459,6 +466,7 @@ class Generator {
         if ('volumes' in patch) this.applyVolumes();
         if ('drumKit' in patch) this.roles.perc.instrument.setKit(this.settings.drumKit);
         if ('muted' in patch) this.applyMutes();
+        if ('wander' in patch) this.applyWander();
         if (Object.keys(patch).every((key) => SOUND_KEYS.has(key))) return;
         this.replan(Object.keys(patch), meterChanged);
     }
@@ -560,6 +568,15 @@ class Generator {
         }
         if (solo !== undefined) r.solo = solo;
         this.applyMix();
+    }
+
+    // Slow pan / volume wander on each role's output, filter and pitch on its sound (engine/wander.js).
+    applyWander() {
+        const { wander } = this.settings;
+        Object.entries(this.roles).forEach(([role, r]) => {
+            r.wander.apply(wander);
+            if (r.instrument.setWander) r.instrument.setWander(instrumentWander(wander, role));
+        });
     }
 
     applyMutes() {

@@ -50,3 +50,41 @@ test('fills may fall down the toms', () => {
     expect(toms.length).toBeGreaterThan(4);
     toms.forEach((e) => expect(Math.abs(e.detune)).toBeLessThanOrEqual(1));
 });
+
+describe('sprinkle', () => {
+    const run = (sprinkle, count = 128) => Array.from({ length: count }, (_, bar) => {
+        const section = { type: 'full', start: bar - (bar % 16) };
+        return drumBar({
+            bar, meter: METERS['4/4'], drums: { style: 'lofi', activity: 0.6, variation: 0.5, sprinkle }, section, sectionsMode: 'gentle', sectionBars: 16, phraseStart: bar - (bar % 4), seed: 7,
+        });
+    });
+    const named = (bar) => bar.map((e) => DRUMS[e.midi]);
+
+    test('at 0 nothing is added; the groove is the same with or without it', () => {
+        const plain = run(0);
+        expect(plain.flat().some((e) => ['crash', 'bell'].includes(DRUMS[e.midi]))).toBe(false);
+        const sprinkled = run(0.8);
+        sprinkled.forEach((bar, i) => {
+            const rest = bar.filter((e) => !['crash', 'bell'].includes(DRUMS[e.midi]));
+            expect(rest.length).toBeGreaterThanOrEqual(plain[i].length);
+            plain[i].forEach((e) => expect(bar).toContainEqual(e));
+        });
+    });
+
+    test('a crash where a section begins, bells and rides on off-beats elsewhere', () => {
+        const bars16 = run(1);
+        const starts = bars16.filter((_, bar) => bar > 0 && bar % 16 === 0);
+        expect(starts.filter((bar) => named(bar).includes('crash')).length).toBeGreaterThanOrEqual(5);
+        starts.forEach((bar) => bar.filter((e) => DRUMS[e.midi] === 'crash').forEach((e) => expect(e.beat).toBe(0)));
+        expect(bars16.flat().filter((e) => DRUMS[e.midi] === 'bell').length).toBeGreaterThan(3);
+    });
+
+    test('more sprinkle, more colour; none in an intro', () => {
+        const count = (amount) => run(amount).flat().filter((e) => ['crash', 'bell'].includes(DRUMS[e.midi])).length;
+        expect(count(1)).toBeGreaterThan(count(0.2));
+        const intro = Array.from({ length: 32 }, (_, bar) => drumBar({
+            bar, meter: METERS['4/4'], drums: { style: 'lofi', activity: 1, variation: 1, sprinkle: 1 }, section: { type: 'intro', start: 0 }, sectionsMode: 'strong', phraseStart: bar - (bar % 4), seed: 7,
+        }));
+        expect(intro.flat()).toHaveLength(0);
+    });
+});

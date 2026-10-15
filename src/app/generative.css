@@ -76,7 +76,7 @@ body {
 .gen-header {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
     flex-wrap: wrap;
 }
 
@@ -861,7 +861,7 @@ body {
 }
 
 .gen-volume input {
-    width: 90px;
+    width: 80px;
 }
 
 /* ⚙ menu: buffer size, quick stop, theme. */
@@ -1176,6 +1176,10 @@ body {
 .gen-randomize {
     display: grid;
     gap: 10px;
+    background: var(--gen-surface);
+    border: 1px solid var(--gen-border);
+    border-radius: 8px;
+    padding: 12px 16px;
 }
 
 .gen-randomize-row {
@@ -1232,4 +1236,136 @@ body {
 
 .gen-sounds .gen-phrase {
     flex: 1 1 320px;
+}
+
+/* Guided tour (Tour.jsx): every part framed faintly, the current one
+   brightly with the rest of the page dimmed, and a card that says what it
+   is. The overlay itself lets everything else through. */
+.gen-tour {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+}
+
+.gen button.gen-tour-frame {
+    position: fixed;
+    padding: 0;
+    border: 2px dashed color-mix(in srgb, var(--gen-accent) 55%, transparent);
+    border-radius: 10px;
+    background: transparent;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.gen button.gen-tour-frame:hover:not(:disabled),
+.gen button.gen-tour-frame.is-hovered {
+    border: 3px solid var(--gen-accent);
+    background: color-mix(in srgb, var(--gen-accent) 10%, transparent);
+}
+
+.gen button.gen-tour-frame.is-current {
+    border: 3px solid var(--gen-accent);
+    background: transparent;
+    cursor: default;
+    box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.5), 0 0 16px 2px var(--gen-accent);
+}
+
+.gen-tour-card {
+    position: fixed;
+    max-width: calc(100vw - 24px);
+    padding: 14px 16px;
+    background: var(--gen-surface);
+    color: var(--gen-text);
+    border: 2px solid var(--gen-accent);
+    border-radius: 10px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+    pointer-events: auto;
+}
+
+.gen-tour-card.is-hover {
+    z-index: 1;
+    pointer-events: none;
+    border-style: dashed;
+}
+
+.gen-tour-card:not(.is-hover) {
+    width: 340px;
+}
+
+.gen-tour-card h3 {
+    margin: 2px 0 6px;
+    font-size: 16px;
+}
+
+.gen-tour-card p {
+    margin: 0 0 12px;
+    font-size: 14px;
+}
+
+.gen-tour-card.is-hover p {
+    margin-bottom: 6px;
+}
+
+.gen-tour-card small {
+    color: var(--gen-muted);
+}
+
+.gen-tour-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+.gen-tour-buttons span {
+    display: inline-flex;
+    gap: 8px;
+}
+
+.gen .gen-tour-buttons button {
+    padding: 6px 14px;
+}
+
+.gen .gen-tour-buttons .gen-tour-next {
+    background: var(--gen-accent);
+    color: var(--gen-accent-text);
+    border-color: var(--gen-accent);
+}
+
+.gen .gen-tour-buttons .gen-tour-skip {
+    border: 0;
+    background: none;
+    color: var(--gen-muted);
+    padding-left: 0;
+}
+
+.gen .gen-tour-buttons .gen-tour-skip:hover {
+    text-decoration: underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gen button.gen-tour-frame {
+        transition: none;
+    }
+}
+
+.gen button.gen-help {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border-radius: 50%;
+    font-weight: 600;
+}
+
+.gen-tour-reference {
+    top: auto;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto !important;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }

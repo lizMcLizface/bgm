@@ -211,7 +211,7 @@ test('swing, section tone and drums travel in links; links made before read them
         seed: 5,
         swing: 0.35,
         sectionTone: true,
-        drums: { style: 'lofi', activity: 0.7, variation: 0.85 },
+        drums: { style: 'lofi', activity: 0.7, variation: 0.85, sprinkle: 0.6 },
         drumKit: { ...kit, room: 0.3, hat: { on: false, level: 1, tone: 0, decay: 1 }, swish: { on: true, level: 1.4, tone: -0.6, decay: 1.5 } },
         muted: { ...defaultSettings().muted, bass: true, perc: true },
     };
@@ -235,7 +235,7 @@ test('pad patterns and movement, and the later drums, travel in links', () => {
         pulseWeights: { groups: 0, beats: 50, push: 100, split: 5 },
         arpWeights: { bounce: 10, up: 0, down: 80, broken: 25 },
         padMotion: { lean: 0.2, fast: 0.75, swell: 0.12 },
-        drums: { style: 'downtempo', activity: 0.4, variation: 0.9 },
+        drums: { style: 'downtempo', activity: 0.4, variation: 0.9, sprinkle: 0.2 },
     };
     settings.drumKit = { ...settings.drumKit, tom: { on: false, level: 1.5, tone: -0.3, decay: 1.2 }, ride: { ...settings.drumKit.ride, level: 0.5 } };
     const back = decodeSettings(encodeSettings(settings));

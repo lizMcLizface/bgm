@@ -11,6 +11,7 @@
 
 import Instrument from './Instrument';
 import DrumKit from './drumKit';
+import { RoleWander, instrumentWander } from './wander';
 import { OPEN_TONE, TONE_ROLES } from '../Generator';
 import Ambience from './ambience';
 import { unitsPerMinute } from '../meter';
@@ -172,7 +173,13 @@ export async function renderWav(gen, seconds, { ending = false, onProgress = () 
                 } else {
                     inst.connect(gain);
                 }
-                gain.connect(ctx.destination);
+                // slow pan / volume wander after the mixer, filter and pitch on the sound
+                // (wander.js); the render starts `from` seconds into the piece
+                const wander = new RoleWander(ctx, role, { offset: from, smooth: false });
+                wander.apply(gen.settings.wander);
+                if (inst.setWander) inst.setWander({ ...instrumentWander(gen.settings.wander, role, from), immediate: true });
+                gain.connect(wander.input);
+                wander.output.connect(ctx.destination);
                 return [role, inst];
             }));
             return { ctx, instruments };
