@@ -164,3 +164,14 @@ test('second lead, sections and ambience travel in links; old codes read them as
     expect(Object.values(decodeShare(plain).settings.ambience).every((v) => v === 0)).toBe(true);
     expect([decodeShare(plain).settings.playMusic, decodeShare(plain).settings.playAmbience]).toEqual([true, false]);
 });
+
+test('a phrase= parameter sets the seed, on a link or on the defaults', async () => {
+    const { phraseToSeed } = await import('./phrase');
+    const alone = shareFromLocation({ search: '?phrase=rainy+sunday' });
+    expect(alone.settings.seed).toBe(phraseToSeed('rainy sunday'));
+    expect(alone.phrase).toBe('rainy sunday');
+    const code = encodeSettings({ ...defaultSettings(), tonic: 4, seed: 3 });
+    const both = shareFromLocation({ search: `?${code}&phrase=amber-tide-lantern-moss` });
+    expect(both.settings.tonic).toBe(4);
+    expect(both.settings.seed).toBe(phraseToSeed('amber-tide-lantern-moss'));
+});

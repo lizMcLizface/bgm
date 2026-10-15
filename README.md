@@ -40,15 +40,18 @@ synthesised with the Web Audio API; there are no samples.
 - Save audio: renders the piece to a WAV file (1-60 min) faster than real
   time, in chunks so long files stay light on memory, with live progress,
   time left and Cancel
-- A pass-phrase per piece: the seed reads as four words
-  (`amber-tide-lantern-moss`); type those - or any words - and press Enter
-  to play that phrase's piece from the start. The same phrase and settings
-  always make the same music
+- A pass-phrase per piece (in the ⚙ menu): every visit starts with a
+  random one, which reads as four words (`amber-tide-lantern-moss`); type
+  those - or any words - and press Enter to play that phrase's piece from
+  the start. The same phrase and settings always make the same music, and
+  a link can name one: `calmbgm.com/?phrase=rainy+sunday`
 - Pause resumes at the next bar; randomizing or changing settings (time
   signature too) changes what comes next without starting over; ⏮ goes
-  back to the start, ◀ ▶ step a bar, ◀◀ ▶▶ a progression (back plays
-  exactly what was heard), and loop repeats the bar or progression playing
-  - handy for shaping sounds; Space plays /
+  back to the start, ◀ ▶ step a chord, ◀◀ ▶▶ a progression - forward
+  keeps the place within it, back goes to the start of the one playing,
+  then to the one before (and plays exactly what was heard) - and loop
+  repeats the chord or progression playing, handy for shaping sounds;
+  Space plays /
   pauses; lock-screen, notification and media-key controls
   (next / previous track = new / previous variation)
 - Drift ("evolution"): related-key and mode changes, progression changes,

@@ -83,7 +83,7 @@ export function useDismiss(menu) {
  * The ⚙ menu. onReload returns false when a buffer change's reload was
  * cancelled.
  */
-export const SettingsMenu = ({ generator, onReload, link, saving, children }) => {
+export const SettingsMenu = ({ generator, onReload, link, saving, phrase, children }) => {
     const [, refresh] = useState(0);
     const [quickStop, setQuickStop] = useState(() => readPref(QUICK_STOP_KEY, true));
     const [theme, setTheme] = useState(storedTheme);
@@ -128,6 +128,7 @@ export const SettingsMenu = ({ generator, onReload, link, saving, children }) =>
                     <button type="button" className="gen-menu-wide" onClick={copy}><LinkIcon /> Copy link to this music</button>
                     {copied && <small role="status">{copied}</small>}
                 </section>
+                {phrase}
                 {children}
                 <section className="gen-menu-section">
                     <h3>Audio</h3>

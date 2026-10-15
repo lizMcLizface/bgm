@@ -501,7 +501,8 @@ class Generator {
         }
         // in bars, each beat a share of its own bar: smooth across a time
         // signature change; then in units of the current bar
-        const bars = entry.bar + Math.min(1, (entry.beatInBar + (now - entry.time) / entry.secondsPerBeat) / entry.units);
+        // (not before the first booked beat: just after a jump it lies ahead)
+        const bars = entry.bar + Math.min(1, (entry.beatInBar + Math.max(0, now - entry.time) / entry.secondsPerBeat) / entry.units);
         return Math.max(0, bars * this.beatsPerBar);
     }
 
@@ -686,25 +687,48 @@ class Generator {
         else this.notifyRunning();
     }
 
-    /** One bar back (-1) or on (+1). */
-    stepBar(direction) {
-        return this.seek(this.hereBar + direction);
+    // The chord a bar belongs to: { start, end } (bars, end inclusive) - from
+    // the bar where it starts to the bar before the next one does.
+    chordOf(bar) {
+        this.planThrough(bar + 1);
+        let start = bar;
+        while (start > 0 && this.plan.has(start - 1) && !this.plan.get(start).chordStart) start--;
+        let end = bar;
+        for (let b = bar + 1; b < bar + 64; b++) {
+            this.planThrough(b);
+            if (this.plan.get(b).chordStart) break;
+            end = b;
+        }
+        return { start, end };
+    }
+
+    // A chord or a progression cycle around `bar`.
+    spanOf(kind, bar) {
+        return kind === 'chord' ? this.chordOf(bar) : this.cycleOf(bar);
     }
 
     /**
-     * To the next progression cycle, or back: to the start of this one -
-     * or, within its first bar, of the one before.
+     * Steps by a chord or a progression ('chord' | 'progression').
+     * Forward keeps the place within it: the second bar of a chord goes to
+     * the second bar of the next (or its last, if it is shorter). Back
+     * returns to the start of the one playing - and, from right at its
+     * start (within a beat), to the start of the one before.
      */
-    stepProgression(direction) {
-        const here = this.hereBar;
-        const { start, end } = this.cycleOf(here);
-        if (direction > 0) return this.seek(end + 1);
-        if (here > start || start === 0) return this.seek(start);
-        return this.seek(this.plan.has(start - 1) ? this.cycleOf(start - 1).start : start);
+    step(kind, direction) {
+        const position = this.position();
+        const here = Math.floor(position / this.beatsPerBar);
+        const span = this.spanOf(kind, here);
+        if (direction > 0) {
+            const next = this.spanOf(kind, span.end + 1);
+            return this.seek(Math.min(next.start + (here - span.start), next.end));
+        }
+        const intoSpan = position - span.start * this.beatsPerBar;
+        if (intoSpan > 1 || span.start <= this.earliestBar) return this.seek(span.start);
+        return this.seek(this.spanOf(kind, span.start - 1).start);
     }
 
     /**
-     * Repeats the bar - or the progression cycle - playing now: 'bar',
+     * Repeats the chord - or the progression cycle - playing now: 'chord',
      * 'progression' or 'off'. Each pass plays the same notes; after a
      * settings change the looped bars are planned again at the next pass.
      */
@@ -712,7 +736,7 @@ class Generator {
         if (mode === 'off') {
             this.loop = null;
         } else {
-            const region = mode === 'bar' ? { start: at, end: at } : this.cycleOf(at);
+            const region = this.spanOf(mode, at);
             this.planThrough(region.end + 1);
             this.loop = { mode, from: region.start, to: region.end, dirty: false };
         }

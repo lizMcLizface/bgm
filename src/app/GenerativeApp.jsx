@@ -37,10 +37,12 @@ import { seedToPhrase, phraseToSeed } from './phrase';
 // Generated sounds in a link are recreated (and levelled) after mount.
 let generator = null;
 let linkedSounds = [];
+let linkedPhrase = null;
 const getGenerator = () => {
     if (!generator) {
         const share = shareFromLocation(window.location);
         generator = new Generator(share ? share.settings : defaultSettings());
+        if (share && share.phrase) linkedPhrase = share.phrase;
         if (share) {
             Object.entries(share.presets).forEach(([role, preset]) => {
                 if (preset.generated) linkedSounds.push({ target: role, madeFor: preset.generated.role, seed: preset.generated.seed });
@@ -79,8 +81,8 @@ function useSettingsInUrl(settings, presets) {
 // typing other words (or any text) and pressing Enter plays that phrase's
 // piece from the start. `edited`: settings changed mid-piece, so what
 // plays differs from the phrase's piece until it starts over.
-const PhraseField = ({ seed, edited, onApply }) => {
-    const [text, setText] = useState(() => seedToPhrase(seed));
+const PhraseField = ({ seed, edited, onApply, initial }) => {
+    const [text, setText] = useState(() => (initial && phraseToSeed(initial) === seed ? initial : seedToPhrase(seed)));
     // a seed from elsewhere (New variation, a link): show its words -
     // unless what was typed stands for it
     useEffect(() => {
@@ -94,16 +96,19 @@ const PhraseField = ({ seed, edited, onApply }) => {
         else onApply(next);
     };
     return (
-        <form className="gen-phrase" onSubmit={apply}>
-            <label>
-                <span className="gen-audio-label">Phrase</span>
+        <section className="gen-menu-section">
+            <h3>Phrase</h3>
+            <form className="gen-phrase" onSubmit={apply}>
                 <input type="text" value={text} spellCheck="false" autoComplete="off" onChange={(e) => setText(e.target.value)}
-                    aria-label="Phrase the piece is made from"
-                    title="The piece is made from this phrase: the same phrase and settings always play the same music. Type your own words and press Enter to hear what they make." />
-            </label>
-            {pending && <button type="submit">Play this phrase</button>}
-            {!pending && edited && <small title="Settings changed while it played">changed since the start · ⏮ replays it</small>}
-        </form>
+                    aria-label="Phrase the piece is made from" />
+                {pending && <button type="submit">Play this phrase</button>}
+            </form>
+            <small>
+                The music is made from this phrase: the same phrase and settings always play the same piece.
+                Type any words and press Enter to hear what they make.
+                {!pending && edited ? ' Settings changed while it played - ⏮ plays it from the start again.' : ''}
+            </small>
+        </section>
     );
 };
 
@@ -160,16 +165,13 @@ const Panel = ({ id, title, heading, onRandom, more, className = '', children })
 // beside single fields - use.
 // The phrase and New variation, then the randomize buttons with how
 // random they are (a setting, so a select - not more buttons).
-const Randomizer = ({ level, onLevel: setLevel, onRandomize, phrase, onNewVariation }) => (
+const Randomizer = ({ level, onLevel: setLevel, onRandomize, onNewVariation }) => (
     <section className="gen-randomize">
         <div className="gen-randomize-row">
-            {phrase}
+            <span className="gen-randomize-title">Randomize</span>
             <button type="button" onClick={onNewVariation} title="Same settings, a new phrase - so different random choices (media key: next track)">
                 New variation
             </button>
-        </div>
-        <div className="gen-randomize-row">
-            <span className="gen-randomize-title">Randomize</span>
             {RANDOM_TARGETS.map(([target, label]) => (
                 <button key={target} type="button" onClick={() => onRandomize(target, level)}>{label}</button>
             ))}
@@ -184,11 +186,11 @@ const Randomizer = ({ level, onLevel: setLevel, onRandomize, phrase, onNewVariat
     </section>
 );
 
-const LOOP_NEXT = { off: 'bar', bar: 'progression', progression: 'off' };
-const LOOP_LABELS = { off: 'Loop', bar: 'Loop: bar', progression: 'Loop: progression' };
+const LOOP_NEXT = { off: 'chord', chord: 'progression', progression: 'off' };
+const LOOP_LABELS = { off: 'Loop', chord: 'Loop: chord', progression: 'Loop: progression' };
 
 // Play / pause and moving around the piece: to the start, a progression
-// or a bar back / on, and looping the bar or progression playing.
+// or a chord back / on, and looping the chord or progression playing.
 const Transport = ({ gen, anyOn, onToggle, onChange }) => {
     const act = (fn) => async () => {
         await fn();
@@ -202,16 +204,16 @@ const Transport = ({ gen, anyOn, onToggle, onChange }) => {
     return (
         <div className="gen-transport" role="toolbar" aria-label="Playback">
             {button('Back to the start', <ToStartIcon />, act(() => gen.rewind()), atStart && gen.hereBar === 0)}
-            {button('Back one progression', <ProgressionBackIcon />, act(() => gen.stepProgression(-1)), atStart)}
-            {button('Back one bar', <BarBackIcon />, act(() => gen.stepBar(-1)), atStart)}
+            {button('Back to the start of this progression, or the one before', <ProgressionBackIcon />, act(() => gen.step('progression', -1)), atStart)}
+            {button('Back to the start of this chord, or the one before', <BarBackIcon />, act(() => gen.step('chord', -1)), atStart)}
             <button type="button" className="gen-play" onClick={onToggle} title={`${anyOn ? 'Pause' : 'Play'} (Space)`} aria-label={anyOn ? 'Pause' : 'Play'}>
                 {anyOn ? <PauseIcon /> : <PlayIcon />}
             </button>
-            {button('Forward one bar', <BarForwardIcon />, act(() => gen.stepBar(1)))}
-            {button('Forward one progression', <ProgressionForwardIcon />, act(() => gen.stepProgression(1)))}
+            {button('Forward one chord', <BarForwardIcon />, act(() => gen.step('chord', 1)))}
+            {button('Forward one progression', <ProgressionForwardIcon />, act(() => gen.step('progression', 1)))}
             <button type="button" className={`gen-icon-button gen-loop${loop !== 'off' ? ' is-on' : ''}`} aria-pressed={loop !== 'off'}
-                title="Loop the bar playing, then the whole progression, then off" onClick={act(() => gen.setLoop(LOOP_NEXT[loop]))}>
-                <LoopIcon />{loop !== 'off' && <span>{loop === 'bar' ? 'bar' : 'progression'}</span>}
+                title="Loop the chord playing, then the whole progression, then off" onClick={act(() => gen.setLoop(LOOP_NEXT[loop]))}>
+                <LoopIcon />{loop !== 'off' && <span>{loop}</span>}
                 <span className="gen-visually-hidden">{LOOP_LABELS[loop]}</span>
             </button>
         </div>
@@ -705,20 +707,21 @@ const GenerativeApp = () => {
                 <SleepTimer generator={gen} running={anyOn} />
                 <div className="gen-header-tools">
                     <MasterVolume />
-                    <SettingsMenu generator={gen} onReload={reloadKeepingSettings} link={() => shareUrl(gen.settings, linkPresets)} saving={saving}>
+                    <SettingsMenu generator={gen} onReload={reloadKeepingSettings} link={() => shareUrl(gen.settings, linkPresets)} saving={saving}
+                        phrase={<PhraseField seed={settings.seed} edited={gen.editedSinceStart} onApply={playPhrase} initial={linkedPhrase} />}>
                         <Recorder generator={gen} fileName={fileName} onProgress={setSaving} />
                     </SettingsMenu>
                 </div>
             </header>
 
-            <Randomizer level={randomLevel} onLevel={setRandomLevel} onRandomize={randomize} onNewVariation={newVariation}
-                phrase={<PhraseField seed={settings.seed} edited={gen.editedSinceStart} onApply={playPhrase} />} />
 
             <ChordTimeline
                 generator={gen}
                 tracks={<TrackStrip roles={shownRoles} presets={Object.fromEntries(Object.entries(roles).map(([role, { presetName, edited }]) => [role, { name: presetName, edited }]))} mix={mix} armed={armed} onMix={changeMix} onArm={setArmed} onEdit={editSound}
                     onRandom={randomizePreset} onGenerate={generateForRole} generating={generating} live={live} />}
             />
+
+            <Randomizer level={randomLevel} onLevel={setRandomLevel} onRandomize={randomize} onNewVariation={newVariation} />
 
             <Panel id="music" title="Music" onRandom={() => randomize('music')}>
                 <div className="gen-row">

@@ -287,22 +287,28 @@ test('a phrase is a piece: same phrase and settings, same notes from the start -
     expect(notes(edited)).toBe(first);
 });
 
-test('stepping: by bar and by progression, back plays exactly what was planned', () => {
-    const gen = generator(6, { mode: 'off' }); // 4 chords, 1 bar each
-    play(gen, 20);
+test('stepping: by chord and by progression; forward keeps the place, back goes to the start first', () => {
+    const gen = generator(6, { mode: 'off' });
+    gen.set('barsPerChord', 2); // 4 chords of 2 bars: cycles of 8 bars
+    play(gen, 40);
     const notes = (bar) => gen.plan.get(bar).events.map((e) => e.midi).join();
     const bar5 = notes(5);
-    gen.pause(12 * gen.beatsPerBar);
+    gen.pause(20 * gen.beatsPerBar);
     gen.seek(5);
     expect(gen.hereBar).toBe(5);
-    expect(notes(5)).toBe(bar5);
-    gen.stepProgression(1);
+    expect(notes(5)).toBe(bar5); // back plays what was planned
+    gen.step('progression', 1); // bar 5 of cycle 0..7 -> bar 5 of 8..15
+    expect(gen.hereBar).toBe(13);
+    gen.step('chord', 1); // second bar of chord 12..13 -> second bar of 14..15
+    expect(gen.hereBar).toBe(15);
+    gen.step('chord', -1); // inside a chord: its start
+    expect(gen.hereBar).toBe(14);
+    gen.step('chord', -1); // at its start: the chord before
+    expect(gen.hereBar).toBe(12);
+    gen.step('progression', -1); // inside a cycle: its start
     expect(gen.hereBar).toBe(8);
-    gen.stepProgression(-1); // in a cycle's first bar: the one before
-    expect(gen.hereBar).toBe(4);
-    gen.stepBar(1);
-    gen.stepProgression(-1); // inside a cycle: its start
-    expect(gen.hereBar).toBe(4);
+    gen.step('progression', -1); // at its start: the one before
+    expect(gen.hereBar).toBe(0);
     gen.seek(-3);
     expect(gen.hereBar).toBe(0);
 });
@@ -313,7 +319,7 @@ test('looping: a bar or a progression; a settings change re-plans the loop at it
     gen.pause(5 * gen.beatsPerBar);
     gen.setLoop('progression');
     expect(gen.loop).toMatchObject({ from: 4, to: 7 });
-    gen.setLoop('bar');
+    gen.setLoop('chord');
     expect(gen.loop).toMatchObject({ from: 6, to: 6 });
     gen.plan.get(6).events.forEach((e) => { e.booked = true; });
     const before = gen.plan.get(6).events.map((e) => e.midi).join();

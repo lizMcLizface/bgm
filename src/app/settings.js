@@ -21,6 +21,7 @@ import { METERS, DEFAULT_METER } from './meter';
 import { SCALE_FAMILIES } from './theory';
 import PROGRESSIONS from './progressions';
 import { decodeShareCode, encodeShareParts, decodeShareParts } from './shareCode';
+import { phraseToSeed } from './phrase';
 
 /** Fresh default settings (a new random seed each call). */
 export function defaultSettings() {
@@ -178,12 +179,26 @@ export function decodeSettings(code) {
 const codeFromLocation = ({ search = '', hash = '' }) => new URLSearchParams(search).get('s')
     || new URLSearchParams(hash.split('?')[1] || '').get('s');
 
-/** { settings, presets } from a share link, or null when there is none or it can't be read. */
+/**
+ * { settings, presets } from a share link, or null when there is none or
+ * it can't be read. A `phrase=` parameter (words, e.g. ?phrase=rainy+sunday)
+ * sets the seed - over a link's own, or on the defaults - and comes back
+ * as `phrase`.
+ */
 export function shareFromLocation(location) {
     const query = new URLSearchParams(location.search || '');
-    if (PARTS.some((key) => query.has(key))) return decodeShare(PARTS.filter((key) => query.has(key)).map((key) => `${key}=${query.get(key)}`).join('&'));
-    const code = codeFromLocation(location);
-    return code ? decodeShare(code) : null;
+    let share = null;
+    if (PARTS.some((key) => query.has(key))) {
+        share = decodeShare(PARTS.filter((key) => query.has(key)).map((key) => `${key}=${query.get(key)}`).join('&'));
+    } else {
+        const code = codeFromLocation(location);
+        share = code ? decodeShare(code) : null;
+    }
+    const phrase = query.get('phrase');
+    const seed = phrase ? phraseToSeed(phrase) : null;
+    if (seed === null) return share;
+    const base = share || { settings: defaultSettings(), presets: {} };
+    return { ...base, settings: { ...base.settings, seed }, phrase };
 }
 
 /** Settings from a share link, or null. */
