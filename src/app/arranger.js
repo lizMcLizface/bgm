@@ -16,6 +16,14 @@
 // centered around the role's home octave (and drifting back to it), or
 // wandering within the role's audible limits.
 //
+// A second lead (the counter role, settings.counter) can answer the lead in
+// its held closing bars and take the melody when the lead rests, harmonise
+// it a third below, or play its own slow line throughout.
+//
+// Sections (settings.sections) shape the energy over minutes: every few
+// phrases the piece moves between Intro, Build, Full and Breakdown, which
+// bring roles in and out and scale the lead's activity.
+//
 // Rhythm is meter-aware (meter.js): event times are in the bar's units,
 // accents and chord tones fall on beat-group starts, and lead rhythms are
 // built per group. Output is exact - timing/velocity/pitch looseness is the
@@ -33,17 +41,47 @@ export const PAD_RANGE = [55, 74];
 export const BASS_RANGE = [31, 50];
 const BASS_CENTER = 40;
 export const LEAD_RANGE = [69, 91];
+// The second lead sits between the pad and the lead.
+export const COUNTER_RANGE = [62, 84];
 
 // Octave offsets each role may use (keeps bass audible, lead not shrill).
-export const OCTAVE_LIMITS = { pad: [-2, 1], bass: [-1, 1], lead: [-2, 1] };
+export const OCTAVE_LIMITS = { pad: [-2, 1], bass: [-1, 1], lead: [-2, 1], counter: [-1, 1] };
 export const OCTAVE_WANDER = { off: 'Off', centered: 'Centered on its octave', wandering: 'Wandering' };
 export const DEFAULT_VOICES = {
     pad: { octave: 0, wander: 'off', chance: 0.3 },
     bass: { octave: 0, wander: 'off', chance: 0.3 },
     lead: { octave: 0, wander: 'off', chance: 0.3 },
+    counter: { octave: 0, wander: 'off', chance: 0.3 },
 };
 
+export const COUNTER_MODES = { off: 'Off', answer: 'Answers the lead', harmony: 'Harmony with the lead', line: 'Own line, always' };
+// activity: how often it answers / takes the melody, or how busy its line is
+export const DEFAULT_COUNTER = { mode: 'off', activity: 0.5 };
+
+export const SECTION_MODES = { off: 'Off', gentle: 'Gentle', strong: 'Strong' };
+// Section length, in phrases.
+export const SECTION_LENGTHS = [2, 4, 8];
+export const DEFAULT_SECTIONS = { mode: 'off', phrases: 4 };
+
+// What each section changes, per mode: a role set to false sits out, `lead`
+// scales the lead's activity, padStyle / bassStyle replace the picked style.
+export const SECTIONS = {
+    intro: { label: 'Intro', gentle: { lead: 0.3, counter: false, bassStyle: 'whole' }, strong: { lead: 0, bass: false, counter: false } },
+    build: { label: 'Build', gentle: { lead: 0.7 }, strong: { lead: 0.5, counter: false } },
+    full: { label: 'Full', gentle: {}, strong: {} },
+    breakdown: { label: 'Breakdown', gentle: { lead: 0.5, bassStyle: 'whole' }, strong: { lead: 0.6, bass: false, padStyle: 'sustain' } },
+};
+const NEXT_SECTION = {
+    intro: { build: 1 },
+    build: { full: 1 },
+    full: { breakdown: 45, full: 35, build: 20 },
+    breakdown: { build: 60, full: 40 },
+};
 const shift = ([lo, hi], octave) => [lo + 12 * octave, hi + 12 * octave];
+// Settings made before a role or option existed fall back to its defaults.
+const voiceOf = (settings, role) => (settings.voices && settings.voices[role]) || DEFAULT_VOICES[role];
+const counterOf = (settings) => settings.counter || DEFAULT_COUNTER;
+const sectionsOf = (settings) => settings.sections || DEFAULT_SECTIONS;
 const clampOctave = (role, o) => Math.max(OCTAVE_LIMITS[role][0], Math.min(OCTAVE_LIMITS[role][1], o));
 
 // A role's octave for the next phrase: at most one octave from the last.
@@ -141,11 +179,68 @@ function vary(motif, meter, rng) {
     return response;
 }
 
+// The second lead's answer in a bar where the lead holds its last note:
+// a few notes after the first beat group (after the first unit in 3/4).
+function echoBar(meter, rng) {
+    const starts = groupStarts(meter);
+    const step = () => (chance(rng, 0.5) ? 1 : -1);
+    if (meter.groups.length === 1) {
+        return pick(rng, [[[1, 1], [2, 1]], [[1, 2]], [[2, 1]]]).map(([beat, length], i) =>
+            ({ beat, length, kind: i === 0 ? 'chord' : 'step', move: i === 0 ? pick(rng, [-3, -2, 2, 3]) : step() }));
+    }
+    const notes = [];
+    meter.groups.forEach((size, g) => {
+        if (g === 0) return;
+        const cells = GROUP_CELLS[size].filter((c) => g > 1 || c.length > 0);
+        pick(rng, cells).forEach(([at, length]) => notes.push({ beat: starts[g] + at, length }));
+    });
+    return notes.map((note, i) => ({ ...note, kind: i === 0 ? 'chord' : 'step', move: i === 0 ? pick(rng, [-3, -2, 2, 3]) : step() }));
+}
+
+// A bar of the second lead's own line: long notes on beat-group starts,
+// more of them the higher its activity.
+function lineBar(meter, rng, activity) {
+    const starts = groupStarts(meter).filter((at, g) => g === 0 || chance(rng, 0.25 + 0.5 * activity));
+    return starts.map((beat, i) => ({
+        beat,
+        length: (i + 1 < starts.length ? starts[i + 1] : meter.units) - beat,
+        kind: i === 0 ? 'chord' : 'step',
+        move: i === 0 ? pick(rng, [-2, 0, 0, 2]) : (chance(rng, 0.5) ? 1 : -1),
+    }));
+}
+
+// The section a phrase starting at `bar` belongs to: kept until it has
+// lasted its length, then the next one by NEXT_SECTION - never more than
+// two Full sections in a row. null while sections are off.
+function decideSection(bar, prevSection, sections, rng) {
+    if (sections.mode === 'off') return null;
+    if (!prevSection) return { type: bar === 0 ? 'intro' : 'build', start: bar, fulls: 0 };
+    if (bar - prevSection.start < sections.phrases * PHRASE_BARS) return prevSection;
+    const next = prevSection.type === 'full' && prevSection.fulls >= 2 ? { breakdown: 1 } : NEXT_SECTION[prevSection.type];
+    const type = weighted(rng, next);
+    return { type, start: bar, fulls: type === 'full' ? prevSection.fulls + 1 : 0 };
+}
+
+// What the second lead does this phrase (null: it rests). Draws nothing
+// from rng while it is off, so pieces without it stay as they were.
+function decideCounter({ mode, activity }, leadActive, meter, rng) {
+    if (mode === 'off') return null;
+    if (mode === 'harmony') return leadActive ? { kind: 'harmony' } : null;
+    if (mode === 'line') return { kind: 'line', bars: [lineBar(meter, rng, activity), lineBar(meter, rng, activity)] };
+    if (!chance(rng, activity)) return null;
+    if (leadActive) return { kind: 'echo', bars: [echoBar(meter, rng), echoBar(meter, rng)] };
+    const motif = makeMotif(meter, rng);
+    return { kind: 'melody', motif, response: vary(motif, meter, rng) };
+}
+
 function decidePhrase(bar, prevPhrase, meter, settings, rng) {
     const prevOctaves = (prevPhrase && prevPhrase.octaves) || {};
     const octaves = Object.fromEntries(Object.keys(OCTAVE_LIMITS).map((role) =>
-        [role, nextOctave(role, prevOctaves[role], settings.voices[role], rng)]));
-    const activity = settings.leadActivity;
+        [role, nextOctave(role, prevOctaves[role], voiceOf(settings, role), rng)]));
+    const sections = sectionsOf(settings);
+    const section = decideSection(bar, prevPhrase && prevPhrase.section, sections, rng);
+    const shape = section ? SECTIONS[section.type][sections.mode] : {};
+    const activity = settings.leadActivity * (shape.lead ?? 1);
     // After a phrase with lead, rest more often - room to breathe.
     const p = activity >= 1 ? 1 : prevPhrase && prevPhrase.leadActive ? activity * 0.7 : activity;
     const leadActive = chance(rng, p);
@@ -159,14 +254,20 @@ function decidePhrase(bar, prevPhrase, meter, settings, rng) {
         if (total(others) > 0) padStyle = weighted(rng, others);
     }
 
+    const response = motif ? vary(motif, meter, rng) : null;
+    const bassStyle = pickStyle(rng, settings.bassWeights);
+
     return {
         start: bar,
         octaves,
         leadActive,
         motif,
-        response: motif ? vary(motif, meter, rng) : null,
-        padStyle,
-        bassStyle: pickStyle(rng, settings.bassWeights),
+        response,
+        padStyle: shape.padStyle || padStyle,
+        bassStyle: shape.bassStyle || bassStyle,
+        bass: shape.bass !== false,
+        section,
+        counter: shape.counter === false ? null : decideCounter(counterOf(settings), leadActive, meter, rng),
     };
 }
 
@@ -253,7 +354,9 @@ function bassEvents({ chord, nextChord, meter, scalePcs, prevMidi, style, chordE
     return { events, bassMidi: rootMidi };
 }
 
-function leadEvents({ notes, chord, scalePcs, prevMidi, range }) {
+// A melodic line - the lead, or the second lead's own parts - over this
+// bar's rhythm: chord tones on strong notes, scale steps between.
+function melodyEvents({ role = 'lead', notes, chord, scalePcs, prevMidi, range, level = 1 }) {
     const chordNotes = notesInRange(chord.pitchClasses, range[0], range[1]);
     const scaleNotes = notesInRange(scalePcs, range[0], range[1]);
     const center = (range[0] + range[1]) / 2;
@@ -273,14 +376,28 @@ function leadEvents({ notes, chord, scalePcs, prevMidi, range }) {
         // Legato up to the next note, never overlapping it.
         const gap = i + 1 < notes.length ? notes[i + 1].beat - note.beat : note.length;
         return {
-            role: 'lead',
+            role,
             midi,
             beat: note.beat,
             length: Math.min(note.length, gap) * 0.95,
-            velocity: note.kind === 'step' ? 0.58 : 0.66,
+            velocity: (note.kind === 'step' ? 0.58 : 0.66) * level,
         };
     });
-    return { events, leadMidi: midi };
+    return { events, midi };
+}
+
+// The lead's notes a diatonic third below (above, where below would leave
+// the second lead's register), same rhythm, a little softer.
+function harmonyEvents(leadNotes, scalePcs, range) {
+    const scale = notesInRange(scalePcs, range[0] - 12, range[1] + 12);
+    return leadNotes.map((e) => {
+        const index = scale.indexOf(nearest(scale, e.midi));
+        let midi = scale[Math.max(0, index - 2)];
+        if (midi < range[0]) midi = scale[Math.min(scale.length - 1, index + 2)];
+        while (midi > range[1]) midi -= 12;
+        while (midi < range[0]) midi += 12;
+        return { ...e, role: 'counter', midi, velocity: e.velocity * 0.8 };
+    });
 }
 
 /**
@@ -295,7 +412,9 @@ function leadEvents({ notes, chord, scalePcs, prevMidi, range }) {
  * @param {number} args.barsLeftInChord - including this one
  * @param {object|null} args.prev - the previous bar's returned state
  * @param {object} args.settings - { leadActivity 0..1, padWeights, bassWeights,
- *   thinPadUnderLead, voices: { pad|bass|lead: { octave, wander, chance } } }
+ *   thinPadUnderLead, voices: { pad|bass|lead|counter: { octave, wander, chance } },
+ *   counter: { mode, activity }, sections: { mode, phrases } } (counter and
+ *   sections optional: off)
  * @param {function} args.rng
  * @returns {{ events: object[], state: object }} event beats/lengths in units
  */
@@ -306,10 +425,15 @@ export function arrangeBar({ bar, meter, chord, nextChord, scalePcs, chordStart,
 
     // With wander off a role sits at its home octave right away (a changed
     // setting doesn't wait for the next phrase); otherwise the phrase decides.
-    const octave = (role) => (settings.voices[role].wander === 'off'
-        ? clampOctave(role, settings.voices[role].octave)
+    const octave = (role) => (voiceOf(settings, role).wander === 'off' || phrase.octaves[role] === undefined
+        ? clampOctave(role, voiceOf(settings, role).octave)
         : phrase.octaves[role]);
-    const ranges = { pad: shift(PAD_RANGE, octave('pad')), bass: shift(BASS_RANGE, octave('bass')), lead: shift(LEAD_RANGE, octave('lead')) };
+    const ranges = {
+        pad: shift(PAD_RANGE, octave('pad')),
+        bass: shift(BASS_RANGE, octave('bass')),
+        lead: shift(LEAD_RANGE, octave('lead')),
+        counter: shift(COUNTER_RANGE, octave('counter')),
+    };
 
     // Re-voice on a new chord, or when the pad's register moved (voice
     // leading from the old voicing keeps that move as small as possible).
@@ -331,15 +455,28 @@ export function arrangeBar({ bar, meter, chord, nextChord, scalePcs, chordStart,
         rng,
     });
 
-    let lead = { events: [], leadMidi: prev ? prev.leadMidi : 79 };
+    const index = bar - phrase.start;
+    let lead = { events: [], midi: prev ? prev.leadMidi : 79 };
     if (phrase.leadActive) {
-        const index = bar - phrase.start;
         const source = index < 2 ? phrase.motif : phrase.response;
-        lead = leadEvents({ notes: source[index % 2], chord, scalePcs, prevMidi: lead.leadMidi, range: ranges.lead });
+        lead = melodyEvents({ notes: source[index % 2], chord, scalePcs, prevMidi: lead.midi, range: ranges.lead });
+    }
+
+    let counter = { events: [], midi: (prev && prev.counterMidi) || 72 };
+    const part = phrase.counter;
+    if (part && part.kind === 'harmony') {
+        counter = { events: harmonyEvents(lead.events, scalePcs, ranges.counter), midi: counter.midi };
+    } else if (part) {
+        const notes = {
+            melody: () => (index < 2 ? part.motif : part.response)[index % 2],
+            echo: () => (index % 2 === 1 ? part.bars[(index - 1) / 2] : []),
+            line: () => part.bars[index % 2],
+        }[part.kind]();
+        counter = melodyEvents({ role: 'counter', notes, chord, scalePcs, prevMidi: counter.midi, range: ranges.counter, level: part.kind === 'melody' ? 1 : 0.85 });
     }
 
     return {
-        events: [...pad, ...bass.events, ...lead.events],
-        state: { phrase, padVoicing: voicing, bassMidi: bass.bassMidi, leadMidi: lead.leadMidi, ranges },
+        events: [...pad, ...(phrase.bass === false ? [] : bass.events), ...lead.events, ...counter.events],
+        state: { phrase, padVoicing: voicing, bassMidi: bass.bassMidi, leadMidi: lead.midi, counterMidi: counter.midi, ranges },
     };
 }

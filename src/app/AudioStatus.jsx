@@ -61,16 +61,8 @@ export const AudioMeter = () => {
 
 const THEME_LABELS = { auto: 'Follow system', light: 'Light', dark: 'Dark' };
 
-/**
- * The ⚙ menu. onReload returns false when a buffer change's reload was
- * cancelled.
- */
-export const SettingsMenu = ({ generator, onReload }) => {
-    const [, refresh] = useState(0);
-    const [quickStop, setQuickStop] = useState(() => readPref(QUICK_STOP_KEY, true));
-    const [theme, setTheme] = useState(storedTheme);
-    const menu = useRef(null);
-    // closes on a click elsewhere or Escape, like a menu
+/** Closes a <details> menu on a click elsewhere or Escape, like a menu. */
+export function useDismiss(menu) {
     useEffect(() => {
         const close = (e) => {
             if (!menu.current || !menu.current.open) return;
@@ -82,7 +74,19 @@ export const SettingsMenu = ({ generator, onReload }) => {
             document.removeEventListener('pointerdown', close);
             document.removeEventListener('keydown', close);
         };
-    }, []);
+    }, [menu]);
+}
+
+/**
+ * The ⚙ menu. onReload returns false when a buffer change's reload was
+ * cancelled.
+ */
+export const SettingsMenu = ({ generator, onReload }) => {
+    const [, refresh] = useState(0);
+    const [quickStop, setQuickStop] = useState(() => readPref(QUICK_STOP_KEY, true));
+    const [theme, setTheme] = useState(storedTheme);
+    const menu = useRef(null);
+    useDismiss(menu);
     useEffect(() => {
         generator.quickStop = quickStop;
         writePref(QUICK_STOP_KEY, quickStop);

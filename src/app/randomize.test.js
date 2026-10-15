@@ -1,4 +1,4 @@
-import { randomKey, randomProgression, randomConductor, randomVoices, randomField, randomPreset, randomLength, randomArrangement, randomStyleWeights, randomRole, RANDOM_FIELDS, presetPool, modeQuality, progressionQuality } from './randomize';
+import { randomKey, randomProgression, randomConductor, randomVoices, randomField, randomPreset, randomLength, randomArrangement, randomStyleWeights, randomRole, RANDOM_FIELDS, presetPool, modeQuality, progressionQuality, randomAmbience } from './randomize';
 import { defaultSettings, sanitizeSettings } from './settings';
 import { PRESET_CATEGORIES } from './presets';
 import { DEFAULT_DRIFT } from './conductor';
@@ -165,4 +165,21 @@ test('key and scale dice skip excluded keys and modes', () => {
             expect(excludedModes).not.toContain(mode);
         }
     });
+});
+
+test('ambience: within reason one or two layers at modest levels, thunder only with rain or wind', () => {
+    const rng = seeded(5);
+    for (let i = 0; i < 200; i++) {
+        const levels = randomAmbience('reason', rng);
+        const on = Object.entries(levels).filter(([, v]) => v > 0);
+        expect(on.filter(([id]) => id !== 'thunder').length).toBeGreaterThanOrEqual(1);
+        expect(on.filter(([id]) => id !== 'thunder').length).toBeLessThanOrEqual(2);
+        on.forEach(([, v]) => expect(v).toBeLessThanOrEqual(0.65));
+        if (levels.thunder) expect(levels.rain + levels.wind).toBeGreaterThan(0);
+    }
+    for (let i = 0; i < 100; i++) {
+        const levels = randomAmbience('wild', rng);
+        expect(Object.values(levels).some((v) => v > 0)).toBe(true);
+        Object.values(levels).forEach((v) => expect(v).toBeGreaterThanOrEqual(0));
+    }
 });

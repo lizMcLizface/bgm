@@ -17,6 +17,9 @@ function loadModule(AC) {
     return moduleLoads.get(AC);
 }
 
+/** Resolves once the processor is loaded into AC (or failed to). */
+export const bitCrusherReady = (AC) => (AC.audioWorklet ? loadModule(AC).catch(() => {}) : Promise.resolve());
+
 class BitCrusher {
     constructor(AC) {
         this.AC = AC;

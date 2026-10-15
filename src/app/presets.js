@@ -765,7 +765,7 @@ export const PRESET_CATEGORIES = {
 export const GENERATIVE_PRESETS = Object.assign({}, ...Object.values(PRESET_CATEGORIES));
 
 /** Each role's preset on a fresh page (and when a link names none). */
-export const ROLE_PRESETS = { lead: 'Glass Lead', pad: 'Soft Pad', bass: 'Warm Bass' };
+export const ROLE_PRESETS = { lead: 'Glass Lead', pad: 'Soft Pad', bass: 'Warm Bass', counter: 'Soft Flute' };
 
 /** The category listed first in each role's preset picker. */
-export const ROLE_CATEGORY = { pad: 'Pads', bass: 'Bass', lead: 'Leads' };
+export const ROLE_CATEGORY = { pad: 'Pads', bass: 'Bass', lead: 'Leads', counter: 'Leads' };

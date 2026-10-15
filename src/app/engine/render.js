@@ -1,0 +1,184 @@
+// Renders the piece to a WAV file, faster than real time: the plan Play
+// would start with (Generator.planner) booked onto fresh Instruments - the
+// current sounds, edits included - and the ambient bed in an
+// OfflineAudioContext, mixed as heard (volumes, mute / solo).
+//
+// Long files render in chunks, so memory stays at one chunk plus the
+// finished 16-bit audio. Each chunk starts early by a pre-roll that covers
+// every note still sounding at its start and the effects' tails, so it
+// begins warmed up exactly where the previous one ended; the two overlap by
+// a short cross-fade (modulation effects restart their phase per chunk).
+
+import Instrument from './Instrument';
+import Ambience from './ambience';
+import { unitsPerMinute } from '../meter';
+import { noiseReady } from '../../nodes/noiseGenerator';
+import { bitCrusherReady } from '../../nodes/bitcrusher';
+
+const CHUNK_SECONDS = 60;
+const MAX_PREROLL = 30;
+const CROSSFADE = 0.25;
+const END_FADE = 4;
+
+const until = async (condition, ms) => {
+    const end = Date.now() + ms;
+    while (!condition() && Date.now() < end) await new Promise((r) => setTimeout(r, 20));
+};
+
+// Every audible note from bar 0 until `seconds`, in seconds.
+function planNotes(gen, audible, seconds) {
+    const planner = gen.planner();
+    const notes = [];
+    let time = 0;
+    for (let bar = 0; time < seconds; bar++) {
+        planner.planBar(bar);
+        const planned = planner.plan.get(bar);
+        planner.plan.delete(bar - 2);
+        const unit = 60 / unitsPerMinute(planner.meter, planned.bpm);
+        planned.events.forEach((e) => {
+            if (audible[e.role]) {
+                notes.push({ role: e.role, midi: e.midi, time: time + e.beat * unit, duration: e.length * unit, velocity: e.velocity, detune: e.detune });
+            }
+        });
+        time += planner.meter.units * unit;
+    }
+    return notes.sort((a, b) => a.time - b.time);
+}
+
+// Over 0.9 a soft knee instead of hard clipping.
+const soft = (x) => {
+    const a = Math.abs(x);
+    return a <= 0.9 ? x : Math.sign(x) * (0.9 + 0.1 * Math.tanh((a - 0.9) / 0.1));
+};
+
+function pcm16(left, right) {
+    const out = new Int16Array(left.length * 2);
+    for (let i = 0; i < left.length; i++) {
+        out[2 * i] = Math.round(soft(left[i]) * 32767);
+        out[2 * i + 1] = Math.round(soft(right[i]) * 32767);
+    }
+    return out;
+}
+
+function wavHeader(frames, sampleRate) {
+    const view = new DataView(new ArrayBuffer(44));
+    const text = (at, s) => [...s].forEach((ch, i) => view.setUint8(at + i, ch.charCodeAt(0)));
+    const bytes = frames * 4;
+    text(0, 'RIFF');
+    view.setUint32(4, 36 + bytes, true);
+    text(8, 'WAVE');
+    text(12, 'fmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true); // PCM
+    view.setUint16(22, 2, true); // stereo
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * 4, true);
+    view.setUint16(32, 4, true);
+    view.setUint16(34, 16, true);
+    text(36, 'data');
+    view.setUint32(40, bytes, true);
+    return view.buffer;
+}
+
+/** Bytes of a WAV file of `seconds` (16-bit stereo). */
+export const wavBytes = (seconds, sampleRate) => 44 + Math.round(seconds * sampleRate) * 4;
+
+/**
+ * @param {Generator} gen - its settings, sounds and mix are rendered
+ * @param {number} seconds
+ * @param {object} [options]
+ * @param {function} [options.onProgress] - called with 0..1
+ * @param {AbortSignal} [options.signal]
+ * @returns {Promise<Blob>} audio/wav
+ */
+export async function renderWav(gen, seconds, { onProgress = () => {}, signal } = {}) {
+    const sampleRate = gen.AC.sampleRate;
+    const anySolo = Object.values(gen.roles).some((r) => r.solo);
+    const audible = Object.fromEntries(Object.entries(gen.roles).map(([role, r]) => [role, (anySolo ? r.solo : !r.mute) && r.volume > 0]));
+    const roles = Object.keys(gen.roles).filter((role) => audible[role]);
+    const presets = Object.fromEntries(roles.map((role) => [role, gen.getRolePreset(role)]));
+    const notes = planNotes(gen, audible, seconds);
+    const ambience = { ...gen.settings.ambience };
+
+    const parts = [];
+    let frames = 0;
+    let carry = null; // the previous chunk's cross-fade overlap
+    let first = 0; // index of the first note not yet past
+    let tail = 0; // longest release + effects tail of the sounds (from the first chunk)
+    for (let start = 0; start < seconds; start += CHUNK_SECONDS) {
+        if (signal && signal.aborted) throw new DOMException('Rendering cancelled', 'AbortError');
+        const end = Math.min(seconds, start + CHUNK_SECONDS);
+        const last = end >= seconds;
+
+        // the chunk's instruments: their tails decide the minimum pre-roll
+        const length = (from) => Math.ceil((end - from + (last ? 0 : CROSSFADE)) * sampleRate);
+        const build = (from) => {
+            const ctx = new OfflineAudioContext({ numberOfChannels: 2, length: length(from), sampleRate });
+            const instruments = Object.fromEntries(roles.map((role) => {
+                const inst = new Instrument({ polyphony: gen.getRolePolyphony(role), preset: presets[role], context: ctx });
+                inst.scheduleSleep = () => {}; // no wall-clock timers during the render
+                const gain = ctx.createGain();
+                gain.gain.value = gen.roles[role].volume;
+                inst.connect(gain);
+                gain.connect(ctx.destination);
+                return [role, inst];
+            }));
+            return { ctx, instruments };
+        };
+        let preroll = 0;
+        if (start > 0) {
+            while (first < notes.length && notes[first].time + notes[first].duration + tail < start - MAX_PREROLL) first++;
+            const sounding = notes.slice(first).filter((n) => n.time < start && n.time + n.duration + tail > start);
+            preroll = Math.min(MAX_PREROLL, Math.max(tail, ...sounding.map((n) => start - n.time)));
+        }
+        const from = start - preroll;
+        const { ctx, instruments } = build(from);
+
+        await Promise.all([noiseReady(ctx), bitCrusherReady(ctx)]);
+        await until(() => Object.values(instruments).every((inst) => inst.reverb.amount === 0 || inst.reverb.node.buffer), 5000);
+        if (start === 0) tail = Math.max(1, ...Object.values(instruments).map((inst) => inst.tailSeconds() + inst.preset.gainRelease));
+        const to = end + (last ? 0 : CROSSFADE);
+        for (let i = first; i < notes.length && notes[i].time < to; i++) {
+            const n = notes[i];
+            if (n.time >= from) instruments[n.role].scheduleNote(n.midi, n.time - from, n.duration, n.velocity, n.detune);
+        }
+        if (Object.values(ambience).some((level) => level > 0)) {
+            const bed = new Ambience({ context: ctx, seed: 1 });
+            bed.setLevels(ambience);
+            await bed.prepare();
+            const volume = ctx.createGain();
+            volume.gain.value = gen.ambienceGain;
+            volume.connect(ctx.destination);
+            bed.connect(volume);
+            bed.start(0, from);
+        }
+
+        const buffer = await ctx.startRendering();
+        const skip = Math.round(preroll * sampleRate);
+        const left = buffer.getChannelData(0).subarray(skip);
+        const right = buffer.getChannelData(1).subarray(skip);
+        if (carry) {
+            const n = carry.left.length;
+            for (let i = 0; i < n; i++) {
+                const t = i / n;
+                left[i] = left[i] * t + carry.left[i] * (1 - t);
+                right[i] = right[i] * t + carry.right[i] * (1 - t);
+            }
+        }
+        const keep = last ? left.length : left.length - Math.round(CROSSFADE * sampleRate);
+        carry = last ? null : { left: left.slice(keep), right: right.slice(keep) };
+        if (last) {
+            // a gentle fade over the file's last seconds
+            const fade = Math.min(keep, Math.round(END_FADE * sampleRate));
+            for (let i = keep - fade; i < keep; i++) {
+                const g = (keep - i) / fade;
+                left[i] *= g * g;
+                right[i] *= g * g;
+            }
+        }
+        parts.push(pcm16(left.subarray(0, keep), right.subarray(0, keep)));
+        frames += keep;
+        onProgress(end / seconds);
+    }
+    return new Blob([wavHeader(frames, sampleRate), ...parts], { type: 'audio/wav' });
+}

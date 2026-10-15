@@ -13,8 +13,10 @@ import Gain from './gain';
 
 export const REVERB_TYPES = ['reverb1', 'reverb2', 'reverb3', 'reverb4', 'reverb5', 'reverb6'];
 
-// AudioContext -> Map(type -> Promise<AudioBuffer>)
-const buffers = new WeakMap();
+// sample rate -> Map(type -> Promise<AudioBuffer>). Keyed by rate, not
+// context: an AudioBuffer plays in any context, so offline renders
+// (app/engine/render.js) reuse what the live context decoded.
+const buffers = new Map();
 
 // A convolver's cost grows with its impulse's length, and some impulses
 // carry seconds of tail below hearing (reverb2: 8 s, silent after ~3.8 s).
@@ -46,8 +48,8 @@ export function trimImpulse(AC, buffer) {
     return trimmed;
 }
 function loadImpulse(AC, type) {
-    if (!buffers.has(AC)) buffers.set(AC, new Map());
-    const cache = buffers.get(AC);
+    if (!buffers.has(AC.sampleRate)) buffers.set(AC.sampleRate, new Map());
+    const cache = buffers.get(AC.sampleRate);
     if (!cache.has(type)) {
         const url = `${import.meta.env.BASE_URL}reverb/${type}.flac`;
         const load = fetch(url)

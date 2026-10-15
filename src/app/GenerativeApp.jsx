@@ -1,20 +1,25 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Generator, { ROLES } from './Generator';
-import { SCALE_FAMILIES, TONIC_NAMES } from './theory';
+import { SCALE_FAMILIES, TONIC_NAMES, scaleById } from './theory';
 import ChordTimeline from './ChordTimeline';
 import { RoleButtons, TrackStrip, useLivePlay } from './Tracks';
 import { defaultSettings, shareFromLocation, sharePath, shareUrl, newSeed } from './settings';
 import SynthEditor from './editor/SynthEditor';
 import PresetPicker from './editor/PresetPicker';
 import PROGRESSIONS, { PROGRESSION_LENGTHS, progressionsOfLength } from './progressions';
-import { PAD_STYLES, BASS_STYLES, styleShares, OCTAVE_LIMITS, OCTAVE_WANDER } from './arranger';
+import {
+    PAD_STYLES, BASS_STYLES, styleShares, OCTAVE_LIMITS, OCTAVE_WANDER, COUNTER_MODES, SECTION_MODES, SECTION_LENGTHS,
+} from './arranger';
 import { DRIFT_MODES } from './conductor';
 import { METERS } from './meter';
 import {
     RANDOM_LEVELS, randomKey, randomProgression, randomConductor, randomVoices, randomField, randomPreset, randomLength,
-    randomArrangement, randomStyleWeights, randomRole, progressionLength, progressionForLength,
+    randomArrangement, randomStyleWeights, randomRole, progressionLength, progressionForLength, randomAmbience,
 } from './randomize';
 import { MasterVolume, AudioMeter, SettingsMenu } from './AudioStatus';
+import { SleepTimer, Recorder } from './Playback';
+import { setupMediaSession, updateMediaSession } from './mediaSession';
+import { AMBIENCE_LAYERS } from './engine/ambience';
 import { DiceIcon, SparkIcon } from './icons';
 import { generateSound, newSoundSeed } from './soundGen';
 import { levelPreset } from './engine/loudness';
@@ -44,6 +49,18 @@ const getGenerator = () => {
     return generator;
 };
 
+// Dev server: a hot update re-runs this module and builds a new Generator;
+// the old one would keep playing (the same piece, offset) with nothing
+// left to stop it. Silence and unplug it first.
+if (import.meta.hot) {
+    import.meta.hot.dispose(() => {
+        if (!generator) return;
+        generator.stopAll();
+        generator.output.disconnect();
+        generator.ambienceOut.disconnect();
+    });
+}
+
 // Keeps the address bar a valid share link for the current settings.
 function useSettingsInUrl(settings, presets) {
     useEffect(() => {
@@ -55,7 +72,7 @@ function useSettingsInUrl(settings, presets) {
 }
 
 // New variation / copy link, next to Play.
-const ShareTools = ({ settings, presets, onLoad }) => {
+const ShareTools = ({ settings, presets, onNewVariation }) => {
     const [message, setMessage] = useState('');
     const flash = (text) => {
         setMessage(text);
@@ -72,7 +89,7 @@ const ShareTools = ({ settings, presets, onLoad }) => {
     };
     return (
         <div className="gen-share">
-            <button type="button" onClick={() => onLoad({ ...settings, seed: newSeed() })} title="Same settings, different random choices">
+            <button type="button" onClick={onNewVariation} title="Same settings, different random choices (media key: next track)">
                 New variation
             </button>
             <button type="button" onClick={copy}>Copy link</button>
@@ -88,6 +105,7 @@ const RANDOM_TARGETS = [
     ['arrangement', 'Arrangement'],
     ['conductor', 'Evolution'],
     ['voices', 'Voices'],
+    ['ambience', 'Ambience'],
 ];
 
 // A remembered open/closed state (per browser).
@@ -313,6 +331,35 @@ const NowPlaying = ({ now, settings, onKeep }) => {
     );
 };
 
+// The ambient bed (engine/ambience.js): on / off (as beside Play), a volume
+// for the whole bed against the music, and a slider per layer to balance them.
+const AmbiencePanel = ({ levels, volume, on, onChange, onVolume, onToggle, onRandom }) => (
+    <Panel id="ambience" title="Ambience" onRandom={onRandom} heading={(
+        <>
+            Ambience
+            <button type="button" className={`gen-part${on ? ' is-on' : ''}`} aria-pressed={on} onClick={onToggle}
+                title={PART_TITLE}>{on ? 'On' : 'Off'}</button>
+        </>
+    )}>
+        <Field label={`Ambience volume ${Math.round(volume * 100)}%`}>
+            <input type="range" min="0" max="1" step="0.05" value={volume} onChange={(e) => onVolume(Number(e.target.value))} />
+        </Field>
+        <div className="gen-ambience">
+            {Object.entries(AMBIENCE_LAYERS).map(([id, label]) => (
+                <Field key={id} label={`${label} ${levels[id] > 0 ? `${Math.round(levels[id] * 100)}%` : '· off'}`}>
+                    <input type="range" min="0" max="1" step="0.05" value={levels[id]}
+                        onChange={(e) => onChange({ ...levels, [id]: Number(e.target.value) })} />
+                </Field>
+            ))}
+        </div>
+    </Panel>
+);
+
+const PART_TITLE = 'Switch on or off: while playing, right away; while stopped, for the next Play. Saved in the link.';
+
+// Space plays / stops - unless typing, or on a control Space presses itself.
+const spaceTarget = (target) => target && (['INPUT', 'SELECT', 'TEXTAREA', 'BUTTON', 'SUMMARY', 'A'].includes(target.tagName) || target.isContentEditable);
+
 const octaveLabel = (o) => (o === 0 ? 'Default' : `${o > 0 ? '+' : '−'}${Math.abs(o)} octave${Math.abs(o) > 1 ? 's' : ''}`);
 const PAD_NOTES = { 3: 'Triads (3)', 4: 'Sevenths (4)', 5: 'Ninths (5)' };
 
@@ -344,7 +391,10 @@ const VoiceControls = ({ role, voice, onChange }) => {
 
 const GenerativeApp = () => {
     const gen = useRef(getGenerator()).current;
+    // music / ambience playing (each can play alone)
     const [running, setRunning] = useState(gen.isRunning);
+    const [ambienceOn, setAmbienceOn] = useState(gen.ambienceRunning);
+    const anyOn = running || ambienceOn;
     const [settings, setSettings] = useState({ ...gen.settings });
     const [roles, setRoles] = useState(() =>
         Object.fromEntries(Object.entries(ROLES).map(([role, { volume }]) => [role, { presetName: gen.roles[role].presetName, edited: false, volume }]))
@@ -378,6 +428,14 @@ const GenerativeApp = () => {
     };
     const now = useNowPlaying(gen, running, settings);
     useSettingsInUrl(settings, linkPresets);
+    useEffect(() => {
+        const sync = () => {
+            setRunning(gen.isRunning);
+            setAmbienceOn(gen.ambienceRunning);
+        };
+        sync(); // after a hot update the state may describe the old generator
+        return gen.onRunningChange(sync);
+    }, [gen]);
     // Reload with the current settings in the address bar (buffer size).
     const reloadKeepingSettings = () => {
         const unsaved = Object.values(roles).some((r) => r.edited);
@@ -431,6 +489,10 @@ const GenerativeApp = () => {
     // Within reason, key and progression are chosen to fit each other: alone,
     // each fits the other's current value; together, the key comes first.
     const randomize = (target, level = randomLevel) => {
+        if (target === 'ambience') {
+            changeAmbience(randomAmbience(level));
+            return;
+        }
         const current = gen.settings;
         const all = target === 'all';
         const music = all || target === 'music';
@@ -452,24 +514,109 @@ const GenerativeApp = () => {
         loadPreset(role, preset);
         loadSettings(patch);
     };
-    const toggle = async () => {
-        if (gen.isRunning) {
-            gen.stop();
-        } else {
-            await gen.start();
-        }
-        setRunning(gen.isRunning);
+    const mediaTitle = () => {
+        const n = gen.nowPlaying();
+        return { title: `${n.keyName} · ${n.bpm} BPM`, artist: 'bgm' };
     };
+    // Media controls start inside the click (iOS needs that), before the
+    // generator's await.
+    const begin = (start) => {
+        updateMediaSession({ playing: true, ...mediaTitle() });
+        return start();
+    };
+    // Which parts play is a setting (in the link): playMusic, playAmbience.
+    // Play starts those; Stop stops everything and keeps them. While
+    // anything plays they follow what is playing, so the link describes
+    // what you hear.
+    const startPart = (key) => begin(() => (key === 'playMusic' ? gen.start() : gen.startAmbience()));
+    const play = () => {
+        const { playMusic, playAmbience } = gen.settings;
+        if (!playMusic && !playAmbience) update('playMusic', true);
+        begin(() => Promise.all([
+            (playMusic || !playAmbience) && gen.start(),
+            playAmbience && gen.startAmbience(),
+        ]));
+    };
+    const stop = () => gen.stopAll();
+    const toggle = () => (gen.anyRunning ? stop() : play());
+    const setPart = (key, on) => {
+        if (gen.anyRunning) {
+            const partRunning = key === 'playMusic' ? gen.isRunning : gen.ambienceRunning;
+            const othersRunning = key === 'playMusic' ? gen.ambienceRunning : gen.isRunning;
+            // switching off the only part playing: Stop, keeping the choice
+            if (!on && !othersRunning) {
+                stop();
+                return;
+            }
+            if (on && !partRunning) startPart(key);
+            if (!on && partRunning) (key === 'playMusic' ? gen.stop() : gen.stopAmbience());
+        }
+        update(key, on);
+    };
+    const togglePart = (key) => setPart(key, !gen.settings[key]);
+    // Turning a layer up switches the ambience on - alone, when nothing
+    // was playing, so it can be heard without the music.
+    const changeAmbience = (levels) => {
+        update('ambience', levels);
+        if (!Object.values(levels).some((v) => v > 0) || gen.ambienceRunning) return;
+        if (!gen.anyRunning) loadSettings({ playMusic: false, playAmbience: true });
+        else update('playAmbience', true);
+        startPart('playAmbience');
+    };
+    // New variation, and back through earlier ones (media keys: next / previous track).
+    const seeds = useRef([]);
+    const newVariation = () => {
+        seeds.current.push(gen.settings.seed);
+        loadSettings({ seed: newSeed() });
+    };
+    const previousVariation = () => {
+        if (seeds.current.length) loadSettings({ seed: seeds.current.pop() });
+    };
+    const handlers = useRef({});
+    handlers.current = { play, stop, toggle, newVariation, previousVariation };
+    useEffect(() => {
+        setupMediaSession({
+            play: () => handlers.current.play(),
+            stop: () => handlers.current.stop(),
+            next: () => handlers.current.newVariation(),
+            previous: () => handlers.current.previousVariation(),
+        });
+        const onKey = (e) => {
+            if (e.code !== 'Space' || e.repeat || e.ctrlKey || e.metaKey || e.altKey || spaceTarget(e.target)) return;
+            e.preventDefault();
+            handlers.current.toggle();
+        };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, []);
+    useEffect(() => {
+        updateMediaSession({ playing: anyOn, ...mediaTitle() });
+    }, [anyOn, now]); // eslint-disable-line react-hooks/exhaustive-deps
+    const fileName = (minutes) => {
+        const key = `${TONIC_NAMES[settings.tonic]} ${scaleById(settings.mode).name}`;
+        const slug = key.toLowerCase().replace(/♯|#/g, 's').replace(/♭/g, 'b').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        return `bgm-${slug}-${settings.bpm}bpm-${minutes}min.wav`;
+    };
+    // The second lead's panel and track show only while it plays.
+    const shownRoles = Object.fromEntries(Object.entries(ROLES).filter(([role]) => role !== 'counter' || settings.counter.mode !== 'off'));
 
     return (
         <main className="gen">
             <header className="gen-header">
                 <h1>bgm <span>calm procedural music</span></h1>
-                <button className="gen-play" onClick={toggle}>{running ? 'Stop' : 'Play'}</button>
-                <ShareTools settings={settings} presets={linkPresets} onLoad={loadSettings} />
+                <button className="gen-play" onClick={toggle} title="Play / stop music and ambience (Space)">{anyOn ? 'Stop' : 'Play'}</button>
+                <div className="gen-parts" role="group" aria-label="What Play plays">
+                    <button type="button" className={`gen-part${settings.playMusic ? ' is-on' : ''}`} aria-pressed={settings.playMusic}
+                        onClick={() => togglePart('playMusic')} title={PART_TITLE}>Music</button>
+                    <button type="button" className={`gen-part${settings.playAmbience ? ' is-on' : ''}`} aria-pressed={settings.playAmbience}
+                        onClick={() => togglePart('playAmbience')} title={PART_TITLE}>Ambience</button>
+                </div>
+                <SleepTimer generator={gen} running={anyOn} />
+                <ShareTools settings={settings} presets={linkPresets} onNewVariation={newVariation} />
                 <div className="gen-header-tools">
                     <MasterVolume />
                     <AudioMeter />
+                    <Recorder generator={gen} fileName={fileName} />
                     <SettingsMenu generator={gen} onReload={reloadKeepingSettings} />
                 </div>
             </header>
@@ -478,7 +625,7 @@ const GenerativeApp = () => {
 
             <ChordTimeline
                 generator={gen}
-                tracks={<TrackStrip roles={ROLES} presets={Object.fromEntries(Object.entries(roles).map(([role, { presetName, edited }]) => [role, { name: presetName, edited }]))} mix={mix} armed={armed} onMix={changeMix} onArm={setArmed} onEdit={editSound}
+                tracks={<TrackStrip roles={shownRoles} presets={Object.fromEntries(Object.entries(roles).map(([role, { presetName, edited }]) => [role, { name: presetName, edited }]))} mix={mix} armed={armed} onMix={changeMix} onArm={setArmed} onEdit={editSound}
                     onRandom={randomizePreset} onGenerate={generateForRole} generating={generating} live={live} />}
             />
 
@@ -539,6 +686,18 @@ const GenerativeApp = () => {
                         onChange={(w) => update('padWeights', w)} onRandom={() => update('padWeights', randomStyleWeights('pad', randomLevel))} />
                     <StyleWeights title="Bass styles" styles={BASS_STYLES} weights={settings.bassWeights}
                         onChange={(w) => update('bassWeights', w)} onRandom={() => update('bassWeights', randomStyleWeights('bass', randomLevel))} />
+                    <Field label="Section length">
+                        <select value={settings.sections.phrases} disabled={settings.sections.mode === 'off'}
+                            onChange={(e) => update('sections', { ...settings.sections, phrases: Number(e.target.value) })}>
+                            {SECTION_LENGTHS.map((n) => <option key={n} value={n}>{n} phrases ({n * 4} bars)</option>)}
+                        </select>
+                    </Field>
+                    {['answer', 'line'].includes(settings.counter.mode) && (
+                        <Field label={`Second lead ${settings.counter.mode === 'answer' ? 'answers' : 'activity'} ${Math.round(settings.counter.activity * 100)}%`}>
+                            <input type="range" min="0" max="1" step="0.05" value={settings.counter.activity}
+                                onChange={(e) => update('counter', { ...settings.counter, activity: Number(e.target.value) })} />
+                        </Field>
+                    )}
                     <fieldset className="gen-weights">
                         <legend>
                             Feel (random, normally distributed per note)
@@ -564,6 +723,17 @@ const GenerativeApp = () => {
                     <input type="range" min="0" max="1" step="0.05" value={settings.leadActivity}
                         onChange={(e) => update('leadActivity', Number(e.target.value))} />
                 </Field>
+                <Field label="Second lead">
+                    <select value={settings.counter.mode} onChange={(e) => update('counter', { ...settings.counter, mode: e.target.value })}>
+                        {Object.entries(COUNTER_MODES).map(([id, label]) => <option key={id} value={id}>{label}</option>)}
+                    </select>
+                </Field>
+                <Field label="Sections">
+                    <select value={settings.sections.mode} title="Intro, build, full and breakdown: voices come and go every few phrases"
+                        onChange={(e) => update('sections', { ...settings.sections, mode: e.target.value })}>
+                        {Object.entries(SECTION_MODES).map(([id, label]) => <option key={id} value={id}>{label}</option>)}
+                    </select>
+                </Field>
                 <label className="gen-check">
                     <input type="checkbox" checked={settings.thinPadUnderLead}
                         onChange={(e) => update('thinPadUnderLead', e.target.checked)} />
@@ -571,7 +741,11 @@ const GenerativeApp = () => {
                 </label>
             </Panel>
 
-            {Object.entries(ROLES).map(([role, { label }]) => (
+            <AmbiencePanel levels={settings.ambience} volume={settings.ambienceVolume} on={settings.playAmbience}
+                onChange={changeAmbience} onVolume={(v) => update('ambienceVolume', v)} onToggle={() => togglePart('playAmbience')}
+                onRandom={() => randomize('ambience')} />
+
+            {Object.entries(shownRoles).map(([role, { label }]) => (
                 <Panel
                     key={role}
                     id={`voice-${role}`}

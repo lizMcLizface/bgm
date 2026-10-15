@@ -115,3 +115,13 @@ test('links carry generated sounds as role + seed', () => {
     expect(code.length).toBeLessThan(25);
     expect(decodeShare(code).presets).toEqual(presets);
 });
+
+test('second lead, sections and ambience travel in links; old codes read them as off', () => {
+    const settings = { ...defaultSettings(), seed: 9, counter: { mode: 'harmony', activity: 0.35 }, sections: { mode: 'strong', phrases: 8 }, ambience: { ...defaultSettings().ambience, rain: 0.4, thunder: 0.65 }, ambienceVolume: 0.55, playMusic: false, playAmbience: true };
+    const code = encodeSettings(settings, { counter: 'Ocarina', lead: { generated: { role: 'counter', seed: 77 } } });
+    expect(decodeShare(code)).toEqual({ settings, presets: { counter: 'Ocarina', lead: { generated: { role: 'counter', seed: 77 } } } });
+    const plain = encodeSettings({ ...defaultSettings(), seed: 9 });
+    expect(decodeShare(plain).settings.counter).toEqual({ mode: 'off', activity: 0.5 });
+    expect(Object.values(decodeShare(plain).settings.ambience).every((v) => v === 0)).toBe(true);
+    expect([decodeShare(plain).settings.playMusic, decodeShare(plain).settings.playAmbience]).toEqual([true, false]);
+});

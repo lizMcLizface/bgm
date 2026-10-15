@@ -22,6 +22,9 @@ function loadModules(AC) {
     return moduleLoads.get(AC);
 }
 
+/** Resolves once the noise processors are loaded into AC (or failed to). */
+export const noiseReady = (AC) => (AC.audioWorklet ? loadModules(AC).catch(() => {}) : Promise.resolve());
+
 class NoiseGenerator {
     constructor(AC) {
         this.AC = AC;

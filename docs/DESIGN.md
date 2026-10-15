@@ -376,13 +376,73 @@ Further options that change the sound or behaviour slightly, not done:
 
 ## 6. Export
 
-- **Quick:** `MediaRecorder` on a `MediaStreamDestination` tapped from
-  `masterBus` → webm/ogg download, realtime.
-- **Better:** render through an `OfflineAudioContext` with a seeded RNG —
-  faster than realtime, deterministic per seed. Possible because
-  `scheduleNote` has no timers and nodes take the context in their
-  constructor; the noise worklets must be registered on the offline context
-  too.
+**Done (2026-10-15)** as "Save audio" (`src/app/engine/render.js`): the
+plan Play would start (`Generator.planner()`, a planning-only copy) is
+booked onto fresh Instruments with the current sounds in an
+`OfflineAudioContext`, mixed as heard, and written as 16-bit WAV.
+
+- Chunks of 60 s, each in its own context, so memory is one chunk plus the
+  finished PCM (~11.5 MB/min) rather than a float buffer of the whole file.
+- Each chunk starts early by a pre-roll covering every note still sounding
+  at its start plus the longest release + effects tail, so it begins warm;
+  consecutive chunks cross-fade over 0.25 s (modulation LFOs restart per
+  context). Measured: no jump at the seam beyond what the music has anyway.
+- Reverb impulses are cached per sample rate (not per context) and the
+  worklets expose "ready" promises, so a chunk renders without refetching.
+- The ambient bed starts at the chunk's offset into the piece: loops and
+  thunder continue exactly.
+- Speed: 40 s with the default voices, a second lead and three ambience
+  layers rendered in ~11 s on the dev server (~4× real time), while the
+  page kept playing. Peaks over 0.9 go through a soft knee.
+
+## 6b. Ambience
+
+`src/app/engine/ambience.js`: rain, thunder, wind, waves, fire, vinyl,
+synthesised from noise in `ambienceSynth.js` - no recordings, nothing to
+license. Each layer is rendered once per sample rate into a 17-31 s loop:
+slow movement (gusts, swells, flicker) is periodic over the loop and the
+noise is cross-faded across the loop point; loop lengths differ so layers
+never line up the same way. Playback is a looping buffer source and a gain
+per layer - negligible audio-thread cost. Thunder is one-off rumbles at
+seeded random times, booked ahead on a timer (or all at once offline).
+
+The bed has its own output and volume (`Generator.ambienceOut`, straight
+to the master bus), so it plays with or without the music:
+start/stop are the music, startAmbience/stopAmbience the bed,
+startAll/stopAll both, and the sleep fade takes whatever plays.
+
+Rendering a layer took 0.2-1.3 s of main-thread time - longer than the
+Transport's 0.4 s lookahead, so notes would have come late. It now runs in
+a worker (`ambience.worker.js`; slow envelopes computed every 32 samples),
+0-1 ms on the main thread; a layer starts, fading in, once its buffer
+arrives, and moving a slider while stopped renders ahead.
+
+## 6c. Second lead and sections
+
+The counter role (arranger.js) has four modes: off; *answers* - with the
+chance set by its activity, a few notes in the bars where the lead holds
+its phrase-ending note, or a full call-and-response melody in phrases the
+lead sits out; *harmony* - the lead's notes a diatonic third below, same
+rhythm; *own line* - long notes on beat-group starts, more with activity.
+It draws nothing from the RNG while off, so pieces without it are
+unchanged.
+
+Sections (arranger.js `SECTIONS`) are decided at phrase starts every 2, 4
+or 8 phrases: intro (only at the start) → build → full → (breakdown | full
+| build), never three fulls in a row. *Gentle* scales the lead's activity
+and simplifies the bass; *strong* drops roles (intro = pad alone,
+breakdown without bass, pad held). The timeline labels each section.
+
+## 6d. Sleep timer and media controls
+
+The sleep timer (`Playback.jsx`) counts down from Play and calls
+`Generator.fadeOut` for the last minute (setTargetAtTime to -60 dB), then
+stops through the quick-stop path so tails are dropped and the output
+restored. Media Session: browsers only grant a session while a media
+element plays, so a silent looping 8 kHz WAV `<audio>` plays alongside
+(`mediaSession.js`); the music still goes straight to the AudioContext
+destination, with no added latency. It is started inside the Play click,
+which iOS requires.
 
 ## 7. Steps
 
@@ -471,9 +531,10 @@ Further options that change the sound or behaviour slightly, not done:
    Z/X octave) and from MIDI after "Connect MIDI" (never prompted on load),
    via Instrument.startNote/stopNote - held notes on the same timer-free
    envelopes. Inaudible roles are drawn faintly on the timeline.
-5. **Sections** — layer entry/exit, intro/A/B/breakdown.
+5. **Sections** — layer entry/exit, intro/build/full/breakdown. **Done**
+   (§6c), with a second lead.
 6. **Performance pass** — §5, measured.
-7. **Export** — §6.
+7. **Export** — §6. **Done.**
 8. **Extraction** — copy into its own repo (§4 list), deploy there.
 
 ## 8. Procedural sounds and levelling

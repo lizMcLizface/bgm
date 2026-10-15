@@ -14,10 +14,16 @@
 // (arranger.js) for the notes. Changing a "home" setting (key, mode,
 // progression, tempo, bars per chord) restarts the music from home at the
 // next bar; any other change continues the drift.
+//
+// The ambient bed (engine/ambience.js) has its own output and volume and
+// plays with the music or on its own: start/stop are the music,
+// startAmbience/stopAmbience the bed, startAll/stopAll both. The sleep
+// timer's fadeOut takes whatever is playing.
 
 import { audioContext } from '../audio/context';
 import { masterBus } from '../audio/bus';
 import Instrument from './engine/Instrument';
+import Ambience from './engine/ambience';
 import Transport from './engine/transport';
 import { scaleById, scaleSemitones, spellScale, romanDegree, diatonicChord, chordSymbol, displayNumeral, noteAtOrAbove } from './theory';
 import { arrangeBar } from './arranger';
@@ -40,10 +46,16 @@ const PLAN_KEEP_BARS = 4;
 
 // Settings that define "home"; changing one resets drift to it.
 const HOME_KEYS = new Set(['tonic', 'mode', 'progression', 'bpm', 'barsPerChord']);
+// Settings that don't change what is planned.
+const SOUND_KEYS = new Set(['ambience', 'ambienceVolume', 'playMusic', 'playAmbience']);
+
+// Ambience volume slider (0..1) to gain: 0.8, the default, is unity.
+const ambienceGain = (volume) => Math.pow(volume / 0.8, 2);
 
 // In display order.
 export const ROLES = {
     lead: { label: 'Lead', polyphony: 2, preset: ROLE_PRESETS.lead, volume: 0.7 },
+    counter: { label: 'Second lead', polyphony: 2, preset: ROLE_PRESETS.counter, volume: 0.6 },
     pad: { label: 'Rhythm / pad', polyphony: 8, preset: ROLE_PRESETS.pad, volume: 0.8 },
     bass: { label: 'Bass / support', polyphony: 2, preset: ROLE_PRESETS.bass, volume: 0.8 },
 };
@@ -76,13 +88,31 @@ class Generator {
         });
         this.transport.onBeat((event) => this.onBeat(event));
         this.planListeners = new Set();
+        this.runningListeners = new Set();
         this.quickStop = true;
+
+        this.ambienceOut = this.AC.createGain();
+        this.ambienceOut.gain.value = ambienceGain(this.settings.ambienceVolume ?? 0.8);
+        this.ambienceOut.connect(masterBus);
+        this.ambience = new Ambience({ context: this.AC, seed: 1 });
+        this.ambience.connect(this.ambienceOut);
+        this.ambience.setLevels(this.settings.ambience);
 
         this.reset();
     }
 
+    /** Whether the music plays. */
     get isRunning() {
         return this.transport.isRunning;
+    }
+
+    get ambienceRunning() {
+        return this.ambience.running;
+    }
+
+    /** Music or ambience. */
+    get anyRunning() {
+        return this.isRunning || this.ambienceRunning;
     }
 
     get meter() {
@@ -117,17 +147,107 @@ class Generator {
         }
         this.transport.setBpm(unitsPerMinute(this.meter, this.plan.get(0).bpm));
         this.transport.start();
+        this.notifyRunning();
     }
 
-    // With quickStop (the default), Stop doesn't wait for long reverbs and
+    async startAmbience() {
+        if (this.ambienceRunning) return;
+        if (this.AC.state !== 'running') await this.AC.resume();
+        this.ambience.start(this.AC.currentTime + 0.05);
+        this.notifyRunning();
+    }
+
+    stopAmbience(fade = 0.6) {
+        if (!this.ambienceRunning) return;
+        this.ambience.stop(this.AC.currentTime, fade);
+        this.notifyRunning();
+    }
+
+    /** Music and ambience together (the main Play). */
+    async startAll() {
+        await Promise.all([this.isRunning ? null : this.start(), this.startAmbience()]);
+    }
+
+    stopAll() {
+        this.cancelFadeOut();
+        if (this.isRunning) this.stop();
+        this.stopAmbience();
+    }
+
+    /** @param {function} callback - called on any Play / Stop of music or ambience (a sleep timer's too) */
+    onRunningChange(callback) {
+        this.runningListeners.add(callback);
+        return () => this.runningListeners.delete(callback);
+    }
+
+    notifyRunning() {
+        this.runningListeners.forEach((listener) => listener(this.isRunning));
+    }
+
+    /**
+     * Fades everything out over `seconds`, then stops (the sleep timer).
+     * Stop in the meantime cancels the fade.
+     */
+    fadeOut(seconds) {
+        if (!this.anyRunning) return;
+        const now = this.AC.currentTime;
+        if (this.isRunning) {
+            const gain = this.output.gain;
+            gain.cancelScheduledValues(now);
+            gain.setValueAtTime(gain.value, now);
+            // -60 dB at the end
+            gain.setTargetAtTime(0, now, seconds / 7);
+        }
+        // the bed fades the same way and stops at the end
+        this.fadeAmbience = this.ambienceRunning;
+        if (this.fadeAmbience) this.ambience.stop(now, seconds * 5 / 7);
+        clearTimeout(this.fadeTimer);
+        this.fadeTimer = setTimeout(() => {
+            this.fadeTimer = null;
+            this.fadeAmbience = false;
+            // silent already: drop the tails and restore the output
+            const quickStop = this.quickStop;
+            this.quickStop = true;
+            if (this.isRunning) this.stop();
+            this.quickStop = quickStop;
+            this.notifyRunning();
+        }, seconds * 1000);
+    }
+
+    get fadingOut() {
+        return Boolean(this.fadeTimer);
+    }
+
+    /** Back to full level from a fadeOut that is under way. */
+    cancelFadeOut() {
+        if (!this.fadeTimer) return;
+        clearTimeout(this.fadeTimer);
+        this.fadeTimer = null;
+        const gain = this.output.gain;
+        gain.cancelScheduledValues(this.AC.currentTime);
+        gain.setValueAtTime(gain.value, this.AC.currentTime);
+        gain.setTargetAtTime(1, this.AC.currentTime, 0.3);
+        if (this.fadeAmbience) {
+            this.fadeAmbience = false;
+            this.ambience.start(this.AC.currentTime + 0.05);
+        }
+    }
+
+    // Stops the music (the ambience plays on). With quickStop (the default), Stop doesn't wait for long reverbs and
     // echoes: the output fades out, then the effects' tails are dropped and
     // the output is restored (for auditions and live play). Without it the
     // voices fade and the tails ring out.
     stop() {
         this.transport.stop();
+        const wasFading = Boolean(this.fadeTimer);
+        clearTimeout(this.fadeTimer);
+        this.fadeTimer = null;
         Object.values(this.roles).forEach(({ instrument }) => instrument.silence());
         if (!this.quickStop) {
+            // a sleep fade cut short: back to full level for the tails
+            if (wasFading) this.output.gain.setTargetAtTime(1, this.AC.currentTime, 0.05);
             this.reset();
+            this.notifyRunning();
             return;
         }
         const gain = this.output.gain;
@@ -136,6 +256,7 @@ class Generator {
         clearTimeout(this.stopFade);
         this.stopFade = setTimeout(() => this.endStopFade(), STOP_FADE_MS);
         this.reset();
+        this.notifyRunning();
     }
 
     endStopFade() {
@@ -153,6 +274,9 @@ class Generator {
      */
     set(key, value) {
         this.settings[key] = value;
+        if (key === 'ambience') this.ambience.setLevels(value);
+        if (key === 'ambienceVolume') this.setAmbienceVolume(value);
+        if (SOUND_KEYS.has(key)) return;
         // Bar numbering and the timeline are per meter: start over in it.
         if (key === 'meter' && this.isRunning) {
             this.stop();
@@ -175,6 +299,9 @@ class Generator {
     setMany(patch) {
         const meterChanged = 'meter' in patch && patch.meter !== this.settings.meter;
         Object.assign(this.settings, patch);
+        if ('ambience' in patch) this.ambience.setLevels(this.settings.ambience);
+        if ('ambienceVolume' in patch) this.setAmbienceVolume(this.settings.ambienceVolume);
+        if (Object.keys(patch).every((key) => SOUND_KEYS.has(key))) return;
         if (this.isRunning && meterChanged) {
             this.stop();
             this.start();
@@ -198,6 +325,15 @@ class Generator {
     keepCurrent() {
         const { tonic, mode, progression, bpm } = this.nowPlaying();
         this.setMany({ tonic, mode, progression, bpm });
+    }
+
+    setAmbienceVolume(volume) {
+        this.ambienceOut.gain.setTargetAtTime(ambienceGain(volume), this.AC.currentTime, 0.05);
+    }
+
+    /** Gain of the ambience volume (for rendering to a file). */
+    get ambienceGain() {
+        return ambienceGain(this.settings.ambienceVolume ?? 0.8);
     }
 
     homeMusic() {
@@ -245,6 +381,7 @@ class Generator {
             bass: [noteAtOrAbove(planned.chord.pitchClasses[0], planned.state.ranges.bass[0] + 5)],
             pad: planned.state.padVoicing,
             lead: [planned.state.leadMidi],
+            counter: [planned.state.counterMidi || 72],
         }[role];
         notes.forEach((midi) => instrument.scheduleNote(midi, time, 1.5, 0.7));
     }
@@ -352,7 +489,7 @@ class Generator {
 
     // Decides one bar. Event times/lengths are in beats from the bar start.
     planBar(bar) {
-        const { barsPerChord, leadActivity, padWeights, bassWeights, thinPadUnderLead, drift, humanize, voices } = this.settings;
+        const { barsPerChord, leadActivity, padWeights, bassWeights, thinPadUnderLead, drift, humanize, voices, counter, sections } = this.settings;
         const prev = this.plan.get(bar - 1);
 
         const fresh = !prev || this.resetMusicAt === bar;
@@ -386,7 +523,7 @@ class Generator {
             chordStart,
             barsLeftInChord,
             prev: prev ? prev.state : null,
-            settings: { leadActivity, padWeights, bassWeights, thinPadUnderLead, voices },
+            settings: { leadActivity, padWeights, bassWeights, thinPadUnderLead, voices, counter, sections },
             rng: this.rng,
         });
         this.humanize(events, humanize, bpm, bar);
@@ -405,6 +542,20 @@ class Generator {
             e.velocity = Math.max(0.05, Math.min(1, e.velocity * (1 + normal(this.rng, velocity))));
             e.detune = normal(this.rng, detune);
         });
+    }
+
+    /**
+     * A copy that only plans: the piece Play would start with these
+     * settings, bar by bar via planBar (for rendering to a file).
+     */
+    planner() {
+        const copy = Object.create(Generator.prototype);
+        copy.settings = JSON.parse(JSON.stringify(this.settings));
+        copy.rng = seeded(copy.settings.seed);
+        copy.plan = new Map();
+        copy.currentBar = -1;
+        copy.resetMusicAt = 0;
+        return copy;
     }
 
     // Plans every missing bar from `fromBar` through the look-ahead horizon

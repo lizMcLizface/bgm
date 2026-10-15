@@ -3,7 +3,8 @@
 Calm procedural background music in the browser - for under a video, a
 podcast or a work session. Live at **[liz.moe/bgm](https://liz.moe/bgm/)**.
 
-Three synth voices - **rhythm/pad**, **bass/support** and **lead** - play
+Synth voices - **rhythm/pad**, **bass/support**, **lead** and an optional
+**second lead** - play
 from scales, chord progressions and simple arrangement rules, and can slowly
 drift: key, mode, progression and tempo change over time with configurable
 chances, either centred on your settings or wandering freely. Everything is
@@ -20,6 +21,22 @@ synthesised with the Web Audio API; there are no samples.
   (whole bar / per beat group / walking) by adjustable shares, a lead that
   plays call-and-response phrases, per-voice octave and octave wander,
   humanized timing, velocity and pitch
+- A second lead that answers the lead, harmonises it a third below, or
+  plays its own slow line
+- Sections: every few phrases the piece moves between intro, build, full
+  and breakdown - voices come and go, the lead plays more or less
+- Ambience under the music - rain, distant thunder, wind, waves, a
+  fireplace, vinyl crackle - synthesised from noise (no recordings), each
+  with its own level, plus a volume for the whole bed against the music;
+  it plays with the music or on its own. "Music" and "Ambience" beside
+  Play choose what Play starts (switching live while playing) and are
+  part of the link; new visits play music only. Turning a layer up while
+  nothing plays starts the ambience alone
+- Sleep timer with a countdown: fades out over the last minute and stops
+- Save audio: renders the piece to a WAV file (1-60 min) faster than real
+  time, in chunks so long files stay light on memory
+- Space plays / stops; lock-screen, notification and media-key controls
+  (next / previous track = new / previous variation)
 - Drift ("evolution"): related-key and mode changes, progression changes,
   tempo glides, optional V-chord preparation for key changes; keys and
   modes can be excluded
@@ -73,9 +90,10 @@ The site is a GitHub Pages project site, so it is built with `base: '/bgm/'`
 src/app/            the application
   Generator.js        plan-ahead sequencer: settings -> planned bars -> audio
   conductor.js        drift of key / mode / progression / tempo per cycle
-  arranger.js         per-bar notes for pad, bass and lead
+  arranger.js         per-bar notes for pad, bass, lead and second lead; sections
   theory.js           scales, chords, spelling, voice leading
-  engine/             Instrument (voices + effects), envelopes, Transport
+  engine/             Instrument (voices + effects), envelopes, Transport,
+                      ambience (+ its worker), offline render to WAV
   editor/             synth editor, presets store
   settings.js         defaults, validation, share links
 src/nodes/          Web Audio building blocks (effects, oscillators, noise)

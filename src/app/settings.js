@@ -9,7 +9,11 @@
 // (shareCode.js); links made before that (base64 JSON, starting 'eyJ')
 // still open.
 
-import { DEFAULT_PAD_WEIGHTS, DEFAULT_BASS_WEIGHTS, DEFAULT_VOICES, OCTAVE_LIMITS, OCTAVE_WANDER } from './arranger';
+import {
+    DEFAULT_PAD_WEIGHTS, DEFAULT_BASS_WEIGHTS, DEFAULT_VOICES, OCTAVE_LIMITS, OCTAVE_WANDER,
+    DEFAULT_COUNTER, COUNTER_MODES, DEFAULT_SECTIONS, SECTION_MODES, SECTION_LENGTHS,
+} from './arranger';
+import { AMBIENCE_LAYERS, DEFAULT_AMBIENCE } from './engine/ambience';
 import { DEFAULT_DRIFT, DRIFT_MODES, TEMPO_BOUNDS } from './conductor';
 import { METERS, DEFAULT_METER } from './meter';
 import { SCALE_FAMILIES } from './theory';
@@ -33,6 +37,12 @@ export function defaultSettings() {
         voices: JSON.parse(JSON.stringify(DEFAULT_VOICES)), // per-role octave + wander
         drift: { ...DEFAULT_DRIFT, excludedTonics: [], excludedModes: [] }, // conductor.js
         humanize: { timing: 12, velocity: 0.08, detune: 3 }, // ms, fraction, cents
+        counter: { ...DEFAULT_COUNTER }, // second lead (arranger.js)
+        sections: { ...DEFAULT_SECTIONS }, // intro / build / full / breakdown
+        ambience: { ...DEFAULT_AMBIENCE }, // rain, wind, ... levels 0..1 (engine/ambience.js)
+        ambienceVolume: 0.8, // the whole bed against the music
+        playMusic: true, // what Play starts
+        playAmbience: false,
         seed: newSeed(),
     };
 }
@@ -78,6 +88,12 @@ const RULES = {
         excludedModes: listOf((id) => MODE_IDS.has(id)),
     },
     humanize: { timing: clamp(0, 40), velocity: clamp(0, 0.25), detune: clamp(0, 15) },
+    counter: { mode: oneOf(Object.keys(COUNTER_MODES)), activity: clamp(0, 1) },
+    sections: { mode: oneOf(Object.keys(SECTION_MODES)), phrases: oneOf(SECTION_LENGTHS) },
+    ambience: Object.fromEntries(Object.keys(AMBIENCE_LAYERS).map((id) => [id, clamp(0, 1)])),
+    ambienceVolume: clamp(0, 1),
+    playMusic: bool,
+    playAmbience: bool,
     seed: int(0, 2 ** 31),
 };
 

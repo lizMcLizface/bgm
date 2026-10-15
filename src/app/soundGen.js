@@ -107,6 +107,9 @@ const RECIPES = {
     },
 };
 
+// The second lead: lead sounds.
+RECIPES.counter = RECIPES.lead;
+
 const ADJECTIVES = ['Amber', 'Ashen', 'Blue', 'Bright', 'Calm', 'Copper', 'Dusky', 'Faded', 'Felt', 'Glass', 'Golden', 'Hazy', 'Hollow',
     'Ivory', 'Lunar', 'Misty', 'Mossy', 'Opal', 'Pale', 'Paper', 'Quiet', 'Rusty', 'Silver', 'Slow', 'Soft', 'Still', 'Velvet', 'Warm',
     'Willow', 'Winter', 'Wooden', 'Woolen'];

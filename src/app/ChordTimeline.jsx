@@ -7,6 +7,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { groupStarts } from './meter';
+import { SECTIONS } from './arranger';
 
 const BARS_BEHIND = 1;
 const BARS_AHEAD = 6;
@@ -57,6 +58,7 @@ function draw(ctx, width, gen, pos) {
         pad: cssVar(style, '--gen-role-pad'),
         bass: cssVar(style, '--gen-role-bass'),
         lead: cssVar(style, '--gen-role-lead'),
+        counter: cssVar(style, '--gen-role-counter'),
     };
     const beatsPerBar = gen.beatsPerBar;
     const pxPerBeat = width / ((BARS_BEHIND + BARS_AHEAD) * beatsPerBar);
@@ -133,6 +135,18 @@ function draw(ctx, width, gen, pos) {
         ctx.setLineDash([]);
         ctx.fillStyle = color.accent;
         ctx.fillText(`→ ${chord.keyName}`, at + 4, rollTop + 2);
+    });
+
+    // Sections: their name where each begins, along the roll's foot.
+    ctx.textBaseline = 'bottom';
+    ctx.font = '600 11px system-ui, -apple-system, "Segoe UI", sans-serif';
+    plan.forEach(({ bar, state }, i) => {
+        const section = state.phrase.section;
+        if (!section || section.start !== bar || (i > 0 && plan[i - 1].state.phrase.section === section)) return;
+        const at = x(bar * beatsPerBar);
+        if (at < -80 || at > width) return;
+        ctx.fillStyle = color.muted;
+        ctx.fillText(SECTIONS[section.type].label.toUpperCase(), Math.max(at, 0) + 4, HEIGHT - 3);
     });
     ctx.textBaseline = 'middle';
 

@@ -267,3 +267,72 @@ test('pad plays every note of 4- and 5-note chords', () => {
         expect(new Set(bar.state.padVoicing.map(pc))).toEqual(new Set(bar.chord.pitchClasses));
     }));
 });
+
+describe('second lead', () => {
+    const counter = (mode, activity = 0.7) => ({ ...AUTO, leadActivity: 0.5, counter: { mode, activity } });
+
+    test('off adds nothing and leaves the piece as it was', () => {
+        const before = run({ seed: 3, settings: AUTO });
+        const off = run({ seed: 3, settings: counter('off') });
+        expect(off.map((b) => b.events)).toEqual(before.map((b) => b.events));
+    });
+
+    test.each(['answer', 'harmony', 'line'])('%s plays in its register, in the scale', (mode) => {
+        const bars = SEEDS.flatMap((seed) => run({ seed, settings: counter(mode) }));
+        const notes = bars.flatMap((b) => byRole(b, 'counter'));
+        expect(notes.length).toBeGreaterThan(0);
+        notes.forEach((e) => {
+            expect(e.midi).toBeGreaterThanOrEqual(62);
+            expect(e.midi).toBeLessThanOrEqual(84);
+            expect([0, 2, 4, 5, 7, 9, 11]).toContain(pc(e.midi));
+        });
+    });
+
+    test('harmony moves with the lead: same rhythm, only while it plays', () => {
+        SEEDS.forEach((seed) => run({ seed, settings: counter('harmony') }).forEach((bar) => {
+            expect(byRole(bar, 'counter').map((e) => e.beat)).toEqual(byRole(bar, 'lead').map((e) => e.beat));
+        }));
+    });
+
+    test('answers fill the bars where the lead holds its last note, or take the melody when it rests', () => {
+        SEEDS.forEach((seed) => run({ seed, settings: counter('answer', 1) }).forEach((bar) => {
+            const { leadActive } = bar.state.phrase;
+            const answers = byRole(bar, 'counter');
+            const inPhrase = bar.bar % PHRASE_BARS;
+            if (!leadActive) expect(answers.length).toBeGreaterThan(0);
+            else if (inPhrase % 2 === 0) expect(answers).toEqual([]);
+            else answers.forEach((e) => expect(e.beat).toBeGreaterThan(0));
+        }));
+    });
+});
+
+describe('sections', () => {
+    const sections = (mode, phrases = 2) => ({ ...AUTO, leadActivity: 1, counter: { mode: 'line', activity: 0.5 }, sections: { mode, phrases } });
+
+    test('change every few phrases, starting with an intro', () => {
+        const bars = run({ bars: 96, settings: sections('strong') });
+        const starts = bars.filter((b) => b.state.phrase.section.start === b.bar).map((b) => b.bar);
+        expect(starts[0]).toBe(0);
+        expect(bars[0].state.phrase.section.type).toBe('intro');
+        starts.slice(1).forEach((bar, i) => expect(bar - starts[i]).toBe(2 * PHRASE_BARS));
+        expect(new Set(bars.map((b) => b.state.phrase.section.type))).toEqual(new Set(['intro', 'build', 'full', 'breakdown']));
+    });
+
+    test('strong: the intro is pad alone, breakdowns drop the bass', () => {
+        SEEDS.forEach((seed) => run({ seed, bars: 96, settings: sections('strong') }).forEach((bar) => {
+            const type = bar.state.phrase.section.type;
+            const roles = new Set(bar.events.map((e) => e.role));
+            if (type === 'intro') expect([...roles]).toEqual(['pad']);
+            if (type === 'breakdown') expect(roles.has('bass')).toBe(false);
+            if (type === 'full') expect(roles.has('bass')).toBe(true);
+        }));
+    });
+
+    test('never more than two full sections in a row', () => {
+        SEEDS.forEach((seed) => {
+            const types = run({ seed, bars: 400, settings: sections('gentle', 2) })
+                .filter((b) => b.state.phrase.section.start === b.bar).map((b) => b.state.phrase.section.type);
+            expect(types.join(' ')).not.toMatch(/full full full/);
+        });
+    });
+});

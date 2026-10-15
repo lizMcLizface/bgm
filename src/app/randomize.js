@@ -12,10 +12,13 @@ import { SCALE_FAMILIES, TONIC_NAMES, scaleById, scaleSemitones } from './theory
 import PROGRESSIONS, { PROGRESSION_LENGTHS, progressionsOfLength } from './progressions';
 import { METERS } from './meter';
 import { DEFAULT_DRIFT, DRIFT_MODES, TEMPO_BOUNDS } from './conductor';
-import { OCTAVE_LIMITS, OCTAVE_WANDER, DEFAULT_PAD_WEIGHTS, DEFAULT_BASS_WEIGHTS } from './arranger';
+import { OCTAVE_LIMITS, OCTAVE_WANDER, DEFAULT_PAD_WEIGHTS, DEFAULT_BASS_WEIGHTS, COUNTER_MODES, SECTION_MODES, SECTION_LENGTHS } from './arranger';
 import { PRESET_CATEGORIES, ROLE_CATEGORY } from './presets';
 import { presetGroups } from './editor/presetStore';
 import { chance, pick, weighted } from './random';
+import { AMBIENCE_LAYERS } from './engine/ambience';
+
+const AMBIENCE_IDS = Object.keys(AMBIENCE_LAYERS);
 
 export const RANDOM_LEVELS = { reason: 'Within reason', wild: 'Full random' };
 
@@ -243,10 +246,46 @@ export function randomStyleWeights(kind, level, rng = Math.random) {
     return weights;
 }
 
-/** Lead activity, pad thinning, pad and bass styles, and feel. */
+/** The second lead: within reason mostly off or answering the lead. */
+export function randomCounter(level, rng = Math.random) {
+    if (level === 'wild') return { mode: pick(rng, Object.keys(COUNTER_MODES)), activity: step(rng(), 0.05) };
+    return { mode: weighted(rng, { off: 4, answer: 3, harmony: 1, line: 1 }), activity: step(between(rng, 0.3, 0.7), 0.05) };
+}
+
+/** Sections: within reason mostly gentle, four phrases long. */
+export function randomSections(level, rng = Math.random) {
+    if (level === 'wild') return { mode: pick(rng, Object.keys(SECTION_MODES)), phrases: pick(rng, SECTION_LENGTHS) };
+    return { mode: weighted(rng, { off: 2, gentle: 3, strong: 1 }), phrases: Number(weighted(rng, { 2: 1, 4: 3, 8: 1 })) };
+}
+
+/**
+ * Ambience levels. Within reason one or two layers that suit each other
+ * (thunder only with rain or wind, vinyl with anything), at modest levels;
+ * full random any mix.
+ */
+export function randomAmbience(level, rng = Math.random) {
+    const levels = Object.fromEntries(AMBIENCE_IDS.map((id) => [id, 0]));
+    if (level === 'wild') {
+        AMBIENCE_IDS.forEach((id) => { levels[id] = chance(rng, 0.5) ? step(rng(), 0.05) : 0; });
+        if (!AMBIENCE_IDS.some((id) => levels[id] > 0)) levels[pick(rng, AMBIENCE_IDS)] = 0.5;
+        return levels;
+    }
+    const main = weighted(rng, { rain: 4, waves: 2, wind: 2, fire: 3, vinyl: 2 });
+    levels[main] = step(between(rng, 0.35, 0.65), 0.05);
+    if (chance(rng, 0.5)) {
+        const second = weighted(rng, { vinyl: 3, fire: main === 'rain' ? 2 : 0, wind: main === 'waves' ? 2 : 1, rain: main === 'fire' ? 2 : 0 });
+        if (second !== main && !levels[second]) levels[second] = step(between(rng, 0.2, 0.4), 0.05);
+    }
+    if ((levels.rain || levels.wind) && chance(rng, 0.35)) levels.thunder = step(between(rng, 0.3, 0.6), 0.05);
+    return levels;
+}
+
+/** Lead activity, pad thinning, pad and bass styles, feel, second lead and sections. */
 export function randomArrangement(settings, level, rng = Math.random) {
     const wild = level === 'wild';
     return {
+        counter: randomCounter(level, rng),
+        sections: randomSections(level, rng),
         leadActivity: wild ? step(rng(), 0.05) : step(between(rng, 0.4, 0.8), 0.05),
         thinPadUnderLead: wild ? chance(rng, 0.5) : chance(rng, 0.8),
         padWeights: randomStyleWeights('pad', level, rng),

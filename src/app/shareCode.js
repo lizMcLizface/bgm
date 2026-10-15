@@ -15,7 +15,8 @@
 import { SCALE_FAMILIES } from './theory';
 import { METERS } from './meter';
 import { DRIFT_MODES, TEMPO_BOUNDS } from './conductor';
-import { OCTAVE_LIMITS, OCTAVE_WANDER } from './arranger';
+import { OCTAVE_LIMITS, OCTAVE_WANDER, COUNTER_MODES, SECTION_MODES, SECTION_LENGTHS } from './arranger';
+import { AMBIENCE_LAYERS } from './engine/ambience';
 import { ROLE_PRESETS } from './presets';
 import { SEED_BITS as SOUND_SEED_BITS } from './soundGen';
 import PROGRESSIONS from './progressions';
@@ -45,8 +46,9 @@ const PRESET_BITS = 8;
 // Preset index meaning "a generated sound" (soundGen.js v1): followed by
 // the role it was made for and its seed.
 const GENERATED_V1 = 2 ** PRESET_BITS - 1;
-// Fixed role order in codes (independent of the UI's order).
-export const CODE_ROLES = ['pad', 'bass', 'lead'];
+// Fixed role order in codes (independent of the UI's order); also the
+// index a generated sound stores for the role it was made for.
+export const CODE_ROLES = ['pad', 'bass', 'lead', 'counter'];
 
 const bitsFor = (count) => Math.max(1, Math.ceil(Math.log2(count)));
 const clampIndex = (i, count) => Math.max(0, Math.min(count - 1, i));
@@ -82,6 +84,7 @@ const modeList = {
 };
 
 const chance = stepped(0, 1, 0.05);
+const level = chance;
 const weight = stepped(0, 100, 5);
 const voice = (role) => [
     [['voices', role, 'octave'], stepped(OCTAVE_LIMITS[role][0], OCTAVE_LIMITS[role][1], 1)],
@@ -128,6 +131,30 @@ const GROUPS = [
         [['humanize', 'velocity'], stepped(0, 0.25, 0.01)],
         [['humanize', 'detune'], stepped(0, 15, 0.5)],
     ],
+];
+
+// Fields added later, written after the first roles' presets.
+const LATER_GROUPS = [
+    [
+        [['counter', 'mode'], options(Object.keys(COUNTER_MODES), 2)],
+        [['counter', 'activity'], chance],
+        ...voice('counter'),
+    ],
+    [
+        [['sections', 'mode'], options(Object.keys(SECTION_MODES), 2)],
+        [['sections', 'phrases'], options(SECTION_LENGTHS, 2)],
+    ],
+    [...Object.keys(AMBIENCE_LAYERS).map((id) => [['ambience', id], level]), [['ambienceVolume'], level]],
+    [[['playMusic'], bool], [['playAmbience'], bool]],
+];
+
+// The order of a code (append only): version, seed, GROUPS, presets of the
+// first three roles, LATER_GROUPS, the second lead's preset.
+const LAYOUT = [
+    ['groups', GROUPS],
+    ['presets', CODE_ROLES.slice(0, 3)],
+    ['groups', LATER_GROUPS],
+    ['presets', CODE_ROLES.slice(3)],
 ];
 
 class BitWriter {
@@ -198,7 +225,12 @@ export function encodeShareCode(settings, defaults, presets = {}) {
     const w = new BitWriter();
     w.write(CODE_VERSION, VERSION_BITS);
     w.write(settings.seed, SEED_BITS);
-    GROUPS.forEach((fields) => {
+    LAYOUT.forEach(([kind, part]) => (kind === 'groups' ? writeGroups(w, part, settings, defaults) : writePresets(w, part, presets)));
+    return w.toBase64Url();
+}
+
+function writeGroups(w, groups, settings, defaults) {
+    groups.forEach((fields) => {
         const changed = fields.map(([path, codec]) => !same(codec, get(settings, path), get(defaults, path)));
         w.write(changed.some(Boolean) ? 1 : 0, 1);
         if (!changed.some(Boolean)) return;
@@ -209,7 +241,10 @@ export function encodeShareCode(settings, defaults, presets = {}) {
             else w.write(codec.toIndex(get(settings, path)), codec.bits);
         });
     });
-    CODE_ROLES.forEach((role) => {
+}
+
+function writePresets(w, roles, presets) {
+    roles.forEach((role) => {
         const preset = presets[role];
         const generated = preset && preset.generated;
         const index = preset === ROLE_PRESETS[role] ? -1 : SHAREABLE_PRESETS.indexOf(preset);
@@ -222,7 +257,30 @@ export function encodeShareCode(settings, defaults, presets = {}) {
             w.write(index, PRESET_BITS);
         }
     });
-    return w.toBase64Url();
+}
+
+function readGroups(r, groups, settings) {
+    groups.forEach((fields) => {
+        if (!r.read(1)) return;
+        fields.forEach(([path, codec]) => {
+            if (!r.read(1)) return;
+            set(settings, path, codec.read ? codec.read(r) : codec.fromIndex(r.read(codec.bits)));
+        });
+    });
+}
+
+function readPresets(r, roles, presets) {
+    roles.forEach((role) => {
+        if (!r.read(1)) return;
+        const index = r.read(PRESET_BITS);
+        if (index === GENERATED_V1) {
+            const madeFor = CODE_ROLES[r.read(2)];
+            const seed = r.read(SOUND_SEED_BITS);
+            if (madeFor) presets[role] = { generated: { role: madeFor, seed } };
+        } else if (SHAREABLE_PRESETS[index]) {
+            presets[role] = SHAREABLE_PRESETS[index];
+        }
+    });
 }
 
 /**
@@ -236,24 +294,7 @@ export function decodeShareCode(code, defaults) {
     if (r.read(VERSION_BITS) !== CODE_VERSION) throw new Error('Unknown share code version');
     const settings = JSON.parse(JSON.stringify(defaults));
     settings.seed = r.read(SEED_BITS);
-    GROUPS.forEach((fields) => {
-        if (!r.read(1)) return;
-        fields.forEach(([path, codec]) => {
-            if (!r.read(1)) return;
-            set(settings, path, codec.read ? codec.read(r) : codec.fromIndex(r.read(codec.bits)));
-        });
-    });
     const presets = {};
-    CODE_ROLES.forEach((role) => {
-        if (!r.read(1)) return;
-        const index = r.read(PRESET_BITS);
-        if (index === GENERATED_V1) {
-            const madeFor = CODE_ROLES[r.read(2)];
-            const seed = r.read(SOUND_SEED_BITS);
-            if (madeFor) presets[role] = { generated: { role: madeFor, seed } };
-        } else if (SHAREABLE_PRESETS[index]) {
-            presets[role] = SHAREABLE_PRESETS[index];
-        }
-    });
+    LAYOUT.forEach(([kind, part]) => (kind === 'groups' ? readGroups(r, part, settings) : readPresets(r, part, presets)));
     return { settings, presets };
 }

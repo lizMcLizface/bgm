@@ -236,13 +236,13 @@ test('mute and solo: any solo silences the rest; mute silences only its role', (
     const gen = generator(1, { mode: 'off' });
     const levels = () => Object.fromEntries(Object.entries(gen.roles).map(([role, r]) => [role, r.gain.gain.value]));
     gen.setRoleMix('bass', { mute: true });
-    expect(levels()).toEqual({ pad: 0.8, bass: 0, lead: 0.7 });
+    expect(levels()).toEqual({ pad: 0.8, bass: 0, lead: 0.7, counter: 0.6 });
     gen.setRoleMix('lead', { solo: true });
-    expect(levels()).toEqual({ pad: 0, bass: 0, lead: 0.7 });
+    expect(levels()).toEqual({ pad: 0, bass: 0, lead: 0.7, counter: 0 });
     gen.setRoleMix('bass', { solo: true }); // solo beats mute
-    expect(levels()).toEqual({ pad: 0, bass: 0.8, lead: 0.7 });
+    expect(levels()).toEqual({ pad: 0, bass: 0.8, lead: 0.7, counter: 0 });
     gen.setRoleMix('lead', { solo: false });
     gen.setRoleMix('bass', { solo: false });
     gen.setRoleVolume('pad', 0.5);
-    expect(levels()).toEqual({ pad: 0.5, bass: 0, lead: 0.7 });
+    expect(levels()).toEqual({ pad: 0.5, bass: 0, lead: 0.7, counter: 0.6 });
 });

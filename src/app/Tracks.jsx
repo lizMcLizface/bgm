@@ -13,7 +13,7 @@ const KEY_OFFSETS = {
     KeyA: 0, KeyW: 1, KeyS: 2, KeyE: 3, KeyD: 4, KeyF: 5, KeyT: 6, KeyG: 7,
     KeyY: 8, KeyH: 9, KeyU: 10, KeyJ: 11, KeyK: 12, KeyO: 13, KeyL: 14, KeyP: 15, Semicolon: 16,
 };
-export const DEFAULT_KEY_OCTAVES = { pad: 4, bass: 2, lead: 5 };
+export const DEFAULT_KEY_OCTAVES = { pad: 4, bass: 2, lead: 5, counter: 5 };
 const OCTAVE_RANGE = [0, 7];
 
 const isTyping = (target) => target && ['INPUT', 'SELECT', 'TEXTAREA'].includes(target.tagName) && target.type !== 'range' && target.type !== 'checkbox';
