@@ -26,6 +26,7 @@ import { generateSound, newSoundSeed } from './soundGen';
 import { levelPreset } from './engine/loudness';
 import { addGeneratedPreset, generatedInfo } from './editor/presetStore';
 import { readPref, writePref } from './prefs';
+import { seedToPhrase, phraseToSeed } from './phrase';
 
 // One Generator for the page's lifetime; StrictMode's double-mount must
 // not build a second set of instruments.
@@ -72,8 +73,40 @@ function useSettingsInUrl(settings, presets) {
     }, [settings, presets]);
 }
 
+// The seed as a pass-phrase (phrase.js): shows the current seed's words;
+// typing other words (or any text) and pressing Enter plays that phrase's
+// piece from the start. `edited`: settings changed mid-piece, so what
+// plays differs from the phrase's piece until it starts over.
+const PhraseField = ({ seed, edited, onApply }) => {
+    const [text, setText] = useState(() => seedToPhrase(seed));
+    // a seed from elsewhere (New variation, a link): show its words -
+    // unless what was typed stands for it
+    useEffect(() => {
+        setText((current) => (phraseToSeed(current) === seed ? current : seedToPhrase(seed)));
+    }, [seed]);
+    const pending = phraseToSeed(text) !== seed;
+    const apply = (e) => {
+        e.preventDefault();
+        const next = phraseToSeed(text);
+        if (next === null) setText(seedToPhrase(seed));
+        else onApply(next);
+    };
+    return (
+        <form className="gen-phrase" onSubmit={apply}>
+            <label>
+                <span className="gen-audio-label">Phrase</span>
+                <input type="text" value={text} spellCheck="false" autoComplete="off" onChange={(e) => setText(e.target.value)}
+                    aria-label="Phrase the piece is made from"
+                    title="The piece is made from this phrase: the same phrase and settings always play the same music. Type your own words and press Enter to hear what they make." />
+            </label>
+            {pending && <button type="submit">Play this phrase</button>}
+            {!pending && edited && <small title="Settings changed while it played">changed since the start · ⏮ replays it</small>}
+        </form>
+    );
+};
+
 // New variation / copy link, next to Play.
-const ShareTools = ({ settings, presets, onNewVariation }) => {
+const ShareTools = ({ settings, presets, onNewVariation, phrase }) => {
     const [message, setMessage] = useState('');
     const flash = (text) => {
         setMessage(text);
@@ -90,7 +123,8 @@ const ShareTools = ({ settings, presets, onNewVariation }) => {
     };
     return (
         <div className="gen-share">
-            <button type="button" onClick={onNewVariation} title="Same settings, different random choices (media key: next track)">
+            {phrase}
+            <button type="button" onClick={onNewVariation} title="Same settings, a new phrase: different random choices (media key: next track)">
                 New variation
             </button>
             <button type="button" onClick={copy}>Copy link</button>
@@ -389,7 +423,7 @@ const AmbiencePanel = ({ levels, shape, volume, on, onChange, onShape, onVolume,
     );
 };
 
-const PART_TITLE = 'Switch on or off: while playing, right away; while stopped, for the next Play. Saved in the link.';
+const PART_TITLE = 'Turn this part on or off. Turning it on also starts playing.';
 
 // Space plays / stops - unless typing, or on a control Space presses itself.
 const spaceTarget = (target) => target && (['INPUT', 'SELECT', 'TEXTAREA', 'BUTTON', 'SUMMARY', 'A'].includes(target.tagName) || target.isContentEditable);
@@ -430,6 +464,7 @@ const GenerativeApp = () => {
     const [ambienceOn, setAmbienceOn] = useState(gen.ambienceRunning);
     const anyOn = running || ambienceOn;
     const [paused, setPaused] = useState(false);
+    const [, setTick] = useState(0);
     const [settings, setSettings] = useState({ ...gen.settings });
     const [roles, setRoles] = useState(() =>
         Object.fromEntries(Object.keys(ROLES).map((role) => [role, { presetName: gen.roles[role].presetName, edited: false }]))
@@ -468,6 +503,7 @@ const GenerativeApp = () => {
             setRunning(gen.isRunning);
             setAmbienceOn(gen.ambienceRunning);
             setPaused(gen.paused);
+            setTick((n) => n + 1);
         };
         sync(); // after a hot update the state may describe the old generator
         return gen.onRunningChange(sync);
@@ -576,13 +612,16 @@ const GenerativeApp = () => {
     };
     const stop = () => gen.stopAll();
     const toggle = () => (gen.anyRunning ? stop() : play());
-    // Switching a part off stops it (all off: paused); switching one on
-    // starts it while anything plays, otherwise readies it for Play.
+    // Switching a part off stops it (all off: paused). Switching one on
+    // starts it - and, when nothing was playing, everything that is on.
     const setPart = (key, on) => {
         const partRunning = key === 'playMusic' ? gen.isRunning : gen.ambienceRunning;
-        if (on && !partRunning && gen.anyRunning) startPart(key);
         if (!on && partRunning) (key === 'playMusic' ? gen.stop() : gen.stopAmbience());
         update(key, on);
+        if (on && !partRunning) {
+            if (gen.anyRunning) startPart(key);
+            else play();
+        }
     };
     const togglePart = (key) => setPart(key, !gen.settings[key]);
     // Turning a layer up switches the ambience on - alone, when nothing
@@ -599,6 +638,11 @@ const GenerativeApp = () => {
     const newVariation = () => {
         seeds.current.push(gen.settings.seed);
         loadSettings({ seed: newSeed() });
+    };
+    // A phrase's piece, from its start.
+    const playPhrase = (seed) => {
+        loadSettings({ seed });
+        gen.rewind();
     };
     const previousVariation = () => {
         if (seeds.current.length) loadSettings({ seed: seeds.current.pop() });
@@ -645,7 +689,8 @@ const GenerativeApp = () => {
                         onClick={() => togglePart('playAmbience')} title={PART_TITLE}>Ambience</button>
                 </div>
                 <SleepTimer generator={gen} running={anyOn} />
-                <ShareTools settings={settings} presets={linkPresets} onNewVariation={newVariation} />
+                <ShareTools settings={settings} presets={linkPresets} onNewVariation={newVariation}
+                    phrase={<PhraseField seed={settings.seed} edited={gen.editedSinceStart} onApply={playPhrase} />} />
                 <div className="gen-header-tools">
                     <MasterVolume />
                     <AudioMeter />

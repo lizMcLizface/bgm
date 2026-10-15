@@ -138,6 +138,9 @@ class Generator {
         this.currentBar = -1;
         this.resetMusicAt = 0;
         this.resumeBar = 0;
+        // Whether settings changed mid-piece: then what plays is no longer
+        // exactly what the seed (phrase) and settings make from the start.
+        this.editedSinceStart = false;
         this.ensurePlanned(0);
     }
 
@@ -324,6 +327,7 @@ class Generator {
     // the preview is planned afresh. Only rewind() goes back to the start.
     replan(keys, meterChanged = keys.includes('meter')) {
         if (this.isRunning || this.paused) {
+            this.editedSinceStart = true;
             const from = this.currentBar + 1;
             if (meterChanged && this.isRunning) {
                 // the bar playing finishes in its old length

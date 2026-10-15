@@ -113,11 +113,11 @@ export const SettingsMenu = ({ generator, onReload }) => {
                     <select value={storedBufferSeconds() || 0} onChange={changeBuffer}>
                         {BUFFERS.map(([seconds, label]) => <option key={seconds} value={seconds}>{label}</option>)}
                     </select>
-                    <small>Larger stops crackling on slow machines, but delays keyboard / MIDI. Reloads the page; settings are kept.</small>
+                    <small>A larger buffer stops crackling on slow computers, but notes you play on the keyboard or MIDI sound a little later. Changing it reloads the page (your settings are kept).</small>
                 </label>
                 <label className="gen-check">
                     <input type="checkbox" checked={quickStop} onChange={(e) => setQuickStop(e.target.checked)} />
-                    Quick fade on Stop (cut reverb and echo tails)
+                    Stop quickly (cut off reverb and echo tails)
                 </label>
                 <label className="gen-field">
                     <span>Theme</span>

@@ -1011,3 +1011,52 @@ body {
     font-size: 13px;
     color: var(--gen-muted);
 }
+
+/* The pass-phrase, beside New variation. */
+.gen-share {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.gen-phrase {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--gen-muted);
+}
+
+.gen-phrase label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.gen-phrase input {
+    width: 15em;
+    max-width: 60vw;
+    padding: 5px 8px;
+    font: inherit;
+    font-size: 13px;
+    color: var(--gen-text);
+    background: var(--gen-bg);
+    border: 1px solid var(--gen-border);
+    border-radius: 6px;
+}
+
+/* Phones: the header's menus (Save audio, settings) open across the
+   screen, wherever their button ended up in the wrapped header. */
+@media (max-width: 600px) {
+    .gen-settings-menu {
+        position: fixed;
+        top: 72px;
+        left: 16px;
+        right: 16px;
+        width: auto;
+        max-height: calc(100vh - 96px);
+        overflow-y: auto;
+    }
+}

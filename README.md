@@ -38,7 +38,12 @@ synthesised with the Web Audio API; there are no samples.
   nothing plays starts the ambience alone
 - Sleep timer with a countdown: fades out over the last minute and stops
 - Save audio: renders the piece to a WAV file (1-60 min) faster than real
-  time, in chunks so long files stay light on memory
+  time, in chunks so long files stay light on memory, with live progress,
+  time left and Cancel
+- A pass-phrase per piece: the seed reads as four words
+  (`amber-tide-lantern-moss`); type those - or any words - and press Enter
+  to play that phrase's piece from the start. The same phrase and settings
+  always make the same music
 - Pause resumes at the next bar; randomizing or changing settings (time
   signature too) changes what comes next without starting over; ⏮ goes
   back to the start; Space plays /

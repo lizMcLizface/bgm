@@ -16,9 +16,21 @@ import { noiseReady } from '../../nodes/noiseGenerator';
 import { bitCrusherReady } from '../../nodes/bitcrusher';
 
 const CHUNK_SECONDS = 60;
+// The render pauses this often (seconds of audio) to report progress and
+// to notice Cancel.
+const PROGRESS_STEP = 1;
 const MAX_PREROLL = 30;
 const CROSSFADE = 0.25;
 const END_FADE = 4;
+
+const cancelled = () => new DOMException('Rendering cancelled', 'AbortError');
+
+// Rejects when `signal` aborts (never, without one).
+const whenAborted = (signal) => new Promise((resolve, reject) => {
+    if (!signal) return;
+    if (signal.aborted) reject(cancelled());
+    signal.addEventListener('abort', () => reject(cancelled()), { once: true });
+});
 
 const until = async (condition, ms) => {
     const end = Date.now() + ms;
@@ -106,7 +118,7 @@ export async function renderWav(gen, seconds, { onProgress = () => {}, signal } 
     let first = 0; // index of the first note not yet past
     let tail = 0; // longest release + effects tail of the sounds (from the first chunk)
     for (let start = 0; start < seconds; start += CHUNK_SECONDS) {
-        if (signal && signal.aborted) throw new DOMException('Rendering cancelled', 'AbortError');
+        if (signal && signal.aborted) throw cancelled();
         const end = Math.min(seconds, start + CHUNK_SECONDS);
         const last = end >= seconds;
 
@@ -154,7 +166,17 @@ export async function renderWav(gen, seconds, { onProgress = () => {}, signal } 
             bed.start(0, from);
         }
 
-        const buffer = await ctx.startRendering();
+        // Progress as the render goes. On Cancel the context is left
+        // suspended (and dropped) instead of resumed.
+        const duration = ctx.length / sampleRate;
+        for (let t = PROGRESS_STEP; t < duration - 0.01; t += PROGRESS_STEP) {
+            ctx.suspend(t).then(() => {
+                if (signal && signal.aborted) return;
+                onProgress(Math.min(1, Math.max(0, from + t) / seconds));
+                ctx.resume();
+            });
+        }
+        const buffer = await Promise.race([ctx.startRendering(), whenAborted(signal)]);
         const skip = Math.round(preroll * sampleRate);
         const left = buffer.getChannelData(0).subarray(skip);
         const right = buffer.getChannelData(1).subarray(skip);

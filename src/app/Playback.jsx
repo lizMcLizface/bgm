@@ -80,24 +80,28 @@ export const Recorder = ({ generator, fileName }) => {
     const [minutes, setMinutes] = useState(() => readPref(RECORD_KEY, 5));
     const [progress, setProgress] = useState(null);
     const [message, setMessage] = useState('');
+    const [started, setStarted] = useState(0);
     const abort = useRef(null);
     const menu = useRef(null);
     useDismiss(menu);
     useEffect(() => writePref(RECORD_KEY, minutes), [minutes]);
     const megabytes = Math.round(wavBytes(minutes * 60, generator.AC.sampleRate) / 1e6);
+    // time left, from the pace so far (once there is a pace to go by)
+    const elapsed = (Date.now() - started) / 1000;
+    const left = progress > 0.03 ? elapsed * (1 - progress) / progress : null;
     const render = async () => {
         const controller = new AbortController();
         abort.current = controller;
         setMessage('');
         setProgress(0);
-        const started = Date.now();
+        const begin = Date.now();
+        setStarted(begin);
         try {
             const blob = await renderWav(generator, minutes * 60, { onProgress: setProgress, signal: controller.signal });
             download(blob, fileName(minutes));
-            const seconds = (Date.now() - started) / 1000;
-            setMessage(`Saved - rendered in ${clock(seconds)}`);
+            setMessage(`Saved. That took ${clock((Date.now() - begin) / 1000)}.`);
         } catch (e) {
-            setMessage(e.name === 'AbortError' ? 'Cancelled' : `Could not render: ${e.message}`);
+            setMessage(e.name === 'AbortError' ? 'Cancelled.' : `Sorry, saving failed: ${e.message}`);
         } finally {
             abort.current = null;
             setProgress(null);
@@ -106,7 +110,7 @@ export const Recorder = ({ generator, fileName }) => {
     return (
         <details className="gen-settings gen-record" ref={menu}>
             <summary title="Save the music as an audio file">
-                {progress === null ? 'Save audio' : `Saving ${Math.round(progress * 100)}%`}
+                {progress === null ? 'Save audio' : `Saving… ${Math.round(progress * 100)}%`}
             </summary>
             <div className="gen-settings-menu">
                 <label className="gen-field">
@@ -115,18 +119,23 @@ export const Recorder = ({ generator, fileName }) => {
                         {RECORD_MINUTES.map((m) => <option key={m} value={m}>{m} min</option>)}
                     </select>
                     <small>
-                        WAV, about {megabytes} MB. The piece from its start, as Play begins it: these settings,
-                        sounds, mix and ambience. Renders faster than real time; the music keeps playing.
+                        Saves the piece from its beginning as a WAV file (about {megabytes} MB), with the sounds,
+                        mix and ambience you have now. It is usually quicker than listening, and the music keeps
+                        playing while it saves.
                     </small>
                 </label>
                 {progress === null ? (
-                    <button type="button" onClick={render}>Render and download</button>
+                    <button type="button" onClick={render}>Save</button>
                 ) : (
-                    <div className="gen-record-progress">
-                        <progress value={progress} max="1" />
-                        <span>{Math.round(progress * 100)}%</span>
-                        <button type="button" onClick={() => abort.current && abort.current.abort()}>Cancel</button>
-                    </div>
+                    <>
+                        <div className="gen-record-progress">
+                            <progress value={progress} max="1" />
+                            <button type="button" onClick={() => abort.current && abort.current.abort()}>Cancel</button>
+                        </div>
+                        <small role="status">
+                            {Math.round(progress * 100)}%{left === null ? '' : ` · about ${clock(left)} left`}
+                        </small>
+                    </>
                 )}
                 {message && <small role="status">{message}</small>}
             </div>

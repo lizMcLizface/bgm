@@ -265,3 +265,24 @@ test('stop pauses: Play picks up at the next bar, settings changes keep the plac
     expect(gen.paused).toBe(false);
     expect(gen.position()).toBe(0);
 });
+
+test('a phrase is a piece: same phrase and settings, same notes from the start - also after edits and a rewind', async () => {
+    const { phraseToSeed } = await import('./phrase');
+    const notes = (gen) => play(gen, 48).map((b) => b.events.map((e) => `${e.role}${e.midi}@${e.beat.toFixed(3)}`).join()).join('|');
+    const make = () => {
+        const gen = new Generator();
+        gen.setMany({ seed: phraseToSeed('rainy sunday'), sections: { mode: 'strong', phrases: 2 }, counter: { mode: 'answer', activity: 0.6 } });
+        return gen;
+    };
+    const first = notes(make());
+    expect(notes(make())).toBe(first);
+    const edited = make();
+    play(edited, 6);
+    edited.pause(5 * edited.beatsPerBar);
+    edited.set('leadActivity', 0.1);
+    expect(edited.editedSinceStart).toBe(true);
+    edited.set('leadActivity', 0.6);
+    edited.rewind();
+    expect(edited.editedSinceStart).toBe(false);
+    expect(notes(edited)).toBe(first);
+});
