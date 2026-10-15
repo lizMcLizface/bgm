@@ -144,8 +144,8 @@ const PARTS = ['m', 'v', 'a'];
  * @param {object} settings
  * @param {object} [presets] - names that aren't built-in presets are left out
  */
-export function encodeSettings(settings, presets) {
-    const parts = encodeShareParts(settings, defaultSettings(), presets);
+export function encodeSettings(settings, presets, { seed = true } = {}) {
+    const parts = encodeShareParts(settings, defaultSettings(), presets, { seed });
     return PARTS.filter((key) => parts[key]).map((key) => `${key}=${parts[key]}`).join('&');
 }
 
@@ -207,9 +207,12 @@ export function settingsFromLocation(location) {
     return share && share.settings;
 }
 
-/** The share link's path + query for the current page. */
-export function sharePath(settings, presets, location = window.location) {
-    return `${location.pathname}?${encodeSettings(settings, presets)}`;
+/**
+ * Path + query for the current page. For the address bar the seed is left
+ * out ({ seed: false }): a reload keeps the settings but makes a new piece.
+ */
+export function sharePath(settings, presets, location = window.location, { seed = true } = {}) {
+    return `${location.pathname}?${encodeSettings(settings, presets, { seed })}`;
 }
 
 /** Full share URL for the current page and settings. */

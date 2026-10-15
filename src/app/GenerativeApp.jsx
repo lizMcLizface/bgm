@@ -67,11 +67,12 @@ if (import.meta.hot) {
     });
 }
 
-// Keeps the address bar a valid share link for the current settings.
+// Keeps the current settings in the address bar - all but the seed: a
+// reload keeps them and makes a new piece; Copy link pins the piece.
 function useSettingsInUrl(settings, presets) {
     useEffect(() => {
         const id = setTimeout(() => {
-            window.history.replaceState(null, '', sharePath(settings, presets));
+            window.history.replaceState(null, '', sharePath(settings, presets, window.location, { seed: false }));
         }, 300);
         return () => clearTimeout(id);
     }, [settings, presets]);
@@ -81,7 +82,7 @@ function useSettingsInUrl(settings, presets) {
 // typing other words (or any text) and pressing Enter plays that phrase's
 // piece from the start. `edited`: settings changed mid-piece, so what
 // plays differs from the phrase's piece until it starts over.
-const PhraseField = ({ seed, edited, onApply, initial }) => {
+const PhraseField = ({ seed, edited, onApply, onRoll, initial }) => {
     const [text, setText] = useState(() => (initial && phraseToSeed(initial) === seed ? initial : seedToPhrase(seed)));
     // a seed from elsewhere (New variation, a link): show its words -
     // unless what was typed stands for it
@@ -102,10 +103,13 @@ const PhraseField = ({ seed, edited, onApply, initial }) => {
                 <input type="text" value={text} spellCheck="false" autoComplete="off" onChange={(e) => setText(e.target.value)}
                     aria-label="Phrase the piece is made from" />
                 {pending && <button type="submit">Play this phrase</button>}
+                <button type="button" className="gen-dice" onClick={onRoll} title="A new random phrase (⏮ then plays its piece from the start)"
+                    aria-label="New random phrase"><DiceIcon /></button>
             </form>
             <small>
                 The music is made from this phrase: the same phrase and settings always play the same piece.
-                Type any words and press Enter to hear what they make.
+                Type any words and press Enter to hear what they make. A new visit or a reload starts with a
+                random phrase; a copied link keeps it.
                 {!pending && edited ? ' Settings changed while it played - ⏮ plays it from the start again.' : ''}
             </small>
         </section>
@@ -708,7 +712,7 @@ const GenerativeApp = () => {
                 <div className="gen-header-tools">
                     <MasterVolume />
                     <SettingsMenu generator={gen} onReload={reloadKeepingSettings} link={() => shareUrl(gen.settings, linkPresets)} saving={saving}
-                        phrase={<PhraseField seed={settings.seed} edited={gen.editedSinceStart} onApply={playPhrase} initial={linkedPhrase} />}>
+                        phrase={<PhraseField seed={settings.seed} edited={gen.editedSinceStart} onApply={playPhrase} onRoll={newVariation} initial={linkedPhrase} />}>
                         <Recorder generator={gen} fileName={fileName} onProgress={setSaving} />
                     </SettingsMenu>
                 </div>

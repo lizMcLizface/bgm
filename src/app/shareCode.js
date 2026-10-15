@@ -171,6 +171,10 @@ const LAYOUT = [
 // the version and the seed.
 
 export const PARTS_VERSION = 2;
+// The same, without the seed: the address bar's copy of the settings, so
+// a reload keeps them but makes a new piece (only a shared link, version
+// 2, pins the piece).
+export const PARTS_VERSION_SEEDLESS = 3;
 const field = (groups, path) => groups.flat().find(([p]) => p.join() === path.join());
 
 const MUSIC_GROUPS = [
@@ -343,11 +347,12 @@ export function decodeShareCode(code, defaults) {
 /**
  * Settings (+ presets, as encodeShareCode) -> { m, v?, a? }: base64url
  * parts; v and a only when they hold anything but defaults.
+ * @param {object} [options] - { seed: false } leaves the seed out
  */
-export function encodeShareParts(settings, defaults, presets = {}) {
+export function encodeShareParts(settings, defaults, presets = {}, { seed = true } = {}) {
     const m = new BitWriter();
-    m.write(PARTS_VERSION, VERSION_BITS);
-    m.write(settings.seed, SEED_BITS);
+    m.write(seed ? PARTS_VERSION : PARTS_VERSION_SEEDLESS, VERSION_BITS);
+    if (seed) m.write(settings.seed, SEED_BITS);
     writeGroups(m, MUSIC_GROUPS, settings, defaults);
     const v = new BitWriter();
     writeGroups(v, VOICE_GROUPS, settings, defaults);
@@ -369,8 +374,10 @@ export function decodeShareParts({ m, v, a }, defaults) {
     const settings = JSON.parse(JSON.stringify(defaults));
     if (m) {
         const r = new BitReader(m);
-        if (r.read(VERSION_BITS) !== PARTS_VERSION) throw new Error('Unknown share code version');
-        settings.seed = r.read(SEED_BITS);
+        const version = r.read(VERSION_BITS);
+        if (version !== PARTS_VERSION && version !== PARTS_VERSION_SEEDLESS) throw new Error('Unknown share code version');
+        // seedless: the defaults' seed - a fresh random one
+        if (version === PARTS_VERSION) settings.seed = r.read(SEED_BITS);
         readGroups(r, MUSIC_GROUPS, settings);
     }
     const presets = {};

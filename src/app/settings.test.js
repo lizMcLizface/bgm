@@ -175,3 +175,14 @@ test('a phrase= parameter sets the seed, on a link or on the defaults', async ()
     expect(both.settings.tonic).toBe(4);
     expect(both.settings.seed).toBe(phraseToSeed('amber-tide-lantern-moss'));
 });
+
+test('the address bar copy leaves the seed out: the settings come back, the piece is new', () => {
+    const settings = { ...defaultSettings(), tonic: 7, bpm: 66, seed: 4242 };
+    const seedless = encodeSettings(settings, {}, { seed: false });
+    expect(seedless.length).toBeLessThan(encodeSettings(settings).length);
+    const back = decodeSettings(seedless);
+    expect(back.tonic).toBe(7);
+    expect(back.bpm).toBe(66);
+    expect(back.seed).not.toBe(4242);
+    expect(decodeSettings(encodeSettings(settings)).seed).toBe(4242);
+});

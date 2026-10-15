@@ -40,11 +40,12 @@ synthesised with the Web Audio API; there are no samples.
 - Save audio: renders the piece to a WAV file (1-60 min) faster than real
   time, in chunks so long files stay light on memory, with live progress,
   time left and Cancel
-- A pass-phrase per piece (in the ⚙ menu): every visit starts with a
-  random one, which reads as four words (`amber-tide-lantern-moss`); type
+- A pass-phrase per piece (in the ⚙ menu, with a dice to roll a new one):
+  every visit - and every reload - starts with a random one, which reads as four words (`amber-tide-lantern-moss`); type
   those - or any words - and press Enter to play that phrase's piece from
   the start. The same phrase and settings always make the same music, and
-  a link can name one: `calmbgm.com/?phrase=rainy+sunday`
+  a link can name one: `calmbgm.com/?phrase=rainy+sunday`. The address bar
+  keeps the settings but not the phrase; "Copy link" pins it
 - Pause resumes at the next bar; randomizing or changing settings (time
   signature too) changes what comes next without starting over; ⏮ goes
   back to the start, ◀ ▶ step a chord, ◀◀ ▶▶ a progression - forward
