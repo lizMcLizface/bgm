@@ -5,7 +5,7 @@
 // so it is never done on page load).
 
 import React, { useEffect, useRef, useState } from 'react';
-import { PencilIcon } from './icons';
+import { DiceIcon, PencilIcon, SparkIcon } from './icons';
 
 // Physical key positions (KeyboardEvent.code), so QWERTZ/AZERTY work too:
 // the home row is the white keys, the row above the black keys.
@@ -18,8 +18,11 @@ const OCTAVE_RANGE = [0, 7];
 
 const isTyping = (target) => target && ['INPUT', 'SELECT', 'TEXTAREA'].includes(target.tagName) && target.type !== 'range' && target.type !== 'checkbox';
 
-/** M / S / ⌨ toggles for one role, and ✎ to edit its sound. */
-export const RoleButtons = ({ role, label, mix, armed, onMix, onArm, onEdit }) => (
+/**
+ * M / S / ⌨ toggles for one role, ✎ to edit its sound and - when given
+ * onRandom / onGenerate - a random preset or a newly generated sound.
+ */
+export const RoleButtons = ({ role, label, mix, armed, onMix, onArm, onEdit, onRandom, onGenerate, generating }) => (
     <div className="gen-rolebuttons" role="group" aria-label={`${label} controls`}>
         <button type="button" className={mix.mute ? 'is-on is-mute' : ''} aria-pressed={mix.mute}
             title="Mute" onClick={() => onMix(role, { mute: !mix.mute })}>M</button>
@@ -28,6 +31,13 @@ export const RoleButtons = ({ role, label, mix, armed, onMix, onArm, onEdit }) =
         <button type="button" className={armed ? 'is-on is-arm' : ''} aria-pressed={armed}
             title="Play this voice with the keyboard / MIDI" onClick={() => onArm(armed ? null : role)}>⌨</button>
         <button type="button" title="Edit sound" aria-label={`Edit ${label} sound`} onClick={() => onEdit(role)}><PencilIcon /></button>
+        {onRandom && (
+            <button type="button" title="Random preset" aria-label={`Random ${label} preset`} onClick={() => onRandom(role)}><DiceIcon /></button>
+        )}
+        {onGenerate && (
+            <button type="button" title="Generate a new sound" aria-label={`Generate a new ${label} sound`}
+                disabled={generating} onClick={() => onGenerate(role)}><SparkIcon /></button>
+        )}
     </div>
 );
 
@@ -121,7 +131,7 @@ export function useLivePlay(generator, armed) {
 }
 
 /** The strip beside the timeline: one row per role, then the keys hint. */
-export const TrackStrip = ({ roles, mix, armed, onMix, onArm, onEdit, live }) => (
+export const TrackStrip = ({ roles, mix, armed, onMix, onArm, onEdit, onRandom, onGenerate, generating, live }) => (
     <div className="gen-tracks">
         {Object.entries(roles).map(([role, { label }]) => (
             <div key={role} className="gen-track">
@@ -129,7 +139,8 @@ export const TrackStrip = ({ roles, mix, armed, onMix, onArm, onEdit, live }) =>
                     <i className={`gen-swatch gen-swatch-${role}`} />
                     {label.split(' / ')[0]}
                 </span>
-                <RoleButtons role={role} label={label} mix={mix[role]} armed={armed === role} onMix={onMix} onArm={onArm} onEdit={onEdit} />
+                <RoleButtons role={role} label={label} mix={mix[role]} armed={armed === role} onMix={onMix} onArm={onArm} onEdit={onEdit}
+                    onRandom={onRandom} onGenerate={onGenerate} generating={generating[role]} />
             </div>
         ))}
         <div className="gen-keys-hint">

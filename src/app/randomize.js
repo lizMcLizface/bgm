@@ -9,7 +9,7 @@
 // randomize press is meant to be different every time.
 
 import { SCALE_FAMILIES, TONIC_NAMES, scaleById, scaleSemitones } from './theory';
-import PROGRESSIONS from './progressions';
+import PROGRESSIONS, { PROGRESSION_LENGTHS, progressionsOfLength } from './progressions';
 import { METERS } from './meter';
 import { DEFAULT_DRIFT, DRIFT_MODES, TEMPO_BOUNDS } from './conductor';
 import { OCTAVE_LIMITS, OCTAVE_WANDER } from './arranger';
@@ -62,6 +62,15 @@ export function modeQuality(modeId) {
 /** 'minor' when the progression is written from a minor tonic (has 'i'), else 'major'. */
 export const progressionQuality = (index) => (PROGRESSIONS[index].includes('i') ? 'minor' : 'major');
 
+// A progression of `length` chords that suits the mode, a different one
+// from the current where possible.
+function fittingProgression(settings, length, rng) {
+    const indices = progressionsOfLength(length);
+    const quality = modeQuality(settings.mode);
+    const fitting = indices.filter((i) => !quality || progressionQuality(i) === quality);
+    return pickOther(rng, fitting.length ? fitting : indices, settings.progression);
+}
+
 // One value per Music field, different from the current one where
 // possible (a dice button that does nothing would look broken). Within
 // reason, mode and progression suit each other (see modeQuality).
@@ -75,12 +84,10 @@ const FIELDS = {
             .filter(([id]) => id !== settings.mode && (!wanted || [wanted, null].includes(modeQuality(id))));
         return fits.length ? weighted(rng, Object.fromEntries(fits)) : settings.mode;
     },
+    // within reason: as many chords as now
     progression: (settings, level, rng) => {
-        const indices = [...PROGRESSIONS.keys()];
-        if (level === 'wild') return pick(rng, others(indices, settings.progression));
-        const quality = modeQuality(settings.mode);
-        const fitting = indices.filter((i) => !quality || progressionQuality(i) === quality);
-        return pickOther(rng, fitting.length ? fitting : indices, settings.progression);
+        if (level === 'wild') return pick(rng, others([...PROGRESSIONS.keys()], settings.progression));
+        return fittingProgression(settings, PROGRESSIONS[settings.progression].length, rng);
     },
     barsPerChord: (settings, level, rng) => (level === 'wild'
         ? pick(rng, others([1, 2, 4], settings.barsPerChord))
@@ -102,6 +109,27 @@ export const RANDOM_FIELDS = Object.keys(FIELDS);
 /** A new value for one Music field: { [key]: value }. */
 export function randomField(key, settings, level, rng = Math.random) {
     return { [key]: FIELDS[key](settings, level, rng) };
+}
+
+/**
+ * A different progression length: { progression } with a progression of
+ * that many chords. Within reason 3 to 6 chords (4 most often).
+ */
+export function randomLength(settings, level, rng = Math.random) {
+    const current = PROGRESSIONS[settings.progression].length;
+    const lengths = PROGRESSION_LENGTHS.filter((n) => n !== current && (level === 'wild' || (n >= 3 && n <= 6)));
+    const length = level === 'wild' ? pick(rng, lengths) : weighted(rng, Object.fromEntries(lengths.map((n) => [n, n === 4 ? 3 : 1])));
+    return { progression: fittingProgression(settings, Number(length), rng) };
+}
+
+/** Chords to the progression, for a "length" control. */
+export const progressionLength = (index) => PROGRESSIONS[index].length;
+
+/** The first progression of `length` chords that suits the mode (choosing a length). */
+export function progressionForLength(settings, length) {
+    const indices = progressionsOfLength(length);
+    const quality = modeQuality(settings.mode);
+    return indices.find((i) => !quality || progressionQuality(i) === quality) ?? indices[0];
 }
 
 /**

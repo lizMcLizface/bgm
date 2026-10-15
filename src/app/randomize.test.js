@@ -1,8 +1,9 @@
-import { randomKey, randomProgression, randomConductor, randomVoices, randomField, randomPreset, RANDOM_FIELDS, presetPool, modeQuality, progressionQuality } from './randomize';
+import { randomKey, randomProgression, randomConductor, randomVoices, randomField, randomPreset, randomLength, RANDOM_FIELDS, presetPool, modeQuality, progressionQuality } from './randomize';
 import { defaultSettings, sanitizeSettings } from './settings';
 import { PRESET_CATEGORIES } from './presets';
 import { DEFAULT_DRIFT } from './conductor';
 import { seeded } from './random';
+import PROGRESSIONS from './progressions';
 
 const RUNS = 300;
 const CURRENT = { pad: 'Soft Pad', bass: 'Warm Bass', lead: 'Glass Lead' };
@@ -119,5 +120,18 @@ test('single preset: a different one from the pool', () => {
         const name = randomPreset('lead', 'Glass Lead', 'reason', rng, GROUPS);
         expect(name).not.toBe('Glass Lead');
         expect(Object.keys(PRESET_CATEGORIES.Leads)).toContain(name);
+    }
+});
+
+test('progressions: within reason keeps the length, randomLength changes it', () => {
+    const rng = seeded(19);
+    let settings = defaultSettings();
+    for (let i = 0; i < 100; i++) {
+        const length = PROGRESSIONS[settings.progression].length;
+        expect(PROGRESSIONS[randomField('progression', settings, 'reason', rng).progression]).toHaveLength(length);
+        const patch = randomLength(settings, i % 2 ? 'wild' : 'reason', rng);
+        expect(PROGRESSIONS[patch.progression].length).not.toBe(length);
+        settings = { ...settings, ...patch };
+        expectValid(settings);
     }
 });

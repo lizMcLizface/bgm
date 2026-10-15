@@ -133,10 +133,11 @@ function homewardKey(current, home, drift, rng) {
  * @param {object} current - { tonic, mode, progression, bpm }
  * @param {object} home - same shape, the user's settings
  * @param {object} drift - DEFAULT_DRIFT shape
- * @param {number} progressionCount - size of the progression bank
+ * @param {number[]} progressions - indices drift may change the progression
+ *   to (Generator: those as long as home's)
  * @param {function} rng
  */
-export function nextMusic(current, home, drift, progressionCount, rng) {
+export function nextMusic(current, home, drift, progressions, rng) {
     if (drift.mode === 'off') return { ...current };
     let next = { ...current };
     const centered = drift.mode === 'centered';
@@ -157,9 +158,9 @@ export function nextMusic(current, home, drift, progressionCount, rng) {
 
     if (centered && current.progression !== home.progression && pull()) {
         next.progression = home.progression;
-    } else if (chance(rng, drift.progressionChance) && progressionCount > 1) {
+    } else if (chance(rng, drift.progressionChance) && progressions.some((i) => i !== current.progression)) {
         const goHome = centered && current.progression !== home.progression && chance(rng, PULL_HOME);
-        const others = [...Array(progressionCount).keys()].filter((i) => i !== current.progression);
+        const others = progressions.filter((i) => i !== current.progression);
         next.progression = goHome ? home.progression : pick(rng, others);
     }
 

@@ -16,8 +16,8 @@ import { SCALE_FAMILIES } from './theory';
 import { METERS } from './meter';
 import { DRIFT_MODES, TEMPO_BOUNDS } from './conductor';
 import { OCTAVE_LIMITS, OCTAVE_WANDER } from './arranger';
-import { GENERATIVE_PRESETS, ROLE_PRESETS } from './presets';
-import presetData from '../util/presetData';
+import { ROLE_PRESETS } from './presets';
+import { SEED_BITS as SOUND_SEED_BITS } from './soundGen';
 import PROGRESSIONS from './progressions';
 
 export const CODE_VERSION = 1;
@@ -25,12 +25,26 @@ const VERSION_BITS = 4;
 const SEED_BITS = 31;
 
 const MODES = SCALE_FAMILIES.flatMap((f) => f.modes.map((m) => m.id));
-/** Presets a link can name: the generator's, then unCAGED's built-ins. */
+/**
+ * Built-in presets a link can name, by index. Append new presets at the
+ * end - never reorder, rename or remove (a test checks every built-in is
+ * listed).
+ */
 export const SHAREABLE_PRESETS = [
-    ...Object.keys(GENERATIVE_PRESETS),
-    ...Object.keys(presetData).filter((name) => name !== '- INIT -'),
+    'Soft Pad', 'Warm Strings', 'Glass Pad', 'Dark Drone', 'Breathy Choir', 'Swelling Analog',
+    'Lo-fi Tape Pad', 'Shimmer', 'Velvet Pad', 'Morning Haze', 'Hollow Air', 'Slow Sweep', 'Warm Bass',
+    'Sub Bass', 'Round Pluck Bass', 'Analog Saw Bass', 'Felt Bass', 'Soft Square Bass', 'Upright Pluck',
+    'Rubber Bass', 'Deep Pulse', 'Muted Pick Bass', 'Glass Lead', 'Soft Flute', 'Warm Square Lead',
+    'Bell Lead', 'Ocarina', 'Sine Whistle', 'Clarinet Lead', 'Hollow Pulse', 'Soft Saw Lead', 'Celesta',
+    'Soft Keys', 'Kalimba Pluck', 'Harp Pluck', 'Music Box', 'Warm Organ', 'Tine Keys', 'Pitched Rain',
+    'Wind Pad', 'Bit Haze', 'Dreary', 'Happy Little Squares', 'LoFi Space', 'Growl Bass',
+    'Distorted Strings', 'Rain Drops', 'Analog', 'Wavy Flute', 'Crunchy Waves', 'Chimes', 'Broken Toy',
+    'Not Broken Toy',
 ];
 const PRESET_BITS = 8;
+// Preset index meaning "a generated sound" (soundGen.js v1): followed by
+// the role it was made for and its seed.
+const GENERATED_V1 = 2 ** PRESET_BITS - 1;
 // Fixed role order in codes (independent of the UI's order).
 export const CODE_ROLES = ['pad', 'bass', 'lead'];
 
@@ -175,8 +189,9 @@ const same = (codec, a, b) => (codec.write
 /**
  * @param {object} settings - complete, valid settings
  * @param {object} defaults - what unchanged values are compared with
- * @param {object} [presets] - role -> built-in preset name (others, and
- *   each role's default, are skipped)
+ * @param {object} [presets] - role -> a built-in preset name, or
+ *   { generated: { role, seed } } for a generated sound; anything else, and
+ *   each role's default, is left out
  * @returns {string} base64url code
  */
 export function encodeShareCode(settings, defaults, presets = {}) {
@@ -195,17 +210,25 @@ export function encodeShareCode(settings, defaults, presets = {}) {
         });
     });
     CODE_ROLES.forEach((role) => {
-        const index = presets[role] === ROLE_PRESETS[role] ? -1 : SHAREABLE_PRESETS.indexOf(presets[role]);
-        w.write(index >= 0 ? 1 : 0, 1);
-        if (index >= 0) w.write(index, PRESET_BITS);
+        const preset = presets[role];
+        const generated = preset && preset.generated;
+        const index = preset === ROLE_PRESETS[role] ? -1 : SHAREABLE_PRESETS.indexOf(preset);
+        w.write(index >= 0 || generated ? 1 : 0, 1);
+        if (generated) {
+            w.write(GENERATED_V1, PRESET_BITS);
+            w.write(CODE_ROLES.indexOf(generated.role), 2);
+            w.write(generated.seed, SOUND_SEED_BITS);
+        } else if (index >= 0) {
+            w.write(index, PRESET_BITS);
+        }
     });
     return w.toBase64Url();
 }
 
 /**
  * @returns {{ settings: object, presets: object }} settings (unsanitized:
- *   run them through sanitizeSettings) and role -> preset name, for the
- *   roles whose preset isn't their default
+ *   run them through sanitizeSettings) and, for the roles whose preset
+ *   isn't their default, role -> preset name or { generated: { role, seed } }
  * @throws on anything that isn't a code of this version
  */
 export function decodeShareCode(code, defaults) {
@@ -223,8 +246,14 @@ export function decodeShareCode(code, defaults) {
     const presets = {};
     CODE_ROLES.forEach((role) => {
         if (!r.read(1)) return;
-        const name = SHAREABLE_PRESETS[r.read(PRESET_BITS)];
-        if (name) presets[role] = name;
+        const index = r.read(PRESET_BITS);
+        if (index === GENERATED_V1) {
+            const madeFor = CODE_ROLES[r.read(2)];
+            const seed = r.read(SOUND_SEED_BITS);
+            if (madeFor) presets[role] = { generated: { role: madeFor, seed } };
+        } else if (SHAREABLE_PRESETS[index]) {
+            presets[role] = SHAREABLE_PRESETS[index];
+        }
     });
     return { settings, presets };
 }

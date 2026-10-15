@@ -200,6 +200,9 @@ class Instrument {
         this.destinations = [];
         this.chainAwake = false;
         this.soundUntil = 0;
+        // Set by flushTails: the effects are silent from then on, whatever
+        // their tail would have been. A new note clears it.
+        this.quietAt = Infinity;
 
         this.preset = null;
         this.chainSignature = null;
@@ -286,6 +289,31 @@ class Instrument {
             + 0.5;
     }
 
+    /**
+     * Drops what the effects are still ringing with - reverb tail, delay
+     * echoes - so a stopped instrument is silent now and its chain can
+     * sleep. Giving the convolver its impulse again resets it; each delay's
+     * output and feedback are held at 0 until its line has emptied. Call it
+     * once the output has been faded out (Generator.stop), or it clicks.
+     */
+    flushTails() {
+        const now = this.AC.currentTime;
+        const impulse = this.reverb.node.buffer;
+        if (impulse) this.reverb.node.buffer = impulse;
+        const holdAtZero = (param, seconds) => {
+            const value = param.value;
+            param.cancelScheduledValues(now);
+            param.setValueAtTime(0, now);
+            param.setValueAtTime(value, now + seconds);
+        };
+        // delay lines are at most 1 s long (src/nodes/delay.js, pingPongDelay.js)
+        const drain = 1.05;
+        [this.delay.wetGain, this.delay.feedbackGain, this.pingPong.wetGain, this.pingPong.leftFeedbackGain, this.pingPong.rightFeedbackGain]
+            .forEach((gain) => holdAtZero(gain.getNode().gain, drain));
+        this.quietAt = now + drain;
+        this.scheduleSleep();
+    }
+
     /** Effects currently in the signal path (for diagnostics). */
     activeEffects() {
         return this.chainSignature ? this.chainSignature.split(',').filter(Boolean) : [];
@@ -361,6 +389,7 @@ class Instrument {
         this.voices[index].scheduleNote(info, { gainPoints: points, filterEvents, portamentoSpeed }, startTime, steal);
         this.busyUntil[index] = startTime + releaseEnd;
         this.soundUntil = Math.max(this.soundUntil, startTime + releaseEnd);
+        this.quietAt = Infinity;
         this.wake(index);
     }
 
@@ -378,6 +407,7 @@ class Instrument {
         const voice = this.voices[index];
         voice.scheduleNote(this.noteInfo(midi), { gainPoints: points, filterEvents, portamentoSpeed }, now, steal);
         this.busyUntil[index] = Infinity;
+        this.quietAt = Infinity;
         this.wake(index);
         const id = ++this.heldIds;
         this.held.set(id, { index, voiceId: voice.voiceId });
@@ -444,7 +474,7 @@ class Instrument {
                 this.awake[i] = false;
             }
         });
-        if (this.chainAwake && !this.awake.some(Boolean) && this.soundUntil + this.tailSeconds() < now) {
+        if (this.chainAwake && !this.awake.some(Boolean) && this.silentFrom() < now) {
             this.output.disconnect();
             this.chainAwake = false;
         }
@@ -458,11 +488,16 @@ class Instrument {
         const due = this.busyUntil.filter((t, i) => this.awake[i] && Number.isFinite(t));
         let at;
         if (due.length) at = Math.min(...due) + 0.25;
-        else if (this.chainAwake && !this.awake.some(Boolean)) at = this.soundUntil + this.tailSeconds() + 0.25;
+        else if (this.chainAwake && !this.awake.some(Boolean)) at = this.silentFrom() + 0.25;
         else return;
         const delay = Math.max(0.05, at - this.AC.currentTime);
         if (this.sleepTimer) clearTimeout(this.sleepTimer);
         this.sleepTimer = setTimeout(() => this.sleepIdle(), delay * 1000);
+    }
+
+    // When the effects will have nothing left to play.
+    silentFrom() {
+        return Math.min(this.soundUntil + this.tailSeconds(), this.quietAt);
     }
 
     /** Whether the effects chain is connected right now (for diagnostics). */

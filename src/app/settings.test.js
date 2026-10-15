@@ -1,6 +1,8 @@
 import { defaultSettings, sanitizeSettings, encodeSettings, decodeSettings, decodeShare, settingsFromLocation, shareFromLocation, shareUrl } from './settings';
 import { randomKey, randomProgression, randomConductor, randomVoices } from './randomize';
-import { PRESET_CATEGORIES } from './presets';
+import { PRESET_CATEGORIES, GENERATIVE_PRESETS } from './presets';
+import { SHAREABLE_PRESETS } from './shareCode';
+import presetData from '../util/presetData';
 import { seeded } from './random';
 
 test('round-trips through a share code', () => {
@@ -100,4 +102,16 @@ test('garbage codes are rejected; the query parameter (and legacy hash) is found
 test('share URLs use the page path and an s= query parameter', () => {
     const url = shareUrl({ ...defaultSettings(), seed: 1 }, {}, { origin: 'https://liz.moe', pathname: '/bgm/' });
     expect(url).toMatch(/^https:\/\/liz\.moe\/bgm\/\?s=[A-Za-z0-9_-]+$/);
+});
+
+test('every built-in preset can be named in a link', () => {
+    const builtIn = [...Object.keys(GENERATIVE_PRESETS), ...Object.keys(presetData).filter((n) => n !== '- INIT -')];
+    builtIn.forEach((name) => expect(SHAREABLE_PRESETS).toContain(name));
+});
+
+test('links carry generated sounds as role + seed', () => {
+    const presets = { lead: { generated: { role: 'lead', seed: 0xabcdef } }, pad: { generated: { role: 'bass', seed: 1 } }, bass: 'Deep Pulse' };
+    const code = encodeSettings({ ...defaultSettings(), seed: 9 }, presets);
+    expect(code.length).toBeLessThan(25);
+    expect(decodeShare(code).presets).toEqual(presets);
 });

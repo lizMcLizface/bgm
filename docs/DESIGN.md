@@ -328,6 +328,15 @@ of Chrome's trace at 10-100 ms buffers) and Chrome's dropout count
 `latencyHint` (stored per browser, applied on reload, since a context's
 buffer is fixed at creation).
 
+#### Stop
+
+Stop fades the generator's output out (time constant 70 ms, -60 dB at
+~0.5 s), then `Instrument.flushTails` drops what the effects still hold -
+reassigning the convolver's buffer resets its state; delay outputs and
+feedback are held at 0 until their lines have emptied - and the output is
+restored for auditions and live play. The chains then sleep at once
+instead of after their tail time (up to ~14 s).
+
 #### Multi-threading
 
 Web Audio renders a context's whole graph on one realtime thread;
@@ -466,3 +475,23 @@ Further options that change the sound or behaviour slightly, not done:
 6. **Performance pass** — §5, measured.
 7. **Export** — §6.
 8. **Extraction** — copy into its own repo (§4 list), deploy there.
+
+## 8. Procedural sounds and levelling
+
+`src/app/soundGen.js` makes a preset from (role, 24-bit seed): a recipe per
+role draws waveform, envelope, filter, osc2/sub, modulation and effects
+from ranges that suit it (pads slow and wide, basses short and dark, leads
+clear with vibrato and echoes). Same role and seed, same sound - so a link
+carries a generated sound as preset index 255 + role + seed
+(`shareCode.js`); changing a recipe needs a new generator version.
+
+Loudness (`src/app/engine/loudness.js`): a role-typical phrase (held
+triad / bass line / melody) is rendered offline through an Instrument and
+its RMS compared with the role's default preset; masterVolume is scaled to
+match (capped at 1). It reproduces the hand levelling of the existing
+pads, basses and leads within ±1.8 dB, and set the 13 presets added on
+2026-10-15. Plucked sounds read lower than sustained ones on this
+measure (Keys & plucks sit 3-7 dB under when measured as a pad); Muted
+Pick Bass is 2.4 dB under at full volume, like Round Pluck Bass. Over 75
+generated sounds the median error is 0 dB; the few that need more than
+full volume end up at most 2.5 dB quiet.

@@ -8,7 +8,7 @@ const ALWAYS = { ...DEFAULT_DRIFT, keyChance: 1, modeChance: 1, progressionChanc
 function walk(drift, { cycles = 400, seed = 1, home = HOME } = {}) {
     const rng = seeded(seed);
     const out = [home];
-    for (let i = 0; i < cycles; i++) out.push(nextMusic(out[out.length - 1], home, drift, 10, rng));
+    for (let i = 0; i < cycles; i++) out.push(nextMusic(out[out.length - 1], home, drift, [...Array(10).keys()], rng));
     return out;
 }
 
@@ -133,4 +133,14 @@ test('centered homeward moves respect exclusions too', () => {
         expect(m.tonic).not.toBe(5);
         expect(m.mode).not.toBe('Major-2');
     });
+});
+
+test('progression changes stay within the allowed list', () => {
+    const allowed = [0, 3, 7];
+    const rng = seeded(4);
+    let music = HOME;
+    for (let i = 0; i < 300; i++) {
+        music = nextMusic(music, HOME, { ...ALWAYS, mode: 'wandering' }, allowed, rng);
+        expect(allowed).toContain(music.progression);
+    }
 });

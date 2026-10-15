@@ -5,6 +5,8 @@
 //   'PolySynth-CustomPresets'), read-only here - visible because both pages
 //   share an origin when run locally
 // - mine: saved from this editor ('Generative-Presets')
+// - generated: made this visit by soundGen.js (kept in memory; a link
+//   recreates them from role + seed, saving one makes it "mine")
 // - JSON files: export/import, the durable route (and how presets get into
 //   the repo or survive the move to a separate site, where localStorage
 //   starts empty)
@@ -18,6 +20,20 @@ import PRESET_DEFAULTS from '../engine/presetDefaults';
 
 const USER_KEY = 'Generative-Presets';
 const UNCAGED_KEY = 'PolySynth-CustomPresets';
+
+// name -> { preset, role, seed }
+const generated = new Map();
+
+/** Registers a generated sound so pickers list it and links can name it. */
+export function addGeneratedPreset(name, preset, { role, seed }) {
+    generated.set(name, { preset, role, seed });
+}
+
+/** { role, seed } of a generated sound, or null. */
+export function generatedInfo(name) {
+    const entry = generated.get(name);
+    return entry ? { role: entry.role, seed: entry.seed } : null;
+}
 
 const readJson = (key) => {
     try {
@@ -53,6 +69,7 @@ export function presetGroups(first) {
         { group: 'unCAGED', editable: false, presets: builtIn },
         { group: 'unCAGED custom', editable: false, presets: readJson(UNCAGED_KEY) },
         { group: 'Mine', editable: true, presets: readJson(USER_KEY) },
+        { group: 'Generated', editable: false, presets: Object.fromEntries([...generated].map(([name, { preset }]) => [name, preset])) },
     ].filter(({ presets }) => Object.keys(presets).length);
 }
 

@@ -6,25 +6,35 @@ import { RoleButtons, TrackStrip, useLivePlay } from './Tracks';
 import { defaultSettings, shareFromLocation, sharePath, shareUrl, exportSettings, importSettingsFile, newSeed } from './settings';
 import SynthEditor from './editor/SynthEditor';
 import PresetPicker from './editor/PresetPicker';
-import PROGRESSIONS from './progressions';
+import PROGRESSIONS, { PROGRESSION_LENGTHS, progressionsOfLength } from './progressions';
 import { PAD_STYLES, BASS_STYLES, styleShares, OCTAVE_LIMITS, OCTAVE_WANDER } from './arranger';
 import { DRIFT_MODES } from './conductor';
 import { METERS } from './meter';
-import { RANDOM_LEVELS, randomKey, randomProgression, randomConductor, randomVoices, randomField, randomPreset } from './randomize';
+import { RANDOM_LEVELS, randomKey, randomProgression, randomConductor, randomVoices, randomField, randomPreset, randomLength, progressionLength, progressionForLength } from './randomize';
 import AudioStatus from './AudioStatus';
-import { DiceIcon } from './icons';
+import { DiceIcon, SparkIcon } from './icons';
+import { generateSound, newSoundSeed } from './soundGen';
+import { levelPreset } from './engine/loudness';
+import { addGeneratedPreset, generatedInfo } from './editor/presetStore';
 import { THEMES, applyTheme, storedTheme } from './theme';
 
 // One Generator for the page's lifetime; StrictMode's double-mount must
 // not build a second set of instruments.
 // Settings (and built-in presets) come from a share link when the page was
 // opened with one.
+// Generated sounds in a link are recreated (and levelled) after mount.
 let generator = null;
+let linkedSounds = [];
 const getGenerator = () => {
     if (!generator) {
         const share = shareFromLocation(window.location);
         generator = new Generator(share ? share.settings : defaultSettings());
-        if (share) Object.entries(share.presets).forEach(([role, name]) => generator.loadRolePreset(role, name));
+        if (share) {
+            Object.entries(share.presets).forEach(([role, preset]) => {
+                if (preset.generated) linkedSounds.push({ target: role, madeFor: preset.generated.role, seed: preset.generated.seed });
+                else generator.loadRolePreset(role, preset);
+            });
+        }
     }
     // Dev server only: lets browser scripts drive it (e.g. preset loudness checks).
     if (import.meta.env.DEV) window.__generator = generator;
@@ -129,15 +139,20 @@ const Randomizer = ({ level, onLevel: setLevel, onRandomize }) => {
     );
 };
 
-// A labelled control; with onRandom, a dice button beside it.
-const Field = ({ label, onRandom, children }) => (
-    <label className="gen-field">
+// A labelled control; with onRandom, a dice button beside it (and with
+// onGenerate, a "new sound" button).
+const Field = ({ label, onRandom, onGenerate, generating, wide, children }) => (
+    <label className={`gen-field${wide ? ' gen-field-wide' : ''}`}>
         <span>{label}</span>
         {onRandom ? (
             <span className="gen-field-row">
                 {children}
                 <button type="button" className="gen-dice" title="Randomize this" aria-label={`Random ${label}`}
                     onClick={(e) => { e.preventDefault(); onRandom(); }}><DiceIcon /></button>
+                {onGenerate && (
+                    <button type="button" className="gen-dice" title="Generate a new sound" aria-label={`Generate a new ${label.toLowerCase()}`}
+                        disabled={generating} onClick={(e) => { e.preventDefault(); onGenerate(); }}><SparkIcon /></button>
+                )}
             </span>
         ) : children}
     </label>
@@ -248,8 +263,9 @@ const Evolution = ({ drift, home, onChange }) => {
     );
 };
 
-// What drift is playing right now, polled from the audible bar.
-function useNowPlaying(gen, running) {
+// What drift is playing right now, polled from the audible bar (and read
+// again whenever the settings change, which re-plans while stopped).
+function useNowPlaying(gen, running, settings) {
     const [now, setNow] = useState(() => gen.nowPlaying());
     useEffect(() => {
         const read = () => setNow((prev) => {
@@ -260,7 +276,7 @@ function useNowPlaying(gen, running) {
         if (!running) return undefined;
         const id = setInterval(read, 300);
         return () => clearInterval(id);
-    }, [gen, running]);
+    }, [gen, running, settings]);
     return now;
 }
 
@@ -320,10 +336,16 @@ const GenerativeApp = () => {
         Object.fromEntries(Object.entries(ROLES).map(([role, { volume }]) => [role, { presetName: gen.roles[role].presetName, edited: false, volume }]))
     );
     // What a link can carry: built-in presets as loaded (edits stay local).
+    // Generated sounds travel as the role they were made for + their seed.
     const linkPresets = useMemo(
-        () => Object.fromEntries(Object.entries(roles).map(([role, { presetName, edited }]) => [role, edited ? null : presetName])),
+        () => Object.fromEntries(Object.entries(roles).map(([role, { presetName, edited }]) => {
+            if (edited) return [role, null];
+            const generated = generatedInfo(presetName);
+            return [role, generated ? { generated } : presetName];
+        })),
         [roles],
     );
+    const [generating, setGenerating] = useState({});
     const [randomLevel, setRandomLevel] = useState('reason');
     const [editorRole, setEditorRole] = useState(Object.keys(ROLES)[0]);
     const [mix, setMix] = useState(() => Object.fromEntries(Object.keys(ROLES).map((role) => [role, { mute: false, solo: false }])));
@@ -340,7 +362,7 @@ const GenerativeApp = () => {
         setEditorOpen(true);
         requestAnimationFrame(() => editorRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' }));
     };
-    const now = useNowPlaying(gen, running);
+    const now = useNowPlaying(gen, running, settings);
     useSettingsInUrl(settings, linkPresets);
     // Reload with the current settings in the address bar (buffer size).
     const reloadKeepingSettings = () => {
@@ -372,7 +394,26 @@ const GenerativeApp = () => {
         if (gen.loadRolePreset(role, name)) presetLoaded(role, name);
     };
     const randomizeField = (key) => loadSettings(randomField(key, gen.settings, randomLevel));
+    const chords = progressionLength(settings.progression);
     const randomizePreset = (role) => loadPreset(role, randomPreset(role, roles[role].presetName, randomLevel));
+    // A procedural sound (soundGen.js) made for `madeFor`, levelled to that
+    // role's default loudness, onto `role`.
+    const loadGeneratedSound = async (role, madeFor, seed) => {
+        setGenerating((g) => ({ ...g, [role]: true }));
+        try {
+            const { name, preset } = generateSound(madeFor, seed);
+            addGeneratedPreset(name, await levelPreset(preset, madeFor), { role: madeFor, seed });
+            loadPreset(role, name);
+        } finally {
+            setGenerating((g) => ({ ...g, [role]: false }));
+        }
+    };
+    const generateForRole = (role) => loadGeneratedSound(role, role, newSoundSeed());
+    useEffect(() => {
+        const sounds = linkedSounds;
+        linkedSounds = [];
+        sounds.forEach(({ target, madeFor, seed }) => loadGeneratedSound(target, madeFor, seed));
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
     // Within reason, key and progression are chosen to fit each other: alone,
     // each fits the other's current value; together, the key comes first.
     const randomize = (target, level) => {
@@ -415,45 +456,57 @@ const GenerativeApp = () => {
 
             <ChordTimeline
                 generator={gen}
-                tracks={<TrackStrip roles={ROLES} mix={mix} armed={armed} onMix={changeMix} onArm={setArmed} onEdit={editSound} live={live} />}
+                tracks={<TrackStrip roles={ROLES} mix={mix} armed={armed} onMix={changeMix} onArm={setArmed} onEdit={editSound}
+                    onRandom={randomizePreset} onGenerate={generateForRole} generating={generating} live={live} />}
             />
 
             <section className="gen-panel">
                 <h2>Music</h2>
-                <Field label="Key" onRandom={() => randomizeField('tonic')}>
-                    <select value={settings.tonic} onChange={(e) => update('tonic', Number(e.target.value))}>
-                        {TONIC_NAMES.map((name, pc) => <option key={name} value={pc}>{name}</option>)}
-                    </select>
-                </Field>
-                <Field label="Scale / mode" onRandom={() => randomizeField('mode')}>
-                    <select value={settings.mode} onChange={(e) => update('mode', e.target.value)}>
-                        {SCALE_FAMILIES.map(({ family, modes }) => (
-                            <optgroup key={family} label={family}>
-                                {modes.map(({ id, name }) => <option key={id} value={id}>{name}</option>)}
-                            </optgroup>
-                        ))}
-                    </select>
-                </Field>
-                <Field label="Progression" onRandom={() => randomizeField('progression')}>
-                    <select value={settings.progression} onChange={(e) => update('progression', Number(e.target.value))}>
-                        {PROGRESSIONS.map((p, i) => <option key={p.join()} value={i}>{p.join(' – ')}</option>)}
-                    </select>
-                </Field>
-                <Field label="Bars per chord" onRandom={() => randomizeField('barsPerChord')}>
-                    <select value={settings.barsPerChord} onChange={(e) => update('barsPerChord', Number(e.target.value))}>
-                        {[1, 2, 4].map((n) => <option key={n}>{n}</option>)}
-                    </select>
-                </Field>
+                <div className="gen-row">
+                    <Field label="Key" onRandom={() => randomizeField('tonic')}>
+                        <select value={settings.tonic} onChange={(e) => update('tonic', Number(e.target.value))}>
+                            {TONIC_NAMES.map((name, pc) => <option key={name} value={pc}>{name}</option>)}
+                        </select>
+                    </Field>
+                    <Field label="Scale / mode" onRandom={() => randomizeField('mode')}>
+                        <select value={settings.mode} onChange={(e) => update('mode', e.target.value)}>
+                            {SCALE_FAMILIES.map(({ family, modes }) => (
+                                <optgroup key={family} label={family}>
+                                    {modes.map(({ id, name }) => <option key={id} value={id}>{name}</option>)}
+                                </optgroup>
+                            ))}
+                        </select>
+                    </Field>
+                </div>
+                <div className="gen-row">
+                    <Field label="Chords" onRandom={() => loadSettings(randomLength(gen.settings, randomLevel))}>
+                        <select value={chords} onChange={(e) => update('progression', progressionForLength(settings, Number(e.target.value)))}>
+                            {PROGRESSION_LENGTHS.map((n) => <option key={n} value={n}>{n} chords</option>)}
+                        </select>
+                    </Field>
+                    <Field label="Progression" onRandom={() => randomizeField('progression')} wide>
+                        <select value={settings.progression} onChange={(e) => update('progression', Number(e.target.value))}>
+                            {progressionsOfLength(chords).map((i) => <option key={i} value={i}>{PROGRESSIONS[i].join(' – ')}</option>)}
+                        </select>
+                    </Field>
+                    <Field label="Bars per chord" onRandom={() => randomizeField('barsPerChord')}>
+                        <select value={settings.barsPerChord} onChange={(e) => update('barsPerChord', Number(e.target.value))}>
+                            {[1, 2, 4].map((n) => <option key={n}>{n}</option>)}
+                        </select>
+                    </Field>
+                </div>
+                <div className="gen-row">
+                    <Field label="Time signature" onRandom={() => randomizeField('meter')}>
+                        <select value={settings.meter} onChange={(e) => update('meter', e.target.value)}>
+                            {Object.entries(METERS).map(([id, { label }]) => <option key={id} value={id}>{label}</option>)}
+                        </select>
+                    </Field>
+                    <Field label={`Tempo ${settings.bpm} BPM${METERS[settings.meter].unitsPerBeat > 1 ? ' (♩.)' : ''}`} onRandom={() => randomizeField('bpm')}>
+                        <input type="range" min="50" max="110" value={settings.bpm}
+                            onChange={(e) => update('bpm', Number(e.target.value))} />
+                    </Field>
+                </div>
                 <NowPlaying now={now} settings={settings} onKeep={keepCurrent} />
-                <Field label="Time signature" onRandom={() => randomizeField('meter')}>
-                    <select value={settings.meter} onChange={(e) => update('meter', e.target.value)}>
-                        {Object.entries(METERS).map(([id, { label }]) => <option key={id} value={id}>{label}</option>)}
-                    </select>
-                </Field>
-                <Field label={`Tempo ${settings.bpm} BPM${METERS[settings.meter].unitsPerBeat > 1 ? ' (♩.)' : ''}`} onRandom={() => randomizeField('bpm')}>
-                    <input type="range" min="50" max="110" value={settings.bpm}
-                        onChange={(e) => update('bpm', Number(e.target.value))} />
-                </Field>
             </section>
 
             <Evolution drift={settings.drift} home={{ tonic: settings.tonic, mode: settings.mode }} onChange={(drift) => update('drift', drift)} />
@@ -497,7 +550,7 @@ const GenerativeApp = () => {
                         {label}
                         <RoleButtons role={role} label={label} mix={mix[role]} armed={armed === role} onMix={changeMix} onArm={setArmed} onEdit={editSound} />
                     </h2>
-                    <Field label="Preset" onRandom={() => randomizePreset(role)}>
+                    <Field label="Preset" onRandom={() => randomizePreset(role)} onGenerate={() => generateForRole(role)} generating={generating[role]} wide>
                         <PresetPicker value={roles[role].presetName} edited={roles[role].edited} onChange={(name) => loadPreset(role, name)} role={role} />
                     </Field>
                     <Field label={`Volume ${Math.round(roles[role].volume * 100)}%`}>

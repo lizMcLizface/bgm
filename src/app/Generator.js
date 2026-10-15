@@ -27,7 +27,12 @@ import { normal, seeded } from './random';
 import { defaultSettings } from './settings';
 import { findPreset } from './editor/presetStore';
 import { ROLE_PRESETS } from './presets';
-import PROGRESSIONS from './progressions';
+import PROGRESSIONS, { progressionsOfLength } from './progressions';
+
+// Stop fades everything out - reverb and echo tails included - with this
+// time constant (-60 dB after ~0.5 s), then drops the tails (STOP_FADE_MS).
+const STOP_FADE = 0.07;
+const STOP_FADE_MS = 500;
 
 // Bars decided ahead of the playhead, and bars kept behind it for display.
 export const PLAN_AHEAD_BARS = 8;
@@ -102,14 +107,38 @@ class Generator {
 
     async start() {
         if (this.AC.state !== 'running') await this.AC.resume();
+        if (this.stopFade) {
+            // still fading out from Stop: finish quickly so the old tails
+            // can't ring into the new start
+            this.output.gain.setTargetAtTime(0, this.AC.currentTime, 0.005);
+            await new Promise((resolve) => setTimeout(resolve, 30));
+            this.endStopFade();
+        }
         this.transport.setBpm(unitsPerMinute(this.meter, this.plan.get(0).bpm));
         this.transport.start();
     }
 
+    // Stop doesn't wait for long reverbs and echoes: the output fades out,
+    // then the effects' tails are dropped and the output is restored (for
+    // auditions and live play).
     stop() {
         this.transport.stop();
         Object.values(this.roles).forEach(({ instrument }) => instrument.silence());
+        const gain = this.output.gain;
+        gain.cancelScheduledValues(this.AC.currentTime);
+        gain.setTargetAtTime(0, this.AC.currentTime, STOP_FADE);
+        clearTimeout(this.stopFade);
+        this.stopFade = setTimeout(() => this.endStopFade(), STOP_FADE_MS);
         this.reset();
+    }
+
+    endStopFade() {
+        if (!this.stopFade) return;
+        clearTimeout(this.stopFade);
+        this.stopFade = null;
+        Object.values(this.roles).forEach(({ instrument }) => instrument.flushTails());
+        this.output.gain.cancelScheduledValues(this.AC.currentTime);
+        this.output.gain.setValueAtTime(1, this.AC.currentTime);
     }
 
     /**
@@ -201,6 +230,7 @@ class Generator {
      */
     async audition(role) {
         if (this.AC.state !== 'running') await this.AC.resume();
+        this.endStopFade();
         const bar = Math.floor(this.position() / this.beatsPerBar);
         const planned = this.plan.get(bar) || this.getPlan()[0];
         const { instrument } = this.roles[role];
@@ -239,6 +269,7 @@ class Generator {
     /** Plays a held note on a role (keyboard / MIDI); returns an id for liveNoteOff. */
     liveNoteOn(role, midi, velocity = 0.8) {
         if (this.AC.state !== 'running') this.AC.resume();
+        this.endStopFade();
         return this.roles[role].instrument.startNote(midi, velocity);
     }
 
@@ -326,7 +357,7 @@ class Generator {
         const inCycle = bar - music.cycleStart;
         // Next cycle's music: decided as this cycle starts, carried through it.
         const upcoming = inCycle === 0
-            ? nextMusic(music, this.homeMusic(), drift, PROGRESSIONS.length, this.rng)
+            ? nextMusic(music, this.homeMusic(), drift, progressionsOfLength(PROGRESSIONS[this.settings.progression].length), this.rng)
             : prev.upcoming;
         const cycleEnd = inCycle === cycleBars - 1;
         const following = cycleEnd ? { ...upcoming, cycleStart: bar + 1 } : music;

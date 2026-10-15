@@ -24,3 +24,10 @@ export const PencilIcon = () => (
         <path d="M9 4l3 3" />
     </Svg>
 );
+
+export const SparkIcon = () => (
+    <Svg>
+        <path d="M8 1.5l1.4 4.1 4.1 1.4-4.1 1.4L8 12.5 6.6 8.4 2.5 7l4.1-1.4z" />
+        <path d="M13 11.5v3M11.5 13h3" />
+    </Svg>
+);

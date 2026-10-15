@@ -10,7 +10,12 @@ vi.mock('../audio/context', () => ({
         state: 'running',
         resume: () => Promise.resolve(),
         createGain: () => {
-            const gain = { value: 1, setTargetAtTime: (v) => { gain.value = v; } };
+            const gain = {
+                value: 1,
+                setTargetAtTime: (v) => { gain.value = v; },
+                setValueAtTime: (v) => { gain.value = v; },
+                cancelScheduledValues: () => {},
+            };
             return { connect: () => {}, gain };
         },
     },
@@ -24,6 +29,7 @@ vi.mock('./engine/Instrument', () => ({ default: class {
     applyPreset() {}
     scheduleNote(midi, start, duration, velocity, detune) { mockBooked.push({ midi, start, duration, velocity, detune }); }
     silence() {}
+    flushTails() {}
 } }));
 
 import Generator from './Generator';

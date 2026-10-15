@@ -14,7 +14,8 @@ synthesised with the Web Audio API; there are no samples.
 - Every scale and mode family (major modes, harmonic/melodic minor,
   harmonic major, double harmonic, Neapolitan, hexatonic, pentatonic), any
   key, with correctly spelled chord names and Roman numerals
-- Triads, sevenths or ninths; 3/4, 4/4, 5/4, 6/8 and 7/4
+- Progressions of 2 to 8 chords; triads, sevenths or ninths; 3/4, 4/4,
+  5/4, 6/8 and 7/4
 - Arrangement: pad styles (sustain / pulse / slow arpeggio) and bass styles
   (whole bar / per beat group / walking) by adjustable shares, a lead that
   plays call-and-response phrases, per-voice octave and octave wander,
@@ -26,13 +27,16 @@ synthesised with the Web Audio API; there are no samples.
   per voice
 - Play any voice from the computer keyboard (A-; and W E T Y U O P, Z/X for
   octave) or from MIDI after clicking "Connect MIDI"
-- A full synth editor per voice, 28 built-in presets by category, and your
+- A full synth editor per voice, 41 built-in presets by category, and your
   own presets (saved in the browser, or exported/imported as JSON)
+- Procedural sounds: a new preset per voice from a random seed, shaped for
+  the role and levelled to its default's loudness; links carry the seed
+- Stop fades out within half a second, reverb and echo tails included
 - Randomize key & scale, progression, conductor, voices or everything at
   once - "within reason" (near the defaults, minor progressions in minor
   modes, lead sounds on the lead) or "full random"
 - Share links: the address bar always holds the current settings, the
-  built-in presets per voice and a random seed in a short code (`?s=FWfOUc`
+  presets per voice (built-in or generated) and a random seed in a short code (`?s=FWfOUc`
   for defaults, ~30 characters fully randomized), so a link plays the same
   piece for whoever opens it
 - An audio-thread load meter with a choice of output buffer size (larger

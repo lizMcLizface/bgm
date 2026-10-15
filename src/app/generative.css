@@ -437,14 +437,14 @@ body {
     gap: 8px;
     align-content: start;
     min-width: 150px;
-    max-width: 190px;
+    max-width: 180px;
 }
 
 .gen-track {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
+    /* name above its buttons: narrow beside the timeline, which is taller anyway */
+    display: grid;
+    justify-items: start;
+    gap: 3px;
     font-size: 13px;
 }
 
@@ -516,7 +516,7 @@ body {
 
     .gen-tracks {
         max-width: none;
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     }
 
     .gen-keys-hint {
@@ -774,4 +774,20 @@ body {
     background: var(--gen-accent);
     border-color: var(--gen-accent);
     color: var(--gen-accent-text);
+}
+
+/* Room for long preset names beside their buttons. */
+@media (min-width: 641px) {
+    .gen-field-wide {
+        grid-column: span 2;
+    }
+}
+
+/* A row of related fields inside a panel (Music: key, chords, time); the
+   same column grid as the panel, so rows line up. */
+.gen-row {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px 16px;
 }
