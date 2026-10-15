@@ -12,7 +12,7 @@
 // make runs differ. Runs are deterministic, so mode=render output can be
 // diffed between two versions of the engine.
 //
-// npm run dev, then open /bgm/bench/ with query parameters:
+// npm run dev, then open /bench/ with query parameters:
 //   scenarios=busy,lush,default  seconds=20  reps=3
 //   variants=full,noNotes,noReverb,...  (see VARIANTS; attributes cost by
 //   switching one part off)

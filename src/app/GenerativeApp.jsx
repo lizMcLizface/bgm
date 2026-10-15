@@ -794,6 +794,31 @@ const GenerativeApp = () => {
                 onToggle={() => setEditorOpen((o) => !o)}
                 sectionRef={editorRef}
             />
+
+            <footer className="gen-footer">
+                <p>
+                    <a href="https://github.com/lizMcLizface/bgm" target="_blank" rel="noopener noreferrer">Source code on GitHub</a>
+                    {' · '}MIT licence · made by lizMcLizface
+                </p>
+                <p>
+                    The music is yours: it is generated, so no rights are claimed on anything you play, record or
+                    save here - use it however you like, in videos, streams or anything else. A credit
+                    (calmbgm.com) is appreciated, never required.
+                </p>
+                <p>
+                    Every sound is synthesised live in your browser with the Web Audio API - no samples or
+                    recordings, rain and thunder included.
+                </p>
+                <p>
+                    No accounts, cookies, ads or analytics. Your preferences (volume, theme, buffer size, sleep
+                    timer) and any sounds you save stay in this browser&apos;s local storage; a share link carries
+                    the music settings in its address. The site is hosted on GitHub Pages, which keeps the usual
+                    server logs.
+                </p>
+                <p>
+                    Provided as is, without warranty of any kind. Mind your volume, especially with headphones.
+                </p>
+            </footer>
         </main>
     );
 };

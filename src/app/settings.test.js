@@ -100,8 +100,8 @@ test('garbage codes are rejected; the query parameter (and legacy hash) is found
 });
 
 test('share URLs use the page path and an s= query parameter', () => {
-    const url = shareUrl({ ...defaultSettings(), seed: 1 }, {}, { origin: 'https://liz.moe', pathname: '/bgm/' });
-    expect(url).toMatch(/^https:\/\/liz\.moe\/bgm\/\?s=[A-Za-z0-9_-]+$/);
+    const url = shareUrl({ ...defaultSettings(), seed: 1 }, {}, { origin: 'https://calmbgm.com', pathname: '/' });
+    expect(url).toMatch(/^https:\/\/calmbgm\.com\/\?s=[A-Za-z0-9_-]+$/);
 });
 
 test('every built-in preset can be named in a link', () => {

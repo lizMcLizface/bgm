@@ -985,3 +985,22 @@ body {
     letter-spacing: normal;
     font-weight: 500;
 }
+
+/* The page's foot: source link and the small print. */
+.gen-footer {
+    margin-top: 48px;
+    padding: 20px 0 32px;
+    border-top: 1px solid var(--gen-border);
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--gen-muted);
+}
+
+.gen-footer p {
+    margin: 0 0 8px;
+    max-width: 70ch;
+}
+
+.gen-footer a {
+    color: var(--gen-accent);
+}

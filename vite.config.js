@@ -1,10 +1,11 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-// Served from liz.moe/bgm/ (GitHub Pages project site), so every asset and
-// worklet URL is prefixed with /bgm/ (import.meta.env.BASE_URL).
+// Served at the root of calmbgm.com (GitHub Pages with a custom domain:
+// public/CNAME). Asset and worklet URLs still go through
+// import.meta.env.BASE_URL, so a sub-path deploy only needs `base` changed.
 export default defineConfig({
-    base: '/bgm/',
+    base: '/',
     plugins: [react()],
     test: {
         environment: 'jsdom',

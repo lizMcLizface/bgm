@@ -1,7 +1,7 @@
 # bgm
 
 Calm procedural background music in the browser - for under a video, a
-podcast or a work session. Live at **[liz.moe/bgm](https://liz.moe/bgm/)**.
+podcast or a work session. Live at **[calmbgm.com](https://calmbgm.com/)**.
 
 Synth voices - **rhythm/pad**, **bass/support**, **lead** and an optional
 **second lead** - play
@@ -71,21 +71,22 @@ synthesised with the Web Audio API; there are no samples.
 
 ```bash
 npm install
-npm run dev       # http://localhost:5173/bgm/
+npm run dev       # http://localhost:5173/
 npm test          # Vitest
 npm run build     # -> dist/
-npm run preview   # serve dist/ at http://localhost:4173/bgm/
+npm run preview   # serve dist/ at http://localhost:4173/
 npm run deploy    # tests + build, then publish dist/ to the gh-pages branch
 ```
 
 Audio performance: with `npm run dev` running, open
-http://localhost:5173/bgm/bench/ (engine load per arrangement, parameters in
-`bench/bench.js`) or `/bgm/bench/nodes.html` (cost per node type); results
+http://localhost:5173/bench/ (engine load per arrangement, parameters in
+`bench/bench.js`) or `/bench/nodes.html` (cost per node type); results
 and history are in `docs/DESIGN.md` §5.
 
-The site is a GitHub Pages project site, so it is built with `base: '/bgm/'`
-(see `vite.config.js`); asset and AudioWorklet URLs go through
-`import.meta.env.BASE_URL`.
+The site is GitHub Pages (the `gh-pages` branch) on the custom domain
+calmbgm.com - `public/CNAME` names it, and it ships with every deploy. It
+is built with `base: '/'` (see `vite.config.js`); asset and AudioWorklet
+URLs go through `import.meta.env.BASE_URL`.
 
 ## Layout
 
@@ -109,3 +110,9 @@ docs/DESIGN.md      design notes, decisions and performance measurements
 Unit tests live next to the code (`*.test.js`) and cover the music logic -
 theory, arrangement rules across meters and scales, drift, planning and
 booking, settings/share-link validation.
+
+## Licence
+
+The code is [MIT licensed](LICENSE). The music it makes is procedural, and
+no rights are claimed on it: use anything you play, record or save however
+you like. A credit (calmbgm.com) is appreciated but not required.

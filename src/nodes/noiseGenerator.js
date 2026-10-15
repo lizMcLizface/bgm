@@ -14,7 +14,7 @@ const PROCESSORS = { white: 'white-noise-processor', pink: 'pink-noise-processor
 const moduleLoads = new WeakMap();
 function loadModules(AC) {
     if (!moduleLoads.has(AC)) {
-        // Relative to the site's base path (/bgm/ when deployed), not the
+        // Relative to the site's base path (vite.config.js `base`), not the
         // domain root. BASE_URL ends with a slash.
         moduleLoads.set(AC, Promise.all(Object.values(PROCESSORS).map((name) =>
             AC.audioWorklet.addModule(`${import.meta.env.BASE_URL}${name}.js`))));
