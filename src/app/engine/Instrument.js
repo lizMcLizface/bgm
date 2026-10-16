@@ -15,7 +15,6 @@ import { minTime } from '../../util/util';
 import { wanderLfo } from './wander';
 import { MIN_WET } from '../../nodes/reverb';
 import { SendReverb } from '../../nodes/sharedReverb';
-import { PERFORMANCE } from '../../audio/performance';
 
 // A held note is booked as if it lasted this long; its release replaces
 // the tail when the key comes up.
@@ -54,8 +53,7 @@ const PARAM_SETTERS = {
     filterFreq: eachVoice('setFilterFreq'),
     filterQ: eachVoice('setFilterQ'),
     filterGain: eachVoice('setFilterGain'),
-    // (a Performance choice caps the unison; the preset keeps its own count)
-    voiceCount: (inst, v) => eachVoice('setVoiceCount')(inst, Math.min(v, PERFORMANCE.maxUnison)),
+    voiceCount: eachVoice('setVoiceCount'),
     detuneSpread: eachVoice('setDetuneSpread'),
     stereoSpread: eachVoice('setStereoSpread'),
     noiseType: eachVoice('setNoiseType'),

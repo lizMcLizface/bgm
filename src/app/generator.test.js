@@ -496,3 +496,39 @@ describe('sounds that change with a preset', () => {
         gen.transport.timer = null;
     });
 });
+
+describe('the audio clock behind the playhead', () => {
+    test('steps of a big output buffer do not make it jump: it advances evenly, close to the true time', () => {
+        const gen = new Generator();
+        const wall = vi.spyOn(performance, 'now');
+        const BUFFER = 0.2;
+        const readings = [];
+        for (let frame = 0; frame < 300; frame++) {
+            const t = 10 + frame * 0.016; // a 60 fps page
+            wall.mockReturnValue(t * 1000);
+            gen.AC.currentTime = Math.floor(t / BUFFER) * BUFFER; // the audio clock moves in whole buffers
+            readings.push({ t, clock: gen.audioClock() });
+        }
+        wall.mockRestore();
+        const settled = readings.slice(30);
+        settled.slice(1).forEach(({ clock }, i) => {
+            const step = clock - settled[i].clock;
+            expect(step).toBeGreaterThanOrEqual(0);
+            expect(step).toBeLessThan(0.03); // never a buffer-sized jump
+        });
+        // and not drifting away from the real time
+        settled.forEach(({ t, clock }) => expect(Math.abs(clock - t)).toBeLessThan(BUFFER + 0.01));
+    });
+
+    test('a jump of the audio clock (a seek, a suspended context) starts it over', () => {
+        const gen = new Generator();
+        const wall = vi.spyOn(performance, 'now');
+        wall.mockReturnValue(5000);
+        gen.AC.currentTime = 5;
+        gen.audioClock();
+        wall.mockReturnValue(5016);
+        gen.AC.currentTime = 20;
+        expect(gen.audioClock()).toBe(20);
+        wall.mockRestore();
+    });
+});

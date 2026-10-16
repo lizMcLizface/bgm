@@ -1850,3 +1850,185 @@ body {
 .gen button.gen-dice {
     padding: 0;
 }
+
+/* Header layout. Three groups - the title, the controls (transport, what Play
+   plays) and the end (presets, then volume, theme, audio and options) - that
+   sit on one row when there is room, on two below 1180 px (title and end, then
+   the controls) and on three on a phone, each row lined up to the edges. */
+.gen-header {
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    grid-template-areas: 'title controls end';
+    align-items: center;
+    column-gap: 16px;
+    row-gap: 10px;
+}
+
+.gen-header h1 { grid-area: title; }
+
+.gen-header-controls {
+    grid-area: controls;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.gen-header-end {
+    grid-area: end;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    min-width: 0;
+}
+
+.gen-header-end .gen-header-tools {
+    margin-left: 0;
+    flex-wrap: nowrap;
+}
+
+@media (max-width: 1179px) {
+    .gen-header {
+        grid-template-columns: 1fr auto;
+        grid-template-areas: 'title end' 'controls controls';
+    }
+}
+
+@media (max-width: 639px) {
+    .gen-header {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas: 'title' 'controls' 'end';
+        row-gap: 8px;
+    }
+
+    .gen-header-controls {
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .gen-header-end {
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .gen-header-end .gen-scene {
+        flex: 1 1 0;
+        min-width: 0;
+    }
+
+    .gen .gen-header-end .gen-scene-button {
+        width: 100%;
+        max-width: none;
+        justify-content: space-between;
+    }
+
+    .gen-header-tools {
+        gap: 6px;
+    }
+
+    .gen-volume input {
+        width: 54px;
+    }
+}
+
+/* On a phone the transport and the Music / Ambience switches share a row, so
+   they are a little smaller there. */
+@media (max-width: 639px) {
+    .gen-transport {
+        gap: 3px;
+    }
+
+    .gen .gen-transport button:not(.gen-play) {
+        padding: 6px 0;
+        width: 28px;
+    }
+
+    .gen-transport .gen-play {
+        width: 46px;
+    }
+
+    .gen-parts {
+        gap: 3px;
+    }
+
+    .gen button.gen-part {
+        padding: 4px 7px;
+        font-size: 12px;
+        gap: 5px;
+    }
+}
+
+@media (max-width: 400px) {
+    .gen-header-controls {
+        gap: 4px;
+    }
+
+    .gen .gen-transport button:not(.gen-play) {
+        width: 25px;
+    }
+
+    .gen-transport {
+        gap: 2px;
+    }
+
+    .gen button.gen-part {
+        padding: 4px 6px;
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 639px) {
+    .gen .gen-transport button.gen-icon-button {
+        min-width: 26px;
+        width: 26px;
+    }
+}
+
+@media (max-width: 400px) {
+    .gen .gen-transport button.gen-icon-button {
+        min-width: 24px;
+        width: 24px;
+    }
+}
+
+/* (narrower than any phone sold now: let the controls wrap rather than overflow) */
+@media (max-width: 340px) {
+    .gen-header-controls {
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 639px) {
+    /* the preset's name matters more than the word "Presets" where room is short */
+    .gen-header-end .gen-scene-label {
+        display: none;
+    }
+}
+
+@media (max-width: 380px) {
+    .gen button.gen-part {
+        padding: 4px 5px;
+    }
+
+    .gen-volume input {
+        width: 44px;
+    }
+
+    .gen-volume .gen-audio-label {
+        display: none;
+    }
+}
+
+.gen-menu-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px 8px;
+    font-size: 12px;
+}
+
+.gen-menu-row [role='status'] {
+    flex: 1 1 auto;
+    color: var(--gen-muted);
+}

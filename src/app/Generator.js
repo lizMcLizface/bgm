@@ -240,6 +240,7 @@ class Generator {
         }
         this.ensurePlanned(this.resumeBar);
         this.transport.setBpm(unitsPerMinute(this.meter, this.plan.get(this.resumeBar).bpm));
+        this.startedAt = performance.now();
         this.transport.start(this.resumeBar * this.beatsPerBar);
         this.notifyRunning();
     }
@@ -686,7 +687,7 @@ class Generator {
      */
     position() {
         if (!this.isRunning || !this.beatLog.length) return (this.resumeBar || 0) * this.beatsPerBar;
-        const now = this.AC.currentTime - (this.AC.outputLatency || this.AC.baseLatency || 0);
+        const now = this.audioClock() - (this.AC.outputLatency || this.AC.baseLatency || 0);
         let entry = this.beatLog[0];
         for (const e of this.beatLog) {
             if (e.time <= now) entry = e;
@@ -696,6 +697,29 @@ class Generator {
         // (not before the first booked beat: just after a jump it lies ahead)
         const bars = entry.bar + Math.min(1, (entry.beatInBar + Math.max(0, now - entry.time) / entry.secondsPerBeat) / entry.units);
         return Math.max(0, bars * this.beatsPerBar);
+    }
+
+    /**
+     * The audio clock, smoothed for drawing. AudioContext.currentTime moves
+     * in steps of one output buffer, which is nothing at the lowest latency
+     * but at 100-200 ms made the playhead jump. Between the steps the page's
+     * own clock (performance.now) carries it: its offset to the audio clock is
+     * the highest seen recently - right at each step - and only eases down
+     * slowly, so it follows a real drift but not the staircase. A jump (a
+     * suspended context, a seek) starts it over.
+     */
+    audioClock() {
+        const wall = performance.now() / 1000;
+        const raw = this.AC.currentTime;
+        const offset = raw - wall;
+        const clock = this.clock;
+        if (!clock || this.AC.state !== 'running' || Math.abs(offset - clock.offset) > 0.5) {
+            this.clock = { offset, wall };
+            return raw;
+        }
+        clock.offset = Math.max(offset, clock.offset - 0.0005 * Math.min(1, wall - clock.wall) * 20);
+        clock.wall = wall;
+        return wall + clock.offset;
     }
 
     // A chord on a scale degree of `music`'s key, with display names.

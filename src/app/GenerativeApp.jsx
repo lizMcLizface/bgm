@@ -1080,6 +1080,7 @@ const GenerativeApp = () => {
         <main className="gen">
             <header className="gen-header">
                 <h1 aria-label="calmbgm - calm procedural music" title="calmbgm - calm procedural music">calm<b>bgm</b></h1>
+                <div className="gen-header-controls">
                 <Transport gen={gen} anyOn={anyOn} onToggle={toggle} onChange={() => setTick((n) => n + 1)} />
                 <div className="gen-parts" role="group" aria-label="What Play plays">
                     <button type="button" className={`gen-part${settings.playMusic ? ' is-on' : ''}`} aria-pressed={settings.playMusic}
@@ -1087,6 +1088,8 @@ const GenerativeApp = () => {
                     <button type="button" className={`gen-part${settings.playAmbience ? ' is-on' : ''}`} aria-pressed={settings.playAmbience}
                         onClick={() => togglePart('playAmbience')} title={PART_TITLE}>Ambience</button>
                 </div>
+                </div>
+                <div className="gen-header-end">
                 <PresetBrowser current={scene} onPick={applyScene} actions={setupActions} />
                 {sleepLeft && <span className="gen-sleep gen-sleep-left" role="timer" title="Sleep timer (in the ⚙ menu)">Sleep {sleepLeft}</span>}
                 <div className="gen-header-tools">
@@ -1100,6 +1103,7 @@ const GenerativeApp = () => {
                         <SleepTimer generator={gen} running={anyOn} onLeft={setSleepLeft} />
                         <Recorder generator={gen} fileName={fileName} onProgress={setSaving} />
                     </SettingsMenu>
+                </div>
                 </div>
             </header>
 

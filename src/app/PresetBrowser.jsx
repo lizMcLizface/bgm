@@ -5,6 +5,7 @@ import { TONIC_NAMES, scaleById } from './theory';
 import { DRUM_STYLES } from './percussion';
 import { AMBIENCE_LAYERS } from './engine/ambience';
 import { METERS } from './meter';
+import { isMobile } from '../audio/performance';
 
 // The top row's preset browser (scenes.js): a button that opens a window
 // over the page with the presets as a grid of cards, sorted into categories
@@ -104,7 +105,9 @@ const PresetBrowser = ({ current, onPick, actions }) => {
             }
         };
         document.addEventListener('keydown', key);
-        if (search.current) search.current.focus({ preventScroll: true });
+        // On a phone, focusing the search box would raise the keyboard over the bottom of the list.
+        const touch = isMobile() || (typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches);
+        if (!touch && search.current) search.current.focus({ preventScroll: true });
         return () => document.removeEventListener('keydown', key);
     }, [open]);
 

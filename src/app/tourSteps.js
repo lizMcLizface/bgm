@@ -41,7 +41,7 @@ export const TOUR_STEPS = [
         id: 'audio',
         selector: '.gen-audio-menu',
         title: 'Audio: if the sound crackles',
-        text: 'The speaker button shows how hard the audio engine is working: green is comfortable, amber is busy, red means the sound may drop out. Open it to see the load, pick a bigger buffer, and - under Performance - turn on a lighter reverb, one reverb shared by all voices, or fewer unison voices. If you hear crackling or dropouts, try those; they are on by default on a phone. Your choices are remembered in this browser.',
+        text: 'The speaker button shows how hard the audio engine is working: green is comfortable, amber is busy, red means the sound may drop out. Open it to see the load, pick a bigger buffer, and - under Performance - turn on a lighter reverb or one reverb shared by all voices. If you hear crackling or dropouts, try those; they are on by default on a phone. Your choices are remembered in this browser.',
     },
     {
         id: 'timeline',

@@ -100,11 +100,11 @@ describe('performance choices', () => {
 
     test('a desktop starts with everything full; a phone (or a tablet) with every saving on', () => {
         userAgent(DESKTOP);
-        expect(readPerformance()).toEqual({ reverb: 'full', sharedReverb: false, maxUnison: Infinity });
+        expect(readPerformance()).toEqual({ reverb: 'full', sharedReverb: false });
         expect(isMobile()).toBe(false);
         userAgent(PIXEL, 5);
         expect(isMobile()).toBe(true);
-        expect(readPerformance()).toEqual({ reverb: 'light', sharedReverb: true, maxUnison: 2 });
+        expect(readPerformance()).toEqual({ reverb: 'light', sharedReverb: true });
         userAgent(IPAD_DESKTOP, 5);
         expect(isMobile()).toBe(true);
         userAgent(IPAD_DESKTOP, 0);
@@ -114,17 +114,17 @@ describe('performance choices', () => {
     test('a choice made on a phone is kept, including turning a saving off', () => {
         userAgent(PIXEL, 5);
         expect(writePerformance({ reverb: 'full' })).toBe(true);
-        expect(readPerformance()).toEqual({ reverb: 'full', sharedReverb: true, maxUnison: 2 });
-        writePerformance({ maxUnison: Infinity, sharedReverb: false });
-        expect(readPerformance()).toEqual({ reverb: 'full', sharedReverb: false, maxUnison: Infinity });
+        expect(readPerformance()).toEqual({ reverb: 'full', sharedReverb: true });
+        writePerformance({ sharedReverb: false });
+        expect(readPerformance()).toEqual({ reverb: 'full', sharedReverb: false });
     });
 
     test('read back what was written, drop what is invalid', () => {
         userAgent(DESKTOP);
-        writePerformance({ reverb: 'light', sharedReverb: true, maxUnison: 2 });
-        expect(readPerformance()).toEqual({ reverb: 'light', sharedReverb: true, maxUnison: 2 });
-        window.localStorage.setItem(PERFORMANCE_KEY, JSON.stringify({ reverb: 'huge', sharedReverb: 'yes', maxUnison: 99 }));
-        expect(readPerformance()).toEqual({ reverb: 'full', sharedReverb: false, maxUnison: Infinity });
+        writePerformance({ reverb: 'light', sharedReverb: true });
+        expect(readPerformance()).toEqual({ reverb: 'light', sharedReverb: true });
+        window.localStorage.setItem(PERFORMANCE_KEY, JSON.stringify({ reverb: 'huge', sharedReverb: 'yes' }));
+        expect(readPerformance()).toEqual({ reverb: 'full', sharedReverb: false });
         window.localStorage.setItem(PERFORMANCE_KEY, '{nope');
         expect(readPerformance().reverb).toBe('full');
     });

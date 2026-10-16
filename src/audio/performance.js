@@ -7,11 +7,8 @@
 //   reverb        'full' (stereo, up to 3 s) or 'light' (mono, 2 s) - nodes/reverb.js
 //   sharedReverb  one convolver per impulse type for every voice, instead of
 //                 one per voice - nodes/sharedReverb.js
-//   maxUnison     the most unison oscillators a voice uses (the preset keeps
-//                 its own value; heavy pads have 4-5) - engine/Instrument.js
 
 export const PERFORMANCE_KEY = 'bgm-performance';
-export const UNISON_LIMIT = 2;
 
 /** Whether this looks like a phone or tablet (where all the savings start on). */
 export function isMobile() {
@@ -28,8 +25,8 @@ export function isMobile() {
 
 // What each choice is before anyone has chosen: everything saved on a phone.
 const defaults = () => (isMobile()
-    ? { reverb: 'light', sharedReverb: true, maxUnison: UNISON_LIMIT }
-    : { reverb: 'full', sharedReverb: false, maxUnison: Infinity });
+    ? { reverb: 'light', sharedReverb: true }
+    : { reverb: 'full', sharedReverb: false });
 
 /**
  * The choices: what is stored, else the device's default (everything on for a
@@ -43,8 +40,6 @@ export function readPerformance() {
         return {
             reverb: raw.reverb === 'light' || raw.reverb === 'full' ? raw.reverb : base.reverb,
             sharedReverb: typeof raw.sharedReverb === 'boolean' ? raw.sharedReverb : base.sharedReverb,
-            maxUnison: raw.maxUnison === null ? Infinity
-                : Number.isInteger(raw.maxUnison) && raw.maxUnison >= 1 && raw.maxUnison <= 8 ? raw.maxUnison : base.maxUnison,
         };
     } catch (e) {
         return base;
@@ -52,7 +47,7 @@ export function readPerformance() {
 }
 
 /**
- * Stores a change ({ reverb?, sharedReverb?, maxUnison? }, Infinity for no limit).
+ * Stores a change ({ reverb?, sharedReverb? }).
  * @returns {boolean} whether it was stored
  */
 export function writePerformance(patch) {
@@ -61,7 +56,6 @@ export function writePerformance(patch) {
         window.localStorage.setItem(PERFORMANCE_KEY, JSON.stringify({
             reverb: next.reverb,
             sharedReverb: next.sharedReverb,
-            maxUnison: Number.isFinite(next.maxUnison) ? next.maxUnison : null,
         }));
         return true;
     } catch (e) {

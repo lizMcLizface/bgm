@@ -9,6 +9,10 @@
 // skipped. Worklets only have Date.now() (whole milliseconds), but the
 // rounding averages out over a second of quanta.
 //
+// It also listens for silence: a run of quanta with nothing in them (below
+// -100 dB) that ends is posted as { silence: seconds } - a gap in the sound
+// the page can log (src/audio/silenceLog.js).
+//
 // Posts { load } about once per second: average render time per quantum
 // as a share of the quantum's real duration (1 = the thread is always
 // busy; above that, audio drops out). null when no burst had two quanta.
@@ -21,9 +25,22 @@ class LoadMeterProcessor extends AudioWorkletProcessor {
         this.busy = 0;
         this.count = 0;
         this.windowStart = currentTime;
+        this.silentFrames = 0;
     }
 
-    process() {
+    process(inputs) {
+        let peak = 0;
+        const input = inputs[0] || [];
+        for (let c = 0; c < input.length; c++) {
+            const data = input[c];
+            for (let i = 0; i < data.length; i++) peak = Math.max(peak, Math.abs(data[i]));
+        }
+        if (peak < 1e-5) {
+            this.silentFrames += 128;
+        } else {
+            if (this.silentFrames >= sampleRate * 0.1) this.port.postMessage({ silence: this.silentFrames / sampleRate });
+            this.silentFrames = 0;
+        }
         const now = Date.now();
         const gap = now - this.last;
         this.last = now;

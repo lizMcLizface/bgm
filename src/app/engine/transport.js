@@ -5,12 +5,18 @@
 // scheduler, without coupling to the metronome singleton or its UI.
 
 import { audioContext } from '../../audio/context';
+import { isMobile } from '../../audio/performance';
 
 // Hidden pages get their main-thread timers throttled to about once a
 // second (or frozen), far past a 0.4 s window - so while hidden the window is
 // this long instead, and the tick comes from a Worker, whose timers aren't
 // throttled the same way.
-const HIDDEN_LOOKAHEAD = 10;
+const HIDDEN_LOOKAHEAD = isMobile() ? 20 : 10; // (a phone is the likelier to be locked)
+// A locked phone may not run the tick for many seconds at a time, and the
+// music then goes - 10 s of it, a gap, 10 s, a gap. So the hidden window also
+// grows to cover the longest silence between ticks actually seen (twice that,
+// and a margin), up to this much.
+const MAX_HIDDEN_LOOKAHEAD = 45;
 
 const TICK_WORKER_SOURCE = 'let id=null;onmessage=(e)=>{clearInterval(id);id=null;if(e.data>0)id=setInterval(()=>postMessage(0),e.data)};';
 
@@ -54,11 +60,19 @@ class Transport {
         this.listeners = new Set();
         this.timer = null;
         this.rebaseAt = null;
+        // the longest stretch (audio seconds) lately between two ticks, while the page was hidden
+        this.slowestGap = 0;
+        this.lastTick = null;
+    }
+
+    get hidden() {
+        return typeof document !== 'undefined' && document.visibilityState === 'hidden';
     }
 
     get lookahead() {
-        const hidden = typeof document !== 'undefined' && document.visibilityState === 'hidden';
-        return hidden ? Math.max(this.baseLookahead, HIDDEN_LOOKAHEAD) : this.baseLookahead;
+        if (!this.hidden) return this.baseLookahead;
+        const observed = Math.min(MAX_HIDDEN_LOOKAHEAD, this.slowestGap * 2 + 2);
+        return Math.max(this.baseLookahead, HIDDEN_LOOKAHEAD, observed);
     }
 
     set lookahead(seconds) {
@@ -92,6 +106,7 @@ class Transport {
     start(fromBeat = 0) {
         if (this.timer) return;
         this.beat = fromBeat;
+        this.lastTick = null;
         this.nextBeatTime = this.AC.currentTime + 0.1;
         this.tick();
         this.timer = startTicker(() => this.tick(), this.interval);
@@ -111,7 +126,19 @@ class Transport {
         this.rebaseAt = { at, to, beatsPerBar };
     }
 
+    // How long the timer left us since the last tick, in audio time: the slowest
+    // lately (easing off by 1% a second) is what the hidden lookahead has to cover.
+    watchGap() {
+        const now = this.AC.currentTime;
+        if (this.lastTick !== null && this.hidden && this.AC.state === 'running') {
+            const gap = now - this.lastTick;
+            this.slowestGap = Math.max(gap, this.slowestGap * Math.pow(0.99, Math.max(0, gap)));
+        }
+        this.lastTick = now;
+    }
+
     tick() {
+        this.watchGap();
         while (this.nextBeatTime < this.AC.currentTime + this.lookahead) {
             const event = {
                 beat: this.beat,

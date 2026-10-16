@@ -6,9 +6,10 @@
  * @param {AudioContext} AC
  * @param {AudioNode} source - the node everything sums into (masterBus)
  * @param {function} onUpdate - ({ load: number|null, dropouts: number|null }) about once a second
+ * @param {function} [onSilence] - (seconds) when a stretch of silence (over 0.1 s) in the output ends
  * @returns {function} stop
  */
-export function startLoadMeter(AC, source, onUpdate) {
+export function startLoadMeter(AC, source, onUpdate, onSilence = () => {}) {
     let node = null;
     let stopped = false;
     const dropouts = () => {
@@ -22,7 +23,10 @@ export function startLoadMeter(AC, source, onUpdate) {
         if (stopped) return;
         node = new AudioWorkletNode(AC, 'load-meter', { numberOfInputs: 1, numberOfOutputs: 0 });
         source.connect(node);
-        node.port.onmessage = ({ data }) => onUpdate({ load: data.load, dropouts: dropouts() });
+        node.port.onmessage = ({ data }) => {
+            if (data.silence !== undefined) onSilence(data.silence);
+            else onUpdate({ load: data.load, dropouts: dropouts() });
+        };
     }, (error) => console.warn('Audio load meter unavailable:', error));
     return () => {
         stopped = true;

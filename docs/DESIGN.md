@@ -750,8 +750,10 @@ and the drum kit has its own - a 9.8 s hall (reverb4, the default pad's) cost
   a "Light" reverb (a 2 s mono impulse on a mono-input convolver); "One reverb
   shared by all voices" (`nodes/sharedReverb.js`: each voice sends to one
   convolver per impulse type, the wet skipping the voice's EQ / filter / limiter
-  and section tone - about 35 MB less, output level within 0.2 dB in a test); and
-  "Fewer unison voices" (at most 2 oscillators per voice).
+  and section tone - about 35 MB less, output level within 0.2 dB in a test).
+  A "fewer unison voices" choice was tried and dropped: `bench/effects.html` shows
+  the unison oscillators cost nothing measurable (a voice's cost is the reverb and
+  a fixed per-voice part, not its oscillators).
 
 Start-up memory about 780 -> 420 MB (full), audio load of the default voices
 about halved in `bench/` (16% -> 10%). Tools: `bench/` (engine, one part

@@ -6,9 +6,10 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { audioContext, storedBufferSeconds, storeBufferSeconds } from '../audio/context';
-import { readPerformance, writePerformance, UNISON_LIMIT } from '../audio/performance';
+import { readPerformance, writePerformance } from '../audio/performance';
 import { masterBus } from '../audio/bus';
 import { startLoadMeter } from '../audio/loadMeter';
+import { addSilence, readSilenceLog, clearSilenceLog, formatSilenceLog, describeSilence } from '../audio/silenceLog';
 import { readPref, writePref } from './prefs';
 import { applyTheme, storedTheme } from './theme';
 import { LinkIcon, SpeakerIcon, SunIcon, MoonIcon, AutoThemeIcon } from './icons';
@@ -22,6 +23,8 @@ const BUFFERS = [
     [0.05, '50 ms'],
     [0.1, '100 ms'],
     [0.2, '200 ms'],
+    [0.5, '500 ms'],
+    [1, '1 second'],
 ];
 
 // Above this the thread is close to missing deadlines on a busy moment.
@@ -44,10 +47,16 @@ export const MasterVolume = () => {
 };
 
 // How busy the audio thread is, and dropouts where reported: { load, dropouts }.
-function useAudioLoad() {
+function useAudioLoad(generator) {
     const [status, setStatus] = useState({ load: null, dropouts: null });
-    useEffect(() => startLoadMeter(audioContext, masterBus, setStatus), []);
-    return status;
+    const [silences, setSilences] = useState(() => readSilenceLog().length);
+    useEffect(() => startLoadMeter(audioContext, masterBus, setStatus, (seconds) => {
+        const entry = describeSilence(generator, seconds);
+        if (!entry) return;
+        addSilence(entry);
+        setSilences(readSilenceLog().length);
+    }), [generator]);
+    return { ...status, silences, resetSilences: () => setSilences(readSilenceLog().length) };
 }
 
 // Above this the load is worth noticing (HIGH_LOAD: close to missing deadlines).
@@ -140,9 +149,20 @@ export const AudioMenu = ({ generator, onReload }) => {
             refresh((n) => n + 1);
         }
     };
+    const [copiedLog, setCopiedLog] = useState('');
+    const copySilences = async () => {
+        const text = formatSilenceLog();
+        try {
+            await navigator.clipboard.writeText(text);
+            setCopiedLog('Log copied.');
+        } catch (e) {
+            window.prompt('Copy this log', text);
+        }
+        setTimeout(() => setCopiedLog(''), 2500);
+    };
     const actualMs = Math.round((audioContext.baseLatency || 0) * 1000);
     // The button is coloured by the load: green, amber, red - red as well for a while after a dropout.
-    const status = useAudioLoad();
+    const status = useAudioLoad(generator);
     const [recentDropout, setRecentDropout] = useState(false);
     useEffect(() => {
         if (!status.dropouts) return undefined;
@@ -189,11 +209,16 @@ export const AudioMenu = ({ generator, onReload }) => {
                         <input type="checkbox" checked={performance.sharedReverb} onChange={(e) => changePerformance({ sharedReverb: e.target.checked })} />
                         One reverb shared by all voices
                     </label>
-                    <label className="gen-check">
-                        <input type="checkbox" checked={Number.isFinite(performance.maxUnison)}
-                            onChange={(e) => changePerformance({ maxUnison: e.target.checked ? UNISON_LIMIT : Infinity })} />
-                        Fewer unison voices in pads (at most {UNISON_LIMIT})
-                    </label>
+                </section>
+                <section className="gen-menu-section">
+                    <h3>Gaps in the sound</h3>
+                    <small>Listens to the output while the music plays and notes any silence over 0.1 s, with what the engine was doing. If the music keeps cutting out (say with the screen locked), play for a minute, then copy the log and send it along.</small>
+                    <div className="gen-menu-row">
+                        <span role="status">{status.silences ? `${status.silences} logged` : 'None logged'}</span>
+                        <button type="button" disabled={!status.silences} onClick={copySilences}>Copy log</button>
+                        <button type="button" disabled={!status.silences} onClick={() => { clearSilenceLog(); status.resetSilences(); }}>Clear</button>
+                    </div>
+                    {copiedLog && <small role="status">{copiedLog}</small>}
                 </section>
             </div>
         </details>

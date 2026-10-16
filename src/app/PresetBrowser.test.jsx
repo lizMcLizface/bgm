@@ -56,6 +56,17 @@ describe('preset browser', () => {
         expect(red.textContent).toMatch(/Driving/);
     });
 
+    test('the search box takes the focus on a computer, but not on a phone (it would raise the keyboard)', () => {
+        render(<PresetBrowser current="" onPick={() => {}} actions={actions()} />);
+        click(document.querySelector('.gen-scene-button'));
+        expect(document.activeElement).toBe(document.querySelector('input[type="search"]'));
+        act(() => { document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); });
+        const ua = vi.spyOn(window.navigator, 'userAgent', 'get').mockReturnValue('Mozilla/5.0 (Linux; Android 15; Pixel 8) Mobile Safari/537.36');
+        click(document.querySelector('.gen-scene-button'));
+        expect(document.activeElement).not.toBe(document.querySelector('input[type="search"]'));
+        ua.mockRestore();
+    });
+
     test('categories narrow the grid, search finds by name, blurb and tag', () => {
         render(<PresetBrowser current="" onPick={() => {}} actions={actions()} />);
         click(document.querySelector('.gen-scene-button'));
