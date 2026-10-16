@@ -12,12 +12,28 @@ test('round-trips through a share code', () => {
         mode: 'Harmonic Minor-5',
         meter: '6/8',
         bpm: 64,
-        padWeights: { sustain: 0, pulse: 0, arpeggio: 100 },
+        padWeights: { sustain: 0, pulse: 0, arpeggio: 100, sequence: 0 },
         drift: { ...defaultSettings().drift, mode: 'centered', excludedTonics: [1, 6], excludedModes: ['Major-7'] },
         humanize: { timing: 20, velocity: 0.1, detune: 5 },
         seed: 12345,
     };
     expect(decodeSettings(encodeSettings(settings))).toEqual(settings);
+});
+
+test('fast tempos and the driving styles round-trip, and old tempo codes are unchanged', () => {
+    const defaults = defaultSettings();
+    [50, 72, 110, 111, 140, 170].forEach((bpm) => {
+        const settings = {
+            ...defaults, bpm, seed: 9, leadDensity: 0.6,
+            padWeights: { ...defaults.padWeights, sequence: 60 },
+            bassWeights: { ...defaults.bassWeights, drive: 80 },
+            drums: { ...defaults.drums, style: 'drive' },
+        };
+        expect(decodeSettings(encodeSettings(settings))).toEqual(settings);
+    });
+    // a tempo inside the first field's range doesn't need the extra field
+    expect(encodeSettings({ ...defaults, bpm: 90, seed: 3 })).toBe(encodeSettings({ ...defaults, bpm: 90, seed: 3 }));
+    expect(encodeSettings({ ...defaults, bpm: 90, seed: 3 }).length).toBeLessThan(encodeSettings({ ...defaults, bpm: 140, seed: 3 }).length);
 });
 
 test('codes only carry what differs from the defaults', () => {
@@ -116,7 +132,7 @@ test('untrusted input is clamped, filtered or replaced by defaults', () => {
     const defaults = defaultSettings();
     expect(clean.tonic).toBe(defaults.tonic);
     expect(clean.mode).toBe(defaults.mode);
-    expect(clean.bpm).toBe(110);
+    expect(clean.bpm).toBe(170);
     expect(clean.meter).toBe('4/4');
     expect(clean.leadActivity).toBe(0);
     expect(clean.padWeights).toEqual({ ...defaults.padWeights, pulse: 40 });
@@ -211,7 +227,7 @@ test('swing, section tone and drums travel in links; links made before read them
         seed: 5,
         swing: 0.35,
         sectionTone: true,
-        drums: { style: 'lofi', activity: 0.7, variation: 0.85, sprinkle: 0.6 },
+        drums: { style: 'lofi', activity: 0.7, variation: 0.85, sprinkle: 0.6, kit: 'crisp' },
         drumKit: { ...kit, room: 0.3, hat: { on: false, level: 1, tone: 0, decay: 1 }, swish: { on: true, level: 1.4, tone: -0.6, decay: 1.5 } },
         muted: { ...defaultSettings().muted, bass: true, perc: true },
     };
@@ -235,9 +251,21 @@ test('pad patterns and movement, and the later drums, travel in links', () => {
         pulseWeights: { groups: 0, beats: 50, push: 100, split: 5 },
         arpWeights: { bounce: 10, up: 0, down: 80, broken: 25 },
         padMotion: { lean: 0.2, fast: 0.75, swell: 0.12 },
-        drums: { style: 'downtempo', activity: 0.4, variation: 0.9, sprinkle: 0.2 },
+        drums: { style: 'downtempo', activity: 0.4, variation: 0.9, sprinkle: 0.2, kit: 'crisp' },
     };
     settings.drumKit = { ...settings.drumKit, tom: { on: false, level: 1.5, tone: -0.3, decay: 1.2 }, ride: { ...settings.drumKit.ride, level: 0.5 } };
     const back = decodeSettings(encodeSettings(settings));
     ['pulseWeights', 'arpWeights', 'padMotion', 'drums', 'drumKit'].forEach((key) => expect(back[key]).toEqual(settings[key]));
+});
+
+test('the crisp drums and the kit choice travel in links, and the wander keeps its place before them', () => {
+    const settings = { ...defaultSettings(), seed: 4 };
+    settings.drums = { ...settings.drums, style: 'electro', kit: 'crisp' };
+    settings.drumKit = { ...settings.drumKit, snare: { on: true, level: 1.4, tone: 0.5, decay: 0.8 }, sizzle: { on: false, level: 1, tone: 0, decay: 1 } };
+    settings.wander = { ...settings.wander, period: 90 };
+    const back = decodeSettings(encodeSettings(settings));
+    expect(back.drumKit.snare).toEqual(settings.drumKit.snare);
+    expect(back.drumKit.sizzle.on).toBe(false);
+    expect(back.drums.kit).toBe('crisp');
+    expect(back.wander.period).toBe(90);
 });

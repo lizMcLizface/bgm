@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Generator, { ROLES, PERC_ROLE } from './Generator';
-import { DRUM_STYLES, DRUMS, DRUM_LABELS, DRUM_PARAMS, randomDrums } from './percussion';
+import { DRUM_STYLES, DRUM_KITS, DRUMS, DRUM_LABELS, DRUM_PARAMS, randomDrums } from './percussion';
 import { SCALE_FAMILIES, TONIC_NAMES, scaleById } from './theory';
 import ChordTimeline from './ChordTimeline';
 import { RoleButtons, TrackStrip, useLivePlay, DRUM_KEY_HINT } from './Tracks';
@@ -11,7 +11,7 @@ import PROGRESSIONS, { PROGRESSION_LENGTHS, progressionsOfLength } from './progr
 import {
     PAD_STYLES, BASS_STYLES, PULSE_PATTERNS, ARP_PATTERNS, styleShares, OCTAVE_LIMITS, OCTAVE_WANDER, COUNTER_MODES, SECTION_MODES, SECTION_LENGTHS,
 } from './arranger';
-import { DRIFT_MODES } from './conductor';
+import { DRIFT_MODES, BPM_LIMITS } from './conductor';
 import { METERS } from './meter';
 import {
     RANDOM_LEVELS, RANDOM_LEVEL_HINTS, randomKey, randomProgression, randomConductor, randomVoices, randomField, randomPreset, randomLength,
@@ -20,7 +20,9 @@ import {
 } from './randomize';
 import { MasterVolume, SettingsMenu } from './AudioStatus';
 import { SleepTimer, Recorder } from './Playback';
-import { SCENES, SCENE_GROUPS, sceneSettings, sceneGroup } from './scenes';
+import { sceneSettings, sceneGroup, buildSetup, parseSetup } from './scenes';
+import PresetBrowser from './PresetBrowser';
+import { saveUserScene, deleteUserScene, isUserScene } from './setupStore';
 import { ROLE_PRESETS } from './presets';
 import { setupMediaSession, updateMediaSession } from './mediaSession';
 import { AMBIENCE_LAYERS, LAYER_PARAMS } from './engine/ambience';
@@ -31,7 +33,8 @@ import {
 import { newSoundSeed } from './soundGen';
 import { soundFrom, SOUND_KINDS, GENERATOR_V2 } from './soundGenV2';
 import { levelPreset } from './engine/loudness';
-import { addGeneratedPreset, generatedInfo } from './editor/presetStore';
+import { addGeneratedPreset, addSetupPreset, findPreset, generatedInfo } from './editor/presetStore';
+import PRESET_DEFAULTS from './engine/presetDefaults';
 import { readPref, writePref } from './prefs';
 import { seedToPhrase, phraseToSeed } from './phrase';
 import { WANDER_ROLES, WANDER_LIMITS } from './engine/wander';
@@ -693,6 +696,12 @@ const PercussionPanel = ({ drums, kit, volume, mix, armed, onArm, onDrums, onKit
                     {Object.entries(DRUM_STYLES).map(([id, label]) => <option key={id} value={id}>{label}</option>)}
                 </select>
             </Field>
+            <Field label="Kit">
+                <select value={drums.kit || 'felt'} title="Felt and brushes, or a snare, a punchy kick and a bright hat in their places"
+                    onChange={(e) => onDrums({ ...drums, kit: e.target.value })}>
+                    {Object.entries(DRUM_KITS).map(([id, label]) => <option key={id} value={id}>{label}</option>)}
+                </select>
+            </Field>
             <Field label={`Volume ${pct(volume)}`}>
                 <input type="range" min="0" max="1" step="0.01" value={volume} onChange={(e) => onVolume(Number(e.target.value))} />
             </Field>
@@ -717,24 +726,6 @@ const PercussionPanel = ({ drums, kit, volume, mix, armed, onArm, onDrums, onKit
         </Panel>
     );
 };
-
-// The top row's preset picker (scenes.js): a whole soundscape at once,
-// grouped by what it plays. It shows the one last picked until anything
-// else is changed.
-const ScenePicker = ({ value, onPick }) => (
-    <label className="gen-sleep gen-scene" title="Start from a preset: key, scale, feel, drums, ambience and sounds together">
-        <span className="gen-audio-label gen-visually-hidden">Preset</span>
-        <select value={value} aria-label="Preset"
-            onChange={(e) => onPick(SCENES.find((s) => s.name === e.target.value))}>
-            <option value="" disabled>Pick a preset…</option>
-            {Object.entries(SCENE_GROUPS).map(([group, label]) => (
-                <optgroup key={group} label={label}>
-                    {SCENES.filter((s) => sceneGroup(s) === group).map((s) => <option key={s.name} value={s.name} title={s.blurb}>{s.name}</option>)}
-                </optgroup>
-            ))}
-        </select>
-    </label>
-);
 
 const GenerativeApp = () => {
     const gen = useRef(getGenerator()).current;
@@ -775,11 +766,17 @@ const GenerativeApp = () => {
     };
     const [editorOpen, setEditorOpen] = useState(false);
     // The guided tour opens by itself on a first visit (shared links too), and from the ⚙ menu.
+    // Opened by itself it starts on a prompt that dims the page; from the menu it goes straight to the steps.
     const [tourOpen, setTourOpen] = useState(false);
+    const [tourPrompt, setTourPrompt] = useState(false);
+    const openTour = (prompt = false) => {
+        setTourPrompt(prompt);
+        setTourOpen(true);
+    };
     const [helpOpen, setHelpOpen] = useState(false);
     useEffect(() => {
         if (tourSeen()) return undefined;
-        const timer = setTimeout(() => setTourOpen(true), 800);
+        const timer = setTimeout(() => openTour(true), 800);
         return () => clearTimeout(timer);
     }, []);
     const editorRef = useRef(null);
@@ -940,15 +937,47 @@ const GenerativeApp = () => {
     // A preset (scene): its settings (a new seed) and sounds. While playing,
     // the music moves there from the next bar, and what plays follows the
     // preset - music, ambience or both. An ambience-only preset leaves the
-    // sounds as they are.
-    const applyScene = (picked) => {
+    // sounds as they are. A pasted setup (`exact`) keeps its own seed, and
+    // sounds that came inside it (`unsaved`) are marked edited until saved.
+    // Sounds arrive at the next bar line, with the composition that goes with them.
+    const loadPresetAt = (role, name) => gen.loadRolePresetAtBar(role, name, undefined, () => presetLoaded(role, name));
+    const loadSceneVoice = (role, spec, sceneName, unsaved) => {
+        if (typeof spec === 'string') {
+            loadPresetAt(role, findPreset(spec) ? spec : ROLE_PRESETS[role]);
+            return;
+        }
+        if (!spec) {
+            loadPresetAt(role, ROLE_PRESETS[role]);
+            return;
+        }
+        // a sound carried in full: the library's own if it is that exactly, else a copy of its own
+        const existing = findPreset(spec.name);
+        const full = { ...PRESET_DEFAULTS, ...spec.synth };
+        const known = existing && Object.entries({ ...PRESET_DEFAULTS, ...existing }).every(([key, value]) => full[key] === value);
+        if (known) {
+            loadPresetAt(role, spec.name);
+            return;
+        }
+        const label = existing ? `${spec.name} (${sceneName})` : spec.name;
+        addSetupPreset(label, spec.synth);
+        gen.loadRolePresetAtBar(role, label, spec.synth, () => {
+            if (unsaved) gen.roles[role].edited = true;
+            patchRole(role, { presetName: label, edited: unsaved });
+        });
+    };
+    // `parts`: 'all', 'composition' (everything but the sounds and the mix) or 'voices' (the sounds only).
+    const applyScene = (picked, { exact = false, unsaved = false, parts = 'all' } = {}) => {
         if (!picked) return;
         const playing = gen.anyRunning;
-        const next = sceneSettings(picked);
-        loadSettings(next);
-        if (sceneGroup(picked) !== 'ambience') {
-            Object.keys(ROLES).forEach((role) => loadPreset(role, picked.presets[role] || ROLE_PRESETS[role]));
+        if (parts !== 'voices') {
+            const next = sceneSettings(picked, exact && Number.isInteger(picked.settings.seed) ? picked.settings.seed : undefined);
+            loadSettings(parts === 'composition' ? { ...next, volumes: gen.settings.volumes, muted: gen.settings.muted } : next);
         }
+        if (parts !== 'composition' && sceneGroup(picked) !== 'ambience') {
+            Object.keys(ROLES).forEach((role) => loadSceneVoice(role, picked.voices[role], picked.name, unsaved));
+        }
+        if (parts === 'voices') return;
+        const next = gen.settings;
         setMix((m) => Object.fromEntries(Object.entries(m).map(([role, v]) => [role, { ...v, mute: gen.roles[role].mute }])));
         if (playing) {
             if (next.playAmbience && !gen.ambienceRunning) startPart('playAmbience');
@@ -957,6 +986,50 @@ const GenerativeApp = () => {
             if (!next.playMusic && gen.isRunning) gen.stop();
         }
         setScene(picked.name);
+    };
+    // The page as a setup: every setting and, per voice, its name and every synth parameter.
+    const captureSetup = (info) => buildSetup({
+        settings: gen.settings,
+        voices: Object.fromEntries(Object.keys(ROLE_PRESETS).map((role) => [role, { name: gen.roles[role].presetName, synth: gen.getRolePreset(role) }])),
+    }, info);
+    const setupActions = {
+        save: (name) => {
+            if (!name) return 'Give it a name first';
+            if (isUserScene(name) && !window.confirm(`Replace your preset "${name}"?`)) return '';
+            if (!saveUserScene(captureSetup({ name }))) return 'Could not save (browser storage unavailable) - use Copy setup instead';
+            setScene(name);
+            return `Saved "${name}" under Mine`;
+        },
+        copy: async () => {
+            const json = JSON.stringify(captureSetup({ name: scene || 'My setup' }), null, 2);
+            try {
+                await navigator.clipboard.writeText(json);
+                return 'Copied. Paste it back in with "Paste / open…", or into src/library/scenes.json.';
+            } catch (e) {
+                return 'Could not copy - use Download .json instead';
+            }
+        },
+        download: () => {
+            const name = scene || 'My setup';
+            const blob = new Blob([JSON.stringify(captureSetup({ name }), null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${name.replace(/[^\w\- ]+/g, '').trim().replace(/\s+/g, '-').toLowerCase() || 'bgm-setup'}.json`;
+            link.click();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            return `Downloaded ${link.download}`;
+        },
+        remove: deleteUserScene,
+        load: (text) => {
+            try {
+                const loaded = parseSetup(text);
+                applyScene(loaded, { exact: true, unsaved: true });
+                return { ok: true, message: `Loaded "${loaded.name}"` };
+            } catch (e) {
+                return { ok: false, message: e.message };
+            }
+        },
     };
     // New variation, and back through earlier ones (media keys: next / previous track).
     const seeds = useRef([]);
@@ -1014,13 +1087,13 @@ const GenerativeApp = () => {
                     <button type="button" className={`gen-part${settings.playAmbience ? ' is-on' : ''}`} aria-pressed={settings.playAmbience}
                         onClick={() => togglePart('playAmbience')} title={PART_TITLE}>Ambience</button>
                 </div>
-                <ScenePicker value={scene} onPick={applyScene} />
+                <PresetBrowser current={scene} onPick={applyScene} actions={setupActions} />
                 {sleepLeft && <span className="gen-sleep gen-sleep-left" role="timer" title="Sleep timer (in the ⚙ menu)">Sleep {sleepLeft}</span>}
                 <div className="gen-header-tools">
                     <button type="button" className="gen-help" onClick={() => setHelpOpen(true)} title="Quick reference: hover the parts of the page to see what they do"
                         aria-label="Quick reference">?</button>
                     <MasterVolume />
-                    <SettingsMenu generator={gen} onReload={reloadKeepingSettings} link={() => shareUrl(gen.settings, linkPresets)} saving={saving} onTour={() => setTourOpen(true)}
+                    <SettingsMenu generator={gen} onReload={reloadKeepingSettings} link={() => shareUrl(gen.settings, linkPresets)} saving={saving} onTour={() => openTour(false)}
                         phrase={<PhraseField seed={settings.seed} edited={gen.editedSinceStart} onApply={playPhrase} onRoll={newVariation} initial={linkedPhrase} />}>
                         <SleepTimer generator={gen} running={anyOn} onLeft={setSleepLeft} />
                         <Recorder generator={gen} fileName={fileName} onProgress={setSaving} />
@@ -1078,7 +1151,7 @@ const GenerativeApp = () => {
                         </select>
                     </Field>
                     <Field label={`Tempo ${settings.bpm} BPM${METERS[settings.meter].unitsPerBeat > 1 ? ' (♩.)' : ''}`} onRandom={() => randomizeField('bpm')}>
-                        <input type="range" min="50" max="110" value={settings.bpm}
+                        <input type="range" min={BPM_LIMITS[0]} max={BPM_LIMITS[1]} value={settings.bpm}
                             onChange={(e) => update('bpm', Number(e.target.value))} />
                     </Field>
                 </div>
@@ -1104,6 +1177,10 @@ const GenerativeApp = () => {
                     )}
                 </>
             )}>
+                <Field label={`Lead busyness ${Math.round(settings.leadDensity * 100)}%`}>
+                    <input type="range" min="0" max="1" step="0.05" value={settings.leadDensity}
+                        onChange={(e) => update('leadDensity', Number(e.target.value))} />
+                </Field>
                 <Field label={`Lead activity ${Math.round(settings.leadActivity * 100)}%`}>
                     <input type="range" min="0" max="1" step="0.05" value={settings.leadActivity}
                         onChange={(e) => update('leadActivity', Number(e.target.value))} />
@@ -1219,7 +1296,7 @@ const GenerativeApp = () => {
                 sectionRef={editorRef}
             />
 
-            {tourOpen && <Tour onClose={() => setTourOpen(false)} />}
+            {tourOpen && <Tour prompt={tourPrompt} onClose={() => setTourOpen(false)} />}
             {helpOpen && <Tour reference onClose={() => setHelpOpen(false)} />}
 
             <footer className="gen-footer">

@@ -1369,3 +1369,430 @@ body {
     align-items: center;
     gap: 12px;
 }
+
+/* Tour start prompt (Tour.jsx): the page dimmed until it is answered. */
+.gen-tour-intro {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    background: rgba(6, 8, 12, 0.78);
+    animation: gen-fade-in 0.25s ease-out;
+}
+
+.gen-tour-intro-card {
+    width: min(440px, 100%);
+    padding: 24px 24px 18px;
+    background: var(--gen-surface);
+    color: var(--gen-text);
+    border: 2px solid var(--gen-accent);
+    border-radius: 14px;
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--gen-accent) 25%, transparent), 0 16px 48px rgba(0, 0, 0, 0.5);
+    display: grid;
+    gap: 12px;
+    text-align: center;
+}
+
+.gen-tour-intro-card h2 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.gen-tour-intro-card p {
+    margin: 0;
+    font-size: 15px;
+}
+
+.gen-tour-intro-card small {
+    color: var(--gen-muted);
+}
+
+.gen-tour-intro-buttons {
+    display: grid;
+    gap: 8px;
+    justify-items: center;
+}
+
+.gen .gen-tour-intro-buttons .gen-tour-start {
+    padding: 10px 28px;
+    font-size: 16px;
+    font-weight: 600;
+    background: var(--gen-accent);
+    color: var(--gen-accent-text);
+    border-color: var(--gen-accent);
+    animation: gen-attention 1.8s ease-in-out infinite;
+}
+
+.gen .gen-tour-intro-buttons .gen-tour-skip {
+    border: 0;
+    background: none;
+    color: var(--gen-muted);
+}
+
+.gen .gen-tour-intro-buttons .gen-tour-skip:hover {
+    text-decoration: underline;
+}
+
+@keyframes gen-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes gen-attention {
+    0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--gen-accent) 55%, transparent); }
+    50% { box-shadow: 0 0 0 9px transparent; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gen-tour-intro,
+    .gen .gen-tour-intro-buttons .gen-tour-start {
+        animation: none;
+    }
+}
+
+/* Preset browser (PresetBrowser.jsx): a window over the page, categories on
+   the left, cards in a grid, your own presets along the bottom. */
+.gen-scene {
+    display: inline-flex;
+}
+
+.gen .gen-scene-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 260px;
+}
+
+.gen-scene-label {
+    color: var(--gen-muted);
+    font-size: 12px;
+}
+
+.gen-scene-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.gen-pb-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: grid;
+    place-items: start center;
+    padding: 56px 12px 12px;
+    background: rgba(6, 8, 12, 0.45);
+    animation: gen-fade-in 0.15s ease-out;
+}
+
+.gen-pb {
+    width: min(960px, 100%);
+    max-height: 100%;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    background: var(--gen-surface);
+    color: var(--gen-text);
+    border: 1px solid var(--gen-border);
+    border-radius: 12px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+}
+
+.gen-pb-head {
+    flex-wrap: wrap;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--gen-border);
+}
+
+.gen-pb-head h2 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.gen-pb-head input[type='search'] {
+    flex: 1;
+    min-width: 0;
+    font: inherit;
+    padding: 6px 10px;
+    border: 1px solid var(--gen-border);
+    border-radius: 6px;
+    background: var(--gen-bg);
+    color: var(--gen-text);
+}
+
+.gen .gen-pb-close {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    font-size: 18px;
+    line-height: 1;
+}
+
+.gen-pb-body {
+    display: grid;
+    grid-template-columns: 190px minmax(0, 1fr);
+    min-height: 0;
+}
+
+.gen-pb-cats {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px;
+    border-right: 1px solid var(--gen-border);
+    overflow-y: auto;
+}
+
+.gen .gen-pb-cats button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    border-color: transparent;
+    background: none;
+    text-align: left;
+}
+
+.gen .gen-pb-cats button small {
+    color: var(--gen-muted);
+}
+
+.gen .gen-pb-cats button.is-active {
+    background: var(--gen-accent);
+    color: var(--gen-accent-text);
+}
+
+.gen .gen-pb-cats button.is-active small {
+    color: inherit;
+    opacity: 0.8;
+}
+
+.gen-pb-scroll {
+    overflow-y: auto;
+    padding: 4px 16px 16px;
+    min-height: 220px;
+}
+
+.gen-pb-scroll h3 {
+    margin: 14px 0 8px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--gen-muted);
+}
+
+.gen-pb-scroll h3 small {
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 400;
+}
+
+.gen-pb-blurb-line,
+.gen-pb-empty {
+    margin: 12px 0 8px;
+    color: var(--gen-muted);
+    font-size: 13px;
+}
+
+.gen-pb-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.gen-pb-card {
+    position: relative;
+    display: grid;
+}
+
+.gen .gen-pb-pick {
+    display: grid;
+    align-content: start;
+    gap: 4px;
+    width: 100%;
+    height: 100%;
+    padding: 10px 12px;
+    text-align: left;
+    background: var(--gen-bg);
+    border-radius: 8px;
+}
+
+.gen .gen-pb-pick:hover {
+    border-color: var(--gen-accent);
+}
+
+.gen-pb-card.is-active .gen-pb-pick {
+    border-color: var(--gen-accent);
+    box-shadow: inset 0 0 0 1px var(--gen-accent);
+}
+
+.gen-pb-pick strong {
+    font-size: 14px;
+    padding-right: 14px;
+}
+
+.gen-pb-blurb {
+    color: var(--gen-muted);
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+.gen-pb-meta {
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+}
+
+.gen-pb-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.gen-pb-chips span {
+    padding: 1px 7px;
+    border: 1px solid var(--gen-border);
+    border-radius: 999px;
+    font-size: 11px;
+    color: var(--gen-muted);
+}
+
+.gen .gen-pb-remove {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    line-height: 1;
+    border-radius: 50%;
+}
+
+.gen-pb-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    padding: 10px 16px;
+    border-top: 1px solid var(--gen-border);
+}
+
+.gen-pb-save {
+    display: flex;
+    gap: 6px;
+    flex: 1 1 260px;
+}
+
+.gen-pb-save input {
+    flex: 1;
+    min-width: 0;
+    font: inherit;
+    padding: 5px 8px;
+    border: 1px solid var(--gen-border);
+    border-radius: 6px;
+    background: var(--gen-bg);
+    color: var(--gen-text);
+}
+
+.gen-pb-actions {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.gen-pb-message {
+    flex-basis: 100%;
+    min-height: 1.2em;
+    font-size: 12px;
+    color: var(--gen-muted);
+}
+
+.gen-pb-paste {
+    flex-basis: 100%;
+    display: grid;
+    gap: 6px;
+}
+
+.gen-pb-paste textarea {
+    width: 100%;
+    font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    padding: 8px;
+    border: 1px solid var(--gen-border);
+    border-radius: 6px;
+    background: var(--gen-bg);
+    color: var(--gen-text);
+    resize: vertical;
+}
+
+.gen-pb-paste span {
+    display: inline-flex;
+    gap: 6px;
+}
+
+@media (max-width: 640px) {
+    .gen-pb-backdrop {
+        padding-top: 12px;
+    }
+
+    .gen-pb-body {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: auto minmax(0, 1fr);
+    }
+
+    .gen-pb-cats {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--gen-border);
+    }
+
+    .gen .gen-pb-cats button {
+        flex: none;
+    }
+
+    .gen-pb-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gen-pb-backdrop {
+        animation: none;
+    }
+}
+
+.gen-pb-apply {
+    flex-basis: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--gen-muted);
+}
+
+.gen .gen-pb-apply button.is-active {
+    background: var(--gen-accent);
+    color: var(--gen-accent-text);
+    border-color: var(--gen-accent);
+}
+
+.gen-pb-apply small {
+    flex-basis: 100%;
+}
+
+@media (min-width: 900px) {
+    .gen-pb-apply small {
+        flex-basis: auto;
+        margin-left: 6px;
+    }
+}

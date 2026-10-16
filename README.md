@@ -26,9 +26,13 @@ synthesised with the Web Audio API; there are no samples.
 - Sections: every few phrases the piece moves between intro, build, full
   and breakdown - voices come and go, the lead plays more or less, and
   (optionally) the voices darken in intros and breakdowns and open up in Full
-- Presets in the top row: 24 soundscapes to start from - music with
-  ambience, music only, or ambience only - each setting key, scale, feel,
-  drums, ambience and every voice's sound at once; switched while playing
+- Presets in the top row: 46 soundscapes in a browsable window (categories,
+  search, cards) - cozy, night, focus, ambience, sub-light cruising,
+  console nostalgia and dig-farm-repeat - each setting key, scale, feel,
+  drums, ambience and every voice's sound at once; switched while playing.
+  "Copy setup" puts the whole current setup, every synth parameter
+  included, on the clipboard as JSON; "Save current" keeps it in the browser
+  under Mine; "Paste / open…" loads one back (docs/LIBRARY.md)
 - Percussion, in its own panel: soft synthesised drums - heartbeat,
   brushes, lo-fi beat or shaker, several grooves each - with activity,
   variation (grooves change between sections and phrases, every hit sounds
@@ -78,7 +82,7 @@ synthesised with the Web Audio API; there are no samples.
   octave) or from MIDI after clicking "Connect MIDI"
 - A full synth editor per voice - with FM, organ / hollow / choir / glass /
   reed waveforms, a pitch envelope, filter LFO, key tracking and velocity
-  to brightness, tremolo and auto-pan - 55 built-in presets by category,
+  to brightness, tremolo and auto-pan - 71 built-in presets by category,
   and your own presets (saved in the browser, or exported/imported as JSON)
 - Procedural sounds: a new preset per voice from a random seed, of a kind
   you pick or the seed picks (pad, texture or keys; bass or pluck bass;
@@ -135,7 +139,9 @@ src/app/            the application
   engine/             Instrument (voices + effects), envelopes, Transport,
                       ambience (+ its worker), offline render to WAV
   editor/             synth editor, presets store
+  PresetBrowser.jsx   the presets window; scenes.js / setupStore.js its data
   settings.js         defaults, validation, share links
+src/library/        the presets as JSON: voices.json (synth sounds), scenes.json (setups)
 src/nodes/          Web Audio building blocks (effects, oscillators, noise)
 src/components/     MonoSynth voice and the knob/select/module UI controls
 public/             AudioWorklet processors (noise, bitcrusher)

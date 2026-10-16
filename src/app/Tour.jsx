@@ -38,9 +38,13 @@ function place(rect, card) {
  * @param {object} props
  * @param {function} props.onClose
  * @param {boolean} [props.reference] - quick reference: every part framed, hover to read, no steps, nothing remembered
+ * @param {boolean} [props.prompt] - open on a start prompt first: the page dimmed behind a card that
+ *   asks whether to take the tour, until it is answered (for the automatic first-visit opening;
+ *   starting from it skips the welcome step, which the prompt says)
  */
-const Tour = ({ onClose, reference = false }) => {
+const Tour = ({ onClose, reference = false, prompt = false }) => {
     const [steps] = useState(availableSteps);
+    const [asking, setAsking] = useState(prompt && !reference);
     const [index, setIndex] = useState(0);
     const [hovered, setHovered] = useState(null);
     const [rects, setRects] = useState({});
@@ -55,16 +59,21 @@ const Tour = ({ onClose, reference = false }) => {
         onClose();
     };
     const go = (to) => setIndex(Math.min(steps.length - 1, Math.max(0, to)));
+    // Starting from the prompt goes past the welcome step: the prompt said it.
+    const begin = () => {
+        setAsking(false);
+        setIndex(Math.min(1, steps.length - 1));
+    };
     const advance = () => (last ? finish() : go(index + 1));
 
     // Bring the step's part into view.
     useEffect(() => {
-        if (reference) return;
+        if (reference || asking) return;
         const el = step.selector && document.querySelector(step.selector);
         if (el) el.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'center' });
         else window.scrollTo({ top: 0, behavior: reducedMotion() ? 'auto' : 'smooth' });
         if (next.current) next.current.focus({ preventScroll: true });
-    }, [step, reference]);
+    }, [step, reference, asking]);
 
     // Follow the parts while the page scrolls or resizes.
     useEffect(() => {
@@ -86,7 +95,7 @@ const Tour = ({ onClose, reference = false }) => {
     useEffect(() => {
         const key = (e) => {
             if (e.key === 'Escape') finish();
-            else if (reference) return;
+            else if (reference || asking) return;
             else if (e.key === 'ArrowRight') advance();
             else if (e.key === 'ArrowLeft') go(index - 1);
             else return;
@@ -100,6 +109,26 @@ const Tour = ({ onClose, reference = false }) => {
     const hoverStep = hovered && (reference || hovered !== step.id) ? steps.find((s) => s.id === hovered) : null;
     const position = place(step.selector ? rects[step.id] : null, cardSize);
     const hoverPosition = hoverStep ? place(rects[hoverStep.id], { width: 300, height: 130 }) : null;
+
+    if (asking) {
+        return (
+            <div className="gen-tour-intro" role="presentation" onClick={finish}>
+                <div className="gen-tour-intro-card" role="dialog" aria-modal="true" aria-labelledby="gen-tour-intro-title" aria-describedby="gen-tour-intro-text"
+                    onClick={(e) => e.stopPropagation()}>
+                    <h2 id="gen-tour-intro-title">Welcome to bgm</h2>
+                    <p id="gen-tour-intro-text">
+                        Calm music that writes itself, for working or studying - or under a video or podcast.
+                        A one-minute tour shows what each part of the page does.
+                    </p>
+                    <div className="gen-tour-intro-buttons">
+                        <button type="button" ref={next} className="gen-tour-start" onClick={begin} autoFocus>Take the tour</button>
+                        <button type="button" className="gen-tour-skip" onClick={finish}>No thanks, let me explore</button>
+                    </div>
+                    <small>You can open the tour again from the ⚙ menu.</small>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="gen-tour" role="presentation">

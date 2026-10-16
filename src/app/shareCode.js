@@ -20,7 +20,7 @@
 
 import { SCALE_FAMILIES } from './theory';
 import { METERS } from './meter';
-import { DRIFT_MODES, TEMPO_BOUNDS } from './conductor';
+import { DRIFT_MODES, TEMPO_BOUNDS, BPM_LIMITS } from './conductor';
 import {
     OCTAVE_LIMITS, OCTAVE_WANDER, COUNTER_MODES, SECTION_MODES, SECTION_LENGTHS, DEFAULT_PULSE_WEIGHTS, DEFAULT_ARP_WEIGHTS,
 } from './arranger';
@@ -30,7 +30,7 @@ import { ROLE_PRESETS } from './presets';
 import { SEED_BITS as SOUND_SEED_BITS } from './soundGen';
 import { GENERATOR_V2, KIND_CODES } from './soundGenV2';
 import PROGRESSIONS from './progressions';
-import { DRUM_STYLES, DRUMS, DRUM_PARAMS } from './percussion';
+import { DRUM_STYLES, DRUM_KITS, DRUMS, DRUM_PARAMS } from './percussion';
 import { WANDER_ROLES, WANDER_LIMITS } from './engine/wander';
 
 export const CODE_VERSION = 1;
@@ -40,7 +40,7 @@ const SEED_BITS = 31;
 const MODES = SCALE_FAMILIES.flatMap((f) => f.modes.map((m) => m.id));
 /**
  * Built-in presets a link can name, by index. Append new presets at the
- * end - never reorder, rename or remove (a test checks every built-in is
+ * end - never reorder or remove (a test checks every built-in is
  * listed).
  */
 export const SHAREABLE_PRESETS = [
@@ -55,6 +55,10 @@ export const SHAREABLE_PRESETS = [
     'Not Broken Toy', 'Breathing Pad', 'Choir Ah', 'Hollow Tremolo', 'FM Bass', 'Thump Bass', 'Reed Lead',
     'Organ Whistle', 'FM Rhodes', 'FM Bell', 'Felt Piano', 'Soft Marimba', 'Glass Mallet', 'Underwater',
     'Tremolo Organ',
+    // the fast / game-style presets
+    'Void Pad', 'Starlight Pad', 'Spore Haze', 'Heroic Strings', 'Drive Bass', 'Chip Bass', 'Deep Throb',
+    'Racer Lead', 'Chip Lead', 'Fanfare Brass', 'Pan Flute', 'Squeezebox', 'Signal Lead', 'Arp Pluck',
+    'Pixel Piano', 'Nylon Guitar',
 ];
 const PRESET_BITS = 8;
 // Preset index meaning "a generated sound" (soundGen.js v1): followed by
@@ -103,6 +107,15 @@ const modeList = {
         ids.forEach((id) => w.write(MODES.indexOf(id), 6));
     },
     read: (r) => Array.from({ length: r.read(6) }, () => MODES[r.read(6)]).filter(Boolean),
+};
+
+// A tempo above what the first tempo field holds (its top is TEMPO_BOUNDS):
+// everything at or below counts as the default, so the field is only
+// written when needed.
+const wideTempo = {
+    bits: 8,
+    toIndex: (v) => (v > TEMPO_BOUNDS[1] ? clampIndex(Math.round(v) - BPM_LIMITS[0], BPM_LIMITS[1] - BPM_LIMITS[0] + 1) : 72 - BPM_LIMITS[0]),
+    fromIndex: (i) => BPM_LIMITS[0] + clampIndex(i, BPM_LIMITS[1] - BPM_LIMITS[0] + 1),
 };
 
 const chance = stepped(0, 1, 0.05);
@@ -214,6 +227,13 @@ const MUSIC_GROUPS = [
         [['padMotion', 'swell'], stepped(0, 0.2, 0.01)],
     ],
     [[['drums', 'sprinkle'], chance]], // colour scattered over the drums
+    [ // the styles added with the faster presets
+        [['padWeights', 'sequence'], weight],
+        [['bassWeights', 'drive'], weight],
+    ],
+    [[['leadDensity'], chance]], // how busy the lead's rhythms are
+    [[['drums', 'kit'], options(Object.keys(DRUM_KITS), 2)]], // felt or crisp drums
+    [[['bpm'], wideTempo]], // tempos past the first field's range (a tempo inside it is left to that field)
 ];
 const VOICE_GROUPS = [
     [...voice('pad'), ...voice('bass'), ...voice('lead'), ...voice('counter'), field(GROUPS, ['padNotes'])],
@@ -232,7 +252,7 @@ const VOICE_LATER_GROUPS = [
     ...DRUMS.slice(0, 6).map(drumGroup),
     // muted voices (solo isn't kept)
     [...CODE_ROLES, 'perc'].map((role) => [['muted', role], bool]),
-    ...DRUMS.slice(6).map(drumGroup),
+    ...DRUMS.slice(6, 11).map(drumGroup),
     [ // slow wander (engine/wander.js)
         [['wander', 'period'], stepped(WANDER_LIMITS.period.min, WANDER_LIMITS.period.max, WANDER_LIMITS.period.step)],
         [['wander', 'pan', 'min'], stepped(-1, 1, WANDER_LIMITS.pan.step)],
@@ -242,6 +262,7 @@ const VOICE_LATER_GROUPS = [
         [['wander', 'pitch'], stepped(WANDER_LIMITS.pitch.min, WANDER_LIMITS.pitch.max, WANDER_LIMITS.pitch.step)],
         ...WANDER_ROLES.map((role) => [['wander', 'voices', role], bool]),
     ],
+    ...DRUMS.slice(11).map(drumGroup), // the crisp drums, added after the wander
 ];
 const shapeCodec = (key, spec) => {
     if (key === 'pan') return stepped(-1, 1, 0.1);

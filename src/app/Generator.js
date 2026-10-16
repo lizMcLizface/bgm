@@ -336,6 +336,7 @@ class Generator {
     stop() {
         const heard = this.position();
         this.transport.stop();
+        this.flushPendingVoices();
         this.toneNow = null;
         const ending = this.endBar !== null;
         this.endBar = null;
@@ -506,11 +507,42 @@ class Generator {
     /** Loads a preset onto a role; `preset` defaults to looking `name` up. */
     loadRolePreset(role, name, preset = findPreset(name)) {
         if (!preset) return false;
+        if (this.pendingVoices) this.pendingVoices = this.pendingVoices.filter((p) => p.role !== role || p.preset === preset);
         const r = this.roles[role];
         r.instrument.applyPreset(preset);
         r.presetName = name;
         r.edited = false;
         return true;
+    }
+
+    /**
+     * Loads a preset onto a role at the next bar line while playing, so a
+     * new sound arrives with the music that goes with it (a change of
+     * composition re-plans from the next bar too); at once when stopped.
+     * A later load for the role (either kind) replaces a waiting one.
+     * @param {function} [applied] - called when it has been loaded
+     * @returns {boolean} whether the preset exists
+     */
+    loadRolePresetAtBar(role, name, preset = findPreset(name), applied) {
+        if (!preset) return false;
+        this.pendingVoices = (this.pendingVoices || []).filter((p) => p.role !== role);
+        if (!this.isRunning) {
+            this.loadRolePreset(role, name, preset);
+            if (applied) applied();
+        } else {
+            this.pendingVoices.push({ role, name, preset, applied });
+        }
+        return true;
+    }
+
+    /** Loads the sounds waiting for a bar line. */
+    flushPendingVoices() {
+        const waiting = this.pendingVoices || [];
+        this.pendingVoices = [];
+        waiting.forEach(({ role, name, preset, applied }) => {
+            this.loadRolePreset(role, name, preset);
+            if (applied) applied();
+        });
     }
 
     /** One synth parameter, live (the editor's knobs). */
@@ -688,7 +720,7 @@ class Generator {
 
     // Decides one bar. Event times/lengths are in beats from the bar start.
     planBar(bar) {
-        const { barsPerChord, leadActivity, padWeights, bassWeights, pulseWeights, arpWeights, padMotion, thinPadUnderLead, drift, humanize, voices, counter, sections, drums, swing } = this.settings;
+        const { barsPerChord, leadActivity, leadDensity, padWeights, bassWeights, pulseWeights, arpWeights, padMotion, thinPadUnderLead, drift, humanize, voices, counter, sections, drums, swing } = this.settings;
         const prev = this.plan.get(bar - 1);
 
         const fresh = !prev || this.resetMusicAt === bar;
@@ -728,7 +760,7 @@ class Generator {
             chordStart,
             barsLeftInChord,
             prev: prev ? prev.state : null,
-            settings: { leadActivity, padWeights, bassWeights, pulseWeights, arpWeights, padMotion, thinPadUnderLead, voices, counter, sections },
+            settings: { leadActivity, leadDensity, padWeights, bassWeights, pulseWeights, arpWeights, padMotion, thinPadUnderLead, voices, counter, sections },
             rng: this.rng,
         });
         // Drums: patterns and looseness from streams of their own (the
@@ -970,6 +1002,7 @@ class Generator {
             this.finishEnding();
             return;
         }
+        if (beatInBar === 0 && this.pendingVoices && this.pendingVoices.length) this.flushPendingVoices();
         if (beatInBar === 0) this.applyTone(this.plan.get(bar).tone, time, secondsPerBeat * this.transport.beatsPerBar);
         const book = (e, start) => {
             e.booked = true;

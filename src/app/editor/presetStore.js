@@ -5,6 +5,8 @@
 //   'PolySynth-CustomPresets'), read-only here - visible because both pages
 //   share an origin when run locally
 // - mine: saved from this editor ('Generative-Presets')
+// - from a setup: sounds that came with a loaded or pasted setup (scenes.js)
+//   and are not stored anywhere else - kept for the visit
 // - generated: made this visit by soundGen.js (kept in memory; a link
 //   recreates them from role + seed, saving one makes it "mine")
 // - JSON files: export/import, the durable route (and how presets get into
@@ -33,6 +35,14 @@ export function addGeneratedPreset(name, preset, info) {
 export function generatedInfo(name) {
     const entry = generated.get(name);
     return entry ? { ...entry.info } : null;
+}
+
+// name -> preset
+const fromSetups = new Map();
+
+/** Registers a sound that came inside a setup, so pickers list it. */
+export function addSetupPreset(name, preset) {
+    fromSetups.set(name, preset);
 }
 
 const readJson = (key) => {
@@ -69,6 +79,7 @@ export function presetGroups(first) {
         { group: 'unCAGED', editable: false, presets: builtIn },
         { group: 'unCAGED custom', editable: false, presets: readJson(UNCAGED_KEY) },
         { group: 'Mine', editable: true, presets: readJson(USER_KEY) },
+        { group: 'From setups', editable: false, presets: Object.fromEntries(fromSetups) },
         { group: 'Generated', editable: false, presets: Object.fromEntries([...generated].map(([name, { preset }]) => [name, preset])) },
     ].filter(({ presets }) => Object.keys(presets).length);
 }

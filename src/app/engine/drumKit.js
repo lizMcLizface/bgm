@@ -19,10 +19,11 @@ import { DRUMS, defaultDrumKit } from '../percussion';
 // swish is a bed under the rest: it lasts a whole beat, so it is kept well
 // below the taps (its RMS about 10 dB under a brush tap's peak level).
 // The tom, clap, ride, crash and bell (added later) are set by ear against those.
-const GAIN = { kick: 1.3, brush: 2.6, shaker: 1.4, rim: 1.45, hat: 2.2, swish: 1.1, tom: 1.1, clap: 2.2, ride: 1.6, crash: 1.7, bell: 2 };
+const GAIN = { kick: 1.3, brush: 2.6, shaker: 1.4, rim: 1.45, hat: 2.2, swish: 1.1, tom: 1.1, clap: 2.2, ride: 1.6, crash: 1.7, bell: 2, snare: 1.5, punch: 1.2, sizzle: 2 };
+// (snare, punch and sizzle - the crisp kit - are set by ear against the felt ones: about as loud as the drum they stand in for.)
 
 // Where each drum sits, -1 (left) .. 1 (right).
-const PAN = { kick: 0, brush: -0.1, shaker: 0.3, rim: -0.25, hat: 0.2, swish: -0.15, tom: 0.15, clap: 0.05, ride: -0.3, crash: 0.25, bell: -0.2 };
+const PAN = { kick: 0, brush: -0.1, shaker: 0.3, rim: -0.25, hat: 0.2, swish: -0.15, tom: 0.15, clap: 0.05, ride: -0.3, crash: 0.25, bell: -0.2, snare: 0, punch: 0, sizzle: 0.2 };
 
 // White noise, the same every time (renders are reproducible).
 const noiseBuffers = new WeakMap();
@@ -189,6 +190,65 @@ const HITS = {
         gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.031 + decay);
         src.connect(band).connect(gain).connect(out);
         return [src];
+    },
+    // The crisp kit. A snare: a short tuned body under a bright, snappy
+    // burst of noise (the snares), ringing a little.
+    snare(kit, { t, v, x, bright, long, out }) {
+        const { AC } = kit;
+        const pitch = Math.pow(bright, 0.3) * (1 + 0.05 * x);
+        const body = AC.createOscillator();
+        body.type = 'triangle';
+        body.frequency.setValueAtTime(260 * pitch, t);
+        body.frequency.exponentialRampToValueAtTime(175 * pitch, t + 0.05);
+        body.connect(envelope(AC, t, 0.32 * v, 0.001, 0.09 * long)).connect(out);
+        body.start(t);
+        body.stop(t + 0.09 * long + 0.05);
+        const decay = 0.17 * long * (1 + 0.2 * x);
+        const src = kit.noise(t, decay + 0.05);
+        const band = AC.createBiquadFilter();
+        band.type = 'highpass';
+        band.frequency.value = Math.min(12000, 1800 * bright * Math.pow(2, 0.25 * x));
+        src.connect(band).connect(envelope(AC, t, 0.32 * v, 0.001, decay)).connect(out);
+        return [body, src];
+    },
+    // A punchy kick: a faster, higher drop than the felt one, a hard click, a shorter body.
+    punch(kit, { t, v, x, bright, long, out }) {
+        const { AC } = kit;
+        const osc = AC.createOscillator();
+        const pitch = Math.pow(bright, 0.4) * (1 + 0.06 * x);
+        osc.frequency.setValueAtTime(190 * pitch, t);
+        osc.frequency.exponentialRampToValueAtTime(52 * pitch, t + 0.05);
+        const decay = 0.24 * long;
+        osc.connect(envelope(AC, t, 0.95 * v, 0.002, decay)).connect(out);
+        osc.start(t);
+        osc.stop(t + decay + 0.05);
+        const click = kit.noise(t, 0.02);
+        const tone = AC.createBiquadFilter();
+        tone.type = 'highpass';
+        tone.frequency.value = 2500 * bright;
+        click.connect(tone).connect(envelope(AC, t, 0.22 * v, 0.001, 0.012)).connect(out);
+        return [osc, click];
+    },
+    // A bright, tight hat: noise and a few inharmonic square tones, high-passed - an electronic "tss".
+    sizzle(kit, { t, v, x, bright, long, out }) {
+        const { AC } = kit;
+        const decay = 0.06 * long * (1 + 0.4 * x);
+        const high = AC.createBiquadFilter();
+        high.type = 'highpass';
+        high.frequency.value = Math.min(16000, 8500 * bright * Math.pow(2, 0.2 * x));
+        high.connect(envelope(AC, t, 0.1 * v, 0.001, decay)).connect(out);
+        const src = kit.noise(t, decay + 0.03);
+        src.connect(high);
+        const tones = [2000, 3010, 4530, 5740].map((freq) => {
+            const osc = AC.createOscillator();
+            osc.type = 'square';
+            osc.frequency.value = freq * Math.pow(bright, 0.3);
+            osc.connect(high);
+            osc.start(t);
+            osc.stop(t + decay + 0.05);
+            return osc;
+        });
+        return [src, ...tones];
     },
     // A soft ride: high noise and a few inharmonic partials ringing on.
     ride(kit, { t, v, x, bright, long, out }) {

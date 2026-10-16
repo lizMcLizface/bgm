@@ -370,3 +370,73 @@ describe('sections', () => {
         });
     });
 });
+
+describe('driving styles', () => {
+    const sequence = { ...AUTO, padWeights: pads('sequence') };
+    const drive = { ...AUTO, bassWeights: basses('drive') };
+
+    test('the new styles are off in the defaults, so existing pieces are unchanged', () => {
+        expect(DEFAULT_PAD_WEIGHTS.sequence).toBe(0);
+        expect(DEFAULT_BASS_WEIGHTS.drive).toBe(0);
+    });
+
+    test('a sequence runs in eighths or sixteenths, detached, within the pad register', () => {
+        SEEDS.forEach((seed) => run({ seed, settings: sequence }).forEach((bar) => {
+            const notes = byRole(bar, 'pad');
+            expect(notes.length).toBeGreaterThanOrEqual(8);
+            const gaps = new Set(notes.map((e) => e.beat).filter((beat, i, all) => i > 0 && beat !== all[i - 1]).map((beat, i, all) => (i ? beat - all[i - 1] : 0.5)));
+            [...gaps].forEach((gap) => expect([0.25, 0.5]).toContain(gap));
+            notes.forEach((e) => {
+                expect(e.midi).toBeGreaterThanOrEqual(PAD_RANGE[0]);
+                expect(e.midi).toBeLessThanOrEqual(PAD_RANGE[1]);
+                expect(e.length).toBeLessThanOrEqual(0.6);
+            });
+        }));
+    });
+
+    test('a sequence in 6/8 runs in units, in 3/4 in eighths', () => {
+        run({ settings: sequence, meter: '6/8', bars: 8 }).forEach((bar) => expect(byRole(bar, 'pad').length).toBeGreaterThanOrEqual(6));
+        run({ settings: sequence, meter: '3/4', bars: 8 }).forEach((bar) => expect(byRole(bar, 'pad').length).toBeGreaterThanOrEqual(6));
+    });
+
+    test('the driving bass pulses on the chord root every half beat, with an octave or fifth now and then', () => {
+        SEEDS.forEach((seed) => {
+            const all = run({ seed, settings: drive });
+            all.forEach((bar) => {
+                const notes = byRole(bar, 'bass');
+                expect(notes).toHaveLength(8);
+                notes.forEach((e) => expect(e.length).toBeLessThan(0.5));
+                notes.forEach((e) => expect(e.midi).toBeGreaterThanOrEqual(BASS_RANGE[0] - 1));
+                notes.forEach((e) => expect(e.midi).toBeLessThanOrEqual(BASS_RANGE[1] + 13));
+            });
+            // mostly the root
+            const roots = all.flatMap((bar) => byRole(bar, 'bass').filter((e) => pc(e.midi) === bar.chord.pitchClasses[0]));
+            expect(roots.length).toBeGreaterThan(all.length * 4);
+        });
+    });
+
+    test('they are deterministic for a seed', () => {
+        expect(run({ seed: 5, settings: { ...sequence, bassWeights: basses('drive') } })).toEqual(run({ seed: 5, settings: { ...sequence, bassWeights: basses('drive') } }));
+    });
+});
+
+describe('lead density', () => {
+    const leadNotes = (leadDensity) => SEEDS.flatMap((seed) => run({ seed, bars: 64, settings: { ...AUTO, leadActivity: 1, leadDensity } }).flatMap((bar) => byRole(bar, 'lead'))).length;
+
+    test('0 leaves pieces exactly as they were; more makes the lead busier', () => {
+        expect(run({ seed: 3, settings: { ...AUTO, leadDensity: 0 } })).toEqual(run({ seed: 3, settings: AUTO }));
+        expect(leadNotes(1)).toBeGreaterThan(leadNotes(0) * 1.6);
+        expect(leadNotes(0.5)).toBeGreaterThan(leadNotes(0));
+    });
+
+    test('busy notes stay in the bar and in the lead register, in every meter', () => {
+        Object.keys(METERS).forEach((meter) => SEEDS.forEach((seed) => run({ seed, meter, bars: 24, settings: { ...AUTO, leadActivity: 1, leadDensity: 1 } }).forEach((bar) => {
+            byRole(bar, 'lead').forEach((e) => {
+                expect(e.beat).toBeGreaterThanOrEqual(0);
+                expect(e.beat + e.length).toBeLessThanOrEqual(METERS[meter].units + 1e-9);
+                expect(e.midi).toBeGreaterThanOrEqual(LEAD_RANGE[0]);
+                expect(e.midi).toBeLessThanOrEqual(LEAD_RANGE[1]);
+            });
+        })));
+    });
+});

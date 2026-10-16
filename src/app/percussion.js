@@ -28,15 +28,26 @@ import { groupStarts, beatStarts } from './meter';
 /** The drums, by the index an event carries as its `midi`. */
 // Append only: an event's drum is its index here (and links store the kit
 // in this order).
-export const DRUMS = ['kick', 'brush', 'shaker', 'rim', 'hat', 'swish', 'tom', 'clap', 'ride', 'crash', 'bell'];
+export const DRUMS = ['kick', 'brush', 'shaker', 'rim', 'hat', 'swish', 'tom', 'clap', 'ride', 'crash', 'bell', 'snare', 'punch', 'sizzle'];
 export const DRUM_LABELS = {
     kick: 'Felt kick', brush: 'Brush tap', shaker: 'Shaker', rim: 'Rim click', hat: 'Soft hat', swish: 'Brush swish',
     tom: 'Felt tom', clap: 'Soft clap', ride: 'Soft ride', crash: 'Soft crash', bell: 'Ride bell',
+    snare: 'Crisp snare', punch: 'Punchy kick', sizzle: 'Bright hat',
 };
 const DRUM = Object.fromEntries(DRUMS.map((name, i) => [name, i]));
 
-export const DRUM_STYLES = { off: 'Off', heartbeat: 'Heartbeat', brushes: 'Brushes', lofi: 'Lo-fi beat', shaker: 'Shaker', downtempo: 'Downtempo' };
-export const DEFAULT_DRUMS = { style: 'off', activity: 0.5, variation: 0.5, sprinkle: 0.35 };
+// Append only (links store the index). Electro and Driving are for fast
+// presets: four-on-the-floor and rock-like beats with sixteenth hats.
+export const DRUM_STYLES = {
+    off: 'Off', heartbeat: 'Heartbeat', brushes: 'Brushes', lofi: 'Lo-fi beat', shaker: 'Shaker', downtempo: 'Downtempo',
+    electro: 'Electro pulse', drive: 'Driving',
+};
+// The kit the grooves play on: 'felt' as the grooves are written, 'crisp' puts
+// a snare, a punchy kick and a bright hat where the brush, felt kick and soft
+// hat were (the rest - clap, rim, toms, cymbals - stay).
+export const DRUM_KITS = { felt: 'Felt and brushes', crisp: 'Crisp and electronic' };
+const CRISP = { kick: 'punch', brush: 'snare', hat: 'sizzle' };
+export const DEFAULT_DRUMS = { style: 'off', activity: 0.5, variation: 0.5, sprinkle: 0.35, kit: 'felt' };
 
 // The kit's sound (engine/drumKit.js), per drum: on, level (1 = as made),
 // tone (-1 dark .. 1 bright), decay (x length); and the room's reverb.
@@ -57,6 +68,8 @@ const SECTION_LEVEL = {
 };
 // With sections off, the groove may change this often (bars).
 const GROOVE_BARS = 16;
+// Styles that play as a machine would (see drumBar).
+const STEADY = new Set(['electro', 'drive']);
 
 // --- the bar's geometry -----------------------------------------------------
 
@@ -72,7 +85,10 @@ function geometry(meter) {
     const backbeats = groups.length ? groups : beats.slice(1);
     const middle = groups.length ? groups[0] : Math.floor(meter.units / 2);
     const offbeats = grid.filter((at) => !beats.includes(at));
-    return { step, grid, beats, first, groups: [first, ...groups], backbeats, middle, offbeats, units: meter.units };
+    // sixteenths (a compound meter's grid is already its eighths)
+    const fineStep = meter.unitsPerBeat === 1 ? 0.25 : 0.5;
+    const fine = Array.from({ length: Math.round(meter.units / fineStep) }, (_, i) => i * fineStep);
+    return { step, grid, fine, fineStep, beats, first, groups: [first, ...groups], backbeats, middle, offbeats, units: meter.units };
 }
 
 // --- grooves ------------------------------------------------------------------
@@ -222,6 +238,71 @@ const GROOVES = {
         },
     ],
 
+    // Electro pulse: kick on every beat, claps on the backbeats, hats on
+    // the off-beats, sixteenths running underneath - a steady engine.
+    electro: [
+        // four on the floor, open hats between, a clap on the backbeats
+        ({ g, level, activity, rng, hit }) => {
+            g.offbeats.forEach((at) => hit('hat', at, 0.34));
+            if (level < 2) return g.beats.forEach((at) => hit('kick', at, 0.45));
+            g.beats.forEach((at) => hit('kick', at, at === g.first ? 0.8 : 0.7));
+            g.backbeats.forEach((at) => hit('clap', at, 0.56));
+            g.fine.forEach((at) => !g.grid.includes(at) && chance(rng, 0.15 + activity * 0.5) && hit('shaker', at, 0.16));
+        },
+        // sixteenth hats with an accent on the beats, kick on the one and the 'and' of the middle
+        ({ g, level, activity, rng, hit }) => {
+            g.fine.forEach((at) => hit('hat', at, g.beats.includes(at) ? 0.34 : g.grid.includes(at) ? 0.24 : 0.14));
+            if (level < 2) return undefined;
+            g.beats.forEach((at) => hit('kick', at, at === g.first ? 0.78 : 0.62));
+            g.backbeats.forEach((at) => hit('clap', at, 0.52));
+            if (chance(rng, activity)) hit('rim', g.units - g.step, 0.26);
+            return undefined;
+        },
+        // pulse: kick on the one and the beats after, a rim sixteenth pattern, a clap and a tom answering
+        ({ g, level, activity, rng, hit }) => {
+            g.grid.forEach((at) => hit('hat', at, g.beats.includes(at) ? 0.3 : 0.22));
+            if (level < 2) return undefined;
+            g.beats.forEach((at) => hit('kick', at, at === g.first ? 0.78 : 0.66));
+            g.backbeats.forEach((at) => hit('clap', at, 0.54));
+            g.fine.forEach((at, i) => i % 4 === 3 && chance(rng, 0.3 + activity * 0.5) && hit('rim', at, 0.2));
+            if (chance(rng, activity * 0.5)) hit('tom', g.units - g.step, 0.34, 0.25, 0.4);
+            return undefined;
+        },
+    ],
+
+    // Driving: a rock-like beat - kick and snare (rim and clap together),
+    // eighth hats, toms in the gaps. Fills come often.
+    drive: [
+        // kicks on the one and the 'and' before the middle, snare on the backbeats, eighth hats
+        ({ g, level, activity, rng, hit }) => {
+            g.grid.forEach((at) => hit('hat', at, g.beats.includes(at) ? 0.36 : 0.26));
+            if (level < 2) return g.backbeats.forEach((at) => hit('rim', at, 0.36));
+            hit('kick', g.first, 0.82);
+            hit('kick', g.middle - g.step, 0.62);
+            if (chance(rng, 0.3 + activity * 0.5)) hit('kick', g.units - g.step, 0.5);
+            g.backbeats.forEach((at) => { hit('clap', at, 0.56); hit('rim', at, 0.4); });
+            return undefined;
+        },
+        // double time: kick eighths on the bar's first group, snare on every beat after
+        ({ g, level, activity, rng, hit }) => {
+            g.grid.forEach((at) => hit('hat', at, g.beats.includes(at) ? 0.34 : 0.22));
+            if (level < 2) return undefined;
+            g.grid.filter((at) => at < g.middle).forEach((at) => hit('kick', at, g.beats.includes(at) ? 0.74 : 0.52));
+            g.beats.filter((at) => at >= g.middle).forEach((at) => { hit('clap', at, 0.54); hit('rim', at, 0.36); });
+            if (chance(rng, activity * 0.6)) hit('tom', g.units - g.step, 0.4, 0.25, -0.4);
+            return undefined;
+        },
+        // marching: kick on every beat, snare on the off-beats leading in, a ride keeping time
+        ({ g, level, activity, rng, hit }) => {
+            g.beats.forEach((at) => hit('ride', at, 0.3));
+            if (level < 2) return undefined;
+            g.beats.forEach((at) => hit('kick', at, at === g.first ? 0.8 : 0.6));
+            g.backbeats.forEach((at) => hit('clap', at, 0.56));
+            g.offbeats.forEach((at) => chance(rng, 0.2 + activity * 0.4) && hit('rim', at, 0.3));
+            return undefined;
+        },
+    ],
+
     shaker: [
         // the grid, accents on the beats
         ({ g, level, hit }) => {
@@ -247,14 +328,16 @@ const GROOVES = {
 
 // Fills, to close a phrase (small) or a section (big): taps over the last
 // beat or two, getting louder - or, now and then, toms falling in pitch.
-function fill(g, big, rng, hit) {
-    const count = big ? Math.min(g.grid.length - 1, 4 + Math.floor(rng() * 3)) : 2 + Math.floor(rng() * 2);
-    const tail = g.grid.slice(-count);
+function fill(g, big, rng, hit, driving) {
+    // a driving style rolls over sixteenths, on snare and toms
+    const grid = driving ? g.fine : g.grid;
+    const count = big ? Math.min(grid.length - 1, 4 + Math.floor(rng() * 3)) : 2 + Math.floor(rng() * 2);
+    const tail = grid.slice(-(driving ? count * 2 : count));
     const toms = chance(rng, big ? 0.5 : 0.3);
     tail.forEach((at, i) => {
         const velocity = 0.3 + (0.35 * i) / tail.length;
         if (toms) hit('tom', at, velocity, 0.25, 0.8 - (1.6 * i) / Math.max(1, tail.length - 1));
-        else hit(rng() < 0.75 ? 'brush' : 'rim', at, velocity);
+        else hit(driving ? (rng() < 0.6 ? 'clap' : 'rim') : (rng() < 0.75 ? 'brush' : 'rim'), at, velocity);
     });
     if (big) hit('kick', tail[0], 0.5);
 }
@@ -275,7 +358,7 @@ function phraseColour(variation, rng) {
 
 // The twist on a phrase's second and fourth bars.
 function twistBar(twist, g, events, hit) {
-    const kicks = events.filter((e) => e.midi === DRUM.kick);
+    const kicks = events.filter((e) => e.midi === DRUM.kick || e.midi === DRUM.punch);
     if (twist === 'kick') {
         // an extra, quieter kick on an off-beat after the middle
         const at = g.offbeats.find((o) => o > g.middle) ?? g.grid[g.grid.length - 1];
@@ -341,23 +424,29 @@ export function drumBar({ bar, meter, drums, section, sectionsMode, sectionBars 
     const grooveStart = section ? section.start : Math.floor(bar / GROOVE_BARS) * GROOVE_BARS;
     let groove = Math.floor(stream(0x510e527f, seed, grooveStart)() * grooves.length);
     const phraseRng = stream(0xbb67ae85, seed, phraseStart);
-    if (phraseRng() < variation * 0.4) groove = (groove + 1 + Math.floor(phraseRng() * (grooves.length - 1))) % grooves.length;
+    // A steady style (electro, driving) is a machine groove: it keeps to one groove per section and
+    // leaves out the swapped drums, twists, dropped hits, ghost notes and constant fills the soft
+    // styles use for life - on a beat like that they read as mistakes.
+    const steady = STEADY.has(drums.style);
+    if (phraseRng() < variation * (steady ? 0.1 : 0.4)) groove = (groove + 1 + Math.floor(phraseRng() * (grooves.length - 1))) % grooves.length;
 
-    const colour = phraseColour(variation, phraseRng);
+    const colour = steady ? { swaps: {}, twist: null, opening: false } : phraseColour(variation, phraseRng);
 
     const rng = stream(0x6a09e667, seed, bar);
     const g = geometry(meter);
     const events = [];
+    const crisp = drums.kit === 'crisp';
     const hit = (drum, beat, velocity, length = 0.25, vary) => {
         if (beat < 0 || beat >= g.units) return;
+        const named = colour.swaps[drum] || drum;
         events.push({
             role: 'perc',
-            midi: DRUM[colour.swaps[drum] || drum],
+            midi: DRUM[crisp ? CRISP[named] || named : named],
             beat,
             length,
             velocity,
             // the sound's variation; a sweep's direction comes from the groove
-            detune: vary !== undefined ? vary * (0.5 + variation * 0.5) : (rng() * 2 - 1) * variation,
+            detune: vary !== undefined ? vary * (0.5 + variation * 0.5) : (rng() * 2 - 1) * variation * (steady ? 0.25 : 1),
         });
     };
     grooves[groove]({ g, level, activity, rng, hit });
@@ -366,11 +455,11 @@ export function drumBar({ bar, meter, drums, section, sectionsMode, sectionBars 
     if (level >= 2 && colour.opening && index === 0) hit('ride', g.first, 0.5, 0.25, 0.8);
 
     // Variation from bar to bar: a hit dropped, a ghost added.
-    if (events.length > 2 && chance(rng, variation * 0.5)) {
+    if (!steady && events.length > 2 && chance(rng, variation * 0.5)) {
         const i = 1 + Math.floor(rng() * (events.length - 1));
         if (events[i].midi !== DRUM.swish) events.splice(i, 1);
     }
-    if (chance(rng, variation * activity)) {
+    if (!steady && chance(rng, variation * activity)) {
         const at = g.offbeats.length ? g.offbeats[Math.floor(rng() * g.offbeats.length)] : g.grid[g.grid.length - 1];
         hit(rng() < 0.5 ? 'brush' : 'rim', at, 0.16);
     }
@@ -378,8 +467,10 @@ export function drumBar({ bar, meter, drums, section, sectionsMode, sectionBars 
     // Fills: a phrase's last bar now and then; a section's last bar more often and bigger.
     const sectionEnds = section ? (bar + 1 - section.start) % sectionBars === 0 : (bar + 1) % GROOVE_BARS === 0;
     const phraseEnds = index === 3;
-    if (level >= 2 && phraseEnds && chance(rng, 0.15 + activity * 0.35 + variation * 0.15)) {
-        fill(g, sectionEnds, rng, hit);
+    // (a steady beat fills at the end of a section, and only now and then at a phrase's)
+    const fillChance = steady ? (sectionEnds ? 0.7 : 0.04 + activity * 0.12) : 0.15 + activity * 0.35 + variation * 0.15;
+    if (level >= 2 && phraseEnds && chance(rng, fillChance)) {
+        fill(g, sectionEnds, rng, hit, drums.style === 'electro' || drums.style === 'drive');
     }
     if (level >= 2 && drums.sprinkle > 0) {
         sprinkle({
@@ -409,7 +500,7 @@ export function loosenDrums(events, { timing, velocity }, unitSeconds, seed, bar
 }
 
 /** A few hits for an audition (the kit on its own while stopped). */
-export const auditionHits = () => ['kick', 'hat', 'brush', 'shaker', 'rim', 'clap', 'tom', 'ride', 'bell', 'crash', 'swish'].map((drum, i) => ({ midi: DRUM[drum], beat: i * 0.5, velocity: 0.6, detune: 0 }));
+export const auditionHits = () => ['kick', 'hat', 'brush', 'shaker', 'rim', 'clap', 'tom', 'ride', 'bell', 'crash', 'swish', 'punch', 'snare', 'sizzle'].map((drum, i) => ({ midi: DRUM[drum], beat: i * 0.5, velocity: 0.6, detune: 0 }));
 
 /** Random drum settings: a style, activity and variation. */
 export function randomDrums(rng = Math.random) {
@@ -419,5 +510,6 @@ export function randomDrums(rng = Math.random) {
         activity: Math.round((0.2 + rng() * 0.6) * 20) / 20,
         variation: Math.round((0.2 + rng() * 0.7) * 20) / 20,
         sprinkle: Math.round((0.1 + rng() * 0.6) * 20) / 20,
+        kit: rng() < 0.25 ? 'crisp' : 'felt',
     };
 }

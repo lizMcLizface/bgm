@@ -431,3 +431,68 @@ test('an ending: V, then a held I, then silence; Stop before the end carries on 
     expect(gen.ending).toBe(false);
     expect([...gen.plan.values()].some((planned) => planned.ending)).toBe(false);
 });
+
+describe('library presets as the generator plays them', () => {
+    // imported late: the module mocks above have to be in place first
+    test('every music preset plans a long stretch: notes in every voice that plays, finite times, the tempo it names', async () => {
+        const { SCENES, sceneSettings, sceneGroup } = await import('./scenes');
+        SCENES.filter((scene) => sceneGroup(scene) !== 'ambience').forEach((scene) => {
+            const gen = new Generator();
+            // (the ambience engine isn't stubbed here)
+            const { ambience, ambienceShape, ambienceVolume, playAmbience, ...music } = sceneSettings(scene, 11);
+            gen.setMany(music);
+            gen.reset();
+            const bars = play(gen, 40);
+            bars.forEach((b) => {
+                expect(b.bpm).toBe(scene.settings.bpm ?? 72);
+                b.events.forEach((e) => {
+                    expect(Number.isFinite(e.beat) && Number.isFinite(e.length) && Number.isFinite(e.midi) && Number.isFinite(e.velocity)).toBe(true);
+                });
+            });
+            expect(bars.flatMap((b) => b.events).filter((e) => e.role === 'bass').length).toBeGreaterThan(20);
+            expect(bars.flatMap((b) => b.events).filter((e) => e.role === 'pad').length).toBeGreaterThan(20);
+        });
+    });
+});
+
+describe('sounds that change with a preset', () => {
+    test('while playing, a new sound waits for the next bar line; stopped, it is loaded at once', () => {
+        const gen = new Generator();
+        gen.reset();
+        const loaded = [];
+        gen.roles.pad.instrument.applyPreset = (preset) => loaded.push(preset.tag);
+        // stopped: at once
+        let applied = 0;
+        gen.loadRolePresetAtBar('pad', 'A', { tag: 'A' }, () => applied++);
+        expect(loaded).toEqual(['A']);
+        expect(applied).toBe(1);
+        // playing: waits for a first beat
+        gen.transport.timer = 1;
+        gen.loadRolePresetAtBar('pad', 'B', { tag: 'B' }, () => applied++);
+        gen.loadRolePresetAtBar('pad', 'C', { tag: 'C' }, () => applied++);
+        expect(loaded).toEqual(['A']);
+        gen.onBeat({ bar: 1, beatInBar: 2, time: 0, secondsPerBeat: 0.5 });
+        expect(loaded).toEqual(['A']);
+        gen.onBeat({ bar: 2, beatInBar: 0, time: 1, secondsPerBeat: 0.5 });
+        expect(loaded).toEqual(['A', 'C']);
+        expect(gen.roles.pad.presetName).toBe('C');
+        expect(applied).toBe(2);
+        gen.transport.timer = null;
+    });
+
+    test('a sound loaded directly replaces one that was waiting, and stopping loads what waits', () => {
+        const gen = new Generator();
+        gen.reset();
+        const loaded = [];
+        gen.roles.bass.instrument.applyPreset = (preset) => loaded.push(preset.tag);
+        gen.transport.timer = 1;
+        gen.loadRolePresetAtBar('bass', 'B', { tag: 'B' });
+        gen.loadRolePreset('bass', 'D', { tag: 'D' });
+        gen.flushPendingVoices();
+        expect(loaded).toEqual(['D']);
+        gen.loadRolePresetAtBar('bass', 'E', { tag: 'E' });
+        gen.flushPendingVoices();
+        expect(loaded).toEqual(['D', 'E']);
+        gen.transport.timer = null;
+    });
+});

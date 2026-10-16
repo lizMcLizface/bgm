@@ -37,6 +37,9 @@ export const DEFAULT_DRIFT = {
 export const MAX_DISTANCE = 2;
 // Wandering tempo bounds (centered uses home ± tempoRange).
 export const TEMPO_BOUNDS = [50, 110];
+// What a piece may be set to (the slider, links, presets); fast presets
+// (battle themes, racing) sit above the range drift and the randomizer use.
+export const BPM_LIMITS = [50, 170];
 // Chance a chance-triggered centered move goes back toward home when away
 // (on top of homePull's own per-cycle return).
 const PULL_HOME = 0.6;
@@ -106,7 +109,10 @@ function nextTempo(bpm, home, drift, rng) {
         const settled = towardHome && Math.sign(home.bpm - target) !== sign ? home.bpm : target;
         return Math.max(lo, Math.min(hi, settled));
     }
-    return Math.max(TEMPO_BOUNDS[0], Math.min(TEMPO_BOUNDS[1], bpm + (chance(rng, 0.5) ? step : -step)));
+    // a home tempo outside the usual range widens it, so wandering doesn't pull a fast piece down
+    const lo = Math.min(TEMPO_BOUNDS[0], home.bpm);
+    const hi = Math.max(TEMPO_BOUNDS[1], home.bpm);
+    return Math.max(lo, Math.min(hi, bpm + (chance(rng, 0.5) ? step : -step)));
 }
 
 const isHomeKey = (m, home) => m.tonic === home.tonic && m.mode === home.mode;

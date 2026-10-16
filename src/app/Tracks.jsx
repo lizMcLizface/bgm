@@ -49,8 +49,8 @@ export const RoleButtons = ({ role, label, mix, armed, onMix, onArm, onEdit, onR
  * @returns {{ octave: number, connectMidi: function, midiStatus: string }}
  */
 // Percussion, armed: the home row plays the drums (percussion.js DRUMS order)...
-export const DRUM_KEYS = { KeyA: 0, KeyS: 1, KeyD: 2, KeyF: 3, KeyG: 4, KeyH: 5, KeyJ: 6, KeyK: 7, KeyL: 8, Semicolon: 9, Quote: 10 };
-export const DRUM_KEY_HINT = 'A kick · S brush · D shaker · F rim · G hat · H swish · J tom · K clap · L ride · ; crash · ’ bell';
+export const DRUM_KEYS = { KeyA: 0, KeyS: 1, KeyD: 2, KeyF: 3, KeyG: 4, KeyH: 5, KeyJ: 6, KeyK: 7, KeyL: 8, Semicolon: 9, Quote: 10, KeyB: 11, KeyN: 12, KeyM: 13 };
+export const DRUM_KEY_HINT = 'A kick · S brush · D shaker · F rim · G hat · H swish · J tom · K clap · L ride · ; crash · ’ bell · B snare · N punch · M bright hat';
 // ... and MIDI notes as General MIDI drums: kicks, side stick, snares
 // (brush taps), clap, hi-hats, cabasa / maracas (shaker), splash (swish),
 // crashes, toms, rides and the ride bell.

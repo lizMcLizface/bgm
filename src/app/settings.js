@@ -18,8 +18,8 @@ import { AMBIENCE_LAYERS, DEFAULT_AMBIENCE, defaultAmbienceShape } from './engin
 import { LAYER_PARAMS, COMMON_PARAMS } from './engine/ambienceSynth';
 import { ROLE_VOLUMES } from './presets';
 import { defaultWander, WANDER_ROLES, WANDER_LIMITS } from './engine/wander';
-import { DEFAULT_DRUMS, DRUM_STYLES, DRUMS, DRUM_PARAMS, defaultDrumKit } from './percussion';
-import { DEFAULT_DRIFT, DRIFT_MODES, TEMPO_BOUNDS } from './conductor';
+import { DEFAULT_DRUMS, DRUM_STYLES, DRUM_KITS, DRUMS, DRUM_PARAMS, defaultDrumKit } from './percussion';
+import { DEFAULT_DRIFT, DRIFT_MODES, BPM_LIMITS } from './conductor';
 import { METERS, DEFAULT_METER } from './meter';
 import { SCALE_FAMILIES } from './theory';
 import PROGRESSIONS from './progressions';
@@ -36,6 +36,7 @@ export function defaultSettings() {
         barsPerChord: 1,
         meter: DEFAULT_METER, // meter.js
         leadActivity: 0.6, // chance a 4-bar phrase has lead (arranger.js)
+        leadDensity: 0, // how busy its rhythms are: 0 as always .. 1 mostly eighths and sixteenths
         padWeights: { ...DEFAULT_PAD_WEIGHTS }, // style shares per phrase
         bassWeights: { ...DEFAULT_BASS_WEIGHTS },
         thinPadUnderLead: true,
@@ -81,13 +82,14 @@ const listOf = (valid) => (v) => (Array.isArray(v) ? [...new Set(v.filter(valid)
 const RULES = {
     tonic: int(0, 11),
     mode: (v) => (MODE_IDS.has(v) ? v : undefined),
-    bpm: clamp(TEMPO_BOUNDS[0], TEMPO_BOUNDS[1]),
+    bpm: clamp(BPM_LIMITS[0], BPM_LIMITS[1]),
     progression: int(0, PROGRESSIONS.length - 1),
     barsPerChord: oneOf([1, 2, 4]),
     meter: oneOf(Object.keys(METERS)),
     leadActivity: clamp(0, 1),
-    padWeights: { sustain: clamp(0, 100), pulse: clamp(0, 100), arpeggio: clamp(0, 100) },
-    bassWeights: { whole: clamp(0, 100), half: clamp(0, 100), walking: clamp(0, 100) },
+    leadDensity: clamp(0, 1),
+    padWeights: { sustain: clamp(0, 100), pulse: clamp(0, 100), arpeggio: clamp(0, 100), sequence: clamp(0, 100) },
+    bassWeights: { whole: clamp(0, 100), half: clamp(0, 100), walking: clamp(0, 100), drive: clamp(0, 100) },
     thinPadUnderLead: bool,
     padNotes: oneOf([3, 4, 5]),
     voices: Object.fromEntries(Object.entries(OCTAVE_LIMITS).map(([role, [lo, hi]]) => [role, {
@@ -110,7 +112,7 @@ const RULES = {
     humanize: { timing: clamp(0, 40), velocity: clamp(0, 0.25), detune: clamp(0, 15) },
     swing: clamp(0, 0.6),
     sectionTone: bool,
-    drums: { style: oneOf(Object.keys(DRUM_STYLES)), activity: clamp(0, 1), variation: clamp(0, 1), sprinkle: clamp(0, 1) },
+    drums: { style: oneOf(Object.keys(DRUM_STYLES)), activity: clamp(0, 1), variation: clamp(0, 1), sprinkle: clamp(0, 1), kit: oneOf(Object.keys(DRUM_KITS)) },
     drumKit: {
         room: clamp(0, 0.5),
         ...Object.fromEntries(DRUMS.map((name) => [name, {

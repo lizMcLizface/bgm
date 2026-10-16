@@ -105,12 +105,14 @@ function nextOctave(role, previous, voice, rng) {
     return options.length ? pick(rng, options) : previous;
 }
 
-export const PAD_STYLES = { sustain: 'Sustain', pulse: 'Pulse', arpeggio: 'Slow arpeggio' };
-export const BASS_STYLES = { whole: 'Whole bar', half: 'Per beat group', walking: 'Walking' };
+// 'sequence' (running eighths or sixteenths) and 'drive' (a pulsing root
+// line) are for the faster, driving presets and are off by default.
+export const PAD_STYLES = { sustain: 'Sustain', pulse: 'Pulse', arpeggio: 'Slow arpeggio', sequence: 'Running sequence' };
+export const BASS_STYLES = { whole: 'Whole bar', half: 'Per beat group', walking: 'Walking', drive: 'Driving pulse' };
 
 // Relative weights per phrase (any scale; only ratios matter).
-export const DEFAULT_PAD_WEIGHTS = { sustain: 55, pulse: 25, arpeggio: 20 };
-export const DEFAULT_BASS_WEIGHTS = { whole: 35, half: 45, walking: 20 };
+export const DEFAULT_PAD_WEIGHTS = { sustain: 55, pulse: 25, arpeggio: 20, sequence: 0 };
+export const DEFAULT_BASS_WEIGHTS = { whole: 35, half: 45, walking: 20, drive: 0 };
 
 const total = (weights) => Object.values(weights).reduce((sum, w) => sum + Math.max(0, w), 0);
 
@@ -158,11 +160,33 @@ function decidePadPattern(style, meter, leadActive, settings, rng) {
         const fast = !leadActive && meter.unitsPerBeat === 1 && chance(rng, padMotionOf(settings).fast);
         return { pattern, step: fast ? 0.5 : 1 };
     }
+    if (style === 'sequence') {
+        // eighths (the unit of a compound meter is one already), sixteenths now and then
+        const pattern = pickStyle(rng, settings.arpWeights || DEFAULT_ARP_WEIGHTS);
+        const fast = meter.unitsPerBeat === 1 && chance(rng, padMotionOf(settings).fast);
+        return { pattern, step: meter.unitsPerBeat === 1 ? (fast ? 0.25 : 0.5) : 1 };
+    }
     return { pattern: null, step: 1 };
 }
 
 // Lead rhythm cells per beat group, [unit, length] within the group; [] is
 // a rest.
+// Busier cells (eighths and sixteenths) for the lead's density setting. Not
+// for compound meters, whose unit is already an eighth.
+const BUSY_CELLS = {
+    2: [
+        [[0, 0.5], [0.5, 0.5], [1, 0.5], [1.5, 0.5]],
+        [[0, 1], [1, 0.5], [1.5, 0.5]],
+        [[0, 0.5], [0.5, 0.5], [1, 1]],
+        [[0, 0.75], [0.75, 0.75], [1.5, 0.5]],
+        [[0, 0.5], [0.5, 0.25], [0.75, 0.25], [1, 1]],
+    ],
+    3: [
+        [[0, 1], [1, 0.5], [1.5, 0.5], [2, 1]],
+        [[0, 0.5], [0.5, 0.5], [1, 0.5], [1.5, 0.5], [2, 1]],
+        [[0, 1], [1, 1], [2, 0.5], [2.5, 0.5]],
+    ],
+};
 const GROUP_CELLS = {
     2: [[[0, 2]], [[0, 1], [1, 1]], [[0, 1.5], [1.5, 0.5]], [[0, 1]], []],
     3: [[[0, 3]], [[0, 2], [2, 1]], [[0, 1], [1, 2]], [[0, 1], [1, 1], [2, 1]], [[0, 2]], []],
@@ -185,12 +209,14 @@ const nearest = (notes, target) =>
 // A bar of lead rhythm: one cell per beat group. Opening bars move (the
 // first group always sounds); closing bars settle - the first group's cell,
 // its last note held to the bar end - so each 2-bar motif breathes out.
-function leadBar(meter, rng, closing) {
+function leadBar(meter, rng, closing, density = 0) {
     const starts = groupStarts(meter);
     const notes = [];
     meter.groups.forEach((size, g) => {
         if (closing && g > 0) return;
-        const cells = GROUP_CELLS[size].filter((c) => g > 0 || c.length > 0);
+        // (no draw at density 0: pieces made before it exist stay as they were)
+        const busy = density > 0 && meter.unitsPerBeat === 1 && chance(rng, density);
+        const cells = busy ? BUSY_CELLS[size] : GROUP_CELLS[size].filter((c) => g > 0 || c.length > 0);
         pick(rng, cells).forEach(([at, length]) => notes.push({ beat: starts[g] + at, length }));
     });
     if (closing) {
@@ -208,7 +234,7 @@ function leadBar(meter, rng, closing) {
     });
 }
 
-const makeMotif = (meter, rng) => [leadBar(meter, rng, false), leadBar(meter, rng, true)];
+const makeMotif = (meter, rng, density = 0) => [leadBar(meter, rng, false, density), leadBar(meter, rng, true, density)];
 
 // The response: same rhythm, contour nudged, a weak note sometimes dropped,
 // and the phrase's last note resolving onto the chord and held to the bar end.
@@ -266,13 +292,13 @@ function decideSection(bar, prevSection, sections, rng) {
 
 // What the second lead does this phrase (null: it rests). Draws nothing
 // from rng while it is off, so pieces without it stay as they were.
-function decideCounter({ mode, activity }, leadActive, meter, rng) {
+function decideCounter({ mode, activity }, leadActive, meter, rng, density = 0) {
     if (mode === 'off') return null;
     if (mode === 'harmony') return leadActive ? { kind: 'harmony' } : null;
     if (mode === 'line') return { kind: 'line', bars: [lineBar(meter, rng, activity), lineBar(meter, rng, activity)] };
     if (!chance(rng, activity)) return null;
     if (leadActive) return { kind: 'echo', bars: [echoBar(meter, rng), echoBar(meter, rng)] };
-    const motif = makeMotif(meter, rng);
+    const motif = makeMotif(meter, rng, density);
     return { kind: 'melody', motif, response: vary(motif, meter, rng) };
 }
 
@@ -287,7 +313,7 @@ function decidePhrase(bar, prevPhrase, meter, settings, rng) {
     // After a phrase with lead, rest more often - room to breathe.
     const p = activity >= 1 ? 1 : prevPhrase && prevPhrase.leadActive ? activity * 0.7 : activity;
     const leadActive = chance(rng, p);
-    const motif = leadActive ? makeMotif(meter, rng) : null;
+    const motif = leadActive ? makeMotif(meter, rng, settings.leadDensity || 0) : null;
 
     let padStyle = pickStyle(rng, settings.padWeights);
     // Density budget: under the lead, re-pick among the other styles -
@@ -317,7 +343,7 @@ function decidePhrase(bar, prevPhrase, meter, settings, rng) {
         bassStyle: shape.bassStyle || bassStyle,
         bass: shape.bass !== false,
         section,
-        counter: shape.counter === false ? null : decideCounter(counterOf(settings), leadActive, meter, rng),
+        counter: shape.counter === false ? null : decideCounter(counterOf(settings), leadActive, meter, rng, settings.leadDensity || 0),
     };
 }
 
@@ -376,7 +402,7 @@ function padEvents({ chordStart, barsLeftInChord, meter, voicing, style, pattern
             return voicing.map((m) => ev(m, at, length, base * accent));
         });
     }
-    if (style === 'arpeggio') {
+    if (style === 'arpeggio' || style === 'sequence') {
         // the bottom note an octave up as well, where the register allows
         const top = voicing[0] + 12;
         const notes = range && top <= range[1] && !voicing.includes(top) ? [...voicing, top] : voicing;
@@ -387,8 +413,10 @@ function padEvents({ chordStart, barsLeftInChord, meter, voicing, style, pattern
             down: (i) => n - 1 - (i % n),
             broken: (i) => broken[i % broken.length],
         }[pattern] || ((i) => bounce(i, n));
+        // a sequence is detached - each note plucked, not blended into the next
+        const length = style === 'sequence' ? 1.05 * step : 1.6 * step;
         return Array.from({ length: Math.round(meter.units / step) }, (_, i) =>
-            ev(notes[order(i)], i * step, 1.6 * step, base * (i === 0 ? 1 : (i * step) % 1 ? 0.75 : 0.85)));
+            ev(notes[order(i)], i * step, length, base * (i === 0 ? 1 : (i * step) % 1 ? 0.75 : 0.85)));
     }
     if (!chordStart) return [];
     return voicing.map((m) => ev(m, 0, barsLeftInChord * meter.units * 0.95, base));
@@ -433,6 +461,18 @@ function bassEvents({ chord, nextChord, meter, scalePcs, prevMidi, style, chordE
             else midi = near(pick(rng, [third, fifth, fifth]));
             events.push(ev(midi, at, meter.unitsPerBeat * 0.9, i === 0 ? 0.8 : 0.66));
         });
+    } else if (style === 'drive') {
+        // a pulse on the root, an octave or a fifth thrown in, the last note leaning into the next chord
+        const step = meter.unitsPerBeat === 1 ? 0.5 : 1;
+        const count = Math.round(meter.units / step);
+        const high = rootMidi + 12 <= range[1] ? rootMidi + 12 : rootMidi;
+        for (let i = 0; i < count; i++) {
+            const at = i * step;
+            let midi = rootMidi;
+            if (approach && i === count - 1) midi = approach;
+            else if (i > 0 && i % 4 === 3) midi = chance(rng, 0.6) ? high : near(fifth);
+            events.push(ev(midi, at, step * 0.8, beats.includes(at) ? 0.8 : 0.6));
+        }
     } else if (style === 'half') {
         const starts = groupStarts(meter);
         starts.forEach((at, g) => {
@@ -508,7 +548,7 @@ function harmonyEvents(leadNotes, scalePcs, range) {
  * @param {boolean} args.chordStart - this bar starts a chord
  * @param {number} args.barsLeftInChord - including this one
  * @param {object|null} args.prev - the previous bar's returned state
- * @param {object} args.settings - { leadActivity 0..1, padWeights, bassWeights,
+ * @param {object} args.settings - { leadActivity 0..1, leadDensity 0..1 (busier rhythms), padWeights, bassWeights,
  *   thinPadUnderLead, pulseWeights, arpWeights, padMotion: { lean, fast, swell },
  *   voices: { pad|bass|lead|counter: { octave, wander, chance } },
  *   counter: { mode, activity }, sections: { mode, phrases } } (counter and

@@ -6,6 +6,36 @@
 
 import { audioContext } from '../../audio/context';
 
+// Hidden pages get their main-thread timers throttled to about once a
+// second (or frozen), far past a 0.4 s window - so while hidden the window is
+// this long instead, and the tick comes from a Worker, whose timers aren't
+// throttled the same way.
+const HIDDEN_LOOKAHEAD = 10;
+
+const TICK_WORKER_SOURCE = 'let id=null;onmessage=(e)=>{clearInterval(id);id=null;if(e.data>0)id=setInterval(()=>postMessage(0),e.data)};';
+
+function startTicker(callback, interval) {
+    try {
+        const url = URL.createObjectURL(new Blob([TICK_WORKER_SOURCE], { type: 'text/javascript' }));
+        const worker = new Worker(url);
+        URL.revokeObjectURL(url);
+        worker.onmessage = callback;
+        worker.postMessage(interval);
+        return { worker };
+    } catch (e) {
+        return { id: setInterval(callback, interval) };
+    }
+}
+
+function stopTicker(ticker) {
+    if (ticker.worker) {
+        ticker.worker.postMessage(0);
+        ticker.worker.terminate();
+    } else {
+        clearInterval(ticker.id);
+    }
+}
+
 class Transport {
     /**
      * @param {object} [options]
@@ -19,11 +49,20 @@ class Transport {
         this.AC = context;
         this.bpm = bpm;
         this.beatsPerBar = beatsPerBar;
-        this.lookahead = lookahead;
+        this.baseLookahead = lookahead;
         this.interval = interval;
         this.listeners = new Set();
         this.timer = null;
         this.rebaseAt = null;
+    }
+
+    get lookahead() {
+        const hidden = typeof document !== 'undefined' && document.visibilityState === 'hidden';
+        return hidden ? Math.max(this.baseLookahead, HIDDEN_LOOKAHEAD) : this.baseLookahead;
+    }
+
+    set lookahead(seconds) {
+        this.baseLookahead = seconds;
     }
 
     get secondsPerBeat() {
@@ -55,11 +94,11 @@ class Transport {
         this.beat = fromBeat;
         this.nextBeatTime = this.AC.currentTime + 0.1;
         this.tick();
-        this.timer = setInterval(() => this.tick(), this.interval);
+        this.timer = startTicker(() => this.tick(), this.interval);
     }
 
     stop() {
-        clearInterval(this.timer);
+        if (this.timer && this.timer !== 1) stopTicker(this.timer);
         this.timer = null;
         this.rebaseAt = null;
     }

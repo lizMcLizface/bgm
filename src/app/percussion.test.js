@@ -88,3 +88,49 @@ describe('sprinkle', () => {
         expect(intro.flat()).toHaveLength(0);
     });
 });
+
+test('the electro and driving styles keep a steady kick, sixteenth hats and a snare-like backbeat, in every meter', () => {
+    ['electro', 'drive'].forEach((style) => Object.keys(METERS).forEach((meter) => {
+        const all = bars({ style, activity: 0.7, variation: 0.5 }, meter, 32).flat();
+        expect(all.length).toBeGreaterThan(100);
+        all.forEach((e) => {
+            expect(e.beat).toBeGreaterThanOrEqual(0);
+            expect(e.beat).toBeLessThan(METERS[meter].units);
+        });
+        expect(all.some((e) => DRUMS[e.midi] === 'kick')).toBe(true);
+        expect(all.some((e) => ['clap', 'rim'].includes(DRUMS[e.midi]))).toBe(true);
+    }));
+    // four on the floor in 4/4 (the sparse intro level is kick-only on the beats)
+    const floor = bars({ style: 'electro', activity: 0, variation: 0 }, '4/4', 64);
+    expect(floor.some((bar) => [0, 1, 2, 3].every((beat) => bar.some((e) => DRUMS[e.midi] === 'kick' && e.beat === beat)))).toBe(true);
+    // sixteenths: hits off the eighth-note grid
+    const sixteenths = bars({ style: 'electro', activity: 0.5, variation: 0.3 }, '4/4', 64).flat();
+    expect(sixteenths.some((e) => e.beat % 0.5 !== 0)).toBe(true);
+});
+
+test('the crisp kit swaps in a snare, a punchy kick and a bright hat, and leaves the felt kit as it was', () => {
+    ['heartbeat', 'brushes', 'lofi', 'shaker', 'downtempo', 'electro', 'drive'].forEach((style) => {
+        const felt = bars({ style, activity: 0.6, variation: 0.5 }, '4/4', 48).flat();
+        const crisp = bars({ style, activity: 0.6, variation: 0.5, kit: 'crisp' }, '4/4', 48).flat();
+        // the same hits in the same places; only these drums change name
+        expect(crisp.map((e) => e.beat)).toEqual(felt.map((e) => e.beat));
+        const swap = { kick: 'punch', brush: 'snare', hat: 'sizzle' };
+        crisp.forEach((e, i) => expect(DRUMS[e.midi]).toBe(swap[DRUMS[felt[i].midi]] || DRUMS[felt[i].midi]));
+        expect(felt.some((e) => ['punch', 'snare', 'sizzle'].includes(DRUMS[e.midi]))).toBe(false);
+    });
+    const used = new Set(bars({ style: 'drive', activity: 0.6, variation: 0.5, kit: 'crisp' }, '4/4', 48).flat().map((e) => DRUMS[e.midi]));
+    ['punch', 'snare', 'sizzle'].forEach((drum) => expect(used.has(drum) || drum === 'snare').toBe(true));
+});
+
+test('steady styles keep one groove per section, with no swapped drums, dropped hits or ghost notes', () => {
+    ['electro', 'drive'].forEach((style) => {
+        const all = bars({ style, activity: 0.5, variation: 0.4, sprinkle: 0 }, '4/4', 64);
+        // far fewer different bars than a soft style makes with the same settings
+        const soft = bars({ style: 'lofi', activity: 0.5, variation: 0.4, sprinkle: 0 }, '4/4', 64);
+        expect(new Set(all.map(shape)).size).toBeLessThan(new Set(soft.map(shape)).size);
+        const used = new Set(all.flat().map((e) => DRUMS[e.midi]));
+        expect(used.has('ride') && style === 'electro').toBe(false);
+        // a hit's variation stays small
+        all.flat().forEach((e) => expect(Math.abs(e.detune)).toBeLessThanOrEqual(0.4 * 0.25 + 1e-9 + (e.detune !== 0 && ['tom', 'swish'].includes(DRUMS[e.midi]) ? 1 : 0)));
+    });
+});
