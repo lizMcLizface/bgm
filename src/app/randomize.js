@@ -8,7 +8,7 @@
 // per role), with randomness via `rng` - Math.random in the UI, since a
 // randomize press is meant to be different every time.
 
-import { SCALE_FAMILIES, TONIC_NAMES, scaleById, scaleSemitones } from './theory';
+import { SCALE_FAMILIES, TONIC_NAMES, CHORD_COLOURS, scaleById, scaleSemitones } from './theory';
 import PROGRESSIONS, { PROGRESSION_LENGTHS, progressionsOfLength } from './progressions';
 import { METERS } from './meter';
 import { DEFAULT_DRIFT, DRIFT_MODES, TEMPO_BOUNDS } from './conductor';
@@ -236,6 +236,31 @@ export function randomVoices(settings, current, level, rng = Math.random, groups
     }));
     const padNotes = wild ? pick(rng, [3, 4, 5]) : weighted(rng, { 3: 5, 4: 4, 5: 1 });
     return { settings: { voices: { ...settings.voices, ...voices }, padNotes: Number(padNotes) }, presets };
+}
+
+/**
+ * The colour layer as a whole: within reason a little of each (a colour on a
+ * few chords, an occasional pedal, tune repeats) and the rest neutral; full
+ * random anything.
+ */
+export function randomColour(level, rng = Math.random) {
+    const wild = level === 'wild';
+    return {
+        chordColour: randomChordColour(level, rng),
+        chordBorrow: wild ? step(rng(), 0.05) : chance(rng, 0.25) ? step(between(rng, 0.1, 0.3), 0.05) : 0,
+        chordSpread: wild ? pick(rng, ['close', 'open']) : weighted(rng, { close: 3, open: 2 }),
+        pedal: { mode: wild ? pick(rng, ['off', 'tonic', 'fifth']) : weighted(rng, { off: 3, tonic: 2, fifth: 1 }), amount: step(wild ? rng() : between(rng, 0.25, 0.6), 0.05) },
+        leadScale: wild ? pick(rng, ['full', 'pentatonic']) : weighted(rng, { full: 2, pentatonic: 1 }),
+        leadLeaps: wild ? step(rng(), 0.05) : step(between(rng, 0.25, 0.75), 0.05),
+        leadRepeat: wild ? step(rng(), 0.05) : step(between(rng, 0, 0.4), 0.05),
+        leadEnding: wild ? pick(rng, ['settled', 'open']) : weighted(rng, { settled: 3, open: 1 }),
+    };
+}
+
+/** Chord colour: within reason mostly plain, otherwise a colour on a few chords; full random anything. */
+export function randomChordColour(level, rng = Math.random) {
+    if (level === 'wild') return { mode: pick(rng, Object.keys(CHORD_COLOURS)), amount: step(rng(), 0.05) };
+    return { mode: weighted(rng, { plain: 3, sus2: 2, add9: 2, add6: 1, floating: 1 }), amount: step(between(rng, 0.15, 0.5), 0.05) };
 }
 
 const STYLE_DEFAULTS = { pad: DEFAULT_PAD_WEIGHTS, bass: DEFAULT_BASS_WEIGHTS, pulse: DEFAULT_PULSE_WEIGHTS, arpeggio: DEFAULT_ARP_WEIGHTS };

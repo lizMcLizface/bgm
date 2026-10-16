@@ -18,11 +18,11 @@
 // the wild would decode differently. A reader that runs out of bits takes
 // the defaults, so fields appended later keep old links valid.
 
-import { SCALE_FAMILIES } from './theory';
+import { SCALE_FAMILIES, CHORD_COLOURS } from './theory';
 import { METERS } from './meter';
 import { DRIFT_MODES, TEMPO_BOUNDS, BPM_LIMITS } from './conductor';
 import {
-    OCTAVE_LIMITS, OCTAVE_WANDER, COUNTER_MODES, SECTION_MODES, SECTION_LENGTHS, DEFAULT_PULSE_WEIGHTS, DEFAULT_ARP_WEIGHTS,
+    OCTAVE_LIMITS, OCTAVE_WANDER, COUNTER_MODES, PEDAL_MODES, SPREADS, LEAD_SCALES, LEAD_ENDINGS, SECTION_MODES, SECTION_LENGTHS, DEFAULT_PULSE_WEIGHTS, DEFAULT_ARP_WEIGHTS,
 } from './arranger';
 import { AMBIENCE_LAYERS } from './engine/ambience';
 import { LAYER_PARAMS } from './engine/ambienceSynth';
@@ -58,7 +58,7 @@ export const SHAREABLE_PRESETS = [
     // the fast / game-style presets
     'Void Pad', 'Starlight Pad', 'Spore Haze', 'Heroic Strings', 'Drive Bass', 'Chip Bass', 'Deep Throb',
     'Racer Lead', 'Chip Lead', 'Fanfare Brass', 'Pan Flute', 'Squeezebox', 'Signal Lead', 'Arp Pluck',
-    'Pixel Piano', 'Nylon Guitar',
+    'Pixel Piano', 'Nylon Guitar', 'Soft Harp', 'Haunted Celesta',
 ];
 const PRESET_BITS = 8;
 // Preset index meaning "a generated sound" (soundGen.js v1): followed by
@@ -234,6 +234,17 @@ const MUSIC_GROUPS = [
     [[['leadDensity'], chance]], // how busy the lead's rhythms are
     [[['drums', 'kit'], options(Object.keys(DRUM_KITS), 2)]], // felt or crisp drums
     [[['bpm'], wideTempo]], // tempos past the first field's range (a tempo inside it is left to that field)
+    [[['chordColour', 'mode'], options(Object.keys(CHORD_COLOURS), 3)], [['chordColour', 'amount'], chance]], // suspended and added-note chords
+    [ // the rest of the colour layer
+        [['chordBorrow'], chance],
+        [['chordSpread'], options(Object.keys(SPREADS), 1)],
+        [['pedal', 'mode'], options(Object.keys(PEDAL_MODES), 2)],
+        [['pedal', 'amount'], chance],
+        [['leadScale'], options(Object.keys(LEAD_SCALES), 1)],
+        [['leadLeaps'], chance],
+        [['leadRepeat'], chance],
+        [['leadEnding'], options(Object.keys(LEAD_ENDINGS), 1)],
+    ],
 ];
 const VOICE_GROUPS = [
     [...voice('pad'), ...voice('bass'), ...voice('lead'), ...voice('counter'), field(GROUPS, ['padNotes'])],

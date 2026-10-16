@@ -117,16 +117,34 @@ export function romanDegree(token) {
  * @param {number[]} scale - from scaleSemitones
  * @param {number} degree - 1..7
  * @param {number} [size=3] - 3 = triad, 4 = seventh
+ * @param {string} [colour='plain'] - 'sus2' / 'sus4' put the neighbouring
+ *   scale note where the third was; 'floating' picks sus4 over a minor chord
+ *   and sus2 over a major one, so no chord settles into major or minor;
+ *   'add9' / 'add6' keep the third and add that scale note on top (a chord
+ *   that already has a ninth is left alone)
  */
-export function diatonicChord(scale, degree, size = 3) {
+export function diatonicChord(scale, degree, size = 3, colour = 'plain') {
     const n = scale.length;
     const offsets = [];
+    const at = (index) => scale[index % n] + 12 * Math.floor(index / n);
     for (let k = 0; k < size; k++) {
-        const index = ((degree - 1) % n) + 2 * k;
-        offsets.push(scale[index % n] + 12 * Math.floor(index / n));
+        let index = ((degree - 1) % n) + 2 * k;
+        if (k === 1 && ['sus2', 'sus4', 'floating'].includes(colour)) {
+            const minor = at(index) - at(index - 2) === 3;
+            index += colour === 'sus4' || (colour === 'floating' && minor) ? 1 : -1;
+        }
+        offsets.push(at(index));
     }
-    return offsets;
+    const root = (degree - 1) % n;
+    if (colour === 'add9' && size < 5) offsets.push(at(root + 8));
+    if (colour === 'add6' && size < 5) offsets.push(at(root + 5));
+    return offsets.sort((a, b) => a - b);
 }
+
+/** The chord colours: the id and what the settings panel calls it. */
+export const CHORD_COLOURS = {
+    plain: 'Plain (major / minor)', sus2: 'Suspended 2nd', sus4: 'Suspended 4th', floating: 'Floating (sus2 or sus4)', add9: 'Added 9th', add6: 'Added 6th',
+};
 
 const TRIAD_SUFFIX = {
     '4,7': '', '3,7': 'm', '3,6': '°', '4,8': '+',

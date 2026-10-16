@@ -723,12 +723,19 @@ class Generator {
     }
 
     // A chord on a scale degree of `music`'s key, with display names.
-    buildChord(music, numeral) {
+    // `borrow` takes the chord from the parallel mode instead (the major IV or V
+    // in a minor key; the minor iv or the flat VI or VII in a major one), while
+    // the melody stays in the home scale.
+    buildChord(music, numeral, colour = 'plain', borrow = false) {
         const { tonic, mode } = music;
         const scale = scaleSemitones(scaleById(mode).intervals);
-        const names = spellScale(tonic, scale);
         const degree = romanDegree(numeral);
-        const offsets = diatonicChord(scale, degree, this.settings.padNotes);
+        const minorHome = scale.length === 7 && scale[2] === 3;
+        const majorHome = scale.length === 7 && scale[2] === 4;
+        const borrowed = borrow && ((minorHome && [4, 5].includes(degree)) || (majorHome && [4, 6, 7].includes(degree)));
+        const chordScale = borrowed ? scaleSemitones(scaleById(minorHome ? 'Major-1' : 'Major-6').intervals) : scale;
+        const names = spellScale(tonic, chordScale);
+        const offsets = diatonicChord(chordScale, degree, this.settings.padNotes, colour);
         return {
             numeral: displayNumeral(numeral, offsets),
             pitchClasses: offsets.map((o) => (tonic + o) % 12),
@@ -742,8 +749,25 @@ class Generator {
     // The chord at `bar` under `music` (progressions restart each cycle).
     chordAt(bar, music) {
         const numerals = PROGRESSIONS[music.progression];
-        const index = Math.floor((bar - music.cycleStart) / this.settings.barsPerChord) % numerals.length;
-        return this.buildChord(music, numerals[index]);
+        const slot = Math.floor((bar - music.cycleStart) / this.settings.barsPerChord);
+        return this.buildChord(music, numerals[slot % numerals.length], this.colourFor(bar), this.borrowFor(bar));
+    }
+
+    // 'plain' or the chord colour setting, for the chord `bar` falls in: a fixed
+    // share of the chords (chordColour.amount) get it, which ones is set by
+    // the seed and the bar, so replaying a bar plays the same chord.
+    colourFor(bar) {
+        const { mode, amount } = this.settings.chordColour;
+        if (mode === 'plain' || amount <= 0) return 'plain';
+        if (amount >= 1) return mode;
+        return seeded(this.settings.seed * 31 + Math.floor(bar / this.settings.barsPerChord))() < amount ? mode : 'plain';
+    }
+
+    // Whether the chord `bar` falls in is borrowed (settings.chordBorrow): by the seed and the bar, like colourFor.
+    borrowFor(bar) {
+        const share = this.settings.chordBorrow;
+        if (!(share > 0)) return false;
+        return seeded(this.settings.seed * 37 + 11 + Math.floor(bar / this.settings.barsPerChord))() < share;
     }
 
     // The new key's dominant, played in the old key's last bar: a standard
@@ -765,7 +789,7 @@ class Generator {
 
     // Decides one bar. Event times/lengths are in beats from the bar start.
     planBar(bar) {
-        const { barsPerChord, leadActivity, leadDensity, padWeights, bassWeights, pulseWeights, arpWeights, padMotion, thinPadUnderLead, drift, humanize, voices, counter, sections, drums, swing } = this.settings;
+        const { barsPerChord, leadActivity, leadDensity, padWeights, bassWeights, pulseWeights, arpWeights, padMotion, thinPadUnderLead, drift, humanize, voices, counter, sections, drums, swing, chordSpread, pedal, leadScale, leadLeaps, leadRepeat, leadEnding } = this.settings;
         const prev = this.plan.get(bar - 1);
 
         const fresh = !prev || this.resetMusicAt === bar;
@@ -805,7 +829,7 @@ class Generator {
             chordStart,
             barsLeftInChord,
             prev: prev ? prev.state : null,
-            settings: { leadActivity, leadDensity, padWeights, bassWeights, pulseWeights, arpWeights, padMotion, thinPadUnderLead, voices, counter, sections },
+            settings: { leadActivity, leadDensity, padWeights, bassWeights, pulseWeights, arpWeights, padMotion, thinPadUnderLead, voices, counter, sections, chordSpread, pedal, leadScale, leadLeaps, leadRepeat, leadEnding },
             rng: this.rng,
         });
         // Drums: patterns and looseness from streams of their own (the

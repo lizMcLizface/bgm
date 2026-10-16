@@ -6,6 +6,7 @@ import { DRUM_STYLES } from './percussion';
 import { AMBIENCE_LAYERS } from './engine/ambience';
 import { METERS } from './meter';
 import { isMobile } from '../audio/performance';
+import { intensity, intensityLabel, viridis, INTENSITY_LABELS } from './intensity';
 
 // The top row's preset browser (scenes.js): a button that opens a window
 // over the page with the presets as a grid of cards, sorted into categories
@@ -33,7 +34,9 @@ function summary(scene) {
     const key = `${TONIC_NAMES[s.tonic].split('/')[0]} ${scaleById(s.mode).name}`;
     const meter = s.meter === '4/4' ? '' : ` · ${METERS[s.meter].label.split(' ')[0]}`;
     const layers = Object.entries(s.ambience).filter(([, level]) => level > 0).map(([id]) => AMBIENCE_LAYERS[id].toLowerCase());
+    const level = intensity(s);
     return {
+        level,
         line: s.playMusic ? `${key} · ${s.bpm} BPM${meter}` : 'No music',
         chips: [
             ...(s.playMusic && s.drums.style !== 'off' ? [DRUM_STYLES[s.drums.style]] : []),
@@ -49,14 +52,15 @@ const matches = (scene, query) => {
 };
 
 const Card = ({ scene, active, onPick, onRemove }) => {
-    const { line, chips } = useMemo(() => summary(scene), [scene]);
+    const { line, chips, level } = useMemo(() => summary(scene), [scene]);
     return (
         <li className={`gen-pb-card${active ? ' is-active' : ''}`}>
             <button type="button" className="gen-pb-pick" onClick={(e) => onPick(scene, e)} aria-current={active ? 'true' : undefined}
                 title="Click: apply as set above. Shift-click: composition only. Ctrl-click: sounds only.">
+                <span className="gen-pb-level" style={{ background: viridis(level) }} title={`${intensityLabel(level)} (${Math.round(level * 100)}%)`} />
                 <strong>{scene.name}</strong>
                 {scene.blurb && <span className="gen-pb-blurb">{scene.blurb}</span>}
-                <span className="gen-pb-meta">{line}</span>
+                <span className="gen-pb-meta">{line} · {intensityLabel(level).toLowerCase()}</span>
                 {chips.length > 0 && <span className="gen-pb-chips">{chips.map((chip) => <span key={chip}>{chip}</span>)}</span>}
             </button>
             {onRemove && (
@@ -196,6 +200,11 @@ const PresetBrowser = ({ current, onPick, actions }) => {
                                 ))}
                             </nav>
                             <div className="gen-pb-scroll">
+                                <div className="gen-pb-legend" aria-label="Colour shows how busy a preset sounds">
+                                    <span>{INTENSITY_LABELS[0]}</span>
+                                    <span className="gen-pb-legend-bar" style={{ background: `linear-gradient(90deg, ${[0, 0.25, 0.5, 0.75, 1].map(viridis).join(', ')})` }} />
+                                    <span>{INTENSITY_LABELS[INTENSITY_LABELS.length - 1]}</span>
+                                </div>
                                 {flat.length === 0 && <p className="gen-pb-empty">Nothing matches &ldquo;{query}&rdquo;.</p>}
                                 {flat.map((section) => (
                                     <section key={section.id}>

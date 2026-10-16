@@ -60,6 +60,15 @@ export const DEFAULT_VOICES = {
     counter: { octave: 0, wander: 'off', chance: 0.3 },
 };
 
+// The colour layer (settings panel "Colour"): everything here is off or
+// neutral by default, and draws nothing from the rng while it is, so pieces
+// made without it stay as they were.
+export const PEDAL_MODES = { off: 'Off', tonic: 'Tonic', fifth: 'Fifth' };
+export const DEFAULT_PEDAL = { mode: 'off', amount: 0.5 }; // amount: the share of phrases whose bass holds the note
+export const SPREADS = { close: 'Close', open: 'Open (second note from the top drops an octave)' };
+export const LEAD_SCALES = { full: 'Whole scale', pentatonic: 'Pentatonic (no 4th / 7th, or 2nd / 6th in minor)' };
+export const LEAD_ENDINGS = { settled: 'Settle on the chord', open: 'Stay open (fifth or 2nd)' };
+
 export const COUNTER_MODES = { off: 'Off', answer: 'Answers the lead', harmony: 'Harmony with the lead', line: 'Own line, always' };
 // activity: how often it answers / takes the melody, or how busy its line is
 export const DEFAULT_COUNTER = { mode: 'off', activity: 0.5 };
@@ -86,6 +95,7 @@ const NEXT_SECTION = {
 const shift = ([lo, hi], octave) => [lo + 12 * octave, hi + 12 * octave];
 // Settings made before a role or option existed fall back to its defaults.
 const voiceOf = (settings, role) => (settings.voices && settings.voices[role]) || DEFAULT_VOICES[role];
+const pedalOf = (settings) => settings.pedal || DEFAULT_PEDAL;
 const counterOf = (settings) => settings.counter || DEFAULT_COUNTER;
 const sectionsOf = (settings) => settings.sections || DEFAULT_SECTIONS;
 const clampOctave = (role, o) => Math.max(OCTAVE_LIMITS[role][0], Math.min(OCTAVE_LIMITS[role][1], o));
@@ -204,6 +214,26 @@ export function notesInRange(pitchClasses, low, high) {
 const nearest = (notes, target) =>
     notes.reduce((best, n) => (Math.abs(n - target) < Math.abs(best - target) ? n : best));
 
+// The scale without the notes that pull hardest toward a chord: the 4th and
+// 7th of a major-ish scale, the 2nd and 6th of a minor-ish one. Only for
+// 7-note scales; anything else stays whole.
+export function pentatonicOf(scalePcs) {
+    if (scalePcs.length !== 7) return scalePcs;
+    const minor = (scalePcs[2] - scalePcs[0] + 12) % 12 === 3;
+    const drop = minor ? [1, 5] : [3, 6];
+    return scalePcs.filter((_, i) => !drop.includes(i));
+}
+
+// An open voicing: the second note from the top drops an octave (drop-2),
+// keeping the chord's notes but spreading them wider.
+export function openVoicing(voicing, low) {
+    if (voicing.length < 3) return voicing;
+    const out = voicing.slice();
+    const at = out.length - 2;
+    if (out[at] - 12 >= low - 12) out[at] -= 12;
+    return out.sort((a, b) => a - b);
+}
+
 // --- phrase-level decisions ---------------------------------------------
 
 // A bar of lead rhythm: one cell per beat group. Opening bars move (the
@@ -313,7 +343,10 @@ function decidePhrase(bar, prevPhrase, meter, settings, rng) {
     // After a phrase with lead, rest more often - room to breathe.
     const p = activity >= 1 ? 1 : prevPhrase && prevPhrase.leadActive ? activity * 0.7 : activity;
     const leadActive = chance(rng, p);
-    const motif = leadActive ? makeMotif(meter, rng, settings.leadDensity || 0) : null;
+    let motif = leadActive ? makeMotif(meter, rng, settings.leadDensity || 0) : null;
+    // Sometimes the last phrase's tune comes round again (only drawn when it is on).
+    const repeat = leadActive && settings.leadRepeat > 0 && prevPhrase && prevPhrase.leadActive && prevPhrase.motif && chance(rng, settings.leadRepeat);
+    if (repeat) motif = prevPhrase.motif;
 
     let padStyle = pickStyle(rng, settings.padWeights);
     // Density budget: under the lead, re-pick among the other styles -
@@ -323,10 +356,12 @@ function decidePhrase(bar, prevPhrase, meter, settings, rng) {
         if (total(others) > 0) padStyle = weighted(rng, others);
     }
 
-    const response = motif ? vary(motif, meter, rng) : null;
+    const response = repeat ? prevPhrase.response : motif ? vary(motif, meter, rng) : null;
     const bassStyle = pickStyle(rng, settings.bassWeights);
     padStyle = shape.padStyle || padStyle;
     const { pattern: padPattern, step: padStep } = decidePadPattern(padStyle, meter, leadActive, settings, rng);
+    const pedal = pedalOf(settings);
+    const pedalNote = pedal.mode !== 'off' && chance(rng, pedal.amount) ? pedal.mode : null;
     const padLift = nextPadLift(prevPhrase && prevPhrase.padLift, padMotionOf(settings).lean, rng);
 
     return {
@@ -341,6 +376,7 @@ function decidePhrase(bar, prevPhrase, meter, settings, rng) {
         padStep,
         padLift,
         bassStyle: shape.bassStyle || bassStyle,
+        pedal: pedalNote,
         bass: shape.bass !== false,
         section,
         counter: shape.counter === false ? null : decideCounter(counterOf(settings), leadActive, meter, rng, settings.leadDensity || 0),
@@ -493,9 +529,10 @@ function bassEvents({ chord, nextChord, meter, scalePcs, prevMidi, style, chordE
 
 // A melodic line - the lead, or the second lead's own parts - over this
 // bar's rhythm: chord tones on strong notes, scale steps between.
-function melodyEvents({ role = 'lead', notes, chord, scalePcs, prevMidi, range, level = 1 }) {
+function melodyEvents({ role = 'lead', notes, chord, scalePcs, prevMidi, range, level = 1, scale = 'full', leaps = 0.5, ending = 'settled' }) {
     const chordNotes = notesInRange(chord.pitchClasses, range[0], range[1]);
-    const scaleNotes = notesInRange(scalePcs, range[0], range[1]);
+    const scaleNotes = notesInRange(scale === 'pentatonic' ? pentatonicOf(scalePcs) : scalePcs, range[0], range[1]);
+    const reach = leaps * 2; // 0.5 (the default) plays the moves as drawn
     const center = (range[0] + range[1]) / 2;
     let midi = prevMidi;
     const events = notes.map((note, i) => {
@@ -505,10 +542,10 @@ function melodyEvents({ role = 'lead', notes, chord, scalePcs, prevMidi, range, 
             const index = scaleNotes.indexOf(nearest(scaleNotes, midi));
             midi = scaleNotes[Math.max(0, Math.min(scaleNotes.length - 1, index + note.move + Math.sign(pull)))];
         } else if (note.kind === 'resolve') {
-            const stable = notesInRange([chord.pitchClasses[0], chord.pitchClasses[1]], range[0], range[1]);
+            const stable = notesInRange(ending === 'open' ? [chord.pitchClasses[2] ?? chord.pitchClasses[0], scalePcs[1]] : [chord.pitchClasses[0], chord.pitchClasses[1]], range[0], range[1]);
             midi = nearest(stable, midi);
         } else {
-            midi = nearest(chordNotes, midi + note.move + pull);
+            midi = nearest(chordNotes, midi + (reach === 1 ? note.move : Math.round(note.move * reach)) + pull);
         }
         // Legato up to the next note, never overlapping it.
         const gap = i + 1 < notes.length ? notes[i + 1].beat - note.beat : note.length;
@@ -587,7 +624,7 @@ export function arrangeBar({ bar, meter, chord, nextChord, scalePcs, chordStart,
         chordStart: chordStart || !prev || padMoved,
         barsLeftInChord,
         meter,
-        voicing,
+        voicing: settings.chordSpread === 'open' ? openVoicing(voicing, ranges.pad[0]) : voicing,
         style: phrase.padStyle,
         pattern: phrase.padPattern,
         step: phrase.padStep,
@@ -596,23 +633,26 @@ export function arrangeBar({ bar, meter, chord, nextChord, scalePcs, chordStart,
         swell: padSwell(padMotionOf(settings).swell, bar - phrase.start),
     });
 
+    // A pedal: the bass holds the key's tonic (or fifth) whatever the chord does.
+    const pedalPc = phrase.pedal ? scalePcs[phrase.pedal === 'fifth' ? 4 % scalePcs.length : 0] : null;
     const bass = bassEvents({
-        chord,
-        nextChord,
+        chord: pedalPc === null ? chord : { ...chord, pitchClasses: [pedalPc, ...chord.pitchClasses.slice(1)] },
+        nextChord: pedalPc === null ? nextChord : null,
         meter,
         scalePcs,
         prevMidi: prev ? prev.bassMidi : BASS_CENTER,
-        style: phrase.bassStyle,
+        style: pedalPc === null ? phrase.bassStyle : 'whole',
         chordEnds: barsLeftInChord === 1,
         range: ranges.bass,
         rng,
     });
 
     const index = bar - phrase.start;
+    const melodyColour = { scale: settings.leadScale, leaps: settings.leadLeaps ?? 0.5, ending: settings.leadEnding };
     let lead = { events: [], midi: prev ? prev.leadMidi : 79 };
     if (phrase.leadActive) {
         const source = index < 2 ? phrase.motif : phrase.response;
-        lead = melodyEvents({ notes: source[index % 2], chord, scalePcs, prevMidi: lead.midi, range: ranges.lead });
+        lead = melodyEvents({ notes: source[index % 2], chord, scalePcs, prevMidi: lead.midi, range: ranges.lead, ...melodyColour });
     }
 
     let counter = { events: [], midi: (prev && prev.counterMidi) || 72 };
@@ -625,7 +665,7 @@ export function arrangeBar({ bar, meter, chord, nextChord, scalePcs, chordStart,
             echo: () => (index % 2 === 1 ? part.bars[(index - 1) / 2] : []),
             line: () => part.bars[index % 2],
         }[part.kind]();
-        counter = melodyEvents({ role: 'counter', notes, chord, scalePcs, prevMidi: counter.midi, range: ranges.counter, level: part.kind === 'melody' ? 1 : 0.85 });
+        counter = melodyEvents({ role: 'counter', notes, chord, scalePcs, prevMidi: counter.midi, range: ranges.counter, level: part.kind === 'melody' ? 1 : 0.85, ...melodyColour });
     }
 
     return {

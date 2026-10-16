@@ -12,7 +12,7 @@
 import {
     DEFAULT_PAD_WEIGHTS, DEFAULT_BASS_WEIGHTS, DEFAULT_VOICES, OCTAVE_LIMITS, OCTAVE_WANDER,
     DEFAULT_COUNTER, COUNTER_MODES, DEFAULT_SECTIONS, SECTION_MODES, SECTION_LENGTHS,
-    DEFAULT_PULSE_WEIGHTS, DEFAULT_ARP_WEIGHTS, DEFAULT_PAD_MOTION,
+    DEFAULT_PULSE_WEIGHTS, DEFAULT_ARP_WEIGHTS, DEFAULT_PAD_MOTION, PEDAL_MODES, SPREADS, LEAD_SCALES, LEAD_ENDINGS,
 } from './arranger';
 import { AMBIENCE_LAYERS, DEFAULT_AMBIENCE, defaultAmbienceShape } from './engine/ambience';
 import { LAYER_PARAMS, COMMON_PARAMS } from './engine/ambienceSynth';
@@ -21,7 +21,7 @@ import { defaultWander, WANDER_ROLES, WANDER_LIMITS } from './engine/wander';
 import { DEFAULT_DRUMS, DRUM_STYLES, DRUM_KITS, DRUMS, DRUM_PARAMS, defaultDrumKit } from './percussion';
 import { DEFAULT_DRIFT, DRIFT_MODES, BPM_LIMITS } from './conductor';
 import { METERS, DEFAULT_METER } from './meter';
-import { SCALE_FAMILIES } from './theory';
+import { SCALE_FAMILIES, CHORD_COLOURS } from './theory';
 import PROGRESSIONS from './progressions';
 import { decodeShareCode, encodeShareParts, decodeShareParts } from './shareCode';
 import { phraseToSeed } from './phrase';
@@ -41,6 +41,15 @@ export function defaultSettings() {
         bassWeights: { ...DEFAULT_BASS_WEIGHTS },
         thinPadUnderLead: true,
         padNotes: 3, // chord size: 3 triads, 4 sevenths, 5 ninths
+        // The colour layer (the Colour panel): each off or neutral by default
+        chordColour: { mode: 'plain', amount: 0.35 }, // a colour (theory.js CHORD_COLOURS) on this share of the chords
+        chordBorrow: 0, // share of chords taken from the parallel mode
+        chordSpread: 'close', // voicing of the pad: close or open (arranger.js SPREADS)
+        pedal: { mode: 'off', amount: 0.5 }, // the bass holds the tonic or fifth for this share of phrases
+        leadScale: 'full', // full, or pentatonic
+        leadLeaps: 0.5, // how far the lead jumps between chord tones: 0.5 as drawn, less is stepwise, more leapy
+        leadRepeat: 0, // share of phrases that repeat the last phrase's tune
+        leadEnding: 'settled', // a phrase ends on the chord, or stays open
         voices: JSON.parse(JSON.stringify(DEFAULT_VOICES)), // per-role octave + wander
         drift: { ...DEFAULT_DRIFT, excludedTonics: [], excludedModes: [] }, // conductor.js
         humanize: { timing: 12, velocity: 0.08, detune: 3 }, // ms, fraction, cents
@@ -92,6 +101,14 @@ const RULES = {
     bassWeights: { whole: clamp(0, 100), half: clamp(0, 100), walking: clamp(0, 100), drive: clamp(0, 100) },
     thinPadUnderLead: bool,
     padNotes: oneOf([3, 4, 5]),
+    chordColour: { mode: oneOf(Object.keys(CHORD_COLOURS)), amount: clamp(0, 1) },
+    chordBorrow: clamp(0, 1),
+    chordSpread: oneOf(Object.keys(SPREADS)),
+    pedal: { mode: oneOf(Object.keys(PEDAL_MODES)), amount: clamp(0, 1) },
+    leadScale: oneOf(Object.keys(LEAD_SCALES)),
+    leadLeaps: clamp(0, 1),
+    leadRepeat: clamp(0, 1),
+    leadEnding: oneOf(Object.keys(LEAD_ENDINGS)),
     voices: Object.fromEntries(Object.entries(OCTAVE_LIMITS).map(([role, [lo, hi]]) => [role, {
         octave: int(lo, hi),
         wander: oneOf(Object.keys(OCTAVE_WANDER)),

@@ -532,3 +532,31 @@ describe('the audio clock behind the playhead', () => {
         wall.mockRestore();
     });
 });
+
+describe('chord colour and borrowed chords', () => {
+    const chordsOf = (patch) => {
+        const gen = generator(31, { mode: 'centered' });
+        Object.assign(gen.settings, { tonic: 9, mode: 'Major-6', progression: 8, barsPerChord: 1 }, patch);
+        gen.reset();
+        return play(gen, 8).map((b) => gen.plan.get(b.bar).chord.name);
+    };
+
+    test('plain by default; always-floating chords are all suspended', () => {
+        expect(chordsOf({}).every((name) => !name.includes('sus'))).toBe(true);
+        expect(chordsOf({ chordColour: { mode: 'floating', amount: 1 } }).every((name) => name.includes('sus'))).toBe(true);
+    });
+
+    test('a share of chords is coloured, the same ones every time', () => {
+        const half = chordsOf({ chordColour: { mode: 'sus2', amount: 0.5 } });
+        expect(half).toEqual(chordsOf({ chordColour: { mode: 'sus2', amount: 0.5 } }));
+        expect(half.filter((name) => name.includes('sus2')).length).toBeGreaterThan(0);
+        expect(half.filter((name) => !name.includes('sus2')).length).toBeGreaterThan(0);
+    });
+
+    test('borrowing in a minor key swaps in the major IV (i - iv - VI - v: Dm becomes D)', () => {
+        const plain = chordsOf({});
+        const borrowed = chordsOf({ chordBorrow: 1 });
+        expect(plain.slice(0, 4)).toEqual(['Am', 'Dm', 'F', 'Em']);
+        expect(borrowed.slice(0, 4)).toEqual(['Am', 'D', 'F', 'E']);
+    });
+});

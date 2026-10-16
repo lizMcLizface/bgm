@@ -990,6 +990,34 @@
       "pingPongAmount": 0.28,
       "reverbType": "reverb5",
       "reverbAmount": 0.4
+    },
+    "Haunted Celesta": {
+      "masterVolume": 0.56,
+      "vcoType": "sine",
+      "osc2Type": "sine",
+      "osc2OctaveOffset": 2,
+      "osc2Detune": 9,
+      "osc2Amount": 0.38,
+      "gainAttack": 0.003,
+      "gainDecay": 1.1,
+      "gainSustain": 0.12,
+      "gainRelease": 0.9,
+      "fmRatio": 5.19,
+      "fmIndex": 0.6,
+      "fmEnvAmount": 1.2,
+      "fmDecay": 0.15,
+      "vibratoDepth": 7,
+      "vibratoRate": 4.2,
+      "chorusAmount": 0.3,
+      "chorusRate": 0.35,
+      "chorusDepth": 0.003,
+      "eqHighGain": 3,
+      "pingPongDelayTime": 0.5,
+      "pingPongFeedback": 0.25,
+      "pingPongTone": 5200,
+      "pingPongAmount": 0.18,
+      "reverbType": "reverb6",
+      "reverbAmount": 0.42
     }
   },
   "Keys & plucks": {
@@ -1221,6 +1249,24 @@
       "chorusAmount": 0.15,
       "reverbType": "reverb4",
       "reverbAmount": 0.3
+    },
+    "Soft Harp": {
+      "masterVolume": 0.72,
+      "vcoType": "triangle",
+      "osc2Type": "sine",
+      "osc2OctaveOffset": 1,
+      "osc2Amount": 0.25,
+      "gainAttack": 0.014,
+      "gainDecay": 1.1,
+      "gainSustain": 0,
+      "gainRelease": 0.9,
+      "filterType": "lowpass",
+      "filterFreq": 1100,
+      "filterVelocity": 1200,
+      "filterEnvAmount": 700,
+      "filterDecay": 0.3,
+      "reverbType": "reverb4",
+      "reverbAmount": 0.38
     }
   },
   "Textures": {

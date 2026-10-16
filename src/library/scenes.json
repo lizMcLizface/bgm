@@ -34,6 +34,11 @@
       "id": "sandbox",
       "label": "Dig, Farm, Repeat",
       "blurb": "Cosy farm folk and block-world adventures"
+    },
+    {
+      "id": "podcast",
+      "label": "Under Speech",
+      "blurb": "Sparse, steady beds for talking over - no busy rhythm, no tune to compete with"
     }
   ],
   "scenes": [
@@ -2017,6 +2022,1208 @@
         "bass": "Chip Bass",
         "lead": "Signal Lead",
         "counter": "Pan Flute"
+      }
+    },
+    {
+      "name": "Open Mic Pad",
+      "category": "podcast",
+      "blurb": "One slow warm pad and a soft bass note, almost nothing moving",
+      "settings": {
+        "tonic": 0,
+        "mode": "Major-1",
+        "bpm": 66,
+        "progression": 1,
+        "barsPerChord": 4,
+        "padNotes": 4,
+        "leadActivity": 0.1,
+        "padWeights": {
+          "sustain": 100,
+          "pulse": 0,
+          "arpeggio": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0
+        },
+        "drums": {
+          "style": "off"
+        }
+      },
+      "voices": {
+        "pad": "Soft Pad",
+        "bass": "Warm Bass",
+        "lead": "Sine Whistle"
+      }
+    },
+    {
+      "name": "Quiet Studio",
+      "category": "podcast",
+      "blurb": "Felt keys, one gentle chord per bar and a rare high note",
+      "settings": {
+        "tonic": 7,
+        "mode": "Major-1",
+        "bpm": 72,
+        "progression": 6,
+        "barsPerChord": 2,
+        "padNotes": 3,
+        "leadActivity": 0.12,
+        "padWeights": {
+          "sustain": 40,
+          "pulse": 60,
+          "arpeggio": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0
+        },
+        "drums": {
+          "style": "off"
+        },
+        "humanize": {
+          "timing": 0.2,
+          "velocity": 0.2,
+          "detune": 0.2
+        }
+      },
+      "voices": {
+        "pad": "Felt Piano",
+        "bass": "Felt Bass",
+        "lead": "Celesta"
+      }
+    },
+    {
+      "name": "Soft Landing",
+      "category": "podcast",
+      "blurb": "Velvet pad in a minor key with a faint heartbeat, settles in the background",
+      "settings": {
+        "tonic": 9,
+        "mode": "Major-6",
+        "bpm": 64,
+        "progression": 6,
+        "barsPerChord": 4,
+        "padNotes": 4,
+        "leadActivity": 0.1,
+        "padWeights": {
+          "sustain": 100,
+          "pulse": 0,
+          "arpeggio": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0
+        },
+        "drums": {
+          "style": "heartbeat",
+          "activity": 0.15,
+          "variation": 0.3
+        }
+      },
+      "voices": {
+        "pad": "Velvet Pad",
+        "bass": "Sub Bass",
+        "lead": "Sine Whistle"
+      }
+    },
+    {
+      "name": "Gentle Interview",
+      "category": "podcast",
+      "blurb": "Warm tine keys, a hushed shaker and a barely-there flute",
+      "settings": {
+        "tonic": 5,
+        "mode": "Major-1",
+        "bpm": 82,
+        "progression": 1,
+        "barsPerChord": 2,
+        "padNotes": 3,
+        "leadActivity": 0.12,
+        "padWeights": {
+          "sustain": 50,
+          "pulse": 40,
+          "arpeggio": 10
+        },
+        "bassWeights": {
+          "whole": 80,
+          "half": 20,
+          "walking": 0
+        },
+        "drums": {
+          "style": "shaker",
+          "activity": 0.2,
+          "variation": 0.4
+        },
+        "swing": 0.15
+      },
+      "voices": {
+        "pad": "Tine Keys",
+        "bass": "Round Pluck Bass",
+        "lead": "Soft Flute"
+      }
+    },
+    {
+      "name": "Room Tone",
+      "category": "podcast",
+      "blurb": "A hazy pad and a little room air, no beat",
+      "settings": {
+        "tonic": 2,
+        "mode": "Major-2",
+        "bpm": 60,
+        "progression": 11,
+        "barsPerChord": 4,
+        "padNotes": 3,
+        "leadActivity": 0.08,
+        "padWeights": {
+          "sustain": 100,
+          "pulse": 0,
+          "arpeggio": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0
+        },
+        "drums": {
+          "style": "off"
+        },
+        "ambience": {
+          "wind": 0.08
+        },
+        "playAmbience": true
+      },
+      "voices": {
+        "pad": "Morning Haze",
+        "bass": "Sub Bass",
+        "lead": "Glass Lead"
+      }
+    },
+    {
+      "name": "Upbeat Explainer",
+      "category": "podcast",
+      "blurb": "Brighter major keys and a light shaker for a lively, friendly episode",
+      "settings": {
+        "tonic": 7,
+        "mode": "Major-1",
+        "bpm": 98,
+        "progression": 1,
+        "barsPerChord": 2,
+        "padNotes": 3,
+        "leadActivity": 0.15,
+        "padWeights": {
+          "sustain": 30,
+          "pulse": 60,
+          "arpeggio": 10
+        },
+        "bassWeights": {
+          "whole": 60,
+          "half": 40,
+          "walking": 0
+        },
+        "drums": {
+          "style": "shaker",
+          "activity": 0.3,
+          "variation": 0.5
+        },
+        "swing": 0.2
+      },
+      "voices": {
+        "pad": "Soft Keys",
+        "bass": "Round Pluck Bass",
+        "lead": "Kalimba Pluck"
+      }
+    },
+    {
+      "name": "Rain Under Speech",
+      "category": "podcast",
+      "blurb": "A faint pad under steady rain, no beat and almost no tune",
+      "settings": {
+        "tonic": 4,
+        "mode": "Major-6",
+        "bpm": 62,
+        "progression": 6,
+        "barsPerChord": 4,
+        "padNotes": 3,
+        "leadActivity": 0.08,
+        "padWeights": {
+          "sustain": 100,
+          "pulse": 0,
+          "arpeggio": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0
+        },
+        "drums": {
+          "style": "off"
+        },
+        "ambience": {
+          "rain": 0.3
+        },
+        "playAmbience": true
+      },
+      "voices": {
+        "pad": "Hollow Air",
+        "bass": "Sub Bass",
+        "lead": "Sine Whistle"
+      }
+    },
+    {
+      "name": "Late Show Lounge",
+      "category": "podcast",
+      "blurb": "Brushed drums, a warm upright and a few electric piano chords, low and smooth",
+      "settings": {
+        "tonic": 5,
+        "mode": "Major-2",
+        "bpm": 88,
+        "progression": 16,
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "leadActivity": 0.12,
+        "padWeights": {
+          "sustain": 50,
+          "pulse": 50,
+          "arpeggio": 0
+        },
+        "bassWeights": {
+          "whole": 30,
+          "half": 70,
+          "walking": 0
+        },
+        "drums": {
+          "style": "brushes",
+          "activity": 0.25,
+          "variation": 0.5
+        },
+        "swing": 0.4
+      },
+      "voices": {
+        "pad": "FM Rhodes",
+        "bass": "Upright Pluck",
+        "lead": "Soft Flute"
+      }
+    },
+    {
+      "name": "Sunday Reading",
+      "category": "focus",
+      "blurb": "Warm organ and a slow felt bass, hardly any melody",
+      "settings": {
+        "tonic": 0,
+        "mode": "Major-1",
+        "bpm": 68,
+        "progression": 1,
+        "barsPerChord": 4,
+        "padNotes": 4,
+        "leadActivity": 0.15,
+        "padWeights": {
+          "sustain": 90,
+          "pulse": 10,
+          "arpeggio": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0
+        },
+        "drums": {
+          "style": "off"
+        }
+      },
+      "voices": {
+        "pad": "Warm Organ",
+        "bass": "Felt Bass",
+        "lead": "Clarinet Lead"
+      }
+    },
+    {
+      "name": "Whiteboard",
+      "category": "focus",
+      "blurb": "A steady light lo-fi pulse and a soft marimba for brainstorming",
+      "settings": {
+        "tonic": 9,
+        "mode": "Major-2",
+        "bpm": 90,
+        "progression": 7,
+        "padNotes": 4,
+        "leadActivity": 0.25,
+        "padWeights": {
+          "sustain": 30,
+          "pulse": 50,
+          "arpeggio": 20
+        },
+        "bassWeights": {
+          "whole": 50,
+          "half": 50,
+          "walking": 0
+        },
+        "drums": {
+          "style": "lofi",
+          "activity": 0.3,
+          "variation": 0.5
+        },
+        "swing": 0.25
+      },
+      "voices": {
+        "pad": "Tine Keys",
+        "bass": "Warm Bass",
+        "lead": "Soft Marimba"
+      }
+    },
+    {
+      "name": "Lamplight",
+      "category": "cozy",
+      "blurb": "Music-box notes over a slow pad, a quiet fire nearby",
+      "settings": {
+        "tonic": 2,
+        "mode": "Major-1",
+        "bpm": 60,
+        "progression": 1,
+        "barsPerChord": 4,
+        "padNotes": 4,
+        "leadActivity": 0.3,
+        "padWeights": {
+          "sustain": 100,
+          "pulse": 0,
+          "arpeggio": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0
+        },
+        "drums": {
+          "style": "off"
+        },
+        "ambience": {
+          "fire": 0.2
+        },
+        "playAmbience": true
+      },
+      "voices": {
+        "pad": "Morning Haze",
+        "bass": "Warm Bass",
+        "lead": "Music Box"
+      }
+    },
+    {
+      "name": "Mushroom Kingdom Commute",
+      "category": "classics",
+      "blurb": "A bouncy platformer stroll: swung bass hops, bright chip lead, snappy beat",
+      "tags": [
+        "mario",
+        "platformer",
+        "bouncy"
+      ],
+      "settings": {
+        "tonic": 0,
+        "mode": "Major-1",
+        "bpm": 136,
+        "progression": 1,
+        "barsPerChord": 1,
+        "padNotes": 3,
+        "leadActivity": 0.85,
+        "leadDensity": 0.7,
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 70,
+          "arpeggio": 30,
+          "sequence": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 40,
+          "walking": 60,
+          "drive": 0
+        },
+        "drums": {
+          "style": "drive",
+          "activity": 0.4,
+          "variation": 0.5,
+          "sprinkle": 0.25,
+          "kit": "crisp"
+        },
+        "swing": 0.25,
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        }
+      },
+      "voices": {
+        "pad": "Pixel Piano",
+        "bass": "Chip Bass",
+        "lead": "Chip Lead"
+      }
+    },
+    {
+      "name": "Tall Grass Route",
+      "category": "classics",
+      "blurb": "Setting off on a long walk: bright major, a skipping bass and a whistle",
+      "tags": [
+        "pokemon",
+        "jrpg",
+        "route"
+      ],
+      "settings": {
+        "tonic": 7,
+        "mode": "Major-1",
+        "bpm": 120,
+        "progression": 1,
+        "barsPerChord": 1,
+        "padNotes": 3,
+        "leadActivity": 0.7,
+        "leadDensity": 0.5,
+        "padWeights": {
+          "sustain": 10,
+          "pulse": 50,
+          "arpeggio": 40,
+          "sequence": 0
+        },
+        "bassWeights": {
+          "whole": 10,
+          "half": 50,
+          "walking": 40,
+          "drive": 0
+        },
+        "drums": {
+          "style": "drive",
+          "activity": 0.3,
+          "variation": 0.4,
+          "kit": "crisp"
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "counter": {
+          "mode": "answer",
+          "activity": 0.4
+        }
+      },
+      "voices": {
+        "pad": "Arp Pluck",
+        "bass": "Round Pluck Bass",
+        "lead": "Organ Whistle",
+        "counter": "Soft Marimba"
+      }
+    },
+    {
+      "name": "Falling Blocks Folk Dance",
+      "category": "classics",
+      "blurb": "Fast minor folk dance, relentless but tidy, like stacking something under pressure",
+      "tags": [
+        "tetris",
+        "puzzle",
+        "folk"
+      ],
+      "settings": {
+        "tonic": 9,
+        "mode": "Major-6",
+        "bpm": 144,
+        "progression": 6,
+        "barsPerChord": 1,
+        "padNotes": 3,
+        "leadActivity": 0.9,
+        "leadDensity": 0.8,
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 60,
+          "arpeggio": 40,
+          "sequence": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 50,
+          "walking": 0,
+          "drive": 50
+        },
+        "drums": {
+          "style": "drive",
+          "activity": 0.4,
+          "variation": 0.3,
+          "kit": "crisp"
+        },
+        "sections": {
+          "mode": "strong",
+          "phrases": 2
+        },
+        "sectionTone": true
+      },
+      "voices": {
+        "pad": "Pixel Piano",
+        "bass": "Drive Bass",
+        "lead": "Squeezebox"
+      }
+    },
+    {
+      "name": "Haunted Staircase",
+      "category": "classics",
+      "blurb": "Gothic harpsichord-ish arpeggios, a pulsing bass and a hard beat in a ruined castle",
+      "tags": [
+        "castlevania",
+        "gothic",
+        "action"
+      ],
+      "settings": {
+        "tonic": 2,
+        "mode": "Major-6",
+        "bpm": 132,
+        "progression": 6,
+        "barsPerChord": 1,
+        "padNotes": 3,
+        "leadActivity": 0.9,
+        "leadDensity": 0.7,
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 30,
+          "arpeggio": 30,
+          "sequence": 40
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 20,
+          "walking": 0,
+          "drive": 80
+        },
+        "drums": {
+          "style": "drive",
+          "activity": 0.5,
+          "variation": 0.4,
+          "kit": "crisp"
+        },
+        "sections": {
+          "mode": "strong",
+          "phrases": 2
+        },
+        "sectionTone": true,
+        "counter": {
+          "mode": "harmony",
+          "activity": 0.5
+        }
+      },
+      "voices": {
+        "pad": "Arp Pluck",
+        "bass": "Drive Bass",
+        "lead": "Reed Lead",
+        "counter": "Organ Whistle"
+      }
+    },
+    {
+      "name": "Robot Factory Rush",
+      "category": "classics",
+      "blurb": "Bright minor, a fast sequence and a bouncing bass for a side-scrolling sprint",
+      "tags": [
+        "megaman",
+        "platformer",
+        "fast"
+      ],
+      "settings": {
+        "tonic": 4,
+        "mode": "Major-6",
+        "bpm": 152,
+        "progression": 6,
+        "barsPerChord": 1,
+        "padNotes": 3,
+        "leadActivity": 1,
+        "leadDensity": 0.9,
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 30,
+          "arpeggio": 0,
+          "sequence": 70
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 10,
+          "walking": 0,
+          "drive": 90
+        },
+        "drums": {
+          "style": "drive",
+          "activity": 0.55,
+          "variation": 0.4,
+          "kit": "crisp"
+        },
+        "sections": {
+          "mode": "strong",
+          "phrases": 2
+        },
+        "sectionTone": true,
+        "counter": {
+          "mode": "harmony",
+          "activity": 0.5
+        }
+      },
+      "voices": {
+        "pad": "Arp Pluck",
+        "bass": "Drive Bass",
+        "lead": "Racer Lead",
+        "counter": "Chip Lead"
+      }
+    },
+    {
+      "name": "Boss Fight, Politely",
+      "category": "classics",
+      "blurb": "Epic strings, a pounding bass and brass; a showdown that still lets you think",
+      "tags": [
+        "jrpg",
+        "boss",
+        "epic"
+      ],
+      "settings": {
+        "tonic": 2,
+        "mode": "Major-6",
+        "bpm": 148,
+        "progression": 6,
+        "barsPerChord": 1,
+        "padNotes": 4,
+        "leadActivity": 0.9,
+        "leadDensity": 0.7,
+        "padWeights": {
+          "sustain": 30,
+          "pulse": 40,
+          "arpeggio": 0,
+          "sequence": 30
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 20,
+          "walking": 0,
+          "drive": 80
+        },
+        "drums": {
+          "style": "drive",
+          "activity": 0.6,
+          "variation": 0.4,
+          "kit": "crisp"
+        },
+        "sections": {
+          "mode": "strong",
+          "phrases": 2
+        },
+        "sectionTone": true,
+        "counter": {
+          "mode": "harmony",
+          "activity": 0.6
+        }
+      },
+      "voices": {
+        "pad": "Heroic Strings",
+        "bass": "Drive Bass",
+        "lead": "Fanfare Brass",
+        "counter": "Pan Flute"
+      }
+    },
+    {
+      "name": "Bonfire Rest",
+      "category": "classics",
+      "blurb": "A quiet pause between dark places: slow minor harp, a low drone and a distant flute",
+      "tags": [
+        "souls",
+        "bonfire",
+        "calm"
+      ],
+      "settings": {
+        "tonic": 2,
+        "mode": "Major-6",
+        "bpm": 58,
+        "progression": 11,
+        "barsPerChord": 4,
+        "padNotes": 4,
+        "leadActivity": 0.3,
+        "padWeights": {
+          "sustain": 60,
+          "pulse": 0,
+          "arpeggio": 40,
+          "sequence": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "off"
+        },
+        "sections": {
+          "mode": "strong",
+          "phrases": 2
+        },
+        "sectionTone": true,
+        "ambience": {
+          "fire": 0.25,
+          "wind": 0.1
+        },
+        "playAmbience": true
+      },
+      "voices": {
+        "pad": "Soft Harp",
+        "bass": "Dark Drone",
+        "lead": "Ocarina"
+      }
+    },
+    {
+      "name": "Island Shop Hours",
+      "category": "sandbox",
+      "blurb": "Easy daytime pop: soft keys, a bouncy bass and a marimba, nothing hurried",
+      "tags": [
+        "animal-crossing",
+        "lounge",
+        "cozy"
+      ],
+      "settings": {
+        "tonic": 5,
+        "mode": "Major-1",
+        "bpm": 100,
+        "progression": 16,
+        "barsPerChord": 1,
+        "padNotes": 4,
+        "leadActivity": 0.5,
+        "leadDensity": 0.4,
+        "padWeights": {
+          "sustain": 20,
+          "pulse": 60,
+          "arpeggio": 20,
+          "sequence": 0
+        },
+        "bassWeights": {
+          "whole": 10,
+          "half": 50,
+          "walking": 40,
+          "drive": 0
+        },
+        "drums": {
+          "style": "shaker",
+          "activity": 0.4,
+          "variation": 0.5
+        },
+        "swing": 0.3,
+        "counter": {
+          "mode": "answer",
+          "activity": 0.4
+        }
+      },
+      "voices": {
+        "pad": "Soft Keys",
+        "bass": "Rubber Bass",
+        "lead": "Soft Marimba",
+        "counter": "Kalimba Pluck"
+      }
+    },
+    {
+      "name": "Quiet Blocky Cave",
+      "category": "sandbox",
+      "blurb": "Slow piano notes with long silences, a deep pad and dripping water",
+      "tags": [
+        "minecraft",
+        "cave",
+        "calm"
+      ],
+      "settings": {
+        "tonic": 0,
+        "mode": "Major-1",
+        "bpm": 60,
+        "progression": 1,
+        "barsPerChord": 4,
+        "padNotes": 3,
+        "leadActivity": 0.2,
+        "padWeights": {
+          "sustain": 100,
+          "pulse": 0,
+          "arpeggio": 0,
+          "sequence": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "off"
+        },
+        "ambience": {
+          "rain": 0.1
+        },
+        "playAmbience": true
+      },
+      "voices": {
+        "pad": "Spore Haze",
+        "bass": "Sub Bass",
+        "lead": "Felt Piano"
+      }
+    },
+    {
+      "name": "Seaside Hearth",
+      "category": "classics",
+      "blurb": "A celesta carrying the tune over steady strings, never settling: suspended minor chords, the sea in the distance",
+      "tags": [
+        "dark-souls",
+        "majula",
+        "melancholy",
+        "calm"
+      ],
+      "settings": {
+        "tonic": 9,
+        "mode": "Major-6",
+        "bpm": 60,
+        "progression": 17,
+        "barsPerChord": 2,
+        "padNotes": 3,
+        "chordColour": {
+          "mode": "floating",
+          "amount": 0.8
+        },
+        "leadActivity": 0.85,
+        "leadDensity": 0.1,
+        "padWeights": {
+          "sustain": 100,
+          "pulse": 0,
+          "arpeggio": 0,
+          "sequence": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "off"
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "ambience": {
+          "waves": 0.25,
+          "wind": 0.1
+        },
+        "ambienceShape": {
+          "waves": {
+            "distance": 0.35,
+            "period": 0.7
+          }
+        },
+        "playAmbience": true,
+        "chordSpread": "open",
+        "leadEnding": "open",
+        "leadRepeat": 0.35
+      },
+      "voices": {
+        "pad": "Warm Strings",
+        "bass": "Dark Drone",
+        "lead": "Haunted Celesta"
+      }
+    },
+    {
+      "name": "Drone and Drift",
+      "category": "night",
+      "blurb": "The bass sits on one note while the chords wander above it; slow, pulling, never quite arriving",
+      "tags": [
+        "pedal",
+        "drone",
+        "ambient"
+      ],
+      "settings": {
+        "tonic": 2,
+        "mode": "Major-2",
+        "bpm": 62,
+        "progression": 15,
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "leadActivity": 0.5,
+        "leadDensity": 0.1,
+        "padWeights": {
+          "sustain": 70,
+          "pulse": 0,
+          "arpeggio": 30,
+          "sequence": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "off"
+        },
+        "pedal": {
+          "mode": "tonic",
+          "amount": 0.85
+        },
+        "chordColour": {
+          "mode": "sus2",
+          "amount": 0.3
+        },
+        "chordSpread": "open",
+        "leadEnding": "open",
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        }
+      },
+      "voices": {
+        "pad": "Velvet Pad",
+        "bass": "Dark Drone",
+        "lead": "Sine Whistle"
+      }
+    },
+    {
+      "name": "Bittersweet Sunday",
+      "category": "cozy",
+      "blurb": "A warm major key that keeps slipping into the minor, like remembering something fondly",
+      "tags": [
+        "borrowed",
+        "major",
+        "nostalgic"
+      ],
+      "settings": {
+        "tonic": 7,
+        "mode": "Major-1",
+        "bpm": 78,
+        "progression": 1,
+        "barsPerChord": 1,
+        "padNotes": 4,
+        "leadActivity": 0.6,
+        "leadDensity": 0.15,
+        "padWeights": {
+          "sustain": 30,
+          "pulse": 40,
+          "arpeggio": 30,
+          "sequence": 0
+        },
+        "bassWeights": {
+          "whole": 40,
+          "half": 60,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "brushes",
+          "activity": 0.3,
+          "variation": 0.5
+        },
+        "swing": 0.25,
+        "chordBorrow": 0.4,
+        "leadRepeat": 0.3,
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        }
+      },
+      "voices": {
+        "pad": "FM Rhodes",
+        "bass": "Felt Bass",
+        "lead": "Clarinet Lead"
+      }
+    },
+    {
+      "name": "Five Notes Only",
+      "category": "focus",
+      "blurb": "A pentatonic lead that can't hit a wrong note, stepping gently and returning to its tune",
+      "tags": [
+        "pentatonic",
+        "stepwise",
+        "repeat"
+      ],
+      "settings": {
+        "tonic": 4,
+        "mode": "Major-1",
+        "bpm": 84,
+        "progression": 10,
+        "barsPerChord": 2,
+        "padNotes": 3,
+        "leadActivity": 0.8,
+        "leadDensity": 0.15,
+        "padWeights": {
+          "sustain": 40,
+          "pulse": 40,
+          "arpeggio": 20,
+          "sequence": 0
+        },
+        "bassWeights": {
+          "whole": 70,
+          "half": 30,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "shaker",
+          "activity": 0.25,
+          "variation": 0.4
+        },
+        "leadScale": "pentatonic",
+        "leadLeaps": 0.2,
+        "leadRepeat": 0.55,
+        "swing": 0.15
+      },
+      "voices": {
+        "pad": "Soft Keys",
+        "bass": "Round Pluck Bass",
+        "lead": "Kalimba Pluck"
+      }
+    },
+    {
+      "name": "Wide Open Plains",
+      "category": "night",
+      "blurb": "Wide-spread strings with an added ninth, a held fifth in the bass and a lead that never quite lands",
+      "tags": [
+        "open",
+        "strings",
+        "cinematic"
+      ],
+      "settings": {
+        "tonic": 9,
+        "mode": "Major-1",
+        "bpm": 70,
+        "progression": 1,
+        "barsPerChord": 2,
+        "padNotes": 3,
+        "leadActivity": 0.55,
+        "leadDensity": 0.1,
+        "padWeights": {
+          "sustain": 100,
+          "pulse": 0,
+          "arpeggio": 0,
+          "sequence": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "off"
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.7
+        },
+        "chordSpread": "open",
+        "pedal": {
+          "mode": "fifth",
+          "amount": 0.4
+        },
+        "leadEnding": "open",
+        "leadLeaps": 0.65,
+        "sections": {
+          "mode": "strong",
+          "phrases": 2
+        },
+        "sectionTone": true,
+        "ambience": {
+          "wind": 0.15
+        },
+        "playAmbience": true
+      },
+      "voices": {
+        "pad": "Warm Strings",
+        "bass": "Sub Bass",
+        "lead": "Pan Flute"
+      }
+    },
+    {
+      "name": "Same Tune, Slightly Different",
+      "category": "cozy",
+      "blurb": "A small, hummable melody that keeps coming back, with the chords shifting underneath",
+      "tags": [
+        "repeat",
+        "hummable",
+        "music-box"
+      ],
+      "settings": {
+        "tonic": 0,
+        "mode": "Major-1",
+        "bpm": 88,
+        "progression": 16,
+        "barsPerChord": 2,
+        "padNotes": 3,
+        "leadActivity": 0.9,
+        "leadDensity": 0.1,
+        "padWeights": {
+          "sustain": 20,
+          "pulse": 30,
+          "arpeggio": 50,
+          "sequence": 0
+        },
+        "bassWeights": {
+          "whole": 60,
+          "half": 40,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "off"
+        },
+        "leadRepeat": 0.85,
+        "leadLeaps": 0.4,
+        "chordColour": {
+          "mode": "add6",
+          "amount": 0.3
+        }
+      },
+      "voices": {
+        "pad": "Harp Pluck",
+        "bass": "Warm Bass",
+        "lead": "Music Box"
+      }
+    },
+    {
+      "name": "Almost Home",
+      "category": "night",
+      "blurb": "A minor-key tune that always stops one step short, over chords that stay suspended",
+      "tags": [
+        "unresolved",
+        "suspended",
+        "minor"
+      ],
+      "settings": {
+        "tonic": 5,
+        "mode": "Major-6",
+        "bpm": 64,
+        "progression": 17,
+        "barsPerChord": 2,
+        "padNotes": 3,
+        "leadActivity": 0.7,
+        "leadDensity": 0.1,
+        "padWeights": {
+          "sustain": 70,
+          "pulse": 0,
+          "arpeggio": 30,
+          "sequence": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "heartbeat",
+          "activity": 0.2,
+          "variation": 0.3
+        },
+        "chordColour": {
+          "mode": "floating",
+          "amount": 0.9
+        },
+        "leadEnding": "open",
+        "chordBorrow": 0.25,
+        "leadRepeat": 0.3,
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        }
+      },
+      "voices": {
+        "pad": "Choir Ah",
+        "bass": "Deep Throb",
+        "lead": "Haunted Celesta"
       }
     }
   ]

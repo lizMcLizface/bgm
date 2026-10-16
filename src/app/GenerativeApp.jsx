@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Generator, { ROLES, PERC_ROLE } from './Generator';
 import { DRUM_STYLES, DRUM_KITS, DRUMS, DRUM_LABELS, DRUM_PARAMS, randomDrums } from './percussion';
-import { SCALE_FAMILIES, TONIC_NAMES, scaleById } from './theory';
+import { SCALE_FAMILIES, TONIC_NAMES, CHORD_COLOURS, scaleById } from './theory';
 import ChordTimeline from './ChordTimeline';
 import { RoleButtons, TrackStrip, useLivePlay, DRUM_KEY_HINT } from './Tracks';
 import { defaultSettings, shareFromLocation, sharePath, shareUrl, newSeed } from './settings';
@@ -10,17 +10,18 @@ import PresetPicker from './editor/PresetPicker';
 import PROGRESSIONS, { PROGRESSION_LENGTHS, progressionsOfLength } from './progressions';
 import {
     PAD_STYLES, BASS_STYLES, PULSE_PATTERNS, ARP_PATTERNS, styleShares, OCTAVE_LIMITS, OCTAVE_WANDER, COUNTER_MODES, SECTION_MODES, SECTION_LENGTHS,
+    PEDAL_MODES, SPREADS, LEAD_SCALES, LEAD_ENDINGS,
 } from './arranger';
 import { DRIFT_MODES, BPM_LIMITS } from './conductor';
 import { METERS } from './meter';
 import {
     RANDOM_LEVELS, RANDOM_LEVEL_HINTS, randomKey, randomProgression, randomConductor, randomVoices, randomField, randomPreset, randomLength,
     randomArrangement, randomStyleWeights, randomRole, progressionLength, progressionForLength, randomAmbience, randomAmbienceShape,
-    randomPadMotion, randomSwing,
+    randomPadMotion, randomSwing, randomColour,
 } from './randomize';
 import { MasterVolume, SettingsMenu, AudioMenu, ThemeToggle } from './AudioStatus';
 import { SleepTimer, Recorder } from './Playback';
-import { sceneSettings, sceneGroup, buildSetup, parseSetup, sceneBySlug, sceneSlug, presetFromSearch, SCENES } from './scenes';
+import { sceneSettings, sceneGroup, buildSetup, parseSetup, sceneBySlug, sceneSlug, presetFromSearch, SCENES, SCENE_CATEGORIES } from './scenes';
 import PresetBrowser from './PresetBrowser';
 import { saveUserScene, deleteUserScene, isUserScene } from './setupStore';
 import { ROLE_PRESETS } from './presets';
@@ -517,6 +518,8 @@ const PART_TITLE = 'Turn this part on or off. Turning it on also starts playing.
 
 // Space plays / stops - unless typing, or on a control Space presses itself.
 const spaceTarget = (target) => target && (['INPUT', 'SELECT', 'TEXTAREA', 'BUTTON', 'SUMMARY', 'A'].includes(target.tagName) || target.isContentEditable);
+// Typing targets only: [ and ] still work with a button focused (the preset browser's trigger is one).
+const typingTarget = (target) => target && (['INPUT', 'SELECT', 'TEXTAREA'].includes(target.tagName) || target.isContentEditable);
 
 const octaveLabel = (o) => (o === 0 ? 'Default' : `${o > 0 ? '+' : '−'}${Math.abs(o)} octave${Math.abs(o) > 1 ? 's' : ''}`);
 const PAD_NOTES = { 3: 'Triads (3)', 4: 'Sevenths (4)', 5: 'Ninths (5)' };
@@ -587,6 +590,71 @@ const PadPlaying = ({ settings, update, level }) => {
                 </Field>
             </fieldset>
         </>
+    );
+};
+
+// Colour: an extra layer of mood over the key and progression - chords that
+// are suspended, borrowed or spread wide, a held bass note, and how the lead
+// moves and ends. Each is off or neutral by default.
+const percent = (v) => `${Math.round(v * 100)}%`;
+const ColourPanel = ({ settings, update, onRandom }) => {
+    const { chordColour: colour, pedal } = settings;
+    return (
+        <Panel id="colour" title="Colour" onRandom={onRandom}>
+            <div className="gen-row">
+                <Field label="Chord colour">
+                    <select value={colour.mode} onChange={(e) => update('chordColour', { ...colour, mode: e.target.value })}>
+                        {Object.entries(CHORD_COLOURS).map(([id, text]) => <option key={id} value={id}>{text}</option>)}
+                    </select>
+                </Field>
+                <Field label={colour.mode === 'plain' ? 'Colour on: none' : `Colour on ${percent(colour.amount)} of chords`}>
+                    <input type="range" min="0" max="1" step="0.05" value={colour.amount} disabled={colour.mode === 'plain'}
+                        title="Which chords is set by the seed, so a new variation colours different ones"
+                        onChange={(e) => update('chordColour', { ...colour, amount: Number(e.target.value) })} />
+                </Field>
+                <Field label={settings.chordBorrow ? `Borrowed chords on ${percent(settings.chordBorrow)}` : 'Borrowed chords: none'}>
+                    <input type="range" min="0" max="1" step="0.05" value={settings.chordBorrow}
+                        title="Chords from the parallel mode: the major IV or V in a minor key, the minor iv or flat VI / VII in a major one"
+                        onChange={(e) => update('chordBorrow', Number(e.target.value))} />
+                </Field>
+                <Field label="Pad voicing">
+                    <select value={settings.chordSpread} onChange={(e) => update('chordSpread', e.target.value)}>
+                        {Object.entries(SPREADS).map(([id, text]) => <option key={id} value={id}>{text}</option>)}
+                    </select>
+                </Field>
+            </div>
+            <div className="gen-row">
+                <Field label="Bass pedal note">
+                    <select value={pedal.mode} onChange={(e) => update('pedal', { ...pedal, mode: e.target.value })}>
+                        {Object.entries(PEDAL_MODES).map(([id, text]) => <option key={id} value={id}>{text}</option>)}
+                    </select>
+                </Field>
+                <Field label={pedal.mode === 'off' ? 'Pedal in: none' : `Pedal in ${percent(pedal.amount)} of phrases`}>
+                    <input type="range" min="0" max="1" step="0.05" value={pedal.amount} disabled={pedal.mode === 'off'}
+                        title="The bass holds the key's tonic (or fifth) through the phrase while the chords move above it"
+                        onChange={(e) => update('pedal', { ...pedal, amount: Number(e.target.value) })} />
+                </Field>
+                <Field label="Lead notes">
+                    <select value={settings.leadScale} onChange={(e) => update('leadScale', e.target.value)}>
+                        {Object.entries(LEAD_SCALES).map(([id, text]) => <option key={id} value={id}>{text}</option>)}
+                    </select>
+                </Field>
+                <Field label={`Lead leaps: ${settings.leadLeaps < 0.4 ? 'stepwise' : settings.leadLeaps > 0.6 ? 'leapy' : 'as drawn'}`}>
+                    <input type="range" min="0" max="1" step="0.05" value={settings.leadLeaps}
+                        onChange={(e) => update('leadLeaps', Number(e.target.value))} />
+                </Field>
+                <Field label={settings.leadRepeat ? `Lead repeats its tune ${percent(settings.leadRepeat)}` : 'Lead repeats its tune: never'}>
+                    <input type="range" min="0" max="1" step="0.05" value={settings.leadRepeat}
+                        title="How often a phrase with lead plays the previous phrase's tune again"
+                        onChange={(e) => update('leadRepeat', Number(e.target.value))} />
+                </Field>
+                <Field label="Phrase endings">
+                    <select value={settings.leadEnding} onChange={(e) => update('leadEnding', e.target.value)}>
+                        {Object.entries(LEAD_ENDINGS).map(([id, text]) => <option key={id} value={id}>{text}</option>)}
+                    </select>
+                </Field>
+            </div>
+        </Panel>
     );
 };
 
@@ -902,6 +970,7 @@ const GenerativeApp = () => {
         if (music || target === 'key') patch = randomKey(current, level, Math.random, { matchProgression: !music });
         if (music || target === 'progression') patch = { ...patch, ...randomProgression({ ...current, ...patch }, level) };
         if (all || target === 'arrangement') patch = { ...patch, ...randomArrangement(current, level) };
+        if (all) patch = { ...patch, ...randomColour(level) };
         if (all || target === 'conductor') patch = { ...patch, ...randomConductor(current, level) };
         if (all || target === 'voices') {
             const names = Object.fromEntries(Object.entries(roles).map(([role, { presetName }]) => [role, presetName]));
@@ -1078,8 +1147,16 @@ const GenerativeApp = () => {
     const previousVariation = () => {
         if (seeds.current.length) loadSettings({ seed: seeds.current.pop() });
     };
+    // Next / previous built-in preset in the browser's order ([ and ] keys).
+    const stepPreset = (dir) => {
+        const rank = (s) => SCENE_CATEGORIES.findIndex((c) => c.id === s.category);
+        const ordered = SCENES.map((s, i) => ({ s, i })).sort((a, b) => rank(a.s) - rank(b.s) || a.i - b.i).map(({ s }) => s);
+        const at = ordered.findIndex((s) => s.name === scene);
+        const next = at < 0 ? (dir > 0 ? 0 : ordered.length - 1) : (at + dir + ordered.length) % ordered.length;
+        applyScene(ordered[next]);
+    };
     const handlers = useRef({});
-    handlers.current = { play, stop, toggle, newVariation, previousVariation };
+    handlers.current = { play, stop, toggle, newVariation, previousVariation, stepPreset };
     useEffect(() => {
         setupMediaSession({
             play: () => handlers.current.play(),
@@ -1088,6 +1165,11 @@ const GenerativeApp = () => {
             previous: () => handlers.current.previousVariation(),
         });
         const onKey = (e) => {
+            if ((e.key === '[' || e.key === ']') && !e.repeat && !e.ctrlKey && !e.metaKey && !e.altKey && !typingTarget(e.target)) {
+                e.preventDefault();
+                handlers.current.stepPreset(e.key === ']' ? 1 : -1);
+                return;
+            }
             if (e.code !== 'Space' || e.repeat || e.ctrlKey || e.metaKey || e.altKey || spaceTarget(e.target)) return;
             e.preventDefault();
             handlers.current.toggle();
@@ -1196,6 +1278,8 @@ const GenerativeApp = () => {
                 </div>
                 <NowPlaying now={now} settings={settings} onKeep={keepCurrent} />
             </Panel>
+
+            <ColourPanel settings={settings} update={update} onRandom={() => loadSettings(randomColour(randomLevel))} />
 
             <Evolution drift={settings.drift} home={{ tonic: settings.tonic, mode: settings.mode }} onChange={(drift) => update('drift', drift)}
                 onRandom={() => randomize('conductor')} />

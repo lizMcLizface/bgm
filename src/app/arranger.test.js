@@ -1,4 +1,4 @@
-import { arrangeBar, notesInRange, styleShares, PAD_RANGE, BASS_RANGE, LEAD_RANGE, PHRASE_BARS, DEFAULT_PAD_WEIGHTS, DEFAULT_BASS_WEIGHTS, DEFAULT_VOICES, OCTAVE_LIMITS } from './arranger';
+import { arrangeBar, notesInRange, styleShares, PAD_RANGE, BASS_RANGE, LEAD_RANGE, PHRASE_BARS, DEFAULT_PAD_WEIGHTS, DEFAULT_BASS_WEIGHTS, DEFAULT_VOICES, OCTAVE_LIMITS, pentatonicOf, openVoicing } from './arranger';
 import { scaleById, scaleSemitones, diatonicChord } from './theory';
 import { seeded } from './random';
 import { METERS, groupStarts, beatStarts } from './meter';
@@ -438,5 +438,63 @@ describe('lead density', () => {
                 expect(e.midi).toBeLessThanOrEqual(LEAD_RANGE[1]);
             });
         })));
+    });
+});
+
+describe('the colour layer', () => {
+    test('pentatonic drops the 4th and 7th of a major scale, the 2nd and 6th of a minor one', () => {
+        expect(pentatonicOf([0, 2, 4, 5, 7, 9, 11])).toEqual([0, 2, 4, 7, 9]);
+        expect(pentatonicOf([0, 2, 3, 5, 7, 8, 10])).toEqual([0, 3, 5, 7, 10]);
+        expect(pentatonicOf([0, 2, 4, 7, 9])).toEqual([0, 2, 4, 7, 9]);
+    });
+    test('an open voicing drops the second note from the top an octave', () => {
+        expect(openVoicing([60, 64, 67], 55)).toEqual([52, 60, 67]);
+        expect(openVoicing([60, 67], 55)).toEqual([60, 67]);
+    });
+});
+
+describe('the colour layer in a piece', () => {
+    const lead = { ...AUTO, leadActivity: 1 };
+    const withColour = (extra) => ({ ...lead, ...extra });
+
+    test('off, it changes nothing', () => {
+        const neutral = { pedal: { mode: 'off', amount: 1 }, leadScale: 'full', leadLeaps: 0.5, leadRepeat: 0, leadEnding: 'settled', chordSpread: 'close' };
+        expect(run({ seed: 5, settings: withColour(neutral) })).toEqual(run({ seed: 5, settings: lead }));
+    });
+
+    test('a tonic pedal: the bass stays on the key\'s tonic under every chord', () => {
+        SEEDS.forEach((seed) => run({ seed, tonic: 2, settings: withColour({ pedal: { mode: 'tonic', amount: 1 } }) })
+            .forEach((bar) => byRole(bar, 'bass').forEach((e) => expect(pc(e.midi)).toBe(2))));
+    });
+
+    test('a fifth pedal sits on the fifth', () => {
+        run({ seed: 3, tonic: 0, settings: withColour({ pedal: { mode: 'fifth', amount: 1 } }) })
+            .forEach((bar) => byRole(bar, 'bass').forEach((e) => expect(pc(e.midi)).toBe(7)));
+    });
+
+    test('a pentatonic lead avoids the 4th and 7th in major, stepping between chord tones', () => {
+        // chord tones may still be anything; steps are the notes a pentatonic lead gives up
+        const bars = run({ seed: 4, bars: 64, degrees: [1], settings: withColour({ leadScale: 'pentatonic' }) });
+        const leads = bars.flatMap((bar) => byRole(bar, 'lead')).map((e) => pc(e.midi));
+        expect(leads.length).toBeGreaterThan(20);
+        expect(leads.filter((n) => [5, 11].includes(n)).length).toBeLessThan(leads.length * 0.1);
+    });
+
+    test('repeating: with leadRepeat 1, every following phrase replays the first tune', () => {
+        const bars = run({ seed: 6, bars: 16, settings: withColour({ leadRepeat: 1 }) });
+        const phrases = [0, 1, 2, 3].map((p) => bars[p * PHRASE_BARS].state.phrase);
+        phrases.slice(1).forEach((phrase) => expect(phrase.motif).toEqual(phrases[0].motif));
+    });
+
+    test('open endings finish on the fifth or the 2nd, not the root or third', () => {
+        const bars = run({ seed: 7, bars: 64, degrees: [1], settings: withColour({ leadEnding: 'open' }) });
+        const lasts = bars.filter((bar) => bar.bar % PHRASE_BARS === PHRASE_BARS - 1).map((bar) => byRole(bar, 'lead').pop()).filter(Boolean);
+        expect(lasts.length).toBeGreaterThan(3);
+        lasts.forEach((e) => expect([7, 2]).toContain(pc(e.midi)));
+    });
+
+    test('an open pad voicing stays within one octave below and the register above', () => {
+        run({ seed: 2, settings: withColour({ chordSpread: 'open', padWeights: pads('sustain') }) })
+            .forEach((bar) => byRole(bar, 'pad').forEach((e) => { expect(e.midi).toBeGreaterThanOrEqual(PAD_RANGE[0] - 12); expect(e.midi).toBeLessThanOrEqual(PAD_RANGE[1]); }));
     });
 });
