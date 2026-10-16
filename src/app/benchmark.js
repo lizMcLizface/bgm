@@ -80,14 +80,15 @@ export function echoCheck(gen) {
             rows.push({ role, effect: 'all', asleep: true });
             return;
         }
-        const checks = [
-            ['pingPong', inst.pingPong.getFeedback(), inst.preset.pingPongFeedback || 0],
-            ['delay', inst.delay.getFeedback(), inst.preset.delayFeedback || 0],
-        ];
-        checks.forEach(([name, actual, wanted]) => {
-            const problem = actual >= 0.9 ? 'near 1: never dies away' : Math.abs(actual - wanted) > 0.02 ? 'differs from the preset' : null;
-            if (problem || wanted > 0) rows.push({ role, effect: name, actual: round(actual), preset: round(wanted), problem });
-        });
+        const inChain = new Set(inst.activeEffects());
+        const wrong = inst.auditEchoes();
+        [['pingPong', inst.pingPong.getFeedback(), inst.preset.pingPongFeedback || 0], ['delay', inst.delay.getFeedback(), inst.preset.delayFeedback || 0]]
+            .filter(([name]) => inChain.has(name))
+            .forEach(([name, actual, wanted]) => {
+                const mismatch = wrong.some((w) => w.effect === name);
+                const problem = mismatch ? 'differs from the preset' : actual >= 0.9 && wanted < 0.9 ? 'near 1: never dies away' : null;
+                if (problem || wanted > 0) rows.push({ role, effect: name, actual: round(actual), preset: round(wanted), problem });
+            });
     });
     return rows;
 }

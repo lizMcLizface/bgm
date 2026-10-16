@@ -278,6 +278,33 @@ class Generator {
 
     notifyRunning() {
         this.runningListeners.forEach((listener) => listener(this.isRunning));
+        this.watchEchoes();
+    }
+
+    /**
+     * While playing, every few seconds, warns in the console (once per
+     * case) about a delay whose real feedback differs from its preset - the
+     * mark of a stuck echo. It only reports; a preset may want feedback of 1.
+     */
+    watchEchoes() {
+        if (!this.isRunning) {
+            clearInterval(this.echoWatch);
+            this.echoWatch = null;
+            return;
+        }
+        if (this.echoWatch) return;
+        const reported = new Set();
+        this.echoWatch = setInterval(() => {
+            Object.entries(this.roles).forEach(([role, { instrument }]) => {
+                if (!instrument.auditEchoes) return;
+                instrument.auditEchoes().forEach(({ effect, actual, preset }) => {
+                    const key = `${role}/${effect}/${actual.toFixed(2)}/${preset}`;
+                    if (reported.has(key)) return;
+                    reported.add(key);
+                    console.warn(`bgm: ${role} ${effect} feedback is ${actual.toFixed(2)} but its preset says ${preset} - a stuck echo? (Audio menu > Benchmark has the details)`);
+                });
+            });
+        }, 5000);
     }
 
     /**

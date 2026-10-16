@@ -492,6 +492,24 @@ class Instrument {
         this.heldUntil = until;
     }
 
+    /**
+     * Delays whose feedback on the audio node is not what the preset says:
+     * a diagnostic for stuck echoes (a node left at its default of 1 by a
+     * scheduling race). Only a chain that is awake and a delay in the chain
+     * can be read - a sleeping or bypassed node is never rendered, so it
+     * reads its default whatever was set. A preset that really asks for 1
+     * matches and is not reported.
+     */
+    auditEchoes() {
+        if (!this.effectsAwake()) return [];
+        const inChain = new Set(this.activeEffects());
+        return [
+            ['pingPong', this.pingPong.getFeedback(), this.preset.pingPongFeedback || 0],
+            ['delay', this.delay.getFeedback(), this.preset.delayFeedback || 0],
+        ].filter(([name, actual, wanted]) => inChain.has(name) && Math.abs(actual - wanted) > 0.02)
+            .map(([effect, actual, preset]) => ({ effect, actual, preset }));
+    }
+
     /** Effects currently in the signal path (for diagnostics). */
     activeEffects() {
         return this.chainSignature ? this.chainSignature.split(',').filter(Boolean) : [];
