@@ -457,6 +457,83 @@ body {
     font-size: 13px;
 }
 
+.gen-voice-button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
+    text-align: left;
+}
+
+.gen-voice-button > span:first-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* The voice picker (editor/VoiceBrowser.jsx) borrows the preset browser's window. */
+.gen-vb {
+    grid-template-rows: auto minmax(0, 1fr);
+}
+
+.gen-vb .gen-pb-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+
+.gen-vb-hint {
+    flex-basis: 100%;
+    color: var(--gen-muted);
+    font-size: 12px;
+}
+
+/* The box round a voice beside the timeline: its colour, name and sound. */
+.gen .gen-track button.gen-track-box,
+.gen .gen-track-box {
+    box-sizing: border-box;
+    min-height: 0;
+    box-shadow: none;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--gen-text);
+    font: inherit;
+    font-size: 13px;
+    text-align: left;
+}
+
+.gen .gen-track-box .gen-swatch {
+    flex: none;
+}
+
+.gen .gen-track-box .gen-track-preset {
+    flex: 1;
+}
+
+.gen button.gen-track-box {
+    cursor: pointer;
+}
+
+/* The box covers the whole voice: its name and sound, and its buttons below. */
+.gen-track {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 5px 8px 6px;
+    border: 1px solid var(--gen-border);
+    border-radius: 6px;
+    background: var(--gen-bg);
+}
+
+.gen-track.is-pickable {
+    cursor: pointer;
+}
+
+.gen-track.is-pickable:hover {
+    border-color: var(--gen-accent);
+}
+
 .gen-track-name {
     display: flex;
     align-items: center;

@@ -240,13 +240,13 @@ const Transport = ({ gen, anyOn, onToggle, onChange }) => {
     return (
         <div className="gen-transport" role="toolbar" aria-label="Playback">
             {button('Back to the start', <ToStartIcon />, act(() => gen.rewind()), atStart && gen.hereBar === 0)}
-            {button('Back to the start of this progression, or the one before', <ProgressionBackIcon />, act(() => gen.step('progression', -1)), atStart)}
-            {button('Back to the start of this chord, or the one before', <BarBackIcon />, act(() => gen.step('chord', -1)), atStart)}
+            {button('Back to the start of this progression, or the one before (Shift + ←)', <ProgressionBackIcon />, act(() => gen.step('progression', -1)), atStart)}
+            {button('Back to the start of this chord, or the one before (←)', <BarBackIcon />, act(() => gen.step('chord', -1)), atStart)}
             <button type="button" className="gen-play" onClick={onToggle} title={`${anyOn ? 'Pause' : 'Play'} (Space)`} aria-label={anyOn ? 'Pause' : 'Play'}>
                 {anyOn ? <PauseIcon /> : <PlayIcon />}
             </button>
-            {button('Forward one chord', <BarForwardIcon />, act(() => gen.step('chord', 1)))}
-            {button('Forward one progression', <ProgressionForwardIcon />, act(() => gen.step('progression', 1)))}
+            {button('Forward one chord (→)', <BarForwardIcon />, act(() => gen.step('chord', 1)))}
+            {button('Forward one progression (Shift + →)', <ProgressionForwardIcon />, act(() => gen.step('progression', 1)))}
             <button type="button" className={`gen-icon-button gen-loop${loop !== 'off' ? ' is-on' : ''}`} aria-pressed={loop !== 'off'}
                 title="Loop the chord playing, then the whole progression, then off" onClick={act(() => gen.setLoop(LOOP_NEXT[loop]))}>
                 <LoopIcon />{loop !== 'off' && <span>{loop}</span>}
@@ -847,6 +847,17 @@ const GenerativeApp = () => {
     const [editorRole, setEditorRole] = useState(Object.keys(ROLES)[0]);
     const [mix, setMix] = useState(() => Object.fromEntries([...Object.keys(ROLES), 'perc'].map((role) => [role, { mute: gen.roles[role].mute, solo: false }])));
     const [armed, setArmed] = useState(null);
+    // Which voice's sound picker is open (null: none).
+    const [pickerRole, setPickerRole] = useState(null);
+    // Opening a voice's picker arms the keyboard for it (so the sounds can be tried by playing),
+    // and closing it puts the arming back as it was.
+    const armedBefore = useRef(null);
+    const choosePicker = (role) => {
+        if (role && pickerRole === null) armedBefore.current = armed;
+        if (role) setArmed(role);
+        else if (pickerRole !== null) setArmed(armedBefore.current);
+        setPickerRole(role);
+    };
     const live = useLivePlay(gen, armed);
     // mutes are settings (kept in the address bar and links), solo isn't
     const changeMix = (role, patch) => {
@@ -1156,7 +1167,12 @@ const GenerativeApp = () => {
         applyScene(ordered[next]);
     };
     const handlers = useRef({});
-    handlers.current = { play, stop, toggle, newVariation, previousVariation, stepPreset };
+    // Move around the piece from the keyboard: a chord / a progression back or on.
+    const move = async (unit, dir) => {
+        await gen.step(unit, dir);
+        setNow((n) => n + 1);
+    };
+    handlers.current = { play, stop, toggle, newVariation, previousVariation, stepPreset, move };
     useEffect(() => {
         setupMediaSession({
             play: () => handlers.current.play(),
@@ -1165,9 +1181,17 @@ const GenerativeApp = () => {
             previous: () => handlers.current.previousVariation(),
         });
         const onKey = (e) => {
-            if ((e.key === '[' || e.key === ']') && !e.repeat && !e.ctrlKey && !e.metaKey && !e.altKey && !typingTarget(e.target)) {
+            // A window over the page (the preset browser, the sound picker) has its own keys.
+            if (document.querySelector('.gen-pb-backdrop') || e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
+            if ((e.key === '[' || e.key === ']') && !typingTarget(e.target)) {
                 e.preventDefault();
                 handlers.current.stepPreset(e.key === ']' ? 1 : -1);
+                return;
+            }
+            // Arrows: a chord back / on, with Shift a progression - unless a field is using the arrows.
+            if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && !typingTarget(e.target) && !(e.target && e.target.type === 'range')) {
+                e.preventDefault();
+                handlers.current.move(e.shiftKey ? 'progression' : 'chord', e.key === 'ArrowRight' ? 1 : -1);
                 return;
             }
             if (e.code !== 'Space' || e.repeat || e.ctrlKey || e.metaKey || e.altKey || spaceTarget(e.target)) return;
@@ -1226,7 +1250,7 @@ const GenerativeApp = () => {
             <ChordTimeline
                 generator={gen}
                 tracks={<TrackStrip roles={shownTracks} presets={Object.fromEntries(Object.entries(roles).map(([role, { presetName, edited }]) => [role, { name: presetName, edited }]))} mix={mix} armed={armed} onMix={changeMix} onArm={setArmed} onEdit={editSound}
-                    onRandom={randomizePreset} onGenerate={generateForRole} generating={generating} live={live} />}
+                    onRandom={randomizePreset} onGenerate={generateForRole} onPick={choosePicker} generating={generating} live={live} />}
             />
 
             <Randomizer level={randomLevel} onLevel={setRandomLevel} onRandomize={randomize} onNewVariation={newVariation} />
@@ -1384,7 +1408,8 @@ const GenerativeApp = () => {
                     )}
                 >
                     <Field label="Preset" onRandom={() => randomizePreset(role)} onGenerate={() => generateForRole(role)} generating={generating[role]} wide>
-                        <PresetPicker value={roles[role].presetName} edited={roles[role].edited} onChange={(name) => loadPreset(role, name)} role={role} />
+                        <PresetPicker value={roles[role].presetName} edited={roles[role].edited} onChange={(name) => loadPreset(role, name)} role={role}
+                            open={pickerRole === role} onOpenChange={(open) => choosePicker(open ? role : null)} />
                     </Field>
                     <Field label="Kind of new sound">
                         <select value={soundKinds[role]} title="What the ✦ button makes for this voice"

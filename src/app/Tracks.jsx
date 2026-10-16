@@ -153,19 +153,33 @@ export function useLivePlay(generator, armed) {
 
 /** The strip beside the timeline: one row per role, then the keys hint. */
 /** presets: role -> { name, edited } (shown beside the role's name). */
-export const TrackStrip = ({ roles, presets, mix, armed, onMix, onArm, onEdit, onRandom, onGenerate, generating, live }) => (
+export const TrackStrip = ({ roles, presets, mix, armed, onMix, onArm, onEdit, onRandom, onGenerate, onPick, generating, live }) => (
     <div className="gen-tracks">
         {Object.entries(roles).map(([role, { label }]) => (
-            <div key={role} className="gen-track">
-                <span className="gen-track-name">
-                    <i className={`gen-swatch gen-swatch-${role}`} />
-                    {label.split(' / ')[0]}
-                    {presets[role] && (
-                        <span className="gen-track-preset" title={presets[role].name}>
-                            {presets[role].name}{presets[role].edited ? ' (edited)' : ''}
-                        </span>
-                    )}
-                </span>
+            <div key={role} className={`gen-track${onPick && role !== 'perc' ? ' is-pickable' : ''}`}
+                // the whole box opens the sound picker; its own buttons (M, S, dice ...) keep their jobs
+                onClick={onPick && role !== 'perc' ? (e) => { if (!e.target.closest('button')) onPick(role); } : undefined}>
+                {/* a box round the voice: its colour, name and sound; a click opens the sound picker */}
+                {onPick && role !== 'perc' ? (
+                    <button type="button" className="gen-track-name gen-track-box" onClick={() => onPick(role)}
+                        title={`Choose the ${label.split(' / ')[0].toLowerCase()} sound${presets[role] ? ` (now ${presets[role].name})` : ''}`}>
+                        <i className={`gen-swatch gen-swatch-${role}`} />
+                        {label.split(' / ')[0]}
+                        {presets[role] && (
+                            <span className="gen-track-preset">{presets[role].name}{presets[role].edited ? ' (edited)' : ''}</span>
+                        )}
+                    </button>
+                ) : (
+                    <span className="gen-track-name gen-track-box">
+                        <i className={`gen-swatch gen-swatch-${role}`} />
+                        {label.split(' / ')[0]}
+                        {presets[role] && (
+                            <span className="gen-track-preset" title={presets[role].name}>
+                                {presets[role].name}{presets[role].edited ? ' (edited)' : ''}
+                            </span>
+                        )}
+                    </span>
+                )}
                 {role === 'perc'
                     ? <RoleButtons role={role} label={label} mix={mix[role]} armed={armed === role} onMix={onMix} onArm={onArm} />
                     : <RoleButtons role={role} label={label} mix={mix[role]} armed={armed === role} onMix={onMix} onArm={onArm} onEdit={onEdit}

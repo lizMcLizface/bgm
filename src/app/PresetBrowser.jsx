@@ -6,6 +6,7 @@ import { DRUM_STYLES } from './percussion';
 import { AMBIENCE_LAYERS } from './engine/ambience';
 import { METERS } from './meter';
 import { isMobile } from '../audio/performance';
+import { ScrollLock } from './scrollLock';
 import { intensity, intensityLabel, viridis, INTENSITY_LABELS } from './intensity';
 
 // The top row's preset browser (scenes.js): a button that opens a window
@@ -175,6 +176,7 @@ const PresetBrowser = ({ current, onPick, actions }) => {
             </button>
             {open && (
                 <div className="gen-pb-backdrop" role="presentation" onMouseDown={(e) => e.target === e.currentTarget && close()}>
+                    <ScrollLock />
                     <div className="gen-pb" role="dialog" aria-modal="true" aria-label="Presets">
                         <div className="gen-pb-head">
                             <h2>Presets</h2>

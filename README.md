@@ -74,7 +74,7 @@ synthesised with the Web Audio API; there are no samples.
   then to the one before (and plays exactly what was heard) - and loop
   repeats the chord or progression playing, handy for shaping sounds;
   Space plays /
-  pauses; [ and ] step to the previous / next preset; lock-screen, notification and media-key controls
+  pauses; [ and ] step to the previous / next preset; ← and → go back / on a chord (with Shift, a progression); lock-screen, notification and media-key controls
   (next / previous track = new / previous variation)
 - Drift ("evolution"): related-key and mode changes, progression changes,
   tempo glides, optional V-chord preparation for key changes; keys and
