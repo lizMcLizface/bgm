@@ -138,6 +138,8 @@ const EFFECT_STAGES = [
     { key: 'filter', active: (p) => !(p.masterFilterType === 'lowpass' && p.masterFilterFreq >= 11000) },
 ];
 
+const DELAY_KEYS = new Set(['delayAmount', 'delayFeedback', 'pingPongAmount', 'pingPongFeedback']);
+
 const ENVELOPE_KEYS = new Set([
     'gainAttack', 'gainHold', 'gainHoldLevel', 'gainDecay', 'gainSustain', 'gainRelease',
     'envelopeAttackShape', 'envelopeDecayShape', 'envelopeReleaseShape',
@@ -245,6 +247,7 @@ class Instrument {
         // Set by flushTails: the effects are silent from then on, whatever
         // their tail would have been. A new note clears it.
         this.quietAt = Infinity;
+        this.heldUntil = 0;
 
         this.preset = null;
         this.chainSignature = null;
@@ -320,6 +323,8 @@ class Instrument {
         const setter = PARAM_SETTERS[key];
         if (setter) setter(this, value);
         if (ENVELOPE_KEYS.has(key)) this.updateEnvelopes();
+        // a delay setting changed while flushTails holds the delays at 0
+        if (DELAY_KEYS.has(key) && this.heldUntil > this.AC.currentTime) this.holdDelays(this.heldUntil);
         this.updateChain();
     }
 
@@ -455,18 +460,36 @@ class Instrument {
         const now = this.AC.currentTime;
         const impulse = this.reverb.node.buffer;
         if (impulse) this.reverb.node.buffer = impulse;
-        const holdAtZero = (param, seconds) => {
-            const value = param.value;
-            param.cancelScheduledValues(now);
-            param.setValueAtTime(0, now);
-            param.setValueAtTime(value, now + seconds);
-        };
         // delay lines are at most 1 s long (src/nodes/delay.js, pingPongDelay.js)
         const drain = 1.05;
-        [this.delay.wetGain, this.delay.feedbackGain, this.pingPong.wetGain, this.pingPong.leftFeedbackGain, this.pingPong.rightFeedbackGain]
-            .forEach((gain) => holdAtZero(gain.getNode().gain, drain));
+        this.holdDelays(now + drain);
         this.quietAt = now + drain;
         this.scheduleSleep();
+    }
+
+    /**
+     * Holds the delays' output and feedback at 0 until `until`, then lets them
+     * go to what the preset says *then* - not what they were when the hold
+     * began, which a preset change inside the hold would be undone by (the
+     * old feedback came back and stayed, echoes that never died).
+     */
+    holdDelays(until) {
+        const now = this.AC.currentTime;
+        const p = { ...PRESET_DEFAULTS, ...this.preset };
+        const wet = (amount) => (amount < 0.5 ? amount * 2 : 1);
+        [
+            [this.delay.wetGain, wet(p.delayAmount)],
+            [this.delay.feedbackGain, p.delayFeedback],
+            [this.pingPong.wetGain, wet(p.pingPongAmount)],
+            [this.pingPong.leftFeedbackGain, p.pingPongFeedback],
+            [this.pingPong.rightFeedbackGain, p.pingPongFeedback],
+        ].forEach(([gain, value]) => {
+            const param = gain.getNode().gain;
+            param.cancelScheduledValues(now);
+            param.setValueAtTime(0, now);
+            param.setValueAtTime(value, until);
+        });
+        this.heldUntil = until;
     }
 
     /** Effects currently in the signal path (for diagnostics). */

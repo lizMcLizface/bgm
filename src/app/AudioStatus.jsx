@@ -10,6 +10,7 @@ import { readPerformance, writePerformance } from '../audio/performance';
 import { masterBus } from '../audio/bus';
 import { startLoadMeter } from '../audio/loadMeter';
 import { addSilence, readSilenceLog, clearSilenceLog, formatSilenceLog, describeSilence } from '../audio/silenceLog';
+import { runBenchmark } from './benchmark';
 import { readPref, writePref } from './prefs';
 import { applyTheme, storedTheme } from './theme';
 import { LinkIcon, SpeakerIcon, SunIcon, MoonIcon, AutoThemeIcon } from './icons';
@@ -160,6 +161,26 @@ export const AudioMenu = ({ generator, onReload }) => {
         }
         setTimeout(() => setCopiedLog(''), 2500);
     };
+    const [bench, setBench] = useState({ running: false, step: '', report: '' });
+    const benchmark = async () => {
+        setBench({ running: true, step: 'Starting', report: '' });
+        let report;
+        try {
+            report = await runBenchmark(generator, { load: status.load, dropouts: status.dropouts }, (step) => setBench((b) => ({ ...b, step })));
+        } catch (e) {
+            report = `Benchmark failed: ${e && e.message ? e.message : e}`;
+        }
+        setBench({ running: false, step: '', report });
+    };
+    const copyBench = async () => {
+        try {
+            await navigator.clipboard.writeText(bench.report);
+            setCopiedLog('Report copied.');
+        } catch (e) {
+            window.prompt('Copy this report', bench.report);
+        }
+        setTimeout(() => setCopiedLog(''), 2500);
+    };
     const actualMs = Math.round((audioContext.baseLatency || 0) * 1000);
     // The button is coloured by the load: green, amber, red - red as well for a while after a dropout.
     const status = useAudioLoad(generator);
@@ -209,6 +230,16 @@ export const AudioMenu = ({ generator, onReload }) => {
                         <input type="checkbox" checked={performance.sharedReverb} onChange={(e) => changePerformance({ sharedReverb: e.target.checked })} />
                         One reverb shared by all voices
                     </label>
+                </section>
+                <section className="gen-menu-section">
+                    <h3>Benchmark</h3>
+                    <small>Checks this device and how fast it makes the current music (a minute or so; the page may stutter meanwhile, so stop the music first), then writes a report to paste into a chat.</small>
+                    <div className="gen-menu-row">
+                        <button type="button" disabled={bench.running} onClick={benchmark}>{bench.running ? 'Running...' : 'Run benchmark'}</button>
+                        <button type="button" disabled={!bench.report} onClick={copyBench}>Copy report</button>
+                    </div>
+                    {bench.running && <small role="status">{bench.step}</small>}
+                    {bench.report && <textarea className="gen-bench-report" readOnly rows={8} value={bench.report} onFocus={(e) => e.target.select()} />}
                 </section>
                 <section className="gen-menu-section">
                     <h3>Gaps in the sound</h3>

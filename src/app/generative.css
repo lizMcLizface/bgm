@@ -2200,3 +2200,10 @@ body {
     white-space: nowrap;
     border-color: var(--gen-accent, currentColor);
 }
+
+.gen-bench-report {
+    width: 100%;
+    box-sizing: border-box;
+    font: 11px/1.4 ui-monospace, Consolas, monospace;
+    resize: vertical;
+}
