@@ -140,6 +140,10 @@ npm run render -- --preset rainy-cafe --minutes 10 --no-video --seed 42
 npm run render -- --link "https://calmbgm.com/?m=...&v=..." --wander brownian --ending
 ```
 
+Several at once: `--preset a,b,c` or `--all` (`--category cozy` for one category) render a few at a time
+(`--jobs`, default a third of your cores, at most 4; each job has its own browser, video process and ffmpeg),
+with a row of progress per render. `--skip-existing` carries on after a stop, and a failed render doesn't stop the rest.
+
 `--help` lists the rest (`--out`, `--width`, `--fps`, `--theme`, `--mp3-quality`, `--ending`, ...). Links
 that carry a *generated* sound can't be rebuilt yet: use a preset or a link of library sounds.
 

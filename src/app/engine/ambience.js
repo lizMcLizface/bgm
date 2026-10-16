@@ -25,7 +25,7 @@
 // (No audio imports at module level: settings.js reads the layer list.)
 
 import { seeded } from '../random';
-import { wanderLfo, defaultAmbienceWander } from './wander';
+import { wanderLfo, defaultAmbienceWander, WalkPath } from './wander';
 import { LAYERS, THUNDER, LAYER_PARAMS, defaultShape, renderParams } from './ambienceSynth';
 
 export const AMBIENCE_LAYERS = {
@@ -131,6 +131,26 @@ const isOffline = (context) => typeof OfflineAudioContext !== 'undefined' && con
 // Each layer's wander runs 0.85 .. 1.15 times the round, from its own phase and seed.
 const layerSlot = (id) => Object.keys(AMBIENCE_LAYERS).indexOf(id);
 const layerPeriodFactor = (id) => 0.85 + 0.3 * (((layerSlot(id) * 0.381966 + 0.19) % 1));
+
+/**
+ * What the wander does to levels at piece time t, for drawing it (the video
+ * of an ambience-only render): a function (id, t) -> the layer's factor
+ * (1 +- layers) and `total(t)` the whole bed's (1 +- total). The same
+ * paths the audio follows.
+ */
+export function ambienceDrift(wander) {
+    const w = { ...defaultAmbienceWander(), ...wander };
+    const paths = {};
+    const wave = (period, phase, seed, t) => {
+        if (w.mode !== 'brownian') return Math.sin(2 * Math.PI * (t / period + phase));
+        paths[seed] = paths[seed] || new WalkPath(seed, period);
+        return paths[seed].valueAt(t);
+    };
+    return {
+        layer: (id, t) => 1 + w.layers * wave(w.period * layerPeriodFactor(id), (layerSlot(id) * 0.618034 + 0.07) % 1, 6101 + layerSlot(id) * 53, t),
+        total: (t) => 1 + w.total * wave(w.period, 0.31, 4411, t),
+    };
+}
 
 const LOOKAHEAD = 4; // seconds of thunder booked ahead while playing live
 const RERENDER_DELAY = 300; // ms after a shape change stops before re-rendering

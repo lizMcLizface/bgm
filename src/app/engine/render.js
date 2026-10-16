@@ -175,7 +175,9 @@ export async function renderWav(gen, seconds, options = {}) {
 export async function renderPcm(gen, seconds, { ending = false, onProgress = () => {}, signal, onChunk } = {}) {
     const sampleRate = gen.AC.sampleRate;
     const anySolo = Object.values(gen.roles).some((r) => r.solo);
-    const audible = Object.fromEntries(Object.entries(gen.roles).map(([role, r]) => [role, (anySolo ? r.solo : !r.mute) && r.volume > 0]));
+    // an ambience-only setup (playMusic off) renders just the bed
+    const musicOn = gen.settings.playMusic !== false;
+    const audible = Object.fromEntries(Object.entries(gen.roles).map(([role, r]) => [role, musicOn && (anySolo ? r.solo : !r.mute) && r.volume > 0]));
     const roles = Object.keys(gen.roles).filter((role) => audible[role]);
     const presets = Object.fromEntries(roles.filter((role) => role !== 'perc').map((role) => [role, gen.getRolePreset(role)]));
     const { notes, tones } = planNotes(gen, audible, seconds, ending);

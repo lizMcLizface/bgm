@@ -7,6 +7,7 @@
 
 import { createCanvas } from '@napi-rs/canvas';
 import { drawTimeline, chordBlocks } from '../src/app/timelineDraw.js';
+import { ambienceDrift } from '../src/app/engine/ambience.js';
 
 export const LAYOUT = { width: 1400, height: 600 };
 const PAD = 16;
@@ -128,6 +129,69 @@ export function createFrameRenderer({ bars, beatsPerBar, meter, mix, roles, colo
             ctx.fillRect(0, 0, rollWidth, rollHeight);
             ctx.globalCompositeOperation = 'source-over';
             ctx.restore();
+            return canvas.data();
+        },
+    };
+}
+
+const clockText = (seconds) => {
+    const s = Math.floor(seconds);
+    return `${Math.floor(s / 3600)}:${String(Math.floor(s / 60) % 60).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+};
+
+/**
+ * The video of an ambience-only render: the same panel, with a bar per layer
+ * that rises and falls with the slow wander (the very paths the audio follows),
+ * and the time. `ambience` is { name, layers: [{ label, level, id }], wander }.
+ */
+export function createAmbienceFrameRenderer({ ambience, colors, outWidth = 1680 }) {
+    const scale = outWidth / LAYOUT.width;
+    const outHeight = Math.round(LAYOUT.height * scale);
+    const canvas = createCanvas(outWidth, outHeight);
+    const ctx = canvas.getContext('2d');
+    const drift = ambienceDrift(ambience.wander);
+    const palette = [colors.counter, colors.pad, colors.lead, colors.bass, colors.perc, colors.accent];
+    const text = (value, x, y, { size = 14, weight = 400, fill = colors.text, align = 'left' } = {}) => {
+        ctx.font = `${weight} ${size}px ${FONT}`;
+        ctx.fillStyle = fill;
+        ctx.textBaseline = 'middle';
+        ctx.textAlign = align;
+        ctx.fillText(value, x, y);
+    };
+    const rowHeight = Math.min(90, (LAYOUT.height - 70 - PAD) / Math.max(1, ambience.layers.length));
+    const top = 50 + (LAYOUT.height - 50 - PAD - rowHeight * ambience.layers.length) / 2; // the rows centred under the title
+    return {
+        width: outWidth,
+        height: outHeight,
+        frame(time) {
+            ctx.setTransform(scale, 0, 0, scale, 0, 0);
+            ctx.fillStyle = colors.panel;
+            ctx.fillRect(0, 0, LAYOUT.width, LAYOUT.height);
+            const nameWidth = (() => { text(ambience.name, PAD, PAD / 2 + 14, { size: 22, weight: 700 }); return ctx.measureText(ambience.name).width; })();
+            text('Ambience', PAD + nameWidth + 16, PAD / 2 + 16, { fill: colors.muted });
+            text(clockText(time), LAYOUT.width - PAD, PAD / 2 + 16, { fill: colors.muted, align: 'right' });
+            const whole = drift.total(time);
+            ambience.layers.forEach((layer, i) => {
+                const y = top + i * rowHeight;
+                const trackX = PAD + 190;
+                const trackWidth = LAYOUT.width - trackX - PAD;
+                const h = Math.min(26, rowHeight * 0.4);
+                ctx.fillStyle = palette[i % palette.length];
+                roundRect(ctx, PAD, y + rowHeight / 2 - 5, 10, 10, 2);
+                ctx.fill();
+                text(layer.label, PAD + 22, y + rowHeight / 2, { size: 16, weight: 500 });
+                roundRect(ctx, trackX, y + rowHeight / 2 - h / 2, trackWidth, h, 6);
+                ctx.fillStyle = colors.surface;
+                ctx.fill();
+                ctx.strokeStyle = colors.border;
+                ctx.stroke();
+                const level = Math.max(0, Math.min(1, layer.level * drift.layer(layer.id, time) * whole));
+                ctx.fillStyle = palette[i % palette.length];
+                ctx.globalAlpha = 0.85;
+                roundRect(ctx, trackX, y + rowHeight / 2 - h / 2, Math.max(h, trackWidth * level), h, 6);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            });
             return canvas.data();
         },
     };

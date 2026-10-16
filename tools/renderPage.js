@@ -10,6 +10,7 @@ import { sceneSettings, sceneBySlug, presetFromSearch, SCENES, sceneSlug } from 
 import { phraseToSeed } from '../src/app/phrase';
 import { renderPcm, planTimeline } from '../src/app/engine/render';
 import { timelineColors } from '../src/app/ChordTimeline';
+import { AMBIENCE_LAYERS } from '../src/app/engine/ambience';
 import '../src/app/generative.css';
 
 let gen = null;
@@ -72,6 +73,11 @@ window.bgmRender = {
             presets: presetNames,
             playMusic: gen.settings.playMusic !== false,
             colors: timelineColors(document.getElementById('palette')),
+            // for the video of an ambience-only render
+            ambience: {
+                layers: Object.entries(AMBIENCE_LAYERS).filter(([id]) => gen.settings.ambience[id] > 0).map(([id, label]) => ({ id, label, level: gen.settings.ambience[id] })),
+                wander: gen.settings.ambienceWander,
+            },
         };
     },
 
