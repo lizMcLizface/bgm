@@ -15,13 +15,13 @@ import {
 import { DRIFT_MODES, BPM_LIMITS } from './conductor';
 import { METERS } from './meter';
 import {
-    RANDOM_LEVELS, RANDOM_LEVEL_HINTS, randomKey, randomProgression, randomConductor, randomVoices, randomField, randomPreset, randomLength,
+    RANDOM_LEVELS, RANDOM_LEVEL_HINTS, randomKey, randomProgression, randomConductor, randomVoices, randomField, randomRelativeKey, relativeKeys, randomPreset, randomLength,
     randomArrangement, randomStyleWeights, randomRole, progressionLength, progressionForLength, randomAmbience, randomAmbienceShape,
     randomPadMotion, randomSwing, randomColour,
 } from './randomize';
 import { MasterVolume, SettingsMenu, AudioMenu, ThemeToggle } from './AudioStatus';
 import { SleepTimer, Recorder } from './Playback';
-import { sceneSettings, sceneGroup, buildSetup, parseSetup, sceneBySlug, sceneSlug, presetFromSearch, SCENES, SCENE_CATEGORIES } from './scenes';
+import { sceneSettings, sceneGroup, buildSetup, parseSetup, sceneBySlug, sceneSlug, presetFromSearch, introFromSearch, SCENES, SCENE_CATEGORIES } from './scenes';
 import PresetBrowser from './PresetBrowser';
 import { saveUserScene, deleteUserScene, isUserScene } from './setupStore';
 import { ROLE_PRESETS } from './presets';
@@ -29,7 +29,7 @@ import { setupMediaSession, updateMediaSession } from './mediaSession';
 import { AMBIENCE_LAYERS, LAYER_PARAMS } from './engine/ambience';
 import { COMMON_PARAMS } from './engine/ambienceSynth';
 import {
-    DiceIcon, SparkIcon, PlayIcon, PauseIcon, ToStartIcon, BarBackIcon, BarForwardIcon, ProgressionBackIcon, ProgressionForwardIcon, LoopIcon,
+    DiceIcon, RotateIcon, SparkIcon, PlayIcon, PauseIcon, ToStartIcon, BarBackIcon, BarForwardIcon, ProgressionBackIcon, ProgressionForwardIcon, LoopIcon,
 } from './icons';
 import { newSoundSeed } from './soundGen';
 import { soundFrom, SOUND_KINDS, GENERATOR_V2 } from './soundGenV2';
@@ -101,15 +101,17 @@ if (import.meta.hot) {
 // reload keeps them and makes a new piece; Copy link pins the piece.
 // While a built-in preset is playing as it is, the address is just that preset's name
 // (?preset=...), a link anyone can read; once anything is changed it is the settings.
-function useSettingsInUrl(settings, presets, presetSlug) {
+// With the short intro on, the address says so too (intro=short), so a link carries it.
+const withIntro = (path, shortIntro) => (shortIntro ? `${path}${path.includes('?') ? '&' : '?'}intro=short` : path);
+function useSettingsInUrl(settings, presets, presetSlug, shortIntro) {
     useEffect(() => {
         const id = setTimeout(() => {
-            window.history.replaceState(null, '', presetSlug
+            window.history.replaceState(null, '', withIntro(presetSlug
                 ? `${window.location.pathname}?preset=${presetSlug}`
-                : sharePath(settings, presets, window.location, { seed: false }));
+                : sharePath(settings, presets, window.location, { seed: false }), shortIntro));
         }, 300);
         return () => clearTimeout(id);
-    }, [settings, presets, presetSlug]);
+    }, [settings, presets, presetSlug, shortIntro]);
 }
 
 // The seed as a pass-phrase (phrase.js): shows the current seed's words;
@@ -259,7 +261,7 @@ const Transport = ({ gen, anyOn, onToggle, onChange }) => {
 
 // A labelled control; with onRandom, a dice button beside it (and with
 // onGenerate, a "new sound" button).
-const Field = ({ label, onRandom, onGenerate, generating, wide, children }) => (
+const Field = ({ label, onRandom, onRelative, onGenerate, generating, wide, children }) => (
     <label className={`gen-field${wide ? ' gen-field-wide' : ''}`}>
         <span>{label}</span>
         {onRandom ? (
@@ -267,6 +269,10 @@ const Field = ({ label, onRandom, onGenerate, generating, wide, children }) => (
                 {children}
                 <button type="button" className="gen-dice" title="Randomize this" aria-label={`Random ${label}`}
                     onClick={(e) => { e.preventDefault(); onRandom(); }}><DiceIcon /></button>
+                {onRelative && (
+                    <button type="button" className="gen-dice" title="Same notes, a different key and scale (C major to A minor, D Dorian ...)"
+                        aria-label="Same notes, different key and scale" onClick={(e) => { e.preventDefault(); onRelative(); }}><RotateIcon /></button>
+                )}
                 {onGenerate && (
                     <button type="button" className="gen-dice" title="Generate a new sound" aria-label={`Generate a new ${label.toLowerCase()}`}
                         disabled={generating} onClick={(e) => { e.preventDefault(); onGenerate(); }}><SparkIcon /></button>
@@ -934,7 +940,19 @@ const GenerativeApp = () => {
     const sceneSlugRef = useRef(linkedScene ? { name: linkedScene.name, slug: sceneSlug(linkedScene.name) } : null);
     const presetSlug = scene && sceneSlugRef.current && sceneSlugRef.current.name === scene && !Object.values(roles).some((r) => r.edited)
         ? sceneSlugRef.current.slug : '';
-    useSettingsInUrl(settings, linkPresets, presetSlug);
+    // The short intro (Generator.setQuickIntro): on from a link's intro=short (this visit only), else as last chosen here.
+    const [shortIntro, setShortIntroState] = useState(() => {
+        const linked = introFromSearch(window.location.search);
+        return linked === null ? readPref('bgm-short-intro', false) === true : linked;
+    });
+    const setShortIntro = (on) => {
+        setShortIntroState(on);
+        writePref('bgm-short-intro', on);
+    };
+    useEffect(() => {
+        gen.setQuickIntro(shortIntro);
+    }, [shortIntro]); // eslint-disable-line react-hooks/exhaustive-deps
+    useSettingsInUrl(settings, linkPresets, presetSlug, shortIntro);
     const [sleepLeft, setSleepLeft] = useState(null);
     const loadSettings = (next) => {
         gen.setMany(next);
@@ -961,6 +979,7 @@ const GenerativeApp = () => {
         setScene('');
         if (gen.loadRolePreset(role, name)) presetLoaded(role, name);
     };
+    const relativeKey = () => loadSettings(randomRelativeKey(gen.settings));
     const randomizeField = (key) => loadSettings(randomField(key, gen.settings, randomLevel));
     const chords = progressionLength(settings.progression);
     const randomizePreset = (role) => loadPreset(role, randomPreset(role, roles[role].presetName, randomLevel));
@@ -1280,7 +1299,7 @@ const GenerativeApp = () => {
                     <MasterVolume />
                     <ThemeToggle />
                     <AudioMenu generator={gen} onReload={reloadKeepingSettings} />
-                    <SettingsMenu midi={{ connect: live.connectMidi, status: live.midiStatus }} link={() => shareUrl(gen.settings, linkPresets)} saving={saving} onStartOver={startOver} smooth={{ value: smoothPresets, onChange: setSmoothPresets }}
+                    <SettingsMenu midi={{ connect: live.connectMidi, status: live.midiStatus }} link={() => withIntro(shareUrl(gen.settings, linkPresets), shortIntro)} saving={saving} onStartOver={startOver} smooth={{ value: smoothPresets, onChange: setSmoothPresets }} intro={{ value: shortIntro, onChange: setShortIntro }}
                         phrase={<PhraseField seed={settings.seed} edited={gen.editedSinceStart} onApply={playPhrase} onRoll={newVariation} initial={linkedPhrase} />}>
                         <SleepTimer generator={gen} running={anyOn} onLeft={setSleepLeft} />
                         <Recorder generator={gen} fileName={fileName} onProgress={setSaving} />
@@ -1305,7 +1324,8 @@ const GenerativeApp = () => {
                             {TONIC_NAMES.map((name, pc) => <option key={name} value={pc}>{name}</option>)}
                         </select>
                     </Field>
-                    <Field label="Scale / mode" onRandom={() => randomizeField('mode')}>
+                    <Field label="Scale / mode" onRandom={() => randomizeField('mode')}
+                        onRelative={relativeKeys(settings.tonic, settings.mode).length ? relativeKey : undefined}>
                         <select value={settings.mode} onChange={(e) => update('mode', e.target.value)}>
                             {SCALE_FAMILIES.map(({ family, modes }) => (
                                 <optgroup key={family} label={family}>

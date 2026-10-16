@@ -1,4 +1,4 @@
-import { SCENES, SCENE_CATEGORIES, sceneSettings, sceneGroup, SCENE_GROUPS, buildSetup, parseSetup, normalizeScene, sceneSlug, sceneBySlug, presetFromSearch } from './scenes';
+import { SCENES, SCENE_CATEGORIES, sceneSettings, sceneGroup, SCENE_GROUPS, buildSetup, parseSetup, normalizeScene, sceneSlug, sceneBySlug, presetFromSearch, introFromSearch } from './scenes';
 import { scaleById } from './theory';
 import { findPreset, sanitizePreset } from './editor/presetStore';
 import { SHAREABLE_PRESETS } from './shareCode';
@@ -13,6 +13,15 @@ const expectContained = (patch, actual) => {
         else expect(actual[key]).toEqual(value);
     });
 };
+
+test('an intro=short link still names its preset, and says whether the intro is short', () => {
+    expect(presetFromSearch('?turnip-town&intro=short')).toBe('turnip-town');
+    expect(presetFromSearch('?preset=turnip-town&intro=short')).toBe('turnip-town');
+    expect(presetFromSearch('?intro=short')).toBeNull();
+    expect(introFromSearch('?intro=short')).toBe(true);
+    expect(introFromSearch('?preset=x&intro=full')).toBe(false);
+    expect(introFromSearch('?preset=x')).toBeNull();
+});
 
 test('every scene is valid as it stands: modes, presets, settings that survive sanitizing', () => {
     expect(new Set(SCENES.map((s) => s.name)).size).toBe(SCENES.length);

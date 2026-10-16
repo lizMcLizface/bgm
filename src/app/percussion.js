@@ -465,7 +465,7 @@ export function drumBar({ bar, meter, drums, section, sectionsMode, sectionBars 
     }
 
     // Fills: a phrase's last bar now and then; a section's last bar more often and bigger.
-    const sectionEnds = section ? (bar + 1 - section.start) % sectionBars === 0 : (bar + 1) % GROOVE_BARS === 0;
+    const sectionEnds = section ? (bar + 1 - section.start) % (section.bars || sectionBars) === 0 : (bar + 1) % GROOVE_BARS === 0;
     const phraseEnds = index === 3;
     // (a steady beat fills at the end of a section, and only now and then at a phrase's)
     const fillChance = steady ? (sectionEnds ? 0.7 : 0.04 + activity * 0.12) : 0.15 + activity * 0.35 + variation * 0.15;

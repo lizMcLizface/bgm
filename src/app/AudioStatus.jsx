@@ -226,7 +226,7 @@ export const AudioMenu = ({ generator, onReload }) => {
 };
 
 /** The ⚙ options menu: sharing, a phrase, the sleep timer and saving audio (children), MIDI, starting over with only the basics. */
-export const SettingsMenu = ({ link, saving, phrase, onStartOver, smooth, midi, children }) => {
+export const SettingsMenu = ({ link, saving, phrase, onStartOver, smooth, intro, midi, children }) => {
     const menu = useRef(null);
     useDismiss(menu);
     const [copied, setCopied] = useState('');
@@ -260,6 +260,16 @@ export const SettingsMenu = ({ link, saving, phrase, onStartOver, smooth, midi, 
                             Change presets smoothly
                         </label>
                         <small>While playing, a new preset starts at the next chord and its sounds blend in over that chord. Off: everything switches at once.</small>
+                    </section>
+                )}
+                {intro && (
+                    <section className="gen-menu-section">
+                        <h3>Opening</h3>
+                        <label className="gen-check">
+                            <input type="checkbox" checked={intro.value} onChange={(e) => intro.onChange(e.target.checked)} />
+                            Short intro
+                        </label>
+                        <small>Presets with sections open with a one-phrase intro instead of a long build. The address and copied links then end in intro=short; add intro=full to switch it off for a link.</small>
                     </section>
                 )}
                 {children}

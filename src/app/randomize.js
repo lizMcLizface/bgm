@@ -125,6 +125,33 @@ const FIELDS = {
     },
 };
 
+/**
+ * Every other key and scale with exactly the notes of this one - C Ionian is
+ * B Locrian, D Dorian, ... on the same white keys. [{ tonic, mode }], none
+ * for a scale that repeats itself (whole tone, diminished).
+ */
+export function relativeKeys(tonic, mode) {
+    const notes = (t, id) => new Set(scaleSemitones(scaleById(id).intervals).map((s) => (t + s) % 12));
+    const same = (a, b) => a.size === b.size && [...a].every((pc) => b.has(pc));
+    const here = notes(tonic, mode);
+    return SCALE_FAMILIES.flatMap((f) => f.modes).flatMap(({ id }) =>
+        [...here].filter((t) => same(here, notes(t, id))).map((t) => ({ tonic: t, mode: id })))
+        .filter((k) => !(k.tonic === tonic && k.mode === mode));
+}
+
+/**
+ * Same notes, a different key and scale: { tonic, mode }, or {} when there is no other.
+ * Every relative is fair game, Locrian included, whatever the progression: the point is to
+ * hear that the same notes sound different from another root. Keys and scales left out under
+ * Evolution are skipped (unless that would leave none).
+ */
+export function randomRelativeKey(settings, rng = Math.random) {
+    let candidates = relativeKeys(settings.tonic, settings.mode);
+    const allowed = candidates.filter((k) => !settings.drift.excludedTonics.includes(k.tonic) && allowedMode(settings)(k.mode));
+    if (allowed.length) candidates = allowed;
+    return candidates.length ? pick(rng, candidates) : {};
+}
+
 /** Music fields that have a single-field randomizer. */
 export const RANDOM_FIELDS = Object.keys(FIELDS);
 

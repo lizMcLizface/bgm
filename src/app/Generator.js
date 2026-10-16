@@ -494,6 +494,16 @@ class Generator {
         this.replan(Object.keys(patch), meterChanged);
     }
 
+    /**
+     * A short opening: with sections, the intro lasts one phrase and goes straight to Full (a
+     * per-visit preference, not part of the settings and so not of share links).
+     */
+    setQuickIntro(on) {
+        if (Boolean(this.quickIntro) === on) return;
+        this.quickIntro = on;
+        this.replan(['sections']);
+    }
+
     /** What is audible now: { tonic, mode, progression, bpm, keyName }. */
     nowPlaying() {
         const planned = this.plan.get(Math.floor(this.position() / this.beatsPerBar)) || this.getPlan()[0];
@@ -864,7 +874,7 @@ class Generator {
             chordStart,
             barsLeftInChord,
             prev: prev ? prev.state : null,
-            settings: { leadActivity, leadDensity, padWeights, bassWeights, pulseWeights, arpWeights, padMotion, thinPadUnderLead, voices, counter, sections, chordSpread, pedal, leadScale, leadLeaps, leadRepeat, leadEnding },
+            settings: { leadActivity, leadDensity, padWeights, bassWeights, pulseWeights, arpWeights, padMotion, thinPadUnderLead, voices, counter, sections: this.quickIntro ? { ...sections, quickIntro: true } : sections, chordSpread, pedal, leadScale, leadLeaps, leadRepeat, leadEnding },
             rng: this.rng,
         });
         // Drums: patterns and looseness from streams of their own (the

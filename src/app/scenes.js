@@ -84,8 +84,18 @@ export const sceneSlug = (name) => name
 export function presetFromSearch(search) {
     const query = new URLSearchParams(search || '');
     if (query.has('preset')) return query.get('preset');
-    const keys = [...query.keys()];
+    const keys = [...query.keys()].filter((key) => key !== 'intro');
     return keys.length === 1 && query.get(keys[0]) === '' ? keys[0] : null;
+}
+
+/**
+ * Whether a link asks for the short intro: `intro=short` (true), `intro=full` (false),
+ * null when it says nothing.
+ */
+export function introFromSearch(search) {
+    const value = new URLSearchParams(search || '').get('intro');
+    if (value === 'short') return true;
+    return value === 'full' ? false : null;
 }
 
 /** The built-in preset a link's `preset=` names (by its slug, or its name), or null. */

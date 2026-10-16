@@ -1,9 +1,10 @@
-import { randomKey, randomProgression, randomConductor, randomVoices, randomField, randomPreset, randomLength, randomArrangement, randomStyleWeights, randomRole, RANDOM_FIELDS, presetPool, modeQuality, progressionQuality, randomAmbience, randomAmbienceShape } from './randomize';
+import { randomKey, randomProgression, randomConductor, randomVoices, randomField, randomPreset, randomLength, randomArrangement, randomStyleWeights, randomRole, RANDOM_FIELDS, presetPool, modeQuality, progressionQuality, randomAmbience, randomAmbienceShape, relativeKeys, randomRelativeKey } from './randomize';
 import { defaultSettings, sanitizeSettings } from './settings';
 import { PRESET_CATEGORIES } from './presets';
 import { DEFAULT_DRIFT } from './conductor';
 import { seeded } from './random';
 import PROGRESSIONS from './progressions';
+import { scaleById, scaleSemitones } from './theory';
 
 const RUNS = 300;
 const CURRENT = { pad: 'Soft Pad', bass: 'Warm Bass', lead: 'Glass Lead' };
@@ -194,5 +195,39 @@ test('ambience shapes: every layer, values in range and on their steps', () => {
             expect(s.pan).toBeLessThanOrEqual(1);
             [s.distance, s.width].forEach((v) => { expect(v).toBeGreaterThanOrEqual(0); expect(v).toBeLessThanOrEqual(1); });
         });
+    });
+});
+
+describe('same notes, another key and scale', () => {
+    const notes = (tonic, mode) => new Set(scaleSemitones(scaleById(mode).intervals).map((s) => (tonic + s) % 12));
+
+    test('C Ionian has six relatives with exactly its notes, including B Locrian and D Dorian', () => {
+        const relatives = relativeKeys(0, 'Major-1');
+        expect(relatives).toHaveLength(6);
+        expect(relatives).toContainEqual({ tonic: 11, mode: 'Major-7' });
+        expect(relatives).toContainEqual({ tonic: 2, mode: 'Major-2' });
+        expect(relatives).toContainEqual({ tonic: 9, mode: 'Major-6' });
+        relatives.forEach(({ tonic, mode }) => expect(notes(tonic, mode)).toEqual(notes(0, 'Major-1')));
+    });
+
+    test('a roll always keeps the notes, never offers the current key, and reaches every relative - Locrian from Ionian too', () => {
+        const settings = { ...defaultSettings(), tonic: 0, mode: 'Major-1', progression: 0 }; // C Ionian, a major progression
+        const seen = new Set();
+        for (let i = 0; i < 200; i++) {
+            const { tonic, mode } = randomRelativeKey(settings);
+            expect(notes(tonic, mode)).toEqual(notes(0, 'Major-1'));
+            expect({ tonic, mode }).not.toEqual({ tonic: 0, mode: 'Major-1' });
+            seen.add(`${tonic} ${mode}`);
+        }
+        expect(seen.size).toBe(6);
+        expect(seen.has('11 Major-7')).toBe(true); // B Locrian
+    });
+
+    test('keys left out under Evolution are skipped, unless that leaves nothing', () => {
+        const settings = { ...defaultSettings(), tonic: 0, mode: 'Major-1' };
+        settings.drift = { ...settings.drift, excludedTonics: [2, 4, 5, 7] }; // D E F G out: A and B are left
+        for (let i = 0; i < 20; i++) expect([9, 11]).toContain(randomRelativeKey(settings).tonic);
+        settings.drift = { ...settings.drift, excludedTonics: [2, 4, 5, 7, 9, 11] };
+        expect(randomRelativeKey(settings).mode).toBeTruthy(); // all of them out: any is better than a dead button
     });
 });

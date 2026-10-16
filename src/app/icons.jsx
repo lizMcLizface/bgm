@@ -70,6 +70,16 @@ export const DiceIcon = () => (
     </Svg>
 );
 
+// Two arrows chasing each other: the same notes, seen from another key.
+export const RotateIcon = () => (
+    <Svg>
+        <path d="M13 6.5A5.5 5.5 0 0 0 3.2 5" />
+        <path d="M3 2.2V5.3h3.1" />
+        <path d="M3 9.5A5.5 5.5 0 0 0 12.8 11" />
+        <path d="M13 13.8V10.7H9.9" />
+    </Svg>
+);
+
 export const PencilIcon = () => (
     <Svg>
         <path d="M10.5 2.5l3 3L5.5 13.5H2.5v-3z" />

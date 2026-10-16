@@ -3,6 +3,7 @@
 // "current bar" by hand, as the Transport would.
 
 import { scaleDistance } from './conductor';
+import { defaultSettings } from './settings';
 
 vi.mock('../audio/context', () => ({
     audioContext: {
@@ -494,6 +495,32 @@ describe('sounds that change with a preset', () => {
         gen.flushPendingVoices();
         expect(loaded).toEqual(['D', 'E']);
         gen.transport.timer = null;
+    });
+});
+
+describe('the short intro', () => {
+    const sectionsOf = (gen, bars) => { gen.planThrough(bars); return [...Array(bars).keys()].map((b) => gen.plan.get(b).state.phrase.section.type); };
+
+    test('the intro lasts one phrase and goes straight to Full; the drums know where it ends', () => {
+        const gen = new Generator({ ...defaultSettings(), sections: { mode: 'strong', phrases: 4 } });
+        gen.reset();
+        const long = sectionsOf(gen, 20);
+        expect(long.slice(0, 16).every((t) => t === 'intro')).toBe(true);
+        gen.setQuickIntro(true);
+        const quick = sectionsOf(gen, 20);
+        expect(quick.slice(0, 4)).toEqual(['intro', 'intro', 'intro', 'intro']);
+        expect(quick.slice(4, 8).every((t) => t === 'full')).toBe(true);
+        expect(gen.plan.get(0).state.phrase.section.bars).toBe(4);
+        gen.setQuickIntro(false);
+        expect(sectionsOf(gen, 20).slice(0, 16).every((t) => t === 'intro')).toBe(true);
+    });
+
+    test('with sections off nothing changes', () => {
+        const gen = new Generator({ ...defaultSettings(), sections: { mode: 'off', phrases: 4 } });
+        gen.reset();
+        gen.setQuickIntro(true);
+        gen.planThrough(6);
+        expect(gen.plan.get(0).state.phrase.section).toBeNull();
     });
 });
 

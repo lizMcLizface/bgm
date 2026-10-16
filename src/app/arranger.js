@@ -310,11 +310,16 @@ function lineBar(meter, rng, activity) {
 
 // The section a phrase starting at `bar` belongs to: kept until it has
 // lasted its length, then the next one by NEXT_SECTION - never more than
-// two Full sections in a row. null while sections are off.
+// two Full sections in a row. null while sections are off. With
+// `sections.quickIntro` the opening intro lasts one phrase and goes straight to Full.
 function decideSection(bar, prevSection, sections, rng) {
     if (sections.mode === 'off') return null;
-    if (!prevSection) return { type: bar === 0 ? 'intro' : 'build', start: bar, fulls: 0 };
-    if (bar - prevSection.start < sections.phrases * PHRASE_BARS) return prevSection;
+    if (!prevSection) {
+        const type = bar === 0 ? 'intro' : 'build';
+        return { type, start: bar, fulls: 0, ...(sections.quickIntro && type === 'intro' ? { bars: PHRASE_BARS } : {}) };
+    }
+    if (bar - prevSection.start < (prevSection.bars || sections.phrases * PHRASE_BARS)) return prevSection;
+    if (sections.quickIntro && prevSection.type === 'intro') return { type: 'full', start: bar, fulls: 1 };
     const next = prevSection.type === 'full' && prevSection.fulls >= 2 ? { breakdown: 1 } : NEXT_SECTION[prevSection.type];
     const type = weighted(rng, next);
     return { type, start: bar, fulls: type === 'full' ? prevSection.fulls + 1 : 0 };
