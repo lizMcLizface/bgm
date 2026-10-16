@@ -22,7 +22,7 @@ import { SCALE_FAMILIES, CHORD_COLOURS } from './theory';
 import { METERS } from './meter';
 import { DRIFT_MODES, TEMPO_BOUNDS, BPM_LIMITS } from './conductor';
 import {
-    OCTAVE_LIMITS, OCTAVE_WANDER, COUNTER_MODES, PEDAL_MODES, SPREADS, LEAD_SCALES, LEAD_ENDINGS, SECTION_MODES, SECTION_LENGTHS, DEFAULT_PULSE_WEIGHTS, DEFAULT_ARP_WEIGHTS,
+    OCTAVE_LIMITS, OCTAVE_WANDER, COUNTER_MODES, PEDAL_MODES, SPREADS, LEAD_SCALES, LEAD_ENDINGS, SECTION_MODES, SECTION_LENGTHS, DEFAULT_PULSE_WEIGHTS, DEFAULT_ARP_WEIGHTS, DEFAULT_DIRECTION_WEIGHTS,
 } from './arranger';
 import { AMBIENCE_LAYERS } from './engine/ambience';
 import { LAYER_PARAMS } from './engine/ambienceSynth';
@@ -31,7 +31,7 @@ import { SEED_BITS as SOUND_SEED_BITS } from './soundGen';
 import { GENERATOR_V2, KIND_CODES } from './soundGenV2';
 import PROGRESSIONS from './progressions';
 import { DRUM_STYLES, DRUM_KITS, DRUMS, DRUM_PARAMS } from './percussion';
-import { WANDER_ROLES, WANDER_LIMITS } from './engine/wander';
+import { WANDER_ROLES, WANDER_LIMITS, WANDER_MODES, AMBIENCE_WANDER_LIMITS } from './engine/wander';
 
 export const CODE_VERSION = 1;
 const VERSION_BITS = 4;
@@ -247,6 +247,11 @@ const MUSIC_GROUPS = [
         [['leadRepeat'], chance],
         [['leadEnding'], options(Object.keys(LEAD_ENDINGS), 1)],
     ],
+    [ // the chord styles added for variety
+        [['padWeights', 'rolled'], weight],
+        [['padWeights', 'stacked'], weight],
+        ...Object.keys(DEFAULT_DIRECTION_WEIGHTS).map((id) => [['directionWeights', id], weight]),
+    ],
 ];
 const VOICE_GROUPS = [
     [...voice('pad'), ...voice('bass'), ...voice('lead'), ...voice('counter'), field(GROUPS, ['padNotes'])],
@@ -276,6 +281,7 @@ const VOICE_LATER_GROUPS = [
         ...WANDER_ROLES.map((role) => [['wander', 'voices', role], bool]),
     ],
     ...DRUMS.slice(11).map(drumGroup), // the crisp drums, added after the wander
+    [[['wander', 'mode'], options(Object.keys(WANDER_MODES), 1)]], // random-walk wander, added last
 ];
 const shapeCodec = (key, spec) => {
     if (key === 'pan') return stepped(-1, 1, 0.1);
@@ -288,6 +294,12 @@ const AMBIENCE_GROUPS = [
     // each layer's shape (engine/ambienceSynth.js): its own params, then distance, pan, width
     ...Object.keys(AMBIENCE_LAYERS).map((id) => [...Object.entries(LAYER_PARAMS[id]), ['distance', {}], ['pan', {}], ['width', {}]]
         .map(([key, spec]) => [['ambienceShape', id, key], shapeCodec(key, spec)])),
+    [ // the bed's slow wander, added last
+        [['ambienceWander', 'mode'], options(Object.keys(WANDER_MODES), 1)],
+        [['ambienceWander', 'total'], stepped(AMBIENCE_WANDER_LIMITS.total.min, AMBIENCE_WANDER_LIMITS.total.max, AMBIENCE_WANDER_LIMITS.total.step)],
+        [['ambienceWander', 'layers'], stepped(AMBIENCE_WANDER_LIMITS.layers.min, AMBIENCE_WANDER_LIMITS.layers.max, AMBIENCE_WANDER_LIMITS.layers.step)],
+        [['ambienceWander', 'period'], stepped(AMBIENCE_WANDER_LIMITS.period.min, AMBIENCE_WANDER_LIMITS.period.max, AMBIENCE_WANDER_LIMITS.period.step)],
+    ],
 ];
 
 class BitWriter {

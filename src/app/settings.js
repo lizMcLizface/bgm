@@ -12,12 +12,12 @@
 import {
     DEFAULT_PAD_WEIGHTS, DEFAULT_BASS_WEIGHTS, DEFAULT_VOICES, OCTAVE_LIMITS, OCTAVE_WANDER,
     DEFAULT_COUNTER, COUNTER_MODES, DEFAULT_SECTIONS, SECTION_MODES, SECTION_LENGTHS,
-    DEFAULT_PULSE_WEIGHTS, DEFAULT_ARP_WEIGHTS, DEFAULT_PAD_MOTION, PEDAL_MODES, SPREADS, LEAD_SCALES, LEAD_ENDINGS,
+    DEFAULT_PULSE_WEIGHTS, DEFAULT_ARP_WEIGHTS, DEFAULT_DIRECTION_WEIGHTS, DEFAULT_PAD_MOTION, PEDAL_MODES, SPREADS, LEAD_SCALES, LEAD_ENDINGS,
 } from './arranger';
 import { AMBIENCE_LAYERS, DEFAULT_AMBIENCE, defaultAmbienceShape } from './engine/ambience';
 import { LAYER_PARAMS, COMMON_PARAMS } from './engine/ambienceSynth';
 import { ROLE_VOLUMES } from './presets';
-import { defaultWander, WANDER_ROLES, WANDER_LIMITS } from './engine/wander';
+import { defaultWander, defaultAmbienceWander, WANDER_ROLES, WANDER_LIMITS, WANDER_MODES, AMBIENCE_WANDER_LIMITS } from './engine/wander';
 import { DEFAULT_DRUMS, DRUM_STYLES, DRUM_KITS, DRUMS, DRUM_PARAMS, defaultDrumKit } from './percussion';
 import { DEFAULT_DRIFT, DRIFT_MODES, BPM_LIMITS } from './conductor';
 import { METERS, DEFAULT_METER } from './meter';
@@ -70,9 +70,11 @@ export function defaultSettings() {
         playAmbience: false,
         volumes: { ...ROLE_VOLUMES }, // per role, 0..1
         pulseWeights: { ...DEFAULT_PULSE_WEIGHTS }, // how the pad pulses / arpeggiates (arranger.js)
+        directionWeights: { ...DEFAULT_DIRECTION_WEIGHTS }, // which way rolled and stacked chords go
         arpWeights: { ...DEFAULT_ARP_WEIGHTS },
         padMotion: { ...DEFAULT_PAD_MOTION }, // register lean, fast arpeggios, swell
         wander: defaultWander(), // slow pan / volume / filter / pitch drift (engine/wander.js)
+        ambienceWander: defaultAmbienceWander(), // the bed's own slow drift in level, in all and per layer
         seed: newSeed(),
     };
 }
@@ -97,7 +99,8 @@ const RULES = {
     meter: oneOf(Object.keys(METERS)),
     leadActivity: clamp(0, 1),
     leadDensity: clamp(0, 1),
-    padWeights: { sustain: clamp(0, 100), pulse: clamp(0, 100), arpeggio: clamp(0, 100), sequence: clamp(0, 100) },
+    padWeights: { sustain: clamp(0, 100), pulse: clamp(0, 100), arpeggio: clamp(0, 100), sequence: clamp(0, 100), rolled: clamp(0, 100), stacked: clamp(0, 100) },
+    directionWeights: { up: clamp(0, 100), down: clamp(0, 100), out: clamp(0, 100), in: clamp(0, 100) },
     bassWeights: { whole: clamp(0, 100), half: clamp(0, 100), walking: clamp(0, 100), drive: clamp(0, 100) },
     thinPadUnderLead: bool,
     padNotes: oneOf([3, 4, 5]),
@@ -159,6 +162,13 @@ const RULES = {
         filter: clamp(WANDER_LIMITS.filter.min, WANDER_LIMITS.filter.max),
         pitch: clamp(WANDER_LIMITS.pitch.min, WANDER_LIMITS.pitch.max),
         voices: Object.fromEntries(WANDER_ROLES.map((role) => [role, bool])),
+        mode: oneOf(Object.keys(WANDER_MODES)),
+    },
+    ambienceWander: {
+        mode: oneOf(Object.keys(WANDER_MODES)),
+        total: clamp(AMBIENCE_WANDER_LIMITS.total.min, AMBIENCE_WANDER_LIMITS.total.max),
+        layers: clamp(AMBIENCE_WANDER_LIMITS.layers.min, AMBIENCE_WANDER_LIMITS.layers.max),
+        period: clamp(AMBIENCE_WANDER_LIMITS.period.min, AMBIENCE_WANDER_LIMITS.period.max),
     },
     seed: int(0, 2 ** 31),
 };

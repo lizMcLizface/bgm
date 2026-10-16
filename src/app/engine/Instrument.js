@@ -387,16 +387,17 @@ class Instrument {
      * (`offset` seconds into them, and `immediate`: no easing in, for
      * renders). 0 stops a movement.
      */
-    setWander({ filter = 0, pitch = 0, periods, phases, offset = 0, immediate = false }) {
+    setWander({ filter = 0, pitch = 0, periods, phases, seeds = {}, mode = 'sine', offset = 0, immediate = false }) {
         const now = this.AC.currentTime;
         [['filter', filter], ['pitch', pitch]].forEach(([kind, cents]) => {
             let lfo = this.wanderLfos[kind];
             if (!lfo) {
                 if (!cents) return;
-                lfo = wanderLfo(this.AC, { period: periods[kind], phase: phases[kind], offset });
+                lfo = wanderLfo(this.AC, { period: periods[kind], phase: phases[kind], seed: seeds[kind], mode, offset });
                 this.wanderLfos[kind] = lfo;
                 if (kind === 'pitch') lfo.depth.connect(this.pitchWanderOut);
             }
+            lfo.setMode(mode);
             lfo.setPeriod(periods[kind]);
             if (immediate) lfo.depth.gain.value = cents;
             else lfo.depth.gain.setTargetAtTime(cents, now, 0.3);

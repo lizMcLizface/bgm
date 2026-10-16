@@ -128,6 +128,8 @@ body {
 .gen-timeline-canvas {
     display: block;
     width: 100%;
+    height: 100%;
+    min-height: 0;
 }
 
 .gen-swatch {
@@ -437,16 +439,40 @@ body {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
     gap: 12px;
-    align-items: start;
+    align-items: stretch;
+    min-height: 0;
+}
+
+/* One shape, whichever voices play: 21:9 with all five showing. A voice
+   that is absent leaves its slot empty instead of the box shrinking. */
+.gen-timeline {
+    box-sizing: border-box;
+    aspect-ratio: 21 / 9;
+    min-height: 470px;
+    grid-template-rows: auto minmax(0, 1fr);
 }
 
 .gen-tracks {
     display: grid;
     gap: 8px;
-    align-content: start;
+    grid-template-rows: repeat(5, minmax(0, 1fr)) auto;
+    align-content: stretch;
     min-width: 150px;
     max-width: 180px;
+    min-height: 0;
 }
+
+.gen-tracks > .gen-track {
+    align-content: center;
+    min-height: 0;
+}
+
+.gen-tracks > .gen-track-lead { grid-row: 1; }
+.gen-tracks > .gen-track-counter { grid-row: 2; }
+.gen-tracks > .gen-track-pad { grid-row: 3; }
+.gen-tracks > .gen-track-bass { grid-row: 4; }
+.gen-tracks > .gen-track-perc { grid-row: 5; }
+.gen-tracks > .gen-keys-hint { grid-row: 6; }
 
 .gen-track {
     /* name above its buttons: narrow beside the timeline, which is taller anyway */
@@ -617,13 +643,30 @@ body {
 }
 
 @media (max-width: 640px) {
+    /* a phone is too narrow for a fixed shape: the strip above the canvas, as tall as it needs */
+    .gen-timeline {
+        aspect-ratio: auto;
+        min-height: 0;
+        grid-template-rows: none;
+    }
+
+    .gen-timeline-canvas {
+        height: 300px;
+    }
+
     .gen-timeline-body {
         grid-template-columns: minmax(0, 1fr);
     }
 
     .gen-tracks {
         max-width: none;
+        grid-template-rows: none;
         grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    }
+
+    .gen-tracks > .gen-track,
+    .gen-tracks > .gen-keys-hint {
+        grid-row: auto;
     }
 
     .gen-keys-hint {

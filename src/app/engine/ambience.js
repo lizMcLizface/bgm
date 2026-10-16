@@ -16,11 +16,16 @@
 // as its buffer is ready; prepare() renders ahead (offline renders, or as
 // soon as a slider moves while stopped).
 //
+// The bed drifts slowly (wander.js): the whole bed's level and each layer's
+// own level move by small amounts, on sine waves or as a bounded random
+// walk (setWander), so a long stretch never sits perfectly still.
+//
 // Times can be offset into the piece (start(time, offset)), so an offline
 // render in chunks (render.js) continues every loop and thunder exactly.
 // (No audio imports at module level: settings.js reads the layer list.)
 
 import { seeded } from '../random';
+import { wanderLfo, defaultAmbienceWander } from './wander';
 import { LAYERS, THUNDER, LAYER_PARAMS, defaultShape, renderParams } from './ambienceSynth';
 
 export const AMBIENCE_LAYERS = {
@@ -121,21 +126,34 @@ function thunderTimes(seed, gap) {
     };
 }
 
+const isOffline = (context) => typeof OfflineAudioContext !== 'undefined' && context instanceof OfflineAudioContext;
+
+// Each layer's wander runs 0.85 .. 1.15 times the round, from its own phase and seed.
+const layerSlot = (id) => Object.keys(AMBIENCE_LAYERS).indexOf(id);
+const layerPeriodFactor = (id) => 0.85 + 0.3 * (((layerSlot(id) * 0.381966 + 0.19) % 1));
+
 const LOOKAHEAD = 4; // seconds of thunder booked ahead while playing live
 const RERENDER_DELAY = 300; // ms after a shape change stops before re-rendering
 const SWAP_FADE = 1; // seconds to cross-fade a re-rendered loop in
 
-const isOffline = (context) => typeof OfflineAudioContext !== 'undefined' && context instanceof OfflineAudioContext;
 
 class Ambience {
     /**
      * @param {object} options
      * @param {BaseAudioContext} options.context
      * @param {number} [options.seed] - for thunder times
+     * @param {number} [options.offset] - seconds of the piece elapsed at context time 0 (renders: for the wander)
      */
-    constructor({ context, seed = 1 }) {
+    constructor({ context, seed = 1, offset = 0 }) {
+        this.offset = offset;
         this.AC = context;
         this.output = context.createGain();
+        // the bed's own slow wander in level, after the start / stop fades
+        this.wanderOut = context.createGain();
+        this.output.connect(this.wanderOut);
+        this.wander = { ...defaultAmbienceWander(), total: 0, layers: 0 };
+        this.totalLfo = wanderLfo(context, { period: this.wander.period, phase: 0.31, seed: 4411, offset, mode: this.wander.mode });
+        this.totalLfo.depth.connect(this.wanderOut.gain);
         this.levels = { ...DEFAULT_AMBIENCE };
         this.shape = defaultAmbienceShape();
         this.chains = {}; // layer id -> live chain (distance, width, pan, level)
@@ -149,7 +167,33 @@ class Ambience {
     }
 
     connect(destination) {
-        this.output.connect(destination);
+        this.wanderOut.connect(destination);
+    }
+
+    /**
+     * The slow wander (settings.ambienceWander): `total` and `layers` are the
+     * fractions of level the whole bed and each layer drift by (+-), `period`
+     * a round in seconds, `mode` 'sine' or 'brownian'. Eases in when live.
+     */
+    setWander(wander) {
+        this.wander = { ...defaultAmbienceWander(), ...wander };
+        this.totalLfo.setMode(this.wander.mode);
+        this.totalLfo.setPeriod(this.wander.period);
+        this.ease(this.totalLfo.depth.gain, this.wander.total);
+        Object.keys(this.chains).forEach((id) => this.applyWanderTo(id));
+    }
+
+    ease(param, value) {
+        if (isOffline(this.AC)) param.value = value;
+        else param.setTargetAtTime(value, this.AC.currentTime, 0.4);
+    }
+
+    // A layer's own wander, its period a little different from the others'.
+    applyWanderTo(id) {
+        const { lfo } = this.chains[id];
+        lfo.setMode(this.wander.mode);
+        lfo.setPeriod(this.wander.period * layerPeriodFactor(id));
+        this.ease(lfo.depth.gain, this.wander.layers);
     }
 
     // Seconds into the piece at context time `time`.
@@ -178,8 +222,19 @@ class Ambience {
             const panner = AC.createStereoPanner();
             const level = AC.createGain();
             level.gain.value = 0;
-            merge.connect(panner).connect(level).connect(this.output);
-            this.chains[id] = { input, filter, same, cross, panner, level };
+            // the layer's wander: a gain around 1, after its level
+            const drift = AC.createGain();
+            const lfo = wanderLfo(AC, {
+                period: this.wander.period * layerPeriodFactor(id),
+                phase: (layerSlot(id) * 0.618034 + 0.07) % 1,
+                seed: 6101 + layerSlot(id) * 53,
+                offset: this.offset || 0,
+                mode: this.wander.mode,
+            });
+            lfo.depth.connect(drift.gain);
+            merge.connect(panner).connect(level).connect(drift).connect(this.output);
+            this.chains[id] = { input, filter, same, cross, panner, level, drift, lfo };
+            this.applyWanderTo(id);
             this.applyShape(id, AC.currentTime, 0);
         }
         return this.chains[id];
@@ -267,7 +322,7 @@ class Ambience {
         const thunder = this.chains.thunder;
         if (thunder) {
             delete this.chains.thunder;
-            setTimeout(() => thunder.level.disconnect(), (fade + 0.5) * 1000);
+            setTimeout(() => { thunder.drift.disconnect(); thunder.lfo.dispose(); }, (fade + 0.5) * 1000);
         }
     }
 

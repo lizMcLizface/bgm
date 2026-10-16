@@ -1,4 +1,4 @@
-import { defaultWander, wanderPeriod, wanderPhase, instrumentWander, wanders, RoleWander, WANDER_ROLES, WANDER_LIMITS } from './engine/wander';
+import { defaultWander, defaultAmbienceWander, AMBIENCE_WANDER_LIMITS, WalkPath, wanderPeriod, wanderPhase, instrumentWander, wanders, RoleWander, WANDER_ROLES, WANDER_LIMITS } from './engine/wander';
 import { TOUR_STEPS } from './tourSteps';
 import { defaultSettings, sanitizeSettings, encodeSettings, decodeSettings, decodeShare } from './settings';
 
@@ -69,7 +69,7 @@ test('wander settings: validated, pan ends put in order, carried in links', () =
     const settings = {
         ...d,
         seed: 3,
-        wander: { period: 120, pan: { min: -0.9, max: 0.35 }, volume: 0.4, filter: 1.25, pitch: 12, voices: { lead: false, counter: true, pad: true, bass: true, perc: true } },
+        wander: { period: 120, pan: { min: -0.9, max: 0.35 }, volume: 0.4, filter: 1.25, pitch: 12, voices: { lead: false, counter: true, pad: true, bass: true, perc: true }, mode: 'brownian' },
     };
     expect(decodeSettings(encodeSettings(settings)).wander).toEqual(settings.wander);
     // a link that changes nothing about it reads the defaults
@@ -83,4 +83,36 @@ test('the tour has unique steps, each with text; its first and last are centred 
         expect(s.text.length).toBeGreaterThan(20);
     });
     expect([TOUR_STEPS[0].selector, TOUR_STEPS[TOUR_STEPS.length - 1].selector]).toEqual([null, null]);
+});
+
+test('the random walk is deterministic, stays within -1..1 and is spread normally around the centre', () => {
+    const a = new WalkPath(5, 120);
+    const b = new WalkPath(5, 120);
+    const values = Array.from({ length: 20000 }, (_, i) => a.valueAt(i * 2));
+    expect(values.map((_, i) => b.valueAt(i * 2))).toEqual(values);
+    expect(Math.max(...values.map(Math.abs))).toBeLessThanOrEqual(1);
+    const mean = values.reduce((x, y) => x + y, 0) / values.length;
+    const sd = Math.sqrt(values.reduce((x, y) => x + (y - mean) ** 2, 0) / values.length);
+    expect(Math.abs(mean)).toBeLessThan(0.08);
+    expect(sd).toBeGreaterThan(0.3);
+    expect(sd).toBeLessThan(0.5);
+    // about two thirds within one sd, and it does move
+    const within = values.filter((v) => Math.abs(v - mean) <= sd).length / values.length;
+    expect(within).toBeGreaterThan(0.6);
+    expect(within).toBeLessThan(0.76);
+    expect(new WalkPath(6, 120).valueAt(300)).not.toBe(a.valueAt(300));
+});
+
+test('ambience wander: validated and carried in links; the default is on, a link without it reads the default', () => {
+    const d = defaultSettings();
+    expect(d.ambienceWander).toEqual(defaultAmbienceWander());
+    expect(sanitizeSettings({ ambienceWander: { mode: 'x', total: 9, layers: -1, period: 1 } }).ambienceWander).toEqual({
+        ...d.ambienceWander,
+        total: AMBIENCE_WANDER_LIMITS.total.max,
+        layers: 0,
+        period: AMBIENCE_WANDER_LIMITS.period.min,
+    });
+    const settings = { ...d, seed: 3, ambienceWander: { mode: 'sine', total: 0.25, layers: 0.5, period: 300 } };
+    expect(decodeSettings(encodeSettings(settings)).ambienceWander).toEqual(settings.ambienceWander);
+    expect(decodeShare(encodeSettings({ ...d, seed: 3 })).settings.ambienceWander).toEqual(d.ambienceWander);
 });

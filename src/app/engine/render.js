@@ -1,4 +1,4 @@
-// Renders the piece to a WAV file, faster than real time: the plan Play
+// Renders the piece to a WAV file (or, as 16-bit PCM chunks, to anything else), faster than real time: the plan Play
 // would start with (Generator.planner) booked onto fresh Instruments - the
 // current sounds, edits included - and the ambient bed in an
 // OfflineAudioContext, mixed as heard (volumes, mute / solo).
@@ -44,9 +44,10 @@ const until = async (condition, ms) => {
     while (!condition() && Date.now() < end) await new Promise((r) => setTimeout(r, 20));
 };
 
+// (With `bars`, each bar's chord, tempo, section and events too, for drawing the plan.)
 // Every audible note from bar 0 until `seconds`, in seconds, and the
 // section tone's changes ({ time, tone, glide: seconds of the bar }).
-function planNotes(gen, audible, seconds, ending) {
+function planNotes(gen, audible, seconds, ending, bars = null) {
     const planner = gen.planner();
     const notes = [];
     const tones = [];
@@ -62,6 +63,20 @@ function planNotes(gen, audible, seconds, ending) {
         planner.plan.delete(bar - 2);
         const unit = 60 / unitsPerMinute(planner.meter, planned.bpm);
         if (!tones.length || tones[tones.length - 1].tone !== planned.tone) tones.push({ time, tone: planned.tone, glide: planner.meter.units * unit });
+        if (bars) {
+            const section = planned.state.phrase.section;
+            bars.push({
+                bar,
+                start: time,
+                seconds: planner.meter.units * unit,
+                units: planner.meter.units,
+                chord: { name: planned.chord.name, numeral: planned.chord.numeral, keyName: planned.chord.keyName },
+                chordStart: Boolean(planned.chordStart),
+                bpm: planned.bpm,
+                section: section ? { type: section.type, start: section.start } : null,
+                events: planned.events.map((e) => ({ role: e.role, midi: e.midi, beat: e.beat, length: e.length })),
+            });
+        }
         planned.events.forEach((e) => {
             if (audible[e.role]) {
                 notes.push({ role: e.role, midi: e.midi, time: time + e.beat * unit, duration: e.length * unit, velocity: e.velocity, detune: e.detune });
@@ -120,6 +135,17 @@ function wavHeader(frames, sampleRate) {
     return view.buffer;
 }
 
+/**
+ * The plan the render plays, bar by bar, as plain data (every voice, muted
+ * or not) - what the video of a render draws.
+ * @returns {object[]} { bar, start, seconds, units, chord, chordStart, bpm, section, events } per bar
+ */
+export function planTimeline(gen, seconds, { ending = false } = {}) {
+    const bars = [];
+    planNotes(gen, Object.fromEntries(Object.keys(gen.roles).map((role) => [role, false])), seconds, ending, bars);
+    return bars;
+}
+
 /** Bytes of a WAV file of `seconds` (16-bit stereo). */
 export const wavBytes = (seconds, sampleRate) => 44 + Math.round(seconds * sampleRate) * 4;
 
@@ -133,7 +159,20 @@ export const wavBytes = (seconds, sampleRate) => 44 + Math.round(seconds * sampl
  * @param {AbortSignal} [options.signal]
  * @returns {Promise<Blob>} audio/wav
  */
-export async function renderWav(gen, seconds, { ending = false, onProgress = () => {}, signal } = {}) {
+export async function renderWav(gen, seconds, options = {}) {
+    const parts = [];
+    const { frames, sampleRate } = await renderPcm(gen, seconds, { ...options, onChunk: (pcm) => { parts.push(pcm); } });
+    return new Blob([wavHeader(frames, sampleRate), ...parts], { type: 'audio/wav' });
+}
+
+/**
+ * The same render as PCM: `onChunk` gets each stretch (about a minute) of
+ * interleaved 16-bit stereo samples in order - awaited, so a consumer
+ * that streams it somewhere (an encoder) sets the pace and memory stays at one chunk.
+ * Same options as renderWav, plus onChunk(Int16Array).
+ * @returns {Promise<{ frames: number, sampleRate: number }>}
+ */
+export async function renderPcm(gen, seconds, { ending = false, onProgress = () => {}, signal, onChunk } = {}) {
     const sampleRate = gen.AC.sampleRate;
     const anySolo = Object.values(gen.roles).some((r) => r.solo);
     const audible = Object.fromEntries(Object.entries(gen.roles).map(([role, r]) => [role, (anySolo ? r.solo : !r.mute) && r.volume > 0]));
@@ -142,7 +181,6 @@ export async function renderWav(gen, seconds, { ending = false, onProgress = () 
     const { notes, tones } = planNotes(gen, audible, seconds, ending);
     const ambience = { ...gen.settings.ambience };
 
-    const parts = [];
     let frames = 0;
     let carry = null; // the previous chunk's cross-fade overlap
     let first = 0; // index of the first note not yet past
@@ -202,9 +240,10 @@ export async function renderWav(gen, seconds, { ending = false, onProgress = () 
             if (n.time >= from) instruments[n.role].scheduleNote(n.midi, n.time - from, n.duration, n.velocity, n.detune);
         }
         if (Object.values(ambience).some((level) => level > 0)) {
-            const bed = new Ambience({ context: ctx, seed: 1 });
+            const bed = new Ambience({ context: ctx, seed: 1, offset: from });
             bed.setShape(gen.settings.ambienceShape);
             bed.setLevels(ambience);
+            bed.setWander(gen.settings.ambienceWander);
             await bed.prepare();
             const volume = ctx.createGain();
             volume.gain.value = gen.ambienceGain;
@@ -246,9 +285,9 @@ export async function renderWav(gen, seconds, { ending = false, onProgress = () 
                 right[i] *= g * g;
             }
         }
-        parts.push(pcm16(left.subarray(0, keep), right.subarray(0, keep)));
+        await onChunk(pcm16(left.subarray(0, keep), right.subarray(0, keep)));
         frames += keep;
         onProgress(end / seconds);
     }
-    return new Blob([wavHeader(frames, sampleRate), ...parts], { type: 'audio/wav' });
+    return { frames, sampleRate };
 }

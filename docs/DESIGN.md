@@ -691,6 +691,44 @@ committed or deployed until it has been listened to.
   music instead. The WAV render plans its ending so the final chord and
   its tail fill the end of the file.
 
+### Long-timescale drift and the command-line renderer (2026-10-16)
+
+- **Two kinds of wander** (`wander.mode`, `ambienceWander.mode`): the sine waves of
+  `engine/wander.js`, or a *bounded random walk*: a seeded Ornstein-Uhlenbeck path
+  (a knot every 2 s, mean-reverting over about period/4, sd 0.4, folded at +-1),
+  so it is normally distributed around the centre and never leaves its limits.
+  It is booked on a constant source's offset as linear ramps - ahead of the
+  clock (90 s, refilled every 15 s) while playing, all at once offline - and
+  the path is a pure function of its seed, so a chunk of a render starting
+  anywhere reproduces it exactly (checked against the path in a browser).
+- **Ambience wander** (`ambienceWander`: mode, total, layers, period): the whole
+  bed's level and each layer's level drift by up to +- that fraction, each layer on
+  its own period (0.85-1.15 x) and phase. On by default (brownian, 8% / 20%, 3 min) - and since
+  scenes patch the defaults, every preset has it. Share codes: appended groups
+  (`wander.mode` after the crisp drums in the voice part, the four fields last
+  in the ambience part), so older links read the defaults.
+- **The timeline keeps one shape**: 21:9 with five voices showing (min height 470 px;
+  below 640 px it flows as before). A voice that is absent leaves its slot in the
+  strip empty. The drawing moved to `timelineDraw.js` (plain data in, canvas calls out).
+- **`npm run render`** (`tools/`): `render.js` starts a Vite dev server and a headless
+  Chrome on `tools/render.html`; `renderPage.js` builds the generator as the page does and
+  streams `renderPcm` (render.js, the WAV render's chunks as 16-bit PCM) to ffmpeg's
+  libmp3lame. The video is drawn in Node with `@napi-rs/canvas` through the same
+  `drawTimeline`, from `planTimeline`'s bars, into ffmpeg (x264), then muxed with the
+  audio (AAC). Measured 2 min: audio ~2x real time, video ~108 fps.
+- **Two more chord styles for the rhythm voice** (`PAD_STYLES`, default shares 10 / 8 next to
+  sustain 55, pulse 25, arpeggio 20): *rolled* (a strummed chord, a sixteenth a note) and
+  *stacked entry* (the notes coming in one a unit and ringing together). Each phrase also picks
+  a direction by `directionWeights` (up 35, down 25, middle outward 20, outside inward 20; `chordOrder`).
+  Styles are picked per phrase, so a long listen cycles through more colours. (Off-beat stabs
+  were tried and dropped: the pads breathed distractingly, direct sounds were hectic.)
+  Share codes: one appended group in the music part; a preset that sets `padWeights` gets
+  the new defaults for the styles it doesn't name.
+- Other slow movements that would fit (not built): a slow tempo breath, a
+  reverb send that rises and falls, a drum-level or lead-density drift, the
+  ambience layers' own *distance / width* drifting, and the section length or
+  tone (`sectionTone`) following a long cycle.
+
 ### After a first listen (2026-10-16)
 
 - Percussion was too repetitive and too quiet (about -50 dB RMS soloed

@@ -12,6 +12,18 @@
 // Each voice and each kind of movement has its own period (the setting's,
 // within about 15% either way) and phase, fixed by the voice and the kind -
 // the voices never move together, and a render matches what was heard.
+//
+// Two kinds of movement (WANDER_MODES): smooth sine waves, or a bounded
+// random walk ("brownian"): a seeded Ornstein-Uhlenbeck path, so over time
+// it is normally distributed around the centre, is pulled back from the
+// edges and is folded back at +-1. The walk is booked on a param as
+// linear ramps between knots every WALK_STEP seconds - ahead of the clock
+// while playing, all at once in an offline render - and the path is a
+// pure function of its seed, so a render can start anywhere in it.
+
+import { seeded, normal } from '../random';
+
+export const WANDER_MODES = { sine: 'Smooth waves', brownian: 'Random walk' };
 
 export const WANDER_ROLES = ['lead', 'counter', 'pad', 'bass', 'perc'];
 const KINDS = ['pan', 'volume', 'filter', 'pitch'];
@@ -32,7 +44,17 @@ export const defaultWander = () => ({
     filter: 0.35,
     pitch: 5,
     voices: { lead: true, counter: true, pad: true, bass: false, perc: false },
+    mode: 'sine',
 });
+
+// The ambient bed's wander (engine/ambience.js): the whole bed's level and
+// each layer's own drift by up to +- that fraction, on a slow round.
+export const AMBIENCE_WANDER_LIMITS = {
+    period: { min: 30, max: 600, step: 10 },
+    total: { min: 0, max: 0.5, step: 0.01 },
+    layers: { min: 0, max: 0.8, step: 0.01 },
+};
+export const defaultAmbienceWander = () => ({ mode: 'brownian', total: 0.08, layers: 0.2, period: 180 });
 
 const fraction = (x) => x - Math.floor(x);
 const slot = (role, kind) => WANDER_ROLES.indexOf(role) * KINDS.length + KINDS.indexOf(kind);
@@ -42,6 +64,104 @@ export const wanderPhase = (role, kind) => fraction(slot(role, kind) * 0.618034 
 
 /** Seconds per round: the setting's period times a factor 0.85 .. 1.15 per voice and kind. */
 export const wanderPeriod = (period, role, kind) => period * (0.85 + 0.3 * fraction(slot(role, kind) * 0.381966 + 0.43));
+
+/** The seed of a voice's walk for a kind of movement (fixed). */
+export const wanderSeed = (role, kind) => 7919 + slot(role, kind) * 131;
+
+const WALK_STEP = 2; // seconds between the walk's knots
+const WALK_SIGMA = 0.4; // spread of the walk around the centre (the limits are +-1)
+const WALK_AHEAD = 90; // seconds booked ahead while playing
+const WALK_REFILL = 15000; // ms between top-ups
+
+// Reflects x into -1..1.
+const fold = (x) => {
+    const y = (((x + 1) % 4) + 4) % 4;
+    return (y <= 2 ? y : 4 - y) - 1;
+};
+
+/**
+ * A seeded bounded random walk, -1..1: knots WALK_STEP seconds apart, straight
+ * lines between them. Mean-reverting (over about `period / 4` seconds), so it
+ * keeps coming back to the centre and, over a long time, spreads as a normal
+ * distribution; reflected at the limits.
+ */
+export class WalkPath {
+    constructor(seed, period) {
+        this.rng = seeded(seed);
+        this.knots = [normal(this.rng, WALK_SIGMA)];
+        this.setPeriod(period);
+    }
+
+    /** Applies to knots not drawn yet. */
+    setPeriod(period) {
+        this.decay = Math.exp(-WALK_STEP / Math.max(WALK_STEP, period / 4));
+    }
+
+    knot(i) {
+        const { knots, decay } = this;
+        while (knots.length <= i) {
+            const last = knots[knots.length - 1];
+            knots.push(fold(last * decay + normal(this.rng, WALK_SIGMA * Math.sqrt(1 - decay * decay))));
+        }
+        return knots[i];
+    }
+
+    /** Value `t` seconds in. */
+    valueAt(t) {
+        const x = Math.max(0, t) / WALK_STEP;
+        const i = Math.floor(x);
+        const f = x - i;
+        return this.knot(i) * (1 - f) + this.knot(i + 1) * f;
+    }
+}
+
+const isOffline = (ctx) => typeof OfflineAudioContext !== 'undefined' && ctx instanceof OfflineAudioContext;
+
+// A walk as a signal: a constant source whose offset follows a WalkPath.
+// `offset`: seconds of the piece already elapsed at context time 0
+// (renders). Offline it books the whole context at once; live it keeps
+// WALK_AHEAD seconds booked from a timer.
+function walkSource(ctx, { seed, period, offset = 0 }) {
+    const source = ctx.createConstantSource();
+    source.offset.value = 0;
+    source.start();
+    const path = new WalkPath(seed, period);
+    const origin = ctx.currentTime;
+    const piece = (time) => offset + (time - origin);
+    const offline = isOffline(ctx);
+    let next = null; // index of the next knot to book
+    const book = (until) => {
+        const param = source.offset;
+        if (next === null) {
+            const now = ctx.currentTime;
+            param.cancelScheduledValues(now);
+            param.setValueAtTime(path.valueAt(piece(now)), now);
+            next = Math.floor(piece(now) / WALK_STEP) + 1;
+        }
+        for (; origin + next * WALK_STEP - offset <= until; next++) {
+            param.linearRampToValueAtTime(path.knot(next), Math.max(ctx.currentTime, origin + next * WALK_STEP - offset));
+        }
+    };
+    let timer = null;
+    return {
+        node: source,
+        start() {
+            if (offline) {
+                book(ctx.length / ctx.sampleRate + WALK_STEP);
+            } else if (!timer) {
+                book(ctx.currentTime + WALK_AHEAD);
+                timer = setInterval(() => book(ctx.currentTime + WALK_AHEAD), WALK_REFILL);
+            }
+        },
+        setPeriod: (seconds) => path.setPeriod(seconds),
+        stop() {
+            clearInterval(timer);
+            timer = null;
+            try { source.stop(); } catch (e) { /* already stopped */ }
+            source.disconnect();
+        },
+    };
+}
 
 // sin(2π(t/period + phase)) as a wave table: sinφ·cos(ωt) + cosφ·sin(ωt).
 function sineWave(ctx, phase) {
@@ -54,27 +174,58 @@ function sineWave(ctx, phase) {
 }
 
 /**
- * A slow sine, ±1, scaled by `depth.gain` (0 until set).
- * @param {object} options - period (seconds), phase (0..1), offset (seconds elapsed)
+ * A slow movement, ±1, scaled by `depth.gain` (0 until set): a sine wave,
+ * or - in 'brownian' mode - a bounded random walk (setMode).
+ * @param {object} options - period (seconds), phase (0..1, of the sine), offset
+ *   (seconds elapsed), seed (of the walk), mode
  */
-export function wanderLfo(ctx, { period, phase, offset = 0 }) {
+export function wanderLfo(ctx, { period, phase, offset = 0, seed = 1, mode = 'sine' }) {
     const osc = ctx.createOscillator();
     osc.setPeriodicWave(sineWave(ctx, phase + offset / period));
     osc.frequency.value = 1 / period;
     const depth = ctx.createGain();
     depth.gain.value = 0;
-    osc.connect(depth);
     osc.start();
-    return {
+    let walk = null;
+    let walkGain = null;
+    let current = null;
+    const lfo = {
         osc,
         depth,
-        setPeriod: (seconds) => { osc.frequency.value = 1 / seconds; },
+        setPeriod: (seconds) => {
+            period = seconds;
+            osc.frequency.value = 1 / seconds;
+            if (walk) walk.setPeriod(seconds);
+        },
+        // Only the wave or the walk is wired into the depth at a time.
+        setMode: (next) => {
+            next = next === 'brownian' ? 'brownian' : 'sine';
+            if (next === current) return;
+            current = next;
+            if (next === 'brownian') {
+                if (!walk) {
+                    walk = walkSource(ctx, { seed, period, offset });
+                    walkGain = ctx.createGain();
+                    walk.node.connect(walkGain);
+                    walkGain.connect(depth);
+                    walk.start();
+                }
+                walkGain.gain.value = 1;
+                osc.disconnect();
+            } else {
+                if (walkGain) walkGain.gain.value = 0;
+                osc.connect(depth);
+            }
+        },
         dispose: () => {
             try { osc.stop(); } catch (e) { /* already stopped */ }
             osc.disconnect();
+            if (walk) { walk.stop(); walkGain.disconnect(); }
             depth.disconnect();
         },
     };
+    lfo.setMode(mode);
+    return lfo;
 }
 
 /** Whether a voice wanders at all. */
@@ -91,6 +242,8 @@ export function instrumentWander(wander, role, offset = 0) {
         pitch: on ? wander.pitch : 0,
         periods: { filter: wanderPeriod(wander.period, role, 'filter'), pitch: wanderPeriod(wander.period, role, 'pitch') },
         phases: { filter: wanderPhase(role, 'filter'), pitch: wanderPhase(role, 'pitch') },
+        seeds: { filter: wanderSeed(role, 'filter'), pitch: wanderSeed(role, 'pitch') },
+        mode: wander.mode || 'sine',
         offset,
     };
 }
@@ -122,8 +275,8 @@ export class RoleWander {
         this.role = role;
         this.smooth = smooth;
         this.input = ctx.createGain(); // the volume
-        this.volumeLfo = wanderLfo(ctx, { period: 60, phase: wanderPhase(role, 'volume'), offset });
-        this.panLfo = wanderLfo(ctx, { period: 60, phase: wanderPhase(role, 'pan'), offset });
+        this.volumeLfo = wanderLfo(ctx, { period: 60, phase: wanderPhase(role, 'volume'), seed: wanderSeed(role, 'volume'), offset });
+        this.panLfo = wanderLfo(ctx, { period: 60, phase: wanderPhase(role, 'pan'), seed: wanderSeed(role, 'pan'), offset });
         this.volumeLfo.depth.connect(this.input.gain);
 
         // pan = centre + wave, shaped into a gain for each side
@@ -155,6 +308,8 @@ export class RoleWander {
     apply(wander) {
         const on = wanders(wander, this.role);
         const { min, max } = wander.pan;
+        this.volumeLfo.setMode(wander.mode);
+        this.panLfo.setMode(wander.mode);
         this.volumeLfo.setPeriod(wanderPeriod(wander.period, this.role, 'volume'));
         this.panLfo.setPeriod(wanderPeriod(wander.period, this.role, 'pan'));
         this.set(this.panCentre.offset, on ? (min + max) / 2 : 0);

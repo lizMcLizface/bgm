@@ -156,7 +156,7 @@ export function useLivePlay(generator, armed) {
 export const TrackStrip = ({ roles, presets, mix, armed, onMix, onArm, onEdit, onRandom, onGenerate, onPick, generating, live }) => (
     <div className="gen-tracks">
         {Object.entries(roles).map(([role, { label }]) => (
-            <div key={role} className={`gen-track${onPick && role !== 'perc' ? ' is-pickable' : ''}`}
+            <div key={role} className={`gen-track gen-track-${role}${onPick && role !== 'perc' ? ' is-pickable' : ''}`}
                 // the whole box opens the sound picker; its own buttons (M, S, dice ...) keep their jobs
                 onClick={onPick && role !== 'perc' ? (e) => { if (!e.target.closest('button')) onPick(role); } : undefined}>
                 {/* a box round the voice: its colour, name and sound; a click opens the sound picker */}

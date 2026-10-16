@@ -9,7 +9,7 @@ import SynthEditor from './editor/SynthEditor';
 import PresetPicker from './editor/PresetPicker';
 import PROGRESSIONS, { PROGRESSION_LENGTHS, progressionsOfLength } from './progressions';
 import {
-    PAD_STYLES, BASS_STYLES, PULSE_PATTERNS, ARP_PATTERNS, styleShares, OCTAVE_LIMITS, OCTAVE_WANDER, COUNTER_MODES, SECTION_MODES, SECTION_LENGTHS,
+    PAD_STYLES, BASS_STYLES, PULSE_PATTERNS, ARP_PATTERNS, CHORD_DIRECTIONS, styleShares, OCTAVE_LIMITS, OCTAVE_WANDER, COUNTER_MODES, SECTION_MODES, SECTION_LENGTHS,
     PEDAL_MODES, SPREADS, LEAD_SCALES, LEAD_ENDINGS,
 } from './arranger';
 import { DRIFT_MODES, BPM_LIMITS } from './conductor';
@@ -38,7 +38,7 @@ import { addGeneratedPreset, addSetupPreset, findPreset, generatedInfo } from '.
 import PRESET_DEFAULTS from './engine/presetDefaults';
 import { readPref, writePref } from './prefs';
 import { seedToPhrase, phraseToSeed } from './phrase';
-import { WANDER_ROLES, WANDER_LIMITS } from './engine/wander';
+import { WANDER_ROLES, WANDER_LIMITS, WANDER_MODES, AMBIENCE_WANDER_LIMITS } from './engine/wander';
 import Tour, { tourSeen } from './Tour';
 import { STAGES, STAGE_KEY, LAST_STAGE } from './tourSteps';
 
@@ -493,11 +493,12 @@ const SoundsBar = ({ onGenerate, generating }) => {
 // The ambient bed (engine/ambience.js): on / off (as beside Play), a volume
 // for the whole bed against the music, and a slider per layer to balance
 // them; under More options, the shape of each layer that is turned up.
-const AmbiencePanel = ({ levels, shape, volume, on, onChange, onShape, onVolume, onToggle, onRandom }) => {
+const AmbiencePanel = ({ levels, shape, volume, on, wander, onChange, onShape, onVolume, onWander, onToggle, onRandom }) => {
     const active = Object.entries(AMBIENCE_LAYERS).filter(([id]) => levels[id] > 0);
     const more = active.length
         ? active.map(([id, label]) => <LayerShape key={id} id={id} label={label} shape={shape[id]} onChange={(s) => onShape({ ...shape, [id]: s })} />)
         : <p className="gen-hint">Turn a layer up to shape it: intensity, distance, direction and more.</p>;
+    const setWander = (patch) => onWander({ ...wander, ...patch });
     return (
     <Panel id="ambience" title="Ambience" onRandom={onRandom} more={more} heading={(
         <>
@@ -517,6 +518,21 @@ const AmbiencePanel = ({ levels, shape, volume, on, onChange, onShape, onVolume,
                 </Field>
             ))}
         </div>
+        <Field label="Level drift">
+            <select value={wander.mode} onChange={(e) => setWander({ mode: e.target.value })}
+                title="How the bed's level slowly moves: smooth waves, or a random walk that stays within its limits">
+                {Object.entries(WANDER_MODES).map(([id, label]) => <option key={id} value={id}>{label}</option>)}
+            </select>
+        </Field>
+        <Field label={`Whole bed ± ${pct(wander.total)}`}>
+            <input type="range" {...AMBIENCE_WANDER_LIMITS.total} value={wander.total} onChange={(e) => setWander({ total: Number(e.target.value) })} />
+        </Field>
+        <Field label={`Each layer ± ${pct(wander.layers)}`}>
+            <input type="range" {...AMBIENCE_WANDER_LIMITS.layers} value={wander.layers} onChange={(e) => setWander({ layers: Number(e.target.value) })} />
+        </Field>
+        <Field label={`Drift round takes ${wander.period < 90 ? `${wander.period} s` : `${(wander.period / 60).toFixed(1)} min`}`}>
+            <input type="range" {...AMBIENCE_WANDER_LIMITS.period} value={wander.period} onChange={(e) => setWander({ period: Number(e.target.value) })} />
+        </Field>
     </Panel>
     );
 };
@@ -575,6 +591,9 @@ const PadPlaying = ({ settings, update, level }) => {
             <StyleWeights title="Arpeggio patterns" styles={ARP_PATTERNS} weights={settings.arpWeights}
                 disabled={styleShares(settings.padWeights).arpeggio === 0}
                 onChange={(w) => update('arpWeights', w)} onRandom={() => update('arpWeights', randomStyleWeights('arpeggio', level))} />
+            <StyleWeights title="Rolled and stacked chords" styles={CHORD_DIRECTIONS} weights={settings.directionWeights}
+                disabled={styleShares(settings.padWeights).rolled + styleShares(settings.padWeights).stacked === 0}
+                onChange={(w) => update('directionWeights', w)} onRandom={() => update('directionWeights', randomStyleWeights('direction', level))} />
             <fieldset className="gen-weights">
                 <legend>
                     Movement
@@ -706,6 +725,12 @@ const WanderPanel = ({ wander, shown, update }) => {
     const { pan } = wander;
     return (
         <Panel id="wander" title="Wander">
+            <Field label="Kind of drift">
+                <select value={wander.mode} onChange={(e) => set({ mode: e.target.value })}
+                    title="Smooth waves go out and back; a random walk wanders up and down by chance, normally spread around the centre and never past the limits">
+                    {Object.entries(WANDER_MODES).map(([id, label]) => <option key={id} value={id}>{label}</option>)}
+                </select>
+            </Field>
             <Field label={`Round takes ${wander.period < 90 ? `${wander.period} s` : `${(wander.period / 60).toFixed(1)} min`}`}>
                 <input type="range" {...WANDER_LIMITS.period} value={wander.period}
                     title="Roughly how long a voice takes to drift out and back; each voice and each kind of drift runs a little differently"
@@ -1430,6 +1455,7 @@ const GenerativeApp = () => {
 
             {has(1) && <AmbiencePanel levels={settings.ambience} shape={settings.ambienceShape} onShape={(s) => update('ambienceShape', s)}
                 volume={settings.ambienceVolume} on={settings.playAmbience}
+                wander={settings.ambienceWander} onWander={(w) => update('ambienceWander', w)}
                 onChange={changeAmbience} onVolume={(v) => update('ambienceVolume', v)} onToggle={() => togglePart('playAmbience')}
                 onRandom={() => randomize('ambience')} />}
 

@@ -5,7 +5,7 @@
 
 const clamp = (x) => Math.max(0, Math.min(1, x));
 const DRUM_WEIGHT = { off: 0, heartbeat: 0.3, brushes: 0.5, shaker: 0.5, lofi: 0.6, downtempo: 0.6, electro: 0.9, drive: 1 };
-const PAD_WEIGHT = { sustain: 0, pulse: 0.5, arpeggio: 0.7, sequence: 1 };
+const PAD_WEIGHT = { sustain: 0, pulse: 0.5, arpeggio: 0.7, sequence: 1, rolled: 0.1, stacked: 0.15 };
 const BASS_WEIGHT = { whole: 0, half: 0.4, walking: 0.7, drive: 1 };
 
 // The weighted average of a { style: share } map against per-style weights.

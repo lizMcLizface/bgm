@@ -61,6 +61,9 @@ synthesised with the Web Audio API; there are no samples.
 - Save audio: renders the piece to a WAV file (1-60 min) faster than real
   time, in chunks so long files stay light on memory, with live progress,
   time left and Cancel; it can end on the home chord instead of fading
+- Slow drift: each voice's pan, volume, filter and pitch wander (Wander panel), and the ambient bed's level -
+  in all and per layer - does too, either on smooth waves or as a bounded random walk (normally spread around the
+  centre, never past its limits)
 - A pass-phrase per piece (in the ⚙ menu, with a dice to roll a new one):
   every visit - and every reload - starts with a random one, which reads as four words (`amber-tide-lantern-moss`); type
   those - or any words - and press Enter to play that phrase's piece from
@@ -119,7 +122,26 @@ npm test          # Vitest
 npm run build     # -> dist/
 npm run preview   # serve dist/ at http://localhost:4173/
 npm run deploy    # tests + build, then publish dist/ to the gh-pages branch
+npm run render -- --preset rainy-cafe --minutes 60   # MP3 + a 30 fps MP4 of the timeline (below)
 ```
+
+### Recording from the command line
+
+`npm run render` records a stretch of a preset as an **MP3** and an **MP4** that shows the page's timeline
+with its playhead (21:9, 1680x720, 30 fps), for demo videos and uploads - no WAV is ever written. It needs
+Chrome (or Edge) and `ffmpeg` on the PATH; the engine is Web Audio, so a headless Chrome renders the sound
+(faster than real time, a minute at a time, streamed into ffmpeg) while the video is drawn alongside and
+muxed at the end. An hour takes roughly half an hour.
+
+```bash
+npm run render -- --list                                   # the presets
+npm run render -- --preset rainy-cafe --minutes 60         # renders/rainy-cafe-60m.mp3 + .mp4
+npm run render -- --preset rainy-cafe --minutes 10 --no-video --seed 42
+npm run render -- --link "https://calmbgm.com/?m=...&v=..." --wander brownian --ending
+```
+
+`--help` lists the rest (`--out`, `--width`, `--fps`, `--theme`, `--mp3-quality`, `--ending`, ...). Links
+that carry a *generated* sound can't be rebuilt yet: use a preset or a link of library sounds.
 
 Audio performance: with `npm run dev` running, open
 http://localhost:5173/bench/ (engine load per arrangement, parameters in

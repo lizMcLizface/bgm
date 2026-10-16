@@ -19,7 +19,7 @@ vi.mock('../audio/context', () => ({
             };
             return { connect: () => {}, gain };
         },
-        createConstantSource: () => ({ connect: () => {}, disconnect: () => {}, start: () => {}, stop: () => {}, offset: { value: 0, setTargetAtTime() {} } }),
+        createConstantSource: () => ({ connect: () => {}, disconnect: () => {}, start: () => {}, stop: () => {}, offset: { value: 0, setTargetAtTime() {}, setValueAtTime() {}, linearRampToValueAtTime() {}, cancelScheduledValues() {} } }),
         createChannelSplitter: () => ({ connect: () => {}, disconnect: () => {} }),
         createChannelMerger: () => ({ connect: () => {}, disconnect: () => {} }),
         createWaveShaper: () => ({ connect: () => {}, disconnect: () => {} }),
@@ -181,7 +181,7 @@ test('humanize 0 is exact: no detune, notes on the arranger grid', () => {
     gen.reset();
     play(gen, 16).forEach((b) => b.events.forEach((e) => {
         expect(e.detune).toBe(0);
-        expect(e.beat * 2).toBe(Math.round(e.beat * 2));
+        expect(e.beat * 4).toBe(Math.round(e.beat * 4)); // (a rolled chord strums in sixteenths)
     }));
 });
 

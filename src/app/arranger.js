@@ -117,11 +117,16 @@ function nextOctave(role, previous, voice, rng) {
 
 // 'sequence' (running eighths or sixteenths) and 'drive' (a pulsing root
 // line) are for the faster, driving presets and are off by default.
-export const PAD_STYLES = { sustain: 'Sustain', pulse: 'Pulse', arpeggio: 'Slow arpeggio', sequence: 'Running sequence' };
+// rolled (a strummed chord) and stacked (the chord's notes entering one by
+// one) are other ways of playing chords, for variety over a long listen.
+export const PAD_STYLES = {
+    sustain: 'Sustain', pulse: 'Pulse', arpeggio: 'Slow arpeggio', sequence: 'Running sequence',
+    rolled: 'Rolled chord', stacked: 'Stacked entry',
+};
 export const BASS_STYLES = { whole: 'Whole bar', half: 'Per beat group', walking: 'Walking', drive: 'Driving pulse' };
 
 // Relative weights per phrase (any scale; only ratios matter).
-export const DEFAULT_PAD_WEIGHTS = { sustain: 55, pulse: 25, arpeggio: 20, sequence: 0 };
+export const DEFAULT_PAD_WEIGHTS = { sustain: 55, pulse: 25, arpeggio: 20, sequence: 0, rolled: 10, stacked: 8 };
 export const DEFAULT_BASS_WEIGHTS = { whole: 35, half: 45, walking: 20, drive: 0 };
 
 const total = (weights) => Object.values(weights).reduce((sum, w) => sum + Math.max(0, w), 0);
@@ -140,6 +145,9 @@ const pickStyle = (rng, weights) => weighted(rng, total(weights) > 0 ? weights :
 // its weight (as the styles).
 export const PULSE_PATTERNS = { groups: 'On the beat groups', beats: 'Every beat', push: 'Pushed (early)', split: 'Low note, then chord' };
 export const ARP_PATTERNS = { bounce: 'Up and down', up: 'Up', down: 'Down', broken: 'Broken (low, top, mid, top)' };
+// The order a rolled or stacked chord's notes come in, a direction per phrase.
+export const CHORD_DIRECTIONS = { up: 'Upwards', down: 'Downwards', out: 'Middle outward', in: 'Outside inward' };
+export const DEFAULT_DIRECTION_WEIGHTS = { up: 35, down: 25, out: 20, in: 20 };
 export const DEFAULT_PULSE_WEIGHTS = { groups: 35, beats: 20, push: 25, split: 20 };
 export const DEFAULT_ARP_WEIGHTS = { bounce: 35, up: 25, down: 15, broken: 25 };
 // lean: chance per phrase the voicings move to another spot in the
@@ -176,6 +184,7 @@ function decidePadPattern(style, meter, leadActive, settings, rng) {
         const fast = meter.unitsPerBeat === 1 && chance(rng, padMotionOf(settings).fast);
         return { pattern, step: meter.unitsPerBeat === 1 ? (fast ? 0.25 : 0.5) : 1 };
     }
+    if (style === 'rolled' || style === 'stacked') return { pattern: pickStyle(rng, settings.directionWeights || DEFAULT_DIRECTION_WEIGHTS), step: 1 };
     return { pattern: null, step: 1 };
 }
 
@@ -421,6 +430,31 @@ function pulseHits(pattern, meter) {
     return starts;
 }
 
+// Indices 0..n-1 (low to high) in the order a chord's notes come in.
+export function chordOrder(direction, n) {
+    const all = [...Array(n).keys()];
+    if (direction === 'down') return all.reverse();
+    if (direction === 'out') {
+        // from the middle, alternating above and below
+        const mid = Math.floor((n - 1) / 2);
+        const order = [mid];
+        for (let k = 1; order.length < n; k++) {
+            if (mid + k < n) order.push(mid + k);
+            if (mid - k >= 0) order.push(mid - k);
+        }
+        return order;
+    }
+    if (direction === 'in') {
+        const order = [];
+        for (let lo = 0, hi = n - 1; lo <= hi; lo++, hi--) {
+            order.push(lo);
+            if (hi !== lo) order.push(hi);
+        }
+        return order;
+    }
+    return all;
+}
+
 function padEvents({ chordStart, barsLeftInChord, meter, voicing, style, pattern, step = 1, thin, range, swell = 1 }) {
     const base = (thin ? 0.48 : 0.6) * swell;
     const ev = (midi, beat, length, velocity) => ({ role: 'pad', midi, beat, length, velocity });
@@ -460,7 +494,19 @@ function padEvents({ chordStart, barsLeftInChord, meter, voicing, style, pattern
             ev(notes[order(i)], i * step, length, base * (i === 0 ? 1 : (i * step) % 1 ? 0.75 : 0.85)));
     }
     if (!chordStart) return [];
-    return voicing.map((m) => ev(m, 0, barsLeftInChord * meter.units * 0.95, base));
+    const length = barsLeftInChord * meter.units * 0.95;
+    if (style === 'rolled' || style === 'stacked') {
+        // `order[rank]` is the voicing note that comes in rank-th
+        const order = chordOrder(pattern, voicing.length);
+        const last = Math.max(1, voicing.length - 1);
+        return order.map((index, rank) => {
+            // rolled: a strum, a quarter unit a note (on the sixteenth grid); stacked: a unit a note, all ringing on together
+            const at = style === 'rolled' ? Math.min(rank, 4) * 0.25 : Math.min(rank, meter.units - 1);
+            const level = style === 'rolled' ? 0.82 + 0.18 * (rank / last) : 0.7 + 0.3 * (rank / last);
+            return ev(voicing[index], at, length - at, base * level);
+        });
+    }
+    return voicing.map((m) => ev(m, 0, length, base));
 }
 
 // A scale note a step from `target`, on the side `from` comes from (so the

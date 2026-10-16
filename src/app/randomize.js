@@ -13,7 +13,7 @@ import PROGRESSIONS, { PROGRESSION_LENGTHS, progressionsOfLength } from './progr
 import { METERS } from './meter';
 import { DEFAULT_DRIFT, DRIFT_MODES, TEMPO_BOUNDS } from './conductor';
 import {
-    OCTAVE_LIMITS, OCTAVE_WANDER, DEFAULT_PAD_WEIGHTS, DEFAULT_BASS_WEIGHTS, DEFAULT_PULSE_WEIGHTS, DEFAULT_ARP_WEIGHTS, DEFAULT_PAD_MOTION,
+    OCTAVE_LIMITS, OCTAVE_WANDER, DEFAULT_PAD_WEIGHTS, DEFAULT_BASS_WEIGHTS, DEFAULT_PULSE_WEIGHTS, DEFAULT_ARP_WEIGHTS, DEFAULT_DIRECTION_WEIGHTS, DEFAULT_PAD_MOTION,
     COUNTER_MODES, SECTION_MODES, SECTION_LENGTHS,
 } from './arranger';
 import { PRESET_CATEGORIES, ROLE_CATEGORY } from './presets';
@@ -290,7 +290,7 @@ export function randomChordColour(level, rng = Math.random) {
     return { mode: weighted(rng, { plain: 3, sus2: 2, add9: 2, add6: 1, floating: 1 }), amount: step(between(rng, 0.15, 0.5), 0.05) };
 }
 
-const STYLE_DEFAULTS = { pad: DEFAULT_PAD_WEIGHTS, bass: DEFAULT_BASS_WEIGHTS, pulse: DEFAULT_PULSE_WEIGHTS, arpeggio: DEFAULT_ARP_WEIGHTS };
+const STYLE_DEFAULTS = { pad: DEFAULT_PAD_WEIGHTS, bass: DEFAULT_BASS_WEIGHTS, pulse: DEFAULT_PULSE_WEIGHTS, arpeggio: DEFAULT_ARP_WEIGHTS, direction: DEFAULT_DIRECTION_WEIGHTS };
 const DEFAULT_HUMANIZE = { timing: 12, velocity: 0.08, detune: 3 };
 
 /**

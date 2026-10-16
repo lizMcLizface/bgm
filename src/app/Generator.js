@@ -55,7 +55,7 @@ const HISTORY_BARS = 512;
 // Settings that define "home"; changing one resets drift to it.
 const HOME_KEYS = new Set(['tonic', 'mode', 'progression', 'bpm', 'barsPerChord']);
 // Settings that don't change what is planned.
-const SOUND_KEYS = new Set(['ambience', 'ambienceShape', 'ambienceVolume', 'playMusic', 'playAmbience', 'volumes', 'drumKit', 'muted', 'wander']);
+const SOUND_KEYS = new Set(['ambience', 'ambienceShape', 'ambienceVolume', 'playMusic', 'playAmbience', 'volumes', 'drumKit', 'muted', 'wander', 'ambienceWander']);
 
 // Ambience volume slider (0..1) to gain: 0.8, the default, is unity.
 const ambienceGain = (volume) => Math.pow(volume / 0.8, 2);
@@ -154,6 +154,7 @@ class Generator {
         this.ambience.connect(this.ambienceOut);
         this.ambience.setShape(this.settings.ambienceShape);
         this.ambience.setLevels(this.settings.ambience);
+        this.ambience.setWander(this.settings.ambienceWander);
 
         this.warmRoles();
         this.reset();
@@ -442,6 +443,7 @@ class Generator {
         if (key === 'counter' || key === 'drums') this.warmRoles();
         if (key === 'ambience') this.ambience.setLevels(value);
         if (key === 'ambienceShape') this.ambience.setShape(value);
+        if (key === 'ambienceWander') this.ambience.setWander(value);
         if (key === 'ambienceVolume') this.setAmbienceVolume(value);
         if (key === 'volumes') this.applyVolumes();
         if (key === 'drumKit') this.roles.perc.instrument.setKit(value);
@@ -485,6 +487,7 @@ class Generator {
         this.warmRoles();
         if ('ambienceShape' in patch) this.ambience.setShape(this.settings.ambienceShape);
         if ('ambience' in patch) this.ambience.setLevels(this.settings.ambience);
+        if ('ambienceWander' in patch) this.ambience.setWander(this.settings.ambienceWander);
         if ('ambienceVolume' in patch) this.setAmbienceVolume(this.settings.ambienceVolume);
         if ('volumes' in patch) this.applyVolumes();
         if ('drumKit' in patch) this.roles.perc.instrument.setKit(this.settings.drumKit);
@@ -834,7 +837,7 @@ class Generator {
 
     // Decides one bar. Event times/lengths are in beats from the bar start.
     planBar(bar) {
-        const { barsPerChord, leadActivity, leadDensity, padWeights, bassWeights, pulseWeights, arpWeights, padMotion, thinPadUnderLead, drift, humanize, voices, counter, sections, drums, swing, chordSpread, pedal, leadScale, leadLeaps, leadRepeat, leadEnding } = this.settings;
+        const { barsPerChord, leadActivity, leadDensity, padWeights, bassWeights, pulseWeights, arpWeights, directionWeights, padMotion, thinPadUnderLead, drift, humanize, voices, counter, sections, drums, swing, chordSpread, pedal, leadScale, leadLeaps, leadRepeat, leadEnding } = this.settings;
         const prev = this.plan.get(bar - 1);
 
         const fresh = !prev || this.resetMusicAt === bar;
@@ -874,7 +877,7 @@ class Generator {
             chordStart,
             barsLeftInChord,
             prev: prev ? prev.state : null,
-            settings: { leadActivity, leadDensity, padWeights, bassWeights, pulseWeights, arpWeights, padMotion, thinPadUnderLead, voices, counter, sections: this.quickIntro ? { ...sections, quickIntro: true } : sections, chordSpread, pedal, leadScale, leadLeaps, leadRepeat, leadEnding },
+            settings: { leadActivity, leadDensity, padWeights, bassWeights, pulseWeights, arpWeights, directionWeights, padMotion, thinPadUnderLead, voices, counter, sections: this.quickIntro ? { ...sections, quickIntro: true } : sections, chordSpread, pedal, leadScale, leadLeaps, leadRepeat, leadEnding },
             rng: this.rng,
         });
         // Drums: patterns and looseness from streams of their own (the

@@ -1,4 +1,4 @@
-import { arrangeBar, notesInRange, styleShares, PAD_RANGE, BASS_RANGE, LEAD_RANGE, PHRASE_BARS, DEFAULT_PAD_WEIGHTS, DEFAULT_BASS_WEIGHTS, DEFAULT_VOICES, OCTAVE_LIMITS, pentatonicOf, openVoicing } from './arranger';
+import { arrangeBar, notesInRange, styleShares, PAD_RANGE, BASS_RANGE, LEAD_RANGE, PHRASE_BARS, DEFAULT_PAD_WEIGHTS, DEFAULT_BASS_WEIGHTS, DEFAULT_VOICES, OCTAVE_LIMITS, pentatonicOf, openVoicing, chordOrder, DEFAULT_DIRECTION_WEIGHTS } from './arranger';
 import { scaleById, scaleSemitones, diatonicChord } from './theory';
 import { seeded } from './random';
 import { METERS, groupStarts, beatStarts } from './meter';
@@ -498,3 +498,24 @@ describe('the colour layer in a piece', () => {
             .forEach((bar) => byRole(bar, 'pad').forEach((e) => { expect(e.midi).toBeGreaterThanOrEqual(PAD_RANGE[0] - 12); expect(e.midi).toBeLessThanOrEqual(PAD_RANGE[1]); }));
     });
 });
+
+test('chord directions: the order of a rolled or stacked chord', () => {
+    expect(chordOrder('up', 4)).toEqual([0, 1, 2, 3]);
+    expect(chordOrder('down', 4)).toEqual([3, 2, 1, 0]);
+    expect(chordOrder('out', 4)).toEqual([1, 2, 0, 3]);
+    expect(chordOrder('in', 5)).toEqual([0, 4, 1, 3, 2]);
+    ['up', 'down', 'out', 'in'].forEach((d) => [3, 4, 5].forEach((n) => expect([...chordOrder(d, n)].sort()).toEqual([...Array(n).keys()])));
+});
+
+test('the chord styles: rolled strums, stacked enters note by note, each in its direction', () => {
+    const style = (id, direction) => run({ seed: 4, bars: 8, settings: { ...AUTO, leadActivity: 0, padWeights: pads(id), directionWeights: only(direction, DEFAULT_DIRECTION_WEIGHTS) } });
+    const first = (bars) => bars[0].events.filter((e) => e.role === 'pad');
+    const up = first(style('rolled', 'up'));
+    expect(up.length).toBeGreaterThan(2);
+    up.forEach((e, i) => { if (i) expect(e.beat).toBeGreaterThan(up[i - 1].beat); expect(e.midi).toBeGreaterThan(i ? up[i - 1].midi : 0); });
+    const down = first(style('rolled', 'down')).sort((a, b) => a.beat - b.beat);
+    down.forEach((e, i) => { if (i) expect(e.midi).toBeLessThan(down[i - 1].midi); });
+    const stacked = first(style('stacked', 'out'));
+    expect(new Set(stacked.map((e) => e.beat)).size).toBe(stacked.length);
+    expect(new Set(stacked.map((e) => (e.beat + e.length).toFixed(3))).size).toBe(1);
+}); 
