@@ -90,7 +90,7 @@ synthesised with the Web Audio API; there are no samples.
   sounds" for every voice at once, sharing one character (smooth, warm,
   bright, glassy, organ, lo-fi or dub); links carry the seeds
 - Stop fades out within half a second, reverb and echo tails included
-  (optional, in the ⚙ menu with the buffer size and theme); master volume
+  (optional, in the Audio menu with the buffer size and the Performance choices); master volume
 - Simple by default: each panel shows its main controls, the rest is
   behind "More options"; a dice button randomizes a whole panel, a style
   group or a single field

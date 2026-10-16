@@ -34,8 +34,14 @@ export const TOUR_STEPS = [
     {
         id: 'tools',
         selector: '.gen-header-tools',
-        title: 'Volume and the ⚙ menu',
-        text: 'The master volume, and the ⚙ menu: copy a link to the music you are hearing, type a phrase to replay a piece, set a sleep timer, save a WAV file, change the audio buffer or theme, and open this tour again.',
+        title: 'Volume, theme and options',
+        text: 'The master volume; the theme button (light, dark, or follow your system); and the ⚙ options menu: copy a link to the music you are hearing, type a phrase to replay a piece, set a sleep timer, save a WAV file, connect a MIDI keyboard, and open this tour again.',
+    },
+    {
+        id: 'audio',
+        selector: '.gen-audio-menu',
+        title: 'Audio: if the sound crackles',
+        text: 'The speaker button shows how hard the audio engine is working: green is comfortable, amber is busy, red means the sound may drop out. Open it to see the load, pick a bigger buffer, and - under Performance - turn on a lighter reverb, one reverb shared by all voices, or fewer unison voices. If you hear crackling or dropouts, try those; they are on by default on a phone. Your choices are remembered in this browser.',
     },
     {
         id: 'timeline',

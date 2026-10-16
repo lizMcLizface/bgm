@@ -25,6 +25,8 @@ import { masterBus } from '../audio/bus';
 import Instrument from './engine/Instrument';
 import DrumKit from './engine/drumKit';
 import Ambience from './engine/ambience';
+import { PERFORMANCE } from '../audio/performance';
+import { hubFor } from '../nodes/sharedReverb';
 import Transport from './engine/transport';
 import { RoleWander, instrumentWander } from './engine/wander';
 import { scaleById, scaleSemitones, spellScale, romanDegree, diatonicChord, chordSymbol, displayNumeral, noteAtOrAbove, voiceLead } from './theory';
@@ -98,10 +100,12 @@ class Generator {
         this.settings = settings;
 
         this.roles = {};
+        // the voices' reverbs, when they share one (Performance menu, nodes/sharedReverb.js)
+        this.reverbHub = PERFORMANCE.sharedReverb ? hubFor(this.AC) : null;
         // volumes are settings (they travel in links); mute / solo are not
         Object.entries(ROLES).forEach(([role, { polyphony, preset }]) => {
             const volume = (this.settings.volumes && this.settings.volumes[role]) ?? ROLE_VOLUMES[role];
-            const instrument = new Instrument({ polyphony, preset: findPreset(preset) });
+            const instrument = new Instrument({ polyphony, preset: findPreset(preset), deferReverb: role === 'counter', reverbHub: this.reverbHub });
             const gain = this.AC.createGain();
             gain.gain.value = volume;
             // section tone: open (and inaudible) unless settings.sectionTone
@@ -117,7 +121,7 @@ class Generator {
         });
         {
             const volume = (this.settings.volumes && this.settings.volumes.perc) ?? ROLE_VOLUMES.perc;
-            const instrument = new DrumKit({ context: this.AC });
+            const instrument = new DrumKit({ context: this.AC, reverbHub: this.reverbHub });
             const gain = this.AC.createGain();
             gain.gain.value = volume;
             instrument.connect(gain);
@@ -127,6 +131,7 @@ class Generator {
             instrument.setKit(this.settings.drumKit);
             this.roles.perc = { instrument, gain, wander, presetName: null, edited: false, volume, mute: false, solo: false, drums: true };
         }
+        if (this.reverbHub) this.reverbHub.connect(this.output);
         // mutes are settings (they persist and travel in links); solo is not
         Object.entries(this.roles).forEach(([role, r]) => { r.mute = Boolean(this.settings.muted && this.settings.muted[role]); });
         this.applyMix();
@@ -150,6 +155,7 @@ class Generator {
         this.ambience.setShape(this.settings.ambienceShape);
         this.ambience.setLevels(this.settings.ambience);
 
+        this.warmRoles();
         this.reset();
     }
 
@@ -409,6 +415,7 @@ class Generator {
         clearTimeout(this.stopFade);
         this.stopFade = null;
         Object.values(this.roles).forEach(({ instrument }) => instrument.flushTails());
+        if (this.reverbHub) this.reverbHub.flushTails();
         this.output.gain.cancelScheduledValues(this.AC.currentTime);
         this.output.gain.setValueAtTime(1, this.AC.currentTime);
     }
@@ -417,8 +424,20 @@ class Generator {
      * Musical settings re-plan everything after the bar now playing. Home
      * settings also bring the music back to them from that bar.
      */
+    /**
+     * The second lead's and the drums' reverbs load only once those play
+     * (a convolver's memory is large, see nodes/reverb.js): called when
+     * their settings change.
+     */
+    warmRoles() {
+        const hear = (role) => { const { reverb } = this.roles[role].instrument; if (reverb) reverb.hear(); };
+        if (this.settings.counter && this.settings.counter.mode !== 'off') hear('counter');
+        if (this.settings.drums && this.settings.drums.style !== 'off') hear('perc');
+    }
+
     set(key, value) {
         this.settings[key] = value;
+        if (key === 'counter' || key === 'drums') this.warmRoles();
         if (key === 'ambience') this.ambience.setLevels(value);
         if (key === 'ambienceShape') this.ambience.setShape(value);
         if (key === 'ambienceVolume') this.setAmbienceVolume(value);
@@ -461,6 +480,7 @@ class Generator {
     setMany(patch) {
         const meterChanged = 'meter' in patch && patch.meter !== this.settings.meter;
         Object.assign(this.settings, patch);
+        this.warmRoles();
         if ('ambienceShape' in patch) this.ambience.setShape(this.settings.ambienceShape);
         if ('ambience' in patch) this.ambience.setLevels(this.settings.ambience);
         if ('ambienceVolume' in patch) this.setAmbienceVolume(this.settings.ambienceVolume);
@@ -623,6 +643,7 @@ class Generator {
         Object.values(this.roles).forEach((r) => {
             const audible = anySolo ? r.solo : !r.mute;
             r.gain.gain.setTargetAtTime(audible ? r.volume : 0, this.AC.currentTime, 0.02);
+            if (r.instrument.reverb && r.instrument.reverb.setLevel) r.instrument.reverb.setLevel(audible ? r.volume : 0);
         });
     }
 

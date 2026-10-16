@@ -83,3 +83,31 @@ export const SparkIcon = () => (
         <path d="M13 11.5v3M11.5 13h3" />
     </Svg>
 );
+
+export const SpeakerIcon = () => (
+    <Svg size={17}>
+        <path d="M2.5 6v4h2.5l3.5 3V3L5 6z" {...solid} />
+        <path d="M11 5.5a3.5 3.5 0 0 1 0 5M12.8 3.8a6 6 0 0 1 0 8.4" />
+    </Svg>
+);
+
+// Theme: a sun (light), a moon (dark), a half-filled disc (follow the system).
+export const SunIcon = () => (
+    <Svg size={17}>
+        <circle cx="8" cy="8" r="3" />
+        <path d="M8 1.5v1.8M8 12.7v1.8M1.5 8h1.8M12.7 8h1.8M3.4 3.4l1.3 1.3M11.3 11.3l1.3 1.3M12.6 3.4l-1.3 1.3M4.7 11.3l-1.3 1.3" />
+    </Svg>
+);
+
+export const MoonIcon = () => (
+    <Svg size={17}>
+        <path d="M13 9.6A5.4 5.4 0 0 1 6.4 3a5.4 5.4 0 1 0 6.6 6.6z" />
+    </Svg>
+);
+
+export const AutoThemeIcon = () => (
+    <Svg size={17}>
+        <circle cx="8" cy="8" r="5.5" />
+        <path d="M8 2.5a5.5 5.5 0 0 0 0 11z" {...solid} />
+    </Svg>
+);

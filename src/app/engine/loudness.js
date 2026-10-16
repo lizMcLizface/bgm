@@ -30,7 +30,7 @@ export async function measureLoudness(preset, role) {
     inst.scheduleSleep = () => {}; // no wall-clock timers during the render
     inst.connect(ctx.destination);
     // impulse responses (and noise worklets) load asynchronously
-    await until(() => inst.reverb.amount === 0 || inst.reverb.node.buffer, 3000);
+    await until(() => inst.reverb.settled, 3000);
     PHRASES[role].forEach(([midi, start, duration]) => inst.scheduleNote(midi, start, duration, 0.8));
     const buffer = await ctx.startRendering();
     let sum = 0;

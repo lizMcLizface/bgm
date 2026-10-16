@@ -176,8 +176,6 @@ export const TrackStrip = ({ roles, presets, mix, armed, onMix, onArm, onEdit, o
             {armed === 'perc' && <>Keys {DRUM_KEY_HINT}</>}
             {armed && armed !== 'perc' && <>Keys A–; play {roles[armed].label.split(' / ')[0].toLowerCase()}, Z/X octave (C{live.octave})</>}
             {!armed && 'Arm ⌨ to play a voice or the drums with your keyboard'}
-            <button type="button" className="gen-keys-button" onClick={live.connectMidi}>Connect MIDI</button>
-            {live.midiStatus && <span>{live.midiStatus}</span>}
         </div>
     </div>
 );

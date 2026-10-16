@@ -24,6 +24,7 @@ import Instrument from '../src/app/engine/Instrument';
 import Generator, { ROLES } from '../src/app/Generator';
 import { findPreset } from '../src/app/editor/presetStore';
 import { defaultSettings } from '../src/app/settings';
+import { ROLE_VOLUMES } from '../src/app/presets';
 import { METERS, unitsPerMinute } from '../src/app/meter';
 
 const SR = 48000;
@@ -95,7 +96,8 @@ export const VARIANTS = {
 export async function run({ scenario, seconds, variant = VARIANTS.full }) {
     const ctx = new OfflineAudioContext({ numberOfChannels: 2, length: SR * seconds, sampleRate: SR });
     const instruments = {};
-    Object.entries(ROLES).forEach(([role, { polyphony, preset, volume }]) => {
+    Object.entries(ROLES).forEach(([role, { polyphony, preset }]) => {
+        const volume = ROLE_VOLUMES[role];
         const inst = new Instrument({ polyphony, preset: findPreset(preset), context: ctx });
         inst.scheduleSleep = () => {};
         const gain = ctx.createGain();
@@ -106,7 +108,7 @@ export async function run({ scenario, seconds, variant = VARIANTS.full }) {
     });
     if (variant.tweak) variant.tweak(instruments, ctx);
     // impulses and worklet modules load asynchronously
-    await until(() => Object.values(instruments).every((i) => i.reverb.amount === 0 || i.reverb.node.buffer));
+    await until(() => Object.values(instruments).every((i) => i.reverb.settled));
     await new Promise((r) => setTimeout(r, 200));
 
     const events = variant.noNotes ? [] : planEvents(SCENARIOS[scenario], seconds);

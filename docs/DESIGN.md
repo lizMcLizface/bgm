@@ -731,3 +731,32 @@ committed or deployed until it has been listened to.
   every second bar, a ride opening a phrase; fills fall down the toms now
   and then. The tom's pitch, like the swish's direction, rides in the
   event's variation value.
+
+## 10. Memory and audio load of the reverbs (2026-10-16)
+
+Measured in headless Chrome on the production build: the page started at
+about 780 MB (JS heap 6 MB). Almost all of it was native: a ConvolverNode holds
+about 14 MB per second of its impulse (48 kHz, stereo), and every instrument
+and the drum kit has its own - a 9.8 s hall (reverb4, the default pad's) cost
+140 MB by itself, and a render's CPU grows the same way. What changed
+(`nodes/reverb.js`):
+
+- impulses are cut where 60 dB of energy is left, and capped at 3 s
+  (`MAX_SECONDS`, faded over the last 0.8 s);
+- a wet level under 0.08 (`MIN_WET`) gets no convolver at all;
+- the second lead's and the drums' reverbs load only when they play
+  (`defer()` / `hear()`, `Generator.warmRoles`);
+- Audio menu > Performance (all apply after a reload, `audio/performance.js`):
+  a "Light" reverb (a 2 s mono impulse on a mono-input convolver); "One reverb
+  shared by all voices" (`nodes/sharedReverb.js`: each voice sends to one
+  convolver per impulse type, the wet skipping the voice's EQ / filter / limiter
+  and section tone - about 35 MB less, output level within 0.2 dB in a test); and
+  "Fewer unison voices" (at most 2 oscillators per voice).
+
+Start-up memory about 780 -> 420 MB (full), audio load of the default voices
+about halved in `bench/` (16% -> 10%). Tools: `bench/` (engine, one part
+switched off at a time) and `bench/voices.html` (each built-in voice ranked by
+cost; even a one-oscillator voice costs ~6% of a core, nearly all of it its
+reverb). The menus: ⚙ is Options (share, phrase, sleep timer, save audio, tour), Audio
+is the engine (load, buffer, quick stop, Performance), and the theme is a
+light / dark / auto button in the header.

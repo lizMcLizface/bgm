@@ -13,6 +13,9 @@ import PRESET_DEFAULTS from './presetDefaults';
 import { gainEnvelopePoints, filterEnvelopeEvents, releasePoints, cancelAndHold } from './envelope';
 import { minTime } from '../../util/util';
 import { wanderLfo } from './wander';
+import { MIN_WET } from '../../nodes/reverb';
+import { SendReverb } from '../../nodes/sharedReverb';
+import { PERFORMANCE } from '../../audio/performance';
 
 // A held note is booked as if it lasted this long; its release replaces
 // the tail when the key comes up.
@@ -51,7 +54,8 @@ const PARAM_SETTERS = {
     filterFreq: eachVoice('setFilterFreq'),
     filterQ: eachVoice('setFilterQ'),
     filterGain: eachVoice('setFilterGain'),
-    voiceCount: eachVoice('setVoiceCount'),
+    // (a Performance choice caps the unison; the preset keeps its own count)
+    voiceCount: (inst, v) => eachVoice('setVoiceCount')(inst, Math.min(v, PERFORMANCE.maxUnison)),
     detuneSpread: eachVoice('setDetuneSpread'),
     stereoSpread: eachVoice('setStereoSpread'),
     noiseType: eachVoice('setNoiseType'),
@@ -127,7 +131,7 @@ const EFFECT_STAGES = [
     { key: 'bitCrush', active: (p) => p.bitCrushAmount > 0 },
     { key: 'delay', active: (p) => p.delayAmount > 0 },
     { key: 'pingPong', active: (p) => p.pingPongAmount > 0 },
-    { key: 'reverb', active: (p) => p.reverbAmount > 0 },
+    { key: 'reverb', active: (p) => p.reverbAmount >= MIN_WET },
     { key: 'eq', active: (p) => p.eqLowGain !== 0 || p.eqHighGain !== 0 },
     { key: 'filter', active: (p) => !(p.masterFilterType === 'lowpass' && p.masterFilterFreq >= 11000) },
 ];
@@ -147,7 +151,7 @@ class Instrument {
      * @param {object} [options.preset]
      * @param {BaseAudioContext} [options.context]
      */
-    constructor({ polyphony = 8, preset = {}, context = audioContext } = {}) {
+    constructor({ polyphony = 8, preset = {}, context = audioContext, deferReverb = false, reverbHub = null } = {}) {
         this.AC = context;
         this.polyphony = polyphony;
 
@@ -159,7 +163,9 @@ class Instrument {
         this.bitCrush = new Nodes.BitCrusher(this.AC);
         this.delay = new Nodes.Delay(this.AC);
         this.pingPong = new Nodes.PingPongDelay(this.AC);
-        this.reverb = new Nodes.Reverb(this.AC);
+        // one shared with the other voices, or its own (nodes/sharedReverb.js)
+        this.reverb = reverbHub ? new SendReverb(this.AC, reverbHub) : new Nodes.Reverb(this.AC);
+        if (deferReverb) this.reverb.defer();
         this.eq = new Nodes.EQ2(this.AC);
         this.filter = new Nodes.Filter(this.AC);
         this.limiter = new Nodes.Compressor(this.AC);
@@ -386,7 +392,7 @@ class Instrument {
             return time * Math.ceil(Math.log(1e-4) / Math.log(fb));
         };
         const impulse = this.reverb.node.buffer;
-        const reverb = p.reverbAmount > 0 ? (impulse ? impulse.duration : 10) : 0;
+        const reverb = p.reverbAmount >= MIN_WET && !this.reverb.shared ? (impulse ? impulse.duration : 10) : 0;
         return reverb
             + echoes(p.delayAmount, p.delayTime, p.delayFeedback)
             + echoes(p.pingPongAmount, p.pingPongDelayTime, p.pingPongFeedback)
@@ -573,9 +579,11 @@ class Instrument {
     }
 
     wake(index) {
+        this.reverb.hear();
         if (!this.chainAwake) {
             this.destinations.forEach((destination) => this.output.connect(destination));
             this.chainAwake = true;
+            if (this.reverb.setAwake) this.reverb.setAwake(true);
         }
         if (!this.awake[index]) {
             this.voices[index].volume.getNode().connect(this.synthMix.getNode());
@@ -599,6 +607,7 @@ class Instrument {
         if (this.chainAwake && !this.awake.some(Boolean) && this.silentFrom() < now) {
             this.output.disconnect();
             this.chainAwake = false;
+            if (this.reverb.setAwake) this.reverb.setAwake(false);
         }
         this.scheduleSleep();
     }

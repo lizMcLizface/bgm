@@ -18,7 +18,7 @@ import {
     randomArrangement, randomStyleWeights, randomRole, progressionLength, progressionForLength, randomAmbience, randomAmbienceShape,
     randomPadMotion, randomSwing,
 } from './randomize';
-import { MasterVolume, SettingsMenu } from './AudioStatus';
+import { MasterVolume, SettingsMenu, AudioMenu, ThemeToggle } from './AudioStatus';
 import { SleepTimer, Recorder } from './Playback';
 import { sceneSettings, sceneGroup, buildSetup, parseSetup } from './scenes';
 import PresetBrowser from './PresetBrowser';
@@ -1079,7 +1079,7 @@ const GenerativeApp = () => {
     return (
         <main className="gen">
             <header className="gen-header">
-                <h1>bgm <span>calm procedural music</span></h1>
+                <h1 aria-label="calmbgm - calm procedural music" title="calmbgm - calm procedural music">calm<b>bgm</b></h1>
                 <Transport gen={gen} anyOn={anyOn} onToggle={toggle} onChange={() => setTick((n) => n + 1)} />
                 <div className="gen-parts" role="group" aria-label="What Play plays">
                     <button type="button" className={`gen-part${settings.playMusic ? ' is-on' : ''}`} aria-pressed={settings.playMusic}
@@ -1093,7 +1093,9 @@ const GenerativeApp = () => {
                     <button type="button" className="gen-help" onClick={() => setHelpOpen(true)} title="Quick reference: hover the parts of the page to see what they do"
                         aria-label="Quick reference">?</button>
                     <MasterVolume />
-                    <SettingsMenu generator={gen} onReload={reloadKeepingSettings} link={() => shareUrl(gen.settings, linkPresets)} saving={saving} onTour={() => openTour(false)}
+                    <ThemeToggle />
+                    <AudioMenu generator={gen} onReload={reloadKeepingSettings} />
+                    <SettingsMenu midi={{ connect: live.connectMidi, status: live.midiStatus }} link={() => shareUrl(gen.settings, linkPresets)} saving={saving} onTour={() => openTour(false)}
                         phrase={<PhraseField seed={settings.seed} edited={gen.editedSinceStart} onApply={playPhrase} onRoll={newVariation} initial={linkedPhrase} />}>
                         <SleepTimer generator={gen} running={anyOn} onLeft={setSleepLeft} />
                         <Recorder generator={gen} fileName={fileName} onProgress={setSaving} />

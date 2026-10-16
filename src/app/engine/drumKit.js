@@ -13,6 +13,7 @@
 import * as Nodes from '../../nodes';
 import { audioContext } from '../../audio/context';
 import { DRUMS, defaultDrumKit } from '../percussion';
+import { SendReverb } from '../../nodes/sharedReverb';
 
 // Each drum's gain, so that at the same velocity they peak from about
 // -6 dB (kick) to -15 dB (hat) - measured; the raw sounds span 18 dB. The
@@ -319,7 +320,7 @@ const HITS = {
 const HIT_SECONDS = 8.1;
 
 class DrumKit {
-    constructor({ context = audioContext } = {}) {
+    constructor({ context = audioContext, reverbHub = null } = {}) {
         this.AC = context;
         this.polyphony = 0;
         this.bus = this.AC.createGain();
@@ -331,7 +332,8 @@ class DrumKit {
             level.connect(pan).connect(this.bus);
             return [name, level];
         }));
-        this.reverb = new Nodes.Reverb(this.AC);
+        this.reverb = reverbHub ? new SendReverb(this.AC, reverbHub) : new Nodes.Reverb(this.AC);
+        this.reverb.defer(); // until the drums play (Generator.warmRoles, wake)
         this.reverb.setType('reverb3');
         [].concat(this.reverb.getNode()).forEach((node) => this.bus.connect(node));
         this.output = this.AC.createGain();
@@ -430,9 +432,11 @@ class DrumKit {
     }
 
     wake() {
+        this.reverb.hear();
         if (!this.awake) {
             this.destinations.forEach((destination) => this.output.connect(destination));
             this.awake = true;
+            if (this.reverb.setAwake) this.reverb.setAwake(true);
         }
         this.scheduleSleep();
     }
@@ -446,6 +450,7 @@ class DrumKit {
             if (this.AC.currentTime < at) return this.scheduleSleep();
             this.output.disconnect();
             this.awake = false;
+            if (this.reverb.setAwake) this.reverb.setAwake(false);
             return undefined;
         }, Math.max(50, (at - this.AC.currentTime) * 1000));
     }

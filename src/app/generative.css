@@ -585,11 +585,9 @@ body {
     box-shadow: 0 1px 0 var(--gen-border);
 }
 
-.gen-header h1 span {
-    margin-left: 6px;
-    font-size: 13px;
-    font-weight: 400;
-    color: var(--gen-muted);
+.gen-header h1 b {
+    color: var(--gen-accent);
+    font-weight: 700;
 }
 
 .gen-play {
@@ -758,9 +756,6 @@ body {
         gap: 10px;
     }
 
-    .gen-header h1 span {
-        display: none;
-    }
 
     .gen-share {
         margin-left: 0;
@@ -864,7 +859,7 @@ body {
     width: 80px;
 }
 
-/* ⚙ menu: buffer size, quick stop, theme. */
+/* ⚙ options menu and the Audio menu (buffer size, quick stop, performance). */
 .gen-settings {
     position: relative;
 }
@@ -1795,4 +1790,63 @@ body {
         flex-basis: auto;
         margin-left: 6px;
     }
+}
+
+.gen-settings summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* The three header buttons (theme, audio, options) are one size; the options
+   one grows only while it shows the saving progress. */
+.gen-settings summary,
+.gen button.gen-theme {
+    box-sizing: border-box;
+    min-width: 34px;
+    height: 30px;
+    padding: 0 8px;
+    justify-content: center;
+}
+
+.gen button.gen-theme {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 6px;
+}
+
+.gen-menu-section small {
+    display: block;
+}
+
+/* The Audio button's colour follows the audio thread's load (AudioMenu). */
+.gen-audio-menu summary {
+    --load: var(--gen-muted);
+    color: var(--load);
+    border-color: color-mix(in srgb, var(--load) 55%, var(--gen-border));
+    background: color-mix(in srgb, var(--load) 14%, transparent);
+    transition: color 0.4s, background 0.4s, border-color 0.4s;
+}
+
+.gen-audio-menu summary.gen-load-ok { --load: #2e9e6b; }
+.gen-audio-menu summary.gen-load-busy { --load: #d9a21b; }
+.gen-audio-menu summary.gen-load-high { --load: #d9463e; }
+
+@media (prefers-reduced-motion: reduce) {
+    .gen-audio-menu summary {
+        transition: none;
+    }
+}
+
+/* An icon in a button is a block, so the button centres it exactly (an inline
+   svg sits on the text baseline and the dice looked low). */
+.gen .gen-dice svg,
+.gen .gen-icon-button svg {
+    display: block;
+}
+
+/* (the generic .gen button padding is more specific than .gen-dice, and left
+   the icon wider than its button, so it sat off-centre) */
+.gen button.gen-dice {
+    padding: 0;
 }

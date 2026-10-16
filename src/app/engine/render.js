@@ -194,7 +194,7 @@ export async function renderWav(gen, seconds, { ending = false, onProgress = () 
         const { ctx, instruments } = build(from);
 
         await Promise.all([noiseReady(ctx), bitCrusherReady(ctx)]);
-        await until(() => Object.values(instruments).every((inst) => inst.reverb.amount === 0 || inst.reverb.node.buffer), 5000);
+        await until(() => Object.values(instruments).every((inst) => inst.reverb.settled), 5000);
         if (start === 0) tail = Math.max(1, ...Object.values(instruments).map((inst) => inst.tailSeconds() + inst.preset.gainRelease));
         const to = end + (last ? 0 : CROSSFADE);
         for (let i = first; i < notes.length && notes[i].time < to; i++) {

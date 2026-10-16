@@ -14,7 +14,12 @@ const BARS_AHEAD = 6;
 const LANE_HEIGHT = 46;
 const ROLL_HEIGHT = 180;
 const GAP = 8;
-const HEIGHT = LANE_HEIGHT + GAP + ROLL_HEIGHT;
+// The drums have a strip of their own under the roll, a row per drum (percussion.js DRUMS: 14),
+// so their ticks never sit on the bass's notes.
+const DRUM_ROWS = 14;
+const DRUM_ROW = 3.2;
+const PERC_HEIGHT = Math.ceil(DRUM_ROWS * DRUM_ROW) + 6;
+const HEIGHT = LANE_HEIGHT + GAP + ROLL_HEIGHT + GAP + PERC_HEIGHT;
 // Pitch window of the roll (MIDI): the arranger's bass floor .. lead ceiling.
 const MIDI_LOW = 29;
 const MIDI_HIGH = 93;
@@ -66,10 +71,18 @@ function draw(ctx, width, gen, pos) {
     const playheadX = BARS_BEHIND * beatsPerBar * pxPerBeat;
     const x = (beat) => playheadX + (beat - pos) * pxPerBeat;
     const rollTop = LANE_HEIGHT + GAP;
+    const percTop = rollTop + ROLL_HEIGHT + GAP;
     const y = (midi) => rollTop + ROLL_HEIGHT - ((midi - MIDI_LOW) / (MIDI_HIGH - MIDI_LOW)) * ROLL_HEIGHT;
     const noteHeight = Math.max(2, ROLL_HEIGHT / (MIDI_HIGH - MIDI_LOW) - 1);
 
     ctx.clearRect(0, 0, width, HEIGHT);
+
+    // a faint line over the drums' strip
+    ctx.strokeStyle = color.border;
+    ctx.beginPath();
+    ctx.moveTo(0, percTop - GAP / 2 + 0.5);
+    ctx.lineTo(width, percTop - GAP / 2 + 0.5);
+    ctx.stroke();
 
     // A loop: its bars shaded.
     if (gen.loop) {
@@ -178,9 +191,9 @@ function draw(ctx, width, gen, pos) {
             const level = end <= pos ? 0.3 : sounding ? 1 : 0.6;
             ctx.globalAlpha = audible[e.role] === false ? level * 0.2 : level;
             if (e.role === 'perc') {
-                // drum hits: short ticks along the bottom, one row per drum;
+                // drum hits: short ticks in the strip under the roll, one row per drum;
                 // a swish (drum 5) as long as it sounds
-                roundRect(ctx, left, rollTop + ROLL_HEIGHT - 3 - e.midi * 3, e.midi === 5 ? w : 3, 2.5, 1);
+                roundRect(ctx, left, percTop + 3 + (DRUM_ROWS - 1 - e.midi) * DRUM_ROW, e.midi === 5 ? w : 3, 2.5, 1);
             } else {
                 roundRect(ctx, left, y(e.midi) - noteHeight / 2, w, noteHeight, 2);
             }
