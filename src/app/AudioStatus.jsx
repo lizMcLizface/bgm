@@ -13,7 +13,8 @@ import { addSilence, readSilenceLog, clearSilenceLog, formatSilenceLog, describe
 import { runBenchmark } from './benchmark';
 import { readPref, writePref } from './prefs';
 import { applyTheme, storedTheme } from './theme';
-import { LinkIcon, SpeakerIcon, SunIcon, MoonIcon, AutoThemeIcon } from './icons';
+import { BACKDROP_DEFAULTS, BACKDROP_LIMITS, PALETTES, SPECTRA } from './Backdrop';
+import { LinkIcon, SpeakerIcon, SunIcon, MoonIcon, AutoThemeIcon, PaletteIcon } from './icons';
 
 const VOLUME_KEY = 'bgm-volume';
 const QUICK_STOP_KEY = 'bgm-quick-stop';
@@ -83,23 +84,89 @@ export const AudioMeter = ({ status }) => {
     );
 };
 
-// Light -> dark -> follow the system, one click each, so a page that opened in
-// the wrong colours is one or two clicks from the right ones.
-const THEME_ORDER = ['light', 'dark', 'auto'];
-const THEME_LABELS = { auto: 'Auto', light: 'Light', dark: 'Dark' };
+const THEME_CHOICES = [['light', 'Light', SunIcon], ['dark', 'Dark', MoonIcon], ['auto', 'Auto', AutoThemeIcon]];
 const THEME_HINTS = { auto: 'Colours follow your system', light: 'Light colours', dark: 'Dark colours' };
-const THEME_ICONS = { auto: AutoThemeIcon, light: SunIcon, dark: MoonIcon };
+const BACKDROP_SLIDERS = [['layers', 'Depth layers'], ['size', 'Cloud size'], ['detail', 'Detail'], ['definition', 'Definition'], ['speed', 'Drift speed'], ['spread', 'Colour spread'], ['glow', 'Light pulses']];
 
-/** The theme button: shows the current theme, a click moves to the next. */
-export const ThemeToggle = () => {
+/**
+ * The visual menu: everything about how the page looks - the theme and the cloudy
+ * background with its options (`backdrop`: null when
+ * WebGL2 is missing). Stays in the hidden-interface view.
+ */
+export const VisualMenu = ({ backdrop }) => {
+    const menu = useRef(null);
+    useDismiss(menu);
     const [theme, setTheme] = useState(storedTheme);
-    const next = THEME_ORDER[(THEME_ORDER.indexOf(theme) + 1) % THEME_ORDER.length];
+    const set = (key, value) => backdrop.onOptions({ ...backdrop.options, [key]: value });
     return (
-        <button type="button" className="gen-theme" onClick={() => { applyTheme(next); setTheme(next); }}
-            title={`${THEME_HINTS[theme]} - click for ${THEME_LABELS[next].toLowerCase()}`}
-            aria-label={`Theme: ${THEME_LABELS[theme]}. Switch to ${THEME_LABELS[next]}`}>
-            {React.createElement(THEME_ICONS[theme])}
-        </button>
+        <details className="gen-settings gen-visual" ref={menu}>
+            <summary title="Look: theme and background" aria-label="Look: theme and background"><PaletteIcon /></summary>
+            <div className="gen-settings-menu">
+                <section className="gen-menu-section">
+                    <h3>Theme</h3>
+                    <div className="gen-menu-choices" role="group" aria-label="Theme">
+                        {THEME_CHOICES.map(([id, label, Icon]) => (
+                            <button key={id} type="button" className={theme === id ? 'is-on' : ''} aria-pressed={theme === id} title={THEME_HINTS[id]}
+                                onClick={() => { applyTheme(id); setTheme(id); }}><Icon /> {label}</button>
+                        ))}
+                    </div>
+                </section>
+                {backdrop && (
+                    <section className="gen-menu-section">
+                        <h3>Background</h3>
+                        <label className="gen-check">
+                            <input type="checkbox" checked={backdrop.value} onChange={(e) => backdrop.onChange(e.target.checked)} />
+                            Cloudy background
+                        </label>
+                        <small>Soft moving clouds, with a pulse of light for every note. Their colour, speed and depth follow the key, tempo, chord style and section of the music. Needs WebGL2.</small>
+                        <label className="gen-check">
+                            <input type="checkbox" checked={backdrop.options.circle} onChange={(e) => set('circle', e.target.checked)} />
+                            Circle visualizer
+                        </label>
+                        <small>A circular spectrum of the sound, on its own or over the clouds. Only shown while the interface is hidden, and below the timeline when that is showing.</small>
+                        {backdrop.options.circle && (
+                            <label className="gen-menu-slider">
+                                <span>Circle style</span>
+                                <select value={backdrop.options.spectrum === 'bars' ? 'bars' : 'ring'} onChange={(e) => set('spectrum', e.target.value)}>
+                                    {Object.entries(SPECTRA).map(([id, label]) => <option key={id} value={id}>{label}</option>)}
+                                </select>
+                            </label>
+                        )}
+                        {(backdrop.value || backdrop.options.circle) && (
+                            <>
+                                <label className="gen-menu-slider">
+                                    <span>Colours</span>
+                                    <select value={backdrop.options.palette} onChange={(e) => set('palette', e.target.value)}>
+                                        {Object.entries(PALETTES).map(([id, { label }]) => <option key={id} value={id}>{label}</option>)}
+                                    </select>
+                                </label>
+                                <button type="button" className="gen-menu-wide" onClick={backdrop.onShuffle}
+                                    title="Pick a new base colour and spread between the colours">Shuffle colours</button>
+                            </>
+                        )}
+                        {backdrop.value && (
+                            <>
+                                <label className="gen-check">
+                                    <input type="checkbox" checked={backdrop.options.trails} onChange={(e) => set('trails', e.target.checked)} />
+                                    Melody trails
+                                </label>
+                                {BACKDROP_SLIDERS.map(([key, label]) => {
+                                    const [min, max, step] = BACKDROP_LIMITS[key];
+                                    return (
+                                        <label key={key} className="gen-menu-slider">
+                                            <span>{label}</span>
+                                            <input type="range" min={min} max={max} step={step} value={backdrop.options[key]}
+                                                onChange={(e) => set(key, Number(e.target.value))} />
+                                        </label>
+                                    );
+                                })}
+                            </>
+                        )}
+                        <button type="button" className="gen-menu-wide" onClick={() => backdrop.onOptions(BACKDROP_DEFAULTS)}>Reset background</button>
+                    </section>
+                )}
+            </div>
+        </details>
     );
 };
 
@@ -257,7 +324,7 @@ export const AudioMenu = ({ generator, onReload }) => {
 };
 
 /** The ⚙ options menu: sharing, a phrase, the sleep timer and saving audio (children), MIDI, starting over with only the basics. */
-export const SettingsMenu = ({ link, saving, phrase, onStartOver, smooth, intro, midi, children }) => {
+export const SettingsMenu = ({ link, saving, phrase, onStartOver, smooth, intro, onTour, midi, children }) => {
     const menu = useRef(null);
     useDismiss(menu);
     const [copied, setCopied] = useState('');
@@ -311,11 +378,13 @@ export const SettingsMenu = ({ link, saving, phrase, onStartOver, smooth, intro,
                         <small role="status">{midi.status || 'Play a voice or the drums from a MIDI keyboard. Arm a voice with its keyboard button first.'}</small>
                     </section>
                 )}
-                {onStartOver && (
+                {(onStartOver || onTour) && (
                     <section className="gen-menu-section">
                         <h3>Help</h3>
-                        <button type="button" className="gen-menu-wide" title="Hide everything but the basics again, and take the tour from the start"
-                            onClick={() => { menu.current.open = false; onStartOver(); }}>Start over with the basics</button>
+                        {onTour && <button type="button" className="gen-menu-wide" title="Take the tour again, of everything unlocked so far"
+                            onClick={() => { menu.current.open = false; onTour(); }}>Take the tour</button>}
+                        {onStartOver && <button type="button" className="gen-menu-wide" title="Hide everything but the basics again, and take the tour from the start"
+                            onClick={() => { menu.current.open = false; onStartOver(); }}>Start over with the basics</button>}
                     </section>
                 )}
             </div>

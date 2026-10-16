@@ -73,8 +73,8 @@ export const TOUR_STEPS = [
         id: 'tools',
         stage: 0,
         selector: '.gen-header-tools',
-        title: 'Volume, theme and options',
-        text: 'The master volume and the theme button. The speaker button shows how hard the audio engine is working - if the sound crackles, open it for a bigger buffer or a lighter reverb. The ⚙ menu copies a link to the music, sets a sleep timer, saves a WAV file, and can start over with only the basics. The Tour button repeats this tour.',
+        title: 'Volume, look and options',
+        text: 'The master volume and the look menu (theme and the cloudy background). The speaker button shows how hard the audio engine is working - if the sound crackles, open it for a bigger buffer or a lighter reverb. The ⚙ menu copies a link to the music, sets a sleep timer, saves a WAV file, repeats this tour and can start over with only the basics.',
     },
     {
         id: 'unlock',
@@ -82,7 +82,7 @@ export const TOUR_STEPS = [
         hint: true,
         selector: '.gen-unlock',
         title: 'That is the basics',
-        text: 'Press Play and leave it running. When you want more, press this button: it unlocks the next set of features and shows you around them, one set at a time. The Tour button beside it repeats a tour whenever you like.',
+        text: 'Press Play and leave it running. When you want more, press this button: it unlocks the next set of features and shows you around them, one set at a time. The ⚙ menu repeats a tour whenever you like.',
     },
 
     // ---- 1: ambience ----
@@ -230,6 +230,6 @@ export const TOUR_STEPS = [
         hint: true,
         selector: null,
         title: 'That is everything',
-        text: 'Press Play and leave it running. The Tour button repeats the tour, and the ⚙ menu can start over with only the basics.',
+        text: 'Press Play and leave it running. The ⚙ menu repeats the tour and can start over with only the basics.',
     },
 ];

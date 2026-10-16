@@ -55,6 +55,8 @@ function roundRect(ctx, x, y, w, h, r) {
  * border, surface, accent, accentText and each role).
  */
 export function drawTimeline(ctx, width, height, view, pos, color) {
+    // A hidden canvas has no size; with no width the beat loops below never reach the edge.
+    if (!(width > 0 && height > 0)) return;
     const { beatsPerBar, plan } = view;
     const rollHeight = height - LANE_HEIGHT - GAP - GAP - PERC_HEIGHT;
     const pxPerBeat = width / ((BARS_BEHIND + BARS_AHEAD) * beatsPerBar);

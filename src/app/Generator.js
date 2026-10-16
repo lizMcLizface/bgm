@@ -191,6 +191,7 @@ class Generator {
         this.transport.beatsPerBar = this.meter.units;
         this.plan = new Map();
         this.beatLog = [];
+        this.noteLog = [];
         this.currentBar = -1;
         this.resetMusicAt = 0;
         this.resumeBar = 0;
@@ -1154,6 +1155,9 @@ class Generator {
         if (beatInBar === 0) this.applyTone(this.plan.get(bar).tone, time, secondsPerBeat * this.transport.beatsPerBar);
         const book = (e, start) => {
             e.booked = true;
+            // For visuals (Backdrop): what was booked, and when it sounds (audio-clock seconds).
+            this.noteLog.push({ role: e.role, midi: e.midi, velocity: e.velocity, time: Math.max(start, this.AC.currentTime), length: e.length * secondsPerBeat });
+            if (this.noteLog.length > 96) this.noteLog.shift();
             this.roles[e.role].instrument.scheduleNote(e.midi, Math.max(start, this.AC.currentTime), e.length * secondsPerBeat, e.velocity, e.detune);
         };
         const current = this.plan.get(bar).events;

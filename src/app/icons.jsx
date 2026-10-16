@@ -94,6 +94,44 @@ export const SparkIcon = () => (
     </Svg>
 );
 
+// Music / Ambience parts: a note, and rolling waves.
+export const MusicIcon = () => (
+    <Svg size={16}>
+        <path d="M6 12.5V3l7-1.5v9.5" />
+        <circle cx="4.2" cy="12.5" r="1.8" {...solid} />
+        <circle cx="11.2" cy="11" r="1.8" {...solid} />
+    </Svg>
+);
+
+export const AmbienceIcon = () => (
+    <Svg size={16}>
+        <path d="M1.5 5.5c1.5-2 3-2 4.5 0s3 2 4.5 0 3-2 4 0" />
+        <path d="M1.5 9c1.5-2 3-2 4.5 0s3 2 4.5 0 3-2 4 0" />
+        <path d="M1.5 12.5c1.5-2 3-2 4.5 0s3 2 4.5 0 3-2 4 0" />
+    </Svg>
+);
+
+// The look menu: a painter's palette.
+export const PaletteIcon = () => (
+    <Svg size={17}>
+        <path d="M8 1.8C4.3 1.8 1.8 4.4 1.8 7.8c0 3.3 2.6 6.4 5.6 6.4 1.2 0 1.6-.7 1.2-1.6-.5-1 .1-2 1.2-2h1.7c1.6 0 2.7-1 2.7-2.7C14.2 4.4 11.6 1.8 8 1.8z" />
+        <circle cx="5" cy="7.5" r="0.9" fill="currentColor" stroke="none" />
+        <circle cx="7.6" cy="4.8" r="0.9" fill="currentColor" stroke="none" />
+        <circle cx="10.7" cy="5.8" r="0.9" fill="currentColor" stroke="none" />
+    </Svg>
+);
+
+// The timeline: a few notes on a roll.
+export const TimelineIcon = () => (
+    <Svg size={16}>
+        <path d="M2.5 5h4M8.5 5h5M4.5 8h5M11 8h2.5M2.5 11h2.5M7 11h6.5" strokeWidth="2" />
+    </Svg>
+);
+
+// Hide / show the interface: a chevron up (collapse) and down (expand), like a section's header.
+export const ChevronUpIcon = () => <Svg size={16}><path d="M3.5 10l4.5-4.5 4.5 4.5" strokeWidth="2" /></Svg>;
+export const ChevronDownIcon = () => <Svg size={16}><path d="M3.5 6l4.5 4.5L12.5 6" strokeWidth="2" /></Svg>;
+
 export const SpeakerIcon = () => (
     <Svg size={17}>
         <path d="M2.5 6v4h2.5l3.5 3V3L5 6z" {...solid} />

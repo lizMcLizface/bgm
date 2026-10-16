@@ -19,7 +19,8 @@ import {
     randomArrangement, randomStyleWeights, randomRole, progressionLength, progressionForLength, randomAmbience, randomAmbienceShape,
     randomPadMotion, randomSwing, randomColour,
 } from './randomize';
-import { MasterVolume, SettingsMenu, AudioMenu, ThemeToggle } from './AudioStatus';
+import Backdrop, { backdropSupported, BACKDROP_DEFAULTS, shuffleColours } from './Backdrop';
+import { MasterVolume, SettingsMenu, AudioMenu, VisualMenu } from './AudioStatus';
 import { SleepTimer, Recorder } from './Playback';
 import { sceneSettings, sceneGroup, buildSetup, parseSetup, sceneBySlug, sceneSlug, presetFromSearch, introFromSearch, SCENES, SCENE_CATEGORIES } from './scenes';
 import PresetBrowser from './PresetBrowser';
@@ -29,7 +30,7 @@ import { setupMediaSession, updateMediaSession } from './mediaSession';
 import { AMBIENCE_LAYERS, LAYER_PARAMS } from './engine/ambience';
 import { COMMON_PARAMS } from './engine/ambienceSynth';
 import {
-    DiceIcon, RotateIcon, SparkIcon, PlayIcon, PauseIcon, ToStartIcon, BarBackIcon, BarForwardIcon, ProgressionBackIcon, ProgressionForwardIcon, LoopIcon,
+    DiceIcon, RotateIcon, SparkIcon, PlayIcon, PauseIcon, ToStartIcon, BarBackIcon, BarForwardIcon, ProgressionBackIcon, ProgressionForwardIcon, LoopIcon, MusicIcon, AmbienceIcon, ChevronUpIcon, ChevronDownIcon, TimelineIcon,
 } from './icons';
 import { newSoundSeed } from './soundGen';
 import { soundFrom, SOUND_KINDS, GENERATOR_V2 } from './soundGenV2';
@@ -1118,6 +1119,22 @@ const GenerativeApp = () => {
     // Smoothly (the ⚙ menu, on by default) the whole change waits for the next chord, and the
     // sounds then glide over that chord instead of switching.
     const [smoothPresets, setSmoothPresets] = useStoredFlag('bgm-smooth-presets', true);
+    const [backdropOn, setBackdropOn] = useStoredFlag('bgm-backdrop', false);
+    const [storedBackdropOptions, setBackdropOptions] = useStoredFlag('bgm-backdrop-options', BACKDROP_DEFAULTS);
+    const backdropOptions = { ...BACKDROP_DEFAULTS, ...storedBackdropOptions };
+    // Hides everything but the transport and the timeline (⚙ menu); Esc or the corner button brings it back.
+    const [zen, setZen] = useState(false);
+    // In that view the timeline can be folded away too (ignored while the interface shows).
+    const [timelineHidden, setTimelineHidden] = useState(false);
+    const bare = zen && timelineHidden;
+    // The circle is only for the hidden-interface view.
+    const circleShown = zen && backdropOptions.circle;
+    useEffect(() => {
+        if (!zen) return undefined;
+        const onKey = (e) => { if (e.key === 'Escape') setZen(false); };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, [zen]);
     const loadPresetAt = (role, name, morph) => gen.loadRolePresetAtBar(role, name, undefined, () => presetLoaded(role, name), { morph });
     const loadSceneVoice = (role, spec, sceneName, unsaved, morph) => {
         if (typeof spec === 'string') {
@@ -1295,16 +1312,18 @@ const GenerativeApp = () => {
     const shownTracks = drumsOn ? { ...shownRoles, ...PERC_ROLE } : shownRoles;
 
     return (
-        <main className="gen">
+        <main className={`gen${zen ? ' gen-zen' : ''}${bare ? ' gen-zen-bare' : ''}`}>
+            {(backdropOn || circleShown) && backdropSupported() && <Backdrop generator={gen} options={{ ...backdropOptions, circle: circleShown }} clouds={backdropOn} />}
+
             <header className="gen-header">
                 <h1 aria-label="calmbgm - calm procedural music" title="calmbgm - calm procedural music">calm<b>bgm</b></h1>
                 <div className="gen-header-controls">
                 <Transport gen={gen} anyOn={anyOn} onToggle={toggle} onChange={() => setTick((n) => n + 1)} />
                 {has(1) && <div className="gen-parts" role="group" aria-label="What Play plays">
-                    <button type="button" className={`gen-part${settings.playMusic ? ' is-on' : ''}`} aria-pressed={settings.playMusic}
-                        onClick={() => togglePart('playMusic')} title={PART_TITLE}>Music</button>
-                    <button type="button" className={`gen-part${settings.playAmbience ? ' is-on' : ''}`} aria-pressed={settings.playAmbience}
-                        onClick={() => togglePart('playAmbience')} title={PART_TITLE}>Ambience</button>
+                    <button type="button" className={`gen-part gen-part-icon${settings.playMusic ? ' is-on' : ''}`} aria-pressed={settings.playMusic}
+                        aria-label="Music" onClick={() => togglePart('playMusic')} title={`Music. ${PART_TITLE}`}><MusicIcon /></button>
+                    <button type="button" className={`gen-part gen-part-icon${settings.playAmbience ? ' is-on' : ''}`} aria-pressed={settings.playAmbience}
+                        aria-label="Ambience" onClick={() => togglePart('playAmbience')} title={`Ambience. ${PART_TITLE}`}><AmbienceIcon /></button>
                 </div>}
                 </div>
                 <div className="gen-header-end">
@@ -1317,18 +1336,26 @@ const GenerativeApp = () => {
                     </button>
                 )}
                 <div className="gen-header-tools">
-                    <button type="button" className="gen-tour-button" onClick={() => openTour(false)}
-                        title="Take the tour again, of everything unlocked so far">Tour</button>
                     <button type="button" className="gen-help" onClick={() => setHelpOpen(true)} title="Quick reference: hover the parts of the page to see what they do"
                         aria-label="Quick reference">?</button>
                     <MasterVolume />
-                    <ThemeToggle />
+                    <VisualMenu backdrop={backdropSupported() ? { value: backdropOn, onChange: setBackdropOn, options: backdropOptions, onOptions: setBackdropOptions, onShuffle: () => setBackdropOptions(shuffleColours(backdropOptions)) } : null} />
                     <AudioMenu generator={gen} onReload={reloadKeepingSettings} />
-                    <SettingsMenu midi={{ connect: live.connectMidi, status: live.midiStatus }} link={() => withIntro(shareUrl(gen.settings, linkPresets), shortIntro)} saving={saving} onStartOver={startOver} smooth={{ value: smoothPresets, onChange: setSmoothPresets }} intro={{ value: shortIntro, onChange: setShortIntro }}
+                    <SettingsMenu midi={{ connect: live.connectMidi, status: live.midiStatus }} link={() => withIntro(shareUrl(gen.settings, linkPresets), shortIntro)} saving={saving} onStartOver={startOver} smooth={{ value: smoothPresets, onChange: setSmoothPresets }} intro={{ value: shortIntro, onChange: setShortIntro }} onTour={() => openTour(false)}
                         phrase={<PhraseField seed={settings.seed} edited={gen.editedSinceStart} onApply={playPhrase} onRoll={newVariation} initial={linkedPhrase} />}>
                         <SleepTimer generator={gen} running={anyOn} onLeft={setSleepLeft} />
                         <Recorder generator={gen} fileName={fileName} onProgress={setSaving} />
                     </SettingsMenu>
+                    {zen && (
+                        <button type="button" className="gen-help gen-hide" aria-pressed={timelineHidden} onClick={() => setTimelineHidden(!timelineHidden)}
+                            aria-label={timelineHidden ? 'Show the timeline' : 'Hide the timeline'} title={timelineHidden ? 'Show the timeline again' : 'Hide the timeline too'}>
+                            <TimelineIcon />
+                        </button>
+                    )}
+                    <button type="button" className="gen-help gen-hide" onClick={() => setZen(!zen)} aria-label={zen ? 'Show the interface' : 'Hide the interface'}
+                        title={zen ? 'Show the whole page again (Esc)' : 'Hide everything but the play controls and the timeline (Esc brings it back)'}>
+                        {zen ? <ChevronDownIcon /> : <ChevronUpIcon />}
+                    </button>
                 </div>
                 </div>
             </header>

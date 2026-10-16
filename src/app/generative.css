@@ -1105,6 +1105,18 @@ body {
     border-color: var(--gen-accent);
 }
 
+.gen button.gen-part-icon {
+    padding: 5px 8px;
+}
+
+.gen button.gen-part-icon::before {
+    display: none;
+}
+
+.gen button.gen-part-icon.is-on {
+    color: var(--gen-accent);
+}
+
 .gen-panel-title .gen-part {
     text-transform: none;
     letter-spacing: normal;
@@ -1472,6 +1484,10 @@ body {
     padding: 0;
     border-radius: 50%;
     font-weight: 600;
+}
+
+.gen button.gen-help.gen-hide {
+    border-radius: 8px;
 }
 
 .gen-tour-reference {
@@ -2206,4 +2222,111 @@ body {
     box-sizing: border-box;
     font: 11px/1.4 ui-monospace, Consolas, monospace;
     resize: vertical;
+}
+
+/* Optional cloudy background (⚙ menu): a fixed canvas behind the page, with the panels a little see-through. */
+.gen-backdrop {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    pointer-events: none;
+}
+
+:root[data-backdrop] .gen-panel,
+:root[data-backdrop] .gen-timeline {
+    background: color-mix(in srgb, var(--gen-surface) 78%, transparent);
+    backdrop-filter: blur(10px);
+}
+
+/* Background options in the ⚙ menu. */
+.gen-menu-slider {
+    display: grid;
+    grid-template-columns: 7.5em 1fr;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+}
+
+.gen-menu-slider input {
+    width: 100%;
+    min-width: 0;
+}
+
+/* Hide UI: only the transport, the timeline with its playhead (without the track strip) and
+   the button that brings the page back stay. */
+.gen-zen > :not(.gen-header):not(.gen-backdrop):not(.gen-timeline) {
+    display: none !important;
+}
+
+.gen-zen .gen-tracks {
+    display: none;
+}
+
+.gen-zen .gen-timeline-body {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.gen-zen .gen-timeline {
+    background: color-mix(in srgb, var(--gen-surface) 45%, transparent);
+    backdrop-filter: none;
+}
+
+.gen-zen .gen-header {
+    background: transparent;
+    box-shadow: none;
+}
+
+.gen-zen .gen-header > :not(.gen-header-controls):not(.gen-header-end) {
+    display: none !important;
+}
+
+/* ...and the look menu, to change the picture while watching it. */
+.gen-zen .gen-header-end > :not(.gen-header-tools) {
+    display: none !important;
+}
+
+.gen-zen .gen-header-tools > :not(.gen-visual):not(.gen-hide) {
+    display: none !important;
+}
+
+
+.gen-menu-choices {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+}
+
+.gen .gen-menu-choices button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 5px 6px;
+}
+
+.gen .gen-menu-choices button.is-on {
+    border-color: var(--gen-accent);
+    color: var(--gen-accent);
+}
+
+.gen-menu-slider select {
+    width: 100%;
+    min-width: 0;
+}
+
+.gen-visual .gen-settings-menu {
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+}
+
+/* Hide the interface, and the timeline as well. */
+.gen-zen-bare > .gen-timeline {
+    display: none !important;
+}
+
+.gen button.gen-hide[aria-pressed='true'] {
+    border-color: var(--gen-accent);
+    color: var(--gen-accent);
 }

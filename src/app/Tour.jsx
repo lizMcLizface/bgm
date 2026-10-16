@@ -135,7 +135,7 @@ const Tour = ({ onClose, reference = false, prompt = false, fromStage = 0, toSta
                         <button type="button" ref={next} className="gen-tour-start" onClick={begin} autoFocus>Take the tour</button>
                         <button type="button" className="gen-tour-skip" onClick={decline}>I don't need help - show me everything</button>
                     </div>
-                    <small>The Tour button in the top bar repeats it.</small>
+                    <small>The ⚙ menu repeats it.</small>
                 </div>
             </div>
         );
