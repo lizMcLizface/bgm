@@ -17,6 +17,15 @@ const HIDDEN_LOOKAHEAD = isMobile() ? 20 : 10; // (a phone is the likelier to be
 // grows to cover the longest silence between ticks actually seen (twice that,
 // and a margin), up to this much.
 const MAX_HIDDEN_LOOKAHEAD = 45;
+// If the page was frozen (a backgrounded phone, a stalled thread) the next beat
+// can end up in the past. The beats it missed are not booked all at once - that
+// plays the backlog as a burst ("really fast", all at once) - the music picks
+// up where it left off, from now, as after a pause.
+const LATE_LIMIT = 0.3;
+// A tick books beats for at most this long (ms) once nothing is urgent, so
+// filling a long lookahead window never holds the page up for long.
+const TICK_BUDGET_MS = 25;
+const URGENT = 0.5;
 
 const TICK_WORKER_SOURCE = 'let id=null;onmessage=(e)=>{clearInterval(id);id=null;if(e.data>0)id=setInterval(()=>postMessage(0),e.data)};';
 
@@ -63,6 +72,22 @@ class Transport {
         // the longest stretch (audio seconds) lately between two ticks, while the page was hidden
         this.slowestGap = 0;
         this.lastTick = null;
+        // Back on screen: make sure the audio is running and the beat that is due is booked now.
+        if (typeof document !== 'undefined' && document.addEventListener) {
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState !== 'visible' || !this.isRunning) return;
+                this.wakeAudio();
+                this.tick();
+            });
+        }
+        if (this.AC && this.AC.addEventListener) this.AC.addEventListener('statechange', () => this.wakeAudio());
+    }
+
+    // The browser may suspend or interrupt the context while the page is away; while we are
+    // playing and the page is visible, ask for it back.
+    wakeAudio() {
+        if (!this.isRunning || this.hidden || !this.AC.resume) return;
+        if (this.AC.state === 'suspended' || this.AC.state === 'interrupted') this.AC.resume().catch(() => {});
     }
 
     get hidden() {
@@ -139,7 +164,12 @@ class Transport {
 
     tick() {
         this.watchGap();
-        while (this.nextBeatTime < this.AC.currentTime + this.lookahead) {
+        const now = this.AC.currentTime;
+        if (this.nextBeatTime < now - LATE_LIMIT) this.nextBeatTime = now + 0.05;
+        const started = performance.now();
+        while (this.nextBeatTime < now + this.lookahead) {
+            // (past the budget, what is left waits for the next tick - unless it is about to be heard)
+            if (this.nextBeatTime > now + URGENT && performance.now() - started > TICK_BUDGET_MS) break;
             const event = {
                 beat: this.beat,
                 bar: Math.floor(this.beat / this.beatsPerBar),

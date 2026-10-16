@@ -69,6 +69,31 @@ export function normalizeScene(raw, defaultCategory = MINE.id) {
 /** In picker order. */
 export const SCENES = library.scenes.map((scene) => normalizeScene(scene, SCENE_CATEGORIES[0].id));
 
+/** A name as it reads in a link: 'Rainy Day, Chickens Inside' -> 'rainy-day-chickens-inside'. */
+export const sceneSlug = (name) => name
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+/**
+ * The preset name in a page address: `?preset=turnip-town`, or just `?turnip-town`
+ * (a lone parameter with no value). null when there is none.
+ */
+export function presetFromSearch(search) {
+    const query = new URLSearchParams(search || '');
+    if (query.has('preset')) return query.get('preset');
+    const keys = [...query.keys()];
+    return keys.length === 1 && query.get(keys[0]) === '' ? keys[0] : null;
+}
+
+/** The built-in preset a link's `preset=` names (by its slug, or its name), or null. */
+export function sceneBySlug(text) {
+    const slug = sceneSlug(String(text || ''));
+    return (slug && SCENES.find((scene) => sceneSlug(scene.name) === slug)) || null;
+}
+
 /** The picker's groups by what a scene plays. */
 export const SCENE_GROUPS = { both: 'Music with ambience', music: 'Music only', ambience: 'Ambience only' };
 

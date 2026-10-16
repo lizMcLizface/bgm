@@ -67,3 +67,54 @@ test('the slowest gap eases off, so one bad stretch does not keep the window wid
     }
     expect(t.slowestGap).toBeLessThan(first);
 });
+
+describe('after the page was frozen', () => {
+    const beatsOf = (t) => {
+        const heard = [];
+        t.onBeat((e) => heard.push(e));
+        return heard;
+    };
+
+    test('the beats it missed are not played back as a burst: it picks up from where it was, from now', () => {
+        const AC = makeContext();
+        const t = new Transport({ context: AC, bpm: 120 });
+        const heard = beatsOf(t);
+        t.start(8);
+        AC.currentTime = 0.4;
+        t.tick();
+        const before = heard.length;
+        const lastBeat = heard[heard.length - 1].beat;
+        AC.currentTime = 60; // frozen for a minute
+        t.tick();
+        const fresh = heard.slice(before);
+        expect(fresh.length).toBeGreaterThan(0);
+        fresh.forEach((e) => expect(e.time).toBeGreaterThanOrEqual(60));
+        // the next beat is the one after the last played, not 120 beats on
+        expect(fresh[0].beat).toBe(lastBeat + 1);
+        // and they are evenly spaced, none stacked up
+        fresh.slice(1).forEach((e, i) => expect(e.time - fresh[i].time).toBeCloseTo(0.5, 5));
+    });
+
+    test('a small delay is not a freeze: the timing is kept', () => {
+        const AC = makeContext();
+        const t = new Transport({ context: AC, bpm: 120 });
+        const heard = beatsOf(t);
+        t.start(0);
+        const first = heard[0].time;
+        AC.currentTime = 0.2;
+        t.tick();
+        expect(heard[1].time - first).toBeCloseTo(0.5, 5);
+    });
+
+    test('back on screen, a suspended context is asked to resume', () => {
+        const AC = makeContext();
+        AC.resume = vi.fn(() => Promise.resolve());
+        const t = new Transport({ context: AC });
+        t.start(0);
+        AC.state = 'interrupted';
+        setHidden(false);
+        document.dispatchEvent(new Event('visibilitychange'));
+        expect(AC.resume).toHaveBeenCalled();
+        t.stop();
+    });
+});

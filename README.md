@@ -33,6 +33,9 @@ synthesised with the Web Audio API; there are no samples.
   "Copy setup" puts the whole current setup, every synth parameter
   included, on the clipboard as JSON; "Save current" keeps it in the browser
   under Mine; "Paste / open…" loads one back (docs/LIBRARY.md)
+- A built-in preset has a plain link, `calmbgm.com/?preset=turnip-town` (or just
+  `?turnip-town`); the address shows only that name until something is changed,
+  then it becomes the usual settings link
 - Percussion, in its own panel: soft synthesised drums - heartbeat,
   brushes, lo-fi beat or shaker, several grooves each - with activity,
   variation (grooves change between sections and phrases, every hit sounds

@@ -1,4 +1,4 @@
-import { SCENES, SCENE_CATEGORIES, sceneSettings, sceneGroup, SCENE_GROUPS, buildSetup, parseSetup, normalizeScene } from './scenes';
+import { SCENES, SCENE_CATEGORIES, sceneSettings, sceneGroup, SCENE_GROUPS, buildSetup, parseSetup, normalizeScene, sceneSlug, sceneBySlug, presetFromSearch } from './scenes';
 import { scaleById } from './theory';
 import { findPreset, sanitizePreset } from './editor/presetStore';
 import { SHAREABLE_PRESETS } from './shareCode';
@@ -110,5 +110,30 @@ describe('setups', () => {
         expect(settings.tonic).toBe(defaultSettings().tonic);
         expect(settings.mode).toBe(defaultSettings().mode);
         expect(settings.meter).toBe('4/4');
+    });
+});
+
+describe('preset links', () => {
+    test('every preset has its own readable slug, and a slug (or the name) finds the preset', () => {
+        const slugs = SCENES.map((s) => sceneSlug(s.name));
+        expect(new Set(slugs).size).toBe(SCENES.length);
+        slugs.forEach((slug) => expect(slug).toMatch(/^[a-z0-9]+(-[a-z0-9]+)*$/));
+        expect(sceneSlug('Rainy Day, Chickens Inside')).toBe('rainy-day-chickens-inside');
+        expect(sceneSlug('Rainy café')).toBe('rainy-cafe');
+        SCENES.forEach((scene) => {
+            expect(sceneBySlug(sceneSlug(scene.name))).toBe(scene);
+            expect(sceneBySlug(scene.name)).toBe(scene);
+        });
+        expect(sceneBySlug('no-such-preset')).toBeNull();
+        expect(sceneBySlug('')).toBeNull();
+        expect(sceneBySlug(null)).toBeNull();
+    });
+
+    test('the address: ?preset=name or just ?name, nothing else', () => {
+        expect(presetFromSearch('?preset=turnip-town')).toBe('turnip-town');
+        expect(presetFromSearch('?turnip-town')).toBe('turnip-town');
+        expect(presetFromSearch('')).toBeNull();
+        expect(presetFromSearch('?m=PKF1TVqggmqogMg8vpzRuiyg')).toBeNull();
+        expect(presetFromSearch('?turnip-town&m=abc')).toBeNull();
     });
 });

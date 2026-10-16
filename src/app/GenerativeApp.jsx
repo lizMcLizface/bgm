@@ -20,7 +20,7 @@ import {
 } from './randomize';
 import { MasterVolume, SettingsMenu, AudioMenu, ThemeToggle } from './AudioStatus';
 import { SleepTimer, Recorder } from './Playback';
-import { sceneSettings, sceneGroup, buildSetup, parseSetup } from './scenes';
+import { sceneSettings, sceneGroup, buildSetup, parseSetup, sceneBySlug, sceneSlug, presetFromSearch, SCENES } from './scenes';
 import PresetBrowser from './PresetBrowser';
 import { saveUserScene, deleteUserScene, isUserScene } from './setupStore';
 import { ROLE_PRESETS } from './presets';
@@ -48,10 +48,28 @@ import Tour, { tourSeen } from './Tour';
 let generator = null;
 let linkedSounds = [];
 let linkedPhrase = null;
+// A link to a built-in preset, ?preset=rainy-day-chickens-inside: the page opens on it (a new piece
+// each visit, or the one a phrase= names). Settings in the link win over it.
+let linkedScene = null;
 const getGenerator = () => {
     if (!generator) {
         const share = shareFromLocation(window.location);
-        generator = new Generator(share ? share.settings : defaultSettings());
+        const query = new URLSearchParams(window.location.search);
+        const hasSettings = ['m', 'v', 'a', 's'].some((key) => query.has(key)) || window.location.hash.includes('s=');
+        linkedScene = hasSettings ? null : sceneBySlug(presetFromSearch(window.location.search));
+        if (linkedScene) {
+            const phrase = new URLSearchParams(window.location.search).get('phrase');
+            const seed = phrase ? phraseToSeed(phrase) : null;
+            generator = new Generator(sceneSettings(linkedScene, seed === null ? undefined : seed));
+            if (phrase && seed !== null) linkedPhrase = phrase;
+            if (sceneGroup(linkedScene) !== 'ambience') {
+                Object.entries(linkedScene.voices).forEach(([role, voice]) => {
+                    if (typeof voice === 'string') generator.loadRolePreset(role, voice);
+                });
+            }
+        } else {
+            generator = new Generator(share ? share.settings : defaultSettings());
+        }
         if (share && share.phrase) linkedPhrase = share.phrase;
         if (share) {
             Object.entries(share.presets).forEach(([role, preset]) => {
@@ -79,13 +97,17 @@ if (import.meta.hot) {
 
 // Keeps the current settings in the address bar - all but the seed: a
 // reload keeps them and makes a new piece; Copy link pins the piece.
-function useSettingsInUrl(settings, presets) {
+// While a built-in preset is playing as it is, the address is just that preset's name
+// (?preset=...), a link anyone can read; once anything is changed it is the settings.
+function useSettingsInUrl(settings, presets, presetSlug) {
     useEffect(() => {
         const id = setTimeout(() => {
-            window.history.replaceState(null, '', sharePath(settings, presets, window.location, { seed: false }));
+            window.history.replaceState(null, '', presetSlug
+                ? `${window.location.pathname}?preset=${presetSlug}`
+                : sharePath(settings, presets, window.location, { seed: false }));
         }, 300);
         return () => clearTimeout(id);
-    }, [settings, presets]);
+    }, [settings, presets, presetSlug]);
 }
 
 // The seed as a pass-phrase (phrase.js): shows the current seed's words;
@@ -786,7 +808,6 @@ const GenerativeApp = () => {
         requestAnimationFrame(() => editorRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' }));
     };
     const now = useNowPlaying(gen, running, settings);
-    useSettingsInUrl(settings, linkPresets);
     useEffect(() => {
         const sync = () => {
             setRunning(gen.isRunning);
@@ -806,12 +827,18 @@ const GenerativeApp = () => {
         return true;
     };
     // The scene last picked (shown in the top row until something changes).
-    const [scene, setScene] = useState('');
+    const [scene, setScene] = useState(linkedScene ? linkedScene.name : '');
+    // the built-in preset the page is on (by slug), so its address can be its name
+    const sceneSlugRef = useRef(linkedScene ? { name: linkedScene.name, slug: sceneSlug(linkedScene.name) } : null);
+    const presetSlug = scene && sceneSlugRef.current && sceneSlugRef.current.name === scene && !Object.values(roles).some((r) => r.edited)
+        ? sceneSlugRef.current.slug : '';
+    useSettingsInUrl(settings, linkPresets, presetSlug);
     const [sleepLeft, setSleepLeft] = useState(null);
     const loadSettings = (next) => {
         gen.setMany(next);
         setSettings({ ...gen.settings });
-        setScene('');
+        // a new variation is still the same preset
+        if (!(Object.keys(next).length === 1 && 'seed' in next)) setScene('');
     };
     const keepCurrent = () => {
         gen.keepCurrent();
@@ -829,6 +856,7 @@ const GenerativeApp = () => {
     };
     const presetLoaded = (role, presetName) => patchRole(role, { presetName, edited: false });
     const loadPreset = (role, name) => {
+        setScene('');
         if (gen.loadRolePreset(role, name)) presetLoaded(role, name);
     };
     const randomizeField = (key) => loadSettings(randomField(key, gen.settings, randomLevel));
@@ -976,7 +1004,10 @@ const GenerativeApp = () => {
         if (parts !== 'composition' && sceneGroup(picked) !== 'ambience') {
             Object.keys(ROLES).forEach((role) => loadSceneVoice(role, picked.voices[role], picked.name, unsaved));
         }
-        if (parts === 'voices') return;
+        if (parts === 'voices') {
+            setScene('');
+            return;
+        }
         const next = gen.settings;
         setMix((m) => Object.fromEntries(Object.entries(m).map(([role, v]) => [role, { ...v, mute: gen.roles[role].mute }])));
         if (playing) {
@@ -985,7 +1016,9 @@ const GenerativeApp = () => {
             if (next.playMusic && !gen.isRunning) startPart('playMusic');
             if (!next.playMusic && gen.isRunning) gen.stop();
         }
-        setScene(picked.name);
+        // only the whole of a built-in preset is a preset link
+        sceneSlugRef.current = parts === 'all' && SCENES.includes(picked) ? { name: picked.name, slug: sceneSlug(picked.name) } : null;
+        setScene(parts === 'all' ? picked.name : '');
     };
     // The page as a setup: every setting and, per voice, its name and every synth parameter.
     const captureSetup = (info) => buildSetup({
