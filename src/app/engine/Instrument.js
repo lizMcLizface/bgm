@@ -15,10 +15,14 @@ import { minTime } from '../../util/util';
 import { wanderLfo } from './wander';
 import { MIN_WET } from '../../nodes/reverb';
 import { SendReverb } from '../../nodes/sharedReverb';
+import { blendPresets } from './morph';
 
 // A held note is booked as if it lasted this long; its release replaces
 // the tail when the key comes up.
 const HELD_SECONDS = 600;
+
+// How often a morph (morphTo) moves the parameters on.
+const MORPH_STEP_MS = 80;
 
 // 12-TET C4..B4, as in PolySynth's parseNoteString - the microtonal
 // per-note multipliers scale these.
@@ -267,8 +271,50 @@ class Instrument {
         Object.keys(next).forEach((key) => this.set(key, next[key]));
     }
 
+    /**
+     * Glides to a preset over `seconds` of audio time instead of jumping
+     * (blendPresets: numbers glide, choices switch halfway). Notes booked
+     * meanwhile use the sound as it is then. An edit, another preset or
+     * dispose() ends it, with the target applied.
+     */
+    morphTo(preset, seconds) {
+        this.finishMorph();
+        const to = { ...PRESET_DEFAULTS, ...preset };
+        const from = { ...PRESET_DEFAULTS, ...this.preset };
+        const changing = Object.keys(to).filter((key) => from[key] !== to[key]);
+        if (!changing.length) return;
+        if (!(seconds > 0.25)) {
+            this.applyPreset(to);
+            return;
+        }
+        const start = this.AC.currentTime;
+        const morph = { to, stepping: false, timer: null };
+        this.morph = morph;
+        morph.timer = setInterval(() => {
+            const t = (this.AC.currentTime - start) / seconds;
+            if (t >= 1) {
+                this.finishMorph();
+                return;
+            }
+            const blended = blendPresets(from, to, t);
+            morph.stepping = true;
+            changing.forEach((key) => this.set(key, blended[key]));
+            morph.stepping = false;
+        }, MORPH_STEP_MS);
+    }
+
+    /** Ends a morph at once, on its target. */
+    finishMorph() {
+        const { morph } = this;
+        if (!morph) return;
+        this.morph = null;
+        clearInterval(morph.timer);
+        this.applyPreset(morph.to);
+    }
+
     /** Sets one preset parameter live - what the synth editor's knobs call. */
     set(key, value) {
+        if (this.morph && !this.morph.stepping) this.finishMorph();
         if (this.preset && this.preset[key] === value) return;
         this.preset = { ...this.preset, [key]: value };
         const setter = PARAM_SETTERS[key];
@@ -640,6 +686,8 @@ class Instrument {
     }
 
     dispose() {
+        if (this.morph) clearInterval(this.morph.timer);
+        this.morph = null;
         if (this.sleepTimer) clearTimeout(this.sleepTimer);
         clearTimeout(this.wanderTimer);
         Object.values(this.wanderLfos).forEach((lfo) => lfo.dispose());

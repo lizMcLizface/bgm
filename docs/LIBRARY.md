@@ -122,3 +122,5 @@ loudness tool in `engine/loudness.js` (the same one that levels generated
 sounds) can level a voice against its role.
 
 Added later: Cold Drifts, Warm Socks and Ice Cave Echoes (icy caves) and Soggy Home Planet and Ruins in the Drizzle (rainy overworld), in the spirit of Metroid Prime's Phendrana Drifts and Tallon Overworld.
+
+Added later still: **Synth Cinema**, film-score synth moods in the spirit of Vangelis (Replicant Blues, Tears in Weather), Jean-Michel Jarre (Oxygen Debt, Oxygene Sunrise), Cliff Martinez (Real Hero Hours, Getaway Driver, Off Duty) and Kavinsky (Nightcall, Voicemail, Outrun Lullaby), with eight new voices: CS-80 Brass, Neon Saw Pad, Night Glass, Neon Pulse Bass, Seq Bass, Lament Lead, Ghost Sweep, Outrun Lead. Written to evoke, not copy; not listened to or loudness-matched.

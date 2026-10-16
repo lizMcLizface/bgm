@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { TOUR_STEPS, TOUR_KEY } from './tourSteps';
+import { TOUR_STEPS, TOUR_KEY, LAST_STAGE } from './tourSteps';
 import { readPref, writePref } from './prefs';
 
 /** Whether the tour has been finished or skipped before. */
@@ -8,8 +8,9 @@ export const tourSeen = () => readPref(TOUR_KEY, false) === true;
 const MARGIN = 12;
 const reducedMotion = () => typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// The steps whose part is on the page now.
-const availableSteps = () => TOUR_STEPS.filter((step) => !step.selector || document.querySelector(step.selector));
+// The steps of the stages from..to whose part is on the page now.
+const availableSteps = (from, to) => TOUR_STEPS.filter((step) => step.stage >= from && step.stage <= to
+    && (!step.hint || step.stage === to) && (!step.selector || document.querySelector(step.selector)));
 
 const rectOf = (selector) => {
     const el = selector && document.querySelector(selector);
@@ -38,12 +39,15 @@ function place(rect, card) {
  * @param {object} props
  * @param {function} props.onClose
  * @param {boolean} [props.reference] - quick reference: every part framed, hover to read, no steps, nothing remembered
+ * @param {number} [props.fromStage] - the first stage of features the tour covers (stages: tourSteps.js)
+ * @param {number} [props.toStage] - the last stage it covers
+ * @param {function} [props.onUnlockAll] - called when the start prompt is dismissed ("I don't need your help")
  * @param {boolean} [props.prompt] - open on a start prompt first: the page dimmed behind a card that
  *   asks whether to take the tour, until it is answered (for the automatic first-visit opening;
  *   starting from it skips the welcome step, which the prompt says)
  */
-const Tour = ({ onClose, reference = false, prompt = false }) => {
-    const [steps] = useState(availableSteps);
+const Tour = ({ onClose, reference = false, prompt = false, fromStage = 0, toStage = LAST_STAGE, onUnlockAll }) => {
+    const [steps] = useState(() => availableSteps(fromStage, toStage));
     const [asking, setAsking] = useState(prompt && !reference);
     const [index, setIndex] = useState(0);
     const [hovered, setHovered] = useState(null);
@@ -57,6 +61,11 @@ const Tour = ({ onClose, reference = false, prompt = false }) => {
     const finish = () => {
         if (!reference) writePref(TOUR_KEY, true);
         onClose();
+    };
+    // Dismissing the start prompt: no help wanted, so everything is available.
+    const decline = () => {
+        if (onUnlockAll) onUnlockAll();
+        finish();
     };
     const go = (to) => setIndex(Math.min(steps.length - 1, Math.max(0, to)));
     // Starting from the prompt goes past the welcome step: the prompt said it.
@@ -94,7 +103,7 @@ const Tour = ({ onClose, reference = false, prompt = false }) => {
 
     useEffect(() => {
         const key = (e) => {
-            if (e.key === 'Escape') finish();
+            if (e.key === 'Escape') (asking ? decline() : finish());
             else if (reference || asking) return;
             else if (e.key === 'ArrowRight') advance();
             else if (e.key === 'ArrowLeft') go(index - 1);
@@ -105,26 +114,28 @@ const Tour = ({ onClose, reference = false, prompt = false }) => {
         return () => document.removeEventListener('keydown', key);
     });
 
-    const framed = steps.filter((s) => s.selector && rects[s.id] && rects[s.id].width > 0);
+    // (two steps can frame one part, at different stages: the later, fuller one is kept)
+    const framed = steps.filter((s, i) => s.selector && rects[s.id] && rects[s.id].width > 0
+        && (!reference || !steps.slice(i + 1).some((t) => t.selector === s.selector)));
     const hoverStep = hovered && (reference || hovered !== step.id) ? steps.find((s) => s.id === hovered) : null;
     const position = place(step.selector ? rects[step.id] : null, cardSize);
     const hoverPosition = hoverStep ? place(rects[hoverStep.id], { width: 300, height: 130 }) : null;
 
     if (asking) {
         return (
-            <div className="gen-tour-intro" role="presentation" onClick={finish}>
+            <div className="gen-tour-intro" role="presentation" onClick={decline}>
                 <div className="gen-tour-intro-card" role="dialog" aria-modal="true" aria-labelledby="gen-tour-intro-title" aria-describedby="gen-tour-intro-text"
                     onClick={(e) => e.stopPropagation()}>
                     <h2 id="gen-tour-intro-title">Welcome to bgm</h2>
                     <p id="gen-tour-intro-text">
                         Calm music that writes itself, for working or studying - or under a video or podcast.
-                        A one-minute tour shows what each part of the page does.
+                        A short tour shows the basics; the rest of the page unlocks a step at a time, whenever you are ready.
                     </p>
                     <div className="gen-tour-intro-buttons">
                         <button type="button" ref={next} className="gen-tour-start" onClick={begin} autoFocus>Take the tour</button>
-                        <button type="button" className="gen-tour-skip" onClick={finish}>No thanks, let me explore</button>
+                        <button type="button" className="gen-tour-skip" onClick={decline}>I don't need help - show me everything</button>
                     </div>
-                    <small>You can open the tour again from the ⚙ menu.</small>
+                    <small>The Tour button in the top bar repeats it.</small>
                 </div>
             </div>
         );

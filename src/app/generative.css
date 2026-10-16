@@ -2138,3 +2138,22 @@ body {
     flex: 1 1 auto;
     color: var(--gen-muted);
 }
+
+/* Top-bar buttons: repeat the tour, and unlock the next set of features. */
+.gen button.gen-tour-button {
+    height: 28px;
+    padding: 0 10px;
+    border-radius: 14px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.gen button.gen-unlock {
+    height: 28px;
+    padding: 0 12px;
+    border-radius: 14px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    border-color: var(--gen-accent, currentColor);
+}

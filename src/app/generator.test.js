@@ -497,6 +497,66 @@ describe('sounds that change with a preset', () => {
     });
 });
 
+describe('changing at the next chord', () => {
+    // the last beat of a bar that is followed by the start of a chord
+    const beforeChord = (gen) => {
+        gen.planThrough(12);
+        const bar = [...gen.plan.keys()].find((b) => b >= 1 && gen.plan.get(b + 1) && gen.plan.get(b + 1).chordStart);
+        return { bar, beat: gen.transport.beatsPerBar - 1 };
+    };
+
+    test('a change waits for the last beat before a chord; stopped, it happens at once', () => {
+        const gen = new Generator();
+        gen.reset();
+        let ran = 0;
+        gen.atNextChord(() => ran++);
+        expect(ran).toBe(1);
+        gen.transport.timer = 1;
+        const { bar, beat } = beforeChord(gen);
+        gen.atNextChord(() => ran++);
+        gen.onBeat({ bar, beatInBar: beat - 1, time: 0, secondsPerBeat: 0.5 });
+        expect(ran).toBe(1);
+        gen.onBeat({ bar, beatInBar: beat, time: 1, secondsPerBeat: 0.5 });
+        expect(ran).toBe(2);
+        gen.onBeat({ bar: bar + 1, beatInBar: 0, time: 2, secondsPerBeat: 0.5 });
+        expect(ran).toBe(2);
+        gen.transport.timer = null;
+    });
+
+    test('a waiting change can be run early (stopping does), once', () => {
+        const gen = new Generator();
+        gen.reset();
+        gen.transport.timer = 1;
+        let ran = 0;
+        gen.atNextChord(() => ran++);
+        expect(ran).toBe(0);
+        gen.runPendingChange();
+        gen.runPendingChange();
+        expect(ran).toBe(1);
+        gen.transport.timer = null;
+    });
+
+    test('sounds that morph glide over the chord that starts, others switch', () => {
+        const gen = new Generator();
+        gen.reset();
+        gen.transport.timer = 1;
+        const calls = [];
+        gen.roles.pad.instrument.morphTo = (preset, seconds) => calls.push(['morph', preset.tag, seconds]);
+        gen.roles.pad.instrument.applyPreset = (preset) => calls.push(['apply', preset.tag]);
+        gen.roles.bass.instrument.applyPreset = (preset) => calls.push(['apply', preset.tag]);
+        const { bar } = beforeChord(gen);
+        const start = bar + 1;
+        const { start: from, end } = gen.chordOf(start);
+        gen.loadRolePresetAtBar('pad', 'P', { tag: 'P' }, undefined, { morph: true });
+        gen.loadRolePresetAtBar('bass', 'B', { tag: 'B' });
+        gen.onBeat({ bar: start, beatInBar: 0, time: 0, secondsPerBeat: 0.5 });
+        const seconds = (end - from + 1) * gen.beatsPerBar * 0.5;
+        expect(calls).toContainEqual(['morph', 'P', seconds]);
+        expect(calls).toContainEqual(['apply', 'B']);
+        gen.transport.timer = null;
+    });
+});
+
 describe('the audio clock behind the playhead', () => {
     test('steps of a big output buffer do not make it jump: it advances evenly, close to the true time', () => {
         const gen = new Generator();

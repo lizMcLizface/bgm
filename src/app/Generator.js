@@ -343,6 +343,7 @@ class Generator {
     stop() {
         const heard = this.position();
         this.transport.stop();
+        this.runPendingChange();
         this.flushPendingVoices();
         this.toneNow = null;
         const ending = this.endBar !== null;
@@ -526,11 +527,12 @@ class Generator {
     }
 
     /** Loads a preset onto a role; `preset` defaults to looking `name` up. */
-    loadRolePreset(role, name, preset = findPreset(name)) {
+    loadRolePreset(role, name, preset = findPreset(name), morphSeconds = 0) {
         if (!preset) return false;
         if (this.pendingVoices) this.pendingVoices = this.pendingVoices.filter((p) => p.role !== role || p.preset === preset);
         const r = this.roles[role];
-        r.instrument.applyPreset(preset);
+        if (morphSeconds > 0) r.instrument.morphTo(preset, morphSeconds);
+        else r.instrument.applyPreset(preset);
         r.presetName = name;
         r.edited = false;
         return true;
@@ -542,26 +544,59 @@ class Generator {
      * composition re-plans from the next bar too); at once when stopped.
      * A later load for the role (either kind) replaces a waiting one.
      * @param {function} [applied] - called when it has been loaded
+     * @param {object} [options]
+     * @param {boolean} [options.morph] - glide to the sound over the chord that starts then,
+     *   instead of switching (only when it arrives at a bar line while playing)
      * @returns {boolean} whether the preset exists
      */
-    loadRolePresetAtBar(role, name, preset = findPreset(name), applied) {
+    loadRolePresetAtBar(role, name, preset = findPreset(name), applied, { morph = false } = {}) {
         if (!preset) return false;
         this.pendingVoices = (this.pendingVoices || []).filter((p) => p.role !== role);
         if (!this.isRunning) {
             this.loadRolePreset(role, name, preset);
             if (applied) applied();
         } else {
-            this.pendingVoices.push({ role, name, preset, applied });
+            this.pendingVoices.push({ role, name, preset, applied, morph });
         }
         return true;
     }
 
-    /** Loads the sounds waiting for a bar line. */
-    flushPendingVoices() {
+    /**
+     * Holds `change` (a function that changes settings and sounds) until the last beat before
+     * the next chord, so the music moves there with a new chord's first bar; at once when the
+     * music is not playing. A later call replaces a waiting one.
+     */
+    atNextChord(change) {
+        if (!this.isRunning) {
+            this.pendingChange = null;
+            change();
+        } else {
+            this.pendingChange = change;
+        }
+    }
+
+    /** Runs the change waiting for a chord (atNextChord), if any. */
+    runPendingChange() {
+        const change = this.pendingChange;
+        this.pendingChange = null;
+        if (change) change();
+    }
+
+    /**
+     * Loads the sounds waiting for a bar line.
+     * @param {number} [bar] - the bar starting; with `secondsPerBeat`, the sounds that asked to
+     *   morph glide over the chord that starts there
+     */
+    flushPendingVoices(bar, secondsPerBeat) {
         const waiting = this.pendingVoices || [];
         this.pendingVoices = [];
-        waiting.forEach(({ role, name, preset, applied }) => {
-            this.loadRolePreset(role, name, preset);
+        let morphSeconds = 0;
+        if (waiting.some((p) => p.morph) && bar !== undefined && secondsPerBeat) {
+            const { start, end } = this.chordOf(bar);
+            morphSeconds = (end - start + 1) * this.beatsPerBar * secondsPerBeat;
+        }
+        waiting.forEach(({ role, name, preset, applied, morph }) => {
+            this.loadRolePreset(role, name, preset, morph ? morphSeconds : 0);
             if (applied) applied();
         });
     }
@@ -1071,7 +1106,11 @@ class Generator {
             this.finishEnding();
             return;
         }
-        if (beatInBar === 0 && this.pendingVoices && this.pendingVoices.length) this.flushPendingVoices();
+        if (this.pendingChange && beatInBar === this.transport.beatsPerBar - 1) {
+            const next = this.plan.get(bar + 1);
+            if (next && next.chordStart) this.runPendingChange();
+        }
+        if (beatInBar === 0 && this.pendingVoices && this.pendingVoices.length) this.flushPendingVoices(bar, secondsPerBeat);
         if (beatInBar === 0) this.applyTone(this.plan.get(bar).tone, time, secondsPerBeat * this.transport.beatsPerBar);
         const book = (e, start) => {
             e.booked = true;

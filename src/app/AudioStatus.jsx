@@ -225,8 +225,8 @@ export const AudioMenu = ({ generator, onReload }) => {
     );
 };
 
-/** The ⚙ options menu: sharing, a phrase, the sleep timer and saving audio (children), MIDI, the tour. */
-export const SettingsMenu = ({ link, saving, phrase, onTour, midi, children }) => {
+/** The ⚙ options menu: sharing, a phrase, the sleep timer and saving audio (children), MIDI, starting over with only the basics. */
+export const SettingsMenu = ({ link, saving, phrase, onStartOver, smooth, midi, children }) => {
     const menu = useRef(null);
     useDismiss(menu);
     const [copied, setCopied] = useState('');
@@ -252,6 +252,16 @@ export const SettingsMenu = ({ link, saving, phrase, onTour, midi, children }) =
                     {copied && <small role="status">{copied}</small>}
                 </section>
                 {phrase}
+                {smooth && (
+                    <section className="gen-menu-section">
+                        <h3>Presets</h3>
+                        <label className="gen-check">
+                            <input type="checkbox" checked={smooth.value} onChange={(e) => smooth.onChange(e.target.checked)} />
+                            Change presets smoothly
+                        </label>
+                        <small>While playing, a new preset starts at the next chord and its sounds blend in over that chord. Off: everything switches at once.</small>
+                    </section>
+                )}
                 {children}
                 {midi && (
                     <section className="gen-menu-section">
@@ -260,10 +270,11 @@ export const SettingsMenu = ({ link, saving, phrase, onTour, midi, children }) =
                         <small role="status">{midi.status || 'Play a voice or the drums from a MIDI keyboard. Arm a voice with its keyboard button first.'}</small>
                     </section>
                 )}
-                {onTour && (
+                {onStartOver && (
                     <section className="gen-menu-section">
                         <h3>Help</h3>
-                        <button type="button" className="gen-menu-wide" onClick={() => { menu.current.open = false; onTour(); }}>Take the tour</button>
+                        <button type="button" className="gen-menu-wide" title="Hide everything but the basics again, and take the tour from the start"
+                            onClick={() => { menu.current.open = false; onStartOver(); }}>Start over with the basics</button>
                     </section>
                 )}
             </div>

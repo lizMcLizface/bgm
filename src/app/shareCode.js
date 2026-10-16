@@ -59,6 +59,8 @@ export const SHAREABLE_PRESETS = [
     'Void Pad', 'Starlight Pad', 'Spore Haze', 'Heroic Strings', 'Drive Bass', 'Chip Bass', 'Deep Throb',
     'Racer Lead', 'Chip Lead', 'Fanfare Brass', 'Pan Flute', 'Squeezebox', 'Signal Lead', 'Arp Pluck',
     'Pixel Piano', 'Nylon Guitar', 'Soft Harp', 'Haunted Celesta',
+    // film-synth presets
+    'CS-80 Brass', 'Neon Saw Pad', 'Night Glass', 'Neon Pulse Bass', 'Seq Bass', 'Lament Lead', 'Ghost Sweep', 'Outrun Lead',
 ];
 const PRESET_BITS = 8;
 // Preset index meaning "a generated sound" (soundGen.js v1): followed by

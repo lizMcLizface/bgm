@@ -39,6 +39,11 @@
       "id": "podcast",
       "label": "Under Speech",
       "blurb": "Sparse, steady beds for talking over - no busy rhythm, no tune to compete with"
+    },
+    {
+      "id": "cinema",
+      "label": "Synth Cinema",
+      "blurb": "Rain-slick streets, long brass lines and neon: film-score synth moods"
     }
   ],
   "scenes": [
@@ -3224,6 +3229,484 @@
         "pad": "Choir Ah",
         "bass": "Deep Throb",
         "lead": "Haunted Celesta"
+      }
+    },
+    {
+      "name": "Replicant Blues",
+      "category": "cinema",
+      "tags": [
+        "vangelis",
+        "blade-runner",
+        "film",
+        "slow"
+      ],
+      "blurb": "A huge slow brass chord, a lonely lament on top and rain on the neon",
+      "settings": {
+        "tonic": 3,
+        "mode": "Major-6",
+        "bpm": 58,
+        "progression": 6,
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "chordSpread": "open",
+        "padWeights": {
+          "sustain": 85,
+          "pulse": 5,
+          "arpeggio": 10,
+          "sequence": 0
+        },
+        "bassWeights": {
+          "whole": 80,
+          "half": 20,
+          "walking": 0,
+          "drive": 0
+        },
+        "leadActivity": 0.45,
+        "leadDensity": 0.1,
+        "leadScale": "pentatonic",
+        "sections": {
+          "mode": "strong",
+          "phrases": 2
+        },
+        "sectionTone": true,
+        "pedal": {
+          "mode": "tonic",
+          "amount": 0.6
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.3
+        },
+        "ambience": {
+          "rain": 0.35,
+          "thunder": 0.15
+        },
+        "playAmbience": true,
+        "humanize": {
+          "timing": 8,
+          "velocity": 0.1,
+          "detune": 4
+        }
+      },
+      "voices": {
+        "pad": "CS-80 Brass",
+        "bass": "Sub Bass",
+        "lead": "Lament Lead"
+      }
+    },
+    {
+      "name": "Tears in Weather",
+      "category": "cinema",
+      "tags": [
+        "vangelis",
+        "blade-runner",
+        "film",
+        "sparse"
+      ],
+      "blurb": "Even slower: glass pad swells, a bell now and then, thunder a long way off",
+      "settings": {
+        "tonic": 2,
+        "mode": "Major-6",
+        "bpm": 50,
+        "progression": 7,
+        "barsPerChord": 2,
+        "padNotes": 5,
+        "chordSpread": "open",
+        "padWeights": {
+          "sustain": 100,
+          "pulse": 0,
+          "arpeggio": 0,
+          "sequence": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0,
+          "drive": 0
+        },
+        "leadActivity": 0.3,
+        "leadDensity": 0,
+        "drums": {
+          "style": "heartbeat",
+          "activity": 0.25,
+          "variation": 0.4
+        },
+        "counter": {
+          "mode": "answer",
+          "activity": 0.3
+        },
+        "chordColour": {
+          "mode": "floating",
+          "amount": 0.5
+        },
+        "sections": {
+          "mode": "strong",
+          "phrases": 2
+        },
+        "sectionTone": true,
+        "ambience": {
+          "rain": 0.3,
+          "thunder": 0.3,
+          "wind": 0.1
+        },
+        "playAmbience": true
+      },
+      "voices": {
+        "pad": "Night Glass",
+        "bass": "Deep Throb",
+        "lead": "Lament Lead",
+        "counter": "CS-80 Brass"
+      }
+    },
+    {
+      "name": "Oxygen Debt",
+      "category": "cinema",
+      "tags": [
+        "jarre",
+        "oxygene",
+        "film",
+        "sequence"
+      ],
+      "blurb": "A burbling sequence, a bouncing bass and a wobbling square lead, 1976-style",
+      "settings": {
+        "tonic": 2,
+        "mode": "Major-6",
+        "bpm": 118,
+        "progression": 17,
+        "barsPerChord": 2,
+        "padNotes": 3,
+        "padWeights": {
+          "sustain": 10,
+          "pulse": 10,
+          "arpeggio": 10,
+          "sequence": 70
+        },
+        "bassWeights": {
+          "whole": 10,
+          "half": 30,
+          "walking": 0,
+          "drive": 60
+        },
+        "drums": {
+          "style": "electro",
+          "activity": 0.35,
+          "variation": 0.3,
+          "kit": "crisp"
+        },
+        "drumKit": {
+          "room": 0.2
+        },
+        "leadActivity": 0.7,
+        "leadDensity": 0.55,
+        "counter": {
+          "mode": "answer",
+          "activity": 0.4
+        },
+        "sections": {
+          "mode": "strong",
+          "phrases": 2
+        },
+        "sectionTone": true,
+        "ambience": {
+          "wind": 0.15
+        },
+        "playAmbience": true,
+        "humanize": {
+          "timing": 4,
+          "velocity": 0.06,
+          "detune": 3
+        }
+      },
+      "voices": {
+        "pad": "Arp Pluck",
+        "bass": "Seq Bass",
+        "lead": "Ghost Sweep",
+        "counter": "Glass Lead"
+      }
+    },
+    {
+      "name": "Oxygene Sunrise",
+      "category": "cinema",
+      "tags": [
+        "jarre",
+        "oxygene",
+        "film",
+        "calm"
+      ],
+      "blurb": "Dorian drift: slow swells, a ghostly sweep and the sea breathing underneath",
+      "settings": {
+        "tonic": 7,
+        "mode": "Major-2",
+        "bpm": 88,
+        "progression": 12,
+        "barsPerChord": 4,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 60,
+          "pulse": 0,
+          "arpeggio": 30,
+          "sequence": 10
+        },
+        "bassWeights": {
+          "whole": 60,
+          "half": 40,
+          "walking": 0,
+          "drive": 0
+        },
+        "leadActivity": 0.5,
+        "leadDensity": 0.25,
+        "chordColour": {
+          "mode": "sus2",
+          "amount": 0.3
+        },
+        "sections": {
+          "mode": "strong",
+          "phrases": 2
+        },
+        "sectionTone": true,
+        "ambience": {
+          "waves": 0.35,
+          "wind": 0.2
+        },
+        "playAmbience": true
+      },
+      "voices": {
+        "pad": "Neon Saw Pad",
+        "bass": "Seq Bass",
+        "lead": "Ghost Sweep"
+      }
+    },
+    {
+      "name": "Real Hero Hours",
+      "category": "cinema",
+      "tags": [
+        "martinez",
+        "drive",
+        "film",
+        "night"
+      ],
+      "blurb": "A quiet night drive: glassy pads, a hushed pulse and one long note at a time",
+      "settings": {
+        "tonic": 9,
+        "mode": "Major-6",
+        "bpm": 72,
+        "progression": 8,
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 70,
+          "pulse": 20,
+          "arpeggio": 10,
+          "sequence": 0
+        },
+        "bassWeights": {
+          "whole": 70,
+          "half": 30,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "downtempo",
+          "activity": 0.3,
+          "variation": 0.4,
+          "kit": "crisp"
+        },
+        "drumKit": {
+          "room": 0.2
+        },
+        "leadActivity": 0.35,
+        "leadDensity": 0.1,
+        "leadScale": "pentatonic",
+        "sections": {
+          "mode": "strong",
+          "phrases": 2
+        },
+        "sectionTone": true,
+        "chordColour": {
+          "mode": "sus4",
+          "amount": 0.25
+        }
+      },
+      "voices": {
+        "pad": "Night Glass",
+        "bass": "Neon Pulse Bass",
+        "lead": "Glass Lead"
+      }
+    },
+    {
+      "name": "Getaway Driver, Off Duty",
+      "category": "cinema",
+      "tags": [
+        "martinez",
+        "drive",
+        "film",
+        "pulse"
+      ],
+      "blurb": "City lights going past: a steady electro pulse, cool pads and a soft lead",
+      "settings": {
+        "tonic": 6,
+        "mode": "Major-6",
+        "bpm": 100,
+        "progression": 6,
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 40,
+          "pulse": 40,
+          "arpeggio": 10,
+          "sequence": 10
+        },
+        "bassWeights": {
+          "whole": 20,
+          "half": 30,
+          "walking": 0,
+          "drive": 50
+        },
+        "drums": {
+          "style": "electro",
+          "activity": 0.4,
+          "variation": 0.3,
+          "kit": "crisp"
+        },
+        "drumKit": {
+          "room": 0.2
+        },
+        "leadActivity": 0.5,
+        "leadDensity": 0.3,
+        "sections": {
+          "mode": "strong",
+          "phrases": 2
+        },
+        "sectionTone": true,
+        "humanize": {
+          "timing": 3,
+          "velocity": 0.05,
+          "detune": 2
+        }
+      },
+      "voices": {
+        "pad": "Night Glass",
+        "bass": "Neon Pulse Bass",
+        "lead": "Soft Saw Lead"
+      }
+    },
+    {
+      "name": "Nightcall, Voicemail",
+      "category": "cinema",
+      "tags": [
+        "kavinsky",
+        "nightcall",
+        "synthwave",
+        "retro"
+      ],
+      "blurb": "Half-time synthwave: a pumping saw bass, fat detuned pads and a bright neon lead",
+      "settings": {
+        "tonic": 9,
+        "mode": "Major-6",
+        "bpm": 91,
+        "progression": 6,
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 30,
+          "pulse": 50,
+          "arpeggio": 0,
+          "sequence": 20
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 20,
+          "walking": 0,
+          "drive": 80
+        },
+        "drums": {
+          "style": "drive",
+          "activity": 0.5,
+          "variation": 0.3,
+          "sprinkle": 0.15,
+          "kit": "crisp"
+        },
+        "drumKit": {
+          "room": 0.2
+        },
+        "leadActivity": 0.7,
+        "leadDensity": 0.5,
+        "sections": {
+          "mode": "strong",
+          "phrases": 2
+        },
+        "sectionTone": true,
+        "counter": {
+          "mode": "harmony",
+          "activity": 0.4
+        },
+        "humanize": {
+          "timing": 3,
+          "velocity": 0.05,
+          "detune": 3
+        }
+      },
+      "voices": {
+        "pad": "Neon Saw Pad",
+        "bass": "Neon Pulse Bass",
+        "lead": "Outrun Lead",
+        "counter": "CS-80 Brass"
+      }
+    },
+    {
+      "name": "Outrun Lullaby",
+      "category": "cinema",
+      "tags": [
+        "kavinsky",
+        "nightcall",
+        "synthwave",
+        "calm"
+      ],
+      "blurb": "The same neon, turned right down: soft pulse, wide pads and a long echo",
+      "settings": {
+        "tonic": 4,
+        "mode": "Major-6",
+        "bpm": 82,
+        "progression": 8,
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 55,
+          "pulse": 35,
+          "arpeggio": 10,
+          "sequence": 0
+        },
+        "bassWeights": {
+          "whole": 40,
+          "half": 40,
+          "walking": 0,
+          "drive": 20
+        },
+        "drums": {
+          "style": "downtempo",
+          "activity": 0.35,
+          "variation": 0.4,
+          "kit": "crisp"
+        },
+        "drumKit": {
+          "room": 0.2
+        },
+        "leadActivity": 0.45,
+        "leadDensity": 0.2,
+        "sections": {
+          "mode": "strong",
+          "phrases": 2
+        },
+        "sectionTone": true,
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.3
+        }
+      },
+      "voices": {
+        "pad": "Neon Saw Pad",
+        "bass": "Neon Pulse Bass",
+        "lead": "Outrun Lead"
       }
     }
   ]

@@ -211,16 +211,18 @@ describe('tour start prompt', () => {
 
     test('"No thanks", Escape and a click on the dark all dismiss it and remember', () => {
         [
-            () => click(button('No thanks')),
+            () => click(button("I don't need help")),
             () => act(() => { document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); }),
             () => click(document.querySelector('.gen-tour-intro')),
         ].forEach((dismiss) => {
             window.localStorage.clear();
             const onClose = vi.fn();
-            render(<Tour prompt onClose={onClose} />);
+            const onUnlockAll = vi.fn();
+            render(<Tour prompt onClose={onClose} onUnlockAll={onUnlockAll} />);
             dismiss();
             expect(onClose).toHaveBeenCalledTimes(1);
-            expect(window.localStorage.getItem('bgm-tour-done')).toBe('true');
+            expect(onUnlockAll).toHaveBeenCalledTimes(1);
+            expect(window.localStorage.getItem('bgm-tour-v2')).toBe('true');
         });
     });
 
@@ -232,6 +234,17 @@ describe('tour start prompt', () => {
         render(<Tour key="no-prompt" onClose={onClose} />);
         expect(document.querySelector('.gen-tour-intro')).toBeNull();
         expect(document.querySelector('.gen-tour-count').textContent).toMatch(/^Step 1 of/);
+    });
+});
+
+describe('tour stages', () => {
+    test('a tour covers only the steps of its stages; the closing hint shows only for the last one', () => {
+        const count = () => Number(document.querySelector('.gen-tour-count').textContent.match(/of (\d+)/)[1]);
+        // no part of the page is mounted here, so only the cards without a frame are left
+        render(<Tour key="first" fromStage={0} toStage={0} onClose={() => {}} />);
+        expect(count()).toBe(1);
+        render(<Tour key="all" onClose={() => {}} />);
+        expect(count()).toBe(2);
     });
 });
 

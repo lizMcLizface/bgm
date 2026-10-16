@@ -40,6 +40,7 @@ import { readPref, writePref } from './prefs';
 import { seedToPhrase, phraseToSeed } from './phrase';
 import { WANDER_ROLES, WANDER_LIMITS } from './engine/wander';
 import Tour, { tourSeen } from './Tour';
+import { STAGES, STAGE_KEY, LAST_STAGE } from './tourSteps';
 
 // One Generator for the page's lifetime; StrictMode's double-mount must
 // not build a second set of instruments.
@@ -870,14 +871,36 @@ const GenerativeApp = () => {
     // Opened by itself it starts on a prompt that dims the page; from the menu it goes straight to the steps.
     const [tourOpen, setTourOpen] = useState(false);
     const [tourPrompt, setTourPrompt] = useState(false);
-    const openTour = (prompt = false) => {
+    // The page unlocks a set of features at a time (STAGES); a browser with no stored stage starts at the basics.
+    const [stage, setStage] = useState(() => {
+        const stored = readPref(STAGE_KEY, null);
+        if (Number.isInteger(stored) && stored >= 0 && stored <= LAST_STAGE) return stored;
+        return 0;
+    });
+    useEffect(() => writePref(STAGE_KEY, stage), [stage]);
+    const has = (needed) => stage >= needed;
+    // The tour covers the stages from..to; the first-visit prompt and a restart cover only the first.
+    const [tourRange, setTourRange] = useState({ from: 0, to: 0, id: 0 });
+    const openTour = (prompt = false, range = { from: 0, to: stage }) => {
         setTourPrompt(prompt);
+        setTourRange((r) => ({ ...range, id: r.id + 1 }));
         setTourOpen(true);
+    };
+    // Unlock the next set of features and show what they are (after they have rendered, so there is something to frame).
+    const unlockNext = () => {
+        const next = Math.min(LAST_STAGE, stage + 1);
+        setTourOpen(false);
+        setStage(next);
+        setTimeout(() => openTour(false, { from: next, to: next }), 0);
+    };
+    const startOver = () => {
+        setStage(0);
+        setTimeout(() => openTour(false, { from: 0, to: 0 }), 0);
     };
     const [helpOpen, setHelpOpen] = useState(false);
     useEffect(() => {
         if (tourSeen()) return undefined;
-        const timer = setTimeout(() => openTour(true), 800);
+        const timer = setTimeout(() => openTour(true, { from: 0, to: 0 }), 800);
         return () => clearTimeout(timer);
     }, []);
     const editorRef = useRef(null);
@@ -1048,14 +1071,17 @@ const GenerativeApp = () => {
     // sounds as they are. A pasted setup (`exact`) keeps its own seed, and
     // sounds that came inside it (`unsaved`) are marked edited until saved.
     // Sounds arrive at the next bar line, with the composition that goes with them.
-    const loadPresetAt = (role, name) => gen.loadRolePresetAtBar(role, name, undefined, () => presetLoaded(role, name));
-    const loadSceneVoice = (role, spec, sceneName, unsaved) => {
+    // Smoothly (the ⚙ menu, on by default) the whole change waits for the next chord, and the
+    // sounds then glide over that chord instead of switching.
+    const [smoothPresets, setSmoothPresets] = useStoredFlag('bgm-smooth-presets', true);
+    const loadPresetAt = (role, name, morph) => gen.loadRolePresetAtBar(role, name, undefined, () => presetLoaded(role, name), { morph });
+    const loadSceneVoice = (role, spec, sceneName, unsaved, morph) => {
         if (typeof spec === 'string') {
-            loadPresetAt(role, findPreset(spec) ? spec : ROLE_PRESETS[role]);
+            loadPresetAt(role, findPreset(spec) ? spec : ROLE_PRESETS[role], morph);
             return;
         }
         if (!spec) {
-            loadPresetAt(role, ROLE_PRESETS[role]);
+            loadPresetAt(role, ROLE_PRESETS[role], morph);
             return;
         }
         // a sound carried in full: the library's own if it is that exactly, else a copy of its own
@@ -1063,7 +1089,7 @@ const GenerativeApp = () => {
         const full = { ...PRESET_DEFAULTS, ...spec.synth };
         const known = existing && Object.entries({ ...PRESET_DEFAULTS, ...existing }).every(([key, value]) => full[key] === value);
         if (known) {
-            loadPresetAt(role, spec.name);
+            loadPresetAt(role, spec.name, morph);
             return;
         }
         const label = existing ? `${spec.name} (${sceneName})` : spec.name;
@@ -1071,18 +1097,27 @@ const GenerativeApp = () => {
         gen.loadRolePresetAtBar(role, label, spec.synth, () => {
             if (unsaved) gen.roles[role].edited = true;
             patchRole(role, { presetName: label, edited: unsaved });
-        });
+        }, { morph });
     };
     // `parts`: 'all', 'composition' (everything but the sounds and the mix) or 'voices' (the sounds only).
-    const applyScene = (picked, { exact = false, unsaved = false, parts = 'all' } = {}) => {
+    const applyScene = (picked, options = {}) => {
         if (!picked) return;
+        if (!(smoothPresets && gen.isRunning && picked.settings.playMusic !== false)) {
+            applySceneNow(picked, options, false);
+            return;
+        }
+        // (the name shows at once; the music follows at the next chord)
+        if ((options.parts || 'all') === 'all') setScene(picked.name);
+        gen.atNextChord(() => applySceneNow(picked, options, true));
+    };
+    const applySceneNow = (picked, { exact = false, unsaved = false, parts = 'all' }, morph) => {
         const playing = gen.anyRunning;
         if (parts !== 'voices') {
             const next = sceneSettings(picked, exact && Number.isInteger(picked.settings.seed) ? picked.settings.seed : undefined);
             loadSettings(parts === 'composition' ? { ...next, volumes: gen.settings.volumes, muted: gen.settings.muted } : next);
         }
         if (parts !== 'composition' && sceneGroup(picked) !== 'ambience') {
-            Object.keys(ROLES).forEach((role) => loadSceneVoice(role, picked.voices[role], picked.name, unsaved));
+            Object.keys(ROLES).forEach((role) => loadSceneVoice(role, picked.voices[role], picked.name, unsaved, morph));
         }
         if (parts === 'voices') {
             setScene('');
@@ -1221,23 +1256,31 @@ const GenerativeApp = () => {
                 <h1 aria-label="calmbgm - calm procedural music" title="calmbgm - calm procedural music">calm<b>bgm</b></h1>
                 <div className="gen-header-controls">
                 <Transport gen={gen} anyOn={anyOn} onToggle={toggle} onChange={() => setTick((n) => n + 1)} />
-                <div className="gen-parts" role="group" aria-label="What Play plays">
+                {has(1) && <div className="gen-parts" role="group" aria-label="What Play plays">
                     <button type="button" className={`gen-part${settings.playMusic ? ' is-on' : ''}`} aria-pressed={settings.playMusic}
                         onClick={() => togglePart('playMusic')} title={PART_TITLE}>Music</button>
                     <button type="button" className={`gen-part${settings.playAmbience ? ' is-on' : ''}`} aria-pressed={settings.playAmbience}
                         onClick={() => togglePart('playAmbience')} title={PART_TITLE}>Ambience</button>
-                </div>
+                </div>}
                 </div>
                 <div className="gen-header-end">
                 <PresetBrowser current={scene} onPick={applyScene} actions={setupActions} />
                 {sleepLeft && <span className="gen-sleep gen-sleep-left" role="timer" title="Sleep timer (in the ⚙ menu)">Sleep {sleepLeft}</span>}
+                {stage < LAST_STAGE && (
+                    <button type="button" className="gen-unlock" onClick={unlockNext}
+                        title={`Unlock the next set of features and be shown around them: ${STAGES[stage + 1].name}`}>
+                        + {STAGES[stage + 1].name}
+                    </button>
+                )}
                 <div className="gen-header-tools">
+                    <button type="button" className="gen-tour-button" onClick={() => openTour(false)}
+                        title="Take the tour again, of everything unlocked so far">Tour</button>
                     <button type="button" className="gen-help" onClick={() => setHelpOpen(true)} title="Quick reference: hover the parts of the page to see what they do"
                         aria-label="Quick reference">?</button>
                     <MasterVolume />
                     <ThemeToggle />
                     <AudioMenu generator={gen} onReload={reloadKeepingSettings} />
-                    <SettingsMenu midi={{ connect: live.connectMidi, status: live.midiStatus }} link={() => shareUrl(gen.settings, linkPresets)} saving={saving} onTour={() => openTour(false)}
+                    <SettingsMenu midi={{ connect: live.connectMidi, status: live.midiStatus }} link={() => shareUrl(gen.settings, linkPresets)} saving={saving} onStartOver={startOver} smooth={{ value: smoothPresets, onChange: setSmoothPresets }}
                         phrase={<PhraseField seed={settings.seed} edited={gen.editedSinceStart} onApply={playPhrase} onRoll={newVariation} initial={linkedPhrase} />}>
                         <SleepTimer generator={gen} running={anyOn} onLeft={setSleepLeft} />
                         <Recorder generator={gen} fileName={fileName} onProgress={setSaving} />
@@ -1249,14 +1292,14 @@ const GenerativeApp = () => {
 
             <ChordTimeline
                 generator={gen}
-                tracks={<TrackStrip roles={shownTracks} presets={Object.fromEntries(Object.entries(roles).map(([role, { presetName, edited }]) => [role, { name: presetName, edited }]))} mix={mix} armed={armed} onMix={changeMix} onArm={setArmed} onEdit={editSound}
-                    onRandom={randomizePreset} onGenerate={generateForRole} onPick={choosePicker} generating={generating} live={live} />}
+                tracks={<TrackStrip roles={shownTracks} presets={Object.fromEntries(Object.entries(roles).map(([role, { presetName, edited }]) => [role, { name: presetName, edited }]))} mix={mix} armed={armed} onMix={changeMix} onArm={setArmed} onEdit={has(3) ? editSound : undefined}
+                    onRandom={randomizePreset} onGenerate={has(3) ? generateForRole : undefined} onPick={choosePicker} generating={generating} live={live} />}
             />
 
-            <Randomizer level={randomLevel} onLevel={setRandomLevel} onRandomize={randomize} onNewVariation={newVariation} />
+            {has(7) && <Randomizer level={randomLevel} onLevel={setRandomLevel} onRandomize={randomize} onNewVariation={newVariation} />}
 
-            <Panel id="music" title="Music" onRandom={() => randomize('music')}>
-                <div className="gen-row">
+            {has(2) && <Panel id="music" title="Music" onRandom={() => randomize('music')}>
+                <div className="gen-row" data-tour="music-key">
                     <Field label="Key" onRandom={() => randomizeField('tonic')}>
                         <select value={settings.tonic} onChange={(e) => update('tonic', Number(e.target.value))}>
                             {TONIC_NAMES.map((name, pc) => <option key={name} value={pc}>{name}</option>)}
@@ -1272,7 +1315,7 @@ const GenerativeApp = () => {
                         </select>
                     </Field>
                 </div>
-                <div className="gen-row">
+                <div className="gen-row" data-tour="music-progression">
                     <Field label="Chords" onRandom={() => loadSettings(randomLength(gen.settings, randomLevel))}>
                         <select value={chords} onChange={(e) => update('progression', progressionForLength(settings, Number(e.target.value)))}>
                             {PROGRESSION_LENGTHS.map((n) => <option key={n} value={n}>{n} chords</option>)}
@@ -1289,7 +1332,7 @@ const GenerativeApp = () => {
                         </select>
                     </Field>
                 </div>
-                <div className="gen-row">
+                <div className="gen-row" data-tour="music-tempo">
                     <Field label="Time signature" onRandom={() => randomizeField('meter')}>
                         <select value={settings.meter} onChange={(e) => update('meter', e.target.value)}>
                             {Object.entries(METERS).map(([id, { label }]) => <option key={id} value={id}>{label}</option>)}
@@ -1301,14 +1344,14 @@ const GenerativeApp = () => {
                     </Field>
                 </div>
                 <NowPlaying now={now} settings={settings} onKeep={keepCurrent} />
-            </Panel>
+            </Panel>}
 
-            <ColourPanel settings={settings} update={update} onRandom={() => loadSettings(randomColour(randomLevel))} />
+            {has(6) && <ColourPanel settings={settings} update={update} onRandom={() => loadSettings(randomColour(randomLevel))} />}
 
-            <Evolution drift={settings.drift} home={{ tonic: settings.tonic, mode: settings.mode }} onChange={(drift) => update('drift', drift)}
-                onRandom={() => randomize('conductor')} />
+            {has(5) && <Evolution drift={settings.drift} home={{ tonic: settings.tonic, mode: settings.mode }} onChange={(drift) => update('drift', drift)}
+                onRandom={() => randomize('conductor')} />}
 
-            <Panel id="arrangement" title="Arrangement" onRandom={() => randomize('arrangement')} more={(
+            {has(4) && <Panel id="arrangement" title="Arrangement" onRandom={() => randomize('arrangement')} more={(
                 <>
                     <Field label="Section length">
                         <select value={settings.sections.phrases} disabled={settings.sections.mode === 'off'}
@@ -1353,24 +1396,24 @@ const GenerativeApp = () => {
                         onChange={(e) => update('sectionTone', e.target.checked)} />
                     Sections change the tone
                 </label>
-            </Panel>
+            </Panel>}
 
-            <FeelPanel humanize={settings.humanize} swing={settings.swing} update={update}
+            {has(6) && <FeelPanel humanize={settings.humanize} swing={settings.swing} update={update}
                 onRandomHumanize={() => update('humanize', randomArrangement(gen.settings, randomLevel).humanize)}
                 onRandom={() => {
                     update('humanize', randomArrangement(gen.settings, randomLevel).humanize);
                     update('swing', randomSwing(randomLevel));
-                }} />
+                }} />}
 
-            <WanderPanel wander={settings.wander} update={update}
-                shown={[...Object.keys(shownRoles), ...(drumsOn ? ['perc'] : [])]} />
+            {has(6) && <WanderPanel wander={settings.wander} update={update}
+                shown={[...Object.keys(shownRoles), ...(drumsOn ? ['perc'] : [])]} />}
 
-            <AmbiencePanel levels={settings.ambience} shape={settings.ambienceShape} onShape={(s) => update('ambienceShape', s)}
+            {has(1) && <AmbiencePanel levels={settings.ambience} shape={settings.ambienceShape} onShape={(s) => update('ambienceShape', s)}
                 volume={settings.ambienceVolume} on={settings.playAmbience}
                 onChange={changeAmbience} onVolume={(v) => update('ambienceVolume', v)} onToggle={() => togglePart('playAmbience')}
-                onRandom={() => randomize('ambience')} />
+                onRandom={() => randomize('ambience')} />}
 
-            <SoundsBar onGenerate={generateAll} generating={Object.values(generating).some(Boolean)} />
+            {has(3) && <SoundsBar onGenerate={generateAll} generating={Object.values(generating).some(Boolean)} />}
 
             {Object.entries(shownRoles).map(([role, { label }]) => (
                 <Panel
@@ -1382,11 +1425,11 @@ const GenerativeApp = () => {
                         <>
                             <i className={`gen-swatch gen-swatch-${role}`} />
                             {label}
-                            <RoleButtons role={role} label={label} mix={mix[role]} armed={armed === role} onMix={changeMix} onArm={setArmed} onEdit={editSound} />
+                            <RoleButtons role={role} label={label} mix={mix[role]} armed={armed === role} onMix={changeMix} onArm={setArmed} onEdit={has(3) ? editSound : undefined} />
                         </>
                     )}
                     onRandom={() => randomizeRole(role)}
-                    more={(
+                    more={!has(3) ? undefined : (
                         <>
                             <VoiceControls role={role} voice={settings.voices[role]}
                                 onChange={(voice) => update('voices', { ...settings.voices, [role]: voice })} />
@@ -1407,17 +1450,19 @@ const GenerativeApp = () => {
                         </>
                     )}
                 >
-                    <Field label="Preset" onRandom={() => randomizePreset(role)} onGenerate={() => generateForRole(role)} generating={generating[role]} wide>
+                    <Field label="Preset" onRandom={() => randomizePreset(role)} onGenerate={has(3) ? () => generateForRole(role) : undefined} generating={generating[role]} wide>
                         <PresetPicker value={roles[role].presetName} edited={roles[role].edited} onChange={(name) => loadPreset(role, name)} role={role}
                             open={pickerRole === role} onOpenChange={(open) => choosePicker(open ? role : null)} />
                     </Field>
-                    <Field label="Kind of new sound">
-                        <select value={soundKinds[role]} title="What the ✦ button makes for this voice"
-                            onChange={(e) => setSoundKinds((k) => ({ ...k, [role]: e.target.value }))}>
-                            <option value="any">Any kind</option>
-                            {Object.entries(SOUND_KINDS[role]).map(([kind, text]) => <option key={kind} value={kind}>{text}</option>)}
-                        </select>
-                    </Field>
+                    {has(3) && (
+                        <Field label="Kind of new sound">
+                            <select value={soundKinds[role]} title="What the ✦ button makes for this voice"
+                                onChange={(e) => setSoundKinds((k) => ({ ...k, [role]: e.target.value }))}>
+                                <option value="any">Any kind</option>
+                                {Object.entries(SOUND_KINDS[role]).map(([kind, text]) => <option key={kind} value={kind}>{text}</option>)}
+                            </select>
+                        </Field>
+                    )}
                     <Field label={`Volume ${Math.round(settings.volumes[role] * 100)}%`}>
                         <input type="range" min="0" max="1" step="0.01" value={settings.volumes[role]}
                             onChange={(e) => setVolume(role, Number(e.target.value))} />
@@ -1425,12 +1470,12 @@ const GenerativeApp = () => {
                 </Panel>
             ))}
 
-            <PercussionPanel drums={settings.drums} kit={settings.drumKit} volume={settings.volumes.perc} mix={mix.perc}
+            {has(3) && <PercussionPanel drums={settings.drums} kit={settings.drumKit} volume={settings.volumes.perc} mix={mix.perc}
                 armed={armed === 'perc'} onArm={setArmed}
                 onDrums={(drums) => update('drums', drums)} onKit={(kit) => update('drumKit', kit)}
-                onVolume={(v) => setVolume('perc', v)} onMix={changeMix} onAudition={() => gen.audition('perc')} />
+                onVolume={(v) => setVolume('perc', v)} onMix={changeMix} onAudition={() => gen.audition('perc')} />}
 
-            <SynthEditor
+            {has(3) && <SynthEditor
                 generator={gen}
                 roles={ROLES}
                 role={editorRole}
@@ -1442,9 +1487,10 @@ const GenerativeApp = () => {
                 open={editorOpen}
                 onToggle={() => setEditorOpen((o) => !o)}
                 sectionRef={editorRef}
-            />
+            />}
 
-            {tourOpen && <Tour prompt={tourPrompt} onClose={() => setTourOpen(false)} />}
+            {tourOpen && <Tour key={tourRange.id} prompt={tourPrompt} fromStage={tourRange.from} toStage={tourRange.to}
+                onUnlockAll={() => setStage(LAST_STAGE)} onClose={() => setTourOpen(false)} />}
             {helpOpen && <Tour reference onClose={() => setHelpOpen(false)} />}
 
             <footer className="gen-footer">
