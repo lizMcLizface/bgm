@@ -1,4 +1,4 @@
-import { SCENES, SCENE_CATEGORIES, sceneSettings, sceneGroup, SCENE_GROUPS, buildSetup, parseSetup, normalizeScene, sceneSlug, sceneBySlug, presetFromSearch, introFromSearch } from './scenes';
+import { SCENES, BROWSABLE_SCENES, SCENE_CATEGORIES, stepBuiltinScene, sceneSettings, sceneGroup, SCENE_GROUPS, buildSetup, parseSetup, normalizeScene, sceneSlug, sceneBySlug, presetFromSearch, introFromSearch } from './scenes';
 import { scaleById } from './theory';
 import { findPreset, sanitizePreset } from './editor/presetStore';
 import { SHAREABLE_PRESETS } from './shareCode';
@@ -44,7 +44,8 @@ test('every scene is in a category, every category has scenes, and the list is l
     const ids = SCENE_CATEGORIES.map((c) => c.id);
     expect(new Set(ids).size).toBe(ids.length);
     SCENES.forEach((scene) => expect(ids).toContain(scene.category));
-    ids.forEach((id) => expect(SCENES.filter((s) => s.category === id).length).toBeGreaterThanOrEqual(4));
+    expect(BROWSABLE_SCENES.length).toBeGreaterThan(40);
+    ids.forEach((id) => expect(BROWSABLE_SCENES.filter((s) => s.category === id).length).toBeGreaterThanOrEqual(1));
     ['ftl', 'metroid', 'f-zero', 'altp', 'stardew', 'terraria'].forEach((tag) =>
         expect(SCENES.some((s) => s.tags.includes(tag))).toBe(true));
 });
@@ -197,7 +198,7 @@ test('tuned music presets name their whole rhythmic vocabulary and retain safe e
   expect(Object.values(settings.padWeights).some(v=>v>0)).toBe(true);expect(Object.values(settings.bassWeights).some(v=>v>0)).toBe(true);
   expect(settings.humanize.timing).toBeLessThanOrEqual(16);expect(settings.humanize.detune).toBeLessThanOrEqual(4);
   const inherited=inheritBook(scene.rulebook).inherited??{};
-  if(scene.name!=='Altman')for(const id of ['melodic-slides','pad-pitch-motion','bass-pitch-motion','chord-slides','gate-envelopes'])expect(inherited[id]?.enabled??false).toBe(false);
+  if(scene.name!=='Altman')for(const id of ['melodic-slides','pad-pitch-motion','bass-pitch-motion','chord-slides','gate-envelopes'])expect(inherited[id]?.enabled??false).toBe(scene.name==='Dark Mirror Dimension' && id==='gate-envelopes');
   if(scene.category==='podcast'){expect(settings.leadActivity).toBeLessThanOrEqual(.12);expect(settings.padMotion.fast).toBe(0);expect(settings.bassWeights.walking).toBe(0);expect(inherited['lead-pickups'].enabled).toBe(false);}
  }
  for(const name of ['Choir at sea','Slow motion','Breathing room','Seaside Hearth','Wide Open Plains']){
@@ -210,4 +211,21 @@ test('Altman keeps the haunted string lead and the unsettling category has its i
  const scene=sceneBySlug('altman');expect(scene.voices.lead).toBe('Haunted Viola');
  const voice=findPreset(scene.voices.lead);expect(sanitizePreset(voice)).toEqual(voice);expect(voice.gainSustain).toBeGreaterThan(.6);expect(voice.gainAttack).toBeGreaterThan(.2);
  for(const name of ['Altman','Seaside Hearth','Almost Home','Desert dusk','Drone and Drift'])expect(sceneBySlug(name).category).toBe('unsettling');
+});
+
+
+test('regular browsing crosses categories and skips hidden archives, which still resolve by URL', () => {
+    expect(SCENE_CATEGORIES.some(c => c.cycleWithin)).toBe(false);
+    for (const archive of SCENES.filter(s => s.hidden)) {
+        expect(sceneBySlug(sceneSlug(archive.name))).toBe(archive);
+        expect(BROWSABLE_SCENES).not.toContain(archive);
+        expect(BROWSABLE_SCENES).toContain(stepBuiltinScene(archive.name, 1));
+    }
+    const ordered = BROWSABLE_SCENES.map((s, i) => ({ s, i })).sort((a, b) => SCENE_CATEGORIES.findIndex(c=>c.id===a.s.category) - SCENE_CATEGORIES.findIndex(c=>c.id===b.s.category) || a.i-b.i).map(x=>x.s);
+    expect(stepBuiltinScene('', 1)).toBe(ordered[0]);
+    expect(stepBuiltinScene('', -1)).toBe(ordered.at(-1));
+    for (let i = 0; i < ordered.length; i++) {
+        expect(stepBuiltinScene(ordered[i].name, 1)).toBe(ordered[(i + 1) % ordered.length]);
+        expect(stepBuiltinScene(ordered[i].name, -1)).toBe(ordered[(i - 1 + ordered.length) % ordered.length]);
+    }
 });

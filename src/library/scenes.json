@@ -49,6 +49,11 @@
       "id": "unsettling",
       "label": "Unsettling",
       "blurb": "Unresolved, melancholy and uncanny: drifting strings, suspended harmony and deliberate clashes"
+    },
+    {
+      "id": "electronic",
+      "label": "Electronic Horizons",
+      "blurb": "Melodic synth nostalgia, sequencer journeys and long progressive-house builds"
     }
   ],
   "scenes": [
@@ -1911,11 +1916,184 @@
     {
       "name": "Bounty Hunter Basement",
       "category": "classics",
+      "blurb": "Metroid Prime · Magmoor Caverns: low choir and string ostinato over a driving kick, backbeat and tom pulse",
+      "tags": [
+        "metroid",
+        "dark",
+        "alien",
+        "prime",
+        "magmoor"
+      ],
+      "settings": {
+        "tonic": 4,
+        "mode": "Major-3",
+        "bpm": 108,
+        "progression": 12,
+        "barsPerChord": 2,
+        "padNotes": 3,
+        "leadActivity": 0.7,
+        "padWeights": {
+          "sustain": 10,
+          "pulse": 65,
+          "arpeggio": 25,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 10,
+          "half": 35,
+          "walking": 0,
+          "drive": 55
+        },
+        "drums": {
+          "style": "drive",
+          "activity": 0.3,
+          "variation": 0.25,
+          "sprinkle": 0.05,
+          "kit": "crisp"
+        },
+        "sections": {
+          "mode": "off",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "ambience": {
+          "wind": 0.08
+        },
+        "ambienceShape": {
+          "wind": {
+            "distance": 0.6
+          }
+        },
+        "playAmbience": true,
+        "leadDensity": 0.05,
+        "leadLeaps": 0.2,
+        "leadRepeat": 0.7,
+        "humanize": {
+          "timing": 4,
+          "velocity": 0.06,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.1,
+          "fast": 0,
+          "swell": 0.04
+        },
+        "volumes": {
+          "pad": 0.52,
+          "bass": 0.62,
+          "lead": 0.55,
+          "counter": 0.2,
+          "perc": 0.62
+        },
+        "ambienceVolume": 0.35,
+        "chordBorrow": 0,
+        "leadEnding": "open",
+        "swing": 0,
+        "pulseWeights": {
+          "groups": 35,
+          "beats": 50,
+          "push": 0,
+          "split": 15
+        },
+        "arpWeights": {
+          "bounce": 10,
+          "up": 15,
+          "down": 10,
+          "broken": 65
+        },
+        "pedal": {
+          "mode": "tonic",
+          "amount": 0.7
+        },
+        "chordColour": {
+          "mode": "sus4",
+          "amount": 0.3
+        },
+        "counter": {
+          "mode": "line",
+          "activity": 0.15
+        },
+        "voices": {
+          "lead": {
+            "octave": -1,
+            "wander": "off",
+            "chance": 0.3
+          },
+          "counter": {
+            "octave": -1,
+            "wander": "off",
+            "chance": 0.3
+          }
+        },
+        "drumKit": {
+          "room": 0.2,
+          "punch": {
+            "level": 1.1
+          },
+          "sizzle": {
+            "level": 0.35
+          },
+          "hat": {
+            "level": 0.45
+          },
+          "clap": {
+            "level": 0.65
+          },
+          "rim": {
+            "level": 0.8
+          },
+          "tom": {
+            "level": 1.2
+          },
+          "ride": {
+            "level": 0.45
+          }
+        }
+      },
+      "voices": {
+        "pad": "Heroic Strings",
+        "bass": "Deep Throb",
+        "lead": "Choir Ah",
+        "counter": "Spore Haze"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "section-cadences": {
+            "enabled": false
+          },
+          "common-tone-bridges": {
+            "enabled": false
+          },
+          "melodic-slides": {
+            "enabled": false
+          },
+          "chord-slides": {
+            "enabled": false
+          },
+          "pad-pitch-motion": {
+            "enabled": false
+          },
+          "bass-pitch-motion": {
+            "enabled": false
+          },
+          "harmonic-pacing": {
+            "enabled": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Bounty Hunter Basement v1",
+      "category": "classics",
       "blurb": "Phrygian shadows: a hollow pad, an echoing marimba and a slow pulse",
       "tags": [
         "metroid",
         "dark",
-        "alien"
+        "alien",
+        "v1"
       ],
       "settings": {
         "tonic": 4,
@@ -1985,16 +2163,132 @@
         "pad": "Spore Haze",
         "bass": "Deep Throb",
         "lead": "Soft Marimba"
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Damp Crater",
+      "category": "unsettling",
+      "blurb": "Metroid-inspired alien storm: a low suspended haze, soft sine-and-triangle signals and rain beyond the crater",
+      "tags": [
+        "metroid",
+        "rain",
+        "dark",
+        "prime"
+      ],
+      "settings": {
+        "tonic": 9,
+        "mode": "Major-6",
+        "bpm": 62,
+        "progression": 12,
+        "barsPerChord": 4,
+        "padNotes": 3,
+        "leadActivity": 0.35,
+        "padWeights": {
+          "sustain": 90,
+          "pulse": 0,
+          "arpeggio": 10,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0,
+          "drive": 0
+        },
+        "ambience": {
+          "rain": 0.35,
+          "thunder": 0.12,
+          "wind": 0.12
+        },
+        "playAmbience": true,
+        "leadDensity": 0,
+        "leadLeaps": 0.4,
+        "leadRepeat": 0.6,
+        "humanize": {
+          "timing": 9,
+          "velocity": 0.06,
+          "detune": 2
+        },
+        "padMotion": {
+          "lean": 0.1,
+          "fast": 0,
+          "swell": 0.07
+        },
+        "volumes": {
+          "pad": 0.5,
+          "bass": 0.43,
+          "lead": 0.5,
+          "counter": 0.25,
+          "perc": 0.25
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "ambienceVolume": 0.5,
+        "chordBorrow": 0,
+        "leadEnding": "open",
+        "swing": 0,
+        "chordColour": {
+          "mode": "floating",
+          "amount": 0.6
+        },
+        "pedal": {
+          "mode": "tonic",
+          "amount": 0.65
+        },
+        "voices": {
+          "lead": {
+            "octave": -1,
+            "wander": "off",
+            "chance": 0.3
+          }
+        }
+      },
+      "voices": {
+        "pad": "Spore Haze",
+        "bass": "Deep Throb",
+        "lead": "Glass Lead"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "section-cadences": {
+            "enabled": false
+          },
+          "common-tone-bridges": {
+            "enabled": false
+          },
+          "melodic-slides": {
+            "enabled": false
+          },
+          "chord-slides": {
+            "enabled": false
+          },
+          "pad-pitch-motion": {
+            "enabled": false
+          },
+          "bass-pitch-motion": {
+            "enabled": false
+          },
+          "held-pad-glides": {
+            "enabled": true
+          }
+        }
+      }
+    },
+    {
+      "name": "Damp Crater v1",
       "category": "unsettling",
       "blurb": "A tense storm on an alien surface: sparse signal notes, a drone and rolling thunder",
       "tags": [
         "metroid",
         "rain",
-        "dark"
+        "dark",
+        "v1"
       ],
       "settings": {
         "tonic": 9,
@@ -2054,16 +2348,148 @@
         "pad": "Spore Haze",
         "bass": "Deep Throb",
         "lead": "Signal Lead"
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Zero Fun Zone",
+      "category": "classics",
+      "blurb": "F-Zero · arcade racing spirit: urgent minor-key synth hooks, a steady eighth-note engine and punchy bass without constant lead runs",
+      "tags": [
+        "f-zero",
+        "racing",
+        "fast"
+      ],
+      "settings": {
+        "tonic": 4,
+        "mode": "Major-6",
+        "bpm": 152,
+        "progression": 6,
+        "barsPerChord": 1,
+        "padNotes": 3,
+        "leadActivity": 0.9,
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 20,
+          "arpeggio": 0,
+          "sequence": 80,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 0,
+          "walking": 0,
+          "drive": 100
+        },
+        "drums": {
+          "style": "drive",
+          "activity": 0.3,
+          "variation": 0.2,
+          "sprinkle": 0.06,
+          "kit": "crisp"
+        },
+        "drumKit": {
+          "room": 0.1,
+          "punch": {
+            "level": 1.1,
+            "tone": -0.1
+          },
+          "sizzle": {
+            "level": 0.55,
+            "tone": 0.2,
+            "decay": 0.8
+          },
+          "hat": {
+            "level": 0.55,
+            "tone": 0.2,
+            "decay": 0.8
+          },
+          "clap": {
+            "level": 0.65
+          },
+          "rim": {
+            "level": 0.7
+          },
+          "tom": {
+            "level": 0.85
+          }
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "sectionTone": true,
+        "counter": {
+          "mode": "answer",
+          "activity": 0.25
+        },
+        "humanize": {
+          "timing": 2,
+          "velocity": 0.06,
+          "detune": 1
+        },
+        "leadDensity": 0.6,
+        "leadLeaps": 0.5,
+        "leadRepeat": 0.7,
+        "padMotion": {
+          "lean": 0.15,
+          "fast": 0,
+          "swell": 0.03
+        },
+        "volumes": {
+          "pad": 0.46,
+          "bass": 0.6,
+          "lead": 0.62,
+          "counter": 0.28,
+          "perc": 0.48
+        },
+        "pulseWeights": {
+          "groups": 35,
+          "beats": 50,
+          "push": 0,
+          "split": 15
+        },
+        "arpWeights": {
+          "bounce": 10,
+          "up": 10,
+          "down": 5,
+          "broken": 75
+        }
+      },
+      "voices": {
+        "pad": "Arp Pluck",
+        "bass": "Drive Bass",
+        "lead": "Racer Lead",
+        "counter": "Soft Saw Lead"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "melodic-slides": {
+            "enabled": false
+          },
+          "chord-slides": {
+            "enabled": false
+          },
+          "pad-pitch-motion": {
+            "enabled": false
+          },
+          "bass-pitch-motion": {
+            "enabled": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Zero Fun Zone v1",
       "category": "classics",
       "blurb": "Hover-car pace: a bright lead over a relentless bass and a hard beat",
       "tags": [
         "f-zero",
         "racing",
-        "fast"
+        "fast",
+        "v1"
       ],
       "settings": {
         "tonic": 4,
@@ -2143,16 +2569,155 @@
         "bass": "Drive Bass",
         "lead": "Racer Lead",
         "counter": "Signal Lead"
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Big Blue-ish",
+      "category": "classics",
+      "blurb": "F-Zero · Big Blue spirit: fast minor-key racing, a cutting synth lead, bright chord attacks and relentless picked bass",
+      "tags": [
+        "f-zero",
+        "racing",
+        "fast"
+      ],
+      "settings": {
+        "tonic": 2,
+        "mode": "Major-6",
+        "bpm": 164,
+        "progression": 12,
+        "barsPerChord": 1,
+        "padNotes": 3,
+        "leadActivity": 0.9,
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 75,
+          "arpeggio": 0,
+          "sequence": 25,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 0,
+          "walking": 0,
+          "drive": 100
+        },
+        "drums": {
+          "style": "drive",
+          "activity": 0.35,
+          "variation": 0.15,
+          "sprinkle": 0.05,
+          "kit": "crisp"
+        },
+        "drumKit": {
+          "room": 0.1,
+          "punch": {
+            "level": 1,
+            "tone": -0.1
+          },
+          "sizzle": {
+            "level": 0.45,
+            "decay": 0.8
+          },
+          "hat": {
+            "level": 0.45,
+            "decay": 0.8
+          },
+          "clap": {
+            "level": 0.6
+          },
+          "rim": {
+            "level": 0.65
+          },
+          "tom": {
+            "level": 0.8
+          }
+        },
+        "swing": 0,
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "sectionTone": false,
+        "counter": {
+          "mode": "harmony",
+          "activity": 0.25
+        },
+        "leadDensity": 0.6,
+        "leadLeaps": 0.5,
+        "leadRepeat": 0.75,
+        "humanize": {
+          "timing": 2,
+          "velocity": 0.06,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.1,
+          "fast": 0,
+          "swell": 0.02
+        },
+        "volumes": {
+          "pad": 0.46,
+          "bass": 0.62,
+          "lead": 0.64,
+          "counter": 0.2,
+          "perc": 0.48
+        },
+        "pulseWeights": {
+          "groups": 20,
+          "beats": 80,
+          "push": 0,
+          "split": 0
+        },
+        "arpWeights": {
+          "bounce": 15,
+          "up": 15,
+          "down": 5,
+          "broken": 65
+        },
+        "chordColour": {
+          "mode": "plain",
+          "amount": 0
+        },
+        "chordBorrow": 0
+      },
+      "voices": {
+        "pad": "Arp Pluck",
+        "bass": "Muted Pick Bass",
+        "lead": "Racer Lead",
+        "counter": "Warm Square Lead"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "melodic-slides": {
+            "enabled": false
+          },
+          "chord-slides": {
+            "enabled": false
+          },
+          "pad-pitch-motion": {
+            "enabled": false
+          },
+          "bass-pitch-motion": {
+            "enabled": false
+          },
+          "harmonic-pacing": {
+            "enabled": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Big Blue-ish v1",
       "category": "classics",
       "blurb": "A smoother ride: bright Mixolydian chords, a bouncing bass and a steady electro beat",
       "tags": [
         "f-zero",
         "racing",
-        "fast"
+        "fast",
+        "v1"
       ],
       "settings": {
         "tonic": 5,
@@ -2233,16 +2798,139 @@
         "bass": "Drive Bass",
         "lead": "Racer Lead",
         "counter": "Pan Flute"
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Heroic Field Trip",
+      "category": "classics",
+      "blurb": "Zelda · A Link to the Past overworld spirit: broad brass phrases, buoyant strings and a steady adventure march",
+      "tags": [
+        "zelda",
+        "altp",
+        "adventure"
+      ],
+      "settings": {
+        "tonic": 10,
+        "mode": "Major-1",
+        "bpm": 124,
+        "progression": 14,
+        "barsPerChord": 1,
+        "padNotes": 3,
+        "leadActivity": 0.8,
+        "padWeights": {
+          "sustain": 10,
+          "pulse": 75,
+          "arpeggio": 15,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 80,
+          "walking": 20,
+          "drive": 0
+        },
+        "drums": {
+          "style": "drive",
+          "activity": 0.25,
+          "variation": 0.25,
+          "sprinkle": 0.05,
+          "kit": "crisp"
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "counter": {
+          "mode": "answer",
+          "activity": 0.25
+        },
+        "drumKit": {
+          "room": 0.15,
+          "sizzle": {
+            "level": 0.3
+          },
+          "hat": {
+            "level": 0.4
+          },
+          "clap": {
+            "level": 0.55
+          },
+          "tom": {
+            "level": 1.1
+          },
+          "ride": {
+            "level": 0.4
+          }
+        },
+        "leadDensity": 0.25,
+        "leadLeaps": 0.55,
+        "leadRepeat": 0.65,
+        "humanize": {
+          "timing": 5,
+          "velocity": 0.08,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.2,
+          "fast": 0,
+          "swell": 0.04
+        },
+        "volumes": {
+          "pad": 0.5,
+          "bass": 0.5,
+          "lead": 0.65,
+          "counter": 0.32,
+          "perc": 0.4
+        },
+        "pulseWeights": {
+          "groups": 60,
+          "beats": 25,
+          "push": 0,
+          "split": 15
+        },
+        "chordColour": {
+          "mode": "plain",
+          "amount": 0
+        },
+        "chordBorrow": 0
+      },
+      "voices": {
+        "pad": "Heroic Strings",
+        "bass": "Chip Bass",
+        "lead": "Fanfare Brass",
+        "counter": "Pan Flute"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "melodic-slides": {
+            "enabled": false
+          },
+          "chord-slides": {
+            "enabled": false
+          },
+          "pad-pitch-motion": {
+            "enabled": false
+          },
+          "bass-pitch-motion": {
+            "enabled": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Heroic Field Trip v1",
       "category": "classics",
       "blurb": "A heroic march: strings, brass and a pan flute over a steady beat",
       "tags": [
         "zelda",
         "altp",
-        "adventure"
+        "adventure",
+        "v1"
       ],
       "settings": {
         "tonic": 10,
@@ -2311,16 +2999,133 @@
         "bass": "Chip Bass",
         "lead": "Fanfare Brass",
         "counter": "Pan Flute"
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Slightly Lost Forest",
+      "category": "classics",
+      "blurb": "Zelda · woodland mystery: lilting harp figures, a soft flute and scattered celesta answers, with space between phrases",
+      "tags": [
+        "zelda",
+        "altp",
+        "forest"
+      ],
+      "settings": {
+        "tonic": 2,
+        "mode": "Major-2",
+        "bpm": 92,
+        "meter": "6/8",
+        "progression": 12,
+        "barsPerChord": 2,
+        "padNotes": 3,
+        "leadActivity": 0.6,
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 20,
+          "arpeggio": 80,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 60,
+          "half": 40,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "shaker",
+          "activity": 0.15,
+          "variation": 0.25,
+          "sprinkle": 0.02,
+          "kit": "felt"
+        },
+        "counter": {
+          "mode": "answer",
+          "activity": 0.2
+        },
+        "ambience": {
+          "wind": 0.1
+        },
+        "playAmbience": true,
+        "leadDensity": 0.2,
+        "leadLeaps": 0.3,
+        "leadRepeat": 0.65,
+        "humanize": {
+          "timing": 8,
+          "velocity": 0.09,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.2,
+          "fast": 0,
+          "swell": 0.05
+        },
+        "volumes": {
+          "pad": 0.58,
+          "bass": 0.4,
+          "lead": 0.55,
+          "counter": 0.3,
+          "perc": 0.25
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "ambienceVolume": 0.35,
+        "arpWeights": {
+          "bounce": 45,
+          "up": 15,
+          "down": 10,
+          "broken": 30
+        },
+        "chordColour": {
+          "mode": "sus2",
+          "amount": 0.45
+        },
+        "chordBorrow": 0,
+        "leadEnding": "open"
+      },
+      "voices": {
+        "pad": "Harp Pluck",
+        "bass": "Upright Pluck",
+        "lead": "Soft Flute",
+        "counter": "Celesta"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "melodic-slides": {
+            "enabled": false
+          },
+          "chord-slides": {
+            "enabled": false
+          },
+          "pad-pitch-motion": {
+            "enabled": false
+          },
+          "bass-pitch-motion": {
+            "enabled": false
+          },
+          "section-cadences": {
+            "enabled": false
+          },
+          "common-tone-bridges": {
+            "enabled": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Slightly Lost Forest v1",
       "category": "classics",
       "blurb": "Playful 6/8: bright pixel keys, a pan flute and a skipping shaker",
       "tags": [
         "zelda",
         "altp",
-        "forest"
+        "forest",
+        "v1"
       ],
       "settings": {
         "tonic": 2,
@@ -2390,16 +3195,121 @@
         "bass": "Chip Bass",
         "lead": "Pan Flute",
         "counter": "Chip Lead"
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Nervous Chicken Village",
+      "category": "classics",
+      "blurb": "Zelda · Kakariko village spirit: a relaxed major-key ocarina, gently rocking harp and upright bass; a place to stop and breathe",
+      "tags": [
+        "zelda",
+        "altp",
+        "village"
+      ],
+      "settings": {
+        "tonic": 5,
+        "mode": "Major-1",
+        "bpm": 84,
+        "progression": 15,
+        "barsPerChord": 1,
+        "padNotes": 3,
+        "leadActivity": 0.65,
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 65,
+          "arpeggio": 35,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 20,
+          "half": 75,
+          "walking": 5,
+          "drive": 0
+        },
+        "drums": {
+          "style": "shaker",
+          "activity": 0.1,
+          "variation": 0.2,
+          "sprinkle": 0.02,
+          "kit": "felt"
+        },
+        "swing": 0.04,
+        "counter": {
+          "mode": "answer",
+          "activity": 0.15
+        },
+        "leadDensity": 0.1,
+        "leadLeaps": 0.25,
+        "leadRepeat": 0.7,
+        "humanize": {
+          "timing": 10,
+          "velocity": 0.09,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.15,
+          "fast": 0,
+          "swell": 0.04
+        },
+        "volumes": {
+          "pad": 0.55,
+          "bass": 0.43,
+          "lead": 0.55,
+          "counter": 0.25,
+          "perc": 0.2
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "pulseWeights": {
+          "groups": 65,
+          "beats": 10,
+          "push": 0,
+          "split": 25
+        },
+        "chordColour": {
+          "mode": "add6",
+          "amount": 0.2
+        },
+        "chordBorrow": 0
+      },
+      "voices": {
+        "pad": "Soft Harp",
+        "bass": "Upright Pluck",
+        "lead": "Ocarina",
+        "counter": "Soft Flute"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "melodic-slides": {
+            "enabled": false
+          },
+          "chord-slides": {
+            "enabled": false
+          },
+          "pad-pitch-motion": {
+            "enabled": false
+          },
+          "bass-pitch-motion": {
+            "enabled": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Nervous Chicken Village v1",
       "category": "classics",
       "blurb": "A sunny village: pentatonic keys, a pan flute and a light swing",
       "tags": [
         "zelda",
         "altp",
-        "village"
+        "village",
+        "v1"
       ],
       "settings": {
         "tonic": 5,
@@ -2464,16 +3374,152 @@
         "bass": "Chip Bass",
         "lead": "Pan Flute",
         "counter": "Chip Lead"
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Dark Mirror Dimension",
+      "category": "unsettling",
+      "blurb": "Zelda · A Link to the Past Dark World spirit: resolute minor brass over measured string pulses, grounded bass and restrained drums",
+      "tags": [
+        "zelda",
+        "altp",
+        "dark"
+      ],
+      "settings": {
+        "tonic": 4,
+        "mode": "Major-6",
+        "bpm": 116,
+        "progression": 7,
+        "barsPerChord": 1,
+        "padNotes": 3,
+        "leadActivity": 0.75,
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 100,
+          "arpeggio": 0,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 100,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "drive",
+          "activity": 0.15,
+          "variation": 0.1,
+          "sprinkle": 0.02,
+          "kit": "crisp"
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "leadDensity": 0.25,
+        "leadLeaps": 0.45,
+        "leadRepeat": 0.6,
+        "humanize": {
+          "timing": 5,
+          "velocity": 0.08,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.1,
+          "fast": 0,
+          "swell": 0.04
+        },
+        "volumes": {
+          "pad": 0.44,
+          "bass": 0.55,
+          "lead": 0.62,
+          "counter": 0.24,
+          "perc": 0.25
+        },
+        "pulseWeights": {
+          "groups": 0,
+          "beats": 100,
+          "push": 0,
+          "split": 0
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.25
+        },
+        "chordBorrow": 0.1,
+        "counter": {
+          "mode": "answer",
+          "activity": 0.2
+        },
+        "drumKit": {
+          "room": 0.2,
+          "sizzle": {
+            "level": 0
+          },
+          "hat": {
+            "level": 0
+          },
+          "clap": {
+            "level": 0.25
+          },
+          "tom": {
+            "level": 0.8
+          },
+          "ride": {
+            "level": 0
+          },
+          "rim": {
+            "level": 0.45
+          },
+          "punch": {
+            "level": 0.6
+          }
+        },
+        "thinPadUnderLead": false
+      },
+      "voices": {
+        "pad": "Heroic Strings",
+        "bass": "Chip Bass",
+        "lead": "Fanfare Brass",
+        "counter": "Warm Square Lead"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "melodic-slides": {
+            "enabled": false
+          },
+          "chord-slides": {
+            "enabled": false
+          },
+          "pad-pitch-motion": {
+            "enabled": false
+          },
+          "bass-pitch-motion": {
+            "enabled": false
+          },
+          "backing-breath": {
+            "enabled": false
+          },
+          "gate-envelopes": {
+            "enabled": true
+          }
+        }
+      }
+    },
+    {
+      "name": "Dark Mirror Dimension v1",
       "category": "unsettling",
       "blurb": "Phrygian dominant: brooding haze, a chip bass and a slow, hard beat",
       "tags": [
         "zelda",
         "altp",
-        "dark"
+        "dark",
+        "v1"
       ],
       "settings": {
         "tonic": 4,
@@ -2534,7 +3580,8 @@
         "pad": "Spore Haze",
         "bass": "Chip Bass",
         "lead": "Fanfare Brass"
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Turnip Town",
@@ -3004,12 +4051,135 @@
     {
       "name": "Cold Drifts, Warm Socks",
       "category": "classics",
-      "blurb": "Icy arpeggios on a music box, a glassy drone and snow wind through the caves",
+      "blurb": "Metroid Prime · Phendrana Drifts: clear piano ripples, celesta glints and a quiet glassy horizon",
       "tags": [
         "metroid",
         "prime",
         "phendrana",
         "ice"
+      ],
+      "settings": {
+        "tonic": 6,
+        "mode": "Major-2",
+        "bpm": 92,
+        "progression": 13,
+        "barsPerChord": 2,
+        "padNotes": 3,
+        "leadActivity": 0.55,
+        "leadDensity": 0.15,
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 0,
+          "arpeggio": 100,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0,
+          "drive": 0
+        },
+        "counter": {
+          "mode": "line",
+          "activity": 0.2
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "ambience": {
+          "wind": 0.15
+        },
+        "ambienceShape": {
+          "wind": {
+            "distance": 0.5,
+            "speed": 0.4
+          }
+        },
+        "playAmbience": true,
+        "wander": {
+          "period": 70
+        },
+        "leadLeaps": 0.25,
+        "leadRepeat": 0.65,
+        "humanize": {
+          "timing": 6,
+          "velocity": 0.08,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.15,
+          "fast": 0.1,
+          "swell": 0.04
+        },
+        "volumes": {
+          "pad": 0.65,
+          "bass": 0.36,
+          "lead": 0.45,
+          "counter": 0.28,
+          "perc": 0.35
+        },
+        "ambienceVolume": 0.4,
+        "chordBorrow": 0,
+        "leadEnding": "open",
+        "swing": 0,
+        "arpWeights": {
+          "bounce": 55,
+          "up": 15,
+          "down": 10,
+          "broken": 20
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.55
+        }
+      },
+      "voices": {
+        "pad": "Felt Piano",
+        "bass": "Sub Bass",
+        "lead": "Celesta",
+        "counter": "Glass Pad"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "section-cadences": {
+            "enabled": false
+          },
+          "common-tone-bridges": {
+            "enabled": false
+          },
+          "melodic-slides": {
+            "enabled": false
+          },
+          "chord-slides": {
+            "enabled": false
+          },
+          "pad-pitch-motion": {
+            "enabled": false
+          },
+          "bass-pitch-motion": {
+            "enabled": false
+          },
+          "harmonic-pacing": {
+            "enabled": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Cold Drifts, Warm Socks v1",
+      "category": "classics",
+      "blurb": "Icy arpeggios on a music box, a glassy drone and snow wind through the caves",
+      "tags": [
+        "metroid",
+        "prime",
+        "phendrana",
+        "ice",
+        "v1"
       ],
       "settings": {
         "tonic": 6,
@@ -3082,17 +4252,146 @@
         "bass": "Sub Bass",
         "lead": "Celesta",
         "counter": "Glass Pad"
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Ice Cave Echoes",
+      "category": "unsettling",
+      "blurb": "Metroid Prime · Phendrana depths: isolated bell signals, slow luminous chords and a distant wordless choir",
+      "tags": [
+        "metroid",
+        "prime",
+        "phendrana",
+        "ice"
+      ],
+      "settings": {
+        "tonic": 9,
+        "mode": "Major-6",
+        "bpm": 66,
+        "progression": 13,
+        "barsPerChord": 4,
+        "padNotes": 4,
+        "leadActivity": 0.4,
+        "padWeights": {
+          "sustain": 90,
+          "pulse": 0,
+          "arpeggio": 10,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "off",
+          "activity": 0,
+          "variation": 0.2,
+          "sprinkle": 0,
+          "kit": "felt"
+        },
+        "counter": {
+          "mode": "line",
+          "activity": 0.15
+        },
+        "ambience": {
+          "wind": 0.2
+        },
+        "ambienceShape": {
+          "wind": {
+            "distance": 0.7
+          }
+        },
+        "playAmbience": true,
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "leadDensity": 0,
+        "leadLeaps": 0.5,
+        "leadRepeat": 0.6,
+        "humanize": {
+          "timing": 8,
+          "velocity": 0.06,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.1,
+          "fast": 0,
+          "swell": 0.08
+        },
+        "volumes": {
+          "pad": 0.48,
+          "bass": 0.32,
+          "lead": 0.48,
+          "counter": 0.25,
+          "perc": 0.25
+        },
+        "ambienceVolume": 0.45,
+        "chordBorrow": 0,
+        "leadEnding": "open",
+        "swing": 0,
+        "chordColour": {
+          "mode": "sus2",
+          "amount": 0.65
+        },
+        "chordSpread": "open",
+        "voices": {
+          "counter": {
+            "octave": -1,
+            "wander": "off",
+            "chance": 0.3
+          }
+        }
+      },
+      "voices": {
+        "pad": "Starlight Pad",
+        "bass": "Sub Bass",
+        "lead": "FM Bell",
+        "counter": "Choir Ah"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "section-cadences": {
+            "enabled": false
+          },
+          "common-tone-bridges": {
+            "enabled": false
+          },
+          "melodic-slides": {
+            "enabled": false
+          },
+          "chord-slides": {
+            "enabled": false
+          },
+          "pad-pitch-motion": {
+            "enabled": false
+          },
+          "bass-pitch-motion": {
+            "enabled": false
+          },
+          "held-pad-glides": {
+            "enabled": true
+          }
+        }
+      }
+    },
+    {
+      "name": "Ice Cave Echoes v1",
       "category": "unsettling",
       "blurb": "Sparse, echoing signal notes over a slow glass pad and a distant wind",
       "tags": [
         "metroid",
         "prime",
         "phendrana",
-        "ice"
+        "ice",
+        "v1"
       ],
       "settings": {
         "tonic": 9,
@@ -3179,17 +4478,144 @@
             "enabled": false
           }
         }
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Soggy Home Planet",
+      "category": "classics",
+      "blurb": "Metroid Prime · Tallon Overworld: interlocking nylon pulses, a grounded bass and lonely flute above the rain",
+      "tags": [
+        "metroid",
+        "prime",
+        "tallon",
+        "rain"
+      ],
+      "settings": {
+        "tonic": 9,
+        "mode": "Major-6",
+        "bpm": 96,
+        "progression": 13,
+        "barsPerChord": 2,
+        "padNotes": 3,
+        "leadActivity": 0.55,
+        "leadDensity": 0.15,
+        "padWeights": {
+          "sustain": 10,
+          "pulse": 30,
+          "arpeggio": 60,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 10,
+          "half": 65,
+          "walking": 0,
+          "drive": 25
+        },
+        "drums": {
+          "style": "downtempo",
+          "activity": 0.2,
+          "variation": 0.3,
+          "sprinkle": 0.03,
+          "kit": "felt"
+        },
+        "counter": {
+          "mode": "line",
+          "activity": 0.2
+        },
+        "ambience": {
+          "rain": 0.35,
+          "thunder": 0.08,
+          "wind": 0.1
+        },
+        "playAmbience": true,
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "leadLeaps": 0.25,
+        "leadRepeat": 0.6,
+        "humanize": {
+          "timing": 7,
+          "velocity": 0.08,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.2,
+          "fast": 0.1,
+          "swell": 0.04
+        },
+        "volumes": {
+          "pad": 0.62,
+          "bass": 0.52,
+          "lead": 0.55,
+          "counter": 0.23,
+          "perc": 0.32
+        },
+        "ambienceVolume": 0.45,
+        "chordBorrow": 0,
+        "leadEnding": "open",
+        "swing": 0,
+        "arpWeights": {
+          "bounce": 15,
+          "up": 15,
+          "down": 10,
+          "broken": 60
+        },
+        "pulseWeights": {
+          "groups": 45,
+          "beats": 35,
+          "push": 5,
+          "split": 15
+        },
+        "chordColour": {
+          "mode": "sus2",
+          "amount": 0.35
+        }
+      },
+      "voices": {
+        "pad": "Nylon Guitar",
+        "bass": "Deep Throb",
+        "lead": "Pan Flute",
+        "counter": "Spore Haze"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "section-cadences": {
+            "enabled": false
+          },
+          "common-tone-bridges": {
+            "enabled": false
+          },
+          "melodic-slides": {
+            "enabled": false
+          },
+          "chord-slides": {
+            "enabled": false
+          },
+          "pad-pitch-motion": {
+            "enabled": false
+          },
+          "bass-pitch-motion": {
+            "enabled": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Soggy Home Planet v1",
       "category": "classics",
       "blurb": "A steady, brooding pulse in the rain: nylon arpeggios, a throbbing bass and a lonely flute",
       "tags": [
         "metroid",
         "prime",
         "tallon",
-        "rain"
+        "rain",
+        "v1"
       ],
       "settings": {
         "tonic": 9,
@@ -3262,10 +4688,144 @@
         "bass": "Deep Throb",
         "lead": "Pan Flute",
         "counter": "Spore Haze"
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Ruins in the Drizzle",
+      "category": "classics",
+      "blurb": "Metroid Prime · Chozo Ruins: quick felt-piano patterns, a soft saw melody and light percussion through the ruins",
+      "tags": [
+        "metroid",
+        "prime",
+        "tallon",
+        "rain",
+        "ruins",
+        "chozo"
+      ],
+      "settings": {
+        "tonic": 2,
+        "mode": "Major-6",
+        "bpm": 128,
+        "progression": 13,
+        "barsPerChord": 2,
+        "padNotes": 3,
+        "leadActivity": 0.65,
+        "leadDensity": 0.25,
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 30,
+          "arpeggio": 35,
+          "sequence": 35,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 65,
+          "walking": 0,
+          "drive": 35
+        },
+        "drums": {
+          "style": "shaker",
+          "activity": 0.25,
+          "variation": 0.3,
+          "sprinkle": 0.05,
+          "kit": "felt"
+        },
+        "counter": {
+          "mode": "answer",
+          "activity": 0.2
+        },
+        "ambience": {
+          "rain": 0.12,
+          "wind": 0.08
+        },
+        "playAmbience": true,
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "leadLeaps": 0.25,
+        "leadRepeat": 0.65,
+        "humanize": {
+          "timing": 4,
+          "velocity": 0.08,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.15,
+          "fast": 0.1,
+          "swell": 0.04
+        },
+        "volumes": {
+          "pad": 0.65,
+          "bass": 0.48,
+          "lead": 0.5,
+          "counter": 0.2,
+          "perc": 0.4
+        },
+        "ambienceVolume": 0.3,
+        "chordBorrow": 0,
+        "leadEnding": "open",
+        "swing": 0,
+        "pulseWeights": {
+          "groups": 40,
+          "beats": 25,
+          "push": 10,
+          "split": 25
+        },
+        "arpWeights": {
+          "bounce": 15,
+          "up": 20,
+          "down": 10,
+          "broken": 55
+        },
+        "chordColour": {
+          "mode": "sus2",
+          "amount": 0.4
+        },
+        "pedal": {
+          "mode": "tonic",
+          "amount": 0.35
+        }
+      },
+      "voices": {
+        "pad": "Felt Piano",
+        "bass": "Deep Throb",
+        "lead": "Soft Saw Lead",
+        "counter": "Spore Haze"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "section-cadences": {
+            "enabled": false
+          },
+          "common-tone-bridges": {
+            "enabled": false
+          },
+          "melodic-slides": {
+            "enabled": false
+          },
+          "chord-slides": {
+            "enabled": false
+          },
+          "pad-pitch-motion": {
+            "enabled": false
+          },
+          "bass-pitch-motion": {
+            "enabled": false
+          },
+          "harmonic-pacing": {
+            "enabled": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Ruins in the Drizzle v1",
       "category": "classics",
       "blurb": "Heroic strings gone damp: a slow march, a tom-and-clap beat and drifting rain",
       "tags": [
@@ -3273,7 +4833,8 @@
         "prime",
         "tallon",
         "rain",
-        "ruins"
+        "ruins",
+        "v1"
       ],
       "settings": {
         "tonic": 2,
@@ -3345,7 +4906,8 @@
         "bass": "Chip Bass",
         "lead": "Signal Lead",
         "counter": "Pan Flute"
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Open Mic Pad",
@@ -4215,11 +5777,109 @@
     {
       "name": "Mushroom Kingdom Commute",
       "category": "classics",
-      "blurb": "A bouncy platformer stroll: swung bass hops, bright chip lead, snappy beat",
+      "blurb": "Mario · platformer spirit: bright chip phrases, hopping bass and offbeat pixel-piano chords, with a light noise-percussion tick",
       "tags": [
         "mario",
         "platformer",
         "bouncy"
+      ],
+      "settings": {
+        "tonic": 0,
+        "mode": "Major-1",
+        "bpm": 128,
+        "progression": 1,
+        "barsPerChord": 1,
+        "padNotes": 3,
+        "leadActivity": 0.8,
+        "leadDensity": 0.35,
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 100,
+          "arpeggio": 0,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 20,
+          "walking": 80,
+          "drive": 0
+        },
+        "drums": {
+          "style": "shaker",
+          "activity": 0.15,
+          "variation": 0.2,
+          "sprinkle": 0.02,
+          "kit": "felt"
+        },
+        "swing": 0.08,
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "leadLeaps": 0.55,
+        "leadRepeat": 0.7,
+        "humanize": {
+          "timing": 3,
+          "velocity": 0.07,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.1,
+          "fast": 0,
+          "swell": 0.03
+        },
+        "volumes": {
+          "pad": 0.42,
+          "bass": 0.5,
+          "lead": 0.6,
+          "counter": 0.25,
+          "perc": 0.18
+        },
+        "pulseWeights": {
+          "groups": 0,
+          "beats": 0,
+          "push": 0,
+          "split": 100
+        },
+        "thinPadUnderLead": false
+      },
+      "voices": {
+        "pad": "Pixel Piano",
+        "bass": "Chip Bass",
+        "lead": "Chip Lead"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "melodic-slides": {
+            "enabled": false
+          },
+          "chord-slides": {
+            "enabled": false
+          },
+          "pad-pitch-motion": {
+            "enabled": false
+          },
+          "bass-pitch-motion": {
+            "enabled": false
+          },
+          "backing-breath": {
+            "enabled": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Mushroom Kingdom Commute v1",
+      "category": "classics",
+      "blurb": "A bouncy platformer stroll: swung bass hops, bright chip lead, snappy beat",
+      "tags": [
+        "mario",
+        "platformer",
+        "bouncy",
+        "v1"
       ],
       "settings": {
         "tonic": 0,
@@ -4280,7 +5940,8 @@
         "pad": "Pixel Piano",
         "bass": "Chip Bass",
         "lead": "Chip Lead"
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Tall Grass Route",
@@ -4423,8 +6084,80 @@
       "voices": {
         "pad": "Pixel Piano",
         "bass": "Drive Bass",
-        "lead": "Squeezebox"
+        "lead": "Soft Saw Lead"
       }
+    },
+    {
+      "name": "Falling Blocks Folk Dance v1",
+      "category": "classics",
+      "blurb": "Fast minor folk dance, relentless but tidy, like stacking something under pressure",
+      "tags": [
+        "tetris",
+        "puzzle",
+        "folk",
+        "v1"
+      ],
+      "settings": {
+        "tonic": 9,
+        "mode": "Major-6",
+        "bpm": 144,
+        "progression": 6,
+        "barsPerChord": 1,
+        "padNotes": 3,
+        "leadActivity": 0.84,
+        "leadDensity": 0.72,
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 60,
+          "arpeggio": 40,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 50,
+          "walking": 0,
+          "drive": 50
+        },
+        "drums": {
+          "style": "drive",
+          "activity": 0.375,
+          "variation": 0.315,
+          "kit": "crisp",
+          "sprinkle": 0.12
+        },
+        "sections": {
+          "mode": "strong",
+          "phrases": 2
+        },
+        "sectionTone": true,
+        "leadLeaps": 0.44,
+        "leadRepeat": 0.48,
+        "humanize": {
+          "timing": 4,
+          "velocity": 0.09,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.32,
+          "fast": 0.16,
+          "swell": 0.035
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.78,
+          "lead": 0.68,
+          "counter": 0.5,
+          "perc": 0.59
+        }
+      },
+      "voices": {
+        "pad": "Pixel Piano",
+        "bass": "Drive Bass",
+        "lead": "Squeezebox"
+      },
+      "hidden": true
     },
     {
       "name": "Haunted Staircase",
@@ -5476,6 +7209,121 @@
         "film",
         "slow"
       ],
+      "blurb": "Blade Runner Blues spirit: a warm, swelling synth lament over distant brass chords and rain, with room around each phrase",
+      "settings": {
+        "tonic": 3,
+        "mode": "Major-6",
+        "bpm": 58,
+        "progression": 6,
+        "barsPerChord": 4,
+        "padNotes": 4,
+        "chordSpread": "open",
+        "padWeights": {
+          "sustain": 100,
+          "pulse": 0,
+          "arpeggio": 0,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0,
+          "drive": 0
+        },
+        "leadActivity": 0.6,
+        "leadDensity": 0,
+        "leadScale": "pentatonic",
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "pedal": {
+          "mode": "tonic",
+          "amount": 0.6
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.3
+        },
+        "ambience": {
+          "rain": 0.25,
+          "thunder": 0.08
+        },
+        "playAmbience": true,
+        "humanize": {
+          "timing": 12,
+          "velocity": 0.12,
+          "detune": 1
+        },
+        "leadLeaps": 0.2,
+        "leadRepeat": 0.6,
+        "padMotion": {
+          "lean": 0.1,
+          "fast": 0,
+          "swell": 0.08
+        },
+        "volumes": {
+          "pad": 0.4,
+          "bass": 0.4,
+          "lead": 0.67,
+          "counter": 0.2,
+          "perc": 0.2
+        },
+        "ambienceVolume": 0.4,
+        "leadEnding": "open",
+        "voices": {
+          "lead": {
+            "octave": -1,
+            "wander": "off",
+            "chance": 0.3
+          }
+        }
+      },
+      "voices": {
+        "pad": "CS-80 Brass",
+        "bass": "Sub Bass",
+        "lead": "Neon Blues Lead"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "section-cadences": {
+            "enabled": false
+          },
+          "common-tone-bridges": {
+            "enabled": false
+          },
+          "melodic-slides": {
+            "enabled": false
+          },
+          "chord-slides": {
+            "enabled": false
+          },
+          "pad-pitch-motion": {
+            "enabled": false
+          },
+          "bass-pitch-motion": {
+            "enabled": false
+          },
+          "gate-envelopes": {
+            "enabled": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Replicant Blues v1",
+      "category": "cinema",
+      "tags": [
+        "vangelis",
+        "blade-runner",
+        "film",
+        "slow",
+        "v1"
+      ],
       "blurb": "A huge slow brass chord, a lonely lament on top and rain on the neon",
       "settings": {
         "tonic": 3,
@@ -5556,7 +7404,8 @@
             "enabled": false
           }
         }
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Tears in Weather",
@@ -5566,6 +7415,130 @@
         "blade-runner",
         "film",
         "sparse"
+      ],
+      "blurb": "Blade Runner · quieter neon-noir: low, lingering synth phrases, luminous glass chords and a distant brass answer",
+      "settings": {
+        "tonic": 2,
+        "mode": "Major-6",
+        "bpm": 50,
+        "progression": 7,
+        "barsPerChord": 4,
+        "padNotes": 4,
+        "chordSpread": "open",
+        "padWeights": {
+          "sustain": 100,
+          "pulse": 0,
+          "arpeggio": 0,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0,
+          "drive": 0
+        },
+        "leadActivity": 0.45,
+        "leadDensity": 0,
+        "drums": {
+          "style": "off",
+          "activity": 0,
+          "variation": 0.2,
+          "sprinkle": 0,
+          "kit": "felt"
+        },
+        "counter": {
+          "mode": "answer",
+          "activity": 0.15
+        },
+        "chordColour": {
+          "mode": "floating",
+          "amount": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "ambience": {
+          "rain": 0.2,
+          "thunder": 0.08,
+          "wind": 0.06
+        },
+        "playAmbience": true,
+        "leadLeaps": 0.2,
+        "leadRepeat": 0.6,
+        "humanize": {
+          "timing": 12,
+          "velocity": 0.12,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.1,
+          "fast": 0,
+          "swell": 0.08
+        },
+        "volumes": {
+          "pad": 0.42,
+          "bass": 0.32,
+          "lead": 0.62,
+          "counter": 0.18,
+          "perc": 0.15
+        },
+        "ambienceVolume": 0.4,
+        "leadScale": "pentatonic",
+        "leadEnding": "open",
+        "voices": {
+          "lead": {
+            "octave": -1,
+            "wander": "off",
+            "chance": 0.3
+          }
+        }
+      },
+      "voices": {
+        "pad": "Night Glass",
+        "bass": "Sub Bass",
+        "lead": "Neon Blues Lead",
+        "counter": "CS-80 Brass"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "section-cadences": {
+            "enabled": false
+          },
+          "common-tone-bridges": {
+            "enabled": false
+          },
+          "melodic-slides": {
+            "enabled": false
+          },
+          "chord-slides": {
+            "enabled": false
+          },
+          "pad-pitch-motion": {
+            "enabled": false
+          },
+          "bass-pitch-motion": {
+            "enabled": false
+          },
+          "gate-envelopes": {
+            "enabled": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Tears in Weather v1",
+      "category": "cinema",
+      "tags": [
+        "vangelis",
+        "blade-runner",
+        "film",
+        "sparse",
+        "v1"
       ],
       "blurb": "Even slower: glass pad swells, a bell now and then, thunder a long way off",
       "settings": {
@@ -5654,7 +7627,8 @@
             "enabled": false
           }
         }
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Oxygen Debt",
@@ -6297,6 +8271,1048 @@
             "enabled": false
           },
           "section-suspensions": {
+            "enabled": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Altman (tonal)",
+      "category": "unsettling",
+      "blurb": "A higher haunted viola over sparse suspended strings: D harmonic minor, an uneasy C-sharp–E–A–D return, and room to breathe",
+      "tags": [
+        "minor",
+        "suspended",
+        "strings",
+        "melancholy",
+        "unsettling"
+      ],
+      "settings": {
+        "tonic": 2,
+        "mode": "Harmonic Minor-1",
+        "bpm": 58,
+        "meter": "4/4",
+        "progression": 31,
+        "barsPerChord": 2,
+        "padNotes": 3,
+        "tonality": {
+          "mode": "tonal",
+          "separation": 1
+        },
+        "leadActivity": 0.65,
+        "leadDensity": 0.1,
+        "leadLeaps": 0.3,
+        "leadRepeat": 0.5,
+        "leadEnding": "open",
+        "chordColour": {
+          "mode": "floating",
+          "amount": 0.8
+        },
+        "chordBorrow": 0.1,
+        "chordSpread": "close",
+        "padWeights": {
+          "sustain": 100,
+          "pulse": 0,
+          "arpeggio": 0,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0,
+          "drive": 0
+        },
+        "counter": {
+          "mode": "answer",
+          "activity": 0.2
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "sectionTone": true,
+        "padMotion": {
+          "lean": 0.1,
+          "fast": 0,
+          "swell": 0.06
+        },
+        "humanize": {
+          "timing": 10,
+          "velocity": 0.09,
+          "detune": 2
+        },
+        "drums": {
+          "style": "off"
+        },
+        "volumes": {
+          "pad": 0.4,
+          "bass": 0.44,
+          "lead": 0.62,
+          "counter": 0.26,
+          "perc": 0.4
+        },
+        "voices": {
+          "lead": {
+            "octave": 0,
+            "wander": "off",
+            "chance": 0.3
+          },
+          "counter": {
+            "octave": -1,
+            "wander": "off",
+            "chance": 0.3
+          }
+        },
+        "wander": {
+          "period": 110,
+          "pan": {
+            "min": -0.25,
+            "max": 0.25
+          },
+          "volume": 0.08,
+          "filter": 0.1,
+          "pitch": 2,
+          "voices": {
+            "lead": true,
+            "counter": true,
+            "pad": true,
+            "bass": false,
+            "perc": false
+          },
+          "mode": "brownian"
+        },
+        "playAmbience": true,
+        "ambience": {
+          "wind": 0.1
+        },
+        "ambienceVolume": 0.4,
+        "thinPadUnderLead": true
+      },
+      "voices": {
+        "pad": "Warm Strings",
+        "bass": "Dark Drone",
+        "lead": "Haunted Viola",
+        "counter": "Heroic Strings"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "held-pad-glides": {
+            "enabled": true
+          },
+          "held-bass-glides": {
+            "enabled": true
+          },
+          "melodic-slides": {
+            "enabled": false
+          },
+          "pad-pitch-motion": {
+            "enabled": false
+          },
+          "bass-pitch-motion": {
+            "enabled": false
+          },
+          "note-resolution": {
+            "enabled": true
+          },
+          "joint-counterpoint": {
+            "enabled": true
+          },
+          "section-cadences": {
+            "enabled": false
+          },
+          "common-tone-bridges": {
+            "enabled": false
+          },
+          "section-suspensions": {
+            "enabled": true
+          }
+        }
+      }
+    },
+    {
+      "name": "Pastel Coastline",
+      "category": "electronic",
+      "blurb": "Jan Hammer / Crockett’s Theme spirit: a glassy FM melody, repeating keys, soft choir and a warm midnight pulse",
+      "tags": [
+        "electronic",
+        "jan-hammer",
+        "crockett",
+        "synth-pop",
+        "nostalgic"
+      ],
+      "settings": {
+        "tonic": 6,
+        "mode": "Major-6",
+        "bpm": 100,
+        "progression": 8,
+        "barsPerChord": 2,
+        "padNotes": 3,
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 0,
+          "arpeggio": 100,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 10,
+          "half": 70,
+          "walking": 0,
+          "drive": 20
+        },
+        "leadActivity": 0.7,
+        "leadDensity": 0.15,
+        "leadLeaps": 0.3,
+        "leadRepeat": 0.7,
+        "chordColour": {
+          "mode": "plain",
+          "amount": 0
+        },
+        "chordBorrow": 0,
+        "humanize": {
+          "timing": 3,
+          "velocity": 0.07,
+          "detune": 1
+        },
+        "swing": 0,
+        "padMotion": {
+          "lean": 0.15,
+          "fast": 0,
+          "swell": 0.04
+        },
+        "counter": {
+          "mode": "line",
+          "activity": 0.12
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "volumes": {
+          "pad": 0.44,
+          "bass": 0.48,
+          "lead": 0.62,
+          "counter": 0.18,
+          "perc": 0.3
+        },
+        "drums": {
+          "style": "downtempo",
+          "activity": 0.15,
+          "variation": 0.15,
+          "sprinkle": 0.02,
+          "kit": "crisp"
+        },
+        "drumKit": {
+          "room": 0.12,
+          "punch": {
+            "level": 1,
+            "tone": -0.1
+          },
+          "sizzle": {
+            "level": 0.5,
+            "decay": 0.8
+          },
+          "hat": {
+            "level": 0.5,
+            "decay": 0.8
+          },
+          "clap": {
+            "level": 0.6
+          },
+          "rim": {
+            "level": 0.65
+          },
+          "ride": {
+            "level": 0.4
+          }
+        },
+        "arpWeights": {
+          "bounce": 20,
+          "up": 15,
+          "down": 10,
+          "broken": 55
+        },
+        "pulseWeights": {
+          "groups": 30,
+          "beats": 40,
+          "push": 0,
+          "split": 30
+        },
+        "ambience": {},
+        "playAmbience": false,
+        "voices": {
+          "lead": {
+            "octave": -1,
+            "wander": "off",
+            "chance": 0.3
+          },
+          "counter": {
+            "octave": -1,
+            "wander": "off",
+            "chance": 0.3
+          }
+        }
+      },
+      "voices": {
+        "pad": "Tine Keys",
+        "bass": "Neon Pulse Bass",
+        "lead": "Coastal FM Lead",
+        "counter": "Breathy Choir"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "tempo-effects": {
+            "enabled": true
+          },
+          "melodic-slides": {
+            "enabled": false
+          },
+          "chord-slides": {
+            "enabled": false
+          },
+          "pad-pitch-motion": {
+            "enabled": false
+          },
+          "bass-pitch-motion": {
+            "enabled": false
+          },
+          "gate-envelopes": {
+            "enabled": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Amber Transit",
+      "category": "electronic",
+      "blurb": "Berlin-school / Tangerine Dream spirit: a repeating resonant sequence under slow brass clouds, with no drum kit",
+      "tags": [
+        "electronic",
+        "berlin-school",
+        "tangerine-dream",
+        "sequencer"
+      ],
+      "settings": {
+        "tonic": 1,
+        "mode": "Major-2",
+        "bpm": 104,
+        "progression": 12,
+        "barsPerChord": 4,
+        "padNotes": 3,
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 0,
+          "arpeggio": 15,
+          "sequence": 85,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0,
+          "drive": 0
+        },
+        "leadActivity": 0.4,
+        "leadDensity": 0.05,
+        "leadLeaps": 0.2,
+        "leadRepeat": 0.75,
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.35
+        },
+        "chordBorrow": 0,
+        "humanize": {
+          "timing": 3,
+          "velocity": 0.07,
+          "detune": 1
+        },
+        "swing": 0,
+        "padMotion": {
+          "lean": 0.1,
+          "fast": 0.1,
+          "swell": 0.07
+        },
+        "counter": {
+          "mode": "line",
+          "activity": 0.15
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "volumes": {
+          "pad": 0.5,
+          "bass": 0.4,
+          "lead": 0.48,
+          "counter": 0.2,
+          "perc": 0.2
+        },
+        "drums": {
+          "style": "off",
+          "activity": 0,
+          "variation": 0,
+          "sprinkle": 0,
+          "kit": "felt"
+        },
+        "drumKit": {
+          "room": 0.12,
+          "punch": {
+            "level": 1,
+            "tone": -0.1
+          },
+          "sizzle": {
+            "level": 0.5,
+            "decay": 0.8
+          },
+          "hat": {
+            "level": 0.5,
+            "decay": 0.8
+          },
+          "clap": {
+            "level": 0.6
+          },
+          "rim": {
+            "level": 0.65
+          },
+          "ride": {
+            "level": 0.4
+          }
+        },
+        "arpWeights": {
+          "bounce": 20,
+          "up": 15,
+          "down": 10,
+          "broken": 55
+        },
+        "pulseWeights": {
+          "groups": 30,
+          "beats": 40,
+          "push": 0,
+          "split": 30
+        },
+        "ambience": {},
+        "playAmbience": false,
+        "pedal": {
+          "mode": "tonic",
+          "amount": 0.8
+        },
+        "voices": {
+          "lead": {
+            "octave": -1,
+            "wander": "off",
+            "chance": 0.3
+          }
+        }
+      },
+      "voices": {
+        "pad": "Arp Pluck",
+        "bass": "Sub Bass",
+        "lead": "CS-80 Brass",
+        "counter": "Glass Pad"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "tempo-effects": {
+            "enabled": true
+          },
+          "melodic-slides": {
+            "enabled": false
+          },
+          "chord-slides": {
+            "enabled": false
+          },
+          "pad-pitch-motion": {
+            "enabled": false
+          },
+          "bass-pitch-motion": {
+            "enabled": false
+          },
+          "gate-envelopes": {
+            "enabled": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Pocket Circuit",
+      "category": "electronic",
+      "blurb": "Kraftwerk / machine-pop spirit: precise clipped chords, a round electronic pulse and little synthetic call-and-answer phrases",
+      "tags": [
+        "electronic",
+        "kraftwerk",
+        "machine-pop",
+        "motorik"
+      ],
+      "settings": {
+        "tonic": 7,
+        "mode": "Major-1",
+        "bpm": 116,
+        "progression": 10,
+        "barsPerChord": 2,
+        "padNotes": 3,
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 100,
+          "arpeggio": 0,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 0,
+          "walking": 0,
+          "drive": 100
+        },
+        "leadActivity": 0.6,
+        "leadDensity": 0.15,
+        "leadLeaps": 0.2,
+        "leadRepeat": 0.8,
+        "chordColour": {
+          "mode": "plain",
+          "amount": 0
+        },
+        "chordBorrow": 0,
+        "humanize": {
+          "timing": 0,
+          "velocity": 0.03,
+          "detune": 0
+        },
+        "swing": 0,
+        "padMotion": {
+          "lean": 0.15,
+          "fast": 0,
+          "swell": 0.04
+        },
+        "counter": {
+          "mode": "answer",
+          "activity": 0.15
+        },
+        "sections": {
+          "mode": "off",
+          "phrases": 4
+        },
+        "sectionTone": false,
+        "volumes": {
+          "pad": 0.4,
+          "bass": 0.46,
+          "lead": 0.5,
+          "counter": 0.2,
+          "perc": 0.28
+        },
+        "drums": {
+          "style": "electro",
+          "activity": 0.1,
+          "variation": 0.05,
+          "sprinkle": 0,
+          "kit": "crisp"
+        },
+        "drumKit": {
+          "room": 0.12,
+          "punch": {
+            "level": 1,
+            "tone": -0.1
+          },
+          "sizzle": {
+            "level": 0.5,
+            "decay": 0.8
+          },
+          "hat": {
+            "level": 0.5,
+            "decay": 0.8
+          },
+          "clap": {
+            "level": 0.6
+          },
+          "rim": {
+            "level": 0.65
+          },
+          "ride": {
+            "level": 0.4
+          }
+        },
+        "arpWeights": {
+          "bounce": 20,
+          "up": 15,
+          "down": 10,
+          "broken": 55
+        },
+        "pulseWeights": {
+          "groups": 0,
+          "beats": 0,
+          "push": 0,
+          "split": 100
+        },
+        "ambience": {},
+        "playAmbience": false,
+        "thinPadUnderLead": false
+      },
+      "voices": {
+        "pad": "Warm Organ",
+        "bass": "Seq Bass",
+        "lead": "Hollow Pulse",
+        "counter": "Music Box"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "tempo-effects": {
+            "enabled": true
+          },
+          "melodic-slides": {
+            "enabled": false
+          },
+          "chord-slides": {
+            "enabled": false
+          },
+          "pad-pitch-motion": {
+            "enabled": false
+          },
+          "bass-pitch-motion": {
+            "enabled": false
+          },
+          "gate-envelopes": {
+            "enabled": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Orbital Afterglow",
+      "category": "electronic",
+      "blurb": "Early-90s orbital-house spirit: rounded organ pulses, looping bleeps and distant glass, with a steady dance pulse",
+      "tags": [
+        "electronic",
+        "90s",
+        "orbital",
+        "house"
+      ],
+      "settings": {
+        "tonic": 9,
+        "mode": "Major-2",
+        "bpm": 122,
+        "progression": 12,
+        "barsPerChord": 2,
+        "padNotes": 3,
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 70,
+          "arpeggio": 30,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 0,
+          "walking": 0,
+          "drive": 100
+        },
+        "leadActivity": 0.55,
+        "leadDensity": 0.35,
+        "leadLeaps": 0.3,
+        "leadRepeat": 0.75,
+        "chordColour": {
+          "mode": "sus2",
+          "amount": 0.3
+        },
+        "chordBorrow": 0,
+        "humanize": {
+          "timing": 3,
+          "velocity": 0.07,
+          "detune": 1
+        },
+        "swing": 0,
+        "padMotion": {
+          "lean": 0.15,
+          "fast": 0,
+          "swell": 0.04
+        },
+        "counter": {
+          "mode": "line",
+          "activity": 0.15
+        },
+        "sections": {
+          "mode": "strong",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "volumes": {
+          "pad": 0.45,
+          "bass": 0.48,
+          "lead": 0.5,
+          "counter": 0.2,
+          "perc": 0.42
+        },
+        "drums": {
+          "style": "electro",
+          "activity": 0.2,
+          "variation": 0.2,
+          "sprinkle": 0.03,
+          "kit": "crisp"
+        },
+        "drumKit": {
+          "room": 0.12,
+          "punch": {
+            "level": 1,
+            "tone": -0.1
+          },
+          "sizzle": {
+            "level": 0.5,
+            "decay": 0.8
+          },
+          "hat": {
+            "level": 0.5,
+            "decay": 0.8
+          },
+          "clap": {
+            "level": 0.6
+          },
+          "rim": {
+            "level": 0.65
+          },
+          "ride": {
+            "level": 0.4
+          }
+        },
+        "arpWeights": {
+          "bounce": 20,
+          "up": 15,
+          "down": 10,
+          "broken": 55
+        },
+        "pulseWeights": {
+          "groups": 30,
+          "beats": 40,
+          "push": 0,
+          "split": 30
+        },
+        "ambience": {},
+        "playAmbience": false
+      },
+      "voices": {
+        "pad": "Warm Organ",
+        "bass": "Deep Pulse",
+        "lead": "Hollow Pulse",
+        "counter": "Night Glass"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "tempo-effects": {
+            "enabled": true
+          },
+          "melodic-slides": {
+            "enabled": false
+          },
+          "chord-slides": {
+            "enabled": false
+          },
+          "pad-pitch-motion": {
+            "enabled": false
+          },
+          "bass-pitch-motion": {
+            "enabled": false
+          },
+          "gate-envelopes": {
+            "enabled": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Long Way to Sunrise",
+      "category": "electronic",
+      "blurb": "Sasha / Digweed-era progressive-house spirit: rolling plucks, a dark bass engine and long builds with a restrained melodic line",
+      "tags": [
+        "electronic",
+        "progressive-house",
+        "sasha",
+        "digweed",
+        "dark"
+      ],
+      "settings": {
+        "tonic": 9,
+        "mode": "Major-6",
+        "bpm": 124,
+        "progression": 21,
+        "barsPerChord": 4,
+        "padNotes": 3,
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 20,
+          "arpeggio": 0,
+          "sequence": 80,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 0,
+          "walking": 0,
+          "drive": 100
+        },
+        "leadActivity": 0.55,
+        "leadDensity": 0.15,
+        "leadLeaps": 0.3,
+        "leadRepeat": 0.75,
+        "chordColour": {
+          "mode": "sus2",
+          "amount": 0.45
+        },
+        "chordBorrow": 0,
+        "humanize": {
+          "timing": 3,
+          "velocity": 0.07,
+          "detune": 1
+        },
+        "swing": 0,
+        "padMotion": {
+          "lean": 0.15,
+          "fast": 0,
+          "swell": 0.04
+        },
+        "counter": {
+          "mode": "line",
+          "activity": 0.12
+        },
+        "sections": {
+          "mode": "strong",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "volumes": {
+          "pad": 0.5,
+          "bass": 0.52,
+          "lead": 0.46,
+          "counter": 0.18,
+          "perc": 0.45
+        },
+        "drums": {
+          "style": "electro",
+          "activity": 0.2,
+          "variation": 0.2,
+          "sprinkle": 0.03,
+          "kit": "crisp"
+        },
+        "drumKit": {
+          "room": 0.12,
+          "punch": {
+            "level": 1,
+            "tone": -0.1
+          },
+          "sizzle": {
+            "level": 0.5,
+            "decay": 0.8
+          },
+          "hat": {
+            "level": 0.5,
+            "decay": 0.8
+          },
+          "clap": {
+            "level": 0.6
+          },
+          "rim": {
+            "level": 0.65
+          },
+          "ride": {
+            "level": 0.4
+          }
+        },
+        "arpWeights": {
+          "bounce": 20,
+          "up": 15,
+          "down": 10,
+          "broken": 55
+        },
+        "pulseWeights": {
+          "groups": 30,
+          "beats": 40,
+          "push": 0,
+          "split": 30
+        },
+        "ambience": {},
+        "playAmbience": false,
+        "leadEnding": "open"
+      },
+      "voices": {
+        "pad": "Progressive Pluck",
+        "bass": "Seq Bass",
+        "lead": "Soft Saw Lead",
+        "counter": "Glass Pad"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "tempo-effects": {
+            "enabled": true
+          },
+          "melodic-slides": {
+            "enabled": false
+          },
+          "chord-slides": {
+            "enabled": false
+          },
+          "pad-pitch-motion": {
+            "enabled": false
+          },
+          "bass-pitch-motion": {
+            "enabled": false
+          },
+          "gate-envelopes": {
+            "enabled": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Rooms Above the Clouds",
+      "category": "electronic",
+      "blurb": "Modern melodic progressive-house / deadmau5 and Lane 8 spirit: wide blooming plucks, a clean bass pulse and a patient uplifting melody",
+      "tags": [
+        "electronic",
+        "progressive-house",
+        "melodic",
+        "deadmau5",
+        "lane-8"
+      ],
+      "settings": {
+        "tonic": 8,
+        "mode": "Major-1",
+        "bpm": 126,
+        "progression": 2,
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 20,
+          "arpeggio": 20,
+          "sequence": 60,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 0,
+          "walking": 0,
+          "drive": 100
+        },
+        "leadActivity": 0.6,
+        "leadDensity": 0.2,
+        "leadLeaps": 0.3,
+        "leadRepeat": 0.7,
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.4
+        },
+        "chordBorrow": 0,
+        "humanize": {
+          "timing": 3,
+          "velocity": 0.07,
+          "detune": 1
+        },
+        "swing": 0,
+        "padMotion": {
+          "lean": 0.15,
+          "fast": 0,
+          "swell": 0.04
+        },
+        "counter": {
+          "mode": "answer",
+          "activity": 0.15
+        },
+        "sections": {
+          "mode": "strong",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "volumes": {
+          "pad": 0.5,
+          "bass": 0.5,
+          "lead": 0.52,
+          "counter": 0.2,
+          "perc": 0.45
+        },
+        "drums": {
+          "style": "electro",
+          "activity": 0.2,
+          "variation": 0.2,
+          "sprinkle": 0.03,
+          "kit": "crisp"
+        },
+        "drumKit": {
+          "room": 0.12,
+          "punch": {
+            "level": 1,
+            "tone": -0.1
+          },
+          "sizzle": {
+            "level": 0.5,
+            "decay": 0.8
+          },
+          "hat": {
+            "level": 0.5,
+            "decay": 0.8
+          },
+          "clap": {
+            "level": 0.6
+          },
+          "rim": {
+            "level": 0.65
+          },
+          "ride": {
+            "level": 0.4
+          }
+        },
+        "arpWeights": {
+          "bounce": 20,
+          "up": 15,
+          "down": 10,
+          "broken": 55
+        },
+        "pulseWeights": {
+          "groups": 30,
+          "beats": 40,
+          "push": 0,
+          "split": 30
+        },
+        "ambience": {},
+        "playAmbience": false
+      },
+      "voices": {
+        "pad": "Progressive Pluck",
+        "bass": "Deep Pulse",
+        "lead": "Soft Saw Lead",
+        "counter": "FM Bell"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "tempo-effects": {
+            "enabled": true
+          },
+          "melodic-slides": {
+            "enabled": false
+          },
+          "chord-slides": {
+            "enabled": false
+          },
+          "pad-pitch-motion": {
+            "enabled": false
+          },
+          "bass-pitch-motion": {
+            "enabled": false
+          },
+          "gate-envelopes": {
             "enabled": false
           }
         }

@@ -58,7 +58,7 @@ import { findPreset } from './editor/presetStore';
 import { stringPatch, isStringPatch } from './engine/stringPatches';
 import { pianoPatch, isPianoPatch } from './engine/pianoPatches';
 import { ROLE_PRESETS, ROLE_VOLUMES } from './presets';
-import PROGRESSIONS, { progressionsOfLength, isUnsettlingProgression } from './progressions';
+import PROGRESSIONS, { progressionsOfLength, isUnsettlingProgression, progressionFamily } from './progressions';
 
 // Stop fades everything out - reverb and echo tails included - with this
 // time constant (-60 dB after ~0.5 s), then drops the tails (STOP_FADE_MS).
@@ -1057,7 +1057,7 @@ class Generator {
         const inCycle = bar - music.cycleStart;
         // Next cycle's music: decided as this cycle starts, carried through it.
         const upcoming = inCycle === 0
-            ? nextMusic(music, this.homeMusic(), drift, progressionsOfLength(PROGRESSIONS[this.settings.progression].length).filter(i=>isUnsettlingProgression(i)===isUnsettlingProgression(this.settings.progression)), this.rng)
+            ? nextMusic(music, this.homeMusic(), drift, progressionsOfLength(PROGRESSIONS[this.settings.progression].length).filter(i=>progressionFamily(i)===progressionFamily(this.settings.progression)), this.rng)
             : prev.upcoming;
         const cycleEnd = inCycle === cycleBars - 1;
         const following = cycleEnd ? this.cycleMusic(upcoming,bar+1,bar) : music;

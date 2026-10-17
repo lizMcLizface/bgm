@@ -9,7 +9,7 @@
 // randomize press is meant to be different every time.
 
 import { SCALE_FAMILIES, TONIC_NAMES, CHORD_COLOURS, scaleById, scaleSemitones } from './theory';
-import PROGRESSIONS, { PROGRESSION_LENGTHS, progressionsOfLength, isUnsettlingProgression, normalProgressions } from './progressions';
+import PROGRESSIONS, { PROGRESSION_LENGTHS, progressionsOfLength, isSpecialProgression, normalProgressions } from './progressions';
 import { METERS } from './meter';
 import { DEFAULT_DRIFT, DRIFT_MODES, TEMPO_BOUNDS } from './conductor';
 import {
@@ -77,7 +77,7 @@ export const progressionQuality = (index) => (PROGRESSIONS[index].includes('i') 
 // A progression of `length` chords that suits the mode, a different one
 // from the current where possible.
 function fittingProgression(settings, length, rng) {
-    const indices = progressionsOfLength(length).filter(i=>!isUnsettlingProgression(i));
+    const indices = progressionsOfLength(length).filter(i=>!isSpecialProgression(i));
     const quality = modeQuality(settings.mode);
     const fitting = indices.filter((i) => !quality || progressionQuality(i) === quality);
     return pickOther(rng, fitting.length ? fitting : indices, settings.progression);
@@ -176,7 +176,7 @@ export const progressionLength = (index) => PROGRESSIONS[index].length;
 
 /** The first progression of `length` chords that suits the mode (choosing a length). */
 export function progressionForLength(settings, length) {
-    const indices = progressionsOfLength(length).filter(i=>!isUnsettlingProgression(i));
+    const indices = progressionsOfLength(length).filter(i=>!isSpecialProgression(i));
     const quality = modeQuality(settings.mode);
     return indices.find((i) => !quality || progressionQuality(i) === quality) ?? indices[0];
 }

@@ -59,6 +59,7 @@ export function normalizeScene(raw, defaultCategory = MINE.id) {
     });
     return {
         name,
+        ...(raw.hidden === true ? { hidden: true } : {}),
         category: text(raw.category, 40) || defaultCategory,
         blurb: text(raw.blurb, 200),
         tags: Array.isArray(raw.tags) ? raw.tags.filter((t) => typeof t === 'string').map((t) => t.slice(0, 30)).slice(0, 12) : [],
@@ -70,6 +71,8 @@ export function normalizeScene(raw, defaultCategory = MINE.id) {
 
 /** In picker order. */
 export const SCENES = library.scenes.map((scene) => normalizeScene(scene, SCENE_CATEGORIES[0].id));
+/** Archived versions resolve through sceneBySlug but stay out of browsing. */
+export const BROWSABLE_SCENES = SCENES.filter(scene => !scene.hidden);
 
 /** A name as it reads in a link: 'Rainy Day, Chickens Inside' -> 'rainy-day-chickens-inside'. */
 export const sceneSlug = (name) => name
@@ -78,6 +81,19 @@ export const sceneSlug = (name) => name
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
+
+/** Keyboard browsing follows category order; testing collections may loop internally. */
+export function stepBuiltinScene(currentName, direction) {
+    const current = SCENES.find(s => s.name === currentName);
+    const category = SCENE_CATEGORIES.find(c => c.id === current?.category);
+    const rank = s => SCENE_CATEGORIES.findIndex(c => c.id === s.category);
+    const ordered = category?.cycleWithin
+        ? BROWSABLE_SCENES.filter(s => s.category === category.id)
+        : BROWSABLE_SCENES.map((s, i) => ({ s, i })).sort((a, b) => rank(a.s) - rank(b.s) || a.i - b.i).map(({ s }) => s);
+    const at = ordered.findIndex(s => s.name === currentName);
+    const next = at < 0 ? (direction > 0 ? 0 : ordered.length - 1) : (at + direction + ordered.length) % ordered.length;
+    return ordered[next];
+}
 
 /**
  * The preset name in a page address: `?preset=turnip-town`, or just `?turnip-town`

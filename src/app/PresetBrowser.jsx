@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { SCENES, SCENE_CATEGORIES, MINE, sceneSettings } from './scenes';
+import { BROWSABLE_SCENES as SCENES, SCENE_CATEGORIES, MINE, sceneSettings } from './scenes';
 import { userScenes } from './setupStore';
 import { TONIC_NAMES, scaleById } from './theory';
 import { DRUM_STYLES } from './percussion';

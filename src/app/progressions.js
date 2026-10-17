@@ -43,6 +43,8 @@ const PROGRESSIONS = [
     ['ii', 'iv', 'iii', 'v', 'iv', 'ii'],
     ['iv', 'iii', 'ii', 'v', 'iii', 'iv'],
     ['ii', 'iv', 'iii', 'v', 'ii', 'iii', 'iv', 'v'],
+    // Suspense with a home: D harmonic minor gives C-sharp / E / A / D roots.
+    ['vii', 'ii', 'V', 'i'],
 ];
 
 /** Chord counts the bank has, ascending: [2, 3, 4, 5, 6, 8]. */
@@ -52,6 +54,8 @@ export const PROGRESSION_LENGTHS = [...new Set(PROGRESSIONS.map((p) => p.length)
 export const progressionsOfLength = (length) => [...PROGRESSIONS.keys()].filter((i) => PROGRESSIONS[i].length === length);
 
 // Appended indices are stable in the existing five-bit share field.
-export const isUnsettlingProgression = index => Number.isInteger(index) && index >= 25 && index < PROGRESSIONS.length;
-export const normalProgressions = [...PROGRESSIONS.keys()].filter(i=>!isUnsettlingProgression(i));
+export const isUnsettlingProgression = index => Number.isInteger(index) && index >= 25 && index <= 30;
+export const isSpecialProgression = index => Number.isInteger(index) && index >= 25 && index < PROGRESSIONS.length;
+export const progressionFamily = index => isUnsettlingProgression(index)?'unresolved':isSpecialProgression(index)?'suspense':'tonal';
+export const normalProgressions = [...PROGRESSIONS.keys()].filter(i=>!isSpecialProgression(i));
 export default PROGRESSIONS;

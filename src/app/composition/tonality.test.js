@@ -2,7 +2,7 @@ import {atonalRow,atonalChord,applyBitonality} from './tonality';
 import {diatonicChord} from '../theory';
 import {defaultSettings,encodeSettings,decodeSettings,sanitizeSettings} from '../settings';
 import {randomField,randomProgression,randomLength} from '../randomize';
-import PROGRESSIONS,{isUnsettlingProgression} from '../progressions';
+import PROGRESSIONS,{isUnsettlingProgression,isSpecialProgression} from '../progressions';
 import {seeded} from '../random';
 test('atonal rows cover all twelve pitch classes deterministically without a diatonic scale',()=>{
  for(const seed of [1,7,42,12345])for(let tonic=0;tonic<12;tonic++){
@@ -31,8 +31,8 @@ test('tonality, dissonant colours and appended progressions survive shared links
 });
 test('normal and wild progression dice exclude unresolved choices, including when leaving one',()=>{
  const rng=seeded(42);for(const level of ['within','wild'])for(let i=0;i<250;i++){
-  const settings={...defaultSettings(),progression:i%2?28:0};
-  for(const patch of [randomField('progression',settings,level,rng),randomProgression(settings,level,rng),randomLength(settings,level,rng)])expect(isUnsettlingProgression(patch.progression)).toBe(false);
+  const settings={...defaultSettings(),progression:[0,28,31][i%3]};
+  for(const patch of [randomField('progression',settings,level,rng),randomProgression(settings,level,rng),randomLength(settings,level,rng)])expect(isSpecialProgression(patch.progression)).toBe(false);
  }
  for(const [i,p]of PROGRESSIONS.entries())if(isUnsettlingProgression(i))expect(p.every(n=>n.toUpperCase()!=='I')).toBe(true);
 });

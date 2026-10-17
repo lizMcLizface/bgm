@@ -2,7 +2,7 @@ import React, { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import PresetBrowser from './PresetBrowser';
 import Tour from './Tour';
-import { SCENES, SCENE_CATEGORIES, buildSetup } from './scenes';
+import { BROWSABLE_SCENES as SCENES, SCENE_CATEGORIES, buildSetup } from './scenes';
 import { userScenes, saveUserScene, deleteUserScene, isUserScene } from './setupStore';
 import { defaultSettings } from './settings';
 import { ROLE_PRESETS } from './presets';
@@ -49,6 +49,7 @@ describe('preset browser', () => {
         click(document.querySelector('.gen-scene-button'));
         expect(document.querySelector('[role="dialog"]')).not.toBeNull();
         expect(cards()).toHaveLength(SCENES.length);
+        expect(cards().some(name => name.endsWith(' v1'))).toBe(false);
         expect(document.querySelector('.gen-pb-card.is-active strong').textContent).toBe('Mildly Alarmed');
         // a card shows what it is: key, tempo, drums
         const red = [...document.querySelectorAll('.gen-pb-card')].find((c) => c.textContent.includes('Mildly Alarmed'));
@@ -145,7 +146,7 @@ describe('preset browser', () => {
         expect(document.querySelector('[role="status"]').textContent).toBe('Copied');
         await act(async () => { button('Download').click(); });
         expect(a.download).toHaveBeenCalled();
-        click(button('Paste'));
+        click(button('Paste / open'));
         type(document.querySelector('.gen-pb-paste textarea'), '{"name":"x","settings":{}}');
         await act(async () => { button('Load').click(); });
         expect(a.load).toHaveBeenCalledWith('{"name":"x","settings":{}}');
@@ -158,7 +159,7 @@ describe('preset browser', () => {
         a.load = vi.fn(() => ({ ok: false, message: 'That is not valid JSON' }));
         render(<PresetBrowser current="" onPick={() => {}} actions={a} />);
         click(document.querySelector('.gen-scene-button'));
-        click(button('Paste'));
+        click(button('Paste / open'));
         type(document.querySelector('.gen-pb-paste textarea'), '{nope');
         await act(async () => { button('Load').click(); });
         expect(document.querySelector('.gen-pb')).not.toBeNull();

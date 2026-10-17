@@ -66,6 +66,8 @@ export const SHAREABLE_PRESETS = [
     // Original oscillator/FM keys, independently selectable in Latest.
     'Felt Piano (classic)', 'Soft Keys (classic)', 'Tine Keys (classic)', 'FM Rhodes (classic)',
     'Haunted Viola',
+    'Neon Blues Lead',
+    'Coastal FM Lead', 'Progressive Pluck',
 ];
 const PRESET_BITS = 8;
 // Preset index meaning "a generated sound" (soundGen.js v1): followed by

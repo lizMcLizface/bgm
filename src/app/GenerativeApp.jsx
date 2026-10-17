@@ -13,7 +13,7 @@ import { RoleButtons, TrackStrip, useLivePlay, DRUM_KEY_HINT } from './Tracks';
 import { defaultSettings, shareFromLocation, sharePath, shareUrl, newSeed } from './settings';
 import SynthEditor from './editor/SynthEditor';
 import PresetPicker from './editor/PresetPicker';
-import PROGRESSIONS, { PROGRESSION_LENGTHS, progressionsOfLength, isUnsettlingProgression } from './progressions';
+import PROGRESSIONS, { PROGRESSION_LENGTHS, progressionsOfLength, progressionFamily } from './progressions';
 import {
     PAD_STYLES, BASS_STYLES, PULSE_PATTERNS, ARP_PATTERNS, CHORD_DIRECTIONS, styleShares, OCTAVE_LIMITS, OCTAVE_WANDER, SECTION_LENGTHS,
 } from './arranger';
@@ -27,7 +27,7 @@ import {
 import Backdrop, { backdropSupported, BACKDROP_DEFAULTS, shuffleColours } from './Backdrop';
 import { MasterVolume, SettingsMenu, AudioMenu, VisualMenu } from './AudioStatus';
 import { SleepTimer, Recorder } from './Playback';
-import { sceneSettings, sceneGroup, buildSetup, parseSetup, sceneBySlug, sceneSlug, presetFromSearch, introFromSearch, SCENES, SCENE_CATEGORIES } from './scenes';
+import { sceneSettings, sceneGroup, stepBuiltinScene, buildSetup, parseSetup, sceneBySlug, sceneSlug, presetFromSearch, introFromSearch, SCENES, SCENE_CATEGORIES } from './scenes';
 import PresetBrowser from './PresetBrowser';
 import { saveUserScene, deleteUserScene, isUserScene } from './setupStore';
 import { ROLE_PRESETS } from './presets';
@@ -1248,11 +1248,7 @@ const GenerativeApp = () => {
     };
     // Next / previous built-in preset in the browser's order ([ and ] keys).
     const stepPreset = (dir) => {
-        const rank = (s) => SCENE_CATEGORIES.findIndex((c) => c.id === s.category);
-        const ordered = SCENES.map((s, i) => ({ s, i })).sort((a, b) => rank(a.s) - rank(b.s) || a.i - b.i).map(({ s }) => s);
-        const at = ordered.findIndex((s) => s.name === scene);
-        const next = at < 0 ? (dir > 0 ? 0 : ordered.length - 1) : (at + dir + ordered.length) % ordered.length;
-        applyScene(ordered[next]);
+        applyScene(stepBuiltinScene(scene, dir));
     };
     const handlers = useRef({});
     // Move around the piece from the keyboard: a chord / a progression back or on.
@@ -1415,8 +1411,8 @@ const GenerativeApp = () => {
                     </Field>
                     <Field label={settings.tonality.mode==='atonal'?'Pitch-set cycle':'Progression'} onRandom={() => randomizeField('progression')} wide>
                         {settings.tonality.mode==='atonal'?<span>Chromatic sets · {chords} slots · no home chord</span>:<select value={settings.progression} onChange={(e) => update('progression', Number(e.target.value))}>
-                            {[false,true].map(unsettling=><optgroup key={String(unsettling)} label={unsettling?'Unresolved · never the tonic':'Tonal progressions'}>
-                                {progressionsOfLength(chords).filter(i=>isUnsettlingProgression(i)===unsettling).map(i=><option key={i} value={i}>{PROGRESSIONS[i].join(' – ')}</option>)}
+                            {[['tonal','Tonal progressions'],['unresolved','Unresolved · never the tonic'],['suspense','Suspense · leading-tone return']].map(([family,label])=><optgroup key={family} label={label}>
+                                {progressionsOfLength(chords).filter(i=>progressionFamily(i)===family).map(i=><option key={i} value={i}>{PROGRESSIONS[i].join(' – ')}</option>)}
                             </optgroup>)}
                         </select>}
                     </Field>

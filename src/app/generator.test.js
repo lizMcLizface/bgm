@@ -1349,3 +1349,18 @@ test('bitonality preserves the backing and transposes actual melodic events acro
  const settings={...defaultSettings(),seed:42,leadActivity:1,counter:{mode:'line',activity:1},sections:{mode:'gentle',phrases:2}},a=new Generator(settings),b=new Generator({...settings,tonality:{mode:'bitonal',separation:1}});a.reset();b.reset();
  for(let bar=0;bar<48;bar++){a.planBar(bar);b.planBar(bar);const x=a.plan.get(bar),y=b.plan.get(bar);expect(y.chord.tonality.mode).toBe('bitonal');expect(y.events.map(({midi,expression,...event})=>({...event,midi:midi-(['lead','counter'].includes(event.role)?1:0),...(expression?{expression:{...expression,...(expression.connectionFrom!==undefined?{connectionFrom:expression.connectionFrom-(['lead','counter'].includes(event.role)?1:0)}:{})}}:{})}))).toEqual(x.events);}
 });
+
+
+test('tonal Altman returns through C-sharp, E, A and D with a thinner bed and higher viola',async()=>{
+ const {sceneBySlug,sceneSettings}=await import('./scenes'),{applyBook,inheritBook}=await import('./rulebook/session'),{encodeSettings,decodeSettings}=await import('./settings');
+ const scene=sceneBySlug('altman-tonal'),original=sceneBySlug('altman'),settings=sceneSettings(scene,42);
+ expect(original.settings.tonality.mode).toBe('atonal');expect(settings.tonality.mode).toBe('tonal');expect(settings.voices.lead.octave).toBe(original.settings.voices.lead.octave+1);
+ expect(settings.padNotes).toBeLessThan(original.settings.padNotes);expect(settings.volumes.pad).toBeLessThan(original.settings.volumes.pad);
+ expect(decodeSettings(encodeSettings(settings))).toEqual(settings);
+ settings.playAmbience=false;settings.ambience=Object.fromEntries(Object.keys(settings.ambience).map(k=>[k,0]));
+ const g=new Generator(settings);g.rulebookTrace=true;applyBook(g,inheritBook(scene.rulebook));g.reset();
+ for(let bar=0;bar<8;bar++){g.planBar(bar);const b=g.plan.get(bar);expect(b.chord.pitchClasses[0]).toBe([1,4,9,2][b.ruleTrace.slot.index]);expect(b.chord.scalePcs).toEqual([2,4,5,7,9,10,1]);expect(b.chord.unresolved).toBeUndefined();}
+ expect(g.noteSlides).toBe(false);expect(g.heldPadGlides).toBe(true);expect(g.noteResolution).toBe(true);
+ settings.drift={...settings.drift,mode:'wandering',progressionChance:1,keyChance:0,modeChance:0};g.reset();const p=g.planner();
+ for(let bar=0;bar<64;bar++){p.planBar(bar);const b=p.plan.get(bar);expect(b.music.progression).toBe(31);expect(b.events.every(e=>[e.midi,e.beat,e.length,e.velocity].every(Number.isFinite)&&e.length>0)).toBe(true);}
+});
