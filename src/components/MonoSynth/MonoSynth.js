@@ -1,8 +1,11 @@
+import {BreathFormants,voiceColour} from '../../app/engine/breathFormants';
 import { Oscillator, Gain, Filter, NoiseGenerator, OscNoiseMixer, StereoPanner } from '../../nodes';
 import { clamp, minTime } from '../../util/util';
 import { CHROMATIC } from '../../theory/notes';
 import { stringBuffer } from '../../app/engine/pluckedString';
 import { pianoBuffer, pianoBodyBuffer } from '../../app/engine/piano';
+
+import { expressivePitchPoints } from '../../app/engine/noteExpression';
 
 // Monophonic Synth Class with Voice Spreading Support
 class MonoSynth {
@@ -1508,7 +1511,11 @@ class MonoSynth {
                 source.buffer = buffer;
                 const heldBody = index > 0;
                 if (heldBody) { source.loop = true; source.playbackRate.value = noteInfo.freq * buffer.length / this.AC.sampleRate; }
-                if (plan.pitchEnv?.amount) {
+                const pitchPoints=expressivePitchPoints(plan);
+                if(pitchPoints) {
+                    source.detune.setValueAtTime(pitchPoints[0][1],attackStart);
+                    pitchPoints.slice(1).forEach(([t,value])=>source.detune.linearRampToValueAtTime(value,attackStart+t));
+                } else if (plan.pitchEnv?.amount) {
                     source.detune.setValueAtTime(plan.pitchEnv.amount, attackStart);
                     source.detune.setTargetAtTime(0, attackStart, Math.max(.001, plan.pitchEnv.decay / 3));
                 }
@@ -1527,6 +1534,12 @@ class MonoSynth {
         }
         this.applyNotePitch(noteInfo, portamentoSpeed, attackStart);
 
+        const colour=voiceColour(plan.voiceColour);
+        if((colour.breath||colour.formant)&&!this.breathFormants){
+            this.breathFormants=new BreathFormants(this.AC);
+            this.modelGate.disconnect(this.gain.getNode());this.modelGate.connect(this.breathFormants.input);this.breathFormants.output.connect(this.gain.getNode());
+        }
+        this.breathFormants?.schedule(plan.voiceColour,plan,attackStart,noteInfo.freq);
         this.scheduleNoteShape(noteInfo.freq, plan, attackStart);
 
         const [[, initial], ...rest] = gainPoints;
@@ -1541,6 +1554,7 @@ class MonoSynth {
     }
 
     stopStrings(time = this.AC.currentTime) {
+        this.breathFormants?.stop(time);
         for (const item of this.stringSources || []) {
             const stop = Math.max(item.start, time);
             if (stop < item.stop) { item.source.stop(stop); item.stop = stop; }
@@ -1594,14 +1608,33 @@ class MonoSynth {
             if (envAmount > 0) depth.setTargetAtTime(index * modFreq, start, Math.max(decay, minTime) / 3);
         }
         const env = plan.pitchEnv;
-        if (env && env.amount) {
+        const held = plan.heldExpression || plan.slide || plan.pitchMotion || plan.pitchPath?.length, pitchPoints=expressivePitchPoints(plan);
+        if (held || this.heldPitchTouched || (env && env.amount)) {
             [...this.mainOscillators().slice(0, this.voiceCount), this.subOscillator, this.osc2].forEach((osc) => {
                 const detune = osc.getOscillatorNode().detune;
                 detune.cancelScheduledValues(start);
-                detune.setValueAtTime(env.amount, start);
-                detune.setTargetAtTime(0, start, Math.max(env.decay, minTime) / 3);
+                if (held) {
+                    const points = pitchPoints;
+                    detune.setValueAtTime(points[0][1], start);
+                    points.slice(1).forEach(([t, value]) => detune.linearRampToValueAtTime(value, start + t));
+                } else {
+                    detune.setValueAtTime(env?.amount || 0, start);
+                    if (env?.amount) detune.setTargetAtTime(0, start, Math.max(env.decay, minTime) / 3);
+                }
             });
         }
+        this.heldPitchActive = !!held;
+        this.heldPitchTouched ||= !!held;
+    }
+
+    clearHeldExpression(time) {
+        if (!this.heldPitchTouched) return;
+        [...this.mainOscillators(), this.subOscillator, this.osc2].forEach(osc => {
+            const param = osc.getOscillatorNode().detune;
+            param.cancelScheduledValues(time);
+            param.setTargetAtTime(0, time, .015);
+        });
+        this.heldPitchActive = false;
     }
 
     noteOff = ({ gainEnv, filterEnv }, voiceId = null) => {
@@ -1819,6 +1852,7 @@ class MonoSynth {
         
         // Stop any playing notes
         this.stopStrings();
+        this.breathFormants?.destroy();
         this.modelGate?.disconnect();
         this.stringGain?.disconnect();
         this.noteStop();

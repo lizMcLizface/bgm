@@ -7,7 +7,7 @@ import { renderEnsemble, matchAverageLevels, drawNotes } from './ensembleReview'
 
 export async function renderPianos(options,onProgress=()=>{}) {
     const base=findPreset(options.patch),settings=sceneSettings(SCENES.find(s=>sceneSlug(s.name)===options.preset),options.seed);
-    const struck={...pianoPatch(options.patch,base),pianoDecay:options.decay,pianoSustain:options.sustain??.28,pianoBrightness:options.brightness,pianoHammer:options.hammer,pianoUnison:options.unison};
+    const struck={...pianoPatch(options.patch,base,'latest',{resonance:false}),pianoDecay:options.decay,pianoSustain:options.sustain??.28,pianoBrightness:options.brightness,pianoHammer:options.hammer,pianoUnison:options.unison};
     if(options.tone!=='preset')struck.pianoType=options.tone;
     const meter=METERS[settings.meter],isTest=options.pattern!=='music',center=options.role==='bass'?36:options.role==='lead'?72:60;
     const testNotes=isTest?Array.from({length:4},(_,bar)=>{

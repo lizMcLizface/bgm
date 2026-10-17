@@ -2238,6 +2238,7 @@ body {
 }
 
 :root[data-backdrop] .gen-panel,
+:root[data-backdrop] .gen-rulebook,
 :root[data-backdrop] .gen-timeline {
     background: color-mix(in srgb, var(--gen-surface) 78%, transparent);
     backdrop-filter: blur(10px);

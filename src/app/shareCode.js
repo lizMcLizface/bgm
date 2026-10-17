@@ -65,6 +65,7 @@ export const SHAREABLE_PRESETS = [
     'CS-80 Brass', 'Neon Saw Pad', 'Night Glass', 'Neon Pulse Bass', 'Seq Bass', 'Lament Lead', 'Ghost Sweep', 'Outrun Lead',
     // Original oscillator/FM keys, independently selectable in Latest.
     'Felt Piano (classic)', 'Soft Keys (classic)', 'Tine Keys (classic)', 'FM Rhodes (classic)',
+    'Haunted Viola',
 ];
 const PRESET_BITS = 8;
 // Preset index meaning "a generated sound" (soundGen.js v1): followed by
@@ -260,6 +261,8 @@ const MUSIC_GROUPS = [
     ],
     [[['harmonyScale'], options(Object.keys(HARMONY_SCALES), 2)]], // append-only: independent harmonic scale
 ];
+// Appended after every earlier music field; old links keep tonal defaults.
+MUSIC_GROUPS.push([[['tonality','mode'],options(['tonal','atonal','bitonal'],2)],[['tonality','separation'],stepped(1,11,1)]]);
 const VOICE_GROUPS = [
     [...voice('pad'), ...voice('bass'), ...voice('lead'), ...voice('counter'), field(GROUPS, ['padNotes'])],
     LATER_GROUPS[4], // volumes

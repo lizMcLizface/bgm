@@ -1,3 +1,6 @@
+import {joinHeldNotes} from '../src/app/composition/heldGlides';
+import { slideNotes } from '../src/app/composition/noteSlides';
+import { expressNotes, expressHeldNotes, connectWindNotes, timeSoundNotes } from '../src/app/composition/noteExpression';
 import { findPreset } from '../src/app/editor/presetStore';
 import Generator, { ROLES } from '../src/app/Generator';
 import { SCENES, sceneSettings, sceneSlug } from '../src/app/scenes';
@@ -61,6 +64,17 @@ function configure(options) {
     generator.sectionCurves=options.sectionCurves??false;
     generator.harmonicDevelopment=options.harmonicDevelopment??false;
     generator.endingDevelopment=options.endingDevelopment??false;
+    generator.noteExpression=options.noteExpression??false;
+    generator.heldExpression=options.heldExpression??false;
+    generator.noteConnection=options.noteConnection??false;
+    generator.tempoEffects=options.tempoEffects??false;
+    generator.gateEnvelopes=options.gateEnvelopes??false;
+    generator.heldPadGlides=options.heldPadGlides??false;
+    generator.heldBassGlides=options.heldBassGlides??false;
+    generator.padPitchMotion=options.padPitchMotion??false;
+    generator.bassPitchMotion=options.bassPitchMotion??false;
+    generator.noteSlides=options.noteSlides??false;
+    generator.chordSlides=options.chordSlides??false;
     generator.formStrategy=options.formStrategy;
     generator.phraseLength = options.phraseLength;
     generator.setMany(settings);
@@ -81,6 +95,12 @@ function configure(options) {
             planBar(bar);
             const planned = planner.plan.get(bar), passage = options.testNotes[bar % options.testNotes.length];
             planned.events = passage.events.map(event => ({ ...event }));
+            if (options.noteExpression) expressNotes(planned.events, { voices: planner.grooveVoices, secondsPerBeat: 60 / unitsPerMinute(planner.meter, planned.bpm), units: planner.meter.units });
+            if (options.heldExpression) expressHeldNotes(planned.events, { voices: planner.grooveVoices, secondsPerBeat: 60 / unitsPerMinute(planner.meter, planned.bpm) });
+            if (options.noteConnection) connectWindNotes(planned.events, { voices: planner.grooveVoices, secondsPerBeat: 60 / unitsPerMinute(planner.meter, planned.bpm), previous: planner.plan.get(bar-1)?.events ?? [], units: planner.meter.units });
+            if (options.tempoEffects || options.gateEnvelopes) timeSoundNotes(planned.events, { voices:planner.grooveVoices,bpm:planned.bpm,tempoEffects:options.tempoEffects,gateEnvelopes:options.gateEnvelopes });
+            if(options.noteSlides || options.padPitchMotion || options.bassPitchMotion || options.chordSlides)slideNotes(planned.events,{bar,previous:planner.plan.get(bar-1)?.events??[],units:planner.meter.units,secondsPerBeat:60/unitsPerMinute(planner.meter,planned.bpm),noteSlides:options.noteSlides,padMotion:options.padPitchMotion,bassMotion:options.bassPitchMotion,chordSlides:options.chordSlides});
+            if(options.heldGlide)for(const n of planned.events)if(n.pitchTargets)n.expression={...n.expression,pitchTargets:n.pitchTargets};
             planned.chord = { ...planned.chord, name: passage.label };
         };
         return planner;
@@ -106,7 +126,10 @@ export function previewEnsemble(options) {
         aligned += b.events.filter(e => e.role === 'bass' && kicks.some(k => Math.abs(k.beat - e.beat) < .05)).length;
     }
     const leaps = bass.slice(1).map((e, i) => Math.abs(e.midi - bass[i].midi));
-    return { variant: options.variant, bars, seconds: start, seed: options.seed, preset: options.preset,
+    const raw=bars.flatMap(b=>b.events.filter(e=>['pad','bass'].includes(e.role)&&(options.parts??roles).includes(e.role)).map(e=>({...e,bar:b.bar,time:b.start+e.beat*b.seconds/b.units,duration:e.length*b.seconds/b.units,section:b.section?.start,ending:b.ending})));
+    const played=joinHeldNotes(raw,{pad:options.heldPadGlides===true,bass:options.heldBassGlides===true,voices:Object.fromEntries(Object.entries(gen.roles).map(([role,v])=>[role,v.instrument.preset])),legacy:options.variant==='legacy'});
+    const heldConnections=played.filter(n=>n.heldMembers).map(n=>({role:n.role,midi:n.midi,duration:n.duration,notes:n.heldMembers.length}));
+    return { performanceEvents:heldConnections.length?played:null, heldConnections, variant: options.variant, bars, seconds: start, seed: options.seed, preset: options.preset,
         summary: { bassNotes: bass.length, kickAlignedBass: aligned, largestBassLeap: leaps.length ? Math.max(...leaps) : 0 } };
 }
 
@@ -143,14 +166,28 @@ export function drawNotes(canvas, plan, parts) {
         const x = left + b.start / plan.seconds * usable;
         ctx.strokeStyle = '#3a4149'; ctx.beginPath(); ctx.moveTo(x, 8); ctx.lineTo(x, height); ctx.stroke();
         ctx.fillStyle = '#c6ced7'; ctx.fillText(`${b.bar + 1} ${b.chord}`, x + 3, 15);
-        for (const e of b.events) {
+        const events=plan.performanceEvents
+            ? [...b.events.filter(e=>!['pad','bass'].includes(e.role)),...plan.performanceEvents.filter(n=>n.bar===b.bar).map(n=>({...n,beat:(n.time-b.start)/(b.seconds/b.units),length:n.duration/(b.seconds/b.units)}))]
+            : b.events;
+        for (const e of events) {
             if (!parts.includes(e.role)) continue;
             const index = roles.indexOf(e.role), beatSeconds = b.seconds / b.units;
             const at = left + (b.start + e.beat * beatSeconds) / plan.seconds * usable;
             const length = Math.max(2, e.length * beatSeconds / plan.seconds * usable);
             const range = e.role === 'bass' ? [24, 60] : e.role === 'perc' ? [0, DRUMS.length] : [48, 96];
             const fraction = Math.max(0, Math.min(1, (e.midi - range[0]) / (range[1] - range[0])));
-            ctx.fillStyle = colours[e.role]; ctx.fillRect(at, 29 + index * row + (1 - fraction) * 24, length, 3);
+            ctx.fillStyle = colours[e.role];
+            if(e.expression?.pitchTargets){
+                const points=[{time:0,midi:e.midi},...e.expression.pitchTargets.filter(p=>p.time>0)];
+                ctx.strokeStyle=colours[e.role];ctx.lineWidth=2;ctx.beginPath();
+                const y=midi=>29+index*row+(1-Math.max(0,Math.min(1,(midi-range[0])/(range[1]-range[0]))))*24;
+                ctx.moveTo(at,y(e.midi));
+                for(let i=1;i<points.length;i++)for(let step=1;step<=20;step++){
+                    const a=points[i-1],b=points[i],u=step/20,ease=u*u*(3-2*u);
+                    ctx.lineTo(at+(a.time+(b.time-a.time)*u)/plan.seconds*usable,y(a.midi+(b.midi-a.midi)*ease));
+                }
+                ctx.stroke();ctx.fillRect(at-2,y(e.midi)-3,4,6);
+            }else ctx.fillRect(at, 29 + index * row + (1 - fraction) * 24, length, 3);
         }
     }
 }

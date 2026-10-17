@@ -8,6 +8,7 @@ import Generator, { ROLES } from '../src/app/Generator';
 import { defaultSettings, shareFromLocation } from '../src/app/settings';
 import { sceneSettings, sceneBySlug, presetFromSearch, SCENES, sceneSlug } from '../src/app/scenes';
 import { prepareSound } from '../src/app/engine/prepareSound';
+import {applyBook,readBook,withPresetBook} from '../src/app/rulebook/session';
 import { generationFromSearch } from '../src/app/generation';
 import { phraseToSeed } from '../src/app/phrase';
 import { renderPcm, planTimeline } from '../src/app/engine/render';
@@ -65,6 +66,7 @@ window.bgmRender = {
             }
         }
         gen.set('generation', generationFromSearch(window.location.search));
+        applyBook(gen,withPresetBook(scene?.rulebook,readBook(window.location.search)));
         gen.reset();
         // the kind of slow drift can be chosen for the recording: wander=sine|brownian (the voices), ambience-wander=sine|brownian
         if (query.has('wander')) gen.settings.wander = { ...gen.settings.wander, mode: query.get('wander') };

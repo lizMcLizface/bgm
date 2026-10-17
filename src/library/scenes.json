@@ -44,6 +44,11 @@
       "id": "cinema",
       "label": "Synth Cinema",
       "blurb": "Rain-slick streets, long brass lines and neon: film-score synth moods"
+    },
+    {
+      "id": "unsettling",
+      "label": "Unsettling",
+      "blurb": "Unresolved, melancholy and uncanny: drifting strings, suspended harmony and deliberate clashes"
     }
   ],
   "scenes": [
@@ -58,14 +63,18 @@
         "progression": 7,
         "padNotes": 4,
         "padWeights": {
-          "sustain": 30,
-          "pulse": 50,
-          "arpeggio": 20
+          "sustain": 36,
+          "pulse": 40,
+          "arpeggio": 16,
+          "sequence": 0,
+          "rolled": 8,
+          "stacked": 0
         },
         "drums": {
           "style": "lofi",
-          "activity": 0.55,
-          "variation": 0.7
+          "activity": 0.51,
+          "variation": 0.64,
+          "sprinkle": 0.09
         },
         "swing": 0.35,
         "sectionTone": true,
@@ -73,7 +82,43 @@
           "rain": 0.4,
           "vinyl": 0.25
         },
-        "playAmbience": true
+        "playAmbience": true,
+        "leadActivity": 0.58,
+        "leadDensity": 0.18,
+        "leadLeaps": 0.28,
+        "leadRepeat": 0.38,
+        "humanize": {
+          "timing": 13,
+          "velocity": 0.1,
+          "detune": 2
+        },
+        "bassWeights": {
+          "whole": 42,
+          "half": 50,
+          "walking": 8,
+          "drive": 0
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.2
+        },
+        "ambienceVolume": 0.66
       },
       "voices": {
         "pad": "Felt Piano",
@@ -93,29 +138,64 @@
         "padNotes": 5,
         "barsPerChord": 2,
         "padWeights": {
-          "sustain": 40,
-          "pulse": 40,
-          "arpeggio": 20
+          "sustain": 42,
+          "pulse": 32,
+          "arpeggio": 18,
+          "sequence": 0,
+          "rolled": 8,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 10,
           "half": 30,
-          "walking": 60
+          "walking": 60,
+          "drive": 0
         },
         "drums": {
           "style": "brushes",
-          "activity": 0.6,
-          "variation": 0.8
+          "activity": 0.56,
+          "variation": 0.64,
+          "sprinkle": 0.09
         },
         "swing": 0.5,
         "counter": {
           "mode": "answer",
-          "activity": 0.5
+          "activity": 0.44
         },
         "ambience": {
           "fire": 0.3
         },
-        "playAmbience": true
+        "playAmbience": true,
+        "leadActivity": 0.56,
+        "leadDensity": 0.22,
+        "leadLeaps": 0.36,
+        "leadRepeat": 0.32,
+        "humanize": {
+          "timing": 15,
+          "velocity": 0.11,
+          "detune": 2
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.2
+        },
+        "ambienceVolume": 0.66
       },
       "voices": {
         "pad": "FM Rhodes",
@@ -134,11 +214,12 @@
         "bpm": 58,
         "progression": 6,
         "barsPerChord": 2,
-        "leadActivity": 0.4,
+        "leadActivity": 0.36,
         "drums": {
           "style": "heartbeat",
-          "activity": 0.4,
-          "variation": 0.5
+          "activity": 0.36,
+          "variation": 0.485,
+          "sprinkle": 0.06
         },
         "sections": {
           "mode": "strong",
@@ -149,7 +230,42 @@
           "rain": 0.3,
           "thunder": 0.25
         },
-        "playAmbience": true
+        "playAmbience": true,
+        "leadDensity": 0.08,
+        "leadLeaps": 0.3,
+        "leadRepeat": 0.42,
+        "humanize": {
+          "timing": 9,
+          "velocity": 0.07,
+          "detune": 2
+        },
+        "padWeights": {
+          "sustain": 60,
+          "pulse": 28,
+          "arpeggio": 12,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 84,
+          "half": 16,
+          "walking": 0,
+          "drive": 0
+        },
+        "padMotion": {
+          "lean": 0.22,
+          "fast": 0.04,
+          "swell": 0.08
+        },
+        "volumes": {
+          "pad": 0.78,
+          "bass": 0.73,
+          "lead": 0.62,
+          "counter": 0.48,
+          "perc": 0.44
+        },
+        "ambienceVolume": 0.72
       },
       "voices": {
         "pad": "Breathing Pad",
@@ -168,23 +284,63 @@
         "progression": 10,
         "padNotes": 4,
         "padWeights": {
-          "sustain": 20,
-          "pulse": 20,
-          "arpeggio": 60
+          "sustain": 24,
+          "pulse": 18,
+          "arpeggio": 50,
+          "sequence": 0,
+          "rolled": 8,
+          "stacked": 0
         },
         "drums": {
           "style": "shaker",
-          "activity": 0.6,
-          "variation": 0.6
+          "activity": 0.56,
+          "variation": 0.57,
+          "sprinkle": 0.09
         },
         "counter": {
           "mode": "answer",
-          "activity": 0.6
+          "activity": 0.54
         },
         "ambience": {
           "waves": 0.25
         },
-        "playAmbience": true
+        "playAmbience": true,
+        "leadActivity": 0.55,
+        "leadDensity": 0.22,
+        "leadLeaps": 0.4,
+        "leadRepeat": 0.34,
+        "humanize": {
+          "timing": 7,
+          "velocity": 0.08,
+          "detune": 1
+        },
+        "bassWeights": {
+          "whole": 42,
+          "half": 50,
+          "walking": 8,
+          "drive": 0
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.2
+        },
+        "ambienceVolume": 0.66
       },
       "voices": {
         "pad": "Glass Pad",
@@ -204,26 +360,71 @@
         "meter": "6/8",
         "progression": 12,
         "barsPerChord": 2,
-        "leadActivity": 0.3,
+        "leadActivity": 0.28,
         "bassWeights": {
           "whole": 80,
           "half": 20,
-          "walking": 0
+          "walking": 0,
+          "drive": 0
         },
         "counter": {
           "mode": "line",
-          "activity": 0.35
+          "activity": 0.29
         },
         "ambience": {
           "waves": 0.5
         },
-        "playAmbience": true
+        "playAmbience": true,
+        "leadDensity": 0.08,
+        "leadLeaps": 0.24,
+        "leadRepeat": 0.4,
+        "humanize": {
+          "timing": 10,
+          "velocity": 0.07,
+          "detune": 2
+        },
+        "padWeights": {
+          "sustain": 86,
+          "pulse": 8,
+          "arpeggio": 6,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "padMotion": {
+          "lean": 0.22,
+          "fast": 0.04,
+          "swell": 0.08
+        },
+        "volumes": {
+          "pad": 0.78,
+          "bass": 0.73,
+          "lead": 0.62,
+          "counter": 0.48,
+          "perc": 0.44
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "ambienceVolume": 0.72
       },
       "voices": {
         "pad": "Underwater",
         "bass": "Deep Pulse",
         "lead": "Glass Lead",
         "counter": "Hollow Tremolo"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "section-cadences": {
+            "enabled": false
+          },
+          "common-tone-bridges": {
+            "enabled": false
+          }
+        }
       }
     },
     {
@@ -240,7 +441,10 @@
         "padWeights": {
           "sustain": 80,
           "pulse": 20,
-          "arpeggio": 0
+          "arpeggio": 0,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "sections": {
           "mode": "gentle",
@@ -250,7 +454,35 @@
         "ambience": {
           "wind": 0.25
         },
-        "playAmbience": true
+        "playAmbience": true,
+        "leadActivity": 0.52,
+        "leadDensity": 0.12,
+        "leadLeaps": 0.28,
+        "leadRepeat": 0.42,
+        "humanize": {
+          "timing": 10,
+          "velocity": 0.08,
+          "detune": 1
+        },
+        "bassWeights": {
+          "whole": 84,
+          "half": 16,
+          "walking": 0,
+          "drive": 0
+        },
+        "padMotion": {
+          "lean": 0.22,
+          "fast": 0.04,
+          "swell": 0.08
+        },
+        "volumes": {
+          "pad": 0.78,
+          "bass": 0.73,
+          "lead": 0.62,
+          "counter": 0.48,
+          "perc": 0.44
+        },
+        "ambienceVolume": 0.72
       },
       "voices": {
         "pad": "Tremolo Organ",
@@ -269,19 +501,55 @@
         "meter": "3/4",
         "progression": 14,
         "padWeights": {
-          "sustain": 10,
-          "pulse": 20,
-          "arpeggio": 70
+          "sustain": 12,
+          "pulse": 18,
+          "arpeggio": 62,
+          "sequence": 0,
+          "rolled": 8,
+          "stacked": 0
         },
         "drums": {
           "style": "shaker",
-          "activity": 0.3,
-          "variation": 0.5
+          "activity": 0.26,
+          "variation": 0.485,
+          "sprinkle": 0.09
         },
         "ambience": {
           "fire": 0.45
         },
-        "playAmbience": true
+        "playAmbience": true,
+        "leadActivity": 0.58,
+        "leadDensity": 0.2,
+        "leadLeaps": 0.3,
+        "leadRepeat": 0.46,
+        "humanize": {
+          "timing": 11,
+          "velocity": 0.11,
+          "detune": 2
+        },
+        "bassWeights": {
+          "whole": 34,
+          "half": 50,
+          "walking": 16,
+          "drive": 0
+        },
+        "padMotion": {
+          "lean": 0.36,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "ambienceVolume": 0.66
       },
       "voices": {
         "pad": "Harp Pluck",
@@ -291,7 +559,7 @@
     },
     {
       "name": "Desert dusk",
-      "category": "night",
+      "category": "unsettling",
       "blurb": "Phrygian dominant: kalimba and clarinet over a heartbeat and wind",
       "settings": {
         "tonic": 4,
@@ -302,17 +570,53 @@
         "padWeights": {
           "sustain": 30,
           "pulse": 20,
-          "arpeggio": 50
+          "arpeggio": 50,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "drums": {
           "style": "heartbeat",
-          "activity": 0.5,
-          "variation": 0.6
+          "activity": 0.46,
+          "variation": 0.57,
+          "sprinkle": 0.06
         },
         "ambience": {
           "wind": 0.35
         },
-        "playAmbience": true
+        "playAmbience": true,
+        "leadActivity": 0.52,
+        "leadDensity": 0.16,
+        "leadLeaps": 0.34,
+        "leadRepeat": 0.38,
+        "humanize": {
+          "timing": 10,
+          "velocity": 0.09,
+          "detune": 2
+        },
+        "bassWeights": {
+          "whole": 84,
+          "half": 16,
+          "walking": 0,
+          "drive": 0
+        },
+        "padMotion": {
+          "lean": 0.22,
+          "fast": 0.04,
+          "swell": 0.08
+        },
+        "volumes": {
+          "pad": 0.78,
+          "bass": 0.73,
+          "lead": 0.62,
+          "counter": 0.48,
+          "perc": 0.44
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "ambienceVolume": 0.72
       },
       "voices": {
         "pad": "Kalimba Pluck",
@@ -332,19 +636,59 @@
         "padNotes": 4,
         "drums": {
           "style": "lofi",
-          "activity": 0.4,
-          "variation": 0.8
+          "activity": 0.36,
+          "variation": 0.64,
+          "sprinkle": 0.09
         },
         "swing": 0.25,
         "humanize": {
-          "timing": 18,
-          "velocity": 0.12,
-          "detune": 6
+          "timing": 16,
+          "velocity": 0.11,
+          "detune": 4
         },
         "ambience": {
           "vinyl": 0.45
         },
-        "playAmbience": true
+        "playAmbience": true,
+        "leadActivity": 0.54,
+        "leadDensity": 0.14,
+        "leadLeaps": 0.3,
+        "leadRepeat": 0.44,
+        "padWeights": {
+          "sustain": 52,
+          "pulse": 30,
+          "arpeggio": 12,
+          "sequence": 0,
+          "rolled": 6,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 42,
+          "half": 50,
+          "walking": 8,
+          "drive": 0
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.2
+        },
+        "ambienceVolume": 0.66
       },
       "voices": {
         "pad": "Lo-fi Tape Pad",
@@ -362,27 +706,72 @@
         "bpm": 64,
         "progression": 10,
         "barsPerChord": 4,
-        "leadActivity": 0.5,
+        "leadActivity": 0.44,
         "padWeights": {
           "sustain": 90,
           "pulse": 10,
-          "arpeggio": 0
+          "arpeggio": 0,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "counter": {
           "mode": "harmony",
-          "activity": 0.5
+          "activity": 0.44
         },
         "ambience": {
           "wind": 0.15,
           "waves": 0.4
         },
-        "playAmbience": true
+        "playAmbience": true,
+        "leadDensity": 0.08,
+        "leadLeaps": 0.26,
+        "leadRepeat": 0.42,
+        "humanize": {
+          "timing": 10,
+          "velocity": 0.08,
+          "detune": 2
+        },
+        "bassWeights": {
+          "whole": 84,
+          "half": 16,
+          "walking": 0,
+          "drive": 0
+        },
+        "padMotion": {
+          "lean": 0.22,
+          "fast": 0.04,
+          "swell": 0.08
+        },
+        "volumes": {
+          "pad": 0.78,
+          "bass": 0.73,
+          "lead": 0.62,
+          "counter": 0.48,
+          "perc": 0.44
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "ambienceVolume": 0.72
       },
       "voices": {
         "pad": "Choir Ah",
         "bass": "Sub Bass",
         "lead": "Reed Lead",
         "counter": "Sine Whistle"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "section-cadences": {
+            "enabled": false
+          },
+          "common-tone-bridges": {
+            "enabled": false
+          }
+        }
       }
     },
     {
@@ -396,16 +785,55 @@
         "progression": 1,
         "padNotes": 4,
         "padWeights": {
-          "sustain": 20,
-          "pulse": 60,
-          "arpeggio": 20
+          "sustain": 26,
+          "pulse": 52,
+          "arpeggio": 16,
+          "sequence": 0,
+          "rolled": 6,
+          "stacked": 0
         },
         "drums": {
           "style": "lofi",
-          "activity": 0.35,
-          "variation": 0.6
+          "activity": 0.31,
+          "variation": 0.57,
+          "sprinkle": 0.09
         },
-        "swing": 0.2
+        "swing": 0.2,
+        "leadActivity": 0.56,
+        "leadDensity": 0.24,
+        "leadLeaps": 0.34,
+        "leadRepeat": 0.38,
+        "humanize": {
+          "timing": 11,
+          "velocity": 0.1,
+          "detune": 1
+        },
+        "bassWeights": {
+          "whole": 42,
+          "half": 50,
+          "walking": 8,
+          "drive": 0
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "chordColour": {
+          "mode": "add6",
+          "amount": 0.2
+        }
       },
       "voices": {
         "pad": "Soft Keys",
@@ -424,18 +852,53 @@
         "meter": "5/4",
         "progression": 15,
         "padWeights": {
-          "sustain": 10,
-          "pulse": 10,
-          "arpeggio": 80
+          "sustain": 12,
+          "pulse": 8,
+          "arpeggio": 76,
+          "sequence": 0,
+          "rolled": 4,
+          "stacked": 0
         },
         "drums": {
           "style": "shaker",
-          "activity": 0.4,
-          "variation": 0.4
+          "activity": 0.36,
+          "variation": 0.4,
+          "sprinkle": 0.09
         },
         "counter": {
           "mode": "answer",
-          "activity": 0.4
+          "activity": 0.34
+        },
+        "leadActivity": 0.56,
+        "leadDensity": 0.24,
+        "leadLeaps": 0.38,
+        "leadRepeat": 0.48,
+        "humanize": {
+          "timing": 5,
+          "velocity": 0.07,
+          "detune": 1
+        },
+        "bassWeights": {
+          "whole": 42,
+          "half": 50,
+          "walking": 8,
+          "drive": 0
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
         }
       },
       "voices": {
@@ -455,23 +918,66 @@
         "bpm": 52,
         "progression": 10,
         "barsPerChord": 4,
-        "leadActivity": 0.35,
+        "leadActivity": 0.32,
         "padNotes": 5,
         "padWeights": {
           "sustain": 100,
           "pulse": 0,
-          "arpeggio": 0
+          "arpeggio": 0,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "sections": {
           "mode": "strong",
           "phrases": 2
         },
-        "sectionTone": true
+        "sectionTone": true,
+        "leadDensity": 0.05,
+        "leadLeaps": 0.24,
+        "leadRepeat": 0.4,
+        "humanize": {
+          "timing": 8,
+          "velocity": 0.07,
+          "detune": 2
+        },
+        "bassWeights": {
+          "whole": 84,
+          "half": 16,
+          "walking": 0,
+          "drive": 0
+        },
+        "padMotion": {
+          "lean": 0.22,
+          "fast": 0.04,
+          "swell": 0.08
+        },
+        "volumes": {
+          "pad": 0.78,
+          "bass": 0.73,
+          "lead": 0.62,
+          "counter": 0.48,
+          "perc": 0.44
+        }
       },
       "voices": {
         "pad": "Shimmer",
         "bass": "Dark Drone",
         "lead": "Glass Lead"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "held-bass-glides": {
+            "enabled": true
+          },
+          "section-cadences": {
+            "enabled": false
+          },
+          "common-tone-bridges": {
+            "enabled": false
+          }
+        }
       }
     },
     {
@@ -483,24 +989,57 @@
         "mode": "Major-6",
         "bpm": 80,
         "progression": 6,
-        "leadActivity": 0.3,
+        "leadActivity": 0.26,
         "padNotes": 4,
         "padWeights": {
           "sustain": 60,
           "pulse": 40,
-          "arpeggio": 0
+          "arpeggio": 0,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 60,
           "half": 40,
-          "walking": 0
+          "walking": 0,
+          "drive": 0
         },
         "drums": {
           "style": "lofi",
-          "activity": 0.25,
-          "variation": 0.4
+          "activity": 0.21,
+          "variation": 0.4,
+          "sprinkle": 0.09
         },
-        "swing": 0.15
+        "swing": 0.15,
+        "leadDensity": 0.08,
+        "leadLeaps": 0.22,
+        "leadRepeat": 0.48,
+        "humanize": {
+          "timing": 7,
+          "velocity": 0.06,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.2
+        }
       },
       "voices": {
         "pad": "Velvet Pad",
@@ -521,23 +1060,53 @@
         "padWeights": {
           "sustain": 20,
           "pulse": 70,
-          "arpeggio": 10
+          "arpeggio": 10,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 20,
           "half": 70,
-          "walking": 10
+          "walking": 10,
+          "drive": 0
         },
         "drums": {
           "style": "lofi",
-          "activity": 0.5,
-          "variation": 0.6
+          "activity": 0.46,
+          "variation": 0.57,
+          "sprinkle": 0.09
         },
         "sections": {
           "mode": "gentle",
           "phrases": 4
         },
-        "sectionTone": true
+        "sectionTone": true,
+        "leadActivity": 0.55,
+        "leadDensity": 0.24,
+        "leadLeaps": 0.34,
+        "leadRepeat": 0.42,
+        "humanize": {
+          "timing": 6,
+          "velocity": 0.08,
+          "detune": 2
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.2
+        }
       },
       "voices": {
         "pad": "Swelling Analog",
@@ -557,16 +1126,55 @@
         "progression": 15,
         "padNotes": 4,
         "padWeights": {
-          "sustain": 20,
-          "pulse": 30,
-          "arpeggio": 50
+          "sustain": 24,
+          "pulse": 26,
+          "arpeggio": 42,
+          "sequence": 0,
+          "rolled": 8,
+          "stacked": 0
         },
         "drums": {
           "style": "brushes",
-          "activity": 0.35,
-          "variation": 0.6
+          "activity": 0.31,
+          "variation": 0.57,
+          "sprinkle": 0.09
         },
-        "swing": 0.3
+        "swing": 0.3,
+        "leadActivity": 0.55,
+        "leadDensity": 0.18,
+        "leadLeaps": 0.28,
+        "leadRepeat": 0.44,
+        "humanize": {
+          "timing": 12,
+          "velocity": 0.1,
+          "detune": 2
+        },
+        "bassWeights": {
+          "whole": 42,
+          "half": 50,
+          "walking": 8,
+          "drive": 0
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "chordColour": {
+          "mode": "add6",
+          "amount": 0.2
+        }
       },
       "voices": {
         "pad": "Tine Keys",
@@ -585,21 +1193,55 @@
         "progression": 16,
         "padNotes": 4,
         "padWeights": {
-          "sustain": 30,
-          "pulse": 50,
-          "arpeggio": 20
+          "sustain": 32,
+          "pulse": 44,
+          "arpeggio": 18,
+          "sequence": 0,
+          "rolled": 6,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 0,
           "half": 20,
-          "walking": 80
+          "walking": 80,
+          "drive": 0
         },
         "drums": {
           "style": "brushes",
-          "activity": 0.6,
-          "variation": 0.7
+          "activity": 0.56,
+          "variation": 0.64,
+          "sprinkle": 0.09
         },
-        "swing": 0.45
+        "swing": 0.45,
+        "leadActivity": 0.58,
+        "leadDensity": 0.28,
+        "leadLeaps": 0.36,
+        "leadRepeat": 0.34,
+        "humanize": {
+          "timing": 12,
+          "velocity": 0.11,
+          "detune": 2
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.2
+        }
       },
       "voices": {
         "pad": "Soft Keys",
@@ -617,22 +1259,67 @@
         "bpm": 56,
         "progression": 11,
         "barsPerChord": 4,
-        "leadActivity": 0.3,
+        "leadActivity": 0.26,
         "padWeights": {
           "sustain": 100,
           "pulse": 0,
-          "arpeggio": 0
+          "arpeggio": 0,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "drums": {
           "style": "heartbeat",
-          "activity": 0.3,
-          "variation": 0.4
+          "activity": 0.26,
+          "variation": 0.4,
+          "sprinkle": 0.06
+        },
+        "leadDensity": 0.05,
+        "leadLeaps": 0.22,
+        "leadRepeat": 0.48,
+        "humanize": {
+          "timing": 8,
+          "velocity": 0.07,
+          "detune": 2
+        },
+        "bassWeights": {
+          "whole": 84,
+          "half": 16,
+          "walking": 0,
+          "drive": 0
+        },
+        "padMotion": {
+          "lean": 0.22,
+          "fast": 0.04,
+          "swell": 0.08
+        },
+        "volumes": {
+          "pad": 0.78,
+          "bass": 0.73,
+          "lead": 0.62,
+          "counter": 0.48,
+          "perc": 0.44
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
         }
       },
       "voices": {
         "pad": "Slow Sweep",
         "bass": "Sub Bass",
         "lead": "Sine Whistle"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "section-cadences": {
+            "enabled": false
+          },
+          "common-tone-bridges": {
+            "enabled": false
+          }
+        }
       }
     },
     {
@@ -646,18 +1333,53 @@
         "meter": "7/4",
         "progression": 10,
         "padWeights": {
-          "sustain": 40,
-          "pulse": 20,
-          "arpeggio": 40
+          "sustain": 24,
+          "pulse": 26,
+          "arpeggio": 44,
+          "sequence": 0,
+          "rolled": 6,
+          "stacked": 0
         },
         "drums": {
           "style": "shaker",
-          "activity": 0.5,
-          "variation": 0.6
+          "activity": 0.46,
+          "variation": 0.57,
+          "sprinkle": 0.09
         },
         "counter": {
           "mode": "answer",
-          "activity": 0.5
+          "activity": 0.44
+        },
+        "leadActivity": 0.58,
+        "leadDensity": 0.2,
+        "leadLeaps": 0.34,
+        "leadRepeat": 0.42,
+        "humanize": {
+          "timing": 8,
+          "velocity": 0.09,
+          "detune": 1
+        },
+        "bassWeights": {
+          "whole": 42,
+          "half": 50,
+          "walking": 8,
+          "drive": 0
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
         }
       },
       "voices": {
@@ -675,9 +1397,9 @@
         "playMusic": false,
         "playAmbience": true,
         "ambience": {
-          "rain": 0.7,
-          "thunder": 0.6,
-          "wind": 0.3
+          "rain": 0.68,
+          "thunder": 0.54,
+          "wind": 0.27
         },
         "ambienceShape": {
           "rain": {
@@ -690,6 +1412,13 @@
           "wind": {
             "gusts": 0.7
           }
+        },
+        "ambienceVolume": 0.84,
+        "ambienceWander": {
+          "mode": "brownian",
+          "total": 0.06,
+          "layers": 0.18,
+          "period": 240
         }
       },
       "voices": {}
@@ -702,8 +1431,8 @@
         "playMusic": false,
         "playAmbience": true,
         "ambience": {
-          "wind": 0.2,
-          "waves": 0.6
+          "wind": 0.17,
+          "waves": 0.58
         },
         "ambienceShape": {
           "waves": {
@@ -713,6 +1442,13 @@
           "wind": {
             "speed": 0.3
           }
+        },
+        "ambienceVolume": 0.83,
+        "ambienceWander": {
+          "mode": "brownian",
+          "total": 0.07,
+          "layers": 0.16,
+          "period": 260
         }
       },
       "voices": {}
@@ -725,8 +1461,8 @@
         "playMusic": false,
         "playAmbience": true,
         "ambience": {
-          "wind": 0.2,
-          "fire": 0.6
+          "wind": 0.16,
+          "fire": 0.58
         },
         "ambienceShape": {
           "fire": {
@@ -735,6 +1471,13 @@
           "wind": {
             "distance": 0.5
           }
+        },
+        "ambienceVolume": 0.83,
+        "ambienceWander": {
+          "mode": "brownian",
+          "total": 0.05,
+          "layers": 0.14,
+          "period": 200
         }
       },
       "voices": {}
@@ -747,14 +1490,21 @@
         "playMusic": false,
         "playAmbience": true,
         "ambience": {
-          "rain": 0.5,
-          "vinyl": 0.35
+          "rain": 0.48,
+          "vinyl": 0.26
         },
         "ambienceShape": {
           "rain": {
             "intensity": 0.45,
             "distance": 0.4
           }
+        },
+        "ambienceVolume": 0.82,
+        "ambienceWander": {
+          "mode": "brownian",
+          "total": 0.04,
+          "layers": 0.12,
+          "period": 240
         }
       },
       "voices": {}
@@ -767,7 +1517,7 @@
         "playMusic": false,
         "playAmbience": true,
         "ambience": {
-          "wind": 0.6
+          "wind": 0.58
         },
         "ambienceShape": {
           "wind": {
@@ -775,6 +1525,13 @@
             "gusts": 0.6,
             "width": 1
           }
+        },
+        "ambienceVolume": 0.84,
+        "ambienceWander": {
+          "mode": "brownian",
+          "total": 0.09,
+          "layers": 0.18,
+          "period": 220
         }
       },
       "voices": {}
@@ -795,12 +1552,14 @@
         "progression": 6,
         "barsPerChord": 2,
         "padNotes": 4,
-        "leadActivity": 0.5,
+        "leadActivity": 0.48,
         "padWeights": {
           "sustain": 0,
           "pulse": 0,
           "arpeggio": 30,
-          "sequence": 70
+          "sequence": 70,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 50,
@@ -810,9 +1569,9 @@
         },
         "drums": {
           "style": "electro",
-          "activity": 0.35,
+          "activity": 0.31,
           "variation": 0.4,
-          "sprinkle": 0.2,
+          "sprinkle": 0.12,
           "kit": "crisp"
         },
         "drumKit": {
@@ -836,20 +1595,42 @@
         "sectionTone": true,
         "counter": {
           "mode": "line",
-          "activity": 0.5
+          "activity": 0.44
         },
         "humanize": {
-          "timing": 8,
+          "timing": 5,
           "velocity": 0.08,
-          "detune": 3
+          "detune": 1
         },
-        "leadDensity": 0.25
+        "leadDensity": 0.28,
+        "leadLeaps": 0.38,
+        "leadRepeat": 0.44,
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        }
       },
       "voices": {
         "pad": "Arp Pluck",
         "bass": "Deep Throb",
         "lead": "Signal Lead",
         "counter": "Starlight Pad"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "tempo-effects": {
+            "enabled": true
+          }
+        }
       }
     },
     {
@@ -868,12 +1649,14 @@
         "progression": 11,
         "barsPerChord": 4,
         "padNotes": 5,
-        "leadActivity": 0.35,
+        "leadActivity": 0.32,
         "padWeights": {
           "sustain": 85,
           "pulse": 15,
           "arpeggio": 0,
-          "sequence": 0
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 100,
@@ -883,8 +1666,9 @@
         },
         "drums": {
           "style": "heartbeat",
-          "activity": 0.3,
-          "variation": 0.4
+          "activity": 0.26,
+          "variation": 0.4,
+          "sprinkle": 0.06
         },
         "sections": {
           "mode": "strong",
@@ -893,10 +1677,30 @@
         "sectionTone": true,
         "counter": {
           "mode": "answer",
-          "activity": 0.35
+          "activity": 0.29
         },
         "wander": {
           "period": 75
+        },
+        "leadDensity": 0.08,
+        "leadLeaps": 0.3,
+        "leadRepeat": 0.48,
+        "humanize": {
+          "timing": 8,
+          "velocity": 0.07,
+          "detune": 2
+        },
+        "padMotion": {
+          "lean": 0.22,
+          "fast": 0.04,
+          "swell": 0.08
+        },
+        "volumes": {
+          "pad": 0.78,
+          "bass": 0.73,
+          "lead": 0.62,
+          "counter": 0.48,
+          "perc": 0.44
         }
       },
       "voices": {
@@ -904,6 +1708,17 @@
         "bass": "Deep Throb",
         "lead": "Signal Lead",
         "counter": "FM Bell"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "section-cadences": {
+            "enabled": false
+          },
+          "common-tone-bridges": {
+            "enabled": false
+          }
+        }
       }
     },
     {
@@ -922,12 +1737,14 @@
         "progression": 8,
         "barsPerChord": 1,
         "padNotes": 4,
-        "leadActivity": 0.55,
+        "leadActivity": 0.52,
         "padWeights": {
           "sustain": 0,
           "pulse": 40,
           "arpeggio": 0,
-          "sequence": 60
+          "sequence": 60,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 0,
@@ -937,9 +1754,9 @@
         },
         "drums": {
           "style": "electro",
-          "activity": 0.5,
+          "activity": 0.46,
           "variation": 0.4,
-          "sprinkle": 0.2,
+          "sprinkle": 0.12,
           "kit": "crisp"
         },
         "drumKit": {
@@ -963,20 +1780,42 @@
         "sectionTone": true,
         "counter": {
           "mode": "answer",
-          "activity": 0.4
+          "activity": 0.34
         },
         "humanize": {
-          "timing": 6,
+          "timing": 4,
           "velocity": 0.08,
-          "detune": 3
+          "detune": 1
         },
-        "leadDensity": 0.4
+        "leadDensity": 0.38,
+        "leadLeaps": 0.4,
+        "leadRepeat": 0.4,
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        }
       },
       "voices": {
         "pad": "Arp Pluck",
         "bass": "Drive Bass",
         "lead": "Signal Lead",
         "counter": "Heroic Strings"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "tempo-effects": {
+            "enabled": true
+          }
+        }
       }
     },
     {
@@ -996,12 +1835,14 @@
         "progression": 24,
         "barsPerChord": 1,
         "padNotes": 4,
-        "leadActivity": 0.85,
+        "leadActivity": 0.8,
         "padWeights": {
           "sustain": 0,
           "pulse": 20,
           "arpeggio": 0,
-          "sequence": 80
+          "sequence": 80,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 0,
@@ -1011,9 +1852,9 @@
         },
         "drums": {
           "style": "drive",
-          "activity": 0.55,
+          "activity": 0.525,
           "variation": 0.4,
-          "sprinkle": 0.2,
+          "sprinkle": 0.18,
           "kit": "crisp"
         },
         "drumKit": {
@@ -1037,14 +1878,28 @@
         "sectionTone": true,
         "counter": {
           "mode": "harmony",
-          "activity": 0.5
+          "activity": 0.44
         },
         "humanize": {
-          "timing": 5,
-          "velocity": 0.07,
-          "detune": 2
+          "timing": 3,
+          "velocity": 0.08,
+          "detune": 1
         },
-        "leadDensity": 0.85
+        "leadDensity": 0.76,
+        "leadLeaps": 0.48,
+        "leadRepeat": 0.42,
+        "padMotion": {
+          "lean": 0.32,
+          "fast": 0.16,
+          "swell": 0.035
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.78,
+          "lead": 0.68,
+          "counter": 0.5,
+          "perc": 0.59
+        }
       },
       "voices": {
         "pad": "Arp Pluck",
@@ -1069,12 +1924,14 @@
         "progression": 7,
         "barsPerChord": 2,
         "padNotes": 3,
-        "leadActivity": 0.55,
+        "leadActivity": 0.48,
         "padWeights": {
           "sustain": 60,
           "pulse": 10,
           "arpeggio": 30,
-          "sequence": 0
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 80,
@@ -1084,8 +1941,9 @@
         },
         "drums": {
           "style": "heartbeat",
-          "activity": 0.45,
-          "variation": 0.5
+          "activity": 0.41,
+          "variation": 0.485,
+          "sprinkle": 0.09
         },
         "sections": {
           "mode": "strong",
@@ -1100,7 +1958,28 @@
             "distance": 0.6
           }
         },
-        "playAmbience": true
+        "playAmbience": true,
+        "leadDensity": 0.12,
+        "leadLeaps": 0.32,
+        "leadRepeat": 0.46,
+        "humanize": {
+          "timing": 7,
+          "velocity": 0.08,
+          "detune": 2
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "ambienceVolume": 0.66
       },
       "voices": {
         "pad": "Spore Haze",
@@ -1110,7 +1989,7 @@
     },
     {
       "name": "Damp Crater",
-      "category": "classics",
+      "category": "unsettling",
       "blurb": "A tense storm on an alien surface: sparse signal notes, a drone and rolling thunder",
       "tags": [
         "metroid",
@@ -1124,12 +2003,14 @@
         "progression": 8,
         "barsPerChord": 2,
         "padNotes": 4,
-        "leadActivity": 0.35,
+        "leadActivity": 0.32,
         "padWeights": {
           "sustain": 70,
           "pulse": 10,
           "arpeggio": 20,
-          "sequence": 0
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 100,
@@ -1142,7 +2023,32 @@
           "thunder": 0.25,
           "wind": 0.1
         },
-        "playAmbience": true
+        "playAmbience": true,
+        "leadDensity": 0.08,
+        "leadLeaps": 0.26,
+        "leadRepeat": 0.44,
+        "humanize": {
+          "timing": 9,
+          "velocity": 0.07,
+          "detune": 2
+        },
+        "padMotion": {
+          "lean": 0.22,
+          "fast": 0.04,
+          "swell": 0.08
+        },
+        "volumes": {
+          "pad": 0.78,
+          "bass": 0.73,
+          "lead": 0.62,
+          "counter": 0.48,
+          "perc": 0.44
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "ambienceVolume": 0.72
       },
       "voices": {
         "pad": "Spore Haze",
@@ -1166,12 +2072,14 @@
         "progression": 6,
         "barsPerChord": 1,
         "padNotes": 3,
-        "leadActivity": 1,
+        "leadActivity": 0.94,
         "padWeights": {
           "sustain": 0,
           "pulse": 40,
           "arpeggio": 0,
-          "sequence": 60
+          "sequence": 60,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 0,
@@ -1181,9 +2089,9 @@
         },
         "drums": {
           "style": "drive",
-          "activity": 0.55,
+          "activity": 0.525,
           "variation": 0.4,
-          "sprinkle": 0.2,
+          "sprinkle": 0.18,
           "kit": "crisp"
         },
         "drumKit": {
@@ -1207,14 +2115,28 @@
         "sectionTone": true,
         "counter": {
           "mode": "harmony",
-          "activity": 0.6
+          "activity": 0.54
         },
         "humanize": {
-          "timing": 4,
-          "velocity": 0.06,
-          "detune": 2
+          "timing": 2,
+          "velocity": 0.07,
+          "detune": 1
         },
-        "leadDensity": 1
+        "leadDensity": 0.9,
+        "leadLeaps": 0.52,
+        "leadRepeat": 0.48,
+        "padMotion": {
+          "lean": 0.32,
+          "fast": 0.16,
+          "swell": 0.035
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.78,
+          "lead": 0.68,
+          "counter": 0.5,
+          "perc": 0.59
+        }
       },
       "voices": {
         "pad": "Arp Pluck",
@@ -1239,12 +2161,14 @@
         "progression": 15,
         "barsPerChord": 1,
         "padNotes": 3,
-        "leadActivity": 0.7,
+        "leadActivity": 0.68,
         "padWeights": {
           "sustain": 0,
           "pulse": 30,
           "arpeggio": 20,
-          "sequence": 50
+          "sequence": 50,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 0,
@@ -1254,9 +2178,9 @@
         },
         "drums": {
           "style": "electro",
-          "activity": 0.55,
+          "activity": 0.525,
           "variation": 0.4,
-          "sprinkle": 0.2,
+          "sprinkle": 0.18,
           "kit": "crisp"
         },
         "drumKit": {
@@ -1281,9 +2205,28 @@
         "sectionTone": true,
         "counter": {
           "mode": "answer",
-          "activity": 0.5
+          "activity": 0.44
         },
-        "leadDensity": 0.6
+        "leadDensity": 0.56,
+        "leadLeaps": 0.46,
+        "leadRepeat": 0.44,
+        "humanize": {
+          "timing": 3,
+          "velocity": 0.08,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.32,
+          "fast": 0.16,
+          "swell": 0.035
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.78,
+          "lead": 0.68,
+          "counter": 0.5,
+          "perc": 0.59
+        }
       },
       "voices": {
         "pad": "Arp Pluck",
@@ -1308,12 +2251,14 @@
         "progression": 1,
         "barsPerChord": 1,
         "padNotes": 3,
-        "leadActivity": 0.75,
+        "leadActivity": 0.72,
         "padWeights": {
           "sustain": 40,
           "pulse": 40,
           "arpeggio": 20,
-          "sequence": 0
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 20,
@@ -1323,9 +2268,9 @@
         },
         "drums": {
           "style": "drive",
-          "activity": 0.45,
+          "activity": 0.425,
           "variation": 0.4,
-          "sprinkle": 0.2,
+          "sprinkle": 0.18,
           "kit": "crisp"
         },
         "sections": {
@@ -1335,12 +2280,31 @@
         "sectionTone": true,
         "counter": {
           "mode": "answer",
-          "activity": 0.5
+          "activity": 0.44
         },
         "drumKit": {
           "room": 0.1
         },
-        "leadDensity": 0.5
+        "leadDensity": 0.46,
+        "leadLeaps": 0.46,
+        "leadRepeat": 0.42,
+        "humanize": {
+          "timing": 5,
+          "velocity": 0.1,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.32,
+          "fast": 0.16,
+          "swell": 0.035
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.78,
+          "lead": 0.68,
+          "counter": 0.5,
+          "perc": 0.59
+        }
       },
       "voices": {
         "pad": "Heroic Strings",
@@ -1366,12 +2330,14 @@
         "progression": 12,
         "barsPerChord": 2,
         "padNotes": 3,
-        "leadActivity": 0.8,
+        "leadActivity": 0.75,
         "padWeights": {
           "sustain": 0,
           "pulse": 30,
           "arpeggio": 70,
-          "sequence": 0
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 30,
@@ -1381,18 +2347,43 @@
         },
         "drums": {
           "style": "shaker",
-          "activity": 0.5,
-          "variation": 0.6
+          "activity": 0.46,
+          "variation": 0.57,
+          "sprinkle": 0.09
         },
         "counter": {
           "mode": "answer",
-          "activity": 0.4
+          "activity": 0.34
         },
         "ambience": {
           "wind": 0.2
         },
         "playAmbience": true,
-        "leadDensity": 0.5
+        "leadDensity": 0.44,
+        "leadLeaps": 0.38,
+        "leadRepeat": 0.48,
+        "humanize": {
+          "timing": 6,
+          "velocity": 0.09,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.36,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "ambienceVolume": 0.66
       },
       "voices": {
         "pad": "Pixel Piano",
@@ -1417,12 +2408,14 @@
         "progression": 15,
         "barsPerChord": 1,
         "padNotes": 3,
-        "leadActivity": 0.7,
+        "leadActivity": 0.66,
         "padWeights": {
           "sustain": 10,
           "pulse": 40,
           "arpeggio": 50,
-          "sequence": 0
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 20,
@@ -1432,15 +2425,39 @@
         },
         "drums": {
           "style": "shaker",
-          "activity": 0.5,
-          "variation": 0.5
+          "activity": 0.46,
+          "variation": 0.485,
+          "sprinkle": 0.09
         },
         "swing": 0.25,
         "counter": {
           "mode": "answer",
-          "activity": 0.45
+          "activity": 0.39
         },
-        "leadDensity": 0.4
+        "leadDensity": 0.38,
+        "leadLeaps": 0.36,
+        "leadRepeat": 0.44,
+        "humanize": {
+          "timing": 7,
+          "velocity": 0.1,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        }
       },
       "voices": {
         "pad": "Pixel Piano",
@@ -1451,7 +2468,7 @@
     },
     {
       "name": "Dark Mirror Dimension",
-      "category": "classics",
+      "category": "unsettling",
       "blurb": "Phrygian dominant: brooding haze, a chip bass and a slow, hard beat",
       "tags": [
         "zelda",
@@ -1465,12 +2482,14 @@
         "progression": 8,
         "barsPerChord": 2,
         "padNotes": 3,
-        "leadActivity": 0.6,
+        "leadActivity": 0.55,
         "padWeights": {
           "sustain": 50,
           "pulse": 30,
           "arpeggio": 20,
-          "sequence": 0
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 30,
@@ -1480,9 +2499,9 @@
         },
         "drums": {
           "style": "drive",
-          "activity": 0.4,
+          "activity": 0.36,
           "variation": 0.4,
-          "sprinkle": 0.2,
+          "sprinkle": 0.12,
           "kit": "crisp"
         },
         "sections": {
@@ -1490,7 +2509,26 @@
           "phrases": 2
         },
         "sectionTone": true,
-        "leadDensity": 0.3
+        "leadDensity": 0.28,
+        "leadLeaps": 0.38,
+        "leadRepeat": 0.42,
+        "humanize": {
+          "timing": 6,
+          "velocity": 0.09,
+          "detune": 2
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        }
       },
       "voices": {
         "pad": "Spore Haze",
@@ -1514,12 +2552,14 @@
         "progression": 1,
         "barsPerChord": 1,
         "padNotes": 3,
-        "leadActivity": 0.6,
+        "leadActivity": 0.56,
         "padWeights": {
-          "sustain": 10,
-          "pulse": 40,
-          "arpeggio": 50,
-          "sequence": 0
+          "sustain": 18,
+          "pulse": 20,
+          "arpeggio": 54,
+          "sequence": 0,
+          "rolled": 8,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 15,
@@ -1529,19 +2569,44 @@
         },
         "drums": {
           "style": "shaker",
-          "activity": 0.4,
-          "variation": 0.5
+          "activity": 0.36,
+          "variation": 0.485,
+          "sprinkle": 0.09
         },
         "swing": 0.2,
         "counter": {
           "mode": "answer",
-          "activity": 0.4
+          "activity": 0.34
         },
         "ambience": {
           "wind": 0.1
         },
         "playAmbience": true,
-        "leadDensity": 0.3
+        "leadDensity": 0.28,
+        "leadLeaps": 0.3,
+        "leadRepeat": 0.46,
+        "humanize": {
+          "timing": 11,
+          "velocity": 0.11,
+          "detune": 2
+        },
+        "padMotion": {
+          "lean": 0.36,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "ambienceVolume": 0.66
       },
       "voices": {
         "pad": "Nylon Guitar",
@@ -1566,12 +2631,14 @@
         "progression": 15,
         "barsPerChord": 1,
         "padNotes": 4,
-        "leadActivity": 0.35,
+        "leadActivity": 0.32,
         "padWeights": {
-          "sustain": 40,
-          "pulse": 0,
-          "arpeggio": 60,
-          "sequence": 0
+          "sustain": 60,
+          "pulse": 24,
+          "arpeggio": 10,
+          "sequence": 0,
+          "rolled": 6,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 70,
@@ -1582,7 +2649,32 @@
         "ambience": {
           "rain": 0.5
         },
-        "playAmbience": true
+        "playAmbience": true,
+        "leadDensity": 0.1,
+        "leadLeaps": 0.24,
+        "leadRepeat": 0.46,
+        "humanize": {
+          "timing": 12,
+          "velocity": 0.09,
+          "detune": 2
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "ambienceVolume": 0.66
       },
       "voices": {
         "pad": "Felt Piano",
@@ -1606,12 +2698,14 @@
         "progression": 16,
         "barsPerChord": 1,
         "padNotes": 4,
-        "leadActivity": 0.8,
+        "leadActivity": 0.74,
         "padWeights": {
-          "sustain": 10,
-          "pulse": 70,
-          "arpeggio": 20,
-          "sequence": 0
+          "sustain": 20,
+          "pulse": 42,
+          "arpeggio": 28,
+          "sequence": 0,
+          "rolled": 10,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 0,
@@ -1621,11 +2715,35 @@
         },
         "drums": {
           "style": "brushes",
-          "activity": 0.55,
-          "variation": 0.6
+          "activity": 0.51,
+          "variation": 0.57,
+          "sprinkle": 0.09
         },
         "swing": 0.45,
-        "leadDensity": 0.5
+        "leadDensity": 0.46,
+        "leadLeaps": 0.38,
+        "leadRepeat": 0.38,
+        "humanize": {
+          "timing": 11,
+          "velocity": 0.12,
+          "detune": 2
+        },
+        "padMotion": {
+          "lean": 0.36,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        }
       },
       "voices": {
         "pad": "Soft Keys",
@@ -1649,12 +2767,14 @@
         "progression": 14,
         "barsPerChord": 2,
         "padNotes": 3,
-        "leadActivity": 0.65,
+        "leadActivity": 0.6,
         "padWeights": {
-          "sustain": 10,
-          "pulse": 30,
-          "arpeggio": 60,
-          "sequence": 0
+          "sustain": 22,
+          "pulse": 22,
+          "arpeggio": 48,
+          "sequence": 0,
+          "rolled": 8,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 30,
@@ -1664,8 +2784,9 @@
         },
         "drums": {
           "style": "shaker",
-          "activity": 0.4,
-          "variation": 0.5
+          "activity": 0.36,
+          "variation": 0.485,
+          "sprinkle": 0.09
         },
         "sections": {
           "mode": "gentle",
@@ -1674,13 +2795,33 @@
         "sectionTone": true,
         "counter": {
           "mode": "answer",
-          "activity": 0.45
+          "activity": 0.39
         },
         "ambience": {
           "wind": 0.1
         },
         "playAmbience": true,
-        "leadDensity": 0.3
+        "leadDensity": 0.28,
+        "leadLeaps": 0.32,
+        "leadRepeat": 0.44,
+        "humanize": {
+          "timing": 10,
+          "velocity": 0.1,
+          "detune": 2
+        },
+        "padMotion": {
+          "lean": 0.36,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "ambienceVolume": 0.66
       },
       "voices": {
         "pad": "Nylon Guitar",
@@ -1705,12 +2846,14 @@
         "progression": 12,
         "barsPerChord": 2,
         "padNotes": 4,
-        "leadActivity": 0.3,
+        "leadActivity": 0.26,
         "padWeights": {
           "sustain": 80,
           "pulse": 0,
           "arpeggio": 20,
-          "sequence": 0
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 100,
@@ -1731,12 +2874,48 @@
             "distance": 0.7
           }
         },
-        "playAmbience": true
+        "playAmbience": true,
+        "leadDensity": 0.05,
+        "leadLeaps": 0.22,
+        "leadRepeat": 0.5,
+        "humanize": {
+          "timing": 8,
+          "velocity": 0.07,
+          "detune": 2
+        },
+        "padMotion": {
+          "lean": 0.22,
+          "fast": 0.04,
+          "swell": 0.08
+        },
+        "volumes": {
+          "pad": 0.78,
+          "bass": 0.73,
+          "lead": 0.62,
+          "counter": 0.48,
+          "perc": 0.44
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "ambienceVolume": 0.72
       },
       "voices": {
         "pad": "Void Pad",
         "bass": "Sub Bass",
         "lead": "Glass Mallet"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "section-cadences": {
+            "enabled": false
+          },
+          "common-tone-bridges": {
+            "enabled": false
+          }
+        }
       }
     },
     {
@@ -1755,12 +2934,14 @@
         "progression": 11,
         "barsPerChord": 2,
         "padNotes": 4,
-        "leadActivity": 0.5,
+        "leadActivity": 0.44,
         "padWeights": {
           "sustain": 20,
           "pulse": 0,
           "arpeggio": 80,
-          "sequence": 0
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 100,
@@ -1770,18 +2951,54 @@
         },
         "counter": {
           "mode": "line",
-          "activity": 0.4
+          "activity": 0.34
         },
         "ambience": {
           "wind": 0.1
         },
-        "playAmbience": true
+        "playAmbience": true,
+        "leadDensity": 0.08,
+        "leadLeaps": 0.32,
+        "leadRepeat": 0.48,
+        "humanize": {
+          "timing": 8,
+          "velocity": 0.08,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.22,
+          "fast": 0.04,
+          "swell": 0.08
+        },
+        "volumes": {
+          "pad": 0.78,
+          "bass": 0.73,
+          "lead": 0.62,
+          "counter": 0.48,
+          "perc": 0.44
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "ambienceVolume": 0.72
       },
       "voices": {
         "pad": "Music Box",
         "bass": "Sub Bass",
         "lead": "Celesta",
         "counter": "Starlight Pad"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "section-cadences": {
+            "enabled": false
+          },
+          "common-tone-bridges": {
+            "enabled": false
+          }
+        }
       }
     },
     {
@@ -1801,13 +3018,15 @@
         "progression": 7,
         "barsPerChord": 2,
         "padNotes": 4,
-        "leadActivity": 0.5,
-        "leadDensity": 0.2,
+        "leadActivity": 0.46,
+        "leadDensity": 0.18,
         "padWeights": {
           "sustain": 30,
-          "pulse": 10,
-          "arpeggio": 60,
-          "sequence": 0
+          "pulse": 12,
+          "arpeggio": 52,
+          "sequence": 0,
+          "rolled": 6,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 80,
@@ -1817,7 +3036,7 @@
         },
         "counter": {
           "mode": "line",
-          "activity": 0.5
+          "activity": 0.44
         },
         "sections": {
           "mode": "gentle",
@@ -1836,7 +3055,27 @@
         "playAmbience": true,
         "wander": {
           "period": 70
-        }
+        },
+        "leadLeaps": 0.32,
+        "leadRepeat": 0.46,
+        "humanize": {
+          "timing": 7,
+          "velocity": 0.08,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "ambienceVolume": 0.66
       },
       "voices": {
         "pad": "Music Box",
@@ -1847,7 +3086,7 @@
     },
     {
       "name": "Ice Cave Echoes",
-      "category": "classics",
+      "category": "unsettling",
       "blurb": "Sparse, echoing signal notes over a slow glass pad and a distant wind",
       "tags": [
         "metroid",
@@ -1862,12 +3101,14 @@
         "progression": 8,
         "barsPerChord": 2,
         "padNotes": 5,
-        "leadActivity": 0.55,
+        "leadActivity": 0.48,
         "padWeights": {
           "sustain": 60,
           "pulse": 0,
           "arpeggio": 40,
-          "sequence": 0
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 100,
@@ -1877,13 +3118,14 @@
         },
         "drums": {
           "style": "heartbeat",
-          "activity": 0.3,
+          "activity": 0.26,
           "variation": 0.4,
-          "kit": "crisp"
+          "kit": "crisp",
+          "sprinkle": 0.09
         },
         "counter": {
           "mode": "answer",
-          "activity": 0.4
+          "activity": 0.34
         },
         "ambience": {
           "wind": 0.25
@@ -1898,13 +3140,45 @@
           "mode": "strong",
           "phrases": 2
         },
-        "sectionTone": true
+        "sectionTone": true,
+        "leadDensity": 0.08,
+        "leadLeaps": 0.28,
+        "leadRepeat": 0.46,
+        "humanize": {
+          "timing": 8,
+          "velocity": 0.08,
+          "detune": 2
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "ambienceVolume": 0.66
       },
       "voices": {
         "pad": "Starlight Pad",
         "bass": "Deep Throb",
         "lead": "Signal Lead",
         "counter": "FM Bell"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "section-cadences": {
+            "enabled": false
+          },
+          "common-tone-bridges": {
+            "enabled": false
+          }
+        }
       }
     },
     {
@@ -1924,13 +3198,15 @@
         "progression": 8,
         "barsPerChord": 2,
         "padNotes": 3,
-        "leadActivity": 0.5,
-        "leadDensity": 0.2,
+        "leadActivity": 0.46,
+        "leadDensity": 0.18,
         "padWeights": {
-          "sustain": 10,
+          "sustain": 30,
           "pulse": 20,
-          "arpeggio": 70,
-          "sequence": 0
+          "arpeggio": 44,
+          "sequence": 0,
+          "rolled": 6,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 30,
@@ -1940,14 +3216,14 @@
         },
         "drums": {
           "style": "downtempo",
-          "activity": 0.35,
-          "variation": 0.5,
-          "sprinkle": 0.2,
+          "activity": 0.31,
+          "variation": 0.485,
+          "sprinkle": 0.12,
           "kit": "crisp"
         },
         "counter": {
           "mode": "line",
-          "activity": 0.4
+          "activity": 0.34
         },
         "ambience": {
           "rain": 0.55,
@@ -1959,7 +3235,27 @@
           "mode": "gentle",
           "phrases": 4
         },
-        "sectionTone": true
+        "sectionTone": true,
+        "leadLeaps": 0.3,
+        "leadRepeat": 0.44,
+        "humanize": {
+          "timing": 10,
+          "velocity": 0.09,
+          "detune": 2
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "ambienceVolume": 0.66
       },
       "voices": {
         "pad": "Nylon Guitar",
@@ -1986,13 +3282,15 @@
         "progression": 6,
         "barsPerChord": 2,
         "padNotes": 4,
-        "leadActivity": 0.55,
-        "leadDensity": 0.15,
+        "leadActivity": 0.5,
+        "leadDensity": 0.14,
         "padWeights": {
           "sustain": 40,
           "pulse": 30,
           "arpeggio": 30,
-          "sequence": 0
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 40,
@@ -2002,14 +3300,14 @@
         },
         "drums": {
           "style": "downtempo",
-          "activity": 0.4,
-          "variation": 0.5,
-          "sprinkle": 0.2,
+          "activity": 0.36,
+          "variation": 0.485,
+          "sprinkle": 0.12,
           "kit": "crisp"
         },
         "counter": {
           "mode": "harmony",
-          "activity": 0.4
+          "activity": 0.34
         },
         "ambience": {
           "rain": 0.4,
@@ -2020,7 +3318,27 @@
           "mode": "strong",
           "phrases": 2
         },
-        "sectionTone": true
+        "sectionTone": true,
+        "leadLeaps": 0.34,
+        "leadRepeat": 0.42,
+        "humanize": {
+          "timing": 8,
+          "velocity": 0.09,
+          "detune": 2
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "ambienceVolume": 0.66
       },
       "voices": {
         "pad": "Heroic Strings",
@@ -2040,25 +3358,73 @@
         "progression": 1,
         "barsPerChord": 4,
         "padNotes": 4,
-        "leadActivity": 0.1,
+        "leadActivity": 0.08,
         "padWeights": {
           "sustain": 100,
           "pulse": 0,
-          "arpeggio": 0
+          "arpeggio": 0,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 100,
           "half": 0,
-          "walking": 0
+          "walking": 0,
+          "drive": 0
         },
         "drums": {
           "style": "off"
+        },
+        "leadDensity": 0.04,
+        "leadLeaps": 0.18,
+        "leadRepeat": 0.56,
+        "humanize": {
+          "timing": 6,
+          "velocity": 0.05,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.12,
+          "fast": 0,
+          "swell": 0.025
+        },
+        "volumes": {
+          "pad": 0.73,
+          "bass": 0.66,
+          "lead": 0.48,
+          "counter": 0.4,
+          "perc": 0.38
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
         }
       },
       "voices": {
         "pad": "Soft Pad",
         "bass": "Warm Bass",
         "lead": "Sine Whistle"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "lead-pickups": {
+            "enabled": false
+          },
+          "lead-transitions": {
+            "enabled": false
+          },
+          "section-suspensions": {
+            "enabled": false
+          },
+          "section-gestures": {
+            "enabled": false
+          },
+          "section-cadences": {
+            "enabled": false
+          }
+        }
       }
     },
     {
@@ -2072,30 +3438,73 @@
         "progression": 6,
         "barsPerChord": 2,
         "padNotes": 3,
-        "leadActivity": 0.12,
+        "leadActivity": 0.1,
         "padWeights": {
-          "sustain": 40,
-          "pulse": 60,
-          "arpeggio": 0
+          "sustain": 80,
+          "pulse": 16,
+          "arpeggio": 0,
+          "sequence": 0,
+          "rolled": 4,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 100,
           "half": 0,
-          "walking": 0
+          "walking": 0,
+          "drive": 0
         },
         "drums": {
           "style": "off"
         },
         "humanize": {
-          "timing": 0.2,
-          "velocity": 0.2,
-          "detune": 0.2
+          "timing": 7,
+          "velocity": 0.06,
+          "detune": 1
+        },
+        "leadDensity": 0.05,
+        "leadLeaps": 0.2,
+        "leadRepeat": 0.58,
+        "padMotion": {
+          "lean": 0.12,
+          "fast": 0,
+          "swell": 0.025
+        },
+        "volumes": {
+          "pad": 0.73,
+          "bass": 0.66,
+          "lead": 0.48,
+          "counter": 0.4,
+          "perc": 0.38
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
         }
       },
       "voices": {
         "pad": "Felt Piano",
         "bass": "Felt Bass",
         "lead": "Celesta"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "lead-pickups": {
+            "enabled": false
+          },
+          "lead-transitions": {
+            "enabled": false
+          },
+          "section-suspensions": {
+            "enabled": false
+          },
+          "section-gestures": {
+            "enabled": false
+          },
+          "section-cadences": {
+            "enabled": false
+          }
+        }
       }
     },
     {
@@ -2109,27 +3518,76 @@
         "progression": 6,
         "barsPerChord": 4,
         "padNotes": 4,
-        "leadActivity": 0.1,
+        "leadActivity": 0.08,
         "padWeights": {
           "sustain": 100,
           "pulse": 0,
-          "arpeggio": 0
+          "arpeggio": 0,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 100,
           "half": 0,
-          "walking": 0
+          "walking": 0,
+          "drive": 0
         },
         "drums": {
           "style": "heartbeat",
-          "activity": 0.15,
-          "variation": 0.3
+          "activity": 0.12,
+          "variation": 0.315,
+          "sprinkle": 0.03
+        },
+        "leadDensity": 0.03,
+        "leadLeaps": 0.18,
+        "leadRepeat": 0.54,
+        "humanize": {
+          "timing": 6,
+          "velocity": 0.05,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.12,
+          "fast": 0,
+          "swell": 0.025
+        },
+        "volumes": {
+          "pad": 0.73,
+          "bass": 0.66,
+          "lead": 0.48,
+          "counter": 0.4,
+          "perc": 0.38
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
         }
       },
       "voices": {
         "pad": "Velvet Pad",
         "bass": "Sub Bass",
         "lead": "Sine Whistle"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "lead-pickups": {
+            "enabled": false
+          },
+          "lead-transitions": {
+            "enabled": false
+          },
+          "section-suspensions": {
+            "enabled": false
+          },
+          "section-gestures": {
+            "enabled": false
+          },
+          "section-cadences": {
+            "enabled": false
+          }
+        }
       }
     },
     {
@@ -2143,28 +3601,77 @@
         "progression": 1,
         "barsPerChord": 2,
         "padNotes": 3,
-        "leadActivity": 0.12,
+        "leadActivity": 0.1,
         "padWeights": {
-          "sustain": 50,
-          "pulse": 40,
-          "arpeggio": 10
+          "sustain": 60,
+          "pulse": 30,
+          "arpeggio": 6,
+          "sequence": 0,
+          "rolled": 4,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 80,
           "half": 20,
-          "walking": 0
+          "walking": 0,
+          "drive": 0
         },
         "drums": {
           "style": "shaker",
-          "activity": 0.2,
-          "variation": 0.4
+          "activity": 0.16,
+          "variation": 0.4,
+          "sprinkle": 0.03
         },
-        "swing": 0.15
+        "swing": 0.15,
+        "leadDensity": 0.06,
+        "leadLeaps": 0.22,
+        "leadRepeat": 0.52,
+        "humanize": {
+          "timing": 7,
+          "velocity": 0.06,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.12,
+          "fast": 0,
+          "swell": 0.025
+        },
+        "volumes": {
+          "pad": 0.73,
+          "bass": 0.66,
+          "lead": 0.48,
+          "counter": 0.4,
+          "perc": 0.38
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        }
       },
       "voices": {
         "pad": "Tine Keys",
         "bass": "Round Pluck Bass",
         "lead": "Soft Flute"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "lead-pickups": {
+            "enabled": false
+          },
+          "lead-transitions": {
+            "enabled": false
+          },
+          "section-suspensions": {
+            "enabled": false
+          },
+          "section-gestures": {
+            "enabled": false
+          },
+          "section-cadences": {
+            "enabled": false
+          }
+        }
       }
     },
     {
@@ -2178,16 +3685,20 @@
         "progression": 11,
         "barsPerChord": 4,
         "padNotes": 3,
-        "leadActivity": 0.08,
+        "leadActivity": 0.06,
         "padWeights": {
           "sustain": 100,
           "pulse": 0,
-          "arpeggio": 0
+          "arpeggio": 0,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 100,
           "half": 0,
-          "walking": 0
+          "walking": 0,
+          "drive": 0
         },
         "drums": {
           "style": "off"
@@ -2195,12 +3706,57 @@
         "ambience": {
           "wind": 0.08
         },
-        "playAmbience": true
+        "playAmbience": true,
+        "leadDensity": 0.03,
+        "leadLeaps": 0.18,
+        "leadRepeat": 0.6,
+        "humanize": {
+          "timing": 6,
+          "velocity": 0.05,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.12,
+          "fast": 0,
+          "swell": 0.025
+        },
+        "volumes": {
+          "pad": 0.73,
+          "bass": 0.66,
+          "lead": 0.48,
+          "counter": 0.4,
+          "perc": 0.38
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "ambienceVolume": 0.72
       },
       "voices": {
         "pad": "Morning Haze",
         "bass": "Sub Bass",
         "lead": "Glass Lead"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "lead-pickups": {
+            "enabled": false
+          },
+          "lead-transitions": {
+            "enabled": false
+          },
+          "section-suspensions": {
+            "enabled": false
+          },
+          "section-gestures": {
+            "enabled": false
+          },
+          "section-cadences": {
+            "enabled": false
+          }
+        }
       }
     },
     {
@@ -2214,28 +3770,77 @@
         "progression": 1,
         "barsPerChord": 2,
         "padNotes": 3,
-        "leadActivity": 0.15,
+        "leadActivity": 0.12,
         "padWeights": {
-          "sustain": 30,
-          "pulse": 60,
-          "arpeggio": 10
+          "sustain": 52,
+          "pulse": 36,
+          "arpeggio": 8,
+          "sequence": 0,
+          "rolled": 4,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 60,
           "half": 40,
-          "walking": 0
+          "walking": 0,
+          "drive": 0
         },
         "drums": {
           "style": "shaker",
-          "activity": 0.3,
-          "variation": 0.5
+          "activity": 0.26,
+          "variation": 0.485,
+          "sprinkle": 0.03
         },
-        "swing": 0.2
+        "swing": 0.2,
+        "leadDensity": 0.08,
+        "leadLeaps": 0.22,
+        "leadRepeat": 0.5,
+        "humanize": {
+          "timing": 6,
+          "velocity": 0.06,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.12,
+          "fast": 0,
+          "swell": 0.025
+        },
+        "volumes": {
+          "pad": 0.73,
+          "bass": 0.66,
+          "lead": 0.48,
+          "counter": 0.4,
+          "perc": 0.38
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        }
       },
       "voices": {
         "pad": "Soft Keys",
         "bass": "Round Pluck Bass",
         "lead": "Kalimba Pluck"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "lead-pickups": {
+            "enabled": false
+          },
+          "lead-transitions": {
+            "enabled": false
+          },
+          "section-suspensions": {
+            "enabled": false
+          },
+          "section-gestures": {
+            "enabled": false
+          },
+          "section-cadences": {
+            "enabled": false
+          }
+        }
       }
     },
     {
@@ -2249,16 +3854,20 @@
         "progression": 6,
         "barsPerChord": 4,
         "padNotes": 3,
-        "leadActivity": 0.08,
+        "leadActivity": 0.06,
         "padWeights": {
           "sustain": 100,
           "pulse": 0,
-          "arpeggio": 0
+          "arpeggio": 0,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 100,
           "half": 0,
-          "walking": 0
+          "walking": 0,
+          "drive": 0
         },
         "drums": {
           "style": "off"
@@ -2266,12 +3875,57 @@
         "ambience": {
           "rain": 0.3
         },
-        "playAmbience": true
+        "playAmbience": true,
+        "leadDensity": 0.03,
+        "leadLeaps": 0.18,
+        "leadRepeat": 0.58,
+        "humanize": {
+          "timing": 7,
+          "velocity": 0.05,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.12,
+          "fast": 0,
+          "swell": 0.025
+        },
+        "volumes": {
+          "pad": 0.73,
+          "bass": 0.66,
+          "lead": 0.48,
+          "counter": 0.4,
+          "perc": 0.38
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "ambienceVolume": 0.72
       },
       "voices": {
         "pad": "Hollow Air",
         "bass": "Sub Bass",
         "lead": "Sine Whistle"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "lead-pickups": {
+            "enabled": false
+          },
+          "lead-transitions": {
+            "enabled": false
+          },
+          "section-suspensions": {
+            "enabled": false
+          },
+          "section-gestures": {
+            "enabled": false
+          },
+          "section-cadences": {
+            "enabled": false
+          }
+        }
       }
     },
     {
@@ -2285,28 +3939,77 @@
         "progression": 16,
         "barsPerChord": 2,
         "padNotes": 4,
-        "leadActivity": 0.12,
+        "leadActivity": 0.1,
         "padWeights": {
-          "sustain": 50,
-          "pulse": 50,
-          "arpeggio": 0
+          "sustain": 58,
+          "pulse": 30,
+          "arpeggio": 8,
+          "sequence": 0,
+          "rolled": 4,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 30,
           "half": 70,
-          "walking": 0
+          "walking": 0,
+          "drive": 0
         },
         "drums": {
           "style": "brushes",
-          "activity": 0.25,
-          "variation": 0.5
+          "activity": 0.21,
+          "variation": 0.485,
+          "sprinkle": 0.03
         },
-        "swing": 0.4
+        "swing": 0.4,
+        "leadDensity": 0.07,
+        "leadLeaps": 0.24,
+        "leadRepeat": 0.5,
+        "humanize": {
+          "timing": 9,
+          "velocity": 0.07,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.12,
+          "fast": 0,
+          "swell": 0.025
+        },
+        "volumes": {
+          "pad": 0.73,
+          "bass": 0.66,
+          "lead": 0.48,
+          "counter": 0.4,
+          "perc": 0.38
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        }
       },
       "voices": {
         "pad": "FM Rhodes",
         "bass": "Upright Pluck",
         "lead": "Soft Flute"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "lead-pickups": {
+            "enabled": false
+          },
+          "lead-transitions": {
+            "enabled": false
+          },
+          "section-suspensions": {
+            "enabled": false
+          },
+          "section-gestures": {
+            "enabled": false
+          },
+          "section-cadences": {
+            "enabled": false
+          }
+        }
       }
     },
     {
@@ -2320,19 +4023,51 @@
         "progression": 1,
         "barsPerChord": 4,
         "padNotes": 4,
-        "leadActivity": 0.15,
+        "leadActivity": 0.14,
         "padWeights": {
           "sustain": 90,
           "pulse": 10,
-          "arpeggio": 0
+          "arpeggio": 0,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 100,
           "half": 0,
-          "walking": 0
+          "walking": 0,
+          "drive": 0
         },
         "drums": {
           "style": "off"
+        },
+        "leadDensity": 0.06,
+        "leadLeaps": 0.22,
+        "leadRepeat": 0.5,
+        "humanize": {
+          "timing": 8,
+          "velocity": 0.07,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.22,
+          "fast": 0.04,
+          "swell": 0.08
+        },
+        "volumes": {
+          "pad": 0.78,
+          "bass": 0.73,
+          "lead": 0.62,
+          "counter": 0.48,
+          "perc": 0.44
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.2
         }
       },
       "voices": {
@@ -2351,23 +4086,56 @@
         "bpm": 90,
         "progression": 7,
         "padNotes": 4,
-        "leadActivity": 0.25,
+        "leadActivity": 0.22,
         "padWeights": {
-          "sustain": 30,
-          "pulse": 50,
-          "arpeggio": 20
+          "sustain": 48,
+          "pulse": 32,
+          "arpeggio": 14,
+          "sequence": 0,
+          "rolled": 6,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 50,
           "half": 50,
-          "walking": 0
+          "walking": 0,
+          "drive": 0
         },
         "drums": {
           "style": "lofi",
-          "activity": 0.3,
-          "variation": 0.5
+          "activity": 0.26,
+          "variation": 0.485,
+          "sprinkle": 0.09
         },
-        "swing": 0.25
+        "swing": 0.25,
+        "leadDensity": 0.12,
+        "leadLeaps": 0.26,
+        "leadRepeat": 0.46,
+        "humanize": {
+          "timing": 6,
+          "velocity": 0.07,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.2
+        }
       },
       "voices": {
         "pad": "Tine Keys",
@@ -2386,16 +4154,20 @@
         "progression": 1,
         "barsPerChord": 4,
         "padNotes": 4,
-        "leadActivity": 0.3,
+        "leadActivity": 0.28,
         "padWeights": {
-          "sustain": 100,
+          "sustain": 96,
           "pulse": 0,
-          "arpeggio": 0
+          "arpeggio": 4,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 100,
           "half": 0,
-          "walking": 0
+          "walking": 0,
+          "drive": 0
         },
         "drums": {
           "style": "off"
@@ -2403,7 +4175,36 @@
         "ambience": {
           "fire": 0.2
         },
-        "playAmbience": true
+        "playAmbience": true,
+        "leadDensity": 0.08,
+        "leadLeaps": 0.24,
+        "leadRepeat": 0.46,
+        "humanize": {
+          "timing": 10,
+          "velocity": 0.08,
+          "detune": 2
+        },
+        "padMotion": {
+          "lean": 0.22,
+          "fast": 0.04,
+          "swell": 0.08
+        },
+        "volumes": {
+          "pad": 0.78,
+          "bass": 0.73,
+          "lead": 0.62,
+          "counter": 0.48,
+          "perc": 0.44
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.2
+        },
+        "ambienceVolume": 0.72
       },
       "voices": {
         "pad": "Morning Haze",
@@ -2427,13 +4228,15 @@
         "progression": 1,
         "barsPerChord": 1,
         "padNotes": 3,
-        "leadActivity": 0.85,
-        "leadDensity": 0.7,
+        "leadActivity": 0.8,
+        "leadDensity": 0.64,
         "padWeights": {
           "sustain": 0,
           "pulse": 70,
           "arpeggio": 30,
-          "sequence": 0
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 0,
@@ -2443,15 +4246,34 @@
         },
         "drums": {
           "style": "drive",
-          "activity": 0.4,
-          "variation": 0.5,
-          "sprinkle": 0.25,
+          "activity": 0.375,
+          "variation": 0.485,
+          "sprinkle": 0.18,
           "kit": "crisp"
         },
         "swing": 0.25,
         "sections": {
           "mode": "gentle",
           "phrases": 4
+        },
+        "leadLeaps": 0.42,
+        "leadRepeat": 0.48,
+        "humanize": {
+          "timing": 4,
+          "velocity": 0.08,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.32,
+          "fast": 0.16,
+          "swell": 0.035
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.78,
+          "lead": 0.68,
+          "counter": 0.5,
+          "perc": 0.59
         }
       },
       "voices": {
@@ -2476,13 +4298,15 @@
         "progression": 1,
         "barsPerChord": 1,
         "padNotes": 3,
-        "leadActivity": 0.7,
-        "leadDensity": 0.5,
+        "leadActivity": 0.66,
+        "leadDensity": 0.46,
         "padWeights": {
           "sustain": 10,
           "pulse": 50,
           "arpeggio": 40,
-          "sequence": 0
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 10,
@@ -2492,9 +4316,10 @@
         },
         "drums": {
           "style": "drive",
-          "activity": 0.3,
+          "activity": 0.275,
           "variation": 0.4,
-          "kit": "crisp"
+          "kit": "crisp",
+          "sprinkle": 0.12
         },
         "sections": {
           "mode": "gentle",
@@ -2502,7 +4327,26 @@
         },
         "counter": {
           "mode": "answer",
-          "activity": 0.4
+          "activity": 0.34
+        },
+        "leadLeaps": 0.38,
+        "leadRepeat": 0.46,
+        "humanize": {
+          "timing": 6,
+          "velocity": 0.09,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.32,
+          "fast": 0.16,
+          "swell": 0.035
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.78,
+          "lead": 0.68,
+          "counter": 0.5,
+          "perc": 0.59
         }
       },
       "voices": {
@@ -2528,13 +4372,15 @@
         "progression": 6,
         "barsPerChord": 1,
         "padNotes": 3,
-        "leadActivity": 0.9,
-        "leadDensity": 0.8,
+        "leadActivity": 0.84,
+        "leadDensity": 0.72,
         "padWeights": {
           "sustain": 0,
           "pulse": 60,
           "arpeggio": 40,
-          "sequence": 0
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 0,
@@ -2544,15 +4390,35 @@
         },
         "drums": {
           "style": "drive",
-          "activity": 0.4,
-          "variation": 0.3,
-          "kit": "crisp"
+          "activity": 0.375,
+          "variation": 0.315,
+          "kit": "crisp",
+          "sprinkle": 0.12
         },
         "sections": {
           "mode": "strong",
           "phrases": 2
         },
-        "sectionTone": true
+        "sectionTone": true,
+        "leadLeaps": 0.44,
+        "leadRepeat": 0.48,
+        "humanize": {
+          "timing": 4,
+          "velocity": 0.09,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.32,
+          "fast": 0.16,
+          "swell": 0.035
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.78,
+          "lead": 0.68,
+          "counter": 0.5,
+          "perc": 0.59
+        }
       },
       "voices": {
         "pad": "Pixel Piano",
@@ -2562,7 +4428,7 @@
     },
     {
       "name": "Haunted Staircase",
-      "category": "classics",
+      "category": "unsettling",
       "blurb": "Gothic harpsichord-ish arpeggios, a pulsing bass and a hard beat in a ruined castle",
       "tags": [
         "castlevania",
@@ -2576,13 +4442,15 @@
         "progression": 6,
         "barsPerChord": 1,
         "padNotes": 3,
-        "leadActivity": 0.9,
-        "leadDensity": 0.7,
+        "leadActivity": 0.84,
+        "leadDensity": 0.64,
         "padWeights": {
           "sustain": 0,
           "pulse": 30,
           "arpeggio": 30,
-          "sequence": 40
+          "sequence": 40,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 0,
@@ -2592,9 +4460,10 @@
         },
         "drums": {
           "style": "drive",
-          "activity": 0.5,
+          "activity": 0.475,
           "variation": 0.4,
-          "kit": "crisp"
+          "kit": "crisp",
+          "sprinkle": 0.12
         },
         "sections": {
           "mode": "strong",
@@ -2603,7 +4472,26 @@
         "sectionTone": true,
         "counter": {
           "mode": "harmony",
-          "activity": 0.5
+          "activity": 0.44
+        },
+        "leadLeaps": 0.44,
+        "leadRepeat": 0.42,
+        "humanize": {
+          "timing": 4,
+          "velocity": 0.09,
+          "detune": 2
+        },
+        "padMotion": {
+          "lean": 0.32,
+          "fast": 0.16,
+          "swell": 0.035
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.78,
+          "lead": 0.68,
+          "counter": 0.5,
+          "perc": 0.59
         }
       },
       "voices": {
@@ -2629,13 +4517,15 @@
         "progression": 6,
         "barsPerChord": 1,
         "padNotes": 3,
-        "leadActivity": 1,
-        "leadDensity": 0.9,
+        "leadActivity": 0.94,
+        "leadDensity": 0.82,
         "padWeights": {
           "sustain": 0,
           "pulse": 30,
           "arpeggio": 0,
-          "sequence": 70
+          "sequence": 70,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 0,
@@ -2645,9 +4535,10 @@
         },
         "drums": {
           "style": "drive",
-          "activity": 0.55,
+          "activity": 0.525,
           "variation": 0.4,
-          "kit": "crisp"
+          "kit": "crisp",
+          "sprinkle": 0.12
         },
         "sections": {
           "mode": "strong",
@@ -2656,7 +4547,26 @@
         "sectionTone": true,
         "counter": {
           "mode": "harmony",
-          "activity": 0.5
+          "activity": 0.44
+        },
+        "leadLeaps": 0.48,
+        "leadRepeat": 0.46,
+        "humanize": {
+          "timing": 3,
+          "velocity": 0.08,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.32,
+          "fast": 0.16,
+          "swell": 0.035
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.78,
+          "lead": 0.68,
+          "counter": 0.5,
+          "perc": 0.59
         }
       },
       "voices": {
@@ -2682,13 +4592,15 @@
         "progression": 6,
         "barsPerChord": 1,
         "padNotes": 4,
-        "leadActivity": 0.9,
-        "leadDensity": 0.7,
+        "leadActivity": 0.84,
+        "leadDensity": 0.66,
         "padWeights": {
           "sustain": 30,
           "pulse": 40,
           "arpeggio": 0,
-          "sequence": 30
+          "sequence": 30,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 0,
@@ -2698,9 +4610,10 @@
         },
         "drums": {
           "style": "drive",
-          "activity": 0.6,
+          "activity": 0.575,
           "variation": 0.4,
-          "kit": "crisp"
+          "kit": "crisp",
+          "sprinkle": 0.12
         },
         "sections": {
           "mode": "strong",
@@ -2709,7 +4622,26 @@
         "sectionTone": true,
         "counter": {
           "mode": "harmony",
-          "activity": 0.6
+          "activity": 0.54
+        },
+        "leadLeaps": 0.46,
+        "leadRepeat": 0.4,
+        "humanize": {
+          "timing": 5,
+          "velocity": 0.1,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.32,
+          "fast": 0.16,
+          "swell": 0.035
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.78,
+          "lead": 0.68,
+          "counter": 0.5,
+          "perc": 0.59
         }
       },
       "voices": {
@@ -2735,12 +4667,14 @@
         "progression": 11,
         "barsPerChord": 4,
         "padNotes": 4,
-        "leadActivity": 0.3,
+        "leadActivity": 0.28,
         "padWeights": {
           "sustain": 60,
           "pulse": 0,
           "arpeggio": 40,
-          "sequence": 0
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 100,
@@ -2760,12 +4694,47 @@
           "fire": 0.25,
           "wind": 0.1
         },
-        "playAmbience": true
+        "playAmbience": true,
+        "leadDensity": 0.07,
+        "leadLeaps": 0.24,
+        "leadRepeat": 0.48,
+        "humanize": {
+          "timing": 10,
+          "velocity": 0.08,
+          "detune": 2
+        },
+        "padMotion": {
+          "lean": 0.22,
+          "fast": 0.04,
+          "swell": 0.08
+        },
+        "volumes": {
+          "pad": 0.78,
+          "bass": 0.73,
+          "lead": 0.62,
+          "counter": 0.48,
+          "perc": 0.44
+        },
+        "ambienceVolume": 0.72
       },
       "voices": {
         "pad": "Soft Harp",
         "bass": "Dark Drone",
         "lead": "Ocarina"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "held-bass-glides": {
+            "enabled": true
+          },
+          "section-cadences": {
+            "enabled": false
+          },
+          "common-tone-bridges": {
+            "enabled": false
+          }
+        }
       }
     },
     {
@@ -2784,13 +4753,15 @@
         "progression": 16,
         "barsPerChord": 1,
         "padNotes": 4,
-        "leadActivity": 0.5,
-        "leadDensity": 0.4,
+        "leadActivity": 0.46,
+        "leadDensity": 0.34,
         "padWeights": {
-          "sustain": 20,
-          "pulse": 60,
-          "arpeggio": 20,
-          "sequence": 0
+          "sustain": 26,
+          "pulse": 52,
+          "arpeggio": 16,
+          "sequence": 0,
+          "rolled": 6,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 10,
@@ -2800,13 +4771,37 @@
         },
         "drums": {
           "style": "shaker",
-          "activity": 0.4,
-          "variation": 0.5
+          "activity": 0.36,
+          "variation": 0.485,
+          "sprinkle": 0.09
         },
         "swing": 0.3,
         "counter": {
           "mode": "answer",
-          "activity": 0.4
+          "activity": 0.34
+        },
+        "leadLeaps": 0.3,
+        "leadRepeat": 0.44,
+        "humanize": {
+          "timing": 11,
+          "velocity": 0.1,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.36,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
         }
       },
       "voices": {
@@ -2832,12 +4827,14 @@
         "progression": 1,
         "barsPerChord": 4,
         "padNotes": 3,
-        "leadActivity": 0.2,
+        "leadActivity": 0.18,
         "padWeights": {
           "sustain": 100,
           "pulse": 0,
           "arpeggio": 0,
-          "sequence": 0
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 100,
@@ -2851,17 +4848,53 @@
         "ambience": {
           "rain": 0.1
         },
-        "playAmbience": true
+        "playAmbience": true,
+        "leadDensity": 0.05,
+        "leadLeaps": 0.22,
+        "leadRepeat": 0.54,
+        "humanize": {
+          "timing": 10,
+          "velocity": 0.08,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.22,
+          "fast": 0.04,
+          "swell": 0.08
+        },
+        "volumes": {
+          "pad": 0.78,
+          "bass": 0.73,
+          "lead": 0.62,
+          "counter": 0.48,
+          "perc": 0.44
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "ambienceVolume": 0.72
       },
       "voices": {
         "pad": "Spore Haze",
         "bass": "Sub Bass",
         "lead": "Felt Piano"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "section-cadences": {
+            "enabled": false
+          },
+          "common-tone-bridges": {
+            "enabled": false
+          }
+        }
       }
     },
     {
       "name": "Seaside Hearth",
-      "category": "classics",
+      "category": "unsettling",
       "blurb": "A celesta carrying the tune over steady strings, never settling: suspended minor chords, the sea in the distance",
       "tags": [
         "dark-souls",
@@ -2880,13 +4913,15 @@
           "mode": "floating",
           "amount": 0.8
         },
-        "leadActivity": 0.85,
-        "leadDensity": 0.1,
+        "leadActivity": 0.78,
+        "leadDensity": 0.12,
         "padWeights": {
           "sustain": 100,
           "pulse": 0,
           "arpeggio": 0,
-          "sequence": 0
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 100,
@@ -2915,17 +4950,50 @@
         "playAmbience": true,
         "chordSpread": "open",
         "leadEnding": "open",
-        "leadRepeat": 0.35
+        "leadRepeat": 0.44,
+        "leadLeaps": 0.28,
+        "humanize": {
+          "timing": 9,
+          "velocity": 0.09,
+          "detune": 2
+        },
+        "padMotion": {
+          "lean": 0.22,
+          "fast": 0.04,
+          "swell": 0.08
+        },
+        "volumes": {
+          "pad": 0.78,
+          "bass": 0.73,
+          "lead": 0.62,
+          "counter": 0.48,
+          "perc": 0.44
+        },
+        "ambienceVolume": 0.72
       },
       "voices": {
         "pad": "Warm Strings",
         "bass": "Dark Drone",
         "lead": "Haunted Celesta"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "held-bass-glides": {
+            "enabled": true
+          },
+          "section-cadences": {
+            "enabled": false
+          },
+          "common-tone-bridges": {
+            "enabled": false
+          }
+        }
       }
     },
     {
       "name": "Drone and Drift",
-      "category": "night",
+      "category": "unsettling",
       "blurb": "The bass sits on one note while the chords wander above it; slow, pulling, never quite arriving",
       "tags": [
         "pedal",
@@ -2939,13 +5007,15 @@
         "progression": 15,
         "barsPerChord": 2,
         "padNotes": 4,
-        "leadActivity": 0.5,
+        "leadActivity": 0.46,
         "leadDensity": 0.1,
         "padWeights": {
           "sustain": 70,
           "pulse": 0,
           "arpeggio": 30,
-          "sequence": 0
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 100,
@@ -2969,12 +5039,42 @@
         "sections": {
           "mode": "gentle",
           "phrases": 4
+        },
+        "leadLeaps": 0.26,
+        "leadRepeat": 0.44,
+        "humanize": {
+          "timing": 9,
+          "velocity": 0.08,
+          "detune": 2
+        },
+        "padMotion": {
+          "lean": 0.22,
+          "fast": 0.04,
+          "swell": 0.08
+        },
+        "volumes": {
+          "pad": 0.78,
+          "bass": 0.73,
+          "lead": 0.62,
+          "counter": 0.48,
+          "perc": 0.44
         }
       },
       "voices": {
         "pad": "Velvet Pad",
         "bass": "Dark Drone",
         "lead": "Sine Whistle"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "section-cadences": {
+            "enabled": false
+          },
+          "common-tone-bridges": {
+            "enabled": false
+          }
+        }
       }
     },
     {
@@ -2993,13 +5093,15 @@
         "progression": 1,
         "barsPerChord": 1,
         "padNotes": 4,
-        "leadActivity": 0.6,
-        "leadDensity": 0.15,
+        "leadActivity": 0.56,
+        "leadDensity": 0.18,
         "padWeights": {
-          "sustain": 30,
-          "pulse": 40,
-          "arpeggio": 30,
-          "sequence": 0
+          "sustain": 36,
+          "pulse": 34,
+          "arpeggio": 22,
+          "sequence": 0,
+          "rolled": 8,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 40,
@@ -3009,15 +5111,38 @@
         },
         "drums": {
           "style": "brushes",
-          "activity": 0.3,
-          "variation": 0.5
+          "activity": 0.26,
+          "variation": 0.485,
+          "sprinkle": 0.09
         },
         "swing": 0.25,
         "chordBorrow": 0.4,
-        "leadRepeat": 0.3,
+        "leadRepeat": 0.42,
         "sections": {
           "mode": "gentle",
           "phrases": 4
+        },
+        "leadLeaps": 0.28,
+        "humanize": {
+          "timing": 12,
+          "velocity": 0.1,
+          "detune": 2
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.2
         }
       },
       "voices": {
@@ -3042,13 +5167,15 @@
         "progression": 10,
         "barsPerChord": 2,
         "padNotes": 3,
-        "leadActivity": 0.8,
-        "leadDensity": 0.15,
+        "leadActivity": 0.74,
+        "leadDensity": 0.18,
         "padWeights": {
-          "sustain": 40,
-          "pulse": 40,
+          "sustain": 42,
+          "pulse": 32,
           "arpeggio": 20,
-          "sequence": 0
+          "sequence": 0,
+          "rolled": 6,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 70,
@@ -3058,13 +5185,35 @@
         },
         "drums": {
           "style": "shaker",
-          "activity": 0.25,
-          "variation": 0.4
+          "activity": 0.21,
+          "variation": 0.4,
+          "sprinkle": 0.09
         },
         "leadScale": "pentatonic",
         "leadLeaps": 0.2,
-        "leadRepeat": 0.55,
-        "swing": 0.15
+        "leadRepeat": 0.58,
+        "swing": 0.15,
+        "humanize": {
+          "timing": 8,
+          "velocity": 0.08,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        }
       },
       "voices": {
         "pad": "Soft Keys",
@@ -3088,13 +5237,15 @@
         "progression": 1,
         "barsPerChord": 2,
         "padNotes": 3,
-        "leadActivity": 0.55,
+        "leadActivity": 0.5,
         "leadDensity": 0.1,
         "padWeights": {
           "sustain": 100,
           "pulse": 0,
           "arpeggio": 0,
-          "sequence": 0
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 100,
@@ -3115,7 +5266,7 @@
           "amount": 0.4
         },
         "leadEnding": "open",
-        "leadLeaps": 0.65,
+        "leadLeaps": 0.54,
         "sections": {
           "mode": "strong",
           "phrases": 2
@@ -3124,12 +5275,42 @@
         "ambience": {
           "wind": 0.15
         },
-        "playAmbience": true
+        "playAmbience": true,
+        "leadRepeat": 0.4,
+        "humanize": {
+          "timing": 9,
+          "velocity": 0.09,
+          "detune": 2
+        },
+        "padMotion": {
+          "lean": 0.22,
+          "fast": 0.04,
+          "swell": 0.08
+        },
+        "volumes": {
+          "pad": 0.78,
+          "bass": 0.73,
+          "lead": 0.62,
+          "counter": 0.48,
+          "perc": 0.44
+        },
+        "ambienceVolume": 0.72
       },
       "voices": {
         "pad": "Warm Strings",
         "bass": "Sub Bass",
         "lead": "Pan Flute"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "section-cadences": {
+            "enabled": false
+          },
+          "common-tone-bridges": {
+            "enabled": false
+          }
+        }
       }
     },
     {
@@ -3148,13 +5329,15 @@
         "progression": 16,
         "barsPerChord": 2,
         "padNotes": 3,
-        "leadActivity": 0.9,
-        "leadDensity": 0.1,
+        "leadActivity": 0.84,
+        "leadDensity": 0.12,
         "padWeights": {
-          "sustain": 20,
-          "pulse": 30,
-          "arpeggio": 50,
-          "sequence": 0
+          "sustain": 24,
+          "pulse": 24,
+          "arpeggio": 46,
+          "sequence": 0,
+          "rolled": 6,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 60,
@@ -3166,10 +5349,31 @@
           "style": "off"
         },
         "leadRepeat": 0.85,
-        "leadLeaps": 0.4,
+        "leadLeaps": 0.34,
         "chordColour": {
           "mode": "add6",
           "amount": 0.3
+        },
+        "humanize": {
+          "timing": 9,
+          "velocity": 0.09,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
         }
       },
       "voices": {
@@ -3180,7 +5384,7 @@
     },
     {
       "name": "Almost Home",
-      "category": "night",
+      "category": "unsettling",
       "blurb": "A minor-key tune that always stops one step short, over chords that stay suspended",
       "tags": [
         "unresolved",
@@ -3194,13 +5398,15 @@
         "progression": 17,
         "barsPerChord": 2,
         "padNotes": 3,
-        "leadActivity": 0.7,
+        "leadActivity": 0.64,
         "leadDensity": 0.1,
         "padWeights": {
           "sustain": 70,
           "pulse": 0,
           "arpeggio": 30,
-          "sequence": 0
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 100,
@@ -3210,8 +5416,9 @@
         },
         "drums": {
           "style": "heartbeat",
-          "activity": 0.2,
-          "variation": 0.3
+          "activity": 0.16,
+          "variation": 0.315,
+          "sprinkle": 0.06
         },
         "chordColour": {
           "mode": "floating",
@@ -3219,16 +5426,45 @@
         },
         "leadEnding": "open",
         "chordBorrow": 0.25,
-        "leadRepeat": 0.3,
+        "leadRepeat": 0.4,
         "sections": {
           "mode": "gentle",
           "phrases": 4
+        },
+        "leadLeaps": 0.26,
+        "humanize": {
+          "timing": 10,
+          "velocity": 0.08,
+          "detune": 2
+        },
+        "padMotion": {
+          "lean": 0.22,
+          "fast": 0.04,
+          "swell": 0.08
+        },
+        "volumes": {
+          "pad": 0.78,
+          "bass": 0.73,
+          "lead": 0.62,
+          "counter": 0.48,
+          "perc": 0.44
         }
       },
       "voices": {
         "pad": "Choir Ah",
         "bass": "Deep Throb",
         "lead": "Haunted Celesta"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "section-cadences": {
+            "enabled": false
+          },
+          "common-tone-bridges": {
+            "enabled": false
+          }
+        }
       }
     },
     {
@@ -3253,7 +5489,9 @@
           "sustain": 85,
           "pulse": 5,
           "arpeggio": 10,
-          "sequence": 0
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 80,
@@ -3261,7 +5499,7 @@
           "walking": 0,
           "drive": 0
         },
-        "leadActivity": 0.45,
+        "leadActivity": 0.42,
         "leadDensity": 0.1,
         "leadScale": "pentatonic",
         "sections": {
@@ -3283,15 +5521,41 @@
         },
         "playAmbience": true,
         "humanize": {
-          "timing": 8,
+          "timing": 10,
           "velocity": 0.1,
-          "detune": 4
-        }
+          "detune": 3
+        },
+        "leadLeaps": 0.28,
+        "leadRepeat": 0.44,
+        "padMotion": {
+          "lean": 0.22,
+          "fast": 0.04,
+          "swell": 0.08
+        },
+        "volumes": {
+          "pad": 0.78,
+          "bass": 0.73,
+          "lead": 0.62,
+          "counter": 0.48,
+          "perc": 0.44
+        },
+        "ambienceVolume": 0.72
       },
       "voices": {
         "pad": "CS-80 Brass",
         "bass": "Sub Bass",
         "lead": "Lament Lead"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "section-cadences": {
+            "enabled": false
+          },
+          "common-tone-bridges": {
+            "enabled": false
+          }
+        }
       }
     },
     {
@@ -3316,7 +5580,9 @@
           "sustain": 100,
           "pulse": 0,
           "arpeggio": 0,
-          "sequence": 0
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 100,
@@ -3324,16 +5590,17 @@
           "walking": 0,
           "drive": 0
         },
-        "leadActivity": 0.3,
-        "leadDensity": 0,
+        "leadActivity": 0.27,
+        "leadDensity": 0.06,
         "drums": {
           "style": "heartbeat",
-          "activity": 0.25,
-          "variation": 0.4
+          "activity": 0.21,
+          "variation": 0.4,
+          "sprinkle": 0.06
         },
         "counter": {
           "mode": "answer",
-          "activity": 0.3
+          "activity": 0.24
         },
         "chordColour": {
           "mode": "floating",
@@ -3349,13 +5616,44 @@
           "thunder": 0.3,
           "wind": 0.1
         },
-        "playAmbience": true
+        "playAmbience": true,
+        "leadLeaps": 0.26,
+        "leadRepeat": 0.46,
+        "humanize": {
+          "timing": 10,
+          "velocity": 0.08,
+          "detune": 2
+        },
+        "padMotion": {
+          "lean": 0.22,
+          "fast": 0.04,
+          "swell": 0.08
+        },
+        "volumes": {
+          "pad": 0.78,
+          "bass": 0.73,
+          "lead": 0.62,
+          "counter": 0.48,
+          "perc": 0.44
+        },
+        "ambienceVolume": 0.72
       },
       "voices": {
         "pad": "Night Glass",
         "bass": "Deep Throb",
         "lead": "Lament Lead",
         "counter": "CS-80 Brass"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "section-cadences": {
+            "enabled": false
+          },
+          "common-tone-bridges": {
+            "enabled": false
+          }
+        }
       }
     },
     {
@@ -3379,7 +5677,9 @@
           "sustain": 10,
           "pulse": 10,
           "arpeggio": 10,
-          "sequence": 70
+          "sequence": 70,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 10,
@@ -3389,18 +5689,19 @@
         },
         "drums": {
           "style": "electro",
-          "activity": 0.35,
-          "variation": 0.3,
-          "kit": "crisp"
+          "activity": 0.325,
+          "variation": 0.315,
+          "kit": "crisp",
+          "sprinkle": 0.12
         },
         "drumKit": {
           "room": 0.2
         },
-        "leadActivity": 0.7,
-        "leadDensity": 0.55,
+        "leadActivity": 0.64,
+        "leadDensity": 0.5,
         "counter": {
           "mode": "answer",
-          "activity": 0.4
+          "activity": 0.34
         },
         "sections": {
           "mode": "strong",
@@ -3413,15 +5714,38 @@
         "playAmbience": true,
         "humanize": {
           "timing": 4,
-          "velocity": 0.06,
-          "detune": 3
-        }
+          "velocity": 0.07,
+          "detune": 2
+        },
+        "leadLeaps": 0.36,
+        "leadRepeat": 0.48,
+        "padMotion": {
+          "lean": 0.32,
+          "fast": 0.16,
+          "swell": 0.035
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.78,
+          "lead": 0.68,
+          "counter": 0.5,
+          "perc": 0.59
+        },
+        "ambienceVolume": 0.66
       },
       "voices": {
         "pad": "Arp Pluck",
         "bass": "Seq Bass",
         "lead": "Ghost Sweep",
         "counter": "Glass Lead"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "tempo-effects": {
+            "enabled": true
+          }
+        }
       }
     },
     {
@@ -3445,7 +5769,9 @@
           "sustain": 60,
           "pulse": 0,
           "arpeggio": 30,
-          "sequence": 10
+          "sequence": 10,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 60,
@@ -3453,8 +5779,8 @@
           "walking": 0,
           "drive": 0
         },
-        "leadActivity": 0.5,
-        "leadDensity": 0.25,
+        "leadActivity": 0.46,
+        "leadDensity": 0.22,
         "chordColour": {
           "mode": "sus2",
           "amount": 0.3
@@ -3468,7 +5794,27 @@
           "waves": 0.35,
           "wind": 0.2
         },
-        "playAmbience": true
+        "playAmbience": true,
+        "leadLeaps": 0.3,
+        "leadRepeat": 0.44,
+        "humanize": {
+          "timing": 7,
+          "velocity": 0.08,
+          "detune": 2
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "ambienceVolume": 0.66
       },
       "voices": {
         "pad": "Neon Saw Pad",
@@ -3497,7 +5843,9 @@
           "sustain": 70,
           "pulse": 20,
           "arpeggio": 10,
-          "sequence": 0
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 70,
@@ -3507,14 +5855,15 @@
         },
         "drums": {
           "style": "downtempo",
-          "activity": 0.3,
+          "activity": 0.26,
           "variation": 0.4,
-          "kit": "crisp"
+          "kit": "crisp",
+          "sprinkle": 0.09
         },
         "drumKit": {
           "room": 0.2
         },
-        "leadActivity": 0.35,
+        "leadActivity": 0.32,
         "leadDensity": 0.1,
         "leadScale": "pentatonic",
         "sections": {
@@ -3525,6 +5874,25 @@
         "chordColour": {
           "mode": "sus4",
           "amount": 0.25
+        },
+        "leadLeaps": 0.24,
+        "leadRepeat": 0.48,
+        "humanize": {
+          "timing": 6,
+          "velocity": 0.07,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
         }
       },
       "voices": {
@@ -3554,7 +5922,9 @@
           "sustain": 40,
           "pulse": 40,
           "arpeggio": 10,
-          "sequence": 10
+          "sequence": 10,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 20,
@@ -3564,30 +5934,53 @@
         },
         "drums": {
           "style": "electro",
-          "activity": 0.4,
-          "variation": 0.3,
-          "kit": "crisp"
+          "activity": 0.36,
+          "variation": 0.315,
+          "kit": "crisp",
+          "sprinkle": 0.09
         },
         "drumKit": {
           "room": 0.2
         },
-        "leadActivity": 0.5,
-        "leadDensity": 0.3,
+        "leadActivity": 0.46,
+        "leadDensity": 0.28,
         "sections": {
           "mode": "strong",
           "phrases": 2
         },
         "sectionTone": true,
         "humanize": {
-          "timing": 3,
-          "velocity": 0.05,
-          "detune": 2
+          "timing": 4,
+          "velocity": 0.07,
+          "detune": 1
+        },
+        "leadLeaps": 0.32,
+        "leadRepeat": 0.46,
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
         }
       },
       "voices": {
         "pad": "Night Glass",
         "bass": "Neon Pulse Bass",
         "lead": "Soft Saw Lead"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "tempo-effects": {
+            "enabled": true
+          }
+        }
       }
     },
     {
@@ -3611,7 +6004,9 @@
           "sustain": 30,
           "pulse": 50,
           "arpeggio": 0,
-          "sequence": 20
+          "sequence": 20,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 0,
@@ -3621,16 +6016,16 @@
         },
         "drums": {
           "style": "drive",
-          "activity": 0.5,
-          "variation": 0.3,
-          "sprinkle": 0.15,
+          "activity": 0.46,
+          "variation": 0.315,
+          "sprinkle": 0.12,
           "kit": "crisp"
         },
         "drumKit": {
           "room": 0.2
         },
-        "leadActivity": 0.7,
-        "leadDensity": 0.5,
+        "leadActivity": 0.64,
+        "leadDensity": 0.44,
         "sections": {
           "mode": "strong",
           "phrases": 2
@@ -3638,12 +6033,26 @@
         "sectionTone": true,
         "counter": {
           "mode": "harmony",
-          "activity": 0.4
+          "activity": 0.34
         },
         "humanize": {
-          "timing": 3,
-          "velocity": 0.05,
-          "detune": 3
+          "timing": 4,
+          "velocity": 0.08,
+          "detune": 2
+        },
+        "leadLeaps": 0.38,
+        "leadRepeat": 0.44,
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
         }
       },
       "voices": {
@@ -3651,6 +6060,14 @@
         "bass": "Neon Pulse Bass",
         "lead": "Outrun Lead",
         "counter": "CS-80 Brass"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "tempo-effects": {
+            "enabled": true
+          }
+        }
       }
     },
     {
@@ -3674,7 +6091,9 @@
           "sustain": 55,
           "pulse": 35,
           "arpeggio": 10,
-          "sequence": 0
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
         },
         "bassWeights": {
           "whole": 40,
@@ -3684,15 +6103,16 @@
         },
         "drums": {
           "style": "downtempo",
-          "activity": 0.35,
+          "activity": 0.31,
           "variation": 0.4,
-          "kit": "crisp"
+          "kit": "crisp",
+          "sprinkle": 0.09
         },
         "drumKit": {
           "room": 0.2
         },
-        "leadActivity": 0.45,
-        "leadDensity": 0.2,
+        "leadActivity": 0.42,
+        "leadDensity": 0.18,
         "sections": {
           "mode": "strong",
           "phrases": 2
@@ -3701,12 +6121,185 @@
         "chordColour": {
           "mode": "add9",
           "amount": 0.3
+        },
+        "leadLeaps": 0.28,
+        "leadRepeat": 0.46,
+        "humanize": {
+          "timing": 6,
+          "velocity": 0.08,
+          "detune": 2
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
         }
       },
       "voices": {
         "pad": "Neon Saw Pad",
         "bass": "Neon Pulse Bass",
         "lead": "Outrun Lead"
+      }
+    },
+    {
+      "name": "Altman",
+      "category": "unsettling",
+      "blurb": "Fragile chamber-like strings over a low drone: chromatic sets, semitone friction and slow, unsteady glides",
+      "tags": [
+        "atonal",
+        "horror",
+        "strings",
+        "unsettling"
+      ],
+      "settings": {
+        "tonic": 2,
+        "mode": "Major-6",
+        "bpm": 54,
+        "meter": "4/4",
+        "progression": 28,
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "tonality": {
+          "mode": "atonal",
+          "separation": 1
+        },
+        "leadActivity": 0.46,
+        "leadDensity": 0.08,
+        "leadLeaps": 0.26,
+        "leadRepeat": 0.32,
+        "leadEnding": "open",
+        "chordColour": {
+          "mode": "flat2",
+          "amount": 0.65
+        },
+        "chordBorrow": 0,
+        "chordSpread": "close",
+        "padWeights": {
+          "sustain": 100,
+          "pulse": 0,
+          "arpeggio": 0,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0,
+          "drive": 0
+        },
+        "counter": {
+          "mode": "line",
+          "activity": 0.4
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "padMotion": {
+          "lean": 0.12,
+          "fast": 0,
+          "swell": 0.09
+        },
+        "humanize": {
+          "timing": 10,
+          "velocity": 0.09,
+          "detune": 4
+        },
+        "drums": {
+          "style": "off"
+        },
+        "volumes": {
+          "pad": 0.64,
+          "bass": 0.54,
+          "lead": 0.55,
+          "counter": 0.42,
+          "perc": 0.4
+        },
+        "voices": {
+          "lead": {
+            "octave": -1,
+            "wander": "off",
+            "chance": 0.3
+          },
+          "counter": {
+            "octave": -1,
+            "wander": "off",
+            "chance": 0.3
+          }
+        },
+        "wander": {
+          "period": 110,
+          "pan": {
+            "min": -0.35,
+            "max": 0.35
+          },
+          "volume": 0.1,
+          "filter": 0.18,
+          "pitch": 7,
+          "voices": {
+            "lead": true,
+            "counter": true,
+            "pad": true,
+            "bass": false,
+            "perc": false
+          },
+          "mode": "brownian"
+        },
+        "playAmbience": true,
+        "ambience": {
+          "wind": 0.12
+        },
+        "ambienceVolume": 0.48
+      },
+      "voices": {
+        "pad": "Warm Strings",
+        "bass": "Dark Drone",
+        "lead": "Haunted Viola",
+        "counter": "Heroic Strings"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "held-pad-glides": {
+            "enabled": true
+          },
+          "held-bass-glides": {
+            "enabled": true
+          },
+          "melodic-slides": {
+            "enabled": true
+          },
+          "pad-pitch-motion": {
+            "enabled": true
+          },
+          "bass-pitch-motion": {
+            "enabled": true
+          },
+          "note-resolution": {
+            "enabled": false
+          },
+          "joint-counterpoint": {
+            "enabled": false
+          },
+          "section-cadences": {
+            "enabled": false
+          },
+          "common-tone-bridges": {
+            "enabled": false
+          },
+          "section-suspensions": {
+            "enabled": false
+          }
+        }
       }
     }
   ]

@@ -138,12 +138,16 @@ export function diatonicChord(scale, degree, size = 3, colour = 'plain') {
     const root = (degree - 1) % n;
     if (colour === 'add9' && size < 5) offsets.push(at(root + 8));
     if (colour === 'add6' && size < 5) offsets.push(at(root + 5));
-    return offsets.sort((a, b) => a - b);
+    if(colour==='flat2')offsets.push(at(root)+13); // Keep the third/fifth; add the chromatic minor ninth.
+    if(colour==='major7'){
+        if(size>=4)offsets[3]=at(root)+11;else offsets.push(at(root)+11);
+    }
+    return [...new Set(offsets)].sort((a, b) => a - b);
 }
 
 /** The chord colours: the id and what the settings panel calls it. */
 export const CHORD_COLOURS = {
-    plain: 'Plain (major / minor)', sus2: 'Suspended 2nd', sus4: 'Suspended 4th', floating: 'Floating (sus2 or sus4)', add9: 'Added 9th', add6: 'Added 6th',
+    plain: 'Plain (major / minor)', sus2: 'Suspended 2nd', sus4: 'Suspended 4th', floating: 'Floating (sus2 or sus4)', add9: 'Added 9th', add6: 'Added 6th', flat2: 'Flat 2nd / minor 9th clash', major7: 'Chromatic major 7th',
 };
 
 const TRIAD_SUFFIX = {

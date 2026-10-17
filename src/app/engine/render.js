@@ -1,3 +1,4 @@
+import {joinHeldNotes} from '../composition/heldGlides';
 // Renders the piece to a WAV file (or, as 16-bit PCM chunks, to anything else), faster than real time: the plan Play
 // would start with (Generator.planner) booked onto fresh Instruments - the
 // current sounds, edits included - and the ambient bed in an
@@ -47,7 +48,7 @@ const until = async (condition, ms) => {
 // (With `bars`, each bar's chord, tempo, section and events too, for drawing the plan.)
 // Every audible note from bar 0 until `seconds`, in seconds, and the
 // section tone's changes ({ time, tone, glide: seconds of the bar }).
-function planNotes(gen, audible, seconds, ending, bars = null) {
+export function planNotes(gen, audible, seconds, ending, bars = null) {
     const planner = gen.planner();
     const notes = [];
     const tones = [];
@@ -80,12 +81,12 @@ function planNotes(gen, audible, seconds, ending, bars = null) {
         }
         planned.events.forEach((e) => {
             if (audible[e.role]) {
-                notes.push({ role: e.role, midi: e.midi, time: time + e.beat * unit, duration: e.length * unit, velocity: e.velocity, detune: e.detune });
+                notes.push({ bar,section:planned.state.phrase.section?.start,ending:planned.ending,role: e.role, midi: e.midi, time: time + e.beat * unit, duration: e.length * unit, velocity: e.velocity, detune: e.detune, expression: e.expression });
             }
         });
         time += planner.meter.units * unit;
     }
-    return { notes: notes.sort((a, b) => a.time - b.time), tones };
+    return { notes: joinHeldNotes(notes,{pad:gen.heldPadGlides===true,bass:gen.heldBassGlides===true,voices:Object.fromEntries(Object.keys(gen.roles).map(role=>[role,gen.roles[role].instrument?.preset])),legacy:gen.settings.generation==='legacy'}).sort((a,b)=>a.time-b.time), tones };
 }
 
 // The section tone's automation for a chunk starting at `from`: as in
@@ -214,6 +215,7 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
                 } else {
                     inst.connect(gain);
                 }
+                inst.tempoTailReserve = gen.tempoEffects === true && gen.settings.generation !== 'legacy';
                 // slow pan / volume wander after the mixer, filter and pitch on the sound
                 // (wander.js); the render starts `from` seconds into the piece
                 const wander = new RoleWander(ctx, role, { offset: from, smooth: false });
@@ -240,7 +242,7 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
         const to = end + (last ? 0 : CROSSFADE);
         for (let i = first; i < notes.length && notes[i].time < to; i++) {
             const n = notes[i];
-            if (n.time >= from) instruments[n.role].scheduleNote(n.midi, n.time - from, n.duration, n.velocity, n.detune);
+            if (n.time >= from) instruments[n.role].scheduleNote(n.midi, n.time - from, n.duration, n.velocity, n.detune, n.expression);
         }
         if (Object.values(ambience).some((level) => level > 0)) {
             const bed = new Ambience({ context: ctx, seed: 1, offset: from });

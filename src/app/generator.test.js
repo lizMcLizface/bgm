@@ -58,6 +58,18 @@ vi.mock('./engine/drumKit', () => ({ default: class {
 
 import Generator from './Generator';
 
+test('optional rulebook tracing records actual borrowing without changing notes or the baseline chord shape',()=>{
+    const g=new Generator({...defaultSettings(),seed:42,chordBorrow:1,sections:{mode:'gentle',phrases:2}});
+    const baseline=g.planner(),traced=g.planner();traced.rulebookTrace=true;
+    for(let bar=0;bar<64;bar++){
+        baseline.planBar(bar);traced.planBar(bar);const a=baseline.plan.get(bar),b=traced.plan.get(bar),{provenance,...chord}=b.chord;
+        expect(chord).toEqual(a.chord);expect(b.events).toEqual(a.events);expect(provenance).toBeTruthy();
+    }
+    expect(traced.buildChord(traced.homeMusic(),'I','plain',true).provenance.borrowed).toBe(false);
+    expect(traced.buildChord(traced.homeMusic(),'IV','plain',true).provenance.borrowed).toBe(true);
+    expect(traced.planner().rulebookTrace).toBe(true);
+});
+
 test('developed strategies preserve actual forecasts, theme memory and restored boundary state',async()=>{
     const {SCENES,sceneSettings,sceneSlug}=await import('./scenes');
     for(const preset of ['open-mic-pad','deep-night','replicant-blues','oxygen-debt','fireside-folk']){
@@ -922,10 +934,25 @@ test('Latest plans and offline planners agree, remain distinct from Original, an
     expect(play(drums,32).map(b=>b.events.filter(e=>e.role!=='perc'))).toEqual(latestBars.map(b=>b.events));
 });
 
+test('per-note expression preserves written events, follows planner copies and stays out of Original', () => {
+    const settings={...defaultSettings(),seed:42,leadActivity:1,sections:{mode:'off',phrases:4}};
+    const g=new Generator(settings),expressive=g.planner(),plain=g.planner({noteExpression:false,noteConnection:false,gateEnvelopes:false});
+    let count=0;
+    for(let bar=0;bar<16;bar++){
+        expressive.planBar(bar);plain.planBar(bar);
+        const events=expressive.plan.get(bar).events;
+        count+=events.filter(e=>e.expression).length;
+        expect(events.map(({expression,...e})=>e)).toEqual(plain.plan.get(bar).events);
+    }
+    expect(count).toBeGreaterThan(0);expect(plain.planner().noteExpression).toBe(false);
+    const original=new Generator({...settings,generation:'legacy'}).planner();original.planBar(0);
+    expect(original.plan.get(0).events.every(e=>!e.expression)).toBe(true);
+});
+
 test('previous Latest reference for ensemble comparisons', () => {
     const fingerprints=['4/4','6/8'].map((meter,i)=>{
         const gen=new Generator({...defaultSettings(),generation:'latest',seed:741+i,meter,leadActivity:.8,drums:{style:'lofi',activity:.5,variation:.5,sprinkle:.35,kit:'felt'}});
-        gen.rhythmGrammar=false;gen.ensembleCoordination=false;gen.formDevelopment=false;gen.themeDevelopment=false;gen.phraseSearch=false;gen.longPhrases=false;gen.contrastPhrases=false;gen.reset();
+        gen.gateEnvelopes=false;gen.noteConnection=false;gen.heldExpression=false;gen.noteExpression=false;gen.rhythmGrammar=false;gen.ensembleCoordination=false;gen.formDevelopment=false;gen.themeDevelopment=false;gen.phraseSearch=false;gen.longPhrases=false;gen.contrastPhrases=false;gen.reset();
         let h=2166136261;for(const c of JSON.stringify(play(gen,32).map(b=>b.events)))h=Math.imul(h^c.charCodeAt(0),16777619);
         return(h>>>0).toString(16);
     });
@@ -1190,4 +1217,135 @@ test('parent chord labels use seven degrees, selected colours and Original stay 
     g.set('harmonyScale','selected');const selected=g.buildChord(music,'vi');expect(selected.root).toBe('C');expect(selected.harmonyPcs).toBeUndefined();
     g.set('generation','legacy');g.set('harmonyScale','auto');expect(g.buildChord(music,'vi')).toEqual(selected);
     g.set('generation','latest');g.set('harmonyScale','minor');expect(g.buildChord({...music,mode:'Pentatonic-5'},'I').pitchClasses).toEqual([0,3,7]);
+});
+
+test('held wind expression copies independently and preserves written notes and Original',()=>{
+    const settings={...defaultSettings(),seed:42,leadActivity:1,sections:{mode:'off',phrases:4}};
+    const g=new Generator(settings);g.grooveVoices={lead:{name:'Reed Lead',preset:{vibratoDepth:0}},counter:{name:'Reed Lead'},pad:{name:'Piano'},bass:{name:'Chip'}};
+    const held=g.planner({noteExpression:false}),plain=g.planner({noteExpression:false,heldExpression:false,noteConnection:false,gateEnvelopes:false});
+    let count=0;
+    for(let bar=0;bar<16;bar++) { held.planBar(bar);plain.planBar(bar);const events=held.plan.get(bar).events;
+        count+=events.filter(e=>e.expression?.breathDepth).length;
+        expect(events.map(({expression,...e})=>e)).toEqual(plain.plan.get(bar).events);
+    }
+    expect(count).toBeGreaterThan(0);expect(plain.planner().heldExpression).toBe(false);
+    const original=new Generator({...settings,generation:'legacy'});original.grooveVoices=g.grooveVoices;
+    for(let bar=0;bar<8;bar++) {original.planBar(bar);expect(original.plan.get(bar).events.every(e=>!e.expression)).toBe(true);}
+});
+
+test('connected wind phrases are note-local, copy their permission and never alter Original',()=>{
+    const g=new Generator({...defaultSettings(),seed:42,leadActivity:1,sections:{mode:'off',phrases:4}});
+    g.grooveVoices={lead:{name:'Reed Lead'},counter:{name:'Soft Flute'},pad:{name:'Piano'},bass:{name:'Chip'}};
+    const enabled=g.planner({noteExpression:false,heldExpression:false}),disabled=g.planner({noteExpression:false,heldExpression:false,noteConnection:false,gateEnvelopes:false});
+    let count=0;
+    for(let bar=0;bar<16;bar++) {enabled.planBar(bar);disabled.planBar(bar);const events=enabled.plan.get(bar).events;
+        count+=events.filter(e=>e.expression?.connected).length;
+        expect(events.map(({expression,...e})=>e)).toEqual(disabled.plan.get(bar).events);
+    }
+    expect(count).toBeGreaterThan(0);expect(disabled.planner().noteConnection).toBe(false);
+    const legacy=new Generator({...defaultSettings(),generation:'legacy'});legacy.grooveVoices=g.grooveVoices;
+    legacy.planBar(0);expect(legacy.plan.get(0).events.every(e=>!e.expression)).toBe(true);
+});
+
+test('timing permissions are independent, use felt BPM in compound meter and bypass Original',()=>{
+ const settings={...defaultSettings(),seed:42,meter:'6/8',bpm:90,leadActivity:1,sections:{mode:'off',phrases:4}};
+ const g=new Generator(settings);g.grooveVoices={lead:{name:'Reed Lead'},counter:{name:'Flute'},pad:{name:'Piano'},bass:{name:'Chip'}};
+ const on=g.planner({tempoEffects:true,gateEnvelopes:true}),off=g.planner({tempoEffects:false,gateEnvelopes:false});
+ let count=0;const plain=events=>events.map(({expression,...e})=>e);
+ for(let bar=0;bar<8;bar++) {on.planBar(bar);off.planBar(bar);const events=on.plan.get(bar).events;
+  expect(plain(events)).toEqual(plain(off.plan.get(bar).events));
+  for(const event of events.filter(e=>e.role!=='perc')) {expect(event.expression.tempoBeat).toBeCloseTo(60/on.plan.get(bar).bpm);count++;}
+ }
+ expect(count).toBeGreaterThan(0);expect(on.planner().tempoEffects).toBe(true);expect(off.planner().gateEnvelopes).toBe(false);
+ on.endBar=8;on.planBar(8);expect(on.plan.get(8).events.filter(e=>e.role!=='perc').every(e=>e.expression?.tempoBeat===60/on.plan.get(8).bpm)).toBe(true);
+ const original=new Generator({...settings,generation:'legacy'});original.tempoEffects=true;original.planBar(0);
+ expect(original.plan.get(0).events.every(e=>!e.expression)).toBe(true);
+});
+
+test('untouched presets retain their envelope tails; fitting requires explicit opt-in',()=>{
+ const g=new Generator({...defaultSettings(),seed:42,leadActivity:1,sections:{mode:'off',phrases:4}});
+ g.grooveVoices={lead:{name:'Reed Lead'},counter:{name:'Flute'},pad:{name:'Soft Pad'},bass:{name:'Bass'}};
+ const untouched=g.planner(),enabled=g.planner({gateEnvelopes:true});let fitted=0;
+ for(let bar=0;bar<8;bar++) {untouched.planBar(bar);enabled.planBar(bar);
+  expect(untouched.plan.get(bar).events.every(e=>!e.expression?.gateAware)).toBe(true);
+  fitted+=enabled.plan.get(bar).events.filter(e=>e.expression?.gateAware).length;
+ }
+ expect(fitted).toBeGreaterThan(0);
+});
+
+test('slides copy independently, preserve the written score and bypass Original',()=>{
+ const settings={...defaultSettings(),seed:42,leadActivity:1,leadDensity:1,padWeights:{sustain:1},sections:{mode:'off',phrases:4}};
+ const g=new Generator(settings),on=g.planner({noteSlides:true,padPitchMotion:true,bassPitchMotion:true,chordSlides:true}),off=g.planner({noteSlides:false,chordSlides:false});let lead=0,pad=0;
+ const plain=events=>events.map(({expression,...e})=>e);
+ for(let bar=0;bar<16;bar++){on.planBar(bar);off.planBar(bar);const events=on.plan.get(bar).events;
+  expect(plain(events)).toEqual(plain(off.plan.get(bar).events));
+  lead+=events.filter(e=>e.role==='lead'&&e.expression?.pitchMotion).length;pad+=events.filter(e=>e.role==='pad'&&e.expression?.slideFromMidi!==undefined).length;
+  const groups=new Map();for(const e of events.filter(e=>e.role==='pad'&&e.expression?.slideFromMidi!==undefined))groups.set(e.beat,(groups.get(e.beat)||0)+1);expect([...groups.values()].every(n=>n===1)).toBe(true);
+ }
+ expect(lead).toBeGreaterThan(0);expect(pad).toBeGreaterThan(0);expect(on.planner().noteSlides).toBe(true);expect(on.planner().padPitchMotion).toBe(true);expect(on.planner().bassPitchMotion).toBe(true);expect(off.planner().chordSlides).toBe(false);
+ const legacy=new Generator({...settings,generation:'legacy'});legacy.noteSlides=true;legacy.chordSlides=true;legacy.planBar(0);expect(legacy.plan.get(0).events.every(e=>!e.expression)).toBe(true);
+});
+
+test('held-glide live booking joins the same notes as the shared renderer interpretation and restarts after seeking',async()=>{
+ const {joinHeldNotes}=await import('./composition/heldGlides');
+ const g=new Generator({...defaultSettings(),bpm:60,sections:{mode:'off',phrases:4}});g.heldBassGlides=true;g.AC.currentTime=0;
+ g.roles.bass.instrument.preset={gainSustain:.8};g.ensurePlanned=()=>{};g.applyTone=()=>{};g.currentBar=0;g.plan=new Map();
+ const notes=[];for(let bar=0;bar<6;bar++){
+  const event={role:'bass',midi:36+[0,5,2,0,5,2][bar],beat:0,length:3.95,velocity:.7,detune:0};
+  g.plan.set(bar,{bar,bpm:60,events:[event],state:{phrase:{section:{start:0}}}});
+  notes.push({...event,time:bar*4,duration:3.95,bar,section:0});
+ }
+ const booked=[];g.roles.bass.instrument.scheduleNote=(midi,time,duration,velocity,detune,expression)=>booked.push({midi,time,duration,expression});
+ const expected=joinHeldNotes(notes,{bass:true,voices:g.grooveVoiceSnapshot()});
+ for(let bar=0;bar<6;bar++)g.onBeat({bar,beatInBar:0,time:10+bar*4,secondsPerBeat:1});
+ const rounded=value=>JSON.parse(JSON.stringify(value,(_,v)=>typeof v==='number'?Math.round(v*1e8)/1e8:v));
+ expect(rounded(booked.map(n=>({midi:n.midi,time:n.time-10,duration:n.duration,expression:n.expression})))).toEqual(rounded(expected.map(n=>({midi:n.midi,time:n.time,duration:n.duration,expression:n.expression}))));
+ expect(booked).toHaveLength(2);expect(g.planner().heldBassGlides).toBe(true);expect(g.planner().heldPadGlides).toBeUndefined();
+ // Seeking into the middle of a former chain gives the destination a fresh head.
+ for(const p of g.plan.values())if(p.bar>=2)for(const e of p.events)e.booked=false;
+ g.currentBar=2;g.onBeat({bar:2,beatInBar:0,time:40,secondsPerBeat:1});expect(booked.at(-1).midi).toBe(38);expect(booked.at(-1).time).toBe(40);
+ const stopped=vi.fn();g.roles.bass.instrument.silence=stopped;g.heldResetBar=3;g.currentBar=3;
+ g.onBeat({bar:3,beatInBar:0,time:44,secondsPerBeat:1});expect(stopped).toHaveBeenCalledWith(44);
+ g.settings.generation='legacy';expect(g.heldGlideBookings(3).size).toBe(0);
+});
+
+test('early notes after a held reset wait until the old voice is cancelled at the boundary',()=>{
+ const g=new Generator({...defaultSettings(),bpm:60,sections:{mode:'off',phrases:4}});g.AC.currentTime=0;g.currentBar=0;g.ensurePlanned=()=>{};g.applyTone=()=>{};
+ const early={role:'bass',midi:41,beat:-.03,length:3.9,velocity:.7};
+ g.plan=new Map([[0,{bar:0,bpm:60,events:[],state:{phrase:{}}}],[1,{bar:1,bpm:60,events:[early],state:{phrase:{}}}]]);
+ g.heldActiveRoles=new Set(['bass']);g.heldResetBar=1;const sequence=[];
+ g.roles.bass.instrument.silence=time=>sequence.push(['cancel',time]);g.roles.bass.instrument.scheduleNote=(midi,time)=>sequence.push(['attack',time]);
+ g.onBeat({bar:0,beatInBar:3,time:13,secondsPerBeat:1});expect(early.booked).toBeUndefined();
+ g.onBeat({bar:1,beatInBar:0,time:14,secondsPerBeat:1});expect(sequence).toEqual([['cancel',14],['attack',14]]);
+ g.loop={from:0,to:1,dirty:false};g.heldResetBar=2;g.transport.rebase=()=>{};g.loopBack();expect(g.heldResetBar).toBe(0);
+});
+
+test('named wind colour is applied in Latest, restored on generation changes, and respects custom patches',()=>{
+ const g=new Generator(defaultSettings()),apply=vi.fn();g.roles.lead.instrument.applyPreset=apply;
+ g.loadRolePreset('lead','Pan Flute');expect(apply.mock.calls.at(-1)[0].breathAmount).toBeGreaterThan(0);expect(apply.mock.calls.at(-1)[0].noiseMix).toBe(0);
+ g.settings.generation='legacy';g.refreshStringPatches();expect(apply.mock.calls.at(-1)[0].breathAmount).toBeUndefined();
+ g.settings.generation='latest';g.refreshStringPatches();expect(apply.mock.calls.at(-1)[0].breathAmount).toBeGreaterThan(0);
+ const custom={vcoType:'sine',gainSustain:.7};g.loadRolePreset('lead','Pan Flute',custom);expect(apply.mock.calls.at(-1)[0]).toBe(custom);
+});
+
+
+test('unresolved progression roots survive section arrivals, drift and requested endings without a tonic',()=>{
+ for(const progression of [25,26,27,28,29,30])for(const mode of ['Major-1','Major-6','Pentatonic-1']){
+  const settings={...defaultSettings(),seed:42,progression,mode,sections:{mode:'strong',phrases:2},sectionTone:true};
+  settings.drift={...settings.drift,mode:'wandering',progressionChance:1,keyChance:0,modeChance:0};
+  const g=new Generator(settings);g.rulebookTrace=true;g.reset();g.endBar=60;
+  for(let bar=0;bar<64;bar++){g.planBar(bar);const b=g.plan.get(bar);expect(b.chord.pitchClasses[0]).not.toBe(b.music.tonic);expect(b.chord.cadence).toBeUndefined();expect(b.music.progression).toBeGreaterThanOrEqual(25);}
+ }
+});
+test('Altman uses chromatic pitch sets and restores its exact continuation and forecasts',async()=>{
+ const {sceneBySlug,sceneSettings}=await import('./scenes'),{applyBook,inheritBook}=await import('./rulebook/session');
+ const scene=sceneBySlug('altman'),settings=sceneSettings(scene,42);settings.playAmbience=false;settings.ambience=Object.fromEntries(Object.keys(settings.ambience).map(k=>[k,0]));const g=new Generator(settings);applyBook(g,inheritBook(scene.rulebook));g.reset();const copy=g.planner();
+ const pcs=new Set();for(let bar=0;bar<96;bar++){g.planBar(bar);copy.planBar(bar);const b=g.plan.get(bar);expect(copy.plan.get(bar)).toEqual(b);expect(b.chord.tonality.mode).toBe('atonal');b.chord.pitchClasses.forEach(p=>pcs.add(p));expect(b.chord.cadence).toBeUndefined();expect(b.events.every(e=>[e.midi,e.beat,e.length,e.velocity].every(Number.isFinite)&&e.length>0)).toBe(true);}
+ expect(pcs.size).toBe(12);expect(g.heldBassGlides).toBe(true);expect(g.noteSlides).toBe(true);
+ const forecast=g.melodyHarmony(96,g.plan.get(95).nextMusic,g.plan.get(95).upcoming,8,g.plan.get(95).bpm);
+ for(let bar=96;bar<104;bar++)g.planBar(bar);for(const h of forecast)expect(h.chord).toEqual(g.plan.get(h.bar).chord);
+});
+test('bitonality preserves the backing and transposes actual melodic events across phrase boundaries',()=>{
+ const settings={...defaultSettings(),seed:42,leadActivity:1,counter:{mode:'line',activity:1},sections:{mode:'gentle',phrases:2}},a=new Generator(settings),b=new Generator({...settings,tonality:{mode:'bitonal',separation:1}});a.reset();b.reset();
+ for(let bar=0;bar<48;bar++){a.planBar(bar);b.planBar(bar);const x=a.plan.get(bar),y=b.plan.get(bar);expect(y.chord.tonality.mode).toBe('bitonal');expect(y.events.map(({midi,expression,...event})=>({...event,midi:midi-(['lead','counter'].includes(event.role)?1:0),...(expression?{expression:{...expression,...(expression.connectionFrom!==undefined?{connectionFrom:expression.connectionFrom-(['lead','counter'].includes(event.role)?1:0)}:{})}}:{})}))).toEqual(x.events);}
 });

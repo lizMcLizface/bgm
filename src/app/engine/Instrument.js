@@ -9,6 +9,7 @@ import * as Nodes from '../../nodes';
 import MonoSynth from '../../components/MonoSynth';
 import { audioContext } from '../../audio/context';
 import { CHROMATIC } from '../../theory/notes';
+import { scheduleEffectTiming } from './tempoEffects';
 import PRESET_DEFAULTS from './presetDefaults';
 import { gainEnvelopePoints, filterEnvelopeEvents, releasePoints, cancelAndHold } from './envelope';
 import { minTime } from '../../util/util';
@@ -16,6 +17,7 @@ import { wanderLfo } from './wander';
 import { MIN_WET } from '../../nodes/reverb';
 import { SendReverb } from '../../nodes/sharedReverb';
 import { blendPresets } from './morph';
+import { cleanExpression, expressiveEnvelope, expressiveSource, breathEnvelope, gateEnvelope } from './noteExpression';
 
 // A held note is booked as if it lasted this long; its release replaces
 // the tail when the key comes up.
@@ -274,6 +276,7 @@ class Instrument {
     applyPreset(preset) {
         const next = { ...PRESET_DEFAULTS, ...preset };
         Object.keys(next).forEach((key) => this.set(key, next[key]));
+        if (this.tempoTimingTouched) scheduleEffectTiming(this, 0, this.AC.currentTime);
     }
 
     /**
@@ -453,8 +456,8 @@ class Instrument {
         const impulse = this.reverb.node.buffer;
         const reverb = p.reverbAmount >= MIN_WET && !this.reverb.shared ? (impulse ? impulse.duration : 10) : 0;
         return reverb
-            + echoes(p.delayAmount, p.delayTime, p.delayFeedback)
-            + echoes(p.pingPongAmount, p.pingPongDelayTime, p.pingPongFeedback)
+            + echoes(p.delayAmount, (this.tempoTailReserve ? 1 : p.delayTime), p.delayFeedback)
+            + echoes(p.pingPongAmount, (this.tempoTailReserve ? 1 : p.pingPongDelayTime), p.pingPongFeedback)
             + 0.5;
     }
 
@@ -557,20 +560,22 @@ class Instrument {
     }
 
     // What MonoSynth.scheduleNote needs besides the gain envelope.
-    notePlan(midi, velocity, duration, gainPoints) {
+    notePlan(midi, velocity, duration, gainPoints, filterEnv = this.filterEnv) {
         const offset = this.filterOffset(midi, velocity);
-        const filterEvents = filterEnvelopeEvents(this.filterEnv, duration)
+        const filterEvents = filterEnvelopeEvents(filterEnv, duration)
             .map((e) => (offset ? { ...e, value: e.value + offset } : e));
         return {
             gainPoints,
+            voiceColour:{breathAmount:this.preset.breathAmount,formantAmount:this.preset.formantAmount,formantVowel:this.preset.formantVowel,formantShift:this.preset.formantShift},
             piano: this.preset.stringModel === 'piano' ? { type: this.preset.pianoType, decay: this.preset.pianoDecay,
                 brightness: this.preset.pianoBrightness, hammer: this.preset.pianoHammer, unison: this.preset.pianoUnison,
-                velocity, sustain: this.preset.pianoSustain, seed: this.preset.pianoSeed } : null,
+                velocity, resonance:this.preset.pianoResonance, sustain: this.preset.pianoSustain, seed: this.preset.pianoSeed } : null,
             string: this.preset.stringModel === 'plucked' ? { decay: this.preset.stringDecay, damping: this.preset.stringDamping,
-                position: this.preset.stringPosition, body: this.preset.stringBody, seed: this.preset.stringSeed } : null,
+                position: this.preset.stringPosition, body: this.preset.stringBody, resonance:this.preset.stringResonance,bodyType:this.preset.stringBodyType, seed: this.preset.stringSeed } : null,
             filterEvents,
             filterOffset: offset,
             portamentoSpeed: this.polyphony === 1 ? this.preset.portamentoSpeed : 0,
+            duration,
             pitchEnv: { amount: this.preset.pitchEnvAmount || 0, decay: this.preset.pitchEnvDecay || 0 },
         };
     }
@@ -608,14 +613,26 @@ class Instrument {
      * @param {number} duration - seconds until release starts
      * @param {number} [velocity=0.8] - 0..1, scales envelope levels
      * @param {number} [detune=0] - cents, for humanized pitch
+     * @param {object} [rawExpression] - bounded per-note envelope and tone overrides
      */
-    scheduleNote(midi, startTime, duration, velocity = 0.8, detune = 0) {
-        const { points, releaseEnd } = gainEnvelopePoints(this.gainEnv, velocity, duration);
+    scheduleNote(midi, startTime, duration, velocity = 0.8, detune = 0, rawExpression = null) {
+        const expression = cleanExpression(rawExpression), shaped = expressiveEnvelope(this.gainEnv, duration, expression);
+        const { points, releaseEnd } = gainEnvelopePoints(shaped.env, velocity, shaped.duration);
+        if (this.delay) scheduleEffectTiming(this, expression?.tempoBeat ?? 0, startTime);
 
         const { index, steal } = this.allocateVoice(startTime);
         const info = this.noteInfo(midi);
         if (detune) info.freq *= Math.pow(2, detune / 1200);
-        this.voices[index].scheduleNote(info, this.notePlan(midi, velocity, duration, points), startTime, steal);
+        const plan=expressiveSource(this.notePlan(midi, velocity, shaped.duration, breathEnvelope(points, shaped.duration, expression), gateEnvelope(this.filterEnv,shaped.duration,expression)), expression);
+        if(expression?.slideFromMidi !== null && expression?.slideFromMidi !== undefined) {
+            const from=this.noteInfo(expression.slideFromMidi).freq,to=this.noteInfo(midi).freq;
+            plan.slide={cents:Math.max(-2400,Math.min(2400,1200*Math.log2(from/to))),seconds:Math.max(.005,Math.min(expression.slideSeconds,shaped.duration*.8))};
+        }
+        if(expression?.pitchTargets) {
+            const base=this.noteInfo(midi).freq;
+            plan.pitchPath=[{time:0,cents:0},...expression.pitchTargets.filter(p=>p.time>0&&p.time<=shaped.duration).map(p=>({time:p.time,cents:Math.max(-2400,Math.min(2400,1200*Math.log2(this.noteInfo(p.midi).freq/base)))}))];
+        }
+        this.voices[index].scheduleNote(info, plan, startTime, steal);
         this.busyUntil[index] = startTime + releaseEnd;
         this.soundUntil = Math.max(this.soundUntil, startTime + releaseEnd);
         this.quietAt = Infinity;
@@ -667,8 +684,10 @@ class Instrument {
 
     /** Fades every voice out quickly, cancelling anything booked after `time`. */
     silence(time = this.AC.currentTime) {
+        if (this.tempoTimingTouched) scheduleEffectTiming(this, 0, time);
         this.voices.forEach((synth, i) => {
             synth.stopStrings?.(time + .3);
+            synth.clearHeldExpression?.(time);
             const gain = synth.gain.getNode().gain;
             cancelAndHold(gain, time);
             gain.setTargetAtTime(0, time, 0.05);

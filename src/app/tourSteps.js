@@ -24,10 +24,10 @@ export const STAGES = [
     { id: 'basics', name: 'The basics' },
     { id: 'ambience', name: 'Voices & ambience' },
     { id: 'music', name: 'Music' },
-    { id: 'instruments', name: 'Instruments' },
-    { id: 'arrangement', name: 'Arrangement' },
+    { id: 'instruments', name: 'Instruments & playing rules' },
+    { id: 'arrangement', name: 'Composition rules' },
     { id: 'evolution', name: 'Evolution' },
-    { id: 'feel', name: 'Colour, feel & wander' },
+    { id: 'feel', name: 'Harmony, feel & wander' },
     { id: 'randomize', name: 'Randomize' },
 ];
 export const LAST_STAGE = STAGES.length - 1;
@@ -67,7 +67,7 @@ export const TOUR_STEPS = [
         stage: 0,
         selector: '.gen-timeline',
         title: 'The timeline',
-        text: 'The chords being played and, in a row per voice, the notes each voice plays. The music is planned a few bars ahead, so what you see is what you will hear.',
+        text: 'The chords being played and, in a row per voice, the notes each voice plays. The music is planned a few bars ahead, so what you see is what you will hear. Hover a chord for its recorded explanation, or click/tap to keep it open. Escape or × closes it. Explore this rule takes you to the matching card in the book.',
     },
     {
         id: 'tools',
@@ -75,6 +75,10 @@ export const TOUR_STEPS = [
         selector: '.gen-header-tools',
         title: 'Volume, look and options',
         text: 'The master volume and the look menu (theme and the fluid background). The speaker button shows how hard the audio engine is working - if the sound crackles, open it for a bigger buffer or a lighter reverb. The ⚙ menu copies a link to the music, sets a sleep timer, saves a WAV file, repeats this tour and can start over with only the basics.',
+    },
+    {
+        id: 'rulebook', stage: 0, selector: '[data-tour="rulebook"]', title: 'Explore the rules',
+        text: 'Open the rulebook to see three rows: instrument rules for how each voice plays, harmonic rules for chord colour and bass pedals, and composition rules for phrases, dialogue and sections. A + reveals a page’s controls; every preset can use those rules from the start.',
     },
     {
         id: 'unlock',
@@ -113,6 +117,11 @@ export const TOUR_STEPS = [
         selector: '[data-tour="ambience"]',
         title: 'Ambience',
         text: 'Rain, distant thunder, wind, waves, a fireplace and vinyl crackle to mix as a bed under the music, with a level for each. Try raising the rain, then add a little fireplace. Under More options, shape every layer you have turned up.',
+    },
+
+    {
+        id: 'ambient-dynamics', stage: 1, rulePage: 'ambient-dynamics', selector: '#group-ambient-drift-period', title: 'Let the ambient bed breathe',
+        text: 'Ambient dynamics lives in the instrument row of the rulebook. Set whole-bed and individual-layer level drift, movement and speed. The ambience mixer stays outside the book. Source can follow the preset or keep your own choice; Reset restores that group without touching the others.',
     },
 
     // ---- 2: music ----
@@ -172,14 +181,26 @@ export const TOUR_STEPS = [
         stage: 3,
         selector: '[data-tour="voice-lead"]',
         title: 'More about a voice',
-        text: 'Each voice panel now has a "Kind of new sound" for its ✦ button and, under More options, its register and how it changes by phrase. The pad also chooses how it plays chords; the bass how it walks.',
+        text: 'Each voice panel has a "Kind of new sound" for its ✦ button. Register and playing choices now live in the rulebook: Lead style, Rhythm / pad and Bass / support each have their own instrument page.',
     },
     {
         id: 'percussion',
         stage: 3,
         selector: '[data-tour="percussion"]',
         title: 'Percussion',
-        text: 'Soft synthesised drums, off until you pick a style. Activity adds ghost notes and fills, Variation changes the grooves, and Sprinkle scatters crashes, bells and toms over them. "Hear the kit" plays a sample.',
+        text: 'This panel shapes and mixes the drum kit. Its patterns live in the rulebook’s Percussion patterns page: choose a style, ornaments, variation and occasional colour accents. Hear the kit auditions its sound.',
+    },
+    {
+        id: 'pad-rules', stage: 3, rulePage: 'pad', selector: '#group-pad-styles', title: 'Rhythm / pad playing rules',
+        text: 'This voice has its own page for chord size, register, styles, patterns and movement. Style weights are relative shares of phrases. Zero excludes a choice if another has weight; all zero gives equal shares. A slider or dice edit becomes Your choices; Follow preset or Reset restores that group.',
+    },
+    {
+        id: 'bass-rules', stage: 3, rulePage: 'bass', selector: '#group-bass-styles', title: 'Bass playing rules',
+        text: 'Choose held, beat-group, walking or driving bass phrases here, independently of its sound and volume. Register has its own group. Resetting styles does not reset register, other voices or harmonic pedal rules.',
+    },
+    {
+        id: 'percussion-rules', stage: 3, rulePage: 'percussion', selector: '#rule-percussion-presence', title: 'Percussion patterns',
+        text: 'Choose the drum style and its ornaments, variation and colour accents. Zero ornament activity keeps the groove’s anchors; switch the style off to stop generating drums. Kit design, audition and volume stay in the percussion sound panel.',
     },
     {
         id: 'editor',
@@ -192,10 +213,19 @@ export const TOUR_STEPS = [
     // ---- 4: arrangement ----
     {
         id: 'arrangement',
-        stage: 4,
-        selector: '[data-tour="arrangement"]',
-        title: 'Arrangement',
-        text: 'How much the lead plays, whether there is a second lead, and sections - intro, build, full and breakdown - that bring voices in and out every few phrases. Try turning Sections on and the lead busyness up.',
+        stage: 4, rulePage: 'melodic-composition',
+        selector: '#rule-motif-development',
+        title: 'Composition rules',
+        text: 'Open the rulebook. Instrument rules choose lead activity and backing styles. Composition pages shape melodic development, voice dialogue, shared rhythm and the long view, including sections and whether they change the tone.',
+    },
+
+    {
+        id: 'duet-rules', stage: 4, rulePage: 'duet', selector: '#rule-duet-dialogue', title: 'A conversation between voices',
+        text: 'Voice dialogue coordinates the lead and an independent second lead. Enabling a rule never silently enables a missing voice: the card explains prerequisites and keeps your permission for when they are met. A mute affects what you hear, not the voice’s generation.',
+    },
+    {
+        id: 'section-rules', stage: 4, rulePage: 'form', selector: '#rule-sections', title: 'The long view',
+        text: 'Sections, tension, harmonic pacing, transitions and endings shape the longer piece here. Sections change the tone is a separate rule; length has its own preset source and reset. Rules apply to upcoming music, allowing a phrase already in progress to finish.',
     },
 
     // ---- 5: evolution ----
@@ -210,10 +240,10 @@ export const TOUR_STEPS = [
     // ---- 6: colour, feel and wander ----
     {
         id: 'feel',
-        stage: 6,
-        selector: '[data-tour="feel"]',
+        stage: 6, rulePage: 'performance',
+        selector: '#rule-human-timing',
         title: 'Feel',
-        text: 'Swing, and under More options how loose the playing is: small random shifts in timing, loudness and pitch so that nothing sounds machine-made.',
+        text: 'Open Playing feel under Instrument rules for swing, timing, dynamics and individual-note tuning. Slow continuous movement stays in the separate Wander panel.',
     },
     {
         id: 'wander',
@@ -224,10 +254,10 @@ export const TOUR_STEPS = [
     },
     {
         id: 'colour',
-        stage: 6,
-        selector: '[data-tour="colour"]',
-        title: 'Colour',
-        text: 'Spice for the chords: richer chord types, borrowed chords, a held bass note, and how the piece moves and ends. Each is off or neutral to begin with - try one.',
+        stage: 6, rulePage: 'harmony',
+        selector: '#rule-borrowed-chords',
+        title: 'Harmonic rules',
+        text: 'The Harmonic colour page holds borrowing, chord colour and its chance, open voicings, harmonic scales and bass pedals. Each rule can follow the preset or take your own choice. Allowed means it may act in a suitable passage; it need not fire in every bar. Chord explanations report the decisions that actually happened.',
     },
 
     // ---- 7: randomize ----
@@ -236,7 +266,7 @@ export const TOUR_STEPS = [
         stage: 7,
         selector: '.gen-randomize',
         title: 'Randomize',
-        text: 'Everything is unlocked, so the dice can touch it all. New variation plays the same settings with different random choices. The other buttons roll the dice on one area at a time - music, evolution, arrangement, ambience and more; "How" sets how far from the current settings they go.',
+        text: 'The main interface is fully revealed, and every rulebook page is available. The dice can touch it all. New variation plays the same settings with different random choices. The other buttons roll the dice on one area at a time - music, evolution, arrangement, ambience and more; "How" sets how far from the current settings they go.',
     },
     {
         id: 'done',

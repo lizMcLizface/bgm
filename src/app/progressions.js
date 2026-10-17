@@ -36,6 +36,13 @@ const PROGRESSIONS = [
     ['I', 'V', 'vi', 'iii', 'IV', 'I', 'IV', 'V'],
     ['I', 'vi', 'IV', 'V', 'I', 'vi', 'ii', 'V'],
     ['i', 'VI', 'III', 'VII', 'i', 'VI', 'iv', 'V'],
+    // Explicit unresolved choices: no tonic degree, including at the loop seam.
+    ['ii', 'iv', 'iii', 'ii'],
+    ['iv', 'ii', 'v', 'iii'],
+    ['iii', 'v', 'ii', 'iv'],
+    ['ii', 'iv', 'iii', 'v', 'iv', 'ii'],
+    ['iv', 'iii', 'ii', 'v', 'iii', 'iv'],
+    ['ii', 'iv', 'iii', 'v', 'ii', 'iii', 'iv', 'v'],
 ];
 
 /** Chord counts the bank has, ascending: [2, 3, 4, 5, 6, 8]. */
@@ -44,4 +51,7 @@ export const PROGRESSION_LENGTHS = [...new Set(PROGRESSIONS.map((p) => p.length)
 /** Indices of the progressions with `length` chords. */
 export const progressionsOfLength = (length) => [...PROGRESSIONS.keys()].filter((i) => PROGRESSIONS[i].length === length);
 
+// Appended indices are stable in the existing five-bit share field.
+export const isUnsettlingProgression = index => Number.isInteger(index) && index >= 25 && index < PROGRESSIONS.length;
+export const normalProgressions = [...PROGRESSIONS.keys()].filter(i=>!isUnsettlingProgression(i));
 export default PROGRESSIONS;

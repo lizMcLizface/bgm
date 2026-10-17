@@ -32,7 +32,8 @@ const APPLY = [
 // "D Aeolian · 92 BPM · 4/4", the drums and the ambience a preset has.
 function summary(scene) {
     const s = sceneSettings(scene, 1);
-    const key = `${TONIC_NAMES[s.tonic].split('/')[0]} ${scaleById(s.mode).name}`;
+    const tonalKey = `${TONIC_NAMES[s.tonic].split('/')[0]} ${scaleById(s.mode).name}`;
+    const key=s.tonality.mode==='atonal'?'Atonal pitch sets':s.tonality.mode==='bitonal'?`${tonalKey} · two tonal centres`:tonalKey;
     const meter = s.meter === '4/4' ? '' : ` · ${METERS[s.meter].label.split(' ')[0]}`;
     const layers = Object.entries(s.ambience).filter(([, level]) => level > 0).map(([id]) => AMBIENCE_LAYERS[id].toLowerCase());
     const level = intensity(s);

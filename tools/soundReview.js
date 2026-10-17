@@ -17,7 +17,7 @@ export async function prepareSoundComparison(options) {
     }));
     const variants=[];
     for(const mode of ['legacy','latest']) {
-        const sounds=Object.fromEntries(await Promise.all(roles.map(async role=>[role,await prepareSound(infos[role],mode)])));
+        const sounds=Object.fromEntries(await Promise.all(roles.map(async role=>[role,await prepareSound(infos[role],mode,{voiceColour:false,stringResonance:false,pianoResonance:false})])));
         variants.push({label:mode==='legacy'?'Previous generated':'Scene-aware generated',sounds,infos});
     }
     if(options.library)variants.push({label:'Library sounds',sounds:undefined});

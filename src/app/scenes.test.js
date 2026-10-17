@@ -5,6 +5,8 @@ import { SHAREABLE_PRESETS } from './shareCode';
 import { defaultSettings } from './settings';
 import { ROLE_PRESETS, GENERATIVE_PRESETS } from './presets';
 import PRESET_DEFAULTS from './engine/presetDefaults';
+import { saveUserScene, userScenes, deleteUserScene } from './setupStore';
+import { inheritBook, applyBook } from './rulebook/session';
 
 // every key of `patch` has to be in `actual` (nested objects: at any depth)
 const expectContained = (patch, actual) => {
@@ -159,4 +161,53 @@ test('full setups retain edited piano-source parameters', () => {
     const synth={stringModel:'piano',pianoType:'electric',pianoDecay:3.2,pianoSustain:.35,pianoBrightness:.8,pianoHammer:.14,pianoUnison:.6,pianoSeed:777};
     const setup=buildSetup({settings:defaultSettings(),voices:{pad:{name:'My piano',synth}}});
     expect(parseSetup(JSON.stringify(setup)).voices.pad.synth).toEqual(synth);
+});
+
+test('rule permissions survive setup JSON and Mine storage, becoming the saved preset’s defaults', () => {
+    const settings=defaultSettings();settings.humanize.timing=23;
+    const rulebook={rules:{'tension-curves':{enabled:false},'human-timing':{enabled:true,value:23}},baseline:{'human-timing':{enabled:true,value:12}}};
+    const setup=buildSetup({settings,voices:{},rulebook},{name:'Rulebook roundtrip'});
+    const parsed=parseSetup(JSON.stringify(setup));
+    expect(parsed.rulebook).toEqual({version:1,...rulebook});
+    expect(saveUserScene(setup)).toBe(true);
+    const saved=userScenes().find(s=>s.name===setup.name);
+    expect(saved.rulebook).toEqual(parsed.rulebook);
+    const gen={settings:sceneSettings(saved,42),setMany(patch){Object.assign(this.settings,patch);},replan(){}};
+    const defaults=inheritBook(saved.rulebook);applyBook(gen,defaults);
+    expect(gen.sectionCurves).toBe(false);expect(gen.settings.humanize.timing).toBe(23);
+    applyBook(gen,{...defaults,rules:{'tension-curves':{enabled:true}}});expect(gen.sectionCurves).toBe(true);
+    applyBook(gen,defaults);expect(gen.sectionCurves).toBe(false);
+    deleteUserScene(setup.name);
+});
+
+test('setup rulebook data is validated without changing older setups', () => {
+    const settings=defaultSettings();
+    expect(parseSetup({name:'Old setup',settings}).rulebook).toBeUndefined();
+    const bad={version:1,rules:{unknown:{enabled:true},'human-timing':{enabled:true,value:999},'tension-curves':{enabled:'no'}},baseline:{'human-timing':{enabled:true,value:12},ambience:{enabled:false}}};
+    expect(parseSetup({name:'Validated',settings,rulebook:bad}).rulebook).toEqual({version:1,rules:{'human-timing':{enabled:true,value:40}},baseline:{'human-timing':{enabled:true,value:12}}});
+    expect(parseSetup({name:'Future book',settings,rulebook:{version:999,rules:bad.rules}}).rulebook.rules).toEqual({});
+});
+
+
+test('tuned music presets name their whole rhythmic vocabulary and retain safe expression defaults',()=>{
+ for(const scene of SCENES.filter(s=>s.settings.playMusic!==false)){
+  const settings=sceneSettings(scene,42);
+  expect(Object.keys(scene.settings.padWeights).sort()).toEqual(['sustain','pulse','arpeggio','sequence','rolled','stacked'].sort());
+  expect(Object.keys(scene.settings.bassWeights).sort()).toEqual(['whole','half','walking','drive'].sort());
+  expect(Object.values(settings.padWeights).some(v=>v>0)).toBe(true);expect(Object.values(settings.bassWeights).some(v=>v>0)).toBe(true);
+  expect(settings.humanize.timing).toBeLessThanOrEqual(16);expect(settings.humanize.detune).toBeLessThanOrEqual(4);
+  const inherited=inheritBook(scene.rulebook).inherited??{};
+  if(scene.name!=='Altman')for(const id of ['melodic-slides','pad-pitch-motion','bass-pitch-motion','chord-slides','gate-envelopes'])expect(inherited[id]?.enabled??false).toBe(false);
+  if(scene.category==='podcast'){expect(settings.leadActivity).toBeLessThanOrEqual(.12);expect(settings.padMotion.fast).toBe(0);expect(settings.bassWeights.walking).toBe(0);expect(inherited['lead-pickups'].enabled).toBe(false);}
+ }
+ for(const name of ['Choir at sea','Slow motion','Breathing room','Seaside Hearth','Wide Open Plains']){
+  const s=sceneSettings(sceneBySlug(name),42);expect(s.padWeights.rolled+s.padWeights.stacked).toBe(0);
+ }
+});
+
+
+test('Altman keeps the haunted string lead and the unsettling category has its intended companions',()=>{
+ const scene=sceneBySlug('altman');expect(scene.voices.lead).toBe('Haunted Viola');
+ const voice=findPreset(scene.voices.lead);expect(sanitizePreset(voice)).toEqual(voice);expect(voice.gainSustain).toBeGreaterThan(.6);expect(voice.gainAttack).toBeGreaterThan(.2);
+ for(const name of ['Altman','Seaside Hearth','Almost Home','Desert dusk','Drone and Drift'])expect(sceneBySlug(name).category).toBe('unsettling');
 });

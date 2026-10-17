@@ -8,7 +8,11 @@
 // shrinking, and the canvas takes whatever height the box has.
 
 import React, { useEffect, useRef, useState } from 'react';
-import { drawTimeline, chordBlocks, MIN_HEIGHT } from './timelineDraw';
+import { drawTimeline, chordBlocks, chordRegions, MIN_HEIGHT } from './timelineDraw';
+import { explainBar } from './rulebook/explain';
+import { RULES } from './rulebook/model';
+import { PAGE_IDS } from './rulebook/navigation';
+import './chordExplanation.css';
 
 const cssVar = (style, name) => style.getPropertyValue(name).trim();
 
@@ -52,9 +56,39 @@ const sameReadout = (a, b) =>
 
 // `tracks`: the role strip (Tracks.jsx) shown left of the canvas; its
 // colour swatches double as the legend.
-const ChordTimeline = ({ generator, tracks }) => {
+const ChordTimeline = ({ generator, tracks, onExploreRule }) => {
     const canvasRef = useRef(null);
     const [now, setNow] = useState(null);
+    const rootRef = useRef(null), buttons = useRef(new Map()), hideTimer = useRef(null), targetsRef = useRef([]), restoringFocus = useRef(false);
+    const [targets, setTargets] = useState([]), [selection, setSelection] = useState(null), [pinned, setPinned] = useState(false);
+    const cancelHide = () => clearTimeout(hideTimer.current);
+    const close = (restoreFocus = false) => {
+        cancelHide(); setSelection(null); setPinned(false);
+        if (restoreFocus) {
+            restoringFocus.current = true;
+            buttons.current.get(selection?.key)?.focus();
+            restoringFocus.current = false;
+        }
+    };
+    const dismissLater = () => {
+        cancelHide();
+        if (!pinned) hideTimer.current = setTimeout(() => setSelection(null), 180);
+    };
+    const inspect = (target, element, pin = false) => {
+        cancelHide();
+        if (pinned && !pin) return;
+        const rect = element.getBoundingClientRect(), root = rootRef.current.getBoundingClientRect();
+        setSelection({ ...target, left: rect.left - root.left, top: rect.bottom - root.top + 8 });
+        if (pin) setPinned(true);
+    };
+    useEffect(() => () => clearTimeout(hideTimer.current), []);
+    useEffect(() => {
+        if (!selection) return;
+        const key = e => { if (e.key === 'Escape') { e.stopPropagation(); e.preventDefault(); close(true); } };
+        const outside = e => { if (!rootRef.current?.contains(e.target) || !e.target.closest('.gen-chord-target, .gen-chord-popover')) close(); };
+        document.addEventListener('keydown', key, true); document.addEventListener('pointerdown', outside);
+        return () => { document.removeEventListener('keydown', key, true); document.removeEventListener('pointerdown', outside); };
+    }, [selection]);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -78,9 +112,18 @@ const ChordTimeline = ({ generator, tracks }) => {
 
         const loop = () => {
             const pos = generator.position();
+            const plan = generator.getPlan();
             drawTimeline(ctx, width, height, {
-                plan: generator.getPlan(), beatsPerBar: generator.beatsPerBar, meter: generator.meter, loop: generator.loop, roles: generator.roles,
+                plan, beatsPerBar: generator.beatsPerBar, meter: generator.meter, loop: generator.loop, roles: generator.roles,
             }, pos, timelineColors(canvas));
+            const regions = chordRegions(plan, generator.beatsPerBar, width, pos);
+            if (regions.length !== targetsRef.current.length || regions.some((r, i) => r.key !== targetsRef.current[i]?.key || r.record !== targetsRef.current[i]?.record)) {
+                targetsRef.current = regions; setTargets(regions);
+            }
+            for (const region of regions) {
+                const button = buttons.current.get(region.key);
+                if (button) { button.style.left = region.left + 'px'; button.style.width = region.width + 'px'; }
+            }
             const r = readout(generator, pos);
             if (!sameReadout(r, last)) {
                 last = r;
@@ -97,7 +140,7 @@ const ChordTimeline = ({ generator, tracks }) => {
     }, [generator]);
 
     return (
-        <section className="gen-timeline">
+        <section className="gen-timeline" ref={rootRef}>
             <div className="gen-timeline-readout" aria-live="polite">
                 {now && (
                     <>
@@ -115,8 +158,27 @@ const ChordTimeline = ({ generator, tracks }) => {
             </div>
             <div className={`gen-timeline-body${tracks ? '' : ' is-no-tracks'}`}>
                 {tracks}
-                <canvas ref={canvasRef} className="gen-timeline-canvas" />
+                <div className="gen-timeline-roll">
+                    <canvas ref={canvasRef} className="gen-timeline-canvas" />
+                    <div className="gen-chord-targets" aria-label="Chord explanations">
+                        {targets.map(target => <button key={target.key} ref={el => { if (el) buttons.current.set(target.key, el); else buttons.current.delete(target.key); }}
+                            className="gen-chord-target" style={{ left: target.left, width: target.width, top: target.top, height: target.height }}
+                            aria-label={`Explain ${target.chord.name}, ${target.endBar > target.startBar + 1 ? 'bars ' + (target.startBar + 1) + ' to ' + target.endBar : 'bar ' + (target.startBar + 1)}`}
+                            aria-expanded={selection?.key === target.key} aria-controls={selection?.key === target.key ? 'gen-chord-explanation' : undefined}
+                            onPointerEnter={e => { if (e.pointerType !== 'touch') inspect(target, e.currentTarget); }} onPointerLeave={dismissLater}
+                            onFocus={e => { if (!restoringFocus.current) inspect(target, e.currentTarget); }} onBlur={dismissLater}
+                            onClick={e => inspect(target, e.currentTarget, true)} />)}
+                    </div>
+                </div>
             </div>
+            {selection && <aside id="gen-chord-explanation" className="gen-chord-popover" role="dialog" aria-label="Why this chord?"
+                style={{ '--chord-left': selection.left + 'px', top: selection.top }} onPointerEnter={cancelHide} onPointerLeave={dismissLater} onFocusCapture={cancelHide} onBlurCapture={e => { if (!e.currentTarget.contains(e.relatedTarget)) dismissLater(); }}>
+                <header><div><strong>Why this chord?</strong><small>{pinned ? 'Selected slot' : 'Click a chord to keep this open'}</small></div><button aria-label="Close chord explanation" onClick={() => close(true)}>×</button></header>
+                <h3>{selection.chord.name} <small>· {selection.endBar > selection.startBar + 1 ? `Bars ${selection.startBar + 1}–${selection.endBar}` : `Bar ${selection.startBar + 1}`}</small></h3>
+                {explainBar(selection.record).map((reason, i) => <div className="gen-chord-reason" key={i}><strong>{reason.title}</strong><p>{reason.text}</p>
+                    {onExploreRule && RULES.some(r => r.id === reason.rule && PAGE_IDS.includes(r.chapter)) && <button onClick={() => { onExploreRule(reason.rule); close(); }}>Explore this rule →</button>}
+                </div>)}
+            </aside>}
         </section>
     );
 };

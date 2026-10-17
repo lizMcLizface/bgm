@@ -9,7 +9,7 @@
 // randomize press is meant to be different every time.
 
 import { SCALE_FAMILIES, TONIC_NAMES, CHORD_COLOURS, scaleById, scaleSemitones } from './theory';
-import PROGRESSIONS, { PROGRESSION_LENGTHS, progressionsOfLength } from './progressions';
+import PROGRESSIONS, { PROGRESSION_LENGTHS, progressionsOfLength, isUnsettlingProgression, normalProgressions } from './progressions';
 import { METERS } from './meter';
 import { DEFAULT_DRIFT, DRIFT_MODES, TEMPO_BOUNDS } from './conductor';
 import {
@@ -77,7 +77,7 @@ export const progressionQuality = (index) => (PROGRESSIONS[index].includes('i') 
 // A progression of `length` chords that suits the mode, a different one
 // from the current where possible.
 function fittingProgression(settings, length, rng) {
-    const indices = progressionsOfLength(length);
+    const indices = progressionsOfLength(length).filter(i=>!isUnsettlingProgression(i));
     const quality = modeQuality(settings.mode);
     const fitting = indices.filter((i) => !quality || progressionQuality(i) === quality);
     return pickOther(rng, fitting.length ? fitting : indices, settings.progression);
@@ -108,7 +108,7 @@ const FIELDS = {
     },
     // within reason: as many chords as now
     progression: (settings, level, rng) => {
-        if (level === 'wild') return pick(rng, others([...PROGRESSIONS.keys()], settings.progression));
+        if (level === 'wild') return pick(rng, others(normalProgressions, settings.progression));
         return fittingProgression(settings, PROGRESSIONS[settings.progression].length, rng);
     },
     barsPerChord: (settings, level, rng) => (level === 'wild'
@@ -176,7 +176,7 @@ export const progressionLength = (index) => PROGRESSIONS[index].length;
 
 /** The first progression of `length` chords that suits the mode (choosing a length). */
 export function progressionForLength(settings, length) {
-    const indices = progressionsOfLength(length);
+    const indices = progressionsOfLength(length).filter(i=>!isUnsettlingProgression(i));
     const quality = modeQuality(settings.mode);
     return indices.find((i) => !quality || progressionQuality(i) === quality) ?? indices[0];
 }
@@ -286,7 +286,7 @@ export function randomColour(level, rng = Math.random) {
 
 /** Chord colour: within reason mostly plain, otherwise a colour on a few chords; full random anything. */
 export function randomChordColour(level, rng = Math.random) {
-    if (level === 'wild') return { mode: pick(rng, Object.keys(CHORD_COLOURS)), amount: step(rng(), 0.05) };
+    if (level === 'wild') return { mode: pick(rng, Object.keys(CHORD_COLOURS).filter(k=>!['flat2','major7'].includes(k))), amount: step(rng(), 0.05) };
     return { mode: weighted(rng, { plain: 3, sus2: 2, add9: 2, add6: 1, floating: 1 }), amount: step(between(rng, 0.15, 0.5), 0.05) };
 }
 

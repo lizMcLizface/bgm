@@ -1,3 +1,4 @@
+import {generatedColourPlan} from './engine/generatedColour';
 // Context is frozen with the sound, rather than inferred again on a link reload.
 import { seeded, weighted } from './random';
 import { generateSoundV2, generateEnsembleSoundV2, soundFrom as previousSoundFrom, SOUND_KINDS } from './soundGenV2';
@@ -69,7 +70,7 @@ function kindFor(info) {
 }
 
 /** v1/v2 remain frozen. A v3 Original render uses the unmodified v2 recipe. */
-export function soundFrom(info, generation = 'latest') {
+export function soundFrom(info, generation = 'latest', {voiceColour=true,stringResonance=true,pianoResonance=true} = {}) {
     if (info.version !== GENERATOR_V3) return previousSoundFrom(info);
     const context = normalizeSoundContext(info), role = info.role;
     const ownSeed = info.ensemble === undefined ? info.seed : (Math.imul(info.ensemble ^ 0x85ebca6b, 2246822507) + (Object.keys(defaults).indexOf(role) + 1) * 0x27d4eb2f) >>> 8;
@@ -140,9 +141,13 @@ export function soundFrom(info, generation = 'latest') {
             pianoBrightness: background ? .4 : .6, pianoHammer: .25, pianoUnison: background ? .3 : .15, pianoSeed: ownSeed & 65535,
             gainAttack: .003, gainDecay: .12, gainSustain: .8,
         });
+        if(pianoResonance&&p.stringModel==='piano')p.pianoResonance=p.pianoType==='electric'?.55:.45;
+        if(stringResonance&&p.stringModel==='plucked')Object.assign(p,{stringResonance:.6,stringBodyType:bass?'bass':'guitar'});
         p.masterVolume = .6;
     }
+    const colour=generation!=='legacy'&&voiceColour?generatedColourPlan({...info,...context},kind):null;
+    if(colour)Object.assign(p,colour.parameters);
     const id = JSON.stringify(context).split('').reduce((h, ch) => Math.imul(h ^ ch.charCodeAt(0), 16777619), 2166136261) >>> 0;
     return { name: `${generation === 'legacy' ? 'Original ' : ''}${context.profile[0].toUpperCase() + context.profile.slice(1)} ${base.name}.${id.toString(16).slice(0, 4)}`,
-        preset: p, kind: base.kind, context };
+        preset: p, kind: base.kind, context, ...(colour?{sourceFamily:colour.family}:{}) };
 }

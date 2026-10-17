@@ -20,3 +20,10 @@ test('mode changes rebuild a v3 recipe while keeping the same saved sound defini
     expect(original.preset).toEqual({...soundFrom(info,'legacy').preset,masterVolume:.42});
     expect(original.preset).not.toEqual(latest.preset);
 });
+
+test('the comparison bypass has a separate cache entry and keeps the saved recipe definition intact',async()=>{
+ const info={version:3,seed:42,role:'lead',kind:'lead',profile:'folk',gate:.6,register:76};
+ const before=prepareSound(info,'latest',{voiceColour:false}),after=prepareSound(info);
+ expect(before).not.toBe(after);expect(prepareSound(info,'latest',{voiceColour:false})).toBe(before);
+ const [a,b]=await Promise.all([before,after]);expect(a.info).toEqual(b.info);expect(a.preset.breathAmount??0).toBe(0);expect(b.preset.breathAmount).toBeGreaterThan(0);
+});

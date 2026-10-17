@@ -9,8 +9,9 @@ const MARGIN = 12;
 const reducedMotion = () => typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // The steps of the stages from..to whose part is on the page now.
-const availableSteps = (from, to) => TOUR_STEPS.filter((step) => step.stage >= from && step.stage <= to
-    && (!step.hint || step.stage === to) && (!step.selector || document.querySelector(step.selector)));
+export const availableSteps = (from, to) => TOUR_STEPS.filter((step) => step.stage >= from && step.stage <= to
+    && (!step.hint || step.stage === to) && (!step.selector || document.querySelector(step.selector)
+        || step.rulePage && document.querySelector('[data-tour="rulebook"]')));
 
 const rectOf = (selector) => {
     const el = selector && document.querySelector(selector);
@@ -46,7 +47,7 @@ function place(rect, card) {
  *   asks whether to take the tour, until it is answered (for the automatic first-visit opening;
  *   starting from it skips the welcome step, which the prompt says)
  */
-const Tour = ({ onClose, reference = false, prompt = false, fromStage = 0, toStage = LAST_STAGE, onUnlockAll }) => {
+const Tour = ({ onClose, reference = false, prompt = false, fromStage = 0, toStage = LAST_STAGE, onUnlockAll, onStep }) => {
     const [steps] = useState(() => availableSteps(fromStage, toStage));
     const [asking, setAsking] = useState(prompt && !reference);
     const [index, setIndex] = useState(0);
@@ -78,11 +79,19 @@ const Tour = ({ onClose, reference = false, prompt = false, fromStage = 0, toSta
     // Bring the step's part into view.
     useEffect(() => {
         if (reference || asking) return;
-        const el = step.selector && document.querySelector(step.selector);
-        if (el) el.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'center' });
-        else window.scrollTo({ top: 0, behavior: reducedMotion() ? 'auto' : 'smooth' });
+        onStep?.(step);
+        let frame, attempts = 0;
+        const scroll = () => {
+            const el = step.selector && document.querySelector(step.selector);
+            // Page preparation may need another React commit before its card exists.
+            if (step.rulePage && !el && attempts++ < 12) { frame = requestAnimationFrame(scroll); return; }
+            if (el) el.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'center' });
+            else window.scrollTo({ top: 0, behavior: reducedMotion() ? 'auto' : 'smooth' });
+        };
+        frame = requestAnimationFrame(scroll);
         if (next.current) next.current.focus({ preventScroll: true });
-    }, [step, reference, asking]);
+        return () => cancelAnimationFrame(frame);
+    }, [step, reference, asking, onStep]);
 
     // Follow the parts while the page scrolls or resizes.
     useEffect(() => {

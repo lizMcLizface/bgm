@@ -50,6 +50,7 @@ export function defaultSettings() {
         chordSpread: 'close', // voicing of the pad: close or open (arranger.js SPREADS)
         pedal: { mode: 'off', amount: 0.5 }, // the bass holds the tonic or fifth for this share of phrases
         harmonyScale: 'auto',
+        tonality: { mode: 'tonal', separation: 1 },
         leadScale: 'full', // full, or pentatonic
         leadLeaps: 0.5, // how far the lead jumps between chord tones: 0.5 as drawn, less is stepwise, more leapy
         leadRepeat: 0, // share of phrases that repeat the last phrase's tune
@@ -114,6 +115,7 @@ const RULES = {
     chordSpread: oneOf(Object.keys(SPREADS)),
     pedal: { mode: oneOf(Object.keys(PEDAL_MODES)), amount: clamp(0, 1) },
     harmonyScale: oneOf(Object.keys(HARMONY_SCALES)),
+    tonality: { mode: oneOf(['tonal','atonal','bitonal']), separation: int(1,11) },
     leadScale: oneOf(Object.keys(LEAD_SCALES)),
     leadLeaps: clamp(0, 1),
     leadRepeat: clamp(0, 1),

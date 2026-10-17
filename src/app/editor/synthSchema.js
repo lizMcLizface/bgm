@@ -23,6 +23,7 @@ const SYNTH_SCHEMA = [
     { label: 'Piano', columns: 4, controls: [
         { kind: 'choice', key: 'pianoType', label: 'Piano tone', options: { felt: 'Felt', electric: 'Electric' } },
         knob('pianoDecay', 'Decay', { modifier: 4.7, offset: .3, min: .3, max: 5, resetValue: 2.5 }),
+        knob('pianoResonance', 'Resonance', { min: 0, max: 1, resetValue: 0 }),
         knob('pianoSustain', 'Held body', { min: 0, max: 1, resetValue: .28 }),
         knob('pianoBrightness', 'Brightness', { min: 0, max: 1, resetValue: .45 }),
         knob('pianoHammer', 'Hammer', { min: 0, max: 1, resetValue: .3 }),

@@ -34,3 +34,25 @@ test('pluck position and body alter timbre; buffers are cached within a fixed me
     for(let i=0;i<100;i++)stringBuffer(context,50+i,{decay:3});
     expect(stringCacheStats().bytes).toBeLessThanOrEqual(stringCacheStats().maxBytes);clearStringCache();
 });
+
+test('instrument body modes retain string tuning and bounded decaying output',()=>{
+ for(const bodyType of ['guitar','harp','bass','kalimba']){
+  for(const midi of [36,48,60,81,100]){
+   const sr=24000,frequency=440*2**((midi-69)/12),options={seed:17,decay:1.5,damping:.45,body:.7,resonance:1,bodyType};
+   const data=renderString(sr,frequency,options),measured=measuredFrequency(data,sr,frequency);
+   expect(Math.abs(1200*Math.log2(measured/frequency)),bodyType+'/'+midi).toBeLessThan(5);
+  }
+  const options={seed:42,decay:.8,damping:1,body:1,resonance:1,bodyType},data=renderString(24000,110,options);
+  expect(data).toEqual(renderString(24000,110,options));let peak=0,mean=0,early=0,late=0;
+  for(let i=0;i<data.length;i++){expect(Number.isFinite(data[i])).toBe(true);peak=Math.max(peak,Math.abs(data[i]));mean+=data[i];if(i<6000)early+=data[i]**2;if(i>data.length-6000)late+=data[i]**2;}
+  expect(peak).toBeLessThanOrEqual(.701);expect(Math.abs(mean/data.length)).toBeLessThan(.005);expect(late).toBeLessThan(early*.1);
+ }
+});
+test('body refinement keeps the old bypass and zero-body sound and separates cached variants',()=>{
+ const options={seed:42,decay:.5,body:.4};
+ expect(renderString(24000,220,options)).toEqual(renderString(24000,220,{...options,resonance:0,bodyType:'harp'}));
+ expect(renderString(24000,220,{...options,body:0})).toEqual(renderString(24000,220,{...options,body:0,resonance:1}));
+ const guitar=renderString(24000,220,{...options,resonance:1,bodyType:'guitar'}),harp=renderString(24000,220,{...options,resonance:1,bodyType:'harp'});expect(guitar).not.toEqual(harp);
+ const context={sampleRate:24000,createBuffer:(_,length)=>({length,getChannelData:()=>new Float32Array(length)})};clearStringCache();
+ const before=stringBuffer(context,220,options),after=stringBuffer(context,220,{...options,resonance:1,bodyType:'guitar'});expect(before).not.toBe(after);expect(stringBuffer(context,220,{...options,resonance:1,bodyType:'guitar'})).toBe(after);clearStringCache();
+});

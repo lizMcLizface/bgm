@@ -1,3 +1,6 @@
+import {atonalChord,describeBitonality,applyBitonality} from './composition/tonality';
+import {breathPatch,isBreathPatch} from './engine/breathPatches';
+import {joinHeldNotes} from './composition/heldGlides';
 // Wires plan -> Transport -> role Instruments -> masterBus.
 //
 // Music is decided ahead of time into a rolling *plan* of bars (chord, pad
@@ -44,6 +47,8 @@ import { harmonyMode } from './composition/harmonyScale';
 import { planPerformance, performPhrase } from './composition/performance';
 import { performEnsemble } from './composition/ensembleRhythm';
 import { instrumentGroovePlan } from './composition/instrumentGroove';
+import { slideNotes } from './composition/noteSlides';
+import { expressNotes, expressHeldNotes, connectWindNotes, timeSoundNotes } from './composition/noteExpression';
 import { nextMusic, glideTempo, scaleDistance } from './conductor';
 import { METERS, unitsPerMinute, swingEvents } from './meter';
 import { drumBar, loosenDrums, auditionHits } from './percussion';
@@ -53,7 +58,7 @@ import { findPreset } from './editor/presetStore';
 import { stringPatch, isStringPatch } from './engine/stringPatches';
 import { pianoPatch, isPianoPatch } from './engine/pianoPatches';
 import { ROLE_PRESETS, ROLE_VOLUMES } from './presets';
-import PROGRESSIONS, { progressionsOfLength } from './progressions';
+import PROGRESSIONS, { progressionsOfLength, isUnsettlingProgression } from './progressions';
 
 // Stop fades everything out - reverb and echo tails included - with this
 // time constant (-60 dB after ~0.5 s), then drops the tails (STOP_FADE_MS).
@@ -120,7 +125,7 @@ class Generator {
         // volumes are settings (they travel in links); mute / solo are not
         Object.entries(ROLES).forEach(([role, { polyphony, preset }]) => {
             const volume = (this.settings.volumes && this.settings.volumes[role]) ?? ROLE_VOLUMES[role];
-            const instrument = new Instrument({ polyphony, preset: findPreset(preset), deferReverb: role === 'counter', reverbHub: this.reverbHub });
+            const instrument = new Instrument({ polyphony, preset: breathPatch(preset,findPreset(preset),this.settings.generation), deferReverb: role === 'counter', reverbHub: this.reverbHub });
             const gain = this.AC.createGain();
             gain.gain.value = volume;
             // section tone: open (and inaudible) unless settings.sectionTone
@@ -132,7 +137,7 @@ class Generator {
             const wander = new RoleWander(this.AC, role);
             gain.connect(wander.input);
             wander.output.connect(this.output);
-            this.roles[role] = { instrument, gain, tone, wander, presetName: preset, edited: false, volume, mute: false, solo: false };
+            this.roles[role] = { instrument, gain, tone, wander, presetName: preset, stringPatchBase:isBreathPatch(preset)?{name:preset,preset:findPreset(preset)}:null, edited: false, volume, mute: false, solo: false };
         });
         {
             const volume = (this.settings.volumes && this.settings.volumes.perc) ?? ROLE_VOLUMES.perc;
@@ -401,6 +406,7 @@ class Generator {
         clearTimeout(this.endTimer);
         this.endTimer = null;
         Object.values(this.roles).forEach(({ instrument }) => instrument.silence());
+        this.heldActiveRoles=new Set();delete this.heldResetBar;
         if (!this.quickStop) {
             // a sleep fade cut short: back to full level for the tails
             if (wasFading) this.output.gain.setTargetAtTime(1, this.AC.currentTime, 0.05);
@@ -429,6 +435,7 @@ class Generator {
         if (!this.isRunning || this.endBar !== null) return;
         const from = this.currentBar + 1;
         this.loop = null;
+        this.queueHeldGlideReset();
         this.endBar = from + 1;
         [...this.plan.keys()].filter((bar) => bar >= from).forEach((bar) => this.plan.delete(bar));
         this.ensurePlanned(from);
@@ -506,6 +513,7 @@ class Generator {
     // new time signature starts at that bar too. Otherwise (at the start)
     // the preview is planned afresh. Only rewind() goes back to the start.
     replan(keys, meterChanged = keys.includes('meter')) {
+        this.queueHeldGlideReset();
         if (this.loop) this.loop.dirty = true;
         if (this.isRunning || this.paused) {
             this.editedSinceStart = true;
@@ -565,7 +573,7 @@ class Generator {
     refreshStringPatches() {
         for (const r of Object.values(this.roles)) if (!r.edited && r.stringPatchBase) {
             const { name, preset } = r.stringPatchBase;
-            r.instrument.applyPreset(pianoPatch(name, stringPatch(name, preset, this.settings.generation), this.settings.generation));
+            r.instrument.applyPreset(breathPatch(name,pianoPatch(name, stringPatch(name, preset, this.settings.generation), this.settings.generation),this.settings.generation));
         }
     }
 
@@ -599,8 +607,8 @@ class Generator {
         if (!preset) return false;
         if (this.pendingVoices) this.pendingVoices = this.pendingVoices.filter((p) => p.role !== role || p.preset === preset);
         const r = this.roles[role];
-        r.stringPatchBase = (isStringPatch(name) || isPianoPatch(name)) && preset === findPreset(name) ? { name, preset } : null;
-        if (r.stringPatchBase) preset = pianoPatch(name, stringPatch(name, preset, this.settings.generation), this.settings.generation);
+        r.stringPatchBase = (isStringPatch(name) || isPianoPatch(name) || isBreathPatch(name)) && preset === findPreset(name) ? { name, preset } : null;
+        if (r.stringPatchBase) preset = breathPatch(name,pianoPatch(name, stringPatch(name, preset, this.settings.generation), this.settings.generation),this.settings.generation);
         if (morphSeconds > 0) r.instrument.morphTo(preset, morphSeconds);
         else r.instrument.applyPreset(preset);
         r.presetName = name;
@@ -659,6 +667,7 @@ class Generator {
      */
     flushPendingVoices(bar, secondsPerBeat) {
         const waiting = this.pendingVoices || [];
+        if(this.heldActiveRoles?.size)for(const {role} of waiting)if(this.heldActiveRoles.has(role)){this.roles[role].instrument.silence();this.heldActiveRoles.delete(role);for(const p of this.plan.values())if(p.bar>=bar)for(const e of p.events)if(e.role===role)e.booked=false;}
         this.pendingVoices = [];
         let morphSeconds = 0;
         if (waiting.some((p) => p.morph) && bar !== undefined && secondsPerBeat) {
@@ -872,23 +881,31 @@ class Generator {
         const chordScale = borrowed ? scaleSemitones(scaleById(minorHome ? 'Major-1' : 'Major-6').intervals) : harmonic;
         const names = spellScale(tonic, chordScale);
         const offsets = diatonicChord(chordScale, degree, this.settings.padNotes, colour);
-        return {
+        const result = {
             numeral: displayNumeral(numeral, offsets),
             pitchClasses: offsets.map((o) => (tonic + o) % 12),
             scalePcs: scale.map((st) => (tonic + st) % 12),
             root: names[(degree - 1) % chordScale.length],
             name: names[(degree - 1) % chordScale.length] + chordSymbol(offsets),
             keyName: `${names[0]} ${scaleById(mode).name}`,
+            ...(this.rulebookTrace?{provenance:{borrowed:Boolean(borrowed),sourceMode:borrowed?(minorHome?'Major-1':'Major-6'):harmonicMode,
+                baseMode:mode,harmonicMode,colour,degree,requestedNumeral:numeral}}:{}),
             ...(harmonicMode === mode ? {} : { harmonyMode: harmonicMode, harmonyPcs: harmonic.map(st => (tonic + st) % 12) }),
         };
+        return this.settings.tonality.mode==='bitonal'?describeBitonality(result,music,this.settings.tonality.separation):result;
     }
+
+    avoidTonic(music) { return this.settings.tonality.mode==='atonal'||isUnsettlingProgression(music.progression); }
+    endingChord(music,bar,numeral) { return this.avoidTonic(music)?this.chordAt(bar,music):this.buildChord(music,numeral); }
 
     // The chord at `bar` under `music` (progressions restart each cycle).
     chordAt(bar, music) {
         const numerals = PROGRESSIONS[music.progression];
         const slot = this.harmonicSlotAt(bar,music);
+        if(this.settings.tonality.mode==='atonal')return atonalChord({seed:this.settings.seed,tonic:music.tonic,slot:Math.floor(music.cycleStart/this.settings.barsPerChord)+slot.index,size:this.settings.padNotes,colour:this.colourFor(slot.start)});
         const colourBar = this.variableHarmonyOn() && music.harmonicDurations ? slot.start : bar;
-        return this.buildChord(music, numerals[slot.index], this.colourFor(colourBar), this.borrowFor(colourBar));
+        const chord=this.buildChord(music, numerals[slot.index], this.colourFor(colourBar), this.borrowFor(colourBar));
+        return isUnsettlingProgression(music.progression)?{...chord,unresolved:true}:chord;
     }
 
     variableHarmonyOn() {
@@ -932,7 +949,8 @@ class Generator {
     // way to make a modulation sound intended. Labelled V/<new tonic>.
     pivotChord(from, to) {
         const dominant = this.buildChord(to, 'V');
-        return { ...dominant, numeral: `${dominant.numeral}/${this.buildChord(to, 'I').root}`, keyName: this.buildChord(from, 'I').keyName };
+        return { ...dominant, numeral: `${dominant.numeral}/${this.buildChord(to, 'I').root}`, keyName: this.buildChord(from, 'I').keyName,
+            ...(this.rulebookTrace?{provenance:{...dominant.provenance,pivotTo:this.buildChord(to,'I').keyName}}:{}) };
     }
 
     // The chord at `bar`: the progression's, or - in the last chord slot of
@@ -941,7 +959,7 @@ class Generator {
         const { barsPerChord, drift } = this.settings;
         const cycleBars = PROGRESSIONS[music.progression].length * barsPerChord;
         const inLastSlot = this.harmonicSlotAt(bar,music).index === PROGRESSIONS[music.progression].length-1;
-        if (inLastSlot && drift.pivot && scaleDistance(music, upcoming) > 0) return this.pivotChord(music, upcoming);
+        if (!this.avoidTonic(music) && inLastSlot && drift.pivot && scaleDistance(music, upcoming) > 0) return this.pivotChord(music, upcoming);
         return this.chordAt(bar, music);
     }
 
@@ -963,7 +981,7 @@ class Generator {
     }
 
     sectionChord(bar, music, upcoming, chord, fromBar = bar) {
-        if (this.sectionCadences === false || this.settings.generation === 'legacy'
+        if (this.avoidTonic(music) || this.sectionCadences === false || this.settings.generation === 'legacy'
             || this.formDevelopment === false || this.settings.sections.mode === 'off') return chord;
         // A conductor pivot takes precedence over a local section cadence.
         if (this.settings.drift.pivot && scaleDistance(music, upcoming) > 0
@@ -1018,7 +1036,7 @@ class Generator {
             if (at >= end && at >= nextEnd - size && this.settings.drift.mode !== 'off' && this.settings.drift.pivot) break;
             const context = at < end ? music : next;
             const baseChord = at < end ? this.chordFor(at, music, upcoming) : this.chordAt(at, next);
-            const chord = this.endBar !== null && at === this.endBar - 1 ? this.buildChord(context, 'V')
+            const chord = this.endBar !== null && at === this.endBar - 1 ? this.endingChord(context,at,'V')
                 : this.sectionChord(at, context, at < end ? upcoming : next, baseChord, bar);
             if (at > bar) bpm = glideTempo(bpm, (at < end ? music : next).bpm);
             result.push({ bar: at, chord, scalePcs: chord.scalePcs, bpm });
@@ -1039,7 +1057,7 @@ class Generator {
         const inCycle = bar - music.cycleStart;
         // Next cycle's music: decided as this cycle starts, carried through it.
         const upcoming = inCycle === 0
-            ? nextMusic(music, this.homeMusic(), drift, progressionsOfLength(PROGRESSIONS[this.settings.progression].length), this.rng)
+            ? nextMusic(music, this.homeMusic(), drift, progressionsOfLength(PROGRESSIONS[this.settings.progression].length).filter(i=>isUnsettlingProgression(i)===isUnsettlingProgression(this.settings.progression)), this.rng)
             : prev.upcoming;
         const cycleEnd = inCycle === cycleBars - 1;
         const following = cycleEnd ? this.cycleMusic(upcoming,bar+1,bar) : music;
@@ -1049,10 +1067,10 @@ class Generator {
             return;
         }
         const closing = this.endBar !== null && bar === this.endBar - 1;
-        const chord = closing ? this.buildChord(music, 'V') : this.sectionChord(bar, music, upcoming, this.chordFor(bar, music, upcoming));
+        const chord = closing ? this.endingChord(music,bar,'V') : this.sectionChord(bar, music, upcoming, this.chordFor(bar, music, upcoming));
         // The next bar's chord; a new cycle's first chord is never a pivot.
-        const nextChord = closing ? this.buildChord(music, 'I')
-            : this.endBar !== null && bar + 1 === this.endBar - 1 ? this.buildChord(following, 'V')
+        const nextChord = closing ? this.endingChord(music,bar+1,'I')
+            : this.endBar !== null && bar + 1 === this.endBar - 1 ? this.endingChord(following,bar+1,'V')
                 : this.sectionChord(bar + 1, following, cycleEnd ? following : upcoming,
                     cycleEnd ? this.chordAt(bar + 1, following) : this.chordFor(bar + 1, music, upcoming), bar);
 
@@ -1092,7 +1110,7 @@ class Generator {
             barsLeftInChord,
             formBarsLeftInChord: barsPerChord - inCycle % barsPerChord,
             prev: prev ? prev.state : null,
-            settings: { bpm:this.settings.bpm,progression:this.settings.progression,sectionTone:this.settings.sectionTone,leadActivity, leadDensity, padWeights, bassWeights, pulseWeights, arpWeights, directionWeights, padMotion, thinPadUnderLead, voices, counter, sections: this.quickIntro ? { ...sections, quickIntro: true } : sections, chordSpread, pedal, leadScale, leadLeaps, leadRepeat, leadEnding },
+            settings: { bpm:this.settings.bpm,progression:this.settings.progression,sectionTone:this.settings.sectionTone,leadActivity, leadDensity, padWeights, bassWeights, pulseWeights, arpWeights, directionWeights, padMotion, thinPadUnderLead, voices, counter, sections: this.quickIntro ? { ...sections, quickIntro: true } : sections, chordSpread, pedal:this.settings.tonality.mode==='atonal'?{mode:'off',amount:0}:pedal, leadScale:this.settings.tonality.mode==='atonal'?'full':leadScale, leadLeaps, leadRepeat, leadEnding },
             rng: this.rng,
         });
         const pendingSuspension=prev?.state.composition?.sectionSuspension;
@@ -1115,6 +1133,7 @@ class Generator {
             peek.plan.set(bar,{bar,chord,chordStart,state,events,music,upcoming,nextMusic:following,bpm});
             peek.planBar(bar+1);
             const arrival=peek.plan.get(bar+1);
+            if(this.settings.tonality.mode==='bitonal')arrival.events=arrival.events.map(e=>['lead','counter'].includes(e.role)?{...e,midi:e.midi-this.settings.tonality.separation}:e);
             if(arrival.state.phrase.section?.type==='full'){
                 const protectedBeats=[...(state.composition.melody.resolutions??[]),...(state.composition.melody.ties??[])]
                     .flatMap(r=>[r.from,r.to]).filter(p=>p.bar===bar).map(p=>p.beat);
@@ -1151,26 +1170,46 @@ class Generator {
         }
         events.push(...hits);
         if(!original&&this.endingDevelopment!==false&&closing){const prepared=prepareEnding(events,this.meter);events.splice(0,events.length,...prepared);state.composition.ending={phase:'prepare',arrival:this.endBar};}
+        applyBitonality(events,this.settings.tonality);
+        if (!original && this.noteExpression !== false) expressNotes(events, {
+            voices: this.grooveVoices ?? this.grooveVoiceSnapshot(), secondsPerBeat: 60 / unitsPerMinute(this.meter, bpm), units: this.meter.units,
+        });
+        if (!original && this.heldExpression !== false) expressHeldNotes(events, {
+            voices: this.grooveVoices ?? this.grooveVoiceSnapshot(), secondsPerBeat: 60 / unitsPerMinute(this.meter, bpm),
+        });
+        if (!original && this.noteConnection !== false) connectWindNotes(events, {
+            voices: this.grooveVoices ?? this.grooveVoiceSnapshot(), secondsPerBeat: 60 / unitsPerMinute(this.meter, bpm),
+            previous: prev?.events ?? [], units: this.meter.units,
+        });
+        if (!original && (this.gateEnvelopes === true || this.tempoEffects === true)) timeSoundNotes(events, {
+            voices: this.grooveVoices ?? this.grooveVoiceSnapshot(), bpm,
+            gateEnvelopes:this.gateEnvelopes === true, tempoEffects:this.tempoEffects === true,
+        });
+        if (!original && (this.noteSlides === true || this.padPitchMotion === true || this.bassPitchMotion === true || this.chordSlides === true)) slideNotes(events, {
+            previous:prev?.events ?? [], bar, units:this.meter.units, secondsPerBeat:60/unitsPerMinute(this.meter,bpm),
+            noteSlides:this.noteSlides === true,padMotion:this.padPitchMotion === true,bassMotion:this.bassPitchMotion === true,chordSlides:this.chordSlides === true,
+        });
         let tone = sectionTone(this.settings, state.phrase.section);
         if (!original && this.settings.sectionTone && state.phrase.section?.form) {
             // Log interpolation gives gradual brightness rather than a label-sized jump.
             const low = sections.mode === 'strong' ? 800 : 1200;
             tone = low * (OPEN_TONE / low) ** state.phrase.section.brightness;
         }
-        this.plan.set(bar, { bar, chord, chordStart, state, events, music, upcoming, nextMusic: following, bpm, tone, boundaries });
+        this.plan.set(bar, { bar, chord, chordStart, state, events, music, upcoming, nextMusic: following, bpm, tone, boundaries,
+            ...(this.rulebookTrace?{ruleTrace:{slot,referenceBarsPerChord:barsPerChord}}:{}) });
     }
 
     // The final bar of an ending - the key's I, held: the pad voice-led from
     // the bar before, the bass on the root, the lead (if it was playing)
     // settling on the tonic, a soft kick under it - and silent bars after.
     planEnding(bar, prev, music, bpm) {
-        const chord = this.buildChord(music, 'I');
+        const chord = this.endingChord(music,this.endBar,'I');
         const developed=this.settings.generation!=='legacy'&&this.endingDevelopment!==false;
         let state=prev.state;
         if(developed){
             const {melody,joint,sectionSuspension,sectionSuspensionArrival,...memory}=state.composition??{};
             state={...state,phrase:{...state.phrase,section:null},composition:{...memory,
-                phrase:{...memory.phrase,start:this.endBar,bars:2,role:'ending'},ending:{phase:bar===this.endBar?'tonic':'tail',arrival:this.endBar}}};
+                phrase:{...memory.phrase,start:this.endBar,bars:2,role:'ending'},ending:{phase:bar===this.endBar?(this.avoidTonic(music)?'unresolved':'tonic'):'tail',arrival:this.endBar}}};
         }
         const final = bar === this.endBar;
         const events = [];
@@ -1190,6 +1229,10 @@ class Generator {
             if (this.settings.drums.style !== 'off') events.push({ role: 'perc', midi: 0, beat: 0, length: 0.25, velocity: 0.5 });
             events.forEach((e) => { e.detune = 0; });
         }
+        if (this.settings.generation !== 'legacy' && this.tempoEffects === true) timeSoundNotes(events, {
+            voices:this.grooveVoices ?? this.grooveVoiceSnapshot(), bpm, tempoEffects:true,
+        });
+        applyBitonality(events,this.settings.tonality);
         this.plan.set(bar, {
             bar, chord, chordStart: final, state: { ...state, padVoicing, ...(developed&&final?{leadMidi:events.find(e=>e.role==='lead')?.midi??state.leadMidi,bassMidi:events.find(e=>e.role==='bass')?.midi??state.bassMidi}:{}) }, events,
             ...(developed?{boundaries:planBoundaries(state,bar,this.endBar)}:{}),
@@ -1216,11 +1259,23 @@ class Generator {
      * A copy that only plans: the piece Play would start with these
      * settings, bar by bar via planBar (for rendering to a file).
      */
-    planner({ ensembleCoordination = this.ensembleCoordination, formDevelopment = this.formDevelopment, phrasePerformance = this.phrasePerformance, themeDevelopment = this.themeDevelopment, phraseSearch = this.phraseSearch, longPhrases = this.longPhrases, phraseLength = this.phraseLength, noteResolution = this.noteResolution, contrastPhrases = this.contrastPhrases, duetInteraction = this.duetInteraction, rhythmDevelopment = this.rhythmDevelopment, rhythmGrammar = this.rhythmGrammar, partRhythmGrammar = this.partRhythmGrammar, instrumentGroove = this.instrumentGroove, jointCounterpoint = this.jointCounterpoint, sectionDevelopment = this.sectionDevelopment, sectionCadences = this.sectionCadences, sectionBridges = this.sectionBridges, harmonicRhythm = this.harmonicRhythm, transitionGestures = this.transitionGestures, leadTransitions = this.leadTransitions, leadPickups = this.leadPickups, sectionSuspensions = this.sectionSuspensions, formStrategies = this.formStrategies, sectionCurves = this.sectionCurves, harmonicDevelopment = this.harmonicDevelopment, formStrategy = this.formStrategy, endingDevelopment = this.endingDevelopment } = {}) {
+    planner({ heldPadGlides = this.heldPadGlides, heldBassGlides = this.heldBassGlides, padPitchMotion = this.padPitchMotion, bassPitchMotion = this.bassPitchMotion, noteSlides = this.noteSlides, chordSlides = this.chordSlides, tempoEffects = this.tempoEffects, gateEnvelopes = this.gateEnvelopes, noteConnection = this.noteConnection, heldExpression = this.heldExpression, noteExpression = this.noteExpression, ensembleCoordination = this.ensembleCoordination, formDevelopment = this.formDevelopment, phrasePerformance = this.phrasePerformance, themeDevelopment = this.themeDevelopment, phraseSearch = this.phraseSearch, longPhrases = this.longPhrases, phraseLength = this.phraseLength, noteResolution = this.noteResolution, contrastPhrases = this.contrastPhrases, duetInteraction = this.duetInteraction, rhythmDevelopment = this.rhythmDevelopment, rhythmGrammar = this.rhythmGrammar, partRhythmGrammar = this.partRhythmGrammar, instrumentGroove = this.instrumentGroove, jointCounterpoint = this.jointCounterpoint, sectionDevelopment = this.sectionDevelopment, sectionCadences = this.sectionCadences, sectionBridges = this.sectionBridges, harmonicRhythm = this.harmonicRhythm, transitionGestures = this.transitionGestures, leadTransitions = this.leadTransitions, leadPickups = this.leadPickups, sectionSuspensions = this.sectionSuspensions, formStrategies = this.formStrategies, sectionCurves = this.sectionCurves, harmonicDevelopment = this.harmonicDevelopment, formStrategy = this.formStrategy, endingDevelopment = this.endingDevelopment } = {}) {
         const copy = Object.create(Generator.prototype);
         copy.settings = JSON.parse(JSON.stringify(this.settings));
         // Comparison tooling can isolate the previous Latest arrangement.
         copy.ensembleCoordination = ensembleCoordination;
+        copy.noteExpression = noteExpression;
+        copy.heldExpression = heldExpression;
+        copy.noteConnection = noteConnection;
+        copy.tempoEffects = tempoEffects;
+        copy.gateEnvelopes = gateEnvelopes;
+        copy.heldPadGlides = heldPadGlides;
+        copy.heldBassGlides = heldBassGlides;
+        copy.padPitchMotion = padPitchMotion;
+        copy.bassPitchMotion = bassPitchMotion;
+        copy.noteSlides = noteSlides;
+        copy.chordSlides = chordSlides;
+        copy.rulebookTrace=this.rulebookTrace;
         copy.formDevelopment = formDevelopment;
         copy.phrasePerformance = phrasePerformance;
         copy.themeDevelopment = themeDevelopment;
@@ -1257,7 +1312,7 @@ class Generator {
     grooveVoiceSnapshot() {
         return Object.fromEntries(['lead', 'counter', 'pad', 'bass'].map(role => {
             const voice = this.roles?.[role], preset = voice?.instrument.preset ?? {};
-            return [role, { name: voice?.presetName ?? '', preset: { stringModel: preset.stringModel, gainAttack: preset.gainAttack } }];
+            return [role, { name: voice?.presetName ?? '', preset: { stringModel: preset.stringModel, gainAttack: preset.gainAttack, gainSustain:preset.gainSustain, vibratoDepth: preset.vibratoDepth } }];
         }));
     }
 
@@ -1390,6 +1445,7 @@ class Generator {
     // first if settings changed), so their notes may be booked again.
     loopBack() {
         const { from, to } = this.loop;
+        if(this.heldResetBar!==undefined)this.heldResetBar=from;
         if (this.loop.dirty) {
             for (let bar = from; bar <= to; bar++) this.plan.delete(bar);
             for (let bar = from; bar <= to; bar++) this.planBar(bar);
@@ -1414,6 +1470,23 @@ class Generator {
         });
     }
 
+    queueHeldGlideReset() {
+        if(this.heldActiveRoles?.size&&this.isRunning)this.heldResetBar=this.currentBar+1;
+    }
+
+    heldGlideBookings(bar) {
+        if(this.settings.generation==='legacy'||(!this.heldPadGlides&&!this.heldBassGlides))return new Map();
+        const notes=[];let time=0;
+        const through=Math.min(bar+4,this.loop?this.loop.to:Infinity,this.endBar===null?Infinity:this.endBar-1);
+        for(let b=bar;b<=through;b++){
+            const planned=this.plan.get(b);if(!planned)break;
+            const unit=60/unitsPerMinute(this.meter,planned.bpm);
+            for(const event of planned.events)if(!event.booked&&['pad','bass'].includes(event.role))notes.push({event,bar:b,role:event.role,midi:event.midi,time:time+event.beat*unit,duration:event.length*unit,expression:event.expression,section:planned.state.phrase.section?.start,ending:planned.ending});
+            time+=this.meter.units*unit;
+        }
+        return new Map(joinHeldNotes(notes,{pad:this.heldPadGlides===true,bass:this.heldBassGlides===true,voices:this.grooveVoiceSnapshot()}).filter(n=>n.heldMembers).map(n=>[n.event,n]));
+    }
+
     // Books this beat's slice of the plan at exact audio times.
     onBeat({ bar, beatInBar, time, secondsPerBeat }) {
         this.beatLog.push({ bar, beatInBar, units: this.transport.beatsPerBar, time, secondsPerBeat });
@@ -1431,15 +1504,26 @@ class Generator {
             const next = this.plan.get(bar + 1);
             if (next && next.chordStart) this.runPendingChange();
         }
+        if(beatInBar===0&&this.heldResetBar!==undefined&&bar>=this.heldResetBar){
+            for(const role of this.heldActiveRoles??[])this.roles[role].instrument.silence(time);
+            this.heldActiveRoles=new Set();delete this.heldResetBar;
+        }
         if (beatInBar === 0 && this.pendingVoices && this.pendingVoices.length) this.flushPendingVoices(bar, secondsPerBeat);
         if (beatInBar === 0) this.applyTone(this.plan.get(bar).tone, time, secondsPerBeat * this.transport.beatsPerBar);
+        let held=this.heldGlideBookings(bar);
         const book = (e, start) => {
+            if(e.booked)return;
+            const connected=held.get(e);
+            if(connected?.heldMembers){
+                for(const n of connected.heldMembers)n.event.booked=true;
+                (this.heldActiveRoles??=new Set()).add(e.role);
+            }
             e.booked = true;
             // For visuals (Backdrop): what was booked, and when it sounds (audio-clock seconds).
-            this.noteLog.push({ boundaries:this.plan.get(bar)?.boundaries,role: e.role, midi: e.midi, velocity: e.velocity, time: Math.max(start, this.AC.currentTime), length: e.length * secondsPerBeat });
+            this.noteLog.push({ boundaries:this.plan.get(bar)?.boundaries,role: e.role, midi: e.midi, velocity: e.velocity, time: Math.max(start, this.AC.currentTime), length: connected?.duration??e.length * secondsPerBeat });
             if (this.noteLog.length > 96) this.noteLog.shift();
             this.emitVisualNote({ type: 'on', ...this.noteLog[this.noteLog.length - 1] });
-            this.roles[e.role].instrument.scheduleNote(e.midi, Math.max(start, this.AC.currentTime), e.length * secondsPerBeat, e.velocity, e.detune);
+            this.roles[e.role].instrument.scheduleNote(e.midi, Math.max(start, this.AC.currentTime), (connected?.duration??e.length * secondsPerBeat), e.velocity, e.detune, connected?.expression??e.expression);
         };
         const current = this.plan.get(bar).events;
         current
@@ -1451,7 +1535,7 @@ class Generator {
         // (the transport's bar length: the old one until a new time signature starts)
         if (beatInBar === this.transport.beatsPerBar - 1) {
             const looping = this.loop && bar === this.loop.to;
-            if (looping) this.loopBack();
+            if (looping) {this.loopBack();held=this.heldGlideBookings(this.loop.from);}
             const next = this.plan.get(looping ? this.loop.from : bar + 1);
             if (next) {
                 // The next bar's tempo applies from the gap before its downbeat,
@@ -1460,6 +1544,9 @@ class Generator {
                 const gap = 60 / unitsPerMinute(this.meter, next.bpm);
                 next.events
                     .filter((e) => !e.booked && e.beat < 0)
+                    // A boundary reset must run before a replacement held voice attacks.
+                    // Its early note is booked by the downbeat fallback a few ms later.
+                    .filter(e=>!(this.heldActiveRoles?.has(e.role)&&(this.heldResetBar===next.bar||this.pendingVoices?.some(p=>p.role===e.role))))
                     .forEach((e) => book(e, time + gap * (1 + e.beat)));
             }
         }

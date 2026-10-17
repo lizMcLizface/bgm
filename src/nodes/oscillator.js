@@ -1,3 +1,4 @@
+import { dutyCycleCurve } from './pulseCurve';
 const MAX_FREQ = 44100;
 
 // Waveforms beyond the built-in four, as harmonic amplitudes (sine terms,
@@ -72,17 +73,7 @@ class Oscillator {
     getDutyCycle = () => this.dutyCycle;
 
     // Create waveshaper curve for duty cycle square wave
-    createDutyCycleCurve = (dutyCycle) => {
-        const curveLength = 2048;
-        const curve = new Float32Array(curveLength);
-        
-        for (let i = 0; i < curveLength; i++) {
-            const x = i / (curveLength - 1); // Normalize to 0-1 range
-            curve[i] = x < dutyCycle ? 1.0 : -1.0; // Step function
-        }
-        
-        return curve;
-    }
+    createDutyCycleCurve = dutyCycleCurve;
 
     // Setters
     setType = (type) => {

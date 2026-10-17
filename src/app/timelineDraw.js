@@ -37,6 +37,19 @@ export function chordBlocks(plan, beatsPerBar) {
     return blocks.map((b) => ({ ...b, start: b.startBar * beatsPerBar, end: b.endBar * beatsPerBar }));
 }
 
+// Match the drawn chord rectangles, clipped to the visible canvas. Used
+// by transparent keyboard/touch targets without duplicating the drawing.
+export function chordRegions(plan, beatsPerBar, width, pos) {
+    const pxPerBeat = width / ((BARS_BEHIND + BARS_AHEAD) * beatsPerBar);
+    if (!(width > 0 && beatsPerBar > 0)) return [];
+    const x = beat => BARS_BEHIND * beatsPerBar * pxPerBeat + (beat - pos) * pxPerBeat;
+    return chordBlocks(plan, beatsPerBar).flatMap(block => {
+        const left = Math.max(0, x(block.start) + 2), right = Math.min(width, x(block.end) - 2);
+        return right > left ? [{ ...block, left, width: right - left, top: 2, height: LANE_HEIGHT - 4,
+            record: plan.find(b => b.bar === block.startBar), key: `${block.startBar}/${block.endBar}/${block.chord.name}` }] : [];
+    });
+}
+
 function roundRect(ctx, x, y, w, h, r) {
     const radius = Math.min(r, w / 2, h / 2);
     ctx.beginPath();
