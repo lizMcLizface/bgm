@@ -68,8 +68,11 @@ body {
 .gen {
     max-width: 1120px;
     margin: 0 auto;
-    padding: 24px 16px 48px;
-    display: grid;
+    padding: 24px 16px 0;
+    min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
     gap: 16px;
 }
 
@@ -1125,8 +1128,8 @@ body {
 
 /* The page's foot: source link and the small print. */
 .gen-footer {
-    margin-top: 48px;
-    padding: 20px 0 32px;
+    margin-top: auto;
+    padding: 20px 0 24px;
     border-top: 1px solid var(--gen-border);
     font-size: 12px;
     line-height: 1.5;
@@ -2282,8 +2285,8 @@ body {
     display: none !important;
 }
 
-/* ...and the look menu, to change the picture while watching it. */
-.gen-zen .gen-header-end > :not(.gen-header-tools) {
+/* Keep preset selection and the look menu in both hidden-interface views. */
+.gen-zen .gen-header-end > :not(.gen-header-tools):not(.gen-scene) {
     display: none !important;
 }
 
@@ -2329,4 +2332,28 @@ body {
 .gen button.gen-hide[aria-pressed='true'] {
     border-color: var(--gen-accent);
     color: var(--gen-accent);
+}
+
+/* Fluid looks: keep common adjustments short, with solver controls tucked away. */
+.gen-visual .gen-settings-menu { width: 320px; max-width: calc(100vw - 24px); }
+.gen-fluid-controls { display: grid; gap: 10px; }
+.gen-fluid-slider { display: grid; grid-template-columns: 1fr auto; gap: 5px 12px; font-size: 12px; }
+.gen-fluid-slider input { grid-column: 1 / -1; width: 100%; margin: 0; }
+.gen-fluid-slider output { color: var(--gen-muted); font-variant-numeric: tabular-nums; }
+.gen-fluid-advanced { border-top: 1px solid var(--gen-border); padding-top: 10px; }
+.gen .gen-fluid-advanced > summary { display: list-item; width: auto; height: auto; border: 0; padding: 0; font-size: 12px; }
+.gen-fluid-advanced[open] > summary { margin-bottom: 12px; }
+
+.gen .gen-fluid-advanced > summary::before { content: '▸'; margin-right: 6px; }
+.gen .gen-fluid-advanced[open] > summary::before { content: '▾'; }
+
+.gen-fluid-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+
+/* The first stage introduces listening and fluid before individual voices. */
+.gen-timeline-body.is-no-tracks { grid-template-columns: minmax(0, 1fr); }
+
+/* Let the stage-unlock label and preset picker share their own phone row. */
+@media (max-width: 639px) {
+    .gen-header-end { flex-wrap: wrap; }
+    .gen-header-end .gen-header-tools { flex-basis: 100%; justify-content: flex-end; }
 }

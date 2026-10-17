@@ -25,10 +25,13 @@ import { SCALE_FAMILIES, CHORD_COLOURS } from './theory';
 import PROGRESSIONS from './progressions';
 import { decodeShareCode, encodeShareParts, decodeShareParts } from './shareCode';
 import { phraseToSeed } from './phrase';
+import { HARMONY_SCALES } from './composition/harmonyScale';
+import { generationFromSearch, withGeneration } from './generation';
 
 /** Fresh default settings (a new random seed each call). */
 export function defaultSettings() {
     return {
+        generation: 'latest',
         tonic: 0,
         mode: 'Major-1', // scale id, as on the main page (theory.js SCALE_FAMILIES)
         bpm: 72,
@@ -46,6 +49,7 @@ export function defaultSettings() {
         chordBorrow: 0, // share of chords taken from the parallel mode
         chordSpread: 'close', // voicing of the pad: close or open (arranger.js SPREADS)
         pedal: { mode: 'off', amount: 0.5 }, // the bass holds the tonic or fifth for this share of phrases
+        harmonyScale: 'auto',
         leadScale: 'full', // full, or pentatonic
         leadLeaps: 0.5, // how far the lead jumps between chord tones: 0.5 as drawn, less is stepwise, more leapy
         leadRepeat: 0, // share of phrases that repeat the last phrase's tune
@@ -92,6 +96,7 @@ const listOf = (valid) => (v) => (Array.isArray(v) ? [...new Set(v.filter(valid)
 // Validator per key path; nested objects are walked key by key.
 const RULES = {
     tonic: int(0, 11),
+    generation: oneOf(['latest', 'legacy']),
     mode: (v) => (MODE_IDS.has(v) ? v : undefined),
     bpm: clamp(BPM_LIMITS[0], BPM_LIMITS[1]),
     progression: int(0, PROGRESSIONS.length - 1),
@@ -108,6 +113,7 @@ const RULES = {
     chordBorrow: clamp(0, 1),
     chordSpread: oneOf(Object.keys(SPREADS)),
     pedal: { mode: oneOf(Object.keys(PEDAL_MODES)), amount: clamp(0, 1) },
+    harmonyScale: oneOf(Object.keys(HARMONY_SCALES)),
     leadScale: oneOf(Object.keys(LEAD_SCALES)),
     leadLeaps: clamp(0, 1),
     leadRepeat: clamp(0, 1),
@@ -264,6 +270,10 @@ export function shareFromLocation(location) {
         const code = codeFromLocation(location);
         share = code ? decodeShare(code) : null;
     }
+    if (share || query.has('generation')) {
+        share = share || { settings: defaultSettings(), presets: {} };
+        share = { ...share, settings: { ...share.settings, generation: generationFromSearch(location.search) } };
+    }
     const phrase = query.get('phrase');
     const seed = phrase ? phraseToSeed(phrase) : null;
     if (seed === null) return share;
@@ -282,7 +292,7 @@ export function settingsFromLocation(location) {
  * out ({ seed: false }): a reload keeps the settings but makes a new piece.
  */
 export function sharePath(settings, presets, location = window.location, { seed = true } = {}) {
-    return `${location.pathname}?${encodeSettings(settings, presets, { seed })}`;
+    return withGeneration(`${location.pathname}?${encodeSettings(settings, presets, { seed })}`, settings.generation);
 }
 
 /** Full share URL for the current page and settings. */

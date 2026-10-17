@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Generator, { ROLES, PERC_ROLE } from './Generator';
 import { DRUM_STYLES, DRUM_KITS, DRUMS, DRUM_LABELS, DRUM_PARAMS, randomDrums } from './percussion';
+import { HARMONY_SCALES } from './composition/harmonyScale';
 import { SCALE_FAMILIES, TONIC_NAMES, CHORD_COLOURS, scaleById } from './theory';
 import ChordTimeline from './ChordTimeline';
 import { RoleButtons, TrackStrip, useLivePlay, DRUM_KEY_HINT } from './Tracks';
@@ -33,15 +34,18 @@ import {
     DiceIcon, RotateIcon, SparkIcon, PlayIcon, PauseIcon, ToStartIcon, BarBackIcon, BarForwardIcon, ProgressionBackIcon, ProgressionForwardIcon, LoopIcon, MusicIcon, AmbienceIcon, ChevronUpIcon, ChevronDownIcon, TimelineIcon,
 } from './icons';
 import { newSoundSeed } from './soundGen';
-import { soundFrom, SOUND_KINDS, GENERATOR_V2 } from './soundGenV2';
-import { levelPreset } from './engine/loudness';
+import { SOUND_KINDS, GENERATOR_V2 } from './soundGenV2';
+import { GENERATOR_V3, soundContext } from './soundGenV3';
+import { prepareSound } from './engine/prepareSound';
 import { addGeneratedPreset, addSetupPreset, findPreset, generatedInfo } from './editor/presetStore';
 import PRESET_DEFAULTS from './engine/presetDefaults';
 import { readPref, writePref } from './prefs';
+import { isMobile } from '../audio/performance';
 import { seedToPhrase, phraseToSeed } from './phrase';
 import { WANDER_ROLES, WANDER_LIMITS, WANDER_MODES, AMBIENCE_WANDER_LIMITS } from './engine/wander';
 import Tour, { tourSeen } from './Tour';
 import { STAGES, STAGE_KEY, LAST_STAGE } from './tourSteps';
+import { generationFromSearch, withGeneration } from './generation';
 
 // One Generator for the page's lifetime; StrictMode's double-mount must
 // not build a second set of instruments.
@@ -73,6 +77,8 @@ const getGenerator = () => {
         } else {
             generator = new Generator(share ? share.settings : defaultSettings());
         }
+        generator.set('generation', generationFromSearch(window.location.search));
+        generator.reset();
         if (share && share.phrase) linkedPhrase = share.phrase;
         if (share) {
             Object.entries(share.presets).forEach(([role, preset]) => {
@@ -104,15 +110,15 @@ if (import.meta.hot) {
 // (?preset=...), a link anyone can read; once anything is changed it is the settings.
 // With the short intro on, the address says so too (intro=short), so a link carries it.
 const withIntro = (path, shortIntro) => (shortIntro ? `${path}${path.includes('?') ? '&' : '?'}intro=short` : path);
-function useSettingsInUrl(settings, presets, presetSlug, shortIntro) {
+function useSettingsInUrl(settings, presets, presetSlug, shortIntro, generation) {
     useEffect(() => {
         const id = setTimeout(() => {
-            window.history.replaceState(null, '', withIntro(presetSlug
+            window.history.replaceState(null, '', withGeneration(withIntro(presetSlug
                 ? `${window.location.pathname}?preset=${presetSlug}`
-                : sharePath(settings, presets, window.location, { seed: false }), shortIntro));
+                : sharePath(settings, presets, window.location, { seed: false }), shortIntro), generation));
         }, 300);
         return () => clearTimeout(id);
-    }, [settings, presets, presetSlug, shortIntro]);
+    }, [settings, presets, presetSlug, shortIntro, generation]);
 }
 
 // The seed as a pass-phrase (phrase.js): shows the current seed's words;
@@ -485,7 +491,7 @@ const SoundsBar = ({ onGenerate, generating }) => {
                 <button type="submit" disabled={generating || phraseToSeed(text, SOUND_SEEDS) === null}>Make these sounds</button>
             </form>
             <small className="gen-random-hint">
-                Every voice gets a new sound, all sharing one character. The same phrase always makes the same sounds.
+                Every voice gets a new sound, made to work together. In Latest, the character follows your preset and musical settings. Shared links keep the result.
             </small>
         </section>
     );
@@ -629,6 +635,13 @@ const ColourPanel = ({ settings, update, onRandom }) => {
     return (
         <Panel id="colour" title="Colour" onRandom={onRandom}>
             <div className="gen-row">
+                <Field label="Harmony scale">
+                    <select aria-label="Harmony scale" value={settings.harmonyScale} disabled={settings.generation === 'legacy'}
+                        title="Automatic gives major/minor pentatonic melodies conventional harmony. Selected scale colours keeps the original chord shapes. Original generation always uses the selected scale."
+                        onChange={(e) => update('harmonyScale', e.target.value)}>
+                        {Object.entries(HARMONY_SCALES).map(([id, text]) => <option key={id} value={id}>{text}</option>)}
+                    </select>
+                </Field>
                 <Field label="Chord colour">
                     <select value={colour.mode} onChange={(e) => update('chordColour', { ...colour, mode: e.target.value })}>
                         {Object.entries(CHORD_COLOURS).map(([id, text]) => <option key={id} value={id}>{text}</option>)}
@@ -962,6 +975,9 @@ const GenerativeApp = () => {
     };
     // The scene last picked (shown in the top row until something changes).
     const [scene, setScene] = useState(linkedScene ? linkedScene.name : '');
+    const soundScene = useRef(linkedScene);
+    const soundRequests = useRef({});
+    const generationRequest = useRef(0);
     // the built-in preset the page is on (by slug), so its address can be its name
     const sceneSlugRef = useRef(linkedScene ? { name: linkedScene.name, slug: sceneSlug(linkedScene.name) } : null);
     const presetSlug = scene && sceneSlugRef.current && sceneSlugRef.current.name === scene && !Object.values(roles).some((r) => r.edited)
@@ -978,7 +994,43 @@ const GenerativeApp = () => {
     useEffect(() => {
         gen.setQuickIntro(shortIntro);
     }, [shortIntro]); // eslint-disable-line react-hooks/exhaustive-deps
-    useSettingsInUrl(settings, linkPresets, presetSlug, shortIntro);
+    const [generationChoice, setGenerationChoice] = useState(gen.settings.generation);
+    const chooseGeneration = async (value, push = true) => {
+        const mode = value === 'legacy' ? 'legacy' : 'latest';
+        setGenerationChoice(mode);
+        if (push) window.history.pushState(null, '', withGeneration(window.location.href, mode));
+        const request = ++generationRequest.current;
+        setGenerating({});
+        const candidates = Object.keys(ROLES).flatMap(role => {
+            soundRequests.current[role] = (soundRequests.current[role] || 0) + 1;
+            const r = gen.roles[role], info = generatedInfo(r.presetName);
+            return !r.edited && info?.version === GENERATOR_V3 ? [{ role, info, name: r.presetName, preset: r.instrument.preset }] : [];
+        });
+        let prepared;
+        try { prepared = await Promise.all(candidates.map(async c => ({ ...c, sound: await prepareSound(c.info, mode) }))); }
+        catch (error) { if (request !== generationRequest.current) return; console.error('Could not rebuild generated sounds', error); setGenerationChoice(gen.settings.generation); window.history.replaceState(null, '', withGeneration(window.location.href, gen.settings.generation)); return; }
+        if (request !== generationRequest.current) return;
+        const waiting = gen.pendingChange;
+        gen.atNextChord(() => {
+            waiting?.();
+            if (request !== generationRequest.current) return;
+            gen.set('generation', mode);
+            for (const c of prepared) {
+                const r = gen.roles[c.role];
+                if (r.edited || r.presetName !== c.name || r.instrument.preset !== c.preset) continue;
+                addGeneratedPreset(c.sound.name, c.sound.preset, c.sound.info);
+                gen.loadRolePreset(c.role, c.sound.name, c.sound.preset, gen.isRunning ? .25 : 0);
+                presetLoaded(c.role, c.sound.name);
+            }
+            setSettings({ ...gen.settings });
+        });
+    };
+    useEffect(() => {
+        const pop = () => chooseGeneration(generationFromSearch(window.location.search), false);
+        window.addEventListener('popstate', pop);
+        return () => window.removeEventListener('popstate', pop);
+    }, [gen]);
+    useSettingsInUrl(settings, linkPresets, presetSlug, shortIntro, generationChoice);
     const [sleepLeft, setSleepLeft] = useState(null);
     const loadSettings = (next) => {
         gen.setMany(next);
@@ -1002,6 +1054,11 @@ const GenerativeApp = () => {
     };
     const presetLoaded = (role, presetName) => patchRole(role, { presetName, edited: false });
     const loadPreset = (role, name) => {
+        const info = generatedInfo(name);
+        if (info?.version === GENERATOR_V3 && name.startsWith('Original ') !== (generationChoice === 'legacy')) {
+            loadGeneratedSound(role, info);
+            return;
+        }
         setScene('');
         if (gen.loadRolePreset(role, name)) presetLoaded(role, name);
     };
@@ -1009,25 +1066,38 @@ const GenerativeApp = () => {
     const randomizeField = (key) => loadSettings(randomField(key, gen.settings, randomLevel));
     const chords = progressionLength(settings.progression);
     const randomizePreset = (role) => loadPreset(role, randomPreset(role, roles[role].presetName, randomLevel));
-    // A procedural sound (soundGenV2.js soundFrom) - info: { role, seed } for
+    // A procedural sound: info retains recipe version and frozen v3 context.
+    // { role, seed } for
     // one voice, { role, ensemble } for a voice of an ensemble (+ version and
     // kind for v2) - levelled to its role's default loudness, onto `target`.
     const loadGeneratedSound = async (target, info) => {
         setGenerating((g) => ({ ...g, [target]: true }));
+        const request = soundRequests.current[target] = (soundRequests.current[target] || 0) + 1;
+        const previous = gen.roles[target].instrument.preset;
         try {
-            const { name, preset, kind } = soundFrom(info);
-            // a v2 sound's link names the kind it turned out as
-            const made = info.version === GENERATOR_V2 && info.seed !== undefined ? { ...info, kind } : info;
-            addGeneratedPreset(name, await levelPreset(preset, info.role), made);
-            loadPreset(target, name);
+            const sound = await prepareSound(info, generationChoice);
+            if (soundRequests.current[target] !== request || gen.roles[target].instrument.preset !== previous) return;
+            addGeneratedPreset(sound.name, sound.preset, sound.info);
+            loadPreset(target, sound.name);
+        } catch (error) {
+            console.error('Could not generate sound', error);
         } finally {
-            setGenerating((g) => ({ ...g, [target]: false }));
+            if (soundRequests.current[target] === request) setGenerating((g) => ({ ...g, [target]: false }));
         }
     };
-    const generateForRole = (role) => loadGeneratedSound(role, { role, seed: newSoundSeed(), kind: soundKinds[role], version: GENERATOR_V2 });
+    const generatedContext = (role) => {
+        const context = soundContext(gen.settings, soundScene.current || { voices: Object.fromEntries(Object.keys(ROLES).map(r => [r, gen.roles[r].presetName])) }, role);
+        const previous = generatedInfo(gen.roles[role].presetName);
+        if (!soundScene.current && previous?.version === GENERATOR_V3) context.profile = previous.profile;
+        return context;
+    };
+    const generateForRole = (role) => loadGeneratedSound(role, { role, seed: newSoundSeed(), kind: soundKinds[role],
+        version: generationChoice === 'legacy' ? GENERATOR_V2 : GENERATOR_V3,
+        ...(generationChoice === 'legacy' ? {} : generatedContext(role)) });
     // New sounds for every voice at once, with a shared character.
     const generateAll = (ensemble) => {
-        Object.keys(ROLES).forEach((role) => loadGeneratedSound(role, { role, ensemble, version: GENERATOR_V2 }));
+        Object.keys(ROLES).forEach((role) => loadGeneratedSound(role, { role, ensemble, version: generationChoice === 'legacy' ? GENERATOR_V2 : GENERATOR_V3,
+            ...(generationChoice === 'legacy' ? {} : generatedContext(role)) }));
     };
     useEffect(() => {
         const sounds = linkedSounds;
@@ -1119,16 +1189,15 @@ const GenerativeApp = () => {
     // Smoothly (the ⚙ menu, on by default) the whole change waits for the next chord, and the
     // sounds then glide over that chord instead of switching.
     const [smoothPresets, setSmoothPresets] = useStoredFlag('bgm-smooth-presets', true);
-    const [backdropOn, setBackdropOn] = useStoredFlag('bgm-backdrop', false);
+    const [backdropOn, setBackdropOn] = useStoredFlag('bgm-backdrop', !isMobile());
+    const [fluidReset, setFluidReset] = useState(0);
     const [storedBackdropOptions, setBackdropOptions] = useStoredFlag('bgm-backdrop-options', BACKDROP_DEFAULTS);
     const backdropOptions = { ...BACKDROP_DEFAULTS, ...storedBackdropOptions };
     // Hides everything but the transport and the timeline (⚙ menu); Esc or the corner button brings it back.
-    const [zen, setZen] = useState(false);
+    const [zen, setZen] = useStoredFlag('bgm-hide-ui', false);
     // In that view the timeline can be folded away too (ignored while the interface shows).
-    const [timelineHidden, setTimelineHidden] = useState(false);
+    const [timelineHidden, setTimelineHidden] = useStoredFlag('bgm-hide-timeline', false);
     const bare = zen && timelineHidden;
-    // The circle is only for the hidden-interface view.
-    const circleShown = zen && backdropOptions.circle;
     useEffect(() => {
         if (!zen) return undefined;
         const onKey = (e) => { if (e.key === 'Escape') setZen(false); };
@@ -1172,9 +1241,12 @@ const GenerativeApp = () => {
         gen.atNextChord(() => applySceneNow(picked, options, true));
     };
     const applySceneNow = (picked, { exact = false, unsaved = false, parts = 'all' }, morph) => {
+        soundScene.current = picked;
         const playing = gen.anyRunning;
         if (parts !== 'voices') {
             const next = sceneSettings(picked, exact && Number.isInteger(picked.settings.seed) ? picked.settings.seed : undefined);
+            next.generation = SCENES.includes(picked) || !picked.settings.generation ? generationChoice : next.generation;
+            setGenerationChoice(next.generation);
             loadSettings(parts === 'composition' ? { ...next, volumes: gen.settings.volumes, muted: gen.settings.muted } : next);
         }
         if (parts !== 'composition' && sceneGroup(picked) !== 'ambience') {
@@ -1313,7 +1385,7 @@ const GenerativeApp = () => {
 
     return (
         <main className={`gen${zen ? ' gen-zen' : ''}${bare ? ' gen-zen-bare' : ''}`}>
-            {(backdropOn || circleShown) && backdropSupported() && <Backdrop generator={gen} options={{ ...backdropOptions, circle: circleShown }} clouds={backdropOn} />}
+            {backdropOn && backdropSupported() && <Backdrop generator={gen} options={{ ...backdropOptions, circle: false }} clouds={backdropOn} resetKey={fluidReset} />}
 
             <header className="gen-header">
                 <h1 aria-label="calmbgm - calm procedural music" title="calmbgm - calm procedural music">calm<b>bgm</b></h1>
@@ -1339,9 +1411,9 @@ const GenerativeApp = () => {
                     <button type="button" className="gen-help" onClick={() => setHelpOpen(true)} title="Quick reference: hover the parts of the page to see what they do"
                         aria-label="Quick reference">?</button>
                     <MasterVolume />
-                    <VisualMenu backdrop={backdropSupported() ? { value: backdropOn, onChange: setBackdropOn, options: backdropOptions, onOptions: setBackdropOptions, onShuffle: () => setBackdropOptions(shuffleColours(backdropOptions)) } : null} />
+                    <VisualMenu backdrop={backdropSupported() ? { value: backdropOn, onChange: setBackdropOn, options: backdropOptions, onOptions: setBackdropOptions, onClear: () => setFluidReset((n) => n + 1), onShuffle: () => setBackdropOptions(shuffleColours(backdropOptions)) } : null} />
                     <AudioMenu generator={gen} onReload={reloadKeepingSettings} />
-                    <SettingsMenu midi={{ connect: live.connectMidi, status: live.midiStatus }} link={() => withIntro(shareUrl(gen.settings, linkPresets), shortIntro)} saving={saving} onStartOver={startOver} smooth={{ value: smoothPresets, onChange: setSmoothPresets }} intro={{ value: shortIntro, onChange: setShortIntro }} onTour={() => openTour(false)}
+                    <SettingsMenu midi={{ connect: live.connectMidi, status: live.midiStatus }} link={() => withGeneration(withIntro(shareUrl(gen.settings, linkPresets), shortIntro), generationChoice)} generation={{ value: generationChoice, onChange: chooseGeneration }} saving={saving} onStartOver={startOver} smooth={{ value: smoothPresets, onChange: setSmoothPresets }} intro={{ value: shortIntro, onChange: setShortIntro }} onTour={() => openTour(false)}
                         phrase={<PhraseField seed={settings.seed} edited={gen.editedSinceStart} onApply={playPhrase} onRoll={newVariation} initial={linkedPhrase} />}>
                         <SleepTimer generator={gen} running={anyOn} onLeft={setSleepLeft} />
                         <Recorder generator={gen} fileName={fileName} onProgress={setSaving} />
@@ -1363,8 +1435,8 @@ const GenerativeApp = () => {
 
             <ChordTimeline
                 generator={gen}
-                tracks={<TrackStrip roles={shownTracks} presets={Object.fromEntries(Object.entries(roles).map(([role, { presetName, edited }]) => [role, { name: presetName, edited }]))} mix={mix} armed={armed} onMix={changeMix} onArm={setArmed} onEdit={has(3) ? editSound : undefined}
-                    onRandom={randomizePreset} onGenerate={has(3) ? generateForRole : undefined} onPick={choosePicker} generating={generating} live={live} />}
+                tracks={has(1) ? <TrackStrip roles={shownTracks} presets={Object.fromEntries(Object.entries(roles).map(([role, { presetName, edited }]) => [role, { name: presetName, edited }]))} mix={mix} armed={armed} onMix={changeMix} onArm={setArmed} onEdit={has(3) ? editSound : undefined}
+                    onRandom={randomizePreset} onGenerate={has(3) ? generateForRole : undefined} onPick={choosePicker} generating={generating} live={live} /> : null}
             />
 
             {has(7) && <Randomizer level={randomLevel} onLevel={setRandomLevel} onRandomize={randomize} onNewVariation={newVariation} />}
@@ -1425,12 +1497,13 @@ const GenerativeApp = () => {
 
             {has(4) && <Panel id="arrangement" title="Arrangement" onRandom={() => randomize('arrangement')} more={(
                 <>
-                    <Field label="Section length">
+                    <Field label={settings.generation === 'legacy' ? 'Section length' : 'Section length reference'}>
                         <select value={settings.sections.phrases} disabled={settings.sections.mode === 'off'}
                             onChange={(e) => update('sections', { ...settings.sections, phrases: Number(e.target.value) })}>
                             {SECTION_LENGTHS.map((n) => <option key={n} value={n}>{n} phrases ({n * 4} bars)</option>)}
                         </select>
                     </Field>
+                    {settings.generation !== 'legacy' && <small>Sections develop around this reference length and prepare the next change. Musical phrases can span four or eight bars.</small>}
                     {['answer', 'line'].includes(settings.counter.mode) && (
                         <Field label={`Second lead ${settings.counter.mode === 'answer' ? 'answers' : 'activity'} ${Math.round(settings.counter.activity * 100)}%`}>
                             <input type="range" min="0" max="1" step="0.05" value={settings.counter.activity}
@@ -1488,7 +1561,7 @@ const GenerativeApp = () => {
 
             {has(3) && <SoundsBar onGenerate={generateAll} generating={Object.values(generating).some(Boolean)} />}
 
-            {Object.entries(shownRoles).map(([role, { label }]) => (
+            {has(1) && Object.entries(shownRoles).map(([role, { label }]) => (
                 <Panel
                     key={role}
                     id={`voice-${role}`}

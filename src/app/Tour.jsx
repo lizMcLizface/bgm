@@ -128,7 +128,7 @@ const Tour = ({ onClose, reference = false, prompt = false, fromStage = 0, toSta
                     onClick={(e) => e.stopPropagation()}>
                     <h2 id="gen-tour-intro-title">Welcome to bgm</h2>
                     <p id="gen-tour-intro-text">
-                        Calm music that writes itself, for working or studying - or under a video or podcast.
+                        Calm music that writes itself, with a fluid background that moves with the sound.
                         A short tour shows the basics; the rest of the page unlocks a step at a time, whenever you are ready.
                     </p>
                     <div className="gen-tour-intro-buttons">

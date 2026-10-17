@@ -644,9 +644,9 @@ function harmonyEvents(leadNotes, scalePcs, range) {
  * @param {function} args.rng
  * @returns {{ events: object[], state: object }} event beats/lengths in units
  */
-export function arrangeBar({ bar, meter, chord, nextChord, scalePcs, chordStart, barsLeftInChord, prev, settings, rng }) {
+export function arrangeBar({ bar, meter, chord, nextChord, scalePcs, chordStart, barsLeftInChord, prev, settings, rng, phraseBars = PHRASE_BARS, phraseBoundary = bar % PHRASE_BARS === 0 }) {
     // a new time signature (mid-phrase, while playing) needs rhythms in it
-    const phrase = !prev || bar % PHRASE_BARS === 0 || bar - prev.phrase.start >= PHRASE_BARS || prev.phrase.units !== meter.units
+    const phrase = !prev || phraseBoundary || bar - prev.phrase.start >= phraseBars || prev.phrase.units !== meter.units
         ? decidePhrase(bar, prev && prev.phrase, meter, settings, rng)
         : prev.phrase;
 
@@ -713,7 +713,7 @@ export function arrangeBar({ bar, meter, chord, nextChord, scalePcs, chordStart,
     } else if (part) {
         const notes = {
             melody: () => (index < 2 ? part.motif : part.response)[index % 2],
-            echo: () => (index % 2 === 1 ? part.bars[(index - 1) / 2] : []),
+            echo: () => (index % 2 === 1 ? part.bars[((index - 1) / 2) % part.bars.length] : []),
             line: () => part.bars[index % 2],
         }[part.kind]();
         counter = melodyEvents({ role: 'counter', notes, chord, scalePcs, prevMidi: counter.midi, range: ranges.counter, level: part.kind === 'melody' ? 1 : 0.85, ...melodyColour });

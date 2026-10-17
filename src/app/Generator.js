@@ -31,12 +31,27 @@ import Transport from './engine/transport';
 import { RoleWander, instrumentWander } from './engine/wander';
 import { scaleById, scaleSemitones, spellScale, romanDegree, diatonicChord, chordSymbol, displayNumeral, noteAtOrAbove, voiceLead } from './theory';
 import { arrangeBar, notesInRange } from './arranger';
+import { arrangeBarLatest } from './composition/arrangerLatest';
+import { planForm } from './composition/formLatest';
+import { sectionCadence } from './composition/sectionCadence';
+import { commonToneBridge } from './composition/commonToneBridge';
+import { harmonicDurations, harmonicSlot } from './composition/harmonicRhythm';
+import { harmonicDestination } from './composition/harmonicDestinations';
+import { planBoundaries, prepareEnding } from './composition/boundaries';
+import { prepareSectionSuspension, commitSectionSuspension } from './composition/sectionSuspension';
+import { drumBarLatest, loosenDrumsLatest } from './composition/percussionLatest';
+import { harmonyMode } from './composition/harmonyScale';
+import { planPerformance, performPhrase } from './composition/performance';
+import { performEnsemble } from './composition/ensembleRhythm';
+import { instrumentGroovePlan } from './composition/instrumentGroove';
 import { nextMusic, glideTempo, scaleDistance } from './conductor';
 import { METERS, unitsPerMinute, swingEvents } from './meter';
 import { drumBar, loosenDrums, auditionHits } from './percussion';
 import { normal, seeded } from './random';
 import { defaultSettings } from './settings';
 import { findPreset } from './editor/presetStore';
+import { stringPatch, isStringPatch } from './engine/stringPatches';
+import { pianoPatch, isPianoPatch } from './engine/pianoPatches';
 import { ROLE_PRESETS, ROLE_VOLUMES } from './presets';
 import PROGRESSIONS, { progressionsOfLength } from './progressions';
 
@@ -145,6 +160,7 @@ class Generator {
         this.transport.onBeat((event) => this.onBeat(event));
         this.planListeners = new Set();
         this.runningListeners = new Set();
+        this.visualListeners = new Set();
         this.quickStop = true;
 
         this.ambienceOut = this.AC.createGain();
@@ -187,6 +203,7 @@ class Generator {
     // the preview of what Play will start with. (Stop pauses instead: see
     // stop() - this is "back to the start".)
     reset() {
+        this.emitVisualNote({ type: 'clear' });
         this.rng = seeded(this.settings.seed);
         this.transport.beatsPerBar = this.meter.units;
         this.plan = new Map();
@@ -370,6 +387,7 @@ class Generator {
     // the output is restored (for auditions and live play). Without it the
     // voices fade and the tails ring out.
     stop() {
+        this.emitVisualNote({ type: 'clear' });
         const heard = this.position();
         this.transport.stop();
         this.runPendingChange();
@@ -468,6 +486,7 @@ class Generator {
 
     set(key, value) {
         this.settings[key] = value;
+        if (key === 'generation') this.refreshStringPatches();
         if (key === 'counter' || key === 'drums') this.warmRoles();
         if (key === 'ambience') this.ambience.setLevels(value);
         if (key === 'ambienceShape') this.ambience.setShape(value);
@@ -512,6 +531,7 @@ class Generator {
     setMany(patch) {
         const meterChanged = 'meter' in patch && patch.meter !== this.settings.meter;
         Object.assign(this.settings, patch);
+        if ('generation' in patch) this.refreshStringPatches();
         this.warmRoles();
         if ('ambienceShape' in patch) this.ambience.setShape(this.settings.ambienceShape);
         if ('ambience' in patch) this.ambience.setLevels(this.settings.ambience);
@@ -540,6 +560,13 @@ class Generator {
         const planned = this.plan.get(Math.floor(this.position() / this.beatsPerBar)) || this.getPlan()[0];
         const { tonic, mode, progression } = planned.music;
         return { tonic, mode, progression, bpm: Math.round(planned.bpm), keyName: planned.chord.keyName };
+    }
+
+    refreshStringPatches() {
+        for (const r of Object.values(this.roles)) if (!r.edited && r.stringPatchBase) {
+            const { name, preset } = r.stringPatchBase;
+            r.instrument.applyPreset(pianoPatch(name, stringPatch(name, preset, this.settings.generation), this.settings.generation));
+        }
     }
 
     /** Makes what is playing now the home settings. */
@@ -572,6 +599,8 @@ class Generator {
         if (!preset) return false;
         if (this.pendingVoices) this.pendingVoices = this.pendingVoices.filter((p) => p.role !== role || p.preset === preset);
         const r = this.roles[role];
+        r.stringPatchBase = (isStringPatch(name) || isPianoPatch(name)) && preset === findPreset(name) ? { name, preset } : null;
+        if (r.stringPatchBase) preset = pianoPatch(name, stringPatch(name, preset, this.settings.generation), this.settings.generation);
         if (morphSeconds > 0) r.instrument.morphTo(preset, morphSeconds);
         else r.instrument.applyPreset(preset);
         r.presetName = name;
@@ -729,19 +758,48 @@ class Generator {
      * liveNoteOff. For percussion `midi` is the drum (percussion.js DRUMS):
      * one hit, nothing to release.
      */
+    // A separate subscription avoids dropping chord notes when the frame rate dips.
+    // Visual consumers never run on the audio-rendering thread.
+    onVisualNote(listener) {
+        this.visualListeners.add(listener);
+        return () => this.visualListeners.delete(listener);
+    }
+
+    emitVisualNote(event) {
+        if (!this.visualListeners?.size) return;
+        const instrument = this.roles[event.role]?.instrument;
+        const enriched = event.type === 'on' ? {
+            ...event,
+            preset: { ...instrument.preset },
+            env: instrument.gainEnv ? { ...instrument.gainEnv } : undefined,
+        } : event;
+        this.visualListeners.forEach((listener) => {
+            try { listener(enriched); } catch (error) { console.warn('Visual note consumer failed', error); }
+        });
+    }
+
+    /**
+     * Plays a held note on a role (keyboard / MIDI); returns an id for
+     * liveNoteOff. For percussion `midi` is the drum (percussion.js DRUMS):
+     * one hit, nothing to release.
+     */
     liveNoteOn(role, midi, velocity = 0.8) {
         if (this.AC.state !== 'running') this.AC.resume();
         this.endStopFade();
         if (role === 'perc') {
             this.roles.perc.instrument.scheduleNote(midi, this.AC.currentTime + 0.005, 0.8, velocity, Math.random() * 2 - 1);
+            this.emitVisualNote({ type: 'on', role, midi, velocity, time: this.AC.currentTime + 0.005, length: 0.15 });
             return null;
         }
-        return this.roles[role].instrument.startNote(midi, velocity);
+        const id = this.roles[role].instrument.startNote(midi, velocity);
+        this.emitVisualNote({ type: 'on', role, midi, velocity, time: this.AC.currentTime + 0.005, liveId: id });
+        return id;
     }
 
     liveNoteOff(role, id) {
         if (role === 'perc') return;
         this.roles[role].instrument.stopNote(id);
+        this.emitVisualNote({ type: 'off', role, liveId: id, time: this.AC.currentTime });
     }
 
     /** @param {function} callback - called whenever planned bars change */
@@ -805,28 +863,52 @@ class Generator {
     buildChord(music, numeral, colour = 'plain', borrow = false) {
         const { tonic, mode } = music;
         const scale = scaleSemitones(scaleById(mode).intervals);
+        const harmonicMode = harmonyMode(mode, this.settings.harmonyScale, this.settings.generation);
+        const harmonic = scaleSemitones(scaleById(harmonicMode).intervals);
         const degree = romanDegree(numeral);
-        const minorHome = scale.length === 7 && scale[2] === 3;
-        const majorHome = scale.length === 7 && scale[2] === 4;
+        const minorHome = harmonic.length === 7 && harmonic[2] === 3;
+        const majorHome = harmonic.length === 7 && harmonic[2] === 4;
         const borrowed = borrow && ((minorHome && [4, 5].includes(degree)) || (majorHome && [4, 6, 7].includes(degree)));
-        const chordScale = borrowed ? scaleSemitones(scaleById(minorHome ? 'Major-1' : 'Major-6').intervals) : scale;
+        const chordScale = borrowed ? scaleSemitones(scaleById(minorHome ? 'Major-1' : 'Major-6').intervals) : harmonic;
         const names = spellScale(tonic, chordScale);
         const offsets = diatonicChord(chordScale, degree, this.settings.padNotes, colour);
         return {
             numeral: displayNumeral(numeral, offsets),
             pitchClasses: offsets.map((o) => (tonic + o) % 12),
             scalePcs: scale.map((st) => (tonic + st) % 12),
-            root: names[(degree - 1) % scale.length],
-            name: names[(degree - 1) % scale.length] + chordSymbol(offsets),
+            root: names[(degree - 1) % chordScale.length],
+            name: names[(degree - 1) % chordScale.length] + chordSymbol(offsets),
             keyName: `${names[0]} ${scaleById(mode).name}`,
+            ...(harmonicMode === mode ? {} : { harmonyMode: harmonicMode, harmonyPcs: harmonic.map(st => (tonic + st) % 12) }),
         };
     }
 
     // The chord at `bar` under `music` (progressions restart each cycle).
     chordAt(bar, music) {
         const numerals = PROGRESSIONS[music.progression];
-        const slot = Math.floor((bar - music.cycleStart) / this.settings.barsPerChord);
-        return this.buildChord(music, numerals[slot % numerals.length], this.colourFor(bar), this.borrowFor(bar));
+        const slot = this.harmonicSlotAt(bar,music);
+        const colourBar = this.variableHarmonyOn() && music.harmonicDurations ? slot.start : bar;
+        return this.buildChord(music, numerals[slot.index], this.colourFor(colourBar), this.borrowFor(colourBar));
+    }
+
+    variableHarmonyOn() {
+        return this.harmonicRhythm !== false && this.settings.generation !== 'legacy'
+            && this.formDevelopment !== false && this.settings.sections.mode !== 'off';
+    }
+
+    harmonicSlotAt(bar,music) {
+        return harmonicSlot({bar,cycleStart:music.cycleStart,count:PROGRESSIONS[music.progression].length,
+            barsPerChord:this.settings.barsPerChord,durations:this.variableHarmonyOn()?music.harmonicDurations:undefined});
+    }
+
+    cycleMusic(music,cycleStart,fromBar) {
+        const next={...music,cycleStart};delete next.harmonicDurations;
+        if(this.variableHarmonyOn()){
+            const durations=harmonicDurations({count:PROGRESSIONS[next.progression].length,barsPerChord:this.settings.barsPerChord,cycleStart,
+                develop:this.harmonicDevelopment!==false, section:this.sectionFormAt(cycleStart,next,fromBar)?.section});
+            if(durations.some(n=>n!==this.settings.barsPerChord))next.harmonicDurations=durations;
+        }
+        return next;
     }
 
     // 'plain' or the chord colour setting, for the chord `bar` falls in: a fixed
@@ -858,9 +940,90 @@ class Generator {
     chordFor(bar, music, upcoming) {
         const { barsPerChord, drift } = this.settings;
         const cycleBars = PROGRESSIONS[music.progression].length * barsPerChord;
-        const inLastSlot = bar - music.cycleStart >= cycleBars - barsPerChord;
+        const inLastSlot = this.harmonicSlotAt(bar,music).index === PROGRESSIONS[music.progression].length-1;
         if (inLastSlot && drift.pivot && scaleDistance(music, upcoming) > 0) return this.pivotChord(music, upcoming);
         return this.chordAt(bar, music);
+    }
+
+    // Forecast the same small section state used by the arranger, without reading
+    // stale future bars during a re-plan or advancing the conductor's RNG.
+    sectionFormAt(bar, music, fromBar = bar) {
+        if (this.settings.generation === 'legacy' || this.formDevelopment === false || this.settings.sections.mode === 'off') return null;
+        const previous = this.plan.get(fromBar - 1)?.state;
+        let form = previous?.composition?.form;
+        const size = this.settings.barsPerChord;
+        for (let at = fromBar; at <= bar; at++) {
+            const inChord = ((at - music.cycleStart) % size + size) % size;
+            form = planForm({ bar: at, seed: this.settings.seed,
+                sections: this.quickIntro ? { ...this.settings.sections, quickIntro: true } : this.settings.sections,
+                settings: this.settings, previous: form, barsPerChord: size, barsLeftInChord: size - inChord,
+                formStrategies:this.formStrategies!==false,sectionCurves:this.sectionCurves!==false,strategyOverride:this.formStrategy, previousTheme: previous?.composition?.phrase?.themeId, developSections: this.sectionDevelopment !== false });
+        }
+        return form;
+    }
+
+    sectionChord(bar, music, upcoming, chord, fromBar = bar) {
+        if (this.sectionCadences === false || this.settings.generation === 'legacy'
+            || this.formDevelopment === false || this.settings.sections.mode === 'off') return chord;
+        // A conductor pivot takes precedence over a local section cadence.
+        if (this.settings.drift.pivot && scaleDistance(music, upcoming) > 0
+            && bar >= music.cycleStart + (PROGRESSIONS[music.progression].length - 1) * this.settings.barsPerChord) return chord;
+        const section = this.sectionFormAt(bar, music, fromBar)?.section;
+        const interior=this.harmonicDevelopment!==false&&(this.endBar===null||bar<this.endBar-1)
+            ?harmonicDestination({section,bar,size:this.settings.barsPerChord,cycleStart:music.cycleStart,scaleSize:(chord.harmonyPcs??chord.scalePcs).length,slot:this.harmonicSlotAt(bar,music)}):null;
+        if(interior)chord={...this.buildChord(music,interior.numeral,this.colourFor(bar),this.borrowFor(bar)),cadence:{...interior,previous:chord.name}};
+        const cadence = sectionCadence({ section, bar,
+            barsPerChord: this.settings.barsPerChord, cycleStart: music.cycleStart,
+            scaleSize: (chord.harmonyPcs ?? chord.scalePcs).length });
+        if (!cadence) {
+            if (this.sectionBridges === false || !section) return chord;
+            const size = this.settings.barsPerChord, end = section.start + section.bars;
+            const bridgeStart = end - size * 2, cycleEnd = music.cycleStart + PROGRESSIONS[music.progression].length * size;
+            const eligible = sectionCadence({ section, bar:end-size, barsPerChord:size,
+                cycleStart:music.cycleStart, scaleSize:(chord.harmonyPcs ?? chord.scalePcs).length });
+            if (!eligible || eligible.kind !== 'prepare' || section.bars < size * 3
+                || bar < bridgeStart || bar >= bridgeStart + size || bridgeStart - size < music.cycleStart
+                || end > cycleEnd || (end === cycleEnd && scaleDistance(music, upcoming) > 0)
+                || (this.endBar !== null && end >= this.endBar - 1)) return chord;
+            // The whole closing chain is in a known key/cycle. Read the original
+            // preceding slot rather than recursively depending on realised notes.
+            const target = this.buildChord(music, 'V', this.colourFor(end-size), this.borrowFor(end-size));
+            const before = this.chordAt(bridgeStart-1, music);
+            const candidates = ['II','IV','VI','III'].map(numeral => ({ ...this.buildChord(music, numeral,
+                this.colourFor(bridgeStart), this.borrowFor(bridgeStart)), bridgeNumeral:numeral }));
+            const selected = commonToneBridge({ before, original:chord, target, candidates });
+            if (!selected) return chord;
+            const {bridgeNumeral, ...prepared} = selected.chord;
+            return { ...prepared, cadence:{kind:'bridge',numeral:bridgeNumeral,arrivalBar:end,previous:chord.name,
+                sharedBefore:selected.sharedBefore,sharedAfter:selected.sharedAfter,target:target.name} };
+        }
+        const prepared = this.buildChord(music, cadence.numeral, this.colourFor(bar), this.borrowFor(bar));
+        return { ...prepared, cadence: { ...cadence, previous: chord.name } };
+    }
+
+    // Only forecast harmony already decided by this cycle's conductor choice.
+    melodyHarmony(bar, music, upcoming, count = 4, bpm = music.bpm) {
+        const size = this.settings.barsPerChord, end = music.cycleStart + PROGRESSIONS[music.progression].length * size;
+        const next = this.cycleMusic(upcoming,end,bar), nextEnd = end + PROGRESSIONS[next.progression].length * size;
+        const result = [];
+        for (let at = bar; at < bar + count; at++) {
+            if (this.endBar !== null && at >= this.endBar) break;
+            if (at >= nextEnd) break;
+            // A bridge in the next cycle's penultimate slot also depends on
+            // whether that cycle will change key. Its conductor choice is unknown.
+            if (at >= end && at >= nextEnd - size * 2 && this.settings.drift.mode !== 'off'
+                && this.sectionCadences !== false && this.sectionBridges !== false
+                && this.formDevelopment !== false && this.settings.sections.mode !== 'off') break;
+            // The next cycle's final pivot needs a conductor decision we do not have.
+            if (at >= end && at >= nextEnd - size && this.settings.drift.mode !== 'off' && this.settings.drift.pivot) break;
+            const context = at < end ? music : next;
+            const baseChord = at < end ? this.chordFor(at, music, upcoming) : this.chordAt(at, next);
+            const chord = this.endBar !== null && at === this.endBar - 1 ? this.buildChord(context, 'V')
+                : this.sectionChord(at, context, at < end ? upcoming : next, baseChord, bar);
+            if (at > bar) bpm = glideTempo(bpm, (at < end ? music : next).bpm);
+            result.push({ bar: at, chord, scalePcs: chord.scalePcs, bpm });
+        }
+        return result;
     }
 
     // Decides one bar. Event times/lengths are in beats from the bar start.
@@ -869,7 +1032,7 @@ class Generator {
         const prev = this.plan.get(bar - 1);
 
         const fresh = !prev || this.resetMusicAt === bar;
-        const music = fresh ? { ...this.homeMusic(), cycleStart: bar } : prev.nextMusic;
+        const music = fresh ? this.cycleMusic(this.homeMusic(),bar,bar) : prev.nextMusic;
         const bpm = fresh ? music.bpm : glideTempo(prev.bpm, music.bpm);
 
         const cycleBars = PROGRESSIONS[music.progression].length * barsPerChord;
@@ -879,24 +1042,47 @@ class Generator {
             ? nextMusic(music, this.homeMusic(), drift, progressionsOfLength(PROGRESSIONS[this.settings.progression].length), this.rng)
             : prev.upcoming;
         const cycleEnd = inCycle === cycleBars - 1;
-        const following = cycleEnd ? { ...upcoming, cycleStart: bar + 1 } : music;
+        const following = cycleEnd ? this.cycleMusic(upcoming,bar+1,bar) : music;
 
         if (this.endBar !== null && bar >= this.endBar) {
             this.planEnding(bar, prev, music, bpm);
             return;
         }
         const closing = this.endBar !== null && bar === this.endBar - 1;
-        const chord = closing ? this.buildChord(music, 'V') : this.chordFor(bar, music, upcoming);
+        const chord = closing ? this.buildChord(music, 'V') : this.sectionChord(bar, music, upcoming, this.chordFor(bar, music, upcoming));
         // The next bar's chord; a new cycle's first chord is never a pivot.
         const nextChord = closing ? this.buildChord(music, 'I')
-            : cycleEnd ? this.chordAt(bar + 1, following) : this.chordFor(bar + 1, music, upcoming);
+            : this.endBar !== null && bar + 1 === this.endBar - 1 ? this.buildChord(following, 'V')
+                : this.sectionChord(bar + 1, following, cycleEnd ? following : upcoming,
+                    cycleEnd ? this.chordAt(bar + 1, following) : this.chordFor(bar + 1, music, upcoming), bar);
 
         // A chord (re)starts on its boundary, or wherever a re-plan changed it.
-        const inChord = inCycle % barsPerChord;
-        const chordStart = inChord === 0 || !prev || prev.chord.name !== chord.name;
-        const barsLeftInChord = barsPerChord - inChord;
+        const slot = this.harmonicSlotAt(bar,music);
+        const chordStart = bar === slot.start || !prev || prev.chord.name !== chord.name;
+        const barsLeftInChord = slot.left;
 
-        const { events, state } = arrangeBar({
+        const original = this.settings.generation === 'legacy';
+        const { events, state } = (original ? arrangeBar : arrangeBarLatest)({
+            seed: this.settings.seed,
+            coordinate: this.ensembleCoordination !== false,
+            developForm: this.formDevelopment !== false,
+            sectionDevelopment: this.sectionDevelopment !== false,
+            formStrategies:this.formStrategies!==false,sectionCurves:this.sectionCurves!==false,formStrategy:this.formStrategy,
+            transitionGestures: this.transitionGestures !== false,
+            leadTransitions: this.leadTransitions !== false,
+            leadPickups: this.leadPickups !== false,
+            endBar: this.endBar,
+            developThemes: this.themeDevelopment !== false,
+            resolveNotes: this.noteResolution !== false,
+            contrastPhrases: this.contrastPhrases !== false,
+            duetInteraction: this.duetInteraction !== false,
+            rhythmDevelopment: this.rhythmDevelopment !== false,
+            rhythmGrammar: this.rhythmGrammar !== false,
+            partRhythmGrammar: this.partRhythmGrammar !== false,
+            jointCounterpoint: this.jointCounterpoint !== false,
+            phraseLength: this.longPhrases === false ? 4 : (this.phraseLength ?? 'auto'),
+            harmonyForecast: !original && this.phraseSearch !== false ? this.melodyHarmony(bar, music, upcoming, this.longPhrases === false ? 4 : 8, bpm) : null,
+            barsPerChord,
             bar,
             meter: this.meter,
             chord,
@@ -904,22 +1090,74 @@ class Generator {
             scalePcs: chord.scalePcs,
             chordStart,
             barsLeftInChord,
+            formBarsLeftInChord: barsPerChord - inCycle % barsPerChord,
             prev: prev ? prev.state : null,
-            settings: { leadActivity, leadDensity, padWeights, bassWeights, pulseWeights, arpWeights, directionWeights, padMotion, thinPadUnderLead, voices, counter, sections: this.quickIntro ? { ...sections, quickIntro: true } : sections, chordSpread, pedal, leadScale, leadLeaps, leadRepeat, leadEnding },
+            settings: { bpm:this.settings.bpm,progression:this.settings.progression,sectionTone:this.settings.sectionTone,leadActivity, leadDensity, padWeights, bassWeights, pulseWeights, arpWeights, directionWeights, padMotion, thinPadUnderLead, voices, counter, sections: this.quickIntro ? { ...sections, quickIntro: true } : sections, chordSpread, pedal, leadScale, leadLeaps, leadRepeat, leadEnding },
             rng: this.rng,
         });
+        const pendingSuspension=prev?.state.composition?.sectionSuspension;
+        if(!original&&pendingSuspension?.to.bar===bar&&state.composition){
+            const resolved=state.composition.melody?.resolutions?.find(r=>r.kind==='section-suspension'
+                &&r.from.bar===pendingSuspension.from.bar&&r.from.midi===pendingSuspension.from.midi);
+            state.composition.sectionSuspensionArrival={...pendingSuspension,
+                ...(resolved?{to:resolved.to}:{}),status:resolved?'resolved':'cancelled'};
+        }
+        const section=state.phrase.section;
+        if(!original&&this.sectionSuspensions!==false&&this.phraseSearch!==false&&this.noteResolution!==false
+            &&section?.form&&section.nextType==='full'&&section.type!=='full'
+            &&bar===section.start+section.bars-1&&state.composition?.melody
+            &&this.resetMusicAt!==bar+1&&(this.endBar===null||bar+1<this.endBar-1)
+            &&PROGRESSIONS[following.progression].length>1&&events.some(e=>e.role==='lead')){
+            // A planner-only preview uses the committed current state. Its own RNG
+            // and zero timing offsets leave the live conductor and raw attack grid intact.
+            const peek=this.planner({sectionSuspensions:false});
+            peek.settings.humanize={timing:0,velocity:0,detune:0};peek.settings.swing=0;peek.endBar=this.endBar;
+            peek.plan.set(bar,{bar,chord,chordStart,state,events,music,upcoming,nextMusic:following,bpm});
+            peek.planBar(bar+1);
+            const arrival=peek.plan.get(bar+1);
+            if(arrival.state.phrase.section?.type==='full'){
+                const protectedBeats=[...(state.composition.melody.resolutions??[]),...(state.composition.melody.ties??[])]
+                    .flatMap(r=>[r.from,r.to]).filter(p=>p.bar===bar).map(p=>p.beat);
+                const suspension=prepareSectionSuspension({bar,events,chord,arrival,meter:this.meter,bpm,
+                    range:state.ranges.lead,settings:this.settings,protectedBeats});
+                if(suspension)commitSectionSuspension(events,state,suspension,bar);
+            }
+        }
         // Drums: patterns and looseness from streams of their own (the
         // arranger's rng is never touched, so the notes stay the same).
+        const boundaries=planBoundaries(state,bar,this.endBar);
         const hits = drums && drums.style !== 'off'
-            ? drumBar({ bar, meter: this.meter, drums, section: state.phrase.section, sectionsMode: sections.mode, sectionBars: sections.phrases * 4, phraseStart: state.phrase.start, seed: this.settings.seed })
+            ? (original ? drumBar : drumBarLatest)({ bar, meter: this.meter, drums, section: state.phrase.section, sectionsMode: sections.mode, sectionBars: state.phrase.section?.bars || sections.phrases * 4, phraseStart: state.phrase.start, phraseBars: state.composition?.phrase?.bars ?? 4, boundaries, seed: this.settings.seed, rhythm: state.composition?.rhythm })
             : [];
         swingEvents(events, this.meter, swing);
         swingEvents(hits, this.meter, swing);
-        this.humanize(events, humanize, bpm, bar);
-        loosenDrums(hits, humanize, 60 / unitsPerMinute(this.meter, bpm), this.settings.seed, bar);
+        if (!original && state.composition?.rhythm) {
+            const unitSeconds = 60 / unitsPerMinute(this.meter, bpm);
+            const phrased = this.phrasePerformance !== false;
+            const groove = this.instrumentGroove !== false
+                ? (prev?.state.composition?.instrumentGroove?.start === state.composition.phrase.start
+                    ? prev.state.composition.instrumentGroove : instrumentGroovePlan(state.composition.phrase.start, this.grooveVoices ?? this.grooveVoiceSnapshot())) : null;
+            if (groove) state.composition.instrumentGroove = groove;
+            performEnsemble([...events, ...hits], phrased ? { ...humanize, velocity: humanize.velocity * .4 } : humanize,
+                unitSeconds, this.settings.seed, bar, this.meter, groove);
+            if (phrased) {
+                const performance = planPerformance(this.settings.seed, state.composition.phrase);
+                state.composition.performance = performance;
+                performPhrase([...events, ...hits], { plan: performance, bar, meter: this.meter, unitSeconds, humanize, groove });
+            }
+        } else {
+            this.humanize(events, humanize, bpm, bar);
+            (original ? loosenDrums : loosenDrumsLatest)(hits, humanize, 60 / unitsPerMinute(this.meter, bpm), this.settings.seed, bar, this.meter);
+        }
         events.push(...hits);
-        const tone = sectionTone(this.settings, state.phrase.section);
-        this.plan.set(bar, { bar, chord, chordStart, state, events, music, upcoming, nextMusic: following, bpm, tone });
+        if(!original&&this.endingDevelopment!==false&&closing){const prepared=prepareEnding(events,this.meter);events.splice(0,events.length,...prepared);state.composition.ending={phase:'prepare',arrival:this.endBar};}
+        let tone = sectionTone(this.settings, state.phrase.section);
+        if (!original && this.settings.sectionTone && state.phrase.section?.form) {
+            // Log interpolation gives gradual brightness rather than a label-sized jump.
+            const low = sections.mode === 'strong' ? 800 : 1200;
+            tone = low * (OPEN_TONE / low) ** state.phrase.section.brightness;
+        }
+        this.plan.set(bar, { bar, chord, chordStart, state, events, music, upcoming, nextMusic: following, bpm, tone, boundaries });
     }
 
     // The final bar of an ending - the key's I, held: the pad voice-led from
@@ -927,7 +1165,13 @@ class Generator {
     // settling on the tonic, a soft kick under it - and silent bars after.
     planEnding(bar, prev, music, bpm) {
         const chord = this.buildChord(music, 'I');
-        const { state } = prev;
+        const developed=this.settings.generation!=='legacy'&&this.endingDevelopment!==false;
+        let state=prev.state;
+        if(developed){
+            const {melody,joint,sectionSuspension,sectionSuspensionArrival,...memory}=state.composition??{};
+            state={...state,phrase:{...state.phrase,section:null},composition:{...memory,
+                phrase:{...memory.phrase,start:this.endBar,bars:2,role:'ending'},ending:{phase:bar===this.endBar?'tonic':'tail',arrival:this.endBar}}};
+        }
         const final = bar === this.endBar;
         const events = [];
         let { padVoicing } = state;
@@ -947,7 +1191,8 @@ class Generator {
             events.forEach((e) => { e.detune = 0; });
         }
         this.plan.set(bar, {
-            bar, chord, chordStart: final, state: { ...state, padVoicing }, events,
+            bar, chord, chordStart: final, state: { ...state, padVoicing, ...(developed&&final?{leadMidi:events.find(e=>e.role==='lead')?.midi??state.leadMidi,bassMidi:events.find(e=>e.role==='bass')?.midi??state.bassMidi}:{}) }, events,
+            ...(developed?{boundaries:planBoundaries(state,bar,this.endBar)}:{}),
             music, upcoming: prev.upcoming, nextMusic: music, bpm, tone: prev.tone, ending: true,
         });
     }
@@ -958,11 +1203,12 @@ class Generator {
     // books those from the previous bar. Bar 0 has no previous bar.
     humanize(events, { timing, velocity, detune }, bpm, bar) {
         const unitSeconds = 60 / unitsPerMinute(this.meter, bpm);
+        const rng = this.settings.generation === 'legacy' ? this.rng : seeded(this.settings.seed ^ Math.imul(bar + 1, 0x3c6ef372));
         events.forEach((e) => {
-            const shift = normal(this.rng, timing / 1000) / unitSeconds;
+            const shift = normal(rng, timing / 1000) / unitSeconds;
             e.beat = Math.max(bar === 0 ? 0 : -0.5, e.beat + shift);
-            e.velocity = Math.max(0.05, Math.min(1, e.velocity * (1 + normal(this.rng, velocity))));
-            e.detune = normal(this.rng, detune);
+            e.velocity = Math.max(0.05, Math.min(1, e.velocity * (1 + normal(rng, velocity))));
+            e.detune = normal(rng, detune);
         });
     }
 
@@ -970,15 +1216,49 @@ class Generator {
      * A copy that only plans: the piece Play would start with these
      * settings, bar by bar via planBar (for rendering to a file).
      */
-    planner() {
+    planner({ ensembleCoordination = this.ensembleCoordination, formDevelopment = this.formDevelopment, phrasePerformance = this.phrasePerformance, themeDevelopment = this.themeDevelopment, phraseSearch = this.phraseSearch, longPhrases = this.longPhrases, phraseLength = this.phraseLength, noteResolution = this.noteResolution, contrastPhrases = this.contrastPhrases, duetInteraction = this.duetInteraction, rhythmDevelopment = this.rhythmDevelopment, rhythmGrammar = this.rhythmGrammar, partRhythmGrammar = this.partRhythmGrammar, instrumentGroove = this.instrumentGroove, jointCounterpoint = this.jointCounterpoint, sectionDevelopment = this.sectionDevelopment, sectionCadences = this.sectionCadences, sectionBridges = this.sectionBridges, harmonicRhythm = this.harmonicRhythm, transitionGestures = this.transitionGestures, leadTransitions = this.leadTransitions, leadPickups = this.leadPickups, sectionSuspensions = this.sectionSuspensions, formStrategies = this.formStrategies, sectionCurves = this.sectionCurves, harmonicDevelopment = this.harmonicDevelopment, formStrategy = this.formStrategy, endingDevelopment = this.endingDevelopment } = {}) {
         const copy = Object.create(Generator.prototype);
         copy.settings = JSON.parse(JSON.stringify(this.settings));
+        // Comparison tooling can isolate the previous Latest arrangement.
+        copy.ensembleCoordination = ensembleCoordination;
+        copy.formDevelopment = formDevelopment;
+        copy.phrasePerformance = phrasePerformance;
+        copy.themeDevelopment = themeDevelopment;
+        copy.phraseSearch = phraseSearch;
+        copy.longPhrases = longPhrases;
+        copy.phraseLength = phraseLength;
+        copy.noteResolution = noteResolution;
+        copy.contrastPhrases = contrastPhrases;
+        copy.duetInteraction = duetInteraction;
+        copy.rhythmDevelopment = rhythmDevelopment;
+        copy.rhythmGrammar = rhythmGrammar;
+        copy.partRhythmGrammar = partRhythmGrammar;
+        copy.instrumentGroove = instrumentGroove;
+        copy.jointCounterpoint = jointCounterpoint;
+        copy.sectionDevelopment = sectionDevelopment;
+        copy.sectionCadences = sectionCadences;
+        copy.sectionBridges = sectionBridges;
+        copy.harmonicRhythm = harmonicRhythm;
+        copy.transitionGestures = transitionGestures;
+        copy.leadTransitions = leadTransitions;
+        copy.leadPickups = leadPickups;
+        copy.sectionSuspensions = sectionSuspensions;
+        copy.formStrategies=formStrategies;copy.sectionCurves=sectionCurves;copy.harmonicDevelopment=harmonicDevelopment;copy.formStrategy=formStrategy;copy.endingDevelopment=endingDevelopment;
+        copy.grooveVoices = JSON.parse(JSON.stringify(this.grooveVoices ?? this.grooveVoiceSnapshot()));
+        copy.quickIntro = this.quickIntro;
         copy.rng = seeded(copy.settings.seed);
         copy.plan = new Map();
         copy.currentBar = -1;
         copy.resetMusicAt = 0;
         copy.endBar = null;
         return copy;
+    }
+
+    grooveVoiceSnapshot() {
+        return Object.fromEntries(['lead', 'counter', 'pad', 'bass'].map(role => {
+            const voice = this.roles?.[role], preset = voice?.instrument.preset ?? {};
+            return [role, { name: voice?.presetName ?? '', preset: { stringModel: preset.stringModel, gainAttack: preset.gainAttack } }];
+        }));
     }
 
     // Plans every missing bar from `fromBar` through the look-ahead horizon
@@ -1156,8 +1436,9 @@ class Generator {
         const book = (e, start) => {
             e.booked = true;
             // For visuals (Backdrop): what was booked, and when it sounds (audio-clock seconds).
-            this.noteLog.push({ role: e.role, midi: e.midi, velocity: e.velocity, time: Math.max(start, this.AC.currentTime), length: e.length * secondsPerBeat });
+            this.noteLog.push({ boundaries:this.plan.get(bar)?.boundaries,role: e.role, midi: e.midi, velocity: e.velocity, time: Math.max(start, this.AC.currentTime), length: e.length * secondsPerBeat });
             if (this.noteLog.length > 96) this.noteLog.shift();
+            this.emitVisualNote({ type: 'on', ...this.noteLog[this.noteLog.length - 1] });
             this.roles[e.role].instrument.scheduleNote(e.midi, Math.max(start, this.AC.currentTime), e.length * secondsPerBeat, e.velocity, e.detune);
         };
         const current = this.plan.get(bar).events;

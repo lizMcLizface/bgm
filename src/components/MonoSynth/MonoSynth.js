@@ -1,6 +1,8 @@
 import { Oscillator, Gain, Filter, NoiseGenerator, OscNoiseMixer, StereoPanner } from '../../nodes';
 import { clamp, minTime } from '../../util/util';
 import { CHROMATIC } from '../../theory/notes';
+import { stringBuffer } from '../../app/engine/pluckedString';
+import { pianoBuffer, pianoBodyBuffer } from '../../app/engine/piano';
 
 // Monophonic Synth Class with Voice Spreading Support
 class MonoSynth {
@@ -427,7 +429,10 @@ class MonoSynth {
         }
         
         // Connect mixer to gain and filter chain
-        this.mixer.connect(this.gain.getNode());
+        this.modelGate = this.AC.createGain();
+        this.stringSources = new Set();
+        this.mixer.connect(this.modelGate);
+        this.modelGate.connect(this.gain.getNode());
         this.gain.connect(this.filter.getNode());
         this.filter.connect(this.volume.getNode());
 
@@ -1492,6 +1497,34 @@ class MonoSynth {
             gain.cancelScheduledValues(startTime);
         }
 
+        this.stopStrings(attackStart);
+        this.modelGate.gain.cancelScheduledValues(attackStart);
+        this.modelGate.gain.setValueAtTime(plan.string || plan.piano ? 0 : 1, attackStart);
+        if (plan.string || plan.piano) {
+            const buffers = [plan.piano ? pianoBuffer(this.AC, noteInfo.freq, plan.piano) : stringBuffer(this.AC, noteInfo.freq, plan.string)];
+            if (plan.piano?.sustain > 0) buffers.push(pianoBodyBuffer(this.AC, noteInfo.freq, plan.piano));
+            for (const [index, buffer] of buffers.entries()) {
+                const source = this.AC.createBufferSource();
+                source.buffer = buffer;
+                const heldBody = index > 0;
+                if (heldBody) { source.loop = true; source.playbackRate.value = noteInfo.freq * buffer.length / this.AC.sampleRate; }
+                if (plan.pitchEnv?.amount) {
+                    source.detune.setValueAtTime(plan.pitchEnv.amount, attackStart);
+                    source.detune.setTargetAtTime(0, attackStart, Math.max(.001, plan.pitchEnv.decay / 3));
+                }
+                if (!this.stringGain) {
+                    this.stringGain = this.AC.createGain();
+                    this.stringGain.gain.value = 2.5; // Bring a decaying string into the oscillator path's working level.
+                    this.stringGain.connect(this.gain.getNode());
+                }
+                source.connect(this.stringGain);
+                const item = { source, start: attackStart, stop: attackStart + Math.min(heldBody ? Infinity : source.buffer.duration, gainPoints[gainPoints.length - 1][0]) };
+                if (this.stringPitchEnabled) { this.stringPitchTap?.connect(source.detune); item.pitchConnected = true; }
+                this.stringSources.add(item);
+                source.onended = () => { if (item.pitchConnected) this.stringPitchTap?.disconnect(source.detune); source.disconnect(); this.stringSources.delete(item); };
+                source.start(attackStart); source.stop(item.stop);
+            }
+        }
         this.applyNotePitch(noteInfo, portamentoSpeed, attackStart);
 
         this.scheduleNoteShape(noteInfo.freq, plan, attackStart);
@@ -1505,6 +1538,13 @@ class MonoSynth {
             if (type === 'set') detune.setValueAtTime(value, attackStart + time);
             else detune.setTargetAtTime(value, attackStart + time, timeConstant);
         });
+    }
+
+    stopStrings(time = this.AC.currentTime) {
+        for (const item of this.stringSources || []) {
+            const stop = Math.max(item.start, time);
+            if (stop < item.stop) { item.source.stop(stop); item.stop = stop; }
+        }
     }
 
     // --- FM and pitch envelope (scheduleNote only) -----------------------
@@ -1778,6 +1818,9 @@ class MonoSynth {
         this.clearTimeouts();
         
         // Stop any playing notes
+        this.stopStrings();
+        this.modelGate?.disconnect();
+        this.stringGain?.disconnect();
         this.noteStop();
         
         // Destroy noise generator

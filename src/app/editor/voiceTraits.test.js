@@ -8,6 +8,9 @@ test('slow, dark pads and quick, bright plucks read as such', () => {
     const pluck = voiceTraits({ gainAttack: 0.003, gainSustain: 0, filterFreq: 9000 });
     expect(pluck.envelope).toBe('plucked');
     expect(pluck.tone).toBe('bright');
+    const piano = voiceTraits({ stringModel: 'piano', pianoType: 'electric', masterFilterType: 'highpass', masterFilterFreq: 20 });
+    expect(piano.envelope).toBe('struck'); expect(piano.wave).toBe('electric piano'); expect(piano.tone).toBe('bright');
+    expect(voiceTraits({ stringModel: 'plucked' }).envelope).toBe('plucked');
 });
 
 test('every built-in preset gets a description', () => {

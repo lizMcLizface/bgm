@@ -13,7 +13,8 @@ import { addSilence, readSilenceLog, clearSilenceLog, formatSilenceLog, describe
 import { runBenchmark } from './benchmark';
 import { readPref, writePref } from './prefs';
 import { applyTheme, storedTheme } from './theme';
-import { BACKDROP_DEFAULTS, BACKDROP_LIMITS, PALETTES, SPECTRA } from './Backdrop';
+import { BACKDROP_DEFAULTS, PALETTES } from './Backdrop';
+import FluidControls from './visuals/FluidControls';
 import { LinkIcon, SpeakerIcon, SunIcon, MoonIcon, AutoThemeIcon, PaletteIcon } from './icons';
 
 const VOLUME_KEY = 'bgm-volume';
@@ -86,10 +87,9 @@ export const AudioMeter = ({ status }) => {
 
 const THEME_CHOICES = [['light', 'Light', SunIcon], ['dark', 'Dark', MoonIcon], ['auto', 'Auto', AutoThemeIcon]];
 const THEME_HINTS = { auto: 'Colours follow your system', light: 'Light colours', dark: 'Dark colours' };
-const BACKDROP_SLIDERS = [['layers', 'Depth layers'], ['size', 'Cloud size'], ['detail', 'Detail'], ['definition', 'Definition'], ['speed', 'Drift speed'], ['spread', 'Colour spread'], ['glow', 'Light pulses']];
 
 /**
- * The visual menu: everything about how the page looks - the theme and the cloudy
+ * The visual menu: everything about how the page looks - the theme and the fluid
  * background with its options (`backdrop`: null when
  * WebGL2 is missing). Stays in the hidden-interface view.
  */
@@ -116,23 +116,10 @@ export const VisualMenu = ({ backdrop }) => {
                         <h3>Background</h3>
                         <label className="gen-check">
                             <input type="checkbox" checked={backdrop.value} onChange={(e) => backdrop.onChange(e.target.checked)} />
-                            Cloudy background
+                            Fluid background
                         </label>
-                        <small>Soft moving clouds, with a pulse of light for every note. Their colour, speed and depth follow the key, tempo, chord style and section of the music. Needs WebGL2.</small>
-                        <label className="gen-check">
-                            <input type="checkbox" checked={backdrop.options.circle} onChange={(e) => set('circle', e.target.checked)} />
-                            Circle visualizer
-                        </label>
-                        <small>A circular spectrum of the sound, on its own or over the clouds. Only shown while the interface is hidden, and below the timeline when that is showing.</small>
-                        {backdrop.options.circle && (
-                            <label className="gen-menu-slider">
-                                <span>Circle style</span>
-                                <select value={backdrop.options.spectrum === 'bars' ? 'bars' : 'ring'} onChange={(e) => set('spectrum', e.target.value)}>
-                                    {Object.entries(SPECTRA).map(([id, label]) => <option key={id} value={id}>{label}</option>)}
-                                </select>
-                            </label>
-                        )}
-                        {(backdrop.value || backdrop.options.circle) && (
+                        <small>Flowing colour shaped by the notes and their sound.</small>
+                        {backdrop.value && (
                             <>
                                 <label className="gen-menu-slider">
                                     <span>Colours</span>
@@ -144,25 +131,8 @@ export const VisualMenu = ({ backdrop }) => {
                                     title="Pick a new base colour and spread between the colours">Shuffle colours</button>
                             </>
                         )}
-                        {backdrop.value && (
-                            <>
-                                <label className="gen-check">
-                                    <input type="checkbox" checked={backdrop.options.trails} onChange={(e) => set('trails', e.target.checked)} />
-                                    Melody trails
-                                </label>
-                                {BACKDROP_SLIDERS.map(([key, label]) => {
-                                    const [min, max, step] = BACKDROP_LIMITS[key];
-                                    return (
-                                        <label key={key} className="gen-menu-slider">
-                                            <span>{label}</span>
-                                            <input type="range" min={min} max={max} step={step} value={backdrop.options[key]}
-                                                onChange={(e) => set(key, Number(e.target.value))} />
-                                        </label>
-                                    );
-                                })}
-                            </>
-                        )}
-                        <button type="button" className="gen-menu-wide" onClick={() => backdrop.onOptions(BACKDROP_DEFAULTS)}>Reset background</button>
+                        {backdrop.value && <FluidControls options={backdrop.options} onOptions={backdrop.onOptions} onClear={backdrop.onClear} />}
+                        <button type="button" className="gen-menu-wide" onClick={() => { backdrop.onOptions(BACKDROP_DEFAULTS); backdrop.onClear?.(); }}>Reset background</button>
                     </section>
                 )}
             </div>
@@ -324,7 +294,7 @@ export const AudioMenu = ({ generator, onReload }) => {
 };
 
 /** The ⚙ options menu: sharing, a phrase, the sleep timer and saving audio (children), MIDI, starting over with only the basics. */
-export const SettingsMenu = ({ link, saving, phrase, onStartOver, smooth, intro, onTour, midi, children }) => {
+export const SettingsMenu = ({ link, saving, phrase, onStartOver, smooth, intro, generation, onTour, midi, children }) => {
     const menu = useRef(null);
     useDismiss(menu);
     const [copied, setCopied] = useState('');
@@ -350,6 +320,14 @@ export const SettingsMenu = ({ link, saving, phrase, onStartOver, smooth, intro,
                     {copied && <small role="status">{copied}</small>}
                 </section>
                 {phrase}
+                {generation && <section className="gen-menu-section">
+                    <label className="gen-menu-slider"><span>Music generation</span>
+                        <select aria-label="Music generation" value={generation.value} onChange={e => generation.onChange(e.target.value)}>
+                            <option value="latest">Latest</option><option value="legacy">Original</option>
+                        </select>
+                    </label>
+                    <small>Latest develops recurring themes, coordinates the ensemble, develops sections and uses revised drum grooves. Original restores the previous algorithms. Changes start at the next chord while playing; shared links keep this choice.</small>
+                </section>}
                 {smooth && (
                     <section className="gen-menu-section">
                         <h3>Presets</h3>

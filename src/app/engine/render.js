@@ -73,7 +73,8 @@ function planNotes(gen, audible, seconds, ending, bars = null) {
                 chord: { name: planned.chord.name, numeral: planned.chord.numeral, keyName: planned.chord.keyName },
                 chordStart: Boolean(planned.chordStart),
                 bpm: planned.bpm,
-                section: section ? { type: section.type, start: section.start } : null,
+                section: section ? { type: section.type, start: section.start, bars:section.bars } : null,
+                boundaries:planned.boundaries,
                 events: planned.events.map((e) => ({ role: e.role, midi: e.midi, beat: e.beat, length: e.length })),
             });
         }

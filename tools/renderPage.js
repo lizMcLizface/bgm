@@ -7,6 +7,8 @@
 import Generator, { ROLES } from '../src/app/Generator';
 import { defaultSettings, shareFromLocation } from '../src/app/settings';
 import { sceneSettings, sceneBySlug, presetFromSearch, SCENES, sceneSlug } from '../src/app/scenes';
+import { prepareSound } from '../src/app/engine/prepareSound';
+import { generationFromSearch } from '../src/app/generation';
 import { phraseToSeed } from '../src/app/phrase';
 import { renderPcm, planTimeline } from '../src/app/engine/render';
 import { timelineColors } from '../src/app/ChordTimeline';
@@ -31,7 +33,7 @@ window.bgmRender = {
      * a share link's m= / v= / a= (or s=), `seed=N` or `phrase=...` to choose the variation.
      * @returns {object} what the video shows: name, roles and their sounds, the palette
      */
-    setup({ theme = 'dark' } = {}) {
+    async setup({ theme = 'dark' } = {}) {
         const query = new URLSearchParams(window.location.search);
         const share = shareFromLocation(window.location);
         const hasSettings = ['m', 'v', 'a', 's'].some((key) => query.has(key)) || window.location.hash.includes('s=');
@@ -54,12 +56,16 @@ window.bgmRender = {
             if (seed !== undefined) settings.seed = seed;
             gen = new Generator(settings);
             if (share) {
-                Object.entries(share.presets).forEach(([role, preset]) => {
-                    if (preset.generated) throw new Error('This link carries a generated sound, which the renderer cannot rebuild yet; pick a library sound or use a preset name');
-                    gen.loadRolePreset(role, preset);
-                });
+                for (const [role, preset] of Object.entries(share.presets)) {
+                    if (preset.generated) {
+                        const sound = await prepareSound(preset.generated, generationFromSearch(window.location.search));
+                        gen.loadRolePreset(role, sound.name, sound.preset);
+                    } else gen.loadRolePreset(role, preset);
+                }
             }
         }
+        gen.set('generation', generationFromSearch(window.location.search));
+        gen.reset();
         // the kind of slow drift can be chosen for the recording: wander=sine|brownian (the voices), ambience-wander=sine|brownian
         if (query.has('wander')) gen.settings.wander = { ...gen.settings.wander, mode: query.get('wander') };
         if (query.has('ambience-wander')) gen.settings.ambienceWander = { ...gen.settings.ambienceWander, mode: query.get('ambience-wander') };
@@ -68,6 +74,7 @@ window.bgmRender = {
         return {
             name,
             seed: gen.settings.seed,
+            generation: gen.settings.generation,
             sampleRate: gen.AC.sampleRate,
             roles: Object.keys(gen.roles),
             presets: presetNames,

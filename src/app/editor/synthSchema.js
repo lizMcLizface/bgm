@@ -17,6 +17,23 @@ const DRY_WET = 'Dry/Wet';
 const pitchKnob = (key, label) => knob(key, label, { modifier: 1.5, offset: 0.5, resetValue: 1.0, decimalPlaces: 3 });
 
 const SYNTH_SCHEMA = [
+    { label: 'Sound source', columns: 2, controls: [
+        { kind: 'choice', key: 'stringModel', label: 'Source', options: { oscillator: 'Oscillator', plucked: 'Plucked string', piano: 'Piano' } },
+    ] },
+    { label: 'Piano', columns: 4, controls: [
+        { kind: 'choice', key: 'pianoType', label: 'Piano tone', options: { felt: 'Felt', electric: 'Electric' } },
+        knob('pianoDecay', 'Decay', { modifier: 4.7, offset: .3, min: .3, max: 5, resetValue: 2.5 }),
+        knob('pianoSustain', 'Held body', { min: 0, max: 1, resetValue: .28 }),
+        knob('pianoBrightness', 'Brightness', { min: 0, max: 1, resetValue: .45 }),
+        knob('pianoHammer', 'Hammer', { min: 0, max: 1, resetValue: .3 }),
+        knob('pianoUnison', 'Unison', { min: 0, max: 1, resetValue: .25 }),
+    ] },
+    { label: 'Plucked string', columns: 4, controls: [
+        knob('stringDecay', 'Decay', { modifier: 4.85, offset: .15, min: .15, max: 5, resetValue: 2 }),
+        knob('stringDamping', 'Damping', { min: 0, max: 1, resetValue: .5 }),
+        knob('stringPosition', 'Pick position', { modifier: .4, offset: .05, min: .05, max: .45, resetValue: .2 }),
+        knob('stringBody', 'Body', { min: 0, max: 1, resetValue: .25 }),
+    ] },
     {
         label: 'VCO',
         columns: 4,

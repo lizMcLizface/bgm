@@ -5,6 +5,15 @@ import { SHAREABLE_PRESETS, encodeShareCode } from './shareCode';
 import presetData from '../util/presetData';
 import { seeded } from './random';
 
+test('independent harmony choices round-trip through appended share fields',()=>{
+    for(const harmonyScale of ['auto','selected','major','minor']){
+        const settings={...defaultSettings(),seed:42,mode:'Pentatonic-1',harmonyScale};
+        expect(decodeSettings(encodeSettings(settings))).toEqual(settings);
+        expect(sanitizeSettings(settings).harmonyScale).toBe(harmonyScale);
+    }
+    expect(sanitizeSettings({...defaultSettings(),harmonyScale:'invalid'}).harmonyScale).toBe('auto');
+});
+
 test('round-trips through a share code', () => {
     const settings = {
         ...defaultSettings(),

@@ -113,7 +113,7 @@ const ChordTimeline = ({ generator, tracks }) => {
                     </>
                 )}
             </div>
-            <div className="gen-timeline-body">
+            <div className={`gen-timeline-body${tracks ? '' : ' is-no-tracks'}`}>
                 {tracks}
                 <canvas ref={canvasRef} className="gen-timeline-canvas" />
             </div>

@@ -50,6 +50,7 @@ const Control = ({ control, params, context, onChange }) => {
     const { kind, key, label, props = {}, options, disabled } = control;
     const isDisabled = disabled ? disabled(params, context) : false;
 
+    if (kind === 'choice') return <label>{label}<select aria-label={label} value={params[key]} onChange={e => onChange(key, e.target.value)}>{Object.entries(options).map(([value, text]) => <option key={value} value={value}>{text}</option>)}</select></label>;
     if (kind === 'select') {
         return <Select label={label} options={options} value={params[key]} onUpdate={(v) => onChange(key, v)} />;
     }
@@ -186,7 +187,7 @@ const SynthEditor = ({ generator, roles, role, onRoleChange, presetName, edited,
 
                     <ThemeProvider theme={theme}>
                         <div className="gen-modules">
-                            {SYNTH_SCHEMA.map(({ label, columns, controls }) => (
+                            {SYNTH_SCHEMA.filter(({ label }) => ['VCO', 'FM'].includes(label) ? !['plucked', 'piano'].includes(params.stringModel) : label === 'Plucked string' ? params.stringModel === 'plucked' : label === 'Piano' ? params.stringModel === 'piano' : true).map(({ label, columns, controls }) => (
                                 <div className={`gen-module ${columns >= 7 ? 'gen-module-full' : columns >= 3 ? 'gen-module-wide' : ''}`} key={label}>
                                     <Module label={label}>
                                         <KnobGrid columns={columns} rows={Math.ceil(controls.length / columns)}>

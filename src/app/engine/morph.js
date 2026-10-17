@@ -2,7 +2,7 @@
 // glide, the choices (a waveform, a filter type, a reverb) switch halfway.
 
 // Numbers that cannot glide: whole steps, or setters that rebuild a waveform.
-const STEPWISE = new Set(['voiceCount', 'subOscOctaveOffset', 'osc2OctaveOffset', 'vcoDutyCycle', 'osc2DutyCycle']);
+const STEPWISE = new Set(['voiceCount', 'subOscOctaveOffset', 'osc2OctaveOffset', 'vcoDutyCycle', 'osc2DutyCycle', 'stringSeed', 'pianoSeed']);
 
 // Frequencies glide in ratio (equal steps in pitch), not in Hz.
 const FREQUENCIES = new Set(['filterFreq', 'masterFilterFreq', 'eqLowFreq', 'eqHighFreq', 'phaserFrequency']);

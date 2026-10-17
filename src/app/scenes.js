@@ -84,7 +84,7 @@ export const sceneSlug = (name) => name
 export function presetFromSearch(search) {
     const query = new URLSearchParams(search || '');
     if (query.has('preset')) return query.get('preset');
-    const keys = [...query.keys()].filter((key) => key !== 'intro');
+    const keys = [...query.keys()].filter((key) => !['intro', 'generation', 'phrase'].includes(key));
     return keys.length === 1 && query.get(keys[0]) === '' ? keys[0] : null;
 }
 

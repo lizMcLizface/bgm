@@ -113,6 +113,353 @@ synthesised with the Web Audio API; there are no samples.
   buffers stop crackling on slow machines), and a light / dark / system
   theme
 
+## Fluid background (desktop MVP)
+
+Open the palette menu beside the volume control and enable **Fluid background**,
+then press Play. Fluid starts enabled on desktop and disabled on mobile when
+there is no saved choice; an explicit choice is remembered. The circle
+visualizer is currently hidden from the interface and inactive. Hide the
+interface and timeline for an unobstructed view.
+Both hidden-view choices are remembered per browser across visits; Escape
+shows the interface again and remembers that choice.
+The WebGL2 fluid replaces the former noise clouds: each voice has a smooth,
+seeded wandering source, with its notes grouped closely around that path.
+Pitch shapes small offsets around the voice,
+velocity and synth envelopes control injection, and held notes follow curved
+paths. Short gates create narrow, stronger jets; longer gates create broader,
+slower sources. Live keys grow and slow as they remain held. Synth brightness
+and roughness also affect the source shape and movement.
+Keyboard/MIDI notes, mute/solo, and ambience-only playback also drive it.
+
+Colour follows the sounding chord, key, section, and activity, with register,
+velocity and synth brightness affecting individual notes. Major/minor warmth
+and harmonic tension are visual interpretations. Follow the key allows larger
+mood changes; named palettes keep the shifts within their colour family, and
+Monochrome stays desaturated. Colour transitions are eased. Voice paths use a
+separate deterministic random stream and never alter the generated music.
+
+Start with a **Flow look**: Balanced, Fine trails, or Soft ink. These set the
+dynamics together while preserving your palette and quality. Changing a look
+clears the existing fluid; **Clear flow** does the same without changing settings
+or stopping playback. The main controls show emitter size, swirl, and trail
+half-life in seconds. **Fullness** broadens dye emitted by notes and audible
+ambient layers without changing their velocity field. There is no procedural
+background pattern. Rain falls, wind blows, waves swell, fire rises, vinyl
+drifts, and thunder pulses with its actual sound. Layer levels, shapes, pan
+and width update these sources live; silent or disabled layers emit nothing.
+Fullness is preserved when changing flow looks. Quality has Efficient,
+Balanced, and High choices.
+
+**Jet direction** offers backward-facing Exhaust or Along source path.
+**Motion speed** sets one budget; **Motion to source** shares it between source
+travel and jet speed. At 0% the source stays still with a strong jet; at 100%
+the source moves with no injected jet. Advanced **Balance drift** varies the
+share smoothly per voice, keeping the total budget fixed and the endpoints
+exact. Changing the balance or speed preserves the current source position.
+These controls affect musical sources; ambience retains its own sound mapping.
+
+**Advanced fluid settings** retains the individual solver controls and shows
+values beside every slider. The palette menu controls motion speed, colour, dye brightness,
+separate velocity/dye diffusion and fade rates, independent simulation/dye
+resolutions, and a kinetic-energy ceiling. Diffusion spreads the field; fade
+removes it over time. Zero diffusion preserves sharper detail. The ceiling is the mean of
+`0.5 * dot(velocity, velocity)` over the normalised unit-area simulation domain;
+it is measured and enforced on the GPU every simulation step. Dye is bounded
+separately. The simulation longest edge is selectable from 128 to 1024 cells,
+and dye from 256 to 2048 cells; both grid axes are powers of two. Resolution
+changes and aspect-ratio changes resample the existing fields. Defaults are
+512/1024, with 24 pressure iterations and a 60 Hz simulation capped at two steps
+per display frame. Dye uses limited MacCormack advection to retain fine trails.
+The Swirl detail control sets vorticity confinement, followed by pressure
+projection and the energy cap. Diffusion uses an implicit solve on each field independently. It needs renderable
+floating-point WebGL2 textures. No video-export changes are included.
+
+In development, `window.__fluid` exposes the solver, emitter controller, and
+frame/step counters for debugging. Numeric energy controls are simulation
+units, not an audio loudness measurement. This is a first visual/timbre mapping;
+there is no spectral separation of individual instruments.
+
+## Music generation modes
+
+The options menu offers **Latest** (default) and **Original**. Latest retains
+themes across rests and develops them through four-bar statements, answers,
+variations and returns. Answers can displace or fragment the retained motif;
+development can sequence it, lengthen notes or create a shorter fragment, with
+restrained ornaments at higher density. Statements and returns keep the stored
+motif, fitted to the sounding harmony. It also uses revised meter-specific percussion with
+protected accents and restrained fills. Bass and drums share accents and pickups,
+walking bass connects chord targets, and rhythmic accompaniment leaves room
+around lead attacks. Timing variation keeps bass and kick together. Latest now
+shapes velocity over each phrase, rising towards a high point and relaxing,
+with shallower movement in supporting parts and less independent note jitter.
+The existing humanisation velocity and timing controls set the amounts; zero
+keeps the corresponding values exact. Original retains its previous performance. Sections now vary in duration,
+prepare their next destination, retain themes through breakdowns and bring
+the main theme back on returns. Section tone follows a smooth brightness
+curve when enabled. Section length is a reference duration in Latest.
+Original uses the previous arranger
+and percussion algorithms. New generated sounds (✦ / New sounds) use scene-aware
+version 3 recipes in Latest. Folk, keys, chip, analogue, cinematic, ambient and
+organ families adapt to the intended register, tempo and note length, with
+different widths and effect depths per role. These creation settings are frozen
+in shared links. Original uses previous recipes; switching modes rebuilds
+unedited v3 sounds at the next chord. Edited sounds and explicit v1/v2 sound definitions retain their settings.
+Latest also upgrades five named pluck patches and four piano patches as described below. The underlying synthesis
+engine is shared.
+
+Append `generation=legacy` to a URL to restore Original, for example
+`/?preset=rainy-cafe&generation=legacy`. Reloads, preset changes and copied
+links keep the choice. Switching while playing applies at the next chord.
+Latest's pentatonic lead option restricts every melodic note, including
+strong notes and endings, to the selected pentatonic set.
+
+For local groove comparisons, open `/tools/percussion.html` with the dev server
+running. It exposes each Latest groove, labelled hits, dry four-bar playback
+and WAV download, with meter, tempo, seed, swing and variation controls.
+
+For ensemble comparisons, open `/tools/ensemble.html`. It compares the previous
+Latest with coordinated Latest using the same seed, themes and sounds, with
+optional Original, individual part controls, matched average levels, note maps
+and WAV downloads. Switching players keeps the listening position.
+
+For longer form comparisons, open `/tools/form.html`. Inspect 32–128 bars of
+previous sections and developed form using the same ensemble, then render a
+matched audio pair. Section strips and phrase decisions show where themes
+return and transitions are prepared. The earlier ensemble comparison keeps
+the previous section system in both versions to isolate ensemble changes.
+
+For sound comparisons, open `/tools/sound.html`. Hear previous generated sounds,
+scene-aware sounds and an optional library reference on identical notes, with
+matched levels, part isolation, family selection, a fast-articulation option and
+WAV downloads. This changes generated voices; applying a named scene continues
+to load its named library sounds. Further acoustic models and per-note expression remain future work.
+
+For performance comparisons, open `/tools/performance.html`. Hear independent
+variation against phrase dynamics on identical pitches and note lengths, using
+current named sounds. It supports part isolation, velocity/timing controls,
+matched levels, per-bar dynamics summaries and WAV downloads. Earlier comparison
+pages retain their original performance to isolate the changes they review.
+
+For melody comparisons, open `/tools/melody.html`. Compare repeating motifs with
+bounded theme development over 8–32 bars, with solo/duet/ensemble playback,
+density overrides, matched levels, WAV downloads and per-bar transform labels.
+Sixteen bars expose statement, answer, development and return with sections off.
+This earlier comparison retains the per-bar pitch search to isolate motif changes.
+
+Latest now plans pitches across the remaining known portion of each four-bar
+phrase, balancing contour, chord fit, leap recovery and the closing target.
+It keeps motif rhythm and note lengths. The path is cached and replanned when
+its harmonic or melodic context changes; unknown future key changes limit the
+forecast rather than being guessed. Latest also chooses four- or eight-bar phrases, keeping shorter phrases for
+driving profiles and short section boundaries. Longer phrases retain their
+orchestration across the midpoint, answer in the second half, and place pickups,
+fills and performance gestures at their actual boundaries. Their midpoint target
+is lighter than the final close. Original remains four bars.
+
+Open `/tools/phrase.html` to compare per-bar and phrase-wide pitch planning.
+It offers the same presets and density controls, settled/open endings,
+solo/duet/ensemble playback, matched levels, WAVs and destination labels.
+Exact timing defaults on; preset humanisation can be restored for listening.
+
+Open `/tools/length.html` to compare forced four- and eight-bar phrasing.
+It includes density and ending controls, solo/duet/ensemble playback, matched
+levels, WAVs and phrase labels. Use 32 bars to hear a full long phrase-role cycle.
+Earlier comparison tools retain four-bar phrases to isolate their original changes.
+
+Latest also plans restrained passing/neighbour notes, anticipations and prepared
+holds over known chord changes, with an explicit chord-tone landing. These reuse
+existing attacks; suspensions tie across the bar instead of reattacking. The
+selected melodic scale and range still constrain them, and a two-bar budget
+keeps embellishment restrained.
+
+Open `/tools/resolution.html` for matched listening comparisons and labels showing
+each tension note and its landing. Density, ending and part controls are included.
+Deliberate two-lead repeat patterns (one lead moves while the other holds) remain
+planned counterpoint work; current second-lead spacing checks are still in place.
+
+Latest can now introduce a distinct contrast phrase before returning to the main
+theme. It uses the retained secondary theme with bounded reflected contour,
+shifted entrances and more space. Development stays available in alternating
+cycles; the existing repeat preference reduces contrast, and 100% suppresses it.
+
+Open `/tools/contrast.html` for a matched previous-cycle/contrast comparison,
+with four/eight-bar phrases, part controls, WAVs and role/transform labels.
+The comparison sets repeat preference to zero to expose the contrast role.
+
+The Colour panel's Harmony scale control separates melodic notes from chord
+colours. Automatic parent harmony uses major/minor parents for Major/Minor
+Pentatonic melodies; other modes keep their selected-scale chords. Selected
+scale colours retains the earlier unusual pentatonic harmony, and explicit
+major/minor parents are available. Bass and accompaniment follow the harmonic
+scale while melodic parts retain their selected note set. The choice persists
+in shared settings URLs; Original keeps its existing selected-scale harmony.
+Open `/tools/harmony.html` for a matched listening comparison with chord labels.
+
+Latest also retains a two-bar second-lead idea for duet phrases. Answers move
+the foreground over that idea; development exchanges the roles, contrast uses
+opposing motion, and returns recall the shared opening. Repeats adapt to harmony
+and sustained clashes rather than forcing exact pitches. Existing activity,
+silence and parallel-harmony choices still apply; Original is unchanged.
+Open `/tools/duet.html` for matched duet/ensemble comparisons. Choose 32 bars
+to include the inverse exchange, or 32 bars with eight-bar phrases for the
+first longer cycle. Earlier comparison pages retain their previous behaviour.
+
+Latest's rhythmic accompaniment and counter can now support, answer or leave
+space around the foreground over a shared two-bar rhythm cell. The cell stays
+recognisable for four phrases, with a bounded weak-slot change before its
+opening returns. Drum ornament choices also reuse the cell; anchors, fills
+and section transitions retain their existing rules. Held textures and chord
+entrances stay fixed, and the accompaniment thinning switch still applies.
+Open `/tools/rhythm.html` to compare this layer with the previous coordination.
+Pulse or Arpeggio makes the accompaniment response easier to hear. Earlier
+comparison pages keep their existing rhythmic behaviour; Original is unchanged.
+
+Latest lead lines also use a bounded melodic rhythm grammar: earlier pickups,
+syncopated attacks, breathing gaps, held or shortened endings, and ties between
+equal pitches. It reuses existing attacks, retains the final motif degree and
+protects cadence/resolution targets. Across-bar ties require unchanged known
+harmony and account for tempo changes; not every phrase has a qualifying tie.
+Open `/tools/grammar.html` to isolate these changes from the previous motif
+rhythm, with solo/ensemble playback, phrase controls and gesture/tie labels.
+Earlier comparisons keep their earlier rhythms; Original remains unchanged.
+
+Latest rhythmic accompaniment and independent counter lines can also breathe:
+one interior attack group can drop out, a phrase tail can shorten, an existing
+pickup can arrive earlier, or repeated attacks can become a hold. A planned
+counter rest can hand a bar to the main lead without losing its motif memory.
+The lead's notes stay the same. Sustained/rolled/stacked pads retain their
+fullness, and the accompaniment thinning switch still applies.
+Open `/tools/breathing.html` for matched comparisons, including counter-only
+and accompaniment-only playback. Earlier tools retain their prior behaviour.
+
+Latest also gives loaded instruments a small timing feel: plucked voices can
+lean forward, keys and breath-like voices sit slightly behind, and chip/classic
+voices have tighter residual timing. Chord pitches share one strike, while
+bass and kick retain their common timing reference. The existing Timing control
+scales the effect; zero remains exact. Profiles refresh at phrase entrances.
+Open `/tools/groove.html` for a matched timing comparison using the same current
+composition and sounds. Earlier comparison pages and Original remain unchanged.
+
+Latest independent leads can also choose pitches jointly over the known part
+of a phrase. A bounded search weighs motif contours, continuity, held clashes,
+crossings and motion between the voices. Cadence, tie and resolution notes stay
+protected. Future counter rhythms are projected from retained ideas and known
+breathing plans, then reconciled as each bar becomes current. Compatible paths
+are retained; changed harmony or rhythmic context replans the remaining phrase.
+Open `/tools/counterpoint.html` for the comparison and per-bar change labels.
+Many passages already fit and remain unchanged. Deep Night, seed 7, full lead
+density and eight bars provides a small foreground response in bar five.
+Explicit parallel harmony, Original and earlier comparison pages are unchanged.
+
+Open `/tools/percussion-audit.html` to isolate core grooves versus optional
+variation/fills, felt versus crisp mapping, or exact versus instrument timing.
+The new comparison includes synced vertical cursors, current bar/beat labels,
+A/B position matching and click-to-seek charts. Earlier pages are unchanged.
+New comparison pages should use `tools/comparisonPlayhead.js` with actual bar
+start times/durations and the renderer's pre-roll offset.
+
+When sections are enabled, Latest also shapes activity, note length, small
+register movement and the balance of allowed accompaniment/bass styles across
+each section. Breakdowns favour longer notes and sustained textures; builds can
+become more rhythmic. Disabled styles and explicit lead silence remain respected.
+Slower long forms can prepare transitions eight bars ahead.
+Open `/tools/sections.html` for the comparison, with synced cursors across chart
+rows. The pair shares section order and lengths; a measured difference table and
+amber bar outlines identify changes inside the sections, including unchanged
+selections. Choose 64 bars to include more breakdown/return transitions. Earlier form
+comparisons and Original retain their previous behaviour.
+
+Latest also prepares full-section arrivals with a closing fifth chord and a
+tonic return, retaining the mode's chord qualities and existing chord-slot grid.
+Conductor pivots and explicit endings take precedence; Sections Off and Original
+retain their previous harmony. `/tools/cadences.html` isolates this layer with
+exact chord/arrival tables, measured note differences and synced playheads.
+Latest can also connect the slot before a cadence through common tones, selecting
+a modal substitute only when both sides connect and the score improves.
+`/tools/bridges.html` isolates this layer and lists shared notes. These are
+harmonic connections; individual voices are not automatically tied across them.
+Eligible Latest section cycles can redistribute whole-bar chord durations while
+keeping progression order and cycle length: a two-bar reference becomes 3/1/2/2.
+This initial layer requires at least four progression entries and two reference
+bars per chord; full sections remain even. `/tools/harmonic-rhythm.html` compares
+actual slot boundaries, with matched audio and synced playheads.
+Latest can also thin rhythmic backing and lighten its closing tail during the
+last two bars before a full arrival or breakdown. Held pads retain their fullness;
+lead rhythm and bass/drum patterns are not directly edited. `/tools/gestures.html`
+isolates the backing layer and marks planned versus actual changes.
+Busy lead ideas can also lose one unaccented interior source attack before a
+section change, preserving endpoints, accents and committed tie/resolution points.
+Sparse lines remain intact. `/tools/lead-transitions.html` isolates this layer
+with lead-only playback, source-removal counts and actual note differences.
+A weak closing lead attack can also become an upbeat into a known full return,
+retaining its pitch degree and source count. Accents, sparse material and committed
+ties/resolutions are preserved. `/tools/lead-pickups.html` isolates this rhythmic
+articulation with source timing, matched audio and synced playheads.
+An eligible closing chord tone can also hold across a full-section return and
+resolve by step against the new harmony. Its preparation can move by up to a third;
+the arrival reuses an existing attack, and silent leads remain silent.
+`/tools/section-suspensions.html` isolates this layer with lead/pad playback,
+explicit preparation/landing status, matched audio and synced playheads.
+
+Latest now selects gradual, thematic, ostinato, cinematic or speech-bed development
+from the composition settings. Duration, recent section history and reference
+harmonic-cycle entrances guide the form. Returns retain the theme with varied
+orchestration; subdivision and tension have separate curves. Harmonic pacing
+keeps progression order/cycle length and protects closing/returning slots, with
+guarded interior modal destinations in long sections. Explicit silence, disabled
+styles, modulation, strict scales and endings retain precedence.
+
+`/tools/development.html` compares the complete Phase 3 batch or isolates form,
+curves, harmony and ending integration. It includes strategy overrides, section
+decision tables, matched audio and shared playheads across chart rows. Earlier
+comparison tools retain their preceding algorithms. Live, offline and visual
+plans carry actual four/eight-bar phrase and section boundaries; final endings
+clear unheard phrase targets before their held tonic and silent tail.
+
+## Plucked strings
+
+Latest uses damped-string synthesis for Nylon Guitar, Soft Harp, Harp Pluck,
+Kalimba Pluck and Upright Pluck, and for generated folk plucks. Original retains
+their oscillator versions. Explicit custom patches and edited voices stay intact.
+The advanced sound editor's Sound source selector chooses the model; the
+Plucked string module adjusts decay, damping, pick position and body. Envelopes, filters, effects, microtonal
+tuning, humanised detune, pitch envelopes, vibrato and pitch wander still apply.
+VCO/FM controls appear when the oscillator source is selected.
+
+Open `/tools/strings.html` for a level-matched comparison on identical notes,
+with patch/part selection, string controls, solo or ensemble playback and WAV
+downloads. Note buffers are generated procedurally ahead of playback and retained
+in a shared 24 MiB cache with piano note buffers. This is an initial string model, not a complete acoustic
+guitar or harp simulation.
+
+## Piano voices
+
+Latest uses struck-key synthesis for Felt Piano, Soft Keys, Tine Keys and FM
+Rhodes, and for generated keys-family voices other than bass. Independently
+decaying partials, register-dependent decay and velocity-sensitive strike colour
+provide felt and electric variants. Original retains the oscillator/FM recipes;
+custom patches and edited voices stay intact. Pixel Piano keeps its chip sound.
+Select Piano under Sound source in the advanced editor to adjust tone, decay,
+brightness, hammer, unison and **Held body**. The held body adds a quiet sustained
+tone under the fading strike so long pad chords stay present; set it to zero for
+a purely decaying voice. Existing envelopes, filters and effects still apply.
+
+The **Classic keys** group keeps Felt Piano (classic), Soft Keys (classic),
+Tine Keys (classic) and FM Rhodes (classic), with their original oscillator/FM
+sound. These are selectable in Latest and retained in sharing links.
+
+Open `/tools/piano.html` for comparisons on identical notes at matched levels,
+with preset music, soft/hard strikes, register sweeps, short and long held chords, optional
+ensemble playback and WAV downloads. Piano and string note buffers share a
+24 MiB cache. The small held-body buffer loops until release. This is an initial procedural model; pedal behaviour and coupled
+soundboard/string resonance remain future work.
+
+## Music generation roadmap
+
+See [Music generation improvement plan](docs/MUSIC_GENERATION_PLAN.md) for the
+phased work on themes, rhythm, form, expression and synthesis, with compatibility
+requirements and listening checks.
+
 ## Development
 
 ```bash

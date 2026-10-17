@@ -124,6 +124,19 @@ const PRESET_DEFAULTS = {
     fmIndex: 0,
     fmEnvAmount: 0,
     fmDecay: 0.5,
+    stringModel: 'oscillator',
+    stringDecay: 2,
+    stringDamping: .5,
+    stringPosition: .2,
+    stringBody: .25,
+    stringSeed: 1,
+    pianoType: 'felt',
+    pianoSustain: 0,
+    pianoDecay: 2.5,
+    pianoBrightness: .45,
+    pianoHammer: .3,
+    pianoUnison: .25,
+    pianoSeed: 1,
 };
 
 export default PRESET_DEFAULTS;

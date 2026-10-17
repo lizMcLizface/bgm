@@ -192,7 +192,8 @@ class Instrument {
         this.pitchWanderOn = false;
         this.pitchWanderOut = this.AC.createGain();
         // What the voices wire to their oscillators' detune: the vibrato and the pitch wander.
-        this.pitchTap = { connect: (destination) => { this.vibrato.connect(destination); this.pitchWanderOut.connect(destination); } };
+        this.pitchTap = { connect: (destination) => { this.vibrato.connect(destination); this.pitchWanderOut.connect(destination); },
+            disconnect: destination => { try { this.vibrato.getDepthNode().disconnect(destination); } catch {} try { this.pitchWanderOut.disconnect(destination); } catch {} } };
 
         // Same order as PolySynth's initSynth. Each effect sits between its
         // own input/output gain nodes, so the chain can route around it.
@@ -214,6 +215,7 @@ class Instrument {
             const synth = new MonoSynth(this.AC);
             // Voices start asleep (disconnected); see wake()/sleepIdle().
             synth.connectVibratoToAll(this.pitchTap);
+            synth.stringPitchTap = this.pitchTap;
             synth.init(startTime);
             // Auto-resync recreates oscillators after 5s without noteOn
             // activity - a scheduleNote()d pad would trip it mid-note.
@@ -359,7 +361,14 @@ class Instrument {
             this.vibrato.getDepthNode().disconnect();
             this.pitchWanderOut.disconnect();
         }
-        this.voices.forEach((synth) => synth.setVibratoEnabled(connected));
+        this.voices.forEach((synth) => {
+            synth.setVibratoEnabled(connected);
+            synth.stringPitchEnabled = connected;
+            for (const item of synth.stringSources || []) {
+                if (connected && !item.pitchConnected) this.pitchTap.connect(item.source.detune);
+                item.pitchConnected = connected;
+            }
+        });
     }
 
     // Same for the filter LFO on the voices' cutoff: a filter whose detune
@@ -554,6 +563,11 @@ class Instrument {
             .map((e) => (offset ? { ...e, value: e.value + offset } : e));
         return {
             gainPoints,
+            piano: this.preset.stringModel === 'piano' ? { type: this.preset.pianoType, decay: this.preset.pianoDecay,
+                brightness: this.preset.pianoBrightness, hammer: this.preset.pianoHammer, unison: this.preset.pianoUnison,
+                velocity, sustain: this.preset.pianoSustain, seed: this.preset.pianoSeed } : null,
+            string: this.preset.stringModel === 'plucked' ? { decay: this.preset.stringDecay, damping: this.preset.stringDamping,
+                position: this.preset.stringPosition, body: this.preset.stringBody, seed: this.preset.stringSeed } : null,
             filterEvents,
             filterOffset: offset,
             portamentoSpeed: this.polyphony === 1 ? this.preset.portamentoSpeed : 0,
@@ -646,6 +660,7 @@ class Instrument {
         cancelAndHold(detune, now);
         detune.setTargetAtTime(held.filterOffset, now, Math.max(this.filterEnv.release, minTime));
         this.busyUntil[held.index] = now + points[points.length - 1][0];
+        voice.stopStrings?.(this.busyUntil[held.index]);
         this.soundUntil = Math.max(this.soundUntil, this.busyUntil[held.index]);
         this.scheduleSleep();
     }
@@ -653,6 +668,7 @@ class Instrument {
     /** Fades every voice out quickly, cancelling anything booked after `time`. */
     silence(time = this.AC.currentTime) {
         this.voices.forEach((synth, i) => {
+            synth.stopStrings?.(time + .3);
             const gain = synth.gain.getNode().gain;
             cancelAndHold(gain, time);
             gain.setTargetAtTime(0, time, 0.05);

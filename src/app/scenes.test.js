@@ -146,3 +146,17 @@ describe('preset links', () => {
         expect(presetFromSearch('?turnip-town&m=abc')).toBeNull();
     });
 });
+
+
+test('full setups retain edited string-source parameters', () => {
+    const synth={stringModel:'plucked',stringDecay:3.2,stringDamping:.8,stringPosition:.14,stringBody:.6,stringSeed:777};
+    const setup=buildSetup({settings:defaultSettings(),voices:{pad:{name:'My string',synth}}});
+    expect(parseSetup(JSON.stringify(setup)).voices.pad.synth).toEqual(synth);
+});
+
+
+test('full setups retain edited piano-source parameters', () => {
+    const synth={stringModel:'piano',pianoType:'electric',pianoDecay:3.2,pianoSustain:.35,pianoBrightness:.8,pianoHammer:.14,pianoUnison:.6,pianoSeed:777};
+    const setup=buildSetup({settings:defaultSettings(),voices:{pad:{name:'My piano',synth}}});
+    expect(parseSetup(JSON.stringify(setup)).voices.pad.synth).toEqual(synth);
+});

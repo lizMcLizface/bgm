@@ -22,7 +22,7 @@ export const STAGE_KEY = 'bgm-stage-v2';
 /** The stages, in the order they unlock. `name` labels the top-bar button that unlocks it. */
 export const STAGES = [
     { id: 'basics', name: 'The basics' },
-    { id: 'ambience', name: 'Ambience' },
+    { id: 'ambience', name: 'Voices & ambience' },
     { id: 'music', name: 'Music' },
     { id: 'instruments', name: 'Instruments' },
     { id: 'arrangement', name: 'Arrangement' },
@@ -39,7 +39,7 @@ export const TOUR_STEPS = [
         stage: 0,
         selector: null,
         title: 'Welcome to bgm',
-        text: 'Calm music that writes itself, for working or studying - or under a video or podcast. To start with only the basics are shown: play, presets and the voices. This short tour covers them; more unlocks whenever you are ready.',
+        text: 'Calm music that writes itself, for working or studying - or under a video or podcast. Start with play, presets and a flowing fluid background that reacts to the sound. This short tour covers them; more unlocks whenever you are ready.',
     },
     {
         id: 'transport',
@@ -47,6 +47,13 @@ export const TOUR_STEPS = [
         selector: '.gen-transport',
         title: 'Play and move around',
         text: 'Play or pause (Space does too). The other buttons go back to the start, to the previous progression or chord, forward a chord or a progression, and loop the chord or progression that is playing.',
+    },
+    {
+        id: 'fluid',
+        stage: 0,
+        selector: '.gen-visual',
+        title: 'Music in motion',
+        text: 'Press Play and watch the fluid respond: short notes make small, fast jets, held notes make broader plumes, and colours follow the harmony and mood. Ambient sounds add their own motion too. Enable Fluid background here if it is off, then change the flow or roll its dice. Hide the interface with the arrow beside it for a clearer view.',
     },
     {
         id: 'scene',
@@ -63,18 +70,11 @@ export const TOUR_STEPS = [
         text: 'The chords being played and, in a row per voice, the notes each voice plays. The music is planned a few bars ahead, so what you see is what you will hear.',
     },
     {
-        id: 'tracks',
-        stage: 0,
-        selector: '.gen-tracks',
-        title: 'Voices',
-        text: 'One row per voice. Click a voice to choose its sound. M mutes it, S solos it, ⌨ lets you play it from the computer keyboard or a MIDI keyboard, and the dice picks a random preset for it. Try muting the bass, or the pad, to hear what each adds. The volume of each is in its panel further down.',
-    },
-    {
         id: 'tools',
         stage: 0,
         selector: '.gen-header-tools',
         title: 'Volume, look and options',
-        text: 'The master volume and the look menu (theme and the cloudy background). The speaker button shows how hard the audio engine is working - if the sound crackles, open it for a bigger buffer or a lighter reverb. The ⚙ menu copies a link to the music, sets a sleep timer, saves a WAV file, repeats this tour and can start over with only the basics.',
+        text: 'The master volume and the look menu (theme and the fluid background). The speaker button shows how hard the audio engine is working - if the sound crackles, open it for a bigger buffer or a lighter reverb. The ⚙ menu copies a link to the music, sets a sleep timer, saves a WAV file, repeats this tour and can start over with only the basics.',
     },
     {
         id: 'unlock',
@@ -85,7 +85,21 @@ export const TOUR_STEPS = [
         text: 'Press Play and leave it running. When you want more, press this button: it unlocks the next set of features and shows you around them, one set at a time. The ⚙ menu repeats a tour whenever you like.',
     },
 
-    // ---- 1: ambience ----
+    // ---- 1: voices and ambience ----
+    {
+        id: 'tracks',
+        stage: 1,
+        selector: '.gen-tracks',
+        title: 'Voices',
+        text: 'One row per voice. Click a voice to choose its sound. M mutes it, S solos it, ⌨ lets you play it from the computer keyboard or a MIDI keyboard, and the dice picks a random preset for it. Try muting the bass, or the pad, to hear what each adds. The volume of each is in its panel further down.',
+    },
+    {
+        id: 'voice-basics',
+        stage: 1,
+        selector: '[data-tour="voice-lead"]',
+        title: 'Shape each voice',
+        text: 'Each voice now has a panel for its sound and volume. Try another preset, or roll its dice. The compact controls beside the timeline let you mute, solo or play a voice. Sound design and the full synth editor unlock later.',
+    },
     {
         id: 'ambience-intro',
         stage: 1,

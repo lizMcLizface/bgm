@@ -26,9 +26,11 @@ import {
 } from './arranger';
 import { AMBIENCE_LAYERS } from './engine/ambience';
 import { LAYER_PARAMS } from './engine/ambienceSynth';
+import { HARMONY_SCALES } from './composition/harmonyScale';
 import { ROLE_PRESETS } from './presets';
 import { SEED_BITS as SOUND_SEED_BITS } from './soundGen';
 import { GENERATOR_V2, KIND_CODES } from './soundGenV2';
+import { GENERATOR_V3, SOUND_PROFILES, normalizeSoundContext } from './soundGenV3';
 import PROGRESSIONS from './progressions';
 import { DRUM_STYLES, DRUM_KITS, DRUMS, DRUM_PARAMS } from './percussion';
 import { WANDER_ROLES, WANDER_LIMITS, WANDER_MODES, AMBIENCE_WANDER_LIMITS } from './engine/wander';
@@ -61,6 +63,8 @@ export const SHAREABLE_PRESETS = [
     'Pixel Piano', 'Nylon Guitar', 'Soft Harp', 'Haunted Celesta',
     // film-synth presets
     'CS-80 Brass', 'Neon Saw Pad', 'Night Glass', 'Neon Pulse Bass', 'Seq Bass', 'Lament Lead', 'Ghost Sweep', 'Outrun Lead',
+    // Original oscillator/FM keys, independently selectable in Latest.
+    'Felt Piano (classic)', 'Soft Keys (classic)', 'Tine Keys (classic)', 'FM Rhodes (classic)',
 ];
 const PRESET_BITS = 8;
 // Preset index meaning "a generated sound" (soundGen.js v1): followed by
@@ -73,6 +77,8 @@ const ENSEMBLE_V1 = 2 ** PRESET_BITS - 2;
 // voice of a v2 ensemble - role, ensemble seed.
 const GENERATED_V2 = 2 ** PRESET_BITS - 3;
 const ENSEMBLE_V2 = 2 ** PRESET_BITS - 4;
+const GENERATED_V3 = 2 ** PRESET_BITS - 5;
+const ENSEMBLE_V3 = 2 ** PRESET_BITS - 6;
 const KIND_BITS = 3;
 // Fixed role order in codes (independent of the UI's order); also the
 // index a generated sound stores for the role it was made for.
@@ -252,6 +258,7 @@ const MUSIC_GROUPS = [
         [['padWeights', 'stacked'], weight],
         ...Object.keys(DEFAULT_DIRECTION_WEIGHTS).map((id) => [['directionWeights', id], weight]),
     ],
+    [[['harmonyScale'], options(Object.keys(HARMONY_SCALES), 2)]], // append-only: independent harmonic scale
 ];
 const VOICE_GROUPS = [
     [...voice('pad'), ...voice('bass'), ...voice('lead'), ...voice('counter'), field(GROUPS, ['padNotes'])],
@@ -397,10 +404,18 @@ function writePresets(w, roles, presets) {
         if (generated) {
             const ensemble = generated.ensemble !== undefined;
             const v2 = generated.version === GENERATOR_V2;
-            w.write(v2 ? (ensemble ? ENSEMBLE_V2 : GENERATED_V2) : (ensemble ? ENSEMBLE_V1 : GENERATED_V1), PRESET_BITS);
+            const v3 = generated.version === GENERATOR_V3;
+            w.write(v3 ? (ensemble ? ENSEMBLE_V3 : GENERATED_V3) : v2 ? (ensemble ? ENSEMBLE_V2 : GENERATED_V2) : (ensemble ? ENSEMBLE_V1 : GENERATED_V1), PRESET_BITS);
             w.write(CODE_ROLES.indexOf(generated.role), 2);
-            if (v2 && !ensemble) w.write(Math.max(0, KIND_CODES.indexOf(generated.kind)), KIND_BITS);
+            if ((v2 || v3) && !ensemble) w.write(Math.max(0, KIND_CODES.indexOf(generated.kind)), KIND_BITS);
             w.write(ensemble ? generated.ensemble : generated.seed, SOUND_SEED_BITS);
+            if (v3) {
+                const context = normalizeSoundContext(generated);
+                w.write(SOUND_PROFILES.indexOf(context.profile), 4);
+                w.write(context.bpm, 9);
+                w.write(Math.round(context.gate * 20), 8);
+                w.write(context.register, 7);
+            }
         } else if (index >= 0) {
             w.write(index, PRESET_BITS);
         }
@@ -425,6 +440,12 @@ function readPresets(r, roles, presets) {
             const madeFor = CODE_ROLES[r.read(2)];
             const seed = r.read(SOUND_SEED_BITS);
             if (madeFor) presets[role] = { generated: index === ENSEMBLE_V1 ? { role: madeFor, ensemble: seed } : { role: madeFor, seed } };
+        } else if (index === GENERATED_V3 || index === ENSEMBLE_V3) {
+            const madeFor = CODE_ROLES[r.read(2)];
+            const kind = index === GENERATED_V3 ? KIND_CODES[r.read(KIND_BITS)] : undefined;
+            const seed = r.read(SOUND_SEED_BITS);
+            const context = normalizeSoundContext({ role: madeFor, profile: SOUND_PROFILES[r.read(4)], bpm: r.read(9), gate: r.read(8) / 20, register: r.read(7) });
+            if (madeFor) presets[role] = { generated: { role: madeFor, ...(index === ENSEMBLE_V3 ? { ensemble: seed } : { seed, kind }), version: GENERATOR_V3, ...context } };
         } else if (index === GENERATED_V2 || index === ENSEMBLE_V2) {
             const madeFor = CODE_ROLES[r.read(2)];
             const kind = index === GENERATED_V2 ? KIND_CODES[r.read(KIND_BITS)] : undefined;

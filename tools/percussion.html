@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Percussion review</title>
+<style>body{font:16px/1.5 system-ui;background:#15171a;color:#e6e8eb;max-width:960px;margin:32px auto;padding:0 20px}form{display:flex;flex-wrap:wrap;gap:16px;align-items:end}label{display:flex;flex-direction:column;gap:5px}select,input,button{font:inherit;background:#252a30;color:inherit;border:1px solid #56616b;border-radius:5px;padding:7px}input[type=number]{width:90px}button{cursor:pointer;background:#3b6ea8}a{color:#9bc8ff}pre{padding:16px;background:#202429;overflow:auto}audio{display:block;width:100%;margin:20px 0}.note{color:#b7bec7}</style></head>
+<body><h1>Percussion review</h1><p>Compare four-bar grooves at the same level and seed. Start dry and straight, then restore variation, swing and timing.</p>
+<form id="review"><label>Generation<select name="mode"><option value="latest">Latest</option><option value="legacy">Original</option></select></label>
+<label>Style<select name="style"></select></label><label>Meter<select name="meter"></select></label>
+<label>Groove<select name="groove"><option value="0">1</option><option value="1">2</option><option value="2">3</option></select></label>
+<label>BPM<input type="number" name="bpm" min="50" max="170" value="80"></label><label>Seed<input type="number" name="seed" min="0" max="2147483647" value="42"></label>
+<label>Swing<input type="number" name="swing" min="0" max="0.6" step="0.05" value="0"></label><label>Timing ms<input type="number" name="timing" min="0" max="40" value="0"></label>
+<label>Embellishments<input type="checkbox" name="embellish"></label><button>Render and play</button></form>
+<p class="note">Latest allows direct selection of each groove and disables ornaments when unchecked. Original uses its seed-selected groove; some built-in stochastic choices remain even at zero variation. Positions below count from zero; * marks a protected anchor in Latest. Both use the same dry felt kit.</p>
+<p id="status" role="status"></p><audio controls loop></audio><a id="save" hidden>Save WAV</a><pre id="grid"></pre>
+<script type="module" src="/tools/percussionReview.js"></script></body></html>

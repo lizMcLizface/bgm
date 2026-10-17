@@ -251,3 +251,22 @@ describe('tour stages', () => {
 test('categories are labelled for the grid', () => {
     SCENE_CATEGORIES.forEach((c) => expect(c.label && c.blurb).toBeTruthy());
 });
+
+test('the first tour introduces fluid and the second introduces voice controls', () => {
+    const parts = document.createElement('div');
+    parts.innerHTML = '<div class="gen-transport"></div><div class="gen-visual"></div><div class="gen-tracks"></div><section data-tour="voice-lead"></section>';
+    document.body.appendChild(parts);
+    try {
+        render(<Tour key="basics-fluid" fromStage={0} toStage={0} onClose={() => {}} />);
+        expect(document.querySelector('.gen-tour-count').textContent).toBe('Step 1 of 3');
+        click(button('Next'));
+        expect(document.querySelector('#gen-tour-title').textContent).toBe('Play and move around');
+        click(button('Next'));
+        expect(document.querySelector('#gen-tour-title').textContent).toBe('Music in motion');
+        render(<Tour key="voices-second" fromStage={1} toStage={1} onClose={() => {}} />);
+        expect(document.querySelector('.gen-tour-count').textContent).toBe('Step 1 of 2');
+        expect(document.querySelector('#gen-tour-title').textContent).toBe('Voices');
+        click(button('Next'));
+        expect(document.querySelector('#gen-tour-title').textContent).toBe('Shape each voice');
+    } finally { parts.remove(); }
+});

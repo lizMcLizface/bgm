@@ -134,6 +134,13 @@ export function drawTimeline(ctx, width, height, view, pos, color) {
     ctx.globalAlpha = 1;
 
     // Key changes: a line through the roll and the new key's name.
+    // Phrase spans come from the plan; an eight-bar phrase has one entrance.
+    plan.forEach(({bar,boundaries})=>{
+        if(!boundaries?.phrase?.opening||boundaries.section?.opening)return;
+        const at=x(bar*beatsPerBar);if(at<0||at>width)return;
+        ctx.strokeStyle=color.muted;ctx.globalAlpha=.45;ctx.setLineDash([2,5]);
+        ctx.beginPath();ctx.moveTo(at,rollTop);ctx.lineTo(at,percTop-GAP);ctx.stroke();ctx.setLineDash([]);
+    });ctx.globalAlpha=1;
     ctx.font = '600 12px system-ui, -apple-system, "Segoe UI", sans-serif';
     ctx.textBaseline = 'top';
     plan.forEach(({ bar, chord }, i) => {
