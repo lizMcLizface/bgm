@@ -4,3 +4,8 @@ dist/
 *.log
 .DS_Store
 renders/
+synth-engine/target/
+synth-engine/effects/target/
+synth-engine/fm/target/
+
+synth-engine/inserts/target/

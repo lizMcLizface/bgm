@@ -320,7 +320,7 @@ const HITS = {
 const HIT_SECONDS = 8.1;
 
 class DrumKit {
-    constructor({ context = audioContext, reverbHub = null } = {}) {
+    constructor({ context = audioContext, reverbHub = null, externalEffects = false } = {}) {
         this.AC = context;
         this.polyphony = 0;
         this.bus = this.AC.createGain();
@@ -332,12 +332,16 @@ class DrumKit {
             level.connect(pan).connect(this.bus);
             return [name, level];
         }));
-        this.reverb = reverbHub ? new SendReverb(this.AC, reverbHub) : new Nodes.Reverb(this.AC);
-        this.reverb.defer(); // until the drums play (Generator.warmRoles, wake)
-        this.reverb.setType('reverb3');
-        [].concat(this.reverb.getNode()).forEach((node) => this.bus.connect(node));
         this.output = this.AC.createGain();
-        this.reverb.connect(this.output);
+        this.reverb = null;
+        if(externalEffects)this.bus.connect(this.output);
+        else {
+            this.reverb = reverbHub ? new SendReverb(this.AC, reverbHub) : new Nodes.Reverb(this.AC);
+            this.reverb.defer(); // until the drums play (Generator.warmRoles, wake)
+            this.reverb.setType('reverb3');
+            [].concat(this.reverb.getNode()).forEach((node) => this.bus.connect(node));
+            this.reverb.connect(this.output);
+        }
         // what render.js reads off an instrument
         this.preset = { gainRelease: HIT_SECONDS };
 
@@ -358,7 +362,7 @@ class DrumKit {
             const { on, level } = kit[name];
             this.drumOut[name].gain.setTargetAtTime(on ? level : 0, now, 0.02);
         });
-        if (this.reverb.amount !== kit.room) this.reverb.setAmount(kit.room);
+        if (this.reverb && this.reverb.amount !== kit.room) this.reverb.setAmount(kit.room);
     }
 
     connect(destination) {
@@ -398,12 +402,14 @@ class DrumKit {
         const { tone, decay } = this.kit[name];
         const x = Math.max(-1, Math.min(1, vary || 0));
         const args = { t: time, v: Math.max(0, Math.min(1, velocity)) * GAIN[name], x, bright: Math.pow(2, tone), long: decay, seconds: duration, out: this.drumOut[name] };
-        hit(this, args).forEach((src) => {
+        const sources=hit(this, args);
+        sources.forEach((src) => {
             this.sources.add(src);
             src.onended = () => this.sources.delete(src);
         });
         this.soundUntil = Math.max(this.soundUntil, time + HIT_SECONDS);
         this.wake();
+        return sources;
     }
 
     /** Stops every hit sounding or booked after `time`. */
@@ -422,21 +428,21 @@ class DrumKit {
 
     /** Drops the reverb's tail (as Instrument.flushTails). */
     flushTails() {
-        const impulse = this.reverb.node.buffer;
+        const impulse = this.reverb?.node.buffer;
         if (impulse) this.reverb.node.buffer = impulse;
     }
 
     tailSeconds() {
-        const impulse = this.reverb.node.buffer;
-        return (impulse ? impulse.duration : 3) + 0.5;
+        const impulse = this.reverb?.node.buffer;
+        return this.reverb ? (impulse ? impulse.duration : 3) + 0.5 : 0;
     }
 
     wake() {
-        this.reverb.hear();
+        this.reverb?.hear();
         if (!this.awake) {
             this.destinations.forEach((destination) => this.output.connect(destination));
             this.awake = true;
-            if (this.reverb.setAwake) this.reverb.setAwake(true);
+            if (this.reverb?.setAwake) this.reverb.setAwake(true);
         }
         this.scheduleSleep();
     }
@@ -450,7 +456,7 @@ class DrumKit {
             if (this.AC.currentTime < at) return this.scheduleSleep();
             this.output.disconnect();
             this.awake = false;
-            if (this.reverb.setAwake) this.reverb.setAwake(false);
+            if (this.reverb?.setAwake) this.reverb.setAwake(false);
             return undefined;
         }, Math.max(50, (at - this.AC.currentTime) * 1000));
     }

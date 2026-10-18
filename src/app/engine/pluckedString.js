@@ -6,9 +6,10 @@ import { cachedNoteBuffer, noteCacheStats, clearNoteCache } from './noteBufferCa
 export const stringCacheStats=noteCacheStats;
 export const clearStringCache=clearNoteCache;
 
-export function renderString(sampleRate,frequency,{decay=2,damping=.5,position=.2,body=.25,resonance=0,bodyType='guitar',seed=1}={}) {
+export function renderString(sampleRate,frequency,{decay=2,damping=.5,position=.2,body=.25,resonance=0,bodyType='guitar',seed=1,softness=0}={}) {
     const sr=clamp(sampleRate,8000,192000),freq=clamp(frequency,10,sr/6);
     decay=clamp(decay,.15,5);damping=clamp(damping,0,1);position=clamp(position,.05,.45);body=clamp(body,0,1);resonance=clamp(resonance,0,1);
+    softness=clamp(softness,0,1);
     const duration=Math.min(6,Math.max(.35,decay*1.25)),out=new Float32Array(Math.ceil(sr*duration));
     const theta=2*Math.PI*freq/sr,mix=.12+damping*.36;
     const filterDelay=Math.atan2(mix*Math.sin(theta),1-mix+mix*Math.cos(theta))/theta;
@@ -22,9 +23,22 @@ export function renderString(sampleRate,frequency,{decay=2,damping=.5,position=.
     const pick=Math.max(1,Math.round(position*n));
     for(let i=0;i<n;i++) {
         const phase=i/n,displacement=(phase<position?phase/position:(1-phase)/(1-position))-.5;
-        ring[i]=displacement+.06*(noise[i]-noise[(i+pick)%n]);
+        ring[i]=displacement+.06*(1-.9*softness)*(noise[i]-noise[(i+pick)%n]);
     }
-    let cursor=0,previous=ring[n-1],apX=0,apY=0,last=0,dc=0,peak=0;
+    if(softness>0){
+        // A finite, softer contact shapes the initial displacement, rather than
+        // letting broad-band pick noise dominate the first loop. Smooth the
+        // periodic buffer in both directions, with its exact periodic state,
+        // so there is no seam impulse or extra phase inside the feedback loop.
+        const cutoff=Math.max(freq*2.5,450+8000*(1-softness)**2),pole=Math.exp(-2*Math.PI*Math.min(sr*.4,cutoff)/sr),alpha=1-pole;
+        for(const reverse of [false,true]){
+            let state=0;for(let k=0;k<n;k++)state=alpha*ring[reverse?n-1-k:k]+pole*state;
+            state/=1-pole**n;
+            for(let k=0;k<n;k++){const i=reverse?n-1-k:k;state=alpha*ring[i]+pole*state;ring[i]=state;}
+        }
+    }
+    const start=softness>0?ring[n-1]:0;
+    let cursor=0,previous=ring[n-1],apX=start,apY=start,last=0,dc=0,peak=0;
     const dcPole=Math.exp(-2*Math.PI*10/sr);
     // A damped body resonance outside the feedback loop cannot destabilise it.
     const r=Math.exp(-1/(sr*.045)),c=2*r*Math.cos(2*Math.PI*185/sr);let b1=0,b2=0;
@@ -39,7 +53,7 @@ export function renderString(sampleRate,frequency,{decay=2,damping=.5,position=.
         bodyX2=bodyX1;bodyX1=x;
         const raw=resonance>0?x+body*((1-resonance)*.35*resonant+resonance*.7*colour):x+body*.35*resonant;
         dc=raw-last+dcPole*dc;last=raw;
-        const edge=Math.min(1,i/(sr*.0015),(out.length-1-i)/(sr*.02));
+        const edge=Math.min(1,i/(sr*(.0015+softness*.004)),(out.length-1-i)/(sr*.02));
         out[i]=dc*Math.max(0,edge);peak=Math.max(peak,Math.abs(out[i]));
     }
     if(peak>0)for(let i=0;i<out.length;i++)out[i]*=.7/peak;

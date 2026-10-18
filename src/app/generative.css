@@ -2291,8 +2291,18 @@ body {
     display: none !important;
 }
 
-.gen-zen .gen-header-tools > :not(.gen-visual):not(.gen-hide) {
+.gen-zen .gen-header-tools > :not(.gen-visual):not(.gen-hide):not(.gen-engine-control) {
     display: none !important;
+}
+
+.gen-engine-control { position:relative; display:inline-flex; }
+.gen button.gen-engine-toggle { display:inline-flex; align-items:center; justify-content:center; gap:6px; min-width:90px; min-height:30px; padding:4px 8px; font-size:12px; white-space:nowrap; }
+.gen-engine-toggle kbd { font:inherit; font-size:10px; opacity:.7; border:1px solid currentColor; border-radius:3px; padding:0 3px; }
+.gen button.gen-engine-toggle[aria-pressed=true] { background:var(--gen-accent); color:var(--gen-accent-text); border-color:var(--gen-accent); }
+.gen-engine-error { position:absolute; z-index:100; top:calc(100% + 8px); right:0; width:240px; max-width:80vw; padding:10px; background:var(--gen-surface); color:var(--gen-text); border:1px solid var(--gen-border); border-radius:6px; font-size:12px; }
+@media(max-width:639px) {
+    .gen-header-end { flex-wrap:wrap; }
+    .gen-header-end .gen-header-tools { flex-basis:100%; justify-content:flex-end; }
 }
 
 

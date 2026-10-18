@@ -33,12 +33,12 @@ const ENDING_FADE = 1.5;
 
 const cancelled = () => new DOMException('Rendering cancelled', 'AbortError');
 
-// Rejects when `signal` aborts (never, without one).
-const whenAborted = (signal) => new Promise((resolve, reject) => {
-    if (!signal) return;
-    if (signal.aborted) reject(cancelled());
-    signal.addEventListener('abort', () => reject(cancelled()), { once: true });
-});
+async function renderOrAbort(ctx,signal){
+    if(signal?.aborted)throw cancelled();let abort;
+    const aborted=new Promise((_,reject)=>{abort=()=>reject(cancelled());signal?.addEventListener('abort',abort,{once:true});});
+    try{return await Promise.race([ctx.startRendering(),aborted]);}
+    finally{signal?.removeEventListener('abort',abort);}
+}
 
 const until = async (condition, ms) => {
     const end = Date.now() + ms;
@@ -175,6 +175,8 @@ export async function renderWav(gen, seconds, options = {}) {
  * @returns {Promise<{ frames: number, sampleRate: number }>}
  */
 export async function renderPcm(gen, seconds, { ending = false, onProgress = () => {}, signal, onChunk } = {}) {
+    if(gen.audioEngineReady)await gen.audioEngineReady;
+    const audioEngine=gen.audioEngine;
     const sampleRate = gen.AC.sampleRate;
     const anySolo = Object.values(gen.roles).some((r) => r.solo);
     // an ambience-only setup (playMusic off) renders just the bed
@@ -196,18 +198,24 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
 
         // the chunk's instruments: their tails decide the minimum pre-roll
         const length = (from) => Math.ceil((end - from + (last ? 0 : CROSSFADE)) * sampleRate);
-        const build = (from) => {
+        const build = async (from) => {
             const ctx = new OfflineAudioContext({ numberOfChannels: 2, length: length(from), sampleRate });
-            const instruments = Object.fromEntries(roles.map((role) => {
+            const Wasm=audioEngine==='wasm'?(await import('./wasmInstrument')).default:null;
+            const instruments={},cleanup=[];
+            try{for(const role of roles){
                 const inst = role === 'perc'
                     ? new DrumKit({ context: ctx })
+                    : Wasm?await Wasm.create({polyphony:gen.getRolePolyphony(role),preset:presets[role],context:ctx,notes:notes.filter(n=>n.role===role&&n.time>=from&&n.time<end+(last?0:CROSSFADE)).map(n=>({...n,time:n.time-from}))})
                     : new Instrument({ polyphony: gen.getRolePolyphony(role), preset: presets[role], context: ctx });
+                instruments[role]=inst;cleanup.push(()=>inst.dispose());
                 if (role === 'perc') inst.setKit(gen.settings.drumKit);
                 inst.scheduleSleep = () => {}; // no wall-clock timers during the render
                 const gain = ctx.createGain();
+                cleanup.push(()=>gain.disconnect());
                 gain.gain.value = gen.roles[role].volume;
                 if (TONE_ROLES.includes(role)) {
                     const tone = ctx.createBiquadFilter();
+                    cleanup.push(()=>tone.disconnect());
                     tone.Q.value = 0.5;
                     automateTone(tone.frequency, tones, from);
                     inst.connect(tone);
@@ -219,13 +227,14 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
                 // slow pan / volume wander after the mixer, filter and pitch on the sound
                 // (wander.js); the render starts `from` seconds into the piece
                 const wander = new RoleWander(ctx, role, { offset: from, smooth: false });
+                cleanup.push(()=>wander.dispose());
                 wander.apply(gen.settings.wander);
                 if (inst.setWander) inst.setWander({ ...instrumentWander(gen.settings.wander, role, from), immediate: true });
                 gain.connect(wander.input);
                 wander.output.connect(ctx.destination);
-                return [role, inst];
-            }));
-            return { ctx, instruments };
+            }
+            return { ctx, instruments, cleanup };
+            }catch(error){cleanup.reverse().forEach(f=>f());throw error;}
         };
         let preroll = 0;
         if (start > 0) {
@@ -234,18 +243,20 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
             preroll = Math.min(MAX_PREROLL, Math.max(tail, ...sounding.map((n) => start - n.time)));
         }
         const from = start - preroll;
-        const { ctx, instruments } = build(from);
-
+        const { ctx, instruments, cleanup } = await build(from);
+        try{
+        if(signal?.aborted)throw cancelled();
         await Promise.all([noiseReady(ctx), bitCrusherReady(ctx)]);
         await until(() => Object.values(instruments).every((inst) => inst.reverb.settled), 5000);
         if (start === 0) tail = Math.max(1, ...Object.values(instruments).map((inst) => inst.tailSeconds() + inst.preset.gainRelease));
         const to = end + (last ? 0 : CROSSFADE);
         for (let i = first; i < notes.length && notes[i].time < to; i++) {
             const n = notes[i];
-            if (n.time >= from) instruments[n.role].scheduleNote(n.midi, n.time - from, n.duration, n.velocity, n.detune, n.expression);
+            if (n.time >= from&&!instruments[n.role].preScheduled) instruments[n.role].scheduleNote(n.midi, n.time - from, n.duration, n.velocity, n.detune, n.expression);
         }
         if (Object.values(ambience).some((level) => level > 0)) {
             const bed = new Ambience({ context: ctx, seed: 1, offset: from });
+            cleanup.push(()=>bed.stop(ctx.currentTime,0));
             bed.setShape(gen.settings.ambienceShape);
             bed.setLevels(ambience);
             bed.setWander(gen.settings.ambienceWander);
@@ -260,14 +271,15 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
         // Progress as the render goes. On Cancel the context is left
         // suspended (and dropped) instead of resumed.
         const duration = ctx.length / sampleRate;
-        for (let t = PROGRESS_STEP; t < duration - 0.01; t += PROGRESS_STEP) {
+        for (let t = PROGRESS_STEP; typeof ctx.suspend==='function' && typeof ctx.resume==='function' && t < duration - 0.01; t += PROGRESS_STEP) {
             ctx.suspend(t).then(() => {
                 if (signal && signal.aborted) return;
                 onProgress(Math.min(1, Math.max(0, from + t) / seconds));
                 ctx.resume();
             });
         }
-        const buffer = await Promise.race([ctx.startRendering(), whenAborted(signal)]);
+        const buffer = await renderOrAbort(ctx,signal);
+        const failure=Object.values(instruments).find(inst=>inst.error)?.error;if(failure)throw failure;
         const skip = Math.round(preroll * sampleRate);
         const left = buffer.getChannelData(0).subarray(skip);
         const right = buffer.getChannelData(1).subarray(skip);
@@ -293,6 +305,7 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
         await onChunk(pcm16(left.subarray(0, keep), right.subarray(0, keep)));
         frames += keep;
         onProgress(end / seconds);
+        }finally{cleanup.reverse().forEach(f=>f());}
     }
     return { frames, sampleRate };
 }

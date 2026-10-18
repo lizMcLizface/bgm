@@ -41,6 +41,7 @@ import { newSoundSeed } from './soundGen';
 import { SOUND_KINDS, GENERATOR_V2 } from './soundGenV2';
 import { GENERATOR_V3, soundContext } from './soundGenV3';
 import { prepareSound } from './engine/prepareSound';
+import WasmOptions,{useAudioEngine,AudioEngineButton} from './WasmOptions';
 import { addGeneratedPreset, addSetupPreset, findPreset, generatedInfo } from './editor/presetStore';
 import PRESET_DEFAULTS from './engine/presetDefaults';
 import { readPref, writePref } from './prefs';
@@ -731,6 +732,7 @@ const PercussionPanel = ({ drums, kit, volume, mix, armed, onArm, onDrums, onKit
 
 const GenerativeApp = () => {
     const gen = useRef(getGenerator()).current;
+    const audioEngine = useAudioEngine(gen);
     // music / ambience playing (each can play alone)
     const [running, setRunning] = useState(gen.isRunning);
     const [ambienceOn, setAmbienceOn] = useState(gen.ambienceRunning);
@@ -1324,6 +1326,7 @@ const GenerativeApp = () => {
                     </button>
                 )}
                 <div className="gen-header-tools">
+                    <AudioEngineButton engine={audioEngine} />
                     <button type="button" className="gen-help" onClick={() => setHelpOpen(true)} title="Quick reference: hover the parts of the page to see what they do"
                         aria-label="Quick reference">?</button>
                     <MasterVolume />
@@ -1332,6 +1335,7 @@ const GenerativeApp = () => {
                     <SettingsMenu midi={{ connect: live.connectMidi, status: live.midiStatus }} link={() => withBook(withGeneration(withIntro(shareUrl(gen.settings, linkPresets), shortIntro), generationChoice), bookRef.current)} generation={{ value: generationChoice, onChange: chooseGeneration }} saving={saving} onStartOver={startOver} smooth={{ value: smoothPresets, onChange: setSmoothPresets }} intro={{ value: shortIntro, onChange: setShortIntro }} onTour={() => openTour(false)}
                         phrase={<PhraseField seed={settings.seed} edited={gen.editedSinceStart} onApply={playPhrase} onRoll={newVariation} initial={linkedPhrase} />}>
                         <SleepTimer generator={gen} running={anyOn} onLeft={setSleepLeft} />
+                        <WasmOptions engine={audioEngine} />
                         <Recorder generator={gen} fileName={fileName} onProgress={setSaving} />
                     </SettingsMenu>
                     {zen && (

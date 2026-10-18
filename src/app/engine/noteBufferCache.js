@@ -3,6 +3,12 @@ const buffers=new Map();let bytes=0;
 const MAX_BYTES=24*1024*1024;
 export const noteCacheStats=()=>({entries:buffers.size,bytes,maxBytes:MAX_BYTES});
 export const clearNoteCache=()=>{buffers.clear();bytes=0;};
+// Prepared lab sources can check the same LRU before dispatching background DSP.
+export function findNoteBuffer(context,key) {
+    const id=JSON.stringify([context.sampleRate,key]);
+    if(!buffers.has(id))return null;
+    const buffer=buffers.get(id);buffers.delete(id);buffers.set(id,buffer);return buffer;
+}
 export function cachedNoteBuffer(context,key,render) {
     const id=JSON.stringify([context.sampleRate,key]);
     if(buffers.has(id)){const b=buffers.get(id);buffers.delete(id);buffers.set(id,b);return b;}

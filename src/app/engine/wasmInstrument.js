@@ -1,0 +1,55 @@
+import DEFAULTS from './presetDefaults';
+import {translatedWasmVoice,needsNativeSource} from './wasmPreset';
+import {LabVoice} from '../../labs/voice';
+import {effectTail} from '../../synth-lab/effectsConfig';
+
+// Keep the generator's Instrument contract, including native physical sources.
+export default class WasmInstrument {
+ static async create({context,preset={},polyphony=8,notes=[],spec=null}){
+  const i=new WasmInstrument(context,preset,polyphony);i.overrideSpec=spec;
+  try{i.voice=await LabVoice.create(context,i.spec(),{notes,onError:e=>{i.error=e;console.error('Wasm voice failed',e);}});i.voice.connect(i.output);i.reverb=i.voice.native?.reverb??i.reverb;i.preScheduled=Number.isFinite(context.length);return i;}
+  catch(e){i.dispose();throw e;}
+ }
+ constructor(context,preset,polyphony){this.AC=context;this.polyphony=polyphony;this.preset={...DEFAULTS,...preset};this.output=context.createGain();this.ready=Promise.resolve();this.revision=0;this.disposed=false;this.reverb={settled:true,hear(){},setLevel(){}};this.held=new Map();this.nextId=1;this.syncEnvelope();}
+ spec(){return this.overrideSpec??(needsNativeSource(this.preset)?{kind:'legacy',patch:this.preset,polyphony:this.polyphony}:translatedWasmVoice(this.preset,this.polyphony));}
+ syncEnvelope(){this.gainEnv={attack:this.preset.gainAttack,decay:this.preset.gainDecay,sustain:this.preset.gainSustain,release:this.preset.gainRelease};}
+ connect(node){this.output.connect(node);}
+ applyPreset(preset){
+  const previous=this.preset;this.preset={...DEFAULTS,...preset};this.overrideSpec=null;this.syncEnvelope();const revision=++this.revision,spec=this.spec();
+  this.loading=true;this.error=null;
+  this.ready=LabVoice.create(this.AC,spec).then(voice=>{
+   if(this.disposed||revision!==this.revision){voice.dispose();return;}
+   const old=this.voice;voice.connect(this.output);this.voice=voice;this.reverb=voice.native?.reverb??{settled:true,hear(){},setLevel(){}};old?.dispose();for(const [id,note]of this.held)if(note.voice)this.held.delete(id);this.loading=false;if(this.wander)this.setWander(this.wander);
+  }).catch(error=>{if(revision===this.revision){this.loading=false;this.preset=previous;this.syncEnvelope();this.error=error;}console.error('Could not change Wasm voice',error);});
+ }
+ morphTo(preset){this.applyPreset(preset);}
+ set(key,value){
+  const before=this.spec();this.preset={...this.preset,[key]:value};this.syncEnvelope();const after=this.spec();
+  if(!this.loading&&before.kind===after.kind&&this.voice){
+   if(after.kind==='legacy'){this.voice.patch={...this.preset};this.voice.native.set(key,value);return;}
+   if(JSON.stringify([before.patch.effects,before.patch.inserts])===JSON.stringify([after.patch.effects,after.patch.inserts])){this.voice.patch=structuredClone(after.patch);this.voice.backend.patch(after.patch,{seconds:.06});return;}
+  }
+  // Coalesce editor drags without reallocating a graph per pointer event.
+  clearTimeout(this.editTimer);this.ready=new Promise(resolve=>{this.editResolve?.();this.editResolve=resolve;this.editTimer=setTimeout(()=>{this.editResolve=null;this.applyPreset(this.preset);this.ready.then(resolve);},70);});
+ }
+ async afterReady(action){let pending;do{pending=this.ready;await pending;}while(!this.disposed&&pending!==this.ready);if(!this.disposed)action();}
+ scheduleNote(midi,time,duration,velocity=.7,detune=0,expression){const until=time+duration,epoch=this.epoch??0;void this.afterReady(()=>{if(epoch!==(this.epoch??0)||until<=this.AC.currentTime)return;const start=Math.max(time,this.AC.currentTime+.003);this.voice.schedule(midi,start,Math.max(.005,until-start),velocity,detune,expression);});}
+ startNote(midi,velocity){const id=this.nextId++,record={voice:null,note:null};this.held.set(id,record);void this.afterReady(()=>{if(this.held.get(id)===record){record.voice=this.voice;record.note=this.voice.on(midi,velocity);}});return id;}
+ stopNote(id){const record=this.held.get(id);record?.voice?.off(record.note);this.held.delete(id);}
+ silence(){this.epoch=(this.epoch??0)+1;this.held.clear();this.voice?.panic();}
+ flushTails(){this.voice?.panic();}
+ tailSeconds(){const p=this.spec();return Math.min(30,p.kind==='legacy'?this.voice?.native?.tailSeconds()??1:effectTail(p.patch.effects));}
+ setWander(value){
+  this.wander=value;if(!this.voice)return;if(this.voice.native){this.voice.native.setWander(value);return;}
+  // Pan/level wander stays native. Pitch/filter use the new source's slow
+  // modulation; old oscillator phases and Brownian paths are approximated.
+  const p=structuredClone(this.voice.patch),period=value.periods?.pitch??60;
+  if(this.voice.spec.kind==='fm'){p.global.wanderCents=Math.min(20,value.pitch);p.global.wanderRate=Math.max(.01,1/period);}
+  else for(const l of p.layers){l.wanderCents=Math.min(20,value.pitch);l.wanderRate=Math.max(.01,1/period);if(value.filter){l.lfo2Filter+=value.filter/1200;l.lfo2Rate=Math.max(.01,1/(value.periods?.filter??60));}}
+  this.voice.backend.patch(p,{seconds:.3});
+ }
+ activeEffects(){return this.voice?.native?.activeEffects()??['Wasm source','Instrument delay','FDN room'];}
+ effectsAwake(){return !this.disposed;}
+ awakeVoices(){return this.voice?.native?.awakeVoices()??this.voice?.stats?.active??this.voice?.keys.size??0;}
+ dispose(){if(this.disposed)return;this.disposed=true;this.revision++;clearTimeout(this.editTimer);this.editResolve?.();this.silence();this.voice?.dispose();this.output.disconnect();}
+}

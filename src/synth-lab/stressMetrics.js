@@ -1,0 +1,3 @@
+export const percentile=(data,p)=>{if(!data.length)return null;const a=[...data].sort((a,b)=>a-b);return a[Math.floor((a.length-1)*p)];};
+export function frameSummary(data){return {samples:data.length,p50Ms:percentile(data,.5),p95Ms:percentile(data,.95),maxMs:data.length?data.reduce((a,b)=>Math.max(a,b),0):null,over33ms:data.filter(t=>t>1000/30).length};}
+export function clockProgress(wallSeconds,audioSeconds){const ratio=wallSeconds>0?audioSeconds/wallSeconds:null;return {wallSeconds,audioSeconds,ratio,lagSeconds:wallSeconds-audioSeconds,inspect:ratio!==null&&(ratio<.95||ratio>1.05),note:'A >5% clock mismatch calls for inspection; this is an observation, not a hardware underrun count.'};}

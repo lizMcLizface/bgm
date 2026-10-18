@@ -254,6 +254,7 @@ class Generator {
     }
 
     async start() {
+        if(this.audioEngineReady)await this.audioEngineReady;
         if (this.AC.state !== 'running') await this.AC.resume();
         if (this.stopFade) {
             // still fading out from Stop: finish quickly so the old tails
@@ -267,6 +268,24 @@ class Generator {
         this.startedAt = performance.now();
         this.transport.start(this.resumeBar * this.beatsPerBar);
         this.notifyRunning();
+    }
+
+    async setAudioEngine(mode) {
+        mode=mode==='wasm'?'wasm':'legacy';const revision=(this.audioEngineRevision??0)+1;this.audioEngineRevision=revision;
+        const work=(async()=>{
+            const replacements=[];let committed=false;
+            try {
+                const Wasm=mode==='wasm'?(await import('./engine/wasmInstrument')).default:null;
+                for(const role of Object.keys(ROLES)){const old=this.roles[role].instrument,snapshot=JSON.stringify(old.preset);const instrument=Wasm?await Wasm.create({context:this.AC,preset:old.preset,polyphony:old.polyphony}):new Instrument({context:this.AC,preset:old.preset,polyphony:old.polyphony,reverbHub:this.reverbHub});replacements.push({role,instrument,source:old,snapshot});}
+                if(revision!==this.audioEngineRevision){replacements.forEach(r=>r.instrument.dispose());return;}
+                if(replacements.some(r=>this.roles[r.role].instrument!==r.source||JSON.stringify(r.source.preset)!==r.snapshot))throw Error('Sounds changed while preparing the engine. Please try the engine switch again.');
+                const running=this.isRunning;if(running)this.stop();
+                for(const {role,instrument}of replacements){const r=this.roles[role];r.instrument.dispose();r.instrument=instrument;instrument.connect(r.tone);}
+                this.audioEngine=mode;committed=true;this.applyWander();this.applyMix();
+                if(running){this.audioEngineReady=null;await this.start();}
+            }catch(error){if(!committed)replacements.forEach(r=>r.instrument.dispose());throw error;}
+        })();this.audioEngineReady=work;
+        try{await work;}finally{if(this.audioEngineReady===work)this.audioEngineReady=null;}
     }
 
     async startAmbience() {

@@ -1,0 +1,13 @@
+export const FAMILIES=[
+ ['strings','Strings','Bowed, silky and layered voices.'],
+ ['keys','Keys & bells','Acoustic and electric keys, bells and celeste.'],
+ ['choir','Choir','Wordless vowels and breath.'],
+ ['organs','Organs','Drawbars, pipes and moving harmonics.'],
+ ['drones','Drones','Long tones, low foundations and slow motion.'],
+ ['bass','Bass','Sub, synth, electric and upright foundations.'],
+ ['plucks','Plucks & mallets','Guitar, harp, kalimba and struck tones.'],
+ ['winds','Winds & brass','Flutes, reeds, whistles and brass.'],
+ ['leads','Synth leads','Melodic analog, FM and chip voices.'],
+ ['pads','Pads & textures','Sustained synth colours and moving textures.'],
+];
+export const familyRole=family=>family==='bass'?'bass':['winds','leads'].includes(family)?'lead':'pad';
