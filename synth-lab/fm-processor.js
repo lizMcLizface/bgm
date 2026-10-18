@@ -1,4 +1,4 @@
-import {PatchTransition,flattenFM,coreDiscrete,fmDiscrete,coreLog,fmLog} from './patch-transition.js';
+import {PatchTransition,flattenFM,coreDiscrete,fmDiscrete,coreLog,fmLog} from './patch-transition.js?v=044d1f7d18507e03';
 class FmProcessor extends AudioWorkletProcessor {
  constructor({processorOptions:o}) {
   super();this.failed=false;this.auditStats=!!o.auditStats;this.auditPeak=0;

@@ -1,7 +1,7 @@
 // Shared control-rate patch interpolation. No second synth instance or tail reset.
 export const flattenFM=p=>[...p.globals.map(([i,v])=>[0,i,v]),...p.operators.map(([op,i,v])=>[1,op*32+i,v]),...p.routes.map(([a,b,v])=>[2,a*8+b,v]),...p.carriers.map(([i,v])=>[3,i,v])];
-export const coreDiscrete=(s,i)=>s===0?[0,1,2].includes(i):[0,1,11,44,48,52,53,54,58,94].includes(i)||(i>=74&&i<=85&&(i-74)%3!==2);
-export const fmDiscrete=(s,i)=>s===0?[0,1,2,4,6,13,49].includes(i)||(i>=29&&i<=40&&(i-29)%3!==2):s===1?[16,17].includes(i%32):false;
+export const coreDiscrete=(s,i)=>s===0?[0,1,2].includes(i):[0,1,11,44,48,52,53,54,58,94,99].includes(i)||(i>=74&&i<=85&&(i-74)%3!==2);
+export const fmDiscrete=(s,i)=>s===0?[0,1,2,4,6,13,49].includes(i)||(i>=29&&i<=40&&(i-29)%3!==2):s===1?[16,17,21].includes(i%32):false;
 export const coreLog=(s,i)=>s===0?[9].includes(i):[9,12,17,18,20,21,22,24,25,35,45,65,66,68,72,88,96].includes(i);
 export const fmLog=(s,i)=>s===0?[10,16,19,20,22,26,28,43,51].includes(i):s===1?[0,1,4,5,7,10].includes(i%32):false;
 export class PatchTransition {

@@ -1,4 +1,4 @@
-import {PatchTransition,flattenFM,coreDiscrete,fmDiscrete,coreLog,fmLog} from './patch-transition.js';
+import {PatchTransition,flattenFM,coreDiscrete,fmDiscrete,coreLog,fmLog} from './patch-transition.js?v=044d1f7d18507e03';
 // Thin Web Audio bridge; all sample generation and event execution are Rust/Wasm.
 class SynthProcessor extends AudioWorkletProcessor {
  constructor({processorOptions:o}) {
