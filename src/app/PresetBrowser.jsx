@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { BROWSABLE_SCENES as SCENES, SCENE_CATEGORIES, MINE, sceneSettings } from './scenes';
+import { BROWSABLE_SCENES as SCENES, SCENE_CATEGORIES, MINE, sceneSettings,sceneUsesWasm } from './scenes';
+import PresetBadges from './PresetBadges';
 import { userScenes } from './setupStore';
 import { TONIC_NAMES, scaleById } from './theory';
 import { DRUM_STYLES } from './percussion';
@@ -49,7 +50,7 @@ function summary(scene) {
 
 const matches = (scene, query) => {
     const words = query.toLowerCase().split(/\s+/).filter(Boolean);
-    const haystack = [scene.name, scene.blurb, ...(scene.tags || [])].join(' ').toLowerCase();
+    const haystack = [scene.name, scene.blurb, ...(scene.tags || []),scene.isNew?'new':'',sceneUsesWasm(scene)?'wasm only':''].join(' ').toLowerCase();
     return words.every((word) => haystack.includes(word));
 };
 
@@ -61,6 +62,7 @@ const Card = ({ scene, active, onPick, onRemove }) => {
                 title="Click: apply as set above. Shift-click: composition only. Ctrl-click: sounds only.">
                 <span className="gen-pb-level" style={{ background: viridis(level) }} title={`${intensityLabel(level)} (${Math.round(level * 100)}%)`} />
                 <strong>{scene.name}</strong>
+                <PresetBadges isNew={scene.isNew} wasm={sceneUsesWasm(scene)}/>
                 {scene.blurb && <span className="gen-pb-blurb">{scene.blurb}</span>}
                 <span className="gen-pb-meta">{line} · {intensityLabel(level).toLowerCase()}</span>
                 {chips.length > 0 && <span className="gen-pb-chips">{chips.map((chip) => <span key={chip}>{chip}</span>)}</span>}

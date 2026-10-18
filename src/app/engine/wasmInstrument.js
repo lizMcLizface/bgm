@@ -2,6 +2,7 @@ import DEFAULTS from './presetDefaults';
 import {translatedWasmVoice,needsNativeSource} from './wasmPreset';
 import {LabVoice} from '../../labs/voice';
 import {effectTail} from '../../synth-lab/effectsConfig';
+import {nativeWasmVoice} from '../../synth-lab/voiceLibrary';
 
 // Keep the generator's Instrument contract, including native physical sources.
 export default class WasmInstrument {
@@ -11,7 +12,7 @@ export default class WasmInstrument {
   catch(e){i.dispose();throw e;}
  }
  constructor(context,preset,polyphony){this.AC=context;this.polyphony=polyphony;this.preset={...DEFAULTS,...preset};this.output=context.createGain();this.ready=Promise.resolve();this.revision=0;this.disposed=false;this.reverb={settled:true,hear(){},setLevel(){}};this.held=new Map();this.nextId=1;this.syncEnvelope();}
- spec(){return this.overrideSpec??(needsNativeSource(this.preset)?{kind:'legacy',patch:this.preset,polyphony:this.polyphony}:translatedWasmVoice(this.preset,this.polyphony));}
+ spec(){return this.overrideSpec??nativeWasmVoice(this.preset,this.polyphony)??(needsNativeSource(this.preset)?{kind:'legacy',patch:this.preset,polyphony:this.polyphony}:translatedWasmVoice(this.preset,this.polyphony));}
  syncEnvelope(){this.gainEnv={attack:this.preset.gainAttack,decay:this.preset.gainDecay,sustain:this.preset.gainSustain,release:this.preset.gainRelease};}
  connect(node){this.output.connect(node);}
  applyPreset(preset){

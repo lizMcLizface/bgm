@@ -1,3 +1,4 @@
+import {engineFromSearch,withAudioEngine} from './audioEngineChoice';
 // Generator settings as data: defaults, validation, and the compact form
 // used in share links (?s=...). Synth presets are not
 // part of the settings; a link carries each role's built-in preset name
@@ -294,7 +295,7 @@ export function settingsFromLocation(location) {
  * out ({ seed: false }): a reload keeps the settings but makes a new piece.
  */
 export function sharePath(settings, presets, location = window.location, { seed = true } = {}) {
-    return withGeneration(`${location.pathname}?${encodeSettings(settings, presets, { seed })}`, settings.generation);
+    return withAudioEngine(withGeneration(`${location.pathname}?${encodeSettings(settings, presets, { seed })}`, settings.generation),engineFromSearch(location.search));
 }
 
 /** Full share URL for the current page and settings. */

@@ -254,6 +254,7 @@ class Generator {
     }
 
     async start() {
+        if(Object.values(this.roles).some(r=>r.instrument.preset?.wasmVoice)&&this.audioEngine!=='wasm'&&!this.audioEngineReady)await this.setAudioEngine('wasm');
         if(this.audioEngineReady)await this.audioEngineReady;
         if (this.AC.state !== 'running') await this.AC.resume();
         if (this.stopFade) {
@@ -271,6 +272,7 @@ class Generator {
     }
 
     async setAudioEngine(mode) {
+        if(mode!=='wasm'&&Object.values(this.roles).some(r=>r.instrument.preset?.wasmVoice))throw Error('This preset uses Wasm-only voices. Choose another sound or preset to compare engines.');
         mode=mode==='wasm'?'wasm':'legacy';const revision=(this.audioEngineRevision??0)+1;this.audioEngineRevision=revision;
         const work=(async()=>{
             const replacements=[];let committed=false;

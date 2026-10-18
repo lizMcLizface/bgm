@@ -2296,6 +2296,9 @@ body {
 }
 
 .gen-engine-control { position:relative; display:inline-flex; }
+.gen-preset-badges { display:flex; flex-wrap:wrap; gap:5px; margin:3px 0; }
+.gen-preset-badges>span { padding:2px 5px; border:1px solid var(--gen-border); border-radius:4px; color:var(--gen-muted); font-size:10px; line-height:1.4; }
+.gen-preset-badges>.gen-new-badge { color:var(--gen-accent); border-color:var(--gen-accent); font-weight:650; }
 .gen button.gen-engine-toggle { display:inline-flex; align-items:center; justify-content:center; gap:6px; min-width:90px; min-height:30px; padding:4px 8px; font-size:12px; white-space:nowrap; }
 .gen-engine-toggle kbd { font:inherit; font-size:10px; opacity:.7; border:1px solid currentColor; border-radius:3px; padding:0 3px; }
 .gen button.gen-engine-toggle[aria-pressed=true] { background:var(--gen-accent); color:var(--gen-accent-text); border-color:var(--gen-accent); }

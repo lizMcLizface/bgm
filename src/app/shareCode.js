@@ -68,6 +68,8 @@ export const SHAREABLE_PRESETS = [
     'Haunted Viola',
     'Neon Blues Lead',
     'Coastal FM Lead', 'Progressive Pluck',
+    'Wasm Bowed Glass', 'Wasm Rosin Silk', 'Wasm Tine Keys', 'Wasm Glass Bells',
+    'Wasm Air Choir', 'Wasm Drawbars', 'Wasm Soft Pipes', 'Wasm DCO Foundation', 'Wasm Round FM Bass',
 ];
 const PRESET_BITS = 8;
 // Preset index meaning "a generated sound" (soundGen.js v1): followed by

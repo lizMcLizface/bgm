@@ -11,6 +11,7 @@ import {breathPatch} from '../app/engine/breathPatches';
 import {translatedWasmVoice,needsNativeSource} from '../app/engine/wasmPreset';
 import {PROCEDURAL_RECIPES} from '../synth-lab/proceduralPatch';
 import {preparedPatch} from './preparedPatch';
+import {WASM_VOICES} from '../synth-lab/voiceLibrary';
 export {FAMILIES} from './families';
 const sub=(id,family,index,name,edit=()=>{})=>{const patch=clonePatch(RECIPES[index]);patch.name=name;patch.global.polyphony=12;edit(patch);return {id,family,name,kind:'subtractive',patch,sourceRecipe:RECIPES[index].name};};
 const fm=(id,family,index,name,edit=()=>{})=>{const patch=cloneFM(FM_RECIPES[index]);patch.name=name;patch.global.polyphony=12;patch.global.quality=1;edit(patch);return {id,family,name,kind:'fm',patch,sourceRecipe:FM_RECIPES[index].name};};
@@ -42,7 +43,9 @@ export function instrumentFamily(name,category=''){
  if(category==='Leads'||/lead|squares|toy/i.test(name))return 'leads';
  return 'pads';
 }
-const libraryNames=new Set(['Felt Piano']);
+for(const v of WASM_VOICES){const lab=voiceByLabId(v.id);Object.assign(lab,{patch:structuredClone(v.patch),presetName:v.name});}
+function voiceByLabId(id){return LAB_VOICES.find(v=>v.id===id);}
+const libraryNames=new Set(['Felt Piano',...WASM_VOICES.map(v=>v.name)]);
 const stringNames=new Set(['Nylon Guitar','Soft Harp','Harp Pluck','Kalimba Pluck','Upright Pluck']);
 for(const [category,presets]of [...Object.entries(PRESET_CATEGORIES),['unCAGED',presetData]])for(const [name,raw]of Object.entries(presets)){
  if(name==='- INIT -'||libraryNames.has(name))continue;libraryNames.add(name);

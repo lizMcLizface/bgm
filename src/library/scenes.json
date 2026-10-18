@@ -54,6 +54,11 @@
       "id": "electronic",
       "label": "Electronic Horizons",
       "blurb": "Melodic synth nostalgia, sequencer journeys and long progressive-house builds"
+    },
+    {
+      "id": "wasm",
+      "label": "Wasm showcases",
+      "blurb": "New native FM and subtractive voices: strings, keys and synth motion"
     }
   ],
   "scenes": [
@@ -9317,6 +9322,346 @@
           }
         }
       }
+    },
+    {
+      "name": "Glass Conservatory",
+      "category": "wasm",
+      "blurb": "Slow bowed-glass strings, silk chords and a distant air choir. A spacious native FM/string showcase.",
+      "settings": {
+        "tonic": 9,
+        "mode": "Major-6",
+        "bpm": 64,
+        "progression": 6,
+        "barsPerChord": 2,
+        "leadActivity": 0.55,
+        "drums": {
+          "style": "off",
+          "activity": 0,
+          "variation": 0,
+          "sprinkle": 0
+        },
+        "sections": {
+          "mode": "strong",
+          "phrases": 2
+        },
+        "sectionTone": true,
+        "ambience": {
+          "rain": 0,
+          "thunder": 0
+        },
+        "playAmbience": false,
+        "leadDensity": 0.12,
+        "leadLeaps": 0.3,
+        "leadRepeat": 0.42,
+        "humanize": {
+          "timing": 9,
+          "velocity": 0.07,
+          "detune": 2
+        },
+        "padWeights": {
+          "sustain": 90,
+          "pulse": 0,
+          "arpeggio": 0,
+          "sequence": 0,
+          "rolled": 10,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 84,
+          "half": 16,
+          "walking": 0,
+          "drive": 0
+        },
+        "padMotion": {
+          "lean": 0.22,
+          "fast": 0.04,
+          "swell": 0.08
+        },
+        "volumes": {
+          "pad": 0.5,
+          "lead": 0.6,
+          "counter": 0.24,
+          "bass": 0.34,
+          "perc": 0.2
+        },
+        "ambienceVolume": 0.72,
+        "padNotes": 3,
+        "counter": {
+          "mode": "answer",
+          "activity": 0.2
+        }
+      },
+      "voices": {
+        "pad": "Wasm Rosin Silk",
+        "lead": "Wasm Bowed Glass",
+        "counter": "Wasm Air Choir",
+        "bass": "Wasm DCO Foundation"
+      },
+      "isNew": true,
+      "tags": [
+        "wasm",
+        "new",
+        "synth laboratory"
+      ]
+    },
+    {
+      "name": "Tine and Tide",
+      "category": "wasm",
+      "blurb": "Tine-key arpeggios, little glass-bell phrases and soft pipes over a round FM bass. Clear attacks and gentle echoes.",
+      "tags": [
+        "wasm",
+        "new",
+        "synth laboratory"
+      ],
+      "settings": {
+        "tonic": 6,
+        "mode": "Major-6",
+        "bpm": 86,
+        "progression": 8,
+        "barsPerChord": 2,
+        "padNotes": 3,
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 0,
+          "arpeggio": 100,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 10,
+          "half": 70,
+          "walking": 0,
+          "drive": 20
+        },
+        "leadActivity": 0.5,
+        "leadDensity": 0.12,
+        "leadLeaps": 0.3,
+        "leadRepeat": 0.7,
+        "chordColour": {
+          "mode": "plain",
+          "amount": 0
+        },
+        "chordBorrow": 0,
+        "humanize": {
+          "timing": 3,
+          "velocity": 0.07,
+          "detune": 1
+        },
+        "swing": 0,
+        "padMotion": {
+          "lean": 0.12,
+          "fast": 0,
+          "swell": 0.04
+        },
+        "counter": {
+          "mode": "answer",
+          "activity": 0.18
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "volumes": {
+          "pad": 0.55,
+          "lead": 0.52,
+          "counter": 0.22,
+          "bass": 0.42,
+          "perc": 0.2
+        },
+        "drums": {
+          "style": "downtempo",
+          "activity": 0.15,
+          "variation": 0.15,
+          "sprinkle": 0.02,
+          "kit": "crisp"
+        },
+        "drumKit": {
+          "room": 0.12,
+          "punch": {
+            "level": 1,
+            "tone": -0.1
+          },
+          "sizzle": {
+            "level": 0.5,
+            "decay": 0.8
+          },
+          "hat": {
+            "level": 0.5,
+            "decay": 0.8
+          },
+          "clap": {
+            "level": 0.6
+          },
+          "rim": {
+            "level": 0.65
+          },
+          "ride": {
+            "level": 0.4
+          }
+        },
+        "arpWeights": {
+          "bounce": 20,
+          "up": 15,
+          "down": 10,
+          "broken": 55
+        },
+        "pulseWeights": {
+          "groups": 30,
+          "beats": 40,
+          "push": 0,
+          "split": 30
+        },
+        "ambience": {
+          "rain": 0,
+          "thunder": 0
+        },
+        "playAmbience": false,
+        "voices": {
+          "lead": {
+            "octave": -1,
+            "wander": "off",
+            "chance": 0.3
+          },
+          "counter": {
+            "octave": -1,
+            "wander": "off",
+            "chance": 0.3
+          }
+        }
+      },
+      "voices": {
+        "pad": "Wasm Tine Keys",
+        "lead": "Wasm Glass Bells",
+        "counter": "Wasm Soft Pipes",
+        "bass": "Wasm Round FM Bass"
+      },
+      "isNew": true
+    },
+    {
+      "name": "Lantern Circuit",
+      "category": "wasm",
+      "blurb": "Parallel FM drawbars in a light pulse, tine-key melody and a chorused DCO bed. A warmer, moving synth ensemble.",
+      "tags": [
+        "wasm",
+        "new",
+        "synth laboratory"
+      ],
+      "settings": {
+        "tonic": 7,
+        "mode": "Major-1",
+        "bpm": 108,
+        "progression": 10,
+        "barsPerChord": 2,
+        "padNotes": 3,
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 80,
+          "arpeggio": 20,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 0,
+          "walking": 0,
+          "drive": 100
+        },
+        "leadActivity": 0.6,
+        "leadDensity": 0.2,
+        "leadLeaps": 0.2,
+        "leadRepeat": 0.8,
+        "chordColour": {
+          "mode": "plain",
+          "amount": 0
+        },
+        "chordBorrow": 0,
+        "humanize": {
+          "timing": 0,
+          "velocity": 0.03,
+          "detune": 0
+        },
+        "swing": 0,
+        "padMotion": {
+          "lean": 0.15,
+          "fast": 0,
+          "swell": 0.04
+        },
+        "counter": {
+          "mode": "line",
+          "activity": 0.25
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "sectionTone": false,
+        "volumes": {
+          "pad": 0.38,
+          "lead": 0.55,
+          "counter": 0.22,
+          "bass": 0.44,
+          "perc": 0.28
+        },
+        "drums": {
+          "style": "electro",
+          "activity": 0.1,
+          "variation": 0.05,
+          "sprinkle": 0,
+          "kit": "crisp"
+        },
+        "drumKit": {
+          "room": 0.12,
+          "punch": {
+            "level": 1,
+            "tone": -0.1
+          },
+          "sizzle": {
+            "level": 0.5,
+            "decay": 0.8
+          },
+          "hat": {
+            "level": 0.5,
+            "decay": 0.8
+          },
+          "clap": {
+            "level": 0.6
+          },
+          "rim": {
+            "level": 0.65
+          },
+          "ride": {
+            "level": 0.4
+          }
+        },
+        "arpWeights": {
+          "bounce": 20,
+          "up": 15,
+          "down": 10,
+          "broken": 55
+        },
+        "pulseWeights": {
+          "groups": 0,
+          "beats": 0,
+          "push": 0,
+          "split": 100
+        },
+        "ambience": {
+          "rain": 0,
+          "thunder": 0
+        },
+        "playAmbience": false,
+        "thinPadUnderLead": false
+      },
+      "voices": {
+        "pad": "Wasm Drawbars",
+        "lead": "Wasm Tine Keys",
+        "counter": "Wasm DCO Foundation",
+        "bass": "Wasm Round FM Bass"
+      },
+      "isNew": true
     }
   ]
 }

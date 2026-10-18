@@ -1,6 +1,7 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { presetGroups } from './presetStore';
 import { voiceTraits } from './voiceTraits';
+import PresetBadges from '../PresetBadges';
 import { ROLE_CATEGORY } from '../presets';
 import { useScrollLock } from '../scrollLock';
 
@@ -31,7 +32,7 @@ const BLURBS = {
 const ROLE_NAMES = { pad: 'rhythm / pad', bass: 'bass / support', lead: 'lead', counter: 'second lead' };
 
 const matches = (name, group, traits, query) => {
-    const haystack = [name, group, traits.wave, ...traits.chips, ...traits.space].join(' ').toLowerCase();
+    const haystack = [name, group, traits.wave, ...traits.chips, ...traits.space,traits.wasm?'new wasm only':''].join(' ').toLowerCase();
     return query.toLowerCase().split(/\s+/).filter(Boolean).every((word) => haystack.includes(word));
 };
 
@@ -39,6 +40,7 @@ const Card = ({ name, traits, active, edited, onPick }) => (
     <li className={`gen-pb-card${active ? ' is-active' : ''}`}>
         <button type="button" className="gen-pb-pick" onClick={() => onPick(name)} aria-current={active ? 'true' : undefined}>
             <strong>{name}</strong>
+            <PresetBadges isNew={traits.wasm} wasm={traits.wasm}/>
             <span className="gen-pb-meta">{traits.wave}{active && edited ? ' · edited' : ''}</span>
             <span className="gen-pb-chips">{traits.chips.map((chip) => <span key={chip}>{chip}</span>)}</span>
         </button>
@@ -60,7 +62,7 @@ const VoiceBrowser = ({ value, edited, onChange, onClose, role }) => {
 
     const items = useMemo(() => groups.map(({ group, presets }) => ({
         group,
-        cards: Object.entries(presets).map(([name, preset]) => ({ name, traits: voiceTraits(preset) })),
+        cards: Object.entries(presets).map(([name, preset]) => ({ name, traits: {...voiceTraits(preset),wasm:!!preset.wasmVoice} })),
     })), [groups]);
     const sections = items
         .map(({ group, cards }) => ({ group, cards: query ? cards.filter(({ name, traits }) => matches(name, group, traits, query)) : cards }))

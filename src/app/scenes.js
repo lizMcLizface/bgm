@@ -22,7 +22,7 @@
 import library from '../library/scenes.json';
 import { defaultSettings, newSeed, sanitizeSettings } from './settings';
 import { ROLE_PRESETS } from './presets';
-import { sanitizePreset } from './editor/presetStore';
+import { sanitizePreset,findPreset } from './editor/presetStore';
 import { cleanBook } from './rulebook/session';
 
 /** The picker's categories, in order: [{ id, label, blurb }]. */
@@ -59,6 +59,7 @@ export function normalizeScene(raw, defaultCategory = MINE.id) {
     });
     return {
         name,
+        ...(raw.isNew === true ? { isNew: true } : {}),
         ...(raw.hidden === true ? { hidden: true } : {}),
         category: text(raw.category, 40) || defaultCategory,
         blurb: text(raw.blurb, 200),
@@ -73,6 +74,7 @@ export function normalizeScene(raw, defaultCategory = MINE.id) {
 export const SCENES = library.scenes.map((scene) => normalizeScene(scene, SCENE_CATEGORIES[0].id));
 /** Archived versions resolve through sceneBySlug but stay out of browsing. */
 export const BROWSABLE_SCENES = SCENES.filter(scene => !scene.hidden);
+export const sceneUsesWasm=scene=>Object.values(scene.voices).some(v=>typeof v==='string'?!!findPreset(v)?.wasmVoice:!!v?.synth?.wasmVoice);
 
 /** A name as it reads in a link: 'Rainy Day, Chickens Inside' -> 'rainy-day-chickens-inside'. */
 export const sceneSlug = (name) => name
@@ -102,7 +104,7 @@ export function stepBuiltinScene(currentName, direction) {
 export function presetFromSearch(search) {
     const query = new URLSearchParams(search || '');
     if (query.has('preset')) return query.get('preset');
-    const keys = [...query.keys()].filter((key) => !['intro', 'generation', 'phrase'].includes(key));
+    const keys = [...query.keys()].filter((key) => !['intro', 'generation', 'phrase', 'wasm'].includes(key));
     return keys.length === 1 && query.get(keys[0]) === '' ? keys[0] : null;
 }
 

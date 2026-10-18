@@ -1,9 +1,9 @@
 import React,{act,StrictMode} from 'react';
 import {createRoot} from 'react-dom/client';
 import WasmOptions,{useAudioEngine,AudioEngineButton} from './WasmOptions';
-function Controls({generator}){const engine=useAudioEngine(generator);return <><AudioEngineButton engine={engine}/><WasmOptions engine={engine}/></>;}
+function Controls({generator,required=false}){const engine=useAudioEngine(generator,{required});return <><AudioEngineButton engine={engine}/><WasmOptions engine={engine}/></>;}
 let node,root;
-beforeEach(()=>{localStorage.clear();node=document.createElement('div');document.body.append(node);root=createRoot(node);globalThis.IS_REACT_ACT_ENVIRONMENT=true;});
+beforeEach(()=>{history.replaceState(null,'','/');localStorage.clear();node=document.createElement('div');document.body.append(node);root=createRoot(node);globalThis.IS_REACT_ACT_ENVIRONMENT=true;});
 afterEach(()=>{act(()=>root.unmount());node.remove();delete globalThis.IS_REACT_ACT_ENVIRONMENT;});
 it('is off for a fresh visitor and persists an explicit opt-in',async()=>{
  const generator={audioEngine:'legacy',setAudioEngine:vi.fn(async function(mode){this.audioEngine=mode;})};await act(async()=>root.render(<Controls generator={generator}/>));const input=node.querySelector('input');expect(input.checked).toBe(false);expect(generator.setAudioEngine).not.toHaveBeenCalled();await act(async()=>{input.click();await Promise.resolve();});expect(input.checked).toBe(true);expect(localStorage.getItem('bgm-audio-engine')).toBe('wasm');
@@ -34,4 +34,18 @@ it('serializes preparation and leaves both controls on the current engine until 
  await act(async()=>{node.querySelector('button').click();window.dispatchEvent(new KeyboardEvent('keydown',{code:'KeyV'}));});
  expect(generator.setAudioEngine).toHaveBeenCalledOnce();expect(node.querySelector('button').disabled).toBe(true);expect(node.querySelector('input').disabled).toBe(true);expect(node.querySelector('input').checked).toBe(false);
  await act(async()=>finish());expect(node.querySelector('button').disabled).toBe(false);expect(node.querySelector('input').checked).toBe(true);
+});
+
+it('uses a temporary Wasm debugging link without changing the saved preference, even when toggled',async()=>{
+ history.replaceState(null,'','/?preset=rainy-cafe&wasm=1');localStorage.setItem('bgm-audio-engine','legacy');
+ const generator={audioEngine:'legacy',setAudioEngine:vi.fn(async function(mode){this.audioEngine=mode;})};await act(async()=>root.render(<Controls generator={generator}/>));
+ expect(generator.audioEngine).toBe('wasm');expect(localStorage.getItem('bgm-audio-engine')).toBe('legacy');expect(node.textContent).toContain('Temporary engine override');
+ await act(async()=>node.querySelector('button').click());expect(generator.audioEngine).toBe('legacy');expect(new URLSearchParams(location.search).get('wasm')).toBe('0');expect(localStorage.getItem('bgm-audio-engine')).toBe('legacy');
+});
+it('a previous-engine debugging link overrides a saved opt-in',async()=>{
+ history.replaceState(null,'','/?wasm=0');localStorage.setItem('bgm-audio-engine','wasm');const generator={audioEngine:'legacy',setAudioEngine:vi.fn()};await act(async()=>root.render(<Controls generator={generator}/>));expect(generator.setAudioEngine).not.toHaveBeenCalled();expect(node.querySelector('input').checked).toBe(false);expect(localStorage.getItem('bgm-audio-engine')).toBe('wasm');
+});
+it('temporarily enables required voices and restores the prior engine when leaving them',async()=>{
+ const generator={audioEngine:'legacy',setAudioEngine:vi.fn(async function(mode){this.audioEngine=mode;})};await act(async()=>root.render(<Controls generator={generator} required/>));expect(generator.audioEngine).toBe('wasm');expect(node.querySelector('button').disabled).toBe(true);expect(localStorage.getItem('bgm-audio-engine')).toBeNull();
+ await act(async()=>root.render(<Controls generator={generator}/>));expect(generator.audioEngine).toBe('legacy');expect(node.querySelector('button').disabled).toBe(false);expect(localStorage.getItem('bgm-audio-engine')).toBeNull();
 });

@@ -12,8 +12,9 @@
 // cents; vibratoDepth in cents, vibratoRate in Hz; *Amount = dry/wet 0..1.
 
 import voices from '../library/voices.json';
+import {WASM_PRESETS} from '../synth-lab/voiceLibrary';
 
-export const PRESET_CATEGORIES = voices;
+export const PRESET_CATEGORIES = {...voices,'Wasm voices':WASM_PRESETS};
 
 /** All generator presets by name (names are unique across categories). */
 export const GENERATIVE_PRESETS = Object.assign({}, ...Object.values(PRESET_CATEGORIES));

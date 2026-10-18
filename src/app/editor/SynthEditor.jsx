@@ -146,6 +146,11 @@ const SynthEditor = ({ generator, roles, role, onRoleChange, presetName, edited,
         }
     };
 
+    const nativeControls=new Set(['gainAttack','gainDecay','gainSustain','gainRelease','masterVolume']);
+    const modules=params.wasmVoice
+        ? SYNTH_SCHEMA.map(m=>({...m,label:m.label==='Master Limiter'?'Level':m.label,controls:m.controls.filter(c=>nativeControls.has(c.key))})).filter(m=>m.controls.length)
+        : SYNTH_SCHEMA.filter(({ label }) => ['VCO', 'FM'].includes(label) ? !['plucked', 'piano'].includes(params.stringModel) : label === 'Plucked string' ? params.stringModel === 'plucked' : label === 'Piano' ? params.stringModel === 'piano' : true);
+
     return (
         <section className="gen-editor" ref={sectionRef}>
             <div className="gen-editor-head">
@@ -185,9 +190,10 @@ const SynthEditor = ({ generator, roles, role, onRoleChange, presetName, edited,
                         <span className="gen-editor-message" role="status">{message}</span>
                     </div>
 
+                    {params.wasmVoice&&<p className="gen-hint">New Wasm voice: shape its envelope and level here, or compare its full sound in the <a href="/labs/all/">Instrument labs</a>.</p>}
                     <ThemeProvider theme={theme}>
                         <div className="gen-modules">
-                            {SYNTH_SCHEMA.filter(({ label }) => ['VCO', 'FM'].includes(label) ? !['plucked', 'piano'].includes(params.stringModel) : label === 'Plucked string' ? params.stringModel === 'plucked' : label === 'Piano' ? params.stringModel === 'piano' : true).map(({ label, columns, controls }) => (
+                            {modules.map(({ label, columns, controls }) => (
                                 <div className={`gen-module ${columns >= 7 ? 'gen-module-full' : columns >= 3 ? 'gen-module-wide' : ''}`} key={label}>
                                     <Module label={label}>
                                         <KnobGrid columns={columns} rows={Math.ceil(controls.length / columns)}>

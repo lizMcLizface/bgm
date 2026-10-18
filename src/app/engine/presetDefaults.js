@@ -6,6 +6,7 @@
 // this the single source.
 const PRESET_DEFAULTS = {
     masterVolume: 0.75,
+    wasmVoice: '',
     polyphony: 8,
     portamentoSpeed: 0,
     masterFilterType: 'lowpass',

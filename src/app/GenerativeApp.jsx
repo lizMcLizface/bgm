@@ -42,6 +42,7 @@ import { SOUND_KINDS, GENERATOR_V2 } from './soundGenV2';
 import { GENERATOR_V3, soundContext } from './soundGenV3';
 import { prepareSound } from './engine/prepareSound';
 import WasmOptions,{useAudioEngine,AudioEngineButton} from './WasmOptions';
+import {engineFromSearch,withAudioEngine} from './audioEngineChoice';
 import { addGeneratedPreset, addSetupPreset, findPreset, generatedInfo } from './editor/presetStore';
 import PRESET_DEFAULTS from './engine/presetDefaults';
 import { readPref, writePref } from './prefs';
@@ -121,9 +122,9 @@ const withIntro = (path, shortIntro) => (shortIntro ? `${path}${path.includes('?
 function useSettingsInUrl(settings, presets, presetSlug, shortIntro, generation, book) {
     useEffect(() => {
         const id = setTimeout(() => {
-            window.history.replaceState(null, '', withBook(withGeneration(withIntro(presetSlug
+            window.history.replaceState(null, '', withAudioEngine(withBook(withGeneration(withIntro(presetSlug
                 ? `${window.location.pathname}?preset=${presetSlug}`
-                : sharePath(settings, presets, window.location, { seed: false }), shortIntro), generation), book, presetSlug ? sceneBySlug(presetSlug)?.rulebook : undefined));
+                : sharePath(settings, presets, window.location, { seed: false }), shortIntro), generation), book, presetSlug ? sceneBySlug(presetSlug)?.rulebook : undefined),engineFromSearch(window.location.search)));
         }, 300);
         return () => clearTimeout(id);
     }, [settings, presets, presetSlug, shortIntro, generation, book]);
@@ -732,7 +733,6 @@ const PercussionPanel = ({ drums, kit, volume, mix, armed, onArm, onDrums, onKit
 
 const GenerativeApp = () => {
     const gen = useRef(getGenerator()).current;
-    const audioEngine = useAudioEngine(gen);
     // music / ambience playing (each can play alone)
     const [running, setRunning] = useState(gen.isRunning);
     const [ambienceOn, setAmbienceOn] = useState(gen.ambienceRunning);
@@ -788,6 +788,7 @@ const GenerativeApp = () => {
     const [roles, setRoles] = useState(() =>
         Object.fromEntries(Object.keys(ROLES).map((role) => [role, { presetName: gen.roles[role].presetName, edited: false }]))
     );
+    const audioEngine = useAudioEngine(gen,{required:Object.values(roles).some(r=>!!findPreset(r.presetName)?.wasmVoice)});
     // What a link can carry: built-in presets as loaded (edits stay local).
     // Generated sounds travel as the role they were made for + their seed.
     const linkPresets = useMemo(
@@ -1119,7 +1120,7 @@ const GenerativeApp = () => {
         window.addEventListener('keydown', onKey);
         return () => window.removeEventListener('keydown', onKey);
     }, [zen]);
-    const loadPresetAt = (role, name, morph) => gen.loadRolePresetAtBar(role, name, undefined, () => presetLoaded(role, name), { morph });
+    const loadPresetAt = async (role, name, morph) => {if(findPreset(name)?.wasmVoice&&gen.audioEngine!=='wasm'&&!await audioEngine.choose('wasm',{remember:false}))return;gen.loadRolePresetAtBar(role,name,undefined,()=>presetLoaded(role,name),{morph});};
     const loadSceneVoice = (role, spec, sceneName, unsaved, morph) => {
         if (typeof spec === 'string') {
             loadPresetAt(role, findPreset(spec) ? spec : ROLE_PRESETS[role], morph);
@@ -1145,8 +1146,9 @@ const GenerativeApp = () => {
         }, { morph });
     };
     // `parts`: 'all', 'composition' (everything but the sounds and the mix) or 'voices' (the sounds only).
-    const applyScene = (picked, options = {}) => {
+    const applyScene = async (picked, options = {}) => {
         if (!picked) return;
+        if(options.parts!=='composition'&&Object.values(picked.voices).some(v=>typeof v==='string'?findPreset(v)?.wasmVoice:v?.synth?.wasmVoice)&&gen.audioEngine!=='wasm'&&!await audioEngine.choose('wasm',{remember:false}))return;
         if (!(smoothPresets && gen.isRunning && picked.settings.playMusic !== false)) {
             applySceneNow(picked, options, false);
             return;

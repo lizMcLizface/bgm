@@ -176,7 +176,7 @@ export async function renderWav(gen, seconds, options = {}) {
  */
 export async function renderPcm(gen, seconds, { ending = false, onProgress = () => {}, signal, onChunk } = {}) {
     if(gen.audioEngineReady)await gen.audioEngineReady;
-    const audioEngine=gen.audioEngine;
+    const audioEngine=Object.values(gen.roles).some(r=>r.instrument.preset?.wasmVoice)?'wasm':gen.audioEngine;
     const sampleRate = gen.AC.sampleRate;
     const anySolo = Object.values(gen.roles).some((r) => r.solo);
     // an ambience-only setup (playMusic off) renders just the bed
