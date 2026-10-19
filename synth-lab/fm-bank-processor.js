@@ -34,7 +34,8 @@ class FmBankProcessor extends AudioWorkletProcessor {
  process(_input,outputs){if(this.failed)return false;try{
   const length=outputs[0]?.[0]?.length??128;
   // Real-time slots registered between quanta inherit this shared clock.
-  if(!this.offline&&(this.rendered===0||this.clock!==currentFrame)){if(this.rendered>0){this.resyncs++;this.skippedFrames+=Math.max(0,currentFrame-this.clock);}this.clock=currentFrame;for(let s=0;s<4;s++)if(this.slots[s])this.fm.bank_set_frame(s,this.clock);}
+  // Repeated browser stamps must not rewind samples already rendered.
+  if(!this.offline&&(this.rendered===0||currentFrame>this.clock)){if(this.rendered>0){this.resyncs++;this.skippedFrames+=currentFrame-this.clock;}this.clock=currentFrame;for(let s=0;s<4;s++)if(this.slots[s])this.fm.bank_set_frame(s,this.clock);}
   for(let at=0;at<length;){let n=Math.min(2048,length-at);
    for(const s of this.slots)if(s){s.transition.tick(this.clock);n=s.transition.span(this.clock,n);}
    this.fm.bank_render(n);

@@ -32,7 +32,8 @@ class SynthProcessor extends AudioWorkletProcessor {
  process(_inputs,outputs){
   if(this.failed)return false;
   try{
-   if(!this.offline&&(!this.aligned||this.clock!==currentFrame)){if(this.aligned){this.resyncs++;this.skippedFrames+=Math.max(0,currentFrame-this.clock);}this.engine.engine_set_frame(currentFrame);this.clock=currentFrame;this.aligned=true;}
+   // Repeated browser stamps must not rewind samples already rendered.
+   if(!this.offline&&(!this.aligned||currentFrame>this.clock)){if(this.aligned){this.resyncs++;this.skippedFrames+=currentFrame-this.clock;}this.engine.engine_set_frame(currentFrame);this.clock=currentFrame;this.aligned=true;}
    const output=outputs[0];if(!output?.length)return true;const n=output[0].length;
    for(let at=0;at<n;){
     this.transition.tick(this.clock);const count=this.transition.span(this.clock,Math.min(2048,n-at));this.engine.engine_render(count);

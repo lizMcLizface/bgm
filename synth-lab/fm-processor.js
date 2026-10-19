@@ -29,7 +29,8 @@ class FmProcessor extends AudioWorkletProcessor {
  process(_input,outputs){
   if(this.failed)return false;
   try{
-   if(!this.offline&&(!this.aligned||this.clock!==currentFrame)){if(this.aligned){this.resyncs++;this.skippedFrames+=Math.max(0,currentFrame-this.clock);}this.fm.fm_set_frame(currentFrame);this.clock=currentFrame;this.aligned=true;}
+   // Repeated browser stamps must not rewind samples already rendered.
+   if(!this.offline&&(!this.aligned||currentFrame>this.clock)){if(this.aligned){this.resyncs++;this.skippedFrames+=currentFrame-this.clock;}this.fm.fm_set_frame(currentFrame);this.clock=currentFrame;this.aligned=true;}
    const out=outputs[0];if(!out?.length)return true;
    for(let at=0;at<out[0].length;){
     this.transition.tick(this.clock);const count=this.transition.span(this.clock,Math.min(2048,out[0].length-at));this.fm.fm_render(count);

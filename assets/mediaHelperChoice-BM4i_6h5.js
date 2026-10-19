@@ -1,0 +1,1 @@
+function l(e=""){const r=new URLSearchParams(e).get("mediaHelper");return r==="0"?!1:r==="1"?!0:null}function t(e,r){if(r!==!0&&r!==!1)return e;const s=e.indexOf("#"),c=s<0?"":e.slice(s),a=s<0?e:e.slice(0,s),n=a.indexOf("?"),i=new URLSearchParams(n<0?"":a.slice(n+1));return i.set("mediaHelper",r?"1":"0"),(n<0?a:a.slice(0,n))+"?"+i+c}export{l as m,t as w};

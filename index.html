@@ -6,22 +6,32 @@
     <meta name="description" content="Calm procedural background music: scales, progressions and three synth voices that slowly drift." />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <title>calmbgm · calm procedural music</title>
-    <script type="module" crossorigin src="/assets/main-BaKn0xi2.js"></script>
+    <script>
+      // Servers without directory redirects fall back to this page for
+      // /labs/x or /synths/x; send those to the sub-page's own folder.
+      if (/^\/(labs|synths)(\/[\w-]+)?$/.test(location.pathname)) location.replace(location.pathname + '/' + location.search + location.hash);
+    </script>
+    <script type="module" crossorigin src="/assets/main-DbNAElLx.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
-    <link rel="modulepreload" crossorigin href="/assets/generative-D2iLVe-b.js">
-    <link rel="modulepreload" crossorigin href="/assets/patch-Cie_17nr.js">
-    <link rel="modulepreload" crossorigin href="/assets/wasmPerformance-BuMnxk9N.js">
-    <link rel="modulepreload" crossorigin href="/assets/fmPatch-D7cefnke.js">
-    <link rel="modulepreload" crossorigin href="/assets/pianoPatches-9OPaaufR.js">
-    <link rel="modulepreload" crossorigin href="/assets/percussion-DwyJ95MN.js">
-    <link rel="modulepreload" crossorigin href="/assets/drumKit-Wc1jWCo6.js">
-    <link rel="modulepreload" crossorigin href="/assets/scenes-DsNh9zGM.js">
+    <link rel="modulepreload" crossorigin href="/assets/generative-Blf_52ov.js">
+    <link rel="modulepreload" crossorigin href="/assets/sharedReverb-uqaDY_zP.js">
+    <link rel="modulepreload" crossorigin href="/assets/random-BuEB9B3z.js">
+    <link rel="modulepreload" crossorigin href="/assets/percussion-B2TBsgwM.js">
+    <link rel="modulepreload" crossorigin href="/assets/drumKit-SnLfMLRS.js">
+    <link rel="modulepreload" crossorigin href="/assets/presetDefaults-CThAdDpJ.js">
+    <link rel="modulepreload" crossorigin href="/assets/fmPatch-C5x8bytf.js">
+    <link rel="modulepreload" crossorigin href="/assets/pianoPatches-DTNjq7Fl.js">
+    <link rel="modulepreload" crossorigin href="/assets/wasmPerformance-oRC3WKEG.js">
+    <link rel="modulepreload" crossorigin href="/assets/percussionLatest-DSCbDxE-.js">
+    <link rel="modulepreload" crossorigin href="/assets/mediaHelperChoice-BM4i_6h5.js">
+    <link rel="modulepreload" crossorigin href="/assets/scenes-CTteOZvr.js">
     <link rel="modulepreload" crossorigin href="/assets/fluid-DwOTRYYG.js">
-    <link rel="stylesheet" crossorigin href="/assets/generative-CzE33gU_.css">
+    <link rel="modulepreload" crossorigin href="/assets/mediaSession-BkAA1t2f.js">
+    <link rel="stylesheet" crossorigin href="/assets/generative-D1GnKlHp.css">
     <link rel="stylesheet" crossorigin href="/assets/scenes-BV3AVPHx.css">
     <link rel="stylesheet" crossorigin href="/assets/main-XZjlopZD.css">
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"></div>
   </body>
 </html>
