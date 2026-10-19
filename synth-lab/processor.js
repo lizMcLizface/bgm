@@ -2,7 +2,7 @@ import {PatchTransition,flattenFM,coreDiscrete,fmDiscrete,coreLog,fmLog} from '.
 // Thin Web Audio bridge; all sample generation and event execution are Rust/Wasm.
 class SynthProcessor extends AudioWorkletProcessor {
  constructor({processorOptions:o}) {
-  super();this.failed=false;this.auditStats=!!o.auditStats;this.auditPeak=0;
+  super();this.failed=false;this.auditStats=!!o.auditStats;this.auditPeak=0;this.resyncs=0;this.skippedFrames=0;
   try{this.engine=new WebAssembly.Instance(o.module,{}).exports;
   if(this.engine.engine_api?.()!==1)throw Error('Synth kernel API mismatch. Rebuild the engine and reload.');
   this.engine.engine_init(sampleRate);
@@ -32,7 +32,7 @@ class SynthProcessor extends AudioWorkletProcessor {
  process(_inputs,outputs){
   if(this.failed)return false;
   try{
-   if(!this.aligned){this.engine.engine_set_frame(currentFrame);this.clock=currentFrame;this.aligned=true;}
+   if(!this.offline&&(!this.aligned||this.clock!==currentFrame)){if(this.aligned){this.resyncs++;this.skippedFrames+=Math.max(0,currentFrame-this.clock);}this.engine.engine_set_frame(currentFrame);this.clock=currentFrame;this.aligned=true;}
    const output=outputs[0];if(!output?.length)return true;const n=output[0].length;
    for(let at=0;at<n;){
     this.transition.tick(this.clock);const count=this.transition.span(this.clock,Math.min(2048,n-at));this.engine.engine_render(count);
@@ -40,8 +40,8 @@ class SynthProcessor extends AudioWorkletProcessor {
     at+=count;this.clock+=count;
    }
    if(this.auditStats)this.auditPeak=Math.max(this.auditPeak,this.engine.engine_stat(0));
-   this.report+=n;if(!this.offline&&this.report>=sampleRate){this.report=0;this.port.postMessage({type:'stats',active:this.engine.engine_stat(0),steals:this.engine.engine_stat(1),dropped:this.engine.engine_stat(2),late:this.engine.engine_stat(3),frame:this.engine.engine_stat(4),peak:this.engine.engine_stat(5),memory:this.engine.memory.buffer.byteLength,simdFrames:this.engine.engine_simd_frames?.()??0});}
-   if(this.stopFrame!==null&&this.engine.engine_stat(4)>=this.stopFrame){if(this.auditStats)this.port.postMessage({type:'stats',final:true,active:this.engine.engine_stat(0),peakActive:this.auditPeak,steals:this.engine.engine_stat(1),dropped:this.engine.engine_stat(2),late:this.engine.engine_stat(3),frame:this.engine.engine_stat(4),memory:this.engine.memory.buffer.byteLength,simdFrames:this.engine.engine_simd_frames?.()??0});this.stop();return false;}
+   this.report+=n;if(!this.offline&&this.report>=sampleRate){this.report=0;this.port.postMessage({type:'stats',resyncs:this.resyncs,skippedFrames:this.skippedFrames,active:this.engine.engine_stat(0),steals:this.engine.engine_stat(1),dropped:this.engine.engine_stat(2),late:this.engine.engine_stat(3),frame:this.engine.engine_stat(4),peak:this.engine.engine_stat(5),memory:this.engine.memory.buffer.byteLength,simdFrames:this.engine.engine_simd_frames?.()??0});}
+   if(this.stopFrame!==null&&this.engine.engine_stat(4)>=this.stopFrame){if(this.auditStats)this.port.postMessage({type:'stats',resyncs:this.resyncs,skippedFrames:this.skippedFrames,final:true,active:this.engine.engine_stat(0),peakActive:this.auditPeak,steals:this.engine.engine_stat(1),dropped:this.engine.engine_stat(2),late:this.engine.engine_stat(3),frame:this.engine.engine_stat(4),memory:this.engine.memory.buffer.byteLength,simdFrames:this.engine.engine_simd_frames?.()??0});this.stop();return false;}
    return true;
   }catch(error){this.fail(error);return false;}
  }

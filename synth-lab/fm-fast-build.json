@@ -1,7 +1,7 @@
 {
   "api": 1,
-  "source": "4e84c2d3a31b0813cc999c85de1d20be53938a1f8c8240f566018543ec296f16",
-  "wasm": "20d883c9b6abc44a108676b640c488c9ad6bbf3f52682f9bec3005e47a7fdc0d",
-  "bytes": 182361,
+  "source": "387d5a4a171cd0c273ea01639609e603a4805c9850067dce54d75e287c461862",
+  "wasm": "97a9cfb1db637c821993546fa51b806b5facfcb92d44de974d1d91c5c90c1624",
+  "bytes": 183300,
   "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)"
 }
