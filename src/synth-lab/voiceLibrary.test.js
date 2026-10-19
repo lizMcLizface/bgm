@@ -1,6 +1,6 @@
 import {WASM_VOICES,WASM_PRESETS,nativeWasmVoice} from './voiceLibrary';
 import {sanitizePreset,findPreset} from '../app/editor/presetStore';
-import {SCENES,sceneUsesWasm,buildSetup,parseSetup,sceneSettings} from '../app/scenes';
+import {BROWSABLE_SCENES as SCENES,sceneUsesWasm,buildSetup,parseSetup,sceneSettings} from '../app/scenes';
 import {voiceById} from '../labs/catalog';
 import DEFAULTS from '../app/engine/presetDefaults';
 test('main presets use the same full native patches as their lab counterparts',()=>{
@@ -23,4 +23,9 @@ test('three new soundscapes retain native voices through setup export/import',()
   const restored=parseSetup(JSON.stringify(buildSetup({settings:sceneSettings(scene,42),voices},{name:scene.name})));
   for(const role of Object.keys(voices))expect(restored.voices[role].synth.wasmVoice).toBe(voices[role].synth.wasmVoice);
  }
+});
+
+test('Soft Pipes has a useful audition level without changing the parallel-drawbar voice',()=>{
+ const pipes=WASM_VOICES.find(v=>v.id==='soft-pipes');expect(pipes.patch.global.gain).toBe(.35);expect(pipes.metadata.masterVolume).toBe(.35);
+ expect(pipes.patch.global.index).toBe(.25);expect(pipes.patch.operators.every(o=>o.attack===.08&&o.release===.55)).toBe(true);
 });

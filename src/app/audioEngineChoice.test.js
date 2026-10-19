@@ -2,6 +2,7 @@ import {engineFromSearch,withAudioEngine} from './audioEngineChoice';
 import {presetFromSearch} from './scenes';
 import {shareUrl,defaultSettings} from './settings';
 test('debugging links explicitly select either engine and leave unknown values alone',()=>{
+ expect(engineFromSearch('?perf=1')).toBe('wasm');expect(engineFromSearch('?wasm=0&perf=1')).toBe('wasm');expect(engineFromSearch('?wasm=0&perf=0')).toBe('legacy');
  expect(engineFromSearch('?wasm=1')).toBe('wasm');expect(engineFromSearch('?wasm=0')).toBe('legacy');expect(engineFromSearch('')).toBeNull();expect(engineFromSearch('?wasm=banana')).toBeNull();
  expect(presetFromSearch('?rainy-cafe&wasm=1')).toBe('rainy-cafe');
 });

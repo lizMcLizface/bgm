@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import {percussionVoice} from '../percussionVoices';
 import VoiceBrowser from './VoiceBrowser';
 
 // The voice's sound: a button with its name that opens the voice browser
@@ -7,7 +8,7 @@ import VoiceBrowser from './VoiceBrowser';
 // with several of these costs nothing until one is used. Uncontrolled by
 // default; with `open` / `onOpenChange` the page can open it from elsewhere
 // (the track strip's boxes). `role` lists that role's own kind of sound first.
-const PresetPicker = ({ value, edited, onChange, id, role, open: controlled, onOpenChange }) => {
+const PresetPicker = ({ value, edited, onChange, id, role, open: controlled, onOpenChange, disabled=false }) => {
     const [own, setOwn] = useState(false);
     const open = controlled === undefined ? own : controlled;
     const trigger = useRef(null);
@@ -18,9 +19,9 @@ const PresetPicker = ({ value, edited, onChange, id, role, open: controlled, onO
     };
     return (
         <>
-            <button ref={trigger} id={id} type="button" className="gen-voice-button" aria-haspopup="dialog" aria-expanded={open}
+            <button ref={trigger} id={id} type="button" className="gen-voice-button" aria-haspopup="dialog" aria-expanded={open} disabled={disabled} aria-label={role==='perc'?'Choose percussion preset':undefined}
                 onClick={() => setOpen(!open)} title="Choose a sound">
-                <span>{value}{edited ? ' (edited)' : ''}</span>
+                <span>{role==='perc'?percussionVoice(value).name:value}{edited ? ' (edited)' : ''}</span>
                 <span aria-hidden="true">▾</span>
             </button>
             {open && createPortal(

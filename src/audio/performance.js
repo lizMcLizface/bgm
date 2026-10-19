@@ -8,6 +8,7 @@
 //   sharedReverb  one convolver per impulse type for every voice, instead of
 //                 one per voice - nodes/sharedReverb.js
 
+import {perfEnabled} from './perfMode';
 export const PERFORMANCE_KEY = 'bgm-performance';
 
 /** Whether this looks like a phone or tablet (where all the savings start on). */
@@ -64,4 +65,5 @@ export function writePerformance(patch) {
 }
 
 /** What this page load runs with. */
-export const PERFORMANCE = readPerformance();
+const loadedPerformance=readPerformance();
+export const PERFORMANCE = {get reverb(){return loadedPerformance.reverb;},get sharedReverb(){return perfEnabled()||loadedPerformance.sharedReverb;}};

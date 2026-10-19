@@ -1,3 +1,4 @@
+import {usePerfMode} from '../audio/PerfModeButton';
 // Header controls: master volume; the theme toggle; the Audio menu - how busy
 // the audio thread is (with dropouts where the browser reports them), output
 // buffer size (src/audio/context.js), quick stop and the Performance choices
@@ -8,6 +9,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { audioContext, storedBufferSeconds, storeBufferSeconds } from '../audio/context';
 import { readPerformance, writePerformance } from '../audio/performance';
 import { masterBus } from '../audio/bus';
+import {playbackDiagnostics,formatPlaybackSummary} from '../audio/playbackDiagnostics';
+import {idleSuspender} from '../audio/idleContext';
 import { startLoadMeter } from '../audio/loadMeter';
 import { addSilence, readSilenceLog, clearSilenceLog, formatSilenceLog, describeSilence } from '../audio/silenceLog';
 import { runBenchmark } from './benchmark';
@@ -15,6 +18,7 @@ import { readPref, writePref } from './prefs';
 import { applyTheme, storedTheme } from './theme';
 import { BACKDROP_DEFAULTS, PALETTES } from './Backdrop';
 import FluidControls from './visuals/FluidControls';
+import WasmQuality from '../audio/WasmQuality';
 import { LinkIcon, SpeakerIcon, SunIcon, MoonIcon, AutoThemeIcon, PaletteIcon } from './icons';
 
 const VOLUME_KEY = 'bgm-volume';
@@ -53,12 +57,12 @@ export const MasterVolume = () => {
 function useAudioLoad(generator) {
     const [status, setStatus] = useState({ load: null, dropouts: null });
     const [silences, setSilences] = useState(() => readSilenceLog().length);
-    useEffect(() => startLoadMeter(audioContext, masterBus, setStatus, (seconds) => {
+    useEffect(() => {const stop=startLoadMeter(audioContext, masterBus, setStatus, (seconds) => {
         const entry = describeSilence(generator, seconds);
         if (!entry) return;
         addSilence(entry);
         setSilences(readSilenceLog().length);
-    }), [generator]);
+    },idleSuspender(audioContext,()=>generator.canSleepAudio()));return stop;}, [generator]);
     return { ...status, silences, resetSilences: () => setSilences(readSilenceLog().length) };
 }
 
@@ -69,16 +73,16 @@ const DROPOUT_SECONDS = 10;
 
 /** Audio-thread load, and dropouts where reported. */
 export const AudioMeter = ({ status }) => {
-    const { load, dropouts } = status;
+    const { load, dropouts, state } = status;
     const percent = load === null ? null : Math.round(load * 100);
     return (
-        <div className="gen-audio" title="How much of its time the audio thread spends making sound. Near 100% the sound drops out; a larger buffer (below) helps.">
+        <div className="gen-audio" title="Estimated audio load where callback bursts allow measurement. A dash means unavailable; paced callbacks are not a CPU measurement. Idle means the context is suspended.">
             <span className="gen-audio-label">Audio load</span>
             <span className={`gen-meter${load > HIGH_LOAD ? ' is-high' : ''}`} aria-hidden="true">
                 <i style={{ width: `${Math.min(100, percent || 0)}%` }} />
             </span>
             <span className="gen-audio-value" role="status">
-                {percent === null ? '–' : `${percent}%`}
+                {state==='suspended'?'Idle':percent === null ? '–' : `≈${percent}%`}
                 {dropouts ? ` · ${dropouts} dropout${dropouts > 1 ? 's' : ''}` : ''}
             </span>
         </div>
@@ -115,7 +119,7 @@ export const VisualMenu = ({ backdrop }) => {
                     <section className="gen-menu-section">
                         <h3>Background</h3>
                         <label className="gen-check">
-                            <input type="checkbox" checked={backdrop.value} onChange={(e) => backdrop.onChange(e.target.checked)} />
+                            <input type="checkbox" checked={backdrop.value} disabled={backdrop.locked} title={backdrop.locked?"Perf mode pauses the fluid background":undefined} onChange={(e) => backdrop.onChange(e.target.checked)} />
                             Fluid background
                         </label>
                         <small>Flowing colour shaped by the notes and their sound.</small>
@@ -161,6 +165,7 @@ export function useDismiss(menu) {
  * when the reload a change needs was cancelled.
  */
 export const AudioMenu = ({ generator, onReload }) => {
+    const perfOn=usePerfMode();
     const [, refresh] = useState(0);
     const [quickStop, setQuickStop] = useState(() => readPref(QUICK_STOP_KEY, true));
     const menu = useRef(null);
@@ -188,15 +193,26 @@ export const AudioMenu = ({ generator, onReload }) => {
         }
     };
     const [copiedLog, setCopiedLog] = useState('');
-    const copySilences = async () => {
-        const text = formatSilenceLog();
+    const diagnosticSnapshot = () => playbackDiagnostics(generator,{...status,masterGain:masterBus.gain.value});
+    const fullReport = () => formatSilenceLog()+'\nPlayback snapshot\n'+JSON.stringify(diagnosticSnapshot(),null,2);
+    const copySilences = async (compact = false) => {
+        const text = compact ? formatPlaybackSummary(diagnosticSnapshot(),readSilenceLog()) : fullReport();
         try {
             await navigator.clipboard.writeText(text);
-            setCopiedLog('Log copied.');
+            setCopiedLog(compact ? 'Summary copied. Paste this into chat.' : 'Full diagnostics copied.');
         } catch (e) {
             window.prompt('Copy this log', text);
         }
         setTimeout(() => setCopiedLog(''), 2500);
+    };
+    const saveDiagnostics = () => {
+        const url = URL.createObjectURL(new Blob([fullReport()],{type:'text/plain;charset=utf-8'}));
+        const link = document.createElement('a');
+        link.href = url;link.download = 'calmbgm-diagnostics-'+new Date().toISOString().replace(/[:.]/g,'-')+'.txt';
+        document.body.append(link);link.click();link.remove();
+        setTimeout(() => URL.revokeObjectURL(url),1000);
+        setCopiedLog('Full report saved. You can attach the file.');
+        setTimeout(() => setCopiedLog(''),2500);
     };
     const [bench, setBench] = useState({ running: false, step: '', report: '' });
     const benchmark = async () => {
@@ -231,7 +247,7 @@ export const AudioMenu = ({ generator, onReload }) => {
     const { load } = status;
     const level = load === null ? 'unknown' : recentDropout || load > HIGH_LOAD ? 'high' : load > BUSY_LOAD ? 'busy' : 'ok';
     const percent = load === null ? null : Math.round(load * 100);
-    const label = `Audio engine${percent === null ? '' : `: ${percent}% load${recentDropout ? ', recent dropout' : ''}`} - buffer and performance`;
+    const label = `Audio engine${status.state==='suspended'?': idle':percent===null?': load estimate unavailable':`: approximately ${percent}% load${recentDropout?', recent dropout':''}`} - buffer and performance`;
     return (
         <details className="gen-settings gen-audio-menu" ref={menu}>
             <summary className={`gen-load-${level}`} title={label} aria-label={label}>
@@ -241,6 +257,12 @@ export const AudioMenu = ({ generator, onReload }) => {
                 <section className="gen-menu-section">
                     <h3>Audio</h3>
                     <AudioMeter status={status} />
+                    <button type="button" className="gen-menu-wide" onClick={() => copySilences(true)}>Copy summary</button>
+                    <div className="gen-menu-row">
+                        <button type="button" onClick={() => copySilences(false)}>Copy full diagnostics</button>
+                        <button type="button" onClick={saveDiagnostics}>Save full report</button>
+                    </div>
+                    {copiedLog && <small role="status">{copiedLog}</small>}
                     <label className="gen-field">
                         <span>Audio buffer (now {actualMs} ms)</span>
                         <select value={storedBufferSeconds() || 0} onChange={changeBuffer}>
@@ -255,18 +277,21 @@ export const AudioMenu = ({ generator, onReload }) => {
                 </section>
                 <section className="gen-menu-section">
                     <h3>Performance</h3>
+                    <WasmQuality />
                     <small>For slower computers or if the sound crackles (all on by default on a phone, with a 100 ms buffer). Each uses less CPU and memory for a plainer sound; the music itself is unchanged. Changing one reloads the page (your settings are kept).</small>
                     <label className="gen-field">
                         <span>Reverb</span>
                         <select value={performance.reverb} onChange={(e) => changePerformance({ reverb: e.target.value })}>
-                            <option value="full">Full (stereo, up to 3 s)</option>
-                            <option value="light">Light (mono, up to 2 s)</option>
+                            <option value="full">Full</option>
+                            <option value="light">Light</option>
                         </select>
                     </label>
+                    <small>Wasm: 16 or 8 room lines, keeping the selected decay and stereo width. Previous engine: stereo up to 3 s, or mono up to 2 s.</small>
                     <label className="gen-check">
-                        <input type="checkbox" checked={performance.sharedReverb} onChange={(e) => changePerformance({ sharedReverb: e.target.checked })} />
-                        One reverb shared by all voices
+                        <input type="checkbox" checked={perfOn||performance.sharedReverb} disabled={perfOn} title={perfOn?"Enabled temporarily by Perf mode":undefined} onChange={(e) => changePerformance({ sharedReverb: e.target.checked })} />
+                        Share matching reverbs
                     </label>
+                    <small>Main page and lab runner: pool matching Wasm rooms. The previous engine shares matching impulses. Instrument delays and private rooms stay independent.</small>
                 </section>
                 <section className="gen-menu-section">
                     <h3>Benchmark</h3>
@@ -280,13 +305,11 @@ export const AudioMenu = ({ generator, onReload }) => {
                 </section>
                 <section className="gen-menu-section">
                     <h3>Gaps in the sound</h3>
-                    <small>Listens to the output while the music plays and notes any silence over 0.1 s, with what the engine was doing. If the music keeps cutting out (say with the screen locked), play for a minute, then copy the log and send it along.</small>
+                    <small>Listens to the output while the music plays and notes any silence over 0.1 s. Copy summary includes the transport, percussion and source counters in a short report for chat, even when no gap was detected. Save full report keeps the complete history in a file you can attach.</small>
                     <div className="gen-menu-row">
                         <span role="status">{status.silences ? `${status.silences} logged` : 'None logged'}</span>
-                        <button type="button" disabled={!status.silences} onClick={copySilences}>Copy log</button>
                         <button type="button" disabled={!status.silences} onClick={() => { clearSilenceLog(); status.resetSilences(); }}>Clear</button>
                     </div>
-                    {copiedLog && <small role="status">{copiedLog}</small>}
                 </section>
             </div>
         </details>

@@ -116,7 +116,7 @@ synthesised with the Web Audio API; there are no samples.
 ## Fluid background (desktop MVP)
 
 Open the palette menu beside the volume control and enable **Fluid background**,
-then press Play. Fluid starts enabled on desktop and disabled on mobile when
+then press Play. Fluid starts disabled on desktop and mobile when
 there is no saved choice; an explicit choice is remembered. The circle
 visualizer is currently hidden from the interface and inactive. Hide the
 interface and timeline for an unobstructed view.
@@ -472,6 +472,25 @@ npm run deploy    # tests + build, then publish dist/ to the gh-pages branch
 npm run render -- --preset rainy-cafe --minutes 60   # MP3 + a 30 fps MP4 of the timeline (below)
 ```
 
+For a single performance-testing switch, open
+`/?preset=tine-and-tide&perf=1` (or `/labs/all/?perf=1`). On the main page,
+**Perf: on/off** in the header switches live and briefly rebuilds the instruments
+at the current bar. The bundle enables Wasm, FM source banking/SIMD, eligible
+acoustic-filter SIMD, shared matching rooms, and pauses the fluid background.
+It retains the selected synthesis/reverb quality, individual delays and private
+rooms. The trial is temporary, travels in shared links and leaves saved device
+preferences untouched. `perf=0` disables the optional bank/SIMD paths for A/B;
+it retains Wasm and the saved room/background choices. Already accepted exact
+optimizations remain enabled in both modes. Perf mode remains off by default.
+
+The optional FM source-bank trial is available at
+`/?preset=tine-and-tide&wasm=1&bank=1` and `/labs/all/?bank=1`.
+It batches sparse FM voices across instruments while retaining separate stereo
+outputs, controls and effects. Omit `bank` and reload for independent sources;
+the choice is temporary and falls back when the optional kernel is unavailable.
+It remains off by default. See [the backend handoff](docs/SYNTH_NEXT_STEPS.md)
+for measured gains, limitations and validation commands.
+
 ### Recording from the command line
 
 `npm run render` records a stretch of a preset as an **MP3** and an **MP4** that shows the page's timeline
@@ -534,3 +553,28 @@ booking, settings/share-link validation.
 The code is [MIT licensed](LICENSE). The music it makes is procedural, and
 no rights are claimed on it: use anything you play, record or save however
 you like. A credit (calmbgm.com) is appreciated but not required.
+
+
+Background playback diagnostics: the main Audio menu can copy a local snapshot of context/engine/quality and source recovery counters even without recorded silence. The audio-load display is an estimate where callback pacing permits measurement; a dash means unavailable and Idle means suspended. Paused silent playback now suspends safely. See [background investigation and device-test limits](docs/SYNTH_DSP_PROFILE.md#background-clocks-idle-shutdown-and-load-reporting--19-october-2026).
+
+
+`/tools/audio-output.html` is a minimal output-path diagnostic: the same quiet PCM loop through native Web Audio, Web Audio plus the lock-screen helper, a media-file element, or a media-stream bridge. It loads no synth/room/worklet. Stop other playing tabs when comparing. Main-page links can temporarily disable the silent helper with `mediaHelper=0`; the default stays on and no preference is saved. These are diagnostics, not a promise of mobile output reliability.
+
+
+Firefox on Android visitors receive a dismissible audio-compatibility notice on the main page and labs. It covers both synth engines, suggests Chrome for better compatibility, and offers an optional persistent opt-out. Playback is still available through Continue anyway; desktop Firefox is unaffected.
+
+
+Percussion is a track voice with four whole-kit presets: **Felt**, **Crisp**, **808** and **Hand percussion**. Click the percussion track name to open the same sound browser as the melodic tracks, filtered to drum kits. Search or use arrow/bracket keys to audition Felt, Crisp, 808 and Hand percussion; Escape closes it. The pencil opens detailed controls for eleven named instruments, their level/tone/length and room. The voice preset includes kit balance; loading/resetting one preserves the groove, track volume and mute/solo. Edited kits are marked and travel with settings/share links. Felt and Crisp retain their existing saved IDs and default balances; 808 adds quieter metallic extras, including a labelled cowbell and open hat. It is an original drum-machine-inspired palette, not a circuit emulation.
+
+The **percussion backend** is separate from the sound preset and melodic engine. Native Web Audio remains the default for Felt/Crisp. Choose **Options → Sound engine → Percussion backend**, or append `perc=wasm` to test queued Wasm percussion. The 808 and Hand Percussion voices require Wasm and prepare it automatically for percussion only. Once prepared, Felt/Crisp can use that same source; changing kit voice does not restart the piece or shorten the lookahead. Future hits remain data in an 8,192-event queue with 64 active voices. Existing `perc=808` links migrate to the 808 voice and `perc=wasm`, retaining saved per-drum edits. The percussion room remains the original convolution path.
+
+`/tools/percussion-engine.html` auditions the four voices with a fixed groove by default, explicit groove variant / seeded choice, meter, seed and variation controls, eleven correctly named live pads, shared playback cursors and WAV downloads. Felt/Crisp compare Native and Wasm; 808 and Hand Percussion are Wasm-only. The raw fourteen-slot compatibility fixtures remain available to automated source audits. `npm run audit:percussion` checks raw-source parity; `npm run audit:percussion-playback` checks playback, cancellation, exports and phone layout. See `docs/SYNTH_NEXT_STEPS.md` for sustained physical-device validation still required.
+
+
+Hand Percussion adds rounded low/muted conga and bongo tones, woodblock and claves, soft tambourine tap/shake, seed shaker/sweep, palm clap and cabasa. It uses modal sine bodies with a quiet contact layer and a balanced kit preset, retaining the same bounded Wasm queue. Standard MIDI bongo/conga/woodblock/tambourine notes address the appropriate roles; note velocity controls hit strength.
+
+Five additional rhythm styles are available on the main page and percussion bench: **Bossa / light Latin**, **Jazz lounge**, **Broken beat**, **Ambient percussion** and **Hand-percussion groove**, each with three variants across all supported meters. They work with any kit. Ambient uses a sparse four-bar texture without a kick/backbeat clock; jazz carries a triplet ride skip; bossa has an alternating two-bar clave. The older seven active styles keep their prior patterns. Main-page pattern edits affect the next unbooked bars; the long lookahead stays intact. Kit voice changes can reinterpret already queued attacks.
+
+On the audition page, changing a control pauses old audio and marks it outdated. Press **Render comparison** to hear the new selection; rendered players show their style/variant. `npm run audit:percussion-palette` checks all four kits across the new styles, Hand controls at 44.1/96 kHz, long-queue playback, stop, exports, saved links, rulebook labels and phone-width layout. Physical listening/balance and sustained phone/Surface testing remain the next gates.
+
+The preset browser contains 92 current scenes, each shown once. The temporary Updated comparisons have been removed after listening; approved revisions are the normal presets and retain New badges. Historical comparison URLs still resolve. `npm run audit:percussion-presets` checks the shared drum browser, sequential scene navigation, mobile layout and the twelve reviewed arrangements.

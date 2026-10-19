@@ -6,6 +6,11 @@
     <meta name="description" content="Calm procedural background music: scales, progressions and three synth voices that slowly drift." />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <title>calmbgm · calm procedural music</title>
+    <script>
+      // Servers without directory redirects fall back to this page for
+      // /labs/x or /synths/x; send those to the sub-page's own folder.
+      if (/^\/(labs|synths)(\/[\w-]+)?$/.test(location.pathname)) location.replace(location.pathname + '/' + location.search + location.hash);
+    </script>
   </head>
   <body>
     <div id="root"></div>

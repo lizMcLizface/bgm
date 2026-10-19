@@ -14,6 +14,7 @@ import * as Nodes from '../../nodes';
 import { audioContext } from '../../audio/context';
 import { DRUMS, defaultDrumKit } from '../percussion';
 import { SendReverb } from '../../nodes/sharedReverb';
+import {drumForVoice,percussionVoice} from '../percussionVoices';
 
 // Each drum's gain, so that at the same velocity they peak from about
 // -6 dB (kick) to -15 dB (hat) - measured; the raw sounds span 18 dB. The
@@ -320,12 +321,12 @@ const HITS = {
 const HIT_SECONDS = 8.1;
 
 class DrumKit {
-    constructor({ context = audioContext, reverbHub = null, externalEffects = false } = {}) {
+    constructor({ context = audioContext, reverbHub = null, externalEffects = false, sourceOnly = false } = {}) {
         this.AC = context;
         this.polyphony = 0;
         this.bus = this.AC.createGain();
         // per drum: its level, then its place in the stereo field
-        this.drumOut = Object.fromEntries(DRUMS.map((name) => {
+        this.drumOut = Object.fromEntries((sourceOnly ? [] : DRUMS).map((name) => {
             const level = this.AC.createGain();
             const pan = this.AC.createStereoPanner();
             pan.pan.value = PAN[name];
@@ -347,15 +348,20 @@ class DrumKit {
 
         this.sources = new Set();
         this.hitCount = 0;
+        this.bookings = [];
+        this.voicePreset = null;
         this.destinations = [];
         this.awake = false;
         this.soundUntil = 0;
         this.sleepTimer = null;
-        this.setKit(defaultDrumKit());
+        // A derived persistent source supplies its own level controls.
+        if (sourceOnly) this.kit = defaultDrumKit();
+        else this.setKit(defaultDrumKit());
     }
 
     /** The kit's sound (percussion.js defaultDrumKit): room, and per drum on / level / tone / decay. */
     setKit(kit) {
+        const retone = this.voicePreset && this.kit && DRUMS.some(name => this.kit[name].tone !== kit[name].tone || this.kit[name].decay !== kit[name].decay);
         this.kit = kit;
         const now = this.AC.currentTime;
         DRUMS.forEach((name) => {
@@ -363,6 +369,27 @@ class DrumKit {
             this.drumOut[name].gain.setTargetAtTime(on ? level : 0, now, 0.02);
         });
         if (this.reverb && this.reverb.amount !== kit.room) this.reverb.setAmount(kit.room);
+        if (retone) this.setVoicePreset(this.voicePreset,{force:true});
+    }
+
+    futureBookings() {
+        return this.bookings.filter(e => e.time >= this.AC.currentTime);
+    }
+
+    setVoicePreset(id,{force=false}={}) {
+        if(percussionVoice(id).wasmOnly)throw Error(percussionVoice(id).name+' requires the Wasm percussion backend.');
+        if (this.voicePreset === id && !force) return;
+        const future = this.futureBookings();
+        // Native compatibility needs to rebuild only not-yet-started nodes.
+        // Already sounding hits keep their natural envelopes and tails.
+        for (const event of future) for (const source of event.sources) {
+            try {source.stop(this.AC.currentTime);} catch { /* already ended */ }
+            this.sources.delete(source);
+        }
+        this.bookings = [];
+        this.voicePreset = percussionVoice(id).id;
+        this.preset = {...this.preset,name:percussionVoice(id).name,kind:'percussion',voice:this.voicePreset};
+        for (const event of future) this.scheduleNote(event.drum,event.time,event.duration,event.velocity,event.vary);
     }
 
     connect(destination) {
@@ -395,6 +422,8 @@ class DrumKit {
      *   a swish's sign is its direction
      */
     scheduleNote(drum, time, duration = 0.25, velocity = 0.7, vary = 0) {
+        const requestedDrum = drum;
+        drum = drumForVoice(drum,this.voicePreset);
         const name = DRUMS[drum];
         const hit = HITS[name];
         if (!hit || !this.kit[name].on) return;
@@ -407,6 +436,8 @@ class DrumKit {
             this.sources.add(src);
             src.onended = () => this.sources.delete(src);
         });
+        this.bookings = this.futureBookings();
+        this.bookings.push({drum:requestedDrum,time,duration,velocity,vary,sources});
         this.soundUntil = Math.max(this.soundUntil, time + HIT_SECONDS);
         this.wake();
         return sources;
@@ -422,6 +453,7 @@ class DrumKit {
             }
         });
         this.sources.clear();
+        this.bookings = [];
         this.soundUntil = time;
         this.scheduleSleep();
     }
@@ -449,7 +481,7 @@ class DrumKit {
 
     scheduleSleep() {
         if (this.sleepTimer) clearTimeout(this.sleepTimer);
-        if (!this.awake) return;
+        if (this.disposed || !this.awake) return;
         const at = this.soundUntil + this.tailSeconds();
         this.sleepTimer = setTimeout(() => {
             this.sleepTimer = null;
@@ -466,9 +498,13 @@ class DrumKit {
     }
 
     dispose() {
+        this.disposed = true;
         if (this.sleepTimer) clearTimeout(this.sleepTimer);
         this.silence();
         this.output.disconnect();
+        this.bus.disconnect();
+        this.reverb?.setAwake?.(false);
+        this.awake = false;
     }
 }
 

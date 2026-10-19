@@ -271,3 +271,12 @@ test('the first tour introduces fluid and the second introduces voice controls',
         expect(document.querySelector('#gen-tour-title').textContent).toBe('Shape each voice');
     } finally { parts.remove(); }
 });
+
+
+test('the cleaned catalog lists each chosen preset once without temporary comparisons or historical versions',()=>{
+ const onPick=vi.fn();render(<PresetBrowser current="" onPick={onPick} actions={actions()}/>);click(document.querySelector('.gen-scene-button'));
+ expect([...document.querySelectorAll('.gen-pb-cats button')].some(e=>e.textContent.startsWith('Updated'))).toBe(false);
+ const found=[...document.querySelectorAll('.gen-pb-pick')];expect(found).toHaveLength(SCENES.length);expect(new Set(cards()).size).toBe(found.length);expect(cards().some(name=>name.includes('(previous)'))).toBe(false);
+ const night=found.find(e=>e.querySelector('strong').textContent==='Late-night brushes');expect(night.textContent).toContain('New');expect(night.textContent).toContain('Wasm only');
+ click(night);expect(onPick.mock.calls.at(-1)[0].name).toBe('Late-night brushes');expect(onPick.mock.calls.at(-1)[1]).toEqual({parts:'all'});
+});

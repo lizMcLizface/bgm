@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { BROWSABLE_SCENES as SCENES, SCENE_CATEGORIES, MINE, sceneSettings,sceneUsesWasm } from './scenes';
+import {percussionVoice} from './percussionVoices';
 import PresetBadges from './PresetBadges';
 import { userScenes } from './setupStore';
 import { TONIC_NAMES, scaleById } from './theory';
@@ -27,7 +28,7 @@ const ALL = 'all';
 const APPLY = [
     ['all', 'Everything', 'Key, feel, drums, ambience and the sounds'],
     ['composition', 'Composition', 'Everything but the sounds (shift-click)'],
-    ['voices', 'Sounds', 'Only the sounds of the voices (ctrl-click)'],
+    ['voices', 'Sounds', 'The melodic sounds and drum kit, keeping the beat (ctrl-click)'],
 ];
 
 // "D Aeolian · 92 BPM · 4/4", the drums and the ambience a preset has.
@@ -42,7 +43,7 @@ function summary(scene) {
         level,
         line: s.playMusic ? `${key} · ${s.bpm} BPM${meter}` : 'No music',
         chips: [
-            ...(s.playMusic && s.drums.style !== 'off' ? [DRUM_STYLES[s.drums.style]] : []),
+            ...(s.playMusic && s.drums.style !== 'off' ? [`${percussionVoice(s.drums.kit).name} · ${DRUM_STYLES[s.drums.style]}`] : []),
             ...layers,
         ],
     };
@@ -50,7 +51,7 @@ function summary(scene) {
 
 const matches = (scene, query) => {
     const words = query.toLowerCase().split(/\s+/).filter(Boolean);
-    const haystack = [scene.name, scene.blurb, ...(scene.tags || []),scene.isNew?'new':'',sceneUsesWasm(scene)?'wasm only':''].join(' ').toLowerCase();
+    const haystack = [scene.name, scene.blurb, ...(scene.tags || []),scene.isNew?'new':'',sceneUsesWasm(scene)?'wasm only':'',percussionVoice(scene.settings.drums?.kit).name,DRUM_STYLES[scene.settings.drums?.style]].join(' ').toLowerCase();
     return words.every((word) => haystack.includes(word));
 };
 

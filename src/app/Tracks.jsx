@@ -57,7 +57,14 @@ export const DRUM_KEY_HINT = 'A kick · S brush · D shaker · F rim · G hat ·
 const MIDI_DRUMS = {
     35: 0, 36: 0, 37: 3, 38: 1, 40: 1, 39: 7, 42: 4, 44: 4, 46: 4, 69: 2, 70: 2, 49: 9, 52: 9, 55: 5, 57: 9,
     41: 6, 43: 6, 45: 6, 47: 6, 48: 6, 50: 6, 51: 8, 53: 10, 59: 8,
+    54: 4, 56: 10, 60: 6, 61: 6, 62: 1, 63: 6, 64: 0, 75: 10, 76: 10, 77: 3,
 };
+
+export function midiDrum(note,voice){
+    if(note===46&&['tr808','hand'].includes(voice))return 5;
+    if(note===69&&voice==='hand')return 8;
+    return MIDI_DRUMS[note];
+}
 
 export function useLivePlay(generator, armed) {
     const [octaves, setOctaves] = useState(DEFAULT_KEY_OCTAVES);
@@ -125,7 +132,8 @@ export function useLivePlay(generator, armed) {
                 const key = `midi-${note}`;
                 const role = state.current.armed;
                 if (command === 0x90 && velocity > 0 && role === 'perc') {
-                    if (MIDI_DRUMS[note] !== undefined) generator.liveNoteOn('perc', MIDI_DRUMS[note], velocity / 127);
+                    const drum=midiDrum(note,generator.settings?.drums?.kit);
+                    if(drum!==undefined)generator.liveNoteOn('perc',drum,velocity/127);
                 } else if (command === 0x90 && velocity > 0) {
                     if (!role || state.current.held.has(key)) return;
                     state.current.held.set(key, { role, id: generator.liveNoteOn(role, note, velocity / 127) });
@@ -153,15 +161,15 @@ export function useLivePlay(generator, armed) {
 
 /** The strip beside the timeline: one row per role, then the keys hint. */
 /** presets: role -> { name, edited } (shown beside the role's name). */
-export const TrackStrip = ({ roles, presets, mix, armed, onMix, onArm, onEdit, onRandom, onGenerate, onPick, generating, live }) => (
+export const TrackStrip = ({ roles, presets, mix, armed, onMix, onArm, onEdit, onRandom, onGenerate, onPick, onPickPercussion, onEditPercussion, percussionHint = DRUM_KEY_HINT, generating, live }) => (
     <div className="gen-tracks">
         {Object.entries(roles).map(([role, { label }]) => (
-            <div key={role} className={`gen-track gen-track-${role}${onPick && role !== 'perc' ? ' is-pickable' : ''}`}
+            <div key={role} className={`gen-track gen-track-${role}${(role === 'perc' ? onPickPercussion : onPick) ? ' is-pickable' : ''}`}
                 // the whole box opens the sound picker; its own buttons (M, S, dice ...) keep their jobs
-                onClick={onPick && role !== 'perc' ? (e) => { if (!e.target.closest('button')) onPick(role); } : undefined}>
+                onClick={(role === 'perc' ? onPickPercussion : onPick) ? (e) => { if (!e.target.closest('button,select,input,label')) (role === 'perc' ? onPickPercussion : onPick)(role); } : undefined}>
                 {/* a box round the voice: its colour, name and sound; a click opens the sound picker */}
-                {onPick && role !== 'perc' ? (
-                    <button type="button" className="gen-track-name gen-track-box" onClick={() => onPick(role)}
+                {(role === 'perc' ? onPickPercussion : onPick) ? (
+                    <button type="button" className="gen-track-name gen-track-box" onClick={() => (role === 'perc' ? onPickPercussion : onPick)(role)}
                         title={`Choose the ${label.split(' / ')[0].toLowerCase()} sound${presets[role] ? ` (now ${presets[role].name})` : ''}`}>
                         <i className={`gen-swatch gen-swatch-${role}`} />
                         {label.split(' / ')[0]}
@@ -181,13 +189,13 @@ export const TrackStrip = ({ roles, presets, mix, armed, onMix, onArm, onEdit, o
                     </span>
                 )}
                 {role === 'perc'
-                    ? <RoleButtons role={role} label={label} mix={mix[role]} armed={armed === role} onMix={onMix} onArm={onArm} />
+                    ? <RoleButtons role={role} label={label} mix={mix[role]} armed={armed === role} onMix={onMix} onArm={onArm} onEdit={onEditPercussion} />
                     : <RoleButtons role={role} label={label} mix={mix[role]} armed={armed === role} onMix={onMix} onArm={onArm} onEdit={onEdit}
                         onRandom={onRandom} onGenerate={onGenerate} generating={generating[role]} />}
             </div>
         ))}
         <div className="gen-keys-hint">
-            {armed === 'perc' && <>Keys {DRUM_KEY_HINT}</>}
+            {armed === 'perc' && <>Keys {percussionHint}</>}
             {armed && armed !== 'perc' && <>Keys A–; play {roles[armed].label.split(' / ')[0].toLowerCase()}, Z/X octave (C{live.octave})</>}
             {!armed && 'Arm ⌨ to play a voice or the drums with your keyboard'}
         </div>

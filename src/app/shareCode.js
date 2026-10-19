@@ -228,7 +228,7 @@ const MUSIC_GROUPS = [
     [ // feel and percussion (docs/DESIGN.md §9 C)
         [['swing'], stepped(0, 0.6, 0.05)],
         [['sectionTone'], bool],
-        [['drums', 'style'], options(Object.keys(DRUM_STYLES), 3)],
+        [['drums', 'style'], options(Object.keys(DRUM_STYLES).slice(0,8), 3)],
         [['drums', 'activity'], chance],
         [['drums', 'variation'], chance],
     ],
@@ -245,7 +245,7 @@ const MUSIC_GROUPS = [
         [['bassWeights', 'drive'], weight],
     ],
     [[['leadDensity'], chance]], // how busy the lead's rhythms are
-    [[['drums', 'kit'], options(Object.keys(DRUM_KITS), 2)]], // felt or crisp drums
+    [[['drums', 'kit'], options(Object.keys(DRUM_KITS), 2)]], // append-only whole-kit voice IDs (felt, crisp, tr808, hand)
     [[['bpm'], wideTempo]], // tempos past the first field's range (a tempo inside it is left to that field)
     [[['chordColour', 'mode'], options(Object.keys(CHORD_COLOURS), 3)], [['chordColour', 'amount'], chance]], // suspended and added-note chords
     [ // the rest of the colour layer
@@ -267,6 +267,9 @@ const MUSIC_GROUPS = [
 ];
 // Appended after every earlier music field; old links keep tonal defaults.
 MUSIC_GROUPS.push([[['tonality','mode'],options(['tonal','atonal','bitonal'],2)],[['tonality','separation'],stepped(1,11,1)]]);
+// The released style field is exactly three bits. Append the expanded enum
+// after every existing music field; never widen or move the old field.
+MUSIC_GROUPS.push([[['drums','style'],options(Object.keys(DRUM_STYLES),4)]]);
 const VOICE_GROUPS = [
     [...voice('pad'), ...voice('bass'), ...voice('lead'), ...voice('counter'), field(GROUPS, ['padNotes'])],
     LATER_GROUPS[4], // volumes

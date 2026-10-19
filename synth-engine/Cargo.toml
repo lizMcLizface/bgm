@@ -13,3 +13,12 @@ lto = true
 codegen-units = 1
 panic = "abort"
 strip = true
+
+[features]
+profile-sections = []
+# Opt-in for profiling; subtractive worklet regressions keep this off by default.
+cache-colour-coefficients = []
+
+# Experimental explicit Wasm SIMD128 voice batching; requires a separate SIMD build.
+simd-voices = []
+simd-colour = []

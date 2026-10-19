@@ -1,6 +1,6 @@
 // Estimates how busy the audio thread is (src/audio/loadMeter.js).
 //
-// The browser renders audio in bursts: when the output device asks for a
+// Some browsers render audio in bursts: when the output device asks for a
 // buffer, it renders several 128-frame quanta back to back, then idles
 // until the next request. This node has no outputs, so it is processed
 // after everything else in each quantum; the wall-clock time between two
@@ -15,45 +15,69 @@
 //
 // Posts { load } about once per second: average render time per quantum
 // as a share of the quantum's real duration (1 = the thread is always
-// busy; above that, audio drops out). null when no burst had two quanta.
+// busy). This is an estimate, not a platform utilization counter. Paced or
+// coarse-clock callbacks return null because their wait time cannot be separated.
 
 class LoadMeterProcessor extends AudioWorkletProcessor {
-    constructor() {
+    constructor({processorOptions = {}} = {}) {
         super();
         this.quantumMs = (128 / sampleRate) * 1000;
-        this.last = 0;
-        this.busy = 0;
-        this.count = 0;
-        this.windowStart = currentTime;
+        this.last = null;
+        this.lastAudioTime = null;
+        this.gapThresholdMs = Math.max(250, processorOptions.gapThresholdMs || 0);
+        this.zeroFrames = 0;
+        this.renderedFrames = 0;
+        this.resetWindow();
+        this.port.onmessage = ({data}) => { if(data.type==='reset'){this.last=null;this.lastAudioTime=null;this.zeroFrames=0;this.resetWindow();} if(data.type==='dispose'){this.disposed=true;this.port.onmessage=null;this.port.close();} };
         this.silentFrames = 0;
     }
 
+    resetWindow(){this.busy=0;this.count=0;this.fast=0;this.idles=0;this.maxCallbackGapMs=0;this.minimumPositive=Infinity;this.windowStart=currentTime;this.windowPeak=0;this.squares=0;this.samples=0;this.nonFinite=0;}
+
     process(inputs) {
+        if(this.disposed)return false;
         let peak = 0;
         const input = inputs[0] || [];
         for (let c = 0; c < input.length; c++) {
             const data = input[c];
-            for (let i = 0; i < data.length; i++) peak = Math.max(peak, Math.abs(data[i]));
+            for (let i = 0; i < data.length; i++) {
+                const value = data[i];
+                if (!Number.isFinite(value)) { this.nonFinite++; peak = Infinity; continue; }
+                peak = Math.max(peak, Math.abs(value));
+                this.windowPeak = Math.max(this.windowPeak, Math.abs(value));
+                this.squares += value * value;
+                this.samples++;
+            }
         }
+        const frames = input[0]?.length ?? 128;
+        this.renderedFrames += frames;
+        this.zeroFrames = peak===0 ? this.zeroFrames+frames : 0;
         if (peak < 1e-5) {
-            this.silentFrames += 128;
+            this.silentFrames += frames;
         } else {
             if (this.silentFrames >= sampleRate * 0.1) this.port.postMessage({ silence: this.silentFrames / sampleRate });
             this.silentFrames = 0;
         }
         const now = Date.now();
-        const gap = now - this.last;
-        this.last = now;
-        // + 1: a gap under one quantum can read as up to a millisecond more
-        if (gap <= this.quantumMs + 1) {
-            this.busy += gap;
-            this.count++;
+        if(this.last!==null){
+            const gap=now-this.last;
+            this.maxCallbackGapMs=Math.max(this.maxCallbackGapMs,gap);
+            // A callback pause is evidence about pacing, not proof of a dropout.
+            if(gap>=this.gapThresholdMs)this.port.postMessage({callbackGap:{wallTime:now,audioTime:currentTime,previousAudioTime:this.lastAudioTime,ms:gap,renderedFrames:this.renderedFrames}});
+            if(gap>0)this.minimumPositive=Math.min(this.minimumPositive,gap);
+            if(gap===0)this.fast++;
+            if(gap>this.quantumMs+1)this.idles++;
+            if(gap>=0&&gap<=this.quantumMs+1){this.busy+=gap;this.count++;}
         }
-        if (currentTime - this.windowStart >= 1) {
-            this.port.postMessage({ load: this.count ? this.busy / this.count / this.quantumMs : null });
-            this.busy = 0;
-            this.count = 0;
-            this.windowStart = currentTime;
+        this.last=now;
+        this.lastAudioTime=currentTime;
+        if(currentTime-this.windowStart>=1){
+            // A paced callback includes the device wait, not just DSP. Require
+            // observable bursts and a millisecond clock; otherwise no estimate.
+            const burst=this.fast>=2&&this.idles>0&&this.minimumPositive<=1&&this.count>=16;
+            this.port.postMessage({load:burst?this.busy/this.count/this.quantumMs:null,loadReason:burst?'burst-estimate':'unavailable-pacing',idle:this.zeroFrames>=sampleRate,
+                output:{audioTime:currentTime,wallTime:now,maxCallbackGapMs:this.maxCallbackGapMs,renderedFrames:this.renderedFrames,peak:this.windowPeak,rms:this.samples?Math.sqrt(this.squares/this.samples):0,nonFinite:this.nonFinite}});
+            this.resetWindow();
         }
         return true;
     }

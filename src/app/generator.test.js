@@ -48,14 +48,24 @@ vi.mock('./engine/Instrument', () => ({ default: class {
 
 const mockHits = vi.hoisted(() => []);
 vi.mock('./engine/drumKit', () => ({ default: class {
-    constructor() { this.polyphony = 0; this.preset = {}; }
+    constructor() { this.polyphony = 0; this.preset = {}; this.bus={gain:{setTargetAtTime(){}}}; }
+    futureBookings(){return [];}
+    dispose(){}
     setKit() {}
+    setVoicePreset(id) {this.voicePreset=id;}
     connect() {}
     scheduleNote(drum, start, duration, velocity) { mockHits.push({ drum, start, velocity }); }
     silence() {}
     flushTails() {}
 } }));
 
+const percussionMock=vi.hoisted(()=>({fail:false}));
+vi.mock('./engine/wasmDrumKit',()=>({default:class {
+ constructor(){this.preset={};this.ready=percussionMock.fail?Promise.reject(Error('Kernel unavailable')):Promise.resolve();}
+ setKit(kit){this.kit=kit;}
+ setVoicePreset(id){this.voicePreset=id;}
+ connect(){} scheduleNote(){} silence(){} flushTails(){} dispose(){}
+}}));
 import Generator from './Generator';
 
 test('optional rulebook tracing records actual borrowing without changing notes or the baseline chord shape',()=>{
@@ -1363,4 +1373,38 @@ test('tonal Altman returns through C-sharp, E, A and D with a thinner bed and hi
  expect(g.noteSlides).toBe(false);expect(g.heldPadGlides).toBe(true);expect(g.noteResolution).toBe(true);
  settings.drift={...settings.drift,mode:'wandering',progressionChance:1,keyChance:0,modeChance:0};g.reset();const p=g.planner();
  for(let bar=0;bar<64;bar++){p.planBar(bar);const b=p.plan.get(bar);expect(b.music.progression).toBe(31);expect(b.events.every(e=>[e.midi,e.beat,e.length,e.velocity].every(Number.isFinite)&&e.length>0)).toBe(true);}
+});
+
+test('audio sleep is blocked by transport, ambience, live keys, auditions and the stop fade',()=>{
+ const g=Object.create(Generator.prototype);g.transport={isRunning:false};g.ambience={running:false};g.liveNotes=new Set();expect(g.canSleepAudio()).toBe(true);g.transport.isRunning=true;expect(g.canSleepAudio()).toBe(false);g.transport.isRunning=false;g.ambience.running=true;expect(g.canSleepAudio()).toBe(false);g.ambience.running=false;g.liveNotes.add('lead:1');expect(g.canSleepAudio()).toBe(false);g.liveNotes.clear();g.stopFade=1;expect(g.canSleepAudio()).toBe(false);g.stopFade=null;g.auditionPending=1;expect(g.canSleepAudio()).toBe(false);
+});
+
+
+test('percussion voice changes preserve melody, rhythm, transport and track controls',async()=>{
+ const g=new Generator({...defaultSettings(),seed:42});g.setRoleVolume('perc',.27);g.roles.perc.mute=true;
+ const before=g.plan,replan=vi.spyOn(g,'replan');const drums={...g.settings.drums};
+ for(const voice of ['crisp','tr808','hand','felt']){
+  await g.loadPercussionVoice(voice);expect(g.plan).toBe(before);expect(replan).not.toHaveBeenCalled();
+  expect(g.settings.drums).toEqual({...drums,kit:voice});expect(g.roles.perc.volume).toBe(.27);expect(g.roles.perc.mute).toBe(true);expect(g.roles.perc.instrument.voicePreset).toBe(voice);
+ }
+ expect(g.percussionEngine).toBe('wasm');
+});
+test('failed percussion preparation restores the prior voice and custom sound edits',async()=>{
+ const g=new Generator({...defaultSettings(),seed:42});g.settings.drumKit.bell.tone=-.3;
+ const before=structuredClone(g.settings);percussionMock.fail=true;
+ try {await expect(g.loadPercussionVoice('tr808')).rejects.toThrow('Kernel unavailable');expect(g.settings).toEqual(before);expect(g.percussionEngine).toBe('native');expect(g.roles.perc.instrument.voicePreset).toBe('felt');}
+ finally{percussionMock.fail=false;}
+});
+
+
+test('new percussion styles leave the melodic plan intact and hand voice prepares independently',async()=>{
+ const defaults=defaultSettings(),g=new Generator({...defaults,seed:73});
+ const shapes=[];
+ for(const style of ['bossa','jazz','broken','ambient','hand']){
+  g.set('drums',{...g.settings.drums,style});g.reset();g.ensurePlanned(15);
+  shapes.push([...g.plan.values()].filter(p=>p.bar<16).map(p=>p.events.filter(e=>e.role!=='perc').map(({role,midi,beat,length})=>({role,midi,beat,length}))));
+ }
+ for(const shape of shapes)expect(shape).toEqual(shapes[0]);
+ const hand=new Generator({...defaultSettings(),drums:{...defaults.drums,kit:'hand'}});await hand.roles.perc.instrument.ready;
+ expect(hand.percussionEngine).toBe('wasm');expect(hand.roles.perc.instrument.voicePreset).toBe('hand');expect(hand.audioEngine).not.toBe('wasm');
 });

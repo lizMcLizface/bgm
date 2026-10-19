@@ -51,8 +51,10 @@ export function describeSilence(generator, seconds) {
     const now = generator.AC.currentTime;
     const roles = {};
     Object.entries(generator.roles).forEach(([role, { instrument }]) => {
+        const until=instrument.soundUntil??instrument.voice?.native?.soundUntil;
+        const ahead=Number.isFinite(until)?`${Math.max(-1,until-now).toFixed(1)} s ahead`:'unavailable';
         roles[role] = instrument.awakeVoices
-            ? `${instrument.awakeVoices()}/${instrument.polyphony} voices, chain ${instrument.effectsAwake() ? 'on' : 'off'}, sound booked ${Math.max(-1, instrument.soundUntil - now).toFixed(1)} s ahead`
+            ? `${instrument.awakeVoices()}/${instrument.polyphony} voices, chain ${instrument.effectsAwake() ? 'on' : 'off'}, sound booked ${ahead}`
             : `chain ${instrument.effectsAwake() ? 'on' : 'off'}`;
     });
     return {

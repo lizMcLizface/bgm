@@ -16,3 +16,12 @@ it('retains the working voice if source creation fails',async()=>{
 it('plays a still-held key on the latest source after overlapping preset loads settle',async()=>{
  const a=voice(),b=voice(),c=voice();state.create.mockResolvedValueOnce(a);const i=await WasmInstrument.create({context:ctx});let first,last;state.create.mockImplementationOnce(()=>new Promise(r=>{first=r;}));i.applyPreset({stringModel:'piano'});const id=i.startNote(60,.7);state.create.mockImplementationOnce(()=>new Promise(r=>{last=r;}));i.applyPreset({fmIndex:2});first(b);await Promise.resolve();expect(a.on).not.toHaveBeenCalled();last(c);await i.ready;await Promise.resolve();expect(c.on).toHaveBeenCalledWith(60,.7);i.stopNote(id);expect(c.off).toHaveBeenCalledWith(7);i.dispose();
 });
+
+it('keeps shared-room endpoints stable across shared and private preset replacements',async()=>{
+ const a={...voice(),roomOutput:{connect:vi.fn()},sharedRoomInput:{}},b=voice(),pool={};state.create.mockResolvedValueOnce(a);const i=await WasmInstrument.create({context:ctx,roomPool:pool});expect(state.create.mock.calls[0][2].roomPool).toBe(pool);expect(a.roomOutput.connect).toHaveBeenCalledWith(i.roomOutput);expect(i.roomInput.connect).toHaveBeenCalledWith(a.sharedRoomInput);const output=i.roomOutput,input=i.roomInput;state.create.mockResolvedValueOnce(b);i.applyPreset({});await i.ready;expect(i.roomInput).toBe(input);expect(i.roomOutput).toBe(output);expect(input.disconnect).toHaveBeenCalledTimes(2);expect(a.dispose).toHaveBeenCalledTimes(1);i.dispose();
+});
+
+it('retains runtime processor errors after a preset replacement succeeds',async()=>{
+ state.create.mockResolvedValueOnce(voice());const i=await WasmInstrument.create({context:ctx});state.create.mockResolvedValueOnce(voice());i.applyPreset({fmIndex:2});await i.ready;
+ const log=vi.spyOn(console,'error').mockImplementation(()=>{});try{state.create.mock.calls.at(-1)[2].onError(Error('processor failed'));expect(i.error.message).toBe('processor failed');}finally{log.mockRestore();i.dispose();}
+});

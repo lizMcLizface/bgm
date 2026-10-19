@@ -7,16 +7,19 @@ import {fileURLToPath} from 'node:url';
 import puppeteer from 'puppeteer-core';
 import {summarizeCpuProfile} from './dspProfileSummary.mjs';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..'),arg=(k,d)=>process.argv.find(s=>s.startsWith('--'+k+'='))?.slice(k.length+3)??d;
-const name=process.env.SYNTH_BROWSER==='firefox'?'firefox':'chrome',output=path.resolve(process.env.SYNTH_PROFILE_DIR||path.join(root,'.tmp/dsp-profile/results')),rate=Number(arg('rate',48000)),seconds=Number(arg('seconds',6)),repeats=Number(arg('repeats',5));
+const attribution=process.argv.includes('--attribution'),sections=attribution||process.argv.includes('--sections'),artifactDir=path.resolve(root,arg('artifact-dir',sections?'.tmp/dsp-sections':'.tmp/dsp-profile'));
+const name=process.env.SYNTH_BROWSER==='firefox'?'firefox':'chrome',output=path.resolve(process.env.SYNTH_PROFILE_DIR||path.join(artifactDir,'results')),rate=Number(arg('rate',48000)),seconds=Number(arg('seconds',6)),repeats=Number(arg('repeats',5));
+if(attribution&&name!=='chrome')throw Error('Attribution mode requires Chrome. Use ordinary timing mode for Firefox.');
 if(![44100,48000,96000].includes(rate)||!Number.isFinite(seconds)||seconds<1||seconds>20||!Number.isInteger(repeats)||repeats<1||repeats>9)throw Error('Use 44.1/48/96 kHz, 1–20 seconds and 1–9 repeats.');
-const builds=JSON.parse(await fs.readFile(path.join(root,'.tmp/dsp-profile/builds.json'))),kernels=['core','fm','effects','inserts'];
+const builds=JSON.parse(await fs.readFile(path.join(artifactDir,'builds.json'))),kernels=['core','fm','effects','inserts'];
 for(const k of kernels){const current=JSON.parse(await fs.readFile(path.join(root,'public/synth-lab',k==='core'?'build.json':k+'-build.json')));if(current.source!==builds[k].production.source||current.wasm!==builds[k].production.wasm)throw Error('Profiling build is stale; run npm run synth:profile-build.');}
+if(builds.core.diagnosticStages&&!attribution)throw Error('Stage builds require attribution-only mode; do not time diagnostic wrappers.');
 const hash=b=>crypto.createHash('sha256').update(b).digest('hex');
-const encoded=Object.fromEntries(await Promise.all(kernels.map(async k=>{const named=await fs.readFile(path.join(root,'.tmp/dsp-profile',k+'.wasm')),normal=await fs.readFile(path.join(root,'public/synth-lab',k+'.wasm'));if(hash(named)!==builds[k].sha256||hash(normal)!==builds[k].production.wasm)throw Error('Kernel/profile artifact hash mismatch: '+k);return [k,named.toString('base64')];})));
+const encoded=Object.fromEntries(await Promise.all(kernels.map(async k=>{const named=await fs.readFile(path.join(artifactDir,k+'.wasm')),normal=await fs.readFile(path.join(root,'public/synth-lab',k+'.wasm'));if(hash(named)!==builds[k].sha256||hash(normal)!==builds[k].production.wasm)throw Error('Kernel/profile artifact hash mismatch: '+k);return [k,named.toString('base64')];})));
 await fs.mkdir(output,{recursive:true});
 const executablePath=process.env.SYNTH_BROWSER_PATH||(name==='chrome'?'C:/Program Files/Google/Chrome/Application/chrome.exe':null);if(!executablePath)throw Error('Set SYNTH_BROWSER_PATH.');
-const browser=await puppeteer.launch(name==='firefox'?{browser:'firefox',executablePath,headless:true,defaultViewport:null,protocolTimeout:600000}:{executablePath,headless:true,pipe:true,args:['--no-sandbox','--mute-audio'],protocolTimeout:600000});
-const report={version:1,created:new Date().toISOString(),browser:await browser.version(),system:{platform:os.platform(),cpu:os.cpus()[0]?.model,logicalCPUs:os.cpus().length},builds,protocol:{rate,seconds,repeats,warmup:1,block:128,profileIntervalUs:500},errors:[],cases:[],profiles:[],limits:'Direct synchronous DSP microbenchmarks, not an AudioWorklet deadline/underrun measurement. Effect timings include input copies. No output copying/metrics in measured source loops. CPU sampling is separate from unprofiled production-module timings.'};
+const browser=await puppeteer.launch(name==='firefox'?{browser:'firefox',executablePath,headless:true,defaultViewport:null,protocolTimeout:600000}:{executablePath,headless:true,pipe:true,args:['--no-sandbox','--mute-audio',...(attribution?['--js-flags=--no-wasm-inlining']:[])],protocolTimeout:600000});
+const report={version:1,created:new Date().toISOString(),browser:await browser.version(),system:{platform:os.platform(),cpu:os.cpus()[0]?.model,logicalCPUs:os.cpus().length},builds,protocol:{timings:!attribution,wasmJitInlining:!attribution,diagnosticSections:sections,profilePhase:'held after warm-up',rate,seconds,repeats,warmup:1,block:128,profileIntervalUs:500},errors:[],cases:[],profiles:[],limits:(attribution?'Attribution-only browser with Wasm JIT inlining disabled; no production timings are collected. ':'')+(sections?'Samples use diagnostic no-inline helper builds and perturb call cost; timings ALWAYS use normal production modules. Interpret attribution as a lead, not production percentages. ':'')+'Direct synchronous DSP microbenchmarks, not an AudioWorklet deadline/underrun measurement. Effect timings include input copies. No output copying/metrics in measured source loops. CPU sampling is separate from unprofiled production-module timings.'};
 try{
  const page=await browser.newPage();page.on('pageerror',e=>report.errors.push(String(e)));await page.goto((process.env.SYNTH_LAB_URL||'http://localhost:5173')+'/tools/stress.html');
  await page.evaluate(async({encoded,kernels})=>{
@@ -26,15 +29,15 @@ try{
  const all=await page.evaluate(()=>window.__dspProfile.api.DSP_CASES),requested=arg('cases','').split(',').filter(Boolean),cases=requested.length?all.filter(s=>requested.includes(s.id)):all;
  if(!cases.length||requested.some(id=>!all.some(c=>c.id===id)))throw Error('Unknown/empty case selection.');
  for(const spec of cases){
-  const row=await page.evaluate(({spec,rate,seconds,repeats})=>{
+  const row=await page.evaluate(({spec,rate,seconds,repeats,attribution})=>{
    const {api,production,named}=window.__dspProfile,f=api.dspFixture(spec,{rate,seconds});
    const reference=api.prepareDsp(production[f.kernel],f).run({capture:true}),symbolic=api.prepareDsp(named[f.kernel],f).run({capture:true}),compatibility=api.compareDsp(reference.pcm,symbolic.pcm);
    // The captured validation pass warms code but is not timed as a measurement.
-   const runs=[];for(let i=0;i<repeats;i++)runs.push(api.prepareDsp(production[f.kernel],f).run());
-   const times=runs.map(r=>r.ms).sort((a,b)=>a-b),median=times.length%2?times[Math.floor(times.length/2)]:(times[times.length/2-1]+times[times.length/2])/2;
-   return {id:spec.id,fixture:f,compatibility,validationStats:reference.stats,medianMs:median,minMs:times[0],maxMs:times.at(-1),audioPerRender:seconds*1000/median,runs:runs.map(({pcm,...r})=>r)};
-  },{spec,rate,seconds,repeats});
-  report.cases.push(row);if(row.compatibility.nonFinite||row.compatibility.maxDifference!==0||row.validationStats?.some((x,i)=>i===0?x!==row.fixture.voices:x!==0))throw Error('Named/production parity or voice diagnostics failed: '+row.id);
+   const runs=[];for(let i=0;i<(attribution?0:repeats);i++)runs.push(api.prepareDsp(production[f.kernel],f).run());
+   const times=runs.map(r=>r.ms).sort((a,b)=>a-b),median=!times.length?null:times.length%2?times[Math.floor(times.length/2)]:(times[times.length/2-1]+times[times.length/2])/2;
+   return {id:spec.id,fixture:f,compatibility,validationStats:reference.stats,medianMs:median,minMs:times[0],maxMs:times.at(-1),audioPerRender:median?seconds*1000/median:null,runs:runs.map(({pcm,...r})=>r)};
+  },{spec,rate,seconds,repeats,attribution});
+  report.cases.push(row);if(row.compatibility.nonFinite||row.compatibility.maxDifference!==0||row.validationStats?.some((x,i)=>i===0?row.fixture.expectedActive!==null&&x!==(row.fixture.expectedActive??row.fixture.voices):x!==0))throw Error('Named/production parity or voice diagnostics failed: '+row.id);
   console.log(JSON.stringify({id:row.id,medianMs:row.medianMs,x:row.audioPerRender,range:[row.minMs,row.maxMs],compat:row.compatibility.maxDifference}));await fs.writeFile(path.join(output,name+'.json'),JSON.stringify(report,null,2));
  }
  if(name==='chrome'&&!process.argv.includes('--no-samples')){

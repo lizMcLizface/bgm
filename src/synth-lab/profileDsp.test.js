@@ -11,6 +11,12 @@ test('profiling fixtures isolate colour, voice/lane counts and prolonged curve c
  expect(curved.patch.operators.map(o=>o.attack)).toEqual(linear.patch.operators.map(o=>o.attack));expect(curved.patch.operators[0].attackCurve).toBe(2);expect(linear.patch.operators[0].attackCurve).toBe(1);
  const layered=fixture('core-lanes8');expect(layered.patch.layers[0]).toEqual(layered.patch.layers[1]);expect(layered.patch.global).toMatchObject({model:2,unison:4,chorus:0,polyphony:16});expect(fixture('fm-idle').notes).toEqual([]);
 });
+test('native fixtures preserve full source quality, chorus/layers and independent colour controls',()=>{
+ const choir=fixture('fm-choir'),dry=fixture('fm-choir-dry-colour'),rosin=fixture('core-rosin'),noir=fixture('core-noir'),chorus=fixture('core-chorus');
+ expect(choir.voices).toBe(8);expect(choir.patch.global.quality).toBe(1);expect(choir.patch.global.formant).toBe(.85);expect(dry.patch.global.formant).toBe(0);expect(dry.patch.operators).toEqual(choir.patch.operators);expect(dry.notes).toEqual(choir.notes);
+ expect(rosin.patch.layers[0].body).toBe(.65);expect(noir.patch.global.model).toBe(2);expect(chorus.patch.global.chorus).toBe(.65);expect(fixture('core-organ-wave').patch.layers[0].waveA).toBe(5);
+ dry.patch.operators[0].ratio=17;expect(fixture('fm-choir').patch.operators[0].ratio).not.toBe(17);
+});
 test('direct render loops preserve partial blocks and continuous input at 128 / 2048 frames',()=>{
  for(const kernel of ['core','fm','effects','inserts']){
   const module=new WebAssembly.Module(fs.readFileSync('public/synth-lab/'+kernel+'.wasm')),spec=DSP_CASES.find(c=>c.kernel===kernel),f=dspFixture(spec,{seconds:.101});

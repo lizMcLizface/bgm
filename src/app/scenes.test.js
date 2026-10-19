@@ -1,4 +1,4 @@
-import { SCENES, BROWSABLE_SCENES, SCENE_CATEGORIES, stepBuiltinScene, sceneSettings, sceneGroup, SCENE_GROUPS, buildSetup, parseSetup, normalizeScene, sceneSlug, sceneBySlug, presetFromSearch, introFromSearch } from './scenes';
+import { SCENES, BROWSABLE_SCENES, SCENE_CATEGORIES, SCENE_BROWSE_ORDER, stepBuiltinSceneEntry, stepBuiltinScene, sceneSettings, sceneGroup, SCENE_GROUPS, buildSetup, parseSetup, normalizeScene, sceneSlug, sceneBySlug, presetFromSearch, introFromSearch } from './scenes';
 import { scaleById } from './theory';
 import { findPreset, sanitizePreset } from './editor/presetStore';
 import { SHAREABLE_PRESETS } from './shareCode';
@@ -221,11 +221,12 @@ test('regular browsing crosses categories and skips hidden archives, which still
         expect(BROWSABLE_SCENES).not.toContain(archive);
         expect(BROWSABLE_SCENES).toContain(stepBuiltinScene(archive.name, 1));
     }
-    const ordered = BROWSABLE_SCENES.map((s, i) => ({ s, i })).sort((a, b) => SCENE_CATEGORIES.findIndex(c=>c.id===a.s.category) - SCENE_CATEGORIES.findIndex(c=>c.id===b.s.category) || a.i-b.i).map(x=>x.s);
-    expect(stepBuiltinScene('', 1)).toBe(ordered[0]);
-    expect(stepBuiltinScene('', -1)).toBe(ordered.at(-1));
+    const ordered = SCENE_BROWSE_ORDER;
+    expect(stepBuiltinScene('', 1)).toBe(ordered[0].scene);
+    expect(stepBuiltinScene('', -1)).toBe(ordered.at(-1).scene);
     for (let i = 0; i < ordered.length; i++) {
-        expect(stepBuiltinScene(ordered[i].name, 1)).toBe(ordered[(i + 1) % ordered.length]);
-        expect(stepBuiltinScene(ordered[i].name, -1)).toBe(ordered[(i - 1 + ordered.length) % ordered.length]);
+        const {scene,category}=ordered[i];
+        expect(stepBuiltinSceneEntry(scene.name, 1, category)).toBe(ordered[(i + 1) % ordered.length]);
+        expect(stepBuiltinSceneEntry(scene.name, -1, category)).toBe(ordered[(i - 1 + ordered.length) % ordered.length]);
     }
 });

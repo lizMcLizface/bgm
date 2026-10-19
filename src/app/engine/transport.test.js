@@ -11,6 +11,48 @@ function setHidden(hidden) {
 
 afterEach(() => setHidden(false));
 
+test('hiding a running page fills its background window before another timer wake', () => {
+    const AC = makeContext(), t = new Transport({ context: AC, bpm: 120 });
+    const heard = [];
+    t.onBeat(e => heard.push(e));
+    t.start();
+    expect(heard.at(-1).time).toBeLessThan(0.4);
+    setHidden(true);
+    document.dispatchEvent(new Event('visibilitychange'));
+    expect(heard.at(-1).time).toBeGreaterThan(9);
+    expect(t.nextBeatTime).toBeGreaterThanOrEqual(10);
+    t.stop();
+});
+
+test('diagnostics distinguish delayed timer wakes and timeline recovery with bounded history', () => {
+    const AC = makeContext(), t = new Transport({ context: AC, bpm: 120 });
+    t.nextBeatTime = 0.1; t.beat = 0; t.tick();
+    AC.currentTime = 2; t.tick();
+    expect(t.diagnostics.maxTickGap).toBe(2);
+    expect(t.diagnostics.recoveries).toBe(1);
+    expect(t.diagnostics.recent.map(e => e.type)).toEqual(['wake-gap', 'rebase']);
+    for (let i = 0; i < 50; i++) { AC.currentTime += 2; t.tick(); }
+    expect(t.diagnostics.recent).toHaveLength(32);
+    expect(t.diagnostics.nextBeatInSeconds).toBeGreaterThanOrEqual(0.4);
+    t.resetDiagnostics();
+    expect(t.diagnostics.recoveries).toBe(0);
+    expect(t.diagnostics.recent).toEqual([]);
+});
+
+test('diagnostics show when the scheduling budget prevents filling the target window', () => {
+    const AC = makeContext(), t = new Transport({ context: AC, bpm: 120 });
+    let ms = 0;
+    const clock = vi.spyOn(performance, 'now').mockImplementation(() => ms);
+    try {
+        t.onBeat(() => { ms += 30; });
+        setHidden(true); t.nextBeatTime = 0.1; t.beat = 0; t.tick();
+        expect(t.diagnostics.budgetHits).toBe(1);
+        expect(t.diagnostics.maxTickMs).toBe(30);
+        expect(t.diagnostics.recent.at(-1)).toMatchObject({ type: 'budget', target: 10 });
+        expect(t.diagnostics.nextBeatInSeconds).toBeLessThan(t.lookahead);
+    } finally { clock.mockRestore(); }
+});
+
 test('visible: the short window; hidden: at least 10 s', () => {
     const t = new Transport({ context: makeContext(), lookahead: 0.4 });
     expect(t.lookahead).toBe(0.4);

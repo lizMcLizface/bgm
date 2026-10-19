@@ -7,7 +7,18 @@
 // silent. The music itself still goes straight from the AudioContext to
 // the speakers, so nothing gets added latency.
 
+import {mediaHelperFromSearch} from '../audio/mediaHelperChoice';
+const helperDefault = mediaHelperFromSearch(typeof location === 'undefined' ? '' : location.search) !== false;
+let helperEnabled = helperDefault;
+let playError = null;
 let element = null;
+
+// Read-only; does not create or start the silent media-session helper.
+export function mediaSessionDiagnostics() {
+    return { state: navigator.mediaSession?.playbackState, helperEnabled, playError,
+        helper: element ? { paused: element.paused, time: element.currentTime, duration: element.duration,
+            readyState: element.readyState, error: element.error?.code ?? null } : null };
+}
 
 // 10 s of silence: 8 kHz, 8-bit mono WAV (128 is the 8-bit zero line).
 function silentWavUrl(seconds = 10, rate = 8000) {
@@ -39,11 +50,13 @@ function loadArtwork() {
     artwork = new Promise((resolve) => {
         const image = new Image();
         image.onload = () => {
-            const canvas = document.createElement('canvas');
-            canvas.width = 512;
-            canvas.height = 512;
-            canvas.getContext('2d').drawImage(image, 0, 0, 512, 512);
-            resolve([{ src: canvas.toDataURL('image/png'), sizes: '512x512', type: 'image/png' }]);
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width = 512;
+                canvas.height = 512;
+                canvas.getContext('2d').drawImage(image, 0, 0, 512, 512);
+                resolve([{ src: canvas.toDataURL('image/png'), sizes: '512x512', type: 'image/png' }]);
+            } catch { resolve([]); } // Artwork must not break controls on a restricted origin.
         };
         image.onerror = () => resolve([]);
         image.src = `${import.meta.env.BASE_URL}favicon.svg`;
@@ -75,14 +88,18 @@ export function setupMediaSession({ play, stop, next, previous }) {
  * Shows the state and what is playing; starts / pauses the silent element.
  * Call from Play / Stop - starting media needs the click that started it.
  */
-export function updateMediaSession({ playing, title, artist }) {
+export function updateMediaSession({ playing, title, artist, helper = helperDefault }) {
     if (!supported()) return;
-    if (playing) {
+    helperEnabled = !!helper;
+    if (playing && helperEnabled) {
         if (!element) {
             element = new Audio(silentWavUrl());
             element.loop = true;
         }
-        element.play().catch(() => {});
+        if (element.paused) {
+            playError = null;
+            element.play().catch(error => { playError = { name: error.name, message: error.message }; });
+        }
     } else if (element) {
         element.pause();
     }

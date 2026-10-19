@@ -1,0 +1,5 @@
+import {idleSuspender} from './idleContext';
+it('does not suspend running music, ambience or other activity',async()=>{const c={state:'running',suspend:vi.fn()};await idleSuspender(c,()=>false)();expect(c.suspend).not.toHaveBeenCalled();});
+it('suspends only an inactive running context',async()=>{const c={state:'running',suspend:vi.fn(async()=>{})};await idleSuspender(c,()=>true)();expect(c.suspend).toHaveBeenCalledOnce();c.state='suspended';await idleSuspender(c,()=>true)();expect(c.suspend).toHaveBeenCalledOnce();});
+it('coalesces pending sleep and resumes if Play or a key races it',async()=>{let finish,sleep=true;const c={state:'running',suspend:vi.fn(()=>new Promise(r=>finish=r)),resume:vi.fn(async()=>{})},idle=idleSuspender(c,()=>sleep);const p=idle();await idle();expect(c.suspend).toHaveBeenCalledOnce();sleep=false;finish();await p;expect(c.resume).toHaveBeenCalledOnce();});
+it('recovers after a browser rejects suspension',async()=>{const c={state:'running',suspend:vi.fn(async()=>{throw Error('interrupted');})},idle=idleSuspender(c,()=>true);await idle();await idle();expect(c.suspend).toHaveBeenCalledTimes(2);});

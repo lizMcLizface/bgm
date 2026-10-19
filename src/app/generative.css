@@ -2371,3 +2371,38 @@ body {
     .gen-header-end { flex-wrap: wrap; }
     .gen-header-end .gen-header-tools { flex-basis: 100%; justify-content: flex-end; }
 }
+
+/* Keep the entire scroll area inside the visible phone viewport, including
+   browser chrome and the panel's own border/padding. */
+@media (max-width: 639px), (max-height: 500px) and (pointer: coarse) {
+    .gen .gen-settings-menu {
+        position: fixed;
+        top: 72px;
+        left: 12px;
+        right: 12px;
+        width: calc(100vw - 24px);
+        max-width: calc(100vw - 24px);
+        grid-template-columns: minmax(0, 1fr);
+        box-sizing: border-box;
+        max-height: calc(100vh - 84px);
+        max-height: calc(100dvh - 84px - env(safe-area-inset-bottom, 0px));
+        overflow-y: auto;
+        overscroll-behavior-y: contain;
+        -webkit-overflow-scrolling: touch;
+    }
+    .gen .gen-settings-menu .gen-menu-section,
+    .gen .gen-settings-menu .gen-field {
+        min-width: 0;
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .gen .gen-settings-menu select {
+        min-width: 0;
+        box-sizing: border-box;
+    }
+}
+
+/* Percussion uses the shared voice browser and the same two-row track card. */
+.gen-percussion-preset { display:contents; }
+@media(max-width:639px) {
+    .gen-header-end .gen-header-tools { flex-wrap:wrap; min-width:0; }
+}

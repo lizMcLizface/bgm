@@ -53,7 +53,7 @@ export const TOUR_STEPS = [
         stage: 0,
         selector: '.gen-visual',
         title: 'Music in motion',
-        text: 'Press Play and watch the fluid respond: short notes make small, fast jets, held notes make broader plumes, and colours follow the harmony and mood. Ambient sounds add their own motion too. Enable Fluid background here if it is off, then change the flow or roll its dice. Hide the interface with the arrow beside it for a clearer view.',
+        text: 'Enable the optional Fluid background here, then press Play: short notes make small, fast jets, held notes make broader plumes, and colours follow the harmony and mood. Ambient sounds add their own motion too. Change the flow or roll its dice. Hide the interface with the arrow beside it for a clearer view.',
     },
     {
         id: 'scene',

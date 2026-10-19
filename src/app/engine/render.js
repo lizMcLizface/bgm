@@ -1,3 +1,6 @@
+import {WasmRoomPool} from '../../synth-lab/roomPool';
+import {PERFORMANCE} from '../../audio/performance';
+import {createWasmRoomRoute} from './wasmRoomRoute';
 import {joinHeldNotes} from '../composition/heldGlides';
 // Renders the piece to a WAV file (or, as 16-bit PCM chunks, to anything else), faster than real time: the plan Play
 // would start with (Generator.planner) booked onto fresh Instruments - the
@@ -12,6 +15,7 @@ import {joinHeldNotes} from '../composition/heldGlides';
 
 import Instrument from './Instrument';
 import DrumKit from './drumKit';
+import WasmDrumKit from './wasmDrumKit';
 import { RoleWander, instrumentWander } from './wander';
 import { OPEN_TONE, TONE_ROLES } from '../Generator';
 import Ambience from './ambience';
@@ -176,6 +180,7 @@ export async function renderWav(gen, seconds, options = {}) {
  */
 export async function renderPcm(gen, seconds, { ending = false, onProgress = () => {}, signal, onChunk } = {}) {
     if(gen.audioEngineReady)await gen.audioEngineReady;
+    if(gen.percussionReady)await gen.percussionReady;
     const audioEngine=Object.values(gen.roles).some(r=>r.instrument.preset?.wasmVoice)?'wasm':gen.audioEngine;
     const sampleRate = gen.AC.sampleRate;
     const anySolo = Object.values(gen.roles).some((r) => r.solo);
@@ -201,14 +206,15 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
         const build = async (from) => {
             const ctx = new OfflineAudioContext({ numberOfChannels: 2, length: length(from), sampleRate });
             const Wasm=audioEngine==='wasm'?(await import('./wasmInstrument')).default:null;
-            const instruments={},cleanup=[];
+            const instruments={},cleanup=[],roomPool=Wasm&&PERFORMANCE.sharedReverb?new WasmRoomPool(ctx,ctx.destination):null;
+            if(roomPool)cleanup.push(()=>roomPool.dispose());
             try{for(const role of roles){
                 const inst = role === 'perc'
-                    ? new DrumKit({ context: ctx })
-                    : Wasm?await Wasm.create({polyphony:gen.getRolePolyphony(role),preset:presets[role],context:ctx,notes:notes.filter(n=>n.role===role&&n.time>=from&&n.time<end+(last?0:CROSSFADE)).map(n=>({...n,time:n.time-from}))})
+                    ? new (gen.percussionEngine && gen.percussionEngine !== 'native' ? WasmDrumKit : DrumKit)({ context: ctx, model:gen.percussionEngine })
+                    : Wasm?await Wasm.create({polyphony:gen.getRolePolyphony(role),preset:presets[role],context:ctx,roomPool,notes:notes.filter(n=>n.role===role&&n.time>=from&&n.time<end+(last?0:CROSSFADE)).map(n=>({...n,time:n.time-from}))})
                     : new Instrument({ polyphony: gen.getRolePolyphony(role), preset: presets[role], context: ctx });
                 instruments[role]=inst;cleanup.push(()=>inst.dispose());
-                if (role === 'perc') inst.setKit(gen.settings.drumKit);
+                if (role === 'perc') {inst.setKit(gen.settings.drumKit);inst.setVoicePreset(gen.settings.drums.kit);if(inst.ready)await inst.ready;}
                 inst.scheduleSleep = () => {}; // no wall-clock timers during the render
                 const gain = ctx.createGain();
                 cleanup.push(()=>gain.disconnect());
@@ -232,6 +238,10 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
                 if (inst.setWander) inst.setWander({ ...instrumentWander(gen.settings.wander, role, from), immediate: true });
                 gain.connect(wander.input);
                 wander.output.connect(ctx.destination);
+                if(roomPool&&role!=='perc'){
+                    const route=createWasmRoomRoute(ctx,inst,{roleWander:wander,volume:gen.roles[role].volume,tone:TONE_ROLES.includes(role)});
+                    if(route.tone)automateTone(route.tone.frequency,tones,from);cleanup.push(()=>route.dispose());
+                }
             }
             return { ctx, instruments, cleanup };
             }catch(error){cleanup.reverse().forEach(f=>f());throw error;}
@@ -254,6 +264,7 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
             const n = notes[i];
             if (n.time >= from&&!instruments[n.role].preScheduled) instruments[n.role].scheduleNote(n.midi, n.time - from, n.duration, n.velocity, n.detune, n.expression);
         }
+        Object.values(instruments).forEach(inst => inst.prepareOffline?.());
         if (Object.values(ambience).some((level) => level > 0)) {
             const bed = new Ambience({ context: ctx, seed: 1, offset: from });
             cleanup.push(()=>bed.stop(ctx.currentTime,0));

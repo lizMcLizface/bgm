@@ -6,6 +6,7 @@
 
 import { audioContext } from '../../audio/context';
 import { isMobile } from '../../audio/performance';
+import {startTicker,stopTicker} from '../../audio/ticker';
 
 // Hidden pages get their main-thread timers throttled to about once a
 // second (or frozen), far past a 0.4 s window - so while hidden the window is
@@ -26,30 +27,6 @@ const LATE_LIMIT = 0.3;
 // filling a long lookahead window never holds the page up for long.
 const TICK_BUDGET_MS = 25;
 const URGENT = 0.5;
-
-const TICK_WORKER_SOURCE = 'let id=null;onmessage=(e)=>{clearInterval(id);id=null;if(e.data>0)id=setInterval(()=>postMessage(0),e.data)};';
-
-function startTicker(callback, interval) {
-    try {
-        const url = URL.createObjectURL(new Blob([TICK_WORKER_SOURCE], { type: 'text/javascript' }));
-        const worker = new Worker(url);
-        URL.revokeObjectURL(url);
-        worker.onmessage = callback;
-        worker.postMessage(interval);
-        return { worker };
-    } catch (e) {
-        return { id: setInterval(callback, interval) };
-    }
-}
-
-function stopTicker(ticker) {
-    if (ticker.worker) {
-        ticker.worker.postMessage(0);
-        ticker.worker.terminate();
-    } else {
-        clearInterval(ticker.id);
-    }
-}
 
 class Transport {
     /**
@@ -72,10 +49,12 @@ class Transport {
         // the longest stretch (audio seconds) lately between two ticks, while the page was hidden
         this.slowestGap = 0;
         this.lastTick = null;
-        // Back on screen: make sure the audio is running and the beat that is due is booked now.
+        this.resetDiagnostics();
+        // Fill the longer window before the first background timer wake can be
+        // throttled. Returning to the page also checks the clock immediately.
         if (typeof document !== 'undefined' && document.addEventListener) {
             document.addEventListener('visibilitychange', () => {
-                if (document.visibilityState !== 'visible' || !this.isRunning) return;
+                if (!this.isRunning) return;
                 this.wakeAudio();
                 this.tick();
             });
@@ -132,6 +111,7 @@ class Transport {
         if (this.timer) return;
         this.beat = fromBeat;
         this.lastTick = null;
+        this.resetDiagnostics();
         this.nextBeatTime = this.AC.currentTime + 0.1;
         this.tick();
         this.timer = startTicker(() => this.tick(), this.interval);
@@ -155,21 +135,46 @@ class Transport {
     // lately (easing off by 1% a second) is what the hidden lookahead has to cover.
     watchGap() {
         const now = this.AC.currentTime;
-        if (this.lastTick !== null && this.hidden && this.AC.state === 'running') {
+        if (this.lastTick !== null && this.AC.state === 'running') {
             const gap = now - this.lastTick;
-            this.slowestGap = Math.max(gap, this.slowestGap * Math.pow(0.99, Math.max(0, gap)));
+            this.maxTickGap = Math.max(this.maxTickGap, gap);
+            if (gap > Math.max(0.25, this.interval * 0.003)) this.recordDiagnostic({ type: 'wake-gap', gap, ahead: this.nextBeatTime - now });
+            if (this.hidden) this.slowestGap = Math.max(gap, this.slowestGap * Math.pow(0.99, Math.max(0, gap)));
         }
         this.lastTick = now;
+    }
+
+    resetDiagnostics() {
+        this.recoveries = 0;
+        this.maxTickGap = 0;
+        this.maxTickMs = 0;
+        this.budgetHits = 0;
+        this.recentDiagnostics = [];
+    }
+
+    recordDiagnostic(event) {
+        this.recentDiagnostics.push({ audioTime: this.AC.currentTime, hidden: this.hidden, ...event });
+        if (this.recentDiagnostics.length > 32) this.recentDiagnostics.shift();
+    }
+
+    get diagnostics() {
+        return { running: this.isRunning, targetAhead: this.lookahead, nextBeatInSeconds: Number.isFinite(this.nextBeatTime) ? this.nextBeatTime - this.AC.currentTime : null,
+            maxTickGap: this.maxTickGap, maxTickMs: this.maxTickMs, budgetHits: this.budgetHits, recoveries: this.recoveries, recent: this.recentDiagnostics.slice() };
     }
 
     tick() {
         this.watchGap();
         const now = this.AC.currentTime;
-        if (this.nextBeatTime < now - LATE_LIMIT) this.nextBeatTime = now + 0.05;
+        if (this.nextBeatTime < now - LATE_LIMIT) {
+            this.recoveries++;
+            this.recordDiagnostic({ type: 'rebase', lateSeconds: now - this.nextBeatTime });
+            this.nextBeatTime = now + 0.05;
+        }
         const started = performance.now();
+        let budgetHit = false;
         while (this.nextBeatTime < now + this.lookahead) {
             // (past the budget, what is left waits for the next tick - unless it is about to be heard)
-            if (this.nextBeatTime > now + URGENT && performance.now() - started > TICK_BUDGET_MS) break;
+            if (this.nextBeatTime > now + URGENT && performance.now() - started > TICK_BUDGET_MS) { budgetHit = true; break; }
             const event = {
                 beat: this.beat,
                 bar: Math.floor(this.beat / this.beatsPerBar),
@@ -186,6 +191,9 @@ class Transport {
                 this.rebaseAt = null;
             }
         }
+        const ms = performance.now() - started;
+        this.maxTickMs = Math.max(this.maxTickMs, ms);
+        if (budgetHit) { this.budgetHits++; this.recordDiagnostic({ type: 'budget', ms, ahead: this.nextBeatTime - now, target: this.lookahead }); }
     }
 }
 

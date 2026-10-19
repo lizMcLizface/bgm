@@ -22,6 +22,7 @@
 // begins, now and then a bell or a ride tap on an off-beat, a little tom
 // pickup. It draws from a stream of its own, so it never moves the rest.
 
+import {ADDITIONAL_DRUM_STYLES,additionalDrumBar} from './additionalDrumStyles';
 import { seeded, chance, normal } from './random';
 import { groupStarts, beatStarts } from './meter';
 
@@ -41,11 +42,12 @@ const DRUM = Object.fromEntries(DRUMS.map((name, i) => [name, i]));
 export const DRUM_STYLES = {
     off: 'Off', heartbeat: 'Heartbeat', brushes: 'Brushes', lofi: 'Lo-fi beat', shaker: 'Shaker', downtempo: 'Downtempo',
     electro: 'Electro pulse', drive: 'Driving',
+    ...ADDITIONAL_DRUM_STYLES,
 };
-// The kit the grooves play on: 'felt' as the grooves are written, 'crisp' puts
-// a snare, a punchy kick and a bright hat where the brush, felt kick and soft
-// hat were (the rest - clap, rim, toms, cymbals - stay).
-export const DRUM_KITS = { felt: 'Felt and brushes', crisp: 'Crisp and electronic' };
+// Append-only saved voice IDs. Felt and Crisp keep their historical event
+// mappings; the source voice resolves those IDs to its complete kit palette.
+// tr808 is deliberately not a numeric object key: enum order is share data.
+export const DRUM_KITS = { felt: 'Felt', crisp: 'Crisp', tr808: '808', hand: 'Hand percussion' };
 const CRISP = { kick: 'punch', brush: 'snare', hat: 'sizzle' };
 export const DEFAULT_DRUMS = { style: 'off', activity: 0.5, variation: 0.5, sprinkle: 0.35, kit: 'felt' };
 
@@ -413,6 +415,8 @@ const stream = (salt, seed, n) => seeded(((seed ^ salt) + Math.imul(n + 1, 0x9e3
  *   velocity, detune: the hit's variation -1..1 })
  */
 export function drumBar({ bar, meter, drums, section, sectionsMode, sectionBars = 16, phraseStart, seed }) {
+    const added=additionalDrumBar({bar,meter,drums,section,sectionsMode,sectionBars,phraseStart,seed},DRUMS);
+    if(added)return added;
     const grooves = GROOVES[drums.style];
     if (!grooves) return [];
     const level = section && SECTION_LEVEL[sectionsMode] ? SECTION_LEVEL[sectionsMode][section.type] : 2;
@@ -500,7 +504,7 @@ export function loosenDrums(events, { timing, velocity }, unitSeconds, seed, bar
 }
 
 /** A few hits for an audition (the kit on its own while stopped). */
-export const auditionHits = () => ['kick', 'hat', 'brush', 'shaker', 'rim', 'clap', 'tom', 'ride', 'bell', 'crash', 'swish', 'punch', 'snare', 'sizzle'].map((drum, i) => ({ midi: DRUM[drum], beat: i * 0.5, velocity: 0.6, detune: 0 }));
+export const auditionHits = (voice) => (voice ? DRUMS.slice(0,11) : ['kick', 'hat', 'brush', 'shaker', 'rim', 'clap', 'tom', 'ride', 'bell', 'crash', 'swish', 'punch', 'snare', 'sizzle']).map((drum, i) => ({ midi: DRUM[drum], beat: i * 0.5, velocity: 0.6, detune: 0 }));
 
 /** Random drum settings: a style, activity and variation. */
 export function randomDrums(rng = Math.random) {

@@ -11,3 +11,16 @@ lto = true
 codegen-units = 1
 panic = "abort"
 strip = true
+
+[features]
+profile-sections = []
+# Exact coefficient reuse. Disable default features for the original reference path.
+cache-colour-coefficients = []
+default = ["cache-colour-coefficients"]
+
+# Experimental explicit Wasm SIMD128 voice batching; requires a separate SIMD build.
+simd-voices = []
+
+# Experimental multi-output FM bank; never enabled in ordinary kernels.
+multitimbral = ["simd-voices"]
+simd-colour = []

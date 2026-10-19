@@ -4,11 +4,11 @@ import {parameterTriples,legacyPreset} from './patch';
 import Instrument from '../app/engine/Instrument';
 import {noiseReady} from '../nodes/noiseGenerator';
 import {bitCrusherReady} from '../nodes/bitcrusher';
-let modulePromise;
+export {synthModule} from './coreModule';
+import {synthModule} from './coreModule';
 const registrations=new WeakMap();
-export async function synthModule(){return modulePromise??=fetch(kernelAsset('core','core.wasm')).then(async r=>{if(!r.ok)throw Error('Wasm kernel unavailable. Run npm run synth:build.');return WebAssembly.compile(await r.arrayBuffer());}).catch(e=>{modulePromise=null;throw e;});}
 export async function makeWasmNode(context,patch,{auditStats=false,patches=[],events=[],offline=false,dry=false,stopFrame=Number.isFinite(context.length)?context.length:null,onStats=()=>{},onError=()=>{}}={}){
- const module=await synthModule();let registered=registrations.get(context);if(!registered){registered=context.audioWorklet.addModule(kernelAsset('core','processor.js'));registrations.set(context,registered);}await registered;
+ const module=await synthModule(patch);let registered=registrations.get(context);if(!registered){registered=context.audioWorklet.addModule(kernelAsset('core','processor.js'));registrations.set(context,registered);}await registered;
  const values=parameterTriples(patch);if(dry)values.find(([scope,index])=>scope===0&&index===8)[2]=0;
  const node=new AudioWorkletNode(context,'calmbgm-subtractive',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{module,parameters:values,events,offline,stopFrame,auditStats,performance:sanitizeNoteBehavior(patch.performance),patches:patches.map(p=>({...p,values:parameterTriples(p.patch),performance:sanitizeNoteBehavior(p.patch.performance)}))}});
  node.port.onmessage=({data})=>{if(data.type==='stats')onStats(data);if(data.type==='error')onError(Error(data.message));};node.onprocessorerror=()=>onError(Error('Audio worklet stopped after an error. Reload the engine.'));

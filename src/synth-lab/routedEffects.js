@@ -29,7 +29,7 @@ export async function createRoutedEffects(context,raw,{kind='wasm',onStats=()=>{
     const intoRoom=level(p.delayToReverb/unitySend);echo.output.connect(intoRoom);intoRoom.connect(room.node,0,1);
    }
   }
-  return {inputs,echoRoomInput,connect:d=>room.connect(d),clear(){room.clear();echo?.clear?.();},memoryBytes:await effectsMemoryBytes(),nativeDelayCount:echo?1:0,nativeDelayCompensationFrames:echo?.compensationFrames??0,dispose(){nodes.forEach(n=>n.disconnect());echo?.dispose();room.dispose();}};
+  return {inputs,echoRoomInput,get stats(){return room.stats;},get error(){return room.error;},connect:d=>room.connect(d),clear(){room.clear();echo?.clear?.();},memoryBytes:await effectsMemoryBytes(),nativeDelayCount:echo?1:0,nativeDelayCompensationFrames:echo?.compensationFrames??0,dispose(){nodes.forEach(n=>n.disconnect());echo?.dispose();room.dispose();}};
  }catch(e){nodes.forEach(n=>n.disconnect());echo?.dispose();room?.dispose();throw e;}
 }
 

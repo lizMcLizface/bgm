@@ -1,5 +1,7 @@
 //! Standalone, allocation-free subtractive DSP prototype. No third-party DSP code.
 #![allow(static_mut_refs)]
+#[path = "../common/denormal.rs"]
+mod denormal;
 use std::f32::consts::PI;
 #[path = "../common/headroom.rs"]
 mod headroom;
@@ -7,6 +9,11 @@ mod headroom;
 mod colour;
 #[path = "../common/notes.rs"]
 mod notes;
+#[cfg(any(feature = "simd-voices", feature = "simd-colour"))]
+#[path = "../common/simd.rs"]
+mod simd;
+#[cfg(feature = "simd-voices")]
+mod simd_voices;
 const VOICES: usize = 32;
 const UNISON: usize = 4;
 const PARAMS: usize = 100;
@@ -21,6 +28,7 @@ fn bound(v: f32, lo: f32, hi: f32) -> f32 {
         lo
     }
 }
+#[cfg_attr(feature = "profile-sections", inline(never))]
 fn soft(x: f32) -> f32 {
     let x = x.clamp(-3., 3.);
     x * (27. + x * x) / (27. + 9. * x * x)
@@ -31,6 +39,7 @@ fn random(state: &mut u32) -> f32 {
     *state ^= *state << 5;
     (*state as f64 / u32::MAX as f64) as f32 * 2. - 1.
 }
+#[cfg_attr(feature = "profile-sections", inline(never))]
 fn blep(t: f32, dt: f32) -> f32 {
     if t < dt {
         let x = t / dt;
@@ -90,6 +99,7 @@ fn init_additive() {
         ADDITIVE_READY = true;
     }
 }
+#[cfg_attr(feature = "profile-sections", inline(never))]
 fn additive_wave(kind: usize, t: f32, dt: f32) -> f32 {
     // Fade the last partial in below Nyquist, avoiding a discontinuous
     // spectrum while notes glide across table boundaries.
@@ -112,6 +122,7 @@ fn additive_wave(kind: usize, t: f32, dt: f32) -> f32 {
         a + (lookup(low) - a) * blend
     }
 }
+#[cfg_attr(feature = "profile-sections", inline(never))]
 fn wave(kind: u32, t: f32, dt: f32, pw: f32, sine: &[f32; LUT + 1]) -> f32 {
     match kind {
         1 => {
@@ -126,6 +137,7 @@ fn wave(kind: u32, t: f32, dt: f32, pw: f32, sine: &[f32; LUT + 1]) -> f32 {
         _ => 0.,
     }
 }
+#[cfg_attr(feature = "profile-sections", inline(never))]
 fn raw_wave(kind: u32, t: f32, pw: f32, sine: &[f32; LUT + 1]) -> f32 {
     match kind {
         3 => 2. * t - 1.,
@@ -145,6 +157,7 @@ fn step_residual(time: f32, jump: f32, current: &mut f32, next: &mut f32) {
     *current += jump * 0.5 * (1. - time).powi(2);
     *next -= jump * 0.5 * time * time;
 }
+#[cfg_attr(feature = "profile-sections", inline(never))]
 fn segment_edges(
     kind: u32,
     phase: f32,
@@ -234,6 +247,7 @@ impl Env {
             self.release_start = self.value;
         }
     }
+    #[cfg_attr(feature = "profile-sections", inline(never))]
     fn next(&mut self, p: &[f32; PARAMS], offset: usize, curves: usize, sr: f32) -> f32 {
         match self.stage {
             1 => {
@@ -295,6 +309,7 @@ struct Filter {
 impl Filter {
     const ZERO: Self = Self { ic1: 0., ic2: 0. };
     // Topology-preserving state variable filter. g is calculated at control rate.
+    #[cfg_attr(feature = "profile-sections", inline(never))]
     fn tick(&mut self, x: f32, g: f32, k: f32, mode: u32) -> f32 {
         let a1 = 1. / (1. + g * (g + k));
         let v1 = a1 * (self.ic1 + g * (x - self.ic2));
@@ -342,6 +357,7 @@ fn damping(resonance: f32, modern: bool) -> f32 {
         2. - resonance * 1.85
     }
 }
+#[cfg_attr(feature = "profile-sections", inline(never))]
 fn lowpass_tick(
     lane: &mut Lane,
     x: f32,
@@ -417,6 +433,7 @@ impl Chorus {
         self.depth = 3.;
         self.configure(sr);
     }
+    #[cfg_attr(feature = "profile-sections", inline(never))]
     fn tick(
         &mut self,
         input: [f32; 2],
@@ -505,6 +522,7 @@ impl Motion {
             ..Self::ZERO
         }
     }
+    #[cfg_attr(feature = "profile-sections", inline(never))]
     fn next(&mut self, rate: f32, sr: f32) -> f32 {
         self.phase += rate / sr;
         if self.phase >= 1. {
@@ -1095,6 +1113,10 @@ impl Engine {
         self.dc_out = [0.; 2];
     }
     fn render(&mut self, n: usize) {
+        denormal::flush(&mut self.dc_in);
+        denormal::flush(&mut self.dc_out);
+        #[cfg(feature = "simd-voices")]
+        if self.simd_eligible() { unsafe { SIMD_FRAMES += n.min(BLOCK) as u64; } self.render_simd(n); return; }
         let n = n.min(BLOCK);
         let mode = self.global[0] as u32;
         let layers = if mode == 2 { 2 } else { 1 };
@@ -1802,3 +1824,9 @@ pub extern "C" fn engine_stat(index: u32) -> f64 {
         }
     }
 }
+
+#[cfg(feature = "simd-voices")]
+static mut SIMD_FRAMES: u64 = 0;
+#[cfg(feature = "simd-voices")]
+#[no_mangle]
+pub extern "C" fn engine_simd_frames() -> u32 { unsafe { SIMD_FRAMES.min(u32::MAX as u64) as u32 } }

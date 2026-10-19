@@ -68,3 +68,31 @@ test('noise pressure changes slew rather than switching levels in one sample',()
  expect(rms(out.slice(12000,12128))/rms(base.slice(12000,12128))).toBeLessThan(1.2);
  expect(rms(out.slice(-4000))/rms(base.slice(-4000))).toBeCloseTo(2.5,3);
 });
+
+
+test('settled colour survives disable, tiny threshold crossings and re-enable at every rate',()=>{
+ for(const rate of [44100,48000,96000]){
+  const input=deterministicNoise(rate,4),settings={formant:.6,body:.5,bodyType:4,bodyDecay:1.5},edits=[
+   {frame:31,settings},
+   {frame:Math.floor(rate*.2)+1,settings:{}},
+   {frame:Math.floor(rate*1.3)+1,settings:{formant:.0000101,body:.0000101}},
+   {frame:Math.floor(rate*2.3)+1,settings:{formant:.8,body:.6,vowel:1.8,bodyType:2,bodyTune:7}},
+   {frame:Math.floor(rate*3.1)+1,settings:{}},
+  ];
+  const a=colourProbe(core,input,rate,settings,{edits,chunk:31}),b=colourProbe(core,input,rate,settings,{edits,chunk:2048});
+  for(let ch=0;ch<2;ch++){expect(eq(a[ch],b[ch])).toBe(true);expect(a[ch].every(Number.isFinite)).toBe(true);}
+  expect(rms(a[0])).toBeGreaterThan(.0001);
+ }
+});
+
+
+test('FM acoustic automation remains exact across callback sizes and quality changes',()=>{
+ function passage(rate,quality,chunk){
+  const b=engine('fm',{formant:.6,body:.5,bodyType:4,bodyDecay:1.5},rate);b.e.fm_param(4,quality);b.event(0,1,0,60,.6);b.event(1,1,Math.floor(rate*3.2),0,0);
+  const edits=[ [.1,{formant:0,body:0}], [1.2,{formant:.0000101,body:.0000101}], [2.3,{formant:.7,body:.6,vowel:1.8,bodyType:2,bodyTune:7}], [2.7,{quality:(quality+1)%3}], [3.1,{formant:0,body:0}] ].map(([t,values])=>({frame:Math.floor(rate*t)+1,values}));
+  const out=new Float32Array(rate*4);let at=0,next=0;
+  while(at<out.length){while(edits[next]?.frame===at){for(const [key,value]of Object.entries(edits[next++].values))b.e.fm_param(FM_GLOBAL.findIndex(([id])=>id===key),value);}const n=Math.min(chunk,out.length-at,(edits[next]?.frame??out.length)-at);out.set(b.render(n,chunk),at);at+=n;}
+  return {out,stats:[0,1,2,3,4].map(b.stat)};
+ }
+ for(const rate of [44100,48000,96000])for(const quality of [0,1,2]){const a=passage(rate,quality,127),b=passage(rate,quality,2048);expect(eq(a.out,b.out)).toBe(true);expect(a.stats).toEqual(b.stats);expect(a.out.every(Number.isFinite)).toBe(true);expect(rms(a.out)).toBeGreaterThan(.0001);}
+},30000);

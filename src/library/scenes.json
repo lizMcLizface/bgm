@@ -139,7 +139,7 @@
     {
       "name": "Late-night brushes",
       "category": "cozy",
-      "blurb": "Electric piano ninths, a walking bass and brushes, by the fire",
+      "blurb": "Soft organ pipes over electric-piano ninths and a restrained felt jazz groove.",
       "settings": {
         "tonic": 5,
         "mode": "Major-2",
@@ -162,10 +162,11 @@
           "drive": 0
         },
         "drums": {
-          "style": "brushes",
+          "style": "jazz",
           "activity": 0.56,
           "variation": 0.64,
-          "sprinkle": 0.09
+          "sprinkle": 0.09,
+          "kit": "felt"
         },
         "swing": 0.5,
         "counter": {
@@ -193,7 +194,7 @@
         "volumes": {
           "pad": 0.76,
           "bass": 0.75,
-          "lead": 0.66,
+          "lead": 0.5,
           "counter": 0.48,
           "perc": 0.5
         },
@@ -210,9 +211,13 @@
       "voices": {
         "pad": "FM Rhodes",
         "bass": "FM Bass",
-        "lead": "Organ Whistle",
+        "lead": "Wasm Soft Pipes",
         "counter": "Soft Flute"
-      }
+      },
+      "isNew": true,
+      "tags": [
+        "updated"
+      ]
     },
     {
       "name": "Deep night",
@@ -570,13 +575,13 @@
     {
       "name": "Desert dusk",
       "category": "unsettling",
-      "blurb": "Phrygian dominant: kalimba and clarinet over a heartbeat and wind",
+      "blurb": "Rounded hand drums under clarinet and kalimba, with shorter chord holds and section cycles.",
       "settings": {
         "tonic": 4,
         "mode": "Harmonic Minor-5",
         "bpm": 70,
         "progression": 13,
-        "barsPerChord": 2,
+        "barsPerChord": 1,
         "padWeights": {
           "sustain": 30,
           "pulse": 20,
@@ -586,10 +591,11 @@
           "stacked": 0
         },
         "drums": {
-          "style": "heartbeat",
+          "style": "hand",
           "activity": 0.46,
           "variation": 0.57,
-          "sprinkle": 0.06
+          "sprinkle": 0.06,
+          "kit": "hand"
         },
         "ambience": {
           "wind": 0.35
@@ -624,20 +630,59 @@
         },
         "sections": {
           "mode": "gentle",
-          "phrases": 4
+          "phrases": 2
         },
-        "ambienceVolume": 0.72
+        "ambienceVolume": 0.72,
+        "drumKit": {
+          "kick": {
+            "level": 0.9
+          },
+          "brush": {
+            "level": 0.85
+          },
+          "shaker": {
+            "level": 0.75
+          },
+          "rim": {
+            "level": 0.65
+          },
+          "hat": {
+            "level": 0.55
+          },
+          "swish": {
+            "level": 0.5
+          },
+          "tom": {
+            "level": 0.8
+          },
+          "clap": {
+            "level": 0.7
+          },
+          "ride": {
+            "level": 0.55
+          },
+          "crash": {
+            "level": 0.4
+          },
+          "bell": {
+            "level": 0.55
+          }
+        }
       },
       "voices": {
         "pad": "Kalimba Pluck",
         "bass": "Warm Bass",
         "lead": "Clarinet Lead"
-      }
+      },
+      "isNew": true,
+      "tags": [
+        "updated"
+      ]
     },
     {
       "name": "Tape memories",
       "category": "cozy",
-      "blurb": "A worn tape pad and a square lead, a dusty beat and vinyl",
+      "blurb": "The same soft felt drums with a spacious displaced backbeat.",
       "settings": {
         "tonic": 10,
         "mode": "Major-1",
@@ -645,10 +690,11 @@
         "progression": 3,
         "padNotes": 4,
         "drums": {
-          "style": "lofi",
+          "style": "broken",
           "activity": 0.36,
           "variation": 0.64,
-          "sprinkle": 0.09
+          "sprinkle": 0.09,
+          "kit": "felt"
         },
         "swing": 0.25,
         "humanize": {
@@ -704,7 +750,11 @@
         "pad": "Lo-fi Tape Pad",
         "bass": "Felt Bass",
         "lead": "Warm Square Lead"
-      }
+      },
+      "isNew": true,
+      "tags": [
+        "updated"
+      ]
     },
     {
       "name": "Choir at sea",
@@ -1060,7 +1110,7 @@
     {
       "name": "Night drive",
       "category": "focus",
-      "blurb": "Pulsing analog chords in minor, a saw bass and a steady beat",
+      "blurb": "The familiar lo-fi night-drive groove, with rounded 808 drums and subdued metallic extras.",
       "settings": {
         "tonic": 2,
         "mode": "Major-6",
@@ -1085,7 +1135,8 @@
           "style": "lofi",
           "activity": 0.46,
           "variation": 0.57,
-          "sprinkle": 0.09
+          "sprinkle": 0.09,
+          "kit": "tr808"
         },
         "sections": {
           "mode": "gentle",
@@ -1116,13 +1167,55 @@
         "chordColour": {
           "mode": "add9",
           "amount": 0.2
+        },
+        "drumKit": {
+          "shaker": {
+            "level": 0.45
+          },
+          "hat": {
+            "level": 0.45
+          },
+          "swish": {
+            "level": 0.35
+          },
+          "ride": {
+            "level": 0.45
+          },
+          "crash": {
+            "level": 0.4
+          },
+          "bell": {
+            "level": 0.2
+          },
+          "snare": {
+            "level": 0.45
+          },
+          "kick": {
+            "level": 0.55
+          },
+          "brush": {
+            "level": 0.55
+          },
+          "rim": {
+            "level": 0.55
+          },
+          "tom": {
+            "level": 0.55
+          },
+          "clap": {
+            "level": 0.55
+          }
         }
       },
       "voices": {
         "pad": "Swelling Analog",
         "bass": "Analog Saw Bass",
         "lead": "Hollow Pulse"
-      }
+      },
+      "isNew": true,
+      "tags": [
+        "updated"
+      ]
     },
     {
       "name": "Quiet-room waltz",
@@ -6478,8 +6571,9 @@
     {
       "name": "Island Shop Hours",
       "category": "sandbox",
-      "blurb": "Easy daytime pop: soft keys, a bouncy bass and a marimba, nothing hurried",
+      "blurb": "Interlocking conga, bongo and seed shaker for the same sunny shop ensemble.",
       "tags": [
+        "updated",
         "animal-crossing",
         "lounge",
         "cozy"
@@ -6508,10 +6602,11 @@
           "drive": 0
         },
         "drums": {
-          "style": "shaker",
+          "style": "hand",
           "activity": 0.36,
           "variation": 0.485,
-          "sprinkle": 0.09
+          "sprinkle": 0.09,
+          "kit": "hand"
         },
         "swing": 0.3,
         "counter": {
@@ -6540,6 +6635,41 @@
         "sections": {
           "mode": "gentle",
           "phrases": 2
+        },
+        "drumKit": {
+          "kick": {
+            "level": 0.9
+          },
+          "brush": {
+            "level": 0.85
+          },
+          "shaker": {
+            "level": 0.75
+          },
+          "rim": {
+            "level": 0.65
+          },
+          "hat": {
+            "level": 0.55
+          },
+          "swish": {
+            "level": 0.5
+          },
+          "tom": {
+            "level": 0.8
+          },
+          "clap": {
+            "level": 0.7
+          },
+          "ride": {
+            "level": 0.55
+          },
+          "crash": {
+            "level": 0.4
+          },
+          "bell": {
+            "level": 0.55
+          }
         }
       },
       "voices": {
@@ -6547,7 +6677,8 @@
         "bass": "Rubber Bass",
         "lead": "Soft Marimba",
         "counter": "Kalimba Pluck"
-      }
+      },
+      "isNew": true
     },
     {
       "name": "Quiet Blocky Cave",
@@ -8440,8 +8571,9 @@
     {
       "name": "Pastel Coastline",
       "category": "electronic",
-      "blurb": "Jan Hammer / Crockett’s Theme spirit: a glassy FM melody, repeating keys, soft choir and a warm midnight pulse",
+      "blurb": "The original downbeat groove with rounded 808 drums and subdued metallic extras.",
       "tags": [
+        "updated",
         "electronic",
         "jan-hammer",
         "crockett",
@@ -8510,30 +8642,44 @@
           "activity": 0.15,
           "variation": 0.15,
           "sprinkle": 0.02,
-          "kit": "crisp"
+          "kit": "tr808"
         },
         "drumKit": {
-          "room": 0.12,
-          "punch": {
-            "level": 1,
-            "tone": -0.1
+          "kick": {
+            "tone": -0.1,
+            "level": 0.55
           },
-          "sizzle": {
-            "level": 0.5,
-            "decay": 0.8
-          },
-          "hat": {
-            "level": 0.5,
-            "decay": 0.8
-          },
-          "clap": {
-            "level": 0.6
+          "shaker": {
+            "level": 0.45
           },
           "rim": {
-            "level": 0.65
+            "level": 0.35
+          },
+          "hat": {
+            "level": 0.25,
+            "decay": 0.8
+          },
+          "swish": {
+            "level": 0.35
+          },
+          "clap": {
+            "level": 0.35
           },
           "ride": {
+            "level": 0.2
+          },
+          "crash": {
             "level": 0.4
+          },
+          "bell": {
+            "level": 0.2
+          },
+          "snare": {
+            "level": 0.45
+          },
+          "room": 0.12,
+          "tom": {
+            "level": 0.55
           }
         },
         "arpWeights": {
@@ -8591,7 +8737,8 @@
             "enabled": false
           }
         }
-      }
+      },
+      "isNew": true
     },
     {
       "name": "Amber Transit",
@@ -9466,7 +9613,7 @@
         "volumes": {
           "pad": 0.55,
           "lead": 0.52,
-          "counter": 0.22,
+          "counter": 0.13,
           "bass": 0.42,
           "perc": 0.2
         },
@@ -9541,6 +9688,2194 @@
     },
     {
       "name": "Lantern Circuit",
+      "category": "wasm",
+      "blurb": "The original electronic pulse with 808 bass drum, snare and quiet hats.",
+      "tags": [
+        "updated",
+        "wasm",
+        "new",
+        "synth laboratory"
+      ],
+      "settings": {
+        "tonic": 7,
+        "mode": "Major-1",
+        "bpm": 108,
+        "progression": 10,
+        "barsPerChord": 2,
+        "padNotes": 3,
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 80,
+          "arpeggio": 20,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 0,
+          "walking": 0,
+          "drive": 100
+        },
+        "leadActivity": 0.6,
+        "leadDensity": 0.2,
+        "leadLeaps": 0.2,
+        "leadRepeat": 0.8,
+        "chordColour": {
+          "mode": "plain",
+          "amount": 0
+        },
+        "chordBorrow": 0,
+        "humanize": {
+          "timing": 0,
+          "velocity": 0.03,
+          "detune": 0
+        },
+        "swing": 0,
+        "padMotion": {
+          "lean": 0.15,
+          "fast": 0,
+          "swell": 0.04
+        },
+        "counter": {
+          "mode": "line",
+          "activity": 0.25
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "sectionTone": false,
+        "volumes": {
+          "pad": 0.38,
+          "lead": 0.55,
+          "counter": 0.22,
+          "bass": 0.44,
+          "perc": 0.28
+        },
+        "drums": {
+          "style": "electro",
+          "activity": 0.1,
+          "variation": 0.05,
+          "sprinkle": 0,
+          "kit": "tr808"
+        },
+        "drumKit": {
+          "kick": {
+            "tone": -0.1,
+            "level": 0.55
+          },
+          "shaker": {
+            "level": 0.45
+          },
+          "rim": {
+            "level": 0.35
+          },
+          "hat": {
+            "level": 0.25,
+            "decay": 0.8
+          },
+          "swish": {
+            "level": 0.35
+          },
+          "clap": {
+            "level": 0.35
+          },
+          "ride": {
+            "level": 0.2
+          },
+          "crash": {
+            "level": 0.4
+          },
+          "bell": {
+            "level": 0.2
+          },
+          "snare": {
+            "level": 0.45
+          },
+          "room": 0.12,
+          "tom": {
+            "level": 0.55
+          }
+        },
+        "arpWeights": {
+          "bounce": 20,
+          "up": 15,
+          "down": 10,
+          "broken": 55
+        },
+        "pulseWeights": {
+          "groups": 0,
+          "beats": 0,
+          "push": 0,
+          "split": 100
+        },
+        "ambience": {
+          "rain": 0,
+          "thunder": 0
+        },
+        "playAmbience": false,
+        "thinPadUnderLead": false
+      },
+      "voices": {
+        "pad": "Wasm Drawbars",
+        "lead": "Wasm Tine Keys",
+        "counter": "Wasm DCO Foundation",
+        "bass": "Wasm Round FM Bass"
+      },
+      "isNew": true
+    },
+    {
+      "name": "Morning coffee · Bossa",
+      "category": "cozy",
+      "blurb": "Hand congas and a quiet bossa clave under the same coffee-house keys.",
+      "settings": {
+        "tonic": 0,
+        "mode": "Major-1",
+        "bpm": 94,
+        "progression": 1,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 26,
+          "pulse": 52,
+          "arpeggio": 16,
+          "sequence": 0,
+          "rolled": 6,
+          "stacked": 0
+        },
+        "drums": {
+          "style": "bossa",
+          "activity": 0.31,
+          "variation": 0.57,
+          "sprinkle": 0.09,
+          "kit": "hand"
+        },
+        "swing": 0.2,
+        "leadActivity": 0.56,
+        "leadDensity": 0.24,
+        "leadLeaps": 0.34,
+        "leadRepeat": 0.38,
+        "humanize": {
+          "timing": 11,
+          "velocity": 0.1,
+          "detune": 1
+        },
+        "bassWeights": {
+          "whole": 42,
+          "half": 50,
+          "walking": 8,
+          "drive": 0
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "chordColour": {
+          "mode": "add6",
+          "amount": 0.2
+        },
+        "drumKit": {
+          "kick": {
+            "level": 1.35
+          },
+          "brush": {
+            "level": 1.25
+          },
+          "shaker": {
+            "level": 1.1
+          },
+          "rim": {
+            "level": 1.0
+          },
+          "hat": {
+            "level": 0.8
+          },
+          "swish": {
+            "level": 0.75
+          },
+          "tom": {
+            "level": 1.2
+          },
+          "clap": {
+            "level": 1.05
+          },
+          "ride": {
+            "level": 0.8
+          },
+          "crash": {
+            "level": 0.6
+          },
+          "bell": {
+            "level": 0.8
+          }
+        }
+      },
+      "voices": {
+        "pad": "Soft Keys",
+        "bass": "Round Pluck Bass",
+        "lead": "Kalimba Pluck"
+      },
+      "comparisonOf": "Morning coffee",
+      "isNew": true,
+      "tags": [
+        "updated",
+        "percussion",
+        "hand",
+        "bossa"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "Late-night brushes · Jazz",
+      "category": "cozy",
+      "blurb": "Soft organ pipes over electric-piano ninths and a restrained felt jazz groove.",
+      "settings": {
+        "tonic": 5,
+        "mode": "Major-2",
+        "bpm": 84,
+        "progression": 16,
+        "padNotes": 5,
+        "barsPerChord": 2,
+        "padWeights": {
+          "sustain": 42,
+          "pulse": 32,
+          "arpeggio": 18,
+          "sequence": 0,
+          "rolled": 8,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 10,
+          "half": 30,
+          "walking": 60,
+          "drive": 0
+        },
+        "drums": {
+          "style": "jazz",
+          "activity": 0.56,
+          "variation": 0.64,
+          "sprinkle": 0.09,
+          "kit": "felt"
+        },
+        "swing": 0.5,
+        "counter": {
+          "mode": "answer",
+          "activity": 0.44
+        },
+        "ambience": {
+          "fire": 0.3
+        },
+        "playAmbience": true,
+        "leadActivity": 0.56,
+        "leadDensity": 0.22,
+        "leadLeaps": 0.36,
+        "leadRepeat": 0.32,
+        "humanize": {
+          "timing": 15,
+          "velocity": 0.11,
+          "detune": 2
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.5,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.2
+        },
+        "ambienceVolume": 0.66
+      },
+      "voices": {
+        "pad": "FM Rhodes",
+        "bass": "FM Bass",
+        "lead": "Wasm Soft Pipes",
+        "counter": "Soft Flute"
+      },
+      "comparisonOf": "Late-night brushes",
+      "isNew": true,
+      "tags": [
+        "updated",
+        "percussion",
+        "felt",
+        "jazz"
+      ],
+      "comparisonSource": "Late-night brushes (previous)",
+      "hidden": true
+    },
+    {
+      "name": "Late Show Lounge · Jazz",
+      "category": "podcast",
+      "blurb": "Quiet ride-led jazz comping for the existing talk-friendly lounge ensemble.",
+      "settings": {
+        "tonic": 5,
+        "mode": "Major-2",
+        "bpm": 88,
+        "progression": 16,
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "leadActivity": 0.1,
+        "padWeights": {
+          "sustain": 58,
+          "pulse": 30,
+          "arpeggio": 8,
+          "sequence": 0,
+          "rolled": 4,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 30,
+          "half": 70,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "jazz",
+          "activity": 0.21,
+          "variation": 0.485,
+          "sprinkle": 0.03,
+          "kit": "felt"
+        },
+        "swing": 0.4,
+        "leadDensity": 0.07,
+        "leadLeaps": 0.24,
+        "leadRepeat": 0.5,
+        "humanize": {
+          "timing": 9,
+          "velocity": 0.07,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.12,
+          "fast": 0,
+          "swell": 0.025
+        },
+        "volumes": {
+          "pad": 0.73,
+          "bass": 0.66,
+          "lead": 0.48,
+          "counter": 0.4,
+          "perc": 0.38
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        }
+      },
+      "voices": {
+        "pad": "FM Rhodes",
+        "bass": "Upright Pluck",
+        "lead": "Soft Flute"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "lead-pickups": {
+            "enabled": false
+          },
+          "lead-transitions": {
+            "enabled": false
+          },
+          "section-suspensions": {
+            "enabled": false
+          },
+          "section-gestures": {
+            "enabled": false
+          },
+          "section-cadences": {
+            "enabled": false
+          }
+        }
+      },
+      "comparisonOf": "Late Show Lounge",
+      "isNew": true,
+      "tags": [
+        "updated",
+        "percussion",
+        "felt",
+        "jazz"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "Island Shop Hours · Hand groove",
+      "category": "sandbox",
+      "blurb": "Interlocking conga, bongo and seed shaker for the same sunny shop ensemble.",
+      "tags": [
+        "updated",
+        "percussion",
+        "hand",
+        "animal-crossing",
+        "lounge",
+        "cozy"
+      ],
+      "settings": {
+        "tonic": 5,
+        "mode": "Major-1",
+        "bpm": 100,
+        "progression": 16,
+        "barsPerChord": 1,
+        "padNotes": 4,
+        "leadActivity": 0.46,
+        "leadDensity": 0.34,
+        "padWeights": {
+          "sustain": 26,
+          "pulse": 52,
+          "arpeggio": 16,
+          "sequence": 0,
+          "rolled": 6,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 10,
+          "half": 50,
+          "walking": 40,
+          "drive": 0
+        },
+        "drums": {
+          "style": "hand",
+          "activity": 0.36,
+          "variation": 0.485,
+          "sprinkle": 0.09,
+          "kit": "hand"
+        },
+        "swing": 0.3,
+        "counter": {
+          "mode": "answer",
+          "activity": 0.34
+        },
+        "leadLeaps": 0.3,
+        "leadRepeat": 0.44,
+        "humanize": {
+          "timing": 11,
+          "velocity": 0.1,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.36,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "drumKit": {
+          "kick": {
+            "level": 0.9
+          },
+          "brush": {
+            "level": 0.85
+          },
+          "shaker": {
+            "level": 0.75
+          },
+          "rim": {
+            "level": 0.65
+          },
+          "hat": {
+            "level": 0.55
+          },
+          "swish": {
+            "level": 0.5
+          },
+          "tom": {
+            "level": 0.8
+          },
+          "clap": {
+            "level": 0.7
+          },
+          "ride": {
+            "level": 0.55
+          },
+          "crash": {
+            "level": 0.4
+          },
+          "bell": {
+            "level": 0.55
+          }
+        }
+      },
+      "voices": {
+        "pad": "Soft Keys",
+        "bass": "Rubber Bass",
+        "lead": "Soft Marimba",
+        "counter": "Kalimba Pluck"
+      },
+      "comparisonOf": "Island Shop Hours",
+      "isNew": true,
+      "comparisonSource": "Island Shop Hours (previous)",
+      "hidden": true
+    },
+    {
+      "name": "Desert dusk · Hand groove",
+      "category": "unsettling",
+      "blurb": "Rounded hand drums under clarinet and kalimba, with shorter chord holds and section cycles.",
+      "settings": {
+        "tonic": 4,
+        "mode": "Harmonic Minor-5",
+        "bpm": 70,
+        "progression": 13,
+        "barsPerChord": 1,
+        "padWeights": {
+          "sustain": 30,
+          "pulse": 20,
+          "arpeggio": 50,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "drums": {
+          "style": "hand",
+          "activity": 0.46,
+          "variation": 0.57,
+          "sprinkle": 0.06,
+          "kit": "hand"
+        },
+        "ambience": {
+          "wind": 0.35
+        },
+        "playAmbience": true,
+        "leadActivity": 0.52,
+        "leadDensity": 0.16,
+        "leadLeaps": 0.34,
+        "leadRepeat": 0.38,
+        "humanize": {
+          "timing": 10,
+          "velocity": 0.09,
+          "detune": 2
+        },
+        "bassWeights": {
+          "whole": 84,
+          "half": 16,
+          "walking": 0,
+          "drive": 0
+        },
+        "padMotion": {
+          "lean": 0.22,
+          "fast": 0.04,
+          "swell": 0.08
+        },
+        "volumes": {
+          "pad": 0.78,
+          "bass": 0.73,
+          "lead": 0.62,
+          "counter": 0.48,
+          "perc": 0.44
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "ambienceVolume": 0.72,
+        "drumKit": {
+          "kick": {
+            "level": 0.9
+          },
+          "brush": {
+            "level": 0.85
+          },
+          "shaker": {
+            "level": 0.75
+          },
+          "rim": {
+            "level": 0.65
+          },
+          "hat": {
+            "level": 0.55
+          },
+          "swish": {
+            "level": 0.5
+          },
+          "tom": {
+            "level": 0.8
+          },
+          "clap": {
+            "level": 0.7
+          },
+          "ride": {
+            "level": 0.55
+          },
+          "crash": {
+            "level": 0.4
+          },
+          "bell": {
+            "level": 0.55
+          }
+        }
+      },
+      "voices": {
+        "pad": "Kalimba Pluck",
+        "bass": "Warm Bass",
+        "lead": "Clarinet Lead"
+      },
+      "comparisonOf": "Desert dusk",
+      "isNew": true,
+      "tags": [
+        "updated",
+        "percussion",
+        "hand"
+      ],
+      "comparisonSource": "Desert dusk (previous)",
+      "hidden": true
+    },
+    {
+      "name": "Deep night · Ambient percussion",
+      "category": "night",
+      "blurb": "Isolated felt taps and soft swells in place of the repeating heartbeat.",
+      "settings": {
+        "tonic": 9,
+        "mode": "Major-6",
+        "bpm": 58,
+        "progression": 6,
+        "barsPerChord": 2,
+        "leadActivity": 0.36,
+        "drums": {
+          "style": "ambient",
+          "activity": 0.36,
+          "variation": 0.485,
+          "sprinkle": 0.06,
+          "kit": "felt"
+        },
+        "sections": {
+          "mode": "strong",
+          "phrases": 2
+        },
+        "sectionTone": true,
+        "ambience": {
+          "rain": 0.3,
+          "thunder": 0.25
+        },
+        "playAmbience": true,
+        "leadDensity": 0.08,
+        "leadLeaps": 0.3,
+        "leadRepeat": 0.42,
+        "humanize": {
+          "timing": 9,
+          "velocity": 0.07,
+          "detune": 2
+        },
+        "padWeights": {
+          "sustain": 60,
+          "pulse": 28,
+          "arpeggio": 12,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 84,
+          "half": 16,
+          "walking": 0,
+          "drive": 0
+        },
+        "padMotion": {
+          "lean": 0.22,
+          "fast": 0.04,
+          "swell": 0.08
+        },
+        "volumes": {
+          "pad": 0.78,
+          "bass": 0.73,
+          "lead": 0.62,
+          "counter": 0.48,
+          "perc": 0.44
+        },
+        "ambienceVolume": 0.72
+      },
+      "voices": {
+        "pad": "Breathing Pad",
+        "bass": "Sub Bass",
+        "lead": "FM Bell"
+      },
+      "comparisonOf": "Deep night",
+      "isNew": true,
+      "tags": [
+        "updated",
+        "percussion",
+        "felt",
+        "ambient"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "Tape memories · Broken beat",
+      "category": "cozy",
+      "blurb": "The same soft felt drums with a spacious displaced backbeat.",
+      "settings": {
+        "tonic": 10,
+        "mode": "Major-1",
+        "bpm": 72,
+        "progression": 3,
+        "padNotes": 4,
+        "drums": {
+          "style": "broken",
+          "activity": 0.36,
+          "variation": 0.64,
+          "sprinkle": 0.09,
+          "kit": "felt"
+        },
+        "swing": 0.25,
+        "humanize": {
+          "timing": 16,
+          "velocity": 0.11,
+          "detune": 4
+        },
+        "ambience": {
+          "vinyl": 0.45
+        },
+        "playAmbience": true,
+        "leadActivity": 0.54,
+        "leadDensity": 0.14,
+        "leadLeaps": 0.3,
+        "leadRepeat": 0.44,
+        "padWeights": {
+          "sustain": 52,
+          "pulse": 30,
+          "arpeggio": 12,
+          "sequence": 0,
+          "rolled": 6,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 42,
+          "half": 50,
+          "walking": 8,
+          "drive": 0
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.2
+        },
+        "ambienceVolume": 0.66
+      },
+      "voices": {
+        "pad": "Lo-fi Tape Pad",
+        "bass": "Felt Bass",
+        "lead": "Warm Square Lead"
+      },
+      "comparisonOf": "Tape memories",
+      "isNew": true,
+      "tags": [
+        "updated",
+        "percussion",
+        "felt",
+        "broken"
+      ],
+      "comparisonSource": "Tape memories (previous)",
+      "hidden": true
+    },
+    {
+      "name": "Night drive · 808",
+      "category": "focus",
+      "blurb": "The familiar lo-fi night-drive groove, with rounded 808 drums and subdued metallic extras.",
+      "settings": {
+        "tonic": 2,
+        "mode": "Major-6",
+        "bpm": 88,
+        "progression": 8,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 20,
+          "pulse": 70,
+          "arpeggio": 10,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 20,
+          "half": 70,
+          "walking": 10,
+          "drive": 0
+        },
+        "drums": {
+          "style": "lofi",
+          "activity": 0.46,
+          "variation": 0.57,
+          "sprinkle": 0.09,
+          "kit": "tr808"
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "leadActivity": 0.55,
+        "leadDensity": 0.24,
+        "leadLeaps": 0.34,
+        "leadRepeat": 0.42,
+        "humanize": {
+          "timing": 6,
+          "velocity": 0.08,
+          "detune": 2
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.2
+        },
+        "drumKit": {
+          "shaker": {
+            "level": 0.45
+          },
+          "hat": {
+            "level": 0.45
+          },
+          "swish": {
+            "level": 0.35
+          },
+          "ride": {
+            "level": 0.45
+          },
+          "crash": {
+            "level": 0.4
+          },
+          "bell": {
+            "level": 0.2
+          },
+          "snare": {
+            "level": 0.45
+          },
+          "kick": {
+            "level": 0.55
+          },
+          "brush": {
+            "level": 0.55
+          },
+          "rim": {
+            "level": 0.55
+          },
+          "tom": {
+            "level": 0.55
+          },
+          "clap": {
+            "level": 0.55
+          }
+        }
+      },
+      "voices": {
+        "pad": "Swelling Analog",
+        "bass": "Analog Saw Bass",
+        "lead": "Hollow Pulse"
+      },
+      "comparisonOf": "Night drive",
+      "isNew": true,
+      "tags": [
+        "updated",
+        "percussion",
+        "tr808",
+        "broken"
+      ],
+      "comparisonSource": "Night drive (previous)",
+      "hidden": true
+    },
+    {
+      "name": "Pastel Coastline · 808",
+      "category": "electronic",
+      "blurb": "The original downbeat groove with rounded 808 drums and subdued metallic extras.",
+      "tags": [
+        "updated",
+        "percussion",
+        "tr808",
+        "downtempo",
+        "electronic",
+        "jan-hammer",
+        "crockett",
+        "synth-pop",
+        "nostalgic"
+      ],
+      "settings": {
+        "tonic": 6,
+        "mode": "Major-6",
+        "bpm": 100,
+        "progression": 8,
+        "barsPerChord": 2,
+        "padNotes": 3,
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 0,
+          "arpeggio": 100,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 10,
+          "half": 70,
+          "walking": 0,
+          "drive": 20
+        },
+        "leadActivity": 0.7,
+        "leadDensity": 0.15,
+        "leadLeaps": 0.3,
+        "leadRepeat": 0.7,
+        "chordColour": {
+          "mode": "plain",
+          "amount": 0
+        },
+        "chordBorrow": 0,
+        "humanize": {
+          "timing": 3,
+          "velocity": 0.07,
+          "detune": 1
+        },
+        "swing": 0,
+        "padMotion": {
+          "lean": 0.15,
+          "fast": 0,
+          "swell": 0.04
+        },
+        "counter": {
+          "mode": "line",
+          "activity": 0.12
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "volumes": {
+          "pad": 0.44,
+          "bass": 0.48,
+          "lead": 0.62,
+          "counter": 0.18,
+          "perc": 0.3
+        },
+        "drums": {
+          "style": "downtempo",
+          "activity": 0.15,
+          "variation": 0.15,
+          "sprinkle": 0.02,
+          "kit": "tr808"
+        },
+        "drumKit": {
+          "kick": {
+            "tone": -0.1,
+            "level": 0.55
+          },
+          "shaker": {
+            "level": 0.45
+          },
+          "rim": {
+            "level": 0.35
+          },
+          "hat": {
+            "level": 0.25,
+            "decay": 0.8
+          },
+          "swish": {
+            "level": 0.35
+          },
+          "clap": {
+            "level": 0.35
+          },
+          "ride": {
+            "level": 0.2
+          },
+          "crash": {
+            "level": 0.4
+          },
+          "bell": {
+            "level": 0.2
+          },
+          "snare": {
+            "level": 0.45
+          },
+          "room": 0.12,
+          "tom": {
+            "level": 0.55
+          }
+        },
+        "arpWeights": {
+          "bounce": 20,
+          "up": 15,
+          "down": 10,
+          "broken": 55
+        },
+        "pulseWeights": {
+          "groups": 30,
+          "beats": 40,
+          "push": 0,
+          "split": 30
+        },
+        "ambience": {},
+        "playAmbience": false,
+        "voices": {
+          "lead": {
+            "octave": -1,
+            "wander": "off",
+            "chance": 0.3
+          },
+          "counter": {
+            "octave": -1,
+            "wander": "off",
+            "chance": 0.3
+          }
+        }
+      },
+      "voices": {
+        "pad": "Tine Keys",
+        "bass": "Neon Pulse Bass",
+        "lead": "Coastal FM Lead",
+        "counter": "Breathy Choir"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "tempo-effects": {
+            "enabled": true
+          },
+          "melodic-slides": {
+            "enabled": false
+          },
+          "chord-slides": {
+            "enabled": false
+          },
+          "pad-pitch-motion": {
+            "enabled": false
+          },
+          "bass-pitch-motion": {
+            "enabled": false
+          },
+          "gate-envelopes": {
+            "enabled": false
+          }
+        }
+      },
+      "comparisonOf": "Pastel Coastline",
+      "isNew": true,
+      "comparisonSource": "Pastel Coastline (previous)",
+      "hidden": true
+    },
+    {
+      "name": "Pocket Circuit · 808",
+      "category": "electronic",
+      "blurb": "The original machine-pop beat, voiced by a balanced 808 kit.",
+      "tags": [
+        "updated",
+        "percussion",
+        "tr808",
+        "electro",
+        "electronic",
+        "kraftwerk",
+        "machine-pop",
+        "motorik"
+      ],
+      "settings": {
+        "tonic": 7,
+        "mode": "Major-1",
+        "bpm": 116,
+        "progression": 10,
+        "barsPerChord": 2,
+        "padNotes": 3,
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 100,
+          "arpeggio": 0,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 0,
+          "walking": 0,
+          "drive": 100
+        },
+        "leadActivity": 0.6,
+        "leadDensity": 0.15,
+        "leadLeaps": 0.2,
+        "leadRepeat": 0.8,
+        "chordColour": {
+          "mode": "plain",
+          "amount": 0
+        },
+        "chordBorrow": 0,
+        "humanize": {
+          "timing": 0,
+          "velocity": 0.03,
+          "detune": 0
+        },
+        "swing": 0,
+        "padMotion": {
+          "lean": 0.15,
+          "fast": 0,
+          "swell": 0.04
+        },
+        "counter": {
+          "mode": "answer",
+          "activity": 0.15
+        },
+        "sections": {
+          "mode": "off",
+          "phrases": 4
+        },
+        "sectionTone": false,
+        "volumes": {
+          "pad": 0.4,
+          "bass": 0.46,
+          "lead": 0.5,
+          "counter": 0.2,
+          "perc": 0.28
+        },
+        "drums": {
+          "style": "electro",
+          "activity": 0.1,
+          "variation": 0.05,
+          "sprinkle": 0,
+          "kit": "tr808"
+        },
+        "drumKit": {
+          "kick": {
+            "tone": -0.1,
+            "level": 0.55
+          },
+          "shaker": {
+            "level": 0.45
+          },
+          "rim": {
+            "level": 0.35
+          },
+          "hat": {
+            "level": 0.25,
+            "decay": 0.8
+          },
+          "swish": {
+            "level": 0.35
+          },
+          "clap": {
+            "level": 0.35
+          },
+          "ride": {
+            "level": 0.2
+          },
+          "crash": {
+            "level": 0.4
+          },
+          "bell": {
+            "level": 0.2
+          },
+          "snare": {
+            "level": 0.45
+          },
+          "room": 0.12,
+          "tom": {
+            "level": 0.55
+          }
+        },
+        "arpWeights": {
+          "bounce": 20,
+          "up": 15,
+          "down": 10,
+          "broken": 55
+        },
+        "pulseWeights": {
+          "groups": 0,
+          "beats": 0,
+          "push": 0,
+          "split": 100
+        },
+        "ambience": {},
+        "playAmbience": false,
+        "thinPadUnderLead": false
+      },
+      "voices": {
+        "pad": "Warm Organ",
+        "bass": "Seq Bass",
+        "lead": "Hollow Pulse",
+        "counter": "Music Box"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "tempo-effects": {
+            "enabled": true
+          },
+          "melodic-slides": {
+            "enabled": false
+          },
+          "chord-slides": {
+            "enabled": false
+          },
+          "pad-pitch-motion": {
+            "enabled": false
+          },
+          "bass-pitch-motion": {
+            "enabled": false
+          },
+          "gate-envelopes": {
+            "enabled": false
+          }
+        }
+      },
+      "comparisonOf": "Pocket Circuit",
+      "isNew": true,
+      "hidden": true
+    },
+    {
+      "name": "Tine and Tide · Broken beat",
+      "category": "wasm",
+      "blurb": "The existing crisp palette and FM tines with a more open broken-beat pattern.",
+      "tags": [
+        "updated",
+        "percussion",
+        "crisp",
+        "broken",
+        "wasm",
+        "new",
+        "synth laboratory"
+      ],
+      "settings": {
+        "tonic": 6,
+        "mode": "Major-6",
+        "bpm": 86,
+        "progression": 8,
+        "barsPerChord": 2,
+        "padNotes": 3,
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 0,
+          "arpeggio": 100,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 10,
+          "half": 70,
+          "walking": 0,
+          "drive": 20
+        },
+        "leadActivity": 0.5,
+        "leadDensity": 0.12,
+        "leadLeaps": 0.3,
+        "leadRepeat": 0.7,
+        "chordColour": {
+          "mode": "plain",
+          "amount": 0
+        },
+        "chordBorrow": 0,
+        "humanize": {
+          "timing": 3,
+          "velocity": 0.07,
+          "detune": 1
+        },
+        "swing": 0,
+        "padMotion": {
+          "lean": 0.12,
+          "fast": 0,
+          "swell": 0.04
+        },
+        "counter": {
+          "mode": "answer",
+          "activity": 0.18
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "volumes": {
+          "pad": 0.55,
+          "lead": 0.52,
+          "counter": 0.13,
+          "bass": 0.42,
+          "perc": 0.2
+        },
+        "drums": {
+          "style": "broken",
+          "activity": 0.15,
+          "variation": 0.15,
+          "sprinkle": 0.02,
+          "kit": "crisp"
+        },
+        "drumKit": {
+          "rim": {
+            "level": 0.65
+          },
+          "hat": {
+            "level": 0.5,
+            "decay": 0.8
+          },
+          "clap": {
+            "level": 0.6
+          },
+          "ride": {
+            "level": 0.4
+          },
+          "punch": {
+            "tone": -0.1
+          },
+          "sizzle": {
+            "level": 0.5,
+            "decay": 0.8
+          },
+          "room": 0.12
+        },
+        "arpWeights": {
+          "bounce": 20,
+          "up": 15,
+          "down": 10,
+          "broken": 55
+        },
+        "pulseWeights": {
+          "groups": 30,
+          "beats": 40,
+          "push": 0,
+          "split": 30
+        },
+        "ambience": {
+          "rain": 0,
+          "thunder": 0
+        },
+        "playAmbience": false,
+        "voices": {
+          "lead": {
+            "octave": -1,
+            "wander": "off",
+            "chance": 0.3
+          },
+          "counter": {
+            "octave": -1,
+            "wander": "off",
+            "chance": 0.3
+          }
+        }
+      },
+      "voices": {
+        "pad": "Wasm Tine Keys",
+        "lead": "Wasm Glass Bells",
+        "counter": "Wasm Soft Pipes",
+        "bass": "Wasm Round FM Bass"
+      },
+      "isNew": true,
+      "comparisonOf": "Tine and Tide",
+      "hidden": true
+    },
+    {
+      "name": "Lantern Circuit · 808",
+      "category": "wasm",
+      "blurb": "The original electronic pulse with 808 bass drum, snare and quiet hats.",
+      "tags": [
+        "updated",
+        "percussion",
+        "tr808",
+        "electro",
+        "wasm",
+        "new",
+        "synth laboratory"
+      ],
+      "settings": {
+        "tonic": 7,
+        "mode": "Major-1",
+        "bpm": 108,
+        "progression": 10,
+        "barsPerChord": 2,
+        "padNotes": 3,
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 80,
+          "arpeggio": 20,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 0,
+          "walking": 0,
+          "drive": 100
+        },
+        "leadActivity": 0.6,
+        "leadDensity": 0.2,
+        "leadLeaps": 0.2,
+        "leadRepeat": 0.8,
+        "chordColour": {
+          "mode": "plain",
+          "amount": 0
+        },
+        "chordBorrow": 0,
+        "humanize": {
+          "timing": 0,
+          "velocity": 0.03,
+          "detune": 0
+        },
+        "swing": 0,
+        "padMotion": {
+          "lean": 0.15,
+          "fast": 0,
+          "swell": 0.04
+        },
+        "counter": {
+          "mode": "line",
+          "activity": 0.25
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "sectionTone": false,
+        "volumes": {
+          "pad": 0.38,
+          "lead": 0.55,
+          "counter": 0.22,
+          "bass": 0.44,
+          "perc": 0.28
+        },
+        "drums": {
+          "style": "electro",
+          "activity": 0.1,
+          "variation": 0.05,
+          "sprinkle": 0,
+          "kit": "tr808"
+        },
+        "drumKit": {
+          "kick": {
+            "tone": -0.1,
+            "level": 0.55
+          },
+          "shaker": {
+            "level": 0.45
+          },
+          "rim": {
+            "level": 0.35
+          },
+          "hat": {
+            "level": 0.25,
+            "decay": 0.8
+          },
+          "swish": {
+            "level": 0.35
+          },
+          "clap": {
+            "level": 0.35
+          },
+          "ride": {
+            "level": 0.2
+          },
+          "crash": {
+            "level": 0.4
+          },
+          "bell": {
+            "level": 0.2
+          },
+          "snare": {
+            "level": 0.45
+          },
+          "room": 0.12,
+          "tom": {
+            "level": 0.55
+          }
+        },
+        "arpWeights": {
+          "bounce": 20,
+          "up": 15,
+          "down": 10,
+          "broken": 55
+        },
+        "pulseWeights": {
+          "groups": 0,
+          "beats": 0,
+          "push": 0,
+          "split": 100
+        },
+        "ambience": {
+          "rain": 0,
+          "thunder": 0
+        },
+        "playAmbience": false,
+        "thinPadUnderLead": false
+      },
+      "voices": {
+        "pad": "Wasm Drawbars",
+        "lead": "Wasm Tine Keys",
+        "counter": "Wasm DCO Foundation",
+        "bass": "Wasm Round FM Bass"
+      },
+      "isNew": true,
+      "comparisonOf": "Lantern Circuit",
+      "comparisonSource": "Lantern Circuit (previous)",
+      "hidden": true
+    },
+    {
+      "name": "Late-night brushes (previous)",
+      "category": "cozy",
+      "blurb": "Electric piano ninths, a walking bass and brushes, by the fire",
+      "settings": {
+        "tonic": 5,
+        "mode": "Major-2",
+        "bpm": 84,
+        "progression": 16,
+        "padNotes": 5,
+        "barsPerChord": 2,
+        "padWeights": {
+          "sustain": 42,
+          "pulse": 32,
+          "arpeggio": 18,
+          "sequence": 0,
+          "rolled": 8,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 10,
+          "half": 30,
+          "walking": 60,
+          "drive": 0
+        },
+        "drums": {
+          "style": "brushes",
+          "activity": 0.56,
+          "variation": 0.64,
+          "sprinkle": 0.09
+        },
+        "swing": 0.5,
+        "counter": {
+          "mode": "answer",
+          "activity": 0.44
+        },
+        "ambience": {
+          "fire": 0.3
+        },
+        "playAmbience": true,
+        "leadActivity": 0.56,
+        "leadDensity": 0.22,
+        "leadLeaps": 0.36,
+        "leadRepeat": 0.32,
+        "humanize": {
+          "timing": 15,
+          "velocity": 0.11,
+          "detune": 2
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.2
+        },
+        "ambienceVolume": 0.66
+      },
+      "voices": {
+        "pad": "FM Rhodes",
+        "bass": "FM Bass",
+        "lead": "Organ Whistle",
+        "counter": "Soft Flute"
+      },
+      "hidden": true
+    },
+    {
+      "name": "Island Shop Hours (previous)",
+      "category": "sandbox",
+      "blurb": "Easy daytime pop: soft keys, a bouncy bass and a marimba, nothing hurried",
+      "tags": [
+        "animal-crossing",
+        "lounge",
+        "cozy"
+      ],
+      "settings": {
+        "tonic": 5,
+        "mode": "Major-1",
+        "bpm": 100,
+        "progression": 16,
+        "barsPerChord": 1,
+        "padNotes": 4,
+        "leadActivity": 0.46,
+        "leadDensity": 0.34,
+        "padWeights": {
+          "sustain": 26,
+          "pulse": 52,
+          "arpeggio": 16,
+          "sequence": 0,
+          "rolled": 6,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 10,
+          "half": 50,
+          "walking": 40,
+          "drive": 0
+        },
+        "drums": {
+          "style": "shaker",
+          "activity": 0.36,
+          "variation": 0.485,
+          "sprinkle": 0.09
+        },
+        "swing": 0.3,
+        "counter": {
+          "mode": "answer",
+          "activity": 0.34
+        },
+        "leadLeaps": 0.3,
+        "leadRepeat": 0.44,
+        "humanize": {
+          "timing": 11,
+          "velocity": 0.1,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.36,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        }
+      },
+      "voices": {
+        "pad": "Soft Keys",
+        "bass": "Rubber Bass",
+        "lead": "Soft Marimba",
+        "counter": "Kalimba Pluck"
+      },
+      "hidden": true
+    },
+    {
+      "name": "Desert dusk (previous)",
+      "category": "unsettling",
+      "blurb": "Phrygian dominant: kalimba and clarinet over a heartbeat and wind",
+      "settings": {
+        "tonic": 4,
+        "mode": "Harmonic Minor-5",
+        "bpm": 70,
+        "progression": 13,
+        "barsPerChord": 2,
+        "padWeights": {
+          "sustain": 30,
+          "pulse": 20,
+          "arpeggio": 50,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "drums": {
+          "style": "heartbeat",
+          "activity": 0.46,
+          "variation": 0.57,
+          "sprinkle": 0.06
+        },
+        "ambience": {
+          "wind": 0.35
+        },
+        "playAmbience": true,
+        "leadActivity": 0.52,
+        "leadDensity": 0.16,
+        "leadLeaps": 0.34,
+        "leadRepeat": 0.38,
+        "humanize": {
+          "timing": 10,
+          "velocity": 0.09,
+          "detune": 2
+        },
+        "bassWeights": {
+          "whole": 84,
+          "half": 16,
+          "walking": 0,
+          "drive": 0
+        },
+        "padMotion": {
+          "lean": 0.22,
+          "fast": 0.04,
+          "swell": 0.08
+        },
+        "volumes": {
+          "pad": 0.78,
+          "bass": 0.73,
+          "lead": 0.62,
+          "counter": 0.48,
+          "perc": 0.44
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "ambienceVolume": 0.72
+      },
+      "voices": {
+        "pad": "Kalimba Pluck",
+        "bass": "Warm Bass",
+        "lead": "Clarinet Lead"
+      },
+      "hidden": true
+    },
+    {
+      "name": "Tape memories (previous)",
+      "category": "cozy",
+      "blurb": "A worn tape pad and a square lead, a dusty beat and vinyl",
+      "settings": {
+        "tonic": 10,
+        "mode": "Major-1",
+        "bpm": 72,
+        "progression": 3,
+        "padNotes": 4,
+        "drums": {
+          "style": "lofi",
+          "activity": 0.36,
+          "variation": 0.64,
+          "sprinkle": 0.09
+        },
+        "swing": 0.25,
+        "humanize": {
+          "timing": 16,
+          "velocity": 0.11,
+          "detune": 4
+        },
+        "ambience": {
+          "vinyl": 0.45
+        },
+        "playAmbience": true,
+        "leadActivity": 0.54,
+        "leadDensity": 0.14,
+        "leadLeaps": 0.3,
+        "leadRepeat": 0.44,
+        "padWeights": {
+          "sustain": 52,
+          "pulse": 30,
+          "arpeggio": 12,
+          "sequence": 0,
+          "rolled": 6,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 42,
+          "half": 50,
+          "walking": 8,
+          "drive": 0
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.2
+        },
+        "ambienceVolume": 0.66
+      },
+      "voices": {
+        "pad": "Lo-fi Tape Pad",
+        "bass": "Felt Bass",
+        "lead": "Warm Square Lead"
+      },
+      "hidden": true
+    },
+    {
+      "name": "Night drive (previous)",
+      "category": "focus",
+      "blurb": "Pulsing analog chords in minor, a saw bass and a steady beat",
+      "settings": {
+        "tonic": 2,
+        "mode": "Major-6",
+        "bpm": 88,
+        "progression": 8,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 20,
+          "pulse": 70,
+          "arpeggio": 10,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 20,
+          "half": 70,
+          "walking": 10,
+          "drive": 0
+        },
+        "drums": {
+          "style": "lofi",
+          "activity": 0.46,
+          "variation": 0.57,
+          "sprinkle": 0.09
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "leadActivity": 0.55,
+        "leadDensity": 0.24,
+        "leadLeaps": 0.34,
+        "leadRepeat": 0.42,
+        "humanize": {
+          "timing": 6,
+          "velocity": 0.08,
+          "detune": 2
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.2
+        }
+      },
+      "voices": {
+        "pad": "Swelling Analog",
+        "bass": "Analog Saw Bass",
+        "lead": "Hollow Pulse"
+      },
+      "hidden": true
+    },
+    {
+      "name": "Night drive · 808 broken beat",
+      "category": "focus",
+      "blurb": "A restrained 808 bass drum and broken backbeat for the original night-drive sounds.",
+      "settings": {
+        "tonic": 2,
+        "mode": "Major-6",
+        "bpm": 88,
+        "progression": 8,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 20,
+          "pulse": 70,
+          "arpeggio": 10,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 20,
+          "half": 70,
+          "walking": 10,
+          "drive": 0
+        },
+        "drums": {
+          "style": "broken",
+          "activity": 0.46,
+          "variation": 0.57,
+          "sprinkle": 0.09,
+          "kit": "tr808"
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "leadActivity": 0.55,
+        "leadDensity": 0.24,
+        "leadLeaps": 0.34,
+        "leadRepeat": 0.42,
+        "humanize": {
+          "timing": 6,
+          "velocity": 0.08,
+          "detune": 2
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.2
+        },
+        "drumKit": {
+          "shaker": {
+            "level": 0.8
+          },
+          "hat": {
+            "level": 0.85
+          },
+          "swish": {
+            "level": 0.65
+          },
+          "ride": {
+            "level": 0.8
+          },
+          "crash": {
+            "level": 0.7
+          },
+          "bell": {
+            "level": 0.35
+          },
+          "snare": {
+            "level": 0.85
+          }
+        }
+      },
+      "voices": {
+        "pad": "Swelling Analog",
+        "bass": "Analog Saw Bass",
+        "lead": "Hollow Pulse"
+      },
+      "isNew": true,
+      "tags": [
+        "updated",
+        "percussion",
+        "tr808",
+        "broken"
+      ],
+      "hidden": true
+    },
+    {
+      "name": "Pastel Coastline (previous)",
+      "category": "electronic",
+      "blurb": "Jan Hammer / Crockett’s Theme spirit: a glassy FM melody, repeating keys, soft choir and a warm midnight pulse",
+      "tags": [
+        "electronic",
+        "jan-hammer",
+        "crockett",
+        "synth-pop",
+        "nostalgic"
+      ],
+      "settings": {
+        "tonic": 6,
+        "mode": "Major-6",
+        "bpm": 100,
+        "progression": 8,
+        "barsPerChord": 2,
+        "padNotes": 3,
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 0,
+          "arpeggio": 100,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 10,
+          "half": 70,
+          "walking": 0,
+          "drive": 20
+        },
+        "leadActivity": 0.7,
+        "leadDensity": 0.15,
+        "leadLeaps": 0.3,
+        "leadRepeat": 0.7,
+        "chordColour": {
+          "mode": "plain",
+          "amount": 0
+        },
+        "chordBorrow": 0,
+        "humanize": {
+          "timing": 3,
+          "velocity": 0.07,
+          "detune": 1
+        },
+        "swing": 0,
+        "padMotion": {
+          "lean": 0.15,
+          "fast": 0,
+          "swell": 0.04
+        },
+        "counter": {
+          "mode": "line",
+          "activity": 0.12
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "volumes": {
+          "pad": 0.44,
+          "bass": 0.48,
+          "lead": 0.62,
+          "counter": 0.18,
+          "perc": 0.3
+        },
+        "drums": {
+          "style": "downtempo",
+          "activity": 0.15,
+          "variation": 0.15,
+          "sprinkle": 0.02,
+          "kit": "crisp"
+        },
+        "drumKit": {
+          "room": 0.12,
+          "punch": {
+            "level": 1,
+            "tone": -0.1
+          },
+          "sizzle": {
+            "level": 0.5,
+            "decay": 0.8
+          },
+          "hat": {
+            "level": 0.5,
+            "decay": 0.8
+          },
+          "clap": {
+            "level": 0.6
+          },
+          "rim": {
+            "level": 0.65
+          },
+          "ride": {
+            "level": 0.4
+          }
+        },
+        "arpWeights": {
+          "bounce": 20,
+          "up": 15,
+          "down": 10,
+          "broken": 55
+        },
+        "pulseWeights": {
+          "groups": 30,
+          "beats": 40,
+          "push": 0,
+          "split": 30
+        },
+        "ambience": {},
+        "playAmbience": false,
+        "voices": {
+          "lead": {
+            "octave": -1,
+            "wander": "off",
+            "chance": 0.3
+          },
+          "counter": {
+            "octave": -1,
+            "wander": "off",
+            "chance": 0.3
+          }
+        }
+      },
+      "voices": {
+        "pad": "Tine Keys",
+        "bass": "Neon Pulse Bass",
+        "lead": "Coastal FM Lead",
+        "counter": "Breathy Choir"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "tempo-effects": {
+            "enabled": true
+          },
+          "melodic-slides": {
+            "enabled": false
+          },
+          "chord-slides": {
+            "enabled": false
+          },
+          "pad-pitch-motion": {
+            "enabled": false
+          },
+          "bass-pitch-motion": {
+            "enabled": false
+          },
+          "gate-envelopes": {
+            "enabled": false
+          }
+        }
+      },
+      "hidden": true
+    },
+    {
+      "name": "Lantern Circuit (previous)",
       "category": "wasm",
       "blurb": "Parallel FM drawbars in a light pulse, tine-key melody and a chorused DCO bed. A warmer, moving synth ensemble.",
       "tags": [
@@ -9661,7 +11996,7 @@
         "counter": "Wasm DCO Foundation",
         "bass": "Wasm Round FM Bass"
       },
-      "isNew": true
+      "hidden": true
     }
   ]
 }

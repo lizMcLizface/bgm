@@ -14,13 +14,15 @@ export async function createEffectsBus(context,settings,{onStats=()=>{},onError=
  const module=await effectsModule();
  if(!registrations.has(context))registrations.set(context,context.audioWorklet.addModule(kernelAsset('effects','effects-processor.js')));
  await registrations.get(context);
+ let stats=null,error=null;
  const node=new AudioWorkletNode(context,'calmbgm-effects',{numberOfInputs:3,numberOfOutputs:1,outputChannelCount:[2],channelCount:2,channelCountMode:'explicit',processorOptions:{module,parameters:effectTriples(settings),endFrame:Number.isFinite(context.length)?context.length:null}});
- node.port.onmessage=({data})=>{if(data.type==='error')onError(Error(data.message));if(data.type==='stats')onStats(data);};
- node.onprocessorerror=()=>onError(Error('Effects worklet failed. Reload the instrument.'));
+ const fail=e=>{error=e;onError(e);};
+ node.port.onmessage=({data})=>{if(data.type==='error')fail(Error(data.message));if(data.type==='stats'){stats={...data,reportedAt:context.currentTime};onStats(data);}};
+ node.onprocessorerror=()=>fail(Error('Effects worklet failed. Reload the instrument.'));
  // This convenience input feeds all three sends. Other instruments can route
  // their own GainNodes to inputs 0/1/2 to share the bus with independent levels.
  const input=context.createGain();for(let i=0;i<3;i++)input.connect(node,0,i);
- return {input,node,kind:'fdn',connect:dest=>node.connect(dest),
+ return {input,node,kind:'fdn',get stats(){return stats;},get error(){return error;},connect:dest=>node.connect(dest),
   patch:p=>node.port.postMessage({type:'parameters',values:effectTriples(p)}),
   clear:()=>node.port.postMessage({type:'clear'}),
   dispose(){input.disconnect();node.port.postMessage({type:'dispose'});node.disconnect();node.port.onmessage=null;setTimeout(()=>node.port.close(),250);},

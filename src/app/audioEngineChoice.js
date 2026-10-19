@@ -1,5 +1,7 @@
+import {perfFromSearch} from '../audio/perfMode';
 // A debugging link overrides this visit, never the device preference.
 export function engineFromSearch(search=''){
+ if(perfFromSearch(search)===true)return 'wasm';
  const value=new URLSearchParams(search).get('wasm');
  return value==='1'?'wasm':value==='0'?'legacy':null;
 }

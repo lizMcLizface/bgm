@@ -1,4 +1,6 @@
 //! Shared per-note acoustic colour. Original software textures, not physical bows/air columns.
+#[cfg(feature = "simd-colour")]
+use crate::simd::V;
 use std::f32::consts::PI;
 pub const COUNT: usize = 13;
 pub const DEFAULTS: [f32; COUNT] = [0., 0., 4500., 0.25, 0., 0., 0., 0., 0., 0., 1., 0., 0.25];
@@ -54,6 +56,7 @@ const BODIES: [[[f32; 3]; 4]; 5] = [
         [4200., 0.05, 0.1],
     ],
 ];
+#[cfg_attr(feature = "simd-colour", allow(dead_code))]
 #[derive(Clone, Copy)]
 struct Band {
     g: f32,
@@ -61,6 +64,7 @@ struct Band {
     z1: f32,
     z2: f32,
 }
+#[cfg_attr(feature = "simd-colour", allow(dead_code))]
 impl Band {
     const ZERO: Self = Self {
         g: 0.,
@@ -72,6 +76,7 @@ impl Band {
         self.g = (PI * hz.clamp(30., sr * 0.4) / sr).tan();
         self.k = 1. / q.max(0.5);
     }
+    #[cfg_attr(feature = "profile-sections", inline(never))]
     fn tick(&mut self, x: f32) -> f32 {
         // Scale the input rather than the output to keep internal resonant states
         // bounded at high Q while retaining unit peak bandpass gain.
@@ -88,6 +93,48 @@ impl Band {
         self.z2 = 0.;
     }
 }
+// Independent resonant modes occupy SIMD lanes. State remains packed across
+// samples; the final weighted sum keeps the original ascending-band order.
+#[cfg(feature = "simd-colour")]
+#[derive(Clone, Copy)]
+struct Modes4 {
+    g: [f32; 4],
+    k: [f32; 4],
+    a: [f32; 4],
+    z1: [f32; 4],
+    z2: [f32; 4],
+}
+#[cfg(feature = "simd-colour")]
+impl Modes4 {
+    const ZERO: Self = Self {
+        g: [0.; 4],
+        k: [0.; 4],
+        a: [0.; 4],
+        z1: [0.; 4],
+        z2: [0.; 4],
+    };
+    fn configure(&mut self, bands: &[Band]) {
+        self.g = core::array::from_fn(|i| bands.get(i).map_or(0., |b| b.g));
+        self.k = core::array::from_fn(|i| bands.get(i).map_or(0., |b| b.k));
+        self.a = (V::s(1.) / (V::s(1.) + V::a(self.g) * (V::a(self.g) + V::a(self.k)))).array();
+    }
+    #[inline(always)]
+    fn tick(&mut self, x: f32) -> [f32; 4] {
+        let g = V::a(self.g);
+        let z1 = V::a(self.z1);
+        let z2 = V::a(self.z2);
+        let x = V::s(x) * V::a(self.k);
+        let v1 = V::a(self.a) * (z1 + g * (x - z2));
+        let v2 = z2 + g * v1;
+        self.z1 = (V::s(2.) * v1 - z1).clamp(-32., 32.).array();
+        self.z2 = (V::s(2.) * v2 - z2).clamp(-32., 32.).array();
+        v1.array()
+    }
+    fn clear(&mut self) {
+        self.z1 = [0.; 4];
+        self.z2 = [0.; 4];
+    }
+}
 fn random(s: &mut u32) -> f32 {
     *s ^= *s << 13;
     *s ^= *s >> 17;
@@ -96,6 +143,10 @@ fn random(s: &mut u32) -> f32 {
 }
 #[derive(Clone, Copy)]
 pub struct Colour {
+    #[cfg(feature = "simd-colour")]
+    formants4: [Modes4; 2],
+    #[cfg(feature = "simd-colour")]
+    body4: [Modes4; 2],
     sr: f32,
     s: [f32; COUNT],
     alpha: f32,
@@ -120,12 +171,18 @@ pub struct Colour {
     attack_a: f32,
     attack: f32,
     active: bool,
+    #[cfg(feature = "cache-colour-coefficients")]
+    configured: u8,
     quiet: u32,
     idle: u32,
     tail_limit: u32,
 }
 impl Colour {
     pub const ZERO: Self = Self {
+        #[cfg(feature = "simd-colour")]
+        formants4: [Modes4::ZERO; 2],
+        #[cfg(feature = "simd-colour")]
+        body4: [Modes4::ZERO; 2],
         sr: 0.,
         s: [0.; COUNT],
         alpha: 0.,
@@ -150,6 +207,8 @@ impl Colour {
         attack_a: 0.,
         attack: 0.,
         active: false,
+        #[cfg(feature = "cache-colour-coefficients")]
+        configured: 0,
         quiet: 0,
         idle: 0,
         tail_limit: 0,
@@ -174,7 +233,12 @@ impl Colour {
         self.grain_a = 1. - (-2. * PI * 12. / sr).exp();
         self.attack_a = 1. - (-1. / (sr * 0.05)).exp();
     }
+    #[cfg_attr(feature = "profile-sections", inline(never))]
     fn refresh(&mut self) {
+        #[cfg(feature = "cache-colour-coefficients")]
+        {
+            self.configured = self.band_mask();
+        }
         let vowel = self.s[5].clamp(0., 2.);
         let i = vowel as usize;
         let j = (i + 1).min(2);
@@ -193,6 +257,8 @@ impl Colour {
                         VOWELS[i][band] * (VOWELS[j][band] / VOWELS[i][band]).powf(mix) * shift;
                     self.formants[ch][band].configure(hz, [5., 7., 9.][band], self.sr);
                 }
+                #[cfg(feature = "simd-colour")]
+                self.formants4[ch].configure(&self.formants[ch]);
             }
             if self.s[7] > 0.00001 {
                 for band in 0..4 {
@@ -204,6 +270,8 @@ impl Colour {
                     self.weight[band] = p[2] + (q[2] - p[2]) * blend;
                     self.body[ch][band].configure(hz, PI * hz.min(self.sr * 0.4) * decay, self.sr);
                 }
+                #[cfg(feature = "simd-colour")]
+                self.body4[ch].configure(&self.body[ch]);
             }
         }
         self.air_a = 1. - (-2. * PI * self.s[2].min(self.sr * 0.4) / self.sr).exp();
@@ -215,6 +283,10 @@ impl Colour {
             0.5
         }) * self.sr) as u32;
     }
+    #[cfg(feature = "cache-colour-coefficients")]
+    fn band_mask(&self) -> u8 {
+        (self.s[4] > 0.00001) as u8 | (((self.s[7] > 0.00001) as u8) << 1)
+    }
     pub fn engaged(&self) -> bool {
         self.active
     }
@@ -224,6 +296,7 @@ impl Colour {
             && self.quiet < (self.sr * 0.03) as u32
             && self.idle < self.tail_limit
     }
+    #[cfg_attr(feature = "profile-sections", inline(never))]
     pub fn tick(
         &mut self,
         input: [f32; 2],
@@ -252,11 +325,26 @@ impl Colour {
             };
         }
         if self.frame % 32 == 0 {
+            #[cfg(feature = "cache-colour-coefficients")]
+            let mut changed = self.configured != self.band_mask();
             for i in 0..COUNT {
                 if ![0, 1, 4, 7].contains(&i) {
+                    #[cfg(feature = "cache-colour-coefficients")]
+                    let previous = self.s[i];
                     self.s[i] += (p[i] - self.s[i]) * self.control_alpha;
+                    #[cfg(feature = "cache-colour-coefficients")]
+                    {
+                        changed |= self.s[i] != previous;
+                    }
                 }
             }
+            // Coefficients are constant once the control smoothing settles.
+            // Keep the original control cadence and every intermediate value.
+            #[cfg(feature = "cache-colour-coefficients")]
+            if changed {
+                self.refresh();
+            }
+            #[cfg(not(feature = "cache-colour-coefficients"))]
             self.refresh();
         }
         let live = input[0].abs().max(input[1].abs()) > 1e-7
@@ -302,22 +390,46 @@ impl Colour {
             }
             if self.s[4] > 0.00001 {
                 let mut vowel = 0.;
+                #[cfg(feature = "simd-colour")]
+                let values = self.formants4[ch].tick(out[ch]);
                 for band in 0..3 {
-                    vowel += self.formants[ch][band].tick(out[ch]) * [0.5, 0.3, 0.2][band];
+                    #[cfg(not(feature = "simd-colour"))]
+                    {
+                        vowel += self.formants[ch][band].tick(out[ch]) * [0.5, 0.3, 0.2][band];
+                    }
+                    #[cfg(feature = "simd-colour")]
+                    {
+                        vowel += values[band] * [0.5, 0.3, 0.2][band];
+                    }
                 }
                 out[ch] = out[ch] * (1. - self.s[4] * 0.65) + vowel * self.s[4] * 1.8;
             } else {
+                #[cfg(feature = "simd-colour")]
+                self.formants4[ch].clear();
+                #[cfg(not(feature = "simd-colour"))]
                 for band in &mut self.formants[ch] {
                     band.clear();
                 }
             }
             if self.s[7] > 0.00001 {
                 let mut body = 0.;
+                #[cfg(feature = "simd-colour")]
+                let values = self.body4[ch].tick(out[ch]);
                 for band in 0..4 {
-                    body += self.body[ch][band].tick(out[ch]) * self.weight[band];
+                    #[cfg(not(feature = "simd-colour"))]
+                    {
+                        body += self.body[ch][band].tick(out[ch]) * self.weight[band];
+                    }
+                    #[cfg(feature = "simd-colour")]
+                    {
+                        body += values[band] * self.weight[band];
+                    }
                 }
                 out[ch] = out[ch] * (1. - self.s[7] * 0.2) + body * self.s[7] * 2.5;
             } else {
+                #[cfg(feature = "simd-colour")]
+                self.body4[ch].clear();
+                #[cfg(not(feature = "simd-colour"))]
                 for band in &mut self.body[ch] {
                     band.clear();
                 }
@@ -333,6 +445,11 @@ impl Colour {
         out
     }
     fn clear(&mut self) {
+        #[cfg(feature = "simd-colour")]
+        {
+            self.formants4 = [Modes4::ZERO; 2];
+            self.body4 = [Modes4::ZERO; 2];
+        }
         self.formants = [[Band::ZERO; 3]; 2];
         self.body = [[Band::ZERO; 4]; 2];
         self.air_low = [0.; 2];
@@ -343,6 +460,10 @@ impl Colour {
         self.bow_level = [0.; 2];
         self.pressure = 0.;
         self.active = false;
+        #[cfg(feature = "cache-colour-coefficients")]
+        {
+            self.configured = 0;
+        }
         self.quiet = 0;
         self.idle = 0;
     }

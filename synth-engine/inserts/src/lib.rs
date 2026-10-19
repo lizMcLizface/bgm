@@ -1,5 +1,7 @@
 //! Original fixed-storage instrument inserts. Shared by subtractive and FM hosts.
 #![allow(static_mut_refs)]
+#[path = "../../common/denormal.rs"]
+mod denormal;
 use std::f32::consts::PI;
 const BLOCK: usize = 2048;
 const DELAY: usize = 8192;
@@ -118,7 +120,7 @@ impl Delay {
             let modulation = (2. * PI * (self.phase + ch as f32 * 0.5)).sin();
             let delay = ((base + depth * modulation) * 0.001 * sr).clamp(2., DELAY as f32 - 3.);
             let delayed = self.read(ch, delay);
-            self.data[ch][self.position] = (input[ch] + delayed * feedback).clamp(-8., 8.);
+            self.data[ch][self.position] = denormal::clean((input[ch] + delayed * feedback).clamp(-8., 8.));
             let wet = mix * 0.5;
             let dry = 1. - wet;
             let gain = if chorus {
@@ -256,6 +258,13 @@ impl Inserts {
         self.trim = 10_f32.powf(self.s[23] / 20.);
     }
     fn render(&mut self, n: usize) {
+        denormal::flush(&mut self.dc_in);
+        denormal::flush(&mut self.dc_out);
+        denormal::flush(&mut self.phaser_last);
+        for ch in 0..2 {
+            denormal::flush(&mut self.phaser[ch]);
+            for band in &mut self.eq[ch] { denormal::flush(&mut band.x); denormal::flush(&mut band.y); }
+        }
         self.peak = 0.;
         if self.p[0] < 0.5
             && self.wet == 1.

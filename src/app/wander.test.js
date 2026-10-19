@@ -116,3 +116,9 @@ test('ambience wander: validated and carried in links; the default is on, a link
     expect(decodeSettings(encodeSettings(settings)).ambienceWander).toEqual(settings.ambienceWander);
     expect(decodeShare(encodeSettings({ ...d, seed: 3 })).settings.ambienceWander).toEqual(d.ambienceWander);
 });
+
+
+test('room sends share pan/volume controls without new oscillators or waveshapers',()=>{
+ const ctx=fakeContext(),rw=new RoleWander(ctx,'pad',{smooth:false}),osc=vi.spyOn(ctx,'createOscillator'),shape=vi.spyOn(ctx,'createWaveShaper'),volume=vi.spyOn(rw.volumeLfo.depth,'connect'),left=vi.spyOn(rw.balanceShapers[0],'connect'),sourceDispose=vi.spyOn(rw.volumeLfo,'dispose');
+ const f=rw.createFollower();expect(osc).not.toHaveBeenCalled();expect(shape).not.toHaveBeenCalled();expect(volume).toHaveBeenCalledWith(f.input.gain);expect(left).toHaveBeenCalled();f.dispose();expect(sourceDispose).not.toHaveBeenCalled();expect(rw.followers.size).toBe(0);rw.dispose();expect(sourceDispose).toHaveBeenCalledTimes(1);expect(()=>rw.createFollower()).toThrow('disposed');
+});

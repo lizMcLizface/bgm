@@ -5,6 +5,15 @@ import { SHAREABLE_PRESETS, encodeShareCode } from './shareCode';
 import presetData from '../util/presetData';
 import { seeded } from './random';
 
+test('share links retain temporary percussion choices without adding a preset field',()=>{
+ for(const model of['wasm','808']){
+  const url=shareUrl(defaultSettings(),{}, {origin:'https://example.test',pathname:'/',search:'?wasm=1&perf=1&mediaHelper=1&perc='+model});
+  expect(new URL(url).searchParams.get('perc')).toBe(model);
+  expect(new URL(url).searchParams.get('mediaHelper')).toBe('1');
+ }
+ expect(new URL(shareUrl(defaultSettings(),{}, {origin:'https://example.test',pathname:'/',search:''})).searchParams.has('perc')).toBe(false);
+});
+
 test('independent harmony choices round-trip through appended share fields',()=>{
     for(const harmonyScale of ['auto','selected','major','minor']){
         const settings={...defaultSettings(),seed:42,mode:'Pentatonic-1',harmonyScale};
@@ -278,4 +287,10 @@ test('the crisp drums and the kit choice travel in links, and the wander keeps i
     expect(back.drumKit.sizzle.on).toBe(false);
     expect(back.drums.kit).toBe('crisp');
     expect(back.wander.period).toBe(90);
+});
+
+test('the temporary media-helper output test survives encoded share links',()=>{
+ const url=shareUrl(defaultSettings(),{}, {origin:'https://example.test',pathname:'/',search:'?mediaHelper=0&perf=1'});
+ expect(new URL(url).searchParams.get('mediaHelper')).toBe('0');expect(new URL(url).searchParams.get('perf')).toBe('1');
+ const ordinary=shareUrl(defaultSettings(),{}, {origin:'https://example.test',pathname:'/',search:''});expect(new URL(ordinary).searchParams.has('mediaHelper')).toBe(false);
 });

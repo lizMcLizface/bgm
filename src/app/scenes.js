@@ -23,6 +23,7 @@ import library from '../library/scenes.json';
 import { defaultSettings, newSeed, sanitizeSettings } from './settings';
 import { ROLE_PRESETS } from './presets';
 import { sanitizePreset,findPreset } from './editor/presetStore';
+import {percussionVoice} from './percussionVoices';
 import { cleanBook } from './rulebook/session';
 
 /** The picker's categories, in order: [{ id, label, blurb }]. */
@@ -61,6 +62,8 @@ export function normalizeScene(raw, defaultCategory = MINE.id) {
         name,
         ...(raw.isNew === true ? { isNew: true } : {}),
         ...(raw.hidden === true ? { hidden: true } : {}),
+        ...(text(raw.comparisonOf,60) ? {comparisonOf:text(raw.comparisonOf,60)} : {}),
+        ...(text(raw.comparisonSource,60) ? {comparisonSource:text(raw.comparisonSource,60)} : {}),
         category: text(raw.category, 40) || defaultCategory,
         blurb: text(raw.blurb, 200),
         tags: Array.isArray(raw.tags) ? raw.tags.filter((t) => typeof t === 'string').map((t) => t.slice(0, 30)).slice(0, 12) : [],
@@ -74,7 +77,7 @@ export function normalizeScene(raw, defaultCategory = MINE.id) {
 export const SCENES = library.scenes.map((scene) => normalizeScene(scene, SCENE_CATEGORIES[0].id));
 /** Archived versions resolve through sceneBySlug but stay out of browsing. */
 export const BROWSABLE_SCENES = SCENES.filter(scene => !scene.hidden);
-export const sceneUsesWasm=scene=>Object.values(scene.voices).some(v=>typeof v==='string'?!!findPreset(v)?.wasmVoice:!!v?.synth?.wasmVoice);
+export const sceneUsesWasm=scene=>percussionVoice(scene.settings.drums?.kit).wasmOnly||Object.values(scene.voices).some(v=>typeof v==='string'?!!findPreset(v)?.wasmVoice:!!v?.synth?.wasmVoice);
 
 /** A name as it reads in a link: 'Rainy Day, Chickens Inside' -> 'rainy-day-chickens-inside'. */
 export const sceneSlug = (name) => name
@@ -84,18 +87,20 @@ export const sceneSlug = (name) => name
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
 
-/** Keyboard browsing follows category order; testing collections may loop internally. */
-export function stepBuiltinScene(currentName, direction) {
-    const current = SCENES.find(s => s.name === currentName);
-    const category = SCENE_CATEGORIES.find(c => c.id === current?.category);
-    const rank = s => SCENE_CATEGORIES.findIndex(c => c.id === s.category);
-    const ordered = category?.cycleWithin
-        ? BROWSABLE_SCENES.filter(s => s.category === category.id)
-        : BROWSABLE_SCENES.map((s, i) => ({ s, i })).sort((a, b) => rank(a.s) - rank(b.s) || a.i - b.i).map(({ s }) => s);
-    const at = ordered.findIndex(s => s.name === currentName);
+/** Keyboard order is the cleaned visible catalog; historical links stay out. */
+export const SCENE_BROWSE_ORDER = SCENE_CATEGORIES.flatMap(category =>
+    BROWSABLE_SCENES.filter(scene => scene.category === category.id).map(scene => ({scene,category:category.id})));
+
+/** Follow the visible card order, retaining the occurrence of comparison originals. */
+export function stepBuiltinSceneEntry(currentName, direction, currentCategory) {
+    const categoryId = currentCategory ?? SCENES.find(s => s.name === currentName)?.category;
+    const category = SCENE_CATEGORIES.find(c => c.id === categoryId);
+    const ordered = category?.cycleWithin ? SCENE_BROWSE_ORDER.filter(e => e.category === categoryId) : SCENE_BROWSE_ORDER;
+    const at = ordered.findIndex(e => e.scene.name === currentName && e.category === categoryId);
     const next = at < 0 ? (direction > 0 ? 0 : ordered.length - 1) : (at + direction + ordered.length) % ordered.length;
     return ordered[next];
 }
+export const stepBuiltinScene = (name, direction, category) => stepBuiltinSceneEntry(name, direction, category).scene;
 
 /**
  * The preset name in a page address: `?preset=turnip-town`, or just `?turnip-town`
@@ -185,4 +190,13 @@ export function parseSetup(source) {
     const scene = normalizeScene(data);
     if (!scene) throw new Error('No setup found: it needs a name and settings');
     return scene;
+}
+
+/** Apply percussion sound independently of its groove, like the melodic tracks. */
+export function sceneSoundSettings(sounds, composition) {
+    return {drums:{...composition.drums,kit:sounds.drums.kit},drumKit:sounds.drumKit};
+}
+/** Original references in Updated use the original scene and URL, without duplicating it. */
+export function sceneComparison(scene) {
+    return scene.comparisonOf ? SCENES.find(s=>s.name===(scene.comparisonSource??scene.comparisonOf)&&s.category!=='updated') : null;
 }

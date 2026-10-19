@@ -288,6 +288,7 @@ export class RoleWander {
         this.panLfo.depth.connect(pan);
         const splitter = ctx.createChannelSplitter(2);
         const merger = ctx.createChannelMerger(2);
+        this.balanceShapers=[];this.followers=new Set();
         this.output = ctx.createGain();
         this.input.connect(splitter);
         [-1, 1].forEach((side, channel) => {
@@ -295,6 +296,7 @@ export class RoleWander {
             gain.gain.value = 0;
             const shaper = ctx.createWaveShaper();
             shaper.curve = balanceCurve(side);
+            this.balanceShapers.push(shaper);
             pan.connect(shaper);
             shaper.connect(gain.gain);
             splitter.connect(gain, channel);
@@ -302,6 +304,18 @@ export class RoleWander {
         });
         merger.connect(this.output);
         this.nodes = [pan, splitter, merger];
+    }
+
+    // Reuse the original control signals for an additional audio send. The
+    // room route needs no second pair of oscillators, walkers or wave shapers.
+    createFollower() {
+        if(this.disposed)throw Error('Wander route is disposed.');
+        const ctx=this.ctx,input=ctx.createGain(),output=ctx.createGain(),split=ctx.createChannelSplitter(2),merge=ctx.createChannelMerger(2),gains=[];
+        this.volumeLfo.depth.connect(input.gain);input.connect(split);
+        for(let ch=0;ch<2;ch++){const gain=ctx.createGain();gain.gain.value=0;this.balanceShapers[ch].connect(gain.gain);split.connect(gain,ch);gain.connect(merge,0,ch);gains.push(gain);}
+        merge.connect(output);let disposed=false;
+        const follower={input,output,dispose:()=>{if(disposed)return;disposed=true;this.volumeLfo.depth.disconnect(input.gain);for(let ch=0;ch<2;ch++)this.balanceShapers[ch].disconnect(gains[ch].gain);[input,output,split,merge,...gains].forEach(n=>n.disconnect());this.followers.delete(follower);}};
+        this.followers.add(follower);return follower;
     }
 
     /** @param {object} wander - settings.wander */
@@ -323,6 +337,7 @@ export class RoleWander {
     }
 
     dispose() {
+        if(this.disposed)return;for(const follower of [...this.followers])follower.dispose();this.disposed=true;
         this.volumeLfo.dispose();
         this.panLfo.dispose();
         try { this.panCentre.stop(); } catch (e) { /* already stopped */ }

@@ -10,7 +10,7 @@ const rms=a=>Math.sqrt(a.reduce((s,x)=>s+x*x,0)/Math.max(1,a.length));
 function cleanPatch(){const p=initialPatch();Object.assign(p.global,{model:0,polyphony:8,unison:1,gain:.3,chorus:0});Object.assign(p.layers[0],{waveA:1,waveB:0,levelA:1,levelB:0,sub:0,noise:0,cutoff:16000,resonance:0,filter:0,filterAmount:0,keytrack:0,velocityTone:0,attack:.002,decay:.002,sustain:1,release:.01,drift:0,lfoPitch:0,lfoFilter:0,lfo2Pitch:0,lfo2Filter:0});return p;}
 test('checked-in Wasm is built from the current Rust sources',()=>{
  const manifest=JSON.parse(fs.readFileSync('public/synth-lab/build.json'));
- const source=crypto.createHash('sha256').update(['synth-engine/Cargo.toml','synth-engine/src/lib.rs','synth-engine/common/colour.rs','synth-engine/common/notes.rs','synth-engine/common/headroom.rs'].map(f=>fs.readFileSync(f,'utf8').replace(/\r\n/g,'\n')).join('\n')).digest('hex');
+ const source=crypto.createHash('sha256').update(['synth-engine/Cargo.toml','synth-engine/src/lib.rs','synth-engine/src/simd_voices.rs','synth-engine/common/simd.rs','synth-engine/common/colour.rs','synth-engine/common/notes.rs','synth-engine/common/headroom.rs','synth-engine/common/denormal.rs'].map(f=>fs.readFileSync(f,'utf8').replace(/\r\n/g,'\n')).join('\n')).digest('hex');
  expect(engine().engine_api()).toBe(1);
  expect(manifest.source).toBe(source);expect(manifest.wasm).toBe(crypto.createHash('sha256').update(bytes).digest('hex'));
 });

@@ -1,6 +1,11 @@
+import VoiceBrowser from './editor/VoiceBrowser';
+import PercussionPresetPicker from './PercussionPresetPicker';
+import {percussionVoice,percussionPads,percussionEdited,percussionKeyHint} from './percussionVoices';
+import {percussionFromSearch,withPercussion} from '../audio/percussionChoice';
+import {mediaHelperFromSearch,withMediaHelper} from '../audio/mediaHelperChoice';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Generator, { ROLES, PERC_ROLE } from './Generator';
-import { DRUM_STYLES, DRUM_KITS, DRUMS, DRUM_LABELS, DRUM_PARAMS, randomDrums } from './percussion';
+import { DRUM_STYLES, DRUM_PARAMS, randomDrums } from './percussion';
 import { SCALE_FAMILIES, TONIC_NAMES, scaleById } from './theory';
 import ChordTimeline from './ChordTimeline';
 import Rulebook from './rulebook/Rulebook';
@@ -27,7 +32,7 @@ import {
 import Backdrop, { backdropSupported, BACKDROP_DEFAULTS, shuffleColours } from './Backdrop';
 import { MasterVolume, SettingsMenu, AudioMenu, VisualMenu } from './AudioStatus';
 import { SleepTimer, Recorder } from './Playback';
-import { sceneSettings, sceneGroup, stepBuiltinScene, buildSetup, parseSetup, sceneBySlug, sceneSlug, presetFromSearch, introFromSearch, SCENES, SCENE_CATEGORIES } from './scenes';
+import { sceneSettings, sceneSoundSettings, sceneGroup, stepBuiltinSceneEntry, buildSetup, parseSetup, sceneBySlug, sceneSlug, presetFromSearch, introFromSearch, SCENES, SCENE_CATEGORIES } from './scenes';
 import PresetBrowser from './PresetBrowser';
 import { saveUserScene, deleteUserScene, isUserScene } from './setupStore';
 import { ROLE_PRESETS } from './presets';
@@ -41,12 +46,14 @@ import { newSoundSeed } from './soundGen';
 import { SOUND_KINDS, GENERATOR_V2 } from './soundGenV2';
 import { GENERATOR_V3, soundContext } from './soundGenV3';
 import { prepareSound } from './engine/prepareSound';
+import PerfModeButton,{usePerfMode} from '../audio/PerfModeButton';
+import {readPerfChoice,setPerfChoice,withPerf} from '../audio/perfMode';
 import WasmOptions,{useAudioEngine,AudioEngineButton} from './WasmOptions';
 import {engineFromSearch,withAudioEngine} from './audioEngineChoice';
+import {simdFromSearch,withSimd,bankFromSearch,withFMBank} from '../audio/simdChoice';
 import { addGeneratedPreset, addSetupPreset, findPreset, generatedInfo } from './editor/presetStore';
 import PRESET_DEFAULTS from './engine/presetDefaults';
 import { readPref, writePref } from './prefs';
-import { isMobile } from '../audio/performance';
 import { seedToPhrase, phraseToSeed } from './phrase';
 import { WANDER_ROLES, WANDER_LIMITS, WANDER_MODES, AMBIENCE_WANDER_LIMITS } from './engine/wander';
 import Tour, { tourSeen } from './Tour';
@@ -96,6 +103,7 @@ const getGenerator = () => {
             });
         }
     }
+    if(new URLSearchParams(location.search).get('perc')==='808'){history.replaceState(null,'',withPercussion(location.pathname+location.search+location.hash,'wasm'));linkedScene=null;}
     // Dev server only: lets browser scripts drive it (e.g. preset loudness checks).
     if (import.meta.env.DEV) window.__generator = generator;
     return generator;
@@ -119,15 +127,15 @@ if (import.meta.hot) {
 // (?preset=...), a link anyone can read; once anything is changed it is the settings.
 // With the short intro on, the address says so too (intro=short), so a link carries it.
 const withIntro = (path, shortIntro) => (shortIntro ? `${path}${path.includes('?') ? '&' : '?'}intro=short` : path);
-function useSettingsInUrl(settings, presets, presetSlug, shortIntro, generation, book) {
+function useSettingsInUrl(settings, presets, presetSlug, shortIntro, generation, book, perfOn) {
     useEffect(() => {
         const id = setTimeout(() => {
-            window.history.replaceState(null, '', withAudioEngine(withBook(withGeneration(withIntro(presetSlug
+            window.history.replaceState(null, '', withPercussion(withMediaHelper(withPerf(withFMBank(withSimd(withAudioEngine(withBook(withGeneration(withIntro(presetSlug
                 ? `${window.location.pathname}?preset=${presetSlug}`
-                : sharePath(settings, presets, window.location, { seed: false }), shortIntro), generation), book, presetSlug ? sceneBySlug(presetSlug)?.rulebook : undefined),engineFromSearch(window.location.search)));
+                : sharePath(settings, presets, window.location, { seed: false }), shortIntro), generation), book, presetSlug ? sceneBySlug(presetSlug)?.rulebook : undefined),engineFromSearch(window.location.search)),simdFromSearch(window.location.search)),bankFromSearch(window.location.search)),readPerfChoice()),mediaHelperFromSearch(window.location.search)),percussionFromSearch(window.location.search)));
         }, 300);
         return () => clearTimeout(id);
-    }, [settings, presets, presetSlug, shortIntro, generation, book]);
+    }, [settings, presets, presetSlug, shortIntro, generation, book, perfOn]);
 }
 
 // The seed as a pass-phrase (phrase.js): shows the current seed's words;
@@ -675,19 +683,19 @@ const WanderPanel = ({ wander, shown, update }) => {
 // activity, variation - and its level; under More options the room and
 // each drum's sound (on, level, tone, length).
 const DRUM_VALUE = { level: pct, tone: (v) => (v === 0 ? 'neutral' : v < 0 ? `darker ${Math.round(-v * 100)}%` : `brighter ${Math.round(v * 100)}%`), decay: (v) => `${v.toFixed(2)}x` };
-const PercussionPanel = ({ drums, kit, volume, mix, armed, onArm, onDrums, onKit, onVolume, onMix, onAudition }) => {
+const PercussionPanel = ({ drums, kit, volume, mix, armed, onArm, onDrums, onKit, onVoice, voiceBusy, voiceOpen, onVoiceOpen, onVolume, onMix, onAudition }) => {
     const setDrum = (name, patch) => onKit({ ...kit, [name]: { ...kit[name], ...patch } });
     const more = (
         <>
             <Field label={`Room ${pct(kit.room)}`}>
                 <input type="range" min="0" max="0.5" step="0.05" value={kit.room} onChange={(e) => onKit({ ...kit, room: Number(e.target.value) })} />
             </Field>
-            {DRUMS.map((name) => (
+            {percussionPads(drums.kit).map(({name,label}) => (
                 <fieldset key={name} className="gen-weights gen-drum">
                     <legend>
                         <label className="gen-check">
                             <input type="checkbox" checked={kit[name].on} onChange={(e) => setDrum(name, { on: e.target.checked })} />
-                            {DRUM_LABELS[name]}
+                            {label}
                         </label>
                     </legend>
                     {Object.entries(DRUM_PARAMS).map(([key, { min, max, step, label }]) => (
@@ -714,18 +722,13 @@ const PercussionPanel = ({ drums, kit, volume, mix, armed, onArm, onDrums, onKit
             )}
             more={more}
         >
-            <Field label="Kit">
-                <select value={drums.kit || 'felt'} title="Felt and brushes, or a snare, a punchy kick and a bright hat in their places"
-                    onChange={(e) => onDrums({ ...drums, kit: e.target.value })}>
-                    {Object.entries(DRUM_KITS).map(([id, label]) => <option key={id} value={id}>{label}</option>)}
-                </select>
-            </Field>
+            <PercussionPresetPicker value={drums.kit} kit={kit} onChange={onVoice} disabled={voiceBusy} open={voiceOpen} onOpenChange={onVoiceOpen} />
             <Field label={`Volume ${pct(volume)}`}>
                 <input type="range" min="0" max="1" step="0.01" value={volume} onChange={(e) => onVolume(Number(e.target.value))} />
             </Field>
             <div className="gen-field">
                 <button type="button" className="gen-keys-button" onClick={onAudition}>Hear the kit</button>
-                {armed && <small>Keys {DRUM_KEY_HINT}</small>}
+                {armed && <small>Keys {percussionKeyHint(drums.kit)}</small>}
             </div>
         </Panel>
     );
@@ -789,6 +792,14 @@ const GenerativeApp = () => {
         Object.fromEntries(Object.keys(ROLES).map((role) => [role, { presetName: gen.roles[role].presetName, edited: false }]))
     );
     const audioEngine = useAudioEngine(gen,{required:Object.values(roles).some(r=>!!findPreset(r.presetName)?.wasmVoice)});
+    const perfOn=usePerfMode();
+    const togglePerfMode=async next=>{
+        const previous=readPerfChoice(),path=location.pathname+location.search+location.hash;
+        setPerfChoice(next);
+        if(!await audioEngine.choose('wasm',{remember:false})){setPerfChoice(previous);history.replaceState(null,'',path);throw Error('Could not prepare performance mode. The previous instruments are retained.');}
+        history.replaceState(null,'',withPerf(withAudioEngine(location.pathname+location.search+location.hash,'wasm'),next));
+    };
+
     // What a link can carry: built-in presets as loaded (edits stay local).
     // Generated sounds travel as the role they were made for + their seed.
     const linkPresets = useMemo(
@@ -944,7 +955,7 @@ const GenerativeApp = () => {
         window.addEventListener('popstate', pop);
         return () => window.removeEventListener('popstate', pop);
     }, [gen]);
-    useSettingsInUrl(settings, linkPresets, presetSlug, shortIntro, generationChoice, book);
+    useSettingsInUrl(settings, linkPresets, presetSlug, shortIntro, generationChoice, book, perfOn);
     const [sleepLeft, setSleepLeft] = useState(null);
     const loadSettings = (next) => {
         clearBookSettings(next);
@@ -962,6 +973,24 @@ const GenerativeApp = () => {
         gen.set(key, value);
         setSettings((s) => ({ ...s, [key]: value }));
         setScene('');
+    };
+    const percussionChoice = useRef(null);
+    const [percussionBusy,setPercussionBusy] = useState(false);
+    const choosePercussionVoice = async id => {
+        if(percussionChoice.current)return percussionChoice.current;
+        setPercussionBusy(true);
+        const loading=gen.loadPercussionVoice(id);percussionChoice.current=loading;
+        try {
+            await loading;
+            clearBookSettings({drums:gen.settings.drums,drumKit:gen.settings.drumKit});
+            if(gen.percussionEngine==='wasm')history.replaceState(null,'',withPercussion(location.pathname+location.search+location.hash,'wasm'));
+            setSettings({...gen.settings});setScene('');
+        } finally {percussionChoice.current=null;setPercussionBusy(false);}
+    };
+    const editPercussionSound = () => {
+        setArmed('perc');
+        document.querySelector('[data-tour="percussion"]')?.scrollIntoView({behavior:'smooth',block:'center'});
+        document.querySelector('[data-tour="percussion"] .gen-voice-button')?.focus({preventScroll:true});
     };
     const patchRole = (role, patch) => setRoles((r) => ({ ...r, [role]: { ...r[role], ...patch } }));
     const setVolume = (role, volume) => {
@@ -1105,7 +1134,7 @@ const GenerativeApp = () => {
     // Smoothly (the ⚙ menu, on by default) the whole change waits for the next chord, and the
     // sounds then glide over that chord instead of switching.
     const [smoothPresets, setSmoothPresets] = useStoredFlag('bgm-smooth-presets', true);
-    const [backdropOn, setBackdropOn] = useStoredFlag('bgm-backdrop', !isMobile());
+    const [backdropOn, setBackdropOn] = useStoredFlag('bgm-backdrop', false);
     const [fluidReset, setFluidReset] = useState(0);
     const [storedBackdropOptions, setBackdropOptions] = useStoredFlag('bgm-backdrop-options', BACKDROP_DEFAULTS);
     const backdropOptions = { ...BACKDROP_DEFAULTS, ...storedBackdropOptions };
@@ -1145,10 +1174,12 @@ const GenerativeApp = () => {
             patchRole(role, { presetName: label, edited: unsaved });
         }, { morph });
     };
+    const sceneBrowseCategory = useRef(null);
     // `parts`: 'all', 'composition' (everything but the sounds and the mix) or 'voices' (the sounds only).
     const applyScene = async (picked, options = {}) => {
         if (!picked) return;
         if(options.parts!=='composition'&&Object.values(picked.voices).some(v=>typeof v==='string'?findPreset(v)?.wasmVoice:v?.synth?.wasmVoice)&&gen.audioEngine!=='wasm'&&!await audioEngine.choose('wasm',{remember:false}))return;
+        sceneBrowseCategory.current = options.browseCategory ?? picked.category;
         if (!(smoothPresets && gen.isRunning && picked.settings.playMusic !== false)) {
             applySceneNow(picked, options, false);
             return;
@@ -1157,16 +1188,16 @@ const GenerativeApp = () => {
         if ((options.parts || 'all') === 'all') setScene(picked.name);
         gen.atNextChord(() => applySceneNow(picked, options, true));
     };
-    const applySceneNow = (picked, { exact = false, unsaved = false, parts = 'all' }, morph) => {
+    const applySceneNow = (picked, { exact = false, unsaved = false, parts = 'all', preserveSeed = false }, morph) => {
         soundScene.current = picked;
         const playing = gen.anyRunning;
         if (parts !== 'voices') {
             setBook({ rules: {}, baseline: {} });
             applyBook(gen, bookRef.current);
-            const next = sceneSettings(picked, exact && Number.isInteger(picked.settings.seed) ? picked.settings.seed : undefined);
+            const next = sceneSettings(picked, exact && Number.isInteger(picked.settings.seed) ? picked.settings.seed : preserveSeed ? gen.settings.seed : undefined);
             next.generation = SCENES.includes(picked) || !picked.settings.generation ? generationChoice : next.generation;
             setGenerationChoice(next.generation);
-            loadSettings(parts === 'composition' ? { ...next, volumes: gen.settings.volumes, muted: gen.settings.muted } : next);
+            loadSettings(parts === 'composition' ? { ...next, volumes: gen.settings.volumes, muted: gen.settings.muted, ...sceneSoundSettings(gen.settings, next) } : next);
             const restoredBook = inheritBook(picked.rulebook);
             applyBook(gen, restoredBook);
             setBook(restoredBook);
@@ -1176,6 +1207,9 @@ const GenerativeApp = () => {
             Object.keys(ROLES).forEach((role) => loadSceneVoice(role, picked.voices[role], picked.name, unsaved, morph));
         }
         if (parts === 'voices') {
+            const next=sceneSettings(picked,gen.settings.seed);
+            const sounds=sceneSoundSettings(next,gen.settings);
+            clearBookSettings(sounds);gen.setMany(sounds);setSettings({...gen.settings});
             setScene('');
             return;
         }
@@ -1252,7 +1286,8 @@ const GenerativeApp = () => {
     };
     // Next / previous built-in preset in the browser's order ([ and ] keys).
     const stepPreset = (dir) => {
-        applyScene(stepBuiltinScene(scene, dir));
+        const entry = stepBuiltinSceneEntry(scene, dir, sceneBrowseCategory.current);
+        applyScene(entry.scene, {browseCategory:entry.category,preserveSeed:false});
     };
     const handlers = useRef({});
     // Move around the piece from the keyboard: a chord / a progression back or on.
@@ -1305,7 +1340,7 @@ const GenerativeApp = () => {
 
     return (
         <main className={`gen${zen && !tourOpen && !helpOpen ? ' gen-zen' : ''}${bare && !tourOpen && !helpOpen ? ' gen-zen-bare' : ''}`}>
-            {backdropOn && backdropSupported() && <Backdrop generator={gen} options={{ ...backdropOptions, circle: false }} clouds={backdropOn} resetKey={fluidReset} />}
+            {backdropOn && !perfOn && backdropSupported() && <Backdrop generator={gen} options={{ ...backdropOptions, circle: false }} clouds={backdropOn} resetKey={fluidReset} />}
 
             <header className="gen-header">
                 <h1 aria-label="calmbgm - calm procedural music" title="calmbgm - calm procedural music">calm<b>bgm</b></h1>
@@ -1329,10 +1364,11 @@ const GenerativeApp = () => {
                 )}
                 <div className="gen-header-tools">
                     <AudioEngineButton engine={audioEngine} />
+                    <PerfModeButton onToggle={togglePerfMode} disabled={audioEngine.busy} />
                     <button type="button" className="gen-help" onClick={() => setHelpOpen(true)} title="Quick reference: hover the parts of the page to see what they do"
                         aria-label="Quick reference">?</button>
                     <MasterVolume />
-                    <VisualMenu backdrop={backdropSupported() ? { value: backdropOn, onChange: setBackdropOn, options: backdropOptions, onOptions: setBackdropOptions, onClear: () => setFluidReset((n) => n + 1), onShuffle: () => setBackdropOptions(shuffleColours(backdropOptions)) } : null} />
+                    <VisualMenu backdrop={backdropSupported() ? { value: backdropOn&&!perfOn, locked:perfOn, onChange: setBackdropOn, options: backdropOptions, onOptions: setBackdropOptions, onClear: () => setFluidReset((n) => n + 1), onShuffle: () => setBackdropOptions(shuffleColours(backdropOptions)) } : null} />
                     <AudioMenu generator={gen} onReload={reloadKeepingSettings} />
                     <SettingsMenu midi={{ connect: live.connectMidi, status: live.midiStatus }} link={() => withBook(withGeneration(withIntro(shareUrl(gen.settings, linkPresets), shortIntro), generationChoice), bookRef.current)} generation={{ value: generationChoice, onChange: chooseGeneration }} saving={saving} onStartOver={startOver} smooth={{ value: smoothPresets, onChange: setSmoothPresets }} intro={{ value: shortIntro, onChange: setShortIntro }} onTour={() => openTour(false)}
                         phrase={<PhraseField seed={settings.seed} edited={gen.editedSinceStart} onApply={playPhrase} onRoll={newVariation} initial={linkedPhrase} />}>
@@ -1357,8 +1393,8 @@ const GenerativeApp = () => {
 
             <ChordTimeline
                 generator={gen} onExploreRule={id => setRuleFocus(previous => ({ id, revision: (previous?.revision ?? 0) + 1 }))}
-                tracks={has(1) ? <TrackStrip roles={shownTracks} presets={Object.fromEntries(Object.entries(roles).map(([role, { presetName, edited }]) => [role, { name: presetName, edited }]))} mix={mix} armed={armed} onMix={changeMix} onArm={setArmed} onEdit={has(3) ? editSound : undefined}
-                    onRandom={randomizePreset} onGenerate={has(3) ? generateForRole : undefined} onPick={choosePicker} generating={generating} live={live} /> : null}
+                tracks={has(1) ? <TrackStrip roles={shownTracks} presets={{...Object.fromEntries(Object.entries(roles).map(([role, { presetName, edited }]) => [role, { name: presetName, edited }])),perc:{name:percussionVoice(settings.drums.kit).name,edited:percussionEdited(settings.drums.kit,settings.drumKit)}}} mix={mix} armed={armed} onMix={changeMix} onArm={setArmed} onEdit={has(3) ? editSound : undefined}
+                    onRandom={randomizePreset} onGenerate={has(3) ? generateForRole : undefined} onPick={choosePicker} onPickPercussion={()=>choosePicker('perc')} onEditPercussion={has(3)?editPercussionSound:undefined} percussionHint={percussionKeyHint(settings.drums.kit)} generating={generating} live={live} /> : null}
             />
 
             <Rulebook generator={gen} settings={settings} book={book} onChoice={changeRule} preset={scene} stage={stage} focusRule={ruleFocus} pageControls={{
@@ -1493,8 +1529,10 @@ const GenerativeApp = () => {
 
             {has(3) && <PercussionPanel drums={settings.drums} kit={settings.drumKit} volume={settings.volumes.perc} mix={mix.perc}
                 armed={armed === 'perc'} onArm={setArmed}
-                onDrums={(drums) => update('drums', drums)} onKit={(kit) => update('drumKit', kit)}
+                onVoice={choosePercussionVoice} voiceBusy={percussionBusy} voiceOpen={pickerRole==='perc'} onVoiceOpen={open=>choosePicker(open?'perc':null)} onDrums={(drums) => update('drums', drums)} onKit={(kit) => update('drumKit', kit)}
                 onVolume={(v) => setVolume('perc', v)} onMix={changeMix} onAudition={() => gen.audition('perc')} />}
+
+            {!has(3)&&pickerRole==='perc'&&<VoiceBrowser role="perc" value={settings.drums.kit} edited={percussionEdited(settings.drums.kit,settings.drumKit)} onChange={choosePercussionVoice} onClose={()=>choosePicker(null)}/>}
 
             {has(3) && <SynthEditor
                 generator={gen}

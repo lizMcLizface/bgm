@@ -1,4 +1,7 @@
 import {kernelAsset} from './kernelAssets';
+import {loadFMModule} from './fmModule';
+import {FM_BANK_LINK,makeFMBankNode} from './fmBank';
+import {optionalSpeedup} from '../audio/perfMode';
 import {sanitizeNoteBehavior} from './noteBehavior';
 import {patchColourTail} from './voiceColour';
 import {WasmBackend} from './backend';
@@ -8,11 +11,11 @@ import {effectTail} from './effectsConfig';
 import {createInstrumentInserts} from './inserts';
 import {insertsTail} from './insertsConfig';
 import {fixture,eventsFor,measure} from './bench';
-let modulePromise;const registrations=new WeakMap();
-function fmModule(){return modulePromise??=fetch(kernelAsset('fm','fm.wasm')).then(async r=>{if(!r.ok)throw Error('FM kernel unavailable. Run npm run synth:build.');return WebAssembly.compile(await r.arrayBuffer());}).catch(e=>{modulePromise=null;throw e;});}
+const registrations=new WeakMap();
 export async function makeFMNode(context,patch,{auditStats=false,offline=false,patches=[],events=[],stopFrame=Number.isFinite(context.length)?context.length:null,onStats=()=>{},onError=()=>{}}={}){
- const module=await fmModule();if(!registrations.has(context))registrations.set(context,context.audioWorklet.addModule(kernelAsset('fm','fm-processor.js')));await registrations.get(context);
- const node=new AudioWorkletNode(context,'calmbgm-fm',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{module,patch:fmPacket(patch),offline,events,stopFrame,auditStats,performance:sanitizeNoteBehavior(patch.performance),patches:patches.map(p=>({...p,patch:fmPacket(p.patch),performance:sanitizeNoteBehavior(p.patch.performance)}))}});
+ if(optionalSpeedup(FM_BANK_LINK)){try{return await makeFMBankNode(context,patch,{auditStats,offline,patches,events,stopFrame,onStats,onError});}catch{/* Optional prototype failure retains the independent source path. */}}
+ const {module,simd}=await loadFMModule();if(!registrations.has(context))registrations.set(context,context.audioWorklet.addModule(kernelAsset('fm','fm-processor.js')));await registrations.get(context);
+ const node=new AudioWorkletNode(context,'calmbgm-fm',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{module,simd,patch:fmPacket(patch),offline,events,stopFrame,auditStats,performance:sanitizeNoteBehavior(patch.performance),patches:patches.map(p=>({...p,patch:fmPacket(p.patch),performance:sanitizeNoteBehavior(p.patch.performance)}))}});
  node.port.onmessage=({data})=>{if(data.type==='stats')onStats(data);if(data.type==='error')onError(Error(data.message));};node.onprocessorerror=()=>onError(Error('FM processor stopped. Reload the instrument.'));return node;
 }
 export class FMBackend extends WasmBackend {

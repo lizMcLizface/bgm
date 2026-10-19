@@ -1,5 +1,6 @@
 // Meter-specific anchors and a restrained, persistent groove. The original
 // percussion.js remains the complete pre-upgrade path.
+import {additionalDrumBar} from '../additionalDrumStyles';
 import { DRUMS } from '../percussion';
 import { seeded, normal } from '../random';
 import { beatStarts } from '../meter';
@@ -25,6 +26,8 @@ export function percussionGeometry(meter, halfTime = false) {
 /** grooveIndex and embellish are review controls, not user settings. */
 export function drumBarLatest({ bar, meter, drums, section, sectionsMode, sectionBars = 16, phraseStart = bar - bar % 4, phraseBars = 4,
     seed = 1, grooveIndex, embellish = true, rhythm, boundaries }) {
+    const added=additionalDrumBar({bar,meter,drums,section,sectionsMode,sectionBars,phraseStart,phraseBars,seed,grooveIndex,embellish,rhythm,boundaries},DRUMS);
+    if(added)return added;
     if(boundaries?.phrase){phraseStart=boundaries.phrase.start;phraseBars=boundaries.phrase.bars;}
     const style = drums.style;
     if (!style || style === 'off') return [];

@@ -1,3 +1,6 @@
+import {percussionVoice} from './percussionVoices';
+import {percussionFromSearch,withPercussion} from '../audio/percussionChoice';
+import {perfEnabled,setPerfChoice} from '../audio/perfMode';
 import React,{useCallback,useEffect,useRef,useState} from 'react';
 import {engineFromSearch,withAudioEngine} from './audioEngineChoice';
 const KEY='bgm-audio-engine';
@@ -10,13 +13,13 @@ export function useAudioEngine(generator,{required=false}={}){
  const restored=useRef(null),pending=useRef(false),override=useRef(engineFromSearch(location.search)),manual=useRef(initialEngine());
  const choose=useCallback(async (next,{remember=true}={})=>{
   if(pending.current||required&&next!=='wasm')return false;
-  pending.current=true;setBusy(true);setError('');
+  pending.current=true;setBusy(true);setError('');const priorPerf=perfEnabled();if(next!=='wasm'&&priorPerf)setPerfChoice(false);
   try{await generator.setAudioEngine(next);const actual=generator.audioEngine??next;setMode(actual);if(remember){manual.current=actual;if(override.current!==null){override.current=actual;history.replaceState(null,'',withAudioEngine(location.pathname+location.search+location.hash,actual));}else try{localStorage.setItem(KEY,actual);}catch{}}return true;}
-  catch(e){setMode(generator.audioEngine??'legacy');setError(e.message);return false;}
+  catch(e){if(priorPerf)setPerfChoice(true);setMode(generator.audioEngine??'legacy');setError(e.message);return false;}
   finally{pending.current=false;setBusy(false);}
  },[generator,required]);
  const toggle=useCallback(()=>choose(generator.audioEngine==='wasm'?'legacy':'wasm'),[choose,generator]);
- useEffect(()=>{if(busy||pending.current||restored.current?.generator===generator&&restored.current.required===required)return;restored.current={generator,required};const desired=required?'wasm':manual.current;if((generator.audioEngine??'legacy')!==desired)void choose(desired,{remember:false});},[generator,choose,required,busy]);
+ useEffect(()=>{if(busy||pending.current||restored.current?.generator===generator&&restored.current.required===required)return;restored.current={generator,required};const desired=required||perfEnabled()?'wasm':manual.current;if((generator.audioEngine??'legacy')!==desired)void choose(desired,{remember:false});},[generator,choose,required,busy]);
  useEffect(()=>{
   const onKey=e=>{
    if(e.code!=='KeyV'||e.defaultPrevented||e.repeat||e.ctrlKey||e.metaKey||e.altKey||
@@ -26,7 +29,7 @@ export function useAudioEngine(generator,{required=false}={}){
   };
   window.addEventListener('keydown',onKey);return()=>window.removeEventListener('keydown',onKey);
  },[toggle]);
- return {mode,busy,error,choose,toggle,required,temporary:override.current!==null};
+ return {generator,mode,busy,error,choose,toggle,required,temporary:override.current!==null};
 }
 
 export function AudioEngineButton({engine}){
@@ -44,5 +47,5 @@ export function AudioEngineButton({engine}){
 
 export default function WasmOptions({engine}){
  const {mode,busy,error,choose,required,temporary}=engine;
- return <section className="gen-menu-section"><h3>Sound engine</h3><label className="gen-check"><input type="checkbox" aria-label="Use Wasm sound engine" checked={mode==='wasm'} disabled={busy||required&&mode==='wasm'} onChange={e=>choose(e.target.checked?'wasm':'legacy')}/>Use Wasm sound engine · experimental</label><small role="status">{busy?'Preparing instruments…':error||(required?'This preset requires Wasm-only voices. Your saved engine preference is unchanged.':temporary?'Temporary engine override from this link. Your saved preference is unchanged. Use V or the header button to compare engines.':'Off by default. Saved on this device. Use the header button or V to compare. Changes resume from the current bar; existing voices are translated and can sound different. Piano, plucked strings and drums retain their native sources.')}</small><a href="/labs/">Instrument labs →</a></section>;
+ return <section className="gen-menu-section"><h3>Sound engine</h3><label className="gen-check"><input type="checkbox" aria-label="Use Wasm sound engine" checked={mode==='wasm'} disabled={busy||required&&mode==='wasm'} onChange={e=>choose(e.target.checked?'wasm':'legacy')}/>Use Wasm sound engine · experimental</label><small role="status">{busy?'Preparing instruments…':error||(required?'This preset requires Wasm-only voices. Your saved engine preference is unchanged.':temporary?'Temporary engine override from this link. Your saved preference is unchanged. Use V or the header button to compare engines.':'Off by default. Saved on this device. Use the header button or V to compare. Changes resume from the current bar; existing voices are translated and can sound different. Piano and plucked strings retain native sources. Percussion can be tried separately below.')}</small><label>Percussion backend · experimental<select aria-label="Percussion backend" value={engine.generator?.percussionEngine ?? (percussionFromSearch(location.search)==='808'?'wasm':percussionFromSearch(location.search))} onChange={e=>{history.replaceState(null,'',withPercussion(location.pathname+location.search+location.hash,e.target.value));location.reload();}}><option value="native" disabled={percussionVoice(engine.generator?.settings?.drums?.kit).wasmOnly}>Native Web Audio</option><option value="wasm">Wasm · queued percussion</option></select></label><small>The Percussion track selects the Felt, Crisp, 808 or Hand Percussion voice. 808 and Hand Percussion require Wasm. Changing this backend reloads the page; the selected voice and rhythm stay the same.</small><a href="/tools/percussion-engine.html">Percussion comparison →</a><a href="/labs/">Instrument labs →</a></section>;
 }

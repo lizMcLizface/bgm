@@ -6,7 +6,7 @@ import {cloneFM,FM_RECIPES} from './fmPatch';import {clonePatch,RECIPES} from '.
 const bytes=fs.readFileSync('public/synth-lab/inserts.wasm'),module=new WebAssembly.Module(bytes);
 const rms=x=>Math.sqrt(x.reduce((s,v)=>s+v*v,0)/x.length),signal=(rate,hz,seconds=1)=>{const data=Float32Array.from({length:Math.ceil(rate*seconds)},(_,i)=>.05*Math.sin(2*Math.PI*hz*i/rate));return [data,data.slice()];};
 test('instrument insert artifact matches its source and patches retain optional insert settings',()=>{
- const m=JSON.parse(fs.readFileSync('public/synth-lab/inserts-build.json')),source=crypto.createHash('sha256').update(['synth-engine/inserts/Cargo.toml','synth-engine/inserts/src/lib.rs'].map(f=>fs.readFileSync(f,'utf8').replace(/\r\n/g,'\n')).join('\n')).digest('hex');expect(m.source).toBe(source);expect(m.wasm).toBe(crypto.createHash('sha256').update(bytes).digest('hex'));
+ const m=JSON.parse(fs.readFileSync('public/synth-lab/inserts-build.json')),source=crypto.createHash('sha256').update(['synth-engine/inserts/Cargo.toml','synth-engine/inserts/src/lib.rs','synth-engine/common/denormal.rs'].map(f=>fs.readFileSync(f,'utf8').replace(/\r\n/g,'\n')).join('\n')).digest('hex');expect(m.source).toBe(source);expect(m.wasm).toBe(crypto.createHash('sha256').update(bytes).digest('hex'));
  for(const [p,copy]of [[RECIPES[0],clonePatch],[FM_RECIPES[0],cloneFM]]){const q=copy(p);q.inserts.chorus=.4;q.inserts.phaserFeedback=-.5;expect(copy(q).inserts).toEqual(q.inserts);expect(copy({...q,inserts:undefined}).inserts).toEqual(defaultInserts());}
  expect(sanitizeInserts({gain:Infinity,phaserFeedback:99,unknown:1})).toMatchObject({gain:0,phaserFeedback:.75});expect(insertsTail(defaultInserts())).toBe(0);expect(insertsActive(defaultInserts())).toBe(false);
 });

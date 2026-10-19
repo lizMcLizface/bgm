@@ -8,7 +8,7 @@ export function reviewEvents({ mode='latest', style='lofi', meter='4/4', groove=
     const geometry=METERS[meter], unitSeconds=60/unitsPerMinute(geometry,bpm);
     const planned=Array.from({length:bars},(_,bar)=>{
         const args={bar,meter:geometry,drums:{style,activity,variation:embellish ? variation : 0,sprinkle:embellish ? sprinkle : 0,kit},
-            section:null,sectionsMode:'off',phraseStart:bar-bar%4,seed,grooveIndex:groove,embellish};
+            section:null,sectionsMode:'off',phraseStart:bar-bar%4,seed,grooveIndex:groove==='auto'?undefined:Number(groove),embellish};
         const events=(mode==='legacy'?drumBar:drumBarLatest)(args);
         swingEvents(events,geometry,swing);
         if (instrumentTiming && mode !== 'legacy') performEnsemble(events,{timing,velocity:0},unitSeconds,seed,bar,geometry,{profiles:{}});

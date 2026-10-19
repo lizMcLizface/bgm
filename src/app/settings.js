@@ -1,4 +1,8 @@
+import {percussionFromSearch,withPercussion} from '../audio/percussionChoice';
+import {mediaHelperFromSearch,withMediaHelper} from '../audio/mediaHelperChoice';
+import {readPerfChoice,withPerf,perfFromSearch} from '../audio/perfMode';
 import {engineFromSearch,withAudioEngine} from './audioEngineChoice';
+import {simdFromSearch,withSimd,bankFromSearch,withFMBank} from '../audio/simdChoice';
 // Generator settings as data: defaults, validation, and the compact form
 // used in share links (?s=...). Synth presets are not
 // part of the settings; a link carries each role's built-in preset name
@@ -295,7 +299,7 @@ export function settingsFromLocation(location) {
  * out ({ seed: false }): a reload keeps the settings but makes a new piece.
  */
 export function sharePath(settings, presets, location = window.location, { seed = true } = {}) {
-    return withAudioEngine(withGeneration(`${location.pathname}?${encodeSettings(settings, presets, { seed })}`, settings.generation),engineFromSearch(location.search));
+    return withPercussion(withMediaHelper(withPerf(withFMBank(withSimd(withAudioEngine(withGeneration(`${location.pathname}?${encodeSettings(settings, presets, { seed })}`, settings.generation),engineFromSearch(location.search)),simdFromSearch(location.search)),bankFromSearch(location.search)),perfFromSearch(location.search)??readPerfChoice()),mediaHelperFromSearch(location.search)),percussionFromSearch(location.search));
 }
 
 /** Full share URL for the current page and settings. */

@@ -5,6 +5,9 @@ function Controls({generator,required=false}){const engine=useAudioEngine(genera
 let node,root;
 beforeEach(()=>{history.replaceState(null,'','/');localStorage.clear();node=document.createElement('div');document.body.append(node);root=createRoot(node);globalThis.IS_REACT_ACT_ENVIRONMENT=true;});
 afterEach(()=>{act(()=>root.unmount());node.remove();delete globalThis.IS_REACT_ACT_ENVIRONMENT;});
+it('a single perf parameter selects Wasm without changing the saved engine',async()=>{
+ history.replaceState(null,'','/?perf=1');localStorage.setItem('bgm-audio-engine','legacy');const generator={audioEngine:'legacy',setAudioEngine:vi.fn(async function(mode){this.audioEngine=mode;})};await act(async()=>root.render(<Controls generator={generator}/>));expect(generator.audioEngine).toBe('wasm');expect(localStorage.getItem('bgm-audio-engine')).toBe('legacy');
+});
 it('is off for a fresh visitor and persists an explicit opt-in',async()=>{
  const generator={audioEngine:'legacy',setAudioEngine:vi.fn(async function(mode){this.audioEngine=mode;})};await act(async()=>root.render(<Controls generator={generator}/>));const input=node.querySelector('input');expect(input.checked).toBe(false);expect(generator.setAudioEngine).not.toHaveBeenCalled();await act(async()=>{input.click();await Promise.resolve();});expect(input.checked).toBe(true);expect(localStorage.getItem('bgm-audio-engine')).toBe('wasm');
 });
