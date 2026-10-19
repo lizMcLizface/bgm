@@ -40,8 +40,8 @@ class SynthProcessor extends AudioWorkletProcessor {
     at+=count;this.clock+=count;
    }
    if(this.auditStats)this.auditPeak=Math.max(this.auditPeak,this.engine.engine_stat(0));
-   this.report+=n;if(!this.offline&&this.report>=sampleRate){this.report=0;this.port.postMessage({type:'stats',active:this.engine.engine_stat(0),steals:this.engine.engine_stat(1),dropped:this.engine.engine_stat(2),late:this.engine.engine_stat(3),frame:this.engine.engine_stat(4),peak:this.engine.engine_stat(5),memory:this.engine.memory.buffer.byteLength});}
-   if(this.stopFrame!==null&&this.engine.engine_stat(4)>=this.stopFrame){if(this.auditStats)this.port.postMessage({type:'stats',final:true,active:this.engine.engine_stat(0),peakActive:this.auditPeak,steals:this.engine.engine_stat(1),dropped:this.engine.engine_stat(2),late:this.engine.engine_stat(3),frame:this.engine.engine_stat(4),memory:this.engine.memory.buffer.byteLength});this.stop();return false;}
+   this.report+=n;if(!this.offline&&this.report>=sampleRate){this.report=0;this.port.postMessage({type:'stats',active:this.engine.engine_stat(0),steals:this.engine.engine_stat(1),dropped:this.engine.engine_stat(2),late:this.engine.engine_stat(3),frame:this.engine.engine_stat(4),peak:this.engine.engine_stat(5),memory:this.engine.memory.buffer.byteLength,simdFrames:this.engine.engine_simd_frames?.()??0});}
+   if(this.stopFrame!==null&&this.engine.engine_stat(4)>=this.stopFrame){if(this.auditStats)this.port.postMessage({type:'stats',final:true,active:this.engine.engine_stat(0),peakActive:this.auditPeak,steals:this.engine.engine_stat(1),dropped:this.engine.engine_stat(2),late:this.engine.engine_stat(3),frame:this.engine.engine_stat(4),memory:this.engine.memory.buffer.byteLength,simdFrames:this.engine.engine_simd_frames?.()??0});this.stop();return false;}
    return true;
   }catch(error){this.fail(error);return false;}
  }

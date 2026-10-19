@@ -37,8 +37,8 @@ class FmProcessor extends AudioWorkletProcessor {
     at+=count;this.clock+=count;
    }
    if(this.auditStats)this.auditPeak=Math.max(this.auditPeak,this.fm.fm_stat(0));
-   this.rendered+=out[0].length;this.frames+=out[0].length;if(!this.offline&&this.frames>=sampleRate){this.frames=0;this.port.postMessage({type:'stats',active:this.fm.fm_stat(0),steals:this.fm.fm_stat(1),dropped:this.fm.fm_stat(2),late:this.fm.fm_stat(3),peak:this.fm.fm_stat(5),latencyFrames:this.fm.fm_stat(6),memory:this.fm.memory.buffer.byteLength});}
-   if(this.stopFrame!==null&&this.rendered>=this.stopFrame){if(this.auditStats)this.port.postMessage({type:'stats',final:true,active:this.fm.fm_stat(0),peakActive:this.auditPeak,steals:this.fm.fm_stat(1),dropped:this.fm.fm_stat(2),late:this.fm.fm_stat(3),frame:this.clock,memory:this.fm.memory.buffer.byteLength});this.stop();return false;}
+   this.rendered+=out[0].length;this.frames+=out[0].length;if(!this.offline&&this.frames>=sampleRate){this.frames=0;this.port.postMessage({type:'stats',active:this.fm.fm_stat(0),steals:this.fm.fm_stat(1),dropped:this.fm.fm_stat(2),late:this.fm.fm_stat(3),peak:this.fm.fm_stat(5),latencyFrames:this.fm.fm_stat(6),memory:this.fm.memory.buffer.byteLength,simdFrames:this.fm.fm_simd_frames?.()??0});}
+   if(this.stopFrame!==null&&this.rendered>=this.stopFrame){if(this.auditStats)this.port.postMessage({type:'stats',final:true,active:this.fm.fm_stat(0),peakActive:this.auditPeak,steals:this.fm.fm_stat(1),dropped:this.fm.fm_stat(2),late:this.fm.fm_stat(3),frame:this.clock,memory:this.fm.memory.buffer.byteLength,simdFrames:this.fm.fm_simd_frames?.()??0});this.stop();return false;}
    return true;
   }catch(e){this.fail(e);return false;}
  }
