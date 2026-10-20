@@ -1,0 +1,229 @@
+{
+  "schema": 1,
+  "banks": [
+    {
+      "id": "juno-factory",
+      "synth": "juno",
+      "name": "Factory 106",
+      "kind": "factory",
+      "count": 128,
+      "url": "synth-presets/juno-factory.yaml"
+    },
+    {
+      "id": "juno-eric106",
+      "synth": "juno",
+      "name": "Eric 106",
+      "kind": "factory",
+      "count": 128,
+      "url": "synth-presets/juno-eric106.yaml"
+    },
+    {
+      "id": "prophet5-factory",
+      "synth": "prophet5",
+      "name": "Factory v1.03 (F5: Rev 3)",
+      "kind": "factory",
+      "count": 200,
+      "url": "synth-presets/prophet5-factory.yaml"
+    },
+    {
+      "id": "jupiter8-factory",
+      "synth": "jupiter8",
+      "name": "Factory tape",
+      "kind": "factory",
+      "count": 64,
+      "url": "synth-presets/jupiter8-factory.yaml"
+    },
+    {
+      "id": "obxa-factory",
+      "synth": "obxa",
+      "name": "Factory patch book (96 programs)",
+      "kind": "factory",
+      "count": 96,
+      "url": "synth-presets/obxa-factory.yaml"
+    },
+    {
+      "id": "dx7-rom1a",
+      "synth": "dx7",
+      "name": "ROM1A",
+      "kind": "factory",
+      "count": 32,
+      "url": "synth-presets/dx7-rom1a.yaml"
+    },
+    {
+      "id": "dx7-rom1b",
+      "synth": "dx7",
+      "name": "ROM1B",
+      "kind": "factory",
+      "count": 32,
+      "url": "synth-presets/dx7-rom1b.yaml"
+    },
+    {
+      "id": "dx7-rom2a",
+      "synth": "dx7",
+      "name": "ROM2A",
+      "kind": "factory",
+      "count": 32,
+      "url": "synth-presets/dx7-rom2a.yaml"
+    },
+    {
+      "id": "dx7-rom2b",
+      "synth": "dx7",
+      "name": "ROM2B",
+      "kind": "factory",
+      "count": 32,
+      "url": "synth-presets/dx7-rom2b.yaml"
+    },
+    {
+      "id": "dx7-rom3a",
+      "synth": "dx7",
+      "name": "ROM3A",
+      "kind": "factory",
+      "count": 32,
+      "url": "synth-presets/dx7-rom3a.yaml"
+    },
+    {
+      "id": "dx7-rom3b",
+      "synth": "dx7",
+      "name": "ROM3B",
+      "kind": "factory",
+      "count": 32,
+      "url": "synth-presets/dx7-rom3b.yaml"
+    },
+    {
+      "id": "dx7-rom4a",
+      "synth": "dx7",
+      "name": "ROM4A",
+      "kind": "factory",
+      "count": 32,
+      "url": "synth-presets/dx7-rom4a.yaml"
+    },
+    {
+      "id": "dx7-rom4b",
+      "synth": "dx7",
+      "name": "ROM4B",
+      "kind": "factory",
+      "count": 32,
+      "url": "synth-presets/dx7-rom4b.yaml"
+    },
+    {
+      "id": "dx7-generated-a6fb8c36",
+      "synth": "dx7",
+      "name": "Generated cartridge a6fb8c36",
+      "kind": "factory",
+      "count": 32,
+      "url": "synth-presets/dx7-generated-a6fb8c36.yaml"
+    },
+    {
+      "id": "vs-factory",
+      "synth": "vs",
+      "name": "Factory programs",
+      "kind": "factory",
+      "count": 100,
+      "url": "synth-presets/vs-factory.yaml"
+    },
+    {
+      "id": "vs-rom-cart",
+      "synth": "vs",
+      "name": "ROM cartridge",
+      "kind": "factory",
+      "count": 100,
+      "url": "synth-presets/vs-rom-cart.yaml"
+    },
+    {
+      "id": "cs80-originals",
+      "synth": "cs80",
+      "name": "bgm sounds",
+      "kind": "original",
+      "count": 12,
+      "url": "synth-presets/cs80-originals.yaml"
+    },
+    {
+      "id": "juno-originals",
+      "synth": "juno",
+      "name": "bgm sounds",
+      "kind": "original",
+      "count": 12,
+      "url": "synth-presets/juno-originals.yaml"
+    },
+    {
+      "id": "prophet5-originals",
+      "synth": "prophet5",
+      "name": "bgm sounds",
+      "kind": "original",
+      "count": 12,
+      "url": "synth-presets/prophet5-originals.yaml"
+    },
+    {
+      "id": "jupiter8-originals",
+      "synth": "jupiter8",
+      "name": "bgm sounds",
+      "kind": "original",
+      "count": 15,
+      "url": "synth-presets/jupiter8-originals.yaml"
+    },
+    {
+      "id": "minimoog-originals",
+      "synth": "minimoog",
+      "name": "bgm sounds",
+      "kind": "original",
+      "count": 12,
+      "url": "synth-presets/minimoog-originals.yaml"
+    },
+    {
+      "id": "dx7-originals",
+      "synth": "dx7",
+      "name": "bgm sounds",
+      "kind": "original",
+      "count": 9,
+      "url": "synth-presets/dx7-originals.yaml"
+    },
+    {
+      "id": "obxa-originals",
+      "synth": "obxa",
+      "name": "bgm sounds",
+      "kind": "original",
+      "count": 13,
+      "url": "synth-presets/obxa-originals.yaml"
+    },
+    {
+      "id": "vs-originals",
+      "synth": "vs",
+      "name": "bgm sounds",
+      "kind": "original",
+      "count": 9,
+      "url": "synth-presets/vs-originals.yaml"
+    },
+    {
+      "id": "tr808-originals",
+      "synth": "tr808",
+      "name": "bgm sounds",
+      "kind": "original",
+      "count": 6,
+      "url": "synth-presets/tr808-originals.yaml"
+    },
+    {
+      "id": "tr909-originals",
+      "synth": "tr909",
+      "name": "bgm sounds",
+      "kind": "original",
+      "count": 6,
+      "url": "synth-presets/tr909-originals.yaml"
+    },
+    {
+      "id": "tr606-originals",
+      "synth": "tr606",
+      "name": "bgm sounds",
+      "kind": "original",
+      "count": 6,
+      "url": "synth-presets/tr606-originals.yaml"
+    },
+    {
+      "id": "tb303-originals",
+      "synth": "tb303",
+      "name": "bgm sounds",
+      "kind": "original",
+      "count": 6,
+      "url": "synth-presets/tb303-originals.yaml"
+    }
+  ]
+}

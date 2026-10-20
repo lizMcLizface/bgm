@@ -1,0 +1,1 @@
+const e="bgm-theme",o=["auto","light","dark"];function n(){try{const t=window.localStorage.getItem(e);return o.includes(t)?t:"auto"}catch{return"auto"}}function c(t){t==="auto"?delete document.documentElement.dataset.theme:document.documentElement.dataset.theme=t;try{window.localStorage.setItem(e,t)}catch{}}export{c as a,n as s};
