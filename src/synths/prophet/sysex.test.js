@@ -1,5 +1,6 @@
 // @vitest-environment node
-import {pack,unpack,parseProphetSysex,decodeProgram,freqSemitones,programCode,CALIBRATION} from './sysex';
+import {BY_KEY,clampValue} from './params';
+import {pack,unpack,parseProphetSysex,decodeProgram,engineValues,freqSemitones,programCode,CALIBRATION} from './sysex';
 
 // A program shaped like factory F5-17 "SYNC I": Osc A saw synced to a silent Osc B,
 // filter envelope Poly-Mod into Osc A frequency.
@@ -35,14 +36,15 @@ test('a program decodes into named panel values',()=>{
  const v=decodeProgram(program());
  expect(v.name).toBe('SYNC I');
  expect([v.oscAFreq,v.oscBFreq,v.oscASaw,v.oscAPulse,v.sync,v.oscBKeyboard]).toEqual([-9,-12,true,false,true,true]);
- expect(v.cutoff).toBeCloseTo(75/120);expect(v.keyTrack).toBe('full');expect(v.filterRev).toBe('rev3');
- expect([v.polyModEnv,v.polyModFreqA,v.polyModFilter]).toEqual([86/120,true,false]);
- expect(v.ampSustain).toBe(1);expect(v.release).toBe(false);
+ expect(v.cutoff).toBeCloseTo(75/127);expect(v.keyTrack).toBe('full');expect(v.filterRev).toBe('rev3');
+ expect([v.polyModEnv,v.polyModFreqA,v.polyModFilter]).toEqual([86/127,true,false]);
+ expect(v.ampSustain).toBeCloseTo(120/127);expect(v.release).toBe(false);
  expect([v.unison,v.bendRange,v.keyPriority]).toEqual([false,7,'low']);
  // 255 = amount never set by older firmware: full depth
  expect([v.velocityAmount,v.aftertouchAmount]).toEqual([1,1]);
- // knob bytes above 120 (found in a few factory programs) count as full
+ // knobs run to 127 (the factory set stores full as 127, and uses 121–126)
  expect(decodeProgram(program({edit:{17:127}})).cutoff).toBe(1);
+ expect(decodeProgram(program({edit:{17:120}})).cutoff).toBeCloseTo(120/127);
 });
 
 test('unison voices, chord memory, low-frequency Osc B and Osc B fine',()=>{
@@ -68,4 +70,17 @@ test('a file of dumps parses program and edit-buffer messages, skipping others',
  const p=parseProphetSysex(bytes);
  expect(p.map(x=>[x.code,x.name,x.device])).toEqual([['F5-17','SYNC I','Prophet-5'],['U1-58','Mine','Prophet-10'],['Edit','Edit','Prophet-5']]);
  expect(p[0].values.sync).toBe(true);
+});
+
+test('a decoded program maps onto the engine table: every key known, every value in range',()=>{
+ const d=new Uint8Array(133);Object.assign(d,{0:48,1:110,3:1,11:1,12:0,14:127,17:64,19:2,20:1,43:0,46:127,51:1,52:1,53:10,55:0,56:4,57:7,58:127,59:127,60:127,61:127,62:127,63:127,64:127,97:255,98:40,41:1,38:1});
+ const e=engineValues(decodeProgram(d),d);
+ for(const [key,value] of Object.entries(e)){expect(BY_KEY[key],key).toBeDefined();expect(clampValue(key,value)).toBeCloseTo(value);}
+ // low-frequency Osc B keeps the whole knob travel (step 110 = +31 st, a rate above the audio range)
+ expect([e.bLow,e.bKybd,e.bFreq]).toEqual([1,0,31]);
+ expect(e.cutoff).toBeCloseTo(20*1000**(64/127));expect(e.aDecay).toBeCloseTo(15);expect(e.track).toBe(2);
+ // chord memory: unison with one voice per chord note
+ expect([e.unison,e.chord,e.unisonVoices,e.chord1,e.chord2,e.chord3,e.chord4]).toEqual([1,1,3,0,4,7,-1]);
+ // switches carry the Rev 4 amounts (255 = unset by older firmware: full)
+ expect(e.velFilter).toBe(1);expect(e.afterFilter).toBeCloseTo(40/127);expect(e.afterAmp).toBe(0);
 });

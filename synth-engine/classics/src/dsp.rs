@@ -306,6 +306,12 @@ impl Ladder {
     /// `g` from [`warp`], `k` = feedback (0 = none, 4 = self-oscillation).
     #[inline]
     pub fn tick(&mut self, x: f32, g: f32, k: f32) -> f32 {
+        self.taps(x, g, k).1
+    }
+    /// The second stage (12 dB/oct, still resonating through the four-stage
+    /// loop, as the 2-pole mode of the IR3109 filters) and the fourth (24 dB/oct).
+    #[inline]
+    pub fn taps(&mut self, x: f32, g: f32, k: f32) -> (f32, f32) {
         let a = g / (1. + g);
         let b = 1. / (1. + g);
         let [s0, s1, s2, s3] = self.s;
@@ -314,13 +320,17 @@ impl Ladder {
         let sum = b * (a2 * a * s0 + a2 * s1 + a * s2 + s3);
         let y = (a4 * x + sum) / (1. + k * a4);
         let mut u = 2. * soft(0.5 * (x - k * y));
-        for st in self.s.iter_mut() {
+        let mut two = 0.;
+        for (i, st) in self.s.iter_mut().enumerate() {
             let v = (u - *st) * a;
             let out = v + *st;
             *st = out + v;
             u = out;
+            if i == 1 {
+                two = out;
+            }
         }
-        u
+        (two, u)
     }
 }
 /// Resonance control 0..1 to ladder feedback; the last few percent self-oscillate.
@@ -342,6 +352,168 @@ impl Adsr {
             self.value
         } else {
             self.tick(1., decay, sustain, release)
+        }
+    }
+}
+
+/// Levels of the waveforms a [`VcOsc`] mixes (0 = off).
+#[derive(Clone, Copy)]
+pub struct Waves {
+    pub saw: f32,
+    pub pulse: f32,
+    pub tri: f32,
+    pub sine: f32,
+}
+impl Waves {
+    pub const NONE: Self = Self { saw: 0., pulse: 0., tri: 0., sine: 0. };
+}
+
+/// Corrections for one sample step: `now` for the new sample, `before` for the
+/// held one. Events sit `tau` ∈ (0, 1] of the way from the held sample to the new one.
+struct Fix {
+    now: f32,
+    before: f32,
+}
+impl Fix {
+    /// PolyBLEP for a step of height `h`.
+    #[inline]
+    fn step(&mut self, h: f32, tau: f32) {
+        let d = 1. - tau;
+        self.before += 0.5 * h * d * d;
+        self.now -= 0.5 * h * tau * tau;
+    }
+    /// PolyBLAMP for a change of slope `m` (value per sample).
+    #[inline]
+    fn corner(&mut self, m: f32, tau: f32) {
+        let d = 1. - tau;
+        self.before += m * d * d * d * (1. / 6.);
+        self.now += m * tau * tau * tau * (1. / 6.);
+    }
+}
+
+/// A band-limited analog-style oscillator: saw, pulse (DC-free) and triangle
+/// mixed, with every discontinuity placed at its sub-sample time (polyBLEP for
+/// steps, polyBLAMP for the triangle's corners), hard-sync resets included. The
+/// output is one sample late, so a correction can reach back before an event.
+#[derive(Clone, Copy)]
+pub struct VcOsc {
+    pub phase: f32,
+    held: f32,
+}
+impl VcOsc {
+    pub const ZERO: Self = Self { phase: 0., held: 0. };
+
+    #[inline]
+    fn value(t: f32, pw: f32, w: &Waves) -> f32 {
+        let pulse = if t < pw { 1. } else { -1. };
+        let sine = if w.sine != 0. { w.sine * sin_turns(t) } else { 0. };
+        w.saw * (2. * t - 1.) + w.pulse * (pulse - (2. * pw - 1.)) + w.tri * (1. - 4. * (t - 0.5).abs()) + sine
+    }
+
+    /// Slope in value per sample at phase `t`.
+    #[inline]
+    fn slope(t: f32, dt: f32, w: &Waves) -> f32 {
+        let sine = if w.sine != 0. { w.sine * TAU * dt * sin_turns(t + 0.25) } else { 0. };
+        2. * dt * w.saw + if t < 0.5 { 4. } else { -4. } * dt * w.tri + sine
+    }
+
+    /// Moves the phase through the part of the sample from `from` to `to`, correcting each edge.
+    #[inline]
+    fn run(t: &mut f32, dt: f32, pw: f32, w: &Waves, from: f32, to: f32, fix: &mut Fix, wrap: &mut f32) {
+        let mut at = from;
+        for _ in 0..4 {
+            let end = *t + dt * (to - at);
+            // the next edge ahead: pulse fall at pw, triangle peak at ½, wrap at 1
+            let (mut edge, mut kind) = (1., 0u8);
+            if w.pulse != 0. && *t < pw && pw < edge {
+                edge = pw;
+                kind = 1;
+            }
+            if w.tri != 0. && *t < 0.5 && 0.5 < edge {
+                edge = 0.5;
+                kind = 2;
+            }
+            if end < edge {
+                *t = end;
+                return;
+            }
+            let tau = (at + (edge - *t) / dt).clamp(from, to);
+            match kind {
+                1 => fix.step(-2. * w.pulse, tau),
+                2 => fix.corner(-8. * dt * w.tri, tau),
+                _ => {
+                    fix.step(2. * (w.pulse - w.saw), tau);
+                    fix.corner(8. * dt * w.tri, tau);
+                    *wrap = tau;
+                }
+            }
+            *t = if kind == 0 { 0. } else { edge };
+            at = tau;
+        }
+        *t = t.clamp(0., 0.999_999);
+    }
+
+    /// Advances one sample at `dt` turns per sample (below ½). `sync` in (0, 1]
+    /// resets the phase that far through the sample; 0 means no reset. Returns the
+    /// output and where this oscillator wrapped within the sample (0 if it did not),
+    /// which is the `sync` for an oscillator slaved to it.
+    #[inline]
+    pub fn step(&mut self, dt: f32, pw: f32, w: &Waves, sync: f32) -> (f32, f32) {
+        let mut fix = Fix { now: 0., before: 0. };
+        let mut t = self.phase;
+        let mut wrap = 0.;
+        if sync > 0. && sync <= 1. {
+            Self::run(&mut t, dt, pw, w, 0., sync, &mut fix, &mut wrap);
+            fix.step(Self::value(0., pw, w) - Self::value(t, pw, w), sync);
+            fix.corner(Self::slope(0., dt, w) - Self::slope(t, dt, w), sync);
+            t = 0.;
+            Self::run(&mut t, dt, pw, w, sync, 1., &mut fix, &mut wrap);
+        } else {
+            Self::run(&mut t, dt, pw, w, 0., 1., &mut fix, &mut wrap);
+        }
+        let out = self.held + fix.before;
+        self.held = Self::value(t, pw, w) + fix.now;
+        self.phase = t;
+        (out, wrap)
+    }
+}
+
+/// Odd taps of a 47-tap Blackman-windowed half-band low-pass (centre tap ½): flat
+/// to 0.2·fs, −50 dB at 0.3·fs and below −79 dB from 0.32·fs (fs = oversampled rate).
+const HALF_BAND: [f32; 11] = [
+    0.315_884_39, -0.099_017_018, 0.052_466_078, -0.030_992_122, 0.018_581_689, -0.010_847_646,
+    0.005_996_370_8, -0.003_052_243_7, 0.001_371_809_1, -0.000_495_819_78, 0.000_104_510_76,
+];
+
+/// Two-to-one decimator for a voice path run at twice the sample rate.
+#[derive(Clone, Copy)]
+pub struct HalfBand {
+    buf: [f32; 128],
+    pos: usize,
+}
+impl HalfBand {
+    pub const ZERO: Self = Self { buf: [0.; 128], pos: 0 };
+    #[inline]
+    fn push(&mut self, x: f32) {
+        self.buf[self.pos] = x;
+        self.buf[self.pos + 64] = x;
+        self.pos = (self.pos + 1) & 63;
+    }
+    /// Takes two oversampled samples, returns one at the base rate (latency 23 oversampled samples).
+    #[inline]
+    pub fn tick(&mut self, a: f32, b: f32) -> f32 {
+        self.push(a);
+        self.push(b);
+        let s = &self.buf[self.pos + 17..self.pos + 64];
+        let mut y = 0.5 * s[23];
+        for (k, c) in HALF_BAND.iter().enumerate() {
+            let m = 2 * k + 1;
+            y += c * (s[23 - m] + s[23 + m]);
+        }
+        if y.abs() < 1e-20 {
+            0.
+        } else {
+            y
         }
     }
 }

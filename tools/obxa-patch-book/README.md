@@ -19,6 +19,9 @@ npx vite-node tools/exportPatchesYaml.mjs banks/oberheim-ob-xa/patch-book.json  
 4. **Switches:** the LED positions come from the reference panel, mapped through the fit and refined locally. "Lit" means the dot is filled. The readings fall into two clusters (below 0.3 and above 0.7), with nothing in between.
 5. **Names and pitch notes:** read by eye from the title crops into `titles.txt` (no OCR available). Codes follow book order. The programmer LEDs on each drawing serve as a cross-check: two drawings show the wrong ones (D3 drawn as D4, ACD2 as BCD5), and these are kept as `drawing_note`.
 
+## Playing the result
+The measured `patch-book.json` loads on the OB-Xa page (`/synths/obxa/`, "Patch book" shelf, automatically on your own machine) and plays through the engine; `npx vite-node tools/auditObxaBook.mjs banks/oberheim-ob-xa/patch-book.json` renders every program.
+
 ## Known limits
 - **Group C** (Trumpets … Pizzicato) is not in this scan, so the set has 96 of the 104 factory programs.
 - **Accuracy:** the drawings are facsimiles. The book itself says fine tuning of frequencies, detune, modulation depth and envelopes matters, so treat the values as ±0.3 or so. Oscillator pitch comes from the printed notes, not from the frequency knob angles.

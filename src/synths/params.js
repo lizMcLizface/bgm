@@ -58,6 +58,11 @@ export function formatValue(p,value){
   case 'ct':return (value>0?'+':'')+Math.round(value)+'¢';
   case 'bi':return (value>0?'+':'')+Math.round(value*100);
   case 'bal':return value<.5?'I '+Math.round((1-value)*100):value>.5?'II '+Math.round(value*100):'I = II';
+  case 'bal-ul':return value<.5?'Up '+Math.round((1-value)*100):value>.5?'Lo '+Math.round(value*100):'Even';
+  case 'note':return ['C','C♯','D','D♯','E','F','F♯','G','G♯','A','A♯','B'][value%12]+(Math.floor(value/12)-1);
+  case 'bp':return ['C','C♯','D','D♯','E','F','F♯','G','G♯','A','A♯','B'][(value+21)%12]+(Math.floor((value+21)/12)-2);
+  case 'alg':return String(value+1);
+  case 'tr':return (value-24>0?'+':'')+(value-24);
   case 'n':return String(value);
   default:return Math.round(value*100)+'';
  }

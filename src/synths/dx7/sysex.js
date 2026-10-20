@@ -60,7 +60,7 @@ export function decodeVoice(v){
 
 const checksumOk=data=>(data.reduce((s,b)=>s+b,0)&0x7f)===0;
 
-/** Every voice in a SysEx file (32-voice bulks and single voices), in file order: [{number, name, checksumOk, values}]. */
+/** Every voice in a SysEx file (32-voice bulks and single voices), in file order: [{number, name, checksumOk, values, raw}] (raw = the 155 unpacked parameters). */
 export function parseDx7Sysex(input){
  const bytes=input instanceof Uint8Array?input:new Uint8Array(input);
  const voices=[];
@@ -70,8 +70,8 @@ export function parseDx7Sysex(input){
   const m=bytes.subarray(i,end+1);i=end;
   const format=m[3],size=m[4]<<7|m[5],data=m.subarray(6,6+size),ok=checksumOk(m.subarray(6,7+size));
   if(m.length<size+8)continue;
-  if(format===9&&size===4096)for(let k=0;k<32;k++){const values=decodeVoice(unpackVoice(data.subarray(k*128,k*128+128)));voices.push({number:k+1,name:values.name,checksumOk:ok,values});}
-  else if(format===0&&size===155){const values=decodeVoice(data);voices.push({number:null,name:values.name,checksumOk:ok,values});}
+  if(format===9&&size===4096)for(let k=0;k<32;k++){const raw=unpackVoice(data.subarray(k*128,k*128+128)),values=decodeVoice(raw);voices.push({number:k+1,name:values.name,checksumOk:ok,values,raw});}
+  else if(format===0&&size===155){const raw=Uint8Array.from(data),values=decodeVoice(raw);voices.push({number:null,name:values.name,checksumOk:ok,values,raw});}
  }
  return voices;
 }

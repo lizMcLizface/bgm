@@ -1,8 +1,9 @@
 // Runs the classic-synth kernel directly (no AudioWorklet): tests and audits.
-export const MODELS={cs80:0,juno:1};
-export function createOfflineSynth(module,{sampleRate=48000,model=MODELS.cs80,params=[]}={}){
+export const MODELS={cs80:0,juno:1,prophet5:2,jupiter8:3,minimoog:4,dx7:5,obxa:6,vs:7};
+export function createOfflineSynth(module,{sampleRate=48000,model=MODELS.cs80,params=[],waves=null}={}){
  const k=new WebAssembly.Instance(module,{}).exports;
  if(!k.syn_init(sampleRate,model))throw Error('Unsupported model or sample rate');
+ if(waves)loadWaves(k,waves);
  for(const [id,value] of params)k.syn_param(id,value);
  return {
   k,sampleRate,
@@ -13,6 +14,11 @@ export function createOfflineSynth(module,{sampleRate=48000,model=MODELS.cs80,pa
   },
   seconds(s,chunk){return this.render(Math.round(s*sampleRate),chunk);},
  };
+}
+/** Writes the vector synthesizer's 128 waves × 128 samples into the kernel and builds its tables. */
+export function loadWaves(k,waves){
+ new Float32Array(k.memory.buffer,k.syn_wave_ptr(),waves.length).set(waves);
+ k.syn_wave_commit();
 }
 export const rms=a=>{let s=0;for(const x of a)s+=x*x;return Math.sqrt(s/Math.max(1,a.length));};
 export const peak=a=>{let m=0;for(const x of a)m=Math.max(m,Math.abs(x));return m;};

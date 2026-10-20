@@ -45,3 +45,31 @@ export function decodePatch(data){
   env2KeyFollow:!(s26&128),
  };
 }
+
+/** Units for the engine, all estimates (knob 0–1 → lo·(hi/lo)^knob) until checked by ear or against recordings. */
+export const CALIBRATION={
+ cutoffHz:[20,20000],hpfHz:[10,2000],attackS:[.001,5],decayS:[.002,10],lfoHz:[.05,25],lfoDelayS:5,vco2FineCents:50,
+};
+const expMap=([lo,hi],x)=>lo*(hi/lo)**x;
+const flag=b=>b?1:0;
+
+/** Decoded patch → values for the engine (src/synths/jupiter/params.js keys). Plays dry, Poly 1, no arpeggio. */
+export function engineValues(v){
+ const C=CALIBRATION;
+ const env=n=>({[`e${n}Attack`]:expMap(C.attackS,v[`env${n}Attack`]),[`e${n}Decay`]:expMap(C.decayS,v[`env${n}Decay`]),
+  [`e${n}Sustain`]:v[`env${n}Sustain`],[`e${n}Release`]:expMap(C.decayS,v[`env${n}Release`]),[`e${n}Key`]:flag(v[`env${n}KeyFollow`])});
+ return {
+  lfoRate:expMap(C.lfoHz,v.lfoRate),lfoDelay:C.lfoDelayS*v.lfoDelay**2,lfoWave:LFO_WAVES.indexOf(v.lfoWave),
+  vcoModLfo:v.vcoModLfo,vcoModEnv:v.vcoModEnv,vcoModDest:v.vcoModVco1&&!v.vcoModVco2?0:v.vcoModVco2&&!v.vcoModVco1?2:1,
+  pw:v.pwm,pwSource:{lfo:0,manual:1,env1:2}[v.pwmSource],
+  crossMod:v.crossMod,vco1Range:FEET.indexOf(v.vco1Range),vco1Wave:VCO1_WAVES.indexOf(v.vco1Wave),
+  sync:flag(v.sync),vco2Range:v.vco2Semitones,vco2Fine:(v.vco2Fine-.5)*2*C.vco2FineCents,vco2Wave:VCO2_WAVES.indexOf(v.vco2Wave),vco2Low:flag(v.vco2Low),
+  sourceMix:v.sourceMix,hpf:expMap(C.hpfHz,v.hpf),cutoff:expMap(C.cutoffHz,v.cutoff),res:v.resonance,
+  // slope lever up = −12 dB (the strings, flutes and voices use it; the brass, sync and organ patches don't): likely, not confirmed
+  slope:v.vcfSlopeUp?0:1,
+  envMod:v.envMod,envSource:v.vcfEnvUp?0:1,vcfLfo:v.vcfLfo,keyFollow:v.keyFollow,
+  vcaLfo:v.vcaLfo,level:v.vcaLevel,
+  ...env(1),e1Invert:flag(v.env1Inverted),...env(2),
+  assign:2,arp:0,chorusMix:0,reverbMix:0,
+ };
+}

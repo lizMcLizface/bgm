@@ -15,13 +15,13 @@ export function loadKernel(){
 }
 
 /** Creates the context synchronously (call from a tap/click), then loads the kernel. */
-export function startLiveSynth({model=MODELS.cs80,params=[],latency='interactive',onStats=()=>{},onError=()=>{}}={}){
+export function startLiveSynth({model=MODELS.cs80,params=[],waves=null,latency='interactive',onStats=()=>{},onError=()=>{}}={}){
  const Context=window.AudioContext||window.webkitAudioContext;
  const context=new Context({latencyHint:latency});
  const resumed=context.resume().catch(()=>{});
  return (async()=>{
   const [module]=await Promise.all([loadKernel(),context.audioWorklet.addModule(asset('classics-processor.js')),resumed]);
-  const node=new AudioWorkletNode(context,'calmbgm-classics',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{module,model,params}});
+  const node=new AudioWorkletNode(context,'calmbgm-classics',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{module,model,params,waves}});
   await new Promise((resolve,reject)=>{node.port.onmessage=({data})=>{
    if(data.type==='ready')resolve();
    else if(data.type==='error'){reject(Error(data.message));onError(Error(data.message));}
@@ -42,6 +42,8 @@ export function startLiveSynth({model=MODELS.cs80,params=[],latency='interactive
    noteOff(id){events.push([NOTE_OFF,id,0,0]);queue();},
    pressure(id,value){events.push([PRESSURE,id,value,0]);queue();},
    control(which,value){events.push([CONTROL,which,value,0]);queue();},
+   /** The vector synthesizer's 128 waves × 128 samples (Float32Array of 16,384). */
+   setWaves(data){node.port.postMessage({type:'waves',waves:data});},
    panic(){flush();node.port.postMessage({type:'panic'});},
    async close(){if(closed)return;closed=true;flush();node.port.postMessage({type:'dispose'});node.disconnect();await context.close().catch(()=>{});},
   };

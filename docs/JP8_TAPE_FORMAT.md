@@ -44,7 +44,7 @@
 Dropouts damage only the patches they hit, and those are always flagged; no wrong patch has ever come through unflagged. A 5-minute 44.1 kHz stereo file takes about 2.7 s in Node; the factory tape takes about 60 ms. The harness lives outside the repo (scratchpad); the unit tests cover the main cases synthetically.
 
 ## Open
-1. Which slope (−12/−24 dB) is "up", and which envelope the VCF switch selects when up (ENV-1 assumed). Horn Tritone reads +9.6 st.
-2. Slider-to-units calibration (Hz, seconds): do this when building the engine.
+1. **Settled by the engine work (20 Oct):** the VCF env switch up selects ENV-1. Every patch with it down (Sync Lead, Echo Piano, Horn Fifth/Tritone, Tomita Chime, Train Chug) has a flat or trivial ENV-1 and a shaped ENV-2. Slope up = −12 dB is likely (strings, flutes, voices, Cello/Violin up; brass, sync, organs down) but not confirmed. Horn Tritone reads +9.6 st.
+2. Slider-to-units calibration (Hz, seconds): estimated in `CALIBRATION` in `patch.js`; to be tuned by ear or against recordings.
 3. The 34-byte 0x81 record (patch presets / panel memory) is not decoded.
-4. **Next:** build the Jupiter-8 engine and page, with a "load tape WAV" import like the Juno's `.syx` shelf, reusing `tape.js`. Show damaged/missing patches in the browser.
+4. **Done:** the Jupiter-8 engine and page (`/synths/jupiter8/`) with a "JP-8 tape" shelf that decodes a WAV in the browser and marks damaged or missing patches. Engine mapping: `engineValues` in `patch.js`.

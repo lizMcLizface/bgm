@@ -3,7 +3,7 @@ import {createRoot} from 'react-dom/client';
 import './synths.css';
 import FirefoxAndroidNotice from '../audio/FirefoxAndroidNotice';
 
-const PAGES={cs80:lazy(()=>import('./cs80/Cs80Page')),juno:lazy(()=>import('./juno/JunoPage'))};
+const PAGES={cs80:lazy(()=>import('./cs80/Cs80Page')),juno:lazy(()=>import('./juno/JunoPage')),prophet5:lazy(()=>import('./prophet/ProphetPage')),jupiter8:lazy(()=>import('./jupiter/JupiterPage')),minimoog:lazy(()=>import('./minimoog/MinimoogPage')),dx7:lazy(()=>import('./dx7/Dx7Page')),obxa:lazy(()=>import('./obxa/ObxaPage')),vs:lazy(()=>import('./vs/VsPage'))};
 const Home=lazy(()=>import('./SynthsHome'));
 /** /synths/ → hub; /synths/<id>/ → that synth. Unknown ids fall back to the hub. */
 export function synthRoute(path){const parts=path.split('/').filter(Boolean);return parts[0]==='synths'&&PAGES[parts[1]]?parts[1]:null;}

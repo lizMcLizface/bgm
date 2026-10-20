@@ -17,7 +17,7 @@
 - **Packing:** 19 groups of 8 bytes. The first byte of each group holds bit 7 of the next 7 bytes (bit k = byte k), giving 133 data bytes.
 
 ## Program bytes
-Knobs are 0–120 on the panel (a few factory programs store up to 127, treated as full). Switches are 0/1.
+Knobs are 0–127. The factory set stores a full knob as 127 in most programs (as 120 in a few) and uses 121–126 too, so 127 is the top. An earlier reading of 0–120 was wrong. Switches are 0/1.
 
 | Byte | Meaning |
 | --- | --- |
@@ -54,6 +54,6 @@ Knobs are 0–120 on the panel (a few factory programs store up to 127, treated 
 | 85, 88–96, 99–132 | Unused in the factory set, or the Prophet-10 layer/stack (89–91) and category (93) fields. Not decoded |
 
 ## Open
-1. **Units for the engine:** cutoff Hz, envelope seconds and LFO Hz are not yet calibrated. The converter's measurements map to RePro-5 units, not physical ones. Use the Rev 3 programs by ear, or recordings, when the engine exists.
+1. **Units for the engine:** `engineValues` in `sysex.js` maps programs onto the engine with estimated units (`CALIBRATION`: cutoff 20 Hz–20 kHz, attack 1 ms–10 s, decay/release 2 ms–15 s, LFO 0.05–25 Hz, glide 5 ms–5 s, all exponential in the knob). The converter's measurements map to RePro-5 units, not physical ones. Tune by ear on the Rev 3 programs, or against recordings.
 2. **Byte 53 = 10 (chord) while unison is off:** this appears in several new factory programs (Internalized, Kyoto). Whether the chord then still applies (a firmware "poly chord") is unconfirmed.
 3. **Prophet-10 layers** (bytes 88–95) are ignored. Only the Prophet-5 page is planned.

@@ -27,3 +27,37 @@ pub fn choose(pool: &[Slot], note: f32) -> usize {
         .or_else(|| oldest(&|_| true))
         .unwrap_or(0)
 }
+
+/// Keys held for a mono, unison or arpeggiated part, oldest first.
+#[derive(Clone, Copy)]
+pub struct KeyStack {
+    pub keys: [(u32, f32); 16],
+    pub len: usize,
+}
+impl KeyStack {
+    pub const EMPTY: Self = Self { keys: [(0, 0.); 16], len: 0 };
+    pub fn remove(&mut self, key: u32) {
+        if let Some(i) = self.keys[..self.len].iter().position(|k| k.0 == key) {
+            self.keys.copy_within(i + 1..self.len, i);
+            self.len -= 1;
+        }
+    }
+    pub fn push(&mut self, key: u32, note: f32) {
+        self.remove(key);
+        if self.len == self.keys.len() {
+            self.keys.copy_within(1.., 0);
+            self.len -= 1;
+        }
+        self.keys[self.len] = (key, note);
+        self.len += 1;
+    }
+    /// The sounding key by priority: 0/2 low, 1/3 last, 4/5 high.
+    pub fn pick(&self, priority: u32) -> Option<(u32, f32)> {
+        let keys = &self.keys[..self.len];
+        match priority {
+            0 | 2 => keys.iter().copied().min_by(|a, b| a.1.total_cmp(&b.1)),
+            4 | 5 => keys.iter().copied().max_by(|a, b| a.1.total_cmp(&b.1)),
+            _ => keys.last().copied(),
+        }
+    }
+}

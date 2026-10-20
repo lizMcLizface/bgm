@@ -7,7 +7,13 @@ mod alloc;
 mod cs80;
 mod dsp;
 mod fx;
+mod dx7;
 mod juno;
+mod obxa;
+mod vs;
+mod minimoog;
+mod jupiter;
+mod prophet;
 
 use dsp::{soft, DcBlock, MAX_BLOCK};
 
@@ -16,12 +22,24 @@ pub const API: u32 = 1;
 const FX_BASE: u32 = 200;
 pub const MODEL_CS80: u32 = 0;
 pub const MODEL_JUNO: u32 = 1;
+pub const MODEL_PROPHET: u32 = 2;
+pub const MODEL_JUPITER: u32 = 3;
+pub const MODEL_MINIMOOG: u32 = 4;
+pub const MODEL_DX7: u32 = 5;
+pub const MODEL_OBXA: u32 = 6;
+pub const MODEL_VS: u32 = 7;
 
 struct Host {
     sr: f32,
     model: u32,
     cs80: cs80::Cs80,
     juno: juno::Juno,
+    prophet: prophet::Prophet,
+    jupiter: jupiter::Jupiter8,
+    minimoog: minimoog::Minimoog,
+    dx7: dx7::Dx7,
+    obxa: obxa::ObXa2,
+    vs: vs::Vs,
     bbd: fx::Bbd,
     space: fx::Space,
     dc: [DcBlock; 2],
@@ -36,6 +54,12 @@ static mut HOST: Host = Host {
     model: MODEL_CS80,
     cs80: cs80::Cs80::new(),
     juno: juno::Juno::new(),
+    prophet: prophet::Prophet::new(),
+    jupiter: jupiter::Jupiter8::new(),
+    minimoog: minimoog::Minimoog::new(),
+    dx7: dx7::Dx7::new(),
+    obxa: obxa::ObXa2::new(),
+    vs: vs::Vs::new(),
     bbd: fx::Bbd::new(),
     space: fx::Space::new(),
     dc: [DcBlock::ZERO; 2],
@@ -52,6 +76,30 @@ macro_rules! model {
         match $h.model {
             MODEL_JUNO => {
                 let $m = &mut $h.juno;
+                $body
+            }
+            MODEL_PROPHET => {
+                let $m = &mut $h.prophet;
+                $body
+            }
+            MODEL_JUPITER => {
+                let $m = &mut $h.jupiter;
+                $body
+            }
+            MODEL_MINIMOOG => {
+                let $m = &mut $h.minimoog;
+                $body
+            }
+            MODEL_DX7 => {
+                let $m = &mut $h.dx7;
+                $body
+            }
+            MODEL_OBXA => {
+                let $m = &mut $h.obxa;
+                $body
+            }
+            MODEL_VS => {
+                let $m = &mut $h.vs;
                 $body
             }
             _ => {
@@ -73,6 +121,12 @@ pub extern "C" fn syn_param_count() -> u32 {
     unsafe {
         match HOST.model {
             MODEL_JUNO => juno::PARAMS as u32,
+            MODEL_PROPHET => prophet::PARAMS as u32,
+            MODEL_JUPITER => jupiter::PAIR_PARAMS as u32,
+            MODEL_MINIMOOG => minimoog::PARAMS as u32,
+            MODEL_DX7 => dx7::PARAMS as u32,
+            MODEL_OBXA => obxa::PAIR_PARAMS as u32,
+            MODEL_VS => vs::PARAMS as u32,
             _ => cs80::PARAMS as u32,
         }
     }
@@ -80,7 +134,7 @@ pub extern "C" fn syn_param_count() -> u32 {
 
 #[no_mangle]
 pub extern "C" fn syn_init(sr: f32, model: u32) -> u32 {
-    if !(8000. ..=384000.).contains(&sr) || model > MODEL_JUNO {
+    if !(8000. ..=384000.).contains(&sr) || model > MODEL_VS {
         return 0;
     }
     unsafe {
@@ -88,6 +142,12 @@ pub extern "C" fn syn_init(sr: f32, model: u32) -> u32 {
         HOST.model = model;
         match model {
             MODEL_JUNO => HOST.juno.init(sr),
+            MODEL_PROPHET => HOST.prophet.init(sr),
+            MODEL_JUPITER => HOST.jupiter.init(sr),
+            MODEL_MINIMOOG => HOST.minimoog.init(sr),
+            MODEL_DX7 => HOST.dx7.init(sr),
+            MODEL_OBXA => HOST.obxa.init(sr),
+            MODEL_VS => HOST.vs.init(sr),
             _ => HOST.cs80.init(sr),
         }
         HOST.bbd.init(sr);
@@ -152,6 +212,18 @@ pub extern "C" fn syn_render(frames: u32) {
             h.juno.render(left, right);
             let (mode, noise) = h.juno.chorus();
             h.bbd.render(&mut BUFFERS.bbd, left, right, mode, noise);
+        } else if h.model == MODEL_PROPHET {
+            h.prophet.render(left, right);
+        } else if h.model == MODEL_JUPITER {
+            h.jupiter.render(left, right);
+        } else if h.model == MODEL_MINIMOOG {
+            h.minimoog.render(left, right);
+        } else if h.model == MODEL_DX7 {
+            h.dx7.render(left, right);
+        } else if h.model == MODEL_OBXA {
+            h.obxa.render(left, right);
+        } else if h.model == MODEL_VS {
+            h.vs.render(left, right);
         } else {
             h.cs80.render(left, right);
         }
@@ -168,6 +240,19 @@ pub extern "C" fn syn_render(frames: u32) {
         h.peak = peak;
         h.frames += n as f64;
     }
+}
+
+/// The shared wave buffer (the vector synthesizer's 128 waves × 128 samples, f32): the host
+/// writes it and then calls `syn_wave_commit`. Other models ignore it.
+#[no_mangle]
+pub extern "C" fn syn_wave_ptr() -> *mut f32 {
+    vs::wave_ptr()
+}
+
+/// Builds the band-limited tables from the buffer. Takes a few tens of milliseconds.
+#[no_mangle]
+pub extern "C" fn syn_wave_commit() {
+    vs::commit();
 }
 
 #[no_mangle]

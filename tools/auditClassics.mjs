@@ -1,10 +1,11 @@
 // Renders every factory sound of one model (a held chord, then a short phrase) and
 // reports level, peak and brightness, plus render speed. Optional WAVs: --wav <dir>.
-// Usage: npx vite-node tools/auditClassics.mjs [--model cs80|juno] [--wav dir]
+// Usage: npx vite-node tools/auditClassics.mjs [--model cs80|juno|prophet5|jupiter8|minimoog|dx7|obxa|vs] [--wav dir]
 import fs from 'node:fs';
 import path from 'node:path';
 import {createOfflineSynth,rms,peak,brightness} from '../src/synths/engine/offline.js';
 import {SYNTHS} from '../src/synths/models.js';
+import {builtinWaves} from '../src/synths/vs/waves.js';
 
 const module=new WebAssembly.Module(fs.readFileSync('public/synths/classics.wasm'));
 const arg=name=>{const at=process.argv.indexOf(name);return at>0?process.argv[at+1]:null;};
@@ -18,7 +19,7 @@ function wav(file,left,right){
 }
 const rows=[];
 for(const preset of PRESETS){
- const s=createOfflineSynth(module,{sampleRate:sr,model:synth.model,params:toPairs(preset.values)});
+ const s=createOfflineSynth(module,{sampleRate:sr,model:synth.model,params:toPairs(preset.values),waves:synth.id==='vs'?builtinWaves():null});
  const chord=[48,55,60,64,67];
  chord.forEach((n,i)=>s.k.syn_note_on(i+1,n,.7));
  const t0=performance.now();

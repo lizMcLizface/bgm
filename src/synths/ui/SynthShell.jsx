@@ -17,8 +17,9 @@ const dirty=name=>name.endsWith(' *')?name:name+' *';
  * synth: entry from ../models. children({values,control,group,replaceValues}) draws the panel.
  * expand(key) may return several keys to edit together (CS-80 channel linking).
  * libraries: extra shelves beside the sound buttons, [{id,label,render({choose,values,current})}].
+ * engineOptions(): extra options for the engine when it starts (the vector synthesizer's waves); onEngine(live): called with the running engine.
  */
-export default function SynthShell({synth,className='',headerExtras=null,nav=null,panelClassName='',expand,libraries=[],children}){
+export default function SynthShell({synth,className='',headerExtras=null,nav=null,panelClassName='',expand,libraries=[],engineOptions,onEngine,children}){
  const {params:{BY_KEY,sanitize,toPairs},presets}=synth;
  const PATCH_KEY=`synths:${synth.id}:patch`,MINE_KEY=`synths:${synth.id}:mine`;
  const [patch,setPatch]=useState(()=>{
@@ -101,8 +102,8 @@ export default function SynthShell({synth,className='',headerExtras=null,nav=nul
   if(audio.state==='starting')return;
   setAudio({state:'starting',message:'Waking the oscillators…'});
   const previous=engine.current;engine.current=null;previous?.close();
-  startLiveSynth({model:synth.model,params:toPairs(patchRef.current.values),latency:setupRef.current.latency,onStats:setStats,onError:e=>setAudio({state:'error',message:e.message})})
-   .then(live=>{engine.current=live;performer.setTarget(live);performer.restore({sustain:pedal?1:0});setAudio({state:'on',message:`${live.context.sampleRate/1000} kHz · ${Math.round(live.latency*1000)} ms output`});})
+  startLiveSynth({model:synth.model,params:toPairs(patchRef.current.values),...(engineOptions?.()??{}),latency:setupRef.current.latency,onStats:setStats,onError:e=>setAudio({state:'error',message:e.message})})
+   .then(live=>{engine.current=live;onEngine?.(live);performer.setTarget(live);performer.restore({sustain:pedal?1:0});setAudio({state:'on',message:`${live.context.sampleRate/1000} kHz · ${Math.round(live.latency*1000)} ms output`});})
    .catch(e=>setAudio({state:'error',message:e.message}));
   if(!midiRef.current.access)connectMidi();
  };
@@ -115,7 +116,7 @@ export default function SynthShell({synth,className='',headerExtras=null,nav=nul
 
  // Keys are parameter keys, or [key, label] where the table's label is ambiguous.
  const control=(entry,tone,prefix='')=>{
-  const [key,label]=Array.isArray(entry)?entry:[prefix+entry];
+  const [key,label]=Array.isArray(entry)?[prefix+entry[0],entry[1]]:[prefix+entry];
   const spec=BY_KEY[key],short=label??spec.label;
   return spec.options
    ?<Choice key={key} spec={spec} value={patch.values[key]} options={spec.options} onChange={change} tone={tone} label={short}/>

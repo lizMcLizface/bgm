@@ -13,17 +13,20 @@
 // converter and against the 40 original Rev 3 programs in factory bank 5
 // (every SYNC patch has sync on, BASS IN FIFTHS has Osc B 14 steps = a fifth
 // above Osc A, the PWM/arpeggiator patches use Osc B low-freq via Poly-Mod).
-// Knob bytes run 0–120 (a few factory programs hold up to 127: treated as full).
+// Knob bytes run 0–127: the factory set stores a full knob as 127 (and uses 121–126 too).
 
 /** Measured or published mappings to units; estimates are marked. */
 export const CALIBRATION={
- knobMax:120,
+ knobMax:127,
  // Osc frequency: 2 steps per semitone (each odd step plays the same note as the even one
  // below it), 0–96 = C0–C4 on the panel; 48 (C2) plays at 8' pitch. Above 96 = C4.
  freqStepsPerSemitone:2,freqMax:96,freq8ft:48,
  // Osc B fine: unipolar, measured on hardware (Funkybot, 2026): raw → cents sharp
  oscBFineCents:[[0,0],[16,13.4],[32,26.1],[48,38.9],[64,52],[80,64.8],[96,77.3],[112,90],[120,96.8],[127,102]],
  // Osc B in low-freq mode: raw frequency → Hz, measured to raw 90, extrapolated above (Funkybot, 2026)
+// Units for the engine, all estimates until checked by ear or against recordings:
+ // knob 0–1 → lo·(hi/lo)^knob.
+ cutoffHz:[20,20000],attackS:[.001,10],decayS:[.002,15],lfoHz:[.05,25],glideS:[.005,5],
  oscBLowHz:[[0,.531],[10,.636],[14,.718],[22,.81],[24,.859],[30,.968],[36,1.154],[42,1.297],[48,1.469],[52,1.858],[54,2.074],[58,2.623],[60,2.97],[62,3.323],[66,4.223],[72,6.031],[78,8.443],[80,9.258],[82,10.937],[84,12.159],[90,16.857],[96,23.745],[102,33.448],[108,47.116],[114,66.37],[120,93.49]],
 };
 
@@ -105,6 +108,37 @@ export function decodeProgram(d){
  };
 }
 
+const expMap=([lo,hi],x)=>lo*(hi/lo)**x;
+const flag=b=>b?1:0;
+
+/** A decoded program → values for the engine (src/synths/prophet/params.js keys). Plays dry, as the hardware. */
+export function engineValues(v,d){
+ const C=CALIBRATION;
+ const chord=v.unisonChord?v.chord.slice(0,10):[];
+ return {
+  pmEnv:v.polyModEnv,pmOscB:v.polyModOscB,pmFreqA:flag(v.polyModFreqA),pmPwA:flag(v.polyModPwA),pmFilter:flag(v.polyModFilter),
+  lfoRate:expMap(C.lfoHz,v.lfoRate),lfoSaw:flag(v.lfoSaw),lfoTri:flag(v.lfoTri),lfoSquare:flag(v.lfoSquare),lfoAmount:v.lfoInitial,wheelMix:v.wheelMix,
+  wmFreqA:flag(v.wheelFreqA),wmFreqB:flag(v.wheelFreqB),wmPwA:flag(v.wheelPwA),wmPwB:flag(v.wheelPwB),wmFilter:flag(v.wheelFilter),
+  aFreq:v.oscAFreq,aSaw:flag(v.oscASaw),aPulse:flag(v.oscAPulse),aPw:v.oscAPw,sync:flag(v.sync),
+  // in low-frequency mode the whole knob travel is a rate: keep the raw step (2 per semitone)
+  bFreq:v.oscBLowFreq?d[1]/C.freqStepsPerSemitone-C.freq8ft/C.freqStepsPerSemitone:v.oscBFreq,
+  bFine:v.oscBFineCents,bSaw:flag(v.oscBSaw),bTri:flag(v.oscBTri),bPulse:flag(v.oscBPulse),bPw:v.oscBPw,bLow:flag(v.oscBLowFreq),bKybd:flag(v.oscBKeyboard),
+  mixA:v.mixA,mixB:v.mixB,mixNoise:v.noise,
+  cutoff:expMap(C.cutoffHz,v.cutoff),res:v.resonance,fEnv:v.filterEnv,track:['off','half','full'].indexOf(v.keyTrack),filterRev:v.filterRev==='rev3'?1:0,
+  fAttack:expMap(C.attackS,v.filterAttack),fDecay:expMap(C.decayS,v.filterDecay),fSustain:v.filterSustain,fRelease:expMap(C.decayS,v.filterRelease),
+  aAttack:expMap(C.attackS,v.ampAttack),aDecay:expMap(C.decayS,v.ampDecay),aSustain:v.ampSustain,aRelease:expMap(C.decayS,v.ampRelease),
+  release:flag(v.release),
+  glide:v.glide>0?expMap(C.glideS,v.glide):0,
+  unison:flag(v.unison),unisonVoices:v.unisonVoices??Math.max(1,chord.length),unisonDetune:v.unisonDetune,
+  priority:Math.max(0,KEY_PRIORITY.indexOf(v.keyPriority)),
+  chord:flag(chord.length>0),...Object.fromEntries(Array.from({length:10},(_,i)=>[`chord${i+1}`,chord[i]??-1])),
+  velFilter:v.velFilter?v.velocityAmount:0,velAmp:v.velAmp?v.velocityAmount:0,
+  afterFilter:v.afterFilter?v.aftertouchAmount:0,afterAmp:v.afterAmp?v.aftertouchAmount:0,
+  bendRange:v.bendRange,vintage:v.vintage,
+  chorusMix:0,reverbMix:0,
+ };
+}
+
 export const programName=d=>String.fromCharCode(...d.subarray(NAME_AT,NAME_AT+NAME_LENGTH)).replace(/[^\x20-\x7e]/g,' ').trim();
 
 /** Every program in a SysEx file (program dumps and edit-buffer dumps), in file order. */
@@ -120,7 +154,8 @@ export function parseProphetSysex(input){
   if(start<0||m.length<start+PACKED_LENGTH+1)continue;
   const data=unpack(m.subarray(start,start+PACKED_LENGTH));
   const bank=dump?m[4]:null,program=dump?m[5]:null;
-  programs.push({device:DEVICES[m[2]],bank,program,code:dump?programCode(bank,program):'Edit',name:programName(data),data,values:decodeProgram(data)});
+  const values=decodeProgram(data);
+  programs.push({device:DEVICES[m[2]],bank,program,code:dump?programCode(bank,program):'Edit',name:programName(data),data,values,engine:engineValues(values,data)});
  }
  return programs;
 }

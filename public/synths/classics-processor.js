@@ -8,12 +8,15 @@ class ClassicsProcessor extends AudioWorkletProcessor {
    this.k=new WebAssembly.Instance(o.module,{}).exports;
    if(this.k.syn_api()!==1)throw Error('Synth kernel API mismatch. Reload the page.');
    if(!this.k.syn_init(sampleRate,o.model))throw Error('Unsupported synth model or sample rate.');
+   if(o.waves)this.loadWaves(o.waves);
    for(const [id,value] of o.params??[])this.k.syn_param(id,value);
    this.bind();
    this.port.onmessage=({data})=>{try{this.message(data);}catch(error){this.fail(error);}};
    this.port.postMessage({type:'ready',sampleRate});
   }catch(error){this.fail(error);}
  }
+ // the vector synthesizer's waves: written into the kernel's shared buffer, then its tables are built
+ loadWaves(waves){new Float32Array(this.k.memory.buffer,this.k.syn_wave_ptr(),waves.length).set(waves);this.k.syn_wave_commit();}
  // Views are re-created only if Wasm memory ever grows.
  bind(){const buffer=this.k.memory.buffer;this.buffer=buffer;this.left=new Float32Array(buffer,this.k.syn_left(),2048);this.right=new Float32Array(buffer,this.k.syn_right(),2048);}
  message(data){
@@ -22,6 +25,7 @@ class ClassicsProcessor extends AudioWorkletProcessor {
   else if(data.type==='events')for(const [kind,a,b,c] of data.values){
    if(kind===NOTE_ON)k.syn_note_on(a,b,c);else if(kind===NOTE_OFF)k.syn_note_off(a);else if(kind===PRESSURE)k.syn_pressure(a,b);else if(kind===CONTROL)k.syn_control(a,b);
   }
+  else if(data.type==='waves')this.loadWaves(data.waves);
   else if(data.type==='panic')k.syn_panic();
   else if(data.type==='dispose')this.stop();
  }
