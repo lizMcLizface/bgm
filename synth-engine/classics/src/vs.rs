@@ -287,8 +287,9 @@ impl<const C: usize> EnvState<C> {
                 1..=3 if continuous || self.loops < d.repeat => {
                     self.loops += 1;
                     self.slew = true;
-                    self.travel(d, d.p[start], 0);
-                    self.dur = 0.004;
+                    // the manual's figure 8-5 draws the return as a sloped line, not a jump: it travels back
+                    // at the rate of the last segment (the rate into point 3, an interpretation)
+                    self.travel(d, d.p[start], 2);
                 }
                 4..=6 if !self.last_pass => {
                     self.dir = -1;
