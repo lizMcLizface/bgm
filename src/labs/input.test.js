@@ -31,3 +31,10 @@ it('detaches disconnected MIDI inputs and releases notes on refresh and disposal
  const input={id:'piano',name:'Piano',state:'connected'},access={inputs:new Map([['piano',input]])};Object.defineProperty(navigator,'requestMIDIAccess',{configurable:true,value:vi.fn().mockResolvedValue(access)});
  const cb={on:vi.fn(),off:vi.fn(),sustain:vi.fn(),control:vi.fn(),panic:vi.fn(),onStatus:vi.fn()},m=new LabMidi(cb);await m.connect();input.onmidimessage({data:[144,60,127]});expect(cb.on).toHaveBeenCalledOnce();input.state='disconnected';access.onstatechange();expect(input.onmidimessage).toBeNull();m.dispose();expect(access.onstatechange).toBeNull();expect(cb.panic).toHaveBeenCalledTimes(3);delete navigator.requestMIDIAccess;
 });
+it('passes poly aftertouch and the soft pedal only to pages that ask for them',()=>{
+ const cb={on:vi.fn(),off:vi.fn(),sustain:vi.fn(),control:vi.fn(),panic:vi.fn()};
+ const plain=new LabMidi(cb);plain.message([160,60,64],'piano');plain.message([176,67,127],'piano');expect(cb.control).not.toHaveBeenCalled();
+ const polyPressure=vi.fn(),soft=vi.fn(),m=new LabMidi({...cb,polyPressure,soft});
+ m.message([161,60,127],'piano');expect(polyPressure).toHaveBeenCalledWith('midi:piano:1:60',1);
+ m.message([176,67,127],'piano');expect(soft).toHaveBeenCalledWith(1);
+});

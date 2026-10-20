@@ -11,3 +11,11 @@ synth-engine/fm/target/
 synth-engine/inserts/target/
 
 synth-engine/percussion/target/
+
+synth-engine/classics/target/
+
+# factory banks exported by tools/exportPatchesYaml.mjs: not ours to publish
+patches/
+dist-public/
+# your own factory banks, auto-loaded by the local /synths pages: never committed or deployed
+banks/

@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run synth:check && vite build",
+    "build": "npm run synth:check && npm run synths:check && vite build",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -38,9 +38,13 @@
     "audit:percussion-presets": "node tools/auditPercussionPresets.mjs",
     "audit:synth-tone": "node tools/auditSynthTone.mjs",
     "audit:phase4": "node tools/runPhase4Audit.mjs",
-    "predeploy": "npm test && npm run build",
-    "deploy": "gh-pages -d dist --dotfiles",
-    "render": "vite-node tools/render.js --"
+    "build:public": "npm run synth:check && vite build --mode public && node tools/checkPublicBuild.mjs",
+    "predeploy": "npm test && npm run build:public",
+    "deploy": "node tools/checkPublicBuild.mjs && gh-pages -d dist-public --dotfiles",
+    "render": "vite-node tools/render.js --",
+    "synths:build": "node tools/buildClassics.mjs",
+    "synths:check": "node tools/buildClassics.mjs --check",
+    "audit:synths": "vite-node tools/auditClassics.mjs"
   },
   "dependencies": {
     "prop-types": "^15.8.1",
