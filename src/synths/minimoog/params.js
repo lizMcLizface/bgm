@@ -41,17 +41,17 @@ export const {PARAMS,BY_KEY,defaultValues,clampValue,sanitize,toPairs}=definePar
  ['feedback',18,'Feedback',0,1,0,'%','lin'],
  ['drive',19,'Drive',0,1,.3,'%','lin'],
  // filter
- ['cutoff',20,'Cutoff',10,24000,900,'Hz','log'],
+ ['cutoff',20,'Cutoff',40,20000,900,'Hz','log'],
  ['emphasis',21,'Emphasis',0,1,.2,'%','lin'],
  ['contour',22,'Contour',0,1,.4,'%','lin'],
  ['kbdThird',23,'Kbd ⅓',0,1,1,'','step',ON],
  ['kbdTwoThirds',24,'Kbd ⅔',0,1,0,'','step',ON],
- ['fAttack',25,'A',.001,10,.005,'s','log'],
- ['fDecay',26,'D',.002,10,.5,'s','log'],
+ ['fAttack',25,'A',.01,10,.01,'s','log'],
+ ['fDecay',26,'D',.01,10,.5,'s','log'],
  ['fSustain',27,'S',0,1,.3,'%','lin'],
  // loudness contour
- ['aAttack',28,'A',.001,10,.003,'s','log'],
- ['aDecay',29,'D',.002,10,.5,'s','log'],
+ ['aAttack',28,'A',.01,10,.01,'s','log'],
+ ['aDecay',29,'D',.01,10,.5,'s','log'],
  ['aSustain',30,'S',0,1,.8,'%','lin'],
  ['decayOn',31,'Decay',0,1,0,'','step',['Off','On']],
  // additions for piano playing (the original has neither velocity nor pressure)

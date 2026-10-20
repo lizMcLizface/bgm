@@ -403,7 +403,8 @@ impl Minimoog {
         let contour = bound(p[id::CONTOUR], 0., 1.);
         let velocity = self.velocity;
         let vel_c = bound(p[id::VEL_CONTOUR], 0., 1.);
-        let amount = 5. * contour * (1. - vel_c * (1. - velocity));
+        // the 204D's contour amount is 0 to 4 octaves (Moog's specifications)
+        let amount = 4. * contour * (1. - vel_c * (1. - velocity));
         let cut = log2(bound(p[id::CUTOFF], 10., 24000.)) + track * (self.pitch - 60.) / 12. + 1.5 * self.brightness - self.soft
             + 3. * bound(p[id::AFTER_FILTER], 0., 1.) * self.pressure_s + amount * self.fenv.value;
         let hzc = exp2(cut);
