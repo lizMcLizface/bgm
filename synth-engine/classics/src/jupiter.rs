@@ -129,6 +129,7 @@ impl Setup {
 
 #[derive(Clone, Copy)]
 struct Voice {
+    onset: Onset,
     key: u32,
     note: f32,
     pitch: f32,
@@ -171,6 +172,7 @@ struct Voice {
 }
 impl Voice {
     const ZERO: Self = Self {
+        onset: Onset::DONE,
         key: 0, note: 60., pitch: 60., velocity: 0., poly: 0., pressure: 0., down: false, held: false, active: false,
         fresh: true, stamp: 0, offset: 0., rng: Rng(1), o1: VcOsc::ZERO, o2: VcOsc::ZERO, out2: 0., e1: Adsr::ZERO,
         e2: Adsr::ZERO, k1: 1., k2: 1., hp: 0., ladder: Ladder::ZERO, dt1: 0., dt1_d: 0., dt2: 0., dt2_d: 0., pw: 0.5,
@@ -312,6 +314,9 @@ impl Jupiter {
         if retrigger || !v.active {
             v.e1.attack();
             v.e2.attack();
+        }
+        if !v.active {
+            v.onset.arm();
         }
         v.active = true;
     }
@@ -912,6 +917,7 @@ fn render_voice(v: &mut Voice, s: &Setup, left: &mut [f32], right: &mut [f32]) {
         v.e1.tick(a1, d1, s1, r1);
         let e = v.e2.tick(a2, d2, s2, r2);
         let o = if s.two_pole { y2 } else { y4 } * e * v.gain;
+        let o = o * v.onset.tick();
         left[i] += o * pl;
         right[i] += o * pr;
     }

@@ -10,6 +10,11 @@ const SYNTHS=[
  {id:'minimoog',name:'Minimoog Model D',maker:'after Moog, 1970',colour:'#b07a4a',ready:true,line:'Three oscillators, an overdriven ladder filter that sings, and one voice: the classic mono lead and bass.'},
  {id:'dx7',name:'DX7',maker:'after Yamaha, 1983',colour:'#6fb6a0',ready:true,line:"Six-operator FM with the DX7's own envelopes and scaling, 32 algorithms, and cartridge SysEx import."},
  {id:'vs',name:'Prophet VS',maker:'after Sequential, 1986',colour:'#9b7fd1',ready:true,line:'Four single-cycle waves mixed by a joystick and a looping vector envelope, into a resonant filter, with the factory programs and waves on import.'},
+
+ {id:'tr808',name:'TR-808',maker:'after Roland, 1980',colour:'#d96a3a',ready:true,line:'Sixteen analog voices: the long sine kick, snare, toms, congas, clap, cowbell and the six-oscillator hats, on a 16-step sequencer with swing, accent and a pattern chain.'},
+ {id:'tr909',name:'TR-909',maker:'after Roland, 1983',colour:'#8a8f96',ready:true,line:'Punchier kick and snare, the 909 toms and clap, with synthesised stand-ins for its sampled hats, crash and ride.'},
+ {id:'tr606',name:'TR-606',maker:'after Roland, 1981',colour:'#6fb6a0',ready:true,line:'The small Drumatix: seven quick, dry voices on the same sequencer.'},
+ {id:'tb303',name:'TB-303',maker:'after Roland, 1981',colour:'#e0a526',ready:true,line:'One oscillator into a squelching resonant filter, with accent, slide and tie on a 16-step pattern.'},
 ];
 
 export default function SynthsHome(){

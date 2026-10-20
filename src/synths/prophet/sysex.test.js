@@ -78,7 +78,7 @@ test('a decoded program maps onto the engine table: every key known, every value
  for(const [key,value] of Object.entries(e)){expect(BY_KEY[key],key).toBeDefined();expect(clampValue(key,value)).toBeCloseTo(value);}
  // low-frequency Osc B keeps the whole knob travel (step 110 = +31 st, a rate above the audio range)
  expect([e.bLow,e.bKybd,e.bFreq]).toEqual([1,0,31]);
- expect(e.cutoff).toBeCloseTo(20*1000**(64/127));expect(e.aDecay).toBeCloseTo(15);expect(e.track).toBe(2);
+ expect(e.cutoff).toBeCloseTo(8.18*(8372/8.18)**(64/127));expect(e.aDecay).toBeCloseTo(100);expect(e.track).toBe(2);
  // chord memory: unison with one voice per chord note
  expect([e.unison,e.chord,e.unisonVoices,e.chord1,e.chord2,e.chord3,e.chord4]).toEqual([1,1,3,0,4,7,-1]);
  // switches carry the Rev 4 amounts (255 = unset by older firmware: full)

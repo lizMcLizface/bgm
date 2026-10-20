@@ -27,7 +27,7 @@ function directorySlash() {
 // part of the public site. `vite build` includes them (dist/, for the local and tablet
 // preview); `vite build --mode public` (used by deploy) leaves out their pages and the
 // engine files Vite copies from public/synths, and writes to dist-public/.
-const SYNTH_PAGES = { synths:'synths/index.html', synthCs80:'synths/cs80/index.html', synthJuno:'synths/juno/index.html', synthProphet5:'synths/prophet5/index.html', synthJupiter8:'synths/jupiter8/index.html', synthMinimoog:'synths/minimoog/index.html', synthDx7:'synths/dx7/index.html', synthObxa:'synths/obxa/index.html', synthVs:'synths/vs/index.html' };
+const SYNTH_PAGES = { synths:'synths/index.html', synthCs80:'synths/cs80/index.html', synthJuno:'synths/juno/index.html', synthProphet5:'synths/prophet5/index.html', synthJupiter8:'synths/jupiter8/index.html', synthMinimoog:'synths/minimoog/index.html', synthDx7:'synths/dx7/index.html', synthObxa:'synths/obxa/index.html', synthVs:'synths/vs/index.html', synthTr808:'synths/tr808/index.html', synthTr909:'synths/tr909/index.html', synthTr606:'synths/tr606/index.html', synthTb303:'synths/tb303/index.html' };
 function dropPrivateFiles(outDir) {
     return { name: 'drop-private-files', apply: 'build', closeBundle() { fs.rmSync(path.join(outDir, 'synths'), { recursive: true, force: true }); } };
 }

@@ -549,6 +549,7 @@ const AMP_MOD_DOUBLINGS: f32 = 6.;
 
 #[derive(Clone, Copy)]
 struct Voice {
+    onset: Onset,
     key: u32,
     note: i32,
     velocity: i32,
@@ -574,6 +575,7 @@ struct Voice {
 
 impl Voice {
     const ZERO: Self = Self {
+        onset: Onset::DONE,
         key: 0, note: 60, velocity: 0, down: false, held: false, active: false, stamp: 0, env: [Env::ZERO; 6],
         ops: [Op { gain: [0, 0], freq: 0, phase: 0 }; 6], pitch_env: PitchEnv::ZERO, base: [0; 6], fb: [0; 2], fb_shift: 16,
         algorithm: 0, pmd: 0, pms: 0, ams: [0.; 6], on: [true; 6], glide: 0, level: 0.,
@@ -715,6 +717,9 @@ impl Dx7 {
         v.velocity = velocity;
         v.down = true;
         v.held = false;
+        if !v.active {
+            v.onset.arm();
+        }
         v.active = true;
         v.stamp = stamp;
         v.glide = glide;
@@ -898,7 +903,7 @@ impl Dx7 {
             let mut out = [0i32; N];
             run_core(t, &mut out, &mut v.ops, v.algorithm, &mut v.fb, v.fb_shift, &mut buses);
             for (a, &o) in acc.iter_mut().zip(out.iter()) {
-                *a += o as f32 * master;
+                *a += o as f32 * master * v.onset.tick();
             }
             // the voice is finished once it is released and every carrier has faded out
             let alg = ALGORITHMS[v.algorithm];

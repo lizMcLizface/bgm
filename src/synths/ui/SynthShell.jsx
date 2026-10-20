@@ -4,6 +4,7 @@ import {startLiveSynth} from '../engine/liveSynth';
 import {Performer} from '../engine/performer';
 import {LabMidi,bindLabKeyboard,mapVelocity} from '../../labs/input';
 import {load,save} from '../storage';
+import Scope from './Scope';
 
 // Everything a /synths page shares: audio start, MIDI piano, computer keys,
 // sounds (factory + saved), setup, the ribbon/pad/keys strip and screen wake.
@@ -17,9 +18,9 @@ const dirty=name=>name.endsWith(' *')?name:name+' *';
  * synth: entry from ../models. children({values,control,group,replaceValues}) draws the panel.
  * expand(key) may return several keys to edit together (CS-80 channel linking).
  * libraries: extra shelves beside the sound buttons, [{id,label,render({choose,values,current})}].
- * engineOptions(): extra options for the engine when it starts (the vector synthesizer's waves); onEngine(live): called with the running engine.
+ * engineOptions(): extra options for the engine when it starts (the vector synthesizer's waves); onEngine(live): called with the running engine; onStats(data): every engine report (the sequencer playhead); onMidiRealtime(status): MIDI clock, start, continue and stop bytes.
  */
-export default function SynthShell({synth,className='',headerExtras=null,nav=null,panelClassName='',expand,libraries=[],engineOptions,onEngine,children}){
+export default function SynthShell({synth,className='',headerExtras=null,nav=null,panelClassName='',expand,libraries=[],engineOptions,onEngine,onStats,onMidiRealtime,children}){
  const {params:{BY_KEY,sanitize,toPairs},presets}=synth;
  const PATCH_KEY=`synths:${synth.id}:patch`,MINE_KEY=`synths:${synth.id}:mine`;
  const [patch,setPatch]=useState(()=>{
@@ -37,8 +38,12 @@ export default function SynthShell({synth,className='',headerExtras=null,nav=nul
  const [stats,setStats]=useState({active:0,peak:0});
  const [notes,setNotes]=useState([]);
  const [pedal,setPedal]=useState(false);
+ const [scope,setScope]=useState(()=>load('synths:scope:open',false)===true);
+ const toggleScope=()=>setScope(v=>{save('synths:scope:open',!v);return !v;});
  const [midi,setMidi]=useState({inputs:[],status:'Not connected.'});
  const engine=useRef(null),patchRef=useRef(patch),setupRef=useRef(setup),expandRef=useRef(expand);
+ const onStatsRef=useRef(onStats);onStatsRef.current=onStats;
+ const realtimeRef=useRef(onMidiRealtime);realtimeRef.current=onMidiRealtime;
  patchRef.current=patch;setupRef.current=setup;expandRef.current=expand;
  const performer=useMemo(()=>new Performer(null,{onNotes:setNotes}),[]);
 
@@ -78,6 +83,7 @@ export default function SynthShell({synth,className='',headerExtras=null,nav=nul
    },
    polyPressure:(key,value)=>performer.pressure(key,value),
    soft:value=>performer.control('soft',value),
+   realtime:status=>realtimeRef.current?.(status),
    panic:()=>{performer.releaseAll();performer.control('sustain',0);setPedal(false);},
    onStatus:inputs=>setMidi({inputs,status:inputs.length?`${inputs.length} MIDI input${inputs.length>1?'s':''} connected.`:'MIDI ready · plug in your piano.'}),
   });
@@ -102,7 +108,7 @@ export default function SynthShell({synth,className='',headerExtras=null,nav=nul
   if(audio.state==='starting')return;
   setAudio({state:'starting',message:'Waking the oscillators…'});
   const previous=engine.current;engine.current=null;previous?.close();
-  startLiveSynth({model:synth.model,params:toPairs(patchRef.current.values),...(engineOptions?.()??{}),latency:setupRef.current.latency,onStats:setStats,onError:e=>setAudio({state:'error',message:e.message})})
+  startLiveSynth({model:synth.model,params:toPairs(patchRef.current.values),...(engineOptions?.()??{}),latency:setupRef.current.latency,onStats:data=>{onStatsRef.current?.(data);setStats(s=>Math.abs(s.peak-data.peak)<.02&&s.active===data.active?s:data);},onError:e=>setAudio({state:'error',message:e.message})})
    .then(live=>{engine.current=live;onEngine?.(live);performer.setTarget(live);performer.restore({sustain:pedal?1:0});setAudio({state:'on',message:`${live.context.sampleRate/1000} kHz · ${Math.round(live.latency*1000)} ms output`});})
    .catch(e=>setAudio({state:'error',message:e.message}));
   if(!midiRef.current.access)connectMidi();
@@ -135,6 +141,7 @@ export default function SynthShell({synth,className='',headerExtras=null,nav=nul
    <span className="meter" aria-label={`${stats.active} voices playing`}><span className="meter-fill" style={{width:Math.min(100,stats.peak*100)+'%'}}/><b>{stats.active}</b>/{patch.values.voices}</span>
    {pedal&&<span className="pill">Pedal</span>}
    {headerExtras}
+   <button type="button" aria-pressed={scope} onClick={toggleScope} title="Oscilloscope and spectrum">Scope</button>
    <button type="button" aria-pressed={showSetup} onClick={()=>setShowSetup(v=>!v)} aria-label="Setup">⚙</button>
    <button type="button" onClick={()=>performer.panic()} title="Silence everything (Esc)">Panic</button>
    <button type="button" onClick={fullscreen} aria-label="Full screen">⛶</button>
@@ -151,6 +158,7 @@ export default function SynthShell({synth,className='',headerExtras=null,nav=nul
    </>}
   </nav>
 
+  {scope&&<Scope engine={engine} audio={audio.state} onClose={toggleScope}/>}
   {!showSetup&&nav}
 
   <main className={'panel'+(showSetup?'':' '+panelClassName)}>

@@ -1,6 +1,6 @@
 # /synths — classic synths for tablet + piano
 
-Status, 20 October 2026: all eight instruments are built and playable at `/synths/<id>/` with a hub at `/synths/`: CS-80 (played and liked on the tablet), Juno-106, Prophet-5, Jupiter-8, Minimoog, DX7, OB-Xa and Prophet VS (all built 20 Oct, not yet heard; presets are level-balanced by measurement only). What to listen for: `docs/SYNTHS_LISTENING.md`. CS-80 and Juno are committed (a80ecff); nothing is deployed. Remaining: the drum machines.
+Status, 20 October 2026: all eight synths plus the sequenced machines are built and playable at `/synths/<id>/` with a hub at `/synths/`: CS-80 (played and liked on the tablet), Juno-106, Prophet-5, Jupiter-8, Minimoog, DX7, OB-Xa and Prophet VS (all built 20 Oct, not yet heard), and the TR-808, TR-909, TR-606 and TB-303 on a new in-kernel step sequencer (built 20 Oct, not yet heard). Everything up to the Prophet VS is committed (60e7fb6); the sequencer and drum machines are not. Nothing is deployed. What to listen for: `docs/SYNTHS_LISTENING.md`.
 
 Factory-patch formats, 20 October 2026: the Prophet VS program and wave SysEx are decoded (`docs/VS_SYSEX_FORMAT.md`). The Jupiter-8 tape decoder now handles real-world recordings and checks every patch's checksum (`docs/JP8_TAPE_FORMAT.md`). The Prophet-5/10 Rev 4 program SysEx is decoded too (`src/synths/prophet/sysex.js`, `docs/P5_SYSEX_FORMAT.md`). That gives the Prophet-5 page an import shelf and the 40 original Rev 3 programs as a yardstick before its engine exists.
 
@@ -206,7 +206,14 @@ Per voice (8 voices): **4 digital oscillators** (A, B, C, D), each playing a 128
 - **Patches**: export/import files, a share link, A/B compare, undo. Presets are currently local to the device.
 - **Platform**: Safari on iPad has no Web MIDI. Use Chrome on an Android tablet, a Web MIDI-capable iPad browser, or the on-screen keys. A PWA manifest would give a home-screen icon and offline use. Measure CPU on the actual tablet; the existing memory notes say phones are CPU-bound.
 
-## Drum machines and the TB-303 (scoped 20 Oct, not started)
+## Drum machines and the TB-303 (built 20 Oct; listen next)
+
+**Built:** `seq.rs` (clock, swing, pattern select at the bar line, chain), `drums.rs` (one engine, three voice sets: TR-808 with 16 tracks, TR-909 with 11, TR-606 with 7) and `tb303.rs`. Kernel models 8 TR-808, 9 TR-909, 10 TR-606, 11 TB-303; `syn_seq(cmd, a, b)` carries the sequencer commands (0 play/stop, 1 set a step, 2 pattern, 3 chain slot, 4 chain length, 5 pattern length (a = steps, b = pattern), 6 rewind, 7 clear, 8 pattern tempo (a = pattern, b = bpm, 0 = global)) and `syn_stat(4..6)` the playhead (step, pattern, running; the worklet reports forty times a second for these models). The clock runs inside the render loop and splits blocks at step boundaries, so steps land on their exact frame at any block size (tests check 128, 333 and 2048). Pages: `src/synths/drums/` (kits, `DrumPage`: step grid with an accent row, tap or drag to paint, tap a name to hit the pad and edit its level, tune, decay, tone and pan; a mixer of all levels; six starter beats) and `src/synths/tb303/` (a piano-roll grid of twelve semitones plus the top C, tie, octave up/down, accent and slide rows; four starter lines). Patterns, chain and the current letter live in the browser (`synths:<id>:patterns`). A piano key plays a pad: C2 is track 1, wrapping every two octaves; on the 303 the keys play the bass live (a hard hit accents, a held key plus another slides).
+- **Voices:** kick = sine with a falling pitch, a click and soft saturation; snare = two resonators plus filtered noise; toms and congas = swept sines; rim = two ringing sines clipped; clap = band-passed noise in three bursts and a tail; cowbell = two squares through a band-pass with a two-stage decay; hats and cymbals = the six square oscillators (205.3, 304.4, 369.6, 522.7, 540 and 800 Hz) through high-pass and band-pass, the closed hat choking the open one; maracas = high-passed noise; claves = a ringing sine. The 909's hats, crash and ride are stand-ins: the same metal source plus noise and a 6-bit quantiser (the originals are ROM samples).
+- **TB-303:** saw or square into the four-pole ladder (the passband drops with resonance, as on the original), a filter envelope with a Decay knob, an accent circuit that builds over consecutive accented notes (more level, more envelope, shorter decay), slide as a fixed glide with no envelope re-trigger, gates of 60% of a step unless tied or slid into the next step, and a drive stage.
+- **Estimates:** every voice's pitches, decays and filter frequencies are by ear and from circuit descriptions, not measured. Compare against Roland50.studio by ear only (its assets are never extracted). Added later the same day: **flam** (a quiet grace note 10–45 ms before the beat, the Flam knob sets the gap; steps fire 50 ms ahead of sound so the main hit stays on the grid), **three accent strengths** per step (the accent row cycles 3 → 2 → 1 → off), **pattern length 1–16** and an **own tempo per pattern**, and **MIDI clock follow** (clock only steers the tempo; start/continue/stop control the transport; the internal clock stays sample-accurate). Not built: the 808's accent as a separate bus level, the 909's shuffle steps, MIDI clock output, the TR-707 and SH-101.
+
+**Original scope notes (kept for the record):**
 
 The voices are cheap on CPU and small in code. The real cost is shared infrastructure /synths does not have yet.
 
@@ -234,10 +241,10 @@ The generator's percussion crate (`synth-engine/percussion`) has a timestamped e
 Compare only: its sound assets are not extracted or shipped. It is described as a simplified rendition, so published circuit studies and recordings of real units remain the stricter check.
 
 **Order:**
-1. Sequencer and TR-808 together.
-2. TR-909, reusing the 808 voices.
-3. TB-303 (bass line plus drums).
-4. TR-606, almost free by then.
+1. Sequencer and TR-808 together (done).
+2. TR-909, reusing the 808 voices (done).
+3. TB-303 (done; the drum and bass patterns share the clock but run in separate pages).
+4. TR-606 (done).
 
 ## Plan
 
@@ -261,3 +268,14 @@ Compare only: its sound assets are not extracted or shipped. It is described as 
 Order 4–9 is a suggestion; the formats work so far means either the Prophet-5 or the Jupiter-8 can come next.
 
 Each model is a Rust module in the same crate (one `classics.wasm`, about 20–30 KB per model; the DX7 may be larger). Split into per-model Wasm files only if download size starts to matter.
+
+
+## Key-press onset (20 Oct)
+Every polyphonic engine now fades a voice in over about 4 ms (`Onset` in `dsp.rs`, a smoothstep) when a key starts it from silence, because several presets began with a step (a pop) when the envelope attack was near zero or the oscillator started mid-cycle. A voice that is still sounding when it is reused keeps its gain. `src/synths/engine/onset.test.js` checks every preset of every engine at three pitches.
+
+## Scope and spectrum (20 Oct)
+Every /synths page has a **Scope** button in the header: an oscilloscope and a spectrum analyser on the synth's final output (left and right averaged, after the shared chorus and reverb). The audio worklet keeps the last 1.3 s in a ring and returns a copy on request (`requestScope` in `liveSynth.js`); the page asks about thirty times a second (`src/synths/ui/Scope.jsx`, maths in `scopeMath.js` with tests).
+- **Scope:** 1–500 ms across, vertical zoom ×1–×50, rising or falling edge trigger with a level slider, and Auto (free-runs when nothing triggers), Normal (holds the last trace) and **Single** (arm, play: the first trigger after arming is captured and held, with its frame count and time). 10% of the screen shows the time before the trigger. Stop freezes the display; tapping or dragging reads time from the trigger and level at that point; samples show as dots when zoomed far in. Readouts: peak, peak-to-peak, RMS, and the pitch (normalised square difference, with the note and cents). **Save WAV** writes what is on screen.
+- **Spectrum:** 8192-point Hann-windowed FFT (0 dB = a full-scale sine), 20 Hz–20 kHz log axis, −100…0 dB, light smoothing, optional **Peak hold**, a tap shows frequency and level, and the strongest peak is named. In Single mode it analyses the captured block (up to 8192 samples from the trigger).
+- Not done: stereo traces, a dual cursor, spectrogram, pre-effects tap.
+

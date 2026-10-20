@@ -48,7 +48,8 @@ export function decodePatch(data){
 
 /** Units for the engine, all estimates (knob 0–1 → lo·(hi/lo)^knob) until checked by ear or against recordings. */
 export const CALIBRATION={
- cutoffHz:[20,20000],hpfHz:[10,2000],attackS:[.001,5],decayS:[.002,10],lfoHz:[.05,25],lfoDelayS:5,vco2FineCents:50,
+ // the owner's manual: attack 1 ms–5 s, decay and release 1 ms–10 s, LFO 0.05–40 Hz, LFO delay 0–4 s
+ cutoffHz:[20,20000],hpfHz:[10,2000],attackS:[.001,5],decayS:[.001,10],lfoHz:[.05,40],lfoDelayS:4,vco2FineCents:50,
 };
 const expMap=([lo,hi],x)=>lo*(hi/lo)**x;
 const flag=b=>b?1:0;

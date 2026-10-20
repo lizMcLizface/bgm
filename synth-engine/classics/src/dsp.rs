@@ -517,3 +517,26 @@ impl HalfBand {
         }
     }
 }
+
+/// A short fade-in (about 4 ms, a smoothstep) for a voice that starts from silence, so a key
+/// press never begins with a step even when the envelope's attack is instant. A voice that is
+/// still sounding when it is reused keeps its gain.
+#[derive(Clone, Copy)]
+pub struct Onset {
+    g: f32,
+}
+impl Onset {
+    pub const DONE: Self = Self { g: 1. };
+    #[inline]
+    pub fn arm(&mut self) {
+        self.g = 0.;
+    }
+    #[inline]
+    pub fn tick(&mut self) -> f32 {
+        if self.g >= 1. {
+            return 1.;
+        }
+        self.g = (self.g + 1. / 192.).min(1.);
+        self.g * self.g * (3. - 2. * self.g)
+    }
+}

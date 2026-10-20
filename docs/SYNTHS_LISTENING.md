@@ -145,3 +145,18 @@ The envelope, scaling, LFO and algorithm behaviour come from MSFA's measured DX7
 
 ## CS-80
 Already played and liked. Only check that nothing changed for the worse after the shared-code updates.
+
+## Drum machines and the TB-303 (`/synths/tr808/`, `tr909`, `tr606`, `tb303`; built 20 Oct, never heard)
+All four sit on one sequencer inside the engine. Start with a beat from the **Beats** shelf (Lines on the 303), press **Play**, then edit while it runs.
+- **Timing:** the groove should be rock steady, also while you drag the sliders and when the tablet is busy. If you hear any wobble, report the tablet and the latency setting. Try **Swing** at 60–66%: the off-beat 16ths should lean back like a shuffle.
+- **Patterns:** letters A–H switch pattern at the bar line (not mid-bar). **Copy →** duplicates the pattern into the next letter and moves on; the **Chain** (＋ adds the current letter) plays them in order. Tapping a chain letter removes it.
+- **808 voices:** the kick should be a long, low, round sine with a quick pitch fall (turn Decay up for the boom, Tune down for lower); the snare has a body and a noise tail (Tone = Snappy); the closed hat cuts the open hat; the clap has the triple-burst flutter; the cowbell is the classic hollow two-tone. Say which voices feel wrong (too thin, too hissy, wrong pitch, too short) and by how much.
+- **909:** the kick should be punchier and clickier, the snare brighter and noisier. Its hats, crash and ride are stand-ins (the originals are samples): are they close enough, or too bright and noisy?
+- **606:** small, dry and quick: check the kick and snare against what you remember.
+- **Levels:** the kit's loudness (kick against hats and cymbals) is set by measurement only; say which voices are too loud or soft. The **Accent** row (AC) makes every voice hit harder on that step; the Accent knob sets how much.
+- **Piano as pads:** each key from C2 is one pad (C2 = BD, C♯2 = SD …), repeating after two octaves. Hit the keys while a beat plays. Velocity changes the level.
+- **TB-303:** try the **Acid** sound and the starter lines. Listen for: the filter sweeping on each note and closing before the next; **ACC** steps jumping out (and growing when several are in a row); **SLD** gliding into the next note without a new attack; **TIE** holding a note over the next step; the **Resonance** thinning the bass and squealing near the top. Report: sweep range too narrow or too wide (Cut off and Env mod), decay times, how loud accents get, the slide time, and the drive amount.
+- Known gaps: no flam, no per-step accent amounts, patterns are always 16 steps in the UI, one tempo per page.
+- **Added after the first listen:** the **Flam** tool (paint flams; the Flam knob sets the gap), the accent row's three strengths (tap cycles), **Steps** (pattern length) and a per-pattern **Tempo**, and **MIDI clock** (tick the box, then press play on your MIDI source). Please check that a flam feels like a flam and that following a clock doesn't stumble.
+- **Key-press pop:** every synth now fades in over ~4 ms. Please say if any preset still clicks on the first note, and which pitch.
+

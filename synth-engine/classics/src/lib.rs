@@ -14,6 +14,9 @@ mod vs;
 mod minimoog;
 mod jupiter;
 mod prophet;
+mod seq;
+mod drums;
+mod tb303;
 
 use dsp::{soft, DcBlock, MAX_BLOCK};
 
@@ -28,6 +31,10 @@ pub const MODEL_MINIMOOG: u32 = 4;
 pub const MODEL_DX7: u32 = 5;
 pub const MODEL_OBXA: u32 = 6;
 pub const MODEL_VS: u32 = 7;
+pub const MODEL_TR808: u32 = 8;
+pub const MODEL_TR909: u32 = 9;
+pub const MODEL_TR606: u32 = 10;
+pub const MODEL_TB303: u32 = 11;
 
 struct Host {
     sr: f32,
@@ -40,6 +47,8 @@ struct Host {
     dx7: dx7::Dx7,
     obxa: obxa::ObXa2,
     vs: vs::Vs,
+    drums: drums::Drums,
+    bass: tb303::Tb303,
     bbd: fx::Bbd,
     space: fx::Space,
     dc: [DcBlock; 2],
@@ -60,6 +69,8 @@ static mut HOST: Host = Host {
     dx7: dx7::Dx7::new(),
     obxa: obxa::ObXa2::new(),
     vs: vs::Vs::new(),
+    drums: drums::Drums::new(),
+    bass: tb303::Tb303::new(),
     bbd: fx::Bbd::new(),
     space: fx::Space::new(),
     dc: [DcBlock::ZERO; 2],
@@ -102,6 +113,14 @@ macro_rules! model {
                 let $m = &mut $h.vs;
                 $body
             }
+            MODEL_TR808 | MODEL_TR909 | MODEL_TR606 => {
+                let $m = &mut $h.drums;
+                $body
+            }
+            MODEL_TB303 => {
+                let $m = &mut $h.bass;
+                $body
+            }
             _ => {
                 let $m = &mut $h.cs80;
                 $body
@@ -127,6 +146,8 @@ pub extern "C" fn syn_param_count() -> u32 {
             MODEL_DX7 => dx7::PARAMS as u32,
             MODEL_OBXA => obxa::PAIR_PARAMS as u32,
             MODEL_VS => vs::PARAMS as u32,
+            MODEL_TR808 | MODEL_TR909 | MODEL_TR606 => drums::PARAMS as u32,
+            MODEL_TB303 => tb303::PARAMS as u32,
             _ => cs80::PARAMS as u32,
         }
     }
@@ -134,7 +155,7 @@ pub extern "C" fn syn_param_count() -> u32 {
 
 #[no_mangle]
 pub extern "C" fn syn_init(sr: f32, model: u32) -> u32 {
-    if !(8000. ..=384000.).contains(&sr) || model > MODEL_VS {
+    if !(8000. ..=384000.).contains(&sr) || model > MODEL_TB303 {
         return 0;
     }
     unsafe {
@@ -148,6 +169,10 @@ pub extern "C" fn syn_init(sr: f32, model: u32) -> u32 {
             MODEL_DX7 => HOST.dx7.init(sr),
             MODEL_OBXA => HOST.obxa.init(sr),
             MODEL_VS => HOST.vs.init(sr),
+            MODEL_TR808 => HOST.drums.init(sr, drums::STYLE_808),
+            MODEL_TR909 => HOST.drums.init(sr, drums::STYLE_909),
+            MODEL_TR606 => HOST.drums.init(sr, drums::STYLE_606),
+            MODEL_TB303 => HOST.bass.init(sr),
             _ => HOST.cs80.init(sr),
         }
         HOST.bbd.init(sr);
@@ -224,6 +249,10 @@ pub extern "C" fn syn_render(frames: u32) {
             h.obxa.render(left, right);
         } else if h.model == MODEL_VS {
             h.vs.render(left, right);
+        } else if matches!(h.model, MODEL_TR808 | MODEL_TR909 | MODEL_TR606) {
+            h.drums.render(left, right);
+        } else if h.model == MODEL_TB303 {
+            h.bass.render(left, right);
         } else {
             h.cs80.render(left, right);
         }
@@ -239,6 +268,20 @@ pub extern "C" fn syn_render(frames: u32) {
         }
         h.peak = peak;
         h.frames += n as f64;
+    }
+}
+
+/// Sequencer commands for the drum machines and the bass line (see `seq.rs`, `drums.rs`,
+/// `tb303.rs`): 0 play/stop, 1 set a step, 2 pattern, 3 chain slot, 4 chain length,
+/// 5 pattern length, 6 rewind, 7 clear a pattern.
+#[no_mangle]
+pub extern "C" fn syn_seq(cmd: u32, a: u32, b: f32) {
+    unsafe {
+        match HOST.model {
+            MODEL_TR808 | MODEL_TR909 | MODEL_TR606 => HOST.drums.command(cmd, a, b),
+            MODEL_TB303 => HOST.bass.command(cmd, a, b),
+            _ => {}
+        }
     }
 }
 
@@ -274,6 +317,18 @@ pub extern "C" fn syn_stat(which: u32) -> f32 {
             1 => model!(HOST, m => m.steals) as f32,
             2 => HOST.peak,
             3 => (HOST.frames / HOST.sr as f64) as f32,
+            4 | 5 | 6 => {
+                let s = match HOST.model {
+                    MODEL_TR808 | MODEL_TR909 | MODEL_TR606 => &HOST.drums.seq,
+                    MODEL_TB303 => &HOST.bass.seq,
+                    _ => return 0.,
+                };
+                match which {
+                    4 => s.last_step as f32,
+                    5 => s.last_pattern as f32,
+                    _ => s.running as u32 as f32,
+                }
+            }
             _ => 0.,
         }
     }

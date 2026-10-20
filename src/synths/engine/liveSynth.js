@@ -20,17 +20,20 @@ export function startLiveSynth({model=MODELS.cs80,params=[],waves=null,latency='
  const context=new Context({latencyHint:latency});
  const resumed=context.resume().catch(()=>{});
  return (async()=>{
+  if(!context.audioWorklet)throw Error('Audio needs a secure page: open this over https:// (or localhost), not plain http.');
   const [module]=await Promise.all([loadKernel(),context.audioWorklet.addModule(asset('classics-processor.js')),resumed]);
+  let scopeHandler=null;
   const node=new AudioWorkletNode(context,'calmbgm-classics',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{module,model,params,waves}});
   await new Promise((resolve,reject)=>{node.port.onmessage=({data})=>{
    if(data.type==='ready')resolve();
    else if(data.type==='error'){reject(Error(data.message));onError(Error(data.message));}
    else if(data.type==='stats')onStats(data);
+   else if(data.type==='scope'){const h=scopeHandler;scopeHandler=null;h?.(data);}
   };});
   node.connect(context.destination);
   // Batch everything sent in one task into a single message.
-  let events=[],edits=[],queued=false;
-  const flush=()=>{queued=false;if(edits.length){node.port.postMessage({type:'params',values:edits});edits=[];}if(events.length){node.port.postMessage({type:'events',values:events});events=[];}};
+  let events=[],edits=[],steps=[],queued=false;
+  const flush=()=>{queued=false;if(edits.length){node.port.postMessage({type:'params',values:edits});edits=[];}if(steps.length){node.port.postMessage({type:'seq',values:steps});steps=[];}if(events.length){node.port.postMessage({type:'events',values:events});events=[];}};
   const queue=()=>{if(!queued){queued=true;queueMicrotask(flush);}};
   let closed=false;
   return {
@@ -42,8 +45,12 @@ export function startLiveSynth({model=MODELS.cs80,params=[],waves=null,latency='
    noteOff(id){events.push([NOTE_OFF,id,0,0]);queue();},
    pressure(id,value){events.push([PRESSURE,id,value,0]);queue();},
    control(which,value){events.push([CONTROL,which,value,0]);queue();},
+   /** Sequencer commands for the drum machines and the bass line: [[cmd,a,b],…] (see syn_seq in the kernel). */
+   seq(commands){steps.push(...commands);queue();},
    /** The vector synthesizer's 128 waves × 128 samples (Float32Array of 16,384). */
    setWaves(data){node.port.postMessage({type:'waves',waves:data});},
+   /** Asks for the newest n output samples (mono): handler({end, rate, samples}); `end` counts frames since the engine started. */
+   requestScope(n,handler){scopeHandler=handler;node.port.postMessage({type:'scope',n});},
    panic(){flush();node.port.postMessage({type:'panic'});},
    async close(){if(closed)return;closed=true;flush();node.port.postMessage({type:'dispose'});node.disconnect();await context.close().catch(()=>{});},
   };

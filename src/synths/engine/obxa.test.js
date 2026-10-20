@@ -53,10 +53,10 @@ test('sync locks oscillator 2 to oscillator 1\'s period, and the filter envelope
  // an audible check: with osc 1 in the mix too, a synced pair repeats every period of oscillator 1
  const both={...CLEAN,osc2Mix:2,osc2Pitch:7.7,oversample:2};
  expect(corr(hold({...both,sync:1},note,.2),128)).toBeGreaterThan(.99);expect(corr(hold({...both,sync:0},note,.2),128)).toBeLessThan(.9);
- // envelope → oscillator 2: the pitch starts two octaves up and falls to the note as the envelope decays
- const sweep={...ONLY2,fenvOsc2:1,fAttack:.001,fDecay:.15,fSustain:0};
+ // envelope → oscillator 2: the pitch starts one octave up at full modulation and falls to the note as the envelope decays
+ const sweep={...ONLY2,fenvOsc2:1,envAmount:1,fAttack:.001,fDecay:.15,fSustain:0};
  const v=synth(sweep);v.k.syn_note_on(1,57,1);v.seconds(.004);const early=pitchHz(v.seconds(.03)[0]);v.seconds(1.5);const late=pitchHz(v.seconds(.3)[0]);
- expect(early).toBeGreaterThan(1.5*late);expect(cents(late,220)).toBeLessThan(2);
+ expect(early).toBeGreaterThan(1.4*late);expect(early).toBeLessThan(2.1*late);expect(cents(late,220)).toBeLessThan(2);
 });
 
 test('the filter is 24 dB with four poles and 12 dB with two, and self-oscillates at the top of the resonance',()=>{

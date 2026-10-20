@@ -122,6 +122,7 @@ struct Setup {
 }
 
 pub struct Minimoog {
+    onset: Onset,
     sr: f32,
     pub p: [f32; PARAMS],
     dirty: bool,
@@ -172,7 +173,7 @@ pub struct Minimoog {
 impl Minimoog {
     pub const fn new() -> Self {
         Self {
-            sr: 48000., p: [0.; PARAMS], dirty: true,
+            onset: Onset::DONE, sr: 48000., p: [0.; PARAMS], dirty: true,
             setup: Setup {
                 os: 1, w: [Waves::NONE; 3], pw: [0.5; 3], mix: [0.; 3], noise: 0., pink: false, fb: 0., mod_osc: false,
                 mod_filter: false, kbd3: true, srv: 48000., f_attack: 1., f_decay: 1., f_sustain: 0., a_attack: 1.,
@@ -235,6 +236,7 @@ impl Minimoog {
 
     fn start(&mut self, key: u32, note: f32, velocity: f32, retrigger: bool) {
         if !self.sounding {
+            self.onset.arm();
             self.fresh = true;
             self.pitch = note;
             self.ladder = Ladder::ZERO;
@@ -456,6 +458,7 @@ impl Minimoog {
                 left[at..at + m].copy_from_slice(&buf[..m]);
             }
             for j in 0..m {
+                left[at + j] *= self.onset.tick();
                 right[at + j] = left[at + j];
             }
             if self.aenv.stage == IDLE {

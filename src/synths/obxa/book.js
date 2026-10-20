@@ -16,7 +16,8 @@ export const semitones=note=>PITCH_NOTES[note]??0;
 
 /** Units for the engine, all estimates (knob 0–10 → exponential ranges) until checked by ear or against recordings. */
 export const CALIBRATION={
- cutoffHz:[30,16000],attackS:[.001,8],decayS:[.003,15],lfoHz:[.1,30],wheelHz:[.5,12],portamentoS:2,detuneCents:100,
+ // the service manual's filter calibration: at cutoff 0 with key tracking on, the filter rings at the key's own pitch, so the lowest key (C0, 65.4 Hz) is the zero point
+ cutoffHz:[65.4,16000],attackS:[.001,8],decayS:[.003,15],lfoHz:[.1,30],wheelHz:[.5,12],portamentoS:2,detuneCents:100,
 };
 
 const flag=b=>b?1:0;

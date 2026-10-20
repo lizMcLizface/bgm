@@ -26,7 +26,14 @@ export const CALIBRATION={
  // Osc B in low-freq mode: raw frequency → Hz, measured to raw 90, extrapolated above (Funkybot, 2026)
 // Units for the engine, all estimates until checked by ear or against recordings:
  // knob 0–1 → lo·(hi/lo)^knob.
- cutoffHz:[20,20000],attackS:[.001,10],decayS:[.002,15],lfoHz:[.05,25],glideS:[.005,5],
+ // Rev 3 technical manual, filter tuning (4-20): with the cutoff CV (TP303) at 2.000 V and keyboard tracking on, playing
+ // the keyboard's A3 (CV 3.75 V above the lowest key) makes the filter ring at 440 Hz, so cutoff = 440 Hz * 2^(CV - 5.75) at
+ // 1 V/octave; the knob spans 0-10 V (7-bit steps of 83 mV): 8.2 Hz to 8.4 kHz, counted at the lowest key
+ cutoffHz:[8.18,8372],// the CEM 3310 envelope chip: time constants run exponentially from 2 ms to 20 s over the knob (zero to -5 V,
+ // four decades at 60 mV per decade), consistent with the Rev 3 service tests (about 1 s at dial 6, release at 10 over 20 s).
+ // The engine's attack is the time to peak (the chip charges towards 6.5 V and is cut at 5.0 V: 1.466 time constants);
+ // its decay and release are the time to -43 dB (5 time constants).
+ attackS:[.0029,29.3],decayS:[.01,100],lfoHz:[.05,25],glideS:[.005,5],
  oscBLowHz:[[0,.531],[10,.636],[14,.718],[22,.81],[24,.859],[30,.968],[36,1.154],[42,1.297],[48,1.469],[52,1.858],[54,2.074],[58,2.623],[60,2.97],[62,3.323],[66,4.223],[72,6.031],[78,8.443],[80,9.258],[82,10.937],[84,12.159],[90,16.857],[96,23.745],[102,33.448],[108,47.116],[114,66.37],[120,93.49]],
 };
 

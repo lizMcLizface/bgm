@@ -64,6 +64,8 @@ export function formatValue(p,value){
   case 'alg':return String(value+1);
   case 'tr':return (value-24>0?'+':'')+(value-24);
   case 'n':return String(value);
+  case 'bpm':return String(Math.round(value));
+  case 'swing':return Math.round(value*100)+'%';
   default:return Math.round(value*100)+'';
  }
 }

@@ -161,6 +161,7 @@ impl Setup {
 
 #[derive(Clone, Copy)]
 struct Voice {
+    onset: Onset,
     key: u32,
     note: f32,
     pitch: f32,
@@ -207,6 +208,7 @@ struct Voice {
 }
 impl Voice {
     const ZERO: Self = Self {
+        onset: Onset::DONE,
         key: 0, note: 60., pitch: 60., velocity: 0., poly: 0., pressure: 0., down: false, held: false, active: false,
         fresh: true, stamp: 0, offset: 0., rng: Rng(1), a: VcOsc::ZERO, b: VcOsc::ZERO, fenv: Adsr::ZERO, aenv: Adsr::ZERO,
         ladder: Ladder::ZERO, dta: 0., dta_d: 0., dtb: 0., dtb_d: 0., pwa: 0.5, pwa_d: 0., pwb: 0.5, pwb_d: 0., cut: 10.,
@@ -312,6 +314,9 @@ impl Prophet {
         if retrigger || !v.active {
             v.fenv.attack();
             v.aenv.attack();
+        }
+        if !v.active {
+            v.onset.arm();
         }
         v.active = true;
     }
@@ -488,14 +493,14 @@ impl Prophet {
         }
         let srv = self.sr * os as f32;
         let release = p[id::RELEASE] >= 0.5;
-        let fall = |i: usize| fall_coefficient(bound(p[i], 0.001, 30.), srv);
+        let fall = |i: usize| fall_coefficient(bound(p[i], 0.001, 120.), srv);
         let short = fall_coefficient(0.015, srv);
         let rev3 = p[id::FILTER_REV] >= 0.5;
         self.setup = Setup {
             os,
             srv,
             wa: Waves { saw: on(id::A_SAW), pulse: on(id::A_PULSE), tri: 0., sine: 0. },
-            wb: Waves { saw: on(id::B_SAW), pulse: on(id::B_PULSE), tri: on(id::B_TRI), sine: 0. },
+            wb: Waves { saw: on(id::B_SAW), pulse: on(id::B_PULSE), tri: 0.5 * on(id::B_TRI), sine: 0. },
             sync,
             mix_a: bound(p[id::MIX_A], 0., 1.),
             mix_b: bound(p[id::MIX_B], 0., 1.),
@@ -505,11 +510,11 @@ impl Prophet {
             pm_freq: if p[id::PM_FREQ_A] >= 0.5 { 4. * pm_b * pm_b } else { 0. },
             pm_pw: if p[id::PM_PW_A] >= 0.5 { 0.45 * pm_b } else { 0. },
             pm_cut: if p[id::PM_FILTER] >= 0.5 { 4. * pm_b } else { 0. },
-            f_attack: attack_coefficient(bound(p[id::F_ATTACK], 0.0005, 20.), srv),
+            f_attack: attack_coefficient(bound(p[id::F_ATTACK], 0.0005, 30.), srv),
             f_decay: fall(id::F_DECAY),
             f_sustain: bound(p[id::F_SUSTAIN], 0., 1.),
             f_release: if release { fall(id::F_RELEASE) } else { short },
-            a_attack: attack_coefficient(bound(p[id::A_ATTACK], 0.0005, 20.), srv),
+            a_attack: attack_coefficient(bound(p[id::A_ATTACK], 0.0005, 30.), srv),
             a_decay: fall(id::A_DECAY),
             a_sustain: bound(p[id::A_SUSTAIN], 0., 1.),
             a_release: if release { fall(id::A_RELEASE) } else { short },
@@ -579,7 +584,9 @@ impl Prophet {
         let pwa = 0.5 + 0.96 * (bound(p[id::A_PW], 0., 1.) - 0.5);
         let pwb = 0.5 + 0.96 * (bound(p[id::B_PW], 0., 1.) - 0.5);
         let glide = bound(p[id::GLIDE], 0., 10.);
-        let glide_k = if glide > 0. { smoothing(glide / 3., rate) } else { 1. };
+        // the glide circuit slews at a constant rate (Rev 3 manual: at most 5 s for 5 octaves): `glide` is the
+        // time in seconds to cover five octaves, so the step per control tick is 60 semitones / glide * ts
+        let glide_step = if glide > 0. { 60. * ts / glide } else { f32::INFINITY };
         let detune = 0.25 * bound(p[id::UNISON_DETUNE], 0., 1.);
         let vintage = bound(p[id::VINTAGE], 0., 1.);
         let track = [0., 0.5, 1.][bound(p[id::TRACK], 0., 2.).round() as usize];
@@ -597,7 +604,7 @@ impl Prophet {
         let wander_rate = 0.25 * ts;
         for v in self.voices.iter_mut().filter(|v| v.active) {
             v.pressure += (v.poly.max(channel_pressure) - v.pressure) * press_k;
-            v.pitch += (v.note - v.pitch) * glide_k;
+            v.pitch += (v.note - v.pitch).clamp(-glide_step, glide_step);
             let drift_a = vintage * (0.08 * v.tune_a + 0.06 * v.wander_a.step(wander_rate, LFO_DRIFT));
             let drift_b = vintage * (0.08 * v.tune_b + 0.06 * v.wander_b.step(wander_rate * 1.3, LFO_DRIFT));
             let fe = v.fenv.value;
@@ -710,6 +717,7 @@ fn render_voice(v: &mut Voice, s: &Setup, vintage: f32, left: &mut [f32], right:
         v.fenv.tick(fa, fd, s.f_sustain, fr);
         let e = v.aenv.tick(aa, ad, s.a_sustain, ar);
         let o = y * e * v.gain;
+        let o = o * v.onset.tick();
         left[i] += o * pl;
         right[i] += o * pr;
     }

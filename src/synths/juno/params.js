@@ -19,10 +19,10 @@ export const {PARAMS,BY_KEY,defaultValues,clampValue,sanitize,toPairs}=definePar
  // HPF: 0 boosts the bass, 1 is flat, 2 and 3 cut
  ['hpf',8,'HPF',0,3,1,'','step',['Boost','Flat','2','3']],
  // VCF
- ['cutoff',9,'Freq',10,40000,3000,'Hz','log'],
+ ['cutoff',9,'Freq',5,60000,3000,'Hz','log'],
  ['res',10,'Res',0,1,.1,'%','lin'],
  ['envPolarity',11,'Env',0,1,0,'','step',['+','−']],
- ['env',12,'Env',0,1,.21,'%','lin'],
+ ['env',12,'Env',0,1,.15,'%','lin'],
  ['lfoVcf',13,'LFO',0,1,0,'%','sq'],
  ['kybd',14,'Kybd',0,1.2,.6,'%','lin'],
  // VCA

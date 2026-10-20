@@ -262,12 +262,14 @@ pub struct Bbd {
     depth: f32,
     mix: f32,
     lp: [[f32; 2]; 2],
+    /// anti-aliasing filter ahead of the delay line
+    pre: [f32; 2],
     rng: Rng,
 }
 const BBD_MODES: [(f32, f32); 4] = [(0.513, 0.00185), (0.513, 0.00185), (0.863, 0.00185), (9.75, 0.0002)];
 impl Bbd {
     pub const fn new() -> Self {
-        Self { sr: 48000., w: 0, phase: 0., rate: 0.513, depth: 0.00185, mix: 0., lp: [[0.; 2]; 2], rng: Rng(0x6d2b_79f5) }
+        Self { sr: 48000., w: 0, phase: 0., rate: 0.513, depth: 0.00185, mix: 0., lp: [[0.; 2]; 2], pre: [0.; 2], rng: Rng(0x6d2b_79f5) }
     }
     pub fn init(&mut self, sr: f32) {
         *self = Self::new();
@@ -285,14 +287,20 @@ impl Bbd {
         let (rate, depth) = BBD_MODES[mode];
         let k = smoothing(0.05, sr);
         let centre = 0.0035 * sr;
-        let lp = 1. - (-core::f32::consts::TAU * 7500. / sr).exp();
+        // 12 dB/octave at about 10 kHz before the delay (anti-aliasing) and after it (reconstruction),
+        // as measured on the original; the delay itself swings between about 1.5 and 5 ms
+        let lp = 1. - (-core::f32::consts::TAU * 10000. / sr).exp();
         let hiss = bound(noise, 0., 1.) * 0.0004;
         let mask = BBD_LEN - 1;
         for i in 0..left.len() {
             self.mix += (target - self.mix) * k;
             self.rate += (rate - self.rate) * k;
             self.depth += (depth - self.depth) * k;
-            let x = 0.5 * (left[i] + right[i]);
+            let mut x = 0.5 * (left[i] + right[i]);
+            for stage in self.pre.iter_mut() {
+                *stage += (x - *stage) * lp;
+                x = *stage;
+            }
             buf[self.w] = x + hiss * self.rng.next();
             self.phase += self.rate / sr;
             if self.phase >= 1. {

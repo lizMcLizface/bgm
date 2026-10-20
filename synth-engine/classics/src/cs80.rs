@@ -159,6 +159,7 @@ impl FilterEg {
 
 #[derive(Clone, Copy)]
 struct Chan {
+    onset: Onset,
     phase: f32,
     hp: Svf,
     lp: Svf,
@@ -181,6 +182,7 @@ struct Chan {
 }
 impl Chan {
     const ZERO: Self = Self {
+        onset: Onset::DONE,
         phase: 0., hp: Svf::ZERO, lp: Svf::ZERO, amp: Adsr::ZERO, feg: FilterEg::ZERO,
         dt: 0., dt_d: 0., pw: 0.5, pw_d: 0., hg: 0., hg_d: 0., lg: 0., lg_d: 0., gain: 0., gain_d: 0.,
         hk: 2., lk: 2., pan: (1., 1.),
@@ -338,6 +340,9 @@ impl Cs80 {
                 ch.hp = Svf::ZERO;
                 ch.lp = Svf::ZERO;
                 ch.feg.value = bound(il[c], -1., 1.);
+            }
+            if !v.active {
+                ch.onset.arm();
             }
             ch.amp.attack();
             ch.feg.stage = ATTACK;
@@ -677,7 +682,7 @@ fn render_chan(ch: &mut Chan, rng: &mut Rng, s: &ChanSetup, left: &mut [f32], ri
             y += s.sine * sin_turns(t);
         }
         let e = ch.amp.tick(s.attack, s.decay, s.sustain, s.release);
-        let o = y * e * ch.gain;
+        let o = y * e * ch.gain * ch.onset.tick();
         left[i] += o * pl;
         right[i] += o * pr;
         let next = t + dt;

@@ -76,6 +76,7 @@ struct Setup {
 
 #[derive(Clone, Copy)]
 struct Voice {
+    onset: Onset,
     key: u32,
     note: f32,
     velocity: f32,
@@ -110,6 +111,7 @@ struct Voice {
 }
 impl Voice {
     const ZERO: Self = Self {
+        onset: Onset::DONE,
         key: 0, note: 60., velocity: 0., poly: 0., pressure: 0., down: false, held: false, active: false, fresh: true,
         stamp: 0, rng: Rng(1), phase: 0., odd: false, env: Adsr::ZERO, gate: 0., hp: 0., ladder: Ladder::ZERO,
         dt: 0., dt_d: 0., pw: 0.5, pw_d: 0., g: 0., g_d: 0., gain: 0., gain_d: 0., k: 0., pan: (1., 1.), cut: 0.,
@@ -232,6 +234,9 @@ impl Juno {
         v.held = false;
         v.stamp = self.stamp;
         v.env.attack();
+        if !v.active {
+            v.onset.arm();
+        }
         v.active = true;
     }
 
@@ -339,8 +344,9 @@ impl Juno {
         let pwm = bound(p[id::PWM], 0., 1.);
         let width = 0.5 - 0.46 * pwm * if p[id::PWM_SOURCE] >= 0.5 { 1. } else { 0.5 * (lfo + 1.) };
         let polarity = if p[id::ENV_POLARITY] >= 0.5 { -1. } else { 1. };
-        let env_oct = 10. * bound(p[id::ENV], 0., 1.) * polarity;
-        let base = log2(bound(p[id::CUTOFF], 5., 60000.)) + 4. * bound(p[id::LFO_VCF], 0., 1.) * lfo
+        // Roland's service notes: envelope modulation of the filter is up to +-14 octaves
+        let env_oct = 14. * bound(p[id::ENV], 0., 1.) * polarity;
+        let base = log2(bound(p[id::CUTOFF], 5., 60000.)) + 3.5 * bound(p[id::LFO_VCF], 0., 1.) * lfo
             + bound(p[id::BEND_VCF], 0., 1.) * self.bend / 6. + 1.5 * self.brightness - self.soft;
         let kybd = bound(p[id::KYBD], 0., 1.2);
         let (vel_vcf, vel_vca, after_vcf) = (bound(p[id::VEL_VCF], 0., 1.), bound(p[id::VEL_VCA], 0., 1.), bound(p[id::AFTER_VCF], 0., 1.));
@@ -449,6 +455,7 @@ fn render_voice(v: &mut Voice, s: &Setup, left: &mut [f32], right: &mut [f32]) {
             e
         };
         let o = y * amp * v.gain;
+        let o = o * v.onset.tick();
         left[i] += o * pl;
         right[i] += o * pr;
         let next = t + dt;

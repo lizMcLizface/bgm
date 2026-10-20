@@ -9,8 +9,8 @@ const ON=['Off','On'];
 
 const LAYER=[
  // LFO (one, with delayed onset)
- ['lfoRate',0,'Rate',.05,25,5,'Hz','log'],
- ['lfoDelay',1,'Delay',0,5,0,'s','sq'],
+ ['lfoRate',0,'Rate',.05,40,5,'Hz','log'],
+ ['lfoDelay',1,'Delay',0,4,0,'s','sq'],
  ['lfoWave',2,'Wave',0,3,0,'','step',['Sine','Saw','Square','Random']],
  // VCO modulation: LFO and ENV-1 into the pitch of VCO-1, both or VCO-2
  ['vcoModLfo',3,'LFO',0,1,0,'%','lin'],
@@ -44,16 +44,16 @@ const LAYER=[
  ['level',26,'Level',0,1,.8,'%','lin'],
  // ENV-1
  ['e1Attack',27,'A',.001,5,.005,'s','log'],
- ['e1Decay',28,'D',.002,10,.6,'s','log'],
+ ['e1Decay',28,'D',.001,10,.6,'s','log'],
  ['e1Sustain',29,'S',0,1,.4,'%','lin'],
- ['e1Release',30,'R',.002,10,.4,'s','log'],
+ ['e1Release',30,'R',.001,10,.4,'s','log'],
  ['e1Key',31,'Key follow',0,1,0,'','step',ON],
  ['e1Invert',32,'Polarity',0,1,0,'','step',['Norm','Inv']],
  // ENV-2 (always the VCA)
  ['e2Attack',33,'A',.001,5,.003,'s','log'],
- ['e2Decay',34,'D',.002,10,.8,'s','log'],
+ ['e2Decay',34,'D',.001,10,.8,'s','log'],
  ['e2Sustain',35,'S',0,1,.9,'%','lin'],
- ['e2Release',36,'R',.002,10,.35,'s','log'],
+ ['e2Release',36,'R',.001,10,.35,'s','log'],
  ['e2Key',37,'Key follow',0,1,0,'','step',ON],
  // assign, portamento, arpeggio
  ['assign',38,'Assign',0,3,2,'','step',['Solo','Unison','Poly 1','Poly 2']],
@@ -62,7 +62,7 @@ const LAYER=[
  ['arp',41,'Arpeggio',0,1,0,'','step',ON],
  ['arpMode',42,'Mode',0,3,0,'','step',['Up','Down','U/D','Rand']],
  ['arpRange',43,'Range',1,4,1,'n','step'],
- ['arpRate',44,'Rate',1,30,8,'Hz','log'],
+ ['arpRate',44,'Rate',1,20,8,'Hz','log'],
  ['arpHold',45,'Hold',0,1,0,'','step',ON],
  // performance (velocity and pressure are additions: the original has neither)
  ['bendRange',46,'Bend',0,12,2,'n','step'],

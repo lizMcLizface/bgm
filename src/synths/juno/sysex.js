@@ -16,9 +16,9 @@
 export const CALIBRATION={
  lfoRate:[.1,30],      // Hz, exponential
  lfoDelay:3,            // s at full slider, square law
- lfoDco:12,             // semitones at full slider, square law
- cutoff:[6,24000],      // Hz at the lowest key, exponential (≈12 octaves)
- kybdReference:36,      // tracking counts from the lowest key; this engine tracks from note 60
+ lfoDco:4,              // semitones at full slider, square law (service notes: LFO MOD ±400 cents)
+ cutoff:[7,54000],      // Hz, exponential: measured self-oscillation of the filter at slider 0 and 10 (the service notes quote 5 Hz–50 kHz)
+ kybdReference:60,      // key follow is +3/−2 octaves over the 61 keys: zero at middle C, which is also where this engine tracks from
  envelope:[.03,3],      // slider-to-time shape: t = lo + (hi − lo)·(a·x + (1 − a)·x^p)
  vcaFloor:-20,          // dB at VCA level 0
  attack:[.0015,3],      // s

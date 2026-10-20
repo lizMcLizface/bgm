@@ -344,6 +344,7 @@ struct Setup {
 
 #[derive(Clone, Copy)]
 struct Voice {
+    onset: Onset,
     key: u32,
     note: f32,
     pitch: f32,
@@ -377,6 +378,7 @@ struct Voice {
 }
 impl Voice {
     const ZERO: Self = Self {
+        onset: Onset::DONE,
         key: 0, note: 60., pitch: 60., velocity: 0., poly: 0., pressure: 0., down: false, held: false, active: false, fresh: true,
         stamp: 0, offset: 0., rng: Rng(1), ph: [0.; 4], amp: EnvState::ZERO, fenv: EnvState::ZERO, mix: EnvState::ZERO, ladder: Ladder::ZERO,
         dt: [0.; 4], dt_d: [0.; 4], g: [0.; 4], g_d: [0.; 4], level: [0; 4], gf: 0., gf_d: 0., k: 0., gain: 0.,
@@ -510,6 +512,9 @@ impl Vs {
             v.amp.start(&setup.amp);
             v.fenv.start(&setup.filter);
             v.mix.start(&setup.mix);
+        }
+        if !v.active {
+            v.onset.arm();
         }
         v.active = true;
     }
@@ -882,6 +887,7 @@ fn render_voice(v: &mut Voice, s: &Setup, left: &mut [f32], right: &mut [f32]) {
         v.gain += v.gain_d;
         let y = v.ladder.tick(x + 1e-5 * v.rng.next(), v.gf, v.k);
         let o = y * v.gain;
+        let o = o * v.onset.tick();
         left[i] += o * pl;
         right[i] += o * pr;
     }

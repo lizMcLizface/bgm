@@ -16,6 +16,11 @@ import * as obxaParams from './obxa/params';
 import {PRESETS as OBXA_PRESETS} from './obxa/presets';
 import * as vsParams from './vs/params';
 import {PRESETS as VS_PRESETS} from './vs/presets';
+import {KITS,drumParams,drumPresets} from './drums/kits';
+import * as tb303Params from './tb303/params';
+import {PRESETS as TB303_PRESETS} from './tb303/presets';
+
+const drums=kit=>{const params=drumParams(kit);return {id:kit.id,model:kit.model,name:kit.name,subtitle:kit.subtitle,params,presets:drumPresets(kit,params),kit};};
 
 export const SYNTHS={
  cs80:{id:'cs80',model:MODELS.cs80,name:'CS-80',subtitle:'inspired polysynth',params:cs80Params,presets:CS80_PRESETS},
@@ -26,4 +31,8 @@ export const SYNTHS={
  dx7:{id:'dx7',model:MODELS.dx7,name:'DX7',subtitle:'inspired FM synth',params:dx7Params,presets:DX7_PRESETS},
  obxa:{id:'obxa',model:MODELS.obxa,name:'OB-Xa',subtitle:'inspired polysynth',params:obxaParams,presets:OBXA_PRESETS},
  vs:{id:'vs',model:MODELS.vs,name:'Prophet VS',subtitle:'inspired vector synth',params:vsParams,presets:VS_PRESETS},
+ tr808:drums(KITS.tr808),
+ tr909:drums(KITS.tr909),
+ tr606:drums(KITS.tr606),
+ tb303:{id:'tb303',model:MODELS.tb303,name:'TB-303',subtitle:'inspired bass line',params:tb303Params,presets:TB303_PRESETS},
 };

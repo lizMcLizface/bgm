@@ -1,0 +1,89 @@
+# What the /synths models assume or don't know (20 Oct 2026)
+
+Each section separates what rests on a source (a decoded factory bank, a published figure, a ported measured pipeline, or a test of behaviour that is the same on the original) from what is an estimate. Estimates are marked **[est]**; things the engine leaves out are **[not built]**. "Sourced" is only as strong as the source: figures marked *(from memory)* are widely cited circuit values that I have not re-verified against a schematic in this project.
+
+Nothing here has been compared against a recording of a real unit. The only comparisons are against published data and against the engines' own consistency (tests).
+
+## Across all engines
+- **The filter is one shared model.** `Ladder` is a zero-delay four-pole with a saturating feedback sum. It is used for the Juno, Prophet-5, Jupiter-8, Minimoog, OB-Xa, Prophet VS and TB-303 with different resonance scaling, not a circuit model of each chip (IR3109, CEM3320/3372, Moog transistor ladder, Curtis, diode ladder). **[est]** Real differences (how bass drops with resonance, saturation character, 2-pole behaviour) are approximated by the feedback law and soft clip only.
+- **Oscillators are ideal.** Band-limited saws and pulses (polyBLEP), no analogue drift except where a section says so, no tuning scatter, no waveform imperfections of real VCOs or DCOs. **[est]** Pulse widths of "wide/narrow" and shark-tooth shapes.
+- **Effects are not the originals.** The chorus and reverb after every model are shared additions. The Juno's BBD chorus is the one exception, and its rates and depth are approximations of published figures.
+- **Velocity, pressure, touch pad and ribbon are additions** on instruments that had none (or different ones), made for playing from a piano.
+- **Presets.** Every factory preset is an original patch in the style of the instrument, balanced for level by measurement (about −22 dB onset on a held chord). None is a copy of an original preset. Loudness balance between presets is a measured guess, not a calibrated one.
+- **Key-press onset.** A ~4 ms smoothstep fade-in on every voice (my addition to prevent clicks) changes the very start of very fast attacks.
+
+## CS-80
+- **Sourced / structural:** two channels per voice, a filter envelope with IL/AL levels, polyphonic touch, ring modulator. Behaviour comes from the instrument's documented architecture and the XILS-lab manual's description.
+- **[est]** Sub-oscillator and aftertouch routing, ring-mod envelope target, the HPF envelope share, keyboard scaling curves.
+- **[est]** The 22 "factory (approx.)" presets are guesses from names. The original voices were fixed circuits, never documented as panel settings.
+- **[not built]** The release-lengthening sustain switch (sustain behaves like a piano pedal).
+
+## Juno-106
+- **Sourced (Roland JUNO-106 Service Notes, 31 Jul 1984, specifications page):** envelope attack 1.5 ms–3 s, decay and release 1.5 ms–12 s; LFO 0.1–30 Hz, delay 0–3 s; **cutoff 5 Hz–50 kHz**; **envelope modulation ±14 octaves**; **LFO modulation of the filter ±3.5 octaves** and of the DCO **±400 cents**; bender ±1200 cents (DCO) and ±3.5 octaves (filter); **key follow +3/−2 octaves** (zero at middle C over the 61 keys, so 1:1 tracking); DCO tune ±50 cents. The pulse width ranges from 50% to 95% duty. The factory patch format is decoded from real SysEx. These replaced earlier estimates (cutoff 6 Hz–24 kHz, envelope depth 10 octaves, LFO to DCO 12 semitones, key-follow zero at the lowest key); the builtin presets were rescaled so they sound as before.
+- **Reported by a Juno owner (2026-10-20, forum post pasted by the user; not a document):** about 4 ms control-DAC latency plus 3–4 ms processing (not modelled: it would only hurt playing); the 1.5 ms minimum envelope time is the VCA's 10 kΩ and 0.1 µF smoothing, which also removes clicks; the high-pass section is two 6 dB/oct filters (about 225 Hz and 700 Hz) and a bass-boost shelf (about +3 dB at 70 Hz), as modelled; the chorus delay sweeps about 5 ms down to 1.5 ms (as modelled) behind 12 dB/oct filters at about 10 kHz before and after the delay (the engine had 7.5 kHz after only; now 10 kHz on both sides); cutoff and envelope-modulation sliders step about 135 cents; with resonance up the filter self-oscillates at about 7 Hz at slider 0 and 54 kHz at slider 10 (the cutoff range is now 7 Hz–54 kHz, replacing the service notes' rounded 5 Hz–50 kHz).
+- **[est]** Envelope curve shape between the end points; the VCA slider as −20…0 dB; BBD chorus depth and rates; per-voice analogue spread; the bender's filter depth is tied to the host's wheel range in semitones, not the original 3.5 octaves at full lever.
+- **[est]** Whether the original's resonance loses as much bass as this ladder does.
+
+## Prophet-5
+- **Sourced:** all 200 factory programs decode (Sequential's own Rev 4 SysEx; bank 5 is the Rev 3 set). Every panel control is therefore real data. Architecture (two oscillators, sync, Poly-Mod, unison, chord memory).
+- **Sourced (Rev 3 Technical Manual TM1000D.2, Oct 1981):** the service tests give real dial points: attack, decay and release at dial 6 are about 1 s, and release at 10 is over 20 s; the filters self-oscillate between 7 and 9.5 on the resonance dial; glide at 10 is at least 5 s to slew 5 octaves. The filter and oscillator CV scale is 1 V/oct (CEM 3320 and 3340), the filter cutoff knob spans about 10.7 octaves (7-bit steps of one semitone), the oscillators span nine octaves. Envelope times now come from the CEM 3310 datasheet (Curtis, 1979): true RC curves, time constants exponential in the control voltage from 2 ms to 20 s (zero to −5 V, four decades at 60 mV per decade), and the attack charges towards 6.5 V and is cut at 5.0 V peak (1.466 time constants to the peak, which is the engine's attack law). In the engine's units that is attack 2.9 ms–29 s (time to peak) and decay/release 10 ms–100 s (time to −43 dB); it agrees with the service tests (dial 6 about 1 s, release at 10 over 20 s) and replaces the interim fit. It assumes the Prophet uses the datasheet's nominal timing capacitor. The OB-Xa very likely uses the same chip (unconfirmed, so not applied).
+- **Sourced (Curtis CEM 3320 and CEM 3340 datasheets):** the filter is a true four-pole low-pass with exponential frequency control at 60 mV per decade (10,000:1 typical, so well over ten octaves), and a linear-law resonance control that goes from zero to oscillation, with about 30 dB of resonance available just before it oscillates; distortion is low (0.1%, mostly second harmonic) and the stages are temperature compensated. The engine's feedback ladder with feedback linear in the resonance knob has the same structure, and its peak just below self-oscillation (about 32 dB at feedback 3.9) is in line with the 30 dB. The oscillator's raw outputs are a sawtooth of 10 V peak-to-peak, a triangle of 5 V and a pulse of about 13.5 V (supply minus 1.5 V); pulse width is linear from 0% at 0 V to 100% at 5 V; hard sync is built in. What the Prophet's mixer does to those relative levels is not in the datasheets, so the engine's equal-level waveforms stay an estimate.
+- **Derived from the schematics' tuning procedure (Rev 3 manual, 4-20 filter tuning):** with the cutoff CV at 2.000 V and keyboard tracking on, the keyboard's A3 (3.75 V of keyboard CV above the lowest key) makes the filter ring at 440 Hz, and A4 at 880 Hz. At 1 V per octave that gives cutoff = 440 Hz · 2^(CV − 5.75). The theory section says CVs are 7-bit steps of 83 mV with 10 V as the working limit, so the cutoff knob spans 0–10 V and the cutoff runs from **8.2 Hz to 8.4 kHz** (counted at the lowest key, plus the keyboard CV). The engine had 20 Hz–20 kHz, so the top was 1.3 octaves too high; imported programs are now darker at the same knob position. The assumption is that the knob maps linearly onto 0–10 V (the manual quotes the test point reading 5.75 V at another dial position, which fits).
+- **Traced from the voice schematic (SD431, page 3-17) and the 3340 datasheet:** the filter's control path is 1 V per octave by design (summing amp 187K over 100K inputs, divider 1.82K/187K, 18 mV/octave at the 3320); the poly-mod buffer enters the cutoff sum through R4181 (54.9K), a gain of 3.4 octaves per volt. Oscillator mixer: the sawtooth (10 V p-p) enters through 150K and the pulse (about 13.5 V) through 200K, so they put in the same current (67 µA); the triangle (5 V) through 150K puts in half as much, so the engine's triangle is now half the level of the saw (it was equal). The CEM 3340 frequency is f = 3·I/(2·Vcc·C); the LFO uses a 0.1 µF timing capacitor with a 0–10 V (10 octave) control, but its absolute range needs the exponential-generator reference current, which I did not trace, so the LFO range is unchanged. Glide is now a constant-rate slew (the circuit charges a capacitor from a current source), with the glide value read as the time to cover five octaves, matching the manual's "5 s for 5 octaves" at maximum; it was an exponential approach.
+- **Decision (user, 2026-10-20):** keep the filter envelope depth at 10 octaves; the OTA bias path could not be traced reliably.
+- **[est]** Still: the filter envelope depth in octaves (the chip gives 5 V peak, the summing gain is on the schematic but I did not trace it), the poly-mod depths, the wheel-mod LFO range, the exact shape of the envelope curve between the tested points, LFO 0.05–25 Hz (the Rev 4 guide says 0.022–500 Hz, which is the modern unit), Poly-Mod and wheel-mod depths, mixer taper, the Rev 1/2 filter difference. House Vibez at cutoff 0 renders at −66 dB, which hints that the bottom of the cutoff range is too low.
+- **[est]** The top of the Osc B low-frequency rate table; whether a chord still applies with unison off (byte 53 = 10).
+
+## Jupiter-8
+- **Sourced:** the factory patches decode from the Hyperreal tape recording (every checksum verified); architecture, assign modes, key modes.
+- **Sourced (Roland JP-8 owner's manual p. 29 and Service Notes p. 1, same figures):** envelope attack 1 ms–5 s, decay and release 1 ms–10 s, sustain 0–100%; LFO 0.05–40 Hz, delay 0–4 s; arpeggio rate 1–20 Hz; key follow 0–120%; VCO-2 fine tune ±50 cents; master tune ±50 cents; filter slopes 12 or 24 dB/octave. These were applied to the factory-patch conversion and the parameter ranges.
+- **[est]** The cutoff and HPF frequency ranges (not in either manual); the envelope curve shape; the VCF envelope polarity is settled (lever up = ENV-1); the slope switch (12 vs 24 dB) mapping is unconfirmed.
+- **[est]** Cross-modulation is linear and never runs VCO-1 backwards; VCO-2 low-frequency rates; Poly 1 / Poly 2 behaviour.
+- **[not built]** The panel-memory record, MIDI-synced arpeggiator, a shared arpeggiator and portamento across layers, per-layer tone mix in Dual.
+
+## Minimoog
+- **Sourced:** the architecture (three oscillators, mixer with feedback, ladder, two contours, keyboard control thirds, glide, decay switch). Full key tracking at ⅓ + ⅔ is tested.
+- **[est]** The drive curve and filter input level; the pulse widths (33% and 17%); shark-tooth shape; how far the contour opens the filter (up to 5 octaves); modulation depths; glide time; whether oscillator 3's low range is 0.35–45 Hz.
+- **[est]** The Moog ladder here is the shared ladder, not the transistor ladder.
+
+## DX7
+- **Sourced and tested:** a port of MSFA's integer pipeline, whose envelope, level and rate scaling, LFO, tables and 32 algorithms were measured from a real DX7. ROM1A and other cartridges load by index. This is the best-founded engine.
+- **[est]** Amplitude modulation depth (about 6 doublings at full AMD); mod wheel and pressure into LFO pitch depth; bend range.
+- **[not built]** Algorithms 4 and 6 feedback loops across several operators, the output DAC and 12-bit exponent stage (no grit), per-voice parameters following panel edits mid-note.
+
+## OB-Xa
+- **Sourced:** the factory patch book decodes (a scan; group C is missing). Architecture (two VCOs, sync, 12/24 dB filter, split and double, brass envelopes).
+- **Sourced (OB-Xa Service Manual 3rd ed., June 1982, voice-card and bend calibration):** with the filter modulation knob full, the filter envelope moves oscillator 2 by **exactly one octave** (the engine had two, independent of the knob); with key tracking on and cutoff at minimum, the filter rings at the key's own pitch, so the cutoff scale starts at the lowest key's pitch (C0, 65.4 Hz; it was 30 Hz); the noise source is **pink** (it was white); the bend lever is ±1 octave (wide) or a whole step (narrow); the transpose switch is ±1 octave; pulse width is calibrated to 50% duty; the unit ships with voices 1–4 panned hard left and 5–8 hard right (the engine pans voices by a fixed pseudo-random spread instead). The user manual gives the structure and no numeric ranges.
+- **[est]** Every other unit range (`CALIBRATION` in `book.js`: attack, decay, LFO rates, the top of the cutoff scale, portamento time); oscillator 2 detune range (±100 cents); unison detune; pulse-width law; wheel vibrato depth; noise level; key tracking as an on/off switch.
+- **[est]** The filter's resonance behaviour (the shared ladder).
+- **[not built]** The original's exact split/double voice allocation details beyond half-and-half.
+
+## Prophet VS
+- **Sourced:** the factory and cartridge programs and the ROM waves decode from the SysEx and wave dumps; the vector mix formula was solved from the manual's sheet points (matches to 1–2%); the envelope rate direction (0 = fastest) was found from real programs; 128 waves × 128 samples; five-point looping envelopes; the 7-source modulation matrix layout.
+- **[est]** Every time and frequency scale: the envelope time curve (1.5 ms–30 s), LFO rates (0.03–30 Hz), cutoff range (30 Hz–18 kHz), filter envelope depth (up to 8 octaves), coarse and fine tuning scale.
+- **[est]** What rate 4A does (ignored); whether a forward loop jumps or glides back (it slews in 4 ms); which chorus bit is left; the repeat encoding beyond "0 = continuous"; the nibble order of the wave low parts; loop mode 7 on the filter.
+- **[est]** The filter (the shared ladder, not the Curtis chip); the aliasing of the original's 8-bit-ish wave playback ("Raw" imitates it roughly).
+- **[not built]** Split and double modes, the arpeggiator, pressure → chorus routes, the exact chorus.
+
+## Drum machines (TR-808, TR-909, TR-606)
+- **Sourced / consistent with literature:** the metal source's six frequencies (205.3, 304.4, 369.6, 522.7, 540, 800 Hz) are the widely cited 808 hat oscillator values *(from memory)*; clap structure (three bursts, then a tail); closed hat chokes open hat; the kick is a decaying sine with a short pitch fall. A published analysis of real 808 kick samples reports a median fundamental of about 49.5 Hz and an initial sweep of about half a tone averaged over 0.2 s ([arXiv 2502.07524](https://arxiv.org/html/2502.07524v1)); the kick here is set to match that (fundamental 50 Hz, about 0.8 semitone average sweep).
+- **[est]** Every pitch, decay time constant, filter frequency and level of every voice other than the kick fundamental. Tom and conga pitches, snare tone frequencies (178 Hz and 1.83×), rim shot, cowbell frequencies (540 and 800 Hz and band-pass centre), hat high-pass cutoff, maracas and claves.
+- **[est]** The kick's click, saturation and the exact sweep shape within the first 10 ms (the analysis cannot resolve it).
+- **[est]** The 909: kick sweep and click, the stand-in hats, crash and ride (real ones are ROM samples; this is metal source plus noise and a 6-bit quantiser). 606 voices are the 808 voices with different constants.
+- **[est]** Accent: one strength curve; no separate accent bus.
+- **[not built]** The 909's shuffle steps, a separate 808 accent level.
+
+## TB-303
+- **Sourced / consistent with an emulation tuned by its author against real units (Open303, constants read from its source):** accented notes use a 200 ms filter decay, slide has a time constant near 12 ms (about 60 ms to settle), the amplifier decays slowly (about 1.2 s) while a note is held, the nominal cutoff range is about 310–2400 Hz before envelope modulation. These were adopted for this engine.
+- **[est]** The filter (the shared four-pole ladder: the real one is a diode ladder with different response, and Open303's has a 150 Hz feedback high-pass that is not modelled); resonance scaling; the envelope-modulation depth (up to 4.8 octaves here); accent charging (+50% per accented note, leaking 45% on plain notes); gate length (60% of a step); the square wave (a plain 50% pulse; the original shapes it from the saw); the exact decay range (80 ms–2.5 s here).
+- **[est]** Drive stage (an addition).
+
+## Sequencer and scope
+- **Sequencer:** timing is exact (tested). Swing as the off-beat 16th's position inside its pair is a common but not universal definition; the 50 ms lookahead is a design choice for flams. Flam gap (10–45 ms) and grace level (45%) are not from any machine.
+- **Scope:** the pitch readout uses the normalised square difference function; cursors and levels are exact.
+
+## What would reduce these most, in order
+1. Any clean recording of a single held note from a real Juno-106, Prophet-5, Jupiter-8 or Minimoog (even an old sample pack): fixes the filter range, envelope curve and resonance behaviour, which dominate the estimates above.
+2. Open303's filter and envelope source for the 303 (already used for the constants above): the filter law is the next thing to read.
+3. A Dexed (or hardware) render of a few ROM1A voices to check the DX7 amplitude-modulation depth.
+4. Service-manual figures for the 808/909/606 voice frequencies and decay components to replace the voice estimates.

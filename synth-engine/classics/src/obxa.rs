@@ -113,6 +113,7 @@ impl Setup {
 
 #[derive(Clone, Copy)]
 struct Voice {
+    onset: Onset,
     key: u32,
     note: f32,
     pitch: f32,
@@ -126,6 +127,8 @@ struct Voice {
     stamp: u32,
     offset: f32,
     rng: Rng,
+    /// state of the pink-noise filter (the OB-Xa's noise source is pink)
+    pink: [f32; 3],
     o1: VcOsc,
     o2: VcOsc,
     fenv: Adsr,
@@ -154,8 +157,9 @@ struct Voice {
 }
 impl Voice {
     const ZERO: Self = Self {
+        onset: Onset::DONE,
         key: 0, note: 60., pitch: 60., velocity: 0., poly: 0., pressure: 0., down: false, held: false, active: false, fresh: true,
-        stamp: 0, offset: 0., rng: Rng(1), o1: VcOsc::ZERO, o2: VcOsc::ZERO, fenv: Adsr::ZERO, aenv: Adsr::ZERO, hp: 0.,
+        stamp: 0, offset: 0., rng: Rng(1), pink: [0.; 3], o1: VcOsc::ZERO, o2: VcOsc::ZERO, fenv: Adsr::ZERO, aenv: Adsr::ZERO, hp: 0.,
         ladder: Ladder::ZERO, dt1: 0., dt1_d: 0., dt2: 0., dt2_d: 0., pw1: 0.5, pw1_d: 0., pw2: 0.5, pw2_d: 0., g: 0., g_d: 0.,
         gain: 0., gain_d: 0., k: 0., pan: (1., 1.), tune: 0., cut: 0., trim: 0., time: 1., spread: 0.,
     };
@@ -277,6 +281,9 @@ impl ObXa {
         if retrigger || !v.active {
             v.fenv.attack();
             v.aenv.attack();
+        }
+        if !v.active {
+            v.onset.arm();
         }
         v.active = true;
     }
@@ -504,7 +511,9 @@ impl ObXa {
         let tune = bound(p[id::TUNE], -100., 100.) / 100.;
         let pitch1 = bound(p[id::OSC1_PITCH], -24., 72.);
         let pitch2 = bound(p[id::OSC2_PITCH], -24., 72.) + bound(p[id::OSC2_DETUNE], -100., 100.) / 100.;
-        let fenv_osc2 = if on(id::FENV_OSC2) { 24. } else { 0. };
+        // service manual, voice card calibration: with the filter modulation knob full, the envelope moves
+        // oscillator 2 exactly one octave
+        let fenv_osc2 = if on(id::FENV_OSC2) { 12. * bound(p[id::ENV_AMOUNT], 0., 1.) } else { 0. };
         let width = 0.5 - 0.46 * bound(p[id::PW], 0., 1.);
         let porta = bound(p[id::PORTAMENTO], 0., 10.);
         let porta_k = if porta > 0. { smoothing(porta / 3., rate) } else { 1. };
@@ -616,12 +625,18 @@ fn render_voice(v: &mut Voice, s: &Setup, vintage: f32, left: &mut [f32], right:
         // oscillator 1 is the master; oscillator 2 resets with it when synced
         let (o1, wrap) = v.o1.step(v.dt1, v.pw1, &s.w1, 0.);
         let (o2, _) = v.o2.step(v.dt2, v.pw2, &s.w2, if s.sync { wrap } else { 0. });
-        let noise = v.rng.next();
+        let white = v.rng.next();
+        // Paul Kellet's three-pole pink filter, scaled to the white noise's loudness
+        v.pink[0] = 0.99765 * v.pink[0] + white * 0.099_046;
+        v.pink[1] = 0.963 * v.pink[1] + white * 0.296_516_4;
+        v.pink[2] = 0.57 * v.pink[2] + white * 1.052_691_3;
+        let noise = 0.35 * (v.pink[0] + v.pink[1] + v.pink[2] + white * 0.1848);
         let x = 0.45 * (s.mix1 * o1 + s.mix2 * o2 + s.noise * noise);
         let (y2, y4) = v.ladder.taps(x + 1e-5 * noise, v.g, v.k);
         v.fenv.tick(fa, fd, fs, fr);
         let e = v.aenv.tick(aa, ad, as_, ar);
         let o = if s.two_pole { y2 } else { y4 } * e * v.gain;
+        let o = o * v.onset.tick();
         left[i] += o * pl;
         right[i] += o * pr;
     }
