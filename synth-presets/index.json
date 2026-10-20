@@ -130,6 +130,22 @@
       "url": "synth-presets/vs-rom-cart.yaml"
     },
     {
+      "id": "poly-originals",
+      "synth": "poly",
+      "name": "bgm sounds",
+      "kind": "original",
+      "count": 11,
+      "url": "synth-presets/poly-originals.yaml"
+    },
+    {
+      "id": "fm-originals",
+      "synth": "fm",
+      "name": "bgm sounds",
+      "kind": "original",
+      "count": 11,
+      "url": "synth-presets/fm-originals.yaml"
+    },
+    {
       "id": "cs80-originals",
       "synth": "cs80",
       "name": "bgm sounds",
