@@ -214,7 +214,7 @@
       "synth": "tr808",
       "name": "bgm sounds",
       "kind": "original",
-      "count": 6,
+      "count": 7,
       "url": "synth-presets/tr808-originals.yaml"
     },
     {
@@ -222,7 +222,7 @@
       "synth": "tr909",
       "name": "bgm sounds",
       "kind": "original",
-      "count": 6,
+      "count": 7,
       "url": "synth-presets/tr909-originals.yaml"
     },
     {
@@ -230,7 +230,7 @@
       "synth": "tr606",
       "name": "bgm sounds",
       "kind": "original",
-      "count": 6,
+      "count": 7,
       "url": "synth-presets/tr606-originals.yaml"
     },
     {

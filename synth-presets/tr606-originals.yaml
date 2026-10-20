@@ -49,11 +49,12 @@ programs:
       tempo: 120
       swing: 0.5
       flam: 0.5
+      kickBody: 0
       voices: 16
       chorusMix: 0
       chorusRate: 0.6
       chorusDepth: 0.5
-      reverbMix: 0.25
+      reverbMix: 0
       reverbDecay: 4
       reverbTone: 6000
       reverbSize: 0.6
@@ -101,6 +102,7 @@ programs:
       tempo: 120
       swing: 0.5
       flam: 0.5
+      kickBody: 0
       voices: 16
       chorusMix: 0
       chorusRate: 0.6
@@ -153,6 +155,7 @@ programs:
       tempo: 120
       swing: 0.5
       flam: 0.5
+      kickBody: 0
       voices: 16
       chorusMix: 0
       chorusRate: 0.6
@@ -205,6 +208,7 @@ programs:
       tempo: 120
       swing: 0.5
       flam: 0.5
+      kickBody: 0
       voices: 16
       chorusMix: 0
       chorusRate: 0.6
@@ -257,6 +261,7 @@ programs:
       tempo: 120
       swing: 0.5
       flam: 0.5
+      kickBody: 0
       voices: 16
       chorusMix: 0
       chorusRate: 0.6
@@ -309,11 +314,65 @@ programs:
       tempo: 120
       swing: 0.5
       flam: 0.5
+      kickBody: 0
       voices: 16
       chorusMix: 0
       chorusRate: 0.6
       chorusDepth: 0.5
       reverbMix: 0.3
+      reverbDecay: 4
+      reverbTone: 6000
+      reverbSize: 0.6
+      reverbPredelay: 0.02
+  - id: "7"
+    name: Deep
+    values:
+      bdLevel: 0.8
+      bdTune: 0.5
+      bdDecay: 0.5
+      bdTone: 0.5
+      bdPan: 0
+      sdLevel: 0.8
+      sdTune: 0.5
+      sdDecay: 0.5
+      sdTone: 0.5
+      sdPan: 0
+      ltLevel: 0.8
+      ltTune: 0.5
+      ltDecay: 0.5
+      ltTone: 0.5
+      ltPan: 0
+      htLevel: 0.8
+      htTune: 0.5
+      htDecay: 0.5
+      htTone: 0.5
+      htPan: 0
+      chLevel: 0.8
+      chTune: 0.5
+      chDecay: 0.5
+      chTone: 0.5
+      chPan: 0
+      ohLevel: 0.8
+      ohTune: 0.5
+      ohDecay: 0.5
+      ohTone: 0.5
+      ohPan: 0
+      cyLevel: 0.8
+      cyTune: 0.5
+      cyDecay: 0.5
+      cyTone: 0.5
+      cyPan: 0
+      master: 0.8
+      accent: 0.5
+      tempo: 120
+      swing: 0.5
+      flam: 0.5
+      kickBody: 1
+      voices: 16
+      chorusMix: 0
+      chorusRate: 0.6
+      chorusDepth: 0.5
+      reverbMix: 0.25
       reverbDecay: 4
       reverbTone: 6000
       reverbSize: 0.6
