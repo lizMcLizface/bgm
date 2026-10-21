@@ -39,6 +39,7 @@ No model has a controlled, verified hardware recording match. The checks are aga
 - **Sourced (Roland JP-8 owner's manual p. 29 and Service Notes p. 1, same figures):** envelope attack 1 ms–5 s, decay and release 1 ms–10 s, sustain 0–100%; LFO 0.05–40 Hz, delay 0–4 s; arpeggio rate 1–20 Hz; key follow 0–120%; VCO-2 fine tune ±50 cents; master tune ±50 cents; filter slopes 12 or 24 dB/octave. These were applied to the factory-patch conversion and the parameter ranges.
 - **[est]** The cutoff and HPF frequency ranges (not in either manual); the envelope curve shape; the VCF envelope polarity is settled (lever up = ENV-1); the slope switch (12 vs 24 dB) mapping is unconfirmed.
 - **[est]** Cross-modulation is linear and never runs VCO-1 backwards; VCO-2 low-frequency rates; Poly 1 / Poly 2 behaviour.
+- **[est, from the factory data] (2026-10-21)** SYNC slaves VCO-1 to VCO-2 (it was the other way round). All ten factory sync patches send the VCO modulator to VCO-1 only, which only sweeps the timbre if VCO-1 is the synced oscillator; with VCO-2 slaved, "Highway Sync" (VCO-1 pushed 31 semitones above a VCO-2 an octave lower) held VCO-2's pulse in one state and went silent until the envelope fell back.
 - **[not built]** The panel-memory record, MIDI-synced arpeggiator, a shared arpeggiator and portamento across layers, per-layer tone mix in Dual.
 
 ## Minimoog

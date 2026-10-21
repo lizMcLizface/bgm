@@ -37,6 +37,18 @@ export async function measureLoudness(preset, role) {
         return 10*Math.log10(sum/(SR*SECONDS*2)+1e-12)+20*Math.log10(preset.masterVolume??1);
     }
     const ctx = new OfflineAudioContext({ numberOfChannels: 2, length: SR * SECONDS, sampleRate: SR });
+    if (preset.diy) {
+        // a DIY patch at level 1, its notes scheduled into the offline voice
+        const [Wasm, { diySpec }] = await Promise.all([import('./wasmInstrument').then((m) => m.default), import('./diySource')]);
+        const notes = PHRASES[role].map(([midi, time, duration]) => ({ role, midi, time, duration, velocity: 0.8, detune: 0 }));
+        const inst = await Wasm.create({ context: ctx, preset, polyphony: 8, spec: diySpec({ ...preset.diy, level: 1 }, 8), notes });
+        inst.connect(ctx.destination);
+        const buffer = await ctx.startRendering();
+        inst.dispose();
+        let sum = 0;
+        for (let c = 0; c < buffer.numberOfChannels; c++) buffer.getChannelData(c).forEach((x) => { sum += x * x; });
+        return 10 * Math.log10(sum / (buffer.length * buffer.numberOfChannels) + 1e-12);
+    }
     const inst = new Instrument({ polyphony: 8, preset, context: ctx });
     inst.scheduleSleep = () => {}; // no wall-clock timers during the render
     inst.connect(ctx.destination);

@@ -16,8 +16,8 @@ export default class WasmInstrument {
  syncEnvelope(){this.gainEnv={attack:this.preset.gainAttack,decay:this.preset.gainDecay,sustain:this.preset.gainSustain,release:this.preset.gainRelease};}
  attachVoice(voice){voice.connect(this.output);this.roomInput.disconnect();if(voice.roomOutput)voice.roomOutput.connect(this.roomOutput);if(voice.sharedRoomInput)this.roomInput.connect(voice.sharedRoomInput);}
  connect(node){this.output.connect(node);}
- applyPreset(preset){
-  const previous=this.preset;this.preset={...DEFAULTS,...preset};this.overrideSpec=null;this.syncEnvelope();const revision=++this.revision,spec=this.spec();
+ applyPreset(preset,override=null){
+  const previous=this.preset;this.preset={...DEFAULTS,...preset};this.overrideSpec=override;this.syncEnvelope();const revision=++this.revision,spec=this.spec();
   this.loading=true;this.error=null;
   this.ready=LabVoice.create(this.AC,spec,{roomPool:this.roomPool,onError:error=>{this.error=error;console.error('Wasm voice failed',error);}}).then(voice=>{
    if(this.disposed||revision!==this.revision){voice.dispose();return;}
@@ -33,6 +33,12 @@ export default class WasmInstrument {
   }
   // Coalesce editor drags without reallocating a graph per pointer event.
   clearTimeout(this.editTimer);this.ready=new Promise(resolve=>{this.editResolve?.();this.editResolve=resolve;this.editTimer=setTimeout(()=>{this.editResolve=null;this.applyPreset(this.preset);this.ready.then(resolve);},70);});
+ }
+ /** A new spec (a DIY patch's edits): patched in place, or rebuilt (coalesced) when its effects change. */
+ setSpec(spec){
+  const before=this.spec();
+  if(!this.loading&&this.voice&&before.kind===spec.kind&&JSON.stringify([before.patch.effects,before.patch.inserts])===JSON.stringify([spec.patch.effects,spec.patch.inserts])){this.overrideSpec=spec;this.voice.patch=structuredClone(spec.patch);this.voice.patchSource(spec.patch,{seconds:.06});return;}
+  this.overrideSpec=spec;clearTimeout(this.editTimer);this.ready=new Promise(resolve=>{this.editResolve?.();this.editResolve=resolve;this.editTimer=setTimeout(()=>{this.editResolve=null;this.applyPreset(this.preset,this.overrideSpec);this.ready.then(resolve);},70);});
  }
  async afterReady(action){let pending;do{pending=this.ready;await pending;}while(!this.disposed&&pending!==this.ready);if(!this.disposed)action();}
  scheduleNote(midi,time,duration,velocity=.7,detune=0,expression){const until=time+duration,epoch=this.epoch??0;void this.afterReady(()=>{if(epoch!==(this.epoch??0)||until<=this.AC.currentTime)return;const start=Math.max(time,this.AC.currentTime+.003);this.voice.schedule(midi,start,Math.max(.005,until-start),velocity,detune,expression);});}

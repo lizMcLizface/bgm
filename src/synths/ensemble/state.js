@@ -19,6 +19,8 @@ export const ROLE_PICKS={
  dx7:{lead:'Soft Lead',counter:'Round Flute',pad:'Glass Tines',bass:'Soft Bass'},
  obxa:{lead:'Smoky Solo',counter:'Wood Flutes',pad:'Ensemble One',bass:'Round Bass'},
  vs:{lead:'Soft Lead',counter:'Glass Flute',pad:'Drift Field',bass:'Round Bass'},
+ poly:{lead:'Slow pressure lead',counter:'Living silk',pad:'DCO chorus pad',bass:'Wooden pulse'},
+ fm:{lead:'Four-op hollow reed',counter:'Air reed',pad:'Tine constellation',bass:'Four-op round bass'},
 };
 const picked=(synth,role)=>SYNTHS[synth].presets.find(p=>p.name===ROLE_PICKS[synth]?.[role])??SYNTHS[synth].presets[0];
 export function roleSound(synth='calmbgm',role='lead',sound){

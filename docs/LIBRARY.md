@@ -30,7 +30,17 @@ rename (a test fails if a built-in voice is missing there).
   Everything goes through the same sanitising as a share link, so a bad
   value falls back to its default rather than breaking anything.
 - `voices` gives each role a built-in voice by name, **or** the voice in
-  full: `{ "name": "...", "synth": { every parameter } }`.
+  full: `{ "name": "...", "synth": { every parameter } }`, **or** a classic or
+  DIY synth sound: `{ "name": "...", "external": { "synth": "jupiter8", "name": "Highway Sync", "values": { only what differs }, "rack": { only what differs }, "level": 0.8 } }`
+  (`synth` is one of poly, fm, cs80, juno, prophet5, jupiter8, minimoog, dx7,
+  obxa, vs; `name` is one of that synth's sounds; leave `level` out to have it
+  matched to the role's loudness).
+- `percussion` (optional, beside `voices`) plays the grooves on a drum
+  machine: `{ "synth": "tr808" | "tr909", "name": "<one of its kits>" }`.
+- `settings.bus` is the shared effects bus: `sends` per role (0..1, all 0 by
+  default) and its effects `rack`. Each voice keeps its own reverb and delay.
+- **Copy setup** writes all of these as they are on the page, so a setup made
+  with the sound window pastes straight in.
 - A scene always plays with a new seed (a pasted setup keeps its own).
 
 ## Fine-tuning a preset

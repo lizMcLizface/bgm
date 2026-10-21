@@ -1,7 +1,7 @@
 //! A Jupiter-8-inspired polysynth. Per voice: VCO-1 (triangle, saw, pulse or
 //! square; 16'–2') cross-modulated by VCO-2 (sine, saw, pulse or noise; continuous
-//! range and fine tune, optionally synced to VCO-1 or slowed to a low-frequency
-//! modulator) → source mix → non-resonant 6 dB high-pass → resonant OTA-style
+//! range and fine tune, optionally slowed to a low-frequency modulator; with SYNC,
+//! VCO-1 is synced to it) → source mix → non-resonant 6 dB high-pass → resonant OTA-style
 //! filter with a 12 dB (second-stage tap) or 24 dB output → VCA. ENV-1 (invertible)
 //! drives pitch, pulse width or the filter; ENV-2 drives the VCA and optionally the
 //! filter; both shorten up the keyboard with key follow. One delayed LFO (sine,
@@ -922,9 +922,11 @@ fn render_voice(v: &mut Voice, s: &Setup, shapes: &[EnvShape; 2], left: &mut [f3
         let pw2 = if s.pulse2 { v.pw } else { 0.5 };
         // cross-mod: VCO-2 (one sample back) moves VCO-1's frequency linearly; it never runs backwards
         let dt1 = if s.xmod != 0. { (v.dt1 * (1. + s.xmod * v.out2)).clamp(0., 0.45) } else { v.dt1 };
-        let (o1, wrap) = v.o1.step(dt1, pw1, &s.w1, 0.);
+        // sync: VCO-1 restarts where VCO-2 wraps (the JP-8's SYNC slaves VCO-1, which is why the
+        // factory sync patches sweep VCO-1 with the VCO modulator)
         let noise = v.rng.next();
-        let o2 = if s.noise2 { noise } else { v.o2.step(v.dt2, pw2, &s.w2, if s.sync { wrap } else { 0. }).0 };
+        let (o2, wrap) = if s.noise2 { (noise, 0.) } else { v.o2.step(v.dt2, pw2, &s.w2, 0.) };
+        let (o1, _) = v.o1.step(dt1, pw1, &s.w1, if s.sync { wrap } else { 0. });
         v.out2 = o2;
         let mut x = 0.5 * (s.mix1 * o1 + s.mix2 * o2);
         v.hp += (x - v.hp) * s.hp_a;

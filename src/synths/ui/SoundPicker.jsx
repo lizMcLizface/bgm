@@ -41,7 +41,8 @@ export function nextSound({sounds,categories},current,currentCategory,dir,jump){
 
 const matches=(p,words)=>{const hay=[p.name,p.note,...(p.styles??[]),p.categoryLabel].join(' ').toLowerCase();return words.every(w=>hay.includes(w));};
 
-export default function SoundPicker({synth,presets,mine,current,currentCategory,choose,remove}){
+// `container`: where the browser window opens (a host page that scopes the synths' styles passes its own).
+export default function SoundPicker({synth,presets,mine,current,currentCategory,choose,remove,container}){
  const [open,setOpen]=useState(false);
  const [category,setCategory]=useState(ALL);
  const [query,setQuery]=useState('');
@@ -108,6 +109,6 @@ export default function SoundPicker({synth,presets,mine,current,currentCategory,
      </div>
     </div>
    </div>
-  </div>,document.body)}
+  </div>,container??document.body)}
  </>;
 }

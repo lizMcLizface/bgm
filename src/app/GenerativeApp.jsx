@@ -3,7 +3,7 @@ import PercussionPresetPicker from './PercussionPresetPicker';
 import {percussionVoice,percussionPads,percussionEdited,percussionKeyHint} from './percussionVoices';
 import {percussionFromSearch,withPercussion} from '../audio/percussionChoice';
 import {mediaHelperFromSearch,withMediaHelper} from '../audio/mediaHelperChoice';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Generator, { ROLES, PERC_ROLE } from './Generator';
 import { DRUM_STYLES, DRUM_PARAMS, randomDrums } from './percussion';
 import { SCALE_FAMILIES, TONIC_NAMES, scaleById } from './theory';
@@ -16,7 +16,9 @@ import { readBook, inheritBook, withPresetBook, withBook, applyBook, baselineCho
 let initialBook = readBook(window.location.search);
 import { RoleButtons, TrackStrip, useLivePlay, DRUM_KEY_HINT } from './Tracks';
 import { defaultSettings, shareFromLocation, sharePath, shareUrl, newSeed } from './settings';
-import SynthEditor from './editor/SynthEditor';
+// The sound window brings the DIY and classic synths with it: loaded on the first ✎.
+const SoundWindow = lazy(() => import('./editor/SoundWindow'));
+const SOUND_ROLES = { ...ROLES, ...PERC_ROLE, bus: { label: 'Shared bus' } };
 import PresetPicker from './editor/PresetPicker';
 import PROGRESSIONS, { PROGRESSION_LENGTHS, progressionsOfLength, progressionFamily } from './progressions';
 import {
@@ -54,6 +56,7 @@ import {simdFromSearch,withSimd,bankFromSearch,withFMBank} from '../audio/simdCh
 import { addGeneratedPreset, addSetupPreset, findPreset, generatedInfo } from './editor/presetStore';
 import PRESET_DEFAULTS from './engine/presetDefaults';
 import { readPref, writePref } from './prefs';
+import { readPerformance, writePerformance } from '../audio/performance';
 import { seedToPhrase, phraseToSeed } from './phrase';
 import { WANDER_ROLES, WANDER_LIMITS, WANDER_MODES, AMBIENCE_WANDER_LIMITS } from './engine/wander';
 import Tour, { tourSeen } from './Tour';
@@ -67,6 +70,8 @@ import { generationFromSearch, withGeneration } from './generation';
 // Generated sounds in a link are recreated (and levelled) after mount.
 let generator = null;
 let linkedSounds = [];
+// Classic / DIY voices and a drum machine from a link or a linked preset: applied after mount (applyRef).
+let linkedRefs = [];
 let linkedPhrase = null;
 // A link to a built-in preset, ?preset=rainy-day-chickens-inside: the page opens on it (a new piece
 // each visit, or the one a phrase= names). Settings in the link win over it.
@@ -75,7 +80,7 @@ const getGenerator = () => {
     if (!generator) {
         const share = shareFromLocation(window.location);
         const query = new URLSearchParams(window.location.search);
-        const hasSettings = ['m', 'v', 'a', 's'].some((key) => query.has(key)) || window.location.hash.includes('s=');
+        const hasSettings = ['m', 'v', 'a', 'x', 's'].some((key) => query.has(key)) || window.location.hash.includes('s=');
         linkedScene = hasSettings ? null : sceneBySlug(presetFromSearch(window.location.search));
         if (linkedScene) {
             const phrase = new URLSearchParams(window.location.search).get('phrase');
@@ -85,7 +90,9 @@ const getGenerator = () => {
             if (sceneGroup(linkedScene) !== 'ambience') {
                 Object.entries(linkedScene.voices).forEach(([role, voice]) => {
                     if (typeof voice === 'string') generator.loadRolePreset(role, voice);
+                    else if (voice?.external) linkedRefs.push({ role, ref: voice.external });
                 });
+                if (linkedScene.percussion) linkedRefs.push({ role: 'perc', ref: linkedScene.percussion });
             }
         } else {
             generator = new Generator(share ? share.settings : defaultSettings());
@@ -98,7 +105,8 @@ const getGenerator = () => {
         if (share && share.phrase) linkedPhrase = share.phrase;
         if (share) {
             Object.entries(share.presets).forEach(([role, preset]) => {
-                if (preset.generated) linkedSounds.push({ target: role, info: preset.generated });
+                if (preset.external || preset.machine) linkedRefs.push({ role, ref: preset.external ?? preset.machine });
+                else if (preset.generated) linkedSounds.push({ target: role, info: preset.generated });
                 else generator.loadRolePreset(role, preset);
             });
         }
@@ -791,6 +799,8 @@ const GenerativeApp = () => {
     const [roles, setRoles] = useState(() =>
         Object.fromEntries(Object.keys(ROLES).map((role) => [role, { presetName: gen.roles[role].presetName, edited: false }]))
     );
+    // the percussion's drum machine ({ synth, name, values, rack, label, ref }), or null for the kit
+    const [percMachine, setPercMachine] = useState(null);
     const audioEngine = useAudioEngine(gen,{required:Object.values(roles).some(r=>!!findPreset(r.presetName)?.wasmVoice)});
     const perfOn=usePerfMode();
     const togglePerfMode=async next=>{
@@ -802,19 +812,20 @@ const GenerativeApp = () => {
 
     // What a link can carry: built-in presets as loaded (edits stay local).
     // Generated sounds travel as the role they were made for + their seed.
+    // Classic / DIY voices and a drum machine travel as references (shareExtras.js).
     const linkPresets = useMemo(
-        () => Object.fromEntries(Object.entries(roles).map(([role, { presetName, edited }]) => {
+        () => ({ ...Object.fromEntries(Object.entries(roles).map(([role, { presetName, edited, external }]) => {
+            if (external) return [role, { external: external.ref }];
             if (edited) return [role, null];
             const generated = generatedInfo(presetName);
             return [role, generated ? { generated } : presetName];
-        })),
-        [roles],
+        })), ...(percMachine ? { perc: { machine: percMachine.ref } } : {}) }),
+        [roles, percMachine],
     );
     const [generating, setGenerating] = useState({});
     // The kind of sound ✦ makes per role ('any': the seed decides).
     const [soundKinds, setSoundKinds] = useState(() => Object.fromEntries(Object.keys(ROLES).map((role) => [role, 'any'])));
     const [randomLevel, setRandomLevel] = useState('reason');
-    const [editorRole, setEditorRole] = useState(Object.keys(ROLES)[0]);
     const [mix, setMix] = useState(() => Object.fromEntries([...Object.keys(ROLES), 'perc'].map((role) => [role, { mute: gen.roles[role].mute, solo: false }])));
     const [armed, setArmed] = useState(null);
     // Which voice's sound picker is open (null: none).
@@ -835,7 +846,6 @@ const GenerativeApp = () => {
         setMix((m) => ({ ...m, [role]: { ...m[role], ...patch } }));
         if (patch.mute !== undefined) setSettings((s) => ({ ...s, muted: { ...gen.settings.muted } }));
     };
-    const [editorOpen, setEditorOpen] = useState(false);
     // The guided tour opens by itself on a first visit (shared links too), and from the ⚙ menu.
     // Opened by itself it starts on a prompt that dims the page; from the menu it goes straight to the steps.
     const [tourOpen, setTourOpen] = useState(false);
@@ -873,12 +883,22 @@ const GenerativeApp = () => {
         const timer = setTimeout(() => openTour(true, { from: 0, to: 0 }), 800);
         return () => clearTimeout(timer);
     }, []);
-    const editorRef = useRef(null);
+    // ✎ opens the voice's sound in the sound window; the percussion's too.
+    const [soundRole, setSoundRole] = useState(null);
+    // While it is open the keyboard and MIDI play the voice it shows (as the preset picker
+    // does); closing it puts the arming back as it was.
+    const soundArmedBefore = useRef(null);
     const editSound = (role) => {
-        setEditorRole(role);
-        setEditorOpen(true);
-        requestAnimationFrame(() => editorRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+        if (soundRole === null) soundArmedBefore.current = armed;
+        if (role !== 'bus') setArmed(role); // (the bus is no voice to play)
+        setSoundRole(role);
     };
+    // the Performance choices shown with the bus (as the Audio menu's: they apply after a reload)
+    const changePerformance = (patch) => {
+        const previous = readPerformance();
+        if (writePerformance(patch) && !reloadKeepingSettings()) writePerformance(previous);
+    };
+    const closeSound = useCallback(() => { setArmed(soundArmedBefore.current); setSoundRole(null); }, []);
     const now = useNowPlaying(gen, running, settings);
     useEffect(() => {
         const sync = () => {
@@ -979,7 +999,8 @@ const GenerativeApp = () => {
     const choosePercussionVoice = async id => {
         if(percussionChoice.current)return percussionChoice.current;
         setPercussionBusy(true);
-        const loading=gen.loadPercussionVoice(id);percussionChoice.current=loading;
+        // a kit of the generator's own replaces a drum machine
+        const loading=(async()=>{if(gen.roles.perc.machine){await gen.setPercussionSource(null);setPercMachine(null);}return gen.loadPercussionVoice(id);})();percussionChoice.current=loading;
         try {
             await loading;
             clearBookSettings({drums:gen.settings.drums,drumKit:gen.settings.drumKit});
@@ -987,17 +1008,38 @@ const GenerativeApp = () => {
             setSettings({...gen.settings});setScene('');
         } finally {percussionChoice.current=null;setPercussionBusy(false);}
     };
-    const editPercussionSound = () => {
-        setArmed('perc');
-        document.querySelector('[data-tour="percussion"]')?.scrollIntoView({behavior:'smooth',block:'center'});
-        document.querySelector('[data-tour="percussion"] .gen-voice-button')?.focus({preventScroll:true});
-    };
-    const patchRole = (role, patch) => setRoles((r) => ({ ...r, [role]: { ...r[role], ...patch } }));
+    const editPercussionSound = () => editSound('perc');
+    // A new preset name is the generator's own synth again (a classic or DIY sound is `external`).
+    const patchRole = (role, patch) => setRoles((r) => ({ ...r, [role]: { ...r[role], ...('presetName' in patch ? { external: null } : {}), ...patch } }));
+    const setExternal = useCallback((role, external) => setRoles((r) => ({ ...r, [role]: { ...r[role], external } })), []);
     const setVolume = (role, volume) => {
         gen.setRoleVolume(role, volume);
         setSettings((s) => ({ ...s, volumes: { ...gen.settings.volumes } }));
     };
     const presetLoaded = (role, presetName) => patchRole(role, { presetName, edited: false });
+    const onNativeEdited = useCallback((role) => setRoles((r) => ({ ...r, [role]: { ...r[role], edited: true } })), []);
+    // a preset file: loaded as it is, an edit until it is saved under a name
+    // A classic / DIY sound or a drum machine from a link, setup or scene (soundRefs.js), level-matched
+    // to its voice unless the reference carries a level.
+    const applyRef = async (role, ref) => {
+        const [{ soundFromRef, machineFromRef, described }, { soundSource, matchedLevel }] = await Promise.all([import('./editor/soundRefs'), import('../synths/ensemble/sources')]);
+        if (role === 'perc') {
+            const machine = machineFromRef(ref);
+            await gen.setPercussionSource({ classics: { synth: machine.synth, name: machine.label, values: machine.values, rack: machine.rack, light: perfOn }, masterVolume: 1 });
+            setPercMachine(machine);
+            return;
+        }
+        let sound = soundFromRef(ref, role);
+        if (!sound.matched) sound = described({ ...sound, level: await matchedLevel(sound, role), matched: true });
+        await gen.setRoleSource(role, soundSource(sound, role, perfOn));
+        setExternal(role, sound);
+    };
+    const applyRefs = (refs) => refs.forEach(({ role, ref }) => applyRef(role, ref).catch((error) => console.error(`Could not load the ${role} sound`, error)));
+    const importPreset = (role, name, preset) => {
+        gen.loadRolePreset(role, name, preset);
+        gen.roles[role].edited = true;
+        patchRole(role, { presetName: name, edited: true });
+    };
     const loadPreset = (role, name) => {
         const info = generatedInfo(name);
         if (info?.version === GENERATOR_V3 && name.startsWith('Original ') !== (generationChoice === 'legacy')) {
@@ -1045,9 +1087,10 @@ const GenerativeApp = () => {
             ...(generationChoice === 'legacy' ? {} : generatedContext(role)) }));
     };
     useEffect(() => {
-        const sounds = linkedSounds;
-        linkedSounds = [];
+        const sounds = linkedSounds, refs = linkedRefs;
+        linkedSounds = []; linkedRefs = [];
         sounds.forEach(({ target, info }) => loadGeneratedSound(target, info));
+        applyRefs(refs);
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
     // Within reason, key and progression are chosen to fit each other: alone,
     // each fits the other's current value; together, the key comes first.
@@ -1151,6 +1194,7 @@ const GenerativeApp = () => {
     }, [zen]);
     const loadPresetAt = async (role, name, morph) => {if(findPreset(name)?.wasmVoice&&gen.audioEngine!=='wasm'&&!await audioEngine.choose('wasm',{remember:false}))return;gen.loadRolePresetAtBar(role,name,undefined,()=>presetLoaded(role,name),{morph});};
     const loadSceneVoice = (role, spec, sceneName, unsaved, morph) => {
+        if (spec?.external) { applyRefs([{ role, ref: spec.external }]); return; }
         if (typeof spec === 'string') {
             loadPresetAt(role, findPreset(spec) ? spec : ROLE_PRESETS[role], morph);
             return;
@@ -1205,6 +1249,8 @@ const GenerativeApp = () => {
         }
         if (parts !== 'composition' && sceneGroup(picked) !== 'ambience') {
             Object.keys(ROLES).forEach((role) => loadSceneVoice(role, picked.voices[role], picked.name, unsaved, morph));
+            if (picked.percussion) applyRefs([{ role: 'perc', ref: picked.percussion }]);
+            else if (gen.roles.perc.machine) { gen.setPercussionSource(null).catch((error) => console.error('Could not restore the kit', error)); setPercMachine(null); }
         }
         if (parts === 'voices') {
             const next=sceneSettings(picked,gen.settings.seed);
@@ -1229,7 +1275,10 @@ const GenerativeApp = () => {
     const captureSetup = (info) => buildSetup({
         settings: gen.settings,
         rulebook: bookRef.current,
-        voices: Object.fromEntries(Object.keys(ROLE_PRESETS).map((role) => [role, { name: gen.roles[role].presetName, synth: gen.getRolePreset(role) }])),
+        voices: Object.fromEntries(Object.keys(ROLE_PRESETS).map((role) => [role, roles[role].external
+            ? { name: roles[role].external.label, external: roles[role].external.ref }
+            : { name: gen.roles[role].presetName, synth: gen.getRolePreset(role) }])),
+        percussion: percMachine?.ref,
     }, info);
     const setupActions = {
         save: (name) => {
@@ -1393,7 +1442,7 @@ const GenerativeApp = () => {
 
             <ChordTimeline
                 generator={gen} onExploreRule={id => setRuleFocus(previous => ({ id, revision: (previous?.revision ?? 0) + 1 }))}
-                tracks={has(1) ? <TrackStrip roles={shownTracks} presets={{...Object.fromEntries(Object.entries(roles).map(([role, { presetName, edited }]) => [role, { name: presetName, edited }])),perc:{name:percussionVoice(settings.drums.kit).name,edited:percussionEdited(settings.drums.kit,settings.drumKit)}}} mix={mix} armed={armed} onMix={changeMix} onArm={setArmed} onEdit={has(3) ? editSound : undefined}
+                tracks={has(1) ? <TrackStrip roles={shownTracks} presets={{...Object.fromEntries(Object.entries(roles).map(([role, { presetName, edited, external }]) => [role, { name: external?.label ?? presetName, edited }])),perc:percMachine?{name:percMachine.label,edited:false}:{name:percussionVoice(settings.drums.kit).name,edited:percussionEdited(settings.drums.kit,settings.drumKit)}}} mix={mix} armed={armed} onMix={changeMix} onArm={setArmed} onEdit={has(3) ? editSound : undefined}
                     onRandom={randomizePreset} onGenerate={has(3) ? generateForRole : undefined} onPick={choosePicker} onPickPercussion={()=>choosePicker('perc')} onEditPercussion={has(3)?editPercussionSound:undefined} percussionHint={percussionKeyHint(settings.drums.kit)} generating={generating} live={live} /> : null}
             />
 
@@ -1508,7 +1557,7 @@ const GenerativeApp = () => {
 
                 >
                     <Field label="Preset" onRandom={() => randomizePreset(role)} onGenerate={has(3) ? () => generateForRole(role) : undefined} generating={generating[role]} wide>
-                        <PresetPicker value={roles[role].presetName} edited={roles[role].edited} onChange={(name) => loadPreset(role, name)} role={role}
+                        <PresetPicker value={roles[role].external?.label ?? roles[role].presetName} edited={roles[role].edited && !roles[role].external} onChange={(name) => loadPreset(role, name)} role={role}
                             open={pickerRole === role} onOpenChange={(open) => choosePicker(open ? role : null)} />
                     </Field>
                     {has(3) && (
@@ -1534,19 +1583,15 @@ const GenerativeApp = () => {
 
             {!has(3)&&pickerRole==='perc'&&<VoiceBrowser role="perc" value={settings.drums.kit} edited={percussionEdited(settings.drums.kit,settings.drumKit)} onChange={choosePercussionVoice} onClose={()=>choosePicker(null)}/>}
 
-            {has(3) && <SynthEditor
-                generator={gen}
-                roles={ROLES}
-                role={editorRole}
-                onRoleChange={setEditorRole}
-                presetName={roles[editorRole].presetName}
-                edited={roles[editorRole].edited}
-                onPresetLoaded={presetLoaded}
-                onEdited={(role) => patchRole(role, { edited: true })}
-                open={editorOpen}
-                onToggle={() => setEditorOpen((o) => !o)}
-                sectionRef={editorRef}
-            />}
+            {soundRole && (
+                <Suspense fallback={null}>
+                    <SoundWindow generator={gen} role={soundRole} roles={SOUND_ROLES} onRole={editSound} voice={roles[soundRole]} light={perfOn}
+                        percussion={{ kit: settings.drums.kit, machine: percMachine }}
+                        bus={settings.bus} onBus={(next) => update('bus', next)} onPerformance={changePerformance}
+                        onNativePreset={loadPreset} onNativeImport={importPreset} onNativeEdited={onNativeEdited} onExternal={setExternal}
+                        onPercussionKit={choosePercussionVoice} onMachine={setPercMachine} onClose={closeSound} />
+                </Suspense>
+            )}
 
             {tourOpen && <Tour key={tourRange.id} prompt={tourPrompt} fromStage={tourRange.from} toStage={tourRange.to}
                 onUnlockAll={() => setStage(LAST_STAGE)} onStep={prepareTourStep} onClose={() => setTourOpen(false)} />}

@@ -22,6 +22,7 @@ import Ambience from './ambience';
 import { unitsPerMinute } from '../meter';
 import { noiseReady } from '../../nodes/noiseGenerator';
 import { bitCrusherReady } from '../../nodes/bitcrusher';
+import { busActive, createBusRack, busTail } from './bus';
 
 const CHUNK_SECONDS = 60;
 // The render pauses this often (seconds of audio) to report progress and
@@ -208,10 +209,16 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
             const Wasm=audioEngine==='wasm'?(await import('./wasmInstrument')).default:null;
             const instruments={},cleanup=[],roomPool=Wasm&&PERFORMANCE.sharedReverb?new WasmRoomPool(ctx,ctx.destination):null;
             if(roomPool)cleanup.push(()=>roomPool.dispose());
+            // the shared effects bus, as the generator builds it (engine/bus.js)
+            const bus=busActive(gen.settings.bus)?await createBusRack(ctx,gen.settings.bus.rack,ctx.destination):null;
+            if(bus)cleanup.push(()=>bus.dispose());
             try{for(const role of roles){
-                const inst = role === 'perc'
+                const inst = role === 'perc' && gen.roles.perc.machine
+                    ? await (await import('./classicsInstrument')).default.create({ context: ctx, preset: gen.roles.perc.instrument.preset, polyphony: 16 })
+                    : role === 'perc'
                     ? new (gen.percussionEngine && gen.percussionEngine !== 'native' ? WasmDrumKit : DrumKit)({ context: ctx, model:gen.percussionEngine })
                     : presets[role]?.classics?await (await import('./classicsInstrument')).default.create({context:ctx,preset:presets[role],polyphony:gen.getRolePolyphony(role)})
+                    : presets[role]?.diy?await (await import('./wasmInstrument')).default.create({polyphony:gen.getRolePolyphony(role),preset:presets[role],spec:(await import('./diySource')).diySpec(presets[role].diy,gen.getRolePolyphony(role)),context:ctx,roomPool,notes:notes.filter(n=>n.role===role&&n.time>=from&&n.time<end+(last?0:CROSSFADE)).map(n=>({...n,time:n.time-from}))})
                     : Wasm?await Wasm.create({polyphony:gen.getRolePolyphony(role),preset:presets[role],context:ctx,roomPool,notes:notes.filter(n=>n.role===role&&n.time>=from&&n.time<end+(last?0:CROSSFADE)).map(n=>({...n,time:n.time-from}))})
                     : new Instrument({ polyphony: gen.getRolePolyphony(role), preset: presets[role], context: ctx });
                 instruments[role]=inst;cleanup.push(()=>inst.dispose());
@@ -239,6 +246,7 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
                 if (inst.setWander) inst.setWander({ ...instrumentWander(gen.settings.wander, role, from), immediate: true });
                 gain.connect(wander.input);
                 wander.output.connect(ctx.destination);
+                if(bus&&gen.settings.bus.sends[role]>0){const send=ctx.createGain();send.gain.value=gen.settings.bus.sends[role];wander.output.connect(send);send.connect(bus.input);cleanup.push(()=>send.disconnect());}
                 if(roomPool&&role!=='perc'){
                     const route=createWasmRoomRoute(ctx,inst,{roleWander:wander,volume:gen.roles[role].volume,tone:TONE_ROLES.includes(role)});
                     if(route.tone)automateTone(route.tone.frequency,tones,from);cleanup.push(()=>route.dispose());
@@ -259,7 +267,7 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
         if(signal?.aborted)throw cancelled();
         await Promise.all([noiseReady(ctx), bitCrusherReady(ctx)]);
         await until(() => Object.values(instruments).every((inst) => inst.reverb.settled), 5000);
-        if (start === 0) tail = Math.max(1, ...Object.values(instruments).map((inst) => inst.tailSeconds() + inst.preset.gainRelease));
+        if (start === 0) tail = Math.max(1, busTail(gen.settings.bus), ...Object.values(instruments).map((inst) => inst.tailSeconds() + inst.preset.gainRelease));
         const to = end + (last ? 0 : CROSSFADE);
         for (let i = first; i < notes.length && notes[i].time < to; i++) {
             const n = notes[i];

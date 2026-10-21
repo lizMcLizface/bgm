@@ -38,12 +38,14 @@ test('VCO-1 ranges and VCO-2 range/fine are in tune at every sample rate',()=>{
  expect(cents(pitchHz(hold({...ONLY2,vco2Wave:0,vco2Fine:30}),48000),440*2**(30/1200))).toBeLessThan(1.5);
 });
 
-test('sync locks VCO-2 to VCO-1\'s period; cross-mod adds sidebands from VCO-2',()=>{
+test('sync locks VCO-1 to VCO-2\'s period; cross-mod adds sidebands from VCO-2',()=>{
  const corr=(x,lag)=>{let s=0,a=0,b=0;for(let i=0;i+lag<x.length;i++){s+=x[i]*x[i+lag];a+=x[i]*x[i];b+=x[i+lag]**2;}return s/Math.sqrt(a*b);};
  const note=noteOf(375);
- for(const vco2Range of [5.3,9,15.5]){
-  expect(corr(hold({...CLEAN,sourceMix:1,vco2Fine:0,sync:1,vco2Range,oversample:2},note,.2),128)).toBeGreaterThan(.99);
-  expect(corr(hold({...CLEAN,sourceMix:1,vco2Fine:0,sync:0,vco2Range,oversample:2},note,.2),128)).toBeLessThan(.9);
+ // VCO-2 on the note (128 samples); VCO-1, heard alone, held above it by ENV-1 through the VCO modulator
+ for(const shift of [5.3,9,15.5]){
+  const swept={...CLEAN,vco2Range:0,vco2Fine:0,vcoModEnv:Math.sqrt(shift/48),vcoModDest:0,e1Attack:.001,e1Sustain:1,oversample:2};
+  expect(corr(hold({...swept,sync:1},note,.2),128)).toBeGreaterThan(.99);
+  expect(corr(hold({...swept,sync:0},note,.2),128)).toBeLessThan(.9);
  }
  // VCO-1 at 440 Hz (triangle, near-pure) modulated by a silent VCO-2 sine a fifth up: a sideband at 659 − 440 Hz
  const fm={...CLEAN,vco1Wave:0,vco2Wave:0,vco2Range:7,vco2Fine:0,cutoff:3000};

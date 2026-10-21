@@ -102,7 +102,7 @@ export const TOUR_STEPS = [
         stage: 1,
         selector: '[data-tour="voice-lead"]',
         title: 'Shape each voice',
-        text: 'Each voice now has a panel for its sound and volume. Try another preset, or roll its dice. The compact controls beside the timeline let you mute, solo or play a voice. Sound design and the full synth editor unlock later.',
+        text: 'Each voice now has a panel for its sound and volume. Try another preset, or roll its dice. The compact controls beside the timeline let you mute, solo or play a voice. Sound design and the synths behind each voice unlock later.',
     },
     {
         id: 'ambience-intro',
@@ -167,7 +167,7 @@ export const TOUR_STEPS = [
         stage: 3,
         selector: '.gen-tracks',
         title: 'Making your own sounds',
-        text: 'Each voice now has two more buttons: ✎ opens its sound in the editor, and ✦ makes a brand new sound for it. Press ✦ a few times and keep what you like.',
+        text: 'Each voice now has two more buttons: ✎ opens its sound in a window, and ✦ makes a brand new sound for it. Press ✦ a few times and keep what you like.',
     },
     {
         id: 'sounds',
@@ -205,9 +205,9 @@ export const TOUR_STEPS = [
     {
         id: 'editor',
         stage: 3,
-        selector: '.gen-editor',
-        title: 'Synth editor',
-        text: 'The full synth behind each voice: oscillators, filter, envelopes and effects. Change a sound by hand, or load and save your own presets.',
+        selector: '.gen-rolebuttons button[title="Edit sound"]',
+        title: 'The synth behind a voice',
+        text: '✎ opens a voice’s sound: the calmbgm synth on faders, DIY Poly and FM, or one of the classic synths, with its effects. While it is open your keyboard and MIDI play that voice, and the arrow keys step through sounds (← →) and categories (↑ ↓). Save, export and import presets there too.',
     },
 
     // ---- 4: arrangement ----

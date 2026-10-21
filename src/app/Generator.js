@@ -1,5 +1,6 @@
 import {WasmRoomPool} from '../synth-lab/roomPool';
 import {createWasmRoomRoute} from './engine/wasmRoomRoute';
+import { busActive, createBusRack } from './engine/bus';
 import {atonalChord,describeBitonality,applyBitonality} from './composition/tonality';
 import {breathPatch,isBreathPatch} from './engine/breathPatches';
 import {joinHeldNotes} from './composition/heldGlides';
@@ -80,7 +81,7 @@ const HISTORY_BARS = 512;
 // Settings that define "home"; changing one resets drift to it.
 const HOME_KEYS = new Set(['tonic', 'mode', 'progression', 'bpm', 'barsPerChord']);
 // Settings that don't change what is planned.
-const SOUND_KEYS = new Set(['ambience', 'ambienceShape', 'ambienceVolume', 'playMusic', 'playAmbience', 'volumes', 'drumKit', 'muted', 'wander', 'ambienceWander']);
+const SOUND_KEYS = new Set(['ambience', 'ambienceShape', 'ambienceVolume', 'playMusic', 'playAmbience', 'volumes', 'drumKit', 'muted', 'wander', 'ambienceWander', 'bus']);
 
 // Ambience volume slider (0..1) to gain: 0.8, the default, is unity.
 const ambienceGain = (volume) => Math.pow(volume / 0.8, 2);
@@ -103,6 +104,8 @@ const ENDING_RING_BARS = 3;
 
 /** The percussion role (engine/drumKit.js): not a synth, so not in ROLES. */
 export const PERC_ROLE = { perc: { label: 'Percussion' } };
+/** A voice played by a classic synth or a DIY patch rather than the generator's own synth (presets). */
+export const externalSource = (preset) => !!(preset?.classics || preset?.diy);
 
 // In display order.
 export const ROLES = {
@@ -167,6 +170,7 @@ class Generator {
         Object.entries(this.roles).forEach(([role, r]) => { r.mute = Boolean(this.settings.muted && this.settings.muted[role]); });
         this.applyMix();
         this.applyWander();
+        this.applyBus();
         this.toneNow = null;
 
         this.transport = new Transport({
@@ -338,7 +342,7 @@ class Generator {
                 const Wasm=mode==='wasm'?(await import('./engine/wasmInstrument')).default:null;
                 for(const role of Object.keys(ROLES)){
                     const r=this.roles[role],old=r.instrument,snapshot=JSON.stringify(old.preset);
-                    if(old.preset.classics)continue;
+                    if(externalSource(old.preset))continue;
                     const instrument=Wasm?await Wasm.create({context:this.AC,preset:old.preset,polyphony:old.polyphony,roomPool}):new Instrument({context:this.AC,preset:old.preset,polyphony:old.polyphony,reverbHub:this.reverbHub});
                     const replacement={role,instrument,source:old,snapshot,roomRoute:null};replacements.push(replacement);
                     if(roomPool)replacement.roomRoute=createWasmRoomRoute(this.AC,instrument,{roleWander:r.wander,volume:r.volume,cutoff:r.tone.frequency.value});
@@ -593,6 +597,7 @@ class Generator {
         if (key === 'drums') void this.syncPercussionVoice();
         if (key === 'muted') this.applyMutes();
         if (key === 'wander') this.applyWander();
+        if (key === 'bus') this.applyBus();
         if (SOUND_KEYS.has(key) || soundOnlyDrums) return;
         this.replan([key]);
     }
@@ -641,6 +646,7 @@ class Generator {
         if ('drums' in patch) void this.syncPercussionVoice();
         if ('muted' in patch) this.applyMutes();
         if ('wander' in patch) this.applyWander();
+        if ('bus' in patch) this.applyBus();
         if (Object.keys(patch).every((key) => SOUND_KEYS.has(key) || key === 'drums' && soundOnlyDrums)) return;
         this.replan(Object.keys(patch), meterChanged);
     }
@@ -689,13 +695,41 @@ class Generator {
         return ambienceGain(this.settings.ambienceVolume ?? 0.8);
     }
 
+    /**
+     * The shared effects bus (settings.bus, engine/bus.js): built the first time a voice sends to
+     * it, then patched. Each voice's send leaves after its wander, so volume, mute and solo apply.
+     */
+    applyBus() {
+        const bus = this.settings.bus;
+        if (!this.busRack) {
+            if (!busActive(bus) || this.busLoading) return;
+            this.busLoading = createBusRack(this.AC, bus.rack, this.output).then((rack) => {
+                this.busRack = rack;
+                for (const r of Object.values(this.roles)) {
+                    r.send = this.AC.createGain();
+                    r.send.gain.value = 0;
+                    r.wander.output.connect(r.send);
+                    r.send.connect(rack.input);
+                }
+                this.applyBus();
+            }).catch((error) => console.error('Could not build the effects bus', error)).finally(() => { this.busLoading = null; });
+            return;
+        }
+        this.busRack.patch(bus.rack);
+        for (const [role, r] of Object.entries(this.roles)) r.send?.gain.setTargetAtTime(bus.sends[role] ?? 0, this.AC.currentTime, 0.03);
+    }
+
     homeMusic() {
         const { tonic, mode, progression, bpm } = this.settings;
         return { tonic, mode, progression, bpm };
     }
 
-    /** Replace one melodic source, committing only the latest successful load. */
-    async setRoleSource(role, source) {
+    /**
+     * Replace one melodic source, committing only the latest successful load: a classic synth
+     * ({classics}), or a preset of the generator's own synth on the current audio engine.
+     * `name` is the preset's (a classic is named by its sound); a classic counts as edited.
+     */
+    async setRoleSource(role, source, name) {
         if(!ROLES[role])throw Error('Unknown melodic role');
         const r=this.roles[role],revision=r.sourceRevision=(r.sourceRevision??0)+1;
         const pending=(async()=>{
@@ -703,13 +737,17 @@ class Generator {
             if(source?.classics){
                 const Classics=(await import('./engine/classicsInstrument')).default;
                 instrument=await Classics.create({context:this.AC,preset:source,polyphony:source.classics.light?Math.min(4,ROLES[role].polyphony):ROLES[role].polyphony});
-            }else if(source?.wasmVoice){
+            }else if(source?.diy){
+                const [Wasm,{diySpec}]=await Promise.all([import('./engine/wasmInstrument').then(m=>m.default),import('./engine/diySource')]);
+                instrument=await Wasm.create({context:this.AC,preset:source,polyphony:ROLES[role].polyphony,spec:diySpec(source.diy,ROLES[role].polyphony),roomPool:this.wasmRoomPool});
+            }else if(source?.wasmVoice||this.audioEngine==='wasm'){
                 const Wasm=(await import('./engine/wasmInstrument')).default;
-                instrument=await Wasm.create({context:this.AC,preset:source,polyphony:ROLES[role].polyphony});
+                instrument=await Wasm.create({context:this.AC,preset:source,polyphony:ROLES[role].polyphony,roomPool:this.wasmRoomPool});
             }else instrument=new Instrument({context:this.AC,preset:source??findPreset(ROLES[role].preset),polyphony:ROLES[role].polyphony,reverbHub:this.reverbHub});
             if(revision!==r.sourceRevision){instrument.dispose();return;}
             r.roomRoute?.dispose();r.roomRoute=null;r.instrument.dispose();r.instrument=instrument;instrument.connect(r.tone);
-            r.stringPatchBase=null;r.edited=true;r.presetName=source?.classics?.name??ROLES[role].preset;
+            if(this.wasmRoomPool&&!source?.classics)r.roomRoute=createWasmRoomRoute(this.AC,instrument,{roleWander:r.wander,volume:r.volume,cutoff:r.tone.frequency.value});
+            r.stringPatchBase=null;r.edited=externalSource(source);r.presetName=name??source?.classics?.name??source?.diy?.name??ROLES[role].preset;
             this.applyMix();
         })();
         this.sourceLoads??=new Set();this.sourceLoads.add(pending);
@@ -749,7 +787,11 @@ class Generator {
         const r = this.roles[role];
         r.stringPatchBase = (isStringPatch(name) || isPianoPatch(name) || isBreathPatch(name)) && preset === findPreset(name) ? { name, preset } : null;
         if (r.stringPatchBase) preset = breathPatch(name,pianoPatch(name, stringPatch(name, preset, this.settings.generation), this.settings.generation),this.settings.generation);
-        if (morphSeconds > 0) r.instrument.morphTo(preset, morphSeconds);
+        // a classic synth or DIY patch gives the role back to the generator's own synth
+        if (externalSource(r.instrument.preset)) {
+            const base = r.stringPatchBase;
+            this.setRoleSource(role, preset, name).then(() => { r.stringPatchBase = base; }, (error) => console.error('Could not restore the voice', error));
+        } else if (morphSeconds > 0) r.instrument.morphTo(preset, morphSeconds);
         else r.instrument.applyPreset(preset);
         r.presetName = name;
         r.edited = false;

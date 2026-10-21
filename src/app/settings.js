@@ -32,6 +32,8 @@ import { decodeShareCode, encodeShareParts, decodeShareParts } from './shareCode
 import { phraseToSeed } from './phrase';
 import { HARMONY_SCALES } from './composition/harmonyScale';
 import { generationFromSearch, withGeneration } from './generation';
+import { defaultBus, BUS_RULES } from './engine/bus';
+import { encodeExtras, decodeExtras } from './shareExtras';
 
 /** Fresh default settings (a new random seed each call). */
 export function defaultSettings() {
@@ -85,6 +87,7 @@ export function defaultSettings() {
         padMotion: { ...DEFAULT_PAD_MOTION }, // register lean, fast arpeggios, swell
         wander: defaultWander(), // slow pan / volume / filter / pitch drift (engine/wander.js)
         ambienceWander: defaultAmbienceWander(), // the bed's own slow drift in level, in all and per layer
+        bus: defaultBus(), // the shared effects bus: per-voice sends (all 0: off) and its rack (engine/bus.js)
         seed: newSeed(),
     };
 }
@@ -183,6 +186,7 @@ const RULES = {
         layers: clamp(AMBIENCE_WANDER_LIMITS.layers.min, AMBIENCE_WANDER_LIMITS.layers.max),
         period: clamp(AMBIENCE_WANDER_LIMITS.period.min, AMBIENCE_WANDER_LIMITS.period.max),
     },
+    bus: BUS_RULES,
     seed: int(0, 2 ** 31),
 };
 
@@ -220,15 +224,19 @@ const fromBase64Url = (code) => decodeURIComponent(escape(atob(code.replace(/-/g
 function legacyBaseline() {
     return { ...defaultSettings(), sections: { ...DEFAULT_SECTIONS } };
 }
-const PARTS = ['m', 'v', 'a'];
+const PARTS = ['m', 'v', 'a', 'x'];
 
 /**
  * Settings (+ role -> built-in preset name) -> short URL-safe string.
  * @param {object} settings
  * @param {object} [presets] - names that aren't built-in presets are left out
  */
-export function encodeSettings(settings, presets, { seed = true } = {}) {
+export function encodeSettings(settings, presets = {}, { seed = true } = {}) {
     const parts = encodeShareParts(settings, defaultSettings(), presets, { seed });
+    // the bus, classic / DIY voices ({ external: ref }) and a drum machine (perc: { machine: ref }): shareExtras.js
+    const sounds = Object.fromEntries(Object.entries(presets).filter(([, p]) => p?.external).map(([role, p]) => [role, p.external]));
+    const x = encodeExtras({ bus: settings.bus, sounds, machine: presets.perc?.machine ?? null });
+    if (x) parts.x = x;
     return PARTS.filter((key) => parts[key]).map((key) => `${key}=${parts[key]}`).join('&');
 }
 
@@ -241,6 +249,12 @@ export function decodeShare(code) {
         if (code.includes('=')) {
             const query = new URLSearchParams(code);
             const { settings, presets } = decodeShareParts(Object.fromEntries(PARTS.map((key) => [key, query.get(key)])), defaultSettings());
+            if (query.get('x')) {
+                const extras = decodeExtras(query.get('x'));
+                if (extras.bus) settings.bus = extras.bus;
+                Object.entries(extras.sounds).forEach(([role, ref]) => { presets[role] = { external: ref }; });
+                if (extras.machine) presets.perc = { machine: extras.machine };
+            }
             return { settings: sanitizeSettings(settings), presets };
         }
         if (code.startsWith('eyJ')) return { settings: sanitizeSettings(JSON.parse(fromBase64Url(code))), presets: {} };

@@ -1,4 +1,4 @@
-import React,{lazy,memo,Suspense,useCallback,useEffect,useMemo,useRef,useState} from 'react';
+import React,{useCallback,useEffect,useRef,useState} from 'react';
 import Generator from '../../app/Generator';
 import {BROWSABLE_SCENES,sceneSettings} from '../../app/scenes';
 import {findPreset} from '../../app/editor/presetStore';
@@ -8,6 +8,7 @@ import PROGRESSIONS from '../../app/progressions';
 import {METERS} from '../../app/meter';
 import {GENERATIVE_PRESETS} from '../../app/presets';
 import {referenceLoudness,measureLoudness} from '../../app/engine/loudness';
+import {matchedLevel,classicsSource} from './sources';
 import ChordTimeline from '../../app/ChordTimeline';
 import {TrackStrip,useLivePlay} from '../../app/Tracks';
 import {applyTheme,storedTheme} from '../../app/theme';
@@ -15,7 +16,7 @@ import Piano,{noteName} from '../../labs/Piano';
 import Slider from '../../labs/Slider';
 import {SYNTHS} from '../models';
 import SoundPicker from '../ui/SoundPicker';
-import {EnsemblePanelContext} from '../ui/EmbeddedShell';
+import {PANELS,VoicePanel} from '../ui/VoicePanel';
 import RackPanel from '../effects/RackPanel';
 import {rackForPatch,instrumentSpaceKeys,splitRackEdits} from '../effects/params';
 import {load,save} from '../storage';
@@ -24,31 +25,14 @@ import '../../app/generative.css';
 import '../../labs/labs.css';
 import './ensemble.css';
 
-const PANELS={cs80:lazy(()=>import('../cs80/Cs80Page')),juno:lazy(()=>import('../juno/JunoPage')),prophet5:lazy(()=>import('../prophet/ProphetPage')),jupiter8:lazy(()=>import('../jupiter/JupiterPage')),minimoog:lazy(()=>import('../minimoog/MinimoogPage')),dx7:lazy(()=>import('../dx7/Dx7Page')),obxa:lazy(()=>import('../obxa/ObxaPage')),vs:lazy(()=>import('../vs/VsPage'))};
 const LABELS={lead:'Lead',counter:'2nd lead',pad:'Pad',bass:'Bass',perc:'Percussion'};
 const PLAYERS=[...ROLES,'perc'],TRACKS=Object.fromEntries(PLAYERS.map(id=>[id,{label:LABELS[id]}]));
 const settingsForScene=sceneSettings;
 const voicesForScene=scene=>Object.fromEntries(ROLES.map(id=>{const spec=scene.voices[id],fallback=roleSound('calmbgm',id);return [id,typeof spec==='string'?{name:spec,synth:findPreset(spec)??fallback.values}:spec??{name:fallback.name,synth:fallback.values}];}));
-const levels=new Map();
-async function matchedLevel(sound,id){
- const key=JSON.stringify([id,sound.synth,sound.values]);
- if(levels.size>=64&&!levels.has(key))levels.delete(levels.keys().next().value);
- if(!levels.has(key))levels.set(key,Promise.all([referenceLoudness(id),measureLoudness({classics:{synth:sound.synth,values:sound.values}},id)]).then(([target,measured])=>Math.max(.01,Math.min(4,10**((target-measured)/20)))).catch(error=>{levels.delete(key);throw error;}));
- return levels.get(key);
-}
 function initial(){try{const hash=location.hash.slice(1);return {setup:hash.startsWith('ensemble=')?decodeEnsemble(hash.slice(9)):cleanEnsemble(load('synths:ensemble',ENSEMBLES[0]))};}catch(error){return {setup:cleanEnsemble(ENSEMBLES[0]),error:error.message};}}
 const soundName=(id,role)=>role.synth==='calmbgm'?role.name:SYNTHS[role.synth].name+' · '+role.name;
 const playerSound=(setup,id)=>id==='perc'?setup.percussion:setup.roles[id];
 const sameMusic=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
-function ScaledPanel({children,full}){
- const ref=useRef(null),[width,setWidth]=useState(1000);
- useEffect(()=>{const el=ref.current,observer=new ResizeObserver(([entry])=>setWidth(entry.contentRect.width));observer.observe(el);return()=>observer.disconnect();},[]);
- return <div ref={ref} className="ensemble-panel-viewport"><div style={{zoom:full?1:Math.min(1,width/1150),minWidth:full?undefined:1150}}>{children}</div></div>;
-}
-const VoicePanel=memo(function VoicePanel({id,role,values,onChange,choose,current,full}){
- const Panel=PANELS[id],context=useMemo(()=>({values,onChange,choose,current}),[values,onChange,choose,current]);
- return <ScaledPanel full={full}><EnsemblePanelContext.Provider value={context}><Suspense fallback={<p>Loading panel…</p>}><Panel key={role+id}/></Suspense></EnsemblePanelContext.Provider></ScaledPanel>;
-});
 // What the players' and chords' minis show: the notes sounding now, the chord
 // under the playhead and the next distinct chords, in the bar's key.
 function readView(g,visual){
@@ -79,9 +63,7 @@ export default function EnsemblePage(){
   if(sound.synth==='calmbgm')preset=sound.values;
   else{
    if(!sound.matched){const level=await matchedLevel(sound,id);sound={...sound,level,matched:true};setSetup(s=>s.roles[id].synth===sound.synth&&s.roles[id].name===sound.name?{...s,roles:{...s.roles,[id]:{...s.roles[id],level,matched:true}}}:s);}
-   const values={...sound.values};
-   if(light){if('oversample'in values)values.oversample=0;if('voices'in values)values.voices=Math.min(values.voices,id==='pad'?4:2);}
-   preset={classics:{synth:sound.synth,name:sound.name,values,rack:sound.rack,light},masterVolume:sound.level??1};
+   preset=classicsSource(sound,id,light);
   }
   g.roles[id].ensembleRack?.dispose();g.roles[id].ensembleRack=null;
   await g.setRoleSource(id,preset);

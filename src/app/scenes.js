@@ -9,7 +9,9 @@
 // where `settings` is a patch over the default settings (anything it
 // doesn't name is the default; a complete settings object works as well)
 // and `voices` names a synth preset per role - or carries one in full,
-// { name, synth }, which is what "Copy setup" produces. So a setup copied
+// { name, synth }, which is what "Copy setup" produces; a voice on a classic
+// or DIY synth is { name, external } and a drum machine `percussion`, both as
+// the references of editor/soundRefs.js. So a setup copied
 // from the page can be pasted straight into scenes.json (give it a
 // category), or into the page's own paste box.
 //
@@ -25,6 +27,7 @@ import { ROLE_PRESETS } from './presets';
 import { sanitizePreset,findPreset } from './editor/presetStore';
 import {percussionVoice} from './percussionVoices';
 import { cleanBook } from './rulebook/session';
+import { cleanRef, MACHINE_SYNTHS } from './shareExtras';
 
 /** The picker's categories, in order: [{ id, label, blurb }]. */
 export const SCENE_CATEGORIES = library.categories;
@@ -52,6 +55,8 @@ export function normalizeScene(raw, defaultCategory = MINE.id) {
         const spec = isObject(raw.voices) ? raw.voices[role] : undefined;
         if (typeof spec === 'string' && spec) {
             voices[role] = spec;
+        } else if (isObject(spec) && cleanRef(spec.external)) {
+            voices[role] = { name: text(spec.name, 60) || cleanRef(spec.external).name, external: cleanRef(spec.external) };
         } else if (isObject(spec)) {
             const synth = sanitizePreset(spec.synth);
             if (synth) voices[role] = { name: text(spec.name, 60) || `${name} ${role}`, synth };
@@ -70,6 +75,7 @@ export function normalizeScene(raw, defaultCategory = MINE.id) {
         settings: raw.settings,
         ...(raw.rulebook ? { rulebook: { version: 1, ...cleanBook(raw.rulebook) } } : {}),
         voices,
+        ...(cleanRef(raw.percussion, MACHINE_SYNTHS) ? { percussion: cleanRef(raw.percussion, MACHINE_SYNTHS) } : {}),
     };
 }
 
@@ -158,7 +164,7 @@ export function sceneSettings(scene, seed = newSeed()) {
  * @param {object} state - { settings, voices: { role: { name, synth } } }
  * @param {object} [info] - { name, blurb, category, tags }
  */
-export function buildSetup({ settings, voices, rulebook }, { name = 'My setup', blurb = '', category = MINE.id, tags = [] } = {}) {
+export function buildSetup({ settings, voices, rulebook, percussion }, { name = 'My setup', blurb = '', category = MINE.id, tags = [] } = {}) {
     return {
         format: SETUP_FORMAT,
         version: SETUP_VERSION,
@@ -168,7 +174,10 @@ export function buildSetup({ settings, voices, rulebook }, { name = 'My setup', 
         tags,
         settings: JSON.parse(JSON.stringify(settings)),
         ...(rulebook ? { rulebook: { version: 1, ...cleanBook({ version: 1, ...rulebook }) } } : {}),
-        voices: Object.fromEntries(ROLES.filter((role) => voices[role]).map((role) => [role, { name: voices[role].name, synth: { ...voices[role].synth } }])),
+        voices: Object.fromEntries(ROLES.filter((role) => voices[role]).map((role) => [role, voices[role].external
+            ? { name: voices[role].name, external: { ...voices[role].external } }
+            : { name: voices[role].name, synth: { ...voices[role].synth } }])),
+        ...(percussion ? { percussion: { ...percussion } } : {}),
     };
 }
 
