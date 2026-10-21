@@ -462,6 +462,16 @@ requirements and listening checks.
 
 ## Development
 
+The public [synth comparison hub](https://calmbgm.com/synths/) offers fourteen
+instruments under Vintage, DIY and Drums, with bundled YAML preset banks.
+DIY Poly and DIY FM wrap the existing synth engines with playable panels.
+Every synth's **Effects** button opens the illustrated shared rack. It can also
+connect to an open instrument from the [effects page](https://calmbgm.com/synths/effects/).
+Choose a program under **Compare presets**, then **Copy comparison link** to send that exact program to a hardware
+tester. **Download YAML** includes the panel settings. See
+[public testing instructions](docs/SYNTHS_PUBLIC_TESTING.md) for exports,
+limitations and validation.
+
 ```bash
 npm install
 npm run dev       # http://localhost:5173/

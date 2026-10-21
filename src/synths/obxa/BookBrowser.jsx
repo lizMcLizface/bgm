@@ -43,7 +43,7 @@ export default function BookBrowser({current,choose,values,layer='upper'}){
  const accept=(text,name)=>{
   try{
    const next=readBook(text,name);
-   if(!next){setMessage('No OB-Xa patches found in that file.');return;}
+   if(!next){setMessage('No patch-book programs found in that file.');return;}
    save(BANK_KEY,{name,text});setBook(next);setCursor(0);setMessage(`Loaded ${next.patches.length} patches from ${name}.`);
   }catch(e){setMessage(`Could not read ${name} (${e.message}).`);}
  };
@@ -61,7 +61,7 @@ export default function BookBrowser({current,choose,values,layer='upper'}){
   {message&&<span className="bank-message" role="status">{message}</span>}
  </span>;
  if(!book)return <div className="bank empty">
-  <span className="bank-title">OB-Xa patch book</span>
+  <span className="bank-title">Oberon Xa patch book</span>
   {importer}
   <span className="bank-hint">Load the measured patch-book JSON (see tools/obxa-patch-book). It stays in this browser.</span>
  </div>;

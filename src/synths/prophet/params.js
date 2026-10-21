@@ -2,6 +2,7 @@
 // shared space effects (ids from 200) come from ../params. Append-only: saved
 // patches use keys. Row format: see defineParams.
 import {defineParams,SPACE} from '../params';
+import {shapeRows} from '../ui/envShape';
 
 const ON=['Off','On'];
 export const CHORD_KEYS=Array.from({length:10},(_,i)=>`chord${i+1}`);
@@ -80,5 +81,8 @@ export const {PARAMS,BY_KEY,defaultValues,clampValue,sanitize,toPairs}=definePar
  ['oversample',60,'2× rate',0,2,1,'','step',['Off','Auto','On']],
  // chord memory: semitones above the key, −1 = empty (not on the panel)
  ...CHORD_KEYS.map((key,i)=>[key,62+i,`Chord ${i+1}`,-1,60,-1,'n','step']),
+ // envelope shapes (ids 180–195, one set for the whole patch)
+ ...shapeRows('amp'),
+ ...shapeRows('filter'),
  ...SPACE,
 ]);

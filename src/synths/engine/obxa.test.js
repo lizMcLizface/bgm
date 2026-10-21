@@ -4,6 +4,7 @@ import {createOfflineSynth,MODELS,rms,peak,brightness,pitchHz as pitchOf} from '
 import {PARAMS,BY_KEY,toPairs,sanitize,clampValue,intoLayer,LAYER_KEYS} from '../obxa/params';
 import {PRESETS} from '../obxa/presets';
 import {engineValues,semitones,PITCH_NOTES} from '../obxa/book';
+import {spectrumDb,spectralPeak} from '../ui/scopeMath';
 
 const module=new WebAssembly.Module(fs.readFileSync('public/synths/classics.wasm'));
 const synth=(values={},sampleRate=48000)=>createOfflineSynth(module,{sampleRate,model:MODELS.obxa,params:toPairs(sanitize(values))});
@@ -23,7 +24,7 @@ test('the OB-Xa table fits the kernel ABI; the lower layer mirrors the upper one
  const k=synth().k;expect(k.syn_param_count()).toBe(144);
  const ids=PARAMS.map(p=>p.id);expect(new Set(ids).size).toBe(ids.length);
  for(const key of LAYER_KEYS)expect(BY_KEY['lo.'+key].id).toBe(BY_KEY[key].id+64);
- for(const p of PARAMS){expect(p.id<131||(p.id>=200&&p.id<216)).toBe(true);expect(p.default).toBeGreaterThanOrEqual(p.min);expect(p.default).toBeLessThanOrEqual(p.max);}
+ for(const p of PARAMS){expect(p.id<131||(p.id>=180&&p.id<196)||(p.id>=200&&p.id<216)).toBe(true);expect(p.default).toBeGreaterThanOrEqual(p.min);expect(p.default).toBeLessThanOrEqual(p.max);}
 });
 
 test('both oscillators are in tune at every sample rate; pitch notes, detune and transpose move them',()=>{
@@ -59,18 +60,36 @@ test('sync locks oscillator 2 to oscillator 1\'s period, and the filter envelope
  expect(early).toBeGreaterThan(1.4*late);expect(early).toBeLessThan(2.1*late);expect(cents(late,220)).toBeLessThan(2);
 });
 
-test('the filter is 24 dB with four poles and 12 dB with two, and self-oscillates at the top of the resonance',()=>{
+test('the filter is 24 dB with four poles and 12 dB with two; neither mode self-oscillates (service manual p.18)',()=>{
  const above=poles=>{const x=hold({...CLEAN,cutoff:400,poles},45);return level(x,110*8)/level(x,110);};
  expect(above(0)).toBeGreaterThan(2*above(1));expect(above(1)).toBeLessThan(.02);
- const sing=hold({...CLEAN,osc1On:0,cutoff:1000,res:1},60,.4);expect(rms(sing)).toBeGreaterThan(.01);expect(Math.abs(pitchHz(sing)/1000-1)).toBeLessThan(.05);
- const calm=hold({...CLEAN,osc1On:0,cutoff:1000,res:.5},60,.4);expect(rms(calm)).toBeLessThan(1e-4);
+ for(const sr of [44100,48000,96000])for(const poles of [0,1]){
+  const quiet=hold({...CLEAN,osc1On:0,noiseOn:0,cutoff:1000,res:1,poles},60,.4,sr);
+  expect(peak(quiet)).toBe(0);
+  // Excite the filter, then disconnect its source while the VCA stays open:
+  // silence at startup alone would miss an unstable feedback loop.
+  const v=synth({...CLEAN,cutoff:1000,res:1,poles},sr);v.k.syn_note_on(1,60,1);v.seconds(.2);
+  v.k.syn_param(BY_KEY.osc1On.id,0);v.seconds(2);
+  expect(rms(v.seconds(.2)[0])).toBeLessThan(1e-5);
+ }
 });
 
 test('key tracking moves the cutoff with the keyboard, and the envelope amount sweeps it',()=>{
- const track=pitchHz(hold({...CLEAN,osc1On:0,cutoff:262,res:1,track:1},72,.4))/pitchHz(hold({...CLEAN,osc1On:0,cutoff:262,res:1,track:1},60,.4));
- expect(Math.abs(track-2)).toBeLessThan(.1);
+ // Service manual pp.16-18 tunes the resonance peak using NOISE, not a
+ // freely oscillating filter. Its octave names differ from MIDI's.
+ const resonantPeak=(note,poles)=>{
+  const x=hold({...CLEAN,osc1On:0,noiseOn:1,cutoff:65.4,res:1,track:1,poles},note,1);
+  return spectralPeak(spectrumDb(x,32768),48000,32768,100,1500).hz;
+ };
+ for(const poles of [0,1])expect(Math.abs(resonantPeak(60,poles)/resonantPeak(48,poles)-2)).toBeLessThan(.15);
  const bright=amount=>{const v=synth({...CLEAN,cutoff:200,envAmount:amount,fDecay:.15,fSustain:0});v.k.syn_note_on(1,45,1);const first=brightness(v.seconds(.03)[0]);v.seconds(.6);return first/brightness(v.seconds(.1)[0]);};
  expect(bright(.8)).toBeGreaterThan(1.3*bright(0));
+});
+
+test('the two-pole SVF retains its low-frequency passband as resonance rises',()=>{
+ const low=res=>level(hold({...CLEAN,cutoff:6000,poles:0,res},36),65.4064);
+ expect(low(1)/low(0)).toBeGreaterThan(.9);
+ expect(low(1)/low(0)).toBeLessThan(1.1);
 });
 
 test('the LFO modulates pitch, filter and pulse width of the chosen destinations; the wheel has its own vibrato',()=>{

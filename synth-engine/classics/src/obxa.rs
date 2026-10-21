@@ -1,8 +1,8 @@
 //! An Oberheim-OB-Xa-inspired eight-voice polysynth. Per voice: two oscillators (saw and
 //! pulse, each or both; oscillator 2 detunable, hard-syncable to oscillator 1, and
 //! optionally swept by the filter envelope) → mixer with noise → a resonant
-//! low-pass that switches between 12 dB (the second stage of the ladder) and 24 dB
-//! (CEM3320 character) → VCA. A filter ADSR and an amplifier ADSR; one LFO (sine,
+//! low-pass that switches between a two-pole state-variable filter and a four-pole
+//! cascade (the OB-Xa uses separate CEM3320 circuits) → VCA. A filter ADSR and an amplifier ADSR; one LFO (sine,
 //! square, sample & hold in any combination) with separate destinations for frequency
 //! (oscillator 1, 2, filter) and pulse width, a wheel vibrato on its own LFO, unison,
 //! polyphonic portamento and key tracking. Two complete layers sit under the key modes
@@ -85,9 +85,11 @@ const DEFAULTS: [(usize, f32); 26] = [
     (id::VEL_FILTER, 0.4), (id::VEL_AMP, 0.5), (id::VOLUME, 0.57), (id::VOICES, 8.),
 ];
 
-/// Resonance 0–1 → loop feedback; the OB-Xa filter just sings at the top. An estimate.
+/// Resonance 0–1 → four-pole loop feedback, below self-oscillation.
 fn feedback(resonance: f32) -> f32 {
-    4.3 * bound(resonance, 0., 1.)
+    // Service manual, 3rd ed., p.18: back the resonance trimmer down until
+    // oscillation stops. The 3.9 endpoint is an estimate below the k=4 threshold.
+    3.9 * bound(resonance, 0., 1.)
 }
 
 #[derive(Clone, Copy)]
@@ -135,6 +137,7 @@ struct Voice {
     aenv: Adsr,
     hp: f32,
     ladder: Ladder,
+    svf: Svf,
     dt1: f32,
     dt1_d: f32,
     dt2: f32,
@@ -160,7 +163,7 @@ impl Voice {
         onset: Onset::DONE,
         key: 0, note: 60., pitch: 60., velocity: 0., poly: 0., pressure: 0., down: false, held: false, active: false, fresh: true,
         stamp: 0, offset: 0., rng: Rng(1), pink: [0.; 3], o1: VcOsc::ZERO, o2: VcOsc::ZERO, fenv: Adsr::ZERO, aenv: Adsr::ZERO, hp: 0.,
-        ladder: Ladder::ZERO, dt1: 0., dt1_d: 0., dt2: 0., dt2_d: 0., pw1: 0.5, pw1_d: 0., pw2: 0.5, pw2_d: 0., g: 0., g_d: 0.,
+        ladder: Ladder::ZERO, svf: Svf::ZERO, dt1: 0., dt1_d: 0., dt2: 0., dt2_d: 0., pw1: 0.5, pw1_d: 0., pw2: 0.5, pw2_d: 0., g: 0., g_d: 0.,
         gain: 0., gain_d: 0., k: 0., pan: (1., 1.), tune: 0., cut: 0., trim: 0., time: 1., spread: 0.,
     };
 }
@@ -191,6 +194,8 @@ pub struct ObXa {
     expression_s: f32,
     pedal: bool,
     pub steals: u32,
+    shape_p: [f32; SHAPE_PARAMS],
+    shapes: [EnvShape; 2],
 }
 
 impl ObXa {
@@ -199,7 +204,7 @@ impl ObXa {
             sr: 48000., p: [0.; PARAMS], dirty: true, setup: Setup::ZERO, voices: [Voice::ZERO; VOICES], stamp: 0, until: 0,
             lfo: Lfo::new(0x3c6e_f372), wheel_lfo: 0., unison: false, stack: KeyStack::EMPTY, playing: None,
             dec: [HalfBand::ZERO; 2], limit: VOICES, bend_to: 0., bend: 0., pressure: 0., modulation: 0., modulation_s: 0.,
-            expression: 1., expression_s: 1., pedal: false, steals: 0,
+            expression: 1., expression_s: 1., pedal: false, steals: 0, shape_p: [0.; SHAPE_PARAMS], shapes: [EnvShape::NATIVE; 2],
         }
     }
 
@@ -225,6 +230,12 @@ impl ObXa {
         }
     }
 
+    /// Envelope shapes: amplitude 0–7, filter 8–15 (see [`EnvShape`]).
+    pub fn set_shape(&mut self, i: usize, value: f32) {
+        self.shape_p[i] = value;
+        self.dirty = true;
+    }
+
     pub fn set(&mut self, i: usize, value: f32) {
         if i < PARAMS && value.is_finite() {
             self.p[i] = value;
@@ -240,10 +251,6 @@ impl ObXa {
         (self.p[id::VOICES].round() as usize).clamp(1, VOICES).min(self.limit.max(1))
     }
 
-    fn ringing(&self) -> bool {
-        feedback(self.p[id::RES]) >= 3.95
-    }
-
     fn release_all(&mut self) {
         for v in self.voices.iter_mut().filter(|v| v.down || v.held) {
             Self::release(v);
@@ -253,7 +260,6 @@ impl ObXa {
     }
 
     fn start(&mut self, index: usize, key: u32, note: f32, velocity: f32, offset: f32, retrigger: bool) {
-        let ringing = self.ringing();
         let porta = self.p[id::PORTAMENTO] > 0.;
         self.stamp = self.stamp.wrapping_add(1);
         let v = &mut self.voices[index];
@@ -262,9 +268,7 @@ impl ObXa {
             v.pressure = 0.;
             v.hp = 0.;
             v.ladder = Ladder::ZERO;
-            if ringing {
-                v.ladder.ring();
-            }
+            v.svf = Svf::ZERO;
             // polyphonic portamento: a voice glides from the note it last played
             if !porta {
                 v.pitch = note;
@@ -411,6 +415,7 @@ impl ObXa {
             v.aenv = Adsr::ZERO;
             v.hp = 0.;
             v.ladder = Ladder::ZERO;
+            v.svf = Svf::ZERO;
         }
         self.stack = KeyStack::EMPTY;
         self.playing = None;
@@ -429,6 +434,13 @@ impl ObXa {
         };
         if os != self.setup.os {
             self.dec = [HalfBand::ZERO; 2];
+        }
+        if (p[id::POLES] < 0.5) != self.setup.two_pole {
+            // The inactive topology must not replay stale integrator state.
+            for v in self.voices.iter_mut() {
+                v.ladder = Ladder::ZERO;
+                v.svf = Svf::ZERO;
+            }
         }
         let srv = self.sr * os as f32;
         let env = |a: usize| [
@@ -457,6 +469,7 @@ impl ObXa {
             self.release_all();
             self.unison = unison;
         }
+        self.shapes = [EnvShape::new(&self.shape_p[..SHAPE_PER_ENV], srv), EnvShape::new(&self.shape_p[SHAPE_PER_ENV..], srv)];
         self.dirty = false;
     }
 
@@ -527,7 +540,10 @@ impl ObXa {
         let k = feedback(p[id::RES]);
         let stereo = bound(p[id::WIDTH], 0., 1.);
         let volume = bound(p[id::VOLUME], 0., 1.);
-        let master = volume * volume * self.expression_s * 0.5 * (1. + 0.3 * k);
+        // The SVF has unity small-signal DC gain at every resonance; it does
+        // not need the cascade's estimated passband-loss compensation.
+        let compensation = if s.two_pole { 1. } else { 1. + 0.3 * k };
+        let master = volume * volume * self.expression_s * 0.5 * compensation;
         let press_k = smoothing(0.025, rate);
         let channel_pressure = self.pressure;
         let inv = 1. / (TICK * s.os) as f32;
@@ -547,7 +563,13 @@ impl ObXa {
             let g = warp(hz, srv);
             let gain = master * (1. - vel_a * (1. - v.velocity)) * (1. + 0.08 * spread * v.trim);
             v.pan = pan(stereo * v.spread);
-            v.k = k * (1. - ((hz - 0.3 * sr) / (0.15 * sr)).clamp(0., 1.));
+            v.k = if s.two_pole {
+                // Positive damping: a resonant peak, never a free oscillator.
+                // The control taper and maximum Q remain estimates.
+                damping(p[id::RES])
+            } else {
+                k * (1. - ((hz - 0.3 * sr) / (0.15 * sr)).clamp(0., 1.))
+            };
             if v.fresh {
                 v.fresh = false;
                 v.dt1 = dt1;
@@ -584,9 +606,9 @@ impl ObXa {
             let len = m * s.os;
             for v in self.voices.iter_mut().filter(|v| v.active) {
                 if s.os == 2 {
-                    render_voice(v, &s, vintage, &mut l2[..len], &mut r2[..len]);
+                    render_voice(v, &s, &self.shapes, vintage, &mut l2[..len], &mut r2[..len]);
                 } else {
-                    render_voice(v, &s, vintage, &mut left[at..at + m], &mut right[at..at + m]);
+                    render_voice(v, &s, &self.shapes, vintage, &mut left[at..at + m], &mut right[at..at + m]);
                 }
                 if v.aenv.stage == IDLE {
                     v.active = false;
@@ -608,12 +630,13 @@ impl ObXa {
 }
 
 #[inline(always)]
-fn render_voice(v: &mut Voice, s: &Setup, vintage: f32, left: &mut [f32], right: &mut [f32]) {
+fn render_voice(v: &mut Voice, s: &Setup, shapes: &[EnvShape; 2], vintage: f32, left: &mut [f32], right: &mut [f32]) {
     let time = 1. + 0.12 * vintage * v.time;
     let c = |x: f32| (x / time).min(1.);
     let [fa, fd, fs, fr] = s.e_f;
     let [aa, ad, as_, ar] = s.e_a;
     let (fa, fd, fr, aa, ad, ar) = (c(fa), c(fd), c(fr), c(aa), c(ad), c(ar));
+    let (rf, ra) = (shapes[1].rates(fa, fd, fr, false), shapes[0].rates(aa, ad, ar, false));
     let (pl, pr) = v.pan;
     for i in 0..left.len() {
         v.dt1 += v.dt1_d;
@@ -632,10 +655,12 @@ fn render_voice(v: &mut Voice, s: &Setup, vintage: f32, left: &mut [f32], right:
         v.pink[2] = 0.57 * v.pink[2] + white * 1.052_691_3;
         let noise = 0.35 * (v.pink[0] + v.pink[1] + v.pink[2] + white * 0.1848);
         let x = 0.45 * (s.mix1 * o1 + s.mix2 * o2 + s.noise * noise);
-        let (y2, y4) = v.ladder.taps(x + 1e-5 * noise, v.g, v.k);
-        v.fenv.tick(fa, fd, fs, fr);
-        let e = v.aenv.tick(aa, ad, as_, ar);
-        let o = if s.two_pole { y2 } else { y4 } * e * v.gain;
+        // The two-pole circuit (voice schematic 1520C, U5) is an SVF, not
+        // an output tap of the four-pole circuit (U6), unlike the Jupiter-8.
+        let filtered = if s.two_pole { v.svf.tick(x, v.g, v.k).0 } else { v.ladder.tick(x, v.g, v.k) };
+        v.fenv.run(&shapes[1], &rf, fa, fd, fs, fr, false);
+        let e = v.aenv.run(&shapes[0], &ra, aa, ad, as_, ar, false);
+        let o = filtered * e * v.gain;
         let o = o * v.onset.tick();
         left[i] += o * pl;
         right[i] += o * pr;
@@ -684,6 +709,12 @@ impl ObXa2 {
         let share = if self.mode == key_mode::WHOLE { VOICES } else { (pool + 1) / 2 };
         self.upper.limit = share;
         self.lower.limit = share;
+    }
+
+    /// One set of envelope shapes for both layers.
+    pub fn set_shape(&mut self, i: usize, value: f32) {
+        self.upper.set_shape(i, value);
+        self.lower.set_shape(i, value);
     }
 
     pub fn set(&mut self, i: usize, value: f32) {

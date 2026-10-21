@@ -139,6 +139,8 @@ pub struct Juno {
     soft: f32,
     pedal: bool,
     pub steals: u32,
+    shape_p: [f32; SHAPE_PARAMS],
+    shape: EnvShape,
 }
 
 impl Juno {
@@ -148,6 +150,7 @@ impl Juno {
             setup: Setup { attack: 1., decay: 1., sustain: 0., release: 1., saw: false, pulse: false, sub: 0., noise: 0., hpf: 1, hp_a: 0., gate: false, gate_k: 1. },
             voices: [Voice::ZERO; VOICES], stamp: 0, until: 0, lfo: Lfo::new(0x2f6b_1e7d), fade: 1., bend_to: 0., bend: 0.,
             pressure: 0., modulation: 0., expression: 1., expression_s: 1., brightness: 0., soft: 0., pedal: false, steals: 0,
+            shape_p: [0.; SHAPE_PARAMS], shape: EnvShape::NATIVE,
         }
     }
 
@@ -173,6 +176,12 @@ impl Juno {
             self.p[i] = value;
             self.dirty = true;
         }
+    }
+
+    /// The one envelope takes the amplitude shape (it drives the VCF too).
+    pub fn set_shape(&mut self, i: usize, value: f32) {
+        self.shape_p[i] = value;
+        self.dirty = true;
     }
 
     pub fn chorus(&self) -> (u32, f32) {
@@ -319,6 +328,7 @@ impl Juno {
             gate: p[id::VCA_MODE] >= 0.5,
             gate_k: smoothing(0.0015, sr),
         };
+        self.shape = EnvShape::new(&self.shape_p[..SHAPE_PER_ENV], sr);
         self.dirty = false;
     }
 
@@ -398,7 +408,7 @@ impl Juno {
             let m = self.until.min(n - at);
             let s = self.setup;
             for v in self.voices.iter_mut().filter(|v| v.active) {
-                render_voice(v, &s, &mut left[at..at + m], &mut right[at..at + m]);
+                render_voice(v, &s, &self.shape, &mut left[at..at + m], &mut right[at..at + m]);
                 let done = if s.gate { !v.down && !v.held && v.gate < 1e-5 } else { v.env.stage == IDLE };
                 if done {
                     v.active = false;
@@ -414,8 +424,9 @@ impl Juno {
 }
 
 #[inline(always)]
-fn render_voice(v: &mut Voice, s: &Setup, left: &mut [f32], right: &mut [f32]) {
+fn render_voice(v: &mut Voice, s: &Setup, shape: &EnvShape, left: &mut [f32], right: &mut [f32]) {
     let (attack, decay, release) = ((s.attack / v.time).min(1.), (s.decay / v.time).min(1.), (s.release / v.time).min(1.));
+    let rate = shape.rates(attack, decay, release, true);
     let gate_to = if v.down || v.held { 1. } else { 0. };
     let (pl, pr) = v.pan;
     for i in 0..left.len() {
@@ -447,7 +458,7 @@ fn render_voice(v: &mut Voice, s: &Setup, left: &mut [f32], right: &mut [f32]) {
         };
         // a whisper of noise lets a fully resonant filter start singing on its own
         let y = v.ladder.tick(x + 1e-5 * noise, v.g, v.k);
-        let e = v.env.tick_linear(attack, decay, s.sustain, release);
+        let e = v.env.run(shape, &rate, attack, decay, s.sustain, release, true);
         let amp = if s.gate {
             v.gate += (gate_to - v.gate) * s.gate_k;
             v.gate

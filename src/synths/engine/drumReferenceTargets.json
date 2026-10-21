@@ -1,0 +1,237 @@
+{
+  "source": "Roland50.studio targets identified against the supplied 606/808/909 videos. Audio-free measurements; fixed demo settings, not hardware parameter-law claims. See docs/SYNTHS_DRUM_VOICING.md.",
+  "voices": [
+    {
+      "model": "tr808",
+      "track": 0,
+      "key": "bd",
+      "t20Seconds": 0.6325,
+      "centroidHz": 52,
+      "attackToKickDb": 0.0
+    },
+    {
+      "model": "tr808",
+      "track": 1,
+      "key": "sd",
+      "t20Seconds": 0.0625,
+      "centroidHz": 2539,
+      "attackToKickDb": -13.126
+    },
+    {
+      "model": "tr808",
+      "track": 2,
+      "key": "lt",
+      "t20Seconds": 0.2075,
+      "centroidHz": 89,
+      "attackToKickDb": -3.418
+    },
+    {
+      "model": "tr808",
+      "track": 3,
+      "key": "mt",
+      "t20Seconds": 0.1275,
+      "centroidHz": 136,
+      "attackToKickDb": -4.467
+    },
+    {
+      "model": "tr808",
+      "track": 4,
+      "key": "ht",
+      "t20Seconds": 0.1025,
+      "centroidHz": 188,
+      "attackToKickDb": -4.227
+    },
+    {
+      "model": "tr808",
+      "track": 8,
+      "key": "rs",
+      "t20Seconds": 0.0075,
+      "centroidHz": 921,
+      "attackToKickDb": -15.073
+    },
+    {
+      "model": "tr808",
+      "track": 10,
+      "key": "cp",
+      "t20Seconds": 0.0875,
+      "centroidHz": 2145,
+      "attackToKickDb": -10.93
+    },
+    {
+      "model": "tr808",
+      "track": 12,
+      "key": "cb",
+      "t20Seconds": 0.0975,
+      "centroidHz": 866,
+      "attackToKickDb": -10.137
+    },
+    {
+      "model": "tr808",
+      "track": 13,
+      "key": "cy",
+      "t20Seconds": 0.6225,
+      "centroidHz": 7506,
+      "attackToKickDb": -8.015
+    },
+    {
+      "model": "tr808",
+      "track": 14,
+      "key": "oh",
+      "t20Seconds": 0.3375,
+      "centroidHz": 8002,
+      "attackToKickDb": -6.974
+    },
+    {
+      "model": "tr808",
+      "track": 15,
+      "key": "ch",
+      "t20Seconds": 0.0425,
+      "centroidHz": 10841,
+      "attackToKickDb": -18.376
+    },
+    {
+      "model": "tr606",
+      "track": 0,
+      "key": "bd",
+      "t20Seconds": 0.0775,
+      "centroidHz": 57,
+      "attackToKickDb": 0.0
+    },
+    {
+      "model": "tr606",
+      "track": 1,
+      "key": "sd",
+      "t20Seconds": 0.0575,
+      "centroidHz": 3451,
+      "attackToKickDb": -2.539
+    },
+    {
+      "model": "tr606",
+      "track": 2,
+      "key": "lt",
+      "t20Seconds": 0.1275,
+      "centroidHz": 131,
+      "attackToKickDb": 2.148
+    },
+    {
+      "model": "tr606",
+      "track": 3,
+      "key": "ht",
+      "t20Seconds": 0.0825,
+      "centroidHz": 206,
+      "attackToKickDb": 3.023
+    },
+    {
+      "model": "tr606",
+      "track": 6,
+      "key": "cy",
+      "t20Seconds": 0.2925,
+      "centroidHz": 7108,
+      "attackToKickDb": -0.324
+    },
+    {
+      "model": "tr606",
+      "track": 5,
+      "key": "oh",
+      "t20Seconds": 0.5125,
+      "centroidHz": 8414,
+      "attackToKickDb": 2.17
+    },
+    {
+      "model": "tr606",
+      "track": 4,
+      "key": "ch",
+      "t20Seconds": 0.0425,
+      "centroidHz": 8491,
+      "attackToKickDb": -0.583
+    },
+    {
+      "model": "tr909",
+      "track": 0,
+      "key": "bd",
+      "t20Seconds": 0.1675,
+      "centroidHz": 57,
+      "attackToKickDb": 0.0
+    },
+    {
+      "model": "tr909",
+      "track": 1,
+      "key": "sd",
+      "t20Seconds": 0.0925,
+      "centroidHz": 4947,
+      "attackToKickDb": -4.649
+    },
+    {
+      "model": "tr909",
+      "track": 2,
+      "key": "lt",
+      "t20Seconds": 0.2825,
+      "centroidHz": 91,
+      "attackToKickDb": 0.625
+    },
+    {
+      "model": "tr909",
+      "track": 3,
+      "key": "mt",
+      "t20Seconds": 0.1875,
+      "centroidHz": 117,
+      "attackToKickDb": 0.076
+    },
+    {
+      "model": "tr909",
+      "track": 4,
+      "key": "ht",
+      "t20Seconds": 0.1975,
+      "centroidHz": 156,
+      "attackToKickDb": 0.103
+    },
+    {
+      "model": "tr909",
+      "track": 5,
+      "key": "rs",
+      "t20Seconds": 0.0225,
+      "centroidHz": 265,
+      "attackToKickDb": -5.287
+    },
+    {
+      "model": "tr909",
+      "track": 6,
+      "key": "cp",
+      "t20Seconds": 0.0975,
+      "centroidHz": 2364,
+      "attackToKickDb": -7.082
+    },
+    {
+      "model": "tr909",
+      "track": 7,
+      "key": "ch",
+      "t20Seconds": 0.0825,
+      "centroidHz": 7671,
+      "attackToKickDb": -21.011
+    },
+    {
+      "model": "tr909",
+      "track": 8,
+      "key": "oh",
+      "t20Seconds": 0.1975,
+      "centroidHz": 6987,
+      "attackToKickDb": -18.212
+    },
+    {
+      "model": "tr909",
+      "track": 9,
+      "key": "cr",
+      "t20Seconds": 0.7125,
+      "centroidHz": 6629,
+      "attackToKickDb": -15.463
+    },
+    {
+      "model": "tr909",
+      "track": 10,
+      "key": "rd",
+      "t20Seconds": 0.5975,
+      "centroidHz": 8287,
+      "attackToKickDb": -16.963
+    }
+  ]
+}

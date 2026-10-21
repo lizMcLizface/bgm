@@ -1,5 +1,5 @@
 // @vitest-environment node
-import {findTrigger,levels,pitchOf,noteName,fft,spectrumDb,spectralPeak,wavBytes} from './scopeMath';
+import {findTrigger,levels,pitchOf,noteName,fft,spectrumDb,spectrumTrace,spectralPeak,wavBytes} from './scopeMath';
 
 const sine=(hz,n,sr=48000,amp=1)=>Float32Array.from({length:n},(_,i)=>amp*Math.sin(2*Math.PI*hz*i/sr+.01));
 
@@ -42,4 +42,24 @@ test('WAV bytes have a valid header and the samples',()=>{
  const b=wavBytes(Float32Array.from([0,.5,-.5,1,-1,2]),44100),v=new DataView(b.buffer);
  expect(String.fromCharCode(...b.slice(0,4))).toBe('RIFF');expect(v.getUint32(24,true)).toBe(44100);expect(v.getUint32(40,true)).toBe(12);
  expect(v.getInt16(46,true)).toBe(16384);expect(v.getInt16(54,true)).toBe(32767); // 2 is clipped to full scale
+});
+
+test('a descending spectrum has no false spikes where log pixels cross FFT bin boundaries',()=>{
+ const bins=Float32Array.from({length:4096},(_,k)=>-k*.2);
+ for(const width of [390,1800,3035]){
+  const trace=spectrumTrace(bins,48000,width);
+  for(let i=1;i<trace.length;i++)expect(trace[i]).toBeLessThanOrEqual(trace[i-1]+1e-5);
+ }
+});
+
+test('the display preserves an isolated high-frequency peak when many bins share a pixel',()=>{
+ const bins=new Float32Array(4096).fill(-100);bins[3000]=-12;
+ expect(Math.max(...spectrumTrace(bins,48000,390))).toBe(-12);
+ // A pure sine has the same bounded interpolated low-frequency envelope at
+ // every display width; drawing introduces no additional bin-boundary peaks.
+ const db=spectrumDb(sine(99.3,8192,48000,.2));
+ for(const width of [390,1800]){
+  const trace=spectrumTrace(db,48000,width,115,180);
+  for(let i=1;i<trace.length;i++)expect(trace[i]).toBeLessThanOrEqual(trace[i-1]+1e-4);
+ }
 });

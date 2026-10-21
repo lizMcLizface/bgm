@@ -17,8 +17,8 @@ const ROWS=[
   {title:'Filter',tone:'red',keys:['cutoff','emphasis','contour',['kbdThird','Kbd ⅓'],['kbdTwoThirds','Kbd ⅔']]},
  ],
  [
-  {title:'Filter contour',tone:'amber',keys:[['fAttack','A'],['fDecay','D'],['fSustain','S']]},
-  {title:'Loudness contour',tone:'amber',keys:[['aAttack','A'],['aDecay','D'],['aSustain','S'],['decayOn','Decay']]},
+  {title:'Filter contour',tone:'amber',keys:[['fAttack','A'],['fDecay','D'],['fSustain','S']],shape:{env:'filter',a:'fAttack',d:'fDecay',s:'fSustain',r:v=>v.decayOn>=.5?v.fDecay:.012}},
+  {title:'Loudness contour',tone:'amber',keys:[['aAttack','A'],['aDecay','D'],['aSustain','S'],['decayOn','Decay']],shape:{env:'amp',a:'aAttack',d:'aDecay',s:'aSustain',r:v=>v.decayOn>=.5?v.aDecay:.012}},
   {title:'Touch (additions)',tone:'violet',keys:[['velContour','Vel → contour'],['velLevel','Vel → level'],['afterFilter','Touch → filter']]},
   {title:'Output',tone:'blue',keys:['volume',['oversample','2× rate']]},
   {title:'Reverb',tone:'blue',keys:['reverbMix','reverbDecay','reverbTone','reverbSize','reverbPredelay']},

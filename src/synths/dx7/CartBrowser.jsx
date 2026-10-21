@@ -34,7 +34,7 @@ export default function CartBrowser({current,choose,values}){
  };
  const accept=(bytes,name)=>{
   const next=readCart(bytes,name);
-  if(!next){setMessage('No DX7 voices found in that file.');return;}
+  if(!next){setMessage('No DX7-format voices found in that file.');return;}
   save(BANK_KEY,{name,data:toBase64(bytes)});setCart(next);setCursor(0);
   const bad=next.voices.filter(v=>!v.checksumOk).length;
   setMessage(`Loaded ${next.voices.length} voice${next.voices.length>1?'s':''} from ${name}`+(bad?` (${bad} with a bad checksum)`:'')+'.');
@@ -53,9 +53,9 @@ export default function CartBrowser({current,choose,values}){
   {message&&<span className="bank-message" role="status">{message}</span>}
  </span>;
  if(!cart)return <div className="bank empty">
-  <span className="bank-title">DX7 cartridge</span>
+  <span className="bank-title">FM7 cartridge</span>
   {importer}
-  <span className="bank-hint">Load a DX7 SysEx file: a ROM cartridge, a 32-voice dump or a single voice. It stays in this browser.</span>
+  <span className="bank-hint">Load a SysEx file in the DX7 format: a ROM cartridge, a 32-voice dump or a single voice. It stays in this browser.</span>
  </div>;
  const voice=cart.voices[index],count=cart.voices.length;
  const bank=Math.floor(index/8),num=index%8,banks=Math.ceil(count/8);

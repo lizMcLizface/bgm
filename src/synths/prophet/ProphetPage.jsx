@@ -19,14 +19,14 @@ const ROWS=[
   {title:'Velocity · touch',tone:'violet',keys:[['velFilter','Vel → filt'],['velAmp','Vel → amp'],['afterFilter','Touch → filt'],['afterAmp','Touch → amp'],['bendRange','Bend']]},
  ],
  [
-  {title:'Filter',tone:'red',keys:['cutoff','res',['fEnv','Env amt'],['track','Kybd'],['filterRev','Rev'],['fAttack','A'],['fDecay','D'],['fSustain','S'],['fRelease','R']]},
-  {title:'Amplifier',tone:'amber',keys:[['aAttack','A'],['aDecay','D'],['aSustain','S'],['aRelease','R'],'release']},
+  {title:'Filter',tone:'red',keys:['cutoff','res',['fEnv','Env amt'],['track','Kybd'],['filterRev','Rev'],['fAttack','A'],['fDecay','D'],['fSustain','S'],['fRelease','R']],shape:{env:'filter',a:'fAttack',d:'fDecay',s:'fSustain',r:'fRelease'}},
+  {title:'Amplifier',tone:'amber',keys:[['aAttack','A'],['aDecay','D'],['aSustain','S'],['aRelease','R'],'release'],shape:{env:'amp',a:'aAttack',d:'aDecay',s:'aSustain',r:'aRelease'}},
   {title:'Character',tone:'amber',keys:['vintage','volume','voices','width',['oversample','2× rate']]},
   {title:'Reverb',tone:'blue',keys:['reverbMix','reverbDecay','reverbTone','reverbSize','reverbPredelay']},
  ],
 ];
 
-const LIBRARIES=[{id:'bank',label:'P5 programs',render:({choose,current})=><BankBrowser choose={choose} current={current}/>}];
+const LIBRARIES=[{id:'bank',label:'Programs',render:({choose,current})=><BankBrowser choose={choose} current={current}/>}];
 
 export default function ProphetPage(){
  return <SynthShell synth={SYNTHS.prophet5} className="prophet" panelClassName="complete" libraries={LIBRARIES}>

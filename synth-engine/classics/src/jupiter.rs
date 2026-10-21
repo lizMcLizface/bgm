@@ -218,6 +218,8 @@ pub struct Jupiter {
     soft: f32,
     pedal: bool,
     pub steals: u32,
+    shape_p: [f32; SHAPE_PARAMS],
+    shapes: [EnvShape; 2],
 }
 
 impl Jupiter {
@@ -228,7 +230,7 @@ impl Jupiter {
             arp_on: false, arp_keys: KeyStack::EMPTY, arp_down: 0, arp_phase: 0., arp_step: 0, arp_sounding: false,
             arp_velocity: 0.8, arp_rng: Rng(0x510e_527f), dec: [HalfBand::ZERO; 2], limit: VOICES, bend_to: 0., bend: 0., pressure: 0.,
             modulation: 0., modulation_s: 0., expression: 1., expression_s: 1., brightness: 0., soft: 0., pedal: false,
-            steals: 0,
+            steals: 0, shape_p: [0.; SHAPE_PARAMS], shapes: [EnvShape::NATIVE; 2],
         }
     }
 
@@ -250,6 +252,12 @@ impl Jupiter {
             v.o1.phase = 0.5 + 0.5 * rng.next();
             v.o2.phase = 0.5 + 0.5 * rng.next();
         }
+    }
+
+    /// Envelope shapes: amplitude 0–7, filter 8–15 (see [`EnvShape`]).
+    pub fn set_shape(&mut self, i: usize, value: f32) {
+        self.shape_p[i] = value;
+        self.dirty = true;
     }
 
     pub fn set(&mut self, i: usize, value: f32) {
@@ -563,6 +571,7 @@ impl Jupiter {
             self.assign = assign;
             self.arp_on = arp;
         }
+        self.shapes = [EnvShape::new(&self.shape_p[..SHAPE_PER_ENV], srv), EnvShape::new(&self.shape_p[SHAPE_PER_ENV..], srv)];
         self.dirty = false;
     }
 
@@ -737,9 +746,9 @@ impl Jupiter {
             let len = m * s.os;
             for v in self.voices.iter_mut().filter(|v| v.active) {
                 if s.os == 2 {
-                    render_voice(v, &s, &mut l2[..len], &mut r2[..len]);
+                    render_voice(v, &s, &self.shapes, &mut l2[..len], &mut r2[..len]);
                 } else {
-                    render_voice(v, &s, &mut left[at..at + m], &mut right[at..at + m]);
+                    render_voice(v, &s, &self.shapes, &mut left[at..at + m], &mut right[at..at + m]);
                 }
                 if v.e2.stage == IDLE {
                     v.active = false;
@@ -803,6 +812,12 @@ impl Jupiter8 {
         let share = if self.mode == key_mode::WHOLE { VOICES } else { (pool + 1) / 2 };
         self.upper.limit = share;
         self.lower.limit = share;
+    }
+
+    /// One set of envelope shapes for both layers.
+    pub fn set_shape(&mut self, i: usize, value: f32) {
+        self.upper.set_shape(i, value);
+        self.lower.set_shape(i, value);
     }
 
     pub fn set(&mut self, i: usize, value: f32) {
@@ -889,12 +904,13 @@ impl Jupiter8 {
 }
 
 #[inline(always)]
-fn render_voice(v: &mut Voice, s: &Setup, left: &mut [f32], right: &mut [f32]) {
+fn render_voice(v: &mut Voice, s: &Setup, shapes: &[EnvShape; 2], left: &mut [f32], right: &mut [f32]) {
     let c = |x: f32, k: f32| (x * k).min(1.);
     let [a1, d1, s1, r1] = s.e1;
     let [a2, d2, s2, r2] = s.e2;
     let (a1, d1, r1) = (c(a1, v.k1), c(d1, v.k1), c(r1, v.k1));
     let (a2, d2, r2) = (c(a2, v.k2), c(d2, v.k2), c(r2, v.k2));
+    let (rf, ra) = (shapes[1].rates(a1, d1, r1, false), shapes[0].rates(a2, d2, r2, false));
     let (pl, pr) = v.pan;
     for i in 0..left.len() {
         v.dt1 += v.dt1_d;
@@ -914,8 +930,8 @@ fn render_voice(v: &mut Voice, s: &Setup, left: &mut [f32], right: &mut [f32]) {
         v.hp += (x - v.hp) * s.hp_a;
         x -= v.hp;
         let (y2, y4) = v.ladder.taps(x + 1e-5 * noise, v.g, v.k);
-        v.e1.tick(a1, d1, s1, r1);
-        let e = v.e2.tick(a2, d2, s2, r2);
+        v.e1.run(&shapes[1], &rf, a1, d1, s1, r1, false);
+        let e = v.e2.run(&shapes[0], &ra, a2, d2, s2, r2, false);
         let o = if s.two_pole { y2 } else { y4 } * e * v.gain;
         let o = o * v.onset.tick();
         left[i] += o * pl;

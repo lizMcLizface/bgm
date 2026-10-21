@@ -1,0 +1,473 @@
+{
+  "date": "2026-10-20",
+  "source": "Roland50.studio comparison targets, identified against the user Videos/606.mp4, 808.mp4 and 909.mp4 recordings. Public demo MP3s are used only as local measurement references. The 808 kick file is bd1075, other 808 tunable voices use the 50/5050 variants; these are fixed recorded settings, not guaranteed universal midpoint hardware settings. The 909 reference uses the default .5 control (index 8 of 18 recordings, OH index 8 at 12 s); tuning is unchanged. 606 uses its standard rows, not the added FX/weak variants. No reference samples are used by the engine or deployed.",
+  "method": "Dry, centre controls; 5 ms RMS envelope relative to hit peak; T20 = last bin at or above -20 dB. Independent oscillator phases are not treated as an error. Files are padded with silence after sample playback finishes.",
+  "kernelBeforeSha256": "9cf44ca90d187026655a3073663e98fc328cfbcdcf4d9f777e848fd0fc4072aa",
+  "kernelAfterSha256": "51d7a91b784319f1e6174cdd53ca088d3740d43fa89a2e81523228bb048aff9e",
+  "recordingHashes": {
+    "606": "17661813bac4bec33de8158c36c9aa607fefef402ef32c895082545d15a4e96d",
+    "808": "15ed78a33b3d4ef5d523b252cbd23472b5abf4f7551b8905027786e3e44beb60",
+    "909": "7b0c3207d5407fb138f4c4f7466f7b23c003a33eda504ce9011ed0f4131416ff"
+  },
+  "kicks": [
+    {
+      "model": "tr808",
+      "targetT20Seconds": 0.6325,
+      "beforeT20Seconds": 1.1125,
+      "afterT20Seconds": 0.6225,
+      "targetLateToAttackDb": -1.1760113569723412,
+      "beforeLateToAttackDb": 1.9889250167281136,
+      "afterLateToAttackDb": -0.05167854074017218
+    },
+    {
+      "model": "tr606",
+      "targetT20Seconds": 0.0775,
+      "beforeT20Seconds": 0.5325,
+      "afterT20Seconds": 0.0825,
+      "targetLateToAttackDb": -23.148119516320747,
+      "beforeLateToAttackDb": -1.613404364320028,
+      "afterLateToAttackDb": -27.995493243045555
+    },
+    {
+      "model": "tr909",
+      "targetT20Seconds": 0.1675,
+      "beforeT20Seconds": 1.0225,
+      "afterT20Seconds": 0.1775,
+      "targetLateToAttackDb": -11.31748519789336,
+      "beforeLateToAttackDb": 1.9000178640858467,
+      "afterLateToAttackDb": -12.16487773521803
+    }
+  ],
+  "recordingSourceAlignments": [
+    {
+      "model": "808",
+      "track": "bd",
+      "startSeconds": 1.582,
+      "correlation": 0.999994,
+      "gainDb": -4.95
+    },
+    {
+      "model": "808",
+      "track": "sd",
+      "startSeconds": 2.082,
+      "correlation": 0.731255,
+      "gainDb": -4.75
+    },
+    {
+      "model": "808",
+      "track": "lt",
+      "startSeconds": 2.582,
+      "correlation": 0.998022,
+      "gainDb": -4.5
+    },
+    {
+      "model": "808",
+      "track": "mt",
+      "startSeconds": 3.081979,
+      "correlation": 0.998879,
+      "gainDb": -5.06
+    },
+    {
+      "model": "808",
+      "track": "ht",
+      "startSeconds": 3.582,
+      "correlation": 0.998968,
+      "gainDb": -4.8
+    },
+    {
+      "model": "808",
+      "track": "rs",
+      "startSeconds": 4.082,
+      "correlation": 0.998003,
+      "gainDb": -5.03
+    },
+    {
+      "model": "808",
+      "track": "cp",
+      "startSeconds": 4.582,
+      "correlation": 0.997586,
+      "gainDb": -4.97
+    },
+    {
+      "model": "808",
+      "track": "cb",
+      "startSeconds": 5.082,
+      "correlation": 0.998213,
+      "gainDb": -4.9
+    },
+    {
+      "model": "808",
+      "track": "cy",
+      "startSeconds": 5.582,
+      "correlation": 0.99687,
+      "gainDb": -5.01
+    },
+    {
+      "model": "808",
+      "track": "oh",
+      "startSeconds": 6.082,
+      "correlation": 0.987989,
+      "gainDb": -5.09
+    },
+    {
+      "model": "808",
+      "track": "ch",
+      "startSeconds": 6.582,
+      "correlation": 0.948701,
+      "gainDb": -5.26
+    },
+    {
+      "model": "606",
+      "track": "bd",
+      "startSeconds": 0.852,
+      "correlation": 0.999999,
+      "gainDb": 0
+    },
+    {
+      "model": "606",
+      "track": "sd",
+      "startSeconds": 1.852,
+      "correlation": 0.997055,
+      "gainDb": -0.03
+    },
+    {
+      "model": "606",
+      "track": "ht",
+      "startSeconds": 2.852,
+      "correlation": 0.99817,
+      "gainDb": 0.04
+    },
+    {
+      "model": "606",
+      "track": "lt",
+      "startSeconds": 3.852,
+      "correlation": 0.998218,
+      "gainDb": 0.03
+    },
+    {
+      "model": "606",
+      "track": "cy",
+      "startSeconds": 4.852,
+      "correlation": 0.996416,
+      "gainDb": -0.08
+    },
+    {
+      "model": "606",
+      "track": "oh",
+      "startSeconds": 5.352,
+      "correlation": 0.992969,
+      "gainDb": -0.07
+    },
+    {
+      "model": "606",
+      "track": "ch",
+      "startSeconds": 5.852,
+      "correlation": 0.986946,
+      "gainDb": -0.37
+    },
+    {
+      "model": "909",
+      "track": "bd",
+      "startSeconds": 0.774,
+      "correlation": 0.999994,
+      "gainDb": 2.14
+    },
+    {
+      "model": "909",
+      "track": "sd",
+      "startSeconds": 1.274,
+      "correlation": 0.997584,
+      "gainDb": 2.23
+    },
+    {
+      "model": "909",
+      "track": "lt",
+      "startSeconds": 1.774,
+      "correlation": 0.998594,
+      "gainDb": 2.39
+    },
+    {
+      "model": "909",
+      "track": "mt",
+      "startSeconds": 2.274,
+      "correlation": 0.997637,
+      "gainDb": 2.12
+    },
+    {
+      "model": "909",
+      "track": "ht",
+      "startSeconds": 2.774,
+      "correlation": 0.998359,
+      "gainDb": 2.18
+    },
+    {
+      "model": "909",
+      "track": "rs",
+      "startSeconds": 3.274,
+      "correlation": 0.997778,
+      "gainDb": 2.22
+    },
+    {
+      "model": "909",
+      "track": "cp",
+      "startSeconds": 3.774,
+      "correlation": 0.997357,
+      "gainDb": 2.13
+    },
+    {
+      "model": "909",
+      "track": "ch",
+      "startSeconds": 4.274,
+      "correlation": 0.991819,
+      "gainDb": 2
+    },
+    {
+      "model": "909",
+      "track": "oh",
+      "startSeconds": 4.774,
+      "correlation": 0.994703,
+      "gainDb": 2.02
+    },
+    {
+      "model": "909",
+      "track": "cr",
+      "startSeconds": 5.274,
+      "correlation": 0.997649,
+      "gainDb": 2.07
+    },
+    {
+      "model": "909",
+      "track": "rd",
+      "startSeconds": 5.774,
+      "correlation": 0.953774,
+      "gainDb": 2.02
+    }
+  ],
+  "remainingVoiceComparisons": [
+    {
+      "model": "tr808",
+      "track": "sd",
+      "referenceT20Seconds": 0.0625,
+      "candidateT20Seconds": 0.2175,
+      "referenceSpectralCentroidHz": 2539.3,
+      "candidateSpectralCentroidHz": 1359.8
+    },
+    {
+      "model": "tr808",
+      "track": "lt",
+      "referenceT20Seconds": 0.2075,
+      "candidateT20Seconds": 0.7875,
+      "referenceSpectralCentroidHz": 89.2,
+      "candidateSpectralCentroidHz": 87.6
+    },
+    {
+      "model": "tr808",
+      "track": "mt",
+      "referenceT20Seconds": 0.1275,
+      "candidateT20Seconds": 0.5925,
+      "referenceSpectralCentroidHz": 136.1,
+      "candidateSpectralCentroidHz": 129.7
+    },
+    {
+      "model": "tr808",
+      "track": "ht",
+      "referenceT20Seconds": 0.1025,
+      "candidateT20Seconds": 0.4475,
+      "referenceSpectralCentroidHz": 188.5,
+      "candidateSpectralCentroidHz": 187.3
+    },
+    {
+      "model": "tr808",
+      "track": "rs",
+      "referenceT20Seconds": 0.0075,
+      "candidateT20Seconds": 0.0175,
+      "referenceSpectralCentroidHz": 847.6,
+      "candidateSpectralCentroidHz": 1123.6
+    },
+    {
+      "model": "tr808",
+      "track": "cp",
+      "referenceT20Seconds": 0.0875,
+      "candidateT20Seconds": 0.2425,
+      "referenceSpectralCentroidHz": 2145.2,
+      "candidateSpectralCentroidHz": 1827
+    },
+    {
+      "model": "tr808",
+      "track": "cb",
+      "referenceT20Seconds": 0.0975,
+      "candidateT20Seconds": 0.2675,
+      "referenceSpectralCentroidHz": 866.4,
+      "candidateSpectralCentroidHz": 1952.9
+    },
+    {
+      "model": "tr808",
+      "track": "cy",
+      "referenceT20Seconds": 0.6225,
+      "candidateT20Seconds": 1.7375,
+      "referenceSpectralCentroidHz": 7505.8,
+      "candidateSpectralCentroidHz": 6980.7
+    },
+    {
+      "model": "tr808",
+      "track": "oh",
+      "referenceT20Seconds": 0.3375,
+      "candidateT20Seconds": 0.3575,
+      "referenceSpectralCentroidHz": 8001.7,
+      "candidateSpectralCentroidHz": 6298.8
+    },
+    {
+      "model": "tr808",
+      "track": "ch",
+      "referenceT20Seconds": 0.0425,
+      "candidateT20Seconds": 0.0625,
+      "referenceSpectralCentroidHz": 10841.3,
+      "candidateSpectralCentroidHz": 6361.1
+    },
+    {
+      "model": "tr606",
+      "track": "sd",
+      "referenceT20Seconds": 0.0575,
+      "candidateT20Seconds": 0.2175,
+      "referenceSpectralCentroidHz": 3451.4,
+      "candidateSpectralCentroidHz": 2183.5
+    },
+    {
+      "model": "tr606",
+      "track": "lt",
+      "referenceT20Seconds": 0.1275,
+      "candidateT20Seconds": 0.5225,
+      "referenceSpectralCentroidHz": 130.7,
+      "candidateSpectralCentroidHz": 115.3
+    },
+    {
+      "model": "tr606",
+      "track": "ht",
+      "referenceT20Seconds": 0.0825,
+      "candidateT20Seconds": 0.3975,
+      "referenceSpectralCentroidHz": 205.6,
+      "candidateSpectralCentroidHz": 200.6
+    },
+    {
+      "model": "tr606",
+      "track": "cy",
+      "referenceT20Seconds": 0.2925,
+      "candidateT20Seconds": 1.2925,
+      "referenceSpectralCentroidHz": 7107.5,
+      "candidateSpectralCentroidHz": 7235.8
+    },
+    {
+      "model": "tr606",
+      "track": "oh",
+      "referenceT20Seconds": 0.5125,
+      "candidateT20Seconds": 0.3175,
+      "referenceSpectralCentroidHz": 8413.7,
+      "candidateSpectralCentroidHz": 6660.6
+    },
+    {
+      "model": "tr606",
+      "track": "ch",
+      "referenceT20Seconds": 0.0425,
+      "candidateT20Seconds": 0.0675,
+      "referenceSpectralCentroidHz": 8490.9,
+      "candidateSpectralCentroidHz": 6704.8
+    },
+    {
+      "model": "tr909",
+      "track": "sd",
+      "referenceT20Seconds": 0.0925,
+      "candidateT20Seconds": 0.3525,
+      "referenceSpectralCentroidHz": 4947,
+      "candidateSpectralCentroidHz": 2860.5
+    },
+    {
+      "model": "tr909",
+      "track": "lt",
+      "referenceT20Seconds": 0.2825,
+      "candidateT20Seconds": 0.9025,
+      "referenceSpectralCentroidHz": 91,
+      "candidateSpectralCentroidHz": 102.1
+    },
+    {
+      "model": "tr909",
+      "track": "mt",
+      "referenceT20Seconds": 0.1875,
+      "candidateT20Seconds": 0.7025,
+      "referenceSpectralCentroidHz": 116.7,
+      "candidateSpectralCentroidHz": 154.7
+    },
+    {
+      "model": "tr909",
+      "track": "ht",
+      "referenceT20Seconds": 0.1975,
+      "candidateT20Seconds": 0.5275,
+      "referenceSpectralCentroidHz": 155.7,
+      "candidateSpectralCentroidHz": 232.6
+    },
+    {
+      "model": "tr909",
+      "track": "rs",
+      "referenceT20Seconds": 0.0225,
+      "candidateT20Seconds": 0.0175,
+      "referenceSpectralCentroidHz": 264.8,
+      "candidateSpectralCentroidHz": 1256
+    },
+    {
+      "model": "tr909",
+      "track": "cp",
+      "referenceT20Seconds": 0.0975,
+      "candidateT20Seconds": 0.3575,
+      "referenceSpectralCentroidHz": 2363.7,
+      "candidateSpectralCentroidHz": 1968
+    },
+    {
+      "model": "tr909",
+      "track": "ch",
+      "referenceT20Seconds": 0.0825,
+      "candidateT20Seconds": 0.0775,
+      "referenceSpectralCentroidHz": 7671.1,
+      "candidateSpectralCentroidHz": 12803
+    },
+    {
+      "model": "tr909",
+      "track": "oh",
+      "referenceT20Seconds": 0.1975,
+      "candidateT20Seconds": 0.4625,
+      "referenceSpectralCentroidHz": 6987.2,
+      "candidateSpectralCentroidHz": 13029.5
+    },
+    {
+      "model": "tr909",
+      "track": "cr",
+      "referenceT20Seconds": 0.7125,
+      "candidateT20Seconds": 2.9975,
+      "referenceSpectralCentroidHz": 6628.6,
+      "candidateSpectralCentroidHz": 14818.9
+    },
+    {
+      "model": "tr909",
+      "track": "rd",
+      "referenceT20Seconds": 0.5975,
+      "candidateT20Seconds": 1.5475,
+      "referenceSpectralCentroidHz": 8287.2,
+      "candidateSpectralCentroidHz": 14679.4
+    }
+  ],
+  "deepVerification": [
+    {
+      "model": "tr808",
+      "originalPcmIdentical": true,
+      "sha256": "2f9d6fda0f1055d7147e154f385e61a77365ed9952a3738105c41a2eea60011c"
+    },
+    {
+      "model": "tr909",
+      "originalPcmIdentical": true,
+      "sha256": "db077e559b6b6cfd4e5705426c9036f27e8b89719964607e631c5fc7f5333cc2"
+    },
+    {
+      "model": "tr606",
+      "originalPcmIdentical": true,
+      "sha256": "1753b4ea364680f1e45bdc0508ee134582a5c839267f91a3a201381754fad775"
+    }
+  ]
+}

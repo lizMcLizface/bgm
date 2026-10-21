@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import {createOfflineSynth,MODELS,rms,peak,brightness,pitchHz} from './offline';
 import {PARAMS,BY_KEY,defaultValues,toPairs,sanitize} from '../juno/params';
 import {PRESETS} from '../juno/presets';
+import {BOOK_SOUNDS} from '../juno/bookPresets';
 
 const module=new WebAssembly.Module(fs.readFileSync('public/synths/classics.wasm'));
 const synth=(values={},sampleRate=48000)=>createOfflineSynth(module,{sampleRate,model:MODELS.juno,params:toPairs(sanitize(values))});
@@ -14,7 +15,7 @@ const CONTROL={bend:0,pressure:1,sustain:5};
 test('the Juno table fits the kernel ABI with unique ids and in-range defaults',()=>{
  const k=synth().k;expect(k.syn_param_count()).toBe(48);
  const ids=PARAMS.map(p=>p.id);expect(new Set(ids).size).toBe(ids.length);
- for(const p of PARAMS){expect(p.id<48||(p.id>=200&&p.id<216)).toBe(true);expect(p.default).toBeGreaterThanOrEqual(p.min);expect(p.default).toBeLessThanOrEqual(p.max);}
+ for(const p of PARAMS){expect(p.id<48||(p.id>=180&&p.id<196)||(p.id>=200&&p.id<216)).toBe(true);expect(p.default).toBeGreaterThanOrEqual(p.min);expect(p.default).toBeLessThanOrEqual(p.max);}
  expect(BY_KEY.chorus.options).toEqual(['Off','I','II','I+II']);
 });
 
@@ -81,7 +82,8 @@ test('every Juno sound stays finite and below full scale under extreme playing',
 });
 
 test('Juno sounds are distinct, use known keys and sit within a few dB of each other',()=>{
- const levels=PRESETS.map(p=>{const s=synth(p.values);[48,55,60,64,67].forEach((n,i)=>s.k.syn_note_on(i+1,n,.7));return 20*Math.log10(rms(s.seconds(1.5)[0]));});
+ // the hand-made sounds; the patch-book ones are checked in derivedSounds.test.js
+ const levels=PRESETS.slice(0,PRESETS.length-BOOK_SOUNDS.length).map(p=>{const s=synth(p.values);[48,55,60,64,67].forEach((n,i)=>s.k.syn_note_on(i+1,n,.7));return 20*Math.log10(rms(s.seconds(1.5)[0]));});
  expect(Math.max(...levels)-Math.min(...levels)).toBeLessThan(8);
  expect(new Set(PRESETS.map(p=>JSON.stringify(p.values))).size).toBe(PRESETS.length);
  for(const p of PRESETS)expect(Object.keys(p.values).sort()).toEqual(Object.keys(defaultValues()).sort());

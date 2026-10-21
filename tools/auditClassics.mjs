@@ -10,6 +10,7 @@ import {builtinWaves} from '../src/synths/vs/waves.js';
 const module=new WebAssembly.Module(fs.readFileSync('public/synths/classics.wasm'));
 const arg=name=>{const at=process.argv.indexOf(name);return at>0?process.argv[at+1]:null;};
 const wavDir=arg('--wav'),synth=SYNTHS[arg('--model')??'cs80'];
+if(!Number.isInteger(synth?.model))throw Error('Choose a classics-kernel model; DIY engines use the synth-lab renderers.');
 const {presets:PRESETS,params:{toPairs}}=synth;
 const sr=48000;
 function wav(file,left,right){

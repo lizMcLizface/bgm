@@ -107,6 +107,7 @@ Layers work as on the Jupiter: the **Layer** buttons choose which patch the pane
 | Bass \| Strings, Brass + Strings | split / double | the layers; Double shares the voices 4 + 4 |
 - **Patch book shelf** (loads by itself): groups A, B, AB … D and programs 1–8; it loads into the *selected layer*, so you can build a split from two book programs. Compare with the book's tips and with recordings: A1 Brass Ensemble, A3 Low Strings, B3 High Strings, AB1 Trumpet Ensemble, AC2 Bass I, AB5 Filter Drone, D3 polyphonic portamento. Programs where the drawing is wrong (D3, ACD2) show a "drawing note".
 - Report the units that matter: filter cutoff range, envelope times, the detune amount, the sync-sweep depth (Env → pitch) and whether the 12/24 dB switch sounds right.
+- Filter correction (20 Oct): the two-pole mode now uses its own SVF, and neither mode self-oscillates. Check resonant sweeps with oscillator/noise input; a silent mixer should stay silent. Resonance taper and saturation remain estimates. See [matching workflow](SYNTHS_MATCHING.md).
 - Known gaps: no chord/hold, no programmer memory, 8 voices maximum (4 per layer in Double/Split).
 
 ## Minimoog (`/synths/minimoog/`, built 20 Oct, never heard)

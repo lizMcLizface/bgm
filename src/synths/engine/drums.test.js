@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import {createOfflineSynth,MODELS,rms,peak} from './offline';
 
 const module=new WebAssembly.Module(fs.readFileSync('public/synths/classics.wasm'));
-const machine=(model,params=[],sr=48000)=>createOfflineSynth(module,{sampleRate:sr,model,params:[[203,0],...params]});
+const machine=(model,params=[],sr=48000)=>createOfflineSynth(module,{sampleRate:sr,model,params:[[203,0],[133,0],...params]});
 const LOOK=2400,FLAM=132,TEMPO=130,SWING=131,ACCENT=129,LEVEL=t=>t*8,DECAY=t=>t*8+2;
 // seq command packing for the drums: pattern << 10 | track << 5 | step (track 16 = the accent row)
 const step=(v,p,t,s,on=1)=>v.seq(1,p<<10|t<<5|s,on);
@@ -22,10 +22,12 @@ test('steps land on their exact frame, whatever the block size',()=>{
 });
 
 test('the output does not depend on the block size',()=>{
- const run=chunk=>{const v=machine(8);v.k.syn_param(TEMPO,140);v.k.syn_param(SWING,.6);for(let s=0;s<16;s+=2){step(v,0,0,s);step(v,0,15,s+1);}step(v,0,1,4);v.seq(0,1);return v.seconds(3,chunk)[0];};
- const a=run(128),b=run(1024);
- let worst=0;for(let i=0;i<a.length;i++)worst=Math.max(worst,Math.abs(a[i]-b[i]));
- expect(worst).toBeLessThan(1e-4);
+ for(const [model,hat]of [[8,15],[9,7],[10,4]]){
+  const run=chunk=>{const v=machine(model);v.k.syn_param(TEMPO,140);v.k.syn_param(SWING,.6);for(let s=0;s<16;s+=2){step(v,0,0,s);step(v,0,hat,s+1);}step(v,0,1,4);v.seq(0,1);return v.seconds(3,chunk)[0];};
+  const a=run(128),b=run(1024);
+  let worst=0;for(let i=0;i<a.length;i++)worst=Math.max(worst,Math.abs(a[i]-b[i]));
+  expect(worst,`gapped hats on model ${model}`).toBeLessThan(1e-4);
+ }
 });
 
 test('swing delays the off-beat 16ths: 66.7% is a triplet shuffle, 50% is straight',()=>{
@@ -116,6 +118,35 @@ test('accent steps have three strengths',()=>{
  const run=level=>{const v=machine(8,[]);v.k.syn_param(129,1);v.k.syn_param(TEMPO,100);step(v,0,5,0);if(level)step(v,0,16,0,level);v.seq(0,1);return peak(v.seconds(.3)[0]);};
  const [none,one,two,three]=[0,1,2,3].map(run);
  expect(one).toBeGreaterThan(none*1.1);expect(two).toBeGreaterThan(one*1.05);expect(three).toBeGreaterThan(two*1.05);
+});
+
+test('accent respects every drum level, including a muted track',()=>{
+ for(const [model,count]of [[8,16],[9,11],[10,7]])for(let track=0;track<count;track++){
+  const v=machine(model,[[LEVEL(track),0],[ACCENT,1]]);step(v,0,track,0);step(v,0,16,0,3);v.seq(0,1);
+  expect(peak(v.seconds(.15)[0]),`model ${model}, track ${track}`).toBe(0);
+ }
+});
+
+test('centre-position kicks have the short per-machine decay measured against the Roland demo targets',()=>{
+ // T20 is measured from 5 ms RMS bins, relative to each hit's peak. This verifies
+ // sustain rather than comparing absolute recording volume or oscillator phase.
+ for(const sr of [44100,48000,96000])for(const [model,lo,hi]of [[8,.52,.78],[9,.12,.23],[10,.055,.13]]){
+  const v=machine(model,[],sr);v.k.syn_note_on(1,36,1);const [x]=v.seconds(1.5),hop=Math.round(sr*.005),bins=[];
+  for(let i=0;i+hop<=x.length;i+=hop)bins.push(rms(x.subarray(i,i+hop)));
+  const threshold=Math.max(...bins)*.1,last=bins.findLastIndex(x=>x>=threshold),t20=(last+.5)*hop/sr;
+  expect(t20,`model ${model} at ${sr} Hz`).toBeGreaterThan(lo);expect(t20).toBeLessThan(hi);
+ }
+});
+
+test('Deep retains the original long kick independently of the other drum settings',()=>{
+ for(const [model,lo,hi]of [[8,1,1.25],[9,.9,1.2],[10,.45,.62]]){
+  const v=machine(model,[[133,1]]);v.k.syn_note_on(1,36,1);const [x]=v.seconds(1.5),bins=[];
+  for(let i=0;i+240<=x.length;i+=240)bins.push(rms(x.subarray(i,i+240)));
+  const threshold=Math.max(...bins)*.1,t20=(bins.findLastIndex(v=>v>=threshold)+.5)*.005;
+  expect(t20).toBeGreaterThan(lo);expect(t20).toBeLessThan(hi);
+  const snare=mode=>{const v=machine(model,[[133,mode]]);v.k.syn_note_on(1,37,1);return v.seconds(.3)[0];};
+  expect(snare(1)).toEqual(snare(0));
+ }
 });
 
 test('each pattern has its own length and its own tempo',()=>{

@@ -4,6 +4,7 @@
 // Two layers: the upper layer uses the plain keys (ids 0–63), the lower layer the same
 // keys with a "lo." prefix (ids 64–127); key mode, split point and balance follow.
 import {defineParams,SPACE} from '../params';
+import {shapeRows} from '../ui/envShape';
 
 const ON=['Off','On'];
 
@@ -95,5 +96,8 @@ export const {PARAMS,BY_KEY,defaultValues,clampValue,sanitize,toPairs}=definePar
  ['keyMode',128,'Key mode',0,2,0,'','step',['Whole','Dual','Split']],
  ['splitPoint',129,'Split',24,108,60,'note','step'],
  ['balance',130,'Balance',0,1,.5,'bal-ul','lin'],
+ // envelope shapes (ids 180–195, one set for the whole patch)
+ ...shapeRows('amp'),
+ ...shapeRows('filter'),
  ...SPACE,
 ]);

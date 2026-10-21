@@ -15,8 +15,8 @@ const ROWS=[
  ],
  [
   {title:'Filter',tone:'red',keys:['cutoff','res',['envAmount','Env'],['poles','Poles'],['track','Track']]},
-  {title:'Filter envelope',tone:'amber',keys:[['fAttack','A'],['fDecay','D'],['fSustain','S'],['fRelease','R']]},
-  {title:'Amp envelope',tone:'amber',keys:[['aAttack','A'],['aDecay','D'],['aSustain','S'],['aRelease','R']]},
+  {title:'Filter envelope',tone:'amber',keys:[['fAttack','A'],['fDecay','D'],['fSustain','S'],['fRelease','R']],shape:{env:'filter',a:'fAttack',d:'fDecay',s:'fSustain',r:'fRelease'}},
+  {title:'Amp envelope',tone:'amber',keys:[['aAttack','A'],['aDecay','D'],['aSustain','S'],['aRelease','R']],shape:{env:'amp',a:'aAttack',d:'aDecay',s:'aSustain',r:'aRelease'}},
  ],
  [
   {title:'LFO',tone:'violet',keys:['lfoRate',['lfoSine','Sine'],['lfoSquare','Square'],['lfoSh','S&H'],['lfoFreqDepth','Freq mod'],['lfoToOsc1','→ Osc 1'],['lfoToOsc2','→ Osc 2'],['lfoToFilter','→ Filter'],['lfoPwDepth','PW mod'],['lfoPwOsc1','→ PW 1'],['lfoPwOsc2','→ PW 2']]},

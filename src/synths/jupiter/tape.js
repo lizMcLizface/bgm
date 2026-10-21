@@ -77,7 +77,7 @@ export function findLeader(x,sr){
  rms.forEach((r,k)=>rates.push(r>loudest*.1?crossingRate(x,k*win,(k+1)*win,sr):0));
  let best={len:0,start:0},run=0;
  rates.forEach((r,k)=>{if(r>1750&&r<2450){run++;if(run>best.len)best={len:run,start:k-run+1};}else run=0;});
- if(best.len<20)throw Error('No pilot tone found: is this a Jupiter-8 tape recording?');
+ if(best.len<20)throw Error('No pilot tone found: is this a patch tape recording?');
  const start=best.start*win,end=(best.start+best.len)*win;
  const pilot=peakFrequency(x,start+win,end-win,sr,crossingRate(x,start+win,end-win,sr));
  let level=0;for(let k=best.start+1;k<best.start+best.len-1;k++)level+=rms[k];level/=Math.max(1,best.len-2);
@@ -204,7 +204,7 @@ export function decodeTape(input){
   if(r.files.some(f=>f.patches.length===64&&f.patches.every(p=>!p.damaged)))break;
  }
  if(!best)throw firstError;
- if(!best.files.length)throw Error('Found a tape signal but no Jupiter-8 patches in it.');
+ if(!best.files.length)throw Error('Found a tape signal but no patches in it.');
  const file=best.files.reduce((a,b)=>score({files:[b]})>score({files:[a]})?b:a);
  const {framed}=best,start=file.first.at,end=file.first.end;
  const have=new Set(file.patches.map(p=>p.number));

@@ -253,6 +253,8 @@ pub struct Cs80 {
     ring_depth_d: f32,
     // stats
     pub steals: u32,
+    shape_p: [f32; SHAPE_PARAMS],
+    shape: EnvShape,
 }
 
 impl Cs80 {
@@ -263,6 +265,7 @@ impl Cs80 {
             lfo: 0., pwm_value: [0.; 2], last_note: None, bend_to: 0., bend: 0., pressure: 0., modulation: 0.,
             expression: 1., expression_s: 1., brightness: 0., soft: 0., pedal: false, ring_phase: 0., ring_env: 0.,
             ring_rising: false, ring_dt: 0., ring_dt_d: 0., ring_depth: 0., ring_depth_d: 0., steals: 0,
+            shape_p: [0.; SHAPE_PARAMS], shape: EnvShape::NATIVE,
         }
     }
 
@@ -283,6 +286,12 @@ impl Cs80 {
             v.ch[0].phase = 0.5 + 0.5 * rng.next();
             v.ch[1].phase = 0.5 + 0.5 * rng.next();
         }
+    }
+
+    /// Amplitude envelope shape for both channels (the IL/AL filter EG keeps its own form).
+    pub fn set_shape(&mut self, i: usize, value: f32) {
+        self.shape_p[i] = value;
+        self.dirty = true;
     }
 
     pub fn set(&mut self, i: usize, value: f32) {
@@ -448,6 +457,7 @@ impl Cs80 {
                 gain: level * level * (2. * side).min(1.) * 0.45,
             };
         }
+        self.shape = EnvShape::new(&self.shape_p[..SHAPE_PER_ENV], sr);
         self.dirty = false;
     }
 
@@ -607,7 +617,7 @@ impl Cs80 {
                     s.attack = (s.attack / v.time).min(1.);
                     s.decay = (s.decay / v.time).min(1.);
                     s.release = (s.release / v.time).min(1.);
-                    render_chan(&mut v.ch[c], &mut v.rng, &s, &mut left[at..at + m], &mut right[at..at + m]);
+                    render_chan(&mut v.ch[c], &mut v.rng, &s, &self.shape, &mut left[at..at + m], &mut right[at..at + m]);
                 }
                 // A muted channel's envelope must not keep the voice alive.
                 let done = |c: usize| v.ch[c].amp.stage == IDLE || setup[c].gain == 0. && v.ch[c].gain < 1e-7;
@@ -641,12 +651,13 @@ impl Cs80 {
 }
 
 #[inline(always)]
-fn render_chan(ch: &mut Chan, rng: &mut Rng, s: &ChanSetup, left: &mut [f32], right: &mut [f32]) {
+fn render_chan(ch: &mut Chan, rng: &mut Rng, s: &ChanSetup, shape: &EnvShape, left: &mut [f32], right: &mut [f32]) {
     let m = left.len();
+    let rate = shape.rates(s.attack, s.decay, s.release, false);
     if s.gain == 0. && ch.gain < 1e-7 {
         // Silent channel: keep its envelopes and phase moving without the DSP.
         for _ in 0..m {
-            ch.amp.tick(s.attack, s.decay, s.sustain, s.release);
+            ch.amp.run(shape, &rate, s.attack, s.decay, s.sustain, s.release, false);
         }
         ch.dt += ch.dt_d * m as f32;
         ch.pw += ch.pw_d * m as f32;
@@ -681,7 +692,7 @@ fn render_chan(ch: &mut Chan, rng: &mut Rng, s: &ChanSetup, left: &mut [f32], ri
         if s.sine > 0. {
             y += s.sine * sin_turns(t);
         }
-        let e = ch.amp.tick(s.attack, s.decay, s.sustain, s.release);
+        let e = ch.amp.run(shape, &rate, s.attack, s.decay, s.sustain, s.release, false);
         let o = y * e * ch.gain * ch.onset.tick();
         left[i] += o * pl;
         right[i] += o * pr;

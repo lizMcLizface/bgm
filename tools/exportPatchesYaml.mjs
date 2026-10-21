@@ -7,6 +7,7 @@
 // Output defaults to patches/<synth>/<input name>.yaml (git-ignored: factory data is not ours to publish).
 import fs from 'node:fs';
 import path from 'node:path';
+import {fileURLToPath} from 'node:url';
 import {junoValues,patchCode,factoryName} from '../src/synths/juno/sysex.js';
 import {decodeTape} from '../src/synths/jupiter/tape.js';
 import {decodePatch} from '../src/synths/jupiter/patch.js';
@@ -14,10 +15,6 @@ import {JP8_NAMES} from '../src/synths/jupiter/names.js';
 import {parseProphetSysex,CALIBRATION as P5} from '../src/synths/prophet/sysex.js';
 import {parseVsSysex} from '../src/synths/vs/sysex.js';
 import {parseDx7Sysex} from '../src/synths/dx7/sysex.js';
-
-const file=process.argv[2];
-if(!file){console.error('Usage: vite-node tools/exportPatchesYaml.mjs <bank.syx | tape.wav> [--out file.yaml]');process.exit(1);}
-const arg=n=>{const i=process.argv.indexOf(n);return i>0?process.argv[i+1]:null;};
 
 // ---- tiny YAML writer: maps, lists of scalars (flow style), scalars with optional comments
 const note=(v,comment)=>({v,comment});
@@ -100,7 +97,7 @@ function jupiter(bytes,name){
 function prophet(bytes,name){
  const programs=parseProphetSysex(bytes);
  const out=programs.map(({code,data:d,values:v})=>{
-  const k=i=>ten(Math.min(d[i],120),120),list=pairs=>pairs.filter(([,on])=>on).map(([n])=>n);
+  const k=i=>ten(Math.min(d[i],P5.knobMax),P5.knobMax),list=pairs=>pairs.filter(([,on])=>on).map(([n])=>n);
   // the amount only matters when something is routed (the Rev 3 programs hold junk there otherwise)
   const touch=(pairs,amount,raw)=>{const to=list(pairs);return to.length?{to,amount:note(Math.round(amount*100)/10,raw>127?'unset: full depth':undefined)}:'off';};
   const pitch=raw=>{const s=Math.floor(Math.min(raw,96)/2);return note(`${NOTES[s%12]}${Math.floor(s/12)}`,st(s-24)+" from 8'");};
@@ -199,15 +196,26 @@ function obxa(book,name){
   'Pitch is as printed under each drawing; the frequency knobs are only approximate on the drawings.'],out)};
 }
 
-const bytes=new Uint8Array(fs.readFileSync(file)),base=path.basename(file).replace(/\.[^.]+$/,'');
-const result=/\.json$/i.test(file)&&/Oberheim OB-Xa/.test(fs.readFileSync(file,'utf8'))?obxa(JSON.parse(fs.readFileSync(file,'utf8')),path.basename(file))
- :/^RIFF/.test(String.fromCharCode(...bytes.subarray(0,4)))?jupiter(bytes,path.basename(file))
- :bytes[1]===0x41?juno(bytes,path.basename(file))
- :bytes[1]===0x43?dx7(bytes,path.basename(file))
- :bytes[1]===0x01&&bytes[2]===0x0A?vs(bytes,path.basename(file))
- :bytes[1]===0x01?prophet(bytes,path.basename(file))
+export function exportPatchYaml(input,name){
+const bytes=new Uint8Array(input);
+const result=/\.json$/i.test(name)&&/Oberheim OB-Xa/.test(new TextDecoder().decode(bytes))?obxa(JSON.parse(new TextDecoder().decode(bytes)),name)
+ :/^RIFF/.test(String.fromCharCode(...bytes.subarray(0,4)))?jupiter(bytes,name)
+ :bytes[1]===0x41?juno(bytes,name)
+ :bytes[1]===0x43?dx7(bytes,name)
+ :bytes[1]===0x01&&bytes[2]===0x0A?vs(bytes,name)
+ :bytes[1]===0x01?prophet(bytes,name)
  :null;
-if(!result){console.error('Not a Juno-106, Prophet-5/10, Prophet VS or DX7 SysEx file, nor a WAV.');process.exit(1);}
+if(!result)throw Error('Not a Juno-106, Prophet-5/10, Prophet VS or DX7 SysEx file, nor a Jupiter tape or OB-Xa book.');
+return result;
+}
+
+if(process.argv[1]===fileURLToPath(import.meta.url)){
+const file=process.argv[2];
+if(!file){console.error('Usage: vite-node tools/exportPatchesYaml.mjs <bank.syx | tape.wav> [--out file.yaml]');process.exit(1);}
+const arg=n=>{const i=process.argv.indexOf(n);return i>0?process.argv[i+1]:null;};
+const base=path.basename(file).replace(/\.[^.]+$/,'');
+const result=exportPatchYaml(fs.readFileSync(file),path.basename(file));
 const target=arg('--out')??path.join('patches',result.synth,`${base}.yaml`);
 fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,result.text);
 console.log(`${target}: ${(result.text.match(/^- /mg)??[]).length} patches`);
+}

@@ -12,7 +12,7 @@ const ROWS=[
   {title:'HPF',tone:'teal',keys:[['hpf','Freq']]},
   {title:'VCF',tone:'red',keys:[['cutoff','Freq'],'res',['envPolarity','Env ±'],'env',['lfoVcf','LFO'],'kybd']},
   {title:'VCA',tone:'blue',keys:[['vcaMode','Env/Gate'],'level']},
-  {title:'ENV',tone:'amber',keys:['attack','decay','sustain','release']},
+  {title:'ENV',tone:'amber',keys:['attack','decay','sustain','release'],shape:{env:'amp',a:'attack',d:'decay',s:'sustain',r:'release'}},
   {title:'Chorus',tone:'green',keys:[['chorus','Mode'],'chorusNoise']},
  ],
  [
@@ -22,7 +22,7 @@ const ROWS=[
  ],
 ];
 
-const LIBRARIES=[{id:'bank',label:'106 bank',render:({choose,current})=><BankBrowser choose={choose} current={current}/>}];
+const LIBRARIES=[{id:'bank',label:'Bank',render:({choose,current})=><BankBrowser choose={choose} current={current}/>}];
 
 export default function JunoPage(){
  return <SynthShell synth={SYNTHS.juno} className="juno" panelClassName="complete" libraries={LIBRARIES}>

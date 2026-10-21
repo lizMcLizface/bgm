@@ -5,7 +5,7 @@ import {SYNTHS} from '../models';
 import {composeWaves} from '../vs/waves';
 
 const module=new WebAssembly.Module(fs.readFileSync('public/synths/classics.wasm'));
-const POLY=Object.entries(SYNTHS).filter(([id])=>!/^tr|^tb/.test(id));
+const POLY=Object.entries(SYNTHS).filter(([id,synth])=>Number.isInteger(synth.model)&&!/^tr|^tb/.test(id));
 
 // A key press must rise from silence: no preset may start with a step (heard as a pop).
 test.each(POLY)('%s: every preset fades in from zero on a key press',(id,synth)=>{

@@ -22,6 +22,11 @@ export class Performer {
  /** Polyphonic aftertouch for one held key. */
  pressure(key,value){const held=this.keys.get(key);if(held)this.target?.pressure(held.id,value);}
  releaseAll(){for(const key of [...this.keys.keys()])this.up(key);}
+ /** A rack pop-out must not release notes still held on a MIDI keyboard. */
+ releaseLocal(){
+  for(const key of [...this.keys.keys()])if(!key.startsWith('midi:'))this.up(key);
+  this.sources.ribbon=this.sources.pad=this.sources.padMod=0;this.sync();
+ }
  notes(){return [...this.keys.values()].map(k=>k.note);}
  control(name,value){this.send(name,value);}
  /** Continuous sources combine: bends add, pressure and modulation take the larger. */

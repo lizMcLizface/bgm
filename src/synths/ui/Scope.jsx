@@ -1,5 +1,5 @@
 import React,{useCallback,useEffect,useRef,useState} from 'react';
-import {findTrigger,levels,pitchOf,noteName,spectrumDb,spectralPeak,wavBytes} from './scopeMath';
+import {findTrigger,levels,pitchOf,noteName,spectrumDb,spectrumTrace,spectralPeak,wavBytes} from './scopeMath';
 import {load,save} from '../storage';
 
 // Oscilloscope and spectrum analyser on the synth's output (left and right averaged). The audio
@@ -79,14 +79,9 @@ function drawSpectrum(canvas,bins,hold,rate,cursor){
  const size=bins.length*2,binHz=rate/size;
  const trace=(arr,fill)=>{
   g.beginPath();g.moveTo(0,h);
-  let px=0;
-  for(;px<w;px++){
-   // the strongest bin under this pixel column (log axis: many bins per pixel at the top)
-   const f0=F_MIN*Math.pow(F_MAX/F_MIN,px/w),f1=F_MIN*Math.pow(F_MAX/F_MIN,(px+1)/w);
-   let a=Math.floor(f0/binHz),b=Math.max(a,Math.floor(f1/binHz)),v=-200;
-   if(b===a){ // between bins: interpolate
-    const p=f0/binHz,i=Math.floor(p),t=p-i;v=(arr[i]??-200)*(1-t)+(arr[i+1]??-200)*t;
-   }else for(let i=a;i<=Math.min(b,arr.length-1);i++)if(arr[i]>v)v=arr[i];
+  const points=spectrumTrace(arr,rate,w,F_MIN,F_MAX);
+  for(let px=0;px<points.length;px++){
+   const v=points[px];
    g.lineTo(px,Math.max(0,Math.min(h,dy(Math.max(DB_MIN,Math.min(0,v))))));
   }
   g.lineTo(w,h);g.closePath();
@@ -209,6 +204,8 @@ export default function Scope({engine,audio,onClose}){
   return ()=>{alive=false;cancelAnimationFrame(raf);run.current.busy=false;};
  },[audio,engine,process]);
  useEffect(()=>{redraw();},[cfg,cursor,fcursor,redraw]);
+ // Peak hold starts when enabled; it must not reveal maxima collected while off.
+ useEffect(()=>{run.current.hold=null;},[cfg.peakHold]);
  useEffect(()=>{const on=()=>redraw();window.addEventListener('resize',on);return ()=>window.removeEventListener('resize',on);},[redraw]);
 
  const r=run.current,read=status.read;

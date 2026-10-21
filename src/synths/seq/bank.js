@@ -8,14 +8,14 @@ export const LETTERS='ABCDEFGH';
 export const STEPS=16;
 
 /** valid(pattern) checks a stored pattern's shape; empty() makes a blank one. */
-export function usePatternBank(id,empty,valid){
+export function usePatternBank(id,empty,valid,initialBank){
  const KEY=`synths:${id}:patterns`;
  const [bank,setBank]=useState(()=>{
-  const s=load(KEY,null);
+  const s=initialBank??load(KEY,null);
   if(s&&Array.isArray(s.patterns)&&s.patterns.length===8&&s.patterns.every(valid)){
    const lengths=Array.from({length:8},(_,i)=>{const n=Number(s.lengths?.[i]);return n>=1&&n<=STEPS?Math.round(n):STEPS;});
    const tempos=Array.from({length:8},(_,i)=>{const n=Number(s.tempos?.[i]);return n>=30&&n<=300?n:0;});
-   return {patterns:s.patterns,lengths,tempos,chain:(s.chain??[]).filter(n=>n>=0&&n<8).slice(0,16),current:Math.min(7,Math.max(0,s.current|0))};
+   return {patterns:s.patterns,lengths,tempos,chain:(Array.isArray(s.chain)?s.chain:[]).filter(n=>Number.isInteger(n)&&n>=0&&n<8).slice(0,16),current:Math.min(7,Math.max(0,s.current|0)),title:String(s.title??'').slice(0,80),names:Array.from({length:8},(_,i)=>String(s.names?.[i]??'').slice(0,32))};
   }
   return {patterns:Array.from({length:8},empty),lengths:Array(8).fill(STEPS),tempos:Array(8).fill(0),chain:[],current:0};
  });

@@ -23,6 +23,8 @@ use dsp::{soft, DcBlock, MAX_BLOCK};
 pub const API: u32 = 1;
 /// Parameter ids at or above this address the shared effects.
 const FX_BASE: u32 = 200;
+/// Envelope shapes (amplitude 180–187, filter 188–195) for the models with ADSRs.
+const SHAPE_BASE: u32 = 180;
 pub const MODEL_CS80: u32 = 0;
 pub const MODEL_JUNO: u32 = 1;
 pub const MODEL_PROPHET: u32 = 2;
@@ -190,6 +192,19 @@ pub extern "C" fn syn_param(id: u32, value: f32) {
     unsafe {
         if id >= FX_BASE {
             HOST.space.set((id - FX_BASE) as usize, value);
+        } else if id >= SHAPE_BASE {
+            let i = (id - SHAPE_BASE) as usize;
+            if i < dsp::SHAPE_PARAMS && value.is_finite() {
+                match HOST.model {
+                    MODEL_CS80 => HOST.cs80.set_shape(i, value),
+                    MODEL_JUNO => HOST.juno.set_shape(i, value),
+                    MODEL_PROPHET => HOST.prophet.set_shape(i, value),
+                    MODEL_JUPITER => HOST.jupiter.set_shape(i, value),
+                    MODEL_MINIMOOG => HOST.minimoog.set_shape(i, value),
+                    MODEL_OBXA => HOST.obxa.set_shape(i, value),
+                    _ => {}
+                }
+            }
         } else {
             model!(HOST, m => m.set(id as usize, value));
         }

@@ -21,8 +21,8 @@ const ROWS=[
   {title:'HPF',tone:'teal',keys:[['hpf','Freq']]},
   {title:'VCF',tone:'red',keys:[['cutoff','Freq'],'res',['slope','Slope'],['envMod','Env'],['envSource','Env'],['vcfLfo','LFO'],['keyFollow','Key']]},
   {title:'VCA',tone:'blue',keys:[['vcaLfo','LFO'],'level']},
-  {title:'ENV-1',tone:'amber',keys:[['e1Attack','A'],['e1Decay','D'],['e1Sustain','S'],['e1Release','R'],['e1Key','Key'],['e1Invert','Polarity']]},
-  {title:'ENV-2',tone:'amber',keys:[['e2Attack','A'],['e2Decay','D'],['e2Sustain','S'],['e2Release','R'],['e2Key','Key']]},
+  {title:'ENV-1',tone:'amber',keys:[['e1Attack','A'],['e1Decay','D'],['e1Sustain','S'],['e1Release','R'],['e1Key','Key'],['e1Invert','Polarity']],shape:{env:'filter',a:'e1Attack',d:'e1Decay',s:'e1Sustain',r:'e1Release'}},
+  {title:'ENV-2',tone:'amber',keys:[['e2Attack','A'],['e2Decay','D'],['e2Sustain','S'],['e2Release','R'],['e2Key','Key']],shape:{env:'amp',a:'e2Attack',d:'e2Decay',s:'e2Sustain',r:'e2Release'}},
  ],
  [
   {title:'Assign',tone:'blue',keys:['assign',['portamento','Porta'],['unisonDetune','Detune']]},
@@ -46,7 +46,7 @@ function copyLayer(values,from){
 
 export default function JupiterPage(){
  const [layer,setLayer]=useState('upper');
- const libraries=[{id:'tape',label:'JP-8 tape',render:({choose,values,current})=><TapeBrowser choose={choose} values={values} current={current} layer={layer}/>}];
+ const libraries=[{id:'tape',label:'Tape',render:({choose,values,current})=><TapeBrowser choose={choose} values={values} current={current} layer={layer}/>}];
  return <SynthShell synth={SYNTHS.jupiter8} className="jupiter" panelClassName="complete" libraries={libraries}>
   {({group,values,replaceValues})=>{
    const prefix=layer==='lower'?LOWER:'';

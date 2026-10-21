@@ -2,6 +2,7 @@
 // shared space effects (ids from 200) come from ../params. Append-only: saved
 // patches use keys. Row format: see defineParams.
 import {defineParams,SPACE,toPosition,fromPosition,formatValue} from '../params';
+import {shapeRows} from '../ui/envShape';
 
 export const FEET=["16'","8'","4'","2'"];
 export const LFO_FUNCTIONS=['Sine','Tri','Saw ↑','Saw ↓','Square','S&H','Drift'];
@@ -73,6 +74,8 @@ export const {PARAMS,BY_KEY,defaultValues,clampValue,sanitize,toPairs}=definePar
  ...CHANNEL.map(([key,id,...rest])=>['i.'+key,id,...rest]),
  ...CHANNEL.map(([key,id,...rest])=>['ii.'+key,id+32,...rest]),
  ...GLOBAL,
+ // envelope shapes (ids 180–195, one set for the whole patch)
+ ...shapeRows('amp'),
  ...SPACE,
 ]);
 export {toPosition,fromPosition,formatValue};

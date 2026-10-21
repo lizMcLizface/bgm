@@ -168,6 +168,8 @@ pub struct Minimoog {
     soft: f32,
     pedal: bool,
     pub steals: u32,
+    shape_p: [f32; SHAPE_PARAMS],
+    shapes: [EnvShape; 2],
 }
 
 impl Minimoog {
@@ -183,7 +185,7 @@ impl Minimoog {
             sounding: false, fenv: Adsr::ZERO, aenv: Adsr::ZERO, ladder: Ladder::ZERO, dec: HalfBand::ZERO, rng: Rng(0x7a3c_91e5),
             pink: [0.; 3], out: 0., until: 0, fresh: true, dt: [0.; 3], dt_d: [0.; 3], cut: 10., cut_d: 0., g: 0., g_d: 0.,
             gain: 0., gain_d: 0., k: 0., pm_semis: 0., fm_oct: 0., bend_to: 0., bend: 0., pressure: 0., pressure_s: 0.,
-            modulation: 0., modulation_s: 0., expression: 1., expression_s: 1., brightness: 0., soft: 0., pedal: false, steals: 0,
+            modulation: 0., modulation_s: 0., expression: 1., expression_s: 1., brightness: 0., soft: 0., pedal: false, steals: 0, shape_p: [0.; SHAPE_PARAMS], shapes: [EnvShape::NATIVE; 2],
         }
     }
 
@@ -197,6 +199,12 @@ impl Minimoog {
         self.osc[0].phase = 0.31;
         self.osc[1].phase = 0.67;
         self.osc[2].phase = 0.11;
+    }
+
+    /// Envelope shapes: amplitude 0–7, filter 8–15 (see [`EnvShape`]).
+    pub fn set_shape(&mut self, i: usize, value: f32) {
+        self.shape_p[i] = value;
+        self.dirty = true;
     }
 
     pub fn set(&mut self, i: usize, value: f32) {
@@ -359,6 +367,7 @@ impl Minimoog {
             a_sustain: bound(p[id::A_SUSTAIN], 0., 1.),
             release,
         };
+        self.shapes = [EnvShape::new(&self.shape_p[..SHAPE_PER_ENV], srv), EnvShape::new(&self.shape_p[SHAPE_PER_ENV..], srv)];
         self.dirty = false;
     }
 
@@ -479,6 +488,7 @@ impl Minimoog {
         let drive = 0.6 + 2.5 * bound(self.p[id::DRIVE], 0., 1.);
         let (fa, fd, fr) = (s.f_attack, s.f_decay, s.release[0]);
         let (aa, ad, ar) = (s.a_attack, s.a_decay, s.release[1]);
+        let (rf, ra) = (self.shapes[1].rates(fa, fd, fr, false), self.shapes[0].rates(aa, ad, ar, false));
         let audio_cut = s.mod_filter && self.fm_oct != 0.;
         let pm = self.pm_semis != 0.;
         let mod_mix = bound(self.p[id::MOD_MIX], 0., 1.);
@@ -510,8 +520,8 @@ impl Minimoog {
             let x = 0.5 * (soft(driven + 0.12) - soft(0.12));
             let g = if audio_cut { warp(exp2(self.cut + self.fm_oct * m), s.srv) } else { self.g };
             let y = self.ladder.tick(x + 1e-5 * white, g, self.k);
-            self.fenv.tick(fa, fd, s.f_sustain, fr);
-            let e = self.aenv.tick(aa, ad, s.a_sustain, ar);
+            self.fenv.run(&self.shapes[1], &rf, fa, fd, s.f_sustain, fr, false);
+            let e = self.aenv.run(&self.shapes[0], &ra, aa, ad, s.a_sustain, ar, false);
             let v = y * e * self.gain;
             self.out = 0.7 * self.out + 0.3 * v;
             *o = v;

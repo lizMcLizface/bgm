@@ -16,7 +16,7 @@ export const semitones=note=>PITCH_NOTES[note]??0;
 
 /** Units for the engine, all estimates (knob 0–10 → exponential ranges) until checked by ear or against recordings. */
 export const CALIBRATION={
- // the service manual's filter calibration: at cutoff 0 with key tracking on, the filter rings at the key's own pitch, so the lowest key (C0, 65.4 Hz) is the zero point
+ // service manual pp.16-18: with cutoff 0 and key tracking on, the resonant NOISE peak matches the key's pitch (not self-oscillation); lowest host key is MIDI 36 / C2, 65.4 Hz
  cutoffHz:[65.4,16000],attackS:[.001,8],decayS:[.003,15],lfoHz:[.1,30],wheelHz:[.5,12],portamentoS:2,detuneCents:100,
 };
 

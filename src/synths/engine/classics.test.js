@@ -23,7 +23,7 @@ test('checked-in Wasm is built from the current Rust sources',()=>{
 test('the parameter table fits the kernel ABI with unique ids and in-range defaults',()=>{
  const k=synth().k;expect(k.syn_api()).toBe(1);const count=k.syn_param_count();
  const ids=PARAMS.map(p=>p.id);expect(new Set(ids).size).toBe(ids.length);
- for(const p of PARAMS){expect(p.id<count||(p.id>=200&&p.id<216)).toBe(true);expect(p.default).toBeGreaterThanOrEqual(p.min);expect(p.default).toBeLessThanOrEqual(p.max);}
+ for(const p of PARAMS){expect(p.id<count||(p.id>=180&&p.id<196)||(p.id>=200&&p.id<216)).toBe(true);expect(p.default).toBeGreaterThanOrEqual(p.min);expect(p.default).toBeLessThanOrEqual(p.max);}
  expect(BY_KEY['ii.lpf'].id).toBe(BY_KEY['i.lpf'].id+32);
 });
 

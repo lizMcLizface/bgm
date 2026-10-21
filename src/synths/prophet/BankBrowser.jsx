@@ -57,7 +57,7 @@ export default function BankBrowser({current,choose}){
  };
  const accept=(bytes,name)=>{
   const organised=organise(bytes,name);
-  if(!organised){setMessage('No Prophet-5/10 programs found in that file.');return;}
+  if(!organised){setMessage('No Rev 4 programs found in that file.');return;}
   save(BANK_KEY,{name,data:toBase64(bytes)});setBank(organised);setCursor({bank:null,index:0});
   setMessage(`Loaded ${organised.count} program${organised.count>1?'s':''} from ${name}.`);
  };
@@ -84,9 +84,9 @@ export default function BankBrowser({current,choose}){
   {message&&<span className="bank-message" role="status">{message}</span>}
  </span>;
  if(!bank)return <div className="bank empty">
-  <span className="bank-title">Prophet-5 programs</span>
+  <span className="bank-title">Oracle 5 programs</span>
   {importer}
-  <span className="bank-hint">Load a Prophet-5/10 Rev 4 SysEx file, such as Sequential's free factory programs download. It stays in this browser.</span>
+  <span className="bank-hint">Load a SysEx file in the Prophet-5/10 Rev 4 format, such as the free factory programs download. It stays in this browser.</span>
  </div>;
  const p=programs[at.index];
  const group=Math.floor(at.index/8),num=at.index%8;

@@ -1,0 +1,152 @@
+# Synth comparison bank. Panel values and resolved engine parameters.
+schema: 1
+id: tb303-originals
+synth: tb303
+name: bgm sounds
+kind: original
+note: Original bgm recipes; not original hardware factory programs.
+programs:
+  - id: "1"
+    name: Acid
+    values:
+      tune: 0
+      cutoff: 420
+      resonance: 0.72
+      envMod: 0.75
+      decay: 0.32
+      accent: 0.6
+      wave: 0
+      volume: 0.7
+      drive: 0.25
+      slide: 0.012
+      tempo: 120
+      swing: 0.5
+      voices: 1
+      chorusMix: 0
+      chorusRate: 0.6
+      chorusDepth: 0.5
+      reverbMix: 0.1
+      reverbDecay: 4
+      reverbTone: 6000
+      reverbSize: 0.6
+      reverbPredelay: 0.02
+  - id: "2"
+    name: Squelch
+    values:
+      tune: 0
+      cutoff: 330
+      resonance: 0.9
+      envMod: 0.85
+      decay: 0.22
+      accent: 0.85
+      wave: 0
+      volume: 0.7
+      drive: 0.4
+      slide: 0.012
+      tempo: 120
+      swing: 0.5
+      voices: 1
+      chorusMix: 0
+      chorusRate: 0.6
+      chorusDepth: 0.5
+      reverbMix: 0.08
+      reverbDecay: 4
+      reverbTone: 6000
+      reverbSize: 0.6
+      reverbPredelay: 0.02
+  - id: "3"
+    name: Sub
+    values:
+      tune: 0
+      cutoff: 200
+      resonance: 0.25
+      envMod: 0.35
+      decay: 0.6
+      accent: 0.4
+      wave: 1
+      volume: 0.7
+      drive: 0.1
+      slide: 0.012
+      tempo: 120
+      swing: 0.5
+      voices: 1
+      chorusMix: 0
+      chorusRate: 0.6
+      chorusDepth: 0.5
+      reverbMix: 0.05
+      reverbDecay: 4
+      reverbTone: 6000
+      reverbSize: 0.6
+      reverbPredelay: 0.02
+  - id: "4"
+    name: Open
+    values:
+      tune: 0
+      cutoff: 1400
+      resonance: 0.35
+      envMod: 0.4
+      decay: 0.5
+      accent: 0.5
+      wave: 0
+      volume: 0.7
+      drive: 0.15
+      slide: 0.012
+      tempo: 120
+      swing: 0.5
+      voices: 1
+      chorusMix: 0
+      chorusRate: 0.6
+      chorusDepth: 0.5
+      reverbMix: 0.15
+      reverbDecay: 4
+      reverbTone: 6000
+      reverbSize: 0.6
+      reverbPredelay: 0.02
+  - id: "5"
+    name: Rubber
+    values:
+      tune: 0
+      cutoff: 520
+      resonance: 0.55
+      envMod: 0.6
+      decay: 0.4
+      accent: 0.5
+      wave: 1
+      volume: 0.7
+      drive: 0.3
+      slide: 0.03
+      tempo: 120
+      swing: 0.5
+      voices: 1
+      chorusMix: 0
+      chorusRate: 0.6
+      chorusDepth: 0.5
+      reverbMix: 0.1
+      reverbDecay: 4
+      reverbTone: 6000
+      reverbSize: 0.6
+      reverbPredelay: 0.02
+  - id: "6"
+    name: Screamer
+    values:
+      tune: 0
+      cutoff: 700
+      resonance: 0.82
+      envMod: 0.9
+      decay: 0.28
+      accent: 1
+      wave: 0
+      volume: 0.7
+      drive: 0.75
+      slide: 0.012
+      tempo: 120
+      swing: 0.5
+      voices: 1
+      chorusMix: 0
+      chorusRate: 0.6
+      chorusDepth: 0.5
+      reverbMix: 0.12
+      reverbDecay: 4
+      reverbTone: 6000
+      reverbSize: 0.6
+      reverbPredelay: 0.02

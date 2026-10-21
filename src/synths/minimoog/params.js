@@ -2,6 +2,7 @@
 // shared space effects (ids from 200) come from ../params. Append-only: saved
 // patches use keys. Row format: see defineParams.
 import {defineParams,SPACE} from '../params';
+import {shapeRows} from '../ui/envShape';
 
 const ON=['Off','On'];
 const RANGES=['LO',"32'","16'","8'","4'","2'"];
@@ -60,5 +61,8 @@ export const {PARAMS,BY_KEY,defaultValues,clampValue,sanitize,toPairs}=definePar
  ['afterFilter',44,'Touch → filter',0,1,0,'%','lin'],
  ['volume',45,'Volume',0,1,.75,'%','lin'],
  ['oversample',46,'2× rate',0,1,1,'','step',['Off','On']],
+ // envelope shapes (ids 180–195, one set for the whole patch)
+ ...shapeRows('amp'),
+ ...shapeRows('filter'),
  ...SPACE,
 ]);

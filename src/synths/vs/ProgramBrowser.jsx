@@ -40,7 +40,7 @@ export default function ProgramBrowser({current,choose,values,setWaves}){
  const applyWaves=next=>{try{save(WAVES_KEY,packWaves(next));}catch{/* too big for storage: the waves just stay for this session */}setWaves(next);};
  const acceptPrograms=(bytes,name,waves)=>{
   const next=readPrograms(bytes,name);
-  if(!next){setMessage('No Prophet VS programs found in that file.');return false;}
+  if(!next){setMessage('No VS-format programs found in that file.');return false;}
   save(PROGRAMS_KEY,{name,data:toBase64(bytes)});setBank(next);setCursor(0);
   if(waves)applyWaves(waves);
   setMessage(`Loaded ${next.programs.length} programs from ${name}${waves?' with their waves':''}.`);return true;
@@ -90,7 +90,7 @@ export default function ProgramBrowser({current,choose,values,setWaves}){
  if(!bank)return <div className="bank empty">
   <span className="bank-title">VS programs</span>
   {importer}
-  <span className="bank-hint">Load a Prophet VS program .syx together with its user-wave dump and the two wave-set .wav files (select them all at once). Without the waves the programs play on a built-in wave set. Nothing leaves this browser.</span>
+  <span className="bank-hint">Load a program .syx in the Prophet VS format together with its user-wave dump and the two wave-set .wav files (select them all at once). Without the waves the programs play on a built-in wave set. Nothing leaves this browser.</span>
  </div>;
  const here=bank.programs[index],decade=Math.floor(here.number/10),digit=here.number%10;
  const inDecade=i=>bank.programs.findIndex(p=>p.number===decade*10+i);

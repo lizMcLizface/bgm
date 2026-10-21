@@ -33,7 +33,7 @@ export default function BankBrowser({current,choose}){
  };
  const accept=(bytes,name)=>{
   const slots=bankFromSysex(bytes),count=slots.filter(Boolean).length;
-  if(!count){setMessage('No Juno-106 patches found in that file.');return;}
+  if(!count){setMessage('No 106-format patches found in that file.');return;}
   save(BANK_KEY,{name,data:toBase64(bytes)});setBank({name,slots});setMessage(`Loaded ${count} patch${count>1?'es':''} from ${name}.`);
  };
  const fromLocal=async entry=>{
@@ -59,9 +59,9 @@ export default function BankBrowser({current,choose}){
   {message&&<span className="bank-message" role="status">{message}</span>}
  </span>;
  if(!bank)return <div className="bank empty">
-  <span className="bank-title">Juno-106 bank</span>
+  <span className="bank-title">Analog 106 bank</span>
   {importer}
-  <span className="bank-hint">Load a Juno-106 SysEx bank (128 patches, 3 KB). It stays in this browser.</span>
+  <span className="bank-hint">Load a SysEx bank in the Juno-106 format (128 patches, 3 KB). It stays in this browser.</span>
  </div>;
  const group=index<64?0:1,bankNo=Math.floor(index%64/8),num=index%8;
  const at=(g,b,n)=>g*64+b*8+n;

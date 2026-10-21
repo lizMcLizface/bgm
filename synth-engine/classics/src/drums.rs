@@ -3,8 +3,8 @@
 //! resonators struck by a pulse (kick, toms, congas, rim), noise through filters (snare,
 //! clap, maracas), two squares through a band-pass (cowbell) and a six-oscillator metal
 //! source through high-pass and band-pass filters (hats, cymbals) shared by the hat voices.
-//! The 909's sampled cymbals and hats are stood in for by the same metal source plus noise
-//! and a 6-bit quantiser. Original code.
+//! The 909's recorded metal voices are approximated by filtered noise and inharmonic
+//! oscillators, with separate crash and ride envelopes. No recordings are played back.
 use crate::dsp::*;
 use crate::seq::{Seq, MAX_PATTERNS, MAX_STEPS};
 use core::f32::consts::TAU;
@@ -25,6 +25,7 @@ const ACCENT: usize = G + 1;
 const TEMPO: usize = G + 2;
 const SWING: usize = G + 3;
 const FLAM: usize = G + 4;
+const KICK_BODY: usize = G + 5;
 /// Steps fire this long before they sound, so a flam's grace note can come before the beat.
 const LOOKAHEAD: f32 = 0.05;
 const PENDING: usize = 48;
@@ -54,6 +55,7 @@ enum Kind {
     ClosedHat,
     OpenHat,
     Cymbal,
+    Ride,
     Maracas,
     Claves,
 }
@@ -75,48 +77,50 @@ const NONE: Spec = spec(Kind::Claves, 0., 0., 0., 0.);
 
 const fn kit_808() -> [Spec; TRACKS] {
     [
-        spec(Kind::Kick, 50., 0.42, 1.0, 0.),
-        spec(Kind::Snare, 178., 0.13, 0.9, 0.),
-        spec(Kind::Tom, 84., 0.30, 0.9, -0.3),
-        spec(Kind::Tom, 124., 0.22, 0.9, 0.),
-        spec(Kind::Tom, 178., 0.17, 0.9, 0.3),
+        // Envelope time constants, not total audible decay. Calibrated against
+        // the dry Roland50 comparison targets; the old values sustained far too long.
+        spec(Kind::Kick, 52., 0.24, 0.75, 0.),
+        spec(Kind::Snare, 172., 0.030, 0.48, 0.),
+        spec(Kind::Tom, 89., 0.083, 0.74, 0.),
+        spec(Kind::Tom, 136., 0.048, 0.80, 0.),
+        spec(Kind::Tom, 188., 0.038, 0.91, 0.),
         spec(Kind::Conga, 232., 0.11, 0.9, -0.4),
         spec(Kind::Conga, 326., 0.10, 0.9, -0.1),
         spec(Kind::Conga, 456., 0.09, 0.9, 0.2),
-        spec(Kind::Rim, 1700., 0.007, 0.8, 0.),
+        spec(Kind::Rim, 1670., 0.003, 1.20, 0.),
         spec(Kind::Claves, 2400., 0.020, 0.9, 0.3),
-        spec(Kind::Clap, 1100., 0.09, 0.8, 0.),
+        spec(Kind::Clap, 1250., 0.027, 0.92, 0.),
         spec(Kind::Maracas, 5000., 0.022, 0.7, 0.4),
-        spec(Kind::Cowbell, 540., 0.16, 0.8, 0.2),
-        spec(Kind::Cymbal, 1., 0.95, 0.6, 0.15),
-        spec(Kind::OpenHat, 1., 0.16, 0.6, 0.1),
-        spec(Kind::ClosedHat, 1., 0.028, 0.6, 0.1),
+        spec(Kind::Cowbell, 556., 0.058, 0.96, 0.),
+        spec(Kind::Cymbal, 1., 0.285, 1.04, 0.),
+        spec(Kind::OpenHat, 1., 0.32, 0.88, 0.),
+        spec(Kind::ClosedHat, 1., 0.019, 0.74, 0.),
     ]
 }
 const fn kit_909() -> [Spec; TRACKS] {
     let mut k = [NONE; TRACKS];
-    k[0] = spec(Kind::Kick, 52., 0.34, 1.0, 0.);
-    k[1] = spec(Kind::Snare, 185., 0.16, 0.9, 0.);
-    k[2] = spec(Kind::Tom, 90., 0.34, 0.9, -0.3);
-    k[3] = spec(Kind::Tom, 135., 0.26, 0.9, 0.);
-    k[4] = spec(Kind::Tom, 200., 0.20, 0.9, 0.3);
-    k[5] = spec(Kind::Rim, 1900., 0.008, 0.8, 0.);
-    k[6] = spec(Kind::Clap, 1200., 0.14, 0.8, 0.);
-    k[7] = spec(Kind::ClosedHat, 1.25, 0.034, 0.6, 0.1);
-    k[8] = spec(Kind::OpenHat, 1.25, 0.2, 0.6, 0.1);
-    k[9] = spec(Kind::Cymbal, 1.3, 1.5, 0.55, -0.2);
-    k[10] = spec(Kind::Cymbal, 1.2, 0.8, 0.55, 0.25);
+    k[0] = spec(Kind::Kick, 52., 0.058, 0.75, 0.);
+    k[1] = spec(Kind::Snare, 172., 0.045, 0.98, 0.);
+    k[2] = spec(Kind::Tom, 89., 0.111, 0.91, 0.);
+    k[3] = spec(Kind::Tom, 117., 0.072, 0.97, 0.);
+    k[4] = spec(Kind::Tom, 154., 0.075, 0.96, 0.);
+    k[5] = spec(Kind::Rim, 470., 0.009, 1.90, 0.);
+    k[6] = spec(Kind::Clap, 1450., 0.032, 1.10, 0.);
+    k[7] = spec(Kind::ClosedHat, 1., 0.036, 0.096, 0.);
+    k[8] = spec(Kind::OpenHat, 1., 0.087, 0.088, 0.);
+    k[9] = spec(Kind::Cymbal, 1., 0.34, 0.119, 0.);
+    k[10] = spec(Kind::Ride, 1., 0.277, 0.062, 0.);
     k
 }
 const fn kit_606() -> [Spec; TRACKS] {
     let mut k = [NONE; TRACKS];
-    k[0] = spec(Kind::Kick, 62., 0.2, 1.0, 0.);
-    k[1] = spec(Kind::Snare, 200., 0.11, 0.9, 0.);
-    k[2] = spec(Kind::Tom, 110., 0.2, 0.9, -0.25);
-    k[3] = spec(Kind::Tom, 190., 0.15, 0.9, 0.25);
-    k[4] = spec(Kind::ClosedHat, 1.1, 0.03, 0.6, 0.1);
-    k[5] = spec(Kind::OpenHat, 1.1, 0.14, 0.6, 0.1);
-    k[6] = spec(Kind::Cymbal, 1.15, 0.7, 0.55, -0.15);
+    k[0] = spec(Kind::Kick, 56., 0.030, 0.75, 0.);
+    k[1] = spec(Kind::Snare, 202., 0.027, 0.90, 0.);
+    k[2] = spec(Kind::Tom, 129., 0.048, 0.72, 0.);
+    k[3] = spec(Kind::Tom, 205., 0.031, 0.97, 0.);
+    k[4] = spec(Kind::ClosedHat, 1., 0.019, 1.67, 0.);
+    k[5] = spec(Kind::OpenHat, 1., 0.51, 1.40, 0.);
+    k[6] = spec(Kind::Cymbal, 1., 0.135, 1.05, 0.);
     k
 }
 static KIT_808: [Spec; TRACKS] = kit_808();
@@ -131,6 +135,31 @@ pub fn track_count(style: u8) -> usize {
     }
 }
 
+/// Linear TPT filter with coefficients prepared on the hit. Keeping these in Hz
+/// avoids the old snare's sample-rate-dependent one-pole coefficients.
+#[derive(Clone, Copy)]
+struct DrumFilter { a1: f32, a2: f32, a3: f32, k: f32, s1: f32, s2: f32 }
+impl DrumFilter {
+    const ZERO: Self = Self { a1: 1., a2: 0., a3: 0., k: 1., s1: 0., s2: 0. };
+    fn set(&mut self, hz: f32, q: f32, sr: f32) {
+        let g = warp(hz, sr);
+        self.k = 1. / q;
+        self.a1 = 1. / (1. + g * (g + self.k));
+        self.a2 = g * self.a1;
+        self.a3 = g * self.a2;
+        self.s1 = 0.; self.s2 = 0.;
+    }
+    #[inline]
+    fn tick(&mut self, x: f32) -> (f32, f32, f32) {
+        let v3 = x - self.s2;
+        let band = self.a1 * self.s1 + self.a2 * v3;
+        let low = self.s2 + self.a2 * self.s1 + self.a3 * v3;
+        self.s1 = 2. * band - self.s1;
+        self.s2 = 2. * low - self.s2;
+        (low, band * self.k, x - self.k * band - low)
+    }
+}
+
 #[derive(Clone, Copy)]
 struct Voice {
     spec: Spec,
@@ -141,7 +170,9 @@ struct Voice {
     tau: f32,
     tone: f32,
     gain: f32,
-    ph: [f32; 2],
+    noise_scale: f32,
+    ph: [f32; 8],
+    filters: [DrumFilter; 3],
     e1: f32,
     e2: f32,
     e3: f32,
@@ -149,7 +180,6 @@ struct Voice {
     k2: f32,
     k3: f32,
     lp: [f32; 2],
-    svf: Svf,
     rng: Rng,
 }
 impl Voice {
@@ -163,7 +193,9 @@ impl Voice {
             tau: 0.1,
             tone: 0.5,
             gain: 0.,
-            ph: [0.; 2],
+            noise_scale: 1.,
+            ph: [0.; 8],
+            filters: [DrumFilter::ZERO; 3],
             e1: 0.,
             e2: 0.,
             e3: 0.,
@@ -171,11 +203,10 @@ impl Voice {
             k2: 0.,
             k3: 0.,
             lp: [0.; 2],
-            svf: Svf::ZERO,
             rng: Rng(0x1234_5678),
         }
     }
-    fn hit(&mut self, sr: f32, spec: Spec, style: u8, tune: f32, decay: f32, tone: f32, gain: f32) {
+    fn hit(&mut self, sr: f32, spec: Spec, style: u8, tune: f32, decay: f32, tone: f32, gain: f32, deep_kick: bool) {
         let k = |tau: f32| (-1. / (tau.max(1e-4) * sr)).exp();
         self.spec = spec;
         self.style = style;
@@ -185,9 +216,12 @@ impl Voice {
         self.tau = spec.decay * exp2((decay - 0.5) * 2.4);
         self.tone = tone;
         self.gain = gain;
-        self.ph = [0.; 2];
+        // Fixed-Hz noise filters pass fewer of the discrete noise bins as the
+        // sample rate rises. Compensate their density to preserve the kit balance.
+        self.noise_scale = (sr / 48000.).sqrt();
+        self.ph = [0.; 8];
+        self.filters = [DrumFilter::ZERO; 3];
         self.lp = [0.; 2];
-        self.svf = Svf::ZERO;
         self.e1 = 1.;
         self.e2 = 1.;
         self.e3 = 1.;
@@ -195,7 +229,7 @@ impl Voice {
             Kind::Kick => {
                 self.e2 = match style {
                     STYLE_909 => 3.6,
-                    STYLE_606 => 1.4,
+                    STYLE_606 => if deep_kick { 1.4 } else { 0.45 },
                     // measured 808 kicks sweep only about half a tone averaged over 0.2 s; this one
                     // starts 2.2x high and is down within about 10 ms (about 0.8 semitone on average)
                     _ => 1.2,
@@ -203,19 +237,23 @@ impl Voice {
                 self.k1 = k(self.tau);
                 self.k2 = k(match style {
                     STYLE_909 => 0.011,
-                    STYLE_606 => 0.020,
+                    STYLE_606 => if deep_kick { 0.020 } else { 0.010 },
                     _ => 0.008,
                 });
                 self.k3 = k(0.0012);
             }
             Kind::Snare => {
-                self.k1 = k(0.075 * (self.tau / spec.decay));
-                self.k2 = k(self.tau * if style == STYLE_909 { 1.5 } else { 1.2 });
+                let body = match style { STYLE_909 => 0.035, STYLE_606 => 0.024, _ => 0.025 };
+                self.k1 = k(body * (self.tau / spec.decay));
+                self.k2 = k(self.tau);
+                let (hi, lo) = if style == STYLE_909 { (3800., 12500.) } else { (1400., 7500.) };
+                self.filters[0].set(hi, 0.707, sr);
+                self.filters[1].set(lo, 0.707, sr);
             }
             Kind::Tom => {
-                self.e2 = if style == STYLE_909 { 1.5 } else { 0.9 };
+                self.e2 = if style == STYLE_909 { 0.45 } else { 0.25 };
                 self.k1 = k(self.tau);
-                self.k2 = k(if style == STYLE_909 { 0.045 } else { 0.03 });
+                self.k2 = k(if style == STYLE_909 { 0.015 } else { 0.008 });
                 self.k3 = k(0.004);
             }
             Kind::Conga => {
@@ -224,15 +262,48 @@ impl Voice {
                 self.k3 = k(0.003);
             }
             Kind::Rim => self.k1 = k(self.tau),
-            Kind::Clap => self.k1 = k(self.tau),
+            Kind::Clap => {
+                self.k1 = k(self.tau);
+                self.filters[0].set(self.f * (0.7 + 0.6 * tone), 1.1, sr);
+            }
             Kind::Cowbell => {
                 self.k1 = k(0.011);
                 self.k2 = k(self.tau);
+                self.filters[0].set(950. * (0.85 + 0.3 * tone), 1.4, sr);
+                self.filters[1].set(2200., 0.707, sr);
             }
-            Kind::ClosedHat | Kind::OpenHat => self.k1 = k(self.tau),
-            Kind::Cymbal => {
-                self.k1 = k(0.05);
+            Kind::ClosedHat | Kind::OpenHat => {
+                let open = spec.kind == Kind::OpenHat;
+                self.k1 = k(if open && style != STYLE_909 { self.tau * 0.9 } else { self.tau });
+                self.k2 = k(0.03);
+                self.k3 = k(0.006 * self.tau / spec.decay);
+                let tune = exp2((tune - 0.5) * 0.5) * (0.8 + 0.4 * tone);
+                if style == STYLE_909 {
+                    self.filters[0].set(if open { 3700. * tune } else { 4500. * tune }, 0.707, sr);
+                    self.filters[1].set(if open { 10000. * tune } else { 11000. * tune }, 0.707, sr);
+                    self.filters[2].set(12200. * tune, 0.707, sr);
+                } else {
+                    let centre = if style == STYLE_606 { 8300. } else if open { 7900. } else { 12500. };
+                    self.filters[0].set(centre * tune, if open { 2.8 } else { 1.4 }, sr);
+                    let high = if style == STYLE_606 && open { 6200. } else if style == STYLE_808 && !open { 7600. } else { 6800. };
+                    self.filters[1].set(high * tune, 0.8, sr);
+                    self.filters[2].set(15500. * tune, 0.707, sr);
+                }
+            }
+            Kind::Cymbal | Kind::Ride => {
+                self.k1 = k(0.025);
                 self.k2 = k(self.tau);
+                let tune = exp2((tune - 0.5) * 0.5) * (0.85 + 0.3 * tone);
+                if style == STYLE_909 {
+                    let high = if spec.kind == Kind::Ride { 2400. } else { 2800. };
+                    self.filters[0].set(high * tune, 0.707, sr);
+                    self.filters[1].set(10300. * tune, 0.707, sr);
+                    self.filters[2].set(12500. * tune, 0.707, sr);
+                } else {
+                    self.filters[0].set(if style == STYLE_808 { 7900. * tune } else { 7400. * tune }, 1.6, sr);
+                    self.filters[1].set(if style == STYLE_808 { 5800. * tune } else { 5200. * tune }, 0.707, sr);
+                    self.filters[2].set(11500. * tune, 0.707, sr);
+                }
             }
             Kind::Maracas => {
                 self.e2 = 0.;
@@ -241,6 +312,27 @@ impl Voice {
             }
             Kind::Claves => self.k1 = k(self.tau),
         }
+    }
+
+    /// A small plate model for the 909 metal voices. These are oscillators with
+    /// inharmonic ratios, not a wavetable or a reconstruction of recorded PCM.
+    #[inline]
+    fn plate(&mut self, sr: f32, ride: bool) -> f32 {
+        let frequencies = if ride {
+            [1193., 2179., 3187., 3917., 5861., 7319., 7837., 9989.]
+        } else {
+            [341., 421., 653., 1013., 1613., 2543., 4163., 6451.]
+        };
+        let mut x = 0.;
+        for (i, hz) in frequencies.iter().enumerate() {
+            let f = hz * self.f;
+            if f < sr * 0.44 {
+                self.ph[i] = (self.ph[i] + f / sr).fract();
+                let weight = if ride { [0.02, 0.03, 0.06, 0.7, 0.2, 0.9, 0.75, 1.1][i] } else { 0.125 };
+                x += sin_turns(self.ph[i]) * weight;
+            }
+        }
+        x
     }
 
     #[inline]
@@ -274,21 +366,20 @@ impl Voice {
                 let (a, b) = (self.f, self.f * 1.83);
                 self.ph[0] = (self.ph[0] + a * dt).fract();
                 self.ph[1] = (self.ph[1] + b * dt).fract();
-                let tonal = (sin_turns(self.ph[0]) * 0.8 + sin_turns(self.ph[1]) * 0.45) * self.e1;
+                let tonal = (sin_turns(self.ph[0]) * 0.8 + sin_turns(self.ph[1]) * 0.12) * self.e1;
                 self.e1 *= self.k1;
-                let n = self.rng.next();
-                self.lp[0] += (n - self.lp[0]) * 0.07;
-                let hp = n - self.lp[0];
-                self.lp[1] += (hp - self.lp[1]) * 0.28;
-                let noise = self.lp[1] * self.e2;
+                let n = self.rng.next() * self.noise_scale;
+                let (_, _, hp) = self.filters[0].tick(n);
+                let (lp, _, _) = self.filters[1].tick(hp);
+                let noise = lp * self.e2;
                 self.e2 *= self.k2;
                 if self.e2 < 1e-4 {
                     self.active = false;
                 }
                 let (tw, nw) = match self.style {
-                    STYLE_909 => (0.75, 0.55 + 0.9 * self.tone),
-                    STYLE_606 => (0.6, 0.5 + 0.8 * self.tone),
-                    _ => (0.95, 0.45 + 0.8 * self.tone),
+                    STYLE_909 => (0.80, 0.65 + 0.9 * self.tone),
+                    STYLE_606 => (0.6, 0.65 + 1.1 * self.tone),
+                    _ => (0.95, 0.6 + 1.2 * self.tone),
                 };
                 (tonal * tw + noise * nw) * 0.9
             }
@@ -325,9 +416,10 @@ impl Voice {
                 (body + strike) * 0.8
             }
             Kind::Rim => {
+                let (ratio, weight) = if self.style == STYLE_909 { (0.46, 0.5) } else { (0.282, 0.95) };
                 self.ph[0] = (self.ph[0] + self.f * dt).fract();
-                self.ph[1] = (self.ph[1] + self.f * 0.282 * dt).fract();
-                let x = soft((sin_turns(self.ph[0]) + sin_turns(self.ph[1]) * 1.2) * 2.2) * self.e1;
+                self.ph[1] = (self.ph[1] + self.f * ratio * dt).fract();
+                let x = soft((sin_turns(self.ph[0]) * weight + sin_turns(self.ph[1]) * 1.2) * 1.2) * self.e1;
                 self.e1 *= self.k1;
                 if self.e1 < 1e-4 {
                     self.active = false;
@@ -335,11 +427,8 @@ impl Voice {
                 x * 0.7
             }
             Kind::Clap => {
-                let n = self.rng.next();
-                let centre = self.f * (0.7 + 0.8 * self.tone);
-                let g = warp(centre, sr);
-                let (lo, hi) = self.svf.tick(n, g, 0.4);
-                let band = (n - lo - hi) / 0.4 * 0.4;
+                let n = self.rng.next() * self.noise_scale;
+                let (_, band, _) = self.filters[0].tick(n);
                 // three quick bursts, then the room tail
                 let t = self.t;
                 let env = if t < 0.031 {
@@ -360,9 +449,8 @@ impl Voice {
                 self.ph[0] = (self.ph[0] + f1 * dt).fract();
                 self.ph[1] = (self.ph[1] + f2 * dt).fract();
                 let sq = pulse(self.ph[0], f1 * dt, 0.5) + pulse(self.ph[1], f2 * dt, 0.5);
-                let g = warp(2400. * (0.7 + 0.6 * self.tone), sr);
-                let (lo, hi) = self.svf.tick(sq * 0.5, g, 0.7);
-                let band = (sq * 0.5 - lo - hi) / 0.7;
+                let (_, band, _) = self.filters[0].tick(sq * 0.5);
+                let (band, _, _) = self.filters[1].tick(band);
                 let env = 0.55 * self.e1 + 0.45 * self.e2;
                 self.e1 *= self.k1;
                 self.e2 *= self.k2;
@@ -372,36 +460,55 @@ impl Voice {
                 soft(band * 1.4) * env * 0.8
             }
             Kind::ClosedHat | Kind::OpenHat => {
-                let cut = 3000. * (1. + 0.8 * self.tone) * (1. + (sp.f - 1.) * 0.6);
-                let g = warp(cut, sr);
-                let mut x = metal;
-                if self.style == STYLE_909 {
-                    x = x * 0.75 + self.rng.next() * 0.3;
+                let v = if self.style == STYLE_909 {
+                    let x = self.rng.next() * self.noise_scale * 0.8;
+                    let (_, _, hi) = self.filters[0].tick(x);
+                    let (low, _, _) = self.filters[1].tick(hi);
+                    let (low, _, _) = self.filters[2].tick(low);
+                    low + self.plate(sr, false) * 0.025
+                } else {
+                    let x = soft(metal * 4.);
+                    let (_, band, _) = self.filters[0].tick(x);
+                    let (_, _, hi) = self.filters[1].tick(band);
+                    let (low, _, _) = self.filters[2].tick(hi);
+                    low
+                };
+                // The analogue open hats hold a slowly decaying body, then close
+                // quickly. A single exponential cannot reproduce that articulation.
+                if sp.kind == Kind::OpenHat && self.style != STYLE_909 && self.t > self.tau {
+                    self.e3 *= self.k3;
                 }
-                let (_, hi) = self.svf.tick(x, g, 1.2);
-                let mut v = hi;
-                if self.style == STYLE_909 {
-                    v = (v * 24.).round() / 24.;
-                }
-                let env = self.e1;
+                let attack = if self.style == STYLE_606 && sp.kind == Kind::OpenHat { 0.45 + 0.55 * self.e2 } else { 1. };
+                self.e2 *= self.k2;
+                let env = self.e1 * self.e3 * attack;
                 self.e1 *= self.k1;
-                if self.e1 < 1e-4 {
+                if env < 1e-4 {
                     self.active = false;
                 }
                 v * env * 4.0
             }
-            Kind::Cymbal => {
-                let g_hi = warp(6800. * (1. + (sp.f - 1.) * 0.5), sr);
-                let mut x = metal;
-                if self.style == STYLE_909 {
-                    x = x * 0.7 + self.rng.next() * 0.35;
-                }
-                let (_, hi) = self.svf.tick(x, g_hi, 1.0);
-                let g_lo = warp(3300., sr);
-                self.lp[0] += (x - self.lp[0]) * (g_lo / (1. + g_lo));
-                let body = x - self.lp[0];
-                let mix = hi * (0.5 + 0.6 * self.tone) + body * (0.35 * (1. - self.tone) + 0.1);
-                let env = 0.35 * self.e1 + 0.65 * self.e2;
+            Kind::Cymbal | Kind::Ride => {
+                let ride = sp.kind == Kind::Ride;
+                let x = if self.style == STYLE_909 {
+                    let noise = self.rng.next() * self.noise_scale;
+                    if ride {
+                        self.plate(sr, true) * 0.4 + noise * (0.15 + 0.3 * self.e1)
+                    } else {
+                        noise * 0.8 + soft(metal * 4.) * 0.15
+                    }
+                } else { soft(metal * 4.) };
+                let mix = if self.style == STYLE_909 {
+                    let (_, _, hi) = self.filters[0].tick(x);
+                    let (low, _, _) = self.filters[1].tick(hi);
+                    let (low, _, _) = self.filters[2].tick(low);
+                    low
+                } else {
+                    let (_, band, _) = self.filters[0].tick(x);
+                    let (_, _, hi) = self.filters[1].tick(band);
+                    let (low, _, _) = self.filters[2].tick(hi);
+                    low
+                };
+                let env = 0.25 * self.e1 + 0.75 * self.e2;
                 self.e1 *= self.k1;
                 self.e2 *= self.k2;
                 if self.e2 < 1e-4 {
@@ -447,6 +554,7 @@ pub struct Drums {
     master: f32,
     accent: f32,
     flam: f32,
+    deep_kick: bool,
     pend: [Pending; PENDING],
     npend: usize,
     metal_ph: [f32; 6],
@@ -467,6 +575,7 @@ impl Drums {
             master: 0.8,
             accent: 0.5,
             flam: 0.5,
+            deep_kick: true,
             pend: [Pending { on: false, wait: 0, track: 0, velocity: 0., accent: 0. }; PENDING],
             npend: 0,
             metal_ph: [0.; 6],
@@ -490,6 +599,7 @@ impl Drums {
         self.master = 0.8;
         self.accent = 0.5;
         self.flam = 0.5;
+        self.deep_kick = true;
         self.pend = [Pending { on: false, wait: 0, track: 0, velocity: 0., accent: 0. }; PENDING];
         self.npend = 0;
         self.metal_ph = [0.; 6];
@@ -523,6 +633,7 @@ impl Drums {
                 TEMPO => self.seq.bpm = v.clamp(30., 300.),
                 SWING => self.seq.swing = v.clamp(0.5, 0.75),
                 FLAM => self.flam = v.clamp(0., 1.),
+                KICK_BODY => self.deep_kick = v >= 0.5,
                 _ => {}
             }
         }
@@ -534,9 +645,20 @@ impl Drums {
         if track >= track_count(self.style) {
             return;
         }
-        let spec = self.kit()[track];
+        let mut spec = self.kit()[track];
+        if self.deep_kick && spec.kind == Kind::Kick {
+            // Preserve the original long, full-level kick for Deep and for saved
+            // patches/URLs from before the calibrated Classic recipe was added.
+            spec.decay = match self.style {
+                STYLE_909 => 0.34,
+                STYLE_606 => 0.2,
+                _ => 0.42,
+            };
+            spec.level = 1.0;
+            spec.f = match self.style { STYLE_909 => 52., STYLE_606 => 62., _ => 50. };
+        }
         let k = self.knobs[track];
-        let gain = k[LEVEL] * spec.level * (0.35 + 0.65 * velocity.clamp(0., 1.)) * 1. + 0.9 * self.accent * accent;
+        let gain = k[LEVEL] * spec.level * (0.35 + 0.65 * velocity.clamp(0., 1.)) * (1. + 0.9 * self.accent * accent);
         // the closed hat chokes the open hat
         if spec.kind == Kind::ClosedHat {
             for (j, s) in self.kit().iter().enumerate() {
@@ -550,7 +672,7 @@ impl Drums {
         }
         let sr = self.sr;
         let style = self.style;
-        self.voices[track].hit(sr, spec, style, k[TUNE], k[DECAY], k[TONE], gain);
+        self.voices[track].hit(sr, spec, style, k[TUNE], k[DECAY], k[TONE], gain, self.deep_kick);
     }
     /// Piano keys: each key from C2 is a pad, wrapping every two octaves.
     pub fn note_on(&mut self, _key: u32, note: f32, velocity: f32) {
@@ -635,18 +757,21 @@ impl Drums {
                 }
             }
             let mut metal = 0.;
-            if any_metal {
-                for (ph, f) in self.metal_ph.iter_mut().zip(METAL.iter()) {
-                    let hz = f * self.metal_scale;
-                    let dt = hz / sr;
-                    *ph += dt;
-                    if *ph >= 1. {
-                        *ph -= 1.;
-                    }
+            // The metal bank runs freely, including the gaps between short hats.
+            // Pausing it at block boundaries made the next hit's tone depend on
+            // the host buffer size once the previous hat had finished decaying.
+            for (ph, f) in self.metal_ph.iter_mut().zip(METAL.iter()) {
+                let hz = f * self.metal_scale;
+                let dt = hz / sr;
+                *ph += dt;
+                if *ph >= 1. {
+                    *ph -= 1.;
+                }
+                if any_metal {
                     metal += pulse(*ph, dt, 0.5);
                 }
-                metal *= 1. / 6.;
             }
+            metal *= 1. / 6.;
             let (mut l, mut r) = (0., 0.);
             for (t, v) in self.voices.iter_mut().enumerate() {
                 if v.active {

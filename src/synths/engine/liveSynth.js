@@ -3,6 +3,9 @@
 // needs a short output buffer more than the generator's dropout insurance.
 import versions from './kernelVersion.json';
 import {MODELS} from './offline';
+import {createRack} from '../effects/graph';
+import {cleanRack} from '../effects/params';
+import {createOutputMonitor} from '../effects/outputMonitor';
 
 export {MODELS};
 export const CONTROLS={bend:0,pressure:1,mod:2,expression:3,brightness:4,sustain:5,soft:6};
@@ -15,22 +18,24 @@ export function loadKernel(){
 }
 
 /** Creates the context synchronously (call from a tap/click), then loads the kernel. */
-export function startLiveSynth({model=MODELS.cs80,params=[],waves=null,latency='interactive',onStats=()=>{},onError=()=>{}}={}){
+export function startLiveSynth({model=MODELS.cs80,params=[],waves=null,rack=cleanRack(),latency='interactive',onStats=()=>{},onError=()=>{}}={}){
  const Context=window.AudioContext||window.webkitAudioContext;
  const context=new Context({latencyHint:latency});
  const resumed=context.resume().catch(()=>{});
+ let outboard,monitor;
  return (async()=>{
   if(!context.audioWorklet)throw Error('Audio needs a secure page: open this over https:// (or localhost), not plain http.');
   const [module]=await Promise.all([loadKernel(),context.audioWorklet.addModule(asset('classics-processor.js')),resumed]);
-  let scopeHandler=null;
+  let stats={active:0,peak:0},outputPeak=0;
   const node=new AudioWorkletNode(context,'calmbgm-classics',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{module,model,params,waves}});
   await new Promise((resolve,reject)=>{node.port.onmessage=({data})=>{
    if(data.type==='ready')resolve();
    else if(data.type==='error'){reject(Error(data.message));onError(Error(data.message));}
-   else if(data.type==='stats')onStats(data);
-   else if(data.type==='scope'){const h=scopeHandler;scopeHandler=null;h?.(data);}
+   else if(data.type==='stats'){stats=data;onStats({...data,peak:outputPeak,reduction:outboard?.reduction??0});}
   };});
-  node.connect(context.destination);
+  outboard=await createRack(context,rack,{onError});
+  monitor=await createOutputMonitor(context,peak=>{outputPeak=peak;onStats({...stats,peak,reduction:outboard.reduction});});
+  node.connect(outboard.input);outboard.connect(monitor.node);monitor.node.connect(context.destination);
   // Batch everything sent in one task into a single message.
   let events=[],edits=[],steps=[],queued=false;
   const flush=()=>{queued=false;if(edits.length){node.port.postMessage({type:'params',values:edits});edits=[];}if(steps.length){node.port.postMessage({type:'seq',values:steps});steps=[];}if(events.length){node.port.postMessage({type:'events',values:events});events=[];}};
@@ -50,9 +55,10 @@ export function startLiveSynth({model=MODELS.cs80,params=[],waves=null,latency='
    /** The vector synthesizer's 128 waves × 128 samples (Float32Array of 16,384). */
    setWaves(data){node.port.postMessage({type:'waves',waves:data});},
    /** Asks for the newest n output samples (mono): handler({end, rate, samples}); `end` counts frames since the engine started. */
-   requestScope(n,handler){scopeHandler=handler;node.port.postMessage({type:'scope',n});},
-   panic(){flush();node.port.postMessage({type:'panic'});},
-   async close(){if(closed)return;closed=true;flush();node.port.postMessage({type:'dispose'});node.disconnect();await context.close().catch(()=>{});},
+   requestScope:monitor.requestScope,
+   setRack:values=>outboard.patch(values),clearRack:()=>outboard.clear(),
+   panic(){flush();node.port.postMessage({type:'panic'});outboard.clear();},
+   async close(){if(closed)return;closed=true;flush();node.port.postMessage({type:'dispose'});node.disconnect();outboard.dispose();monitor.dispose();await context.close().catch(()=>{});},
   };
- })().catch(error=>{context.close().catch(()=>{});throw error;});
+ })().catch(error=>{outboard?.dispose();monitor?.dispose();context.close().catch(()=>{});throw error;});
 }

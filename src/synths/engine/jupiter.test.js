@@ -25,7 +25,7 @@ test('the Jupiter table fits the kernel ABI with unique ids and in-range default
  const ids=PARAMS.map(p=>p.id);expect(new Set(ids).size).toBe(ids.length);
  // the lower layer mirrors the upper one, 64 ids up
  for(const key of LAYER_KEYS)expect(BY_KEY['lo.'+key].id).toBe(BY_KEY[key].id+64);
- for(const p of PARAMS){expect(p.id<131||(p.id>=200&&p.id<216)).toBe(true);expect(p.default).toBeGreaterThanOrEqual(p.min);expect(p.default).toBeLessThanOrEqual(p.max);}
+ for(const p of PARAMS){expect(p.id<131||(p.id>=180&&p.id<196)||(p.id>=200&&p.id<216)).toBe(true);expect(p.default).toBeGreaterThanOrEqual(p.min);expect(p.default).toBeLessThanOrEqual(p.max);}
  expect(BY_KEY.assign.options).toEqual(['Solo','Unison','Poly 1','Poly 2']);
 });
 

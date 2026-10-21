@@ -23,20 +23,16 @@ function directorySlash() {
     };
 }
 
-// The /synths pages are a personal sandbox for learning how classic synths work, not
-// part of the public site. `vite build` includes them (dist/, for the local and tablet
-// preview); `vite build --mode public` (used by deploy) leaves out their pages and the
-// engine files Vite copies from public/synths, and writes to dist-public/.
-const SYNTH_PAGES = { synths:'synths/index.html', synthCs80:'synths/cs80/index.html', synthJuno:'synths/juno/index.html', synthProphet5:'synths/prophet5/index.html', synthJupiter8:'synths/jupiter8/index.html', synthMinimoog:'synths/minimoog/index.html', synthDx7:'synths/dx7/index.html', synthObxa:'synths/obxa/index.html', synthVs:'synths/vs/index.html', synthTr808:'synths/tr808/index.html', synthTr909:'synths/tr909/index.html', synthTr606:'synths/tr606/index.html', synthTb303:'synths/tb303/index.html' };
-function dropPrivateFiles(outDir) {
-    return { name: 'drop-private-files', apply: 'build', closeBundle() { fs.rmSync(path.join(outDir, 'synths'), { recursive: true, force: true }); } };
-}
+// The public /synths comparison pages include the engine and explicitly exported
+// YAML banks in public/synth-presets/. Raw banks/ and listening references stay local.
+const SYNTH_PAGES = { synthEffects:'synths/effects/index.html', synthPoly:'synths/poly/index.html', synthFm:'synths/fm/index.html', synths:'synths/index.html', synthCs80:'synths/cs80/index.html', synthJuno:'synths/juno/index.html', synthProphet5:'synths/prophet5/index.html', synthJupiter8:'synths/jupiter8/index.html', synthMinimoog:'synths/minimoog/index.html', synthDx7:'synths/dx7/index.html', synthObxa:'synths/obxa/index.html', synthVs:'synths/vs/index.html', synthTr808:'synths/tr808/index.html', synthTr909:'synths/tr909/index.html', synthTr606:'synths/tr606/index.html', synthTb303:'synths/tb303/index.html' };
 
 // Your own factory banks for the /synths pages, auto-loaded on your machine only. They live in the
 // git-ignored banks/<synth>/ folders. The dev and preview servers serve them at /local-banks/ (plus
 // an index.json), and a local `vite build` copies them into dist/local-banks/ so any static server of
 // dist/ has them too. The public build (deploy) never includes them; tools/checkPublicBuild.mjs
-// refuses a deploy that does.
+// refuses a deploy containing raw banks. Public comparison banks are separately
+// allowlisted by tools/buildSynthPresets.mjs and published as YAML.
 const BANKS_DIR = 'banks', BANKS_URL = 'local-banks';
 function bankIndex() {
     if (!fs.existsSync(BANKS_DIR)) return {};
@@ -63,7 +59,7 @@ function localBanks(isPublic) {
         name: 'local-banks',
         configureServer(server) { server.middlewares.use(serve); },
         configurePreviewServer(server) { server.middlewares.use(serve); },
-        apply(_, env) { return env.command === 'serve' || !isPublic; },
+        apply() { return !isPublic; },
         writeBundle(options) {
             if (isPublic) return;
             const out = path.join(options.dir, BANKS_URL), index = bankIndex();
@@ -85,10 +81,10 @@ export default defineConfig(({ mode }) => {
   const isPublic = mode === 'public', outDir = isPublic ? 'dist-public' : 'dist';
   return {
     base: '/',
-    plugins: [react(), directorySlash(), localBanks(isPublic), ...(isPublic ? [dropPrivateFiles(outDir)] : [])],
+    plugins: [react(), directorySlash(), localBanks(isPublic)],
     build: {
         outDir,
-        rollupOptions: { input: { main: 'index.html', percussion: 'tools/percussion-engine.html', audioOutput: 'tools/audio-output.html', labs:'labs/index.html', labAll:'labs/all/index.html', labStrings:'labs/strings/index.html', labKeys:'labs/keys/index.html', labChoir:'labs/choir/index.html', labOrgans:'labs/organs/index.html', labDrones:'labs/drones/index.html', labBass:'labs/bass/index.html', labPlucks:'labs/plucks/index.html', labWinds:'labs/winds/index.html', labLeads:'labs/leads/index.html', labPads:'labs/pads/index.html', ...(isPublic ? {} : SYNTH_PAGES), synthLab: 'tools/synth-lab.html', currentSynth: 'tools/current-synth.html', effectsLab:'tools/effects.html', fmLab:'tools/fm.html', ensembleSynth:'tools/ensemble-synth.html', spectrum:'tools/spectrum.html', quality:'tools/quality.html', tone:'tools/tone.html', modulation:'tools/modulation.html', instrumentEffects:'tools/instrument-effects.html', acoustic:'tools/acoustic.html', sources:'tools/sources.html', behavior:'tools/behavior.html', stress:'tools/stress.html' } },
+        rollupOptions: { input: { main: 'index.html', percussion: 'tools/percussion-engine.html', audioOutput: 'tools/audio-output.html', labs:'labs/index.html', labAll:'labs/all/index.html', labStrings:'labs/strings/index.html', labKeys:'labs/keys/index.html', labChoir:'labs/choir/index.html', labOrgans:'labs/organs/index.html', labDrones:'labs/drones/index.html', labBass:'labs/bass/index.html', labPlucks:'labs/plucks/index.html', labWinds:'labs/winds/index.html', labLeads:'labs/leads/index.html', labPads:'labs/pads/index.html', ...SYNTH_PAGES, synthLab: 'tools/synth-lab.html', currentSynth: 'tools/current-synth.html', effectsLab:'tools/effects.html', fmLab:'tools/fm.html', ensembleSynth:'tools/ensemble-synth.html', spectrum:'tools/spectrum.html', quality:'tools/quality.html', tone:'tools/tone.html', modulation:'tools/modulation.html', instrumentEffects:'tools/instrument-effects.html', acoustic:'tools/acoustic.html', sources:'tools/sources.html', behavior:'tools/behavior.html', stress:'tools/stress.html' } },
     },
     test: {
         environment: 'jsdom',

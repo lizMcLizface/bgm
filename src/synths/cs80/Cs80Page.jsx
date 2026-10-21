@@ -9,7 +9,7 @@ const CHANNEL=[
  {title:'VCO',tone:'cream',keys:['feet','pw','pwm','pwmRate','saw','square','noise','sine']},
  {title:'VCF',tone:'red',keys:['hpf','hpRes','lpf','lpRes','keytrack']},
  {title:'Filter EG',tone:'amber',keys:['il','al','fa','fd','fr','hpEg']},
- {title:'VCA',tone:'blue',keys:['a','d','s','r','level']},
+ {title:'VCA',tone:'blue',keys:['a','d','s','r','level'],shape:{env:'amp',a:'a',d:'d',s:'s',r:'r'}},
 ];
 const touchGroup=c=>({title:'Touch '+(c==='i'?'I':'II'),tone:c==='i'?'green':'teal',keys:[[c+'.initBrill','Initial bright'],[c+'.initLevel','Initial level'],[c+'.afterBrill','After bright'],[c+'.afterLevel','After level']]});
 const GROUPS={
@@ -38,15 +38,15 @@ const other=c=>c==='i'?'ii':'i',roman=c=>c==='i'?'I':'II';
 function Factory({values,choose}){
  const at={i:matchChannel(values,'i',ROW_I),ii:matchChannel(values,'ii',ROW_II)};
  const load=next=>{const i=matchChannel(next,'i',ROW_I),ii=matchChannel(next,'ii',ROW_II);choose({name:`I ${i<0?'custom':ROW_I[i].name} · II ${ii<0?'custom':ROW_II[ii].name}`,values:next});};
- return <div className="factory" title="Approximations of the 22 factory presets: the original names and button order, settings estimated from descriptions. Not measured from a CS-80.">
-  {[['i',ROW_I],['ii',ROW_II]].map(([c,row])=><div className="factory-row" key={c} role="group" aria-label={'Factory presets for channel '+roman(c)}>
+ return <div className="factory" title="Two rows of tones, one per channel: pick an upper and a lower tone to stack.">
+  {[['i',ROW_I],['ii',ROW_II]].map(([c,row])=><div className="factory-row" key={c} role="group" aria-label={'Tones for channel '+roman(c)}>
    <span className="factory-label">{roman(c)}</span>
    {row.map((p,n)=><button type="button" key={p.name} style={{'--chip':p.colour}} className={at[c]===n?'on':''} onClick={()=>load(withChannel(values,c,p))}>{p.name}</button>)}
    {c==='ii'&&<button type="button" className="neutral" onClick={()=>load(neutralPanel(values))} title="Reset the sub oscillator, ring modulator, touch, glide and mix controls; keeps volume and space">Neutral panel</button>}
   </div>)}
  </div>;
 }
-const LIBRARIES=[{id:'factory',label:'Factory (approx.)',render:props=><Factory {...props}/>}];
+const LIBRARIES=[{id:'factory',label:'Tone rows',render:props=><Factory {...props}/>}];
 
 export default function Cs80Page(){
  // earlier versions kept the layout in the shared setup

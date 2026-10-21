@@ -168,19 +168,26 @@ pub fn damping(resonance: f32) -> f32 {
 pub struct Adsr {
     pub value: f32,
     pub stage: u8,
+    /// Shaped stages only: progress through the stage (0..1) and the level it started from.
+    x: f32,
+    from: f32,
 }
 pub const IDLE: u8 = 0;
 pub const ATTACK: u8 = 1;
 pub const DECAY: u8 = 2;
 pub const RELEASE: u8 = 3;
 impl Adsr {
-    pub const ZERO: Self = Self { value: 0., stage: IDLE };
+    pub const ZERO: Self = Self { value: 0., stage: IDLE, x: 0., from: 0. };
     pub fn attack(&mut self) {
         self.stage = ATTACK;
+        self.x = 0.;
+        self.from = self.value;
     }
     pub fn release(&mut self) {
         if self.stage != IDLE {
             self.stage = RELEASE;
+            self.x = 0.;
+            self.from = self.value;
         }
     }
     #[inline]
@@ -191,6 +198,8 @@ impl Adsr {
                 if self.value >= 1. {
                     self.value = 1.;
                     self.stage = DECAY;
+                    self.x = 0.;
+                    self.from = 1.;
                 }
             }
             DECAY => {
@@ -348,11 +357,161 @@ impl Adsr {
             if self.value >= 1. {
                 self.value = 1.;
                 self.stage = DECAY;
+                self.x = 0.;
+                self.from = 1.;
             }
             self.value
         } else {
             self.tick(1., decay, sustain, release)
         }
+    }
+
+    /// A stage drawn by an [`EnvShape`]: each stage runs its curve from the level it
+    /// started at to its target in exactly its time. `rate` is progress per sample.
+    #[inline]
+    pub fn tick_shaped(&mut self, shape: &EnvShape, rate: &[f32; 3], sustain: f32) -> f32 {
+        match self.stage {
+            ATTACK => {
+                self.x += rate[0];
+                if self.x >= 1. {
+                    self.value = 1.;
+                    self.stage = DECAY;
+                    self.x = 0.;
+                    self.from = 1.;
+                } else {
+                    self.value = self.from + (1. - self.from) * shape.at(0, self.x);
+                }
+            }
+            DECAY => {
+                if self.x < 1. {
+                    self.x += rate[1];
+                    let g = shape.at(1, self.x.min(1.));
+                    self.value = sustain + (self.from - sustain) * (1. - g);
+                } else {
+                    // holding: follow sustain changes without zipper noise
+                    self.value += (sustain - self.value) * shape.slew;
+                    if sustain < 1e-4 && self.value < 1e-4 {
+                        self.value = 0.;
+                        self.stage = IDLE;
+                    }
+                }
+            }
+            RELEASE => {
+                self.x += rate[2];
+                if self.x >= 1. || self.from < 1e-4 {
+                    self.value = 0.;
+                    self.stage = IDLE;
+                } else {
+                    self.value = self.from * (1. - shape.at(2, self.x));
+                }
+            }
+            _ => {}
+        }
+        self.value
+    }
+
+    /// The model's own envelope, or the shaped one when the patch draws its own curves.
+    /// `attack`, `decay` and `release` are the model's per-sample coefficients;
+    /// `linear_attack` marks an attack that is already a per-sample step (Juno-106).
+    #[inline]
+    pub fn run(&mut self, shape: &EnvShape, rate: &[f32; 3], attack: f32, decay: f32, sustain: f32, release: f32, linear_attack: bool) -> f32 {
+        if shape.custom {
+            self.tick_shaped(shape, rate, sustain)
+        } else if linear_attack {
+            self.tick_linear(attack, decay, sustain, release)
+        } else {
+            self.tick(attack, decay, sustain, release)
+        }
+    }
+}
+
+/// Points per stage curve; the shaped envelope reads them with linear interpolation.
+const SHAPE_POINTS: usize = 65;
+/// Shape parameters per envelope: mode, curve A/D/R, smooth A/D/R, steps.
+pub const SHAPE_PER_ENV: usize = 8;
+/// Parameter slots for the two shaped envelopes (amplitude, then filter).
+pub const SHAPE_PARAMS: usize = 2 * SHAPE_PER_ENV;
+/// Native equivalents (the editor's starting curves): the analog attack, an RC charging
+/// towards 1.3 and stopped at 1, is bend ATTACK_K / CURVE_K; decay and release, -43 dB at
+/// the stage time, are FALL_K / CURVE_K; the Juno-106's attack is linear (bend 0).
+const ATTACK_K: f32 = 1.466;
+const FALL_K: f32 = 5.;
+const CURVE_K: f32 = 10.;
+
+/// Per-patch envelope curves: each stage has a bend (0 linear, + fast start like an RC
+/// circuit, − slow start), a tanh smoothing that rounds the ends into an S, and the
+/// envelope can be quantised into steps (the smoothing then rounds the step edges).
+/// Built once per parameter change; voices only interpolate the tables.
+#[derive(Clone, Copy)]
+pub struct EnvShape {
+    pub custom: bool,
+    curve: [[f32; SHAPE_POINTS]; 3],
+    slew: f32,
+}
+impl EnvShape {
+    pub const NATIVE: Self = Self { custom: false, curve: [[0.; SHAPE_POINTS]; 3], slew: 1. };
+
+    /// `p` holds one envelope's [`SHAPE_PER_ENV`] values, `rate` is the envelope's sample rate.
+    pub fn new(p: &[f32], rate: f32) -> Self {
+        if p.len() < SHAPE_PER_ENV || bound(p[0], 0., 1.) < 0.5 {
+            return Self::NATIVE;
+        }
+        let steps = bound(p[7], 0., 32.).round();
+        let mut curve = [[0.; SHAPE_POINTS]; 3];
+        for (stage, table) in curve.iter_mut().enumerate() {
+            let bend = bound(p[1 + stage], -1., 1.);
+            let smooth = bound(p[4 + stage], 0., 1.);
+            for (i, y) in table.iter_mut().enumerate() {
+                *y = stage_curve(i as f32 / (SHAPE_POINTS - 1) as f32, bend, smooth, steps);
+            }
+        }
+        Self { custom: true, curve, slew: smoothing(0.005, rate) }
+    }
+
+    /// Stage progress (0..1) → how far the level has moved towards the stage's target.
+    #[inline]
+    pub fn at(&self, stage: usize, x: f32) -> f32 {
+        let f = x.clamp(0., 1.) * (SHAPE_POINTS - 1) as f32;
+        let i = (f as usize).min(SHAPE_POINTS - 2);
+        let t = &self.curve[stage];
+        t[i] + (t[i + 1] - t[i]) * (f - i as f32)
+    }
+
+    /// Progress per sample for each stage, from the model's own (already scaled) coefficients,
+    /// so key follow, voice spread and the stage times all carry over. Zero cost when native.
+    #[inline]
+    pub fn rates(&self, attack: f32, decay: f32, release: f32, linear_attack: bool) -> [f32; 3] {
+        if !self.custom {
+            return [0.; 3];
+        }
+        let rc = |c: f32, k: f32| if c >= 1. { 1. } else { -(1. - c).ln() / k };
+        [if linear_attack { attack } else { rc(attack, ATTACK_K) }, rc(decay, FALL_K), rc(release, FALL_K)]
+    }
+}
+
+/// tanh S-curve through (0, 0) and (1, 1); `k` → 0 is the identity.
+fn s_curve(x: f32, k: f32) -> f32 {
+    if k < 1e-3 {
+        x
+    } else {
+        0.5 + 0.5 * (k * (2. * x - 1.)).tanh() / k.tanh()
+    }
+}
+
+/// One stage's progress curve; see [`EnvShape`]. Also mirrored in src/synths/ui/envShape.js.
+pub fn stage_curve(x: f32, bend: f32, smooth: f32, steps: f32) -> f32 {
+    let k = bend * CURVE_K;
+    let bent = |x: f32| if k.abs() < 1e-3 { x } else { (1. - (-k * x).exp()) / (1. - (-k).exp()) };
+    if steps >= 2. {
+        // a staircase along the bent curve; smoothing turns each hard step into a tanh ramp
+        let g = bent(x) * steps;
+        let i = g.floor().min(steps - 1.);
+        let u = g - i;
+        let edge = 1. + 24. * (1. - smooth) * (1. - smooth);
+        let ramp = if smooth >= 1. { u } else { s_curve(u, edge) };
+        ((i + ramp) / steps).clamp(0., 1.)
+    } else {
+        bent(s_curve(x, 4. * smooth))
     }
 }
 

@@ -104,6 +104,24 @@ export function spectrumDb(x,size=8192){
  return out;
 }
 
+/** Log-frequency display samples. Interpolate when a pixel spans less than a
+ * bin; a bin boundary alone must not switch to peak aggregation. */
+export function spectrumTrace(bins,sampleRate,width,lo=20,hi=20000){
+ const count=Math.max(0,Math.floor(width)),out=new Float32Array(count);
+ const binHz=sampleRate/(2*bins.length),top=Math.min(hi,sampleRate/2),ratio=top/lo;
+ const at=p=>{const i=Math.floor(p),t=p-i;return (bins[i]??-200)*(1-t)+(bins[i+1]??-200)*t;};
+ for(let px=0;px<count;px++){
+  const a=lo*ratio**(px/count)/binHz,b=lo*ratio**((px+1)/count)/binHz;
+  if(b-a<1)out[px]=at(Math.sqrt(a*b));
+  else{
+   let peak=Math.max(at(a),at(b));
+   for(let k=Math.ceil(a);k<=Math.min(Math.floor(b),bins.length-1);k++)peak=Math.max(peak,bins[k]);
+   out[px]=peak;
+  }
+ }
+ return out;
+}
+
 /** The largest bin between two frequencies with parabolic refinement: {hz, db}. */
 export function spectralPeak(db,sampleRate,size,lo=20,hi=20000){
  const a=Math.max(2,Math.floor(lo*size/sampleRate)),b=Math.min(db.length-2,Math.ceil(hi*size/sampleRate));

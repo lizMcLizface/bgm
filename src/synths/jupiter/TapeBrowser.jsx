@@ -53,7 +53,7 @@ export default function TapeBrowser({current,choose,values,layer='upper'}){
   await new Promise(r=>setTimeout(r,30));
   try{
    const result=decodeTape(bytes);
-   if(!result.patches.length){setMessage('No Jupiter-8 patches found in that recording.');return;}
+   if(!result.patches.length){setMessage('No patches found in that recording.');return;}
    const patches=result.patches.map(p=>({number:p.number,data:hex(p.data),damaged:p.damaged}));
    save(BANK_KEY,{name,patches});setTape({name,slots:slotsFrom(patches)});
    const damaged=patches.filter(p=>p.damaged).length,missing=64-patches.length;
@@ -79,9 +79,9 @@ export default function TapeBrowser({current,choose,values,layer='upper'}){
   {message&&<span className="bank-message" role="status">{message}</span>}
  </span>;
  if(!tape)return <div className="bank empty">
-  <span className="bank-title">Jupiter-8 tape</span>
+  <span className="bank-title">Pluto 8 tape</span>
   {importer}
-  <span className="bank-hint">Load a WAV recording of a Jupiter-8 patch tape (mono or stereo, any common sample rate). Only the decoded patches stay in this browser.</span>
+  <span className="bank-hint">Load a WAV recording of a patch tape in the Jupiter-8 format (mono or stereo, any common sample rate). Only the decoded patches stay in this browser.</span>
  </div>;
  const bank=Math.floor(index/8),num=index%8,slot=tape.slots[index];
  return <div className="bank">

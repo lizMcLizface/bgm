@@ -38,19 +38,23 @@
     "audit:percussion-presets": "node tools/auditPercussionPresets.mjs",
     "audit:synth-tone": "node tools/auditSynthTone.mjs",
     "audit:phase4": "node tools/runPhase4Audit.mjs",
-    "build:public": "npm run synth:check && vite build --mode public && node tools/checkPublicBuild.mjs",
+    "build:public": "npm run synth:check && npm run synths:check && vite build --mode public && node tools/checkPublicBuild.mjs",
     "predeploy": "npm test && npm run build:public",
     "deploy": "node tools/checkPublicBuild.mjs && gh-pages -d dist-public --dotfiles",
     "render": "vite-node tools/render.js --",
     "synths:build": "node tools/buildClassics.mjs",
     "synths:check": "node tools/buildClassics.mjs --check",
-    "audit:synths": "vite-node tools/auditClassics.mjs"
+    "synths:presets": "vite-node tools/buildSynthPresets.mjs",
+    "audit:synths": "vite-node tools/auditClassics.mjs",
+    "audit:synth-reference": "npm run synths:check && vite-node tools/matchSynthReference.mjs"
   },
   "dependencies": {
+    "fflate": "^0.8.3",
     "prop-types": "^15.8.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "styled-components": "^6.6.0"
+    "styled-components": "^6.6.0",
+    "yaml": "^2.8.1"
   },
   "devDependencies": {
     "@napi-rs/canvas": "^1.0.11",

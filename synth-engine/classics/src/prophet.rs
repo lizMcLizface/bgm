@@ -242,6 +242,8 @@ pub struct Prophet {
     soft: f32,
     pedal: bool,
     pub steals: u32,
+    shape_p: [f32; SHAPE_PARAMS],
+    shapes: [EnvShape; 2],
 }
 
 impl Prophet {
@@ -250,7 +252,7 @@ impl Prophet {
             sr: 48000., p: [0.; PARAMS], dirty: true, setup: Setup::ZERO, voices: [Voice::ZERO; VOICES], stamp: 0, until: 0,
             lfo: Lfo::new(0x3c6e_f372), noise: Rng(0x1b87_3593), unison: false, stack: KeyStack::EMPTY, playing: None,
             dec: [HalfBand::ZERO; 2], bend_to: 0., bend: 0., pressure: 0., modulation: 0., modulation_s: 0., expression: 1.,
-            expression_s: 1., brightness: 0., soft: 0., pedal: false, steals: 0,
+            expression_s: 1., brightness: 0., soft: 0., pedal: false, steals: 0, shape_p: [0.; SHAPE_PARAMS], shapes: [EnvShape::NATIVE; 2],
         }
     }
 
@@ -277,6 +279,12 @@ impl Prophet {
             v.a.phase = 0.5 + 0.5 * rng.next();
             v.b.phase = 0.5 + 0.5 * rng.next();
         }
+    }
+
+    /// Envelope shapes: amplitude 0–7, filter 8–15 (see [`EnvShape`]).
+    pub fn set_shape(&mut self, i: usize, value: f32) {
+        self.shape_p[i] = value;
+        self.dirty = true;
     }
 
     pub fn set(&mut self, i: usize, value: f32) {
@@ -528,6 +536,7 @@ impl Prophet {
             self.stack = KeyStack::EMPTY;
             self.playing = None;
         }
+        self.shapes = [EnvShape::new(&self.shape_p[..SHAPE_PER_ENV], srv), EnvShape::new(&self.shape_p[SHAPE_PER_ENV..], srv)];
         self.dirty = false;
     }
 
@@ -666,9 +675,9 @@ impl Prophet {
             let len = m * s.os;
             for v in self.voices.iter_mut().filter(|v| v.active) {
                 if s.os == 2 {
-                    render_voice(v, &s, vintage, &mut l2[..len], &mut r2[..len]);
+                    render_voice(v, &s, &self.shapes, vintage, &mut l2[..len], &mut r2[..len]);
                 } else {
-                    render_voice(v, &s, vintage, &mut left[at..at + m], &mut right[at..at + m]);
+                    render_voice(v, &s, &self.shapes, vintage, &mut left[at..at + m], &mut right[at..at + m]);
                 }
                 if v.aenv.stage == IDLE {
                     v.active = false;
@@ -690,11 +699,12 @@ impl Prophet {
 }
 
 #[inline(always)]
-fn render_voice(v: &mut Voice, s: &Setup, vintage: f32, left: &mut [f32], right: &mut [f32]) {
+fn render_voice(v: &mut Voice, s: &Setup, shapes: &[EnvShape; 2], vintage: f32, left: &mut [f32], right: &mut [f32]) {
     let time = 1. + 0.15 * vintage * v.time;
     let scale = |c: f32| (c / time).min(1.);
     let (fa, fd, fr) = (scale(s.f_attack), scale(s.f_decay), scale(s.f_release));
     let (aa, ad, ar) = (scale(s.a_attack), scale(s.a_decay), scale(s.a_release));
+    let (rf, ra) = (shapes[1].rates(fa, fd, fr, false), shapes[0].rates(aa, ad, ar, false));
     let (pl, pr) = v.pan;
     let audio_cut = s.pm_cut != 0.;
     for i in 0..left.len() {
@@ -714,8 +724,8 @@ fn render_voice(v: &mut Voice, s: &Setup, vintage: f32, left: &mut [f32], right:
         let g = if audio_cut { warp(exp2(v.cut + s.pm_cut * b), s.srv) } else { v.g };
         // a whisper of noise lets a fully resonant filter start singing on its own
         let y = v.ladder.tick(x + 1e-5 * noise, g, v.k);
-        v.fenv.tick(fa, fd, s.f_sustain, fr);
-        let e = v.aenv.tick(aa, ad, s.a_sustain, ar);
+        v.fenv.run(&shapes[1], &rf, fa, fd, s.f_sustain, fr, false);
+        let e = v.aenv.run(&shapes[0], &ra, aa, ad, s.a_sustain, ar, false);
         let o = y * e * v.gain;
         let o = o * v.onset.tick();
         left[i] += o * pl;

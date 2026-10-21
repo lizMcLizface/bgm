@@ -7,9 +7,9 @@ import {createOfflineSynth,rms,peak} from '../engine/offline';
 
 const module=new WebAssembly.Module(fs.readFileSync('public/synths/classics.wasm'));
 
-test('the two rows keep the original names and order',()=>{
- expect(ROW_I.map(p=>p.name)).toEqual(['Strings 1','Strings 3','Brass 1','Flute 1','Electric Piano','Clavichord 1','Harpsichord 1','Organ 1','Guitar 1','Funky 1','Funky 3']);
- expect(ROW_II.map(p=>p.name)).toEqual(['Strings 2','Strings 4','Brass 2','Brass 3','Bass 1','Clavichord 2','Harpsichord 2','Organ 2','Guitar 2','Funky 2','Funky 4']);
+test('the two tone rows hold eleven tones each, with names of their own',()=>{
+ expect(ROW_I.map(p=>p.name)).toEqual(['Wide Bow','Shimmer Bow','Swell Horn','Breath','Stop Organ','Tine','Pluck Clav','Quill','Twang','Quack','Rubber']);
+ expect(ROW_II.map(p=>p.name)).toEqual(['Soft Bow','High Bow','Warm Horn','Low Horn','Flute Stop','Bright Clav','Quill Two','Nylon','Wah','Snap','Thump']);
 });
 
 test('each preset sets every key of its channel to an in-range value and is recognised afterwards',()=>{
