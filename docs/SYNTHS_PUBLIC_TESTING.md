@@ -2,7 +2,7 @@
 
 The deployed `/synths/` hub and all fourteen instrument pages are included in
 `npm run build:public`. They load the curated YAML files in
-`public/synth-presets/`: 24 banks, 896 programs. Each synth's own sounds ("bgm sounds"), which now include the sounds approximated from printed patch books and sheets (Pluto 8, Oberon Xa, Oracle 5, Analog 106), renamed and sorted into each synth's categories. The only factory comparison banks left are the FM7 ROM cartridges and the VectorVS programs, until generated suites replace them; those files are deployed from the local machine and kept out of the repository. The existing main app and labs
+`public/synth-presets/`: 14 banks, 668 programs, one per synth with its own sounds: hand-made recipes, sounds approximated from printed patch books and sheets (Pluto 8, Oberon Xa, Oracle 5, Analog 106), renamed and sorted into each synth's categories, and generated suites for FM7 (128 voices) and VectorVS (100 programs). No factory data is published. The existing main app and labs
 remain available at their usual addresses.
 
 The hub groups instruments into **Vintage**, **DIY** and **Drums**. DIY Poly at

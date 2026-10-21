@@ -31,6 +31,7 @@ export default function SynthsHome(){
    <h1>Synths</h1>
    <p>Play with a MIDI keyboard, computer keys or touch. Explore vintage models, our own synth engines and drum machines. Choose a preset bank to share a program link or download its YAML settings.</p>
   </header>
+  <a className="home-rack" href={BASE+'synths/ensemble/'}><b>Ensemble ↗</b><span>Hear the synths in context. Choose a progression, swap the players, and shape every part.</span></a>
   <a className="home-rack" href={BASE+'synths/effects/'}><b>Effects rack ↗</b><span>A little outboard for any synth · saturation, EQ, compressor, modulation, echo and room.</span></a>
   <nav className="home-categories" aria-label="Synth categories">{CATEGORIES.map(c=><a key={c.id} href={'#'+c.id}>{c.name}<small>{c.ids.length}</small></a>)}</nav>
   {CATEGORIES.map(category=><section key={category.id} className="home-category" id={category.id} aria-labelledby={category.id+'-title'}>

@@ -30,9 +30,9 @@ const RAW=[
   aAttack:.001,aDecay:1.4,aSustain:0,aRelease:.6,velFilter:.5,velAmp:.5,reverbMix:.35,volume:1}},
  {name:'Steam Pipes',category:'organ',styles:['organ', 'wobble'],colour:'#8a8f98',note:'Square-ish pulses with noise and a little LFO pitch wobble.',values:{
   osc1Saw:0,osc1Pulse:1,osc2Saw:0,osc2Pulse:1,osc2Pitch:12,osc2Detune:2,noiseOn:1,cutoff:3000,res:.05,envAmount:.1,poles:0,
-  lfoRate:5,lfoFreqDepth:.15,lfoToOsc1:1,lfoToOsc2:1,fSustain:1,aAttack:.01,aDecay:.4,aSustain:1,aRelease:.12,reverbMix:.2,volume:.39}},
+  lfoRate:5,lfoFreqDepth:.28,lfoToOsc1:1,lfoToOsc2:1,fSustain:1,aAttack:.01,aDecay:.4,aSustain:1,aRelease:.12,reverbMix:.2,volume:.39}},
  {name:'S/H Burble',category:'fx',styles:['random', 'resonant'],colour:'#9b7fd1',note:'Sample & hold steps the resonant filter.',values:{
-  osc2Pitch:-12,osc2Detune:5,cutoff:500,res:.7,envAmount:.1,poles:1,track:1,lfoRate:7,lfoSine:0,lfoSh:1,lfoFreqDepth:.5,lfoToFilter:1,
+  osc2Pitch:-12,osc2Detune:5,cutoff:500,res:.7,envAmount:.1,poles:1,track:1,lfoRate:7,lfoSine:0,lfoSh:1,lfoFreqDepth:.63,lfoToFilter:1,
   aAttack:.004,aDecay:1,aSustain:.9,aRelease:.5,reverbMix:.3,volume:.64}},
  {name:'Bass',category:'bass',styles:['round'],colour:'#3f6b4f',note:'Two low saws, snappy filter, 12 dB for a rounder tone.',values:{
   osc1Pitch:-12,osc2Pitch:-12,osc2Detune:5,cutoff:140,res:.3,envAmount:.45,poles:1,track:1,
@@ -40,7 +40,7 @@ const RAW=[
   voices:4,width:.1,reverbMix:.03,volume:.76}},
  {name:'Wind',category:'fx',styles:['noise'],colour:'#4a62b8',note:'Noise only through a swept resonant filter.',values:{
   osc1On:0,osc2Mix:0,noiseOn:1,cutoff:500,res:.6,envAmount:.2,poles:1,track:1,fAttack:1.2,fDecay:3,fSustain:.6,fRelease:2,
-  aAttack:1.2,aDecay:3,aSustain:.85,aRelease:2.2,lfoRate:.15,lfoFreqDepth:.4,lfoToFilter:1,width:.8,reverbMix:.45,reverbDecay:7,volume:.93}},
+  aAttack:1.2,aDecay:3,aSustain:.85,aRelease:2.2,lfoRate:.15,lfoFreqDepth:.57,lfoToFilter:1,width:.8,reverbMix:.45,reverbDecay:7,volume:.93}},
  {name:'Plain',category:'init',styles:['neutral'],colour:'#c9c3b4',note:'A neutral starting point: two slightly detuned saws.',values:{}},
 ];
 

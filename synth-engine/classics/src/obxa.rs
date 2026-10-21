@@ -511,11 +511,14 @@ impl ObXa {
         self.wheel_lfo = (self.wheel_lfo + bound(p[id::WHEEL_RATE], 0.1, 20.) * ts).fract();
         let vibrato = bound(p[id::WHEEL_DEPTH], 0., 1.) * self.modulation_s * sin_turns(self.wheel_lfo);
         let depth = bound(p[id::LFO_FREQ_DEPTH], 0., 1.);
-        let pitch_mod = 12. * depth * depth * lfo;
+        // Calibrated on the factory patch book: most programs set the knob near 2 for a gentle vibrato
+        // (about ±10 cents here) and a full knob makes sirens (±1 octave), hence the cube law.
+        let pitch_mod = 12. * depth * depth * depth * lfo;
         let (lfo1, lfo2) = (if on(id::LFO_TO_OSC1) { pitch_mod } else { 0. }, if on(id::LFO_TO_OSC2) { pitch_mod } else { 0. });
         let wheel1 = if on(id::WHEEL_OSC1) { 1.0 * vibrato } else { 0. };
         let wheel2 = if on(id::WHEEL_OSC2) { 1.0 * vibrato } else { 0. };
-        let filter_mod = if on(id::LFO_TO_FILTER) { 4. * depth * lfo } else { 0. };
+        // filter sweeps: up to 5 octaves, square law (knob 2-3 is a slow wah, not a full octave)
+        let filter_mod = if on(id::LFO_TO_FILTER) { 5. * depth * depth * lfo } else { 0. };
         let pw_depth = bound(p[id::LFO_PW_DEPTH], 0., 1.) * lfo;
         let (pw_l1, pw_l2) = (if on(id::LFO_PW_OSC1) { 0.45 * pw_depth } else { 0. }, if on(id::LFO_PW_OSC2) { 0.45 * pw_depth } else { 0. });
         // the host sends the bend in semitones; "osc 2 only" bends just the second oscillator
@@ -527,6 +530,11 @@ impl ObXa {
         // service manual, voice card calibration: with the filter modulation knob full, the envelope moves
         // oscillator 2 exactly one octave
         let fenv_osc2 = if on(id::FENV_OSC2) { 12. * bound(p[id::ENV_AMOUNT], 0., 1.) } else { 0. };
+        // [est, from the factory patch book] Without sync the envelope's rise above its sustain moves the
+        // pitch, so held notes settle back in tune: the book's unsynced programs with full sustain (Sax,
+        // F-ENV Horns, Soft Piano) are tuned instruments, which a sustained offset of semitones is not.
+        // With sync the offset is timbre, and the whole envelope sweeps.
+        let fenv_floor = if on(id::SYNC) { 0. } else { bound(p[id::F_SUSTAIN], 0., 1.) };
         let width = 0.5 - 0.46 * bound(p[id::PW], 0., 1.);
         let porta = bound(p[id::PORTAMENTO], 0., 10.);
         let porta_k = if porta > 0. { smoothing(porta / 3., rate) } else { 1. };
@@ -553,7 +561,7 @@ impl ObXa {
             let fe = v.fenv.value;
             let pitch = v.pitch + transpose + tune + detune * v.offset + 0.06 * spread * v.tune;
             let dt1 = (note_hz(pitch + pitch1 + bend1 + lfo1 + wheel1) / srv).min(0.45);
-            let dt2 = (note_hz(pitch + pitch2 + bend2 + lfo2 + wheel2 + fenv_osc2 * fe) / srv).min(0.45);
+            let dt2 = (note_hz(pitch + pitch2 + bend2 + lfo2 + wheel2 + fenv_osc2 * (fe - fenv_floor).max(0.)) / srv).min(0.45);
             let pw1 = (width + pw_l1).clamp(0.02, 0.98);
             let pw2 = (width + pw_l2).clamp(0.02, 0.98);
             // key tracking counts from the lowest key (C2 on the 61-key keyboard)

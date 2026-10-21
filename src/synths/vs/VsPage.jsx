@@ -4,7 +4,7 @@ import {SYNTHS} from '../models';
 import ProgramBrowser,{readStoredWaves} from './ProgramBrowser';
 import VectorPad from './VectorPad';
 import ModMatrix from './ModMatrix';
-import {composeWaves} from './waves';
+import {composeWaves,builtinWaves} from './waves';
 import {BY_KEY} from './params';
 
 // Content-sized sections: controls keep a usable size and the panel scrolls as
@@ -47,7 +47,7 @@ export default function VsPage(){
  const setWaves=next=>{wavesRef.current=next;liveRef.current?.setWaves(new Float32Array(next));};
  const libraries=[{id:'programs',label:'VS programs',render:({choose,values,current})=><ProgramBrowser choose={choose} values={values} current={current} setWaves={setWaves}/>}];
  return <SynthShell synth={SYNTHS.vs} className="vs" panelClassName="vs-panel" libraries={libraries}
-  engineOptions={()=>({waves:new Float32Array(wavesRef.current)})} onEngine={live=>{liveRef.current=live;live.setWaves(new Float32Array(wavesRef.current));}} onComparisonWaves={setWaves}>
+  engineOptions={()=>({waves:new Float32Array(wavesRef.current)})} onEngine={live=>{liveRef.current=live;live.setWaves(new Float32Array(wavesRef.current));}} onComparisonWaves={setWaves} onChoose={p=>{if(p.builtinWaves)setWaves(builtinWaves());}}>
   {({group,control,values,replaceValues})=>[
    <div className="panel-row vs-sources" key="0">
     <section className="group vector" key="pad"><h3>Vector</h3>

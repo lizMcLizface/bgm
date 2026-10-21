@@ -2,86 +2,6 @@
   "schema": 1,
   "banks": [
     {
-      "id": "dx7-rom1a",
-      "synth": "dx7",
-      "name": "ROM1A",
-      "kind": "factory",
-      "count": 32,
-      "url": "synth-presets/dx7-rom1a.yaml"
-    },
-    {
-      "id": "dx7-rom1b",
-      "synth": "dx7",
-      "name": "ROM1B",
-      "kind": "factory",
-      "count": 32,
-      "url": "synth-presets/dx7-rom1b.yaml"
-    },
-    {
-      "id": "dx7-rom2a",
-      "synth": "dx7",
-      "name": "ROM2A",
-      "kind": "factory",
-      "count": 32,
-      "url": "synth-presets/dx7-rom2a.yaml"
-    },
-    {
-      "id": "dx7-rom2b",
-      "synth": "dx7",
-      "name": "ROM2B",
-      "kind": "factory",
-      "count": 32,
-      "url": "synth-presets/dx7-rom2b.yaml"
-    },
-    {
-      "id": "dx7-rom3a",
-      "synth": "dx7",
-      "name": "ROM3A",
-      "kind": "factory",
-      "count": 32,
-      "url": "synth-presets/dx7-rom3a.yaml"
-    },
-    {
-      "id": "dx7-rom3b",
-      "synth": "dx7",
-      "name": "ROM3B",
-      "kind": "factory",
-      "count": 32,
-      "url": "synth-presets/dx7-rom3b.yaml"
-    },
-    {
-      "id": "dx7-rom4a",
-      "synth": "dx7",
-      "name": "ROM4A",
-      "kind": "factory",
-      "count": 32,
-      "url": "synth-presets/dx7-rom4a.yaml"
-    },
-    {
-      "id": "dx7-rom4b",
-      "synth": "dx7",
-      "name": "ROM4B",
-      "kind": "factory",
-      "count": 32,
-      "url": "synth-presets/dx7-rom4b.yaml"
-    },
-    {
-      "id": "vs-factory",
-      "synth": "vs",
-      "name": "Factory programs",
-      "kind": "factory",
-      "count": 100,
-      "url": "synth-presets/vs-factory.yaml"
-    },
-    {
-      "id": "vs-rom-cart",
-      "synth": "vs",
-      "name": "ROM cartridge",
-      "kind": "factory",
-      "count": 100,
-      "url": "synth-presets/vs-rom-cart.yaml"
-    },
-    {
       "id": "poly-originals",
       "synth": "poly",
       "name": "bgm sounds",
@@ -142,7 +62,7 @@
       "synth": "dx7",
       "name": "bgm sounds",
       "kind": "original",
-      "count": 9,
+      "count": 137,
       "url": "synth-presets/dx7-originals.yaml"
     },
     {
@@ -158,7 +78,7 @@
       "synth": "vs",
       "name": "bgm sounds",
       "kind": "original",
-      "count": 9,
+      "count": 109,
       "url": "synth-presets/vs-originals.yaml"
     },
     {

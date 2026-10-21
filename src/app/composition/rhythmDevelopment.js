@@ -40,10 +40,11 @@ export function shapeRhythmicPart(events, { role, style, rhythm, meter, enabled 
     if (!functionName) return events;
     const collides = at => rhythm.leadAttacks.some(t => Math.abs(t - at) < rhythm.guard);
     const groups = [...new Set(events.map(e => e.beat))].sort((a, b) => a - b);
+    const running = role === 'pad' && ['arpeggio', 'sequence'].includes(style);
     let moved = false;
     const moves = new Map();
     for (const beat of groups) {
-        if (beat === 0 || moved || functionName !== 'answer') continue;
+        if (running || beat === 0 || moved || functionName !== 'answer') continue;
         const end = Math.min(...events.filter(e => e.beat === beat).map(e => e.beat + e.length), meter.units);
         const target = rhythm.preferred.find(at => at > beat && at - beat <= meter.unitsPerBeat
             && at < end - .06 && !groups.some(t => Math.abs(t - at) < .06) && !collides(at));

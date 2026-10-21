@@ -35,6 +35,10 @@ export function barRhythm({ phrase, bar, meter, lead }) {
 export function spaceAccompaniment(events, { rhythm, meter, style, enabled }) {
     if (!enabled || !rhythm.leadAttacks.length || ['sustain', 'rolled', 'stacked'].includes(style)) return events;
     const collision = at => rhythm.leadAttacks.some(t => Math.abs(at - t) < rhythm.guard);
+    // A running figure loses its shape when individual steps disappear.
+    // Make room for the lead with dynamics while retaining attacks and tails.
+    if (['arpeggio', 'sequence'].includes(style)) return events.map(e =>
+        e.beat !== 0 && collision(e.beat) ? { ...e, velocity: e.velocity * 0.8 } : e);
     let dropped = 0;
     const budget = Math.floor(events.length / 3);
     const out = [];

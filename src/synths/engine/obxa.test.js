@@ -170,3 +170,13 @@ test.skipIf(!fs.existsSync(BOOK))('the local patch book maps into range and play
  // a few programs are deliberately silent on their own (a bare noise or effects patch with the mix off)
  expect(quiet.length,quiet.join(', ')).toBeLessThanOrEqual(3);
 });
+
+test('the book\'s typical settings stay in tune: a vibrato knob at 2 is about ±10 cents, and without sync a sustained filter envelope leaves osc 2 on the note',()=>{
+ const swing=values=>{const v=synth(values);v.k.syn_note_on(1,57,1);v.seconds(.3);const hz=[];for(let i=0;i<24;i++)hz.push(pitchHz(v.seconds(.04)[0]));return [Math.min(...hz),Math.max(...hz)];};
+ const [lo,hi]=swing({...SINE,lfoRate:3,lfoSine:1,lfoFreqDepth:.2,lfoToOsc1:1});
+ expect(1200*Math.log2(hi/lo)).toBeGreaterThan(8);expect(1200*Math.log2(hi/lo)).toBeLessThan(35);
+ // F-ENV Horns-like: envelope → osc 2 with full sustain and no sync: the held note is in tune; the attack still lifts it
+ const held={...ONLY2,fenvOsc2:1,envAmount:.56,fAttack:.05,fDecay:.3,fSustain:1};
+ const v=synth(held);v.k.syn_note_on(1,57,1);v.seconds(.8);expect(cents(pitchHz(v.seconds(.3)[0]),220)).toBeLessThan(3);
+ const blip=synth({...held,fSustain:0,fAttack:.001,fDecay:.2});blip.k.syn_note_on(1,57,1);blip.seconds(.004);expect(pitchHz(blip.seconds(.03)[0])).toBeGreaterThan(220*2**(3/12));
+});

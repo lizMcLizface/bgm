@@ -21,6 +21,9 @@ npx vite-node tools/buildJp8SheetPresets.mjs                                    
 ## Checks
 Against the decoded factory tape, used only as a check (nothing from it is written): VCO waves and ranges, sync, slope and polarity agree on 59–64 of 64 patches. Where they differ the sheet is used: some sheets draw decay at the top when sustain is at 10, and the tape decoder's key-follow and LFO-wave readings do not match the printed labels.
 
+## Calibration
+`npx vite-node tools/calibrateJp8Sheets.mjs` fits, per slider, a line from the drawn reading to the factory tape's value of the same program and writes its two coefficients to `calibration.json`, which the preset build applies (no tape value is copied). A slider is calibrated only when at least 30 programs agree with the fit, the slope is plausible and the error clearly drops. The drawings sit low on LFO rate, ENV-1 decay, ENV-2 attack and release (the strings attacked and stopped in 0.1 s); fine tune is drawn more scattered than the programs, which sit near centre. ENV-2 decay does not track the tape at all (likely the tape byte map, which was itself fitted against these sheets) and stays as drawn.
+
 ## Known limits
 - **Accuracy:** the drawings are hand-marked facsimiles: about ±0.05 per slider, ±0.1 on a few knobs drawn as a bar through the knob (the longer side is taken).
 - **Not read:** the arpeggiator, the bender and LFO-mod inset, and the playing notes under each drawing.

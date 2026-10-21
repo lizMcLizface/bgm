@@ -20,8 +20,3 @@ dist-public/
 # Raw source banks and reference recordings remain local; public YAML is exported separately
 banks/
 
-# Factory comparison banks still published from this machine until the generated FM7 / VectorVS
-# suites replace them; kept out of the public repository
-public/synth-presets/dx7-rom*.yaml
-public/synth-presets/vs-factory.yaml
-public/synth-presets/vs-rom-cart.yaml

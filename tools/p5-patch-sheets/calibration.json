@@ -1,0 +1,48 @@
+{
+ "note": "Per-knob lines, drawn reading → value, fitted on the factory file (tools/calibrateP5Sheets.mjs). Only the coefficients are kept.",
+ "programs": 40,
+ "controls": {
+  "oscAPw": {
+   "a": 1.107,
+   "b": -0.093,
+   "kept": 38,
+   "before": 0.053,
+   "after": 0.018
+  },
+  "oscBPw": {
+   "a": 1.217,
+   "b": -0.117,
+   "kept": 37,
+   "before": 0.039,
+   "after": 0.022
+  },
+  "cutoff": {
+   "a": 1.051,
+   "b": -0.062,
+   "kept": 38,
+   "before": 0.056,
+   "after": 0.038
+  }
+ },
+ "skipped": {
+  "glide": "slope 0.00: the reading and the memory do not track",
+  "mixA": "no clear gain (0.047 → 0.042)",
+  "mixB": "no clear gain (0.028 → 0.029)",
+  "noise": "no clear gain (0.003 → 0.002)",
+  "resonance": "no clear gain (0.044 → 0.038)",
+  "filterEnv": "no clear gain (0.042 → 0.047)",
+  "lfoRate": "no clear gain (0.036 → 0.030)",
+  "lfoInitial": "no clear gain (0.005 → 0.010)",
+  "wheelMix": "slope -0.01: the reading and the memory do not track",
+  "polyModEnv": "no clear gain (0.021 → 0.025)",
+  "polyModOscB": "no clear gain (0.029 → 0.022)",
+  "filterAttack": "no clear gain (0.026 → 0.024)",
+  "filterDecay": "no clear gain (0.020 → 0.021)",
+  "filterSustain": "no clear gain (0.038 → 0.034)",
+  "filterRelease": "no clear gain (0.041 → 0.039)",
+  "ampAttack": "no clear gain (0.043 → 0.039)",
+  "ampDecay": "no clear gain (0.035 → 0.038)",
+  "ampSustain": "no clear gain (0.035 → 0.034)",
+  "ampRelease": "no clear gain (0.049 → 0.048)"
+ }
+}

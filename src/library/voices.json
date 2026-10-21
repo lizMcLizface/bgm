@@ -1300,6 +1300,28 @@
       "reverbAmount": 0.3,
       "eqLowGain": -3,
       "eqHighGain": -2
+    },
+    "Nebula Lead": {
+      "masterVolume": 0.5,
+      "vcoType": "sine",
+      "osc2Type": "triangle",
+      "osc2OctaveOffset": 1,
+      "osc2Amount": 0.25,
+      "voiceCount": 2,
+      "detuneSpread": 6,
+      "gainAttack": 0.18,
+      "gainDecay": 0.8,
+      "gainSustain": 0.6,
+      "gainRelease": 1.6,
+      "filterType": "lowpass",
+      "filterFreq": 2200,
+      "vibratoDepth": 5,
+      "vibratoRate": 4.6,
+      "pingPongDelayTime": 0.59,
+      "pingPongFeedback": 0.4,
+      "pingPongAmount": 0.25,
+      "reverbType": "reverb6",
+      "reverbAmount": 0.6
     }
   },
   "Keys & plucks": {
@@ -1582,6 +1604,30 @@
       "reverbAmount": 0.25,
       "eqLowGain": -4,
       "eqHighGain": -2
+    },
+    "Galaxy Arp": {
+      "masterVolume": 0.5,
+      "vcoType": "triangle",
+      "osc2Type": "sawtooth",
+      "osc2Amount": 0.35,
+      "voiceCount": 2,
+      "detuneSpread": 8,
+      "stereoSpread": 60,
+      "gainAttack": 0.005,
+      "gainDecay": 0.4,
+      "gainSustain": 0.12,
+      "gainRelease": 0.7,
+      "filterType": "lowpass",
+      "filterFreq": 1000,
+      "filterQ": 2,
+      "filterEnvAmount": 1600,
+      "filterDecay": 0.3,
+      "pingPongDelayTime": 0.395,
+      "pingPongFeedback": 0.45,
+      "pingPongTone": 2500,
+      "pingPongAmount": 0.3,
+      "reverbType": "reverb6",
+      "reverbAmount": 0.55
     }
   },
   "Textures": {

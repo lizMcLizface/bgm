@@ -1,0 +1,61 @@
+{
+ "note": "Per-slider lines, drawn reading → value, fitted on the factory tape (tools/calibrateJp8Sheets.mjs). Only the coefficients are kept.",
+ "programs": 64,
+ "controls": {
+  "lfoRate": {
+   "a": 0.758,
+   "b": 0.22,
+   "kept": 59,
+   "before": 0.087,
+   "after": 0.053
+  },
+  "env1Decay": {
+   "a": 0.617,
+   "b": 0.382,
+   "kept": 47,
+   "before": 0.212,
+   "after": 0.095
+  },
+  "env2Attack": {
+   "a": 1.579,
+   "b": 0.012,
+   "kept": 60,
+   "before": 0.079,
+   "after": 0.038
+  },
+  "env2Release": {
+   "a": 0.881,
+   "b": 0.212,
+   "kept": 57,
+   "before": 0.174,
+   "after": 0.113
+  },
+  "vco2Fine": {
+   "a": 0.19,
+   "b": 0.447,
+   "kept": 60,
+   "before": 0.101,
+   "after": 0.056
+  }
+ },
+ "skipped": {
+  "lfoDelay": "only 25 programs agree",
+  "vcoModLfo": "no clear gain (0.040 → 0.042)",
+  "vcoModEnv": "no clear gain (0.034 → 0.030)",
+  "pwm": "no clear gain (0.091 → 0.096)",
+  "crossMod": "no clear gain (0.019 → 0.021)",
+  "hpf": "no clear gain (0.012 → 0.014)",
+  "cutoff": "no clear gain (0.079 → 0.082)",
+  "resonance": "no clear gain (0.046 → 0.050)",
+  "envMod": "no clear gain (0.062 → 0.067)",
+  "vcfLfo": "no clear gain (0.017 → 0.020)",
+  "keyFollow": "no clear gain (0.090 → 0.102)",
+  "vcaLevel": "no clear gain (0.080 → 0.079)",
+  "env1Attack": "no clear gain (0.068 → 0.066)",
+  "env1Sustain": "no clear gain (0.083 → 0.096)",
+  "env1Release": "no clear gain (0.147 → 0.122)",
+  "env2Decay": "slope -0.01: the reading and the memory do not track",
+  "env2Sustain": "no clear gain (0.063 → 0.071)",
+  "sourceMix": "no clear gain (0.051 → 0.054)"
+ }
+}

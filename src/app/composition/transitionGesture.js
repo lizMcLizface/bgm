@@ -13,6 +13,9 @@ export function transitionGesture(section, bar) {
  */
 export function gesturePart(events,{gesture,meter,style,enabled=true}) {
     if(!gesture||!enabled||!events.length||['sustain','rolled','stacked','harmony'].includes(style))return events;
+    // Prepare the transition dynamically without punching holes in a running figure.
+    if(['arpeggio','sequence'].includes(style))return events.map(e=>({...e,
+        velocity:e.velocity*(gesture.step===1?.86:.94)}));
     const groups=[...new Set(events.map(e=>e.beat))].sort((a,b)=>a-b),anchors=groupStarts(meter);
     const weak=groups.slice(1,-1).filter(at=>!anchors.includes(at));
     const removed=weak.at(-1),previous=groups[groups.indexOf(removed)-1];

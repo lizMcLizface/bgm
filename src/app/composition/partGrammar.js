@@ -13,7 +13,8 @@ export function planPartGrammar({ seed, phrase, roles = {} }) {
 
 /** Phrase space belongs to active parts too. No attacks are added. */
 export function partGrammar(events, { plan, role, index, meter, style, enabled = true, lead = [] }) {
-    if (!enabled || !events.length || role === 'pad' && ['sustain', 'rolled', 'stacked'].includes(style)) return events;
+    // Running figures need every step and may ring across the bar line.
+    if (!enabled || !events.length || role === 'pad' && ['sustain', 'rolled', 'stacked', 'arpeggio', 'sequence'].includes(style)) return events;
     if (role === 'counter' && index === plan.counterRest && lead.length) return [];
     let out = events.map(e => ({ ...e }));
     const operation = plan[role][index], beat = meter.unitsPerBeat, step = beat === 3 ? 1 : .5;

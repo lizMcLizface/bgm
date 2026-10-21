@@ -7,11 +7,12 @@ import {load,save} from '../storage';
 import Scope from './Scope';
 import ComparisonPresets from './ComparisonPresets';
 import EnvShapeEditor from './EnvShapeEditor';
-import SoundPicker from './SoundPicker';
+import SoundPicker,{soundList,nextSound} from './SoundPicker';
 import {SHAPE_KEYS} from './envShape';
 import RackPanel from '../effects/RackPanel';
 import {RACK_PARAMS,SPACE_KEYS,cleanRack,rackForPatch,instrumentSpaceKeys,splitRackEdits} from '../effects/params';
 import {serveRack} from '../effects/connection';
+import EmbeddedShell,{useEnsemblePanel} from './EmbeddedShell';
 
 // Everything a /synths page shares: audio start, MIDI piano, computer keys,
 // sounds (factory + saved), setup, the ribbon/pad/keys strip and screen wake.
@@ -33,9 +34,14 @@ function clearComparisonLink(){
  * libraries: extra shelves beside the sound buttons, [{id,label,render({choose,values,current})}].
  * startEngine(options): optional host for another existing engine, using the
  * same note/control/scope contract as startLiveSynth.
+ * onChoose(sound): called before a sound loads (the vector synth switches waves for its own sounds).
  * engineOptions(): extra options for the engine when it starts (the vector synthesizer's waves); onEngine(live): called with the running engine; onStats(data): every engine report (the sequencer playhead); onMidiRealtime(status): MIDI clock, start, continue and stop bytes.
  */
-export default function SynthShell({synth,className='',headerExtras=null,nav=null,panelClassName='',expand,libraries=[],startEngine=startLiveSynth,engineOptions,onEngine,onStats,onMidiRealtime,onComparisonWaves,initialPatch,children}){
+export default function SynthShell(props){
+ const embedded=useEnsemblePanel();
+ return embedded?<EmbeddedShell {...props}/>:<StandaloneShell {...props}/>;
+}
+function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelClassName='',expand,libraries=[],startEngine=startLiveSynth,engineOptions,onEngine,onStats,onMidiRealtime,onComparisonWaves,initialPatch,onChoose,children}){
  const {params:{BY_KEY,sanitize,toPairs},presets}=synth;
  const PATCH_KEY=`synths:${synth.id}:patch`,MINE_KEY=`synths:${synth.id}:mine`;
  const [patch,setPatch]=useState(()=>{
@@ -84,7 +90,8 @@ export default function SynthShell({synth,className='',headerExtras=null,nav=nul
   for(const k of keys)engine.current?.setParam(BY_KEY[k].id,value);
  },[BY_KEY]);
  const replaceValues=useCallback(values=>{clearComparisonLink();engine.current?.setParams(toPairs(values));setPatch(p=>({name:dirty(p.name),values}));},[toPairs]);
- const choose=useCallback(next=>{if(!next.comparison)clearComparisonLink();if(next.comparison)setOutboard(cleanRack());else if(next.rack)setOutboard(RACK_PARAMS.sanitize(next.rack));setPatch({name:next.name,values:{...next.values},...(next.comparison?{comparison:next.comparison}:{})});engine.current?.setParams(toPairs(next.values));},[toPairs]);
+ const onChooseRef=useRef(onChoose);onChooseRef.current=onChoose;
+ const choose=useCallback(next=>{onChooseRef.current?.(next);if(!next.comparison)clearComparisonLink();if(next.comparison)setOutboard(cleanRack());else if(next.rack)setOutboard(RACK_PARAMS.sanitize(next.rack));setPatch({name:next.name,category:next.cat??next.category,values:{...next.values},...(next.comparison?{comparison:next.comparison}:{})});engine.current?.setParams(toPairs(next.values));},[toPairs]);
  const changeRack=useCallback(changes=>{
   const {native,extra}=splitRackEdits(synth,changes);
   if(!Object.keys(native).length&&!Object.keys(extra).length)return;
@@ -110,7 +117,7 @@ export default function SynthShell({synth,className='',headerExtras=null,nav=nul
 
  // inputs
  const velocity=useCallback(v=>mapVelocity(v,CURVES[setupRef.current.velocity]??CURVES.normal),[]);
- const midiRef=useRef(null);
+ const midiRef=useRef(null),programRef=useRef(null);
  useEffect(()=>{
   const m=new LabMidi({
    on:(key,note,v)=>performer.down(key,note,velocity(v)),
@@ -126,6 +133,7 @@ export default function SynthShell({synth,className='',headerExtras=null,nav=nul
    polyPressure:(key,value)=>performer.pressure(key,value),
    soft:value=>performer.control('soft',value),
    realtime:status=>realtimeRef.current?.(status),
+   program:number=>programRef.current?.(number),
    panic:()=>{performer.releaseAll();performer.control('sustain',0);setPedal(false);},
    onStatus:inputs=>setMidi({inputs,status:inputs.length?`${inputs.length} MIDI input${inputs.length>1?'s':''} connected.`:'MIDI ready · plug in your piano.'}),
   });
@@ -135,6 +143,27 @@ export default function SynthShell({synth,className='',headerExtras=null,nav=nul
   return ()=>{keyboard();m.dispose();window.removeEventListener('blur',blur);performer.panic();engine.current?.close();engine.current=null;};
  },[performer,velocity]);
  const connectMidi=async()=>{try{await midiRef.current.connect();}catch(e){setMidi(m=>({...m,status:e.message}));}};
+
+ // Sound hotkeys: ← → the previous/next sound, ↑ ↓ the first sound of the previous/next category,
+ // N a new generated sound in the current category (synths with a generator). Not while typing or
+ // on a slider; MIDI Program Change picks a sound by number.
+ const hotkeys=useRef(null);
+ hotkeys.current={list:soundList(synth,presets,mine),current:patch.name.replace(/ \*$/,''),category:patch.category,choose};
+ useEffect(()=>{
+  const key=e=>{
+   if(e.repeat||e.ctrlKey||e.metaKey||e.altKey||e.target?.closest?.('input,select,textarea,[contenteditable=true],[role=slider],.sp,.env-shape'))return;
+   const h=hotkeys.current,arrow={ArrowLeft:[-1,false],ArrowRight:[1,false],ArrowUp:[-1,true],ArrowDown:[1,true]}[e.key];
+   if(arrow){const next=nextSound(h.list,h.current,h.category,...arrow);if(next){e.preventDefault();h.choose(next);}}
+   else if(e.code==='KeyN'&&synth.generate){
+    const here=h.list.sounds.find(p=>p.name===h.current)?.cat??h.category;
+    const category=synth.generates?.includes(here)?here:synth.generates?.[0];
+    if(category){e.preventDefault();h.choose(synth.generate(category,Math.floor(Math.random()*1e9)));}
+   }
+  };
+  window.addEventListener('keydown',key);
+  return ()=>window.removeEventListener('keydown',key);
+ },[synth]);
+ programRef.current=number=>{const {sounds}=hotkeys.current.list;if(sounds.length)hotkeys.current.choose(sounds[number%sounds.length]);};
 
  // keep the screen awake while the synth is on
  useEffect(()=>{
@@ -210,7 +239,7 @@ export default function SynthShell({synth,className='',headerExtras=null,nav=nul
     {[{id:'sounds',label:'Sounds'},...libraries].map(l=><button type="button" key={l.id} role="radio" aria-checked={shelf===l.id} onClick={()=>pickShelf(l.id)}>{l.label}</button>)}
    </span>}
    {library?library.render({choose,values:patch.values,current,rack:outboard}):<>
-   <SoundPicker synth={synth} presets={presets} mine={mine} current={current} choose={choose} remove={removeMine}/>
+   <SoundPicker synth={synth} presets={presets} mine={mine} current={current} currentCategory={patch.category} choose={choose} remove={removeMine}/>
    <button type="button" className="save" onClick={saveMine}>＋ Save sound</button>
    </>}
   </nav>

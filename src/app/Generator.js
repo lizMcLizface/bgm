@@ -269,6 +269,7 @@ class Generator {
     }
 
     async start() {
+        if(this.sourceLoads?.size)await Promise.all(this.sourceLoads);
         if(Object.values(this.roles).some(r=>r.instrument.preset?.wasmVoice)&&this.audioEngine!=='wasm'&&!this.audioEngineReady)await this.setAudioEngine('wasm');
         if(this.audioEngineReady)await this.audioEngineReady;
         if(this.percussionReady)await this.percussionReady;
@@ -293,6 +294,7 @@ class Generator {
      */
     syncPercussionVoice() {
         const r = this.roles.perc, voice = percussionVoice(this.settings.drums.kit);
+        if (r.machine) return Promise.resolve(); // a drum machine (setPercussionSource) keeps the part
         const revision = this.percussionRevision = (this.percussionRevision ?? 0) + 1;
         if (!voice.wasmOnly || this.percussionEngine === 'wasm') {
             r.instrument.setVoicePreset(voice.id);r.presetName = voice.name;this.percussionError = null;
@@ -336,6 +338,7 @@ class Generator {
                 const Wasm=mode==='wasm'?(await import('./engine/wasmInstrument')).default:null;
                 for(const role of Object.keys(ROLES)){
                     const r=this.roles[role],old=r.instrument,snapshot=JSON.stringify(old.preset);
+                    if(old.preset.classics)continue;
                     const instrument=Wasm?await Wasm.create({context:this.AC,preset:old.preset,polyphony:old.polyphony,roomPool}):new Instrument({context:this.AC,preset:old.preset,polyphony:old.polyphony,reverbHub:this.reverbHub});
                     const replacement={role,instrument,source:old,snapshot,roomRoute:null};replacements.push(replacement);
                     if(roomPool)replacement.roomRoute=createWasmRoomRoute(this.AC,instrument,{roleWander:r.wander,volume:r.volume,cutoff:r.tone.frequency.value});
@@ -689,6 +692,54 @@ class Generator {
     homeMusic() {
         const { tonic, mode, progression, bpm } = this.settings;
         return { tonic, mode, progression, bpm };
+    }
+
+    /** Replace one melodic source, committing only the latest successful load. */
+    async setRoleSource(role, source) {
+        if(!ROLES[role])throw Error('Unknown melodic role');
+        const r=this.roles[role],revision=r.sourceRevision=(r.sourceRevision??0)+1;
+        const pending=(async()=>{
+            let instrument;
+            if(source?.classics){
+                const Classics=(await import('./engine/classicsInstrument')).default;
+                instrument=await Classics.create({context:this.AC,preset:source,polyphony:source.classics.light?Math.min(4,ROLES[role].polyphony):ROLES[role].polyphony});
+            }else if(source?.wasmVoice){
+                const Wasm=(await import('./engine/wasmInstrument')).default;
+                instrument=await Wasm.create({context:this.AC,preset:source,polyphony:ROLES[role].polyphony});
+            }else instrument=new Instrument({context:this.AC,preset:source??findPreset(ROLES[role].preset),polyphony:ROLES[role].polyphony,reverbHub:this.reverbHub});
+            if(revision!==r.sourceRevision){instrument.dispose();return;}
+            r.roomRoute?.dispose();r.roomRoute=null;r.instrument.dispose();r.instrument=instrument;instrument.connect(r.tone);
+            r.stringPatchBase=null;r.edited=true;r.presetName=source?.classics?.name??ROLES[role].preset;
+            this.applyMix();
+        })();
+        this.sourceLoads??=new Set();this.sourceLoads.add(pending);
+        try{await pending;}finally{this.sourceLoads.delete(pending);}
+    }
+
+    /**
+     * The percussion part's source: a classic drum machine ({classics: {synth: 'tr808' | 'tr909',
+     * values, rack}}) playing the generator's drums on its pads, or null for the kit chosen in
+     * settings. The pattern and its bookings carry on; only the sound changes.
+     */
+    async setPercussionSource(source) {
+        const r = this.roles.perc, revision = r.sourceRevision = (r.sourceRevision ?? 0) + 1;
+        let instrument;
+        if (source?.classics) {
+            const Classics = (await import('./engine/classicsInstrument')).default;
+            instrument = await Classics.create({ context: this.AC, preset: source, polyphony: 16 });
+        } else {
+            if (!r.machine) return;
+            const Kit = this.percussionEngine === 'native' ? DrumKit : WasmDrumKit;
+            instrument = new Kit({ context: this.AC, reverbHub: this.reverbHub, model: this.percussionEngine });
+            if (instrument.ready) await instrument.ready;
+        }
+        if (revision !== r.sourceRevision) { instrument.dispose(); return; }
+        instrument.setKit(this.settings.drumKit);
+        r.instrument.silence?.();r.instrument.dispose();
+        r.instrument = instrument;r.machine = !!source?.classics;instrument.connect(r.gain);
+        r.presetName = source?.classics?.name ?? percussionVoice(this.settings.drums.kit).name;
+        if (!r.machine) { instrument.setVoicePreset(this.settings.drums.kit); await this.syncPercussionVoice(); }
+        this.applyMix();
     }
 
     /** Loads a preset onto a role; `preset` defaults to looking `name` up. */

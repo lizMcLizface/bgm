@@ -8,7 +8,7 @@ if(!fs.existsSync(root)){console.error(`${root}/ is missing: run npm run build:p
 const problems=[];
 const synths=['poly','fm','cs80','juno','prophet5','jupiter8','minimoog','dx7','obxa','vs','tr808','tr909','tr606','tb303'];
 for(const file of ['core.wasm','processor.js','fm.wasm','fm-processor.js','effects.wasm','effects-processor.js','inserts.wasm','inserts-processor.js','patch-transition.js'])if(!fs.existsSync(path.join(root,'synth-lab',file)))problems.push(`Missing synth-lab/${file}`);
-for(const file of ['synths/index.html','synths/effects/index.html','synths/classics.wasm','synths/classics-processor.js','synths/output-scope.js',...synths.map(s=>`synths/${s}/index.html`)])if(!fs.existsSync(path.join(root,file)))problems.push(`Missing ${file}`);
+for(const file of ['synths/ensemble/index.html','synths/index.html','synths/effects/index.html','synths/classics.wasm','synths/classics-processor.js','synths/output-scope.js',...synths.map(s=>`synths/${s}/index.html`)])if(!fs.existsSync(path.join(root,file)))problems.push(`Missing ${file}`);
 const indexFile=path.join(root,'synth-presets/index.json');
 if(!fs.existsSync(indexFile))problems.push('Missing comparison bank index');
 const allowed=new Set(['synth-presets/index.json']),ids=new Set(),covered=new Set();

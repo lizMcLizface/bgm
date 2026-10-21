@@ -17,7 +17,10 @@ export const semitones=note=>PITCH_NOTES[note]??0;
 /** Units for the engine, all estimates (knob 0–10 → exponential ranges) until checked by ear or against recordings. */
 export const CALIBRATION={
  // service manual pp.16-18: with cutoff 0 and key tracking on, the resonant NOISE peak matches the key's pitch (not self-oscillation); lowest host key is MIDI 36 / C2, 65.4 Hz
- cutoffHz:[65.4,16000],attackS:[.001,8],decayS:[.003,15],lfoHz:[.1,30],wheelHz:[.5,12],portamentoS:2,detuneCents:100,
+ cutoffHz:[65.4,16000],attackS:[.001,8],decayS:[.003,15],lfoHz:[.1,30],wheelHz:[.5,12],portamentoS:2,
+ // 72 of the 96 book programs leave detune at 12 o'clock and the rest sit within about one division of it (a chorus beat):
+ // ±50 cents keeps those readings to a few cents of beating instead of audible mistuning
+ detuneCents:50,
 };
 
 const flag=b=>b?1:0;

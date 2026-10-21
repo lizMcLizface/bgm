@@ -552,3 +552,8 @@ label.inline.toggle{min-height:32px;}label.inline.toggle em{font-style:normal;co
  .sp-cats button{flex:none;}
  .sp-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}
 }
+.presets .sp-new{border-top:1px solid var(--focus);color:var(--focus);background:#2f2b25;}
+.sp-make{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;margin:12px 0 4px;padding:10px 14px;border:1px dashed var(--focus);background:var(--bg);color:var(--focus);font-weight:600;text-align:left;}
+.sp-make small{font-weight:400;color:var(--muted);}
+.sp-keys{color:var(--muted);font-size:11px;white-space:nowrap;}
+@media (max-width:640px){.sp-keys{display:none;}}

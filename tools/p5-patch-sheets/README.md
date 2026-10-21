@@ -22,6 +22,9 @@ npx vite-node tools/buildP5SheetPresets.mjs                                     
 ## Checks
 Against the original programs in Sequential's free factory file (bank F5), used only as a check: the knobs land within 0.02–0.05 on average (glide 0.14), the buttons agree on 795 of 798, and the printed pitches on 70 of 76 (the rest are in bank 5, where the sheets and the file differ; the sheets are used).
 
+## Calibration
+`npx vite-node tools/calibrateP5Sheets.mjs` fits per-knob lines against bank F5 (coefficients only, in `calibration.json`); the two pulse widths and cutoff get small corrections, every other knob already reads within about 0.05. Glide is a performance knob on the original, not part of a program: the drawings show wherever it sat (0.6 on a dozen sheets whose programs have none), so it is kept only on the sounds about gliding.
+
 ## Known limits
 - 5-7 and 5-8 are not in the scan.
 - The playing notes under each drawing (wheel amounts, suggested edits) are not decoded.

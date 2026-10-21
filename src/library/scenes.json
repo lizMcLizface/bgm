@@ -2012,6 +2012,135 @@
       }
     },
     {
+      "name": "Plotting a Course",
+      "category": "starship",
+      "blurb": "Galaxy-map spirit (Mass Effect 2): a soft arpeggio echoing over a deep drone, slow pad swells and a distant lead, no drums, lots of space",
+      "tags": [
+        "mass-effect",
+        "galaxy-map",
+        "space",
+        "ambient",
+        "slow"
+      ],
+      "isNew": true,
+      "settings": {
+        "tonic": 2,
+        "mode": "Major-6",
+        "bpm": 76,
+        "progression": 17,
+        "barsPerChord": 4,
+        "padNotes": 4,
+        "chordSpread": "open",
+        "padWeights": {
+          "sustain": 10,
+          "pulse": 0,
+          "arpeggio": 50,
+          "sequence": 40,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "arpWeights": {
+          "bounce": 30,
+          "up": 40,
+          "down": 10,
+          "broken": 20
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0,
+          "drive": 0
+        },
+        "pedal": {
+          "mode": "tonic",
+          "amount": 0.6
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.4
+        },
+        "leadActivity": 0.4,
+        "leadDensity": 0.05,
+        "leadLeaps": 0.3,
+        "leadRepeat": 0.55,
+        "leadScale": "pentatonic",
+        "leadEnding": "open",
+        "counter": {
+          "mode": "line",
+          "activity": 0.25
+        },
+        "drums": {
+          "style": "off",
+          "activity": 0,
+          "variation": 0,
+          "sprinkle": 0
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "humanize": {
+          "timing": 6,
+          "velocity": 0.08,
+          "detune": 1
+        },
+        "padMotion": {
+          "lean": 0.2,
+          "fast": 0.15,
+          "swell": 0.08
+        },
+        "voices": {
+          "counter": {
+            "octave": -1,
+            "wander": "off",
+            "chance": 0.3
+          }
+        },
+        "volumes": {
+          "pad": 0.5,
+          "bass": 0.45,
+          "lead": 0.55,
+          "counter": 0.35,
+          "perc": 0
+        },
+        "ambience": {},
+        "playAmbience": false
+      },
+      "voices": {
+        "pad": "Galaxy Arp",
+        "bass": "Dark Drone",
+        "lead": "Nebula Lead",
+        "counter": "Starlight Pad"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "tempo-effects": {
+            "enabled": true
+          },
+          "section-cadences": {
+            "enabled": false
+          },
+          "melodic-slides": {
+            "enabled": false
+          },
+          "chord-slides": {
+            "enabled": false
+          },
+          "pad-pitch-motion": {
+            "enabled": false
+          },
+          "bass-pitch-motion": {
+            "enabled": false
+          },
+          "gate-envelopes": {
+            "enabled": false
+          }
+        }
+      }
+    },
+    {
       "name": "Bounty Hunter Basement",
       "category": "classics",
       "blurb": "Metroid Prime · Magmoor Caverns: low choir and string ostinato over a driving kick, backbeat and tom pulse",

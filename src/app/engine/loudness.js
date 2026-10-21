@@ -25,6 +25,17 @@ const until = async (condition, ms) => {
 
 /** RMS level in dB of `preset` playing `role`'s phrase. */
 export async function measureLoudness(preset, role) {
+    if(preset.classics){
+        const [{loadKernel},{createOfflineSynth},{SYNTHS},{builtinWaves}]=await Promise.all([import('../../synths/engine/liveSynth'),import('../../synths/engine/offline'),import('../../synths/models'),import('../../synths/vs/waves')]);
+        const spec=preset.classics,synth=SYNTHS[spec.synth],engine=createOfflineSynth(await loadKernel(),{sampleRate:SR,model:synth.model,params:synth.params.toPairs(spec.values),waves:synth.id==='vs'?builtinWaves():null});
+        const events=PHRASES[role].flatMap(([midi,start,duration],id)=>[[Math.round(start*SR),true,id+1,midi],[Math.round((start+duration)*SR),false,id+1,midi]]).sort((a,b)=>a[0]-b[0]);
+        let frame=0,sum=0;
+        for(const [at,on,id,midi]of [...events,[SR*SECONDS,false,0,0]]){
+            const channels=engine.render(at-frame);for(const channel of channels)for(const x of channel)sum+=x*x;
+            if(on)engine.k.syn_note_on(id,midi,.8);else engine.k.syn_note_off(id);frame=at;
+        }
+        return 10*Math.log10(sum/(SR*SECONDS*2)+1e-12)+20*Math.log10(preset.masterVolume??1);
+    }
     const ctx = new OfflineAudioContext({ numberOfChannels: 2, length: SR * SECONDS, sampleRate: SR });
     const inst = new Instrument({ polyphony: 8, preset, context: ctx });
     inst.scheduleSleep = () => {}; // no wall-clock timers during the render

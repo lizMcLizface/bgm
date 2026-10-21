@@ -211,6 +211,7 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
             try{for(const role of roles){
                 const inst = role === 'perc'
                     ? new (gen.percussionEngine && gen.percussionEngine !== 'native' ? WasmDrumKit : DrumKit)({ context: ctx, model:gen.percussionEngine })
+                    : presets[role]?.classics?await (await import('./classicsInstrument')).default.create({context:ctx,preset:presets[role],polyphony:gen.getRolePolyphony(role)})
                     : Wasm?await Wasm.create({polyphony:gen.getRolePolyphony(role),preset:presets[role],context:ctx,roomPool,notes:notes.filter(n=>n.role===role&&n.time>=from&&n.time<end+(last?0:CROSSFADE)).map(n=>({...n,time:n.time-from}))})
                     : new Instrument({ polyphony: gen.getRolePolyphony(role), preset: presets[role], context: ctx });
                 instruments[role]=inst;cleanup.push(()=>inst.dispose());
