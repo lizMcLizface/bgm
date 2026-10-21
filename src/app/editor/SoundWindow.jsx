@@ -153,8 +153,8 @@ export default function SoundWindow({ generator: gen, role, roles, onRole, voice
         if (!changes.length) return;
         for (const [key, value] of changes) gen.setRoleParam(role, key, value);
         setPreset((p) => ({ ...p, ...Object.fromEntries(changes) }));
-        if (!voice.edited) onNativeEdited(role);
-    }, [gen, role, voice?.edited, onNativeEdited]);
+        onNativeEdited(role); // every edit: the page's link follows the sound
+    }, [gen, role, onNativeEdited]);
 
     // The generator's own synth: keep, restore, share and remove presets (the old editor's header).
     const flash = (text) => setMessage(text);

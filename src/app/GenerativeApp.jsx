@@ -48,12 +48,13 @@ import { newSoundSeed } from './soundGen';
 import { SOUND_KINDS, GENERATOR_V2 } from './soundGenV2';
 import { GENERATOR_V3, soundContext } from './soundGenV3';
 import { prepareSound } from './engine/prepareSound';
-import PerfModeButton,{usePerfMode} from '../audio/PerfModeButton';
+import {usePerfMode} from '../audio/PerfModeButton';
 import {readPerfChoice,setPerfChoice,withPerf} from '../audio/perfMode';
-import WasmOptions,{useAudioEngine,AudioEngineButton} from './WasmOptions';
+import WasmOptions,{useAudioEngine} from './WasmOptions';
 import {engineFromSearch,withAudioEngine} from './audioEngineChoice';
 import {simdFromSearch,withSimd,bankFromSearch,withFMBank} from '../audio/simdChoice';
 import { addGeneratedPreset, addSetupPreset, findPreset, generatedInfo } from './editor/presetStore';
+import { presetEdit, presetFromEdit } from './editor/presetEdits';
 import PRESET_DEFAULTS from './engine/presetDefaults';
 import { readPref, writePref } from './prefs';
 import { readPerformance, writePerformance } from '../audio/performance';
@@ -106,6 +107,7 @@ const getGenerator = () => {
         if (share) {
             Object.entries(share.presets).forEach(([role, preset]) => {
                 if (preset.external || preset.machine) linkedRefs.push({ role, ref: preset.external ?? preset.machine });
+                else if (preset.edit) { generator.loadRolePreset(role, preset.edit.name, presetFromEdit(preset.edit)); generator.roles[role].edited = true; }
                 else if (preset.generated) linkedSounds.push({ target: role, info: preset.generated });
                 else generator.loadRolePreset(role, preset);
             });
@@ -797,7 +799,7 @@ const GenerativeApp = () => {
     };
     const wrapGroup = (id, children) => <GroupCard id={id} settings={settings} book={book} onChange={changeGroup}>{children}</GroupCard>;
     const [roles, setRoles] = useState(() =>
-        Object.fromEntries(Object.keys(ROLES).map((role) => [role, { presetName: gen.roles[role].presetName, edited: false }]))
+        Object.fromEntries(Object.keys(ROLES).map((role) => [role, { presetName: gen.roles[role].presetName, edited: gen.roles[role].edited }]))
     );
     // the percussion's drum machine ({ synth, name, values, rack, label, ref }), or null for the kit
     const [percMachine, setPercMachine] = useState(null);
@@ -812,15 +814,17 @@ const GenerativeApp = () => {
 
     // What a link can carry: built-in presets as loaded (edits stay local).
     // Generated sounds travel as the role they were made for + their seed.
-    // Classic / DIY voices and a drum machine travel as references (shareExtras.js).
+    // Classic / DIY voices and a drum machine travel as references, an edited sound as its
+    // preset's name and the values that differ (shareExtras.js); `soundEdits` counts edits.
+    const [soundEdits, setSoundEdits] = useState(0);
     const linkPresets = useMemo(
         () => ({ ...Object.fromEntries(Object.entries(roles).map(([role, { presetName, edited, external }]) => {
             if (external) return [role, { external: external.ref }];
-            if (edited) return [role, null];
+            if (edited) return [role, { edit: presetEdit(presetName, gen.getRolePreset(role)) }];
             const generated = generatedInfo(presetName);
             return [role, generated ? { generated } : presetName];
         })), ...(percMachine ? { perc: { machine: percMachine.ref } } : {}) }),
-        [roles, percMachine],
+        [roles, percMachine, soundEdits], // eslint-disable-line react-hooks/exhaustive-deps
     );
     const [generating, setGenerating] = useState({});
     // The kind of sound ✦ makes per role ('any': the seed decides).
@@ -912,8 +916,7 @@ const GenerativeApp = () => {
     }, [gen]);
     // Reload with the current settings in the address bar (buffer size).
     const reloadKeepingSettings = () => {
-        const unsaved = Object.values(roles).some((r) => r.edited);
-        if (unsaved && !window.confirm('Changing the buffer reloads the page. Settings are kept, unsaved sound edits are lost. Continue?')) return false;
+        // (edited sounds travel in the address too, shareExtras.js)
         window.history.replaceState(null, '', withBook(sharePath(gen.settings, linkPresets), bookRef.current));
         window.location.reload();
         return true;
@@ -1017,7 +1020,7 @@ const GenerativeApp = () => {
         setSettings((s) => ({ ...s, volumes: { ...gen.settings.volumes } }));
     };
     const presetLoaded = (role, presetName) => patchRole(role, { presetName, edited: false });
-    const onNativeEdited = useCallback((role) => setRoles((r) => ({ ...r, [role]: { ...r[role], edited: true } })), []);
+    const onNativeEdited = useCallback((role) => { setRoles((r) => (r[role].edited ? r : { ...r, [role]: { ...r[role], edited: true } })); setSoundEdits((n) => n + 1); }, []);
     // a preset file: loaded as it is, an edit until it is saved under a name
     // A classic / DIY sound or a drum machine from a link, setup or scene (soundRefs.js), level-matched
     // to its voice unless the reference carries a level.
@@ -1185,6 +1188,8 @@ const GenerativeApp = () => {
     const [zen, setZen] = useStoredFlag('bgm-hide-ui', false);
     // In that view the timeline can be folded away too (ignored while the interface shows).
     const [timelineHidden, setTimelineHidden] = useStoredFlag('bgm-hide-timeline', false);
+    // a mini piano above each chord of the timeline (the Look menu)
+    const [chordPianos, setChordPianos] = useStoredFlag('bgm-chord-pianos', false);
     const bare = zen && timelineHidden;
     useEffect(() => {
         if (!zen) return undefined;
@@ -1412,17 +1417,16 @@ const GenerativeApp = () => {
                     </button>
                 )}
                 <div className="gen-header-tools">
-                    <AudioEngineButton engine={audioEngine} />
-                    <PerfModeButton onToggle={togglePerfMode} disabled={audioEngine.busy} />
                     <button type="button" className="gen-help" onClick={() => setHelpOpen(true)} title="Quick reference: hover the parts of the page to see what they do"
                         aria-label="Quick reference">?</button>
                     <MasterVolume />
-                    <VisualMenu backdrop={backdropSupported() ? { value: backdropOn&&!perfOn, locked:perfOn, onChange: setBackdropOn, options: backdropOptions, onOptions: setBackdropOptions, onClear: () => setFluidReset((n) => n + 1), onShuffle: () => setBackdropOptions(shuffleColours(backdropOptions)) } : null} />
-                    <AudioMenu generator={gen} onReload={reloadKeepingSettings} />
+                    <VisualMenu pianos={{ value: chordPianos, onChange: setChordPianos }} backdrop={backdropSupported() ? { value: backdropOn&&!perfOn, locked:perfOn, onChange: setBackdropOn, options: backdropOptions, onOptions: setBackdropOptions, onClear: () => setFluidReset((n) => n + 1), onShuffle: () => setBackdropOptions(shuffleColours(backdropOptions)) } : null} />
+                    <AudioMenu generator={gen} onReload={reloadKeepingSettings}>
+                        <WasmOptions engine={audioEngine} perf={{ onToggle: togglePerfMode }} />
+                    </AudioMenu>
                     <SettingsMenu midi={{ connect: live.connectMidi, status: live.midiStatus }} link={() => withBook(withGeneration(withIntro(shareUrl(gen.settings, linkPresets), shortIntro), generationChoice), bookRef.current)} generation={{ value: generationChoice, onChange: chooseGeneration }} saving={saving} onStartOver={startOver} smooth={{ value: smoothPresets, onChange: setSmoothPresets }} intro={{ value: shortIntro, onChange: setShortIntro }} onTour={() => openTour(false)}
                         phrase={<PhraseField seed={settings.seed} edited={gen.editedSinceStart} onApply={playPhrase} onRoll={newVariation} initial={linkedPhrase} />}>
                         <SleepTimer generator={gen} running={anyOn} onLeft={setSleepLeft} />
-                        <WasmOptions engine={audioEngine} />
                         <Recorder generator={gen} fileName={fileName} onProgress={setSaving} />
                     </SettingsMenu>
                     {zen && (
@@ -1441,7 +1445,7 @@ const GenerativeApp = () => {
 
 
             <ChordTimeline
-                generator={gen} onExploreRule={id => setRuleFocus(previous => ({ id, revision: (previous?.revision ?? 0) + 1 }))}
+                generator={gen} pianos={chordPianos} onExploreRule={id => setRuleFocus(previous => ({ id, revision: (previous?.revision ?? 0) + 1 }))}
                 tracks={has(1) ? <TrackStrip roles={shownTracks} presets={{...Object.fromEntries(Object.entries(roles).map(([role, { presetName, edited, external }]) => [role, { name: external?.label ?? presetName, edited }])),perc:percMachine?{name:percMachine.label,edited:false}:{name:percussionVoice(settings.drums.kit).name,edited:percussionEdited(settings.drums.kit,settings.drumKit)}}} mix={mix} armed={armed} onMix={changeMix} onArm={setArmed} onEdit={has(3) ? editSound : undefined}
                     onRandom={randomizePreset} onGenerate={has(3) ? generateForRole : undefined} onPick={choosePicker} onPickPercussion={()=>choosePicker('perc')} onEditPercussion={has(3)?editPercussionSound:undefined} percussionHint={percussionKeyHint(settings.drums.kit)} generating={generating} live={live} /> : null}
             />

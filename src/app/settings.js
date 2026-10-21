@@ -233,9 +233,10 @@ const PARTS = ['m', 'v', 'a', 'x'];
  */
 export function encodeSettings(settings, presets = {}, { seed = true } = {}) {
     const parts = encodeShareParts(settings, defaultSettings(), presets, { seed });
-    // the bus, classic / DIY voices ({ external: ref }) and a drum machine (perc: { machine: ref }): shareExtras.js
+    // the bus, classic / DIY voices ({ external: ref }), edited sounds ({ edit }) and a drum machine (perc: { machine: ref }): shareExtras.js
     const sounds = Object.fromEntries(Object.entries(presets).filter(([, p]) => p?.external).map(([role, p]) => [role, p.external]));
-    const x = encodeExtras({ bus: settings.bus, sounds, machine: presets.perc?.machine ?? null });
+    const edits = Object.fromEntries(Object.entries(presets).filter(([, p]) => p?.edit).map(([role, p]) => [role, p.edit]));
+    const x = encodeExtras({ bus: settings.bus, sounds, machine: presets.perc?.machine ?? null, edits });
     if (x) parts.x = x;
     return PARTS.filter((key) => parts[key]).map((key) => `${key}=${parts[key]}`).join('&');
 }
@@ -254,6 +255,7 @@ export function decodeShare(code) {
                 if (extras.bus) settings.bus = extras.bus;
                 Object.entries(extras.sounds).forEach(([role, ref]) => { presets[role] = { external: ref }; });
                 if (extras.machine) presets.perc = { machine: extras.machine };
+                Object.entries(extras.edits).forEach(([role, edit]) => { presets[role] = { edit }; });
             }
             return { settings: sanitizeSettings(settings), presets };
         }

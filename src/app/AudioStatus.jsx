@@ -97,7 +97,7 @@ const THEME_HINTS = { auto: 'Colours follow your system', light: 'Light colours'
  * background with its options (`backdrop`: null when
  * WebGL2 is missing). Stays in the hidden-interface view.
  */
-export const VisualMenu = ({ backdrop }) => {
+export const VisualMenu = ({ backdrop, pianos }) => {
     const menu = useRef(null);
     useDismiss(menu);
     const [theme, setTheme] = useState(storedTheme);
@@ -115,6 +115,16 @@ export const VisualMenu = ({ backdrop }) => {
                         ))}
                     </div>
                 </section>
+                {pianos && (
+                    <section className="gen-menu-section">
+                        <h3>Timeline</h3>
+                        <label className="gen-check">
+                            <input type="checkbox" checked={pianos.value} onChange={(e) => pianos.onChange(e.target.checked)} />
+                            Mini pianos above the chords
+                        </label>
+                        <small>Each chord's notes on a one-octave keyboard, the bar's scale underlined.</small>
+                    </section>
+                )}
                 {backdrop && (
                     <section className="gen-menu-section">
                         <h3>Background</h3>
@@ -164,7 +174,7 @@ export function useDismiss(menu) {
  * The Audio menu: the audio engine's own settings. onReload returns false
  * when the reload a change needs was cancelled.
  */
-export const AudioMenu = ({ generator, onReload }) => {
+export const AudioMenu = ({ generator, onReload, children }) => {
     const perfOn=usePerfMode();
     const [, refresh] = useState(0);
     const [quickStop, setQuickStop] = useState(() => readPref(QUICK_STOP_KEY, true));
@@ -254,6 +264,7 @@ export const AudioMenu = ({ generator, onReload }) => {
                 <SpeakerIcon />
             </summary>
             <div className="gen-settings-menu">
+                {children}
                 <section className="gen-menu-section">
                     <h3>Audio</h3>
                     <AudioMeter status={status} />

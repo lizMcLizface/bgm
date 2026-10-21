@@ -1,6 +1,7 @@
 import React from 'react';
 import {buildKeyRange,countWhiteKeys} from './piano/keyModel';
 import {getIntervalColor,getIntervalLabel} from './piano/intervals';
+import './piano.css';
 const NAMES=['C','C♯','D','E♭','E','F','F♯','G','A♭','A','B♭','B'];
 export const noteName=m=>NAMES[((m%12)+12)%12]+(Math.floor(m/12)-1);
 // unCAGED key model, mini-piano white/black geometry and interval colours,

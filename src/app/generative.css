@@ -1920,7 +1920,9 @@ body {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 10px;
+    /* wrap rather than spill left over the transport (a long preset name) */
+    flex-wrap: wrap;
+    gap: 8px 10px;
     min-width: 0;
 }
 

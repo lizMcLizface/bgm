@@ -2014,7 +2014,7 @@
     {
       "name": "Plotting a Course",
       "category": "starship",
-      "blurb": "Galaxy-map spirit (Mass Effect 2): a soft arpeggio echoing over a deep drone, slow pad swells and a distant lead, no drums, lots of space",
+      "blurb": "Galaxy-map spirit (Mass Effect 2): a felt piano over a slow rubbery pulse, an echoing arpeggio and a deep flanged void pad, no drums, lots of space",
       "tags": [
         "mass-effect",
         "galaxy-map",
@@ -2026,7 +2026,7 @@
       "settings": {
         "tonic": 2,
         "mode": "Major-6",
-        "bpm": 76,
+        "bpm": 88,
         "progression": 17,
         "barsPerChord": 4,
         "padNotes": 4,
@@ -2059,7 +2059,7 @@
           "mode": "add9",
           "amount": 0.4
         },
-        "leadActivity": 0.4,
+        "leadActivity": 1,
         "leadDensity": 0.05,
         "leadLeaps": 0.3,
         "leadRepeat": 0.55,
@@ -2092,26 +2092,26 @@
         },
         "voices": {
           "counter": {
-            "octave": -1,
+            "octave": 1,
             "wander": "off",
             "chance": 0.3
           }
         },
         "volumes": {
-          "pad": 0.5,
-          "bass": 0.45,
-          "lead": 0.55,
-          "counter": 0.35,
+          "pad": 0.62,
+          "bass": 0.44,
+          "lead": 0.36,
+          "counter": 0.63,
           "perc": 0
         },
         "ambience": {},
         "playAmbience": false
       },
       "voices": {
-        "pad": "Galaxy Arp",
-        "bass": "Dark Drone",
-        "lead": "Nebula Lead",
-        "counter": "Starlight Pad"
+        "lead": "Starmap Piano",
+        "counter": "Starmap Arp",
+        "pad": "Starmap Pulse",
+        "bass": "Starmap Void"
       },
       "rulebook": {
         "version": 1,

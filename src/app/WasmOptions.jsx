@@ -3,8 +3,10 @@ import {percussionFromSearch,withPercussion} from '../audio/percussionChoice';
 import {perfEnabled,setPerfChoice} from '../audio/perfMode';
 import React,{useCallback,useEffect,useRef,useState} from 'react';
 import {engineFromSearch,withAudioEngine} from './audioEngineChoice';
+import {usePerfMode} from '../audio/PerfModeButton';
 const KEY='bgm-audio-engine';
-function initialEngine(){const linked=engineFromSearch(location.search);if(linked)return linked;try{return localStorage.getItem(KEY)==='wasm'?'wasm':'legacy';}catch{return 'legacy';}}
+// Wasm unless this device chose the previous engine.
+function initialEngine(){const linked=engineFromSearch(location.search);if(linked)return linked;try{return localStorage.getItem(KEY)==='legacy'?'legacy':'wasm';}catch{return 'wasm';}}
 
 // One controller keeps the header, shortcut and options in sync. The engine
 // rebuilds instruments asynchronously; ignore extra requests while preparing.
@@ -45,7 +47,15 @@ export function AudioEngineButton({engine}){
  </span>;
 }
 
-export default function WasmOptions({engine}){
+// Perf mode: a checkbox in the engine's section (it runs on the Wasm engine).
+function PerfOption({perf,disabled}){
+ const on=usePerfMode(),[busy,setBusy]=useState(false),[error,setError]=useState('');
+ return <><label className="gen-check"><input type="checkbox" aria-label="Performance mode" checked={on} disabled={disabled||busy}
+  onChange={async e=>{const next=e.target.checked;setBusy(true);setError('');try{await perf.onToggle(next);}catch(err){setError(err.message);}finally{setBusy(false);}}}/>Perf mode{busy?' · preparing…':''}</label>
+  <small role={error?'alert':undefined}>{error||'Experimental Wasm speedups, shared matching rooms and the fluid background paused, for slower devices. Keeps your synthesis and reverb quality. Temporary for this link; switching briefly rebuilds instruments.'}</small></>;
+}
+
+export default function WasmOptions({engine,perf}){
  const {mode,busy,error,choose,required,temporary}=engine;
- return <section className="gen-menu-section"><h3>Sound engine</h3><label className="gen-check"><input type="checkbox" aria-label="Use Wasm sound engine" checked={mode==='wasm'} disabled={busy||required&&mode==='wasm'} onChange={e=>choose(e.target.checked?'wasm':'legacy')}/>Use Wasm sound engine · experimental</label><small role="status">{busy?'Preparing instruments…':error||(required?'This preset requires Wasm-only voices. Your saved engine preference is unchanged.':temporary?'Temporary engine override from this link. Your saved preference is unchanged. Use V or the header button to compare engines.':'Off by default. Saved on this device. Use the header button or V to compare. Changes resume from the current bar; existing voices are translated and can sound different. Piano and plucked strings retain native sources. Percussion can be tried separately below.')}</small><label>Percussion backend · experimental<select aria-label="Percussion backend" value={engine.generator?.percussionEngine ?? (percussionFromSearch(location.search)==='808'?'wasm':percussionFromSearch(location.search))} onChange={e=>{history.replaceState(null,'',withPercussion(location.pathname+location.search+location.hash,e.target.value));location.reload();}}><option value="native" disabled={percussionVoice(engine.generator?.settings?.drums?.kit).wasmOnly}>Native Web Audio</option><option value="wasm">Wasm · queued percussion</option></select></label><small>The Percussion track selects the Felt, Crisp, 808 or Hand Percussion voice. 808 and Hand Percussion require Wasm. Changing this backend reloads the page; the selected voice and rhythm stay the same.</small><a href="/tools/percussion-engine.html">Percussion comparison →</a><a href="/labs/">Instrument labs →</a></section>;
+ return <section className="gen-menu-section"><h3>Sound engine</h3><label className="gen-check"><input type="checkbox" aria-label="Use Wasm sound engine" checked={mode==='wasm'} disabled={busy||required&&mode==='wasm'} onChange={e=>choose(e.target.checked?'wasm':'legacy')}/>Use Wasm sound engine</label><small role="status">{busy?'Preparing instruments…':error||(required?'This preset requires Wasm-only voices. Your saved engine preference is unchanged.':temporary?'Temporary engine override from this link. Your saved preference is unchanged. Press V to compare engines.':'On by default; turning it off is saved on this device. Press V to compare with the previous engine. Changes resume from the current bar; existing voices are translated and can sound different. Piano and plucked strings retain native sources. Percussion can be tried separately below.')}</small>{perf&&<PerfOption perf={perf} disabled={busy}/>}<label className="gen-field"><span>Percussion backend · experimental</span><select aria-label="Percussion backend" value={engine.generator?.percussionEngine ?? (percussionFromSearch(location.search)==='808'?'wasm':percussionFromSearch(location.search))} onChange={e=>{history.replaceState(null,'',withPercussion(location.pathname+location.search+location.hash,e.target.value));location.reload();}}><option value="native" disabled={percussionVoice(engine.generator?.settings?.drums?.kit).wasmOnly}>Native Web Audio</option><option value="wasm">Wasm · queued percussion</option></select></label><small>The Percussion track selects the Felt, Crisp, 808 or Hand Percussion voice. 808 and Hand Percussion require Wasm. Changing this backend reloads the page; the selected voice and rhythm stay the same.</small><a href="/tools/percussion-engine.html">Percussion comparison →</a><a href="/labs/">Instrument labs →</a></section>;
 }

@@ -1,5 +1,11 @@
 .gen-timeline { position: relative; }
 .gen-timeline-roll { position: relative; min-width: 0; min-height: 0; }
+/* The canvas and the chord buttons over it; with mini pianos, a strip of them above. */
+.gen-timeline-stage { position: relative; height: 100%; min-height: 0; }
+.gen-timeline-roll.has-pianos { display: grid; grid-template-rows: 34px minmax(0, 1fr); gap: 4px; }
+.gen-timeline-pianos { position: relative; overflow: hidden; }
+.gen-timeline-piano { position: absolute; top: 0; height: 100%; padding: 0 2px; box-sizing: border-box; }
+.gen-timeline-piano .lab-piano.mini { height: 34px; max-width: 112px; }
 .gen-chord-targets { position: absolute; inset: 0; pointer-events: none; }
 .gen .gen-chord-targets button.gen-chord-target { position: absolute; pointer-events: auto; padding: 0; margin: 0; border: 0; border-radius: 6px; background: transparent; cursor: help; }
 .gen .gen-chord-targets button.gen-chord-target:hover:not(:disabled) { background: transparent; box-shadow: inset 0 0 0 2px var(--gen-accent); }
@@ -13,3 +19,11 @@
 .gen-chord-reason { font-size: 13px; margin-top: 12px; }
 .gen-chord-reason p { color: var(--gen-muted); margin: 5px 0 8px; }
 .gen-chord-reason button { font-size: 11px; padding: 4px 8px; }
+/* The page styles every button; the keys keep the piano's own look (labs/piano.css), without labels at this size. */
+.gen .gen-timeline-piano .lab-piano button { padding: 0; border: 1px solid #737b84; border-radius: 0 0 2px 2px; font-size: 0; cursor: default; }
+.gen .gen-timeline-piano .lab-piano button.white { background: #e7e7e3; }
+.gen .gen-timeline-piano .lab-piano button.black { background: #282d35; border-color: #12161c; box-shadow: none; }
+.gen .gen-timeline-piano .lab-piano button.chord { background: color-mix(in srgb, var(--interval) 60%, #eceeea); }
+.gen .gen-timeline-piano .lab-piano button.black.chord { background: color-mix(in srgb, var(--interval) 70%, #282d35); }
+.gen .gen-timeline-piano .lab-piano button.scale { border-bottom: 3px solid var(--interval); }
+.gen .gen-timeline-piano .lab-piano button span, .gen .gen-timeline-piano .lab-piano button small { display: none; }

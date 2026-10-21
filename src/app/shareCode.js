@@ -71,6 +71,7 @@ export const SHAREABLE_PRESETS = [
     'Wasm Bowed Glass', 'Wasm Rosin Silk', 'Wasm Tine Keys', 'Wasm Glass Bells',
     'Wasm Air Choir', 'Wasm Drawbars', 'Wasm Soft Pipes', 'Wasm DCO Foundation', 'Wasm Round FM Bass',
     'Galaxy Arp', 'Nebula Lead',
+    'Starmap Piano', 'Starmap Arp', 'Starmap Pulse', 'Starmap Void',
 ];
 const PRESET_BITS = 8;
 // Preset index meaning "a generated sound" (soundGen.js v1): followed by

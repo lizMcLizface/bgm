@@ -1,6 +1,7 @@
 // What a link carries beyond the bit-packed parts (shareCode.js): the shared effects bus when it
 // is not the default, the voices played by a classic or DIY synth, and a drum machine - as the
-// compact references of editor/soundRefs.js, in a compressed JSON part `x`. Validated here
+// compact references of editor/soundRefs.js - and edited sounds of the generator's own synth
+// (editor/presetEdits.js), in a compressed JSON part `x`. Validated here
 // without the synths (which load only when a sound is applied); unknown synths are dropped.
 import { compressSync, decompressSync, strToU8, strFromU8 } from 'fflate';
 import { defaultBus } from './engine/bus';
@@ -17,6 +18,13 @@ const numbers = (raw, max) => {
     const out = Object.fromEntries(Object.entries(raw).filter(([key, v]) => key.length <= 60 && typeof v === 'number' && Number.isFinite(v)).slice(0, max));
     return Object.keys(out).length ? out : undefined;
 };
+/** An untrusted edit of the generator's own synth ({ name, values }) -> a clean one, or null (presetStore checks the values' keys and types). */
+export function cleanEdit(raw) {
+    if (!isObject(raw) || !text(raw.name, 60) || !isObject(raw.values)) return null;
+    const values = Object.fromEntries(Object.entries(raw.values).filter(([key, v]) => key.length <= 60
+        && (typeof v === 'number' ? Number.isFinite(v) : typeof v === 'boolean' || (typeof v === 'string' && v.length <= 40))).slice(0, 300));
+    return { name: text(raw.name, 60), values };
+}
 /** An untrusted reference -> a clean one, or null. */
 export function cleanRef(raw, synths = VOICE_SYNTHS) {
     if (!isObject(raw) || !synths.includes(raw.synth) || !text(raw.name, 60)) return null;
@@ -36,22 +44,25 @@ const fromBase64Url = (text) => Uint8Array.from(atob(text.replaceAll('-', '+').r
  * { bus, sounds: { role: ref }, machine: ref } -> the `x` part, or '' when there is nothing to
  * carry (a default bus, no classic or DIY voices, the generator's own kit).
  */
-export function encodeExtras({ bus, sounds = {}, machine = null }) {
+export function encodeExtras({ bus, sounds = {}, machine = null, edits = {} }) {
     const data = {};
     if (bus && JSON.stringify(bus) !== JSON.stringify(defaultBus())) data.b = bus;
     const s = Object.fromEntries(ROLES.filter((role) => sounds[role]).map((role) => [role, sounds[role]]));
     if (Object.keys(s).length) data.s = s;
     if (machine) data.p = machine;
+    const n = Object.fromEntries(ROLES.filter((role) => edits[role]).map((role) => [role, edits[role]]));
+    if (Object.keys(n).length) data.n = n;
     return Object.keys(data).length ? toBase64Url(compressSync(strToU8(JSON.stringify(data)), { level: 9 })) : '';
 }
-/** The `x` part -> { bus?, sounds, machine } (clean); nothing usable for anything unreadable. */
+/** The `x` part -> { bus?, sounds, machine, edits } (clean); nothing usable for anything unreadable. */
 export function decodeExtras(part) {
     try {
-        if (typeof part !== 'string' || part.length > 20000) return { sounds: {} };
+        if (typeof part !== 'string' || part.length > 20000) return { sounds: {}, edits: {} };
         const data = JSON.parse(strFromU8(decompressSync(fromBase64Url(part))));
         const sounds = Object.fromEntries(ROLES.map((role) => [role, cleanRef(data?.s?.[role])]).filter(([, ref]) => ref));
-        return { ...(isObject(data?.b) ? { bus: data.b } : {}), sounds, machine: cleanRef(data?.p, MACHINE_SYNTHS) };
+        const edits = Object.fromEntries(ROLES.map((role) => [role, cleanEdit(data?.n?.[role])]).filter(([, edit]) => edit));
+        return { ...(isObject(data?.b) ? { bus: data.b } : {}), sounds, machine: cleanRef(data?.p, MACHINE_SYNTHS), edits };
     } catch (e) {
-        return { sounds: {} };
+        return { sounds: {}, edits: {} };
     }
 }

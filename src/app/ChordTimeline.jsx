@@ -12,6 +12,8 @@ import { drawTimeline, chordBlocks, chordRegions, MIN_HEIGHT } from './timelineD
 import { explainBar } from './rulebook/explain';
 import { RULES } from './rulebook/model';
 import { PAGE_IDS } from './rulebook/navigation';
+import { scaleById, scaleSemitones } from './theory';
+import Piano from '../labs/Piano';
 import './chordExplanation.css';
 
 const cssVar = (style, name) => style.getPropertyValue(name).trim();
@@ -54,12 +56,19 @@ const sameReadout = (a, b) =>
     && a.next.map((c) => c.name).join() === b.next.map((c) => c.name).join()
     && a.key === b.key && a.bpm === b.bpm;
 
+// One octave above a chord: its tones marked, the bar's scale underlined, coloured from the chord's root.
+const ChordPiano = React.memo(({ chord, record, fallback }) => {
+    const tonic = record?.music?.tonic ?? fallback.tonic, mode = record?.music?.mode ?? fallback.mode;
+    const scale = scaleSemitones(scaleById(mode).intervals).map((n) => (n + tonic) % 12);
+    return <Piano mini low={60} high={71} scale={scale} chord={chord.pitchClasses} root={chord.pitchClasses[0] ?? tonic} label={`Chord ${chord.name}`} />;
+});
+
 // `tracks`: the role strip (Tracks.jsx) shown left of the canvas; its
-// colour swatches double as the legend.
-const ChordTimeline = ({ generator, tracks, onExploreRule }) => {
+// colour swatches double as the legend. `pianos`: a mini piano above each chord.
+const ChordTimeline = ({ generator, tracks, onExploreRule, pianos = false }) => {
     const canvasRef = useRef(null);
     const [now, setNow] = useState(null);
-    const rootRef = useRef(null), buttons = useRef(new Map()), hideTimer = useRef(null), targetsRef = useRef([]), restoringFocus = useRef(false);
+    const rootRef = useRef(null), buttons = useRef(new Map()), keyboards = useRef(new Map()), hideTimer = useRef(null), targetsRef = useRef([]), restoringFocus = useRef(false);
     const [targets, setTargets] = useState([]), [selection, setSelection] = useState(null), [pinned, setPinned] = useState(false);
     const cancelHide = () => clearTimeout(hideTimer.current);
     const close = (restoreFocus = false) => {
@@ -123,6 +132,8 @@ const ChordTimeline = ({ generator, tracks, onExploreRule }) => {
             for (const region of regions) {
                 const button = buttons.current.get(region.key);
                 if (button) { button.style.left = region.left + 'px'; button.style.width = region.width + 'px'; }
+                const keyboard = keyboards.current.get(region.key);
+                if (keyboard) { keyboard.style.left = region.left + 'px'; keyboard.style.width = region.width + 'px'; keyboard.style.opacity = region.end <= pos ? 0.45 : 1; }
             }
             const r = readout(generator, pos);
             if (!sameReadout(r, last)) {
@@ -158,7 +169,18 @@ const ChordTimeline = ({ generator, tracks, onExploreRule }) => {
             </div>
             <div className={`gen-timeline-body${tracks ? '' : ' is-no-tracks'}`}>
                 {tracks}
-                <div className="gen-timeline-roll">
+                <div className={`gen-timeline-roll${pianos ? ' has-pianos' : ''}`}>
+                    {pianos && (
+                        <div className="gen-timeline-pianos" aria-hidden="true">
+                            {targets.map((target) => (
+                                <div key={target.key} className="gen-timeline-piano" ref={(el) => { if (el) keyboards.current.set(target.key, el); else keyboards.current.delete(target.key); }}
+                                    style={{ left: target.left, width: target.width }}>
+                                    <ChordPiano chord={target.chord} record={target.record} fallback={generator.settings} />
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                    <div className="gen-timeline-stage">
                     <canvas ref={canvasRef} className="gen-timeline-canvas" />
                     <div className="gen-chord-targets" aria-label="Chord explanations">
                         {targets.map(target => <button key={target.key} ref={el => { if (el) buttons.current.set(target.key, el); else buttons.current.delete(target.key); }}
@@ -168,6 +190,7 @@ const ChordTimeline = ({ generator, tracks, onExploreRule }) => {
                             onPointerEnter={e => { if (e.pointerType !== 'touch') inspect(target, e.currentTarget); }} onPointerLeave={dismissLater}
                             onFocus={e => { if (!restoringFocus.current) inspect(target, e.currentTarget); }} onBlur={dismissLater}
                             onClick={e => inspect(target, e.currentTarget, true)} />)}
+                    </div>
                     </div>
                 </div>
             </div>
