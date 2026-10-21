@@ -55,6 +55,22 @@ programs:
       afterFilter: 0
       volume: 0.71
       oversample: 1
+      ampShape: 0
+      ampCurveA: 0.1466
+      ampCurveD: 0.5
+      ampCurveR: 0.5
+      ampSmoothA: 0
+      ampSmoothD: 0
+      ampSmoothR: 0
+      ampSteps: 0
+      filterShape: 0
+      filterCurveA: 0.1466
+      filterCurveD: 0.5
+      filterCurveR: 0.5
+      filterSmoothA: 0
+      filterSmoothD: 0
+      filterSmoothR: 0
+      filterSteps: 0
       chorusMix: 0
       chorusRate: 0.6
       chorusDepth: 0.5
@@ -112,6 +128,22 @@ programs:
       afterFilter: 0
       volume: 0.69
       oversample: 1
+      ampShape: 0
+      ampCurveA: 0.1466
+      ampCurveD: 0.5
+      ampCurveR: 0.5
+      ampSmoothA: 0
+      ampSmoothD: 0
+      ampSmoothR: 0
+      ampSteps: 0
+      filterShape: 0
+      filterCurveA: 0.1466
+      filterCurveD: 0.5
+      filterCurveR: 0.5
+      filterSmoothA: 0
+      filterSmoothD: 0
+      filterSmoothR: 0
+      filterSteps: 0
       chorusMix: 0
       chorusRate: 0.6
       chorusDepth: 0.5
@@ -169,6 +201,22 @@ programs:
       afterFilter: 0
       volume: 0.7
       oversample: 1
+      ampShape: 0
+      ampCurveA: 0.1466
+      ampCurveD: 0.5
+      ampCurveR: 0.5
+      ampSmoothA: 0
+      ampSmoothD: 0
+      ampSmoothR: 0
+      ampSteps: 0
+      filterShape: 0
+      filterCurveA: 0.1466
+      filterCurveD: 0.5
+      filterCurveR: 0.5
+      filterSmoothA: 0
+      filterSmoothD: 0
+      filterSmoothR: 0
+      filterSteps: 0
       chorusMix: 0
       chorusRate: 0.6
       chorusDepth: 0.5
@@ -226,6 +274,22 @@ programs:
       afterFilter: 0
       volume: 0.7
       oversample: 1
+      ampShape: 0
+      ampCurveA: 0.1466
+      ampCurveD: 0.5
+      ampCurveR: 0.5
+      ampSmoothA: 0
+      ampSmoothD: 0
+      ampSmoothR: 0
+      ampSteps: 0
+      filterShape: 0
+      filterCurveA: 0.1466
+      filterCurveD: 0.5
+      filterCurveR: 0.5
+      filterSmoothA: 0
+      filterSmoothD: 0
+      filterSmoothR: 0
+      filterSteps: 0
       chorusMix: 0
       chorusRate: 0.6
       chorusDepth: 0.5
@@ -283,6 +347,22 @@ programs:
       afterFilter: 0
       volume: 0.98
       oversample: 1
+      ampShape: 0
+      ampCurveA: 0.1466
+      ampCurveD: 0.5
+      ampCurveR: 0.5
+      ampSmoothA: 0
+      ampSmoothD: 0
+      ampSmoothR: 0
+      ampSteps: 0
+      filterShape: 0
+      filterCurveA: 0.1466
+      filterCurveD: 0.5
+      filterCurveR: 0.5
+      filterSmoothA: 0
+      filterSmoothD: 0
+      filterSmoothR: 0
+      filterSteps: 0
       chorusMix: 0
       chorusRate: 0.6
       chorusDepth: 0.5
@@ -340,6 +420,22 @@ programs:
       afterFilter: 0
       volume: 0.75
       oversample: 1
+      ampShape: 0
+      ampCurveA: 0.1466
+      ampCurveD: 0.5
+      ampCurveR: 0.5
+      ampSmoothA: 0
+      ampSmoothD: 0
+      ampSmoothR: 0
+      ampSteps: 0
+      filterShape: 0
+      filterCurveA: 0.1466
+      filterCurveD: 0.5
+      filterCurveR: 0.5
+      filterSmoothA: 0
+      filterSmoothD: 0
+      filterSmoothR: 0
+      filterSteps: 0
       chorusMix: 0
       chorusRate: 0.6
       chorusDepth: 0.5
@@ -397,6 +493,22 @@ programs:
       afterFilter: 0
       volume: 0.38
       oversample: 1
+      ampShape: 0
+      ampCurveA: 0.1466
+      ampCurveD: 0.5
+      ampCurveR: 0.5
+      ampSmoothA: 0
+      ampSmoothD: 0
+      ampSmoothR: 0
+      ampSteps: 0
+      filterShape: 0
+      filterCurveA: 0.1466
+      filterCurveD: 0.5
+      filterCurveR: 0.5
+      filterSmoothA: 0
+      filterSmoothD: 0
+      filterSmoothR: 0
+      filterSteps: 0
       chorusMix: 0
       chorusRate: 0.6
       chorusDepth: 0.5
@@ -454,6 +566,22 @@ programs:
       afterFilter: 0
       volume: 1
       oversample: 1
+      ampShape: 0
+      ampCurveA: 0.1466
+      ampCurveD: 0.5
+      ampCurveR: 0.5
+      ampSmoothA: 0
+      ampSmoothD: 0
+      ampSmoothR: 0
+      ampSteps: 0
+      filterShape: 0
+      filterCurveA: 0.1466
+      filterCurveD: 0.5
+      filterCurveR: 0.5
+      filterSmoothA: 0
+      filterSmoothD: 0
+      filterSmoothR: 0
+      filterSteps: 0
       chorusMix: 0
       chorusRate: 0.6
       chorusDepth: 0.5
@@ -511,6 +639,22 @@ programs:
       afterFilter: 0
       volume: 0.84
       oversample: 1
+      ampShape: 0
+      ampCurveA: 0.1466
+      ampCurveD: 0.5
+      ampCurveR: 0.5
+      ampSmoothA: 0
+      ampSmoothD: 0
+      ampSmoothR: 0
+      ampSteps: 0
+      filterShape: 0
+      filterCurveA: 0.1466
+      filterCurveD: 0.5
+      filterCurveR: 0.5
+      filterSmoothA: 0
+      filterSmoothD: 0
+      filterSmoothR: 0
+      filterSteps: 0
       chorusMix: 0
       chorusRate: 0.6
       chorusDepth: 0.5
@@ -568,6 +712,22 @@ programs:
       afterFilter: 0
       volume: 0.62
       oversample: 1
+      ampShape: 0
+      ampCurveA: 0.1466
+      ampCurveD: 0.5
+      ampCurveR: 0.5
+      ampSmoothA: 0
+      ampSmoothD: 0
+      ampSmoothR: 0
+      ampSteps: 0
+      filterShape: 0
+      filterCurveA: 0.1466
+      filterCurveD: 0.5
+      filterCurveR: 0.5
+      filterSmoothA: 0
+      filterSmoothD: 0
+      filterSmoothR: 0
+      filterSteps: 0
       chorusMix: 0
       chorusRate: 0.6
       chorusDepth: 0.5
@@ -625,6 +785,22 @@ programs:
       afterFilter: 0
       volume: 0.62
       oversample: 1
+      ampShape: 0
+      ampCurveA: 0.1466
+      ampCurveD: 0.5
+      ampCurveR: 0.5
+      ampSmoothA: 0
+      ampSmoothD: 0
+      ampSmoothR: 0
+      ampSteps: 0
+      filterShape: 0
+      filterCurveA: 0.1466
+      filterCurveD: 0.5
+      filterCurveR: 0.5
+      filterSmoothA: 0
+      filterSmoothD: 0
+      filterSmoothR: 0
+      filterSteps: 0
       chorusMix: 0
       chorusRate: 0.6
       chorusDepth: 0.5
@@ -682,6 +858,22 @@ programs:
       afterFilter: 0
       volume: 0.75
       oversample: 1
+      ampShape: 0
+      ampCurveA: 0.1466
+      ampCurveD: 0.5
+      ampCurveR: 0.5
+      ampSmoothA: 0
+      ampSmoothD: 0
+      ampSmoothR: 0
+      ampSteps: 0
+      filterShape: 0
+      filterCurveA: 0.1466
+      filterCurveD: 0.5
+      filterCurveR: 0.5
+      filterSmoothA: 0
+      filterSmoothD: 0
+      filterSmoothR: 0
+      filterSteps: 0
       chorusMix: 0
       chorusRate: 0.6
       chorusDepth: 0.5

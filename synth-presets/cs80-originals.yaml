@@ -94,6 +94,14 @@ programs:
       autoTouch: 0
       autoTime: 1.5
       voices: 8
+      ampShape: 0
+      ampCurveA: 0.1466
+      ampCurveD: 0.5
+      ampCurveR: 0.5
+      ampSmoothA: 0
+      ampSmoothD: 0
+      ampSmoothR: 0
+      ampSteps: 0
       chorusMix: 0.15
       chorusRate: 0.6
       chorusDepth: 0.5
@@ -190,6 +198,14 @@ programs:
       autoTouch: 0
       autoTime: 1.5
       voices: 6
+      ampShape: 0
+      ampCurveA: 0.1466
+      ampCurveD: 0.5
+      ampCurveR: 0.5
+      ampSmoothA: 0
+      ampSmoothD: 0
+      ampSmoothR: 0
+      ampSteps: 0
       chorusMix: 0.1
       chorusRate: 0.6
       chorusDepth: 0.5
@@ -286,6 +302,14 @@ programs:
       autoTouch: 0
       autoTime: 1.5
       voices: 10
+      ampShape: 0
+      ampCurveA: 0.1466
+      ampCurveD: 0.5
+      ampCurveR: 0.5
+      ampSmoothA: 0
+      ampSmoothD: 0
+      ampSmoothR: 0
+      ampSteps: 0
       chorusMix: 0.45
       chorusRate: 0.5
       chorusDepth: 0.55
@@ -382,6 +406,14 @@ programs:
       autoTouch: 0
       autoTime: 1.5
       voices: 12
+      ampShape: 0
+      ampCurveA: 0.1466
+      ampCurveD: 0.5
+      ampCurveR: 0.5
+      ampSmoothA: 0
+      ampSmoothD: 0
+      ampSmoothR: 0
+      ampSteps: 0
       chorusMix: 0
       chorusRate: 0.6
       chorusDepth: 0.5
@@ -478,6 +510,14 @@ programs:
       autoTouch: 0
       autoTime: 1.5
       voices: 10
+      ampShape: 0
+      ampCurveA: 0.1466
+      ampCurveD: 0.5
+      ampCurveR: 0.5
+      ampSmoothA: 0
+      ampSmoothD: 0
+      ampSmoothR: 0
+      ampSteps: 0
       chorusMix: 0.35
       chorusRate: 0.6
       chorusDepth: 0.5
@@ -574,6 +614,14 @@ programs:
       autoTouch: 0
       autoTime: 1.5
       voices: 8
+      ampShape: 0
+      ampCurveA: 0.1466
+      ampCurveD: 0.5
+      ampCurveR: 0.5
+      ampSmoothA: 0
+      ampSmoothD: 0
+      ampSmoothR: 0
+      ampSteps: 0
       chorusMix: 0
       chorusRate: 0.6
       chorusDepth: 0.5
@@ -670,6 +718,14 @@ programs:
       autoTouch: 0
       autoTime: 1.5
       voices: 6
+      ampShape: 0
+      ampCurveA: 0.1466
+      ampCurveD: 0.5
+      ampCurveR: 0.5
+      ampSmoothA: 0
+      ampSmoothD: 0
+      ampSmoothR: 0
+      ampSteps: 0
       chorusMix: 0
       chorusRate: 0.6
       chorusDepth: 0.5
@@ -766,6 +822,14 @@ programs:
       autoTouch: 0
       autoTime: 1.5
       voices: 4
+      ampShape: 0
+      ampCurveA: 0.1466
+      ampCurveD: 0.5
+      ampCurveR: 0.5
+      ampSmoothA: 0
+      ampSmoothD: 0
+      ampSmoothR: 0
+      ampSteps: 0
       chorusMix: 0
       chorusRate: 0.6
       chorusDepth: 0.5
@@ -862,6 +926,14 @@ programs:
       autoTouch: 0
       autoTime: 1.5
       voices: 12
+      ampShape: 0
+      ampCurveA: 0.1466
+      ampCurveD: 0.5
+      ampCurveR: 0.5
+      ampSmoothA: 0
+      ampSmoothD: 0
+      ampSmoothR: 0
+      ampSteps: 0
       chorusMix: 0.3
       chorusRate: 0.6
       chorusDepth: 0.5
@@ -958,6 +1030,14 @@ programs:
       autoTouch: 0
       autoTime: 1.5
       voices: 10
+      ampShape: 0
+      ampCurveA: 0.1466
+      ampCurveD: 0.5
+      ampCurveR: 0.5
+      ampSmoothA: 0
+      ampSmoothD: 0
+      ampSmoothR: 0
+      ampSteps: 0
       chorusMix: 0.4
       chorusRate: 0.6
       chorusDepth: 0.5
@@ -1054,6 +1134,14 @@ programs:
       autoTouch: 0
       autoTime: 1.5
       voices: 12
+      ampShape: 0
+      ampCurveA: 0.1466
+      ampCurveD: 0.5
+      ampCurveR: 0.5
+      ampSmoothA: 0
+      ampSmoothD: 0
+      ampSmoothR: 0
+      ampSteps: 0
       chorusMix: 0
       chorusRate: 0.6
       chorusDepth: 0.5
@@ -1150,6 +1238,14 @@ programs:
       autoTouch: 0
       autoTime: 1.5
       voices: 8
+      ampShape: 0
+      ampCurveA: 0.1466
+      ampCurveD: 0.5
+      ampCurveR: 0.5
+      ampSmoothA: 0
+      ampSmoothD: 0
+      ampSmoothR: 0
+      ampSteps: 0
       chorusMix: 0
       chorusRate: 0.6
       chorusDepth: 0.5

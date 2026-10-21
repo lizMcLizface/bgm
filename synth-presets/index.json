@@ -2,46 +2,6 @@
   "schema": 1,
   "banks": [
     {
-      "id": "juno-factory",
-      "synth": "juno",
-      "name": "Factory 106",
-      "kind": "factory",
-      "count": 128,
-      "url": "synth-presets/juno-factory.yaml"
-    },
-    {
-      "id": "juno-eric106",
-      "synth": "juno",
-      "name": "Eric 106",
-      "kind": "factory",
-      "count": 128,
-      "url": "synth-presets/juno-eric106.yaml"
-    },
-    {
-      "id": "prophet5-factory",
-      "synth": "prophet5",
-      "name": "Factory v1.03 (F5: Rev 3)",
-      "kind": "factory",
-      "count": 200,
-      "url": "synth-presets/prophet5-factory.yaml"
-    },
-    {
-      "id": "jupiter8-factory",
-      "synth": "jupiter8",
-      "name": "Factory tape",
-      "kind": "factory",
-      "count": 64,
-      "url": "synth-presets/jupiter8-factory.yaml"
-    },
-    {
-      "id": "obxa-factory",
-      "synth": "obxa",
-      "name": "Factory patch book (96 programs)",
-      "kind": "factory",
-      "count": 96,
-      "url": "synth-presets/obxa-factory.yaml"
-    },
-    {
       "id": "dx7-rom1a",
       "synth": "dx7",
       "name": "ROM1A",
@@ -106,14 +66,6 @@
       "url": "synth-presets/dx7-rom4b.yaml"
     },
     {
-      "id": "dx7-generated-a6fb8c36",
-      "synth": "dx7",
-      "name": "Generated cartridge a6fb8c36",
-      "kind": "factory",
-      "count": 32,
-      "url": "synth-presets/dx7-generated-a6fb8c36.yaml"
-    },
-    {
       "id": "vs-factory",
       "synth": "vs",
       "name": "Factory programs",
@@ -158,7 +110,7 @@
       "synth": "juno",
       "name": "bgm sounds",
       "kind": "original",
-      "count": 12,
+      "count": 111,
       "url": "synth-presets/juno-originals.yaml"
     },
     {
@@ -166,7 +118,7 @@
       "synth": "prophet5",
       "name": "bgm sounds",
       "kind": "original",
-      "count": 12,
+      "count": 50,
       "url": "synth-presets/prophet5-originals.yaml"
     },
     {
@@ -174,7 +126,7 @@
       "synth": "jupiter8",
       "name": "bgm sounds",
       "kind": "original",
-      "count": 15,
+      "count": 79,
       "url": "synth-presets/jupiter8-originals.yaml"
     },
     {
@@ -198,7 +150,7 @@
       "synth": "obxa",
       "name": "bgm sounds",
       "kind": "original",
-      "count": 13,
+      "count": 109,
       "url": "synth-presets/obxa-originals.yaml"
     },
     {
