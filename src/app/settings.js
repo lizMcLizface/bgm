@@ -70,6 +70,8 @@ export function defaultSettings() {
         // softer notes starting more gently, stronger notes sounding brighter; these values change nothing
         dynamics: { level: 1, range: 1, attack: 0, brightness: 0 },
         arc: { shape: 'off', minutes: 20 }, // the energy over a long stretch: rise, wind down or wave (composition/arc.js)
+        feel: { busy: 0, bright: 0 }, // the feel pad's place: calmer..busier, darker..brighter (composition/feel.js)
+        breakdowns: { meter: 'same', halfTime: false }, // a breakdown's own meter, and half-time drums in it
         timbreDrift: 0, // 0..1: oscillator sounds' colour moves slowly around their own (composition/timbreDrift.js)
         keyLift: 0, // 0..1: chance that a build lifts the full sections after it a whole step (Generator.planBar)
         sectionSpace: 0, // 0..1: a wide room the voices send to more in intros and breakdowns (composition/sectionSpace.js)
@@ -166,6 +168,8 @@ const RULES = {
     sectionSpace: clamp(0, 1),
     keyLift: clamp(0, 1),
     timbreDrift: clamp(0, 1),
+    breakdowns: { meter: oneOf(['same', ...Object.keys(METERS)]), halfTime: bool },
+    feel: { busy: clamp(-1, 1), bright: clamp(-1, 1) },
     arc: { shape: oneOf(Object.keys(ARC_SHAPES)), minutes: clamp(2, 60) },
     swing: clamp(0, 0.6),
     sectionTone: bool,

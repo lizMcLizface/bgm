@@ -36,6 +36,8 @@ import { MasterVolume, SettingsMenu, AudioMenu, VisualMenu } from './AudioStatus
 import { SleepTimer, Recorder } from './Playback';
 import { sceneSettings, sceneSoundSettings, sceneGroup, stepBuiltinSceneEntry, buildSetup, parseSetup, sceneBySlug, sceneSlug, presetFromSearch, introFromSearch, SCENES, SCENE_CATEGORIES } from './scenes';
 import PresetBrowser from './PresetBrowser';
+import FeelPad from './FeelPad';
+import ListeningTimer from './ListeningTimer';
 import { saveUserScene, deleteUserScene, isUserScene } from './setupStore';
 import { ROLE_PRESETS } from './presets';
 import { setupMediaSession, updateMediaSession } from './mediaSession';
@@ -991,6 +993,11 @@ const GenerativeApp = () => {
         gen.keepCurrent();
         setSettings({ ...gen.settings });
     };
+    // the feel pad: a place over the preset, so the preset's name stays
+    const changeFeel = (feel) => {
+        gen.set('feel', feel);
+        setSettings((s) => ({ ...s, feel }));
+    };
     const update = (key, value) => {
         clearBookSettings({ [key]: value });
         gen.set(key, value);
@@ -1411,6 +1418,7 @@ const GenerativeApp = () => {
                 </div>
                 <div className="gen-header-end">
                 <PresetBrowser current={scene} onPick={applyScene} actions={setupActions} />
+                <ListeningTimer generator={gen} running={anyOn} />
                 {sleepLeft && <span className="gen-sleep gen-sleep-left" role="timer" title="Sleep timer (in the ⚙ menu)">Sleep {sleepLeft}</span>}
                 {stage < LAST_STAGE && (
                     <button type="button" className="gen-unlock" onClick={unlockNext}
@@ -1451,6 +1459,10 @@ const GenerativeApp = () => {
                 tracks={has(1) ? <TrackStrip roles={shownTracks} presets={{...Object.fromEntries(Object.entries(roles).map(([role, { presetName, edited, external }]) => [role, { name: external?.label ?? presetName, edited }])),perc:percMachine?{name:percMachine.label,edited:false}:{name:percussionVoice(settings.drums.kit).name,edited:percussionEdited(settings.drums.kit,settings.drumKit)}}} mix={mix} armed={armed} onMix={changeMix} onArm={setArmed} onEdit={has(3) ? editSound : undefined}
                     onRandom={randomizePreset} onGenerate={has(3) ? generateForRole : undefined} onPick={choosePicker} onPickPercussion={()=>choosePicker('perc')} onEditPercussion={has(3)?editPercussionSound:undefined} percussionHint={percussionKeyHint(settings.drums.kit)} generating={generating} live={live} /> : null}
             />
+
+            {has(2) && <Panel id="feel" title="Feel">
+                <FeelPad feel={settings.feel} onChange={changeFeel} />
+            </Panel>}
 
             <Rulebook generator={gen} settings={settings} book={book} onChoice={changeRule} preset={scene} stage={stage} focusRule={ruleFocus} pageControls={{
                 melody: wrapGroup('lead-register', <VoiceControls role="lead" voice={settings.voices.lead} onChange={voice => changeGroup('lead-register', voice)} />),

@@ -5,6 +5,7 @@
 import { scaleDistance } from './conductor';
 import PROGRESSIONS from './progressions';
 import { defaultSettings } from './settings';
+import { METERS, beatStarts, groupStarts } from './meter';
 
 vi.mock('../audio/context', () => ({
     audioContext: {
@@ -488,8 +489,8 @@ test('6/8: units of eighths, felt tempo in dotted quarters', () => {
     expect(gen.transport.beatsPerBar).toBe(6);
     play(gen, 8).forEach((b) => b.events.forEach((e) => expect(e.beat).toBeLessThan(6)));
     const { downbeats } = perform(gen, 3);
-    // 72 dotted quarters per minute = 2 per bar -> 60/72*2 s per bar
-    expect(downbeats[2] - downbeats[1]).toBeCloseTo((60 / 72) * 2, 5);
+    // 72 BPM at 6/8's pace (0.75): 54 dotted quarters per minute, 2 per bar -> 60/54*2 s per bar
+    expect(downbeats[2] - downbeats[1]).toBeCloseTo((60 / (72 * 0.75)) * 2, 5);
 });
 
 test('keepCurrent makes the drifted music the new home, without a jump', () => {
@@ -928,7 +929,8 @@ test('Original generation reference fixtures', () => {
             drums: { style: 'lofi', activity: 0.5, variation: 0.5, sprinkle: 0.35, kit: 'felt' }, sections: { mode: 'strong', phrases: 2 } });
         return fingerprint(play(gen, 48).map(b => ({ events: b.events, chord: b.chord, section: b.state.phrase.section })));
     });
-    expect(fixtures).toEqual(['5b9bc750', 'ed5448a7', '37b2e5d0']);
+    // (6/8 changed with its pace, meter.js)
+    expect(fixtures).toEqual(['5b9bc750', 'ed5448a7', '692f3d06']);
 });
 
 test('Latest plans and offline planners agree, remain distinct from Original, and ignore drum enablement', () => {
@@ -966,7 +968,8 @@ test('previous Latest reference for ensemble comparisons', () => {
         let h=2166136261;for(const c of JSON.stringify(play(gen,32).map(b=>b.events)))h=Math.imul(h^c.charCodeAt(0),16777619);
         return(h>>>0).toString(16);
     });
-    expect(fingerprints).toEqual(['8ddcde1','c801237d']);
+    // (6/8 changed with its pace, meter.js)
+    expect(fingerprints).toEqual(['8ddcde1','2ecfd48d']);
 });
 
 test('ensemble coordination preserves the theme, serialises rhythm, and survives offline planning', () => {
@@ -1264,10 +1267,10 @@ test('timing permissions are independent, use felt BPM in compound meter and byp
  let count=0;const plain=events=>events.map(({expression,...e})=>e);
  for(let bar=0;bar<8;bar++) {on.planBar(bar);off.planBar(bar);const events=on.plan.get(bar).events;
   expect(plain(events)).toEqual(plain(off.plan.get(bar).events));
-  for(const event of events.filter(e=>e.role!=='perc')) {expect(event.expression.tempoBeat).toBeCloseTo(60/on.plan.get(bar).bpm);count++;}
+  for(const event of events.filter(e=>e.role!=='perc')) {expect(event.expression.tempoBeat).toBeCloseTo(60/(on.plan.get(bar).bpm*.75));count++;}
  }
  expect(count).toBeGreaterThan(0);expect(on.planner().tempoEffects).toBe(true);expect(off.planner().gateEnvelopes).toBe(false);
- on.endBar=8;on.planBar(8);expect(on.plan.get(8).events.filter(e=>e.role!=='perc').every(e=>e.expression?.tempoBeat===60/on.plan.get(8).bpm)).toBe(true);
+ on.endBar=8;on.planBar(8);expect(on.plan.get(8).events.filter(e=>e.role!=='perc').every(e=>Math.abs(e.expression?.tempoBeat-60/(on.plan.get(8).bpm*.75))<1e-9)).toBe(true);
  const original=new Generator({...settings,generation:'legacy'});original.tempoEffects=true;original.planBar(0);
  expect(original.plan.get(0).events.every(e=>!e.expression)).toBe(true);
 });
@@ -1460,5 +1463,125 @@ describe('key lifts', () => {
         gen.settings.sections = { ...gen.settings.sections, mode: 'gentle' };
         gen.reset();
         expect(play(gen, 120).every((b) => !b.keyLift)).toBe(true);
+    });
+});
+
+describe('every meter plays', () => {
+    it.each(Object.keys(METERS))('%s: bars fill their length with finite notes in every part', (id) => {
+        const meter = METERS[id];
+        expect(groupStarts(meter).every((s) => s < meter.units)).toBe(true);
+        expect(beatStarts(meter).every((s) => s < meter.units)).toBe(true);
+        const gen = generator(9, { mode: 'off' });
+        gen.settings.meter = id;
+        gen.settings.drums = { ...gen.settings.drums, style: 'downtempo' };
+        gen.settings.sections = { mode: 'gentle', phrases: 2 };
+        gen.reset();
+        const roles = new Set();
+        for (const b of play(gen, 48)) for (const e of b.events) {
+            expect([e.midi, e.beat, e.length, e.velocity].every(Number.isFinite)).toBe(true);
+            expect(e.beat).toBeLessThan(meter.units);
+            roles.add(e.role);
+        }
+        expect(['perc', 'pad', 'bass'].every((r) => roles.has(r))).toBe(true);
+    });
+});
+
+describe('breakdowns', () => {
+    const piece = (breakdowns) => {
+        const gen = generator(11, { mode: 'off' });
+        Object.assign(gen.settings, { meter: '4/4', sections: { mode: 'strong', phrases: 2 }, drums: { ...gen.settings.drums, style: 'downtempo' }, breakdowns });
+        gen.reset();
+        return play(gen, 96);
+    };
+    it('can play in a meter of their own and come back to the piece’s', () => {
+        const bars = piece({ meter: '6/8', halfTime: false }), breakdown = bars.filter((b) => b.state.phrase.section?.type === 'breakdown');
+        expect(breakdown.length).toBeGreaterThan(0);
+        for (const b of bars) {
+            const own = b.state.phrase.section?.type === 'breakdown';
+            expect(b.meter.units).toBe(own ? 6 : 4);
+            for (const e of b.events) expect(e.beat).toBeLessThan(b.meter.units);
+        }
+    });
+    it('can stretch the drums to half time, and only in breakdowns', () => {
+        const plain = piece({ meter: 'same', halfTime: false }), half = piece({ meter: 'same', halfTime: true });
+        let changed = 0;
+        plain.forEach((b, i) => {
+            const hits = (bar) => bar.events.filter((e) => e.role === 'perc').map((e) => [e.midi, +(e.beat).toFixed(3)]).sort();
+            if (b.state.phrase.section?.type !== 'breakdown') { expect(hits(half[i])).toEqual(hits(b)); return; }
+            for (const [, beat] of hits(half[i])) expect(hits(b).some(([, x]) => Math.abs(x * 2 - beat) < 0.06)).toBe(true);
+            if (JSON.stringify(hits(half[i])) !== JSON.stringify(hits(b))) changed++;
+        });
+        expect(changed).toBeGreaterThan(0);
+    });
+});
+
+describe('the feel pad', () => {
+    const plan = (feel) => {
+        const gen = generator(21, { mode: 'off' });
+        Object.assign(gen.settings, { sections: { mode: 'gentle', phrases: 2 }, drums: { ...gen.settings.drums, style: 'downtempo', activity: 0.4 }, feel });
+        gen.reset();
+        const bars = play(gen, 48);
+        return { gen, notes: (role) => bars.flatMap((b) => b.events.filter((e) => e.role === role)).length, tone: Math.max(...bars.map((b) => b.tone)) };
+    };
+    it('busier plays more, calmer less, and the centre leaves the preset as it is', () => {
+        const centre = plan({ busy: 0, bright: 0 }), busy = plan({ busy: 1, bright: 0 }), calm = plan({ busy: -1, bright: 0 });
+        expect(busy.notes('pad') + busy.notes('perc')).toBeGreaterThan(centre.notes('pad') + centre.notes('perc'));
+        expect(calm.notes('perc')).toBeLessThan(centre.notes('perc'));
+        expect(centre.gen.settings.feel).toEqual({ busy: 0, bright: 0 });
+        expect(busy.gen.settings.drums.activity).toBe(0.4); // the settings keep the preset's values
+    });
+    it('darker closes the tone', () => {
+        expect(plan({ busy: 0, bright: -1 }).tone).toBeLessThan(plan({ busy: 0, bright: 0 }).tone);
+    });
+});
+
+describe('the section readout', () => {
+    it('names the section, the bars left in it and the next one', () => {
+        const gen = generator(5, { mode: 'off' });
+        gen.settings.sections = { mode: 'strong', phrases: 2 };
+        gen.reset();
+        play(gen, 3);
+        const r = gen.sectionReadout(1);
+        expect(r.type).toBe('intro');
+        expect(r.left).toBe(r.end - 1 + 1);
+        expect(['build', 'full']).toContain(r.next);
+        gen.settings.sections = { mode: 'off', phrases: 2 };
+        gen.reset();
+        play(gen, 2);
+        expect(gen.sectionReadout(1)).toBeNull();
+    });
+});
+
+describe('next section now', () => {
+    it('ends the playing section at the next phrase boundary and carries on without skipping a bar', () => {
+        const gen = generator(5, { mode: 'off' });
+        gen.settings.sections = { mode: 'strong', phrases: 4 };
+        gen.reset();
+        const bars = play(gen, 6);
+        const section = gen.sectionOf(5);
+        expect(section.end).toBeGreaterThan(8);
+        gen.bookingBar = 5;
+        gen.resumeBar = 6; // paused here
+        expect(gen.nextSectionNow()).toBe(true);
+        const after = [6, 7, 8, 9].map((b) => { gen.currentBar = b; gen.ensurePlanned(b); return gen.plan.get(b); });
+        expect(after[1].state.phrase.section.start).toBe(section.start);
+        expect(after[2].state.phrase.section.start).toBe(8);
+        expect(after[2].state.phrase.section.type).not.toBe(section.type);
+        expect(gen.sectionReadout(7).left).toBe(1);
+        expect(bars.length + after.length).toBe(10);
+    });
+});
+
+describe('a busier feel on drums', () => {
+    it('adds soft ghost notes even where the style keeps its density', () => {
+        const count = (busy) => {
+            const gen = generator(21, { mode: 'off' });
+            Object.assign(gen.settings, { drums: { ...gen.settings.drums, style: 'downtempo', activity: 0.4 }, feel: { busy, bright: 0 } });
+            gen.reset();
+            return play(gen, 32).flatMap((b) => b.events.filter((e) => e.role === 'perc'));
+        };
+        const centre = count(0), busy = count(1);
+        expect(busy.length).toBeGreaterThan(centre.length * 1.2);
+        expect(busy.filter((e) => e.ghost).every((e) => e.velocity < 0.6)).toBe(true);
     });
 });

@@ -1,6 +1,7 @@
 import {isUnsettlingProgression} from '../progressions';
 import { DRUM_STYLES } from '../percussion';
 import { ARC_SHAPES } from '../composition/arc';
+import { METERS } from '../meter';
 // Stable rule identifiers and a reversible adapter over the current generator.
 // Page visibility never enters compilation: presets use the whole rulebook.
 export const CHAPTERS = [
@@ -94,6 +95,8 @@ export const RULES=[
     setting('energy-arc','form','Shape the energy over a long stretch','Let the whole piece rise from calm, wind down (it then stays calm) or swell and settle in waves, over the length below. Calmer stretches play softer, darker and with fewer drum hits.','arc.shape','off','winddown',{options:['off','rise','winddown','wave'],optionLabels:ARC_SHAPES}),
     setting('energy-arc-length','form','Set the arc’s length','How long the rise or wind-down takes, or one wave lasts. A short arc is a quick way to hear it.','arc.minutes',20,10,{parameter:{min:2,max:60,step:1,unit:'min',label:'Arc length'}}),
     setting('timbre-drift','evolution','Let the sounds’ colour drift','Move a few safe settings - filter, second oscillator, detune, breath, vibrato - slowly around each synth sound’s own values. FM, piano, plucked, classic and DIY sounds stay as they are, and the saved sounds never change.','timbreDrift',0,.4,{parameter:{min:0,max:1,step:.05,unit:'%',label:'Drift amount'}}),
+    setting('breakdown-meter','form','Give breakdowns their own metre','Play breakdowns in another time signature - a lilting 6/8 inside a 4/4 piece, say - and return to the piece’s metre after them.','breakdowns.meter','same','6/8',{needs:'sections',options:['same',...Object.keys(METERS)]}),
+    setting('half-time-breakdowns','percussion','Play breakdowns in half time','Stretch the drums’ pattern to half speed in breakdowns, so the backbeat moves from 2 to 3. Bars with an odd number of beats keep their pattern.','breakdowns.halfTime',false,true,{role:'perc',needs:'percussion'}),
     setting('key-lift','form','Lift the key for a return','At the end of a build, sometimes pivot a whole step up for the full sections that follow; the next breakdown starts back home.','keyLift',0,.4,{needs:'sections',parameter:{min:0,max:1,step:.05,unit:'%',label:'Lift chance'}}),
     setting('section-space','form','Let sections open out','Send the voices to a wide room more in intros and breakdowns and almost not at all in full sections, so the space follows the form.','sectionSpace',0,.6,{needs:'sections',parameter:{min:0,max:1,step:.05,unit:'%',label:'Section space'}}),
     setting('section-tone','form','Let sections change the tone','Darken intros and breakdowns and open the sound in full sections.','sectionTone',false,true,{needs:'sections'}),

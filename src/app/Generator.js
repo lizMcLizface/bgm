@@ -41,7 +41,7 @@ import { RoleWander, instrumentWander } from './engine/wander';
 import { scaleById, scaleSemitones, spellScale, romanDegree, diatonicChord, chordSymbol, displayNumeral, noteAtOrAbove, voiceLead } from './theory';
 import { arrangeBar, notesInRange } from './arranger';
 import { arrangeBarLatest } from './composition/arrangerLatest';
-import { planForm } from './composition/formLatest';
+import { planForm, cutForm } from './composition/formLatest';
 import { sectionCadence } from './composition/sectionCadence';
 import { commonToneBridge } from './composition/commonToneBridge';
 import { harmonicDurations, harmonicSlot } from './composition/harmonicRhythm';
@@ -63,8 +63,9 @@ import { planLoudness } from './composition/loudness';
 import { SPACE_RACK, SPACE_ROLE, sectionSpaceLevel } from './composition/sectionSpace';
 import { arcEnergy, applyArc, arcTone, arcSpace } from './composition/arc';
 import { timbreDrift } from './composition/timbreDrift';
+import { applyFeel, feelActive, feelTone, feelEnergy, ghostNotes } from './composition/feel';
 import { nextMusic, glideTempo, scaleDistance } from './conductor';
-import { METERS, unitsPerMinute, swingEvents } from './meter';
+import { METERS, unitsPerMinute, swingEvents, halfTime } from './meter';
 import { drumBar, loosenDrums, auditionHits } from './percussion';
 import { normal, seeded } from './random';
 import { defaultSettings } from './settings';
@@ -230,8 +231,10 @@ class Generator {
     // The master meter requests sleep only after one second of exact silence.
     canSleepAudio(){return !this.anyRunning&&!this.liveNotes?.size&&!this.stopFade&&!this.auditionPending;}
 
+    // The piece's meter - or, while a bar is being planned, that bar's (meterFor): a breakdown
+    // may have one of its own (settings.breakdowns.meter). A planned bar keeps its meter.
     get meter() {
-        return METERS[this.settings.meter];
+        return this.barMeter ?? METERS[this.settings.meter];
     }
 
     /** Units (Transport pulses) per bar - quarters, or eighths in 6/8. */
@@ -303,9 +306,11 @@ class Generator {
             this.endStopFade();
         }
         this.ensurePlanned(this.resumeBar);
-        this.transport.setBpm(unitsPerMinute(this.meter, this.plan.get(this.resumeBar).bpm));
+        const resumed = this.plan.get(this.resumeBar), resumeMeter = resumed.meter ?? this.meter;
+        this.transport.setBpm(unitsPerMinute(resumeMeter, resumed.bpm));
+        this.transport.beatsPerBar = resumeMeter.units;
         this.startedAt = performance.now();
-        this.transport.start(this.resumeBar * this.beatsPerBar);
+        this.transport.start(this.resumeBar * resumeMeter.units);
         this.notifyRunning();
     }
 
@@ -359,7 +364,7 @@ class Generator {
                 for(const role of Object.keys(ROLES)){
                     const r=this.roles[role],old=r.instrument,snapshot=JSON.stringify(old.preset);
                     if(externalSource(old.preset))continue;
-                    const instrument=Wasm?await Wasm.create({context:this.AC,preset:old.preset,polyphony:old.polyphony,roomPool,dynamics:this.settings.dynamics}):new Instrument({context:this.AC,preset:old.preset,polyphony:old.polyphony,reverbHub:this.reverbHub});
+                    const instrument=Wasm?await Wasm.create({context:this.AC,preset:old.preset,polyphony:old.polyphony,roomPool,dynamics:applyFeel(this.settings).dynamics}):new Instrument({context:this.AC,preset:old.preset,polyphony:old.polyphony,reverbHub:this.reverbHub});
                     const replacement={role,instrument,source:old,snapshot,roomRoute:null};replacements.push(replacement);
                     if(roomPool)replacement.roomRoute=createWasmRoomRoute(this.AC,instrument,{roleWander:r.wander,volume:r.volume,cutoff:r.tone.frequency.value});
                 }
@@ -556,7 +561,7 @@ class Generator {
     /** Seconds an ending takes from endSoon() until the music stops (about). */
     endingSeconds() {
         const planned = this.plan.get(Math.max(this.currentBar, 0)) || this.getPlan()[0];
-        const bar = (60 / unitsPerMinute(this.meter, planned.bpm)) * this.beatsPerBar;
+        const meter = planned.meter ?? this.meter, bar = (60 / unitsPerMinute(meter, planned.bpm)) * meter.units;
         return bar * (ENDING_RING_BARS + 2);
     }
 
@@ -614,7 +619,7 @@ class Generator {
         if (key === 'muted') this.applyMutes();
         if (key === 'wander') this.applyWander();
         if (key === 'bus') this.applyBus();
-        if (key === 'dynamics') this.applyDynamics();
+        if (key === 'dynamics' || key === 'feel') this.applyDynamics();
         if (SOUND_KEYS.has(key) || soundOnlyDrums) return;
         this.replan([key]);
     }
@@ -680,7 +685,7 @@ class Generator {
         if ('muted' in patch) this.applyMutes();
         if ('wander' in patch) this.applyWander();
         if ('bus' in patch) this.applyBus();
-        if ('dynamics' in patch) this.applyDynamics();
+        if ('dynamics' in patch || 'feel' in patch) this.applyDynamics();
         if (Object.keys(patch).every((key) => SOUND_KEYS.has(key) || key === 'drums' && soundOnlyDrums)) return;
         this.replan(Object.keys(patch), meterChanged);
     }
@@ -736,7 +741,8 @@ class Generator {
     // The scene's dynamics reach the Wasm voices through their patches (velocity → attack and
     // filter); the notes carry the rest (composition/dynamics.js).
     applyDynamics() {
-        for (const { instrument } of Object.values(this.roles)) instrument?.setDynamics?.(this.settings.dynamics);
+        const { dynamics } = applyFeel(this.settings);
+        for (const { instrument } of Object.values(this.roles)) instrument?.setDynamics?.(dynamics);
     }
 
     applyBus() {
@@ -815,7 +821,7 @@ class Generator {
                 instrument=await Wasm.create({context:this.AC,preset:source,polyphony:ROLES[role].polyphony,spec:diySpec(source.diy,ROLES[role].polyphony),roomPool:this.wasmRoomPool});
             }else if(source?.wasmVoice||this.audioEngine==='wasm'){
                 const Wasm=(await import('./engine/wasmInstrument')).default;
-                instrument=await Wasm.create({context:this.AC,preset:source,polyphony:ROLES[role].polyphony,roomPool:this.wasmRoomPool,dynamics:this.settings.dynamics});
+                instrument=await Wasm.create({context:this.AC,preset:source,polyphony:ROLES[role].polyphony,roomPool:this.wasmRoomPool,dynamics:applyFeel(this.settings).dynamics});
             }else instrument=new Instrument({context:this.AC,preset:source??findPreset(ROLES[role].preset),polyphony:ROLES[role].polyphony,reverbHub:this.reverbHub});
             if(revision!==r.sourceRevision){instrument.dispose();return;}
             r.roomRoute?.dispose();r.roomRoute=null;r.instrument.dispose();r.instrument=instrument;instrument.connect(r.tone);
@@ -972,7 +978,7 @@ class Generator {
         const planned = this.plan.get(bar) || this.getPlan()[0];
         const time = this.AC.currentTime + 0.05;
         if (role === 'perc') {
-            const beat = 60 / unitsPerMinute(this.meter, planned.bpm);
+            const beat = 60 / unitsPerMinute(planned.meter ?? this.meter, planned.bpm);
             auditionHits(this.settings.drums.kit).forEach((e) => instrument.scheduleNote(e.midi, time + e.beat * beat, 0.1, e.velocity));
             return;
         }
@@ -1247,6 +1253,8 @@ class Generator {
         const size = this.settings.barsPerChord;
         for (let at = fromBar; at <= bar; at++) {
             const inChord = ((at - music.cycleStart) % size + size) % size;
+            // Next now (nextSectionNow): the section ends at this phrase boundary instead
+            form = cutForm(form, at, this.sectionCut);
             form = planForm({ bar: at, seed: this.settings.seed,
                 sections: this.quickIntro ? { ...this.settings.sections, quickIntro: true } : this.settings.sections,
                 settings: this.settings, previous: form, barsPerChord: size, barsLeftInChord: size - inChord,
@@ -1334,8 +1342,28 @@ class Generator {
         return result;
     }
 
-    // Decides one bar. Event times/lengths are in beats from the bar start.
+    // A bar's meter: the piece's, or a breakdown's own (settings.breakdowns.meter). Needs the
+    // developed form (sections on, latest generation) to know the section before the bar is planned.
+    meterFor(bar, music) {
+        const base = METERS[this.settings.meter], own = METERS[this.settings.breakdowns?.meter];
+        if (!own || own === base || (this.endBar !== null && bar >= this.endBar - 1)) return base;
+        return this.sectionFormAt(bar, music)?.section?.type === 'breakdown' ? own : base;
+    }
+
+    // Decides one bar, in its own meter. Event times/lengths are in beats from the bar start.
     planBar(bar) {
+        const prev = this.plan.get(bar - 1), fresh = !prev || this.resetMusicAt === bar;
+        const meter = this.meterFor(bar, fresh ? this.cycleMusic(this.homeMusic(), bar, bar) : prev.nextMusic);
+        // the feel pad's place, over the settings for this bar's planning only (composition/feel.js)
+        const settings = this.settings;
+        this.barMeter = meter;
+        if (feelActive(settings.feel)) this.settings = applyFeel(settings);
+        try { this.planBarIn(bar); } finally { this.barMeter = null; this.settings = settings; }
+        const planned = this.plan.get(bar);
+        if (planned) planned.meter = meter;
+    }
+
+    planBarIn(bar) {
         const { barsPerChord, leadActivity, leadDensity, padWeights, bassWeights, pulseWeights, arpWeights, directionWeights, padMotion, thinPadUnderLead, drift, humanize, voices, counter, sections, drums, swing, chordSpread, pedal, leadScale, leadLeaps, leadRepeat, leadEnding } = this.settings;
         const prev = this.plan.get(bar - 1);
 
@@ -1395,6 +1423,7 @@ class Generator {
             seed: this.settings.seed,
             coordinate: this.ensembleCoordination !== false,
             developForm: this.formDevelopment !== false,
+            sectionCut: this.sectionCut,
             sectionDevelopment: this.sectionDevelopment !== false,
             formStrategies:this.formStrategies!==false,sectionCurves:this.sectionCurves!==false,formStrategy:this.formStrategy,
             transitionGestures: this.transitionGestures !== false,
@@ -1456,9 +1485,13 @@ class Generator {
         // Drums: patterns and looseness from streams of their own (the
         // arranger's rng is never touched, so the notes stay the same).
         const boundaries=planBoundaries(state,bar,this.endBar);
-        const hits = drums && drums.style !== 'off'
+        let hits = drums && drums.style !== 'off'
             ? (original ? drumBar : drumBarLatest)({ bar, meter: this.meter, drums, section: state.phrase.section, sectionsMode: sections.mode, sectionBars: state.phrase.section?.bars || sections.phrases * 4, phraseStart: state.phrase.start, phraseBars: state.composition?.phrase?.bars ?? 4, boundaries, seed: this.settings.seed, rhythm: state.composition?.rhythm })
             : [];
+        // half-time breakdowns (settings.breakdowns.halfTime): the drums only
+        if (this.settings.breakdowns?.halfTime && state.phrase.section?.type === 'breakdown') hits = halfTime(hits, this.meter);
+        // a busier feel: ghost notes on the light drums (composition/feel.js)
+        if (this.settings.feel?.busy > 0) hits = ghostNotes(hits, this.settings.feel.busy, { bar, seed: this.settings.seed, meter: this.meter });
         swingEvents(events, this.meter, swing);
         swingEvents(hits, this.meter, swing);
         if (!original && state.composition?.rhythm) {
@@ -1483,9 +1516,11 @@ class Generator {
         if(!original&&this.endingDevelopment!==false&&closing){const prepared=prepareEnding(events,this.meter);events.splice(0,events.length,...prepared);state.composition.ending={phase:'prepare',arrival:this.endBar};}
         applyBitonality(events,this.settings.tonality);
         // the long arc: this bar's place in the piece's running time (composition/arc.js)
-        const elapsed = prev ? (prev.elapsed ?? 0) + rubatoTime(prev.rubato, 60 / unitsPerMinute(this.meter, prev.bpm), this.meter.units) : 0;
+        const prevMeter = prev?.meter ?? this.meter;
+        const elapsed = prev ? (prev.elapsed ?? 0) + rubatoTime(prev.rubato, 60 / unitsPerMinute(prevMeter, prev.bpm), prevMeter.units) : 0;
         const energy = arcEnergy(this.settings.arc, elapsed);
         applyArc(events, energy, { bar, seed: this.settings.seed });
+        applyArc(events, feelEnergy(this.settings.feel), { bar: bar + 7919, seed: this.settings.seed });
         applyDynamics(events, this.settings.dynamics);
         ornamentNotes(events, { amount: this.settings.ornaments, bar, seed: this.settings.seed, voices: this.grooveVoices ?? this.grooveVoiceSnapshot(),
             scalePcs: chord.scalePcs ?? [], unitSeconds: 60 / unitsPerMinute(this.meter, bpm) });
@@ -1500,7 +1535,7 @@ class Generator {
             previous: prev?.events ?? [], units: this.meter.units,
         });
         if (!original && (this.gateEnvelopes === true || this.tempoEffects === true)) timeSoundNotes(events, {
-            voices: this.grooveVoices ?? this.grooveVoiceSnapshot(), bpm,
+            voices: this.grooveVoices ?? this.grooveVoiceSnapshot(), bpm: bpm * (this.meter.pace ?? 1),
             gateEnvelopes:this.gateEnvelopes === true, tempoEffects:this.tempoEffects === true,
         });
         if (!original && (this.noteSlides === true || this.padPitchMotion === true || this.bassPitchMotion === true || this.chordSlides === true)) slideNotes(events, {
@@ -1515,7 +1550,7 @@ class Generator {
             tone = low * (OPEN_TONE / low) ** state.phrase.section.brightness;
         }
         const rubato = planRubato({ bar, state, meter: this.meter, endBar: this.endBar, amount: this.settings.rubato });
-        tone = arcTone(tone, energy);
+        tone = feelTone(arcTone(tone, energy), this.settings.feel);
         const space = sectionSpaceLevel(state.phrase.section, this.settings.sectionSpace) + arcSpace(energy);
         const loudness = planLoudness(events, this.meter.units, this.plan.get(bar - 1)?.loudness?.average, this.settings.evenLoudness);
         this.plan.set(bar, { bar, chord, chordStart, state, events, music, upcoming, nextMusic: following, bpm, tone, boundaries, rubato, loudness, space, elapsed, energy, keyLift: liftPivot ? 2 : keyLift,
@@ -1553,7 +1588,7 @@ class Generator {
             events.forEach((e) => { e.detune = 0; });
         }
         if (this.settings.generation !== 'legacy' && this.tempoEffects === true) timeSoundNotes(events, {
-            voices:this.grooveVoices ?? this.grooveVoiceSnapshot(), bpm, tempoEffects:true,
+            voices:this.grooveVoices ?? this.grooveVoiceSnapshot(), bpm: bpm * (this.meter.pace ?? 1), tempoEffects:true,
         });
         applyBitonality(events,this.settings.tonality);
         this.plan.set(bar, {
@@ -1725,7 +1760,75 @@ class Generator {
 
     // A chord or a progression cycle around `bar`.
     spanOf(kind, bar) {
-        return kind === 'chord' ? this.chordOf(bar) : this.cycleOf(bar);
+        return kind === 'chord' ? this.chordOf(bar) : kind === 'section' ? this.sectionOf(bar) ?? this.cycleOf(bar) : this.cycleOf(bar);
+    }
+
+    // The section a bar belongs to: { start, end, type } (end inclusive), or null without sections.
+    sectionOf(bar) {
+        this.planThrough(bar);
+        const section = this.plan.get(bar)?.state?.phrase?.section;
+        if (!section) return null;
+        const cut = this.sectionCut?.start === section.start ? this.sectionCut.at - 1 : Infinity; // (Next now)
+        return { start: section.start, end: Math.min(cut, section.start + (section.bars || this.settings.sections.phrases * 4) - 1), type: section.type };
+    }
+
+    /**
+     * For the timeline's readout: the section playing at `bar`, the bars left in it and the next
+     * one's type, when the plan or the form can tell ({ type, left, next, end }); null without
+     * sections. Cached per planned bar.
+     */
+    sectionReadout(bar) {
+        const entry = this.plan.get(bar), section = entry?.state?.phrase?.section;
+        if (!section) return null;
+        const holding = this.loop?.mode === 'section';
+        if (this.readoutCache?.entry === entry && this.readoutCache.holding === holding) return this.readoutCache.value;
+        const cut = this.sectionCut?.start === section.start ? this.sectionCut.at - 1 : Infinity;
+        const end = Math.min(cut, section.start + (section.bars || this.settings.sections.phrases * 4) - 1);
+        const next = this.plan.get(end + 1)?.state?.phrase?.section?.type
+            ?? (end + 1 - bar <= 64 ? this.sectionFormAt(end + 1, entry.music, bar + 1)?.section?.type : null) ?? null;
+        const value = { type: section.type, left: end - bar + 1, next, end, holding };
+        this.readoutCache = { entry, holding, value };
+        return value;
+    }
+
+    /**
+     * Goes on to the next section soon. With the developed form the playing section ends at the
+     * next phrase boundary (within four bars) and the music carries on into the next one;
+     * otherwise (Original generation) it skips to the next section's start at the next bar line.
+     * Paused, Play's start moves there.
+     */
+    nextSectionNow() {
+        const here = this.isRunning ? Math.max(this.currentBar, 0) : this.hereBar;
+        const section = this.sectionOf(here);
+        if (!section) return false;
+        if (this.loop) this.setLoop('off');
+        const formed = this.plan.get(here)?.state?.composition?.form?.section?.start === section.start;
+        if (formed) {
+            const from = (this.bookingBar ?? here) + 1, at = Math.ceil(Math.max(from, section.start + 1) / 4) * 4;
+            if (at > section.end) return false;
+            this.sectionCut = { start: section.start, at };
+            [...this.plan.keys()].filter((b) => b >= at).forEach((b) => this.plan.delete(b));
+            this.readoutCache = null;
+            if (this.loop) this.loop.dirty = true;
+            this.ensurePlanned(Math.max(this.currentBar, 0));
+            this.planListeners.forEach((listener) => listener());
+            return true;
+        }
+        const to = section.end + 1;
+        if (!this.isRunning) { this.seek(to); return true; }
+        // the bar now being booked ends first (its last beat may be booked already)
+        const from = this.bookingBar ?? here, after = this.bookingLastBeat ? from + 1 : from;
+        if (to <= after + 1) return false;
+        this.planThrough(to + 1);
+        this.jump = { after, to };
+        this.readoutCache = null;
+        return true;
+    }
+
+    /** Keeps the section playing (a loop over it) or lets it go on. */
+    holdSection(on) {
+        this.setLoop(on ? 'section' : 'off');
+        this.readoutCache = null;
     }
 
     /**
@@ -1776,7 +1879,8 @@ class Generator {
             this.planListeners.forEach((listener) => listener());
         }
         for (let bar = from; bar <= to; bar++) this.plan.get(bar).events.forEach((ev) => { ev.booked = false; });
-        this.transport.rebase((to + 1) * this.transport.beatsPerBar, from * this.meter.units, this.meter.units);
+        const fromMeter = this.plan.get(from).meter ?? this.meter;
+        this.transport.rebase((to + 1) * this.transport.beatsPerBar, from * fromMeter.units, fromMeter.units);
     }
 
     // Section tone: glides to a bar's cutoff over that bar (at once when
@@ -1803,9 +1907,9 @@ class Generator {
         const through=Math.min(bar+4,this.loop?this.loop.to:Infinity,this.endBar===null?Infinity:this.endBar-1);
         for(let b=bar;b<=through;b++){
             const planned=this.plan.get(b);if(!planned)break;
-            const unit=60/unitsPerMinute(this.meter,planned.bpm),at=beat=>time+rubatoTime(planned.rubato,unit,beat);
+            const meter=planned.meter??this.meter,unit=60/unitsPerMinute(meter,planned.bpm),at=beat=>time+rubatoTime(planned.rubato,unit,beat);
             for(const event of planned.events)if(!event.booked&&['pad','bass'].includes(event.role))notes.push({event,bar:b,role:event.role,midi:event.midi,time:at(event.beat),duration:at(event.beat+event.length)-at(event.beat),expression:event.expression,section:planned.state.phrase.section?.start,ending:planned.ending});
-            time+=rubatoTime(planned.rubato,unit,this.meter.units);
+            time+=rubatoTime(planned.rubato,unit,meter.units);
         }
         return new Map(joinHeldNotes(notes,{pad:this.heldPadGlides===true,bass:this.heldBassGlides===true,voices:this.grooveVoiceSnapshot()}).filter(n=>n.heldMembers).map(n=>[n.event,n]));
     }
@@ -1844,7 +1948,7 @@ class Generator {
         if (beatInBar === 0) this.applySpace(this.plan.get(bar).space ?? 0, time, secondsPerBeat * this.transport.beatsPerBar);
         if (beatInBar === 0) this.levelTrim.gain.setTargetAtTime(this.plan.get(bar).loudness?.trim ?? 1, time, secondsPerBeat * this.transport.beatsPerBar * 0.3);
         let held=this.heldGlideBookings(bar);
-        const rubato = this.plan.get(bar)?.rubato, unit = rubato && 60 / unitsPerMinute(this.meter, this.plan.get(bar).bpm);
+        const rubato = this.plan.get(bar)?.rubato, unit = rubato && 60 / unitsPerMinute(this.plan.get(bar).meter ?? this.meter, this.plan.get(bar).bpm);
         const seconds = (e) => (rubato ? rubatoTime(rubato, unit, e.beat + e.length) - rubatoTime(rubato, unit, e.beat) : e.length * secondsPerBeat);
         const book = (e, start) => {
             if(e.booked)return;
@@ -1871,16 +1975,31 @@ class Generator {
         // Early (humanized) notes a re-plan created after their slot: now.
         if (beatInBar === 0) current.filter((e) => !e.booked && e.beat < 0).forEach((e) => book(e, time));
 
+        this.bookingBar = bar;
+        this.bookingLastBeat = beatInBar === this.transport.beatsPerBar - 1;
         // (the transport's bar length: the old one until a new time signature starts)
         if (beatInBar === this.transport.beatsPerBar - 1) {
             const looping = this.loop && bar === this.loop.to;
             if (looping) {this.loopBack();held=this.heldGlideBookings(this.loop.from);}
-            const next = this.plan.get(looping ? this.loop.from : bar + 1);
+            // nextSectionNow: on from the next section's start
+            const jumping = !looping && this.jump && bar === this.jump.after ? this.jump.to : null;
+            if (jumping !== null) {
+                this.jump = null;
+                for (const [b, planned] of this.plan) if (b >= jumping) planned.events.forEach((ev) => { ev.booked = false; });
+                const toMeter = this.plan.get(jumping).meter ?? this.meter;
+                this.transport.rebase(this.transport.beat + 1, jumping * toMeter.units, toMeter.units);
+                held = this.heldGlideBookings(jumping);
+            }
+            const next = this.plan.get(looping ? this.loop.from : jumping ?? bar + 1);
             if (next) {
                 // The next bar's tempo applies from the gap before its downbeat,
                 // and its slightly-early notes are booked from here.
-                this.transport.setBpm(unitsPerMinute(this.meter, next.bpm));
-                const gap = 60 / (unitsPerMinute(this.meter, next.bpm) * this.transport.tempoScale);
+                // a bar in another meter (a breakdown's own): renumber from its downbeat
+                const nextMeter = next.meter ?? this.meter;
+                if (nextMeter.units !== this.transport.beatsPerBar && !this.transport.rebaseAt)
+                    this.transport.rebase(this.transport.beat + 1, next.bar * nextMeter.units, nextMeter.units);
+                this.transport.setBpm(unitsPerMinute(nextMeter, next.bpm));
+                const gap = 60 / (unitsPerMinute(nextMeter, next.bpm) * this.transport.tempoScale);
                 next.events
                     .filter((e) => !e.booked && e.beat < 0)
                     // A boundary reset must run before a replacement held voice attacks.

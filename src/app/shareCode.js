@@ -283,6 +283,8 @@ MUSIC_GROUPS.push([[['sectionSpace'],stepped(0,1,.05)]]); // composition/section
 MUSIC_GROUPS.push([[['keyLift'],stepped(0,1,.05)]]); // key lifts (Generator.planBar)
 MUSIC_GROUPS.push([[['arc','shape'],options(Object.keys(ARC_SHAPES),2)],[['arc','minutes'],stepped(2,60,1)]]); // composition/arc.js
 MUSIC_GROUPS.push([[['timbreDrift'],stepped(0,1,.05)]]); // composition/timbreDrift.js
+MUSIC_GROUPS.push([[['breakdowns','meter'],options(['same',...Object.keys(METERS)],5)],[['breakdowns','halfTime'],bool]]); // a breakdown's meter and feel
+MUSIC_GROUPS.push([[['feel','busy'],stepped(-1,1,.05)],[['feel','bright'],stepped(-1,1,.05)]]); // the feel pad (composition/feel.js)
 MUSIC_GROUPS.push([[['dynamics','level'],stepped(.6,1.2,.05)],[['dynamics','range'],stepped(0,2,.05)],[['dynamics','attack'],stepped(0,1,.05)],[['dynamics','brightness'],stepped(0,1,.05)]]);
 const VOICE_GROUPS = [
     [...voice('pad'), ...voice('bass'), ...voice('lead'), ...voice('counter'), field(GROUPS, ['padNotes'])],

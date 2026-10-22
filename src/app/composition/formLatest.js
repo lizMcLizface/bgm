@@ -16,6 +16,15 @@ function destination(type, history, rng, quickIntro) {
     return weighted(rng, recentBreak ? { full: 1, build: .25, breakdown: .1 } : { full: .35, breakdown: 1, build: .2 });
 }
 
+/**
+ * A section ended early (Generator.nextSectionNow, cut: { start, at }): the form as it reaches
+ * `bar`, with the section starting at cut.start lasting only until cut.at.
+ */
+export function cutForm(form, bar, cut) {
+    if (!cut || bar !== cut.at || form?.section?.start !== cut.start || bar >= form.section.start + form.section.bars) return form;
+    return { ...form, section: { ...form.section, bars: bar - form.section.start } };
+}
+
 /** Small serialisable section plan; no dependency on drum presence or RNG traversal. */
 export function planForm({ bar, seed, sections, previous, barsPerChord = 1, barsLeftInChord = 1, settings, previousTheme = 0, developSections = false, formStrategies = false, sectionCurves = false, strategyOverride }) {
     if (!sections || sections.mode === 'off') return null;

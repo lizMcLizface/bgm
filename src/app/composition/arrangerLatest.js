@@ -2,7 +2,7 @@ import { arrangeBar, notesInRange, pentatonicOf } from '../arranger';
 import { seeded, pick } from '../random';
 import { groupStarts } from '../meter';
 import { phraseRhythm, barRhythm, spaceAccompaniment, spaceCounter } from './ensembleRhythm';
-import { planForm, formEnvelope, formSettings, shapeFormNotes } from './formLatest';
+import { planForm, formEnvelope, formSettings, shapeFormNotes, cutForm } from './formLatest';
 import { planDevelopment, developTheme } from './themeDevelopment';
 import { phraseLength } from './phraseLength';
 import { planPhraseMelody } from './phraseMelody';
@@ -97,7 +97,7 @@ export function arrangeBarLatest(args) {
     const form = args.developForm !== false ? planForm({ bar, seed, sections: settings.sections,
         developSections: args.sectionDevelopment === true,
         formStrategies:args.formStrategies===true,sectionCurves:args.sectionCurves===true,strategyOverride:args.formStrategy,
-        previous: prev?.composition?.form, barsPerChord: args.barsPerChord,
+        previous: cutForm(prev?.composition?.form, bar, args.sectionCut), barsPerChord: args.barsPerChord,
         barsLeftInChord: args.formBarsLeftInChord ?? args.barsLeftInChord, settings, previousTheme: prev?.composition?.phrase?.themeId }) : null;
     const section = formEnvelope(form, bar, settings.sections?.mode);
     const oldPhrase = prev?.composition?.phrase;

@@ -16,8 +16,11 @@ export default class WasmInstrument {
  spec(){return this.overrideSpec??nativeWasmVoice(this.preset,this.polyphony)??(needsNativeSource(this.preset)?{kind:'legacy',patch:this.preset,polyphony:this.polyphony}:{...translatedWasmVoice(this.preset,this.polyphony,this.dynamics),fx:this.preset});}
  /** Timbre drift (composition/timbreDrift.js): the source patched live from the preset and these values, the preset unchanged. */
  setDrift(values,seconds=.5){if(!this.voice||this.loading)return;const spec=this.spec();if(spec.kind==='legacy'){this.voice.native?.setDrift?.(values);return;}if(this.overrideSpec||spec.kind!=='subtractive'||this.preset.wasmVoice)return;const drifted=values?translatedWasmVoice({...this.preset,...values},this.polyphony,this.dynamics):spec;if(drifted.kind!==spec.kind||JSON.stringify([drifted.patch.effects,drifted.patch.inserts])!==JSON.stringify([spec.patch.effects,spec.patch.inserts]))return;this.voice.patchSource(drifted.patch,{seconds});}
- /** The scene's dynamics (settings.dynamics): part of the translated patch, so a change rebuilds the voice. */
- setDynamics(dynamics){const before=JSON.stringify(this.spec());this.dynamics=dynamics;if(this.voice&&JSON.stringify(this.spec())!==before)this.applyPreset(this.preset,this.overrideSpec);}
+ /** The scene's dynamics (settings.dynamics): part of the translated patch, patched live where only the source changes. */
+ setDynamics(dynamics){const before=this.spec();this.dynamics=dynamics;const after=this.spec();if(!this.voice||JSON.stringify(after)===JSON.stringify(before))return;
+  // only source parameters change (velocity → attack, velocity → filter): patched live, so sounding notes go on
+  if(!this.loading&&before.kind===after.kind&&JSON.stringify([before.patch.effects,before.patch.inserts])===JSON.stringify([after.patch.effects,after.patch.inserts])){this.voice.patch=structuredClone(after.patch);this.voice.patchSource(after.patch,{seconds:.1});return;}
+  this.applyPreset(this.preset,this.overrideSpec);}
  syncEnvelope(){this.gainEnv={attack:this.preset.gainAttack,decay:this.preset.gainDecay,sustain:this.preset.gainSustain,release:this.preset.gainRelease};}
  attachVoice(voice){voice.connect(this.output);this.roomInput.disconnect();if(voice.roomOutput)voice.roomOutput.connect(this.roomOutput);if(voice.sharedRoomInput)this.roomInput.connect(voice.sharedRoomInput);}
  connect(node){this.output.connect(node);}

@@ -1,4 +1,5 @@
 import { notesInRange, pentatonicOf } from '../arranger';
+import { unitsPerMinute } from '../meter';
 
 export const JOINT_BEAM = 20;
 const clash = (a, b, duration) => {
@@ -14,7 +15,7 @@ export function planJointCounterpoint({ bars, meter, ranges, settings, previousM
     if (previous?.key === key && JSON.stringify(previous.contexts.filter(b => b.bar >= bars[0].bar)) === JSON.stringify(contexts)) return previous;
     const stages = []; let clock = 0;
     for (const b of bars) {
-        const unit = 60 / ((b.bpm || 120) * meter.unitsPerBeat);
+        const unit = 60 / unitsPerMinute(meter, b.bpm || 120);
         for (const role of ['lead', 'counter']) for (const event of b[role]) {
             const pcs = settings.leadScale === 'pentatonic' ? pentatonicOf(b.scalePcs) : b.scalePcs;
             const allowed = notesInRange(pcs, ...ranges[role]);

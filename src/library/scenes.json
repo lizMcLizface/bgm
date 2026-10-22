@@ -210,8 +210,8 @@
           "attack": 0.3,
           "brightness": 0.3
         },
-        "rubato": 0.4,
-        "ornaments": 0.3,
+        "rubato": 0.45,
+        "ornaments": 0.35,
         "ducking": 0.4,
         "evenLoudness": 0.4,
         "sectionSpace": 0.4,
@@ -432,7 +432,7 @@
       "settings": {
         "tonic": 0,
         "mode": "Major-6",
-        "bpm": 62,
+        "bpm": 83,
         "meter": "6/8",
         "progression": 12,
         "barsPerChord": 2,
@@ -465,7 +465,7 @@
           "attack": 0.5,
           "brightness": 0.4
         },
-        "rubato": 0.5,
+        "rubato": 0.6,
         "ornaments": 0.2,
         "ducking": 0.4,
         "evenLoudness": 0.5,
@@ -563,8 +563,8 @@
           "attack": 0.5,
           "brightness": 0.4
         },
-        "rubato": 0.5,
-        "ornaments": 0.2,
+        "rubato": 0.6,
+        "ornaments": 0.4,
         "ducking": 0.4,
         "evenLoudness": 0.5,
         "sectionSpace": 0.6,
@@ -643,8 +643,8 @@
           "attack": 0.3,
           "brightness": 0.3
         },
-        "rubato": 0.4,
-        "ornaments": 0.3,
+        "rubato": 0.5,
+        "ornaments": 0.6,
         "ducking": 0.4,
         "evenLoudness": 0.4,
         "sectionSpace": 0.4,
@@ -672,7 +672,11 @@
           "mode": "gentle",
           "phrases": 2
         },
-        "ambienceVolume": 0.66
+        "ambienceVolume": 0.66,
+        "breakdowns": {
+          "meter": "6/8",
+          "halfTime": false
+        }
       },
       "voices": {
         "pad": "Harp Pluck",
@@ -1108,10 +1112,10 @@
           "attack": 0.35,
           "brightness": 0.2
         },
-        "rubato": 0.25,
+        "rubato": 0,
         "ornaments": 0.1,
         "ducking": 0.5,
-        "evenLoudness": 0.7,
+        "evenLoudness": 0.8,
         "sectionSpace": 0.3,
         "keyLift": 0,
         "timbreDrift": 0.2,
@@ -1283,7 +1287,7 @@
         "rubato": 0.25,
         "ornaments": 0.1,
         "ducking": 0.5,
-        "evenLoudness": 0.7,
+        "evenLoudness": 0.85,
         "sectionSpace": 0.3,
         "keyLift": 0,
         "timbreDrift": 0.2,
@@ -1478,7 +1482,7 @@
           "attack": 0.3,
           "brightness": 0.3
         },
-        "rubato": 0.4,
+        "rubato": 0.7,
         "ornaments": 0.3,
         "ducking": 0.4,
         "evenLoudness": 0.4,
@@ -1565,7 +1569,7 @@
           "brightness": 0.2
         },
         "rubato": 0.25,
-        "ornaments": 0.1,
+        "ornaments": 0.4,
         "ducking": 0.5,
         "evenLoudness": 0.7,
         "sectionSpace": 0.3,
@@ -1759,6 +1763,10 @@
         "sections": {
           "mode": "gentle",
           "phrases": 2
+        },
+        "arc": {
+          "shape": "rise",
+          "minutes": 10
         }
       },
       "voices": {
@@ -2008,6 +2016,14 @@
           "lead": 0.66,
           "counter": 0.48,
           "perc": 0.5
+        },
+        "breakdowns": {
+          "meter": "same",
+          "halfTime": true
+        },
+        "arc": {
+          "shape": "wave",
+          "minutes": 15
         }
       },
       "voices": {
@@ -2094,7 +2110,7 @@
         "evenLoudness": 0.5,
         "sectionSpace": 0.5,
         "keyLift": 0.15,
-        "timbreDrift": 0.4,
+        "timbreDrift": 0.5,
         "padMotion": {
           "lean": 0.22,
           "fast": 0.04,
@@ -2106,6 +2122,14 @@
           "lead": 0.62,
           "counter": 0.48,
           "perc": 0.44
+        },
+        "breakdowns": {
+          "meter": "same",
+          "halfTime": true
+        },
+        "arc": {
+          "shape": "wave",
+          "minutes": 20
         }
       },
       "voices": {
@@ -2219,6 +2243,10 @@
           "lead": 0.66,
           "counter": 0.48,
           "perc": 0.5
+        },
+        "breakdowns": {
+          "meter": "same",
+          "halfTime": true
         }
       },
       "voices": {
@@ -2309,12 +2337,12 @@
           "attack": 0.15,
           "brightness": 0.3
         },
-        "rubato": 0.1,
+        "rubato": 0,
         "ornaments": 0.1,
         "ducking": 0.3,
         "evenLoudness": 0.5,
         "sectionSpace": 0.5,
-        "keyLift": 0.15,
+        "keyLift": 0.5,
         "timbreDrift": 0.4,
         "leadDensity": 0.76,
         "leadLeaps": 0.48,
@@ -2330,6 +2358,10 @@
           "lead": 0.68,
           "counter": 0.5,
           "perc": 0.59
+        },
+        "breakdowns": {
+          "meter": "same",
+          "halfTime": true
         }
       },
       "voices": {
@@ -2425,7 +2457,7 @@
         "evenLoudness": 0.5,
         "sectionSpace": 0.5,
         "keyLift": 0.15,
-        "timbreDrift": 0.4,
+        "timbreDrift": 0.5,
         "padMotion": {
           "lean": 0.2,
           "fast": 0.15,
@@ -2446,7 +2478,11 @@
           "perc": 0
         },
         "ambience": {},
-        "playAmbience": false
+        "playAmbience": false,
+        "arc": {
+          "shape": "wave",
+          "minutes": 15
+        }
       },
       "voices": {
         "lead": "Starmap Piano",
@@ -2816,9 +2852,9 @@
         "ornaments": 0.2,
         "ducking": 0.3,
         "evenLoudness": 0.3,
-        "sectionSpace": 0.6,
+        "sectionSpace": 0.75,
         "keyLift": 0,
-        "timbreDrift": 0.5,
+        "timbreDrift": 0.6,
         "padMotion": {
           "lean": 0.1,
           "fast": 0,
@@ -2853,6 +2889,10 @@
             "wander": "off",
             "chance": 0.3
           }
+        },
+        "arc": {
+          "shape": "wave",
+          "minutes": 12
         }
       },
       "voices": {
@@ -2943,9 +2983,9 @@
         "ornaments": 0.2,
         "ducking": 0.3,
         "evenLoudness": 0.3,
-        "sectionSpace": 0.6,
+        "sectionSpace": 0.75,
         "keyLift": 0,
-        "timbreDrift": 0.5,
+        "timbreDrift": 0.6,
         "padMotion": {
           "lean": 0.22,
           "fast": 0.04,
@@ -3055,12 +3095,12 @@
           "attack": 0,
           "brightness": 0.4
         },
-        "rubato": 0.15,
+        "rubato": 0,
         "ornaments": 0.4,
         "ducking": 0.3,
         "evenLoudness": 0.4,
         "sectionSpace": 0.3,
-        "keyLift": 0.35,
+        "keyLift": 0.6,
         "timbreDrift": 0.1,
         "leadDensity": 0.6,
         "leadLeaps": 0.5,
@@ -3088,6 +3128,10 @@
           "up": 10,
           "down": 5,
           "broken": 75
+        },
+        "breakdowns": {
+          "meter": "same",
+          "halfTime": true
         }
       },
       "voices": {
@@ -3187,12 +3231,12 @@
           "attack": 0,
           "brightness": 0.4
         },
-        "rubato": 0.15,
+        "rubato": 0,
         "ornaments": 0.4,
         "ducking": 0.3,
         "evenLoudness": 0.4,
         "sectionSpace": 0.3,
-        "keyLift": 0.35,
+        "keyLift": 0.6,
         "timbreDrift": 0.1,
         "leadDensity": 0.9,
         "leadLeaps": 0.52,
@@ -3208,6 +3252,10 @@
           "lead": 0.68,
           "counter": 0.5,
           "perc": 0.59
+        },
+        "breakdowns": {
+          "meter": "same",
+          "halfTime": true
         }
       },
       "voices": {
@@ -3304,12 +3352,12 @@
           "attack": 0,
           "brightness": 0.4
         },
-        "rubato": 0.15,
+        "rubato": 0,
         "ornaments": 0.4,
         "ducking": 0.3,
         "evenLoudness": 0.4,
         "sectionSpace": 0.3,
-        "keyLift": 0.35,
+        "keyLift": 0.6,
         "timbreDrift": 0.1,
         "padMotion": {
           "lean": 0.1,
@@ -3339,7 +3387,11 @@
           "mode": "plain",
           "amount": 0
         },
-        "chordBorrow": 0
+        "chordBorrow": 0,
+        "breakdowns": {
+          "meter": "same",
+          "halfTime": true
+        }
       },
       "voices": {
         "pad": "Arp Pluck",
@@ -3445,12 +3497,12 @@
           "attack": 0,
           "brightness": 0.4
         },
-        "rubato": 0.15,
+        "rubato": 0,
         "ornaments": 0.4,
         "ducking": 0.3,
         "evenLoudness": 0.4,
         "sectionSpace": 0.3,
-        "keyLift": 0.35,
+        "keyLift": 0.5,
         "timbreDrift": 0.1,
         "padMotion": {
           "lean": 0.32,
@@ -3557,7 +3609,7 @@
         "ducking": 0.3,
         "evenLoudness": 0.4,
         "sectionSpace": 0.3,
-        "keyLift": 0.35,
+        "keyLift": 0.5,
         "timbreDrift": 0.1,
         "padMotion": {
           "lean": 0.2,
@@ -3677,7 +3729,7 @@
         "ducking": 0.3,
         "evenLoudness": 0.4,
         "sectionSpace": 0.3,
-        "keyLift": 0.35,
+        "keyLift": 0.5,
         "timbreDrift": 0.1,
         "padMotion": {
           "lean": 0.32,
@@ -3712,7 +3764,7 @@
       "settings": {
         "tonic": 2,
         "mode": "Major-2",
-        "bpm": 92,
+        "bpm": 123,
         "meter": "6/8",
         "progression": 12,
         "barsPerChord": 2,
@@ -3762,7 +3814,7 @@
           "brightness": 0.4
         },
         "rubato": 0.15,
-        "ornaments": 0.4,
+        "ornaments": 0.6,
         "ducking": 0.3,
         "evenLoudness": 0.4,
         "sectionSpace": 0.3,
@@ -3796,7 +3848,11 @@
           "amount": 0.45
         },
         "chordBorrow": 0,
-        "leadEnding": "open"
+        "leadEnding": "open",
+        "breakdowns": {
+          "meter": "3/4",
+          "halfTime": false
+        }
       },
       "voices": {
         "pad": "Harp Pluck",
@@ -3841,7 +3897,7 @@
       "settings": {
         "tonic": 2,
         "mode": "Major-2",
-        "bpm": 96,
+        "bpm": 128,
         "meter": "6/8",
         "progression": 12,
         "barsPerChord": 2,
@@ -3890,7 +3946,7 @@
           "brightness": 0.4
         },
         "rubato": 0.15,
-        "ornaments": 0.4,
+        "ornaments": 0.5,
         "ducking": 0.3,
         "evenLoudness": 0.4,
         "sectionSpace": 0.3,
@@ -3980,7 +4036,7 @@
           "brightness": 0.4
         },
         "rubato": 0.15,
-        "ornaments": 0.4,
+        "ornaments": 0.55,
         "ducking": 0.3,
         "evenLoudness": 0.4,
         "sectionSpace": 0.3,
@@ -4096,7 +4152,7 @@
           "brightness": 0.4
         },
         "rubato": 0.15,
-        "ornaments": 0.4,
+        "ornaments": 0.5,
         "ducking": 0.3,
         "evenLoudness": 0.4,
         "sectionSpace": 0.3,
@@ -4420,7 +4476,7 @@
           "brightness": 0.3
         },
         "rubato": 0.3,
-        "ornaments": 0.35,
+        "ornaments": 0.5,
         "ducking": 0.4,
         "evenLoudness": 0.4,
         "sectionSpace": 0.4,
@@ -4584,7 +4640,7 @@
           "brightness": 0.3
         },
         "rubato": 0.3,
-        "ornaments": 0.35,
+        "ornaments": 0.5,
         "ducking": 0.4,
         "evenLoudness": 0.4,
         "sectionSpace": 0.4,
@@ -4605,6 +4661,10 @@
         "sections": {
           "mode": "gentle",
           "phrases": 2
+        },
+        "breakdowns": {
+          "meter": "12/8",
+          "halfTime": false
         }
       },
       "voices": {
@@ -4678,7 +4738,7 @@
           "brightness": 0.3
         },
         "rubato": 0.3,
-        "ornaments": 0.35,
+        "ornaments": 0.45,
         "ducking": 0.4,
         "evenLoudness": 0.4,
         "sectionSpace": 0.4,
@@ -4768,9 +4828,9 @@
         "ornaments": 0.35,
         "ducking": 0.4,
         "evenLoudness": 0.4,
-        "sectionSpace": 0.4,
+        "sectionSpace": 0.6,
         "keyLift": 0.25,
-        "timbreDrift": 0.2,
+        "timbreDrift": 0.5,
         "padMotion": {
           "lean": 0.22,
           "fast": 0.04,
@@ -4882,7 +4942,11 @@
           "mode": "gentle",
           "phrases": 4
         },
-        "ambienceVolume": 0.72
+        "ambienceVolume": 0.72,
+        "arc": {
+          "shape": "winddown",
+          "minutes": 30
+        }
       },
       "voices": {
         "pad": "Music Box",
@@ -4971,12 +5035,12 @@
           "brightness": 0.4
         },
         "rubato": 0.15,
-        "ornaments": 0.4,
+        "ornaments": 0.3,
         "ducking": 0.3,
         "evenLoudness": 0.4,
         "sectionSpace": 0.3,
         "keyLift": 0.35,
-        "timbreDrift": 0.1,
+        "timbreDrift": 0.5,
         "padMotion": {
           "lean": 0.15,
           "fast": 0.1,
@@ -5210,9 +5274,9 @@
         "ornaments": 0.2,
         "ducking": 0.3,
         "evenLoudness": 0.3,
-        "sectionSpace": 0.6,
+        "sectionSpace": 0.8,
         "keyLift": 0,
-        "timbreDrift": 0.5,
+        "timbreDrift": 0.6,
         "padMotion": {
           "lean": 0.1,
           "fast": 0,
@@ -5240,6 +5304,10 @@
             "wander": "off",
             "chance": 0.3
           }
+        },
+        "arc": {
+          "shape": "wave",
+          "minutes": 12
         }
       },
       "voices": {
@@ -5351,9 +5419,9 @@
         "ornaments": 0.2,
         "ducking": 0.3,
         "evenLoudness": 0.3,
-        "sectionSpace": 0.6,
+        "sectionSpace": 0.8,
         "keyLift": 0,
-        "timbreDrift": 0.5,
+        "timbreDrift": 0.6,
         "padMotion": {
           "lean": 0.3,
           "fast": 0.12,
@@ -6762,7 +6830,7 @@
         "rubato": 0.25,
         "ornaments": 0.1,
         "ducking": 0.5,
-        "evenLoudness": 0.7,
+        "evenLoudness": 0.85,
         "sectionSpace": 0.3,
         "keyLift": 0,
         "timbreDrift": 0.2,
@@ -6867,7 +6935,11 @@
           "mode": "add9",
           "amount": 0.2
         },
-        "ambienceVolume": 0.72
+        "ambienceVolume": 0.72,
+        "arc": {
+          "shape": "winddown",
+          "minutes": 30
+        }
       },
       "voices": {
         "pad": "Morning Haze",
@@ -6932,12 +7004,12 @@
           "attack": 0,
           "brightness": 0.4
         },
-        "rubato": 0.15,
-        "ornaments": 0.4,
+        "rubato": 0,
+        "ornaments": 0.5,
         "ducking": 0.3,
         "evenLoudness": 0.4,
         "sectionSpace": 0.3,
-        "keyLift": 0.35,
+        "keyLift": 0.5,
         "timbreDrift": 0.1,
         "padMotion": {
           "lean": 0.1,
@@ -7043,12 +7115,12 @@
           "attack": 0,
           "brightness": 0.4
         },
-        "rubato": 0.15,
-        "ornaments": 0.4,
+        "rubato": 0,
+        "ornaments": 0.5,
         "ducking": 0.3,
         "evenLoudness": 0.4,
         "sectionSpace": 0.3,
-        "keyLift": 0.35,
+        "keyLift": 0.5,
         "timbreDrift": 0.1,
         "padMotion": {
           "lean": 0.32,
@@ -7135,7 +7207,7 @@
         "ducking": 0.3,
         "evenLoudness": 0.4,
         "sectionSpace": 0.3,
-        "keyLift": 0.35,
+        "keyLift": 0.4,
         "timbreDrift": 0.1,
         "padMotion": {
           "lean": 0.32,
@@ -7214,12 +7286,12 @@
           "attack": 0,
           "brightness": 0.4
         },
-        "rubato": 0.15,
-        "ornaments": 0.4,
+        "rubato": 0,
+        "ornaments": 0.5,
         "ducking": 0.3,
         "evenLoudness": 0.4,
         "sectionSpace": 0.3,
-        "keyLift": 0.35,
+        "keyLift": 0.6,
         "timbreDrift": 0.1,
         "padMotion": {
           "lean": 0.32,
@@ -7298,12 +7370,12 @@
           "attack": 0,
           "brightness": 0.4
         },
-        "rubato": 0.15,
-        "ornaments": 0.4,
+        "rubato": 0,
+        "ornaments": 0.5,
         "ducking": 0.3,
         "evenLoudness": 0.4,
         "sectionSpace": 0.3,
-        "keyLift": 0.35,
+        "keyLift": 0.6,
         "timbreDrift": 0.1,
         "padMotion": {
           "lean": 0.32,
@@ -7386,7 +7458,7 @@
           "attack": 0.45,
           "brightness": 0.35
         },
-        "rubato": 0.5,
+        "rubato": 0.1,
         "ornaments": 0.2,
         "ducking": 0.3,
         "evenLoudness": 0.3,
@@ -7404,6 +7476,10 @@
           "lead": 0.68,
           "counter": 0.5,
           "perc": 0.59
+        },
+        "breakdowns": {
+          "meter": "same",
+          "halfTime": true
         }
       },
       "voices": {
@@ -7474,12 +7550,12 @@
           "attack": 0,
           "brightness": 0.4
         },
-        "rubato": 0.15,
+        "rubato": 0,
         "ornaments": 0.4,
         "ducking": 0.3,
         "evenLoudness": 0.4,
         "sectionSpace": 0.3,
-        "keyLift": 0.35,
+        "keyLift": 0.6,
         "timbreDrift": 0.1,
         "padMotion": {
           "lean": 0.32,
@@ -7492,6 +7568,10 @@
           "lead": 0.68,
           "counter": 0.5,
           "perc": 0.59
+        },
+        "breakdowns": {
+          "meter": "same",
+          "halfTime": true
         }
       },
       "voices": {
@@ -7558,16 +7638,16 @@
         },
         "dynamics": {
           "level": 1,
-          "range": 1.1,
+          "range": 1.3,
           "attack": 0,
-          "brightness": 0.4
+          "brightness": 0.5
         },
-        "rubato": 0.15,
+        "rubato": 0.1,
         "ornaments": 0.4,
         "ducking": 0.3,
         "evenLoudness": 0.4,
         "sectionSpace": 0.3,
-        "keyLift": 0.35,
+        "keyLift": 0.7,
         "timbreDrift": 0.1,
         "padMotion": {
           "lean": 0.32,
@@ -7580,6 +7660,10 @@
           "lead": 0.68,
           "counter": 0.5,
           "perc": 0.59
+        },
+        "breakdowns": {
+          "meter": "same",
+          "halfTime": true
         }
       },
       "voices": {
@@ -7647,7 +7731,7 @@
           "attack": 0,
           "brightness": 0.4
         },
-        "rubato": 0.15,
+        "rubato": 0.6,
         "ornaments": 0.4,
         "ducking": 0.3,
         "evenLoudness": 0.4,
@@ -7869,9 +7953,9 @@
         "ornaments": 0.35,
         "ducking": 0.4,
         "evenLoudness": 0.4,
-        "sectionSpace": 0.4,
+        "sectionSpace": 0.5,
         "keyLift": 0.25,
-        "timbreDrift": 0.2,
+        "timbreDrift": 0.4,
         "padMotion": {
           "lean": 0.22,
           "fast": 0.04,
@@ -8087,7 +8171,7 @@
         "evenLoudness": 0.3,
         "sectionSpace": 0.6,
         "keyLift": 0,
-        "timbreDrift": 0.5,
+        "timbreDrift": 0.7,
         "padMotion": {
           "lean": 0.22,
           "fast": 0.04,
@@ -8099,6 +8183,10 @@
           "lead": 0.62,
           "counter": 0.48,
           "perc": 0.44
+        },
+        "arc": {
+          "shape": "wave",
+          "minutes": 10
         }
       },
       "voices": {
@@ -8175,7 +8263,7 @@
           "attack": 0.3,
           "brightness": 0.3
         },
-        "rubato": 0.4,
+        "rubato": 0.55,
         "ornaments": 0.3,
         "ducking": 0.4,
         "evenLoudness": 0.4,
@@ -8356,7 +8444,7 @@
           "brightness": 0.4
         },
         "rubato": 0.5,
-        "ornaments": 0.2,
+        "ornaments": 0.4,
         "ducking": 0.4,
         "evenLoudness": 0.5,
         "sectionSpace": 0.6,
@@ -8540,7 +8628,7 @@
           "attack": 0.45,
           "brightness": 0.35
         },
-        "rubato": 0.5,
+        "rubato": 0.7,
         "ornaments": 0.2,
         "ducking": 0.3,
         "evenLoudness": 0.3,
@@ -8883,7 +8971,7 @@
           "attack": 0.35,
           "brightness": 0.5
         },
-        "rubato": 0.6,
+        "rubato": 0.8,
         "ornaments": 0.3,
         "ducking": 0.4,
         "evenLoudness": 0.3,
@@ -9019,7 +9107,7 @@
           "attack": 0.35,
           "brightness": 0.5
         },
-        "rubato": 0.6,
+        "rubato": 0.8,
         "ornaments": 0.3,
         "ducking": 0.4,
         "evenLoudness": 0.3,
@@ -9243,7 +9331,11 @@
           "counter": 0.48,
           "perc": 0.5
         },
-        "ambienceVolume": 0.66
+        "ambienceVolume": 0.66,
+        "arc": {
+          "shape": "rise",
+          "minutes": 12
+        }
       },
       "voices": {
         "pad": "Neon Saw Pad",
@@ -9506,7 +9598,7 @@
         "ducking": 0.4,
         "evenLoudness": 0.3,
         "sectionSpace": 0.7,
-        "keyLift": 0.4,
+        "keyLift": 0.5,
         "timbreDrift": 0.35,
         "leadLeaps": 0.38,
         "leadRepeat": 0.44,
@@ -9621,6 +9713,10 @@
           "lead": 0.66,
           "counter": 0.48,
           "perc": 0.5
+        },
+        "arc": {
+          "shape": "winddown",
+          "minutes": 25
         }
       },
       "voices": {
@@ -9707,7 +9803,7 @@
         "evenLoudness": 0.3,
         "sectionSpace": 0.6,
         "keyLift": 0,
-        "timbreDrift": 0.5,
+        "timbreDrift": 0.7,
         "drums": {
           "style": "off"
         },
@@ -9869,13 +9965,13 @@
           "attack": 0.45,
           "brightness": 0.35
         },
-        "rubato": 0.5,
+        "rubato": 0.6,
         "ornaments": 0.2,
         "ducking": 0.3,
         "evenLoudness": 0.3,
         "sectionSpace": 0.6,
         "keyLift": 0,
-        "timbreDrift": 0.5,
+        "timbreDrift": 0.6,
         "drums": {
           "style": "off"
         },
@@ -10117,6 +10213,10 @@
             "wander": "off",
             "chance": 0.3
           }
+        },
+        "breakdowns": {
+          "meter": "same",
+          "halfTime": true
         }
       },
       "voices": {
@@ -10442,7 +10542,11 @@
         },
         "ambience": {},
         "playAmbience": false,
-        "thinPadUnderLead": false
+        "thinPadUnderLead": false,
+        "breakdowns": {
+          "meter": "same",
+          "halfTime": true
+        }
       },
       "voices": {
         "pad": "Warm Organ",
@@ -10530,7 +10634,7 @@
         "ducking": 0.4,
         "evenLoudness": 0.5,
         "sectionSpace": 0.5,
-        "keyLift": 0.25,
+        "keyLift": 0.35,
         "timbreDrift": 0.3,
         "swing": 0,
         "padMotion": {
@@ -10598,7 +10702,11 @@
           "split": 30
         },
         "ambience": {},
-        "playAmbience": false
+        "playAmbience": false,
+        "breakdowns": {
+          "meter": "same",
+          "halfTime": true
+        }
       },
       "voices": {
         "pad": "Warm Organ",
@@ -10687,7 +10795,7 @@
         "ducking": 0.4,
         "evenLoudness": 0.5,
         "sectionSpace": 0.5,
-        "keyLift": 0.25,
+        "keyLift": 0.35,
         "timbreDrift": 0.3,
         "swing": 0,
         "padMotion": {
@@ -10756,7 +10864,15 @@
         },
         "ambience": {},
         "playAmbience": false,
-        "leadEnding": "open"
+        "leadEnding": "open",
+        "breakdowns": {
+          "meter": "same",
+          "halfTime": true
+        },
+        "arc": {
+          "shape": "rise",
+          "minutes": 15
+        }
       },
       "voices": {
         "pad": "Progressive Pluck",
@@ -10845,7 +10961,7 @@
         "ducking": 0.4,
         "evenLoudness": 0.5,
         "sectionSpace": 0.5,
-        "keyLift": 0.25,
+        "keyLift": 0.4,
         "timbreDrift": 0.3,
         "swing": 0,
         "padMotion": {
@@ -10913,7 +11029,11 @@
           "split": 30
         },
         "ambience": {},
-        "playAmbience": false
+        "playAmbience": false,
+        "breakdowns": {
+          "meter": "same",
+          "halfTime": true
+        }
       },
       "voices": {
         "pad": "Progressive Pluck",
@@ -11481,8 +11601,8 @@
           "attack": 0.3,
           "brightness": 0.3
         },
-        "rubato": 0.4,
-        "ornaments": 0.3,
+        "rubato": 0.45,
+        "ornaments": 0.35,
         "ducking": 0.4,
         "evenLoudness": 0.4,
         "sectionSpace": 0.4,
@@ -12365,6 +12485,10 @@
             "wander": "off",
             "chance": 0.3
           }
+        },
+        "breakdowns": {
+          "meter": "same",
+          "halfTime": true
         }
       },
       "voices": {
@@ -12544,7 +12668,11 @@
         },
         "ambience": {},
         "playAmbience": false,
-        "thinPadUnderLead": false
+        "thinPadUnderLead": false,
+        "breakdowns": {
+          "meter": "same",
+          "halfTime": true
+        }
       },
       "voices": {
         "pad": "Warm Organ",
@@ -13541,6 +13669,10 @@
             "wander": "off",
             "chance": 0.3
           }
+        },
+        "breakdowns": {
+          "meter": "same",
+          "halfTime": true
         }
       },
       "voices": {
@@ -14144,6 +14276,172 @@
         "pad": "Glass Pad",
         "bass": "Sub Bass",
         "lead": "Nebula Lead"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "section-cadences": {
+            "enabled": false
+          },
+          "common-tone-bridges": {
+            "enabled": false
+          },
+          "melodic-slides": {
+            "enabled": false
+          },
+          "chord-slides": {
+            "enabled": false
+          },
+          "pad-pitch-motion": {
+            "enabled": false
+          },
+          "bass-pitch-motion": {
+            "enabled": false
+          },
+          "gate-envelopes": {
+            "enabled": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Demo: Shifting metre",
+      "category": "demo",
+      "blurb": "A 4/4 groove whose breakdowns turn into a lilting 6/8 with half-time drums, then come back. A/B: “Give breakdowns their own metre”, “Play breakdowns in half time”",
+      "settings": {
+        "tonic": 10,
+        "mode": "Major-1",
+        "bpm": 100,
+        "progression": 2,
+        "barsPerChord": 1,
+        "meter": "4/4",
+        "leadActivity": 0.7,
+        "leadDensity": 0.3,
+        "sections": {
+          "mode": "strong",
+          "phrases": 2
+        },
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 50,
+          "arpeggio": 50,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 60,
+          "walking": 0,
+          "drive": 40
+        },
+        "drums": {
+          "style": "downtempo",
+          "activity": 0.6,
+          "variation": 0.4
+        },
+        "humanize": {
+          "timing": 12,
+          "velocity": 0.08,
+          "detune": 2
+        },
+        "breakdowns": {
+          "meter": "6/8",
+          "halfTime": true
+        },
+        "volumes": {
+          "pad": 0.5,
+          "bass": 0.5,
+          "lead": 0.65,
+          "counter": 0.3,
+          "perc": 0.5
+        }
+      },
+      "voices": {
+        "pad": "Arp Pluck",
+        "bass": "Round Pluck Bass",
+        "lead": "Warm Square Lead"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "section-cadences": {
+            "enabled": false
+          },
+          "common-tone-bridges": {
+            "enabled": false
+          },
+          "melodic-slides": {
+            "enabled": false
+          },
+          "chord-slides": {
+            "enabled": false
+          },
+          "pad-pitch-motion": {
+            "enabled": false
+          },
+          "bass-pitch-motion": {
+            "enabled": false
+          },
+          "gate-envelopes": {
+            "enabled": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Demo: Seven-eight",
+      "category": "demo",
+      "blurb": "A whole piece in 7/8, felt as 2+2+3: the long third beat gives it a limp that keeps rolling. Pick another metre in the Music panel to compare",
+      "settings": {
+        "tonic": 2,
+        "mode": "Major-2",
+        "bpm": 120,
+        "progression": 4,
+        "barsPerChord": 2,
+        "meter": "7/8",
+        "leadActivity": 0.7,
+        "leadDensity": 0.35,
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 40,
+          "arpeggio": 60,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 30,
+          "half": 70,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "shaker",
+          "activity": 0.5,
+          "variation": 0.4
+        },
+        "humanize": {
+          "timing": 12,
+          "velocity": 0.08,
+          "detune": 2
+        },
+        "volumes": {
+          "pad": 0.5,
+          "bass": 0.5,
+          "lead": 0.65,
+          "counter": 0.3,
+          "perc": 0.45
+        }
+      },
+      "voices": {
+        "pad": "Kalimba Pluck",
+        "bass": "Upright Pluck",
+        "lead": "Pan Flute"
       },
       "rulebook": {
         "version": 1,

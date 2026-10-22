@@ -24,6 +24,7 @@ import { rubatoTime } from '../composition/rubato';
 import { automateDuck, DUCKED_BY } from './ducking';
 import { SPACE_RACK, SPACE_ROLE, spaceTail } from '../composition/sectionSpace';
 import { timbreDrift } from '../composition/timbreDrift';
+import { applyFeel } from '../composition/feel';
 import { noiseReady } from '../../nodes/noiseGenerator';
 import { bitCrusherReady } from '../../nodes/bitcrusher';
 import { spaceReady } from '../../nodes/space';
@@ -69,26 +70,27 @@ export function planNotes(gen, audible, seconds, ending, bars = null) {
     for (let bar = 0; time < seconds; bar++) {
         // an ending: a V bar, then the final I's two bars and its tail fill the end
         if (ending && planner.endBar === null && bar > 0) {
-            const barSeconds = (planner.meter.units * 60) / unitsPerMinute(planner.meter, planner.plan.get(bar - 1).bpm);
+            const last = planner.plan.get(bar - 1), lastMeter = last.meter ?? planner.meter;
+            const barSeconds = (lastMeter.units * 60) / unitsPerMinute(lastMeter, last.bpm);
             if (time + 3 * barSeconds + ENDING_TAIL >= seconds) planner.endBar = bar + 1;
         }
         planner.planBar(bar);
         const planned = planner.plan.get(bar);
         planner.plan.delete(bar - 2);
-        const unit = 60 / unitsPerMinute(planner.meter, planned.bpm);
-        if (!tones.length || tones[tones.length - 1].tone !== planned.tone) tones.push({ time, tone: planned.tone, glide: planner.meter.units * unit });
+        const meter = planned.meter ?? planner.meter, unit = 60 / unitsPerMinute(meter, planned.bpm);
+        if (!tones.length || tones[tones.length - 1].tone !== planned.tone) tones.push({ time, tone: planned.tone, glide: meter.units * unit });
         barStarts.push(time);
         const trim = planned.loudness?.trim ?? 1;
-        if (levels.length ? levels[levels.length - 1].trim !== trim : trim !== 1) levels.push({ time, trim, glide: planner.meter.units * unit * 0.9 });
+        if (levels.length ? levels[levels.length - 1].trim !== trim : trim !== 1) levels.push({ time, trim, glide: meter.units * unit * 0.9 });
         const space = planned.space ?? 0;
-        if (spaces.length ? spaces[spaces.length - 1].trim !== space : space > 0) spaces.push({ time, trim: space, glide: planner.meter.units * unit * 2.1 });
+        if (spaces.length ? spaces[spaces.length - 1].trim !== space : space > 0) spaces.push({ time, trim: space, glide: meter.units * unit * 2.1 });
         if (bars) {
             const section = planned.state.phrase.section;
             bars.push({
                 bar,
                 start: time,
-                seconds: rubatoTime(planned.rubato, unit, planner.meter.units),
-                units: planner.meter.units,
+                seconds: rubatoTime(planned.rubato, unit, meter.units),
+                units: meter.units,
                 chord: { name: planned.chord.name, numeral: planned.chord.numeral, keyName: planned.chord.keyName },
                 chordStart: Boolean(planned.chordStart),
                 bpm: planned.bpm,
@@ -103,7 +105,7 @@ export function planNotes(gen, audible, seconds, ending, bars = null) {
                 notes.push({ bar,section:planned.state.phrase.section?.start,ending:planned.ending,role: e.role, midi: e.midi, time: at(e.beat), duration: at(e.beat + e.length) - at(e.beat), velocity: e.velocity, detune: e.detune, expression: e.expression });
             }
         });
-        time += rubatoTime(planned.rubato, unit, planner.meter.units);
+        time += rubatoTime(planned.rubato, unit, meter.units);
     }
     return { notes: joinHeldNotes(notes,{pad:gen.heldPadGlides===true,bass:gen.heldBassGlides===true,voices:Object.fromEntries(Object.keys(gen.roles).map(role=>[role,gen.roles[role].instrument?.preset])),legacy:gen.settings.generation==='legacy'}).sort((a,b)=>a.time-b.time), tones, levels, spaces, barStarts };
 }
@@ -249,7 +251,7 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
                     ? new (gen.percussionEngine && gen.percussionEngine !== 'native' ? WasmDrumKit : DrumKit)({ context: ctx, model:gen.percussionEngine })
                     : presets[role]?.classics?await (await import('./classicsInstrument')).default.create({context:ctx,preset:presets[role],polyphony:gen.getRolePolyphony(role)})
                     : presets[role]?.diy?await (await import('./wasmInstrument')).default.create({polyphony:gen.getRolePolyphony(role),preset:presets[role],spec:(await import('./diySource')).diySpec(presets[role].diy,gen.getRolePolyphony(role)),context:ctx,roomPool,notes:notes.filter(n=>n.role===role&&n.time>=from&&n.time<end+(last?0:CROSSFADE)).map(n=>({...n,time:n.time-from}))})
-                    : Wasm?await Wasm.create({polyphony:gen.getRolePolyphony(role),preset:presets[role],context:ctx,roomPool,dynamics:gen.settings.dynamics,notes:notes.filter(n=>n.role===role&&n.time>=from&&n.time<end+(last?0:CROSSFADE)).map(n=>({...n,time:n.time-from}))})
+                    : Wasm?await Wasm.create({polyphony:gen.getRolePolyphony(role),preset:presets[role],context:ctx,roomPool,dynamics:applyFeel(gen.settings).dynamics,notes:notes.filter(n=>n.role===role&&n.time>=from&&n.time<end+(last?0:CROSSFADE)).map(n=>({...n,time:n.time-from}))})
                     : new Instrument({ polyphony: gen.getRolePolyphony(role), preset: presets[role], context: ctx });
                 instruments[role]=inst;cleanup.push(()=>inst.dispose());
                 if (role === 'perc') {inst.setKit(gen.settings.drumKit);inst.setVoicePreset(gen.settings.drums.kit);if(inst.ready)await inst.ready;}

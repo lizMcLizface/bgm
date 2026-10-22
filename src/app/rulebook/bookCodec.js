@@ -79,7 +79,9 @@ export const BOOK_RULE_IDS=[
   "key-lift",
   "energy-arc",
   "energy-arc-length",
-  "timbre-drift"
+  "timbre-drift",
+  "breakdown-meter",
+  "half-time-breakdowns"
 ];
 export const BOOK_GROUP_IDS=[
   "pad-register",

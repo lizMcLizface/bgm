@@ -48,13 +48,18 @@ function readout(gen, pos) {
         next: blocks.slice(index + 1, index + 4).map((b) => b.chord),
         key: blocks[index].chord.keyName,
         bpm: bar ? Math.round(bar.bpm) : null,
+        section: bar ? gen.sectionReadout?.(bar.bar) ?? null : null,
     };
 }
+
+const SECTION_NAMES = { intro: 'Intro', build: 'Build', full: 'Full', breakdown: 'Breakdown' };
+const sectionName = (type) => SECTION_NAMES[type] ?? 'Next part';
 
 const sameReadout = (a, b) =>
     a && b && a.current.name === b.current.name && a.current.numeral === b.current.numeral
     && a.next.map((c) => c.name).join() === b.next.map((c) => c.name).join()
-    && a.key === b.key && a.bpm === b.bpm;
+    && a.key === b.key && a.bpm === b.bpm
+    && JSON.stringify(a.section) === JSON.stringify(b.section);
 
 // One octave above a chord: its tones marked, the bar's scale underlined, coloured from the chord's root.
 const ChordPiano = React.memo(({ chord, record, fallback }) => {
@@ -162,6 +167,17 @@ const ChordTimeline = ({ generator, tracks, onExploreRule, pianos = false }) => 
                         {now.next.length > 0 && (
                             <span className="gen-next">
                                 then {now.next.map((c) => c.name).join(' → ')}
+                            </span>
+                        )}
+                        {now.section && (
+                            // the form: this section, what comes next and when; go on now, or hold it
+                            <span className="gen-section">
+                                <span>{sectionName(now.section.type)}{now.section.holding ? ' · held'
+                                    : ` · ${sectionName(now.section.next)} in ${now.section.left} ${now.section.left === 1 ? 'bar' : 'bars'}`}</span>
+                                <button type="button" disabled={now.section.holding} title="Go on to the next section at the next bar line"
+                                    onClick={() => generator.nextSectionNow()}>Next now</button>
+                                <button type="button" aria-pressed={now.section.holding} title="Keep playing this section until you let it go"
+                                    onClick={() => generator.holdSection(!now.section.holding)}>Hold</button>
                             </span>
                         )}
                     </>

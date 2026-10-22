@@ -2281,3 +2281,28 @@ body {
 @media(max-width:639px) {
     .gen-header-end .gen-header-tools { flex-wrap:wrap; min-width:0; }
 }
+
+/* the feel pad (FeelPad.jsx): a vector-joystick diamond */
+.gen-feel { grid-column: 1 / -1; display: grid; grid-template-columns: 190px minmax(0, 52ch); gap: 24px; align-items: center; }
+@media (max-width: 520px) { .gen-feel { grid-template-columns: 1fr; justify-items: center; } }
+.gen-feel-pad { width: 190px; height: 190px; flex: none; touch-action: none; cursor: crosshair; overflow: visible; }
+.gen-feel-pad:focus-visible { outline: 2px solid var(--gen-accent); outline-offset: 4px; border-radius: 6px; }
+.gen-feel-diamond { fill: var(--gen-bg); stroke: var(--gen-border); stroke-width: 1; }
+.gen-feel-inner { fill: none; stroke: var(--gen-border); stroke-width: .5; stroke-dasharray: 2 2; }
+.gen-feel-axis { stroke: var(--gen-border); stroke-width: .4; }
+.gen-feel-corner { fill: var(--gen-muted); font-size: 7px; font-weight: 600; pointer-events: none; }
+.gen-feel-arm { stroke: var(--gen-accent); stroke-width: .8; opacity: .6; }
+.gen-feel-joy { fill: none; stroke: var(--gen-accent); stroke-width: 1.6; }
+.gen-feel-text { min-width: 0; }
+.gen-feel-text strong { font-size: 15px; }
+.gen-feel-text p { color: var(--gen-muted); font-size: 13px; margin: 6px 0 10px; }
+
+/* the form in the timeline readout: section, what's next and when; go on now or hold */
+.gen-section { margin-left: auto; display: flex; align-items: baseline; gap: 6px; color: var(--gen-muted); font-size: 14px; }
+.gen-section > span { margin-right: 4px; }
+.gen-section button { font: inherit; font-size: 12px; color: var(--gen-text); background: var(--gen-bg); border: 1px solid var(--gen-border); border-radius: 5px; padding: 3px 9px; cursor: pointer; }
+.gen-section button:disabled { opacity: .45; cursor: default; }
+.gen-section button[aria-pressed=true] { background: var(--gen-accent); color: var(--gen-accent-text); border-color: var(--gen-accent); }
+
+/* the listening timer (ListeningTimer.jsx): steady digits */
+.gen-listening { font-variant-numeric: tabular-nums; white-space: nowrap; }
