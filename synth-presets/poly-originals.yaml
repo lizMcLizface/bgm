@@ -67,7 +67,7 @@ programs:
       layers.0.coarseA: 0
       layers.0.lfoShape: 0
       layers.0.lfoDelay: 0.5
-      layers.0.reservedA: 0
+      layers.0.velocityAttack: 0
       layers.0.reservedB: 0
       layers.0.hardSync: 0
       layers.0.polyFilter: 0
@@ -167,7 +167,7 @@ programs:
       layers.1.coarseA: 0
       layers.1.lfoShape: 0
       layers.1.lfoDelay: 0
-      layers.1.reservedA: 0
+      layers.1.velocityAttack: 0
       layers.1.reservedB: 0
       layers.1.hardSync: 0
       layers.1.polyFilter: 0
@@ -326,7 +326,7 @@ programs:
       layers.0.coarseA: 0
       layers.0.lfoShape: 0
       layers.0.lfoDelay: 0
-      layers.0.reservedA: 0
+      layers.0.velocityAttack: 0
       layers.0.reservedB: 0
       layers.0.hardSync: 0
       layers.0.polyFilter: 0
@@ -426,7 +426,7 @@ programs:
       layers.1.coarseA: 0
       layers.1.lfoShape: 0
       layers.1.lfoDelay: 0
-      layers.1.reservedA: 0
+      layers.1.velocityAttack: 0
       layers.1.reservedB: 0
       layers.1.hardSync: 0
       layers.1.polyFilter: 0
@@ -585,7 +585,7 @@ programs:
       layers.0.coarseA: 0
       layers.0.lfoShape: 0
       layers.0.lfoDelay: 1.2
-      layers.0.reservedA: 0
+      layers.0.velocityAttack: 0
       layers.0.reservedB: 0
       layers.0.hardSync: 0
       layers.0.polyFilter: 0
@@ -685,7 +685,7 @@ programs:
       layers.1.coarseA: 0
       layers.1.lfoShape: 0
       layers.1.lfoDelay: 0
-      layers.1.reservedA: 0
+      layers.1.velocityAttack: 0
       layers.1.reservedB: 0
       layers.1.hardSync: 0
       layers.1.polyFilter: 0
@@ -844,7 +844,7 @@ programs:
       layers.0.coarseA: 0
       layers.0.lfoShape: 0
       layers.0.lfoDelay: 0
-      layers.0.reservedA: 0
+      layers.0.velocityAttack: 0
       layers.0.reservedB: 0
       layers.0.hardSync: 0
       layers.0.polyFilter: 0
@@ -944,7 +944,7 @@ programs:
       layers.1.coarseA: 0
       layers.1.lfoShape: 0
       layers.1.lfoDelay: 0
-      layers.1.reservedA: 0
+      layers.1.velocityAttack: 0
       layers.1.reservedB: 0
       layers.1.hardSync: 0
       layers.1.polyFilter: 0
@@ -1103,7 +1103,7 @@ programs:
       layers.0.coarseA: 0
       layers.0.lfoShape: 0
       layers.0.lfoDelay: 0
-      layers.0.reservedA: 0
+      layers.0.velocityAttack: 0
       layers.0.reservedB: 0
       layers.0.hardSync: 0
       layers.0.polyFilter: 0
@@ -1203,7 +1203,7 @@ programs:
       layers.1.coarseA: 0
       layers.1.lfoShape: 0
       layers.1.lfoDelay: 0
-      layers.1.reservedA: 0
+      layers.1.velocityAttack: 0
       layers.1.reservedB: 0
       layers.1.hardSync: 0
       layers.1.polyFilter: 0
@@ -1362,7 +1362,7 @@ programs:
       layers.0.coarseA: 0
       layers.0.lfoShape: 0
       layers.0.lfoDelay: 1
-      layers.0.reservedA: 0
+      layers.0.velocityAttack: 0
       layers.0.reservedB: 0
       layers.0.hardSync: 0
       layers.0.polyFilter: 0
@@ -1462,7 +1462,7 @@ programs:
       layers.1.coarseA: 0
       layers.1.lfoShape: 0
       layers.1.lfoDelay: 0
-      layers.1.reservedA: 0
+      layers.1.velocityAttack: 0
       layers.1.reservedB: 0
       layers.1.hardSync: 0
       layers.1.polyFilter: 0
@@ -1621,7 +1621,7 @@ programs:
       layers.0.coarseA: 0
       layers.0.lfoShape: 0
       layers.0.lfoDelay: 0
-      layers.0.reservedA: 0
+      layers.0.velocityAttack: 0
       layers.0.reservedB: 0
       layers.0.hardSync: 1
       layers.0.polyFilter: 0
@@ -1721,7 +1721,7 @@ programs:
       layers.1.coarseA: 0
       layers.1.lfoShape: 0
       layers.1.lfoDelay: 0
-      layers.1.reservedA: 0
+      layers.1.velocityAttack: 0
       layers.1.reservedB: 0
       layers.1.hardSync: 0
       layers.1.polyFilter: 0
@@ -1880,7 +1880,7 @@ programs:
       layers.0.coarseA: 0
       layers.0.lfoShape: 0
       layers.0.lfoDelay: 0
-      layers.0.reservedA: 0
+      layers.0.velocityAttack: 0
       layers.0.reservedB: 0
       layers.0.hardSync: 0
       layers.0.polyFilter: 0.8
@@ -1980,7 +1980,7 @@ programs:
       layers.1.coarseA: 0
       layers.1.lfoShape: 0
       layers.1.lfoDelay: 0
-      layers.1.reservedA: 0
+      layers.1.velocityAttack: 0
       layers.1.reservedB: 0
       layers.1.hardSync: 0
       layers.1.polyFilter: 0
@@ -2139,7 +2139,7 @@ programs:
       layers.0.coarseA: 0
       layers.0.lfoShape: 0
       layers.0.lfoDelay: 0
-      layers.0.reservedA: 0
+      layers.0.velocityAttack: 0
       layers.0.reservedB: 0
       layers.0.hardSync: 0
       layers.0.polyFilter: 0
@@ -2239,7 +2239,7 @@ programs:
       layers.1.coarseA: 0
       layers.1.lfoShape: 0
       layers.1.lfoDelay: 0
-      layers.1.reservedA: 0
+      layers.1.velocityAttack: 0
       layers.1.reservedB: 0
       layers.1.hardSync: 0
       layers.1.polyFilter: 0
@@ -2398,7 +2398,7 @@ programs:
       layers.0.coarseA: 0
       layers.0.lfoShape: 0
       layers.0.lfoDelay: 0
-      layers.0.reservedA: 0
+      layers.0.velocityAttack: 0
       layers.0.reservedB: 0
       layers.0.hardSync: 0
       layers.0.polyFilter: 0
@@ -2498,7 +2498,7 @@ programs:
       layers.1.coarseA: 0
       layers.1.lfoShape: 0
       layers.1.lfoDelay: 0
-      layers.1.reservedA: 0
+      layers.1.velocityAttack: 0
       layers.1.reservedB: 0
       layers.1.hardSync: 0
       layers.1.polyFilter: 0
@@ -2657,7 +2657,7 @@ programs:
       layers.0.coarseA: 0
       layers.0.lfoShape: 0
       layers.0.lfoDelay: 0
-      layers.0.reservedA: 0
+      layers.0.velocityAttack: 0
       layers.0.reservedB: 0
       layers.0.hardSync: 0
       layers.0.polyFilter: 0
@@ -2757,7 +2757,7 @@ programs:
       layers.1.coarseA: 0
       layers.1.lfoShape: 0
       layers.1.lfoDelay: 0
-      layers.1.reservedA: 0
+      layers.1.velocityAttack: 0
       layers.1.reservedB: 0
       layers.1.hardSync: 0
       layers.1.polyFilter: 0
