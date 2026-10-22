@@ -27,6 +27,7 @@ import {
 import { AMBIENCE_LAYERS } from './engine/ambience';
 import { LAYER_PARAMS } from './engine/ambienceSynth';
 import { HARMONY_SCALES } from './composition/harmonyScale';
+import { ARC_SHAPES } from './composition/arc';
 import { ROLE_PRESETS } from './presets';
 import { SEED_BITS as SOUND_SEED_BITS } from './soundGen';
 import { GENERATOR_V2, KIND_CODES } from './soundGenV2';
@@ -272,6 +273,17 @@ MUSIC_GROUPS.push([[['tonality','mode'],options(['tonal','atonal','bitonal'],2)]
 // The released style field is exactly three bits. Append the expanded enum
 // after every existing music field; never widen or move the old field.
 MUSIC_GROUPS.push([[['drums','style'],options(Object.keys(DRUM_STYLES),4)]]);
+// How the scene plays (composition/dynamics.js); old links play as before.
+// Rubato at cadences (composition/rubato.js).
+MUSIC_GROUPS.push([[['rubato'],stepped(0,1,.05)]]);
+MUSIC_GROUPS.push([[['ornaments'],stepped(0,1,.05)]]); // composition/ornaments.js
+MUSIC_GROUPS.push([[['ducking'],stepped(0,1,.05)]]); // engine/ducking.js
+MUSIC_GROUPS.push([[['evenLoudness'],stepped(0,1,.05)]]); // composition/loudness.js
+MUSIC_GROUPS.push([[['sectionSpace'],stepped(0,1,.05)]]); // composition/sectionSpace.js
+MUSIC_GROUPS.push([[['keyLift'],stepped(0,1,.05)]]); // key lifts (Generator.planBar)
+MUSIC_GROUPS.push([[['arc','shape'],options(Object.keys(ARC_SHAPES),2)],[['arc','minutes'],stepped(2,60,1)]]); // composition/arc.js
+MUSIC_GROUPS.push([[['timbreDrift'],stepped(0,1,.05)]]); // composition/timbreDrift.js
+MUSIC_GROUPS.push([[['dynamics','level'],stepped(.6,1.2,.05)],[['dynamics','range'],stepped(0,2,.05)],[['dynamics','attack'],stepped(0,1,.05)],[['dynamics','brightness'],stepped(0,1,.05)]]);
 const VOICE_GROUPS = [
     [...voice('pad'), ...voice('bass'), ...voice('lead'), ...voice('counter'), field(GROUPS, ['padNotes'])],
     LATER_GROUPS[4], // volumes

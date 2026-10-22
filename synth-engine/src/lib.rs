@@ -207,6 +207,9 @@ struct Env {
     left: u32,
     release_start: f32,
     release_total: u32,
+    // per note (the amp envelope only): attack time multiplier and floor, from velocity
+    attack_scale: f32,
+    attack_min: f32,
 }
 impl Env {
     const ZERO: Self = Self {
@@ -217,6 +220,8 @@ impl Env {
         left: 0,
         release_start: 0.,
         release_total: 1,
+        attack_scale: 1.,
+        attack_min: 0.,
     };
     fn trigger(&mut self) {
         *self = Self {
@@ -224,9 +229,17 @@ impl Env {
             ..Self::ZERO
         };
     }
-    fn trigger_amp(&mut self, p: &[f32; PARAMS], sr: f32) {
+    fn trigger_amp(&mut self, p: &[f32; PARAMS], sr: f32, velocity: f32) {
         self.trigger();
-        if p[99] >= 0.5 && p[17] == 0. {
+        // Velocity → softer attack (layer parameter 46): softer notes up to 3× slower and at
+        // least 60 ms at full amount, the strongest a little quicker (app/composition/dynamics.js).
+        let amount = p[46];
+        if amount > 0. {
+            let soft = ((0.68 - velocity) / 0.3).clamp(-0.5, 1.);
+            self.attack_scale = (amount * soft * 1.6).exp2();
+            self.attack_min = amount * soft.max(0.) * 0.06;
+        }
+        if p[99] >= 0.5 && p[17] == 0. && self.attack_min == 0. {
             self.value = 1.;
             self.linear = 1.;
             self.stage = 2;
@@ -251,7 +264,9 @@ impl Env {
     fn next(&mut self, p: &[f32; PARAMS], offset: usize, curves: usize, sr: f32) -> f32 {
         match self.stage {
             1 => {
-                self.linear += (p[offset] * sr).max(1.).recip();
+                self.linear += ((p[offset] * self.attack_scale).max(self.attack_min) * sr)
+                    .max(1.)
+                    .recip();
                 self.value = if p[curves] == 1. {
                     self.linear
                 } else {
@@ -955,7 +970,7 @@ impl Engine {
                             v.tail = v.last;
                             v.fade = 64;
                             for l in 0..2 {
-                                v.amp[l].trigger_amp(&self.p[l], self.sr);
+                                v.amp[l].trigger_amp(&self.p[l], self.sr, v.velocity);
                                 v.filter_env[l].trigger();
                                 v.mod_env[l].trigger();
                             }
@@ -1022,7 +1037,7 @@ impl Engine {
                 v.tail = tail;
                 v.fade = 64;
                 for l in 0..2 {
-                    v.amp[l].trigger_amp(&self.p[l], self.sr);
+                    v.amp[l].trigger_amp(&self.p[l], self.sr, v.velocity);
                     v.filter_env[l].trigger();
                     v.mod_env[l].trigger();
                     v.motion[l] = Motion::seeded(e.id, l);

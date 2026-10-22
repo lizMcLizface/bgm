@@ -12,7 +12,7 @@ const select = (key, label, options, disabled) => ({ kind: 'select', key, label,
 const toggle = (key, label) => ({ kind: 'toggle', key, label });
 
 const osc2Off = (p) => p.osc2Type === 'off';
-const DRY_WET = 'Dry/Wet';
+const DRY_WET = 'Mix';
 
 const pitchKnob = (key, label) => knob(key, label, { modifier: 1.5, offset: 0.5, resetValue: 1.0, decimalPlaces: 3 });
 
@@ -145,71 +145,109 @@ const SYNTH_SCHEMA = [
             knob('vibratoRate', 'Rate', { modifier: 50 }),
         ],
     },
-    {
-        label: 'Tremolo / Auto-pan',
-        columns: 4,
-        controls: [
-            knob('tremoloRate', 'Trem Rate', { scalingType: 'logarithmic', minValue: 0.05, maxValue: 12, resetValue: 4, decimalPlaces: 2 }),
-            knob('tremoloDepth', 'Trem Depth', { resetValue: 0 }),
-            knob('autoPanRate', 'Pan Rate', { scalingType: 'logarithmic', minValue: 0.02, maxValue: 5, resetValue: 0.2, decimalPlaces: 2 }),
-            knob('autoPanDepth', 'Pan Depth', { resetValue: 0 }),
-        ],
-    },
+    // The effects keep to ranges that stay musical and stable (feedback below runaway, the phaser's
+    // sweep inside its centre); `unit` overrides the guess from the label. Values outside a range
+    // in an older preset are only clamped on the panel, not rewritten.
     {
         label: 'Drive',
         columns: 2,
         controls: [
-            knob('distortionDist', 'Distortion', { modifier: 30 }),
+            knob('distortionDist', 'Drive', { min: 0, max: 12, resetValue: 6, decimalPlaces: 1 }),
             knob('distortionAmount', DRY_WET),
+        ],
+    },
+    {
+        label: 'Tape',
+        columns: 3,
+        controls: [
+            knob('tapeWow', 'Wow', { min: 0, max: 1 }),
+            knob('tapeWowRate', 'Wow rate', { scalingType: 'logarithmic', minValue: 0.1, maxValue: 3, resetValue: 0.6, unit: 'Hz' }),
+            knob('tapeFlutter', 'Flutter', { min: 0, max: 1 }),
+            knob('tapeDrive', 'Saturation', { min: 0, max: 1 }),
+            knob('tapeTone', 'Tone', { scalingType: 'logarithmic', minValue: 2000, maxValue: 16000, resetValue: 9000, isRounded: true }),
         ],
     },
     {
         label: 'Crush',
         columns: 2,
         controls: [
-            knob('bitCrushDepth', 'Bit Depth', { modifier: 14, offset: 2, resetValue: 8, isRounded: true }),
+            knob('bitCrushDepth', 'Bits', { modifier: 14, offset: 2, resetValue: 8, isRounded: true }),
             knob('bitCrushAmount', DRY_WET),
         ],
     },
     {
-        label: 'Flanger',
+        label: 'EQ2',
+        columns: 2,
+        controls: [
+            knob('eqLowGain', 'Low Gain', { type: 'B', modifier: 12, resetValue: 0, unit: 'dB' }),
+            knob('eqLowFreq', 'Low Freq', { scalingType: 'logarithmic', minValue: 40, maxValue: 640, resetValue: 320, isRounded: true }),
+            knob('eqMidGain', 'Mid Gain', { type: 'B', modifier: 12, resetValue: 0, unit: 'dB' }),
+            knob('eqMidFreq', 'Mid Freq', { scalingType: 'logarithmic', minValue: 200, maxValue: 6000, resetValue: 1000, isRounded: true }),
+            knob('eqMidQ', 'Mid Q', { scalingType: 'logarithmic', minValue: 0.3, maxValue: 4, resetValue: 0.7, unit: 'decimal' }),
+            knob('eqHighGain', 'High Gain', { type: 'B', modifier: 12, resetValue: 0, unit: 'dB' }),
+            knob('eqHighFreq', 'High Freq', { scalingType: 'logarithmic', minValue: 1500, maxValue: 12000, resetValue: 3200, isRounded: true }),
+        ],
+    },
+    {
+        label: 'Compressor',
         columns: 3,
         controls: [
-            knob('flangerDelay', 'Delay', { modifier: 0.015, offset: 0.005, resetValue: 0.01, decimalPlaces: 5 }),
-            knob('flangerDepth', 'Depth', { modifier: 0.005, decimalPlaces: 5 }),
-            knob('flangerRate', 'Rate', { modifier: 2 }),
-            knob('flangerFeedback', 'Feedback'),
-            knob('flangerAmount', DRY_WET),
+            knob('compAmount', 'Amount', { min: 0, max: 1 }),
+            knob('compRatio', 'Ratio', { scalingType: 'logarithmic', minValue: 1.5, maxValue: 20, resetValue: 4, unit: 'decimal' }),
+            knob('compAttack', 'Attack', { scalingType: 'logarithmic', minValue: 0.001, maxValue: 0.2, resetValue: 0.01, unit: 's' }),
+            knob('compRelease', 'Release', { scalingType: 'logarithmic', minValue: 0.03, maxValue: 1, resetValue: 0.25, unit: 's' }),
+            knob('compOutput', 'Output', { type: 'B', modifier: 12, resetValue: 0, unit: 'dB' }),
         ],
     },
     {
         label: 'Chorus',
         columns: 2,
         controls: [
-            knob('chorusRate', 'Rate', { modifier: 5, resetValue: 0.6 }),
-            knob('chorusDepth', 'Depth', { modifier: 0.01, resetValue: 0.002, decimalPlaces: 4 }),
-            knob('chorusFeedback', 'Feedback'),
+            knob('chorusRate', 'Rate', { scalingType: 'logarithmic', minValue: 0.05, maxValue: 5, resetValue: 0.6, unit: 'Hz' }),
+            knob('chorusDepth', 'Depth', { min: 0, max: 0.008, resetValue: 0.002, unit: 's' }),
+            knob('chorusFeedback', 'Feedback', { min: 0, max: 0.6 }),
             knob('chorusAmount', DRY_WET),
+        ],
+    },
+    {
+        label: 'Flanger',
+        columns: 3,
+        controls: [
+            knob('flangerRate', 'Rate', { scalingType: 'logarithmic', minValue: 0.02, maxValue: 2, resetValue: 0.15, unit: 'Hz' }),
+            knob('flangerDepth', 'Depth', { min: 0, max: 0.005, resetValue: 0.002, unit: 's' }),
+            knob('flangerDelay', 'Delay', { min: 0.001, max: 0.012, resetValue: 0.004, unit: 's' }),
+            knob('flangerFeedback', 'Feedback', { min: 0, max: 0.85, resetValue: 0.3 }),
+            knob('flangerAmount', DRY_WET),
         ],
     },
     {
         label: 'Phaser',
         columns: 3,
         controls: [
-            knob('phaserRate', 'Rate', { modifier: 5, resetValue: 0.5 }),
-            knob('phaserDepth', 'Depth', { modifier: 1000, resetValue: 800, isRounded: true }),
-            knob('phaserFrequency', 'Frequency', { scalingType: 'logarithmic', minValue: 200, maxValue: 8000, resetValue: 800, isRounded: true }),
-            knob('phaserFeedback', 'Feedback', { resetValue: 0.3 }),
+            knob('phaserRate', 'Rate', { scalingType: 'logarithmic', minValue: 0.02, maxValue: 5, resetValue: 0.5, unit: 'Hz' }),
+            knob('phaserDepth', 'Sweep', { min: 0, max: 1000, resetValue: 600, isRounded: true, unit: 'Hz' }),
+            knob('phaserFrequency', 'Centre', { scalingType: 'logarithmic', minValue: 200, maxValue: 4000, resetValue: 800, isRounded: true }),
+            knob('phaserFeedback', 'Feedback', { min: 0, max: 0.75, resetValue: 0.3 }),
             knob('phaserAmount', DRY_WET),
+        ],
+    },
+    {
+        label: 'Tremolo / Auto-pan',
+        columns: 4,
+        controls: [
+            knob('tremoloRate', 'Trem rate', { scalingType: 'logarithmic', minValue: 0.05, maxValue: 12, resetValue: 4, unit: 'Hz' }),
+            knob('tremoloDepth', 'Trem depth', { resetValue: 0 }),
+            knob('autoPanRate', 'Pan rate', { scalingType: 'logarithmic', minValue: 0.02, maxValue: 5, resetValue: 0.2, unit: 'Hz' }),
+            knob('autoPanDepth', 'Pan depth', { resetValue: 0 }),
         ],
     },
     {
         label: 'Delay',
         columns: 2,
         controls: [
-            knob('delayTime', 'Time'),
-            knob('delayFeedback', 'Feedback'),
-            knob('delayTone', 'Tone', { modifier: 11000, resetValue: 4400, isRounded: true }),
+            knob('delayTime', 'Time', { min: 0.02, max: 1, resetValue: 0.375 }),
+            knob('delayFeedback', 'Feedback', { min: 0, max: 0.9, resetValue: 0.3 }),
+            knob('delayTone', 'Tone', { scalingType: 'logarithmic', minValue: 500, maxValue: 12000, resetValue: 4400, isRounded: true }),
             knob('delayAmount', DRY_WET),
         ],
     },
@@ -217,9 +255,9 @@ const SYNTH_SCHEMA = [
         label: 'Ping Pong Delay',
         columns: 2,
         controls: [
-            knob('pingPongDelayTime', 'Time'),
-            knob('pingPongFeedback', 'Feedback'),
-            knob('pingPongTone', 'Tone', { modifier: 11000, resetValue: 4400, isRounded: true }),
+            knob('pingPongDelayTime', 'Time', { min: 0.02, max: 1, resetValue: 0.375 }),
+            knob('pingPongFeedback', 'Feedback', { min: 0, max: 0.9, resetValue: 0.3 }),
+            knob('pingPongTone', 'Tone', { scalingType: 'logarithmic', minValue: 500, maxValue: 12000, resetValue: 4400, isRounded: true }),
             knob('pingPongAmount', DRY_WET),
         ],
     },
@@ -227,18 +265,34 @@ const SYNTH_SCHEMA = [
         label: 'Reverb',
         columns: 2,
         controls: [
-            select('reverbType', 'Type', REVERB),
+            // a sampled room (Type) on the Web Audio voices, a room network (Size) on the Wasm ones
+            select('reverbType', 'Type', REVERB, (p, context) => context?.engine === 'wasm'),
+            knob('reverbDecay', 'Decay', { scalingType: 'logarithmic', minValue: 0.3, maxValue: 20, resetValue: 8, unit: 's' }),
+            knob('reverbSize', 'Size', { min: 0.2, max: 1, resetValue: 0.7 }, (p, context) => context?.engine !== 'wasm'),
+            knob('reverbDamping', 'Damping', { scalingType: 'logarithmic', minValue: 1000, maxValue: 16000, resetValue: 6000, isRounded: true, unit: 'Hz' }),
+            knob('reverbPredelay', 'Pre-delay', { min: 0, max: 0.15, resetValue: 0.025, unit: 's' }),
             knob('reverbAmount', DRY_WET),
         ],
     },
     {
-        label: 'EQ2',
-        columns: 2,
+        label: 'Shimmer',
+        columns: 3,
         controls: [
-            knob('eqLowGain', 'Low Gain', { type: 'B', modifier: 24 }),
-            knob('eqHighGain', 'High Gain', { type: 'B', modifier: 24 }),
-            knob('eqLowFreq', 'Low Freq', { modifier: 640, resetValue: 320, isRounded: true }),
-            knob('eqHighFreq', 'High Freq', { modifier: 8600, offset: 2400, resetValue: 3200, isRounded: true }),
+            knob('shimmerDecay', 'Decay', { scalingType: 'logarithmic', minValue: 1, maxValue: 20, resetValue: 6, unit: 's' }),
+            { kind: 'choice', key: 'shimmerInterval', label: 'Interval', options: { fifth: 'Fifth', octave: 'Octave', twelfth: '12th', twoOctaves: '2 oct' } },
+            knob('shimmerClimb', 'Climb', { min: 0, max: 0.9, resetValue: 0.5 }),
+            knob('shimmerTone', 'Tone', { scalingType: 'logarithmic', minValue: 2000, maxValue: 16000, resetValue: 7000, isRounded: true }),
+            knob('shimmerMix', DRY_WET),
+        ],
+    },
+    {
+        label: 'Freeze',
+        columns: 3,
+        controls: [
+            toggle('freezeHold', 'Hold'),
+            knob('freezeLength', 'Length', { min: 0.25, max: 4, resetValue: 2, unit: 's' }),
+            knob('freezeFade', 'Fade', { scalingType: 'logarithmic', minValue: 0.05, maxValue: 4, resetValue: 1, unit: 's' }),
+            knob('freezeMix', DRY_WET),
         ],
     },
     {

@@ -26,11 +26,10 @@
 .sound-window-synth .panel-row{min-width:0}
 .sound-window-synth .rack-content{padding:18px}
 .sound-window-synth .ensemble-panel-viewport{border-top:0}
-/* The bus: its sends and performance choices above its rack; a voice's own send above its effects. */
+/* The bus: its sends and performance choices above its rack. */
 .sound-window-bus{display:flex;flex-wrap:wrap;gap:12px;padding:12px 16px 0}
 .sound-window-bus .group{flex:0 1 auto}
-.sound-window-send{max-width:420px}
-.sound-window-send .hint,.sound-window-perf .hint{font-size:12px;color:var(--muted);max-width:34ch;margin:6px 0 0}
+.sound-window-perf .hint{font-size:12px;color:var(--muted);max-width:34ch;margin:6px 0 0}
 .sound-window-perf{display:flex;flex-direction:column;gap:8px;padding:10px 12px;max-width:340px}
 .sound-window-perf label{display:flex;gap:8px;align-items:center;font-size:13px}
 @media(max-width:560px){
@@ -40,3 +39,12 @@
  .sound-window .ensemble-role-tabs button{padding:4px 10px}
  .sound-window-tools{padding:8px 12px}
 }
+/* The calmbgm synth's effects with the effects rack's companions and colours. */
+.sound-window-synth .native-effect{--rack-bg:#1a1916;border-top:3px solid var(--rack-colour)}
+.sound-window-synth .native-effect>header{display:flex;align-items:center;gap:8px;margin:-2px 0 4px}
+.sound-window-synth .native-effect>header h3{margin:0;color:var(--rack-colour);font-size:12px}
+.sound-window-synth .native-effect .rack-graphic{width:56px;height:44px}
+.sound-window-synth .native-effect.is-idle .rack-graphic{opacity:.45}
+.sound-window-synth .native-effect [class*=tone-]{--tone:var(--rack-colour)}
+/* a long module (the equalizer) across two columns where there are two */
+@media(min-width:760px){.sound-window-synth .native-effect.wide{grid-column:span 2}}

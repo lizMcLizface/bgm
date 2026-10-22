@@ -11,6 +11,7 @@ import {PreparedSource} from './PreparedSource';
 import {preparedPatch} from './preparedPatch';
 import {roomPerformance} from './performance';
 import {createNativeEcho} from '../synth-lab/nativeEcho';
+import {VoiceFx} from '../app/engine/voiceFx';
 import {sourcePerformance,WASM_PERFORMANCE_EVENT} from '../audio/wasmPerformance';
 export {noteEvents} from './noteEvents';
 export class LabVoice {
@@ -23,6 +24,8 @@ export class LabVoice {
   if(this.spec.kind==='fm'&&!Number.isFinite(c.length)){this.performanceChange=()=>this.patchSource(this.effectivePatch??this.patch,{seconds:.04});window.addEventListener(WASM_PERFORMANCE_EVENT,this.performanceChange);if(sourcePerformance(this.patch).global.quality!==sourcePatch.global.quality)this.performanceChange();}
   let source=this.backend.node;
   if(insertsActive(this.patch.inserts)){this.insert=await createInstrumentInserts(c,this.patch.inserts,{onError});source.connect(this.insert.input);source=this.insert.node;}
+  // the calmbgm synth's tape, tremolo, compressor, shimmer and freeze (app/engine/voiceFx.js)
+  if(this.spec.fx){this.fx=new VoiceFx(c,this.spec.fx);source.connect(this.fx.input);source=this.fx.output;}
   this.effects=roomPerformance(this.patch.effects);
   if(this.patch.routing?.room==='private'&&Number.isFinite(this.patch.routing.roomDecay))this.effects.decay=this.patch.routing.roomDecay;
   if(this.roomPool&&this.patch.routing?.room!=='private'){
@@ -56,6 +59,6 @@ export class LabVoice {
   else for(const l of p.layers){l.cutoff=Math.min(20000,l.cutoff*2**(brightness*2));l.bow=Math.min(1,l.bow+texture*.3);l.lfoPitch+=motion*12;l.pressureTone=Math.max(.5,l.pressureTone);p.global.pressure=pressure;}
   this.patchSource(p,{seconds:.06});
  }
- panic(){if(this.disposed)return;this.keys.clear();this.released.clear();this.pedal=false;this.native?.silence();this.native?.flushTails();this.backend?.panic();this.room?.clear?.();this.echo?.clear?.();this.insert?.clear?.();}
- dispose(){if(this.disposed)return;this.disposed=true;if(this.performanceChange)window.removeEventListener(WASM_PERFORMANCE_EVENT,this.performanceChange);this.keys.clear();this.released.clear();this.native?.dispose();this.channel?.dispose();this.echo?.dispose();this.room?.dispose();this.insert?.dispose();this.backend?.dispose();this.output.disconnect();}
+ panic(){if(this.disposed)return;this.keys.clear();this.released.clear();this.pedal=false;this.native?.silence();this.native?.flushTails();this.backend?.panic();this.room?.clear?.();this.echo?.clear?.();this.insert?.clear?.();this.fx?.clear();}
+ dispose(){if(this.disposed)return;this.disposed=true;if(this.performanceChange)window.removeEventListener(WASM_PERFORMANCE_EVENT,this.performanceChange);this.keys.clear();this.released.clear();this.native?.dispose();this.channel?.dispose();this.echo?.dispose();this.room?.dispose();this.insert?.dispose();this.fx?.dispose();this.backend?.dispose();this.output.disconnect();}
 }

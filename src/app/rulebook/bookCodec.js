@@ -66,7 +66,20 @@ export const BOOK_RULE_IDS=[
   "percussion-sprinkle",
   "ambient-bed-drift",
   "ambient-layer-drift",
-  "harmonic-drift"
+  "harmonic-drift",
+  "dynamic-level",
+  "dynamic-range",
+  "soft-attacks",
+  "velocity-brightness",
+  "cadence-rubato",
+  "lead-ornaments",
+  "melody-ducking",
+  "even-loudness",
+  "section-space",
+  "key-lift",
+  "energy-arc",
+  "energy-arc-length",
+  "timbre-drift"
 ];
 export const BOOK_GROUP_IDS=[
   "pad-register",

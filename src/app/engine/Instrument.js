@@ -18,6 +18,8 @@ import { MIN_WET } from '../../nodes/reverb';
 import { SendReverb } from '../../nodes/sharedReverb';
 import { blendPresets } from './morph';
 import { cleanExpression, expressiveEnvelope, expressiveSource, breathEnvelope, gateEnvelope } from './noteExpression';
+import { FX_STAGES, fxTail } from './voiceFx';
+import { dynamicAttack } from '../composition/dynamics';
 
 // A held note is booked as if it lasted this long; its release replaces
 // the tail when the key comes up.
@@ -92,6 +94,9 @@ const PARAM_SETTERS = {
     pingPongAmount: (inst, v) => inst.pingPong.setAmount(v),
     reverbAmount: (inst, v) => inst.reverb.setAmount(v),
     reverbType: (inst, v) => inst.reverb.setType(v),
+    reverbDecay: (inst, v) => inst.reverb.setDecay(v),
+    reverbDamping: (inst, v) => inst.reverb.setDamping(v),
+    reverbPredelay: (inst, v) => inst.reverb.setPredelay(v),
     bitCrushDepth: (inst, v) => inst.bitCrush.setBitDepth(v),
     bitCrushAmount: (inst, v) => inst.bitCrush.setAmount(v),
     vibratoRate: (inst, v) => inst.vibrato.setRate(v),
@@ -103,6 +108,9 @@ const PARAM_SETTERS = {
     eqHighGain: (inst, v) => inst.eq.setHighGain(v),
     eqLowFreq: (inst, v) => inst.eq.setLowFreq(v),
     eqHighFreq: (inst, v) => inst.eq.setHighFreq(v),
+    eqMidGain: (inst, v) => inst.eq.setMidGain(v),
+    eqMidFreq: (inst, v) => inst.eq.setMidFreq(v),
+    eqMidQ: (inst, v) => inst.eq.setMidQ(v),
     masterLimiterThreshold: (inst, v) => inst.limiter.setThreshold(v),
     masterLimiterRatio: (inst, v) => inst.limiter.setRatio(v),
     masterLimiterKnee: (inst, v) => inst.limiter.setKnee(v),
@@ -123,20 +131,28 @@ const PARAM_SETTERS = {
     fmEnvAmount: (inst) => inst.updateFm(),
     fmDecay: (inst) => inst.updateFm(),
 };
+// tape, compressor, shimmer and freeze: the stages' own setters (motion's are above)
+for (const [stage, { setters }] of Object.entries(FX_STAGES)) {
+    for (const [key, setter] of Object.entries(setters)) PARAM_SETTERS[key] ??= (inst, v) => setter(inst[stage], v);
+}
 
 // The effect chain, in order, and when each effect actually changes the
 // sound (otherwise it is routed around - see Instrument.updateChain).
 const EFFECT_STAGES = [
     { key: 'motion', active: (p) => p.tremoloDepth > 0 || p.autoPanDepth > 0 },
     { key: 'distortion', active: (p) => p.distortionAmount > 0 },
+    { key: 'tape', active: FX_STAGES.tape.active },
     { key: 'flanger', active: (p) => p.flangerAmount > 0 },
     { key: 'chorus', active: (p) => p.chorusAmount > 0 },
     { key: 'phaser', active: (p) => p.phaserAmount > 0 },
     { key: 'bitCrush', active: (p) => p.bitCrushAmount > 0 },
+    { key: 'compressor', active: FX_STAGES.compressor.active },
     { key: 'delay', active: (p) => p.delayAmount > 0 },
     { key: 'pingPong', active: (p) => p.pingPongAmount > 0 },
     { key: 'reverb', active: (p) => p.reverbAmount >= MIN_WET },
-    { key: 'eq', active: (p) => p.eqLowGain !== 0 || p.eqHighGain !== 0 },
+    { key: 'shimmer', active: FX_STAGES.shimmer.active },
+    { key: 'freeze', active: FX_STAGES.freeze.active },
+    { key: 'eq', active: (p) => p.eqLowGain !== 0 || p.eqMidGain !== 0 || p.eqHighGain !== 0 },
     { key: 'filter', active: (p) => !(p.masterFilterType === 'lowpass' && p.masterFilterFreq >= 11000) },
 ];
 
@@ -167,6 +183,10 @@ class Instrument {
         this.chorus = new Nodes.Chorus(this.AC);
         this.phaser = new Nodes.Phaser(this.AC);
         this.bitCrush = new Nodes.BitCrusher(this.AC);
+        this.tape = FX_STAGES.tape.create(this.AC);
+        this.compressor = FX_STAGES.compressor.create(this.AC);
+        this.shimmer = FX_STAGES.shimmer.create(this.AC);
+        this.freeze = FX_STAGES.freeze.create(this.AC);
         this.delay = new Nodes.Delay(this.AC);
         this.pingPong = new Nodes.PingPongDelay(this.AC);
         // one shared with the other voices, or its own (nodes/sharedReverb.js)
@@ -320,6 +340,19 @@ class Instrument {
         this.applyPreset(morph.to);
     }
 
+    /**
+     * Timbre drift (composition/timbreDrift.js): parameters applied live without changing the
+     * preset, so the editor, saving and links never see them; null puts the preset's back.
+     */
+    setDrift(values) {
+        const keys = new Set([...Object.keys(this.drift ?? {}), ...Object.keys(values ?? {})]);
+        for (const key of keys) {
+            const value = values && key in values ? values[key] : this.preset?.[key];
+            if (value !== undefined && PARAM_SETTERS[key]) PARAM_SETTERS[key](this, value);
+        }
+        this.drift = values;
+    }
+
     /** Sets one preset parameter live - what the synth editor's knobs call. */
     set(key, value) {
         if (this.morph && !this.morph.stepping) this.finishMorph();
@@ -458,6 +491,7 @@ class Instrument {
         return reverb
             + echoes(p.delayAmount, (this.tempoTailReserve ? 1 : p.delayTime), p.delayFeedback)
             + echoes(p.pingPongAmount, (this.tempoTailReserve ? 1 : p.pingPongDelayTime), p.pingPongFeedback)
+            + fxTail(p)
             + 0.5;
     }
 
@@ -472,6 +506,8 @@ class Instrument {
         const now = this.AC.currentTime;
         const impulse = this.reverb.node.buffer;
         if (impulse) this.reverb.node.buffer = impulse;
+        this.shimmer.clear();
+        this.freeze.clear();
         // delay lines are at most 1 s long (src/nodes/delay.js, pingPongDelay.js)
         const drain = 1.05;
         this.holdDelays(now + drain);
@@ -617,6 +653,8 @@ class Instrument {
      */
     scheduleNote(midi, startTime, duration, velocity = 0.8, detune = 0, rawExpression = null) {
         const expression = cleanExpression(rawExpression), shaped = expressiveEnvelope(this.gainEnv, duration, expression);
+        // the scene's gentle onsets (composition/dynamics.js)
+        if (expression?.dynamicAttack) shaped.env = { ...shaped.env, attack: dynamicAttack(shaped.env.attack, velocity, expression.dynamicAttack) };
         const { points, releaseEnd } = gainEnvelopePoints(shaped.env, velocity, shaped.duration);
         if (this.delay) scheduleEffectTiming(this, expression?.tempoBeat ?? 0, startTime);
 
@@ -770,6 +808,8 @@ class Instrument {
         Object.values(this.wanderLfos).forEach((lfo) => lfo.dispose());
         this.silence();
         this.voices.forEach((synth) => synth.destroy());
+        this.shimmer.dispose();
+        this.freeze.dispose();
         this.output.disconnect();
     }
 }

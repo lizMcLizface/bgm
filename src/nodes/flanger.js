@@ -52,7 +52,7 @@ class Flanger {
         this.dryGain.setGain(1 - val);
         this.wetGain.setGain(val);
     }
-    setFeedback = (val) => this.feedback.setGain(val);
+    setFeedback = (val) => this.feedback.setGain(Math.max(-0.9, Math.min(0.9, val))); // below runaway
     setRate = (val) => this.lfo.setRate(val);
     setDepth = (val) => this.lfo.setDepth(val);
     setDelay = (val) => {

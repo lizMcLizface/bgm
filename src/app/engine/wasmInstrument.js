@@ -3,16 +3,21 @@ import {translatedWasmVoice,needsNativeSource} from './wasmPreset';
 import {LabVoice} from '../../labs/voice';
 import {effectTail} from '../../synth-lab/effectsConfig';
 import {nativeWasmVoice} from '../../synth-lab/voiceLibrary';
+import {FX_KEYS,fxTail} from './voiceFx';
 
 // Keep the generator's Instrument contract, including native physical sources.
 export default class WasmInstrument {
- static async create({context,preset={},polyphony=8,notes=[],spec=null,roomPool=null}){
-  const i=new WasmInstrument(context,preset,polyphony);i.overrideSpec=spec;i.roomPool=roomPool;
+ static async create({context,preset={},polyphony=8,notes=[],spec=null,roomPool=null,dynamics=null}){
+  const i=new WasmInstrument(context,preset,polyphony);i.overrideSpec=spec;i.roomPool=roomPool;i.dynamics=dynamics;
   try{i.voice=await LabVoice.create(context,i.spec(),{notes,roomPool,onError:e=>{i.error=e;console.error('Wasm voice failed',e);}});i.attachVoice(i.voice);i.reverb=i.voice.native?.reverb??i.reverb;i.preScheduled=Number.isFinite(context.length);return i;}
   catch(e){i.dispose();throw e;}
  }
  constructor(context,preset,polyphony){this.AC=context;this.polyphony=polyphony;this.preset={...DEFAULTS,...preset};this.output=context.createGain();this.roomOutput=context.createGain();this.roomInput=context.createGain();this.ready=Promise.resolve();this.revision=0;this.disposed=false;this.reverb={settled:true,hear(){},setLevel(){}};this.held=new Map();this.nextId=1;this.syncEnvelope();}
- spec(){return this.overrideSpec??nativeWasmVoice(this.preset,this.polyphony)??(needsNativeSource(this.preset)?{kind:'legacy',patch:this.preset,polyphony:this.polyphony}:translatedWasmVoice(this.preset,this.polyphony));}
+ spec(){return this.overrideSpec??nativeWasmVoice(this.preset,this.polyphony)??(needsNativeSource(this.preset)?{kind:'legacy',patch:this.preset,polyphony:this.polyphony}:{...translatedWasmVoice(this.preset,this.polyphony,this.dynamics),fx:this.preset});}
+ /** Timbre drift (composition/timbreDrift.js): the source patched live from the preset and these values, the preset unchanged. */
+ setDrift(values,seconds=.5){if(!this.voice||this.loading)return;const spec=this.spec();if(spec.kind==='legacy'){this.voice.native?.setDrift?.(values);return;}if(this.overrideSpec||spec.kind!=='subtractive'||this.preset.wasmVoice)return;const drifted=values?translatedWasmVoice({...this.preset,...values},this.polyphony,this.dynamics):spec;if(drifted.kind!==spec.kind||JSON.stringify([drifted.patch.effects,drifted.patch.inserts])!==JSON.stringify([spec.patch.effects,spec.patch.inserts]))return;this.voice.patchSource(drifted.patch,{seconds});}
+ /** The scene's dynamics (settings.dynamics): part of the translated patch, so a change rebuilds the voice. */
+ setDynamics(dynamics){const before=JSON.stringify(this.spec());this.dynamics=dynamics;if(this.voice&&JSON.stringify(this.spec())!==before)this.applyPreset(this.preset,this.overrideSpec);}
  syncEnvelope(){this.gainEnv={attack:this.preset.gainAttack,decay:this.preset.gainDecay,sustain:this.preset.gainSustain,release:this.preset.gainRelease};}
  attachVoice(voice){voice.connect(this.output);this.roomInput.disconnect();if(voice.roomOutput)voice.roomOutput.connect(this.roomOutput);if(voice.sharedRoomInput)this.roomInput.connect(voice.sharedRoomInput);}
  connect(node){this.output.connect(node);}
@@ -29,7 +34,11 @@ export default class WasmInstrument {
   const before=this.spec();this.preset={...this.preset,[key]:value};this.syncEnvelope();const after=this.spec();
   if(!this.loading&&before.kind===after.kind&&this.voice){
    if(after.kind==='legacy'){this.voice.patch={...this.preset};this.voice.native.set(key,value);return;}
+   // tape, tremolo, compressor, shimmer, freeze: set on the voice's VoiceFx as they are
+   if(FX_KEYS.has(key)&&this.voice.fx){this.voice.fx.set(this.preset);this.voice.spec.fx=this.preset;return;}
    if(JSON.stringify([before.patch.effects,before.patch.inserts])===JSON.stringify([after.patch.effects,after.patch.inserts])){this.voice.patch=structuredClone(after.patch);this.voice.patchSource(after.patch,{seconds:.06});return;}
+   // An insert edit (phaser, EQ, ...) on a voice that already has its inserts: patched in place, so a drag neither cuts notes nor tails.
+   if(this.voice.insert&&JSON.stringify(before.patch.effects)===JSON.stringify(after.patch.effects)){this.voice.patch=structuredClone(after.patch);this.voice.insert.patch(after.patch.inserts);this.voice.patchSource(after.patch,{seconds:.06});return;}
   }
   // Coalesce editor drags without reallocating a graph per pointer event.
   clearTimeout(this.editTimer);this.ready=new Promise(resolve=>{this.editResolve?.();this.editResolve=resolve;this.editTimer=setTimeout(()=>{this.editResolve=null;this.applyPreset(this.preset);this.ready.then(resolve);},70);});
@@ -46,7 +55,7 @@ export default class WasmInstrument {
  stopNote(id){const record=this.held.get(id);record?.voice?.off(record.note);this.held.delete(id);}
  silence(){this.epoch=(this.epoch??0)+1;this.held.clear();this.voice?.panic();}
  flushTails(){this.voice?.panic();}
- tailSeconds(){const p=this.spec();return Math.min(30,p.kind==='legacy'?this.voice?.native?.tailSeconds()??1:effectTail({...p.patch.effects,...(p.patch.routing?.room==='private'&&Number.isFinite(p.patch.routing.roomDecay)?{decay:p.patch.routing.roomDecay}:{})}));}
+ tailSeconds(){const p=this.spec();return Math.min(30,p.kind==='legacy'?this.voice?.native?.tailSeconds()??1:fxTail(p.fx)+effectTail({...p.patch.effects,...(p.patch.routing?.room==='private'&&Number.isFinite(p.patch.routing.roomDecay)?{decay:p.patch.routing.roomDecay}:{})}));}
  setWander(value){
   this.wander=value;if(!this.voice)return;if(this.voice.native){this.voice.native.setWander(value);return;}
   // Pan/level wander stays native. Pitch/filter use the new source's slow

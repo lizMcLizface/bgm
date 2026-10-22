@@ -6,7 +6,7 @@ import { defineParams } from '../../synths/params';
 import SYNTH_SCHEMA from './synthSchema';
 
 // The modules that colour a finished sound rather than make it: the window's Effects tab.
-export const EFFECT_MODULES = new Set(['Drive', 'Crush', 'Flanger', 'Chorus', 'Phaser', 'Delay', 'Ping Pong Delay', 'Reverb', 'EQ2']);
+export const EFFECT_MODULES = new Set(['Drive', 'Tape', 'Crush', 'EQ2', 'Compressor', 'Chorus', 'Flanger', 'Phaser', 'Tremolo / Auto-pan', 'Delay', 'Ping Pong Delay', 'Reverb', 'Shimmer', 'Freeze']);
 // What a Wasm voice offers of the generator's controls: its envelope and level.
 const NATIVE_CONTROLS = new Set(['gainAttack', 'gainDecay', 'gainSustain', 'gainRelease', 'masterVolume']);
 
@@ -36,13 +36,25 @@ for (const module of SYNTH_SCHEMA) for (const c of module.controls) {
     } else {
         const { min, max, curve } = knobRange(c.props ?? {});
         const rounded = c.props?.round || c.props?.isRounded;
-        rows.push([c.key, id, c.label, min, max, Math.min(max, Math.max(min, c.props?.resetValue ?? min)), unitOf(c.label, min, max), rounded && max - min <= 16 ? 'step' : curve]);
+        rows.push([c.key, id, c.label, min, max, Math.min(max, Math.max(min, c.props?.resetValue ?? min)), c.props?.unit ?? unitOf(c.label, min, max), rounded && max - min <= 16 ? 'step' : curve]);
     }
 }
 const params = defineParams(rows);
 
 /** The calmbgm synth as a /synths model: its parameter table and nothing to play (the generator plays it). */
 export const NATIVE_SYNTH = { id: 'calmbgm', name: 'calmbgm synth', params };
+
+// Effects whose settings default to 0 in presets (presetDefaults), silent even with the mix up:
+// while the mix is 0 the panel shows the control's own default in place of such a 0, and raising
+// the mix writes those shown values too, so the effect is heard at once. (The preset defaults stay
+// as they are: links store a sound as its differences from them.)
+const IDLE_SETTINGS = {
+    distortionAmount: ['distortionDist'],
+    flangerAmount: ['flangerRate', 'flangerDepth', 'flangerDelay', 'flangerFeedback'],
+    delayAmount: ['delayTime', 'delayFeedback'],
+    pingPongAmount: ['pingPongDelayTime', 'pingPongFeedback'],
+};
+const idleKeys = (preset) => Object.entries(IDLE_SETTINGS).filter(([mix]) => !(preset[mix] > 0)).flatMap(([, keys]) => keys.filter((k) => !preset[k]));
 
 /** A preset as panel values: every control's value, choices and toggles as option indices. */
 export function toPanel(preset) {
@@ -51,13 +63,20 @@ export function toPanel(preset) {
         const v = preset[p.key];
         values[p.key] = CHOICES[p.key] ? Math.max(0, CHOICES[p.key].indexOf(v)) : TOGGLES.has(p.key) ? (v ? 1 : 0) : Number.isFinite(v) ? v : p.default;
     }
+    for (const key of idleKeys(preset)) values[key] = params.BY_KEY[key].default;
     return params.sanitize(values);
 }
 /** One panel value as the preset stores it. */
 export const fromPanel = (key, value) => (CHOICES[key] ? CHOICES[key][value] : TOGGLES.has(key) ? value === 1 : value);
-/** The panel values that differ between two sets, as preset values (an edit's changes). */
-export function panelChanges(before, after) {
-    return Object.keys(after).filter((k) => after[k] !== before[k]).map((k) => [k, fromPanel(k, after[k])]);
+/** The panel values that differ between two sets, as preset values (an edit's changes); with the
+ * preset, raising an effect's mix from 0 also writes the settings the panel showed for it. */
+export function panelChanges(before, after, preset) {
+    const keys = Object.keys(after).filter((k) => after[k] !== before[k]);
+    if (preset) {
+        const idle = new Set(idleKeys(preset));
+        for (const mix of keys) for (const k of (after[mix] > 0 ? IDLE_SETTINGS[mix] ?? [] : [])) if (idle.has(k) && !keys.includes(k)) keys.push(k);
+    }
+    return keys.map((k) => [k, fromPanel(k, after[k])]);
 }
 /** The schema's modules for a preset and a tab (instrument or effects), without the controls that do nothing for it
  * (a Wasm voice: only its envelope and level). */

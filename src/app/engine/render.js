@@ -20,8 +20,13 @@ import { RoleWander, instrumentWander } from './wander';
 import { OPEN_TONE, TONE_ROLES } from '../Generator';
 import Ambience from './ambience';
 import { unitsPerMinute } from '../meter';
+import { rubatoTime } from '../composition/rubato';
+import { automateDuck, DUCKED_BY } from './ducking';
+import { SPACE_RACK, SPACE_ROLE, spaceTail } from '../composition/sectionSpace';
+import { timbreDrift } from '../composition/timbreDrift';
 import { noiseReady } from '../../nodes/noiseGenerator';
 import { bitCrusherReady } from '../../nodes/bitcrusher';
+import { spaceReady } from '../../nodes/space';
 import { busActive, createBusRack, busTail } from './bus';
 
 const CHUNK_SECONDS = 60;
@@ -57,6 +62,9 @@ export function planNotes(gen, audible, seconds, ending, bars = null) {
     const planner = gen.planner();
     const notes = [];
     const tones = [];
+    const levels = []; // the bars' loudness trims (composition/loudness.js)
+    const spaces = []; // the section space's send (composition/sectionSpace.js)
+    const barStarts = []; // when each bar starts (timbre drift is set per chunk from its middle bar)
     let time = 0;
     for (let bar = 0; time < seconds; bar++) {
         // an ending: a V bar, then the final I's two bars and its tail fill the end
@@ -69,12 +77,17 @@ export function planNotes(gen, audible, seconds, ending, bars = null) {
         planner.plan.delete(bar - 2);
         const unit = 60 / unitsPerMinute(planner.meter, planned.bpm);
         if (!tones.length || tones[tones.length - 1].tone !== planned.tone) tones.push({ time, tone: planned.tone, glide: planner.meter.units * unit });
+        barStarts.push(time);
+        const trim = planned.loudness?.trim ?? 1;
+        if (levels.length ? levels[levels.length - 1].trim !== trim : trim !== 1) levels.push({ time, trim, glide: planner.meter.units * unit * 0.9 });
+        const space = planned.space ?? 0;
+        if (spaces.length ? spaces[spaces.length - 1].trim !== space : space > 0) spaces.push({ time, trim: space, glide: planner.meter.units * unit * 2.1 });
         if (bars) {
             const section = planned.state.phrase.section;
             bars.push({
                 bar,
                 start: time,
-                seconds: planner.meter.units * unit,
+                seconds: rubatoTime(planned.rubato, unit, planner.meter.units),
                 units: planner.meter.units,
                 chord: { name: planned.chord.name, numeral: planned.chord.numeral, keyName: planned.chord.keyName },
                 chordStart: Boolean(planned.chordStart),
@@ -86,12 +99,13 @@ export function planNotes(gen, audible, seconds, ending, bars = null) {
         }
         planned.events.forEach((e) => {
             if (audible[e.role]) {
-                notes.push({ bar,section:planned.state.phrase.section?.start,ending:planned.ending,role: e.role, midi: e.midi, time: time + e.beat * unit, duration: e.length * unit, velocity: e.velocity, detune: e.detune, expression: e.expression });
+                const at = (beat) => time + rubatoTime(planned.rubato, unit, beat);
+                notes.push({ bar,section:planned.state.phrase.section?.start,ending:planned.ending,role: e.role, midi: e.midi, time: at(e.beat), duration: at(e.beat + e.length) - at(e.beat), velocity: e.velocity, detune: e.detune, expression: e.expression });
             }
         });
-        time += planner.meter.units * unit;
+        time += rubatoTime(planned.rubato, unit, planner.meter.units);
     }
-    return { notes: joinHeldNotes(notes,{pad:gen.heldPadGlides===true,bass:gen.heldBassGlides===true,voices:Object.fromEntries(Object.keys(gen.roles).map(role=>[role,gen.roles[role].instrument?.preset])),legacy:gen.settings.generation==='legacy'}).sort((a,b)=>a.time-b.time), tones };
+    return { notes: joinHeldNotes(notes,{pad:gen.heldPadGlides===true,bass:gen.heldBassGlides===true,voices:Object.fromEntries(Object.keys(gen.roles).map(role=>[role,gen.roles[role].instrument?.preset])),legacy:gen.settings.generation==='legacy'}).sort((a,b)=>a.time-b.time), tones, levels, spaces, barStarts };
 }
 
 // The section tone's automation for a chunk starting at `from`: as in
@@ -105,6 +119,18 @@ function automateTone(param, tones, from) {
     });
     param.setValueAtTime(value, 0);
     tones.filter((t) => t.time > from).forEach(({ time, tone, glide }) => param.setTargetAtTime(tone, time - from, glide / 3));
+}
+
+// The loudness trims for a chunk starting at `from`, glided as in playback (a third of a bar).
+function automateLevel(param, levels, from, initial = 1) {
+    let value = initial, previous = null;
+    for (const point of levels.filter((l) => l.time <= from)) {
+        if (previous) value += (previous.trim - value) * (1 - Math.exp((-3 * (point.time - previous.time)) / previous.glide));
+        previous = point;
+    }
+    if (previous) value += (previous.trim - value) * (1 - Math.exp((-3 * (from - previous.time)) / previous.glide));
+    param.setValueAtTime(value, 0);
+    levels.filter((l) => l.time > from).forEach(({ time, trim, glide }) => param.setTargetAtTime(trim, time - from, glide / 3));
 }
 
 // Over 0.9 a soft knee instead of hard clipping.
@@ -190,7 +216,7 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
     const audible = Object.fromEntries(Object.entries(gen.roles).map(([role, r]) => [role, musicOn && (anySolo ? r.solo : !r.mute) && r.volume > 0]));
     const roles = Object.keys(gen.roles).filter((role) => audible[role]);
     const presets = Object.fromEntries(roles.filter((role) => role !== 'perc').map((role) => [role, gen.getRolePreset(role)]));
-    const { notes, tones } = planNotes(gen, audible, seconds, ending);
+    const { notes, tones, levels, spaces, barStarts } = planNotes(gen, audible, seconds, ending);
     const ambience = { ...gen.settings.ambience };
 
     let frames = 0;
@@ -207,11 +233,15 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
         const build = async (from) => {
             const ctx = new OfflineAudioContext({ numberOfChannels: 2, length: length(from), sampleRate });
             const Wasm=audioEngine==='wasm'?(await import('./wasmInstrument')).default:null;
-            const instruments={},cleanup=[],roomPool=Wasm&&PERFORMANCE.sharedReverb?new WasmRoomPool(ctx,ctx.destination):null;
+            // the music, through the bars' loudness trims
+            const out=ctx.createGain();out.connect(ctx.destination);automateLevel(out.gain,levels,from);
+            const instruments={},cleanup=[()=>out.disconnect()],roomPool=Wasm&&PERFORMANCE.sharedReverb?new WasmRoomPool(ctx,out):null;
             if(roomPool)cleanup.push(()=>roomPool.dispose());
             // the shared effects bus, as the generator builds it (engine/bus.js)
-            const bus=busActive(gen.settings.bus)?await createBusRack(ctx,gen.settings.bus.rack,ctx.destination):null;
+            const bus=busActive(gen.settings.bus)?await createBusRack(ctx,gen.settings.bus.rack,out):null;
             if(bus)cleanup.push(()=>bus.dispose());
+            const space=spaces.length?await createBusRack(ctx,SPACE_RACK,out):null;
+            if(space)cleanup.push(()=>space.dispose());
             try{for(const role of roles){
                 const inst = role === 'perc' && gen.roles.perc.machine
                     ? await (await import('./classicsInstrument')).default.create({ context: ctx, preset: gen.roles.perc.instrument.preset, polyphony: 16 })
@@ -219,11 +249,16 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
                     ? new (gen.percussionEngine && gen.percussionEngine !== 'native' ? WasmDrumKit : DrumKit)({ context: ctx, model:gen.percussionEngine })
                     : presets[role]?.classics?await (await import('./classicsInstrument')).default.create({context:ctx,preset:presets[role],polyphony:gen.getRolePolyphony(role)})
                     : presets[role]?.diy?await (await import('./wasmInstrument')).default.create({polyphony:gen.getRolePolyphony(role),preset:presets[role],spec:(await import('./diySource')).diySpec(presets[role].diy,gen.getRolePolyphony(role)),context:ctx,roomPool,notes:notes.filter(n=>n.role===role&&n.time>=from&&n.time<end+(last?0:CROSSFADE)).map(n=>({...n,time:n.time-from}))})
-                    : Wasm?await Wasm.create({polyphony:gen.getRolePolyphony(role),preset:presets[role],context:ctx,roomPool,notes:notes.filter(n=>n.role===role&&n.time>=from&&n.time<end+(last?0:CROSSFADE)).map(n=>({...n,time:n.time-from}))})
+                    : Wasm?await Wasm.create({polyphony:gen.getRolePolyphony(role),preset:presets[role],context:ctx,roomPool,dynamics:gen.settings.dynamics,notes:notes.filter(n=>n.role===role&&n.time>=from&&n.time<end+(last?0:CROSSFADE)).map(n=>({...n,time:n.time-from}))})
                     : new Instrument({ polyphony: gen.getRolePolyphony(role), preset: presets[role], context: ctx });
                 instruments[role]=inst;cleanup.push(()=>inst.dispose());
                 if (role === 'perc') {inst.setKit(gen.settings.drumKit);inst.setVoicePreset(gen.settings.drums.kit);if(inst.ready)await inst.ready;}
                 inst.scheduleSleep = () => {}; // no wall-clock timers during the render
+                if (gen.settings.timbreDrift > 0 && inst.setDrift) {
+                    const middle = (from + end) / 2, bar = Math.max(0, barStarts.findLastIndex((t) => t <= middle));
+                    const values = timbreDrift(presets[role], role, bar, gen.settings.timbreDrift, gen.settings.seed);
+                    if (values) inst.setDrift(values, 0);
+                }
                 const gain = ctx.createGain();
                 cleanup.push(()=>gain.disconnect());
                 gain.gain.value = gen.roles[role].volume;
@@ -244,8 +279,15 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
                 cleanup.push(()=>wander.dispose());
                 wander.apply(gen.settings.wander);
                 if (inst.setWander) inst.setWander({ ...instrumentWander(gen.settings.wander, role, from), immediate: true });
-                gain.connect(wander.input);
-                wander.output.connect(ctx.destination);
+                if (gen.settings.ducking > 0 && DUCKED_BY[role]) {
+                    const duck = ctx.createGain();
+                    cleanup.push(() => duck.disconnect());
+                    automateDuck(duck.gain, role, notes, gen.settings.ducking, from);
+                    gain.connect(duck);
+                    duck.connect(wander.input);
+                } else gain.connect(wander.input);
+                wander.output.connect(out);
+                if(space){const send=ctx.createGain();automateLevel(send.gain,spaces.map(s=>({...s,trim:s.trim*(SPACE_ROLE[role]??1)})),from,0);wander.output.connect(send);send.connect(space.input);cleanup.push(()=>send.disconnect());}
                 if(bus&&gen.settings.bus.sends[role]>0){const send=ctx.createGain();send.gain.value=gen.settings.bus.sends[role];wander.output.connect(send);send.connect(bus.input);cleanup.push(()=>send.disconnect());}
                 if(roomPool&&role!=='perc'){
                     const route=createWasmRoomRoute(ctx,inst,{roleWander:wander,volume:gen.roles[role].volume,tone:TONE_ROLES.includes(role)});
@@ -265,9 +307,9 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
         const { ctx, instruments, cleanup } = await build(from);
         try{
         if(signal?.aborted)throw cancelled();
-        await Promise.all([noiseReady(ctx), bitCrusherReady(ctx)]);
+        await Promise.all([noiseReady(ctx), bitCrusherReady(ctx), spaceReady(ctx)]);
         await until(() => Object.values(instruments).every((inst) => inst.reverb.settled), 5000);
-        if (start === 0) tail = Math.max(1, busTail(gen.settings.bus), ...Object.values(instruments).map((inst) => inst.tailSeconds() + inst.preset.gainRelease));
+        if (start === 0) tail = Math.max(1, busTail(gen.settings.bus), spaces.length ? spaceTail() : 0, ...Object.values(instruments).map((inst) => inst.tailSeconds() + inst.preset.gainRelease));
         const to = end + (last ? 0 : CROSSFADE);
         for (let i = first; i < notes.length && notes[i].time < to; i++) {
             const n = notes[i];

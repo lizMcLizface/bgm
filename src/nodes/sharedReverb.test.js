@@ -14,7 +14,9 @@ function makeContext() {
         };
         return n;
     };
-    return { currentTime: 0, sampleRate: 48000, createGain: () => node(), createConvolver: () => node() };
+    const param = () => ({ value: 0, setValueAtTime() {}, setTargetAtTime() {} });
+    return { currentTime: 0, sampleRate: 48000, createGain: () => node(), createConvolver: () => node(),
+        createDelay: () => node({ delayTime: param() }), createBiquadFilter: () => node({ frequency: param(), Q: param() }) };
 }
 
 beforeEach(() => {

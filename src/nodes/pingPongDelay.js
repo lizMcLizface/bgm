@@ -68,6 +68,7 @@ class PingPongDelay {
         }
     }
     setFeedback = (val) => {
+        val = Math.max(0, Math.min(0.95, val)); // below runaway
         this.leftFeedbackGain.setGain(val);
         this.rightFeedbackGain.setGain(val);
     }

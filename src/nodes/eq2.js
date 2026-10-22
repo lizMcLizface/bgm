@@ -1,4 +1,4 @@
-const MAX_GAIN = 10;
+const MAX_GAIN = 12;
 const MAX_FREQ = 11000;
 const MAX_LOW_FREQ = 1000;
 const MIN_HIGH_FREQ = 1000;
@@ -18,7 +18,15 @@ class EQ2 {
         this.high.frequency.value = 3200.0;
         this.high.gain.value = 0.0;
 
-        this.low.connect(this.high);
+        // Mid (a peak between the shelves)
+        this.mid = this.AC.createBiquadFilter();
+        this.mid.type = 'peaking';
+        this.mid.frequency.value = 1000.0;
+        this.mid.Q.value = 0.7;
+        this.mid.gain.value = 0.0;
+
+        this.low.connect(this.mid);
+        this.mid.connect(this.high);
     }
 
     connect = (destination) => {
@@ -49,6 +57,12 @@ class EQ2 {
             ? this.high.gain.setTargetAtTime(gain, this.AC.currentTime, time)
             : this.high.gain.setValueAtTime(gain, this.AC.currentTime);
     }
+    setMidGain = (gain) => {
+        if (gain < -MAX_GAIN || gain > MAX_GAIN) return false;
+        this.mid.gain.setValueAtTime(gain, this.AC.currentTime);
+    }
+    setMidFreq = (freq) => this.mid.frequency.setValueAtTime(Math.min(MAX_FREQ, Math.max(100, freq)), this.AC.currentTime);
+    setMidQ = (q) => this.mid.Q.setValueAtTime(Math.min(8, Math.max(0.1, q)), this.AC.currentTime);
     setLowFreq = (freq) => {
         if (freq < 0 || freq > MAX_LOW_FREQ) return false;
         this.low.frequency.setValueAtTime(freq, this.AC.currentTime);

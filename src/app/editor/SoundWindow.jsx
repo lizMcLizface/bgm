@@ -211,14 +211,6 @@ export default function SoundWindow({ generator: gen, role, roles, onRole, voice
     const audition = () => gen.audition(role).catch((error) => setMessage(error.message));
 
     const send = (id, value) => onBus({ ...bus, sends: { ...bus.sends, [id]: value } });
-    // this voice's send to the bus, at the top of its Effects
-    const sendGroup = !isBus && (
-        <section className="group sound-window-send" style={{ '--n': 1 }}>
-            <h3>Shared bus</h3>
-            <div className="group-controls"><Fader spec={sendSpec(role, 'Send')} value={bus.sends[role] ?? 0} onChange={send} tone="teal" /></div>
-            <p className="hint">How much of this voice goes to the bus shared by every voice, after its own effects. Shape the bus under “Shared bus”.</p>
-        </section>
-    );
     const performance = readPerformance();
     const title = isBus ? 'Effects every voice can send to' : isPerc ? (machine ? machineLabel(machine.synth) : `${PERCUSSION_VOICES[percussion.kit]?.name ?? 'Kit'} kit`) : external ? synth.name : 'calmbgm synth';
     return (
@@ -306,7 +298,6 @@ export default function SoundWindow({ generator: gen, role, roles, onRole, voice
                                 tools={<button type="button" onClick={() => gen.busRack?.clear()}>Clear tails</button>} />
                         </>
                     )}
-                    {!isBus && tab === 'effects' && <div className="sound-window-bus">{sendGroup}</div>}
                     {isPerc && !machine && (
                         <p className="sound-window-note">
                             {tab === 'effects' ? 'The kit’s room and each drum’s level and tone are in the Percussion panel.' : 'This kit is the generator’s own: choose another above, or a drum machine to play the same grooves on its pads.'}
@@ -325,7 +316,7 @@ export default function SoundWindow({ generator: gen, role, roles, onRole, voice
                         <VoicePanel id={external.synth} role={role} values={external.values} onChange={editValues} choose={chooseLibrary} current={external.name} full={full} />
                     )}
                     {!isPerc && !isBus && !external && preset && (
-                        <NativePanel preset={preset} part={tab} polyphony={gen.getRolePolyphony(role)} onChange={editNative} />
+                        <NativePanel preset={preset} part={tab} polyphony={gen.getRolePolyphony(role)} engine={gen.getRoleEngine?.(role)} onChange={editNative} />
                     )}
                 </div>
                 <div ref={setBrowserHost} className="sound-window-synth sound-window-browsers" />

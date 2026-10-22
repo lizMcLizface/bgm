@@ -6,7 +6,7 @@ import { cleanExpression, expressiveEnvelope, expressiveSource } from './noteExp
 test('expression is bounded and absent expression leaves the old envelopes untouched',()=>{
     const env={attack:.1,release:.6};expect(expressiveEnvelope(env,2,null)).toEqual({env,duration:2});
     const e=cleanExpression({attackScale:NaN,gateScale:Infinity,releaseScale:5,brightnessCents:9999});
-    expect(e).toMatchObject({attackScale:1,releaseScale:1,gateScale:1,brightnessCents:240,breathDepth:0,vibratoDepth:0});
+    expect(e).toMatchObject({attackScale:1,releaseScale:1,gateScale:1,brightnessCents:600,breathDepth:0,vibratoDepth:0});
     expect(cleanExpression(null)).toBeNull();
 });
 test('source expression is scoped to the note and changes filter and physical models safely',()=>{

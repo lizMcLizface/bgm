@@ -1408,3 +1408,57 @@ test('new percussion styles leave the melodic plan intact and hand voice prepare
  const hand=new Generator({...defaultSettings(),drums:{...defaults.drums,kit:'hand'}});await hand.roles.perc.instrument.ready;
  expect(hand.percussionEngine).toBe('wasm');expect(hand.roles.perc.instrument.voicePreset).toBe('hand');expect(hand.audioEngine).not.toBe('wasm');
 });
+
+describe('smooth home changes', () => {
+    const changed = (smooth) => {
+        const gen = generator(5, { mode: 'off' });
+        gen.smoothChanges = smooth;
+        play(gen, 8);
+        gen.resumeBar = 8; // paused at bar 8
+        gen.currentBar = 7;
+        gen.setMany({ tonic: 7, bpm: gen.settings.bpm + 30 });
+        return { gen, bars: [8, 9, 10, 11, 12, 13, 14, 15].map((b) => { gen.currentBar = b; gen.ensurePlanned(b); return gen.plan.get(b); }) };
+    };
+    it('pivot through the new key’s dominant and glide to the new tempo', () => {
+        const { gen, bars } = changed(true);
+        expect(bars[0].chord.numeral).toContain('/');
+        expect(bars[1].music.tonic).toBe(7);
+        expect(bars[0].bpm).toBeLessThan(gen.settings.bpm);
+        for (let i = 1; i < bars.length; i++) expect(bars[i].bpm).toBeGreaterThanOrEqual(bars[i - 1].bpm);
+        expect(bars[bars.length - 1].bpm).toBe(gen.settings.bpm);
+    });
+    it('change at once without smooth changes', () => {
+        const { gen, bars } = changed(false);
+        expect(bars[0].music.tonic).toBe(7);
+        expect(bars[0].bpm).toBe(gen.settings.bpm);
+    });
+});
+
+describe('key lifts', () => {
+    it('pivot a whole step up after a build and come home at the next breakdown', () => {
+        let found = null;
+        for (let seed = 1; seed < 40 && !found; seed++) {
+            const gen = generator(seed, { mode: 'off' });
+            gen.settings.sections = { ...gen.settings.sections, mode: 'gentle' };
+            gen.settings.keyLift = 1;
+            gen.reset();
+            const bars = play(gen, 160);
+            const lifted = bars.findIndex((b) => b.keyLift === 2);
+            if (lifted < 0) continue;
+            found = { bars, lifted };
+        }
+        expect(found).not.toBeNull();
+        const { bars, lifted } = found;
+        const home = bars[0].music.tonic;
+        expect(bars[lifted].chord.numeral).toContain('/');
+        expect(bars[lifted + 1].music.tonic).toBe((home + 2) % 12);
+        const back = bars.findIndex((b, i) => i > lifted && b.keyLift === 0);
+        if (back > 0) expect(bars[back].music.tonic).toBe(home);
+    });
+    it('never lift when off', () => {
+        const gen = generator(3, { mode: 'off' });
+        gen.settings.sections = { ...gen.settings.sections, mode: 'gentle' };
+        gen.reset();
+        expect(play(gen, 120).every((b) => !b.keyLift)).toBe(true);
+    });
+});

@@ -106,6 +106,47 @@ function loadImpulse(AC, type) {
     return cache.get(type);
 }
 
+// The room controls a sampled room can follow (the Wasm voices' rooms take them as they are; the
+// presets' defaults - 8 s, 6 kHz, 25 ms - are that room's, and leave a sampled room as recorded):
+// decay only shortens the impulse (an envelope with that RT60, once below the impulse's own
+// length), damping darkens it below its default, pre-delay adds what is above 25 ms.
+export const ROOM_DEFAULTS = { decay: 8, damping: 6000, predelay: 0.025 };
+const decayStep = (decay) => Math.round(decay * 10) / 10;
+const envelopes = new WeakMap();
+export function decayedImpulse(AC, buffer, decay) {
+    if (!(decay < buffer.duration)) return buffer;
+    if (!envelopes.has(buffer)) envelopes.set(buffer, new Map());
+    const cache = envelopes.get(buffer), key = decayStep(decay);
+    if (!cache.has(key)) {
+        const out = AC.createBuffer(buffer.numberOfChannels, buffer.length, buffer.sampleRate);
+        const k = -6.91 / (key * buffer.sampleRate);
+        for (let c = 0; c < buffer.numberOfChannels; c++) {
+            const from = buffer.getChannelData(c), to = out.getChannelData(c);
+            for (let i = 0; i < from.length; i++) to[i] = from[i] * Math.exp(k * i);
+        }
+        cache.set(key, out);
+    }
+    return cache.get(key);
+}
+/** Pre-delay and damping in front of a convolver (or a send to a shared one). */
+export class RoomColour {
+    constructor(AC) {
+        this.AC = AC;
+        this.input = AC.createGain();
+        this.delay = AC.createDelay(0.2);
+        this.filter = AC.createBiquadFilter();
+        this.filter.type = 'lowpass';
+        this.filter.Q.value = 0.5;
+        this.input.connect(this.delay);
+        this.delay.connect(this.filter);
+        this.setPredelay(ROOM_DEFAULTS.predelay);
+        this.setDamping(ROOM_DEFAULTS.damping);
+    }
+    connect = (destination) => this.filter.connect(destination);
+    setPredelay = (seconds) => this.delay.delayTime.setTargetAtTime(Math.min(0.2, Math.max(0, seconds - ROOM_DEFAULTS.predelay)), this.AC.currentTime, 0.02);
+    setDamping = (hz) => this.filter.frequency.setTargetAtTime(Math.min(20000, 20000 * (Math.max(200, hz) / ROOM_DEFAULTS.damping) ** 1.5), this.AC.currentTime, 0.02);
+}
+
 class Reverb {
     constructor(AC) {
         this.AC = AC;
@@ -119,6 +160,9 @@ class Reverb {
         this.dryGain = new Gain(this.AC);
         this.wetGain = new Gain(this.AC);
         this.node.connect(this.wetGain.getNode());
+        this.colour = new RoomColour(this.AC);
+        this.colour.connect(this.node);
+        this.decay = ROOM_DEFAULTS.decay;
         this.loadedType = null;
 
         this.setAmount(0);
@@ -137,7 +181,7 @@ class Reverb {
     }
 
     // Getters
-    getNode = () => [this.dryGain.getNode(), this.node];
+    getNode = () => [this.dryGain.getNode(), this.colour.input];
     getType = () => this.type;
     getAmount = () => this.wetGain.getGain();
 
@@ -161,15 +205,16 @@ class Reverb {
 
     // Loads the current type's impulse once the reverb can be heard.
     ensureImpulse() {
-        if (this.deferred || this.amount < MIN_WET || this.loadedType === this.type) return;
+        const wanted = `${this.type}|${decayStep(this.decay)}`;
+        if (this.deferred || this.amount < MIN_WET || this.loadedType === wanted) return;
         const type = this.type;
-        this.loadedType = type;
+        this.loadedType = wanted;
         loadImpulse(this.AC, type).then(
             (buffer) => {
-                if (this.type === type) this.node.buffer = buffer;
+                if (this.loadedType === wanted) this.node.buffer = decayedImpulse(this.AC, buffer, this.decay);
             },
             (error) => {
-                if (this.loadedType === type) this.loadedType = null;
+                if (this.loadedType === wanted) this.loadedType = null;
                 console.warn(`Reverb "${type}" could not be loaded; playing dry.`, error);
             },
         );
@@ -193,6 +238,13 @@ class Reverb {
         this.type = val;
         this.ensureImpulse();
     };
+
+    setDecay = (seconds) => {
+        this.decay = Math.max(0.3, seconds);
+        this.ensureImpulse();
+    };
+    setPredelay = (seconds) => this.colour.setPredelay(seconds);
+    setDamping = (hz) => this.colour.setDamping(hz);
 }
 
 export default Reverb;

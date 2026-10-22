@@ -41,6 +41,8 @@ class Transport {
         this.AC = context;
         this.bpm = bpm;
         this.beatsPerBar = beatsPerBar;
+        // a beat's own tempo against bpm (rubato, set by the listener as the beat is booked)
+        this.tempoScale = 1;
         this.baseLookahead = lookahead;
         this.interval = interval;
         this.listeners = new Set();
@@ -84,7 +86,7 @@ class Transport {
     }
 
     get secondsPerBeat() {
-        return 60 / this.bpm;
+        return 60 / (this.bpm * this.tempoScale);
     }
 
     get isRunning() {

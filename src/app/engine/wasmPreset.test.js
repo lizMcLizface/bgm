@@ -21,7 +21,8 @@ it('preserves organ/hollow waveforms and active sine subs rather than substituti
  for(const name of ['Spore Haze','Underwater'])expect(translatedWasmPreset(preset(name)).layers[0]).toMatchObject({waveA:6,sub:0,drift:0,drive:0,lfo2Rate:preset(name).filterLfoRate});
  expect(translatedWasmPreset(preset('Underwater')).global.spread).toBe(4);
  const warm=translatedWasmPreset(preset('Warm Organ'));expect(warm.global.model).toBe(2);expect(warm.layers[1]).toMatchObject({waveA:1,waveB:0,levelA:.5,coarseA:-12});
- const tremolo=translatedWasmPreset(preset('Tremolo Organ'));expect(tremolo.layers[0]).toMatchObject({lfoRate:.7,lfo2Rate:5.5,lfo2Amp:.3});
+ // tremolo and auto-pan are effects after the voice now (engine/voiceFx.js), not its LFOs
+ const tremolo=translatedWasmPreset(preset('Tremolo Organ'));expect(tremolo.layers[0]).toMatchObject({lfo2Amp:0,modDepth1:0,modDepth2:0});
 });
 it('carries the requested delay tone and modulation rates into the translated effect chain',()=>{
  const p=translatedWasmPreset({chorusAmount:.3,chorusRate:.8,chorusDepth:.002,flangerAmount:.2,flangerRate:.1,flangerDepth:.003,flangerDelay:.006,flangerFeedback:.6,delayAmount:.24,delayTime:.3,delayFeedback:.75,delayTone:7775});
@@ -33,4 +34,10 @@ it('exposes unresolved source/effect mappings instead of treating availability a
 });
 it('translates oscillator/envelope/effect controls into bounded source parameters',()=>{
  const {kind,patch:p}=translatedWasmVoice({vcoType:'sawtooth',osc2Type:'square',gainAttack:.7,gainRelease:2,filterFreq:1400,pingPongAmount:.4,pingPongDelayTime:.6,voiceCount:8},32);expect(kind).toBe('subtractive');expect(p.global.polyphony).toBe(16);expect(p.global.unison).toBe(4);expect(p.layers[0]).toMatchObject({waveA:3,waveB:4,attack:.7,release:2,cutoff:1400});expect(p.effects).toMatchObject({pingPong:1,delayMs:600});expect(Object.values(p.global).every(Number.isFinite)).toBe(true);
+});
+
+it('carries the mid EQ band and the room controls into the translated patch',()=>{
+ const p=translatedWasmPreset({reverbAmount:.3,reverbDecay:3,reverbSize:.4,reverbDamping:2500,reverbPredelay:.06,eqMidGain:-4,eqMidFreq:800,eqMidQ:1.2});
+ expect(p.effects).toMatchObject({decay:3,size:.4,damping:2500,predelay:60});expect(p.inserts).toMatchObject({midGain:-4,midFreq:800,midQ:1.2});
+ expect(translatedWasmPreset({reverbAmount:.3}).effects).toMatchObject({decay:8,size:.7,damping:6000,predelay:25});
 });

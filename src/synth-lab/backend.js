@@ -4,6 +4,7 @@ import {parameterTriples,legacyPreset} from './patch';
 import Instrument from '../app/engine/Instrument';
 import {noiseReady} from '../nodes/noiseGenerator';
 import {bitCrusherReady} from '../nodes/bitcrusher';
+import {spaceReady} from '../nodes/space';
 export {synthModule} from './coreModule';
 import {synthModule} from './coreModule';
 const registrations=new WeakMap();
@@ -28,7 +29,7 @@ export class WasmBackend {
  panic(){this.starts.clear();this.node.port.postMessage({type:'panic'});}
  dispose(){this.node.port.postMessage({type:'dispose'});this.node.disconnect();this.node.port.onmessage=null;const port=this.node.port;setTimeout(()=>port.close(),250);}
 }
-const settled=async inst=>{await Promise.all([noiseReady(inst.AC),bitCrusherReady(inst.AC)]);};
+const settled=async inst=>{await Promise.all([noiseReady(inst.AC),bitCrusherReady(inst.AC),spaceReady(inst.AC)]);};
 export class CurrentBackend {
  constructor(context,inst){this.context=context;this.inst=inst;this.kind='current';this.held=new Map();this.pedal=false;this.pending=[];}
  static async create(context,patch){const inst=new Instrument({context,polyphony:patch.global.polyphony,preset:legacyPreset(patch)});await settled(inst);return new CurrentBackend(context,inst);}

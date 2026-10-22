@@ -54,7 +54,7 @@ class Delay {
             this.wetGain.setGain(1);
         }
     }
-    setFeedback = (val) => this.feedbackGain.setGain(val);
+    setFeedback = (val) => this.feedbackGain.setGain(Math.max(0, Math.min(0.95, val))); // below runaway
     setTone = (val) => this.tone.setFreq(val);
     setDelayTime = (val) => {
         if (val < 0 || val > MAX_DELAY_TIME) return false;

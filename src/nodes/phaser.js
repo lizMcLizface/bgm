@@ -3,6 +3,10 @@ import LFO from './lfo';
 
 const MAX_LFO_RATE = 10;
 const MAX_LFO_DEPTH = 1000;
+// The LFO swings the allpasses' frequency by ±depth around the centre; past the centre they would
+// reach 0 Hz, where they stop being stable and the feedback loop runs away (a loud, lasting howl).
+const MAX_SWEEP = 0.8;
+const MAX_FEEDBACK = 0.75;
 
 class Phaser {
     constructor(AC) {
@@ -72,6 +76,7 @@ class Phaser {
         
         this.setAmount(0);
         this.setFeedback(0.3);
+        this.applySweep();
     }
     
     connect = (destination) => {
@@ -110,11 +115,13 @@ class Phaser {
     setDepth = (val) => {
         if (val < 0 || val > MAX_LFO_DEPTH) return false;
         this.depth = val;
-        this.lfo.setDepth(val);
+        this.applySweep();
     }
+
+    applySweep = () => this.lfo.setDepth(Math.min(this.depth, this.frequency * MAX_SWEEP));
     
     setFeedback = (val) => {
-        this.feedback = Math.max(0, Math.min(0.95, val));
+        this.feedback = Math.max(0, Math.min(MAX_FEEDBACK, val));
         this.feedbackGain.setGain(this.feedback);
     }
     
@@ -124,6 +131,7 @@ class Phaser {
         this.allPassFilters.forEach(filter => {
             filter.frequency.setValueAtTime(val, this.AC.currentTime);
         });
+        this.applySweep();
     }
 }
 

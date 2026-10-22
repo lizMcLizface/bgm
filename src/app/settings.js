@@ -22,6 +22,7 @@ import {
 import { AMBIENCE_LAYERS, DEFAULT_AMBIENCE, defaultAmbienceShape } from './engine/ambience';
 import { LAYER_PARAMS, COMMON_PARAMS } from './engine/ambienceSynth';
 import { ROLE_VOLUMES } from './presets';
+import { ARC_SHAPES } from './composition/arc';
 import { defaultWander, defaultAmbienceWander, WANDER_ROLES, WANDER_LIMITS, WANDER_MODES, AMBIENCE_WANDER_LIMITS } from './engine/wander';
 import { DEFAULT_DRUMS, DRUM_STYLES, DRUM_KITS, DRUMS, DRUM_PARAMS, defaultDrumKit } from './percussion';
 import { DEFAULT_DRIFT, DRIFT_MODES, BPM_LIMITS } from './conductor';
@@ -65,6 +66,17 @@ export function defaultSettings() {
         voices: JSON.parse(JSON.stringify(DEFAULT_VOICES)), // per-role octave + wander
         drift: { ...DEFAULT_DRIFT, excludedTonics: [], excludedModes: [] }, // conductor.js
         humanize: { timing: 12, velocity: 0.08, detune: 3 }, // ms, fraction, cents
+        // how the scene plays (composition/dynamics.js): strength and spread of the velocities,
+        // softer notes starting more gently, stronger notes sounding brighter; these values change nothing
+        dynamics: { level: 1, range: 1, attack: 0, brightness: 0 },
+        arc: { shape: 'off', minutes: 20 }, // the energy over a long stretch: rise, wind down or wave (composition/arc.js)
+        timbreDrift: 0, // 0..1: oscillator sounds' colour moves slowly around their own (composition/timbreDrift.js)
+        keyLift: 0, // 0..1: chance that a build lifts the full sections after it a whole step (Generator.planBar)
+        sectionSpace: 0, // 0..1: a wide room the voices send to more in intros and breakdowns (composition/sectionSpace.js)
+        evenLoudness: 0, // 0..1: busy bars turned down and sparse ones up, at most ±4 dB (composition/loudness.js)
+        ducking: 0, // 0..1: the pad (and second lead) dip while a melody plays (engine/ducking.js)
+        ornaments: 0, // 0..1: grace notes, mordents, turns and slow trills on the leads (composition/ornaments.js)
+        rubato: 0, // 0..1: slowing into phrase ends, more into section changes and the ending (composition/rubato.js)
         // Added later (docs/DESIGN.md §9 C), off by default: links only
         // carry what differs from the defaults, so a link made before them
         // must read them as off.
@@ -146,6 +158,15 @@ const RULES = {
         excludedModes: listOf((id) => MODE_IDS.has(id)),
     },
     humanize: { timing: clamp(0, 40), velocity: clamp(0, 0.25), detune: clamp(0, 15) },
+    dynamics: { level: clamp(0.6, 1.2), range: clamp(0, 2), attack: clamp(0, 1), brightness: clamp(0, 1) },
+    rubato: clamp(0, 1),
+    ornaments: clamp(0, 1),
+    ducking: clamp(0, 1),
+    evenLoudness: clamp(0, 1),
+    sectionSpace: clamp(0, 1),
+    keyLift: clamp(0, 1),
+    timbreDrift: clamp(0, 1),
+    arc: { shape: oneOf(Object.keys(ARC_SHAPES)), minutes: clamp(2, 60) },
     swing: clamp(0, 0.6),
     sectionTone: bool,
     drums: { style: oneOf(Object.keys(DRUM_STYLES)), activity: clamp(0, 1), variation: clamp(0, 1), sprinkle: clamp(0, 1), kit: oneOf(Object.keys(DRUM_KITS)) },

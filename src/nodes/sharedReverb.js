@@ -1,5 +1,5 @@
 import Gain from './gain';
-import Reverb, { MIN_WET } from './reverb';
+import Reverb, { MIN_WET, RoomColour, ROOM_DEFAULTS } from './reverb';
 
 // One reverb for all the voices, a choice in the ⚙ menu's Performance section
 // (audio/performance.js). Normally every instrument has a convolver of its own
@@ -31,16 +31,18 @@ class ReverbHub {
         this.output.connect(destination);
     }
 
-    /** The convolver for an impulse type, made (and its impulse loaded) on first use. */
-    bus(type) {
-        if (!this.buses.has(type)) {
+    /** The convolver for an impulse type (and decay), made (and its impulse loaded) on first use. */
+    bus(type, decay = ROOM_DEFAULTS.decay) {
+        const key = `${type}|${Math.round(decay * 10) / 10}`;
+        if (!this.buses.has(key)) {
             const reverb = new Reverb(this.AC);
             reverb.setType(type);
+            reverb.setDecay(decay);
             reverb.setAmount(1); // fully wet: the voices' dry sound goes the other way
             reverb.connect(this.output);
-            this.buses.set(type, reverb);
+            this.buses.set(key, reverb);
         }
-        return this.buses.get(type);
+        return this.buses.get(key);
     }
 
     /** Drops what the convolvers are ringing with (as Instrument.flushTails). */
@@ -70,7 +72,11 @@ export class SendReverb {
         this.dryGain = new Gain(AC);
         this.sendGain = new Gain(AC);
         this.levelGain = new Gain(AC);
-        this.sendGain.connect(this.levelGain.getNode());
+        // each voice's own pre-delay and damping, before the shared convolver
+        this.colour = new RoomColour(AC);
+        this.decay = ROOM_DEFAULTS.decay;
+        this.sendGain.connect(this.colour.input);
+        this.colour.connect(this.levelGain.getNode());
         // the bus the level feeds, and whether the voice is awake (a sleeping
         // voice's send is cut so the chain before it can stop rendering)
         this.bus = null;
@@ -90,6 +96,13 @@ export class SendReverb {
         this.type = val;
         this.route();
     };
+
+    setDecay = (seconds) => {
+        this.decay = Math.max(0.3, seconds);
+        this.route();
+    };
+    setPredelay = (seconds) => this.colour.setPredelay(seconds);
+    setDamping = (hz) => this.colour.setDamping(hz);
 
     getNode = () => [this.dryGain.getNode(), this.sendGain.getNode()];
 
@@ -125,7 +138,7 @@ export class SendReverb {
 
     // Connects the level to the bus for the current type - or to none.
     route() {
-        const bus = this.wanted ? this.hub.bus(this.type) : null;
+        const bus = this.wanted ? this.hub.bus(this.type, this.decay) : null;
         const target = bus && !this.asleep ? bus : null;
         if (target === this.bus) return;
         if (this.bus) this.levelGain.disconnect();
@@ -134,7 +147,7 @@ export class SendReverb {
     }
 
     get settled() {
-        return !this.wanted || Boolean(this.hub.bus(this.type).node.buffer);
+        return !this.wanted || Boolean(this.hub.bus(this.type, this.decay).node.buffer);
     }
 
     // What Instrument.tailSeconds and flushTails look at: nothing here, the hub owns the tails.

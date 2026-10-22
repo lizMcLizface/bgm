@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { defineConfig } from 'vite';
+import { configDefaults } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 
 // GitHub Pages redirects /labs/strings to /labs/strings/; Vite's dev and preview
@@ -89,6 +90,8 @@ export default defineConfig(({ mode }) => {
     test: {
         environment: 'jsdom',
         globals: true,
+        // .tmp/ holds local scratch experiments (git-ignored), not the suite
+        exclude: [...configDefaults.exclude, '.tmp/**'],
     },
   };
 });

@@ -1180,6 +1180,8 @@ const GenerativeApp = () => {
     // Smoothly (the ⚙ menu, on by default) the whole change waits for the next chord, and the
     // sounds then glide over that chord instead of switching.
     const [smoothPresets, setSmoothPresets] = useStoredFlag('bgm-smooth-presets', true);
+    // (smooth changes also pivot into a new key and glide to a new tempo, Generator.planHomeChange)
+    useEffect(() => { gen.smoothChanges = smoothPresets; }, [gen, smoothPresets]);
     const [backdropOn, setBackdropOn] = useStoredFlag('bgm-backdrop', false);
     const [fluidReset, setFluidReset] = useState(0);
     const [storedBackdropOptions, setBackdropOptions] = useStoredFlag('bgm-backdrop-options', BACKDROP_DEFAULTS);
