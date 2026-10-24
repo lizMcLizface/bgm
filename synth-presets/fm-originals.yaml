@@ -212,6 +212,7 @@ programs:
       effects.quality: 1
       effects.bypass: 0
       effects.reverbReturn: 0
+      effects.reflections: 0
       inserts.bypass: 0
       inserts.saturation: 0
       inserts.drive: 6
@@ -466,6 +467,7 @@ programs:
       effects.quality: 1
       effects.bypass: 0
       effects.reverbReturn: 0
+      effects.reflections: 0
       inserts.bypass: 0
       inserts.saturation: 0
       inserts.drive: 6
@@ -720,6 +722,7 @@ programs:
       effects.quality: 1
       effects.bypass: 0
       effects.reverbReturn: 0
+      effects.reflections: 0
       inserts.bypass: 0
       inserts.saturation: 0
       inserts.drive: 6
@@ -974,6 +977,7 @@ programs:
       effects.quality: 1
       effects.bypass: 0
       effects.reverbReturn: 0
+      effects.reflections: 0
       inserts.bypass: 0
       inserts.saturation: 0
       inserts.drive: 6
@@ -1228,6 +1232,7 @@ programs:
       effects.quality: 1
       effects.bypass: 0
       effects.reverbReturn: 0
+      effects.reflections: 0
       inserts.bypass: 0
       inserts.saturation: 0
       inserts.drive: 6
@@ -1482,6 +1487,7 @@ programs:
       effects.quality: 1
       effects.bypass: 0
       effects.reverbReturn: 0
+      effects.reflections: 0
       inserts.bypass: 0
       inserts.saturation: 0
       inserts.drive: 6
@@ -1736,6 +1742,7 @@ programs:
       effects.quality: 1
       effects.bypass: 0
       effects.reverbReturn: 0
+      effects.reflections: 0
       inserts.bypass: 0
       inserts.saturation: 0
       inserts.drive: 6
@@ -1990,6 +1997,7 @@ programs:
       effects.quality: 1
       effects.bypass: 0
       effects.reverbReturn: 0
+      effects.reflections: 0
       inserts.bypass: 0
       inserts.saturation: 0
       inserts.drive: 6
@@ -2244,6 +2252,7 @@ programs:
       effects.quality: 1
       effects.bypass: 0
       effects.reverbReturn: 0
+      effects.reflections: 0
       inserts.bypass: 0
       inserts.saturation: 0
       inserts.drive: 6
@@ -2498,6 +2507,7 @@ programs:
       effects.quality: 1
       effects.bypass: 0
       effects.reverbReturn: 0
+      effects.reflections: 0
       inserts.bypass: 0
       inserts.saturation: 0
       inserts.drive: 6
@@ -2752,6 +2762,7 @@ programs:
       effects.quality: 1
       effects.bypass: 0
       effects.reverbReturn: 0
+      effects.reflections: 0
       inserts.bypass: 0
       inserts.saturation: 0
       inserts.drive: 6

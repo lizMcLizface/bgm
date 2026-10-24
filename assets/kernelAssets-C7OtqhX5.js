@@ -1,1 +1,0 @@
-const c="5c916640dd4bf334",f="dc3a35773e3d3368",t="47d809fef220b3f2",n="a49d06d9072f0b86",o="c3ac876909747e26",a={percussion:c,core:f,effects:t,fm:n,"fm-simd":"1f41fcbda160af44","fm-bank":"117403de644b12ea","core-acoustic":"6c96e44a6d1b3ee6","fm-fast":"036b9a7171b79152",inserts:o},d=(s,e)=>`/synth-lab/${e}?v=${a[s]}`;export{d as k};
