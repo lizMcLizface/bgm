@@ -173,6 +173,11 @@ const PRESET_DEFAULTS = {
     pianoHammer: .3,
     pianoUnison: .25,
     pianoSeed: 1,
+    pianoWear: 0,
+    pianoTemperament: 'equal',
+    pianoTonic: 'C',
+    pianoA4: 440,
+    pianoStretch: 0,
 };
 
 export default PRESET_DEFAULTS;

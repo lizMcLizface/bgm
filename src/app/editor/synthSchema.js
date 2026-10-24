@@ -6,6 +6,8 @@
 // spectrum views and theme picker.
 
 import { WAVEFORM, FILTER, REVERB, ENVELOPE_SHAPE, NOISE } from '../../util/util';
+import { TEMPERAMENTS, TONICS } from '../engine/temperament';
+import { isAcousticPiano } from '../engine/acousticPiano';
 
 const knob = (key, label, props = {}, disabled) => ({ kind: 'knob', key, label, props, disabled });
 const select = (key, label, options, disabled) => ({ kind: 'select', key, label, options, disabled });
@@ -21,13 +23,20 @@ const SYNTH_SCHEMA = [
         { kind: 'choice', key: 'stringModel', label: 'Source', options: { oscillator: 'Oscillator', plucked: 'Plucked string', piano: 'Piano' } },
     ] },
     { label: 'Piano', columns: 4, controls: [
-        { kind: 'choice', key: 'pianoType', label: 'Piano tone', options: { felt: 'Felt', electric: 'Electric' } },
+        { kind: 'choice', key: 'pianoType', label: 'Piano tone', options: { felt: 'Felt', electric: 'Electric', grand: 'Grand', felted: 'Felted', upright: 'Upright', ambient: 'Ambient', glass: 'Glass grand', drama: 'Soft drama', soft: 'Soft piano', subdued: 'Subdued', concert: 'Concert grand' } },
         knob('pianoDecay', 'Decay', { modifier: 4.7, offset: .3, min: .3, max: 5, resetValue: 2.5 }),
         knob('pianoResonance', 'Resonance', { min: 0, max: 1, resetValue: 0 }),
         knob('pianoSustain', 'Held body', { min: 0, max: 1, resetValue: .28 }),
         knob('pianoBrightness', 'Brightness', { min: 0, max: 1, resetValue: .45 }),
         knob('pianoHammer', 'Hammer', { min: 0, max: 1, resetValue: .3 }),
         knob('pianoUnison', 'Unison', { min: 0, max: 1, resetValue: .25 }),
+        knob('pianoWear', 'Age', { min: 0, max: 1, resetValue: 0 }, (p) => !isAcousticPiano(p.pianoType)),
+    ] },
+    { label: 'Piano tuning', columns: 4, controls: [
+        { kind: 'choice', key: 'pianoTemperament', label: 'Temperament', options: TEMPERAMENTS },
+        { kind: 'choice', key: 'pianoTonic', label: 'Centred on', options: Object.fromEntries(TONICS.map((t) => [t, t])) },
+        knob('pianoA4', 'A4 pitch', { modifier: 100, offset: 380, min: 380, max: 480, resetValue: 440, decimalPlaces: 1 }),
+        knob('pianoStretch', 'Stretch', { min: 0, max: 1, resetValue: 0 }),
     ] },
     { label: 'Plucked string', columns: 4, controls: [
         knob('stringDecay', 'Decay', { modifier: 4.85, offset: .15, min: .15, max: 5, resetValue: 2 }),

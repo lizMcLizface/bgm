@@ -67,6 +67,7 @@ export function normalizeScene(raw, defaultCategory = MINE.id) {
     return {
         name,
         ...(raw.isNew === true ? { isNew: true } : {}),
+        ...(raw.isUpdated === true ? { isUpdated: true } : {}),
         ...(raw.hidden === true ? { hidden: true } : {}),
         ...(text(raw.comparisonOf,60) ? {comparisonOf:text(raw.comparisonOf,60)} : {}),
         ...(text(raw.comparisonSource,60) ? {comparisonSource:text(raw.comparisonSource,60)} : {}),

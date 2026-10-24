@@ -51,7 +51,7 @@ function summary(scene) {
 
 const matches = (scene, query) => {
     const words = query.toLowerCase().split(/\s+/).filter(Boolean);
-    const haystack = [scene.name, scene.blurb, ...(scene.tags || []),scene.isNew?'new':'',sceneUsesWasm(scene)?'wasm only':'',percussionVoice(scene.settings.drums?.kit).name,DRUM_STYLES[scene.settings.drums?.style]].join(' ').toLowerCase();
+    const haystack = [scene.name, scene.blurb, ...(scene.tags || []),scene.isNew?'new':'',scene.isUpdated?'updated':'',sceneUsesWasm(scene)?'wasm only':'',percussionVoice(scene.settings.drums?.kit).name,DRUM_STYLES[scene.settings.drums?.style]].join(' ').toLowerCase();
     return words.every((word) => haystack.includes(word));
 };
 
@@ -63,7 +63,7 @@ const Card = ({ scene, active, onPick, onRemove }) => {
                 title="Click: apply as set above. Shift-click: composition only. Ctrl-click: sounds only.">
                 <span className="gen-pb-level" style={{ background: viridis(level) }} title={`${intensityLabel(level)} (${Math.round(level * 100)}%)`} />
                 <strong>{scene.name}</strong>
-                <PresetBadges isNew={scene.isNew} wasm={sceneUsesWasm(scene)}/>
+                <PresetBadges isNew={scene.isNew} isUpdated={scene.isUpdated} wasm={sceneUsesWasm(scene)}/>
                 {scene.blurb && <span className="gen-pb-blurb">{scene.blurb}</span>}
                 <span className="gen-pb-meta">{line} · {intensityLabel(level).toLowerCase()}</span>
                 {chips.length > 0 && <span className="gen-pb-chips">{chips.map((chip) => <span key={chip}>{chip}</span>)}</span>}

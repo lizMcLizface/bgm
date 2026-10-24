@@ -134,6 +134,97 @@
         "volumes": {
           "pad": 0.76,
           "bass": 0.75,
+          "lead": 0.45,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.2
+        },
+        "ambienceVolume": 0.45
+      },
+      "voices": {
+        "pad": "Felt Piano (updated)",
+        "bass": "Thump Bass",
+        "lead": "Measured Flute"
+      },
+      "tags": [
+        "updated"
+      ],
+      "isUpdated": true
+    },
+    {
+      "name": "Rainy café (previous piano)",
+      "category": "cozy",
+      "blurb": "Felt piano and a lazy lo-fi beat, rain on the window",
+      "settings": {
+        "tonic": 2,
+        "mode": "Major-2",
+        "bpm": 76,
+        "progression": 7,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 36,
+          "pulse": 40,
+          "arpeggio": 16,
+          "sequence": 0,
+          "rolled": 8,
+          "stacked": 0
+        },
+        "drums": {
+          "style": "lofi",
+          "activity": 0.51,
+          "variation": 0.64,
+          "sprinkle": 0.09
+        },
+        "swing": 0.35,
+        "sectionTone": true,
+        "ambience": {
+          "rain": 0.4,
+          "vinyl": 0.25
+        },
+        "playAmbience": true,
+        "leadActivity": 0.58,
+        "leadDensity": 0.18,
+        "leadLeaps": 0.28,
+        "leadRepeat": 0.38,
+        "humanize": {
+          "timing": 13,
+          "velocity": 0.1,
+          "detune": 2
+        },
+        "dynamics": {
+          "level": 0.95,
+          "range": 0.9,
+          "attack": 0.3,
+          "brightness": 0.3
+        },
+        "rubato": 0.4,
+        "ornaments": 0.3,
+        "ducking": 0.4,
+        "evenLoudness": 0.4,
+        "sectionSpace": 0.4,
+        "keyLift": 0,
+        "timbreDrift": 0.3,
+        "bassWeights": {
+          "whole": 42,
+          "half": 50,
+          "walking": 8,
+          "drive": 0
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
           "lead": 0.66,
           "counter": 0.48,
           "perc": 0.5
@@ -152,7 +243,8 @@
         "pad": "Felt Piano",
         "bass": "Thump Bass",
         "lead": "Reed Lead"
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Late-night brushes",
@@ -1064,10 +1156,95 @@
         }
       },
       "voices": {
+        "pad": "Soft Keys (updated)",
+        "bass": "Round Pluck Bass",
+        "lead": "Kalimba Pluck"
+      },
+      "tags": [
+        "updated"
+      ],
+      "isUpdated": true
+    },
+    {
+      "name": "Morning coffee (previous piano)",
+      "category": "cozy",
+      "blurb": "Soft keys, a round bass and a kalimba, a light swung beat",
+      "settings": {
+        "tonic": 0,
+        "mode": "Major-1",
+        "bpm": 94,
+        "progression": 1,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 26,
+          "pulse": 52,
+          "arpeggio": 16,
+          "sequence": 0,
+          "rolled": 6,
+          "stacked": 0
+        },
+        "drums": {
+          "style": "lofi",
+          "activity": 0.31,
+          "variation": 0.57,
+          "sprinkle": 0.09
+        },
+        "swing": 0.2,
+        "leadActivity": 0.56,
+        "leadDensity": 0.24,
+        "leadLeaps": 0.34,
+        "leadRepeat": 0.38,
+        "humanize": {
+          "timing": 11,
+          "velocity": 0.1,
+          "detune": 1
+        },
+        "dynamics": {
+          "level": 0.95,
+          "range": 0.9,
+          "attack": 0.3,
+          "brightness": 0.3
+        },
+        "rubato": 0.4,
+        "ornaments": 0.3,
+        "ducking": 0.4,
+        "evenLoudness": 0.4,
+        "sectionSpace": 0.4,
+        "keyLift": 0,
+        "timbreDrift": 0.3,
+        "bassWeights": {
+          "whole": 42,
+          "half": 50,
+          "walking": 8,
+          "drive": 0
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "chordColour": {
+          "mode": "add6",
+          "amount": 0.2
+        }
+      },
+      "voices": {
         "pad": "Soft Keys",
         "bass": "Round Pluck Bass",
         "lead": "Kalimba Pluck"
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Clockwork",
@@ -1597,10 +1774,95 @@
         }
       },
       "voices": {
+        "pad": "Soft Keys (updated)",
+        "bass": "Upright Pluck",
+        "lead": "Soft Flute"
+      },
+      "tags": [
+        "updated"
+      ],
+      "isUpdated": true
+    },
+    {
+      "name": "Dorian walk (previous piano)",
+      "category": "focus",
+      "blurb": "ii-V-I in Dorian: seventh chords, a walking upright bass and a flute",
+      "settings": {
+        "tonic": 9,
+        "mode": "Major-2",
+        "bpm": 100,
+        "progression": 16,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 32,
+          "pulse": 44,
+          "arpeggio": 18,
+          "sequence": 0,
+          "rolled": 6,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 20,
+          "walking": 80,
+          "drive": 0
+        },
+        "drums": {
+          "style": "brushes",
+          "activity": 0.56,
+          "variation": 0.64,
+          "sprinkle": 0.09
+        },
+        "swing": 0.45,
+        "leadActivity": 0.58,
+        "leadDensity": 0.28,
+        "leadLeaps": 0.36,
+        "leadRepeat": 0.34,
+        "humanize": {
+          "timing": 12,
+          "velocity": 0.11,
+          "detune": 2
+        },
+        "dynamics": {
+          "level": 0.9,
+          "range": 0.6,
+          "attack": 0.35,
+          "brightness": 0.2
+        },
+        "rubato": 0.25,
+        "ornaments": 0.4,
+        "ducking": 0.5,
+        "evenLoudness": 0.7,
+        "sectionSpace": 0.3,
+        "keyLift": 0,
+        "timbreDrift": 0.2,
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.2
+        }
+      },
+      "voices": {
         "pad": "Soft Keys",
         "bass": "Upright Pluck",
         "lead": "Soft Flute"
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Breathing room",
@@ -2376,13 +2638,159 @@
       "category": "starship",
       "blurb": "Galaxy-map spirit (Mass Effect 2): a felt piano over a slow rubbery pulse, an echoing arpeggio and a deep flanged void pad, no drums, lots of space",
       "tags": [
+        "ambient",
+        "galaxy-map",
+        "mass-effect",
+        "slow",
+        "space",
+        "updated"
+      ],
+      "settings": {
+        "tonic": 2,
+        "mode": "Major-6",
+        "bpm": 88,
+        "progression": 17,
+        "barsPerChord": 4,
+        "padNotes": 4,
+        "chordSpread": "open",
+        "padWeights": {
+          "sustain": 10,
+          "pulse": 0,
+          "arpeggio": 50,
+          "sequence": 40,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "arpWeights": {
+          "bounce": 30,
+          "up": 40,
+          "down": 10,
+          "broken": 20
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0,
+          "drive": 0
+        },
+        "pedal": {
+          "mode": "tonic",
+          "amount": 0.6
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.4
+        },
+        "leadActivity": 1,
+        "leadDensity": 0.05,
+        "leadLeaps": 0.3,
+        "leadRepeat": 0.55,
+        "leadScale": "pentatonic",
+        "leadEnding": "open",
+        "counter": {
+          "mode": "line",
+          "activity": 0.25
+        },
+        "drums": {
+          "style": "off",
+          "activity": 0,
+          "variation": 0,
+          "sprinkle": 0
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "humanize": {
+          "timing": 6,
+          "velocity": 0.08,
+          "detune": 1
+        },
+        "dynamics": {
+          "level": 1,
+          "range": 0.8,
+          "attack": 0.15,
+          "brightness": 0.3
+        },
+        "rubato": 0.1,
+        "ornaments": 0.1,
+        "ducking": 0.3,
+        "evenLoudness": 0.5,
+        "sectionSpace": 0.5,
+        "keyLift": 0.15,
+        "timbreDrift": 0.5,
+        "padMotion": {
+          "lean": 0.2,
+          "fast": 0.15,
+          "swell": 0.08
+        },
+        "voices": {
+          "counter": {
+            "octave": 1,
+            "wander": "off",
+            "chance": 0.3
+          }
+        },
+        "volumes": {
+          "pad": 0.62,
+          "bass": 0.44,
+          "lead": 0.36,
+          "counter": 0.63,
+          "perc": 0
+        },
+        "ambience": {},
+        "playAmbience": false,
+        "arc": {
+          "shape": "wave",
+          "minutes": 15
+        }
+      },
+      "voices": {
+        "lead": "Starmap Piano (updated)",
+        "counter": "Starmap Arp",
+        "pad": "Starmap Pulse",
+        "bass": "Starmap Void"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "tempo-effects": {
+            "enabled": true
+          },
+          "section-cadences": {
+            "enabled": false
+          },
+          "melodic-slides": {
+            "enabled": false
+          },
+          "chord-slides": {
+            "enabled": false
+          },
+          "pad-pitch-motion": {
+            "enabled": false
+          },
+          "bass-pitch-motion": {
+            "enabled": false
+          },
+          "gate-envelopes": {
+            "enabled": false
+          }
+        }
+      },
+      "isUpdated": true
+    },
+    {
+      "name": "Plotting a Course (previous piano)",
+      "category": "starship",
+      "blurb": "Galaxy-map spirit (Mass Effect 2): a felt piano over a slow rubbery pulse, an echoing arpeggio and a deep flanged void pad, no drums, lots of space",
+      "tags": [
         "mass-effect",
         "galaxy-map",
         "space",
         "ambient",
         "slow"
       ],
-      "isNew": true,
       "settings": {
         "tonic": 2,
         "mode": "Major-6",
@@ -2515,7 +2923,8 @@
             "enabled": false
           }
         }
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Bounty Hunter Basement",
@@ -4512,6 +4921,88 @@
       "category": "sandbox",
       "blurb": "Slow felt piano and a lone flute while it rains",
       "tags": [
+        "cozy",
+        "rain",
+        "stardew",
+        "updated"
+      ],
+      "settings": {
+        "tonic": 9,
+        "mode": "Major-6",
+        "bpm": 72,
+        "progression": 15,
+        "barsPerChord": 1,
+        "padNotes": 4,
+        "leadActivity": 0.32,
+        "padWeights": {
+          "sustain": 60,
+          "pulse": 24,
+          "arpeggio": 10,
+          "sequence": 0,
+          "rolled": 6,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 70,
+          "half": 30,
+          "walking": 0,
+          "drive": 0
+        },
+        "ambience": {
+          "rain": 0.5
+        },
+        "playAmbience": true,
+        "leadDensity": 0.1,
+        "leadLeaps": 0.24,
+        "leadRepeat": 0.46,
+        "humanize": {
+          "timing": 12,
+          "velocity": 0.09,
+          "detune": 2
+        },
+        "dynamics": {
+          "level": 0.95,
+          "range": 1,
+          "attack": 0.2,
+          "brightness": 0.3
+        },
+        "rubato": 0.3,
+        "ornaments": 0.35,
+        "ducking": 0.4,
+        "evenLoudness": 0.4,
+        "sectionSpace": 0.4,
+        "keyLift": 0.25,
+        "timbreDrift": 0.2,
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "ambienceVolume": 0.45
+      },
+      "voices": {
+        "pad": "Felt Piano (updated)",
+        "bass": "Felt Bass",
+        "lead": "Pan Flute"
+      },
+      "isUpdated": true
+    },
+    {
+      "name": "Rainy Day, Chickens Inside (previous piano)",
+      "category": "sandbox",
+      "blurb": "Slow felt piano and a lone flute while it rains",
+      "tags": [
         "stardew",
         "rain",
         "cozy"
@@ -4585,10 +5076,99 @@
         "pad": "Felt Piano",
         "bass": "Felt Bass",
         "lead": "Pan Flute"
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Pint-Sized Saloon",
+      "category": "sandbox",
+      "blurb": "Swung keys, a walking upright bass and an accordion, brushed lightly",
+      "tags": [
+        "stardew",
+        "swing",
+        "tavern",
+        "updated"
+      ],
+      "settings": {
+        "tonic": 0,
+        "mode": "Major-1",
+        "bpm": 116,
+        "progression": 16,
+        "barsPerChord": 1,
+        "padNotes": 4,
+        "leadActivity": 0.74,
+        "padWeights": {
+          "sustain": 20,
+          "pulse": 42,
+          "arpeggio": 28,
+          "sequence": 0,
+          "rolled": 10,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 30,
+          "walking": 70,
+          "drive": 0
+        },
+        "drums": {
+          "style": "brushes",
+          "activity": 0.51,
+          "variation": 0.57,
+          "sprinkle": 0.09
+        },
+        "swing": 0.45,
+        "leadDensity": 0.46,
+        "leadLeaps": 0.38,
+        "leadRepeat": 0.38,
+        "humanize": {
+          "timing": 11,
+          "velocity": 0.12,
+          "detune": 2
+        },
+        "dynamics": {
+          "level": 0.95,
+          "range": 1,
+          "attack": 0.2,
+          "brightness": 0.3
+        },
+        "rubato": 0.3,
+        "ornaments": 0.5,
+        "ducking": 0.4,
+        "evenLoudness": 0.4,
+        "sectionSpace": 0.4,
+        "keyLift": 0.25,
+        "timbreDrift": 0.2,
+        "padMotion": {
+          "lean": 0.36,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "breakdowns": {
+          "meter": "12/8",
+          "halfTime": false
+        }
+      },
+      "voices": {
+        "pad": "Soft Keys (updated)",
+        "bass": "Upright Pluck",
+        "lead": "Squeezebox"
+      },
+      "isUpdated": true
+    },
+    {
+      "name": "Pint-Sized Saloon (previous piano)",
       "category": "sandbox",
       "blurb": "Swung keys, a walking upright bass and an accordion, brushed lightly",
       "tags": [
@@ -4671,7 +5251,8 @@
         "pad": "Soft Keys",
         "bass": "Upright Pluck",
         "lead": "Squeezebox"
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Block Forest",
@@ -4971,6 +5552,143 @@
       "category": "classics",
       "blurb": "Metroid Prime · Phendrana Drifts: clear piano ripples, celesta glints and a quiet glassy horizon",
       "tags": [
+        "ice",
+        "metroid",
+        "phendrana",
+        "prime",
+        "updated"
+      ],
+      "settings": {
+        "tonic": 6,
+        "mode": "Major-2",
+        "bpm": 92,
+        "progression": 13,
+        "barsPerChord": 2,
+        "padNotes": 3,
+        "leadActivity": 0.55,
+        "leadDensity": 0.15,
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 0,
+          "arpeggio": 100,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0,
+          "drive": 0
+        },
+        "counter": {
+          "mode": "line",
+          "activity": 0.2
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "ambience": {
+          "wind": 0.15
+        },
+        "ambienceShape": {
+          "wind": {
+            "distance": 0.5,
+            "speed": 0.4
+          }
+        },
+        "playAmbience": true,
+        "wander": {
+          "period": 70
+        },
+        "leadLeaps": 0.25,
+        "leadRepeat": 0.65,
+        "humanize": {
+          "timing": 6,
+          "velocity": 0.08,
+          "detune": 1
+        },
+        "dynamics": {
+          "level": 1,
+          "range": 1.1,
+          "attack": 0,
+          "brightness": 0.4
+        },
+        "rubato": 0.15,
+        "ornaments": 0.3,
+        "ducking": 0.3,
+        "evenLoudness": 0.4,
+        "sectionSpace": 0.3,
+        "keyLift": 0.35,
+        "timbreDrift": 0.5,
+        "padMotion": {
+          "lean": 0.15,
+          "fast": 0.1,
+          "swell": 0.04
+        },
+        "volumes": {
+          "pad": 0.65,
+          "bass": 0.36,
+          "lead": 0.22,
+          "counter": 0.28,
+          "perc": 0.35
+        },
+        "ambienceVolume": 0.4,
+        "chordBorrow": 0,
+        "leadEnding": "open",
+        "swing": 0,
+        "arpWeights": {
+          "bounce": 55,
+          "up": 15,
+          "down": 10,
+          "broken": 20
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.55
+        }
+      },
+      "voices": {
+        "pad": "Felt Piano (updated)",
+        "bass": "Sub Bass",
+        "lead": "Celesta",
+        "counter": "Glass Pad"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "section-cadences": {
+            "enabled": false
+          },
+          "common-tone-bridges": {
+            "enabled": false
+          },
+          "melodic-slides": {
+            "enabled": false
+          },
+          "chord-slides": {
+            "enabled": false
+          },
+          "pad-pitch-motion": {
+            "enabled": false
+          },
+          "bass-pitch-motion": {
+            "enabled": false
+          },
+          "harmonic-pacing": {
+            "enabled": false
+          }
+        }
+      },
+      "isUpdated": true
+    },
+    {
+      "name": "Cold Drifts, Warm Socks (previous piano)",
+      "category": "classics",
+      "blurb": "Metroid Prime · Phendrana Drifts: clear piano ripples, celesta glints and a quiet glassy horizon",
+      "tags": [
         "metroid",
         "prime",
         "phendrana",
@@ -5099,7 +5817,8 @@
             "enabled": false
           }
         }
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Cold Drifts, Warm Socks v1",
@@ -5696,6 +6415,154 @@
       "category": "classics",
       "blurb": "Metroid Prime · Chozo Ruins: quick felt-piano patterns, a soft saw melody and light percussion through the ruins",
       "tags": [
+        "chozo",
+        "metroid",
+        "prime",
+        "rain",
+        "ruins",
+        "tallon",
+        "updated"
+      ],
+      "settings": {
+        "tonic": 2,
+        "mode": "Major-6",
+        "bpm": 128,
+        "progression": 13,
+        "barsPerChord": 2,
+        "padNotes": 3,
+        "leadActivity": 0.65,
+        "leadDensity": 0.25,
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 30,
+          "arpeggio": 35,
+          "sequence": 35,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 65,
+          "walking": 0,
+          "drive": 35
+        },
+        "drums": {
+          "style": "shaker",
+          "activity": 0.25,
+          "variation": 0.3,
+          "sprinkle": 0.05,
+          "kit": "felt"
+        },
+        "counter": {
+          "mode": "answer",
+          "activity": 0.2
+        },
+        "ambience": {
+          "rain": 0.12,
+          "wind": 0.08
+        },
+        "playAmbience": true,
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "leadLeaps": 0.25,
+        "leadRepeat": 0.65,
+        "humanize": {
+          "timing": 4,
+          "velocity": 0.08,
+          "detune": 1
+        },
+        "dynamics": {
+          "level": 1,
+          "range": 1.1,
+          "attack": 0,
+          "brightness": 0.4
+        },
+        "rubato": 0.15,
+        "ornaments": 0.4,
+        "ducking": 0.3,
+        "evenLoudness": 0.4,
+        "sectionSpace": 0.3,
+        "keyLift": 0.35,
+        "timbreDrift": 0.1,
+        "padMotion": {
+          "lean": 0.15,
+          "fast": 0.1,
+          "swell": 0.04
+        },
+        "volumes": {
+          "pad": 0.65,
+          "bass": 0.48,
+          "lead": 0.5,
+          "counter": 0.2,
+          "perc": 0.4
+        },
+        "ambienceVolume": 0.3,
+        "chordBorrow": 0,
+        "leadEnding": "open",
+        "swing": 0,
+        "pulseWeights": {
+          "groups": 40,
+          "beats": 25,
+          "push": 10,
+          "split": 25
+        },
+        "arpWeights": {
+          "bounce": 15,
+          "up": 20,
+          "down": 10,
+          "broken": 55
+        },
+        "chordColour": {
+          "mode": "sus2",
+          "amount": 0.4
+        },
+        "pedal": {
+          "mode": "tonic",
+          "amount": 0.35
+        }
+      },
+      "voices": {
+        "pad": "Felt Piano (updated)",
+        "bass": "Deep Throb",
+        "lead": "Soft Saw Lead",
+        "counter": "Spore Haze"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "section-cadences": {
+            "enabled": false
+          },
+          "common-tone-bridges": {
+            "enabled": false
+          },
+          "melodic-slides": {
+            "enabled": false
+          },
+          "chord-slides": {
+            "enabled": false
+          },
+          "pad-pitch-motion": {
+            "enabled": false
+          },
+          "bass-pitch-motion": {
+            "enabled": false
+          },
+          "harmonic-pacing": {
+            "enabled": false
+          }
+        }
+      },
+      "isUpdated": true
+    },
+    {
+      "name": "Ruins in the Drizzle (previous piano)",
+      "category": "classics",
+      "blurb": "Metroid Prime · Chozo Ruins: quick felt-piano patterns, a soft saw melody and light percussion through the ruins",
+      "tags": [
         "metroid",
         "prime",
         "tallon",
@@ -5835,7 +6702,8 @@
             "enabled": false
           }
         }
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Ruins in the Drizzle v1",
@@ -6096,6 +6964,103 @@
         }
       },
       "voices": {
+        "pad": "Felt Piano (updated)",
+        "bass": "Felt Bass",
+        "lead": "Celesta"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "lead-pickups": {
+            "enabled": false
+          },
+          "lead-transitions": {
+            "enabled": false
+          },
+          "section-suspensions": {
+            "enabled": false
+          },
+          "section-gestures": {
+            "enabled": false
+          },
+          "section-cadences": {
+            "enabled": false
+          }
+        }
+      },
+      "tags": [
+        "updated"
+      ],
+      "isUpdated": true
+    },
+    {
+      "name": "Quiet Studio (previous piano)",
+      "category": "podcast",
+      "blurb": "Felt keys, one gentle chord per bar and a rare high note",
+      "settings": {
+        "tonic": 7,
+        "mode": "Major-1",
+        "bpm": 72,
+        "progression": 6,
+        "barsPerChord": 2,
+        "padNotes": 3,
+        "leadActivity": 0.1,
+        "padWeights": {
+          "sustain": 80,
+          "pulse": 16,
+          "arpeggio": 0,
+          "sequence": 0,
+          "rolled": 4,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "off"
+        },
+        "humanize": {
+          "timing": 7,
+          "velocity": 0.06,
+          "detune": 1
+        },
+        "dynamics": {
+          "level": 0.85,
+          "range": 0.45,
+          "attack": 0.6,
+          "brightness": 0.15
+        },
+        "rubato": 0.2,
+        "ornaments": 0,
+        "ducking": 0.6,
+        "evenLoudness": 0.8,
+        "sectionSpace": 0.2,
+        "keyLift": 0,
+        "timbreDrift": 0.15,
+        "leadDensity": 0.05,
+        "leadLeaps": 0.2,
+        "leadRepeat": 0.58,
+        "padMotion": {
+          "lean": 0.12,
+          "fast": 0,
+          "swell": 0.025
+        },
+        "volumes": {
+          "pad": 0.73,
+          "bass": 0.66,
+          "lead": 0.48,
+          "counter": 0.4,
+          "perc": 0.38
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        }
+      },
+      "voices": {
         "pad": "Felt Piano",
         "bass": "Felt Bass",
         "lead": "Celesta"
@@ -6119,7 +7084,8 @@
             "enabled": false
           }
         }
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Soft Landing",
@@ -6484,6 +7450,107 @@
         }
       },
       "voices": {
+        "pad": "Soft Keys (updated)",
+        "bass": "Round Pluck Bass",
+        "lead": "Kalimba Pluck"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "lead-pickups": {
+            "enabled": false
+          },
+          "lead-transitions": {
+            "enabled": false
+          },
+          "section-suspensions": {
+            "enabled": false
+          },
+          "section-gestures": {
+            "enabled": false
+          },
+          "section-cadences": {
+            "enabled": false
+          }
+        }
+      },
+      "tags": [
+        "updated"
+      ],
+      "isUpdated": true
+    },
+    {
+      "name": "Upbeat Explainer (previous piano)",
+      "category": "podcast",
+      "blurb": "Brighter major keys and a light shaker for a lively, friendly episode",
+      "settings": {
+        "tonic": 7,
+        "mode": "Major-1",
+        "bpm": 98,
+        "progression": 1,
+        "barsPerChord": 2,
+        "padNotes": 3,
+        "leadActivity": 0.12,
+        "padWeights": {
+          "sustain": 52,
+          "pulse": 36,
+          "arpeggio": 8,
+          "sequence": 0,
+          "rolled": 4,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 60,
+          "half": 40,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "shaker",
+          "activity": 0.26,
+          "variation": 0.485,
+          "sprinkle": 0.03
+        },
+        "swing": 0.2,
+        "leadDensity": 0.08,
+        "leadLeaps": 0.22,
+        "leadRepeat": 0.5,
+        "humanize": {
+          "timing": 6,
+          "velocity": 0.06,
+          "detune": 1
+        },
+        "dynamics": {
+          "level": 0.85,
+          "range": 0.45,
+          "attack": 0.6,
+          "brightness": 0.15
+        },
+        "rubato": 0.2,
+        "ornaments": 0,
+        "ducking": 0.6,
+        "evenLoudness": 0.8,
+        "sectionSpace": 0.2,
+        "keyLift": 0,
+        "timbreDrift": 0.15,
+        "padMotion": {
+          "lean": 0.12,
+          "fast": 0,
+          "swell": 0.025
+        },
+        "volumes": {
+          "pad": 0.73,
+          "bass": 0.66,
+          "lead": 0.48,
+          "counter": 0.4,
+          "perc": 0.38
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        }
+      },
+      "voices": {
         "pad": "Soft Keys",
         "bass": "Round Pluck Bass",
         "lead": "Kalimba Pluck"
@@ -6507,7 +7574,8 @@
             "enabled": false
           }
         }
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Rain Under Speech",
@@ -7777,6 +8845,132 @@
       "category": "sandbox",
       "blurb": "Interlocking conga, bongo and seed shaker for the same sunny shop ensemble.",
       "tags": [
+        "animal-crossing",
+        "cozy",
+        "lounge",
+        "updated"
+      ],
+      "settings": {
+        "tonic": 5,
+        "mode": "Major-1",
+        "bpm": 100,
+        "progression": 16,
+        "barsPerChord": 1,
+        "padNotes": 4,
+        "leadActivity": 0.46,
+        "leadDensity": 0.34,
+        "padWeights": {
+          "sustain": 26,
+          "pulse": 52,
+          "arpeggio": 16,
+          "sequence": 0,
+          "rolled": 6,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 10,
+          "half": 50,
+          "walking": 40,
+          "drive": 0
+        },
+        "drums": {
+          "style": "hand",
+          "activity": 0.36,
+          "variation": 0.485,
+          "sprinkle": 0.09,
+          "kit": "hand"
+        },
+        "swing": 0.3,
+        "counter": {
+          "mode": "answer",
+          "activity": 0.34
+        },
+        "leadLeaps": 0.3,
+        "leadRepeat": 0.44,
+        "humanize": {
+          "timing": 11,
+          "velocity": 0.1,
+          "detune": 1
+        },
+        "dynamics": {
+          "level": 0.95,
+          "range": 1,
+          "attack": 0.2,
+          "brightness": 0.3
+        },
+        "rubato": 0.3,
+        "ornaments": 0.35,
+        "ducking": 0.4,
+        "evenLoudness": 0.4,
+        "sectionSpace": 0.4,
+        "keyLift": 0.25,
+        "timbreDrift": 0.2,
+        "padMotion": {
+          "lean": 0.36,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "drumKit": {
+          "kick": {
+            "level": 0.9
+          },
+          "brush": {
+            "level": 0.85
+          },
+          "shaker": {
+            "level": 0.75
+          },
+          "rim": {
+            "level": 0.65
+          },
+          "hat": {
+            "level": 0.55
+          },
+          "swish": {
+            "level": 0.5
+          },
+          "tom": {
+            "level": 0.8
+          },
+          "clap": {
+            "level": 0.7
+          },
+          "ride": {
+            "level": 0.55
+          },
+          "crash": {
+            "level": 0.4
+          },
+          "bell": {
+            "level": 0.55
+          }
+        }
+      },
+      "voices": {
+        "pad": "Soft Keys (updated)",
+        "bass": "Rubber Bass",
+        "lead": "Soft Marimba",
+        "counter": "Kalimba Pluck"
+      },
+      "isUpdated": true,
+      "isNew": true
+    },
+    {
+      "name": "Island Shop Hours (previous piano)",
+      "category": "sandbox",
+      "blurb": "Interlocking conga, bongo and seed shaker for the same sunny shop ensemble.",
+      "tags": [
         "updated",
         "animal-crossing",
         "lounge",
@@ -7895,10 +9089,106 @@
         "lead": "Soft Marimba",
         "counter": "Kalimba Pluck"
       },
-      "isNew": true
+      "hidden": true
     },
     {
       "name": "Quiet Blocky Cave",
+      "category": "sandbox",
+      "blurb": "Slow piano notes with long silences, a deep pad and dripping water",
+      "tags": [
+        "calm",
+        "cave",
+        "minecraft",
+        "updated"
+      ],
+      "settings": {
+        "tonic": 0,
+        "mode": "Major-1",
+        "bpm": 60,
+        "progression": 1,
+        "barsPerChord": 4,
+        "padNotes": 3,
+        "leadActivity": 0.18,
+        "padWeights": {
+          "sustain": 100,
+          "pulse": 0,
+          "arpeggio": 0,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "off"
+        },
+        "ambience": {
+          "rain": 0.1
+        },
+        "playAmbience": true,
+        "leadDensity": 0.05,
+        "leadLeaps": 0.22,
+        "leadRepeat": 0.54,
+        "humanize": {
+          "timing": 10,
+          "velocity": 0.08,
+          "detune": 1
+        },
+        "dynamics": {
+          "level": 0.95,
+          "range": 1,
+          "attack": 0.2,
+          "brightness": 0.3
+        },
+        "rubato": 0.3,
+        "ornaments": 0.35,
+        "ducking": 0.4,
+        "evenLoudness": 0.4,
+        "sectionSpace": 0.5,
+        "keyLift": 0.25,
+        "timbreDrift": 0.4,
+        "padMotion": {
+          "lean": 0.22,
+          "fast": 0.04,
+          "swell": 0.08
+        },
+        "volumes": {
+          "pad": 0.78,
+          "bass": 0.73,
+          "lead": 0.62,
+          "counter": 0.48,
+          "perc": 0.44
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "ambienceVolume": 0.72
+      },
+      "voices": {
+        "pad": "Spore Haze",
+        "bass": "Sub Bass",
+        "lead": "Felt Piano (updated)"
+      },
+      "rulebook": {
+        "version": 1,
+        "rules": {
+          "section-cadences": {
+            "enabled": false
+          },
+          "common-tone-bridges": {
+            "enabled": false
+          }
+        }
+      },
+      "isUpdated": true
+    },
+    {
+      "name": "Quiet Blocky Cave (previous piano)",
       "category": "sandbox",
       "blurb": "Slow piano notes with long silences, a deep pad and dripping water",
       "tags": [
@@ -7989,7 +9279,8 @@
             "enabled": false
           }
         }
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Seaside Hearth",
@@ -8299,6 +9590,91 @@
       "blurb": "A pentatonic lead that can't hit a wrong note, stepping gently and returning to its tune",
       "tags": [
         "pentatonic",
+        "repeat",
+        "stepwise",
+        "updated"
+      ],
+      "settings": {
+        "tonic": 4,
+        "mode": "Major-1",
+        "bpm": 84,
+        "progression": 10,
+        "barsPerChord": 2,
+        "padNotes": 3,
+        "leadActivity": 0.74,
+        "leadDensity": 0.18,
+        "padWeights": {
+          "sustain": 42,
+          "pulse": 32,
+          "arpeggio": 20,
+          "sequence": 0,
+          "rolled": 6,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 70,
+          "half": 30,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "shaker",
+          "activity": 0.21,
+          "variation": 0.4,
+          "sprinkle": 0.09
+        },
+        "leadScale": "pentatonic",
+        "leadLeaps": 0.2,
+        "leadRepeat": 0.58,
+        "swing": 0.15,
+        "humanize": {
+          "timing": 8,
+          "velocity": 0.08,
+          "detune": 1
+        },
+        "dynamics": {
+          "level": 0.9,
+          "range": 0.6,
+          "attack": 0.35,
+          "brightness": 0.2
+        },
+        "rubato": 0.25,
+        "ornaments": 0.1,
+        "ducking": 0.5,
+        "evenLoudness": 0.7,
+        "sectionSpace": 0.3,
+        "keyLift": 0,
+        "timbreDrift": 0.2,
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.48,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        }
+      },
+      "voices": {
+        "pad": "Soft Keys (updated)",
+        "bass": "Round Pluck Bass",
+        "lead": "Kalimba Pluck"
+      },
+      "isUpdated": true
+    },
+    {
+      "name": "Five Notes Only (previous piano)",
+      "category": "focus",
+      "blurb": "A pentatonic lead that can't hit a wrong note, stepping gently and returning to its tune",
+      "tags": [
+        "pentatonic",
         "stepwise",
         "repeat"
       ],
@@ -8374,7 +9750,8 @@
         "pad": "Soft Keys",
         "bass": "Round Pluck Bass",
         "lead": "Kalimba Pluck"
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Wide Open Plains",
@@ -11874,7 +13251,7 @@
         }
       },
       "voices": {
-        "pad": "Soft Keys",
+        "pad": "Soft Keys (updated)",
         "bass": "Rubber Bass",
         "lead": "Soft Marimba",
         "counter": "Kalimba Pluck"
@@ -14469,6 +15846,349 @@
           }
         }
       }
+    },
+    {
+      "name": "Solo Grand",
+      "category": "focus",
+      "tags": [
+        "updated",
+        "piano"
+      ],
+      "blurb": "Just a concert grand: rolled chords and a quiet melody, nothing else",
+      "settings": {
+        "tonic": 7,
+        "mode": "Major-1",
+        "bpm": 66,
+        "progression": 6,
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "leadActivity": 0.9,
+        "padWeights": {
+          "sustain": 25,
+          "pulse": 10,
+          "arpeggio": 30,
+          "sequence": 0,
+          "rolled": 35,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "off"
+        },
+        "humanize": {
+          "timing": 10,
+          "velocity": 0.09,
+          "detune": 0
+        },
+        "dynamics": {
+          "level": 0.9,
+          "range": 0.6,
+          "attack": 0.5,
+          "brightness": 0.35
+        },
+        "rubato": 0.45,
+        "ornaments": 0.15,
+        "ducking": 0.6,
+        "evenLoudness": 0.8,
+        "sectionSpace": 0.2,
+        "keyLift": 0,
+        "timbreDrift": 0.15,
+        "leadDensity": 0.12,
+        "leadLeaps": 0.2,
+        "leadRepeat": 0.58,
+        "padMotion": {
+          "lean": 0.12,
+          "fast": 0,
+          "swell": 0.025
+        },
+        "volumes": {
+          "pad": 0.8,
+          "bass": 0.59,
+          "lead": 0.62,
+          "counter": 0.4,
+          "perc": 0.38
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "muted": {
+          "bass": false,
+          "counter": true,
+          "perc": true,
+          "pad": false,
+          "lead": false
+        }
+      },
+      "voices": {
+        "pad": "Concert Grand",
+        "bass": "Starmap Piano (updated)",
+        "lead": "Studio Grand"
+      },
+      "isNew": true
+    },
+    {
+      "name": "Piano and Pads",
+      "category": "night",
+      "tags": [
+        "updated",
+        "piano",
+        "ambient"
+      ],
+      "blurb": "A grand piano singing over slow pads: soft, wide and ambient",
+      "settings": {
+        "tonic": 5,
+        "mode": "Major-4",
+        "bpm": 54,
+        "progression": 6,
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "leadActivity": 1.0,
+        "padWeights": {
+          "sustain": 72,
+          "pulse": 0,
+          "arpeggio": 8,
+          "sequence": 0,
+          "rolled": 20,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "off"
+        },
+        "humanize": {
+          "timing": 12,
+          "velocity": 0.08,
+          "detune": 1
+        },
+        "dynamics": {
+          "level": 0.9,
+          "range": 0.55,
+          "attack": 0.8,
+          "brightness": 0.25
+        },
+        "rubato": 0.5,
+        "ornaments": 0.1,
+        "ducking": 0.5,
+        "evenLoudness": 0.8,
+        "sectionSpace": 0.6,
+        "keyLift": 0,
+        "timbreDrift": 0.4,
+        "leadDensity": 0.1,
+        "leadLeaps": 0.2,
+        "leadRepeat": 0.58,
+        "padMotion": {
+          "lean": 0.15,
+          "fast": 0,
+          "swell": 0.06
+        },
+        "volumes": {
+          "pad": 0.7,
+          "bass": 0.6,
+          "lead": 0.66,
+          "counter": 0.36,
+          "perc": 0.38
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "muted": {
+          "bass": false,
+          "perc": true,
+          "pad": false,
+          "lead": false,
+          "counter": false
+        }
+      },
+      "voices": {
+        "pad": "Measured Choir Ah",
+        "bass": "Sub Bass",
+        "lead": "Concert Grand",
+        "counter": "Glass Pad"
+      },
+      "isNew": true
+    },
+    {
+      "name": "Piano and Clarinet, Cinematic",
+      "category": "cinema",
+      "tags": [
+        "updated",
+        "piano",
+        "cinematic"
+      ],
+      "blurb": "Grand piano and a solo clarinet over a pad floating below as the bass: slow, wide, cinematic",
+      "settings": {
+        "tonic": 9,
+        "mode": "Major-6",
+        "bpm": 60,
+        "progression": 6,
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "leadActivity": 0.45,
+        "padWeights": {
+          "sustain": 30,
+          "pulse": 0,
+          "arpeggio": 30,
+          "sequence": 0,
+          "rolled": 40,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "off"
+        },
+        "humanize": {
+          "timing": 9,
+          "velocity": 0.08,
+          "detune": 1
+        },
+        "dynamics": {
+          "level": 0.95,
+          "range": 0.8,
+          "attack": 0.5,
+          "brightness": 0.3
+        },
+        "rubato": 0.5,
+        "ornaments": 0.15,
+        "ducking": 0.4,
+        "evenLoudness": 0.8,
+        "sectionSpace": 0.5,
+        "keyLift": 0,
+        "timbreDrift": 0.3,
+        "leadDensity": 0.14,
+        "leadLeaps": 0.2,
+        "leadRepeat": 0.58,
+        "padMotion": {
+          "lean": 0.2,
+          "fast": 0,
+          "swell": 0.05
+        },
+        "volumes": {
+          "pad": 0.78,
+          "bass": 0.72,
+          "lead": 0.25,
+          "counter": 0.4,
+          "perc": 0.38
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "muted": {
+          "counter": true,
+          "perc": true,
+          "pad": false,
+          "bass": false,
+          "lead": false
+        }
+      },
+      "voices": {
+        "pad": "Concert Grand",
+        "bass": "Velvet Pad",
+        "lead": "Measured Clarinet"
+      },
+      "isNew": true
+    },
+    {
+      "name": "Ambient Piano, Distant Storm",
+      "category": "night",
+      "tags": [
+        "piano",
+        "ambient",
+        "rain",
+        "thunder"
+      ],
+      "blurb": "Slow grand piano over a bowed-glass pad, with light rain and thunder far away",
+      "settings": {
+        "tonic": 7,
+        "mode": "Major-6",
+        "bpm": 66,
+        "progression": 6,
+        "barsPerChord": 2,
+        "leadActivity": 0.9,
+        "leadDensity": 0.1,
+        "padWeights": {
+          "sustain": 25,
+          "pulse": 10,
+          "arpeggio": 30,
+          "sequence": 0,
+          "rolled": 35,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0,
+          "drive": 0
+        },
+        "padNotes": 4,
+        "leadLeaps": 0.2,
+        "leadRepeat": 0.6,
+        "humanize": {
+          "timing": 10,
+          "velocity": 0.09,
+          "detune": 0
+        },
+        "dynamics": {
+          "level": 0.9,
+          "range": 0.6,
+          "attack": 0.5,
+          "brightness": 0.35
+        },
+        "rubato": 0.45,
+        "ornaments": 0.15,
+        "ducking": 0.6,
+        "evenLoudness": 0.8,
+        "sectionSpace": 0.2,
+        "timbreDrift": 0.15,
+        "feel": {
+          "busy": -0.25,
+          "bright": -0.4
+        },
+        "muted": {
+          "counter": true
+        },
+        "ambience": {
+          "rain": 0.15,
+          "thunder": 0.45
+        },
+        "ambienceVolume": 0.65,
+        "playAmbience": true,
+        "volumes": {
+          "lead": 0.73,
+          "counter": 0.4,
+          "pad": 0.98,
+          "bass": 0.78,
+          "perc": 0.38
+        },
+        "padMotion": {
+          "lean": 0.1,
+          "fast": 0,
+          "swell": 0.03
+        }
+      },
+      "voices": {
+        "pad": "Concert Grand",
+        "bass": "Wasm Bowed Glass",
+        "lead": "Studio Grand"
+      },
+      "isNew": true
     }
   ]
 }

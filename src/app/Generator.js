@@ -43,7 +43,8 @@ import { arrangeBar, notesInRange } from './arranger';
 import { arrangeBarLatest } from './composition/arrangerLatest';
 import { planForm, cutForm } from './composition/formLatest';
 import { sectionCadence } from './composition/sectionCadence';
-import { commonToneBridge } from './composition/commonToneBridge';
+import { commonToneBridge, bridgeBetween } from './composition/commonToneBridge';
+import { splitHarmony, markSplit } from './composition/barSplit';
 import { harmonicDurations, harmonicSlot } from './composition/harmonicRhythm';
 import { harmonicDestination } from './composition/harmonicDestinations';
 import { planBoundaries, prepareEnding } from './composition/boundaries';
@@ -65,8 +66,8 @@ import { arcEnergy, applyArc, arcTone, arcSpace } from './composition/arc';
 import { timbreDrift } from './composition/timbreDrift';
 import { applyFeel, feelActive, feelTone, feelEnergy, ghostNotes } from './composition/feel';
 import { nextMusic, glideTempo, scaleDistance } from './conductor';
-import { METERS, unitsPerMinute, swingEvents, halfTime } from './meter';
-import { drumBar, loosenDrums, auditionHits } from './percussion';
+import { METERS, unitsPerMinute, swingEvents, halfTime, chordBars, splitBeat } from './meter';
+import { drumBar, loosenDrums, auditionHits, DRUMS } from './percussion';
 import { normal, seeded } from './random';
 import { defaultSettings } from './settings';
 import { findPreset } from './editor/presetStore';
@@ -1226,6 +1227,15 @@ class Generator {
         return seeded(this.settings.seed * 37 + 11 + Math.floor(bar / this.settings.barsPerChord))() < share;
     }
 
+    // A long bar's second chord (barSplit.js): the diatonic chord that best joins its chord to the
+    // next by common tones; null where there is none, or no seven-note harmony to take it from.
+    bridgeChord(music, chord, nextChord) {
+        if (this.avoidTonic(music) || this.settings.tonality.mode !== 'tonal' || (chord.harmonyPcs ?? chord.scalePcs).length !== 7) return null;
+        if (!nextChord || nextChord.keyName !== chord.keyName) return null;
+        const candidates = ['I', 'II', 'III', 'IV', 'V', 'VI'].map((numeral) => this.buildChord(music, numeral));
+        return bridgeBetween({ before: chord, target: nextChord, candidates });
+    }
+
     // The new key's dominant, played in the old key's last bar: a standard
     // way to make a modulation sound intended. Labelled V/<new tonic>.
     pivotChord(from, to) {
@@ -1353,14 +1363,24 @@ class Generator {
     // Decides one bar, in its own meter. Event times/lengths are in beats from the bar start.
     planBar(bar) {
         const prev = this.plan.get(bar - 1), fresh = !prev || this.resetMusicAt === bar;
-        const meter = this.meterFor(bar, fresh ? this.cycleMusic(this.homeMusic(), bar, bar) : prev.nextMusic);
-        // the feel pad's place, over the settings for this bar's planning only (composition/feel.js)
         const settings = this.settings;
-        this.barMeter = meter;
-        if (feelActive(settings.feel)) this.settings = applyFeel(settings);
-        try { this.planBarIn(bar); } finally { this.barMeter = null; this.settings = settings; }
+        this.settings = this.planningSettings(settings);
+        this.planningFrom = settings;
+        let meter;
+        try {
+            meter = this.barMeter = this.meterFor(bar, fresh ? this.cycleMusic(this.homeMusic(), bar, bar) : prev.nextMusic);
+            this.planBarIn(bar);
+        } finally { this.barMeter = null; this.settings = settings; this.planningFrom = null; }
         const planned = this.plan.get(bar);
         if (planned) planned.meter = meter;
+    }
+
+    // The settings bars are planned with, for one bar's planning only: the feel pad's place over
+    // them (composition/feel.js), and bars per chord as played in the piece's metre (meter.js chordBars).
+    planningSettings(settings = this.settings) {
+        const planned = feelActive(settings.feel) ? applyFeel(settings) : settings;
+        const barsPerChord = chordBars(METERS[settings.meter], settings.barsPerChord);
+        return barsPerChord === settings.barsPerChord ? planned : { ...planned, barsPerChord };
     }
 
     planBarIn(bar) {
@@ -1368,7 +1388,9 @@ class Generator {
         const prev = this.plan.get(bar - 1);
 
         const fresh = !prev || this.resetMusicAt === bar;
-        let music = fresh ? this.cycleMusic(this.homeMusic(),bar,bar) : prev.nextMusic;
+        // (chords of another length - a new metre, meter.js chordBars - start the progression's cycle again)
+        const restart = !fresh && prev.chordBars !== undefined && prev.chordBars !== barsPerChord;
+        let music = fresh ? this.cycleMusic(this.homeMusic(),bar,bar) : restart ? this.cycleMusic(prev.nextMusic, bar, bar) : prev.nextMusic;
         // Key lifts (settings.keyLift): a build's last bar may pivot a whole step up for the full
         // sections after it; the next breakdown starts back home. Carried bar to bar as keyLift.
         let keyLift = fresh ? 0 : prev.keyLift ?? 0, liftPivot = false;
@@ -1482,12 +1504,17 @@ class Generator {
                 if(suspension)commitSectionSuspension(events,state,suspension,bar);
             }
         }
+        // A long bar holding a chord of its own, at one bar per chord, takes a second one (composition/barSplit.js).
+        const splitAt = splitBeat(this.meter), split = splitAt !== null && this.planningFrom?.barsPerChord === 1 && slot.start === bar && barsLeftInChord === 1
+            && !closing && !pivot && !liftPivot && !chord.cadence ? this.bridgeChord(music, chord, nextChord) : null;
+        if (split) splitHarmony(events, { at: splitAt, chord: split, meter: this.meter });
         // Drums: patterns and looseness from streams of their own (the
         // arranger's rng is never touched, so the notes stay the same).
         const boundaries=planBoundaries(state,bar,this.endBar);
         let hits = drums && drums.style !== 'off'
             ? (original ? drumBar : drumBarLatest)({ bar, meter: this.meter, drums, section: state.phrase.section, sectionsMode: sections.mode, sectionBars: state.phrase.section?.bars || sections.phrases * 4, phraseStart: state.phrase.start, phraseBars: state.composition?.phrase?.bars ?? 4, boundaries, seed: this.settings.seed, rhythm: state.composition?.rhythm })
             : [];
+        if (split) markSplit(hits, { at: splitAt, kicks: [DRUMS.indexOf('kick'), DRUMS.indexOf('punch')] });
         // half-time breakdowns (settings.breakdowns.halfTime): the drums only
         if (this.settings.breakdowns?.halfTime && state.phrase.section?.type === 'breakdown') hits = halfTime(hits, this.meter);
         // a busier feel: ghost notes on the light drums (composition/feel.js)
@@ -1553,7 +1580,8 @@ class Generator {
         tone = feelTone(arcTone(tone, energy), this.settings.feel);
         const space = sectionSpaceLevel(state.phrase.section, this.settings.sectionSpace) + arcSpace(energy);
         const loudness = planLoudness(events, this.meter.units, this.plan.get(bar - 1)?.loudness?.average, this.settings.evenLoudness);
-        this.plan.set(bar, { bar, chord, chordStart, state, events, music, upcoming, nextMusic: following, bpm, tone, boundaries, rubato, loudness, space, elapsed, energy, keyLift: liftPivot ? 2 : keyLift,
+        this.plan.set(bar, { bar, chord, chordStart, state, events, music, upcoming, nextMusic: following, bpm, tone, boundaries, rubato, loudness, space, elapsed, energy, keyLift: liftPivot ? 2 : keyLift, chordBars: barsPerChord,
+            ...(split ? { split: { beat: splitAt, chord: split } } : {}),
             ...(this.rulebookTrace?{ruleTrace:{slot,referenceBarsPerChord:barsPerChord}}:{}) });
     }
 
@@ -1619,7 +1647,7 @@ class Generator {
      */
     planner({ heldPadGlides = this.heldPadGlides, heldBassGlides = this.heldBassGlides, padPitchMotion = this.padPitchMotion, bassPitchMotion = this.bassPitchMotion, noteSlides = this.noteSlides, chordSlides = this.chordSlides, tempoEffects = this.tempoEffects, gateEnvelopes = this.gateEnvelopes, noteConnection = this.noteConnection, heldExpression = this.heldExpression, noteExpression = this.noteExpression, ensembleCoordination = this.ensembleCoordination, formDevelopment = this.formDevelopment, phrasePerformance = this.phrasePerformance, themeDevelopment = this.themeDevelopment, phraseSearch = this.phraseSearch, longPhrases = this.longPhrases, phraseLength = this.phraseLength, noteResolution = this.noteResolution, contrastPhrases = this.contrastPhrases, duetInteraction = this.duetInteraction, rhythmDevelopment = this.rhythmDevelopment, rhythmGrammar = this.rhythmGrammar, partRhythmGrammar = this.partRhythmGrammar, instrumentGroove = this.instrumentGroove, jointCounterpoint = this.jointCounterpoint, sectionDevelopment = this.sectionDevelopment, sectionCadences = this.sectionCadences, sectionBridges = this.sectionBridges, harmonicRhythm = this.harmonicRhythm, transitionGestures = this.transitionGestures, leadTransitions = this.leadTransitions, leadPickups = this.leadPickups, sectionSuspensions = this.sectionSuspensions, formStrategies = this.formStrategies, sectionCurves = this.sectionCurves, harmonicDevelopment = this.harmonicDevelopment, formStrategy = this.formStrategy, endingDevelopment = this.endingDevelopment } = {}) {
         const copy = Object.create(Generator.prototype);
-        copy.settings = JSON.parse(JSON.stringify(this.settings));
+        copy.settings = JSON.parse(JSON.stringify(this.planningFrom ?? this.settings));
         // Comparison tooling can isolate the previous Latest arrangement.
         copy.ensembleCoordination = ensembleCoordination;
         copy.noteExpression = noteExpression;
@@ -1772,6 +1800,12 @@ class Generator {
         return { start: section.start, end: Math.min(cut, section.start + (section.bars || this.settings.sections.phrases * 4) - 1), type: section.type };
     }
 
+    withPlanningSettings(fn) {
+        const settings = this.settings;
+        this.settings = this.planningSettings(settings);
+        try { return fn(); } finally { this.settings = settings; }
+    }
+
     /**
      * For the timeline's readout: the section playing at `bar`, the bars left in it and the next
      * one's type, when the plan or the form can tell ({ type, left, next, end }); null without
@@ -1785,7 +1819,7 @@ class Generator {
         const cut = this.sectionCut?.start === section.start ? this.sectionCut.at - 1 : Infinity;
         const end = Math.min(cut, section.start + (section.bars || this.settings.sections.phrases * 4) - 1);
         const next = this.plan.get(end + 1)?.state?.phrase?.section?.type
-            ?? (end + 1 - bar <= 64 ? this.sectionFormAt(end + 1, entry.music, bar + 1)?.section?.type : null) ?? null;
+            ?? (end + 1 - bar <= 64 ? this.withPlanningSettings(() => this.sectionFormAt(end + 1, entry.music, bar + 1))?.section?.type : null) ?? null;
         const value = { type: section.type, left: end - bar + 1, next, end, holding };
         this.readoutCache = { entry, holding, value };
         return value;

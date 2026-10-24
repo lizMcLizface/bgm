@@ -5,6 +5,8 @@ const BASE=import.meta.env.BASE_URL;
 const SYNTHS=[
  {id:'poly',name:'DIY Poly',maker:'calmbgm · subtractive',colour:'#63c5b6',ready:true,line:'Four polyphonic architectures, dual oscillators, optional two-layer voices, modulation routes, air and body colour, inserts and room effects.'},
  {id:'fm',name:'DIY FM',maker:'calmbgm · FM',colour:'#9b86e5',ready:true,line:'Four or six operators with editable routing, operator envelopes, feedback, expressive modulation and the original FM recipes.'},
+ {id:'piano',name:'Grand & Upright',maker:'calmbgm · modelled strings',colour:'#d9b98a',ready:true,line:'A concert grand, a felted piano for cosy sounds and an old upright, modelled from stiff strings, felt hammers and a soundboard, with a choice of temperament, key and stretch.'},
+ {id:'strings',name:'Strings',maker:'calmbgm · measured strings',colour:'#c9a15f',ready:false,line:'Violin, cello, string sections and a plucked cello, tuned against recordings: the bow swell, vibrato, ensemble and release you hear in a sampled orchestra.'},
  {id:'cs80',name:'V 80',maker:'two-tier analog poly · 1977',ready:true,colour:'#c8452b',line:'Two channels per voice, IL/AL filter envelope, polyphonic touch, ribbon and ring modulator.'},
  {id:'juno',name:'Analog 106',maker:'DCO poly · 1984',ready:true,colour:'#7fd0c8',line:'One DCO with sub and noise, a self-oscillating 4-pole filter, one envelope and the BBD chorus.'},
  {id:'prophet5',name:'Oracle 5',maker:'analog poly · 1978',ready:true,colour:'#e0a526',line:"Two VCOs with hard sync and Poly-Mod into a 4-pole low-pass, unison, and factory programs on import."},
@@ -21,7 +23,7 @@ const SYNTHS=[
 ];
 const CATEGORIES=[
  {id:'vintage',name:'Vintage',description:'Experimental models for comparison with the original hardware. Sound and calibration are still being checked.',ids:['cs80','juno','prophet5','jupiter8','obxa','minimoog','dx7','vs','tb303']},
- {id:'diy',name:'DIY',description:'Our own synth engines, with their original recipes and a playable panel for exploring new sounds.',ids:['poly','fm']},
+ {id:'diy',name:'DIY',description:'Our own synth engines, with their original recipes and a playable panel for exploring new sounds.',ids:['poly','fm','piano','strings']},
  {id:'drums',name:'Drums',description:'Drum machines with hands-on voice controls and step sequencing.',ids:['tr808','tr909','tr606']},
 ];
 

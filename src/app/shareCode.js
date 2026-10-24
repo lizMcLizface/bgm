@@ -73,6 +73,16 @@ export const SHAREABLE_PRESETS = [
     'Wasm Air Choir', 'Wasm Drawbars', 'Wasm Soft Pipes', 'Wasm DCO Foundation', 'Wasm Round FM Bass',
     'Galaxy Arp', 'Nebula Lead',
     'Starmap Piano', 'Starmap Arp', 'Starmap Pulse', 'Starmap Void',
+    // modelled acoustic pianos (engine/acousticPiano.js)
+    'Concert Grand', 'Studio Grand', 'Felted Piano', 'Old Upright', 'Tired Upright', 'Baroque Grand', 'Parlour Meantone',
+    // tuned against recordings of sampled instruments
+    'Measured Celesta', 'Measured Choir Ah', 'Measured Breathy Choir',
+    'Measured Trumpet', 'Measured Horn', 'Measured Brass', 'Measured Clarinet', 'Measured Flute',
+    'Measured Violin', 'Measured Cello', 'Measured String Section', 'Measured Chamber Strings', 'Measured Epic Strings', 'Measured Cello Pizzicato',
+    // the modelled pianos, as updated versions placed beside the originals
+    'Felt Piano (updated)', 'Soft Keys (updated)', 'Starmap Piano (updated)',
+    // modelled pianos matched to sampled ones (appended: codes index into this list)
+    'Ambient Piano', 'Glass Grand', 'Soft Drama', 'Soft Piano', 'Subdued Piano', 'Studio Concert',
 ];
 const PRESET_BITS = 8;
 // Preset index meaning "a generated sound" (soundGen.js v1): followed by

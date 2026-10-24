@@ -22,3 +22,18 @@ export function commonToneBridge({ before, original, target, candidates }) {
     if (best.chord.pitchClasses.join(',') === original.pitchClasses.join(',')) return null;
     return { chord: best.chord, sharedBefore: best.sharedBefore, sharedAfter: best.sharedAfter };
 }
+
+/** The chord that best joins `before` to `target` by common tones, from the candidates other than
+ * the two (a long bar's second chord: barSplit.js); null when none shares a tone with both. */
+export function bridgeBetween({ before, target, candidates }) {
+    const same = (a, b) => a.pitchClasses.join(',') === b.pitchClasses.join(',');
+    let best = null;
+    for (const chord of candidates) {
+        if (same(chord, before) || same(chord, target)) continue;
+        const from = shared(chord.pitchClasses, before.pitchClasses), to = shared(chord.pitchClasses, target.pitchClasses);
+        if (!from.length || !to.length) continue;
+        const score = movement(before.pitchClasses, chord.pitchClasses) + movement(chord.pitchClasses, target.pitchClasses) - 1.5 * (from.length + to.length);
+        if (!best || score < best.score) best = { chord, score };
+    }
+    return best?.chord ?? null;
+}

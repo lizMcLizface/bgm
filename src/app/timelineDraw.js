@@ -23,18 +23,24 @@ export const MIN_HEIGHT = LANE_HEIGHT + GAP + 120 + GAP + PERC_HEIGHT;
 const MIDI_LOW = 29;
 const MIDI_HIGH = 93;
 
-// Consecutive bars belonging to one chord occurrence -> one block.
+// Consecutive bars belonging to one chord occurrence -> one block; a split bar (a long bar's
+// second chord, composition/barSplit.js) -> two.
 export function chordBlocks(plan, beatsPerBar) {
     const blocks = [];
-    plan.forEach(({ bar, chord, chordStart }) => {
-        const last = blocks[blocks.length - 1];
-        if (!chordStart && last && last.endBar === bar) {
+    plan.forEach(({ bar, chord, chordStart, split }) => {
+        const last = blocks[blocks.length - 1], start = bar * beatsPerBar, end = (bar + 1) * beatsPerBar;
+        if (!chordStart && last && last.endBar === bar && !last.split) {
             last.endBar = bar + 1;
+            last.end = end;
         } else {
-            blocks.push({ chord, startBar: bar, endBar: bar + 1 });
+            blocks.push({ chord, startBar: bar, endBar: bar + 1, start, end });
+        }
+        if (split) {
+            blocks[blocks.length - 1].end = start + split.beat;
+            blocks.push({ chord: split.chord, startBar: bar, endBar: bar + 1, start: start + split.beat, end, split: true });
         }
     });
-    return blocks.map((b) => ({ ...b, start: b.startBar * beatsPerBar, end: b.endBar * beatsPerBar }));
+    return blocks;
 }
 
 // Match the drawn chord rectangles, clipped to the visible canvas. Used

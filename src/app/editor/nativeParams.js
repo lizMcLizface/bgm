@@ -83,7 +83,7 @@ export function panelChanges(before, after, preset) {
 export function panelModules(preset, part, context) {
     const string = ['plucked', 'piano'].includes(preset.stringModel);
     return SYNTH_SCHEMA
-        .filter(({ label }) => ['VCO', 'FM'].includes(label) ? !string : label === 'Plucked string' ? preset.stringModel === 'plucked' : label === 'Piano' ? preset.stringModel === 'piano' : true)
+        .filter(({ label }) => ['VCO', 'FM'].includes(label) ? !string : label === 'Plucked string' ? preset.stringModel === 'plucked' : ['Piano', 'Piano tuning'].includes(label) ? preset.stringModel === 'piano' : true)
         .filter(({ label }) => EFFECT_MODULES.has(label) === (part === 'effects'))
         .map((m) => ({ title: m.label, keys: m.controls.filter((c) => !(c.disabled && c.disabled(preset, context)) && (!preset.wasmVoice || NATIVE_CONTROLS.has(c.key))).map((c) => c.key) }))
         .filter((m) => m.keys.length);

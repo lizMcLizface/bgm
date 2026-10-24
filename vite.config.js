@@ -27,7 +27,7 @@ function directorySlash() {
 
 // The public /synths comparison pages include the engine and explicitly exported
 // YAML banks in public/synth-presets/. Raw banks/ and listening references stay local.
-const SYNTH_PAGES = { synthEnsemble:'synths/ensemble/index.html', synthEffects:'synths/effects/index.html', synthPoly:'synths/poly/index.html', synthFm:'synths/fm/index.html', synths:'synths/index.html', synthCs80:'synths/cs80/index.html', synthJuno:'synths/juno/index.html', synthProphet5:'synths/prophet5/index.html', synthJupiter8:'synths/jupiter8/index.html', synthMinimoog:'synths/minimoog/index.html', synthDx7:'synths/dx7/index.html', synthObxa:'synths/obxa/index.html', synthVs:'synths/vs/index.html', synthTr808:'synths/tr808/index.html', synthTr909:'synths/tr909/index.html', synthTr606:'synths/tr606/index.html', synthTb303:'synths/tb303/index.html' };
+const SYNTH_PAGES = { synthEnsemble:'synths/ensemble/index.html', synthEffects:'synths/effects/index.html', synthPoly:'synths/poly/index.html', synthFm:'synths/fm/index.html', synths:'synths/index.html', synthCs80:'synths/cs80/index.html', synthJuno:'synths/juno/index.html', synthProphet5:'synths/prophet5/index.html', synthJupiter8:'synths/jupiter8/index.html', synthMinimoog:'synths/minimoog/index.html', synthDx7:'synths/dx7/index.html', synthObxa:'synths/obxa/index.html', synthVs:'synths/vs/index.html', synthTr808:'synths/tr808/index.html', synthTr909:'synths/tr909/index.html', synthTr606:'synths/tr606/index.html', synthTb303:'synths/tb303/index.html', synthPiano:'synths/piano/index.html' };
 
 // Your own factory banks for the /synths pages, auto-loaded on your machine only. They live in the
 // git-ignored banks/<synth>/ folders. The dev and preview servers serve them at /local-banks/ (plus

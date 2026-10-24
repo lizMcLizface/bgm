@@ -8,6 +8,8 @@ const Home=lazy(()=>import('./SynthsHome'));
 PAGES.effects=lazy(()=>import('./effects/EffectsPage'));
 PAGES.ensemble=lazy(()=>import('./ensemble/EnsemblePage'));
 PAGES.poly=lazy(()=>import('./diy/DiyPage').then(m=>({default:m.PolyPage})));
+PAGES.piano=lazy(()=>import('./piano/PianoPage'));
+PAGES.strings=lazy(()=>import('./strings/StringsPage'));
 PAGES.fm=lazy(()=>import('./diy/DiyPage').then(m=>({default:m.FMPage})));
 /** /synths/ → hub; /synths/<id>/ → that synth. Unknown ids fall back to the hub. */
 export function synthRoute(path){const parts=path.split('/').filter(Boolean);return parts[0]==='synths'&&PAGES[parts[1]]?parts[1]:null;}

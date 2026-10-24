@@ -20,6 +20,8 @@ import { blendPresets } from './morph';
 import { cleanExpression, expressiveEnvelope, expressiveSource, breathEnvelope, gateEnvelope } from './noteExpression';
 import { FX_STAGES, fxTail } from './voiceFx';
 import { dynamicAttack } from '../composition/dynamics';
+import { isAcousticPiano } from './acousticPiano';
+import { isTempered, tuningCents } from './temperament';
 
 // A held note is booked as if it lasted this long; its release replaces
 // the tail when the key comes up.
@@ -605,7 +607,7 @@ class Instrument {
             voiceColour:{breathAmount:this.preset.breathAmount,formantAmount:this.preset.formantAmount,formantVowel:this.preset.formantVowel,formantShift:this.preset.formantShift},
             piano: this.preset.stringModel === 'piano' ? { type: this.preset.pianoType, decay: this.preset.pianoDecay,
                 brightness: this.preset.pianoBrightness, hammer: this.preset.pianoHammer, unison: this.preset.pianoUnison,
-                velocity, resonance:this.preset.pianoResonance, sustain: this.preset.pianoSustain, seed: this.preset.pianoSeed } : null,
+                velocity, resonance:this.preset.pianoResonance, sustain: isAcousticPiano(this.preset.pianoType) ? 0 : this.preset.pianoSustain, seed: this.preset.pianoSeed, wear: this.preset.pianoWear } : null,
             string: this.preset.stringModel === 'plucked' ? { decay: this.preset.stringDecay, damping: this.preset.stringDamping,
                 position: this.preset.stringPosition, body: this.preset.stringBody, resonance:this.preset.stringResonance,bodyType:this.preset.stringBodyType, seed: this.preset.stringSeed } : null,
             filterEvents,
@@ -616,12 +618,20 @@ class Instrument {
         };
     }
 
+    /** The preset's piano tuning as temperament.js takes it. */
+    pianoTuning() {
+        const p = this.preset;
+        return { temperament: p.pianoTemperament, tonic: p.pianoTonic, a4: p.pianoA4, stretch: p.pianoStretch, wear: p.pianoWear, seed: p.pianoSeed };
+    }
+
     /** MIDI note number -> MonoSynth noteInfo, honouring the preset's microtonal tuning. */
     noteInfo(midi) {
         const pc = ((midi % 12) + 12) % 12;
         const oct = Math.floor(midi / 12) - 1;
         const p = this.preset;
-        const freq = BASE_FREQ[pc] * p[PITCH_KEYS[pc]] * p.allThemPitches * Math.pow(p.octaveRatio, oct - 4);
+        let freq = BASE_FREQ[pc] * p[PITCH_KEYS[pc]] * p.allThemPitches * Math.pow(p.octaveRatio, oct - 4);
+        // A piano is tuned as a whole: temperament, stretch and wear move each key from equal temperament.
+        if (p.stringModel === 'piano' && isTempered(this.pianoTuning())) freq *= 2 ** (tuningCents(midi, this.pianoTuning()) / 1200);
         return { freq, note: `${CHROMATIC[pc]}${oct}`, oct };
     }
 

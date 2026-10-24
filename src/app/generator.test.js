@@ -5,7 +5,7 @@
 import { scaleDistance } from './conductor';
 import PROGRESSIONS from './progressions';
 import { defaultSettings } from './settings';
-import { METERS, beatStarts, groupStarts } from './meter';
+import { METERS, beatStarts, groupStarts, chordBars, splitBeat } from './meter';
 
 vi.mock('../audio/context', () => ({
     audioContext: {
@@ -309,12 +309,13 @@ test('cadence forecasts stay on the actual chord grid through modal drift and od
         const gen=new Generator(settings),forecasts=[];
         for(let bar=0;bar<64;bar++){
             gen.planBar(bar);const b=gen.plan.get(bar);
-            forecasts.push(gen.melodyHarmony(bar,b.music,b.upcoming,8,b.bpm));
+            // (as planned: 7/4 plays a chord a bar at two bars per chord, meter.js chordBars)
+            forecasts.push(gen.withPlanningSettings(()=>gen.melodyHarmony(bar,b.music,b.upcoming,8,b.bpm)));
         }
         for(const forecast of forecasts)for(const h of forecast.filter(h=>h.bar<64))expect(h.chord).toEqual(gen.plan.get(h.bar).chord);
         for(const b of gen.plan.values())if(b.chord.cadence){
-            expect(Math.abs((b.state.phrase.section.start-b.music.cycleStart)%barsPerChord)).toBe(0);
-            if(b.chordStart)expect(Math.abs((b.bar-b.music.cycleStart)%barsPerChord)).toBe(0);
+            expect(Math.abs((b.state.phrase.section.start-b.music.cycleStart)%b.chordBars)).toBe(0);
+            if(b.chordStart)expect(Math.abs((b.bar-b.music.cycleStart)%b.chordBars)).toBe(0);
         }
     }
 });
@@ -1463,6 +1464,46 @@ describe('key lifts', () => {
         gen.settings.sections = { ...gen.settings.sections, mode: 'gentle' };
         gen.reset();
         expect(play(gen, 120).every((b) => !b.keyLift)).toBe(true);
+    });
+});
+
+describe('chords change about as often in any metre', () => {
+    it('long bars halve bars per chord or split, short ones double it', () => {
+        expect(chordBars(METERS['7/4'], 2)).toBe(1);
+        expect(chordBars(METERS['6/4'], 4)).toBe(2);
+        expect(chordBars(METERS['7/4'], 1)).toBe(1);
+        expect(chordBars(METERS['2/4'], 1)).toBe(2);
+        for (const id of ['4/4', '3/4', '5/4', '6/8', '12/8', '7/8']) expect(chordBars(METERS[id], 2)).toBe(2);
+        expect(splitBeat(METERS['7/4'])).toBe(4);
+        expect(splitBeat(METERS['6/4'])).toBe(3);
+        expect(splitBeat(METERS['4/4'])).toBe(null);
+    });
+
+    it('a 7/4 bar at one chord per bar moves to a bridge chord at beat 4', () => {
+        const gen = new Generator({ ...defaultSettings(), seed: 3, meter: '7/4', barsPerChord: 1, drums: { ...defaultSettings().drums, style: 'brushes' } });
+        const bars = play(gen, 24), split = bars.filter((b) => b.split);
+        expect(split.length).toBeGreaterThan(12);
+        for (const b of split) {
+            expect(b.split.beat).toBe(4);
+            expect(b.split.chord.pitchClasses).not.toEqual(b.chord.pitchClasses);
+            const after = b.events.filter((e) => e.role === 'pad' && e.beat >= 4);
+            for (const e of after) expect(b.split.chord.pitchClasses).toContain(e.midi % 12);
+            const kicks = b.events.filter((e) => e.role === 'perc' && e.midi === 0);
+            if (kicks.some((e) => e.beat < 0.25)) expect(kicks.some((e) => Math.abs(e.beat - 4) < 0.3)).toBe(true);
+        }
+    });
+
+    it('a metre change while playing starts the progression again when chord lengths change', () => {
+        const gen = new Generator({ ...defaultSettings(), seed: 5, meter: '4/4', barsPerChord: 2 });
+        play(gen, 11);
+        gen.transport.timer = 1;
+        gen.set('meter', '7/4');
+        gen.transport.timer = null;
+        const bars = [];
+        for (let bar = 11; bar < 40; bar++) { gen.currentBar = bar; gen.ensurePlanned(bar); bars.push(gen.plan.get(bar)); }
+        const first = bars.find((b) => b.meter.units === 7);
+        expect(first.music.cycleStart).toBe(first.bar);
+        for (const b of bars.filter((b) => b.meter.units === 7)) { expect(b.chordStart).toBe(true); expect(b.chord.name).toBeTruthy(); }
     });
 });
 

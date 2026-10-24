@@ -72,3 +72,26 @@ export function halfTime(events, meter) {
 export const unitsPerMinute = (meter, bpm) => bpm * meter.unitsPerBeat * (meter.pace ?? 1);
 /** Seconds of one felt beat at a tempo. */
 export const beatSeconds = (meter, bpm) => (60 * meter.unitsPerBeat) / unitsPerMinute(meter, bpm);
+
+/** A bar's length against a 4/4 bar at the same tempo: 7/4 1.75, 2/4 0.5, 6/8 (at its pace) 0.67. */
+export const barLength = (meter) => meter.units / (meter.unitsPerBeat * (meter.pace ?? 1)) / 4;
+
+/**
+ * Bars per chord as played, so that chords change about as often as in 4/4 whatever the
+ * metre: long bars (6/4, 7/4) halve it where they can, short ones (2/4) double it. A long bar
+ * left with one chord of its own moves to a second one at its splitBeat.
+ */
+export function chordBars(meter, barsPerChord) {
+    const length = barLength(meter);
+    if (length >= 1.5 && barsPerChord >= 2) return barsPerChord / 2;
+    if (length <= 0.5) return barsPerChord * 2;
+    return barsPerChord;
+}
+
+/** Where a long bar takes a second chord: the group start nearest its middle (7/4 -> 4, 6/4 -> 3); null for other bars. */
+export function splitBeat(meter) {
+    if (barLength(meter) < 1.5) return null;
+    const middle = meter.units / 2, starts = groupStarts(meter).slice(1);
+    if (!starts.length) return null;
+    return starts.reduce((best, at) => (Math.abs(at - middle) < Math.abs(best - middle) ? at : best));
+}
