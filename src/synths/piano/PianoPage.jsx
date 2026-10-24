@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Keys } from '../ui/controls';
 import { LabMidi, bindLabKeyboard, mapVelocity } from '../../labs/input';
 import { load, save } from '../storage';
+import { LINES, playLine, lineSeconds } from './lines';
 import PianoPlayer, { renderOptions, dynamics } from './player';
 import { pianoBuffer } from '../../app/engine/piano';
 import { TEMPERAMENTS, TONICS, temperamentOffsets, tunedFrequency } from '../../app/engine/temperament';
@@ -32,13 +33,17 @@ export default function PianoPage() {
     const [held, setHeld] = useState([]);
     const [pedal, setPedal] = useState(false);
     const [low, setLow] = useState(saved.low ?? 48);
+    const [keyVelocity, setKeyVelocity] = useState(saved.keyVelocity ?? 92);
+    const [variation, setVariation] = useState(saved.variation ?? 12);
+    const [playing, setPlaying] = useState(null);
+    const stopLine = useRef(null);
     const [last, setLast] = useState(null);
     const [out, setOut] = useState({ peak: 0, hold: 0, clips: 0 });
     const [midi, setMidi] = useState({ inputs: [], status: 'Not connected.' });
-    const player = useRef(null), midiRef = useRef(null), live = useRef({ settings, room });
-    live.current = { settings, room };
+    const player = useRef(null), midiRef = useRef(null), live = useRef({ settings, room, keyVelocity, variation });
+    live.current = { settings, room, keyVelocity, variation };
 
-    useEffect(() => { save(KEY, { name, settings, room, low }); }, [name, settings, room, low]);
+    useEffect(() => { save(KEY, { name, settings, room, low, keyVelocity, variation }); }, [name, settings, room, low, keyVelocity, variation]);
     useEffect(() => { player.current?.set(settings, .9, room); }, [settings, room, audio.state]);
 
     // Render the keys in view ahead of being played, a note at a time, so the first chord is not late.
@@ -74,7 +79,11 @@ export default function PianoPage() {
 
     useEffect(() => {
         const keyboard = bindLabKeyboard(window, {
-            on: (key, note) => { if (player.current) player.current.down(key, note, .72); }, off: (key) => player.current?.up(key), panic: () => player.current?.panic(),
+            on: (key, note) => {
+                // Computer keys have no touch: send the chosen velocity, varied a little each time.
+                const { keyVelocity: base, variation: spread } = live.current;
+                if (player.current) player.current.down(key, note, Math.min(127, Math.max(1, base + (Math.random() * 2 - 1) * spread)) / 127);
+            }, off: (key) => player.current?.up(key), panic: () => player.current?.panic(),
             octave: () => Math.floor(low / 12) - 1, shift: (d) => setLow((l) => Math.min(84, Math.max(24, l + 12 * d))),
         });
         const space = (on) => (e) => { if (e.code === 'Space' && !e.target?.closest?.('input,select,textarea,button')) { e.preventDefault(); player.current?.sustain(on); } };
@@ -96,6 +105,14 @@ export default function PianoPage() {
         frame = requestAnimationFrame(tick);
         return () => cancelAnimationFrame(frame);
     }, [audio.state]);
+    const toggleLine = (index) => {
+        stopLine.current?.();
+        if (playing === index || !player.current) { stopLine.current = null; return; }
+        setPlaying(index);
+        const stop = playLine(player.current, LINES[index], { variation: live.current.variation, onEnd: () => setPlaying((p) => (p === index ? null : p)) });
+        stopLine.current = stop;
+    };
+    useEffect(() => () => stopLine.current?.(), []);
     useEffect(() => () => { midiRef.current?.dispose(); player.current?.close(); player.current = null; }, []);
 
     const choose = (preset) => { setName(preset); setSettings({ ...DEFAULTS, ...PRESETS[preset] }); };
@@ -134,7 +151,17 @@ export default function PianoPage() {
                     <div className="probe-bar" title="Gain applied to the note, from its velocity"><i style={{ width: (last ? dynamics(last.velocity) * 100 : 0) + '%' }} /><span>{last ? `${last.db.toFixed(1)} dB` : '—'}</span></div>
                     <div className={'probe-bar out' + (out.clips ? ' clipped' : '')} title="Output peak (the limiter holds it below full scale)"><i style={{ width: Math.min(100, out.peak * 100) + '%' }} /><b style={{ left: Math.min(100, out.hold * 100) + '%' }} /><span>{out.hold > 0 ? (20 * Math.log10(out.hold)).toFixed(1) + ' dBFS' : '−∞'}{out.clips ? ` · ${out.clips} clipped` : ''}</span></div>
                 </div>
-                <p className="hint">Velocity is the 0–127 value your keyboard sent (computer keys always send 92). The second bar is the level that velocity maps to; the third is what leaves the page.</p>
+                <div className="row">
+                    <label>Computer key velocity<input type="range" min="1" max="127" step="1" value={keyVelocity} onChange={(e) => setKeyVelocity(Number(e.target.value))} /><output>{keyVelocity}</output></label>
+                    <label>Random variation<input type="range" min="0" max="40" step="1" value={variation} onChange={(e) => setVariation(Number(e.target.value))} /><output>±{variation}</output></label>
+                </div>
+                <p className="hint">Velocity is the 0–127 value your keyboard sent; computer keys send the velocity above, varied by up to the amount set (also used for the test lines). The second bar is the level that velocity maps to; the third is what leaves the page.</p>
+            </section>
+            <section className="group wide"><h3>Test lines</h3>
+                <div className="row lines">
+                    {LINES.map((line, i) => <button type="button" key={line.name} className={playing === i ? 'on' : ''} disabled={audio.state !== 'on'} onClick={() => toggleLine(i)}>{playing === i ? '■ ' : '▶ '}{line.name}<small>{line.tempo} bpm · {Math.round(lineSeconds(line) - 2)} s</small></button>)}
+                </div>
+                <p className="hint">Short pieces for judging the sound: calm and melancholic for the soft touch and pedal, energetic for fast repeated notes, low register for the bass, dynamics for the velocity range. They use the sound and variation above.</p>
             </section>
             <section className="group wide"><h3>Temperament</h3>
                 <div className="row">

@@ -571,6 +571,9 @@ label.inline.toggle{min-height:32px;}label.inline.toggle em{font-style:normal;co
 .piano .probe-bar.clipped i{background:#e5484d;}
 .piano .probe-bar b{position:absolute;top:0;bottom:0;width:2px;background:var(--cream);}
 .piano .probe-bar span{position:relative;padding:0 8px;font-size:11px;line-height:20px;font-variant-numeric:tabular-nums;color:var(--text);}
+.piano .row.lines button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;}
+.piano .row.lines button small{font-size:11px;color:var(--muted);}
+.piano .row.lines button.on{outline:2px solid var(--amber);}
 .piano .hint{font-size:12px;color:var(--muted);margin:4px 0 10px;}
 .tuning{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;max-width:560px;}
 .tuning-note{display:flex;flex-direction:column;align-items:stretch;text-align:center;font-size:11px;color:var(--muted);height:120px;position:relative;}

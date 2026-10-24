@@ -40,7 +40,7 @@ function normaliser(buffer) {
     return loudness.get(buffer);
 }
 export const dynamics = (velocity) => velocity ** 1.7;
-export const noteSource = (key) => (key.startsWith('midi:') ? 'MIDI' : key.startsWith('touch:') ? 'Screen' : 'Computer keys');
+export const noteSource = (key) => (key.startsWith('midi:') ? 'MIDI' : key.startsWith('touch:') ? 'Screen' : key.startsWith('line:') ? 'Test line' : 'Computer keys');
 
 export default class PianoPlayer {
     constructor(context, onChange = () => {}, onNote = () => {}) {
