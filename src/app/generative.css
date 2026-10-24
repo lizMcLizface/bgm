@@ -2306,3 +2306,36 @@ body {
 
 /* the listening timer (ListeningTimer.jsx): steady digits */
 .gen-listening { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.gen-weather-sources {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: start;
+    gap: 12px;
+}
+.gen-weather-source {
+    min-width: 0;
+    border: 1px solid var(--gen-border);
+    border-radius: 8px;
+    padding: 14px;
+}
+.gen-weather-source h3 { margin: 0 0 12px; font-size: 15px; }
+.gen-weather-source > select {
+    width: 100%;
+    min-width: 0;
+    margin: 8px 0 12px;
+    padding: 6px 8px;
+    border: 1px solid var(--gen-border);
+    border-radius: 6px;
+    background: var(--gen-bg);
+    color: var(--gen-text);
+    font: inherit;
+    font-size: 13px;
+}
+.gen-weather-source summary { cursor: pointer; font-size: 13px; }
+.gen-weather-source .gen-weights { display: block; margin: 12px 0 0; padding: 0; border: 0; }
+.gen-weather-source .gen-field { margin: 10px 0; }
+.gen-weather-source .gen-weights legend { display: none; }
+@media (max-width: 850px) {
+    .gen-weather-sources { grid-template-columns: 1fr; }
+}

@@ -186,7 +186,7 @@ const RULES = {
     sections: { mode: oneOf(Object.keys(SECTION_MODES)), phrases: oneOf(SECTION_LENGTHS) },
     ambience: Object.fromEntries(Object.keys(AMBIENCE_LAYERS).map((id) => [id, clamp(0, 1)])),
     ambienceShape: Object.fromEntries(Object.keys(AMBIENCE_LAYERS).map((id) => [id, Object.fromEntries([
-        ...Object.keys(LAYER_PARAMS[id]).map((key) => [key, clamp(0, 1)]),
+        ...Object.entries(LAYER_PARAMS[id]).map(([key, spec]) => [key, spec.options ? oneOf(spec.options) : clamp(0, 1)]),
         ...Object.entries(COMMON_PARAMS).map(([key, { min, max }]) => [key, clamp(min, max)]),
     ])])),
     ambienceVolume: clamp(0, 1),

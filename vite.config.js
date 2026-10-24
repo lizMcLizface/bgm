@@ -3,6 +3,7 @@ import path from 'node:path';
 import { defineConfig } from 'vite';
 import { configDefaults } from 'vitest/config';
 import react from '@vitejs/plugin-react';
+import { localRainReferences } from './tools/rainReferencesPlugin.mjs';
 
 // GitHub Pages redirects /labs/strings to /labs/strings/; Vite's dev and preview
 // servers instead fall back to the main app. Mirror the Pages redirect locally.
@@ -82,10 +83,10 @@ export default defineConfig(({ mode }) => {
   const isPublic = mode === 'public', outDir = isPublic ? 'dist-public' : 'dist';
   return {
     base: '/',
-    plugins: [react(), directorySlash(), localBanks(isPublic)],
+    plugins: [react(), directorySlash(), localBanks(isPublic), localRainReferences(isPublic)],
     build: {
         outDir,
-        rollupOptions: { input: { main: 'index.html', percussion: 'tools/percussion-engine.html', audioOutput: 'tools/audio-output.html', labs:'labs/index.html', labAll:'labs/all/index.html', labStrings:'labs/strings/index.html', labKeys:'labs/keys/index.html', labChoir:'labs/choir/index.html', labOrgans:'labs/organs/index.html', labDrones:'labs/drones/index.html', labBass:'labs/bass/index.html', labPlucks:'labs/plucks/index.html', labWinds:'labs/winds/index.html', labLeads:'labs/leads/index.html', labPads:'labs/pads/index.html', ...SYNTH_PAGES, synthLab: 'tools/synth-lab.html', currentSynth: 'tools/current-synth.html', effectsLab:'tools/effects.html', fmLab:'tools/fm.html', ensembleSynth:'tools/ensemble-synth.html', spectrum:'tools/spectrum.html', quality:'tools/quality.html', tone:'tools/tone.html', modulation:'tools/modulation.html', instrumentEffects:'tools/instrument-effects.html', acoustic:'tools/acoustic.html', sources:'tools/sources.html', behavior:'tools/behavior.html', stress:'tools/stress.html' } },
+        rollupOptions: { input: { main: 'index.html', ambient: 'ambient/index.html', percussion: 'tools/percussion-engine.html', audioOutput: 'tools/audio-output.html', labs:'labs/index.html', labAll:'labs/all/index.html', labStrings:'labs/strings/index.html', labKeys:'labs/keys/index.html', labChoir:'labs/choir/index.html', labOrgans:'labs/organs/index.html', labDrones:'labs/drones/index.html', labBass:'labs/bass/index.html', labPlucks:'labs/plucks/index.html', labWinds:'labs/winds/index.html', labLeads:'labs/leads/index.html', labPads:'labs/pads/index.html', ...SYNTH_PAGES, synthLab: 'tools/synth-lab.html', currentSynth: 'tools/current-synth.html', effectsLab:'tools/effects.html', fmLab:'tools/fm.html', ensembleSynth:'tools/ensemble-synth.html', spectrum:'tools/spectrum.html', quality:'tools/quality.html', tone:'tools/tone.html', modulation:'tools/modulation.html', instrumentEffects:'tools/instrument-effects.html', acoustic:'tools/acoustic.html', sources:'tools/sources.html', behavior:'tools/behavior.html', stress:'tools/stress.html' } },
     },
     test: {
         environment: 'jsdom',

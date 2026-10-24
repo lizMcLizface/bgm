@@ -8,8 +8,8 @@
     <title>calmbgm · calm procedural music</title>
     <script>
       // Servers without directory redirects fall back to this page for
-      // /labs/x or /synths/x; send those to the sub-page's own folder.
-      if (/^\/(labs|synths)(\/[\w-]+)?$/.test(location.pathname)) location.replace(location.pathname + '/' + location.search + location.hash);
+      // /labs/x, /synths/x or /ambient; send those to the sub-page's own folder.
+      if (/^\/(?:(labs|synths)(\/[\w-]+)?|ambient)$/.test(location.pathname)) location.replace(location.pathname + '/' + location.search + location.hash);
     </script>
   </head>
   <body>

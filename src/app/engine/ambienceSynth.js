@@ -1,12 +1,14 @@
-// The ambient bed's sounds (engine/ambience.js), rendered sample by sample
+// The ambient bed's shape definitions and legacy loop sounds, rendered sample by sample
 // from noise. Pure: no Web Audio here, so it runs in a worker
 // (ambience.worker.js) and in tests. Slow movement - gusts, swells,
 // flicker, rolls - is computed every CONTROL samples, not every sample.
 //
-// Each layer has a shape (LAYER_PARAMS): the `render` parameters change
+// Rain/thunder/waves now stream from weatherBedModel.js; their legacy render
+// flags retain slider/link quantization. Wind/fire/vinyl still loop here.
+// For those layers, the `render` parameters change
 // what is generated, so they re-render the loop; the others, and the
 // distance / pan / width every layer has (COMMON_PARAMS), act live on the
-// audio. All are 0..1 (pan -1..1), with defaults that make the layer's
+// audio. Numeric controls are 0..1 (pan -1..1), with defaults that make the layer's
 // usual sound. Loudness is normalised against the defaults, so "more
 // intense" does play louder.
 
@@ -16,11 +18,21 @@ import { seeded } from '../random';
 export const LAYER_PARAMS = {
     rain: {
         intensity: { label: 'Intensity', default: 0.5, render: true },
-        drops: { label: 'Drop size', default: 0.4, render: true },
+        drops: { label: 'Near drops', default: 0.4, render: true },
+        wind: { label: 'Wind chaos', default: 0.3 },
+        coupling: { label: 'Weather coupling', default: 0.75 },
+        texture: { label: 'Impact texture', default: 0.45 },
+        shelter: { label: 'Shelter', default: 0 },
+        surface: { label: 'Surface', default: 'mixed', options: ['mixed', 'leaves', 'glass', 'concrete', 'tin', 'puddle'] },
     },
     thunder: {
         frequency: { label: 'How often', default: 0.4 },
         intensity: { label: 'Intensity', default: 0.5 },
+        decay: { label: 'Rumble / echo length', default: 0.65 },
+        crack: { label: 'Initial strike', default: 1 },
+        roll: { label: 'Rolling body', default: 1 },
+        echo: { label: 'Echoes', default: 1 },
+        shelter: { label: 'Shelter', default: 0 },
     },
     wind: {
         speed: { label: 'Speed', default: 0.4, render: true },
@@ -29,6 +41,11 @@ export const LAYER_PARAMS = {
     waves: {
         period: { label: 'Wave length', default: 0.5, render: true },
         size: { label: 'Wave size', default: 0.5, render: true },
+        retreat: { label: 'Retreat length', default: 0.55 },
+        surge: { label: 'Approach', default: 1 },
+        break: { label: 'Breaking crest', default: 1 },
+        wash: { label: 'Backwash', default: 1 },
+        shelter: { label: 'Shelter', default: 0 },
     },
     fire: {
         crackle: { label: 'Crackle', default: 0.5, render: true },

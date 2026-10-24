@@ -1,0 +1,602 @@
+[
+  {
+    "file": "rain_band0_ref.wav",
+    "seconds": 15,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 6.8306,
+    "medianHz": 32,
+    "stereoCorrelation": 0.8858,
+    "envelopeCV": 0.7957,
+    "envelopeAC": {
+      "2": 0.0547,
+      "0.1": 0.4321,
+      "0.5": 0.2141
+    }
+  },
+  {
+    "file": "rain_band0_synth.wav",
+    "seconds": 14.9537,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 11.0688,
+    "medianHz": 54,
+    "stereoCorrelation": 0.8905,
+    "envelopeCV": 0.8179,
+    "envelopeAC": {
+      "2": -0.0806,
+      "0.1": 0.5992,
+      "0.5": 0.1873
+    }
+  },
+  {
+    "file": "rain_band1_ref.wav",
+    "seconds": 15,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 10.1234,
+    "medianHz": 70,
+    "stereoCorrelation": 0.8964,
+    "envelopeCV": 1.0011,
+    "envelopeAC": {
+      "2": 0.1371,
+      "0.1": 0.7074,
+      "0.5": 0.6398
+    }
+  },
+  {
+    "file": "rain_band1_synth.wav",
+    "seconds": 14.9537,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 10.251,
+    "medianHz": 129,
+    "stereoCorrelation": 0.8651,
+    "envelopeCV": 0.8837,
+    "envelopeAC": {
+      "2": -0.0855,
+      "0.1": 0.6384,
+      "0.5": 0.1172
+    }
+  },
+  {
+    "file": "rain_band2_ref.wav",
+    "seconds": 15,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 8.4093,
+    "medianHz": 188,
+    "stereoCorrelation": 0.4932,
+    "envelopeCV": 0.4337,
+    "envelopeAC": {
+      "2": 0.3227,
+      "0.1": 0.4867,
+      "0.5": 0.4717
+    }
+  },
+  {
+    "file": "rain_band2_synth.wav",
+    "seconds": 14.9537,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 8.0785,
+    "medianHz": 296,
+    "stereoCorrelation": 0.4904,
+    "envelopeCV": 0.4141,
+    "envelopeAC": {
+      "2": -0.2876,
+      "0.1": 0.7115,
+      "0.5": 0.338
+    }
+  },
+  {
+    "file": "rain_band3_ref.wav",
+    "seconds": 15,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 9.8267,
+    "medianHz": 377,
+    "stereoCorrelation": 0.0341,
+    "envelopeCV": 0.43,
+    "envelopeAC": {
+      "2": 0.5023,
+      "0.1": 0.6465,
+      "0.5": 0.5929
+    }
+  },
+  {
+    "file": "rain_band3_synth.wav",
+    "seconds": 14.9537,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 26.2735,
+    "medianHz": 581,
+    "stereoCorrelation": 0.0341,
+    "envelopeCV": 0.7348,
+    "envelopeAC": {
+      "2": -0.1019,
+      "0.1": 0.8173,
+      "0.5": 0.3655
+    }
+  },
+  {
+    "file": "rain_band4_ref.wav",
+    "seconds": 15,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 11.0033,
+    "medianHz": 651,
+    "stereoCorrelation": -0.0395,
+    "envelopeCV": 0.4175,
+    "envelopeAC": {
+      "2": 0.5188,
+      "0.1": 0.6866,
+      "0.5": 0.6689
+    }
+  },
+  {
+    "file": "rain_band4_synth.wav",
+    "seconds": 14.9537,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 18.7624,
+    "medianHz": 958,
+    "stereoCorrelation": 0.0085,
+    "envelopeCV": 0.8244,
+    "envelopeAC": {
+      "2": 0.2008,
+      "0.1": 0.8415,
+      "0.5": 0.4534
+    }
+  },
+  {
+    "file": "rain_band5_ref.wav",
+    "seconds": 15,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 15.9013,
+    "medianHz": 1152,
+    "stereoCorrelation": -0.0779,
+    "envelopeCV": 0.4441,
+    "envelopeAC": {
+      "2": 0.3312,
+      "0.1": 0.5558,
+      "0.5": 0.5328
+    }
+  },
+  {
+    "file": "rain_band5_synth.wav",
+    "seconds": 14.9537,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 16.1201,
+    "medianHz": 1427,
+    "stereoCorrelation": -0.0051,
+    "envelopeCV": 0.5931,
+    "envelopeAC": {
+      "2": 0.1511,
+      "0.1": 0.6872,
+      "0.5": 0.2402
+    }
+  },
+  {
+    "file": "rain_band6_ref.wav",
+    "seconds": 15,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 32.9929,
+    "medianHz": 1868,
+    "stereoCorrelation": -0.0614,
+    "envelopeCV": 0.5563,
+    "envelopeAC": {
+      "2": 0.1863,
+      "0.1": 0.333,
+      "0.5": 0.3269
+    }
+  },
+  {
+    "file": "rain_band6_synth.wav",
+    "seconds": 14.9537,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 38.2256,
+    "medianHz": 2848,
+    "stereoCorrelation": 0.0027,
+    "envelopeCV": 0.5956,
+    "envelopeAC": {
+      "2": -0.006,
+      "0.1": 0.682,
+      "0.5": 0.2631
+    }
+  },
+  {
+    "file": "rain_band7_ref.wav",
+    "seconds": 15,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 30.0412,
+    "medianHz": 3887,
+    "stereoCorrelation": -0.033,
+    "envelopeCV": 0.532,
+    "envelopeAC": {
+      "2": 0.1412,
+      "0.1": 0.4393,
+      "0.5": 0.3864
+    }
+  },
+  {
+    "file": "rain_band7_synth.wav",
+    "seconds": 14.9537,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 44.6208,
+    "medianHz": 5545,
+    "stereoCorrelation": -0.0001,
+    "envelopeCV": 0.6636,
+    "envelopeAC": {
+      "2": -0.1735,
+      "0.1": 0.7902,
+      "0.5": 0.4123
+    }
+  },
+  {
+    "file": "rain_band8_ref.wav",
+    "seconds": 15,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 24.409,
+    "medianHz": 8425,
+    "stereoCorrelation": 0.065,
+    "envelopeCV": 0.4654,
+    "envelopeAC": {
+      "2": 0.256,
+      "0.1": 0.6317,
+      "0.5": 0.5679
+    }
+  },
+  {
+    "file": "rain_band8_synth.wav",
+    "seconds": 14.9537,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 36.1724,
+    "medianHz": 9932,
+    "stereoCorrelation": 0.0635,
+    "envelopeCV": 0.4681,
+    "envelopeAC": {
+      "2": -0.0887,
+      "0.1": 0.6961,
+      "0.5": 0.2021
+    }
+  },
+  {
+    "file": "rain_band9_ref.wav",
+    "seconds": 15,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 28.4424,
+    "medianHz": 13674,
+    "stereoCorrelation": 0.0079,
+    "envelopeCV": 0.4967,
+    "envelopeAC": {
+      "2": 0.2896,
+      "0.1": 0.7213,
+      "0.5": 0.6577
+    }
+  },
+  {
+    "file": "rain_band9_synth.wav",
+    "seconds": 14.9537,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 29.023,
+    "medianHz": 12575,
+    "stereoCorrelation": 0.0086,
+    "envelopeCV": 0.5023,
+    "envelopeAC": {
+      "2": 0.1641,
+      "0.1": 0.6681,
+      "0.5": 0.0371
+    }
+  },
+  {
+    "file": "tin_band0_ref.wav",
+    "seconds": 15,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 6.1747,
+    "medianHz": 65,
+    "stereoCorrelation": 0.9867,
+    "envelopeCV": 0.5787,
+    "envelopeAC": {
+      "2": 0.4838,
+      "0.1": 0.5732,
+      "0.5": 0.5001
+    }
+  },
+  {
+    "file": "tin_band0_synth.wav",
+    "seconds": 14.9537,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 10.8717,
+    "medianHz": 92,
+    "stereoCorrelation": 0.9463,
+    "envelopeCV": 0.7286,
+    "envelopeAC": {
+      "2": -0.0987,
+      "0.1": 0.6087,
+      "0.5": 0.2093
+    }
+  },
+  {
+    "file": "tin_band1_ref.wav",
+    "seconds": 15,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 5.5271,
+    "medianHz": 102,
+    "stereoCorrelation": 0.7092,
+    "envelopeCV": 0.4724,
+    "envelopeAC": {
+      "2": 0.6027,
+      "0.1": 0.7216,
+      "0.5": 0.7046
+    }
+  },
+  {
+    "file": "tin_band1_synth.wav",
+    "seconds": 14.9537,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 6.0525,
+    "medianHz": 135,
+    "stereoCorrelation": 0.7209,
+    "envelopeCV": 0.4189,
+    "envelopeAC": {
+      "2": -0.0626,
+      "0.1": 0.5825,
+      "0.5": 0.0479
+    }
+  },
+  {
+    "file": "tin_band2_ref.wav",
+    "seconds": 15,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 6.8648,
+    "medianHz": 172,
+    "stereoCorrelation": 0.5918,
+    "envelopeCV": 0.525,
+    "envelopeAC": {
+      "2": 0.7463,
+      "0.1": 0.7971,
+      "0.5": 0.7907
+    }
+  },
+  {
+    "file": "tin_band2_synth.wav",
+    "seconds": 14.9537,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 7.8361,
+    "medianHz": 511,
+    "stereoCorrelation": 0.5844,
+    "envelopeCV": 0.4071,
+    "envelopeAC": {
+      "2": -0.2973,
+      "0.1": 0.7681,
+      "0.5": 0.3627
+    }
+  },
+  {
+    "file": "tin_band3_ref.wav",
+    "seconds": 15,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 8.5788,
+    "medianHz": 404,
+    "stereoCorrelation": 0.422,
+    "envelopeCV": 0.4873,
+    "envelopeAC": {
+      "2": 0.8895,
+      "0.1": 0.9277,
+      "0.5": 0.9213
+    }
+  },
+  {
+    "file": "tin_band3_synth.wav",
+    "seconds": 14.9537,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 11.3722,
+    "medianHz": 732,
+    "stereoCorrelation": 0.4038,
+    "envelopeCV": 0.5478,
+    "envelopeAC": {
+      "2": -0.1096,
+      "0.1": 0.8275,
+      "0.5": 0.3896
+    }
+  },
+  {
+    "file": "tin_band4_ref.wav",
+    "seconds": 15,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 8.706,
+    "medianHz": 388,
+    "stereoCorrelation": 0.3102,
+    "envelopeCV": 0.5381,
+    "envelopeAC": {
+      "2": 0.6347,
+      "0.1": 0.7508,
+      "0.5": 0.6908
+    }
+  },
+  {
+    "file": "tin_band4_synth.wav",
+    "seconds": 14.9537,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 16.4646,
+    "medianHz": 635,
+    "stereoCorrelation": 0.3123,
+    "envelopeCV": 0.8252,
+    "envelopeAC": {
+      "2": 0.1903,
+      "0.1": 0.8473,
+      "0.5": 0.4419
+    }
+  },
+  {
+    "file": "tin_band5_ref.wav",
+    "seconds": 15,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 11.1321,
+    "medianHz": 867,
+    "stereoCorrelation": 0.7068,
+    "envelopeCV": 0.467,
+    "envelopeAC": {
+      "2": 0.8832,
+      "0.1": 0.9053,
+      "0.5": 0.9024
+    }
+  },
+  {
+    "file": "tin_band5_synth.wav",
+    "seconds": 14.9537,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 9.0398,
+    "medianHz": 1836,
+    "stereoCorrelation": 0.7077,
+    "envelopeCV": 0.4298,
+    "envelopeAC": {
+      "2": 0.1356,
+      "0.1": 0.73,
+      "0.5": 0.2476
+    }
+  },
+  {
+    "file": "tin_band6_ref.wav",
+    "seconds": 15,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 9.7029,
+    "medianHz": 1174,
+    "stereoCorrelation": 0.3231,
+    "envelopeCV": 0.5111,
+    "envelopeAC": {
+      "2": 0.7661,
+      "0.1": 0.8278,
+      "0.5": 0.7878
+    }
+  },
+  {
+    "file": "tin_band6_synth.wav",
+    "seconds": 14.9537,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 14.5056,
+    "medianHz": 2008,
+    "stereoCorrelation": 0.346,
+    "envelopeCV": 0.4342,
+    "envelopeAC": {
+      "2": 0.0045,
+      "0.1": 0.7269,
+      "0.5": 0.3033
+    }
+  },
+  {
+    "file": "tin_band7_ref.wav",
+    "seconds": 15,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 15.6555,
+    "medianHz": 2950,
+    "stereoCorrelation": 0.2066,
+    "envelopeCV": 0.4335,
+    "envelopeAC": {
+      "2": 0.9155,
+      "0.1": 0.9418,
+      "0.5": 0.9351
+    }
+  },
+  {
+    "file": "tin_band7_synth.wav",
+    "seconds": 14.9537,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 10.5117,
+    "medianHz": 4829,
+    "stereoCorrelation": 0.2057,
+    "envelopeCV": 0.4824,
+    "envelopeAC": {
+      "2": -0.2094,
+      "0.1": 0.8394,
+      "0.5": 0.439
+    }
+  },
+  {
+    "file": "tin_band8_ref.wav",
+    "seconds": 15,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 20.9181,
+    "medianHz": 4027,
+    "stereoCorrelation": 0.8346,
+    "envelopeCV": 0.4403,
+    "envelopeAC": {
+      "2": 0.5932,
+      "0.1": 0.7133,
+      "0.5": 0.6326
+    }
+  },
+  {
+    "file": "tin_band8_synth.wav",
+    "seconds": 14.9537,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 11.126,
+    "medianHz": 9399,
+    "stereoCorrelation": 0.8339,
+    "envelopeCV": 0.461,
+    "envelopeAC": {
+      "2": -0.1103,
+      "0.1": 0.7135,
+      "0.5": 0.1977
+    }
+  },
+  {
+    "file": "tin_band9_ref.wav",
+    "seconds": 15,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 16.1099,
+    "medianHz": 6223,
+    "stereoCorrelation": 0.2772,
+    "envelopeCV": 0.362,
+    "envelopeAC": {
+      "2": 0.5913,
+      "0.1": 0.8751,
+      "0.5": 0.8321
+    }
+  },
+  {
+    "file": "tin_band9_synth.wav",
+    "seconds": 14.9537,
+    "rate": 44100,
+    "rms": 0.018,
+    "crest": 10.685,
+    "medianHz": 10750,
+    "stereoCorrelation": 0.2784,
+    "envelopeCV": 0.3701,
+    "envelopeAC": {
+      "2": 0.1643,
+      "0.1": 0.6999,
+      "0.5": 0.042
+    }
+  }
+]

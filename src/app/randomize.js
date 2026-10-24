@@ -368,6 +368,7 @@ export function randomAmbienceShape(level, rng = Math.random) {
     return Object.fromEntries(AMBIENCE_IDS.map((id) => {
         const shape = defaultShape(id);
         Object.entries(LAYER_PARAMS[id]).forEach(([key, spec]) => {
+            if (spec.options) { shape[key] = wild ? pick(rng, spec.options) : spec.default; return; }
             shape[key] = step(wild ? rng() : clamp01(spec.default + between(rng, -0.25, 0.25)), 0.1);
         });
         shape.distance = step(wild ? rng() : between(rng, 0, 0.3), 0.05);

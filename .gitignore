@@ -20,3 +20,7 @@ dist-public/
 # Raw source banks and reference recordings remain local; public YAML is exported separately
 banks/
 
+
+rain_synth/reference/
+rain_synth/bands/
+rain_synth/*_demo.wav

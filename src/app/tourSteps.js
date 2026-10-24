@@ -115,8 +115,8 @@ export const TOUR_STEPS = [
         id: 'ambience',
         stage: 1,
         selector: '[data-tour="ambience"]',
-        title: 'Ambience',
-        text: 'Rain, distant thunder, wind, waves, a fireplace and vinyl crackle to mix as a bed under the music, with a level for each. Try raising the rain, then add a little fireplace. Under More options, shape every layer you have turned up.',
+        title: 'Vibe',
+        text: 'Mix rain, thunder and waves beneath the music or listen to weather alone. Each source has its own presets and settings: try Open rain, then add Distant rolls. Wind, fireplace and vinyl have their own levels too; shape those under More options when enabled.',
     },
 
     {

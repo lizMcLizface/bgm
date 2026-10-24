@@ -22,6 +22,7 @@
 // category - see setupStore.js.
 
 import library from '../library/scenes.json';
+import { WEATHER_SCENES } from './weatherPresets';
 import { defaultSettings, newSeed, sanitizeSettings } from './settings';
 import { ROLE_PRESETS } from './presets';
 import { sanitizePreset,findPreset } from './editor/presetStore';
@@ -80,7 +81,7 @@ export function normalizeScene(raw, defaultCategory = MINE.id) {
 }
 
 /** In picker order. */
-export const SCENES = library.scenes.map((scene) => normalizeScene(scene, SCENE_CATEGORIES[0].id));
+export const SCENES = [...library.scenes, ...WEATHER_SCENES].map((scene) => normalizeScene(scene, SCENE_CATEGORIES[0].id));
 /** Archived versions resolve through sceneBySlug but stay out of browsing. */
 export const BROWSABLE_SCENES = SCENES.filter(scene => !scene.hidden);
 export const sceneUsesWasm=scene=>percussionVoice(scene.settings.drums?.kit).wasmOnly||Object.values(scene.voices).some(v=>typeof v==='string'?!!findPreset(v)?.wasmVoice:!!v?.synth?.wasmVoice);

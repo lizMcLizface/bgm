@@ -317,15 +317,20 @@ const VOICE_LATER_GROUPS = [
     [[['wander', 'mode'], options(Object.keys(WANDER_MODES), 1)]], // random-walk wander, added last
 ];
 const shapeCodec = (key, spec) => {
+    if (spec.options) return options(spec.options);
     if (key === 'pan') return stepped(-1, 1, 0.1);
     if (key === 'width' || spec.render) return stepped(0, 1, 0.1);
     return stepped(0, 1, 0.05);
 };
+// Freeze the original field order/widths: weather controls are appended below,
+// never inserted into the existing rain/thunder/wind/waves/fire/vinyl groups.
+const LEGACY_SHAPE_KEYS = { rain: ['intensity', 'drops'], thunder: ['frequency', 'intensity'], wind: ['speed', 'gusts'],
+    waves: ['period', 'size'], fire: ['crackle', 'roar'], vinyl: ['crackle', 'hiss'] };
 const AMBIENCE_GROUPS = [
     LATER_GROUPS[2], // levels, volume
     LATER_GROUPS[3], // what Play starts
     // each layer's shape (engine/ambienceSynth.js): its own params, then distance, pan, width
-    ...Object.keys(AMBIENCE_LAYERS).map((id) => [...Object.entries(LAYER_PARAMS[id]), ['distance', {}], ['pan', {}], ['width', {}]]
+    ...Object.keys(AMBIENCE_LAYERS).map((id) => [...LEGACY_SHAPE_KEYS[id].map(key => [key, LAYER_PARAMS[id][key]]), ['distance', {}], ['pan', {}], ['width', {}]]
         .map(([key, spec]) => [['ambienceShape', id, key], shapeCodec(key, spec)])),
     [ // the bed's slow wander, added last
         [['ambienceWander', 'mode'], options(Object.keys(WANDER_MODES), 1)],
@@ -333,6 +338,9 @@ const AMBIENCE_GROUPS = [
         [['ambienceWander', 'layers'], stepped(AMBIENCE_WANDER_LIMITS.layers.min, AMBIENCE_WANDER_LIMITS.layers.max, AMBIENCE_WANDER_LIMITS.layers.step)],
         [['ambienceWander', 'period'], stepped(AMBIENCE_WANDER_LIMITS.period.min, AMBIENCE_WANDER_LIMITS.period.max, AMBIENCE_WANDER_LIMITS.period.step)],
     ],
+    ...['rain', 'thunder', 'waves'].map(id => Object.entries(LAYER_PARAMS[id])
+        .filter(([key]) => !LEGACY_SHAPE_KEYS[id].includes(key))
+        .map(([key, spec]) => [['ambienceShape', id, key], shapeCodec(key, spec)])),
 ];
 
 class BitWriter {

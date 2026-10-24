@@ -43,6 +43,8 @@ import { ROLE_PRESETS } from './presets';
 import { setupMediaSession, updateMediaSession } from './mediaSession';
 import { AMBIENCE_LAYERS, LAYER_PARAMS } from './engine/ambience';
 import { COMMON_PARAMS } from './engine/ambienceSynth';
+import { WEATHER_SOURCES } from './engine/weatherBedModel';
+import { WEATHER_PRESETS, weatherPresetPatch, matchingWeatherPreset } from './weatherPresets';
 import {
     DiceIcon, RotateIcon, SparkIcon, PlayIcon, PauseIcon, ToStartIcon, BarBackIcon, BarForwardIcon, ProgressionBackIcon, ProgressionForwardIcon, LoopIcon, MusicIcon, AmbienceIcon, ChevronUpIcon, ChevronDownIcon, TimelineIcon,
 } from './icons';
@@ -475,13 +477,15 @@ const LayerShape = ({ id, label, shape, onChange }) => {
         <fieldset className="gen-weights">
             <legend>{label}</legend>
             {Object.entries(LAYER_PARAMS[id]).map(([key, spec]) => (
-                <Field key={key} label={`${spec.label} ${Math.round(shape[key] * 100)}%`}>
-                    <input type="range" min="0" max="1" step={spec.render ? 0.1 : 0.05} value={shape[key]} onChange={(e) => set(key, Number(e.target.value))} />
+                <Field key={key} label={spec.options ? spec.label : `${spec.label} ${Math.round(shape[key] * 100)}%`}>
+                    {spec.options ? <select aria-label={`${label} ${spec.label.toLowerCase()}`} value={shape[key]} onChange={e => set(key, e.target.value)}>
+                        {spec.options.map(option => <option key={option} value={option}>{option[0].toUpperCase() + option.slice(1)}</option>)}
+                    </select> : <input aria-label={`${label} ${spec.label.toLowerCase()}`} type="range" min="0" max="1" step={spec.render ? 0.1 : 0.05} value={shape[key]} onChange={(e) => set(key, Number(e.target.value))} />}
                 </Field>
             ))}
             {Object.entries(COMMON_PARAMS).map(([key, spec]) => (
                 <Field key={key} label={`${names[key] || spec.label} ${key === 'pan' ? panLabel(shape.pan) : `${Math.round(shape[key] * 100)}%`}`}>
-                    <input type="range" min={spec.min} max={spec.max} step={key === 'distance' ? 0.05 : 0.1} value={shape[key]} onChange={(e) => set(key, Number(e.target.value))} />
+                    <input aria-label={`${label} ${(names[key] || spec.label).toLowerCase()}`} type="range" min={spec.min} max={spec.max} step={key === 'distance' ? 0.05 : 0.1} value={shape[key]} onChange={(e) => set(key, Number(e.target.value))} />
                 </Field>
             ))}
         </fieldset>
@@ -527,17 +531,17 @@ const SoundsBar = ({ onGenerate, generating }) => {
 };
 
 // The ambient bed (engine/ambience.js): on / off (as beside Play), a volume
-// for the whole bed against the music, and a slider per layer to balance
-// them; under More options, the shape of each layer that is turned up.
+// for the whole bed against the music, and independent weather source cards.
+// More options holds the active wind, fire and vinyl shapes.
 const AmbiencePanel = ({ levels, shape, volume, on, onChange, onShape, onVolume, onToggle, onRandom }) => {
-    const active = Object.entries(AMBIENCE_LAYERS).filter(([id]) => levels[id] > 0);
+    const active = Object.entries(AMBIENCE_LAYERS).filter(([id]) => levels[id] > 0 && !WEATHER_SOURCES.includes(id));
     const more = active.length
         ? active.map(([id, label]) => <LayerShape key={id} id={id} label={label} shape={shape[id]} onChange={(s) => onShape({ ...shape, [id]: s })} />)
-        : <p className="gen-hint">Turn a layer up to shape it: intensity, distance, direction and more.</p>;
+        : null;
     return (
-    <Panel id="ambience" title="Ambience" onRandom={onRandom} more={more} heading={(
+    <Panel id="ambience" title="Vibe" onRandom={onRandom} more={more} heading={(
         <>
-            Ambience
+            Vibe
             <button type="button" className={`gen-part${on ? ' is-on' : ''}`} aria-pressed={on} onClick={onToggle}
                 title={PART_TITLE}>{on ? 'On' : 'Off'}</button>
         </>
@@ -545,8 +549,28 @@ const AmbiencePanel = ({ levels, shape, volume, on, onChange, onShape, onVolume,
         <Field label={`Ambience volume ${Math.round(volume * 100)}%`}>
             <input type="range" min="0" max="1" step="0.05" value={volume} onChange={(e) => onVolume(Number(e.target.value))} />
         </Field>
+        <p className="gen-hint">Build a weather bed. Each source has its own preset and settings; changes leave the other sources alone.</p>
+        <div className="gen-weather-sources">
+            {WEATHER_SOURCES.map(id => <section key={id} className="gen-weather-source" aria-label={`${AMBIENCE_LAYERS[id]} source`}>
+                <h3>{AMBIENCE_LAYERS[id]}</h3>
+                <Field label={`${AMBIENCE_LAYERS[id]} level ${Math.round(levels[id] * 100)}%`}>
+                    <input aria-label={`${AMBIENCE_LAYERS[id]} level`} type="range" min="0" max="1" step="0.05" value={levels[id]}
+                        onChange={e => onChange({ ...levels, [id]: Number(e.target.value) })} />
+                </Field>
+                <select aria-label={`${AMBIENCE_LAYERS[id]} preset`} value={matchingWeatherPreset(id, shape[id], levels[id])} onChange={e => {
+                    const patch = weatherPresetPatch(id, e.target.value, shape, levels);
+                    if (patch) { onShape(patch.ambienceShape); onChange(patch.ambience); }
+                }}>
+                    <option value="">Choose a {id === 'waves' ? 'wave' : id} preset…</option>
+                    {WEATHER_PRESETS[id].map(preset => <option key={preset.id} value={preset.id}>{preset.name}</option>)}
+                </select>
+                <details><summary>{AMBIENCE_LAYERS[id]} settings</summary>
+                    <LayerShape id={id} label={AMBIENCE_LAYERS[id]} shape={shape[id]} onChange={s => onShape({ ...shape, [id]: s })} />
+                </details>
+            </section>)}
+        </div>
         <div className="gen-ambience">
-            {Object.entries(AMBIENCE_LAYERS).map(([id, label]) => (
+            {Object.entries(AMBIENCE_LAYERS).filter(([id]) => !WEATHER_SOURCES.includes(id)).map(([id, label]) => (
                 <Field key={id} label={`${label} ${levels[id] > 0 ? `${Math.round(levels[id] * 100)}%` : '· off'}`}>
                     <input type="range" min="0" max="1" step="0.05" value={levels[id]}
                         onChange={(e) => onChange({ ...levels, [id]: Number(e.target.value) })} />

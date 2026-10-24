@@ -2,35 +2,31 @@
 // fireplace and vinyl crackle. Everything is synthesised here from noise -
 // no recordings, so nothing to license or download.
 //
-// Each layer is rendered once (per sample rate) into a buffer of 17-31 s
-// that loops seamlessly: its slow movement (gusts, swells, flicker) is
-// periodic over the loop, and the noise is cross-faded across the loop
-// point. The lengths differ, so layers never line up the same way twice.
-// Playing a layer is then one looping buffer source and a gain - next to
-// nothing for the audio thread. Thunder is the exception: one-off rumbles
-// at seeded random times (a looped one would be heard to repeat).
+// Rain, thunder and waves share the streaming weather model used by /ambient/.
+// A worklet supplies three stereo sources, each with independent shape,
+// shelter, spatial controls and level. Offline exports run that same model
+// in a worker and retain history across chunk prerolls and crossfades.
 //
-// Rendering a layer takes a moment, so it happens in a worker
-// (ambience.worker.js, sounds in ambienceSynth.js) - never on the main
-// thread, where it would hold up the note scheduler. A layer starts as soon
-// as its buffer is ready; prepare() renders ahead (offline renders, or as
-// soon as a slider moves while stopped).
+// Wind, fireplace and vinyl use seamless 17-31 s loops, prepared in
+// ambience.worker.js. Different loop lengths keep their movement apart.
+// A layer starts when its buffer is ready; prepare() can render ahead.
 //
 // The bed drifts slowly (wander.js): the whole bed's level and each layer's
 // own level move by small amounts, on sine waves or as a bounded random
 // walk (setWander), so a long stretch never sits perfectly still.
 //
 // Times can be offset into the piece (start(time, offset)), so an offline
-// render in chunks (render.js) continues every loop and thunder exactly.
+// render in chunks (render.js) continues the loops and weather events.
 // (No audio imports at module level: settings.js reads the layer list.)
 
-import { seeded } from '../random';
+import { WeatherBedRoute, WeatherBedOffline } from './weatherBedAudio';
+import { WEATHER_SOURCES } from './weatherBedModel';
 import { wanderLfo, defaultAmbienceWander, WalkPath } from './wander';
-import { LAYERS, THUNDER, LAYER_PARAMS, defaultShape, renderParams } from './ambienceSynth';
+import { LAYERS, LAYER_PARAMS, defaultShape, renderParams } from './ambienceSynth';
 
 export const AMBIENCE_LAYERS = {
     rain: 'Rain',
-    thunder: 'Distant thunder',
+    thunder: 'Thunder',
     wind: 'Wind',
     waves: 'Waves',
     fire: 'Fireplace',
@@ -108,24 +104,6 @@ const levelGain = (level) => Math.pow(level, 1.6) * 1.8;
 const distanceCutoff = (d) => 18000 * Math.pow(600 / 18000, d);
 const distanceGain = (d) => 1 - 0.35 * d;
 
-// Thunder "how often" (0..1) to the average gap: 2.5 min down to 15 s.
-const thunderGap = (frequency) => 150 * Math.pow(10, -frequency);
-
-// Thunder: seeded times, the first after a fraction of a gap; strikes
-// spread around the pan by up to the width.
-function thunderTimes(seed, gap) {
-    const rng = seeded(seed);
-    const list = [];
-    let at = gap * (0.15 + 0.35 * rng());
-    return (until) => {
-        while (!list.length || list[list.length - 1].at < until) {
-            list.push({ at, variant: Math.floor(rng() * THUNDER.variants), gain: 0.5 + rng() * 0.5, spread: rng() - 0.5 });
-            at += gap * (0.5 + rng());
-        }
-        return list;
-    };
-}
-
 const isOffline = (context) => typeof OfflineAudioContext !== 'undefined' && context instanceof OfflineAudioContext;
 
 // Each layer's wander runs 0.85 .. 1.15 times the round, from its own phase and seed.
@@ -152,7 +130,7 @@ export function ambienceDrift(wander) {
     };
 }
 
-const LOOKAHEAD = 4; // seconds of thunder booked ahead while playing live
+
 const RERENDER_DELAY = 300; // ms after a shape change stops before re-rendering
 const SWAP_FADE = 1; // seconds to cross-fade a re-rendered loop in
 
@@ -164,7 +142,7 @@ class Ambience {
      * @param {number} [options.seed] - for thunder times
      * @param {number} [options.offset] - seconds of the piece elapsed at context time 0 (renders: for the wander)
      */
-    constructor({ context, seed = 1, offset = 0 }) {
+    constructor({ context, seed = 1, offset = 0, weatherBuffers = null }) {
         this.offset = offset;
         this.AC = context;
         this.output = context.createGain();
@@ -180,9 +158,9 @@ class Ambience {
         this.playing = {}; // layer id -> { source, fade, key } or { pending, key }
         this.running = false;
         this.seed = seed;
-        this.thunderGap = thunderGap(this.shape.thunder.frequency);
-        this.thunders = thunderTimes(seed, this.thunderGap);
-        this.thunderTimer = null;
+        this.weatherBuffers = weatherBuffers;
+        this.weatherRoute = new WeatherBedRoute(context, id => this.chain(id).input, seed);
+        this.weatherPlaying = [];
         this.renderTimers = {};
     }
 
@@ -234,7 +212,11 @@ class Ambience {
             const merge = AC.createChannelMerger(2);
             const same = [AC.createGain(), AC.createGain()]; // L->L, R->R
             const cross = [AC.createGain(), AC.createGain()]; // L->R, R->L
-            input.connect(filter).connect(split);
+            input.connect(filter);
+            const shelter = WEATHER_SOURCES.includes(id) ? [AC.createBiquadFilter(), AC.createBiquadFilter()] : [];
+            let previous = filter;
+            for (const f of shelter) { f.type = 'lowpass'; f.Q.value = Math.SQRT1_2; previous.connect(f); previous = f; }
+            previous.connect(split);
             [0, 1].forEach((c) => {
                 split.connect(same[c], c).connect(merge, 0, c);
                 split.connect(cross[c], c).connect(merge, 0, 1 - c);
@@ -253,7 +235,7 @@ class Ambience {
             });
             lfo.depth.connect(drift.gain);
             merge.connect(panner).connect(level).connect(drift).connect(this.output);
-            this.chains[id] = { input, filter, same, cross, panner, level, drift, lfo };
+            this.chains[id] = { input, filter, shelter, same, cross, panner, level, drift, lfo };
             this.applyWanderTo(id);
             this.applyShape(id, AC.currentTime, 0);
         }
@@ -267,28 +249,27 @@ class Ambience {
         const { distance, pan, width } = this.shape[id];
         const set = (param, value) => (ramp ? param.setTargetAtTime(value, time, ramp / 3) : param.setValueAtTime(value, time));
         set(chain.filter.frequency, distanceCutoff(distance));
+        for (const f of chain.shelter) set(f.frequency, Math.min(this.AC.sampleRate * .45, 18000 * (300 / 18000) ** (this.shape[id].shelter || 0)));
         // width 1: as is; 0: both channels the mid
         chain.same.forEach((g) => set(g.gain, (1 + width) / 2));
         chain.cross.forEach((g) => set(g.gain, (1 - width) / 2));
-        // thunder pans each strike instead (bookThunder)
-        set(chain.panner.pan, id === 'thunder' ? 0 : pan);
-        const level = id === 'thunder'
-            ? levelGain(this.levels.thunder) * (0.4 + 1.2 * this.shape.thunder.intensity)
-            : levelGain(this.levels[id] || 0);
+        set(chain.panner.pan, pan);
+        const level = levelGain(this.levels[id] || 0);
         set(chain.level.gain, level * distanceGain(distance));
     }
 
     /** Layer levels, 0..1 each (AMBIENCE_LAYERS); applies live while running. */
     setLevels(levels) {
         this.levels = { ...DEFAULT_AMBIENCE, ...levels };
-        this.prepare();
+        this.prepare().catch(error => { this.error = error; });
+        this.weatherRoute.setState(this.shape, this.levels);
         if (this.running) this.update(this.AC.currentTime, 0.4);
     }
 
     /**
      * Layer shapes (settings.ambienceShape): live params apply at once;
-     * render params re-render the loop shortly after the last change and
-     * cross-fade it in.
+     * weather params update the streaming model; other render params
+     * re-render their loop and cross-fade it in.
      */
     setShape(shape) {
         const previous = this.shape;
@@ -296,21 +277,31 @@ class Ambience {
         const now = this.AC.currentTime;
         Object.keys(AMBIENCE_LAYERS).forEach((id) => {
             this.applyShape(id, now, 0.15);
-            if (id === 'thunder' || renderKey(id, previous[id]) === renderKey(id, this.shape[id])) return;
+            if (WEATHER_SOURCES.includes(id) || renderKey(id, previous[id]) === renderKey(id, this.shape[id])) return;
             if (isOffline(this.AC)) return; // offline: prepare() then start() pick it up
             clearTimeout(this.renderTimers[id]);
             this.renderTimers[id] = setTimeout(() => this.swapLoop(id), RERENDER_DELAY);
         });
-        const gap = thunderGap(this.shape.thunder.frequency);
-        if (gap !== this.thunderGap) {
-            this.thunderGap = gap;
-            this.thunders = thunderTimes(this.seed, gap);
-        }
+        this.weatherRoute.setState(this.shape, this.levels);
     }
 
     /** Renders every layer that is turned up; resolves when all are ready. */
     prepare() {
-        return Promise.all(Object.keys(this.levels).filter((id) => this.levels[id] > 0).map((id) => layerBuffer(this.AC, id, this.shape[id]).promise));
+        const tasks = Object.keys(this.levels).filter(id => this.levels[id] > 0 && !WEATHER_SOURCES.includes(id))
+            .map(id => layerBuffer(this.AC, id, this.shape[id]).promise);
+        if (WEATHER_SOURCES.some(id => this.levels[id] > 0)) {
+            if (isOffline(this.AC)) {
+                this.weatherPreparation ??= (async () => {
+                    if (!this.weatherBuffers) {
+                        this.ownedWeatherOffline = new WeatherBedOffline(this.AC.sampleRate, this.shape, this.levels, this.seed);
+                        this.weatherBuffers = await this.ownedWeatherOffline.render(this.offset, this.AC.length);
+                    }
+                    this.weatherAudioBuffers = Object.fromEntries(Object.entries(this.weatherBuffers).map(([id, channels]) => [id, toBuffer(this.AC, channels)]));
+                })();
+                tasks.push(this.weatherPreparation);
+            } else tasks.push(this.weatherRoute.prepare());
+        }
+        return Promise.all(tasks);
     }
 
     /**
@@ -322,7 +313,6 @@ class Ambience {
         this.running = true;
         this.startedAt = time;
         this.offset = offset;
-        this.booked = new Set();
         this.output.gain.cancelScheduledValues(time);
         this.output.gain.setValueAtTime(1, time);
         this.update(time, 0);
@@ -335,31 +325,31 @@ class Ambience {
         this.output.gain.cancelScheduledValues(time);
         this.output.gain.setTargetAtTime(0, time, fade / 5);
         Object.keys(this.playing).forEach((id) => this.stopLayer(id, time + fade));
-        clearInterval(this.thunderTimer);
-        this.thunderTimer = null;
-        // rumbles already booked end with the output's fade; their nodes are
-        // dropped with the thunder chain, which starts fresh next time
-        const thunder = this.chains.thunder;
-        if (thunder) {
-            delete this.chains.thunder;
-            setTimeout(() => { thunder.drift.disconnect(); thunder.lfo.dispose(); }, (fade + 0.5) * 1000);
-        }
+        this.weatherRoute.stop(time + fade); this.weatherRunning = false;
+        for (const source of this.weatherPlaying) source.stop(time + fade);
+        this.weatherPlaying = []; this.ownedWeatherOffline?.dispose();
     }
 
     // Starts, re-levels or stops each layer to match this.levels.
     update(time, ramp) {
-        Object.keys(LAYERS).forEach((id) => {
+        Object.keys(LAYERS).filter(id => !WEATHER_SOURCES.includes(id)).forEach((id) => {
             const level = this.levels[id] || 0;
             const playing = this.playing[id];
             if (level > 0 && !playing) this.startLayer(id, time, ramp);
             else if (level > 0) this.applyShape(id, time, Math.max(ramp, 0.3));
             else if (playing) this.stopLayer(id, time + 0.5, 0.1);
         });
-        if (this.levels.thunder > 0) {
-            this.chain('thunder');
-            this.applyShape('thunder', time, ramp ? 0.3 : 0);
-        }
-        this.updateThunder(time);
+        WEATHER_SOURCES.forEach(id => { if (this.levels[id] > 0) this.chain(id); this.applyShape(id, time, ramp ? .3 : 0); });
+        const active = WEATHER_SOURCES.some(id => this.levels[id] > 0);
+        if (active && !this.weatherRunning) {
+            this.weatherRunning = true; this.weatherRoute.setState(this.shape, this.levels);
+            if (isOffline(this.AC)) {
+                for (const [id, buffer] of Object.entries(this.weatherAudioBuffers || {})) {
+                    const source = this.AC.createBufferSource(); source.buffer = buffer; source.connect(this.chain(id).input); source.start(time);
+                    source.onended = () => source.disconnect(); this.weatherPlaying.push(source);
+                }
+            } else void this.weatherRoute.start(time);
+        } else if (!active && this.weatherRunning) { this.weatherRoute.stop(time + .5); this.weatherRunning = false; }
     }
 
     // A layer whose buffer is still rendering starts (fading in) once it's
@@ -425,52 +415,7 @@ class Ambience {
         playing.source.stop(time);
     }
 
-    // Live: books thunder a few seconds ahead from a timer. Offline (no
-    // clock to wait for): books everything up to the render's end at once.
-    updateThunder(time) {
-        if (!this.running || !(this.levels.thunder > 0)) {
-            clearInterval(this.thunderTimer);
-            this.thunderTimer = null;
-            return;
-        }
-        if (isOffline(this.AC)) {
-            this.bookThunder(this.AC.length / this.AC.sampleRate);
-        } else if (!this.thunderTimer) {
-            this.bookThunder(time + LOOKAHEAD);
-            this.thunderTimer = setInterval(() => this.bookThunder(this.AC.currentTime + LOOKAHEAD), 1000);
-        }
-    }
 
-    // Books each rumble sounding before context time `until` that isn't
-    // booked yet - one already under way (an offline chunk's start, thunder
-    // just turned up) joins in the middle.
-    bookThunder(until) {
-        const now = Math.max(this.AC.currentTime, this.startedAt);
-        const from = this.pieceTime(now);
-        const to = this.pieceTime(until);
-        const entry = layerBuffer(this.AC, 'thunder');
-        if (!entry.buffer) {
-            // still rendering: book from where the clock is then
-            entry.promise.then(() => this.running && this.bookThunder(until));
-            return;
-        }
-        const { pan, width } = this.shape.thunder;
-        const chain = this.chain('thunder');
-        this.thunders(to).forEach(({ at, variant, gain, spread }) => {
-            if (this.booked.has(at) || at >= to || at + THUNDER.seconds <= from) return;
-            this.booked.add(at);
-            const into = Math.max(0, from - at);
-            const source = this.AC.createBufferSource();
-            source.buffer = entry.buffer[variant];
-            const level = this.AC.createGain();
-            level.gain.value = gain;
-            const panner = this.AC.createStereoPanner();
-            panner.pan.value = Math.max(-1, Math.min(1, pan + spread * 1.4 * width));
-            source.connect(level).connect(panner).connect(chain.input);
-            source.start(now + Math.max(0, at - from), into);
-            source.onended = () => panner.disconnect();
-        });
-    }
 }
 
 export default Ambience;

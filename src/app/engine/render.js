@@ -19,6 +19,8 @@ import WasmDrumKit from './wasmDrumKit';
 import { RoleWander, instrumentWander } from './wander';
 import { OPEN_TONE, TONE_ROLES } from '../Generator';
 import Ambience from './ambience';
+import { WeatherBedOffline } from './weatherBedAudio';
+import { WEATHER_SOURCES } from './weatherBedModel';
 import { unitsPerMinute } from '../meter';
 import { rubatoTime } from '../composition/rubato';
 import { automateDuck, DUCKED_BY } from './ducking';
@@ -219,12 +221,16 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
     const roles = Object.keys(gen.roles).filter((role) => audible[role]);
     const presets = Object.fromEntries(roles.filter((role) => role !== 'perc').map((role) => [role, gen.getRolePreset(role)]));
     const { notes, tones, levels, spaces, barStarts } = planNotes(gen, audible, seconds, ending);
-    const ambience = { ...gen.settings.ambience };
+    const ambience = Object.fromEntries(Object.entries(gen.settings.ambience).map(([id, value]) => [id, gen.settings.playAmbience ? value : 0]));
 
     let frames = 0;
     let carry = null; // the previous chunk's cross-fade overlap
     let first = 0; // index of the first note not yet past
     let tail = 0; // longest release + effects tail of the sounds (from the first chunk)
+    const weather = WEATHER_SOURCES.some(id => ambience[id] > 0)
+        ? new WeatherBedOffline(sampleRate, gen.settings.ambienceShape, ambience, 1) : null;
+    const cancelWeather = () => weather?.dispose(); signal?.addEventListener('abort', cancelWeather, { once: true });
+    try {
     for (let start = 0; start < seconds; start += CHUNK_SECONDS) {
         if (signal && signal.aborted) throw cancelled();
         const end = Math.min(seconds, start + CHUNK_SECONDS);
@@ -319,7 +325,8 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
         }
         Object.values(instruments).forEach(inst => inst.prepareOffline?.());
         if (Object.values(ambience).some((level) => level > 0)) {
-            const bed = new Ambience({ context: ctx, seed: 1, offset: from });
+            const weatherBuffers = weather ? await weather.render(from, ctx.length) : null;
+            const bed = new Ambience({ context: ctx, seed: 1, offset: from, weatherBuffers });
             cleanup.push(()=>bed.stop(ctx.currentTime,0));
             bed.setShape(gen.settings.ambienceShape);
             bed.setLevels(ambience);
@@ -372,4 +379,5 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
         }finally{cleanup.reverse().forEach(f=>f());}
     }
     return { frames, sampleRate };
+    } finally { signal?.removeEventListener('abort', cancelWeather); weather?.dispose(); }
 }

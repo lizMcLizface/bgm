@@ -12,6 +12,19 @@ synthesised with the Web Audio API; there are no samples.
 
 ## Features
 
+- Vibe on the main page: updated procedural rain, thunder and waves, with separate
+  source settings and presets, alongside wind, fireplace and vinyl. Weather plays
+  with music or on its own; shared links and WAV/video exports retain its settings.
+  Continuous synthesis and retained export history keep events flowing across chunks.
+- Detailed weather maker at `/ambient/`: continuous AudioWorklet synthesis,
+  correlated rain and impact density, five impact materials, shelter filtering and
+  seeded playback. Thunder adds a crack, rolling body and generated reverberation;
+  breaking waves add approach, crest and continuous retreat/backwash. All twelve components have
+  level/solo controls, with automatic activity, individual event previews and storm/
+  shoreline presets. Local reference/previous-synth WAV auditions
+  are available when `rain_synth/bands/` exists; recordings stay out of public builds.
+  See [the rain lab notes](docs/RAIN_LAB.md) for the model and reference mapping.
+
 - Every scale and mode family (major modes, harmonic/melodic minor,
   harmonic major, double harmonic, Neapolitan, hexatonic, pentatonic), any
   key, with correctly spelled chord names and Roman numerals
