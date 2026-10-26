@@ -16,6 +16,7 @@ import { minTime } from '../../util/util';
 import { wanderLfo } from './wander';
 import { MIN_WET } from '../../nodes/reverb';
 import { SendReverb } from '../../nodes/sharedReverb';
+import FdnRoom, { fdnRoomSupported } from './fdnRoom';
 import { blendPresets } from './morph';
 import { cleanExpression, expressiveEnvelope, expressiveSource, breathEnvelope, gateEnvelope } from './noteExpression';
 import { FX_STAGES, fxTail } from './voiceFx';
@@ -175,7 +176,7 @@ class Instrument {
      * @param {object} [options.preset]
      * @param {BaseAudioContext} [options.context]
      */
-    constructor({ polyphony = 8, preset = {}, context = audioContext, deferReverb = false, reverbHub = null } = {}) {
+    constructor({ polyphony = 8, preset = {}, context = audioContext, deferReverb = false, reverbHub = null, fdnRoom = false } = {}) {
         this.AC = context;
         this.polyphony = polyphony;
 
@@ -192,7 +193,9 @@ class Instrument {
         this.delay = new Nodes.Delay(this.AC);
         this.pingPong = new Nodes.PingPongDelay(this.AC);
         // one shared with the other voices, or its own (nodes/sharedReverb.js)
-        this.reverb = reverbHub ? new SendReverb(this.AC, reverbHub) : new Nodes.Reverb(this.AC);
+        // or, for a voice the Wasm engine runs natively, the kernel's room (engine/fdnRoom.js)
+        this.reverb = fdnRoom && fdnRoomSupported(this.AC) ? new FdnRoom(this.AC, 'reverb1')
+            : reverbHub ? new SendReverb(this.AC, reverbHub) : new Nodes.Reverb(this.AC);
         if (deferReverb) this.reverb.defer();
         this.eq = new Nodes.EQ2(this.AC);
         this.filter = new Nodes.Filter(this.AC);
@@ -489,7 +492,8 @@ class Instrument {
             return time * Math.ceil(Math.log(1e-4) / Math.log(fb));
         };
         const impulse = this.reverb.node.buffer;
-        const reverb = p.reverbAmount >= MIN_WET && !this.reverb.shared ? (impulse ? impulse.duration : 10) : 0;
+        const reverb = p.reverbAmount >= MIN_WET && !this.reverb.shared
+            ? (this.reverb.tailSeconds ? this.reverb.tailSeconds() : impulse ? impulse.duration : 10) : 0;
         return reverb
             + echoes(p.delayAmount, (this.tempoTailReserve ? 1 : p.delayTime), p.delayFeedback)
             + echoes(p.pingPongAmount, (this.tempoTailReserve ? 1 : p.pingPongDelayTime), p.pingPongFeedback)
@@ -506,8 +510,11 @@ class Instrument {
      */
     flushTails() {
         const now = this.AC.currentTime;
-        const impulse = this.reverb.node.buffer;
-        if (impulse) this.reverb.node.buffer = impulse;
+        if (this.reverb.flush) this.reverb.flush();
+        else {
+            const impulse = this.reverb.node.buffer;
+            if (impulse) this.reverb.node.buffer = impulse;
+        }
         this.shimmer.clear();
         this.freeze.clear();
         // delay lines are at most 1 s long (src/nodes/delay.js, pingPongDelay.js)
@@ -820,6 +827,7 @@ class Instrument {
         this.voices.forEach((synth) => synth.destroy());
         this.shimmer.dispose();
         this.freeze.dispose();
+        this.reverb.dispose?.();
         this.output.disconnect();
     }
 }

@@ -260,7 +260,7 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
                     : Wasm?await Wasm.create({polyphony:gen.getRolePolyphony(role),preset:presets[role],context:ctx,roomPool,dynamics:applyFeel(gen.settings).dynamics,notes:notes.filter(n=>n.role===role&&n.time>=from&&n.time<end+(last?0:CROSSFADE)).map(n=>({...n,time:n.time-from}))})
                     : new Instrument({ polyphony: gen.getRolePolyphony(role), preset: presets[role], context: ctx });
                 instruments[role]=inst;cleanup.push(()=>inst.dispose());
-                if (role === 'perc') {inst.setKit(gen.settings.drumKit);inst.setVoicePreset(gen.settings.drums.kit);if(inst.ready)await inst.ready;}
+                if (role === 'perc') {inst.setKit(gen.settings.drumKit);inst.setVoicePreset(gen.settings.drums.kit);if(inst.ready)await inst.ready;inst.reverb?.hear?.(); /* a room in the Wasm kernel must be built before the render starts */}
                 inst.scheduleSleep = () => {}; // no wall-clock timers during the render
                 if (gen.settings.timbreDrift > 0 && inst.setDrift) {
                     const middle = (from + end) / 2, bar = Math.max(0, barStarts.findLastIndex((t) => t <= middle));

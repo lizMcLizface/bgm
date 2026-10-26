@@ -1,7 +1,6 @@
 import DrumKit from './drumKit';
-import * as Nodes from '../../nodes';
 import {audioContext} from '../../audio/context';
-import {SendReverb} from '../../nodes/sharedReverb';
+import {makeDrumRoom} from './fdnRoom';
 import {DRUMS, defaultDrumKit} from '../percussion';
 import {kernelAsset} from '../../synth-lab/kernelAssets';
 import {drumForVoice,percussionVoice} from '../percussionVoices';
@@ -16,7 +15,7 @@ export function percussionModule() {
 }
 
 /** Same public routing/lifecycle as DrumKit, with a single persistent source.
- * The room is intentionally the original convolution path for source A/B tests.
+ * The room is the Wasm FDN room (fdnRoom.js), or the original convolution where that cannot run.
  * Native remains the default; loading errors are surfaced before playback.
  */
 export default class WasmDrumKit extends DrumKit {
@@ -33,7 +32,7 @@ export default class WasmDrumKit extends DrumKit {
         this.polyphony = 64;
         if (!externalEffects) {
             this.bus.disconnect();
-            this.reverb = reverbHub ? new SendReverb(context, reverbHub) : new Nodes.Reverb(context);
+            this.reverb = makeDrumRoom(context, reverbHub);
             this.reverb.defer();
             this.reverb.setType('reverb3');
             [].concat(this.reverb.getNode()).forEach(node => this.bus.connect(node));
@@ -119,6 +118,7 @@ export default class WasmDrumKit extends DrumKit {
         this.output.disconnect();
         this.bus.disconnect();
         this.reverb?.setAwake?.(false);
+        this.reverb?.dispose?.();
         this.reverb?.disconnect?.();
         this.destinations = [];
         this.awake = false;

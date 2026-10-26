@@ -10,10 +10,9 @@
 // disconnected, so the reverb doesn't render silence - when nothing has
 // sounded for its tail.
 
-import * as Nodes from '../../nodes';
 import { audioContext } from '../../audio/context';
 import { DRUMS, defaultDrumKit } from '../percussion';
-import { SendReverb } from '../../nodes/sharedReverb';
+import { makeDrumRoom } from './fdnRoom';
 import {drumForVoice,percussionVoice} from '../percussionVoices';
 
 // Each drum's gain, so that at the same velocity they peak from about
@@ -337,7 +336,7 @@ class DrumKit {
         this.reverb = null;
         if(externalEffects)this.bus.connect(this.output);
         else {
-            this.reverb = reverbHub ? new SendReverb(this.AC, reverbHub) : new Nodes.Reverb(this.AC);
+            this.reverb = makeDrumRoom(this.AC, reverbHub);
             this.reverb.defer(); // until the drums play (Generator.warmRoles, wake)
             this.reverb.setType('reverb3');
             [].concat(this.reverb.getNode()).forEach((node) => this.bus.connect(node));
@@ -460,11 +459,13 @@ class DrumKit {
 
     /** Drops the reverb's tail (as Instrument.flushTails). */
     flushTails() {
+        if (this.reverb?.flush) return this.reverb.flush();
         const impulse = this.reverb?.node.buffer;
         if (impulse) this.reverb.node.buffer = impulse;
     }
 
     tailSeconds() {
+        if (this.reverb?.tailSeconds) return this.reverb.tailSeconds();
         const impulse = this.reverb?.node.buffer;
         return this.reverb ? (impulse ? impulse.duration : 3) + 0.5 : 0;
     }
@@ -504,6 +505,7 @@ class DrumKit {
         this.output.disconnect();
         this.bus.disconnect();
         this.reverb?.setAwake?.(false);
+        this.reverb?.dispose?.();
         this.awake = false;
     }
 }

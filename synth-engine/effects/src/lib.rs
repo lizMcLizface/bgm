@@ -9,7 +9,11 @@ const FDN: usize = 32768; // > 160 ms at 192 kHz
 const ECHO: usize = 384002; // two seconds at 192 kHz, including interpolation
 const EARLY: usize = 65536;
 const DIFF: usize = 8192;
-const PARAMS: usize = 17;
+const PARAMS: usize = 18;
+// Denser early reflections, scaled by parameter 17 (off by default): offsets in ms after the pre-delay,
+// with their gains. The first four reflections (13, 27, 43 and 59 ms) are always on.
+const DENSE_MS: [f32; 8] = [5., 9., 17., 23., 33., 39., 49., 71.];
+const DENSE_GAIN: [f32; 8] = [0.22, -0.19, 0.17, -0.15, 0.13, 0.11, -0.09, 0.07];
 const TIMES: [f32; LINES] = [
     0.0297, 0.0371, 0.0411, 0.0437, 0.0531, 0.0593, 0.0617, 0.0671, 0.0713, 0.0797, 0.0839, 0.0893,
     0.0971, 0.1013, 0.1097, 0.1277,
@@ -167,7 +171,7 @@ impl Effects {
         };
         self.headroom.init(self.sr);
         self.p = [
-            1., 0.22, 0.12, 8., 0.7, 6000., 25., 1., 0.3, 375., 0.4, 4500., 1., 0.2, 1., 0., 0.,
+            1., 0.22, 0.12, 8., 0.7, 6000., 25., 1., 0.3, 375., 0.4, 4500., 1., 0.2, 1., 0., 0., 0.,
         ];
         self.smooth = [self.p[0], self.p[1], self.p[2]];
         self.pos = 0;
@@ -223,6 +227,7 @@ impl Effects {
             (0., 1.),
             (0., 1.),
             (-24., 18.),
+            (0., 8.),
         ];
         let val = value.clamp(ranges[index].0, ranges[index].1);
         if self.p[index] == val {
@@ -409,6 +414,20 @@ impl Effects {
                         * norm
                         * 0.5;
                     self.lines[j][self.pos] = mixed[j] * norm + injection;
+                }
+                if self.p[17] > 0. {
+                    for ch in 0..2 {
+                        for j in 0..DENSE_MS.len() {
+                            // alternate which ear a reflection came from, as the first four do
+                            let side = if j % 2 == 0 { 1 - ch } else { ch };
+                            early[ch] += tap(
+                                &self.early[side],
+                                self.early_pos,
+                                (self.p[6] + DENSE_MS[j]) * 0.001 * self.sr,
+                            ) * DENSE_GAIN[j]
+                                * self.p[17];
+                        }
+                    }
                 }
                 let reverb = [late[0] * 0.7 + early[0], late[1] * 0.7 + early[1]];
                 let mid = (reverb[0] + reverb[1]) * 0.5 * self.return_gain;

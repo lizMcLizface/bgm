@@ -17,6 +17,7 @@ export const EFFECTS = [
  ['quality','Reverb network · 8 / 16 lines',0,1,1,1],
  ['bypass','Bypass effects',0,1,1,0],
  ['reverbReturn','Reverb return · dB',-24,18,.5,0],
+ ['reflections','Early reflections',0,8,.01,0],
 ];
 export const defaultEffects=()=>Object.fromEntries(EFFECTS.map(([key,,,,,value])=>[key,value]));
 export function sanitizeEffects(raw={}) {
