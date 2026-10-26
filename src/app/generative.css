@@ -2163,6 +2163,24 @@ body {
     box-shadow: none;
 }
 
+/* Over the landscape the remaining chrome fades further, so the picture shows through. */
+:root[data-backdrop] .gen-zen .gen-timeline {
+    background: color-mix(in srgb, var(--gen-surface) 18%, transparent);
+    border-color: color-mix(in srgb, var(--gen-border) 40%, transparent);
+}
+
+:root[data-backdrop] .gen-zen .gen-header .gen-header-controls,
+:root[data-backdrop] .gen-zen .gen-header .gen-header-end {
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+:root[data-backdrop] .gen-zen .gen-header .gen-header-controls:hover,
+:root[data-backdrop] .gen-zen .gen-header .gen-header-end:hover,
+:root[data-backdrop] .gen-zen .gen-header :focus-within {
+    opacity: 1;
+}
+
 .gen-zen .gen-header > :not(.gen-header-controls):not(.gen-header-end) {
     display: none !important;
 }

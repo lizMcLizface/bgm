@@ -34,7 +34,7 @@ import {
 } from './randomize';
 import Backdrop, { backdropSupported, BACKDROP_DEFAULTS, shuffleColours } from './Backdrop';
 import SceneryBackdrop, { SCENERY_DEFAULTS } from './SceneryBackdrop';
-import { landscapeForScene } from '../scenery/presetScenes';
+import { sceneryForScene } from '../scenery/presetScenes';
 import { viewFromSearch, withView } from './viewLink';
 import { MasterVolume, SettingsMenu, AudioMenu, VisualMenu } from './AudioStatus';
 import { SleepTimer, Recorder } from './Playback';
@@ -1223,19 +1223,16 @@ const GenerativeApp = () => {
     // fluid on/off preference carries over.
     const [backdropMode, setBackdropMode] = useStoredFlag('bgm-backdrop-mode', readPref('bgm-backdrop', false) ? 'fluid' : 'off', linkedView?.backdrop);
     const backdropOn = backdropMode === 'fluid';
-    const [storedScenery, setSceneryOptions] = useStoredFlag('bgm-scenery-options', { ...SCENERY_DEFAULTS, seed: Math.floor(Math.random() * 1e6) });
+    // A link to a preset opens on that preset's landscape too (held in memory, not saved).
+    const [storedScenery, setSceneryOptions] = useStoredFlag('bgm-scenery-options', { ...SCENERY_DEFAULTS, seed: Math.floor(Math.random() * 1e6) },
+        linkedScene ? sceneryForScene({ ...SCENERY_DEFAULTS, ...readPref('bgm-scenery-options', {}) }, linkedScene) : undefined);
     const sceneryOptions = { ...SCENERY_DEFAULTS, ...storedScenery };
     const sceneryRef = useRef(sceneryOptions);
     sceneryRef.current = sceneryOptions;
     // A musical preset brings its own landscape, weather, hour and season (src/scenery/presetScenes.js).
     const applyLandscape = (picked) => {
-        const o = sceneryRef.current, l = landscapeForScene(picked.name, picked.category);
-        if (!o.follow || !l) return;
-        setSceneryOptions({
-            ...o, biome: l.biome, seed: o.biome === l.biome ? o.seed : Math.floor(Math.random() * 1e6),
-            weather: l.weather, hour: l.hour, year: l.year,
-            time: o.moveTime ? 'cycle' : 'fixed', season: o.moveSeason ? 'cycle' : 'fixed', epoch: Date.now(),
-        });
+        const next = sceneryForScene(sceneryRef.current, picked);
+        if (next !== sceneryRef.current) setSceneryOptions(next);
     };
     useEffect(() => { if (readPref('bgm-scenery-options', null) === null) setSceneryOptions(sceneryOptions); }, []); // eslint-disable-line react-hooks/exhaustive-deps
     const [fluidReset, setFluidReset] = useState(0);

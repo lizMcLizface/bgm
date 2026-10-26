@@ -139,3 +139,15 @@ export function landscapeForScene(name, category) {
 }
 
 export const SCENE_LANDSCAPES = BY_NAME;
+
+// `options` (the scenery options) as they become when a preset is picked; unchanged when the
+// user turned following off or the preset has no landscape. `random` supplies a new seed.
+export function sceneryForScene(options, scene, random = () => Math.floor(Math.random() * 1e6)) {
+    const l = scene && landscapeForScene(scene.name, scene.category);
+    if (!options.follow || !l) return options;
+    return {
+        ...options, biome: l.biome, seed: options.biome === l.biome ? options.seed : random(),
+        weather: l.weather, hour: l.hour, year: l.year,
+        time: options.moveTime ? 'cycle' : 'fixed', season: options.moveSeason ? 'cycle' : 'fixed', epoch: Date.now(),
+    };
+}
