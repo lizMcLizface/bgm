@@ -7,23 +7,9 @@ import { Buf } from './scene.js';
 import { hex, mix } from './lighting.js';
 import { bayer, clamp, fbm2, hash, makeRng } from './noise.js';
 import { cumulus, seedOf, stratus } from './shapes.js';
+import { WEATHER } from './catalog.js';
 
-export const WEATHER = {
-    clear: 'Clear',
-    sparse: 'Sparse clouds',
-    scattered: 'Scattered clouds',
-    dense: 'Dense clouds',
-    towering: 'Towering clouds',
-    streaks: 'High streaks',
-    mixed: 'Streaks and puffs',
-    overcast: 'Overcast',
-    rain: 'Rain',
-    storm: 'Thunderstorm',
-    snow: 'Snow',
-    fog: 'Fog',
-    haze: 'Haze',
-    dust: 'Dust storm',
-};
+export { WEATHER };
 const KINDS = Object.keys(WEATHER);
 
 export const DEFAULT_WEATHER = [['clear', 1], ['sparse', 1.5], ['scattered', 3], ['dense', 1], ['towering', 1.2], ['streaks', 0.7], ['mixed', 0.8], ['overcast', 0.6], ['rain', 0.4], ['storm', 0.2], ['fog', 0.4], ['haze', 0.4], ['snow', 0.8]];

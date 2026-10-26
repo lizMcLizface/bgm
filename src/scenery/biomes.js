@@ -7,6 +7,7 @@ import { bayer, clamp, fbm1, fbm2, hash, lerp, makeRng, noise1, noise2, smoothst
 import { blades, blobTree, canopyRidge, celestial, conifer, cumulus, hill, mountains, seedOf, sky, sphereField, water } from './shapes.js';
 import { DEFAULT_WEATHER, weatherOverlay, weatherSky } from './weather.js';
 import { seasonAt } from './seasons.js';
+import { BIOME_NAMES } from './catalog.js';
 import { farmland, river, savanna, woodland } from './landscapes.js';
 
 // Four tones per material: two shadow tones, then their lit counterparts.
@@ -780,16 +781,16 @@ function industrial(sc, rng) {
 }
 
 export const BIOMES = {
-    lake: { name: 'Mountain lake', hour: 15.5, build: lake },
-    grassland: { name: 'Grassland', hour: 11, build: grassland },
-    hills: { name: 'Rolling hills', hour: 9.5, build: hills },
-    desert: { name: 'Desert', hour: 17.6, build: desert },
-    seaside: { name: 'Seaside', hour: 13, build: seaside },
-    industrial: { name: 'Industrial', hour: 19.9, build: industrial },
-    farmland: { name: 'Farmland', hour: 10.5, build: farmland },
-    savanna: { name: 'Savanna', hour: 17.2, build: savanna },
-    woodland: { name: 'Woodland', hour: 9, build: woodland },
-    river: { name: 'River valley', hour: 15, build: river },
+    lake: { name: BIOME_NAMES.lake, hour: 15.5, build: lake },
+    grassland: { name: BIOME_NAMES.grassland, hour: 11, build: grassland },
+    hills: { name: BIOME_NAMES.hills, hour: 9.5, build: hills },
+    desert: { name: BIOME_NAMES.desert, hour: 17.6, build: desert },
+    seaside: { name: BIOME_NAMES.seaside, hour: 13, build: seaside },
+    industrial: { name: BIOME_NAMES.industrial, hour: 19.9, build: industrial },
+    farmland: { name: BIOME_NAMES.farmland, hour: 10.5, build: farmland },
+    savanna: { name: BIOME_NAMES.savanna, hour: 17.2, build: savanna },
+    woodland: { name: BIOME_NAMES.woodland, hour: 9, build: woodland },
+    river: { name: BIOME_NAMES.river, hour: 15, build: river },
 };
 
 export function createScene(biome, seed, weather = 'auto', year = 1, W = 384, H = 216) {

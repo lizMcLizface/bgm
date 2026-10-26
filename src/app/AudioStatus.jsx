@@ -18,6 +18,7 @@ import { readPref, writePref } from './prefs';
 import { applyTheme, storedTheme } from './theme';
 import { BACKDROP_DEFAULTS, PALETTES } from './Backdrop';
 import FluidControls from './visuals/FluidControls';
+import SceneryControls from './visuals/SceneryControls';
 import WasmQuality from '../audio/WasmQuality';
 import { LinkIcon, SpeakerIcon, SunIcon, MoonIcon, AutoThemeIcon, PaletteIcon } from './icons';
 
@@ -97,7 +98,8 @@ const THEME_HINTS = { auto: 'Colours follow your system', light: 'Light colours'
  * background with its options (`backdrop`: null when
  * WebGL2 is missing). Stays in the hidden-interface view.
  */
-export const VisualMenu = ({ backdrop, pianos }) => {
+// `backdrop.mode` is 'off', 'fluid' or 'scenery'; only one background runs at a time.
+export const VisualMenu = ({ backdrop, scenery, pianos }) => {
     const menu = useRef(null);
     useDismiss(menu);
     const [theme, setTheme] = useState(storedTheme);
@@ -128,11 +130,16 @@ export const VisualMenu = ({ backdrop, pianos }) => {
                 {backdrop && (
                     <section className="gen-menu-section">
                         <h3>Background</h3>
-                        <label className="gen-check">
-                            <input type="checkbox" checked={backdrop.value} disabled={backdrop.locked} title={backdrop.locked?"Perf mode pauses the fluid background":undefined} onChange={(e) => backdrop.onChange(e.target.checked)} />
-                            Fluid background
-                        </label>
-                        <small>Flowing colour shaped by the notes and their sound.</small>
+                        <div className="gen-menu-choices" role="group" aria-label="Background">
+                            {[['off', 'None'], ['fluid', 'Fluid'], ['scenery', 'Landscape']].map(([id, label]) => {
+                                const disabled = id === 'fluid' && (!backdrop.fluidOk || backdrop.locked);
+                                return <button key={id} type="button" className={backdrop.mode === id ? 'is-on' : ''} aria-pressed={backdrop.mode === id} disabled={disabled}
+                                    title={id === 'fluid' && backdrop.locked ? 'Perf mode pauses the fluid background' : id === 'fluid' && !backdrop.fluidOk ? 'Needs WebGL2' : undefined}
+                                    onClick={() => backdrop.onMode(id)}>{label}</button>;
+                            })}
+                        </div>
+                        <small>{backdrop.mode === 'scenery' ? 'A pixel landscape whose light, weather and season change on their own.' : 'Fluid: flowing colour shaped by the notes and their sound.'}</small>
+                        {backdrop.mode === 'scenery' && scenery && <SceneryControls options={scenery.options} onOptions={scenery.onOptions} />}
                         {backdrop.value && (
                             <>
                                 <label className="gen-menu-slider">
@@ -146,7 +153,7 @@ export const VisualMenu = ({ backdrop, pianos }) => {
                             </>
                         )}
                         {backdrop.value && <FluidControls options={backdrop.options} onOptions={backdrop.onOptions} onClear={backdrop.onClear} />}
-                        <button type="button" className="gen-menu-wide" onClick={() => { backdrop.onOptions(BACKDROP_DEFAULTS); backdrop.onClear?.(); }}>Reset background</button>
+                        {backdrop.mode === 'fluid' && <button type="button" className="gen-menu-wide" onClick={() => { backdrop.onOptions(BACKDROP_DEFAULTS); backdrop.onClear?.(); }}>Reset background</button>}
                     </section>
                 )}
             </div>

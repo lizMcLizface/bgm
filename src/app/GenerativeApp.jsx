@@ -14,6 +14,7 @@ import { GROUPS, groupValue } from './rulebook/groups';
 import { RULES } from './rulebook/model';
 import { readBook, inheritBook, withPresetBook, withBook, applyBook, baselineChoice, withoutSettings } from './rulebook/session';
 let initialBook = readBook(window.location.search);
+const linkedView = viewFromSearch(window.location.search);
 import { RoleButtons, TrackStrip, useLivePlay, DRUM_KEY_HINT } from './Tracks';
 import { defaultSettings, shareFromLocation, sharePath, shareUrl, newSeed } from './settings';
 // The sound window brings the DIY and classic synths with it: loaded on the first ✎.
@@ -32,6 +33,8 @@ import {
     randomPadMotion, randomColour,
 } from './randomize';
 import Backdrop, { backdropSupported, BACKDROP_DEFAULTS, shuffleColours } from './Backdrop';
+import SceneryBackdrop, { SCENERY_DEFAULTS } from './SceneryBackdrop';
+import { viewFromSearch, withView } from './viewLink';
 import { MasterVolume, SettingsMenu, AudioMenu, VisualMenu } from './AudioStatus';
 import { SleepTimer, Recorder } from './Playback';
 import { sceneSettings, sceneSoundSettings, sceneGroup, stepBuiltinSceneEntry, buildSetup, parseSetup, sceneBySlug, sceneSlug, presetFromSearch, introFromSearch, SCENES, SCENE_CATEGORIES } from './scenes';
@@ -144,9 +147,9 @@ const withIntro = (path, shortIntro) => (shortIntro ? `${path}${path.includes('?
 function useSettingsInUrl(settings, presets, presetSlug, shortIntro, generation, book, perfOn) {
     useEffect(() => {
         const id = setTimeout(() => {
-            window.history.replaceState(null, '', withPercussion(withMediaHelper(withPerf(withFMBank(withSimd(withAudioEngine(withBook(withGeneration(withIntro(presetSlug
+            window.history.replaceState(null, '', withView(withPercussion(withMediaHelper(withPerf(withFMBank(withSimd(withAudioEngine(withBook(withGeneration(withIntro(presetSlug
                 ? `${window.location.pathname}?preset=${presetSlug}`
-                : sharePath(settings, presets, window.location, { seed: false }), shortIntro), generation), book, presetSlug ? sceneBySlug(presetSlug)?.rulebook : undefined),engineFromSearch(window.location.search)),simdFromSearch(window.location.search)),bankFromSearch(window.location.search)),readPerfChoice()),mediaHelperFromSearch(window.location.search)),percussionFromSearch(window.location.search)));
+                : sharePath(settings, presets, window.location, { seed: false }), shortIntro), generation), book, presetSlug ? sceneBySlug(presetSlug)?.rulebook : undefined),engineFromSearch(window.location.search)),simdFromSearch(window.location.search)),bankFromSearch(window.location.search)),readPerfChoice()),mediaHelperFromSearch(window.location.search)),percussionFromSearch(window.location.search)), linkedView));
         }, 300);
         return () => clearTimeout(id);
     }, [settings, presets, presetSlug, shortIntro, generation, book, perfOn]);
@@ -201,8 +204,9 @@ const RANDOM_TARGETS = [
 ];
 
 // A remembered open/closed state (per browser).
-function useStoredFlag(key, initial) {
-    const [value, setValue] = useState(() => readPref(key, initial));
+// `override` (e.g. from ?view=) wins over the stored value for this visit without being saved.
+function useStoredFlag(key, initial, override) {
+    const [value, setValue] = useState(() => override ?? readPref(key, initial));
     const set = (next) => {
         setValue(next);
         writePref(key, next);
@@ -909,7 +913,8 @@ const GenerativeApp = () => {
     };
     const [helpOpen, setHelpOpen] = useState(false);
     useEffect(() => {
-        if (tourSeen()) return undefined;
+        // A ?view= link opens straight into its view; the tour stays in the ⚙ menu.
+        if (tourSeen() || linkedView) return undefined;
         const timer = setTimeout(() => openTour(true, { from: 0, to: 0 }), 800);
         return () => clearTimeout(timer);
     }, []);
@@ -1213,14 +1218,21 @@ const GenerativeApp = () => {
     const [smoothPresets, setSmoothPresets] = useStoredFlag('bgm-smooth-presets', true);
     // (smooth changes also pivot into a new key and glide to a new tempo, Generator.planHomeChange)
     useEffect(() => { gen.smoothChanges = smoothPresets; }, [gen, smoothPresets]);
-    const [backdropOn, setBackdropOn] = useStoredFlag('bgm-backdrop', false);
+    // The page background: none, the fluid simulation or the pixel landscape. An older
+    // fluid on/off preference carries over.
+    const [backdropMode, setBackdropMode] = useStoredFlag('bgm-backdrop-mode', readPref('bgm-backdrop', false) ? 'fluid' : 'off', linkedView?.backdrop);
+    const backdropOn = backdropMode === 'fluid';
+    const [storedScenery, setSceneryOptions] = useStoredFlag('bgm-scenery-options', { ...SCENERY_DEFAULTS, seed: Math.floor(Math.random() * 1e6) });
+    const sceneryOptions = { ...SCENERY_DEFAULTS, ...storedScenery };
+    // Keep the first random landscape, so a reload shows the same one.
+    useEffect(() => { if (readPref('bgm-scenery-options', null) === null) setSceneryOptions(sceneryOptions); }, []); // eslint-disable-line react-hooks/exhaustive-deps
     const [fluidReset, setFluidReset] = useState(0);
     const [storedBackdropOptions, setBackdropOptions] = useStoredFlag('bgm-backdrop-options', BACKDROP_DEFAULTS);
     const backdropOptions = { ...BACKDROP_DEFAULTS, ...storedBackdropOptions };
     // Hides everything but the transport and the timeline (⚙ menu); Esc or the corner button brings it back.
-    const [zen, setZen] = useStoredFlag('bgm-hide-ui', false);
+    const [zen, setZen] = useStoredFlag('bgm-hide-ui', false, linkedView ? true : undefined);
     // In that view the timeline can be folded away too (ignored while the interface shows).
-    const [timelineHidden, setTimelineHidden] = useStoredFlag('bgm-hide-timeline', false);
+    const [timelineHidden, setTimelineHidden] = useStoredFlag('bgm-hide-timeline', false, linkedView ? false : undefined);
     // a mini piano above each chord of the timeline (the Look menu)
     const [chordPianos, setChordPianos] = useStoredFlag('bgm-chord-pianos', false);
     const bare = zen && timelineHidden;
@@ -1428,6 +1440,7 @@ const GenerativeApp = () => {
     return (
         <main className={`gen${zen && !tourOpen && !helpOpen ? ' gen-zen' : ''}${bare && !tourOpen && !helpOpen ? ' gen-zen-bare' : ''}`}>
             {backdropOn && !perfOn && backdropSupported() && <Backdrop generator={gen} options={{ ...backdropOptions, circle: false }} clouds={backdropOn} resetKey={fluidReset} />}
+            {backdropMode === 'scenery' && <SceneryBackdrop options={sceneryOptions} light={perfOn} />}
 
             <header className="gen-header">
                 <h1 aria-label="calmbgm - calm procedural music" title="calmbgm - calm procedural music">calm<b>bgm</b></h1>
@@ -1454,7 +1467,8 @@ const GenerativeApp = () => {
                     <button type="button" className="gen-help" onClick={() => setHelpOpen(true)} title="Quick reference: hover the parts of the page to see what they do"
                         aria-label="Quick reference">?</button>
                     <MasterVolume />
-                    <VisualMenu pianos={{ value: chordPianos, onChange: setChordPianos }} backdrop={backdropSupported() ? { value: backdropOn&&!perfOn, locked:perfOn, onChange: setBackdropOn, options: backdropOptions, onOptions: setBackdropOptions, onClear: () => setFluidReset((n) => n + 1), onShuffle: () => setBackdropOptions(shuffleColours(backdropOptions)) } : null} />
+                    <VisualMenu pianos={{ value: chordPianos, onChange: setChordPianos }} backdrop={{ mode: backdropMode, onMode: setBackdropMode, fluidOk: backdropSupported(), value: backdropOn&&!perfOn&&backdropSupported(), locked:perfOn, options: backdropOptions, onOptions: setBackdropOptions, onClear: () => setFluidReset((n) => n + 1), onShuffle: () => setBackdropOptions(shuffleColours(backdropOptions)) }}
+                        scenery={{ options: sceneryOptions, onOptions: setSceneryOptions }} />
                     <AudioMenu generator={gen} onReload={reloadKeepingSettings}>
                         <WasmOptions engine={audioEngine} perf={{ onToggle: togglePerfMode }} />
                     </AudioMenu>

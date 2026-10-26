@@ -2112,6 +2112,12 @@ body {
     pointer-events: none;
 }
 
+/* The pixel landscape is drawn small and scaled up with hard pixel edges, cropped to fill. */
+.gen-backdrop-pixels {
+    object-fit: cover;
+    image-rendering: pixelated;
+}
+
 :root[data-backdrop] .gen-panel,
 :root[data-backdrop] .gen-rulebook,
 :root[data-backdrop] .gen-timeline {
