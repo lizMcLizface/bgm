@@ -448,7 +448,7 @@ function ruins(sc, rng) {
 // them, pillars of rock fading into the dark, glowing fungi on the shore, and by day a
 // shaft of sunlight through a hole in the roof. In ice, the walls glow pale blue.
 function cave(sc, rng) {
-    const { W, H, U } = sc, lake = sc.horizon = sc.horizonAt(rng.range(0.58, 0.68)), icy = rng.chance(0.3), s = seedOf(rng);
+    const { W, H, U } = sc, lake = sc.horizon = sc.horizonAt(rng.range(0.58, 0.68)), icy = rng.chance(0.3) || !!sc.look.icy, s = seedOf(rng);
     sc.climate = 'dry';
     const dim = icy ? [0.5, 0.58, 0.7] : [0.46, 0.52, 0.56];
     sc.relight = (L) => {
@@ -558,7 +558,9 @@ function roomFrame(sc, rng) {
     // The lamp's light falls off across the room in a few dithered steps.
     const level = (x, y) => clamp(Math.floor((1 - Math.hypot(x - lx, (y - ly) * 1.2) / (W * 0.85)) * 3 + bayer(x, y) * 0.9), 0, 3);
     const wall = [0.25, 0.45, 0.65, 0.85].map(v => shades(wallC, v)), wood = [0.3, 0.5, 0.7, 0.9].map(v => shades(woodC, v));
-    const wx0 = Math.round(W * rng.range(0.26, 0.34)), wx1 = Math.round(W - W * rng.range(0.26, 0.34)), wy0 = Math.round(H * rng.range(0.1, 0.16)), wy1 = Math.round(H * rng.range(0.66, 0.74));
+    // A wide screen gets a wide window, about three quarters of it; a tall one keeps some wall each side.
+    const side = W / H >= 1.4 ? [0.1, 0.14] : [0.14, 0.2];
+    const wx0 = Math.round(W * rng.range(...side)), wx1 = Math.round(W - W * rng.range(...side)), wy0 = Math.round(H * rng.range(0.1, 0.16)), wy1 = Math.round(H * rng.range(0.66, 0.74));
     const ft = Math.max(3, Math.round(W * 0.014)), b = new Buf(W, H), ws = seedOf(rng), stripes = rng.chance(0.5);
     for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
         const inWin = x >= wx0 && x <= wx1 && y >= wy0 && y <= wy1;

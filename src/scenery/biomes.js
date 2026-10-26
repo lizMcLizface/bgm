@@ -806,12 +806,15 @@ export const BIOMES = {
     savanna: { name: BIOME_NAMES.savanna, hour: 17.2, build: savanna },
     woodland: { name: BIOME_NAMES.woodland, hour: 9, build: woodland },
     river: { name: BIOME_NAMES.river, hour: 15, build: river },
-    // In review (tools/scenery.html); not offered on the page yet.
-    ...Object.fromEntries([...Object.entries(WILDS), ...Object.entries(PLACES), ...Object.entries(VISTAS), ...Object.entries(NOOKS)].map(([k, build]) => [k, { name: DRAFT_BIOME_NAMES[k], hour: WILD_HOURS[k] ?? PLACE_HOURS[k] ?? VISTA_HOURS[k] ?? NOOK_HOURS[k], build, draft: true }])),
+    // Built in wilds.js, places.js, vistas.js and nooks.js; a name in DRAFT_BIOME_NAMES keeps one in review (tools/scenery.html only).
+    ...Object.fromEntries([...Object.entries(WILDS), ...Object.entries(PLACES), ...Object.entries(VISTAS), ...Object.entries(NOOKS)].map(([k, build]) => [k, { name: BIOME_NAMES[k] ?? DRAFT_BIOME_NAMES[k], hour: WILD_HOURS[k] ?? PLACE_HOURS[k] ?? VISTA_HOURS[k] ?? NOOK_HOURS[k], build, draft: k in DRAFT_BIOME_NAMES }])),
 };
 
-export function createScene(biome, seed, weather = 'auto', year = 1, W = 384, H = 216) {
+// `look` pins choices a seed would otherwise roll: { icy } for the cavern, { lanterns } for the garden,
+// { world, open } for the starship (the planet's kind; open space with no deck).
+export function createScene(biome, seed, weather = 'auto', year = 1, W = 384, H = 216, look = null) {
     const sc = new Scene(W, H);
+    sc.look = look || {};
     sc.year = year;
     sc.S = seasonAt(year);
     seasonGroups(sc);

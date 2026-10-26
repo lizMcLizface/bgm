@@ -60,7 +60,7 @@ export const TOUR_STEPS = [
         stage: 0,
         selector: '.gen-scene',
         title: 'Presets',
-        text: 'A whole soundscape in one pick: key, scale, feel, drums, ambience and sounds together. Start here - open the list, try a few, and keep the one you like. [ and ] step through them from the keyboard.',
+        text: 'A whole soundscape in one pick: key, scale, feel, drums, ambience and sounds together. Start here - open the list, try a few, and keep the one you like. [ and ] step through them from the keyboard, at the next chord; with Shift, at once.',
     },
     {
         id: 'timeline',
@@ -302,7 +302,7 @@ export const MINIMAL_TOUR_STEPS = [
         id: 'minimal-presets',
         selector: '.gen-scene-nav',
         title: 'Presets',
-        text: 'Each preset is a whole soundscape with its own landscape. The arrows step to the previous or next one ([ and ] on the keyboard), the dice picks one at random, and the name opens the full list.',
+        text: 'Each preset is a whole soundscape with its own landscape. The arrows step to the previous or next one ([ and ] on the keyboard, with Shift to switch at once rather than at the next chord), the dice picks one at random, and the name opens the full list.',
     },
     {
         id: 'minimal-timeline',

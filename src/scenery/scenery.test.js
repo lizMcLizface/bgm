@@ -31,6 +31,17 @@ describe('scenery', () => {
         expect(a).not.toEqual(b);
     });
 
+    it('a pinned look changes only the landscapes that lacked it', () => {
+        [['cave', { icy: true }], ['garden', { lanterns: true }]].forEach(([biome, look]) => {
+            const changed = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].filter((seed) => {
+                const a = createScene(biome, seed, 'clear', 1).render(0, 22), b = createScene(biome, seed, 'clear', 1, 384, 216, look).render(0, 22);
+                return a.some((p, i) => p !== b[i]);
+            });
+            expect(changed.length, biome).toBeGreaterThan(0);
+            expect(changed.length, biome).toBeLessThan(10);
+        });
+    });
+
     const hasKind = (sc, kind) => sc.frame.some(s => sc.defs[s]?.k === kind);
 
     it('draws aurora on a clear winter night, not by day', () => {

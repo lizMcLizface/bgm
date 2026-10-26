@@ -88,12 +88,15 @@ let linkedPhrase = null;
 // A link to a built-in preset, ?preset=rainy-day-chickens-inside: the page opens on it (a new piece
 // each visit, or the one a phrase= names). Settings in the link win over it.
 let linkedScene = null;
+const DEFAULT_SCENE = 'Ambient Piano, Distant Storm';
 const getGenerator = () => {
     if (!generator) {
         const share = shareFromLocation(window.location);
         const query = new URLSearchParams(window.location.search);
         const hasSettings = ['m', 'v', 'a', 'x', 's'].some((key) => query.has(key)) || window.location.hash.includes('s=');
         linkedScene = hasSettings ? null : sceneBySlug(presetFromSearch(window.location.search));
+        // A plain visit, with nothing in the link, opens on the house preset.
+        if (!linkedScene && !hasSettings && !share) linkedScene = sceneBySlug(DEFAULT_SCENE);
         if (linkedScene) {
             const phrase = new URLSearchParams(window.location.search).get('phrase');
             const seed = phrase ? phraseToSeed(phrase) : null;
@@ -1414,10 +1417,17 @@ const GenerativeApp = () => {
     const previousVariation = () => {
         if (seeds.current.length) loadSettings({ seed: seeds.current.pop() });
     };
-    // Next / previous built-in preset in the browser's order ([ and ] keys).
-    const stepPreset = (dir) => {
+    // A preset at once rather than at the next chord: the music stops, takes it, and starts its piece from the top.
+    const cutToScene = async (picked, options) => {
+        const playing = gen.isRunning;
+        if (playing) gen.stop();
+        await applyScene(picked, options);
+        if (playing && gen.settings.playMusic !== false && !gen.isRunning) { await gen.rewind(); startPart('playMusic'); }
+    };
+    // Next / previous built-in preset in the browser's order ([ and ] keys; with Shift, at once).
+    const stepPreset = (dir, { now = false } = {}) => {
         const entry = stepBuiltinSceneEntry(scene, dir, sceneBrowseCategory.current);
-        applyScene(entry.scene, {browseCategory:entry.category,preserveSeed:false});
+        (now ? cutToScene : applyScene)(entry.scene, {browseCategory:entry.category,preserveSeed:false});
     };
     const handlers = useRef({});
     // Move around the piece from the keyboard: a chord / a progression back or on.
@@ -1440,9 +1450,11 @@ const GenerativeApp = () => {
         const onKey = (e) => {
             // A window over the page (the preset browser, the sound picker) has its own keys.
             if (document.querySelector('.gen-pb-backdrop') || e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
-            if ((e.key === '[' || e.key === ']') && !typingTarget(e.target)) {
+            // Shift+[ / Shift+] (often typed as { and }) switch at once instead of at the next chord.
+            const bracket = e.key === '[' || e.key === '{' ? -1 : e.key === ']' || e.key === '}' ? 1 : 0;
+            if (bracket && !typingTarget(e.target)) {
                 e.preventDefault();
-                handlers.current.stepPreset(e.key === ']' ? 1 : -1);
+                handlers.current.stepPreset(bracket, { now: e.shiftKey || e.key === '{' || e.key === '}' });
                 return;
             }
             // Arrows: a chord back / on, with Shift a progression - unless a field is using the arrows.
@@ -1491,9 +1503,9 @@ const GenerativeApp = () => {
                 </div>
                 <div className="gen-header-end">
                 <div className="gen-scene-nav">
-                    {zen && <button type="button" className="gen-help gen-scene-step" onClick={() => stepPreset(-1)} aria-label="Previous preset" title="Previous preset ([)"><ChevronLeftIcon /></button>}
+                    {zen && <button type="button" className="gen-help gen-scene-step" onClick={(e) => stepPreset(-1, { now: e.shiftKey })} aria-label="Previous preset" title="Previous preset ([, with Shift at once)"><ChevronLeftIcon /></button>}
                     <PresetBrowser current={scene} onPick={applyScene} actions={setupActions} />
-                    {zen && <button type="button" className="gen-help gen-scene-step" onClick={() => stepPreset(1)} aria-label="Next preset" title="Next preset (])"><ChevronRightIcon /></button>}
+                    {zen && <button type="button" className="gen-help gen-scene-step" onClick={(e) => stepPreset(1, { now: e.shiftKey })} aria-label="Next preset" title="Next preset (], with Shift at once)"><ChevronRightIcon /></button>}
                     {zen && <button type="button" className="gen-help gen-scene-step" onClick={randomPreset} aria-label="Random preset" title="A preset at random"><DiceIcon /></button>}
                 </div>
                 <ListeningTimer generator={gen} running={anyOn} />

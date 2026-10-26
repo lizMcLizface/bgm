@@ -3,37 +3,37 @@ export const BIOME_NAMES = {
     lake: 'Mountain lake',
     grassland: 'Grassland',
     hills: 'Rolling hills',
-    desert: 'Desert',
-    seaside: 'Seaside',
-    industrial: 'Industrial',
-    farmland: 'Farmland',
-    savanna: 'Savanna',
+    alpine: 'Alpine peaks',
     woodland: 'Woodland',
     river: 'River valley',
-};
-
-// Landscapes still in review: shown in the scenery tool (tools/scenery.html), not yet on the page.
-export const DRAFT_BIOME_NAMES = {
-    alpine: 'Alpine peaks',
+    farmland: 'Farmland',
+    village: 'Snowy village',
     tundra: 'Tundra',
     swamp: 'Swamp',
-    volcano: 'Volcano',
-    synth: 'Synthwave',
-    planet: 'Alien planet',
-    camp: 'Campfire clearing',
-    harbour: 'Harbour town',
     jungle: 'Jungle',
-    ruins: 'Castle on the hill',
-    cave: 'Glowworm cavern',
-    room: 'Window view',
+    savanna: 'Savanna',
+    desert: 'Desert',
+    volcano: 'Volcano',
+    seaside: 'Seaside',
+    harbour: 'Harbour town',
     reef: 'Underwater',
     garden: 'Blossom garden',
+    ruins: 'Castle on the hill',
+    camp: 'Campfire clearing',
+    cave: 'Glowworm cavern',
+    industrial: 'Industrial',
     street: 'Rainy neon street',
+    synth: 'Synthwave',
     train: 'Train window',
-    starship: 'Observation deck',
-    village: 'Snowy village',
+    room: 'Window view',
     cafe: 'Café',
+    planet: 'Alien planet',
+    starship: 'Observation deck',
 };
+
+// Landscapes still in review: shown in the scenery tool (tools/scenery.html), not yet on the
+// page. Empty while every landscape is approved; a new one starts here.
+export const DRAFT_BIOME_NAMES = {};
 
 // Scene size in landscape pixels for a window of this aspect (width / height). Wide windows
 // get the 384x216 picture cropped to fill; narrower ones a picture of their own shape with

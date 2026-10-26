@@ -66,7 +66,8 @@ function starship(sc, rng) {
     }
     // The planet: a texture of longitude and latitude, turning; lit from one side, the
     // night side dark (with cities on a living world), a glowing rim of air on the day side.
-    const kind = pick(rng, ['terran', 3], ['gas', 2], ['ice', 1], ['lava', 1]), Wd = WORLDS[kind];
+    // A preset can pin the world (sc.look.world) and show open space with no deck around it (sc.look.open).
+    const rolled = pick(rng, ['terran', 3], ['gas', 2], ['ice', 1], ['lava', 1]), kind = WORLDS[sc.look.world] ? sc.look.world : rolled, Wd = WORLDS[kind], open = !!sc.look.open;
     const big = rng.chance(0.55), R = big ? hw * rng.range(0.9, 1.4) : hh * rng.range(0.35, 0.55);
     const pcx = vx + rng.range(-0.5, 0.5) * hw, pcy = big ? vy + hh + R * rng.range(0.25, 0.6) : vy + rng.range(-0.25, 0.3) * hh;
     const la = rng.range(0.4, 2.7) * (rng.chance(0.5) ? 1 : -1), ld = [Math.sin(la), -0.35, Math.cos(la)], ln = Math.hypot(...ld), Ld = ld.map(v => v / ln);
@@ -86,7 +87,7 @@ function starship(sc, rng) {
     const cityLight = flame(sc, '#ffd47a'), lavaGlow = flame(sc, '#ff6a20'), rim = [flame(sc, Wd.glow), flame(sc, mul(hex(Wd.glow), [0.5, 0.5, 0.6]))];
     // Every pixel of the disc keeps its position on the sphere; each frame only looks up the texture.
     const px = [], lon0 = [], latI = [], lit = [], rimPx = [];
-    const inBack = (x, y) => Math.abs(y - vy) < hh;
+    const inBack = (x, y) => open || Math.abs(y - vy) < hh;
     for (let y = Math.max(0, Math.floor(pcy - R - 3)); y < Math.min(H, pcy + R + 3); y++) for (let x = Math.max(0, Math.floor(pcx - R - 3)); x < Math.min(W, pcx + R + 3); x++) {
         if (!inBack(x, y)) continue;
         const nx = (x + 0.5 - pcx) / R, ny = (y + 0.5 - pcy) / R, r2 = nx * nx + ny * ny;
@@ -154,6 +155,7 @@ function starship(sc, rng) {
         put(x - dir * L, y, engine); put(x - dir * (L + 1), y, engine);
         if (Math.floor(t * 2) % 2) { put(x - dir * 2, y - 1, blinkR); put(x - dir * (L - 2), y - 1, blinkG); }
     });
+    if (open) return;
     // The deck: one great window from floor to ceiling and wall to wall, in tall panes;
     // strip lights in the ceiling, a polished floor mirroring the view.
     const wall = sc.ramp(['#1a1e26', '#242a34', '#3a4250', '#4e5868'], 0), floorR = sc.ramp(['#14161c', '#1c2028', '#2a303a', '#3a4250'], 0);
@@ -454,10 +456,10 @@ function cafeRoom(sc, rng, vx, vy, hw, hh) {
             const sx = cx + side * 0.24;
             // A chair: seat, legs at the front, and a back of rails between two uprights.
             const cw2 = woody(wood, tables.length * 7 + side + 3, 'z'), bx = sx + side * 0.06;
-            box(sx - 0.07, sx + 0.07, 0.58, 0.61, cz - 0.06, cz + 0.06, cw2);
-            for (const lz of [cz - 0.055, cz + 0.045]) box(sx - side * 0.06 - 0.01, sx - side * 0.06 + 0.01, 0.61, 1, lz, lz + 0.01, cw2);
-            for (const lz of [cz - 0.06, cz + 0.05]) box(bx - 0.012, bx + 0.012, 0.25, 1, lz, lz + 0.01, cw2);
-            for (const ry of [0.27, 0.36, 0.45]) box(bx - 0.01, bx + 0.01, ry, ry + 0.035, cz - 0.05, cz + 0.05, cw2);
+            box(sx - 0.07, sx + 0.07, 0.68, 0.71, cz - 0.06, cz + 0.06, cw2);
+            for (const lz of [cz - 0.055, cz + 0.045]) box(sx - side * 0.06 - 0.01, sx - side * 0.06 + 0.01, 0.71, 1, lz, lz + 0.01, cw2);
+            for (const lz of [cz - 0.06, cz + 0.05]) box(bx - 0.012, bx + 0.012, 0.35, 1, lz, lz + 0.01, cw2);
+            for (const ry of [0.37, 0.46, 0.55]) box(bx - 0.01, bx + 0.01, ry, ry + 0.035, cz - 0.05, cz + 0.05, cw2);
         }
         const cupX = cx + rng.range(-0.08, 0.08), cupZ = cz + rng.range(-0.03, 0.02), cupC = rng.pick(items);
         box(cupX - 0.022, cupX + 0.022, 0.355, 0.4, cupZ - 0.015, cupZ + 0.015, (f, X, Y, z, lv) => cupC[lv][f === 'top' ? 0 : 3]);

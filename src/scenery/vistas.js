@@ -164,7 +164,7 @@ function garden(sc, rng) {
     sc.addStatic(bb);
     sc.addSway(fb, 0.5);
     // Paper lanterns strung along the bank, glowing after dark.
-    if (rng.chance(0.45)) {
+    if (rng.chance(0.45) || sc.look.lanterns) {
         const pb = new Buf(W, H), cord = sc.slot({ k: 'mat', c: hex('#2a2420'), d: 0.12 }), ly = bankY - U * rng.range(0.12, 0.18), sag = U * 0.03;
         const paper = ['#ff6a4a', '#ffd890'].map(c => sc.slot({ k: 'emit', c: hex(c), base: hex(c === '#ff6a4a' ? '#a8402a' : '#d8c8a0'), d: 0.12, v: 1 }));
         for (let x = 0; x < W; x++) {
@@ -637,6 +637,16 @@ function train(sc, rng) {
     {
         const plat = Math.round(nearTop + (H - nearTop) * 0.25), Pv = sc.ramp(Q.gravel, 0.04), edge = sc.slot({ k: 'mat', c: hex('#e8c840'), d: 0.04 });
         const brick = sc.ramp(rng.pick([P.roof, P.wall, Q.plaster]), 0.08), Cv = sc.ramp(['#24303c', '#2e3c4a', '#4a5e72', '#627890'], 0.05);
+        // Brick in offset courses: each brick its own tone, its top edge catching the light and
+        // its bottom in shadow, pitted here and there; dark mortar between.
+        const brickAt = (x, y) => {
+            const row = y >> 2, ry = y & 3, bx = x + (row & 1) * 4, col = bx >> 3, cx = bx & 7, h = hash(col, row, 913);
+            if (ry === 0 || cx === 0) return brick.face(1, 0);
+            if (hash(x, y, 914) < 0.08) return brick.flat(h < 0.5 ? 0 : 1);
+            if (ry === 1) return h < 0.2 ? brick.flat(2) : brick.flat(3);
+            if (ry === 3 || cx === 7) return h < 0.3 ? brick.flat(0) : brick.flat(1);
+            return h < 0.25 ? brick.flat(1) : h > 0.8 ? brick.flat(2) : brick.face(1, 1);
+        };
         const posterC = ['#c84a3a', '#3a7ac0', '#e0c050', '#4aa070'].map(c => sc.slot({ k: 'mat', c: hex(c), d: 0.06 }));
         const glow = sc.slot({ k: 'emit', c: hex(LIGHTS.warm), base: hex('#3a3a40'), d: 0.06, v: 1 }), white = sc.slot({ k: 'mat', c: hex('#f0eee8'), d: 0.05 }), ink = sc.slot({ k: 'mat', c: hex('#1a2230'), d: 0.05 });
         const roofY = poleTop + Math.round(U * 0.04), hallTop = roofY;
@@ -650,7 +660,7 @@ function train(sc, rng) {
                     // Windows and doors in frames, posters between them, brick all round.
                     const inW = wx > bay * 0.25 && wx < bay * 0.75 && y > wTop && y < wBot, rim = inW && (wx < bay * 0.25 + 2 || wx > bay * 0.75 - 2 || y < wTop + 2 || (!door && (y > wBot - 2 || Math.abs(wx - bay / 2) < 1 || Math.abs(y - (wTop + wBot) / 2) < 1)));
                     const poster = !inW && wx > bay * 0.78 && wx < bay * 0.95 && y > wTop + U * 0.02 && y < wTop + U * 0.08;
-                    stb.set(x, y, rim ? Cv.flat(3) : inW ? (door ? Cv.flat(1) : glow) : poster ? posterC[k % posterC.length] : brick.face(1, (y % 4 === 0 || (x + (y >> 2) * 3) % 8 === 0) ? 0 : 1));
+                    stb.set(x, y, rim ? Cv.flat(3) : inW ? (door ? Cv.flat(1) : glow) : poster ? posterC[k % posterC.length] : brickAt(x, y));
                 }
             }
             for (let y = roofY - Math.round(U * 0.025); y <= roofY; y++) stb.set(x, y, Cv.flat(y === roofY ? 0 : 2));
