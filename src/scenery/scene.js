@@ -83,6 +83,9 @@ export class Scene {
     constructor(W, H) {
         this.W = W; this.H = H;
         this.horizon = Math.round(H * 0.6);
+        // Size unit for trees, peaks and towers: the height of a 16:9 scene, so a tall
+        // (portrait) scene gets more land and sky rather than bigger objects.
+        this.U = Math.min(H, 216);
         this.bias = 0;           // keeps noon from lighting both faces equally
         this.defs = [null];
         this.keyed = new Map();
@@ -102,6 +105,12 @@ export class Scene {
         this.climate = null;     // 'dry': no snow, see seasons.js
         this.S = seasonAt(1);
         this.leafCut = 255;
+    }
+
+    // Horizon row for a scene that puts it at fraction f of a 16:9 frame; a taller
+    // frame gives three quarters of its extra rows to the land.
+    horizonAt(f) {
+        return Math.round(f * this.U + (this.H - this.U) * 0.25);
     }
 
     slot(def) {

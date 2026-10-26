@@ -5,6 +5,10 @@ Each preset (scene) maps to a landscape kind, weather, hour and season in
 ("(previous piano)", "v1", "· Bossa", "(tonal)") share their base preset's
 landscape; presets not listed fall back to their category.
 
+On a tall (portrait) window the scene is built at the window's shape with about the same
+number of pixels: trees, peaks and towers keep their 16:9 size (`Scene.U`) and most of the
+extra height goes to the land below the horizon (`Scene.horizonAt`).
+
 Landscape menu options: **Preset picks the landscape**, **Time of day keeps
 changing**, **Seasons keep changing**. With a "keeps changing" box off, the day
 or the year stays at the preset's hour or season; with it on, it starts there
@@ -29,7 +33,8 @@ and moves on.
 - **Damp Crater, Boss Fight**: alien/arena places drawn as hills or desert with storm or dust.
 - **Underwater**: seaside in fog.
 - **Chapel organ, Haunted Staircase, Altman**: no building; hills or woodland in fog.
-- **Demo, Piano and Pads, Solo Grand, other abstract presets**: neutral lake.
+- **Piano and Pads, Solo Grand, other abstract presets**: neutral lake. The Demo scenes each
+  have their own calm pick (lake, hills, grassland, savanna, seaside, farmland, river, woodland).
 
 ## Missing landscapes, easiest to hardest to add
 
@@ -62,8 +67,10 @@ ground, meadow, trees, water, houses). Difficulty is how much new shape code eac
 ## Sky features
 
 Done, in [effects.js](../src/scenery/effects.js):
-- **Aurora**: green and violet curtains on clear nights over lake, hills, woodland,
-  grassland and farmland; strongest in autumn and winter, swelling and fading over a few minutes.
+- **Aurora**: one or two folded curtains on clear nights over lake, hills, woodland,
+  grassland and farmland: a sharp bright lower edge that meanders and kinks, vertical rays
+  drifting along it, green fading through teal into violet, stars and moon showing through;
+  strongest in autumn and winter, swelling and fading over a few minutes.
 - **Shooting stars**: a streak every so often on dark nights, everywhere except industrial.
 - **Fireflies**: after dusk over grassland, farmland, woodland and river; gone in autumn and
   winter, and in rain.

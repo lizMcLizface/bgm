@@ -155,7 +155,7 @@ function bank(sc, rng, side, wl, kind) {
     const trees = [];
     for (let i = rng.int(1, 4); i > 0; i--) {
         const by = rng.range(yTop + 12, H * 0.95);
-        trees.push({ x: spot(by, 10), by, h: H * (i === 1 ? rng.range(0.6, 0.92) : rng.range(0.3, 0.65)) });
+        trees.push({ x: spot(by, 10), by, h: sc.U * (i === 1 ? rng.range(0.6, 0.92) : rng.range(0.3, 0.65)) });
     }
     for (let i = rng.int(0, 7); i > 0; i--) {
         const by = rng.range(yTop + 2, yTop + 20);
@@ -166,8 +166,8 @@ function bank(sc, rng, side, wl, kind) {
         rock(b, spot(by, 4), by, rng.range(2, 6), sc.ramp(P.cliff, 0.02), rng);
     }
     trees.sort((a, c) => a.by - c.by).forEach(t => {
-        if (kind === 'conifer' || (kind === 'mixed' && rng.chance(0.5))) conifer(sb, t.x, t.by, t.h, F, rng, { sway: t.h / H, trunk: T });
-        else crowns.push(blobTree(sb, t.x, t.by, t.h * 0.75, L, T, rng, { sway: t.h / H }));
+        if (kind === 'conifer' || (kind === 'mixed' && rng.chance(0.5))) conifer(sb, t.x, t.by, t.h, F, rng, { sway: Math.min(1, t.h / sc.U), trunk: T });
+        else crowns.push(blobTree(sb, t.x, t.by, t.h * 0.75, L, T, rng, { sway: Math.min(1, t.h / sc.U) }));
     });
     sc.addStatic(b);
     sc.addSway(sb, 0.9);
@@ -184,17 +184,17 @@ export function reeds(sc, rng, wl) {
 }
 
 function lake(sc, rng) {
-    const { H } = sc;
+    const { H, U } = sc;
     const side = pick(rng, [1, 2], [-1, 2], [0, 1]);
-    const wl = sc.horizon = Math.round(H * rng.range(0.5, 0.66));
+    const wl = sc.horizon = sc.horizonAt(rng.range(0.5, 0.66));
     sc.bias = rng.range(-0.4, 0.4);
     sky(sc);
     celestial(sc, rng);
     weather(sc, wl, [['fog', 0.8]]);
     const snowy = rng.chance(0.75);
-    mountains(sc, rng, { d: 0.48, base: wl, top: lerp(H * 0.06, wl - H * 0.18, rng() ** 1.5), ramp: P.rock, snow: snowy && P.snow, freq: rng.range(0.007, 0.015), mist: 16, snowAt: rng.range(0.25, 0.5), env: envelope(rng) });
+    mountains(sc, rng, { d: 0.48, base: wl, top: lerp(Math.max(H * 0.06, wl - U * 0.54), wl - U * 0.18, rng() ** 1.5), ramp: P.rock, snow: snowy && P.snow, freq: rng.range(0.007, 0.015), mist: 16, snowAt: rng.range(0.25, 0.5), env: envelope(rng) });
     if (rng.chance(0.45)) cumulus(sc, rng, { n: rng.int(2, 6), y0: wl - 26, y1: wl - 10, w0: 30, w1: 60, d: 0.45, speed: 0.7, tall: [0.12, 0.2] });
-    if (rng.chance(0.8)) mountains(sc, rng, { d: 0.26, base: wl, top: wl - H * rng.range(0.12, 0.32), ramp: rng.chance(0.7) ? P.mossRock : P.rock, freq: rng.range(0.012, 0.022), mist: 12, env: envelope(rng) });
+    if (rng.chance(0.8)) mountains(sc, rng, { d: 0.26, base: wl, top: wl - U * rng.range(0.12, 0.32), ramp: rng.chance(0.7) ? P.mossRock : P.rock, freq: rng.range(0.012, 0.022), mist: 12, env: envelope(rng) });
     if (rng.chance(0.65)) coniferRidge(sc, rng, { d: 0.14, base: wl + 1, top: wl - rng.range(3, 10), ramp: P.forest, tmin: 4, tmax: rng.range(8, 16), density: rng.range(0.5, 1.2) });
     else canopyRidge(sc, rng, { d: 0.14, base: wl + 1, top: wl - 5, bottom: wl + 1, ramp: P.canopy, rmin: 2, rmax: 5, rows: 1 });
     water(sc, rng, { y0: wl + 1, ramp: P.lake, mix: rng.range(0.3, 0.5), fres: 0.8, waves: rng.range(0.04, 0.1) });
@@ -273,7 +273,7 @@ export function loneTrees(sc, rng, n, h, kind) {
         // A single tree is often the hero of the picture: big and off-centre.
         const hero = n === 1 && rng.chance(0.6);
         const x = hero ? Math.round(W * (rng.chance(0.5) ? rng.range(0.2, 0.38) : rng.range(0.62, 0.8))) : rng.int(10, W - 11);
-        const by = hero ? Math.min(H + 4, h[x] + rng.range(20, 40)) : h[x] + rng.range(6, 20), th = hero ? H * rng.range(0.55, 0.8) : rng.range(28, 60);
+        const by = hero ? Math.min(H + 4, h[x] + rng.range(20, 40)) : h[x] + rng.range(6, 20), th = hero ? sc.U * rng.range(0.55, 0.8) : rng.range(28, 60);
         if (kind === 'conifer') conifer(sb, x, by, th * 1.4, D, rng, { sway: 0.6, trunk: T });
         else crowns.push(blobTree(sb, x, by, th, F = sc.leaves(P.leaf, 0, leafVariant(rng)), T, rng, { sway: 1 }));
     }
@@ -282,14 +282,14 @@ export function loneTrees(sc, rng, n, h, kind) {
 }
 
 function grassland(sc, rng) {
-    const { W, H } = sc, hz = sc.horizon = Math.round(H * rng.range(0.42, 0.6));
+    const { W, H } = sc, hz = sc.horizon = sc.horizonAt(rng.range(0.42, 0.6));
     sc.bias = rng.range(-0.4, 0.4);
     sky(sc);
     celestial(sc, rng);
     weather(sc, hz);
     const back = pick(rng, ['blue', 2], ['snow', 1], ['hills', 1], ['none', 1]);
-    if (back === 'blue') mountains(sc, rng, { d: 0.32, base: hz + 8, top: hz - H * rng.range(0.1, 0.3), ramp: P.blueRock, freq: rng.range(0.006, 0.014), mist: 10, env: envelope(rng) });
-    if (back === 'snow') mountains(sc, rng, { d: 0.42, base: hz + 8, top: hz - H * rng.range(0.15, 0.32), ramp: P.rock, snow: P.snow, freq: rng.range(0.008, 0.014), mist: 10, env: envelope(rng) });
+    if (back === 'blue') mountains(sc, rng, { d: 0.32, base: hz + 8, top: hz - sc.U * rng.range(0.1, 0.3), ramp: P.blueRock, freq: rng.range(0.006, 0.014), mist: 10, env: envelope(rng) });
+    if (back === 'snow') mountains(sc, rng, { d: 0.42, base: hz + 8, top: hz - sc.U * rng.range(0.15, 0.32), ramp: P.rock, snow: P.snow, freq: rng.range(0.008, 0.014), mist: 10, env: envelope(rng) });
     if (back === 'hills') hill(sc, rng, { d: 0.45, y: hz + 4, amp: 10, freq: 0.01, ramp: P.hill, bottom: hz + 30 });
     const mid = pick(rng, ['canopy', 3], ['conifer', 1], ['open', 1.2]);
     const midTop = hz + rng.range(0, 8);
@@ -304,12 +304,12 @@ function grassland(sc, rng) {
 }
 
 function hills(sc, rng) {
-    const { W, H } = sc, hz = sc.horizon = Math.round(H * rng.range(0.5, 0.68));
+    const { W, H } = sc, hz = sc.horizon = sc.horizonAt(rng.range(0.5, 0.68));
     sc.bias = rng.range(-0.4, 0.4);
     sky(sc);
     celestial(sc, rng);
     weather(sc, hz);
-    if (rng.chance(0.3)) mountains(sc, rng, { d: 0.6, base: hz + 4, top: hz - H * rng.range(0.08, 0.2), ramp: P.blueRock, freq: 0.01, mist: 8, env: envelope(rng) });
+    if (rng.chance(0.3)) mountains(sc, rng, { d: 0.6, base: hz + 4, top: hz - sc.U * rng.range(0.08, 0.2), ramp: P.blueRock, freq: 0.01, mist: 8, env: envelope(rng) });
     ground(sc, hz + 4, P.hill, 0.6);
     const n = rng.int(3, 6), span = H * 0.92 - hz, density = rng.range(0, 1);
     const kind = pick(rng, ['leafy', 3.6], ['conifer', 1]);
@@ -450,18 +450,18 @@ export function shimmer(sc, y0, y1) {
 }
 
 function desert(sc, rng) {
-    const { H } = sc, hz = sc.horizon = Math.round(H * rng.range(0.5, 0.66));
+    const { H } = sc, hz = sc.horizon = sc.horizonAt(rng.range(0.5, 0.66));
     sc.bias = rng.range(-0.5, 0.5);
     sky(sc);
     celestial(sc, rng);
     weather(sc, hz, [['clear', 3], ['sparse', 2], ['scattered', 1.5], ['haze', 1.2], ['dust', 0.8], ['towering', 0.5]], 0.3);
-    if (rng.chance(0.4)) mountains(sc, rng, { d: 0.55, base: hz + 2, top: hz - H * rng.range(0.1, 0.22), ramp: P.mesa, freq: rng.range(0.008, 0.016), mist: 10, env: envelope(rng) });
+    if (rng.chance(0.4)) mountains(sc, rng, { d: 0.55, base: hz + 2, top: hz - sc.U * rng.range(0.1, 0.22), ramp: P.mesa, freq: rng.range(0.008, 0.016), mist: 10, env: envelope(rng) });
     ground(sc, hz + 1, P.sand, 0.35);
     const layers = pick(rng, [0, 1], [1, 2], [2, 2]);
     for (let k = 0; k < layers; k++) {
         const near = k === layers - 1 && layers > 1;
         mesa(sc, rng, {
-            d: near ? 0.24 : 0.45, base: hz + (near ? 8 : 2), top: hz - H * rng.range(near ? 0.18 : 0.1, near ? 0.36 : 0.22),
+            d: near ? 0.24 : 0.45, base: hz + (near ? 8 : 2), top: hz - sc.U * rng.range(near ? 0.18 : 0.1, near ? 0.36 : 0.22),
             ramp: P.mesa, cover: rng.range(0.15, 0.55), freq: pick(rng, [0.011, 3], [0.025, 1]),
         });
     }
@@ -474,7 +474,7 @@ function desert(sc, rng) {
 function cliff(sc, rng, side, hz, lighthouse) {
     const { W, H } = sc, b = new Buf(W, H), R = sc.ramp(P.cliff, 0.1), G = sc.ramp(P.grass, 0.1), s = seedOf(rng);
     const edge = W * (side > 0 ? rng.range(0.6, 0.85) : rng.range(0.15, 0.4));
-    const top = lerp(H * 0.18, hz - 8, rng.range(0, 0.7));
+    const top = lerp(Math.max(H * 0.18, hz - sc.U * 0.4), hz - 8, rng.range(0, 0.7));
     const foot = x => hz + 12 + noise1(x * 0.1, s + 3) * 4;
     const inland = x => (x - edge) * side + (noise1(x * 0.05, s) - 0.5) * 10;
     const h = Float32Array.from({ length: W }, (_, x) => {
@@ -595,7 +595,7 @@ function boats(sc, rng, hz, n) {
 }
 
 function seaside(sc, rng) {
-    const { W, H } = sc, hz = sc.horizon = Math.round(H * rng.range(0.42, 0.58));
+    const { W, H } = sc, hz = sc.horizon = sc.horizonAt(rng.range(0.42, 0.58));
     sc.bias = rng.range(-0.4, 0.4);
     sky(sc);
     celestial(sc, rng);
@@ -621,7 +621,7 @@ function seaside(sc, rng) {
 // ---------------------------------------------------------------- industrial
 
 function industrial(sc, rng) {
-    const { W, H } = sc, hz = sc.horizon = Math.round(H * rng.range(0.6, 0.76));
+    const { W, H } = sc, hz = sc.horizon = sc.horizonAt(rng.range(0.6, 0.76));
     sc.bias = rng.range(-0.3, 0.3);
     sky(sc);
     celestial(sc, rng, { count: 60 });
@@ -718,7 +718,7 @@ function industrial(sc, rng) {
     }
 
     const crane = (cx, dir) => {
-        const cBase = hz + rng.range(6, depth + 4), cTop = Math.round(cBase - H * rng.range(0.25, 0.45));
+        const cBase = hz + rng.range(6, depth + 4), cTop = Math.round(cBase - sc.U * rng.range(0.25, 0.45));
         for (let y = cTop; y <= cBase; y++) {
             near.set(cx, y, S.flat(1)); near.set(cx + 4, y, S.flat(1));
             const k = (y - cTop) % 5;

@@ -1465,6 +1465,14 @@ body {
     display: inline-flex;
 }
 
+/* The preset picker, with previous / next / random beside it in the minimal view. */
+.gen-scene-nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
 .gen .gen-scene-button {
     display: inline-flex;
     align-items: center;
@@ -1955,6 +1963,7 @@ body {
         gap: 8px;
     }
 
+    .gen-header-end .gen-scene-nav,
     .gen-header-end .gen-scene {
         flex: 1 1 0;
         min-width: 0;
@@ -2125,6 +2134,15 @@ body {
     backdrop-filter: blur(10px);
 }
 
+/* Over the pixel landscape a blur would smear the pixels into mush, so the panels are
+   nearly solid instead and what shows through stays crisp. */
+:root[data-backdrop='pixels'] .gen-panel,
+:root[data-backdrop='pixels'] .gen-rulebook,
+:root[data-backdrop='pixels'] .gen-timeline {
+    background: color-mix(in srgb, var(--gen-surface) 96%, transparent);
+    backdrop-filter: none;
+}
+
 /* Background options in the ⚙ menu. */
 .gen-menu-slider {
     display: grid;
@@ -2141,12 +2159,28 @@ body {
 
 /* Hide UI: only the transport, the timeline with its playhead (without the track strip) and
    the button that brings the page back stay. */
-.gen-zen > :not(.gen-header):not(.gen-backdrop):not(.gen-timeline) {
+.gen-zen > :not(.gen-header):not(.gen-backdrop):not(.gen-timeline):not(.gen-tour):not(.gen-tour-intro) {
     display: none !important;
 }
 
 .gen-zen .gen-tracks {
     display: none;
+}
+
+/* ... unless asked for (the instruments button of the minimal view). */
+.gen-zen.gen-zen-tracks .gen-tracks {
+    display: grid;
+}
+
+@media (min-width: 641px) {
+    .gen-zen.gen-zen-tracks .gen-timeline-body {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+}
+
+.gen-zen-views {
+    display: inline-flex;
+    gap: inherit;
 }
 
 .gen-zen .gen-timeline-body {
@@ -2165,7 +2199,7 @@ body {
 
 /* Over the landscape the remaining chrome fades further, so the picture shows through. */
 :root[data-backdrop] .gen-zen .gen-timeline {
-    background: color-mix(in srgb, var(--gen-surface) 18%, transparent);
+    background: color-mix(in srgb, var(--gen-surface) 42%, transparent);
     border-color: color-mix(in srgb, var(--gen-border) 40%, transparent);
 }
 
@@ -2186,11 +2220,11 @@ body {
 }
 
 /* Keep preset selection and the look menu in both hidden-interface views. */
-.gen-zen .gen-header-end > :not(.gen-header-tools):not(.gen-scene) {
+.gen-zen .gen-header-end > :not(.gen-header-tools):not(.gen-scene):not(.gen-scene-nav) {
     display: none !important;
 }
 
-.gen-zen .gen-header-tools > :not(.gen-visual):not(.gen-hide):not(.gen-engine-control) {
+.gen-zen .gen-header-tools > :not(.gen-visual):not(.gen-hide):not(.gen-engine-control):not(.gen-zen-views) {
     display: none !important;
 }
 

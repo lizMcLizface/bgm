@@ -112,6 +112,15 @@ const BY_NAME = {
     'Piano and Pads': L('lake', 'fog', 20, 2),
     'Piano and Clarinet, Cinematic': L('hills', 'overcast', 17.5, 2.4),
     'Ambient Piano, Distant Storm': L('lake', 'storm', 22, 1.8),
+
+    'Demo: Breathing cadences': L('lake', 'haze', 6.5, 0.4),
+    'Demo: Strong and soft': L('hills', 'mixed', 15, 2.2),
+    'Demo: Make room': L('grassland', 'streaks', 9, 1.2),
+    'Demo: Opening out': L('savanna', 'sparse', 7, 1),
+    'Demo: Two-minute wave': L('seaside', 'scattered', 16, 1.1),
+    'Demo: Living colour': L('farmland', 'sparse', 11, 0.5),
+    'Demo: Shifting metre': L('river', 'scattered', 13, 1.6),
+    'Demo: Seven-eight': L('woodland', 'sparse', 10, 2.4),
 };
 
 // Scenes not listed above (the user's own, or new ones) fall back to their category.

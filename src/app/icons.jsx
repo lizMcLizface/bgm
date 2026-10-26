@@ -128,9 +128,19 @@ export const TimelineIcon = () => (
     </Svg>
 );
 
+// The instruments beside the timeline: a column of named rows.
+export const TracksIcon = () => (
+    <Svg size={16}>
+        <path d="M2.5 4h3M2.5 8h3M2.5 12h3M8 4h5.5M8 8h5.5M8 12h5.5" strokeWidth="2" />
+    </Svg>
+);
+
 // Hide / show the interface: a chevron up (collapse) and down (expand), like a section's header.
 export const ChevronUpIcon = () => <Svg size={16}><path d="M3.5 10l4.5-4.5 4.5 4.5" strokeWidth="2" /></Svg>;
 export const ChevronDownIcon = () => <Svg size={16}><path d="M3.5 6l4.5 4.5L12.5 6" strokeWidth="2" /></Svg>;
+// Previous / next preset.
+export const ChevronLeftIcon = () => <Svg size={16}><path d="M10 3.5L5.5 8l4.5 4.5" strokeWidth="2" /></Svg>;
+export const ChevronRightIcon = () => <Svg size={16}><path d="M6 3.5l4.5 4.5L6 12.5" strokeWidth="2" /></Svg>;
 
 export const SpeakerIcon = () => (
     <Svg size={17}>

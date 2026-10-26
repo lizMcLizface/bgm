@@ -15,6 +15,9 @@ import { RULES } from './rulebook/model';
 import { readBook, inheritBook, withPresetBook, withBook, applyBook, baselineChoice, withoutSettings } from './rulebook/session';
 let initialBook = readBook(window.location.search);
 const linkedView = viewFromSearch(window.location.search);
+// A first visit (no link to a view, no tour taken, no background chosen) opens on the landscape in
+// the minimal view, with a tour of its own; opening the whole page then starts the main tour.
+const firstVisit = !linkedView && !tourSeen() && !minimalTourSeen() && readPref('bgm-backdrop-mode', null) === null;
 import { RoleButtons, TrackStrip, useLivePlay, DRUM_KEY_HINT } from './Tracks';
 import { defaultSettings, shareFromLocation, sharePath, shareUrl, newSeed } from './settings';
 // The sound window brings the DIY and classic synths with it: loaded on the first ✎.
@@ -38,7 +41,7 @@ import { sceneryForScene } from '../scenery/presetScenes';
 import { viewFromSearch, withView } from './viewLink';
 import { MasterVolume, SettingsMenu, AudioMenu, VisualMenu } from './AudioStatus';
 import { SleepTimer, Recorder } from './Playback';
-import { sceneSettings, sceneSoundSettings, sceneGroup, stepBuiltinSceneEntry, buildSetup, parseSetup, sceneBySlug, sceneSlug, presetFromSearch, introFromSearch, SCENES, SCENE_CATEGORIES } from './scenes';
+import { sceneSettings, sceneSoundSettings, sceneGroup, stepBuiltinSceneEntry, randomBuiltinSceneEntry, buildSetup, parseSetup, sceneBySlug, sceneSlug, presetFromSearch, introFromSearch, SCENES, SCENE_CATEGORIES } from './scenes';
 import PresetBrowser from './PresetBrowser';
 import FeelPad from './FeelPad';
 import ListeningTimer from './ListeningTimer';
@@ -50,7 +53,7 @@ import { COMMON_PARAMS } from './engine/ambienceSynth';
 import { WEATHER_SOURCES } from './engine/weatherBedModel';
 import { WEATHER_PRESETS, weatherPresetPatch, matchingWeatherPreset } from './weatherPresets';
 import {
-    DiceIcon, RotateIcon, SparkIcon, PlayIcon, PauseIcon, ToStartIcon, BarBackIcon, BarForwardIcon, ProgressionBackIcon, ProgressionForwardIcon, LoopIcon, MusicIcon, AmbienceIcon, ChevronUpIcon, ChevronDownIcon, TimelineIcon,
+    DiceIcon, RotateIcon, SparkIcon, PlayIcon, PauseIcon, ToStartIcon, BarBackIcon, BarForwardIcon, ProgressionBackIcon, ProgressionForwardIcon, LoopIcon, MusicIcon, AmbienceIcon, ChevronUpIcon, ChevronDownIcon, TimelineIcon, TracksIcon, ChevronLeftIcon, ChevronRightIcon,
 } from './icons';
 import { newSoundSeed } from './soundGen';
 import { SOUND_KINDS, GENERATOR_V2 } from './soundGenV2';
@@ -68,8 +71,8 @@ import { readPref, writePref } from './prefs';
 import { readPerformance, writePerformance } from '../audio/performance';
 import { seedToPhrase, phraseToSeed } from './phrase';
 import { WANDER_ROLES, WANDER_LIMITS, WANDER_MODES, AMBIENCE_WANDER_LIMITS } from './engine/wander';
-import Tour, { tourSeen } from './Tour';
-import { STAGES, STAGE_KEY, LAST_STAGE } from './tourSteps';
+import Tour, { tourSeen, minimalTourSeen } from './Tour';
+import { STAGES, STAGE_KEY, LAST_STAGE, MINIMAL_TOUR_KEY } from './tourSteps';
 import { generationFromSearch, withGeneration } from './generation';
 
 // One Generator for the page's lifetime; StrictMode's double-mount must
@@ -885,6 +888,8 @@ const GenerativeApp = () => {
     // Opened by itself it starts on a prompt that dims the page; from the menu it goes straight to the steps.
     const [tourOpen, setTourOpen] = useState(false);
     const [tourPrompt, setTourPrompt] = useState(false);
+    // whether the open tour is the minimal view's (tourSteps.js, MINIMAL_TOUR_STEPS)
+    const [tourMinimal, setTourMinimal] = useState(false);
     // The page unlocks a set of features at a time (STAGES); a browser with no stored stage starts at the basics.
     const [stage, setStage] = useState(() => {
         const stored = readPref(STAGE_KEY, null);
@@ -895,8 +900,9 @@ const GenerativeApp = () => {
     const has = (needed) => stage >= needed;
     // The tour covers the stages from..to; the first-visit prompt and a restart cover only the first.
     const [tourRange, setTourRange] = useState({ from: 0, to: 0, id: 0 });
-    const openTour = (prompt = false, range = { from: 0, to: stage }) => {
+    const openTour = (prompt = false, range = { from: 0, to: stage }, minimal = false) => {
         setTourPrompt(prompt);
+        setTourMinimal(minimal);
         setTourRange((r) => ({ ...range, id: r.id + 1 }));
         setTourOpen(true);
     };
@@ -915,8 +921,11 @@ const GenerativeApp = () => {
     const [helpOpen, setHelpOpen] = useState(false);
     useEffect(() => {
         // A ?view= link opens straight into its view; the tour stays in the ⚙ menu.
+        // In the minimal view the minimal tour comes first, and the main one waits for the whole page.
         if (tourSeen() || linkedView) return undefined;
-        const timer = setTimeout(() => openTour(true, { from: 0, to: 0 }), 800);
+        const minimal = zen && !minimalTourSeen();
+        if (zen && !minimal) return undefined;
+        const timer = setTimeout(() => openTour(true, { from: 0, to: 0 }, minimal), 800);
         return () => clearTimeout(timer);
     }, []);
     // ✎ opens the voice's sound in the sound window; the percussion's too.
@@ -1221,7 +1230,7 @@ const GenerativeApp = () => {
     useEffect(() => { gen.smoothChanges = smoothPresets; }, [gen, smoothPresets]);
     // The page background: none, the fluid simulation or the pixel landscape. An older
     // fluid on/off preference carries over.
-    const [backdropMode, setBackdropMode] = useStoredFlag('bgm-backdrop-mode', readPref('bgm-backdrop', false) ? 'fluid' : 'off', linkedView?.backdrop);
+    const [backdropMode, setBackdropMode] = useStoredFlag('bgm-backdrop-mode', firstVisit ? 'scenery' : readPref('bgm-backdrop', false) ? 'fluid' : 'off', linkedView?.backdrop);
     const backdropOn = backdropMode === 'fluid';
     // A link to a preset opens on that preset's landscape too (held in memory, not saved).
     const [storedScenery, setSceneryOptions] = useStoredFlag('bgm-scenery-options', { ...SCENERY_DEFAULTS, seed: Math.floor(Math.random() * 1e6) },
@@ -1239,7 +1248,19 @@ const GenerativeApp = () => {
     const [storedBackdropOptions, setBackdropOptions] = useStoredFlag('bgm-backdrop-options', BACKDROP_DEFAULTS);
     const backdropOptions = { ...BACKDROP_DEFAULTS, ...storedBackdropOptions };
     // Hides everything but the transport and the timeline (⚙ menu); Esc or the corner button brings it back.
-    const [zen, setZen] = useStoredFlag('bgm-hide-ui', false, linkedView ? true : undefined);
+    const [zen, setZen] = useStoredFlag('bgm-hide-ui', firstVisit, linkedView ? true : undefined);
+    // In that view the instruments can show beside the timeline, as on the whole page.
+    const [zenTracks, setZenTracks] = useStoredFlag('bgm-zen-tracks', false);
+    // A first visit's landscape and minimal view stay the starting point until changed.
+    useEffect(() => { if (firstVisit) { writePref('bgm-backdrop-mode', 'scenery'); writePref('bgm-hide-ui', true); } }, []);
+    // Leaving the minimal view for the whole page: the main tour starts there if it has not been taken.
+    const showWholePage = () => {
+        setZen(false);
+        if (tourSeen()) return;
+        writePref(MINIMAL_TOUR_KEY, true);
+        setTourOpen(false);
+        setTimeout(() => openTour(false, { from: 0, to: 0 }), 0);
+    };
     // In that view the timeline can be folded away too (ignored while the interface shows).
     const [timelineHidden, setTimelineHidden] = useStoredFlag('bgm-hide-timeline', false, linkedView ? false : undefined);
     // a mini piano above each chord of the timeline (the Look menu)
@@ -1247,7 +1268,7 @@ const GenerativeApp = () => {
     const bare = zen && timelineHidden;
     useEffect(() => {
         if (!zen) return undefined;
-        const onKey = (e) => { if (e.key === 'Escape') setZen(false); };
+        const onKey = (e) => { if (e.key === 'Escape' && !document.querySelector('.gen-tour, .gen-tour-intro')) showWholePage(); };
         window.addEventListener('keydown', onKey);
         return () => window.removeEventListener('keydown', onKey);
     }, [zen]);
@@ -1404,6 +1425,10 @@ const GenerativeApp = () => {
         await gen.step(unit, dir);
         setNow((n) => n + 1);
     };
+    const randomPreset = () => {
+        const entry = randomBuiltinSceneEntry(scene);
+        applyScene(entry.scene, { browseCategory: entry.category, preserveSeed: false });
+    };
     handlers.current = { play, stop, toggle, newVariation, previousVariation, stepPreset, move };
     useEffect(() => {
         setupMediaSession({
@@ -1447,8 +1472,9 @@ const GenerativeApp = () => {
     const drumsOn = settings.drums.style !== 'off';
     const shownTracks = drumsOn ? { ...shownRoles, ...PERC_ROLE } : shownRoles;
 
+    const zenShown = zen && (!tourOpen || tourMinimal) && !helpOpen;
     return (
-        <main className={`gen${zen && !tourOpen && !helpOpen ? ' gen-zen' : ''}${bare && !tourOpen && !helpOpen ? ' gen-zen-bare' : ''}`}>
+        <main className={`gen${zenShown ? ' gen-zen' : ''}${zenShown && bare ? ' gen-zen-bare' : ''}${zenShown && zenTracks ? ' gen-zen-tracks' : ''}`}>
             {backdropOn && !perfOn && backdropSupported() && <Backdrop generator={gen} options={{ ...backdropOptions, circle: false }} clouds={backdropOn} resetKey={fluidReset} />}
             {backdropMode === 'scenery' && <SceneryBackdrop options={sceneryOptions} light={perfOn} />}
 
@@ -1464,7 +1490,12 @@ const GenerativeApp = () => {
                 </div>}
                 </div>
                 <div className="gen-header-end">
-                <PresetBrowser current={scene} onPick={applyScene} actions={setupActions} />
+                <div className="gen-scene-nav">
+                    {zen && <button type="button" className="gen-help gen-scene-step" onClick={() => stepPreset(-1)} aria-label="Previous preset" title="Previous preset ([)"><ChevronLeftIcon /></button>}
+                    <PresetBrowser current={scene} onPick={applyScene} actions={setupActions} />
+                    {zen && <button type="button" className="gen-help gen-scene-step" onClick={() => stepPreset(1)} aria-label="Next preset" title="Next preset (])"><ChevronRightIcon /></button>}
+                    {zen && <button type="button" className="gen-help gen-scene-step" onClick={randomPreset} aria-label="Random preset" title="A preset at random"><DiceIcon /></button>}
+                </div>
                 <ListeningTimer generator={gen} running={anyOn} />
                 {sleepLeft && <span className="gen-sleep gen-sleep-left" role="timer" title="Sleep timer (in the ⚙ menu)">Sleep {sleepLeft}</span>}
                 {stage < LAST_STAGE && (
@@ -1488,12 +1519,18 @@ const GenerativeApp = () => {
                         <Recorder generator={gen} fileName={fileName} onProgress={setSaving} />
                     </SettingsMenu>
                     {zen && (
-                        <button type="button" className="gen-help gen-hide" aria-pressed={timelineHidden} onClick={() => setTimelineHidden(!timelineHidden)}
-                            aria-label={timelineHidden ? 'Show the timeline' : 'Hide the timeline'} title={timelineHidden ? 'Show the timeline again' : 'Hide the timeline too'}>
-                            <TimelineIcon />
-                        </button>
+                        <span className="gen-zen-views">
+                            <button type="button" className="gen-help gen-hide" aria-pressed={zenTracks} disabled={timelineHidden} onClick={() => setZenTracks(!zenTracks)}
+                                aria-label={zenTracks ? 'Hide the instruments' : 'Show the instruments'} title={zenTracks ? 'Hide the instruments beside the timeline' : 'Show the instruments beside the timeline'}>
+                                <TracksIcon />
+                            </button>
+                            <button type="button" className="gen-help gen-hide" aria-pressed={timelineHidden} onClick={() => setTimelineHidden(!timelineHidden)}
+                                aria-label={timelineHidden ? 'Show the timeline' : 'Hide the timeline'} title={timelineHidden ? 'Show the timeline again' : 'Hide the timeline too'}>
+                                <TimelineIcon />
+                            </button>
+                        </span>
                     )}
-                    <button type="button" className="gen-help gen-hide" onClick={() => setZen(!zen)} aria-label={zen ? 'Show the interface' : 'Hide the interface'}
+                    <button type="button" className="gen-help gen-hide gen-expand" onClick={() => (zen ? showWholePage() : setZen(true))} aria-label={zen ? 'Show the interface' : 'Hide the interface'}
                         title={zen ? 'Show the whole page again (Esc)' : 'Hide everything but the play controls and the timeline (Esc brings it back)'}>
                         {zen ? <ChevronDownIcon /> : <ChevronUpIcon />}
                     </button>
@@ -1504,7 +1541,7 @@ const GenerativeApp = () => {
 
             <ChordTimeline
                 generator={gen} pianos={chordPianos} onExploreRule={id => setRuleFocus(previous => ({ id, revision: (previous?.revision ?? 0) + 1 }))}
-                tracks={has(1) ? <TrackStrip roles={shownTracks} presets={{...Object.fromEntries(Object.entries(roles).map(([role, { presetName, edited, external }]) => [role, { name: external?.label ?? presetName, edited }])),perc:percMachine?{name:percMachine.label,edited:false}:{name:percussionVoice(settings.drums.kit).name,edited:percussionEdited(settings.drums.kit,settings.drumKit)}}} mix={mix} armed={armed} onMix={changeMix} onArm={setArmed} onEdit={has(3) ? editSound : undefined}
+                tracks={has(1) || zenShown && zenTracks ? <TrackStrip roles={shownTracks} presets={{...Object.fromEntries(Object.entries(roles).map(([role, { presetName, edited, external }]) => [role, { name: external?.label ?? presetName, edited }])),perc:percMachine?{name:percMachine.label,edited:false}:{name:percussionVoice(settings.drums.kit).name,edited:percussionEdited(settings.drums.kit,settings.drumKit)}}} mix={mix} armed={armed} onMix={changeMix} onArm={setArmed} onEdit={has(3) ? editSound : undefined}
                     onRandom={randomizePreset} onGenerate={has(3) ? generateForRole : undefined} onPick={choosePicker} onPickPercussion={()=>choosePicker('perc')} onEditPercussion={has(3)?editPercussionSound:undefined} percussionHint={percussionKeyHint(settings.drums.kit)} generating={generating} live={live} /> : null}
             />
 
@@ -1659,8 +1696,8 @@ const GenerativeApp = () => {
                 </Suspense>
             )}
 
-            {tourOpen && <Tour key={tourRange.id} prompt={tourPrompt} fromStage={tourRange.from} toStage={tourRange.to}
-                onUnlockAll={() => setStage(LAST_STAGE)} onStep={prepareTourStep} onClose={() => setTourOpen(false)} />}
+            {tourOpen && <Tour key={tourRange.id} prompt={tourPrompt} fromStage={tourRange.from} toStage={tourRange.to} minimal={tourMinimal}
+                onUnlockAll={() => { setStage(LAST_STAGE); if (tourMinimal) setZen(false); }} onStep={prepareTourStep} onClose={() => setTourOpen(false)} />}
             {helpOpen && <Tour reference onClose={() => setHelpOpen(false)} />}
 
             <footer className="gen-footer">

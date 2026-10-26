@@ -39,7 +39,7 @@ export const TOUR_STEPS = [
         stage: 0,
         selector: null,
         title: 'Welcome to bgm',
-        text: 'Calm music that writes itself, for working or studying - or under a video or podcast. Start with play, presets and a flowing fluid background that reacts to the sound. This short tour covers them; more unlocks whenever you are ready.',
+        text: 'Calm music that writes itself, for working or studying - or under a video or podcast. Start with play, presets and the background: a pixel landscape, or a fluid that reacts to the sound. This short tour covers them; more unlocks whenever you are ready.',
     },
     {
         id: 'transport',
@@ -74,7 +74,7 @@ export const TOUR_STEPS = [
         stage: 0,
         selector: '.gen-header-tools',
         title: 'Volume, look and options',
-        text: 'The master volume and the look menu (theme and the fluid background). The speaker button shows how hard the audio engine is working - if the sound crackles, open it for a bigger buffer or a lighter reverb. The ⚙ menu copies a link to the music, sets a sleep timer, saves a WAV file, repeats this tour and can start over with only the basics.',
+        text: 'The master volume and the look menu (theme and the background). The speaker button shows how hard the audio engine is working - if the sound crackles, open it for a bigger buffer or a lighter reverb. The ⚙ menu copies a link to the music, sets a sleep timer, saves a WAV file, repeats this tour and can start over with only the basics.',
     },
     {
         id: 'rulebook', stage: 0, selector: '[data-tour="rulebook"]', title: 'Explore the rules',
@@ -275,5 +275,57 @@ export const TOUR_STEPS = [
         selector: null,
         title: 'That is everything',
         text: 'Press Play and leave it running. The ⚙ menu repeats the tour and can start over with only the basics.',
+    },
+];
+
+/**
+ * localStorage key: set once the tour of the minimal view (where a first visit starts: the landscape
+ * with only the play controls, the presets and the timeline) has been finished or skipped.
+ */
+export const MINIMAL_TOUR_KEY = 'bgm-tour-minimal-v1';
+
+/** The tour of the minimal view. Opening the whole page afterwards starts the main tour (TOUR_STEPS). */
+export const MINIMAL_TOUR_STEPS = [
+    {
+        id: 'minimal-welcome',
+        selector: null,
+        title: 'Welcome to calmbgm',
+        text: 'Calm music that writes itself, for working, studying or winding down. The landscape behind it changes with the preset, the time of day and the season. This is the quiet view; the whole page with every control is one click away.',
+    },
+    {
+        id: 'minimal-transport',
+        selector: '.gen-transport',
+        title: 'Play',
+        text: 'Play or pause (Space does too). The other buttons go back to the start, a chord or a progression back or on, and loop what is playing.',
+    },
+    {
+        id: 'minimal-presets',
+        selector: '.gen-scene-nav',
+        title: 'Presets',
+        text: 'Each preset is a whole soundscape with its own landscape. The arrows step to the previous or next one ([ and ] on the keyboard), the dice picks one at random, and the name opens the full list.',
+    },
+    {
+        id: 'minimal-timeline',
+        selector: '.gen-timeline',
+        title: 'The timeline',
+        text: 'The chords being played and the notes each voice plays, a few bars ahead, so what you see is what you will hear. Hover or tap a chord to read why it was chosen.',
+    },
+    {
+        id: 'minimal-view',
+        selector: '.gen-zen-views',
+        title: 'What shows',
+        text: 'Show the instruments beside the timeline (with their mute and solo buttons), or fold the timeline away to leave only the landscape.',
+    },
+    {
+        id: 'minimal-look',
+        selector: '.gen-visual',
+        title: 'The background',
+        text: 'Choose the landscape and whether it follows the preset, the clock and the calendar, or switch to the fluid background that moves with the sound.',
+    },
+    {
+        id: 'minimal-expand',
+        selector: '.gen-expand',
+        title: 'The whole page',
+        text: 'Opens every control: voices, ambience, the rulebook and more, a set at a time, with a tour of its own. Esc does the same, and the same corner button brings this view back.',
     },
 ];

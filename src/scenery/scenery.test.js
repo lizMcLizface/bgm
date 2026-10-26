@@ -10,6 +10,12 @@ describe('scenery', () => {
         expect(a.every(px => px >>> 24 === 255)).toBe(true);
     });
 
+    it.each(Object.keys(BIOMES))('%s fills a portrait frame, horizon lower than in landscape', biome => {
+        const sc = createScene(biome, 42, 'auto', 1, 192, 426);
+        expect(sc.render(1.5, BIOMES[biome].hour).every(px => px >>> 24 === 255)).toBe(true);
+        expect(sc.horizon / sc.H).toBeLessThan(createScene(biome, 42).horizon / 216);
+    });
+
     it('relights without registering new colours mid-run', () => {
         const sc = createScene('seaside', 7);
         for (let h = 0; h < 24; h += 3) sc.render(h, h);

@@ -2,7 +2,7 @@
 // background. By default a day passes in 4 minutes and a season in an hour, starting from
 // the real time and date; either can instead follow the clock / calendar or hold still.
 // The weather fades in place. The scenery code is loaded only when this background is picked.
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 // time: 'cycle' | 'clock' | 'fixed' (at `hour`); season: 'cycle' | 'calendar' | 'fixed' (at `year`).
 export const SCENERY_DEFAULTS = { biome: 'lake', seed: 1, weather: 'auto', time: 'cycle', hour: 15, season: 'cycle', year: 1.2,
@@ -24,6 +24,21 @@ export function calendarYear(d = new Date()) {
 
 const FPS = 15;
 
+// Scene size in landscape pixels for a window of this aspect (width / height). Wide windows
+// get the 384x216 picture cropped to fill; narrower ones a picture of their own shape with
+// about as many pixels, so a phone held upright shows more land and sky, not a cropped strip.
+export function frameSize(aspect) {
+    if (aspect >= 1.5) return [384, 216];
+    const a = Math.max(0.4, aspect), W = Math.round(Math.sqrt(384 * 216 * a));
+    return [W, Math.round(W / a)];
+}
+
+// The window's shape, coarse enough that resizing does not keep rebuilding the scene.
+const shapeOf = () => {
+    const a = window.innerWidth / Math.max(1, window.innerHeight);
+    return a >= 1.5 ? 1.5 : Math.round(a * 10) / 10;
+};
+
 const SceneryBackdrop = ({ options = SCENERY_DEFAULTS, light = false }) => {
     const canvasRef = useRef(null), sceneRef = useRef(null), optionsRef = useRef(options);
     // Where the passing day and year started, kept across landscape changes.
@@ -34,10 +49,13 @@ const SceneryBackdrop = ({ options = SCENERY_DEFAULTS, light = false }) => {
         start.current = { at: performance.now(), hour: o.epoch ? o.hour : start.current.hour, year: o.epoch ? o.year : start.current.year, epoch: o.epoch };
     }
     optionsRef.current = o;
+    const [shape, setShape] = useState(shapeOf);
 
     useEffect(() => {
-        document.documentElement.dataset.backdrop = 'on';
-        return () => { delete document.documentElement.dataset.backdrop; };
+        document.documentElement.dataset.backdrop = 'pixels';
+        const resize = () => setShape(shapeOf());
+        window.addEventListener('resize', resize);
+        return () => { delete document.documentElement.dataset.backdrop; window.removeEventListener('resize', resize); };
     }, []);
 
     useEffect(() => {
@@ -54,7 +72,7 @@ const SceneryBackdrop = ({ options = SCENERY_DEFAULTS, light = false }) => {
                     year: p.season === 'calendar' ? calendarYear() : p.season === 'fixed' ? p.year : (start.current.year + s / (SEASON_MINUTES * 60)) % 4,
                 };
             };
-            const scene = sceneRef.current = createScene(now.biome, now.seed, now.weather, timeOf(now, performance.now()).year);
+            const scene = sceneRef.current = createScene(now.biome, now.seed, now.weather, timeOf(now, performance.now()).year, ...frameSize(shape));
             canvas.width = scene.W; canvas.height = scene.H;
             const image = ctx.createImageData(scene.W, scene.H), pixels = new Uint32Array(image.data.buffer);
             const draw = (t) => {
@@ -75,7 +93,7 @@ const SceneryBackdrop = ({ options = SCENERY_DEFAULTS, light = false }) => {
             frame = requestAnimationFrame(draw);
         }).catch((e) => console.warn('Scenery:', e));
         return () => { cancelled = true; cancelAnimationFrame(frame); sceneRef.current = null; };
-    }, [o.biome, o.seed, light]);
+    }, [o.biome, o.seed, light, shape]);
 
     // Weather fades to the new choice without rebuilding the landscape.
     useEffect(() => { sceneRef.current?.wx?.set(o.weather); }, [o.weather]);

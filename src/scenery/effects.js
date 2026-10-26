@@ -7,28 +7,53 @@ import { bayer, clamp, hash, noise1, smoothstep } from './noise.js';
 const AURORA = new Set(['lake', 'hills', 'woodland', 'grassland', 'farmland']);
 const FIREFLIES = new Set(['grassland', 'farmland', 'woodland', 'river']);
 
-// Curtains of light high in the sky on clear nights: likelier in the cold half of the year,
-// they swell and fade over a couple of minutes.
+// Aurora on clear nights, likelier in the cold half of the year, swelling and fading over a
+// few minutes. Each curtain is a folded ribbon: a sharp, bright lower edge that meanders
+// across the sky, fine vertical rays crawling along it, green fading up through teal into
+// violet. Stars and the moon still show through it.
+const AURORA_HUES = [['#c6ffe0', '#7dffb6', '#3cf08e'], ['#5dffa8', '#38e08e', '#22b878'], ['#4fe0c8', '#36b4b0', '#2a8a9a'], ['#b08cff', '#8c6ae6', '#6a4cc0']];
+
 function aurora(sc, rng) {
-    const { W } = sc, hz = sc.horizon, seed = rng.int(1, 1e6), ph = rng() * 6;
-    const slot = (c, v) => sc.slot({ k: 'aur', c: hex(c), v });
-    const green = [slot('#5dffa8', 0.3), slot('#5dffa8', 0.55), slot('#8dffc4', 0.8)];
-    const violet = [slot('#a07bff', 0.3), slot('#c08bff', 0.55)];
+    const { W, U } = sc, hz = sc.horizon, ph = rng() * 6;
+    // hue band (edge, green, teal, violet) x brightness (bright .. faint)
+    const slots = AURORA_HUES.map(row => row.map((c, i) => sc.slot({ k: 'aur', c: hex(c), v: [0.85, 0.6, 0.38][i] })));
+    const curtains = [
+        { seed: rng.int(1, 1e6), base: rng.range(0.42, 0.58), h: 1, a: 1, drift: rng.range(0.8, 1.4) * (rng.chance(0.5) ? 1 : -1) },
+        { seed: rng.int(1, 1e6), base: rng.range(0.22, 0.34), h: 0.7, a: 0.55, drift: rng.range(0.5, 1) * (rng.chance(0.5) ? 1 : -1) },
+    ];
+    let sky = null;
     sc.addFn((f, t, L) => {
         const S = sc.S, dark = smoothstep(0.35, 0.8, L.stars);
         if (dark <= 0) return;
         const cold = Math.max(S.snow, S.autumn * 0.7), wave = 0.5 + 0.5 * Math.sin(t * 0.05 + ph);
-        const inten = dark * (0.3 + 0.7 * cold) * (0.35 + 0.65 * wave);
+        const inten = dark * (0.3 + 0.7 * cold) * (0.35 + 0.65 * wave) * (1 - L.veil);
         if (inten < 0.08) return;
-        for (let x = 0; x < W; x++) {
-            const ray = clamp((noise1(x * 0.05 + t * 0.12, seed) - 0.25) * 1.8);
-            if (ray <= 0) continue;
-            const base = hz * 0.5 + (noise1(x * 0.012 + t * 0.03, seed + 1) - 0.5) * hz * 0.25;
-            const h = hz * 0.42 * ray * inten;
-            for (let y = Math.max(0, Math.floor(base - h)); y <= base; y++) {
-                const u = (base - y) / h, a = (1 - u) ** 1.3 * (0.5 + 0.5 * inten);
-                if (a <= bayer(x, y)) continue;
-                f[y * W + x] = u > 0.7 ? violet[a > 0.4 ? 1 : 0] : green[a > 0.66 ? 2 : a > 0.33 ? 1 : 0];
+        sky ||= Uint8Array.from(sc.defs, d => (d?.k === 'sky' ? 1 : 0));
+        for (const c of curtains) {
+            const s = c.seed;
+            for (let x = 0; x < W; x++) {
+                // Where along the arc the curtain is lit at all; it comes and goes in patches.
+                const en = smoothstep(0.3, 0.62, noise1(x * 0.009 + t * 0.006, s)), e = en * c.a * inten;
+                if (e < 0.05) continue;
+                // The lower edge folds: a slow meander plus tighter kinks that travel along it.
+                const base = hz * c.base + (noise1(x * 0.011 + t * 0.012, s + 1) - 0.5) * hz * 0.32
+                    + Math.sin(x * 0.045 + t * 0.09 * c.drift + noise1(x * 0.02, s + 2) * 4) * hz * 0.035;
+                // Rays: thin vertical streaks of different brightness, drifting sideways.
+                const ray = 0.35 + 0.65 * noise1(x * 0.32 + t * 0.5 * c.drift, s + 3) ** 1.5;
+                const h = U * c.h * (0.16 + 0.24 * noise1(x * 0.05 + t * 0.03, s + 4)) * (0.6 + 0.4 * ray) * (0.3 + 0.7 * en);
+                const y1 = Math.min(hz - 1, Math.round(base));
+                for (let y = Math.max(0, Math.floor(base - h)); y <= y1; y++) {
+                    const i = y * W + x;
+                    if (!sky[f[i]]) continue;
+                    const u = (base - y) / h;
+                    // Sharp rise at the edge, a bright band just above it, then a long fade.
+                    const prof = u < 0.05 ? 0.55 + u * 9 : Math.exp(-(u - 0.05) * 2.2);
+                    const a = e * prof * (u < 0.1 ? 1 : ray ** (0.5 + u));
+                    const lv = a * 3 + bayer(x, y) - 0.5;
+                    if (lv < 0.5) continue;
+                    const hue = u < 0.06 ? 0 : u < 0.4 ? 1 : u < 0.68 ? 2 : 3;
+                    f[i] = slots[hue][lv >= 2.5 ? 0 : lv >= 1.5 ? 1 : 2];
+                }
             }
         }
     });

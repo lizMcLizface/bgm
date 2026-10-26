@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { TOUR_STEPS, TOUR_KEY, LAST_STAGE } from './tourSteps';
+import { TOUR_STEPS, TOUR_KEY, LAST_STAGE, MINIMAL_TOUR_STEPS, MINIMAL_TOUR_KEY } from './tourSteps';
 import { readPref, writePref } from './prefs';
 
 /** Whether the tour has been finished or skipped before. */
 export const tourSeen = () => readPref(TOUR_KEY, false) === true;
+/** Whether the tour of the minimal view has been finished or skipped before. */
+export const minimalTourSeen = () => readPref(MINIMAL_TOUR_KEY, false) === true;
 
 const MARGIN = 12;
 const reducedMotion = () => typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -46,9 +48,11 @@ function place(rect, card) {
  * @param {boolean} [props.prompt] - open on a start prompt first: the page dimmed behind a card that
  *   asks whether to take the tour, until it is answered (for the automatic first-visit opening;
  *   starting from it skips the welcome step, which the prompt says)
+ * @param {boolean} [props.minimal] - the tour of the minimal view (MINIMAL_TOUR_STEPS) instead of the stages;
+ *   declining its prompt declines the main tour as well
  */
-const Tour = ({ onClose, reference = false, prompt = false, fromStage = 0, toStage = LAST_STAGE, onUnlockAll, onStep }) => {
-    const [steps] = useState(() => availableSteps(fromStage, toStage));
+const Tour = ({ onClose, reference = false, prompt = false, fromStage = 0, toStage = LAST_STAGE, onUnlockAll, onStep, minimal = false }) => {
+    const [steps] = useState(() => (minimal ? MINIMAL_TOUR_STEPS.filter((s) => !s.selector || document.querySelector(s.selector)) : availableSteps(fromStage, toStage)));
     const [asking, setAsking] = useState(prompt && !reference);
     const [index, setIndex] = useState(0);
     const [hovered, setHovered] = useState(null);
@@ -60,12 +64,13 @@ const Tour = ({ onClose, reference = false, prompt = false, fromStage = 0, toSta
     const last = index === steps.length - 1;
 
     const finish = () => {
-        if (!reference) writePref(TOUR_KEY, true);
+        if (!reference) writePref(minimal ? MINIMAL_TOUR_KEY : TOUR_KEY, true);
         onClose();
     };
     // Dismissing the start prompt: no help wanted, so everything is available.
     const decline = () => {
         if (onUnlockAll) onUnlockAll();
+        if (minimal) writePref(TOUR_KEY, true);
         finish();
     };
     const go = (to) => setIndex(Math.min(steps.length - 1, Math.max(0, to)));
@@ -135,14 +140,15 @@ const Tour = ({ onClose, reference = false, prompt = false, fromStage = 0, toSta
             <div className="gen-tour-intro" role="presentation" onClick={decline}>
                 <div className="gen-tour-intro-card" role="dialog" aria-modal="true" aria-labelledby="gen-tour-intro-title" aria-describedby="gen-tour-intro-text"
                     onClick={(e) => e.stopPropagation()}>
-                    <h2 id="gen-tour-intro-title">Welcome to bgm</h2>
+                    <h2 id="gen-tour-intro-title">{minimal ? 'Welcome to calmbgm' : 'Welcome to bgm'}</h2>
                     <p id="gen-tour-intro-text">
-                        Calm music that writes itself, with a fluid background that moves with the sound.
-                        A short tour shows the basics; the rest of the page unlocks a step at a time, whenever you are ready.
+                        {minimal
+                            ? 'Calm music that writes itself, over a landscape that follows the preset, the time of day and the season. A short tour shows this quiet view; the whole page, with every control, has a tour of its own.'
+                            : 'Calm music that writes itself, with a background that moves with the sound. A short tour shows the basics; the rest of the page unlocks a step at a time, whenever you are ready.'}
                     </p>
                     <div className="gen-tour-intro-buttons">
                         <button type="button" ref={next} className="gen-tour-start" onClick={begin} autoFocus>Take the tour</button>
-                        <button type="button" className="gen-tour-skip" onClick={decline}>I don't need help - show me everything</button>
+                        <button type="button" className="gen-tour-skip" onClick={decline}>{minimal ? 'I know my way around - show the whole page' : "I don't need help - show me everything"}</button>
                     </div>
                     <small>The ⚙ menu repeats it.</small>
                 </div>

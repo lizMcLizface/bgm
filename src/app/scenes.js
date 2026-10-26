@@ -108,6 +108,11 @@ export function stepBuiltinSceneEntry(currentName, direction, currentCategory) {
     const next = at < 0 ? (direction > 0 ? 0 : ordered.length - 1) : (at + direction + ordered.length) % ordered.length;
     return ordered[next];
 }
+/** A built-in preset at random for the dice: any listed one but the current, demos left out. */
+export function randomBuiltinSceneEntry(currentName, random = Math.random) {
+    const pool = SCENE_BROWSE_ORDER.filter(e => e.category !== 'demo' && e.scene.name !== currentName);
+    return pool[Math.floor(random() * pool.length)];
+}
 export const stepBuiltinScene = (name, direction, category) => stepBuiltinSceneEntry(name, direction, category).scene;
 
 /**

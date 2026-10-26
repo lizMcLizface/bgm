@@ -52,13 +52,13 @@ function windmill(sc, b, x, by, h, d) {
 }
 
 export function farmland(sc, rng) {
-    const { W, H } = sc, hz = sc.horizon = Math.round(H * rng.range(0.42, 0.56));
+    const { W, H } = sc, hz = sc.horizon = sc.horizonAt(rng.range(0.42, 0.56));
     groups(sc);
     sc.bias = rng.range(-0.4, 0.4);
     sky(sc);
     celestial(sc, rng);
     weather(sc, hz);
-    if (rng.chance(0.5)) mountains(sc, rng, { d: 0.5, base: hz + 2, top: hz - H * rng.range(0.06, 0.16), ramp: P.blueRock, freq: 0.01, mist: 8, env: envelope(rng) });
+    if (rng.chance(0.5)) mountains(sc, rng, { d: 0.5, base: hz + 2, top: hz - sc.U * rng.range(0.06, 0.16), ramp: P.blueRock, freq: 0.01, mist: 8, env: envelope(rng) });
     else hill(sc, rng, { d: 0.45, y: hz + 3, amp: rng.range(4, 10), freq: 0.012, ramp: P.hill, bottom: hz + 20 });
     ground(sc, hz + 1, P.hill, 0.3);
 
@@ -132,7 +132,7 @@ export function farmland(sc, rng) {
 // ---------------------------------------------------------------- savanna
 
 export function savanna(sc, rng) {
-    const { W, H } = sc, hz = sc.horizon = Math.round(H * rng.range(0.55, 0.68));
+    const { W, H } = sc, hz = sc.horizon = sc.horizonAt(rng.range(0.55, 0.68));
     groups(sc);
     sc.climate = 'dry';
     sc.bias = rng.range(-0.4, 0.4);
@@ -142,9 +142,9 @@ export function savanna(sc, rng) {
     if (rng.chance(0.35)) {
         // A lone snow-capped massif on the horizon.
         const c = rng.range(0.2, 0.8), w = rng.range(0.15, 0.3);
-        mountains(sc, rng, { d: 0.55, base: hz + 2, top: hz - H * rng.range(0.18, 0.3), ramp: P.blueRock, snow: P.snow, snowAt: 0.2, sharp: 0.8, freq: 0.006, mist: 10, env: u => 1 - smoothstep(w * 0.3, w, Math.abs(u - c)) });
+        mountains(sc, rng, { d: 0.55, base: hz + 2, top: hz - sc.U * rng.range(0.18, 0.3), ramp: P.blueRock, snow: P.snow, snowAt: 0.2, sharp: 0.8, freq: 0.006, mist: 10, env: u => 1 - smoothstep(w * 0.3, w, Math.abs(u - c)) });
     } else if (rng.chance(0.6)) {
-        mesa(sc, rng, { d: 0.5, base: hz + 2, top: hz - H * rng.range(0.06, 0.14), ramp: P.mesa, cover: rng.range(0.15, 0.35), freq: 0.016 });
+        mesa(sc, rng, { d: 0.5, base: hz + 2, top: hz - sc.U * rng.range(0.06, 0.14), ramp: P.mesa, cover: rng.range(0.15, 0.35), freq: 0.016 });
     }
     ground(sc, hz + 1, Q.savanna, 0.35);
     shimmer(sc, hz - 24, hz + 8);
@@ -161,7 +161,7 @@ export function savanna(sc, rng) {
     const sb = new Buf(W, H, { sway: true, rank: true }), crowns = [];
     for (let i = pick(rng, [0, 1], [1, 2], [2, 1]); i > 0; i--) {
         const x = Math.round(W * rng.range(0.1, 0.9)), L = sc.leaves(P.leaf, 0, leafVariant(rng));
-        crowns.push(blobTree(sb, x, Math.min(H + 2, ty[x] + rng.range(10, 30)), H * rng.range(0.45, 0.7), L, sc.ramp(P.trunk, 0), rng, { sway: 0.6, shape: 'umbrella' }));
+        crowns.push(blobTree(sb, x, Math.min(H + 2, ty[x] + rng.range(10, 30)), sc.U * rng.range(0.45, 0.7), L, sc.ramp(P.trunk, 0), rng, { sway: 0.6, shape: 'umbrella' }));
     }
     sc.addSway(sb, 0.7);
 }
@@ -169,13 +169,13 @@ export function savanna(sc, rng) {
 // ---------------------------------------------------------------- woodland
 
 export function woodland(sc, rng) {
-    const { W, H } = sc, hz = sc.horizon = Math.round(H * rng.range(0.5, 0.62));
+    const { W, H } = sc, hz = sc.horizon = sc.horizonAt(rng.range(0.5, 0.62));
     groups(sc);
     sc.bias = rng.range(-0.4, 0.4);
     sky(sc);
     celestial(sc, rng);
     weather(sc, hz, [['fog', 1], ['overcast', 0.9]]);
-    if (rng.chance(0.4)) mountains(sc, rng, { d: 0.55, base: hz, top: hz - H * rng.range(0.1, 0.22), ramp: P.mossRock, freq: 0.012, mist: 8, env: envelope(rng) });
+    if (rng.chance(0.4)) mountains(sc, rng, { d: 0.55, base: hz, top: hz - sc.U * rng.range(0.1, 0.22), ramp: P.mossRock, freq: 0.012, mist: 8, env: envelope(rng) });
     canopyRidge(sc, rng, { d: 0.42, base: hz + 4, top: hz - rng.range(6, 14), bottom: hz + 6, ramp: P.canopy, rmin: 2, rmax: 5, rows: 2 });
     ground(sc, hz + 2, P.hill, 0.3);
     const clear = W * rng.range(0.3, 0.7), conif = rng.range(0, 0.7);
@@ -218,8 +218,8 @@ export function woodland(sc, rng) {
     for (const side of [-1, 1]) {
         for (let i = rng.int(1, 2); i > 0; i--) {
             const x = side < 0 ? rng.range(-W * 0.05, W * 0.16) : rng.range(W * 0.84, W * 1.05), by = H + rng.range(-6, 10);
-            if (rng() < conif) conifer(sb, x, by, H * rng.range(0.9, 1.2), Df, rng, { sway: 0.8, trunk: Tf });
-            else crowns.push(blobTree(sb, x, by, H * rng.range(0.85, 1.15), sc.leaves(P.leaf, 0, leafVariant(rng)), Tf, rng, { sway: 0.8 }));
+            if (rng() < conif) conifer(sb, x, by, sc.U * rng.range(0.9, 1.2), Df, rng, { sway: 0.8, trunk: Tf });
+            else crowns.push(blobTree(sb, x, by, sc.U * rng.range(0.85, 1.15), sc.leaves(P.leaf, 0, leafVariant(rng)), Tf, rng, { sway: 0.8 }));
         }
     }
     sc.addSway(sb, 0.8);
@@ -229,17 +229,17 @@ export function woodland(sc, rng) {
 // ---------------------------------------------------------------- river valley
 
 export function river(sc, rng) {
-    const { W, H } = sc, hz = sc.horizon = Math.round(H * rng.range(0.45, 0.58));
+    const { W, H } = sc, hz = sc.horizon = sc.horizonAt(rng.range(0.45, 0.58));
     groups(sc);
     sc.bias = rng.range(-0.4, 0.4);
     sky(sc);
     celestial(sc, rng);
     weather(sc, hz, [['fog', 0.8]]);
     const vx = rng.range(0.35, 0.65);
-    if (rng.chance(0.5)) mountains(sc, rng, { d: 0.5, base: hz + 2, top: hz - H * rng.range(0.12, 0.25), ramp: P.rock, snow: rng.chance(0.5) && P.snow, freq: 0.012, mist: 10, env: envelope(rng) });
+    if (rng.chance(0.5)) mountains(sc, rng, { d: 0.5, base: hz + 2, top: hz - sc.U * rng.range(0.12, 0.25), ramp: P.rock, snow: rng.chance(0.5) && P.snow, freq: 0.012, mist: 10, env: envelope(rng) });
     // Valley sides: hills rising toward both edges, nearer ones steeper.
     for (const [d, rise] of [[0.4, 0.14], [0.24, 0.24]]) {
-        mountains(sc, rng, { d, base: hz + 4, top: hz - H * rise * rng.range(0.7, 1.2), ramp: P.mossRock, sharp: 1, talus: 0.6, spur: 14, freq: 0.01, mist: 6, env: u => smoothstep(0.06, 0.45, Math.abs(u - vx)) });
+        mountains(sc, rng, { d, base: hz + 4, top: hz - sc.U * rise * rng.range(0.7, 1.2), ramp: P.mossRock, sharp: 1, talus: 0.6, spur: 14, freq: 0.01, mist: 6, env: u => smoothstep(0.06, 0.45, Math.abs(u - vx)) });
     }
     ground(sc, hz + 2, P.hill, 0.25);
     meadow(sc, rng, { top: hz + 3, flowers: rng.range(0, 0.1), blades: rng.range(0.12, 0.25) });
@@ -261,25 +261,49 @@ export function river(sc, rng) {
     sc.addStatic(bank);
     water(sc, rng, { y0: hz + 1, ramp: Q.river, mix: 0.45, fres: 0.6, waves: 0.06, speed: 3, mask });
 
+    // Where a bridge would cross, chosen up front so the trees can be split into those
+    // behind it and those in front of it.
+    const bc = centres[Math.floor(centres.length * (0.25 + 0.25 * hash(3, 1, s)))];
+    const span = bc.w * 2 + 10 + bc.p * 20;
+
     // Trees along the banks, smaller with distance.
-    const tb = new Buf(W, H, { rank: true }), T = sc.ramp(P.trunk, 0.1);
+    const tb = new Buf(W, H, { rank: true }), tf = new Buf(W, H, { rank: true }), T = sc.ramp(P.trunk, 0.1);
     for (const c of centres) {
         if (!rng.chance(0.04 + c.p * 0.04)) continue;
         const side = rng.chance(0.5) ? -1 : 1, x = c.cx + side * (c.w + rng.range(4, 14) * (0.5 + c.p * 3)), d = 0.3 * (1 - c.p);
-        if (rng.chance(0.25)) conifer(tb, x, c.y, (8 + c.p * 50) * rng.range(0.7, 1.2), sc.ramp(P.forest, d), rng, { trunk: T });
-        else blobTree(tb, x, c.y, (6 + c.p * 46) * rng.range(0.7, 1.2), sc.leaves(P.leaf, d, leafVariant(rng)), T, rng, { shape: rng.chance(0.2) ? 'tall' : 'dome' });
+        const b = c.y > bc.y ? tf : tb;
+        if (rng.chance(0.25)) conifer(b, x, c.y, (8 + c.p * 50) * rng.range(0.7, 1.2), sc.ramp(P.forest, d), rng, { trunk: T });
+        else blobTree(b, x, c.y, (6 + c.p * 46) * rng.range(0.7, 1.2), sc.leaves(P.leaf, d, leafVariant(rng)), T, rng, { shape: rng.chance(0.2) ? 'tall' : 'dome' });
     }
-    sc.addStatic(tb);
     if (rng.chance(0.4)) {
+        rng();
+        // A dirt path runs off from each end of the bridge, curving toward the viewer.
+        const c = bc, pb = new Buf(W, H), mud = sc.ramp(Q.soil, 0.12 * (1 - c.p));
+        for (const side of [-1, 1]) {
+            const x0 = c.cx + side * span / 2, drop = (H - c.y) * (0.1 + 0.5 * hash(side, 4, s)), reach = W * (0.5 + 0.4 * hash(side, 5, s));
+            for (let k = -2; ; k++) {
+                const x = Math.round(x0 + side * k);
+                if (x < 0 || x >= W) break;
+                const q = Math.max(0, k) / reach, y = c.y + 1 + drop * q * q + (noise1(k * 0.04, s + side) - 0.5) * 3 * q;
+                const p = (y - hz) / (H - hz), hw = 0.9 + p * 3.4;
+                for (let yy = Math.round(y - hw); yy <= Math.round(y + hw); yy++) {
+                    if (mask.get(x, yy)) continue;
+                    pb.set(x, yy, mud.flat(Math.abs(yy - y) > hw - 0.8 ? 1 : 2 + (hash(x, yy, s) < 0.15 ? 1 : 0)));
+                }
+            }
+        }
+        sc.addStatic(pb);
+        sc.addStatic(tb);
         // A stone arch bridge across the middle distance.
-        const c = centres[Math.floor(centres.length * rng.range(0.25, 0.5))], st = sc.ramp(P.stone, 0.15), bb = new Buf(W, H);
+        const st = sc.ramp(P.stone, 0.15), bb = new Buf(W, H);
         // Deck across the river; the arch's underside drops from the crown to the water at each end.
-        const span = c.w * 2 + 10 + c.p * 20, deck = c.y - 3 - c.p * 10, th = 2 + c.p * 4, archH = c.y + 2 - (deck + th);
+        const deck = c.y - 3 - c.p * 10, th = 2 + c.p * 4, archH = c.y + 2 - (deck + th);
         for (let x = c.cx - span / 2; x <= c.cx + span / 2; x++) {
             const u = (x - c.cx) / (span / 2), under = deck + th + archH * (1 - Math.sqrt(Math.max(0, 1 - u * u)));
             for (let y = Math.round(deck); y <= under; y++) bb.set(x, y, st.face(u < 0 ? -1 : 1, y - deck < 1 ? 1 : 0));
         }
         sc.addStatic(bb);
-    }
+    } else sc.addStatic(tb);
+    sc.addStatic(tf);
     reeds(sc, rng, hz);
 }
