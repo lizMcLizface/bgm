@@ -34,6 +34,7 @@ import {
 } from './randomize';
 import Backdrop, { backdropSupported, BACKDROP_DEFAULTS, shuffleColours } from './Backdrop';
 import SceneryBackdrop, { SCENERY_DEFAULTS } from './SceneryBackdrop';
+import { landscapeForScene } from '../scenery/presetScenes';
 import { viewFromSearch, withView } from './viewLink';
 import { MasterVolume, SettingsMenu, AudioMenu, VisualMenu } from './AudioStatus';
 import { SleepTimer, Recorder } from './Playback';
@@ -1224,7 +1225,18 @@ const GenerativeApp = () => {
     const backdropOn = backdropMode === 'fluid';
     const [storedScenery, setSceneryOptions] = useStoredFlag('bgm-scenery-options', { ...SCENERY_DEFAULTS, seed: Math.floor(Math.random() * 1e6) });
     const sceneryOptions = { ...SCENERY_DEFAULTS, ...storedScenery };
-    // Keep the first random landscape, so a reload shows the same one.
+    const sceneryRef = useRef(sceneryOptions);
+    sceneryRef.current = sceneryOptions;
+    // A musical preset brings its own landscape, weather, hour and season (src/scenery/presetScenes.js).
+    const applyLandscape = (picked) => {
+        const o = sceneryRef.current, l = landscapeForScene(picked.name, picked.category);
+        if (!o.follow || !l) return;
+        setSceneryOptions({
+            ...o, biome: l.biome, seed: o.biome === l.biome ? o.seed : Math.floor(Math.random() * 1e6),
+            weather: l.weather, hour: l.hour, year: l.year,
+            time: o.moveTime ? 'cycle' : 'fixed', season: o.moveSeason ? 'cycle' : 'fixed', epoch: Date.now(),
+        });
+    };
     useEffect(() => { if (readPref('bgm-scenery-options', null) === null) setSceneryOptions(sceneryOptions); }, []); // eslint-disable-line react-hooks/exhaustive-deps
     const [fluidReset, setFluidReset] = useState(0);
     const [storedBackdropOptions, setBackdropOptions] = useStoredFlag('bgm-backdrop-options', BACKDROP_DEFAULTS);
@@ -1284,6 +1296,7 @@ const GenerativeApp = () => {
     };
     const applySceneNow = (picked, { exact = false, unsaved = false, parts = 'all', preserveSeed = false }, morph) => {
         soundScene.current = picked;
+        if (parts !== 'voices') applyLandscape(picked);
         const playing = gen.anyRunning;
         if (parts !== 'voices') {
             setBook({ rules: {}, baseline: {} });

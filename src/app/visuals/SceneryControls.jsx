@@ -15,6 +15,18 @@ export default function SceneryControls({ options, onOptions }) {
             <button type="button" className="gen-dice" aria-label="New landscape" title="A new landscape of this kind"
                 onClick={() => set('seed', Math.floor(Math.random() * 1e6))}><DiceIcon /></button>
         </div>
+        <label className="gen-check">
+            <input type="checkbox" checked={options.follow} onChange={(e) => set('follow', e.target.checked)} />
+            Preset picks the landscape
+        </label>
+        <label className="gen-check">
+            <input type="checkbox" checked={options.moveTime} onChange={(e) => onOptions({ ...options, moveTime: e.target.checked, time: e.target.checked ? 'cycle' : 'fixed' })} />
+            Time of day keeps changing
+        </label>
+        <label className="gen-check">
+            <input type="checkbox" checked={options.moveSeason} onChange={(e) => onOptions({ ...options, moveSeason: e.target.checked, season: e.target.checked ? 'cycle' : 'fixed' })} />
+            Seasons keep changing
+        </label>
         <label className="gen-menu-slider">
             <span>Kind</span>
             <select value={options.biome} aria-label="Landscape kind" onChange={(e) => set('biome', e.target.value)}>

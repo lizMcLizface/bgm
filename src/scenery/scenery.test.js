@@ -24,4 +24,23 @@ describe('scenery', () => {
         const b = createScene('lake', 2).render(0, 12);
         expect(a).not.toEqual(b);
     });
+
+    const hasKind = (sc, kind) => sc.frame.some(s => sc.defs[s]?.k === kind);
+
+    it('draws aurora on a clear winter night, not by day', () => {
+        const sc = createScene('lake', 3, 'clear', 3.3);
+        sc.render(20, 1);
+        expect(hasKind(sc, 'aur')).toBe(true);
+        sc.render(20, 12);
+        expect(hasKind(sc, 'aur')).toBe(false);
+    });
+
+    it('lights fireflies on a summer night, not in winter', () => {
+        const sc = createScene('grassland', 5, 'clear', 1.2);
+        sc.render(3, 23);
+        expect(hasKind(sc, 'flame')).toBe(true);
+        sc.year = 3.3;
+        sc.render(3, 23);
+        expect(hasKind(sc, 'flame')).toBe(false);
+    });
 });

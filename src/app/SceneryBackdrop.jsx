@@ -5,7 +5,10 @@
 import React, { useEffect, useRef } from 'react';
 
 // time: 'cycle' | 'clock' | 'fixed' (at `hour`); season: 'cycle' | 'calendar' | 'fixed' (at `year`).
-export const SCENERY_DEFAULTS = { biome: 'lake', seed: 1, weather: 'auto', time: 'cycle', hour: 15, season: 'cycle', year: 1.2 };
+export const SCENERY_DEFAULTS = { biome: 'lake', seed: 1, weather: 'auto', time: 'cycle', hour: 15, season: 'cycle', year: 1.2,
+    // follow: a musical preset brings its own landscape (src/scenery/presetScenes.js); moveTime / moveSeason
+    // say whether the day and the year then keep passing; a new epoch restarts them from `hour` and `year`.
+    follow: true, moveTime: true, moveSeason: true, epoch: 0 };
 export const DAY_MINUTES = 4, SEASON_MINUTES = 60;
 
 // Hours since midnight, local time.
@@ -25,8 +28,11 @@ const SceneryBackdrop = ({ options = SCENERY_DEFAULTS, light = false }) => {
     const canvasRef = useRef(null), sceneRef = useRef(null), optionsRef = useRef(options);
     // Where the passing day and year started, kept across landscape changes.
     const start = useRef(null);
-    start.current ||= { at: performance.now(), hour: clockHour(), year: calendarYear() };
+    start.current ||= { at: performance.now(), hour: options.epoch ? options.hour : clockHour(), year: options.epoch ? options.year : calendarYear(), epoch: options.epoch ?? SCENERY_DEFAULTS.epoch };
     const o = { ...SCENERY_DEFAULTS, ...options };
+    if (start.current.epoch !== o.epoch) {
+        start.current = { at: performance.now(), hour: o.epoch ? o.hour : start.current.hour, year: o.epoch ? o.year : start.current.year, epoch: o.epoch };
+    }
     optionsRef.current = o;
 
     useEffect(() => {

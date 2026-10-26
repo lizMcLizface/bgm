@@ -163,6 +163,7 @@ export class Scene {
             case 'glow': return mix(L.skyHor, L.sun, def.v);
             case 'moon': return mix([150, 166, 204], [236, 240, 255], def.v);
             case 'star': return mix(L.skyTop, WHITE, L.stars * def.v);
+            case 'aur': return mix(L.skyTop, def.c, L.stars * def.v);
             case 'emit': return mix(this.lit(def.base, def.d, L), def.c, L.lights * def.v);
             case 'flame': return def.c;
             case 'leaf': {

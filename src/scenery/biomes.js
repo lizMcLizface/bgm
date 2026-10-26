@@ -8,6 +8,7 @@ import { blades, blobTree, canopyRidge, celestial, conifer, cumulus, hill, mount
 import { DEFAULT_WEATHER, weatherOverlay, weatherSky } from './weather.js';
 import { seasonAt } from './seasons.js';
 import { BIOME_NAMES } from './catalog.js';
+import { embers, fireflies } from './effects.js';
 import { farmland, river, savanna, woodland } from './landscapes.js';
 
 // Four tones per material: two shadow tones, then their lit counterparts.
@@ -744,6 +745,7 @@ function industrial(sc, rng) {
     const flares = stacks.slice(0, pick(rng, [0, 1], [1, 2], [2, 0.6]));
     for (const st of stacks.slice(flares.length, flares.length + rng.int(0, 3))) plumes.push({ x: st.x, y: st.y, r: 2.6, rise: 34 });
     const flame = ['#fff4c8', '#ffc45c', '#ff7a2c'].map(c => sc.slot({ k: 'flame', c: hex(c) }));
+    embers(sc, flares);
     const steam = sc.slot({ k: 'cloud', v: 0.55, d: 0.3 });
     const cable = S.flat(1), fs = seedOf(rng);
     sc.addFn((f, t) => {
@@ -800,7 +802,10 @@ export function createScene(biome, seed, weather = 'auto', year = 1, W = 384, H 
     seasonGroups(sc);
     sc.weatherFixed = weather === 'auto' ? null : weather;
     sc.wrng = makeRng(seed ^ 0x5bd1e995);
+    sc.frng = makeRng(seed ^ 0x2f6b9a31);
+    sc.biome = biome;
     BIOMES[biome].build(sc, makeRng(seed));
+    fireflies(sc);
     weatherOverlay(sc);
     return sc;
 }

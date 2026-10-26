@@ -1,5 +1,6 @@
 // Procedural building blocks. Each adds one or more layers to a Scene.
 import { Buf, REFLECT, VEIL } from './scene.js';
+import { skyEffects } from './effects.js';
 import { bayer, clamp, fbm1, fbm2, hash, noise1, noise2, quant } from './noise.js';
 
 export const seedOf = rng => rng.int(0, 1e6);
@@ -58,6 +59,7 @@ export function celestial(sc, rng, { count = 90 } = {}) {
             });
         }
     });
+    skyEffects(sc);
 }
 
 // Union of spheres seen from the front: per-pixel depth, owning sphere and the
