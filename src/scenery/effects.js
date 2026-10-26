@@ -4,8 +4,8 @@
 import { hex } from './lighting.js';
 import { bayer, clamp, hash, noise1, smoothstep } from './noise.js';
 
-const AURORA = new Set(['lake', 'hills', 'woodland', 'grassland', 'farmland']);
-const FIREFLIES = new Set(['grassland', 'farmland', 'woodland', 'river']);
+const AURORA = new Set(['lake', 'hills', 'woodland', 'grassland', 'farmland', 'alpine', 'tundra', 'camp']);
+const FIREFLIES = new Set(['grassland', 'farmland', 'woodland', 'river', 'swamp', 'camp']);
 
 // Aurora on clear nights, likelier in the cold half of the year, swelling and fading over a
 // few minutes. Each curtain is a folded ribbon: a sharp, bright lower edge that meanders

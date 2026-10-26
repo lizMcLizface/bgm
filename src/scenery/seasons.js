@@ -7,9 +7,14 @@ import { clamp, smoothstep } from './noise.js';
 const NAMES = ['Early spring', 'Late spring', 'Early summer', 'Late summer', 'Early autumn', 'Late autumn', 'Early winter', 'Late winter'];
 export const seasonName = y => NAMES[Math.floor((((y % 4) + 4) % 4) * 2)];
 
-// `climate` 'dry' (savanna, desert): no snow and trees keep most leaves.
+// `climate` 'dry' (savanna, desert): no snow and trees keep most leaves;
+// 'cold' (tundra): snow from mid autumn to late spring, a short green summer.
 export function seasonAt(year, climate) {
     const y = ((year % 4) + 4) % 4;
+    if (climate === 'cold') {
+        const S = seasonAt(y), snow = 1 - smoothstep(0.45, 0.85, y) * (1 - smoothstep(2.05, 2.45, y));
+        return { ...S, snow, bloom: 0, fresh: S.fresh * (1 - snow), dry: 0, autumn: Math.min(S.autumn, 1 - snow), leafy: Math.min(S.leafy, 1 - snow * 0.9) };
+    }
     const thaw = 1 - smoothstep(3.7, 3.97, y);
     if (climate === 'dry') {
         // Wet season around spring, then a long golden dry season.

@@ -36,33 +36,39 @@ and moves on.
 - **Piano and Pads, Solo Grand, other abstract presets**: neutral lake. The Demo scenes each
   have their own calm pick (lake, hills, grassland, savanna, seaside, farmland, river, woodland).
 
-## Missing landscapes, easiest to hardest to add
+## Drafts in review
 
-Each landscape is a build function in [biomes.js](../src/scenery/biomes.js) or
-[landscapes.js](../src/scenery/landscapes.js) that stacks existing helpers (sky, mountains,
-ground, meadow, trees, water, houses). Difficulty is how much new shape code each needs.
+Built in [wilds.js](../src/scenery/wilds.js) and listed in the scenery tool
+(`tools/scenery.html`, marked "new"; the Shape picker shows the phone build), but not yet in
+the page's Look menu or the preset table above. Once a draft is approved, move its name from
+`DRAFT_BIOME_NAMES` to `BIOME_NAMES` in [catalog.js](../src/scenery/catalog.js) and point the
+presets below at it.
 
-1. **Snowy tundra / winter forest** (easy): `woodland` or `hills` with `climate = 'snow'`
-   forced, conifers and snowcaps. Seasons and snow palettes already exist.
-2. **Alpine peaks** (easy): `lake` without the lake, with bigger `mountains` and snowcaps.
-3. **Highway** (easy-medium): flat ground, a perspective road, poles and a few moving car lights
-   (like the lights in `industrial`); the road is the only new shape.
-4. **Swamp** (medium): reuse `water`, `reeds`, bare trees and fog; needs mangrove roots and
-   mist banks tuned for it.
-5. **Town / harbour** (medium): `house` and `village` exist, but street grids, lit windows at
+| Draft | What is in it | Presets it would take over |
+|---|---|---|
+| Alpine peaks | a tall snowy massif, a rockier range, an alpine meadow, a chalet, boulders, a green shoulder | Soft Landing, Five Notes Only, Rooms Above the Clouds, Windy hill |
+| Tundra | a cold climate (snow from mid autumn to late spring), stunted spruces, a lake that freezes, aurora | Cold Drifts, Warm Socks; Quiet-room waltz; Falling Blocks Folk Dance; Altman |
+| Swamp | channels between mossy hummocks, cypresses on arching roots, hanging moss, snags, lily pads, fireflies, fog | Ruins in the Drizzle, Haunted Staircase, Soggy Home Planet, Damp Crater |
+| Volcano | a cone with a glowing crater, lava flows, an ash plume lit from below, embers, a cracked lava field, a red night sky | Boss Fight, Politely; Dark Mirror Dimension |
+| Synthwave | a neon horizon at every hour: a huge striped sun with a halo (sunset, magenta or rose), glowing bands and stars, a city silhouette, wireframe pyramids or cloud banks, a scrolling grid floor with a centre line or a winding glowing road | Outrun Lullaby; Night drive; Getaway Driver, Off Duty; Nightcall, Voicemail; Real Hero Hours; Pocket Circuit; Lantern Circuit |
+| Alien planet | a black sky by day, a ringed planet and a moon, craters, a domed outpost with a blinking mast | Slightly Slower Than Light, Mild Vacuum, Plotting a Course, Orbital Afterglow, Hull Breach Brunch |
+| Campfire clearing | a fire with flames, embers and a pool of light, a stone ring, a log seat, a tent, forest around | Campfire, Fireside folk, Bonfire Rest |
+
+## Still missing, easiest to hardest to add
+
+Each landscape is a build function that stacks existing helpers (sky, mountains, ground,
+meadow, trees, water, houses). Difficulty is how much new shape code each needs.
+
+1. **Town / harbour** (medium): `house` and `village` exist, but street grids, lit windows at
    scale and a quay with boats need a layout pass. Seaside already has boats and a lighthouse.
-6. **Jungle / rainforest** (medium): dense layered canopy, vines, a waterfall; needs a new tree
+2. **Jungle / rainforest** (medium): dense layered canopy, vines, a waterfall; needs a new tree
    type and its own wet-season palette.
-7. **Volcanic / lava** (medium-hard): dark rock, a glowing lava flow and a plume. Embers now
-   exist; the lava animation and sky tint are new.
-8. **Ruins / castle** (hard): needs architectural shapes (arches, towers, broken walls) the
+3. **Ruins / castle** (hard): needs architectural shapes (arches, towers, broken walls) the
    shape library does not have.
-9. **Cave / underground** (hard): the scene has a sky and horizon baked in; a cave needs a
+4. **Cave / underground** (hard): the scene has a sky and horizon baked in; a cave needs a
    different layer stack, lighting model (no sun) and framing.
-10. **Interiors (café, library, window view)** (hardest): new composition, props and lighting,
-    probably a window frame over an existing landscape.
-11. **Space / planet surface** (medium-hard): stars exist, but planets, rings and a ground
-    plane under a lit sky need a sky mode with no atmosphere.
+5. **Interiors (café, library, window view)** (hardest): new composition, props and lighting,
+   probably a window frame over an existing landscape.
 
 ## Sky features
 
@@ -72,11 +78,10 @@ Done, in [effects.js](../src/scenery/effects.js):
   drifting along it, green fading through teal into violet, stars and moon showing through;
   strongest in autumn and winter, swelling and fading over a few minutes.
 - **Shooting stars**: a streak every so often on dark nights, everywhere except industrial.
-- **Fireflies**: after dusk over grassland, farmland, woodland and river; gone in autumn and
+- **Fireflies**: after dusk over grassland, farmland, woodland, river, swamp and the campfire clearing; gone in autumn and
   winter, and in rain.
 - **Embers**: sparks rising from industrial flares.
 
 Already there: falling leaves (woodland, lake banks, lone trees, strongest in autumn).
 
-Still missing: falling petals in spring, underwater caustics, and embers need a campfire
-object (Bonfire Rest, Campfire, Fireside folk have none yet).
+Still missing: falling petals in spring and underwater caustics.

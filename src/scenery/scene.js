@@ -100,6 +100,7 @@ export class Scene {
         this.veil = null;        // { def, amounts: [thin, thick] }
         this.presence = 1;       // how much of a fading weather group shows
         this.update = null;      // t -> void, runs before each frame is coloured
+        this.relight = null;     // (L, t) -> void, adjusts the lighting after the weather (a sky with no air)
         this.groups = new Map(); // palette array -> season group (grass, rock...)
         this.year = 1;           // time of year, see seasons.js
         this.climate = null;     // 'dry': no snow, see seasons.js
@@ -285,6 +286,7 @@ export class Scene {
         this.update?.(t);
         const L = lightAt(hour), { W, H } = this;
         if (this.atmos) applyAtmos(L, this.atmos, this.flash ? this.flash(t) : 0);
+        this.relight?.(L, t);
         const hz = this.horizon;
         L.sunPx = [W / 2 + L.sunX * W * 0.44, hz - L.sunElev * hz * 0.85];
         L.moonPx = [W / 2 + L.moonX * W * 0.44, hz - L.moonElev * hz * 0.85];

@@ -7,9 +7,10 @@ import { bayer, clamp, fbm1, fbm2, hash, lerp, makeRng, noise1, noise2, smoothst
 import { blades, blobTree, canopyRidge, celestial, conifer, cumulus, hill, mountains, seedOf, sky, sphereField, water } from './shapes.js';
 import { DEFAULT_WEATHER, weatherOverlay, weatherSky } from './weather.js';
 import { seasonAt } from './seasons.js';
-import { BIOME_NAMES } from './catalog.js';
+import { BIOME_NAMES, DRAFT_BIOME_NAMES } from './catalog.js';
 import { embers, fireflies } from './effects.js';
 import { farmland, river, savanna, woodland } from './landscapes.js';
+import { WILDS, WILD_HOURS } from './wilds.js';
 
 // Four tones per material: two shadow tones, then their lit counterparts.
 export const P = {
@@ -793,6 +794,8 @@ export const BIOMES = {
     savanna: { name: BIOME_NAMES.savanna, hour: 17.2, build: savanna },
     woodland: { name: BIOME_NAMES.woodland, hour: 9, build: woodland },
     river: { name: BIOME_NAMES.river, hour: 15, build: river },
+    // In review (tools/scenery.html); not offered on the page yet.
+    ...Object.fromEntries(Object.entries(WILDS).map(([k, build]) => [k, { name: DRAFT_BIOME_NAMES[k], hour: WILD_HOURS[k], build, draft: true }])),
 };
 
 export function createScene(biome, seed, weather = 'auto', year = 1, W = 384, H = 216) {

@@ -1,6 +1,7 @@
 // Prototype viewer for procedural pixel scenery: biome, seed and time of day,
 // with an optional day cycle. State lives in the URL hash so scenes can be shared.
 import { BIOMES, createScene } from './biomes.js';
+import { frameSize } from './catalog.js';
 import { WEATHER } from './weather.js';
 import { seasonName } from './seasons.js';
 
@@ -9,11 +10,14 @@ const canvas = document.getElementById('view');
 const ctx = canvas.getContext('2d');
 const $ = id => document.getElementById(id);
 
-const state = { biome: 'lake', seed: 1, hour: BIOMES.lake.hour, weather: 'auto', year: 1.2, cycle: false, dayMinutes: 4, yearCycle: false, yearMinutes: 20 };
+const state = { biome: 'lake', seed: 1, hour: BIOMES.lake.hour, weather: 'auto', year: 1.2, cycle: false, dayMinutes: 4, yearCycle: false, yearMinutes: 20, frame: 'window' };
+// The scene's shape: the window's (as the page builds it), 16:9, or a phone held upright.
+const FRAMES = { window: () => innerWidth / Math.max(1, innerHeight), wide: () => 16 / 9, phone: () => 412 / 915 };
 let scene, image, pixels, last = 0, elapsed = 0, prev = performance.now(), renderMs = 0, shown = null;
 
 function readHash() {
-    const [biome, seed, hour, weather, year] = location.hash.slice(1).split('/');
+    const [biome, seed, hour, weather, year, frame] = location.hash.slice(1).split('/');
+    if (FRAMES[frame]) state.frame = frame;
     if (year && !isNaN(+year)) state.year = ((+year % 4) + 4) % 4;
     state.weather = WEATHER[weather] ? weather : 'auto';
     if (BIOMES[biome]) state.biome = biome;
@@ -22,11 +26,12 @@ function readHash() {
 }
 
 function writeHash() {
-    history.replaceState(null, '', `#${state.biome}/${state.seed}/${state.hour.toFixed(1)}/${state.weather}/${state.year.toFixed(2)}`);
+    history.replaceState(null, '', `#${state.biome}/${state.seed}/${state.hour.toFixed(1)}/${state.weather}/${state.year.toFixed(2)}/${state.frame}`);
 }
 
 function rebuild() {
-    scene = createScene(state.biome, state.seed, state.weather, state.year);
+    scene = createScene(state.biome, state.seed, state.weather, state.year, ...frameSize(FRAMES[state.frame]()));
+    canvas.classList.toggle('phone', state.frame === 'phone');
     canvas.width = scene.W;
     canvas.height = scene.H;
     image = ctx.createImageData(scene.W, scene.H);
@@ -34,6 +39,7 @@ function rebuild() {
     document.querySelectorAll('[data-biome]').forEach(b => b.classList.toggle('on', b.dataset.biome === state.biome));
     $('seed').value = state.seed;
     $('weather').value = state.weather;
+    $('frame').value = state.frame;
     shown = null;
     draw();
     writeHash();
@@ -76,6 +82,7 @@ function buildUi() {
     for (const [key, b] of Object.entries(BIOMES)) {
         const btn = document.createElement('button');
         btn.textContent = b.name;
+        if (b.draft) { btn.classList.add('draft'); btn.title = 'New, in review'; }
         btn.dataset.biome = key;
         btn.onclick = () => { state.biome = key; if (!state.cycle) state.hour = b.hour; rebuild(); };
         row.append(btn);
@@ -83,9 +90,11 @@ function buildUi() {
     const wx = $('weather');
     wx.append(new Option('Auto', 'auto'), ...Object.entries(WEATHER).map(([k, name]) => new Option(name, k)));
     // Weather fades in place; the landscape is not rebuilt.
-    wx.onchange = e => { state.weather = e.target.value; scene.wx.set(state.weather); writeHash(); };
+    wx.onchange = e => { state.weather = e.target.value; scene.wx?.set(state.weather); writeHash(); };
+    $('frame').onchange = e => { state.frame = e.target.value; rebuild(); };
     $('nextWeather').onclick = () => {
         const w = scene.wx;
+        if (!w) return;
         if (state.weather !== 'auto') { state.weather = 'auto'; $('weather').value = 'auto'; writeHash(); }
         w.changing = true;
         w.go(w.pickNext(), 15);
