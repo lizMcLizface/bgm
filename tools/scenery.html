@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="/favicon.svg">
+<title>Pixel scenery · calmbgm</title>
+<style>
+    html, body { margin: 0; height: 100%; background: #0b0f1c; color: #e8ecf6; font: 13px/1.4 system-ui, sans-serif; overflow: hidden; }
+    #view { position: fixed; inset: 0; width: 100vw; height: 100vh; object-fit: cover; image-rendering: pixelated; }
+    #panel { position: fixed; left: 12px; bottom: 12px; max-width: calc(100vw - 24px); box-sizing: border-box; padding: 10px 12px; border-radius: 10px;
+        background: rgba(10, 14, 28, 0.72); backdrop-filter: blur(6px); display: grid; gap: 8px; }
+    .bare #panel > :not(.keep) { display: none; }
+    .row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+    button, select, input { font: inherit; color: inherit; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 6px; padding: 4px 8px; }
+    button.on { background: rgba(140, 190, 255, 0.35); border-color: rgba(160, 200, 255, 0.6); }
+    button:hover { background: rgba(255, 255, 255, 0.16); }
+    #seed { width: 7em; }
+    #hour { flex: 1; min-width: 140px; padding: 0; }
+    #clock { font-variant-numeric: tabular-nums; min-width: 3.2em; }
+    #season { min-width: 6.5em; }
+    #year { flex: 1; min-width: 140px; padding: 0; }
+    #perf, .hint { opacity: 0.6; font-size: 11px; }
+    .bare #panel { padding: 4px; background: transparent; backdrop-filter: none; }
+</style>
+</head>
+<body>
+<canvas id="view"></canvas>
+<div id="panel">
+    <div class="row" id="biomes"></div>
+    <div class="row">
+        <label>Seed <input id="seed" type="number"></label>
+        <button id="new" title="Space">New scene</button>
+    </div>
+    <div class="row">
+        <label>Weather <select id="weather"></select></label>
+        <button id="nextWeather" title="Fade to a plausible next weather">Next</button>
+    </div>
+    <div class="row">
+        <span id="clock"></span>
+        <input id="hour" type="range" min="0" max="23.99" step="0.05">
+    </div>
+    <div class="row">
+        <span id="season"></span>
+        <input id="year" type="range" min="0" max="3.99" step="0.01">
+    </div>
+    <div class="row">
+        <label><input id="yearCycle" type="checkbox"> Year cycle</label>
+        <select id="yearSpeed">
+            <option value="4">4 min/year</option>
+            <option value="20" selected>20 min/year</option>
+            <option value="120">2 h/year</option>
+        </select>
+    </div>
+    <div class="row">
+        <label><input id="cycle" type="checkbox"> Day cycle</label>
+        <select id="speed">
+            <option value="1">1 min/day</option>
+            <option value="4" selected>4 min/day</option>
+            <option value="15">15 min/day</option>
+            <option value="60">1 h/day</option>
+        </select>
+    </div>
+    <div class="row"><span id="perf"></span></div>
+    <div class="hint">←/→ biome · Space new seed · H hide panel</div>
+    <div class="row keep"><button id="hide" title="H">◐</button></div>
+</div>
+<script type="module" src="/src/scenery/page.js"></script>
+</body>
+</html>
