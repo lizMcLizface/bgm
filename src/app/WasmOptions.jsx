@@ -6,7 +6,7 @@ import {engineFromSearch,withAudioEngine} from './audioEngineChoice';
 import {usePerfMode} from '../audio/PerfModeButton';
 const KEY='bgm-audio-engine';
 // Wasm unless this device chose the previous engine.
-function initialEngine(){const linked=engineFromSearch(location.search);if(linked)return linked;try{return localStorage.getItem(KEY)==='legacy'?'legacy':'wasm';}catch{return 'wasm';}}
+export function initialEngine(){const linked=engineFromSearch(location.search);if(linked)return linked;try{return localStorage.getItem(KEY)==='legacy'?'legacy':'wasm';}catch{return 'wasm';}}
 
 // One controller keeps the header, shortcut and options in sync. The engine
 // rebuilds instruments asynchronously; ignore extra requests while preparing.
@@ -21,7 +21,7 @@ export function useAudioEngine(generator,{required=false}={}){
   finally{pending.current=false;setBusy(false);}
  },[generator,required]);
  const toggle=useCallback(()=>choose(generator.audioEngine==='wasm'?'legacy':'wasm'),[choose,generator]);
- useEffect(()=>{if(busy||pending.current||restored.current?.generator===generator&&restored.current.required===required)return;restored.current={generator,required};const desired=required||perfEnabled()?'wasm':manual.current;if((generator.audioEngine??'legacy')!==desired)void choose(desired,{remember:false});},[generator,choose,required,busy]);
+ useEffect(()=>{if(busy||pending.current||restored.current?.generator===generator&&restored.current.required===required)return;restored.current={generator,required};const desired=required||perfEnabled()?'wasm':manual.current;if((generator.audioEngine??'legacy')!==desired)void choose(desired,{remember:false});else if(desired==='legacy')generator.warmLegacy?.();},[generator,choose,required,busy]);
  useEffect(()=>{
   const onKey=e=>{
    if(e.code!=='KeyV'||e.defaultPrevented||e.repeat||e.ctrlKey||e.metaKey||e.altKey||

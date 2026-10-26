@@ -150,9 +150,12 @@ class Generator {
         // the voices' reverbs, when they share one (Performance menu, nodes/sharedReverb.js)
         this.reverbHub = PERFORMANCE.sharedReverb ? hubFor(this.AC) : null;
         // volumes are settings (they travel in links); mute / solo are not
+        // These are the previous engine's instruments; the Wasm engine (the default) replaces them once it
+        // is ready. Their reverbs hold no impulse - so fetch none - until a note plays (wake) or
+        // warmLegacy() says the previous engine is staying.
         Object.entries(ROLES).forEach(([role, { polyphony, preset }]) => {
             const volume = (this.settings.volumes && this.settings.volumes[role]) ?? ROLE_VOLUMES[role];
-            const instrument = new Instrument({ polyphony, preset: breathPatch(preset,findPreset(preset),this.settings.generation), deferReverb: role === 'counter', reverbHub: this.reverbHub });
+            const instrument = new Instrument({ polyphony, preset: breathPatch(preset,findPreset(preset),this.settings.generation), deferReverb: true, reverbHub: this.reverbHub });
             const gain = this.AC.createGain();
             gain.gain.value = volume;
             // section tone: open (and inaudible) unless settings.sectionTone
@@ -601,8 +604,14 @@ class Generator {
      */
     warmRoles() {
         const hear = (role) => { const { reverb } = this.roles[role].instrument; if (reverb) reverb.hear(); };
-        if (this.settings.counter && this.settings.counter.mode !== 'off') hear('counter');
+        // before the engine is chosen the lead is a placeholder: warmLegacy() or the swap takes it from there
+        if (this.audioEngine && this.settings.counter && this.settings.counter.mode !== 'off') hear('counter');
         if (this.settings.drums && this.settings.drums.style !== 'off') hear('perc');
+    }
+
+    /** The previous engine is staying: load every voice's reverb now instead of at its first note. */
+    warmLegacy() {
+        for (const { instrument } of Object.values(this.roles)) instrument.reverb?.hear?.();
     }
 
     set(key, value) {
