@@ -8,9 +8,12 @@ import { blades, blobTree, canopyRidge, celestial, conifer, cumulus, hill, mount
 import { DEFAULT_WEATHER, weatherOverlay, weatherSky } from './weather.js';
 import { seasonAt } from './seasons.js';
 import { BIOME_NAMES, DRAFT_BIOME_NAMES } from './catalog.js';
-import { embers, fireflies } from './effects.js';
+import { embers, fireflies, valleyMist } from './effects.js';
 import { farmland, river, savanna, woodland } from './landscapes.js';
 import { WILDS, WILD_HOURS } from './wilds.js';
+import { PLACES, PLACE_HOURS } from './places.js';
+import { VISTAS, VISTA_HOURS } from './vistas.js';
+import { NOOKS, NOOK_HOURS } from './nooks.js';
 
 // Four tones per material: two shadow tones, then their lit counterparts.
 export const P = {
@@ -242,10 +245,12 @@ function village(sc, rng, h, d, y0) {
     sc.addStatic(b);
 }
 
-// Leaves shaken loose from foreground crowns, tumbling downwind to the ground.
+// Leaves shaken loose from foreground crowns, tumbling downwind to the ground; from
+// blossoming trees (leaf variant 3, 4) petals too in spring, slower and further.
 export function leafFall(sc, rng, crowns, R) {
     if (!crowns.length) return;
     const { W, H } = sc, slots = [R.at(0, -0.5, 0.8, 3), R.at(-0.5, 0, 0.8, 2), R.at(0.5, 0.5, 0.7, 2)];
+    const petals = R.v >= 3 && ['#f6c4d6', '#fff0f4', '#e49ab4'].map(c => sc.slot({ k: 'mat', c: hex(c), d: 0 }));
     const leaves = [];
     for (const c of crowns) {
         for (let i = Math.round(0.6 * c.w); i > 0; i--) {
@@ -261,6 +266,12 @@ export function leafFall(sc, rng, crowns, R) {
             if (x < 0 || y < 0 || x >= W - 1 || y >= H) continue;
             f[y * W + x] = l.slot;
             if (l.big && (age * 9) % 1 < 0.5) f[y * W + x + 1] = l.slot;
+        }
+        const m = petals ? Math.floor(leaves.length * 1.6 * S.bloom) : 0;
+        for (let i = 0; i < m; i++) {
+            const l = leaves[i % leaves.length], age = (t / (l.period * 1.5) + l.ph + (i >= leaves.length ? 0.5 : 0)) % 1;
+            const x = Math.round(l.x + age * 70 + Math.sin(age * 7 + l.ph * 6) * 6 + wind(l.x, t) * 3), y = Math.round(l.y + age * l.fall * 1.1);
+            if (x >= 0 && y >= 0 && x < W && y < H) f[y * W + x] = petals[i % 3];
         }
     });
 }
@@ -577,6 +588,7 @@ function boats(sc, rng, hz, n) {
     if (!n) return;
     const { W, H } = sc;
     const hull = sc.slot({ k: 'mat', c: hex('#4a3226'), d: 0.2 }), sail = sc.ramp(['#b8b2a8', '#d4cec2', '#f4f0e6', '#ffffff'], 0.2);
+    const sailLit = sail.face(1, 1), sailShade = sail.face(-1, 0);   // made now: a slot made mid-frame has no colour yet
     const list = Array.from({ length: n }, () => ({ x: rng.range(0, W), y: hz + rng.range(3, (H - hz) * 0.45), v: rng.range(0.4, 1.6) * (rng.chance(0.5) ? 1 : -1) }));
     list.forEach(b => { b.s = 0.6 + (b.y - hz) / (H - hz) * 2.4; });
     sc.addFn((f, t) => {
@@ -588,8 +600,8 @@ function boats(sc, rng, hz, n) {
             for (let k = 1 - len; k < len; k++) put(x + k, y + 1, hull);
             for (let r = 1; r <= sh; r++) {
                 const w = Math.round((sh - r) * 0.6) + 1;
-                for (let k = 0; k < w; k++) put(x + k, y - r, sail.face(1, 1));
-                if (r < sh * 0.7) for (let k = 1; k < w * 0.6; k++) put(x - k, y - r, sail.face(-1, 0));
+                for (let k = 0; k < w; k++) put(x + k, y - r, sailLit);
+                if (r < sh * 0.7) for (let k = 1; k < w * 0.6; k++) put(x - k, y - r, sailShade);
             }
         }
     });
@@ -795,7 +807,7 @@ export const BIOMES = {
     woodland: { name: BIOME_NAMES.woodland, hour: 9, build: woodland },
     river: { name: BIOME_NAMES.river, hour: 15, build: river },
     // In review (tools/scenery.html); not offered on the page yet.
-    ...Object.fromEntries(Object.entries(WILDS).map(([k, build]) => [k, { name: DRAFT_BIOME_NAMES[k], hour: WILD_HOURS[k], build, draft: true }])),
+    ...Object.fromEntries([...Object.entries(WILDS), ...Object.entries(PLACES), ...Object.entries(VISTAS), ...Object.entries(NOOKS)].map(([k, build]) => [k, { name: DRAFT_BIOME_NAMES[k], hour: WILD_HOURS[k] ?? PLACE_HOURS[k] ?? VISTA_HOURS[k] ?? NOOK_HOURS[k], build, draft: true }])),
 };
 
 export function createScene(biome, seed, weather = 'auto', year = 1, W = 384, H = 216) {
@@ -808,7 +820,9 @@ export function createScene(biome, seed, weather = 'auto', year = 1, W = 384, H 
     sc.frng = makeRng(seed ^ 0x2f6b9a31);
     sc.biome = biome;
     BIOMES[biome].build(sc, makeRng(seed));
+    valleyMist(sc);
     fireflies(sc);
     weatherOverlay(sc);
+    for (const build of sc.foreground) build();
     return sc;
 }

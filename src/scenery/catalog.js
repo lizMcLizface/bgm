@@ -21,6 +21,18 @@ export const DRAFT_BIOME_NAMES = {
     synth: 'Synthwave',
     planet: 'Alien planet',
     camp: 'Campfire clearing',
+    harbour: 'Harbour town',
+    jungle: 'Jungle',
+    ruins: 'Castle on the hill',
+    cave: 'Glowworm cavern',
+    room: 'Window view',
+    reef: 'Underwater',
+    garden: 'Blossom garden',
+    street: 'Rainy neon street',
+    train: 'Train window',
+    starship: 'Observation deck',
+    village: 'Snowy village',
+    cafe: 'Café',
 };
 
 // Scene size in landscape pixels for a window of this aspect (width / height). Wide windows

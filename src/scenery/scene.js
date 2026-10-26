@@ -101,6 +101,8 @@ export class Scene {
         this.presence = 1;       // how much of a fading weather group shows
         this.update = null;      // t -> void, runs before each frame is coloured
         this.relight = null;     // (L, t) -> void, adjusts the lighting after the weather (a sky with no air)
+        this.foreground = [];    // builds run after the weather overlay: what stands in front of the rain (a cave, a room)
+        this.lightHooks = [];    // (L, t) -> void, run after relight: effects that set the veil or read the light
         this.groups = new Map(); // palette array -> season group (grass, rock...)
         this.year = 1;           // time of year, see seasons.js
         this.climate = null;     // 'dry': no snow, see seasons.js
@@ -152,7 +154,7 @@ export class Scene {
         d = Math.min(0.92, d);
         const q = v => Math.round(clamp(v, -1, 1) * 2) / 2;
         return {
-            c, d,
+            c, d, v,
             at: (nx, ny, nz, o) => {
                 const x = q(nx), y = q(ny), z = Math.sqrt(Math.max(0.1, 1 - x * x - y * y)), n = Math.hypot(x, y, z);
                 return this.slot({ k: 'leaf', c, n: [x / n, y / n, z / n], o, d, v });
@@ -174,8 +176,14 @@ export class Scene {
             case 'moon': return mix([150, 166, 204], [236, 240, 255], def.v);
             case 'star': return mix(L.skyTop, WHITE, L.stars * def.v);
             case 'aur': return mix(L.skyTop, def.c, L.stars * def.v);
+            // A sky gradient level (v) washed toward a colour: by night (n) for the Milky Way, by day for a rainbow.
+            case 'skymix': return mix(mix(L.skyTop, L.skyHor, def.v), def.c, def.a * (def.n ? L.stars * L.stars : L.day));
             case 'emit': return mix(this.lit(def.base, def.d, L), def.c, L.lights * def.v);
             case 'flame': return def.c;
+            // Daylight let in from somewhere (a hole in a cave roof): bright by day, gone at night.
+            case 'day': return mix(def.base, def.c, L.day * def.v);
+            // Indoors: lit by the daylight coming in (dimmer than outside, never fogged) and by a lamp after dark.
+            case 'room': return mix(mul(def.c, mix([0.22, 0.2, 0.28], L.tint, 0.8)), def.lamp, L.lights * def.v);
             case 'leaf': {
                 const lx = clamp(L.lightX * 1.6 + this.bias, -1, 1) * 0.9;
                 const up = 0.4 + 0.6 * Math.abs(L.sunElev), ln = Math.hypot(lx, up, 0.6);
@@ -287,6 +295,7 @@ export class Scene {
         const L = lightAt(hour), { W, H } = this;
         if (this.atmos) applyAtmos(L, this.atmos, this.flash ? this.flash(t) : 0);
         this.relight?.(L, t);
+        for (const h of this.lightHooks) h(L, t);
         const hz = this.horizon;
         L.sunPx = [W / 2 + L.sunX * W * 0.44, hz - L.sunElev * hz * 0.85];
         L.moonPx = [W / 2 + L.moonX * W * 0.44, hz - L.moonElev * hz * 0.85];

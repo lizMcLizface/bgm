@@ -35,7 +35,7 @@ const NEXT = {
     streaks: ['sparse', 'mixed', 'clear'],
     mixed: ['streaks', 'scattered', 'overcast'],
     overcast: ['dense', 'rain', 'snow', 'fog', 'mixed'],
-    rain: ['overcast', 'storm'],
+    rain: ['overcast', 'storm', 'mixed'],
     storm: ['rain'],
     snow: ['overcast', 'fog', 'sparse'],
     fog: ['clear', 'haze', 'overcast'],
@@ -207,6 +207,7 @@ export class Weather {
         this.dur = 1;
         this.next = null;
         this.now = 0;
+        this.wetAt = -Infinity;  // last time rain was still falling (rainbows follow it)
         this.skyLayer = (f, t, L) => this.draw('sky', f, t, L);
         this.overLayer = (f, t, L) => this.draw('over', f, t, L);
     }
@@ -266,6 +267,8 @@ export class Weather {
             this.p = clamp((t - this.startAt) / this.dur);
             if (this.p >= 1) this.prev = null;
         }
+        const wet = k => k === 'rain' || k === 'storm';
+        if (wet(this.cur) ? !this.prev || this.p > 0.3 : wet(this.prev) && this.p < 0.7) this.wetAt = t;
         const c = this.group(this.cur), pv = this.prev && this.group(this.prev), p = this.prev ? this.p : 1;
         const sc = this.sc;
         sc.atmos = pv ? blendAtmos(pv.atmos, c.atmos, p) : c.atmos;

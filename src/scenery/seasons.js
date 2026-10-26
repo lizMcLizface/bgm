@@ -8,9 +8,11 @@ const NAMES = ['Early spring', 'Late spring', 'Early summer', 'Late summer', 'Ea
 export const seasonName = y => NAMES[Math.floor((((y % 4) + 4) % 4) * 2)];
 
 // `climate` 'dry' (savanna, desert): no snow and trees keep most leaves;
-// 'cold' (tundra): snow from mid autumn to late spring, a short green summer.
+// 'cold' (tundra): snow from mid autumn to late spring, a short green summer;
+// 'wet' (jungle): green the whole year round.
 export function seasonAt(year, climate) {
     const y = ((year % 4) + 4) % 4;
+    if (climate === 'wet') return { y, fresh: 0.6, bloom: 0, dry: 0, autumn: 0, snow: 0, leafy: 1 };
     if (climate === 'cold') {
         const S = seasonAt(y), snow = 1 - smoothstep(0.45, 0.85, y) * (1 - smoothstep(2.05, 2.45, y));
         return { ...S, snow, bloom: 0, fresh: S.fresh * (1 - snow), dry: 0, autumn: Math.min(S.autumn, 1 - snow), leafy: Math.min(S.leafy, 1 - snow * 0.9) };
@@ -85,12 +87,14 @@ export function seasonColor(c, g, S) {
 }
 
 // Leaf tones: variant 0-2 turn yellow / orange / red at staggered times,
-// variant 3 blossoms pink in spring and goes yellow in autumn.
+// variant 3 blossoms pink in spring and goes yellow in autumn, variant 4 (cherry)
+// is all blossom in spring and turns red-orange in autumn.
 const AUTUMN = [
     ['#2a2410', '#463a14', '#6e5a1a', '#9a7e20', '#c4a22a', '#e2c442', '#f4e27a'],
     ['#2e1a0c', '#4e2812', '#7a3c16', '#a8561c', '#d07a22', '#eca232', '#f8cc58'],
     ['#2e100c', '#4e1812', '#7a2414', '#a8381a', '#d0561e', '#ec8a2c', '#f8c450'],
     ['#2a2410', '#463a14', '#6e5a1a', '#9a7e20', '#c4a22a', '#e2c442', '#f4e27a'],
+    ['#2e140c', '#4e2214', '#7a3018', '#a84a1e', '#d06428', '#ec8a3a', '#f8b45a'],
 ].map(p => p.map(hex));
 const FRESH = ['#12301c', '#1c4a26', '#2c6a2e', '#459034', '#6eb43e', '#a2d452', '#d2ec7a'].map(hex);
 const BLOSSOM = ['#4a2a3a', '#6e3a52', '#9a5272', '#c47494', '#e49ab4', '#f6c4d6', '#fff0f4'].map(hex);
@@ -100,6 +104,7 @@ export function leafColor(c, i, v, S) {
     const turn = smoothstep(1.5 + v % 3 * 0.12, 2.25 + v % 3 * 0.12, S.y) * (1 - smoothstep(3.7, 3.95, S.y));
     let col = mix(c[i], FRESH[i], S.fresh * 0.6);
     if (v === 3) col = mix(col, BLOSSOM[i], S.bloom * (i >= 3 ? 0.9 : 0.4));
+    if (v === 4) col = mix(col, BLOSSOM[i], S.bloom * (i >= 2 ? 1 : 0.75));
     col = mix(col, AUTUMN[v][i], turn);
     return mix(col, hueOf(col, DEAD), S.snow * 0.7);
 }
