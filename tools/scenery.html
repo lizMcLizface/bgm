@@ -14,6 +14,9 @@
     .row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
     button, select, input { font: inherit; color: inherit; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 6px; padding: 4px 8px; }
     button.on { background: rgba(140, 190, 255, 0.35); border-color: rgba(160, 200, 255, 0.6); }
+    button.draft { border-style: dashed; border-color: rgba(255, 200, 120, 0.7); }
+    button.draft::after { content: ' · new'; color: #ffc878; font-size: 11px; }
+    #view.phone { left: 50%; width: calc(100vh * 412 / 915); transform: translateX(-50%); }
     button:hover { background: rgba(255, 255, 255, 0.16); }
     #seed { width: 7em; }
     #hour { flex: 1; min-width: 140px; padding: 0; }
@@ -23,10 +26,10 @@
     #perf, .hint { opacity: 0.6; font-size: 11px; }
     .bare #panel { padding: 4px; background: transparent; backdrop-filter: none; }
 </style>
-  <script type="module" crossorigin src="/assets/scenery-CDJnf1mu.js"></script>
+  <script type="module" crossorigin src="/assets/scenery-CGTcoMVm.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
-  <link rel="modulepreload" crossorigin href="/assets/seasons-Bcpo9aRR.js">
-  <link rel="modulepreload" crossorigin href="/assets/biomes-C4Q3bLsi.js">
+  <link rel="modulepreload" crossorigin href="/assets/seasons-Dbb4FTEn.js">
+  <link rel="modulepreload" crossorigin href="/assets/biomes-1a8AalRm.js">
 </head>
 <body>
 <canvas id="view"></canvas>
@@ -39,6 +42,7 @@
     <div class="row">
         <label>Weather <select id="weather"></select></label>
         <button id="nextWeather" title="Fade to a plausible next weather">Next</button>
+        <label>Shape <select id="frame"><option value="window">This window</option><option value="wide">16:9</option><option value="phone">Phone, upright</option></select></label>
     </div>
     <div class="row">
         <span id="clock"></span>
