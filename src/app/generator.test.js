@@ -965,7 +965,7 @@ test('per-note expression preserves written events, follows planner copies and s
 test('previous Latest reference for ensemble comparisons', () => {
     const fingerprints=['4/4','6/8'].map((meter,i)=>{
         const gen=new Generator({...defaultSettings(),generation:'latest',seed:741+i,meter,leadActivity:.8,drums:{style:'lofi',activity:.5,variation:.5,sprinkle:.35,kit:'felt'}});
-        gen.registerLevel=false;gen.gateEnvelopes=false;gen.noteConnection=false;gen.heldExpression=false;gen.noteExpression=false;gen.rhythmGrammar=false;gen.ensembleCoordination=false;gen.formDevelopment=false;gen.themeDevelopment=false;gen.phraseSearch=false;gen.longPhrases=false;gen.contrastPhrases=false;gen.reset();
+        gen.registerLevel=false;gen.gateEnvelopes=false;gen.noteConnection=false;gen.heldExpression=false;gen.noteExpression=false;gen.rhythmGrammar=false;gen.ensembleCoordination=false;gen.formDevelopment=false;gen.themeDevelopment=false;gen.phraseSearch=false;gen.longPhrases=false;gen.contrastPhrases=false;gen.padVariation=false;gen.reset();
         let h=2166136261;for(const c of JSON.stringify(play(gen,32).map(b=>b.events)))h=Math.imul(h^c.charCodeAt(0),16777619);
         return(h>>>0).toString(16);
     });

@@ -17,6 +17,7 @@ import { fragmentLead } from './leadTransition';
 import { pickupLead } from './leadPickup';
 import { landSectionSuspension } from './sectionSuspension';
 import { subdivideSection } from './formStrategies';
+import { varyPad } from './padVariation';
 
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 const rngFor = (seed, index, salt) => seeded(Math.imul(seed ^ salt, 1664525) ^ Math.imul(index + 1, 1013904223));
@@ -115,7 +116,9 @@ export function arrangeBarLatest(args) {
     const phrase = prior?.phrase.start === base.state.phrase.start ? prior.phrase : planThemePhrase({ seed,
         start: base.state.phrase.start, section: base.state.phrase.section, previous: prior?.phrase, settings, contrast: args.contrastPhrases === true });
     phrase.bars = bars; phrase.units = meter.units;
-    const composition = { key, themes, phrase, ...(form ? { form } : {}) };
+    // which bar of its chord this is (0 on the first): a chord held for several bars is not played the same way each time (padVariation.js)
+    const chordBar = args.chordStart ? 0 : (prev?.composition?.chordBar ?? 0) + 1;
+    const composition = { key, themes, phrase, chordBar, ...(form ? { form } : {}) };
     const transitionFor=(s,at)=>(args.endBar==null||s?.start+s?.bars<args.endBar-1)?transitionGesture(s,at):null;
     const gestureFor=(s,at)=>args.transitionGestures===true?transitionFor(s,at):null;
     const gesture=gestureFor(section,bar),leadGesture=args.leadTransitions===true?transitionFor(section,bar):null;
@@ -185,6 +188,8 @@ export function arrangeBarLatest(args) {
             bars:composition.melody.bars.map(b=>b.bar===bar?{...b,events:lead.map(e=>({...e}))}:b)};
     }
     let events = base.events.filter(e => e.role !== 'lead');
+    if (args.padVariation !== false) events = [...varyPad(events.filter(e => e.role === 'pad'), { style: base.state.phrase.padStyle, index, chordBar, seed, phraseStart: phrase.start,
+        range: base.state.ranges.pad }), ...events.filter(e => e.role !== 'pad')];
     // Parallel harmony must follow the actual new melody, not the legacy notes.
     if (base.state.phrase.counter?.kind === 'harmony') {
         const range = base.state.ranges.counter, scale = notesInRange(scalePcs, range[0] - 12, range[1] + 12);

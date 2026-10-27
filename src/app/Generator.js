@@ -1469,6 +1469,7 @@ class Generator {
             rhythmDevelopment: this.rhythmDevelopment !== false,
             rhythmGrammar: this.rhythmGrammar !== false,
             partRhythmGrammar: this.partRhythmGrammar !== false,
+            padVariation: this.padVariation !== false,
             jointCounterpoint: this.jointCounterpoint !== false,
             phraseLength: this.longPhrases === false ? 4 : (this.phraseLength ?? 'auto'),
             harmonyForecast: !original && this.phraseSearch !== false ? this.melodyHarmony(bar, music, upcoming, this.longPhrases === false ? 4 : 8, bpm, { keyLift, chord: liftPivot || pivot ? chord : null }) : null,
@@ -1656,7 +1657,7 @@ class Generator {
      * A copy that only plans: the piece Play would start with these
      * settings, bar by bar via planBar (for rendering to a file).
      */
-    planner({ heldPadGlides = this.heldPadGlides, heldBassGlides = this.heldBassGlides, padPitchMotion = this.padPitchMotion, bassPitchMotion = this.bassPitchMotion, noteSlides = this.noteSlides, chordSlides = this.chordSlides, tempoEffects = this.tempoEffects, gateEnvelopes = this.gateEnvelopes, noteConnection = this.noteConnection, heldExpression = this.heldExpression, noteExpression = this.noteExpression, ensembleCoordination = this.ensembleCoordination, formDevelopment = this.formDevelopment, phrasePerformance = this.phrasePerformance, themeDevelopment = this.themeDevelopment, phraseSearch = this.phraseSearch, longPhrases = this.longPhrases, phraseLength = this.phraseLength, noteResolution = this.noteResolution, registerLevel = this.registerLevel, contrastPhrases = this.contrastPhrases, duetInteraction = this.duetInteraction, rhythmDevelopment = this.rhythmDevelopment, rhythmGrammar = this.rhythmGrammar, partRhythmGrammar = this.partRhythmGrammar, instrumentGroove = this.instrumentGroove, jointCounterpoint = this.jointCounterpoint, sectionDevelopment = this.sectionDevelopment, sectionCadences = this.sectionCadences, sectionBridges = this.sectionBridges, harmonicRhythm = this.harmonicRhythm, transitionGestures = this.transitionGestures, leadTransitions = this.leadTransitions, leadPickups = this.leadPickups, sectionSuspensions = this.sectionSuspensions, formStrategies = this.formStrategies, sectionCurves = this.sectionCurves, harmonicDevelopment = this.harmonicDevelopment, formStrategy = this.formStrategy, endingDevelopment = this.endingDevelopment } = {}) {
+    planner({ heldPadGlides = this.heldPadGlides, heldBassGlides = this.heldBassGlides, padPitchMotion = this.padPitchMotion, bassPitchMotion = this.bassPitchMotion, noteSlides = this.noteSlides, chordSlides = this.chordSlides, tempoEffects = this.tempoEffects, gateEnvelopes = this.gateEnvelopes, noteConnection = this.noteConnection, heldExpression = this.heldExpression, noteExpression = this.noteExpression, ensembleCoordination = this.ensembleCoordination, formDevelopment = this.formDevelopment, phrasePerformance = this.phrasePerformance, themeDevelopment = this.themeDevelopment, phraseSearch = this.phraseSearch, longPhrases = this.longPhrases, phraseLength = this.phraseLength, noteResolution = this.noteResolution, registerLevel = this.registerLevel, contrastPhrases = this.contrastPhrases, duetInteraction = this.duetInteraction, rhythmDevelopment = this.rhythmDevelopment, rhythmGrammar = this.rhythmGrammar, partRhythmGrammar = this.partRhythmGrammar, padVariation = this.padVariation, instrumentGroove = this.instrumentGroove, jointCounterpoint = this.jointCounterpoint, sectionDevelopment = this.sectionDevelopment, sectionCadences = this.sectionCadences, sectionBridges = this.sectionBridges, harmonicRhythm = this.harmonicRhythm, transitionGestures = this.transitionGestures, leadTransitions = this.leadTransitions, leadPickups = this.leadPickups, sectionSuspensions = this.sectionSuspensions, formStrategies = this.formStrategies, sectionCurves = this.sectionCurves, harmonicDevelopment = this.harmonicDevelopment, formStrategy = this.formStrategy, endingDevelopment = this.endingDevelopment } = {}) {
         const copy = Object.create(Generator.prototype);
         copy.settings = JSON.parse(JSON.stringify(this.planningFrom ?? this.settings));
         // Comparison tooling can isolate the previous Latest arrangement.
@@ -1686,6 +1687,7 @@ class Generator {
         copy.rhythmDevelopment = rhythmDevelopment;
         copy.rhythmGrammar = rhythmGrammar;
         copy.partRhythmGrammar = partRhythmGrammar;
+        copy.padVariation = padVariation;
         copy.instrumentGroove = instrumentGroove;
         copy.jointCounterpoint = jointCounterpoint;
         copy.sectionDevelopment = sectionDevelopment;
