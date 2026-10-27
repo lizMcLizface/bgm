@@ -1,5 +1,5 @@
 import { notesInRange } from '../arranger';
-import { beatStarts } from '../meter';
+import { beatStarts, groupStarts } from '../meter';
 import { seeded } from '../random';
 
 const nearest = (notes, target) => notes.reduce((best, n) => Math.abs(n - target) < Math.abs(best - target) ? n : best);
@@ -71,4 +71,73 @@ export function counterPitches(events, { lead, scalePcs, range, previousMidi, ch
         previous = candidates[0];
         return { ...e, midi: previous };
     });
+}
+
+// Rhythm cells for the grouped and driving bass. A bare held root ("hold") is a call: it leaves the
+// bar waiting for an answer, so it is only used while the lead is playing; with no lead the line
+// keeps moving. Chosen once per phrase, so a phrase has one recognisable bass figure.
+const HALF_CELLS = { hold: 3, repeat: 3, push: 2, sync: 2, octave: 1.5 };
+const DRIVE_CELLS = { straight: 3, offbeat: 2, octave: 2, gallop: 1 };
+
+const weighted = (rng, table) => {
+    const entries = Object.entries(table), total = entries.reduce((sum, [, w]) => sum + w, 0);
+    let roll = rng() * total;
+    for (const [name, w] of entries) if ((roll -= w) < 0) return name;
+    return entries[0][0];
+};
+
+export function bassCell({ style, seed, phraseStart, leadPlaying }) {
+    const table = style === 'half' ? { ...HALF_CELLS } : style === 'drive' ? DRIVE_CELLS : null;
+    if (!table) return null;
+    if (!leadPlaying) delete table.hold;
+    return weighted(seeded(seed ^ Math.imul(phraseStart + 1, 0x85ebca6b) ^ 0x2545f491), table);
+}
+
+export function varyBass(events, { style, cell, meter, range }) {
+    if (!cell || !events.length || !['half', 'drive'].includes(style) || cell === 'hold' || cell === 'straight') return events;
+    const step = meter.unitsPerBeat === 1 ? 0.5 : 1, last = meter.units - step;
+    const snap = at => Math.round(at / step) * step;
+    const up = midi => midi + 12 <= range[1] ? midi + 12 : midi;
+    let out = events.map(e => ({ ...e }));
+    if (style === 'half') {
+        const starts = groupStarts(meter), size = at => meter.groups[starts.indexOf(at)] ?? meter.unitsPerBeat;
+        const added = [], free = at => !out.some(o => Math.abs(o.beat - at) < 1e-6) && !added.some(o => Math.abs(o.beat - at) < 1e-6);
+        for (const e of out) {
+            const g = starts.indexOf(e.beat), span = g >= 0 ? size(e.beat) : 0;
+            if (g < 0 || span < 2 * step || e.length < span * 0.5) continue;
+            if (cell === 'repeat' || cell === 'octave') {
+                const at = snap(e.beat + span / 2);
+                if (at > e.beat && at < e.beat + span && free(at)) {
+                    added.push({ ...e, beat: at, length: (e.beat + span - at) * 0.9, velocity: e.velocity * 0.78, midi: cell === 'octave' ? up(e.midi) : e.midi });
+                    e.length = (at - e.beat) * 0.94;
+                }
+            } else if (cell === 'sync') {
+                // the second hit lands three-quarters through the group: 1, (and of 2), next group
+                const at = snap(e.beat + span * 0.75);
+                if (at > e.beat && at < e.beat + span && at <= last && free(at)) {
+                    added.push({ ...e, beat: at, length: (e.beat + span - at) * 0.9, velocity: e.velocity * 0.8 });
+                    e.length = (at - e.beat) * 0.94;
+                }
+            } else if (cell === 'push' && g > 0) {
+                // anticipate the later groups by a step; the bar's first beat stays put
+                if (!free(e.beat - step)) continue;
+                const prev = out.find(o => o !== e && o.beat < e.beat && o.beat + o.length > e.beat - step);
+                if (prev) prev.length = Math.max(step * 0.5, e.beat - step - prev.beat) * 0.94;
+                e.beat -= step; e.length += step * 0.6;
+            }
+        }
+        out.push(...added);
+    } else {
+        const high = up(out[0].midi);
+        out = out.filter((e, i) => {
+            if (cell === 'offbeat') return i === 0 || e.beat % meter.unitsPerBeat !== 0 || e.beat === last;
+            return true;
+        });
+        out.forEach((e, i) => {
+            if (cell === 'octave' && i > 0 && i % 2 === 1 && e.beat !== last) e.midi = high;
+            if (cell === 'gallop' && i % 3 === 2) e.velocity *= 0.6;
+        });
+    }
+    out.sort((a, b) => a.beat - b.beat);
+    return out.map((e, i) => ({ ...e, length: i + 1 < out.length ? Math.min(e.length, (out[i + 1].beat - e.beat) * 0.94) : e.length }));
 }

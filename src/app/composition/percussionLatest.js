@@ -12,13 +12,16 @@ export const LATEST_GROOVE_COUNT = 3;
 
 export function percussionGeometry(meter, halfTime = false) {
     const beats = beatStarts(meter);
-    // All positions are zero-based units. 6/8 is two felt dotted quarters.
+    // All positions are zero-based units. 6/8 is two felt dotted quarters. 5/8 and 7/8 count
+    // eighths: the kick sits on the long group's start and the backbeat lands where the groups
+    // lean (7/8 as 2+2+3: kick, snare, kick, ., snare on the last pulse), not on every group start.
     const shape = meter.unitsPerBeat === 3 ? { kicks: [0], backbeats: [3] }
+        : meter.unitsPerBeat === 2 ? (meter.units === 7 ? { kicks: [0, 4], backbeats: [2, 6] } : { kicks: [0], backbeats: [3] })
         : meter.units === 3 ? { kicks: [0], backbeats: [1, 2] }
             : meter.units === 5 ? { kicks: [0, 3], backbeats: [1, 4] }
                 : meter.units === 7 ? { kicks: [0, 2, 4], backbeats: [1, 3, 5] }
                     : { kicks: [0, 2], backbeats: halfTime ? [2] : [1, 3] };
-    const step = meter.unitsPerBeat === 3 ? 1 : 0.5;
+    const step = meter.unitsPerBeat === 1 ? 0.5 : 1;
     const grid = Array.from({ length: Math.round(meter.units / step) }, (_, i) => i * step);
     return { ...shape, beats, step, grid };
 }
@@ -69,7 +72,7 @@ export function drumBarLatest({ bar, meter, drums, section, sectionsMode, sectio
         hit('kick', 0, 0.62, true);
         hit('kick', g.step, 0.34, true);
         if (groove === 1 && !sparse && meter.units >= 4) {
-            const middle = meter.unitsPerBeat === 3 ? 3 : 2;
+            const middle = meter.unitsPerBeat === 3 ? 3 : meter.unitsPerBeat === 2 ? g.beats[1] : 2;
             hit('kick', middle, 0.42, true); hit('kick', middle + g.step, 0.24);
         }
         if (groove === 2 && !sparse) g.beats.forEach(at => hit('shaker', at, 0.14));
@@ -113,7 +116,7 @@ export function drumBarLatest({ bar, meter, drums, section, sectionsMode, sectio
             const fillStart = meter.units - meter.unitsPerBeat;
             // Reserve the final felt beat; retain structural anchors underneath.
             for (let i = events.length - 1; i >= 0; i--) if (events[i].beat >= fillStart && !events[i].anchor) events.splice(i, 1);
-            const step = meter.unitsPerBeat === 3 ? 1 : 0.5;
+            const step = g.step;
             for (let at = fillStart; at < meter.units; at += step) hit(at === fillStart ? 'brush' : 'tom', at, 0.3 + (at - fillStart) / meter.unitsPerBeat * 0.12);
         } else if (ornamentRng() < variation * activity * 0.35) {
             // One embellishment budget: a ghost OR an extra kick, never both.

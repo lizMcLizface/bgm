@@ -138,6 +138,14 @@ const BY_NAME = {
     'Demo: Living colour': L('farmland', 'sparse', 8, 1.1),
     'Demo: Shifting metre': L('river', 'scattered', 13, 1.6),
     'Demo: Seven-eight': L('woodland', 'sparse', 10, 2.4),
+    'Odd-Time Lamplight': L('city', 'haze', 23, 2.4, LATE),
+    'Demo: 7/8 electro': L('city', 'scattered', 22.5, 1.4, { ...NIGHT, look: { neon: true } }),
+    'Demo: 5/8 downtempo': L('lake', 'haze', 19, 2.1, EVENING),
+    'Bossa in Seven': L('city', 'sparse', 19, 1.2, DUSK),
+    'Demo: Bass figures': L('room', 'sparse', 15, 0.8),
+    'Neon Overpass': L('city', 'clear', 22, 2.2, { ...NIGHT, look: { neon: true } }),
+    'Demo: Low note, then chord': L('lake', 'storm', 22, 1.8, { hours: [18, 4] }),
+    'Demo: Struck leads, no trills': L('garden', 'sparse', 10, 0.4),
 };
 
 // Scenes not listed above (the user's own, or new ones) fall back to their category.

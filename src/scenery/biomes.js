@@ -13,6 +13,7 @@ import { farmland, river, savanna, woodland } from './landscapes.js';
 import { WILDS, WILD_HOURS } from './wilds.js';
 import { PLACES, PLACE_HOURS } from './places.js';
 import { VISTAS, VISTA_HOURS } from './vistas.js';
+import { SKYLINES, SKYLINE_HOURS } from './skyline.js';
 import { NOOKS, NOOK_HOURS } from './nooks.js';
 
 // Four tones per material: two shadow tones, then their lit counterparts.
@@ -807,7 +808,7 @@ export const BIOMES = {
     woodland: { name: BIOME_NAMES.woodland, hour: 9, build: woodland },
     river: { name: BIOME_NAMES.river, hour: 15, build: river },
     // Built in wilds.js, places.js, vistas.js and nooks.js; a name in DRAFT_BIOME_NAMES keeps one in review (tools/scenery.html only).
-    ...Object.fromEntries([...Object.entries(WILDS), ...Object.entries(PLACES), ...Object.entries(VISTAS), ...Object.entries(NOOKS)].map(([k, build]) => [k, { name: BIOME_NAMES[k] ?? DRAFT_BIOME_NAMES[k], hour: WILD_HOURS[k] ?? PLACE_HOURS[k] ?? VISTA_HOURS[k] ?? NOOK_HOURS[k], build, draft: k in DRAFT_BIOME_NAMES }])),
+    ...Object.fromEntries([...Object.entries(WILDS), ...Object.entries(PLACES), ...Object.entries(VISTAS), ...Object.entries(NOOKS), ...Object.entries(SKYLINES)].map(([k, build]) => [k, { name: BIOME_NAMES[k] ?? DRAFT_BIOME_NAMES[k], hour: WILD_HOURS[k] ?? PLACE_HOURS[k] ?? VISTA_HOURS[k] ?? NOOK_HOURS[k] ?? SKYLINE_HOURS[k], build, draft: k in DRAFT_BIOME_NAMES }])),
 };
 
 // `look` pins choices a seed would otherwise roll: { icy } for the cavern, { lanterns } for the garden,

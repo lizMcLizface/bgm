@@ -1,8 +1,8 @@
-import { phraseRhythm, barRhythm, performEnsemble, spaceAccompaniment, spaceCounter } from './ensembleRhythm';
-import { walkingBass, alignBass, counterPitches } from './ensembleVoices';
+import { phraseRhythm, barRhythm, performEnsemble, spaceAccompaniment, spaceCounter, splitPulseRoots } from './ensembleRhythm';
+import { walkingBass, alignBass, counterPitches, bassCell, varyBass } from './ensembleVoices';
 import { METERS } from '../meter';
 import { DRUMS } from '../percussion';
-import { drumBarLatest } from './percussionLatest';
+import { drumBarLatest, percussionGeometry } from './percussionLatest';
 
 const note = (role, midi, beat, length = 0.9) => ({ role, midi, beat, length, velocity: 0.65, detune: 0 });
 const C = { pitchClasses: [0, 4, 7] }, F = { pitchClasses: [5, 9, 0] }, scale = [0, 2, 4, 5, 7, 9, 11];
@@ -81,4 +81,44 @@ test('ensemble timing locks bass to kick and does not change the melody when per
     const exact = structuredClone(input);
     performEnsemble(exact, { timing: 0, velocity: 0, detune: 0 }, .5, 42, 7, METERS['4/4']);
     expect(exact).toEqual(input);
+});
+
+test('eighth-based uneven meters get kicks and backbeats on their groups, in eighths', () => {
+    const seven = percussionGeometry(METERS['7/8']), five = percussionGeometry(METERS['5/8']);
+    expect(seven.kicks).toEqual([0, 4]); expect(seven.backbeats).toEqual([2, 6]); expect(seven.step).toBe(1);
+    expect(five.kicks).toEqual([0]); expect(five.backbeats).toEqual([3]);
+    const shared = phraseRhythm({ seed: 3, start: 0, meter: METERS['7/8'], bassStyle: 'whole', role: 'development' });
+    expect(shared.bars[0].kicks).toEqual([0, 4]);
+    for (const style of ['lofi', 'electro', 'drive', 'brushes', 'shaker', 'downtempo'])
+        for (let bar = 0; bar < 8; bar++) drumBarLatest({ bar, meter: METERS['7/8'], drums: { style, activity: 1, variation: 1 }, seed: 5, embellish: false })
+            .forEach(e => expect(e.beat % 1).toBe(0));
+});
+
+test('a bare held bass root is only chosen while the lead plays, and bass cells never double or overlap hits', () => {
+    for (let seed = 1; seed < 80; seed++) expect(bassCell({ style: 'half', seed, phraseStart: 0, leadPlaying: false })).not.toBe('hold');
+    const seen = new Set();
+    for (let seed = 1; seed < 80; seed++) seen.add(bassCell({ style: 'half', seed, phraseStart: 0, leadPlaying: true }));
+    expect(seen.has('hold')).toBe(true); expect(seen.size).toBeGreaterThan(3);
+    expect(bassCell({ style: 'whole', seed: 1, phraseStart: 0, leadPlaying: true })).toBe(null);
+    for (const meter of Object.values(METERS)) for (const style of ['half', 'drive']) for (const cell of ['repeat', 'push', 'sync', 'octave', 'offbeat', 'gallop']) {
+        const base = style === 'half'
+            ? meter.groups.map((g, i) => note('bass', 36, meter.groups.slice(0, i).reduce((a, b) => a + b, 0), g * 0.9))
+            : Array.from({ length: Math.round(meter.units / (meter.unitsPerBeat === 1 ? 0.5 : 1)) }, (_, i) => note('bass', 36, i * (meter.unitsPerBeat === 1 ? 0.5 : 1), 0.4));
+        const out = varyBass(base, { style, cell, meter, range: [31, 50] });
+        out.forEach((e, i) => {
+            expect(e.beat).toBeGreaterThanOrEqual(0); expect(e.beat).toBeLessThan(meter.units); expect(e.length).toBeGreaterThan(0);
+            if (i) { expect(e.beat).toBeGreaterThan(out[i - 1].beat); expect(out[i - 1].beat + out[i - 1].length).toBeLessThanOrEqual(e.beat + 1e-9); }
+        });
+    }
+});
+
+test('the low-note-then-chord pulse keeps its held roots apart from the stabs it spaces around the lead', () => {
+    const meter = METERS['4/4'];
+    const pad = (midi, beat, length) => ({ role: 'pad', midi, beat, length, velocity: 0.5 });
+    const raw = [pad(48, 0, 1.9), pad(55, 1, 0.9), pad(64, 1, 0.9), pad(48, 2, 1.9), pad(55, 3, 0.9)];
+    const { roots, rest } = splitPulseRoots(raw, { meter });
+    expect(roots.map(e => e.beat)).toEqual([0, 2]);
+    expect(roots.every(e => e.length === 1.9)).toBe(true);
+    expect(rest).toHaveLength(3);
+    expect(splitPulseRoots(raw, { meter, enabled: false })).toEqual({ roots: [], rest: raw });
 });

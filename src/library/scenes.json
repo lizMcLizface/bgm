@@ -16124,12 +16124,18 @@
         "leadActivity": 0.9,
         "leadDensity": 0.1,
         "padWeights": {
-          "sustain": 25,
-          "pulse": 10,
-          "arpeggio": 30,
+          "sustain": 20,
+          "pulse": 30,
+          "arpeggio": 20,
           "sequence": 0,
-          "rolled": 35,
+          "rolled": 30,
           "stacked": 0
+        },
+        "pulseWeights": {
+          "groups": 15,
+          "beats": 0,
+          "push": 10,
+          "split": 75
         },
         "bassWeights": {
           "whole": 100,
@@ -16189,6 +16195,456 @@
         "lead": "Studio Grand"
       },
       "isNew": true
+    },
+    {
+      "name": "Odd-Time Lamplight",
+      "category": "cozy",
+      "blurb": "Lo-fi in seven (2+2+3): a felt piano, an upright bass and a kalimba over a limping beat, a city glowing across the water",
+      "settings": {
+        "humanize": {
+          "timing": 10,
+          "velocity": 0.08,
+          "detune": 2
+        },
+        "volumes": {
+          "pad": 0.55,
+          "bass": 0.55,
+          "lead": 0.62,
+          "counter": 0.3,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "leadActivity": 0.7,
+        "leadDensity": 0.3,
+        "tonic": 9,
+        "mode": "Major-6",
+        "bpm": 104,
+        "meter": "7/8",
+        "progression": 4,
+        "barsPerChord": 2,
+        "swing": 0,
+        "padWeights": {
+          "sustain": 20,
+          "pulse": 50,
+          "arpeggio": 30,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 100,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "lofi",
+          "activity": 0.6,
+          "variation": 0.4,
+          "sprinkle": 0.1
+        }
+      },
+      "voices": {
+        "pad": "Felt Piano",
+        "bass": "Upright Pluck",
+        "lead": "Kalimba Pluck"
+      }
+    },
+    {
+      "name": "Demo: 7/8 electro",
+      "category": "demo",
+      "blurb": "Electro in seven: a kick on every long beat, claps on the groups' leaning pulses, off-beat hats and a driving bass in eighths.",
+      "settings": {
+        "humanize": {
+          "timing": 10,
+          "velocity": 0.08,
+          "detune": 2
+        },
+        "volumes": {
+          "pad": 0.55,
+          "bass": 0.55,
+          "lead": 0.62,
+          "counter": 0.3,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "leadActivity": 0.7,
+        "leadDensity": 0.3,
+        "tonic": 4,
+        "mode": "Major-6",
+        "bpm": 118,
+        "meter": "7/8",
+        "progression": 4,
+        "barsPerChord": 2,
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 0,
+          "arpeggio": 50,
+          "sequence": 50,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 0,
+          "walking": 0,
+          "drive": 100
+        },
+        "drums": {
+          "style": "electro",
+          "activity": 0.7,
+          "variation": 0.5,
+          "sprinkle": 0.1
+        }
+      },
+      "voices": {
+        "pad": "Arp Pluck",
+        "bass": "Drive Bass",
+        "lead": "Bell Lead"
+      }
+    },
+    {
+      "name": "Demo: 5/8 downtempo",
+      "category": "demo",
+      "blurb": "Five-eight as 3+2: a kick on the long group, a clap on the short one, hats in eighths.",
+      "settings": {
+        "humanize": {
+          "timing": 10,
+          "velocity": 0.08,
+          "detune": 2
+        },
+        "volumes": {
+          "pad": 0.55,
+          "bass": 0.55,
+          "lead": 0.62,
+          "counter": 0.3,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "leadActivity": 0.7,
+        "leadDensity": 0.3,
+        "tonic": 2,
+        "mode": "Major-2",
+        "bpm": 96,
+        "meter": "5/8",
+        "progression": 4,
+        "barsPerChord": 2,
+        "padWeights": {
+          "sustain": 30,
+          "pulse": 40,
+          "arpeggio": 0,
+          "sequence": 0,
+          "rolled": 30,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 100,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "downtempo",
+          "activity": 0.55,
+          "variation": 0.4,
+          "sprinkle": 0.1
+        }
+      },
+      "voices": {
+        "pad": "Glass Pad",
+        "bass": "Round Pluck Bass",
+        "lead": "Soft Flute"
+      }
+    },
+    {
+      "name": "Bossa in Seven",
+      "category": "cozy",
+      "blurb": "A light bossa feel in 7/8: Rhodes chords, a felt bass and a harp, the skyline lighting up at dusk",
+      "settings": {
+        "humanize": {
+          "timing": 10,
+          "velocity": 0.08,
+          "detune": 2
+        },
+        "volumes": {
+          "pad": 0.55,
+          "bass": 0.55,
+          "lead": 0.62,
+          "counter": 0.3,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "leadActivity": 0.7,
+        "leadDensity": 0.3,
+        "tonic": 7,
+        "mode": "Major-1",
+        "bpm": 112,
+        "meter": "7/8",
+        "progression": 10,
+        "barsPerChord": 2,
+        "padWeights": {
+          "sustain": 30,
+          "pulse": 40,
+          "arpeggio": 30,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 40,
+          "half": 60,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "bossa",
+          "activity": 0.6,
+          "variation": 0.5,
+          "sprinkle": 0.1
+        }
+      },
+      "voices": {
+        "pad": "FM Rhodes",
+        "bass": "Felt Bass",
+        "lead": "Harp Pluck"
+      }
+    },
+    {
+      "name": "Demo: Bass figures",
+      "category": "demo",
+      "blurb": "One bass figure per phrase from the grouped bass: re-struck, anticipated, syncopated, octave. A held bare root only appears while the lead plays. Pad and drums stay plain.",
+      "settings": {
+        "humanize": {
+          "timing": 10,
+          "velocity": 0.08,
+          "detune": 2
+        },
+        "volumes": {
+          "pad": 0.55,
+          "bass": 0.55,
+          "lead": 0.62,
+          "counter": 0.3,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "leadActivity": 0.55,
+        "leadDensity": 0.3,
+        "tonic": 0,
+        "mode": "Major-1",
+        "bpm": 92,
+        "meter": "4/4",
+        "progression": 2,
+        "barsPerChord": 1,
+        "padWeights": {
+          "sustain": 100,
+          "pulse": 0,
+          "arpeggio": 0,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 100,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "lofi",
+          "activity": 0.5,
+          "variation": 0.3,
+          "sprinkle": 0.05
+        }
+      },
+      "voices": {
+        "pad": "Soft Pad",
+        "bass": "Muted Pick Bass",
+        "lead": "Glass Lead"
+      }
+    },
+    {
+      "name": "Neon Overpass",
+      "category": "electronic",
+      "blurb": "A driving bass in changing figures under a Deep Pulse, electro beat and bell lead, over a pink, purple and blue skyline",
+      "settings": {
+        "humanize": {
+          "timing": 10,
+          "velocity": 0.08,
+          "detune": 2
+        },
+        "volumes": {
+          "pad": 0.55,
+          "bass": 0.55,
+          "lead": 0.62,
+          "counter": 0.3,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "leadActivity": 0.7,
+        "leadDensity": 0.3,
+        "tonic": 9,
+        "mode": "Major-6",
+        "bpm": 122,
+        "meter": "4/4",
+        "progression": 2,
+        "barsPerChord": 1,
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 55,
+          "arpeggio": 0,
+          "sequence": 45,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 0,
+          "walking": 0,
+          "drive": 100
+        },
+        "drums": {
+          "style": "electro",
+          "activity": 0.7,
+          "variation": 0.5,
+          "sprinkle": 0.1
+        }
+      },
+      "voices": {
+        "pad": "Deep Pulse",
+        "bass": "Neon Pulse Bass",
+        "lead": "Bell Lead"
+      }
+    },
+    {
+      "name": "Demo: Low note, then chord",
+      "category": "demo",
+      "blurb": "The pad's low-note-then-chord pulse only, over a quiet half-bar bass: the root comes back with the first chord stab of each group instead of being held under a rootless chord.",
+      "settings": {
+        "humanize": {
+          "timing": 10,
+          "velocity": 0.08,
+          "detune": 2
+        },
+        "volumes": {
+          "pad": 0.55,
+          "bass": 0.55,
+          "lead": 0.62,
+          "counter": 0.3,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "leadActivity": 0.5,
+        "leadDensity": 0.3,
+        "tonic": 10,
+        "mode": "Major-6",
+        "bpm": 66,
+        "meter": "4/4",
+        "progression": 4,
+        "barsPerChord": 2,
+        "pulseWeights": {
+          "groups": 0,
+          "beats": 0,
+          "push": 0,
+          "split": 100
+        },
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 100,
+          "arpeggio": 0,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 100,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "off"
+        }
+      },
+      "voices": {
+        "pad": "Ambient Piano",
+        "bass": "Felt Bass",
+        "lead": "Glass Grand"
+      }
+    },
+    {
+      "name": "Demo: Struck leads, no trills",
+      "category": "demo",
+      "blurb": "Celesta lead with ornaments at full: graces and mordents only, never a trill. Swap the lead for a piano or the Wind Lead and trills return on long notes.",
+      "settings": {
+        "humanize": {
+          "timing": 10,
+          "velocity": 0.08,
+          "detune": 2
+        },
+        "volumes": {
+          "pad": 0.55,
+          "bass": 0.55,
+          "lead": 0.62,
+          "counter": 0.3,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "leadActivity": 0.8,
+        "leadDensity": 0.2,
+        "tonic": 7,
+        "mode": "Major-1",
+        "bpm": 84,
+        "meter": "4/4",
+        "progression": 2,
+        "barsPerChord": 1,
+        "ornaments": 1,
+        "padWeights": {
+          "sustain": 70,
+          "pulse": 0,
+          "arpeggio": 0,
+          "sequence": 0,
+          "rolled": 30,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "off"
+        }
+      },
+      "voices": {
+        "pad": "Soft Pad",
+        "bass": "Warm Bass",
+        "lead": "Celesta"
+      }
     }
   ]
 }

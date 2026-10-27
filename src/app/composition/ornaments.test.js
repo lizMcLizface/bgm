@@ -28,6 +28,10 @@ describe('ornaments', () => {
         expect(kinds.has('grace')).toBe(true);
         expect(kinds.has('trill')).toBe(true);
     });
+    it('never trill a struck or bell-like voice, which would stutter', () => {
+        for (const name of ['Celesta', 'Glass Bells', 'Music Box', 'Soft Vibes', 'Kalimba'])
+            for (let b = 0; b < 120; b++) expect(run(name, {}, 1, b).some((e) => e.ornament === 'trill')).toBe(false);
+    });
     it('plan the same bar the same way', () => {
         expect(run('Wind Lead', {}, 1, 5)).toEqual(run('Wind Lead', {}, 1, 5));
     });

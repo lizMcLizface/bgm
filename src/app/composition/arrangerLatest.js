@@ -1,12 +1,12 @@
 import { arrangeBar, notesInRange, pentatonicOf } from '../arranger';
 import { seeded, pick } from '../random';
 import { groupStarts } from '../meter';
-import { phraseRhythm, barRhythm, spaceAccompaniment, spaceCounter } from './ensembleRhythm';
+import { phraseRhythm, barRhythm, spaceAccompaniment, spaceCounter, splitPulseRoots } from './ensembleRhythm';
 import { planForm, formEnvelope, formSettings, shapeFormNotes, cutForm } from './formLatest';
 import { planDevelopment, developTheme } from './themeDevelopment';
 import { phraseLength } from './phraseLength';
 import { planPhraseMelody } from './phraseMelody';
-import { walkingBass, alignBass, counterPitches } from './ensembleVoices';
+import { walkingBass, alignBass, counterPitches, bassCell, varyBass } from './ensembleVoices';
 import { duetPlan, duetMotif, duetCounter } from './duet';
 import { planRhythmDevelopment, developBarRhythm, shapeRhythmicPart } from './rhythmDevelopment';
 import { planRhythmGrammar, grammarMotif } from './rhythmGrammar';
@@ -210,18 +210,24 @@ export function arrangeBarLatest(args) {
         composition.rhythm = rhythm;
         const partPlan = args.partRhythmGrammar === true ? planPartGrammar({ seed, phrase, roles: rhythm.roles }) : null;
         if (partPlan) composition.partGrammar = partPlan;
-        let pad = spaceAccompaniment(events.filter(e => e.role === 'pad'), { rhythm, meter,
+        const split = splitPulseRoots(events.filter(e => e.role === 'pad'), { meter,
+            enabled: base.state.phrase.padStyle === 'pulse' && base.state.phrase.padPattern === 'split' });
+        let pad = spaceAccompaniment(split.rest, { rhythm, meter,
             style: base.state.phrase.padStyle, enabled: settings.thinPadUnderLead });
         pad = shapeRhythmicPart(pad, { role: 'pad', style: base.state.phrase.padStyle, rhythm, meter, enabled: settings.thinPadUnderLead });
         if (partPlan) pad = partGrammar(pad, { plan: partPlan, role: 'pad', index, meter,
             style: base.state.phrase.padStyle, enabled: settings.thinPadUnderLead, lead });
         pad=gesturePart(pad,{gesture,meter,style:base.state.phrase.padStyle,enabled:settings.thinPadUnderLead});
+        if (split.roots.length) pad = [...split.roots, ...pad].sort((a, b) => a.beat - b.beat || a.midi - b.midi);
         let bass = events.filter(e => e.role === 'bass');
         if (bass.length && !base.state.phrase.pedal) {
             bass = base.state.phrase.bassStyle === 'walking'
                 ? walkingBass({ chord, nextChord: args.nextChord, scalePcs: chord.harmonyPcs ?? scalePcs, range: base.state.ranges.bass,
                     previousMidi: prev?.bassMidi ?? 40, meter, chordEnds: args.barsLeftInChord === 1, seed, bar, rhythm })
                 : alignBass(bass, { style: base.state.phrase.bassStyle, rhythm, meter });
+            const style = base.state.phrase.bassStyle;
+            const cell = bassCell({ style, seed, phraseStart: phrase.start, leadPlaying: activeLead });
+            bass = varyBass(bass, { style, cell, meter, range: base.state.ranges.bass });
         }
         let counter = events.filter(e => e.role === 'counter');
         if (base.state.phrase.counter?.kind !== 'harmony') {

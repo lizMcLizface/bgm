@@ -67,7 +67,8 @@ const Tour = ({ onClose, reference = false, prompt = false, fromStage = 0, toSta
         if (!reference) writePref(minimal ? MINIMAL_TOUR_KEY : TOUR_KEY, true);
         onClose();
     };
-    // Dismissing the start prompt: no help wanted, so everything is available.
+    // Dismissing the start prompt: no help wanted, so everything is available (the minimal view stays
+    // as it is - whoever knows their way around can bring the interface back themselves).
     const decline = () => {
         if (onUnlockAll) onUnlockAll();
         if (minimal) writePref(TOUR_KEY, true);
@@ -148,7 +149,7 @@ const Tour = ({ onClose, reference = false, prompt = false, fromStage = 0, toSta
                     </p>
                     <div className="gen-tour-intro-buttons">
                         <button type="button" ref={next} className="gen-tour-start" onClick={begin} autoFocus>Take the tour</button>
-                        <button type="button" className="gen-tour-skip" onClick={decline}>{minimal ? 'I know my way around - show the whole page' : "I don't need help - show me everything"}</button>
+                        <button type="button" className="gen-tour-skip" onClick={decline}>{minimal ? 'No tour, thanks - just the landscape' : "I don't need help - show me everything"}</button>
                     </div>
                     <small>The ⚙ menu repeats it.</small>
                 </div>

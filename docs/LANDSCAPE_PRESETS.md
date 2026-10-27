@@ -24,13 +24,14 @@ the window.
 A preset can also pin something its landscape would otherwise leave to chance (`look`):
 Ice Cave Echoes always gets the icy cavern, Lantern Circuit always the garden's strings of
 paper lanterns; on the observation deck, Mildly Alarmed always faces a gas giant and
-Plotting a Course drops the deck for open space. The dice still gives a new landscape of the same kind with the same pin.
+Plotting a Course drops the deck for open space; Neon Overpass lights the city skyline in pink, purple and blue (`neon`). The dice still gives a new landscape of the same kind with the same pin.
 
 ## Preset table
 
 | Preset | Landscape | Weather | Starts at | Kept to |
 |---|---|---|---|---|
 | Rainy café | Café | Rain | 16:00, early autumn | 10:00–23:00 |
+| City skyline | a city across dark water: three ranks of towers fading into the haze, windows that come on at dusk and flicker, red beacons on the tall ones, a far embankment with lamps and traffic, all mirrored in the water. The `neon` look lights it pink down the left edges, blue down the right and purple between, with sign panels and a coloured glow above the roofs | Odd-Time Lamplight, Bossa in Seven, Neon Overpass, Demo: 7/8 electro |
 | Late-night brushes | Café | Overcast | 23:00, late autumn | 21:00–03:30 |
 | Fireside folk | Campfire clearing | Clear | 21:00, late autumn | 20:00–05:00 |
 | Tape memories | Window view | Haze | 18:30, late summer | 17:00–23:00 |

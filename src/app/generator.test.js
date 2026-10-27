@@ -965,7 +965,7 @@ test('per-note expression preserves written events, follows planner copies and s
 test('previous Latest reference for ensemble comparisons', () => {
     const fingerprints=['4/4','6/8'].map((meter,i)=>{
         const gen=new Generator({...defaultSettings(),generation:'latest',seed:741+i,meter,leadActivity:.8,drums:{style:'lofi',activity:.5,variation:.5,sprinkle:.35,kit:'felt'}});
-        gen.gateEnvelopes=false;gen.noteConnection=false;gen.heldExpression=false;gen.noteExpression=false;gen.rhythmGrammar=false;gen.ensembleCoordination=false;gen.formDevelopment=false;gen.themeDevelopment=false;gen.phraseSearch=false;gen.longPhrases=false;gen.contrastPhrases=false;gen.reset();
+        gen.registerLevel=false;gen.gateEnvelopes=false;gen.noteConnection=false;gen.heldExpression=false;gen.noteExpression=false;gen.rhythmGrammar=false;gen.ensembleCoordination=false;gen.formDevelopment=false;gen.themeDevelopment=false;gen.phraseSearch=false;gen.longPhrases=false;gen.contrastPhrases=false;gen.reset();
         let h=2166136261;for(const c of JSON.stringify(play(gen,32).map(b=>b.events)))h=Math.imul(h^c.charCodeAt(0),16777619);
         return(h>>>0).toString(16);
     });
@@ -1110,7 +1110,7 @@ test('theme development survives planning/restore, remains independent of percus
 
 test('phrase search uses decided harmony, preserves rhythms, restores and copies comparison choices',()=>{
     const settings={...defaultSettings(),seed:42,leadActivity:1,leadDensity:.75,sections:{mode:'off',phrases:4},humanize:{timing:0,velocity:0,detune:0},drift:{...defaultSettings().drift,mode:'off'}};
-    const gen=new Generator(settings),reference=new Generator(settings);gen.rhythmGrammar=false;reference.rhythmGrammar=false;gen.noteResolution=false;gen.reset();reference.noteResolution=false;reference.phraseSearch=false;reference.reset();
+    const gen=new Generator(settings),reference=new Generator(settings);gen.rhythmGrammar=false;reference.rhythmGrammar=false;gen.registerLevel=false;reference.registerLevel=false;gen.noteResolution=false;gen.reset();reference.noteResolution=false;reference.phraseSearch=false;reference.reset();
     const bars=play(gen,32),old=play(reference,32),rhythm=bs=>bs.map(b=>b.events.filter(e=>e.role==='lead').map(e=>[e.beat,e.length,e.velocity]));
     expect(rhythm(bars)).toEqual(rhythm(old));expect(bars.map(b=>b.events)).not.toEqual(old.map(b=>b.events));
     const offline=gen.planner();for(let bar=0;bar<32;bar++)offline.planBar(bar);expect([...offline.plan.values()]).toEqual(bars);
@@ -1360,7 +1360,7 @@ test('Altman uses chromatic pitch sets and restores its exact continuation and f
  for(let bar=96;bar<104;bar++)g.planBar(bar);for(const h of forecast)expect(h.chord).toEqual(g.plan.get(h.bar).chord);
 });
 test('bitonality preserves the backing and transposes actual melodic events across phrase boundaries',()=>{
- const settings={...defaultSettings(),seed:42,leadActivity:1,counter:{mode:'line',activity:1},sections:{mode:'gentle',phrases:2}},a=new Generator(settings),b=new Generator({...settings,tonality:{mode:'bitonal',separation:1}});a.reset();b.reset();
+ const settings={...defaultSettings(),seed:42,leadActivity:1,counter:{mode:'line',activity:1},sections:{mode:'gentle',phrases:2}},a=new Generator(settings),b=new Generator({...settings,tonality:{mode:'bitonal',separation:1}});a.registerLevel=false;b.registerLevel=false;a.reset();b.reset();
  for(let bar=0;bar<48;bar++){a.planBar(bar);b.planBar(bar);const x=a.plan.get(bar),y=b.plan.get(bar);expect(y.chord.tonality.mode).toBe('bitonal');expect(y.events.map(({midi,expression,...event})=>({...event,midi:midi-(['lead','counter'].includes(event.role)?1:0),...(expression?{expression:{...expression,...(expression.connectionFrom!==undefined?{connectionFrom:expression.connectionFrom-(['lead','counter'].includes(event.role)?1:0)}:{})}}:{})}))).toEqual(x.events);}
 });
 

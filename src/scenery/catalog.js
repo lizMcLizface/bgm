@@ -23,6 +23,7 @@ export const BIOME_NAMES = {
     cave: 'Glowworm cavern',
     industrial: 'Industrial',
     street: 'Rainy neon street',
+    city: 'City skyline',
     synth: 'Synthwave',
     train: 'Train window',
     room: 'Window view',

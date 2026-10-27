@@ -9,19 +9,21 @@ const source = (seed, index, salt) => seeded(Math.imul(seed ^ salt, 1664525) ^ M
 // This is the ensemble's reference rhythm even when the drum part is off.
 export function phraseRhythm({ seed, start, meter, bassStyle, role, section, bars = 4 }) {
     const rng = source(seed, start, 0x5be0cd19);
-    const accents = groupStarts(meter), step = meter.unitsPerBeat === 3 ? 1 : 0.5;
+    const accents = groupStarts(meter), step = meter.unitsPerBeat === 1 ? 0.5 : 1;
+    // 5/8 and 7/8 kick on the long group, not on each group start (see percussionGeometry)
+    const kicks = meter.unitsPerBeat === 3 ? [0] : meter.unitsPerBeat === 2 ? (meter.units === 7 ? [0, 4] : [0]) : accents;
     return { start, bars: Array.from({ length: bars }, (_, index) => {
         const pickup = index === bars - 1 && ['half', 'drive'].includes(bassStyle)
             && section?.transition !== 'release'
             && rng() < (section?.transition === 'arrival' ? 1 : role === 'return' ? 0.35 : 0.7) ? meter.units - step : null;
-        return { accents: [...accents], kicks: [...(meter.unitsPerBeat === 3 ? [0] : accents), ...(pickup === null ? [] : [pickup])], pickup,
+        return { accents: [...accents], kicks: [...kicks, ...(pickup === null ? [] : [pickup])], pickup,
             closing: index === bars - 1 };
     }) };
 }
 
 export function barRhythm({ phrase, bar, meter, lead }) {
     const base = phrase.bars[Math.max(0, Math.min(phrase.bars.length - 1, bar - phrase.start))];
-    const guard = meter.unitsPerBeat * 0.3, step = meter.unitsPerBeat === 3 ? 1 : 0.5;
+    const guard = meter.unitsPerBeat * 0.3, step = meter.unitsPerBeat === 1 ? 0.5 : 1;
     const leadAttacks = lead.map(e => e.beat);
     const clear = at => leadAttacks.every(attack => Math.abs(at - attack) >= guard - 1e-6);
     const answers = Array.from({ length: Math.ceil(meter.units / step) }, (_, i) => i * step).filter(clear);
@@ -29,6 +31,19 @@ export function barRhythm({ phrase, bar, meter, lead }) {
     return { phraseStart: phrase.start, bar, accents: base.accents,
         kicks: base.kicks.filter(at => at !== base.pickup || pickup !== null), pickup,
         closing: base.closing, leadAttacks, answers, guard };
+}
+
+/**
+ * The pad's "low note, then chord" pulse: a root held under each beat group with chord stabs on top.
+ * The held roots are the floor of the pattern, so they stay out of the spacing and shaping that
+ * move, trim or drop the stabs around the lead; otherwise a stab can be left floating over a root
+ * that was cut short or pushed late. Returns the roots apart from the stabs.
+ */
+export function splitPulseRoots(events, { meter, enabled = true }) {
+    if (!enabled || !events.length) return { roots: [], rest: events };
+    const starts = groupStarts(meter), low = Math.min(...events.map(e => e.midi));
+    const isRoot = e => e.midi === low && starts.includes(e.beat);
+    return { roots: events.filter(isRoot), rest: events.filter(e => !isRoot(e)) };
 }
 
 /** Protect chord entrances; let rhythmic accompaniment answer nearby attacks. */

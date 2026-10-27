@@ -1709,7 +1709,7 @@ const GenerativeApp = () => {
             )}
 
             {tourOpen && <Tour key={tourRange.id} prompt={tourPrompt} fromStage={tourRange.from} toStage={tourRange.to} minimal={tourMinimal}
-                onUnlockAll={() => { setStage(LAST_STAGE); if (tourMinimal) setZen(false); }} onStep={prepareTourStep} onClose={() => setTourOpen(false)} />}
+                onUnlockAll={() => setStage(LAST_STAGE)} onStep={prepareTourStep} onClose={() => setTourOpen(false)} />}
             {helpOpen && <Tour reference onClose={() => setHelpOpen(false)} />}
 
             <footer className="gen-footer">

@@ -10,6 +10,8 @@ const KINDS = {
     keys: ['grace', 'mordent'], plucked: ['grace', 'mordent'], tight: ['grace', 'mordent', 'trill'],
     breath: ['grace', 'turn', 'trill'], neutral: ['grace', 'turn', 'trill'], swell: [],
 };
+// A struck or plucked voice decays as soon as it speaks, so a slow trill on it sounds like a stutter.
+const STRUCK = /cel[eè]sta|bell|glock|chime|music.?box|vibe|marimba|xylo|glass|tine|kalimba|steel|gamelan|bowl|harp|pluck|mallet/i;
 const CHANCE = { grace: 0.2, mordent: 0.1, turn: 0.12, trill: 0.08 };
 
 const neighbour = (midi, pcs, direction) => {
@@ -23,7 +25,7 @@ export function ornamentNotes(events, { amount = 0, bar, seed = 0, voices = {}, 
     const out = [];
     for (const role of ['lead', 'counter']) {
         const notes = events.filter((e) => e.role === role).sort((a, b) => a.beat - b.beat);
-        const kinds = KINDS[grooveProfile(voices[role])] ?? [];
+        const kinds = (KINDS[grooveProfile(voices[role])] ?? []).filter((k) => k !== 'trill' || !STRUCK.test(voices[role]?.name ?? ''));
         let done = false;
         notes.forEach((e, i) => {
             const roll = rng();

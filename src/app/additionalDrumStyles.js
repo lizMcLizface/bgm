@@ -38,9 +38,11 @@ export function additionalDrumBar({bar,meter,drums,section,sectionsMode,sectionB
     };
     // Preserve recognizable four-beat figures in 4/4; fit odd/compound bars
     // to their own grid rather than allowing hits to spill over the boundary.
-    const at=(fraction,fine=false)=>Math.round(fraction*units/(unit===3?1:fine ? .25 : .5))*(unit===3?1:fine ? .25 : .5);
+    // the bar's eighth grid: half a unit when units are quarters, a whole one when they are eighths
+    const eighth=unit===1?.5:1;
+    const at=(fraction,fine=false)=>Math.round(fraction*units/(fine?eighth/2:eighth))*(fine?eighth/2:eighth);
     const positions=(name,list,velocity,anchor=false,fine=false)=>list.slice(0,sparse?1:list.length).forEach((f,i)=>hit(name,at(f,fine),velocity*(i===0?1:.85),anchor));
-    const shaker=level=>{for(let beat=0;beat<units;beat+=sparse?unit:unit===3?1:.5)hit('shaker',beat,level*(beats.includes(beat)?1:.6));};
+    const shaker=level=>{for(let beat=0;beat<units;beat+=sparse?unit:eighth)hit('shaker',beat,level*(beats.includes(beat)?1:.6));};
     if(drums.style==='bossa'){
         const three=(bar+(variant===1?1:0))%2===0;
         const clave=three?(variant===2?[0,.25,.625]:[0,.375,.75]):[.25,.5];
@@ -79,7 +81,7 @@ export function additionalDrumBar({bar,meter,drums,section,sectionsMode,sectionB
     if(embellish&&drums.style!=='ambient'&&!sparse&&!boundaries?.ending&&section?.transition!=='release'){
         const closing=bar-phraseStart===phraseBars-1;
         if(closing&&activity>.25&&rng()<activity*variation*.45){
-            hit('tom',units-(unit===3?1:.5),.22,false,.2);
+            hit('tom',units-eighth,.22,false,.2);
         }else if(rng()<activity*variation*.25){
             const answers=rhythm?.answers?.filter(t=>t>=0&&t<units);
             hit('rim',answers?.length?answers[Math.floor(rng()*answers.length)]:at(.875,true),.12);

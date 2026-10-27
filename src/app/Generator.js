@@ -59,6 +59,7 @@ import { expressNotes, expressHeldNotes, connectWindNotes, timeSoundNotes } from
 import { applyDynamics, expressDynamics } from './composition/dynamics';
 import { planRubato, rubatoTime } from './composition/rubato';
 import { ornamentNotes } from './composition/ornaments';
+import { tameHighRegister } from './composition/register';
 import { Ducker, DUCKED_BY, duckFloor } from './engine/ducking';
 import { planLoudness } from './composition/loudness';
 import { SPACE_RACK, SPACE_ROLE, sectionSpaceLevel } from './composition/sectionSpace';
@@ -1579,6 +1580,7 @@ class Generator {
             noteSlides:this.noteSlides === true,padMotion:this.padPitchMotion === true,bassMotion:this.bassPitchMotion === true,chordSlides:this.chordSlides === true,
         });
         expressDynamics(events, this.settings.dynamics);
+        if (!original && this.registerLevel !== false) tameHighRegister(events, { voices: this.grooveVoices ?? this.grooveVoiceSnapshot() });
         let tone = sectionTone(this.settings, state.phrase.section);
         if (!original && this.settings.sectionTone && state.phrase.section?.form) {
             // Log interpolation gives gradual brightness rather than a label-sized jump.
@@ -1654,7 +1656,7 @@ class Generator {
      * A copy that only plans: the piece Play would start with these
      * settings, bar by bar via planBar (for rendering to a file).
      */
-    planner({ heldPadGlides = this.heldPadGlides, heldBassGlides = this.heldBassGlides, padPitchMotion = this.padPitchMotion, bassPitchMotion = this.bassPitchMotion, noteSlides = this.noteSlides, chordSlides = this.chordSlides, tempoEffects = this.tempoEffects, gateEnvelopes = this.gateEnvelopes, noteConnection = this.noteConnection, heldExpression = this.heldExpression, noteExpression = this.noteExpression, ensembleCoordination = this.ensembleCoordination, formDevelopment = this.formDevelopment, phrasePerformance = this.phrasePerformance, themeDevelopment = this.themeDevelopment, phraseSearch = this.phraseSearch, longPhrases = this.longPhrases, phraseLength = this.phraseLength, noteResolution = this.noteResolution, contrastPhrases = this.contrastPhrases, duetInteraction = this.duetInteraction, rhythmDevelopment = this.rhythmDevelopment, rhythmGrammar = this.rhythmGrammar, partRhythmGrammar = this.partRhythmGrammar, instrumentGroove = this.instrumentGroove, jointCounterpoint = this.jointCounterpoint, sectionDevelopment = this.sectionDevelopment, sectionCadences = this.sectionCadences, sectionBridges = this.sectionBridges, harmonicRhythm = this.harmonicRhythm, transitionGestures = this.transitionGestures, leadTransitions = this.leadTransitions, leadPickups = this.leadPickups, sectionSuspensions = this.sectionSuspensions, formStrategies = this.formStrategies, sectionCurves = this.sectionCurves, harmonicDevelopment = this.harmonicDevelopment, formStrategy = this.formStrategy, endingDevelopment = this.endingDevelopment } = {}) {
+    planner({ heldPadGlides = this.heldPadGlides, heldBassGlides = this.heldBassGlides, padPitchMotion = this.padPitchMotion, bassPitchMotion = this.bassPitchMotion, noteSlides = this.noteSlides, chordSlides = this.chordSlides, tempoEffects = this.tempoEffects, gateEnvelopes = this.gateEnvelopes, noteConnection = this.noteConnection, heldExpression = this.heldExpression, noteExpression = this.noteExpression, ensembleCoordination = this.ensembleCoordination, formDevelopment = this.formDevelopment, phrasePerformance = this.phrasePerformance, themeDevelopment = this.themeDevelopment, phraseSearch = this.phraseSearch, longPhrases = this.longPhrases, phraseLength = this.phraseLength, noteResolution = this.noteResolution, registerLevel = this.registerLevel, contrastPhrases = this.contrastPhrases, duetInteraction = this.duetInteraction, rhythmDevelopment = this.rhythmDevelopment, rhythmGrammar = this.rhythmGrammar, partRhythmGrammar = this.partRhythmGrammar, instrumentGroove = this.instrumentGroove, jointCounterpoint = this.jointCounterpoint, sectionDevelopment = this.sectionDevelopment, sectionCadences = this.sectionCadences, sectionBridges = this.sectionBridges, harmonicRhythm = this.harmonicRhythm, transitionGestures = this.transitionGestures, leadTransitions = this.leadTransitions, leadPickups = this.leadPickups, sectionSuspensions = this.sectionSuspensions, formStrategies = this.formStrategies, sectionCurves = this.sectionCurves, harmonicDevelopment = this.harmonicDevelopment, formStrategy = this.formStrategy, endingDevelopment = this.endingDevelopment } = {}) {
         const copy = Object.create(Generator.prototype);
         copy.settings = JSON.parse(JSON.stringify(this.planningFrom ?? this.settings));
         // Comparison tooling can isolate the previous Latest arrangement.
@@ -1678,6 +1680,7 @@ class Generator {
         copy.longPhrases = longPhrases;
         copy.phraseLength = phraseLength;
         copy.noteResolution = noteResolution;
+        copy.registerLevel = registerLevel;
         copy.contrastPhrases = contrastPhrases;
         copy.duetInteraction = duetInteraction;
         copy.rhythmDevelopment = rhythmDevelopment;

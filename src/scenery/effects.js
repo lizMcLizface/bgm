@@ -7,7 +7,7 @@ import { bayer, clamp, fbm2, hash, noise1, smoothstep } from './noise.js';
 import { REFLECT, VEIL } from './scene.js';
 
 const AURORA = new Set(['lake', 'hills', 'woodland', 'grassland', 'farmland', 'alpine', 'tundra', 'camp']);
-const NO_MILKY_WAY = new Set(['industrial', 'synth']);
+const NO_MILKY_WAY = new Set(['industrial', 'synth', 'city']);
 const NO_RAINBOW = new Set(['synth', 'planet']);
 const MIST = new Set(['lake', 'hills', 'woodland', 'grassland', 'farmland', 'river', 'alpine', 'swamp', 'camp', 'jungle', 'ruins', 'harbour', 'savanna', 'village', 'garden']);
 const FIREFLIES = new Set(['grassland', 'farmland', 'woodland', 'river', 'swamp', 'camp', 'jungle']);
