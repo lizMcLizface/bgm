@@ -22,6 +22,7 @@ import { cleanExpression, expressiveEnvelope, expressiveSource, breathEnvelope, 
 import { FX_STAGES, fxTail } from './voiceFx';
 import { dynamicAttack } from '../composition/dynamics';
 import { isAcousticPiano } from './acousticPiano';
+import { isCalibratedPiano } from './calibratedPiano';
 import { isTempered, tuningCents } from './temperament';
 
 // A held note is booked as if it lasted this long; its release replaces
@@ -614,7 +615,7 @@ class Instrument {
             voiceColour:{breathAmount:this.preset.breathAmount,formantAmount:this.preset.formantAmount,formantVowel:this.preset.formantVowel,formantShift:this.preset.formantShift},
             piano: this.preset.stringModel === 'piano' ? { type: this.preset.pianoType, decay: this.preset.pianoDecay,
                 brightness: this.preset.pianoBrightness, hammer: this.preset.pianoHammer, unison: this.preset.pianoUnison,
-                velocity, resonance:this.preset.pianoResonance, sustain: isAcousticPiano(this.preset.pianoType) ? 0 : this.preset.pianoSustain, seed: this.preset.pianoSeed, wear: this.preset.pianoWear } : null,
+                velocity, resonance:this.preset.pianoResonance, sustain: isAcousticPiano(this.preset.pianoType) || isCalibratedPiano(this.preset.pianoType) ? 0 : this.preset.pianoSustain, seed: this.preset.pianoSeed, wear: this.preset.pianoWear } : null,
             string: this.preset.stringModel === 'plucked' ? { decay: this.preset.stringDecay, damping: this.preset.stringDamping,
                 position: this.preset.stringPosition, body: this.preset.stringBody, resonance:this.preset.stringResonance,bodyType:this.preset.stringBodyType, seed: this.preset.stringSeed } : null,
             filterEvents,

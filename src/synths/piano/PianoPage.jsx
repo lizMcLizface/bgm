@@ -5,6 +5,7 @@ import { load, save } from '../storage';
 import { LINES, playLine, lineSeconds } from './lines';
 import PianoPlayer, { renderOptions, dynamics } from './player';
 import { pianoBuffer } from '../../app/engine/piano';
+import { CALIBRATED_LABELS, preloadCalibratedPiano, isCalibratedPiano } from '../../app/engine/calibratedPiano';
 import { TEMPERAMENTS, TONICS, temperamentOffsets, tunedFrequency } from '../../app/engine/temperament';
 import { tuningOptions } from './player';
 import library from '../../library/voices.json';
@@ -13,7 +14,7 @@ const KEY = 'synths:piano';
 const DEFAULTS = { pianoType: 'grand', pianoDecay: 2.5, pianoBrightness: .5, pianoHammer: .4, pianoUnison: .3, pianoResonance: .5, pianoWear: 0, pianoSeed: 11,
     pianoTemperament: 'equal', pianoTonic: 'C', pianoA4: 440, pianoStretch: 0 };
 const PRESETS = Object.fromEntries(Object.entries(library.Pianos).map(([name, p]) => [name, Object.fromEntries(Object.keys(DEFAULTS).map((k) => [k, p[k] ?? DEFAULTS[k]]))]));
-const TYPES = { grand: 'Grand', felted: 'Felted', upright: 'Upright', ambient: 'Ambient', glass: 'Glass grand', drama: 'Soft drama', soft: 'Soft piano', subdued: 'Subdued', concert: 'Concert grand' };
+const TYPES = { grand: 'Grand', felted: 'Felted', upright: 'Upright', ambient: 'Ambient', glass: 'Glass grand', drama: 'Soft drama', soft: 'Soft piano', subdued: 'Subdued', concert: 'Concert grand', ...CALIBRATED_LABELS };
 // label, key, min, max, step, format
 const SLIDERS = [
     ['Body', [['Decay', 'pianoDecay', .5, 5, .05, (v) => v.toFixed(1) + ' s'], ['Resonance', 'pianoResonance', 0, 1, .01], ['Age', 'pianoWear', 0, 1, .01]]],
@@ -59,6 +60,9 @@ export default function PianoPage() {
         const id = setTimeout(step, 150);
         return () => { cancelled = true; clearTimeout(id); };
     }, [settings, low, audio.state]);
+
+    // A measured piano is made ready (table unpacked, levels set) as soon as it is chosen, so its first note is not late.
+    useEffect(() => { if (isCalibratedPiano(settings.pianoType)) preloadCalibratedPiano(settings.pianoType); }, [settings.pianoType]);
 
     const start = useCallback(async () => {
         if (player.current) { await player.current.context.resume(); return; }

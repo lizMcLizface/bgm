@@ -43,6 +43,8 @@ const BY_NAME = {
     'Whiteboard': L('room', 'sparse', 14, 3.1, DAY),
     'Five Notes Only': L('alpine', 'clear', 10, 0.7, DAY),
     'Solo Grand': L('lake', 'clear', 14, 2),
+    'Pure Piano': L('lake', 'clear', 15.5, 1.8),
+    'Felted Piano': L('tundra', 'snow', 23, 3, { ...NIGHT, seasons: WINTER }),   // "Felted Piano (v1)" shares it
 
     'Desert dusk': L('desert', 'haze', 18.5, 1.5, { hours: [17, 21] }),
     'Damp Crater': L('swamp', 'fog', 1, 1.5, NIGHT),
@@ -169,7 +171,7 @@ const BY_CATEGORY = {
 };
 
 // "Name (previous piano)", "Name v1" and "Name · Bossa" share the landscape of "Name".
-const baseName = (name) => name.replace(/\s*\((previous[^)]*|tonal)\)$/i, '').replace(/\s+v\d+$/i, '').replace(/\s+·\s+.*$/, '').trim();
+const baseName = (name) => name.replace(/\s*\((previous[^)]*|tonal|v\d+)\)$/i, '').replace(/\s+v\d+$/i, '').replace(/\s+·\s+.*$/, '').trim();
 
 export function landscapeForScene(name, category) {
     return BY_NAME[name] || BY_NAME[baseName(name)] || BY_CATEGORY[category] || null;

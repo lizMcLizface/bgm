@@ -1,6 +1,7 @@
 // The instrument applies a piano's tuning to every note it plays, and only to pianos.
 vi.mock('../../audio/context', () => ({ audioContext: { currentTime: 0 } }));
 
+import { CALIBRATED_TYPES } from './calibratedPiano';
 import Instrument from './Instrument';
 import PRESET_DEFAULTS from './presetDefaults';
 import { sanitizePreset } from '../editor/presetStore';
@@ -39,5 +40,5 @@ test('the new piano settings survive a preset round trip and the library presets
     const pianos = Object.entries(library.Pianos);
     expect(pianos.length).toBeGreaterThanOrEqual(5);
     for (const [name, p] of pianos) expect(sanitizePreset(p), name).toEqual(p);
-    expect(new Set(pianos.map(([, p]) => p.pianoType))).toEqual(new Set(['grand', 'felted', 'upright', 'ambient', 'glass', 'drama', 'soft', 'subdued', 'concert']));
+    expect(new Set(pianos.map(([, p]) => p.pianoType))).toEqual(new Set(['grand', 'felted', 'upright', 'ambient', 'glass', 'drama', 'soft', 'subdued', 'concert', ...CALIBRATED_TYPES]));
 });

@@ -2,6 +2,7 @@
 // velocity layer, through a release envelope, the sustain pedal and a small room.
 import { pianoBuffer } from '../../app/engine/piano';
 import { tunedFrequency } from '../../app/engine/temperament';
+import { isCalibratedPiano } from '../../app/engine/calibratedPiano';
 
 /** The renderer's options for a page's settings (the same keys a generator preset uses). */
 export const renderOptions = (s, velocity) => ({
@@ -29,7 +30,17 @@ function roomImpulse(context, seconds = 2.4) {
 // The renderer levels every note by its low band, which leaves the top of the keyboard several dB
 // louder and makes a soft key almost as loud as a hard one. Here each buffer is brought to one
 // loudness (measured once) and key velocity alone sets the level, over about 30 dB.
-const TARGET_RMS = .1, loudness = new WeakMap();
+const TARGET_RMS = .1, loudness = new WeakMap(), rmsCache = new WeakMap();
+// first half second of a buffer
+function startRms(buffer) {
+    if (!rmsCache.has(buffer)) {
+        const data = buffer.getChannelData(0), n = Math.min(data.length, Math.round(buffer.sampleRate * .5));
+        let sum = 0;
+        for (let i = 0; i < n; i++) sum += data[i] * data[i];
+        rmsCache.set(buffer, Math.sqrt(sum / n) || TARGET_RMS);
+    }
+    return rmsCache.get(buffer);
+}
 function normaliser(buffer) {
     if (!loudness.has(buffer)) {
         const data = buffer.getChannelData(0), n = Math.min(data.length, Math.round(buffer.sampleRate * .5));
@@ -62,11 +73,19 @@ export default class PianoPlayer {
         const s = this.settings;
         return pianoBuffer(this.context, tunedFrequency(midi, tuningOptions(s)), renderOptions(s, velocity));
     }
+    /**
+     * The gain that brings a buffer to the page's loudness. A measured piano has a loudness curve of its own, the top of the
+     * keyboard quieter than the middle, so it is levelled once by a middle key at this strength and not note by note.
+     */
+    weight(velocity, buffer) {
+        if (!isCalibratedPiano(this.settings.pianoType)) return normaliser(buffer);
+        return Math.min(4, TARGET_RMS / startRms(this.buffer(63, velocity)));
+    }
     down(key, midi, velocity = .7) {
         this.up(key, true);
         const ctx = this.context, v = Math.min(1, Math.max(.05, velocity)), source = ctx.createBufferSource(), gain = ctx.createGain();
         source.buffer = this.buffer(midi, v);
-        const level = normaliser(source.buffer) * dynamics(v);
+        const level = this.weight(v, source.buffer) * dynamics(v);
         gain.gain.value = level; source.connect(gain); gain.connect(this.dry); gain.connect(this.send);
         const voice = { source, gain, midi, held: true };
         source.onended = () => { gain.disconnect(); if (this.voices.get(key) === voice) this.voices.delete(key); this.sustained.delete(voice); this.onChange(); };

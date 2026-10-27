@@ -433,6 +433,9 @@ class MonoSynth {
         
         // Connect mixer to gain and filter chain
         this.modelGate = this.AC.createGain();
+        // Closed until a note opens it (scheduleNote sets it per note): a fresh voice's oscillators run from the start, at 440 Hz,
+        // and an open gate would let them out as a loud tone the moment the voice is woken (a preset swap rebuilds every voice).
+        this.modelGate.gain.value = 0;
         this.stringSources = new Set();
         this.mixer.connect(this.modelGate);
         this.modelGate.connect(this.gain.getNode());
@@ -441,6 +444,9 @@ class MonoSynth {
 
         this.volume.setGain(0.2);
         this.gain.setGain(0);
+        // and straight away, not at the next render quantum: a new node reads 1 until its first event has run
+        this.volume.getNode().gain.value = 0.2;
+        this.gain.getNode().gain.value = 0;
         
         // Initialize filter state
         this.updateNoiseFilterBypass();

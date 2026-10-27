@@ -1,11 +1,13 @@
 import { cachedNoteBuffer, noteCacheStats, clearNoteCache } from './noteBufferCache';
 import { isAcousticPiano, renderAcousticPiano } from './acousticPiano';
+import { isCalibratedPiano, renderCalibratedPiano } from './calibratedPiano';
 export const pianoCacheStats=noteCacheStats;
 export const clearPianoCache=clearNoteCache;
 const clamp=(x,lo,hi)=>Math.max(lo,Math.min(hi,Number.isFinite(x)?x:lo));
 
 /** Struck partials with separate decay rates; no recorded samples. */
 export function renderPiano(sampleRate,frequency,{type='felt',decay=2.5,brightness=.45,hammer=.3,unison=.25,velocity=.8,seed=1,resonance=0,softness=0,wear=0}={}) {
+    if(isCalibratedPiano(type))return renderCalibratedPiano(sampleRate,frequency,{type,decay,unison,velocity,seed});
     if(isAcousticPiano(type))return renderAcousticPiano(sampleRate,frequency,{type,decay,brightness,hammer,unison,velocity,seed,resonance,wear});
     const sr=clamp(sampleRate,8000,192000),freq=clamp(frequency,10,sr/6),electric=type==='electric';
     decay=clamp(decay,.3,5);brightness=clamp(brightness,0,1);hammer=clamp(hammer,0,1);unison=clamp(unison,0,1);velocity=clamp(velocity,0,1);

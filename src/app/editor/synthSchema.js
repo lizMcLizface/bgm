@@ -8,6 +8,7 @@
 import { WAVEFORM, FILTER, REVERB, ENVELOPE_SHAPE, NOISE } from '../../util/util';
 import { TEMPERAMENTS, TONICS } from '../engine/temperament';
 import { isAcousticPiano } from '../engine/acousticPiano';
+import { isCalibratedPiano, CALIBRATED_LABELS } from '../engine/calibratedPiano';
 
 const knob = (key, label, props = {}, disabled) => ({ kind: 'knob', key, label, props, disabled });
 const select = (key, label, options, disabled) => ({ kind: 'select', key, label, options, disabled });
@@ -23,14 +24,14 @@ const SYNTH_SCHEMA = [
         { kind: 'choice', key: 'stringModel', label: 'Source', options: { oscillator: 'Oscillator', plucked: 'Plucked string', piano: 'Piano' } },
     ] },
     { label: 'Piano', columns: 4, controls: [
-        { kind: 'choice', key: 'pianoType', label: 'Piano tone', options: { felt: 'Felt', electric: 'Electric', grand: 'Grand', felted: 'Felted', upright: 'Upright', ambient: 'Ambient', glass: 'Glass grand', drama: 'Soft drama', soft: 'Soft piano', subdued: 'Subdued', concert: 'Concert grand' } },
+        { kind: 'choice', key: 'pianoType', label: 'Piano tone', options: { felt: 'Felt', electric: 'Electric', grand: 'Grand', felted: 'Felted', upright: 'Upright', ambient: 'Ambient', glass: 'Glass grand', drama: 'Soft drama', soft: 'Soft piano', subdued: 'Subdued', concert: 'Concert grand' , ...CALIBRATED_LABELS } },
         knob('pianoDecay', 'Decay', { modifier: 4.7, offset: .3, min: .3, max: 5, resetValue: 2.5 }),
         knob('pianoResonance', 'Resonance', { min: 0, max: 1, resetValue: 0 }),
         knob('pianoSustain', 'Held body', { min: 0, max: 1, resetValue: .28 }),
         knob('pianoBrightness', 'Brightness', { min: 0, max: 1, resetValue: .45 }),
         knob('pianoHammer', 'Hammer', { min: 0, max: 1, resetValue: .3 }),
         knob('pianoUnison', 'Unison', { min: 0, max: 1, resetValue: .25 }),
-        knob('pianoWear', 'Age', { min: 0, max: 1, resetValue: 0 }, (p) => !isAcousticPiano(p.pianoType)),
+        knob('pianoWear', 'Age', { min: 0, max: 1, resetValue: 0 }, (p) => !isAcousticPiano(p.pianoType) && !isCalibratedPiano(p.pianoType)),
     ] },
     { label: 'Piano tuning', columns: 4, controls: [
         { kind: 'choice', key: 'pianoTemperament', label: 'Temperament', options: TEMPERAMENTS },

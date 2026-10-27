@@ -12882,7 +12882,7 @@
             "level": 1.1
           },
           "rim": {
-            "level": 1.0
+            "level": 1
           },
           "hat": {
             "level": 0.8
@@ -15926,11 +15926,95 @@
         }
       },
       "voices": {
+        "pad": "Studio Concert v2",
+        "bass": "Starmap Piano (updated)",
+        "lead": "Ravel"
+      },
+      "isNew": true
+    },
+    {
+      "name": "Solo Grand (v1)",
+      "category": "focus",
+      "tags": [
+        "piano",
+        "v1"
+      ],
+      "blurb": "Just a concert grand: rolled chords and a quiet melody, nothing else (the modelled piano of the first version)",
+      "settings": {
+        "tonic": 7,
+        "mode": "Major-1",
+        "bpm": 66,
+        "progression": 6,
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "leadActivity": 0.9,
+        "padWeights": {
+          "sustain": 25,
+          "pulse": 10,
+          "arpeggio": 30,
+          "sequence": 0,
+          "rolled": 35,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "off"
+        },
+        "humanize": {
+          "timing": 10,
+          "velocity": 0.09,
+          "detune": 0
+        },
+        "dynamics": {
+          "level": 0.9,
+          "range": 0.6,
+          "attack": 0.5,
+          "brightness": 0.35
+        },
+        "rubato": 0.45,
+        "ornaments": 0.15,
+        "ducking": 0.6,
+        "evenLoudness": 0.8,
+        "sectionSpace": 0.2,
+        "keyLift": 0,
+        "timbreDrift": 0.15,
+        "leadDensity": 0.12,
+        "leadLeaps": 0.2,
+        "leadRepeat": 0.58,
+        "padMotion": {
+          "lean": 0.12,
+          "fast": 0,
+          "swell": 0.025
+        },
+        "volumes": {
+          "pad": 0.8,
+          "bass": 0.59,
+          "lead": 0.62,
+          "counter": 0.4,
+          "perc": 0.38
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "muted": {
+          "bass": false,
+          "counter": true,
+          "perc": true,
+          "pad": false,
+          "lead": false
+        }
+      },
+      "voices": {
         "pad": "Concert Grand",
         "bass": "Starmap Piano (updated)",
         "lead": "Studio Grand"
-      },
-      "isNew": true
+      }
     },
     {
       "name": "Piano and Pads",
@@ -15948,7 +16032,94 @@
         "progression": 6,
         "barsPerChord": 2,
         "padNotes": 4,
-        "leadActivity": 1.0,
+        "leadActivity": 1,
+        "padWeights": {
+          "sustain": 72,
+          "pulse": 0,
+          "arpeggio": 8,
+          "sequence": 0,
+          "rolled": 20,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "off"
+        },
+        "humanize": {
+          "timing": 12,
+          "velocity": 0.08,
+          "detune": 1
+        },
+        "dynamics": {
+          "level": 0.9,
+          "range": 0.55,
+          "attack": 0.8,
+          "brightness": 0.25
+        },
+        "rubato": 0.5,
+        "ornaments": 0.1,
+        "ducking": 0.5,
+        "evenLoudness": 0.8,
+        "sectionSpace": 0.6,
+        "keyLift": 0,
+        "timbreDrift": 0.4,
+        "leadDensity": 0.1,
+        "leadLeaps": 0.2,
+        "leadRepeat": 0.58,
+        "padMotion": {
+          "lean": 0.15,
+          "fast": 0,
+          "swell": 0.06
+        },
+        "volumes": {
+          "pad": 0.7,
+          "bass": 0.6,
+          "lead": 0.66,
+          "counter": 0.36,
+          "perc": 0.38
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "muted": {
+          "bass": false,
+          "perc": true,
+          "pad": false,
+          "lead": false,
+          "counter": false
+        }
+      },
+      "voices": {
+        "pad": "Measured Choir Ah",
+        "bass": "Sub Bass",
+        "lead": "Studio Concert v2",
+        "counter": "Glass Pad"
+      },
+      "isNew": true
+    },
+    {
+      "name": "Piano and Pads (v1)",
+      "category": "night",
+      "tags": [
+        "piano",
+        "ambient",
+        "v1"
+      ],
+      "blurb": "A grand piano singing over slow pads: soft, wide and ambient (the modelled piano of the first version)",
+      "settings": {
+        "tonic": 5,
+        "mode": "Major-4",
+        "bpm": 54,
+        "progression": 6,
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "leadActivity": 1,
         "padWeights": {
           "sustain": 72,
           "pulse": 0,
@@ -16016,8 +16187,7 @@
         "bass": "Sub Bass",
         "lead": "Concert Grand",
         "counter": "Glass Pad"
-      },
-      "isNew": true
+      }
     },
     {
       "name": "Piano and Clarinet, Cinematic",
@@ -16099,11 +16269,96 @@
         }
       },
       "voices": {
-        "pad": "Concert Grand",
+        "pad": "Studio Concert v2",
         "bass": "Velvet Pad",
         "lead": "Measured Clarinet"
       },
       "isNew": true
+    },
+    {
+      "name": "Piano and Clarinet, Cinematic (v1)",
+      "category": "cinema",
+      "tags": [
+        "piano",
+        "cinematic",
+        "v1"
+      ],
+      "blurb": "Grand piano and a solo clarinet over a pad floating below as the bass: slow, wide, cinematic (the modelled piano of the first version)",
+      "settings": {
+        "tonic": 9,
+        "mode": "Major-6",
+        "bpm": 60,
+        "progression": 6,
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "leadActivity": 0.45,
+        "padWeights": {
+          "sustain": 30,
+          "pulse": 0,
+          "arpeggio": 30,
+          "sequence": 0,
+          "rolled": 40,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "off"
+        },
+        "humanize": {
+          "timing": 9,
+          "velocity": 0.08,
+          "detune": 1
+        },
+        "dynamics": {
+          "level": 0.95,
+          "range": 0.8,
+          "attack": 0.5,
+          "brightness": 0.3
+        },
+        "rubato": 0.5,
+        "ornaments": 0.15,
+        "ducking": 0.4,
+        "evenLoudness": 0.8,
+        "sectionSpace": 0.5,
+        "keyLift": 0,
+        "timbreDrift": 0.3,
+        "leadDensity": 0.14,
+        "leadLeaps": 0.2,
+        "leadRepeat": 0.58,
+        "padMotion": {
+          "lean": 0.2,
+          "fast": 0,
+          "swell": 0.05
+        },
+        "volumes": {
+          "pad": 0.78,
+          "bass": 0.72,
+          "lead": 0.25,
+          "counter": 0.4,
+          "perc": 0.38
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "muted": {
+          "counter": true,
+          "perc": true,
+          "pad": false,
+          "bass": false,
+          "lead": false
+        }
+      },
+      "voices": {
+        "pad": "Concert Grand",
+        "bass": "Velvet Pad",
+        "lead": "Measured Clarinet"
+      }
     },
     {
       "name": "Ambient Piano, Distant Storm",
@@ -16190,11 +16445,359 @@
         }
       },
       "voices": {
+        "pad": "Studio Concert v2",
+        "bass": "Wasm Bowed Glass",
+        "lead": "Ambient Piano v2"
+      },
+      "isNew": true
+    },
+    {
+      "name": "Ambient Piano, Distant Storm (v1)",
+      "category": "night",
+      "tags": [
+        "piano",
+        "ambient",
+        "rain",
+        "thunder",
+        "v1"
+      ],
+      "blurb": "Slow grand piano over a bowed-glass pad, with light rain and thunder far away (the modelled piano of the first version)",
+      "settings": {
+        "tonic": 7,
+        "mode": "Major-6",
+        "bpm": 66,
+        "progression": 6,
+        "barsPerChord": 2,
+        "leadActivity": 0.9,
+        "leadDensity": 0.1,
+        "padWeights": {
+          "sustain": 20,
+          "pulse": 30,
+          "arpeggio": 20,
+          "sequence": 0,
+          "rolled": 30,
+          "stacked": 0
+        },
+        "pulseWeights": {
+          "groups": 15,
+          "beats": 0,
+          "push": 10,
+          "split": 75
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0,
+          "drive": 0
+        },
+        "padNotes": 4,
+        "leadLeaps": 0.2,
+        "leadRepeat": 0.6,
+        "humanize": {
+          "timing": 10,
+          "velocity": 0.09,
+          "detune": 0
+        },
+        "dynamics": {
+          "level": 0.9,
+          "range": 0.6,
+          "attack": 0.5,
+          "brightness": 0.35
+        },
+        "rubato": 0.45,
+        "ornaments": 0.15,
+        "ducking": 0.6,
+        "evenLoudness": 0.8,
+        "sectionSpace": 0.2,
+        "timbreDrift": 0.15,
+        "feel": {
+          "busy": -0.25,
+          "bright": -0.4
+        },
+        "muted": {
+          "counter": true
+        },
+        "ambience": {
+          "rain": 0.15,
+          "thunder": 0.45
+        },
+        "ambienceVolume": 0.65,
+        "playAmbience": true,
+        "volumes": {
+          "lead": 0.73,
+          "counter": 0.4,
+          "pad": 0.98,
+          "bass": 0.78,
+          "perc": 0.38
+        },
+        "padMotion": {
+          "lean": 0.1,
+          "fast": 0,
+          "swell": 0.03
+        }
+      },
+      "voices": {
         "pad": "Concert Grand",
         "bass": "Wasm Bowed Glass",
         "lead": "Studio Grand"
+      }
+    },
+    {
+      "name": "Pure Piano",
+      "category": "focus",
+      "tags": [
+        "piano",
+        "solo"
+      ],
+      "blurb": "Only a grand piano: slow chords, a low line beneath and a quiet melody, no pads and nothing else",
+      "settings": {
+        "tonic": 7,
+        "mode": "Major-1",
+        "bpm": 66,
+        "progression": 6,
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "leadActivity": 0.9,
+        "padWeights": {
+          "sustain": 20,
+          "pulse": 10,
+          "arpeggio": 30,
+          "sequence": 0,
+          "rolled": 40,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "off"
+        },
+        "humanize": {
+          "timing": 10,
+          "velocity": 0.09,
+          "detune": 0
+        },
+        "dynamics": {
+          "level": 0.9,
+          "range": 0.6,
+          "attack": 0.5,
+          "brightness": 0.4
+        },
+        "rubato": 0.45,
+        "ornaments": 0.15,
+        "ducking": 0.6,
+        "evenLoudness": 0.8,
+        "sectionSpace": 0.2,
+        "keyLift": 0,
+        "timbreDrift": 0.15,
+        "leadDensity": 0.12,
+        "leadLeaps": 0.2,
+        "leadRepeat": 0.58,
+        "padMotion": {
+          "lean": 0.12,
+          "fast": 0,
+          "swell": 0.025
+        },
+        "volumes": {
+          "pad": 0.74,
+          "bass": 0.5,
+          "lead": 0.66,
+          "counter": 0.4,
+          "perc": 0.38
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "muted": {
+          "bass": false,
+          "counter": true,
+          "perc": true,
+          "pad": false,
+          "lead": false
+        }
+      },
+      "voices": {
+        "pad": "Studio Concert v2",
+        "bass": "Studio Concert v2",
+        "lead": "Studio Concert v2"
       },
       "isNew": true
+    },
+    {
+      "name": "Felted Piano",
+      "category": "cozy",
+      "tags": [
+        "piano",
+        "felt",
+        "soft"
+      ],
+      "blurb": "A felted piano close to the ear: muffled, warm and hushed, with a soft low line",
+      "settings": {
+        "tonic": 3,
+        "mode": "Major-6",
+        "bpm": 58,
+        "progression": 6,
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "leadActivity": 0.9,
+        "padWeights": {
+          "sustain": 30,
+          "pulse": 15,
+          "arpeggio": 25,
+          "sequence": 0,
+          "rolled": 30,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "off"
+        },
+        "humanize": {
+          "timing": 10,
+          "velocity": 0.09,
+          "detune": 0
+        },
+        "dynamics": {
+          "level": 0.85,
+          "range": 0.6,
+          "attack": 0.5,
+          "brightness": 0.2
+        },
+        "rubato": 0.45,
+        "ornaments": 0.15,
+        "ducking": 0.6,
+        "evenLoudness": 0.8,
+        "sectionSpace": 0.2,
+        "keyLift": 0,
+        "timbreDrift": 0.15,
+        "leadDensity": 0.12,
+        "leadLeaps": 0.2,
+        "leadRepeat": 0.58,
+        "padMotion": {
+          "lean": 0.12,
+          "fast": 0,
+          "swell": 0.025
+        },
+        "volumes": {
+          "pad": 0.8,
+          "bass": 0.5,
+          "lead": 0.62,
+          "counter": 0.4,
+          "perc": 0.38
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "muted": {
+          "bass": false,
+          "counter": true,
+          "perc": true,
+          "pad": false,
+          "lead": false
+        }
+      },
+      "voices": {
+        "pad": "Felted Piano v2",
+        "bass": "Felted Piano v2",
+        "lead": "Felted Piano v2"
+      },
+      "isNew": true
+    },
+    {
+      "name": "Felted Piano (v1)",
+      "category": "cozy",
+      "tags": [
+        "piano",
+        "felt",
+        "soft",
+        "v1"
+      ],
+      "blurb": "A felted piano close to the ear: muffled, warm and hushed, with a soft low line (the modelled felted piano of the first version)",
+      "settings": {
+        "tonic": 3,
+        "mode": "Major-6",
+        "bpm": 58,
+        "progression": 6,
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "leadActivity": 0.9,
+        "padWeights": {
+          "sustain": 30,
+          "pulse": 15,
+          "arpeggio": 25,
+          "sequence": 0,
+          "rolled": 30,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "off"
+        },
+        "humanize": {
+          "timing": 10,
+          "velocity": 0.09,
+          "detune": 0
+        },
+        "dynamics": {
+          "level": 0.85,
+          "range": 0.6,
+          "attack": 0.5,
+          "brightness": 0.2
+        },
+        "rubato": 0.45,
+        "ornaments": 0.15,
+        "ducking": 0.6,
+        "evenLoudness": 0.8,
+        "sectionSpace": 0.2,
+        "keyLift": 0,
+        "timbreDrift": 0.15,
+        "leadDensity": 0.12,
+        "leadLeaps": 0.2,
+        "leadRepeat": 0.58,
+        "padMotion": {
+          "lean": 0.12,
+          "fast": 0,
+          "swell": 0.025
+        },
+        "volumes": {
+          "pad": 0.8,
+          "bass": 0.5,
+          "lead": 0.62,
+          "counter": 0.4,
+          "perc": 0.38
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "muted": {
+          "bass": false,
+          "counter": true,
+          "perc": true,
+          "pad": false,
+          "lead": false
+        }
+      },
+      "voices": {
+        "pad": "Felted Piano",
+        "bass": "Felted Piano",
+        "lead": "Felted Piano"
+      }
     },
     {
       "name": "Odd-Time Lamplight",
@@ -16587,9 +17190,9 @@
         }
       },
       "voices": {
-        "pad": "Ambient Piano",
+        "pad": "Ambient Piano v2",
         "bass": "Felt Bass",
-        "lead": "Glass Grand"
+        "lead": "Glass Grand v2"
       }
     },
     {

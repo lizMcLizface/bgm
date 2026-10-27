@@ -83,6 +83,12 @@ export const SHAREABLE_PRESETS = [
     'Felt Piano (updated)', 'Soft Keys (updated)', 'Starmap Piano (updated)',
     // modelled pianos matched to sampled ones (appended: codes index into this list)
     'Ambient Piano', 'Glass Grand', 'Soft Drama', 'Soft Piano', 'Subdued Piano', 'Studio Concert',
+    // the piano played from measurements of a real one (engine/calibratedPiano.js)
+    'Studio Concert v2',
+    // the same, measured from six more sampled pianos
+    'Ambient Piano v2', 'Soft Drama v2', 'Glass Grand v2', 'House Piano', 'Ravel', 'Subdued Piano v2',
+    'Soft Piano v2',
+    'Felted Piano v2',
 ];
 const PRESET_BITS = 8;
 // Preset index meaning "a generated sound" (soundGen.js v1): followed by
