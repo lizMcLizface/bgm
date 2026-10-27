@@ -581,3 +581,10 @@ label.inline.toggle{min-height:32px;}label.inline.toggle em{font-style:normal;co
 .tuning-note::before{content:'';position:absolute;left:0;right:0;top:46px;border-top:1px solid var(--line);}
 .tuning-note i.flat{background:#5b8fd9;top:46px;}.tuning-note i.sharp{background:var(--amber);bottom:74px;}
 .tuning-note b{margin-top:auto;font-weight:600;color:var(--cream);}
+
+.strings .spectrogram{margin:8px 0;}
+.strings .spectrogram figcaption{font-size:12px;opacity:.8;margin-bottom:2px;}
+.strings table.levels{font-size:12px;border-collapse:collapse;margin-top:8px;}
+.strings table.levels th,.strings table.levels td{padding:2px 10px;text-align:right;font-weight:normal;}
+.strings table.levels thead th{opacity:.7;}
+.strings label.check{display:flex;align-items:center;gap:6px;}
