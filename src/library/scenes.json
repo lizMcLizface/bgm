@@ -16645,6 +16645,265 @@
         "bass": "Warm Bass",
         "lead": "Celesta"
       }
+    },
+    {
+      "name": "Outrun After Midnight",
+      "category": "electronic",
+      "blurb": "Eighties machine pop: a gated snare and clap, eighth-note bass pulse, a saw chord and an outrun lead, with a tom fill closing each phrase, under a neon skyline",
+      "tags": [
+        "synthwave",
+        "drums"
+      ],
+      "settings": {
+        "humanize": {
+          "timing": 5,
+          "velocity": 0.07,
+          "detune": 2
+        },
+        "volumes": {
+          "pad": 0.7,
+          "bass": 0.72,
+          "lead": 0.62,
+          "counter": 0.45,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "dynamics": {
+          "level": 0.95,
+          "range": 0.8,
+          "attack": 0.3,
+          "brightness": 0.4
+        },
+        "rubato": 0.1,
+        "ornaments": 0.15,
+        "ducking": 0.5,
+        "evenLoudness": 0.6,
+        "sectionSpace": 0.4,
+        "keyLift": 0,
+        "timbreDrift": 0.3,
+        "leadLeaps": 0.34,
+        "leadRepeat": 0.42,
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "tonic": 9,
+        "mode": "Major-6",
+        "bpm": 108,
+        "progression": 7,
+        "barsPerChord": 1,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 40,
+          "pulse": 35,
+          "arpeggio": 25,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 30,
+          "walking": 0,
+          "drive": 70
+        },
+        "drums": {
+          "style": "synthwave",
+          "activity": 0.7,
+          "variation": 0.55,
+          "sprinkle": 0.1,
+          "kit": "tr808"
+        },
+        "leadActivity": 0.65,
+        "leadDensity": 0.3,
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.2
+        }
+      },
+      "voices": {
+        "pad": "Soft Saw Lead",
+        "bass": "Neon Pulse Bass",
+        "lead": "Outrun Lead"
+      }
+    },
+    {
+      "name": "Rainfall Breaks",
+      "category": "electronic",
+      "blurb": "Drum and bass at 170: a rolling broken beat with ghost snares under a plucked arpeggio and a sub bass, a bright lead answered by a kalimba, rain on a neon skyline. Its half-time groove drops the snare to 3 for sixteen bars at a time",
+      "tags": [
+        "dnb",
+        "drums"
+      ],
+      "settings": {
+        "humanize": {
+          "timing": 5,
+          "velocity": 0.07,
+          "detune": 2
+        },
+        "volumes": {
+          "pad": 0.7,
+          "bass": 0.8,
+          "lead": 0.58,
+          "counter": 0.35,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "dynamics": {
+          "level": 0.95,
+          "range": 0.8,
+          "attack": 0.3,
+          "brightness": 0.4
+        },
+        "rubato": 0.1,
+        "ornaments": 0.15,
+        "ducking": 0.5,
+        "evenLoudness": 0.6,
+        "sectionSpace": 0.4,
+        "keyLift": 0,
+        "timbreDrift": 0.3,
+        "leadLeaps": 0.34,
+        "leadRepeat": 0.42,
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "tonic": 4,
+        "mode": "Major-6",
+        "bpm": 170,
+        "progression": 6,
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 30,
+          "arpeggio": 30,
+          "sequence": 40,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 55,
+          "half": 45,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "breaks",
+          "activity": 0.8,
+          "variation": 0.6,
+          "sprinkle": 0.1,
+          "kit": "tr808"
+        },
+        "leadActivity": 0.6,
+        "leadDensity": 0.45,
+        "counter": {
+          "mode": "answer",
+          "activity": 0.4
+        }
+      },
+      "voices": {
+        "pad": "Galaxy Arp",
+        "bass": "Sub Bass",
+        "lead": "Glass Lead",
+        "counter": "Kalimba Pluck"
+      }
+    },
+    {
+      "name": "Wet Pavement Two-Step",
+      "category": "electronic",
+      "blurb": "UK garage at 130: skipping kicks around a snare on 2 and 4, off-beat hats and a shaker, Rhodes chords and a rubber bass, rain on the city",
+      "tags": [
+        "garage",
+        "drums"
+      ],
+      "settings": {
+        "humanize": {
+          "timing": 5,
+          "velocity": 0.07,
+          "detune": 2
+        },
+        "volumes": {
+          "pad": 0.7,
+          "bass": 0.72,
+          "lead": 0.62,
+          "counter": 0.45,
+          "perc": 0.5
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "dynamics": {
+          "level": 0.95,
+          "range": 0.8,
+          "attack": 0.3,
+          "brightness": 0.4
+        },
+        "rubato": 0.1,
+        "ornaments": 0.15,
+        "ducking": 0.5,
+        "evenLoudness": 0.6,
+        "sectionSpace": 0.4,
+        "keyLift": 0,
+        "timbreDrift": 0.3,
+        "leadLeaps": 0.34,
+        "leadRepeat": 0.42,
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "tonic": 2,
+        "mode": "Major-2",
+        "bpm": 130,
+        "progression": 1,
+        "barsPerChord": 1,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 30,
+          "pulse": 40,
+          "arpeggio": 0,
+          "sequence": 0,
+          "rolled": 30,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 60,
+          "walking": 0,
+          "drive": 40
+        },
+        "drums": {
+          "style": "twostep",
+          "activity": 0.65,
+          "variation": 0.55,
+          "sprinkle": 0.1,
+          "kit": "tr808"
+        },
+        "leadActivity": 0.55,
+        "leadDensity": 0.3,
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.25
+        }
+      },
+      "voices": {
+        "pad": "FM Rhodes",
+        "bass": "Rubber Bass",
+        "lead": "Kalimba Pluck"
+      }
     }
   ]
 }

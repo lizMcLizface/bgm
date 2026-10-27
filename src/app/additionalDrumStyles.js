@@ -2,10 +2,12 @@
 // sound source. This module has no audio dependencies and never consumes
 // the melodic arranger's random stream.
 import {seeded} from './random';
-import {beatStarts} from './meter';
+import {beatStarts,groupStarts} from './meter';
 
 export const ADDITIONAL_DRUM_STYLES = {
     bossa:'Bossa / light Latin', jazz:'Jazz lounge', broken:'Broken beat', ambient:'Ambient percussion', hand:'Hand-percussion groove',
+    // Appended after the released styles. The share link keeps four bits for the style: sixteen in all, so three are left.
+    twostep:'Two-step garage', breaks:'Breakbeat / drum and bass', synthwave:'Synthwave',
 };
 export const DRUM_STYLE_NOTES = {
     bossa:'A two-bar clave with soft syncopated bass and shaker.',
@@ -13,6 +15,9 @@ export const DRUM_STYLE_NOTES = {
     broken:'Displaced kicks and backbeats, with gaps between the hats.',
     ambient:'A sparse four-bar texture of isolated taps and swells, without a repeating backbeat.',
     hand:'Interlocking low and high hand-drum roles, wood and seed shaker. Try the Hand percussion voice.',
+    twostep:'Skipping kicks around a snare on 2 and 4, with off-beat hats and a quiet shaker: UK garage at 120-135.',
+    breaks:'A broken kick and snare with ghost notes between: a rolling breakbeat, or at 165-175 BPM drum and bass (the half-time variant puts the snare on 3).',
+    synthwave:'Eighties machine pop: a gated snare with a clap on 2 and 4, hats in eighths, and a tom fill at the end of a phrase. One variant plays four on the floor.',
 };
 const clamp=(n,lo=0,hi=1)=>Math.max(lo,Math.min(hi,n));
 export function additionalDrumBar({bar,meter,drums,section,sectionsMode,sectionBars=16,phraseStart=bar-bar%4,phraseBars=4,
@@ -72,6 +77,53 @@ export function additionalDrumBar({bar,meter,drums,section,sectionsMode,sectionB
         }
         // A colour budget, not a hidden hi-hat clock or generic drum fill.
         if(embellish&&!sparse&&activity>0&&rng()<activity*variation*.45)hit('shaker',at(.875),.1);
+    }else if(drums.style==='twostep'||drums.style==='breaks'||drums.style==='synthwave'){
+        // Figures are sixteenth-step numbers 0..15 of a 4/4 bar. Other meters scale them for the
+        // syncopation, but backbeats and the main kicks follow the bar's own groups (as in
+        // percussionLatest.js: 7/8 kicks on 0 and 4, snares on 2 and 6).
+        const step=list=>list.map(n=>n/16), odd=bar%2===1, four=units===4&&unit===1;
+        const later=groupStarts(meter).slice(1);
+        const backbeats=four?[1,3]:unit===2?(units===7?[2,6]:[3]):later.length?later:beats.slice(1);
+        const anchors=four?[0]:unit===2&&units===7?[0,4]:[0];
+        const kicks=list=>four?step(list):[...anchors,...step(list).filter(f=>{const p=at(f,true);return !anchors.includes(p)&&backbeats.every(b=>Math.abs(b-p)>=eighth*.75);}).slice(0,3)];
+        const snare=(name,level)=>backbeats.forEach(b=>hit(name,b,level,true));
+        const offbeats=(name,level)=>{for(let beat=0;beat<units;beat+=eighth)if(!beats.includes(beat))hit(name,beat,level);};
+        const eighths=(name,level,accent)=>{for(let beat=0;beat<units;beat+=eighth)hit(name,beat,level*(beats.includes(beat)?accent:1));};
+        if(drums.style==='twostep'){
+            positions('kick',kicks([[0,7,10],[0,6,11],[0,3,10]][variant].concat(odd&&variant!==2?[14]:[])),.5,true,true);
+            snare('brush',.4);
+            if(variant===2)positions('rim',step([7]),.16,false,true);
+            if(!sparse){
+                offbeats('hat',.2);
+                if(variant!==1)positions('brush',step([[15],[],[9]][variant]),.12,false,true);
+                eighths('shaker',.07,.6);
+            }
+        }else if(drums.style==='breaks'){
+            const half=variant===2;
+            positions('kick',kicks([[0,10],[0,3,10],[0,7,10]][variant].concat(odd?[variant===0?13:14]:[])),.52,true,true);
+            if(half)hit('snare',four?2:backbeats[Math.floor((backbeats.length-1)/2)],.46,true);else snare('snare',.46);
+            if(!sparse){
+                // ghost notes between the backbeats
+                positions('snare',step([[7,15],[7,9,15],[4,15]][variant]),.13,false,true);
+                eighths('hat',.17,.7);
+                if(odd)positions('hat',step([13,14,15]),.1,false,true);
+            }
+        }else{
+            const floor=variant===2;
+            // four on the floor: a kick on every felt beat, whatever the meter
+            if(floor&&!four)beats.forEach(b=>hit('kick',b,.54,true));
+            else positions('kick',kicks(floor?[0,4,8,12]:[[0,8,11],[0,6,8,14]][variant]),.54,true,true);
+            snare('snare',.44);snare('clap',.22);
+            if(!sparse){
+                eighths('hat',.19,.75);
+                if(floor)offbeats('hat',.25);
+                else if(variant===1)positions('rim',step([15]),.13,false,true);
+            }
+            // a tom fill closing the phrase, running down the last beat
+            if(embellish&&!sparse&&bar-phraseStart===phraseBars-1&&activity>.2&&rng()<activity*(.35+variation*.6)){
+                step([12,13,14,15]).forEach((f,i)=>hit('tom',at(f,true),.3-i*.03,false,.2));
+            }
+        }
     }else if(drums.style==='hand'){
         positions('kick',[[0,.75],[.125,.5],[0,.625]][variant],.46,true);
         positions('brush',[[.375,.875],[.25,.75],[.375]][variant],.29,true);

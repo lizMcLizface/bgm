@@ -37,7 +37,7 @@ test('new styles are deterministic, bounded and distinct in every supported mete
    }
    expect(new Set(variants).size).toBe(3);firsts.push(variants[0]);
   }
-  expect(new Set(firsts).size).toBe(5);
+  expect(new Set(firsts).size).toBe(Object.keys(ADDITIONAL_DRUM_STYLES).length);
  }
 });
 

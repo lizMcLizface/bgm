@@ -144,6 +144,9 @@ const BY_NAME = {
     'Bossa in Seven': L('city', 'sparse', 19, 1.2, DUSK),
     'Demo: Bass figures': L('room', 'sparse', 15, 0.8),
     'Neon Overpass': L('city', 'clear', 22, 2.2, { ...NIGHT, look: { neon: true } }),
+    'Outrun After Midnight': L('city', 'clear', 23, 1.5, { ...NIGHT, look: { neon: true } }),
+    'Rainfall Breaks': L('city', 'rain', 1, 2.2, { ...LATE, look: { neon: true } }),
+    'Wet Pavement Two-Step': L('city', 'rain', 20, 2.6, EVENING),
     'Demo: Low note, then chord': L('lake', 'storm', 22, 1.8, { hours: [18, 4] }),
     'Demo: Struck leads, no trills': L('garden', 'sparse', 10, 0.4),
 };
