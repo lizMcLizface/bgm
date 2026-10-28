@@ -105,7 +105,7 @@ const BY_NAME = {
     'Replicant Blues': L('street', 'rain', 23, 2.6, NIGHT),
     'Tears in Weather': L('street', 'rain', 0.5, 3, NIGHT),
     'Oxygen Debt': L('industrial', 'haze', 4, 2),
-    'Oxygene Sunrise': L('lake', 'haze', 6, 0.3, DAWN),
+    'Oxygene Sunrise': L('floating', 'haze', 6, 0.3, DAWN),
     'Real Hero Hours': L('synth', 'scattered', 20, 1.5, DUSK),
     'Getaway Driver, Off Duty': L('synth', 'clear', 21, 1.4, NIGHT),
     'Nightcall, Voicemail': L('street', 'clear', 2.5, 1.5, LATE),
@@ -117,7 +117,7 @@ const BY_NAME = {
     'Pocket Circuit': L('synth', 'clear', 16, 1.5),
     'Orbital Afterglow': L('starship', 'clear', 20, 1.3),
     'Long Way to Sunrise': L('train', 'streaks', 5.5, 0.5, { hours: [3.5, 8.5] }),
-    'Rooms Above the Clouds': L('alpine', 'towering', 16, 1),
+    'Rooms Above the Clouds': L('floating', 'sparse', 16.5, 1, { hours: [8, 20.5] }),
 
     'Glass Conservatory': L('jungle', 'sparse', 11, 0.6),
     'Tine and Tide': L('harbour', 'scattered', 10, 0.7),

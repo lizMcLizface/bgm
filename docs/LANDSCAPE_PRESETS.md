@@ -112,7 +112,7 @@ Plotting a Course drops the deck for open space; Neon Overpass lights the city s
 | Replicant Blues | Rainy neon street | Rain | 23:00, late autumn | 20:00–05:00 |
 | Tears in Weather | Rainy neon street | Rain | 00:30, early winter | 20:00–05:00 |
 | Oxygen Debt | Industrial | Haze | 04:00, early autumn | — |
-| Oxygene Sunrise | Mountain lake | Haze | 06:00, early spring | 04:30–09:00 |
+| Oxygene Sunrise | Floating island | Haze | 06:00, early spring | 04:30–09:00 |
 | Real Hero Hours | Synthwave | Scattered clouds | 20:00, late summer | 16:30–21:30 |
 | Getaway Driver, Off Duty | Synthwave | Clear | 21:00, early summer | 20:00–05:00 |
 | Nightcall, Voicemail | Rainy neon street | Clear | 02:30, late summer | 21:00–03:30 |
@@ -123,7 +123,7 @@ Plotting a Course drops the deck for open space; Neon Overpass lights the city s
 | Pocket Circuit | Synthwave | Clear | 16:00, late summer | — |
 | Orbital Afterglow | Observation deck | Clear | 20:00, early summer | — |
 | Long Way to Sunrise | Train window | High streaks | 05:30, late spring | 03:30–08:30 |
-| Rooms Above the Clouds | Alpine peaks | Towering clouds | 16:00, early summer | — |
+| Rooms Above the Clouds | Floating island | Sparse clouds | 16:30, early summer | 08:00–20:30 |
 | Glass Conservatory | Jungle | Sparse clouds | 11:00, late spring | — |
 | Tine and Tide | Harbour town | Scattered clouds | 10:00, late spring | — |
 | Lantern Circuit | Blossom garden | Clear | 21:00, late summer | 20:00–05:00 |
@@ -173,13 +173,14 @@ page's Look menu. A new landscape starts in `DRAFT_BIOME_NAMES` in
 
 | Landscape | What is in it | Presets using it |
 |---|---|---|
-| Alpine peaks | a tall snowy massif, a rockier range, an alpine meadow, a chalet, boulders, a green shoulder | Five Notes Only, Rooms Above the Clouds |
+| Alpine peaks | a tall snowy massif, a rockier range, an alpine meadow, a chalet, boulders, a green shoulder | Five Notes Only |
 | Tundra | a cold climate (snow from mid autumn to late spring), stunted spruces, a lake that freezes, aurora | Deep night, Slow motion |
 | Swamp | channels between mossy hummocks, cypresses on arching roots, hanging moss, snags, lily pads, fireflies, fog | Damp Crater, Gentle drizzle |
 | Volcano | a cone with a glowing crater, lava flows, an ash plume lit from below, embers, a cracked lava field, a red night sky | Dark Mirror Dimension, Boss Fight, Politely |
 | Synthwave | a neon horizon at every hour: a huge striped sun with a halo (sunset, magenta or rose), glowing bands and stars, a city silhouette, wireframe pyramids or cloud banks, a scrolling grid floor with a centre line or a winding glowing road | Night drive, Real Hero Hours, Getaway Driver, Off Duty, Outrun Lullaby, Pocket Circuit |
 | Alien planet | a black sky by day, a ringed planet and a moon, craters, a domed outpost with a blinking mast | Mild Vacuum, Altman |
 | Campfire clearing | a fire with flames, embers and a pool of light, a stone ring, a log seat, a tent, forest around | Fireside folk, Campfire, Bonfire Rest |
+| Floating island | a lens of layered rock and meadow with roots hanging from its underside over a sea of cloud, a pond and stream that spill off the edge as a waterfall into the cloud, trees, sometimes an old arch with a glowing portal, crystals and rising motes that glow after dark, small hazy islets (some with threadlike falls) in the distance ([skyisles.js](../src/scenery/skyisles.js)) | Rooms Above the Clouds, Oxygene Sunrise |
 | Harbour town | a bay with the town on both shores, a steep hillside town or a long waterfront; houses of one to four storeys with gable, hipped or flat roofs, gardens and cypresses, a domed church, a bell tower or a hilltop fort, a breakwater whose lighthouse sweeps the water at night, fishing boats and yachts | Choir at sea, Seaside Hearth, Island Shop Hours, Tine and Tide, Rolling surf |
 | Jungle | a green-all-year climate, misty ridges of canopy with trees standing out of it, a mossy outcrop with a waterfall into a pool, creepers, ferns and broad leaves | Soggy Home Planet, Glass Conservatory |
 | Castle on the hill | a castle on a hill in the middle distance: curtain wall, a keep, round towers with conical roofs or battlements, a gatehouse, flags, ivy, windows lit at night (sometimes a roofless ruin), a path winding up to it | Chapel organ, Haunted Staircase, Heroic Field Trip, Ruins in the Drizzle, Piano and Clarinet, Cinematic |

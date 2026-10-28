@@ -29,6 +29,7 @@ export const BIOME_NAMES = {
     room: 'Window view',
     cafe: 'Café',
     planet: 'Alien planet',
+    floating: 'Floating island',
     starship: 'Observation deck',
 };
 
