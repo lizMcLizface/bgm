@@ -24,3 +24,5 @@ banks/
 rain_synth/reference/
 rain_synth/bands/
 rain_synth/*_demo.wav
+
+docs/ref/
