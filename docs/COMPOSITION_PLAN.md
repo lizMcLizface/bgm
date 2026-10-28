@@ -292,6 +292,16 @@ or v1 copies).
 - **Use now.** Demo: Generated chords only. **Could benefit.** Deep night, Slow motion, Getaway Driver, Outrun After Midnight, Neon Overpass, Morning coffee,
   Heroic Field Trip, Fireside folk, Wet Pavement Two-Step; start with `wistful` or `dreamy` and wander .5.
 
+### Seeded on 28 October 2026 (starting amounts, from the "could benefit" lists; heard in general, not preset by preset)
+- `leadInertia` .4: Fireside folk, Nervous Chicken Village, Slightly Lost Forest, Quiet-room waltz, Bittersweet Sunday, Mushroom Kingdom Commute, Heroic Field Trip, Tears in Weather, Sunday Reading, Solo Grand, Pure Piano.
+- `padContour` .4: Wide Open Plains, Choir at sea, Seaside Hearth, Chapel organ, Piano and Pads, Real Hero Hours, Outrun Lullaby, Oxygene Sunrise, Boss Fight Politely, Heroic Field Trip.
+- `leadTendency` .5 (Pint-Sized Saloon .3): Fireside folk, Quiet-room waltz, Heroic Field Trip, Solo Grand, Pure Piano, Tears in Weather.
+- `bassEuclid` .3: Pastel Coastline, Island Shop Hours, Turnip Town, Sunrise in seven (their hidden comparison variants share it).
+- `padVibrato` .3: Deep night, Slow motion, Breathing room, Mild Vacuum, Dig Straight Down, Lamplight, Wide Open Plains, Seaside Hearth, Tears in Weather, Oxygene Sunrise, Real Hero Hours, Outrun Lullaby, Getaway Driver, Nightcall, Altman.
+- `leadSyncopation` added: Bittersweet Sunday and Quiet-room waltz .15, Fireside folk .1, Clockwork, Glass garden and Sunrise in seven .2.
+- Generated progressions (`dreamy`, wander .5): Deep night and Slow motion only. `borrowStyle` is not seeded (no preset has borrowing on).
+- Not seeded: `padRoot` and `chordSize` beyond the earlier 38 and 15, and Demo presets, which stay as they were.
+
 The same information is in code form in `src/app/rulebook/suitability.js` (`SUITABILITY`, `suggestRules`), with a test that
 keeps it consistent with the rulebook and the preset library. Add an entry there whenever a rule is added above.
 

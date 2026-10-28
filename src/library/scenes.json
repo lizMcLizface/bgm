@@ -349,6 +349,10 @@
       "category": "night",
       "blurb": "A slow breathing pad, bells and a heartbeat under distant thunder",
       "settings": {
+        "padVibrato": 0.3,
+        "progressionMode": "generated",
+        "progressionMood": {"brightness": 0.1, "stability": 0.3, "adventure": 0.5},
+        "progressionWander": 0.5,
         "tonic": 9,
         "mode": "Major-6",
         "bpm": 58,
@@ -435,6 +439,7 @@
       "category": "focus",
       "blurb": "Bright Lydian chimes and marimba over a shaker and waves",
       "settings": {
+        "leadSyncopation": 0.2,
         "tonic": 4,
         "mode": "Major-4",
         "bpm": 92,
@@ -621,6 +626,7 @@
       "category": "night",
       "blurb": "A tremolo organ and a flute, wind around the walls",
       "settings": {
+        "padContour": 0.4,
         "tonic": 7,
         "mode": "Major-1",
         "bpm": 66,
@@ -701,6 +707,9 @@
       "category": "cozy",
       "blurb": "A harp in 3/4, an upright bass and an ocarina by the fire",
       "settings": {
+        "leadInertia": 0.4,
+        "leadTendency": 0.5,
+        "leadSyncopation": 0.1,
         "tonic": 2,
         "mode": "Pentatonic-1",
         "bpm": 88,
@@ -999,6 +1008,7 @@
       "category": "night",
       "blurb": "Voices and a reed over long Mixolydian chords and waves",
       "settings": {
+        "padContour": 0.4,
         "tonic": 9,
         "mode": "Major-5",
         "bpm": 64,
@@ -1260,6 +1270,7 @@
       "category": "focus",
       "blurb": "A music box in 5/4 with bells and a ticking shaker",
       "settings": {
+        "leadSyncopation": 0.2,
         "tonic": 9,
         "mode": "Major-1",
         "bpm": 80,
@@ -1340,6 +1351,10 @@
       "category": "night",
       "blurb": "Shimmer and a dark drone, very slow, sections that open and close",
       "settings": {
+        "padVibrato": 0.3,
+        "progressionMode": "generated",
+        "progressionMood": {"brightness": 0.1, "stability": 0.3, "adventure": 0.5},
+        "progressionWander": 0.5,
         "tonic": 5,
         "mode": "Major-4",
         "bpm": 52,
@@ -1637,6 +1652,9 @@
       "category": "cozy",
       "blurb": "Tine keys in 3/4, a felt bass and a clarinet, brushed lightly",
       "settings": {
+        "leadInertia": 0.4,
+        "leadTendency": 0.5,
+        "leadSyncopation": 0.15,
         "tonic": 5,
         "mode": "Major-1",
         "bpm": 76,
@@ -1884,6 +1902,7 @@
       "category": "night",
       "blurb": "Long slow sweeps over four-bar chords, a heartbeat, a whistle now and then",
       "settings": {
+        "padVibrato": 0.3,
         "tonic": 4,
         "mode": "Major-6",
         "bpm": 56,
@@ -1974,6 +1993,8 @@
       "category": "focus",
       "blurb": "Major pentatonic in 7/4: a glass pad, an ocarina and a kalimba answering",
       "settings": {
+        "bassEuclid": 0.3,
+        "leadSyncopation": 0.2,
         "tonic": 7,
         "mode": "Pentatonic-1",
         "bpm": 84,
@@ -2331,6 +2352,7 @@
         "ambient"
       ],
       "settings": {
+        "padVibrato": 0.3,
         "tonic": 9,
         "mode": "Major-2",
         "bpm": 70,
@@ -3973,6 +3995,9 @@
         "adventure"
       ],
       "settings": {
+        "leadInertia": 0.4,
+        "padContour": 0.4,
+        "leadTendency": 0.5,
         "tonic": 10,
         "mode": "Major-1",
         "bpm": 124,
@@ -4202,6 +4227,7 @@
         "forest"
       ],
       "settings": {
+        "leadInertia": 0.4,
         "tonic": 2,
         "mode": "Major-2",
         "bpm": 123,
@@ -4429,6 +4455,7 @@
         "village"
       ],
       "settings": {
+        "leadInertia": 0.4,
         "tonic": 5,
         "mode": "Major-1",
         "bpm": 84,
@@ -4869,6 +4896,7 @@
         "farm"
       ],
       "settings": {
+        "bassEuclid": 0.3,
         "tonic": 7,
         "mode": "Major-1",
         "bpm": 104,
@@ -5127,6 +5155,7 @@
         "updated"
       ],
       "settings": {
+        "leadTendency": 0.3,
         "tonic": 0,
         "mode": "Major-1",
         "bpm": 116,
@@ -5397,6 +5426,7 @@
         "underground"
       ],
       "settings": {
+        "padVibrato": 0.3,
         "tonic": 2,
         "mode": "Major-6",
         "bpm": 66,
@@ -7819,6 +7849,7 @@
       "category": "focus",
       "blurb": "Warm organ and a slow felt bass, hardly any melody",
       "settings": {
+        "leadInertia": 0.4,
         "tonic": 0,
         "mode": "Major-1",
         "bpm": 68,
@@ -7977,6 +8008,7 @@
       "category": "cozy",
       "blurb": "Music-box notes over a slow pad, a quiet fire nearby",
       "settings": {
+        "padVibrato": 0.3,
         "tonic": 2,
         "mode": "Major-1",
         "bpm": 60,
@@ -8068,6 +8100,7 @@
         "bouncy"
       ],
       "settings": {
+        "leadInertia": 0.4,
         "tonic": 0,
         "mode": "Major-1",
         "bpm": 128,
@@ -8711,6 +8744,7 @@
         "epic"
       ],
       "settings": {
+        "padContour": 0.4,
         "tonic": 2,
         "mode": "Major-6",
         "bpm": 148,
@@ -8906,6 +8940,7 @@
         "updated"
       ],
       "settings": {
+        "bassEuclid": 0.3,
         "tonic": 5,
         "mode": "Major-1",
         "bpm": 100,
@@ -9350,6 +9385,8 @@
         "calm"
       ],
       "settings": {
+        "padContour": 0.4,
+        "padVibrato": 0.3,
         "tonic": 9,
         "mode": "Major-6",
         "bpm": 60,
@@ -9564,6 +9601,8 @@
         "nostalgic"
       ],
       "settings": {
+        "leadInertia": 0.4,
+        "leadSyncopation": 0.15,
         "tonic": 7,
         "mode": "Major-1",
         "bpm": 78,
@@ -9820,6 +9859,8 @@
         "cinematic"
       ],
       "settings": {
+        "padContour": 0.4,
+        "padVibrato": 0.3,
         "tonic": 9,
         "mode": "Major-1",
         "bpm": 70,
@@ -10343,6 +10384,9 @@
       ],
       "blurb": "Blade Runner · quieter neon-noir: low, lingering synth phrases, luminous glass chords and a distant brass answer",
       "settings": {
+        "leadInertia": 0.4,
+        "leadTendency": 0.5,
+        "padVibrato": 0.3,
         "tonic": 2,
         "mode": "Major-6",
         "bpm": 50,
@@ -10699,6 +10743,8 @@
       ],
       "blurb": "Dorian drift: slow swells, a ghostly sweep and the sea breathing underneath",
       "settings": {
+        "padContour": 0.4,
+        "padVibrato": 0.3,
         "tonic": 7,
         "mode": "Major-2",
         "bpm": 88,
@@ -10791,6 +10837,8 @@
       ],
       "blurb": "A quiet night drive: glassy pads, a hushed pulse and one long note at a time",
       "settings": {
+        "padContour": 0.4,
+        "padVibrato": 0.3,
         "tonic": 9,
         "mode": "Major-6",
         "bpm": 72,
@@ -10885,6 +10933,7 @@
       ],
       "blurb": "City lights going past: a steady electro pulse, cool pads and a soft lead",
       "settings": {
+        "padVibrato": 0.3,
         "tonic": 6,
         "mode": "Major-6",
         "bpm": 100,
@@ -10983,6 +11032,7 @@
       ],
       "blurb": "Half-time synthwave: a pumping saw bass, fat detuned pads and a bright neon lead",
       "settings": {
+        "padVibrato": 0.3,
         "tonic": 9,
         "mode": "Major-6",
         "bpm": 91,
@@ -11086,6 +11136,8 @@
       ],
       "blurb": "The same neon, turned right down: soft pulse, wide pads and a long echo",
       "settings": {
+        "padContour": 0.4,
+        "padVibrato": 0.3,
         "tonic": 4,
         "mode": "Major-6",
         "bpm": 82,
@@ -11182,6 +11234,7 @@
         "unsettling"
       ],
       "settings": {
+        "padVibrato": 0.3,
         "tonic": 2,
         "mode": "Major-6",
         "bpm": 54,
@@ -11520,6 +11573,7 @@
         "nostalgic"
       ],
       "settings": {
+        "bassEuclid": 0.3,
         "tonic": 6,
         "mode": "Major-6",
         "bpm": 100,
@@ -13228,6 +13282,7 @@
         "cozy"
       ],
       "settings": {
+        "bassEuclid": 0.3,
         "tonic": 5,
         "mode": "Major-1",
         "bpm": 100,
@@ -13478,6 +13533,10 @@
       "category": "night",
       "blurb": "Isolated felt taps and soft swells in place of the repeating heartbeat.",
       "settings": {
+        "padVibrato": 0.3,
+        "progressionMode": "generated",
+        "progressionMood": {"brightness": 0.1, "stability": 0.3, "adventure": 0.5},
+        "progressionWander": 0.5,
         "tonic": 9,
         "mode": "Major-6",
         "bpm": 58,
@@ -13815,6 +13874,7 @@
         "nostalgic"
       ],
       "settings": {
+        "bassEuclid": 0.3,
         "tonic": 6,
         "mode": "Major-6",
         "bpm": 100,
@@ -16130,6 +16190,8 @@
       ],
       "blurb": "Just a concert grand: rolled chords and a quiet melody, nothing else",
       "settings": {
+        "leadInertia": 0.4,
+        "leadTendency": 0.5,
         "tonic": 7,
         "mode": "Major-1",
         "bpm": 66,
@@ -16300,6 +16362,7 @@
       ],
       "blurb": "A grand piano singing over slow pads: soft, wide and ambient",
       "settings": {
+        "padContour": 0.4,
         "tonic": 5,
         "mode": "Major-4",
         "bpm": 54,
@@ -16825,6 +16888,8 @@
       ],
       "blurb": "Only a grand piano: slow chords, a low line beneath and a quiet melody, no pads and nothing else",
       "settings": {
+        "leadInertia": 0.4,
+        "leadTendency": 0.5,
         "tonic": 7,
         "mode": "Major-1",
         "bpm": 66,
