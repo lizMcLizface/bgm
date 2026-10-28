@@ -224,6 +224,12 @@ Compare with the published values, then with the presets you consider best, and 
 the gaps to choose weights. The listening gate stays: numbers show what to try, not
 whether it sounds good.
 
+First run (28 October 2026): `npm run audit:composition`, results and the plan changes they
+imply in [COMPOSITION_AUDIT.md](COMPOSITION_AUDIT.md). Measured so far: intervals, direction,
+degree profile, phrase endings, syncopation, chord roots and motion, pitch-class circulation,
+exact repeats, low-register spacing and mood cues. Not yet: counter line, n-gram surprise,
+Longuet-Higgins & Lee syncopation, seam scores.
+
 ## 5. What changed from the first version of this document
 - **Dropped:** a directional predominant→dominant→tonic role table as the default.
   The rock-harmony corpus shows symmetric, distance-weighted motion; directional

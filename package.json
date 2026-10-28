@@ -32,6 +32,7 @@
     "audit:synth-stress": "node tools/auditSynthStress.mjs",
     "audit:synth-ensemble": "node tools/auditSynthEnsemble.mjs",
     "audit:synth-spectrum": "node tools/auditSynthSpectrum.mjs",
+    "audit:composition": "vitest run --config tools/vitest.audit.config.js tools/compositionAudit.audit.js",
     "audit:percussion": "node tools/auditPercussionEngine.mjs",
     "audit:percussion-playback": "node tools/auditPercussionPlayback.mjs",
     "audit:percussion-palette": "node tools/auditPercussionPalette.mjs",
