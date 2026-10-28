@@ -1626,3 +1626,56 @@ describe('a busier feel on drums', () => {
         expect(busy.filter((e) => e.ghost).every((e) => e.velocity < 0.6)).toBe(true);
     });
 });
+
+describe('generated progressions', () => {
+    const plan = (extra, bars = 48) => {
+        const g = new Generator({ ...defaultSettings(), seed: 11, tonic: 0, mode: 'Major-1', progression: 0, barsPerChord: 1, sections: { mode: 'off', phrases: 2 }, ...extra });
+        const p = g.planner();
+        for (let bar = 0; bar < bars; bar++) p.planBar(bar);
+        return [...p.plan.values()].sort((a, z) => a.bar - z.bar);
+    };
+    const names = (bars) => bars.map((b) => b.chord.name);
+
+    test('bank mode is untouched by the new settings', () => {
+        expect(names(plan({ progressionMode: 'bank' }))).toEqual(names(plan({})));
+        expect(plan({}).every((b) => b.music.numerals === undefined)).toBe(true);
+    });
+
+    test('a generated plan has chords of the bank progression length, deterministic for a seed', () => {
+        const a = plan({ progressionMode: 'generated' });
+        expect(names(plan({ progressionMode: 'generated' }))).toEqual(names(a));
+        const cycle = PROGRESSIONS[0].length;
+        expect(a[0].music.numerals).toHaveLength(cycle);
+        a.forEach((b) => { expect(b.chord.pitchClasses.length).toBeGreaterThanOrEqual(3); expect(b.chord.name).toBeTruthy(); });
+    });
+
+    test('with no wander the first generated cycle repeats for ever; with full wander the cycles change', () => {
+        const cycle = PROGRESSIONS[0].length;
+        const fixed = names(plan({ progressionMode: 'generated', progressionWander: 0 }));
+        for (let i = 0; i < fixed.length - cycle; i++) expect(fixed[i + cycle]).toBe(fixed[i]);
+        const moving = names(plan({ progressionMode: 'generated', progressionWander: 1 }, 96));
+        const cycles = new Set(); for (let i = 0; i + cycle <= moving.length; i += cycle) cycles.add(moving.slice(i, i + cycle).join('|'));
+        expect(cycles.size).toBeGreaterThan(3);
+    });
+
+    test('a floating mood never plays the tonic chord and marks the harmony unresolved', () => {
+        const bars = plan({ progressionMode: 'generated', progressionWander: 1, progressionMood: { brightness: 0, stability: 0.05, adventure: 0.5 } }, 64);
+        expect(bars.every((b) => b.music.unsettled === true)).toBe(true);
+        expect(bars.every((b) => b.chord.numeral !== 'I')).toBe(true);
+        expect(bars.every((b) => b.chord.unresolved === true)).toBe(true);
+    });
+
+    test('a settled mood keeps the tonic in every cycle; dark moods borrow flat chords more than bright ones', () => {
+        const settled = plan({ progressionMode: 'generated', progressionWander: 1, progressionMood: { brightness: 0, stability: 0.9, adventure: 0.3 } }, 64);
+        const cycle = PROGRESSIONS[0].length;
+        for (let i = 0; i + cycle <= settled.length; i += cycle) expect(settled.slice(i, i + cycle).some((b) => b.chord.numeral === 'I')).toBe(true);
+        const flats = (brightness) => [11, 12, 13, 14, 15, 16].flatMap((seed) => plan({ seed, progressionMode: 'generated', progressionWander: 1, progressionMood: { brightness, stability: 0.7, adventure: 0.5 } }, 64)).filter((b) => /^b?(VI|VII)|^iv/.test(b.chord.numeral)).length;
+        expect(flats(-0.9)).toBeGreaterThan(flats(0.9));
+    });
+
+    test('a minor key and a non-seven-note scale both plan without error', () => {
+        expect(plan({ progressionMode: 'generated', mode: 'Major-6' }, 32).length).toBe(32);
+        const penta = plan({ progressionMode: 'generated', mode: 'Pentatonic-1' }, 32);
+        expect(penta.length).toBe(32);
+    });
+});

@@ -152,6 +152,115 @@ export function syncopationByBar(bars, roles = ['lead', 'bass', 'perc', 'counter
     });
 }
 
+/**
+ * Longuet-Higgins & Lee (1984) syncopation of one bar of onsets (beats from the bar start, felt-beat units). Every grid
+ * position has a weight by metrical level (bar 0, group starts -1, beats, half-beats, quarter-beats, each one lighter);
+ * a note followed by a rest or tie on a heavier position is a syncopation of strength weight(rest) - weight(note), and
+ * the heaviest silent position before the next onset counts. Simple metres only (the unit is the felt beat).
+ */
+export function lhlSyncopation(onsets, units, groups = [units], grid = 4) {
+    const slots = units * grid, starts = new Set(), lone = groups.length === 1;
+    let at = 0; groups.forEach((g) => { starts.add(at); at += g; });
+    const weight = (slot) => {
+        if (slot === 0) return 0;
+        const pos = slot / grid;
+        if (starts.has(pos)) return -1;
+        let depth = lone ? 1 : 2; // a beat sits below the bar (and below the groups when there are several)
+        if (Number.isInteger(pos)) return -depth;
+        if (Number.isInteger(pos * 2)) return -(depth + 1);
+        return -(depth + 2);
+    };
+    const hit = new Set(onsets.map((o) => Math.round(o * grid)).filter((slot) => slot >= 0 && slot < slots));
+    const marks = [...hit].sort((a, b) => a - b);
+    let total = 0;
+    marks.forEach((slot, i) => {
+        const next = i + 1 < marks.length ? marks[i + 1] : slots;
+        let heaviest = -Infinity;
+        for (let j = slot + 1; j < next; j++) heaviest = Math.max(heaviest, weight(j));
+        if (heaviest > weight(slot)) total += heaviest - weight(slot);
+    });
+    return total;
+}
+
+/** lhlSyncopation for each bar, from the onsets of the given roles. */
+export function lhlByBar(bars, roles = ['lead']) {
+    return bars.map((b) => {
+        if (b.meter.unitsPerBeat !== 1) return { bar: b.bar, score: null, onsets: 0 };
+        const onsets = b.events.filter((e) => roles.includes(e.role)).map((e) => e.beat);
+        return { bar: b.bar, score: lhlSyncopation(onsets, b.meter.units, b.meter.groups), onsets: new Set(onsets.map((o) => Math.round(o * 4))).size };
+    });
+}
+
+/**
+ * Smoothness of the seams where the section changes (Medina-Gray 2019: meter, timbre, pitch-class, dynamics and tempo
+ * continuity). Each aspect is 0..1; `smooth` is their mean. Pitch-class continuity is the share of pitch classes in the
+ * first `ahead` seconds after the seam that were already sounding in the `back` seconds before it (>= .5 is mildly smooth).
+ */
+export function seamScores(bars, unitsPerMinute, { back = 5, ahead = 1, sectionOf = (b) => b.state?.phrase?.section?.type ?? 'none' } = {}) {
+    const seconds = (b) => b.meter.units * 60 / unitsPerMinute(b.meter, b.bpm);
+    const roles = (b) => new Set(b.events.filter((e) => e.role !== 'perc').map((e) => e.role));
+    const level = (b) => mean(b.events.filter((e) => e.role !== 'perc').map((e) => e.velocity));
+    const sameMeter = (a, b) => a.meter.units === b.meter.units && a.meter.unitsPerBeat === b.meter.unitsPerBeat && a.meter.groups.join() === b.meter.groups.join();
+    const seams = [];
+    for (let i = 1; i < bars.length; i++) {
+        const before = bars[i - 1], after = bars[i];
+        if (sectionOf(before) === sectionOf(after)) continue;
+        // the pitch classes of the last `back` seconds, and of the first `ahead` seconds after the seam
+        const prior = new Set(); let t = 0;
+        for (let k = i - 1; k >= 0 && t < back; k--) { b_pcs(bars[k]).forEach((pc) => prior.add(pc)); t += seconds(bars[k]); }
+        const secUnit = 60 / unitsPerMinute(after.meter, after.bpm);
+        const next = after.events.filter((e) => e.role !== 'perc' && e.beat * secUnit < ahead).map((e) => e.midi % 12);
+        const incoming = [...new Set(next)];
+        const rb = roles(before), ra = roles(after), union = new Set([...rb, ...ra]);
+        const shared = [...union].filter((r) => rb.has(r) && ra.has(r)).length;
+        const lb = level(before), la = level(after);
+        const aspects = {
+            meter: sameMeter(before, after) ? 1 : 0,
+            timbre: union.size ? shared / union.size : 1,
+            pitch: incoming.length ? incoming.filter((pc) => prior.has(pc)).length / incoming.length : 1,
+            dynamics: Number.isFinite(lb) && Number.isFinite(la) ? 1 - Math.min(1, Math.abs(la - lb) / 0.25) : 1,
+            tempo: 1 - Math.min(1, Math.abs(after.bpm / before.bpm - 1) / 0.1),
+        };
+        seams.push({ bar: after.bar, from: sectionOf(before), to: sectionOf(after), ...Object.fromEntries(Object.entries(aspects).map(([k, v]) => [k, round(v, 3)])),
+            smooth: round(mean(Object.values(aspects)), 3) });
+    }
+    return seams;
+}
+const b_pcs = (b) => b.events.filter((e) => e.role !== 'perc').map((e) => e.midi % 12);
+
+/**
+ * How often a leading tone (7) goes up to the tonic and a fourth (4) steps down to a third, among held or repeated-context
+ * notes of the lead line (consecutive notes within one bar). `notes` come from `line`; `tonicOf(bar)` is the key's tonic pc.
+ */
+export function tendencyResolution(notes, tonicOf, minLength = 0) {
+    let leading = 0, leadingUp = 0, fourth = 0, fourthDown = 0;
+    for (let i = 0; i + 1 < notes.length; i++) {
+        const n = notes[i], next = notes[i + 1];
+        if (n.bar !== next.bar || n.length < minLength) continue;
+        const pc = mod12(n.midi - tonicOf(n.bar));
+        if (pc === 11) { leading++; if (next.midi - n.midi === 1) leadingUp++; }
+        else if (pc === 5) { fourth++; if (next.midi < n.midi && n.midi - next.midi <= 2) fourthDown++; }
+    }
+    return { leading, leadingToTonic: round(leading ? leadingUp / leading : null, 3), fourth, fourthToThird: round(fourth ? fourthDown / fourth : null, 3) };
+}
+
+/**
+ * Share of bars with at least `minOnsets` onsets from `roles` whose onsets form a maximally even set (a rotation of a
+ * Euclidean rhythm) on the bar's eighth-note grid. Simple metres only.
+ */
+export function euclideanShare(bars, roles = ['bass'], minOnsets = 3) {
+    let counted = 0, even = 0;
+    bars.forEach((b) => {
+        if (b.meter.unitsPerBeat !== 1) return;
+        const n = b.meter.units * 2, steps = [...new Set(b.events.filter((e) => roles.includes(e.role) && Math.abs(e.beat * 2 - Math.round(e.beat * 2)) < 1e-6).map((e) => Math.round(e.beat * 2)))].sort((a, z) => a - z);
+        if (steps.length < minOnsets || steps.length >= n) return;
+        counted++;
+        const gaps = steps.map((x, i) => (steps[(i + 1) % steps.length] - x + n) % n || n);
+        if (Math.max(...gaps) - Math.min(...gaps) <= 1) even++;
+    });
+    return { bars: counted, share: round(counted ? even / counted : null, 3) };
+}
+
 /** Mean syncopation for bars in each position of a 4-bar phrase, to see whether cadence bars are plainer. */
 export function syncopationByPhrasePosition(rows, span = 4) {
     const buckets = Array.from({ length: span }, () => []);

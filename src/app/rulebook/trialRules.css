@@ -1,0 +1,15 @@
+.trial-rules { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; margin-top: 8px; }
+.trial-tile { display: flex; flex-direction: column; gap: 6px; padding: 8px 10px; border: 1px solid var(--gen-border, #444); border-radius: 8px; min-width: 0; opacity: .75; }
+.trial-tile.is-on { opacity: 1; border-color: var(--gen-accent, #8ab); }
+.trial-tile.is-blocked { opacity: .5; }
+.trial-tile-head { display: flex; align-items: baseline; gap: 6px; font-size: 13px; }
+.trial-tile-name { flex: 1; min-width: 0; }
+.trial-tile-head output { font-variant-numeric: tabular-nums; color: var(--gen-muted, #999); font-size: 12px; }
+.trial-tile-reset { background: none; border: 0; padding: 0 2px; cursor: pointer; color: var(--gen-muted, #999); font-size: 12px; }
+.trial-tile input[type=range], .trial-tile select { width: 100%; min-width: 0; }
+.trial-tile small { color: var(--gen-muted, #999); font-size: 11px; }
+[data-tour="trial"] > .gen-hint { grid-column: 1 / -1; margin: 0; }
+.trial-toggle { grid-column: 1 / -1; }
+.trial-steps { display: flex; gap: 4px; }
+.trial-steps button { flex: 1; min-width: 0; padding: 3px 2px; font-size: 12px; border: 1px solid var(--gen-border, #444); border-radius: 6px; background: none; color: inherit; cursor: pointer; }
+.trial-steps button.is-picked { background: var(--gen-accent, #8ab); color: var(--gen-bg, #111); border-color: transparent; }

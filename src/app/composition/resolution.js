@@ -63,5 +63,22 @@ export function resolveMelody(plan,{bars,meter,range,settings,seed,chance=.6,pen
             note.midi=midi;add(kind,b.bar,note,b.bar,after);break;
         }
     }
+    // Tendency tones (leadTendency): a leading tone that is held or accented goes up to the tonic, a fourth degree steps down to the
+    // third (a half or whole step, whichever the scale has). One per bar at most; never an accent that would lose its chord tone,
+    // and never the closing note of a phrase.
+    const tendency=settings.leadTendency??0;
+    if(tendency>0)for(let bi=0;bi<bars.length;bi++){
+        const b=bars[bi],events=result.bars[bi].events,scale=allowed(b),tonic=b.scalePcs[0],closing=plan.destination?.closing&&plan.destination.bar===b.bar;
+        for(let i=0;i+1<events.length;i++){
+            const note=events[i],next=events[i+1],degreePc=((note.midi-tonic)%12+12)%12;
+            if(degreePc!==11&&degreePc!==5)continue;
+            const source=b.notes.find(n=>n.beat===note.beat);
+            if(!(source?.accent||note.length>=meter.unitsPerBeat*.75)||(closing&&i+1===events.length-1)||rng()>=tendency)continue;
+            const want=degreePc===11?note.midi+1:scale.filter(m=>m<note.midi&&note.midi-m<=2).at(-1);
+            const landing=b.notes.find(n=>n.beat===next.beat);
+            if(want===undefined||next.midi===want||!scale.includes(want)||!scale.includes(note.midi)||(landing?.accent&&!chordTone(want,b)))continue;
+            next.midi=want;add('tendency',b.bar,note,b.bar,next);break;
+        }
+    }
     return result;
 }

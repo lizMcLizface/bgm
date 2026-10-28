@@ -195,10 +195,12 @@ export function drawTimeline(ctx, width, height, view, pos, color) {
     const audible = Object.fromEntries(Object.entries(view.roles).map(([role, r]) => [role, anySolo ? r.solo : !r.mute]));
 
     // Piano roll.
-    plan.forEach(({ bar, events }) => {
+    plan.forEach(({ bar, events, meter }) => {
+        // every bar is drawn one bar wide, so a bar in another meter (a breakdown's own) is squeezed or stretched to fit
+        const scale = meter?.units ? beatsPerBar / meter.units : 1;
         events.forEach((e) => {
-            const start = bar * beatsPerBar + e.beat;
-            const end = start + e.length;
+            const start = bar * beatsPerBar + e.beat * scale;
+            const end = start + e.length * scale;
             const left = x(start);
             const w = Math.max(2, x(end) - left);
             if (left > width || left + w < 0) return;

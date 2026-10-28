@@ -5,7 +5,7 @@ import { phraseRhythm, barRhythm, spaceAccompaniment, spaceCounter, splitPulseRo
 import { planForm, formEnvelope, formSettings, shapeFormNotes, cutForm } from './formLatest';
 import { planDevelopment, developTheme } from './themeDevelopment';
 import { phraseLength } from './phraseLength';
-import { planPhraseMelody } from './phraseMelody';
+import { planPhraseMelody, inertiaCost } from './phraseMelody';
 import { walkingBass, alignBass, counterPitches, bassCell, varyBass } from './ensembleVoices';
 import { duetPlan, duetMotif, duetCounter } from './duet';
 import { planRhythmDevelopment, developBarRhythm, shapeRhythmicPart } from './rhythmDevelopment';
@@ -18,6 +18,7 @@ import { pickupLead } from './leadPickup';
 import { landSectionSuspension } from './sectionSuspension';
 import { subdivideSection } from './formStrategies';
 import { varyPad } from './padVariation';
+import { syncopate } from './syncopation';
 
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 const rngFor = (seed, index, salt) => seeded(Math.imul(seed ^ salt, 1664525) ^ Math.imul(index + 1, 1013904223));
@@ -69,7 +70,7 @@ export function realiseThemeBar(notes, { chord, scalePcs, range, previousMidi, s
     const degreePitch = degree => anchor + ((pcs[((degree % pcs.length) + pcs.length) % pcs.length] - pcs[0] + 12) % 12) + 12 * Math.floor(degree / pcs.length);
     const stable = allowed.filter(m => [chord.pitchClasses[0], chord.pitchClasses[1]].includes(m % 12));
     const open = allowed.filter(m => [chord.pitchClasses[2], scalePcs[1]].includes(m % 12));
-    let beam = [{ score: 0, pitches: [], last: previousMidi }];
+    let beam = [{ score: 0, pitches: [], last: previousMidi, motion: 0 }];
     for (let i = 0; i < notes.length; i++) {
         const note = notes[i], target = clamp(degreePitch(note.degree), ...range);
         const last = closing && i === notes.length - 1;
@@ -83,8 +84,9 @@ export function realiseThemeBar(notes, { chord, scalePcs, range, previousMidi, s
             const reversed = desiredDirection && Math.sign(midi - path.last) !== desiredDirection && midi !== path.last;
             const cost = Math.abs(midi - target) * 0.7 + (note.accent && !chordTone ? 4 : 0)
                 + Math.max(0, leap - (3 + (settings.leadLeaps ?? 0.5) * 6)) * 0.9
-                + (reversed ? 0.8 : 0) + (midi === path.last && i ? 0.3 : 0);
-            paths.push({ score: path.score + cost, pitches: [...path.pitches, midi], last: midi });
+                + (reversed ? 0.8 : 0) + (midi === path.last && i ? 0.3 : 0)
+                + inertiaCost({ amount: settings.leadInertia ?? 0, previous: path.motion, motion: midi - path.last, leap, from: notes[i - 1], to: note });
+            paths.push({ score: path.score + cost, pitches: [...path.pitches, midi], last: midi, motion: midi - path.last });
         }
         beam = paths.sort((a, b) => a.score - b.score || a.last - b.last).slice(0, 12);
     }
@@ -105,7 +107,7 @@ export function arrangeBarLatest(args) {
     const continuing = oldPhrase && oldPhrase.units === meter.units && bar < oldPhrase.start + (oldPhrase.bars ?? 4)
         && !(form?.section.start === bar) && !((oldPhrase.bars ?? 4) === 4 && bar % 4 === 0);
     const bars = continuing ? oldPhrase.bars : phraseLength({ choice: args.phraseLength ?? 4, seed, bar, settings, form });
-    const base = arrangeBar({ ...args, scalePcs: chord.harmonyPcs ?? scalePcs, phraseBars: bars, phraseBoundary: !continuing, settings: section ? formSettings(settings, section) : args.developForm !== false
+    const base = arrangeBar({ ...args, closeFigure: true, scalePcs: chord.harmonyPcs ?? scalePcs, phraseBars: bars, phraseBoundary: !continuing, settings: section ? formSettings(settings, section) : args.developForm !== false
             ? { ...settings, sections: { ...settings.sections, mode: 'off' } } : settings,
         rng: rngFor(seed, bar, 0x7f4a7c15) });
     if (args.developForm !== false) base.state.phrase = { ...base.state.phrase, section };
@@ -147,7 +149,9 @@ export function arrangeBarLatest(args) {
     const fragmented=fragmentLead(shaped,{gesture:leadGesture,meter,protectedBeats:protectedBeats(bar)});
     const pickupGesture=args.leadPickups===true?transitionFor(section,bar):null;
     const picked=pickupLead(fragmented,{gesture:pickupGesture,meter,protectedBeats:protectedBeats(bar)});
-    const notes = picked.map((note, i) => ({ ...note,
+    const push = (list, at, offset) => syncopate(list, { amount: settings.leadSyncopation ?? 0, meter, seed, bar: at, index: offset, bars,
+        protectedBeats: protectedBeats(at), keepLast: offset === bars - 1, delay: true });
+    const notes = push(picked, bar, index).map((note, i) => ({ ...note,
         degree: note.degree + (duet ? 0 : phrase.shift + (response && phrase.role === 'answer' && i === 0 ? -1 : 0)) }));
     const activeLead = base.state.phrase.leadActive && settings.leadActivity > 0;
     if(activeLead&&leadGesture)composition.leadTransition={...leadGesture,removed:shaped.length-notes.length};
@@ -166,8 +170,8 @@ export function arrangeBarLatest(args) {
                 protectedBeats:protectedBeats(h.bar),density:settings.leadDensity,index:offset});
             const fragment=fragmentLead(shapeFormNotes(subdivided, futureSection, offset, settings.sections?.mode === 'strong',futureSection?.curves?protectedBeats(h.bar):[]),
                 {gesture:args.leadTransitions===true?transitionFor(futureSection,h.bar):null,meter,protectedBeats:protectedBeats(h.bar)});
-            return { ...h, ...(futureSection?.curves?{tension:futureSection.motion.tension}:{}), midpoint: bars === 8 && offset === 3, notes: pickupLead(fragment,
-                {gesture:args.leadPickups===true?transitionFor(futureSection,h.bar):null,meter,protectedBeats:protectedBeats(h.bar)}).map((note, i) => ({ ...note,
+            return { ...h, ...(futureSection?.curves?{tension:futureSection.motion.tension}:{}), midpoint: bars === 8 && offset === 3, notes: push(pickupLead(fragment,
+                {gesture:args.leadPickups===true?transitionFor(futureSection,h.bar):null,meter,protectedBeats:protectedBeats(h.bar)}), h.bar, offset).map((note, i) => ({ ...note,
                 degree: note.degree + (duet ? 0 : phrase.shift + (offset >= bars / 2 && phrase.role === 'answer' && i === 0 ? -1 : 0)) })) };
         });
         if (horizon.length) {
@@ -231,8 +235,9 @@ export function arrangeBarLatest(args) {
                     previousMidi: prev?.bassMidi ?? 40, meter, chordEnds: args.barsLeftInChord === 1, seed, bar, rhythm })
                 : alignBass(bass, { style: base.state.phrase.bassStyle, rhythm, meter });
             const style = base.state.phrase.bassStyle;
-            const cell = bassCell({ style, seed, phraseStart: phrase.start, leadPlaying: activeLead });
-            bass = varyBass(bass, { style, cell, meter, range: base.state.ranges.bass });
+            const cell = bassCell({ style, seed, phraseStart: phrase.start, leadPlaying: activeLead, euclid: settings.bassEuclid ?? 0 });
+            bass = varyBass(bass, { style, cell, meter, range: base.state.ranges.bass, seed, phraseStart: phrase.start });
+            if (style !== 'walking') bass = syncopate(bass, { amount: settings.leadSyncopation ?? 0, meter, seed: seed ^ 0x3c6ef372, bar, index, bars, weight: 0.6 });
         }
         let counter = events.filter(e => e.role === 'counter');
         if (base.state.phrase.counter?.kind !== 'harmony') {

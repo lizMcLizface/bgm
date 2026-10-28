@@ -1,7 +1,7 @@
 # Music theory grounding — literature review and proposed rules
 
-28 October 2026 (revised after reading the sources in `docs/ref/`). Nothing here is
-implemented yet. Per-source detail, page references and caveats are in
+28 October 2026 (revised after reading the sources in `docs/ref/`). The build order and status now live in
+[COMPOSITION_PLAN.md](COMPOSITION_PLAN.md); this file is the evidence. Nothing in §2 is implemented except the syncopation control. Per-source detail, page references and caveats are in
 [theory-notes/](theory-notes/README.md); this file is the synthesis. Where the first
 version of this document differed from the sources, the sources won; see §5 for what
 changed.
@@ -189,6 +189,8 @@ pearce-expectation)*
   smooth, use disjunction only for deliberate drops.
 
 ## 3. Priority list
+
+Superseded by [COMPOSITION_PLAN.md](COMPOSITION_PLAN.md), which adds the pad, chord-size and melodic-inertia work and drops what we ruled out. Kept for the original ranking.
 
 | # | Change | Where | Effort | Basis |
 | --- | --- | --- | --- | --- |

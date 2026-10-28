@@ -25,7 +25,7 @@ import { unitsPerMinute } from '../meter';
 import { rubatoTime } from '../composition/rubato';
 import { automateDuck, DUCKED_BY } from './ducking';
 import { SPACE_RACK, SPACE_ROLE, spaceTail } from '../composition/sectionSpace';
-import { timbreDrift } from '../composition/timbreDrift';
+import { voiceMotion } from '../composition/timbreDrift';
 import { applyFeel } from '../composition/feel';
 import { noiseReady } from '../../nodes/noiseGenerator';
 import { bitCrusherReady } from '../../nodes/bitcrusher';
@@ -262,9 +262,9 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
                 instruments[role]=inst;cleanup.push(()=>inst.dispose());
                 if (role === 'perc') {inst.setKit(gen.settings.drumKit);inst.setVoicePreset(gen.settings.drums.kit);if(inst.ready)await inst.ready;inst.reverb?.hear?.(); /* a room in the Wasm kernel must be built before the render starts */}
                 inst.scheduleSleep = () => {}; // no wall-clock timers during the render
-                if (gen.settings.timbreDrift > 0 && inst.setDrift) {
+                if ((gen.settings.timbreDrift > 0 || gen.settings.padVibrato > 0) && inst.setDrift) {
                     const middle = (from + end) / 2, bar = Math.max(0, barStarts.findLastIndex((t) => t <= middle));
-                    const values = timbreDrift(presets[role], role, bar, gen.settings.timbreDrift, gen.settings.seed);
+                    const values = voiceMotion(presets[role], role, bar, gen.settings, gen.settings.seed);
                     if (values) inst.setDrift(values, 0);
                 }
                 const gain = ctx.createGain();

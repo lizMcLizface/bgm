@@ -146,7 +146,8 @@
           "mode": "add9",
           "amount": 0.2
         },
-        "ambienceVolume": 0.45
+        "ambienceVolume": 0.45,
+        "leadSyncopation": 0.2
       },
       "voices": {
         "pad": "Felt Piano (updated)",
@@ -329,7 +330,8 @@
           "mode": "add9",
           "amount": 0.2
         },
-        "ambienceVolume": 0.66
+        "ambienceVolume": 0.66,
+        "leadSyncopation": 0.3
       },
       "voices": {
         "pad": "FM Rhodes",
@@ -508,7 +510,9 @@
           "mode": "add9",
           "amount": 0.2
         },
-        "ambienceVolume": 0.66
+        "ambienceVolume": 0.66,
+        "padRoot": "unlessBass",
+        "chordSize": "functional"
       },
       "voices": {
         "pad": "Glass Pad",
@@ -768,7 +772,8 @@
         "breakdowns": {
           "meter": "6/8",
           "halfTime": false
-        }
+        },
+        "padRoot": "unlessBass"
       },
       "voices": {
         "pad": "Harp Pluck",
@@ -884,7 +889,8 @@
           "bell": {
             "level": 0.55
           }
-        }
+        },
+        "leadSyncopation": 0.3
       },
       "voices": {
         "pad": "Kalimba Pluck",
@@ -974,7 +980,9 @@
           "mode": "add9",
           "amount": 0.2
         },
-        "ambienceVolume": 0.66
+        "ambienceVolume": 0.66,
+        "leadSyncopation": 0.35,
+        "padRoot": "unlessBass"
       },
       "voices": {
         "pad": "Lo-fi Tape Pad",
@@ -1153,7 +1161,8 @@
         "chordColour": {
           "mode": "add6",
           "amount": 0.2
-        }
+        },
+        "leadSyncopation": 0.2
       },
       "voices": {
         "pad": "Soft Keys (updated)",
@@ -1487,7 +1496,9 @@
         "chordColour": {
           "mode": "add9",
           "amount": 0.2
-        }
+        },
+        "padRoot": "unlessBass",
+        "chordSize": "functional"
       },
       "voices": {
         "pad": "Velvet Pad",
@@ -1606,7 +1617,10 @@
           "clap": {
             "level": 0.55
           }
-        }
+        },
+        "leadSyncopation": 0.2,
+        "padRoot": "unlessBass",
+        "chordSize": "functional"
       },
       "voices": {
         "pad": "Swelling Analog",
@@ -1691,7 +1705,8 @@
         "chordColour": {
           "mode": "add6",
           "amount": 0.2
-        }
+        },
+        "chordSize": "functional"
       },
       "voices": {
         "pad": "Tine Keys",
@@ -2286,7 +2301,10 @@
         "arc": {
           "shape": "wave",
           "minutes": 15
-        }
+        },
+        "leadSyncopation": 0.25,
+        "padRoot": "unlessBass",
+        "chordSize": "functional"
       },
       "voices": {
         "pad": "Arp Pluck",
@@ -2509,7 +2527,10 @@
         "breakdowns": {
           "meter": "same",
           "halfTime": true
-        }
+        },
+        "leadSyncopation": 0.3,
+        "padRoot": "unlessBass",
+        "chordSize": "functional"
       },
       "voices": {
         "pad": "Arp Pluck",
@@ -2624,7 +2645,10 @@
         "breakdowns": {
           "meter": "same",
           "halfTime": true
-        }
+        },
+        "leadSyncopation": 0.2,
+        "padRoot": "unlessBass",
+        "chordSize": "functional"
       },
       "voices": {
         "pad": "Arp Pluck",
@@ -3076,7 +3100,8 @@
           "ride": {
             "level": 0.45
           }
-        }
+        },
+        "padRoot": "unlessBass"
       },
       "voices": {
         "pad": "Heroic Strings",
@@ -3541,7 +3566,9 @@
         "breakdowns": {
           "meter": "same",
           "halfTime": true
-        }
+        },
+        "leadSyncopation": 0.25,
+        "padRoot": "unlessBass"
       },
       "voices": {
         "pad": "Arp Pluck",
@@ -3800,7 +3827,9 @@
         "breakdowns": {
           "meter": "same",
           "halfTime": true
-        }
+        },
+        "leadSyncopation": 0.25,
+        "padRoot": "unlessBass"
       },
       "voices": {
         "pad": "Arp Pluck",
@@ -4042,7 +4071,9 @@
           "mode": "plain",
           "amount": 0
         },
-        "chordBorrow": 0
+        "chordBorrow": 0,
+        "leadSyncopation": 0.25,
+        "padRoot": "unlessBass"
       },
       "voices": {
         "pad": "Heroic Strings",
@@ -4261,7 +4292,8 @@
         "breakdowns": {
           "meter": "3/4",
           "halfTime": false
-        }
+        },
+        "padRoot": "unlessBass"
       },
       "voices": {
         "pad": "Harp Pluck",
@@ -4477,7 +4509,8 @@
           "mode": "add6",
           "amount": 0.2
         },
-        "chordBorrow": 0
+        "chordBorrow": 0,
+        "padRoot": "unlessBass"
       },
       "voices": {
         "pad": "Soft Harp",
@@ -4707,7 +4740,9 @@
             "level": 0.6
           }
         },
-        "thinPadUnderLead": false
+        "thinPadUnderLead": false,
+        "leadSyncopation": 0.2,
+        "padRoot": "unlessBass"
       },
       "voices": {
         "pad": "Heroic Strings",
@@ -4907,7 +4942,9 @@
           "mode": "gentle",
           "phrases": 2
         },
-        "ambienceVolume": 0.66
+        "ambienceVolume": 0.66,
+        "leadSyncopation": 0.2,
+        "padRoot": "unlessBass"
       },
       "voices": {
         "pad": "Nylon Guitar",
@@ -5158,7 +5195,9 @@
         "breakdowns": {
           "meter": "12/8",
           "halfTime": false
-        }
+        },
+        "leadSyncopation": 0.35,
+        "chordSize": "functional"
       },
       "voices": {
         "pad": "Soft Keys (updated)",
@@ -5337,7 +5376,9 @@
           "counter": 0.48,
           "perc": 0.5
         },
-        "ambienceVolume": 0.66
+        "ambienceVolume": 0.66,
+        "leadSyncopation": 0.2,
+        "padRoot": "unlessBass"
       },
       "voices": {
         "pad": "Nylon Guitar",
@@ -6280,7 +6321,8 @@
         "chordColour": {
           "mode": "sus2",
           "amount": 0.35
-        }
+        },
+        "padRoot": "unlessBass"
       },
       "voices": {
         "pad": "Nylon Guitar",
@@ -7841,7 +7883,8 @@
         "chordColour": {
           "mode": "add9",
           "amount": 0.2
-        }
+        },
+        "chordSize": "functional"
       },
       "voices": {
         "pad": "Warm Organ",
@@ -8097,7 +8140,8 @@
           "push": 0,
           "split": 100
         },
-        "thinPadUnderLead": false
+        "thinPadUnderLead": false,
+        "leadSyncopation": 0.3
       },
       "voices": {
         "pad": "Pixel Piano",
@@ -8288,7 +8332,9 @@
           "lead": 0.68,
           "counter": 0.5,
           "perc": 0.59
-        }
+        },
+        "leadSyncopation": 0.25,
+        "padRoot": "unlessBass"
       },
       "voices": {
         "pad": "Arp Pluck",
@@ -8372,7 +8418,9 @@
           "lead": 0.68,
           "counter": 0.5,
           "perc": 0.59
-        }
+        },
+        "leadSyncopation": 0.15,
+        "padRoot": "unlessBass"
       },
       "voices": {
         "pad": "Pixel Piano",
@@ -8548,7 +8596,9 @@
         "breakdowns": {
           "meter": "same",
           "halfTime": true
-        }
+        },
+        "leadSyncopation": 0.15,
+        "padRoot": "unlessBass"
       },
       "voices": {
         "pad": "Arp Pluck",
@@ -8640,7 +8690,9 @@
         "breakdowns": {
           "meter": "same",
           "halfTime": true
-        }
+        },
+        "leadSyncopation": 0.2,
+        "padRoot": "unlessBass"
       },
       "voices": {
         "pad": "Arp Pluck",
@@ -8732,7 +8784,10 @@
         "breakdowns": {
           "meter": "same",
           "halfTime": true
-        }
+        },
+        "leadSyncopation": 0.25,
+        "padRoot": "unlessBass",
+        "chordSize": "functional"
       },
       "voices": {
         "pad": "Heroic Strings",
@@ -8955,7 +9010,9 @@
           "bell": {
             "level": 0.55
           }
-        }
+        },
+        "leadSyncopation": 0.3,
+        "chordSize": "functional"
       },
       "voices": {
         "pad": "Soft Keys (updated)",
@@ -10612,7 +10669,9 @@
           "counter": 0.5,
           "perc": 0.59
         },
-        "ambienceVolume": 0.66
+        "ambienceVolume": 0.66,
+        "leadSyncopation": 0.35,
+        "padRoot": "unlessBass"
       },
       "voices": {
         "pad": "Arp Pluck",
@@ -10712,7 +10771,8 @@
         "arc": {
           "shape": "rise",
           "minutes": 12
-        }
+        },
+        "padRoot": "unlessBass"
       },
       "voices": {
         "pad": "Neon Saw Pad",
@@ -10804,7 +10864,9 @@
           "lead": 0.66,
           "counter": 0.48,
           "perc": 0.5
-        }
+        },
+        "padRoot": "unlessBass",
+        "chordSize": "functional"
       },
       "voices": {
         "pad": "Night Glass",
@@ -10891,7 +10953,10 @@
           "lead": 0.66,
           "counter": 0.48,
           "perc": 0.5
-        }
+        },
+        "leadSyncopation": 0.3,
+        "padRoot": "unlessBass",
+        "chordSize": "functional"
       },
       "voices": {
         "pad": "Night Glass",
@@ -10990,7 +11055,10 @@
           "lead": 0.66,
           "counter": 0.48,
           "perc": 0.5
-        }
+        },
+        "leadSyncopation": 0.3,
+        "padRoot": "unlessBass",
+        "chordSize": "functional"
       },
       "voices": {
         "pad": "Neon Saw Pad",
@@ -11094,7 +11162,8 @@
         "arc": {
           "shape": "winddown",
           "minutes": 25
-        }
+        },
+        "padRoot": "unlessBass"
       },
       "voices": {
         "pad": "Neon Saw Pad",
@@ -11594,7 +11663,8 @@
         "breakdowns": {
           "meter": "same",
           "halfTime": true
-        }
+        },
+        "padRoot": "unlessBass"
       },
       "voices": {
         "pad": "Tine Keys",
@@ -11923,7 +11993,9 @@
         "breakdowns": {
           "meter": "same",
           "halfTime": true
-        }
+        },
+        "leadSyncopation": 0.25,
+        "padRoot": "unlessBass"
       },
       "voices": {
         "pad": "Warm Organ",
@@ -12083,7 +12155,9 @@
         "breakdowns": {
           "meter": "same",
           "halfTime": true
-        }
+        },
+        "leadSyncopation": 0.25,
+        "padRoot": "unlessBass"
       },
       "voices": {
         "pad": "Warm Organ",
@@ -12249,7 +12323,9 @@
         "arc": {
           "shape": "rise",
           "minutes": 15
-        }
+        },
+        "leadSyncopation": 0.2,
+        "padRoot": "unlessBass"
       },
       "voices": {
         "pad": "Progressive Pluck",
@@ -12410,7 +12486,10 @@
         "breakdowns": {
           "meter": "same",
           "halfTime": true
-        }
+        },
+        "leadSyncopation": 0.25,
+        "padRoot": "unlessBass",
+        "chordSize": "functional"
       },
       "voices": {
         "pad": "Progressive Pluck",
@@ -12648,7 +12727,8 @@
             "wander": "off",
             "chance": 0.3
           }
-        }
+        },
+        "leadSyncopation": 0.35
       },
       "voices": {
         "pad": "Wasm Tine Keys",
@@ -12787,7 +12867,9 @@
           "thunder": 0
         },
         "playAmbience": false,
-        "thinPadUnderLead": false
+        "thinPadUnderLead": false,
+        "leadSyncopation": 0.2,
+        "padRoot": "unlessBass"
       },
       "voices": {
         "pad": "Wasm Drawbars",
@@ -12905,7 +12987,8 @@
           "bell": {
             "level": 0.8
           }
-        }
+        },
+        "leadSyncopation": 0.2
       },
       "voices": {
         "pad": "Soft Keys",
@@ -13005,7 +13088,8 @@
           "mode": "add9",
           "amount": 0.2
         },
-        "ambienceVolume": 0.66
+        "ambienceVolume": 0.66,
+        "leadSyncopation": 0.3
       },
       "voices": {
         "pad": "FM Rhodes",
@@ -13248,7 +13332,9 @@
           "bell": {
             "level": 0.55
           }
-        }
+        },
+        "leadSyncopation": 0.3,
+        "chordSize": "functional"
       },
       "voices": {
         "pad": "Soft Keys (updated)",
@@ -13369,7 +13455,8 @@
           "bell": {
             "level": 0.55
           }
-        }
+        },
+        "leadSyncopation": 0.3
       },
       "voices": {
         "pad": "Kalimba Pluck",
@@ -13560,7 +13647,9 @@
           "mode": "add9",
           "amount": 0.2
         },
-        "ambienceVolume": 0.66
+        "ambienceVolume": 0.66,
+        "leadSyncopation": 0.35,
+        "padRoot": "unlessBass"
       },
       "voices": {
         "pad": "Lo-fi Tape Pad",
@@ -13689,7 +13778,10 @@
           "clap": {
             "level": 0.55
           }
-        }
+        },
+        "leadSyncopation": 0.2,
+        "padRoot": "unlessBass",
+        "chordSize": "functional"
       },
       "voices": {
         "pad": "Swelling Analog",
@@ -13866,7 +13958,8 @@
         "breakdowns": {
           "meter": "same",
           "halfTime": true
-        }
+        },
+        "padRoot": "unlessBass"
       },
       "voices": {
         "pad": "Tine Keys",
@@ -14049,7 +14142,9 @@
         "breakdowns": {
           "meter": "same",
           "halfTime": true
-        }
+        },
+        "leadSyncopation": 0.25,
+        "padRoot": "unlessBass"
       },
       "voices": {
         "pad": "Warm Organ",
@@ -14212,7 +14307,8 @@
             "wander": "off",
             "chance": 0.3
           }
-        }
+        },
+        "leadSyncopation": 0.35
       },
       "voices": {
         "pad": "Wasm Tine Keys",
@@ -14356,7 +14452,9 @@
           "thunder": 0
         },
         "playAmbience": false,
-        "thinPadUnderLead": false
+        "thinPadUnderLead": false,
+        "leadSyncopation": 0.2,
+        "padRoot": "unlessBass"
       },
       "voices": {
         "pad": "Wasm Drawbars",
@@ -14893,7 +14991,10 @@
           "snare": {
             "level": 0.85
           }
-        }
+        },
+        "leadSyncopation": 0.35,
+        "padRoot": "unlessBass",
+        "chordSize": "functional"
       },
       "voices": {
         "pad": "Swelling Analog",
@@ -15528,6 +15629,179 @@
             "enabled": false
           }
         }
+      }
+    },
+    {
+      "name": "Demo: Groove slider",
+      "category": "demo",
+      "blurb": "A steady four-on-the-floor groove under a busy bell lead and a drive bass, set half-way off the beat. A/B: “Push the groove off the beat” - none is straight, high pushes notes half a beat early",
+      "settings": {
+        "humanize": {
+          "timing": 6,
+          "velocity": 0.06,
+          "detune": 2
+        },
+        "tonic": 9,
+        "mode": "Major-6",
+        "bpm": 112,
+        "meter": "4/4",
+        "progression": 2,
+        "barsPerChord": 1,
+        "leadActivity": 0.9,
+        "leadDensity": 0.5,
+        "sections": {
+          "mode": "off",
+          "phrases": 2
+        },
+        "drums": {
+          "style": "electro",
+          "activity": 0.7,
+          "variation": 0.3
+        },
+        "volumes": {
+          "pad": 0.5,
+          "bass": 0.6,
+          "lead": 0.62,
+          "counter": 0.3,
+          "perc": 0.5
+        },
+        "padWeights": {
+          "sustain": 40,
+          "pulse": 60,
+          "arpeggio": 0,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 50,
+          "walking": 0,
+          "drive": 50
+        },
+        "leadSyncopation": 0.5
+      },
+      "voices": {
+        "pad": "Deep Pulse",
+        "bass": "Neon Pulse Bass",
+        "lead": "Bell Lead"
+      }
+    },
+    {
+      "name": "Demo: Pad and bass",
+      "category": "demo",
+      "blurb": "A nylon guitar pad over an upright bass through ii-V-I, sevenths allowed. A/B: “Leave the root to the bass” (guitar and bass do not need the root twice) and “Add sevenths where they pull” (only the V is a seventh chord)",
+      "settings": {
+        "humanize": {
+          "timing": 8,
+          "velocity": 0.06,
+          "detune": 2
+        },
+        "tonic": 0,
+        "mode": "Major-1",
+        "bpm": 84,
+        "meter": "4/4",
+        "progression": 16,
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "padRoot": "unlessBass",
+        "chordSize": "functional",
+        "leadActivity": 0,
+        "sections": {
+          "mode": "off",
+          "phrases": 2
+        },
+        "drums": {
+          "style": "off",
+          "activity": 0
+        },
+        "padWeights": {
+          "sustain": 30,
+          "pulse": 0,
+          "arpeggio": 0,
+          "sequence": 0,
+          "rolled": 70,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 40,
+          "half": 60,
+          "walking": 0,
+          "drive": 0
+        },
+        "volumes": {
+          "pad": 0.62,
+          "bass": 0.6,
+          "lead": 0.5,
+          "counter": 0.3,
+          "perc": 0.4
+        }
+      },
+      "voices": {
+        "pad": "Nylon Guitar",
+        "bass": "Upright Pluck",
+        "lead": "Measured Flute"
+      }
+    },
+    {
+      "name": "Demo: Generated chords",
+      "category": "demo",
+      "blurb": "A soft pad, a warm bass and a flute, over chords drawn fresh each cycle from rock-corpus statistics in a wistful mood. A/B: “Generate the chord progression”, then the brightness, stability, adventure and change sliders",
+      "settings": {
+        "humanize": {
+          "timing": 8,
+          "velocity": 0.06,
+          "detune": 2
+        },
+        "tonic": 9,
+        "mode": "Major-6",
+        "bpm": 78,
+        "meter": "4/4",
+        "progression": 3,
+        "barsPerChord": 2,
+        "progressionMode": "generated",
+        "progressionMood": {
+          "brightness": -0.4,
+          "stability": 0.5,
+          "adventure": 0.3
+        },
+        "progressionWander": 0.6,
+        "leadActivity": 0.55,
+        "leadDensity": 0.2,
+        "sections": {
+          "mode": "off",
+          "phrases": 2
+        },
+        "drums": {
+          "style": "off",
+          "activity": 0
+        },
+        "padWeights": {
+          "sustain": 50,
+          "pulse": 0,
+          "arpeggio": 10,
+          "sequence": 0,
+          "rolled": 40,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 50,
+          "half": 50,
+          "walking": 0,
+          "drive": 0
+        },
+        "volumes": {
+          "pad": 0.6,
+          "bass": 0.55,
+          "lead": 0.5,
+          "counter": 0.3,
+          "perc": 0.4
+        }
+      },
+      "voices": {
+        "pad": "Soft Pad",
+        "bass": "Warm Bass",
+        "lead": "Measured Flute"
       }
     },
     {
@@ -16848,7 +17122,8 @@
           "activity": 0.6,
           "variation": 0.4,
           "sprinkle": 0.1
-        }
+        },
+        "leadSyncopation": 0.25
       },
       "voices": {
         "pad": "Felt Piano",
@@ -17016,7 +17291,8 @@
           "activity": 0.6,
           "variation": 0.5,
           "sprinkle": 0.1
-        }
+        },
+        "leadSyncopation": 0.4
       },
       "voices": {
         "pad": "FM Rhodes",
@@ -17128,7 +17404,9 @@
           "activity": 0.7,
           "variation": 0.5,
           "sprinkle": 0.1
-        }
+        },
+        "leadSyncopation": 0.35,
+        "padRoot": "unlessBass"
       },
       "voices": {
         "pad": "Deep Pulse",
@@ -17327,7 +17605,9 @@
         "chordColour": {
           "mode": "add9",
           "amount": 0.2
-        }
+        },
+        "leadSyncopation": 0.3,
+        "padRoot": "unlessBass"
       },
       "voices": {
         "pad": "Soft Saw Lead",
@@ -17413,7 +17693,9 @@
         "counter": {
           "mode": "answer",
           "activity": 0.4
-        }
+        },
+        "leadSyncopation": 0.5,
+        "padRoot": "unlessBass"
       },
       "voices": {
         "pad": "Galaxy Arp",
@@ -17500,7 +17782,8 @@
         "chordColour": {
           "mode": "add9",
           "amount": 0.25
-        }
+        },
+        "leadSyncopation": 0.55
       },
       "voices": {
         "pad": "FM Rhodes",

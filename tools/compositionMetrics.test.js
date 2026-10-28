@@ -60,3 +60,52 @@ test('lead notes are classified against the sounding chord', () => {
     const s = M.chordRelativeShare(bars);
     expect(s).toMatchObject({ count: 4, root: 0.25, third: 0.25, fifth: 0.25, nonChord: 0.25 });
 });
+
+test('Longuet-Higgins & Lee syncopation: straight is 0, an off-beat note held over a heavier beat scores the weight gap', () => {
+    expect(M.lhlSyncopation([0, 1, 2, 3], 4, [2, 2])).toBe(0);
+    expect(M.lhlSyncopation([0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5], 4, [2, 2])).toBe(0);
+    // an eighth-note onset at 1.5 held across beat 2 (a group start, weight -1): -1 - (-3) = 2
+    expect(M.lhlSyncopation([0, 1.5], 4, [2, 2])).toBe(2);
+    // the same push on a beat (1) held across the group start: beat -2, group start -1 -> 1
+    expect(M.lhlSyncopation([0, 1], 4, [2, 2])).toBe(1);
+    // son clave 3-3-4-2-4 on 16 pulses: onsets 0, 3, 6, 10, 12 (in quarters: 0, .75, 1.5, 2.5, 3)
+    expect(M.lhlSyncopation([0, 0.75, 1.5, 2.5, 3], 4, [2, 2])).toBeGreaterThan(M.lhlSyncopation([0, 1, 2, 3], 4, [2, 2]));
+    // the heavier the rest, the larger the score: a sixteenth at 0.25 held to beat 1 versus an eighth at 0.5
+    expect(M.lhlSyncopation([0, 0.25], 4, [2, 2])).toBe(3); // quarter-beat -4 held across the group start -1
+    expect(M.lhlSyncopation([0, 0.5], 4, [2, 2])).toBe(2); // half-beat -3 held across it
+});
+
+test('lhlByBar skips compound metres and reads the chosen roles', () => {
+    const compound = { bar: 0, events: [], meter: { units: 6, groups: [3, 3], unitsPerBeat: 3 } };
+    const simple = bar(1, [note('lead', 60, 0), note('lead', 60, 1.5), note('bass', 40, 1)]);
+    const rows = M.lhlByBar([compound, simple], ['lead']);
+    expect(rows[0].score).toBeNull();
+    expect(rows[1].score).toBe(2);
+});
+
+test('seam scores: identical material across a section change is smooth, a new key, metre and tempo is not', () => {
+    const upm = (m, bpm) => bpm * m.unitsPerBeat;
+    const mk = (n, type, midis, meter = { units: 4, groups: [2, 2], unitsPerBeat: 1 }, bpm = 120, velocity = 0.6) => ({
+        bar: n, meter, bpm, state: { phrase: { section: { type } } },
+        events: midis.map((midi, i) => ({ role: i ? 'bass' : 'lead', midi, beat: i * 0.5, length: 0.5, velocity })) });
+    const same = M.seamScores([mk(0, 'full', [60, 36]), mk(1, 'full', [60, 36]), mk(2, 'breakdown', [60, 36])], upm);
+    expect(same).toHaveLength(1);
+    expect(same[0]).toMatchObject({ bar: 2, from: 'full', to: 'breakdown', meter: 1, timbre: 1, pitch: 1, dynamics: 1, tempo: 1, smooth: 1 });
+    const jarring = M.seamScores([mk(0, 'full', [60, 36]), mk(1, 'breakdown', [61], { units: 6, groups: [3, 3], unitsPerBeat: 3 }, 90, 0.2)], upm);
+    expect(jarring[0].meter).toBe(0);
+    expect(jarring[0].pitch).toBe(0);
+    expect(jarring[0].smooth).toBeLessThan(0.4);
+});
+
+test('tendency resolution counts held leading tones that rise to the tonic and fourths that fall', () => {
+    const n = (midi, i, bar = 0, length = 1) => ({ bar, beat: i, midi, length });
+    const r = M.tendencyResolution([n(71, 0), n(72, 1), n(77, 2), n(76, 3), n(71, 0, 1), n(67, 1, 1)], () => 0, 0.75);
+    expect(r).toMatchObject({ leading: 2, leadingToTonic: 0.5, fourth: 1, fourthToThird: 1 });
+});
+
+test('euclideanShare recognises evenly spread onsets in any rotation', () => {
+    const m = { units: 4, groups: [2, 2], unitsPerBeat: 1 };
+    const ev = (beats) => beats.map((beat) => ({ role: 'bass', midi: 36, beat, length: 0.5, velocity: 0.6 }));
+    const r = M.euclideanShare([{ bar: 0, meter: m, events: ev([0, 1.5, 3]) }, { bar: 1, meter: m, events: ev([0.5, 2, 3.5]) }, { bar: 2, meter: m, events: ev([0, 0.5, 1]) }, { bar: 3, meter: m, events: ev([0, 1]) }]);
+    expect(r).toEqual({ bars: 3, share: 0.667 }); // tresillo and its rotation are even, a cluster is not, two onsets are skipped
+});

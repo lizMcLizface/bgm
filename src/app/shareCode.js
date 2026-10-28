@@ -22,7 +22,7 @@ import { SCALE_FAMILIES, CHORD_COLOURS } from './theory';
 import { METERS } from './meter';
 import { DRIFT_MODES, TEMPO_BOUNDS, BPM_LIMITS } from './conductor';
 import {
-    OCTAVE_LIMITS, OCTAVE_WANDER, COUNTER_MODES, PEDAL_MODES, SPREADS, LEAD_SCALES, LEAD_ENDINGS, SECTION_MODES, SECTION_LENGTHS, DEFAULT_PULSE_WEIGHTS, DEFAULT_ARP_WEIGHTS, DEFAULT_DIRECTION_WEIGHTS,
+    OCTAVE_LIMITS, OCTAVE_WANDER, COUNTER_MODES, PEDAL_MODES, SPREADS, PAD_ROOTS, LEAD_SCALES, LEAD_ENDINGS, SECTION_MODES, SECTION_LENGTHS, DEFAULT_PULSE_WEIGHTS, DEFAULT_ARP_WEIGHTS, DEFAULT_DIRECTION_WEIGHTS,
 } from './arranger';
 import { AMBIENCE_LAYERS } from './engine/ambience';
 import { LAYER_PARAMS } from './engine/ambienceSynth';
@@ -302,6 +302,15 @@ MUSIC_GROUPS.push([[['timbreDrift'],stepped(0,1,.05)]]); // composition/timbreDr
 MUSIC_GROUPS.push([[['breakdowns','meter'],options(['same',...Object.keys(METERS)],5)],[['breakdowns','halfTime'],bool]]); // a breakdown's meter and feel
 MUSIC_GROUPS.push([[['feel','busy'],stepped(-1,1,.05)],[['feel','bright'],stepped(-1,1,.05)]]); // the feel pad (composition/feel.js)
 MUSIC_GROUPS.push([[['dynamics','level'],stepped(.6,1.2,.05)],[['dynamics','range'],stepped(0,2,.05)],[['dynamics','attack'],stepped(0,1,.05)],[['dynamics','brightness'],stepped(0,1,.05)]]);
+MUSIC_GROUPS.push([[['leadSyncopation'],chance]]); // composition/syncopation.js; appended, old links play straight
+MUSIC_GROUPS.push([[['padRoot'],options(Object.keys(PAD_ROOTS),2)],[['chordSize'],options(['uniform','functional'],1)]]); // pad root rule and chord size by function
+MUSIC_GROUPS.push([[['leadInertia'],chance]]); // composition/phraseMelody.js inertiaCost
+MUSIC_GROUPS.push([[['padContour'],chance]]); // arranger.js padContour: phrase register arc and contrary outer voices
+MUSIC_GROUPS.push([[['leadTendency'],chance]]); // composition/resolution.js tendency tones
+MUSIC_GROUPS.push([[['bassEuclid'],chance]]); // composition/ensembleVoices.js euclidBass
+MUSIC_GROUPS.push([[['borrowStyle'],options(['even','corpus'],1)]]); // Generator.borrowFor
+MUSIC_GROUPS.push([[['padVibrato'],stepped(0,1,.05)]]); // composition/timbreDrift.js slowVibrato
+MUSIC_GROUPS.push([[['progressionMode'],options(['bank','generated'],1)],[['progressionMood','brightness'],stepped(-1,1,.05)],[['progressionMood','stability'],stepped(0,1,.05)],[['progressionMood','adventure'],stepped(0,1,.05)],[['progressionWander'],stepped(0,1,.05)]]); // composition/progressionGen.js
 const VOICE_GROUPS = [
     [...voice('pad'), ...voice('bass'), ...voice('lead'), ...voice('counter'), field(GROUPS, ['padNotes'])],
     LATER_GROUPS[4], // volumes

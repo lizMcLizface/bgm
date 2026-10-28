@@ -17,7 +17,7 @@ import {simdFromSearch,withSimd,bankFromSearch,withFMBank} from '../audio/simdCh
 import {
     DEFAULT_PAD_WEIGHTS, DEFAULT_BASS_WEIGHTS, DEFAULT_VOICES, OCTAVE_LIMITS, OCTAVE_WANDER,
     DEFAULT_COUNTER, COUNTER_MODES, DEFAULT_SECTIONS, SECTION_MODES, SECTION_LENGTHS,
-    DEFAULT_PULSE_WEIGHTS, DEFAULT_ARP_WEIGHTS, DEFAULT_DIRECTION_WEIGHTS, DEFAULT_PAD_MOTION, PEDAL_MODES, SPREADS, LEAD_SCALES, LEAD_ENDINGS,
+    DEFAULT_PULSE_WEIGHTS, DEFAULT_ARP_WEIGHTS, DEFAULT_DIRECTION_WEIGHTS, DEFAULT_PAD_MOTION, PEDAL_MODES, SPREADS, PAD_ROOTS, LEAD_SCALES, LEAD_ENDINGS,
 } from './arranger';
 import { AMBIENCE_LAYERS, DEFAULT_AMBIENCE, defaultAmbienceShape } from './engine/ambience';
 import { LAYER_PARAMS, COMMON_PARAMS } from './engine/ambienceSynth';
@@ -29,6 +29,7 @@ import { DEFAULT_DRIFT, DRIFT_MODES, BPM_LIMITS } from './conductor';
 import { METERS, DEFAULT_METER } from './meter';
 import { SCALE_FAMILIES, CHORD_COLOURS } from './theory';
 import PROGRESSIONS from './progressions';
+import { DEFAULT_MOOD } from './composition/progressionGen';
 import { decodeShareCode, encodeShareParts, decodeShareParts } from './shareCode';
 import { phraseToSeed } from './phrase';
 import { HARMONY_SCALES } from './composition/harmonyScale';
@@ -44,6 +45,9 @@ export function defaultSettings() {
         mode: 'Major-1', // scale id, as on the main page (theory.js SCALE_FAMILIES)
         bpm: 72,
         progression: 0,
+        progressionMode: 'bank', // 'bank': the chosen progression; 'generated': chords drawn from the rock corpus and bent by progressionMood, keeping the bank progression's length
+        progressionMood: { ...DEFAULT_MOOD }, // brightness -1 dark..1 bright, stability 0 floating..1 settled, adventure 0 plain..1 wandering
+        progressionWander: 0.5, // generated mode: the chance that each new cycle is a fresh progression instead of repeating the last (0 keeps the first for ever)
         barsPerChord: 1,
         meter: DEFAULT_METER, // meter.js
         leadActivity: 0.6, // chance a 4-bar phrase has lead (arranger.js)
@@ -51,6 +55,9 @@ export function defaultSettings() {
         padWeights: { ...DEFAULT_PAD_WEIGHTS }, // style shares per phrase
         bassWeights: { ...DEFAULT_BASS_WEIGHTS },
         thinPadUnderLead: true,
+        chordSize: 'uniform', // 'uniform': every chord has padNotes notes; 'functional': only dominant-function chords do, the rest are triads (a chord colour still adds its note)
+        padContour: 0, // the pad rises toward the middle of a phrase and its top voice prefers to move against the bass: 0 as before, 1 strongly
+        padRoot: 'always', // whether the pad plays the chord root when the bass does: always, unlessBass, never
         padNotes: 3, // chord size: 3 triads, 4 sevenths, 5 ninths
         // The colour layer (the Colour panel): each off or neutral by default
         chordColour: { mode: 'plain', amount: 0.35 }, // a colour (theory.js CHORD_COLOURS) on this share of the chords
@@ -61,6 +68,11 @@ export function defaultSettings() {
         tonality: { mode: 'tonal', separation: 1 },
         leadScale: 'full', // full, or pentatonic
         leadLeaps: 0.5, // how far the lead jumps between chord tones: 0.5 as drawn, less is stepwise, more leapy
+        borrowStyle: 'even', // which chords get borrowed from the parallel mode when chordBorrow is on: 'even' (any eligible one) or 'corpus' (flat VII and VI more than the minor iv)
+        bassEuclid: 0, // share of phrases whose grouped or driving bass plays an evenly spread (Euclidean) figure: 0 as drawn
+        leadTendency: 0, // how often a held leading tone goes up to the tonic and a fourth steps down to the third: 0 as drawn, 1 almost always (needs note resolution)
+        leadInertia: 0, // how strongly a step carries on the same way, and how a big leap wants a longer note: 0 as drawn, 1 strongly
+        leadSyncopation: 0, // share of beats the lead and bass push half a beat early: 0 straight, 1 heavily off the beat
         leadRepeat: 0, // share of phrases that repeat the last phrase's tune
         leadEnding: 'settled', // a phrase ends on the chord, or stays open
         voices: JSON.parse(JSON.stringify(DEFAULT_VOICES)), // per-role octave + wander
@@ -72,6 +84,7 @@ export function defaultSettings() {
         arc: { shape: 'off', minutes: 20 }, // the energy over a long stretch: rise, wind down or wave (composition/arc.js)
         feel: { busy: 0, bright: 0 }, // the feel pad's place: calmer..busier, darker..brighter (composition/feel.js)
         breakdowns: { meter: 'same', halfTime: false }, // a breakdown's own meter, and half-time drums in it
+        padVibrato: 0, // 0..1: pad and second-lead oscillator sounds without vibrato get a very slow, shallow one (composition/timbreDrift.js)
         timbreDrift: 0, // 0..1: oscillator sounds' colour moves slowly around their own (composition/timbreDrift.js)
         keyLift: 0, // 0..1: chance that a build lifts the full sections after it a whole step (Generator.planBar)
         sectionSpace: 0, // 0..1: a wide room the voices send to more in intros and breakdowns (composition/sectionSpace.js)
@@ -123,6 +136,9 @@ const RULES = {
     mode: (v) => (MODE_IDS.has(v) ? v : undefined),
     bpm: clamp(BPM_LIMITS[0], BPM_LIMITS[1]),
     progression: int(0, PROGRESSIONS.length - 1),
+    progressionMode: oneOf(['bank', 'generated']),
+    progressionMood: { brightness: clamp(-1, 1), stability: clamp(0, 1), adventure: clamp(0, 1) },
+    progressionWander: clamp(0, 1),
     barsPerChord: oneOf([1, 2, 4]),
     meter: oneOf(Object.keys(METERS)),
     leadActivity: clamp(0, 1),
@@ -132,6 +148,9 @@ const RULES = {
     bassWeights: { whole: clamp(0, 100), half: clamp(0, 100), walking: clamp(0, 100), drive: clamp(0, 100) },
     thinPadUnderLead: bool,
     padNotes: oneOf([3, 4, 5]),
+    chordSize: oneOf(['uniform', 'functional']),
+    padContour: clamp(0, 1),
+    padRoot: oneOf(Object.keys(PAD_ROOTS)),
     chordColour: { mode: oneOf(Object.keys(CHORD_COLOURS)), amount: clamp(0, 1) },
     chordBorrow: clamp(0, 1),
     chordSpread: oneOf(Object.keys(SPREADS)),
@@ -140,6 +159,11 @@ const RULES = {
     tonality: { mode: oneOf(['tonal','atonal','bitonal']), separation: int(1,11) },
     leadScale: oneOf(Object.keys(LEAD_SCALES)),
     leadLeaps: clamp(0, 1),
+    borrowStyle: oneOf(['even', 'corpus']),
+    bassEuclid: clamp(0, 1),
+    leadTendency: clamp(0, 1),
+    leadInertia: clamp(0, 1),
+    leadSyncopation: clamp(0, 1),
     leadRepeat: clamp(0, 1),
     leadEnding: oneOf(Object.keys(LEAD_ENDINGS)),
     voices: Object.fromEntries(Object.entries(OCTAVE_LIMITS).map(([role, [lo, hi]]) => [role, {
@@ -167,6 +191,7 @@ const RULES = {
     evenLoudness: clamp(0, 1),
     sectionSpace: clamp(0, 1),
     keyLift: clamp(0, 1),
+    padVibrato: clamp(0, 1),
     timbreDrift: clamp(0, 1),
     breakdowns: { meter: oneOf(['same', ...Object.keys(METERS)]), halfTime: bool },
     feel: { busy: clamp(-1, 1), bright: clamp(-1, 1) },

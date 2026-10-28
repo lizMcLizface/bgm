@@ -10,6 +10,7 @@ import { SCALE_FAMILIES, TONIC_NAMES, scaleById } from './theory';
 import ChordTimeline from './ChordTimeline';
 import Rulebook from './rulebook/Rulebook';
 import GroupCard from './rulebook/GroupCard';
+import TrialRules, { TRIAL_RULE_IDS } from './rulebook/TrialRules';
 import { GROUPS, groupValue } from './rulebook/groups';
 import { RULES } from './rulebook/model';
 import { readBook, inheritBook, withPresetBook, withBook, applyBook, baselineChoice, withoutSettings } from './rulebook/session';
@@ -460,7 +461,7 @@ function useNowPlaying(gen, running, settings) {
 // away from them; differing parts are highlighted.
 const NowPlaying = ({ now, settings, onKeep }) => {
     const keyDiffers = now.tonic !== settings.tonic || now.mode !== settings.mode;
-    const progressionDiffers = now.progression !== settings.progression;
+    const progressionDiffers = settings.progressionMode === 'generated' || now.progression !== settings.progression;
     const tempoDiffers = now.bpm !== settings.bpm;
     if (!keyDiffers && !progressionDiffers && !tempoDiffers) return null;
     const part = (differs, text) => <span className={differs ? 'gen-differs' : ''}>{text}</span>;
@@ -468,7 +469,7 @@ const NowPlaying = ({ now, settings, onKeep }) => {
         <div className="gen-nowplaying" role="status">
             <span>Now playing:</span>
             {part(keyDiffers, now.keyName)}
-            {part(progressionDiffers, PROGRESSIONS[now.progression].join(' – '))}
+            {part(progressionDiffers, (now.numerals ?? PROGRESSIONS[now.progression]).join(' – '))}
             {part(tempoDiffers, `${now.bpm} BPM`)}
             <button type="button" onClick={onKeep}>Keep this</button>
         </div>
@@ -1556,6 +1557,11 @@ const GenerativeApp = () => {
                 tracks={has(1) || zenShown && zenTracks ? <TrackStrip roles={shownTracks} presets={{...Object.fromEntries(Object.entries(roles).map(([role, { presetName, edited, external }]) => [role, { name: external?.label ?? presetName, edited }])),perc:percMachine?{name:percMachine.label,edited:false}:{name:percussionVoice(settings.drums.kit).name,edited:percussionEdited(settings.drums.kit,settings.drumKit)}}} mix={mix} armed={armed} onMix={changeMix} onArm={setArmed} onEdit={has(3) ? editSound : undefined}
                     onRandom={randomizePreset} onGenerate={has(3) ? generateForRole : undefined} onPick={choosePicker} onPickPercussion={()=>choosePicker('perc')} onEditPercussion={has(3)?editPercussionSound:undefined} percussionHint={percussionKeyHint(settings.drums.kit)} generating={generating} live={live} /> : null}
             />
+
+            {has(2) && TRIAL_RULE_IDS.length > 0 && <Panel id="trial" title="Trial rules">
+                <p className="gen-hint">New rules to try by ear, all in one place. Each follows the preset until you change it.</p>
+                <TrialRules settings={settings} book={book} onChoice={changeRule} />
+            </Panel>}
 
             {has(2) && <Panel id="feel" title="Feel">
                 <FeelPad feel={settings.feel} onChange={changeFeel} />

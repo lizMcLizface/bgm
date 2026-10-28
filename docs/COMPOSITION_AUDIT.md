@@ -106,10 +106,39 @@ motion than pop, consistent with the minor and "unresolved" progression banks. 4
 - Mood cues: notes per second median 1.36 (range .41–3.97) against Eerola's 1.2–6 scale; articulation .88
   (legato-leaning). Consistent with calm music; no preset sits at the energetic end.
 
+## Closure rule tried and reverted
+A settled phrase end that preferred tonic-triad tones of the key over the chord's root and third raised the response-end
+tonic-triad share from .29 to .67. It only changed phrases whose final chord is not the tonic chord, i.e. it overrode the
+progression. The site lets users pick unusual progressions (including ones with no I at all) so the openness can be heard,
+so a melody that ends on the sounding chord's own root or third is the intended behaviour. Reverted.
+Finding 1 is therefore not a melody defect: the low tonic-triad share reflects the progressions' phrase-final chords.
+The only part worth keeping is the seventh at V→I arrivals (finding on cadences), and only for progressions that
+choose that arrival.
+
+## Syncopation control built
+`leadSyncopation` (0 to 1, default 0; rulebook rule “Push the groove off the beat”, `src/app/composition/syncopation.js`):
+the lead and, outside walking bass, the bass push a note on a beat half a beat early (keeping its end), and a held
+lead downbeat can arrive half a beat late; the cadence bar is pushed least and a phrase's last note never moves.
+Measured on the lead alone (a drum kit on every beat hides it in the merged measure, which is why the merged median only
+moved 0.09 to 0.29): amount 0 / .3 / .6 / 1 gives Keith 0.43 / 0.70 / 0.94 / 1.22 per bar on three dense presets. About 45
+groove and game presets carry .15 to .55; calm, ambient, piano and podcast presets stay 0, as do the old “Demo:” presets
+so their A/B comparisons stay clean. New “Demo: Groove slider” preset. Audit: `AUDIT_SYNC=0.5` forces an amount;
+`tools/grooveDemoData.audit.js` writes the plans behind the demo page. Not listened to.
+
+## Metrics added after the first run
+- **Longuet-Higgins & Lee syncopation** (`lhlSyncopation`, `lhlByBar`): weights by metrical level, the heaviest silent
+  position after a note counts. Lead alone, current library: median 0.52 per bar (p10–p90 0.25–1.00); it rises from 0.67
+  to 1.80 on three dense presets as `leadSyncopation` goes from 0 to 1.
+- **Section seams** (`seamScores`, after Medina-Gray): meter, timbre, pitch-class, dynamics and tempo continuity at each
+  section change. Median overall smoothness 0.80 (0.69–0.89): meter and tempo 1.00, pitch classes 0.63, dynamics 0.69,
+  timbre 0.70. The lowest seams are presets with strong contrast on purpose (Demo: Living colour, Breathing room, Make room).
+- **Tendency tones**: a held leading tone goes up to the tonic 33% of the time, a held fourth steps down 13% (before `leadTendency`).
+- **Pad voicing** (`tools/padAudit.audit.js`): root in pad and bass, span, movement, contrary outer voices, phrase register arc.
+- **Rule conflicts** (`tools/ruleConflicts.audit.js`) and the **unchanged-defaults guard** (`tools/planDump.audit.js`).
+
 ## What this changes in the plan
 Order by size of gap and cheapness:
-1. **Closure rule for the end of a 4-bar response:** prefer 1̂/3̂/5̂ of the key (and a V→I cadence) where the
-   chord allows; keep 2̂/7̂ for the call or for half-cadence phrases. Test: the response-end tonic-triad share.
+1. ~~Closure rule~~: dropped. Endings follow the chosen progression on purpose (see above).
 2. **Key-level stability prior** (Krumhansl) in the beam search so the fifth and tonic triad are used in their
    natural proportions. Test: degree profile against Essen.
 3. **Step inertia and fewer zig-zags** (Huron 2006; Schellenberg proximity): continue descending steps, allow

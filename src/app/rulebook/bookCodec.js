@@ -81,7 +81,21 @@ export const BOOK_RULE_IDS=[
   "energy-arc-length",
   "timbre-drift",
   "breakdown-meter",
-  "half-time-breakdowns"
+  "half-time-breakdowns",
+  "lead-syncopation",
+  "pad-root",
+  "chord-size-by-function",
+  "lead-inertia",
+  "pad-contour",
+  "lead-tendency",
+  "bass-euclid",
+  "borrow-style",
+  "pad-vibrato",
+  "progression-mode",
+  "progression-brightness",
+  "progression-stability",
+  "progression-adventure",
+  "progression-wander"
 ];
 export const BOOK_GROUP_IDS=[
   "pad-register",

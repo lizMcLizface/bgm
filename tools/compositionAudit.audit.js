@@ -7,6 +7,9 @@
 // shows what to try, not how it sounds.
 //
 //   AUDIT_BARS=128 AUDIT_SEEDS=2 npm run audit:composition
+//   AUDIT_SYNC=0.5 forces the syncopation amount on every preset
+//   AUDIT_INERTIA=0.5 forces the melodic inertia amount
+//   AUDIT_SET='{"padRoot":"unlessBass","chordSize":"functional"}' forces any settings on every preset
 //   AUDIT_ONLY=boss-fight-politely,rainy-cafe npm run audit:composition
 
 import fs from 'node:fs';
@@ -25,7 +28,10 @@ const OUT = path.resolve('.tmp/composition-audit');
 const thirdOf = (modeId) => scaleSemitones(scaleById(modeId).intervals)[2];
 
 function auditScene(scene, seed) {
-    const settings = { ...sceneSettings(scene, seed), humanize: { timing: 0, velocity: 0, detune: 0 }, swing: 0 };
+    const settings = { ...sceneSettings(scene, seed), humanize: { timing: 0, velocity: 0, detune: 0 }, swing: 0,
+        ...(process.env.AUDIT_SYNC === undefined ? {} : { leadSyncopation: Number(process.env.AUDIT_SYNC) }),
+        ...(process.env.AUDIT_INERTIA === undefined ? {} : { leadInertia: Number(process.env.AUDIT_INERTIA) }),
+        ...(process.env.AUDIT_SET ? JSON.parse(process.env.AUDIT_SET) : {}) };
     const g = new Generator(settings);
     applyBook(g, inheritBook(scene.rulebook));
     const planner = g.planner();
@@ -49,6 +55,12 @@ function auditScene(scene, seed) {
         strongBeat: M.strongBeatChordTones(bars, 'lead', groupStarts),
         leadVsChord: M.chordRelativeShare(bars, 'lead'),
         phraseEnds: tonal && lead.length > 20 ? { all: M.phraseEndNotes(lead, tonicOf), first: M.phraseEndNotes(lead, tonicOf, 4, 0), second: M.phraseEndNotes(lead, tonicOf, 4, 1), call: M.phraseEndNotes(lead, tonicOf, 2, 0), response: M.phraseEndNotes(lead, tonicOf, 2, 1) } : null,
+        tendency: tonal ? M.tendencyResolution(lead, tonicOf, 0.75) : null,
+        bassEven: M.euclideanShare(bars, ['bass']),
+        leadLHL: (() => { const rows = M.lhlByBar(bars, ['lead']).filter((r) => r.score !== null && r.onsets > 0); return rows.length ? Number((rows.reduce((a, r) => a + r.score, 0) / rows.length).toFixed(3)) : null; })(),
+        leadBassLHL: (() => { const rows = M.lhlByBar(bars, ['lead', 'bass']).filter((r) => r.score !== null && r.onsets > 0); return rows.length ? Number((rows.reduce((a, r) => a + r.score, 0) / rows.length).toFixed(3)) : null; })(),
+        seams: (() => { const list = M.seamScores(bars, unitsPerMinute); const avg = (k) => list.length ? Number((list.reduce((a, x) => a + x[k], 0) / list.length).toFixed(3)) : null; return { count: list.length, smooth: avg('smooth'), meter: avg('meter'), timbre: avg('timbre'), pitch: avg('pitch'), dynamics: avg('dynamics'), tempo: avg('tempo') }; })(),
+        leadSyncopation: (() => { const rows = M.syncopationByBar(bars, ['lead']).filter((r) => r.score !== null && r.onsets > 0); return rows.length ? Number((rows.reduce((a, r) => a + r.score, 0) / rows.length).toFixed(3)) : null; })(),
         syncopation: { meanPerBar: Number((M.syncopationByBar(bars).filter((r) => r.score !== null).reduce((a, r) => a + r.score, 0) / Math.max(1, syncRows.filter((r) => r.score !== null).length)).toFixed(3)), byPhrasePosition: M.syncopationByPhrasePosition(syncRows) },
         leadDensityByPhrasePosition: M.densityByPhrasePosition(bars, ['lead']),
         harmony: tonal ? { chords: roots.chords, dominantArrivals: M.dominantSeventhAtCadence(roots.roots), rootShare: roots.rootShare, fifthsDistanceShare: roots.fifthsDistanceShare, seventhShare: roots.seventhShare, } : null,
@@ -124,6 +136,17 @@ function summarise(results) {
 
     L.push('', '## Rhythm', '', '| measure | ours | note |', '| --- | --- | --- |');
     L.push(`| Keith syncopation per bar (merged lead/bass/perc/counter onsets) | ${dist(results.map((r) => r.syncopation.meanPerBar), 2)} | no published target; Witek: medium is best for groove |`);
+    L.push(`| Keith syncopation per bar, lead alone (bars with a lead note; the pulse is implied, as a drum kit would hide it) | ${dist(results.map((r) => r.leadSyncopation), 2)} | – | |`);
+    L.push(`| Longuet-Higgins & Lee syncopation per bar, lead alone | ${dist(results.map((r) => r.leadLHL), 2)} | – | Longuet-Higgins & Lee 1984 |`);
+    L.push(`| Longuet-Higgins & Lee syncopation per bar, lead + bass | ${dist(results.map((r) => r.leadBassLHL), 2)} | – | |`);
+    const ev = results.filter((r) => r.bassEven && r.bassEven.bars > 0);
+    if (ev.length) { const w = ev.reduce((a, r) => a + r.bassEven.bars, 0); L.push(`| bass bars whose onsets form a maximally even (Euclidean) set (${w} bars with 3+ eighth-grid onsets) | ${fmt(ev.reduce((a, r) => a + r.bassEven.share * r.bassEven.bars, 0) / w)} | Toussaint 2013 | |`); }
+    const tend = results.filter((r) => r.tendency && r.modeFamily === 'major-like');
+    if (tend.length) {
+        const pool = (k, c) => { const w = tend.reduce((a, r) => a + r.tendency[c], 0); return w ? tend.reduce((a, r) => a + (r.tendency[k] ?? 0) * r.tendency[c], 0) / w : null; };
+        L.push(`| held leading tone that goes up to the tonic (major-like, ${tend.reduce((a, r) => a + r.tendency.leading, 0)} cases) | ${fmt(pool('leadingToTonic', 'leading'))} | high in tonal music (Krumhansl; Huron 2006) | tendency tones |`);
+        L.push(`| held fourth that steps down (${tend.reduce((a, r) => a + r.tendency.fourth, 0)} cases) | ${fmt(pool('fourthToThird', 'fourth'))} | – | |`);
+    }
     const pos = (i) => dist(results.map((r) => r.syncopation.byPhrasePosition[i]), 2);
     L.push(`| syncopation by bar of a 4-bar phrase: 1 / 2 / 3 / 4 | ${[0, 1, 2, 3].map(pos).join(' / ')} | GTTM: cadence bar (4) should be plainer |`);
     const dens = (i) => dist(results.map((r) => r.leadDensityByPhrasePosition[i]), 2);
@@ -158,7 +181,7 @@ function summarise(results) {
     L.push(`| lead articulation (length / gap to next) | ${dist(results.map((r) => r.mood.leadArticulation), 2)} | 1 legato … 0.25 | Eerola et al. |`);
     const byPreset = new Map(); results.forEach((r) => { if (!byPreset.has(r.slug)) byPreset.set(r.slug, []); byPreset.get(r.slug).push(r); });
     const rank = (title, key, d = 2, n = 8, asc = false) => {
-        const rows = [...byPreset.values()].map((rs) => [rs[0].name, mean(rs.map(key).filter((x) => x !== null && x !== undefined))]).filter(([, v]) => v !== null && Number.isFinite(v));
+        const rows = [...byPreset.values()].map((rs) => [rs[0].name, rs.map(key).filter((x) => x !== null && x !== undefined)]).filter(([, vals]) => vals.length).map(([name, vals]) => [name, mean(vals)]).filter(([, v]) => Number.isFinite(v));
         rows.sort((a, z) => (asc ? a[1] - z[1] : z[1] - a[1]));
         L.push('', `### ${title}`, '', rows.slice(0, n).map(([name, v]) => `${name} ${fmt(v, d)}`).join(' · '));
     };
@@ -168,7 +191,18 @@ function summarise(results) {
     rank('Most exact bar repeats (all tracks)', (r) => r.exactRepeat, 3);
     rank('Fewest exact bar repeats', (r) => r.exactRepeat, 3, 8, true);
     rank('Most bars with a close low pair (Huron: avoid)', (r) => r.spacing.closeLowPairShare, 3);
+    rank('Roughest section seams (lowest overall smoothness; a deliberate contrast is not a fault)', (r) => r.seams?.count ? r.seams.smooth : null, 2, 8, true);
     rank('Highest pitch-class circulation at N=100 (chromatic or drifting)', (r) => r.circulation[100], 2);
+    const withSeams = results.filter((r) => r.seams && r.seams.count > 0);
+    if (withSeams.length) {
+        const col = (k) => dist(withSeams.map((r) => r.seams[k]), 2);
+        L.push('', '## Section seams (Medina-Gray: how smooth the change between section types is; 1 = continuous)', '',
+            `${withSeams.length} runs have section changes (median ${dist(withSeams.map((r) => r.seams.count), 0)} per run).`, '',
+            '| aspect | median (p10-p90) | note |', '| --- | --- | --- |',
+            `| overall smoothness | ${col('smooth')} | mean of the five |`, `| meter continuity | ${col('meter')} | same metre across the seam |`,
+            `| timbre | ${col('timbre')} | parts that keep playing across it |`, `| pitch classes | ${col('pitch')} | first second already in the previous five seconds; .5 or more is mildly smooth |`,
+            `| dynamics | ${col('dynamics')} | mean velocity either side |`, `| tempo | ${col('tempo')} | bpm either side |`);
+    }
     return L.join('\n') + '\n';
 }
 

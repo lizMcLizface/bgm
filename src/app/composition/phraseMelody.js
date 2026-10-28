@@ -6,6 +6,21 @@ const nearest=(notes,target)=>notes.reduce((best,n)=>Math.abs(n-target)<Math.abs
 const clamp=(x,lo,hi)=>Math.max(lo,Math.min(hi,x));
 export const PHRASE_BEAM=24;
 
+/**
+ * Melodic inertia (0..1): a step tends to be followed by another step the same way, and descending steps carry on more
+ * than ascending ones (Huron 2006: about .70 continue after a descending step); a large leap wants a longer note at one
+ * end (Huron PR12). Returns a cost for the move from the previous note; zero when the amount is zero.
+ */
+export function inertiaCost({amount=0,previous=0,motion=0,leap=0,from,to}) {
+    if(!(amount>0))return 0;
+    let cost=0;
+    const wasStep=previous!==0&&Math.abs(previous)<=2;
+    if(wasStep&&motion!==0&&Math.sign(motion)!==Math.sign(previous))cost+=amount*(previous<0?1.5:.9);
+    if(wasStep&&motion===0)cost+=amount*.7; // stalling on the note is not carrying on
+    if(leap>=5&&from&&to&&from.length<1&&to.length<1)cost+=amount*.8;
+    return cost;
+}
+
 /** Joint, bounded search through the remaining notes of a known phrase. */
 export function searchPhrase({bars,range,settings,previousMidi,seed,closing=true}) {
     const stages=[];
@@ -35,9 +50,10 @@ export function searchPhrase({bars,range,settings,previousMidi,seed,closing=true
             const contour=direction&&motion&&Math.sign(motion)!==direction?.8:0;
             const recovery=Math.abs(path.motion)>4&&motion&&Math.sign(motion)===Math.sign(path.motion)?1.5:0;
             const reach=closing?Math.max(0,Math.abs(midi-goal)-remaining*2)*.4:0;
+            const inertia=inertiaCost({amount:settings.leadInertia??0,previous:path.motion,motion,leap,from:prior?.note,to:stage.note});
             const chordCost=stage.tension===undefined?3:4-stage.tension*2;
             const score=path.score+Math.abs(midi-stage.target)*.65+(stage.note.accent&&!stage.chord.includes(midi%12)?chordCost:0)
-                +Math.max(0,leap-(3+(settings.leadLeaps??.5)*6))*.9+leap*.08+contour+recovery+Math.max(0,run-1)*.7+reach;
+                +Math.max(0,leap-(3+(settings.leadLeaps??.5)*6))*.9+leap*.08+contour+recovery+Math.max(0,run-1)*.7+reach+inertia;
             paths.push({score,last:midi,motion,run,pitches:[...path.pitches,midi]});
         }
         // Preserve different destinations/directions rather than many duplicate prefixes.
@@ -57,7 +73,7 @@ export function searchPhrase({bars,range,settings,previousMidi,seed,closing=true
 
 /** Reuse the chosen path only while its remaining musical context agrees. */
 export function planPhraseMelody(options,previous) {
-    const signature=JSON.stringify([options.seed,options.range,options.settings.leadScale,options.settings.leadEnding,options.settings.leadLeaps,options.closing,!!options.resolveNotes,!!options.rhythmGrammar,options.meter,options.settings.leadDensity]);
+    const signature=JSON.stringify([options.seed,options.range,options.settings.leadScale,options.settings.leadEnding,options.settings.leadLeaps,options.settings.leadInertia,options.settings.leadTendency,options.closing,!!options.resolveNotes,!!options.rhythmGrammar,options.meter,options.settings.leadDensity]);
     const stages=options.bars.map(b=>({bar:b.bar,bpm:b.bpm,...(b.tension===undefined?{}:{tension:b.tension}),midpoint:!!b.midpoint,chord:{pitchClasses:b.chord.pitchClasses},scalePcs:b.scalePcs,notes:b.notes}));
     const from=stages[0].bar,remaining=previous?.stages?.filter(b=>b.bar>=from);
     const priorEvents=previous?.bars?.filter(b=>b.bar<from).flatMap(b=>b.events);

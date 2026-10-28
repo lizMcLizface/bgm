@@ -218,7 +218,13 @@ function voicingsInRange(pitchClasses, low, high) {
     return voicings;
 }
 
-const movement = (a, b) => a.reduce((sum, note, i) => sum + Math.abs(note - b[i]), 0);
+const movement = (a, b) => {
+    if (a.length === b.length) return a.reduce((sum, note, i) => sum + Math.abs(note - b[i]), 0);
+    // another size (a seventh becoming a triad): each note goes to its nearest neighbour in the other voicing, the larger voicing's notes counting half
+    const [small, large] = a.length < b.length ? [a, b] : [b, a];
+    const near = (note, list) => Math.min(...list.map((m) => Math.abs(m - note)));
+    return small.reduce((sum, note) => sum + near(note, large), 0) + 0.5 * large.reduce((sum, note) => sum + near(note, small), 0);
+};
 
 /**
  * Picks the voicing of a chord within [low, high] that moves least from the
@@ -232,9 +238,10 @@ const movement = (a, b) => a.reduce((sum, note, i) => sum + Math.abs(note - b[i]
  * @param {number} high - highest allowed MIDI note
  * @param {number[]} [previous] - previous voicing, same size
  * @param {number} [target] - MIDI note the voicing's center leans toward
+ * @param {{contrary?: number, against?: number}} [options] - contrary: cost per semitone of the top voice moving the way the bass moves (against: +1 / -1)
  * @returns {number[]} MIDI notes, ascending
  */
-export function voiceLead(pitchClasses, low, high, previous = null, target = null) {
+export function voiceLead(pitchClasses, low, high, previous = null, target = null, { contrary = 0, against = 0 } = {}) {
     // Big chords (ninths span 13-14 semitones in close position) may not
     // fit a narrow range from every bottom note: widen it a semitone at a
     // time, alternating top and bottom, so they sit as close as possible.
@@ -248,9 +255,11 @@ export function voiceLead(pitchClasses, low, high, previous = null, target = nul
 
     const center = (low + high) / 2;
     const mean = (v) => v.reduce((s, n) => s + n, 0) / v.length;
+    // `against` is the way the bass is moving (+1 up, -1 down, 0 unknown): with `contrary` set, the top voice is charged for moving the same way
+    const sameWay = contrary && against && previous && previous.length ? (v) => Math.max(0, (v.at(-1) - previous.at(-1)) * against) * contrary : () => 0;
     const lean = target === null ? () => 0 : (v) => Math.abs(mean(v) - target) * v.length * 1.25;
-    const score = previous && previous.length === pitchClasses.length
-        ? (v) => movement(v, previous) + lean(v)
+    const score = previous && previous.length
+        ? (v) => movement(v, previous) + lean(v) + sameWay(v)
         : (v) => Math.abs(mean(v) - (target === null ? center : target));
     return candidates.reduce((best, v) => (score(v) < score(best) ? v : best));
 }
@@ -259,3 +268,13 @@ export function voiceLead(pitchClasses, low, high, previous = null, target = nul
 export function noteAtOrAbove(pc, low) {
     return low + ((pc - low) % 12 + 12) % 12;
 }
+
+// Relative chance that a borrowed chord is taken on each degree (borrowStyle 'corpus'). Rock corpus (de Clercq & Temperley 2011):
+// bVII .081, bVI .040, so the borrowed VII comes up about twice as often as the borrowed VI; the minor iv is set lower (judgement,
+// the corpus counts it little). In a minor key the major IV (the Dorian chord) is taken a little more than the major V.
+const BORROW_WEIGHTS = { major: { 7: 1.6, 6: 0.8, 4: 0.5 }, minor: { 4: 1.3, 5: 0.7 } };
+export function borrowWeight(numeral, modeId) {
+    const degree = romanDegree(numeral), minor = scaleSemitones(scaleById(modeId).intervals)[2] === 3;
+    return BORROW_WEIGHTS[minor ? 'minor' : 'major'][degree] ?? 1;
+}
+

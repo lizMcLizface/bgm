@@ -42,3 +42,22 @@ export function timbreDrift(preset, role, bar, amount, seed = 0) {
     }
     return Object.keys(values).length ? values : null;
 }
+
+/**
+ * Slow pad vibrato (settings.padVibrato, 0..1): a pad or second-lead oscillator sound that has no vibrato of its own gets a
+ * very gentle one (up to 6 cents at full, 0.3-0.8 Hz, so it reads as a slow shimmer, not as singing), its depth and rate
+ * gliding between seeded targets every 8 bars like the timbre drift. Same safety rules as the drift (canDrift). A sound
+ * that already has vibrato, and every other role, is left alone. Applied live; the preset never changes.
+ */
+export function slowVibrato(preset, role, bar, amount, seed = 0) {
+    if (!(amount > 0) || (role !== 'pad' && role !== 'counter') || !canDrift(preset) || preset.vibratoDepth > 0) return null;
+    const segment = Math.floor(Math.max(0, bar) / SEGMENT), t = smooth((Math.max(0, bar) % SEGMENT) / SEGMENT);
+    const at = (key) => (position(seed, role, segment, key) * (1 - t) + position(seed, role, segment + 1, key) * t + 1) / 2;
+    return { vibratoDepth: Math.round(amount * (0.35 + 0.65 * at('depth')) * 6 * 100) / 100, vibratoRate: Math.round((0.3 + 0.5 * at('rate')) * 1000) / 1000 };
+}
+
+/** What a role's sound moves by at `bar`: the timbre drift and the slow pad vibrato together, or null. */
+export function voiceMotion(preset, role, bar, { timbreDrift: drift = 0, padVibrato = 0 } = {}, seed = 0) {
+    const a = timbreDrift(preset, role, bar, drift, seed), b = slowVibrato(preset, role, bar, padVibrato, seed);
+    return a || b ? { ...b, ...a } : null;
+}

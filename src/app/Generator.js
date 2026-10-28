@@ -38,7 +38,7 @@ import { PERFORMANCE } from '../audio/performance';
 import { hubFor } from '../nodes/sharedReverb';
 import Transport from './engine/transport';
 import { RoleWander, instrumentWander } from './engine/wander';
-import { scaleById, scaleSemitones, spellScale, romanDegree, diatonicChord, chordSymbol, displayNumeral, noteAtOrAbove, voiceLead } from './theory';
+import { borrowWeight, scaleById, scaleSemitones, spellScale, romanDegree, diatonicChord, chordSymbol, displayNumeral, noteAtOrAbove, voiceLead } from './theory';
 import { arrangeBar, notesInRange } from './arranger';
 import { arrangeBarLatest } from './composition/arrangerLatest';
 import { planForm, cutForm } from './composition/formLatest';
@@ -64,7 +64,8 @@ import { Ducker, DUCKED_BY, duckFloor } from './engine/ducking';
 import { planLoudness } from './composition/loudness';
 import { SPACE_RACK, SPACE_ROLE, sectionSpaceLevel } from './composition/sectionSpace';
 import { arcEnergy, applyArc, arcTone, arcSpace } from './composition/arc';
-import { timbreDrift } from './composition/timbreDrift';
+import { voiceMotion } from './composition/timbreDrift';
+import { generateProgression } from './composition/progressionGen';
 import { applyFeel, feelActive, feelTone, feelEnergy, ghostNotes } from './composition/feel';
 import { nextMusic, glideTempo, scaleDistance } from './conductor';
 import { METERS, unitsPerMinute, swingEvents, halfTime, chordBars, splitBeat } from './meter';
@@ -714,8 +715,8 @@ class Generator {
     /** What is audible now: { tonic, mode, progression, bpm, keyName }. */
     nowPlaying() {
         const planned = this.plan.get(Math.floor(this.position() / this.beatsPerBar)) || this.getPlan()[0];
-        const { tonic, mode, progression } = planned.music;
-        return { tonic, mode, progression, bpm: Math.round(planned.bpm), keyName: planned.chord.keyName };
+        const { tonic, mode, progression, numerals } = planned.music;
+        return { tonic, mode, progression, ...(numerals ? { numerals } : {}), bpm: Math.round(planned.bpm), keyName: planned.chord.keyName };
     }
 
     refreshStringPatches() {
@@ -779,11 +780,11 @@ class Generator {
     // Timbre drift (composition/timbreDrift.js) at a bar's start, for each melodic role; a role
     // that was drifting gets its preset back when the setting goes to 0.
     applyDrift(bar, barSeconds) {
-        const amount = this.settings.timbreDrift;
+        const amounts = { timbreDrift: this.settings.timbreDrift, padVibrato: this.settings.padVibrato };
         for (const role of ['lead', 'counter', 'pad', 'bass']) {
             const r = this.roles[role], instrument = r?.instrument;
             if (!instrument?.setDrift) continue;
-            const values = timbreDrift(instrument.preset, role, bar, amount, this.settings.seed);
+            const values = voiceMotion(instrument.preset, role, bar, amounts, this.settings.seed);
             if (!values && !r.drifting) continue;
             instrument.setDrift(values, barSeconds);
             r.drifting = !!values;
@@ -1172,7 +1173,9 @@ class Generator {
         const borrowed = borrow && ((minorHome && [4, 5].includes(degree)) || (majorHome && [4, 6, 7].includes(degree)));
         const chordScale = borrowed ? scaleSemitones(scaleById(minorHome ? 'Major-1' : 'Major-6').intervals) : harmonic;
         const names = spellScale(tonic, chordScale);
-        const offsets = diatonicChord(chordScale, degree, this.settings.padNotes, colour);
+        // 'functional': dominant-function chords (V, vii) keep the full size, the others are triads
+        const size = this.settings.chordSize === 'functional' && ![5, 7].includes(degree) ? 3 : this.settings.padNotes;
+        const offsets = diatonicChord(chordScale, degree, size, colour);
         const result = {
             numeral: displayNumeral(numeral, offsets),
             pitchClasses: offsets.map((o) => (tonic + o) % 12),
@@ -1187,17 +1190,18 @@ class Generator {
         return this.settings.tonality.mode==='bitonal'?describeBitonality(result,music,this.settings.tonality.separation):result;
     }
 
-    avoidTonic(music) { return this.settings.tonality.mode==='atonal'||isUnsettlingProgression(music.progression); }
+    avoidTonic(music) { return this.settings.tonality.mode==='atonal'||music.unsettled===true||isUnsettlingProgression(music.progression); }
     endingChord(music,bar,numeral) { return this.avoidTonic(music)?this.chordAt(bar,music):this.buildChord(music,numeral); }
 
     // The chord at `bar` under `music` (progressions restart each cycle).
     chordAt(bar, music) {
-        const numerals = PROGRESSIONS[music.progression];
+        const numerals = music.numerals ?? PROGRESSIONS[music.progression]; // a generated cycle carries its own chords
         const slot = this.harmonicSlotAt(bar,music);
         if(this.settings.tonality.mode==='atonal')return atonalChord({seed:this.settings.seed,tonic:music.tonic,slot:Math.floor(music.cycleStart/this.settings.barsPerChord)+slot.index,size:this.settings.padNotes,colour:this.colourFor(slot.start)});
         const colourBar = this.variableHarmonyOn() && music.harmonicDurations ? slot.start : bar;
-        const chord=this.buildChord(music, numerals[slot.index], this.colourFor(colourBar), this.borrowFor(colourBar));
-        return isUnsettlingProgression(music.progression)?{...chord,unresolved:true}:chord;
+        const borrow = music.borrows ? !!music.borrows[slot.index] : this.borrowFor(colourBar, numerals[slot.index]);
+        const chord=this.buildChord(music, numerals[slot.index], this.colourFor(colourBar), borrow);
+        return music.unsettled===true||isUnsettlingProgression(music.progression)?{...chord,unresolved:true}:chord;
     }
 
     variableHarmonyOn() {
@@ -1210,8 +1214,24 @@ class Generator {
             barsPerChord:this.settings.barsPerChord,durations:this.variableHarmonyOn()?music.harmonicDurations:undefined});
     }
 
+    // Generated progressions (settings.progressionMode 'generated', composition/progressionGen.js): the chords of the cycle starting at
+    // `cycleStart`, kept on `next` as numerals and explicit borrow flags. The cycle keeps the length of its bank progression, so every
+    // length assumption elsewhere holds. With progressionWander at 0 the first cycle is kept for ever; above 0 each new cycle is a fresh
+    // draw with that chance, starting from where the last one left off. Scales without seven notes keep the bank progression.
+    generateCycle(next,cycleStart) {
+        const harmonic=scaleSemitones(scaleById(harmonyMode(next.mode,this.settings.harmonyScale,this.settings.generation)).intervals);
+        if(harmonic.length!==7||this.settings.tonality.mode==='atonal')return;
+        const family=harmonic[2]===3?'minor':'major',length=PROGRESSIONS[next.progression].length,{seed,progressionWander:wander}=this.settings;
+        const keep=next.numerals&&next.genFamily===family&&next.numerals.length===length&&seeded((seed*37+cycleStart*101+7)>>>0)()>=wander;
+        if(keep)return;
+        const made=generateProgression({seed:(seed^Math.imul(cycleStart+1,0x9e3779b1))>>>0,length,family,mood:this.settings.progressionMood,
+            after:next.numerals&&next.genFamily===family?next.genIds?.at(-1):null});
+        Object.assign(next,{numerals:made.numerals,borrows:made.borrows,unsettled:made.unsettled,genIds:made.ids,genFamily:family});
+    }
+
     cycleMusic(music,cycleStart,fromBar) {
         const next={...music,cycleStart};delete next.harmonicDurations;
+        if(this.settings.progressionMode==='generated')this.generateCycle(next,cycleStart);
         if(this.variableHarmonyOn()){
             const durations=harmonicDurations({count:PROGRESSIONS[next.progression].length,barsPerChord:this.settings.barsPerChord,cycleStart,
                 develop:this.harmonicDevelopment!==false, section:this.sectionFormAt(cycleStart,next,fromBar)?.section});
@@ -1231,10 +1251,12 @@ class Generator {
     }
 
     // Whether the chord `bar` falls in is borrowed (settings.chordBorrow): by the seed and the bar, like colourFor.
-    borrowFor(bar) {
+    // borrowStyle 'corpus' scales the chance by which chord would be borrowed (BORROW_WEIGHTS), given its numeral.
+    borrowFor(bar, numeral = null) {
         const share = this.settings.chordBorrow;
         if (!(share > 0)) return false;
-        return seeded(this.settings.seed * 37 + 11 + Math.floor(bar / this.settings.barsPerChord))() < share;
+        const weight = this.settings.borrowStyle === 'corpus' && numeral ? borrowWeight(numeral, this.settings.mode) : 1;
+        return seeded(this.settings.seed * 37 + 11 + Math.floor(bar / this.settings.barsPerChord))() < share * weight;
     }
 
     // A long bar's second chord (barSplit.js): the diatonic chord that best joins its chord to the
@@ -1292,7 +1314,7 @@ class Generator {
         const section = this.sectionFormAt(bar, music, fromBar)?.section;
         const interior=this.harmonicDevelopment!==false&&(this.endBar===null||bar<this.endBar-1)
             ?harmonicDestination({section,bar,size:this.settings.barsPerChord,cycleStart:music.cycleStart,scaleSize:(chord.harmonyPcs??chord.scalePcs).length,slot:this.harmonicSlotAt(bar,music)}):null;
-        if(interior)chord={...this.buildChord(music,interior.numeral,this.colourFor(bar),this.borrowFor(bar)),cadence:{...interior,previous:chord.name}};
+        if(interior)chord={...this.buildChord(music,interior.numeral,this.colourFor(bar),this.borrowFor(bar,interior.numeral)),cadence:{...interior,previous:chord.name}};
         const cadence = sectionCadence({ section, bar,
             barsPerChord: this.settings.barsPerChord, cycleStart: music.cycleStart,
             scaleSize: (chord.harmonyPcs ?? chord.scalePcs).length });
@@ -1394,7 +1416,7 @@ class Generator {
     }
 
     planBarIn(bar) {
-        const { barsPerChord, leadActivity, leadDensity, padWeights, bassWeights, pulseWeights, arpWeights, directionWeights, padMotion, thinPadUnderLead, drift, humanize, voices, counter, sections, drums, swing, chordSpread, pedal, leadScale, leadLeaps, leadRepeat, leadEnding } = this.settings;
+        const { barsPerChord, leadActivity, leadDensity, padWeights, bassWeights, pulseWeights, arpWeights, directionWeights, padMotion, thinPadUnderLead, drift, humanize, voices, counter, sections, drums, swing, chordSpread, pedal, leadScale, leadLeaps, leadRepeat, leadSyncopation, leadInertia, leadTendency, bassEuclid, leadEnding, padRoot, padContour } = this.settings;
         const prev = this.plan.get(bar - 1);
 
         const fresh = !prev || this.resetMusicAt === bar;
@@ -1483,7 +1505,7 @@ class Generator {
             barsLeftInChord,
             formBarsLeftInChord: barsPerChord - inCycle % barsPerChord,
             prev: prev ? prev.state : null,
-            settings: { bpm:this.settings.bpm,progression:this.settings.progression,sectionTone:this.settings.sectionTone,leadActivity, leadDensity, padWeights, bassWeights, pulseWeights, arpWeights, directionWeights, padMotion, thinPadUnderLead, voices, counter, sections: this.quickIntro ? { ...sections, quickIntro: true } : sections, chordSpread, pedal:this.settings.tonality.mode==='atonal'?{mode:'off',amount:0}:pedal, leadScale:this.settings.tonality.mode==='atonal'?'full':leadScale, leadLeaps, leadRepeat, leadEnding },
+            settings: { bpm:this.settings.bpm,progression:this.settings.progression,sectionTone:this.settings.sectionTone,leadActivity, leadDensity, padWeights, bassWeights, pulseWeights, arpWeights, directionWeights, padMotion, thinPadUnderLead, voices, counter, sections: this.quickIntro ? { ...sections, quickIntro: true } : sections, chordSpread, pedal:this.settings.tonality.mode==='atonal'?{mode:'off',amount:0}:pedal, leadScale:this.settings.tonality.mode==='atonal'?'full':leadScale, leadLeaps, leadRepeat, leadSyncopation, leadInertia, leadTendency, bassEuclid, leadEnding, padRoot, padContour },
             rng: this.rng,
         });
         const pendingSuspension=prev?.state.composition?.sectionSuspension;
@@ -1964,6 +1986,12 @@ class Generator {
 
     // Books this beat's slice of the plan at exact audio times.
     onBeat({ bar, beatInBar, time, secondsPerBeat }) {
+        // a new meter's tempo starts on its downbeat: its units are not the length of the old bar's last one
+        if (beatInBar === 0 && this.meterTempo?.bar === bar) {
+            this.transport.setBpm(this.meterTempo.bpm);
+            secondsPerBeat = this.transport.secondsPerBeat;
+        }
+        if (beatInBar === 0) this.meterTempo = null;
         // rubato: this beat's own length (the transport adds it after this call)
         const scale = this.plan.get(bar)?.rubato?.[beatInBar] ?? 1;
         if (scale !== this.transport.tempoScale) {
@@ -2046,8 +2074,11 @@ class Generator {
                 const nextMeter = next.meter ?? this.meter;
                 if (nextMeter.units !== this.transport.beatsPerBar && !this.transport.rebaseAt)
                     this.transport.rebase(this.transport.beat + 1, next.bar * nextMeter.units, nextMeter.units);
-                this.transport.setBpm(unitsPerMinute(nextMeter, next.bpm));
-                const gap = 60 / (unitsPerMinute(nextMeter, next.bpm) * this.transport.tempoScale);
+                // (across a change of meter the old bar's last unit keeps its own length: the new tempo waits for the downbeat)
+                const newMeter = Boolean(this.transport.rebaseAt) && unitsPerMinute(nextMeter, next.bpm) !== this.transport.bpm;
+                if (newMeter) this.meterTempo = { bar: next.bar, bpm: unitsPerMinute(nextMeter, next.bpm) };
+                else this.transport.setBpm(unitsPerMinute(nextMeter, next.bpm));
+                const gap = newMeter ? this.transport.secondsPerBeat : 60 / (unitsPerMinute(nextMeter, next.bpm) * this.transport.tempoScale);
                 next.events
                     .filter((e) => !e.booked && e.beat < 0)
                     // A boundary reset must run before a replacement held voice attacks.

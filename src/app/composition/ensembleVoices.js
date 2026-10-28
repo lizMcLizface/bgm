@@ -86,15 +86,28 @@ const weighted = (rng, table) => {
     return entries[0][0];
 };
 
-export function bassCell({ style, seed, phraseStart, leadPlaying }) {
+/**
+ * A maximally even rhythm of `k` onsets in `n` equal steps (Bjorklund; Toussaint 2013), as a list of step numbers. The bar's
+ * first step always carries an onset. E(3,8) is the tresillo, E(5,8) the cinquillo, E(7,16) the samba clave in a rotation.
+ */
+export function euclideanOnsets(k, n) {
+    const out = [];
+    for (let i = 0; i < n; i++) if ((i * k) % n < k) out.push(i);
+    return out;
+}
+
+export function bassCell({ style, seed, phraseStart, leadPlaying, euclid = 0 }) {
     const table = style === 'half' ? { ...HALF_CELLS } : style === 'drive' ? DRIVE_CELLS : null;
     if (!table) return null;
     if (!leadPlaying) delete table.hold;
-    return weighted(seeded(seed ^ Math.imul(phraseStart + 1, 0x85ebca6b) ^ 0x2545f491), table);
+    const cell = weighted(seeded(seed ^ Math.imul(phraseStart + 1, 0x85ebca6b) ^ 0x2545f491), table);
+    // bassEuclid: this share of phrases swaps the drawn cell for an evenly spread figure; a separate draw, so 0 changes nothing
+    return euclid > 0 && seeded(seed ^ Math.imul(phraseStart + 1, 0x9e3779b1) ^ 0x1b873593)() < euclid ? 'euclid' : cell;
 }
 
-export function varyBass(events, { style, cell, meter, range }) {
+export function varyBass(events, { style, cell, meter, range, seed = 1, phraseStart = 0 }) {
     if (!cell || !events.length || !['half', 'drive'].includes(style) || cell === 'hold' || cell === 'straight') return events;
+    if (cell === 'euclid') return euclidBass(events, { meter, seed, phraseStart });
     const step = meter.unitsPerBeat === 1 ? 0.5 : 1, last = meter.units - step;
     const snap = at => Math.round(at / step) * step;
     const up = midi => midi + 12 <= range[1] ? midi + 12 : midi;
@@ -140,4 +153,16 @@ export function varyBass(events, { style, cell, meter, range }) {
     }
     out.sort((a, b) => a.beat - b.beat);
     return out.map((e, i) => ({ ...e, length: i + 1 < out.length ? Math.min(e.length, (out[i + 1].beat - e.beat) * 0.94) : e.length }));
+}
+
+/** The bass as an evenly spread figure: k onsets in the bar's steps (eighths, or the beat units of a compound metre), the root on each, the bar's last onset keeping the original approach note. */
+function euclidBass(events, { meter, seed, phraseStart }) {
+    const step = meter.unitsPerBeat === 1 ? 0.5 : 1, n = Math.round(meter.units / step);
+    if (n < 4) return events;
+    const pick = seeded(seed ^ Math.imul(phraseStart + 1, 0x85ebca6b) ^ 0x7f4a7c15)();
+    const k = Math.max(2, Math.min(n - 1, Math.round(n * (pick < 0.5 ? 0.375 : 0.625)))); // 3 or 5 of 8, 4 or 6 of 12 ...
+    const onsets = euclideanOnsets(k, n).map(i => i * step), root = events[0], approach = events.at(-1);
+    const out = onsets.map((beat, j) => ({ ...root, beat, velocity: root.velocity * (j === 0 ? 1 : 0.8),
+        midi: j === onsets.length - 1 && events.length > 1 ? approach.midi : root.midi }));
+    return out.map((e, i) => ({ ...e, length: ((i + 1 < out.length ? out[i + 1].beat : meter.units) - e.beat) * 0.94 }));
 }

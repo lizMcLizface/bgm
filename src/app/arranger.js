@@ -67,6 +67,13 @@ export const PEDAL_MODES = { off: 'Off', tonic: 'Tonic', fifth: 'Fifth' };
 export const DEFAULT_PEDAL = { mode: 'off', amount: 0.5 }; // amount: the share of phrases whose bass holds the note
 export const SPREADS = { close: 'Close', open: 'Open (second note from the top drops an octave)' };
 export const LEAD_SCALES = { full: 'Whole scale', pentatonic: 'Pentatonic (no 4th / 7th, or 2nd / 6th in minor)' };
+export const PAD_ROOTS = { always: 'Always play the chord root', unlessBass: 'Leave it to the bass when the bass plays it', never: 'Never (third, fifth and upper tones only)' };
+/** The pitch classes the pad voices: the chord, without its root where `rule` says the bass has it. A triad without its root doubles the third, so the pad keeps three notes. */
+export function padPitchClasses(pitchClasses, { rule = 'always', bassPc = null } = {}) {
+    if (pitchClasses.length < 3 || rule === 'always' || (rule === 'unlessBass' && bassPc !== pitchClasses[0])) return pitchClasses;
+    const rest = pitchClasses.slice(1);
+    return rest.length >= 3 ? rest : [...rest, rest[0]];
+}
 export const LEAD_ENDINGS = { settled: 'Settle on the chord', open: 'Stay open (fifth or 2nd)' };
 
 export const COUNTER_MODES = { off: 'Off', answer: 'Answers the lead', harmony: 'Harmony with the lead', line: 'Own line, always' };
@@ -157,6 +164,7 @@ export const DEFAULT_PAD_MOTION = { lean: 0.6, fast: 0.3, swell: 0.06 };
 // Where the pad's voicings lean within its register: -1 low .. 1 high,
 // in semitones from the middle per step.
 const PAD_LIFT_STEP = 4.5;
+const PAD_ARC = 6; // semitones between the pad's centre at the middle of a phrase and at its ends, at full padContour
 const padMotionOf = (settings) => ({ ...DEFAULT_PAD_MOTION, ...settings.padMotion });
 // Pad level over the four bars of a phrase: in, up to bar 3, settling.
 const padSwell = (depth, index) => [1 - depth, 1, 1 + depth, 1 - depth / 3][index % PHRASE_BARS];
@@ -455,7 +463,7 @@ export function chordOrder(direction, n) {
     return all;
 }
 
-function padEvents({ chordStart, barsLeftInChord, meter, voicing, style, pattern, step = 1, thin, range, swell = 1 }) {
+function padEvents({ chordStart, barsLeftInChord, meter, voicing, style, pattern, step = 1, thin, range, swell = 1, closeFigure = false }) {
     const base = (thin ? 0.48 : 0.6) * swell;
     const ev = (midi, beat, length, velocity) => ({ role: 'pad', midi, beat, length, velocity });
 
@@ -490,8 +498,13 @@ function padEvents({ chordStart, barsLeftInChord, meter, voicing, style, pattern
         }[pattern] || ((i) => bounce(i, n));
         // a sequence is detached - each note plucked, not blended into the next
         const length = style === 'sequence' ? 1.05 * step : 1.6 * step;
-        return Array.from({ length: Math.round(meter.units / step) }, (_, i) =>
+        const figure = Array.from({ length: Math.round(meter.units / step) }, (_, i) =>
             ev(notes[order(i)], i * step, length, base * (i === 0 ? 1 : (i * step) % 1 ? 0.75 : 0.85)));
+        // The last note rings on past the bar line, so one on the bottom or top note, where the next bar's figure may open
+        // (a down figure ending on the bottom note, then an up one) stops at the line instead of sounding twice.
+        const last = figure[figure.length - 1];
+        if (closeFigure && last && (last.midi === Math.min(...notes) || last.midi === Math.max(...notes))) last.length = Math.min(last.length, (meter.units - last.beat) * 0.95);
+        return figure;
     }
     if (!chordStart) return [];
     const length = barsLeftInChord * meter.units * 0.95;
@@ -644,7 +657,7 @@ function harmonyEvents(leadNotes, scalePcs, range) {
  * @param {function} args.rng
  * @returns {{ events: object[], state: object }} event beats/lengths in units
  */
-export function arrangeBar({ bar, meter, chord, nextChord, scalePcs, chordStart, barsLeftInChord, prev, settings, rng, phraseBars = PHRASE_BARS, phraseBoundary = bar % PHRASE_BARS === 0 }) {
+export function arrangeBar({ bar, meter, chord, nextChord, scalePcs, chordStart, barsLeftInChord, prev, settings, rng, phraseBars = PHRASE_BARS, phraseBoundary = bar % PHRASE_BARS === 0, closeFigure = false }) {
     // a new time signature (mid-phrase, while playing) needs rhythms in it
     const phrase = !prev || phraseBoundary || bar - prev.phrase.start >= phraseBars || prev.phrase.units !== meter.units
         ? decidePhrase(bar, prev && prev.phrase, meter, settings, rng)
@@ -667,9 +680,17 @@ export function arrangeBar({ bar, meter, chord, nextChord, scalePcs, chordStart,
     const padMoved = prev && prev.padVoicing && prev.padVoicing.some((m) => m < ranges.pad[0] || m > ranges.pad[1]);
     // The phrase's lean pulls the voicing a little low or high in the range
     // (not while it follows an octave move - one jump at a time).
-    const padTarget = padMoved ? null : (ranges.pad[0] + ranges.pad[1]) / 2 + (phrase.padLift || 0) * PAD_LIFT_STEP;
-    const voicing = chordStart || !prev || padMoved || prev.padVoicing.length !== chord.pitchClasses.length
-        ? voiceLead(chord.pitchClasses, ranges.pad[0], ranges.pad[1], prev && prev.padVoicing.length === chord.pitchClasses.length ? prev.padVoicing : null, padTarget)
+    // padContour: the pad rises toward the middle of a phrase and settles at its end, and its top voice prefers to move against the bass.
+    const contour = settings.padContour ?? 0, phrasePos = Math.min(1, Math.max(0, (bar - phrase.start + 0.5) / Math.max(1, phraseBars)));
+    const padTarget = padMoved ? null : (ranges.pad[0] + ranges.pad[1]) / 2 + (phrase.padLift || 0) * PAD_LIFT_STEP + contour * PAD_ARC * (Math.sin(Math.PI * phrasePos) - 0.65);
+    // The bass pedal (if any) is decided before the pad so the pad can leave a root the bass is playing. Running figures (arpeggio, sequence) keep the full chord: three notes would repeat pitches.
+    const pedalPc = phrase.pedal ? scalePcs[phrase.pedal === 'fifth' ? 4 % scalePcs.length : 0] : null;
+    const padPcs = padPitchClasses(chord.pitchClasses, { rule: ['arpeggio', 'sequence'].includes(phrase.padStyle) ? 'always' : settings.padRoot, bassPc: phrase.bass === false ? null : (pedalPc ?? chord.pitchClasses[0]) });
+    // Voice leading across a change of chord size is only used with the new pad rules, so a preset without them voices exactly as before.
+    const sizeAware = (settings.padRoot ?? 'always') !== 'always' || settings.chordSize === 'functional';
+    const voicing = chordStart || !prev || padMoved || prev.padVoicing.length !== padPcs.length
+        ? voiceLead(padPcs, ranges.pad[0], ranges.pad[1], prev && (sizeAware || prev.padVoicing.length === padPcs.length) ? prev.padVoicing : null, padTarget,
+            { contrary: contour * 4, against: prev && prev.bassMidi ? Math.sign(nearest(notesInRange([chord.pitchClasses[0]], ranges.bass[0], ranges.bass[1]), prev.bassMidi) - prev.bassMidi) : 0 })
         : prev.padVoicing;
     const pad = padEvents({
         chordStart: chordStart || !prev || padMoved,
@@ -678,6 +699,7 @@ export function arrangeBar({ bar, meter, chord, nextChord, scalePcs, chordStart,
         voicing: settings.chordSpread === 'open' ? openVoicing(voicing, ranges.pad[0]) : voicing,
         style: phrase.padStyle,
         pattern: phrase.padPattern,
+        closeFigure,
         step: phrase.padStep,
         thin: phrase.leadActive && settings.thinPadUnderLead,
         range: ranges.pad,
@@ -685,7 +707,6 @@ export function arrangeBar({ bar, meter, chord, nextChord, scalePcs, chordStart,
     });
 
     // A pedal: the bass holds the key's tonic (or fifth) whatever the chord does.
-    const pedalPc = phrase.pedal ? scalePcs[phrase.pedal === 'fifth' ? 4 % scalePcs.length : 0] : null;
     const bass = bassEvents({
         chord: pedalPc === null ? chord : { ...chord, pitchClasses: [pedalPc, ...chord.pitchClasses.slice(1)] },
         nextChord: pedalPc === null ? nextChord : null,
