@@ -71,6 +71,14 @@ export const DiceIcon = () => (
 );
 
 // Two arrows chasing each other: the same notes, seen from another key.
+// Back to how it was: an arrow curling counter-clockwise.
+export const UndoIcon = () => (
+    <Svg>
+        <path d="M3.2 3.5v3.3h3.3" />
+        <path d="M3.6 6.6A5.2 5.2 0 1 1 3 9.2" />
+    </Svg>
+);
+
 export const RotateIcon = () => (
     <Svg>
         <path d="M13 6.5A5.5 5.5 0 0 0 3.2 5" />

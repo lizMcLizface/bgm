@@ -15,7 +15,8 @@ const describe = (busy, bright) => {
     return [part(busy, 'Calmer', 'Busier'), part(bright, 'Darker', 'Brighter')].filter(Boolean).join(' · ') || 'As the preset is made';
 };
 
-export default function FeelPad({ feel, onChange }) {
+// `compact`: just the pad, with a small button at its top right that puts it back in the middle.
+export default function FeelPad({ feel, onChange, compact = false }) {
     const svg = useRef(null), timer = useRef(null), pending = useRef(null);
     const [point, setPoint] = useState([feel?.busy ?? 0, feel?.bright ?? 0]);
     useEffect(() => { if (!pending.current) setPoint([feel?.busy ?? 0, feel?.bright ?? 0]); }, [feel?.busy, feel?.bright]);
@@ -60,11 +61,16 @@ export default function FeelPad({ feel, onChange }) {
                 <line x1="50" y1="50" x2={x} y2={y} className="gen-feel-arm" />
                 <circle cx={x} cy={y} r="5" className="gen-feel-joy" />
             </svg>
-            <div className="gen-feel-text">
+            {compact && (
+                <button type="button" className="gen-feel-reset" disabled={!point[0] && !point[1]} onClick={() => moveTo([0, 0], true)} title="Back to the middle: the preset as it is made" aria-label="Centre the feel pad">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3.2 3.5v3.3h3.3" /><path d="M3.6 6.6A5.2 5.2 0 1 1 3 9.2" /></svg>
+                </button>
+            )}
+            {!compact && <div className="gen-feel-text">
                 <strong>{describe(...point)}</strong>
                 <p>Move the point to make the music calmer or busier, darker or brighter, on top of the preset. Changes take effect over the next bars.</p>
                 <button type="button" disabled={!point[0] && !point[1]} onClick={() => moveTo([0, 0], true)}>Centre</button>
-            </div>
+            </div>}
         </div>
     );
 }

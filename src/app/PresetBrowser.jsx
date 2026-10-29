@@ -10,6 +10,9 @@ import { METERS } from './meter';
 import { isMobile } from '../audio/performance';
 import { ScrollLock } from './scrollLock';
 import { intensity, intensityLabel, viridis, INTENSITY_LABELS } from './intensity';
+import { sceneVoices } from './sceneVoices';
+import { FAMILIES } from './editor/soundFamilies';
+import { AmbienceIcon } from './icons';
 
 // The top row's preset browser (scenes.js): a button that opens a window
 // over the page with the presets as a grid of cards, sorted into categories
@@ -41,6 +44,7 @@ function summary(scene) {
     const level = intensity(s);
     return {
         level,
+        played: sceneVoices(scene, s),
         line: s.playMusic ? `${key} · ${s.bpm} BPM${meter}` : 'No music',
         chips: [
             ...(s.playMusic && s.drums.style !== 'off' ? [`${percussionVoice(s.drums.kit).name} · ${DRUM_STYLES[s.drums.style]}`] : []),
@@ -55,8 +59,21 @@ const matches = (scene, query) => {
     return words.every((word) => haystack.includes(word));
 };
 
+// What plays, as small badges along the card's foot: a ring in each voice's colour on the timeline around its
+// kind of instrument, dimmed for a voice that does not play, and the ambience, lit when it is on.
+const Played = ({ played: { voices, ambience } }) => (
+    <span className="gen-pb-voices" role="img"
+        aria-label={`${voices.filter((v) => v.used).map((v) => `${v.label}: ${v.name}`).join('; ') || 'No music'}${ambience.on ? `; ambience: ${ambience.layers.join(', ')}` : ''}`}>
+        {voices.map(({ role, label, letter, used, name, family }) => (
+            <span key={role} className={`gen-pb-voice${used ? '' : ' is-off'}`} style={{ '--role': `var(--gen-role-${role})`, '--fam': FAMILIES[family].colour }}
+                title={used ? `${label}: ${name} (${FAMILIES[family].label.toLowerCase()})` : `${label}: not playing`}>{letter}</span>
+        ))}
+        <span className={`gen-pb-ambient${ambience.on ? ' is-on' : ''}`} title={ambience.on ? `Ambience: ${ambience.layers.join(', ')}` : 'No ambience'}><AmbienceIcon /></span>
+    </span>
+);
+
 const Card = ({ scene, active, onPick, onRemove }) => {
-    const { line, chips, level } = useMemo(() => summary(scene), [scene]);
+    const { line, chips, level, played } = useMemo(() => summary(scene), [scene]);
     return (
         <li className={`gen-pb-card${active ? ' is-active' : ''}`}>
             <button type="button" className="gen-pb-pick" onClick={(e) => onPick(scene, e)} aria-current={active ? 'true' : undefined}
@@ -67,6 +84,7 @@ const Card = ({ scene, active, onPick, onRemove }) => {
                 {scene.blurb && <span className="gen-pb-blurb">{scene.blurb}</span>}
                 <span className="gen-pb-meta">{line} · {intensityLabel(level).toLowerCase()}</span>
                 {chips.length > 0 && <span className="gen-pb-chips">{chips.map((chip) => <span key={chip}>{chip}</span>)}</span>}
+                <Played played={played} />
             </button>
             {onRemove && (
                 <button type="button" className="gen-pb-remove" onClick={() => onRemove(scene.name)}
@@ -181,7 +199,7 @@ const PresetBrowser = ({ current, onPick, actions }) => {
             {open && (
                 <div className="gen-pb-backdrop" role="presentation" onMouseDown={(e) => e.target === e.currentTarget && close()}>
                     <ScrollLock />
-                    <div className="gen-pb" role="dialog" aria-modal="true" aria-label="Presets">
+                    <div className="gen-pb gen-scenes" role="dialog" aria-modal="true" aria-label="Presets">
                         <div className="gen-pb-head">
                             <h2>Presets</h2>
                             <input ref={search} type="search" value={query} onChange={(e) => setQuery(e.target.value)}

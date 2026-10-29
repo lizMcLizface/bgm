@@ -134,7 +134,7 @@
         "volumes": {
           "pad": 1,
           "bass": 0.32,
-          "lead": 0.23,
+          "lead": 0.46,
           "counter": 0.25,
           "perc": 0.26
         },
@@ -146,7 +146,7 @@
           "mode": "add9",
           "amount": 0.2
         },
-        "ambienceVolume": 0.45,
+        "ambienceVolume": 0.4,
         "leadSyncopation": 0.2
       },
       "voices": {
@@ -315,11 +315,12 @@
           "fast": 0.12,
           "swell": 0.055
         },
+        "padRoot": "never",
         "volumes": {
           "pad": 0.76,
           "bass": 0.75,
           "lead": 0.073,
-          "counter": 0.48,
+          "counter": 0.55,
           "perc": 0.5
         },
         "sections": {
@@ -752,7 +753,7 @@
         "ornaments": 0.6,
         "ducking": 0.4,
         "evenLoudness": 0.4,
-        "sectionSpace": 0.4,
+        "sectionSpace": 0.5,
         "keyLift": 0,
         "timbreDrift": 0.3,
         "bassWeights": {
@@ -768,8 +769,8 @@
         },
         "volumes": {
           "pad": 0.76,
-          "bass": 0.75,
-          "lead": 0.66,
+          "bass": 0.61,
+          "lead": 0.77,
           "counter": 0.48,
           "perc": 0.5
         },
@@ -975,11 +976,11 @@
           "swell": 0.055
         },
         "volumes": {
-          "pad": 0.76,
-          "bass": 0.44,
-          "lead": 0.66,
+          "pad": 0.53,
+          "bass": 0.7,
+          "lead": 0.8,
           "counter": 0.48,
-          "perc": 0.5
+          "perc": 0.41
         },
         "sections": {
           "mode": "gentle",
@@ -13127,11 +13128,12 @@
           "fast": 0.12,
           "swell": 0.055
         },
+        "padRoot": "never",
         "volumes": {
           "pad": 0.76,
           "bass": 0.75,
           "lead": 0.073,
-          "counter": 0.48,
+          "counter": 0.55,
           "perc": 0.5
         },
         "sections": {
@@ -13692,11 +13694,11 @@
           "swell": 0.055
         },
         "volumes": {
-          "pad": 0.76,
-          "bass": 0.44,
-          "lead": 0.66,
+          "pad": 0.53,
+          "bass": 0.7,
+          "lead": 0.8,
           "counter": 0.48,
-          "perc": 0.5
+          "perc": 0.41
         },
         "sections": {
           "mode": "gentle",

@@ -105,6 +105,13 @@ export const TOUR_STEPS = [
         text: 'Each voice now has a panel for its sound and volume. Try another preset, or roll its dice. The compact controls beside the timeline let you mute, solo or play a voice. Sound design and the synths behind each voice unlock later.',
     },
     {
+        id: 'control-panel',
+        stage: 1,
+        selector: '[data-tour="quick"]',
+        title: 'Control panel',
+        text: 'The settings most worth reaching for, in one place. The faders mix each voice and the ambience; the pad and sliders beside them set how calm or busy, dark or bright, swung and loose it plays; the buttons choose chord size, colour and where the root goes. Double-click a fader to put it back to the preset, and the ↶ button resets the whole panel.',
+    },
+    {
         id: 'ambience-intro',
         stage: 1,
         selector: '.gen-parts',

@@ -44,7 +44,10 @@ import { MasterVolume, SettingsMenu, AudioMenu, VisualMenu } from './AudioStatus
 import { SleepTimer, Recorder } from './Playback';
 import { sceneSettings, sceneSoundSettings, sceneGroup, stepBuiltinSceneEntry, randomBuiltinSceneEntry, buildSetup, parseSetup, sceneBySlug, sceneSlug, presetFromSearch, introFromSearch, SCENES, SCENE_CATEGORIES } from './scenes';
 import PresetBrowser from './PresetBrowser';
-import FeelPad from './FeelPad';
+import QuickPanel from './QuickPanel';
+import Wordmark from './Wordmark';
+import { useIdle } from './useIdle';
+import { quickSettings } from './quickControls';
 import ListeningTimer from './ListeningTimer';
 import { saveUserScene, deleteUserScene, isUserScene } from './setupStore';
 import { ROLE_PRESETS } from './presets';
@@ -54,7 +57,7 @@ import { COMMON_PARAMS } from './engine/ambienceSynth';
 import { WEATHER_SOURCES } from './engine/weatherBedModel';
 import { WEATHER_PRESETS, weatherPresetPatch, matchingWeatherPreset } from './weatherPresets';
 import {
-    DiceIcon, RotateIcon, SparkIcon, PlayIcon, PauseIcon, ToStartIcon, BarBackIcon, BarForwardIcon, ProgressionBackIcon, ProgressionForwardIcon, LoopIcon, MusicIcon, AmbienceIcon, ChevronUpIcon, ChevronDownIcon, TimelineIcon, TracksIcon, ChevronLeftIcon, ChevronRightIcon,
+    DiceIcon, RotateIcon, UndoIcon, SparkIcon, PlayIcon, PauseIcon, ToStartIcon, BarBackIcon, BarForwardIcon, ProgressionBackIcon, ProgressionForwardIcon, LoopIcon, MusicIcon, AmbienceIcon, ChevronUpIcon, ChevronDownIcon, TimelineIcon, TracksIcon, ChevronLeftIcon, ChevronRightIcon,
 } from './icons';
 import { newSoundSeed } from './soundGen';
 import { SOUND_KINDS, GENERATOR_V2 } from './soundGenV2';
@@ -295,7 +298,7 @@ const Transport = ({ gen, anyOn, onToggle, onChange }) => {
             {button('Back to the start', <ToStartIcon />, act(() => gen.rewind()), atStart && gen.hereBar === 0)}
             {button('Back to the start of this progression, or the one before (Shift + ←)', <ProgressionBackIcon />, act(() => gen.step('progression', -1)), atStart)}
             {button('Back to the start of this chord, or the one before (←)', <BarBackIcon />, act(() => gen.step('chord', -1)), atStart)}
-            <button type="button" className="gen-play" onClick={onToggle} title={`${anyOn ? 'Pause' : 'Play'} (Space)`} aria-label={anyOn ? 'Pause' : 'Play'}>
+            <button type="button" className={`gen-play${anyOn ? ' is-playing' : ''}`} onClick={onToggle} title={`${anyOn ? 'Pause' : 'Play'} (Space)`} aria-label={anyOn ? 'Pause' : 'Play'}>
                 {anyOn ? <PauseIcon /> : <PlayIcon />}
             </button>
             {button('Forward one chord (→)', <BarForwardIcon />, act(() => gen.step('chord', 1)))}
@@ -1068,6 +1071,7 @@ const GenerativeApp = () => {
     const setVolume = (role, volume) => {
         gen.setRoleVolume(role, volume);
         setSettings((s) => ({ ...s, volumes: { ...gen.settings.volumes } }));
+        setScene(''); // no longer the preset as shipped, so the address carries the settings
     };
     const presetLoaded = (role, presetName) => patchRole(role, { presetName, edited: false });
     const onNativeEdited = useCallback((role) => { setRoles((r) => (r[role].edited ? r : { ...r, [role]: { ...r[role], edited: true } })); setSoundEdits((n) => n + 1); }, []);
@@ -1257,6 +1261,8 @@ const GenerativeApp = () => {
     const backdropOptions = { ...BACKDROP_DEFAULTS, ...storedBackdropOptions };
     // Hides everything but the transport and the timeline (⚙ menu); Esc or the corner button brings it back.
     const [zen, setZen] = useStoredFlag('bgm-hide-ui', firstVisit, linkedView ? true : undefined);
+    // After a minute of music with nobody at the page, the controls fade back and the scenery takes over until it is touched.
+    const idle = useIdle(60000, anyOn && backdropMode !== 'off' && !zen && !tourOpen && !helpOpen);
     // In that view the instruments can show beside the timeline, as on the whole page.
     const [zenTracks, setZenTracks] = useStoredFlag('bgm-zen-tracks', false);
     // A first visit's landscape and minimal view stay the starting point until changed.
@@ -1307,11 +1313,16 @@ const GenerativeApp = () => {
         }, { morph });
     };
     const sceneBrowseCategory = useRef(null);
+    // The preset the page was last put on, kept when a tweak clears its name from the top row: [ and ] step on from it,
+    // and the quick panel's Reset goes back to it (or, with none picked, to how the page opened).
+    const lastSceneName = useRef(linkedScene ? linkedScene.name : '');
+    const openedWith = useRef(quickSettings(structuredClone(gen.settings)));
     // `parts`: 'all', 'composition' (everything but the sounds and the mix) or 'voices' (the sounds only).
     const applyScene = async (picked, options = {}) => {
         if (!picked) return;
         if(options.parts!=='composition'&&Object.values(picked.voices).some(v=>typeof v==='string'?findPreset(v)?.wasmVoice:v?.synth?.wasmVoice)&&gen.audioEngine!=='wasm'&&!await audioEngine.choose('wasm',{remember:false}))return;
         sceneBrowseCategory.current = options.browseCategory ?? picked.category;
+        if ((options.parts || 'all') === 'all') lastSceneName.current = picked.name;
         if (!(smoothPresets && gen.isRunning && picked.settings.playMusic !== false)) {
             applySceneNow(picked, options, false);
             return;
@@ -1431,8 +1442,18 @@ const GenerativeApp = () => {
     };
     // Next / previous built-in preset in the browser's order ([ and ] keys; with Shift, at once).
     const stepPreset = (dir, { now = false } = {}) => {
-        const entry = stepBuiltinSceneEntry(scene, dir, sceneBrowseCategory.current);
+        const entry = stepBuiltinSceneEntry(scene || lastSceneName.current, dir, sceneBrowseCategory.current);
         (now ? cutToScene : applyScene)(entry.scene, {browseCategory:entry.category,preserveSeed:false});
+    };
+    // The quick panel's Reset: its settings back to the preset's (the sounds are left alone).
+    // (the quick panel's own settings as the preset has them, for its Preset buttons too)
+    const presetQuick = useMemo(() => (soundScene.current ? quickSettings(sceneSettings(soundScene.current, gen.settings.seed)) : openedWith.current), [soundScene.current]); // eslint-disable-line react-hooks/exhaustive-deps
+    const [quickEpoch, setQuickEpoch] = useState(0);
+    const [quickOpen, setQuickOpen] = useStoredFlag('bgm-desk-open', true);
+    const resetQuick = () => {
+        loadSettings(structuredClone(presetQuick));
+        setQuickEpoch((n) => n + 1);
+        if (soundScene.current && lastSceneName.current === soundScene.current.name) setScene(soundScene.current.name);
     };
     const handlers = useRef({});
     // Move around the piece from the keyboard: a chord / a progression back or on.
@@ -1491,12 +1512,14 @@ const GenerativeApp = () => {
 
     const zenShown = zen && (!tourOpen || tourMinimal) && !helpOpen;
     return (
-        <main className={`gen${zenShown ? ' gen-zen' : ''}${zenShown && bare ? ' gen-zen-bare' : ''}${zenShown && zenTracks ? ' gen-zen-tracks' : ''}`}>
+        <main className={`gen${idle ? ' gen-idle' : ''}${zenShown ? ' gen-zen' : ''}${zenShown && bare ? ' gen-zen-bare' : ''}${zenShown && zenTracks ? ' gen-zen-tracks' : ''}`}>
             {backdropOn && !perfOn && backdropSupported() && <Backdrop generator={gen} options={{ ...backdropOptions, circle: false }} clouds={backdropOn} resetKey={fluidReset} />}
             {backdropMode === 'scenery' && <SceneryBackdrop options={sceneryOptions} light={perfOn} />}
 
+            <div className="gen-idle-hint" aria-hidden="true">move the mouse or tap to bring the controls back</div>
+
             <header className="gen-header">
-                <h1 aria-label="calmbgm - calm procedural music" title="calmbgm - calm procedural music">calm<b>bgm</b></h1>
+                <h1 aria-label="calmbgm - music that writes itself" title="calmbgm - music that writes itself"><Wordmark playing={anyOn} /></h1>
                 <div className="gen-header-controls">
                 <Transport gen={gen} anyOn={anyOn} onToggle={toggle} onChange={() => setTick((n) => n + 1)} />
                 {has(1) && <div className="gen-parts" role="group" aria-label="What Play plays">
@@ -1562,13 +1585,18 @@ const GenerativeApp = () => {
                     onRandom={randomizePreset} onGenerate={has(3) ? generateForRole : undefined} onPick={choosePicker} onPickPercussion={()=>choosePicker('perc')} onEditPercussion={has(3)?editPercussionSound:undefined} percussionHint={percussionKeyHint(settings.drums.kit)} generating={generating} live={live} /> : null}
             />
 
+            {has(1) && <Panel id="quick"title="Control panel" heading={<>
+                <button type="button" className="gen-quick-toggle" aria-expanded={quickOpen} aria-controls="gen-desk" onClick={() => setQuickOpen(!quickOpen)}>
+                    <span>Control panel</span><span aria-hidden="true">{quickOpen ? '−' : '+'}</span>
+                </button>
+                {quickOpen && <button type="button" className="gen-quick-reset" onClick={resetQuick} aria-label={`Reset to ${lastSceneName.current || 'the preset'}`}
+                    title={`Put these sliders and buttons back to how ${lastSceneName.current ? `“${lastSceneName.current}”` : 'the preset'} has them`}><UndoIcon /></button>}</>}>
+                {quickOpen && <QuickPanel settings={settings} roleLabels={Object.fromEntries(Object.entries(SOUND_ROLES).map(([role, { label }]) => [role, label.split(' / ')[0]]))} onVolume={setVolume} onSettings={loadSettings} onFeel={changeFeel} baseline={presetQuick} resetKey={quickEpoch} />}
+            </Panel>}
+
             {has(2) && TRIAL_RULE_IDS.length > 0 && <Panel id="trial" title="Trial rules">
                 <p className="gen-hint">New rules to try by ear, all in one place. Each follows the preset until you change it.</p>
                 <TrialRules settings={settings} book={book} onChoice={changeRule} />
-            </Panel>}
-
-            {has(2) && <Panel id="feel" title="Feel">
-                <FeelPad feel={settings.feel} onChange={changeFeel} />
             </Panel>}
 
             <Rulebook generator={gen} settings={settings} book={book} onChoice={changeRule} preset={scene} stage={stage} focusRule={ruleFocus} pageControls={{

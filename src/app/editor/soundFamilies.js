@@ -34,12 +34,12 @@ const BY_NAME = [
 ];
 const BY_GROUP = { Pads: 'pad', Bass: 'bass', Leads: 'lead', 'Keys & plucks': 'keys', Pianos: 'piano', Textures: 'texture', 'Classic keys': 'keys', Measured: 'strings', 'Wasm voices': 'pad' };
 
-/** The family id of a sound: by its name, else by the block it is listed in. */
-export function soundFamily(name, group) {
+/** The family id of a sound: by its name, else by the block it is listed in, else `fallback`. */
+export function soundFamily(name, group, fallback) {
     const lower = String(name).toLowerCase();
     if (group === 'Bass') return 'bass';
     const hit = BY_NAME.find(([, pattern]) => pattern.test(lower));
-    return (hit && hit[0]) || BY_GROUP[group] || 'texture';
+    return (hit && hit[0]) || BY_GROUP[group] || fallback || 'texture';
 }
 
 /** The colour of a listing block, from its name (a block of mixed sounds has none of its own). */

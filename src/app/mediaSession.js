@@ -106,7 +106,7 @@ export function updateMediaSession({ playing, title, artist, helper = helperDefa
     navigator.mediaSession.playbackState = playing ? 'playing' : 'paused';
     loadArtwork().then((images) => {
         try {
-            navigator.mediaSession.metadata = new window.MediaMetadata({ title, artist, album: 'calmbgm · calm procedural music', artwork: images });
+            navigator.mediaSession.metadata = new window.MediaMetadata({ title, artist, album: 'calmbgm · music that writes itself', artwork: images });
         } catch (e) { /* MediaMetadata missing */ }
     });
 }
