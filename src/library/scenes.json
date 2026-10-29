@@ -352,7 +352,11 @@
       "settings": {
         "padVibrato": 0.3,
         "progressionMode": "generated",
-        "progressionMood": {"brightness": 0.1, "stability": 0.3, "adventure": 0.5},
+        "progressionMood": {
+          "brightness": 0.1,
+          "stability": 0.3,
+          "adventure": 0.5
+        },
         "progressionWander": 0.5,
         "tonic": 9,
         "mode": "Major-6",
@@ -592,10 +596,10 @@
           "swell": 0.08
         },
         "volumes": {
-          "pad": 0.66,
+          "pad": 0.3,
           "bass": 0.32,
-          "lead": 0.62,
-          "counter": 0.84,
+          "lead": 0.84,
+          "counter": 1,
           "perc": 0.44
         },
         "sections": {
@@ -608,7 +612,7 @@
         "pad": "Underwater",
         "bass": "Deep Pulse",
         "lead": "Glass Lead",
-        "counter": "Hollow Tremolo"
+        "counter": "Warm Organ"
       },
       "rulebook": {
         "version": 1,
@@ -689,9 +693,9 @@
           "swell": 0.08
         },
         "volumes": {
-          "pad": 0.73,
-          "bass": 0.73,
-          "lead": 0.62,
+          "pad": 0.33,
+          "bass": 1,
+          "lead": 0.72,
           "counter": 0.48,
           "perc": 0.44
         },
@@ -699,8 +703,8 @@
       },
       "voices": {
         "pad": "Tremolo Organ",
-        "bass": "Warm Bass",
-        "lead": "Soft Flute"
+        "bass": "Warm Organ",
+        "lead": "Tremolo Organ"
       }
     },
     {
@@ -1070,9 +1074,9 @@
           "swell": 0.08
         },
         "volumes": {
-          "pad": 0.64,
+          "pad": 0.5,
           "bass": 0.3,
-          "lead": 0.62,
+          "lead": 0.71,
           "counter": 0.48,
           "perc": 0.44
         },
@@ -1331,7 +1335,7 @@
         "volumes": {
           "pad": 0.76,
           "bass": 0.31,
-          "lead": 0.66,
+          "lead": 0.89,
           "counter": 0.48,
           "perc": 0.5
         },
@@ -1354,7 +1358,11 @@
       "settings": {
         "padVibrato": 0.3,
         "progressionMode": "generated",
-        "progressionMood": {"brightness": 0.1, "stability": 0.3, "adventure": 0.5},
+        "progressionMood": {
+          "brightness": 0.1,
+          "stability": 0.3,
+          "adventure": 0.5
+        },
         "progressionWander": 0.5,
         "tonic": 5,
         "mode": "Major-4",
@@ -1413,9 +1421,9 @@
           "swell": 0.08
         },
         "volumes": {
-          "pad": 1,
+          "pad": 0.72,
           "bass": 0.35,
-          "lead": 0.47,
+          "lead": 0.75,
           "counter": 0.36,
           "perc": 0.33
         }
@@ -1499,9 +1507,9 @@
           "swell": 0.055
         },
         "volumes": {
-          "pad": 0.76,
+          "pad": 0.57,
           "bass": 0.75,
-          "lead": 0.66,
+          "lead": 0.8,
           "counter": 0.48,
           "perc": 0.5
         },
@@ -1586,8 +1594,8 @@
           "swell": 0.055
         },
         "volumes": {
-          "pad": 1,
-          "bass": 0.42,
+          "pad": 0.84,
+          "bass": 0.68,
           "lead": 0.37,
           "counter": 0.27,
           "perc": 0.28
@@ -1639,9 +1647,9 @@
         "chordSize": "functional"
       },
       "voices": {
-        "pad": "Swelling Analog",
+        "pad": "Coastal FM Lead",
         "bass": "Analog Saw Bass",
-        "lead": "Hollow Pulse"
+        "lead": "Racer Lead"
       },
       "isNew": true,
       "tags": [
@@ -1962,8 +1970,8 @@
         },
         "volumes": {
           "pad": 0.78,
-          "bass": 0.3,
-          "lead": 0.62,
+          "bass": 0.44,
+          "lead": 0.85,
           "counter": 0.48,
           "perc": 0.44
         },
@@ -1974,7 +1982,7 @@
       },
       "voices": {
         "pad": "Slow Sweep",
-        "bass": "Sub Bass",
+        "bass": "Breathing Pad",
         "lead": "Sine Whistle"
       },
       "rulebook": {
@@ -1994,7 +2002,7 @@
       "category": "focus",
       "blurb": "Major pentatonic in 7/4: a glass pad, an ocarina and a kalimba answering",
       "settings": {
-        "bassEuclid": 0.3,
+        "bassEuclid": 0.15,
         "leadSyncopation": 0.2,
         "tonic": 7,
         "mode": "Pentatonic-1",
@@ -2024,7 +2032,7 @@
         "leadLeaps": 0.34,
         "leadRepeat": 0.42,
         "humanize": {
-          "timing": 8,
+          "timing": 16,
           "velocity": 0.09,
           "detune": 1
         },
@@ -2034,13 +2042,13 @@
           "attack": 0.35,
           "brightness": 0.2
         },
-        "rubato": 0.25,
-        "ornaments": 0.1,
+        "rubato": 0.4,
+        "ornaments": 0.5,
         "ducking": 0.5,
         "evenLoudness": 0.7,
         "sectionSpace": 0.3,
         "keyLift": 0,
-        "timbreDrift": 0.2,
+        "timbreDrift": 0.4,
         "bassWeights": {
           "whole": 42,
           "half": 50,
@@ -2054,9 +2062,9 @@
         },
         "volumes": {
           "pad": 0.76,
-          "bass": 0.75,
-          "lead": 0.66,
-          "counter": 0.48,
+          "bass": 0.57,
+          "lead": 0.78,
+          "counter": 0.86,
           "perc": 0.5
         },
         "sections": {
@@ -2066,7 +2074,9 @@
         "arc": {
           "shape": "rise",
           "minutes": 10
-        }
+        },
+        "padVibrato": 0.5,
+        "swing": 0.1
       },
       "voices": {
         "pad": "Glass Pad",
@@ -2312,7 +2322,7 @@
         "volumes": {
           "pad": 0.76,
           "bass": 0.46,
-          "lead": 0.66,
+          "lead": 0.82,
           "counter": 0.81,
           "perc": 0.5
         },
@@ -2332,7 +2342,15 @@
         "pad": "Arp Pluck",
         "bass": "Deep Throb",
         "lead": "Signal Lead",
-        "counter": "Starlight Pad"
+        "counter": {
+          "name": "Electric Tines",
+          "external": {
+            "synth": "cs80",
+            "name": "Electric Tines",
+            "category": "keys",
+            "level": 4
+          }
+        }
       },
       "rulebook": {
         "version": 1,
@@ -2543,7 +2561,7 @@
         "volumes": {
           "pad": 0.76,
           "bass": 0.75,
-          "lead": 0.66,
+          "lead": 0.8,
           "counter": 0.78,
           "perc": 0.5
         },
@@ -2559,7 +2577,7 @@
         "pad": "Arp Pluck",
         "bass": "Drive Bass",
         "lead": "Signal Lead",
-        "counter": "Warm Square Lead"
+        "counter": "Wasm Tine Keys"
       },
       "rulebook": {
         "version": 1,
@@ -3054,10 +3072,10 @@
           "swell": 0.04
         },
         "volumes": {
-          "pad": 0.52,
+          "pad": 0.27,
           "bass": 0.38,
-          "lead": 0.45,
-          "counter": 0.29,
+          "lead": 0.68,
+          "counter": 0.59,
           "perc": 0.62
         },
         "ambienceVolume": 0.35,
@@ -3127,7 +3145,7 @@
         "padRoot": "unlessBass"
       },
       "voices": {
-        "pad": "Heroic Strings",
+        "pad": "Warm Organ",
         "bass": "Deep Throb",
         "lead": "Choir Ah",
         "counter": "Spore Haze"
@@ -5046,7 +5064,7 @@
         },
         "volumes": {
           "pad": 1,
-          "bass": 0.23,
+          "bass": 0.48,
           "lead": 0.21,
           "counter": 0.25,
           "perc": 0.26
@@ -5403,7 +5421,7 @@
           "pad": 0.76,
           "bass": 0.75,
           "lead": 0.41,
-          "counter": 0.69,
+          "counter": 0.4,
           "perc": 0.5
         },
         "ambienceVolume": 0.66,
@@ -5588,7 +5606,7 @@
           "pad": 0.78,
           "bass": 0.3,
           "lead": 0.62,
-          "counter": 0.81,
+          "counter": 0.42,
           "perc": 0.44
         },
         "sections": {
@@ -5703,7 +5721,7 @@
         "volumes": {
           "pad": 1,
           "bass": 0.089,
-          "lead": 0.13,
+          "lead": 0.32,
           "counter": 0.17,
           "perc": 0.21
         },
@@ -6330,7 +6348,7 @@
           "pad": 0.62,
           "bass": 0.32,
           "lead": 0.34,
-          "counter": 0.33,
+          "counter": 0.14,
           "perc": 0.32
         },
         "ambienceVolume": 0.45,
@@ -7902,8 +7920,8 @@
           "swell": 0.08
         },
         "volumes": {
-          "pad": 0.78,
-          "bass": 0.43,
+          "pad": 0.66,
+          "bass": 1,
           "lead": 0.62,
           "counter": 0.48,
           "perc": 0.44
@@ -8065,9 +8083,9 @@
           "swell": 0.08
         },
         "volumes": {
-          "pad": 0.78,
+          "pad": 0.64,
           "bass": 0.73,
-          "lead": 0.62,
+          "lead": 0.9,
           "counter": 0.48,
           "perc": 0.44
         },
@@ -8363,7 +8381,7 @@
         "volumes": {
           "pad": 0.76,
           "bass": 0.7,
-          "lead": 0.57,
+          "lead": 0.28,
           "counter": 0.72,
           "perc": 0.59
         },
@@ -8623,7 +8641,7 @@
         "volumes": {
           "pad": 0.76,
           "bass": 0.78,
-          "lead": 0.68,
+          "lead": 0.5,
           "counter": 0.42,
           "perc": 0.59
         },
@@ -8637,8 +8655,8 @@
       "voices": {
         "pad": "Arp Pluck",
         "bass": "Drive Bass",
-        "lead": "Reed Lead",
-        "counter": "Organ Whistle"
+        "lead": "Soft Saw Lead",
+        "counter": "Warm Organ"
       }
     },
     {
@@ -9005,7 +9023,7 @@
           "pad": 1,
           "bass": 0.44,
           "lead": 0.56,
-          "counter": 0.28,
+          "counter": 0.69,
           "perc": 0.29
         },
         "sections": {
@@ -9666,7 +9684,7 @@
         "volumes": {
           "pad": 0.76,
           "bass": 0.44,
-          "lead": 0.66,
+          "lead": 0.89,
           "counter": 0.48,
           "perc": 0.5
         },
@@ -9936,9 +9954,9 @@
           "swell": 0.08
         },
         "volumes": {
-          "pad": 1,
+          "pad": 0.75,
           "bass": 0.24,
-          "lead": 0.31,
+          "lead": 0.64,
           "counter": 0.39,
           "perc": 0.36
         },
@@ -10028,7 +10046,7 @@
         "volumes": {
           "pad": 0.76,
           "bass": 0.75,
-          "lead": 0.66,
+          "lead": 0.85,
           "counter": 0.48,
           "perc": 0.5
         },
@@ -10222,7 +10240,7 @@
         "volumes": {
           "pad": 0.4,
           "bass": 0.16,
-          "lead": 0.67,
+          "lead": 0.9,
           "counter": 0.2,
           "perc": 0.2
         },
@@ -10465,7 +10483,7 @@
         "volumes": {
           "pad": 0.42,
           "bass": 0.13,
-          "lead": 0.62,
+          "lead": 0.89,
           "counter": 0.18,
           "perc": 0.15
         },
@@ -10710,8 +10728,8 @@
         "volumes": {
           "pad": 0.65,
           "bass": 0.67,
-          "lead": 1,
-          "counter": 0.43,
+          "lead": 0.78,
+          "counter": 0.63,
           "perc": 0.51
         },
         "ambienceVolume": 0.66,
@@ -11826,9 +11844,9 @@
         },
         "sectionTone": true,
         "volumes": {
-          "pad": 0.5,
+          "pad": 0.86,
           "bass": 0.16,
-          "lead": 0.48,
+          "lead": 0.3,
           "counter": 0.2,
           "perc": 0.2
         },
@@ -12631,10 +12649,10 @@
           "swell": 0.08
         },
         "volumes": {
-          "pad": 0.096,
-          "lead": 0.24,
-          "counter": 0.023,
-          "bass": 0.094,
+          "pad": 0.41,
+          "lead": 0.56,
+          "counter": 0.31,
+          "bass": 0.35,
           "perc": 0.2
         },
         "ambienceVolume": 0.72,
@@ -12787,7 +12805,7 @@
       },
       "voices": {
         "pad": "Wasm Tine Keys",
-        "lead": "Wasm Glass Bells",
+        "lead": "Celesta",
         "counter": "Wasm Soft Pipes",
         "bass": "Wasm Round FM Bass"
       },
@@ -12854,10 +12872,10 @@
         },
         "sectionTone": false,
         "volumes": {
-          "pad": 0.032,
-          "lead": 0.16,
+          "pad": 0.27,
+          "lead": 0.66,
           "counter": 0.061,
-          "bass": 0.13,
+          "bass": 0.46,
           "perc": 0.28
         },
         "drums": {
@@ -13348,7 +13366,7 @@
           "pad": 1,
           "bass": 0.44,
           "lead": 0.56,
-          "counter": 0.28,
+          "counter": 0.69,
           "perc": 0.29
         },
         "sections": {
@@ -13537,7 +13555,11 @@
       "settings": {
         "padVibrato": 0.3,
         "progressionMode": "generated",
-        "progressionMood": {"brightness": 0.1, "stability": 0.3, "adventure": 0.5},
+        "progressionMood": {
+          "brightness": 0.1,
+          "stability": 0.3,
+          "adventure": 0.5
+        },
         "progressionWander": 0.5,
         "tonic": 9,
         "mode": "Major-6",
@@ -13792,8 +13814,8 @@
           "swell": 0.055
         },
         "volumes": {
-          "pad": 1,
-          "bass": 0.42,
+          "pad": 0.84,
+          "bass": 0.68,
           "lead": 0.37,
           "counter": 0.27,
           "perc": 0.28
@@ -13845,9 +13867,9 @@
         "chordSize": "functional"
       },
       "voices": {
-        "pad": "Swelling Analog",
+        "pad": "Coastal FM Lead",
         "bass": "Analog Saw Bass",
-        "lead": "Hollow Pulse"
+        "lead": "Racer Lead"
       },
       "comparisonOf": "Night drive",
       "isNew": true,
@@ -14446,10 +14468,10 @@
         },
         "sectionTone": false,
         "volumes": {
-          "pad": 0.032,
-          "lead": 0.16,
+          "pad": 0.27,
+          "lead": 0.66,
           "counter": 0.061,
-          "bass": 0.13,
+          "bass": 0.46,
           "perc": 0.28
         },
         "drums": {
@@ -16245,7 +16267,7 @@
           "swell": 0.06
         },
         "volumes": {
-          "pad": 0.61,
+          "pad": 1,
           "bass": 0.45,
           "lead": 1,
           "counter": 0.31,
@@ -16265,7 +16287,7 @@
       },
       "voices": {
         "pad": "Studio Concert v2",
-        "bass": "Starmap Piano (updated)",
+        "bass": "Soft Drama v2",
         "lead": "Ravel"
       },
       "isNew": true
@@ -16418,7 +16440,7 @@
         "volumes": {
           "pad": 0.7,
           "bass": 0.25,
-          "lead": 0.66,
+          "lead": 1,
           "counter": 0.36,
           "perc": 0.38
         },
@@ -16435,8 +16457,8 @@
         }
       },
       "voices": {
-        "pad": "Measured Choir Ah",
-        "bass": "Sub Bass",
+        "pad": "Measured Epic Strings",
+        "bass": "Studio Concert v2",
         "lead": "Studio Concert v2",
         "counter": "Glass Pad"
       },
@@ -16944,7 +16966,7 @@
         },
         "volumes": {
           "pad": 0.74,
-          "bass": 0.5,
+          "bass": 0.32,
           "lead": 0.66,
           "counter": 0.4,
           "perc": 0.38
@@ -17014,12 +17036,12 @@
           "brightness": 0.2
         },
         "rubato": 0.45,
-        "ornaments": 0.15,
+        "ornaments": 0.5,
         "ducking": 0.6,
         "evenLoudness": 0.8,
         "sectionSpace": 0.2,
         "keyLift": 0,
-        "timbreDrift": 0.15,
+        "timbreDrift": 0.4,
         "leadDensity": 0.12,
         "leadLeaps": 0.2,
         "leadRepeat": 0.58,
@@ -17031,7 +17053,7 @@
         "volumes": {
           "pad": 0.8,
           "bass": 0.5,
-          "lead": 0.62,
+          "lead": 0.73,
           "counter": 0.4,
           "perc": 0.38
         },
@@ -17045,7 +17067,8 @@
           "perc": true,
           "pad": false,
           "lead": false
-        }
+        },
+        "padVibrato": 0.5
       },
       "voices": {
         "pad": "Felted Piano v2",
@@ -17153,7 +17176,7 @@
         "volumes": {
           "pad": 0.55,
           "bass": 0.55,
-          "lead": 0.62,
+          "lead": 0.87,
           "counter": 0.3,
           "perc": 0.5
         },
@@ -17359,7 +17382,12 @@
           "variation": 0.5,
           "sprinkle": 0.1
         },
-        "leadSyncopation": 0.4
+        "leadSyncopation": 0.4,
+        "ambience": {
+          "rain": 0.1,
+          "thunder": 0.25
+        },
+        "playAmbience": true
       },
       "voices": {
         "pad": "FM Rhodes",
