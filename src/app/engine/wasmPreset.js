@@ -9,12 +9,13 @@ const resonance=p=>Math.max(0,Math.min(1,(Math.SQRT2-1/(p.filterType==='bandpass
 // `dynamics`: the scene's (settings.dynamics) - velocity → softer attack in the kernel, and velocity → filter on top of the sound's own.
 export function translatedWasmPreset(raw={},polyphony=8,dynamics=null){
  const p={...DEFAULTS,...raw},out=initialPatch(),l=out.layers[0];out.name='Translated voice';
+ // The original attack is an exponential approach with the attack as its time constant, and the decay starts after one time constant: the peak is 63% of the amount, not all of it.
  // Architecture init values are musical choices, not legacy defaults.
  Object.assign(out.global,{model:1,polyphony:Math.min(16,polyphony),unison:Math.min(4,p.voiceCount||1),spread:p.detuneSpread*(p.voiceCount===2?.5:1),gain:Math.min(.8,p.masterVolume*.95),width:p.stereoSpread/100,chorus:0});
  Object.assign(l,{waveA:wave(p.vcoType),waveB:wave(p.osc2Type),levelA:1,levelB:p.osc2Type==='off'?0:p.osc2Amount,pulse:p.vcoDutyCycle,pulseB:p.osc2DutyCycle-p.vcoDutyCycle,coarseA:12*Math.log2(p.allThemPitches||1),coarseB:p.osc2OctaveOffset*12,fineB:p.osc2Detune,
-  cutoff:p.filterFreq*2**(-p.filterVelocity*.1/1200),resonance:resonance(p),filter:p.filterType==='highpass'?3:p.filterType==='bandpass'?2:0,filterAmount:p.filterAttack||p.filterDecay?p.filterEnvAmount/1200:0,keytrack:p.filterKeyTrack,velocityTone:p.filterVelocity/1200,
+  cutoff:p.filterFreq*2**(-p.filterVelocity*.1/1200),resonance:resonance(p),filter:p.filterType==='highpass'?3:p.filterType==='bandpass'?2:0,filterAmount:p.filterAttack||p.filterDecay?p.filterEnvAmount/1200*(p.filterAttack>0?1-Math.exp(-1):1):0,keytrack:p.filterKeyTrack,velocityTone:p.filterVelocity/1200,
   attack:p.gainAttack,decay:p.gainDecay,sustain:p.gainSustain,release:p.gainRelease,legacyAmp:1,ampAttackCurve:curve(p.envelopeAttackShape,p.envelopeAttackExponent),ampDecayCurve:curve(p.envelopeDecayShape,p.envelopeDecayExponent),ampReleaseCurve:curve(p.envelopeReleaseShape,p.envelopeReleaseExponent),
-  filterAttack:Math.max(.002,p.filterAttack),filterDecay:Math.max(.002,p.filterDecay*3),filterSustain:0,filterRelease:Math.max(.002,p.filterRelease),filterDecayCurve:.5,
+  filterAttack:Math.max(.002,p.filterAttack),filterDecay:Math.max(.002,p.filterDecay*4.2),filterSustain:0,filterRelease:Math.max(.002,p.filterRelease),filterDecayCurve:.5,
   lfoPitch:p.vibratoDepth,lfoRate:Math.max(.01,p.vibratoRate),lfo2Filter:p.filterLfoDepth/1200,lfo2Rate:Math.max(.01,p.filterLfoRate),noise:p.noiseMix,breath:p.breathAmount,formant:p.formantAmount,vowel:p.formantVowel==='oo'?1:p.formantVowel==='ee'?2:0,formantShift:p.formantShift,
   polyPitch:0,sub:0,drift:0,drive:0,pressureTone:0,highpass:p.masterFilterType==='highpass'?p.masterFilterFreq:10,highResonance:p.masterFilterType==='highpass'?(Math.SQRT2-1/10**(p.masterFilterQ/20))/(Math.SQRT2-.15):0});
  const d=dynamicsOf(dynamics);l.velocityAttack=d.attack;l.velocityTone=Math.min(4,l.velocityTone+d.brightness*1.5);
@@ -42,7 +43,11 @@ export function translatedWasmVoice(raw={},polyphony=8,dynamics=null){
   velocity:i===0?dynamicsOf(dynamics).brightness*.8:1,keyScale:0,rateScale:0,pan:0,legacyEnvelope:i===0?0:1,attackCurve:i===0?1:curve(p.envelopeAttackShape,p.envelopeAttackExponent),decayCurve:i===0?1:curve(p.envelopeDecayShape,p.envelopeDecayExponent),releaseCurve:i===0?4:curve(p.envelopeReleaseShape,p.envelopeReleaseExponent)});
  f.effects=base.effects;f.inserts=base.inserts;return {kind:'fm',patch:sanitizeFM(f)};
 }
-export const needsNativeSource=p=>p?.stringModel==='piano'||p?.stringModel==='plucked';
+// The kernel's noise is white and unpitched. A trace of coloured noise is close enough, but a noise-dominant sound (wind, rain) stays on the original engine.
+const coloursNoise=p=>p?.noiseMix>=.3&&(p.noiseType!=='white'&&p.noiseType!==undefined||p.noiseFilterEnabled);
+// The kernel has no bit crusher either; a light touch is close enough, a clear one stays on the original engine.
+const crushes=p=>p?.bitCrushAmount>=.2;
+export const needsNativeSource=p=>p?.stringModel==='piano'||p?.stringModel==='plucked'||!!coloursNoise(p)||!!crushes(p);
 
 // Availability is not a fidelity claim. Keep unresolved mappings visible while
 // the original Instrument remains the reference for existing presets.
@@ -57,5 +62,6 @@ export function wasmMappingNotes(raw={}){
  if(p.octaveRatio!==2||Object.keys(p).some(k=>/^pitch[A-G]/.test(k)&&k!=='pitchEnvAmount'&&k!=='pitchEnvDecay'&&p[k]!==1))notes.push('custom note tuning not mapped');
  if(p.pitchEnvAmount)notes.push('pitch transient approximated');
  if(p.noiseMix>0&&(p.noiseType!=='white'||p.noiseFilterEnabled))notes.push('noise colour/filter not mapped');
+ if(p.bitCrushAmount>0)notes.push('bit crusher not mapped');
  return notes;
 }

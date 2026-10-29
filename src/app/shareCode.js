@@ -56,7 +56,7 @@ export const SHAREABLE_PRESETS = [
     'Wind Pad', 'Bit Haze', 'Dreary', 'Happy Little Squares', 'LoFi Space', 'Growl Bass',
     'Distorted Strings', 'Rain Drops', 'Analog', 'Wavy Flute', 'Crunchy Waves', 'Chimes', 'Broken Toy',
     'Not Broken Toy', 'Breathing Pad', 'Choir Ah', 'Hollow Tremolo', 'FM Bass', 'Thump Bass', 'Reed Lead',
-    'Organ Whistle', 'FM Rhodes', 'FM Bell', 'Felt Piano', 'Soft Marimba', 'Glass Mallet', 'Underwater',
+    'Organ Whistle', 'FM Rhodes', 'FM Bell', 'Felt Keys', 'Soft Marimba', 'Glass Mallet', 'Underwater',
     'Tremolo Organ',
     // the fast / game-style presets
     'Void Pad', 'Starlight Pad', 'Spore Haze', 'Heroic Strings', 'Drive Bass', 'Chip Bass', 'Deep Throb',
@@ -65,7 +65,7 @@ export const SHAREABLE_PRESETS = [
     // film-synth presets
     'CS-80 Brass', 'Neon Saw Pad', 'Night Glass', 'Neon Pulse Bass', 'Seq Bass', 'Lament Lead', 'Ghost Sweep', 'Outrun Lead',
     // Original oscillator/FM keys, independently selectable in Latest.
-    'Felt Piano (classic)', 'Soft Keys (classic)', 'Tine Keys (classic)', 'FM Rhodes (classic)',
+    'Felt Keys (classic)', 'Soft Keys (classic)', 'Tine Keys (classic)', 'FM Rhodes (classic)',
     'Haunted Viola',
     'Neon Blues Lead',
     'Coastal FM Lead', 'Progressive Pluck',
@@ -80,7 +80,7 @@ export const SHAREABLE_PRESETS = [
     'Measured Trumpet', 'Measured Horn', 'Measured Brass', 'Measured Clarinet', 'Measured Flute',
     'Measured Violin', 'Measured Cello', 'Measured String Section', 'Measured Chamber Strings', 'Measured Epic Strings', 'Measured Cello Pizzicato',
     // the modelled pianos, as updated versions placed beside the originals
-    'Felt Piano (updated)', 'Soft Keys (updated)', 'Starmap Piano (updated)',
+    'Felt Keys (updated)', 'Soft Keys (updated)', 'Starmap Piano (updated)',
     // modelled pianos matched to sampled ones (appended: codes index into this list)
     'Ambient Piano', 'Glass Grand', 'Soft Drama', 'Soft Piano', 'Subdued Piano', 'Studio Concert',
     // the piano played from measurements of a real one (engine/calibratedPiano.js)

@@ -39,10 +39,10 @@ test('a setup keeps a classic voice and a drum machine, and reads back', () => {
 test('an edited sound of the generator\'s own synth travels as its changes, and comes back whole', async () => {
     const { presetEdit, presetFromEdit } = await import('./editor/presetEdits');
     const { findPreset } = await import('./editor/presetStore');
-    const edited = { ...findPreset('Felt Piano'), filterFreq: 1234, reverbType: 'reverb2' };
-    const edit = presetEdit('Felt Piano', edited);
+    const edited = { ...findPreset('Felt Keys'), filterFreq: 1234, reverbType: 'reverb2' };
+    const edit = presetEdit('Felt Keys', edited);
     expect(edit.values).toEqual({ filterFreq: 1234, reverbType: 'reverb2' });
     const { presets } = decodeShare(encodeSettings(defaultSettings(), { lead: { edit } }));
     expect(presets.lead).toEqual({ edit });
-    expect(presetFromEdit(presets.lead.edit)).toMatchObject({ ...findPreset('Felt Piano'), filterFreq: 1234, reverbType: 'reverb2' });
+    expect(presetFromEdit(presets.lead.edit)).toMatchObject({ ...findPreset('Felt Keys'), filterFreq: 1234, reverbType: 'reverb2' });
 });

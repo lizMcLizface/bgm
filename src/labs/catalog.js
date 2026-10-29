@@ -18,14 +18,14 @@ const fm=(id,family,index,name,edit=()=>{})=>{const patch=cloneFM(FM_RECIPES[ind
 export const LAB_VOICES=[
  fm('bowed-glass','strings',4,'Bowed glass'),sub('rosin-silk','strings',9,'Rosin silk'),sub('layered-strings','strings',2,'Layered strings'),sub('soft-strings','strings',1,'Soft ensemble'),
  fm('tine-keys','keys',0,'Tine keys'),fm('glass-bells','keys',1,'Glass bells'),fm('celeste','keys',0,'Celeste',p=>{p.global.index=.65;for(const o of p.operators){o.attack=.003;o.decay1=.35;o.decay2=1.4;o.sustain=0;o.release=.8;}}),
- {id:'felt-keys',family:'keys',name:'Felt piano · existing source',kind:'legacy',patch:pianoPatch('Felt Piano',findPreset('Felt Piano'))},
+ {id:'felt-keys',family:'keys',name:'Felt piano · existing source',kind:'legacy',patch:pianoPatch('Felt Keys',findPreset('Felt Keys'))},
  fm('air-choir','choir',9,'Air choir'),fm('vowel-choir','choir',9,'Open vowel choir',p=>{p.global.breath=.12;p.global.formant=.7;p.global.vowel=.05;p.global.formantShift=0;}),fm('hollow-voices','choir',7,'Hollow voices',p=>{p.global.formant=.5;p.global.breath=.08;for(const o of p.operators){o.attack=.5;o.release=1.5;}}),
- fm('drawbars','organs',5,'Parallel drawbars'),fm('soft-pipes','organs',5,'Soft pipes',p=>{p.global.index=.25;p.global.formant=.2;p.global.breath=.04;for(const o of p.operators){o.attack=.08;o.release=.55;}}),fm('hollow-organ','organs',7,'Hollow reed organ',p=>{for(const o of p.operators){o.sustain=.8;o.release=.5;}}),
+ fm('drawbars','organs',5,'Parallel drawbars'),fm('soft-pipes','organs',5,'Soft pipes',p=>{p.global.index=.25;p.global.formant=.2;p.global.breath=.04;for(const o of p.operators){o.attack=.08;o.release=.55;}}),fm('hollow-organ','organs',7,'Hollow reed organ',p=>{p.global.index=.55;p.global.feedback=.03;p.operators.forEach((o,i)=>{o.release=.5;o.sustain=i===3?.8:.35;if(i<3)o.keyScale=-.4;});}),
  sub('dco-drone','drones',3,'DCO foundation'),sub('noir-drone','drones',2,'Layered noir'),fm('living-glass','drones',8,'Living glass'),sub('slow-pressure','drones',5,'Slow pressure'),
 ];
 for(const v of LAB_VOICES)if(v.kind!=='legacy'){v.patch.effects={...v.patch.effects,dry:1,reverb:.18,decay:v.family==='drones'?12:6,delay:v.family==='keys'?.14:.05,delayMs:375,feedback:.35};}
 for(const v of LAB_VOICES)Object.assign(v,{availability:v.kind==='legacy'?'previous':'wasm',isNew:v.kind!=='legacy',origin:v.kind==='legacy'?'Existing instrument library':'New synth laboratory'});
-Object.assign(LAB_VOICES.find(v=>v.id==='felt-keys'),{name:'Felt Piano',presetName:'Felt Piano'});
+Object.assign(LAB_VOICES.find(v=>v.id==='felt-keys'),{name:'Felt Keys',presetName:'Felt Keys'});
 // Keep the original lab IDs, then expose every remaining standalone recipe.
 for(const [i,family]of [[0,'winds'],[4,'leads'],[6,'leads'],[7,'pads'],[8,'strings'],[10,'plucks']]){const v=sub('core-'+i,family,i,RECIPES[i].name);Object.assign(v,{availability:'wasm',isNew:true,origin:'New subtractive laboratory'});LAB_VOICES.push(v);}
 for(const [i,family]of [[2,'bass'],[3,'winds'],[6,'keys'],[10,'winds']]){const v=fm('fm-'+i,family,i,FM_RECIPES[i].name);Object.assign(v,{availability:'wasm',isNew:true,origin:'New FM laboratory'});LAB_VOICES.push(v);}
@@ -45,7 +45,7 @@ export function instrumentFamily(name,category=''){
 }
 for(const v of WASM_VOICES){const lab=voiceByLabId(v.id);Object.assign(lab,{patch:structuredClone(v.patch),presetName:v.name});}
 function voiceByLabId(id){return LAB_VOICES.find(v=>v.id===id);}
-const libraryNames=new Set(['Felt Piano',...WASM_VOICES.map(v=>v.name)]);
+const libraryNames=new Set(['Felt Keys',...WASM_VOICES.map(v=>v.name)]);
 const stringNames=new Set(['Nylon Guitar','Soft Harp','Harp Pluck','Kalimba Pluck','Upright Pluck']);
 for(const [category,presets]of [...Object.entries(PRESET_CATEGORIES),['unCAGED',presetData]])for(const [name,raw]of Object.entries(presets)){
  if(name==='- INIT -'||libraryNames.has(name))continue;libraryNames.add(name);

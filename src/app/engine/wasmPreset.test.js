@@ -5,7 +5,7 @@ it('selects FM for existing FM sounds and keeps physical sources explicit',()=>{
  const fm=translatedWasmVoice({fmIndex:2,fmRatio:3},8);expect(fm.kind).toBe('fm');expect(fm.patch.global.quality).toBe(1);expect(fm.patch.routes[0][1]).toBe(1);expect(fm.patch.operators[0].ratio).toBe(3);expect(needsNativeSource({stringModel:'piano'})).toBe(true);expect(needsNativeSource({stringModel:'plucked'})).toBe(true);expect(needsNativeSource({vcoType:'sawtooth'})).toBe(false);
 });
 it('does not add a square sub, analogue drift, drive or a second chorus to clean existing voices',()=>{
- for(const name of ['Celesta','Bell Lead','Felt Piano (classic)','Soft Keys (classic)','Tine Keys (classic)']){
+ for(const name of ['Celesta','Bell Lead','Felt Keys (classic)','Soft Keys (classic)','Tine Keys (classic)']){
   const p=translatedWasmPreset(preset(name));expect(p.layers[0]).toMatchObject({sub:0,drift:0,drive:0,legacyAmp:1,ampAttackCurve:2,ampDecayCurve:2,ampReleaseCurve:2});expect(p.global.chorus).toBe(0);
  }
  const p=translatedWasmPreset({vcoType:'sine',subOscType:'sine',subOscOctaveOffset:0,gainAttack:0,gainDecay:0});expect(p.layers[0]).toMatchObject({sub:0,attack:0,decay:0});
@@ -40,4 +40,12 @@ it('carries the mid EQ band and the room controls into the translated patch',()=
  const p=translatedWasmPreset({reverbAmount:.3,reverbDecay:3,reverbSize:.4,reverbDamping:2500,reverbPredelay:.06,eqMidGain:-4,eqMidFreq:800,eqMidQ:1.2});
  expect(p.effects).toMatchObject({decay:3,size:.4,damping:2500,predelay:60});expect(p.inserts).toMatchObject({midGain:-4,midFreq:800,midQ:1.2});
  expect(translatedWasmPreset({reverbAmount:.3}).effects).toMatchObject({decay:8,size:.7,damping:6000,predelay:25});
+});
+it('keeps coloured or pitch-filtered noise beds on the original engine',()=>{
+ for(const name of ['Wind Pad','Pitched Rain'])expect(needsNativeSource(preset(name))).toBe(true);
+ expect(needsNativeSource({noiseMix:.4,noiseType:'white'})).toBe(false);expect(needsNativeSource({noiseMix:0,noiseType:'brown'})).toBe(false);expect(needsNativeSource(preset('Breathy Choir'))).toBe(false);
+});
+it('keeps clearly bit-crushed voices on the original engine',()=>{
+ for(const name of ['Bit Haze','Chip Bass'])expect(needsNativeSource(preset(name))).toBe(true);
+ expect(needsNativeSource(preset('Lo-fi Tape Pad'))).toBe(false);expect(wasmMappingNotes(preset('Lo-fi Tape Pad'))).toContain('bit crusher not mapped');
 });

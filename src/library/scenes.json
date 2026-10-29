@@ -150,7 +150,7 @@
         "leadSyncopation": 0.2
       },
       "voices": {
-        "pad": "Felt Piano (updated)",
+        "pad": "Felt Keys (updated)",
         "bass": "Thump Bass",
         "lead": "Measured Flute"
       },
@@ -241,7 +241,7 @@
         "ambienceVolume": 0.66
       },
       "voices": {
-        "pad": "Felt Piano",
+        "pad": "Felt Keys",
         "bass": "Thump Bass",
         "lead": "Reed Lead"
       },
@@ -5057,7 +5057,7 @@
         "ambienceVolume": 0.45
       },
       "voices": {
-        "pad": "Felt Piano (updated)",
+        "pad": "Felt Keys (updated)",
         "bass": "Felt Bass",
         "lead": "Pan Flute"
       },
@@ -5138,7 +5138,7 @@
         "ambienceVolume": 0.66
       },
       "voices": {
-        "pad": "Felt Piano",
+        "pad": "Felt Keys",
         "bass": "Felt Bass",
         "lead": "Pan Flute"
       },
@@ -5722,7 +5722,7 @@
         }
       },
       "voices": {
-        "pad": "Felt Piano (updated)",
+        "pad": "Felt Keys (updated)",
         "bass": "Sub Bass",
         "lead": "Celesta",
         "counter": "Glass Pad"
@@ -5858,7 +5858,7 @@
         }
       },
       "voices": {
-        "pad": "Felt Piano",
+        "pad": "Felt Keys",
         "bass": "Sub Bass",
         "lead": "Celesta",
         "counter": "Glass Pad"
@@ -6597,7 +6597,7 @@
         }
       },
       "voices": {
-        "pad": "Felt Piano (updated)",
+        "pad": "Felt Keys (updated)",
         "bass": "Deep Throb",
         "lead": "Soft Saw Lead",
         "counter": "Spore Haze"
@@ -6744,7 +6744,7 @@
         }
       },
       "voices": {
-        "pad": "Felt Piano",
+        "pad": "Felt Keys",
         "bass": "Deep Throb",
         "lead": "Soft Saw Lead",
         "counter": "Spore Haze"
@@ -7036,7 +7036,7 @@
         }
       },
       "voices": {
-        "pad": "Felt Piano (updated)",
+        "pad": "Felt Keys (updated)",
         "bass": "Felt Bass",
         "lead": "Celesta"
       },
@@ -7133,7 +7133,7 @@
         }
       },
       "voices": {
-        "pad": "Felt Piano",
+        "pad": "Felt Keys",
         "bass": "Felt Bass",
         "lead": "Celesta"
       },
@@ -9264,7 +9264,7 @@
       "voices": {
         "pad": "Spore Haze",
         "bass": "Sub Bass",
-        "lead": "Felt Piano (updated)"
+        "lead": "Felt Keys (updated)"
       },
       "rulebook": {
         "version": 1,
@@ -9359,7 +9359,7 @@
       "voices": {
         "pad": "Spore Haze",
         "bass": "Sub Bass",
-        "lead": "Felt Piano"
+        "lead": "Felt Keys"
       },
       "rulebook": {
         "version": 1,
@@ -17191,7 +17191,7 @@
         "leadSyncopation": 0.25
       },
       "voices": {
-        "pad": "Felt Piano",
+        "pad": "Felt Keys",
         "bass": "Upright Pluck",
         "lead": "Kalimba Pluck"
       }

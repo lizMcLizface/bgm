@@ -6,7 +6,7 @@ vi.mock('./loudness',()=>({levelPreset:vi.fn(async preset=>preset)}));
 const withoutResonance=({pianoResonance,...p})=>p;
 test('named keys opt in without changing their envelope, sustain or old oscillator recipes',()=>{
  const original={gainRelease:2};
- for(const name of ['Felt Piano','Soft Keys','Tine Keys','FM Rhodes']){
+ for(const name of ['Felt Keys','Soft Keys','Tine Keys','FM Rhodes']){
   const before=pianoPatch(name,original,'latest',{resonance:false}),after=pianoPatch(name,original);
   expect(after.pianoResonance).toBeGreaterThan(0);expect(withoutResonance(after)).toEqual(withoutResonance(before));
   expect(sanitizePreset(after)).toEqual(after);expect(after.pianoSustain).toBe(.28);expect(pianoPatch(name,original,'legacy')).toBe(original);

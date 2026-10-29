@@ -7,7 +7,7 @@ const note=(role,midi,beat=1)=>({role,midi,beat,length:.7,velocity:.65,detune:0}
 test('profiles use actual instrument sources and named classic/chip identity with plain-data plans',()=>{
     const voices={lead:{name:'Flute'},counter:{preset:{stringModel:'plucked'}},pad:{preset:{stringModel:'piano'}}};
     expect(instrumentGroovePlan(4,voices)).toEqual({start:4,profiles:{lead:'breath',counter:'plucked',pad:'keys'}});
-    expect(grooveProfile({name:'Felt Piano (classic)',preset:{stringModel:'piano'}})).toBe('tight');
+    expect(grooveProfile({name:'Felt Keys (classic)',preset:{stringModel:'piano'}})).toBe('tight');
     expect(grooveProfile({name:'Custom',preset:{gainAttack:.5}})).toBe('swell');expect(grooveProfile()).toBe('neutral');
     expect(JSON.parse(JSON.stringify(instrumentGroovePlan(4,voices)))).toEqual(instrumentGroovePlan(4,voices));
 });

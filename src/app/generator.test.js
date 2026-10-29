@@ -1062,13 +1062,13 @@ test('named string patches follow generation mode while edited or explicit sound
 test('named piano patches follow generation mode, preserve edits, and leave Pixel Piano distinct', () => {
     const gen=new Generator({...defaultSettings(),generation:'latest'}),loaded=[];
     gen.roles.pad.instrument.applyPreset=preset=>loaded.push(preset);
-    for(const name of ['Felt Piano','Soft Keys','Tine Keys','FM Rhodes']){
+    for(const name of ['Felt Keys','Soft Keys','Tine Keys','FM Rhodes']){
         gen.loadRolePreset('pad',name);expect(loaded.at(-1).stringModel).toBe('piano');
         gen.set('generation','legacy');expect(loaded.at(-1).stringModel).toBeUndefined();
         gen.set('generation','latest');expect(loaded.at(-1).stringModel).toBe('piano');
     }
     gen.roles.pad.edited=true;const count=loaded.length;gen.set('generation','legacy');expect(loaded).toHaveLength(count);
-    gen.loadRolePreset('pad','Felt Piano',{stringModel:'piano',pianoBrightness:.92});gen.set('generation','latest');gen.set('generation','legacy');
+    gen.loadRolePreset('pad','Felt Keys',{stringModel:'piano',pianoBrightness:.92});gen.set('generation','latest');gen.set('generation','legacy');
     expect(loaded.at(-1).pianoBrightness).toBe(.92);
     gen.set('generation','latest');gen.loadRolePreset('pad','Pixel Piano');expect(loaded.at(-1).stringModel).toBeUndefined();
 });
@@ -1076,7 +1076,7 @@ test('named piano patches follow generation mode, preserve edits, and leave Pixe
 test('classic piano patches remain oscillator voices through generation changes',()=>{
     const gen=new Generator({...defaultSettings(),generation:'latest'}),loaded=[];
     gen.roles.pad.instrument.applyPreset=p=>loaded.push(p);
-    for(const name of ['Felt Piano','Soft Keys','Tine Keys','FM Rhodes']){
+    for(const name of ['Felt Keys','Soft Keys','Tine Keys','FM Rhodes']){
         gen.loadRolePreset('pad',name+' (classic)');expect(loaded.at(-1).stringModel).toBe('oscillator');
         expect(gen.roles.pad.stringPatchBase).toBeNull();
         gen.set('generation','legacy');gen.set('generation','latest');expect(loaded.at(-1).stringModel).toBe('oscillator');

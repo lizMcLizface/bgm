@@ -16,8 +16,8 @@ it('includes approved rounded prepared instruments and preserves original oscill
  for(const name of ['Nylon Guitar','Soft Harp','Harp Pluck','Kalimba Pluck','Upright Pluck']){expect(libraryVoice(name+' (classic)').patch.stringModel).toBe('oscillator');expect(libraryVoice(name).patch.stringModel).toBe('plucked');}
 });
 it('marks new Wasm voices, native-only sources and translated existing presets independently',()=>{
- const glass=voiceById('bowed-glass'),felt=libraryVoice('Felt Piano'),strings=libraryVoice('Warm Strings');
- expect(voiceLabel(glass)).toContain('NEW · Wasm only');expect(voiceLabel(felt)).toBe('Felt Piano · Previous only');expect(voiceLabel(strings)).toBe('Warm Strings · Both engines');
+ const glass=voiceById('bowed-glass'),felt=libraryVoice('Felt Keys'),strings=libraryVoice('Warm Strings');
+ expect(voiceLabel(glass)).toContain('NEW · Wasm only');expect(voiceLabel(felt)).toBe('Felt Keys · Previous only');expect(voiceLabel(strings)).toBe('Warm Strings · Both engines');
  expect(voiceEngine(glass,'previous')).toBe('wasm');expect(voiceEngine(felt,'wasm')).toBe('previous');expect(voiceSpec(felt,'wasm').kind).toBe('legacy');
  expect(voiceSpec(strings,'previous').kind).toBe('legacy');expect(voiceSpec(strings,'wasm').kind).toBe('subtractive');expect(voiceSpec(libraryVoice('Nylon Guitar'),'wasm').kind).toBe('legacy');
 });
