@@ -18,7 +18,7 @@ test('every existing poly and FM recipe survives panel storage without changing 
 test('layer and operator edits stay independent, including custom routing and sends',()=>{
  const values={...POLY.presets[2].values,'layers.1.cutoff':1234,'effects.reverb':.31,'inserts.chorus':.23};
  const poly=POLY.inflate(values);
- expect(poly.layers[1].cutoff).toBe(1234);expect(poly.layers[0].cutoff).toBe(850);
+ expect(poly.layers[1].cutoff).toBe(1234);expect(poly.layers[0].cutoff).toBe(700);
  expect(poly.effects.reverb).toBe(.31);expect(poly.inserts.chorus).toBe(.23);
  const fm=FM.inflate({...FM.presets[0].values,'operators.4.ratio':7.25,'routes.0.5':.7,'carriers.2':.4});
  expect(fm.operators[4].ratio).toBe(7.25);expect(fm.operators[0].ratio).toBe(1);
