@@ -2159,7 +2159,7 @@ body {
 
 /* Hide UI: only the transport, the timeline with its playhead (without the track strip) and
    the button that brings the page back stay. */
-.gen-zen > :not(.gen-header):not(.gen-backdrop):not(.gen-timeline):not(.gen-tour):not(.gen-tour-intro) {
+.gen-zen > :not(.gen-header):not(.gen-backdrop):not(.gen-timeline):not(.gen-chord-keys):not(.gen-hero):not(.gen-tour):not(.gen-tour-intro) {
     display: none !important;
 }
 
@@ -2197,6 +2197,13 @@ body {
     box-shadow: none;
 }
 
+/* The pattern blocks under the timeline follow the timeline's look. */
+.gen-zen .gen-chord-keys { background: color-mix(in srgb, var(--gen-surface) 45%, transparent); }
+:root[data-backdrop] .gen-zen .gen-chord-keys {
+    background: color-mix(in srgb, var(--gen-surface) 42%, transparent);
+    border-color: color-mix(in srgb, var(--gen-border) 40%, transparent);
+}
+
 /* Over the landscape the remaining chrome fades further, so the picture shows through. */
 :root[data-backdrop] .gen-zen .gen-timeline {
     background: color-mix(in srgb, var(--gen-surface) 42%, transparent);
@@ -2224,7 +2231,7 @@ body {
     display: none !important;
 }
 
-.gen-zen .gen-header-tools > :not(.gen-visual):not(.gen-hide):not(.gen-engine-control):not(.gen-zen-views) {
+.gen-zen .gen-header-tools > :not(.gen-visual):not(.gen-options):not(.gen-hide):not(.gen-engine-control):not(.gen-zen-views) {
     display: none !important;
 }
 

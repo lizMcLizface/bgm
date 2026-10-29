@@ -177,3 +177,39 @@ export const AutoThemeIcon = () => (
         <path d="M8 2.5a5.5 5.5 0 0 0 0 11z" {...solid} />
     </Svg>
 );
+
+// The instruments whose patterns can be shown under the timeline.
+export const PianoIcon = () => (
+    <Svg size={16}>
+        <rect x="2" y="3" width="12" height="10" rx="1.5" />
+        <path d="M8 9v4" />
+        <path d="M5.5 4v4.5M10.5 4v4.5" strokeWidth="2.4" />
+    </Svg>
+);
+
+export const GuitarIcon = () => (
+    <Svg size={16}>
+        <circle cx="4.8" cy="11.2" r="2.4" />
+        <circle cx="7" cy="9" r="2" />
+        <path d="M8.4 7.6L13 3M11.8 2l2.2 2.2" />
+    </Svg>
+);
+
+export const BassIcon = () => (
+    <Svg size={16}>
+        <path d="M3 13c-1-1-1-3 .5-4l2.5-1.5L7.5 9l-1.5 2.5C5 13 4 13.5 3 13z" />
+        <path d="M6.8 8.2L13.5 1.5M12 1h3M13 2.5l1.5 1.5" />
+    </Svg>
+);
+
+export const CloseIcon = () => <Svg size={12}><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" strokeWidth="2" /></Svg>;
+
+// The hero view: a sword, blade up and to the right, guard across it, grip and pommel below.
+export const SwordIcon = () => (
+    <Svg size={16}>
+        <path d="M13.5 2.5L7 9" strokeWidth="2" />
+        <path d="M5 7l4 4" />
+        <path d="M7 9l-3.2 3.2" strokeWidth="2" />
+        <circle cx="3" cy="13" r="1" />
+    </Svg>
+);

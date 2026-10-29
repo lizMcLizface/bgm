@@ -5,7 +5,9 @@
 // so it is never done on page load).
 
 import React, { useEffect, useRef, useState } from 'react';
-import { DiceIcon, PencilIcon, SparkIcon } from './icons';
+import { DiceIcon, PencilIcon, SparkIcon, PianoIcon, GuitarIcon, BassIcon } from './icons';
+
+export const PATTERN_VIEWS = [['piano', 'Piano', PianoIcon], ['guitar', 'Guitar', GuitarIcon], ['bass', 'Bass', BassIcon]];
 
 // Physical key positions (KeyboardEvent.code), so QWERTZ/AZERTY work too:
 // the home row is the white keys, the row above the black keys.
@@ -13,6 +15,20 @@ const KEY_OFFSETS = {
     KeyA: 0, KeyW: 1, KeyS: 2, KeyE: 3, KeyD: 4, KeyF: 5, KeyT: 6, KeyG: 7,
     KeyY: 8, KeyH: 9, KeyU: 10, KeyJ: 11, KeyK: 12, KeyO: 13, KeyL: 14, KeyP: 15, Semicolon: 16,
 };
+// Icon buttons that show or hide the piano / guitar / bass pattern blocks under the timeline.
+export const PatternButtons = ({ patterns, onPattern, label = true }) => (
+    <div className="gen-pattern-show" role="group" aria-label="Show patterns under the timeline">
+        {label && <span>Show on</span>}
+        {PATTERN_VIEWS.map(([id, name, Icon]) => (
+            <button key={id} type="button" className={patterns[id] ? 'is-on' : ''} aria-pressed={patterns[id]} aria-label={`${name} pattern`}
+                title={`${patterns[id] ? 'Hide' : 'Show'} the ${name.toLowerCase()} pattern under the timeline`} onClick={() => onPattern(id, !patterns[id])}><Icon /></button>
+        ))}
+    </div>
+);
+
+// The notes held right now on a MIDI keyboard (or the computer keyboard, with a voice armed), for views that show them.
+export const midiHeld = new Set();
+
 export const DEFAULT_KEY_OCTAVES = { pad: 4, bass: 2, lead: 5, counter: 5 };
 const OCTAVE_RANGE = [0, 7];
 
@@ -74,7 +90,7 @@ export function useLivePlay(generator, armed) {
     state.current.octaves = octaves;
 
     const releaseAll = () => {
-        state.current.held.forEach(({ role, id }) => generator.liveNoteOff(role, id));
+        state.current.held.forEach(({ role, id, midi }) => { generator.liveNoteOff(role, id); midiHeld.delete(midi); });
         state.current.held.clear();
     };
 
@@ -101,12 +117,14 @@ export function useLivePlay(generator, armed) {
             if (offset === undefined || state.current.held.has(e.code)) return;
             e.preventDefault();
             const midi = 12 * (state.current.octaves[armed] + 1) + offset;
-            state.current.held.set(e.code, { role: armed, id: generator.liveNoteOn(armed, midi, 0.8) });
+            state.current.held.set(e.code, { role: armed, id: generator.liveNoteOn(armed, midi, 0.8), midi });
+            midiHeld.add(midi);
         };
         const up = (e) => {
             const held = state.current.held.get(e.code);
             if (!held) return;
             generator.liveNoteOff(held.role, held.id);
+            midiHeld.delete(held.midi);
             state.current.held.delete(e.code);
         };
         window.addEventListener('keydown', down);
@@ -131,12 +149,14 @@ export function useLivePlay(generator, armed) {
                 const command = status & 0xf0;
                 const key = `midi-${note}`;
                 const role = state.current.armed;
+                if (command === 0x90 && velocity > 0) midiHeld.add(note);
+                else if (command === 0x80 || command === 0x90) midiHeld.delete(note);
                 if (command === 0x90 && velocity > 0 && role === 'perc') {
                     const drum=midiDrum(note,generator.settings?.drums?.kit);
                     if(drum!==undefined)generator.liveNoteOn('perc',drum,velocity/127);
                 } else if (command === 0x90 && velocity > 0) {
                     if (!role || state.current.held.has(key)) return;
-                    state.current.held.set(key, { role, id: generator.liveNoteOn(role, note, velocity / 127) });
+                    state.current.held.set(key, { role, id: generator.liveNoteOn(role, note, velocity / 127), midi: note });
                 } else if (command === 0x80 || (command === 0x90 && velocity === 0)) {
                     const held = state.current.held.get(key);
                     if (!held) return;
@@ -161,7 +181,7 @@ export function useLivePlay(generator, armed) {
 
 /** The strip beside the timeline: one row per role, then the keys hint. */
 /** presets: role -> { name, edited } (shown beside the role's name). */
-export const TrackStrip = ({ roles, presets, mix, armed, onMix, onArm, onEdit, onRandom, onGenerate, onPick, onPickPercussion, onEditPercussion, percussionHint = DRUM_KEY_HINT, generating, live }) => (
+export const TrackStrip = ({ roles, presets, mix, armed, onMix, onArm, onEdit, onRandom, onGenerate, onPick, onPickPercussion, onEditPercussion, percussionHint = DRUM_KEY_HINT, generating, live, patterns, onPattern }) => (
     <div className="gen-tracks">
         {Object.entries(roles).map(([role, { label }]) => (
             <div key={role} className={`gen-track gen-track-${role}${(role === 'perc' ? onPickPercussion : onPick) ? ' is-pickable' : ''}`}
@@ -197,7 +217,7 @@ export const TrackStrip = ({ roles, presets, mix, armed, onMix, onArm, onEdit, o
         <div className="gen-keys-hint">
             {armed === 'perc' && <>Keys {percussionHint}</>}
             {armed && armed !== 'perc' && <>Keys A–; play {roles[armed].label.split(' / ')[0].toLowerCase()}, Z/X octave (C{live.octave})</>}
-            {!armed && 'Arm ⌨ to play a voice or the drums with your keyboard'}
+            {onPattern && <PatternButtons patterns={patterns} onPattern={onPattern} />}
         </div>
     </div>
 );

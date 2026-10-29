@@ -16,10 +16,15 @@ import { RULES } from './rulebook/model';
 import { readBook, inheritBook, withPresetBook, withBook, applyBook, baselineChoice, withoutSettings } from './rulebook/session';
 let initialBook = readBook(window.location.search);
 const linkedView = viewFromSearch(window.location.search);
+// ?patterns=: which pattern blocks show, in which mode, on which string (viewLink.js); the string arrives as its note name.
+const linkedPatterns = patternsFromSearch(window.location.search);
+const linkedPatternOptions = linkedPatterns && linkedBlockOptions(linkedPatterns.options);
 // A first visit (no link to a view, no tour taken, no background chosen) opens on the landscape in
 // the minimal view, with a tour of its own; opening the whole page then starts the main tour.
 const firstVisit = !linkedView && !tourSeen() && !minimalTourSeen() && readPref('bgm-backdrop-mode', null) === null;
-import { RoleButtons, TrackStrip, useLivePlay, DRUM_KEY_HINT } from './Tracks';
+import { RoleButtons, TrackStrip, PatternButtons, useLivePlay, DRUM_KEY_HINT } from './Tracks';
+import { INSTRUMENTS, anchorStrings, stringLetter } from './MiniFretboard';
+import { linkedBlockOptions } from './patternDefaults';
 import { defaultSettings, shareFromLocation, sharePath, shareUrl, newSeed } from './settings';
 // The sound window brings the DIY and classic synths with it: loaded on the first ✎.
 const SoundWindow = lazy(() => import('./editor/SoundWindow'));
@@ -39,7 +44,7 @@ import {
 import Backdrop, { backdropSupported, BACKDROP_DEFAULTS, shuffleColours } from './Backdrop';
 import SceneryBackdrop, { SCENERY_DEFAULTS } from './SceneryBackdrop';
 import { sceneryForScene } from '../scenery/presetScenes';
-import { viewFromSearch, withView } from './viewLink';
+import { viewFromSearch, withView, patternsFromSearch, patternsParam, withPatterns } from './viewLink';
 import { MasterVolume, SettingsMenu, AudioMenu, VisualMenu } from './AudioStatus';
 import { SleepTimer, Recorder } from './Playback';
 import { sceneSettings, sceneSoundSettings, sceneGroup, stepBuiltinSceneEntry, randomBuiltinSceneEntry, buildSetup, parseSetup, sceneBySlug, sceneSlug, presetFromSearch, introFromSearch, SCENES, SCENE_CATEGORIES } from './scenes';
@@ -158,9 +163,9 @@ const withIntro = (path, shortIntro) => (shortIntro ? `${path}${path.includes('?
 function useSettingsInUrl(settings, presets, presetSlug, shortIntro, generation, book, perfOn) {
     useEffect(() => {
         const id = setTimeout(() => {
-            window.history.replaceState(null, '', withView(withPercussion(withMediaHelper(withPerf(withFMBank(withSimd(withAudioEngine(withBook(withGeneration(withIntro(presetSlug
+            window.history.replaceState(null, '', withPatterns(withView(withPercussion(withMediaHelper(withPerf(withFMBank(withSimd(withAudioEngine(withBook(withGeneration(withIntro(presetSlug
                 ? `${window.location.pathname}?preset=${presetSlug}`
-                : sharePath(settings, presets, window.location, { seed: false }), shortIntro), generation), book, presetSlug ? sceneBySlug(presetSlug)?.rulebook : undefined),engineFromSearch(window.location.search)),simdFromSearch(window.location.search)),bankFromSearch(window.location.search)),readPerfChoice()),mediaHelperFromSearch(window.location.search)),percussionFromSearch(window.location.search)), linkedView));
+                : sharePath(settings, presets, window.location, { seed: false }), shortIntro), generation), book, presetSlug ? sceneBySlug(presetSlug)?.rulebook : undefined),engineFromSearch(window.location.search)),simdFromSearch(window.location.search)),bankFromSearch(window.location.search)),readPerfChoice()),mediaHelperFromSearch(window.location.search)),percussionFromSearch(window.location.search)), linkedView), linkedPatterns?.raw));
         }, 300);
         return () => clearTimeout(id);
     }, [settings, presets, presetSlug, shortIntro, generation, book, perfOn]);
@@ -1261,8 +1266,12 @@ const GenerativeApp = () => {
     const backdropOptions = { ...BACKDROP_DEFAULTS, ...storedBackdropOptions };
     // Hides everything but the transport and the timeline (⚙ menu); Esc or the corner button brings it back.
     const [zen, setZen] = useStoredFlag('bgm-hide-ui', firstVisit, linkedView ? true : undefined);
+    // Which pattern blocks show under the timeline (they also keep the page from going idle).
+    const [showPiano, setShowPiano] = useStoredFlag('bgm-show-piano', false, linkedPatterns?.show.piano);
+    const [showGuitar, setShowGuitar] = useStoredFlag('bgm-show-guitar', false, linkedPatterns?.show.guitar);
+    const [showBass, setShowBass] = useStoredFlag('bgm-show-bass', false, linkedPatterns?.show.bass);
     // After a minute of music with nobody at the page, the controls fade back and the scenery takes over until it is touched.
-    const idle = useIdle(60000, anyOn && backdropMode !== 'off' && !zen && !tourOpen && !helpOpen);
+    const idle = useIdle(60000, anyOn && backdropMode !== 'off' && !zen && !tourOpen && !helpOpen && !(showPiano || showGuitar || showBass));
     // In that view the instruments can show beside the timeline, as on the whole page.
     const [zenTracks, setZenTracks] = useStoredFlag('bgm-zen-tracks', false);
     // A first visit's landscape and minimal view stay the starting point until changed.
@@ -1278,7 +1287,16 @@ const GenerativeApp = () => {
     // In that view the timeline can be folded away too (ignored while the interface shows).
     const [timelineHidden, setTimelineHidden] = useStoredFlag('bgm-hide-timeline', false, linkedView ? false : undefined);
     // a mini piano above each chord of the timeline (the Look menu)
-    const [chordPianos, setChordPianos] = useStoredFlag('bgm-chord-pianos', false);
+    // per block: what the first panel shows (mode: scale | played) and, on the fretboards, the string the root is found on
+    const [storedPatternOptions, setPatternOptions] = useStoredFlag('bgm-pattern-options', {}, linkedPatternOptions ? { ...readPref('bgm-pattern-options', {}), ...linkedPatternOptions } : undefined);
+    const patternOptions = storedPatternOptions;
+    const setPatternOption = (id, patch) => setPatternOptions({ ...patternOptions, [id]: { ...patternOptions[id], ...patch } });
+    // The link's extra: open in this background with the interface hidden and these patterns showing.
+    const viewParam = backdropMode === 'scenery' ? 'landscape' : backdropMode === 'fluid' ? 'fluid' : null;
+    const withThisView = (url) => withPatterns(withView(url, { view: viewParam }), patternsParam({ piano: showPiano, guitar: showGuitar, bass: showBass }, patternOptions,
+        (id, anchor) => { const strings = INSTRUMENTS[id].strings, anchors = anchorStrings(strings); return stringLetter(strings, anchors.includes(anchor) ? anchor : anchors[0]); }));
+    const patterns = { piano: showPiano, guitar: showGuitar, bass: showBass };
+    const setPattern = (id, on) => ({ piano: setShowPiano, guitar: setShowGuitar, bass: setShowBass })[id](on);
     const bare = zen && timelineHidden;
     useEffect(() => {
         if (!zen) return undefined;
@@ -1548,18 +1566,21 @@ const GenerativeApp = () => {
                     <button type="button" className="gen-help" onClick={() => setHelpOpen(true)} title="Quick reference: hover the parts of the page to see what they do"
                         aria-label="Quick reference">?</button>
                     <MasterVolume />
-                    <VisualMenu pianos={{ value: chordPianos, onChange: setChordPianos }} backdrop={{ mode: backdropMode, onMode: setBackdropMode, fluidOk: backdropSupported(), value: backdropOn&&!perfOn&&backdropSupported(), locked:perfOn, options: backdropOptions, onOptions: setBackdropOptions, onClear: () => setFluidReset((n) => n + 1), onShuffle: () => setBackdropOptions(shuffleColours(backdropOptions)) }}
+                    <VisualMenu backdrop={{ mode: backdropMode, onMode: setBackdropMode, fluidOk: backdropSupported(), value: backdropOn&&!perfOn&&backdropSupported(), locked:perfOn, options: backdropOptions, onOptions: setBackdropOptions, onClear: () => setFluidReset((n) => n + 1), onShuffle: () => setBackdropOptions(shuffleColours(backdropOptions)) }}
                         scenery={{ options: sceneryOptions, onOptions: setSceneryOptions }} />
                     <AudioMenu generator={gen} onReload={reloadKeepingSettings}>
                         <WasmOptions engine={audioEngine} perf={{ onToggle: togglePerfMode }} />
                     </AudioMenu>
-                    <SettingsMenu midi={{ connect: live.connectMidi, status: live.midiStatus }} link={() => withBook(withGeneration(withIntro(shareUrl(gen.settings, linkPresets), shortIntro), generationChoice), bookRef.current)} generation={{ value: generationChoice, onChange: chooseGeneration }} saving={saving} onStartOver={startOver} smooth={{ value: smoothPresets, onChange: setSmoothPresets }} intro={{ value: shortIntro, onChange: setShortIntro }} onTour={() => openTour(false)}
+                    <SettingsMenu midi={{ connect: live.connectMidi, status: live.midiStatus }} link={(withView) => { // a built-in preset playing as it is stays its name (?preset=...), as in the address bar, rather than its expanded settings
+                        const base = presetSlug ? `${window.location.origin}${window.location.pathname}?preset=${presetSlug}` : shareUrl(gen.settings, linkPresets);
+                        const url = withBook(withGeneration(withIntro(base, shortIntro), generationChoice), bookRef.current, presetSlug ? sceneBySlug(presetSlug)?.rulebook : undefined); return withView && viewParam ? withThisView(url) : url; }} viewLink={viewParam ? { label: `${viewParam === 'landscape' ? 'Landscape' : 'Fluid'} view${showPiano || showGuitar || showBass ? ' with the patterns' : ''}` } : null} generation={{ value: generationChoice, onChange: chooseGeneration }} saving={saving} onStartOver={startOver} smooth={{ value: smoothPresets, onChange: setSmoothPresets }} intro={{ value: shortIntro, onChange: setShortIntro }} onTour={() => openTour(false)}
                         phrase={<PhraseField seed={settings.seed} edited={gen.editedSinceStart} onApply={playPhrase} onRoll={newVariation} initial={linkedPhrase} />}>
                         <SleepTimer generator={gen} running={anyOn} onLeft={setSleepLeft} />
                         <Recorder generator={gen} fileName={fileName} onProgress={setSaving} />
                     </SettingsMenu>
                     {zen && (
                         <span className="gen-zen-views">
+                            <PatternButtons patterns={patterns} onPattern={setPattern} label={false} />
                             <button type="button" className="gen-help gen-hide" aria-pressed={zenTracks} disabled={timelineHidden} onClick={() => setZenTracks(!zenTracks)}
                                 aria-label={zenTracks ? 'Hide the instruments' : 'Show the instruments'} title={zenTracks ? 'Hide the instruments beside the timeline' : 'Show the instruments beside the timeline'}>
                                 <TracksIcon />
@@ -1580,9 +1601,9 @@ const GenerativeApp = () => {
 
 
             <ChordTimeline
-                generator={gen} pianos={chordPianos} onExploreRule={id => setRuleFocus(previous => ({ id, revision: (previous?.revision ?? 0) + 1 }))}
+                generator={gen} patterns={patterns} onPattern={setPattern} options={patternOptions} onOptions={setPatternOption} onExploreRule={id => setRuleFocus(previous => ({ id, revision: (previous?.revision ?? 0) + 1 }))}
                 tracks={has(1) || zenShown && zenTracks ? <TrackStrip roles={shownTracks} presets={{...Object.fromEntries(Object.entries(roles).map(([role, { presetName, edited, external }]) => [role, { name: external?.label ?? presetName, edited }])),perc:percMachine?{name:percMachine.label,edited:false}:{name:percussionVoice(settings.drums.kit).name,edited:percussionEdited(settings.drums.kit,settings.drumKit)}}} mix={mix} armed={armed} onMix={changeMix} onArm={setArmed} onEdit={has(3) ? editSound : undefined}
-                    onRandom={randomizePreset} onGenerate={has(3) ? generateForRole : undefined} onPick={choosePicker} onPickPercussion={()=>choosePicker('perc')} onEditPercussion={has(3)?editPercussionSound:undefined} percussionHint={percussionKeyHint(settings.drums.kit)} generating={generating} live={live} /> : null}
+                    onRandom={randomizePreset} onGenerate={has(3) ? generateForRole : undefined} onPick={choosePicker} onPickPercussion={()=>choosePicker('perc')} onEditPercussion={has(3)?editPercussionSound:undefined} percussionHint={percussionKeyHint(settings.drums.kit)} generating={generating} live={live} patterns={patterns} onPattern={setPattern} /> : null}
             />
 
             {has(1) && <Panel id="quick"title="Control panel" heading={<>

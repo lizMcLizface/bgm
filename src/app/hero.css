@@ -1,0 +1,47 @@
+/* The hero view: a floating window over the page (HeroView.jsx), draggable by its header. */
+.gen-hero {
+    position: fixed;
+    left: 50%;
+    bottom: 16px;
+    z-index: 60;
+    box-sizing: border-box;
+    width: min(1080px, calc(100vw - 24px));
+    padding: 10px 12px 12px;
+    background: color-mix(in srgb, var(--gen-surface) 96%, transparent);
+    border: 1px solid var(--gen-border);
+    border-radius: 10px;
+    box-shadow: 0 14px 44px rgba(0, 0, 0, .55);
+    backdrop-filter: blur(8px);
+}
+
+.gen-hero > header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    margin-bottom: 8px;
+    cursor: grab;
+    color: var(--gen-text);
+    touch-action: none;
+}
+
+.gen-hero > header:active { cursor: grabbing; }
+.gen-hero > header > svg { color: var(--gen-accent); }
+.gen-hero > header strong { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--gen-muted); }
+
+.gen-hero-look { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; font-size: 11px; color: var(--gen-muted); }
+.gen-hero-look input { width: 120px; }
+.gen-hero-look span { min-width: 34px; font-variant-numeric: tabular-nums; }
+
+.gen .gen-hero-close[type] { display: grid; place-items: center; width: 24px; height: 24px; padding: 0; border-color: transparent; background: transparent; color: var(--gen-muted); }
+.gen .gen-hero-close[type]:hover:not(:disabled) { color: var(--gen-text); }
+
+.gen-hero-canvas { display: block; width: 100%; background: #0d1117; border-radius: 6px; }
+.gen-hero-guitar .gen-hero-canvas { height: 250px; }
+.gen-hero-bass .gen-hero-canvas { height: 190px; }
+.gen-hero-piano .gen-hero-canvas { height: 360px; }
+
+@media (max-width: 640px) {
+    .gen-hero-look { margin-left: 0; }
+    .gen-hero-piano .gen-hero-canvas { height: 300px; }
+}

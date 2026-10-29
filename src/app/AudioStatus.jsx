@@ -99,7 +99,7 @@ const THEME_HINTS = { auto: 'Colours follow your system', light: 'Light colours'
  * WebGL2 is missing). Stays in the hidden-interface view.
  */
 // `backdrop.mode` is 'off', 'fluid' or 'scenery'; only one background runs at a time.
-export const VisualMenu = ({ backdrop, scenery, pianos }) => {
+export const VisualMenu = ({ backdrop, scenery }) => {
     const menu = useRef(null);
     useDismiss(menu);
     const [theme, setTheme] = useState(storedTheme);
@@ -117,16 +117,6 @@ export const VisualMenu = ({ backdrop, scenery, pianos }) => {
                         ))}
                     </div>
                 </section>
-                {pianos && (
-                    <section className="gen-menu-section">
-                        <h3>Timeline</h3>
-                        <label className="gen-check">
-                            <input type="checkbox" checked={pianos.value} onChange={(e) => pianos.onChange(e.target.checked)} />
-                            Mini pianos above the chords
-                        </label>
-                        <small>Each chord's notes on a one-octave keyboard, the bar's scale underlined.</small>
-                    </section>
-                )}
                 {backdrop && (
                     <section className="gen-menu-section">
                         <h3>Background</h3>
@@ -335,12 +325,12 @@ export const AudioMenu = ({ generator, onReload, children }) => {
 };
 
 /** The ⚙ options menu: sharing, a phrase, the sleep timer and saving audio (children), MIDI, starting over with only the basics. */
-export const SettingsMenu = ({ link, saving, phrase, onStartOver, smooth, intro, generation, onTour, midi, children }) => {
+export const SettingsMenu = ({ link, viewLink, saving, phrase, onStartOver, smooth, intro, generation, onTour, midi, children }) => {
     const menu = useRef(null);
     useDismiss(menu);
-    const [copied, setCopied] = useState('');
+    const [copied, setCopied] = useState(''), [withView, setWithView] = useState(false);
     const copy = async () => {
-        const url = link();
+        const url = link(withView);
         try {
             await navigator.clipboard.writeText(url);
             setCopied('Link copied.');
@@ -350,7 +340,7 @@ export const SettingsMenu = ({ link, saving, phrase, onStartOver, smooth, intro,
         setTimeout(() => setCopied(''), 2500);
     };
     return (
-        <details className="gen-settings" ref={menu}>
+        <details className="gen-settings gen-options" ref={menu}>
             <summary title="Options: share, phrase, sleep timer, save audio, MIDI" aria-label="Options: share, phrase, sleep timer, save audio, MIDI">
                 {'⚙'}{saving !== null && saving !== undefined ? ` Saving ${Math.round(saving * 100)}%` : ''}
             </summary>
@@ -358,6 +348,12 @@ export const SettingsMenu = ({ link, saving, phrase, onStartOver, smooth, intro,
                 <section className="gen-menu-section">
                     <h3>Share</h3>
                     <button type="button" className="gen-menu-wide" onClick={copy}><LinkIcon /> Copy link to this music</button>
+                    {viewLink && (
+                        <label className="gen-check">
+                            <input type="checkbox" checked={withView} onChange={(e) => setWithView(e.target.checked)} />
+                            Open it in this view: {viewLink.label}
+                        </label>
+                    )}
                     {copied && <small role="status">{copied}</small>}
                 </section>
                 {phrase}
