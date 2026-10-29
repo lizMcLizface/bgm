@@ -1,0 +1,1 @@
+import{s}from"./proceduralPatch-CWeF0h9G.js";import{s as t,d as a}from"./effectsConfig-CRK0Bjtj.js";function i(e){const r=s(e);if(r.family==="drums")throw Error("Percussion kits use the percussion laboratory.");return{...r,effects:t(e.effects??{...a(),reverb:.18,delay:0,decay:6})}}export{i as p};
