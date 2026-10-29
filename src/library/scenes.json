@@ -4220,7 +4220,7 @@
     {
       "name": "Slightly Lost Forest",
       "category": "classics",
-      "blurb": "Zelda · woodland mystery: lilting harp figures, a soft flute and scattered celesta answers, with space between phrases",
+      "blurb": "Zelda · woodland mystery: lilting harp figures, an ocarina and scattered bright answers, with space between phrases",
       "tags": [
         "zelda",
         "altp",
@@ -4232,7 +4232,7 @@
         "mode": "Major-2",
         "bpm": 123,
         "meter": "6/8",
-        "progression": 12,
+        "progression": 1,
         "barsPerChord": 2,
         "padNotes": 3,
         "leadActivity": 0.6,
@@ -4254,7 +4254,7 @@
           "style": "shaker",
           "activity": 0.15,
           "variation": 0.25,
-          "sprinkle": 0.02,
+          "sprinkle": 0,
           "kit": "felt"
         },
         "counter": {
@@ -4294,8 +4294,8 @@
         "volumes": {
           "pad": 0.58,
           "bass": 0.4,
-          "lead": 0.55,
-          "counter": 0.3,
+          "lead": 0.68,
+          "counter": 0.53,
           "perc": 0.25
         },
         "sections": {
@@ -4324,8 +4324,8 @@
       "voices": {
         "pad": "Harp Pluck",
         "bass": "Upright Pluck",
-        "lead": "Soft Flute",
-        "counter": "Celesta"
+        "lead": "Ocarina",
+        "counter": "Studio Concert v2"
       },
       "rulebook": {
         "version": 1,

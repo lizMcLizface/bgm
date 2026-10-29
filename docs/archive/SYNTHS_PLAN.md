@@ -1,3 +1,5 @@
+> **Archived 2026-10-28.** Historical record of finished work; open items are tracked in [../ROADMAP.md](../ROADMAP.md).
+
 # /synths — classic synths for tablet + piano
 
 Status, 20 October 2026: all eight synths plus the sequenced machines are built and playable at `/synths/<id>/` with a hub at `/synths/`: CS-80 (played and liked on the tablet), Juno-106, Prophet-5, Jupiter-8, Minimoog, DX7, OB-Xa and Prophet VS (all built 20 Oct, not yet heard), and the TR-808, TR-909, TR-606 and TB-303 on a new in-kernel step sequencer (built 20 Oct, not yet heard). Everything up to the Prophet VS is committed (60e7fb6); the sequencer and drum machines are not. The public build now includes the comparison pages and YAML banks (see below). What to listen for: `docs/SYNTHS_LISTENING.md`.

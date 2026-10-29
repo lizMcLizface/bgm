@@ -18,6 +18,8 @@ export const PATCHES = {
 };
 /** The instrument's range as measured (the sampler sounds nothing outside it). */
 export const RANGE = [36, 84];
+/** How far below the measured range the smooth (body times source) part is played: it has no recording to run out of. */
+export const EXTENDED_LOW = 24;
 export { DEFAULT_TUNING, PATCH_TUNING, defaultTuning };
 const TARGET_DB = -22;                       // loudness of a note at velocity 80, middle C, in dB mean-square, after levelling
 
@@ -57,7 +59,7 @@ export default class StringPlayer {
     /** The cache key of a note: everything that changes how it sounds. */
     keyOf(patch, midi, velocity, { without = null, exact = false } = {}) {
         const v = exact ? Math.round(clamp(velocity, 1, 127)) : Math.round(clamp(velocity, 1, 127) / 6) * 6, t = this.tuning;
-        return { v, key: [patch, midi, v, t.vibrato, t.noise, t.tilt, t.evenness, t.smear, t.lineRatio, t.wakeDb, t.wakeTime, t.noiseShare, t.phase, t.onset, t.shimmer, t.bed, t.flare, t.noiseTau, without ?? ''].join(':') };
+        return { v, key: [patch, midi, v, t.vibrato, t.noise, t.tilt, t.evenness, t.smear, t.lineRatio, t.wakeDb, t.wakeTime, t.noiseShare, t.parts, t.phase, t.onset, t.shimmer, t.bed, t.flare, t.noiseTau, without ?? ''].join(':') };
     }
 
     /** Keep a rendered note: the samples in a Web Audio buffer, and what the page shows about it. */
@@ -121,7 +123,7 @@ export default class StringPlayer {
 
     /** Start a note. Returns a handle for `stop`. */
     start(patch, midi, velocity, when = this.context.currentTime, options = {}) {
-        const spec = PATCHES[patch], { buffer, made, release } = this.note(patch, clamp(midi, RANGE[0], RANGE[1]), velocity * 127, options);
+        const spec = PATCHES[patch], { buffer, made, release } = this.note(patch, clamp(midi, this.tuning.parts === 'smooth' ? EXTENDED_LOW : RANGE[0], RANGE[1]), velocity * 127, options);
         const source = this.context.createBufferSource(), gain = this.context.createGain();
         source.buffer = buffer;
         if (spec.bowed) { source.loop = true; source.loopStart = made.loopStart; source.loopEnd = made.loopEnd; }

@@ -1,3 +1,5 @@
+> **Archived 2026-10-28.** Historical record of finished work; open items are tracked in [../ROADMAP.md](../ROADMAP.md).
+
 # Synths ensemble page: plan
 
 A single page for judging the /synths instruments in context: the generator's progression playing on its usual voice lines (lead, second lead, pad, bass, percussion), with any role swapped to a classic synth and one of its sounds, the synth's own panel at hand, and an effects rack per voice. Closer to the main generator than the labs: key, scale, progression and the general presets can all change, and ensemble presets place particular synths in particular roles ("Oracle 5 lead in the lead role").

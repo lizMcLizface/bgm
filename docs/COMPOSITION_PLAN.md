@@ -44,16 +44,16 @@ voice leading across a change of chord size, which now only applies when the pad
 | Item | State |
 | --- | --- |
 | Offline audit (`npm run audit:composition`), pad audit (`tools/padAudit.audit.js`) | done |
-| A1 Syncopation control `leadSyncopation`, 44 presets seeded, Demo: Groove slider | done, heard and liked; uncommitted |
-| C1 Pad root rule `padRoot`, C2 chord size by function `chordSize`, voice leading across size changes; 38 and 15 presets seeded; Demo: Pad and bass | built, tests green, **not yet heard**; uncommitted |
-| B1+B2 Melodic inertia `leadInertia` (step carry-on, descending bias, leap lengthening); no presets seeded yet | built, tests green, **not yet heard**; uncommitted |
-| C3+C4 Pad contour `padContour` (register arc over a phrase, top voice against the bass); no presets seeded yet | built, tests green, **not yet heard**; uncommitted |
-| B5 Tendency tones `leadTendency` (held leading tone to the tonic, held fourth down to the third); no presets seeded yet | built, tests green, **not yet heard**; uncommitted |
+| A1 Syncopation control `leadSyncopation`, 44 presets seeded, Demo: Groove slider | done, heard and liked |
+| C1 Pad root rule `padRoot`, C2 chord size by function `chordSize`, voice leading across size changes; 38 and 15 presets seeded; Demo: Pad and bass | built, tests green, **not yet heard** |
+| B1+B2 Melodic inertia `leadInertia` (step carry-on, descending bias, leap lengthening); no presets seeded yet | built, tests green, **not yet heard** |
+| C3+C4 Pad contour `padContour` (register arc over a phrase, top voice against the bass); no presets seeded yet | built, tests green, **not yet heard** |
+| B5 Tendency tones `leadTendency` (held leading tone to the tonic, held fourth down to the third); no presets seeded yet | built, tests green, **not yet heard** |
 | A6 Longuet-Higgins & Lee syncopation metric, E6 section-seam scoring, tendency metric (all in the audit) | done |
-| A4 Euclidean bass figures `bassEuclid` (share of phrases whose grouped or driving bass plays an evenly spread figure); no presets seeded | built, tests green, **not yet heard**; uncommitted |
-| E2 Corpus-weighted borrowing `borrowStyle` (even / corpus; weights the flat VII and VI above the minor iv); no presets seeded | built, tests green, **not yet heard**; uncommitted |
-| D1 Slow pad vibrato `padVibrato` (pads and second leads that are oscillator sounds with no vibrato); no presets seeded | built, tests green, **not yet heard**; uncommitted |
-| G1 Generated progressions (`progressionMode`, `progressionMood`, `progressionWander`; `composition/progressionGen.js`; Demo: Generated chords) | built, tests green, **not yet heard**; uncommitted |
+| A4 Euclidean bass figures `bassEuclid` (share of phrases whose grouped or driving bass plays an evenly spread figure); no presets seeded | built, tests green, **not yet heard** |
+| E2 Corpus-weighted borrowing `borrowStyle` (even / corpus; weights the flat VII and VI above the minor iv); no presets seeded | built, tests green, **not yet heard** |
+| D1 Slow pad vibrato `padVibrato` (pads and second leads that are oscillator sounds with no vibrato); no presets seeded | built, tests green, **not yet heard** |
+| G1 Generated progressions (`progressionMode`, `progressionMood`, `progressionWander`; `composition/progressionGen.js`; Demo: Generated chords) | built, tests green, **not yet heard** |
 | Rule-suitability registry `src/app/rulebook/suitability.js` (data + `suggestRules`, validated against the rulebook and library) | done |
 | Unchanged-defaults guard `tools/planDump.audit.js` (see below) | done: 158 of 158 plans identical to the last commit with the rules off |
 | Conflict check `tools/ruleConflicts.audit.js` (all rules alone and together over every music preset) | done: no crashes, no new violations (see Interactions and limits) |

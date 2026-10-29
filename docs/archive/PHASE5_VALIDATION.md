@@ -1,3 +1,5 @@
+> **Archived 2026-10-28.** Historical record of finished work; open items are tracked in [../ROADMAP.md](../ROADMAP.md).
+
 # Phase 5 validation
 
 

@@ -1,3 +1,5 @@
+> **Archived 2026-10-28.** Historical record of finished work; open items are tracked in [../ROADMAP.md](../ROADMAP.md).
+
 # Music generation improvement plan
 
 At the end of each implementation slice, report the current phase, what remains in that phase, and the direct next step.

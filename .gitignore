@@ -26,3 +26,6 @@ rain_synth/bands/
 rain_synth/*_demo.wav
 
 docs/ref/
+# Scratch
+__pycache__/
+.codex-remote-attachments/

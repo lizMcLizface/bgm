@@ -469,7 +469,7 @@ soundboard/string resonance remain future work.
 
 ## Music generation roadmap
 
-See [Music generation improvement plan](docs/MUSIC_GENERATION_PLAN.md) for the
+See [Music generation improvement plan](docs/archive/MUSIC_GENERATION_PLAN.md) for the
 phased work on themes, rhythm, form, expression and synthesis, with compatibility
 requirements and listening checks.
 
@@ -511,7 +511,7 @@ The optional FM source-bank trial is available at
 It batches sparse FM voices across instruments while retaining separate stereo
 outputs, controls and effects. Omit `bank` and reload for independent sources;
 the choice is temporary and falls back when the optional kernel is unavailable.
-It remains off by default. See [the backend handoff](docs/SYNTH_NEXT_STEPS.md)
+It remains off by default. See [the backend handoff](docs/archive/SYNTH_NEXT_STEPS.md)
 for measured gains, limitations and validation commands.
 
 ### Recording from the command line
@@ -591,7 +591,7 @@ Percussion is a track voice with four whole-kit presets: **Felt**, **Crisp**, **
 
 The **percussion backend** is separate from the sound preset and melodic engine. Native Web Audio remains the default for Felt/Crisp. Choose **Options → Sound engine → Percussion backend**, or append `perc=wasm` to test queued Wasm percussion. The 808 and Hand Percussion voices require Wasm and prepare it automatically for percussion only. Once prepared, Felt/Crisp can use that same source; changing kit voice does not restart the piece or shorten the lookahead. Future hits remain data in an 8,192-event queue with 64 active voices. Existing `perc=808` links migrate to the 808 voice and `perc=wasm`, retaining saved per-drum edits. The percussion room remains the original convolution path.
 
-`/tools/percussion-engine.html` auditions the four voices with a fixed groove by default, explicit groove variant / seeded choice, meter, seed and variation controls, eleven correctly named live pads, shared playback cursors and WAV downloads. Felt/Crisp compare Native and Wasm; 808 and Hand Percussion are Wasm-only. The raw fourteen-slot compatibility fixtures remain available to automated source audits. `npm run audit:percussion` checks raw-source parity; `npm run audit:percussion-playback` checks playback, cancellation, exports and phone layout. See `docs/SYNTH_NEXT_STEPS.md` for sustained physical-device validation still required.
+`/tools/percussion-engine.html` auditions the four voices with a fixed groove by default, explicit groove variant / seeded choice, meter, seed and variation controls, eleven correctly named live pads, shared playback cursors and WAV downloads. Felt/Crisp compare Native and Wasm; 808 and Hand Percussion are Wasm-only. The raw fourteen-slot compatibility fixtures remain available to automated source audits. `npm run audit:percussion` checks raw-source parity; `npm run audit:percussion-playback` checks playback, cancellation, exports and phone layout. See `docs/archive/SYNTH_NEXT_STEPS.md` for sustained physical-device validation still required.
 
 
 Hand Percussion adds rounded low/muted conga and bongo tones, woodblock and claves, soft tambourine tap/shake, seed shaker/sweep, palm clap and cabasa. It uses modal sine bodies with a quiet contact layer and a balanced kit preset, retaining the same bounded Wasm queue. Standard MIDI bongo/conga/woodblock/tambourine notes address the appropriate roles; note velocity controls hit strength.

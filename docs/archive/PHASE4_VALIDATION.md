@@ -1,3 +1,5 @@
+> **Archived 2026-10-28.** Historical record of finished work; open items are tracked in [../ROADMAP.md](../ROADMAP.md).
+
 # Phase 4 sound validation
 
 Implementation and automated checks completed locally on 17 October 2026. The common listening review is at [tools/phase4.html](http://localhost:5173/tools/phase4.html?preset=rainy-cafe&seed=42&bars=8&part=all&sound=library). [One chord tone sliding](http://localhost:5173/tools/phase4.html?preset=rainy-cafe&seed=42&bars=8&part=pad&sound=library&fixture=chord-slide&auditRole=pad&slides=1) and [melodic slides](http://localhost:5173/tools/phase4.html?preset=rainy-cafe&seed=42&bars=8&part=lead&sound=library&fixture=lead-slide&auditRole=lead&slides=1) use the same page.

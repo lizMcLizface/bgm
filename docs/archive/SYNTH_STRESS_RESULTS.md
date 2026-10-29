@@ -1,3 +1,5 @@
+> **Archived 2026-10-28.** Historical record of finished work; open items are tracked in [../ROADMAP.md](../ROADMAP.md).
+
 # Synth stress matrix — first desktop measurements
 
 18 October 2026. The source/effects feature pass is implemented in the isolated synth laboratories. This matrix measures that graph; it does not migrate the music generator or set automatic device budgets.

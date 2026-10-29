@@ -10,4 +10,4 @@ feedback kernels, and the level, rate and velocity scaling tables and curves. Ch
 fixed block rendering into Rust arrays, sample-rate scaling of the envelope speeds, amplitude modulation, controllers,
 mono/portamento and voice management. This is the only third-party code in the classics crate; the rest is original.
 
-The synth pages are private (see docs/SYNTHS_PLAN.md) and are not part of the public site.
+The synth pages are private (see docs/archive/SYNTHS_PLAN.md) and are not part of the public site.

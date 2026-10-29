@@ -63,7 +63,7 @@ export function unpackTable(file) {
 
 const layerOf = (entry, v) => entry.layers[v] ?? null;
 /** The two measured strengths around `velocity` and the weight of the upper one. */
-function strengthPair(table, velocity) {
+export function strengthPair(table, velocity) {
     const have = LAYERS.filter((v) => table.pitches.some((p) => p.layers[v]));
     const v = clamp(velocity, have[0], have.at(-1));
     let hi = have.findIndex((x) => x >= v); if (hi < 0) hi = have.length - 1;

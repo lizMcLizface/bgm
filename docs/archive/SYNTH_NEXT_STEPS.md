@@ -1,3 +1,5 @@
+> **Archived 2026-10-28.** Historical record of finished work; open items are tracked in [../ROADMAP.md](../ROADMAP.md).
+
 # Synth handoff: sound design and backend optimization
 
 Updated 19 October 2026. Use this as the starting point when resuming either track.

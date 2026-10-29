@@ -6,9 +6,12 @@ import { localBanks, fetchLocalBank } from '../localBanks';
 import SpectrogramView from './SpectrogramView';
 import WaveformView from './WaveformView';
 import { spectrogram, difference, bandLevels, flatten } from '../../app/engine/stringModel/spectrogram';
-import StringPlayer, { PATCHES, RANGE, DEFAULT_TUNING, defaultTuning, measuredPitches } from '../../app/engine/stringModel/player';
+import RealtimeStrings from '../../app/engine/stringModel/realtime';
+import StringPlayer, { PATCHES, RANGE, EXTENDED_LOW, DEFAULT_TUNING, defaultTuning, measuredPitches } from '../../app/engine/stringModel/player';
 
 const KEY = 'synths:strings';
+/** The sustained-pad preset (real time engine, Long): a slow swell that opens from dark, hardly any bow noise, a long release. */
+const PAD = { rtAttack: 1.1, rtOpen: 1.8, rtHiss: 0, rtNoise: -44, rtRelease: 3.5, vibrato: 1 };
 // label, key, min, max, step, format
 const SLIDERS = [
     ['Tone', [['Vibrato', 'vibrato', 0, 2, .05, (v) => '×' + v.toFixed(2)], ['Bow noise', 'noise', -12, 12, .5, (v) => (v > 0 ? '+' : '') + v.toFixed(1) + ' dB'], ['Brightness', 'tilt', -6, 6, .25, (v) => (v > 0 ? '+' : '') + v.toFixed(2) + ' dB/oct'], ['Even levels', 'evenness', 0, 1, .05, (v) => Math.round(v * 100) + '%'], ['Body shimmer', 'shimmer', 0, 3, .05, (v) => '×' + v.toFixed(2)], ['Line flare', 'flare', 0, 3, .05, (v) => '×' + v.toFixed(2)], ['Bow-noise bed', 'bed', -12, 12, .5, (v) => (v > 0 ? '+' : '') + v.toFixed(1) + ' dB'], ['Starting transient', 'onset', 0, 4, .05, (v) => '×' + v.toFixed(2)], ['Wake', 'wakeDb', -40, 12, 1, (v) => (v <= -40 ? 'off' : v + ' dB')], ['Wake time', 'wakeTime', .05, 1.2, .05, (v) => v.toFixed(2) + ' s'], ['Noise share', 'noiseShare', 0, 1, .005, (v) => (v * 100).toFixed(1) + '% of a harmonic'], ['Noise in harmonics', 'smear', 0, 3, .05, (v) => '×' + v.toFixed(2)], ['Line width', 'lineRatio', .03, .5, .01, (v) => '±' + Math.round(v * 100) + '% of pitch']]],
@@ -16,7 +19,7 @@ const SLIDERS = [
 // The calibration take held a note 5 s up to C3 and 4 s above it, so the recording of one lasts that long before its release.
 const nativeHold = (pitch) => (pitch <= 60 ? 5 : 4);
 const NAMES = ['C', 'C♯', 'D', 'E♭', 'E', 'F', 'F♯', 'G', 'A♭', 'A', 'B♭', 'B'];
-const clampNote = (n) => Math.max(RANGE[0], Math.min(RANGE[1], n));
+const clampNote = (n, low = RANGE[0]) => Math.max(low, Math.min(RANGE[1], n));
 
 export default function StringsPage() {
     const saved = useMemo(() => load(KEY, {}), []);
@@ -26,6 +29,7 @@ export default function StringsPage() {
     const [tunings, setTunings] = useState(saved.tunings ?? (saved.tuning ? { long: saved.tuning, live: saved.tuning } : {}));
     const tuning = useMemo(() => ({ ...defaultTuning(patch), ...tunings[patch] }), [tunings, patch]);
     const [volume, setVolume] = useState(saved.volume ?? 1);
+    const [live_, setLive] = useState(saved.realtime ?? false);        // play the real-time voices instead of the rendered notes (bowed patches)
     const [audio, setAudio] = useState({ state: 'off', message: '' });
     const [held, setHeld] = useState([]);
     const [low, setLow] = useState(saved.low ?? 48);
@@ -35,24 +39,39 @@ export default function StringsPage() {
     const [ab, setAb] = useState({ pitch: saved.abPitch ?? 60, velocity: saved.abVelocity ?? 80, maxHz: saved.abMaxHz ?? 4000, waveMs: saved.abWaveMs ?? 200, waveStart: saved.abWaveStart ?? 0, leaveOut: saved.abLeaveOut ?? true });
     const [clips, setClips] = useState(null), [abNow, setAbNow] = useState('');
     const clipCache = useRef(new Map()), abTimers = useRef([]), abHandles = useRef([]);
-    const engine = useRef(null), midiRef = useRef(null), notes = useRef(new Map()), pedal = useRef(false), sustained = useRef(new Set());
-    const live = useRef({ patch, dynamic });
-    live.current = { patch, dynamic };
+    const rt = useRef(null), engine = useRef(null), midiRef = useRef(null), notes = useRef(new Map()), pedal = useRef(false), sustained = useRef(new Set());
+    const spec_ = PATCHES[patch];
+    const live = useRef({ patch, dynamic, smooth: false, realtime: false });
+    live.current = { patch, dynamic, smooth: tuning.parts === 'smooth', realtime: live_ && PATCHES[patch].bowed };
 
-    useEffect(() => { save(KEY, { patch, dynamic, tunings, volume, low, abPitch: ab.pitch, abVelocity: ab.velocity, abMaxHz: ab.maxHz, abWaveMs: ab.waveMs, abWaveStart: ab.waveStart, abLeaveOut: ab.leaveOut }); }, [patch, dynamic, tunings, volume, low, ab]);
+    useEffect(() => { save(KEY, { patch, dynamic, tunings, volume, realtime: live_, low, abPitch: ab.pitch, abVelocity: ab.velocity, abMaxHz: ab.maxHz, abWaveMs: ab.waveMs, abWaveStart: ab.waveStart, abLeaveOut: ab.leaveOut }); }, [patch, dynamic, tunings, volume, low, ab, live_]);
     useEffect(() => { localBanks('cello-reference').then((list) => setClips(new Map(list.map((e) => [e.name, e])))); }, []);
-    useEffect(() => { engine.current?.setTuning(tuning); }, [tuning, audio.state]);
-    useEffect(() => { if (engine.current) engine.current.master.gain.value = volume; }, [volume, audio.state]);
+    useEffect(() => { engine.current?.setTuning(tuning); rt.current?.setTuning(tuning); }, [tuning, audio.state]);
+    // the real-time body is rebuilt after a slider has stopped moving, not on every step
+    useEffect(() => {
+        if (audio.state !== 'on' || !live_ || !PATCHES[patch].bowed) return undefined;
+        const timer = setTimeout(() => { rt.current?.ready.then(() => rt.current.body(patch)); }, 200);
+        return () => clearTimeout(timer);
+    }, [audio.state, live_, patch, tuning.rtShimmer, tuning.wakeDb, tuning.wakeTime]);
+    useEffect(() => { if (engine.current) engine.current.master.gain.value = volume; if (rt.current) rt.current.master.gain.value = volume; }, [volume, audio.state]);
 
     const refresh = () => setHeld([...notes.current.values()].map((n) => n.midi));
-    const release = (note) => engine.current?.stop(note.handle);
+    const release = (note) => (note.realtime ? rt.current?.stop(note.handle) : engine.current?.stop(note.handle));
     const down = useCallback((key, midiNote, velocity, fromMidi = false) => {
         const player = engine.current;
         if (!player) return;
         const previous = notes.current.get(key);
         if (previous) release(previous);
         const { patch: p, dynamic: d } = live.current, strength = fromMidi ? Math.round(Math.max(1, Math.min(127, velocity * 127))) : d;
-        const note = clampNote(midiNote), handle = player.start(p, note, strength / 127);
+        const note = clampNote(midiNote, live.current.smooth ? EXTENDED_LOW : RANGE[0]);
+        if (live.current.realtime && rt.current?.node) {
+            const handle = rt.current.start(p, note, strength / 127);
+            notes.current.set(key, { handle, midi: midiNote, realtime: true });
+            setStats({ realtime: true, ...rt.current.stats });
+            refresh();
+            return;
+        }
+        const handle = player.start(p, note, strength / 127);
         notes.current.set(key, { handle, midi: midiNote });
         const shown = player.note(p, note, strength);
         setStats({ ...player.stats, loop: shown.made.loop ?? null, harmonics: shown.model.tonal.length });
@@ -83,6 +102,9 @@ export default function StringsPage() {
             const player = new StringPlayer(context).connect(context.destination);
             player.setTuning(tuning); player.master.gain.value = volume;
             engine.current = player;
+            const real = new RealtimeStrings(context).connect(context.destination);
+            real.setTuning(tuning); real.master.gain.value = volume; rt.current = real;
+            await real.ready;
             const m = new LabMidi({
                 on: (key, note, v) => down(key, note, mapVelocity(v, { curve: 1.1 }), true), off: (key) => up(key), sustain, control() {}, panic,
                 onStatus: (inputs) => setMidi({ inputs, status: inputs.length ? `${inputs.length} MIDI input${inputs.length > 1 ? 's' : ''} connected.` : 'MIDI ready · plug in your piano.' }),
@@ -96,14 +118,14 @@ export default function StringsPage() {
     // so a key press finds its note ready (a note first asked for during play is rendered on the spot, which is a noticeable delay).
     useEffect(() => {
         const player = engine.current;
-        if (audio.state !== 'on' || !player) return undefined;
-        const order = Array.from({ length: RANGE[1] - RANGE[0] + 1 }, (_, i) => RANGE[0] + i).sort((x, y) => Math.abs(x - (low + 12)) - Math.abs(y - (low + 12)));
+        if (audio.state !== 'on' || !player || (live_ && spec_.bowed)) return undefined;
+        const first = tuning.parts === 'smooth' ? EXTENDED_LOW : RANGE[0], order = Array.from({ length: RANGE[1] - first + 1 }, (_, i) => first + i).sort((x, y) => Math.abs(x - (low + 12)) - Math.abs(y - (low + 12)));
         let done = 0, cancelled = false;
         const timer = setTimeout(() => {                  // after a slider has stopped moving
             for (const midi of order) player.prepare(patch, midi, dynamic).then(() => { if (!cancelled) setWarm(++done >= order.length ? null : Math.round(100 * done / order.length)); });
         }, 250);
         return () => { cancelled = true; clearTimeout(timer); player.cancelQueued(); };
-    }, [audio.state, patch, dynamic, tuning, low]);
+    }, [audio.state, patch, dynamic, tuning, low, live_]);
 
     useEffect(() => {
         const keyboard = bindLabKeyboard(window, {
@@ -199,14 +221,25 @@ export default function StringsPage() {
         </header>
         <nav className="presets" aria-label="Articulation">
             {Object.entries(PATCHES).map(([id, p]) => <button type="button" key={id} className={id === patch ? 'on' : ''} onClick={() => setPatch(id)}>{p.label}</button>)}
+            <button type="button" className={live_ && tuning.rtAttack >= .5 && patch === 'long' ? 'on' : ''} title="The sustained note with a slow swell, no bow hiss and a long release: a pad that stands on its own" onClick={() => { panic(); setPatch('long'); setLive(true); setTunings((all) => ({ ...all, long: { ...defaultTuning('long'), ...all.long, ...PAD } })); }}>Pad</button>
         </nav>
         <main className="panel diy-panel">
             <section className="group wide"><h3>{spec.bowed ? 'Bowed note' : 'Fixed-length note'}</h3>
                 <div className="row">
                     <label>Dynamics<input type="range" min="1" max="127" step="1" value={dynamic} onChange={(e) => setDynamic(Number(e.target.value))} /><output>{dynamic}</output></label>
+                    <label>Engine<select value={live_ ? 'realtime' : 'rendered'} onChange={(e) => { panic(); setLive(e.target.value === 'realtime'); }}><option value="rendered">rendered notes (current)</option><option value="realtime">real time (wavetable + body convolver; Long and Live)</option></select></label>
+                    <label>Part<select value={tuning.parts} onChange={(e) => change('parts', e.target.value)}><option value="full">everything (the table)</option><option value="smooth">smooth: body � source, no per-note detail (reaches below C2)</option><option value="residual">residual only: the table minus the smooth part</option></select></label>
                     <label>Phases<select value={tuning.phase} onChange={(e) => change('phase', e.target.value)}><option value="random">random</option><option value="pulse">pulse (all in phase)</option><option value="minimum">pulse + body ringing</option></select></label>
                     <label>Volume<input type="range" min="0" max="2" step=".05" value={volume} onChange={(e) => setVolume(Number(e.target.value))} /><output>{Math.round(volume * 100)}%</output></label>
                 </div>
+                {live_ && spec.bowed && <div className="row">
+                    <label>Bow noise (real time)<input type="range" min="-60" max="-10" step="1" value={tuning.rtNoise} onChange={(e) => change('rtNoise', Number(e.target.value))} /><output>{tuning.rtNoise} dB</output></label>
+                    <label>Attack<input type="range" min=".01" max="2.5" step=".01" value={tuning.rtAttack} onChange={(e) => change('rtAttack', Number(e.target.value))} /><output>{tuning.rtAttack.toFixed(2)} s</output></label>
+                    <label>Opening up<input type="range" min="0" max="3" step=".05" value={tuning.rtOpen} onChange={(e) => change('rtOpen', Number(e.target.value))} /><output>{tuning.rtOpen.toFixed(2)} s</output></label>
+                    <label>Attack hiss<input type="range" min="0" max="3" step=".05" value={tuning.rtHiss} onChange={(e) => change('rtHiss', Number(e.target.value))} /><output>�{tuning.rtHiss.toFixed(2)}</output></label>
+                    <label>Release<input type="range" min=".5" max="6" step=".1" value={tuning.rtRelease} onChange={(e) => change('rtRelease', Number(e.target.value))} /><output>�{tuning.rtRelease.toFixed(1)}</output></label>
+                    <label>Fine body (real time)<input type="range" min="0" max="4" step=".1" value={tuning.rtShimmer} onChange={(e) => change('rtShimmer', Number(e.target.value))} /><output>�{tuning.rtShimmer.toFixed(1)}</output></label>
+                </div>}
                 {SLIDERS.map(([title, rows]) => <div className="row" key={title}>
                     {rows.map(([label, key, min, max, step, format]) => <label key={key}>{label}
                         <input type="range" min={min} max={max} step={step} value={tuning[key]} onChange={(e) => change(key, Number(e.target.value))} />
@@ -219,7 +252,8 @@ export default function StringsPage() {
                 <p className="hint">{spec.bowed
                     ? 'Harmonics at the levels measured from the sampled cello (and carried between notes in frequency, so its body resonances stay put), vibrato as measured, the bow\'s attack, and a seamless loop for the steady part. Hold a key to sustain; the release follows the sample\'s.'
                     : 'One buffer per note from the measured spectrum and the way each band dies away. It ignores the key, as the sample does.'}</p>
-                {stats && <p className="hint">Last note: {stats.lastMs} ms to render ({stats.renders} so far), {stats.harmonics} harmonics{stats.loop ? `, loop ${stats.loop.L.toFixed(2)} s (${stats.loop.k} vibrato cycles at ${stats.loop.rate.toFixed(2)} Hz)` : ''}.</p>}
+                {stats?.realtime && <p className="hint">Real time: table built in {stats.tableMs} ms, body (impulse response) built in {stats.bodyMs} ms. Wake and wake time shape the body's ringing; Part picks the spectrum (everything / smooth / residual).</p>}
+                {stats && !stats.realtime && <p className="hint">Last note: {stats.lastMs} ms to render ({stats.renders} so far), {stats.harmonics} harmonics{stats.loop ? `, loop ${stats.loop.L.toFixed(2)} s (${stats.loop.k} vibrato cycles at ${stats.loop.rate.toFixed(2)} Hz)` : ''}.</p>}
             </section>
             <section className="group wide" style={{ gridColumn: '1 / -1' }}><h3>A/B against the recording</h3>
                 {!clips || clips.size === 0 ? <p className="hint">No recordings here. Run <code>node tools/extractStringClips.mjs</code> (it cuts the sampler's notes into banks/cello-reference/, which stays on this machine) and reload.</p> : <>
