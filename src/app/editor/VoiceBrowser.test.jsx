@@ -45,7 +45,7 @@ test('every sound is listed, in blocks, with the current sound marked', () => {
     mount('Soft Pad');
     click(trigger());
     expect(cards()).toEqual(expect.arrayContaining([...Object.keys(PRESET_CATEGORIES.Pads), ...Object.keys(PRESET_CATEGORIES.Bass), ...Object.keys(PRESET_CATEGORIES.Leads)]));
-    expect([...document.querySelectorAll('.gen-pb-scroll h3')].map((h) => h.firstChild.textContent)).toEqual(expect.arrayContaining(['Pads', 'Bass', 'Leads']));
+    expect([...document.querySelectorAll('.gen-pb-scroll section')].map((s) => s.dataset.group)).toEqual(expect.arrayContaining(['Pads', 'Bass', 'Leads']));
     expect(document.querySelector('.is-active strong').textContent).toBe('Soft Pad');
 });
 
@@ -107,4 +107,28 @@ test('searching narrows the cards across every block', () => {
     });
     expect(cards()).toContain('Harp Pluck');
     expect(cards()).not.toContain('Soft Pad');
+});
+
+test('the base chips filter the cards to sounds built on that synth', () => {
+    mount('Soft Pad');
+    click(trigger());
+    const all = cards().length;
+    const chip = document.querySelector('.gen-pb-bases button');
+    expect(chip).toBeTruthy();
+    click(chip);
+    const some = cards().length;
+    expect(some).toBeGreaterThan(0);
+    expect(some).toBeLessThan(all);
+    click(document.querySelector('.gen-pb-bases button[aria-pressed="true"]'));
+    expect(cards().length).toBe(all);
+});
+
+test('the classic synths list their favourite sounds as cards that name the synth', () => {
+    mount('Soft Pad');
+    click(trigger());
+    expect(cards()).toEqual(expect.arrayContaining(['Plain', 'Electric Tines', 'Velvet Strings', 'Soft Bow', 'Classic Pad', 'Wide Pulse Pad', 'Strange Machine', 'Rimshot', 'Alto Reed', 'Nylon', 'Bass 106', 'Singing Filter']));
+    const picked = vi.fn();
+    expect(document.querySelector('[data-group="Classic synths"] [data-preset="Mercury D · Singing Filter"]')).toBeTruthy();
+    expect([...document.querySelectorAll('.gen-pb-base')].some((b) => b.textContent === 'V 80')).toBe(true);
+    expect(picked).not.toHaveBeenCalled();
 });

@@ -1,6 +1,7 @@
 // Factory sounds: original patches in the CS-80 idiom, not copies of its ROM
 // presets or of any recording. Each is a set of overrides on the defaults.
 import {sanitize,CHANNEL_KEYS} from './params';
+import {ROW_II,neutralPanel,withChannel} from './factory';
 
 const ch=(prefix,values)=>Object.fromEntries(Object.entries(values).map(([k,v])=>[prefix+'.'+k,v]));
 const both=values=>({...ch('i',values),...ch('ii',values)});
@@ -67,5 +68,10 @@ export const CATEGORIES=[
  {id:'pads',label:'Pads',blurb:'Long sweeps to hold under a chord'},
  {id:'init',label:'Init',blurb:'Neutral starting points'},
 ];
+// The row-II tone of the same name on both channels, as a sound of its own.
+const SOFT_BOW_TONE=ROW_II.find(p=>p.name==='Soft Bow');
+const SOFT_BOW={name:'Soft Bow',category:'strings',styles:['bowed','slow'],colour:'#5b8fd9',note:'A slow-swelling bowed saw on both channels, the filter opening on touch.',
+ values:withChannel(withChannel(neutralPanel({volume:.6}),'i',SOFT_BOW_TONE),'ii',SOFT_BOW_TONE)};
+RAW.splice(RAW.length-1,0,SOFT_BOW);
 export const PRESETS=RAW.map(p=>({...p,values:sanitize(p.values)}));
 export const channelKeys=prefix=>CHANNEL_KEYS.map(k=>prefix+'.'+k);

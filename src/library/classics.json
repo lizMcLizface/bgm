@@ -1,0 +1,17 @@
+{
+  "synths": { "cs80": "V 80", "juno": "Analog 106", "minimoog": "Mercury D" },
+  "sounds": [
+    { "synth": "cs80", "name": "Plain", "family": "keys", "note": "One saw per channel, open filter: the neutral starting point" },
+    { "synth": "cs80", "name": "Electric Tines", "family": "keys", "note": "Sine bell with a touch of saw and a gentle tremolo" },
+    { "synth": "cs80", "name": "Velvet Strings", "family": "strings", "note": "Wide, slow strings from two pulse-width-modulated channels" },
+    { "synth": "cs80", "name": "Soft Bow", "family": "strings", "note": "Slow-swelling bowed saw with a filter that opens on touch" },
+    { "synth": "juno", "name": "Classic Pad", "family": "pad", "note": "Saw and pulse with slow width movement through chorus" },
+    { "synth": "juno", "name": "Wide Pulse Pad", "family": "pad", "note": "Pulse and sub with moving width, wide chorus" },
+    { "synth": "juno", "name": "Strange Machine", "family": "texture", "note": "Resonant, envelope-swept width: odd and machine-like" },
+    { "synth": "juno", "name": "Rimshot", "family": "texture", "note": "A resonant click, played as a pitched percussion hit" },
+    { "synth": "juno", "name": "Alto Reed", "family": "wind", "note": "Reedy pulse with a little filter bite" },
+    { "synth": "juno", "name": "Nylon", "family": "pluck", "note": "Short plucked pulse, like a nylon-string guitar" },
+    { "synth": "juno", "name": "Bass 106", "family": "bass", "note": "Pulse and sub at 16 feet with the bass-boost high-pass" },
+    { "synth": "minimoog", "name": "Singing Filter", "family": "lead", "note": "No oscillators: the resonance sings at the pitch you play" }
+  ]
+}

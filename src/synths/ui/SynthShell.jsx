@@ -2,6 +2,10 @@ import React,{useCallback,useEffect,useMemo,useRef,useState} from 'react';
 import {Fader,Choice,Ribbon,TouchPad,Keys} from './controls';
 import {startLiveSynth} from '../engine/liveSynth';
 import {Performer} from '../engine/performer';
+import {createPhraseRunner,phraseForCode} from './phraseRunner';
+import PhraseDock from './PhraseDock';
+import {recalledContext} from '../../app/auditionPhrases';
+import {buildContext,DEFAULT_HARMONY} from '../../app/harmonyContext';
 import {LabMidi,bindLabKeyboard,mapVelocity} from '../../labs/input';
 import {load,save} from '../storage';
 import Scope from './Scope';
@@ -76,6 +80,13 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
  const realtimeRef=useRef(onMidiRealtime);realtimeRef.current=onMidiRealtime;
  patchRef.current=patch;setupRef.current=setup;expandRef.current=expand;rackRef.current=rackValues;
  const performer=useMemo(()=>new Performer(null,{onNotes:setNotes}),[]);
+ const [audition,setAudition]=useState(()=>({follow:true,...DEFAULT_HARMONY,...load('synths:audition',{})}));
+ const [phrasePlaying,setPhrasePlaying]=useState(null);
+ const context=useMemo(()=>audition.follow?recalledContext():buildContext(audition),[audition]);
+ const contextRef=useRef(context);contextRef.current=context;
+ const phrases=useMemo(()=>createPhraseRunner(performer,{context:()=>contextRef.current,onState:setPhrasePlaying}),[performer]);
+ const changeAudition=next=>{setAudition(next);save('synths:audition',next);};
+ const audioOn=useRef(false);audioOn.current=audio.state==='on';
 
  // persistence (debounced: faders change values many times a second)
  useEffect(()=>{const t=setTimeout(()=>save(PATCH_KEY,patch),300);return ()=>clearTimeout(t);},[patch,PATCH_KEY]);
@@ -145,24 +156,32 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
  const connectMidi=async()=>{try{await midiRef.current.connect();}catch(e){setMidi(m=>({...m,status:e.message}));}};
 
  // Sound hotkeys: ← → the previous/next sound, ↑ ↓ the first sound of the previous/next category,
- // N a new generated sound in the current category (synths with a generator). Not while typing or
+ // N a new generated sound in the current category (synths with a generator), 1-5 an audition phrase
+ // on the current sound (short bass, slow bass, chord, arpeggio, lead; Esc stops it). Not while typing or
  // on a slider; MIDI Program Change picks a sound by number.
  const hotkeys=useRef(null);
  hotkeys.current={list:soundList(synth,presets,mine),current:patch.name.replace(/ \*$/,''),category:patch.category,choose};
+ const stepSound=(dir,jump)=>{const h=hotkeys.current,next=nextSound(h.list,h.current,h.category,dir,jump);if(next)h.choose(next);return !!next;};
+ const makeSound=()=>{
+  const h=hotkeys.current;if(!synth.generate)return false;
+  const here=h.list.sounds.find(p=>p.name===h.current)?.cat??h.category;
+  const category=synth.generates?.includes(here)?here:synth.generates?.[0];
+  if(category)h.choose(synth.generate(category,Math.floor(Math.random()*1e9)));
+  return !!category;
+ };
  useEffect(()=>{
   const key=e=>{
    if(e.repeat||e.ctrlKey||e.metaKey||e.altKey||e.target?.closest?.('input,select,textarea,[contenteditable=true],[role=slider],.sp,.env-shape'))return;
-   const h=hotkeys.current,arrow={ArrowLeft:[-1,false],ArrowRight:[1,false],ArrowUp:[-1,true],ArrowDown:[1,true]}[e.key];
-   if(arrow){const next=nextSound(h.list,h.current,h.category,...arrow);if(next){e.preventDefault();h.choose(next);}}
-   else if(e.code==='KeyN'&&synth.generate){
-    const here=h.list.sounds.find(p=>p.name===h.current)?.cat??h.category;
-    const category=synth.generates?.includes(here)?here:synth.generates?.[0];
-    if(category){e.preventDefault();h.choose(synth.generate(category,Math.floor(Math.random()*1e9)));}
-   }
+   const phrase=phraseForCode(e.code);
+   if(phrase){if(audioOn.current){e.preventDefault();phrases.play(phrase);}return;}
+   const arrow={ArrowLeft:[-1,false],ArrowRight:[1,false],ArrowUp:[-1,true],ArrowDown:[1,true]}[e.key];
+   if(arrow){if(stepSound(...arrow))e.preventDefault();}
+   else if(e.code==='KeyN'&&makeSound())e.preventDefault();
   };
-  window.addEventListener('keydown',key);
-  return ()=>window.removeEventListener('keydown',key);
- },[synth]);
+  const escape=e=>{if(e.key==='Escape')phrases.stop();};
+  window.addEventListener('keydown',key);window.addEventListener('keydown',escape);
+  return ()=>{window.removeEventListener('keydown',key);window.removeEventListener('keydown',escape);phrases.stop();};
+ },[synth,phrases]);
  programRef.current=number=>{const {sounds}=hotkeys.current.list;if(sounds.length)hotkeys.current.choose(sounds[number%sounds.length]);};
 
  // keep the screen awake while the synth is on
@@ -228,7 +247,7 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
    <button type="button" aria-pressed={showEffects} aria-label="Effects rack" onClick={()=>{setShowSetup(false);setShowEffects(v=>!v);}}>Effects</button>
    <button type="button" aria-pressed={scope} onClick={toggleScope} title="Oscilloscope and spectrum">Scope</button>
    <button type="button" aria-pressed={showSetup} onClick={()=>setShowSetup(v=>!v)} aria-label="Setup">⚙</button>
-   <button type="button" onClick={()=>performer.panic()} title="Silence everything (Esc)">Panic</button>
+   <button type="button" onClick={()=>{phrases.stop();performer.panic();}} title="Silence everything (Esc)">Panic</button>
    <button type="button" onClick={fullscreen} aria-label="Full screen">⛶</button>
   </header>
 
@@ -285,6 +304,9 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
   </main>
 
   <footer className="perform">
+   <PhraseDock audition={audition} onAudition={changeAudition} context={context} playing={phrasePlaying} onPlay={id=>{if(audio.state==='on')phrases.play(id);}} onStop={()=>phrases.stop()}
+    sounds={{step:stepSound,make:makeSound,canMake:!!synth.generate}}
+    keysHint={`Keys: 1–5 phrases · Esc stops · ← → sound · ↑ ↓ kind${synth.generate?' · N new sound':''} · A S D F G H J K play notes (W E T Y U black keys) · Z X octave${midi.inputs.length?' · your MIDI keyboard plays too':''}`}/>
    <div className="perform-row">
     <TouchPad onTouch={(pressure,mod)=>{performer.source('pad',pressure);performer.source('padMod',mod);}}/>
     <Ribbon range={setup.ribbonRange} onBend={b=>performer.source('ribbon',b)}/>

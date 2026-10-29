@@ -1100,6 +1100,10 @@ const GenerativeApp = () => {
             return;
         }
         setScene('');
+        const classic = findPreset(name)?.classicRef;
+        if (classic) {
+            return applyRef(role, { synth: classic.synth, name: classic.name }).catch((error) => console.error(`Could not load the ${role} sound`, error));
+        }
         if (gen.loadRolePreset(role, name)) presetLoaded(role, name);
     };
     const relativeKey = () => loadSettings(randomRelativeKey(gen.settings));
@@ -1678,7 +1682,7 @@ const GenerativeApp = () => {
 
                 >
                     <Field label="Preset" onRandom={() => randomizePreset(role)} onGenerate={has(3) ? () => generateForRole(role) : undefined} generating={generating[role]} wide>
-                        <PresetPicker value={roles[role].external?.label ?? roles[role].presetName} edited={roles[role].edited && !roles[role].external} onChange={(name) => loadPreset(role, name)} role={role}
+                        <PresetPicker value={roles[role].external?.label ?? roles[role].presetName} edited={roles[role].edited && !roles[role].external} onChange={(name) => loadPreset(role, name)} onAudition={(phrase) => gen.auditionPhrase(role, phrase)} harmony={() => gen.auditionContext()} role={role}
                             open={pickerRole === role} onOpenChange={(open) => choosePicker(open ? role : null)} />
                     </Field>
                     {has(3) && (

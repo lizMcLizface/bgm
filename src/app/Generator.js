@@ -70,6 +70,8 @@ import { applyFeel, feelActive, feelTone, feelEnergy, ghostNotes } from './compo
 import { nextMusic, glideTempo, scaleDistance } from './conductor';
 import { METERS, unitsPerMinute, swingEvents, halfTime, chordBars, splitBeat } from './meter';
 import { drumBar, loosenDrums, auditionHits, DRUMS } from './percussion';
+import { phraseEvents, DEFAULT_CONTEXT } from './auditionPhrases';
+import { contextFromPlan } from './auditionContext';
 import { normal, seeded } from './random';
 import { defaultSettings } from './settings';
 import { findPreset } from './editor/presetStore';
@@ -1002,6 +1004,30 @@ class Generator {
         }[role];
         notes.forEach((midi) => instrument.scheduleNote(midi, time, 1.5, 0.7));
         }finally{this.auditionPending--;}
+    }
+
+    /** The key, scale and the chord under the playhead with the next few: what auditions play over (auditionContext.js). */
+    auditionContext() {
+        return contextFromPlan(this.getPlan(), this.beatsPerBar, this.position()) ?? DEFAULT_CONTEXT;
+    }
+
+    /**
+     * Plays one of the picker's audition phrases (auditionPhrases.js) on the role's
+     * instrument, in its own register and tempo, over the key and chords the music is in.
+     * @returns {number} how long the phrase lasts, in seconds
+     */
+    async auditionPhrase(role, phraseId) {
+        const { instrument } = this.roles[role];
+        this.auditionPending = (this.auditionPending ?? 0) + 1;
+        try {
+            if (instrument.ready) await instrument.ready;
+            if (this.AC.state !== 'running') await this.AC.resume();
+            this.endStopFade();
+            const start = this.AC.currentTime + 0.05;
+            const events = phraseEvents(phraseId, this.auditionContext(), start);
+            events.forEach(({ midi, time, duration, velocity }) => instrument.scheduleNote(midi, time, duration, velocity));
+            return events.reduce((end, e) => Math.max(end, e.time + e.duration), start) - start;
+        } finally { this.auditionPending--; }
     }
 
     setRoleVolume(role, volume) {

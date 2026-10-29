@@ -1,5 +1,6 @@
 import React,{useEffect,useMemo,useRef,useState} from 'react';
 import {createPortal} from 'react-dom';
+import {recalledContext} from '../../app/auditionPhrases';
 
 // A synth page's sound browser, in the style of the generator's preset window
 // (src/app/PresetBrowser.jsx): a button that opens the sounds as cards sorted
@@ -47,6 +48,7 @@ export default function SoundPicker({synth,presets,mine,current,currentCategory,
  const [category,setCategory]=useState(ALL);
  const [query,setQuery]=useState('');
  const trigger=useRef(null),search=useRef(null);
+ const harmony=useMemo(()=>open?recalledContext():null,[open]);
  const {categories,sounds}=useMemo(()=>soundList(synth,presets,mine),[synth,presets,mine]);
  const active=sounds.find(p=>p.name===current&&(p.cat===MINE.id)===(currentCategory===MINE.id))??sounds.find(p=>p.name===current);
  const close=()=>{setOpen(false);setQuery('');trigger.current?.focus();};
@@ -72,7 +74,7 @@ export default function SoundPicker({synth,presets,mine,current,currentCategory,
  const label=id=>categories.find(c=>c.id===id)?.label??id;
 
  return <>
-  <button ref={trigger} type="button" className="sp-trigger" aria-haspopup="dialog" aria-expanded={open} onClick={()=>setOpen(true)} title={`Browse every sound by category · keys: ← → sound, ↑ ↓ category${synth.generate?', N new':''}`}>
+  <button ref={trigger} type="button" className="sp-trigger" aria-haspopup="dialog" aria-expanded={open} onClick={()=>setOpen(true)} title={`Browse every sound by category · keys: ← → sound, ↑ ↓ category${synth.generate?', N new':''}, 1-5 hear a bass line, chord, arpeggio or lead`}>
    <span className="sp-trigger-label">{active?.categoryLabel??(here?label(here):'Sounds')}</span><span className="sp-trigger-name">{current||'Pick one…'}</span><span aria-hidden="true">▾</span>
   </button>
   {here&&canMake(here)&&<button type="button" className="sp-new" onClick={()=>make(here)} title={`A fresh sound in ${label(here)}, generated now`}>✦ New</button>}
@@ -81,7 +83,7 @@ export default function SoundPicker({synth,presets,mine,current,currentCategory,
    <div className="sp" role="dialog" aria-modal="true" aria-label={synth.name+' sounds'}>
     <div className="sp-head">
      <h2>{synth.name} sounds</h2>
-     <small className="sp-keys">← → sound · ↑ ↓ category{synth.generate?' · N new':''}</small>
+     <small className="sp-keys">← → sound · ↑ ↓ category{synth.generate?' · N new':''} · 1–5 phrases{open&&<> over {harmony.key}: {harmony.chords.map(c=>c.name).join(' ')}</>}</small>
      <input ref={search} type="search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search: brass, glassy, sync…" aria-label="Search sounds"/>
      <button type="button" className="sp-close" onClick={close} aria-label="Close">×</button>
     </div>

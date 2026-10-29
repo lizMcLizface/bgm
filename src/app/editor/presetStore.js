@@ -17,6 +17,7 @@
 // access is guarded and the page works without it.
 
 import { PRESET_CATEGORIES, HIDDEN_PRESETS } from '../presets';
+import classics from '../../library/classics.json';
 import presetData from '../../util/presetData';
 import PRESET_DEFAULTS from '../engine/presetDefaults';
 
@@ -36,6 +37,17 @@ export function generatedInfo(name) {
     const entry = generated.get(name);
     return entry ? { ...entry.info } : null;
 }
+
+/**
+ * The classic synths' sounds worth having in the picker (library/classics.json), listed as
+ * references: { classicRef: { synth, name, label, family, note } }. They are not presets of the
+ * generator's synth - picking one loads the sound on the classic (GenerativeApp.loadPreset), so
+ * the name is the one the voice shows then: 'V 80 · Plain'.
+ */
+const CLASSIC_SOUNDS = Object.fromEntries(classics.sounds.map(({ synth, name, family, note }) => {
+    const label = `${classics.synths[synth]} · ${name}`;
+    return [label, { classicRef: { synth, name, label, synthName: classics.synths[synth], family, note } }];
+}));
 
 // name -> preset
 const fromSetups = new Map();
@@ -77,6 +89,7 @@ export function presetGroups(first, includeHidden = false) {
         .sort((a, b) => (b.group === first) - (a.group === first));
     return [
         ...categories,
+        { group: 'Classic synths', editable: false, presets: CLASSIC_SOUNDS },
         { group: 'unCAGED', editable: false, presets: builtIn },
         { group: 'unCAGED custom', editable: false, presets: readJson(UNCAGED_KEY) },
         { group: 'Mine', editable: true, presets: readJson(USER_KEY) },

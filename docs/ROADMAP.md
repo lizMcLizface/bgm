@@ -11,6 +11,7 @@ Nothing here is known to be right until it has been heard in the app.
 - The 2026-10-16 game / FTL / Synth Cinema preset batch and Plotting a Course: unheard, loudness never measured.
 
 ## 2. Not started
+- **Classic synth quality (user report 2026-10-29)**: only a handful of presets are good - V 80 (Plain, Electric Tines, Velvet Strings, Soft Bow), Analog 106 (Classic Pad, Wide Pulse Pad, Strange Machine, Rimshot, Alto Reed, Nylon, Bass 106), Mercury D (Singing Filter); those are listed in the main-page picker (library/classics.json). On the others (Oracle 5, Pluto 8, Oberon Xa, FM7, VectorVS...) almost every preset sounds bad - weird wobble, "off" - which points to an underlying engine bug, not patch tuning. Needs real reference recordings to compare against before fixing; start by rendering one preset per synth offline and looking for the shared fault (voice detune/drift, unison, LFO, filter tracking).
 - Composition: A2 lead density arc, A3 rubato vs syncopation, B3 lead compass, B4 tonal-stability prior, C5 pad subset per attack, C6 low-spacing roughness, E3-E5 harmony and form, G2-G4 generated-progression follow-ups.
 - Swap short-pattern pads to Deep Pulse in 7 presets (Bounty Hunter Basement, Heroic Field Trip, Dark Mirror Dimension, Boss Fight Politely, Demo Opening out, Nightcall Voicemail, Getaway Driver). User said "fine for now".
 - 365 "sound of the week" preset generator, also wired into randomize.

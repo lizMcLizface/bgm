@@ -555,7 +555,7 @@ label.inline.toggle{min-height:32px;}label.inline.toggle em{font-style:normal;co
 .presets .sp-new{border-top:1px solid var(--focus);color:var(--focus);background:#2f2b25;}
 .sp-make{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;margin:12px 0 4px;padding:10px 14px;border:1px dashed var(--focus);background:var(--bg);color:var(--focus);font-weight:600;text-align:left;}
 .sp-make small{font-weight:400;color:var(--muted);}
-.sp-keys{color:var(--muted);font-size:11px;white-space:nowrap;}
+.sp-keys{color:var(--muted);font-size:11px;max-width:40%;}
 @media (max-width:640px){.sp-keys{display:none;}}
 
 /* Modelled pianos: plain sliders in the setup-style groups, and the temperament's deviation chart */
@@ -588,3 +588,22 @@ label.inline.toggle{min-height:32px;}label.inline.toggle em{font-style:normal;co
 .strings table.levels th,.strings table.levels td{padding:2px 10px;text-align:right;font-weight:normal;}
 .strings table.levels thead th{opacity:.7;}
 .strings label.check{display:flex;align-items:center;gap:6px;}
+
+/* the audition dock at the foot of a page (ui/PhraseDock) */
+.dock{display:grid;gap:6px;padding:2px 0 6px;border-bottom:1px solid var(--line);}
+.dock-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;}
+.dock-label{min-width:54px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.04em;}
+.dock-phrases,.dock-sounds{display:inline-flex;flex-wrap:wrap;gap:4px;}
+.dock button{min-height:32px;padding:2px 10px;font-size:13px;}
+.dock-phrases button{display:inline-flex;align-items:center;gap:6px;}
+.dock-phrases b{color:var(--focus);font-size:12px;}
+.dock-phrases button.on{background:var(--focus);color:#1b1914;}
+.dock-phrases button.on b{color:inherit;}
+.dock label{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:12px;}
+.dock select{font:inherit;font-size:13px;padding:3px 6px;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:6px;max-width:170px;}
+.dock-context{display:inline-flex;flex-wrap:wrap;align-items:center;gap:4px 10px;margin-left:auto;font-size:13px;}
+.dock-chords{display:inline-flex;gap:4px;}
+.dock-chords>span{display:inline-flex;align-items:baseline;gap:4px;padding:1px 8px;border:1px solid var(--line);border-radius:999px;}
+.dock-chords small{color:var(--muted);font-size:11px;}
+.dock-keys{margin:0;color:var(--muted);font-size:11px;line-height:1.4;}
+@media (max-width:640px){.dock-context{margin-left:0;}.dock-sounds{display:none;}}

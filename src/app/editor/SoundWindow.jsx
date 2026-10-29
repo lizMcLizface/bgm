@@ -250,7 +250,7 @@ export default function SoundWindow({ generator: gen, role, roles, onRole, voice
                                     </optgroup>
                                 </select>
                             </label>
-                            {!external && <PresetPicker value={voice.presetName} edited={voice.edited} onChange={(name) => onNativePreset(role, name)} role={role} disabled={busy} />}
+                            {!external && <PresetPicker value={voice.presetName} edited={voice.edited} onChange={(name) => onNativePreset(role, name)} onAudition={(phrase) => gen.auditionPhrase(role, phrase)} harmony={() => gen.auditionContext()} role={role} disabled={busy} />}
                         </>
                     )}
                     <div className="sound-window-tabs" role="group" aria-label="Controls">

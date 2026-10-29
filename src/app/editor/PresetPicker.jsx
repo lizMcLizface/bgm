@@ -8,7 +8,7 @@ import VoiceBrowser from './VoiceBrowser';
 // with several of these costs nothing until one is used. Uncontrolled by
 // default; with `open` / `onOpenChange` the page can open it from elsewhere
 // (the track strip's boxes). `role` lists that role's own kind of sound first.
-const PresetPicker = ({ value, edited, onChange, id, role, open: controlled, onOpenChange, disabled=false }) => {
+const PresetPicker = ({ value, edited, onChange, id, role, open: controlled, onOpenChange, onAudition, harmony, disabled=false }) => {
     const [own, setOwn] = useState(false);
     const open = controlled === undefined ? own : controlled;
     const trigger = useRef(null);
@@ -25,7 +25,7 @@ const PresetPicker = ({ value, edited, onChange, id, role, open: controlled, onO
                 <span aria-hidden="true">▾</span>
             </button>
             {open && createPortal(
-                <VoiceBrowser value={value} edited={edited} onChange={onChange} onClose={() => setOpen(false)} role={role} />,
+                <VoiceBrowser value={value} edited={edited} onChange={onChange} onClose={() => setOpen(false)} onAudition={onAudition} harmony={harmony} role={role} />,
                 // inside the page's own root (its theme and styles), and out of the field's <label>
                 (trigger.current && trigger.current.closest('.gen')) || document.body,
             )}
