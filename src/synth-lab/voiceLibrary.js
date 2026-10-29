@@ -3,6 +3,7 @@
 // wasmVoice selects the full patch rather than translating that metadata.
 import {RECIPES,clonePatch,legacyPreset} from './patch';
 import {FM_RECIPES,cloneFM} from './fmPatch';
+import {applyTrim} from '../library/levelTrim';
 const definitions=[
  ['bowed-glass','Wasm Bowed Glass','strings','fm',4],
  ['rosin-silk','Wasm Rosin Silk','strings','subtractive',9],
@@ -17,6 +18,7 @@ const definitions=[
 export const WASM_VOICES=definitions.map(([id,name,family,kind,index])=>{
  const patch=kind==='fm'?cloneFM(FM_RECIPES[index]):clonePatch(RECIPES[index]);patch.name=name;patch.global.polyphony=12;if(kind==='fm')patch.global.quality=1;
  if(id==='soft-pipes'){patch.global.gain=.35;patch.global.index=.25;patch.global.formant=.2;patch.global.breath=.04;for(const o of patch.operators){o.attack=.08;o.release=.55;}}
+ applyTrim(id,patch);
  patch.effects={...patch.effects,dry:1,reverb:.18,decay:family==='drones'?12:6,delay:family==='keys'?.14:.05,delayMs:375,feedback:.35};
  const carriers=kind==='fm'?patch.operators.filter((_,i)=>patch.carriers[i]>0):[];
  const metadata=kind==='fm'?{masterVolume:patch.global.gain,gainAttack:Math.min(...carriers.map(o=>o.attack)),gainDecay:Math.max(...carriers.map(o=>o.decay1+o.decay2)),gainSustain:Math.max(...carriers.map(o=>o.sustain)),gainRelease:Math.max(...carriers.map(o=>o.release)),filterFreq:10000}:legacyPreset(patch);

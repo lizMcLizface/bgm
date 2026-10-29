@@ -43,7 +43,10 @@ export function sanitizeFM(raw){
 }
 export const cloneFM=p=>sanitizeFM(JSON.parse(JSON.stringify(p)));
 export function fmPacket(raw){const p=sanitizeFM(raw);return {globals:FM_GLOBAL.map(([id],i)=>[i,p.global[id]]),operators:p.operators.flatMap((op,n)=>FM_OPERATOR.map(([id],i)=>[n,i,op[id]])),routes:p.routes.flatMap((row,from)=>row.map((value,to)=>[from,to,value])),carriers:p.carriers.map((value,i)=>[i,value])};}
-function recipe(name,count,algorithm,globals,operators){const p=initialFM();p.name=name;Object.assign(p.global,{operators:count,algorithm},globals);Object.assign(p,topology(count,algorithm));operators.forEach((op,i)=>Object.assign(p.operators[i],op));return p;}
+function recipe(name,count,algorithm,globals,operators){const p=initialFM();p.name=name;Object.assign(p.global,{operators:count,algorithm},globals);Object.assign(p,topology(count,algorithm));operators.forEach((op,i)=>Object.assign(p.operators[i],op));
+ // Carriers set the loudness: full velocity sensitivity there makes a soft key soft (at 0.5 it only lost about 4 dB). Modulators keep theirs, so velocity still shapes the brightness.
+ for(let i=0;i<count;i++)if(p.carriers[i]>0)p.operators[i].velocity=1;
+ return p;}
 export const FM_RECIPES=[
  recipe('Tine constellation',6,2,{feedback:.12},[
   {ratio:1,level:2.7,decay1:.4,breakpoint:.25,decay2:2,sustain:.06,release:.5,velocity:.9},
@@ -57,7 +60,7 @@ export const FM_RECIPES=[
  recipe('Four-op round bass',4,1,{feedback:.2,gain:.27},[{ratio:1,level:2.5,decay1:.15,breakpoint:.1,decay2:.2,sustain:.05,velocity:.9},{ratio:1,level:1,attack:.004,decay1:.4,sustain:.5,release:.25},{ratio:2,level:1.1,decay1:.09,sustain:0},{ratio:1,level:.5,decay1:.25,sustain:.3,release:.2}]),
  recipe('Breathing FM brass',6,2,{feedback:.12,vibrato:3},[{ratio:1,level:2.5,attack:.18,decay1:.8,breakpoint:.7,sustain:.6,pressure:.8},{ratio:1,attack:.08,sustain:.8,release:.5},{ratio:1,level:1.2,attack:.23,sustain:.6,pressure:.6},{ratio:2,level:.45,attack:.1,sustain:.6,pan:-.2,release:.45},{ratio:2,level:1.1,attack:.2,sustain:.5},{ratio:1,level:.6,attack:.1,sustain:.7,pan:.2,release:.5}]),
  recipe('Bowed glass pad',6,1,{feedback:.07,vibrato:4,lfoRate:.3,lfoIndex:.06,gain:.47},[{ratio:1,level:.6,attack:1,decay1:2,sustain:.6},{ratio:2,level:1.3,attack:.9,decay1:2,sustain:.6,pressure:.4},{ratio:1,attack:.65,decay1:2,sustain:.85,release:3,pan:-.4,detune:-3},{ratio:3.001,level:.4,attack:1.5,sustain:.3},{ratio:1,level:.8,attack:1.2,sustain:.5},{ratio:1,attack:.9,sustain:.8,release:3.5,pan:.4,detune:3}]),
- recipe('Parallel drawbars',6,3,{feedback:.04,gain:.2},[{ratio:.5,level:.7,sustain:.9,decay1:.1,release:.25},{ratio:1,sustain:.9,decay1:.1,release:.25},{ratio:2,level:.6,sustain:.9,decay1:.1,release:.25},{ratio:3,level:.35,sustain:.9,decay1:.1,release:.25},{ratio:4,level:.2,sustain:.9,decay1:.1,release:.25},{ratio:6,level:.12,sustain:.9,decay1:.1,release:.25}]),
+ recipe('Parallel drawbars',6,3,{feedback:.04,gain:.2},[{ratio:.5,level:1.4,sustain:.9,decay1:.1,release:.25},{ratio:1,level:2,sustain:.9,decay1:.1,release:.25},{ratio:2,level:1.2,sustain:.9,decay1:.1,release:.25},{ratio:3,level:.7,sustain:.9,decay1:.1,release:.25},{ratio:4,level:.4,sustain:.9,decay1:.1,release:.25},{ratio:6,level:.24,sustain:.9,decay1:.1,release:.25}]),
  recipe('Fixed orbit bells',4,1,{feedback:.06,gain:.19},[{fixed:1627,level:1.4,attack:.003,decay1:.15,breakpoint:.15,decay2:1,sustain:0,release:.6,velocity:.9},{ratio:1,level:.85,attack:.003,decay1:1.4,breakpoint:.35,decay2:3,sustain:.08,release:2.5,pan:-.25},{fixed:3431,level:.65,attack:.003,decay1:.4,breakpoint:.12,decay2:1.5,sustain:0,release:.8},{ratio:2,level:.4,attack:.004,decay1:2,breakpoint:.3,decay2:4,sustain:.04,release:3,pan:.25}]),
  recipe('Four-op hollow reed',4,2,{feedback:.06,vibrato:4,gain:.2},[{ratio:2,level:1.1,attack:.09,decay1:.7,breakpoint:.75,decay2:1,sustain:.6,pressure:.5},{ratio:3,wave:1,level:.25,attack:.12,decay1:1,breakpoint:.7,sustain:.5,pressure:.4},{ratio:1,wave:2,level:.15,attack:.1,sustain:.5},{ratio:1,level:.85,attack:.055,decay1:1,breakpoint:.85,decay2:.5,sustain:.7,release:1}]),
 ];
@@ -66,5 +69,8 @@ const livingGlass=cloneFM(FM_RECIPES[4]);livingGlass.name='Living glass';
 Object.assign(livingGlass.global,{wanderCents:3,wanderRate:.18,lfo2Rate:.12,modAttack:2,modDecay:3,modSustain:.4,modSource1:8,modTarget1:2,modDepth1:.16,modSource2:3,modTarget2:6,modDepth2:.35,modSource3:2,modTarget3:5,modDepth3:.18});
 livingGlass.operators[0].attackCurve=1.3;Object.assign(livingGlass.inserts,{chorus:.3,phaser:.1,phaserDepth:.7,highGain:-1,gain:-1});FM_RECIPES.push(livingGlass);
 
-const choir=cloneFM(FM_RECIPES[3]);choir.name='Air choir';Object.assign(choir.global,{polyphony:16,gain:.17,index:.7,feedback:.04,breath:.35,formant:.85,vowel:.15,formantShift:-2,body:.12,bodyType:3,noisePressure:.6,wanderCents:2});for(const op of choir.operators)Object.assign(op,{attack:.7,release:1.5});FM_RECIPES.push(choir);
+const choir=cloneFM(FM_RECIPES[3]);choir.name='Air choir';Object.assign(choir.global,{polyphony:16,gain:.17,index:.7,feedback:.04,breath:.35,formant:.85,vowel:.15,formantShift:-2,body:.12,bodyType:3,noisePressure:.6,wanderCents:2});for(const op of choir.operators)Object.assign(op,{attack:.7,release:1.5});
+// The carriers (operators 2, 4 and 6) feed nothing, so doubling them is +6 dB with the same tone; the level pass needs more than the gain limit allows.
+for(const i of [1,3,5])choir.operators[i].level*=2;
+FM_RECIPES.push(choir);
 const airReed=cloneFM(FM_RECIPES[7]);airReed.name='Air reed';Object.assign(airReed.global,{breath:.5,formant:.2,vowel:1.7,body:.3,bodyType:3,noisePressure:.8,noiseAttack:.2});FM_RECIPES.push(airReed);

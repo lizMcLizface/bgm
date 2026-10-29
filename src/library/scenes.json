@@ -132,11 +132,11 @@
           "swell": 0.055
         },
         "volumes": {
-          "pad": 0.76,
-          "bass": 0.75,
-          "lead": 0.45,
-          "counter": 0.48,
-          "perc": 0.5
+          "pad": 1,
+          "bass": 0.32,
+          "lead": 0.23,
+          "counter": 0.25,
+          "perc": 0.26
         },
         "sections": {
           "mode": "gentle",
@@ -225,7 +225,7 @@
         },
         "volumes": {
           "pad": 0.76,
-          "bass": 0.75,
+          "bass": 0.63,
           "lead": 0.66,
           "counter": 0.48,
           "perc": 0.5
@@ -318,7 +318,7 @@
         "volumes": {
           "pad": 0.76,
           "bass": 0.75,
-          "lead": 0.5,
+          "lead": 0.073,
           "counter": 0.48,
           "perc": 0.5
         },
@@ -421,7 +421,7 @@
         },
         "volumes": {
           "pad": 0.78,
-          "bass": 0.73,
+          "bass": 0.3,
           "lead": 0.62,
           "counter": 0.48,
           "perc": 0.44
@@ -502,8 +502,8 @@
         },
         "volumes": {
           "pad": 0.76,
-          "bass": 0.75,
-          "lead": 0.66,
+          "bass": 0.68,
+          "lead": 0.95,
           "counter": 0.48,
           "perc": 0.5
         },
@@ -591,10 +591,10 @@
           "swell": 0.08
         },
         "volumes": {
-          "pad": 0.78,
-          "bass": 0.73,
+          "pad": 0.66,
+          "bass": 0.32,
           "lead": 0.62,
-          "counter": 0.48,
+          "counter": 0.84,
           "perc": 0.44
         },
         "sections": {
@@ -688,7 +688,7 @@
           "swell": 0.08
         },
         "volumes": {
-          "pad": 0.78,
+          "pad": 0.73,
           "bass": 0.73,
           "lead": 0.62,
           "counter": 0.48,
@@ -976,7 +976,7 @@
         },
         "volumes": {
           "pad": 0.76,
-          "bass": 0.75,
+          "bass": 0.44,
           "lead": 0.66,
           "counter": 0.48,
           "perc": 0.5
@@ -1069,8 +1069,8 @@
           "swell": 0.08
         },
         "volumes": {
-          "pad": 0.78,
-          "bass": 0.73,
+          "pad": 0.64,
+          "bass": 0.3,
           "lead": 0.62,
           "counter": 0.48,
           "perc": 0.44
@@ -1158,11 +1158,11 @@
           "swell": 0.055
         },
         "volumes": {
-          "pad": 0.76,
-          "bass": 0.75,
-          "lead": 0.66,
-          "counter": 0.48,
-          "perc": 0.5
+          "pad": 1,
+          "bass": 0.4,
+          "lead": 0.39,
+          "counter": 0.28,
+          "perc": 0.29
         },
         "sections": {
           "mode": "gentle",
@@ -1244,7 +1244,7 @@
         },
         "volumes": {
           "pad": 0.76,
-          "bass": 0.75,
+          "bass": 0.68,
           "lead": 0.66,
           "counter": 0.48,
           "perc": 0.5
@@ -1329,7 +1329,7 @@
         },
         "volumes": {
           "pad": 0.76,
-          "bass": 0.75,
+          "bass": 0.31,
           "lead": 0.66,
           "counter": 0.48,
           "perc": 0.5
@@ -1412,11 +1412,11 @@
           "swell": 0.08
         },
         "volumes": {
-          "pad": 0.78,
-          "bass": 0.73,
-          "lead": 0.62,
-          "counter": 0.48,
-          "perc": 0.44
+          "pad": 1,
+          "bass": 0.35,
+          "lead": 0.47,
+          "counter": 0.36,
+          "perc": 0.33
         }
       },
       "voices": {
@@ -1711,7 +1711,7 @@
         },
         "volumes": {
           "pad": 0.76,
-          "bass": 0.75,
+          "bass": 0.44,
           "lead": 0.66,
           "counter": 0.48,
           "perc": 0.5
@@ -1791,11 +1791,11 @@
           "swell": 0.055
         },
         "volumes": {
-          "pad": 0.76,
-          "bass": 0.75,
-          "lead": 0.66,
-          "counter": 0.48,
-          "perc": 0.5
+          "pad": 1,
+          "bass": 0.44,
+          "lead": 0.39,
+          "counter": 0.28,
+          "perc": 0.29
         },
         "sections": {
           "mode": "gentle",
@@ -1961,7 +1961,7 @@
         },
         "volumes": {
           "pad": 0.78,
-          "bass": 0.73,
+          "bass": 0.3,
           "lead": 0.62,
           "counter": 0.48,
           "perc": 0.44
@@ -2310,9 +2310,9 @@
         },
         "volumes": {
           "pad": 0.76,
-          "bass": 0.75,
+          "bass": 0.46,
           "lead": 0.66,
-          "counter": 0.48,
+          "counter": 0.81,
           "perc": 0.5
         },
         "breakdowns": {
@@ -2419,8 +2419,8 @@
           "swell": 0.08
         },
         "volumes": {
-          "pad": 0.78,
-          "bass": 0.73,
+          "pad": 0.42,
+          "bass": 0.45,
           "lead": 0.62,
           "counter": 0.48,
           "perc": 0.44
@@ -2780,7 +2780,7 @@
         },
         "volumes": {
           "pad": 0.62,
-          "bass": 0.44,
+          "bass": 0.21,
           "lead": 0.36,
           "counter": 0.63,
           "perc": 0
@@ -2926,7 +2926,7 @@
         },
         "volumes": {
           "pad": 0.62,
-          "bass": 0.44,
+          "bass": 0.21,
           "lead": 0.36,
           "counter": 0.63,
           "perc": 0
@@ -3054,9 +3054,9 @@
         },
         "volumes": {
           "pad": 0.52,
-          "bass": 0.62,
-          "lead": 0.55,
-          "counter": 0.2,
+          "bass": 0.38,
+          "lead": 0.45,
+          "counter": 0.29,
           "perc": 0.62
         },
         "ambienceVolume": 0.35,
@@ -3237,11 +3237,11 @@
           "swell": 0.055
         },
         "volumes": {
-          "pad": 0.76,
-          "bass": 0.75,
-          "lead": 0.66,
-          "counter": 0.48,
-          "perc": 0.5
+          "pad": 1,
+          "bass": 0.43,
+          "lead": 0.88,
+          "counter": 0.44,
+          "perc": 0.46
         },
         "ambienceVolume": 0.66
       },
@@ -3317,8 +3317,8 @@
           "swell": 0.07
         },
         "volumes": {
-          "pad": 0.5,
-          "bass": 0.43,
+          "pad": 0.71,
+          "bass": 0.27,
           "lead": 0.5,
           "counter": 0.25,
           "perc": 0.25
@@ -3448,11 +3448,11 @@
           "swell": 0.08
         },
         "volumes": {
-          "pad": 0.78,
-          "bass": 0.73,
-          "lead": 0.62,
-          "counter": 0.48,
-          "perc": 0.44
+          "pad": 1,
+          "bass": 0.4,
+          "lead": 0.56,
+          "counter": 0.43,
+          "perc": 0.39
         },
         "sections": {
           "mode": "gentle",
@@ -3824,7 +3824,7 @@
         },
         "volumes": {
           "pad": 0.46,
-          "bass": 0.62,
+          "bass": 0.52,
           "lead": 0.64,
           "counter": 0.2,
           "perc": 0.48
@@ -3973,7 +3973,7 @@
           "pad": 0.76,
           "bass": 0.78,
           "lead": 0.68,
-          "counter": 0.5,
+          "counter": 0.31,
           "perc": 0.59
         }
       },
@@ -4083,7 +4083,7 @@
           "pad": 0.5,
           "bass": 0.5,
           "lead": 0.65,
-          "counter": 0.32,
+          "counter": 0.2,
           "perc": 0.4
         },
         "pulseWeights": {
@@ -4205,7 +4205,7 @@
           "pad": 0.76,
           "bass": 0.78,
           "lead": 0.68,
-          "counter": 0.5,
+          "counter": 0.31,
           "perc": 0.59
         }
       },
@@ -4427,7 +4427,7 @@
         "volumes": {
           "pad": 0.76,
           "bass": 0.75,
-          "lead": 0.66,
+          "lead": 0.41,
           "counter": 0.48,
           "perc": 0.5
         },
@@ -4635,7 +4635,7 @@
         "volumes": {
           "pad": 0.76,
           "bass": 0.75,
-          "lead": 0.66,
+          "lead": 0.41,
           "counter": 0.48,
           "perc": 0.5
         },
@@ -4872,11 +4872,11 @@
           "swell": 0.055
         },
         "volumes": {
-          "pad": 0.76,
-          "bass": 0.75,
-          "lead": 0.66,
-          "counter": 0.48,
-          "perc": 0.5
+          "pad": 1,
+          "bass": 0.69,
+          "lead": 0.61,
+          "counter": 0.44,
+          "perc": 0.46
         }
       },
       "voices": {
@@ -4962,7 +4962,7 @@
         "volumes": {
           "pad": 0.76,
           "bass": 0.75,
-          "lead": 0.66,
+          "lead": 0.41,
           "counter": 0.48,
           "perc": 0.5
         },
@@ -5044,11 +5044,11 @@
           "swell": 0.055
         },
         "volumes": {
-          "pad": 0.76,
-          "bass": 0.75,
-          "lead": 0.66,
-          "counter": 0.48,
-          "perc": 0.5
+          "pad": 1,
+          "bass": 0.23,
+          "lead": 0.21,
+          "counter": 0.25,
+          "perc": 0.26
         },
         "sections": {
           "mode": "gentle",
@@ -5126,8 +5126,8 @@
         },
         "volumes": {
           "pad": 0.76,
-          "bass": 0.75,
-          "lead": 0.66,
+          "bass": 0.44,
+          "lead": 0.41,
           "counter": 0.48,
           "perc": 0.5
         },
@@ -5211,11 +5211,11 @@
           "swell": 0.055
         },
         "volumes": {
-          "pad": 0.76,
-          "bass": 0.75,
-          "lead": 0.66,
-          "counter": 0.48,
-          "perc": 0.5
+          "pad": 1,
+          "bass": 0.44,
+          "lead": 0.39,
+          "counter": 0.28,
+          "perc": 0.29
         },
         "sections": {
           "mode": "gentle",
@@ -5401,8 +5401,8 @@
         "volumes": {
           "pad": 0.76,
           "bass": 0.75,
-          "lead": 0.66,
-          "counter": 0.48,
+          "lead": 0.41,
+          "counter": 0.69,
           "perc": 0.5
         },
         "ambienceVolume": 0.66,
@@ -5489,8 +5489,8 @@
           "swell": 0.08
         },
         "volumes": {
-          "pad": 0.78,
-          "bass": 0.73,
+          "pad": 0.42,
+          "bass": 0.3,
           "lead": 0.62,
           "counter": 0.48,
           "perc": 0.44
@@ -5585,9 +5585,9 @@
         },
         "volumes": {
           "pad": 0.78,
-          "bass": 0.73,
+          "bass": 0.3,
           "lead": 0.62,
-          "counter": 0.48,
+          "counter": 0.81,
           "perc": 0.44
         },
         "sections": {
@@ -5700,11 +5700,11 @@
           "swell": 0.04
         },
         "volumes": {
-          "pad": 0.65,
-          "bass": 0.36,
-          "lead": 0.22,
-          "counter": 0.28,
-          "perc": 0.35
+          "pad": 1,
+          "bass": 0.089,
+          "lead": 0.13,
+          "counter": 0.17,
+          "perc": 0.21
         },
         "ambienceVolume": 0.4,
         "chordBorrow": 0,
@@ -5837,7 +5837,7 @@
         },
         "volumes": {
           "pad": 0.65,
-          "bass": 0.36,
+          "bass": 0.15,
           "lead": 0.45,
           "counter": 0.28,
           "perc": 0.35
@@ -5974,7 +5974,7 @@
         },
         "volumes": {
           "pad": 0.76,
-          "bass": 0.75,
+          "bass": 0.31,
           "lead": 0.66,
           "counter": 0.48,
           "perc": 0.5
@@ -6073,10 +6073,10 @@
           "swell": 0.08
         },
         "volumes": {
-          "pad": 0.48,
-          "bass": 0.32,
+          "pad": 0.81,
+          "bass": 0.13,
           "lead": 0.48,
-          "counter": 0.25,
+          "counter": 0.21,
           "perc": 0.25
         },
         "ambienceVolume": 0.45,
@@ -6218,11 +6218,11 @@
           "swell": 0.055
         },
         "volumes": {
-          "pad": 0.76,
-          "bass": 0.75,
-          "lead": 0.66,
-          "counter": 0.48,
-          "perc": 0.5
+          "pad": 1,
+          "bass": 0.36,
+          "lead": 0.52,
+          "counter": 0.38,
+          "perc": 0.39
         },
         "ambienceVolume": 0.66
       },
@@ -6327,9 +6327,9 @@
         },
         "volumes": {
           "pad": 0.62,
-          "bass": 0.52,
-          "lead": 0.55,
-          "counter": 0.23,
+          "bass": 0.32,
+          "lead": 0.34,
+          "counter": 0.33,
           "perc": 0.32
         },
         "ambienceVolume": 0.45,
@@ -6467,9 +6467,9 @@
         },
         "volumes": {
           "pad": 0.76,
-          "bass": 0.75,
-          "lead": 0.66,
-          "counter": 0.48,
+          "bass": 0.46,
+          "lead": 0.41,
+          "counter": 0.69,
           "perc": 0.5
         },
         "ambienceVolume": 0.66
@@ -6565,11 +6565,11 @@
           "swell": 0.04
         },
         "volumes": {
-          "pad": 0.65,
-          "bass": 0.48,
-          "lead": 0.5,
-          "counter": 0.2,
-          "perc": 0.4
+          "pad": 1,
+          "bass": 0.18,
+          "lead": 0.3,
+          "counter": 0.17,
+          "perc": 0.24
         },
         "ambienceVolume": 0.3,
         "chordBorrow": 0,
@@ -6713,9 +6713,9 @@
         },
         "volumes": {
           "pad": 0.65,
-          "bass": 0.48,
+          "bass": 0.3,
           "lead": 0.5,
-          "counter": 0.2,
+          "counter": 0.29,
           "perc": 0.4
         },
         "ambienceVolume": 0.3,
@@ -6862,7 +6862,7 @@
           "pad": 0.76,
           "bass": 0.75,
           "lead": 0.66,
-          "counter": 0.48,
+          "counter": 0.3,
           "perc": 0.5
         },
         "ambienceVolume": 0.66
@@ -7024,11 +7024,11 @@
           "swell": 0.025
         },
         "volumes": {
-          "pad": 0.73,
-          "bass": 0.66,
-          "lead": 0.48,
-          "counter": 0.4,
-          "perc": 0.38
+          "pad": 1,
+          "bass": 0.21,
+          "lead": 0.26,
+          "counter": 0.21,
+          "perc": 0.2
         },
         "sections": {
           "mode": "gentle",
@@ -7122,7 +7122,7 @@
         },
         "volumes": {
           "pad": 0.73,
-          "bass": 0.66,
+          "bass": 0.39,
           "lead": 0.48,
           "counter": 0.4,
           "perc": 0.38
@@ -7219,7 +7219,7 @@
         },
         "volumes": {
           "pad": 0.73,
-          "bass": 0.66,
+          "bass": 0.27,
           "lead": 0.48,
           "counter": 0.4,
           "perc": 0.38
@@ -7316,7 +7316,7 @@
         },
         "volumes": {
           "pad": 0.73,
-          "bass": 0.66,
+          "bass": 0.6,
           "lead": 0.48,
           "counter": 0.4,
           "perc": 0.38
@@ -7413,7 +7413,7 @@
         },
         "volumes": {
           "pad": 0.73,
-          "bass": 0.66,
+          "bass": 0.27,
           "lead": 0.48,
           "counter": 0.4,
           "perc": 0.38
@@ -7510,11 +7510,11 @@
           "swell": 0.025
         },
         "volumes": {
-          "pad": 0.73,
-          "bass": 0.66,
-          "lead": 0.48,
-          "counter": 0.4,
-          "perc": 0.38
+          "pad": 1,
+          "bass": 0.36,
+          "lead": 0.29,
+          "counter": 0.24,
+          "perc": 0.23
         },
         "sections": {
           "mode": "gentle",
@@ -7612,7 +7612,7 @@
         },
         "volumes": {
           "pad": 0.73,
-          "bass": 0.66,
+          "bass": 0.6,
           "lead": 0.48,
           "counter": 0.4,
           "perc": 0.38
@@ -7710,7 +7710,7 @@
         },
         "volumes": {
           "pad": 0.73,
-          "bass": 0.66,
+          "bass": 0.27,
           "lead": 0.48,
           "counter": 0.4,
           "perc": 0.38
@@ -7902,7 +7902,7 @@
         },
         "volumes": {
           "pad": 0.78,
-          "bass": 0.73,
+          "bass": 0.43,
           "lead": 0.62,
           "counter": 0.48,
           "perc": 0.44
@@ -7984,7 +7984,7 @@
         "volumes": {
           "pad": 0.76,
           "bass": 0.75,
-          "lead": 0.66,
+          "lead": 0.95,
           "counter": 0.48,
           "perc": 0.5
         },
@@ -8361,9 +8361,9 @@
         },
         "volumes": {
           "pad": 0.76,
-          "bass": 0.78,
-          "lead": 0.68,
-          "counter": 0.5,
+          "bass": 0.7,
+          "lead": 0.57,
+          "counter": 0.72,
           "perc": 0.59
         },
         "leadSyncopation": 0.25,
@@ -8623,7 +8623,7 @@
           "pad": 0.76,
           "bass": 0.78,
           "lead": 0.68,
-          "counter": 0.5,
+          "counter": 0.42,
           "perc": 0.59
         },
         "breakdowns": {
@@ -8812,7 +8812,7 @@
           "pad": 0.76,
           "bass": 0.78,
           "lead": 0.68,
-          "counter": 0.5,
+          "counter": 0.31,
           "perc": 0.59
         },
         "breakdowns": {
@@ -8902,7 +8902,7 @@
         },
         "volumes": {
           "pad": 0.78,
-          "bass": 0.73,
+          "bass": 0.47,
           "lead": 0.62,
           "counter": 0.48,
           "perc": 0.44
@@ -9001,11 +9001,11 @@
           "swell": 0.055
         },
         "volumes": {
-          "pad": 0.76,
-          "bass": 0.75,
-          "lead": 0.66,
-          "counter": 0.48,
-          "perc": 0.5
+          "pad": 1,
+          "bass": 0.44,
+          "lead": 0.56,
+          "counter": 0.28,
+          "perc": 0.29
         },
         "sections": {
           "mode": "gentle",
@@ -9131,7 +9131,7 @@
         "volumes": {
           "pad": 0.76,
           "bass": 0.75,
-          "lead": 0.66,
+          "lead": 0.95,
           "counter": 0.48,
           "perc": 0.5
         },
@@ -9249,11 +9249,11 @@
           "swell": 0.08
         },
         "volumes": {
-          "pad": 0.78,
-          "bass": 0.73,
-          "lead": 0.62,
-          "counter": 0.48,
-          "perc": 0.44
+          "pad": 0.7,
+          "bass": 0.19,
+          "lead": 1,
+          "counter": 0.3,
+          "perc": 0.28
         },
         "sections": {
           "mode": "gentle",
@@ -9344,11 +9344,11 @@
           "swell": 0.08
         },
         "volumes": {
-          "pad": 0.78,
-          "bass": 0.73,
-          "lead": 0.62,
-          "counter": 0.48,
-          "perc": 0.44
+          "pad": 1,
+          "bass": 0.27,
+          "lead": 0.56,
+          "counter": 0.43,
+          "perc": 0.39
         },
         "sections": {
           "mode": "gentle",
@@ -9461,7 +9461,7 @@
         },
         "volumes": {
           "pad": 1,
-          "bass": 0.59,
+          "bass": 0.38,
           "lead": 0.5,
           "counter": 0.39,
           "perc": 0.36
@@ -9564,7 +9564,7 @@
         },
         "volumes": {
           "pad": 0.78,
-          "bass": 0.73,
+          "bass": 0.47,
           "lead": 0.62,
           "counter": 0.48,
           "perc": 0.44
@@ -9664,7 +9664,7 @@
         },
         "volumes": {
           "pad": 0.76,
-          "bass": 0.75,
+          "bass": 0.44,
           "lead": 0.66,
           "counter": 0.48,
           "perc": 0.5
@@ -9747,11 +9747,11 @@
           "swell": 0.055
         },
         "volumes": {
-          "pad": 0.76,
-          "bass": 0.75,
-          "lead": 0.66,
-          "counter": 0.48,
-          "perc": 0.5
+          "pad": 1,
+          "bass": 0.4,
+          "lead": 0.39,
+          "counter": 0.28,
+          "perc": 0.29
         },
         "sections": {
           "mode": "gentle",
@@ -9832,7 +9832,7 @@
         },
         "volumes": {
           "pad": 0.76,
-          "bass": 0.75,
+          "bass": 0.68,
           "lead": 0.66,
           "counter": 0.48,
           "perc": 0.5
@@ -9936,8 +9936,8 @@
         },
         "volumes": {
           "pad": 1,
-          "bass": 0.59,
-          "lead": 0.5,
+          "bass": 0.24,
+          "lead": 0.31,
           "counter": 0.39,
           "perc": 0.36
         },
@@ -10116,8 +10116,8 @@
           "swell": 0.08
         },
         "volumes": {
-          "pad": 0.78,
-          "bass": 0.73,
+          "pad": 0.64,
+          "bass": 0.45,
           "lead": 0.62,
           "counter": 0.48,
           "perc": 0.44
@@ -10220,7 +10220,7 @@
         },
         "volumes": {
           "pad": 0.4,
-          "bass": 0.4,
+          "bass": 0.16,
           "lead": 0.67,
           "counter": 0.2,
           "perc": 0.2
@@ -10348,7 +10348,7 @@
         },
         "volumes": {
           "pad": 0.78,
-          "bass": 0.73,
+          "bass": 0.3,
           "lead": 0.62,
           "counter": 0.48,
           "perc": 0.44
@@ -10463,7 +10463,7 @@
         },
         "volumes": {
           "pad": 0.42,
-          "bass": 0.32,
+          "bass": 0.13,
           "lead": 0.62,
           "counter": 0.18,
           "perc": 0.15
@@ -10599,7 +10599,7 @@
         },
         "volumes": {
           "pad": 0.78,
-          "bass": 0.73,
+          "bass": 0.45,
           "lead": 0.62,
           "counter": 0.48,
           "perc": 0.44
@@ -10707,11 +10707,11 @@
           "swell": 0.035
         },
         "volumes": {
-          "pad": 0.76,
-          "bass": 0.78,
-          "lead": 0.68,
-          "counter": 0.5,
-          "perc": 0.59
+          "pad": 0.65,
+          "bass": 0.67,
+          "lead": 1,
+          "counter": 0.43,
+          "perc": 0.51
         },
         "ambienceVolume": 0.66,
         "leadSyncopation": 0.35,
@@ -10807,11 +10807,11 @@
           "swell": 0.055
         },
         "volumes": {
-          "pad": 0.76,
-          "bass": 0.75,
-          "lead": 0.66,
-          "counter": 0.48,
-          "perc": 0.5
+          "pad": 0.67,
+          "bass": 0.66,
+          "lead": 1,
+          "counter": 0.42,
+          "perc": 0.44
         },
         "ambienceVolume": 0.66,
         "arc": {
@@ -11308,7 +11308,7 @@
         },
         "volumes": {
           "pad": 1,
-          "bass": 0.53,
+          "bass": 0.34,
           "lead": 0.54,
           "counter": 0.42,
           "perc": 0.4
@@ -11476,7 +11476,7 @@
         },
         "volumes": {
           "pad": 0.63,
-          "bass": 0.44,
+          "bass": 0.28,
           "lead": 0.62,
           "counter": 0.26,
           "perc": 0.4
@@ -11640,7 +11640,7 @@
           "pad": 0.44,
           "bass": 0.48,
           "lead": 0.62,
-          "counter": 0.18,
+          "counter": 0.2,
           "perc": 0.3
         },
         "drums": {
@@ -11826,7 +11826,7 @@
         "sectionTone": true,
         "volumes": {
           "pad": 0.5,
-          "bass": 0.4,
+          "bass": 0.16,
           "lead": 0.48,
           "counter": 0.2,
           "perc": 0.2
@@ -12156,7 +12156,7 @@
         "sectionTone": true,
         "volumes": {
           "pad": 0.45,
-          "bass": 0.48,
+          "bass": 0.21,
           "lead": 0.5,
           "counter": 0.2,
           "perc": 0.42
@@ -12487,7 +12487,7 @@
         "sectionTone": true,
         "volumes": {
           "pad": 0.5,
-          "bass": 0.5,
+          "bass": 0.22,
           "lead": 0.52,
           "counter": 0.2,
           "perc": 0.45
@@ -12630,10 +12630,10 @@
           "swell": 0.08
         },
         "volumes": {
-          "pad": 0.11,
+          "pad": 0.096,
           "lead": 0.24,
-          "counter": 0.24,
-          "bass": 0.34,
+          "counter": 0.023,
+          "bass": 0.094,
           "perc": 0.2
         },
         "ambienceVolume": 0.72,
@@ -12716,10 +12716,10 @@
         },
         "sectionTone": true,
         "volumes": {
-          "pad": 0.55,
-          "lead": 0.52,
-          "counter": 0.13,
-          "bass": 0.27,
+          "pad": 0.16,
+          "lead": 0.17,
+          "counter": 0.019,
+          "bass": 0.12,
           "perc": 0.2
         },
         "drums": {
@@ -12853,10 +12853,10 @@
         },
         "sectionTone": false,
         "volumes": {
-          "pad": 0.38,
-          "lead": 0.55,
-          "counter": 0.22,
-          "bass": 0.28,
+          "pad": 0.032,
+          "lead": 0.16,
+          "counter": 0.061,
+          "bass": 0.13,
           "perc": 0.28
         },
         "drums": {
@@ -12994,7 +12994,7 @@
         },
         "volumes": {
           "pad": 0.76,
-          "bass": 0.75,
+          "bass": 0.68,
           "lead": 0.66,
           "counter": 0.48,
           "perc": 0.5
@@ -13130,7 +13130,7 @@
         "volumes": {
           "pad": 0.76,
           "bass": 0.75,
-          "lead": 0.5,
+          "lead": 0.073,
           "counter": 0.48,
           "perc": 0.5
         },
@@ -13343,11 +13343,11 @@
           "swell": 0.055
         },
         "volumes": {
-          "pad": 0.76,
-          "bass": 0.75,
-          "lead": 0.66,
-          "counter": 0.48,
-          "perc": 0.5
+          "pad": 1,
+          "bass": 0.44,
+          "lead": 0.56,
+          "counter": 0.28,
+          "perc": 0.29
         },
         "sections": {
           "mode": "gentle",
@@ -13606,7 +13606,7 @@
         },
         "volumes": {
           "pad": 0.78,
-          "bass": 0.73,
+          "bass": 0.3,
           "lead": 0.62,
           "counter": 0.48,
           "perc": 0.44
@@ -13693,7 +13693,7 @@
         },
         "volumes": {
           "pad": 0.76,
-          "bass": 0.75,
+          "bass": 0.44,
           "lead": 0.66,
           "counter": 0.48,
           "perc": 0.5
@@ -13941,7 +13941,7 @@
           "pad": 0.44,
           "bass": 0.48,
           "lead": 0.62,
-          "counter": 0.18,
+          "counter": 0.2,
           "perc": 0.3
         },
         "drums": {
@@ -14303,10 +14303,10 @@
         },
         "sectionTone": true,
         "volumes": {
-          "pad": 0.55,
-          "lead": 0.52,
-          "counter": 0.13,
-          "bass": 0.27,
+          "pad": 0.16,
+          "lead": 0.17,
+          "counter": 0.019,
+          "bass": 0.12,
           "perc": 0.2
         },
         "drums": {
@@ -14444,10 +14444,10 @@
         },
         "sectionTone": false,
         "volumes": {
-          "pad": 0.38,
-          "lead": 0.55,
-          "counter": 0.22,
-          "bass": 0.28,
+          "pad": 0.032,
+          "lead": 0.16,
+          "counter": 0.061,
+          "bass": 0.13,
           "perc": 0.28
         },
         "drums": {
@@ -14597,7 +14597,7 @@
         "volumes": {
           "pad": 0.76,
           "bass": 0.75,
-          "lead": 0.66,
+          "lead": 0.56,
           "counter": 0.48,
           "perc": 0.5
         },
@@ -14690,7 +14690,7 @@
         "volumes": {
           "pad": 0.76,
           "bass": 0.75,
-          "lead": 0.66,
+          "lead": 0.95,
           "counter": 0.48,
           "perc": 0.5
         },
@@ -14852,7 +14852,7 @@
         },
         "volumes": {
           "pad": 0.76,
-          "bass": 0.75,
+          "bass": 0.44,
           "lead": 0.66,
           "counter": 0.48,
           "perc": 0.5
@@ -15148,7 +15148,7 @@
           "pad": 0.44,
           "bass": 0.48,
           "lead": 0.62,
-          "counter": 0.18,
+          "counter": 0.2,
           "perc": 0.3
         },
         "drums": {
@@ -15304,10 +15304,10 @@
         },
         "sectionTone": false,
         "volumes": {
-          "pad": 0.38,
-          "lead": 0.55,
-          "counter": 0.22,
-          "bass": 0.28,
+          "pad": 0.032,
+          "lead": 0.16,
+          "counter": 0.061,
+          "bass": 0.13,
           "perc": 0.28
         },
         "drums": {
@@ -15474,7 +15474,7 @@
         },
         "volumes": {
           "pad": 0.4,
-          "bass": 0.45,
+          "bass": 0.41,
           "lead": 0.75,
           "counter": 0.3,
           "perc": 0.3
@@ -15564,7 +15564,7 @@
         "evenLoudness": 1,
         "volumes": {
           "pad": 1,
-          "bass": 0.41,
+          "bass": 0.24,
           "lead": 0.63,
           "counter": 0.27,
           "perc": 0.45
@@ -15719,7 +15719,7 @@
           "variation": 0.3
         },
         "volumes": {
-          "pad": 0.5,
+          "pad": 0.22,
           "bass": 0.6,
           "lead": 0.62,
           "counter": 0.3,
@@ -15971,7 +15971,7 @@
         "timbreDrift": 1,
         "volumes": {
           "pad": 0.7,
-          "bass": 0.4,
+          "bass": 0.16,
           "lead": 0.55,
           "counter": 0.3,
           "perc": 0.3
@@ -16062,7 +16062,7 @@
         },
         "volumes": {
           "pad": 0.5,
-          "bass": 0.5,
+          "bass": 0.45,
           "lead": 0.65,
           "counter": 0.3,
           "perc": 0.5
@@ -16144,7 +16144,7 @@
         "volumes": {
           "pad": 0.5,
           "bass": 0.5,
-          "lead": 0.65,
+          "lead": 0.4,
           "counter": 0.3,
           "perc": 0.45
         }
@@ -16243,11 +16243,11 @@
           "swell": 0.06
         },
         "volumes": {
-          "pad": 0.8,
-          "bass": 0.59,
-          "lead": 0.62,
-          "counter": 0.4,
-          "perc": 0.38
+          "pad": 0.61,
+          "bass": 0.45,
+          "lead": 1,
+          "counter": 0.31,
+          "perc": 0.29
         },
         "sections": {
           "mode": "gentle",
@@ -16328,11 +16328,11 @@
           "swell": 0.025
         },
         "volumes": {
-          "pad": 0.8,
-          "bass": 0.59,
-          "lead": 0.62,
-          "counter": 0.4,
-          "perc": 0.38
+          "pad": 1,
+          "bass": 0.31,
+          "lead": 0.59,
+          "counter": 0.21,
+          "perc": 0.2
         },
         "sections": {
           "mode": "gentle",
@@ -16415,7 +16415,7 @@
         },
         "volumes": {
           "pad": 0.7,
-          "bass": 0.6,
+          "bass": 0.25,
           "lead": 0.66,
           "counter": 0.36,
           "perc": 0.38
@@ -16501,11 +16501,11 @@
           "swell": 0.06
         },
         "volumes": {
-          "pad": 0.7,
-          "bass": 0.6,
-          "lead": 0.66,
-          "counter": 0.36,
-          "perc": 0.38
+          "pad": 0.45,
+          "bass": 0.16,
+          "lead": 1,
+          "counter": 0.23,
+          "perc": 0.24
         },
         "sections": {
           "mode": "gentle",
@@ -16673,11 +16673,11 @@
           "swell": 0.05
         },
         "volumes": {
-          "pad": 0.78,
-          "bass": 0.72,
-          "lead": 0.25,
-          "counter": 0.4,
-          "perc": 0.38
+          "pad": 1,
+          "bass": 0.39,
+          "lead": 0.14,
+          "counter": 0.22,
+          "perc": 0.21
         },
         "sections": {
           "mode": "gentle",
@@ -16861,11 +16861,11 @@
         "ambienceVolume": 0.65,
         "playAmbience": true,
         "volumes": {
-          "lead": 0.73,
-          "counter": 0.4,
-          "pad": 0.98,
-          "bass": 0.32,
-          "perc": 0.38
+          "lead": 0.57,
+          "counter": 0.17,
+          "pad": 1,
+          "bass": 0.14,
+          "perc": 0.16
         },
         "padMotion": {
           "lean": 0.1,
@@ -17114,11 +17114,11 @@
           "swell": 0.025
         },
         "volumes": {
-          "pad": 0.8,
-          "bass": 0.5,
-          "lead": 0.62,
-          "counter": 0.4,
-          "perc": 0.38
+          "pad": 1,
+          "bass": 0.62,
+          "lead": 0.77,
+          "counter": 0.28,
+          "perc": 0.26
         },
         "sections": {
           "mode": "gentle",
@@ -17264,7 +17264,7 @@
         },
         "volumes": {
           "pad": 0.55,
-          "bass": 0.55,
+          "bass": 0.5,
           "lead": 0.62,
           "counter": 0.3,
           "perc": 0.5
@@ -17320,7 +17320,7 @@
         },
         "volumes": {
           "pad": 0.55,
-          "bass": 0.55,
+          "bass": 0.32,
           "lead": 0.62,
           "counter": 0.3,
           "perc": 0.5
@@ -17377,7 +17377,7 @@
         },
         "volumes": {
           "pad": 0.55,
-          "bass": 0.55,
+          "bass": 0.46,
           "lead": 0.62,
           "counter": 0.3,
           "perc": 0.5
@@ -17432,7 +17432,7 @@
           "detune": 2
         },
         "volumes": {
-          "pad": 0.55,
+          "pad": 0.24,
           "bass": 0.55,
           "lead": 0.62,
           "counter": 0.3,
@@ -17490,11 +17490,11 @@
           "detune": 2
         },
         "volumes": {
-          "pad": 0.55,
-          "bass": 0.55,
-          "lead": 0.62,
-          "counter": 0.3,
-          "perc": 0.5
+          "pad": 0.41,
+          "bass": 0.24,
+          "lead": 1,
+          "counter": 0.22,
+          "perc": 0.37
         },
         "sections": {
           "mode": "gentle",
@@ -17696,7 +17696,7 @@
         },
         "volumes": {
           "pad": 0.7,
-          "bass": 0.8,
+          "bass": 0.33,
           "lead": 0.58,
           "counter": 0.35,
           "perc": 0.5

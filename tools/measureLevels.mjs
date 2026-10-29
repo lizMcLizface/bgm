@@ -1,11 +1,12 @@
-// Measures instrument levels (full velocity) in headless Chrome and merges them into src/labs/levels/suite.json,
-// the data the /labs/levels/ page ships with. Needs the dev server (npm run dev) running.
+// Measures instrument levels in headless Chrome and merges them into src/labs/levels/suite.json (full velocity) or
+// suite.mid.json / suite.low.json, the data the /labs/levels/ page ships with. Needs the dev server (npm run dev) running.
 // The work is split across several Chrome processes (one shard each), so it uses several cores.
 //
 //   npm run levels:measure                 measure what is missing or changed since it was measured
 //   npm run levels:measure -- --all        re-measure everything
 //   npm run levels:measure -- --group=bass measure one category (ids: see src/labs/levels/groups.js)
 //   npm run levels:measure -- --ids=library-Warm%20Strings,rosin-silk
+//   npm run levels:measure -- --velocity=low   full (default), mid (0.5) or low (0.25)
 //   npm run levels:measure -- --workers=8  Chrome processes to run at once (default: a quarter of the logical cores, 2 to 8)
 //   npm run levels:measure -- --keep-removed   do not drop voices that no longer exist
 import fs from 'node:fs/promises';
@@ -14,7 +15,9 @@ import path from 'node:path';
 import puppeteer from 'puppeteer-core';
 const arg=(key,fallback)=>process.argv.find(s=>s.startsWith('--'+key+'='))?.slice(key.length+3)??fallback;
 const flag=key=>process.argv.includes('--'+key);
-const origin=process.env.SYNTH_LAB_URL||'http://localhost:5173',file=path.resolve('src/labs/levels/suite.json');
+const velocityName=arg('velocity','full'),velocity={full:1,mid:.5,low:.25}[velocityName];
+if(!velocity)throw Error('--velocity must be full, mid or low');
+const origin=process.env.SYNTH_LAB_URL||'http://localhost:5173',file=path.resolve(velocityName==='full'?'src/labs/levels/suite.json':`src/labs/levels/suite.${velocityName}.json`);
 const workers=Math.max(1,Number(arg('workers',Math.min(8,Math.max(2,Math.floor(os.availableParallelism()/4))))));
 const suite=JSON.parse(await fs.readFile(file,'utf8'));
 const launch=()=>puppeteer.launch({executablePath:process.env.SYNTH_BROWSER_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true,args:['--no-sandbox','--mute-audio','--autoplay-policy=no-user-gesture-required']});
@@ -41,12 +44,12 @@ async function shard(index,ids){
  const browser=await launch();
  try{
   const page=await open(browser,'');
-  const run=await page.evaluate(async(ids,per)=>{
+  const run=await page.evaluate(async(ids,per,velocity)=>{
    const {LAB_VOICES}=await import('/src/labs/catalog.js'),{measureAll}=await import('/src/labs/levels/render.js');
    const results={},failed=[];
-   await measureAll(LAB_VOICES.filter(v=>ids.includes(v.id)),{concurrency:per,onResult:(v,entry)=>{results[v.id]=entry;report('\u0001'+v.name+'\u0001'+entry.engine);},onFail:(v,e)=>{failed.push(v.name+': '+e.message);report('\u0002'+v.name+': '+e.message);}});
+   await measureAll(LAB_VOICES.filter(v=>ids.includes(v.id)),{velocity,concurrency:per,onResult:(v,entry)=>{results[v.id]=entry;report('\u0001'+v.name+'\u0001'+entry.engine);},onFail:(v,e)=>{failed.push(v.name+': '+e.message);report('\u0002'+v.name+': '+e.message);}});
    return {results,failed};
-  },ids,2);
+  },ids,2,velocity);
   Object.assign(results,run.results);failed.push(...run.failed);
  }finally{await browser.close();}
 }
@@ -61,7 +64,7 @@ if(!flag('keep-removed'))for(const id of Object.keys(voices))if(!plan.current.in
 const ordered=Object.fromEntries(Object.entries(voices).sort(([a],[b])=>a<b?-1:1));
 // One instrument per line keeps the diff of a re-measurement readable.
 const body=Object.entries(ordered).map(([id,v])=>JSON.stringify(id)+':'+JSON.stringify(v)).join(',\n');
-const head=`{"version":1,"velocity":1,"generated":${JSON.stringify(Object.keys(results).length?new Date().toISOString():suite.generated)},"voices":{\n`;
+const head=`{"version":1,"velocity":${velocity},"generated":${JSON.stringify(Object.keys(results).length?new Date().toISOString():suite.generated)},"voices":{\n`;
 await fs.writeFile(file,head+body+'\n}}\n');
 console.log(`wrote ${Object.keys(ordered).length} instruments to ${path.relative('.',file)}${failed.length?`; ${failed.length} failed`:''}`);
 if(failed.length){console.log(failed.join('\n'));process.exitCode=1;}

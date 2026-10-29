@@ -12,9 +12,10 @@ import {translatedWasmVoice,needsNativeSource} from '../app/engine/wasmPreset';
 import {PROCEDURAL_RECIPES} from '../synth-lab/proceduralPatch';
 import {preparedPatch} from './preparedPatch';
 import {WASM_VOICES} from '../synth-lab/voiceLibrary';
+import {applyTrim} from '../library/levelTrim';
 export {FAMILIES} from './families';
-const sub=(id,family,index,name,edit=()=>{})=>{const patch=clonePatch(RECIPES[index]);patch.name=name;patch.global.polyphony=12;edit(patch);return {id,family,name,kind:'subtractive',patch,sourceRecipe:RECIPES[index].name};};
-const fm=(id,family,index,name,edit=()=>{})=>{const patch=cloneFM(FM_RECIPES[index]);patch.name=name;patch.global.polyphony=12;patch.global.quality=1;edit(patch);return {id,family,name,kind:'fm',patch,sourceRecipe:FM_RECIPES[index].name};};
+const sub=(id,family,index,name,edit=()=>{})=>{const patch=clonePatch(RECIPES[index]);patch.name=name;patch.global.polyphony=12;edit(patch);applyTrim(id,patch);return {id,family,name,kind:'subtractive',patch,sourceRecipe:RECIPES[index].name};};
+const fm=(id,family,index,name,edit=()=>{})=>{const patch=cloneFM(FM_RECIPES[index]);patch.name=name;patch.global.polyphony=12;patch.global.quality=1;edit(patch);applyTrim(id,patch);return {id,family,name,kind:'fm',patch,sourceRecipe:FM_RECIPES[index].name};};
 export const LAB_VOICES=[
  fm('bowed-glass','strings',4,'Bowed glass'),sub('rosin-silk','strings',9,'Rosin silk'),sub('layered-strings','strings',2,'Layered strings'),sub('soft-strings','strings',1,'Soft ensemble'),
  fm('tine-keys','keys',0,'Tine keys'),fm('glass-bells','keys',1,'Glass bells'),fm('celeste','keys',0,'Celeste',p=>{p.global.index=.65;for(const o of p.operators){o.attack=.003;o.decay1=.35;o.decay2=1.4;o.sustain=0;o.release=.8;}}),
@@ -29,7 +30,7 @@ Object.assign(LAB_VOICES.find(v=>v.id==='felt-keys'),{name:'Felt Keys',presetNam
 // Keep the original lab IDs, then expose every remaining standalone recipe.
 for(const [i,family]of [[0,'winds'],[4,'leads'],[6,'leads'],[7,'pads'],[8,'strings'],[10,'plucks']]){const v=sub('core-'+i,family,i,RECIPES[i].name);Object.assign(v,{availability:'wasm',isNew:true,origin:'New subtractive laboratory'});LAB_VOICES.push(v);}
 for(const [i,family]of [[2,'bass'],[3,'winds'],[6,'keys'],[10,'winds']]){const v=fm('fm-'+i,family,i,FM_RECIPES[i].name);Object.assign(v,{availability:'wasm',isNew:true,origin:'New FM laboratory'});LAB_VOICES.push(v);}
-for(const [i,p]of PROCEDURAL_RECIPES.entries())if(p.family!=='drums')LAB_VOICES.push({id:'prepared-'+i,family:p.family==='piano'?'keys':p.string.bodyType==='bass'?'bass':'plucks',name:p.name,kind:'procedural',patch:preparedPatch(p),sourceRecipe:p.name,availability:'wasm',isNew:true,origin:'Prepared source · rounded contact · Wasm effects'});
+for(const [i,p]of PROCEDURAL_RECIPES.entries())if(p.family!=='drums')LAB_VOICES.push({id:'prepared-'+i,family:p.family==='piano'?'keys':p.string.bodyType==='bass'?'bass':'plucks',name:p.name,kind:'procedural',patch:(patch=>{applyTrim('prepared-'+i,patch,1);return patch;})(preparedPatch(p)),sourceRecipe:p.name,availability:'wasm',isNew:true,origin:'Prepared source · rounded contact · Wasm effects'});
 
 export function instrumentFamily(name,category=''){
  if(category==='Bass'||/bass/i.test(name))return 'bass';

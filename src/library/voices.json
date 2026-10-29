@@ -65,7 +65,7 @@
       "reverbAmount": 0.45
     },
     "Dark Drone": {
-      "masterVolume": 0.6,
+      "masterVolume": 0.98,
       "vcoType": "sawtooth",
       "subOscOctaveOffset": -1,
       "subOscType": "sine",
@@ -87,7 +87,7 @@
       "reverbAmount": 0.5
     },
     "Breathy Choir": {
-      "masterVolume": 0.65,
+      "masterVolume": 0.571,
       "vcoType": "triangle",
       "voiceCount": 3,
       "detuneSpread": 10,
@@ -151,7 +151,7 @@
       "eqHighGain": -6
     },
     "Shimmer": {
-      "masterVolume": 0.63,
+      "masterVolume": 0.325,
       "vcoType": "sine",
       "osc2Type": "sine",
       "osc2OctaveOffset": 2,
@@ -291,7 +291,7 @@
       "eqHighGain": -3
     },
     "Choir Ah": {
-      "masterVolume": 0.71,
+      "masterVolume": 0.868,
       "vcoType": "choir",
       "voiceCount": 3,
       "detuneSpread": 9,
@@ -312,7 +312,7 @@
       "reverbAmount": 0.45
     },
     "Hollow Tremolo": {
-      "masterVolume": 0.66,
+      "masterVolume": 0.376,
       "vcoType": "hollow",
       "voiceCount": 2,
       "detuneSpread": 6,
@@ -331,7 +331,7 @@
       "reverbAmount": 0.35
     },
     "Void Pad": {
-      "masterVolume": 0.58,
+      "masterVolume": 1.076,
       "vcoType": "sawtooth",
       "subOscOctaveOffset": -1,
       "subOscType": "sine",
@@ -356,7 +356,7 @@
       "eqHighGain": -3
     },
     "Starlight Pad": {
-      "masterVolume": 0.55,
+      "masterVolume": 0.326,
       "vcoType": "triangle",
       "osc2Type": "sawtooth",
       "osc2OctaveOffset": 1,
@@ -382,7 +382,7 @@
       "reverbAmount": 0.5
     },
     "Spore Haze": {
-      "masterVolume": 0.9,
+      "masterVolume": 0.545,
       "vcoType": "hollow",
       "osc2Type": "triangle",
       "osc2Detune": 8,
@@ -435,7 +435,7 @@
       "voiceCount": 4,
       "detuneSpread": 14,
       "stereoSpread": 60,
-      "gainAttack": 0.45,
+      "gainAttack": 0.12,
       "gainDecay": 0.8,
       "gainSustain": 0.75,
       "gainRelease": 0.7,
@@ -443,7 +443,7 @@
       "filterFreq": 1200,
       "filterQ": 3,
       "filterEnvAmount": 3200,
-      "filterAttack": 0.6,
+      "filterAttack": 0.3,
       "filterDecay": 1.5,
       "vibratoDepth": 4,
       "vibratoRate": 5,
@@ -501,7 +501,7 @@
       "reverbAmount": 0.6
     },
     "Starmap Void": {
-      "masterVolume": 0.58,
+      "masterVolume": 1.214,
       "vcoType": "sawtooth",
       "subOscOctaveOffset": -1,
       "subOscType": "sine",
@@ -549,7 +549,7 @@
       "reverbAmount": 0.05
     },
     "Sub Bass": {
-      "masterVolume": 0.68,
+      "masterVolume": 1.65,
       "vcoType": "sine",
       "subOscOctaveOffset": -1,
       "subOscType": "sine",
@@ -591,7 +591,7 @@
       "distortionAmount": 0.1
     },
     "Felt Bass": {
-      "masterVolume": 0.69,
+      "masterVolume": 1.169,
       "vcoType": "sine",
       "osc2Type": "triangle",
       "osc2Amount": 0.25,
@@ -604,7 +604,7 @@
       "reverbAmount": 0.08
     },
     "Soft Square Bass": {
-      "masterVolume": 0.4,
+      "masterVolume": 0.813,
       "vcoType": "square_dc",
       "vcoDutyCycle": 0.35,
       "gainAttack": 0.02,
@@ -651,7 +651,7 @@
       "filterDecay": 0.18
     },
     "Deep Pulse": {
-      "masterVolume": 0.52,
+      "masterVolume": 1.182,
       "vcoType": "sawtooth",
       "voiceCount": 2,
       "detuneSpread": 5,
@@ -745,7 +745,7 @@
       "bitCrushAmount": 0.2
     },
     "Deep Throb": {
-      "masterVolume": 0.85,
+      "masterVolume": 1.371,
       "vcoType": "sine",
       "osc2Type": "triangle",
       "osc2OctaveOffset": 1,
@@ -1111,7 +1111,7 @@
       "reverbAmount": 0.3
     },
     "Pan Flute": {
-      "masterVolume": 0.5,
+      "masterVolume": 0.81,
       "vcoType": "triangle",
       "noiseType": "pink",
       "noiseMix": 0.06,
@@ -1215,7 +1215,7 @@
       "reverbAmount": 0.5
     },
     "Ghost Sweep": {
-      "masterVolume": 0.5,
+      "masterVolume": 0.292,
       "vcoType": "square_dc",
       "vcoDutyCycle": 0.3,
       "voiceCount": 2,
@@ -1418,7 +1418,7 @@
       "pitchEnvDecay": 0.07,
       "stringModel": "piano",
       "pianoSustain": 0,
-      "masterVolume": 1.5,
+      "masterVolume": 0.672,
       "pianoType": "felted",
       "pianoDecay": 2.4,
       "pianoBrightness": 0.5,
@@ -1585,7 +1585,7 @@
       "pitchEnvDecay": 0.07,
       "stringModel": "piano",
       "pianoSustain": 0,
-      "masterVolume": 1.7,
+      "masterVolume": 0.661,
       "pianoType": "felted",
       "pianoDecay": 2.6,
       "pianoBrightness": 0.35,
@@ -1599,7 +1599,7 @@
       "reverbAmount": 0.3
     },
     "Soft Marimba": {
-      "masterVolume": 1,
+      "masterVolume": 0.59,
       "vcoType": "sine",
       "fmRatio": 4,
       "fmEnvAmount": 2.5,
@@ -1840,7 +1840,7 @@
   },
   "Pianos": {
     "Concert Grand": {
-      "masterVolume": 1.3,
+      "masterVolume": 0.546,
       "vcoType": "triangle",
       "gainAttack": 0.001,
       "gainDecay": 0.1,
@@ -1864,7 +1864,7 @@
       "reverbAmount": 0.22
     },
     "Studio Grand": {
-      "masterVolume": 1,
+      "masterVolume": 0.549,
       "vcoType": "triangle",
       "gainAttack": 0.001,
       "gainDecay": 0.1,
@@ -1888,7 +1888,7 @@
       "reverbAmount": 0.12
     },
     "Felted Piano": {
-      "masterVolume": 1.2,
+      "masterVolume": 0.671,
       "vcoType": "triangle",
       "gainAttack": 0.001,
       "gainDecay": 0.1,
@@ -1964,7 +1964,7 @@
       "reverbAmount": 0.1
     },
     "Baroque Grand": {
-      "masterVolume": 1.2,
+      "masterVolume": 0.552,
       "vcoType": "triangle",
       "gainAttack": 0.001,
       "gainDecay": 0.1,
@@ -1989,7 +1989,7 @@
       "reverbAmount": 0.28
     },
     "Parlour Meantone": {
-      "masterVolume": 1.2,
+      "masterVolume": 0.572,
       "vcoType": "triangle",
       "gainAttack": 0.001,
       "gainDecay": 0.1,
@@ -2014,7 +2014,7 @@
       "reverbAmount": 0.25
     },
     "Ambient Piano": {
-      "masterVolume": 1.3,
+      "masterVolume": 0.526,
       "vcoType": "triangle",
       "gainAttack": 0.001,
       "gainDecay": 0.1,
@@ -2038,7 +2038,7 @@
       "reverbAmount": 0.3
     },
     "Glass Grand": {
-      "masterVolume": 1.3,
+      "masterVolume": 0.533,
       "vcoType": "triangle",
       "gainAttack": 0.001,
       "gainDecay": 0.1,
@@ -2062,7 +2062,7 @@
       "reverbAmount": 0.22
     },
     "Soft Drama": {
-      "masterVolume": 1.3,
+      "masterVolume": 0.567,
       "vcoType": "triangle",
       "gainAttack": 0.001,
       "gainDecay": 0.1,
@@ -2086,7 +2086,7 @@
       "reverbAmount": 0.28
     },
     "Soft Piano": {
-      "masterVolume": 1.3,
+      "masterVolume": 0.581,
       "vcoType": "triangle",
       "gainAttack": 0.001,
       "gainDecay": 0.1,
@@ -2110,7 +2110,7 @@
       "reverbAmount": 0.22
     },
     "Subdued Piano": {
-      "masterVolume": 1.3,
+      "masterVolume": 0.582,
       "vcoType": "triangle",
       "gainAttack": 0.001,
       "gainDecay": 0.1,
@@ -2134,7 +2134,7 @@
       "reverbAmount": 0.22
     },
     "Studio Concert": {
-      "masterVolume": 1.3,
+      "masterVolume": 0.565,
       "vcoType": "triangle",
       "gainAttack": 0.001,
       "gainDecay": 0.1,
@@ -2230,7 +2230,7 @@
       "reverbAmount": 0.22
     },
     "Glass Grand v2": {
-      "masterVolume": 1.3,
+      "masterVolume": 0.603,
       "vcoType": "triangle",
       "gainAttack": 0.001,
       "gainDecay": 0.1,
@@ -2254,7 +2254,7 @@
       "reverbAmount": 0.22
     },
     "House Piano": {
-      "masterVolume": 1.3,
+      "masterVolume": 0.71,
       "vcoType": "triangle",
       "gainAttack": 0.001,
       "gainDecay": 0.1,
@@ -2278,7 +2278,7 @@
       "reverbAmount": 0.22
     },
     "Ravel": {
-      "masterVolume": 1.3,
+      "masterVolume": 0.614,
       "vcoType": "triangle",
       "gainAttack": 0.001,
       "gainDecay": 0.1,
@@ -2413,7 +2413,7 @@
       "reverbAmount": 0.45
     },
     "Measured Breathy Choir": {
-      "masterVolume": 0.65,
+      "masterVolume": 0.437,
       "vcoType": "triangle",
       "voiceCount": 3,
       "detuneSpread": 10,
@@ -2711,7 +2711,7 @@
       "reverbAmount": 0.5
     },
     "Wind Pad": {
-      "masterVolume": 0.7,
+      "masterVolume": 1.58,
       "vcoType": "sine",
       "noiseType": "brown",
       "noiseMix": 0.7,

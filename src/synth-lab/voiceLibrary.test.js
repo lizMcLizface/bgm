@@ -26,6 +26,7 @@ test('three new soundscapes retain native voices through setup export/import',()
 });
 
 test('Soft Pipes has a useful audition level without changing the parallel-drawbar voice',()=>{
- const pipes=WASM_VOICES.find(v=>v.id==='soft-pipes');expect(pipes.patch.global.gain).toBe(.35);expect(pipes.metadata.masterVolume).toBe(.35);
+ const pipes=WASM_VOICES.find(v=>v.id==='soft-pipes');// the audition level now comes from the level pass (library/levelTrims.json), never below the original .35
+ expect(pipes.patch.global.gain).toBeGreaterThanOrEqual(.35);expect(pipes.patch.global.gain).toBeLessThanOrEqual(.8);expect(pipes.metadata.masterVolume).toBe(pipes.patch.global.gain);
  expect(pipes.patch.global.index).toBe(.25);expect(pipes.patch.operators.every(o=>o.attack===.08&&o.release===.55)).toBe(true);
 });

@@ -63,7 +63,7 @@ const presetData = {
         osc2PhaseOffset: 0,
     },
     'Dreary': {
-        masterVolume: 0.75,
+        masterVolume: 1.814,
         polyphony: 8,
         portamentoSpeed: 0,
         masterFilterType: 'lowpass',
@@ -117,7 +117,7 @@ const presetData = {
         osc2PhaseOffset: 0,
     },
     'Happy Little Squares': {
-        masterVolume: 0.75,
+        masterVolume: 1.68,
         polyphony: 1,
         portamentoSpeed: 0,
         masterFilterType: 'lowpass',
@@ -171,7 +171,7 @@ const presetData = {
         osc2PhaseOffset: 0,
     },
     'LoFi Space': {
-        masterVolume: 0.75,
+        masterVolume: 1.884,
         polyphony: 8,
         portamentoSpeed: 0,
         masterFilterType: 'lowpass',
@@ -387,7 +387,7 @@ const presetData = {
         osc2PhaseOffset: 0,
     },
     'Analog': {
-        masterVolume: 0.75,
+        masterVolume: 1.286,
         polyphony: 4,
         portamentoSpeed: 0,
         masterFilterType: 'lowpass',

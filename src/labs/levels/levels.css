@@ -43,3 +43,19 @@
 .lv-export { margin-left:16px; display:inline-flex; gap:6px; vertical-align:middle; }
 .lv-export button { font-size:12px; padding:3px 10px; }
 .lv-x span.stale { font-style:italic; opacity:.7; }
+
+.lv-summary { margin:6px 0 20px; border:1px solid var(--gen-border); border-radius:8px; padding:8px 12px; background:var(--gen-surface); }
+.lv-summary summary { cursor:pointer; font-size:13px; color:var(--gen-muted); }
+.lv-summary-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(430px,1fr)); gap:18px 28px; margin-top:10px; }
+.lv-summary table { border-collapse:collapse; font-size:12px; width:100%; }
+.lv-summary caption { text-align:left; font-weight:600; font-size:13px; padding-bottom:4px; }
+.lv-summary th { text-align:right; font-weight:500; color:var(--gen-muted); padding:2px 6px; }
+.lv-summary th:first-child, .lv-summary td:first-child { text-align:left; }
+.lv-summary td { padding:2px 6px; text-align:right; font-variant-numeric:tabular-nums; border-top:1px solid var(--gen-border); position:relative; }
+.lv-summary td i { position:absolute; left:0; bottom:0; height:2px; background:var(--gen-accent); opacity:.7; }
+.lv-summary td.off { color:#e0925a; font-weight:600; }
+
+.lv-resp tr.none td:first-child { color:#e0705a; font-weight:600; }
+.lv-resp tr.weak td:first-child { color:#e0a35a; }
+.lv-resp td.off { color:#e0a35a; font-weight:600; }
+.lv-resp tr.none td.off { color:#e0705a; }

@@ -23,12 +23,12 @@ test('rejected grooves retain the preferred originals; experiments still resolve
  expect(BROWSABLE_SCENES.filter(s=>sceneSettings(s,42).drums.style==='broken').map(s=>s.name)).toEqual(['Tape memories']);
 });
 test('Late-night brushes uses audible Soft Pipes; Desert dusk holds chords for a shorter cycle',()=>{
- const night=sceneBySlug('Late-night brushes');expect(night.voices.lead).toBe('Wasm Soft Pipes');expect(night.settings.volumes.lead).toBe(.5);expect(sceneUsesWasm(night)).toBe(true);
+ const night=sceneBySlug('Late-night brushes');expect(night.voices.lead).toBe('Wasm Soft Pipes');expect(night.settings.volumes.lead).toBe(.073);expect(sceneUsesWasm(night)).toBe(true);
  const desert=sceneSettings(sceneBySlug('Desert dusk'),42),old=sceneSettings(sceneComparison(revisions.find(s=>s.comparisonOf==='Desert dusk')),42);
  expect(desert.barsPerChord).toBeLessThan(old.barsPerChord);expect(desert.sections.phrases).toBeLessThan(old.sections.phrases);
  expect(desert.bpm).toBe(old.bpm);expect(desert.drums.kit).toBe('hand');
  const drive=sceneSettings(sceneBySlug('Night drive'),42);expect(drive.drums.style).toBe('lofi');expect(drive.drums.kit).toBe('tr808');expect(drive.drumKit.kick.level).toBe(.55);
- expect(sceneBySlug('Tine and Tide').settings.volumes.counter).toBe(.13);
+ expect(sceneBySlug('Tine and Tide').settings.volumes.counter).toBe(.019);
 });
 test('Sounds applies the kit without changing the beat; Composition retains kit and balances',()=>{
  const old=sceneSettings(sceneBySlug('rainy-cafe'),42),next=sceneSettings(revisions.find(s=>s.settings.drums.kit==='hand'),42);
