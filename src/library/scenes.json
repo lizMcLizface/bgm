@@ -1161,7 +1161,7 @@
         "volumes": {
           "pad": 1,
           "bass": 0.4,
-          "lead": 0.39,
+          "lead": 0.59,
           "counter": 0.28,
           "perc": 0.29
         },
