@@ -325,12 +325,12 @@ export const AudioMenu = ({ generator, onReload, children }) => {
 };
 
 /** The ⚙ options menu: sharing, a phrase, the sleep timer and saving audio (children), MIDI, starting over with only the basics. */
-export const SettingsMenu = ({ link, viewLink, saving, phrase, onStartOver, smooth, intro, generation, onTour, midi, children }) => {
+export const SettingsMenu = ({ link, saving, phrase, onStartOver, smooth, intro, generation, onTour, midi, children }) => {
     const menu = useRef(null);
     useDismiss(menu);
-    const [copied, setCopied] = useState(''), [withView, setWithView] = useState(false);
-    const copy = async () => {
-        const url = link(withView);
+    const [copied, setCopied] = useState('');
+    const copy = async (withViewSettings = false) => {
+        const url = link(withViewSettings);
         try {
             await navigator.clipboard.writeText(url);
             setCopied('Link copied.');
@@ -347,13 +347,11 @@ export const SettingsMenu = ({ link, viewLink, saving, phrase, onStartOver, smoo
             <div className="gen-settings-menu">
                 <section className="gen-menu-section">
                     <h3>Share</h3>
-                    <button type="button" className="gen-menu-wide" onClick={copy}><LinkIcon /> Copy link to this music</button>
-                    {viewLink && (
-                        <label className="gen-check">
-                            <input type="checkbox" checked={withView} onChange={(e) => setWithView(e.target.checked)} />
-                            Open it in this view: {viewLink.label}
-                        </label>
-                    )}
+                    <button type="button" className="gen-menu-wide" onClick={() => copy()}><LinkIcon /> Copy link to this music</button>
+                    <button type="button" className="gen-menu-wide" onClick={() => copy(true)}
+                        title="The music's settings and how the page looks (background, minimal view, pattern blocks), without the exact take: whoever opens it hears a fresh variation">
+                        <LinkIcon /> Copy music + view settings
+                    </button>
                     {copied && <small role="status">{copied}</small>}
                 </section>
                 {phrase}

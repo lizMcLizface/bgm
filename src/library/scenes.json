@@ -2544,7 +2544,7 @@
           "pad": 0.76,
           "bass": 0.75,
           "lead": 0.66,
-          "counter": 0.48,
+          "counter": 0.78,
           "perc": 0.5
         },
         "breakdowns": {
@@ -2559,7 +2559,7 @@
         "pad": "Arp Pluck",
         "bass": "Drive Bass",
         "lead": "Signal Lead",
-        "counter": "Heroic Strings"
+        "counter": "Warm Square Lead"
       },
       "rulebook": {
         "version": 1,

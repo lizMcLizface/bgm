@@ -1293,7 +1293,7 @@ const GenerativeApp = () => {
     const setPatternOption = (id, patch) => setPatternOptions({ ...patternOptions, [id]: { ...patternOptions[id], ...patch } });
     // The link's extra: open in this background with the interface hidden and these patterns showing.
     const viewParam = backdropMode === 'scenery' ? 'landscape' : backdropMode === 'fluid' ? 'fluid' : null;
-    const withThisView = (url) => withPatterns(withView(url, { view: viewParam }), patternsParam({ piano: showPiano, guitar: showGuitar, bass: showBass }, patternOptions,
+    const withThisView = (url) => withPatterns(viewParam ? withView(url, { view: viewParam }) : url, patternsParam({ piano: showPiano, guitar: showGuitar, bass: showBass }, patternOptions,
         (id, anchor) => { const strings = INSTRUMENTS[id].strings, anchors = anchorStrings(strings); return stringLetter(strings, anchors.includes(anchor) ? anchor : anchors[0]); }));
     const patterns = { piano: showPiano, guitar: showGuitar, bass: showBass };
     const setPattern = (id, on) => ({ piano: setShowPiano, guitar: setShowGuitar, bass: setShowBass })[id](on);
@@ -1571,9 +1571,14 @@ const GenerativeApp = () => {
                     <AudioMenu generator={gen} onReload={reloadKeepingSettings}>
                         <WasmOptions engine={audioEngine} perf={{ onToggle: togglePerfMode }} />
                     </AudioMenu>
-                    <SettingsMenu midi={{ connect: live.connectMidi, status: live.midiStatus }} link={(withView) => { // a built-in preset playing as it is stays its name (?preset=...), as in the address bar, rather than its expanded settings
-                        const base = presetSlug ? `${window.location.origin}${window.location.pathname}?preset=${presetSlug}` : shareUrl(gen.settings, linkPresets);
-                        const url = withBook(withGeneration(withIntro(base, shortIntro), generationChoice), bookRef.current, presetSlug ? sceneBySlug(presetSlug)?.rulebook : undefined); return withView && viewParam ? withThisView(url) : url; }} viewLink={viewParam ? { label: `${viewParam === 'landscape' ? 'Landscape' : 'Fluid'} view${showPiano || showGuitar || showBass ? ' with the patterns' : ''}` } : null} generation={{ value: generationChoice, onChange: chooseGeneration }} saving={saving} onStartOver={startOver} smooth={{ value: smoothPresets, onChange: setSmoothPresets }} intro={{ value: shortIntro, onChange: setShortIntro }} onTour={() => openTour(false)}
+                    <SettingsMenu midi={{ connect: live.connectMidi, status: live.midiStatus }} link={(withViewSettings) => {
+                        // a built-in preset playing as it is stays its name (?preset=...), as in the address bar, rather than its expanded settings.
+                        // "music + view" is the music's settings without the seed (a fresh take, not this exact one) with the view and patterns
+                        const base = presetSlug ? `${window.location.origin}${window.location.pathname}?preset=${presetSlug}`
+                            : withViewSettings ? `${window.location.origin}${sharePath(gen.settings, linkPresets, window.location, { seed: false })}` : shareUrl(gen.settings, linkPresets);
+                        const url = withBook(withGeneration(withIntro(base, shortIntro), generationChoice), bookRef.current, presetSlug ? sceneBySlug(presetSlug)?.rulebook : undefined);
+                        return withViewSettings ? withThisView(url) : url;
+                    }}
                         phrase={<PhraseField seed={settings.seed} edited={gen.editedSinceStart} onApply={playPhrase} onRoll={newVariation} initial={linkedPhrase} />}>
                         <SleepTimer generator={gen} running={anyOn} onLeft={setSleepLeft} />
                         <Recorder generator={gen} fileName={fileName} onProgress={setSaving} />
