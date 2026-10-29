@@ -14,6 +14,7 @@
     "synth:build": "node tools/buildSynth.mjs",
     "synth:check": "node tools/buildSynth.mjs --check",
     "synth:profile-build": "node tools/buildSynthProfile.mjs",
+    "levels:measure": "node tools/measureLevels.mjs",
     "audit:synth-profile": "node tools/profileSynth.mjs",
     "audit:worklet-profile": "node tools/profileWorklet.mjs",
     "audit:playback-profile": "node tools/profilePlayback.mjs",

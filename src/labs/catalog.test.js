@@ -1,4 +1,4 @@
-import {PRESET_CATEGORIES} from '../app/presets';
+import {PRESET_CATEGORIES,HIDDEN_PRESETS} from '../app/presets';
 import presetData from '../util/presetData';
 import {RECIPES} from '../synth-lab/patch';
 import {FM_RECIPES} from '../synth-lab/fmPatch';
@@ -6,7 +6,7 @@ import {PROCEDURAL_RECIPES} from '../synth-lab/proceduralPatch';
 import {FAMILIES,LAB_VOICES,libraryVoice,voiceById,voiceSpec,voiceEngine,voiceLabel,voiceMetadata} from './catalog';
 
 it('exposes every built-in calmbgm/unCAGED instrument and every new synth/FM recipe',()=>{
- for(const group of [...Object.values(PRESET_CATEGORIES),presetData])for(const name of Object.keys(group))if(name!=='- INIT -')expect(libraryVoice(name),name).toBeDefined();
+ for(const group of [...Object.values(PRESET_CATEGORIES),presetData])for(const name of Object.keys(group))if(name!=='- INIT -'&&!HIDDEN_PRESETS.has(name))expect(libraryVoice(name),name).toBeDefined();
  for(const recipe of [...RECIPES,...FM_RECIPES,...PROCEDURAL_RECIPES.filter(p=>p.family!=='drums')])expect(LAB_VOICES.some(v=>v.sourceRecipe===recipe.name),recipe.name).toBe(true);
  expect(new Set(LAB_VOICES.map(v=>v.id)).size).toBe(LAB_VOICES.length);for(const [family]of FAMILIES)expect(LAB_VOICES.some(v=>v.family===family),family).toBe(true);
 });

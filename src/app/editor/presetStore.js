@@ -16,7 +16,7 @@
 // localStorage can be unavailable (private mode, blocked storage); every
 // access is guarded and the page works without it.
 
-import { PRESET_CATEGORIES } from '../presets';
+import { PRESET_CATEGORIES, HIDDEN_PRESETS } from '../presets';
 import presetData from '../../util/presetData';
 import PRESET_DEFAULTS from '../engine/presetDefaults';
 
@@ -67,12 +67,13 @@ export function sanitizePreset(raw) {
 /**
  * Every preset by group, for pickers.
  * @param {string} [first] - a category to list first (a role's own)
+ * @param {boolean} [includeHidden] - keep presets withheld from the pickers (lookups need them)
  * @returns {Array<{ group: string, editable: boolean, presets: object }>}
  */
-export function presetGroups(first) {
+export function presetGroups(first, includeHidden = false) {
     const builtIn = Object.fromEntries(Object.entries(presetData).filter(([name]) => name !== '- INIT -'));
     const categories = Object.entries(PRESET_CATEGORIES)
-        .map(([group, presets]) => ({ group, editable: false, presets }))
+        .map(([group, presets]) => ({ group, editable: false, presets: includeHidden ? presets : Object.fromEntries(Object.entries(presets).filter(([name]) => !HIDDEN_PRESETS.has(name))) }))
         .sort((a, b) => (b.group === first) - (a.group === first));
     return [
         ...categories,
@@ -86,7 +87,7 @@ export function presetGroups(first) {
 
 /** Looks a preset up by name, user presets winning over built-ins. */
 export function findPreset(name) {
-    const groups = presetGroups().reverse();
+    const groups = presetGroups(undefined, true).reverse();
     const hit = groups.find(({ presets }) => name in presets);
     return hit ? hit.presets[name] : null;
 }

@@ -21,7 +21,7 @@
       "eqHighGain": -4
     },
     "Warm Strings": {
-      "masterVolume": 0.71,
+      "masterVolume": 0.45,
       "vcoType": "sawtooth",
       "voiceCount": 5,
       "detuneSpread": 9,
@@ -110,7 +110,7 @@
       "reverbAmount": 0.5
     },
     "Swelling Analog": {
-      "masterVolume": 0.61,
+      "masterVolume": 0.26,
       "vcoType": "square",
       "voiceCount": 4,
       "detuneSpread": 15,
@@ -438,7 +438,7 @@
       "gainAttack": 0.45,
       "gainDecay": 0.8,
       "gainSustain": 0.75,
-      "gainRelease": 1.4,
+      "gainRelease": 0.7,
       "filterType": "lowpass",
       "filterFreq": 1200,
       "filterQ": 3,
@@ -453,7 +453,8 @@
       "pingPongFeedback": 0.35,
       "pingPongAmount": 0.18,
       "reverbType": "reverb6",
-      "reverbAmount": 0.5
+      "reverbAmount": 0.35,
+      "reverbDecay": 4
     },
     "Neon Saw Pad": {
       "masterVolume": 0.5,
@@ -918,13 +919,16 @@
       "gainAttack": 0.05,
       "gainDecay": 0.4,
       "gainSustain": 0.6,
-      "gainRelease": 0.6,
+      "gainRelease": 0.5,
       "chorusAmount": 0.2,
       "delayTime": 0.5,
-      "delayFeedback": 0.4,
-      "delayAmount": 0.25,
+      "delayFeedback": 0.25,
+      "delayAmount": 0.18,
+      "eqHighGain": -3,
       "reverbType": "reverb4",
-      "reverbAmount": 0.35
+      "reverbAmount": 0.28,
+      "reverbDecay": 4,
+      "reverbDamping": 2200
     },
     "Clarinet Lead": {
       "masterVolume": 0.51,
@@ -1221,10 +1225,13 @@
       "gainSustain": 0.55,
       "gainRelease": 0.7,
       "filterType": "lowpass",
-      "filterFreq": 1800,
-      "filterQ": 6,
-      "filterLfoRate": 0.25,
-      "filterLfoDepth": 1200,
+      "filterFreq": 900,
+      "filterQ": 4,
+      "filterEnvAmount": 2600,
+      "filterDecay": 1.1,
+      "filterRelease": 0.7,
+      "filterLfoRate": 0.15,
+      "filterLfoDepth": 450,
       "pingPongDelayTime": 0.375,
       "pingPongFeedback": 0.45,
       "pingPongAmount": 0.3,
@@ -2436,7 +2443,7 @@
       "gainHoldLevel": 0.22,
       "gainDecay": 1.9,
       "gainSustain": 1,
-      "gainRelease": 1.15,
+      "gainRelease": 0.5,
       "filterType": "lowpass",
       "filterFreq": 2400,
       "filterQ": 1,
@@ -2447,7 +2454,8 @@
       "envelopeDecayShape": "logarithmic",
       "envelopeDecayExponent": 2,
       "reverbType": "reverb4",
-      "reverbAmount": 0.2
+      "reverbAmount": 0.2,
+      "reverbDecay": 3.5
     },
     "Measured Horn": {
       "masterVolume": 0.55,
@@ -2457,7 +2465,7 @@
       "gainHoldLevel": 0.28,
       "gainDecay": 1.9,
       "gainSustain": 1,
-      "gainRelease": 1.1,
+      "gainRelease": 0.6,
       "filterType": "lowpass",
       "filterFreq": 900,
       "filterQ": 1,
@@ -2468,7 +2476,8 @@
       "envelopeDecayShape": "logarithmic",
       "envelopeDecayExponent": 2,
       "reverbType": "reverb4",
-      "reverbAmount": 0.2
+      "reverbAmount": 0.2,
+      "reverbDecay": 3.5
     },
     "Measured Brass": {
       "masterVolume": 0.5,
@@ -2481,7 +2490,7 @@
       "gainHoldLevel": 0.35,
       "gainDecay": 1.6,
       "gainSustain": 1,
-      "gainRelease": 1.2,
+      "gainRelease": 0.5,
       "filterType": "lowpass",
       "filterFreq": 1200,
       "filterQ": 1,
@@ -2492,7 +2501,8 @@
       "envelopeDecayShape": "logarithmic",
       "envelopeDecayExponent": 2,
       "reverbType": "reverb4",
-      "reverbAmount": 0.2
+      "reverbAmount": 0.2,
+      "reverbDecay": 3.5
     },
     "Measured Clarinet": {
       "masterVolume": 0.55,
@@ -2502,10 +2512,10 @@
       "gainHoldLevel": 0.35,
       "gainDecay": 1.2,
       "gainSustain": 1,
-      "gainRelease": 1.3,
+      "gainRelease": 0.35,
       "filterType": "lowpass",
-      "filterFreq": 2200,
-      "filterQ": 1,
+      "filterFreq": 2000,
+      "filterQ": 0.4,
       "filterKeyTrack": 0,
       "filterVelocity": 150,
       "vibratoDepth": 3.5,
@@ -2513,7 +2523,8 @@
       "envelopeDecayShape": "logarithmic",
       "envelopeDecayExponent": 2,
       "reverbType": "reverb4",
-      "reverbAmount": 0.2
+      "reverbAmount": 0.15,
+      "reverbDecay": 3.5
     },
     "Measured Flute": {
       "masterVolume": 0.55,
@@ -2523,7 +2534,7 @@
       "gainHoldLevel": 0.2,
       "gainDecay": 3.5,
       "gainSustain": 1,
-      "gainRelease": 0.9,
+      "gainRelease": 0.5,
       "filterType": "lowpass",
       "filterFreq": 1200,
       "filterQ": 1,
@@ -2536,7 +2547,8 @@
       "envelopeDecayShape": "logarithmic",
       "envelopeDecayExponent": 2,
       "reverbType": "reverb4",
-      "reverbAmount": 0.2
+      "reverbAmount": 0.2,
+      "reverbDecay": 3.5
     },
     "Measured Violin": {
       "masterVolume": 0.5,
@@ -2637,7 +2649,7 @@
       "reverbAmount": 0.3
     },
     "Measured Epic Strings": {
-      "masterVolume": 0.6,
+      "masterVolume": 0.38,
       "vcoType": "sawtooth",
       "filterType": "lowpass",
       "filterQ": 0.8,

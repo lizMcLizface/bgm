@@ -14,7 +14,7 @@ test('profiling fixtures isolate colour, voice/lane counts and prolonged curve c
 test('native fixtures preserve full source quality, chorus/layers and independent colour controls',()=>{
  const choir=fixture('fm-choir'),dry=fixture('fm-choir-dry-colour'),rosin=fixture('core-rosin'),noir=fixture('core-noir'),chorus=fixture('core-chorus');
  expect(choir.voices).toBe(8);expect(choir.patch.global.quality).toBe(1);expect(choir.patch.global.formant).toBe(.85);expect(dry.patch.global.formant).toBe(0);expect(dry.patch.operators).toEqual(choir.patch.operators);expect(dry.notes).toEqual(choir.notes);
- expect(rosin.patch.layers[0].body).toBe(.65);expect(noir.patch.global.model).toBe(2);expect(chorus.patch.global.chorus).toBe(.65);expect(fixture('core-organ-wave').patch.layers[0].waveA).toBe(5);
+ expect(rosin.patch.layers[0].body).toBe(.8);expect(noir.patch.global.model).toBe(2);expect(chorus.patch.global.chorus).toBe(.65);expect(fixture('core-organ-wave').patch.layers[0].waveA).toBe(5);
  dry.patch.operators[0].ratio=17;expect(fixture('fm-choir').patch.operators[0].ratio).not.toBe(17);
 });
 test('direct render loops preserve partial blocks and continuous input at 128 / 2048 frames',()=>{

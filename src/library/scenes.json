@@ -1585,11 +1585,11 @@
           "swell": 0.055
         },
         "volumes": {
-          "pad": 0.76,
-          "bass": 0.75,
-          "lead": 0.66,
-          "counter": 0.48,
-          "perc": 0.5
+          "pad": 1,
+          "bass": 0.42,
+          "lead": 0.37,
+          "counter": 0.27,
+          "perc": 0.28
         },
         "chordColour": {
           "mode": "add9",
@@ -9460,11 +9460,11 @@
           "swell": 0.08
         },
         "volumes": {
-          "pad": 0.78,
-          "bass": 0.73,
-          "lead": 0.62,
-          "counter": 0.48,
-          "perc": 0.44
+          "pad": 1,
+          "bass": 0.59,
+          "lead": 0.5,
+          "counter": 0.39,
+          "perc": 0.36
         },
         "ambienceVolume": 0.72
       },
@@ -9935,11 +9935,11 @@
           "swell": 0.08
         },
         "volumes": {
-          "pad": 0.78,
-          "bass": 0.73,
-          "lead": 0.62,
-          "counter": 0.48,
-          "perc": 0.44
+          "pad": 1,
+          "bass": 0.59,
+          "lead": 0.5,
+          "counter": 0.39,
+          "perc": 0.36
         },
         "ambienceVolume": 0.72
       },
@@ -11307,9 +11307,9 @@
           "style": "off"
         },
         "volumes": {
-          "pad": 0.64,
-          "bass": 0.54,
-          "lead": 0.55,
+          "pad": 1,
+          "bass": 0.53,
+          "lead": 0.54,
           "counter": 0.42,
           "perc": 0.4
         },
@@ -11475,7 +11475,7 @@
           "style": "off"
         },
         "volumes": {
-          "pad": 0.4,
+          "pad": 0.63,
           "bass": 0.44,
           "lead": 0.62,
           "counter": 0.26,
@@ -12630,8 +12630,8 @@
           "swell": 0.08
         },
         "volumes": {
-          "pad": 0.5,
-          "lead": 0.6,
+          "pad": 0.11,
+          "lead": 0.24,
           "counter": 0.24,
           "bass": 0.34,
           "perc": 0.2
@@ -12719,7 +12719,7 @@
           "pad": 0.55,
           "lead": 0.52,
           "counter": 0.13,
-          "bass": 0.42,
+          "bass": 0.27,
           "perc": 0.2
         },
         "drums": {
@@ -12856,7 +12856,7 @@
           "pad": 0.38,
           "lead": 0.55,
           "counter": 0.22,
-          "bass": 0.44,
+          "bass": 0.28,
           "perc": 0.28
         },
         "drums": {
@@ -13790,11 +13790,11 @@
           "swell": 0.055
         },
         "volumes": {
-          "pad": 0.76,
-          "bass": 0.75,
-          "lead": 0.66,
-          "counter": 0.48,
-          "perc": 0.5
+          "pad": 1,
+          "bass": 0.42,
+          "lead": 0.37,
+          "counter": 0.27,
+          "perc": 0.28
         },
         "chordColour": {
           "mode": "add9",
@@ -14306,7 +14306,7 @@
           "pad": 0.55,
           "lead": 0.52,
           "counter": 0.13,
-          "bass": 0.42,
+          "bass": 0.27,
           "perc": 0.2
         },
         "drums": {
@@ -14447,7 +14447,7 @@
           "pad": 0.38,
           "lead": 0.55,
           "counter": 0.22,
-          "bass": 0.44,
+          "bass": 0.28,
           "perc": 0.28
         },
         "drums": {
@@ -14937,11 +14937,11 @@
           "swell": 0.055
         },
         "volumes": {
-          "pad": 0.76,
-          "bass": 0.75,
-          "lead": 0.66,
-          "counter": 0.48,
-          "perc": 0.5
+          "pad": 1,
+          "bass": 0.42,
+          "lead": 0.37,
+          "counter": 0.27,
+          "perc": 0.28
         },
         "chordColour": {
           "mode": "add9",
@@ -15019,11 +15019,11 @@
           "swell": 0.055
         },
         "volumes": {
-          "pad": 0.76,
-          "bass": 0.75,
-          "lead": 0.66,
-          "counter": 0.48,
-          "perc": 0.5
+          "pad": 1,
+          "bass": 0.42,
+          "lead": 0.37,
+          "counter": 0.27,
+          "perc": 0.28
         },
         "chordColour": {
           "mode": "add9",
@@ -15307,7 +15307,7 @@
           "pad": 0.38,
           "lead": 0.55,
           "counter": 0.22,
-          "bass": 0.44,
+          "bass": 0.28,
           "perc": 0.28
         },
         "drums": {
@@ -15563,11 +15563,11 @@
         "ducking": 1,
         "evenLoudness": 1,
         "volumes": {
-          "pad": 0.7,
-          "bass": 0.45,
-          "lead": 0.7,
-          "counter": 0.3,
-          "perc": 0.5
+          "pad": 1,
+          "bass": 0.41,
+          "lead": 0.63,
+          "counter": 0.27,
+          "perc": 0.45
         },
         "bassWeights": {
           "whole": 50,
@@ -16772,7 +16772,7 @@
           "lead": 1,
           "counter": 0.4,
           "pad": 0.58,
-          "bass": 0.78,
+          "bass": 0.32,
           "perc": 0.38
         },
         "padMotion": {
@@ -16864,7 +16864,7 @@
           "lead": 0.73,
           "counter": 0.4,
           "pad": 0.98,
-          "bass": 0.78,
+          "bass": 0.32,
           "perc": 0.38
         },
         "padMotion": {
