@@ -38,3 +38,10 @@ it('passes poly aftertouch and the soft pedal only to pages that ask for them',(
  m.message([161,60,127],'piano');expect(polyPressure).toHaveBeenCalledWith('midi:piano:1:60',1);
  m.message([176,67,127],'piano');expect(soft).toHaveBeenCalledWith(1);
 });
+it('steps through voices with , and . without playing a note, and not while typing',()=>{
+ const on=vi.fn(),cycleVoice=vi.fn(),cleanup=bindLabKeyboard(window,{on,off:vi.fn(),panic:vi.fn(),cycleVoice});
+ const press=(code,target=window)=>target.dispatchEvent(new KeyboardEvent('keydown',{code,bubbles:true,cancelable:true}));
+ press('Comma');press('Period');expect(cycleVoice.mock.calls).toEqual([[-1],[1]]);expect(on).not.toHaveBeenCalled();
+ const field=document.createElement('input');document.body.append(field);press('Period',field);expect(cycleVoice).toHaveBeenCalledTimes(2);
+ cleanup();
+});

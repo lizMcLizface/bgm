@@ -13,9 +13,12 @@ export function VoiceBadges({voice,engine}){
   {notes.length>0&&<small className="lab-mapping-note">Approximation: {notes.join(' · ')}.</small>}
  </span>;
 }
+const matchesQuery=(v,query,currentId)=>v.id===currentId||`${v.family} ${v.name} ${v.origin} ${availabilityLabel(v)} ${v.isNew?'new':''}`.toLowerCase().includes(query.toLowerCase());
+// The ids in dropdown order, so the step-through hotkey visits exactly what the list shows.
+export const visibleVoiceIds=(query,currentId)=>FAMILIES.flatMap(([id])=>voicesFor(id).filter(v=>matchesQuery(v,query,currentId)).map(v=>v.id));
 export default function LabTrack({role,name,source,armed,enabled,active,root,chord,query='',onVoice,onEngine,onArm,onToggle}){
  const voice=voiceById(source.id),engine=voiceEngine(voice,source.engine);
- const match=v=>v.id===source.id||`${v.family} ${v.name} ${v.origin} ${availabilityLabel(v)} ${v.isNew?'new':''}`.toLowerCase().includes(query.toLowerCase());
+ const match=v=>matchesQuery(v,query,source.id);
  return <article className={'lab-track role-'+role+(armed?' selected':'')}>
   <div><label className="lab-check"><input aria-label={'Hear '+name} type="checkbox" checked={enabled} onChange={e=>onToggle(role,e.target.checked)}/>{name}</label><button aria-pressed={armed} onClick={()=>onArm(role)}>Play this</button></div>
   <small className="lab-part-source">{armed?'Voice under test':'Context instrument'}</small>
