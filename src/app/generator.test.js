@@ -1679,3 +1679,69 @@ describe('generated progressions', () => {
         expect(penta.length).toBe(32);
     });
 });
+
+test('the step sequencer replaces the generated drums and each chord slot plays its own stage', () => {
+    const sequencer = { on: true, machine: 'tr808', arrangement: 'warehouse-shift', edits: {}, slots: [4, 1, 1, 1] };
+    const settings = { ...defaultSettings(), seed: 7, barsPerChord: 1, progression: 0, sections: { mode: 'off', phrases: 2 }, drums: { ...defaultSettings().drums, style: 'electro' } };
+    const plain = new Generator(settings).planner(), seq = new Generator({ ...settings, sequencer }).planner();
+    for (let bar = 0; bar < 8; bar++) { plain.planBar(bar); seq.planBar(bar); }
+    const perc = (p, bar) => p.plan.get(bar).events.filter((e) => e.role === 'perc');
+    expect(perc(plain, 0).every((e) => e.track === undefined)).toBe(true);
+    // chord slot 0 plays Breakdown (no kick), slot 1 the Groove (a kick on every beat), exactly, and the cycle repeats
+    expect(perc(seq, 0).some((e) => e.track === 'bd')).toBe(false);
+    expect(perc(seq, 1).filter((e) => e.track === 'bd').map((e) => e.beat)).toEqual([0, 1, 2, 3]);
+    expect(perc(seq, 4).some((e) => e.track === 'bd')).toBe(false);
+    expect(perc(seq, 5).filter((e) => e.track === 'bd')).toHaveLength(4);
+});
+
+test('with lanes on, the chords and bass are stabs from the sequencer rows; off, the arranged parts remain', () => {
+    const sequencer = { on: true, machine: 'tr808', arrangement: 'warehouse-shift', edits: {}, slots: [1], lanes: true, gate: 0.2, pump: 0.5 };
+    const settings = { ...defaultSettings(), seed: 7, barsPerChord: 1, progression: 0, sections: { mode: 'off', phrases: 2 } };
+    const lanes = new Generator({ ...settings, sequencer }).planner(), arranged = new Generator({ ...settings, sequencer: { ...sequencer, lanes: false } }).planner();
+    lanes.planBar(2); arranged.planBar(2);
+    const pads = lanes.plan.get(2).events.filter((e) => e.role === 'pad');
+    expect(pads.length).toBeGreaterThan(0);
+    expect(pads.every((e) => e.length === 0.2 && [0.5, 1.5, 2.5, 3.5].includes(e.beat))).toBe(true);
+    expect(lanes.plan.get(2).events.filter((e) => e.role === 'bass').length).toBeGreaterThan(4);
+    expect(arranged.plan.get(2).events.some((e) => e.role === 'pad' && e.length !== 0.2)).toBe(true);
+});
+
+test('a bar on a stage with effect moves records where in its chord it falls', () => {
+    const sequencer = { on: true, machine: 'tr808', arrangement: 'warehouse-shift', edits: {}, slots: [5], lanes: false, gate: 0.2, pump: 0.5, fills: false, moves: { 5: [{ key: 'inserts.phaser', from: 0, to: 0.6 }] } };
+    const g = new Generator({ ...defaultSettings(), seed: 7, barsPerChord: 2, progression: 0, sections: { mode: 'off', phrases: 2 }, sequencer }).planner();
+    g.planBar(2);
+    expect(g.plan.get(2).seqMotion).toEqual({ stage: 5, start: 2, bars: 2 });
+});
+
+test('with glide set, a bar of the bass line carries slides from the previous note', () => {
+    const settings = { ...defaultSettings(), seed: 11, barsPerChord: 1, progression: 0, sections: { mode: 'off', phrases: 2 }, bassWeights: { whole: 0, half: 0, walking: 100, drive: 0 } };
+    const plain = new Generator(settings).planner(), glide = new Generator({ ...settings, portamento: { lead: 0, counter: 0, bass: 0.8 } }).planner();
+    for (let bar = 0; bar < 4; bar++) { plain.planBar(bar); glide.planBar(bar); }
+    const slides = (p) => [0, 1, 2, 3].flatMap((bar) => p.plan.get(bar).events).filter((e) => e.role === 'bass' && Number.isFinite(e.expression?.slideFromMidi));
+    expect(slides(plain)).toHaveLength(0);
+    expect(slides(glide).length).toBeGreaterThan(0);
+});
+
+test('with sections, effect moves run across the whole section and the kick cuts only on its last bar', () => {
+    const sequencer = { on: true, machine: 'tr808', arrangement: 'warehouse-shift', edits: {}, slots: [5], lanes: false, gate: 0.2, pump: 0.5, fills: false, sectionBars: 8, moves: { 5: [{ key: 'inserts.phaser', from: 0, to: 0.6 }] } };
+    const g = new Generator({ ...defaultSettings(), seed: 7, barsPerChord: 1, progression: 0, sections: { mode: 'off', phrases: 2 }, sequencer }).planner();
+    for (let bar = 0; bar < 9; bar++) g.planBar(bar);
+    expect(g.plan.get(3).seqMotion).toEqual({ stage: 5, start: 0, bars: 8 });
+    expect(g.plan.get(8).seqMotion).toEqual({ stage: 5, start: 8, bars: 8 });
+    const kicks = (bar) => g.plan.get(bar).events.filter((e) => e.track === 'bd').length;
+    expect(kicks(6)).toBeGreaterThan(0);
+    expect(kicks(7)).toBe(0);
+});
+
+test('every sequencer preset plans a long stretch of exact drums with finite notes', async () => {
+    const { SCENES, sceneSettings } = await import('./scenes');
+    const presets = SCENES.filter((s) => s.settings.sequencer?.on);
+    expect(presets.length).toBeGreaterThanOrEqual(13);
+    for (const scene of presets) {
+        const p = new Generator(sceneSettings(scene, 5)).planner();
+        for (let bar = 0; bar < 40; bar++) p.planBar(bar);
+        const events = [...Array(40).keys()].flatMap((bar) => p.plan.get(bar).events);
+        expect(events.filter((e) => e.role === 'perc' && e.track).length, scene.name).toBeGreaterThan(100);
+        expect(events.every((e) => Number.isFinite(e.beat) && Number.isFinite(e.midi) && Number.isFinite(e.velocity)), scene.name).toBe(true);
+    }
+});

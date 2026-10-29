@@ -89,6 +89,9 @@ export const SHAREABLE_PRESETS = [
     'Ambient Piano v2', 'Soft Drama v2', 'Glass Grand v2', 'House Piano', 'Ravel', 'Subdued Piano v2',
     'Soft Piano v2',
     'Felted Piano v2',
+    // short, tight voices for driven rhythm (step sequencer lanes)
+    'Supersaw Stab', 'Techno Stab', 'Pluck Chord', 'Rolling Bass',
+    'Drive Lead', 'Acid Lead',
 ];
 const PRESET_BITS = 8;
 // Preset index meaning "a generated sound" (soundGen.js v1): followed by

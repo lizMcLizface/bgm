@@ -30,6 +30,7 @@ import { METERS, DEFAULT_METER } from './meter';
 import { SCALE_FAMILIES, CHORD_COLOURS } from './theory';
 import PROGRESSIONS from './progressions';
 import { DEFAULT_MOOD } from './composition/progressionGen';
+import { defaultSequencer, sequencerIds, cleanEdits, cleanSlots, cleanMoves, SEQ_MACHINES, SECTION_BARS } from './sequencer';
 import { decodeShareCode, encodeShareParts, decodeShareParts } from './shareCode';
 import { phraseToSeed } from './phrase';
 import { HARMONY_SCALES } from './composition/harmonyScale';
@@ -115,6 +116,8 @@ export function defaultSettings() {
         wander: defaultWander(), // slow pan / volume / filter / pitch drift (engine/wander.js)
         ambienceWander: defaultAmbienceWander(), // the bed's own slow drift in level, in all and per layer
         bus: defaultBus(), // the shared effects bus: per-voice sends (all 0: off) and its rack (engine/bus.js)
+        portamento: { lead: 0, counter: 0, bass: 0 }, // glide between notes, 0..1 (composition/portamento.js)
+        sequencer: defaultSequencer(), // the step sequencer as the percussion (sequencer.js)
         seed: newSeed(),
     };
 }
@@ -237,6 +240,8 @@ const RULES = {
         period: clamp(AMBIENCE_WANDER_LIMITS.period.min, AMBIENCE_WANDER_LIMITS.period.max),
     },
     bus: BUS_RULES,
+    portamento: { lead: clamp(0, 1), counter: clamp(0, 1), bass: clamp(0, 1) },
+    sequencer: { on: bool, machine: oneOf(SEQ_MACHINES), arrangement: (v) => (typeof v === 'string' && (v === '' || sequencerIds().has(v)) ? v : undefined), edits: cleanEdits, slots: cleanSlots, lanes: bool, gate: clamp(0.05, 1), pump: clamp(0, 1), variation: clamp(0, 1), sectionBars: oneOf(SECTION_BARS), fills: bool, moves: cleanMoves },
     seed: int(0, 2 ** 31),
 };
 
@@ -286,7 +291,7 @@ export function encodeSettings(settings, presets = {}, { seed = true } = {}) {
     // the bus, classic / DIY voices ({ external: ref }), edited sounds ({ edit }) and a drum machine (perc: { machine: ref }): shareExtras.js
     const sounds = Object.fromEntries(Object.entries(presets).filter(([, p]) => p?.external).map(([role, p]) => [role, p.external]));
     const edits = Object.fromEntries(Object.entries(presets).filter(([, p]) => p?.edit).map(([role, p]) => [role, p.edit]));
-    const x = encodeExtras({ bus: settings.bus, sounds, machine: presets.perc?.machine ?? null, edits });
+    const x = encodeExtras({ bus: settings.bus, sounds, machine: presets.perc?.machine ?? null, edits, sequencer: settings.sequencer, portamento: settings.portamento });
     if (x) parts.x = x;
     return PARTS.filter((key) => parts[key]).map((key) => `${key}=${parts[key]}`).join('&');
 }
@@ -303,6 +308,8 @@ export function decodeShare(code) {
             if (query.get('x')) {
                 const extras = decodeExtras(query.get('x'));
                 if (extras.bus) settings.bus = extras.bus;
+                if (extras.sequencer) settings.sequencer = extras.sequencer;
+                if (extras.portamento) settings.portamento = extras.portamento;
                 Object.entries(extras.sounds).forEach(([role, ref]) => { presets[role] = { external: ref }; });
                 if (extras.machine) presets.perc = { machine: extras.machine };
                 Object.entries(extras.edits).forEach(([role, edit]) => { presets[role] = { edit }; });

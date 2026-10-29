@@ -1,0 +1,17 @@
+.seq-on { display: block; margin: 8px 0; }
+.seq-stages { display: flex; flex-wrap: wrap; gap: 4px; margin: 10px 0 6px; }
+.seq-stages button { font: inherit; font-size: 0.8rem; padding: 3px 8px; border-radius: 12px; border: 1px solid #8884; background: transparent; color: inherit; cursor: pointer; }
+.seq-stages button.on { background: #6a8; color: #000; border-color: transparent; }
+.seq-grid { display: grid; gap: 2px; margin: 6px 0; overflow-x: auto; }
+.seq-row { display: grid; grid-template-columns: 2.2em repeat(16, minmax(14px, 1fr)); gap: 2px; align-items: center; }
+.seq-name { font-size: 0.7rem; opacity: 0.7; }
+.seq-cell { height: 18px; padding: 0; border-radius: 3px; border: 1px solid #8883; background: #8881; cursor: pointer; }
+.seq-cell.beat { background: #8882; }
+.seq-cell.on { background: #6a8; border-color: transparent; }
+.seq-cell.flam { background: linear-gradient(135deg, #6a8 55%, transparent 55%); }
+.seq-slots { margin-top: 10px; }
+.seq-slot select { max-width: 60%; }
+.seq-lane { margin-top: 4px; }
+.seq-move { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 4px 0; }
+.seq-move label { display: flex; gap: 4px; align-items: center; font-size: 0.75rem; }
+.seq-sections { display: flex; gap: 8px; margin: 6px 0; }

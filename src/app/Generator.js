@@ -55,6 +55,8 @@ import { planPerformance, performPhrase } from './composition/performance';
 import { performEnsemble } from './composition/ensembleRhythm';
 import { instrumentGroovePlan } from './composition/instrumentGroove';
 import { slideNotes } from './composition/noteSlides';
+import { glideNotes } from './composition/portamento';
+import { SweepFilter, SWEEP_OPEN } from './engine/sweepFilter';
 import { expressNotes, expressHeldNotes, connectWindNotes, timeSoundNotes } from './composition/noteExpression';
 import { applyDynamics, expressDynamics } from './composition/dynamics';
 import { planRubato, rubatoTime } from './composition/rubato';
@@ -70,6 +72,7 @@ import { applyFeel, feelActive, feelTone, feelEnergy, ghostNotes } from './compo
 import { nextMusic, glideTempo, scaleDistance } from './conductor';
 import { METERS, unitsPerMinute, swingEvents, halfTime, chordBars, splitBeat } from './meter';
 import { drumBar, loosenDrums, auditionHits, DRUMS } from './percussion';
+import { sequencerBar, sequencerLanes, stageForBar, stageSpan, moveValues } from './sequencer';
 import { phraseEvents, DEFAULT_CONTEXT } from './auditionPhrases';
 import { contextFromPlan } from './auditionContext';
 import { normal, seeded } from './random';
@@ -759,10 +762,34 @@ class Generator {
         for (const { instrument } of Object.values(this.roles)) instrument?.setDynamics?.(dynamics);
     }
 
+    /** The sequencer's moves (effects opening, closing, sweeping across a chord) at this beat, through the effects bus. */
+    applyMoves(bar, beatInBar) {
+        const seq = this.settings.sequencer, motion = this.plan.get(bar)?.seqMotion;
+        const active = motion && seq?.on ? moveValues(seq, motion.stage, (bar - motion.start + beatInBar / this.transport.beatsPerBar) / Math.max(1, motion.bars)) : null;
+        if (!active && !this.moveState) return;
+        this.moveState = active;
+        this.applySweep(active, 60 / unitsPerMinute(this.meter, this.plan.get(bar)?.bpm ?? this.settings.bpm));
+        this.applyBus();
+    }
+
+    /** The sequencer's filter moves on the whole mix: built when first asked for, wide open (off) when no move uses it. */
+    applySweep(active, secondsPerBeat) {
+        const wants = active && ['filter.lowpass', 'filter.highpass', 'filter.resonance'].some((key) => key in active);
+        if (!wants && !this.sweep) return;
+        if (!this.sweep) {
+            // between the master fade and the loudness trim, wide open at first so joining the chain is silent
+            this.sweep = new SweepFilter(this.AC);
+            this.output.disconnect(this.levelTrim);
+            this.output.connect(this.sweep.input);
+            this.sweep.output.connect(this.levelTrim);
+        }
+        this.sweep.set({ lowpass: active?.['filter.lowpass'] ?? SWEEP_OPEN.lowpass, highpass: active?.['filter.highpass'] ?? SWEEP_OPEN.highpass, resonance: active?.['filter.resonance'] ?? SWEEP_OPEN.resonance }, wants ? secondsPerBeat / 2 : 0.05);
+    }
+
     applyBus() {
-        const bus = this.settings.bus;
+        const bus = this.settings.bus, moves = this.moveState ?? {}, wantsMoves = this.settings.sequencer?.on && Object.keys(this.settings.sequencer.moves ?? {}).length > 0;
         if (!this.busRack) {
-            if (!busActive(bus) || this.busLoading) return;
+            if (!(busActive(bus) || wantsMoves) || this.busLoading) return;
             this.busLoading = createBusRack(this.AC, bus.rack, this.output).then((rack) => {
                 this.busRack = rack;
                 for (const r of Object.values(this.roles)) {
@@ -775,8 +802,8 @@ class Generator {
             }).catch((error) => console.error('Could not build the effects bus', error)).finally(() => { this.busLoading = null; });
             return;
         }
-        this.busRack.patch(bus.rack);
-        for (const [role, r] of Object.entries(this.roles)) r.send?.gain.setTargetAtTime(bus.sends[role] ?? 0, this.AC.currentTime, 0.03);
+        this.busRack.patch({ ...bus.rack, ...Object.fromEntries(Object.entries(moves).filter(([key]) => !key.startsWith('send.'))) });
+        for (const [role, r] of Object.entries(this.roles)) r.send?.gain.setTargetAtTime(moves[`send.${role}`] ?? bus.sends[role] ?? 0, this.AC.currentTime, 0.03);
     }
 
     // Timbre drift (composition/timbreDrift.js) at a bar's start, for each melodic role; a role
@@ -1570,7 +1597,12 @@ class Generator {
         // Drums: patterns and looseness from streams of their own (the
         // arranger's rng is never touched, so the notes stay the same).
         const boundaries=planBoundaries(state,bar,this.endBar);
-        let hits = drums && drums.style !== 'off'
+        // the step sequencer (sequencer.js) plays its pattern as written: it skips the looseners below and joins the bar after them
+        const seq = this.settings.sequencer, seqHits = seq?.on && seq.arrangement ? sequencerBar({ meter: this.meter, seq, slotIndex: slot.index, bar, seed: this.settings.seed, barsLeft: stageSpan(seq, slot, bar).left }) : [];
+        // lanes: the chords and the bass as tight stabs on the sequencer's own rows, instead of the arranged pad and bass
+        const laneHits = seqHits.length && seq.lanes ? sequencerLanes({ meter: this.meter, seq, chord, slotIndex: slot.index, bar, seed: this.settings.seed }) : [];
+        if (laneHits.length) events.splice(0, events.length, ...events.filter((e) => e.role !== 'pad' && e.role !== 'bass'));
+        let hits = !seqHits.length && drums && drums.style !== 'off'
             ? (original ? drumBar : drumBarLatest)({ bar, meter: this.meter, drums, section: state.phrase.section, sectionsMode: sections.mode, sectionBars: state.phrase.section?.bars || sections.phrases * 4, phraseStart: state.phrase.start, phraseBars: state.composition?.phrase?.bars ?? 4, boundaries, seed: this.settings.seed, rhythm: state.composition?.rhythm })
             : [];
         if (split) markSplit(hits, { at: splitAt, kicks: [DRUMS.indexOf('kick'), DRUMS.indexOf('punch')] });
@@ -1598,7 +1630,7 @@ class Generator {
             this.humanize(events, humanize, bpm, bar);
             (original ? loosenDrums : loosenDrumsLatest)(hits, humanize, 60 / unitsPerMinute(this.meter, bpm), this.settings.seed, bar, this.meter);
         }
-        events.push(...hits);
+        events.push(...hits, ...seqHits, ...laneHits);
         if(!original&&this.endingDevelopment!==false&&closing){const prepared=prepareEnding(events,this.meter);events.splice(0,events.length,...prepared);state.composition.ending={phase:'prepare',arrival:this.endBar};}
         applyBitonality(events,this.settings.tonality);
         // the long arc: this bar's place in the piece's running time (composition/arc.js)
@@ -1628,6 +1660,9 @@ class Generator {
             previous:prev?.events ?? [], bar, units:this.meter.units, secondsPerBeat:60/unitsPerMinute(this.meter,bpm),
             noteSlides:this.noteSlides === true,padMotion:this.padPitchMotion === true,bassMotion:this.bassPitchMotion === true,chordSlides:this.chordSlides === true,
         });
+        if (!original && Object.values(this.settings.portamento ?? {}).some((v) => v > 0)) glideNotes(events, {
+            previous: prev?.events ?? [], units: this.meter.units, secondsPerBeat: 60 / unitsPerMinute(this.meter, bpm), amounts: this.settings.portamento,
+        });
         expressDynamics(events, this.settings.dynamics);
         if (!original && this.registerLevel !== false) tameHighRegister(events, { voices: this.grooveVoices ?? this.grooveVoiceSnapshot() });
         let tone = sectionTone(this.settings, state.phrase.section);
@@ -1640,7 +1675,9 @@ class Generator {
         tone = feelTone(arcTone(tone, energy), this.settings.feel);
         const space = sectionSpaceLevel(state.phrase.section, this.settings.sectionSpace) + arcSpace(energy);
         const loudness = planLoudness(events, this.meter.units, this.plan.get(bar - 1)?.loudness?.average, this.settings.evenLoudness);
-        this.plan.set(bar, { bar, chord, chordStart, state, events, music, upcoming, nextMusic: following, bpm, tone, boundaries, rubato, loudness, space, elapsed, energy, keyLift: liftPivot ? 2 : keyLift, chordBars: barsPerChord,
+        // the sequencer's effect moves (sequencer.js): this chord's stage and where in the chord a beat falls
+        const seqMotion = seq?.on && seq.arrangement && Object.keys(seq.moves ?? {}).length ? { stage: stageForBar(seq, { slotIndex: slot.index, bar }), ...(({ start, bars }) => ({ start, bars }))(stageSpan(seq, slot, bar)) } : null;
+        this.plan.set(bar, { seqMotion, bar, chord, chordStart, state, events, music, upcoming, nextMusic: following, bpm, tone, boundaries, rubato, loudness, space, elapsed, energy, keyLift: liftPivot ? 2 : keyLift, chordBars: barsPerChord,
             ...(split ? { split: { beat: splitAt, chord: split } } : {}),
             ...(this.rulebookTrace?{ruleTrace:{slot,referenceBarsPerChord:barsPerChord}}:{}) });
     }
@@ -2046,6 +2083,7 @@ class Generator {
         }
         if (beatInBar === 0 && this.pendingVoices && this.pendingVoices.length) this.flushPendingVoices(bar, secondsPerBeat);
         if (beatInBar === 0) this.applyTone(this.plan.get(bar).tone, time, secondsPerBeat * this.transport.beatsPerBar);
+        this.applyMoves(bar, beatInBar);
         if (beatInBar === 0) this.applyDrift(bar, secondsPerBeat * this.transport.beatsPerBar);
         if (beatInBar === 0) this.applySpace(this.plan.get(bar).space ?? 0, time, secondsPerBeat * this.transport.beatsPerBar);
         if (beatInBar === 0) this.levelTrim.gain.setTargetAtTime(this.plan.get(bar).loudness?.trim ?? 1, time, secondsPerBeat * this.transport.beatsPerBar * 0.3);
@@ -2064,11 +2102,19 @@ class Generator {
             this.noteLog.push({ boundaries:this.plan.get(bar)?.boundaries,role: e.role, midi: e.midi, velocity: e.velocity, time: Math.max(start, this.AC.currentTime), length: connected?.duration??seconds(e) });
             if (this.noteLog.length > 96) this.noteLog.shift();
             this.emitVisualNote({ type: 'on', ...this.noteLog[this.noteLog.length - 1] });
+            // a kick of the sequencer pumps the chords and the bass (settings.sequencer.pump, up to 9 dB and 6 dB)
+            if (e.exact && e.track === 'bd' && this.settings.sequencer?.on && this.settings.sequencer.lanes && this.settings.sequencer.pump > 0) {
+                const at = Math.max(start, this.AC.currentTime), pump = this.settings.sequencer.pump;
+                for (const [role, db] of [['pad', 9], ['bass', 6]]) this.roles[role]?.ducker?.note(at, at + 0.04, 10 ** (-db * pump / 20));
+            }
             if (this.settings.ducking > 0 && this.audible(e.role)) {
                 const at = Math.max(start, this.AC.currentTime), length = connected?.duration ?? seconds(e);
                 for (const [role, by] of Object.entries(DUCKED_BY)) if (by[e.role]) this.roles[role].ducker?.note(at, at + length, duckFloor(role, e.role, this.settings.ducking));
             }
-            this.roles[e.role].instrument.scheduleNote(e.midi, Math.max(start, this.AC.currentTime), (connected?.duration??seconds(e)), e.velocity, e.detune, connected?.expression??e.expression);
+            const instrument = this.roles[e.role].instrument;
+            // a sequencer hit names its machine track; the other kits play the nearest drum
+            if (e.track && instrument.hitTrack) instrument.hitTrack(e.track, e.midi, Math.max(start, this.AC.currentTime), e.velocity);
+            else instrument.scheduleNote(e.midi, Math.max(start, this.AC.currentTime), (connected?.duration??seconds(e)), e.velocity, e.detune, connected?.expression??e.expression);
         };
         const current = this.plan.get(bar).events;
         current

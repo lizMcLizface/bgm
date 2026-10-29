@@ -33,6 +33,8 @@ test('every scene is valid as it stands: modes, presets, settings that survive s
         // nothing the scene says was thrown away as invalid
         expectContained(scene.settings, settings);
         Object.values(scene.voices).forEach((name) => {
+            // a classic synth's voice: { name, external }, checked by cleanRef when the scene is read
+            if (name?.external) { expect(name.external.synth).toBeTruthy(); return; }
             expect(typeof name).toBe('string');
             expect(findPreset(name)).toBeTruthy();
             expect(SHAREABLE_PRESETS).toContain(name);

@@ -44,7 +44,7 @@ const fromBase64Url = (text) => Uint8Array.from(atob(text.replaceAll('-', '+').r
  * { bus, sounds: { role: ref }, machine: ref } -> the `x` part, or '' when there is nothing to
  * carry (a default bus, no classic or DIY voices, the generator's own kit).
  */
-export function encodeExtras({ bus, sounds = {}, machine = null, edits = {} }) {
+export function encodeExtras({ bus, sounds = {}, machine = null, edits = {}, sequencer = null, portamento = null }) {
     const data = {};
     if (bus && JSON.stringify(bus) !== JSON.stringify(defaultBus())) data.b = bus;
     const s = Object.fromEntries(ROLES.filter((role) => sounds[role]).map((role) => [role, sounds[role]]));
@@ -52,16 +52,20 @@ export function encodeExtras({ bus, sounds = {}, machine = null, edits = {} }) {
     if (machine) data.p = machine;
     const n = Object.fromEntries(ROLES.filter((role) => edits[role]).map((role) => [role, edits[role]]));
     if (Object.keys(n).length) data.n = n;
+    // the step sequencer (sequencer.js), only when it plays or has a beat chosen
+    if (sequencer && (sequencer.on || sequencer.arrangement)) data.q = sequencer;
+    // glide between notes (composition/portamento.js), only when a role has some
+    if (portamento && Object.values(portamento).some((v) => v > 0)) data.g = portamento;
     return Object.keys(data).length ? toBase64Url(compressSync(strToU8(JSON.stringify(data)), { level: 9 })) : '';
 }
-/** The `x` part -> { bus?, sounds, machine, edits } (clean); nothing usable for anything unreadable. */
+/** The `x` part -> { bus?, sounds, machine, edits, sequencer? } (clean); nothing usable for anything unreadable. */
 export function decodeExtras(part) {
     try {
         if (typeof part !== 'string' || part.length > 20000) return { sounds: {}, edits: {} };
         const data = JSON.parse(strFromU8(decompressSync(fromBase64Url(part))));
         const sounds = Object.fromEntries(ROLES.map((role) => [role, cleanRef(data?.s?.[role])]).filter(([, ref]) => ref));
         const edits = Object.fromEntries(ROLES.map((role) => [role, cleanEdit(data?.n?.[role])]).filter(([, edit]) => edit));
-        return { ...(isObject(data?.b) ? { bus: data.b } : {}), sounds, machine: cleanRef(data?.p, MACHINE_SYNTHS), edits };
+        return { ...(isObject(data?.b) ? { bus: data.b } : {}), sounds, machine: cleanRef(data?.p, MACHINE_SYNTHS), edits, ...(isObject(data?.q) ? { sequencer: data.q } : {}), ...(isObject(data?.g) ? { portamento: data.g } : {}) };
     } catch (e) {
         return { sounds: {}, edits: {} };
     }

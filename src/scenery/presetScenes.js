@@ -151,6 +151,22 @@ const BY_NAME = {
     'Wet Pavement Two-Step': L('city', 'rain', 20, 2.6, EVENING),
     'Demo: Low note, then chord': L('lake', 'storm', 22, 1.8, { hours: [18, 4] }),
     'Demo: Struck leads, no trills': L('garden', 'sparse', 10, 0.4),
+
+    // the step-sequencer presets: house, techno, trance and minimal at a warehouse party (neither synthwave nor the city)
+    'Warehouse Lift': L('warehouse', 'clear', 23, 1.8, NIGHT),
+    'Acid Jack Afterhours': L('warehouse', 'haze', 2, 2.2, LATE),
+    'Electro Story': L('warehouse', 'sparse', 22, 1.6, NIGHT),
+    'Dub Pulse Basement': L('warehouse', 'fog', 1, 2.6, LATE),
+    'Uplifting Trance Departures': L('warehouse', 'clear', 22.5, 1.4, NIGHT),
+    'Progressive Night Bus': L('warehouse', 'haze', 1.5, 2, LATE),
+    'Minimal Click Lab': L('warehouse', 'fog', 3, 2.4, LATE),
+    'Slow House Sunset': L('warehouse', 'scattered', 19.5, 1.5, DUSK),
+    'Deep Pocket Daydream': L('warehouse', 'haze', 20, 2.1, EVENING),
+    'Disco Ride Afternoon': L('warehouse', 'sparse', 18, 1.7, DUSK),
+    // the hip hop ones sit in town
+    'Trap House Tuesday': L('street', 'rain', 23.5, 2.2, LATE),
+    'Boom Bap Bakery': L('street', 'overcast', 20, 2.3, EVENING),
+    'Dusty Vinyl Sunday': L('room', 'haze', 17, 2.3, EVENING),
 };
 
 // Scenes not listed above (the user's own, or new ones) fall back to their category.

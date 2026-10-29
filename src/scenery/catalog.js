@@ -25,6 +25,7 @@ export const BIOME_NAMES = {
     street: 'Rainy neon street',
     city: 'City skyline',
     synth: 'Synthwave',
+    warehouse: 'Warehouse night',
     train: 'Train window',
     room: 'Window view',
     cafe: 'Café',

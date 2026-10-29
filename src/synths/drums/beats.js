@@ -32,6 +32,8 @@ export const BEATS=[
  beat('tumbao','Tumbao','Latin',116,{bd:'1 7 11 15',cl:'1 4 7 11 13',lc:'4 8 12 16',mc:'3 7 11 15',hc:'6 14',ma:'1 3 5 7 9 11 13 15',A:'1 7 11'}),
  beat('dembow','Dembow','Latin',96,{bd:'1 7 9 15',sd:'5 8 13 16',ch:'1 3 5 7 9 11 13 15',cl:'4 12',A:'1 9'}),
  beat('baile-step','Baile step','Latin',130,{bd:'1 4 7 11 14',sd:'5 13',cp:'3 8 11 16',ch:'1 3 5 7 9 11 13 15',lt:'10',A:'1 7 11'}),
+ beat('uplifting-trance','Uplifting trance','Trance',138,{bd:'1 5 9 13',cp:'5 13',oh:'3 7 11 15',ch:'2 4 6 8 10 12 14 16',A:'1 5 9 13'}),
+ beat('progressive-trance','Progressive trance','Trance',130,{bd:'1 5 9 13',cp:'5 13',oh:'3 7 11 15',ch:'2 4 6 8 10 12 14 16',rs:'8 16',A:'1 9'}),
  beat('tom-conversation','Tom conversation','Percussion',102,{bd:'1 9',lt:'1 7 12',mt:'4 10 15',ht:'3 8 14',ch:'1 3 5 7 9 11 13 15',A:'1 9'},.55),
  beat('flam-parade','Flam parade','Percussion',108,{bd:'1 9',sd:'5f 13f 16',lt:'7 15',ht:'4 12',ch:'1 3 5 7 9 11 13 15',A:'5 13'}),
 ];
@@ -65,5 +67,14 @@ export const ARRANGEMENTS=[
  arrangement('trap-switch','Trap switch','trap-steps',{sd:'9 13 15 16',ch:'1 3 5 7 9 10 11 12 13 14 15 16'}),
  arrangement('breaks-round','Breaks round','breakbeat',{sd:'5 8 10 13f 15 16',bd:'1 7 11 14'},FOUR),
  arrangement('jungle-roll','Jungle roll','jungle-step',{sd:'5 8 10 12 13 14 15 16',bd:'1 7 11'},LONG),
+ arrangement('trance-journey','Trance journey','uplifting-trance',{sd:'9 11 13 14 15 16',cp:'5 13'},LONG),
+ arrangement('progressive-journey','Progressive journey','progressive-trance',{sd:'13 14 15 16',rs:'4 8 12 16'},LONG),
  arrangement('latin-circuit','Latin circuit','tumbao',{lc:'4 8 12 16',mc:'3 7 11 14',hc:'6 10 13 15',sd:'13f'},LONG),
 ];
+
+/** An arrangement by id, or any single beat as a standard eight-stage one (chain: the Groove stage). */
+export function arrangementFor(id){
+ const found=ARRANGEMENTS.find(a=>a.id===id);if(found)return found;
+ const beat=BEATS.find(b=>b.id===id);
+ return beat?arrangement(beat.id,beat.name,beat.id,{sd:'5 13 15 16'},[1]):null;
+}

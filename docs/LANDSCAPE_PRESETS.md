@@ -57,7 +57,8 @@ Plotting a Course drops the deck for open space; Neon Overpass lights the city s
 | Sunrise in seven | Savanna | High streaks | 06:00, early summer | 04:30–09:00 |
 | Sunday Reading | Café | Overcast | 14:00, early winter | 08:00–17:30 |
 | Whiteboard | Window view | Sparse clouds | 14:00, early winter | 08:00–17:30 |
-| Five Notes Only | Alpine peaks | Clear | 10:00, late spring | 08:00–17:30 |
+| Five Notes Only | Warehouse night | a long low shed with a sawtooth roof out of town at night: a big slatted door glowing, a crowd of small figures nodding on the beat in it, light beams sweeping up out of the roof into the haze, strip windows pulsing with the kick, string lights and a chain-link fence in front, the dim edge of town behind; cold white, teal and amber ([warehouse.js](../src/scenery/warehouse.js)) | Warehouse Lift, Acid Jack Afterhours, Electro Story, Dub Pulse Basement, Uplifting Trance Departures, Progressive Night Bus, Minimal Click Lab, Slow House Sunset, Deep Pocket Daydream, Disco Ride Afternoon |
+| Alpine peaks | Clear | 10:00, late spring | 08:00–17:30 |
 | Solo Grand | Mountain lake | Clear | 14:00, early autumn | — |
 | Desert dusk | Desert | Haze | 18:30, late summer | 17:00–21:00 |
 | Damp Crater | Swamp | Fog | 01:00, late summer | 20:00–05:00 |
@@ -165,7 +166,7 @@ The nearest landscape is used; these want something that is not drawn yet.
 
 ## The newer landscapes
 
-Built in [wilds.js](../src/scenery/wilds.js), [places.js](../src/scenery/places.js),
+Built in [warehouse.js](../src/scenery/warehouse.js), [wilds.js](../src/scenery/wilds.js), [places.js](../src/scenery/places.js),
 [vistas.js](../src/scenery/vistas.js) and [nooks.js](../src/scenery/nooks.js); all are in the
 page's Look menu. A new landscape starts in `DRAFT_BIOME_NAMES` in
 [catalog.js](../src/scenery/catalog.js), which shows it only in the scenery tool

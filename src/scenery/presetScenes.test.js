@@ -34,6 +34,11 @@ describe('preset landscapes', () => {
         library.scenes.forEach((s) => expect(landscapeForScene(s.name, s.category), s.name).toBeTruthy());
     });
 
+    it('puts the step-sequencer presets away from the synthwave coast', () => {
+        library.scenes.filter((s) => s.tags?.includes('sequencer')).forEach((s) => expect(landscapeForScene(s.name, s.category).biome, s.name).not.toBe('synth'));
+        ['Warehouse Lift', 'Minimal Click Lab', 'Uplifting Trance Departures'].forEach((n) => expect(landscapeForScene(n, 'electronic').biome, n).toBe('warehouse'));
+    });
+
     it('names a landscape for each weather preset rather than leaving it to its category', () => {
         WEATHER_SCENES.forEach((s) => expect(SCENE_LANDSCAPES[s.name], s.name).toBeTruthy());
     });

@@ -17885,6 +17885,2624 @@
         "bass": "Rubber Bass",
         "lead": "Kalimba Pluck"
       }
+    },
+    {
+      "name": "Warehouse Lift",
+      "category": "electronic",
+      "blurb": "A 909 warehouse beat that climbs through its stages as the chords change: groove, variation, build, then the drop",
+      "tags": [
+        "sequencer",
+        "techno",
+        "edm"
+      ],
+      "settings": {
+        "humanize": {
+          "timing": 2,
+          "velocity": 0.05,
+          "detune": 2
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "dynamics": {
+          "level": 0.95,
+          "range": 0.8,
+          "attack": 0.3,
+          "brightness": 0.45
+        },
+        "rubato": 0,
+        "ornaments": 0.1,
+        "ducking": 0.5,
+        "evenLoudness": 0.6,
+        "sectionSpace": 0.4,
+        "keyLift": 0,
+        "timbreDrift": 0.2,
+        "mode": "Major-6",
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 30,
+          "pulse": 40,
+          "arpeggio": 30,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 20,
+          "walking": 0,
+          "drive": 80
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.3
+        },
+        "padRoot": "unlessBass",
+        "drums": {
+          "style": "electro",
+          "activity": 0.6,
+          "variation": 0.4,
+          "sprinkle": 0.1,
+          "kit": "tr808"
+        },
+        "bpm": 138,
+        "tonic": 9,
+        "progression": 7,
+        "volumes": {
+          "pad": 0.6,
+          "bass": 0.75,
+          "lead": 0.72,
+          "counter": 0.4,
+          "perc": 0.8
+        },
+        "leadActivity": 0.62,
+        "leadDensity": 0.35,
+        "leadLeaps": 0.2,
+        "leadRepeat": 0.6,
+        "sequencer": {
+          "on": true,
+          "machine": "tr909",
+          "arrangement": "warehouse-shift",
+          "edits": {},
+          "slots": [
+            0,
+            1,
+            5,
+            6,
+            2,
+            4,
+            5,
+            6
+          ],
+          "lanes": true,
+          "gate": 0.2,
+          "pump": 0.6,
+          "fills": true,
+          "moves": {
+            "0": [
+              {
+                "key": "inserts.chorus",
+                "from": 0.6,
+                "to": 0
+              },
+              {
+                "key": "send.pad",
+                "from": 0.5,
+                "to": 0
+              }
+            ],
+            "2": [
+              {
+                "key": "inserts.phaser",
+                "from": 0.15,
+                "to": 0.55
+              },
+              {
+                "key": "inserts.phaserRate",
+                "from": 0.1,
+                "to": 0.6
+              },
+              {
+                "key": "send.pad",
+                "from": 0.35,
+                "to": 0.35
+              }
+            ],
+            "4": [
+              {
+                "key": "inserts.chorus",
+                "from": 0.7,
+                "to": 0.1
+              },
+              {
+                "key": "effects.reverb",
+                "from": 0.5,
+                "to": 0.15
+              },
+              {
+                "key": "send.pad",
+                "from": 0.6,
+                "to": 0.4
+              },
+              {
+                "key": "filter.lowpass",
+                "from": 20000,
+                "to": 900
+              }
+            ],
+            "5": [
+              {
+                "key": "inserts.phaser",
+                "from": 0,
+                "to": 0.8
+              },
+              {
+                "key": "effects.delay",
+                "from": 0,
+                "to": 0.4
+              },
+              {
+                "key": "effects.delayMs",
+                "from": 326,
+                "to": 109
+              },
+              {
+                "key": "send.pad",
+                "from": 0,
+                "to": 0.7
+              },
+              {
+                "key": "send.lead",
+                "from": 0,
+                "to": 0.4
+              },
+              {
+                "key": "filter.lowpass",
+                "from": 500,
+                "to": 20000
+              }
+            ],
+            "6": [
+              {
+                "key": "inserts.saturation",
+                "from": 0.5,
+                "to": 0.15
+              },
+              {
+                "key": "send.bass",
+                "from": 0.3,
+                "to": 0.3
+              }
+            ]
+          },
+          "sectionBars": 8
+        },
+        "leadSyncopation": 0.5,
+        "bus": {
+          "sends": {
+            "pad": 0,
+            "bass": 0,
+            "lead": 0.28,
+            "counter": 0,
+            "perc": 0
+          },
+          "rack": {
+            "effects.dry": 1,
+            "effects.reverb": 0.12,
+            "effects.delay": 0.22,
+            "effects.delayMs": 217,
+            "effects.feedback": 0.25
+          }
+        },
+        "portamento": {
+          "lead": 0,
+          "counter": 0,
+          "bass": 0.15
+        }
+      },
+      "voices": {
+        "pad": "Supersaw Stab",
+        "bass": "Rolling Bass",
+        "lead": "Drive Lead"
+      },
+      "percussion": {
+        "synth": "tr909",
+        "name": "Room"
+      }
+    },
+    {
+      "name": "Acid Jack Afterhours",
+      "category": "electronic",
+      "blurb": "A 909 acid-house journey; every chord follows the arrangement, stage by stage, through fills and breakdowns",
+      "tags": [
+        "sequencer",
+        "house",
+        "edm"
+      ],
+      "settings": {
+        "humanize": {
+          "timing": 2,
+          "velocity": 0.05,
+          "detune": 2
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "dynamics": {
+          "level": 0.95,
+          "range": 0.8,
+          "attack": 0.3,
+          "brightness": 0.45
+        },
+        "rubato": 0,
+        "ornaments": 0.1,
+        "ducking": 0.5,
+        "evenLoudness": 0.6,
+        "sectionSpace": 0.4,
+        "keyLift": 0,
+        "timbreDrift": 0.2,
+        "mode": "Major-6",
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 30,
+          "pulse": 40,
+          "arpeggio": 30,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 20,
+          "walking": 0,
+          "drive": 80
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.3
+        },
+        "padRoot": "unlessBass",
+        "drums": {
+          "style": "electro",
+          "activity": 0.6,
+          "variation": 0.4,
+          "sprinkle": 0.1,
+          "kit": "tr808"
+        },
+        "bpm": 126,
+        "tonic": 4,
+        "progression": 6,
+        "volumes": {
+          "pad": 0.6,
+          "bass": 0.75,
+          "lead": 0.7,
+          "counter": 0.4,
+          "perc": 0.8
+        },
+        "leadActivity": 0.7,
+        "leadDensity": 0.42,
+        "leadLeaps": 0.3,
+        "leadRepeat": 0.55,
+        "sequencer": {
+          "on": true,
+          "machine": "tr909",
+          "arrangement": "acid-journey",
+          "edits": {},
+          "slots": [
+            1,
+            2,
+            5,
+            6,
+            4,
+            5,
+            6,
+            7
+          ],
+          "lanes": true,
+          "gate": 0.16,
+          "pump": 0.5,
+          "fills": true,
+          "moves": {
+            "1": [
+              {
+                "key": "inserts.flanger",
+                "from": 0,
+                "to": 0.4
+              },
+              {
+                "key": "send.pad",
+                "from": 0.3,
+                "to": 0.3
+              }
+            ],
+            "2": [
+              {
+                "key": "inserts.phaser",
+                "from": 0.1,
+                "to": 0.7
+              },
+              {
+                "key": "inserts.phaserRate",
+                "from": 0.05,
+                "to": 0.8
+              },
+              {
+                "key": "send.pad",
+                "from": 0.4,
+                "to": 0.4
+              }
+            ],
+            "4": [
+              {
+                "key": "effects.delay",
+                "from": 0.1,
+                "to": 0.4
+              },
+              {
+                "key": "effects.feedback",
+                "from": 0.4,
+                "to": 0.5
+              },
+              {
+                "key": "send.pad",
+                "from": 0.5,
+                "to": 0.5
+              },
+              {
+                "key": "send.lead",
+                "from": 0.4,
+                "to": 0.4
+              },
+              {
+                "key": "filter.lowpass",
+                "from": 18000,
+                "to": 1200
+              }
+            ],
+            "5": [
+              {
+                "key": "inserts.flanger",
+                "from": 0,
+                "to": 0.9
+              },
+              {
+                "key": "effects.delayMs",
+                "from": 357,
+                "to": 119
+              },
+              {
+                "key": "effects.delay",
+                "from": 0.1,
+                "to": 0.4
+              },
+              {
+                "key": "send.pad",
+                "from": 0.2,
+                "to": 0.7
+              },
+              {
+                "key": "filter.highpass",
+                "from": 30,
+                "to": 1400
+              }
+            ]
+          },
+          "sectionBars": 8
+        },
+        "leadSyncopation": 0.55,
+        "bus": {
+          "sends": {
+            "pad": 0,
+            "bass": 0,
+            "lead": 0.28,
+            "counter": 0,
+            "perc": 0
+          },
+          "rack": {
+            "effects.dry": 1,
+            "effects.reverb": 0.12,
+            "effects.delay": 0.22,
+            "effects.delayMs": 238,
+            "effects.feedback": 0.25
+          }
+        },
+        "portamento": {
+          "lead": 0.2,
+          "counter": 0,
+          "bass": 0.35
+        }
+      },
+      "voices": {
+        "pad": "Techno Stab",
+        "bass": "Rolling Bass",
+        "lead": "Acid Lead"
+      },
+      "percussion": {
+        "synth": "tr909",
+        "name": "Room"
+      }
+    },
+    {
+      "name": "Electro Story",
+      "category": "electronic",
+      "blurb": "An 808 electro-funk groove telling a story across sixteen bars: intro, groove, variation, fill, breakdown, build, drop",
+      "tags": [
+        "sequencer",
+        "electro",
+        "808"
+      ],
+      "settings": {
+        "humanize": {
+          "timing": 2,
+          "velocity": 0.05,
+          "detune": 2
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "dynamics": {
+          "level": 0.95,
+          "range": 0.8,
+          "attack": 0.3,
+          "brightness": 0.45
+        },
+        "rubato": 0,
+        "ornaments": 0.1,
+        "ducking": 0.5,
+        "evenLoudness": 0.6,
+        "sectionSpace": 0.4,
+        "keyLift": 0,
+        "timbreDrift": 0.2,
+        "mode": "Major-6",
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 30,
+          "pulse": 40,
+          "arpeggio": 30,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 20,
+          "walking": 0,
+          "drive": 80
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.3
+        },
+        "padRoot": "unlessBass",
+        "drums": {
+          "style": "electro",
+          "activity": 0.6,
+          "variation": 0.4,
+          "sprinkle": 0.1,
+          "kit": "tr808"
+        },
+        "bpm": 118,
+        "tonic": 0,
+        "progression": 6,
+        "volumes": {
+          "pad": 0.6,
+          "bass": 0.75,
+          "lead": 0.7,
+          "counter": 0.4,
+          "perc": 0.8
+        },
+        "leadActivity": 0.62,
+        "leadDensity": 0.35,
+        "leadLeaps": 0.3,
+        "leadRepeat": 0.55,
+        "sequencer": {
+          "on": true,
+          "machine": "tr808",
+          "arrangement": "electro-story",
+          "edits": {
+            "0": {
+              "cb": "................"
+            },
+            "1": {
+              "cb": "................",
+              "rs": "..x....x..x....x"
+            },
+            "2": {
+              "cb": "................",
+              "rs": "..x....x..x....x"
+            },
+            "3": {
+              "cb": "................",
+              "rs": "..x....x..x..x.x"
+            },
+            "4": {
+              "cb": "................"
+            },
+            "5": {
+              "cb": "................",
+              "rs": "..x....x..x....x"
+            },
+            "6": {
+              "cb": "................",
+              "rs": "..x....x..x....x"
+            },
+            "7": {
+              "cb": "................",
+              "rs": "..x....x..x....x"
+            }
+          },
+          "slots": [],
+          "lanes": true,
+          "gate": 0.3,
+          "pump": 0.4,
+          "fills": true,
+          "moves": {
+            "1": [
+              {
+                "key": "inserts.chorus",
+                "from": 0.1,
+                "to": 0.6
+              },
+              {
+                "key": "inserts.chorusRate",
+                "from": 0.2,
+                "to": 1.2
+              },
+              {
+                "key": "send.pad",
+                "from": 0.4,
+                "to": 0.4
+              }
+            ],
+            "4": [
+              {
+                "key": "inserts.chorus",
+                "from": 0.7,
+                "to": 0.2
+              },
+              {
+                "key": "effects.reverb",
+                "from": 0.4,
+                "to": 0.1
+              },
+              {
+                "key": "send.pad",
+                "from": 0.6,
+                "to": 0.3
+              },
+              {
+                "key": "filter.lowpass",
+                "from": 20000,
+                "to": 1500
+              }
+            ],
+            "5": [
+              {
+                "key": "inserts.phaser",
+                "from": 0,
+                "to": 0.7
+              },
+              {
+                "key": "effects.delay",
+                "from": 0,
+                "to": 0.4
+              },
+              {
+                "key": "effects.delayMs",
+                "from": 381,
+                "to": 127
+              },
+              {
+                "key": "send.pad",
+                "from": 0,
+                "to": 0.6
+              },
+              {
+                "key": "filter.highpass",
+                "from": 30,
+                "to": 900
+              }
+            ]
+          },
+          "sectionBars": 4
+        },
+        "leadSyncopation": 0.4,
+        "bus": {
+          "sends": {
+            "pad": 0,
+            "bass": 0,
+            "lead": 0.28,
+            "counter": 0,
+            "perc": 0
+          },
+          "rack": {
+            "effects.dry": 1,
+            "effects.reverb": 0.12,
+            "effects.delay": 0.22,
+            "effects.delayMs": 254,
+            "effects.feedback": 0.25
+          }
+        },
+        "portamento": {
+          "lead": 0.25,
+          "counter": 0,
+          "bass": 0
+        }
+      },
+      "voices": {
+        "pad": "Pluck Chord",
+        "bass": "Drive Bass",
+        "lead": "Drive Lead"
+      },
+      "percussion": {
+        "synth": "tr808",
+        "name": "Room"
+      }
+    },
+    {
+      "name": "Dub Pulse Basement",
+      "category": "electronic",
+      "blurb": "A slow 808 dub cycle with a heavy kick; the second chord drops to a breakdown and the fourth turns around",
+      "tags": [
+        "sequencer",
+        "dub",
+        "808"
+      ],
+      "settings": {
+        "humanize": {
+          "timing": 2,
+          "velocity": 0.05,
+          "detune": 2
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "dynamics": {
+          "level": 0.95,
+          "range": 0.8,
+          "attack": 0.3,
+          "brightness": 0.45
+        },
+        "rubato": 0,
+        "ornaments": 0.1,
+        "ducking": 0.5,
+        "evenLoudness": 0.6,
+        "sectionSpace": 0.4,
+        "keyLift": 0,
+        "timbreDrift": 0.2,
+        "mode": "Major-6",
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 30,
+          "pulse": 40,
+          "arpeggio": 30,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 20,
+          "walking": 0,
+          "drive": 80
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.3
+        },
+        "padRoot": "unlessBass",
+        "drums": {
+          "style": "electro",
+          "activity": 0.6,
+          "variation": 0.4,
+          "sprinkle": 0.1,
+          "kit": "tr808"
+        },
+        "bpm": 116,
+        "tonic": 2,
+        "progression": 7,
+        "volumes": {
+          "pad": 0.6,
+          "bass": 0.75,
+          "lead": 0.7,
+          "counter": 0.4,
+          "perc": 0.8
+        },
+        "leadActivity": 0.4,
+        "leadDensity": 0.18,
+        "leadLeaps": 0.2,
+        "leadRepeat": 0.65,
+        "sequencer": {
+          "on": true,
+          "machine": "tr808",
+          "arrangement": "dub-cycle",
+          "edits": {},
+          "slots": [
+            1,
+            1,
+            2,
+            4,
+            1,
+            2,
+            7,
+            4
+          ],
+          "lanes": true,
+          "gate": 0.4,
+          "pump": 0.5,
+          "fills": true,
+          "moves": {
+            "1": [
+              {
+                "key": "effects.delay",
+                "from": 0.15,
+                "to": 0.55
+              },
+              {
+                "key": "effects.feedback",
+                "from": 0.35,
+                "to": 0.7
+              },
+              {
+                "key": "send.pad",
+                "from": 0.4,
+                "to": 0.4
+              },
+              {
+                "key": "send.lead",
+                "from": 0.5,
+                "to": 0.5
+              }
+            ],
+            "4": [
+              {
+                "key": "effects.delay",
+                "from": 0.5,
+                "to": 0.8
+              },
+              {
+                "key": "effects.delayMs",
+                "from": 388,
+                "to": 517
+              },
+              {
+                "key": "inserts.chorus",
+                "from": 0.3,
+                "to": 0.6
+              },
+              {
+                "key": "send.pad",
+                "from": 0.6,
+                "to": 0.6
+              },
+              {
+                "key": "filter.lowpass",
+                "from": 20000,
+                "to": 700
+              }
+            ],
+            "7": [
+              {
+                "key": "effects.delay",
+                "from": 0.6,
+                "to": 0
+              },
+              {
+                "key": "effects.feedback",
+                "from": 0.7,
+                "to": 0.3
+              },
+              {
+                "key": "send.pad",
+                "from": 0.5,
+                "to": 0.1
+              }
+            ]
+          },
+          "sectionBars": 8
+        },
+        "leadSyncopation": 0.3,
+        "bus": {
+          "sends": {
+            "pad": 0,
+            "bass": 0,
+            "lead": 0.28,
+            "counter": 0,
+            "perc": 0
+          },
+          "rack": {
+            "effects.dry": 1,
+            "effects.reverb": 0.12,
+            "effects.delay": 0.22,
+            "effects.delayMs": 388,
+            "effects.feedback": 0.4
+          }
+        },
+        "portamento": {
+          "lead": 0,
+          "counter": 0,
+          "bass": 0.2
+        }
+      },
+      "voices": {
+        "pad": "Pluck Chord",
+        "bass": "Sub Bass",
+        "lead": "Bell Lead"
+      },
+      "percussion": {
+        "synth": "tr808",
+        "name": "Room"
+      }
+    },
+    {
+      "name": "Boom Bap Bakery",
+      "category": "electronic",
+      "blurb": "A dusty 808 boom bap: a swung kick and snare, warm Rhodes chords, a soft sub and a music box hook that closes into a filtered breakdown",
+      "tags": [
+        "sequencer",
+        "hiphop",
+        "boombap"
+      ],
+      "settings": {
+        "humanize": {
+          "timing": 2,
+          "velocity": 0.05,
+          "detune": 2
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "dynamics": {
+          "level": 0.95,
+          "range": 0.8,
+          "attack": 0.3,
+          "brightness": 0.45
+        },
+        "rubato": 0,
+        "ornaments": 0.1,
+        "ducking": 0.5,
+        "evenLoudness": 0.6,
+        "sectionSpace": 0.4,
+        "keyLift": 0,
+        "timbreDrift": 0.2,
+        "mode": "Major-6",
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 30,
+          "pulse": 40,
+          "arpeggio": 30,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 20,
+          "walking": 0,
+          "drive": 80
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.3
+        },
+        "padRoot": "unlessBass",
+        "drums": {
+          "style": "electro",
+          "activity": 0.6,
+          "variation": 0.4,
+          "sprinkle": 0.1,
+          "kit": "tr808"
+        },
+        "bpm": 88,
+        "tonic": 2,
+        "progression": 8,
+        "volumes": {
+          "pad": 0.6,
+          "bass": 0.75,
+          "lead": 0.7,
+          "counter": 0.4,
+          "perc": 0.8
+        },
+        "leadLeaps": 0.3,
+        "leadActivity": 0.45,
+        "leadDensity": 0.22,
+        "leadRepeat": 0.6,
+        "leadSyncopation": 0.35,
+        "portamento": {
+          "lead": 0,
+          "counter": 0,
+          "bass": 0.2
+        },
+        "bus": {
+          "sends": {
+            "pad": 0,
+            "bass": 0,
+            "lead": 0.28,
+            "counter": 0,
+            "perc": 0
+          },
+          "rack": {
+            "effects.dry": 1,
+            "effects.reverb": 0.12,
+            "effects.delay": 0.2,
+            "effects.delayMs": 511,
+            "effects.feedback": 0.3
+          }
+        },
+        "sequencer": {
+          "on": true,
+          "machine": "tr808",
+          "arrangement": "boom-bap-verse",
+          "edits": {},
+          "slots": [],
+          "lanes": false,
+          "gate": 0.22,
+          "pump": 0.5,
+          "variation": 0.6,
+          "fills": true,
+          "moves": {
+            "4": [
+              {
+                "key": "filter.lowpass",
+                "from": 20000,
+                "to": 1400
+              },
+              {
+                "key": "effects.delay",
+                "from": 0.2,
+                "to": 0.5
+              },
+              {
+                "key": "send.lead",
+                "from": 0.3,
+                "to": 0.5
+              }
+            ],
+            "5": [
+              {
+                "key": "filter.highpass",
+                "from": 30,
+                "to": 500
+              },
+              {
+                "key": "effects.delayMs",
+                "from": 511,
+                "to": 170
+              },
+              {
+                "key": "effects.delay",
+                "from": 0.15,
+                "to": 0.4
+              },
+              {
+                "key": "send.lead",
+                "from": 0.3,
+                "to": 0.5
+              }
+            ],
+            "7": [
+              {
+                "key": "filter.lowpass",
+                "from": 20000,
+                "to": 2500
+              }
+            ]
+          },
+          "sectionBars": 4
+        }
+      },
+      "voices": {
+        "pad": "FM Rhodes",
+        "bass": "Sub Bass",
+        "lead": "Music Box"
+      },
+      "percussion": {
+        "synth": "tr808",
+        "name": "Room"
+      }
+    },
+    {
+      "name": "Trap House Tuesday",
+      "category": "electronic",
+      "blurb": "Half-time trap at 140: a sliding 808 sub on the kicks, sparse dark plucks, a bell hook and rolling hats that fill every eight bars",
+      "tags": [
+        "sequencer",
+        "hiphop",
+        "trap"
+      ],
+      "settings": {
+        "humanize": {
+          "timing": 2,
+          "velocity": 0.05,
+          "detune": 2
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "dynamics": {
+          "level": 0.95,
+          "range": 0.8,
+          "attack": 0.3,
+          "brightness": 0.45
+        },
+        "rubato": 0,
+        "ornaments": 0.1,
+        "ducking": 0.5,
+        "evenLoudness": 0.6,
+        "sectionSpace": 0.4,
+        "keyLift": 0,
+        "timbreDrift": 0.2,
+        "mode": "Major-6",
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 30,
+          "pulse": 40,
+          "arpeggio": 30,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 20,
+          "walking": 0,
+          "drive": 80
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.3
+        },
+        "padRoot": "unlessBass",
+        "drums": {
+          "style": "electro",
+          "activity": 0.6,
+          "variation": 0.4,
+          "sprinkle": 0.1,
+          "kit": "tr808"
+        },
+        "bpm": 140,
+        "tonic": 6,
+        "progression": 7,
+        "volumes": {
+          "pad": 0.6,
+          "bass": 0.75,
+          "lead": 0.72,
+          "counter": 0.4,
+          "perc": 0.8
+        },
+        "leadLeaps": 0.3,
+        "leadActivity": 0.5,
+        "leadDensity": 0.25,
+        "leadRepeat": 0.65,
+        "leadSyncopation": 0.4,
+        "portamento": {
+          "lead": 0.2,
+          "counter": 0,
+          "bass": 0.7
+        },
+        "bus": {
+          "sends": {
+            "pad": 0,
+            "bass": 0,
+            "lead": 0.28,
+            "counter": 0,
+            "perc": 0
+          },
+          "rack": {
+            "effects.dry": 1,
+            "effects.reverb": 0.18,
+            "effects.delay": 0.2,
+            "effects.delayMs": 214,
+            "effects.feedback": 0.3
+          }
+        },
+        "sequencer": {
+          "on": true,
+          "machine": "tr808",
+          "arrangement": "trap-switch",
+          "edits": {
+            "0": {
+              "pad": "x.......x.....x."
+            },
+            "1": {
+              "pad": "x.......x.....x."
+            },
+            "2": {
+              "pad": "x.......x.....x."
+            },
+            "3": {
+              "pad": "x.......x.....x."
+            },
+            "5": {
+              "pad": "x.......x.....x."
+            },
+            "6": {
+              "pad": "x.......x.....x."
+            },
+            "7": {
+              "pad": "x.......x.....x."
+            }
+          },
+          "slots": [
+            1,
+            2,
+            1,
+            3,
+            1,
+            2,
+            4,
+            5
+          ],
+          "lanes": true,
+          "gate": 0.35,
+          "pump": 0.3,
+          "variation": 0.5,
+          "fills": true,
+          "moves": {
+            "4": [
+              {
+                "key": "filter.lowpass",
+                "from": 20000,
+                "to": 1000
+              },
+              {
+                "key": "effects.delay",
+                "from": 0.2,
+                "to": 0.55
+              }
+            ],
+            "5": [
+              {
+                "key": "filter.highpass",
+                "from": 30,
+                "to": 1200
+              },
+              {
+                "key": "effects.delay",
+                "from": 0.15,
+                "to": 0.45
+              },
+              {
+                "key": "send.lead",
+                "from": 0.3,
+                "to": 0.5
+              }
+            ]
+          },
+          "sectionBars": 8
+        }
+      },
+      "voices": {
+        "pad": "Pluck Chord",
+        "bass": "Sub Bass",
+        "lead": "Bell Lead"
+      },
+      "percussion": {
+        "synth": "tr808",
+        "name": "Room"
+      }
+    },
+    {
+      "name": "Dusty Vinyl Sunday",
+      "category": "cozy",
+      "blurb": "Slow lo-fi hip hop at 78: a lazy swung beat, soft keys, a felt bass and a clarinet that answers itself, with a vinyl-warm filter that breathes",
+      "tags": [
+        "sequencer",
+        "hiphop",
+        "lofi"
+      ],
+      "settings": {
+        "humanize": {
+          "timing": 2,
+          "velocity": 0.05,
+          "detune": 2
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "dynamics": {
+          "level": 0.95,
+          "range": 0.8,
+          "attack": 0.3,
+          "brightness": 0.45
+        },
+        "rubato": 0,
+        "ornaments": 0.1,
+        "ducking": 0.5,
+        "evenLoudness": 0.6,
+        "sectionSpace": 0.4,
+        "keyLift": 0,
+        "timbreDrift": 0.2,
+        "mode": "Major-6",
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 30,
+          "pulse": 40,
+          "arpeggio": 30,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 20,
+          "walking": 0,
+          "drive": 80
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.3
+        },
+        "padRoot": "unlessBass",
+        "drums": {
+          "style": "electro",
+          "activity": 0.6,
+          "variation": 0.4,
+          "sprinkle": 0.1,
+          "kit": "tr808"
+        },
+        "bpm": 78,
+        "tonic": 9,
+        "progression": 6,
+        "volumes": {
+          "pad": 0.6,
+          "bass": 0.75,
+          "lead": 0.62,
+          "counter": 0.4,
+          "perc": 0.8
+        },
+        "leadLeaps": 0.3,
+        "leadActivity": 0.4,
+        "leadDensity": 0.18,
+        "leadRepeat": 0.55,
+        "leadSyncopation": 0.25,
+        "portamento": {
+          "lead": 0.1,
+          "counter": 0,
+          "bass": 0
+        },
+        "bus": {
+          "sends": {
+            "pad": 0,
+            "bass": 0,
+            "lead": 0.28,
+            "counter": 0,
+            "perc": 0
+          },
+          "rack": {
+            "effects.dry": 1,
+            "effects.reverb": 0.12,
+            "effects.delay": 0.2,
+            "effects.delayMs": 577,
+            "effects.feedback": 0.3
+          }
+        },
+        "sequencer": {
+          "on": true,
+          "machine": "tr808",
+          "arrangement": "dusty-vinyl",
+          "edits": {},
+          "slots": [],
+          "lanes": false,
+          "gate": 0.22,
+          "pump": 0.2,
+          "variation": 0.6,
+          "fills": true,
+          "moves": {
+            "1": [
+              {
+                "key": "filter.lowpass",
+                "from": 9000,
+                "to": 16000
+              }
+            ],
+            "4": [
+              {
+                "key": "filter.lowpass",
+                "from": 20000,
+                "to": 1800
+              },
+              {
+                "key": "effects.delay",
+                "from": 0.15,
+                "to": 0.4
+              }
+            ]
+          },
+          "sectionBars": 8
+        }
+      },
+      "voices": {
+        "pad": "Soft Keys",
+        "bass": "Felt Bass",
+        "lead": "Clarinet Lead"
+      },
+      "percussion": {
+        "synth": "tr808",
+        "name": "Room"
+      }
+    },
+    {
+      "name": "Uplifting Trance Departures",
+      "category": "electronic",
+      "blurb": "Modern uplifting trance at 138: sixteenth-note plucks arpeggiating the chords, an off-beat bass, a driving lead, and 8-bar builds that rise through a high-pass into the drop",
+      "tags": [
+        "sequencer",
+        "trance",
+        "edm"
+      ],
+      "settings": {
+        "humanize": {
+          "timing": 2,
+          "velocity": 0.05,
+          "detune": 2
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "dynamics": {
+          "level": 0.95,
+          "range": 0.8,
+          "attack": 0.3,
+          "brightness": 0.45
+        },
+        "rubato": 0,
+        "ornaments": 0.1,
+        "ducking": 0.5,
+        "evenLoudness": 0.6,
+        "sectionSpace": 0.4,
+        "keyLift": 0,
+        "timbreDrift": 0.2,
+        "mode": "Major-6",
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 30,
+          "pulse": 40,
+          "arpeggio": 30,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 20,
+          "walking": 0,
+          "drive": 80
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.3
+        },
+        "padRoot": "unlessBass",
+        "drums": {
+          "style": "electro",
+          "activity": 0.6,
+          "variation": 0.4,
+          "sprinkle": 0.1,
+          "kit": "tr808"
+        },
+        "bpm": 138,
+        "tonic": 9,
+        "progression": 6,
+        "volumes": {
+          "pad": 0.6,
+          "bass": 0.75,
+          "lead": 0.72,
+          "counter": 0.4,
+          "perc": 0.8
+        },
+        "leadLeaps": 0.3,
+        "leadActivity": 0.7,
+        "leadDensity": 0.4,
+        "leadRepeat": 0.6,
+        "leadSyncopation": 0.35,
+        "portamento": {
+          "lead": 0.1,
+          "counter": 0,
+          "bass": 0.1
+        },
+        "bus": {
+          "sends": {
+            "pad": 0,
+            "bass": 0,
+            "lead": 0.28,
+            "counter": 0,
+            "perc": 0
+          },
+          "rack": {
+            "effects.dry": 1,
+            "effects.reverb": 0.12,
+            "effects.delay": 0.2,
+            "effects.delayMs": 217,
+            "effects.feedback": 0.3
+          }
+        },
+        "sequencer": {
+          "on": true,
+          "machine": "tr909",
+          "arrangement": "trance-journey",
+          "edits": {},
+          "slots": [
+            0,
+            1,
+            5,
+            6,
+            1,
+            4,
+            5,
+            6
+          ],
+          "lanes": true,
+          "gate": 0.16,
+          "pump": 0.7,
+          "variation": 0.85,
+          "fills": true,
+          "moves": {
+            "0": [
+              {
+                "key": "filter.highpass",
+                "from": 200,
+                "to": 10
+              }
+            ],
+            "4": [
+              {
+                "key": "filter.lowpass",
+                "from": 20000,
+                "to": 1200
+              },
+              {
+                "key": "effects.reverb",
+                "from": 0.3,
+                "to": 0.7
+              },
+              {
+                "key": "send.pad",
+                "from": 0.3,
+                "to": 0.5
+              },
+              {
+                "key": "send.lead",
+                "from": 0.4,
+                "to": 0.5
+              }
+            ],
+            "5": [
+              {
+                "key": "filter.highpass",
+                "from": 30,
+                "to": 2200
+              },
+              {
+                "key": "effects.delay",
+                "from": 0.1,
+                "to": 0.45
+              },
+              {
+                "key": "effects.delayMs",
+                "from": 326,
+                "to": 109
+              },
+              {
+                "key": "inserts.phaser",
+                "from": 0,
+                "to": 0.5
+              },
+              {
+                "key": "send.pad",
+                "from": 0.1,
+                "to": 0.6
+              }
+            ],
+            "6": [
+              {
+                "key": "inserts.saturation",
+                "from": 0.4,
+                "to": 0.1
+              }
+            ]
+          },
+          "sectionBars": 8
+        }
+      },
+      "voices": {
+        "pad": "Pluck Chord",
+        "bass": "Rolling Bass",
+        "lead": "Drive Lead"
+      },
+      "percussion": {
+        "synth": "tr909",
+        "name": "Room"
+      }
+    },
+    {
+      "name": "Progressive Night Bus",
+      "category": "electronic",
+      "blurb": "Rolling progressive trance at 130: a patient off-beat bass, plucked arpeggios that thin and return, and a resonant lead over long filter sweeps",
+      "tags": [
+        "sequencer",
+        "trance",
+        "progressive"
+      ],
+      "settings": {
+        "humanize": {
+          "timing": 2,
+          "velocity": 0.05,
+          "detune": 2
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "dynamics": {
+          "level": 0.95,
+          "range": 0.8,
+          "attack": 0.3,
+          "brightness": 0.45
+        },
+        "rubato": 0,
+        "ornaments": 0.1,
+        "ducking": 0.5,
+        "evenLoudness": 0.6,
+        "sectionSpace": 0.4,
+        "keyLift": 0,
+        "timbreDrift": 0.2,
+        "mode": "Major-6",
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 30,
+          "pulse": 40,
+          "arpeggio": 30,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 20,
+          "walking": 0,
+          "drive": 80
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.3
+        },
+        "padRoot": "unlessBass",
+        "drums": {
+          "style": "electro",
+          "activity": 0.6,
+          "variation": 0.4,
+          "sprinkle": 0.1,
+          "kit": "tr808"
+        },
+        "bpm": 130,
+        "tonic": 4,
+        "progression": 7,
+        "volumes": {
+          "pad": 0.6,
+          "bass": 0.75,
+          "lead": 0.68,
+          "counter": 0.4,
+          "perc": 0.8
+        },
+        "leadLeaps": 0.3,
+        "leadActivity": 0.55,
+        "leadDensity": 0.3,
+        "leadRepeat": 0.65,
+        "leadSyncopation": 0.45,
+        "portamento": {
+          "lead": 0.25,
+          "counter": 0,
+          "bass": 0.2
+        },
+        "bus": {
+          "sends": {
+            "pad": 0,
+            "bass": 0,
+            "lead": 0.28,
+            "counter": 0,
+            "perc": 0
+          },
+          "rack": {
+            "effects.dry": 1,
+            "effects.reverb": 0.12,
+            "effects.delay": 0.2,
+            "effects.delayMs": 231,
+            "effects.feedback": 0.3
+          }
+        },
+        "sequencer": {
+          "on": true,
+          "machine": "tr909",
+          "arrangement": "progressive-journey",
+          "edits": {},
+          "slots": [
+            1,
+            2,
+            5,
+            6
+          ],
+          "lanes": true,
+          "gate": 0.2,
+          "pump": 0.6,
+          "variation": 0.75,
+          "fills": true,
+          "moves": {
+            "1": [
+              {
+                "key": "inserts.chorus",
+                "from": 0,
+                "to": 0.5
+              },
+              {
+                "key": "send.pad",
+                "from": 0.3,
+                "to": 0.3
+              }
+            ],
+            "2": [
+              {
+                "key": "inserts.phaser",
+                "from": 0.1,
+                "to": 0.6
+              },
+              {
+                "key": "send.pad",
+                "from": 0.4,
+                "to": 0.4
+              }
+            ],
+            "5": [
+              {
+                "key": "filter.lowpass",
+                "from": 700,
+                "to": 20000
+              },
+              {
+                "key": "effects.delay",
+                "from": 0.1,
+                "to": 0.45
+              },
+              {
+                "key": "effects.delayMs",
+                "from": 346,
+                "to": 115
+              },
+              {
+                "key": "send.pad",
+                "from": 0.2,
+                "to": 0.6
+              }
+            ],
+            "6": [
+              {
+                "key": "inserts.saturation",
+                "from": 0.4,
+                "to": 0.1
+              }
+            ]
+          },
+          "sectionBars": 16
+        }
+      },
+      "voices": {
+        "pad": "Progressive Pluck",
+        "bass": "Rolling Bass",
+        "lead": "Acid Lead"
+      },
+      "percussion": {
+        "synth": "tr909",
+        "name": "Room"
+      }
+    },
+    {
+      "name": "Minimal Click Lab",
+      "category": "electronic",
+      "blurb": "Sparse minimal tech at 126: tiny clicks and rim shots, a patient off-beat sub, one or two stabs a bar and a lone blip of a lead; the room is the instrument and the filter opens over sixteen bars",
+      "tags": [
+        "sequencer",
+        "minimal",
+        "tech"
+      ],
+      "settings": {
+        "humanize": {
+          "timing": 2,
+          "velocity": 0.05,
+          "detune": 2
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "dynamics": {
+          "level": 0.95,
+          "range": 0.8,
+          "attack": 0.3,
+          "brightness": 0.45
+        },
+        "rubato": 0,
+        "ornaments": 0.1,
+        "ducking": 0.5,
+        "evenLoudness": 0.6,
+        "sectionSpace": 0.4,
+        "keyLift": 0,
+        "timbreDrift": 0.2,
+        "mode": "Major-6",
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 30,
+          "pulse": 40,
+          "arpeggio": 30,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 20,
+          "walking": 0,
+          "drive": 80
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.45
+        },
+        "padRoot": "unlessBass",
+        "drums": {
+          "style": "electro",
+          "activity": 0.6,
+          "variation": 0.4,
+          "sprinkle": 0.1,
+          "kit": "tr808"
+        },
+        "bpm": 126,
+        "tonic": 11,
+        "progression": 12,
+        "volumes": {
+          "pad": 0.6,
+          "bass": 0.75,
+          "lead": 0.6,
+          "counter": 0.4,
+          "perc": 0.8
+        },
+        "leadLeaps": 0.3,
+        "leadActivity": 0.22,
+        "leadDensity": 0.08,
+        "leadRepeat": 0.8,
+        "leadSyncopation": 0.5,
+        "portamento": {
+          "lead": 0,
+          "counter": 0,
+          "bass": 0.1
+        },
+        "bus": {
+          "sends": {
+            "pad": 0,
+            "bass": 0,
+            "lead": 0.28,
+            "counter": 0,
+            "perc": 0
+          },
+          "rack": {
+            "effects.dry": 1,
+            "effects.reverb": 0.14,
+            "effects.delay": 0.25,
+            "effects.delayMs": 238,
+            "effects.feedback": 0.3
+          }
+        },
+        "sequencer": {
+          "on": true,
+          "machine": "tr808",
+          "arrangement": "minimal-click",
+          "edits": {
+            "0": {
+              "rd": "................",
+              "cr": "................",
+              "cy": "................"
+            },
+            "1": {
+              "pad": "..x.....x.......",
+              "rd": "................",
+              "cr": "................",
+              "cy": "................"
+            },
+            "2": {
+              "pad": "..x.....x.....x.",
+              "rd": "................",
+              "cr": "................",
+              "cy": "................"
+            },
+            "3": {
+              "pad": "..x...x...x...x.",
+              "rd": "................",
+              "cr": "................",
+              "cy": "................"
+            },
+            "4": {
+              "rd": "................",
+              "cr": "................",
+              "cy": "................"
+            },
+            "5": {
+              "pad": "..x...x...x...x.",
+              "rd": "................",
+              "cr": "................",
+              "cy": "................"
+            },
+            "6": {
+              "pad": "x..x..x...x..x..",
+              "rd": "................",
+              "cr": "................",
+              "cy": "................"
+            },
+            "7": {
+              "pad": "..x.....x.......",
+              "rd": "................",
+              "cr": "................",
+              "cy": "................"
+            }
+          },
+          "slots": [
+            0,
+            1,
+            2,
+            1,
+            4,
+            1,
+            2,
+            6
+          ],
+          "lanes": true,
+          "gate": 0.12,
+          "pump": 0.55,
+          "variation": 0.9,
+          "fills": true,
+          "moves": {
+            "0": [
+              {
+                "key": "filter.lowpass",
+                "from": 900,
+                "to": 6000
+              }
+            ],
+            "1": [
+              {
+                "key": "filter.lowpass",
+                "from": 2500,
+                "to": 16000
+              },
+              {
+                "key": "inserts.chorus",
+                "from": 0,
+                "to": 0.35
+              },
+              {
+                "key": "send.pad",
+                "from": 0.2,
+                "to": 0.3
+              }
+            ],
+            "2": [
+              {
+                "key": "effects.delay",
+                "from": 0.25,
+                "to": 0.55
+              },
+              {
+                "key": "effects.feedback",
+                "from": 0.3,
+                "to": 0.55
+              },
+              {
+                "key": "send.pad",
+                "from": 0.4,
+                "to": 0.4
+              }
+            ],
+            "4": [
+              {
+                "key": "filter.lowpass",
+                "from": 16000,
+                "to": 700
+              },
+              {
+                "key": "effects.reverb",
+                "from": 0.2,
+                "to": 0.55
+              },
+              {
+                "key": "send.pad",
+                "from": 0.5,
+                "to": 0.5
+              }
+            ],
+            "6": [
+              {
+                "key": "filter.highpass",
+                "from": 20,
+                "to": 60
+              },
+              {
+                "key": "inserts.saturation",
+                "from": 0.3,
+                "to": 0.1
+              }
+            ]
+          },
+          "sectionBars": 16
+        }
+      },
+      "voices": {
+        "pad": "Techno Stab",
+        "bass": "Rolling Bass",
+        "lead": "Hollow Pulse"
+      },
+      "percussion": {
+        "synth": "tr808",
+        "name": "Room"
+      }
+    },
+    {
+      "name": "Slow House Sunset",
+      "category": "cozy",
+      "blurb": "Chilled house at 100 with an 808: a warm Rhodes stab on the off-beats, a soft sub bounce and a flute that glides between notes while the filter breathes",
+      "tags": [
+        "sequencer",
+        "house",
+        "chill"
+      ],
+      "settings": {
+        "humanize": {
+          "timing": 2,
+          "velocity": 0.05,
+          "detune": 2
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "dynamics": {
+          "level": 0.95,
+          "range": 0.8,
+          "attack": 0.3,
+          "brightness": 0.45
+        },
+        "rubato": 0,
+        "ornaments": 0.1,
+        "ducking": 0.5,
+        "evenLoudness": 0.6,
+        "sectionSpace": 0.4,
+        "keyLift": 0,
+        "timbreDrift": 0.2,
+        "mode": "Major-1",
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 30,
+          "pulse": 40,
+          "arpeggio": 30,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 20,
+          "walking": 0,
+          "drive": 80
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.4
+        },
+        "padRoot": "unlessBass",
+        "drums": {
+          "style": "electro",
+          "activity": 0.6,
+          "variation": 0.4,
+          "sprinkle": 0.1,
+          "kit": "tr808"
+        },
+        "bpm": 100,
+        "tonic": 5,
+        "progression": 16,
+        "volumes": {
+          "pad": 0.6,
+          "bass": 0.75,
+          "lead": 0.65,
+          "counter": 0.4,
+          "perc": 0.8
+        },
+        "leadLeaps": 0.3,
+        "leadActivity": 0.4,
+        "leadDensity": 0.18,
+        "leadRepeat": 0.55,
+        "leadSyncopation": 0.3,
+        "portamento": {
+          "lead": 0.3,
+          "counter": 0,
+          "bass": 0.1
+        },
+        "bus": {
+          "sends": {
+            "pad": 0,
+            "bass": 0,
+            "lead": 0.28,
+            "counter": 0,
+            "perc": 0
+          },
+          "rack": {
+            "effects.dry": 1,
+            "effects.reverb": 0.14,
+            "effects.delay": 0.2,
+            "effects.delayMs": 450,
+            "effects.feedback": 0.3
+          }
+        },
+        "sequencer": {
+          "on": true,
+          "machine": "tr808",
+          "arrangement": "slow-house",
+          "edits": {
+            "0": {
+              "rd": "................",
+              "cr": "................",
+              "cy": "................"
+            },
+            "1": {
+              "rd": "................",
+              "cr": "................",
+              "cy": "................"
+            },
+            "2": {
+              "rd": "................",
+              "cr": "................",
+              "cy": "................"
+            },
+            "3": {
+              "rd": "................",
+              "cr": "................",
+              "cy": "................"
+            },
+            "4": {
+              "rd": "................",
+              "cr": "................",
+              "cy": "................"
+            },
+            "5": {
+              "rd": "................",
+              "cr": "................",
+              "cy": "................"
+            },
+            "6": {
+              "rd": "................",
+              "cr": "................",
+              "cy": "................"
+            },
+            "7": {
+              "rd": "................",
+              "cr": "................",
+              "cy": "................"
+            }
+          },
+          "slots": [
+            0,
+            1,
+            2,
+            1,
+            4,
+            1,
+            2,
+            7
+          ],
+          "lanes": true,
+          "gate": 0.4,
+          "pump": 0.25,
+          "variation": 0.55,
+          "fills": true,
+          "moves": {
+            "1": [
+              {
+                "key": "inserts.chorus",
+                "from": 0,
+                "to": 0.4
+              },
+              {
+                "key": "send.pad",
+                "from": 0.3,
+                "to": 0.3
+              }
+            ],
+            "4": [
+              {
+                "key": "filter.lowpass",
+                "from": 20000,
+                "to": 1500
+              },
+              {
+                "key": "effects.delay",
+                "from": 0.2,
+                "to": 0.5
+              }
+            ],
+            "5": [
+              {
+                "key": "filter.lowpass",
+                "from": 1200,
+                "to": 20000
+              }
+            ],
+            "7": [
+              {
+                "key": "effects.delay",
+                "from": 0.3,
+                "to": 0.1
+              }
+            ]
+          },
+          "sectionBars": 8
+        }
+      },
+      "voices": {
+        "pad": "FM Rhodes",
+        "bass": "Sub Bass",
+        "lead": "Soft Flute"
+      },
+      "percussion": {
+        "synth": "tr808",
+        "name": "Room"
+      }
+    },
+    {
+      "name": "Deep Pocket Daydream",
+      "category": "cozy",
+      "blurb": "A deep, slow house pocket at 96: swung hats on a soft 808 kick, plucked keys, a rounded bass and a kalimba that daydreams over the top",
+      "tags": [
+        "sequencer",
+        "house",
+        "deep",
+        "chill"
+      ],
+      "settings": {
+        "humanize": {
+          "timing": 2,
+          "velocity": 0.05,
+          "detune": 2
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "dynamics": {
+          "level": 0.95,
+          "range": 0.8,
+          "attack": 0.3,
+          "brightness": 0.45
+        },
+        "rubato": 0,
+        "ornaments": 0.1,
+        "ducking": 0.5,
+        "evenLoudness": 0.6,
+        "sectionSpace": 0.4,
+        "keyLift": 0,
+        "timbreDrift": 0.2,
+        "mode": "Major-6",
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 30,
+          "pulse": 40,
+          "arpeggio": 30,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 20,
+          "walking": 0,
+          "drive": 80
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.45
+        },
+        "padRoot": "unlessBass",
+        "drums": {
+          "style": "electro",
+          "activity": 0.6,
+          "variation": 0.4,
+          "sprinkle": 0.1,
+          "kit": "tr808"
+        },
+        "bpm": 96,
+        "tonic": 0,
+        "progression": 8,
+        "volumes": {
+          "pad": 0.6,
+          "bass": 0.75,
+          "lead": 0.64,
+          "counter": 0.4,
+          "perc": 0.8
+        },
+        "leadLeaps": 0.3,
+        "leadActivity": 0.38,
+        "leadDensity": 0.16,
+        "leadRepeat": 0.6,
+        "leadSyncopation": 0.3,
+        "portamento": {
+          "lead": 0,
+          "counter": 0,
+          "bass": 0.15
+        },
+        "bus": {
+          "sends": {
+            "pad": 0,
+            "bass": 0,
+            "lead": 0.28,
+            "counter": 0,
+            "perc": 0
+          },
+          "rack": {
+            "effects.dry": 1,
+            "effects.reverb": 0.14,
+            "effects.delay": 0.2,
+            "effects.delayMs": 469,
+            "effects.feedback": 0.3
+          }
+        },
+        "sequencer": {
+          "on": true,
+          "machine": "tr808",
+          "arrangement": "deep-pocket",
+          "edits": {
+            "0": {
+              "rd": "................",
+              "cr": "................",
+              "cy": "................"
+            },
+            "1": {
+              "rd": "................",
+              "cr": "................",
+              "cy": "................"
+            },
+            "2": {
+              "rd": "................",
+              "cr": "................",
+              "cy": "................"
+            },
+            "3": {
+              "rd": "................",
+              "cr": "................",
+              "cy": "................"
+            },
+            "4": {
+              "rd": "................",
+              "cr": "................",
+              "cy": "................"
+            },
+            "5": {
+              "rd": "................",
+              "cr": "................",
+              "cy": "................"
+            },
+            "6": {
+              "rd": "................",
+              "cr": "................",
+              "cy": "................"
+            },
+            "7": {
+              "rd": "................",
+              "cr": "................",
+              "cy": "................"
+            }
+          },
+          "slots": [
+            1,
+            2,
+            1,
+            3,
+            4,
+            1,
+            2,
+            7
+          ],
+          "lanes": true,
+          "gate": 0.3,
+          "pump": 0.3,
+          "variation": 0.6,
+          "fills": true,
+          "moves": {
+            "1": [
+              {
+                "key": "inserts.phaser",
+                "from": 0.05,
+                "to": 0.3
+              },
+              {
+                "key": "inserts.phaserRate",
+                "from": 0.05,
+                "to": 0.2
+              },
+              {
+                "key": "send.pad",
+                "from": 0.3,
+                "to": 0.3
+              }
+            ],
+            "4": [
+              {
+                "key": "filter.lowpass",
+                "from": 20000,
+                "to": 1100
+              },
+              {
+                "key": "effects.reverb",
+                "from": 0.2,
+                "to": 0.5
+              },
+              {
+                "key": "send.pad",
+                "from": 0.4,
+                "to": 0.4
+              }
+            ],
+            "6": [
+              {
+                "key": "effects.delay",
+                "from": 0.15,
+                "to": 0.4
+              },
+              {
+                "key": "send.lead",
+                "from": 0.3,
+                "to": 0.5
+              }
+            ]
+          },
+          "sectionBars": 8
+        }
+      },
+      "voices": {
+        "pad": "Soft Keys",
+        "bass": "Round Pluck Bass",
+        "lead": "Kalimba Pluck"
+      },
+      "percussion": {
+        "synth": "tr808",
+        "name": "Room"
+      }
+    },
+    {
+      "name": "Disco Ride Afternoon",
+      "category": "cozy",
+      "blurb": "Lazy disco-house at 104: a ride cymbal over a gentle 808 kick, organ stabs on the off-beat, a springy bass and a music box tune",
+      "tags": [
+        "sequencer",
+        "house",
+        "disco",
+        "chill"
+      ],
+      "settings": {
+        "humanize": {
+          "timing": 2,
+          "velocity": 0.05,
+          "detune": 2
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "dynamics": {
+          "level": 0.95,
+          "range": 0.8,
+          "attack": 0.3,
+          "brightness": 0.45
+        },
+        "rubato": 0,
+        "ornaments": 0.1,
+        "ducking": 0.5,
+        "evenLoudness": 0.6,
+        "sectionSpace": 0.4,
+        "keyLift": 0,
+        "timbreDrift": 0.2,
+        "mode": "Major-1",
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 30,
+          "pulse": 40,
+          "arpeggio": 30,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 20,
+          "walking": 0,
+          "drive": 80
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.35
+        },
+        "padRoot": "unlessBass",
+        "drums": {
+          "style": "electro",
+          "activity": 0.6,
+          "variation": 0.4,
+          "sprinkle": 0.1,
+          "kit": "tr808"
+        },
+        "bpm": 104,
+        "tonic": 7,
+        "progression": 1,
+        "volumes": {
+          "pad": 0.6,
+          "bass": 0.75,
+          "lead": 0.66,
+          "counter": 0.4,
+          "perc": 0.8
+        },
+        "leadLeaps": 0.3,
+        "leadActivity": 0.45,
+        "leadDensity": 0.2,
+        "leadRepeat": 0.55,
+        "leadSyncopation": 0.35,
+        "portamento": {
+          "lead": 0.05,
+          "counter": 0,
+          "bass": 0.2
+        },
+        "bus": {
+          "sends": {
+            "pad": 0,
+            "bass": 0,
+            "lead": 0.28,
+            "counter": 0,
+            "perc": 0
+          },
+          "rack": {
+            "effects.dry": 1,
+            "effects.reverb": 0.14,
+            "effects.delay": 0.2,
+            "effects.delayMs": 288,
+            "effects.feedback": 0.3
+          }
+        },
+        "sequencer": {
+          "on": true,
+          "machine": "tr808",
+          "arrangement": "disco-turn",
+          "edits": {
+            "0": {
+              "rd": "................",
+              "cr": "................",
+              "cy": "................"
+            },
+            "1": {
+              "rd": "................",
+              "cr": "................",
+              "cy": "................"
+            },
+            "2": {
+              "rd": "................",
+              "cr": "................",
+              "cy": "................"
+            },
+            "3": {
+              "rd": "................",
+              "cr": "................",
+              "cy": "................"
+            },
+            "4": {
+              "rd": "................",
+              "cr": "................",
+              "cy": "................"
+            },
+            "5": {
+              "rd": "................",
+              "cr": "................",
+              "cy": "................"
+            },
+            "6": {
+              "rd": "................",
+              "cr": "................",
+              "cy": "................"
+            },
+            "7": {
+              "rd": "................",
+              "cr": "................",
+              "cy": "................"
+            }
+          },
+          "slots": [
+            1,
+            2,
+            1,
+            3
+          ],
+          "lanes": true,
+          "gate": 0.28,
+          "pump": 0.25,
+          "variation": 0.5,
+          "fills": true,
+          "moves": {
+            "1": [
+              {
+                "key": "inserts.chorus",
+                "from": 0.05,
+                "to": 0.35
+              },
+              {
+                "key": "send.pad",
+                "from": 0.3,
+                "to": 0.3
+              }
+            ],
+            "3": [
+              {
+                "key": "effects.delay",
+                "from": 0.1,
+                "to": 0.45
+              },
+              {
+                "key": "effects.delayMs",
+                "from": 433,
+                "to": 144
+              },
+              {
+                "key": "send.pad",
+                "from": 0.3,
+                "to": 0.5
+              }
+            ]
+          },
+          "sectionBars": 8
+        }
+      },
+      "voices": {
+        "pad": "Warm Organ",
+        "bass": "Felt Bass",
+        "lead": "Music Box"
+      },
+      "percussion": {
+        "synth": "tr808",
+        "name": "Room"
+      }
     }
   ]
 }

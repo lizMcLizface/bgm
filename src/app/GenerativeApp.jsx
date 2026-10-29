@@ -30,6 +30,7 @@ import { defaultSettings, shareFromLocation, sharePath, shareUrl, newSeed } from
 const SoundWindow = lazy(() => import('./editor/SoundWindow'));
 const SOUND_ROLES = { ...ROLES, ...PERC_ROLE, bus: { label: 'Shared bus' } };
 import PresetPicker from './editor/PresetPicker';
+import SequencerPanel from './SequencerPanel';
 import PROGRESSIONS, { PROGRESSION_LENGTHS, progressionsOfLength, progressionFamily } from './progressions';
 import {
     PAD_STYLES, BASS_STYLES, PULSE_PATTERNS, ARP_PATTERNS, CHORD_DIRECTIONS, styleShares, OCTAVE_LIMITS, OCTAVE_WANDER, SECTION_LENGTHS,
@@ -1752,6 +1753,12 @@ const GenerativeApp = () => {
                         <input type="range" min="0" max="1" step="0.01" value={settings.volumes[role]}
                             onChange={(e) => setVolume(role, Number(e.target.value))} />
                     </Field>
+                    {has(3) && role in settings.portamento && (
+                        <Field label={`Glide between notes ${Math.round(settings.portamento[role] * 100)}%`}>
+                            <input type="range" min="0" max="1" step="0.01" value={settings.portamento[role]}
+                                onChange={(e) => update('portamento', { ...settings.portamento, [role]: Number(e.target.value) })} />
+                        </Field>
+                    )}
                 </Panel>
             ))}
 
@@ -1759,6 +1766,8 @@ const GenerativeApp = () => {
                 armed={armed === 'perc'} onArm={setArmed}
                 onVoice={choosePercussionVoice} voiceBusy={percussionBusy} voiceOpen={pickerRole==='perc'} onVoiceOpen={open=>choosePicker(open?'perc':null)} onDrums={(drums) => update('drums', drums)} onKit={(kit) => update('drumKit', kit)}
                 onVolume={(v) => setVolume('perc', v)} onMix={changeMix} onAudition={() => gen.audition('perc')} />}
+            {has(3) && <SequencerPanel seq={settings.sequencer} chords={PROGRESSIONS[settings.progression] ?? []} machine={percMachine} onChange={(seq) => update('sequencer', seq)}
+                onMachine={(synth, name = 'Room') => { void applyRef('perc', { synth, name }); }} />}
 
             {!has(3)&&pickerRole==='perc'&&<VoiceBrowser role="perc" value={settings.drums.kit} edited={percussionEdited(settings.drums.kit,settings.drumKit)} onChange={choosePercussionVoice} onClose={()=>choosePicker(null)}/>}
 
