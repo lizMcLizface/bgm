@@ -2,7 +2,7 @@ const bounded = (value, fallback, lo, hi) => Number.isFinite(value) ? Math.max(l
 export function cleanExpression(raw) {
     if (!raw || typeof raw !== 'object') return null;
     return { pitchTargets:cleanPitchTargets(raw.pitchTargets), pitchMotion:raw.pitchMotion&&typeof raw.pitchMotion==='object'?{phase:bounded(raw.pitchMotion.phase,0,-1e9,1e9),rate:bounded(raw.pitchMotion.rate,.4,.01,4),depth:bounded(raw.pitchMotion.depth,0,0,60)}:null, slideFromMidi:Number.isFinite(raw.slideFromMidi)?Math.max(0,Math.min(127,Math.round(raw.slideFromMidi))):null,
-        slideSeconds:bounded(raw.slideSeconds,.2,.02,1.5), gateAware:raw.gateAware === true, tempoBeat:bounded(raw.tempoBeat,0,0,3), connected: raw.connected === true, attackScale: bounded(raw.attackScale, 1, .65, 1.3), releaseScale: bounded(raw.releaseScale, 1, .7, 1),
+        slideSeconds:bounded(raw.slideSeconds,.2,.02,1.5), gateAware:raw.gateAware === true, tempoBeat:bounded(raw.tempoBeat,0,0,3), connected: raw.connected === true, attackScale: bounded(raw.attackScale, 1, .65, 8), releaseScale: bounded(raw.releaseScale, 1, .7, 1),
         gateScale: bounded(raw.gateScale, 1, .9, 1), brightnessCents: bounded(raw.brightnessCents, 0, -600, 600), dynamicAttack: bounded(raw.dynamicAttack, 0, 0, 1),
         breathDepth: bounded(raw.breathDepth, 0, 0, .3), vibratoDepth: bounded(raw.vibratoDepth, 0, 0, 12),
         vibratoDelay: bounded(raw.vibratoDelay, .4, .2, .8), vibratoRate: bounded(raw.vibratoRate, 5, 4, 6) };

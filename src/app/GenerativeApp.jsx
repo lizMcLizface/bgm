@@ -104,6 +104,7 @@ import PRESET_DEFAULTS from './engine/presetDefaults';
 import { readPref, writePref } from './prefs';
 import { readPerformance, writePerformance } from '../audio/performance';
 import { seedToPhrase, phraseToSeed } from './phrase';
+import IntensityPanel from './IntensityPanel';
 import { WANDER_ROLES, WANDER_LIMITS, WANDER_MODES, AMBIENCE_WANDER_LIMITS } from './engine/wander';
 import Tour, { tourSeen, minimalTourSeen } from './Tour';
 import { STAGES, STAGE_KEY, LAST_STAGE, MINIMAL_TOUR_KEY, QUESTS_INTRO_KEY } from './tourSteps';
@@ -921,7 +922,7 @@ const GenerativeApp = () => {
     const armedBefore = useRef(null);
     const choosePicker = (role) => {
         if (role && pickerRole === null) armedBefore.current = armed;
-        if (role) setArmed(role);
+        if (role && !(role === 'perc' && percMachine)) setArmed(role); // (a step-sequencer drum machine is not played by hand)
         else if (pickerRole !== null) setArmed(armedBefore.current);
         setPickerRole(role);
     };
@@ -1001,7 +1002,7 @@ const GenerativeApp = () => {
     const editSound = (role) => {
         emitQuest('editor', { role });
         if (soundRole === null) soundArmedBefore.current = armed;
-        if (role !== 'bus') setArmed(role); // (the bus is no voice to play)
+        if (role !== 'bus' && !(role === 'perc' && percMachine)) setArmed(role); // (the bus is no voice to play, nor a step-sequencer drum machine)
         setSoundRole(role);
     };
     // the Performance choices shown with the bus (as the Audio menu's: they apply after a reload)
@@ -1348,7 +1349,7 @@ const GenerativeApp = () => {
     const [storedBackdropOptions, setBackdropOptions] = useStoredFlag('bgm-backdrop-options', BACKDROP_DEFAULTS);
     const backdropOptions = { ...BACKDROP_DEFAULTS, ...storedBackdropOptions };
     // Hides everything but the transport and the timeline (⚙ menu); Esc or the corner button brings it back.
-    const [zen, setZen] = useStoredFlag('bgm-hide-ui', firstVisit, linkedView ? true : undefined);
+    const [zen, setZen] = useStoredFlag('bgm-hide-ui', firstVisit, linkedView ? !linkedView.full : undefined);
     // Which pattern blocks show under the timeline (they also keep the page from going idle).
     const [showPiano, setShowPiano] = useStoredFlag('bgm-show-piano', false, linkedPatterns?.show.piano);
     const [showGuitar, setShowGuitar] = useStoredFlag('bgm-show-guitar', false, linkedPatterns?.show.guitar);
@@ -1395,9 +1396,10 @@ const GenerativeApp = () => {
     const [storedPatternOptions, setPatternOptions] = useStoredFlag('bgm-pattern-options', {}, linkedPatternOptions ? { ...readPref('bgm-pattern-options', {}), ...linkedPatternOptions } : undefined);
     const patternOptions = storedPatternOptions;
     const setPatternOption = (id, patch) => setPatternOptions({ ...patternOptions, [id]: { ...patternOptions[id], ...patch } });
-    // The link's extra: open in this background with the interface hidden and these patterns showing.
-    const viewParam = backdropMode === 'scenery' ? 'landscape' : backdropMode === 'fluid' ? 'fluid' : null;
-    const withThisView = (url) => withPatterns(viewParam ? withView(url, { view: viewParam }) : url, patternsParam({ piano: showPiano, guitar: showGuitar, bass: showBass }, patternOptions,
+    // The link's extra: this background (or none: plain) with the interface hidden or - from the full page - shown (ui=full), and these
+    // patterns showing. Always written, so the new tab opens as this one is and not as its own stored choices and first-visit defaults have it.
+    const viewParam = backdropMode === 'scenery' ? 'landscape' : backdropMode === 'fluid' ? 'fluid' : 'plain';
+    const withThisView = (url) => withPatterns(withView(url, { view: viewParam, full: !zen }), patternsParam({ piano: showPiano, guitar: showGuitar, bass: showBass }, patternOptions,
         (id, anchor) => { const strings = INSTRUMENTS[id].strings, anchors = anchorStrings(strings); return stringLetter(strings, anchors.includes(anchor) ? anchor : anchors[0]); }));
     const patterns = { piano: showPiano, guitar: showGuitar, bass: showBass };
     // the instrument views are a later feature (a link that opens them, or one already open, still shows them)
@@ -1742,7 +1744,7 @@ const GenerativeApp = () => {
                 </button>
                 {quickOpen && <button type="button" className="gen-quick-reset" onClick={resetQuick} aria-label={`Reset to ${lastSceneName.current || 'the preset'}`}
                     title={`Put these sliders and buttons back to how ${lastSceneName.current ? `“${lastSceneName.current}”` : 'the preset'} has them`}><UndoIcon /></button>}</>}>
-                {quickOpen && <QuickPanel settings={settings} roleLabels={Object.fromEntries(Object.entries(SOUND_ROLES).map(([role, { label }]) => [role, label.split(' / ')[0]]))} onVolume={setVolume} onSettings={loadSettings} onFeel={changeFeel} baseline={presetQuick} resetKey={quickEpoch} />}
+                {quickOpen && <QuickPanel settings={settings} roleLabels={Object.fromEntries(Object.entries(SOUND_ROLES).map(([role, { label }]) => [role, label.split(' / ')[0]]))} onVolume={setVolume} onSettings={loadSettings} onFeel={changeFeel} onPush={(push) => update('push', push)} nowLevel={now.pushLevel ?? 0} baseline={presetQuick} resetKey={quickEpoch} />}
             </Panel>}
 
             {has(3) && TRIAL_RULE_IDS.length > 0 && <Panel id="trial" title="Trial rules">
@@ -1893,6 +1895,7 @@ const GenerativeApp = () => {
                 onVolume={(v) => setVolume('perc', v)} onMix={changeMix} onAudition={() => gen.audition('perc')} />}
             {has(4) && <SequencerPanel seq={settings.sequencer} chords={PROGRESSIONS[settings.progression] ?? []} machine={percMachine} onChange={(seq) => update('sequencer', seq)}
                 onMachine={(synth, name = 'Room') => { void applyRef('perc', { synth, name }); }} />}
+            {has(4) && <IntensityPanel push={settings.push} now={now.pushLevel ?? 0} onChange={(push) => update('push', push)} />}
 
             {!has(4)&&pickerRole==='perc'&&<VoiceBrowser role="perc" value={settings.drums.kit} edited={percussionEdited(settings.drums.kit,settings.drumKit)} onChange={choosePercussionVoice} onClose={()=>choosePicker(null)}/>}
 

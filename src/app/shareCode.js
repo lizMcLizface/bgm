@@ -28,6 +28,7 @@ import { AMBIENCE_LAYERS } from './engine/ambience';
 import { LAYER_PARAMS } from './engine/ambienceSynth';
 import { HARMONY_SCALES } from './composition/harmonyScale';
 import { ARC_SHAPES } from './composition/arc';
+import { PUSH_MODES } from './composition/push';
 import { ROLE_PRESETS } from './presets';
 import { SEED_BITS as SOUND_SEED_BITS } from './soundGen';
 import { GENERATOR_V2, KIND_CODES } from './soundGenV2';
@@ -91,7 +92,7 @@ export const SHAREABLE_PRESETS = [
     'Felted Piano v2',
     // short, tight voices for driven rhythm (step sequencer lanes)
     'Supersaw Stab', 'Techno Stab', 'Pluck Chord', 'Rolling Bass',
-    'Drive Lead', 'Acid Lead',
+    'Drive Lead', 'Acid Lead', 'Trance Chord', 'Trance Bass',
 ];
 const PRESET_BITS = 8;
 // Preset index meaning "a generated sound" (soundGen.js v1): followed by
@@ -314,6 +315,8 @@ MUSIC_GROUPS.push([[['bassEuclid'],chance]]); // composition/ensembleVoices.js e
 MUSIC_GROUPS.push([[['borrowStyle'],options(['even','corpus'],1)]]); // Generator.borrowFor
 MUSIC_GROUPS.push([[['padVibrato'],stepped(0,1,.05)]]); // composition/timbreDrift.js slowVibrato
 MUSIC_GROUPS.push([[['progressionMode'],options(['bank','generated'],1)],[['progressionMood','brightness'],stepped(-1,1,.05)],[['progressionMood','stability'],stepped(0,1,.05)],[['progressionMood','adventure'],stepped(0,1,.05)],[['progressionWander'],stepped(0,1,.05)]]); // composition/progressionGen.js
+MUSIC_GROUPS.push([[['push','level'],stepped(-1,1,.05)],[['push','program','mode'],options(Object.keys(PUSH_MODES),2)],[['push','program','low'],stepped(-1,1,.05)],[['push','program','high'],stepped(-1,1,.05)],
+    [['push','program','lowSeconds'],stepped(5,600,5)],[['push','program','highSeconds'],stepped(5,600,5)],[['push','program','rampSeconds'],stepped(0,120,1)],[['push','program','minutes'],stepped(1,120,1)]]); // composition/push.js; appended, old links play as made
 const VOICE_GROUPS = [
     [...voice('pad'), ...voice('bass'), ...voice('lead'), ...voice('counter'), field(GROUPS, ['padNotes'])],
     LATER_GROUPS[4], // volumes

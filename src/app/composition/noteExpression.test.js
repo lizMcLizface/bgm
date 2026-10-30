@@ -67,3 +67,10 @@ test('sound timing rules are independent metadata, respect physical/chip envelop
  expect(events.map(({expression,...e})=>e)).toEqual(before);
  const plain=structuredClone(before);timeSoundNotes(plain,{voices,bpm:90});expect(plain).toEqual(before);
 });
+
+test('a slow attack and vibrato set on a note by its source (the sequencer\'s held chords) survive the expression pass',()=>{
+    const held={...note('pad',2),expression:{attackScale:8,vibratoDepth:5,vibratoDelay:.4,vibratoRate:4.6}},stab=note('pad',.45);
+    expressNotes([held,stab],{voices:{pad:{name:'Felt piano'}},secondsPerBeat:.5,units:4});
+    expect(held.expression).toMatchObject({attackScale:8,vibratoDepth:5,vibratoDelay:.4,vibratoRate:4.6});
+    expect(stab.expression.attackScale).toBeLessThan(2);expect(stab.expression.vibratoDepth).toBeUndefined();
+});

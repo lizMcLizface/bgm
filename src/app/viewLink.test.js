@@ -10,6 +10,24 @@ describe('view link', () => {
         expect(viewFromSearch('')).toBeNull();
     });
 
+    it('reads no background as ?view=plain, which a link from a page without one needs', () => {
+        expect(viewFromSearch('?view=plain&ui=full')).toEqual({ view: 'plain', backdrop: 'off', full: true });
+        expect(viewFromSearch('?view=plain').backdrop).toBe('off');
+        expect(withView('/?preset=calm', { view: 'plain', full: true })).toBe('/?preset=calm&view=plain&ui=full');
+    });
+
+    it('keeps the whole interface when the link says ui=full, and only then', () => {
+        expect(viewFromSearch('?view=landscape&ui=full')).toEqual({ view: 'landscape', backdrop: 'scenery', full: true });
+        expect(viewFromSearch('?view=landscape&ui=other').full).toBeUndefined();
+        expect(viewFromSearch('?ui=full')).toBeNull();
+        expect(withView('/?preset=calm', { view: 'landscape', full: true })).toBe('/?preset=calm&view=landscape&ui=full');
+        expect(withView('/?a=1#x', { view: 'fluid', full: true })).toBe('/?a=1&view=fluid&ui=full#x');
+        // a link made with the interface hidden says nothing more, and what it carries survives a rewrite
+        expect(withView('/?a=1', { view: 'landscape', full: false })).toBe('/?a=1&view=landscape');
+        const read = viewFromSearch('?view=landscape&ui=full');
+        expect(viewFromSearch(withView('/?a=1', read).slice(1))).toEqual(read);
+    });
+
     it('keeps the parameter when the address is rewritten', () => {
         const linked = viewFromSearch('?view=landscape');
         expect(withView('/?preset=calm', linked)).toBe('/?preset=calm&view=landscape');

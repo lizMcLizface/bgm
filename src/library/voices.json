@@ -531,6 +531,34 @@
       "flangerDelay": 0.007800003051757811,
       "chorusAmount": 0.2222222222222222,
       "chorusFeedback": 0.13333333333333333
+    },
+    "Trance Chord": {
+      "masterVolume": 0.45,
+      "vcoType": "sawtooth",
+      "voiceCount": 5,
+      "detuneSpread": 14,
+      "stereoSpread": 60,
+      "gainAttack": 0.02,
+      "gainDecay": 1,
+      "gainSustain": 0.6,
+      "gainRelease": 0.6,
+      "filterType": "lowpass",
+      "filterFreq": 1400,
+      "filterQ": 1.2,
+      "filterEnvAmount": 2200,
+      "filterDecay": 0.6,
+      "filterKeyTrack": 0.3,
+      "chorusAmount": 0.5,
+      "chorusRate": 0.35,
+      "reverbType": "reverb5",
+      "reverbAmount": 0.3,
+      "pingPongDelayTime": 0.326,
+      "pingPongFeedback": 0.35,
+      "pingPongTone": 3200,
+      "pingPongAmount": 0.18,
+      "filterAttack": 0.05,
+      "vibratoDepth": 0,
+      "reverbDecay": 2.2
     }
   },
   "Bass": {
@@ -558,7 +586,10 @@
       "gainSustain": 0.7,
       "gainRelease": 0.2,
       "filterType": "lowpass",
-      "filterFreq": 300
+      "filterFreq": 300,
+      "reverbType": "reverb3",
+      "reverbAmount": 0.12,
+      "reverbDecay": 1.2
     },
     "Round Pluck Bass": {
       "masterVolume": 0.94,
@@ -588,7 +619,10 @@
       "filterEnvAmount": 2400,
       "filterDecay": 0.3,
       "distortionDist": 4,
-      "distortionAmount": 0.1
+      "distortionAmount": 0.1,
+      "reverbType": "reverb3",
+      "reverbAmount": 0.12,
+      "reverbDecay": 1.2
     },
     "Felt Bass": {
       "masterVolume": 1.169,
@@ -614,7 +648,10 @@
       "filterType": "lowpass",
       "filterFreq": 500,
       "filterQ": 1,
-      "eqLowGain": 3
+      "eqLowGain": 3,
+      "reverbType": "reverb3",
+      "reverbAmount": 0.12,
+      "reverbDecay": 1.2
     },
     "Upright Pluck": {
       "masterVolume": 0.95,
@@ -648,7 +685,10 @@
       "filterFreq": 450,
       "filterQ": 2.5,
       "filterEnvAmount": 1500,
-      "filterDecay": 0.18
+      "filterDecay": 0.18,
+      "reverbType": "reverb3",
+      "reverbAmount": 0.12,
+      "reverbDecay": 1.2
     },
     "Deep Pulse": {
       "masterVolume": 1.182,
@@ -664,7 +704,10 @@
       "filterType": "lowpass",
       "filterFreq": 380,
       "filterQ": 1,
-      "eqLowGain": 2
+      "eqLowGain": 2,
+      "reverbType": "reverb3",
+      "reverbAmount": 0.12,
+      "reverbDecay": 1.2
     },
     "Muted Pick Bass": {
       "masterVolume": 1,
@@ -694,7 +737,10 @@
       "gainRelease": 0.2,
       "filterType": "lowpass",
       "filterFreq": 1400,
-      "filterVelocity": 1200
+      "filterVelocity": 1200,
+      "reverbType": "reverb3",
+      "reverbAmount": 0.12,
+      "reverbDecay": 1.2
     },
     "Thump Bass": {
       "masterVolume": 1,
@@ -710,7 +756,10 @@
       "filterType": "lowpass",
       "filterFreq": 700,
       "filterEnvAmount": 1200,
-      "filterDecay": 0.12
+      "filterDecay": 0.12,
+      "reverbType": "reverb3",
+      "reverbAmount": 0.12,
+      "reverbDecay": 1.2
     },
     "Drive Bass": {
       "masterVolume": 0.52,
@@ -730,7 +779,10 @@
       "filterDecay": 0.16,
       "filterVelocity": 900,
       "distortionDist": 5,
-      "distortionAmount": 0.15
+      "distortionAmount": 0.15,
+      "reverbType": "reverb3",
+      "reverbAmount": 0.12,
+      "reverbDecay": 1.2
     },
     "Chip Bass": {
       "masterVolume": 0.85,
@@ -742,7 +794,10 @@
       "filterType": "lowpass",
       "filterFreq": 1800,
       "bitCrushDepth": 6,
-      "bitCrushAmount": 0.2
+      "bitCrushAmount": 0.2,
+      "reverbType": "reverb3",
+      "reverbAmount": 0.12,
+      "reverbDecay": 1.2
     },
     "Deep Throb": {
       "masterVolume": 1.371,
@@ -759,7 +814,10 @@
       "filterLfoRate": 1.3,
       "filterLfoDepth": 250,
       "tremoloRate": 2,
-      "tremoloDepth": 0.25
+      "tremoloDepth": 0.25,
+      "reverbType": "reverb3",
+      "reverbAmount": 0.12,
+      "reverbDecay": 1.2
     },
     "Neon Pulse Bass": {
       "masterVolume": 0.5,
@@ -779,7 +837,10 @@
       "filterDecay": 0.2,
       "filterVelocity": 600,
       "distortionDist": 3,
-      "distortionAmount": 0.1
+      "distortionAmount": 0.1,
+      "reverbType": "reverb3",
+      "reverbAmount": 0.12,
+      "reverbDecay": 1.2
     },
     "Seq Bass": {
       "masterVolume": 0.5,
@@ -796,7 +857,10 @@
       "filterFreq": 900,
       "filterQ": 3,
       "filterEnvAmount": 1800,
-      "filterDecay": 0.25
+      "filterDecay": 0.25,
+      "reverbType": "reverb3",
+      "reverbAmount": 0.12,
+      "reverbDecay": 1.2
     },
     "Starmap Pulse": {
       "masterVolume": 0.63,
@@ -816,7 +880,10 @@
       "pingPongDelayTime": 0.25777723524305557,
       "pingPongFeedback": 0.14666680230034723,
       "pingPongTone": 2591.1126030815976,
-      "pingPongAmount": 0.2355556911892361
+      "pingPongAmount": 0.2355556911892361,
+      "reverbType": "reverb3",
+      "reverbAmount": 0.12,
+      "reverbDecay": 1.2
     },
     "Rolling Bass": {
       "masterVolume": 0.6,
@@ -833,7 +900,35 @@
       "filterQ": 3,
       "filterEnvAmount": 1800,
       "filterDecay": 0.12,
-      "filterVelocity": 600
+      "filterVelocity": 600,
+      "reverbType": "reverb3",
+      "reverbAmount": 0.12,
+      "reverbDecay": 1.2
+    },
+    "Trance Bass": {
+      "masterVolume": 0.58,
+      "vcoType": "sawtooth",
+      "subOscOctaveOffset": -1,
+      "subOscType": "sine",
+      "voiceCount": 2,
+      "detuneSpread": 5,
+      "gainAttack": 0.004,
+      "gainDecay": 0.22,
+      "gainSustain": 0.6,
+      "gainRelease": 0.12,
+      "filterType": "lowpass",
+      "filterFreq": 420,
+      "filterQ": 2,
+      "filterEnvAmount": 2200,
+      "filterDecay": 0.2,
+      "filterKeyTrack": 0.5,
+      "filterVelocity": 600,
+      "distortionDist": 3,
+      "distortionAmount": 0.2,
+      "eqLowGain": 2,
+      "reverbType": "reverb3",
+      "reverbAmount": 0.12,
+      "reverbDecay": 1.2
     }
   },
   "Leads": {
@@ -1904,7 +1999,7 @@
       "masterVolume": 0.5,
       "vcoType": "sawtooth",
       "stereoSpread": 30,
-      "gainRelease": 0.1,
+      "gainRelease": 0.35,
       "filterType": "lowpass",
       "filterQ": 1.5,
       "voiceCount": 5,
@@ -1917,14 +2012,19 @@
       "filterDecay": 0.18,
       "filterVelocity": 800,
       "chorusAmount": 0.2,
-      "reverbType": "reverb4",
-      "reverbAmount": 0.12
+      "reverbType": "reverb5",
+      "reverbAmount": 0.3,
+      "pingPongDelayTime": 0.326,
+      "pingPongFeedback": 0.35,
+      "pingPongTone": 3200,
+      "pingPongAmount": 0.25,
+      "reverbDecay": 1.6
     },
     "Techno Stab": {
       "masterVolume": 0.5,
       "vcoType": "square",
       "stereoSpread": 30,
-      "gainRelease": 0.08,
+      "gainRelease": 0.3,
       "filterType": "lowpass",
       "filterQ": 4,
       "voiceCount": 2,
@@ -1937,7 +2037,16 @@
       "filterDecay": 0.12,
       "filterVelocity": 700,
       "distortionDist": 3,
-      "distortionAmount": 0.1
+      "distortionAmount": 0.1,
+      "chorusAmount": 0.15,
+      "chorusRate": 0.5,
+      "pingPongDelayTime": 0.357,
+      "pingPongFeedback": 0.35,
+      "pingPongTone": 3000,
+      "pingPongAmount": 0.25,
+      "reverbType": "reverb5",
+      "reverbAmount": 0.3,
+      "reverbDecay": 1.6
     },
     "Pluck Chord": {
       "masterVolume": 0.5,

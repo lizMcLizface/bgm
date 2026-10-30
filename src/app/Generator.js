@@ -69,6 +69,7 @@ import { arcEnergy, applyArc, arcTone, arcSpace } from './composition/arc';
 import { voiceMotion } from './composition/timbreDrift';
 import { generateProgression } from './composition/progressionGen';
 import { applyFeel, feelActive, feelTone, feelEnergy, ghostNotes } from './composition/feel';
+import { applyPush, pushLevel, glidePush, pushTempo, pushEnergy, pushTone } from './composition/push';
 import { nextMusic, glideTempo, scaleDistance } from './conductor';
 import { METERS, unitsPerMinute, swingEvents, halfTime, chordBars, splitBeat } from './meter';
 import { drumBar, loosenDrums, auditionHits, DRUMS } from './percussion';
@@ -721,7 +722,7 @@ class Generator {
     nowPlaying() {
         const planned = this.plan.get(Math.floor(this.position() / this.beatsPerBar)) || this.getPlan()[0];
         const { tonic, mode, progression, numerals } = planned.music;
-        return { tonic, mode, progression, ...(numerals ? { numerals } : {}), bpm: Math.round(planned.bpm), keyName: planned.chord.keyName };
+        return { tonic, mode, progression, ...(numerals ? { numerals } : {}), bpm: Math.round(planned.bpm), pushLevel: planned.pushLevel ?? 0, keyName: planned.chord.keyName };
     }
 
     refreshStringPatches() {
@@ -733,8 +734,9 @@ class Generator {
 
     /** Makes what is playing now the home settings. */
     keepCurrent() {
-        const { tonic, mode, progression, bpm } = this.nowPlaying();
-        this.setMany({ tonic, mode, progression, bpm });
+        const { tonic, mode, progression, bpm, pushLevel } = this.nowPlaying();
+        // (the tempo as the preset has it, without intensity's share)
+        this.setMany({ tonic, mode, progression, bpm: Math.round(bpm / pushTempo(pushLevel)) });
     }
 
     applyVolumes() {
@@ -1449,7 +1451,11 @@ class Generator {
     planBar(bar) {
         const prev = this.plan.get(bar - 1), fresh = !prev || this.resetMusicAt === bar;
         const settings = this.settings;
-        this.settings = this.planningSettings(settings);
+        // intensity (composition/push.js): the level at this bar's place in music time
+        // (by hand it glides from the bar before's level, so a slider move ramps; a program sets its own)
+        const prevMeter0 = prev?.meter ?? this.meter, prevBar = prev ? 60 / unitsPerMinute(prevMeter0, prev.bpm) : 0;
+        const level = glidePush(settings.push, prev?.pushLevel, pushLevel(settings.push, prev ? (prev.elapsed ?? 0) + rubatoTime(prev.rubato, prevBar, prevMeter0.units) : 0), prevBar * prevMeter0.units);
+        this.settings = this.planningSettings(settings, level);
         this.planningFrom = settings;
         let meter;
         try {
@@ -1462,8 +1468,8 @@ class Generator {
 
     // The settings bars are planned with, for one bar's planning only: the feel pad's place over
     // them (composition/feel.js), and bars per chord as played in the piece's metre (meter.js chordBars).
-    planningSettings(settings = this.settings) {
-        const planned = feelActive(settings.feel) ? applyFeel(settings) : settings;
+    planningSettings(settings = this.settings, level = 0) {
+        const felt = feelActive(settings.feel) ? applyFeel(settings) : settings, planned = level ? applyPush(felt, level) : felt;
         const barsPerChord = chordBars(METERS[settings.meter], settings.barsPerChord);
         return barsPerChord === settings.barsPerChord ? planned : { ...planned, barsPerChord };
     }
@@ -1491,8 +1497,10 @@ class Generator {
         }
         // a smooth home change glides to the new tempo (planHomeChange)
         const gliding = prev && this.homeGlide && bar >= this.homeGlide.from;
-        const bpm = gliding ? glideTempo(prev.bpm, this.homeMusic().bpm, this.homeGlide.step) : fresh ? music.bpm : glideTempo(prev.bpm, music.bpm);
-        if (gliding && bpm === this.homeMusic().bpm) this.homeGlide = null;
+        // (intensity moves the tempo a little: up to 15% either way, gliding like any tempo change)
+        const tempoScale = pushTempo(this.settings.pushLevel ?? 0), scaled = (value) => (tempoScale === 1 ? value : Math.round(value * tempoScale));
+        const bpm = gliding ? glideTempo(prev.bpm, scaled(this.homeMusic().bpm), this.homeGlide.step) : fresh ? scaled(music.bpm) : glideTempo(prev.bpm, scaled(music.bpm));
+        if (gliding && bpm === scaled(this.homeMusic().bpm)) this.homeGlide = null;
 
         const cycleBars = PROGRESSIONS[music.progression].length * barsPerChord;
         const inCycle = bar - music.cycleStart;
@@ -1639,6 +1647,7 @@ class Generator {
         const energy = arcEnergy(this.settings.arc, elapsed);
         applyArc(events, energy, { bar, seed: this.settings.seed });
         applyArc(events, feelEnergy(this.settings.feel), { bar: bar + 7919, seed: this.settings.seed });
+        applyArc(events, pushEnergy(this.settings.pushLevel ?? 0), { bar: bar + 104729, seed: this.settings.seed });
         applyDynamics(events, this.settings.dynamics);
         ornamentNotes(events, { amount: this.settings.ornaments, bar, seed: this.settings.seed, voices: this.grooveVoices ?? this.grooveVoiceSnapshot(),
             scalePcs: chord.scalePcs ?? [], unitSeconds: 60 / unitsPerMinute(this.meter, bpm) });
@@ -1672,12 +1681,12 @@ class Generator {
             tone = low * (OPEN_TONE / low) ** state.phrase.section.brightness;
         }
         const rubato = planRubato({ bar, state, meter: this.meter, endBar: this.endBar, amount: this.settings.rubato });
-        tone = feelTone(arcTone(tone, energy), this.settings.feel);
+        tone = pushTone(feelTone(arcTone(tone, energy), this.settings.feel), this.settings.pushLevel ?? 0);
         const space = sectionSpaceLevel(state.phrase.section, this.settings.sectionSpace) + arcSpace(energy);
         const loudness = planLoudness(events, this.meter.units, this.plan.get(bar - 1)?.loudness?.average, this.settings.evenLoudness);
         // the sequencer's effect moves (sequencer.js): this chord's stage and where in the chord a beat falls
         const seqMotion = seq?.on && seq.arrangement && Object.keys(seq.moves ?? {}).length ? { stage: stageForBar(seq, { slotIndex: slot.index, bar }), ...(({ start, bars }) => ({ start, bars }))(stageSpan(seq, slot, bar)) } : null;
-        this.plan.set(bar, { seqMotion, bar, chord, chordStart, state, events, music, upcoming, nextMusic: following, bpm, tone, boundaries, rubato, loudness, space, elapsed, energy, keyLift: liftPivot ? 2 : keyLift, chordBars: barsPerChord,
+        this.plan.set(bar, { seqMotion, bar, chord, chordStart, state, events, music, upcoming, nextMusic: following, bpm, tone, boundaries, rubato, loudness, space, elapsed, energy, pushLevel: this.settings.pushLevel ?? 0, keyLift: liftPivot ? 2 : keyLift, chordBars: barsPerChord,
             ...(split ? { split: { beat: splitAt, chord: split } } : {}),
             ...(this.rulebookTrace?{ruleTrace:{slot,referenceBarsPerChord:barsPerChord}}:{}) });
     }

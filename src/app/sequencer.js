@@ -10,6 +10,8 @@ export const SEQ_VOICES = ['bd', 'sd', 'lt', 'mt', 'ht', 'lc', 'mc', 'hc', 'rs',
 export const SEQ_MACHINES = ['tr808', 'tr909'];
 export const SEQ_MAX_SLOTS = 16;
 export const ROW = /^[.xf]{16}$/;
+// the chord lane's row also has held chords (h), stacked entries (s) and arpeggio notes (a); see sequencerLanes
+export const LANE_ROW = /^[.xfhsa]{16}$/;
 
 // Lanes: the chords and the bass played on steps of their own (rows 'pad' and 'bass': x a hit, f an accent / octave up),
 // with tight stab voices, for the driven rhythm of techno and house that sustained pads and swells cannot give.
@@ -97,7 +99,7 @@ export function cleanEdits(raw) {
     for (const [stage, rows] of Object.entries(raw)) {
         const s = Number(stage);
         if (!Number.isInteger(s) || s < 0 || s > 7 || !rows || typeof rows !== 'object') continue;
-        const clean = Object.fromEntries(Object.entries(rows).filter(([voice, row]) => (SEQ_VOICES.includes(voice) || voice === 'A' || LANES.includes(voice)) && ROW.test(row)));
+        const clean = Object.fromEntries(Object.entries(rows).filter(([voice, row]) => (SEQ_VOICES.includes(voice) || voice === 'A' ? ROW.test(row) : LANES.includes(voice) && (voice === 'pad' ? LANE_ROW : ROW).test(row))));
         if (Object.keys(clean).length) out[s] = clean;
     }
     return out;
@@ -129,6 +131,8 @@ export function stageSpan(seq, slot, bar) {
 export function stageForBar(seq, { slotIndex = 0, bar = 0 } = {}) {
     const recipe = arrangementFor(seq?.arrangement);
     if (!recipe) return 1;
+    // intensity (composition/push.js) plays the Drop or the Breakdown in place of the preset's stage at its extremes
+    if (Number.isInteger(seq.forceStage)) return seq.forceStage;
     const sb = seq.sectionBars | 0;
     if (sb > 0) {
         // sections in turn: each list entry is one section, then the list starts again; "follow" walks the arrangement's chain
@@ -188,6 +192,12 @@ export function sequencerBar({ meter, seq, slotIndex = 0, bar = 0, swing, seed =
 }
 
 const STAB_RANGE = [57, 79], BASS_RANGE = [31, 45];
+// what only the held chords get: a slow attack and a vibrato that comes in late (the voice itself stays crisp for the stabs and arpeggios)
+const HELD_EXPRESSION = { attackScale: 8, vibratoDepth: 5, vibratoDelay: 0.4, vibratoRate: 4.6 };
+// the walks an arpeggio row takes over the chord's tones (indices into the ladder), one picked per bar
+// the order a stack's tones enter in: from the bottom, from the top, or from the middle outwards (one third each: the first tone is the lowest, the highest or an inner one)
+const STACK_ORDERS = [(i) => i, (i, n) => n - 1 - i, (i, n) => Array.from({ length: n }, (_, k) => k).sort((a, b) => Math.abs(a - (n - 1) / 2) - Math.abs(b - (n - 1) / 2) || a - b)[i]];
+const ARP_WALKS = [[0, 1, 2, 3, 4], [4, 3, 2, 1, 0], [0, 1, 2, 3, 2, 1], [3, 2, 1, 0, 1, 2], [0, 2, 1, 3, 2, 4], [4, 2, 3, 1, 2, 0], [2, 1, 0, 1, 2, 3], [0, 3, 1, 4, 2]];
 const placed = (pc, [low, high], near) => {
     let best = null;
     for (let m = low; m <= high; m++) if (m % 12 === pc && (best === null || Math.abs(m - near) < Math.abs(best - near))) best = m;
@@ -197,6 +207,8 @@ const placed = (pc, [low, high], near) => {
 /**
  * The chord and bass lanes of a bar: the chord's tones as short stabs and its root as a bass line, on the steps of the
  * stage's 'pad' and 'bass' rows. `gate` is the length in beats. Returns events for roles 'pad' and 'bass'.
+ * Besides the stab (x, f accent) the chord row can hold the chord (h: all its tones, until the next hit), stack it (s: one tone
+ * more at each s, from the bottom, the top or the outside in, all held until the next hit) or arpeggiate it (a: one tone at a time, walking up, down, back and forth or in leaps, a different walk each bar).
  */
 export function sequencerLanes({ meter, seq, chord, slotIndex = 0, bar = 0, seed = 0 }) {
     const stages = sequencerStages(seq);
@@ -215,11 +227,27 @@ export function sequencerLanes({ meter, seq, chord, slotIndex = 0, bar = 0, seed
     // the chord's tones and the first two again an octave up, walked up and down
     const ladder = [...tones, ...tones.slice(0, 2).map((m) => m + 12)], contour = [0, 1, 2, 3, 4, 3, 2, 1];
     const events = [];
-    let walked = 0;
+    let walked = 0, stacked = 0, arped = 0;
+    // (hashed: the first draw of a generator seeded with neighbouring bars is too alike to pick from)
+    const walkRng = seeded((Math.imul(seed + 1, 0x9e3779b1) ^ Math.imul(bar + 1, 0x85ebca6b)) >>> 0);
+    walkRng(); walkRng();
+    const walk = ARP_WALKS[Math.floor(walkRng() * ARP_WALKS.length)], stackOrder = STACK_ORDERS[Math.floor(walkRng() * STACK_ORDERS.length)];
+    // beats from step `from` to the next hit of the row (or the bar's end; `skip`: hits that do not end it): how long a held note rings
+    const until = (row, from, skip = '') => { let i = from + 1; while (i < steps && (row[i % 16] === '.' || row[i % 16] === undefined || skip.includes(row[i % 16]))) i++; return (i - from) * 0.25; };
     for (let s = 0; s < steps; s++) {
         const c = s % 16, at = s * 0.25;
         const stab = stage.rows.pad?.[c], low = stage.rows.bass?.[c];
-        if ((stab === 'x' || stab === 'f') && !(restBar && stab !== 'f')) {
+        if (stab === 'h') {
+            stacked = 0;
+            for (const midi of tones) events.push({ role: 'pad', midi, beat: at, length: until(stage.rows.pad, s), velocity: 0.72, detune: 0, expression: { ...HELD_EXPRESSION } });
+        } else if (stab === 's') {
+            if (stacked < tones.length) events.push({ role: 'pad', midi: tones[stackOrder(stacked, tones.length)], beat: at, length: until(stage.rows.pad, s, 's'), velocity: 0.7, detune: 0, expression: { ...HELD_EXPRESSION } });
+            stacked++;
+        } else if (stab === 'a') {
+            stacked = 0;
+            events.push({ role: 'pad', midi: ladder[walk[arped++ % walk.length] % ladder.length], beat: at, length: Math.min(gate, 0.5 * meter.unitsPerBeat), velocity: 0.74, detune: 0 });
+        } else if ((stab === 'x' || stab === 'f') && !(restBar && stab !== 'f')) {
+            stacked = 0;
             const kept = stab === 'f' || v === 0 || rng() < keep;
             if (kept) {
                 const single = stab !== 'f' && v > 0 && rng() < 0.45 + 0.5 * v;

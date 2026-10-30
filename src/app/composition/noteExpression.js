@@ -12,12 +12,15 @@ export function expressNotes(events, { voices, secondsPerBeat, units }) {
         const dynamic = clamp((event.velocity - .6) * 500, -150, 150);
         const brightness = clamp(dynamic + (short ? 55 : held ? -40 : 0), -200, 200);
         const expressive = profile === 'breath' || profile === 'neutral';
+        // what the note's source set on purpose (the sequencer's held chords: a slow attack and a late vibrato) stays
+        const own = event.expression ?? {};
         event.expression = {
             profile,
-            attackScale: expressive ? short ? .72 : held ? 1.2 : 1 : 1,
+            attackScale: own.attackScale ?? (expressive ? short ? .72 : held ? 1.2 : 1 : 1),
             releaseScale: short ? .78 : 1,
             gateScale: melodic && expressive && short ? .94 : 1,
             brightnessCents: brightness,
+            ...(own.vibratoDepth > 0 ? { vibratoDepth: own.vibratoDepth, vibratoDelay: own.vibratoDelay, vibratoRate: own.vibratoRate } : {}),
         };
     }
     return events;

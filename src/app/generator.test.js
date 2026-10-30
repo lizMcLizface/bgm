@@ -1745,3 +1745,36 @@ test('every sequencer preset plans a long stretch of exact drums with finite not
         expect(events.every((e) => Number.isFinite(e.beat) && Number.isFinite(e.midi) && Number.isFinite(e.velocity)), scene.name).toBe(true);
     }
 });
+
+test('intensity (settings.push): overdrive plays faster and busier than calm, and a program follows each bar\'s place in music time', async () => {
+    const { pushLevel } = await import('./composition/push');
+    const plan = (push, bars = 40) => { const g = new Generator({ ...defaultSettings(), push }); const p = g.planner(); for (let b = 0; b < bars; b++) p.planBar(b); return [...p.plan.values()].sort((a, z) => a.bar - z.bar); };
+    const off = { mode: 'off' };
+    const calm = plan({ level: -1, program: off }), plain = plan({ level: 0, program: off }), hard = plan({ level: 1, program: off });
+    expect(hard.at(-1).bpm).toBeGreaterThan(plain.at(-1).bpm * 1.1); expect(calm.at(-1).bpm).toBeLessThan(plain.at(-1).bpm * 0.9);
+    const notes = (bars, role) => bars.flatMap((b) => b.events).filter((e) => e.role === role).length;
+    expect(notes(hard, 'lead')).toBeGreaterThan(notes(calm, 'lead'));
+    expect(hard.flatMap((b) => b.events).length).toBeGreaterThan(calm.flatMap((b) => b.events).length);
+    expect(plain.every((b) => !b.pushLevel)).toBe(true);
+    // intervals: every bar was planned at the level of its own start
+    const push = { level: 0, program: { mode: 'intervals', low: -0.6, high: 0.9, lowSeconds: 20, highSeconds: 20, rampSeconds: 12, minutes: 10 } };
+    const bars = plan(push, 60);
+    bars.forEach((b) => expect(b.pushLevel).toBeCloseTo(pushLevel(push, b.elapsed), 5));
+    const levels = bars.map((b) => b.pushLevel);
+    expect(Math.min(...levels)).toBeCloseTo(-0.6, 5); expect(Math.max(...levels)).toBeCloseTo(0.9, 5);
+    // a steady ramp between the two: the climb passes through values in between
+    expect(levels.some((v) => v > -0.4 && v < 0.7)).toBe(true);
+});
+
+test('intensity moved by hand from +1 to -1 mid-piece ramps through 0 bar by bar, without a jump', async () => {
+    const manual = (level) => ({ level, program: { mode: 'off' } });
+    const g = new Generator({ ...defaultSettings(), push: manual(1) }), p = g.planner();
+    for (let b = 0; b < 8; b++) p.planBar(b);
+    expect(p.plan.get(7).pushLevel).toBe(1);
+    p.settings = { ...p.settings, push: manual(-1) };
+    for (let b = 8; b < 40; b++) p.planBar(b);
+    const levels = [...p.plan.values()].sort((a, z) => a.bar - z.bar).filter((b) => b.bar >= 7).map((b) => b.pushLevel);
+    levels.slice(1).forEach((v, i) => { expect(v).toBeLessThanOrEqual(levels[i] + 1e-9); expect(levels[i] - v).toBeLessThan(0.5); });
+    expect(levels.some((v) => Math.abs(v) < 0.2)).toBe(true);
+    expect(levels.at(-1)).toBe(-1);
+});

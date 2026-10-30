@@ -74,6 +74,31 @@ test('lanes play the chord as short stabs and the root as a bass line on their o
     expect(sequencerLanes({ meter: METERS['4/4'], seq: s, chord: null })).toEqual([]);
 });
 
+test('the chord row holds the chord (h), stacks it a tone at a time (s) and arpeggiates it (a)', () => {
+    const chord = { pitchClasses: [9, 0, 4, 7] };
+    const play = (pad, bar = 0) => sequencerLanes({ meter: METERS['4/4'], seq: seq({ arrangement: 'warehouse-shift', lanes: true, variation: 0, gate: 0.45, slots: [1], edits: { 1: { pad } } }), chord, bar, seed: 5 }).filter((e) => e.role === 'pad');
+    // a held chord rings until the next hit, a stack's tones all ring until the next hit or the bar's end
+    const held = play('h.......s.s.s...');
+    expect(held.filter((e) => e.beat === 0).map((e) => e.length)).toEqual([2, 2, 2, 2]);
+    expect(held.filter((e) => e.beat > 0).map((e) => [e.beat, e.length])).toEqual([[2, 2], [2.5, 1.5], [3, 1]]);
+    expect(new Set(held.map((e) => e.midi)).size).toBe(4);
+    // only the held notes carry the slow attack and the late vibrato; stabs and arpeggio notes stay crisp
+    expect(held.every((e) => e.expression.attackScale > 1 && e.expression.vibratoDepth > 0)).toBe(true);
+    const arp = play('a.a.a.a.a.a.a.a.');
+    expect(arp).toHaveLength(8);
+    expect(arp.every((e) => e.length === 0.45 && !e.expression)).toBe(true);
+    expect(new Set([0, 1, 2, 3, 4, 5, 6, 7].map((bar) => play('a.a.a.a.', bar).map((e) => e.midi).join())).size).toBeGreaterThan(1);
+    // the walks go down as well as up: over a run of bars the first step of an arpeggio falls about as often as it rises
+    const firstSteps = Array.from({ length: 32 }, (_, bar) => { const m = play('a.a.a.a.', bar).map((e) => e.midi); return Math.sign(m[1] - m[0]); });
+    expect(firstSteps.filter((d) => d < 0).length).toBeGreaterThan(8);
+    expect(firstSteps.filter((d) => d > 0).length).toBeGreaterThan(8);
+    // a stack does not always climb: its first tone is the lowest, the highest or an inner one, bar by bar
+    const firstTones = new Set(Array.from({ length: 24 }, (_, bar) => play('s.s.s.s.', bar)[0].midi));
+    expect(firstTones.size).toBe(3);
+    expect(play('x...............').every((e) => !e.expression)).toBe(true);
+    expect(sanitizeSettings({ sequencer: { edits: { 1: { pad: 'h.......s.s.a.x.', bass: 'h...............' } } } }).sequencer.edits).toEqual({ 1: { pad: 'h.......s.s.a.x.' } });
+});
+
 test('house and techno get off-beat stabs, and a breakdown has no bass', () => {
     expect(laneDefaults('Techno', 'Groove').pad).toBe('..x...x...x...x.');
     expect(laneDefaults('Techno', 'Breakdown').bass).toBe('................');

@@ -6,6 +6,8 @@ import { STAGE_NAMES, SEQ_MACHINES, LANES, MOVE_PARAMS, MOVE_MAX, SECTION_BARS, 
 import './sequencer.css';
 
 const NEXT = { '.': 'x', x: 'f', f: '.' };
+// the chord lane also holds the chord (h), stacks it a tone at a time (s) and arpeggiates it (a)
+const NEXT_CHORD = { '.': 'x', x: 'f', f: 'h', h: 's', s: 'a', a: '.' };
 const CATEGORIES = [...new Set(BEATS.map((b) => b.category))];
 
 /**
@@ -35,7 +37,7 @@ export default function SequencerPanel({ seq, chords, machine, onChange, onMachi
     const choose = (id) => set({ arrangement: id, edits: {}, slots: [], on: id ? true : false });
     const setCell = (voice, step) => {
         const row = [...(rows[voice] ?? blank)];
-        row[step] = NEXT[row[step]] ?? 'x';
+        row[step] = (voice === 'pad' ? NEXT_CHORD : NEXT)[row[step]] ?? 'x';
         onChange({ ...seq, edits: { ...seq.edits, [stage]: { ...(seq.edits?.[stage] ?? {}), [voice]: row.join('') } } });
     };
     const sections = seq.sectionBars > 0;
@@ -92,7 +94,7 @@ export default function SequencerPanel({ seq, chords, machine, onChange, onMachi
             {seq.lanes && (
                 <>
                     <label className="gen-field"><span>{`Stab length ${Math.round(seq.gate * 100)}% of a beat`}</span>
-                        <input type="range" min="0.05" max="1" step="0.01" value={seq.gate} onChange={(e) => set({ gate: Number(e.target.value) })} /></label>
+                        <input type="range" min="0.05" max="4" step="0.01" value={seq.gate} onChange={(e) => set({ gate: Number(e.target.value) })} /></label>
                     <label className="gen-field"><span>{`Variation ${Math.round((seq.variation ?? 0) * 100)}%: single notes, thinner bars, rests`}</span>
                         <input type="range" min="0" max="1" step="0.01" value={seq.variation ?? 0} onChange={(e) => set({ variation: Number(e.target.value) })} /></label>
                     <label className="gen-field"><span>{`Kick pump ${Math.round(seq.pump * 100)}%`}</span>
@@ -125,10 +127,10 @@ export default function SequencerPanel({ seq, chords, machine, onChange, onMachi
                         </div>
                         {seq.lanes && LANES.map((lane) => (
                             <div className="seq-row seq-lane" role="row" key={lane}>
-                                <span className="seq-name" title={lane === 'pad' ? 'Chord stabs (accent: louder)' : 'Bass (accent: octave up)'}>{lane === 'pad' ? 'CHD' : 'BAS'}</span>
+                                <span className="seq-name" title={lane === 'pad' ? 'Chords: stab, accent, held chord, stacked tones, arpeggio note' : 'Bass (accent: octave up)'}>{lane === 'pad' ? 'CHD' : 'BAS'}</span>
                                 {[...(rows[lane] ?? blank)].map((cell, step) => (
                                     <button key={step} type="button" role="gridcell" aria-label={`${lane === 'pad' ? 'Chord' : 'Bass line'} step ${step + 1}`}
-                                        className={`seq-cell${cell === 'x' ? ' on' : cell === 'f' ? ' flam' : ''}${step % 4 === 0 ? ' beat' : ''}`} onClick={() => setCell(lane, step)} />
+                                        className={`seq-cell${cell === 'x' ? ' on' : cell === 'f' ? ' flam' : cell === 'h' ? ' held' : cell === 's' ? ' stack' : cell === 'a' ? ' arp' : ''}${step % 4 === 0 ? ' beat' : ''}`} onClick={() => setCell(lane, step)} />
                                 ))}
                             </div>
                         ))}

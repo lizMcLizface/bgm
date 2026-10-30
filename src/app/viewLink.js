@@ -1,19 +1,20 @@
 import { PATTERN_DEFAULTS } from './patternDefaults';
 
-// ?view=landscape (or ?view=fluid) opens the page with that background and the interface
+// ?view=landscape (or ?view=fluid, or ?view=plain for no background) opens the page with that background and the interface
 // half hidden: only the transport and the timeline show. The parameter stays in the address,
 // so a bookmark or a screen-saver link keeps opening that way; it does not change saved preferences.
-const VIEWS = { landscape: 'scenery', fluid: 'fluid' };
+// &ui=full keeps the whole interface: a link made on the full page carries the background without hiding anything.
+const VIEWS = { landscape: 'scenery', fluid: 'fluid', plain: 'off' };
 
 export const viewFromSearch = (search = '') => {
-    const view = new URLSearchParams(search).get('view');
-    return VIEWS[view] ? { view, backdrop: VIEWS[view] } : null;
+    const params = new URLSearchParams(search), view = params.get('view');
+    return VIEWS[view] ? { view, backdrop: VIEWS[view], ...(params.get('ui') === 'full' ? { full: true } : {}) } : null;
 };
 
 export const withView = (path, linked) => {
     if (!linked) return path;
     const [base, hash = ''] = path.split('#');
-    return `${base}${base.includes('?') ? '&' : '?'}view=${linked.view}${hash ? `#${hash}` : ''}`;
+    return `${base}${base.includes('?') ? '&' : '?'}view=${linked.view}${linked.full ? '&ui=full' : ''}${hash ? `#${hash}` : ''}`;
 };
 
 // ?patterns=guitar.played.D,bass,piano.scale : which pattern blocks show under the timeline, each with

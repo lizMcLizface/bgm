@@ -17952,21 +17952,43 @@
         "tonic": 9,
         "progression": 7,
         "volumes": {
-          "pad": 0.6,
+          "pad": 0.5,
           "bass": 0.75,
-          "lead": 0.72,
+          "lead": 0.8,
           "counter": 0.4,
           "perc": 0.8
         },
-        "leadActivity": 0.62,
-        "leadDensity": 0.35,
+        "leadActivity": 0.8,
+        "leadDensity": 0.12,
         "leadLeaps": 0.2,
-        "leadRepeat": 0.6,
+        "leadRepeat": 0.8,
         "sequencer": {
           "on": true,
           "machine": "tr909",
           "arrangement": "warehouse-shift",
-          "edits": {},
+          "edits": {
+            "1": {
+              "pad": "..f.......x...x."
+            },
+            "2": {
+              "pad": "..x...a.a.x.a.a."
+            },
+            "3": {
+              "pad": "..x.a.x.a.x.a.xf"
+            },
+            "4": {
+              "pad": "f.......x......."
+            },
+            "5": {
+              "pad": "x.x.x.x.s.s.s.s."
+            },
+            "6": {
+              "pad": "..f...x...x...x."
+            },
+            "7": {
+              "pad": "..x.......x.a.a."
+            }
+          },
           "slots": [
             0,
             1,
@@ -17978,7 +18000,7 @@
             6
           ],
           "lanes": true,
-          "gate": 0.2,
+          "gate": 0.22,
           "pump": 0.6,
           "fills": true,
           "moves": {
@@ -18078,7 +18100,8 @@
               }
             ]
           },
-          "sectionBars": 8
+          "sectionBars": 8,
+          "variation": 0.4
         },
         "leadSyncopation": 0.5,
         "bus": {
@@ -18179,21 +18202,43 @@
         "tonic": 4,
         "progression": 6,
         "volumes": {
-          "pad": 0.6,
+          "pad": 0.45,
           "bass": 0.75,
-          "lead": 0.7,
+          "lead": 0.78,
           "counter": 0.4,
           "perc": 0.8
         },
-        "leadActivity": 0.7,
-        "leadDensity": 0.42,
+        "leadActivity": 0.75,
+        "leadDensity": 0.25,
         "leadLeaps": 0.3,
-        "leadRepeat": 0.55,
+        "leadRepeat": 0.75,
         "sequencer": {
           "on": true,
           "machine": "tr909",
           "arrangement": "acid-journey",
-          "edits": {},
+          "edits": {
+            "1": {
+              "pad": "..f.......x...x."
+            },
+            "2": {
+              "pad": "..x.....x.x...a."
+            },
+            "3": {
+              "pad": "..x...x...x.a.xf"
+            },
+            "4": {
+              "pad": "f.......x......."
+            },
+            "5": {
+              "pad": "x.x.x.x.x.x.x.x."
+            },
+            "6": {
+              "pad": "..f..xx...x...x."
+            },
+            "7": {
+              "pad": "..x.......x.a.a."
+            }
+          },
           "slots": [
             1,
             2,
@@ -18205,7 +18250,7 @@
             7
           ],
           "lanes": true,
-          "gate": 0.16,
+          "gate": 0.2,
           "pump": 0.5,
           "fills": true,
           "moves": {
@@ -18313,7 +18358,7 @@
           }
         },
         "portamento": {
-          "lead": 0.2,
+          "lead": 0.45,
           "counter": 0,
           "bass": 0.35
         }
@@ -18414,30 +18459,37 @@
             },
             "1": {
               "cb": "................",
-              "rs": "..x....x..x....x"
+              "rs": "..x....x..x....x",
+              "pad": "a.a.a.a.a.a.a.a."
             },
             "2": {
               "cb": "................",
-              "rs": "..x....x..x....x"
+              "rs": "..x....x..x....x",
+              "pad": "a..a..a.a..a..a."
             },
             "3": {
               "cb": "................",
-              "rs": "..x....x..x..x.x"
+              "rs": "..x....x..x..x.x",
+              "pad": "a.a.a.a.aaaaaaaa"
             },
             "4": {
-              "cb": "................"
+              "cb": "................",
+              "pad": "f.......x......."
             },
             "5": {
               "cb": "................",
-              "rs": "..x....x..x....x"
+              "rs": "..x....x..x....x",
+              "pad": "a.a.a.a.a.a.a.a."
             },
             "6": {
               "cb": "................",
-              "rs": "..x....x..x....x"
+              "rs": "..x....x..x....x",
+              "pad": "f..x..x...x..x.."
             },
             "7": {
               "cb": "................",
-              "rs": "..x....x..x....x"
+              "rs": "..x....x..x....x",
+              "pad": "a.a.a.a.x.x.x.xf"
             }
           },
           "slots": [],
@@ -18628,7 +18680,20 @@
           "on": true,
           "machine": "tr808",
           "arrangement": "dub-cycle",
-          "edits": {},
+          "edits": {
+            "1": {
+              "pad": "..x...x...x...x."
+            },
+            "2": {
+              "pad": "..x.......x....."
+            },
+            "4": {
+              "pad": "....x.......x..."
+            },
+            "7": {
+              "pad": "..x...x...x...a."
+            }
+          },
           "slots": [
             1,
             1,
@@ -19026,19 +19091,22 @@
               "pad": "x.......x.....x."
             },
             "2": {
-              "pad": "x.......x.....x."
+              "pad": "a..a..a.a..a...."
             },
             "3": {
-              "pad": "x.......x.....x."
+              "pad": "a.a.a.a.aaaaaaaa"
+            },
+            "4": {
+              "pad": "x..............."
             },
             "5": {
-              "pad": "x.......x.....x."
+              "pad": "x.......a.a.a.a."
             },
             "6": {
               "pad": "x.......x.....x."
             },
             "7": {
-              "pad": "x.......x.....x."
+              "pad": "x.....x.a.a.a.xf"
             }
           },
           "slots": [
@@ -19246,7 +19314,7 @@
     {
       "name": "Uplifting Trance Departures",
       "category": "electronic",
-      "blurb": "Modern uplifting trance at 138: sixteenth-note plucks arpeggiating the chords, an off-beat bass, a driving lead, and 8-bar builds that rise through a high-pass into the drop",
+      "blurb": "Modern uplifting trance at 138: held supersaw chords on a syncopated 3-3-2 push, an off-beat bass and a long-note lead hook that repeats and answers itself, with 8-bar builds that rise through a high-pass into the drop",
       "tags": [
         "sequencer",
         "trance",
@@ -19289,13 +19357,13 @@
         },
         "bassWeights": {
           "whole": 0,
-          "half": 20,
+          "half": 70,
           "walking": 0,
-          "drive": 80
+          "drive": 30
         },
         "chordColour": {
           "mode": "add9",
-          "amount": 0.3
+          "amount": 0
         },
         "padRoot": "unlessBass",
         "drums": {
@@ -19309,19 +19377,19 @@
         "tonic": 9,
         "progression": 6,
         "volumes": {
-          "pad": 0.6,
+          "pad": 0.5,
           "bass": 0.75,
-          "lead": 0.72,
+          "lead": 0.8,
           "counter": 0.4,
           "perc": 0.8
         },
-        "leadLeaps": 0.3,
-        "leadActivity": 0.7,
+        "leadLeaps": 0.2,
+        "leadActivity": 1,
         "leadDensity": 0.4,
-        "leadRepeat": 0.6,
-        "leadSyncopation": 0.35,
+        "leadRepeat": 0.8,
+        "leadSyncopation": 0.2,
         "portamento": {
-          "lead": 0.1,
+          "lead": 0.15,
           "counter": 0,
           "bass": 0.1
         },
@@ -19329,7 +19397,7 @@
           "sends": {
             "pad": 0,
             "bass": 0,
-            "lead": 0.28,
+            "lead": 0.35,
             "counter": 0,
             "perc": 0
           },
@@ -19345,21 +19413,43 @@
           "on": true,
           "machine": "tr909",
           "arrangement": "trance-journey",
-          "edits": {},
+          "edits": {
+            "1": {
+              "pad": "h.......s.s.s..."
+            },
+            "2": {
+              "pad": "f..x....a.a.a.a."
+            },
+            "3": {
+              "pad": "a.a.a.a.a.a.x.xf"
+            },
+            "4": {
+              "pad": "f.....x.x......."
+            },
+            "5": {
+              "pad": "s.s.s.s........."
+            },
+            "6": {
+              "pad": "f..x..x.h......."
+            },
+            "7": {
+              "pad": "h.......a.a.a.xf"
+            }
+          },
           "slots": [
             0,
             1,
             5,
             6,
-            1,
+            2,
             4,
             5,
             6
           ],
           "lanes": true,
-          "gate": 0.16,
+          "gate": 0.45,
           "pump": 0.7,
-          "variation": 0.85,
+          "variation": 0,
           "fills": true,
           "moves": {
             "0": [
@@ -19430,9 +19520,9 @@
         }
       },
       "voices": {
-        "pad": "Pluck Chord",
-        "bass": "Rolling Bass",
-        "lead": "Drive Lead"
+        "pad": "Trance Chord",
+        "bass": "Trance Bass",
+        "lead": "Outrun Lead"
       },
       "percussion": {
         "synth": "tr909",
@@ -19485,9 +19575,9 @@
         },
         "bassWeights": {
           "whole": 0,
-          "half": 20,
+          "half": 70,
           "walking": 0,
-          "drive": 80
+          "drive": 30
         },
         "chordColour": {
           "mode": "add9",
@@ -19505,17 +19595,17 @@
         "tonic": 4,
         "progression": 7,
         "volumes": {
-          "pad": 0.6,
+          "pad": 0.5,
           "bass": 0.75,
-          "lead": 0.68,
+          "lead": 0.65,
           "counter": 0.4,
           "perc": 0.8
         },
         "leadLeaps": 0.3,
-        "leadActivity": 0.55,
-        "leadDensity": 0.3,
-        "leadRepeat": 0.65,
-        "leadSyncopation": 0.45,
+        "leadActivity": 0.75,
+        "leadDensity": 0.12,
+        "leadRepeat": 0.75,
+        "leadSyncopation": 0.3,
         "portamento": {
           "lead": 0.25,
           "counter": 0,
@@ -19541,7 +19631,23 @@
           "on": true,
           "machine": "tr909",
           "arrangement": "progressive-journey",
-          "edits": {},
+          "edits": {
+            "1": {
+              "pad": "x..x..x.x..x..x."
+            },
+            "2": {
+              "pad": "x..x..x.a.a.a.a."
+            },
+            "3": {
+              "pad": "a.a.a.a.a.a.a.a."
+            },
+            "5": {
+              "pad": "s.s.s.s........."
+            },
+            "6": {
+              "pad": "h..x..x.h..x..x."
+            }
+          },
           "slots": [
             1,
             2,
@@ -19549,9 +19655,9 @@
             6
           ],
           "lanes": true,
-          "gate": 0.2,
+          "gate": 0.25,
           "pump": 0.6,
-          "variation": 0.75,
+          "variation": 0.45,
           "fills": true,
           "moves": {
             "1": [
@@ -19613,8 +19719,8 @@
       },
       "voices": {
         "pad": "Progressive Pluck",
-        "bass": "Rolling Bass",
-        "lead": "Acid Lead"
+        "bass": "Trance Bass",
+        "lead": "Soft Saw Lead"
       },
       "percussion": {
         "synth": "tr909",
@@ -19736,7 +19842,7 @@
               "cy": "................"
             },
             "2": {
-              "pad": "..x.....x.....x.",
+              "pad": "..x.....x.....a.",
               "rd": "................",
               "cr": "................",
               "cy": "................"
@@ -19765,7 +19871,7 @@
               "cy": "................"
             },
             "7": {
-              "pad": "..x.....x.......",
+              "pad": "..x.....x...a...",
               "rd": "................",
               "cr": "................",
               "cy": "................"
@@ -19982,22 +20088,26 @@
             "1": {
               "rd": "................",
               "cr": "................",
-              "cy": "................"
+              "cy": "................",
+              "pad": "h.....x.....x..."
             },
             "2": {
               "rd": "................",
               "cr": "................",
-              "cy": "................"
+              "cy": "................",
+              "pad": "x..x..x...a.a.a."
             },
             "3": {
               "rd": "................",
               "cr": "................",
-              "cy": "................"
+              "cy": "................",
+              "pad": "a.a.a.a.x.x...xf"
             },
             "4": {
               "rd": "................",
               "cr": "................",
-              "cy": "................"
+              "cy": "................",
+              "pad": "h..............."
             },
             "5": {
               "rd": "................",
@@ -20012,7 +20122,8 @@
             "7": {
               "rd": "................",
               "cr": "................",
-              "cy": "................"
+              "cy": "................",
+              "pad": "h.......s.s.s..."
             }
           },
           "slots": [
@@ -20195,22 +20306,26 @@
             "1": {
               "rd": "................",
               "cr": "................",
-              "cy": "................"
+              "cy": "................",
+              "pad": "h.......x..x...."
             },
             "2": {
               "rd": "................",
               "cr": "................",
-              "cy": "................"
+              "cy": "................",
+              "pad": "x..x....a.a.a..."
             },
             "3": {
               "rd": "................",
               "cr": "................",
-              "cy": "................"
+              "cy": "................",
+              "pad": "a.a.a.a.x.x...xf"
             },
             "4": {
               "rd": "................",
               "cr": "................",
-              "cy": "................"
+              "cy": "................",
+              "pad": "h..............."
             },
             "5": {
               "rd": "................",
@@ -20225,7 +20340,8 @@
             "7": {
               "rd": "................",
               "cr": "................",
-              "cy": "................"
+              "cy": "................",
+              "pad": "h.......s.s.s..."
             }
           },
           "slots": [
@@ -20416,17 +20532,20 @@
             "1": {
               "rd": "................",
               "cr": "................",
-              "cy": "................"
+              "cy": "................",
+              "pad": "..x...x...x...x."
             },
             "2": {
               "rd": "................",
               "cr": "................",
-              "cy": "................"
+              "cy": "................",
+              "pad": "h.....x.x.x.x..."
             },
             "3": {
               "rd": "................",
               "cr": "................",
-              "cy": "................"
+              "cy": "................",
+              "pad": "a.a.a.a.a.a.x.xf"
             },
             "4": {
               "rd": "................",
