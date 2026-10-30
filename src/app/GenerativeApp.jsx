@@ -14,6 +14,21 @@ import TrialRules, { TRIAL_RULE_IDS } from './rulebook/TrialRules';
 import { GROUPS, groupValue } from './rulebook/groups';
 import { RULES } from './rulebook/model';
 import { readBook, inheritBook, withPresetBook, withBook, applyBook, baselineChoice, withoutSettings } from './rulebook/session';
+// the presets of each category by name, in library order, for the unlocks (presetUnlocks.js)
+const PRESET_CATEGORIES = SCENE_CATEGORIES.map(({ id, label }) => ({ id, label, names: BROWSABLE_SCENES.filter((s) => s.category === id).map((s) => s.name) }));
+// The built-in preset the music started from, remembered for this tab: when the page is rebuilt from its address
+// (a reload, a hot update) the address carries the changed settings, not the preset they came from, and the
+// buttons that go back to the preset (a voice's ↶, the control panel's Preset and Reset) need the preset itself.
+const BASE_SCENE_KEY = 'bgm-base-scene';
+const readBaseScene = () => {
+    try { const name = window.sessionStorage.getItem(BASE_SCENE_KEY); return name ? SCENES.find((s) => s.name === name) ?? null : null; } catch (e) { return null; }
+};
+const writeBaseScene = (scene) => {
+    try {
+        if (scene && SCENES.includes(scene)) window.sessionStorage.setItem(BASE_SCENE_KEY, scene.name);
+        else window.sessionStorage.removeItem(BASE_SCENE_KEY);
+    } catch (e) { /* not stored */ }
+};
 let initialBook = readBook(window.location.search);
 const linkedView = viewFromSearch(window.location.search);
 // ?patterns=: which pattern blocks show, in which mode, on which string (viewLink.js); the string arrives as its note name.
@@ -21,6 +36,13 @@ const linkedPatterns = patternsFromSearch(window.location.search);
 const linkedPatternOptions = linkedPatterns && linkedBlockOptions(linkedPatterns.options);
 // A first visit (no link to a view, no tour taken, no background chosen) opens on the landscape in
 // the minimal view, with a tour of its own; opening the whole page then starts the main tour.
+// A link with something set up in it (a preset, settings, patterns, a view), opened by someone new to the page,
+// is a PREVIEW: the whole page is open to try, no tour or quests, and a button starts the tutorial from the beginning.
+const linkedSetup = (() => {
+    const query = new URLSearchParams(window.location.search);
+    return ['preset', 'm', 'v', 'a', 'x', 's', 'patterns', 'view', 'phrase', 'rb'].some((key) => query.has(key)) || window.location.hash.includes('s=');
+})();
+const previewVisit = linkedSetup && !tourSeen() && !minimalTourSeen() && readPref(STAGE_KEY, null) === null;
 const firstVisit = !linkedView && !tourSeen() && !minimalTourSeen() && readPref('bgm-backdrop-mode', null) === null;
 import { RoleButtons, TrackStrip, PatternButtons, useLivePlay, DRUM_KEY_HINT } from './Tracks';
 import { INSTRUMENTS, anchorStrings, stringLetter } from './MiniFretboard';
@@ -38,8 +60,8 @@ import {
 import { DRIFT_MODES, BPM_LIMITS } from './conductor';
 import { METERS } from './meter';
 import {
-    RANDOM_LEVELS, RANDOM_LEVEL_HINTS, randomKey, randomProgression, randomConductor, randomVoices, randomField, randomRelativeKey, relativeKeys, randomPreset, randomLength,
-    randomArrangement, randomStyleWeights, randomRole, progressionLength, progressionForLength, randomAmbience, randomAmbienceShape,
+    RANDOM_LEVELS, RANDOM_LEVEL_HINTS, randomKey, randomProgression, randomConductor, randomVoices, randomField, randomRelativeKey, relativeKeys, randomPreset as randomVoiceSound, randomLength,
+    randomArrangement, randomStyleWeights, progressionLength, progressionForLength, randomAmbience, randomAmbienceShape,
     randomPadMotion, randomColour,
 } from './randomize';
 import Backdrop, { backdropSupported, BACKDROP_DEFAULTS, shuffleColours } from './Backdrop';
@@ -48,7 +70,9 @@ import { sceneryForScene } from '../scenery/presetScenes';
 import { viewFromSearch, withView, patternsFromSearch, patternsParam, withPatterns } from './viewLink';
 import { MasterVolume, SettingsMenu, AudioMenu, VisualMenu } from './AudioStatus';
 import { SleepTimer, Recorder } from './Playback';
-import { sceneSettings, sceneSoundSettings, sceneGroup, stepBuiltinSceneEntry, randomBuiltinSceneEntry, buildSetup, parseSetup, sceneBySlug, sceneSlug, presetFromSearch, introFromSearch, SCENES, SCENE_CATEGORIES } from './scenes';
+import { sceneSettings, sceneSoundSettings, sceneGroup, stepBuiltinSceneEntry, randomBuiltinSceneEntry, buildSetup, parseSetup, sceneBySlug, sceneSlug, presetFromSearch, introFromSearch, SCENES, SCENE_CATEGORIES, BROWSABLE_SCENES } from './scenes';
+import { presetAccess, STARTERS } from './presetUnlocks';
+import { useStarred } from './starred';
 import PresetBrowser from './PresetBrowser';
 import QuickPanel from './QuickPanel';
 import Wordmark from './Wordmark';
@@ -82,7 +106,14 @@ import { readPerformance, writePerformance } from '../audio/performance';
 import { seedToPhrase, phraseToSeed } from './phrase';
 import { WANDER_ROLES, WANDER_LIMITS, WANDER_MODES, AMBIENCE_WANDER_LIMITS } from './engine/wander';
 import Tour, { tourSeen, minimalTourSeen } from './Tour';
-import { STAGES, STAGE_KEY, LAST_STAGE, MINIMAL_TOUR_KEY } from './tourSteps';
+import { STAGES, STAGE_KEY, LAST_STAGE, MINIMAL_TOUR_KEY, QUESTS_INTRO_KEY } from './tourSteps';
+import { emitQuest } from './quests/questBus';
+import useQuests from './quests/useQuests';
+import { isUnlocked } from './quests/questState';
+import QuestWidget from './quests/QuestWidget';
+import PreviewGuide from './quests/PreviewGuide';
+import TestRestart, { ANNOUNCE_KEY } from './quests/TestRestart';
+import MiniKeyboard from './MiniKeyboard';
 import { generationFromSearch, withGeneration } from './generation';
 
 // One Generator for the page's lifetime; StrictMode's double-mount must
@@ -290,8 +321,9 @@ const LOOP_LABELS = { off: 'Loop', chord: 'Loop: chord', progression: 'Loop: pro
 // Play / pause and moving around the piece: to the start, a progression
 // or a chord back / on, and looping the chord or progression playing.
 const Transport = ({ gen, anyOn, onToggle, onChange }) => {
-    const act = (fn) => async () => {
+    const act = (fn, quest) => async () => {
         await fn();
+        if (quest) emitQuest(quest.type, quest);
         onChange();
     };
     const atStart = gen.hereBar <= gen.earliestBar && !gen.isRunning;
@@ -301,16 +333,16 @@ const Transport = ({ gen, anyOn, onToggle, onChange }) => {
     );
     return (
         <div className="gen-transport" role="toolbar" aria-label="Playback">
-            {button('Back to the start', <ToStartIcon />, act(() => gen.rewind()), atStart && gen.hereBar === 0)}
-            {button('Back to the start of this progression, or the one before (Shift + ←)', <ProgressionBackIcon />, act(() => gen.step('progression', -1)), atStart)}
-            {button('Back to the start of this chord, or the one before (←)', <BarBackIcon />, act(() => gen.step('chord', -1)), atStart)}
+            {button('Back to the start', <ToStartIcon />, act(() => gen.rewind(), { type: 'step', unit: 'start', dir: -1 }), atStart && gen.hereBar === 0)}
+            {button('Back to the start of this progression, or the one before (Shift + ←)', <ProgressionBackIcon />, act(() => gen.step('progression', -1), { type: 'step', unit: 'progression', dir: -1 }), atStart)}
+            {button('Back to the start of this chord, or the one before (←)', <BarBackIcon />, act(() => gen.step('chord', -1), { type: 'step', unit: 'chord', dir: -1 }), atStart)}
             <button type="button" className={`gen-play${anyOn ? ' is-playing' : ''}`} onClick={onToggle} title={`${anyOn ? 'Pause' : 'Play'} (Space)`} aria-label={anyOn ? 'Pause' : 'Play'}>
                 {anyOn ? <PauseIcon /> : <PlayIcon />}
             </button>
-            {button('Forward one chord (→)', <BarForwardIcon />, act(() => gen.step('chord', 1)))}
-            {button('Forward one progression (Shift + →)', <ProgressionForwardIcon />, act(() => gen.step('progression', 1)))}
+            {button('Forward one chord (→)', <BarForwardIcon />, act(() => gen.step('chord', 1), { type: 'step', unit: 'chord', dir: 1 }))}
+            {button('Forward one progression (Shift + →)', <ProgressionForwardIcon />, act(() => gen.step('progression', 1), { type: 'step', unit: 'progression', dir: 1 }))}
             <button type="button" className={`gen-icon-button gen-loop${loop !== 'off' ? ' is-on' : ''}`} aria-pressed={loop !== 'off'}
-                title="Loop the chord playing, then the whole progression, then off" onClick={act(() => gen.setLoop(LOOP_NEXT[loop]))}>
+                title="Loop the chord playing, then the whole progression, then off" onClick={act(() => gen.setLoop(LOOP_NEXT[loop]), { type: 'loop', mode: LOOP_NEXT[loop] })}>
                 <LoopIcon />{loop !== 'off' && <span>{loop}</span>}
                 <span className="gen-visually-hidden">{LOOP_LABELS[loop]}</span>
             </button>
@@ -320,9 +352,10 @@ const Transport = ({ gen, anyOn, onToggle, onChange }) => {
 
 // A labelled control; with onRandom, a dice button beside it (and with
 // onGenerate, a "new sound" button).
-const Field = ({ label, onRandom, onRelative, onGenerate, generating, wide, children }) => (
-    <label className={`gen-field${wide ? ' gen-field-wide' : ''}`}>
+const Field = ({ label, onRandom, onRelative, onGenerate, generating, wide, onReset, resetTitle = 'Back to the preset', children }) => (
+    <label className={`gen-field${wide ? ' gen-field-wide' : ''}${onReset ? ' has-reset' : ''}`}>
         <span>{label}</span>
+        {onReset && <button type="button" className="gen-field-reset" title={resetTitle} aria-label={resetTitle} onClick={(e) => { e.preventDefault(); onReset(); }}>↶</button>}
         {onRandom ? (
             <span className="gen-field-row">
                 {children}
@@ -810,6 +843,7 @@ const GenerativeApp = () => {
     const setBook = next => { bookRef.current = next; setBookState(next); };
     const clearBookSettings = patch => setBook(withoutSettings(bookRef.current, patch, gen.settings));
     const changeRule = (id, choice) => {
+        emitQuest('rule', { id });
         const rule = RULES.find(r => r.id === id), previous = bookRef.current;
         const rules = { ...previous.rules }, baseline = { ...previous.baseline };
         if (choice) {
@@ -829,6 +863,7 @@ const GenerativeApp = () => {
         }
     };
     const changeGroup = (id, value) => {
+        emitQuest('rule', { id });
         const group = GROUPS.find(g => g.id === id), previous = bookRef.current;
         if (!group || value !== null && group.validate(value) === undefined) return;
         const groups = { ...previous.groups }, groupBaseline = { ...previous.groupBaseline };
@@ -893,6 +928,8 @@ const GenerativeApp = () => {
     const live = useLivePlay(gen, armed);
     // mutes are settings (kept in the address bar and links), solo isn't
     const changeMix = (role, patch) => {
+        if (patch.mute !== undefined) emitQuest('mute', { role, on: !!patch.mute });
+        if (patch.solo !== undefined) emitQuest('solo', { role, on: !!patch.solo });
         gen.setRoleMix(role, patch);
         setMix((m) => ({ ...m, [role]: { ...m[role], ...patch } }));
         if (patch.mute !== undefined) setSettings((s) => ({ ...s, muted: { ...gen.settings.muted } }));
@@ -904,16 +941,23 @@ const GenerativeApp = () => {
     // whether the open tour is the minimal view's (tourSteps.js, MINIMAL_TOUR_STEPS)
     const [tourMinimal, setTourMinimal] = useState(false);
     // The page unlocks a set of features at a time (STAGES); a browser with no stored stage starts at the basics.
+    const [preview, setPreview] = useState(previewVisit);
     const [stage, setStage] = useState(() => {
+        if (previewVisit) return LAST_STAGE;
         const stored = readPref(STAGE_KEY, null);
         if (Number.isInteger(stored) && stored >= 0 && stored <= LAST_STAGE) return stored;
+        // the stage kept before 'Mixing & ambience' was inserted as level 3: the later ones moved up one
+        const before = readPref('bgm-stage-v2', null);
+        if (Number.isInteger(before) && before >= 0) return Math.min(LAST_STAGE, before >= 2 ? before + 1 : before);
         return 0;
     });
-    useEffect(() => writePref(STAGE_KEY, stage), [stage]);
+    useEffect(() => { if (!preview) writePref(STAGE_KEY, stage); }, [stage, preview]);
     const has = (needed) => stage >= needed;
     // The tour covers the stages from..to; the first-visit prompt and a restart cover only the first.
     const [tourRange, setTourRange] = useState({ from: 0, to: 0, id: 0 });
-    const openTour = (prompt = false, range = { from: 0, to: stage }, minimal = false) => {
+    const [tourOnly, setTourOnly] = useState(null);
+    const openTour = (prompt = false, range = { from: 0, to: stage }, minimal = false, only = null) => {
+        setTourOnly(only);
         setTourPrompt(prompt);
         setTourMinimal(minimal);
         setTourRange((r) => ({ ...range, id: r.id + 1 }));
@@ -922,11 +966,13 @@ const GenerativeApp = () => {
     // Unlock the next set of features and show what they are (after they have rendered, so there is something to frame).
     const unlockNext = () => {
         const next = Math.min(LAST_STAGE, stage + 1);
+        quests.skipThrough(stage); // unlocking by hand: this level's quests are not asked for
         setTourOpen(false);
         setStage(next);
         setTimeout(() => openTour(false, { from: next, to: next }), 0);
     };
     const startOver = () => {
+        quests.reset();
         setStage(0);
         setRuleFocus(previous => ({ reset: true, revision: (previous?.revision ?? 0) + 1 }));
         setTimeout(() => openTour(false, { from: 0, to: 0 }), 0);
@@ -935,6 +981,12 @@ const GenerativeApp = () => {
     useEffect(() => {
         // A ?view= link opens straight into its view; the tour stays in the ⚙ menu.
         // In the minimal view the minimal tour comes first, and the main one waits for the whole page.
+        // Someone who took the tour before quests existed is shown them once, with a way to skip ahead.
+        if (previewVisit) return undefined;
+        if (tourSeen() && !linkedView && readPref(QUESTS_INTRO_KEY, false) !== true) {
+            const timer = setTimeout(() => openTour(false, { from: 0, to: 0 }, false, ['quests']), 1200);
+            return () => clearTimeout(timer);
+        }
         if (tourSeen() || linkedView) return undefined;
         const minimal = zen && !minimalTourSeen();
         if (zen && !minimal) return undefined;
@@ -947,6 +999,7 @@ const GenerativeApp = () => {
     // does); closing it puts the arming back as it was.
     const soundArmedBefore = useRef(null);
     const editSound = (role) => {
+        emitQuest('editor', { role });
         if (soundRole === null) soundArmedBefore.current = armed;
         if (role !== 'bus') setArmed(role); // (the bus is no voice to play)
         setSoundRole(role);
@@ -977,7 +1030,9 @@ const GenerativeApp = () => {
     };
     // The scene last picked (shown in the top row until something changes).
     const [scene, setScene] = useState(linkedScene ? linkedScene.name : '');
-    const soundScene = useRef(linkedScene);
+    // (a link to a preset names it; one with settings in it leaves the preset to what this tab remembers)
+    const soundScene = useRef(linkedScene ?? readBaseScene());
+    useEffect(() => { if (linkedScene) writeBaseScene(linkedScene); }, []);
     const soundRequests = useRef({});
     const generationRequest = useRef(0);
     // the built-in preset the page is on (by slug), so its address can be its name
@@ -1047,10 +1102,12 @@ const GenerativeApp = () => {
     };
     // the feel pad: a place over the preset, so the preset's name stays
     const changeFeel = (feel) => {
+        emitQuest('feel');
         gen.set('feel', feel);
         setSettings((s) => ({ ...s, feel }));
     };
     const update = (key, value) => {
+        emitQuest('setting', { key, value });
         clearBookSettings({ [key]: value });
         gen.set(key, value);
         setSettings((s) => ({ ...s, [key]: value }));
@@ -1074,7 +1131,32 @@ const GenerativeApp = () => {
     // A new preset name is the generator's own synth again (a classic or DIY sound is `external`).
     const patchRole = (role, patch) => setRoles((r) => ({ ...r, [role]: { ...r[role], ...('presetName' in patch ? { external: null } : {}), ...patch } }));
     const setExternal = useCallback((role, external) => setRoles((r) => ({ ...r, [role]: { ...r[role], external } })), []);
+    // Which voices have a sound other than the preset's (the preset's own is kept as it was applied), and the
+    // preset's volumes: each can go back to them (the ↶ on the voice's fields).
+    const [changedVoices, setChangedVoices] = useState({});
+    const presetVolumes = useMemo(() => (soundScene.current ? sceneSettings(soundScene.current, 1).volumes : null), [soundScene.current]); // eslint-disable-line react-hooks/exhaustive-deps
+    // A voice differs from the preset's when it was changed here, is edited, or (after the page was rebuilt from its
+    // address) is not the sound the preset names for it.
+    const voiceChanged = (role) => {
+        const base = soundScene.current;
+        if (!base) return false;
+        const spec = base.voices[role];
+        const named = typeof spec === 'string' ? (findPreset(spec) ? spec : ROLE_PRESETS[role]) : null;
+        return !!(changedVoices[role] || roles[role].edited || (named && (roles[role].presetName !== named || roles[role].external)));
+    };
+    const volumeChanged = (role) => !!presetVolumes && presetVolumes[role] !== undefined && Math.abs(settings.volumes[role] - presetVolumes[role]) > 0.005;
+    const resetVoice = (role) => {
+        const scene = soundScene.current;
+        if (!scene) return;
+        emitQuest('voice-reset', { role });
+        loadSceneVoice(role, scene.voices[role], scene.name, false);
+    };
+    const resetVolume = (role) => {
+        gen.setRoleVolume(role, presetVolumes[role]);
+        setSettings((s) => ({ ...s, volumes: { ...gen.settings.volumes } }));
+    };
     const setVolume = (role, volume) => {
+        emitQuest('volume', { role, dir: Math.sign(volume - (gen.settings.volumes[role] ?? 0)) });
         gen.setRoleVolume(role, volume);
         setSettings((s) => ({ ...s, volumes: { ...gen.settings.volumes } }));
         setScene(''); // no longer the preset as shipped, so the address carries the settings
@@ -1104,6 +1186,8 @@ const GenerativeApp = () => {
         patchRole(role, { presetName: name, edited: true });
     };
     const loadPreset = (role, name) => {
+        emitQuest('sound', { role });
+        setChangedVoices((c) => ({ ...c, [role]: true }));
         const info = generatedInfo(name);
         if (info?.version === GENERATOR_V3 && name.startsWith('Original ') !== (generationChoice === 'legacy')) {
             loadGeneratedSound(role, info);
@@ -1119,12 +1203,13 @@ const GenerativeApp = () => {
     const relativeKey = () => loadSettings(randomRelativeKey(gen.settings));
     const randomizeField = (key) => loadSettings(randomField(key, gen.settings, randomLevel));
     const chords = progressionLength(settings.progression);
-    const randomizePreset = (role) => loadPreset(role, randomPreset(role, roles[role].presetName, randomLevel));
+    const randomizePreset = (role) => (emitQuest('dice', { role }), loadPreset(role, randomVoiceSound(role, roles[role].presetName, randomLevel)));
     // A procedural sound: info retains recipe version and frozen v3 context.
     // { role, seed } for
     // one voice, { role, ensemble } for a voice of an ensemble (+ version and
     // kind for v2) - levelled to its role's default loudness, onto `target`.
     const loadGeneratedSound = async (target, info) => {
+        setChangedVoices((c) => ({ ...c, [target]: true }));
         setGenerating((g) => ({ ...g, [target]: true }));
         const request = soundRequests.current[target] = (soundRequests.current[target] || 0) + 1;
         const previous = gen.roles[target].instrument.preset;
@@ -1145,9 +1230,9 @@ const GenerativeApp = () => {
         if (!soundScene.current && previous?.version === GENERATOR_V3) context.profile = previous.profile;
         return context;
     };
-    const generateForRole = (role) => loadGeneratedSound(role, { role, seed: newSoundSeed(), kind: soundKinds[role],
+    const generateForRole = (role) => (emitQuest('newsound', { role }), loadGeneratedSound(role, { role, seed: newSoundSeed(), kind: soundKinds[role],
         version: generationChoice === 'legacy' ? GENERATOR_V2 : GENERATOR_V3,
-        ...(generationChoice === 'legacy' ? {} : generatedContext(role)) });
+        ...(generationChoice === 'legacy' ? {} : generatedContext(role)) }));
     // New sounds for every voice at once, with a shared character.
     const generateAll = (ensemble) => {
         Object.keys(ROLES).forEach((role) => loadGeneratedSound(role, { role, ensemble, version: generationChoice === 'legacy' ? GENERATOR_V2 : GENERATOR_V3,
@@ -1162,6 +1247,7 @@ const GenerativeApp = () => {
     // Within reason, key and progression are chosen to fit each other: alone,
     // each fits the other's current value; together, the key comes first.
     const randomize = (target, level = randomLevel) => {
+        emitQuest('randomize');
         if (target === 'ambience') {
             update('ambienceShape', randomAmbienceShape(level));
             changeAmbience(randomAmbience(level));
@@ -1184,11 +1270,6 @@ const GenerativeApp = () => {
         }
         loadSettings(patch);
     };
-    const randomizeRole = (role) => {
-        const { settings: patch, preset } = randomRole(role, gen.settings, roles[role].presetName, randomLevel);
-        loadPreset(role, preset);
-        loadSettings(patch);
-    };
     const mediaTitle = () => {
         const n = gen.nowPlaying();
         return { title: `${n.keyName} · ${n.bpm} BPM`, artist: 'bgm' };
@@ -1205,6 +1286,7 @@ const GenerativeApp = () => {
     // what you hear.
     const startPart = (key) => begin(() => (key === 'playMusic' ? gen.start() : gen.startAmbience()));
     const play = () => {
+        emitQuest('play');
         const { playMusic, playAmbience } = gen.settings;
         if (!playMusic && !playAmbience) update('playMusic', true);
         begin(() => Promise.all([
@@ -1277,13 +1359,34 @@ const GenerativeApp = () => {
     const [zenTracks, setZenTracks] = useStoredFlag('bgm-zen-tracks', false);
     // A first visit's landscape and minimal view stay the starting point until changed.
     useEffect(() => { if (firstVisit) { writePref('bgm-backdrop-mode', 'scenery'); writePref('bgm-hide-ui', true); } }, []);
-    // Leaving the minimal view for the whole page: the main tour starts there if it has not been taken.
+    const lastSceneName = useRef(linkedScene ? linkedScene.name : '');
+    // Quests and achievements (src/app/quests): finishing a level's quests unlocks the next stage.
+    const quests = useQuests({ stage, lastStage: LAST_STAGE, setStage, scene: scene || lastSceneName.current, playing: anyOn, enabled: !preview });
+    // (testing) a restart at a level announces it like a level-up, so its Show me opens that level's tour
+    useEffect(() => {
+        const level = readPref(ANNOUNCE_KEY, null);
+        if (level === null) return;
+        try { window.localStorage.removeItem(ANNOUNCE_KEY); } catch (e) { /* not stored */ }
+        if (Number.isInteger(level) && level > 0 && level <= LAST_STAGE) quests.announceLevel(level);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    // Presets start as a small set and open as each category is listened to (presetUnlocks.js), unless the quests
+    // are off, this is a preview, someone knew the page before quests, or Unlock all was pressed.
+    const presetsLocked = !preview && !quests.state.off && !quests.state.seeded && !quests.state.presetsAll;
+    const access = useMemo(() => (presetsLocked ? presetAccess(PRESET_CATEGORIES, quests.state.heard, [...STARTERS, DEFAULT_SCENE]) : null), [presetsLocked, quests.state.heard]);
+    const openPreset = access ? (s) => access.isOpen(s.name) : null;
+    const [starredPresets, toggleStar] = useStarred();
+    // A first visit has only the landscape view: the whole page opens when the first level's quests are done
+    // (or the quests are switched off, or someone who knew the page before them is back).
+    const expandLocked = () => stage === 0 && !quests.state.off && !tourSeen();
+    // Leaving the minimal view for the whole page: the tour of what is new there starts if the main tour has
+    // not been taken (not what the landscape tour already showed).
     const showWholePage = () => {
+        if (expandLocked()) return;
         setZen(false);
         if (tourSeen()) return;
         writePref(MINIMAL_TOUR_KEY, true);
         setTourOpen(false);
-        setTimeout(() => openTour(false, { from: 0, to: 0 }), 0);
+        setTimeout(() => openTour(false, { from: stage > 0 ? 1 : 0, to: stage }), 0);
     };
     // In that view the timeline can be folded away too (ignored while the interface shows).
     const [timelineHidden, setTimelineHidden] = useStoredFlag('bgm-hide-timeline', false, linkedView ? false : undefined);
@@ -1297,16 +1400,31 @@ const GenerativeApp = () => {
     const withThisView = (url) => withPatterns(viewParam ? withView(url, { view: viewParam }) : url, patternsParam({ piano: showPiano, guitar: showGuitar, bass: showBass }, patternOptions,
         (id, anchor) => { const strings = INSTRUMENTS[id].strings, anchors = anchorStrings(strings); return stringLetter(strings, anchors.includes(anchor) ? anchor : anchors[0]); }));
     const patterns = { piano: showPiano, guitar: showGuitar, bass: showBass };
-    const setPattern = (id, on) => ({ piano: setShowPiano, guitar: setShowGuitar, bass: setShowBass })[id](on);
+    // the instrument views are a later feature (a link that opens them, or one already open, still shows them)
+    const patternViews = has(4) || showPiano || showGuitar || showBass;
+    const setPattern = (id, on) => (emitQuest('pattern', { id, on }), { piano: setShowPiano, guitar: setShowGuitar, bass: setShowBass })[id](on);
+    // Leaving a preview (a link someone new opened): the tutorial from the beginning, on the music they have.
+    const startFromBeginning = () => {
+        ['bgm-quests-v2', 'bgm-tour-v2', MINIMAL_TOUR_KEY, QUESTS_INTRO_KEY, 'bgm-quest-collapsed', 'bgm-intros-v1'].forEach((key) => { try { window.localStorage.removeItem(key); } catch (e) { /* not stored */ } });
+        quests.reset();
+        setPreview(false);
+        setStage(0);
+        writePref(STAGE_KEY, 0);
+        setShowPiano(false); setShowGuitar(false); setShowBass(false);
+        setZen(true);
+        if (backdropMode === 'off') setBackdropMode('scenery');
+        setTimeout(() => openTour(true, { from: 0, to: 0 }, true), 300);
+    };
     const bare = zen && timelineHidden;
     useEffect(() => {
         if (!zen) return undefined;
         const onKey = (e) => { if (e.key === 'Escape' && !document.querySelector('.gen-tour, .gen-tour-intro')) showWholePage(); };
         window.addEventListener('keydown', onKey);
         return () => window.removeEventListener('keydown', onKey);
-    }, [zen]);
+    }, [zen, stage, quests.state.off]); // eslint-disable-line react-hooks/exhaustive-deps
     const loadPresetAt = async (role, name, morph) => {if(findPreset(name)?.wasmVoice&&gen.audioEngine!=='wasm'&&!await audioEngine.choose('wasm',{remember:false}))return;gen.loadRolePresetAtBar(role,name,undefined,()=>presetLoaded(role,name),{morph});};
     const loadSceneVoice = (role, spec, sceneName, unsaved, morph) => {
+        setChangedVoices((c) => (c[role] ? { ...c, [role]: false } : c));
         if (spec?.external) { applyRefs([{ role, ref: spec.external }]); return; }
         if (typeof spec === 'string') {
             loadPresetAt(role, findPreset(spec) ? spec : ROLE_PRESETS[role], morph);
@@ -1334,7 +1452,6 @@ const GenerativeApp = () => {
     const sceneBrowseCategory = useRef(null);
     // The preset the page was last put on, kept when a tweak clears its name from the top row: [ and ] step on from it,
     // and the quick panel's Reset goes back to it (or, with none picked, to how the page opened).
-    const lastSceneName = useRef(linkedScene ? linkedScene.name : '');
     const openedWith = useRef(quickSettings(structuredClone(gen.settings)));
     // `parts`: 'all', 'composition' (everything but the sounds and the mix) or 'voices' (the sounds only).
     const applyScene = async (picked, options = {}) => {
@@ -1352,6 +1469,7 @@ const GenerativeApp = () => {
     };
     const applySceneNow = (picked, { exact = false, unsaved = false, parts = 'all', preserveSeed = false }, morph) => {
         soundScene.current = picked;
+        writeBaseScene(picked);
         if (parts !== 'voices') applyLandscape(picked);
         const playing = gen.anyRunning;
         if (parts !== 'voices') {
@@ -1441,6 +1559,7 @@ const GenerativeApp = () => {
     // New variation, and back through earlier ones (media keys: next / previous track).
     const seeds = useRef([]);
     const newVariation = () => {
+        emitQuest('randomize');
         seeds.current.push(gen.settings.seed);
         loadSettings({ seed: newSeed() });
     };
@@ -1461,7 +1580,8 @@ const GenerativeApp = () => {
     };
     // Next / previous built-in preset in the browser's order ([ and ] keys; with Shift, at once).
     const stepPreset = (dir, { now = false } = {}) => {
-        const entry = stepBuiltinSceneEntry(scene || lastSceneName.current, dir, sceneBrowseCategory.current);
+        const entry = stepBuiltinSceneEntry(scene || lastSceneName.current, dir, sceneBrowseCategory.current, openPreset);
+        emitQuest('preset', { name: entry.scene.name, category: entry.scene.category });
         (now ? cutToScene : applyScene)(entry.scene, {browseCategory:entry.category,preserveSeed:false});
     };
     // The quick panel's Reset: its settings back to the preset's (the sounds are left alone).
@@ -1477,11 +1597,13 @@ const GenerativeApp = () => {
     const handlers = useRef({});
     // Move around the piece from the keyboard: a chord / a progression back or on.
     const move = async (unit, dir) => {
+        emitQuest('step', { unit, dir });
         await gen.step(unit, dir);
         setNow((n) => n + 1);
     };
     const randomPreset = () => {
-        const entry = randomBuiltinSceneEntry(scene);
+        const entry = randomBuiltinSceneEntry(scene, Math.random, openPreset);
+        emitQuest('preset', { name: entry.scene.name, category: entry.scene.category });
         applyScene(entry.scene, { browseCategory: entry.category, preserveSeed: false });
     };
     handlers.current = { play, stop, toggle, newVariation, previousVariation, stepPreset, move };
@@ -1541,7 +1663,7 @@ const GenerativeApp = () => {
                 <h1 aria-label="calmbgm - music that writes itself" title="calmbgm - music that writes itself"><Wordmark playing={anyOn} /></h1>
                 <div className="gen-header-controls">
                 <Transport gen={gen} anyOn={anyOn} onToggle={toggle} onChange={() => setTick((n) => n + 1)} />
-                {has(1) && <div className="gen-parts" role="group" aria-label="What Play plays">
+                {has(2) && <div className="gen-parts" role="group" aria-label="What Play plays">
                     <button type="button" className={`gen-part gen-part-icon${settings.playMusic ? ' is-on' : ''}`} aria-pressed={settings.playMusic}
                         aria-label="Music" onClick={() => togglePart('playMusic')} title={`Music. ${PART_TITLE}`}><MusicIcon /></button>
                     <button type="button" className={`gen-part gen-part-icon${settings.playAmbience ? ' is-on' : ''}`} aria-pressed={settings.playAmbience}
@@ -1551,7 +1673,7 @@ const GenerativeApp = () => {
                 <div className="gen-header-end">
                 <div className="gen-scene-nav">
                     {zen && <button type="button" className="gen-help gen-scene-step" onClick={(e) => stepPreset(-1, { now: e.shiftKey })} aria-label="Previous preset" title="Previous preset ([, with Shift at once)"><ChevronLeftIcon /></button>}
-                    <PresetBrowser current={scene} onPick={applyScene} actions={setupActions} />
+                    <PresetBrowser access={access} heard={quests.state.heard} starred={starredPresets} onStar={toggleStar} onUnlockAll={quests.unlockAllPresets} current={scene} onPick={(picked, options) => { if (picked && (options?.parts ?? 'all') === 'all') emitQuest('preset', { name: picked.name, category: picked.category }); return applyScene(picked, options); }} actions={setupActions} />
                     {zen && <button type="button" className="gen-help gen-scene-step" onClick={(e) => stepPreset(1, { now: e.shiftKey })} aria-label="Next preset" title="Next preset (], with Shift at once)"><ChevronRightIcon /></button>}
                     {zen && <button type="button" className="gen-help gen-scene-step" onClick={randomPreset} aria-label="Random preset" title="A preset at random"><DiceIcon /></button>}
                 </div>
@@ -1567,12 +1689,13 @@ const GenerativeApp = () => {
                     <button type="button" className="gen-help" onClick={() => setHelpOpen(true)} title="Quick reference: hover the parts of the page to see what they do"
                         aria-label="Quick reference">?</button>
                     <MasterVolume />
-                    <VisualMenu backdrop={{ mode: backdropMode, onMode: setBackdropMode, fluidOk: backdropSupported(), value: backdropOn&&!perfOn&&backdropSupported(), locked:perfOn, options: backdropOptions, onOptions: setBackdropOptions, onClear: () => setFluidReset((n) => n + 1), onShuffle: () => setBackdropOptions(shuffleColours(backdropOptions)) }}
-                        scenery={{ options: sceneryOptions, onOptions: setSceneryOptions }} />
+                    <VisualMenu backdrop={{ mode: backdropMode, onMode: (mode) => { emitQuest('backdrop', { mode }); setBackdropMode(mode); }, fluidOk: backdropSupported(), gated: !(preview || quests.state.off || isUnlocked(quests.state, 'fluid')), value: backdropOn&&!perfOn&&backdropSupported(), locked:perfOn, options: backdropOptions, onOptions: (next) => { emitQuest('fluid-option'); setBackdropOptions(next); }, onClear: () => setFluidReset((n) => n + 1), onShuffle: () => { emitQuest('fluid-option'); setBackdropOptions(shuffleColours(backdropOptions)); } }}
+                        scenery={{ options: sceneryOptions, onOptions: (next) => { emitQuest('scenery', { keys: Object.keys(next).filter((k) => next[k] !== sceneryOptions[k]) }); setSceneryOptions(next); } }} />
                     <AudioMenu generator={gen} onReload={reloadKeepingSettings}>
                         <WasmOptions engine={audioEngine} perf={{ onToggle: togglePerfMode }} />
                     </AudioMenu>
                     <SettingsMenu midi={{ connect: live.connectMidi, status: live.midiStatus }} link={(withViewSettings) => {
+                        emitQuest('share');
                         // a built-in preset playing as it is stays its name (?preset=...), as in the address bar, rather than its expanded settings.
                         // "music + view" is the music's settings without the seed (a fresh take, not this exact one) with the view and patterns
                         const base = presetSlug ? `${window.location.origin}${window.location.pathname}?preset=${presetSlug}`
@@ -1586,7 +1709,7 @@ const GenerativeApp = () => {
                     </SettingsMenu>
                     {zen && (
                         <span className="gen-zen-views">
-                            <PatternButtons patterns={patterns} onPattern={setPattern} label={false} />
+                            {patternViews && <PatternButtons patterns={patterns} onPattern={setPattern} label={false} />}
                             <button type="button" className="gen-help gen-hide" aria-pressed={zenTracks} disabled={timelineHidden} onClick={() => setZenTracks(!zenTracks)}
                                 aria-label={zenTracks ? 'Hide the instruments' : 'Show the instruments'} title={zenTracks ? 'Hide the instruments beside the timeline' : 'Show the instruments beside the timeline'}>
                                 <TracksIcon />
@@ -1598,7 +1721,8 @@ const GenerativeApp = () => {
                         </span>
                     )}
                     <button type="button" className="gen-help gen-hide gen-expand" onClick={() => (zen ? showWholePage() : setZen(true))} aria-label={zen ? 'Show the interface' : 'Hide the interface'}
-                        title={zen ? 'Show the whole page again (Esc)' : 'Hide everything but the play controls and the timeline (Esc brings it back)'}>
+                        disabled={zen && expandLocked()}
+                        title={zen && expandLocked() ? 'The whole page unlocks when you finish the first level of quests' : zen ? 'Show the whole page again (Esc)' : 'Hide everything but the play controls and the timeline (Esc brings it back)'}>
                         {zen ? <ChevronDownIcon /> : <ChevronUpIcon />}
                     </button>
                 </div>
@@ -1608,11 +1732,11 @@ const GenerativeApp = () => {
 
             <ChordTimeline
                 generator={gen} patterns={patterns} onPattern={setPattern} options={patternOptions} onOptions={setPatternOption} onExploreRule={id => setRuleFocus(previous => ({ id, revision: (previous?.revision ?? 0) + 1 }))}
-                tracks={has(1) || zenShown && zenTracks ? <TrackStrip roles={shownTracks} presets={{...Object.fromEntries(Object.entries(roles).map(([role, { presetName, edited, external }]) => [role, { name: external?.label ?? presetName, edited }])),perc:percMachine?{name:percMachine.label,edited:false}:{name:percussionVoice(settings.drums.kit).name,edited:percussionEdited(settings.drums.kit,settings.drumKit)}}} mix={mix} armed={armed} onMix={changeMix} onArm={setArmed} onEdit={has(3) ? editSound : undefined}
-                    onRandom={randomizePreset} onGenerate={has(3) ? generateForRole : undefined} onPick={choosePicker} onPickPercussion={()=>choosePicker('perc')} onEditPercussion={has(3)?editPercussionSound:undefined} percussionHint={percussionKeyHint(settings.drums.kit)} generating={generating} live={live} patterns={patterns} onPattern={setPattern} /> : null}
+                tracks={has(1) || zenShown && zenTracks ? <TrackStrip roles={shownTracks} presets={{...Object.fromEntries(Object.entries(roles).map(([role, { presetName, edited, external }]) => [role, { name: external?.label ?? presetName, edited }])),perc:percMachine?{name:percMachine.label,edited:false}:{name:percussionVoice(settings.drums.kit).name,edited:percussionEdited(settings.drums.kit,settings.drumKit)}}} mix={mix} armed={armed} onMix={changeMix} onArm={setArmed} onEdit={has(4) ? editSound : undefined}
+                    onRandom={randomizePreset} onGenerate={has(4) ? generateForRole : undefined} onPick={choosePicker} onPickPercussion={()=>choosePicker('perc')} onEditPercussion={has(4)?editPercussionSound:undefined} percussionHint={percussionKeyHint(settings.drums.kit)} generating={generating} live={live} patterns={patterns} onPattern={patternViews ? setPattern : undefined} /> : null}
             />
 
-            {has(1) && <Panel id="quick"title="Control panel" heading={<>
+            {has(7) && <Panel id="quick"title="Control panel" heading={<>
                 <button type="button" className="gen-quick-toggle" aria-expanded={quickOpen} aria-controls="gen-desk" onClick={() => setQuickOpen(!quickOpen)}>
                     <span>Control panel</span><span aria-hidden="true">{quickOpen ? '−' : '+'}</span>
                 </button>
@@ -1621,12 +1745,12 @@ const GenerativeApp = () => {
                 {quickOpen && <QuickPanel settings={settings} roleLabels={Object.fromEntries(Object.entries(SOUND_ROLES).map(([role, { label }]) => [role, label.split(' / ')[0]]))} onVolume={setVolume} onSettings={loadSettings} onFeel={changeFeel} baseline={presetQuick} resetKey={quickEpoch} />}
             </Panel>}
 
-            {has(2) && TRIAL_RULE_IDS.length > 0 && <Panel id="trial" title="Trial rules">
+            {has(3) && TRIAL_RULE_IDS.length > 0 && <Panel id="trial" title="Trial rules">
                 <p className="gen-hint">New rules to try by ear, all in one place. Each follows the preset until you change it.</p>
                 <TrialRules settings={settings} book={book} onChoice={changeRule} />
             </Panel>}
 
-            <Rulebook generator={gen} settings={settings} book={book} onChoice={changeRule} preset={scene} stage={stage} focusRule={ruleFocus} pageControls={{
+            {has(4) && <Rulebook generator={gen} settings={settings} book={book} onChoice={changeRule} preset={scene} stage={stage} focusRule={ruleFocus} pageControls={{
                 melody: wrapGroup('lead-register', <VoiceControls role="lead" voice={settings.voices.lead} onChange={voice => changeGroup('lead-register', voice)} />),
                 ensemble: wrapGroup('counter-register', <VoiceControls role="counter" voice={settings.voices.counter} onChange={voice => changeGroup('counter-register', voice)} />),
                 pad: <>
@@ -1644,11 +1768,11 @@ const GenerativeApp = () => {
                     {wrapGroup('ambient-drift-mode', <Field label="Level drift movement"><select aria-label="Level drift movement" value={settings.ambienceWander.mode} onChange={e => changeGroup('ambient-drift-mode', e.target.value)}>{Object.entries(WANDER_MODES).map(([id, label]) => <option key={id} value={id}>{label}</option>)}</select></Field>)}
                     {wrapGroup('ambient-drift-period', <Field label={`Drift round takes ${settings.ambienceWander.period} s`}><input aria-label="Level drift period" type="range" {...AMBIENCE_WANDER_LIMITS.period} value={settings.ambienceWander.period} onChange={e => changeGroup('ambient-drift-period', Number(e.target.value))} /></Field>)}
                 </>,
-            }} />
+            }} />}
 
-            {has(7) && <Randomizer level={randomLevel} onLevel={setRandomLevel} onRandomize={randomize} onNewVariation={newVariation} />}
+            {has(8) && <Randomizer level={randomLevel} onLevel={setRandomLevel} onRandomize={randomize} onNewVariation={newVariation} />}
 
-            {has(2) && <Panel id="music" title="Music" onRandom={() => randomize('music')}>
+            {has(3) && <Panel id="music" title="Music" onRandom={() => randomize('music')}>
                 <div className="gen-row" data-tour="music-key">
                     <Field label={settings.tonality.mode==='atonal'?'Pitch-set transposition':'Key'} onRandom={() => randomizeField('tonic')}>
                         <select value={settings.tonic} onChange={(e) => update('tonic', Number(e.target.value))}>
@@ -1707,18 +1831,18 @@ const GenerativeApp = () => {
                 <NowPlaying now={now} settings={settings} onKeep={keepCurrent} />
             </Panel>}
 
-            {has(5) && <Evolution drift={settings.drift} home={{ tonic: settings.tonic, mode: settings.mode }} onChange={(drift) => update('drift', drift)}
+            {has(6) && <Evolution drift={settings.drift} home={{ tonic: settings.tonic, mode: settings.mode }} onChange={(drift) => update('drift', drift)}
                 onRandom={() => randomize('conductor')} />}
 
-            {has(6) && <WanderPanel wander={settings.wander} update={update}
+            {has(7) && <WanderPanel wander={settings.wander} update={update}
                 shown={[...Object.keys(shownRoles), ...(drumsOn ? ['perc'] : [])]} />}
 
-            {has(1) && <AmbiencePanel levels={settings.ambience} shape={settings.ambienceShape} onShape={(s) => update('ambienceShape', s)}
+            {has(2) && <AmbiencePanel levels={settings.ambience} shape={settings.ambienceShape} onShape={(s) => update('ambienceShape', s)}
                 volume={settings.ambienceVolume} on={settings.playAmbience}
                 onChange={changeAmbience} onVolume={(v) => update('ambienceVolume', v)} onToggle={() => togglePart('playAmbience')}
                 onRandom={() => randomize('ambience')} />}
 
-            {has(3) && <SoundsBar onGenerate={generateAll} generating={Object.values(generating).some(Boolean)} />}
+            {has(4) && <SoundsBar onGenerate={generateAll} generating={Object.values(generating).some(Boolean)} />}
 
             {has(1) && Object.entries(shownRoles).map(([role, { label }]) => (
                 <Panel
@@ -1730,17 +1854,18 @@ const GenerativeApp = () => {
                         <>
                             <i className={`gen-swatch gen-swatch-${role}`} />
                             {label}
-                            <RoleButtons role={role} label={label} mix={mix[role]} armed={armed === role} onMix={changeMix} onArm={setArmed} onEdit={has(3) ? editSound : undefined} />
+                            <RoleButtons role={role} label={label} mix={mix[role]} armed={armed === role} onMix={changeMix} onArm={setArmed} onEdit={has(4) ? editSound : undefined} />
                         </>
                     )}
-                    onRandom={() => randomizeRole(role)}
+                    // the voice's dice changes its sound only: its register and the music's arrangement stay as they are
+                    onRandom={() => randomizePreset(role)}
 
                 >
-                    <Field label="Preset" onRandom={() => randomizePreset(role)} onGenerate={has(3) ? () => generateForRole(role) : undefined} generating={generating[role]} wide>
+                    <Field label="Preset" onReset={voiceChanged(role) ? () => resetVoice(role) : undefined} resetTitle="Back to this preset's sound for the voice" onRandom={() => randomizePreset(role)} onGenerate={has(4) ? () => generateForRole(role) : undefined} generating={generating[role]} wide>
                         <PresetPicker value={roles[role].external?.label ?? roles[role].presetName} edited={roles[role].edited && !roles[role].external} onChange={(name) => loadPreset(role, name)} onAudition={(phrase) => gen.auditionPhrase(role, phrase)} harmony={() => gen.auditionContext()} role={role}
                             open={pickerRole === role} onOpenChange={(open) => choosePicker(open ? role : null)} />
                     </Field>
-                    {has(3) && (
+                    {has(4) && (
                         <Field label="Kind of new sound">
                             <select value={soundKinds[role]} title="What the ✦ button makes for this voice"
                                 onChange={(e) => setSoundKinds((k) => ({ ...k, [role]: e.target.value }))}>
@@ -1749,11 +1874,11 @@ const GenerativeApp = () => {
                             </select>
                         </Field>
                     )}
-                    <Field label={`Volume ${Math.round(settings.volumes[role] * 100)}%`}>
+                    <Field label={`Volume ${Math.round(settings.volumes[role] * 100)}%`} onReset={volumeChanged(role) ? () => resetVolume(role) : undefined} resetTitle="Back to this preset's volume">
                         <input type="range" min="0" max="1" step="0.01" value={settings.volumes[role]}
                             onChange={(e) => setVolume(role, Number(e.target.value))} />
                     </Field>
-                    {has(3) && role in settings.portamento && (
+                    {has(4) && role in settings.portamento && (
                         <Field label={`Glide between notes ${Math.round(settings.portamento[role] * 100)}%`}>
                             <input type="range" min="0" max="1" step="0.01" value={settings.portamento[role]}
                                 onChange={(e) => update('portamento', { ...settings.portamento, [role]: Number(e.target.value) })} />
@@ -1762,14 +1887,14 @@ const GenerativeApp = () => {
                 </Panel>
             ))}
 
-            {has(3) && <PercussionPanel drums={settings.drums} kit={settings.drumKit} volume={settings.volumes.perc} mix={mix.perc}
+            {has(4) && <PercussionPanel drums={settings.drums} kit={settings.drumKit} volume={settings.volumes.perc} mix={mix.perc}
                 armed={armed === 'perc'} onArm={setArmed}
                 onVoice={choosePercussionVoice} voiceBusy={percussionBusy} voiceOpen={pickerRole==='perc'} onVoiceOpen={open=>choosePicker(open?'perc':null)} onDrums={(drums) => update('drums', drums)} onKit={(kit) => update('drumKit', kit)}
                 onVolume={(v) => setVolume('perc', v)} onMix={changeMix} onAudition={() => gen.audition('perc')} />}
-            {has(3) && <SequencerPanel seq={settings.sequencer} chords={PROGRESSIONS[settings.progression] ?? []} machine={percMachine} onChange={(seq) => update('sequencer', seq)}
+            {has(4) && <SequencerPanel seq={settings.sequencer} chords={PROGRESSIONS[settings.progression] ?? []} machine={percMachine} onChange={(seq) => update('sequencer', seq)}
                 onMachine={(synth, name = 'Room') => { void applyRef('perc', { synth, name }); }} />}
 
-            {!has(3)&&pickerRole==='perc'&&<VoiceBrowser role="perc" value={settings.drums.kit} edited={percussionEdited(settings.drums.kit,settings.drumKit)} onChange={choosePercussionVoice} onClose={()=>choosePicker(null)}/>}
+            {!has(4)&&pickerRole==='perc'&&<VoiceBrowser role="perc" value={settings.drums.kit} edited={percussionEdited(settings.drums.kit,settings.drumKit)} onChange={choosePercussionVoice} onClose={()=>choosePicker(null)}/>}
 
             {soundRole && (
                 <Suspense fallback={null}>
@@ -1781,9 +1906,16 @@ const GenerativeApp = () => {
                 </Suspense>
             )}
 
-            {tourOpen && <Tour key={tourRange.id} prompt={tourPrompt} fromStage={tourRange.from} toStage={tourRange.to} minimal={tourMinimal}
-                onUnlockAll={() => setStage(LAST_STAGE)} onStep={prepareTourStep} onClose={() => setTourOpen(false)} />}
+            {tourOpen && <Tour key={tourRange.id} only={tourOnly} prompt={tourPrompt} fromStage={tourRange.from} toStage={tourRange.to} minimal={tourMinimal}
+                onUnlockAll={() => { quests.skipThrough(LAST_STAGE); quests.setOff(true); setStage(LAST_STAGE); }} onStep={prepareTourStep} onClose={() => setTourOpen(false)} />}
             {helpOpen && <Tour reference onClose={() => setHelpOpen(false)} />}
+            {armed && armed !== 'perc' && ROLES[armed] && pickerRole === null && soundRole === null && !tourOpen
+                && <MiniKeyboard role={armed} label={ROLES[armed].label.split(' / ')[0]} generator={gen} onClose={() => setArmed(null)} />}
+            <TestRestart />
+            {preview && <PreviewGuide onStart={startFromBeginning} />}
+            {!preview && <QuestWidget quests={quests} stage={stage} hidden={helpOpen}
+                corner={zen}
+                onShowLevel={(level) => { if (zen) { setZen(false); writePref(MINIMAL_TOUR_KEY, true); } setTimeout(() => openTour(false, { from: level, to: level }), 300); }} />}
 
             <footer className="gen-footer">
                 <p className="gen-footer-links">

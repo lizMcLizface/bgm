@@ -17,6 +17,7 @@ import Piano, { noteName } from '../labs/Piano';
 import MiniFretboard, { INSTRUMENTS, anchorStrings, stringLetter, windowOctave, nearestPosition, chordLayout, windowDots, pickPlaying } from './MiniFretboard';
 import { CloseIcon, SwordIcon } from './icons';
 import HeroView from './HeroView';
+import { emitQuest } from './quests/questBus';
 import { resolvePatternOptions } from './patternDefaults';
 import { DEFAULT_KEY_OCTAVES } from './Tracks';
 import './chordExplanation.css';
@@ -465,7 +466,7 @@ const ChordTimeline = ({ generator, tracks, onExploreRule, patterns = {}, onPatt
                 </div>)}
             </aside>}
         </section>
-        {(patterns.piano || patterns.guitar || patterns.bass) && now?.keys.length > 0 && <ChordKeys keys={now.keys} patterns={patterns} onPattern={onPattern} options={options} onOptions={onOptions} played={played} onHero={(id) => setHero(hero === id ? null : id)} />}
+        {(patterns.piano || patterns.guitar || patterns.bass) && now?.keys.length > 0 && <ChordKeys keys={now.keys} patterns={patterns} onPattern={onPattern} options={options} onOptions={onOptions} played={played} onHero={(id) => { if (hero !== id) emitQuest('hero', { id }); setHero(hero === id ? null : id); }} />}
         {hero && patterns[hero] && (
             <HeroView generator={generator} instrument={hero} voices={options[hero]?.voices ?? defaultVoices(hero)} onClose={() => setHero(null)}
                 colorsOf={() => timelineColors(rootRef.current)}

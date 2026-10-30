@@ -1,0 +1,179 @@
+/* Quest card and messages (QuestWidget.jsx): top left, under the header; achievements and the star bottom right. */
+.gen-quest {
+    position: fixed;
+    left: 12px;
+    top: var(--quest-top, 72px);
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    width: min(330px, calc(100vw - 24px));
+    pointer-events: none;
+}
+.gen-quest-trophies {
+    position: fixed;
+    right: 12px;
+    bottom: 12px;
+    z-index: 45;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    width: min(320px, calc(100vw - 24px));
+    pointer-events: none;
+}
+.gen-quest[hidden] { display: none; }
+.gen-quest > * { pointer-events: auto; }
+
+.gen-quest-card,
+.gen-quest-message {
+    box-sizing: border-box;
+    padding: 10px 12px;
+    border: 1px solid var(--gen-border);
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--gen-surface) 94%, transparent);
+    color: var(--gen-text);
+    font-size: 13px;
+    line-height: 1.4;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
+}
+.gen-quest-card { width: 100%; display: flex; flex-direction: column; gap: 4px; border-left: 3px solid var(--gen-accent); }
+.gen-quest-card p { margin: 0; color: var(--gen-muted); font-size: 12px; }
+.gen-quest-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 11px; color: var(--gen-muted); }
+.gen-quest .gen-quest-head button { border: 1px solid transparent; background: none; padding: 0; width: 22px; height: 22px; border-radius: 11px; cursor: pointer; color: inherit; font-size: 13px; font-weight: 700; line-height: 1; }
+.gen-quest .gen-quest-head button.is-on, .gen-quest .gen-quest-head button:hover { border-color: var(--gen-border); color: var(--gen-text); }
+.gen-quest-name { font-size: 15px; }
+.gen-quest-tasks { list-style: none; margin: 2px 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.gen-quest-tasks li { display: grid; grid-template-columns: 16px 1fr auto; gap: 4px; font-size: 12px; color: var(--gen-muted); }
+.gen-quest-tasks li.is-done { color: var(--gen-text); }
+.gen-quest-tasks li.is-done span:nth-child(2) { text-decoration: line-through; opacity: 0.7; }
+.gen-quest-count { font-variant-numeric: tabular-nums; }
+.gen-quest-card .gen-quest-help { margin: 2px 0; padding: 6px 8px; border-radius: 6px; background: color-mix(in srgb, var(--gen-accent) 10%, transparent); color: var(--gen-text); }
+
+.gen-quest-actions { display: flex; gap: 6px; margin-top: 4px; }
+.gen-quest .gen-quest-actions button,
+.gen-quest .gen-quest-chip,
+.gen-quest-log footer button {
+    height: 26px;
+    padding: 0 10px;
+    border-radius: 13px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.gen-quest .gen-quest-actions button:first-child { border-color: var(--gen-accent); }
+
+.gen-quest-messages { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+.gen-quest-trophies > *, .gen-quest-toasts > * { pointer-events: auto; }
+.gen-quest-toasts { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+.gen-quest-trophies .gen-quest-chip { height: 28px; min-width: 28px; padding: 0 8px; border-radius: 14px; font-size: 13px; font-weight: 600; cursor: pointer; background: color-mix(in srgb, var(--gen-surface) 85%, transparent); }
+.gen-quest-message { display: flex; flex-direction: column; gap: 2px; animation: gen-quest-in 0.25s ease-out; }
+.gen-quest-message span { color: var(--gen-muted); font-size: 12px; }
+.gen-quest-message.is-level { border-left: 3px solid var(--gen-role-lead); }
+.gen-quest-message.is-achievement { border-left: 3px solid var(--gen-role-bass); }
+@keyframes gen-quest-in { from { opacity: 0; transform: translateY(8px); } }
+.gen-quest-trophies .gen-quest-message { animation: gen-quest-in 0.25s ease-out, gen-quest-out 0.5s ease-in 6.5s forwards; }
+@keyframes gen-quest-out { to { opacity: 0; transform: translateX(16px); } }
+
+.gen-quest-chips { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.gen-quest .gen-quest-chip { background: color-mix(in srgb, var(--gen-surface) 85%, transparent); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* the part a quest points at */
+.gen-quest-pulse { outline: 2px solid var(--gen-accent); outline-offset: 3px; animation: gen-quest-pulse 0.8s ease-in-out 4; }
+@keyframes gen-quest-pulse { 50% { outline-color: transparent; outline-offset: 7px; } }
+
+.gen-quest-log-backdrop { position: fixed; inset: 0; z-index: 80; background: rgba(0, 0, 0, 0.45); display: flex; align-items: center; justify-content: center; padding: 16px; pointer-events: auto; }
+.gen-quest-log { box-sizing: border-box; width: min(560px, 100%); max-height: 100%; overflow: auto; padding: 16px; border-radius: 12px; background: var(--gen-surface); color: var(--gen-text); border: 1px solid var(--gen-border); font-size: 13px; }
+.gen-quest-log header { display: flex; justify-content: space-between; align-items: center; }
+.gen-quest-log h2 { margin: 0; font-size: 17px; }
+.gen-quest-log h3 { margin: 14px 0 6px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gen-muted); }
+.gen-quest-log header button { border: 0; background: none; font-size: 22px; cursor: pointer; color: inherit; }
+.gen-quest-stats { color: var(--gen-muted); margin: 6px 0 0; }
+.gen-quest-levels, .gen-quest-levels ul, .gen-quest-achievements { margin: 0; padding: 0; list-style: none; }
+.gen-quest-levels > li { margin-bottom: 8px; }
+.gen-quest-levels > li.is-locked { color: var(--gen-muted); }
+.gen-quest-level-name { font-weight: 600; }
+.gen-quest-levels ul { padding-left: 14px; color: var(--gen-muted); }
+.gen-quest-levels li.is-done { color: var(--gen-text); }
+.gen-quest-levels li.is-skipped { text-decoration: line-through; }
+.gen-quest-achievements { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 6px; }
+.gen-quest-achievements li { display: flex; flex-direction: column; padding: 6px 8px; border: 1px solid var(--gen-border); border-radius: 8px; color: var(--gen-muted); }
+.gen-quest-achievements li.is-earned { color: var(--gen-text); border-color: var(--gen-role-bass); }
+.gen-quest-log footer { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; gap: 8px; flex-wrap: wrap; }
+
+/* temporary: back to a first visit, for testing */
+.gen .gen-test-restart { position: fixed; top: 4px; right: 4px; z-index: 90; display: flex; gap: 4px; align-items: center; opacity: 0.6; }
+.gen .gen-test-restart:hover, .gen .gen-test-restart:focus-within { opacity: 1; }
+.gen .gen-test-restart select, .gen .gen-test-restart button { height: 20px; padding: 0 8px; border-radius: 10px; font-size: 11px; cursor: pointer; }
+
+/* the first-open explanation beside a menu (FeatureIntro.jsx): the tour card's look, with a frame round its part */
+.gen-intro-frame { position: fixed; z-index: 69; pointer-events: none; box-sizing: border-box; border: 2px solid var(--gen-accent); border-radius: 8px; box-shadow: 0 0 0 4px color-mix(in srgb, var(--gen-accent) 25%, transparent); }
+.gen-intro-card { position: fixed; z-index: 70; box-sizing: border-box; padding: 12px 14px; border: 2px solid var(--gen-accent); border-radius: 12px; background: var(--gen-surface); color: var(--gen-text); font-size: 13px; line-height: 1.45; box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3); }
+.gen-intro-card strong { display: block; font-size: 15px; margin-bottom: 4px; }
+.gen-intro-card p { margin: 0 0 10px; }
+.gen-intro-card button { display: inline-flex; align-items: center; justify-content: center; height: 26px; padding: 0 14px; border-radius: 13px; font-size: 12px; font-weight: 600; cursor: pointer; border-color: var(--gen-accent); }
+
+/* the preview guide (PreviewGuide.jsx): bottom left, for someone who opened a shared setup */
+.gen-preview { position: fixed; left: 12px; bottom: 12px; z-index: 40; box-sizing: border-box; width: min(320px, calc(100vw - 24px)); padding: 10px 12px; border: 1px solid var(--gen-border); border-left: 3px solid var(--gen-accent); border-radius: 10px; background: color-mix(in srgb, var(--gen-surface) 94%, transparent); color: var(--gen-text); font-size: 12px; line-height: 1.4; box-shadow: 0 4px 18px rgba(0, 0, 0, 0.18); display: flex; flex-direction: column; gap: 6px; }
+.gen-preview.is-folded { width: auto; flex-direction: row; align-items: center; padding: 6px 8px; }
+.gen-preview-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 13px; }
+.gen-preview ul { margin: 0; padding-left: 16px; color: var(--gen-muted); }
+.gen-preview button { cursor: pointer; border-radius: 14px; font-size: 12px; font-weight: 600; padding: 4px 12px; }
+.gen-preview .gen-preview-start { border-color: var(--gen-accent); }
+.gen-preview .gen-preview-fold { border: 1px solid transparent; background: none; padding: 0; width: 22px; height: 22px; border-radius: 11px; color: inherit; }
+
+/* the part a quest task points at, lit while its row is hovered */
+.gen-quest-glow { outline: 2px solid var(--gen-accent); outline-offset: 3px; border-radius: 6px; animation: gen-quest-glow 1.1s ease-in-out infinite; }
+@keyframes gen-quest-glow { 50% { outline-color: transparent; outline-offset: 6px; } }
+.gen-quest-tasks li { cursor: default; border-radius: 4px; }
+.gen-quest-tasks li:hover, .gen-quest-tasks li:focus-visible { background: color-mix(in srgb, var(--gen-accent) 12%, transparent); outline: none; }
+.gen-quest-hint { color: var(--gen-muted); font-size: 11px; }
+
+/* labels centred in their buttons, both ways */
+.gen-quest .gen-quest-head button,
+.gen-quest .gen-quest-chip,
+.gen-quest-trophies .gen-quest-chip,
+.gen-quest .gen-quest-actions button,
+.gen-preview button,
+.gen .gen-test-restart button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    text-align: center;
+}
+.gen .gen-quest-head button { padding: 0; }
+.gen .gen-test-restart button { padding: 0 10px; }
+
+/* the top rows fold the card away when clicked */
+.gen-quest-head, .gen-quest-name { cursor: pointer; }
+
+/* the tour card's quiet text link ("I know my way around"), under its buttons */
+.gen .gen-tour-card .gen-tour-link { display: block; margin-top: 8px; padding: 0; border: 0; background: none; color: var(--gen-muted); font-size: 12px; cursor: pointer; text-decoration: underline; text-align: left; }
+.gen .gen-tour-card .gen-tour-link:hover { color: var(--gen-text); }
+
+/* preset unlocks and stars (PresetBrowser.jsx) */
+.gen-pb-unlock-note { margin: 0 0 8px; font-size: 12px; color: var(--gen-muted); display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.gen .gen-pb-unlock-note button { height: 24px; padding: 0 10px; border-radius: 12px; font-size: 12px; cursor: pointer; }
+.gen-pb-locked { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 8px 0 14px; padding: 8px 10px; border: 1px dashed var(--gen-border); border-radius: 8px; font-size: 12px; color: var(--gen-muted); }
+.gen-pb-locked progress { flex: 1 1 120px; height: 6px; min-width: 100px; }
+.gen-pb-listened { font-size: 11px; color: var(--gen-muted); }
+.gen .gen-pb-star { position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; padding: 0; display: inline-flex; align-items: center; justify-content: center; line-height: 1; border-radius: 50%; font-size: 14px; cursor: pointer; background: transparent; border-color: transparent; color: var(--gen-muted); }
+.gen .gen-pb-star.has-remove { right: 30px; }
+.gen .gen-pb-star:hover, .gen .gen-pb-star.is-on { color: var(--gen-role-bass); border-color: var(--gen-border); }
+
+/* the on-screen piano for the armed voice (MiniKeyboard.jsx): bottom centre, touch sized */
+.gen-minikeyboard { position: fixed; left: 50%; bottom: 12px; transform: translateX(-50%); z-index: 55; box-sizing: border-box; width: min(520px, calc(100vw - 24px)); padding: 8px 10px 10px; border: 1px solid var(--gen-border); border-radius: 12px; background: color-mix(in srgb, var(--gen-surface) 96%, transparent); color: var(--gen-text); box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3); touch-action: none; user-select: none; -webkit-user-select: none; }
+.gen-minikeyboard-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 6px; }
+.gen-minikeyboard-head > span { display: flex; align-items: center; gap: 6px; }
+.gen .gen-minikeyboard-head button { width: 26px; height: 26px; padding: 0; display: inline-flex; align-items: center; justify-content: center; line-height: 1; border-radius: 13px; font-size: 14px; cursor: pointer; }
+/* the shared piano (labs/Piano.jsx), made touch sized here; its keys show the scale as the timeline's mini piano does */
+.gen-minikeyboard .lab-piano { height: 110px; }
+.gen-minikeyboard .lab-piano button.held, .gen-minikeyboard .lab-piano button:active { background: var(--gen-accent); }
+.gen-intro-card .gen-intro-count { display: block; color: var(--gen-muted); font-size: 11px; margin-bottom: 2px; }
+
+/* "back to the preset" at the top right of a voice's field (Field in GenerativeApp.jsx) */
+.gen-field.has-reset { position: relative; }
+.gen .gen-field-reset { position: absolute; top: -2px; right: 0; width: 22px; height: 22px; padding: 0; display: inline-flex; align-items: center; justify-content: center; line-height: 1; border-radius: 11px; font-size: 14px; cursor: pointer; color: var(--gen-muted); background: transparent; border-color: transparent; }
+.gen .gen-field-reset:hover { color: var(--gen-text); border-color: var(--gen-border); }

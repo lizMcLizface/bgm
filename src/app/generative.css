@@ -2159,7 +2159,7 @@ body {
 
 /* Hide UI: only the transport, the timeline with its playhead (without the track strip) and
    the button that brings the page back stay. */
-.gen-zen > :not(.gen-header):not(.gen-backdrop):not(.gen-timeline):not(.gen-chord-keys):not(.gen-hero):not(.gen-tour):not(.gen-tour-intro) {
+.gen-zen > :not(.gen-header):not(.gen-backdrop):not(.gen-timeline):not(.gen-chord-keys):not(.gen-hero):not(.gen-quest):not(.gen-quest-trophies):not(.gen-test-restart):not(.gen-intro-card):not(.gen-intro-frame):not(.gen-preview):not(.gen-tour):not(.gen-tour-intro) {
     display: none !important;
 }
 
@@ -3149,11 +3149,11 @@ body {
 
 /* idle: after a minute of music with nobody at the page the controls fade back (the timeline and header only partly)
    and a quiet hint shows; any movement, tap or key brings them back. Windows over the page are never faded. */
-.gen > *:not(.gen-backdrop):not(.gen-idle-hint):not(.gen-pb-backdrop):not(.gen-tour):not(.gen-tour-intro) {
+.gen > *:not(.gen-backdrop):not(.gen-idle-hint):not(.gen-pb-backdrop):not(.gen-quest):not(.gen-quest-trophies):not(.gen-test-restart):not(.gen-intro-card):not(.gen-intro-frame):not(.gen-preview):not(.gen-tour):not(.gen-tour-intro) {
     transition: opacity 1.2s ease;
 }
 
-.gen.gen-idle > *:not(.gen-backdrop):not(.gen-idle-hint):not(.gen-pb-backdrop):not(.gen-tour):not(.gen-tour-intro):not(.gen-timeline):not(.gen-header) {
+.gen.gen-idle > *:not(.gen-backdrop):not(.gen-idle-hint):not(.gen-pb-backdrop):not(.gen-quest):not(.gen-quest-trophies):not(.gen-test-restart):not(.gen-intro-card):not(.gen-intro-frame):not(.gen-preview):not(.gen-tour):not(.gen-tour-intro):not(.gen-timeline):not(.gen-header) {
     opacity: 0.12;
 }
 
@@ -3185,7 +3185,7 @@ body {
 @media (prefers-reduced-motion: reduce) {
     .gen-wordmark.is-playing .gen-wordmark-drop { animation: none; opacity: 0.8; }
     .gen-transport .gen-play.is-playing::after { animation: none; opacity: 0.25; }
-    .gen > *:not(.gen-backdrop):not(.gen-idle-hint):not(.gen-pb-backdrop):not(.gen-tour):not(.gen-tour-intro),
+    .gen > *:not(.gen-backdrop):not(.gen-idle-hint):not(.gen-pb-backdrop):not(.gen-quest):not(.gen-quest-trophies):not(.gen-test-restart):not(.gen-intro-card):not(.gen-intro-frame):not(.gen-preview):not(.gen-tour):not(.gen-tour-intro),
     .gen-idle-hint { transition: none; }
 }
 

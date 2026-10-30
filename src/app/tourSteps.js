@@ -17,12 +17,13 @@ export const TOUR_KEY = 'bgm-tour-v2';
  * localStorage key: how many stages are unlocked (an index into STAGES). Versioned with TOUR_KEY: an
  * earlier build stored 'bgm-stage' as everything-unlocked for people who had seen the single tour.
  */
-export const STAGE_KEY = 'bgm-stage-v2';
+export const STAGE_KEY = 'bgm-stage-v3';
 
 /** The stages, in the order they unlock. `name` labels the top-bar button that unlocks it. */
 export const STAGES = [
     { id: 'basics', name: 'The basics' },
-    { id: 'ambience', name: 'Voices & ambience' },
+    { id: 'voices', name: 'Voices' },
+    { id: 'mixing', name: 'Ambience' },
     { id: 'music', name: 'Music' },
     { id: 'instruments', name: 'Instruments & playing rules' },
     { id: 'arrangement', name: 'Composition rules' },
@@ -31,6 +32,9 @@ export const STAGES = [
     { id: 'randomize', name: 'Randomize' },
 ];
 export const LAST_STAGE = STAGES.length - 1;
+
+/** localStorage key: set once the quest system has been introduced (in the tour, or on its own to people who had taken the tour before it existed). */
+export const QUESTS_INTRO_KEY = 'bgm-quests-intro-v1';
 
 export const TOUR_STEPS = [
     // ---- 0: the basics ----
@@ -60,7 +64,7 @@ export const TOUR_STEPS = [
         stage: 0,
         selector: '.gen-scene',
         title: 'Presets',
-        text: 'A whole soundscape in one pick: key, scale, feel, drums, ambience and sounds together. Start here - open the list, try a few, and keep the one you like. [ and ] step through them from the keyboard, at the next chord; with Shift, at once.',
+        text: 'A whole soundscape in one pick: key, scale, feel, drums, ambience and sounds together. Start here - open the list, try a few, and keep the one you like. [ and ] step through them from the keyboard, at the next chord; with Shift, at once. You start with a few of the best; listening to a category opens more, and a star keeps your favourites at the top.',
     },
     {
         id: 'timeline',
@@ -70,15 +74,12 @@ export const TOUR_STEPS = [
         text: 'The chords being played and, in a row per voice, the notes each voice plays. The music is planned a few bars ahead, so what you see is what you will hear. Hover a chord for its recorded explanation, or click/tap to keep it open. Escape or × closes it. Explore this rule takes you to the matching card in the book.',
     },
     {
-        id: 'tools',
+        id: 'quests',
         stage: 0,
-        selector: '.gen-header-tools',
-        title: 'Volume, look and options',
-        text: 'The master volume and the look menu (theme and the background). The speaker button shows how hard the audio engine is working - if the sound crackles, open it for a bigger buffer or a lighter reverb. The ⚙ menu copies a link to the music, sets a sleep timer, saves a WAV file, repeats this tour and can start over with only the basics.',
-    },
-    {
-        id: 'rulebook', stage: 0, selector: '[data-tour="rulebook"]', title: 'Explore the rules',
-        text: 'Open the rulebook to see three rows: instrument rules for how each voice plays, harmonic rules for chord colour and bass pedals, and composition rules for phrases, dialogue and sections. A + reveals a page’s controls; every preset can use those rules from the start.',
+        selector: null,
+        title: 'Quests unlock the rest',
+        text: 'A quest card in the corner sets you small tasks - press play, loop a chord, change the scale - and ticks them off as you do them. Finish every quest in a level and the next set of features unlocks, with a short tour of what is new. The star beside it lists every quest and your achievements. Hover a task to see which control it means, and ? explains more.',
+        action: { id: 'unlock-all', label: 'I know my way around - unlock everything' },
     },
     {
         id: 'unlock',
@@ -86,10 +87,24 @@ export const TOUR_STEPS = [
         hint: true,
         selector: '.gen-unlock',
         title: 'That is the basics',
-        text: 'Press Play and leave it running. When you want more, press this button: it unlocks the next set of features and shows you around them, one set at a time. The ⚙ menu repeats a tour whenever you like.',
+        text: 'Press Play and leave it running. Quests unlock the next set of features as you finish them; if you would rather not wait, press this button to unlock the next set now. The ⚙ menu repeats a tour whenever you like.',
     },
 
     // ---- 1: voices and ambience ----
+    {
+        id: 'whole-page',
+        stage: 1,
+        selector: null,
+        title: 'The whole page',
+        text: 'This is the full page. It opens a little at a time: each level of quests you finish unlocks another set of features. What you know from the landscape view is still at the top, and this first level adds the voices.',
+    },
+    {
+        id: 'tools',
+        stage: 1,
+        selector: '.gen-header-tools',
+        title: 'Volume, look and options',
+        text: 'The master volume and the look menu (theme and the background). The speaker button shows how hard the audio engine is working - if the sound crackles, open it for a bigger buffer or a lighter reverb. The ⚙ menu copies a link to the music, sets a sleep timer, saves a WAV file, repeats this tour and can start over with only the basics.',
+    },
     {
         id: 'tracks',
         stage: 1,
@@ -105,64 +120,51 @@ export const TOUR_STEPS = [
         text: 'Each voice now has a panel for its sound and volume. Try another preset, or roll its dice. The compact controls beside the timeline let you mute, solo or play a voice. Sound design and the synths behind each voice unlock later.',
     },
     {
-        id: 'control-panel',
-        stage: 1,
-        selector: '[data-tour="quick"]',
-        title: 'Control panel',
-        text: 'The settings most worth reaching for, in one place. The faders mix each voice and the ambience; the pad and sliders beside them set how calm or busy, dark or bright, swung and loose it plays; the buttons choose chord size, colour and where the root goes. Double-click a fader to put it back to the preset, and the ↶ button resets the whole panel.',
-    },
-    {
         id: 'ambience-intro',
-        stage: 1,
+        stage: 2,
         selector: '.gen-parts',
         title: 'Music and ambience',
         text: 'Choose what Play starts: the music, the ambient bed (rain, wind, waves and the like), or both. Either one can play alone - try switching Music off for just the rain.',
     },
     {
         id: 'ambience',
-        stage: 1,
+        stage: 2,
         selector: '[data-tour="ambience"]',
         title: 'Vibe',
         text: 'Mix rain, thunder and waves beneath the music or listen to weather alone. Each source has its own presets and settings: try Open rain, then add Distant rolls. Wind, fireplace and vinyl have their own levels too; shape those under More options when enabled.',
     },
 
     {
-        id: 'ambient-dynamics', stage: 1, rulePage: 'ambient-dynamics', selector: '#group-ambient-drift-period', title: 'Let the ambient bed breathe',
-        text: 'Ambient dynamics lives in the instrument row of the rulebook. Set whole-bed and individual-layer level drift, movement and speed. The ambience mixer stays outside the book. Source can follow the preset or keep your own choice; Reset restores that group without touching the others.',
-    },
-
-    // ---- 2: music ----
-    {
         id: 'music-intro',
-        stage: 2,
+        stage: 3,
         selector: '[data-tour="music"]',
         title: 'Music',
         text: 'Here is what the music is made of. Everything changes live while it plays, so try each control as we go. Each has its own dice for a random pick.',
     },
     {
         id: 'music-key',
-        stage: 2,
+        stage: 3,
         selector: '[data-tour="music-key"]',
         title: 'Try it: key and scale',
         text: 'The key sets how high or low everything sits. The scale sets the mood: major is bright, minor is sad, Dorian warm, Lydian dreamy. Pick another of each and listen - the whole piece moves there.',
     },
     {
         id: 'music-progression',
-        stage: 2,
+        stage: 3,
         selector: '[data-tour="music-progression"]',
         title: 'Try it: progressions',
         text: 'The progression is the chord pattern that repeats. Change how many chords it has, then pick another from the list - or press the dice and hear what you get. "Bars per chord" slows the changes down. The ← → keys step through the chords while you listen, Shift+← → through whole progressions.',
     },
     {
         id: 'music-tempo',
-        stage: 2,
+        stage: 3,
         selector: '[data-tour="music-tempo"]',
         title: 'Try it: time and tempo',
         text: 'Drag the tempo down for something sleepier, up for something that moves. The time signature changes the pulse: 3/4 and 6/8 sway, 4/4 is steady.',
     },
     {
         id: 'music-now',
-        stage: 2,
+        stage: 3,
         selector: '.gen-nowplaying',
         title: 'What is playing right now',
         text: 'Later, evolution can make the music drift away from your settings. This line shows what is playing at this moment, and "Keep this" makes it your new home.',
@@ -170,48 +172,65 @@ export const TOUR_STEPS = [
 
     // ---- 3: instruments ----
     {
+        id: 'rulebook', stage: 4, selector: '[data-tour="rulebook"]', title: 'Explore the rules',
+        text: 'The rulebook is the deepest part of the page. Open it to see three rows: instrument rules for how each voice plays, harmonic rules for chord colour and bass pedals, and composition rules for phrases, dialogue and sections. A + reveals a page’s controls; every preset can use those rules from the start.',
+    },
+    {
+        id: 'ambient-dynamics', stage: 4, rulePage: 'ambient-dynamics', selector: '#group-ambient-drift-period', title: 'Let the ambient bed breathe',
+        text: 'Ambient dynamics lives in the instrument row of the rulebook. Set whole-bed and individual-layer level drift, movement and speed. The ambience mixer stays outside the book. Source can follow the preset or keep your own choice; Reset restores that group without touching the others.',
+    },
+
+    // ---- 2: music ----
+    {
         id: 'instruments-intro',
-        stage: 3,
+        stage: 4,
         selector: '.gen-tracks',
         title: 'Making your own sounds',
         text: 'Each voice now has two more buttons: ✎ opens its sound in a window, and ✦ makes a brand new sound for it. Press ✦ a few times and keep what you like.',
     },
     {
+        id: 'patterns',
+        stage: 4,
+        selector: '.gen-tracks',
+        title: 'Instrument views',
+        text: 'The piano, guitar and bass buttons beside the voices open a keyboard or fretboard under the timeline that shows exactly which notes are being played. Each has a hero button: a game-style window where the notes arrive for you to play along. A shared link can open them already.',
+    },
+    {
         id: 'sounds',
-        stage: 3,
+        stage: 4,
         selector: '.gen-sounds',
         title: 'New sounds',
         text: 'Gives every voice a new sound at once, all sharing one character. The same phrase always makes the same sounds, so a phrase you like can be typed in again.',
     },
     {
         id: 'voice-lead',
-        stage: 3,
+        stage: 4,
         selector: '[data-tour="voice-lead"]',
         title: 'More about a voice',
         text: 'Each voice panel has a "Kind of new sound" for its ✦ button. Register and playing choices now live in the rulebook: Lead style, Rhythm / pad and Bass / support each have their own instrument page.',
     },
     {
         id: 'percussion',
-        stage: 3,
+        stage: 4,
         selector: '[data-tour="percussion"]',
         title: 'Percussion',
         text: 'This panel shapes and mixes the drum kit. Its patterns live in the rulebook’s Percussion patterns page: choose a style, ornaments, variation and occasional colour accents. Hear the kit auditions its sound.',
     },
     {
-        id: 'pad-rules', stage: 3, rulePage: 'pad', selector: '#group-pad-styles', title: 'Rhythm / pad playing rules',
+        id: 'pad-rules', stage: 4, rulePage: 'pad', selector: '#group-pad-styles', title: 'Rhythm / pad playing rules',
         text: 'This voice has its own page for chord size, register, styles, patterns and movement. Style weights are relative shares of phrases. Zero excludes a choice if another has weight; all zero gives equal shares. A slider or dice edit becomes Your choices; Follow preset or Reset restores that group.',
     },
     {
-        id: 'bass-rules', stage: 3, rulePage: 'bass', selector: '#group-bass-styles', title: 'Bass playing rules',
+        id: 'bass-rules', stage: 4, rulePage: 'bass', selector: '#group-bass-styles', title: 'Bass playing rules',
         text: 'Choose held, beat-group, walking or driving bass phrases here, independently of its sound and volume. Register has its own group. Resetting styles does not reset register, other voices or harmonic pedal rules.',
     },
     {
-        id: 'percussion-rules', stage: 3, rulePage: 'percussion', selector: '#rule-percussion-presence', title: 'Percussion patterns',
+        id: 'percussion-rules', stage: 4, rulePage: 'percussion', selector: '#rule-percussion-presence', title: 'Percussion patterns',
         text: 'Choose the drum style and its ornaments, variation and colour accents. Zero ornament activity keeps the groove’s anchors; switch the style off to stop generating drums. Kit design, audition and volume stay in the percussion sound panel.',
     },
     {
         id: 'editor',
-        stage: 3,
+        stage: 4,
         selector: '.gen-rolebuttons button[title="Edit sound"]',
         title: 'The synth behind a voice',
         text: '✎ opens a voice’s sound: the calmbgm synth on faders, DIY Poly and FM, or one of the classic synths, with its effects. While it is open your keyboard and MIDI play that voice, and the arrow keys step through sounds (← →) and categories (↑ ↓). Save, export and import presets there too.',
@@ -220,25 +239,25 @@ export const TOUR_STEPS = [
     // ---- 4: arrangement ----
     {
         id: 'arrangement',
-        stage: 4, rulePage: 'melodic-composition',
+        stage: 5, rulePage: 'melodic-composition',
         selector: '#rule-motif-development',
         title: 'Composition rules',
         text: 'Open the rulebook. Instrument rules choose lead activity and backing styles. Composition pages shape melodic development, voice dialogue, shared rhythm and the long view, including sections and whether they change the tone.',
     },
 
     {
-        id: 'duet-rules', stage: 4, rulePage: 'duet', selector: '#rule-duet-dialogue', title: 'A conversation between voices',
+        id: 'duet-rules', stage: 5, rulePage: 'duet', selector: '#rule-duet-dialogue', title: 'A conversation between voices',
         text: 'Voice dialogue coordinates the lead and an independent second lead. Enabling a rule never silently enables a missing voice: the card explains prerequisites and keeps your permission for when they are met. A mute affects what you hear, not the voice’s generation.',
     },
     {
-        id: 'section-rules', stage: 4, rulePage: 'form', selector: '#rule-sections', title: 'The long view',
+        id: 'section-rules', stage: 5, rulePage: 'form', selector: '#rule-sections', title: 'The long view',
         text: 'Sections, tension, harmonic pacing, transitions and endings shape the longer piece here. Sections change the tone is a separate rule; length has its own preset source and reset. Rules apply to upcoming music, allowing a phrase already in progress to finish.',
     },
 
     // ---- 5: evolution ----
     {
         id: 'evolution',
-        stage: 5,
+        stage: 6,
         selector: '[data-tour="evolution"]',
         title: 'Evolution',
         text: 'How the music drifts over time. "Centered on my settings" drifts around them and keeps coming back; Wandering is a free walk. Choose which keys and modes it may visit, and under More options how often it changes.',
@@ -246,22 +265,29 @@ export const TOUR_STEPS = [
 
     // ---- 6: colour, feel and wander ----
     {
+        id: 'control-panel',
+        stage: 7,
+        selector: '[data-tour="quick"]',
+        title: 'Control panel',
+        text: 'The settings most worth reaching for, in one place. The faders mix each voice and the ambience; the pad and sliders beside them set how calm or busy, dark or bright, swung and loose it plays; the buttons choose chord size, colour and where the root goes. Double-click a fader to put it back to the preset, and the ↶ button resets the whole panel.',
+    },
+    {
         id: 'feel',
-        stage: 6, rulePage: 'performance',
+        stage: 7, rulePage: 'performance',
         selector: '#rule-human-timing',
         title: 'Feel',
         text: 'Open Playing feel under Instrument rules for swing, timing, dynamics and individual-note tuning. Slow continuous movement stays in the separate Wander panel.',
     },
     {
         id: 'wander',
-        stage: 6,
+        stage: 7,
         selector: '[data-tour="wander"]',
         title: 'Wander',
         text: 'Slow drift, about a minute a round: each voice glides left and right and its volume, filter and pitch breathe, so the sound keeps moving. Set how far, how slowly, and which voices drift.',
     },
     {
         id: 'colour',
-        stage: 6, rulePage: 'harmony',
+        stage: 7, rulePage: 'harmony',
         selector: '#rule-borrowed-chords',
         title: 'Harmonic rules',
         text: 'The Harmonic colour page holds borrowing, chord colour and its chance, open voicings, harmonic scales and bass pedals. Each rule can follow the preset or take your own choice. Allowed means it may act in a suitable passage; it need not fire in every bar. Chord explanations report the decisions that actually happened.',
@@ -270,14 +296,14 @@ export const TOUR_STEPS = [
     // ---- 7: randomize ----
     {
         id: 'randomize',
-        stage: 7,
+        stage: 8,
         selector: '.gen-randomize',
         title: 'Randomize',
         text: 'The main interface is fully revealed, and every rulebook page is available. The dice can touch it all. New variation plays the same settings with different random choices. The other buttons roll the dice on one area at a time - music, evolution, arrangement, ambience and more; "How" sets how far from the current settings they go.',
     },
     {
         id: 'done',
-        stage: 7,
+        stage: 8,
         hint: true,
         selector: null,
         title: 'That is everything',
@@ -297,7 +323,7 @@ export const MINIMAL_TOUR_STEPS = [
         id: 'minimal-welcome',
         selector: null,
         title: 'Welcome to calmbgm',
-        text: 'Calm music that writes itself, for working, studying or winding down. The landscape behind it changes with the preset, the time of day and the season. This is the quiet view; the whole page with every control is one click away.',
+        text: 'Calm music that writes itself, for working, studying or winding down. The landscape behind it changes with the preset, the time of day and the season. This is the quiet view: all there is to start with. The rest of the page unlocks as you go.',
     },
     {
         id: 'minimal-transport',
@@ -330,9 +356,16 @@ export const MINIMAL_TOUR_STEPS = [
         text: 'Choose the landscape and whether it follows the preset, the clock and the calendar, or switch to the fluid background that moves with the sound.',
     },
     {
+        id: 'minimal-quests',
+        selector: '.gen-quest-card',
+        title: 'Quests',
+        text: 'Small tasks that show you around: press play, skip a chord, try another preset. Each ticks itself off when you do it, hovering a task lights up the control it means, and ? explains more. Finish every quest in a level and the next one unlocks.',
+        action: { id: 'unlock-all', label: 'I know my way around - unlock everything' },
+    },
+    {
         id: 'minimal-expand',
         selector: '.gen-expand',
         title: 'The whole page',
-        text: 'Opens every control: voices, ambience, the rulebook and more, a set at a time, with a tour of its own. Esc does the same, and the same corner button brings this view back.',
+        text: 'This view is all there is for now. Finishing the first level opens the whole page with its voices, ambience, music and rulebook, and shows you around it. The star in the bottom right lists every quest and your achievements.',
     },
 ];

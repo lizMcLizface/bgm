@@ -7,6 +7,7 @@ import { soundBase, BASES } from './soundBase';
 import { AUDITION_PHRASES } from '../auditionPhrases';
 import { CHROMATIC } from '../../theory/notes';
 import PresetBadges from '../PresetBadges';
+import FeatureIntro from '../FeatureIntro';
 import { ROLE_CATEGORY } from '../presets';
 import { useScrollLock } from '../scrollLock';
 
@@ -195,6 +196,7 @@ const VoiceBrowser = ({ value, edited, onChange, onClose, onAudition, harmony, r
     return (
         <div className="gen-pb-backdrop" role="presentation" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
             <div ref={dialog} tabIndex={-1} className="gen-pb gen-vb" role="dialog" aria-modal="true" aria-busy={busy} aria-label={`Choose a sound for the ${ROLE_NAMES[role] || role} voice`}>
+                <FeatureIntro ids={['voice-picker', 'voice-picker-kinds', 'voice-picker-filters', 'voice-picker-backend', 'voice-picker-phrases']} />
                 <div className="gen-pb-head">
                     <h2>Sound: {ROLE_NAMES[role] || role}</h2>
                     <input type="search" value={query} onChange={(e) => setQuery(e.target.value)}

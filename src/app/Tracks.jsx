@@ -5,6 +5,7 @@
 // so it is never done on page load).
 
 import React, { useEffect, useRef, useState } from 'react';
+import { emitQuest } from './quests/questBus';
 import { DiceIcon, PencilIcon, SparkIcon, PianoIcon, GuitarIcon, BassIcon } from './icons';
 
 export const PATTERN_VIEWS = [['piano', 'Piano', PianoIcon], ['guitar', 'Guitar', GuitarIcon], ['bass', 'Bass', BassIcon]];
@@ -118,6 +119,7 @@ export function useLivePlay(generator, armed) {
             e.preventDefault();
             const midi = 12 * (state.current.octaves[armed] + 1) + offset;
             state.current.held.set(e.code, { role: armed, id: generator.liveNoteOn(armed, midi, 0.8), midi });
+            emitQuest('liveplay', { role: armed });
             midiHeld.add(midi);
         };
         const up = (e) => {
@@ -157,6 +159,7 @@ export function useLivePlay(generator, armed) {
                 } else if (command === 0x90 && velocity > 0) {
                     if (!role || state.current.held.has(key)) return;
                     state.current.held.set(key, { role, id: generator.liveNoteOn(role, note, velocity / 127), midi: note });
+                    emitQuest('liveplay', { role });
                 } else if (command === 0x80 || (command === 0x90 && velocity === 0)) {
                     const held = state.current.held.get(key);
                     if (!held) return;

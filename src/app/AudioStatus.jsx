@@ -17,6 +17,7 @@ import { runBenchmark } from './benchmark';
 import { readPref, writePref } from './prefs';
 import { applyTheme, storedTheme } from './theme';
 import { BACKDROP_DEFAULTS, PALETTES } from './Backdrop';
+import FeatureIntro from './FeatureIntro';
 import FluidControls from './visuals/FluidControls';
 import SceneryControls from './visuals/SceneryControls';
 import WasmQuality from '../audio/WasmQuality';
@@ -108,6 +109,7 @@ export const VisualMenu = ({ backdrop, scenery }) => {
         <details className="gen-settings gen-visual" ref={menu}>
             <summary title="Look: theme and background" aria-label="Look: theme and background"><PaletteIcon /></summary>
             <div className="gen-settings-menu">
+                <FeatureIntro ids={['look-menu', backdrop?.mode === 'scenery' ? 'look-landscape' : backdrop?.mode === 'fluid' ? 'look-fluid' : null]} />
                 <section className="gen-menu-section">
                     <h3>Theme</h3>
                     <div className="gen-menu-choices" role="group" aria-label="Theme">
@@ -118,13 +120,13 @@ export const VisualMenu = ({ backdrop, scenery }) => {
                     </div>
                 </section>
                 {backdrop && (
-                    <section className="gen-menu-section">
+                    <section className="gen-menu-section" data-intro="look-background">
                         <h3>Background</h3>
                         <div className="gen-menu-choices" role="group" aria-label="Background">
                             {[['off', 'None'], ['fluid', 'Fluid'], ['scenery', 'Landscape']].map(([id, label]) => {
-                                const disabled = id === 'fluid' && (!backdrop.fluidOk || backdrop.locked);
+                                const disabled = id === 'fluid' && (!backdrop.fluidOk || backdrop.locked || backdrop.gated);
                                 return <button key={id} type="button" className={backdrop.mode === id ? 'is-on' : ''} aria-pressed={backdrop.mode === id} disabled={disabled}
-                                    title={id === 'fluid' && backdrop.locked ? 'Perf mode pauses the fluid background' : id === 'fluid' && !backdrop.fluidOk ? 'Needs WebGL2' : undefined}
+                                    title={id === 'fluid' && backdrop.gated ? 'Unlocks with the Key & Scale quest' : id === 'fluid' && backdrop.locked ? 'Perf mode pauses the fluid background' : id === 'fluid' && !backdrop.fluidOk ? 'Needs WebGL2' : undefined}
                                     onClick={() => backdrop.onMode(id)}>{label}</button>;
                             })}
                         </div>
@@ -261,6 +263,7 @@ export const AudioMenu = ({ generator, onReload, children }) => {
                 <SpeakerIcon />
             </summary>
             <div className="gen-settings-menu">
+                <FeatureIntro ids="audio-menu" />
                 {children}
                 <section className="gen-menu-section">
                     <h3>Audio</h3>
@@ -345,6 +348,7 @@ export const SettingsMenu = ({ link, saving, phrase, onStartOver, smooth, intro,
                 {'⚙'}{saving !== null && saving !== undefined ? ` Saving ${Math.round(saving * 100)}%` : ''}
             </summary>
             <div className="gen-settings-menu">
+                <FeatureIntro ids="options-menu" />
                 <section className="gen-menu-section">
                     <h3>Share</h3>
                     <button type="button" className="gen-menu-wide" onClick={() => copy()}><LinkIcon /> Copy link to this music</button>

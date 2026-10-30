@@ -23,7 +23,7 @@ export default function FluidControls({ options, onOptions, onClear }) {
                 onChange={(e) => set(key, Number(e.target.value))} />
         </label>;
     };
-    return <div className="gen-fluid-controls">
+    return <div className="gen-fluid-controls" data-intro="look-fluid">
         <div className="gen-fluid-heading">
             <span>Fluid settings</span>
             <button type="button" className="gen-dice" aria-label="Random fluid settings" title="Randomize fluid settings"

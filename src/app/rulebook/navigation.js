@@ -19,9 +19,9 @@ export function initialPages(saved, oldPages, stage) {
         if (oldPages >= 7) for (const id of PAGE_IDS) pages.add(id);
     }
     // Existing stage unlocks retain access at their new home.
-    if (stage >= 3) for (const id of ['pad', 'bass', 'percussion']) pages.add(id);
-    if (stage >= 4) for (const id of ['ensemble', 'melodic-composition', 'duet', 'rhythm', 'form']) pages.add(id);
-    if (stage >= 6) for (const id of ['harmony', 'performance']) pages.add(id);
-    if (stage >= 1) pages.add('ambient-dynamics');
+    if (stage >= 4) for (const id of ['pad', 'bass', 'percussion']) pages.add(id);
+    if (stage >= 5) for (const id of ['ensemble', 'melodic-composition', 'duet', 'rhythm', 'form']) pages.add(id);
+    if (stage >= 7) for (const id of ['harmony', 'performance']) pages.add(id);
+    if (stage >= 2) pages.add('ambient-dynamics');
     return PAGE_IDS.filter(id => pages.has(id));
 }

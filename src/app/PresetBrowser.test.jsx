@@ -243,9 +243,9 @@ describe('tour stages', () => {
         const count = () => Number(document.querySelector('.gen-tour-count').textContent.match(/of (\d+)/)[1]);
         // no part of the page is mounted here, so only the cards without a frame are left
         render(<Tour key="first" fromStage={0} toStage={0} onClose={() => {}} />);
-        expect(count()).toBe(1);
-        render(<Tour key="all" onClose={() => {}} />);
         expect(count()).toBe(2);
+        render(<Tour key="all" onClose={() => {}} />);
+        expect(count()).toBe(4);
     });
 });
 
@@ -259,13 +259,15 @@ test('the first tour introduces fluid and the second introduces voice controls',
     document.body.appendChild(parts);
     try {
         render(<Tour key="basics-fluid" fromStage={0} toStage={0} onClose={() => {}} />);
-        expect(document.querySelector('.gen-tour-count').textContent).toBe('Step 1 of 3');
+        expect(document.querySelector('.gen-tour-count').textContent).toBe('Step 1 of 4');
         click(button('Next'));
         expect(document.querySelector('#gen-tour-title').textContent).toBe('Play and move around');
         click(button('Next'));
         expect(document.querySelector('#gen-tour-title').textContent).toBe('Music in motion');
         render(<Tour key="voices-second" fromStage={1} toStage={1} onClose={() => {}} />);
-        expect(document.querySelector('.gen-tour-count').textContent).toBe('Step 1 of 2');
+        expect(document.querySelector('.gen-tour-count').textContent).toBe('Step 1 of 3');
+        expect(document.querySelector('#gen-tour-title').textContent).toBe('The whole page');
+        click(button('Next'));
         expect(document.querySelector('#gen-tour-title').textContent).toBe('Voices');
         click(button('Next'));
         expect(document.querySelector('#gen-tour-title').textContent).toBe('Shape each voice');

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { TOUR_STEPS, TOUR_KEY, LAST_STAGE, MINIMAL_TOUR_STEPS, MINIMAL_TOUR_KEY } from './tourSteps';
+import { TOUR_STEPS, TOUR_KEY, LAST_STAGE, MINIMAL_TOUR_STEPS, MINIMAL_TOUR_KEY, QUESTS_INTRO_KEY } from './tourSteps';
 import { readPref, writePref } from './prefs';
 
 /** Whether the tour has been finished or skipped before. */
@@ -48,11 +48,12 @@ function place(rect, card) {
  * @param {boolean} [props.prompt] - open on a start prompt first: the page dimmed behind a card that
  *   asks whether to take the tour, until it is answered (for the automatic first-visit opening;
  *   starting from it skips the welcome step, which the prompt says)
+ * @param {string[]} [props.only] - show just the steps with these ids (the quest introduction for people who took the tour before quests)
  * @param {boolean} [props.minimal] - the tour of the minimal view (MINIMAL_TOUR_STEPS) instead of the stages;
  *   declining its prompt declines the main tour as well
  */
-const Tour = ({ onClose, reference = false, prompt = false, fromStage = 0, toStage = LAST_STAGE, onUnlockAll, onStep, minimal = false }) => {
-    const [steps] = useState(() => (minimal ? MINIMAL_TOUR_STEPS.filter((s) => !s.selector || document.querySelector(s.selector)) : availableSteps(fromStage, toStage)));
+const Tour = ({ onClose, reference = false, prompt = false, fromStage = 0, toStage = LAST_STAGE, onUnlockAll, onStep, minimal = false, only = null }) => {
+    const [steps] = useState(() => (only ? TOUR_STEPS.filter((s) => only.includes(s.id)) : minimal ? MINIMAL_TOUR_STEPS.filter((s) => !s.selector || document.querySelector(s.selector)) : availableSteps(fromStage, toStage)));
     const [asking, setAsking] = useState(prompt && !reference);
     const [index, setIndex] = useState(0);
     const [hovered, setHovered] = useState(null);
@@ -65,6 +66,7 @@ const Tour = ({ onClose, reference = false, prompt = false, fromStage = 0, toSta
 
     const finish = () => {
         if (!reference) writePref(minimal ? MINIMAL_TOUR_KEY : TOUR_KEY, true);
+        if (!reference && steps.some((s) => s.id === 'quests' || s.id === 'minimal-quests')) writePref(QUESTS_INTRO_KEY, true);
         onClose();
     };
     // Dismissing the start prompt: no help wanted, so everything is available (the minimal view stays
@@ -202,6 +204,7 @@ const Tour = ({ onClose, reference = false, prompt = false, fromStage = 0, toSta
                         </button>
                     </span>
                 </div>
+                {step.action && onUnlockAll && <button type="button" className="gen-tour-link" onClick={decline}>{step.action.label}</button>}
             </div>}
         </div>
     );

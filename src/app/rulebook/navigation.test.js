@@ -15,7 +15,7 @@ test('the main book separates instrument, harmonic and composition pages without
 test('old page and stage preferences retain access in the new navigation', () => {
     expect(initialPages(null, 7, 0)).toEqual(PAGE_IDS);
     expect(initialPages(null, 2, 0)).toEqual(expect.arrayContaining(['melody', 'ensemble']));
-    expect(initialPages(null, null, 3)).toEqual(expect.arrayContaining(['pad', 'bass', 'percussion']));
-    expect(initialPages(null, null, 6)).toEqual(PAGE_IDS);
+    expect(initialPages(null, null, 4)).toEqual(expect.arrayContaining(['pad', 'bass', 'percussion']));
+    expect(initialPages(null, null, 7)).toEqual(PAGE_IDS);
     expect(initialPages(['harmony', 'invalid', 'evolution'], null, 0)).toEqual(['melody', 'harmony']);
 });

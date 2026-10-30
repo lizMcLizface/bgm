@@ -13,7 +13,7 @@ const seasonsText = ([a, b]) => `${seasonName(a)} to ${seasonName(b - 0.01)}`;
 // Options for the pixel landscape background (SceneryBackdrop).
 export default function SceneryControls({ options, onOptions }) {
     const set = (key, value) => onOptions({ ...options, [key]: value });
-    return <div className="gen-fluid-controls">
+    return <div className="gen-fluid-controls" data-intro="look-landscape">
         <div className="gen-fluid-heading">
             <span>Landscape</span>
             <button type="button" className="gen-dice" aria-label="New landscape" title="A new landscape of this kind"

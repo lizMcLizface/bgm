@@ -100,17 +100,19 @@ export const SCENE_BROWSE_ORDER = SCENE_CATEGORIES.flatMap(category =>
     BROWSABLE_SCENES.filter(scene => scene.category === category.id).map(scene => ({scene,category:category.id})));
 
 /** Follow the visible card order, retaining the occurrence of comparison originals. */
-export function stepBuiltinSceneEntry(currentName, direction, currentCategory) {
+export function stepBuiltinSceneEntry(currentName, direction, currentCategory, allowed = null) {
     const categoryId = currentCategory ?? SCENES.find(s => s.name === currentName)?.category;
     const category = SCENE_CATEGORIES.find(c => c.id === categoryId);
-    const ordered = category?.cycleWithin ? SCENE_BROWSE_ORDER.filter(e => e.category === categoryId) : SCENE_BROWSE_ORDER;
+    const inRange = category?.cycleWithin ? SCENE_BROWSE_ORDER.filter(e => e.category === categoryId) : SCENE_BROWSE_ORDER;
+    // `allowed(scene)` leaves out the presets not open yet (presetUnlocks.js); the current one stays as the place to step from
+    const ordered = allowed ? inRange.filter(e => allowed(e.scene) || e.scene.name === currentName) : inRange;
     const at = ordered.findIndex(e => e.scene.name === currentName && e.category === categoryId);
     const next = at < 0 ? (direction > 0 ? 0 : ordered.length - 1) : (at + direction + ordered.length) % ordered.length;
     return ordered[next];
 }
 /** A built-in preset at random for the dice: any listed one but the current, demos left out. */
-export function randomBuiltinSceneEntry(currentName, random = Math.random) {
-    const pool = SCENE_BROWSE_ORDER.filter(e => e.category !== 'demo' && e.scene.name !== currentName);
+export function randomBuiltinSceneEntry(currentName, random = Math.random, allowed = null) {
+    const pool = SCENE_BROWSE_ORDER.filter(e => e.category !== 'demo' && e.scene.name !== currentName && (!allowed || allowed(e.scene)));
     return pool[Math.floor(random() * pool.length)];
 }
 export const stepBuiltinScene = (name, direction, category) => stepBuiltinSceneEntry(name, direction, category).scene;

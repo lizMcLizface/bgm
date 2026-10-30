@@ -1,3 +1,4 @@
+import FeatureIntro from './FeatureIntro';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { BROWSABLE_SCENES as SCENES, SCENE_CATEGORIES, MINE, sceneSettings,sceneUsesWasm } from './scenes';
 import {percussionVoice} from './percussionVoices';
@@ -28,6 +29,10 @@ import { AmbienceIcon } from './icons';
 // only (ctrl / cmd-click), or what the buttons in the header are set to.
 
 const ALL = 'all';
+const STARRED = { id: 'starred', label: '★ Starred', blurb: 'Kept at the top' };
+
+// 'Listened 12 min' on a card: time spent with the preset (quest log), once it is a few seconds.
+const listened = (seconds) => (seconds < 10 ? '' : seconds < 60 ? 'Heard briefly' : `Listened ${Math.round(seconds / 60)} min`);
 const APPLY = [
     ['all', 'Everything', 'Key, feel, drums, ambience and the sounds'],
     ['composition', 'Composition', 'Everything but the sounds (shift-click)'],
@@ -72,7 +77,7 @@ const Played = ({ played: { voices, ambience } }) => (
     </span>
 );
 
-const Card = ({ scene, active, onPick, onRemove }) => {
+const Card = ({ scene, active, onPick, onRemove, starred, onStar, seconds }) => {
     const { line, chips, level, played } = useMemo(() => summary(scene), [scene]);
     return (
         <li className={`gen-pb-card${active ? ' is-active' : ''}`}>
@@ -85,7 +90,13 @@ const Card = ({ scene, active, onPick, onRemove }) => {
                 <span className="gen-pb-meta">{line} · {intensityLabel(level).toLowerCase()}</span>
                 {chips.length > 0 && <span className="gen-pb-chips">{chips.map((chip) => <span key={chip}>{chip}</span>)}</span>}
                 <Played played={played} />
+                {listened(seconds) && <span className="gen-pb-listened">{listened(seconds)}</span>}
             </button>
+            {onStar && (
+                <button type="button" className={`gen-pb-star${starred ? ' is-on' : ''}${onRemove ? ' has-remove' : ''}`} aria-pressed={starred}
+                    onClick={() => onStar(scene.name)} aria-label={`${starred ? 'Unstar' : 'Star'} ${scene.name}`}
+                    title={starred ? 'Starred: kept at the top. Click to unstar.' : 'Star: keep this at the top of the list'}>{starred ? '★' : '☆'}</button>
+            )}
             {onRemove && (
                 <button type="button" className="gen-pb-remove" onClick={() => onRemove(scene.name)}
                     aria-label={`Delete ${scene.name}`} title="Delete this preset">×</button>
@@ -94,7 +105,13 @@ const Card = ({ scene, active, onPick, onRemove }) => {
     );
 };
 
-const PresetBrowser = ({ current, onPick, actions }) => {
+/**
+ * @param {object} [props.access] - presetAccess() while presets are still being unlocked (presetUnlocks.js); null: all open
+ * @param {object} [props.heard] - seconds listened per preset name
+ * @param {string[]} [props.starred] - starred preset names; `onStar(name)` toggles one
+ * @param {function} [props.onUnlockAll] - open every preset
+ */
+const PresetBrowser = ({ current, onPick, actions, access = null, heard = {}, starred = [], onStar, onUnlockAll }) => {
     const [open, setOpen] = useState(false);
     const [category, setCategory] = useState(ALL);
     const [query, setQuery] = useState('');
@@ -141,15 +158,21 @@ const PresetBrowser = ({ current, onPick, actions }) => {
     // Yours are read when the window is open and again after a save or delete.
     const mine = useMemo(() => (open ? userScenes() : []), [open, version]); // eslint-disable-line react-hooks/exhaustive-deps
     const categories = useMemo(
-        () => [...SCENE_CATEGORIES, ...(mine.length ? [MINE] : [])],
-        [mine.length],
+        () => [...(starred.length ? [STARRED] : []), ...SCENE_CATEGORIES, ...(mine.length ? [MINE] : [])],
+        [mine.length, starred.length],
     );
-    const scenes = useMemo(() => [...mine, ...SCENES].map((scene) => ({ scene, id: scene.category })), [mine]);
-    const shown = scenes.filter(({ scene, id }) => (category === ALL || id === category) && (!query || matches(scene, query)));
-    const count = (id) => scenes.filter((entry) => entry.id === id).length;
+    // presets not open yet are left out, and starred ones come first in their category
+    const scenes = useMemo(() => [...mine, ...SCENES]
+        .filter((scene) => !access || scene.category === MINE.id || access.isOpen(scene.name))
+        .map((scene) => ({ scene, id: scene.category }))
+        .sort((a, b) => Number(starred.includes(b.scene.name)) - Number(starred.includes(a.scene.name))), [mine, access, starred]);
+    const shown = category === STARRED.id
+        ? scenes.filter(({ scene }) => starred.includes(scene.name) && (!query || matches(scene, query)))
+        : scenes.filter(({ scene, id }) => (category === ALL || id === category) && (!query || matches(scene, query)));
+    const count = (id) => (id === STARRED.id ? scenes.filter(({ scene }) => starred.includes(scene.name)).length : scenes.filter((entry) => entry.id === id).length);
     // With "All", the cards go in category order under their headings.
     const sections = (category === ALL && !query ? categories : [categories.find((c) => c.id === category) || categories[0]])
-        .map((c) => ({ ...c, items: shown.filter(({ id }) => id === c.id).map(({ scene }) => scene) }))
+        .map((c) => ({ ...c, items: c.id === STARRED.id ? shown.map(({ scene }) => scene) : shown.filter(({ id }) => id === c.id).map(({ scene }) => scene) }))
         .filter(({ items }) => items.length);
     const flat = category === ALL && query ? [{ id: ALL, label: 'Matches', blurb: '', items: shown.map(({ scene }) => scene) }].filter(({ items }) => items.length) : sections;
 
@@ -200,6 +223,7 @@ const PresetBrowser = ({ current, onPick, actions }) => {
                 <div className="gen-pb-backdrop" role="presentation" onMouseDown={(e) => e.target === e.currentTarget && close()}>
                     <ScrollLock />
                     <div className="gen-pb gen-scenes" role="dialog" aria-modal="true" aria-label="Presets">
+                        <FeatureIntro ids="preset-list" />
                         <div className="gen-pb-head">
                             <h2>Presets</h2>
                             <input ref={search} type="search" value={query} onChange={(e) => setQuery(e.target.value)}
@@ -224,6 +248,12 @@ const PresetBrowser = ({ current, onPick, actions }) => {
                                 ))}
                             </nav>
                             <div className="gen-pb-scroll">
+                                {access && (
+                                    <p className="gen-pb-unlock-note">
+                                        Presets open up as you listen to each category. Time spent with each is kept in this browser.
+                                        <button type="button" onClick={() => { if (window.confirm('Open every preset now?')) onUnlockAll?.(); }}>Unlock all presets</button>
+                                    </p>
+                                )}
                                 <div className="gen-pb-legend" aria-label="Colour shows how busy a preset sounds">
                                     <span>{INTENSITY_LABELS[0]}</span>
                                     <span className="gen-pb-legend-bar" style={{ background: `linear-gradient(90deg, ${[0, 0.25, 0.5, 0.75, 1].map(viridis).join(', ')})` }} />
@@ -237,9 +267,17 @@ const PresetBrowser = ({ current, onPick, actions }) => {
                                         <ul className="gen-pb-grid">
                                             {section.items.map((scene) => (
                                                 <Card key={`${scene.category}/${scene.name}`} scene={scene} active={scene.name === current}
-                                                    onPick={pick} onRemove={scene.category === MINE.id ? remove : null} />
+                                                    onPick={pick} onRemove={scene.category === MINE.id ? remove : null}
+                                                    starred={starred.includes(scene.name)} onStar={onStar} seconds={heard[scene.name] ?? 0} />
                                             ))}
                                         </ul>
+                                        {access && !query && access.byCategory[section.id]?.next && (
+                                            <div className="gen-pb-locked">
+                                                <span aria-hidden="true">🔒</span>
+                                                <span>{access.byCategory[section.id].total - access.byCategory[section.id].open} more in {section.label}. {access.byCategory[section.id].goal}</span>
+                                                <progress max="1" value={access.byCategory[section.id].progress} aria-label={`Progress to the next presets in ${section.label}`} />
+                                            </div>
+                                        )}
                                     </section>
                                 ))}
                             </div>
