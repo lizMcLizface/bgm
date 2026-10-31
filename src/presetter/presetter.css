@@ -1,0 +1,52 @@
+/* /tools/presetter/ (PresetterApp.jsx): the page in a frame, a bar for the preset in it, and the table of presets below. Colours are the page's own (generative.css). */
+html, body { margin: 0; background: var(--gen-bg); color: var(--gen-text); font: 14px/1.4 system-ui, sans-serif; }
+/* The page on the left half, the bar, filters and presets on the right, each scrolling on its own (a narrow window stacks them). */
+.ps { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; height: 100vh; box-sizing: border-box; padding: 10px 12px; }
+.ps-frame { width: 100%; height: 100%; border: 1px solid var(--gen-border); border-radius: 8px; background: var(--gen-surface); }
+.ps-side { display: flex; flex-direction: column; gap: 8px; min-width: 0; min-height: 0; }
+@media (max-width: 1100px) {
+    .ps { grid-template-columns: minmax(0, 1fr); grid-template-rows: 80vh auto; height: auto; }
+    .ps-side { min-height: 90vh; }
+}
+
+.ps button, .ps select, .ps input[type='search'], .ps input[type='text'], .ps .ps-file {
+    font: inherit; color: var(--gen-text); background: var(--gen-surface); border: 1px solid var(--gen-border); border-radius: 6px; padding: 5px 9px;
+}
+.ps button { cursor: pointer; }
+.ps button:hover:not(:disabled) { border-color: var(--gen-accent); }
+.ps button:disabled { opacity: 0.45; cursor: default; }
+.ps .ps-primary { background: var(--gen-accent); color: var(--gen-accent-text); border-color: var(--gen-accent); font-weight: 600; }
+
+.ps-bar { flex: none; max-height: 40%; overflow: auto; display: grid; gap: 6px; padding: 10px 12px; background: var(--gen-surface); border: 1px solid var(--gen-border); border-radius: 8px; }
+.ps-now { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: baseline; }
+.ps-now strong { font-size: 16px; }
+.ps-actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.ps-check { display: inline-flex; gap: 6px; align-items: center; color: var(--gen-muted); margin-left: 8px; }
+.ps-message { margin: 0; color: var(--gen-muted); }
+.ps-detail { color: var(--gen-muted); }
+.ps-detail ul { margin: 4px 0 0; padding-left: 20px; }
+.ps-muted { color: var(--gen-muted); }
+.ps-warn { color: #c4562a; }
+
+.ps-filters { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; padding: 2px 0 6px; border-bottom: 1px solid var(--gen-border); }
+.ps-filters input[type='search'] { min-width: 160px; flex: 1; }
+.ps-spacer { flex: 1; }
+.ps-file { position: relative; display: inline-block; cursor: pointer; }
+.ps-file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+
+.ps-table-wrap { flex: 1; min-height: 0; overflow: auto; border: 1px solid var(--gen-border); border-radius: 8px; }
+.ps-table { width: 100%; border-collapse: collapse; }
+.ps-table th { position: sticky; top: 0; background: var(--gen-bg); text-align: left; font-weight: 600; color: var(--gen-muted); padding: 6px 8px; border-bottom: 1px solid var(--gen-border); white-space: nowrap; z-index: 2; }
+.ps-table td { padding: 4px 8px; border-bottom: 1px solid var(--gen-border); vertical-align: middle; }
+.ps-row { cursor: pointer; }
+.ps-row:hover { background: color-mix(in srgb, var(--gen-accent) 8%, transparent); }
+.ps-row.is-selected { background: color-mix(in srgb, var(--gen-accent) 20%, transparent); box-shadow: inset 3px 0 0 var(--gen-accent); }
+.ps-row.is-ok .ps-name { color: #3d9a63; }
+.ps-row.is-tweak .ps-name { color: #c79a2a; }
+.ps-row.is-redo .ps-name { color: #c4562a; }
+.ps-name { font-weight: 600; white-space: nowrap; }
+.ps-dot { width: 18px; color: var(--gen-muted); text-align: center; }
+.ps-recent { color: var(--gen-accent); font-weight: 600; }
+.ps-recent .ps-muted { font-weight: 400; }
+.ps-note { width: 100%; min-width: 140px; }
+.ps-empty { padding: 20px 8px; }

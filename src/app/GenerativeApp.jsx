@@ -1540,6 +1540,14 @@ const GenerativeApp = () => {
             : { name: gen.roles[role].presetName, synth: gen.getRolePreset(role) }])),
         percussion: percMachine?.ref,
     }, info);
+    // Dev server only: the preset tool (/tools/presetter/) loads presets into this page and reads back what was changed on it.
+    useEffect(() => {
+        if (!import.meta.env.DEV) return undefined;
+        // (a preset is taken at once and its piece starts from the top, never carried over from the last one at a chord)
+        window.__bgm = { applyScene: (scene) => cutToScene(scene), capture: () => captureSetup({ name: soundScene.current?.name ?? '' }), loadedName: () => soundScene.current?.name ?? '',
+            running: () => gen.isRunning, pendingChange: () => !!gen.pendingChange };
+        return () => { delete window.__bgm; };
+    });
     const setupActions = {
         save: (name) => {
             if (!name) return 'Give it a name first';
