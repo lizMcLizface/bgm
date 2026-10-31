@@ -69,12 +69,6 @@ describe('the panel', () => {
         expect(host.querySelector('[data-quick="counter"]').disabled).toBe(false);
     });
 
-    test('the chord size is chosen with pills', () => {
-        const calls = mount();
-        click([...host.querySelectorAll('[aria-label="Size"] button')].find((b) => b.textContent === '7ths'));
-        expect(calls.settings).toHaveBeenLastCalledWith({ padNotes: 4 });
-    });
-
     test('the voices are named as the rest of the page names them, in their colours', () => {
         const base = defaultSettings();
         mount({ ...base, drums: { ...base.drums, style: 'basic' } });

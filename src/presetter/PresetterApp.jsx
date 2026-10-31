@@ -7,11 +7,13 @@ import { voiceLayers } from '../app/arranger';
 import { applyChange, describeChange, leafPaths } from './changes';
 import { diffSetup } from './diff';
 import { STATUSES, loadStore, saveStore, update, saveChange, dump, mergeDump, entryOf } from './store';
-import { rowsFor, ago, neighbour } from './table';
+import { rowsFor, ago, neighbour, SORTS } from './table';
+import { JUDGEMENTS, feel, texture, styles, instruments, median, levelClass, detail } from './judgements';
 
 const SCENES = SCENE_BROWSE_ORDER.map(({ scene }) => scene);
 const CATEGORY_LABEL = Object.fromEntries(SCENE_CATEGORIES.map((c) => [c.id, c.label]));
 const LAYER_LABEL = { combined: 'One voice', pad: 'Pad', rhythm: 'Rhythm', split: 'Both' };
+const MEDIAN_LUFS = median(Object.values(JUDGEMENTS).map((j) => j.lufs));
 const nameOf = (spec) => (typeof spec === 'string' ? spec : spec?.name ?? '');
 
 function download(file, name) {
@@ -29,7 +31,7 @@ export default function PresetterApp() {
     const [selected, setSelected] = useState('');
     const [ready, setReady] = useState(false);
     const [mine, setMine] = useState(true); // open a preset with the changes kept for it
-    const [filter, setFilter] = useState({ query: '', category: '', status: '', changed: '' });
+    const [filter, setFilter] = useState({ query: '', category: '', status: '', changed: '', sort: '' });
     const [message, setMessage] = useState('');
     const [lastSaved, setLastSaved] = useState(null); // { name, paths, warnings }
     const [now, setNow] = useState(Date.now());
@@ -43,7 +45,7 @@ export default function PresetterApp() {
     }, []);
     const bgm = () => { try { return frame.current?.contentWindow?.__bgm ?? null; } catch { return null; } };
 
-    const rows = useMemo(() => rowsFor(SCENES, store, { ...filter, now }), [store, filter, now]);
+    const rows = useMemo(() => rowsFor(SCENES, store, { ...filter, judgements: JUDGEMENTS, now }), [store, filter, now]);
     const scene = SCENES.find((s) => s.name === selected) ?? null;
     const entry = entryOf(store, selected);
 
@@ -152,6 +154,9 @@ export default function PresetterApp() {
                     <option value="yes">Has my changes</option>
                     <option value="recent">Changed in the last day</option>
                 </select>
+                <select value={filter.sort} onChange={(e) => setFilter({ ...filter, sort: e.target.value })} aria-label="Order" title="From the audio judgements (tools/judgeLibrary.mjs)">
+                    {Object.entries(SORTS).map(([k, label]) => <option key={k} value={k}>{label}</option>)}
+                </select>
                 <span className="ps-muted">{rows.length} of {SCENES.length} · {judged} judged · {changedCount} with changes</span>
                 <span className="ps-spacer" />
                 <button type="button" onClick={exportFile} disabled={!judged && !changedCount && !Object.keys(store.presets).length}>Dump to file</button>
@@ -161,11 +166,11 @@ export default function PresetterApp() {
             <div className="ps-table-wrap">
                 <table className="ps-table">
                     <thead>
-                        <tr><th aria-label="Heard" /><th>Preset</th><th>Category</th><th>Layers</th><th>Pad / rhythm</th><th>Verdict</th><th>My changes</th><th>Note</th></tr>
+                        <tr><th aria-label="Heard" /><th>Preset</th><th>Category</th><th>Layers</th><th>Pad / rhythm</th><th title="Integrated loudness of a render, LUFS">LUFS</th><th title="Essentia mood heads that are on, and what the sound is made of">Feel</th><th>Style</th><th>Verdict</th><th>My changes</th><th>Note</th></tr>
                     </thead>
                     <tbody>
                         {rows.map((s) => {
-                            const e = entryOf(store, s.name), layers = voiceLayers(s.settings);
+                            const e = entryOf(store, s.name), layers = voiceLayers(s.settings), j = JUDGEMENTS[s.name];
                             const recent = e.changedAt && now - e.changedAt < 24 * 3600 * 1000;
                             return (
                                 <tr key={s.name} className={`ps-row${s.name === selected ? ' is-selected' : ''}${e.change ? ' has-change' : ''}${e.status ? ` is-${e.status}` : ''}`}
@@ -175,6 +180,9 @@ export default function PresetterApp() {
                                     <td className="ps-muted">{CATEGORY_LABEL[s.category] ?? s.category}</td>
                                     <td>{LAYER_LABEL[layers] ?? layers}{s.settings.layerFlow?.mode && s.settings.layerFlow.mode !== 'off' ? ' · flow' : ''}</td>
                                     <td className="ps-muted">{nameOf(sceneVoiceSpec(s, 'pad', layers))} / {nameOf(sceneVoiceSpec(s, 'rhythm', layers)) || '-'}</td>
+                                    <td className={`ps-num ps-level-${levelClass(j?.lufs, MEDIAN_LUFS)}`} title={detail(j)}>{j ? j.lufs.toFixed(1) : ''}</td>
+                                    <td className="ps-muted" title={detail(j)}>{j ? [feel(j), texture(j)].filter(Boolean).join(' · ') : ''}</td>
+                                    <td className="ps-muted" title={detail(j)}>{j ? [styles(j, 2), instruments(j, 2)].filter(Boolean).join(' | ') : ''}</td>
                                     <td>
                                         <select value={e.status} onChange={(ev) => setStore((st) => update(st, s.name, { status: ev.target.value }))} aria-label={`Verdict for ${s.name}`}>
                                             {Object.entries(STATUSES).map(([k, label]) => <option key={k} value={k}>{label}</option>)}

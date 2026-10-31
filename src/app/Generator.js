@@ -74,7 +74,7 @@ import { applyMood, glideMood, moodColour, moodTone } from './composition/mood';
 import { nextMusic, glideTempo, scaleDistance } from './conductor';
 import { METERS, unitsPerMinute, swingEvents, halfTime, chordBars, splitBeat } from './meter';
 import { drumBar, loosenDrums, auditionHits, DRUMS } from './percussion';
-import { sequencerBar, sequencerLanes, stageForBar, stageSpan, moveValues } from './sequencer';
+import { sequencerBar, sequencerLanes, stageForBar, stageSpan, moveValues, playedStage } from './sequencer';
 import { phraseEvents, DEFAULT_CONTEXT } from './auditionPhrases';
 import { contextFromPlan } from './auditionContext';
 import { normal, seeded } from './random';
@@ -719,6 +719,18 @@ class Generator {
         if (Boolean(this.quickIntro) === on) return;
         this.quickIntro = on;
         this.replan(['sections']);
+    }
+
+    /** The step sequencer's playhead: { stage (the drums'), lanes (the chord and bass lanes' stage), step (of 16) }, or null when it is not playing. */
+    sequencerNow() {
+        const seq = this.settings.sequencer;
+        if (!seq?.on || !seq.arrangement) return null;
+        const pos = this.position(), bar = Math.floor(pos / this.beatsPerBar), planned = this.plan.get(bar);
+        // (from the plan's chord slot, so a bar planned before the recording of its stage still has one)
+        const played = planned?.seqPlayed ?? (planned?.music ? playedStage(seq, { slotIndex: this.harmonicSlotAt(bar, planned.music).index, bar }) : null);
+        if (!played) return null;
+        const { chosen, fill } = played;
+        return { stage: fill ? 3 : chosen, lanes: chosen, step: Math.floor(((pos % this.beatsPerBar) / this.beatsPerBar) * 16) % 16 };
     }
 
     /** What is audible now: { tonic, mode, progression, bpm, keyName }. */
@@ -1698,7 +1710,8 @@ class Generator {
         const loudness = planLoudness(events, this.meter.units, this.plan.get(bar - 1)?.loudness?.average, this.settings.evenLoudness);
         // the sequencer's effect moves (sequencer.js): this chord's stage and where in the chord a beat falls
         const seqMotion = seq?.on && seq.arrangement && Object.keys(seq.moves ?? {}).length ? { stage: stageForBar(seq, { slotIndex: slot.index, bar }), ...(({ start, bars }) => ({ start, bars }))(stageSpan(seq, slot, bar)) } : null;
-        this.plan.set(bar, { seqMotion, bar, chord, chordStart, state, events, music, upcoming, nextMusic: following, bpm, tone, boundaries, rubato, loudness, space, elapsed, energy, pushLevel: this.settings.pushLevel ?? 0, moodLevel: this.settings.moodLevel ?? 0, keyLift: liftPivot ? 2 : keyLift, chordBars: barsPerChord,
+        const seqPlayed = seq?.on && seq.arrangement ? playedStage(seq, { slotIndex: slot.index, bar }) : null;
+        this.plan.set(bar, { seqMotion, seqPlayed, bar, chord, chordStart, state, events, music, upcoming, nextMusic: following, bpm, tone, boundaries, rubato, loudness, space, elapsed, energy, pushLevel: this.settings.pushLevel ?? 0, moodLevel: this.settings.moodLevel ?? 0, keyLift: liftPivot ? 2 : keyLift, chordBars: barsPerChord,
             ...(split ? { split: { beat: splitAt, chord: split } } : {}),
             ...(this.rulebookTrace?{ruleTrace:{slot,referenceBarsPerChord:barsPerChord}}:{}) });
     }

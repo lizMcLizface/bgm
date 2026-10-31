@@ -157,6 +157,13 @@ const SMALL = new Set(['ch', 'oh', 'ma', 'rs', 'cb', 'rd', 'cl']);
 const CYMBALS = new Set(['cy', 'cr', 'rd']);
 const smallVelocity = (c, rng) => (c % 4 === 2 ? 0.8 : c % 4 === 0 ? 0.6 : 0.46) * (0.9 + 0.2 * rng());
 
+/** The stage a bar's chords play (`chosen`) and whether its drums play the Fill stage instead (every eighth bar, with `seq.fills`). */
+export function playedStage(seq, { slotIndex = 0, bar = 0 } = {}) {
+    const chosen = stageForBar(seq, { slotIndex, bar });
+    const fill = !!seq.fills && ((bar % 8) + 8) % 8 === 7 && chosen !== 0 && chosen !== 4;
+    return { chosen, fill };
+}
+
 /**
  * One bar of events ({ role: 'perc', midi, track, beat, length, velocity, detune }) from a stage's rows.
  * Sixteenths; other meters tile or cut the 16 steps. The beat's swing delays the off sixteenths.
@@ -164,10 +171,9 @@ const smallVelocity = (c, rng) => (c % 4 === 2 ? 0.8 : c % 4 === 0 ? 0.6 : 0.46)
 export function sequencerBar({ meter, seq, slotIndex = 0, bar = 0, swing, seed = 0, barsLeft = 99 }) {
     const stages = sequencerStages(seq);
     if (!stages) return [];
-    const chosen = stageForBar(seq, { slotIndex, bar });
     // fills (seq.fills): the drums of every eighth bar play the Fill stage, except in an intro or a breakdown, and the kick drops
     // out in every sixteenth bar's fill so the groove comes back with weight (house and techno guides: a fill every 8 or 16 bars)
-    const fillBar = seq.fills && ((bar % 8) + 8) % 8 === 7 && chosen !== 0 && chosen !== 4;
+    const { chosen, fill: fillBar } = playedStage(seq, { slotIndex, bar });
     const noKick = (fillBar && ((bar % 16) + 16) % 16 === 15) || (chosen === 5 && barsLeft === 1);
     const stage = stages[fillBar ? 3 : chosen] ?? stages[1];
     const recipe = arrangementFor(seq.arrangement);

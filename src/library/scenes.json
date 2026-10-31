@@ -5899,12 +5899,12 @@
           "swell": 0.04
         },
         "volumes": {
-          "pad": 1,
-          "bass": 0.089,
-          "lead": 0.32,
-          "counter": 0.17,
+          "pad": 0.3,
+          "bass": 0.5,
+          "lead": 0.84,
+          "counter": 0.8,
           "perc": 0.21,
-          "rhythm": 1
+          "rhythm": 0.86
         },
         "ambienceVolume": 0.4,
         "chordBorrow": 0,
@@ -5920,7 +5920,7 @@
           "mode": "add9",
           "amount": 0.55
         },
-        "layers": "rhythm"
+        "layers": "split"
       },
       "voices": {
         "pad": "Felt Keys (updated)",
@@ -5956,7 +5956,7 @@
       },
       "isUpdated": true,
       "layerVoices": {
-        "pad": "Warm Organ",
+        "pad": "Starlight Pad",
         "rhythm": "Felt Keys (updated)"
       }
     },
@@ -20046,7 +20046,7 @@
         "tonic": 9,
         "progression": 6,
         "volumes": {
-          "pad": 0.5,
+          "pad": 0.69,
           "bass": 0.75,
           "lead": 0.8,
           "counter": 0.4,
@@ -20188,7 +20188,7 @@
           },
           "sectionBars": 8
         },
-        "layers": "rhythm"
+        "layers": "split"
       },
       "voices": {
         "pad": "Trance Chord",
@@ -20197,10 +20197,10 @@
       },
       "percussion": {
         "synth": "tr909",
-        "name": "Room"
+        "name": "Deep"
       },
       "layerVoices": {
-        "pad": "Swelling Analog",
+        "pad": "Outrun Lead",
         "rhythm": "Trance Chord"
       }
     },

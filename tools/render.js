@@ -169,7 +169,7 @@ async function renderOne(target, ctx, cleanups) {
         page.on('console', (message) => {
             if (message.type() === 'error' && !/Failed to load resource/.test(message.text())) board.log(`[${target.label}] ${message.text()}`);
         });
-        await page.goto(`${base}/tools/render.html?${target.query}${target.hash || ''}`);
+        await page.goto(`${base}/tools/render.html?${target.query}${target.hash || ''}`, { waitUntil: 'domcontentloaded', timeout: 120000 }); // the ready flag below is the real wait; a heavy preset can hold the load event past 30 s
         await page.waitForFunction('window.bgmRenderReady === true', { timeout: 120000 });
         const info = await page.evaluate((theme) => window.bgmRender.setup({ theme }), options.theme);
         row.set({ label: info.name });

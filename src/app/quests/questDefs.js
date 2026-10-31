@@ -174,10 +174,10 @@ export const QUESTS = [
     {
         id: 'on-the-beat', stage: 4, added: 1, name: 'On the Beat',
         text: 'Change the drums, or program your own beat.',
-        help: 'The percussion panel picks the drum style and shapes the kit. The step sequencer replaces the generated drums with a beat you program, one pattern per chord, played on drum machine sounds.',
+        help: 'The percussion panel picks the drum style and shapes the kit. The beat grid replaces the generated drums with a beat you program, one pattern per chord, played on drum machine sounds.',
         tasks: [
             setting('drums', 'Change the drums', ['drums'], { show: '[data-tour="percussion"]' }),
-            task('sequencer', 'Switch on the step sequencer', 'setting', (e) => e.key === 'sequencer' && e.value?.on === true, { show: '.gen-sequencer' }),
+            task('sequencer', 'Switch on the beat grid', 'setting', (e) => e.key === 'sequencer' && e.value?.on === true, { show: '.gen-sequencer' }),
         ],
     },
 

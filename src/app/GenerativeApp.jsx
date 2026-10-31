@@ -1017,6 +1017,7 @@ const GenerativeApp = () => {
     };
     const closeSound = useCallback(() => { setArmed(soundArmedBefore.current); setSoundRole(null); }, []);
     const now = useNowPlaying(gen, running, settings);
+    const sequencerPlayhead = useCallback(() => gen.sequencerNow(), [gen]);
     useEffect(() => {
         const sync = () => {
             setRunning(gen.isRunning);
@@ -1926,7 +1927,7 @@ const GenerativeApp = () => {
                 armed={armed === 'perc'} onArm={setArmed}
                 onVoice={choosePercussionVoice} voiceBusy={percussionBusy} voiceOpen={pickerRole==='perc'} onVoiceOpen={open=>choosePicker(open?'perc':null)} onDrums={(drums) => update('drums', drums)} onKit={(kit) => update('drumKit', kit)}
                 onVolume={(v) => setVolume('perc', v)} onMix={changeMix} onAudition={() => gen.audition('perc')} />}
-            {has(4) && <SequencerPanel seq={settings.sequencer} chords={PROGRESSIONS[settings.progression] ?? []} machine={percMachine} onChange={(seq) => update('sequencer', seq)}
+            {has(4) && <SequencerPanel seq={settings.sequencer} chords={PROGRESSIONS[settings.progression] ?? []} machine={percMachine} playhead={running ? sequencerPlayhead : null} onChange={(seq) => update('sequencer', seq)}
                 onMachine={(synth, name = 'Room') => { void applyRef('perc', { synth, name }); }} />}
             {has(4) && <IntensityPanel push={settings.push} now={now.pushLevel ?? 0} onChange={(push) => update('push', push)} />}
 

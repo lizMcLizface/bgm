@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BEATS, ARRANGEMENTS, arrangementFor } from '../synths/drums/beats';
 import { KITS } from '../synths/drums/kits';
 import { SYNTHS } from '../synths/models';
@@ -15,8 +15,27 @@ const CATEGORIES = [...new Set(BEATS.map((b) => b.category))];
  * eight stages editable step by step, and a stage for each chord of the progression.
  * @param {{ seq: object, chords: string[], onChange: (seq: object) => void, onMachine: (synth: string) => void }} props
  */
-export default function SequencerPanel({ seq, chords, machine, onChange, onMachine }) {
-    const [stage, setStage] = useState(1);
+export default function SequencerPanel({ seq, chords, machine, onChange, onMachine, playhead }) {
+    const [picked, setPicked] = useState(1);
+    const [follow, setFollow] = useState(true);
+    // where the music is: the stage and the step (a function of the generator, read each frame while it plays)
+    const [now, setNow] = useState(null);
+    useEffect(() => {
+        if (!playhead || !seq.on) { setNow(null); return undefined; }
+        let frame = 0;
+        const tick = () => {
+            let next = null;
+            try { next = playhead(); } catch { /* the generator is mid-change: no playhead this frame */ }
+            setNow((prev) => (prev?.step === next?.step && prev?.stage === next?.stage && prev?.lanes === next?.lanes ? prev : next));
+            frame = requestAnimationFrame(tick);
+        };
+        tick();
+        return () => cancelAnimationFrame(frame);
+    }, [playhead, seq.on]);
+    // the grid shows the stage that is playing (Follow), or the one picked; the step is lit on that stage
+    const stage = follow && now ? now.lanes : picked;
+    const lit = () => (now && stage === now.lanes ? now.step : -1);
+    const setStage = (i) => { setPicked(i); setFollow(false); };
     const stages = sequencerStages(seq);
     const recipe = arrangementFor(seq.arrangement);
     // the drum machine actually loaded wins over the setting (it can be changed in the sound window too)
@@ -54,14 +73,14 @@ export default function SequencerPanel({ seq, chords, machine, onChange, onMachi
         <section className="gen-panel gen-panel-role gen-role-perc seq-panel" data-tour="sequencer">
             <h2 className="gen-panel-title">
                 <i className="gen-swatch gen-swatch-perc" />
-                Step sequencer
+                Beat grid
             </h2>
             <label className="gen-check seq-on">
                 <input type="checkbox" checked={!!seq.on} disabled={!seq.arrangement} onChange={(e) => set({ on: e.target.checked })} />
-                Play the sequencer as the percussion
+                Play the beat grid as the percussion
             </label>
             <label className="gen-field">
-                <span>Machine</span>
+                <span>Drum model (808 or 909 sounds)</span>
                 <select value={machineId} onChange={(e) => { set({ machine: e.target.value }); onMachine?.(e.target.value, 'Room'); }}>
                     {SEQ_MACHINES.map((id) => <option key={id} value={id}>{KITS[id].name}</option>)}
                 </select>
@@ -104,8 +123,9 @@ export default function SequencerPanel({ seq, chords, machine, onChange, onMachi
             {recipe && (
                 <>
                     <div className="seq-stages" role="tablist" aria-label="Stage">
+                        {playhead && seq.on && <button type="button" aria-pressed={follow} className={follow ? 'on' : ''} onClick={() => { setFollow(!follow); setPicked(stage); }}>Follow</button>}
                         {STAGE_NAMES.map((name, i) => (
-                            <button key={name} type="button" role="tab" aria-selected={stage === i} className={stage === i ? 'on' : ''} onClick={() => setStage(i)}>{name}</button>
+                            <button key={name} type="button" role="tab" aria-selected={stage === i} className={`${stage === i ? 'on' : ''}${now && (now.stage === i || now.lanes === i) ? ' playing' : ''}`} onClick={() => setStage(i)}>{name}</button>
                         ))}
                     </div>
                     <div className="seq-grid" role="grid" aria-label={`${STAGE_NAMES[stage]} pattern`}>
@@ -114,7 +134,7 @@ export default function SequencerPanel({ seq, chords, machine, onChange, onMachi
                                 <span className="seq-name" title={long}>{short}</span>
                                 {[...(rows[key] ?? blank)].map((cell, step) => (
                                     <button key={step} type="button" role="gridcell" aria-label={`${long} step ${step + 1}`}
-                                        className={`seq-cell${cell === 'x' ? ' on' : cell === 'f' ? ' flam' : ''}${step % 4 === 0 ? ' beat' : ''}`} onClick={() => setCell(key, step)} />
+                                        className={`seq-cell${cell === 'x' ? ' on' : cell === 'f' ? ' flam' : ''}${step % 4 === 0 ? ' beat' : ''}${step === lit() ? ' play' : ''}`} onClick={() => setCell(key, step)} />
                                 ))}
                             </div>
                         ))}
@@ -122,7 +142,7 @@ export default function SequencerPanel({ seq, chords, machine, onChange, onMachi
                             <span className="seq-name" title="Accent">AC</span>
                             {[...(rows.A ?? blank)].map((cell, step) => (
                                 <button key={step} type="button" role="gridcell" aria-label={`Accent step ${step + 1}`}
-                                    className={`seq-cell${cell === 'x' ? ' on' : ''}${step % 4 === 0 ? ' beat' : ''}`} onClick={() => setCell('A', step)} />
+                                    className={`seq-cell${cell === 'x' ? ' on' : ''}${step % 4 === 0 ? ' beat' : ''}${step === lit() ? ' play' : ''}`} onClick={() => setCell('A', step)} />
                             ))}
                         </div>
                         {seq.lanes && LANES.map((lane) => (
@@ -130,7 +150,7 @@ export default function SequencerPanel({ seq, chords, machine, onChange, onMachi
                                 <span className="seq-name" title={lane === 'pad' ? 'Chords: stab, accent, held chord, stacked tones, arpeggio note' : 'Bass (accent: octave up)'}>{lane === 'pad' ? 'CHD' : 'BAS'}</span>
                                 {[...(rows[lane] ?? blank)].map((cell, step) => (
                                     <button key={step} type="button" role="gridcell" aria-label={`${lane === 'pad' ? 'Chord' : 'Bass line'} step ${step + 1}`}
-                                        className={`seq-cell${cell === 'x' ? ' on' : cell === 'f' ? ' flam' : cell === 'h' ? ' held' : cell === 's' ? ' stack' : cell === 'a' ? ' arp' : ''}${step % 4 === 0 ? ' beat' : ''}`} onClick={() => setCell(lane, step)} />
+                                        className={`seq-cell${cell === 'x' ? ' on' : cell === 'f' ? ' flam' : cell === 'h' ? ' held' : cell === 's' ? ' stack' : cell === 'a' ? ' arp' : ''}${step % 4 === 0 ? ' beat' : ''}${step === lit() ? ' play' : ''}`} onClick={() => setCell(lane, step)} />
                                 ))}
                             </div>
                         ))}

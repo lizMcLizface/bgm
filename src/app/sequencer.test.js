@@ -1,4 +1,4 @@
-import { sequencerBar, sequencerLanes, cleanMoves, moveValues, stageSpan, laneDefaults, sequencerStages, stageForBar, cleanEdits, cleanSlots, defaultSequencer, nearestDrum } from './sequencer';
+import { sequencerBar, sequencerLanes, cleanMoves, moveValues, stageSpan, laneDefaults, sequencerStages, stageForBar, cleanEdits, cleanSlots, defaultSequencer, nearestDrum, playedStage } from './sequencer';
 import { METERS } from './meter';
 import { defaultSettings, sanitizeSettings, encodeSettings, decodeShare } from './settings';
 import { BEATS, ARRANGEMENTS } from '../synths/drums/beats';
@@ -220,4 +220,12 @@ describe('the lanes with the layers split', () => {
         expect(roles(out)).toEqual(['bass', 'rhythm']);
         expect(out.filter((e) => e.role === 'bass')).toEqual(play('x.a.h.s.x.a.h.s.', 'combined').filter((e) => e.role === 'bass'));
     });
+});
+
+test('playedStage: the stage a bar plays, and a Fill on every eighth bar with fills on (not in an intro or a breakdown)', () => {
+    const seq = { arrangement: 'trance-journey', fills: true, slots: [], edits: {} };
+    expect(playedStage({ ...seq, fills: false }, { bar: 7 }).fill).toBe(false);
+    const bars = Array.from({ length: 16 }, (_, bar) => playedStage(seq, { bar }));
+    bars.forEach(({ chosen, fill }, bar) => expect(fill).toBe(bar % 8 === 7 && chosen !== 0 && chosen !== 4));
+    expect(bars.some((b) => b.fill)).toBe(true);
 });

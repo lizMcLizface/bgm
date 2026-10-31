@@ -1927,3 +1927,11 @@ describe('changing the layers or their flow while a piece is planned', () => {
         }
     });
 });
+
+test('a planned bar of the step sequencer records the stage it plays, for the playhead', () => {
+    const sequencer = { on: true, machine: 'tr808', arrangement: 'warehouse-shift', edits: {}, slots: [5], fills: true };
+    const g = new Generator({ ...defaultSettings(), seed: 7, barsPerChord: 2, progression: 0, sections: { mode: 'off', phrases: 2 }, sequencer }).planner();
+    g.planBar(2); g.planBar(7);
+    expect(g.plan.get(2).seqPlayed).toEqual({ chosen: 5, fill: false });
+    expect(g.plan.get(7).seqPlayed).toEqual({ chosen: 5, fill: true });
+});

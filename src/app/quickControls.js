@@ -61,11 +61,7 @@ export const CHOICE_GROUPS = [
         ['sections', 'Sections', 'The pad alone in an intro, both in a build and the full sections, the rhythm part alone in a breakdown'],
         ['journey', 'Journey', 'Pad, both, rhythm, both, one voice, and round again'],
     ]),
-    one('chords', 'Size', 'padNotes', 'How many notes the rhythm voice\'s chords have', [
-        [3, 'Triad', 'Three notes'],
-        [4, '7ths', 'Four notes'],
-        [5, '9ths', 'Five notes'],
-    ]),
+    // (a Size group - padNotes: Triad / 7ths / 9ths - is left out for now: with it the row is too wide for the panel)
     {
         id: 'colour', label: 'Colour', title: 'What the chords are made of beyond the scale',
         choices: [
