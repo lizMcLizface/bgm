@@ -1,6 +1,6 @@
 import { defaultSettings, sanitizeSettings, encodeSettings, decodeSettings, decodeShare, settingsFromLocation, shareFromLocation, shareUrl } from './settings';
 import { randomKey, randomProgression, randomConductor, randomVoices } from './randomize';
-import { PRESET_CATEGORIES, GENERATIVE_PRESETS } from './presets';
+import { PRESET_CATEGORIES, GENERATIVE_PRESETS, ROLE_VOLUMES, ROLE_PRESETS } from './presets';
 import { SHAREABLE_PRESETS, encodeShareCode } from './shareCode';
 import presetData from '../util/presetData';
 import { seeded } from './random';
@@ -96,7 +96,7 @@ test('ambience shapes travel in the a= part', () => {
 });
 
 test('voice volumes travel in links', () => {
-    const settings = { ...defaultSettings(), seed: 3, volumes: { lead: 0.42, counter: 0.6, pad: 0.15, bass: 1, perc: 0.33 } };
+    const settings = { ...defaultSettings(), seed: 3, volumes: { lead: 0.42, counter: 0.6, pad: 0.15, bass: 1, perc: 0.33, rhythm: ROLE_VOLUMES.rhythm } };
     expect(decodeSettings(encodeSettings(settings)).volumes).toEqual(settings.volumes);
 });
 
@@ -293,4 +293,34 @@ test('the temporary media-helper output test survives encoded share links',()=>{
  const url=shareUrl(defaultSettings(),{}, {origin:'https://example.test',pathname:'/',search:'?mediaHelper=0&perf=1'});
  expect(new URL(url).searchParams.get('mediaHelper')).toBe('0');expect(new URL(url).searchParams.get('perf')).toBe('1');
  const ordinary=shareUrl(defaultSettings(),{}, {origin:'https://example.test',pathname:'/',search:''});expect(new URL(ordinary).searchParams.has('mediaHelper')).toBe(false);
+});
+
+describe('the layers in a link', () => {
+    test('the layers over time come back', () => {
+        const d = { ...defaultSettings(), seed: 3, layerFlow: { mode: 'journey', phrases: 8 } };
+        expect(decodeSettings(encodeSettings(d)).layerFlow).toEqual({ mode: 'journey', phrases: 8 });
+        expect(decodeSettings(encodeSettings({ ...d, layerFlow: { mode: 'sections', phrases: 4 } })).layerFlow).toEqual({ mode: 'sections', phrases: 4 });
+        expect(decodeSettings(encodeSettings({ ...d, seed: 3, layerFlow: defaultSettings().layerFlow })).layerFlow).toEqual({ mode: 'off', phrases: 4 });
+    });
+
+    test('the layers, the rules, the rhythm mix and register come back, and a link without them reads as one voice', () => {
+        const d = defaultSettings();
+        const settings = { ...d, seed: 3, layers: 'split', layerRules: { ...d.layerRules, clear: false, mix: false }, volumes: { ...d.volumes, rhythm: 0.37 }, muted: { ...d.muted, rhythm: true },
+            voices: { ...d.voices, rhythm: { octave: -1, wander: 'centered', chance: 0.55 } } };
+        const back = decodeSettings(encodeSettings(settings));
+        expect(back).toEqual(settings);
+        expect(decodeSettings(encodeSettings({ ...d, seed: 3 })).layers).toBe('combined');
+    });
+
+    test('the rhythm voice travels by name, and is left out when it is the default', () => {
+        const d = { ...defaultSettings(), seed: 3, layers: 'split' };
+        expect(decodeShare(encodeSettings(d, { rhythm: 'Music Box' })).presets.rhythm).toBe('Music Box');
+        expect(decodeShare(encodeSettings(d, { rhythm: ROLE_PRESETS.rhythm })).presets.rhythm).toBeUndefined();
+    });
+
+    test('a link made with the layers on one voice (the default) is the same length as one made without the setting existing: nothing is written for it', () => {
+        const d = { ...defaultSettings(), seed: 5, swing: 0.2, padRoot: 'never' };
+        expect(decodeSettings(encodeSettings(d))).toEqual(d);
+        expect(encodeSettings({ ...d, layers: 'rhythm' }).length).toBeGreaterThan(encodeSettings(d).length);
+    });
 });

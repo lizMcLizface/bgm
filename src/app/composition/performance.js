@@ -1,7 +1,7 @@
 import { seeded } from '../random';
 
 const clamp=(x,lo,hi)=>Math.max(lo,Math.min(hi,x));
-const weights={lead:1,counter:.8,pad:.45,bass:.5,perc:.4};
+const weights={lead:1,counter:.8,pad:.45,bass:.5,perc:.4,rhythm:.45};
 
 /** A seeded phrase gesture, carried as plain data for inspection/restore. */
 export function planPerformance(seed,phrase) {

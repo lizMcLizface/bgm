@@ -172,3 +172,39 @@ describe('the colour pills', () => {
         expect(onSettings).toHaveBeenLastCalledWith({ chordBorrow: 0.3, chordColour: { ...base.chordColour, mode: 'plain' } });
     });
 });
+
+describe('the layers pills', () => {
+    let host, root;
+    beforeEach(() => { host = document.createElement('div'); document.body.appendChild(host); root = createRoot(host); });
+    afterEach(() => { act(() => root.unmount()); host.remove(); });
+    const render = (settings, props = {}) => {
+        const onSettings = vi.fn();
+        act(() => root.render(<QuickPanel settings={settings} baseline={quickSettings(settings)} roleLabels={{ rhythm: 'Rhythm' }} onVolume={vi.fn()} onSettings={onSettings} onFeel={vi.fn()} {...props} />));
+        return onSettings;
+    };
+    const pill = (name) => [...host.querySelectorAll('[aria-label="Layers"] button')].find((b) => b.textContent === name);
+    const rhythmSlider = () => host.querySelector('[data-quick="rhythm"]');
+
+    test('one voice is lit by default; Both sets split, and the rhythm fader only shows once the rhythm part plays', () => {
+        const base = defaultSettings();
+        expect(choiceAt(base, CHOICE_GROUPS.find((g) => g.id === 'layers'))).toBe('combined');
+        const onSettings = render(base, { baseline: undefined }); // (with a baseline the Preset pill is the one lit)
+        expect(pill('One').getAttribute('aria-checked')).toBe('true');
+        expect(rhythmSlider()).toBeNull();
+        act(() => { pill('Both').dispatchEvent(new MouseEvent('click', { bubbles: true })); });
+        expect(onSettings).toHaveBeenLastCalledWith({ layers: 'split' });
+        render({ ...base, layers: 'split' });
+        expect(rhythmSlider()).not.toBeNull();
+        render({ ...base, layers: 'pad' });
+        expect(rhythmSlider()).toBeNull();
+    });
+
+    test('before the pad rules are unlocked the layers are not mentioned, unless a preset already uses them', () => {
+        const base = defaultSettings();
+        render(base, { layersUnlocked: false });
+        expect(host.querySelector('[aria-label="Layers"]')).toBeNull();
+        expect(rhythmSlider()).toBeNull();
+        render({ ...base, layers: 'split' }, { layersUnlocked: false });
+        expect(host.querySelector('[aria-label="Layers"]')).not.toBeNull();
+    });
+});

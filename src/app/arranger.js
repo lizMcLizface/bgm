@@ -49,15 +49,23 @@ const BASS_CENTER = 40;
 export const LEAD_RANGE = [69, 91];
 // The second lead sits between the pad and the lead.
 export const COUNTER_RANGE = [62, 84];
+// The rhythm layer (settings.layers): above the pad when both play (split); alone it keeps the pad's register, as the pad voice did.
+export const RHYTHM_RANGE = [64, 84];
+const PAD_SPAN_WITH_RHYTHM = 16;
+const PAD_RAISE_WITH_RHYTHM = 2; // semitones: lower than that and its thirds crowd the bass (more close low pairs than one voice has)
+const RHYTHM_GAP = 5; // semitones: the rhythm layer starts a fourth above the pad's top note
 
 // Octave offsets each role may use (keeps bass audible, lead not shrill).
 export const OCTAVE_LIMITS = { pad: [-2, 1], bass: [-1, 1], lead: [-2, 1], counter: [-1, 1] };
+// (the rhythm layer's is kept apart so the pad's rule pages and links, which list OCTAVE_LIMITS, stay as they were)
+export const RHYTHM_OCTAVES = [-2, 1];
 export const OCTAVE_WANDER = { off: 'Off', centered: 'Centered on its octave', wandering: 'Wandering' };
 export const DEFAULT_VOICES = {
     pad: { octave: 0, wander: 'off', chance: 0.3 },
     bass: { octave: 0, wander: 'off', chance: 0.3 },
     lead: { octave: 0, wander: 'off', chance: 0.3 },
     counter: { octave: 0, wander: 'off', chance: 0.3 },
+    rhythm: { octave: 0, wander: 'off', chance: 0.3 },
 };
 
 // The colour layer (settings panel "Colour"): everything here is off or
@@ -105,7 +113,8 @@ const voiceOf = (settings, role) => (settings.voices && settings.voices[role]) |
 const pedalOf = (settings) => settings.pedal || DEFAULT_PEDAL;
 const counterOf = (settings) => settings.counter || DEFAULT_COUNTER;
 const sectionsOf = (settings) => settings.sections || DEFAULT_SECTIONS;
-const clampOctave = (role, o) => Math.max(OCTAVE_LIMITS[role][0], Math.min(OCTAVE_LIMITS[role][1], o));
+const octaveLimits = (role) => OCTAVE_LIMITS[role] || RHYTHM_OCTAVES;
+const clampOctave = (role, o) => Math.max(octaveLimits(role)[0], Math.min(octaveLimits(role)[1], o));
 
 // A role's octave for the next phrase: at most one octave from the last.
 function nextOctave(role, previous, voice, rng) {
@@ -132,6 +141,47 @@ export const PAD_STYLES = {
 };
 export const BASS_STYLES = { whole: 'Whole bar', half: 'Per beat group', walking: 'Walking', drive: 'Driving pulse' };
 
+// What the chord voices play (settings.layers). combined: one voice, every style, switching per phrase (the pad role);
+// pad: held styles only; rhythm: running styles only, on the rhythm role; split: held on the pad and running on the rhythm role, together.
+export const LAYERS = { combined: 'One voice', pad: 'Pad', rhythm: 'Rhythm', split: 'Pad and rhythm' };
+// The rules that keep the two layers apart when both play (layers 'split'); each is a switch, and none applies to the other modes.
+export const LAYER_RULES = {
+    register: 'Pad low, rhythm layer a fourth or more above it',
+    ownership: 'The bass has the root; the pad plays guide tones',
+    attacks: 'The rhythm layer stays off the pad attacks',
+    density: 'Cap the attacks per beat across lead, second lead and rhythm',
+    clear: 'The rhythm layer leaves the lead notes (and their octaves) alone',
+    entrances: 'Pad alone in the intro, rhythm layer out of breakdowns',
+    mix: 'The rhythm layer is brought forward, and not ducked under the lead',
+};
+export const DEFAULT_LAYER_RULES = Object.fromEntries(Object.keys(LAYER_RULES).map((k) => [k, true]));
+// The layers changing over time (settings.layerFlow): `sections` gives each section its own (intro the pad alone, build and full
+// both, breakdown the rhythm part alone: the planner with sections, composition/arrangerLatest.js); `journey` walks through
+// JOURNEY, each stop lasting `phrases` phrases (decided here, with no random draws).
+export const LAYER_FLOWS = { off: 'Fixed', sections: 'With the sections', journey: 'A journey' };
+export const FLOW_PHRASES = [2, 4, 8];
+export const DEFAULT_LAYER_FLOW = { mode: 'off', phrases: 4 };
+export const JOURNEY = ['pad', 'split', 'rhythm', 'split', 'combined'];
+export const SECTION_LAYERS = { intro: 'pad', build: 'split', full: 'split', breakdown: 'rhythm' };
+/** The layers the voices are for: both parts have a voice whenever the layers move, since any of them may play. */
+export const voiceLayers = (settings) => ((settings.layerFlow?.mode ?? 'off') === 'off' ? settings.layers ?? 'combined' : 'split');
+/**
+ * Whether the layers were changed (not by a flow, which moves at phrase starts) since the phrase that goes on: then the phrase
+ * ends and a new one starts at this bar, so the new parts play from the next bar and not from the next phrase, while the voices
+ * have already been swapped for them (Generator.pendingVoices change at a bar).
+ */
+export const layersSwitched = (settings, phrase) => (settings.layerFlow?.mode ?? 'off') === 'off' && !!phrase && (phrase.layers ?? 'combined') !== (settings.layers ?? 'combined');
+function phraseLayers(settings, previous) {
+    const flow = settings.layerFlow ?? DEFAULT_LAYER_FLOW;
+    if (flow.mode !== 'journey') return { layers: settings.layers ?? 'combined' };
+    const dwell = flow.phrases ?? DEFAULT_LAYER_FLOW.phrases, last = previous && previous.flow;
+    if (!last) return { layers: JOURNEY[0], flow: { step: 0, count: 1 } };
+    const step = last.count >= dwell ? (last.step + 1) % JOURNEY.length : last.step;
+    return { layers: JOURNEY[step], flow: { step, count: step === last.step ? last.count + 1 : 1 } };
+}
+export const HELD_STYLES = ['sustain', 'rolled', 'stacked'];
+export const RUNNING_STYLES = ['pulse', 'arpeggio', 'sequence'];
+
 // Relative weights per phrase (any scale; only ratios matter).
 export const DEFAULT_PAD_WEIGHTS = { sustain: 55, pulse: 25, arpeggio: 20, sequence: 0, rolled: 10, stacked: 8 };
 export const DEFAULT_BASS_WEIGHTS = { whole: 35, half: 45, walking: 20, drive: 0 };
@@ -147,6 +197,12 @@ export function styleShares(weights) {
 
 // All weights at zero means "no preference", not "nothing".
 const pickStyle = (rng, weights) => weighted(rng, total(weights) > 0 ? weights : styleShares(weights));
+
+// The weights restricted to some styles; a preset with none of them set gets the defaults' share of them.
+function onlyStyles(weights, keys) {
+    const kept = Object.fromEntries(Object.keys(weights).map((k) => [k, keys.includes(k) ? weights[k] : 0]));
+    return total(kept) > 0 ? kept : Object.fromEntries(Object.keys(weights).map((k) => [k, keys.includes(k) ? DEFAULT_PAD_WEIGHTS[k] ?? 0 : 0]));
+}
 
 // How each pad style is played: a pattern per phrase, in proportion to
 // its weight (as the styles).
@@ -358,6 +414,9 @@ function decidePhrase(bar, prevPhrase, meter, settings, rng) {
     const prevOctaves = (prevPhrase && prevPhrase.octaves) || {};
     const octaves = Object.fromEntries(Object.keys(OCTAVE_LIMITS).map((role) =>
         [role, nextOctave(role, prevOctaves[role], voiceOf(settings, role), rng)]));
+    const { layers, flow } = phraseLayers(settings, prevPhrase);
+    // (drawn only with a rhythm layer, so the other modes draw exactly what they did)
+    if (layers === 'split' || layers === 'rhythm') octaves.rhythm = nextOctave('rhythm', prevOctaves.rhythm, voiceOf(settings, 'rhythm'), rng);
     const sections = sectionsOf(settings);
     const section = decideSection(bar, prevPhrase && prevPhrase.section, sections, rng);
     const shape = section ? SECTIONS[section.type][sections.mode] : {};
@@ -370,18 +429,30 @@ function decidePhrase(bar, prevPhrase, meter, settings, rng) {
     const repeat = leadActive && settings.leadRepeat > 0 && prevPhrase && prevPhrase.leadActive && prevPhrase.motif && chance(rng, settings.leadRepeat);
     if (repeat) motif = prevPhrase.motif;
 
-    let padStyle = pickStyle(rng, settings.padWeights);
+    // The first chord part: the pad (held styles only with a pad layer), or the only part - the rhythm layer's - when there is no pad.
+    const padWeights = layers === 'combined' ? settings.padWeights
+        : onlyStyles(settings.padWeights, layers === 'rhythm' ? RUNNING_STYLES : HELD_STYLES);
+    let padStyle = pickStyle(rng, padWeights);
     // Density budget: under the lead, re-pick among the other styles -
     // unless arpeggio is the only one allowed, which then wins.
     if (leadActive && settings.thinPadUnderLead && padStyle === 'arpeggio') {
-        const others = { ...settings.padWeights, arpeggio: 0 };
+        const others = { ...padWeights, arpeggio: 0 };
         if (total(others) > 0) padStyle = weighted(rng, others);
     }
 
     const response = repeat ? prevPhrase.response : motif ? vary(motif, meter, rng) : null;
     const bassStyle = pickStyle(rng, settings.bassWeights);
-    padStyle = shape.padStyle || padStyle;
-    const { pattern: padPattern, step: padStep } = decidePadPattern(padStyle, meter, leadActive, settings, rng);
+    // (a section's replacement style is a held one: it belongs to the pad, never to a running rhythm layer)
+    if (layers !== 'rhythm') padStyle = shape.padStyle || padStyle;
+    let { pattern: padPattern, step: padStep } = decidePadPattern(padStyle, meter, leadActive, settings, rng);
+    let rhythm = null;
+    if (layers === 'rhythm') {
+        rhythm = { style: padStyle, pattern: padPattern, step: padStep };
+        padStyle = null; padPattern = null; padStep = 1;
+    } else if (layers === 'split') {
+        const style = pickStyle(rng, onlyStyles(settings.padWeights, RUNNING_STYLES));
+        rhythm = { style, ...decidePadPattern(style, meter, leadActive, settings, rng) };
+    }
     const pedal = pedalOf(settings);
     const pedalNote = pedal.mode !== 'off' && chance(rng, pedal.amount) ? pedal.mode : null;
     const padLift = nextPadLift(prevPhrase && prevPhrase.padLift, padMotionOf(settings).lean, rng);
@@ -396,6 +467,8 @@ function decidePhrase(bar, prevPhrase, meter, settings, rng) {
         padStyle,
         padPattern,
         padStep,
+        ...(flow ? { flow } : {}),
+        ...(layers === 'combined' && !flow ? {} : { layers, rhythmStyle: rhythm?.style ?? null, rhythmPattern: rhythm?.pattern ?? null, rhythmStep: rhythm?.step ?? 1 }),
         padLift,
         bassStyle: shape.bassStyle || bassStyle,
         pedal: pedalNote,
@@ -463,9 +536,9 @@ export function chordOrder(direction, n) {
     return all;
 }
 
-function padEvents({ chordStart, barsLeftInChord, meter, voicing, style, pattern, step = 1, thin, range, swell = 1, closeFigure = false }) {
+function padEvents({ role = 'pad', chordStart, barsLeftInChord, meter, voicing, style, pattern, step = 1, thin, range, swell = 1, closeFigure = false }) {
     const base = (thin ? 0.48 : 0.6) * swell;
-    const ev = (midi, beat, length, velocity) => ({ role: 'pad', midi, beat, length, velocity });
+    const ev = (midi, beat, length, velocity) => ({ role, midi, beat, length, velocity });
 
     if (style === 'pulse') {
         const starts = groupStarts(meter);
@@ -659,7 +732,7 @@ function harmonyEvents(leadNotes, scalePcs, range) {
  */
 export function arrangeBar({ bar, meter, chord, nextChord, scalePcs, chordStart, barsLeftInChord, prev, settings, rng, phraseBars = PHRASE_BARS, phraseBoundary = bar % PHRASE_BARS === 0, closeFigure = false }) {
     // a new time signature (mid-phrase, while playing) needs rhythms in it
-    const phrase = !prev || phraseBoundary || bar - prev.phrase.start >= phraseBars || prev.phrase.units !== meter.units
+    const phrase = !prev || phraseBoundary || bar - prev.phrase.start >= phraseBars || prev.phrase.units !== meter.units || layersSwitched(settings, prev.phrase)
         ? decidePhrase(bar, prev && prev.phrase, meter, settings, rng)
         : prev.phrase;
 
@@ -674,37 +747,63 @@ export function arrangeBar({ bar, meter, chord, nextChord, scalePcs, chordStart,
         lead: shift(LEAD_RANGE, octave('lead')),
         counter: shift(COUNTER_RANGE, octave('counter')),
     };
+    const rules = phrase.layers === 'split' ? { ...DEFAULT_LAYER_RULES, ...settings.layerRules } : {};
+    // The pad stays in the low middle (G3 to about B4) so the rhythm layer has room above it.
+    if (rules.register) ranges.pad = shift([PAD_RANGE[0] + PAD_RAISE_WITH_RHYTHM, PAD_RANGE[0] + PAD_RAISE_WITH_RHYTHM + PAD_SPAN_WITH_RHYTHM], octave('pad'));
+    // (only with a rhythm layer: the range is stored in the state, which is not to change for the other modes)
+    if (phrase.layers === 'split' || phrase.layers === 'rhythm') ranges.rhythm = shift(phrase.layers === 'split' ? RHYTHM_RANGE : PAD_RANGE, octave('rhythm'));
 
-    // Re-voice on a new chord, or when the pad's register moved (voice
-    // leading from the old voicing keeps that move as small as possible).
-    const padMoved = prev && prev.padVoicing && prev.padVoicing.some((m) => m < ranges.pad[0] || m > ranges.pad[1]);
     // The phrase's lean pulls the voicing a little low or high in the range
     // (not while it follows an octave move - one jump at a time).
     // padContour: the pad rises toward the middle of a phrase and settles at its end, and its top voice prefers to move against the bass.
     const contour = settings.padContour ?? 0, phrasePos = Math.min(1, Math.max(0, (bar - phrase.start + 0.5) / Math.max(1, phraseBars)));
-    const padTarget = padMoved ? null : (ranges.pad[0] + ranges.pad[1]) / 2 + (phrase.padLift || 0) * PAD_LIFT_STEP + contour * PAD_ARC * (Math.sin(Math.PI * phrasePos) - 0.65);
     // The bass pedal (if any) is decided before the pad so the pad can leave a root the bass is playing. Running figures (arpeggio, sequence) keep the full chord: three notes would repeat pitches.
     const pedalPc = phrase.pedal ? scalePcs[phrase.pedal === 'fifth' ? 4 % scalePcs.length : 0] : null;
-    const padPcs = padPitchClasses(chord.pitchClasses, { rule: ['arpeggio', 'sequence'].includes(phrase.padStyle) ? 'always' : settings.padRoot, bassPc: phrase.bass === false ? null : (pedalPc ?? chord.pitchClasses[0]) });
     // Voice leading across a change of chord size is only used with the new pad rules, so a preset without them voices exactly as before.
-    const sizeAware = (settings.padRoot ?? 'always') !== 'always' || settings.chordSize === 'functional';
-    const voicing = chordStart || !prev || padMoved || prev.padVoicing.length !== padPcs.length
-        ? voiceLead(padPcs, ranges.pad[0], ranges.pad[1], prev && (sizeAware || prev.padVoicing.length === padPcs.length) ? prev.padVoicing : null, padTarget,
-            { contrary: contour * 4, against: prev && prev.bassMidi ? Math.sign(nearest(notesInRange([chord.pitchClasses[0]], ranges.bass[0], ranges.bass[1]), prev.bassMidi) - prev.bassMidi) : 0 })
-        : prev.padVoicing;
-    const pad = padEvents({
-        chordStart: chordStart || !prev || padMoved,
-        barsLeftInChord,
-        meter,
-        voicing: settings.chordSpread === 'open' ? openVoicing(voicing, ranges.pad[0]) : voicing,
-        style: phrase.padStyle,
-        pattern: phrase.padPattern,
-        closeFigure,
-        step: phrase.padStep,
-        thin: phrase.leadActive && settings.thinPadUnderLead,
-        range: ranges.pad,
-        swell: padSwell(padMotionOf(settings).swell, bar - phrase.start),
-    });
+    // With the root left to the bass (and a pad to hold the guide tones), the pad plays it only where the bass does not.
+    const padRule = rules.ownership && (settings.padRoot ?? 'always') === 'always' ? 'unlessBass' : settings.padRoot;
+    const sizeAware = (padRule ?? 'always') !== 'always' || settings.chordSize === 'functional';
+    // One chord part (the pad, or the rhythm layer): re-voiced on a new chord, or when its register moved (voice
+    // leading from the old voicing keeps that move as small as possible).
+    const chordPart = ({ role, style, pattern, step, range, prevVoicing }) => {
+        const moved = prev && prevVoicing && prevVoicing.some((m) => m < range[0] || m > range[1]);
+        const target = moved ? null : (range[0] + range[1]) / 2 + (phrase.padLift || 0) * PAD_LIFT_STEP + contour * PAD_ARC * (Math.sin(Math.PI * phrasePos) - 0.65);
+        const rule = role === 'rhythm' || ['arpeggio', 'sequence'].includes(style) ? 'always' : padRule;
+        const pcs = padPitchClasses(chord.pitchClasses, { rule, bassPc: phrase.bass === false ? null : (pedalPc ?? chord.pitchClasses[0]) });
+        // (a bar planned before this part existed - the layers changed mid-piece - has no voicing of it to lead from)
+        const voicing = chordStart || !prev || !prevVoicing || moved || prevVoicing.length !== pcs.length
+            ? voiceLead(pcs, range[0], range[1], prev && prevVoicing && (sizeAware || prevVoicing.length === pcs.length) ? prevVoicing : null, target,
+                { contrary: contour * 4, against: prev && prev.bassMidi ? Math.sign(nearest(notesInRange([chord.pitchClasses[0]], ranges.bass[0], ranges.bass[1]), prev.bassMidi) - prev.bassMidi) : 0 })
+            : prevVoicing;
+        const events = padEvents({
+            role,
+            chordStart: chordStart || !prev || moved,
+            barsLeftInChord,
+            meter,
+            voicing: settings.chordSpread === 'open' ? openVoicing(voicing, range[0]) : voicing,
+            style,
+            pattern,
+            closeFigure,
+            step,
+            thin: phrase.leadActive && settings.thinPadUnderLead,
+            range,
+            swell: padSwell(padMotionOf(settings).swell, bar - phrase.start),
+        });
+        return { voicing, events };
+    };
+    const layers = phrase.layers ?? 'combined';
+    const padPart = layers === 'rhythm' ? null
+        : chordPart({ role: 'pad', style: phrase.padStyle, pattern: phrase.padPattern, step: phrase.padStep, range: ranges.pad, prevVoicing: prev && prev.padVoicing });
+    if (rules.register && padPart) {
+        // the rhythm layer starts a fourth over the highest pad note, and keeps room for a chord above that
+        const low = Math.max(ranges.rhythm[0], Math.max(...padPart.voicing) + RHYTHM_GAP);
+        ranges.rhythm = [low, Math.max(ranges.rhythm[1], low + 12)];
+    }
+    const rhythmPart = layers === 'split' || layers === 'rhythm'
+        ? chordPart({ role: 'rhythm', style: phrase.rhythmStyle, pattern: phrase.rhythmPattern, step: phrase.rhythmStep, range: ranges.rhythm, prevVoicing: prev && prev.rhythmVoicing })
+        : null;
+    const pad = padPart ? padPart.events : [];
+    const voicing = (padPart || rhythmPart).voicing;
 
     // A pedal: the bass holds the key's tonic (or fifth) whatever the chord does.
     const bass = bassEvents({
@@ -741,7 +840,7 @@ export function arrangeBar({ bar, meter, chord, nextChord, scalePcs, chordStart,
     }
 
     return {
-        events: [...pad, ...(phrase.bass === false ? [] : bass.events), ...lead.events, ...counter.events],
-        state: { phrase, padVoicing: voicing, bassMidi: bass.bassMidi, leadMidi: lead.midi, counterMidi: counter.midi, ranges },
+        events: [...pad, ...(rhythmPart ? rhythmPart.events : []), ...(phrase.bass === false ? [] : bass.events), ...lead.events, ...counter.events],
+        state: { phrase, padVoicing: voicing, ...(rhythmPart ? { rhythmVoicing: rhythmPart.voicing } : {}), bassMidi: bass.bassMidi, leadMidi: lead.midi, counterMidi: counter.midi, ranges },
     };
 }

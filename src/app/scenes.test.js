@@ -1,4 +1,4 @@
-import { SCENES, BROWSABLE_SCENES, SCENE_CATEGORIES, SCENE_BROWSE_ORDER, stepBuiltinSceneEntry, stepBuiltinScene, sceneSettings, sceneGroup, SCENE_GROUPS, buildSetup, parseSetup, normalizeScene, sceneSlug, sceneBySlug, presetFromSearch, introFromSearch } from './scenes';
+import { SCENES, BROWSABLE_SCENES, SCENE_CATEGORIES, SCENE_BROWSE_ORDER, stepBuiltinSceneEntry, stepBuiltinScene, sceneSettings, sceneGroup, SCENE_GROUPS, buildSetup, parseSetup, normalizeScene, sceneVoiceSpec, sceneSlug, sceneBySlug, presetFromSearch, introFromSearch } from './scenes';
 import { scaleById } from './theory';
 import { findPreset, sanitizePreset } from './editor/presetStore';
 import { SHAREABLE_PRESETS } from './shareCode';
@@ -231,4 +231,46 @@ test('regular browsing crosses categories and skips hidden archives, which still
         expect(stepBuiltinSceneEntry(scene.name, 1, category)).toBe(ordered[(i + 1) % ordered.length]);
         expect(stepBuiltinSceneEntry(scene.name, -1, category)).toBe(ordered[(i - 1 + ordered.length) % ordered.length]);
     }
+});
+
+describe('layer voices (the voices for a pad and a rhythm part, by preset)', () => {
+    const withLayers = SCENES.filter((s) => s.layerVoices);
+
+    test('most presets have them, each a real shareable voice, and the preset keeps a voice that is not its own', () => {
+        expect(withLayers.length).toBeGreaterThan(80);
+        withLayers.forEach((scene) => {
+            expect(Object.keys(scene.layerVoices).every((role) => role === 'pad' || role === 'rhythm')).toBe(true);
+            expect(scene.layerVoices.rhythm, scene.name).toBeTruthy();
+            Object.values(scene.layerVoices).forEach((name) => { expect(findPreset(name), `${scene.name}: ${name}`).toBeTruthy(); });
+            // either its own voice becomes the rhythm part (and a pad is chosen), or a rhythm part is chosen (and its own voice is the pad)
+            if (scene.layerVoices.pad) expect(scene.layerVoices.rhythm).toBe(scene.voices.pad);
+            else expect(scene.layerVoices.rhythm).not.toBe(scene.voices.pad);
+            // a pad that has a voice made for it is not the voice the preset uses for another part
+            expect(Object.entries(scene.voices).filter(([role]) => role !== 'pad').map(([, v]) => v)).not.toContain(scene.layerVoices.pad);
+            expect(sceneSettings(scene, 1).volumes.rhythm).toBeGreaterThan(0);
+        });
+    });
+
+    test('a hidden revision copy carries the same layer voices as the preset it matches', () => {
+        SCENES.filter((s) => s.comparisonOf && JSON.stringify(s.voices) === JSON.stringify(sceneBySlug(s.comparisonOf)?.voices))
+            .forEach((s) => expect(s.layerVoices).toEqual(sceneBySlug(s.comparisonOf).layerVoices));
+    });
+
+    test('the voice for a role: the preset\'s own, the made ones with the layers split, a preset\'s own pad voice for a lone rhythm part', () => {
+        const pad = withLayers.find((s) => s.layerVoices.pad), rhythmOnly = withLayers.find((s) => !s.layerVoices.pad);
+        expect(sceneVoiceSpec(pad, 'pad', 'combined')).toBe(pad.voices.pad);
+        expect(sceneVoiceSpec(pad, 'pad', 'split')).toBe(pad.layerVoices.pad);
+        expect(sceneVoiceSpec(pad, 'rhythm', 'combined')).toBe(pad.layerVoices.rhythm); // ready before it is wanted
+        expect(sceneVoiceSpec(rhythmOnly, 'pad', 'split')).toBe(rhythmOnly.voices.pad);
+        expect(sceneVoiceSpec(rhythmOnly, 'lead', 'split')).toBe(rhythmOnly.voices.lead);
+        const plain = { voices: { pad: 'Soft Pad' } };
+        expect(sceneVoiceSpec(plain, 'rhythm', 'split')).toBeUndefined();
+        expect(sceneVoiceSpec(plain, 'rhythm', 'rhythm')).toBe('Soft Pad');
+    });
+
+    test('normalizing keeps only a pad and a rhythm voice, by name', () => {
+        const scene = normalizeScene({ name: 'x', settings: {}, voices: { pad: 'Soft Pad' }, layerVoices: { pad: 'Velvet Pad', rhythm: 'Music Box', lead: 'Glass Lead', bass: 5 } });
+        expect(scene.layerVoices).toEqual({ pad: 'Velvet Pad', rhythm: 'Music Box' });
+        expect(normalizeScene({ name: 'x', settings: {}, voices: {}, layerVoices: 'nope' })).not.toHaveProperty('layerVoices');
+    });
 });

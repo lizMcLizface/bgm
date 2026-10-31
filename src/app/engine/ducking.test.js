@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { Ducker, duckFloor, automateDuck } from './ducking';
+import { Ducker, duckFloor, duckedBy, automateDuck } from './ducking';
 
 // records the automation and evaluates it the way an AudioParam would, roughly
 function param() {
@@ -33,5 +33,14 @@ describe('ducking', () => {
         automateDuck(p, 'pad', [{ role: 'lead', time: 10, duration: 1 }, { role: 'bass', time: 12, duration: 1 }], 1, 9);
         expect(p.target(1.5)).toBeLessThan(1);
         expect(p.target(3.5)).toBe(1);
+    });
+});
+
+describe('the rhythm layer', () => {
+    test('ducks as the pad does when it plays alone, and not at all beside a pad', () => {
+        for (const layers of [undefined, 'combined', 'pad', 'rhythm']) expect(duckFloor('rhythm', 'lead', 1, layers)).toBeCloseTo(10 ** (-6 / 20));
+        expect(duckFloor('rhythm', 'lead', 1, 'split')).toBe(1);
+        expect(duckFloor('pad', 'lead', 1, 'split')).toBeCloseTo(10 ** (-6 / 20)); // the pad still makes room
+        expect(duckedBy('split').rhythm).toEqual({});
     });
 });

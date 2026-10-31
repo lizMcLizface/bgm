@@ -206,11 +206,14 @@ const placed = (pc, [low, high], near) => {
 
 /**
  * The chord and bass lanes of a bar: the chord's tones as short stabs and its root as a bass line, on the steps of the
- * stage's 'pad' and 'bass' rows. `gate` is the length in beats. Returns events for roles 'pad' and 'bass'.
+ * stage's 'pad' and 'bass' rows. `gate` is the length in beats. Returns events for roles 'pad' and 'bass', and with `layers` 'split' or 'rhythm' for 'rhythm' too.
  * Besides the stab (x, f accent) the chord row can hold the chord (h: all its tones, until the next hit), stack it (s: one tone
  * more at each s, from the bottom, the top or the outside in, all held until the next hit) or arpeggiate it (a: one tone at a time, walking up, down, back and forth or in leaps, a different walk each bar).
  */
-export function sequencerLanes({ meter, seq, chord, slotIndex = 0, bar = 0, seed = 0 }) {
+export function sequencerLanes({ meter, seq, chord, slotIndex = 0, bar = 0, seed = 0, layers = 'combined' }) {
+    // With a rhythm part (layers 'split' or 'rhythm') the short hits - stabs, single tones and arpeggio steps - are its, and the chords held
+    // or stacked over the steps stay the pad's, or the rhythm part's too when it plays alone.
+    const rhythmic = layers === 'split' || layers === 'rhythm' ? 'rhythm' : 'pad', heldRole = layers === 'rhythm' ? 'rhythm' : 'pad';
     const stages = sequencerStages(seq);
     if (!stages || !chord?.pitchClasses?.length) return [];
     const stage = stages[stageForBar(seq, { slotIndex, bar })] ?? stages[1];
@@ -239,13 +242,13 @@ export function sequencerLanes({ meter, seq, chord, slotIndex = 0, bar = 0, seed
         const stab = stage.rows.pad?.[c], low = stage.rows.bass?.[c];
         if (stab === 'h') {
             stacked = 0;
-            for (const midi of tones) events.push({ role: 'pad', midi, beat: at, length: until(stage.rows.pad, s), velocity: 0.72, detune: 0, expression: { ...HELD_EXPRESSION } });
+            for (const midi of tones) events.push({ role: heldRole, midi, beat: at, length: until(stage.rows.pad, s), velocity: 0.72, detune: 0, expression: { ...HELD_EXPRESSION } });
         } else if (stab === 's') {
-            if (stacked < tones.length) events.push({ role: 'pad', midi: tones[stackOrder(stacked, tones.length)], beat: at, length: until(stage.rows.pad, s, 's'), velocity: 0.7, detune: 0, expression: { ...HELD_EXPRESSION } });
+            if (stacked < tones.length) events.push({ role: heldRole, midi: tones[stackOrder(stacked, tones.length)], beat: at, length: until(stage.rows.pad, s, 's'), velocity: 0.7, detune: 0, expression: { ...HELD_EXPRESSION } });
             stacked++;
         } else if (stab === 'a') {
             stacked = 0;
-            events.push({ role: 'pad', midi: ladder[walk[arped++ % walk.length] % ladder.length], beat: at, length: Math.min(gate, 0.5 * meter.unitsPerBeat), velocity: 0.74, detune: 0 });
+            events.push({ role: rhythmic, midi: ladder[walk[arped++ % walk.length] % ladder.length], beat: at, length: Math.min(gate, 0.5 * meter.unitsPerBeat), velocity: 0.74, detune: 0 });
         } else if ((stab === 'x' || stab === 'f') && !(restBar && stab !== 'f')) {
             stacked = 0;
             const kept = stab === 'f' || v === 0 || rng() < keep;
@@ -254,9 +257,9 @@ export function sequencerLanes({ meter, seq, chord, slotIndex = 0, bar = 0, seed
                 if (single) {
                     const midi = ladder[contour[(walked + bar * 3) % contour.length] % ladder.length];
                     walked++;
-                    events.push({ role: 'pad', midi, beat: at, length: gate, velocity: 0.78, detune: 0 });
+                    events.push({ role: rhythmic, midi, beat: at, length: gate, velocity: 0.78, detune: 0 });
                 } else {
-                    for (const midi of tones) events.push({ role: 'pad', midi, beat: at, length: gate, velocity: stab === 'f' ? 0.95 : 0.7, detune: 0 });
+                    for (const midi of tones) events.push({ role: rhythmic, midi, beat: at, length: gate, velocity: stab === 'f' ? 0.95 : 0.7, detune: 0 });
                 }
             }
         }

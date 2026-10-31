@@ -13,8 +13,8 @@ import PROGRESSIONS, { PROGRESSION_LENGTHS, progressionsOfLength, isSpecialProgr
 import { METERS } from './meter';
 import { DEFAULT_DRIFT, DRIFT_MODES, TEMPO_BOUNDS } from './conductor';
 import {
-    OCTAVE_LIMITS, OCTAVE_WANDER, DEFAULT_PAD_WEIGHTS, DEFAULT_BASS_WEIGHTS, DEFAULT_PULSE_WEIGHTS, DEFAULT_ARP_WEIGHTS, DEFAULT_DIRECTION_WEIGHTS, DEFAULT_PAD_MOTION,
-    COUNTER_MODES, SECTION_MODES, SECTION_LENGTHS,
+    OCTAVE_LIMITS, RHYTHM_OCTAVES, OCTAVE_WANDER, DEFAULT_PAD_WEIGHTS, DEFAULT_BASS_WEIGHTS, DEFAULT_PULSE_WEIGHTS, DEFAULT_ARP_WEIGHTS, DEFAULT_DIRECTION_WEIGHTS, DEFAULT_PAD_MOTION,
+    COUNTER_MODES, SECTION_MODES, SECTION_LENGTHS, HELD_STYLES, styleShares,
 } from './arranger';
 import { PRESET_CATEGORIES, ROLE_CATEGORY } from './presets';
 import { presetGroups } from './editor/presetStore';
@@ -254,7 +254,7 @@ export function randomVoices(settings, current, level, rng = Math.random, groups
     const presets = Object.fromEntries(roles.map((role) => [role, randomPreset(role, current[role], level, rng, groups)]));
     const wild = level === 'wild';
     const voices = Object.fromEntries(roles.map((role) => {
-        const [lo, hi] = OCTAVE_LIMITS[role];
+        const [lo, hi] = OCTAVE_LIMITS[role] ?? RHYTHM_OCTAVES;
         if (wild) {
             return [role, { octave: intBetween(rng, lo, hi), wander: pick(rng, Object.keys(OCTAVE_WANDER)), chance: step(rng(), 0.05) }];
         }
@@ -388,10 +388,21 @@ export function randomAmbienceShape(level, rng = Math.random) {
     }));
 }
 
-/** Lead activity, pad thinning, pad and bass styles and patterns, feel, second lead and sections. */
+/**
+ * What plays the chords: one voice, a pad, a rhythm part or both. Full random anything; within reason it follows the styles chosen
+ * (mostly held styles suit a pad, mostly running ones a rhythm part, a mix suits both) and one voice stays the most likely.
+ */
+export function randomLayers(padWeights, level, rng = Math.random) {
+    if (level === 'wild') return pick(rng, ['combined', 'pad', 'rhythm', 'split']);
+    const shares = styleShares(padWeights);
+    const held = HELD_STYLES.reduce((sum, k) => sum + (shares[k] ?? 0), 0);
+    return weighted(rng, held >= 0.65 ? { combined: 4, pad: 2, split: 3 } : held <= 0.35 ? { combined: 4, rhythm: 2, split: 3 } : { combined: 4, split: 4, pad: 1, rhythm: 1 });
+}
+
+/** Lead activity, pad thinning, pad and bass styles and patterns, feel, second lead, sections and what plays the chords. */
 export function randomArrangement(settings, level, rng = Math.random) {
     const wild = level === 'wild';
-    return {
+    const arrangement = {
         counter: randomCounter(level, rng),
         sections: randomSections(level, rng),
         leadActivity: wild ? step(rng(), 0.05) : step(between(rng, 0.4, 0.8), 0.05),
@@ -409,6 +420,9 @@ export function randomArrangement(settings, level, rng = Math.random) {
                 detune: step(DEFAULT_HUMANIZE.detune * between(rng, 0.5, 1.5), 0.5),
             },
     };
+    // (drawn last, so the rest of an arrangement is what it was for the same random numbers)
+    arrangement.layers = randomLayers(arrangement.padWeights, level, rng);
+    return arrangement;
 }
 
 /**

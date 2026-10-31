@@ -50,7 +50,7 @@ describe('patterns link', () => {
 
     it('writes them back', () => {
         const letter = (id, anchor) => ['E', 'A', 'D'][anchor];
-        expect(patternsParam({ piano: true, guitar: true, bass: false }, { guitar: { mode: 'played', anchor: 2 } }, letter)).toBe('piano.played..lcpb,guitar.played.D.pt');
+        expect(patternsParam({ piano: true, guitar: true, bass: false }, { guitar: { mode: 'played', anchor: 2 } }, letter)).toBe('piano.played..lcpbr,guitar.played.D.prt');
         expect(patternsParam({ guitar: true, bass: true }, { guitar: { mode: 'scale' }, bass: { track: false } }, letter)).toBe('guitar.scale.E,bass.played.E.bu');
         expect(patternsParam({ guitar: true }, { guitar: { mode: 'played', anchor: 1, voices: ['bass', 'lead'], exact: false, track: true } }, letter)).toBe('guitar.played.A.lbat');
         expect(patternsFromSearch('?patterns=guitar.played.E.pu').options.guitar.track).toBe(false);

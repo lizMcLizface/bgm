@@ -1,4 +1,4 @@
-import { arrangeBar, notesInRange, styleShares, PAD_RANGE, BASS_RANGE, LEAD_RANGE, PHRASE_BARS, DEFAULT_PAD_WEIGHTS, DEFAULT_BASS_WEIGHTS, DEFAULT_VOICES, OCTAVE_LIMITS, pentatonicOf, openVoicing, chordOrder, DEFAULT_DIRECTION_WEIGHTS } from './arranger';
+import { arrangeBar, notesInRange, styleShares, PAD_RANGE, RHYTHM_RANGE, BASS_RANGE, LEAD_RANGE, PHRASE_BARS, DEFAULT_PAD_WEIGHTS, DEFAULT_BASS_WEIGHTS, DEFAULT_VOICES, OCTAVE_LIMITS, pentatonicOf, openVoicing, chordOrder, DEFAULT_DIRECTION_WEIGHTS, JOURNEY } from './arranger';
 import { scaleById, scaleSemitones, diatonicChord } from './theory';
 import { seeded } from './random';
 import { METERS, groupStarts, beatStarts } from './meter';
@@ -519,3 +519,175 @@ test('the chord styles: rolled strums, stacked enters note by note, each in its 
     expect(new Set(stacked.map((e) => e.beat)).size).toBe(stacked.length);
     expect(new Set(stacked.map((e) => (e.beat + e.length).toFixed(3))).size).toBe(1);
 }); 
+
+// --- layers (settings.layers): pad, rhythm, both, or one voice ---------------
+
+describe('layers', () => {
+    const MIXED = { ...AUTO, padWeights: { sustain: 30, pulse: 20, arpeggio: 20, sequence: 10, rolled: 10, stacked: 10 } };
+    const phrasesOf = (layers, settings = MIXED) => run({ settings: { ...settings, layers }, bars: 64, seed: 5 }).filter((b) => b.bar % PHRASE_BARS === 0).map((b) => b.state.phrase);
+
+    test('combined is the default and adds nothing to the state', () => {
+        expect(run({ settings: { ...MIXED, layers: 'combined' } })).toEqual(run({ settings: MIXED }));
+        run({ settings: MIXED }).forEach((b) => {
+            expect(b.state.phrase.layers).toBeUndefined();
+            expect(b.state.rhythmVoicing).toBeUndefined();
+            expect(b.state.ranges.rhythm).toBeUndefined();
+            expect(byRole(b, 'rhythm')).toEqual([]);
+        });
+    });
+
+    test('pad plays held styles only, and no rhythm events', () => {
+        phrasesOf('pad').forEach((p) => expect(['sustain', 'rolled', 'stacked']).toContain(p.padStyle));
+        run({ settings: { ...MIXED, layers: 'pad' } }).forEach((b) => expect(byRole(b, 'rhythm')).toEqual([]));
+    });
+
+    test('rhythm plays running styles only, on the rhythm role, and no pad', () => {
+        phrasesOf('rhythm').forEach((p) => {
+            expect(['pulse', 'arpeggio', 'sequence']).toContain(p.rhythmStyle);
+            expect(p.padStyle).toBeNull();
+        });
+        const bars = run({ settings: { ...MIXED, layers: 'rhythm' } });
+        bars.forEach((b) => expect(byRole(b, 'pad')).toEqual([]));
+        expect(bars.some((b) => byRole(b, 'rhythm').length > 0)).toBe(true);
+        // alone it keeps the pad's register
+        bars.forEach((b) => byRole(b, 'rhythm').forEach((e) => { expect(e.midi).toBeGreaterThanOrEqual(PAD_RANGE[0]); expect(e.midi).toBeLessThanOrEqual(PAD_RANGE[1]); }));
+    });
+
+    test('rhythm ignores a section that holds the chord', () => {
+        const settings = { ...MIXED, layers: 'rhythm', sections: { mode: 'strong', phrases: 1 } };
+        phrasesOf('rhythm', settings).forEach((p) => expect(['pulse', 'arpeggio', 'sequence']).toContain(p.rhythmStyle));
+    });
+
+    const NO_RULES = { register: false, ownership: false, attacks: false, density: false, entrances: false, mix: false };
+
+    test('split plays a held pad and a running rhythm layer together', () => {
+        phrasesOf('split').forEach((p) => {
+            expect(['sustain', 'rolled', 'stacked']).toContain(p.padStyle);
+            expect(['pulse', 'arpeggio', 'sequence']).toContain(p.rhythmStyle);
+        });
+        const bars = run({ settings: { ...MIXED, layers: 'split' } });
+        expect(bars.some((b) => byRole(b, 'pad').length > 0 && byRole(b, 'rhythm').length > 0)).toBe(true);
+    });
+
+    test('with the rules off each layer keeps its own fixed range', () => {
+        run({ settings: { ...MIXED, layers: 'split', layerRules: NO_RULES } }).forEach((b) => {
+            byRole(b, 'pad').forEach((e) => { expect(e.midi).toBeGreaterThanOrEqual(PAD_RANGE[0]); expect(e.midi).toBeLessThanOrEqual(PAD_RANGE[1]); });
+            byRole(b, 'rhythm').forEach((e) => { expect(e.midi).toBeGreaterThanOrEqual(RHYTHM_RANGE[0]); expect(e.midi).toBeLessThanOrEqual(RHYTHM_RANGE[1]); });
+        });
+    });
+
+    test('register rule: the rhythm layer starts a fourth over the highest pad note', () => {
+        SEEDS.forEach((seed) => run({ settings: { ...MIXED, layers: 'split' }, seed }).forEach((b) => {
+            const top = Math.max(...b.state.padVoicing);
+            expect(b.state.ranges.rhythm[0]).toBeGreaterThanOrEqual(top + 5);
+            byRole(b, 'rhythm').forEach((e) => expect(e.midi).toBeGreaterThanOrEqual(top + 5));
+        }));
+    });
+
+    test('ownership rule: the pad leaves the root to the bass, the rhythm layer keeps the chord', () => {
+        const settings = { ...MIXED, layers: 'split', padWeights: { ...pads('sustain'), arpeggio: 1 } };
+        const bars = run({ settings, bars: 16 });
+        bars.forEach((b) => byRole(b, 'pad').forEach((e) => expect(pc(e.midi)).not.toBe(b.chord.pitchClasses[0])));
+        expect(bars.some((b) => byRole(b, 'rhythm').some((e) => pc(e.midi) === b.chord.pitchClasses[0]))).toBe(true);
+        // a preset that says never keeps saying it, and off leaves the root in
+        const without = run({ settings: { ...settings, layerRules: { ...NO_RULES } }, bars: 16 });
+        expect(without.some((b) => byRole(b, 'pad').some((e) => pc(e.midi) === b.chord.pitchClasses[0]))).toBe(true);
+    });
+
+    test('a preset with only held weights still gets a rhythm layer from the defaults', () => {
+        const held = { ...AUTO, padWeights: pads('sustain'), layers: 'split' };
+        phrasesOf('split', held).forEach((p) => { expect(p.padStyle).toBe('sustain'); expect(['pulse', 'arpeggio']).toContain(p.rhythmStyle); });
+    });
+
+    test.each(['pad', 'rhythm', 'split'])('%s is deterministic and every chord note is in the chord', (layers) => {
+        const settings = { ...MIXED, layers };
+        expect(run({ settings, seed: 9 })).toEqual(run({ settings, seed: 9 }));
+        run({ settings, seed: 9 }).forEach((b) => ['pad', 'rhythm'].forEach((role) => byRole(b, role).forEach((e) => expect(b.chord.pitchClasses).toContain(pc(e.midi)))));
+    });
+
+    test('the rhythm layer has an octave of its own', () => {
+        const settings = { ...MIXED, layers: 'split', layerRules: NO_RULES, voices: { ...DEFAULT_VOICES, rhythm: { octave: -1, wander: 'off', chance: 0.3 } } };
+        run({ settings }).forEach((b) => byRole(b, 'rhythm').forEach((e) => expect(e.midi).toBeLessThanOrEqual(RHYTHM_RANGE[1] - 12)));
+    });
+});
+
+describe('layers over time (a journey)', () => {
+    const MIXED = { ...AUTO, padWeights: { sustain: 30, pulse: 20, arpeggio: 20, sequence: 10, rolled: 10, stacked: 10 } };
+    const journey = (phrases, extra = {}) => ({ ...MIXED, layerFlow: { mode: 'journey', phrases }, ...extra });
+    const phrasesOf = (settings, bars = 160, extra = {}) => run({ settings, bars, seed: 3, ...extra }).filter((b) => b.bar % PHRASE_BARS === 0).map((b) => b.state.phrase);
+
+    test('walks through its stops, a set number of phrases at each, and round again', () => {
+        const layers = phrasesOf(journey(2), 4 * 2 * JOURNEY.length * 2).map((p) => p.layers);
+        const expected = [...JOURNEY, ...JOURNEY].flatMap((l) => [l, l]);
+        expect(layers).toEqual(expected);
+        expect(phrasesOf(journey(4), 4 * 4 * 3).map((p) => p.layers)).toEqual([JOURNEY[0], JOURNEY[0], JOURNEY[0], JOURNEY[0], JOURNEY[1], JOURNEY[1], JOURNEY[1], JOURNEY[1], JOURNEY[2], JOURNEY[2], JOURNEY[2], JOURNEY[2]]);
+    });
+
+    test('each stop plays what it says, and is the same every time', () => {
+        const settings = journey(2), bars = run({ settings, bars: 4 * 2 * JOURNEY.length, seed: 3 });
+        bars.forEach((b) => {
+            const has = (role) => byRole(b, role).length > 0, layers = b.state.phrase.layers;
+            if (layers === 'pad') expect(has('rhythm')).toBe(false);
+            if (layers === 'rhythm') expect(has('pad')).toBe(false);
+            if (layers === 'combined') expect(has('rhythm')).toBe(false);
+        });
+        expect(bars.some((b) => byRole(b, 'pad').length && byRole(b, 'rhythm').length)).toBe(true);
+        expect(run({ settings, bars: 60, seed: 3 })).toEqual(run({ settings, bars: 60, seed: 3 }));
+    });
+
+    test('a chord that holds across a change of stop still plays (no voicing to lead from for the new part)', () => {
+        for (const barsPerChord of [2, 3, 4]) {
+            const out = run({ settings: journey(2), bars: 4 * 2 * JOURNEY.length, seed: 4, barsPerChord });
+            out.forEach((b) => [...byRole(b, 'pad'), ...byRole(b, 'rhythm')].forEach((e) => expect(Number.isFinite(e.midi)).toBe(true)));
+        }
+    });
+
+    test('off leaves the layers as they were set, and a journey of the default dwell starts on the pad', () => {
+        expect(run({ settings: { ...MIXED, layers: 'split', layerFlow: { mode: 'off', phrases: 4 } } })).toEqual(run({ settings: { ...MIXED, layers: 'split' } }));
+        expect(phrasesOf({ ...MIXED, layerFlow: { mode: 'journey' } }, 8)[0].layers).toBe('pad');
+    });
+});
+
+describe('changing the layers while it plays', () => {
+    const MIXED = { ...AUTO, padWeights: { sustain: 30, pulse: 20, arpeggio: 20, sequence: 10, rolled: 10, stacked: 10 } };
+    const MODES = ['combined', 'pad', 'rhythm', 'split'];
+
+    // the settings change at `at`, the way a re-plan from that bar carries on from the bar before it
+    function runSwitching(from, to, { at, barsPerChord, bars = 24, seed = 2 }) {
+        const scale = scaleSemitones(scaleById('Major-1').intervals);
+        const chordAt = (bar) => ({ pitchClasses: diatonicChord(scale, [1, 5, 6, 4][Math.floor(bar / barsPerChord) % 4], 3).map((o) => o % 12) });
+        const rng = seeded(seed);
+        let prev = null;
+        const out = [];
+        for (let bar = 0; bar < bars; bar++) {
+            const { events, state } = arrangeBar({ bar, meter: METERS['4/4'], chord: chordAt(bar), nextChord: chordAt(bar + 1), scalePcs: scale, chordStart: bar % barsPerChord === 0,
+                barsLeftInChord: barsPerChord - (bar % barsPerChord), prev, settings: { ...MIXED, layers: bar < at ? from : to }, rng });
+            out.push({ bar, events, state });
+            prev = state;
+        }
+        return out;
+    }
+
+    test.each(MODES.flatMap((from) => MODES.filter((to) => to !== from).map((to) => [from, to])))('%s to %s, at a phrase start and in the middle of a chord', (from, to) => {
+        for (const barsPerChord of [1, 2, 3, 4]) for (const at of [4, 5, 6, 8]) {
+            const out = runSwitching(from, to, { at, barsPerChord });
+            out.forEach((b) => b.events.forEach((e) => expect(Number.isFinite(e.midi)).toBe(true)));
+            // from the next phrase on, the new mode is what plays
+            const settled = out.filter((b) => b.bar >= Math.ceil(at / PHRASE_BARS) * PHRASE_BARS);
+            const has = (role) => settled.some((b) => b.events.some((e) => e.role === role));
+            expect(has('rhythm')).toBe(to === 'rhythm' || to === 'split');
+            expect(has('pad')).toBe(to !== 'rhythm');
+        }
+    });
+
+    test('the new layers start at the bar the settings changed, not at the next phrase (the voices swap at that bar)', () => {
+        for (const [from, to] of MODES.flatMap((f) => MODES.filter((t) => t !== f).map((t) => [f, t]))) for (const at of [5, 6, 7]) {
+            const out = runSwitching(from, to, { at, barsPerChord: 1 });
+            expect(out[at - 1].state.phrase.layers ?? 'combined').toBe(from);
+            expect(out[at].state.phrase.layers ?? 'combined').toBe(to);
+            expect(out[at].state.phrase.start).toBe(at);
+            if (to === 'rhythm' || to === 'split') expect(out[at].events.some((e) => e.role === 'rhythm')).toBe(true);
+            if (from === 'rhythm' || from === 'split') expect(out[at].events.some((e) => e.role === 'rhythm')).toBe(to === 'rhythm' || to === 'split');
+        }
+    });
+});

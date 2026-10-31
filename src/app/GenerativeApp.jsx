@@ -50,12 +50,16 @@ import { linkedBlockOptions } from './patternDefaults';
 import { defaultSettings, shareFromLocation, sharePath, shareUrl, newSeed } from './settings';
 // The sound window brings the DIY and classic synths with it: loaded on the first ✎.
 const SoundWindow = lazy(() => import('./editor/SoundWindow'));
-const SOUND_ROLES = { ...ROLES, ...PERC_ROLE, bus: { label: 'Shared bus' } };
+// With a pad and a rhythm part (or either on its own) the chord voices are named for what they play, not 'Rhythm / pad'.
+const roleNames = (layers) => (layers && layers !== 'combined'
+    ? { ...ROLES, pad: { ...ROLES.pad, label: 'Pad' }, rhythm: { ...ROLES.rhythm, label: 'Rhythm' } } : ROLES);
+// (the generator's recipes know four voices: the rhythm part is made like a second lead, a pluck or a bell)
+const recipeRole = (role) => (role === 'rhythm' ? 'counter' : role);
 import PresetPicker from './editor/PresetPicker';
 import SequencerPanel from './SequencerPanel';
 import PROGRESSIONS, { PROGRESSION_LENGTHS, progressionsOfLength, progressionFamily } from './progressions';
 import {
-    PAD_STYLES, BASS_STYLES, PULSE_PATTERNS, ARP_PATTERNS, CHORD_DIRECTIONS, styleShares, OCTAVE_LIMITS, OCTAVE_WANDER, SECTION_LENGTHS,
+    PAD_STYLES, BASS_STYLES, PULSE_PATTERNS, ARP_PATTERNS, CHORD_DIRECTIONS, styleShares, voiceLayers as layersOf, FLOW_PHRASES, OCTAVE_LIMITS, RHYTHM_OCTAVES, OCTAVE_WANDER, SECTION_LENGTHS,
 } from './arranger';
 import { DRIFT_MODES, BPM_LIMITS } from './conductor';
 import { METERS } from './meter';
@@ -70,7 +74,7 @@ import { sceneryForScene } from '../scenery/presetScenes';
 import { viewFromSearch, withView, patternsFromSearch, patternsParam, withPatterns } from './viewLink';
 import { MasterVolume, SettingsMenu, AudioMenu, VisualMenu } from './AudioStatus';
 import { SleepTimer, Recorder } from './Playback';
-import { sceneSettings, sceneSoundSettings, sceneGroup, stepBuiltinSceneEntry, randomBuiltinSceneEntry, buildSetup, parseSetup, sceneBySlug, sceneSlug, presetFromSearch, introFromSearch, SCENES, SCENE_CATEGORIES, BROWSABLE_SCENES } from './scenes';
+import { sceneSettings, sceneSoundSettings, sceneGroup, stepBuiltinSceneEntry, randomBuiltinSceneEntry, buildSetup, parseSetup, sceneBySlug, sceneSlug, sceneVoiceSpec, presetFromSearch, introFromSearch, SCENES, SCENE_CATEGORIES, BROWSABLE_SCENES } from './scenes';
 import { presetAccess, STARTERS } from './presetUnlocks';
 import { useStarred } from './starred';
 import PresetBrowser from './PresetBrowser';
@@ -145,7 +149,8 @@ const getGenerator = () => {
             generator = new Generator(sceneSettings(linkedScene, seed === null ? undefined : seed));
             if (phrase && seed !== null) linkedPhrase = phrase;
             if (sceneGroup(linkedScene) !== 'ambience') {
-                Object.entries(linkedScene.voices).forEach(([role, voice]) => {
+                Object.keys(ROLES).forEach((role) => {
+                    const voice = sceneVoiceSpec(linkedScene, role, layersOf(generator.settings));
                     if (typeof voice === 'string') generator.loadRolePreset(role, voice);
                     else if (voice?.external) linkedRefs.push({ role, ref: voice.external });
                 });
@@ -648,7 +653,7 @@ const PAD_NOTES = { 3: 'Triads (3)', 4: 'Sevenths (4)', 5: 'Ninths (5)' };
 
 // Per-role register: home octave, and whether/how it wanders by phrase.
 const VoiceControls = ({ role, voice, onChange }) => {
-    const [lo, hi] = OCTAVE_LIMITS[role];
+    const [lo, hi] = OCTAVE_LIMITS[role] ?? RHYTHM_OCTAVES;
     const set = (key, value) => onChange({ ...voice, [key]: value });
     return (
         <>
@@ -1141,7 +1146,7 @@ const GenerativeApp = () => {
     const voiceChanged = (role) => {
         const base = soundScene.current;
         if (!base) return false;
-        const spec = base.voices[role];
+        const spec = sceneVoiceSpec(base, role, layersOf(settings));
         const named = typeof spec === 'string' ? (findPreset(spec) ? spec : ROLE_PRESETS[role]) : null;
         return !!(changedVoices[role] || roles[role].edited || (named && (roles[role].presetName !== named || roles[role].external)));
     };
@@ -1231,13 +1236,13 @@ const GenerativeApp = () => {
         if (!soundScene.current && previous?.version === GENERATOR_V3) context.profile = previous.profile;
         return context;
     };
-    const generateForRole = (role) => (emitQuest('newsound', { role }), loadGeneratedSound(role, { role, seed: newSoundSeed(), kind: soundKinds[role],
+    const generateForRole = (role) => (emitQuest('newsound', { role }), loadGeneratedSound(role, { role: recipeRole(role), seed: newSoundSeed(), kind: soundKinds[role],
         version: generationChoice === 'legacy' ? GENERATOR_V2 : GENERATOR_V3,
-        ...(generationChoice === 'legacy' ? {} : generatedContext(role)) }));
+        ...(generationChoice === 'legacy' ? {} : generatedContext(recipeRole(role))) }));
     // New sounds for every voice at once, with a shared character.
     const generateAll = (ensemble) => {
-        Object.keys(ROLES).forEach((role) => loadGeneratedSound(role, { role, ensemble, version: generationChoice === 'legacy' ? GENERATOR_V2 : GENERATOR_V3,
-            ...(generationChoice === 'legacy' ? {} : generatedContext(role)) }));
+        Object.keys(shownRoles).forEach((role) => loadGeneratedSound(role, { role: recipeRole(role), ensemble, version: generationChoice === 'legacy' ? GENERATOR_V2 : GENERATOR_V3,
+            ...(generationChoice === 'legacy' ? {} : generatedContext(recipeRole(role))) }));
     };
     useEffect(() => {
         const sounds = linkedSounds, refs = linkedRefs;
@@ -1451,6 +1456,20 @@ const GenerativeApp = () => {
             patchRole(role, { presetName: label, edited: unsaved });
         }, { morph });
     };
+    // Changing the layers swaps the pad and the rhythm part to the voices the preset made for them, unless one was changed by hand.
+    const voiceLayers = useRef(layersOf(settings));
+    useEffect(() => {
+        const base = soundScene.current, was = voiceLayers.current, now = layersOf(settings);
+        voiceLayers.current = now;
+        if (!base || was === now) return;
+        for (const role of ['pad', 'rhythm']) {
+            const after = sceneVoiceSpec(base, role, now), before = sceneVoiceSpec(base, role, was);
+            const nameOf = (spec) => (typeof spec === 'string' ? spec : spec?.name);
+            if (nameOf(after) && nameOf(after) !== nameOf(before) && roles[role].presetName === (nameOf(before) ?? ROLE_PRESETS[role]) && !roles[role].edited && !changedVoices[role]) {
+                loadSceneVoice(role, after, base.name, false, smoothPresets && gen.isRunning);
+            }
+        }
+    }, [settings.layers, settings.layerFlow?.mode]); // eslint-disable-line react-hooks/exhaustive-deps
     const sceneBrowseCategory = useRef(null);
     // The preset the page was last put on, kept when a tweak clears its name from the top row: [ and ] step on from it,
     // and the quick panel's Reset goes back to it (or, with none picked, to how the page opened).
@@ -1487,7 +1506,9 @@ const GenerativeApp = () => {
             setSettings({ ...gen.settings });
         }
         if (parts !== 'composition' && sceneGroup(picked) !== 'ambience') {
-            Object.keys(ROLES).forEach((role) => loadSceneVoice(role, picked.voices[role], picked.name, unsaved, morph));
+            // (with the layers split a preset has a voice made for each part, see sceneVoiceSpec)
+            Object.keys(ROLES).forEach((role) => loadSceneVoice(role, sceneVoiceSpec(picked, role, layersOf(gen.settings)), picked.name, unsaved, morph));
+            voiceLayers.current = layersOf(gen.settings); // (the voices are already the ones for these layers)
             if (picked.percussion) applyRefs([{ role: 'perc', ref: picked.percussion }]);
             else if (gen.roles.perc.machine) { gen.setPercussionSource(null).catch((error) => console.error('Could not restore the kit', error)); setPercMachine(null); }
         }
@@ -1648,7 +1669,9 @@ const GenerativeApp = () => {
         return `bgm-${slug}-${settings.bpm}bpm-${minutes}min.wav`;
     };
     // The second lead's panel and track show only while it plays.
-    const shownRoles = Object.fromEntries(Object.entries(ROLES).filter(([role]) => role !== 'counter' || settings.counter.mode !== 'off'));
+    const shownRoles = Object.fromEntries(Object.entries(roleNames(layersOf(settings))).filter(([role]) => (role !== 'counter' || settings.counter.mode !== 'off')
+        && (role !== 'rhythm' || ['split', 'rhythm'].includes(layersOf(settings))) && (role !== 'pad' || layersOf(settings) !== 'rhythm')));
+    const soundRoles = { ...roleNames(layersOf(settings)), ...PERC_ROLE, bus: { label: 'Shared bus' } };
     // ... and the drums' track while they play
     const drumsOn = settings.drums.style !== 'off';
     const shownTracks = drumsOn ? { ...shownRoles, ...PERC_ROLE } : shownRoles;
@@ -1744,7 +1767,7 @@ const GenerativeApp = () => {
                 </button>
                 {quickOpen && <button type="button" className="gen-quick-reset" onClick={resetQuick} aria-label={`Reset to ${lastSceneName.current || 'the preset'}`}
                     title={`Put these sliders and buttons back to how ${lastSceneName.current ? `“${lastSceneName.current}”` : 'the preset'} has them`}><UndoIcon /></button>}</>}>
-                {quickOpen && <QuickPanel settings={settings} roleLabels={Object.fromEntries(Object.entries(SOUND_ROLES).map(([role, { label }]) => [role, label.split(' / ')[0]]))} onVolume={setVolume} onSettings={loadSettings} onFeel={changeFeel} onPush={(push) => update('push', push)} nowLevel={now.pushLevel ?? 0} onMood={(mood) => update('mood', mood)} nowMood={now.moodLevel ?? 0} baseline={presetQuick} resetKey={quickEpoch} />}
+                {quickOpen && <QuickPanel settings={settings} layersUnlocked={has(4)} roleLabels={Object.fromEntries(Object.entries(soundRoles).map(([role, { label }]) => [role, label.split(' / ')[0]]))} onVolume={setVolume} onSettings={loadSettings} onFeel={changeFeel} onPush={(push) => update('push', push)} nowLevel={now.pushLevel ?? 0} onMood={(mood) => update('mood', mood)} nowMood={now.moodLevel ?? 0} baseline={presetQuick} resetKey={quickEpoch} />}
             </Panel>}
 
             {has(3) && TRIAL_RULE_IDS.length > 0 && <Panel id="trial" title="Trial rules">
@@ -1757,6 +1780,8 @@ const GenerativeApp = () => {
                 ensemble: wrapGroup('counter-register', <VoiceControls role="counter" voice={settings.voices.counter} onChange={voice => changeGroup('counter-register', voice)} />),
                 pad: <>
                     {wrapGroup('pad-register', <VoiceControls role="pad" voice={settings.voices.pad} onChange={voice => changeGroup('pad-register', voice)} />)}
+                    {['split', 'rhythm'].includes(layersOf(settings)) && wrapGroup('rhythm-register', <VoiceControls role="rhythm" voice={settings.voices.rhythm} onChange={voice => changeGroup('rhythm-register', voice)} />)}
+                    {wrapGroup('layer-flow-length', <Field label="Phrases at each stop of a journey"><select aria-label="Phrases at each stop" value={settings.layerFlow.phrases} onChange={e => changeGroup('layer-flow-length', Number(e.target.value))}>{FLOW_PHRASES.map(n => <option key={n} value={n}>{n} phrases</option>)}</select></Field>)}
                     {wrapGroup('pad-size', <Field label="Chord notes"><select aria-label="Chord notes" value={settings.padNotes} onChange={e => changeGroup('pad-size', Number(e.target.value))}>{Object.entries(PAD_NOTES).map(([n, text]) => <option key={n} value={n}>{text}</option>)}</select></Field>)}
                     <PadPlaying settings={settings} update={updatePlaying} level={randomLevel} wrap={wrapGroup} />
                 </>,
@@ -1872,7 +1897,7 @@ const GenerativeApp = () => {
                             <select value={soundKinds[role]} title="What the ✦ button makes for this voice"
                                 onChange={(e) => setSoundKinds((k) => ({ ...k, [role]: e.target.value }))}>
                                 <option value="any">Any kind</option>
-                                {Object.entries(SOUND_KINDS[role]).map(([kind, text]) => <option key={kind} value={kind}>{text}</option>)}
+                                {Object.entries(SOUND_KINDS[recipeRole(role)]).map(([kind, text]) => <option key={kind} value={kind}>{text}</option>)}
                             </select>
                         </Field>
                     )}
@@ -1901,7 +1926,7 @@ const GenerativeApp = () => {
 
             {soundRole && (
                 <Suspense fallback={null}>
-                    <SoundWindow generator={gen} role={soundRole} roles={SOUND_ROLES} onRole={editSound} voice={roles[soundRole]} light={perfOn}
+                    <SoundWindow generator={gen} role={soundRole} roles={soundRoles} onRole={editSound} voice={roles[soundRole]} light={perfOn}
                         percussion={{ kit: settings.drums.kit, machine: percMachine }}
                         bus={settings.bus} onBus={(next) => update('bus', next)} onPerformance={changePerformance}
                         onNativePreset={loadPreset} onNativeImport={importPreset} onNativeEdited={onNativeEdited} onExternal={setExternal}

@@ -2,6 +2,7 @@
 .gen-rulebook [data-rule-role='lead'] { --book-accent: var(--gen-role-lead); }
 .gen-rulebook [data-rule-role='counter'] { --book-accent: var(--gen-role-counter); }
 .gen-rulebook [data-rule-role='pad'] { --book-accent: var(--gen-role-pad); }
+.gen-rulebook [data-rule-role='rhythm'] { --book-accent: var(--gen-role-rhythm); }
 .gen-rulebook [data-rule-role='bass'] { --book-accent: var(--gen-role-bass); }
 .gen-rulebook [data-rule-role='perc'] { --book-accent: var(--gen-role-perc); }
 .gen-rulebook .embedded-book-chapters button[data-rule-role]::before { content: ''; display: inline-block; width: 6px; height: 6px; margin-right: 6px; border-radius: 2px; background: var(--book-accent); vertical-align: middle; }

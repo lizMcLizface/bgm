@@ -2,7 +2,7 @@
 // sounds in it, weighted by role) against the piece's running average sets a slow gain trim for
 // the bar, so a bar full of arpeggios and drums is not much louder than a sparse one. Planned with
 // the bar (deterministic, so renders match playback); at most ±4 dB, glided over the bar.
-const WEIGHT = { lead: 1, counter: 0.8, pad: 0.6, bass: 0.9, perc: 0.5 };
+const WEIGHT = { lead: 1, counter: 0.8, pad: 0.6, bass: 0.9, perc: 0.5, rhythm: 0.6 };
 const AVERAGE = 0.08; // running average weight of each new bar (about a dozen bars)
 const LIMIT_DB = 4;
 

@@ -1,4 +1,4 @@
-import { PAD_STYLES, BASS_STYLES, PULSE_PATTERNS, ARP_PATTERNS, CHORD_DIRECTIONS, OCTAVE_LIMITS, OCTAVE_WANDER, SECTION_LENGTHS, styleShares } from '../arranger';
+import { RHYTHM_OCTAVES, FLOW_PHRASES, PAD_STYLES, BASS_STYLES, PULSE_PATTERNS, ARP_PATTERNS, CHORD_DIRECTIONS, OCTAVE_LIMITS, OCTAVE_WANDER, SECTION_LENGTHS, styleShares } from '../arranger';
 
 const number = (min, max, integer = false) => value => Number.isFinite(value) && (!integer || Number.isInteger(value)) ? Math.max(min, Math.min(max, value)) : undefined;
 const option = values => value => values.includes(value) ? value : undefined;
@@ -12,6 +12,10 @@ const weights = names => fields(Object.fromEntries(Object.keys(names).map(key =>
 export const GROUPS = [
     ...Object.entries(OCTAVE_LIMITS).map(([role, [lo, hi]]) => ({ id: `${role}-register`, role, title: 'Register & octave movement', path: `voices.${role}`,
         description: 'Choose the home octave and how it can move between phrases.', validate: fields({ octave: number(lo, hi, true), wander: option(Object.keys(OCTAVE_WANDER)), chance: number(0, 1) }) })),
+    { id: 'rhythm-register', role: 'rhythm', title: 'Register & octave movement', path: 'voices.rhythm', needs: 'layers',
+        description: 'Choose the home octave and how it can move between phrases. With a pad below it, the rhythm part still starts a fourth above the pad.', validate: fields({ octave: number(RHYTHM_OCTAVES[0], RHYTHM_OCTAVES[1], true), wander: option(Object.keys(OCTAVE_WANDER)), chance: number(0, 1) }) },
+    { id: 'layer-flow-length', role: 'rhythm', title: 'Phrases at each stop', path: 'layerFlow.phrases', needs: 'flow',
+        description: 'How many phrases a journey stays at each of its stops (a phrase is four bars or longer).', validate: option(FLOW_PHRASES) },
     { id: 'pad-styles', role: 'pad', title: 'Chord playing styles', path: 'padWeights', weights: true, validate: weights(PAD_STYLES) },
     { id: 'pad-pulses', role: 'pad', title: 'Pulse patterns', path: 'pulseWeights', weights: true, needs: 'pulse', validate: weights(PULSE_PATTERNS) },
     { id: 'pad-arpeggios', role: 'pad', title: 'Arpeggio patterns', path: 'arpWeights', weights: true, needs: 'arpeggio', validate: weights(ARP_PATTERNS) },
@@ -43,6 +47,8 @@ export function groupReason(group, settings) {
     if (!settings.playMusic) return 'Music playback is off. These choices are retained.';
     if (settings.muted?.[group.role]) return 'This voice is muted. Its playing choices are retained.';
     if (group.role === 'counter' && settings.counter.mode === 'off') return 'The second lead is off. These choices do not enable it.';
+    if (group.needs === 'flow') return settings.layerFlow?.mode === 'journey' ? null : 'The layers are not on a journey. Choose Journey under Over time to use this.';
+    if (group.needs === 'layers') return ['split', 'rhythm'].includes(settings.layers) ? null : 'There is no rhythm part. Choose Both or Rhythm under Layers to hear this.';
     if (group.needs === 'sections') return settings.sections.mode === 'off' ? 'Sections are off. The reference length is retained.' : null;
     const shares = styleShares(settings.padWeights);
     if (group.needs && (group.needs === 'directions' ? shares.rolled + shares.stacked === 0 : shares[group.needs] === 0)) return 'The corresponding chord style has zero share. These pattern choices are retained.';

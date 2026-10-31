@@ -8,7 +8,7 @@ import { defaultBus } from './engine/bus';
 
 export const VOICE_SYNTHS = ['poly', 'fm', 'cs80', 'juno', 'prophet5', 'jupiter8', 'minimoog', 'dx7', 'obxa', 'vs'];
 export const MACHINE_SYNTHS = ['tr808', 'tr909'];
-const ROLES = ['lead', 'counter', 'pad', 'bass'];
+const ROLES = ['lead', 'counter', 'pad', 'bass', 'rhythm'];
 
 const isObject = (value) => value && typeof value === 'object' && !Array.isArray(value);
 const text = (value, max) => (typeof value === 'string' ? value.slice(0, max) : undefined);
@@ -44,7 +44,7 @@ const fromBase64Url = (text) => Uint8Array.from(atob(text.replaceAll('-', '+').r
  * { bus, sounds: { role: ref }, machine: ref } -> the `x` part, or '' when there is nothing to
  * carry (a default bus, no classic or DIY voices, the generator's own kit).
  */
-export function encodeExtras({ bus, sounds = {}, machine = null, edits = {}, sequencer = null, portamento = null }) {
+export function encodeExtras({ bus, sounds = {}, machine = null, edits = {}, sequencer = null, portamento = null, rhythm = null }) {
     const data = {};
     if (bus && JSON.stringify(bus) !== JSON.stringify(defaultBus())) data.b = bus;
     const s = Object.fromEntries(ROLES.filter((role) => sounds[role]).map((role) => [role, sounds[role]]));
@@ -56,6 +56,8 @@ export function encodeExtras({ bus, sounds = {}, machine = null, edits = {}, seq
     if (sequencer && (sequencer.on || sequencer.arrangement)) data.q = sequencer;
     // glide between notes (composition/portamento.js), only when a role has some
     if (portamento && Object.values(portamento).some((v) => v > 0)) data.g = portamento;
+    // the rhythm part's built-in voice, by name (the other voices' names have a place in the bit-packed part)
+    if (typeof rhythm === 'string' && rhythm) data.r = rhythm.slice(0, 60);
     return Object.keys(data).length ? toBase64Url(compressSync(strToU8(JSON.stringify(data)), { level: 9 })) : '';
 }
 /** The `x` part -> { bus?, sounds, machine, edits, sequencer? } (clean); nothing usable for anything unreadable. */
@@ -65,7 +67,7 @@ export function decodeExtras(part) {
         const data = JSON.parse(strFromU8(decompressSync(fromBase64Url(part))));
         const sounds = Object.fromEntries(ROLES.map((role) => [role, cleanRef(data?.s?.[role])]).filter(([, ref]) => ref));
         const edits = Object.fromEntries(ROLES.map((role) => [role, cleanEdit(data?.n?.[role])]).filter(([, edit]) => edit));
-        return { ...(isObject(data?.b) ? { bus: data.b } : {}), sounds, machine: cleanRef(data?.p, MACHINE_SYNTHS), edits, ...(isObject(data?.q) ? { sequencer: data.q } : {}), ...(isObject(data?.g) ? { portamento: data.g } : {}) };
+        return { ...(isObject(data?.b) ? { bus: data.b } : {}), sounds, machine: cleanRef(data?.p, MACHINE_SYNTHS), edits, ...(isObject(data?.q) ? { sequencer: data.q } : {}), ...(isObject(data?.g) ? { portamento: data.g } : {}), ...(text(data?.r, 60) ? { rhythm: text(data.r, 60) } : {}) };
     } catch (e) {
         return { sounds: {}, edits: {} };
     }

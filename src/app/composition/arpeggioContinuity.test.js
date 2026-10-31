@@ -42,10 +42,15 @@ test('Slightly Slower Than Light preserves its running notes with lead, phrase g
                 partRhythmGrammar: true, transitionGestures: true };
             const actual = arrangeBarLatest(args);
             const reference = arrangeBarLatest({ ...args, coordinate: false });
-            if (['arpeggio', 'sequence'].includes(actual.state.phrase.padStyle)) {
-                styles.add(actual.state.phrase.padStyle);
-                const pad = actual.events.filter(e => e.role === 'pad');
-                expect(pattern(pad)).toEqual(pattern(reference.events.filter(e => e.role === 'pad')));
+            // (the preset starts on the rhythm layer alone: its chord voice is the rhythm part)
+            const phrase = actual.state.phrase, style = phrase.padStyle ?? phrase.rhythmStyle, role = phrase.padStyle ? 'pad' : 'rhythm';
+            if (['arpeggio', 'sequence'].includes(style)) {
+                styles.add(style);
+                const pad = actual.events.filter(e => e.role === role);
+                const same = reference.events.filter(e => e.role === role);
+                expect(pad.map(({ midi, beat }) => ({ midi, beat }))).toEqual(same.map(({ midi, beat }) => ({ midi, beat })));
+                // (a note is cut short by a hundredth where the same note is struck again straight after it: rhythmDevelopment.js)
+                pad.forEach((e, i) => expect(Math.abs(e.length - same[i].length)).toBeLessThanOrEqual(0.0251));
                 if (actual.events.some(e => e.role === 'lead')) leadBars++;
                 if (pad.at(-1).beat + pad.at(-1).length > meter.units) tailBars++;
             }

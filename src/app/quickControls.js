@@ -1,6 +1,7 @@
 // The quick panel (QuickPanel.jsx): the settings most worth reaching for without opening the
 // rulebook - the mix, the feel sliders, where the chord root goes - and four-step stacks
 // (off / low / med / high) that move several linked settings together. Pure data and helpers.
+import { voiceLayers } from './arranger';
 
 const get = (settings, path) => path.split('.').reduce((o, k) => o?.[k], settings);
 // The top-level patch that sets a path (key, key.sub, key.sub.sub) to a value, copying what is around it.
@@ -16,6 +17,7 @@ export const MIX_SLIDERS = [
     { id: 'lead', label: 'Lead', role: 'lead' },
     { id: 'counter', label: 'Lead 2', role: 'counter', off: (s) => s.counter?.mode === 'off', offTitle: 'There is no second lead: choose what it does under Second lead' },
     { id: 'pad', label: 'Pad', role: 'pad' },
+    { id: 'rhythm', label: 'Rhythm', role: 'rhythm', off: (s) => !['split', 'rhythm'].includes(voiceLayers(s)), offTitle: 'The chords have no rhythm layer: choose Both or Rhythm under Layers' },
     { id: 'bass', label: 'Bass', role: 'bass' },
     { id: 'perc', label: 'Drums', role: 'perc', off: (s) => s.drums?.style === 'off', offTitle: 'The drums are off' },
     { id: 'ambience', label: 'Ambience', path: 'ambienceVolume', title: 'The whole ambience bed against the music' },
@@ -47,6 +49,17 @@ export const CHOICE_GROUPS = [
         ['always', 'Both', 'The pad plays the chord root as well as the bass'],
         ['unlessBass', 'Bass', 'The root is left to the bass; the pad keeps its other notes'],
         ['never', 'None', 'The pad never plays the chord root'],
+    ]),
+    one('layers', 'Layers', 'layers', 'What plays the chords: one voice, a pad, a rhythm part, or both at once', [
+        ['combined', 'One', 'One voice plays every style, switching from phrase to phrase'],
+        ['pad', 'Pad', 'Held chords only'],
+        ['rhythm', 'Rhythm', 'Pulses, arpeggios and sequences only'],
+        ['split', 'Both', 'A pad holds the chords and a rhythm part plays above it'],
+    ]),
+    one('flow', 'Over time', 'layerFlow.mode', 'Whether the layers change as the piece goes on', [
+        ['off', 'Fixed', 'The layers stay as chosen'],
+        ['sections', 'Sections', 'The pad alone in an intro, both in a build and the full sections, the rhythm part alone in a breakdown'],
+        ['journey', 'Journey', 'Pad, both, rhythm, both, one voice, and round again'],
     ]),
     one('chords', 'Size', 'padNotes', 'How many notes the rhythm voice\'s chords have', [
         [3, 'Triad', 'Three notes'],

@@ -132,6 +132,8 @@ const BY_NAME = {
     'Rolling surf': L('harbour', 'scattered', 14, 2.3),
     'Coastal storm': L('seaside', 'storm', 21, 3.1, NIGHT),
 
+    'Demo: Pad under pluck': L('lake', 'clear', 18.5, 1.7),
+    'Demo: Layers over time': L('hills', 'haze', 9, 2.1),
     'Demo: Breathing cadences': L('lake', 'haze', 8.5, 1.1),
     'Demo: Strong and soft': L('hills', 'mixed', 10, 2.2),
     'Demo: Make room': L('grassland', 'streaks', 7.5, 1.2),

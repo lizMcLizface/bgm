@@ -5,7 +5,7 @@
 import { RACK_PARAMS, cleanRack, rackPackets } from '../../synths/effects/params';
 import { effectTail } from '../../synth-lab/effectsConfig';
 
-export const BUS_ROLES = ['lead', 'counter', 'pad', 'bass', 'perc'];
+export const BUS_ROLES = ['lead', 'counter', 'pad', 'bass', 'perc', 'rhythm'];
 // A send bus returns only what it adds: no dry level; a medium room.
 export const DEFAULT_BUS_RACK = { ...cleanRack(), 'effects.dry': 0, 'effects.reverb': 0.6, 'effects.decay': 4, 'effects.size': 0.8, 'effects.damping': 5000, 'effects.predelay': 25 };
 export const defaultBus = () => ({ sends: Object.fromEntries(BUS_ROLES.map((role) => [role, 0])), rack: { ...DEFAULT_BUS_RACK } });

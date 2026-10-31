@@ -1,10 +1,10 @@
 import { INSTRUMENTS, anchorStrings, stringLetter } from './MiniFretboard';
 
 // How each pattern block starts, until the visitor changes it: what the first panel shows (mode), which voices
-// it follows (lead, counter = second lead, pad = rhythm, bass) and whether notes are tracked (only for one voice).
+// it follows (lead, counter = second lead, pad = rhythm (or the pad, with a rhythm layer beside it), rhythm = the rhythm layer, bass) and whether notes are tracked (only for one voice).
 export const PATTERN_DEFAULTS = {
-    piano: { mode: 'played', voices: ['lead', 'counter', 'pad', 'bass'], track: false },
-    guitar: { mode: 'played', voices: ['pad'], track: true },
+    piano: { mode: 'played', voices: ['lead', 'counter', 'pad', 'rhythm', 'bass'], track: false },
+    guitar: { mode: 'played', voices: ['pad', 'rhythm'], track: true },
     bass: { mode: 'played', voices: ['bass'], track: true },
 };
 

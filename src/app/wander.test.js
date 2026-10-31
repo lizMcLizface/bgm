@@ -15,8 +15,8 @@ test('every voice and kind drifts on its own period and phase, the same every ti
         periods.add(period.toFixed(3));
         phases.add(wanderPhase(role, kind).toFixed(3));
     }));
-    expect(periods.size).toBe(20);
-    expect(phases.size).toBe(20);
+    expect(periods.size).toBe(WANDER_ROLES.length * 4);
+    expect(phases.size).toBe(WANDER_ROLES.length * 4);
 });
 
 test('only the voices switched on wander; the instrument gets cents of cutoff and pitch', () => {
@@ -69,7 +69,7 @@ test('wander settings: validated, pan ends put in order, carried in links', () =
     const settings = {
         ...d,
         seed: 3,
-        wander: { period: 120, pan: { min: -0.9, max: 0.35 }, volume: 0.4, filter: 1.25, pitch: 12, voices: { lead: false, counter: true, pad: true, bass: true, perc: true }, mode: 'brownian' },
+        wander: { period: 120, pan: { min: -0.9, max: 0.35 }, volume: 0.4, filter: 1.25, pitch: 12, voices: { lead: false, counter: true, pad: true, bass: true, perc: true, rhythm: true }, mode: 'brownian' },
     };
     expect(decodeSettings(encodeSettings(settings)).wander).toEqual(settings.wander);
     // a link that changes nothing about it reads the defaults

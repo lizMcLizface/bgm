@@ -38,6 +38,7 @@ export const timelineColors = (element) => {
         bass: cssVar(style, '--gen-role-bass'),
         lead: cssVar(style, '--gen-role-lead'),
         counter: cssVar(style, '--gen-role-counter'),
+        rhythm: cssVar(style, '--gen-role-rhythm'),
         perc: cssVar(style, '--gen-role-perc'),
     };
 };
@@ -85,7 +86,7 @@ const sameReadout = (a, b) =>
 
 // The notes sounding now, per voice. The voices are named for what they play: the lead, a second lead
 // (the counter-melody), the rhythm (the pad's chords) and the bass.
-export const VOICES = [['lead', 'Lead', 'l'], ['counter', 'Second lead', 'c'], ['pad', 'Rhythm', 'p'], ['bass', 'Bass', 'b']];
+export const VOICES = [['lead', 'Lead', 'l'], ['counter', 'Second lead', 'c'], ['pad', 'Rhythm', 'p'], ['rhythm', 'Rhythm layer', 'r'], ['bass', 'Bass', 'b']];
 // Tracking: a note stays fully visible for HOLD_SECONDS after it ends, then goes grey (white, on the piano) and fades out over the rest of FADE_SECONDS.
 const HOLD_SECONDS = 0.15;
 const FADE_SECONDS = 1.1;

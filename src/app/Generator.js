@@ -62,7 +62,7 @@ import { applyDynamics, expressDynamics } from './composition/dynamics';
 import { planRubato, rubatoTime } from './composition/rubato';
 import { ornamentNotes } from './composition/ornaments';
 import { tameHighRegister } from './composition/register';
-import { Ducker, DUCKED_BY, duckFloor } from './engine/ducking';
+import { Ducker, duckedBy, duckFloor } from './engine/ducking';
 import { planLoudness } from './composition/loudness';
 import { SPACE_RACK, SPACE_ROLE, sectionSpaceLevel } from './composition/sectionSpace';
 import { arcEnergy, applyArc, arcTone, arcSpace } from './composition/arc';
@@ -114,7 +114,7 @@ const SECTION_TONE = {
     gentle: { intro: 2200, build: 4500, full: OPEN_TONE, breakdown: 2800 },
     strong: { intro: 1200, build: 3000, full: OPEN_TONE, breakdown: 1600 },
 };
-export const TONE_ROLES = ['pad', 'lead', 'counter'];
+export const TONE_ROLES = ['pad', 'lead', 'counter', 'rhythm'];
 export const sectionTone = (settings, section) =>
     (settings.sectionTone && section && SECTION_TONE[settings.sections.mode] ? SECTION_TONE[settings.sections.mode][section.type] : OPEN_TONE);
 
@@ -134,6 +134,8 @@ export const ROLES = {
     counter: { label: 'Second lead', polyphony: 2, preset: ROLE_PRESETS.counter },
     pad: { label: 'Rhythm / pad', polyphony: 8, preset: ROLE_PRESETS.pad },
     bass: { label: 'Bass / support', polyphony: 2, preset: ROLE_PRESETS.bass },
+    // the chord voices' running part (settings.layers); silent, and out of the mixer, unless the layers include it
+    rhythm: { label: 'Rhythm layer', polyphony: 8, preset: ROLE_PRESETS.rhythm },
 };
 
 class Generator {
@@ -813,7 +815,7 @@ class Generator {
     // that was drifting gets its preset back when the setting goes to 0.
     applyDrift(bar, barSeconds) {
         const amounts = { timbreDrift: this.settings.timbreDrift, padVibrato: this.settings.padVibrato };
-        for (const role of ['lead', 'counter', 'pad', 'bass']) {
+        for (const role of ['lead', 'counter', 'pad', 'bass', 'rhythm']) {
             const r = this.roles[role], instrument = r?.instrument;
             if (!instrument?.setDrift) continue;
             const values = voiceMotion(instrument.preset, role, bar, amounts, this.settings.seed);
@@ -1031,6 +1033,7 @@ class Generator {
             pad: planned.state.padVoicing,
             lead: [planned.state.leadMidi],
             counter: [planned.state.counterMidi || 72],
+            rhythm: planned.state.rhythmVoicing ?? planned.state.padVoicing,
         }[role];
         notes.forEach((midi) => instrument.scheduleNote(midi, time, 1.5, 0.7));
         }finally{this.auditionPending--;}
@@ -1483,7 +1486,7 @@ class Generator {
     }
 
     planBarIn(bar) {
-        const { barsPerChord, leadActivity, leadDensity, padWeights, bassWeights, pulseWeights, arpWeights, directionWeights, padMotion, thinPadUnderLead, drift, humanize, voices, counter, sections, drums, swing, chordSpread, pedal, leadScale, leadLeaps, leadRepeat, leadSyncopation, leadInertia, leadTendency, bassEuclid, leadEnding, padRoot, padContour } = this.settings;
+        const { barsPerChord, leadActivity, leadDensity, padWeights, bassWeights, pulseWeights, arpWeights, directionWeights, padMotion, thinPadUnderLead, drift, humanize, voices, counter, sections, drums, swing, chordSpread, pedal, leadScale, leadLeaps, leadRepeat, leadSyncopation, leadInertia, leadTendency, bassEuclid, leadEnding, padRoot, padContour, layers, layerRules, layerFlow } = this.settings;
         const prev = this.plan.get(bar - 1);
 
         const fresh = !prev || this.resetMusicAt === bar;
@@ -1574,7 +1577,7 @@ class Generator {
             barsLeftInChord,
             formBarsLeftInChord: barsPerChord - inCycle % barsPerChord,
             prev: prev ? prev.state : null,
-            settings: { bpm:this.settings.bpm,progression:this.settings.progression,sectionTone:this.settings.sectionTone,leadActivity, leadDensity, padWeights, bassWeights, pulseWeights, arpWeights, directionWeights, padMotion, thinPadUnderLead, voices, counter, sections: this.quickIntro ? { ...sections, quickIntro: true } : sections, chordSpread, pedal:this.settings.tonality.mode==='atonal'?{mode:'off',amount:0}:pedal, leadScale:this.settings.tonality.mode==='atonal'?'full':leadScale, leadLeaps, leadRepeat, leadSyncopation, leadInertia, leadTendency, bassEuclid, leadEnding, padRoot, padContour },
+            settings: { bpm:this.settings.bpm,progression:this.settings.progression,sectionTone:this.settings.sectionTone,leadActivity, leadDensity, padWeights, bassWeights, pulseWeights, arpWeights, directionWeights, padMotion, thinPadUnderLead, voices, counter, sections: this.quickIntro ? { ...sections, quickIntro: true } : sections, chordSpread, pedal:this.settings.tonality.mode==='atonal'?{mode:'off',amount:0}:pedal, leadScale:this.settings.tonality.mode==='atonal'?'full':leadScale, leadLeaps, leadRepeat, leadSyncopation, leadInertia, leadTendency, bassEuclid, leadEnding, padRoot, padContour, layers, layerRules, layerFlow },
             rng: this.rng,
         });
         const pendingSuspension=prev?.state.composition?.sectionSuspension;
@@ -1616,8 +1619,9 @@ class Generator {
         // the step sequencer (sequencer.js) plays its pattern as written: it skips the looseners below and joins the bar after them
         const seq = this.settings.sequencer, seqHits = seq?.on && seq.arrangement ? sequencerBar({ meter: this.meter, seq, slotIndex: slot.index, bar, seed: this.settings.seed, barsLeft: stageSpan(seq, slot, bar).left }) : [];
         // lanes: the chords and the bass as tight stabs on the sequencer's own rows, instead of the arranged pad and bass
-        const laneHits = seqHits.length && seq.lanes ? sequencerLanes({ meter: this.meter, seq, chord, slotIndex: slot.index, bar, seed: this.settings.seed }) : [];
-        if (laneHits.length) events.splice(0, events.length, ...events.filter((e) => e.role !== 'pad' && e.role !== 'bass'));
+        const laneHits = seqHits.length && seq.lanes ? sequencerLanes({ meter: this.meter, seq, chord, slotIndex: slot.index, bar, seed: this.settings.seed, layers: state.phrase.layers }) : [];
+        // (beside a rhythm part the arranged pad stays under the stabs, unless the lane holds chords of its own)
+        if (laneHits.length) events.splice(0, events.length, ...events.filter((e) => e.role !== 'bass' && e.role !== 'rhythm' && (e.role !== 'pad' || (state.phrase.layers === 'split' && !laneHits.some((h) => h.role === 'pad')))));
         let hits = !seqHits.length && drums && drums.style !== 'off'
             ? (original ? drumBar : drumBarLatest)({ bar, meter: this.meter, drums, section: state.phrase.section, sectionsMode: sections.mode, sectionBars: state.phrase.section?.bars || sections.phrases * 4, phraseStart: state.phrase.start, phraseBars: state.composition?.phrase?.bars ?? 4, boundaries, seed: this.settings.seed, rhythm: state.composition?.rhythm })
             : [];
@@ -1719,8 +1723,10 @@ class Generator {
             const hold = units * 2 * 0.95;
             const nearest = (notes, target) => notes.reduce((best, m) => (Math.abs(m - target) < Math.abs(best - target) ? m : best));
             const [root] = chord.pitchClasses;
-            padVoicing = voiceLead(chord.pitchClasses, state.ranges.pad[0], state.ranges.pad[1], state.padVoicing);
-            padVoicing.forEach((midi) => events.push({ role: 'pad', midi, beat: 0, length: hold, velocity: 0.55 }));
+            // (the held final chord is the rhythm layer's when there is no pad)
+            const chordRole = state.phrase.layers === 'rhythm' ? 'rhythm' : 'pad', chordRange = state.ranges[chordRole];
+            padVoicing = voiceLead(chord.pitchClasses, chordRange[0], chordRange[1], state.padVoicing);
+            padVoicing.forEach((midi) => events.push({ role: chordRole, midi, beat: 0, length: hold, velocity: 0.55 }));
             events.push({ role: 'bass', midi: nearest(notesInRange([root], ...state.ranges.bass), state.bassMidi), beat: 0, length: hold, velocity: 0.7 });
             const tonics = notesInRange([root], ...state.ranges.lead);
             if (state.phrase.leadActive && tonics.length) {
@@ -1812,7 +1818,7 @@ class Generator {
     }
 
     grooveVoiceSnapshot() {
-        return Object.fromEntries(['lead', 'counter', 'pad', 'bass'].map(role => {
+        return Object.fromEntries(['lead', 'counter', 'pad', 'bass', 'rhythm'].map(role => {
             const voice = this.roles?.[role], preset = voice?.instrument.preset ?? {};
             return [role, { name: voice?.presetName ?? '', preset: { stringModel: preset.stringModel, gainAttack: preset.gainAttack, gainSustain:preset.gainSustain, vibratoDepth: preset.vibratoDepth } }];
         }));
@@ -2126,7 +2132,7 @@ class Generator {
             }
             if (this.settings.ducking > 0 && this.audible(e.role)) {
                 const at = Math.max(start, this.AC.currentTime), length = connected?.duration ?? seconds(e);
-                for (const [role, by] of Object.entries(DUCKED_BY)) if (by[e.role]) this.roles[role].ducker?.note(at, at + length, duckFloor(role, e.role, this.settings.ducking));
+                for (const [role, by] of Object.entries(duckedBy(this.settings.layers))) if (by[e.role]) this.roles[role].ducker?.note(at, at + length, duckFloor(role, e.role, this.settings.ducking, this.settings.layers));
             }
             const instrument = this.roles[e.role].instrument;
             // a sequencer hit names its machine track; the other kits play the nearest drum

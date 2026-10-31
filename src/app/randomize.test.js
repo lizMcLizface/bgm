@@ -1,8 +1,9 @@
-import { randomKey, randomProgression, randomConductor, randomVoices, randomField, randomPreset, randomLength, randomArrangement, randomStyleWeights, randomRole, RANDOM_FIELDS, presetPool, modeQuality, progressionQuality, randomAmbience, randomAmbienceShape, relativeKeys, randomRelativeKey } from './randomize';
+import { randomKey, randomProgression, randomConductor, randomVoices, randomField, randomPreset, randomLength, randomArrangement, randomLayers, randomStyleWeights, randomRole, RANDOM_FIELDS, presetPool, modeQuality, progressionQuality, randomAmbience, randomAmbienceShape, relativeKeys, randomRelativeKey } from './randomize';
 import { defaultSettings, sanitizeSettings } from './settings';
 import { PRESET_CATEGORIES } from './presets';
 import { DEFAULT_DRIFT } from './conductor';
 import { seeded } from './random';
+import { DEFAULT_PAD_WEIGHTS } from './arranger';
 import PROGRESSIONS from './progressions';
 import { scaleById, scaleSemitones } from './theory';
 
@@ -229,5 +230,40 @@ describe('same notes, another key and scale', () => {
         for (let i = 0; i < 20; i++) expect([9, 11]).toContain(randomRelativeKey(settings).tonic);
         settings.drift = { ...settings.drift, excludedTonics: [2, 4, 5, 7, 9, 11] };
         expect(randomRelativeKey(settings).mode).toBeTruthy(); // all of them out: any is better than a dead button
+    });
+});
+
+describe('what plays the chords', () => {
+    const held = { sustain: 80, pulse: 5, arpeggio: 5, sequence: 0, rolled: 10, stacked: 0 };
+    const running = { sustain: 5, pulse: 40, arpeggio: 30, sequence: 25, rolled: 0, stacked: 0 };
+    const tally = (weights, level = 'reasonable') => {
+        const rng = seeded(11), count = {};
+        for (let i = 0; i < 600; i++) { const l = randomLayers(weights, level, rng); count[l] = (count[l] ?? 0) + 1; }
+        return count;
+    };
+
+    test('within reason one voice stays the most likely, and the layers follow the styles', () => {
+        const a = tally(held), b = tally(running);
+        expect(a.combined).toBeGreaterThan(a.split); expect(a.rhythm ?? 0).toBe(0); expect(a.pad).toBeGreaterThan(0);
+        expect(b.combined).toBeGreaterThan(b.split); expect(b.pad ?? 0).toBe(0); expect(b.rhythm).toBeGreaterThan(0);
+        const mixed = tally(DEFAULT_PAD_WEIGHTS);
+        expect(mixed.split).toBeGreaterThan(mixed.pad);
+    });
+
+    test('full random takes any of the four', () => {
+        expect(Object.keys(tally(held, 'wild')).sort()).toEqual(['combined', 'pad', 'rhythm', 'split']);
+    });
+
+    test('an arrangement carries a valid choice, and drawing it last leaves the rest as it was', () => {
+        const rng = () => seeded(5);
+        const a = randomArrangement(defaultSettings(), 'reasonable', rng()), { layers, ...rest } = a;
+        expect(['combined', 'pad', 'rhythm', 'split']).toContain(layers);
+        expect(sanitizeSettings({ ...defaultSettings(), ...a }).layers).toBe(layers);
+        expect(rest.padWeights).toEqual(randomArrangement(defaultSettings(), 'reasonable', rng()).padWeights);
+    });
+
+    test('a rhythm voice is drawn from the keys and plucks', () => {
+        expect(presetPool('rhythm', 'reasonable').length).toBeGreaterThan(5);
+        expect(presetPool('rhythm', 'reasonable')).toContain('Kalimba Pluck');
     });
 });

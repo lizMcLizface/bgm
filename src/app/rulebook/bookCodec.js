@@ -95,7 +95,16 @@ export const BOOK_RULE_IDS=[
   "progression-brightness",
   "progression-stability",
   "progression-adventure",
-  "progression-wander"
+  "progression-wander",
+  "pad-layers",
+  "layer-register",
+  "layer-ownership",
+  "layer-attacks",
+  "layer-density",
+  "layer-clear",
+  "layer-entrances",
+  "layer-mix",
+  "layer-flow"
 ];
 export const BOOK_GROUP_IDS=[
   "pad-register",
@@ -111,7 +120,9 @@ export const BOOK_GROUP_IDS=[
   "bass-styles",
   "section-reference",
   "ambient-drift-mode",
-  "ambient-drift-period"
+  "ambient-drift-period",
+  "rhythm-register",
+  "layer-flow-length"
 ];
 const PREFIX='b1.',LIMIT=12000;
 const encoder=new TextEncoder(),decoder=new TextDecoder('utf-8',{fatal:true});

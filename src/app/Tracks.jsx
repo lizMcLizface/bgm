@@ -185,7 +185,7 @@ export function useLivePlay(generator, armed) {
 /** The strip beside the timeline: one row per role, then the keys hint. */
 /** presets: role -> { name, edited } (shown beside the role's name). */
 export const TrackStrip = ({ roles, presets, mix, armed, onMix, onArm, onEdit, onRandom, onGenerate, onPick, onPickPercussion, onEditPercussion, percussionHint = DRUM_KEY_HINT, generating, live, patterns, onPattern }) => (
-    <div className="gen-tracks">
+    <div className={`gen-tracks${roles.rhythm && roles.pad ? ' gen-tracks-split' : ''}`}>
         {Object.entries(roles).map(([role, { label }]) => (
             <div key={role} className={`gen-track gen-track-${role}${(role === 'perc' ? onPickPercussion : onPick) ? ' is-pickable' : ''}`}
                 // the whole box opens the sound picker; its own buttons (M, S, dice ...) keep their jobs

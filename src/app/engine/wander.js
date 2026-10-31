@@ -25,7 +25,8 @@ import { seeded, normal } from '../random';
 
 export const WANDER_MODES = { sine: 'Smooth waves', brownian: 'Random walk' };
 
-export const WANDER_ROLES = ['lead', 'counter', 'pad', 'bass', 'perc'];
+// (the rhythm layer last: the others keep their slots, and so their phases and walks)
+export const WANDER_ROLES = ['lead', 'counter', 'pad', 'bass', 'perc', 'rhythm'];
 const KINDS = ['pan', 'volume', 'filter', 'pitch'];
 
 export const WANDER_LIMITS = {
@@ -43,7 +44,7 @@ export const defaultWander = () => ({
     volume: 0.12,
     filter: 0.35,
     pitch: 5,
-    voices: { lead: true, counter: true, pad: true, bass: false, perc: false },
+    voices: { lead: true, counter: true, pad: true, bass: false, perc: false, rhythm: true },
     mode: 'sine',
 });
 

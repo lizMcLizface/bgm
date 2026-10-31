@@ -195,3 +195,29 @@ test('cymbal steps play well under the other drums, and a preset can silence the
     const quiet = sequencerBar({ meter: METERS['4/4'], seq: seq({ arrangement: 'disco-ride', edits: { 1: { rd: '.'.repeat(16) } } }), bar: 0, seed: 1 });
     expect(quiet.some((e) => e.track === 'rd')).toBe(false);
 });
+
+describe('the lanes with the layers split', () => {
+    const chord = { pitchClasses: [9, 0, 4, 7] };
+    const play = (pad, layers) => sequencerLanes({ meter: METERS['4/4'], seq: seq({ arrangement: 'warehouse-shift', lanes: true, variation: 0, gate: 0.3, slots: [1], edits: { 1: { pad, bass: '.xxf.xxf.xxf.xxf' } } }), chord, bar: 0, seed: 5, layers });
+    const roles = (events) => [...new Set(events.map((e) => e.role))].sort();
+
+    test('as before with one voice or a pad: every chord hit is the pad\'s', () => {
+        for (const layers of [undefined, 'combined', 'pad']) expect(roles(play('x.a.h.s.x.a.h.s.', layers))).toEqual(['bass', 'pad']);
+    });
+
+    test('with a rhythm part the stabs and arpeggio steps are its, and the held and stacked chords stay the pad\'s', () => {
+        const out = play('x.a.h.s.x.a.h.s.', 'split');
+        expect(roles(out)).toEqual(['bass', 'pad', 'rhythm']);
+        expect(out.filter((e) => e.role === 'rhythm').every((e) => e.length <= 0.5 && !e.expression)).toBe(true);
+        expect(out.filter((e) => e.role === 'pad').every((e) => e.expression?.attackScale > 1)).toBe(true);
+        // the same hits as with one voice, only named differently
+        const one = play('x.a.h.s.x.a.h.s.', 'combined');
+        expect(out.map((e) => [e.beat, e.midi]).sort()).toEqual(one.map((e) => [e.beat, e.midi]).sort());
+    });
+
+    test('a rhythm part alone plays the whole chord row, and the bass line is unchanged', () => {
+        const out = play('x.a.h.s.x.a.h.s.', 'rhythm');
+        expect(roles(out)).toEqual(['bass', 'rhythm']);
+        expect(out.filter((e) => e.role === 'bass')).toEqual(play('x.a.h.s.x.a.h.s.', 'combined').filter((e) => e.role === 'bass'));
+    });
+});

@@ -109,3 +109,15 @@ test('euclideanShare recognises evenly spread onsets in any rotation', () => {
     const r = M.euclideanShare([{ bar: 0, meter: m, events: ev([0, 1.5, 3]) }, { bar: 1, meter: m, events: ev([0.5, 2, 3.5]) }, { bar: 2, meter: m, events: ev([0, 0.5, 1]) }, { bar: 3, meter: m, events: ev([0, 1]) }]);
     expect(r).toEqual({ bars: 3, share: 0.667 }); // tresillo and its rotation are even, a cluster is not, two onsets are skipped
 });
+
+test('layer separation counts close, coincident and low rhythm attacks against the sounding pad', () => {
+    const pad = [note('pad', 60, 0, 4), note('pad', 64, 0, 4), note('pad', 67, 0, 4)];
+    // far above (a fifth over the top note), then one a step over it, then one struck with a pad entry that starts later
+    const apart = bar(0, [...pad, note('rhythm', 72, 0, 1), note('rhythm', 79, 2, 1)]);
+    expect(M.layerSeparation([apart])).toMatchObject({ attacks: 2, closeShare: 0, belowFourth: 0, coincident: 0, meanGap: 8.5 });
+    const tight = bar(0, [...pad, note('rhythm', 68, 1, 1), note('rhythm', 67, 2, 1), note('pad', 72, 3, 1), note('rhythm', 76, 3, 1)]);
+    const t = M.layerSeparation([tight]);
+    expect(t).toMatchObject({ attacks: 3, belowFourth: 1 });
+    expect([t.closeShare, t.unison, t.coincident]).toEqual([0.6667, 0.3333, 0.3333]);
+    expect(M.layerSeparation([bar(0, pad)])).toBeNull();
+});

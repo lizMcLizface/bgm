@@ -23,7 +23,7 @@ import { WeatherBedOffline } from './weatherBedAudio';
 import { WEATHER_SOURCES } from './weatherBedModel';
 import { unitsPerMinute } from '../meter';
 import { rubatoTime } from '../composition/rubato';
-import { automateDuck, DUCKED_BY } from './ducking';
+import { automateDuck, duckedBy } from './ducking';
 import { SPACE_RACK, SPACE_ROLE, spaceTail } from '../composition/sectionSpace';
 import { voiceMotion } from '../composition/timbreDrift';
 import { applyFeel } from '../composition/feel';
@@ -287,10 +287,10 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
                 cleanup.push(()=>wander.dispose());
                 wander.apply(gen.settings.wander);
                 if (inst.setWander) inst.setWander({ ...instrumentWander(gen.settings.wander, role, from), immediate: true });
-                if (gen.settings.ducking > 0 && DUCKED_BY[role]) {
+                if (gen.settings.ducking > 0 && duckedBy(gen.settings.layers)[role]) {
                     const duck = ctx.createGain();
                     cleanup.push(() => duck.disconnect());
-                    automateDuck(duck.gain, role, notes, gen.settings.ducking, from);
+                    automateDuck(duck.gain, role, notes, gen.settings.ducking, from, gen.settings.layers);
                     gain.connect(duck);
                     duck.connect(wander.input);
                 } else gain.connect(wander.input);

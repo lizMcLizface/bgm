@@ -1,4 +1,5 @@
-import { arrangeBar, notesInRange, pentatonicOf } from '../arranger';
+import { arrangeBar, notesInRange, pentatonicOf, DEFAULT_LAYER_RULES, SECTION_LAYERS, layersSwitched } from '../arranger';
+import { separateLayers } from './layerRules';
 import { seeded, pick } from '../random';
 import { groupStarts } from '../meter';
 import { phraseRhythm, barRhythm, spaceAccompaniment, spaceCounter, splitPulseRoots } from './ensembleRhythm';
@@ -104,11 +105,13 @@ export function arrangeBarLatest(args) {
         barsLeftInChord: args.formBarsLeftInChord ?? args.barsLeftInChord, settings, previousTheme: prev?.composition?.phrase?.themeId }) : null;
     const section = formEnvelope(form, bar, settings.sections?.mode);
     const oldPhrase = prev?.composition?.phrase;
-    const continuing = oldPhrase && oldPhrase.units === meter.units && bar < oldPhrase.start + (oldPhrase.bars ?? 4)
+    const continuing = oldPhrase && oldPhrase.units === meter.units && bar < oldPhrase.start + (oldPhrase.bars ?? 4) && !layersSwitched(settings, prev?.phrase)
         && !(form?.section.start === bar) && !((oldPhrase.bars ?? 4) === 4 && bar % 4 === 0);
     const bars = continuing ? oldPhrase.bars : phraseLength({ choice: args.phraseLength ?? 4, seed, bar, settings, form });
-    const base = arrangeBar({ ...args, closeFigure: true, scalePcs: chord.harmonyPcs ?? scalePcs, phraseBars: bars, phraseBoundary: !continuing, settings: section ? formSettings(settings, section) : args.developForm !== false
-            ? { ...settings, sections: { ...settings.sections, mode: 'off' } } : settings,
+    // (with the layers following the sections each section plays its own, from the phrase it starts at)
+    const layered = (s) => (s.layerFlow?.mode === 'sections' && section && SECTION_LAYERS[section.type] ? { ...s, layers: SECTION_LAYERS[section.type] } : s);
+    const base = arrangeBar({ ...args, closeFigure: true, scalePcs: chord.harmonyPcs ?? scalePcs, phraseBars: bars, phraseBoundary: !continuing, settings: layered(section ? formSettings(settings, section) : args.developForm !== false
+            ? { ...settings, sections: { ...settings.sections, mode: 'off' } } : settings),
         rng: rngFor(seed, bar, 0x7f4a7c15) });
     if (args.developForm !== false) base.state.phrase = { ...base.state.phrase, section };
     const developing = args.developThemes !== false;
@@ -192,8 +195,14 @@ export function arrangeBarLatest(args) {
             bars:composition.melody.bars.map(b=>b.bar===bar?{...b,events:lead.map(e=>({...e}))}:b)};
     }
     let events = base.events.filter(e => e.role !== 'lead');
+    // The rhythm layer (settings.layers) is shaped by the pad's rules below, as a pad part of its own style and range, and gets its role back after.
+    const rhythmStyle = base.state.phrase.rhythmStyle, rhythmPlays = events.some(e => e.role === 'rhythm');
+    const asPad = list => list.map(e => ({ ...e, role: 'pad' })), asRhythm = list => list.map(e => ({ ...e, role: 'rhythm' }));
     if (args.padVariation !== false) events = [...varyPad(events.filter(e => e.role === 'pad'), { style: base.state.phrase.padStyle, index, chordBar, seed, phraseStart: phrase.start,
-        range: base.state.ranges.pad }), ...events.filter(e => e.role !== 'pad')];
+        range: base.state.ranges.pad }),
+        ...(rhythmPlays ? asRhythm(varyPad(asPad(events.filter(e => e.role === 'rhythm')), { style: rhythmStyle, index, chordBar, seed: seed ^ 0x5bd1e995, phraseStart: phrase.start,
+            range: base.state.ranges.rhythm })) : []),
+        ...events.filter(e => e.role !== 'pad' && e.role !== 'rhythm')];
     // Parallel harmony must follow the actual new melody, not the legacy notes.
     if (base.state.phrase.counter?.kind === 'harmony') {
         const range = base.state.ranges.counter, scale = notesInRange(scalePcs, range[0] - 12, range[1] + 12);
@@ -219,15 +228,18 @@ export function arrangeBarLatest(args) {
         composition.rhythm = rhythm;
         const partPlan = args.partRhythmGrammar === true ? planPartGrammar({ seed, phrase, roles: rhythm.roles }) : null;
         if (partPlan) composition.partGrammar = partPlan;
-        const split = splitPulseRoots(events.filter(e => e.role === 'pad'), { meter,
-            enabled: base.state.phrase.padStyle === 'pulse' && base.state.phrase.padPattern === 'split' });
-        let pad = spaceAccompaniment(split.rest, { rhythm, meter,
-            style: base.state.phrase.padStyle, enabled: settings.thinPadUnderLead });
-        pad = shapeRhythmicPart(pad, { role: 'pad', style: base.state.phrase.padStyle, rhythm, meter, enabled: settings.thinPadUnderLead });
-        if (partPlan) pad = partGrammar(pad, { plan: partPlan, role: 'pad', index, meter,
-            style: base.state.phrase.padStyle, enabled: settings.thinPadUnderLead, lead });
-        pad=gesturePart(pad,{gesture,meter,style:base.state.phrase.padStyle,enabled:settings.thinPadUnderLead});
-        if (split.roots.length) pad = [...split.roots, ...pad].sort((a, b) => a.beat - b.beat || a.midi - b.midi);
+        // One chord part through the ensemble rules: spaced under the lead, shaped, given its part grammar and any transition gesture.
+        const shapeChords = (list, style, pattern) => {
+            const split = splitPulseRoots(list, { meter, enabled: style === 'pulse' && pattern === 'split' });
+            let part = spaceAccompaniment(split.rest, { rhythm, meter, style, enabled: settings.thinPadUnderLead });
+            part = shapeRhythmicPart(part, { role: 'pad', style, rhythm, meter, enabled: settings.thinPadUnderLead });
+            if (partPlan) part = partGrammar(part, { plan: partPlan, role: 'pad', index, meter, style, enabled: settings.thinPadUnderLead, lead });
+            part = gesturePart(part, { gesture, meter, style, enabled: settings.thinPadUnderLead });
+            if (split.roots.length) part = [...split.roots, ...part].sort((a, b) => a.beat - b.beat || a.midi - b.midi);
+            return part;
+        };
+        const pad = shapeChords(events.filter(e => e.role === 'pad'), base.state.phrase.padStyle, base.state.phrase.padPattern);
+        const rhythmChords = rhythmPlays ? asRhythm(shapeChords(asPad(events.filter(e => e.role === 'rhythm')), rhythmStyle, base.state.phrase.rhythmPattern)) : [];
         let bass = events.filter(e => e.role === 'bass');
         if (bass.length && !base.state.phrase.pedal) {
             bass = base.state.phrase.bassStyle === 'walking'
@@ -307,10 +319,11 @@ export function arrangeBarLatest(args) {
                 }) };
             }
         }
-        events = [...pad, ...bass, ...counter];
+        events = [...pad, ...rhythmChords, ...bass, ...counter];
         if (bass.length) base.state.bassMidi = bass[bass.length - 1].midi;
         if (counter.length) base.state.counterMidi = counter[counter.length - 1].midi;
     }
+    if (base.state.phrase.layers === 'split') events = separateLayers(events, { lead, rules: { ...DEFAULT_LAYER_RULES, ...settings.layerRules }, section, meter });
     if (section) {
         events = events.filter(e => !(section.type === 'intro' && (e.role === 'counter'
             || (settings.sections.mode === 'strong' && e.role === 'bass' && bar - section.start < 4)))

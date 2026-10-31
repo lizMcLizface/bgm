@@ -21,7 +21,7 @@ export const withView = (path, linked) => {
 // its mode (scale | played) and, for the fretboards, the string the root is found on. Only what a link
 // names changes; anything not named stays as the visitor has it, and nothing here is saved.
 const PATTERN_IDS = ['piano', 'guitar', 'bass'];
-const VOICE_LETTERS = { l: 'lead', c: 'counter', p: 'pad', b: 'bass' };
+const VOICE_LETTERS = { l: 'lead', c: 'counter', p: 'pad', b: 'bass', r: 'rhythm' };
 export const patternsFromSearch = (search = '') => {
     const raw = new URLSearchParams(search).get('patterns');
     if (!raw) return null;

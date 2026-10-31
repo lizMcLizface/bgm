@@ -3,7 +3,7 @@ import { createVoiceMotion, voicePath } from './voicePaths';
 import { noteColour } from './musicColour';
 
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-const ROLE_PHASE = { bass: 0.4, pad: 0, lead: 2.1, counter: 4.2, perc: 5.3 };
+const ROLE_PHASE = { bass: 0.4, pad: 0, lead: 2.1, counter: 4.2, perc: 5.3, rhythm: 3.2 };
 
 // One motion budget, shared between travelling source and injected jet.
 // Drift is smooth, per voice, and vanishes at the two explicit endpoints.

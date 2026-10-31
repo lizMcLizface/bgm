@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import FeelPad from './FeelPad';
 import IntensityFader from './IntensityFader';
 import MoodFader from './MoodFader';
+import { voiceLayers as layersOf } from './arranger';
 import { MIX_SLIDERS, FEEL_SLIDERS, CHOICE_GROUPS, choiceAt, choicePaths, choicePatch, STACKS, LEVELS, readValue, sliderPatch, stackLevel, stackPatch, stackPaths, matchesPreset, presetPatch } from './quickControls';
 
 // milliseconds as they are, everything else as a percentage of 1
@@ -51,7 +52,7 @@ const PRESET = { key: 'preset', label: 'Preset', preset: true, title: 'As the pr
 
 // `roleLabels`: each voice's name as the rest of the page has it (rhythm, percussion, ...).
 // `baseline`: the preset's quick settings (Preset buttons); `resetKey` changes when Reset is pressed.
-export default function QuickPanel({ settings, roleLabels = {}, onVolume, onSettings, onFeel, onPush, nowLevel = 0, onMood, nowMood = 0, baseline, resetKey = 0 }) {
+export default function QuickPanel({ settings, layersUnlocked = true, roleLabels = {}, onVolume, onSettings, onFeel, onPush, nowLevel = 0, onMood, nowMood = 0, baseline, resetKey = 0 }) {
     const [picked, setPicked] = useState({});
     useEffect(() => setPicked({}), [baseline, resetKey]);
     const onPreset = (paths) => !!baseline && matchesPreset(settings, baseline, paths);
@@ -62,7 +63,7 @@ export default function QuickPanel({ settings, roleLabels = {}, onVolume, onSett
             <div className="gen-quick-top">
                 <div className="gen-quick-group" role="group" aria-label="Mix">
                     <div className="gen-quick-sliders">
-                        {MIX_SLIDERS.map(({ id, label, role, path, title, off, offTitle }) => (role
+                        {MIX_SLIDERS.filter(({ id }) => id !== 'rhythm' || (layersUnlocked && !['combined', 'pad'].includes(layersOf(settings)))).map(({ id, label, role, path, title, off, offTitle }) => (role
                             ? <Slider key={id} id={id} label={roleLabels[role] ?? label} title={off?.(settings) ? offTitle : title} off={!!off?.(settings)} colour={`var(--gen-role-${role})`} home={baseline?.volumes?.[role]} value={settings.volumes?.[role] ?? 0} onChange={(v) => onVolume(role, v)} />
                             : <Slider key={id} id={id} label={label} title={title} home={baseline?.[path]} value={settings[path] ?? 0} onChange={(v) => onSettings({ [path]: v })} />))}
                     </div>
@@ -81,7 +82,7 @@ export default function QuickPanel({ settings, roleLabels = {}, onVolume, onSett
             </div>
             <div className="gen-quick-bottom">
                 <div className="gen-quick-choices-row" role="group" aria-label="Chords and second lead">
-                    {CHOICE_GROUPS.map((group) => {
+                    {CHOICE_GROUPS.filter((group) => !['layers', 'flow'].includes(group.id) || layersUnlocked || layersOf(settings) !== 'combined').map((group) => {
                         const paths = choicePaths(group);
                         return (
                             <Choices key={group.id} label={group.label} title={group.title} hue={HUES.choice} active={settled(group.id, choiceAt(settings, group), paths)}

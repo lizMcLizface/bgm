@@ -64,6 +64,9 @@ export function normalizeScene(raw, defaultCategory = MINE.id) {
             else if (typeof spec.name === 'string' && spec.name) voices[role] = spec.name;
         }
     });
+    // The voices for the pad and the rhythm part when the chords are split between them (settings.layers), by preset name.
+    const layerVoices = Object.fromEntries(['pad', 'rhythm'].filter((role) => isObject(raw.layerVoices) && typeof raw.layerVoices[role] === 'string' && raw.layerVoices[role])
+        .map((role) => [role, raw.layerVoices[role]]));
     return {
         name,
         ...(raw.isNew === true ? { isNew: true } : {}),
@@ -77,15 +80,29 @@ export function normalizeScene(raw, defaultCategory = MINE.id) {
         settings: raw.settings,
         ...(raw.rulebook ? { rulebook: { version: 1, ...cleanBook(raw.rulebook) } } : {}),
         voices,
+        ...(Object.keys(layerVoices).length ? { layerVoices } : {}),
         ...(cleanRef(raw.percussion, MACHINE_SYNTHS) ? { percussion: cleanRef(raw.percussion, MACHINE_SYNTHS) } : {}),
     };
+}
+
+/**
+ * The voice a scene gives a role at the given layers (settings.layers): the preset's own, except that with the pad and the rhythm
+ * part separate each has the voice made for it (layerVoices), and a preset on the rhythm layer alone with none plays its pad voice.
+ * The rhythm part has a voice ready even while the layers are one voice, so switching to it needs no wait.
+ * @returns {string|object|undefined} a preset name or a full voice, undefined for the page's default
+ */
+export function sceneVoiceSpec(scene, role, layers = 'combined') {
+    const own = scene.voices?.[role], made = scene.layerVoices ?? {};
+    if (role === 'rhythm') return made.rhythm ?? own ?? (layers === 'rhythm' ? scene.voices?.pad : undefined);
+    if (role === 'pad' && layers !== 'combined') return made.pad ?? own;
+    return own;
 }
 
 /** In picker order. */
 export const SCENES = [...library.scenes, ...WEATHER_SCENES].map((scene) => normalizeScene(scene, SCENE_CATEGORIES[0].id));
 /** Archived versions resolve through sceneBySlug but stay out of browsing. */
 export const BROWSABLE_SCENES = SCENES.filter(scene => !scene.hidden);
-export const sceneUsesWasm=scene=>percussionVoice(scene.settings.drums?.kit).wasmOnly||Object.values(scene.voices).some(v=>typeof v==='string'?!!findPreset(v)?.wasmVoice:!!v?.synth?.wasmVoice);
+export const sceneUsesWasm=scene=>percussionVoice(scene.settings.drums?.kit).wasmOnly||[...Object.values(scene.voices),...Object.values(scene.layerVoices??{})].some(v=>typeof v==='string'?!!findPreset(v)?.wasmVoice:!!v?.synth?.wasmVoice);
 
 /** A name as it reads in a link: 'Rainy Day, Chickens Inside' -> 'rainy-day-chickens-inside'. */
 export const sceneSlug = (name) => name

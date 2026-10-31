@@ -378,3 +378,55 @@ export function moodCues(bars, unitsPerMinute) {
     });
     return { notesPerSecond: round(seconds ? attacks / seconds : null, 2), leadMeanMidi: round(mean(lead), 1), leadArticulation: round(mean(art), 2), leadMeanVelocity: round(mean(vel), 3) };
 }
+
+/**
+ * How well the pad and the rhythm layer (settings.layers 'split') stay apart (docs/SPLIT_LAYERS_PLAN.md stage 2), over each
+ * rhythm attack (the notes struck together at one time). Null without both parts.
+ *  closeShare:    attacks with a sounding pad note a step or less away (close pitches fuse or beat; Huron 2001)
+ *  belowFourth:   attacks whose lowest note is under a fourth above the highest sounding pad note
+ *  coincident:    attacks struck on the instant a pad note starts, other than on a bar's downbeat (where fusion is wanted)
+ *  unison:        attacks that double a sounding pad note exactly
+ *  meanGap:       mean semitones from the highest sounding pad note to the rhythm attack's lowest note
+ *  nearLead:      attacks with a note within two semitones of a sounding lead note, or the same pitch class as it (the rhythm layer
+ *                 then plays the lead's notes in a less present tone and is lost under it); of the attacks with a lead note sounding
+ */
+export function layerSeparation(bars, { padRole = 'pad', rhythmRole = 'rhythm', leadRole = 'lead' } = {}) {
+    const EPS = 0.01;
+    const pad = [], lead = [], rhythm = new Map();
+    let origin = 0;
+    for (const b of bars) {
+        for (const e of b.events) {
+            const at = origin + e.beat;
+            if (e.role === padRole) pad.push({ at, end: at + e.length, midi: e.midi });
+            else if (e.role === leadRole) lead.push({ at, end: at + e.length, midi: e.midi });
+            else if (e.role === rhythmRole) {
+                const key = Math.round(at * 1000);
+                if (!rhythm.has(key)) rhythm.set(key, { at, bar: b.bar, beat: e.beat, midis: [] });
+                rhythm.get(key).midis.push(e.midi);
+            }
+        }
+        origin += b.meter.units;
+    }
+    if (!pad.length || !rhythm.size) return null;
+    let n = 0, close = 0, below = 0, coincident = 0, unison = 0, gaps = [], withPad = 0, withLead = 0, nearLead = 0;
+    for (const a of rhythm.values()) {
+        n++;
+        const low = Math.min(...a.midis);
+        const leading = lead.filter((p) => p.at <= a.at + EPS && p.end > a.at + EPS);
+        if (leading.length) {
+            withLead++;
+            if (a.midis.some((m) => leading.some((l) => Math.abs(l.midi - m) <= 2 || mod12(l.midi - m) === 0))) nearLead++;
+        }
+        const sounding = pad.filter((p) => p.at <= a.at + EPS && p.end > a.at + EPS);
+        if (pad.some((p) => Math.abs(p.at - a.at) < EPS) && a.beat > EPS) coincident++;
+        if (!sounding.length) continue;
+        withPad++;
+        const top = Math.max(...sounding.map((p) => p.midi));
+        gaps.push(low - top);
+        if (low < top + 5) below++;
+        if (a.midis.some((m) => sounding.some((p) => Math.abs(p.midi - m) <= 2))) close++;
+        if (a.midis.some((m) => sounding.some((p) => p.midi === m))) unison++;
+    }
+    const share = (x, of = withPad) => round(of ? x / of : null);
+    return { attacks: n, withPad, closeShare: share(close), belowFourth: share(below), coincident: share(coincident, n), unison: share(unison), meanGap: round(mean(gaps), 2), nearLead: share(nearLead, withLead) };
+}

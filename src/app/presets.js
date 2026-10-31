@@ -23,10 +23,10 @@ export const HIDDEN_PRESETS = new Set(['Measured Violin', 'Measured Cello']);
 export const GENERATIVE_PRESETS = Object.assign({}, ...Object.values(PRESET_CATEGORIES));
 
 /** Each role's preset on a fresh page (and when a link names none). */
-export const ROLE_PRESETS = { lead: 'Glass Lead', pad: 'Soft Pad', bass: 'Warm Bass', counter: 'Soft Flute' };
+export const ROLE_PRESETS = { lead: 'Glass Lead', pad: 'Soft Pad', bass: 'Warm Bass', counter: 'Soft Flute', rhythm: 'Kalimba Pluck' };
 
 /** Each role's default mix volume (settings.volumes). */
-export const ROLE_VOLUMES = { lead: 0.7, counter: 0.6, pad: 0.8, bass: 0.8, perc: 0.7 };
+export const ROLE_VOLUMES = { lead: 0.7, counter: 0.6, pad: 0.8, bass: 0.8, perc: 0.7, rhythm: 0.6 };
 
 /** The category listed first in each role's preset picker. */
-export const ROLE_CATEGORY = { pad: 'Pads', bass: 'Bass', lead: 'Leads', counter: 'Leads' };
+export const ROLE_CATEGORY = { pad: 'Pads', bass: 'Bass', lead: 'Leads', counter: 'Leads', rhythm: 'Keys & plucks' };

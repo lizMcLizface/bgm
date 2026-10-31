@@ -24,8 +24,8 @@ const PARAMS = {
     noiseMix: { uses: (p) => p.noiseMix > 0, at: (p, u, a) => clamp(p.noiseMix * (1 + u * 0.3 * a), 0, 1) },
     vibratoDepth: { uses: (p) => p.vibratoDepth > 0, at: (p, u, a) => p.vibratoDepth * (1 + u * 0.3 * a) },
 };
-const ROLE_KEYS = { lead: Object.keys(PARAMS), counter: Object.keys(PARAMS), pad: Object.keys(PARAMS), bass: ['filterFreq'] };
-const ROLE_SALT = { lead: 1, counter: 2, pad: 3, bass: 4 };
+const ROLE_KEYS = { lead: Object.keys(PARAMS), counter: Object.keys(PARAMS), pad: Object.keys(PARAMS), bass: ['filterFreq'], rhythm: Object.keys(PARAMS) };
+const ROLE_SALT = { lead: 1, counter: 2, pad: 3, bass: 4, rhythm: 5 };
 
 const position = (seed, role, segment, key) => seeded((seed * 131 + segment * 977 + ROLE_SALT[role] * 7919 + key.length * 31) >>> 0)() * 2 - 1;
 

@@ -34,7 +34,7 @@ export function musicMood(heard, planned, activity = 0.3, palette = {}) {
 export function noteColour(note, { hue, mood = {}, spread = 40, age = 0 }) {
     const root = mood.root ?? 0;
     const distance = fifthDistance((note.midi % 12) - root);
-    const roleOffset = { bass: -0.14, pad: 0, lead: 0.16, counter: -0.24, perc: 0.28 }[note.role] || 0;
+    const roleOffset = { bass: -0.14, pad: 0, lead: 0.16, counter: -0.24, perc: 0.28, rhythm: 0.08 }[note.role] || 0;
     const pitch = clamp((note.midi - 36) / 60, 0, 1), velocity = clamp(note.velocity ?? 0.7, 0, 1);
     const chordTone = (mood.chordPcs || []).includes(wrap(note.midi));
     const colourSpread = spread * (mood.spread ?? 1) * (1 + (mood.tension || 0) * 0.3);

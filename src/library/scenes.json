@@ -136,7 +136,8 @@
           "bass": 0.32,
           "lead": 0.46,
           "counter": 0.25,
-          "perc": 0.26
+          "perc": 0.26,
+          "rhythm": 1
         },
         "sections": {
           "mode": "gentle",
@@ -157,7 +158,11 @@
       "tags": [
         "updated"
       ],
-      "isUpdated": true
+      "isUpdated": true,
+      "layerVoices": {
+        "pad": "Soft Pad",
+        "rhythm": "Felt Keys (updated)"
+      }
     },
     {
       "name": "Rainy café (previous piano)",
@@ -321,7 +326,8 @@
           "bass": 0.75,
           "lead": 0.073,
           "counter": 0.55,
-          "perc": 0.5
+          "perc": 0.5,
+          "rhythm": 0.76
         },
         "sections": {
           "mode": "gentle",
@@ -343,7 +349,11 @@
       "isNew": true,
       "tags": [
         "updated"
-      ]
+      ],
+      "layerVoices": {
+        "pad": "Lo-fi Tape Pad",
+        "rhythm": "FM Rhodes"
+      }
     },
     {
       "name": "Deep night",
@@ -429,7 +439,8 @@
           "bass": 0.3,
           "lead": 0.62,
           "counter": 0.48,
-          "perc": 0.44
+          "perc": 0.44,
+          "rhythm": 0.78
         },
         "ambienceVolume": 0.72
       },
@@ -437,6 +448,9 @@
         "pad": "Breathing Pad",
         "bass": "Sub Bass",
         "lead": "FM Bell"
+      },
+      "layerVoices": {
+        "rhythm": "Harp Pluck"
       }
     },
     {
@@ -510,7 +524,8 @@
           "bass": 0.68,
           "lead": 0.95,
           "counter": 0.48,
-          "perc": 0.5
+          "perc": 0.5,
+          "rhythm": 0.76
         },
         "sections": {
           "mode": "gentle",
@@ -529,6 +544,9 @@
         "bass": "Round Pluck Bass",
         "lead": "Soft Marimba",
         "counter": "Glass Mallet"
+      },
+      "layerVoices": {
+        "rhythm": "Kalimba Pluck"
       }
     },
     {
@@ -600,7 +618,8 @@
           "bass": 0.32,
           "lead": 0.84,
           "counter": 1,
-          "perc": 0.44
+          "perc": 0.44,
+          "rhythm": 0.3
         },
         "sections": {
           "mode": "gentle",
@@ -624,6 +643,9 @@
             "enabled": false
           }
         }
+      },
+      "layerVoices": {
+        "rhythm": "Harp Pluck"
       }
     },
     {
@@ -697,7 +719,8 @@
           "bass": 1,
           "lead": 0.72,
           "counter": 0.48,
-          "perc": 0.44
+          "perc": 0.44,
+          "rhythm": 0.33
         },
         "ambienceVolume": 0.72
       },
@@ -705,6 +728,9 @@
         "pad": "Tremolo Organ",
         "bass": "Warm Organ",
         "lead": "Tremolo Organ"
+      },
+      "layerVoices": {
+        "rhythm": "Kalimba Pluck"
       }
     },
     {
@@ -776,7 +802,8 @@
           "bass": 0.61,
           "lead": 0.77,
           "counter": 0.48,
-          "perc": 0.5
+          "perc": 0.5,
+          "rhythm": 0.76
         },
         "sections": {
           "mode": "gentle",
@@ -793,6 +820,10 @@
         "pad": "Harp Pluck",
         "bass": "Upright Pluck",
         "lead": "Ocarina"
+      },
+      "layerVoices": {
+        "pad": "Lo-fi Tape Pad",
+        "rhythm": "Harp Pluck"
       }
     },
     {
@@ -862,7 +893,8 @@
           "bass": 0.73,
           "lead": 0.62,
           "counter": 0.48,
-          "perc": 0.44
+          "perc": 0.44,
+          "rhythm": 0.78
         },
         "sections": {
           "mode": "gentle",
@@ -914,7 +946,11 @@
       "isNew": true,
       "tags": [
         "updated"
-      ]
+      ],
+      "layerVoices": {
+        "pad": "Starmap Void",
+        "rhythm": "Kalimba Pluck"
+      }
     },
     {
       "name": "Tape memories",
@@ -984,7 +1020,8 @@
           "bass": 0.7,
           "lead": 0.8,
           "counter": 0.48,
-          "perc": 0.41
+          "perc": 0.41,
+          "rhythm": 0.53
         },
         "sections": {
           "mode": "gentle",
@@ -1006,7 +1043,10 @@
       "isNew": true,
       "tags": [
         "updated"
-      ]
+      ],
+      "layerVoices": {
+        "rhythm": "Nylon Guitar"
+      }
     },
     {
       "name": "Choir at sea",
@@ -1078,7 +1118,8 @@
           "bass": 0.3,
           "lead": 0.71,
           "counter": 0.48,
-          "perc": 0.44
+          "perc": 0.44,
+          "rhythm": 0.5
         },
         "sections": {
           "mode": "gentle",
@@ -1102,6 +1143,9 @@
             "enabled": false
           }
         }
+      },
+      "layerVoices": {
+        "rhythm": "Glass Mallet"
       }
     },
     {
@@ -1167,7 +1211,8 @@
           "bass": 0.4,
           "lead": 0.59,
           "counter": 0.28,
-          "perc": 0.29
+          "perc": 0.29,
+          "rhythm": 1
         },
         "sections": {
           "mode": "gentle",
@@ -1187,7 +1232,11 @@
       "tags": [
         "updated"
       ],
-      "isUpdated": true
+      "isUpdated": true,
+      "layerVoices": {
+        "pad": "Warm Strings",
+        "rhythm": "Soft Keys (updated)"
+      }
     },
     {
       "name": "Morning coffee (previous piano)",
@@ -1337,7 +1386,8 @@
           "bass": 0.31,
           "lead": 0.89,
           "counter": 0.48,
-          "perc": 0.5
+          "perc": 0.5,
+          "rhythm": 0.76
         },
         "sections": {
           "mode": "gentle",
@@ -1349,6 +1399,10 @@
         "bass": "Sub Bass",
         "lead": "Bell Lead",
         "counter": "Celesta"
+      },
+      "layerVoices": {
+        "pad": "Glass Pad",
+        "rhythm": "Music Box"
       }
     },
     {
@@ -1425,7 +1479,8 @@
           "bass": 0.35,
           "lead": 0.75,
           "counter": 0.36,
-          "perc": 0.33
+          "perc": 0.33,
+          "rhythm": 0.72
         }
       },
       "voices": {
@@ -1446,6 +1501,9 @@
             "enabled": false
           }
         }
+      },
+      "layerVoices": {
+        "rhythm": "Kalimba Pluck"
       }
     },
     {
@@ -1511,7 +1569,8 @@
           "bass": 0.75,
           "lead": 0.8,
           "counter": 0.48,
-          "perc": 0.5
+          "perc": 0.5,
+          "rhythm": 0.57
         },
         "sections": {
           "mode": "gentle",
@@ -1528,6 +1587,9 @@
         "pad": "Velvet Pad",
         "bass": "Warm Bass",
         "lead": "Soft Saw Lead"
+      },
+      "layerVoices": {
+        "rhythm": "Felt Keys"
       }
     },
     {
@@ -1598,7 +1660,8 @@
           "bass": 0.68,
           "lead": 0.37,
           "counter": 0.27,
-          "perc": 0.28
+          "perc": 0.28,
+          "rhythm": 0.84
         },
         "chordColour": {
           "mode": "add9",
@@ -1654,7 +1717,11 @@
       "isNew": true,
       "tags": [
         "updated"
-      ]
+      ],
+      "layerVoices": {
+        "pad": "Velvet Pad",
+        "rhythm": "Coastal FM Lead"
+      }
     },
     {
       "name": "Quiet-room waltz",
@@ -1723,7 +1790,8 @@
           "bass": 0.44,
           "lead": 0.66,
           "counter": 0.48,
-          "perc": 0.5
+          "perc": 0.5,
+          "rhythm": 0.76
         },
         "sections": {
           "mode": "gentle",
@@ -1739,6 +1807,10 @@
         "pad": "Tine Keys",
         "bass": "Felt Bass",
         "lead": "Clarinet Lead"
+      },
+      "layerVoices": {
+        "pad": "Soft Pad",
+        "rhythm": "Tine Keys"
       }
     },
     {
@@ -1804,7 +1876,8 @@
           "bass": 0.44,
           "lead": 0.39,
           "counter": 0.28,
-          "perc": 0.29
+          "perc": 0.29,
+          "rhythm": 1
         },
         "sections": {
           "mode": "gentle",
@@ -1823,7 +1896,11 @@
       "tags": [
         "updated"
       ],
-      "isUpdated": true
+      "isUpdated": true,
+      "layerVoices": {
+        "pad": "Hollow Air",
+        "rhythm": "Soft Keys (updated)"
+      }
     },
     {
       "name": "Dorian walk (previous piano)",
@@ -1973,7 +2050,8 @@
           "bass": 0.44,
           "lead": 0.85,
           "counter": 0.48,
-          "perc": 0.44
+          "perc": 0.44,
+          "rhythm": 0.78
         },
         "sections": {
           "mode": "gentle",
@@ -1995,6 +2073,9 @@
             "enabled": false
           }
         }
+      },
+      "layerVoices": {
+        "rhythm": "Celesta"
       }
     },
     {
@@ -2065,7 +2146,8 @@
           "bass": 0.57,
           "lead": 0.78,
           "counter": 0.86,
-          "perc": 0.5
+          "perc": 0.5,
+          "rhythm": 0.76
         },
         "sections": {
           "mode": "gentle",
@@ -2083,6 +2165,9 @@
         "bass": "Rubber Bass",
         "lead": "Ocarina",
         "counter": "Kalimba Pluck"
+      },
+      "layerVoices": {
+        "rhythm": "Music Box"
       }
     },
     {
@@ -2324,7 +2409,8 @@
           "bass": 0.46,
           "lead": 0.82,
           "counter": 0.81,
-          "perc": 0.5
+          "perc": 0.5,
+          "rhythm": 0.76
         },
         "breakdowns": {
           "meter": "same",
@@ -2336,7 +2422,8 @@
         },
         "leadSyncopation": 0.25,
         "padRoot": "unlessBass",
-        "chordSize": "functional"
+        "chordSize": "functional",
+        "layers": "rhythm"
       },
       "voices": {
         "pad": "Arp Pluck",
@@ -2359,6 +2446,10 @@
             "enabled": true
           }
         }
+      },
+      "layerVoices": {
+        "pad": "Night Glass",
+        "rhythm": "Arp Pluck"
       }
     },
     {
@@ -2442,7 +2533,8 @@
           "bass": 0.45,
           "lead": 0.62,
           "counter": 0.48,
-          "perc": 0.44
+          "perc": 0.44,
+          "rhythm": 0.42
         },
         "breakdowns": {
           "meter": "same",
@@ -2469,6 +2561,9 @@
             "enabled": false
           }
         }
+      },
+      "layerVoices": {
+        "rhythm": "Arp Pluck"
       }
     },
     {
@@ -2563,7 +2658,8 @@
           "bass": 0.75,
           "lead": 0.8,
           "counter": 0.78,
-          "perc": 0.5
+          "perc": 0.5,
+          "rhythm": 0.76
         },
         "breakdowns": {
           "meter": "same",
@@ -2571,7 +2667,8 @@
         },
         "leadSyncopation": 0.3,
         "padRoot": "unlessBass",
-        "chordSize": "functional"
+        "chordSize": "functional",
+        "layers": "rhythm"
       },
       "voices": {
         "pad": "Arp Pluck",
@@ -2586,6 +2683,10 @@
             "enabled": true
           }
         }
+      },
+      "layerVoices": {
+        "pad": "Slow Sweep",
+        "rhythm": "Arp Pluck"
       }
     },
     {
@@ -2681,7 +2782,8 @@
           "bass": 0.78,
           "lead": 0.68,
           "counter": 0.5,
-          "perc": 0.59
+          "perc": 0.59,
+          "rhythm": 0.76
         },
         "breakdowns": {
           "meter": "same",
@@ -2689,13 +2791,18 @@
         },
         "leadSyncopation": 0.2,
         "padRoot": "unlessBass",
-        "chordSize": "functional"
+        "chordSize": "functional",
+        "layers": "rhythm"
       },
       "voices": {
         "pad": "Arp Pluck",
         "bass": "Drive Bass",
         "lead": "Fanfare Brass",
         "counter": "Heroic Strings"
+      },
+      "layerVoices": {
+        "pad": "Neon Saw Pad",
+        "rhythm": "Arp Pluck"
       }
     },
     {
@@ -2802,7 +2909,8 @@
           "bass": 0.21,
           "lead": 0.36,
           "counter": 0.63,
-          "perc": 0
+          "perc": 0,
+          "rhythm": 0.62
         },
         "ambience": {},
         "playAmbience": false,
@@ -2843,7 +2951,10 @@
           }
         }
       },
-      "isUpdated": true
+      "isUpdated": true,
+      "layerVoices": {
+        "rhythm": "Pluck Chord"
+      }
     },
     {
       "name": "Plotting a Course (previous piano)",
@@ -3076,7 +3187,8 @@
           "bass": 0.38,
           "lead": 0.68,
           "counter": 0.59,
-          "perc": 0.62
+          "perc": 0.62,
+          "rhythm": 0.27
         },
         "ambienceVolume": 0.35,
         "chordBorrow": 0,
@@ -3175,6 +3287,9 @@
             "enabled": false
           }
         }
+      },
+      "layerVoices": {
+        "rhythm": "Music Box"
       }
     },
     {
@@ -3340,7 +3455,8 @@
           "bass": 0.27,
           "lead": 0.5,
           "counter": 0.25,
-          "perc": 0.25
+          "perc": 0.25,
+          "rhythm": 0.71
         },
         "sections": {
           "mode": "gentle",
@@ -3400,6 +3516,9 @@
             "enabled": true
           }
         }
+      },
+      "layerVoices": {
+        "rhythm": "Music Box"
       }
     },
     {
@@ -3590,7 +3709,8 @@
           "bass": 0.6,
           "lead": 0.62,
           "counter": 0.28,
-          "perc": 0.48
+          "perc": 0.48,
+          "rhythm": 0.46
         },
         "pulseWeights": {
           "groups": 35,
@@ -3609,7 +3729,8 @@
           "halfTime": true
         },
         "leadSyncopation": 0.25,
-        "padRoot": "unlessBass"
+        "padRoot": "unlessBass",
+        "layers": "rhythm"
       },
       "voices": {
         "pad": "Arp Pluck",
@@ -3633,6 +3754,10 @@
             "enabled": false
           }
         }
+      },
+      "layerVoices": {
+        "pad": "Swelling Analog",
+        "rhythm": "Arp Pluck"
       }
     },
     {
@@ -3846,7 +3971,8 @@
           "bass": 0.52,
           "lead": 0.64,
           "counter": 0.2,
-          "perc": 0.48
+          "perc": 0.48,
+          "rhythm": 0.46
         },
         "pulseWeights": {
           "groups": 20,
@@ -3870,7 +3996,8 @@
           "halfTime": true
         },
         "leadSyncopation": 0.25,
-        "padRoot": "unlessBass"
+        "padRoot": "unlessBass",
+        "layers": "rhythm"
       },
       "voices": {
         "pad": "Arp Pluck",
@@ -3897,6 +4024,10 @@
             "enabled": false
           }
         }
+      },
+      "layerVoices": {
+        "pad": "Heroic Strings",
+        "rhythm": "Arp Pluck"
       }
     },
     {
@@ -4103,7 +4234,8 @@
           "bass": 0.5,
           "lead": 0.65,
           "counter": 0.2,
-          "perc": 0.4
+          "perc": 0.4,
+          "rhythm": 0.5
         },
         "pulseWeights": {
           "groups": 60,
@@ -4141,6 +4273,9 @@
             "enabled": false
           }
         }
+      },
+      "layerVoices": {
+        "rhythm": "Arp Pluck"
       }
     },
     {
@@ -4315,7 +4450,8 @@
           "bass": 0.4,
           "lead": 0.68,
           "counter": 0.53,
-          "perc": 0.25
+          "perc": 0.25,
+          "rhythm": 0.58
         },
         "sections": {
           "mode": "gentle",
@@ -4338,7 +4474,8 @@
           "meter": "3/4",
           "halfTime": false
         },
-        "padRoot": "unlessBass"
+        "padRoot": "unlessBass",
+        "layers": "rhythm"
       },
       "voices": {
         "pad": "Harp Pluck",
@@ -4368,6 +4505,10 @@
             "enabled": false
           }
         }
+      },
+      "layerVoices": {
+        "pad": "Heroic Strings",
+        "rhythm": "Harp Pluck"
       }
     },
     {
@@ -4539,7 +4680,8 @@
           "bass": 0.43,
           "lead": 0.55,
           "counter": 0.25,
-          "perc": 0.2
+          "perc": 0.2,
+          "rhythm": 0.55
         },
         "sections": {
           "mode": "gentle",
@@ -4556,7 +4698,8 @@
           "amount": 0.2
         },
         "chordBorrow": 0,
-        "padRoot": "unlessBass"
+        "padRoot": "unlessBass",
+        "layers": "rhythm"
       },
       "voices": {
         "pad": "Soft Harp",
@@ -4580,6 +4723,10 @@
             "enabled": false
           }
         }
+      },
+      "layerVoices": {
+        "pad": "Warm Organ",
+        "rhythm": "Soft Harp"
       }
     },
     {
@@ -4745,7 +4892,8 @@
           "bass": 0.55,
           "lead": 0.62,
           "counter": 0.24,
-          "perc": 0.25
+          "perc": 0.25,
+          "rhythm": 0.44
         },
         "pulseWeights": {
           "groups": 0,
@@ -4818,6 +4966,9 @@
             "enabled": true
           }
         }
+      },
+      "layerVoices": {
+        "rhythm": "Measured Cello Pizzicato"
       }
     },
     {
@@ -4983,7 +5134,8 @@
           "bass": 0.75,
           "lead": 0.41,
           "counter": 0.48,
-          "perc": 0.5
+          "perc": 0.5,
+          "rhythm": 0.76
         },
         "sections": {
           "mode": "gentle",
@@ -4998,6 +5150,10 @@
         "bass": "Upright Pluck",
         "lead": "Pan Flute",
         "counter": "Squeezebox"
+      },
+      "layerVoices": {
+        "pad": "Velvet Pad",
+        "rhythm": "Nylon Guitar"
       }
     },
     {
@@ -5067,7 +5223,8 @@
           "bass": 0.48,
           "lead": 0.21,
           "counter": 0.25,
-          "perc": 0.26
+          "perc": 0.26,
+          "rhythm": 1
         },
         "sections": {
           "mode": "gentle",
@@ -5080,7 +5237,11 @@
         "bass": "Felt Bass",
         "lead": "Pan Flute"
       },
-      "isUpdated": true
+      "isUpdated": true,
+      "layerVoices": {
+        "pad": "Warm Organ",
+        "rhythm": "Felt Keys (updated)"
+      }
     },
     {
       "name": "Rainy Day, Chickens Inside (previous piano)",
@@ -5234,7 +5395,8 @@
           "bass": 0.44,
           "lead": 0.39,
           "counter": 0.28,
-          "perc": 0.29
+          "perc": 0.29,
+          "rhythm": 1
         },
         "sections": {
           "mode": "gentle",
@@ -5252,7 +5414,11 @@
         "bass": "Upright Pluck",
         "lead": "Squeezebox"
       },
-      "isUpdated": true
+      "isUpdated": true,
+      "layerVoices": {
+        "pad": "Warm Strings",
+        "rhythm": "Soft Keys (updated)"
+      }
     },
     {
       "name": "Pint-Sized Saloon (previous piano)",
@@ -5422,7 +5588,8 @@
           "bass": 0.75,
           "lead": 0.41,
           "counter": 0.4,
-          "perc": 0.5
+          "perc": 0.5,
+          "rhythm": 0.76
         },
         "ambienceVolume": 0.66,
         "leadSyncopation": 0.2,
@@ -5433,6 +5600,10 @@
         "bass": "Warm Bass",
         "lead": "Pan Flute",
         "counter": "Soft Marimba"
+      },
+      "layerVoices": {
+        "pad": "Soft Pad",
+        "rhythm": "Nylon Guitar"
       }
     },
     {
@@ -5512,7 +5683,8 @@
           "bass": 0.3,
           "lead": 0.62,
           "counter": 0.48,
-          "perc": 0.44
+          "perc": 0.44,
+          "rhythm": 0.42
         },
         "sections": {
           "mode": "gentle",
@@ -5535,6 +5707,9 @@
             "enabled": false
           }
         }
+      },
+      "layerVoices": {
+        "rhythm": "Harp Pluck"
       }
     },
     {
@@ -5607,7 +5782,8 @@
           "bass": 0.3,
           "lead": 0.62,
           "counter": 0.42,
-          "perc": 0.44
+          "perc": 0.44,
+          "rhythm": 0.78
         },
         "sections": {
           "mode": "gentle",
@@ -5635,6 +5811,10 @@
             "enabled": false
           }
         }
+      },
+      "layerVoices": {
+        "pad": "Warm Organ",
+        "rhythm": "Music Box"
       }
     },
     {
@@ -5723,7 +5903,8 @@
           "bass": 0.089,
           "lead": 0.32,
           "counter": 0.17,
-          "perc": 0.21
+          "perc": 0.21,
+          "rhythm": 1
         },
         "ambienceVolume": 0.4,
         "chordBorrow": 0,
@@ -5738,7 +5919,8 @@
         "chordColour": {
           "mode": "add9",
           "amount": 0.55
-        }
+        },
+        "layers": "rhythm"
       },
       "voices": {
         "pad": "Felt Keys (updated)",
@@ -5772,7 +5954,11 @@
           }
         }
       },
-      "isUpdated": true
+      "isUpdated": true,
+      "layerVoices": {
+        "pad": "Warm Organ",
+        "rhythm": "Felt Keys (updated)"
+      }
     },
     {
       "name": "Cold Drifts, Warm Socks (previous piano)",
@@ -6096,7 +6282,8 @@
           "bass": 0.13,
           "lead": 0.48,
           "counter": 0.21,
-          "perc": 0.25
+          "perc": 0.25,
+          "rhythm": 0.81
         },
         "ambienceVolume": 0.45,
         "chordBorrow": 0,
@@ -6150,6 +6337,9 @@
             "enabled": true
           }
         }
+      },
+      "layerVoices": {
+        "rhythm": "Celesta"
       }
     },
     {
@@ -6349,7 +6539,8 @@
           "bass": 0.32,
           "lead": 0.34,
           "counter": 0.14,
-          "perc": 0.32
+          "perc": 0.32,
+          "rhythm": 0.62
         },
         "ambienceVolume": 0.45,
         "chordBorrow": 0,
@@ -6371,7 +6562,8 @@
           "mode": "sus2",
           "amount": 0.35
         },
-        "padRoot": "unlessBass"
+        "padRoot": "unlessBass",
+        "layers": "rhythm"
       },
       "voices": {
         "pad": "Nylon Guitar",
@@ -6401,6 +6593,10 @@
             "enabled": false
           }
         }
+      },
+      "layerVoices": {
+        "pad": "Swelling Analog",
+        "rhythm": "Nylon Guitar"
       }
     },
     {
@@ -6588,7 +6784,8 @@
           "bass": 0.18,
           "lead": 0.3,
           "counter": 0.17,
-          "perc": 0.24
+          "perc": 0.24,
+          "rhythm": 1
         },
         "ambienceVolume": 0.3,
         "chordBorrow": 0,
@@ -6613,7 +6810,8 @@
         "pedal": {
           "mode": "tonic",
           "amount": 0.35
-        }
+        },
+        "layers": "rhythm"
       },
       "voices": {
         "pad": "Felt Keys (updated)",
@@ -6647,7 +6845,11 @@
           }
         }
       },
-      "isUpdated": true
+      "isUpdated": true,
+      "layerVoices": {
+        "pad": "Warm Organ",
+        "rhythm": "Felt Keys (updated)"
+      }
     },
     {
       "name": "Ruins in the Drizzle (previous piano)",
@@ -6954,7 +7156,8 @@
           "bass": 0.66,
           "lead": 0.48,
           "counter": 0.4,
-          "perc": 0.38
+          "perc": 0.38,
+          "rhythm": 0.73
         },
         "sections": {
           "mode": "gentle",
@@ -6985,6 +7188,9 @@
             "enabled": false
           }
         }
+      },
+      "layerVoices": {
+        "rhythm": "Soft Marimba"
       }
     },
     {
@@ -7047,7 +7253,8 @@
           "bass": 0.21,
           "lead": 0.26,
           "counter": 0.21,
-          "perc": 0.2
+          "perc": 0.2,
+          "rhythm": 1
         },
         "sections": {
           "mode": "gentle",
@@ -7082,7 +7289,11 @@
       "tags": [
         "updated"
       ],
-      "isUpdated": true
+      "isUpdated": true,
+      "layerVoices": {
+        "pad": "Morning Haze",
+        "rhythm": "Felt Keys (updated)"
+      }
     },
     {
       "name": "Quiet Studio (previous piano)",
@@ -7241,7 +7452,8 @@
           "bass": 0.27,
           "lead": 0.48,
           "counter": 0.4,
-          "perc": 0.38
+          "perc": 0.38,
+          "rhythm": 0.73
         },
         "sections": {
           "mode": "gentle",
@@ -7272,6 +7484,9 @@
             "enabled": false
           }
         }
+      },
+      "layerVoices": {
+        "rhythm": "Music Box"
       }
     },
     {
@@ -7338,7 +7553,8 @@
           "bass": 0.6,
           "lead": 0.48,
           "counter": 0.4,
-          "perc": 0.38
+          "perc": 0.38,
+          "rhythm": 0.73
         },
         "sections": {
           "mode": "gentle",
@@ -7369,6 +7585,10 @@
             "enabled": false
           }
         }
+      },
+      "layerVoices": {
+        "pad": "Morning Haze",
+        "rhythm": "Tine Keys"
       }
     },
     {
@@ -7435,7 +7655,8 @@
           "bass": 0.27,
           "lead": 0.48,
           "counter": 0.4,
-          "perc": 0.38
+          "perc": 0.38,
+          "rhythm": 0.73
         },
         "sections": {
           "mode": "gentle",
@@ -7467,6 +7688,9 @@
             "enabled": false
           }
         }
+      },
+      "layerVoices": {
+        "rhythm": "Music Box"
       }
     },
     {
@@ -7533,7 +7757,8 @@
           "bass": 0.36,
           "lead": 0.29,
           "counter": 0.24,
-          "perc": 0.23
+          "perc": 0.23,
+          "rhythm": 1
         },
         "sections": {
           "mode": "gentle",
@@ -7568,7 +7793,11 @@
       "tags": [
         "updated"
       ],
-      "isUpdated": true
+      "isUpdated": true,
+      "layerVoices": {
+        "pad": "Velvet Pad",
+        "rhythm": "Soft Keys (updated)"
+      }
     },
     {
       "name": "Upbeat Explainer (previous piano)",
@@ -7732,7 +7961,8 @@
           "bass": 0.27,
           "lead": 0.48,
           "counter": 0.4,
-          "perc": 0.38
+          "perc": 0.38,
+          "rhythm": 0.73
         },
         "sections": {
           "mode": "gentle",
@@ -7764,6 +7994,9 @@
             "enabled": false
           }
         }
+      },
+      "layerVoices": {
+        "rhythm": "Felt Keys"
       }
     },
     {
@@ -7830,7 +8063,8 @@
           "bass": 0.66,
           "lead": 0.48,
           "counter": 0.4,
-          "perc": 0.38
+          "perc": 0.38,
+          "rhythm": 0.73
         },
         "sections": {
           "mode": "gentle",
@@ -7861,6 +8095,10 @@
             "enabled": false
           }
         }
+      },
+      "layerVoices": {
+        "pad": "Velvet Pad",
+        "rhythm": "FM Rhodes"
       }
     },
     {
@@ -7924,7 +8162,8 @@
           "bass": 1,
           "lead": 0.62,
           "counter": 0.48,
-          "perc": 0.44
+          "perc": 0.44,
+          "rhythm": 0.66
         },
         "sections": {
           "mode": "gentle",
@@ -7940,6 +8179,9 @@
         "pad": "Warm Organ",
         "bass": "Felt Bass",
         "lead": "Clarinet Lead"
+      },
+      "layerVoices": {
+        "rhythm": "Soft Marimba"
       }
     },
     {
@@ -8005,7 +8247,8 @@
           "bass": 0.75,
           "lead": 0.95,
           "counter": 0.48,
-          "perc": 0.5
+          "perc": 0.5,
+          "rhythm": 0.76
         },
         "sections": {
           "mode": "gentle",
@@ -8020,6 +8263,10 @@
         "pad": "Tine Keys",
         "bass": "Warm Bass",
         "lead": "Soft Marimba"
+      },
+      "layerVoices": {
+        "pad": "Glass Pad",
+        "rhythm": "Tine Keys"
       }
     },
     {
@@ -8087,7 +8334,8 @@
           "bass": 0.73,
           "lead": 0.9,
           "counter": 0.48,
-          "perc": 0.44
+          "perc": 0.44,
+          "rhythm": 0.64
         },
         "sections": {
           "mode": "gentle",
@@ -8107,6 +8355,9 @@
         "pad": "Morning Haze",
         "bass": "Warm Bass",
         "lead": "Music Box"
+      },
+      "layerVoices": {
+        "rhythm": "Soft Marimba"
       }
     },
     {
@@ -8383,16 +8634,22 @@
           "bass": 0.7,
           "lead": 0.28,
           "counter": 0.72,
-          "perc": 0.59
+          "perc": 0.59,
+          "rhythm": 0.76
         },
         "leadSyncopation": 0.25,
-        "padRoot": "unlessBass"
+        "padRoot": "unlessBass",
+        "layers": "rhythm"
       },
       "voices": {
         "pad": "Arp Pluck",
         "bass": "Round Pluck Bass",
         "lead": "Organ Whistle",
         "counter": "Soft Marimba"
+      },
+      "layerVoices": {
+        "pad": "Soft Pad",
+        "rhythm": "Arp Pluck"
       }
     },
     {
@@ -8643,20 +8900,26 @@
           "bass": 0.78,
           "lead": 0.5,
           "counter": 0.42,
-          "perc": 0.59
+          "perc": 0.59,
+          "rhythm": 0.76
         },
         "breakdowns": {
           "meter": "same",
           "halfTime": true
         },
         "leadSyncopation": 0.15,
-        "padRoot": "unlessBass"
+        "padRoot": "unlessBass",
+        "layers": "rhythm"
       },
       "voices": {
         "pad": "Arp Pluck",
         "bass": "Drive Bass",
         "lead": "Soft Saw Lead",
         "counter": "Warm Organ"
+      },
+      "layerVoices": {
+        "pad": "Void Pad",
+        "rhythm": "Arp Pluck"
       }
     },
     {
@@ -8737,20 +9000,26 @@
           "bass": 0.78,
           "lead": 0.68,
           "counter": 0.5,
-          "perc": 0.59
+          "perc": 0.59,
+          "rhythm": 0.76
         },
         "breakdowns": {
           "meter": "same",
           "halfTime": true
         },
         "leadSyncopation": 0.2,
-        "padRoot": "unlessBass"
+        "padRoot": "unlessBass",
+        "layers": "rhythm"
       },
       "voices": {
         "pad": "Arp Pluck",
         "bass": "Drive Bass",
         "lead": "Racer Lead",
         "counter": "Chip Lead"
+      },
+      "layerVoices": {
+        "pad": "Swelling Analog",
+        "rhythm": "Arp Pluck"
       }
     },
     {
@@ -8832,7 +9101,8 @@
           "bass": 0.78,
           "lead": 0.68,
           "counter": 0.31,
-          "perc": 0.59
+          "perc": 0.59,
+          "rhythm": 0.76
         },
         "breakdowns": {
           "meter": "same",
@@ -8847,6 +9117,9 @@
         "bass": "Drive Bass",
         "lead": "Fanfare Brass",
         "counter": "Pan Flute"
+      },
+      "layerVoices": {
+        "rhythm": "Soft Marimba"
       }
     },
     {
@@ -8924,7 +9197,8 @@
           "bass": 0.47,
           "lead": 0.62,
           "counter": 0.48,
-          "perc": 0.44
+          "perc": 0.44,
+          "rhythm": 0.78
         },
         "ambienceVolume": 0.72
       },
@@ -8946,6 +9220,10 @@
             "enabled": false
           }
         }
+      },
+      "layerVoices": {
+        "pad": "Soft Pad",
+        "rhythm": "Soft Harp"
       }
     },
     {
@@ -9024,7 +9302,8 @@
           "bass": 0.44,
           "lead": 0.56,
           "counter": 0.69,
-          "perc": 0.29
+          "perc": 0.29,
+          "rhythm": 1
         },
         "sections": {
           "mode": "gentle",
@@ -9075,7 +9354,11 @@
         "counter": "Kalimba Pluck"
       },
       "isUpdated": true,
-      "isNew": true
+      "isNew": true,
+      "layerVoices": {
+        "pad": "Soft Pad",
+        "rhythm": "Soft Keys (updated)"
+      }
     },
     {
       "name": "Island Shop Hours (previous piano)",
@@ -9272,7 +9555,8 @@
           "bass": 0.19,
           "lead": 1,
           "counter": 0.3,
-          "perc": 0.28
+          "perc": 0.28,
+          "rhythm": 0.7
         },
         "sections": {
           "mode": "gentle",
@@ -9296,7 +9580,10 @@
           }
         }
       },
-      "isUpdated": true
+      "isUpdated": true,
+      "layerVoices": {
+        "rhythm": "Soft Marimba"
+      }
     },
     {
       "name": "Quiet Blocky Cave (previous piano)",
@@ -9483,7 +9770,8 @@
           "bass": 0.38,
           "lead": 0.5,
           "counter": 0.39,
-          "perc": 0.36
+          "perc": 0.36,
+          "rhythm": 1
         },
         "ambienceVolume": 0.72
       },
@@ -9505,6 +9793,9 @@
             "enabled": false
           }
         }
+      },
+      "layerVoices": {
+        "rhythm": "Celesta"
       }
     },
     {
@@ -9586,7 +9877,8 @@
           "bass": 0.47,
           "lead": 0.62,
           "counter": 0.48,
-          "perc": 0.44
+          "perc": 0.44,
+          "rhythm": 0.78
         },
         "arc": {
           "shape": "wave",
@@ -9608,6 +9900,9 @@
             "enabled": false
           }
         }
+      },
+      "layerVoices": {
+        "rhythm": "Glass Mallet"
       }
     },
     {
@@ -9686,7 +9981,8 @@
           "bass": 0.44,
           "lead": 0.89,
           "counter": 0.48,
-          "perc": 0.5
+          "perc": 0.5,
+          "rhythm": 0.76
         },
         "chordColour": {
           "mode": "add9",
@@ -9697,6 +9993,10 @@
         "pad": "FM Rhodes",
         "bass": "Felt Bass",
         "lead": "Clarinet Lead"
+      },
+      "layerVoices": {
+        "pad": "Velvet Pad",
+        "rhythm": "FM Rhodes"
       }
     },
     {
@@ -9770,7 +10070,8 @@
           "bass": 0.4,
           "lead": 0.39,
           "counter": 0.28,
-          "perc": 0.29
+          "perc": 0.29,
+          "rhythm": 1
         },
         "sections": {
           "mode": "gentle",
@@ -9782,7 +10083,11 @@
         "bass": "Round Pluck Bass",
         "lead": "Kalimba Pluck"
       },
-      "isUpdated": true
+      "isUpdated": true,
+      "layerVoices": {
+        "pad": "Morning Haze",
+        "rhythm": "Soft Keys (updated)"
+      }
     },
     {
       "name": "Five Notes Only (previous piano)",
@@ -9958,7 +10263,8 @@
           "bass": 0.24,
           "lead": 0.64,
           "counter": 0.39,
-          "perc": 0.36
+          "perc": 0.36,
+          "rhythm": 0.75
         },
         "ambienceVolume": 0.72
       },
@@ -9977,6 +10283,9 @@
             "enabled": false
           }
         }
+      },
+      "layerVoices": {
+        "rhythm": "Glass Mallet"
       }
     },
     {
@@ -10048,7 +10357,8 @@
           "bass": 0.75,
           "lead": 0.85,
           "counter": 0.48,
-          "perc": 0.5
+          "perc": 0.5,
+          "rhythm": 0.76
         },
         "sections": {
           "mode": "gentle",
@@ -10059,6 +10369,10 @@
         "pad": "Harp Pluck",
         "bass": "Warm Bass",
         "lead": "Music Box"
+      },
+      "layerVoices": {
+        "pad": "Soft Pad",
+        "rhythm": "Harp Pluck"
       }
     },
     {
@@ -10139,7 +10453,8 @@
           "bass": 0.45,
           "lead": 0.62,
           "counter": 0.48,
-          "perc": 0.44
+          "perc": 0.44,
+          "rhythm": 0.64
         }
       },
       "voices": {
@@ -10157,6 +10472,9 @@
             "enabled": false
           }
         }
+      },
+      "layerVoices": {
+        "rhythm": "Measured Cello Pizzicato"
       }
     },
     {
@@ -10242,7 +10560,8 @@
           "bass": 0.16,
           "lead": 0.9,
           "counter": 0.2,
-          "perc": 0.2
+          "perc": 0.2,
+          "rhythm": 0.4
         },
         "ambienceVolume": 0.4,
         "leadEnding": "open",
@@ -10284,6 +10603,9 @@
             "enabled": false
           }
         }
+      },
+      "layerVoices": {
+        "rhythm": "Arp Pluck"
       }
     },
     {
@@ -10485,7 +10807,8 @@
           "bass": 0.13,
           "lead": 0.89,
           "counter": 0.18,
-          "perc": 0.15
+          "perc": 0.15,
+          "rhythm": 0.42
         },
         "ambienceVolume": 0.4,
         "leadScale": "pentatonic",
@@ -10529,6 +10852,9 @@
             "enabled": false
           }
         }
+      },
+      "layerVoices": {
+        "rhythm": "Harp Pluck"
       }
     },
     {
@@ -10730,11 +11056,13 @@
           "bass": 0.67,
           "lead": 0.78,
           "counter": 0.63,
-          "perc": 0.51
+          "perc": 0.51,
+          "rhythm": 0.65
         },
         "ambienceVolume": 0.66,
         "leadSyncopation": 0.35,
-        "padRoot": "unlessBass"
+        "padRoot": "unlessBass",
+        "layers": "rhythm"
       },
       "voices": {
         "pad": "Arp Pluck",
@@ -10749,6 +11077,10 @@
             "enabled": true
           }
         }
+      },
+      "layerVoices": {
+        "pad": "Warm Strings",
+        "rhythm": "Arp Pluck"
       }
     },
     {
@@ -10830,7 +11162,8 @@
           "bass": 0.66,
           "lead": 1,
           "counter": 0.42,
-          "perc": 0.44
+          "perc": 0.44,
+          "rhythm": 0.67
         },
         "ambienceVolume": 0.66,
         "arc": {
@@ -10843,6 +11176,9 @@
         "pad": "Neon Saw Pad",
         "bass": "Seq Bass",
         "lead": "Ghost Sweep"
+      },
+      "layerVoices": {
+        "rhythm": "Pluck Chord"
       }
     },
     {
@@ -10930,7 +11266,8 @@
           "bass": 0.75,
           "lead": 0.66,
           "counter": 0.48,
-          "perc": 0.5
+          "perc": 0.5,
+          "rhythm": 0.76
         },
         "padRoot": "unlessBass",
         "chordSize": "functional"
@@ -10939,6 +11276,9 @@
         "pad": "Night Glass",
         "bass": "Neon Pulse Bass",
         "lead": "Glass Lead"
+      },
+      "layerVoices": {
+        "rhythm": "Pluck Chord"
       }
     },
     {
@@ -11020,7 +11360,8 @@
           "bass": 0.75,
           "lead": 0.66,
           "counter": 0.48,
-          "perc": 0.5
+          "perc": 0.5,
+          "rhythm": 0.76
         },
         "leadSyncopation": 0.3,
         "padRoot": "unlessBass",
@@ -11038,6 +11379,9 @@
             "enabled": true
           }
         }
+      },
+      "layerVoices": {
+        "rhythm": "Arp Pluck"
       }
     },
     {
@@ -11123,7 +11467,8 @@
           "bass": 0.75,
           "lead": 0.66,
           "counter": 0.48,
-          "perc": 0.5
+          "perc": 0.5,
+          "rhythm": 0.76
         },
         "leadSyncopation": 0.3,
         "padRoot": "unlessBass",
@@ -11142,6 +11487,9 @@
             "enabled": true
           }
         }
+      },
+      "layerVoices": {
+        "rhythm": "Harp Pluck"
       }
     },
     {
@@ -11228,7 +11576,8 @@
           "bass": 0.75,
           "lead": 0.66,
           "counter": 0.48,
-          "perc": 0.5
+          "perc": 0.5,
+          "rhythm": 0.76
         },
         "arc": {
           "shape": "winddown",
@@ -11240,6 +11589,9 @@
         "pad": "Neon Saw Pad",
         "bass": "Neon Pulse Bass",
         "lead": "Outrun Lead"
+      },
+      "layerVoices": {
+        "rhythm": "Arp Pluck"
       }
     },
     {
@@ -11330,7 +11682,8 @@
           "bass": 0.34,
           "lead": 0.54,
           "counter": 0.42,
-          "perc": 0.4
+          "perc": 0.4,
+          "rhythm": 1
         },
         "voices": {
           "lead": {
@@ -11408,6 +11761,9 @@
             "enabled": false
           }
         }
+      },
+      "layerVoices": {
+        "rhythm": "Measured Cello Pizzicato"
       }
     },
     {
@@ -11498,7 +11854,8 @@
           "bass": 0.28,
           "lead": 0.62,
           "counter": 0.26,
-          "perc": 0.4
+          "perc": 0.4,
+          "rhythm": 0.63
         },
         "voices": {
           "lead": {
@@ -11577,6 +11934,9 @@
             "enabled": true
           }
         }
+      },
+      "layerVoices": {
+        "rhythm": "Measured Cello Pizzicato"
       }
     },
     {
@@ -11660,7 +12020,8 @@
           "bass": 0.48,
           "lead": 0.62,
           "counter": 0.2,
-          "perc": 0.3
+          "perc": 0.3,
+          "rhythm": 0.44
         },
         "drums": {
           "style": "downtempo",
@@ -11737,7 +12098,8 @@
           "meter": "same",
           "halfTime": true
         },
-        "padRoot": "unlessBass"
+        "padRoot": "unlessBass",
+        "layers": "rhythm"
       },
       "voices": {
         "pad": "Tine Keys",
@@ -11768,7 +12130,11 @@
           }
         }
       },
-      "isNew": true
+      "isNew": true,
+      "layerVoices": {
+        "pad": "Night Glass",
+        "rhythm": "Tine Keys"
+      }
     },
     {
       "name": "Amber Transit",
@@ -11848,7 +12214,8 @@
           "bass": 0.16,
           "lead": 0.3,
           "counter": 0.2,
-          "perc": 0.2
+          "perc": 0.2,
+          "rhythm": 0.86
         },
         "drums": {
           "style": "off",
@@ -11905,7 +12272,8 @@
             "wander": "off",
             "chance": 0.3
           }
-        }
+        },
+        "layers": "rhythm"
       },
       "voices": {
         "pad": "Arp Pluck",
@@ -11935,6 +12303,10 @@
             "enabled": false
           }
         }
+      },
+      "layerVoices": {
+        "pad": "Slow Sweep",
+        "rhythm": "Arp Pluck"
       }
     },
     {
@@ -12015,7 +12387,8 @@
           "bass": 0.46,
           "lead": 0.5,
           "counter": 0.2,
-          "perc": 0.28
+          "perc": 0.28,
+          "rhythm": 0.4
         },
         "drums": {
           "style": "electro",
@@ -12098,6 +12471,9 @@
             "enabled": false
           }
         }
+      },
+      "layerVoices": {
+        "rhythm": "Techno Stab"
       }
     },
     {
@@ -12178,7 +12554,8 @@
           "bass": 0.21,
           "lead": 0.5,
           "counter": 0.2,
-          "perc": 0.42
+          "perc": 0.42,
+          "rhythm": 0.45
         },
         "drums": {
           "style": "electro",
@@ -12260,6 +12637,9 @@
             "enabled": false
           }
         }
+      },
+      "layerVoices": {
+        "rhythm": "Pluck Chord"
       }
     },
     {
@@ -12341,7 +12721,8 @@
           "bass": 0.52,
           "lead": 0.46,
           "counter": 0.18,
-          "perc": 0.45
+          "perc": 0.45,
+          "rhythm": 0.5
         },
         "drums": {
           "style": "electro",
@@ -12398,7 +12779,8 @@
           "minutes": 15
         },
         "leadSyncopation": 0.2,
-        "padRoot": "unlessBass"
+        "padRoot": "unlessBass",
+        "layers": "rhythm"
       },
       "voices": {
         "pad": "Progressive Pluck",
@@ -12428,6 +12810,10 @@
             "enabled": false
           }
         }
+      },
+      "layerVoices": {
+        "pad": "Neon Saw Pad",
+        "rhythm": "Progressive Pluck"
       }
     },
     {
@@ -12509,7 +12895,8 @@
           "bass": 0.22,
           "lead": 0.52,
           "counter": 0.2,
-          "perc": 0.45
+          "perc": 0.45,
+          "rhythm": 0.5
         },
         "drums": {
           "style": "electro",
@@ -12562,7 +12949,8 @@
         },
         "leadSyncopation": 0.25,
         "padRoot": "unlessBass",
-        "chordSize": "functional"
+        "chordSize": "functional",
+        "layers": "rhythm"
       },
       "voices": {
         "pad": "Progressive Pluck",
@@ -12592,6 +12980,10 @@
             "enabled": false
           }
         }
+      },
+      "layerVoices": {
+        "pad": "Swelling Analog",
+        "rhythm": "Progressive Pluck"
       }
     },
     {
@@ -12653,7 +13045,8 @@
           "lead": 0.56,
           "counter": 0.31,
           "bass": 0.35,
-          "perc": 0.2
+          "perc": 0.2,
+          "rhythm": 0.41
         },
         "ambienceVolume": 0.72,
         "padNotes": 3,
@@ -12673,7 +13066,10 @@
         "wasm",
         "new",
         "synth laboratory"
-      ]
+      ],
+      "layerVoices": {
+        "rhythm": "Soft Marimba"
+      }
     },
     {
       "name": "Tine and Tide",
@@ -12739,7 +13135,8 @@
           "lead": 0.17,
           "counter": 0.019,
           "bass": 0.12,
-          "perc": 0.2
+          "perc": 0.2,
+          "rhythm": 0.16
         },
         "drums": {
           "style": "downtempo",
@@ -12801,7 +13198,8 @@
             "chance": 0.3
           }
         },
-        "leadSyncopation": 0.35
+        "leadSyncopation": 0.35,
+        "layers": "rhythm"
       },
       "voices": {
         "pad": "Wasm Tine Keys",
@@ -12809,7 +13207,11 @@
         "counter": "Wasm Soft Pipes",
         "bass": "Wasm Round FM Bass"
       },
-      "isNew": true
+      "isNew": true,
+      "layerVoices": {
+        "pad": "Wasm DCO Foundation",
+        "rhythm": "Wasm Tine Keys"
+      }
     },
     {
       "name": "Lantern Circuit",
@@ -12876,7 +13278,8 @@
           "lead": 0.66,
           "counter": 0.061,
           "bass": 0.46,
-          "perc": 0.28
+          "perc": 0.28,
+          "rhythm": 0.27
         },
         "drums": {
           "style": "electro",
@@ -12950,7 +13353,10 @@
         "counter": "Wasm DCO Foundation",
         "bass": "Wasm Round FM Bass"
       },
-      "isNew": true
+      "isNew": true,
+      "layerVoices": {
+        "rhythm": "Harp Pluck"
+      }
     },
     {
       "name": "Morning coffee · Bossa",
@@ -13152,7 +13558,8 @@
           "bass": 0.75,
           "lead": 0.073,
           "counter": 0.55,
-          "perc": 0.5
+          "perc": 0.5,
+          "rhythm": 0.76
         },
         "sections": {
           "mode": "gentle",
@@ -13180,7 +13587,11 @@
         "jazz"
       ],
       "comparisonSource": "Late-night brushes (previous)",
-      "hidden": true
+      "hidden": true,
+      "layerVoices": {
+        "pad": "Lo-fi Tape Pad",
+        "rhythm": "FM Rhodes"
+      }
     },
     {
       "name": "Late Show Lounge · Jazz",
@@ -13247,7 +13658,8 @@
           "bass": 0.66,
           "lead": 0.48,
           "counter": 0.4,
-          "perc": 0.38
+          "perc": 0.38,
+          "rhythm": 0.73
         },
         "sections": {
           "mode": "gentle",
@@ -13287,7 +13699,11 @@
         "felt",
         "jazz"
       ],
-      "hidden": true
+      "hidden": true,
+      "layerVoices": {
+        "pad": "Velvet Pad",
+        "rhythm": "FM Rhodes"
+      }
     },
     {
       "name": "Island Shop Hours · Hand groove",
@@ -13367,7 +13783,8 @@
           "bass": 0.44,
           "lead": 0.56,
           "counter": 0.69,
-          "perc": 0.29
+          "perc": 0.29,
+          "rhythm": 1
         },
         "sections": {
           "mode": "gentle",
@@ -13420,7 +13837,11 @@
       "comparisonOf": "Island Shop Hours",
       "isNew": true,
       "comparisonSource": "Island Shop Hours (previous)",
-      "hidden": true
+      "hidden": true,
+      "layerVoices": {
+        "pad": "Soft Pad",
+        "rhythm": "Soft Keys (updated)"
+      }
     },
     {
       "name": "Desert dusk · Hand groove",
@@ -13489,7 +13910,8 @@
           "bass": 0.73,
           "lead": 0.62,
           "counter": 0.48,
-          "perc": 0.44
+          "perc": 0.44,
+          "rhythm": 0.78
         },
         "sections": {
           "mode": "gentle",
@@ -13546,7 +13968,11 @@
         "hand"
       ],
       "comparisonSource": "Desert dusk (previous)",
-      "hidden": true
+      "hidden": true,
+      "layerVoices": {
+        "pad": "Starmap Void",
+        "rhythm": "Kalimba Pluck"
+      }
     },
     {
       "name": "Deep night · Ambient percussion",
@@ -13633,7 +14059,8 @@
           "bass": 0.3,
           "lead": 0.62,
           "counter": 0.48,
-          "perc": 0.44
+          "perc": 0.44,
+          "rhythm": 0.78
         },
         "ambienceVolume": 0.72
       },
@@ -13650,7 +14077,10 @@
         "felt",
         "ambient"
       ],
-      "hidden": true
+      "hidden": true,
+      "layerVoices": {
+        "rhythm": "Harp Pluck"
+      }
     },
     {
       "name": "Tape memories · Broken beat",
@@ -13720,7 +14150,8 @@
           "bass": 0.7,
           "lead": 0.8,
           "counter": 0.48,
-          "perc": 0.41
+          "perc": 0.41,
+          "rhythm": 0.53
         },
         "sections": {
           "mode": "gentle",
@@ -13748,7 +14179,10 @@
         "broken"
       ],
       "comparisonSource": "Tape memories (previous)",
-      "hidden": true
+      "hidden": true,
+      "layerVoices": {
+        "rhythm": "Nylon Guitar"
+      }
     },
     {
       "name": "Night drive · 808",
@@ -13818,7 +14252,8 @@
           "bass": 0.68,
           "lead": 0.37,
           "counter": 0.27,
-          "perc": 0.28
+          "perc": 0.28,
+          "rhythm": 0.84
         },
         "chordColour": {
           "mode": "add9",
@@ -13880,7 +14315,11 @@
         "broken"
       ],
       "comparisonSource": "Night drive (previous)",
-      "hidden": true
+      "hidden": true,
+      "layerVoices": {
+        "pad": "Velvet Pad",
+        "rhythm": "Coastal FM Lead"
+      }
     },
     {
       "name": "Pastel Coastline · 808",
@@ -13966,7 +14405,8 @@
           "bass": 0.48,
           "lead": 0.62,
           "counter": 0.2,
-          "perc": 0.3
+          "perc": 0.3,
+          "rhythm": 0.44
         },
         "drums": {
           "style": "downtempo",
@@ -14043,7 +14483,8 @@
           "meter": "same",
           "halfTime": true
         },
-        "padRoot": "unlessBass"
+        "padRoot": "unlessBass",
+        "layers": "rhythm"
       },
       "voices": {
         "pad": "Tine Keys",
@@ -14077,7 +14518,11 @@
       "comparisonOf": "Pastel Coastline",
       "isNew": true,
       "comparisonSource": "Pastel Coastline (previous)",
-      "hidden": true
+      "hidden": true,
+      "layerVoices": {
+        "pad": "Night Glass",
+        "rhythm": "Tine Keys"
+      }
     },
     {
       "name": "Pocket Circuit · 808",
@@ -14161,7 +14606,8 @@
           "bass": 0.46,
           "lead": 0.5,
           "counter": 0.2,
-          "perc": 0.28
+          "perc": 0.28,
+          "rhythm": 0.4
         },
         "drums": {
           "style": "electro",
@@ -14261,7 +14707,10 @@
       },
       "comparisonOf": "Pocket Circuit",
       "isNew": true,
-      "hidden": true
+      "hidden": true,
+      "layerVoices": {
+        "rhythm": "Techno Stab"
+      }
     },
     {
       "name": "Tine and Tide · Broken beat",
@@ -14472,7 +14921,8 @@
           "lead": 0.66,
           "counter": 0.061,
           "bass": 0.46,
-          "perc": 0.28
+          "perc": 0.28,
+          "rhythm": 0.27
         },
         "drums": {
           "style": "electro",
@@ -14549,7 +14999,10 @@
       "isNew": true,
       "comparisonOf": "Lantern Circuit",
       "comparisonSource": "Lantern Circuit (previous)",
-      "hidden": true
+      "hidden": true,
+      "layerVoices": {
+        "rhythm": "Harp Pluck"
+      }
     },
     {
       "name": "Late-night brushes (previous)",
@@ -15391,6 +15844,130 @@
         "bass": "Wasm Round FM Bass"
       },
       "hidden": true
+    },
+    {
+      "name": "Demo: Pad under pluck",
+      "category": "demo",
+      "isNew": true,
+      "blurb": "A velvet pad holds the chords and a kalimba arpeggio plays above it, two parts instead of one. Intros are the pad alone and breakdowns the kalimba's rests. A/B: Layers in the control panel (One, Pad, Rhythm, Both)",
+      "settings": {
+        "humanize": {
+          "timing": 10,
+          "velocity": 0.07,
+          "detune": 2
+        },
+        "meter": "4/4",
+        "leadDensity": 0.15,
+        "bassWeights": {
+          "whole": 45,
+          "half": 45,
+          "walking": 10,
+          "drive": 0
+        },
+        "ducking": 0.3,
+        "tonic": 2,
+        "mode": "Major-1",
+        "bpm": 84,
+        "progression": 3,
+        "barsPerChord": 2,
+        "layers": "split",
+        "padWeights": {
+          "sustain": 60,
+          "pulse": 0,
+          "arpeggio": 30,
+          "sequence": 0,
+          "rolled": 10,
+          "stacked": 0
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "leadActivity": 0.5,
+        "drums": {
+          "style": "off",
+          "activity": 0
+        },
+        "volumes": {
+          "pad": 0.8,
+          "rhythm": 0.8,
+          "bass": 0.5,
+          "lead": 0.5,
+          "counter": 0.3,
+          "perc": 0.3
+        }
+      },
+      "voices": {
+        "pad": "Velvet Pad",
+        "rhythm": "Kalimba Pluck",
+        "bass": "Warm Bass",
+        "lead": "Soft Flute"
+      }
+    },
+    {
+      "name": "Demo: Layers over time",
+      "category": "demo",
+      "isNew": true,
+      "blurb": "The layers move on their own: strings alone, then strings under a harp, the harp alone, both again, then one voice, two phrases at each stop and round again. Control panel, Over time",
+      "settings": {
+        "humanize": {
+          "timing": 10,
+          "velocity": 0.07,
+          "detune": 2
+        },
+        "meter": "4/4",
+        "leadDensity": 0.15,
+        "bassWeights": {
+          "whole": 45,
+          "half": 45,
+          "walking": 10,
+          "drive": 0
+        },
+        "ducking": 0.3,
+        "tonic": 9,
+        "mode": "Major-6",
+        "bpm": 96,
+        "progression": 3,
+        "barsPerChord": 2,
+        "layers": "combined",
+        "layerFlow": {
+          "mode": "journey",
+          "phrases": 2
+        },
+        "padWeights": {
+          "sustain": 40,
+          "pulse": 20,
+          "arpeggio": 30,
+          "sequence": 10,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "sections": {
+          "mode": "off",
+          "phrases": 2
+        },
+        "leadActivity": 0.45,
+        "drums": {
+          "style": "brushes",
+          "activity": 0.35,
+          "variation": 0.4,
+          "sprinkle": 0.1
+        },
+        "volumes": {
+          "pad": 0.75,
+          "rhythm": 0.8,
+          "bass": 0.5,
+          "lead": 0.5,
+          "counter": 0.3,
+          "perc": 0.3
+        }
+      },
+      "voices": {
+        "pad": "Warm Strings",
+        "rhythm": "Harp Pluck",
+        "bass": "Upright Pluck",
+        "lead": "Soft Flute"
+      }
     },
     {
       "name": "Demo: Breathing cadences",
@@ -16271,7 +16848,8 @@
           "bass": 0.45,
           "lead": 1,
           "counter": 0.31,
-          "perc": 0.29
+          "perc": 0.29,
+          "rhythm": 1
         },
         "sections": {
           "mode": "gentle",
@@ -16290,7 +16868,10 @@
         "bass": "Soft Drama v2",
         "lead": "Ravel"
       },
-      "isNew": true
+      "isNew": true,
+      "layerVoices": {
+        "rhythm": "Music Box"
+      }
     },
     {
       "name": "Solo Grand (v1)",
@@ -16442,7 +17023,8 @@
           "bass": 0.25,
           "lead": 1,
           "counter": 0.36,
-          "perc": 0.38
+          "perc": 0.38,
+          "rhythm": 0.7
         },
         "sections": {
           "mode": "gentle",
@@ -16462,7 +17044,10 @@
         "lead": "Studio Concert v2",
         "counter": "Glass Pad"
       },
-      "isNew": true
+      "isNew": true,
+      "layerVoices": {
+        "rhythm": "Music Box"
+      }
     },
     {
       "name": "Piano and Pads (v1)",
@@ -16529,7 +17114,8 @@
           "bass": 0.16,
           "lead": 1,
           "counter": 0.23,
-          "perc": 0.24
+          "perc": 0.24,
+          "rhythm": 0.45
         },
         "sections": {
           "mode": "gentle",
@@ -16548,6 +17134,9 @@
         "bass": "Sub Bass",
         "lead": "Concert Grand",
         "counter": "Glass Pad"
+      },
+      "layerVoices": {
+        "rhythm": "Music Box"
       }
     },
     {
@@ -16615,7 +17204,8 @@
           "bass": 0.72,
           "lead": 0.25,
           "counter": 0.4,
-          "perc": 0.38
+          "perc": 0.38,
+          "rhythm": 0.78
         },
         "sections": {
           "mode": "gentle",
@@ -16634,7 +17224,10 @@
         "bass": "Velvet Pad",
         "lead": "Measured Clarinet"
       },
-      "isNew": true
+      "isNew": true,
+      "layerVoices": {
+        "rhythm": "Celesta"
+      }
     },
     {
       "name": "Piano and Clarinet, Cinematic (v1)",
@@ -16969,7 +17562,8 @@
           "bass": 0.32,
           "lead": 0.66,
           "counter": 0.4,
-          "perc": 0.38
+          "perc": 0.38,
+          "rhythm": 0.74
         },
         "sections": {
           "mode": "gentle",
@@ -16988,7 +17582,10 @@
         "bass": "Studio Concert v2",
         "lead": "Studio Concert v2"
       },
-      "isNew": true
+      "isNew": true,
+      "layerVoices": {
+        "rhythm": "Glass Mallet"
+      }
     },
     {
       "name": "Felted Piano",
@@ -17178,7 +17775,8 @@
           "bass": 0.55,
           "lead": 0.87,
           "counter": 0.3,
-          "perc": 0.5
+          "perc": 0.5,
+          "rhythm": 0.55
         },
         "sections": {
           "mode": "gentle",
@@ -17219,6 +17817,10 @@
         "pad": "Felt Keys",
         "bass": "Upright Pluck",
         "lead": "Kalimba Pluck"
+      },
+      "layerVoices": {
+        "pad": "Lo-fi Tape Pad",
+        "rhythm": "Felt Keys"
       }
     },
     {
@@ -17348,7 +17950,8 @@
           "bass": 0.32,
           "lead": 0.62,
           "counter": 0.3,
-          "perc": 0.5
+          "perc": 0.5,
+          "rhythm": 0.55
         },
         "sections": {
           "mode": "gentle",
@@ -17393,6 +17996,10 @@
         "pad": "FM Rhodes",
         "bass": "Felt Bass",
         "lead": "Harp Pluck"
+      },
+      "layerVoices": {
+        "pad": "Lo-fi Tape Pad",
+        "rhythm": "FM Rhodes"
       }
     },
     {
@@ -17466,7 +18073,8 @@
           "bass": 0.55,
           "lead": 0.62,
           "counter": 0.3,
-          "perc": 0.5
+          "perc": 0.5,
+          "rhythm": 0.24
         },
         "sections": {
           "mode": "gentle",
@@ -17501,12 +18109,17 @@
           "sprinkle": 0.1
         },
         "leadSyncopation": 0.35,
-        "padRoot": "unlessBass"
+        "padRoot": "unlessBass",
+        "layers": "rhythm"
       },
       "voices": {
         "pad": "Deep Pulse",
         "bass": "Neon Pulse Bass",
         "lead": "Bell Lead"
+      },
+      "layerVoices": {
+        "pad": "Slow Sweep",
+        "rhythm": "Deep Pulse"
       }
     },
     {
@@ -17641,7 +18254,8 @@
           "bass": 0.72,
           "lead": 0.62,
           "counter": 0.45,
-          "perc": 0.5
+          "perc": 0.5,
+          "rhythm": 0.7
         },
         "sections": {
           "mode": "gentle",
@@ -17708,6 +18322,10 @@
         "pad": "Soft Saw Lead",
         "bass": "Neon Pulse Bass",
         "lead": "Outrun Lead"
+      },
+      "layerVoices": {
+        "pad": "Night Glass",
+        "rhythm": "Soft Saw Lead"
       }
     },
     {
@@ -17729,7 +18347,8 @@
           "bass": 0.33,
           "lead": 0.58,
           "counter": 0.35,
-          "perc": 0.5
+          "perc": 0.5,
+          "rhythm": 0.7
         },
         "sections": {
           "mode": "gentle",
@@ -17790,13 +18409,18 @@
           "activity": 0.4
         },
         "leadSyncopation": 0.5,
-        "padRoot": "unlessBass"
+        "padRoot": "unlessBass",
+        "layers": "rhythm"
       },
       "voices": {
         "pad": "Galaxy Arp",
         "bass": "Sub Bass",
         "lead": "Glass Lead",
         "counter": "Kalimba Pluck"
+      },
+      "layerVoices": {
+        "pad": "Night Glass",
+        "rhythm": "Galaxy Arp"
       }
     },
     {
@@ -17818,7 +18442,8 @@
           "bass": 0.72,
           "lead": 0.62,
           "counter": 0.45,
-          "perc": 0.5
+          "perc": 0.5,
+          "rhythm": 0.7
         },
         "sections": {
           "mode": "gentle",
@@ -17884,6 +18509,10 @@
         "pad": "FM Rhodes",
         "bass": "Rubber Bass",
         "lead": "Kalimba Pluck"
+      },
+      "layerVoices": {
+        "pad": "Night Glass",
+        "rhythm": "FM Rhodes"
       }
     },
     {
@@ -17956,7 +18585,8 @@
           "bass": 0.75,
           "lead": 0.8,
           "counter": 0.4,
-          "perc": 0.8
+          "perc": 0.8,
+          "rhythm": 0.5
         },
         "leadActivity": 0.8,
         "leadDensity": 0.12,
@@ -18124,7 +18754,8 @@
           "lead": 0,
           "counter": 0,
           "bass": 0.15
-        }
+        },
+        "layers": "rhythm"
       },
       "voices": {
         "pad": "Supersaw Stab",
@@ -18134,6 +18765,10 @@
       "percussion": {
         "synth": "tr909",
         "name": "Room"
+      },
+      "layerVoices": {
+        "pad": "Starlight Pad",
+        "rhythm": "Supersaw Stab"
       }
     },
     {
@@ -18206,7 +18841,8 @@
           "bass": 0.75,
           "lead": 0.78,
           "counter": 0.4,
-          "perc": 0.8
+          "perc": 0.8,
+          "rhythm": 0.45
         },
         "leadActivity": 0.75,
         "leadDensity": 0.25,
@@ -18361,7 +18997,8 @@
           "lead": 0.45,
           "counter": 0,
           "bass": 0.35
-        }
+        },
+        "layers": "rhythm"
       },
       "voices": {
         "pad": "Techno Stab",
@@ -18371,6 +19008,10 @@
       "percussion": {
         "synth": "tr909",
         "name": "Room"
+      },
+      "layerVoices": {
+        "pad": "Starlight Pad",
+        "rhythm": "Techno Stab"
       }
     },
     {
@@ -18443,7 +19084,8 @@
           "bass": 0.75,
           "lead": 0.7,
           "counter": 0.4,
-          "perc": 0.8
+          "perc": 0.8,
+          "rhythm": 0.6
         },
         "leadActivity": 0.62,
         "leadDensity": 0.35,
@@ -18588,7 +19230,8 @@
           "lead": 0.25,
           "counter": 0,
           "bass": 0
-        }
+        },
+        "layers": "rhythm"
       },
       "voices": {
         "pad": "Pluck Chord",
@@ -18598,6 +19241,10 @@
       "percussion": {
         "synth": "tr808",
         "name": "Room"
+      },
+      "layerVoices": {
+        "pad": "Swelling Analog",
+        "rhythm": "Pluck Chord"
       }
     },
     {
@@ -18670,7 +19317,8 @@
           "bass": 0.75,
           "lead": 0.7,
           "counter": 0.4,
-          "perc": 0.8
+          "perc": 0.8,
+          "rhythm": 0.6
         },
         "leadActivity": 0.4,
         "leadDensity": 0.18,
@@ -18799,7 +19447,8 @@
           "lead": 0,
           "counter": 0,
           "bass": 0.2
-        }
+        },
+        "layers": "rhythm"
       },
       "voices": {
         "pad": "Pluck Chord",
@@ -18809,6 +19458,10 @@
       "percussion": {
         "synth": "tr808",
         "name": "Room"
+      },
+      "layerVoices": {
+        "pad": "Swelling Analog",
+        "rhythm": "Pluck Chord"
       }
     },
     {
@@ -18881,7 +19534,8 @@
           "bass": 0.75,
           "lead": 0.7,
           "counter": 0.4,
-          "perc": 0.8
+          "perc": 0.8,
+          "rhythm": 0.6
         },
         "leadLeaps": 0.3,
         "leadActivity": 0.45,
@@ -18979,6 +19633,10 @@
       "percussion": {
         "synth": "tr808",
         "name": "Room"
+      },
+      "layerVoices": {
+        "pad": "Neon Saw Pad",
+        "rhythm": "FM Rhodes"
       }
     },
     {
@@ -19051,7 +19709,8 @@
           "bass": 0.75,
           "lead": 0.72,
           "counter": 0.4,
-          "perc": 0.8
+          "perc": 0.8,
+          "rhythm": 0.6
         },
         "leadLeaps": 0.3,
         "leadActivity": 0.5,
@@ -19156,7 +19815,8 @@
             ]
           },
           "sectionBars": 8
-        }
+        },
+        "layers": "rhythm"
       },
       "voices": {
         "pad": "Pluck Chord",
@@ -19166,6 +19826,10 @@
       "percussion": {
         "synth": "tr808",
         "name": "Room"
+      },
+      "layerVoices": {
+        "pad": "Night Glass",
+        "rhythm": "Pluck Chord"
       }
     },
     {
@@ -19238,7 +19902,8 @@
           "bass": 0.75,
           "lead": 0.62,
           "counter": 0.4,
-          "perc": 0.8
+          "perc": 0.8,
+          "rhythm": 0.6
         },
         "leadLeaps": 0.3,
         "leadActivity": 0.4,
@@ -19309,6 +19974,10 @@
       "percussion": {
         "synth": "tr808",
         "name": "Room"
+      },
+      "layerVoices": {
+        "pad": "Velvet Pad",
+        "rhythm": "Soft Keys"
       }
     },
     {
@@ -19381,7 +20050,8 @@
           "bass": 0.75,
           "lead": 0.8,
           "counter": 0.4,
-          "perc": 0.8
+          "perc": 0.8,
+          "rhythm": 0.5
         },
         "leadLeaps": 0.2,
         "leadActivity": 1,
@@ -19517,7 +20187,8 @@
             ]
           },
           "sectionBars": 8
-        }
+        },
+        "layers": "rhythm"
       },
       "voices": {
         "pad": "Trance Chord",
@@ -19527,6 +20198,10 @@
       "percussion": {
         "synth": "tr909",
         "name": "Room"
+      },
+      "layerVoices": {
+        "pad": "Swelling Analog",
+        "rhythm": "Trance Chord"
       }
     },
     {
@@ -19599,7 +20274,8 @@
           "bass": 0.75,
           "lead": 0.65,
           "counter": 0.4,
-          "perc": 0.8
+          "perc": 0.8,
+          "rhythm": 0.5
         },
         "leadLeaps": 0.3,
         "leadActivity": 0.75,
@@ -19715,7 +20391,8 @@
             ]
           },
           "sectionBars": 16
-        }
+        },
+        "layers": "rhythm"
       },
       "voices": {
         "pad": "Progressive Pluck",
@@ -19725,6 +20402,10 @@
       "percussion": {
         "synth": "tr909",
         "name": "Room"
+      },
+      "layerVoices": {
+        "pad": "Swelling Analog",
+        "rhythm": "Progressive Pluck"
       }
     },
     {
@@ -19797,7 +20478,8 @@
           "bass": 0.75,
           "lead": 0.6,
           "counter": 0.4,
-          "perc": 0.8
+          "perc": 0.8,
+          "rhythm": 0.6
         },
         "leadLeaps": 0.3,
         "leadActivity": 0.22,
@@ -19965,7 +20647,8 @@
             ]
           },
           "sectionBars": 16
-        }
+        },
+        "layers": "rhythm"
       },
       "voices": {
         "pad": "Techno Stab",
@@ -19975,6 +20658,10 @@
       "percussion": {
         "synth": "tr808",
         "name": "Room"
+      },
+      "layerVoices": {
+        "pad": "Neon Saw Pad",
+        "rhythm": "Techno Stab"
       }
     },
     {
@@ -20047,7 +20734,8 @@
           "bass": 0.75,
           "lead": 0.65,
           "counter": 0.4,
-          "perc": 0.8
+          "perc": 0.8,
+          "rhythm": 0.6
         },
         "leadLeaps": 0.3,
         "leadActivity": 0.4,
@@ -20182,7 +20870,8 @@
             ]
           },
           "sectionBars": 8
-        }
+        },
+        "layers": "rhythm"
       },
       "voices": {
         "pad": "FM Rhodes",
@@ -20192,6 +20881,10 @@
       "percussion": {
         "synth": "tr808",
         "name": "Room"
+      },
+      "layerVoices": {
+        "pad": "Breathing Pad",
+        "rhythm": "FM Rhodes"
       }
     },
     {
@@ -20265,7 +20958,8 @@
           "bass": 0.75,
           "lead": 0.64,
           "counter": 0.4,
-          "perc": 0.8
+          "perc": 0.8,
+          "rhythm": 0.6
         },
         "leadLeaps": 0.3,
         "leadActivity": 0.38,
@@ -20408,7 +21102,8 @@
             ]
           },
           "sectionBars": 8
-        }
+        },
+        "layers": "rhythm"
       },
       "voices": {
         "pad": "Soft Keys",
@@ -20418,6 +21113,10 @@
       "percussion": {
         "synth": "tr808",
         "name": "Room"
+      },
+      "layerVoices": {
+        "pad": "Warm Strings",
+        "rhythm": "Soft Keys"
       }
     },
     {
@@ -20491,7 +21190,8 @@
           "bass": 0.75,
           "lead": 0.66,
           "counter": 0.4,
-          "perc": 0.8
+          "perc": 0.8,
+          "rhythm": 0.6
         },
         "leadLeaps": 0.3,
         "leadActivity": 0.45,
@@ -20611,7 +21311,8 @@
             ]
           },
           "sectionBars": 8
-        }
+        },
+        "layers": "rhythm"
       },
       "voices": {
         "pad": "Warm Organ",
@@ -20621,6 +21322,10 @@
       "percussion": {
         "synth": "tr808",
         "name": "Room"
+      },
+      "layerVoices": {
+        "pad": "Soft Pad",
+        "rhythm": "Warm Organ"
       }
     }
   ]

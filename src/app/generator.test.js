@@ -6,6 +6,7 @@ import { scaleDistance } from './conductor';
 import PROGRESSIONS from './progressions';
 import { defaultSettings } from './settings';
 import { METERS, beatStarts, groupStarts, chordBars, splitBeat } from './meter';
+import { defaultSequencer } from './sequencer';
 
 vi.mock('../audio/context', () => ({
     audioContext: {
@@ -525,15 +526,15 @@ test('mute and solo: any solo silences the rest; mute silences only its role', (
     const gen = generator(1, { mode: 'off' });
     const levels = () => Object.fromEntries(Object.entries(gen.roles).map(([role, r]) => [role, r.gain.gain.value]));
     gen.setRoleMix('bass', { mute: true });
-    expect(levels()).toEqual({ pad: 0.8, bass: 0, lead: 0.7, counter: 0.6, perc: 0.7 });
+    expect(levels()).toEqual({ pad: 0.8, bass: 0, lead: 0.7, counter: 0.6, rhythm: 0.6, perc: 0.7 });
     gen.setRoleMix('lead', { solo: true });
-    expect(levels()).toEqual({ pad: 0, bass: 0, lead: 0.7, counter: 0, perc: 0 });
+    expect(levels()).toEqual({ pad: 0, bass: 0, lead: 0.7, counter: 0, rhythm: 0, perc: 0 });
     gen.setRoleMix('bass', { solo: true }); // solo beats mute
-    expect(levels()).toEqual({ pad: 0, bass: 0.8, lead: 0.7, counter: 0, perc: 0 });
+    expect(levels()).toEqual({ pad: 0, bass: 0.8, lead: 0.7, counter: 0, rhythm: 0, perc: 0 });
     gen.setRoleMix('lead', { solo: false });
     gen.setRoleMix('bass', { solo: false });
     gen.setRoleVolume('pad', 0.5);
-    expect(levels()).toEqual({ pad: 0.5, bass: 0, lead: 0.7, counter: 0.6, perc: 0.7 });
+    expect(levels()).toEqual({ pad: 0.5, bass: 0, lead: 0.7, counter: 0.6, rhythm: 0.6, perc: 0.7 });
 });
 
 test('stop pauses: Play picks up at the next bar, settings changes keep the place, rewind goes back', () => {
@@ -717,7 +718,9 @@ describe('library presets as the generator plays them', () => {
                 });
             });
             expect(bars.flatMap((b) => b.events).filter((e) => e.role === 'bass').length).toBeGreaterThan(20);
-            expect(bars.flatMap((b) => b.events).filter((e) => e.role === 'pad').length).toBeGreaterThan(20);
+            // (the chord voice: the pad, or the rhythm part when the preset starts on it alone)
+            const chordRole = scene.settings.layers === 'rhythm' ? 'rhythm' : 'pad';
+            expect(bars.flatMap((b) => b.events).filter((e) => e.role === chordRole).length, scene.name).toBeGreaterThan(20);
         });
     });
 });
@@ -1777,4 +1780,150 @@ test('intensity moved by hand from +1 to -1 mid-piece ramps through 0 bar by bar
     levels.slice(1).forEach((v, i) => { expect(v).toBeLessThanOrEqual(levels[i] + 1e-9); expect(levels[i] - v).toBeLessThan(0.5); });
     expect(levels.some((v) => Math.abs(v) < 0.2)).toBe(true);
     expect(levels.at(-1)).toBe(-1);
+});
+
+describe('layers (settings.layers) through the whole planner', () => {
+    const planned = (layers, extra = {}) => {
+        const g = new Generator({ ...defaultSettings(), seed: 11, layers, sections: { mode: 'gentle', phrases: 2 }, endSoon: false, ...extra }), p = g.planner();
+        for (let bar = 0; bar < 64; bar++) p.planBar(bar);
+        return [...p.plan.values()].sort((a, z) => a.bar - z.bar);
+    };
+    const has = (bars, role) => bars.some((b) => b.events.some((e) => e.role === role));
+
+    test('every mode has a voice for each role it plans, and only plans those', () => {
+        const g = new Generator({ ...defaultSettings(), layers: 'split' });
+        expect(Object.keys(g.roles)).toEqual(expect.arrayContaining(['pad', 'rhythm']));
+        const expected = { combined: [true, false], pad: [true, false], rhythm: [false, true], split: [true, true] };
+        for (const [layers, [pad, rhythm]] of Object.entries(expected)) {
+            const bars = planned(layers);
+            expect([layers, has(bars, 'pad')]).toEqual([layers, pad]);
+            expect([layers, has(bars, 'rhythm')]).toEqual([layers, rhythm]);
+            bars.forEach((b) => b.events.forEach((e) => expect([e.midi, e.beat, e.length, e.velocity].every(Number.isFinite)).toBe(true)));
+        }
+    });
+
+    test('combined plans the same notes as with no layers setting', () => {
+        const strip = (bars) => bars.map((b) => b.events);
+        expect(strip(planned('combined'))).toEqual(strip(planned(undefined)));
+    });
+
+    test('a layers piece ends on a held chord from the voice that played the chords', () => {
+        for (const layers of ['rhythm', 'split']) {
+            const g = new Generator({ ...defaultSettings(), seed: 3, layers }), p = g.planner();
+            p.endBar = 24;
+            for (let bar = 0; bar <= 26; bar++) p.planBar(bar);
+            const last = p.plan.get(24).events.filter((e) => e.role !== 'bass' && e.role !== 'lead' && e.role !== 'perc');
+            expect(last.length).toBeGreaterThan(0);
+            last.forEach((e) => expect(e.role).toBe(layers === 'rhythm' ? 'rhythm' : 'pad'));
+        }
+    });
+});
+
+describe('the layers following the sections', () => {
+    test('an intro is the pad alone, builds and full sections both, a breakdown the rhythm part alone', () => {
+        const g = new Generator({ ...defaultSettings(), seed: 13, layerFlow: { mode: 'sections', phrases: 4 }, sections: { mode: 'strong', phrases: 2 }, leadActivity: 0.6 }), p = g.planner();
+        for (let bar = 0; bar < 200; bar++) p.planBar(bar);
+        const seen = new Map();
+        for (const b of [...p.plan.values()]) {
+            const type = b.state.phrase.section?.type;
+            if (!type) continue;
+            const roles = seen.get(type) ?? new Set();
+            b.events.forEach((e) => (e.role === 'pad' || e.role === 'rhythm') && roles.add(e.role));
+            seen.set(type, roles);
+        }
+        expect([...seen.get('intro')]).toEqual(['pad']);
+        expect(seen.get('build')).toEqual(new Set(['pad', 'rhythm']));
+        expect(seen.get('full')).toEqual(new Set(['pad', 'rhythm']));
+        if (seen.has('breakdown')) expect([...seen.get('breakdown')]).toEqual(['rhythm']);
+        expect(seen.has('breakdown') || seen.has('full')).toBe(true);
+    });
+});
+
+describe('sequencer lanes with the layers split', () => {
+    const bars = (layers) => {
+        const g = new Generator({ ...defaultSettings(), seed: 21, layers, padWeights: { sustain: 100, pulse: 0, arpeggio: 0, sequence: 0, rolled: 0, stacked: 0 },
+            sequencer: { ...defaultSequencer(), on: true, arrangement: 'warehouse-shift', lanes: true, variation: 0 } }), p = g.planner();
+        for (let bar = 0; bar < 16; bar++) p.planBar(bar);
+        return [...p.plan.values()].sort((a, z) => a.bar - z.bar);
+    };
+    const roles = (list) => new Set(list.flatMap((b) => b.events.map((e) => e.role)));
+
+    test('one voice: the lane replaces the arranged pad and bass, as it did', () => {
+        const r = roles(bars('combined'));
+        expect(r.has('pad')).toBe(true); expect(r.has('rhythm')).toBe(false);
+    });
+
+    test('split: stabs are the rhythm part and the arranged pad holds the chords under them', () => {
+        const list = bars('split');
+        expect(roles(list).has('rhythm')).toBe(true);
+        // the held pad is the arranged one: its notes last longer than a stab
+        expect(list.some((b) => b.events.some((e) => e.role === 'pad' && e.length > 2))).toBe(true);
+        expect(list.every((b) => b.events.filter((e) => e.role === 'rhythm').every((e) => e.length < 1.5))).toBe(true);
+    });
+});
+
+describe('the layer demos', () => {
+    const plan = async (slug, bars) => {
+        const { sceneBySlug, sceneSettings } = await import('./scenes');
+        const settings = sceneSettings(sceneBySlug(slug), 9);
+        settings.ambience = Object.fromEntries(Object.keys(settings.ambience).map((k) => [k, 0]));
+        const p = new Generator(settings).planner();
+        for (let bar = 0; bar < bars; bar++) p.planBar(bar);
+        return [...p.plan.values()].sort((a, z) => a.bar - z.bar);
+    };
+
+    test('pad under pluck: the pad alone in the intro, then both', async () => {
+        const list = await plan('demo-pad-under-pluck', 96);
+        const roles = (b) => new Set(b.events.map((e) => e.role).filter((r) => r === 'pad' || r === 'rhythm'));
+        const intro = list.filter((b) => b.state.phrase.section?.type === 'intro');
+        expect(intro.length).toBeGreaterThan(0);
+        intro.forEach((b) => expect(roles(b).has('rhythm')).toBe(false));
+        expect(list.some((b) => roles(b).has('pad') && roles(b).has('rhythm'))).toBe(true);
+    });
+
+    test('layers over time: every stop of the journey is heard', async () => {
+        const list = await plan('demo-layers-over-time', 240);
+        const stops = [...new Set(list.map((b) => b.state.phrase.layers))];
+        expect(stops).toEqual(['pad', 'split', 'rhythm', 'combined']);
+        expect(list.filter((b) => b.state.phrase.layers === 'rhythm').every((b) => !b.events.some((e) => e.role === 'pad'))).toBe(true);
+    });
+});
+
+describe('changing the layers or their flow while a piece is planned', () => {
+    const MODES = ['combined', 'pad', 'rhythm', 'split'];
+    const finite = (b) => b.events.every((e) => [e.midi, e.beat, e.length, e.velocity].every(Number.isFinite) && e.length > 0);
+
+    test.each(MODES.flatMap((from) => MODES.filter((to) => to !== from).map((to) => [from, to])))('%s to %s, with sections, several bars to a chord and an ending', (from, to) => {
+        for (const extra of [{ barsPerChord: 1 }, { barsPerChord: 2 }, { barsPerChord: 4, sections: { mode: 'strong', phrases: 2 } }, { sections: { mode: 'gentle', phrases: 2 }, counter: { mode: 'line', activity: 0.6 } }]) {
+            const g = new Generator({ ...defaultSettings(), seed: 17, layers: from, ...extra }), p = g.planner();
+            for (let bar = 0; bar < 11; bar++) p.planBar(bar);
+            p.settings = { ...p.settings, layers: to };
+            for (let bar = 11; bar < 60; bar++) { p.planBar(bar); expect(finite(p.plan.get(bar))).toBe(true); }
+            p.endBar = 64;
+            for (let bar = 60; bar <= 65; bar++) p.planBar(bar);
+            expect(finite(p.plan.get(64))).toBe(true);
+        }
+    });
+
+    test('into and out of the flows, and between them', () => {
+        const flows = [{ mode: 'off', phrases: 4 }, { mode: 'sections', phrases: 2 }, { mode: 'journey', phrases: 2 }, { mode: 'journey', phrases: 8 }];
+        for (const a of flows) for (const b of flows) {
+            const g = new Generator({ ...defaultSettings(), seed: 5, layerFlow: a, sections: { mode: 'gentle', phrases: 2 }, barsPerChord: 2 }), p = g.planner();
+            for (let bar = 0; bar < 13; bar++) p.planBar(bar);
+            p.settings = { ...p.settings, layerFlow: b, layers: 'split' };
+            for (let bar = 13; bar < 70; bar++) { p.planBar(bar); expect(finite(p.plan.get(bar))).toBe(true); }
+        }
+    });
+
+    test('with the sequencer lanes, and after a re-plan from the middle of the piece', () => {
+        for (const layers of MODES) {
+            const g = new Generator({ ...defaultSettings(), seed: 8, layers, sequencer: { ...defaultSequencer(), on: true, arrangement: 'warehouse-shift', lanes: true } }), p = g.planner();
+            for (let bar = 0; bar < 9; bar++) p.planBar(bar);
+            for (const to of MODES) {
+                const q = p.planner();
+                q.settings = { ...q.settings, layers: to };
+                for (let bar = 9; bar < 30; bar++) { q.planBar(bar); expect(finite(q.plan.get(bar))).toBe(true); }
+            }
+        }
+    });
 });

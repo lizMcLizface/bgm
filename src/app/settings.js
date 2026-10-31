@@ -17,11 +17,11 @@ import {simdFromSearch,withSimd,bankFromSearch,withFMBank} from '../audio/simdCh
 import {
     DEFAULT_PAD_WEIGHTS, DEFAULT_BASS_WEIGHTS, DEFAULT_VOICES, OCTAVE_LIMITS, OCTAVE_WANDER,
     DEFAULT_COUNTER, COUNTER_MODES, DEFAULT_SECTIONS, SECTION_MODES, SECTION_LENGTHS,
-    DEFAULT_PULSE_WEIGHTS, DEFAULT_ARP_WEIGHTS, DEFAULT_DIRECTION_WEIGHTS, DEFAULT_PAD_MOTION, PEDAL_MODES, SPREADS, PAD_ROOTS, LEAD_SCALES, LEAD_ENDINGS,
+    DEFAULT_PULSE_WEIGHTS, DEFAULT_ARP_WEIGHTS, DEFAULT_DIRECTION_WEIGHTS, DEFAULT_PAD_MOTION, PEDAL_MODES, SPREADS, PAD_ROOTS, LEAD_SCALES, LEAD_ENDINGS, LAYERS, LAYER_RULES, DEFAULT_LAYER_RULES, LAYER_FLOWS, FLOW_PHRASES, DEFAULT_LAYER_FLOW, RHYTHM_OCTAVES,
 } from './arranger';
 import { AMBIENCE_LAYERS, DEFAULT_AMBIENCE, defaultAmbienceShape } from './engine/ambience';
 import { LAYER_PARAMS, COMMON_PARAMS } from './engine/ambienceSynth';
-import { ROLE_VOLUMES } from './presets';
+import { ROLE_VOLUMES, ROLE_PRESETS } from './presets';
 import { ARC_SHAPES } from './composition/arc';
 import { PUSH_MODES, defaultPush } from './composition/push';
 import { defaultMood } from './composition/mood';
@@ -60,6 +60,9 @@ export function defaultSettings() {
         thinPadUnderLead: true,
         chordSize: 'uniform', // 'uniform': every chord has padNotes notes; 'functional': only dominant-function chords do, the rest are triads (a chord colour still adds its note)
         padContour: 0, // the pad rises toward the middle of a phrase and its top voice prefers to move against the bass: 0 as before, 1 strongly
+        layers: 'combined', // what the chord voices play: one voice with every style, the pad (held styles), the rhythm layer (running styles), or both at once (arranger.js LAYERS)
+        layerFlow: { ...DEFAULT_LAYER_FLOW }, // the layers changing over time: with the sections, or a journey through them (arranger.js LAYER_FLOWS)
+        layerRules: { ...DEFAULT_LAYER_RULES }, // what keeps the pad and the rhythm layer apart when both play (arranger.js LAYER_RULES): on, and only with layers 'split'
         padRoot: 'always', // whether the pad plays the chord root when the bass does: always, unlessBass, never
         padNotes: 3, // chord size: 3 triads, 4 sevenths, 5 ninths
         // The colour layer (the Colour panel): each off or neutral by default
@@ -158,6 +161,9 @@ const RULES = {
     chordSize: oneOf(['uniform', 'functional']),
     padContour: clamp(0, 1),
     padRoot: oneOf(Object.keys(PAD_ROOTS)),
+    layers: oneOf(Object.keys(LAYERS)),
+    layerFlow: { mode: oneOf(Object.keys(LAYER_FLOWS)), phrases: oneOf(FLOW_PHRASES) },
+    layerRules: Object.fromEntries(Object.keys(LAYER_RULES).map((k) => [k, bool])),
     chordColour: { mode: oneOf(Object.keys(CHORD_COLOURS)), amount: clamp(0, 1) },
     chordBorrow: clamp(0, 1),
     chordSpread: oneOf(Object.keys(SPREADS)),
@@ -173,7 +179,7 @@ const RULES = {
     leadSyncopation: clamp(0, 1),
     leadRepeat: clamp(0, 1),
     leadEnding: oneOf(Object.keys(LEAD_ENDINGS)),
-    voices: Object.fromEntries(Object.entries(OCTAVE_LIMITS).map(([role, [lo, hi]]) => [role, {
+    voices: Object.fromEntries([...Object.entries(OCTAVE_LIMITS), ['rhythm', RHYTHM_OCTAVES]].map(([role, [lo, hi]]) => [role, {
         octave: int(lo, hi),
         wander: oneOf(Object.keys(OCTAVE_WANDER)),
         chance: clamp(0, 1),
@@ -297,7 +303,8 @@ export function encodeSettings(settings, presets = {}, { seed = true } = {}) {
     // the bus, classic / DIY voices ({ external: ref }), edited sounds ({ edit }) and a drum machine (perc: { machine: ref }): shareExtras.js
     const sounds = Object.fromEntries(Object.entries(presets).filter(([, p]) => p?.external).map(([role, p]) => [role, p.external]));
     const edits = Object.fromEntries(Object.entries(presets).filter(([, p]) => p?.edit).map(([role, p]) => [role, p.edit]));
-    const x = encodeExtras({ bus: settings.bus, sounds, machine: presets.perc?.machine ?? null, edits, sequencer: settings.sequencer, portamento: settings.portamento });
+    const rhythm = typeof presets.rhythm === 'string' && presets.rhythm !== ROLE_PRESETS.rhythm ? presets.rhythm : null;
+    const x = encodeExtras({ bus: settings.bus, sounds, machine: presets.perc?.machine ?? null, edits, sequencer: settings.sequencer, portamento: settings.portamento, rhythm });
     if (x) parts.x = x;
     return PARTS.filter((key) => parts[key]).map((key) => `${key}=${parts[key]}`).join('&');
 }
@@ -318,6 +325,7 @@ export function decodeShare(code) {
                 if (extras.portamento) settings.portamento = extras.portamento;
                 Object.entries(extras.sounds).forEach(([role, ref]) => { presets[role] = { external: ref }; });
                 if (extras.machine) presets.perc = { machine: extras.machine };
+                if (extras.rhythm) presets.rhythm = extras.rhythm;
                 Object.entries(extras.edits).forEach(([role, edit]) => { presets[role] = { edit }; });
             }
             return { settings: sanitizeSettings(settings), presets };

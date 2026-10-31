@@ -22,7 +22,7 @@ import { SCALE_FAMILIES, CHORD_COLOURS } from './theory';
 import { METERS } from './meter';
 import { DRIFT_MODES, TEMPO_BOUNDS, BPM_LIMITS } from './conductor';
 import {
-    OCTAVE_LIMITS, OCTAVE_WANDER, COUNTER_MODES, PEDAL_MODES, SPREADS, PAD_ROOTS, LEAD_SCALES, LEAD_ENDINGS, SECTION_MODES, SECTION_LENGTHS, DEFAULT_PULSE_WEIGHTS, DEFAULT_ARP_WEIGHTS, DEFAULT_DIRECTION_WEIGHTS,
+    OCTAVE_LIMITS, RHYTHM_OCTAVES, LAYERS, LAYER_FLOWS, FLOW_PHRASES, OCTAVE_WANDER, COUNTER_MODES, PEDAL_MODES, SPREADS, PAD_ROOTS, LEAD_SCALES, LEAD_ENDINGS, SECTION_MODES, SECTION_LENGTHS, DEFAULT_PULSE_WEIGHTS, DEFAULT_ARP_WEIGHTS, DEFAULT_DIRECTION_WEIGHTS,
 } from './arranger';
 import { AMBIENCE_LAYERS } from './engine/ambience';
 import { LAYER_PARAMS } from './engine/ambienceSynth';
@@ -318,6 +318,14 @@ MUSIC_GROUPS.push([[['progressionMode'],options(['bank','generated'],1)],[['prog
 MUSIC_GROUPS.push([[['push','level'],stepped(-1,1,.05)],[['push','program','mode'],options(Object.keys(PUSH_MODES),2)],[['push','program','low'],stepped(-1,1,.05)],[['push','program','high'],stepped(-1,1,.05)],
     [['push','program','lowSeconds'],stepped(5,600,5)],[['push','program','highSeconds'],stepped(5,600,5)],[['push','program','rampSeconds'],stepped(0,120,1)],[['push','program','minutes'],stepped(1,120,1)]]); // composition/push.js; appended, old links play as made
 MUSIC_GROUPS.push([[['mood','level'],stepped(-1,1,.05)]]); // composition/mood.js; appended, old links play as made
+// The layers (arranger.js LAYERS): the chord voices as one, a pad, a rhythm part or both, with the rhythm part's own mix, register and
+// the rules that keep it apart (the rule list is fixed here: a new rule goes on the end). Its voice is in the `x` part (shareExtras.js).
+MUSIC_GROUPS.push([[['layers'],options(Object.keys(LAYERS),2)],
+    ...['register','ownership','attacks','density','clear','entrances','mix'].map((rule)=>[['layerRules',rule],bool]),
+    [['volumes','rhythm'],stepped(0,1,.01)],[['muted','rhythm'],bool],
+    [['voices','rhythm','octave'],stepped(RHYTHM_OCTAVES[0],RHYTHM_OCTAVES[1],1)],[['voices','rhythm','wander'],options(Object.keys(OCTAVE_WANDER),2)],[['voices','rhythm','chance'],chance],
+    [['wander','voices','rhythm'],bool]]);
+MUSIC_GROUPS.push([[['layerFlow','mode'],options(Object.keys(LAYER_FLOWS),2)],[['layerFlow','phrases'],options(FLOW_PHRASES,2)]]); // the layers over time; appended
 const VOICE_GROUPS = [
     [...voice('pad'), ...voice('bass'), ...voice('lead'), ...voice('counter'), field(GROUPS, ['padNotes'])],
     LATER_GROUPS[4], // volumes
@@ -343,7 +351,7 @@ const VOICE_LATER_GROUPS = [
         [['wander', 'volume'], stepped(WANDER_LIMITS.volume.min, WANDER_LIMITS.volume.max, WANDER_LIMITS.volume.step)],
         [['wander', 'filter'], stepped(WANDER_LIMITS.filter.min, WANDER_LIMITS.filter.max, WANDER_LIMITS.filter.step)],
         [['wander', 'pitch'], stepped(WANDER_LIMITS.pitch.min, WANDER_LIMITS.pitch.max, WANDER_LIMITS.pitch.step)],
-        ...WANDER_ROLES.map((role) => [['wander', 'voices', role], bool]),
+        ...WANDER_ROLES.filter((role) => role !== 'rhythm').map((role) => [['wander', 'voices', role], bool]), // (the rhythm layer's has no place in a link yet)
     ],
     ...DRUMS.slice(11).map(drumGroup), // the crisp drums, added after the wander
     [[['wander', 'mode'], options(Object.keys(WANDER_MODES), 1)]], // random-walk wander, added last
