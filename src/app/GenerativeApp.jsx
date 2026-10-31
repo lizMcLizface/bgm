@@ -1744,7 +1744,7 @@ const GenerativeApp = () => {
                 </button>
                 {quickOpen && <button type="button" className="gen-quick-reset" onClick={resetQuick} aria-label={`Reset to ${lastSceneName.current || 'the preset'}`}
                     title={`Put these sliders and buttons back to how ${lastSceneName.current ? `“${lastSceneName.current}”` : 'the preset'} has them`}><UndoIcon /></button>}</>}>
-                {quickOpen && <QuickPanel settings={settings} roleLabels={Object.fromEntries(Object.entries(SOUND_ROLES).map(([role, { label }]) => [role, label.split(' / ')[0]]))} onVolume={setVolume} onSettings={loadSettings} onFeel={changeFeel} onPush={(push) => update('push', push)} nowLevel={now.pushLevel ?? 0} baseline={presetQuick} resetKey={quickEpoch} />}
+                {quickOpen && <QuickPanel settings={settings} roleLabels={Object.fromEntries(Object.entries(SOUND_ROLES).map(([role, { label }]) => [role, label.split(' / ')[0]]))} onVolume={setVolume} onSettings={loadSettings} onFeel={changeFeel} onPush={(push) => update('push', push)} nowLevel={now.pushLevel ?? 0} onMood={(mood) => update('mood', mood)} nowMood={now.moodLevel ?? 0} baseline={presetQuick} resetKey={quickEpoch} />}
             </Panel>}
 
             {has(3) && TRIAL_RULE_IDS.length > 0 && <Panel id="trial" title="Trial rules">

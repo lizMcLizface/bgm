@@ -123,7 +123,11 @@ export function romanDegree(token) {
  *   'add9' / 'add6' keep the third and add that scale note on top (a chord
  *   that already has a ninth is left alone)
  */
+// (the mood slider's colours are these plus '+7' / '+9', which are not settings - see composition/mood.js)
 export function diatonicChord(scale, degree, size = 3, colour = 'plain') {
+    // 'name+7' / '+9' / '+13' (the mood slider's, composition/mood.js): the colour with at least a seventh or a ninth chord's notes, '+13' with the thirteenth (the sixth, an octave up) over a ninth chord
+    const [base, extension] = colour.split('+');
+    if (extension) { colour = base; size = Math.max(size, extension === '7' ? 4 : 5); }
     const n = scale.length;
     const offsets = [];
     const at = (index) => scale[index % n] + 12 * Math.floor(index / n);
@@ -138,6 +142,7 @@ export function diatonicChord(scale, degree, size = 3, colour = 'plain') {
     const root = (degree - 1) % n;
     if (colour === 'add9' && size < 5) offsets.push(at(root + 8));
     if (colour === 'add6' && size < 5) offsets.push(at(root + 5));
+    if (extension === '13') offsets.push(at(root + 12));
     if(colour==='flat2')offsets.push(at(root)+13); // Keep the third/fifth; add the chromatic minor ninth.
     if(colour==='major7'){
         if(size>=4)offsets[3]=at(root)+11;else offsets.push(at(root)+11);

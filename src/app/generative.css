@@ -3248,7 +3248,7 @@ body {
 }
 
 /* The intensity fader (IntensityFader.jsx), in the bottom row between the pill groups: the track is a meter, lit from the middle - red to the right, a gentle blue to the left - and the cap is the target. */
-.gen-quick-intensity { grid-area: 2 / 2; align-self: end; justify-self: stretch; min-width: 0; }
+.gen-quick-intensity { grid-area: 2 / 2; align-self: end; justify-self: stretch; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
 @media (max-width: 900px) { .gen-quick-intensity { grid-area: auto; width: 100%; max-width: 340px; } }
 .gen-intensity {
     --gen-intensity-hot: #ef4444;
@@ -3320,3 +3320,9 @@ body {
 .gen-intensity input[type='range']:focus-visible { outline: 2px solid var(--gen-accent); outline-offset: 2px; border-radius: 6px; }
 .gen-intensity.is-off { opacity: 0.6; }
 .gen-intensity.is-off input[type='range'] { cursor: default; }
+
+/* the mood fader (MoodFader.jsx) is the intensity fader's shape in violet (suspended) and gold (lush) */
+.gen-mood { --gen-intensity-hot: #e0a82e; --gen-intensity-cool: #9a7fe0; }
+.gen-mood .gen-intensity-meter .up { background: linear-gradient(to right, #f6d36b, var(--gen-intensity-hot)); }
+.gen-mood .gen-intensity-meter .down { background: linear-gradient(to left, #c4b0f5, var(--gen-intensity-cool)); }
+.gen-mood .gen-intensity-name { min-height: 1.2em; }

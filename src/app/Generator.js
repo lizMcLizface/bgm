@@ -70,6 +70,7 @@ import { voiceMotion } from './composition/timbreDrift';
 import { generateProgression } from './composition/progressionGen';
 import { applyFeel, feelActive, feelTone, feelEnergy, ghostNotes } from './composition/feel';
 import { applyPush, pushLevel, glidePush, pushTempo, pushEnergy, pushTone } from './composition/push';
+import { applyMood, glideMood, moodColour, moodTone } from './composition/mood';
 import { nextMusic, glideTempo, scaleDistance } from './conductor';
 import { METERS, unitsPerMinute, swingEvents, halfTime, chordBars, splitBeat } from './meter';
 import { drumBar, loosenDrums, auditionHits, DRUMS } from './percussion';
@@ -722,7 +723,7 @@ class Generator {
     nowPlaying() {
         const planned = this.plan.get(Math.floor(this.position() / this.beatsPerBar)) || this.getPlan()[0];
         const { tonic, mode, progression, numerals } = planned.music;
-        return { tonic, mode, progression, ...(numerals ? { numerals } : {}), bpm: Math.round(planned.bpm), pushLevel: planned.pushLevel ?? 0, keyName: planned.chord.keyName };
+        return { tonic, mode, progression, ...(numerals ? { numerals } : {}), bpm: Math.round(planned.bpm), pushLevel: planned.pushLevel ?? 0, moodLevel: planned.moodLevel ?? 0, keyName: planned.chord.keyName };
     }
 
     refreshStringPatches() {
@@ -1299,6 +1300,11 @@ class Generator {
     // share of the chords (chordColour.amount) get it, which ones is set by
     // the seed and the bar, so replaying a bar plays the same chord.
     colourFor(bar) {
+        // the mood slider's colour (composition/mood.js) first: its own seeded roll per chord, the setting's colour for the chords it leaves
+        if (this.settings.moodLevel) {
+            const coloured = moodColour(this.settings.moodLevel, seeded(this.settings.seed * 41 + 13 + Math.floor(bar / this.settings.barsPerChord))());
+            if (coloured) return coloured;
+        }
         const { mode, amount } = this.settings.chordColour;
         if (mode === 'plain' || amount <= 0) return 'plain';
         if (amount >= 1) return mode;
@@ -1455,7 +1461,9 @@ class Generator {
         // (by hand it glides from the bar before's level, so a slider move ramps; a program sets its own)
         const prevMeter0 = prev?.meter ?? this.meter, prevBar = prev ? 60 / unitsPerMinute(prevMeter0, prev.bpm) : 0;
         const level = glidePush(settings.push, prev?.pushLevel, pushLevel(settings.push, prev ? (prev.elapsed ?? 0) + rubatoTime(prev.rubato, prevBar, prevMeter0.units) : 0), prevBar * prevMeter0.units);
-        this.settings = this.planningSettings(settings, level);
+        // mood (composition/mood.js) glides the same way from the bar before's level
+        const mood = glideMood(prev?.moodLevel, settings.mood?.level ?? 0, prevBar * prevMeter0.units);
+        this.settings = this.planningSettings(settings, level, mood);
         this.planningFrom = settings;
         let meter;
         try {
@@ -1468,8 +1476,8 @@ class Generator {
 
     // The settings bars are planned with, for one bar's planning only: the feel pad's place over
     // them (composition/feel.js), and bars per chord as played in the piece's metre (meter.js chordBars).
-    planningSettings(settings = this.settings, level = 0) {
-        const felt = feelActive(settings.feel) ? applyFeel(settings) : settings, planned = level ? applyPush(felt, level) : felt;
+    planningSettings(settings = this.settings, level = 0, mood = 0) {
+        const felt = feelActive(settings.feel) ? applyFeel(settings) : settings, pushed = level ? applyPush(felt, level) : felt, planned = mood ? applyMood(pushed, mood) : pushed;
         const barsPerChord = chordBars(METERS[settings.meter], settings.barsPerChord);
         return barsPerChord === settings.barsPerChord ? planned : { ...planned, barsPerChord };
     }
@@ -1681,12 +1689,12 @@ class Generator {
             tone = low * (OPEN_TONE / low) ** state.phrase.section.brightness;
         }
         const rubato = planRubato({ bar, state, meter: this.meter, endBar: this.endBar, amount: this.settings.rubato });
-        tone = pushTone(feelTone(arcTone(tone, energy), this.settings.feel), this.settings.pushLevel ?? 0);
+        tone = moodTone(pushTone(feelTone(arcTone(tone, energy), this.settings.feel), this.settings.pushLevel ?? 0), this.settings.moodLevel ?? 0);
         const space = sectionSpaceLevel(state.phrase.section, this.settings.sectionSpace) + arcSpace(energy);
         const loudness = planLoudness(events, this.meter.units, this.plan.get(bar - 1)?.loudness?.average, this.settings.evenLoudness);
         // the sequencer's effect moves (sequencer.js): this chord's stage and where in the chord a beat falls
         const seqMotion = seq?.on && seq.arrangement && Object.keys(seq.moves ?? {}).length ? { stage: stageForBar(seq, { slotIndex: slot.index, bar }), ...(({ start, bars }) => ({ start, bars }))(stageSpan(seq, slot, bar)) } : null;
-        this.plan.set(bar, { seqMotion, bar, chord, chordStart, state, events, music, upcoming, nextMusic: following, bpm, tone, boundaries, rubato, loudness, space, elapsed, energy, pushLevel: this.settings.pushLevel ?? 0, keyLift: liftPivot ? 2 : keyLift, chordBars: barsPerChord,
+        this.plan.set(bar, { seqMotion, bar, chord, chordStart, state, events, music, upcoming, nextMusic: following, bpm, tone, boundaries, rubato, loudness, space, elapsed, energy, pushLevel: this.settings.pushLevel ?? 0, moodLevel: this.settings.moodLevel ?? 0, keyLift: liftPivot ? 2 : keyLift, chordBars: barsPerChord,
             ...(split ? { split: { beat: splitAt, chord: split } } : {}),
             ...(this.rulebookTrace?{ruleTrace:{slot,referenceBarsPerChord:barsPerChord}}:{}) });
     }

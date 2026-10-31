@@ -317,6 +317,7 @@ MUSIC_GROUPS.push([[['padVibrato'],stepped(0,1,.05)]]); // composition/timbreDri
 MUSIC_GROUPS.push([[['progressionMode'],options(['bank','generated'],1)],[['progressionMood','brightness'],stepped(-1,1,.05)],[['progressionMood','stability'],stepped(0,1,.05)],[['progressionMood','adventure'],stepped(0,1,.05)],[['progressionWander'],stepped(0,1,.05)]]); // composition/progressionGen.js
 MUSIC_GROUPS.push([[['push','level'],stepped(-1,1,.05)],[['push','program','mode'],options(Object.keys(PUSH_MODES),2)],[['push','program','low'],stepped(-1,1,.05)],[['push','program','high'],stepped(-1,1,.05)],
     [['push','program','lowSeconds'],stepped(5,600,5)],[['push','program','highSeconds'],stepped(5,600,5)],[['push','program','rampSeconds'],stepped(0,120,1)],[['push','program','minutes'],stepped(1,120,1)]]); // composition/push.js; appended, old links play as made
+MUSIC_GROUPS.push([[['mood','level'],stepped(-1,1,.05)]]); // composition/mood.js; appended, old links play as made
 const VOICE_GROUPS = [
     [...voice('pad'), ...voice('bass'), ...voice('lead'), ...voice('counter'), field(GROUPS, ['padNotes'])],
     LATER_GROUPS[4], // volumes

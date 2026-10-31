@@ -4,6 +4,7 @@
 import React, { useEffect, useState } from 'react';
 import FeelPad from './FeelPad';
 import IntensityFader from './IntensityFader';
+import MoodFader from './MoodFader';
 import { MIX_SLIDERS, FEEL_SLIDERS, CHOICE_GROUPS, choiceAt, choicePaths, choicePatch, STACKS, LEVELS, readValue, sliderPatch, stackLevel, stackPatch, stackPaths, matchesPreset, presetPatch } from './quickControls';
 
 // milliseconds as they are, everything else as a percentage of 1
@@ -50,7 +51,7 @@ const PRESET = { key: 'preset', label: 'Preset', preset: true, title: 'As the pr
 
 // `roleLabels`: each voice's name as the rest of the page has it (rhythm, percussion, ...).
 // `baseline`: the preset's quick settings (Preset buttons); `resetKey` changes when Reset is pressed.
-export default function QuickPanel({ settings, roleLabels = {}, onVolume, onSettings, onFeel, onPush, nowLevel = 0, baseline, resetKey = 0 }) {
+export default function QuickPanel({ settings, roleLabels = {}, onVolume, onSettings, onFeel, onPush, nowLevel = 0, onMood, nowMood = 0, baseline, resetKey = 0 }) {
     const [picked, setPicked] = useState({});
     useEffect(() => setPicked({}), [baseline, resetKey]);
     const onPreset = (paths) => !!baseline && matchesPreset(settings, baseline, paths);
@@ -100,7 +101,12 @@ export default function QuickPanel({ settings, roleLabels = {}, onVolume, onSett
                     })}
                 </div>
             </div>
-            {onPush && settings.push && <div className="gen-quick-intensity"><IntensityFader push={settings.push} now={nowLevel} onChange={onPush} /></div>}
+            {onPush && settings.push && (
+                <div className="gen-quick-intensity">
+                    <IntensityFader push={settings.push} now={nowLevel} onChange={onPush} />
+                    {onMood && settings.mood && <MoodFader mood={settings.mood} now={nowMood} onChange={onMood} />}
+                </div>
+            )}
         </div>
     );
 }

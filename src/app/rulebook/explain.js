@@ -18,7 +18,7 @@ export function explainBar(bar) {
     else if(c?.kind==='arrive')add('section-cadences','A return to the tonic','The main section arrives on its tonic after preparation.');
     else if(c?.kind==='phrase-destination')add('harmonic-pacing','An interior harmonic destination',`${c.reason}. This chord closes the first half of the section.`);
     if(p?.borrowed)add('borrowed-chords','Borrowed from the parallel mode',`This chord uses the parallel ${p.sourceMode==='Major-1'?'major':'minor'} while the melodic scale stays in its home mode.`);
-    if(p&&p.colour!=='plain')add('chord-colour','An added chord colour',`Uses ${CHORD_COLOURS[p.colour]?.toLowerCase()??p.colour} colouring.`);
+    if(p&&p.colour!=='plain')add('chord-colour','An added chord colour',`Uses ${CHORD_COLOURS[p.colour]?.toLowerCase()??p.colour.replace('plain+','seventh/ninth ').replace('+',' with extension ')} colouring.`);
     if(p&&p.harmonicMode!==p.baseMode)add('harmonic-parent','Separate melodic and harmonic scales','The melody keeps its selected scale while the chords use a different harmonic scale.');
     const trace=bar.ruleTrace;
     if(trace&&trace.slot.bars!==trace.referenceBarsPerChord)add('harmonic-pacing','A change in harmonic pace',`This chord slot lasts ${trace.slot.bars} bars instead of the ${trace.referenceBarsPerChord}-bar reference. Progression order and total cycle length are retained.`);

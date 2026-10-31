@@ -24,6 +24,7 @@ import { LAYER_PARAMS, COMMON_PARAMS } from './engine/ambienceSynth';
 import { ROLE_VOLUMES } from './presets';
 import { ARC_SHAPES } from './composition/arc';
 import { PUSH_MODES, defaultPush } from './composition/push';
+import { defaultMood } from './composition/mood';
 import { defaultWander, defaultAmbienceWander, WANDER_ROLES, WANDER_LIMITS, WANDER_MODES, AMBIENCE_WANDER_LIMITS } from './engine/wander';
 import { DEFAULT_DRUMS, DRUM_STYLES, DRUM_KITS, DRUMS, DRUM_PARAMS, defaultDrumKit } from './percussion';
 import { DEFAULT_DRIFT, DRIFT_MODES, BPM_LIMITS } from './conductor';
@@ -85,6 +86,7 @@ export function defaultSettings() {
         dynamics: { level: 1, range: 1, attack: 0, brightness: 0 },
         arc: { shape: 'off', minutes: 20 }, // the energy over a long stretch: rise, wind down or wave (composition/arc.js)
         feel: { busy: 0, bright: 0 }, // the feel pad's place: calmer..busier, darker..brighter (composition/feel.js)
+        mood: defaultMood(), // chord mood, suspended .. lush (composition/mood.js)
         push: defaultPush(), // intensity, very calm .. overdrive, by hand or by a program of intervals or a ramp (composition/push.js)
         breakdowns: { meter: 'same', halfTime: false }, // a breakdown's own meter, and half-time drums in it
         padVibrato: 0, // 0..1: pad and second-lead oscillator sounds without vibrato get a very slow, shallow one (composition/timbreDrift.js)
@@ -200,6 +202,7 @@ const RULES = {
     timbreDrift: clamp(0, 1),
     breakdowns: { meter: oneOf(['same', ...Object.keys(METERS)]), halfTime: bool },
     feel: { busy: clamp(-1, 1), bright: clamp(-1, 1) },
+    mood: { level: clamp(-1, 1) },
     push: { level: clamp(-1, 1), program: { mode: oneOf(Object.keys(PUSH_MODES)), low: clamp(-1, 1), high: clamp(-1, 1), lowSeconds: clamp(5, 600), highSeconds: clamp(5, 600), rampSeconds: clamp(0, 120), minutes: clamp(1, 120) } },
     arc: { shape: oneOf(Object.keys(ARC_SHAPES)), minutes: clamp(2, 60) },
     swing: clamp(0, 0.6),
