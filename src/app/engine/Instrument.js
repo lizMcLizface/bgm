@@ -24,6 +24,7 @@ import { dynamicAttack } from '../composition/dynamics';
 import { isAcousticPiano } from './acousticPiano';
 import { isCalibratedPiano } from './calibratedPiano';
 import { isTempered, tuningCents } from './temperament';
+import { pianoBufferLater } from './pianoRenderPool';
 
 // A held note is booked as if it lasted this long; its release replaces
 // the tail when the key comes up.
@@ -266,6 +267,7 @@ class Instrument {
         // Held (live-played) notes: id -> { index, voiceId }.
         this.held = new Map();
         this.heldIds = 0;
+        this.pianoEpoch = 0; // bumped by silence(), so piano notes rendering in the background are not booked
         // The effects chain sleeps as well (output disconnected, so nothing
         // in it renders) once every voice is asleep and the effects' tails
         // have died away: a reverb or delay fed silence costs as much as one
@@ -669,7 +671,7 @@ class Instrument {
      * @param {number} [detune=0] - cents, for humanized pitch
      * @param {object} [rawExpression] - bounded per-note envelope and tone overrides
      */
-    scheduleNote(midi, startTime, duration, velocity = 0.8, detune = 0, rawExpression = null) {
+    scheduleNote(midi, startTime, duration, velocity = 0.8, detune = 0, rawExpression = null, rendered = false) {
         const expression = cleanExpression(rawExpression), shaped = expressiveEnvelope(this.gainEnv, duration, expression);
         // the scene's gentle onsets (composition/dynamics.js)
         if (expression?.dynamicAttack) shaped.env = { ...shaped.env, attack: dynamicAttack(shaped.env.attack, velocity, expression.dynamicAttack) };
@@ -688,6 +690,13 @@ class Instrument {
             const base=this.noteInfo(midi).freq;
             plan.pitchPath=[{time:0,cents:0},...expression.pitchTargets.filter(p=>p.time>0&&p.time<=shaped.duration).map(p=>({time:p.time,cents:Math.max(-2400,Math.min(2400,1200*Math.log2(this.noteInfo(p.midi).freq/base)))}))];
         }
+        // a piano note not rendered yet (a chord the first time): rendered on the workers, all of its notes at once, then booked
+        const waiting = !rendered && plan.piano ? pianoBufferLater(this.AC, info.freq, plan.piano) : null;
+        if (waiting) {
+            const epoch = this.pianoEpoch;
+            void waiting.then(() => { if (epoch === this.pianoEpoch) this.scheduleNote(midi, Math.max(startTime, this.AC.currentTime + 0.005), duration, velocity, detune, rawExpression, true); });
+            return;
+        }
         this.voices[index].scheduleNote(info, plan, startTime, steal);
         this.busyUntil[index] = startTime + releaseEnd;
         this.soundUntil = Math.max(this.soundUntil, startTime + releaseEnd);
@@ -701,24 +710,43 @@ class Instrument {
      * @returns {number} id for stopNote
      */
     startNote(midi, velocity = 0.8) {
-        const now = this.AC.currentTime + 0.005;
         const { points } = gainEnvelopePoints(this.gainEnv, velocity, HELD_SECONDS);
-        const plan = this.notePlan(midi, velocity, HELD_SECONDS, points);
+        const plan = this.notePlan(midi, velocity, HELD_SECONDS, points), info = this.noteInfo(midi);
+        const id = ++this.heldIds;
+        // a piano note not rendered yet (the velocity changes with every key, so most are): rendered on the workers, a chord's
+        // notes at once, then started; a key let go in the meantime still plays its short note
+        const waiting = plan.piano ? pianoBufferLater(this.AC, info.freq, plan.piano) : null;
+        if (waiting) {
+            const entry = { pending: true, released: false };
+            this.held.set(id, entry);
+            void waiting.then(() => {
+                if (this.held.get(id) !== entry) return;
+                this.held.delete(id);
+                this.beginHeld(id, info, plan);
+                if (entry.released) this.stopNote(id);
+            });
+            return id;
+        }
+        this.beginHeld(id, info, plan);
+        return id;
+    }
+
+    beginHeld(id, info, plan) {
+        const now = this.AC.currentTime + 0.005;
         const { index, steal } = this.allocateVoice(now);
         const voice = this.voices[index];
-        voice.scheduleNote(this.noteInfo(midi), plan, now, steal);
+        voice.scheduleNote(info, plan, now, steal);
         this.busyUntil[index] = Infinity;
         this.quietAt = Infinity;
         this.wake(index);
-        const id = ++this.heldIds;
         this.held.set(id, { index, voiceId: voice.voiceId, filterOffset: plan.filterOffset });
-        return id;
     }
 
     /** Releases a note from startNote - unless its voice was taken since. */
     stopNote(id) {
         const held = this.held.get(id);
         if (!held) return;
+        if (held.pending) { held.released = true; return; }
         this.held.delete(id);
         const voice = this.voices[held.index];
         if (voice.voiceId !== held.voiceId) return;
@@ -740,6 +768,7 @@ class Instrument {
 
     /** Fades every voice out quickly, cancelling anything booked after `time`. */
     silence(time = this.AC.currentTime) {
+        this.pianoEpoch++; // piano notes still being rendered are dropped
         if (this.tempoTimingTouched) scheduleEffectTiming(this, 0, time);
         this.voices.forEach((synth, i) => {
             synth.stopStrings?.(time + .3);

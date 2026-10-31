@@ -80,6 +80,10 @@ import { contextFromPlan } from './auditionContext';
 import { normal, seeded } from './random';
 import { defaultSettings } from './settings';
 import { findPreset } from './editor/presetStore';
+import { pianoBufferLater } from './engine/pianoRenderPool';
+
+// what a MIDI keyboard plays when no voice is chosen (midiPiano)
+const MIDI_PIANO = 'Studio Concert v2';
 import { stringPatch, isStringPatch } from './engine/stringPatches';
 import { pianoPatch, isPianoPatch } from './engine/pianoPatches';
 import { ROLE_PRESETS, ROLE_VOLUMES } from './presets';
@@ -1154,9 +1158,33 @@ class Generator {
      * liveNoteOff. For percussion `midi` is the drum (percussion.js DRUMS):
      * one hit, nothing to release.
      */
+    /**
+     * The piano a MIDI keyboard plays when no voice is chosen: Studio Concert v2 at full volume (the dynamics are in
+     * the playing), apart from the music's roles and mix. Made on first use; a MIDI connection makes it ahead.
+     */
+    midiPiano() {
+        if (!this.midi) {
+            const instrument = new Instrument({ context: this.AC, polyphony: 12, preset: findPreset(MIDI_PIANO), reverbHub: this.reverbHub });
+            const gain = this.AC.createGain();
+            gain.gain.value = 1;
+            instrument.connect(gain);
+            gain.connect(this.output);
+            this.midi = { instrument, gain };
+            // a note rendered now starts the render workers and loads the piano's model, so the first chord is not the slow one
+            const warm = instrument.notePlan(60, 0.7, 1, []).piano;
+            if (warm) pianoBufferLater(this.AC, instrument.noteInfo(60).freq, warm);
+        }
+        return this.midi.instrument;
+    }
+
     liveNoteOn(role, midi, velocity = 0.8) {
         if (this.AC.state !== 'running') this.AC.resume();
         this.endStopFade();
+        if (role === 'midi') {
+            const id = this.midiPiano().startNote(midi, velocity);
+            this.liveNotes?.add(role + ':' + id);
+            return id;
+        }
         if (role === 'perc') {
             this.roles.perc.instrument.scheduleNote(midi, this.AC.currentTime + 0.005, 0.8, velocity, Math.random() * 2 - 1);
             this.emitVisualNote({ type: 'on', role, midi, velocity, time: this.AC.currentTime + 0.005, length: 0.15 });
@@ -1171,6 +1199,7 @@ class Generator {
     liveNoteOff(role, id) {
         this.liveNotes?.delete(role+':'+id);
         if (role === 'perc') return;
+        if (role === 'midi') { this.midi?.instrument.stopNote(id); return; }
         this.roles[role].instrument.stopNote(id);
         this.emitVisualNote({ type: 'off', role, liveId: id, time: this.AC.currentTime });
     }

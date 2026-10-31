@@ -45,3 +45,6 @@
     .gen-hero-look { margin-left: 0; }
     .gen-hero-piano .gen-hero-canvas { height: 300px; }
 }
+.gen-hero-marks { display: inline-flex; gap: 4px; }
+.gen .gen-hero-marks button[type] { padding: 2px 9px; font-size: 11px; border-radius: 999px; color: var(--gen-muted); }
+.gen .gen-hero-marks button[type].on { color: var(--gen-text); border-color: var(--gen-accent); background: color-mix(in srgb, var(--gen-accent) 18%, transparent); }

@@ -6,14 +6,14 @@ import { unitsPerMinute } from './meter';
 
 /**
  * @returns {{ notes: Array<{bar:number, beat:number, role:string, midi:number, t:number, dur:number}>,
- *             bars: Array<{t:number, sec:number, beatSec:number}> }}
+ *             bars: Array<{t:number, sec:number, beatSec:number, chord:object|null, chordStart:boolean}>, chord: object|null }} (`chord`: the chord of the bar now playing)
  *   `t`: seconds until the note starts (negative once it has), `dur`: seconds it is held.
  */
 export function upcomingNotes(generator, roles, lookahead, behind = 0.25) {
     const plan = generator.getPlan(), perBar = generator.beatsPerBar, position = generator.position();
     const byBar = new Map(plan.map((p) => [p.bar, p]));
     const current = Math.floor(position / perBar), now = byBar.get(current);
-    if (!now) return { notes: [], bars: [] };
+    if (!now) return { notes: [], bars: [], chord: null };
     const meterOf = (p) => p.meter ?? generator.meter;
     const barSeconds = (p) => (meterOf(p).units * 60) / unitsPerMinute(meterOf(p), p.bpm);
     // seconds from now to the start of every planned bar
@@ -25,12 +25,12 @@ export function upcomingNotes(generator, roles, lookahead, behind = 0.25) {
         const start = starts.get(bar);
         if (start === undefined || start > lookahead) continue;
         const meter = meterOf(p), sec = barSeconds(p), units = meter.units;
-        if (start + sec > 0) bars.push({ t: start, sec, beatSec: (sec * meter.unitsPerBeat * (meter.pace ?? 1)) / units });
+        if (start + sec > 0) bars.push({ t: start, sec, beatSec: (sec * meter.unitsPerBeat * (meter.pace ?? 1)) / units, chord: p.chord ?? null, chordStart: !!p.chordStart });
         for (const e of p.events) {
             if (!roles.includes(e.role)) continue;
             const t = start + (e.beat / units) * sec, dur = Math.max(0.05, (e.length / units) * sec);
             if (t <= lookahead && t + dur > -behind) notes.push({ bar, beat: e.beat, role: e.role, midi: e.midi, t, dur });
         }
     }
-    return { notes: notes.sort((a, b) => a.t - b.t || a.midi - b.midi), bars: bars.sort((a, b) => a.t - b.t) };
+    return { notes: notes.sort((a, b) => a.t - b.t || a.midi - b.midi), bars: bars.sort((a, b) => a.t - b.t), chord: now.chord ?? null };
 }

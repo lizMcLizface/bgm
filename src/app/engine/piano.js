@@ -57,11 +57,17 @@ export function renderPiano(sampleRate,frequency,{type='felt',decay=2.5,brightne
     return out;
 }
 
-export function pianoBuffer(context,frequency,options={}) {
+/** The cache key's parts for a note: its rounded pitch and its settings with the velocity in eight layers. */
+export function pianoNote(frequency,options={}) {
     const freq=Math.round(frequency*100)/100;
     // Eight brightness layers bound cache growth; gain still follows exact velocity.
-    const settings={...options,velocity:Math.round(clamp(options.velocity ?? .8,0,1)*7)/7};
-    return cachedNoteBuffer(context,['piano',freq,settings],()=>renderPiano(context.sampleRate,freq,settings));
+    return {freq,settings:{...options,velocity:Math.round(clamp(options.velocity ?? .8,0,1)*7)/7}};
+}
+export const pianoKey=({freq,settings})=>['piano',freq,settings];
+
+export function pianoBuffer(context,frequency,options={}) {
+    const note=pianoNote(frequency,options);
+    return cachedNoteBuffer(context,pianoKey(note),()=>renderPiano(context.sampleRate,note.freq,note.settings));
 }
 
 // A quiet harmonic body sustains under the transient until the note releases.

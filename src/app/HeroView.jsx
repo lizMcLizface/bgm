@@ -8,7 +8,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { upcomingNotes } from './heroNotes';
 import { NECKS, foldIntoNeck, fingerMoments } from './heroFingering';
-import { midiHeld } from './Tracks';
+import { midiHeld, midiHeldRole } from './Tracks';
+import { getIntervalColor, getIntervalLabel } from '../labs/piano/intervals';
 import { CloseIcon, SwordIcon } from './icons';
 import { readPref, writePref } from './prefs';
 import './hero.css';
@@ -150,7 +151,7 @@ function placeNotes(notes, neck, cache, hand) {
 
 // ---- piano -------------------------------------------------------------------------------------------------
 
-const LOW = 21, HIGH = 108;
+const LOW = 21, HIGH = 108, NEUTRAL_HELD = '#9fb0c4';
 const isBlack = (midi) => [1, 3, 6, 8, 10].includes(midi % 12);
 
 function pianoKeys(w) {
@@ -166,7 +167,7 @@ function pianoKeys(w) {
     return keys;
 }
 
-function drawPiano(ctx, w, h, { notes, bars, look, colors, held }) {
+function drawPiano(ctx, w, h, { notes, bars, look, colors, held, heldRole, chord, showChord, showScale }) {
     const keysH = Math.min(104, Math.round(h * 0.28)), fall = h - keysH, pps = fall / look, keys = pianoKeys(w);
     const y = (t) => fall - t * pps;
     ctx.clearRect(0, 0, w, h);
@@ -183,6 +184,18 @@ function drawPiano(ctx, w, h, { notes, bars, look, colors, held }) {
             ctx.strokeStyle = k === 0 ? 'rgba(255,255,255,.2)' : 'rgba(255,255,255,.06)';
             ctx.lineWidth = k === 0 ? 1.5 : 1;
             ctx.beginPath(); ctx.moveTo(0, y(t)); ctx.lineTo(w, y(t)); ctx.stroke();
+        }
+        // where the chord changes, the chord's tones are marked on the line, over their keys, as on the keys' tops
+        if (showChord && bar.chordStart && bar.chord?.pitchClasses?.length && bar.t >= 0 && bar.t <= look) {
+            const at = y(bar.t), root = bar.chord.pitchClasses[0], tones = new Set(bar.chord.pitchClasses);
+            for (let m = LOW; m <= HIGH; m++) {
+                if (!tones.has(m % 12)) continue;
+                const key = keys.get(m);
+                const inset = key.black ? 1 : 1.5; // as the notes' own, rounded the same way
+                ctx.fillStyle = getIntervalColor((m % 12 - root + 12) % 12); roundRect(ctx, key.x + inset, at - 1.5, key.w - inset * 2, 3, 4); ctx.fill();
+            }
+            ctx.fillStyle = 'rgba(255,255,255,.75)'; ctx.font = '600 11px ui-monospace, monospace'; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+            ctx.fillText(bar.chord.name ?? '', 6, at - 5);
         }
     }
 
@@ -202,12 +215,36 @@ function drawPiano(ctx, w, h, { notes, bars, look, colors, held }) {
     }
     ctx.globalAlpha = 1;
 
-    // the keys, white then black, lit by what sounds and by what is held on a MIDI keyboard
+    // the keys, white then black, in the mini pianos' language (labs/Piano.jsx): a chord tone has a bar in its interval's colour
+    // (from the chord's root) along the top of its key, every scale tone one along the foot (from the scale's tonic, so it stays
+    // put), each named at the foot by its interval from the chord; a key that sounds fills whole in its
+    // voice's colour, and one that is held in the voice it is played on
+    const root = chord?.pitchClasses?.[0], chordTones = new Set(chord?.pitchClasses ?? []), scaleTones = new Set(chord?.scalePcs ?? []), tonic = chord?.scalePcs?.[0];
+    const toneOf = (midi) => {
+        const pc = midi % 12, isChord = chordTones.has(pc);
+        if (root === undefined || !(isChord || scaleTones.has(pc))) return null;
+        // the chord's colour and name move with the chord; the scale's colour, along the foot, stays with the key
+        const interval = (pc - root + 12) % 12;
+        return { isChord, labelled: isChord ? showChord : showScale, color: getIntervalColor(interval), label: getIntervalLabel(interval), scaleColor: getIntervalColor((pc - (tonic ?? root) + 12) % 12) };
+    };
     const paint = (midi, base) => {
-        const key = keys.get(midi), lit = sounding.get(midi), pressed = held.has(midi);
-        ctx.fillStyle = lit ?? (pressed ? colors.accent : base);
-        ctx.fillRect(key.x + 0.5, fall, key.w - 1, key.black ? keysH * 0.62 : keysH);
-        if (pressed && lit) { ctx.strokeStyle = colors.accent; ctx.lineWidth = 3; ctx.strokeRect(key.x + 2, fall + 2, key.w - 4, (key.black ? keysH * 0.62 : keysH) - 4); }
+        const key = keys.get(midi), lit = sounding.get(midi), pressed = held.has(midi), tone = toneOf(midi);
+        // a held key takes its voice's colour; with no voice chosen (a MIDI keyboard on its own) it is a neutral grey-blue
+        const heldColor = (heldRole.get(midi) && colors[heldRole.get(midi)]) || NEUTRAL_HELD;
+        const height = key.black ? keysH * 0.62 : keysH;
+        // the whole key for what sounds or is held; a chord tone's colour is a bar along the top, a scale tone's along the foot
+        ctx.fillStyle = pressed ? heldColor : lit ?? base;
+        ctx.fillRect(key.x + 0.5, fall, key.w - 1, height);
+        if (tone) {
+            if (tone.isChord && showChord) { ctx.fillStyle = tone.color; ctx.fillRect(key.x + 0.5, fall, key.w - 1, 5); }
+            if (showScale) { ctx.fillStyle = tone.scaleColor; ctx.fillRect(key.x + 0.5, fall + height - 3, key.w - 1, 3); }
+            if (tone.labelled) {
+                ctx.fillStyle = key.black && !lit && !pressed ? (tone.isChord ? '#fff' : '#d4dae2') : '#343945';
+                ctx.globalAlpha = tone.isChord ? 1 : 0.75; ctx.font = '600 8px ui-monospace, monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+                ctx.fillText(tone.label, key.x + key.w / 2, fall + height - 6); ctx.globalAlpha = 1;
+            }
+        }
+        if (pressed && lit) { ctx.strokeStyle = lit; ctx.lineWidth = 3; ctx.strokeRect(key.x + 2, fall + 2, key.w - 4, height - 4); }
     };
     for (let m = LOW; m <= HIGH; m++) if (!isBlack(m)) paint(m, '#e7e7e3');
     ctx.strokeStyle = '#737b84'; ctx.lineWidth = 1;
@@ -215,7 +252,7 @@ function drawPiano(ctx, w, h, { notes, bars, look, colors, held }) {
     for (let m = LOW; m <= HIGH; m++) if (isBlack(m)) paint(m, '#20242b');
     // a mark on each C
     ctx.fillStyle = '#737b84'; ctx.font = '600 9px ui-monospace, monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
-    for (let m = LOW; m <= HIGH; m++) if (m % 12 === 0) { const key = keys.get(m); ctx.fillText(`C${m / 12 - 1}`, key.x + key.w / 2, fall + keysH - 4); }
+    for (let m = LOW; m <= HIGH; m++) if (m % 12 === 0) { const key = keys.get(m); ctx.fillText(`C${m / 12 - 1}`, key.x + key.w / 2, fall + keysH - (toneOf(m)?.labelled ? 17 : 4)); }
     ctx.strokeStyle = colors.text; ctx.lineWidth = 2;
     ctx.beginPath(); ctx.moveTo(0, fall); ctx.lineTo(w, fall); ctx.stroke();
 }
@@ -227,6 +264,10 @@ const HeroView = ({ generator, instrument, voices, voiceToggle, colorsOf, onClos
     const [look, setLook] = useState(() => Math.min(8, Math.max(1, Number(readPref('bgm-hero-look', 3)) || 3)));
     const [offset, setOffset] = useState({ x: 0, y: 0 }), drag = useRef(null);
     const changeLook = (value) => { setLook(value); writePref('bgm-hero-look', value); };
+    // what the piano marks: the chord (bars on the keys' tops and on the chord changes, and their names) and the scale (bars along the feet)
+    const [showChord, setShowChord] = useState(() => readPref('bgm-hero-chord', true) !== false);
+    const [showScale, setShowScale] = useState(() => readPref('bgm-hero-scale', true) !== false);
+    const toggle = (value, set, key) => { set(!value); writePref(key, !value); };
 
     useEffect(() => { cache.current.clear(); hand.current = null; }, [instrument, voices.join()]);
 
@@ -242,8 +283,8 @@ const HeroView = ({ generator, instrument, voices, voiceToggle, colorsOf, onClos
         const observer = new ResizeObserver(resize);
         observer.observe(canvas); resize();
         const loop = () => {
-            const colors = colorsOf(), { notes, bars } = upcomingNotes(generator, voices, look);
-            if (instrument === 'piano') drawPiano(ctx, width, height, { notes, bars, look, colors, held: midiHeld });
+            const colors = colorsOf(), { notes, bars, chord } = upcomingNotes(generator, voices, look);
+            if (instrument === 'piano') drawPiano(ctx, width, height, { notes, bars, look, colors, held: midiHeld, heldRole: midiHeldRole, chord, showChord, showScale });
             else {
                 const neck = NECKS[instrument];
                 drawHighway(ctx, width, height, { neck, notes: placeNotes(notes, neck, cache.current, hand), bars, look, colors });
@@ -252,7 +293,7 @@ const HeroView = ({ generator, instrument, voices, voiceToggle, colorsOf, onClos
         };
         frame = requestAnimationFrame(loop);
         return () => { cancelAnimationFrame(frame); observer.disconnect(); };
-    }, [generator, instrument, voices.join(), look]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [generator, instrument, voices.join(), look, showChord, showScale]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const startDrag = (e) => {
         if (e.target.closest('button, input, label, select')) return;
@@ -271,6 +312,12 @@ const HeroView = ({ generator, instrument, voices, voiceToggle, colorsOf, onClos
                     <input type="range" min="1" max="8" step="0.5" value={look} onChange={(e) => changeLook(Number(e.target.value))} aria-label="Look ahead in seconds" />
                     <span>{look.toFixed(1)} s</span>
                 </label>
+                {instrument === 'piano' && (
+                    <span className="gen-hero-marks" role="group" aria-label="Piano markings">
+                        <button type="button" aria-pressed={showChord} className={showChord ? 'on' : ''} title="Mark the chord's tones: a bar along the top of each key, and on the line where the chord changes" onClick={() => toggle(showChord, setShowChord, 'bgm-hero-chord')}>Chord</button>
+                        <button type="button" aria-pressed={showScale} className={showScale ? 'on' : ''} title="Mark the scale's tones: a bar along the foot of each key, from the tonic" onClick={() => toggle(showScale, setShowScale, 'bgm-hero-scale')}>Scale</button>
+                    </span>
+                )}
                 {voiceToggle}
                 <button type="button" className="gen-hero-close" aria-label="Close the hero view" title="Close" onClick={onClose}><CloseIcon /></button>
             </header>

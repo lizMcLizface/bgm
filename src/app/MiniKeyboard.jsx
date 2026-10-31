@@ -7,7 +7,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Piano from '../labs/Piano';
 import FeatureIntro from './FeatureIntro';
-import { DEFAULT_KEY_OCTAVES, midiHeld } from './Tracks';
+import { DEFAULT_KEY_OCTAVES, holdNote, releaseNote } from './Tracks';
 import { scaleById, scaleSemitones } from './theory';
 import { emitQuest } from './quests/questBus';
 import './quests/quests.css';
@@ -34,13 +34,13 @@ export default function MiniKeyboard({ role, label, generator, onClose }) {
         const note = held.current.get(pointer);
         if (!note) return;
         generator.liveNoteOff(note.role, note.id);
-        midiHeld.delete(note.midi);
+        releaseNote(note.midi);
         held.current.delete(pointer);
     };
     const start = (pointer, midi) => {
         stop(pointer);
         held.current.set(pointer, { role, id: generator.liveNoteOn(role, midi, 0.8), midi });
-        midiHeld.add(midi);
+        holdNote(midi, role);
         emitQuest('liveplay', { role });
     };
     // let go of everything when the voice changes or the keyboard goes

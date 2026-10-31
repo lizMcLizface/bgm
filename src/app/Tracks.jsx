@@ -6,6 +6,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { emitQuest } from './quests/questBus';
+import { readPref, writePref } from './prefs';
 import { DiceIcon, PencilIcon, SparkIcon, PianoIcon, GuitarIcon, BassIcon } from './icons';
 
 export const PATTERN_VIEWS = [['piano', 'Piano', PianoIcon], ['guitar', 'Guitar', GuitarIcon], ['bass', 'Bass', BassIcon]];
@@ -28,7 +29,14 @@ export const PatternButtons = ({ patterns, onPattern, label = true }) => (
 );
 
 // The notes held right now on a MIDI keyboard (or the computer keyboard, with a voice armed), for views that show them.
+// (set once a MIDI keyboard has been found, so the next visit connects to it again)
+const MIDI_PREF = 'bgm-midi-connected';
+
 export const midiHeld = new Set();
+// ... and the voice each is played on (none: a MIDI keyboard with no voice chosen), so a view can colour it
+export const midiHeldRole = new Map();
+export const holdNote = (midi, role = null) => { midiHeld.add(midi); if (role) midiHeldRole.set(midi, role); else midiHeldRole.delete(midi); };
+export const releaseNote = (midi) => { midiHeld.delete(midi); midiHeldRole.delete(midi); };
 
 export const DEFAULT_KEY_OCTAVES = { pad: 4, bass: 2, lead: 5, counter: 5 };
 const OCTAVE_RANGE = [0, 7];
@@ -91,7 +99,7 @@ export function useLivePlay(generator, armed) {
     state.current.octaves = octaves;
 
     const releaseAll = () => {
-        state.current.held.forEach(({ role, id, midi }) => { generator.liveNoteOff(role, id); midiHeld.delete(midi); });
+        state.current.held.forEach(({ role, id, midi }) => { generator.liveNoteOff(role, id); releaseNote(midi); });
         state.current.held.clear();
     };
 
@@ -120,13 +128,13 @@ export function useLivePlay(generator, armed) {
             const midi = 12 * (state.current.octaves[armed] + 1) + offset;
             state.current.held.set(e.code, { role: armed, id: generator.liveNoteOn(armed, midi, 0.8), midi });
             emitQuest('liveplay', { role: armed });
-            midiHeld.add(midi);
+            holdNote(midi, armed);
         };
         const up = (e) => {
             const held = state.current.held.get(e.code);
             if (!held) return;
             generator.liveNoteOff(held.role, held.id);
-            midiHeld.delete(held.midi);
+            releaseNote(held.midi);
             state.current.held.delete(e.code);
         };
         window.addEventListener('keydown', down);
@@ -139,7 +147,7 @@ export function useLivePlay(generator, armed) {
         };
     }, [armed, generator]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    const connectMidi = async () => {
+    const connectMidi = async ({ remembered = false } = {}) => {
         if (!navigator.requestMIDIAccess) {
             setMidiStatus('MIDI is not supported in this browser');
             return;
@@ -150,16 +158,19 @@ export function useLivePlay(generator, armed) {
                 const [status, note, velocity] = data;
                 const command = status & 0xf0;
                 const key = `midi-${note}`;
-                const role = state.current.armed;
-                if (command === 0x90 && velocity > 0) midiHeld.add(note);
-                else if (command === 0x80 || command === 0x90) midiHeld.delete(note);
+                // (what the keyboard sends, to see how hard it really plays: note on/off and the velocity, raw and as the voice gets it)
+                if (command === 0x90 || command === 0x80) console.log(`[MIDI] ${command === 0x90 && velocity > 0 ? 'on ' : 'off'} note ${note} velocity ${velocity}/127${command === 0x90 && velocity > 0 ? ` -> ${(velocity / 127).toFixed(2)}` : ''}`);
+                // no voice chosen: the keyboard plays its own piano (generator.midiPiano), its keys in a neutral colour
+                const role = state.current.armed || 'midi';
+                if (command === 0x90 && velocity > 0) holdNote(note, role !== 'midi' && role !== 'perc' ? role : null);
+                else if (command === 0x80 || command === 0x90) releaseNote(note);
                 if (command === 0x90 && velocity > 0 && role === 'perc') {
                     const drum=midiDrum(note,generator.settings?.drums?.kit);
-                    if(drum!==undefined)generator.liveNoteOn('perc',drum,velocity/127);
+                    if(drum!==undefined)generator.liveNoteOn('perc',drum,velocity / 127);
                 } else if (command === 0x90 && velocity > 0) {
                     if (!role || state.current.held.has(key)) return;
                     state.current.held.set(key, { role, id: generator.liveNoteOn(role, note, velocity / 127), midi: note });
-                    emitQuest('liveplay', { role });
+                    if (role !== 'midi') emitQuest('liveplay', { role });
                 } else if (command === 0x80 || (command === 0x90 && velocity === 0)) {
                     const held = state.current.held.get(key);
                     if (!held) return;
@@ -170,14 +181,20 @@ export function useLivePlay(generator, armed) {
             const attach = () => {
                 const inputs = [...access.inputs.values()];
                 inputs.forEach((input) => { input.onmidimessage = onMessage; });
+                // a keyboard is there: remembered for next visit, and its piano made ahead of the first key
+                if (inputs.length) { writePref(MIDI_PREF, true); generator.midiPiano(); }
                 setMidiStatus(inputs.length ? `MIDI: ${inputs.map((i) => i.name).join(', ')}` : 'MIDI connected - no devices found');
             };
             access.onstatechange = attach;
             attach();
         } catch (err) {
-            setMidiStatus('MIDI access was denied');
+            // a remembered connection that the browser would now ask about stays quiet until the Connect button is used
+            if (!remembered) setMidiStatus('MIDI access was denied');
         }
     };
+
+    // a keyboard connected on an earlier visit connects again, and so does one plugged in later (access.onstatechange)
+    useEffect(() => { if (readPref(MIDI_PREF, false)) void connectMidi({ remembered: true }); }, [generator]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return { octave: armed ? octaves[armed] : null, connectMidi, midiStatus };
 }
