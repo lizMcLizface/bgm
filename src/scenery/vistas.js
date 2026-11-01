@@ -26,12 +26,13 @@ const putter = (f, W, H) => (x, y, v) => {
 
 // A roof with upturned eaves: from the eave line at `y` (width w, centred on cx) up to a
 // ridge of width `top` at height h. The corners lift by `lift` pixels.
-function eaveRoof(b, cx, y, w, top, h, lift, R) {
+function eaveRoof(b, cx, y, w, top, h, lift, R, wall = 0) {
     for (let x = Math.floor(cx - w / 2); x <= cx + w / 2; x++) {
-        const u = (x - cx) / (w / 2), up = Math.abs(u) ** 4 * lift;
+        // Over the wall (of width `wall`) the eave sits on it; only what overhangs lifts.
+        const u = (x - cx) / (w / 2), over = Math.max(0, (Math.abs(x - cx) - wall / 2) / (w / 2 - wall / 2)), up = over ** 2 * lift;
         // The roof's outline: concave flanks sweeping up to the ridge.
         const ridge = Math.abs(x - cx) <= top / 2 ? h : h * (1 - ((Math.abs(x - cx) - top / 2) / (w / 2 - top / 2)) ** 0.6);
-        for (let yy = Math.round(y - Math.max(ridge, up + 1)); yy <= y - up; yy++) {
+        for (let yy = Math.round(y - Math.max(ridge, up + 2)); yy <= y - up; yy++) {
             const edge = yy >= y - up - 1;
             b.set(x, yy, R.face(u < 0 ? -1 : 1, edge ? 0 : (x + yy) % 3 === 0 ? 0 : 1));
         }
@@ -51,8 +52,11 @@ function pagoda(b, cx, by, s, Rv, Rp, Rt, lamp, rng) {
         }
         // A lit window in the middle of each tier at night.
         for (let yy = Math.round(y - h * 0.7); yy <= y - h * 0.25; yy++) for (let x = Math.round(cx - s); x <= cx + s; x++) b.set(x, yy, lamp);
+        // Each storey is wider than the ridge it stands on, so its wall carries on down to the roof below;
+        // otherwise its corners hang over open sky and the roofs seem to fly.
+        if (i) for (let x = Math.round(cx - w / 2); x <= cx + w / 2; x++) for (let yy = Math.round(y) + 1; yy < y + 6 * s && !b.get(x, yy); yy++) b.set(x, yy, Rt.flat(0));
         y -= h;
-        eaveRoof(b, cx, y, w * 1.55, w * 0.55, 3.5 * s, 2.5 * s, Rt);
+        eaveRoof(b, cx, y, w * 1.55, w * 0.55, 3.5 * s, 2.5 * s, Rt, w);
         y -= 3 * s;
     }
     // The spire with its rings.
@@ -70,7 +74,7 @@ function hall(b, cx, by, s, Rv, Rp, Rt, lamp) {
         const door = !col && y > y0 - h * 0.7 && Math.abs(x - cx) < w * 0.32;
         b.set(x, y, col ? Rv.face(x < cx ? -1 : 1, 1) : door ? lamp : Rp.face(x < cx ? -1 : 1, 1));
     }
-    eaveRoof(b, cx, y0 - h, w * 1.35, w * 0.5, 14 * s, 4 * s, Rt);
+    eaveRoof(b, cx, y0 - h, w * 1.35, w * 0.5, 14 * s, 4 * s, Rt, w);
 }
 
 // A stone lantern: base, post, a light box that glows at night, a curved cap.
@@ -231,7 +235,7 @@ function garden(sc, rng) {
     const nb = new Buf(W, H), Mo = sc.ramp(Q.moss, 0.02, 'grass'), St = sc.ramp(Q.lanternStone, 0.02, 'rock'), ns = seedOf(rng);
     for (let x = 0; x < W; x++) for (let y = Math.round(nearY[x]); y < H; y++) {
         const edge = y - nearY[x] < 1.5;
-        nb.set(x, y, edge ? St.flat(1) : Mo.face(1, fbm2(x * 0.06, y * 0.12, ns, 2) > 0.5 ? 1 : 0));
+        nb.set(x, y, edge ? St.flat(1) : Mo.face(1, fbm2(x * 0.06, y * 0.12, ns, 3) + (hash(x, y, ns) - 0.5) * 0.16 > 0.5 ? 1 : 0));
     }
     // Stepping stones winding from the foreground to one foot of the bridge, larger as they near.
     const foot = rng.chance(0.5) ? bx0 : bx1, from = clamp(foot + (foot === bx0 ? -1 : 1) * W * rng.range(0.05, 0.25), W * 0.05, W * 0.95), wig = rng() * 6;

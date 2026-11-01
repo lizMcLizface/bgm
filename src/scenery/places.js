@@ -69,12 +69,12 @@ function harbour(sc, rng) {
         const u = x / W, a = lift(u);
         return a < 0.06 ? Infinity : hz - U * 0.42 * a * (0.75 + 0.5 * fbm1(x * 0.012, s, 3));
     });
-    if (rng.chance(0.5)) mountains(sc, rng, { d: 0.55, base: hz - 2, top: hz - U * rng.range(0.32, 0.5), ramp: P.blueRock, freq: 0.01, mist: 10, env: u => 0.3 + 0.7 * lift(u) });
+    if (rng.chance(0.5)) mountains(sc, rng, { d: 0.55, base: hz + 3, top: hz - U * rng.range(0.32, 0.5), ramp: P.blueRock, freq: 0.01, mist: 10, env: u => 0.3 + 0.7 * lift(u) });
     const hb = new Buf(W, H), G = sc.ramp(P.hill, 0.28);
     for (let x = 0; x < W; x++) {
         if (land[x] === Infinity) continue;
         const slope = (land[Math.min(W - 1, x + 3)] ?? land[x]) - (land[Math.max(0, x - 3)] ?? land[x]);
-        for (let y = Math.max(0, Math.ceil(land[x])); y <= hz; y++) hb.set(x, y, G.face(slope >= 0 ? 1 : -1, fbm2(x * 0.03, y * 0.08, s + 1, 2) > 0.52 || y - land[x] < 1.2 ? 1 : 0));
+        for (let y = Math.max(0, Math.ceil(land[x])); y <= hz; y++) hb.set(x, y, G.face(slope + (fbm2(x * 0.03, y * 0.07, s + 2, 3) - 0.5) * 7 + (hash(x, y, s + 3) - 0.5) * 2 >= 0 ? 1 : -1, fbm2(x * 0.03, y * 0.08, s + 1, 3) + (hash(x, y, s + 4) - 0.5) * 0.1 > 0.52 || y - land[x] < 1.2 ? 1 : 0));
     }
     sc.addStatic(hb);
 
@@ -221,16 +221,17 @@ function jungle(sc, rng) {
     celestial(sc, rng);
     weather(sc, hz, [['fog', 2], ['rain', 1.6], ['towering', 1.8], ['storm', 0.6], ['haze', 1]], 0.4);
     // Ridge after ridge of canopy fading into the mist.
-    for (const [d, lift] of [[0.62, 0.3], [0.48, 0.2], [0.34, 0.1]]) {
-        canopyRidge(sc, rng, { d, base: hz - U * lift + 10, top: hz - U * lift - rng.range(4, 12), bottom: hz + 2, ramp: P.canopy, rmin: 2, rmax: 5 + (0.6 - d) * 10, rows: 2 });
-    }
-    // Emergent trees standing above the nearest canopy.
+    const canopy = (d, lift) => canopyRidge(sc, rng, { d, base: hz - U * lift + 10, top: hz - U * lift - rng.range(4, 12), bottom: hz + 2, ramp: P.canopy, rmin: 2, rmax: 5 + (0.6 - d) * 10, rows: 2 });
+    canopy(0.62, 0.3);
+    canopy(0.48, 0.2);
+    // Emergent trees breaking through the canopy: the nearest ridge, drawn after them, hides where they root.
     const em = new Buf(W, H), Te = sc.ramp(P.trunk, 0.3);
     for (let i = rng.int(2, 6); i > 0; i--) {
-        const x = rng.range(0, W), by = hz - U * 0.1 + rng.range(4, 12);
-        blobTree(em, x, by, U * rng.range(0.18, 0.3), sc.leaves(Q.jungleLeaf, 0.3, 0), Te, rng);
+        const x = rng.range(0, W), by = hz - U * 0.1 + rng.range(8, 14);
+        blobTree(em, x, by, U * rng.range(0.22, 0.34), sc.leaves(Q.jungleLeaf, 0.3, 0), Te, rng);
     }
     sc.addStatic(em);
+    canopy(0.34, 0.1);
     // A mossy outcrop in the middle distance, a waterfall pouring off it into a pool.
     const cTop = hz - U * rng.range(0.1, 0.2), cBase = hz + (H - hz) * rng.range(0.2, 0.3), s = seedOf(rng), R = sc.ramp(P.mossRock, 0.16);
     // Dense forest filling the ground up to the outcrop's foot.
@@ -392,7 +393,7 @@ function ruins(sc, rng) {
     sky(sc);
     celestial(sc, rng);
     weather(sc, hz, [['fog', 1.2], ['overcast', 1], ['mixed', 1.2], ['towering', 1]]);
-    if (rng.chance(0.6)) mountains(sc, rng, { d: 0.55, base: hz + 2, top: hz - U * rng.range(0.1, 0.22), ramp: P.blueRock, snow: rng.chance(0.4) && P.snow, freq: 0.01, mist: 8, env: envelope(rng) });
+    if (rng.chance(0.6)) mountains(sc, rng, { d: 0.55, base: hz + 7, top: hz - U * rng.range(0.1, 0.22), ramp: P.blueRock, snow: rng.chance(0.4) && P.snow, freq: 0.01, mist: 8, env: envelope(rng) });
     // The castle's hill: a broad rise in the middle distance.
     const cx = Math.round(W * rng.range(0.32, 0.68)), crest = hz - U * rng.range(0.1, 0.18), spread = W * rng.range(0.22, 0.34), s = U / 216 * rng.range(0.9, 1.3);
     const hs = seedOf(rng), Hl = sc.ramp(P.hill, 0.2), hb = new Buf(W, H, { rank: true });
@@ -427,6 +428,12 @@ function ruins(sc, rng) {
             if (e < 0 && bayer(x, y) > 0.5 + e) continue;
             pb.set(x, y, Sd.flat(e < 1 ? 0 : hash(x >> 1, y, ps) < 0.1 ? 2 : 1));
         }
+    }
+    // On up the hill in a thin zigzag to the gate itself.
+    const gy = Math.round(g[cx]) + 1, Sh = sc.ramp(P.sand, 0.14);
+    for (let y = gy; y < hz + 7; y++) {
+        const q = (y - gy) / (hz + 7 - gy), x0 = cx + Math.sin(q * Math.PI * 2) * spread * 0.14 * q, w = 0.5 + q * 0.6;
+        for (let x = Math.floor(x0 - w); x <= x0 + w; x++) pb.set(x, y, Sh.flat(hash(x, y, ps) < 0.25 ? 2 : 1));
     }
     sc.addStatic(pb);
     loneTrees(sc, rng, pick(rng, [0, 1], [1, 2], [2, 1.5]), ty, rng.chance(0.3) ? 'conifer' : 'leafy');

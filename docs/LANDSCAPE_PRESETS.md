@@ -34,11 +34,11 @@ Plotting a Course drops the deck for open space; Neon Overpass lights the city s
 | City skyline | a city across dark water: three ranks of towers fading into the haze, windows that come on at dusk and flicker, red beacons on the tall ones, a far embankment with lamps and traffic, all mirrored in the water. The `neon` look lights it pink down the left edges, blue down the right and purple between, with sign panels and a coloured glow above the roofs | Odd-Time Lamplight, Bossa in Seven, Neon Overpass, Demo: 7/8 electro |
 | Late-night brushes | Café | Overcast | 23:00, late autumn | 21:00–03:30 |
 | Fireside folk | Campfire clearing | Clear | 21:00, late autumn | 20:00–05:00 |
-| Tape memories | Window view | Haze | 18:30, late summer | 17:00–23:00 |
+| Tape memories | Dusk lake | Haze | 18:00, late summer | 17:00–23:00 |
 | Morning coffee | Café | Sparse clouds | 08:00, late spring | 06:30–11:00 |
 | Quiet-room waltz | Snowy village | Snow | 17:00, early winter | 15:30–23:00, late autumn to late winter |
 | Lamplight | Window view | Clear | 23:00, early autumn | 19:00–02:00 |
-| Bittersweet Sunday | Farmland | Haze | 17:30, early autumn | 14:00–20:00, late summer to late autumn |
+| Bittersweet Sunday | Country road | Haze | 17:30, early autumn | 14:00–20:00, autumn |
 | Same Tune, Slightly Different | Train window | Streaks and puffs | 15:00, late summer | — |
 | Deep night | Tundra | Clear | 01:00, early autumn | 21:00–03:30 |
 | Underwater | Underwater | Clear | 21:00, early summer | — |
@@ -53,21 +53,21 @@ Plotting a Course drops the deck for open space; Neon Overpass lights the city s
 | Clockwork | Industrial | Scattered clouds | 12:00, early autumn | — |
 | Study session | Window view | Overcast | 21:00, early winter | 18:00–02:00 |
 | Night drive | Synthwave | Clear | 01:30, late summer | 20:00–05:00 |
-| Dorian walk | River valley | Scattered clouds | 16:00, early autumn | — |
+| Dorian walk | Autumn path | Haze | 17:06, early autumn | 15:30–19:30, autumn |
 | Sunrise in seven | Savanna | High streaks | 06:00, early summer | 04:30–09:00 |
 | Sunday Reading | Café | Overcast | 14:00, early winter | 08:00–17:30 |
 | Whiteboard | Window view | Sparse clouds | 14:00, early winter | 08:00–17:30 |
 | Five Notes Only | Warehouse night | a long low shed with a sawtooth roof out of town at night: a big slatted door glowing, a crowd of small figures nodding on the beat in it, light beams sweeping up out of the roof into the haze, strip windows pulsing with the kick, string lights and a chain-link fence in front, the dim edge of town behind; cold white, teal and amber ([warehouse.js](../src/scenery/warehouse.js)) | Warehouse Lift, Acid Jack Afterhours, Electro Story, Dub Pulse Basement, Uplifting Trance Departures, Progressive Night Bus, Minimal Click Lab, Slow House Sunset, Deep Pocket Daydream, Disco Ride Afternoon |
 | Alpine peaks | Clear | 10:00, late spring | 08:00–17:30 |
-| Solo Grand | Mountain lake | Clear | 14:00, early autumn | — |
+| Solo Grand | Sunset peaks | Streaks and puffs | 17:42, early autumn | 16:30–21:30 |
 | Desert dusk | Desert | Haze | 18:30, late summer | 17:00–21:00 |
 | Damp Crater | Swamp | Fog | 01:00, late summer | 20:00–05:00 |
 | Dark Mirror Dimension | Volcano | Clear | 22:00, late autumn | 20:00–05:00 |
 | Ice Cave Echoes | Glowworm cavern | Clear | 13:00, early winter | late autumn to late winter |
 | Haunted Staircase | Castle on the hill | Fog | 23:00, late autumn | 21:00–03:30, late summer to late autumn |
 | Seaside Hearth | Harbour town | Overcast | 19:00, early winter | 17:00–23:00, early autumn to late winter |
-| Drone and Drift | Mountain lake | Haze | 05:00, late autumn | 04:30–09:00 |
-| Almost Home | Train window | Haze | 19:00, late autumn | 17:00–23:00 |
+| Drone and Drift | Sunset peaks | Haze | 06:00, late autumn | 04:30–09:00 |
+| Almost Home | Country road | Haze | 18:00, late autumn | 17:00–23:00 |
 | Altman | Alien planet | Clear | 02:00, early winter | 20:00–05:00 |
 | Thunderstorm | Grassland | Thunderstorm | 17:00, late summer | — |
 | Beach at night | Seaside | Clear | 23:00, late summer | 20:00–05:00 |
@@ -88,7 +88,7 @@ Plotting a Course drops the deck for open space; Neon Overpass lights the city s
 | Cold Drifts, Warm Socks | Snowy village | Snow | 11:00, early winter | late autumn to late winter |
 | Soggy Home Planet | Jungle | Rain | 14:00, early summer | — |
 | Ruins in the Drizzle | Castle on the hill | Rain | 15:00, early autumn | — |
-| Mushroom Kingdom Commute | Grassland | Sparse clouds | 10:00, early spring | — |
+| Mushroom Kingdom Commute | Country road | Sparse clouds | 17:27, early spring | 16:00–20:00 |
 | Tall Grass Route | Grassland | Scattered clouds | 13:00, late summer | — |
 | Falling Blocks Folk Dance | Snowy village | Snow | 14:00, early winter | late autumn to late winter |
 | Robot Factory Rush | Industrial | Dense clouds | 15:00, late summer | — |
@@ -104,10 +104,10 @@ Plotting a Course drops the deck for open space; Neon Overpass lights the city s
 | Quiet Blocky Cave | Glowworm cavern | Clear | 20:00, early summer | — |
 | Open Mic Pad | Café | Clear | 20:00, early summer | 18:00–01:00 |
 | Quiet Studio | Window view | Sparse clouds | 09:00, early spring | — |
-| Soft Landing | Blossom garden | Sparse clouds | 15:00, early autumn | — |
-| Gentle Interview | Grassland | Scattered clouds | 11:00, early autumn | — |
+| Soft Landing | Lavender slope | Sparse clouds | 17:30, early summer | 15:00–20:00, late spring to mid summer |
+| Gentle Interview | Country road | Scattered clouds | 11:00, early autumn | 08:00–17:30 |
 | Room Tone | Window view | Overcast | 12:30, late summer | — |
-| Upbeat Explainer | Grassland | Scattered clouds | 16:30, late spring | — |
+| Upbeat Explainer | Lavender slope | Scattered clouds | 16:30, late spring | 08:00–17:30, late spring to mid summer |
 | Rain Under Speech | Rainy neon street | Rain | 19:30, early autumn | 18:00–02:00 |
 | Late Show Lounge | Café | Clear | 22:00, late summer | 20:00–02:00 |
 | Replicant Blues | Rainy neon street | Rain | 23:00, late autumn | 20:00–05:00 |
@@ -135,7 +135,7 @@ Plotting a Course drops the deck for open space; Neon Overpass lights the city s
 | Gentle shoreline | Seaside | Clear | 06:30, early summer | 04:30–09:00 |
 | Rolling surf | Harbour town | Scattered clouds | 14:00, early autumn | — |
 | Coastal storm | Seaside | Thunderstorm | 21:00, early winter | 20:00–05:00 |
-| Demo: Breathing cadences | Mountain lake | Haze | 08:30, early summer | — |
+| Demo: Breathing cadences | Lavender slope | Sparse clouds | 07:00, early summer | 04:30–09:00, late spring to mid summer |
 | Demo: Strong and soft | Rolling hills | Streaks and puffs | 10:00, early autumn | — |
 | Demo: Make room | Grassland | High streaks | 07:30, early summer | — |
 | Demo: Opening out | Savanna | Sparse clouds | 17:30, late summer | — |
@@ -143,6 +143,11 @@ Plotting a Course drops the deck for open space; Neon Overpass lights the city s
 | Demo: Living colour | Farmland | Sparse clouds | 08:00, early summer | — |
 | Demo: Shifting metre | River valley | Scattered clouds | 13:00, late summer | — |
 | Demo: Seven-eight | Woodland | Sparse clouds | 10:00, early autumn | — |
+| Demo: Pad under pluck | Sunset peaks | Streaks and puffs | 17:42, late summer | 16:30–21:30 |
+| Demo: 5/8 downtempo | Dusk lake | Scattered clouds | 17:42, early autumn | 17:00–23:00 |
+| Slow House Sunset | Dusk lake | Scattered clouds | 17:36, mid summer | 16:30–21:30 |
+| Dusty Vinyl Sunday | Autumn path | Haze | 17:00, early autumn | 15:30–20:00, autumn |
+| Pure Piano | Dusk lake | Streaks and puffs | 17:42, late summer | 16:30–21:30 |
 
 ## Doesn't quite fit yet
 
@@ -162,7 +167,7 @@ The nearest landscape is used; these want something that is not drawn yet.
 - **Zero Fun Zone, Big Blue-ish**: racing presets on the desert and underwater. No track.
 - **Damp Crater**: the swamp at night. No crater.
 - **Bounty Hunter Basement**: the glowworm cavern. No sci-fi base.
-- **Solo Grand, Piano and Pads, Drone and Drift**: abstract presets on the mountain lake.
+- **Piano and Pads**: an abstract preset on the mountain lake.
 
 ## The newer landscapes
 
@@ -225,3 +230,27 @@ Done, in [effects.js](../src/scenery/effects.js):
 Already there: falling leaves (woodland, lake banks, lone trees, strongest in autumn).
 
 Still missing: nothing on the list. (The reef draft has its own caustics.)
+
+## Golden-hour landscapes
+
+Built in [sunsets.js](../src/scenery/sunsets.js). While the sun is low each one pushes the sky
+toward a strong sunset (violet zenith, coral and pink near the horizon, pink-lit clouds, rosy land),
+so the hour matters more than elsewhere; by noon they are ordinary day scenes.
+
+- **Sunset peaks** (`peaks`): sharp snowy peaks, the sun setting in a notch between them, a lake
+  mirroring it, dark pines. Solo Grand, Drone and Drift, Demo: Pad under pluck.
+- **Lavender slope** (`lavender`): a violet field of spikes rolling up to a line of pines under a
+  snowy summit, a pale tree or two and shrubs standing in the flowers. Soft Landing, Upbeat Explainer,
+  Demo: Breathing cadences (all kept to the flowering months, since lavender turns to straw in autumn).
+- **Country road** (`road`): a timber hut with a chimney and smoke, a winding dirt road from its door,
+  a great tree at the edge, misty mountains. Almost Home, Bittersweet Sunday, Gentle Interview,
+  Mushroom Kingdom Commute.
+- **Dusk lake** (`dusklake`): a pink hill, village lights coming on across still water, and a bank
+  with woods, a track and utility poles receding along it. Pure Piano, Tape memories, Slow House
+  Sunset, Demo: 5/8 downtempo.
+- **Autumn path** (`autumn`): rows of orange trees along a path to a gap at the far end. Dorian walk, Dusty Vinyl Sunday.
+
+Trees here are tied to the ground by `treeShadows` (a shade at the foot and a shadow that lengthens
+as the sun sinks) and `footTufts` (grass in front of the trunk), both in
+[biomes.js](../src/scenery/biomes.js). The lone trees in Grassland, Rolling hills and the other
+landscapes using `loneTrees` get them too.

@@ -1,7 +1,7 @@
 // Scene templates. Each biome is a menu of optional elements (backdrops,
 // framing, landmarks, foregrounds, weather); the seed picks from the menu and
 // then varies every element's shape and placement.
-import { Buf, Scene, wind } from './scene.js';
+import { Buf, REFLECT, Scene, wind } from './scene.js';
 import { hex } from './lighting.js';
 import { bayer, clamp, fbm1, fbm2, hash, lerp, makeRng, noise1, noise2, smoothstep } from './noise.js';
 import { blades, blobTree, canopyRidge, celestial, conifer, cumulus, hill, mountains, seedOf, sky, sphereField, water } from './shapes.js';
@@ -17,6 +17,7 @@ import { SKYLINES, SKYLINE_HOURS } from './skyline.js';
 import { WAREHOUSES, WAREHOUSE_HOURS } from './warehouse.js';
 import { NOOKS, NOOK_HOURS } from './nooks.js';
 import { SKYISLES, SKYISLE_HOURS } from './skyisles.js';
+import { SUNSETS, SUNSET_HOURS } from './sunsets.js';
 
 // Four tones per material: two shadow tones, then their lit counterparts.
 export const P = {
@@ -109,15 +110,30 @@ export function coniferRidge(sc, rng, o) {
     sc.addStatic(b);
 }
 
-// Boulders: squashed sphere clusters lit like everything else.
+// Boulders: a low cluster of spheres broken into flat facets, each tilted its own way and split from
+// its neighbours by a dark crack, with a chipped outline. Sunk into the ground: the bottom is uneven
+// and shaded, and what stands in front (see footTufts) hides the rest of the join.
 export function rock(b, cx, by, r, R, rng) {
-    const spheres = Array.from({ length: rng.int(1, 3) }, (_, i) => ({ x: cx + (i ? rng.range(-r, r) * 0.7 : 0), y: by - r * 0.5, r: r * (i ? rng.range(0.5, 0.8) : 1), z: 0 }));
-    const F = sphereField(spheres);
+    const spheres = Array.from({ length: rng.int(1, 3) }, (_, i) => ({ x: cx + (i ? rng.range(-r, r) * 0.8 : 0), y: by - r * (i ? 0.2 : 0.3), r: r * (i ? rng.range(0.5, 0.8) : 1), z: 0 }));
+    const F = sphereField(spheres), s = Math.round(cx * 13 + by * 7), cell = Math.max(2.2, r * 0.55);
     for (let j = 0; j < F.h; j++) {
         for (let i = 0; i < F.w; i++) {
-            const o = j * F.w + i, y = F.y0 + j;
-            if (F.id[o] < 0 || y > by) continue;
-            b.set(F.x0 + i, y, R.face(F.nx[o] < 0 ? -1 : 1, F.ny[o] < -0.35 ? 1 : 0));
+            const o = j * F.w + i, x = F.x0 + i, y = F.y0 + j;
+            const floor = by - 1 + noise1(x * 0.4, s) * 2.5;
+            if (F.id[o] < 0 || y > floor) continue;
+            const rim = Math.hypot(F.nx[o], F.ny[o]);
+            if (r > 2.5 && rim > 0.78 && noise2(x * 0.5, y * 0.5, s + 1) < (rim - 0.78) * 3) continue;
+            if (r < 2.5) { b.set(x, y, R.face(F.nx[o] < 0 ? -1 : 1, F.ny[o] < -0.3 ? 1 : 0)); continue; }
+            // The nearest of a few jittered points owns the pixel; the second nearest tells how close the crack is.
+            const cu = Math.floor(x / cell), cv = Math.floor(y / cell);
+            let near = 1e9, second = 1e9, fx = 0, fy = 0;
+            for (let dv = -1; dv <= 1; dv++) for (let du = -1; du <= 1; du++) {
+                const u = cu + du, v = cv + dv, d = Math.hypot(x - (u + hash(u, v, s + 2)) * cell, y - (v + hash(u, v, s + 3)) * cell);
+                if (d < near) { second = near; near = d; fx = u; fy = v; } else if (d < second) second = d;
+            }
+            const tiltX = F.nx[o] + (hash(fx, fy, s + 4) - 0.5) * 1.4, tiltY = F.ny[o] + (hash(fx, fy, s + 5) - 0.5) * 0.9;
+            if (second - near < 0.7 || floor - y < 1.5) b.set(x, y, R.flat(0));
+            else b.set(x, y, R.face(tiltX < 0 ? -1 : 1, tiltY < -0.08 ? 1 : 0));
         }
     }
 }
@@ -240,7 +256,7 @@ export function meadow(sc, rng, { top, amp = 3, d = 0, flowers = 0.06, blades: d
 
 function village(sc, rng, h, d, y0) {
     const { W, H } = sc, b = new Buf(W, H), wall = sc.ramp(P.wall, d), roof = sc.ramp(rng.chance(0.5) ? P.roof : P.slate, d);
-    const cx = rng.range(W * 0.15, W * 0.85), n = rng.int(2, 6), s = 6 + (1 - d) * 4;
+    const cx = rng.range(W * 0.15, W * 0.85), n = rng.int(2, 6), s = 8 + (1 - d) * 6;
     for (let i = 0; i < n; i++) {
         const x = Math.round(clamp(cx + rng.range(-1, 1) * n * s, 4, W - 5));
         house(sc, b, x, (h ? h[x] : y0) + rng.range(1, 4), Math.round(s * rng.range(0.8, 1.2)), Math.round(s * 0.45), wall, roof, () => rng.chance(0.6));
@@ -279,20 +295,62 @@ export function leafFall(sc, rng, crowns, R) {
     });
 }
 
+// Ties trees to the ground. `treeShadows` (call it before adding the trees' layer) keeps a shade at
+// each foot and, while the light is direct, throws a shadow away from the sun that lengthens as it
+// sinks. Each tree is { x, by, w (half the crown's width), h }; `slot` is the ground's darkest tone,
+// `cast` scales the shadow's length (a forest keeps it short, or the shadows would cover the floor).
+export function treeShadows(sc, trees, slot, cast = 1) {
+    const { W, H } = sc;
+    sc.addFn((f, t, L) => {
+        const s = clamp((L.contrast - 0.4) / 0.6), lx = L.lightX, len = 0.2 + 1.1 * (1 - Math.abs(L.sunElev)) ** 2;
+        for (const tr of trees) {
+            const reach = Math.min(tr.h * len * cast, sc.U * 0.8) * Math.abs(lx), rx = tr.w * 0.6 + reach / 2, ry = tr.w * 0.1 + 1.5, foot = tr.w * 0.3 + 1;
+            const cx = tr.x + (lx > 0 ? -1 : 1) * reach / 2;
+            for (let y = Math.max(0, Math.floor(tr.by - ry)); y <= Math.min(H - 1, tr.by + ry); y++) {
+                for (let x = Math.max(0, Math.floor(Math.min(cx - rx, tr.x - foot))); x <= Math.min(W - 1, Math.max(cx + rx, tr.x + foot)); x++) {
+                    const i = y * W + x, v = f[i];
+                    if (v >= REFLECT || sc.defs[v]?.k === 'sky') continue;
+                    const e = ((x - cx) / rx) ** 2 + ((y - tr.by) / ry) ** 2, c = ((x - tr.x) / foot) ** 2 + ((y - tr.by) / (ry * 0.7)) ** 2;
+                    if (bayer(x, y) < Math.max(c < 1 ? 0.85 : 0, e < 1 ? s * 0.85 * (1 - e * e) : 0)) f[i] = slot;
+                }
+            }
+        }
+    });
+}
+
+// Grass grown up in front of each foot, so a trunk stands in the meadow and not on it.
+export function footTufts(sc, trees, R, amp = 0.8) {
+    const sb = new Buf(sc.W, sc.H, { sway: true }), slots = [R.flat(2), R.flat(3)];
+    for (const tr of trees) {
+        const rng = makeRng(Math.round(tr.x * 31 + tr.by * 7) + 1), wide = Math.min(tr.w * 0.3 + 3, 14), n = Math.round(wide * 2) + 2;
+        const tall = tr.h ? Math.min(3 + wide * 0.4, Math.max(2, tr.h * 0.13)) : 3 + wide * 0.4;   // never half a sapling's height
+        for (let i = 0; i < n; i++) blades(sb, rng, Math.round(tr.x + rng.range(-wide, wide)), Math.round(tr.by + rng.range(0, 2)), tall, slots, null);
+    }
+    sc.addSway(sb, amp);
+}
+
 export function loneTrees(sc, rng, n, h, kind) {
     if (!n) return;
     const { W, H } = sc, sb = new Buf(W, H, { sway: true, rank: true });
-    const D = sc.ramp(P.forest, 0), T = sc.ramp(P.trunk, 0), crowns = [];
+    const D = sc.ramp(P.forest, 0), T = sc.ramp(P.trunk, 0), crowns = [], feet = [];
     let F;
     for (let i = 0; i < n; i++) {
         // A single tree is often the hero of the picture: big and off-centre.
         const hero = n === 1 && rng.chance(0.6);
         const x = hero ? Math.round(W * (rng.chance(0.5) ? rng.range(0.2, 0.38) : rng.range(0.62, 0.8))) : rng.int(10, W - 11);
         const by = hero ? Math.min(H + 4, h[x] + rng.range(20, 40)) : h[x] + rng.range(6, 20), th = hero ? sc.U * rng.range(0.55, 0.8) : rng.range(28, 60);
-        if (kind === 'conifer') conifer(sb, x, by, th * 1.4, D, rng, { sway: 0.6, trunk: T });
-        else crowns.push(blobTree(sb, x, by, th, F = sc.leaves(P.leaf, 0, leafVariant(rng)), T, rng, { sway: 1 }));
+        if (kind === 'conifer') {
+            conifer(sb, x, by, th * 1.4, D, rng, { sway: 0.6, trunk: T });
+            feet.push({ x, by, w: th * 0.24, h: th * 1.4 });
+        } else {
+            const c = blobTree(sb, x, by, th, F = sc.leaves(P.leaf, 0, leafVariant(rng)), T, rng, { sway: 1 });
+            crowns.push(c);
+            feet.push({ x, by, w: c.w, h: th });
+        }
     }
+    treeShadows(sc, feet, sc.ramp(P.grass, 0).flat(0));
     sc.addSway(sb, 0.8);
+    footTufts(sc, feet, sc.ramp(P.grass, 0, 'blade'));
     if (F) leafFall(sc, rng, crowns, F);
 }
 
@@ -308,7 +366,7 @@ function grassland(sc, rng) {
     if (back === 'hills') hill(sc, rng, { d: 0.45, y: hz + 4, amp: 10, freq: 0.01, ramp: P.hill, bottom: hz + 30 });
     const mid = pick(rng, ['canopy', 3], ['conifer', 1], ['open', 1.2]);
     const midTop = hz + rng.range(0, 8);
-    ground(sc, midTop + 4, P.hill, 0.25);
+    ground(sc, Math.min(midTop + 4, hz + 8), P.hill, 0.25);   // up to the backdrop's foot, so no sky shows under it
     if (mid === 'canopy') canopyRidge(sc, rng, { d: 0.14, base: midTop + 14, top: midTop, bottom: H - 1, ramp: P.canopy, rmin: 3, rmax: rng.range(5, 9), rows: 3 });
     if (mid === 'conifer') coniferRidge(sc, rng, { d: 0.16, base: midTop + 14, top: midTop + 4, ramp: P.forest, tmin: 6, tmax: 14 });
     if (mid === 'open') hill(sc, rng, { d: 0.22, y: midTop + 8, amp: 6, freq: 0.012, ramp: P.hill, bottom: H - 1 });
@@ -326,15 +384,15 @@ function hills(sc, rng) {
     weather(sc, hz);
     if (rng.chance(0.3)) mountains(sc, rng, { d: 0.6, base: hz + 4, top: hz - sc.U * rng.range(0.08, 0.2), ramp: P.blueRock, freq: 0.01, mist: 8, env: envelope(rng) });
     ground(sc, hz + 4, P.hill, 0.6);
-    const n = rng.int(3, 6), span = H * 0.92 - hz, density = rng.range(0, 1);
+    const n = rng.int(3, 6), span = H * 0.92 - hz, density = rng.range(0.35, 1);
     const kind = pick(rng, ['leafy', 3.6], ['conifer', 1]);
     const villageAt = rng.chance(0.3) ? rng.int(1, n - 2) : -1;
     let last;
     for (let k = 0; k < n; k++) {
-        const p = k / (n - 1), d = 0.62 * (1 - p), fg = k === n - 1;
+        const p = k / (n - 1), d = 0.46 * (1 - p), fg = k === n - 1;
         const D = sc.ramp(P.forest, d), T = sc.ramp(P.trunk, d);
         last = hill(sc, rng, {
-            d, y: hz + (k / n) * span + 4, amp: 5 + p * rng.range(10, 22), freq: rng.range(0.006, 0.013) * (1 - p * 0.4), ramp: P.hill,
+            d, y: hz + (k / n) * span + 4, amp: 8 + p * rng.range(14, 30), freq: rng.range(0.006, 0.013) * (1 - p * 0.4), ramp: P.hill,
             mist: fg ? null : [10 + k * 4, 18 + k * 4],
             trees: !fg && k > 0 ? (b, h) => {
                 for (let i = Math.round(density * rng.range(2, 12)); i > 0; i--) {
@@ -810,7 +868,7 @@ export const BIOMES = {
     woodland: { name: BIOME_NAMES.woodland, hour: 9, build: woodland },
     river: { name: BIOME_NAMES.river, hour: 15, build: river },
     // Built in wilds.js, places.js, vistas.js and nooks.js; a name in DRAFT_BIOME_NAMES keeps one in review (tools/scenery.html only).
-    ...Object.fromEntries([...Object.entries(WILDS), ...Object.entries(PLACES), ...Object.entries(VISTAS), ...Object.entries(NOOKS), ...Object.entries(SKYLINES), ...Object.entries(WAREHOUSES), ...Object.entries(SKYISLES)].map(([k, build]) => [k, { name: BIOME_NAMES[k] ?? DRAFT_BIOME_NAMES[k], hour: WILD_HOURS[k] ?? PLACE_HOURS[k] ?? VISTA_HOURS[k] ?? NOOK_HOURS[k] ?? SKYLINE_HOURS[k] ?? WAREHOUSE_HOURS[k] ?? SKYISLE_HOURS[k], build, draft: k in DRAFT_BIOME_NAMES }])),
+    ...Object.fromEntries([...Object.entries(WILDS), ...Object.entries(PLACES), ...Object.entries(VISTAS), ...Object.entries(NOOKS), ...Object.entries(SKYLINES), ...Object.entries(WAREHOUSES), ...Object.entries(SKYISLES), ...Object.entries(SUNSETS)].map(([k, build]) => [k, { name: BIOME_NAMES[k] ?? DRAFT_BIOME_NAMES[k], hour: WILD_HOURS[k] ?? PLACE_HOURS[k] ?? VISTA_HOURS[k] ?? NOOK_HOURS[k] ?? SKYLINE_HOURS[k] ?? WAREHOUSE_HOURS[k] ?? SKYISLE_HOURS[k] ?? SUNSET_HOURS[k], build, draft: k in DRAFT_BIOME_NAMES }])),
 };
 
 // `look` pins choices a seed would otherwise roll: { icy } for the cavern, { lanterns } for the garden,

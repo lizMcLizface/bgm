@@ -64,7 +64,10 @@ export function wind(x, t) {
 
 // Order in which a drifting layer's pixels appear as a weather fades in:
 // blotchy, so clouds form and thin out in patches rather than evenly.
+const ranks = new Map();   // by size: the same for every layer, and slow enough to be worth sharing
 function dissolveRank(w, h) {
+    const known = ranks.get(w * 65536 + h);
+    if (known) return known;
     const r = new Uint8Array(w * h), cells = Math.max(1, Math.round(w / 20));
     for (let y = 0; y < h; y++) {
         for (let x = 0; x < w; x++) {
@@ -72,6 +75,7 @@ function dissolveRank(w, h) {
             r[y * w + x] = Math.min(255, clamp((n - 0.25) * 2) * 0.85 * 256 + bayer(x, y) * 0.15 * 256);
         }
     }
+    ranks.set(w * 65536 + h, r);
     return r;
 }
 

@@ -31,6 +31,11 @@ export const BIOME_NAMES = {
     cafe: 'Café',
     planet: 'Alien planet',
     floating: 'Floating island',
+    peaks: 'Sunset peaks',
+    lavender: 'Lavender slope',
+    road: 'Country road',
+    dusklake: 'Dusk lake',
+    autumn: 'Autumn path',
     starship: 'Observation deck',
 };
 

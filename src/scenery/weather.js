@@ -5,7 +5,7 @@
 // light and fog blend). Uses its own random streams so terrain never moves.
 import { Buf } from './scene.js';
 import { hex, mix } from './lighting.js';
-import { bayer, clamp, fbm2, hash, makeRng } from './noise.js';
+import { bayer, clamp, fbm1, fbm2, hash, makeRng } from './noise.js';
 import { cumulus, seedOf, stratus } from './shapes.js';
 import { WEATHER } from './catalog.js';
 
@@ -88,7 +88,7 @@ function clouds(sc, rng, kind, g) {
     const mid = (n, w0 = 30, w1 = 85) => n && cumulus(sc, rng, { n, y0: H * 0.06, y1: hz * 0.72, w0, w1, d: 0.1, speed: 1.6, tall: [0.3, 0.45] });
     const deck = (cover, d = 0.1) => {
         stratus(sc, rng, { y0: -hz * 0.6, y1: hz * 1.05, d, speed: 1.2, cover, cells: 7 });
-        stratus(sc, rng, { y0: hz * 0.35, y1: hz, d: d + 0.2, speed: 2.2, cover: cover * 0.7, fy: 0.16 });
+        stratus(sc, rng, { y0: hz * 0.35, y1: hz, d: d + 0.2, speed: 0.7, cover: cover * 0.7, fy: 0.16 });
     };
     switch (kind) {
         case 'clear': far(rng.int(0, 2)); break;
@@ -132,14 +132,16 @@ function bolt(sc, rng, g) {
     });
 }
 
-// Drifting banks (fog, dust) baked once into a wrapping buffer: solid thin
-// and thick layers with only a sliver of dither at their edges.
+// Drifting banks (fog, dust) baked once into a wrapping buffer: solid thin and thick layers with a
+// little dither at their edges. Each column's profile is shifted by its own amount, so a bank's top and
+// bottom roll and tear rather than running level across the picture.
 function bank(sc, rng, { y0, y1, speed, fy, cells, density, profile }) {
     const { W, H } = sc, bw = W * 2, b = new Buf(bw, H, { wrap: true }), seed = seedOf(rng), fx = cells / bw;
+    const rolls = Math.max(2, Math.round(cells * 2)), roll = Float32Array.from({ length: bw }, (_, x) => (fbm1(x * rolls / bw, seed + 7, 4, rolls) - 0.5) * 0.4);
     for (let y = Math.max(0, Math.floor(y0)); y < Math.min(H, y1); y++) {
-        const p = profile((y - y0) / (y1 - y0));
+        const u = (y - y0) / (y1 - y0);
         for (let x = 0; x < bw; x++) {
-            const v = fbm2(x * fx, y * fy, seed, 3, cells) * p * density + (bayer(x, y) - 0.5) * 0.04;
+            const v = fbm2(x * fx, y * fy, seed, 3, cells) * profile(clamp(u + roll[x])) * density + (bayer(x, y) - 0.5) * 0.09;
             if (v > 0.6) b.set(x, y, 2);
             else if (v > 0.48) b.set(x, y, 1);
         }

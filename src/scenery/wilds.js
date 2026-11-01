@@ -5,7 +5,8 @@ import { Buf } from './scene.js';
 import { hex, mix } from './lighting.js';
 import { bayer, clamp, fbm1, fbm2, hash, lerp, noise1, noise2, smoothstep } from './noise.js';
 import { blades, blobTree, canopyRidge, celestial, conifer, cumulus, mountains, seedOf, sky, water } from './shapes.js';
-import { P, LIGHTS, coniferRidge, envelope, ground, house, leafFall, leafVariant, meadow, pick, reeds, rock, weather } from './biomes.js';
+import { P, LIGHTS, coniferRidge, envelope, footTufts, ground, leafFall, leafVariant, meadow, pick, reeds, rock, treeShadows, weather } from './biomes.js';
+import { hut, smoke } from './sunsets.js';
 import { embers, skyEffects } from './effects.js';
 
 const Q = {
@@ -55,7 +56,7 @@ function snag(b, x, by, h, T, rng) {
         const ex = x0 + Math.cos(a) * len, ey = y0 + Math.sin(a) * len;
         for (let i = rng.int(1, 3); i > 0; i--) limb(ex, ey, a + rng.range(-0.9, 0.9), len * rng.range(0.4, 0.7), Math.max(1, w - 1), depth - 1);
     };
-    limb(x, by, -Math.PI / 2 + rng.range(-0.15, 0.15), h * 0.55, Math.max(1, Math.round(h / 14)), h < 25 ? 2 : 3);
+    limb(x, by, -Math.PI / 2 + rng.range(-0.15, 0.15), h * 0.55, Math.max(1, Math.round(h / 22)), h < 25 ? 2 : 3);
 }
 
 // ---------------------------------------------------------------- alpine peaks
@@ -74,23 +75,28 @@ function alpine(sc, rng) {
     mountains(sc, rng, { d: 0.24, base: hz + 2, top: hz - U * rng.range(0.2, 0.34), ramp: rng.chance(0.6) ? P.rock : P.mossRock, snow: P.snow, snowAt: rng.range(0.15, 0.3), sharp: 1.3, freq: rng.range(0.01, 0.018), mist: 12, env: envelope(rng) });
     coniferRidge(sc, rng, { d: 0.15, base: hz + 3, top: hz - rng.range(2, 8), ramp: P.forest, tmin: 4, tmax: rng.range(8, 14), density: rng.range(0.4, 1) });
     ground(sc, hz + 3, P.hill, 0.2);
-    const ty = meadow(sc, rng, { top: hz + 4, amp: 5, flowers: rng.range(0.08, 0.2), blades: rng.range(0.15, 0.3) });
-    // A green shoulder of the mountain rising out of the meadow at one side.
+    // A green shoulder of the mountain at one side, its foot behind the rise of the meadow.
     if (rng.chance(0.6)) {
         const left = rng.chance(0.5), reach = rng.range(0.25, 0.45);
-        mountains(sc, rng, { d: 0.08, base: hz + rng.range(10, 22), top: hz - U * rng.range(0.1, 0.2), ramp: P.mossRock, sharp: 1, talus: 0.8, freq: 0.012, mist: 0, env: u => (1 - smoothstep(0, reach, left ? u : 1 - u)) ** 0.8 });
+        mountains(sc, rng, { d: 0.08, base: hz + 8, top: hz - U * rng.range(0.1, 0.2), ramp: P.mossRock, sharp: 1, talus: 0.8, freq: 0.012, mist: 0, env: u => (1 - smoothstep(0, reach, left ? u : 1 - u)) ** 0.8 });
     }
-    // A chalet on the meadow, and boulders the glacier left behind.
-    const b = new Buf(W, H);
-    if (rng.chance(0.6)) {
-        const x = Math.round(W * rng.range(0.15, 0.85)), p = rng.range(0.1, 0.35), by = Math.round(ty[x] + (H - ty[x]) * p), s = 8 + p * 22;
-        house(sc, b, x, by, Math.round(s * 1.3), Math.round(s * 0.55), sc.ramp(Q.chalet, 0.15 * (1 - p)), sc.ramp(P.slate, 0.15 * (1 - p)), () => rng.chance(0.7));
-    }
+    const ty = meadow(sc, rng, { top: hz + 4, amp: 5, flowers: rng.range(0.08, 0.2), blades: rng.range(0.15, 0.3) });
+    // A chalet on the meadow, and boulders the glacier left behind, all sunk into the grass.
+    const b = new Buf(W, H), feet = [];
     for (let i = rng.int(1, 6); i > 0; i--) {
-        const x = rng.range(0, W), p = rng.range(0.2, 1), by = ty[clamp(Math.round(x), 0, W - 1)] + (H - hz) * p;
-        rock(b, x, by, 2 + p * 10, sc.ramp(P.rock, 0.1 * (1 - p)), rng);
+        const x = rng.range(0, W), p = rng.range(0.2, 1), by = ty[clamp(Math.round(x), 0, W - 1)] + (H - hz) * p, r = 3 + p * 12;
+        rock(b, x, by, r, sc.ramp(P.rock, 0.1 * (1 - p)), rng);
+        feet.push({ x, by, w: r, h: r * 1.2 });
     }
+    if (rng.chance(0.6)) {
+        const x = Math.round(W * rng.range(0.25, 0.85)), p = rng.range(0.1, 0.3), by = Math.round(ty[x] + (H - ty[x]) * p), s = Math.round(U * (0.13 + p * 0.3));
+        const home = hut(sc, b, x, by, s, rng, 0.14 * (1 - p));
+        feet.push({ x: (home.span[0] + home.span[1]) / 2, by: by + 1, w: (home.span[1] - home.span[0]) / 2, h: s * 0.4 });
+        smoke(sc, home.smoke[0], home.smoke[1], U * 0.14);
+    }
+    treeShadows(sc, feet, sc.ramp(P.grass, 0).flat(0), 0.6);
     sc.addStatic(b);
+    footTufts(sc, feet, sc.ramp(P.grass, 0, 'blade'), 0.6);
     const sb = new Buf(W, H, { sway: true }), D = sc.ramp(P.forest, 0), T = sc.ramp(P.trunk, 0);
     for (let i = pick(rng, [0, 1], [1, 1.5], [2, 1], [3, 0.6]); i > 0; i--) {
         const x = rng.chance(0.5) ? rng.range(-W * 0.04, W * 0.22) : rng.range(W * 0.78, W * 1.04), p = rng.range(0.5, 1);
@@ -126,17 +132,19 @@ function tundra(sc, rng) {
     }
     // Lone stunted spruces, smaller with distance.
     const b = new Buf(W, H, { sway: true }), D = sc.ramp(P.forest, 0), T = sc.ramp(P.trunk, 0);
-    const trees = [];
+    const trees = [], feet = [];
     for (let i = rng.int(3, 14); i > 0; i--) {
         const x = rng.range(-4, W + 4), p = rng.range(0.02, 1) ** 1.6;
         trees.push({ x, by: ty[clamp(Math.round(x), 0, W - 1)] + (H - hz) * p, h: (6 + p * U * 0.55) * rng.range(0.6, 1.2), p });
     }
     trees.sort((a, c) => a.by - c.by).forEach(t => conifer(b, t.x, t.by, t.h, t.p > 0.4 ? D : sc.ramp(P.forest, 0.25 * (1 - t.p)), rng, { sway: t.p * 0.5, trunk: T }));
     for (let i = rng.int(0, 5); i > 0; i--) {
-        const x = rng.range(0, W), p = rng.range(0.1, 1);
-        rock(b, x, ty[clamp(Math.round(x), 0, W - 1)] + (H - hz) * p, 2 + p * 8, sc.ramp(P.rock, 0.1 * (1 - p)), rng);
+        const x = rng.range(0, W), p = rng.range(0.1, 1), by = ty[clamp(Math.round(x), 0, W - 1)] + (H - hz) * p, r = 3 + p * 9;
+        rock(b, x, by, r, sc.ramp(P.rock, 0.1 * (1 - p)), rng);
+        feet.push({ x, by, w: r, h: r });
     }
     sc.addSway(b, 0.5);
+    footTufts(sc, feet, sc.ramp(Q.tundra, 0, 'blade'), 0.5);
 }
 
 // ---------------------------------------------------------------- swamp
@@ -188,18 +196,67 @@ function swamp(sc, rng) {
     reeds(sc, rng, hz);
     // Near trees: cypresses on their roots, snags, curtains of hanging moss.
     const sb = new Buf(W, H, { sway: true, rank: true }), T = sc.ramp(P.trunk, 0), Hm = sc.ramp(Q.mossHang, 0), crowns = [];
-    const near = [];
+    const Mud = sc.ramp(Q.mud, 0.02), Moss = sc.ramp(P.mossRock, 0.02), Ring = sc.ramp(Q.bog, 0.02), near = [];
     for (let i = rng.int(3, 7); i > 0; i--) near.push({ x: rng.chance(0.7) ? (rng.chance(0.5) ? rng.range(-10, W * 0.3) : rng.range(W * 0.7, W + 10)) : rng.range(0, W), p: rng.range(0.25, 1) });
     near.sort((a, c) => a.p - c.p).forEach(t => {
-        const by = hz + (H - hz) * t.p, h = U * (0.25 + t.p * 0.65) * rng.range(0.8, 1.1);
-        if (rng.chance(0.2)) { snag(sb, t.x, by, h * 0.8, T, rng); return; }
-        // Roots arching out of the water around the trunk's foot.
-        const tw = Math.max(1, Math.round(h / 11));
-        for (let r = rng.int(3, 6); r > 0; r--) {
-            const dir = rng.chance(0.5) ? -1 : 1, spread = h * rng.range(0.06, 0.16), top = h * rng.range(0.08, 0.16);
-            for (let k = 0; k <= 12; k++) {
-                const u = k / 12, x = t.x + dir * (tw * 0.5 + spread * u), y = by - top * (1 - u) - Math.sin(u * Math.PI) * top * 0.4;
+        const by = hz + (H - hz) * t.p, h = U * (0.25 + t.p * 0.65) * rng.range(0.8, 1.1), tw = Math.max(1, Math.round(h / 11));
+        // Its foot first, so the trunk stands in the scene: a dark reflection and rings on open water, a
+        // mound of mud and moss around the base, then buttresses that flare into it.
+        const inWater = mask.get(t.x, by + 1), rx = tw * 1.7 + 2.5, ry = tw * 0.42 + 1.2;
+        const lumps = Array.from({ length: rng.int(3, 6) }, (_, i) => ({ x: t.x + (i ? rng.range(-2.6, 2.6) * rx : 0), y: by + (i ? rng.range(-0.6, 1.6) * ry : ry * 0.5), rx: rx * (i ? rng.range(0.4, 1) : 1.1), ry: ry * (i ? rng.range(0.55, 1) : 1.3) }));
+        const lumpL = Math.min(...lumps.map(l => l.x - l.rx)), lumpR = Math.max(...lumps.map(l => l.x + l.rx));
+        if (inWater) {
+            for (let j = 1; j < h * 0.28; j++) {
+                // Horizontal slivers that break up with distance, as a reflection does on still water.
+                const fade = 1 - j / (h * 0.28), hw = tw * (0.9 - 0.3 * j / (h * 0.28)), wob = Math.sin(j * 0.8) * 1.2;
+                if (hash(Math.round(t.x), j, 4) > fade + 0.25) continue;
+                for (let k = -hw; k <= hw; k++) if (hash(Math.round(t.x + k) >> 1, j, 5) < fade + 0.2 && mask.get(t.x + k, by + j)) sb.set(t.x + k + wob, by + j, Mud.flat(0));
+            }
+            // A few broken ripples along the near side, where the mound meets the water.
+            for (let x = Math.floor(lumpL - 2); x <= lumpR + 2; x++) {
+                const y = Math.round(by + ry * 1.9 + Math.sin(x * 0.17 + by) * ry * 0.7);
+                if (fbm1(x * 0.16, Math.round(by), 2) > 0.52 && mask.get(x, y)) sb.set(x, y, Ring.flat(3));
+            }
+        }
+        for (const l of lumps) for (let dy = -l.ry; dy <= l.ry; dy++) for (let dx = -l.rx; dx <= l.rx; dx++) {
+            const px = Math.round(l.x + dx), py = Math.round(l.y + dy);
+            const e = (dx / l.rx) ** 2 + (dy / l.ry) ** 2 + (fbm1(px * 0.3, Math.round(by), 2) - 0.5) * 0.9;
+            if (e >= 1) continue;
+            sb.set(px, py, dy > l.ry * 0.25 && e > 0.55 ? Mud.flat(0) : fbm2(px * 0.16, py * 0.4, Math.round(by) + 3, 2) + (hash(px, py, 6) - 0.5) * 0.14 > 0.54 ? Moss.flat(hash(px, py, 8) < 0.3 ? 1 : 0) : Mud.flat(hash(px, py, 7) < 0.25 ? 2 : 1));
+        }
+        // Sedge sprouting from the mound, thickest away from the trunk.
+        const sedge = [];
+        for (let i = Math.round((lumpR - lumpL) * 0.35); i > 0; i--) {
+            const l = rng.pick(lumps), x = Math.round(l.x + rng.range(-0.9, 0.9) * l.rx), y = Math.round(l.y + rng.range(-0.5, 0.4) * l.ry);
+            if (y < by) blades(sb, rng, x, y, 2 + h * 0.05, [Gb.flat(1), Gb.flat(3)], null);
+            else sedge.push([x, y]);
+        }
+        // Grows up in front of the foot, drawn last so the trunk stands in the mound rather than behind it.
+        const inFront = () => {
+            for (const [x, y] of sedge) blades(sb, rng, x, y, 2 + h * 0.05, [Gb.flat(1), Gb.flat(3)], null);
+            for (let k = -tw * 1.6; k <= tw * 1.6; k += 0.8) blades(sb, rng, Math.round(t.x + k), Math.round(by + 1 + rng.range(0, ry * 0.7)), 1.5 + tw * 0.5, [Gb.flat(1), Gb.flat(2)], null);
+        };
+        if (rng.chance(0.2)) { snag(sb, t.x, by, h * 0.8, T, rng); inFront(); return; }
+        // Buttresses: the trunk swells toward the water in uneven lobes, and roots arch out of it.
+        const flare = h * 0.2, lobes = rng.range(0, 6);
+        for (let j = 0; j <= flare; j++) {
+            const u = 1 - j / flare, hw = tw * (0.5 + 1.5 * u ** 2.2) + Math.sin(j * 0.5 + lobes) * u * tw * 0.3;
+            for (let k = -hw; k <= hw; k++) sb.set(t.x + k, by - j, T.face(k < 0 ? -1 : 1, Math.abs(k) > hw - 1 || (Math.round(k) + j >> 1) % 3 === 0 ? 0 : 1));
+        }
+        const foot = tw * 2, toes = rng.int(3, 5);
+        for (let i = 0; i < toes; i++) {
+            const from = lerp(-foot * 0.8, foot * 0.8, (i + 0.5) / toes) + rng.range(-1, 1), out = from / foot * rng.range(1.2, 2.2) * tw, len = ry * rng.range(0.7, 1.7) + tw * 0.3, w0 = Math.max(1, tw * rng.range(0.3, 0.5));
+            for (let k = -2; k <= len; k++) {
+                const u = Math.max(0, k) / len, x = t.x + from + out * u * u, w = w0 * (1 - u * 0.8);
+                for (let q = -w; q <= w; q++) sb.set(x + q, by + k, T.face(q < 0 ? -1 : 1, q > w - 1 ? 1 : 0));
+            }
+        }
+        for (let r = rng.int(4, 7); r > 0; r--) {
+            const dir = rng.chance(0.5) ? -1 : 1, spread = h * rng.range(0.08, 0.18), top = h * rng.range(0.05, 0.12);
+            for (let k = 0; k <= 16; k++) {
+                const u = k / 16, x = t.x + dir * (tw * 0.8 + spread * u), y = by - top * (1 - u) - Math.sin(u * Math.PI) * top * 0.5;
                 sb.set(x, y, T.face(dir, 0));
+                if (tw > 2) sb.set(x, y + 1, T.flat(0));
             }
         }
         const c = blobTree(sb, t.x, by, h, sc.leaves(Q.cypress, 0, leafVariant(rng)), T, rng, { sway: 0.4, shape: rng.chance(0.5) ? 'tall' : 'dome' });
@@ -212,6 +269,7 @@ function swamp(sc, rng) {
                 for (let j = 0; j < len; j++) if (hash(x, j, k) < 0.9 - j / len * 0.5) sb.set(x, y0 + j, Hm.flat(j < len * 0.4 ? 2 : 1), Math.round(255 * (j + 1) / len), x, rng.int(1, 120));
             }
         }
+        inFront();
     });
     sc.addSway(sb, 0.5);
     if (crowns.length) leafFall(sc, rng, crowns, sc.leaves(Q.cypress, 0, 1));
@@ -257,9 +315,11 @@ function volcano(sc, rng) {
     // A lava field: dark crust with cracks that glow at night.
     const field = new Buf(W, H), A = sc.ramp(Q.ash, 0.05), fs = seedOf(rng);
     const crack = [0.6, 1].map(v => sc.slot({ k: 'emit', c: hex('#ff6a28'), base: A.c[0], d: 0.05, v }));
-    for (let y = hz + 3; y < H; y++) {
-        const z = Math.log(1 + (y - hz) * 0.15) * 6;
+    for (let y = hz - 5; y < H; y++) {
+        const z = Math.log(1 + Math.max(0, y - hz) * 0.15) * 6;
         for (let x = 0; x < W; x++) {
+            // The field laps up over the cone's foot in tongues of scree, so no ruled line joins them.
+            if (y < hz + 3 + (fbm1(x * 0.04, fs + 3, 3) - 0.6) * 18) continue;
             const n = fbm2(x * 0.02, z * 0.8, fs, 3), c = Math.abs(noise2(x * 0.06, z * 1.4, fs + 1) - 0.5);
             field.set(x, y, c < 0.012 && fbm2(x * 0.01, z * 0.4, fs + 2, 2) > 0.42 ? crack[c < 0.006 ? 1 : 0] : A.flat(clamp(Math.floor(n * 4.4 - 0.6), 0, 3)));
         }
@@ -279,7 +339,7 @@ function volcano(sc, rng) {
             const end = craterY + (hz + 2 - craterY) * fl.len;
             for (let y = craterY; y <= end; y++) {
                 const dy = y - craterY, x = cx + fl.a * dy + (fbm1(dy * 0.08, fl.s, 2) - 0.5) * dy * 0.25;
-                const w = fl.w * (0.6 + dy / 30);
+                const w = fl.w * (0.6 + dy / 30) * Math.min(1, 0.2 + (end - y) / 10);
                 for (let k = -w; k <= w; k++) {
                     const heat = clamp(1 - dy / (end - craterY + 1)) * 0.7 + 0.3 * noise2((x + k) * 0.3, y * 0.25 - t * 1.4, fl.s);
                     put(x + k, y, lava[clamp(Math.floor((1 - heat) * 4.2 + Math.abs(k) / (w + 1)), 0, 4)]);
@@ -629,15 +689,20 @@ function camp(sc, rng) {
     const lx = fx + (rng.chance(0.5) ? -1 : 1) * rng.range(14, 22) * k, ly = fy + rng.range(2, 6) * k;
     for (let j = -8 * k; j <= 8 * k; j++) for (let i = 0; i < 2.2 * k; i++) props.set(lx + j, ly - i, T.face(i < k ? 1 : -1, i < 1 ? 1 : 0));
     if (rng.chance(0.75)) {
-        const tx = fx + (lx > fx ? -1 : 1) * rng.range(28, 40) * k, ty = fy - rng.range(2, 6) * k, tw = 11 * k, th = 10 * k;
-        const C = sc.ramp(rng.chance(0.5) ? Q.tent : Q.tentGreen, 0), door = sc.ramp(P.struct, 0);
+        const away = lx > fx ? -1 : 1, tx = fx + away * rng.range(44, 58) * k, ty = fy - rng.range(2, 6) * k, tw = 15 * k, th = 17 * k, len = 26 * k;
+        const C = sc.ramp(rng.chance(0.5) ? Q.tent : Q.tentGreen, 0), door = sc.ramp(P.struct, 0), Line = sc.ramp(P.trunk, 0);
+        // The long side of the canvas, running back away from the fire, with the seams of its panels.
+        for (let u = 0; u <= len; u++) {
+            const e = u / len, top = ty - th - e * 2, bot = ty - e * 3;
+            for (let y = Math.round(top); y <= bot; y++) props.set(tx + away * (tw * ((y - top) / (bot - top)) + u), y, C.face(away, u % Math.round(7 * k) < 1 ? 0 : 1));
+        }
+        // The front, its flap tied open on the dark inside; a ridge pole and a guy line pegged out.
         for (let j = 0; j <= th; j++) {
             const hwj = tw * j / th;
-            for (let i = -hwj; i <= hwj; i++) {
-                const inDoor = Math.abs(i) < hwj * 0.35 && j > th * 0.35;
-                props.set(tx + i, ty - th + j, inDoor ? door.flat(0) : C.face(i < 0 ? -1 : 1, j < 1 ? 1 : 0));
-            }
+            for (let i = -hwj; i <= hwj; i++) props.set(tx + i, ty - th + j, Math.abs(i) < hwj * 0.42 && j > th * 0.3 ? door.flat(0) : C.face(-away, j < 1 || Math.abs(Math.abs(i) - hwj) < 1 ? 1 : 0));
         }
+        for (let u = -1; u <= len; u++) props.set(tx + away * u, ty - th - Math.max(0, u) / len * 2 - 1, C.flat(3));
+        for (let u = 0; u <= 14 * k; u++) props.set(tx - away * (tw + u), ty - th * 0.45 * (1 - u / (14 * k)), Line.flat(1));
     }
     sc.addStatic(props);
     const flame = ['#fff6c8', '#ffd060', '#ff9a30', '#e05a1c'].map(c => sc.slot({ k: 'flame', c: hex(c) }));

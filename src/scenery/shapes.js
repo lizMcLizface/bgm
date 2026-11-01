@@ -100,42 +100,89 @@ export function sphereField(spheres, light = [-0.35, -0.8, 0.5]) {
     return { x0, y0, w, h, id, nx, ny, shade };
 }
 
-// Cumulus: a few big lobes along a flat base, cauliflower clumps on top.
+// Cumulus built up in three sizes of billow: big lobes stacked in tiers that narrow toward the top,
+// puffs sitting on the lobes' surfaces, and small curls on those, so a large cloud has as much detail
+// per pixel as a small one. Wind shears the rows, the rim frays, and the base is uneven and tears
+// into thin horizontal wisps rather than ending on a line. Only pixels joined to the main body are
+// kept: the cloud drifts as one rigid image, so a loose scrap would visibly travel with it.
 function cloud(b, cx, base, w, h, slots, rng) {
-    const lobes = [], nl = Math.max(2, Math.round(w / 20));
-    for (let i = 0; i < nl; i++) {
-        const u = (i + rng.range(0.2, 0.8)) / nl, bell = Math.sin(Math.PI * u);
-        const r = Math.max(3, h * (0.35 + 0.65 * bell) * rng.range(0.7, 1));
-        lobes.push({ x: cx - w / 2 + u * w, y: base - r * 0.4, r, z: 0 });
+    const s = rng.int(0, 1e6), lobes = [], tiers = h > 26 ? 3 : h > 11 ? 2 : 1, lean = rng.range(-0.25, 0.25);
+    for (let k = 0; k < tiers; k++) {
+        const span = w * (1 - k * 0.3), c = cx + lean * k * h * 0.3 + rng.range(-0.08, 0.08) * w, nl = Math.max(2, Math.round(span / Math.max(8, h * 0.55)));
+        for (let i = 0; i < nl; i++) {
+            const u = (i + rng.range(0.15, 0.85)) / nl, bell = Math.sin(Math.PI * u) ** 0.7;
+            const r = Math.max(2, h * (0.2 + 0.26 * bell) * rng.range(0.7, 1.15) * (1 - k * 0.14));
+            lobes.push({ x: c - span / 2 + u * span, y: base - r * 0.35 - k * h * 0.27 - bell * h * 0.1, r, z: rng.range(-0.1, 0.1) * h + (tiers - k) * h * 0.08 });
+        }
     }
-    const spheres = [...lobes];
-    for (let k = Math.round(w / 3); k > 0; k--) {
-        const L = rng.pick(lobes), a = -Math.PI * rng.range(0.06, 0.94);
-        spheres.push({ x: L.x + Math.cos(a) * L.r * 0.8, y: L.y + Math.sin(a) * L.r * 0.8, r: L.r * rng.range(0.2, 0.42), z: L.r * 0.55 });
-    }
-    const F = sphereField(spheres);
+    // A puff on the part of a parent facing the viewer or the sky, resting on its surface.
+    const sprout = (L, r) => {
+        const a = rng() * Math.PI * 2, d = Math.sqrt(rng()) * 0.95, dy = Math.sin(a) * d;
+        return { x: L.x + Math.cos(a) * d * L.r, y: L.y + (dy > 0 ? dy * 0.4 : dy) * L.r, r, z: L.z + Math.sqrt(Math.max(0, 1 - d * d)) * L.r * 0.92 };
+    };
+    const puffs = lobes.flatMap(L => Array.from({ length: Math.round(5 + L.r * 0.5) }, () => sprout(L, Math.max(1.2, L.r * rng.range(0.28, 0.5)))));
+    const curls = h > 9 ? Array.from({ length: Math.min(260, Math.round(w * h * 0.06)) }, () => { const P = rng.pick(puffs); return sprout(P, Math.max(1, P.r * rng.range(0.3, 0.55))); }) : [];
+    const F = sphereField([...lobes, ...puffs, ...curls]), pixels = new Map(), key = (x, y) => (y + 4096) * 16384 + x + 8192;
+    const put = (x, y, v) => pixels.set(key(x, y), v);
+    const shear = rng.range(-0.12, 0.12), flow = y => Math.round((base - y) * shear + (fbm1(y * 0.11, s, 2) - 0.5) * Math.min(10, h * 0.3));
+    const floor = x => base - fbm1(x * 0.07, s + 1, 3) * Math.min(6, h * 0.2);
     for (let j = 0; j < F.h; j++) {
-        const y = F.y0 + j;
-        if (y > base) continue;
+        const y = F.y0 + j, dx = flow(y);
         for (let i = 0; i < F.w; i++) {
             const o = j * F.w + i;
             if (F.id[o] < 0) continue;
-            const x = F.x0 + i;
-            let v = 0.15 + F.shade[o] * 0.8 + (base - y) / h * 0.12 + (hash(x, y, 9) - 0.5) * 0.08;
-            if (y > base - 2) v -= 0.25;
-            b.set(x, y, slots[clamp(Math.floor(v * 4), 0, 3)]);
+            const x = F.x0 + i, under = y - floor(x), n = fbm2(x * 0.09, y * 0.16, s + 2, 2);
+            if (under > 0 || (under > -3 && bayer(x, y) < (under + 3) / 3)) continue;
+            // Fray the outer edge in clumps (only there: a gap inside would show sky through the cloud).
+            const open = (di, dj) => { const ii = i + di, jj = j + dj; return ii < 0 || jj < 0 || ii >= F.w || jj >= F.h || F.id[jj * F.w + ii] < 0; };
+            if (n < 0.42 && (open(-2, 0) || open(2, 0) || open(0, -2) || open(0, 2))) continue;
+            let v = 0.2 + F.shade[o] * 0.62 + (base - y) / h * 0.14 + (n - 0.5) * 0.36 + (hash(x, y, 9) - 0.5) * 0.06;
+            if (under > -Math.min(5, h * 0.22)) v -= 0.22;
+            put(x + dx, y, slots[clamp(Math.floor(v * 4), 0, 3)]);
         }
     }
+    // Torn wisps trailing from the underside and past the ends.
+    if (h > 5) {
+        const reach = Math.min(10, h * 0.28);
+        for (let y = Math.floor(base - reach * 0.6); y <= base + reach; y++) {
+            for (let x = Math.floor(cx - w * 0.68); x <= cx + w * 0.68; x++) {
+                const fade = 1 - Math.abs(y - base) / reach - (Math.abs(x - cx) / (w * 0.68)) ** 2;
+                if (fade > 0 && fbm2(x * 0.045, y * 0.42, s + 3, 3) > 0.74 - fade * 0.2) put(x + flow(y), y, slots[hash(x >> 2, y, s) < 0.3 ? 1 : 0]);
+            }
+        }
+    }
+    largestPatch(pixels).forEach(k => b.set(k % 16384 - 8192, Math.floor(k / 16384) - 4096, pixels.get(k)));
+}
+
+// The biggest group of touching pixels (corners count) among keys laid out as above.
+function largestPatch(pixels) {
+    const seen = new Set();
+    let best = [];
+    for (const start of pixels.keys()) {
+        if (seen.has(start)) continue;
+        const patch = [start];
+        seen.add(start);
+        for (let i = 0; i < patch.length; i++) {
+            for (const dy of [-16384, 0, 16384]) for (const dx of [-1, 0, 1]) {
+                const n = patch[i] + dy + dx;
+                if (pixels.has(n) && !seen.has(n)) { seen.add(n); patch.push(n); }
+            }
+        }
+        if (patch.length > best.length) best = patch;
+    }
+    return best;
 }
 
 export function cumulus(sc, rng, { n, y0, y1, w0, w1, d = 0.2, speed = 1, tall = [0.3, 0.45] }) {
-    const { W, H } = sc, b = new Buf(W * 2, H, { wrap: true });
-    const slots = [0, 1, 2, 3].map(v => sc.slot({ k: 'cloud', v: v / 3, d }));
+    const { W, H } = sc, slots = [0, 1, 2, 3].map(v => sc.slot({ k: 'cloud', v: v / 3, d }));
+    // Parallax inside the layer: clouds lower in the sky are further off, so they drift slower and
+    // the higher ones slide past them. A few bands of speed, far ones drawn first.
+    const bands = Array.from({ length: 3 }, () => new Buf(W * 2, H, { wrap: true }));
     for (let i = 0; i < n; i++) {
-        const w = rng.range(w0, w1);
-        cloud(b, rng() * W * 2, rng.range(y0, y1), w, w * rng.range(tall[0], tall[1]), slots, rng);
+        const w = rng.range(w0, w1), x = rng() * W * 2, y = rng.range(y0, y1);
+        cloud(bands[Math.min(2, Math.floor(3 * (y1 - y) / Math.max(1, y1 - y0)))], x, y, w, w * rng.range(tall[0], tall[1]), slots, rng);
     }
-    sc.addDrift(b, speed);
+    bands.forEach((b, k) => sc.addDrift(b, speed * (0.7 + k * 0.3)));
 }
 
 // Long wind-streaked cloud banks (dusk / overcast).
@@ -209,7 +256,9 @@ export function mountains(sc, rng, o) {
             const gx = elev(x + 1, y) - elev(x - 1, y);
             const side = gx >= 0 ? -1 : 1;
             const lv = dd < 1 || Math.abs(gx) < 1.1 ? 1 : 0;
-            const snowy = S && y < snowLine + (noise2(x * 0.12, y * 0.1, s + 6) - 0.5) * 10 && dd < (snowLine - h[x]) * 0.9 + 2;
+            // `snowJag` makes the snow line wander: down the gullies and up the ribs, not level across a peak.
+            const line = snowLine + (o.snowJag ? (fbm1(x * 0.04, s + 9, 3) - 0.5) * o.snowJag + (noise1(x * 0.18, s + 10) - 0.5) * o.snowJag * 0.35 : 0);
+            const snowy = S && y < line + (noise2(x * 0.12, y * 0.1, s + 6) - 0.5) * 10 && dd < (line - h[x]) * 0.9 + 2;
             const m = mist ? (y - (o.base - mist)) / mist : -1;
             const misty = m > 0 && bayer(x, y) < m * 0.9;
             const ramp = snowy ? (misty ? SM : S) : (misty ? M : R);
@@ -231,7 +280,8 @@ export function hill(sc, rng, o) {
         const slope = h[Math.min(W - 1, x + 3)] - h[Math.max(0, x - 3)];
         for (let y = Math.max(0, Math.ceil(h[x])); y <= bottom; y++) {
             const dd = y - h[x];
-            const side = slope + (noise2(x * 0.04, y * 0.08, s + 2) - 0.5) * 0.9 >= 0 ? 1 : -1;
+            // Mostly the lie of the land, dithered where it turns, so light and shade fade into each other.
+            const side = slope * 0.8 + (fbm2(x * 0.018, y * 0.05, s + 2, 3) - 0.5) * 0.7 + (hash(x, y, s + 3) - 0.5) * 2.4 >= 0 ? 1 : -1;
             let lv = fbm2(x * 0.025, dd * 0.16, s + 1, 3) > 0.55 ? 1 : 0;
             if (dd < 1.2) lv = 1;
             const m = o.mist ? (dd - o.mist[0]) / o.mist[1] : -1;
@@ -298,9 +348,12 @@ export function conifer(b, cx, by, h, R, rng, { sway = 0, trunk } = {}) {
             b.set(x, y, R.face(x < seam ? -1 : 1, lv), wt, cx);
         }
     }
-    const tw = h > 50 ? 2 : 1;
-    for (let y = Math.round(by - th); y <= by; y++) {
-        for (let k = 0; k < tw; k++) b.set(Math.round(cx) + k - (tw >> 1), y, trunk ? trunk.face(k ? 1 : -1, 0) : R.flat(0));
+    const tw = Math.max(1, Math.round(h / 22));
+    // The trunk runs up under the lowest skirt so it never looks stuck on, and flares where it roots.
+    const up = Math.round(by - th - (tw > 1 ? h * 0.05 : 0));
+    for (let y = up; y <= by; y++) {
+        const wide = tw + (tw > 2 && by - y < tw ? Math.round((tw - (by - y)) * 0.8) : 0), x0 = Math.round(cx) - (wide >> 1);
+        for (let k = 0; k < wide; k++) if (y >= by - th || !b.get(x0 + k, y)) b.set(x0 + k, y, trunk ? trunk.face(k < wide / 2 ? -1 : 1, 0) : R.flat(0));
     }
 }
 
@@ -335,12 +388,16 @@ export function blobTree(b, cx, by, h, R, T, rng, { sway = 0, shape = 'dome' } =
     const cw = h * (umbrella ? rng.range(0.6, 0.8) : tall ? rng.range(0.16, 0.22) : rng.range(0.42, 0.56));
     const ch = h * (umbrella ? rng.range(0.12, 0.17) : tall ? rng.range(0.4, 0.48) : rng.range(0.3, 0.38));
     const ccx = cx + lean * th + rng.range(-0.1, 0.1) * cw, ccy = by - th - ch * 0.85;
-    const clusters = [{ x: ccx, y: ccy, r: ch * 0.8, z: 0 }];
-    for (let i = umbrella ? Math.round(cw / ch * 2.2) : clamp(Math.round(h / 7), 2, 13); i > 0; i--) {
-        const a = rng() * Math.PI * 2, d = Math.sqrt(rng()) * 0.72;
+    // A dome's crown is a few uneven masses around a smaller heart, heavier to one side, with bays between
+    // them; a round central sphere would show through as a ball.
+    const dome = !umbrella && !tall, lop = rng.range(-0.3, 0.3), masses = Array.from({ length: rng.int(2, 4) }, () => ({ a: rng() * Math.PI * 2, d: rng.range(0.45, 0.85) }));
+    const clusters = [{ x: ccx, y: ccy, r: ch * (dome ? 0.55 : 0.8), z: 0 }];
+    for (let i = umbrella ? Math.round(cw / ch * 2.2) : clamp(Math.round(h / (dome ? 5 : 7)), dome ? 4 : 2, dome ? 24 : 13); i > 0; i--) {
+        const m = dome && rng.pick(masses), a = m ? m.a + rng.range(-0.9, 0.9) : rng() * Math.PI * 2, d = m ? m.d * rng.range(0.6, 1.25) : Math.sqrt(rng()) * 0.72;
         // An acacia's crown is a flat layer of overlapping pads.
-        const r = umbrella ? ch * rng.range(0.75, 1.05) : (0.32 + 0.26 * rng()) * Math.min(cw, ch * 1.3);
-        clusters.push({ x: ccx + Math.cos(a) * d * cw, y: ccy + Math.sin(a) * d * ch * (umbrella ? 0.4 : 0.85), r, z: rng.range(-0.25, 0.25) * cw });
+        const r = umbrella ? ch * rng.range(0.75, 1.05) : dome ? (0.2 + 0.32 * rng()) * Math.min(cw, ch * 1.3) * (1 - d * 0.2) : (0.32 + 0.26 * rng()) * Math.min(cw, ch * 1.3);
+        const cos = Math.cos(a);
+        clusters.push({ x: ccx + cos * d * cw * (1 + (dome ? lop * Math.sign(cos) : 0)), y: ccy + Math.sin(a) * d * ch * (umbrella ? 0.4 : 0.85) + (dome ? ch * 0.08 : 0), r, z: rng.range(-0.25, 0.25) * cw });
     }
     const weight = c => (sway ? Math.round(255 * Math.min(1, sway) * clamp((by - th - c.y) / (ch * 2), 0.25, 1)) : 0);
 
@@ -353,9 +410,10 @@ export function blobTree(b, cx, by, h, R, T, rng, { sway = 0, shape = 'dome' } =
     }
     // Deep shade inside the crown, then limbs reaching into it.
     for (const c of clusters) {
-        const r = c.r * 0.72, wt = weight(c);
+        const r = c.r * 0.72, wt = weight(c), seed = Math.round(c.x * 3 + c.y * 5);
         for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) {
-            if (dx * dx + dy * dy > r * r) continue;
+            const reach = r * (0.62 + 0.38 * hash(Math.round(Math.atan2(dy, dx) * 2.5), 1, seed));
+            if (dx * dx + dy * dy > reach * reach) continue;
             const x = c.x + dx, y = c.y + dy * 0.9;
             b.set(x, y, R.at(dx / r, dy / r, 0.5, 0), wt, cx, 1 + Math.floor(hash(Math.round(x) >> 1, Math.round(y) >> 1, cx) * 254));
         }
@@ -384,7 +442,7 @@ export function blobTree(b, cx, by, h, R, T, rng, { sway = 0, shape = 'dome' } =
         const depth = h < 30 ? 1 : h < 70 ? 2 : 3;
         for (const c of clusters.slice(1)) {
             const dx = c.x - sx, dy = c.y - sy, d = Math.hypot(dx, dy);
-            grow(sx, sy, Math.atan2(dy, dx), d * 0.75, Math.max(1, tw * 0.6), depth, c);
+            grow(sx, sy, Math.atan2(dy, dx), Math.max(d * 0.75, d - c.r * 0.5), Math.max(1, tw * 0.6), depth, c);
         }
         grow(sx, sy, -Math.PI / 2 + rng.range(-0.2, 0.2), (sy - ccy) * 0.9, Math.max(1, tw * 0.7), depth, clusters[0]);
         // Snow settles on every branch pixel with open sky above it.
@@ -428,8 +486,9 @@ export function blades(sb, rng, x, groundY, maxH, slots, flowers) {
 
 // Reflective water from y0 down: mirrored frame rows with ripple, Fresnel
 // fade to the water's own colour near the viewer, and drifting highlights.
-// `mask` (a Buf) limits the water to its nonzero pixels, e.g. a river.
-export function water(sc, rng, { y0, ramp, mix = 0.4, fres = 0.7, waves = 0.08, speed = 3, glitter = false, d = 0.08, mask = null }) {
+// `mask` (a Buf) limits the water to its nonzero pixels, e.g. a river. `glassy` keeps mirroring the top
+// of the sky past the point where the reflection runs out, for still water in a tall frame.
+export function water(sc, rng, { y0, ramp, mix = 0.4, fres = 0.7, waves = 0.08, speed = 3, glitter = false, d = 0.08, mask = null, glassy = false }) {
     const { W, H } = sc, R = sc.ramp(ramp, d), s = seedOf(rng);
     sc.water = { k: 'mat', c: R.c[1], d: d + 0.1 };
     sc.reflectMix = mix;
@@ -437,7 +496,7 @@ export function water(sc, rng, { y0, ramp, mix = 0.4, fres = 0.7, waves = 0.08, 
     const sun = sc.slot({ k: 'sun' });
     sc.addFn((f, t, L) => {
         for (let y = y0; y < H; y++) {
-            const dy = y - y0, p = dy / (H - y0), sy = y0 - 1 - dy;
+            const dy = y - y0, p = dy / (H - y0), sy = glassy ? Math.max(0, y0 - 1 - dy) : y0 - 1 - dy;
             const amp = 0.4 + p * 1.8;
             const rx = Math.round(Math.sin(dy * 0.7 + t * 1.3) * amp * 0.6 + Math.sin(dy * 0.23 - t * 0.7) * amp * 0.5);
             const zx = 0.11 / (0.25 + p * 1.6), drift = t * speed * (0.3 + p);

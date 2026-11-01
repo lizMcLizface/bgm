@@ -4,7 +4,8 @@ import { Buf } from './scene.js';
 import { hex } from './lighting.js';
 import { bayer, clamp, fbm1, fbm2, hash, lerp, noise1, smoothstep } from './noise.js';
 import { blades, blobTree, canopyRidge, celestial, conifer, hill, mountains, seedOf, sky, water } from './shapes.js';
-import { P, coniferRidge, envelope, ground, house, leafFall, leafVariant, meadow, mesa, pick, reeds, rock, shimmer, weather } from './biomes.js';
+import { bush } from './sunsets.js';
+import { P, coniferRidge, envelope, footTufts, ground, house, leafFall, leafVariant, meadow, mesa, pick, reeds, rock, shimmer, treeShadows, weather } from './biomes.js';
 
 const Q = {
     wheat: ['#8a6a2e', '#a8863a', '#d0ae50', '#ecd078'],
@@ -92,25 +93,46 @@ export function farmland(sc, rng) {
     sc.addStatic(b);
 
     // Hedgerows along some field boundaries, a farmstead in a middle band.
-    const hedge = new Buf(W, H, { rank: true }), T = sc.ramp(P.trunk, 0.2);
+    // Chosen first, so that hedges nearer than the farm can leave a gap for it and be drawn after it.
+    const kf = rng.int(1, Math.max(1, n - 3)), fy = (bands[kf] + bands[kf + 1]) / 2, fp = (fy - hz) / (H - hz), fd = 0.3 * (1 - fp) ** 1.5;
+    const fx = W * rng.range(0.15, 0.85), scale = 6 + fp * 26, farm = new Buf(W, H), hasMill = rng.chance(0.65), millX = Math.round(fx + scale * rng.range(-3, -1.8));
+    const farmL = (hasMill ? millX : fx) - scale * 1.4, farmR = fx + scale * 2.6;
+    const behind = new Buf(W, H, { rank: true }), before = new Buf(W, H, { rank: true }), T = sc.ramp(P.trunk, 0.2);
     for (let k = 1; k < n; k++) {
         if (!rng.chance(0.55)) continue;
-        const y = bands[k], p = (y - hz) / (H - hz), d = 0.32 * (1 - p) ** 1.5, L = sc.leaves(P.leaf, d, leafVariant(rng));
-        const x0 = rng.range(-20, W * 0.5), x1 = rng.range(x0 + W * 0.3, W + 20);
-        for (let x = x0; x < x1; x += rng.range(2, 4) * (0.6 + p * 2)) blobTree(hedge, x, y + 1, (6 + p * 22) * rng.range(0.6, 1.1), L, T, rng);
+        const y = bands[k], p = (y - hz) / (H - hz), d = Math.round(0.32 * (1 - p) ** 1.5 * 12) / 12, L = sc.leaves(P.leaf, d, leafVariant(rng)), Sd = sc.ramp(Q.soil, d);
+        const x0 = rng.range(-20, W * 0.5), x1 = rng.range(x0 + W * 0.3, W + 20), b2 = y > fy ? before : behind;
+        const top = (6 + p * 22) * 1.1, overlaps = y > fy && y - top < fy + 2;
+        for (let x = x0; x < x1; x += rng.range(2, 4) * (0.6 + p * 2)) {
+            if (overlaps && x > farmL && x < farmR) continue;   // the lane to the farm: nothing stands right in front of it
+            blobTree(b2, x, y + 1, (6 + p * 22) * rng.range(0.6, 1.1), L, T, rng);
+            // Undergrowth hides the stems, and a line of shade grounds the row.
+            bush(b2, x + rng.range(-1, 1), y + 2, 1.5 + p * 6, L, rng, true);
+            b2.set(x, y + 2, Sd.flat(0));
+        }
     }
-    sc.addStatic(hedge);
-    const kf = rng.int(1, Math.max(1, n - 3)), fy = (bands[kf] + bands[kf + 1]) / 2, fp = (fy - hz) / (H - hz), fd = 0.3 * (1 - fp) ** 1.5;
-    const fx = W * rng.range(0.15, 0.85), scale = 6 + fp * 26, farm = new Buf(W, H);
+    sc.addStatic(behind);
+    // The yard: trodden grass round the buildings, instead of walls rising straight out of a crop.
+    const yard = new Buf(W, H), Yd = sc.ramp(P.grass, fd), Dirt = sc.ramp(Q.soil, fd), yardCx = (farmL + farmR) / 2, yardR = (farmR - farmL) * 0.56, yardH = scale * 0.9;
+    for (let y = Math.floor(fy - yardH * 0.7); y <= fy + yardH; y++) for (let x = Math.floor(yardCx - yardR); x <= yardCx + yardR; x++) {
+        const e = Math.hypot((x - yardCx) / yardR, (y - fy) / yardH) + (hash(x, y, s + 6) - 0.5) * 0.14;
+        if (e < 1) yard.set(x, y, e < 0.45 && fbm2(x * 0.1, y * 0.2, s + 7, 2) > 0.55 ? Dirt.flat(2) : Yd.flat(fbm2(x * 0.08, y * 0.2, s + 8, 2) > 0.5 ? 2 : 1));
+    }
+    sc.addStatic(yard);
     const wall = sc.ramp(P.wall, fd), roof = sc.ramp(rng.chance(0.5) ? P.roof : P.slate, fd), barn = sc.ramp(Q.barn, fd);
     house(sc, farm, fx, fy, Math.round(scale * 1.1), Math.round(scale * 0.5), wall, roof, () => rng.chance(0.7));
     house(sc, farm, fx + scale * 1.4, fy + 1, Math.round(scale * 1.5), Math.round(scale * 0.7), barn, sc.ramp(P.slate, fd), () => false);
+    const yardFeet = [{ x: fx, by: fy + 1, w: scale * 0.55, h: scale * 0.8 }, { x: fx + scale * 1.4, by: fy + 2, w: scale * 0.75, h: scale }];
+    if (hasMill) yardFeet.push({ x: millX, by: fy + 1, w: scale * 0.4, h: scale * 1.7 });
+    treeShadows(sc, yardFeet, Yd.flat(0), 0.7);
     sc.addStatic(farm);
-    if (rng.chance(0.65)) {
+    if (hasMill) {
         const mill = new Buf(W, H);
-        windmill(sc, mill, Math.round(fx + scale * rng.range(-3, -1.8)), Math.round(fy), Math.round(scale * 1.7), fd);
+        windmill(sc, mill, millX, Math.round(fy), Math.round(scale * 1.7), fd);
         sc.addStatic(mill);
     }
+    footTufts(sc, yardFeet, sc.ramp(P.grass, fd, 'blade'), 0.4);
+    sc.addStatic(before);
 
     // Foreground: grass verge with a fence.
     const verge = H - rng.range(10, 22), sb = new Buf(W, H, { sway: true }), G = sc.ramp(P.grass, 0), B = sc.ramp(P.grass, 0, 'blade');
@@ -150,20 +172,26 @@ export function savanna(sc, rng) {
     shimmer(sc, hz - 24, hz + 8);
     const ty = meadow(sc, rng, { top: hz + rng.range(2, 6), pal: [Q.savanna, Q.savannaHi], blade: 'savanna', tall: 1.6, blades: rng.range(0.25, 0.4), flowers: 0 });
     // Distant trees stand in the grass, so they go on after it.
-    const T = sc.ramp(P.trunk, 0.3), mid = new Buf(W, H, { rank: true });
+    const T = sc.ramp(P.trunk, 0.3), mid = new Buf(W, H, { rank: true }), shade = sc.ramp(Q.savanna, 0).flat(0), grass = sc.ramp(Q.savanna, 0, 'savanna'), midFeet = [];
     for (let i = rng.int(6, 24); i > 0; i--) {
-        const y = hz + rng.range(3, 24), p = (y - hz) / (H - hz), d = 0.4 * (1 - p * 2);
-        const L = sc.leaves(P.leaf, Math.max(0.08, d), leafVariant(rng));
-        if (rng.chance(0.7)) blobTree(mid, rng.range(0, W), y, rng.range(8, 20) * (1 + p * 3), L, T, rng, { shape: 'umbrella' });
-        else blobTree(mid, rng.range(0, W), y, rng.range(4, 8) * (1 + p * 3), L, T, rng);
+        const y = hz + rng.range(3, 24), p = (y - hz) / (H - hz), d = 0.4 * (1 - p * 2), x = rng.range(0, W);
+        const L = sc.leaves(P.leaf, Math.max(0.08, d), leafVariant(rng)), umbrella = rng.chance(0.7), h = (umbrella ? rng.range(8, 20) : rng.range(4, 8)) * (1 + p * 3);
+        const c = blobTree(mid, x, y, h, L, T, rng, umbrella ? { shape: 'umbrella' } : {});
+        midFeet.push({ x, by: y, w: c.w, h });
     }
+    treeShadows(sc, midFeet, shade);
     sc.addStatic(mid);
-    const sb = new Buf(W, H, { sway: true, rank: true }), crowns = [];
+    footTufts(sc, midFeet, grass, 0.5);
+    const sb = new Buf(W, H, { sway: true, rank: true }), crowns = [], feet = [];
     for (let i = pick(rng, [0, 1], [1, 2], [2, 1]); i > 0; i--) {
-        const x = Math.round(W * rng.range(0.1, 0.9)), L = sc.leaves(P.leaf, 0, leafVariant(rng));
-        crowns.push(blobTree(sb, x, Math.min(H + 2, ty[x] + rng.range(10, 30)), sc.U * rng.range(0.45, 0.7), L, sc.ramp(P.trunk, 0), rng, { sway: 0.6, shape: 'umbrella' }));
+        const x = Math.round(W * rng.range(0.1, 0.9)), L = sc.leaves(P.leaf, 0, leafVariant(rng)), by = Math.min(H + 2, ty[x] + rng.range(10, 30)), h = sc.U * rng.range(0.45, 0.7);
+        const c = blobTree(sb, x, by, h, L, sc.ramp(P.trunk, 0), rng, { sway: 0.6, shape: 'umbrella' });
+        crowns.push(c);
+        feet.push({ x, by, w: c.w, h });
     }
+    treeShadows(sc, feet, shade);
     sc.addSway(sb, 0.7);
+    footTufts(sc, feet, grass);
 }
 
 // ---------------------------------------------------------------- woodland
@@ -182,6 +210,7 @@ export function woodland(sc, rng) {
     // The clearing's grass runs right up to the far forest; the tree rows
     // then stand in it.
     meadow(sc, rng, { top: hz + 3, flowers: rng.range(0.03, 0.12), blades: rng.range(0.15, 0.3) });
+    const shade = sc.ramp(P.grass, 0).flat(0), footLayers = [];
     if (rng.chance(0.6)) {
         // A dirt path winding out of the clearing toward the viewer.
         const pb = new Buf(W, H), Sd = sc.ramp(Q.soil, 0), s = seedOf(rng), y0 = hz + 8;
@@ -207,6 +236,9 @@ export function woodland(sc, rng) {
             if (Math.abs(x - clear) < gap) continue;
             trees.push({ x, by: y0 + rng.range(0, 6), h: rng.range(20, 40) * (0.6 + p * 1.2) });
         }
+        const rowFeet = trees.map(t => ({ x: t.x, by: t.by, w: t.h * 0.24, h: t.h }));
+        treeShadows(sc, rowFeet, shade, 0.5);
+        footLayers.push([rowFeet, b]);
         trees.sort((a, c) => a.by - c.by).forEach(t => {
             if (rng() < conif) conifer(b, t.x, t.by, t.h * 1.2, Dr, rng, { trunk: Tr });
             else blobTree(b, t.x, t.by, t.h, sc.leaves(P.leaf, d, leafVariant(rng)), Tr, rng);
@@ -214,15 +246,20 @@ export function woodland(sc, rng) {
         sc.addStatic(b);
     }
     // Big framing trees on either side, crowns running off the top.
+    const blade = sc.ramp(P.grass, 0, 'blade');
+    footLayers.forEach(([feet]) => footTufts(sc, feet, blade, 0.5));
+    const frame = [];
     const sb = new Buf(W, H, { sway: true, rank: true }), crowns = [], Tf = sc.ramp(P.trunk, 0), Df = sc.ramp(P.forest, 0);
     for (const side of [-1, 1]) {
         for (let i = rng.int(1, 2); i > 0; i--) {
             const x = side < 0 ? rng.range(-W * 0.05, W * 0.16) : rng.range(W * 0.84, W * 1.05), by = H + rng.range(-6, 10);
-            if (rng() < conif) conifer(sb, x, by, sc.U * rng.range(0.9, 1.2), Df, rng, { sway: 0.8, trunk: Tf });
-            else crowns.push(blobTree(sb, x, by, sc.U * rng.range(0.85, 1.15), sc.leaves(P.leaf, 0, leafVariant(rng)), Tf, rng, { sway: 0.8 }));
+            if (rng() < conif) { const h = sc.U * rng.range(0.9, 1.2); conifer(sb, x, by, h, Df, rng, { sway: 0.8, trunk: Tf }); frame.push({ x, by, w: h * 0.2, h }); }
+            else { const h = sc.U * rng.range(0.85, 1.15), c = blobTree(sb, x, by, h, sc.leaves(P.leaf, 0, leafVariant(rng)), Tf, rng, { sway: 0.8 }); crowns.push(c); frame.push({ x, by, w: c.w, h }); }
         }
     }
+    treeShadows(sc, frame, shade, 0.5);
     sc.addSway(sb, 0.8);
+    footTufts(sc, frame, blade);
     if (crowns.length) leafFall(sc, rng, crowns, sc.leaves(P.leaf, 0, 1));
 }
 
@@ -267,14 +304,18 @@ export function river(sc, rng) {
     const span = bc.w * 2 + 10 + bc.p * 20;
 
     // Trees along the banks, smaller with distance.
-    const tb = new Buf(W, H, { rank: true }), tf = new Buf(W, H, { rank: true }), T = sc.ramp(P.trunk, 0.1);
+    const tb = new Buf(W, H, { rank: true }), tf = new Buf(W, H, { rank: true }), T = sc.ramp(P.trunk, 0.1), feet = [];
     for (const c of centres) {
         if (!rng.chance(0.04 + c.p * 0.04)) continue;
         const side = rng.chance(0.5) ? -1 : 1, x = c.cx + side * (c.w + rng.range(4, 14) * (0.5 + c.p * 3)), d = 0.3 * (1 - c.p);
-        const b = c.y > bc.y ? tf : tb;
-        if (rng.chance(0.25)) conifer(b, x, c.y, (8 + c.p * 50) * rng.range(0.7, 1.2), sc.ramp(P.forest, d), rng, { trunk: T });
-        else blobTree(b, x, c.y, (6 + c.p * 46) * rng.range(0.7, 1.2), sc.leaves(P.leaf, d, leafVariant(rng)), T, rng, { shape: rng.chance(0.2) ? 'tall' : 'dome' });
+        // Where the river swings sideways another reach can pass this spot: never root a tree in it.
+        if ([-3, 0, 3].some(k => mask.get(x + k, c.y + 1))) continue;
+        const pine = rng.chance(0.25), b = c.y > bc.y ? tf : tb, h = (pine ? 12 + c.p * sc.U * 0.7 : 10 + c.p * sc.U * 0.6) * rng.range(0.8, 1.2);
+        if (pine) conifer(b, x, c.y, h, sc.ramp(P.forest, d), rng, { trunk: T });
+        else blobTree(b, x, c.y, h, sc.leaves(P.leaf, d, leafVariant(rng)), T, rng, { shape: rng.chance(0.2) ? 'tall' : 'dome' });
+        feet.push({ x, by: c.y, w: h * 0.22, h });
     }
+    treeShadows(sc, feet, sc.ramp(P.grass, 0).flat(0));
     if (rng.chance(0.4)) {
         rng();
         // A dirt path runs off from each end of the bridge, curving toward the viewer.
@@ -305,5 +346,15 @@ export function river(sc, rng) {
         sc.addStatic(bb);
     } else sc.addStatic(tb);
     sc.addStatic(tf);
-    reeds(sc, rng, hz);
+    footTufts(sc, feet.filter(t => t.h > 18), sc.ramp(P.grass, 0, 'blade'));
+    // Reeds in clumps along the water's edge, sized for how far off they are.
+    const rs = new Buf(W, H, { sway: true }), Rd = sc.ramp(P.hill, 0, 'blade');
+    for (const c of centres) for (const side of [-1, 1]) {
+        if (!rng.chance(0.05 + c.p * 0.14)) continue;
+        for (let i = rng.int(3, 9); i > 0; i--) {
+            const x = Math.round(c.cx + side * (c.w + rng.range(0, 2 + c.p * 7)));
+            if (!mask.get(x, c.y)) blades(rs, rng, x, Math.round(c.y + rng.range(-1, 1)), 2 + c.p * 11, [Rd.flat(1), Rd.flat(3)], null);
+        }
+    }
+    sc.addSway(rs, 0.8);
 }
