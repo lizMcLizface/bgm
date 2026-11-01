@@ -324,3 +324,10 @@ describe('the layers in a link', () => {
         expect(encodeSettings({ ...d, layers: 'rhythm' }).length).toBeGreaterThan(encodeSettings(d).length);
     });
 });
+
+test('a melodic style travels in a link, and an unknown one is dropped', () => {
+    const code = encodeSettings({ ...defaultSettings(), seed: 3, melodyStyle: 'hook', melodyPlan: 'change' });
+    expect(decodeSettings(code)).toMatchObject({ melodyStyle: 'hook', melodyPlan: 'change' });
+    expect(decodeSettings(encodeSettings({ ...defaultSettings(), seed: 3 })).melodyStyle).toBe('auto');
+    expect(sanitizeSettings({ ...defaultSettings(), melodyStyle: 'polka' }).melodyStyle).toBe('auto');
+});

@@ -104,7 +104,11 @@ export const BOOK_RULE_IDS=[
   "layer-clear",
   "layer-entrances",
   "layer-mix",
-  "layer-flow"
+  "layer-flow",
+  "melody-style",
+  "melody-plan",
+  "melody-bass",
+  "melody-rhythm"
 ];
 export const BOOK_GROUP_IDS=[
   "pad-register",

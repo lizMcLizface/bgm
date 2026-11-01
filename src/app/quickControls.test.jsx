@@ -2,7 +2,7 @@ import React, { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import QuickPanel, { snapToNotch } from './QuickPanel';
 import { defaultSettings, sanitizeSettings } from './settings';
-import { STACKS, CHOICE_GROUPS, choiceAt, choicePatch, stackLevel, stackPatch, quickSettings, QUICK_KEYS, FEEL_SLIDERS, sliderPatch, readValue } from './quickControls';
+import { MELODY_PLAN, MELODY_STYLE, QUICK_KEYS as QUICK_KEY_LIST, STACKS, CHOICE_GROUPS, choiceAt, choicePatch, stackLevel, stackPatch, quickSettings, QUICK_KEYS, FEEL_SLIDERS, sliderPatch, readValue } from './quickControls';
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -143,7 +143,7 @@ test('the stacks are flair, groove, depth and colour: each moves several setting
 
 test('every pill of every choice group is a valid setting and is found again once set', () => {
     const base = defaultSettings();
-    for (const group of CHOICE_GROUPS) for (const { value } of group.choices) {
+    for (const group of [...CHOICE_GROUPS, MELODY_PLAN, MELODY_STYLE]) for (const { value } of group.choices) {
         const patch = choicePatch(base, group, value);
         const clean = sanitizeSettings({ ...base, ...patch }, base);
         for (const [key, v] of Object.entries(patch)) expect(clean[key], `${group.id} ${value} ${key}`).toEqual(v);
@@ -201,4 +201,8 @@ describe('the layers pills', () => {
         render({ ...base, layers: 'split' }, { layersUnlocked: false });
         expect(host.querySelector('[aria-label="Layers"]')).not.toBeNull();
     });
+});
+
+test('Reset puts the melody row back too', () => {
+    for (const key of ['melodyPlan', 'melodyStyle', 'melodyParts']) expect(QUICK_KEY_LIST).toContain(key);
 });

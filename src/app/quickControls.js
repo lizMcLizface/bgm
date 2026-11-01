@@ -23,6 +23,32 @@ export const MIX_SLIDERS = [
     { id: 'ambience', label: 'Ambience', path: 'ambienceVolume', title: 'The whole ambience bed against the music' },
 ];
 
+/** The melody row: what the band does with its tune, the style a song is written in, and which parts join the lead in it. */
+export const MELODY_PLAN = {
+    id: 'melody', label: 'Melody', title: 'What the band does with its tune',
+    choices: [
+        ['noodle', 'Noodle', 'The lead draws new motifs as it goes'],
+        ['same', 'Same', 'One song for this seed, written over the chords, that keeps coming back'],
+        ['change', 'Change', 'A song that slowly turns into another over 10 to 15 minutes, a bar at a time'],
+    ].map(([value, label, title]) => ({ value, label, title, set: [['melodyPlan', value]] })),
+};
+export const MELODY_STYLE = {
+    id: 'melodyStyle', label: 'Style', title: 'The rhythms and intervals a song is written in',
+    choices: [
+        ['auto', 'Auto', 'The style that suits these settings'],
+        ['song', 'Song', 'A singable tune of steps and one leap'],
+        ['lounge', 'Lounge', 'Late, off-the-beat phrases on colour tones'],
+        ['hook', 'Hook', 'A short dance figure, repeated'],
+        ['game', 'Game', 'Quick arpeggios that climb in sequence'],
+        ['cinema', 'Cinema', 'Long notes in a wide arch'],
+        ['riff', 'Riff', 'A tight, repeating, syncopated figure'],
+    ].map(([value, label, title]) => ({ value, label, title, set: [['melodyStyle', value]] })),
+};
+export const MELODY_PARTS = [
+    { id: 'bass', label: 'Bass', path: 'melodyParts.bass', title: 'The bass plays the tune\u2019s rhythm and shape on chord tones. A walking bass and a pedal keep their own line' },
+    { id: 'rhythm', label: 'Rhythm', path: 'melodyParts.rhythm', title: 'A rhythmic chord part plays the tune\u2019s opening rhythm. Held chords and programmed sequencer lanes keep theirs' },
+];
+
 /** Vertical sliders for how it plays (calmer / busier and darker / brighter are the feel pad's, beside them). `path` is a settings key, or key.sub inside an object. */
 export const FEEL_SLIDERS = [
     { id: 'swing', label: 'Swing', path: 'swing', min: 0, max: 0.6, step: 0.02, title: 'Straight to swung off-beats' },
@@ -148,7 +174,7 @@ export const stackPatch = (settings, stack, level) => mergePatches(settings, sta
 const KEYS = new Set([
     ...FEEL_SLIDERS.map((s) => s.path.split('.')[0]),
     ...STACKS.flatMap((stack) => stack.levels.flat().map(([path]) => path.split('.')[0])),
-    ...CHOICE_GROUPS.flatMap((group) => choicePaths(group).map((path) => path.split('.')[0])), 'volumes', 'ambienceVolume',
+    ...[...CHOICE_GROUPS, MELODY_PLAN, MELODY_STYLE].flatMap((group) => choicePaths(group).map((path) => path.split('.')[0])), 'melodyParts', 'volumes', 'ambienceVolume',
 ]);
 export const QUICK_KEYS = [...KEYS];
 

@@ -31,7 +31,8 @@ test('Slightly Slower Than Light preserves its running notes with lead, phrase g
     const scene = sceneBySlug('slightly-slower-than-light'), styles = new Set();
     let leadBars = 0, tailBars = 0;
     for (const seed of [1, 17, 42]) {
-        const settings = sceneSettings(scene, seed), meter = METERS['4/4'];
+        // (coordination is what is being tested here; how a song treats these notes is in songParts.test.js)
+        const settings = { ...sceneSettings(scene, seed), melodyPlan: 'noodle', melodyStyle: undefined }, meter = METERS['4/4'];
         const scalePcs = [2, 4, 5, 7, 9, 10, 0];
         const chords = [[2, 5, 9, 0], [10, 2, 5, 9], [5, 9, 0, 4], [9, 0, 4, 7]].map(pitchClasses => ({ pitchClasses }));
         let prev = null;

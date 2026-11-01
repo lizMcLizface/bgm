@@ -20,6 +20,8 @@ import { landSectionSuspension } from './sectionSuspension';
 import { subdivideSection } from './formStrategies';
 import { varyPad } from './padVariation';
 import { syncopate } from './syncopation';
+import { composeSong, hasMelodicStyle, evolveSong, changeBars } from './melodicStyle';
+import { songBass, songRhythm, SONG_RHYTHM_STYLES } from './songParts';
 
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 const rngFor = (seed, index, salt) => seeded(Math.imul(seed ^ salt, 1664525) ^ Math.imul(index + 1, 1013904223));
@@ -48,8 +50,11 @@ function makeTheme(meter, seed, id, density) {
     });
 }
 
+// The middle of a whole theme, in scale degrees: it sits in the lead's register as one piece, in one octave.
+const themeCentre = (theme) => { const degrees = theme.flat().map(note => note.degree); return (Math.min(...degrees) + Math.max(...degrees)) / 2; };
+
 export function planThemePhrase({ seed, start, section, previous, settings, contrast = false }) {
-    const ordinal = previous?.ordinal !== undefined ? previous.ordinal + 1 : Math.floor(start / 4), rng = rngFor(seed, ordinal, 0x68e31da4);
+    const ordinal = previous?.ordinal !== undefined ? previous.ordinal + (previous.sung === false ? 0 : 1) : previous === undefined && hasMelodicStyle(settings) ? 0 : Math.floor(start / 4), rng = rngFor(seed, ordinal, 0x68e31da4);
     const returning = section?.type === 'full' && previous?.sectionType && previous.sectionType !== 'full';
     const ordinary = section?.form && section.type === 'breakdown' ? 'recollection' : returning ? 'return' : ['statement', 'answer', 'development', 'return'][ordinal % 4];
     let role = contrast && ordinary === 'development' && Math.floor(ordinal / 4) % 2 === 0 && section?.type !== 'intro'
@@ -114,22 +119,35 @@ export function arrangeBarLatest(args) {
             ? { ...settings, sections: { ...settings.sections, mode: 'off' } } : settings),
         rng: rngFor(seed, bar, 0x7f4a7c15) });
     if (args.developForm !== false) base.state.phrase = { ...base.state.phrase, section };
-    const developing = args.developThemes !== false;
-    const key = `${seed}/${meter.units}/${meter.groups.join(',')}/${settings.leadDensity ?? 0}${developing ? '/development' : ''}`;
+    const developing = args.developThemes !== false, styled = hasMelodicStyle(settings);
+    // (a song is written for the density the user set: the intensity's moves do not rewrite it)
+    const songDensity = args.songDensity ?? settings.leadDensity ?? 0;
+    const key = `${seed}/${meter.units}/${meter.groups.join(',')}/${styled ? songDensity : settings.leadDensity ?? 0}${developing ? '/development' : ''}${styled ? `/${settings.melodyStyle}` : ''}`;
     const prior = prev?.composition?.key === key ? prev.composition : null;
-    const themes = prior?.themes ?? [makeTheme(meter, seed, 0, settings.leadDensity ?? 0), makeTheme(meter, seed, 1, settings.leadDensity ?? 0)];
     const phrase = prior?.phrase.start === base.state.phrase.start ? prior.phrase : planThemePhrase({ seed,
         start: base.state.phrase.start, section: base.state.phrase.section, previous: prior?.phrase, settings, contrast: args.contrastPhrases === true });
+    const writeSong = (gen) => composeSong({ seed: gen ? seed + Math.imul(gen, 0x9e3779b1) : seed, styleName: settings.melodyStyle, preset: `${settings.progression}/${args.modeName ?? ''}`, meter,
+        harmony: args.songHarmony?.() ?? [], density: songDensity, leadScale: settings.leadScale, range: base.state.ranges.lead });
+    const song = styled && settings.melodyPlan === 'change' ? evolveSong({ previous: prev?.composition?.song, known: prior?.themes, bar,
+        period: changeBars({ seed, meter, bpm: settings.bpm }), moveOn: phrase !== prior?.phrase && ['statement', 'return'].includes(phrase.role), write: writeSong }) : null;
+    const themes = song?.themes ?? prior?.themes ?? (styled ? writeSong(0)
+        : [makeTheme(meter, seed, 0, settings.leadDensity ?? 0), makeTheme(meter, seed, 1, settings.leadDensity ?? 0)]);
     phrase.bars = bars; phrase.units = meter.units;
+    // A styled song only moves on when it was heard: the first phrase the lead plays is its statement.
+    if (styled) phrase.sung = !!base.state.phrase.leadActive && settings.leadActivity > 0;
     // which bar of its chord this is (0 on the first): a chord held for several bars is not played the same way each time (padVariation.js)
     const chordBar = args.chordStart ? 0 : (prev?.composition?.chordBar ?? 0) + 1;
-    const composition = { key, themes, phrase, chordBar, ...(form ? { form } : {}) };
+    const composition = { key, themes, phrase, chordBar, ...(form ? { form } : {}), ...(song ? { song } : {}) };
     const transitionFor=(s,at)=>(args.endBar==null||s?.start+s?.bars<args.endBar-1)?transitionGesture(s,at):null;
     const gestureFor=(s,at)=>args.transitionGestures===true?transitionFor(s,at):null;
     const gesture=gestureFor(section,bar),leadGesture=args.leadTransitions===true?transitionFor(section,bar):null;
     if(gesture)composition.transitionGesture=gesture;
-    const index = bar - base.state.phrase.start;
+    const index = bar - base.state.phrase.start, themeBars = themes[0].length;
+    // A styled song's statements come back as written: only answers and development vary it.
+    const locked = styled && ['statement', 'return', 'recollection'].includes(phrase.role), fidelity = styled ? (locked ? 2 : 1.2) : undefined;
+    const songSection = (at) => (locked && at?.motion ? { ...at, motion: null } : at);
     const grammar = args.rhythmGrammar === true ? planRhythmGrammar({ seed, phrase, ending: settings.leadEnding }) : null;
+    if (grammar && locked) grammar.operations = grammar.operations.map((operation, offset) => (offset < themeBars ? 'identity' : operation));
     if (grammar) composition.grammar = grammar;
     const duet = args.duetInteraction === true && args.coordinate !== false && settings.leadActivity > 0
         && base.state.phrase.leadActive && base.state.phrase.counter && base.state.phrase.counter.kind !== 'harmony'
@@ -141,18 +159,18 @@ export function arrangeBarLatest(args) {
     const development = developing ? (prior?.development?.start === phrase.start ? prior.development
         : planDevelopment({ seed, phrase, density: settings.leadDensity ?? 0 })) : null;
     if (development) composition.development = development;
-    const stored = themes[duet && duet.mode !== 'contrary motion' ? 0 : phrase.themeId][index % 2];
+    const stored = themes[duet && duet.mode !== 'contrary motion' ? 0 : phrase.themeId][index % themeBars];
     const source = duet ? duetMotif(stored, { plan: duet, offset: index }) : development ? developTheme(stored, { operation: development.operations[index], meter,
         interval: development.interval, density: development.density }) : stored;
     const response = index >= bars / 2;
     const material = grammar ? grammarMotif(source, { plan: grammar, offset: index, meter }) : source;
     const protectedBeats=at=>[...(prior?.melody?.resolutions??[]),...(prior?.melody?.ties??[])].flatMap(r=>[r.from,r.to]).filter(p=>p?.bar===at).map(p=>p.beat);
-    const shaped = shapeFormNotes(subdivideSection(material,{motion:section?.curves?section.motion:null,meter,
-        protectedBeats:protectedBeats(bar),density:settings.leadDensity,index}), section, index, settings.sections?.mode === 'strong',section?.curves?protectedBeats(bar):[]);
+    const shaped = shapeFormNotes(subdivideSection(material,{motion:section?.curves&&!locked?section.motion:null,meter,
+        protectedBeats:protectedBeats(bar),density:settings.leadDensity,index}), songSection(section), index, settings.sections?.mode === 'strong',section?.curves?protectedBeats(bar):[]);
     const fragmented=fragmentLead(shaped,{gesture:leadGesture,meter,protectedBeats:protectedBeats(bar)});
     const pickupGesture=args.leadPickups===true?transitionFor(section,bar):null;
     const picked=pickupLead(fragmented,{gesture:pickupGesture,meter,protectedBeats:protectedBeats(bar)});
-    const push = (list, at, offset) => syncopate(list, { amount: settings.leadSyncopation ?? 0, meter, seed, bar: at, index: offset, bars,
+    const push = (list, at, offset) => syncopate(list, { amount: locked ? 0 : settings.leadSyncopation ?? 0, meter, seed, bar: locked ? offset : at, index: offset, bars,
         protectedBeats: protectedBeats(at), keepLast: offset === bars - 1, delay: true });
     const notes = push(picked, bar, index).map((note, i) => ({ ...note,
         degree: note.degree + (duet ? 0 : phrase.shift + (response && phrase.role === 'answer' && i === 0 ? -1 : 0)) }));
@@ -164,21 +182,21 @@ export function arrangeBarLatest(args) {
         previousMidi: prev?.leadMidi ?? 79, settings, closing: index === bars - 1 }) : [];
     if (activeLead && args.harmonyForecast?.length) {
         const horizon = args.harmonyForecast.filter(h => h.bar < phrase.start + bars).map(h => {
-            const offset = h.bar - phrase.start, memory = themes[duet && duet.mode !== 'contrary motion' ? 0 : phrase.themeId][offset % 2];
+            const offset = h.bar - phrase.start, memory = themes[duet && duet.mode !== 'contrary motion' ? 0 : phrase.themeId][offset % themeBars];
             const motif = duet ? duetMotif(memory, { plan: duet, offset }) : development ? developTheme(memory, { operation: development.operations[offset], meter,
                 interval: development.interval, density: development.density }) : memory;
             const futureSection = form ? formEnvelope(form, h.bar, settings.sections?.mode) : section;
             const rhythmic = grammar ? grammarMotif(motif, { plan: grammar, offset, meter }) : motif;
-            const subdivided=subdivideSection(rhythmic,{motion:futureSection?.curves?futureSection.motion:null,meter,
+            const subdivided=subdivideSection(rhythmic,{motion:futureSection?.curves&&!locked?futureSection.motion:null,meter,
                 protectedBeats:protectedBeats(h.bar),density:settings.leadDensity,index:offset});
-            const fragment=fragmentLead(shapeFormNotes(subdivided, futureSection, offset, settings.sections?.mode === 'strong',futureSection?.curves?protectedBeats(h.bar):[]),
+            const fragment=fragmentLead(shapeFormNotes(subdivided, songSection(futureSection), offset, settings.sections?.mode === 'strong',futureSection?.curves?protectedBeats(h.bar):[]),
                 {gesture:args.leadTransitions===true?transitionFor(futureSection,h.bar):null,meter,protectedBeats:protectedBeats(h.bar)});
-            return { ...h, ...(futureSection?.curves?{tension:futureSection.motion.tension}:{}), midpoint: bars === 8 && offset === 3, notes: push(pickupLead(fragment,
+            return { ...h, ...(futureSection?.curves?{tension:futureSection.motion.tension}:{}), midpoint: bars === 8 && offset === 3, ...(fidelity ? { fidelity, centre: themeCentre(themes[duet && duet.mode !== 'contrary motion' ? 0 : phrase.themeId]) } : {}), notes: push(pickupLead(fragment,
                 {gesture:args.leadPickups===true?transitionFor(futureSection,h.bar):null,meter,protectedBeats:protectedBeats(h.bar)}), h.bar, offset).map((note, i) => ({ ...note,
                 degree: note.degree + (duet ? 0 : phrase.shift + (offset >= bars / 2 && phrase.role === 'answer' && i === 0 ? -1 : 0)) })) };
         });
         if (horizon.length) {
-            const melody = planPhraseMelody({ bars: horizon, meter, rhythmGrammar: !!grammar, resolveNotes: args.resolveNotes === true, range: base.state.ranges.lead, settings, previousMidi: prev?.leadMidi ?? 79,
+            const melody = planPhraseMelody({ bars: horizon, meter, rhythmGrammar: !!grammar && !locked, resolveNotes: args.resolveNotes === true && !locked, range: base.state.ranges.lead, settings, previousMidi: prev?.leadMidi ?? 79,
                 seed: seed ^ phrase.themeId, closing: horizon.at(-1).bar === phrase.start + bars - 1 }, prior?.melody);
             composition.melody = melody;
             lead = melody.bars.find(b => b.bar === bar).events.map(event => ({ ...event }));
@@ -229,7 +247,11 @@ export function arrangeBarLatest(args) {
         const partPlan = args.partRhythmGrammar === true ? planPartGrammar({ seed, phrase, roles: rhythm.roles }) : null;
         if (partPlan) composition.partGrammar = partPlan;
         // One chord part through the ensemble rules: spaced under the lead, shaped, given its part grammar and any transition gesture.
+        const songTheme = themes[phrase.themeId];
         const shapeChords = (list, style, pattern) => {
+            // In a song a rhythmic chord part plays the theme's opening rhythm (songParts.js); its section gestures stay.
+            if (styled && settings.melodyParts?.rhythm !== false && SONG_RHYTHM_STYLES.includes(style) && !args.lanes)
+                return gesturePart(songRhythm(list, { notes: songTheme[index % 2], style, meter }), { gesture, meter, style, enabled: settings.thinPadUnderLead });
             const split = splitPulseRoots(list, { meter, enabled: style === 'pulse' && pattern === 'split' });
             let part = spaceAccompaniment(split.rest, { rhythm, meter, style, enabled: settings.thinPadUnderLead });
             part = shapeRhythmicPart(part, { role: 'pad', style, rhythm, meter, enabled: settings.thinPadUnderLead });
@@ -241,7 +263,11 @@ export function arrangeBarLatest(args) {
         const pad = shapeChords(events.filter(e => e.role === 'pad'), base.state.phrase.padStyle, base.state.phrase.padPattern);
         const rhythmChords = rhythmPlays ? asRhythm(shapeChords(asPad(events.filter(e => e.role === 'rhythm')), rhythmStyle, base.state.phrase.rhythmPattern)) : [];
         let bass = events.filter(e => e.role === 'bass');
-        if (bass.length && !base.state.phrase.pedal) {
+        // In a song the bass plays the theme's rhythm and shape on chord tones; a walking bass and a pedal keep their own line.
+        const bassSings = styled && settings.melodyParts?.bass !== false && !base.state.phrase.pedal && base.state.phrase.bassStyle !== 'walking';
+        if (bassSings) composition.songBar = songTheme[index % themeBars];
+        if (bass.length && bassSings) bass = songBass(bass, { notes: composition.songBar, style: base.state.phrase.bassStyle, chord, range: base.state.ranges.bass, meter });
+        else if (bass.length && !base.state.phrase.pedal) {
             bass = base.state.phrase.bassStyle === 'walking'
                 ? walkingBass({ chord, nextChord: args.nextChord, scalePcs: chord.harmonyPcs ?? scalePcs, range: base.state.ranges.bass,
                     previousMidi: prev?.bassMidi ?? 40, meter, chordEnds: args.barsLeftInChord === 1, seed, bar, rhythm })
@@ -272,7 +298,7 @@ export function arrangeBarLatest(args) {
             }
         }
         counter=gesturePart(counter,{gesture,meter,style:base.state.phrase.counter?.kind==='harmony'?'harmony':'line'});
-        if (args.jointCounterpoint === true && activeLead && composition.melody && base.state.phrase.counter
+        if (args.jointCounterpoint === true && !locked && activeLead && composition.melody && base.state.phrase.counter
             && base.state.phrase.counter.kind !== 'harmony' && section?.type !== 'intro'
             && !(section?.type === 'build' && settings.sections.mode === 'strong' && section.progress < .5)) {
             const memory = composition.duetMemory ?? duetMemory;

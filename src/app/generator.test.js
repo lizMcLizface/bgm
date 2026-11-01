@@ -95,7 +95,8 @@ test('developed strategies preserve actual forecasts, theme memory and restored 
             expect(b.events.every(e=>[e.midi,e.beat,e.length,e.velocity].every(Number.isFinite)&&e.length>0)).toBe(true);
         }
         for(const forecast of forecasts)for(const h of forecast.filter(h=>h.bar<128))expect(h.chord).toEqual(p.plan.get(h.bar).chord);
-        expect(p.plan.get(127).state.composition.themes).toEqual(p.plan.get(0).state.composition.themes);
+        // (a Change preset's tune moves on by design; it must still restore exactly, below)
+        if(settings.melodyPlan!=='change')expect(p.plan.get(127).state.composition.themes).toEqual(p.plan.get(0).state.composition.themes);
         const copy=g.planner();for(let bar=0;bar<48;bar++)copy.planBar(bar);
         copy.plan.set(47,JSON.parse(JSON.stringify(copy.plan.get(47))));
         for(let bar=48;bar<128;bar++){copy.planBar(bar);expect(copy.plan.get(bar)).toEqual(p.plan.get(bar));copy.plan.delete(bar-2);}
@@ -712,7 +713,8 @@ describe('library presets as the generator plays them', () => {
             gen.reset();
             const bars = play(gen, 40);
             bars.forEach((b) => {
-                expect(b.bpm).toBe(scene.settings.bpm ?? 72);
+                // (an intensity program moves the tempo on purpose)
+                if ((scene.settings.push?.program?.mode ?? 'off') === 'off') expect(b.bpm).toBe(scene.settings.bpm ?? 72);
                 b.events.forEach((e) => {
                     expect(Number.isFinite(e.beat) && Number.isFinite(e.length) && Number.isFinite(e.midi) && Number.isFinite(e.velocity)).toBe(true);
                 });
@@ -1934,4 +1936,75 @@ test('a planned bar of the step sequencer records the stage it plays, for the pl
     g.planBar(2); g.planBar(7);
     expect(g.plan.get(2).seqPlayed).toEqual({ chosen: 5, fill: false });
     expect(g.plan.get(7).seqPlayed).toEqual({ chosen: 5, fill: true });
+});
+
+describe('a styled preset', () => {
+    const planned = (settings) => {
+        const p = new Generator({ ...defaultSettings(), seed: 5, leadActivity: 1, leadDensity: .3, humanize: { timing: 0, velocity: 0, detune: 0 }, swing: 0, ...settings }).planner();
+        for (let bar = 0; bar < 32; bar++) p.planBar(bar);
+        return [...p.plan.values()].sort((a, z) => a.bar - z.bar);
+    };
+
+    test('plays a composed four-bar theme; Noodle keeps the drawn motif, whatever the style', () => {
+        expect(planned({ melodyPlan: 'same', melodyStyle: 'hook' }).at(-1).state.composition.themes[0]).toHaveLength(4);
+        expect(planned({ melodyStyle: 'hook' }).at(-1).state.composition.themes[0]).toHaveLength(2);
+    });
+
+    const themesOver = (settings, bars) => {
+        const p = new Generator({ ...defaultSettings(), seed: 5, leadActivity: 1, leadDensity: .3, bpm: 120, ...settings }).planner();
+        for (let bar = 0; bar < bars; bar++) p.planBar(bar);
+        return [...p.plan.values()].sort((a, z) => a.bar - z.bar).map((b) => JSON.stringify(b.state.composition.themes));
+    };
+
+    test('Same keeps one song, even while the intensity moves the density', () => {
+        const program = { level: 0, program: { mode: 'intervals', low: -1, high: 1, lowSeconds: 30, highSeconds: 30, rampSeconds: 5, minutes: 5 } };
+        expect(new Set(themesOver({ melodyPlan: 'same', push: program }, 200)).size).toBe(1);
+    });
+
+    test('Change starts as the same song, then turns into others a bar of the tune at a time', () => {
+        const bars = 15 * 60 / 2; // fifteen minutes of 4/4 at 120
+        const same = themesOver({ melodyPlan: 'same' }, 8)[0], changing = themesOver({ melodyPlan: 'change' }, bars);
+        expect(changing[0]).toBe(same);
+        const versions = [...new Set(changing)];
+        expect(versions.length).toBeGreaterThanOrEqual(4);
+        expect(versions.length).toBeLessThanOrEqual(7);
+        const barsOf = (text) => JSON.parse(text)[0].map((bar) => JSON.stringify(bar));
+        for (let i = 1; i < Math.min(4, versions.length); i++) {
+            const before = barsOf(versions[i - 1]), after = barsOf(versions[i]);
+            expect(after.filter((bar, b) => bar !== before[b]).length).toBeLessThanOrEqual(2);
+        }
+        expect(barsOf(versions.at(-1))[0]).not.toBe(barsOf(versions[0])[0]);
+    });
+
+    test('the bass and a rhythmic chord part join the song, each can be left out, and Noodle ignores them', () => {
+        const parts = (over) => planned({ melodyPlan: 'same', melodyStyle: 'song', padWeights: { sustain: 0, pulse: 100, arpeggio: 0, sequence: 0, rolled: 0, stacked: 0 },
+            bassWeights: { whole: 0, half: 100, walking: 0, drive: 0 }, sections: { mode: 'off', phrases: 2 }, ...over });
+        const line = (list, role) => list.map((b) => b.events.filter((e) => e.role === role).map((e) => [e.midi, +e.beat.toFixed(3)]));
+        const all = parts({}), noBass = parts({ melodyParts: { bass: false, rhythm: true } }), noChords = parts({ melodyParts: { bass: true, rhythm: false } });
+        expect(line(all, 'bass')).not.toEqual(line(noBass, 'bass'));
+        expect(line(all, 'pad')).toEqual(line(noBass, 'pad'));
+        expect(line(all, 'pad')).not.toEqual(line(noChords, 'pad'));
+        const chordTones = all.flatMap((b) => b.events.filter((e) => e.role === 'bass').map((e) => b.chord.pitchClasses.includes(e.midi % 12)));
+        expect(chordTones.length).toBeGreaterThan(30);
+        expect(chordTones.every(Boolean)).toBe(true);
+        const noodle = (over) => line(planned({ ...over }), 'bass');
+        expect(noodle({ melodyParts: { bass: false, rhythm: false } })).toEqual(noodle({}));
+    });
+
+    test('switching from Same to Change carries on with the tune that is playing', () => {
+        const p = new Generator({ ...defaultSettings(), seed: 5, leadActivity: 1, leadDensity: .3, melodyPlan: 'same' }).planner();
+        for (let bar = 0; bar < 8; bar++) p.planBar(bar);
+        const before = p.plan.get(7).state.composition.themes;
+        p.settings = { ...p.settings, melodyPlan: 'change' };
+        p.planBar(8);
+        expect(p.plan.get(8).state.composition.themes).toEqual(before);
+    });
+
+    test('plays real lead notes in every style', () => {
+        for (const melodyStyle of ['song', 'lounge', 'hook', 'game', 'cinema', 'riff']) {
+            const lead = planned({ melodyPlan: 'same', melodyStyle, leadDensity: .7 }).flatMap((b) => b.events.filter((e) => e.role === 'lead'));
+            expect(lead.length).toBeGreaterThan(30);
+            expect(lead.every((e) => Number.isFinite(e.midi) && e.length > 0)).toBe(true);
+        }
+    });
 });

@@ -148,7 +148,9 @@
           "amount": 0.2
         },
         "ambienceVolume": 0.4,
-        "leadSyncopation": 0.2
+        "leadSyncopation": 0.2,
+        "melodyPlan": "change",
+        "melodyStyle": "lounge"
       },
       "voices": {
         "pad": "Felt Keys (updated)",
@@ -338,7 +340,9 @@
           "amount": 0.2
         },
         "ambienceVolume": 0.66,
-        "leadSyncopation": 0.3
+        "leadSyncopation": 0.3,
+        "melodyPlan": "change",
+        "melodyStyle": "lounge"
       },
       "voices": {
         "pad": "FM Rhodes",
@@ -442,7 +446,9 @@
           "perc": 0.44,
           "rhythm": 0.78
         },
-        "ambienceVolume": 0.72
+        "ambienceVolume": 0.72,
+        "melodyPlan": "change",
+        "melodyStyle": "cinema"
       },
       "voices": {
         "pad": "Breathing Pad",
@@ -537,7 +543,9 @@
         },
         "ambienceVolume": 0.66,
         "padRoot": "unlessBass",
-        "chordSize": "functional"
+        "chordSize": "functional",
+        "melodyPlan": "change",
+        "melodyStyle": "lounge"
       },
       "voices": {
         "pad": "Glass Pad",
@@ -625,7 +633,9 @@
           "mode": "gentle",
           "phrases": 4
         },
-        "ambienceVolume": 0.72
+        "ambienceVolume": 0.72,
+        "melodyPlan": "change",
+        "melodyStyle": "cinema"
       },
       "voices": {
         "pad": "Underwater",
@@ -722,7 +732,9 @@
           "perc": 0.44,
           "rhythm": 0.33
         },
-        "ambienceVolume": 0.72
+        "ambienceVolume": 0.72,
+        "melodyPlan": "change",
+        "melodyStyle": "cinema"
       },
       "voices": {
         "pad": "Tremolo Organ",
@@ -814,7 +826,9 @@
           "meter": "6/8",
           "halfTime": false
         },
-        "padRoot": "unlessBass"
+        "padRoot": "unlessBass",
+        "melodyPlan": "change",
+        "melodyStyle": "song"
       },
       "voices": {
         "pad": "Harp Pluck",
@@ -1033,7 +1047,9 @@
         },
         "ambienceVolume": 0.66,
         "leadSyncopation": 0.35,
-        "padRoot": "unlessBass"
+        "padRoot": "unlessBass",
+        "melodyPlan": "change",
+        "melodyStyle": "lounge"
       },
       "voices": {
         "pad": "Lo-fi Tape Pad",
@@ -1125,7 +1141,9 @@
           "mode": "gentle",
           "phrases": 4
         },
-        "ambienceVolume": 0.72
+        "ambienceVolume": 0.72,
+        "melodyPlan": "change",
+        "melodyStyle": "cinema"
       },
       "voices": {
         "pad": "Choir Ah",
@@ -1222,7 +1240,9 @@
           "mode": "add6",
           "amount": 0.2
         },
-        "leadSyncopation": 0.2
+        "leadSyncopation": 0.2,
+        "melodyPlan": "change",
+        "melodyStyle": "lounge"
       },
       "voices": {
         "pad": "Soft Keys (updated)",
@@ -1392,7 +1412,9 @@
         "sections": {
           "mode": "gentle",
           "phrases": 2
-        }
+        },
+        "melodyPlan": "change",
+        "melodyStyle": "lounge"
       },
       "voices": {
         "pad": "Music Box",
@@ -1481,7 +1503,9 @@
           "counter": 0.36,
           "perc": 0.33,
           "rhythm": 0.72
-        }
+        },
+        "melodyPlan": "change",
+        "melodyStyle": "cinema"
       },
       "voices": {
         "pad": "Shimmer",
@@ -1581,7 +1605,9 @@
           "amount": 0.2
         },
         "padRoot": "unlessBass",
-        "chordSize": "functional"
+        "chordSize": "functional",
+        "melodyPlan": "change",
+        "melodyStyle": "cinema"
       },
       "voices": {
         "pad": "Velvet Pad",
@@ -1707,7 +1733,9 @@
         },
         "leadSyncopation": 0.2,
         "padRoot": "unlessBass",
-        "chordSize": "functional"
+        "chordSize": "functional",
+        "melodyPlan": "change",
+        "melodyStyle": "lounge"
       },
       "voices": {
         "pad": "Coastal FM Lead",
@@ -1801,7 +1829,9 @@
           "mode": "add6",
           "amount": 0.2
         },
-        "chordSize": "functional"
+        "chordSize": "functional",
+        "melodyPlan": "change",
+        "melodyStyle": "lounge"
       },
       "voices": {
         "pad": "Tine Keys",
@@ -1886,7 +1916,9 @@
         "chordColour": {
           "mode": "add9",
           "amount": 0.2
-        }
+        },
+        "melodyPlan": "change",
+        "melodyStyle": "lounge"
       },
       "voices": {
         "pad": "Soft Keys (updated)",
@@ -2056,7 +2088,9 @@
         "sections": {
           "mode": "gentle",
           "phrases": 4
-        }
+        },
+        "melodyPlan": "change",
+        "melodyStyle": "cinema"
       },
       "voices": {
         "pad": "Slow Sweep",
@@ -2158,7 +2192,9 @@
           "minutes": 10
         },
         "padVibrato": 0.5,
-        "swing": 0.1
+        "swing": 0.1,
+        "melodyPlan": "change",
+        "melodyStyle": "lounge"
       },
       "voices": {
         "pad": "Glass Pad",
@@ -2423,7 +2459,9 @@
         "leadSyncopation": 0.25,
         "padRoot": "unlessBass",
         "chordSize": "functional",
-        "layers": "rhythm"
+        "layers": "rhythm",
+        "melodyPlan": "change",
+        "melodyStyle": "cinema"
       },
       "voices": {
         "pad": "Arp Pluck",
@@ -2543,7 +2581,9 @@
         "arc": {
           "shape": "wave",
           "minutes": 20
-        }
+        },
+        "melodyPlan": "change",
+        "melodyStyle": "cinema"
       },
       "voices": {
         "pad": "Void Pad",
@@ -2668,7 +2708,9 @@
         "leadSyncopation": 0.3,
         "padRoot": "unlessBass",
         "chordSize": "functional",
-        "layers": "rhythm"
+        "layers": "rhythm",
+        "melodyPlan": "change",
+        "melodyStyle": "cinema"
       },
       "voices": {
         "pad": "Arp Pluck",
@@ -2792,7 +2834,9 @@
         "leadSyncopation": 0.2,
         "padRoot": "unlessBass",
         "chordSize": "functional",
-        "layers": "rhythm"
+        "layers": "rhythm",
+        "melodyPlan": "change",
+        "melodyStyle": "cinema"
       },
       "voices": {
         "pad": "Arp Pluck",
@@ -2917,7 +2961,9 @@
         "arc": {
           "shape": "wave",
           "minutes": 15
-        }
+        },
+        "melodyPlan": "change",
+        "melodyStyle": "cinema"
       },
       "voices": {
         "lead": "Starmap Piano (updated)",
@@ -3254,7 +3300,9 @@
             "level": 0.45
           }
         },
-        "padRoot": "unlessBass"
+        "padRoot": "unlessBass",
+        "melodyPlan": "change",
+        "melodyStyle": "song"
       },
       "voices": {
         "pad": "Warm Organ",
@@ -3730,7 +3778,9 @@
         },
         "leadSyncopation": 0.25,
         "padRoot": "unlessBass",
-        "layers": "rhythm"
+        "layers": "rhythm",
+        "melodyPlan": "change",
+        "melodyStyle": "game"
       },
       "voices": {
         "pad": "Arp Pluck",
@@ -3997,7 +4047,9 @@
         },
         "leadSyncopation": 0.25,
         "padRoot": "unlessBass",
-        "layers": "rhythm"
+        "layers": "rhythm",
+        "melodyPlan": "change",
+        "melodyStyle": "game"
       },
       "voices": {
         "pad": "Arp Pluck",
@@ -4249,7 +4301,9 @@
         },
         "chordBorrow": 0,
         "leadSyncopation": 0.25,
-        "padRoot": "unlessBass"
+        "padRoot": "unlessBass",
+        "melodyPlan": "change",
+        "melodyStyle": "song"
       },
       "voices": {
         "pad": "Heroic Strings",
@@ -4475,7 +4529,9 @@
           "halfTime": false
         },
         "padRoot": "unlessBass",
-        "layers": "rhythm"
+        "layers": "rhythm",
+        "melodyPlan": "change",
+        "melodyStyle": "song"
       },
       "voices": {
         "pad": "Harp Pluck",
@@ -4699,7 +4755,9 @@
         },
         "chordBorrow": 0,
         "padRoot": "unlessBass",
-        "layers": "rhythm"
+        "layers": "rhythm",
+        "melodyPlan": "change",
+        "melodyStyle": "song"
       },
       "voices": {
         "pad": "Soft Harp",
@@ -5143,7 +5201,9 @@
         },
         "ambienceVolume": 0.66,
         "leadSyncopation": 0.2,
-        "padRoot": "unlessBass"
+        "padRoot": "unlessBass",
+        "melodyPlan": "change",
+        "melodyStyle": "lounge"
       },
       "voices": {
         "pad": "Nylon Guitar",
@@ -5230,7 +5290,9 @@
           "mode": "gentle",
           "phrases": 2
         },
-        "ambienceVolume": 0.45
+        "ambienceVolume": 0.45,
+        "melodyPlan": "change",
+        "melodyStyle": "cinema"
       },
       "voices": {
         "pad": "Felt Keys (updated)",
@@ -5407,7 +5469,9 @@
           "halfTime": false
         },
         "leadSyncopation": 0.35,
-        "chordSize": "functional"
+        "chordSize": "functional",
+        "melodyPlan": "change",
+        "melodyStyle": "lounge"
       },
       "voices": {
         "pad": "Soft Keys (updated)",
@@ -5593,7 +5657,9 @@
         },
         "ambienceVolume": 0.66,
         "leadSyncopation": 0.2,
-        "padRoot": "unlessBass"
+        "padRoot": "unlessBass",
+        "melodyPlan": "change",
+        "melodyStyle": "lounge"
       },
       "voices": {
         "pad": "Nylon Guitar",
@@ -5690,7 +5756,9 @@
           "mode": "gentle",
           "phrases": 4
         },
-        "ambienceVolume": 0.72
+        "ambienceVolume": 0.72,
+        "melodyPlan": "change",
+        "melodyStyle": "cinema"
       },
       "voices": {
         "pad": "Void Pad",
@@ -5793,7 +5861,9 @@
         "arc": {
           "shape": "winddown",
           "minutes": 30
-        }
+        },
+        "melodyPlan": "change",
+        "melodyStyle": "song"
       },
       "voices": {
         "pad": "Music Box",
@@ -5920,7 +5990,9 @@
           "mode": "add9",
           "amount": 0.55
         },
-        "layers": "split"
+        "layers": "split",
+        "melodyPlan": "change",
+        "melodyStyle": "song"
       },
       "voices": {
         "pad": "Felt Keys (updated)",
@@ -6563,7 +6635,9 @@
           "amount": 0.35
         },
         "padRoot": "unlessBass",
-        "layers": "rhythm"
+        "layers": "rhythm",
+        "melodyPlan": "change",
+        "melodyStyle": "song"
       },
       "voices": {
         "pad": "Nylon Guitar",
@@ -6811,7 +6885,9 @@
           "mode": "tonic",
           "amount": 0.35
         },
-        "layers": "rhythm"
+        "layers": "rhythm",
+        "melodyPlan": "change",
+        "melodyStyle": "song"
       },
       "voices": {
         "pad": "Felt Keys (updated)",
@@ -8257,7 +8333,9 @@
         "chordColour": {
           "mode": "add9",
           "amount": 0.2
-        }
+        },
+        "melodyPlan": "change",
+        "melodyStyle": "lounge"
       },
       "voices": {
         "pad": "Tine Keys",
@@ -8349,7 +8427,9 @@
         "arc": {
           "shape": "winddown",
           "minutes": 30
-        }
+        },
+        "melodyPlan": "change",
+        "melodyStyle": "cinema"
       },
       "voices": {
         "pad": "Morning Haze",
@@ -8444,7 +8524,9 @@
           "split": 100
         },
         "thinPadUnderLead": false,
-        "leadSyncopation": 0.3
+        "leadSyncopation": 0.3,
+        "melodyPlan": "change",
+        "melodyStyle": "game"
       },
       "voices": {
         "pad": "Pixel Piano",
@@ -8639,7 +8721,9 @@
         },
         "leadSyncopation": 0.25,
         "padRoot": "unlessBass",
-        "layers": "rhythm"
+        "layers": "rhythm",
+        "melodyPlan": "change",
+        "melodyStyle": "game"
       },
       "voices": {
         "pad": "Arp Pluck",
@@ -8729,7 +8813,9 @@
           "perc": 0.59
         },
         "leadSyncopation": 0.15,
-        "padRoot": "unlessBass"
+        "padRoot": "unlessBass",
+        "melodyPlan": "change",
+        "melodyStyle": "game"
       },
       "voices": {
         "pad": "Pixel Piano",
@@ -9009,7 +9095,9 @@
         },
         "leadSyncopation": 0.2,
         "padRoot": "unlessBass",
-        "layers": "rhythm"
+        "layers": "rhythm",
+        "melodyPlan": "change",
+        "melodyStyle": "game"
       },
       "voices": {
         "pad": "Arp Pluck",
@@ -9110,7 +9198,9 @@
         },
         "leadSyncopation": 0.25,
         "padRoot": "unlessBass",
-        "chordSize": "functional"
+        "chordSize": "functional",
+        "melodyPlan": "change",
+        "melodyStyle": "game"
       },
       "voices": {
         "pad": "Heroic Strings",
@@ -9200,7 +9290,9 @@
           "perc": 0.44,
           "rhythm": 0.78
         },
-        "ambienceVolume": 0.72
+        "ambienceVolume": 0.72,
+        "melodyPlan": "change",
+        "melodyStyle": "song"
       },
       "voices": {
         "pad": "Soft Harp",
@@ -9224,6 +9316,878 @@
       "layerVoices": {
         "pad": "Soft Pad",
         "rhythm": "Soft Harp"
+      }
+    },
+    {
+      "name": "Crystal Prelude, Slightly Overdue",
+      "category": "classics",
+      "isNew": true,
+      "blurb": "Final Fantasy, Prelude and Main Theme: endless rising harp arpeggios under a warm string bed, with a clarinet and a second string line singing a long tune that slowly becomes another",
+      "tags": [
+        "final fantasy",
+        "jrpg",
+        "harp",
+        "split",
+        "melody"
+      ],
+      "voices": {
+        "pad": "Warm Strings",
+        "bass": "Felt Bass",
+        "lead": "Measured Clarinet",
+        "counter": "Warm Strings"
+      },
+      "layerVoices": {
+        "rhythm": "Soft Harp"
+      },
+      "settings": {
+        "meter": "4/4",
+        "layers": "split",
+        "melodyPlan": "change",
+        "sectionTone": true,
+        "humanize": {
+          "timing": 7,
+          "velocity": 0.08,
+          "detune": 2
+        },
+        "padRoot": "unlessBass",
+        "chordSize": "functional",
+        "padContour": 0.35,
+        "leadInertia": 0.4,
+        "leadTendency": 0.4,
+        "timbreDrift": 0.25,
+        "padVibrato": 0.2,
+        "evenLoudness": 0.4,
+        "ducking": 0.25,
+        "sectionSpace": 0.5,
+        "playAmbience": false,
+        "voices": {
+          "pad": {
+            "octave": -1,
+            "wander": "off",
+            "chance": 0.3
+          }
+        },
+        "tonic": 0,
+        "mode": "Major-1",
+        "bpm": 80,
+        "progression": 22,
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 55,
+          "pulse": 0,
+          "arpeggio": 45,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "arpWeights": {
+          "bounce": 10,
+          "up": 70,
+          "down": 5,
+          "broken": 15
+        },
+        "bassWeights": {
+          "whole": 65,
+          "half": 35,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "off",
+          "activity": 0
+        },
+        "leadActivity": 0.95,
+        "leadDensity": 0.2,
+        "leadLeaps": 0.4,
+        "leadRepeat": 0.6,
+        "leadEnding": "settled",
+        "melodyStyle": "cinema",
+        "counter": {
+          "mode": "line",
+          "activity": 0.3
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "layerFlow": {
+          "mode": "sections",
+          "phrases": 4
+        },
+        "dynamics": {
+          "level": 1,
+          "range": 1.3,
+          "attack": 0.3,
+          "brightness": 0.5
+        },
+        "rubato": 0.45,
+        "ornaments": 0.25,
+        "keyLift": 0.3,
+        "arc": {
+          "shape": "rise",
+          "minutes": 10
+        },
+        "padMotion": {
+          "lean": 0.2,
+          "fast": 0.08,
+          "swell": 0.05
+        },
+        "volumes": {
+          "pad": 0.42,
+          "bass": 0.45,
+          "lead": 0.66,
+          "counter": 0.7,
+          "perc": 0.3,
+          "rhythm": 0.8
+        },
+        "bus": {
+          "sends": {
+            "pad": 0.35,
+            "bass": 0,
+            "lead": 0.3,
+            "counter": 0.3,
+            "perc": 0,
+            "rhythm": 0.12
+          },
+          "rack": {
+            "effects.dry": 1,
+            "effects.reverb": 0.3,
+            "effects.delay": 0,
+            "effects.delayMs": 375,
+            "effects.feedback": 0.25
+          }
+        }
+      }
+    },
+    {
+      "name": "Corridors of Slightly Late",
+      "category": "classics",
+      "isNew": true,
+      "blurb": "Chrono Trigger, Corridors of Time: a floating modal haze, hand drums in seven and mallets circling under a breathy pan flute that bends between its notes",
+      "tags": [
+        "chrono trigger",
+        "jrpg",
+        "modal",
+        "split",
+        "melody",
+        "odd meter"
+      ],
+      "voices": {
+        "pad": "Morning Haze",
+        "bass": "Upright Pluck",
+        "lead": "Pan Flute"
+      },
+      "layerVoices": {
+        "rhythm": "Glass Mallet"
+      },
+      "settings": {
+        "meter": "7/8",
+        "layers": "split",
+        "melodyPlan": "change",
+        "sectionTone": true,
+        "humanize": {
+          "timing": 7,
+          "velocity": 0.08,
+          "detune": 2
+        },
+        "padRoot": "unlessBass",
+        "chordSize": "functional",
+        "padContour": 0.35,
+        "leadInertia": 0.4,
+        "leadTendency": 0.4,
+        "timbreDrift": 0.25,
+        "padVibrato": 0.2,
+        "evenLoudness": 0.4,
+        "ducking": 0.25,
+        "sectionSpace": 0.5,
+        "playAmbience": false,
+        "voices": {
+          "pad": {
+            "octave": -1,
+            "wander": "off",
+            "chance": 0.3
+          }
+        },
+        "tonic": 9,
+        "mode": "Major-2",
+        "bpm": 92,
+        "progression": 12,
+        "barsPerChord": 2,
+        "padNotes": 3,
+        "padWeights": {
+          "sustain": 50,
+          "pulse": 0,
+          "arpeggio": 20,
+          "sequence": 30,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "arpWeights": {
+          "bounce": 25,
+          "up": 15,
+          "down": 10,
+          "broken": 50
+        },
+        "bassWeights": {
+          "whole": 10,
+          "half": 90,
+          "walking": 0,
+          "drive": 0
+        },
+        "bassEuclid": 0.25,
+        "drums": {
+          "style": "hand",
+          "activity": 0.42,
+          "variation": 0.4,
+          "sprinkle": 0.1
+        },
+        "chordColour": {
+          "mode": "sus2",
+          "amount": 0.35
+        },
+        "leadScale": "pentatonic",
+        "leadActivity": 0.9,
+        "leadDensity": 0.32,
+        "leadLeaps": 0.35,
+        "leadRepeat": 0.72,
+        "leadSyncopation": 0.1,
+        "melodyStyle": "riff",
+        "portamento": {
+          "lead": 0.25,
+          "counter": 0,
+          "bass": 0
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "dynamics": {
+          "level": 1,
+          "range": 1.05,
+          "attack": 0.25,
+          "brightness": 0.45
+        },
+        "rubato": 0.12,
+        "ornaments": 0.5,
+        "keyLift": 0,
+        "swing": 0,
+        "padMotion": {
+          "lean": 0.2,
+          "fast": 0.1,
+          "swell": 0.05
+        },
+        "volumes": {
+          "pad": 0.3,
+          "bass": 0.55,
+          "lead": 0.72,
+          "counter": 0.35,
+          "perc": 0.6,
+          "rhythm": 0.5
+        },
+        "bus": {
+          "sends": {
+            "pad": 0.3,
+            "bass": 0,
+            "lead": 0.35,
+            "counter": 0,
+            "perc": 0.08,
+            "rhythm": 0.12
+          },
+          "rack": {
+            "effects.dry": 1,
+            "effects.reverb": 0.22,
+            "effects.delay": 0.15,
+            "effects.delayMs": 326,
+            "effects.feedback": 0.3
+          }
+        }
+      }
+    },
+    {
+      "name": "Rain Over the Bug Capital",
+      "category": "classics",
+      "isNew": true,
+      "blurb": "Hollow Knight, City of Tears: falling piano figures in the rain, a mournful voice above and low strings holding the stone city together",
+      "tags": [
+        "hollow knight",
+        "melancholy",
+        "piano",
+        "rain",
+        "split",
+        "melody"
+      ],
+      "voices": {
+        "pad": "Warm Strings",
+        "bass": "Sub Bass",
+        "lead": "Lament Lead",
+        "counter": "Haunted Viola"
+      },
+      "layerVoices": {
+        "rhythm": "Soft Drama v2"
+      },
+      "settings": {
+        "meter": "4/4",
+        "layers": "split",
+        "melodyPlan": "change",
+        "sectionTone": true,
+        "humanize": {
+          "timing": 7,
+          "velocity": 0.08,
+          "detune": 2
+        },
+        "padRoot": "unlessBass",
+        "chordSize": "functional",
+        "padContour": 0.35,
+        "leadInertia": 0.4,
+        "leadTendency": 0.4,
+        "timbreDrift": 0.25,
+        "padVibrato": 0.3,
+        "evenLoudness": 0.4,
+        "ducking": 0.25,
+        "sectionSpace": 0.75,
+        "playAmbience": true,
+        "voices": {
+          "pad": {
+            "octave": -1,
+            "wander": "off",
+            "chance": 0.3
+          }
+        },
+        "tonic": 2,
+        "mode": "Major-6",
+        "bpm": 68,
+        "progression": 8,
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 55,
+          "pulse": 0,
+          "arpeggio": 45,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "arpWeights": {
+          "bounce": 15,
+          "up": 5,
+          "down": 60,
+          "broken": 20
+        },
+        "bassWeights": {
+          "whole": 85,
+          "half": 15,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "off",
+          "activity": 0
+        },
+        "mood": {
+          "level": -0.2
+        },
+        "leadEnding": "open",
+        "leadActivity": 1,
+        "leadDensity": 0.16,
+        "leadLeaps": 0.45,
+        "leadRepeat": 0.65,
+        "melodyStyle": "cinema",
+        "counter": {
+          "mode": "answer",
+          "activity": 0.22
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "dynamics": {
+          "level": 0.95,
+          "range": 1.4,
+          "attack": 0.35,
+          "brightness": 0.35
+        },
+        "rubato": 0.6,
+        "ornaments": 0.2,
+        "keyLift": 0,
+        "ambience": {
+          "rain": 0.42,
+          "thunder": 0.06
+        },
+        "ambienceVolume": 0.42,
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.05,
+          "swell": 0.06
+        },
+        "volumes": {
+          "pad": 0.26,
+          "bass": 0.3,
+          "lead": 0.62,
+          "counter": 0.55,
+          "perc": 0.3,
+          "rhythm": 1
+        },
+        "bus": {
+          "sends": {
+            "pad": 0.4,
+            "bass": 0,
+            "lead": 0.45,
+            "counter": 0.4,
+            "perc": 0,
+            "rhythm": 0.2
+          },
+          "rack": {
+            "effects.dry": 1,
+            "effects.reverb": 0.38,
+            "effects.delay": 0,
+            "effects.delayMs": 441,
+            "effects.feedback": 0.25
+          }
+        }
+      }
+    },
+    {
+      "name": "Summit Before Breakfast",
+      "category": "classics",
+      "isNew": true,
+      "blurb": "Celeste, First Steps and Resurrections: a running synth arpeggio under a plain piano tune, a beat that comes and goes, and the whole climb swelling and easing in long waves",
+      "tags": [
+        "celeste",
+        "indie",
+        "arp",
+        "piano",
+        "split",
+        "melody",
+        "intensity"
+      ],
+      "voices": {
+        "pad": "Starlight Pad",
+        "bass": "Neon Pulse Bass",
+        "lead": "House Piano"
+      },
+      "layerVoices": {
+        "rhythm": "Galaxy Arp"
+      },
+      "settings": {
+        "meter": "4/4",
+        "layers": "split",
+        "melodyPlan": "change",
+        "sectionTone": true,
+        "humanize": {
+          "timing": 7,
+          "velocity": 0.08,
+          "detune": 2
+        },
+        "padRoot": "unlessBass",
+        "chordSize": "functional",
+        "padContour": 0.35,
+        "leadInertia": 0.4,
+        "leadTendency": 0.4,
+        "timbreDrift": 0.25,
+        "padVibrato": 0.2,
+        "evenLoudness": 0.4,
+        "ducking": 0.25,
+        "sectionSpace": 0.5,
+        "playAmbience": false,
+        "voices": {
+          "pad": {
+            "octave": -1,
+            "wander": "off",
+            "chance": 0.3
+          }
+        },
+        "tonic": 6,
+        "mode": "Major-1",
+        "bpm": 108,
+        "progression": 2,
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 45,
+          "pulse": 0,
+          "arpeggio": 25,
+          "sequence": 30,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "arpWeights": {
+          "bounce": 35,
+          "up": 45,
+          "down": 5,
+          "broken": 15
+        },
+        "bassWeights": {
+          "whole": 10,
+          "half": 60,
+          "walking": 0,
+          "drive": 30
+        },
+        "drums": {
+          "style": "electro",
+          "activity": 0.38,
+          "variation": 0.35,
+          "sprinkle": 0.08
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.35
+        },
+        "leadActivity": 0.92,
+        "leadDensity": 0.3,
+        "leadLeaps": 0.4,
+        "leadRepeat": 0.75,
+        "leadSyncopation": 0.2,
+        "melodyStyle": "hook",
+        "sections": {
+          "mode": "strong",
+          "phrases": 4
+        },
+        "layerFlow": {
+          "mode": "sections",
+          "phrases": 4
+        },
+        "breakdowns": {
+          "meter": "same",
+          "halfTime": true
+        },
+        "push": {
+          "level": 0,
+          "program": {
+            "mode": "intervals",
+            "low": -0.3,
+            "high": 0.5,
+            "lowSeconds": 75,
+            "highSeconds": 60,
+            "rampSeconds": 20,
+            "minutes": 10
+          }
+        },
+        "dynamics": {
+          "level": 1,
+          "range": 1.2,
+          "attack": 0.2,
+          "brightness": 0.55
+        },
+        "rubato": 0.08,
+        "ornaments": 0.12,
+        "keyLift": 0.4,
+        "padMotion": {
+          "lean": 0.15,
+          "fast": 0.1,
+          "swell": 0.05
+        },
+        "volumes": {
+          "pad": 0.34,
+          "bass": 0.5,
+          "lead": 1,
+          "counter": 0.35,
+          "perc": 0.34,
+          "rhythm": 0.45
+        },
+        "bus": {
+          "sends": {
+            "pad": 0.28,
+            "bass": 0,
+            "lead": 0.25,
+            "counter": 0,
+            "perc": 0.05,
+            "rhythm": 0.1
+          },
+          "rack": {
+            "effects.dry": 1,
+            "effects.reverb": 0.2,
+            "effects.delay": 0.18,
+            "effects.delayMs": 417,
+            "effects.feedback": 0.3
+          }
+        }
+      }
+    },
+    {
+      "name": "Emerald Loop Zone",
+      "category": "classics",
+      "isNew": true,
+      "blurb": "Sonic the Hedgehog, Green Hill Zone: a bouncy chip bass, stabbing chords on the off-beats and a bright square lead in harmony, sprinting through key lifts",
+      "tags": [
+        "sonic",
+        "genesis",
+        "chiptune",
+        "upbeat",
+        "split",
+        "melody"
+      ],
+      "voices": {
+        "pad": "Warm Organ",
+        "bass": "Chip Bass",
+        "lead": "Warm Square Lead",
+        "counter": "Chip Lead"
+      },
+      "layerVoices": {
+        "rhythm": "Pixel Piano"
+      },
+      "settings": {
+        "meter": "4/4",
+        "layers": "split",
+        "melodyPlan": "change",
+        "sectionTone": true,
+        "humanize": {
+          "timing": 3,
+          "velocity": 0.05,
+          "detune": 1
+        },
+        "padRoot": "unlessBass",
+        "chordSize": "functional",
+        "padContour": 0.2,
+        "leadInertia": 0.4,
+        "leadTendency": 0.4,
+        "timbreDrift": 0.25,
+        "padVibrato": 0,
+        "evenLoudness": 0.4,
+        "ducking": 0.2,
+        "sectionSpace": 0.2,
+        "playAmbience": false,
+        "voices": {
+          "pad": {
+            "octave": -1,
+            "wander": "off",
+            "chance": 0.3
+          }
+        },
+        "tonic": 0,
+        "mode": "Major-1",
+        "bpm": 136,
+        "progression": 1,
+        "barsPerChord": 1,
+        "padNotes": 3,
+        "padWeights": {
+          "sustain": 30,
+          "pulse": 70,
+          "arpeggio": 0,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "pulseWeights": {
+          "groups": 10,
+          "beats": 15,
+          "push": 60,
+          "split": 15
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 65,
+          "walking": 0,
+          "drive": 35
+        },
+        "drums": {
+          "style": "drive",
+          "activity": 0.5,
+          "variation": 0.35,
+          "sprinkle": 0.1,
+          "kit": "crisp"
+        },
+        "leadActivity": 0.9,
+        "leadDensity": 0.55,
+        "leadLeaps": 0.55,
+        "leadRepeat": 0.8,
+        "leadSyncopation": 0.25,
+        "melodyStyle": "game",
+        "counter": {
+          "mode": "harmony",
+          "activity": 0.45
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "dynamics": {
+          "level": 0.95,
+          "range": 0.9,
+          "attack": 0.1,
+          "brightness": 0.6
+        },
+        "rubato": 0,
+        "ornaments": 0.18,
+        "keyLift": 0.6,
+        "padMotion": {
+          "lean": 0.05,
+          "fast": 0,
+          "swell": 0.03
+        },
+        "volumes": {
+          "pad": 0.28,
+          "bass": 0.6,
+          "lead": 0.66,
+          "counter": 0.6,
+          "perc": 0.5,
+          "rhythm": 0.6
+        },
+        "bus": {
+          "sends": {
+            "pad": 0.12,
+            "bass": 0,
+            "lead": 0.14,
+            "counter": 0.14,
+            "perc": 0,
+            "rhythm": 0.05
+          },
+          "rack": {
+            "effects.dry": 1,
+            "effects.reverb": 0.12,
+            "effects.delay": 0.08,
+            "effects.delayMs": 221,
+            "effects.feedback": 0.22
+          }
+        }
+      }
+    },
+    {
+      "name": "Two A.M. at the Tanuki Shop",
+      "category": "classics",
+      "isNew": true,
+      "blurb": "Animal Crossing, the small hours: sleepy swung electric piano and brushes, a soft mallet tune wandering home and a warm pad with the shop lights still on",
+      "tags": [
+        "animal crossing",
+        "cozy",
+        "jazz",
+        "lofi",
+        "split",
+        "melody"
+      ],
+      "voices": {
+        "pad": "Soft Pad",
+        "bass": "Upright Pluck",
+        "lead": "Soft Marimba"
+      },
+      "layerVoices": {
+        "rhythm": "FM Rhodes"
+      },
+      "settings": {
+        "meter": "4/4",
+        "layers": "split",
+        "melodyPlan": "change",
+        "sectionTone": true,
+        "humanize": {
+          "timing": 7,
+          "velocity": 0.08,
+          "detune": 2
+        },
+        "padRoot": "unlessBass",
+        "chordSize": "functional",
+        "padContour": 0.35,
+        "leadInertia": 0.4,
+        "leadTendency": 0.4,
+        "timbreDrift": 0.25,
+        "padVibrato": 0.2,
+        "evenLoudness": 0.4,
+        "ducking": 0.25,
+        "sectionSpace": 0.5,
+        "playAmbience": true,
+        "voices": {
+          "pad": {
+            "octave": -1,
+            "wander": "off",
+            "chance": 0.3
+          }
+        },
+        "tonic": 5,
+        "mode": "Major-1",
+        "bpm": 78,
+        "progression": 23,
+        "barsPerChord": 1,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 45,
+          "pulse": 45,
+          "arpeggio": 10,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "pulseWeights": {
+          "groups": 30,
+          "beats": 15,
+          "push": 45,
+          "split": 10
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 70,
+          "walking": 30,
+          "drive": 0
+        },
+        "drums": {
+          "style": "brushes",
+          "activity": 0.56,
+          "variation": 0.64,
+          "sprinkle": 0.09
+        },
+        "mood": {
+          "level": 0.3
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.3
+        },
+        "chordBorrow": 0.12,
+        "borrowStyle": "corpus",
+        "leadActivity": 0.88,
+        "leadDensity": 0.26,
+        "leadLeaps": 0.4,
+        "leadRepeat": 0.7,
+        "leadSyncopation": 0.25,
+        "melodyStyle": "lounge",
+        "leadEnding": "open",
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "swing": 0.34,
+        "dynamics": {
+          "level": 0.95,
+          "range": 1,
+          "attack": 0.3,
+          "brightness": 0.35
+        },
+        "rubato": 0.3,
+        "ornaments": 0.32,
+        "keyLift": 0,
+        "ambience": {
+          "vinyl": 0.18,
+          "rain": 0.1
+        },
+        "ambienceVolume": 0.3,
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.1,
+          "swell": 0.05
+        },
+        "volumes": {
+          "pad": 0.24,
+          "bass": 0.42,
+          "lead": 0.85,
+          "counter": 0.3,
+          "perc": 0.4,
+          "rhythm": 0.62
+        },
+        "bus": {
+          "sends": {
+            "pad": 0.25,
+            "bass": 0,
+            "lead": 0.22,
+            "counter": 0,
+            "perc": 0.05,
+            "rhythm": 0.08
+          },
+          "rack": {
+            "effects.dry": 1,
+            "effects.reverb": 0.18,
+            "effects.delay": 0,
+            "effects.delayMs": 384,
+            "effects.feedback": 0.2
+          }
+        }
       }
     },
     {
@@ -9345,7 +10309,9 @@
           }
         },
         "leadSyncopation": 0.3,
-        "chordSize": "functional"
+        "chordSize": "functional",
+        "melodyPlan": "change",
+        "melodyStyle": "lounge"
       },
       "voices": {
         "pad": "Soft Keys (updated)",
@@ -9987,7 +10953,9 @@
         "chordColour": {
           "mode": "add9",
           "amount": 0.2
-        }
+        },
+        "melodyPlan": "change",
+        "melodyStyle": "lounge"
       },
       "voices": {
         "pad": "FM Rhodes",
@@ -10076,7 +11044,9 @@
         "sections": {
           "mode": "gentle",
           "phrases": 2
-        }
+        },
+        "melodyPlan": "change",
+        "melodyStyle": "song"
       },
       "voices": {
         "pad": "Soft Keys (updated)",
@@ -10266,7 +11236,9 @@
           "perc": 0.36,
           "rhythm": 0.75
         },
-        "ambienceVolume": 0.72
+        "ambienceVolume": 0.72,
+        "melodyPlan": "change",
+        "melodyStyle": "cinema"
       },
       "voices": {
         "pad": "Warm Strings",
@@ -10363,7 +11335,9 @@
         "sections": {
           "mode": "gentle",
           "phrases": 2
-        }
+        },
+        "melodyPlan": "change",
+        "melodyStyle": "song"
       },
       "voices": {
         "pad": "Harp Pluck",
@@ -10571,7 +11545,9 @@
             "wander": "off",
             "chance": 0.3
           }
-        }
+        },
+        "melodyPlan": "change",
+        "melodyStyle": "cinema"
       },
       "voices": {
         "pad": "CS-80 Brass",
@@ -10819,7 +11795,9 @@
             "wander": "off",
             "chance": 0.3
           }
-        }
+        },
+        "melodyPlan": "change",
+        "melodyStyle": "cinema"
       },
       "voices": {
         "pad": "Night Glass",
@@ -11062,7 +12040,9 @@
         "ambienceVolume": 0.66,
         "leadSyncopation": 0.35,
         "padRoot": "unlessBass",
-        "layers": "rhythm"
+        "layers": "rhythm",
+        "melodyPlan": "change",
+        "melodyStyle": "cinema"
       },
       "voices": {
         "pad": "Arp Pluck",
@@ -11170,7 +12150,9 @@
           "shape": "rise",
           "minutes": 12
         },
-        "padRoot": "unlessBass"
+        "padRoot": "unlessBass",
+        "melodyPlan": "change",
+        "melodyStyle": "cinema"
       },
       "voices": {
         "pad": "Neon Saw Pad",
@@ -11270,7 +12252,9 @@
           "rhythm": 0.76
         },
         "padRoot": "unlessBass",
-        "chordSize": "functional"
+        "chordSize": "functional",
+        "melodyPlan": "change",
+        "melodyStyle": "cinema"
       },
       "voices": {
         "pad": "Night Glass",
@@ -11365,7 +12349,9 @@
         },
         "leadSyncopation": 0.3,
         "padRoot": "unlessBass",
-        "chordSize": "functional"
+        "chordSize": "functional",
+        "melodyPlan": "change",
+        "melodyStyle": "cinema"
       },
       "voices": {
         "pad": "Night Glass",
@@ -11472,7 +12458,9 @@
         },
         "leadSyncopation": 0.3,
         "padRoot": "unlessBass",
-        "chordSize": "functional"
+        "chordSize": "functional",
+        "melodyPlan": "change",
+        "melodyStyle": "cinema"
       },
       "voices": {
         "pad": "Neon Saw Pad",
@@ -11583,7 +12571,9 @@
           "shape": "winddown",
           "minutes": 25
         },
-        "padRoot": "unlessBass"
+        "padRoot": "unlessBass",
+        "melodyPlan": "change",
+        "melodyStyle": "cinema"
       },
       "voices": {
         "pad": "Neon Saw Pad",
@@ -12099,7 +13089,9 @@
           "halfTime": true
         },
         "padRoot": "unlessBass",
-        "layers": "rhythm"
+        "layers": "rhythm",
+        "melodyPlan": "change",
+        "melodyStyle": "hook"
       },
       "voices": {
         "pad": "Tine Keys",
@@ -12273,7 +13265,9 @@
             "chance": 0.3
           }
         },
-        "layers": "rhythm"
+        "layers": "rhythm",
+        "melodyPlan": "change",
+        "melodyStyle": "hook"
       },
       "voices": {
         "pad": "Arp Pluck",
@@ -12441,7 +13435,9 @@
           "halfTime": true
         },
         "leadSyncopation": 0.25,
-        "padRoot": "unlessBass"
+        "padRoot": "unlessBass",
+        "melodyPlan": "change",
+        "melodyStyle": "hook"
       },
       "voices": {
         "pad": "Warm Organ",
@@ -12607,7 +13603,9 @@
           "halfTime": true
         },
         "leadSyncopation": 0.25,
-        "padRoot": "unlessBass"
+        "padRoot": "unlessBass",
+        "melodyPlan": "change",
+        "melodyStyle": "hook"
       },
       "voices": {
         "pad": "Warm Organ",
@@ -12780,7 +13778,9 @@
         },
         "leadSyncopation": 0.2,
         "padRoot": "unlessBass",
-        "layers": "rhythm"
+        "layers": "rhythm",
+        "melodyPlan": "change",
+        "melodyStyle": "hook"
       },
       "voices": {
         "pad": "Progressive Pluck",
@@ -12950,7 +13950,9 @@
         "leadSyncopation": 0.25,
         "padRoot": "unlessBass",
         "chordSize": "functional",
-        "layers": "rhythm"
+        "layers": "rhythm",
+        "melodyPlan": "change",
+        "melodyStyle": "hook"
       },
       "voices": {
         "pad": "Progressive Pluck",
@@ -13053,7 +14055,9 @@
         "counter": {
           "mode": "answer",
           "activity": 0.2
-        }
+        },
+        "melodyPlan": "change",
+        "melodyStyle": "cinema"
       },
       "voices": {
         "pad": "Wasm Rosin Silk",
@@ -13199,7 +14203,9 @@
           }
         },
         "leadSyncopation": 0.35,
-        "layers": "rhythm"
+        "layers": "rhythm",
+        "melodyPlan": "change",
+        "melodyStyle": "lounge"
       },
       "voices": {
         "pad": "Wasm Tine Keys",
@@ -13345,7 +14351,9 @@
         "playAmbience": false,
         "thinPadUnderLead": false,
         "leadSyncopation": 0.2,
-        "padRoot": "unlessBass"
+        "padRoot": "unlessBass",
+        "melodyPlan": "change",
+        "melodyStyle": "hook"
       },
       "voices": {
         "pad": "Wasm Drawbars",
@@ -13467,7 +14475,9 @@
             "level": 0.8
           }
         },
-        "leadSyncopation": 0.2
+        "leadSyncopation": 0.2,
+        "melodyPlan": "change",
+        "melodyStyle": "lounge"
       },
       "voices": {
         "pad": "Soft Keys",
@@ -13570,7 +14580,9 @@
           "amount": 0.2
         },
         "ambienceVolume": 0.66,
-        "leadSyncopation": 0.3
+        "leadSyncopation": 0.3,
+        "melodyPlan": "change",
+        "melodyStyle": "lounge"
       },
       "voices": {
         "pad": "FM Rhodes",
@@ -13826,7 +14838,9 @@
           }
         },
         "leadSyncopation": 0.3,
-        "chordSize": "functional"
+        "chordSize": "functional",
+        "melodyPlan": "change",
+        "melodyStyle": "lounge"
       },
       "voices": {
         "pad": "Soft Keys (updated)",
@@ -14062,7 +15076,9 @@
           "perc": 0.44,
           "rhythm": 0.78
         },
-        "ambienceVolume": 0.72
+        "ambienceVolume": 0.72,
+        "melodyPlan": "change",
+        "melodyStyle": "cinema"
       },
       "voices": {
         "pad": "Breathing Pad",
@@ -14163,7 +15179,9 @@
         },
         "ambienceVolume": 0.66,
         "leadSyncopation": 0.35,
-        "padRoot": "unlessBass"
+        "padRoot": "unlessBass",
+        "melodyPlan": "change",
+        "melodyStyle": "lounge"
       },
       "voices": {
         "pad": "Lo-fi Tape Pad",
@@ -14299,7 +15317,9 @@
         },
         "leadSyncopation": 0.2,
         "padRoot": "unlessBass",
-        "chordSize": "functional"
+        "chordSize": "functional",
+        "melodyPlan": "change",
+        "melodyStyle": "lounge"
       },
       "voices": {
         "pad": "Coastal FM Lead",
@@ -14484,7 +15504,9 @@
           "halfTime": true
         },
         "padRoot": "unlessBass",
-        "layers": "rhythm"
+        "layers": "rhythm",
+        "melodyPlan": "change",
+        "melodyStyle": "hook"
       },
       "voices": {
         "pad": "Tine Keys",
@@ -14674,7 +15696,9 @@
           "halfTime": true
         },
         "leadSyncopation": 0.25,
-        "padRoot": "unlessBass"
+        "padRoot": "unlessBass",
+        "melodyPlan": "change",
+        "melodyStyle": "hook"
       },
       "voices": {
         "pad": "Warm Organ",
@@ -14841,7 +15865,9 @@
             "chance": 0.3
           }
         },
-        "leadSyncopation": 0.35
+        "leadSyncopation": 0.35,
+        "melodyPlan": "change",
+        "melodyStyle": "lounge"
       },
       "voices": {
         "pad": "Wasm Tine Keys",
@@ -14988,7 +16014,9 @@
         "playAmbience": false,
         "thinPadUnderLead": false,
         "leadSyncopation": 0.2,
-        "padRoot": "unlessBass"
+        "padRoot": "unlessBass",
+        "melodyPlan": "change",
+        "melodyStyle": "hook"
       },
       "voices": {
         "pad": "Wasm Drawbars",
@@ -16861,7 +17889,9 @@
           "perc": true,
           "pad": false,
           "lead": false
-        }
+        },
+        "melodyPlan": "change",
+        "melodyStyle": "song"
       },
       "voices": {
         "pad": "Studio Concert v2",
@@ -16949,7 +17979,9 @@
           "perc": true,
           "pad": false,
           "lead": false
-        }
+        },
+        "melodyPlan": "change",
+        "melodyStyle": "song"
       },
       "voices": {
         "pad": "Concert Grand",
@@ -17036,7 +18068,9 @@
           "pad": false,
           "lead": false,
           "counter": false
-        }
+        },
+        "melodyPlan": "change",
+        "melodyStyle": "cinema"
       },
       "voices": {
         "pad": "Measured Epic Strings",
@@ -17127,7 +18161,9 @@
           "pad": false,
           "lead": false,
           "counter": false
-        }
+        },
+        "melodyPlan": "change",
+        "melodyStyle": "cinema"
       },
       "voices": {
         "pad": "Measured Choir Ah",
@@ -17217,7 +18253,9 @@
           "pad": false,
           "bass": false,
           "lead": false
-        }
+        },
+        "melodyPlan": "change",
+        "melodyStyle": "cinema"
       },
       "voices": {
         "pad": "Studio Concert v2",
@@ -17306,7 +18344,9 @@
           "pad": false,
           "bass": false,
           "lead": false
-        }
+        },
+        "melodyPlan": "change",
+        "melodyStyle": "cinema"
       },
       "voices": {
         "pad": "Concert Grand",
@@ -17396,7 +18436,9 @@
           "lean": 0.1,
           "fast": 0,
           "swell": 0.06
-        }
+        },
+        "melodyPlan": "change",
+        "melodyStyle": "song"
       },
       "voices": {
         "pad": "Ambient Piano v2",
@@ -17488,7 +18530,9 @@
           "lean": 0.1,
           "fast": 0,
           "swell": 0.03
-        }
+        },
+        "melodyPlan": "change",
+        "melodyStyle": "song"
       },
       "voices": {
         "pad": "Concert Grand",
@@ -17575,7 +18619,9 @@
           "perc": true,
           "pad": false,
           "lead": false
-        }
+        },
+        "melodyPlan": "change",
+        "melodyStyle": "song"
       },
       "voices": {
         "pad": "Studio Concert v2",
@@ -17665,7 +18711,9 @@
           "pad": false,
           "lead": false
         },
-        "padVibrato": 0.5
+        "padVibrato": 0.5,
+        "melodyPlan": "change",
+        "melodyStyle": "song"
       },
       "voices": {
         "pad": "Felted Piano v2",
@@ -17752,7 +18800,9 @@
           "perc": true,
           "pad": false,
           "lead": false
-        }
+        },
+        "melodyPlan": "change",
+        "melodyStyle": "song"
       },
       "voices": {
         "pad": "Felted Piano",
@@ -17811,7 +18861,9 @@
           "variation": 0.4,
           "sprinkle": 0.1
         },
-        "leadSyncopation": 0.25
+        "leadSyncopation": 0.25,
+        "melodyPlan": "change",
+        "melodyStyle": "lounge"
       },
       "voices": {
         "pad": "Felt Keys",
@@ -17990,7 +19042,9 @@
           "rain": 0.1,
           "thunder": 0.25
         },
-        "playAmbience": true
+        "playAmbience": true,
+        "melodyPlan": "change",
+        "melodyStyle": "lounge"
       },
       "voices": {
         "pad": "FM Rhodes",
@@ -18110,7 +19164,9 @@
         },
         "leadSyncopation": 0.35,
         "padRoot": "unlessBass",
-        "layers": "rhythm"
+        "layers": "rhythm",
+        "melodyPlan": "change",
+        "melodyStyle": "hook"
       },
       "voices": {
         "pad": "Deep Pulse",
@@ -18236,6 +19292,419 @@
       }
     },
     {
+      "name": "Demo: Song in lounge style",
+      "category": "demo",
+      "blurb": "Rainy café with a lounge melody: every seed is its own late, off-the-beat tune, written over these chords",
+      "settings": {
+        "tonic": 2,
+        "mode": "Major-2",
+        "bpm": 76,
+        "progression": 7,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 36,
+          "pulse": 40,
+          "arpeggio": 16,
+          "sequence": 0,
+          "rolled": 8,
+          "stacked": 0
+        },
+        "drums": {
+          "style": "lofi",
+          "activity": 0.51,
+          "variation": 0.64,
+          "sprinkle": 0.09
+        },
+        "swing": 0.35,
+        "sectionTone": true,
+        "ambience": {
+          "rain": 0.4,
+          "vinyl": 0.25
+        },
+        "playAmbience": true,
+        "leadActivity": 0.58,
+        "leadDensity": 0.18,
+        "leadLeaps": 0.28,
+        "leadRepeat": 0.38,
+        "humanize": {
+          "timing": 13,
+          "velocity": 0.1,
+          "detune": 2
+        },
+        "dynamics": {
+          "level": 0.95,
+          "range": 0.9,
+          "attack": 0.3,
+          "brightness": 0.3
+        },
+        "rubato": 0.4,
+        "ornaments": 0.3,
+        "ducking": 0.4,
+        "evenLoudness": 0.4,
+        "sectionSpace": 0.4,
+        "keyLift": 0,
+        "timbreDrift": 0.3,
+        "bassWeights": {
+          "whole": 42,
+          "half": 50,
+          "walking": 8,
+          "drive": 0
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 1,
+          "bass": 0.32,
+          "lead": 0.46,
+          "counter": 0.25,
+          "perc": 0.26,
+          "rhythm": 1
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.2
+        },
+        "ambienceVolume": 0.4,
+        "leadSyncopation": 0.2,
+        "melodyStyle": "lounge",
+        "melodyPlan": "same"
+      },
+      "voices": {
+        "pad": "Felt Keys (updated)",
+        "bass": "Thump Bass",
+        "lead": "Measured Flute"
+      },
+      "layerVoices": {
+        "pad": "Soft Pad",
+        "rhythm": "Felt Keys (updated)"
+      }
+    },
+    {
+      "name": "Demo: Song in hook style",
+      "category": "demo",
+      "blurb": "Uplifting Trance Departures with a hook melody: every seed is its own repeated riff, written over these chords",
+      "settings": {
+        "humanize": {
+          "timing": 2,
+          "velocity": 0.05,
+          "detune": 2
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "dynamics": {
+          "level": 0.95,
+          "range": 0.8,
+          "attack": 0.3,
+          "brightness": 0.45
+        },
+        "rubato": 0,
+        "ornaments": 0.1,
+        "ducking": 0.5,
+        "evenLoudness": 0.6,
+        "sectionSpace": 0.4,
+        "keyLift": 0,
+        "timbreDrift": 0.2,
+        "mode": "Major-6",
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 30,
+          "pulse": 40,
+          "arpeggio": 30,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 70,
+          "walking": 0,
+          "drive": 30
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0
+        },
+        "padRoot": "unlessBass",
+        "drums": {
+          "style": "electro",
+          "activity": 0.6,
+          "variation": 0.4,
+          "sprinkle": 0.1,
+          "kit": "tr808"
+        },
+        "bpm": 138,
+        "tonic": 9,
+        "progression": 6,
+        "volumes": {
+          "pad": 0.69,
+          "bass": 0.75,
+          "lead": 0.8,
+          "counter": 0.4,
+          "perc": 0.8,
+          "rhythm": 0.5
+        },
+        "leadLeaps": 0.2,
+        "leadActivity": 1,
+        "leadDensity": 0.4,
+        "leadRepeat": 0.8,
+        "leadSyncopation": 0.2,
+        "portamento": {
+          "lead": 0.15,
+          "counter": 0,
+          "bass": 0.1
+        },
+        "bus": {
+          "sends": {
+            "pad": 0,
+            "bass": 0,
+            "lead": 0.35,
+            "counter": 0,
+            "perc": 0
+          },
+          "rack": {
+            "effects.dry": 1,
+            "effects.reverb": 0.12,
+            "effects.delay": 0.2,
+            "effects.delayMs": 217,
+            "effects.feedback": 0.3
+          }
+        },
+        "sequencer": {
+          "on": true,
+          "machine": "tr909",
+          "arrangement": "trance-journey",
+          "edits": {
+            "1": {
+              "pad": "h.......s.s.s..."
+            },
+            "2": {
+              "pad": "f..x....a.a.a.a."
+            },
+            "3": {
+              "pad": "a.a.a.a.a.a.x.xf"
+            },
+            "4": {
+              "pad": "f.....x.x......."
+            },
+            "5": {
+              "pad": "s.s.s.s........."
+            },
+            "6": {
+              "pad": "f..x..x.h......."
+            },
+            "7": {
+              "pad": "h.......a.a.a.xf"
+            }
+          },
+          "slots": [
+            0,
+            1,
+            5,
+            6,
+            2,
+            4,
+            5,
+            6
+          ],
+          "lanes": true,
+          "gate": 0.45,
+          "pump": 0.7,
+          "variation": 0,
+          "fills": true,
+          "moves": {
+            "0": [
+              {
+                "key": "filter.highpass",
+                "from": 200,
+                "to": 10
+              }
+            ],
+            "4": [
+              {
+                "key": "filter.lowpass",
+                "from": 20000,
+                "to": 1200
+              },
+              {
+                "key": "effects.reverb",
+                "from": 0.3,
+                "to": 0.7
+              },
+              {
+                "key": "send.pad",
+                "from": 0.3,
+                "to": 0.5
+              },
+              {
+                "key": "send.lead",
+                "from": 0.4,
+                "to": 0.5
+              }
+            ],
+            "5": [
+              {
+                "key": "filter.highpass",
+                "from": 30,
+                "to": 2200
+              },
+              {
+                "key": "effects.delay",
+                "from": 0.1,
+                "to": 0.45
+              },
+              {
+                "key": "effects.delayMs",
+                "from": 326,
+                "to": 109
+              },
+              {
+                "key": "inserts.phaser",
+                "from": 0,
+                "to": 0.5
+              },
+              {
+                "key": "send.pad",
+                "from": 0.1,
+                "to": 0.6
+              }
+            ],
+            "6": [
+              {
+                "key": "inserts.saturation",
+                "from": 0.4,
+                "to": 0.1
+              }
+            ]
+          },
+          "sectionBars": 8
+        },
+        "layers": "split",
+        "melodyStyle": "hook",
+        "melodyPlan": "same"
+      },
+      "voices": {
+        "pad": "Trance Chord",
+        "bass": "Trance Bass",
+        "lead": "Outrun Lead"
+      },
+      "percussion": {
+        "synth": "tr909",
+        "name": "Deep"
+      },
+      "layerVoices": {
+        "pad": "Outrun Lead",
+        "rhythm": "Trance Chord"
+      }
+    },
+    {
+      "name": "Demo: Song in game style",
+      "category": "demo",
+      "blurb": "Boss Fight, Politely with a game melody: every seed is its own arpeggio-led theme, written over these chords",
+      "settings": {
+        "padContour": 0.4,
+        "tonic": 2,
+        "mode": "Major-6",
+        "bpm": 148,
+        "progression": 6,
+        "barsPerChord": 1,
+        "padNotes": 4,
+        "leadActivity": 0.84,
+        "leadDensity": 0.66,
+        "padWeights": {
+          "sustain": 30,
+          "pulse": 40,
+          "arpeggio": 0,
+          "sequence": 30,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 20,
+          "walking": 0,
+          "drive": 80
+        },
+        "drums": {
+          "style": "drive",
+          "activity": 0.575,
+          "variation": 0.4,
+          "kit": "crisp",
+          "sprinkle": 0.12
+        },
+        "sections": {
+          "mode": "strong",
+          "phrases": 2
+        },
+        "sectionTone": true,
+        "counter": {
+          "mode": "harmony",
+          "activity": 0.54
+        },
+        "leadLeaps": 0.46,
+        "leadRepeat": 0.4,
+        "humanize": {
+          "timing": 5,
+          "velocity": 0.1,
+          "detune": 1
+        },
+        "dynamics": {
+          "level": 1,
+          "range": 1.3,
+          "attack": 0,
+          "brightness": 0.5
+        },
+        "rubato": 0.1,
+        "ornaments": 0.4,
+        "ducking": 0.3,
+        "evenLoudness": 0.4,
+        "sectionSpace": 0.3,
+        "keyLift": 0.7,
+        "timbreDrift": 0.1,
+        "padMotion": {
+          "lean": 0.32,
+          "fast": 0.16,
+          "swell": 0.035
+        },
+        "volumes": {
+          "pad": 0.76,
+          "bass": 0.78,
+          "lead": 0.68,
+          "counter": 0.31,
+          "perc": 0.59,
+          "rhythm": 0.76
+        },
+        "breakdowns": {
+          "meter": "same",
+          "halfTime": true
+        },
+        "leadSyncopation": 0.25,
+        "padRoot": "unlessBass",
+        "chordSize": "functional",
+        "melodyStyle": "game",
+        "melodyPlan": "same"
+      },
+      "voices": {
+        "pad": "Heroic Strings",
+        "bass": "Drive Bass",
+        "lead": "Fanfare Brass",
+        "counter": "Pan Flute"
+      },
+      "layerVoices": {
+        "rhythm": "Soft Marimba"
+      }
+    },
+    {
       "name": "Outrun After Midnight",
       "category": "electronic",
       "blurb": "Eighties machine pop: a gated snare and clap, eighth-note bass pulse, a saw chord and an outrun lead, with a tom fill closing each phrase, under a neon skyline",
@@ -18316,7 +19785,9 @@
           "amount": 0.2
         },
         "leadSyncopation": 0.3,
-        "padRoot": "unlessBass"
+        "padRoot": "unlessBass",
+        "melodyPlan": "change",
+        "melodyStyle": "hook"
       },
       "voices": {
         "pad": "Soft Saw Lead",
@@ -18410,7 +19881,9 @@
         },
         "leadSyncopation": 0.5,
         "padRoot": "unlessBass",
-        "layers": "rhythm"
+        "layers": "rhythm",
+        "melodyPlan": "change",
+        "melodyStyle": "hook"
       },
       "voices": {
         "pad": "Galaxy Arp",
@@ -18503,7 +19976,9 @@
           "mode": "add9",
           "amount": 0.25
         },
-        "leadSyncopation": 0.55
+        "leadSyncopation": 0.55,
+        "melodyPlan": "change",
+        "melodyStyle": "hook"
       },
       "voices": {
         "pad": "FM Rhodes",
@@ -18755,7 +20230,9 @@
           "counter": 0,
           "bass": 0.15
         },
-        "layers": "rhythm"
+        "layers": "rhythm",
+        "melodyPlan": "change",
+        "melodyStyle": "hook"
       },
       "voices": {
         "pad": "Supersaw Stab",
@@ -18998,7 +20475,9 @@
           "counter": 0,
           "bass": 0.35
         },
-        "layers": "rhythm"
+        "layers": "rhythm",
+        "melodyPlan": "change",
+        "melodyStyle": "hook"
       },
       "voices": {
         "pad": "Techno Stab",
@@ -19231,7 +20710,9 @@
           "counter": 0,
           "bass": 0
         },
-        "layers": "rhythm"
+        "layers": "rhythm",
+        "melodyPlan": "change",
+        "melodyStyle": "hook"
       },
       "voices": {
         "pad": "Pluck Chord",
@@ -19448,7 +20929,9 @@
           "counter": 0,
           "bass": 0.2
         },
-        "layers": "rhythm"
+        "layers": "rhythm",
+        "melodyPlan": "change",
+        "melodyStyle": "hook"
       },
       "voices": {
         "pad": "Pluck Chord",
@@ -19623,7 +21106,9 @@
             ]
           },
           "sectionBars": 4
-        }
+        },
+        "melodyPlan": "change",
+        "melodyStyle": "hook"
       },
       "voices": {
         "pad": "FM Rhodes",
@@ -19816,7 +21301,9 @@
           },
           "sectionBars": 8
         },
-        "layers": "rhythm"
+        "layers": "rhythm",
+        "melodyPlan": "change",
+        "melodyStyle": "hook"
       },
       "voices": {
         "pad": "Pluck Chord",
@@ -19964,7 +21451,9 @@
             ]
           },
           "sectionBars": 8
-        }
+        },
+        "melodyPlan": "change",
+        "melodyStyle": "hook"
       },
       "voices": {
         "pad": "Soft Keys",
@@ -20188,7 +21677,9 @@
           },
           "sectionBars": 8
         },
-        "layers": "split"
+        "layers": "split",
+        "melodyPlan": "change",
+        "melodyStyle": "hook"
       },
       "voices": {
         "pad": "Trance Chord",
@@ -20392,7 +21883,9 @@
           },
           "sectionBars": 16
         },
-        "layers": "rhythm"
+        "layers": "rhythm",
+        "melodyPlan": "change",
+        "melodyStyle": "hook"
       },
       "voices": {
         "pad": "Progressive Pluck",
@@ -20648,7 +22141,9 @@
           },
           "sectionBars": 16
         },
-        "layers": "rhythm"
+        "layers": "rhythm",
+        "melodyPlan": "change",
+        "melodyStyle": "hook"
       },
       "voices": {
         "pad": "Techno Stab",
@@ -20871,7 +22366,9 @@
           },
           "sectionBars": 8
         },
-        "layers": "rhythm"
+        "layers": "rhythm",
+        "melodyPlan": "change",
+        "melodyStyle": "hook"
       },
       "voices": {
         "pad": "FM Rhodes",
@@ -21103,7 +22600,9 @@
           },
           "sectionBars": 8
         },
-        "layers": "rhythm"
+        "layers": "rhythm",
+        "melodyPlan": "change",
+        "melodyStyle": "hook"
       },
       "voices": {
         "pad": "Soft Keys",
@@ -21312,7 +22811,9 @@
           },
           "sectionBars": 8
         },
-        "layers": "rhythm"
+        "layers": "rhythm",
+        "melodyPlan": "change",
+        "melodyStyle": "hook"
       },
       "voices": {
         "pad": "Warm Organ",

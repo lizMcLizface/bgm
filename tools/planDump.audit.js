@@ -7,7 +7,7 @@ import Generator from '../src/app/Generator';
 import { BROWSABLE_SCENES, sceneSettings, sceneSlug } from '../src/app/scenes';
 import { applyBook, inheritBook } from '../src/app/rulebook/session';
 
-const NEW_KEYS = ['leadSyncopation', 'leadInertia', 'padRoot', 'chordSize', 'padContour', 'leadTendency', 'bassEuclid', 'borrowStyle', 'padVibrato'];
+const NEW_KEYS = ['leadSyncopation', 'leadInertia', 'padRoot', 'chordSize', 'padContour', 'leadTendency', 'bassEuclid', 'borrowStyle', 'padVibrato', 'melodyStyle', 'melodyPlan'];
 test('plan dump', () => {
     const out = {};
     for (const scene of BROWSABLE_SCENES) {

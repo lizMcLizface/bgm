@@ -2754,7 +2754,8 @@ body {
 .gen-quick-bottom > .gen-quick-choices-row:first-child { grid-area: 2 / 1; align-self: end; }
 .gen-quick-bottom > .gen-quick-stacks { grid-area: 2 / 3; align-self: end; margin-left: 0; }
 
-@media (max-width: 900px) {
+/* below this the three columns (faders, pad, faders) need more room than the panel has */
+@media (max-width: 1080px) {
     .gen-quick {
         grid-template-columns: 1fr;
         grid-template-rows: none;
@@ -2942,6 +2943,44 @@ body {
 .gen-quick-pills {
     --hue: var(--gen-accent);
     align-items: center;
+}
+
+/* The melody row: a line of its own across the whole panel, wrapping inside it */
+.gen-quick-melody {
+    grid-column: 1 / -1;
+    min-width: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 12px 28px;
+    padding-top: 14px;
+    border-top: 1px solid color-mix(in srgb, var(--gen-muted) 25%, transparent);
+}
+
+.gen-quick-melody-song {
+    min-width: 0;
+    flex: 1 1 280px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 12px 28px;
+    transition: opacity 0.15s ease;
+}
+
+.gen-quick-melody-song.is-idle { opacity: 0.6; }
+.gen-quick-melody .gen-quick-pills { min-width: 0; max-width: 100%; align-items: flex-start; }
+.gen-quick-melody .gen-quick-choices { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 6px; }
+.gen-quick-melody .gen-quick-label { text-align: left; }
+.gen .gen-quick-melody .gen-quick-pills button.is-preset { margin-top: 0; }
+.gen .gen-quick-melody .gen-quick-pills button:disabled { cursor: default; }
+
+@media (max-width: 1080px) {
+    /* the panel's own faders wrap too, so nothing in it runs off a phone's screen */
+    .gen-quick { max-width: 100%; }
+    .gen-quick-top > [aria-label='Mix'],
+    .gen-quick-top > .gen-quick-feel { max-width: 100%; min-width: 0; }
+    .gen-quick-sliders { flex-wrap: wrap; justify-content: center; row-gap: 12px; }
+    .gen-quick-melody { width: 100%; }
 }
 
 .gen-quick-label {
@@ -3261,7 +3300,7 @@ body {
 
 /* The intensity fader (IntensityFader.jsx), in the bottom row between the pill groups: the track is a meter, lit from the middle - red to the right, a gentle blue to the left - and the cap is the target. */
 .gen-quick-intensity { grid-area: 2 / 2; align-self: end; justify-self: stretch; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
-@media (max-width: 900px) { .gen-quick-intensity { grid-area: auto; width: 100%; max-width: 340px; } }
+@media (max-width: 1080px) { .gen-quick-intensity { grid-area: auto; width: 100%; max-width: 340px; } }
 .gen-intensity {
     --gen-intensity-hot: #ef4444;
     --gen-intensity-cool: #6f9cf0;

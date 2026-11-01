@@ -1,3 +1,4 @@
+import { MELODIC_STYLES, MELODY_PLANS } from './composition/melodicStyle';
 import {percussionFromSearch,withPercussion} from '../audio/percussionChoice';
 import {mediaHelperFromSearch,withMediaHelper} from '../audio/mediaHelperChoice';
 import {readPerfChoice,withPerf,perfFromSearch} from '../audio/perfMode';
@@ -77,6 +78,9 @@ export function defaultSettings() {
         borrowStyle: 'even', // which chords get borrowed from the parallel mode when chordBorrow is on: 'even' (any eligible one) or 'corpus' (flat VII and VI more than the minor iv)
         bassEuclid: 0, // share of phrases whose grouped or driving bass plays an evenly spread (Euclidean) figure: 0 as drawn
         leadTendency: 0, // how often a held leading tone goes up to the tonic and a fourth steps down to the third: 0 as drawn, 1 almost always (needs note resolution)
+        melodyPlan: 'noodle', // the lead's tune: drawn motifs, one song, or a song that turns into another over 10-15 minutes (composition/melodicStyle.js)
+        melodyParts: { bass: true, rhythm: true }, // whether the bass and a rhythmic chord part join the song (composition/songParts.js)
+        melodyStyle: 'auto', // the preset's melodic style: each seed writes its own song in it; auto takes the one that suits the settings
         leadInertia: 0, // how strongly a step carries on the same way, and how a big leap wants a longer note: 0 as drawn, 1 strongly
         leadSyncopation: 0, // share of beats the lead and bass push half a beat early: 0 straight, 1 heavily off the beat
         leadRepeat: 0, // share of phrases that repeat the last phrase's tune
@@ -175,6 +179,9 @@ const RULES = {
     borrowStyle: oneOf(['even', 'corpus']),
     bassEuclid: clamp(0, 1),
     leadTendency: clamp(0, 1),
+    melodyPlan: oneOf(MELODY_PLANS),
+    melodyStyle: oneOf(Object.keys(MELODIC_STYLES)),
+    melodyParts: { bass: bool, rhythm: bool },
     leadInertia: clamp(0, 1),
     leadSyncopation: clamp(0, 1),
     leadRepeat: clamp(0, 1),

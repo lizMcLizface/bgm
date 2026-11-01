@@ -29,6 +29,7 @@ import { LAYER_PARAMS } from './engine/ambienceSynth';
 import { HARMONY_SCALES } from './composition/harmonyScale';
 import { ARC_SHAPES } from './composition/arc';
 import { PUSH_MODES } from './composition/push';
+import { MELODIC_STYLES, MELODY_PLANS } from './composition/melodicStyle';
 import { ROLE_PRESETS } from './presets';
 import { SEED_BITS as SOUND_SEED_BITS } from './soundGen';
 import { GENERATOR_V2, KIND_CODES } from './soundGenV2';
@@ -326,6 +327,7 @@ MUSIC_GROUPS.push([[['layers'],options(Object.keys(LAYERS),2)],
     [['voices','rhythm','octave'],stepped(RHYTHM_OCTAVES[0],RHYTHM_OCTAVES[1],1)],[['voices','rhythm','wander'],options(Object.keys(OCTAVE_WANDER),2)],[['voices','rhythm','chance'],chance],
     [['wander','voices','rhythm'],bool]]);
 MUSIC_GROUPS.push([[['layerFlow','mode'],options(Object.keys(LAYER_FLOWS),2)],[['layerFlow','phrases'],options(FLOW_PHRASES,2)]]); // the layers over time; appended
+MUSIC_GROUPS.push([[['melodyStyle'],options(Object.keys(MELODIC_STYLES),4)],[['melodyPlan'],options(MELODY_PLANS,2)],[['melodyParts','bass'],bool],[['melodyParts','rhythm'],bool]]); // composition/melodicStyle.js; appended, old links play as made
 const VOICE_GROUPS = [
     [...voice('pad'), ...voice('bass'), ...voice('lead'), ...voice('counter'), field(GROUPS, ['padNotes'])],
     LATER_GROUPS[4], // volumes

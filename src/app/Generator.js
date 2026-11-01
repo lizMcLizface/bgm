@@ -69,6 +69,8 @@ import { arcEnergy, applyArc, arcTone, arcSpace } from './composition/arc';
 import { voiceMotion } from './composition/timbreDrift';
 import { generateProgression } from './composition/progressionGen';
 import { applyFeel, feelActive, feelTone, feelEnergy, ghostNotes } from './composition/feel';
+import { songStyle } from './composition/melodicStyle';
+import { songBass } from './composition/songParts';
 import { applyPush, pushLevel, glidePush, pushTempo, pushEnergy, pushTone } from './composition/push';
 import { applyMood, glideMood, moodColour, moodTone } from './composition/mood';
 import { nextMusic, glideTempo, scaleDistance } from './conductor';
@@ -1463,6 +1465,12 @@ class Generator {
 
     // `lift`: this bar's key lift ({ keyLift, chord: its pivot chord, if it pivots - a lift's or a
     // smooth home change's }); the forecast stops at a pivot and before any later lift, return or new home.
+    // One cycle of the current chords, bar by bar, for writing a styled song over them (composition/melodicStyle.js).
+    songHarmony(music) {
+        const bars = PROGRESSIONS[music.progression].length * this.settings.barsPerChord;
+        return Array.from({ length: bars }, (_, i) => this.chordAt(music.cycleStart + i, music));
+    }
+
     melodyHarmony(bar, music, upcoming, count = 4, bpm = music.bpm, lift = null) {
         const size = this.settings.barsPerChord, end = music.cycleStart + PROGRESSIONS[music.progression].length * size;
         const next = this.cycleMusic(upcoming,end,bar), nextEnd = end + PROGRESSIONS[next.progression].length * size;
@@ -1607,6 +1615,10 @@ class Generator {
             padVariation: this.padVariation !== false,
             jointCounterpoint: this.jointCounterpoint !== false,
             phraseLength: this.longPhrases === false ? 4 : (this.phraseLength ?? 'auto'),
+            songHarmony: () => this.songHarmony(music),
+            modeName: this.settings.mode,
+            songDensity: (this.planningFrom ?? this.settings).leadDensity,
+            lanes: !!(this.settings.sequencer?.on && this.settings.sequencer.arrangement && this.settings.sequencer.lanes),
             harmonyForecast: !original && this.phraseSearch !== false ? this.melodyHarmony(bar, music, upcoming, this.longPhrases === false ? 4 : 8, bpm, { keyLift, chord: liftPivot || pivot ? chord : null }) : null,
             barsPerChord,
             bar,
@@ -1618,7 +1630,7 @@ class Generator {
             barsLeftInChord,
             formBarsLeftInChord: barsPerChord - inCycle % barsPerChord,
             prev: prev ? prev.state : null,
-            settings: { bpm:this.settings.bpm,progression:this.settings.progression,sectionTone:this.settings.sectionTone,leadActivity, leadDensity, padWeights, bassWeights, pulseWeights, arpWeights, directionWeights, padMotion, thinPadUnderLead, voices, counter, sections: this.quickIntro ? { ...sections, quickIntro: true } : sections, chordSpread, pedal:this.settings.tonality.mode==='atonal'?{mode:'off',amount:0}:pedal, leadScale:this.settings.tonality.mode==='atonal'?'full':leadScale, leadLeaps, leadRepeat, leadSyncopation, leadInertia, leadTendency, bassEuclid, leadEnding, padRoot, padContour, layers, layerRules, layerFlow },
+            settings: { melodyStyle:songStyle(this.planningFrom??this.settings),melodyPlan:this.settings.melodyPlan,melodyParts:this.settings.melodyParts,bpm:this.settings.bpm,progression:this.settings.progression,sectionTone:this.settings.sectionTone,leadActivity, leadDensity, padWeights, bassWeights, pulseWeights, arpWeights, directionWeights, padMotion, thinPadUnderLead, voices, counter, sections: this.quickIntro ? { ...sections, quickIntro: true } : sections, chordSpread, pedal:this.settings.tonality.mode==='atonal'?{mode:'off',amount:0}:pedal, leadScale:this.settings.tonality.mode==='atonal'?'full':leadScale, leadLeaps, leadRepeat, leadSyncopation, leadInertia, leadTendency, bassEuclid, leadEnding, padRoot, padContour, layers, layerRules, layerFlow },
             rng: this.rng,
         });
         const pendingSuspension=prev?.state.composition?.sectionSuspension;
@@ -1660,7 +1672,10 @@ class Generator {
         // the step sequencer (sequencer.js) plays its pattern as written: it skips the looseners below and joins the bar after them
         const seq = this.settings.sequencer, seqHits = seq?.on && seq.arrangement ? sequencerBar({ meter: this.meter, seq, slotIndex: slot.index, bar, seed: this.settings.seed, barsLeft: stageSpan(seq, slot, bar).left }) : [];
         // lanes: the chords and the bass as tight stabs on the sequencer's own rows, instead of the arranged pad and bass
-        const laneHits = seqHits.length && seq.lanes ? sequencerLanes({ meter: this.meter, seq, chord, slotIndex: slot.index, bar, seed: this.settings.seed, layers: state.phrase.layers }) : [];
+        let laneHits = seqHits.length && seq.lanes ? sequencerLanes({ meter: this.meter, seq, chord, slotIndex: slot.index, bar, seed: this.settings.seed, layers: state.phrase.layers }) : [];
+        // A lane's bass is programmed, so in a song it keeps its rhythm and takes the tune's shape on its notes (composition/songParts.js).
+        if (state.composition?.songBar && laneHits.some((h) => h.role === 'bass')) laneHits = [...laneHits.filter((h) => h.role !== 'bass'),
+            ...songBass(laneHits.filter((h) => h.role === 'bass'), { notes: state.composition.songBar, style: 'drive', chord, range: state.ranges.bass, meter: this.meter })];
         // (beside a rhythm part the arranged pad stays under the stabs, unless the lane holds chords of its own)
         if (laneHits.length) events.splice(0, events.length, ...events.filter((e) => e.role !== 'bass' && e.role !== 'rhythm' && (e.role !== 'pad' || (state.phrase.layers === 'split' && !laneHits.some((h) => h.role === 'pad')))));
         let hits = !seqHits.length && drums && drums.style !== 'off'

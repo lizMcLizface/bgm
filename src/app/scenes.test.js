@@ -233,6 +233,17 @@ test('regular browsing crosses categories and skips hidden archives, which still
     }
 });
 
+describe('the game soundtrack presets', () => {
+    const NAMES = ['Crystal Prelude, Slightly Overdue', 'Corridors of Slightly Late', 'Rain Over the Bug Capital', 'Summit Before Breakfast', 'Emerald Loop Zone', 'Two A.M. at the Tanuki Shop'];
+    test.each(NAMES)('%s plays a pad, a rhythm part of its own voice and a song', (name) => {
+        const scene = SCENES.find((s) => s.name === name), settings = sceneSettings(scene, 1);
+        expect(settings).toMatchObject({ layers: 'split', melodyPlan: 'change' });
+        expect(settings.melodyStyle).not.toBe('auto');
+        expect(scene.layerVoices.rhythm).not.toBe(scene.voices.pad);
+        expect(scene.category).toBe('classics');
+    });
+});
+
 describe('layer voices (the voices for a pad and a rhythm part, by preset)', () => {
     const withLayers = SCENES.filter((s) => s.layerVoices);
 
@@ -247,7 +258,7 @@ describe('layer voices (the voices for a pad and a rhythm part, by preset)', () 
             else expect(scene.layerVoices.rhythm).not.toBe(scene.voices.pad);
             // a pad that has a voice made for it is not the voice the preset uses for another part
             // (Uplifting Trance Departures chooses to double its lead as the pad)
-            if (scene.name !== 'Uplifting Trance Departures') expect(Object.entries(scene.voices).filter(([role]) => role !== 'pad').map(([, v]) => v)).not.toContain(scene.layerVoices.pad);
+            if (!['Uplifting Trance Departures', 'Demo: Song in hook style'].includes(scene.name)) expect(Object.entries(scene.voices).filter(([role]) => role !== 'pad').map(([, v]) => v)).not.toContain(scene.layerVoices.pad);
             expect(sceneSettings(scene, 1).volumes.rhythm).toBeGreaterThan(0);
         });
     });

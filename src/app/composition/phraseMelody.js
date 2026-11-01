@@ -2,6 +2,7 @@ import { notesInRange, pentatonicOf } from '../arranger';
 import { resolveMelody } from './resolution';
 import { tieMelody } from './rhythmGrammar';
 import { seeded } from '../random';
+import { clashes } from './melodicStyle';
 const nearest=(notes,target)=>notes.reduce((best,n)=>Math.abs(n-target)<Math.abs(best-target)?n:best);
 const clamp=(x,lo,hi)=>Math.max(lo,Math.min(hi,x));
 export const PHRASE_BEAM=24;
@@ -26,7 +27,7 @@ export function searchPhrase({bars,range,settings,previousMidi,seed,closing=true
     const stages=[];
     bars.forEach((bar,bi)=>{
         const pcs=settings.leadScale==='pentatonic'?pentatonicOf(bar.scalePcs):bar.scalePcs;
-        const allowed=notesInRange(pcs,...range),tonic=nearest(notesInRange([pcs[0]],range[0]-12,range[1]+12),(range[0]+range[1])/2-3);
+        const allowed=notesInRange(pcs,...range),tonic=nearest(notesInRange([pcs[0]],range[0]-12,range[1]+12),(range[0]+range[1])/2-(bar.centre===undefined?3:bar.centre*12/pcs.length));
         const anchor=pcs[0]+12*Math.floor(tonic/12);
         bar.notes.forEach((note,ni)=>{
             const degree=note.degree,index=((degree%pcs.length)+pcs.length)%pcs.length;
@@ -35,7 +36,7 @@ export function searchPhrase({bars,range,settings,previousMidi,seed,closing=true
             const endingPcs=(bar.midpoint||settings.leadEnding==='open')?[bar.chord.pitchClasses[2],bar.scalePcs[1]]:bar.chord.pitchClasses.slice(0,2);
             const endings=allowed.filter(n=>endingPcs.includes(n%12));
             const pool=end&&endings.length?endings:allowed;
-            stages.push({bi,ni,note,target,pool,chord:bar.chord.pitchClasses,tension:bar.tension});
+            stages.push({bi,ni,note,target,pool,chord:bar.chord.pitchClasses,tension:bar.tension,fidelity:bar.fidelity});
         });
     });
     if(!stages.length)return {bars:bars.map(b=>({bar:b.bar,events:[]})),score:0,destination:null,beamWidth:PHRASE_BEAM};
@@ -52,8 +53,11 @@ export function searchPhrase({bars,range,settings,previousMidi,seed,closing=true
             const reach=closing?Math.max(0,Math.abs(midi-goal)-remaining*2)*.4:0;
             const inertia=inertiaCost({amount:settings.leadInertia??0,previous:path.motion,motion,leap,from:prior?.note,to:stage.note});
             const chordCost=stage.tension===undefined?3:4-stage.tension*2;
-            const score=path.score+Math.abs(midi-stage.target)*.65+(stage.note.accent&&!stage.chord.includes(midi%12)?chordCost:0)
-                +Math.max(0,leap-(3+(settings.leadLeaps??.5)*6))*.9+leap*.08+contour+recovery+Math.max(0,run-1)*.7+reach+inertia;
+            // A styled theme (melodicStyle.js) keeps its pitches: it only gives way where a held or accented note fights the chord.
+            const fits=stage.fidelity?((stage.note.accent||stage.note.length>=1)&&clashes(midi%12,stage.chord)?5:0)
+                :(stage.note.accent&&!stage.chord.includes(midi%12)?chordCost:0);
+            const score=path.score+Math.abs(midi-stage.target)*(stage.fidelity??.65)+fits
+                +Math.max(0,leap-(3+(settings.leadLeaps??.5)*6))*(stage.fidelity?.3:.9)+leap*.08+contour+recovery+Math.max(0,run-1)*.7+reach+inertia;
             paths.push({score,last:midi,motion,run,pitches:[...path.pitches,midi]});
         }
         // Preserve different destinations/directions rather than many duplicate prefixes.
@@ -61,7 +65,7 @@ export function searchPhrase({bars,range,settings,previousMidi,seed,closing=true
             const key=path.last+'/'+Math.sign(path.motion)+'/'+Math.min(2,path.run),count=seen.get(key)||0;seen.set(key,count+1);return count<2;
         }).slice(0,PHRASE_BEAM);
     });
-    const good=beam.filter(path=>path.score<=beam[0].score+.75),rng=seeded(seed^0x1f83d9ab),chosen=good[Math.floor(rng()*good.length)];
+    const good=beam.filter(path=>path.score<=beam[0].score+.75),rng=seeded(seed^0x1f83d9ab),chosen=stages[0].fidelity?beam[0]:good[Math.floor(rng()*good.length)];
     const output=bars.map(b=>({bar:b.bar,events:[]}));
     stages.forEach((stage,index)=>{const notes=bars[stage.bi].notes,note=stage.note;
         output[stage.bi].events.push({role:'lead',midi:chosen.pitches[index],beat:note.beat,
@@ -74,7 +78,7 @@ export function searchPhrase({bars,range,settings,previousMidi,seed,closing=true
 /** Reuse the chosen path only while its remaining musical context agrees. */
 export function planPhraseMelody(options,previous) {
     const signature=JSON.stringify([options.seed,options.range,options.settings.leadScale,options.settings.leadEnding,options.settings.leadLeaps,options.settings.leadInertia,options.settings.leadTendency,options.closing,!!options.resolveNotes,!!options.rhythmGrammar,options.meter,options.settings.leadDensity]);
-    const stages=options.bars.map(b=>({bar:b.bar,bpm:b.bpm,...(b.tension===undefined?{}:{tension:b.tension}),midpoint:!!b.midpoint,chord:{pitchClasses:b.chord.pitchClasses},scalePcs:b.scalePcs,notes:b.notes}));
+    const stages=options.bars.map(b=>({bar:b.bar,bpm:b.bpm,...(b.tension===undefined?{}:{tension:b.tension}),...(b.fidelity?{fidelity:b.fidelity,centre:b.centre}:{}),midpoint:!!b.midpoint,chord:{pitchClasses:b.chord.pitchClasses},scalePcs:b.scalePcs,notes:b.notes}));
     const from=stages[0].bar,remaining=previous?.stages?.filter(b=>b.bar>=from);
     const priorEvents=previous?.bars?.filter(b=>b.bar<from).flatMap(b=>b.events);
     const expected=priorEvents?.length?priorEvents.at(-1).midi:previous?.previousMidi;

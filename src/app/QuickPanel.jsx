@@ -6,7 +6,8 @@ import FeelPad from './FeelPad';
 import IntensityFader from './IntensityFader';
 import MoodFader from './MoodFader';
 import { voiceLayers as layersOf } from './arranger';
-import { MIX_SLIDERS, FEEL_SLIDERS, CHOICE_GROUPS, choiceAt, choicePaths, choicePatch, STACKS, LEVELS, readValue, sliderPatch, stackLevel, stackPatch, stackPaths, matchesPreset, presetPatch } from './quickControls';
+import { songPartCan } from './composition/songParts';
+import { MELODY_PLAN, MELODY_STYLE, MELODY_PARTS, MIX_SLIDERS, FEEL_SLIDERS, CHOICE_GROUPS, choiceAt, choicePaths, choicePatch, STACKS, LEVELS, readValue, sliderPatch, stackLevel, stackPatch, stackPaths, matchesPreset, presetPatch } from './quickControls';
 
 // milliseconds as they are, everything else as a percentage of 1
 const format = (value, { max }) => (max >= 20 ? `${Math.round(value)}` : `${Math.round(value * 100)}`);
@@ -34,8 +35,8 @@ const Slider = ({ id, label, title, value, min = 0, max = 1, step = 0.01, onChan
 // (green low, yellow medium, red high); the choices of one setting share the group's. Exactly one
 // lights up: the one picked, else Preset when the settings are still the preset's, else whichever level
 // they happen to match, else none.
-const Choices = ({ label, title, hue, options, active, onPick }) => (
-    <div className="gen-quick-group gen-quick-pills" role="radiogroup" aria-label={label} title={title} style={{ '--hue': hue }}>
+const Choices = ({ label, title, hue, options, active, onPick, wide = false }) => (
+    <div className={`gen-quick-group gen-quick-pills${wide ? ' is-wide' : ''}`} role="radiogroup" aria-label={label} title={title} style={{ '--hue': hue }}>
         <div className="gen-quick-choices">
             {options.map(({ key, label: text, title: hint, preset, hue: own }) => (
                 <button key={key} type="button" role="radio" aria-checked={active === key} title={hint} style={own ? { '--hue': own } : undefined} className={`${preset ? 'is-preset' : ''}${active === key ? ' is-on' : ''}`}
@@ -49,6 +50,40 @@ const Choices = ({ label, title, hue, options, active, onPick }) => (
 const HUES = { choice: '#8f7ae0' };
 const LEVEL_HUES = ['#8d9aa6', '#5fb878', '#e3b93a', '#e5654f']; // off, low, med, high
 const PRESET = { key: 'preset', label: 'Preset', preset: true, title: 'As the preset has it' };
+
+// The melody row: its own line across the panel, so it never pushes the columns above it wider. A style or a part only
+// means something in a song, so picking either while the lead noodles starts one.
+const MelodyRow = ({ settings, baseline, settled, pick, onSettings }) => {
+    const noodling = choiceAt(settings, MELODY_PLAN) === 'noodle';
+    // (the Preset pill says what the preset has, so its plan and style can be seen before changing them)
+    const presetPill = (group) => {
+        if (!baseline) return [];
+        const named = group.choices.find((choice) => choice.value === choiceAt(baseline, group))?.label;
+        return [named ? { ...PRESET, label: `Preset: ${named}` } : PRESET];
+    };
+    const pills = (group) => [...group.choices.map(({ value, label, title }) => ({ key: value, label, title })), ...presetPill(group)];
+    return (
+        <div className="gen-quick-melody" role="group" aria-label="Melody controls">
+            <Choices wide label={MELODY_PLAN.label} title={MELODY_PLAN.title} hue={HUES.choice} options={pills(MELODY_PLAN)} active={settled(MELODY_PLAN.id, choiceAt(settings, MELODY_PLAN), choicePaths(MELODY_PLAN))}
+                onPick={(key) => pick(MELODY_PLAN.id, key, key === 'preset' ? presetPatch(settings, baseline, choicePaths(MELODY_PLAN)) : choicePatch(settings, MELODY_PLAN, key))} />
+            <div className={noodling ? 'gen-quick-melody-song is-idle' : 'gen-quick-melody-song'}>
+                <Choices wide label={MELODY_STYLE.label} title={MELODY_STYLE.title} hue={HUES.choice} options={pills(MELODY_STYLE)} active={settled(MELODY_STYLE.id, choiceAt(settings, MELODY_STYLE), choicePaths(MELODY_STYLE))}
+                    onPick={(key) => pick(MELODY_STYLE.id, key, key === 'preset' ? presetPatch(settings, baseline, choicePaths(MELODY_STYLE))
+                        : { ...choicePatch(settings, MELODY_STYLE, key), ...(noodling ? choicePatch(settings, MELODY_PLAN, 'same') : {}) })} />
+                <div className="gen-quick-group gen-quick-pills is-wide" role="group" aria-label="Parts in the song">
+                    <div className="gen-quick-choices">
+                        {MELODY_PARTS.map(({ id, label, path, title }) => {
+                            const on = readValue(settings, path) !== false, can = songPartCan(settings, id);
+                            return <button key={id} type="button" role="switch" aria-checked={on && can} title={can ? title : `This preset has no such part: ${title}`} disabled={!can} className={on && can ? 'is-on' : ''}
+                                onClick={() => onSettings({ ...sliderPatch(settings, path, !on), ...(noodling ? choicePatch(settings, MELODY_PLAN, 'same') : {}) })}>{label}</button>;
+                        })}
+                    </div>
+                    <span className="gen-quick-label">In the song</span>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 // `roleLabels`: each voice's name as the rest of the page has it (rhythm, percussion, ...).
 // `baseline`: the preset's quick settings (Preset buttons); `resetKey` changes when Reset is pressed.
@@ -101,6 +136,7 @@ export default function QuickPanel({ settings, layersUnlocked = true, roleLabels
                         );
                     })}
                 </div>
+            <MelodyRow settings={settings} baseline={baseline} settled={settled} pick={pick} onSettings={onSettings} />
             </div>
             {onPush && settings.push && (
                 <div className="gen-quick-intensity">
