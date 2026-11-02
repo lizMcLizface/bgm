@@ -53,3 +53,4 @@ html, body { margin: 0; background: var(--gen-bg); color: var(--gen-text); font:
 .ps-num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .ps-level-loud { color: #e07a5f; font-weight: 600; }
 .ps-level-quiet { color: #6fa8dc; font-weight: 600; }
+.ps-to-check { color: #d9a441; font-size: .85em; white-space: nowrap; }

@@ -44,7 +44,7 @@ export const TIERS = [
 ];
 
 /** Categories that are always fully open: demos of new features and test presets. */
-export const OPEN_CATEGORIES = ['wasm', 'demo'];
+export const OPEN_CATEGORIES = ['wasm', 'demo', 'recordings'];
 
 /** A preset counts as heard (for `distinct`) after this many seconds. */
 export const HEARD_SECONDS = 30;

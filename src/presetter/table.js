@@ -1,5 +1,6 @@
 // The presetter's table: which presets are shown, and in what order.
 import { searchText } from './judgements';
+import { instrumentsToCheck, TO_CHECK_MARK } from './toCheck';
 
 export const RECENT_HOURS = 24;
 export const SORTS = { '': 'Library order', loud: 'Loudest first', quiet: 'Quietest first', range: 'Most dynamic first', busy: 'Busiest first' };
@@ -9,14 +10,16 @@ const SORT_KEY = { loud: (j) => -j.lufs, quiet: (j) => j.lufs, range: (j) => -j.
  * @param {object[]} scenes - { name, category, ... } in library order
  * @param {object} store - store.js
  * @param {object} [filter] - { query, category, status ('' any, 'unjudged', or a status), changed ('' any, 'yes', 'recent'), sort (SORTS),
- *   judgements (judgements.js, by preset name; searched too and what the sorts use), now }
+ *   toCheck (only presets using an older Measured voice, toCheck.js), judgements (judgements.js, by preset name; searched too and what the sorts use), now }
  */
-export function rowsFor(scenes, store, { query = '', category = '', status = '', changed = '', sort = '', judgements = {}, now = Date.now() } = {}) {
+export function rowsFor(scenes, store, { query = '', category = '', status = '', changed = '', sort = '', toCheck = false, judgements = {}, now = Date.now() } = {}) {
     const q = query.trim().toLowerCase();
     const shown = scenes.filter((scene) => {
         const e = store.presets[scene.name];
         if (category && scene.category !== category) return false;
-        if (q && !`${scene.name} ${scene.blurb ?? ''} ${e?.note ?? ''} ${searchText(judgements[scene.name])}`.toLowerCase().includes(q)) return false;
+        const older = instrumentsToCheck(scene);
+        if (toCheck && !older.length) return false;
+        if (q && !`${scene.name} ${scene.blurb ?? ''} ${e?.note ?? ''} ${older.length ? `${TO_CHECK_MARK} ${older.join(' ')}` : ''} ${searchText(judgements[scene.name])}`.toLowerCase().includes(q)) return false;
         if (status === 'unjudged' ? e?.status : status && (e?.status ?? '') !== status) return false;
         if (changed === 'yes' && !e?.change) return false;
         if (changed === 'recent' && !(e?.changedAt && now - e.changedAt <= RECENT_HOURS * 3600 * 1000)) return false;

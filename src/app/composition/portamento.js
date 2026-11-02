@@ -2,7 +2,12 @@
 // Performance only - the written notes stay as they are. It uses the slide every engine already plays
 // (expression.slideFromMidi / slideSeconds, engine/Instrument.js and labs/noteEvents.js).
 const ROLES = ['lead', 'counter', 'bass'];
-const MAX_SECONDS = 0.3, MAX_STEP = { lead: 9, counter: 9, bass: 12 };
+const MAX_SECONDS = 0.3, MAX_STEP = { lead: 9, counter: 9, bass: 12 }, VOICE_SHARE = { lead: 1, counter: 0.5, bass: 0.5 };
+
+/** The glide each role plays with: the setting, or more when its voice glides by itself (preset.glide), most on the lead. */
+export function roleGlides(amounts = {}, voices = {}) {
+    return Object.fromEntries(ROLES.map((role) => [role, Math.max(amounts[role] ?? 0, (voices[role]?.preset?.glide ?? 0) * VOICE_SHARE[role])]));
+}
 
 /**
  * Notes that follow another of their role closely get a slide from it. \`previous\` is the bar before

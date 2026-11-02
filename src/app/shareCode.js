@@ -94,6 +94,16 @@ export const SHAREABLE_PRESETS = [
     // short, tight voices for driven rhythm (step sequencer lanes)
     'Supersaw Stab', 'Techno Stab', 'Pluck Chord', 'Rolling Bass',
     'Drive Lead', 'Acid Lead', 'Trance Chord', 'Trance Bass',
+    // measured from the Iowa and VSCO recordings (engine/iowaModel)
+    'Iowa Flute', 'Iowa Flute, no vibrato', 'Iowa Alto Flute', 'Iowa Bass Flute', 'VSCO Piccolo',
+    'Iowa Oboe', 'Iowa Eb Clarinet', 'Iowa Bb Clarinet', 'Iowa Bass Clarinet', 'Iowa Bassoon',
+    'Iowa Soprano Sax', 'Iowa Soprano Sax, no vibrato', 'Iowa Alto Sax', 'Iowa Alto Sax, no vibrato', 'Iowa French Horn',
+    'Iowa Trumpet', 'Iowa Trumpet, no vibrato', 'VSCO Trumpet, harmon mute', 'VSCO Trumpet, straight mute', 'VSCO French Horn, muted',
+    'Iowa Tenor Trombone', 'Iowa Bass Trombone', 'Iowa Tuba', 'Iowa Violin', 'Iowa Viola',
+    'Iowa Cello', 'Iowa Double Bass', 'Iowa Bowed Vibraphone', 'Iowa Violin Pizzicato', 'Iowa Viola Pizzicato',
+    'Iowa Cello Pizzicato', 'Iowa Double Bass Pizzicato', 'Iowa Guitar', 'VSCO Harp', 'Iowa Marimba, yarn',
+    'Iowa Marimba, roll', 'Iowa Marimba, rubber', 'Iowa Xylophone, hard rubber', 'Iowa Xylophone, hard rubber roll', 'Iowa Xylophone, rosewood',
+    'Iowa Xylophone, rosewood roll', 'Iowa Vibraphone', 'Iowa Orchestra Bells, plastic', 'Iowa Orchestra Bells, brass', 'Iowa Crotales',
 ];
 const PRESET_BITS = 8;
 // Preset index meaning "a generated sound" (soundGen.js v1): followed by

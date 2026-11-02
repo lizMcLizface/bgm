@@ -13,6 +13,8 @@ export const BASES = {
     string: { label: 'Calm string', colour: '#d98070' },
     legacy: { label: 'Web Audio', colour: '#98a0a8' },
     classic: { label: 'Classic', colour: '#d07ab0' },
+    iowa: { label: 'Iowa', colour: '#8fb3a0' },
+    vsco: { label: 'VSCO', colour: '#a3b98a' },
 };
 
 /** @returns {{ id: string, label: string, colour: string }} */
@@ -20,6 +22,7 @@ export function soundBase(preset = {}) {
     // the picker lists a classic's sound as a reference, which names its synth; the page itself never loads the synths
     if (preset.classicRef) return { ...BASES.classic, id: 'classic', label: preset.classicRef.synthName };
     if (preset.classics) return { ...BASES.classic, id: 'classic' };
+    if (preset.iowa) { const id = preset.iowaSource === 'vsco' ? 'vsco' : 'iowa'; return { id, ...BASES[id] }; }
     const voice = preset.wasmVoice && wasmVoiceById(preset.wasmVoice);
     let id;
     if (voice) id = voice.kind === 'fm' ? 'fm' : 'poly';

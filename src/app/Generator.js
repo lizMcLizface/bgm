@@ -54,8 +54,9 @@ import { harmonyMode } from './composition/harmonyScale';
 import { planPerformance, performPhrase } from './composition/performance';
 import { performEnsemble } from './composition/ensembleRhythm';
 import { instrumentGroovePlan } from './composition/instrumentGroove';
+import { rangedRoles, planRegisterShift, applyRegisterShift } from './composition/registerShift';
 import { slideNotes } from './composition/noteSlides';
-import { glideNotes } from './composition/portamento';
+import { glideNotes, roleGlides } from './composition/portamento';
 import { SweepFilter, SWEEP_OPEN } from './engine/sweepFilter';
 import { expressNotes, expressHeldNotes, connectWindNotes, timeSoundNotes } from './composition/noteExpression';
 import { applyDynamics, expressDynamics } from './composition/dynamics';
@@ -132,7 +133,7 @@ const ENDING_RING_BARS = 3;
 /** The percussion role (engine/drumKit.js): not a synth, so not in ROLES. */
 export const PERC_ROLE = { perc: { label: 'Percussion' } };
 /** A voice played by a classic synth or a DIY patch rather than the generator's own synth (presets). */
-export const externalSource = (preset) => !!(preset?.classics || preset?.diy);
+export const externalSource = (preset) => !!(preset?.classics || preset?.diy || preset?.iowa);
 
 // In display order.
 export const ROLES = {
@@ -877,7 +878,10 @@ class Generator {
         const r=this.roles[role],revision=r.sourceRevision=(r.sourceRevision??0)+1;
         const pending=(async()=>{
             let instrument;
-            if(source?.classics){
+            if(source?.iowa){
+                const Iowa=(await import('./engine/iowaInstrument')).default;
+                instrument=await Iowa.create({context:this.AC,preset:source,polyphony:ROLES[role].polyphony});
+            }else if(source?.classics){
                 const Classics=(await import('./engine/classicsInstrument')).default;
                 instrument=await Classics.create({context:this.AC,preset:source,polyphony:source.classics.light?Math.min(4,ROLES[role].polyphony):ROLES[role].polyphony});
             }else if(source?.diy){
@@ -889,8 +893,8 @@ class Generator {
             }else instrument=new Instrument({context:this.AC,preset:source??findPreset(ROLES[role].preset),polyphony:ROLES[role].polyphony,reverbHub:this.reverbHub});
             if(revision!==r.sourceRevision){instrument.dispose();return;}
             r.roomRoute?.dispose();r.roomRoute=null;r.instrument.dispose();r.instrument=instrument;instrument.connect(r.tone);
-            if(this.wasmRoomPool&&!source?.classics)r.roomRoute=createWasmRoomRoute(this.AC,instrument,{roleWander:r.wander,volume:r.volume,cutoff:r.tone.frequency.value});
-            r.stringPatchBase=null;r.edited=externalSource(source);r.presetName=name??source?.classics?.name??source?.diy?.name??ROLES[role].preset;
+            if(this.wasmRoomPool&&!source?.classics&&!source?.iowa)r.roomRoute=createWasmRoomRoute(this.AC,instrument,{roleWander:r.wander,volume:r.volume,cutoff:r.tone.frequency.value});
+            r.stringPatchBase=null;r.edited=externalSource(source)&&!source?.iowa;r.presetName=name??source?.classics?.name??source?.diy?.name??ROLES[role].preset;
             this.applyMix();
         })();
         this.sourceLoads??=new Set();this.sourceLoads.add(pending);
@@ -930,8 +934,8 @@ class Generator {
         const r = this.roles[role];
         r.stringPatchBase = (isStringPatch(name) || isPianoPatch(name) || isBreathPatch(name)) && preset === findPreset(name) ? { name, preset } : null;
         if (r.stringPatchBase) preset = breathPatch(name,pianoPatch(name, stringPatch(name, preset, this.settings.generation), this.settings.generation),this.settings.generation);
-        // a classic synth or DIY patch gives the role back to the generator's own synth
-        if (externalSource(r.instrument.preset)) {
+        // a classic synth or DIY patch gives the role back to the generator's own synth, and a voice measured from recordings is an instrument of its own
+        if (preset.iowa || externalSource(r.instrument.preset)) {
             const base = r.stringPatchBase;
             this.setRoleSource(role, preset, name).then(() => { r.stringPatchBase = base; }, (error) => console.error('Could not restore the voice', error));
         } else if (morphSeconds > 0) r.instrument.morphTo(preset, morphSeconds);
@@ -1124,9 +1128,11 @@ class Generator {
         const anySolo = Object.values(this.roles).some((r) => r.solo);
         Object.values(this.roles).forEach((r) => {
             const audible = anySolo ? r.solo : !r.mute;
-            r.gain.gain.setTargetAtTime(audible ? r.volume : 0, this.AC.currentTime, 0.02);
-            r.roomRoute?.gain.gain.setTargetAtTime(audible ? r.volume : 0, this.AC.currentTime, 0.02);
-            if (r.instrument.reverb && r.instrument.reverb.setLevel) r.instrument.reverb.setLevel(audible ? r.volume : 0);
+            if (audible) r.playedLive = false;       // heard again: the part is the generator's again
+            const open = audible || r.playedLive;
+            r.gain.gain.setTargetAtTime(open ? r.volume : 0, this.AC.currentTime, 0.02);
+            r.roomRoute?.gain.gain.setTargetAtTime(open ? r.volume : 0, this.AC.currentTime, 0.02);
+            if (r.instrument.reverb && r.instrument.reverb.setLevel) r.instrument.reverb.setLevel(open ? r.volume : 0);
         });
     }
 
@@ -1179,6 +1185,18 @@ class Generator {
         return this.midi.instrument;
     }
 
+    /**
+     * A person playing a muted voice takes it over: its own notes stop, those already booked included, and its channel opens for what is played, until it is
+     * heard again. Generated and played notes share an instrument, so the mute cannot stay on one and not the other. Until then a mute changes nothing.
+     */
+    playAlong(role) {
+        const r = this.roles[role];
+        if (this.audible(role) || r.playedLive) return;
+        r.instrument.silence();
+        r.playedLive = true;
+        this.applyMix();
+    }
+
     liveNoteOn(role, midi, velocity = 0.8) {
         if (this.AC.state !== 'running') this.AC.resume();
         this.endStopFade();
@@ -1187,6 +1205,7 @@ class Generator {
             this.liveNotes?.add(role + ':' + id);
             return id;
         }
+        this.playAlong(role);
         if (role === 'perc') {
             this.roles.perc.instrument.scheduleNote(midi, this.AC.currentTime + 0.005, 0.8, velocity, Math.random() * 2 - 1);
             this.emitVisualNote({ type: 'on', role, midi, velocity, time: this.AC.currentTime + 0.005, length: 0.15 });
@@ -1709,6 +1728,7 @@ class Generator {
         events.push(...hits, ...seqHits, ...laneHits);
         if(!original&&this.endingDevelopment!==false&&closing){const prepared=prepareEnding(events,this.meter);events.splice(0,events.length,...prepared);state.composition.ending={phase:'prepare',arrival:this.endBar};}
         applyBitonality(events,this.settings.tonality);
+        state.registerShift = this.shiftRegisters(events, state, prev, bar);
         // the long arc: this bar's place in the piece's running time (composition/arc.js)
         const prevMeter = prev?.meter ?? this.meter;
         const elapsed = prev ? (prev.elapsed ?? 0) + rubatoTime(prev.rubato, 60 / unitsPerMinute(prevMeter, prev.bpm), prevMeter.units) : 0;
@@ -1737,8 +1757,9 @@ class Generator {
             previous:prev?.events ?? [], bar, units:this.meter.units, secondsPerBeat:60/unitsPerMinute(this.meter,bpm),
             noteSlides:this.noteSlides === true,padMotion:this.padPitchMotion === true,bassMotion:this.bassPitchMotion === true,chordSlides:this.chordSlides === true,
         });
-        if (!original && Object.values(this.settings.portamento ?? {}).some((v) => v > 0)) glideNotes(events, {
-            previous: prev?.events ?? [], units: this.meter.units, secondsPerBeat: 60 / unitsPerMinute(this.meter, bpm), amounts: this.settings.portamento,
+        const glides = roleGlides(this.settings.portamento, this.grooveVoices ?? this.grooveVoiceSnapshot());
+        if (!original && Object.values(glides).some((v) => v > 0)) glideNotes(events, {
+            previous: prev?.events ?? [], units: this.meter.units, secondsPerBeat: 60 / unitsPerMinute(this.meter, bpm), amounts: glides,
         });
         expressDynamics(events, this.settings.dynamics);
         if (!original && this.registerLevel !== false) tameHighRegister(events, { voices: this.grooveVoices ?? this.grooveVoiceSnapshot() });
@@ -1796,8 +1817,9 @@ class Generator {
             voices:this.grooveVoices ?? this.grooveVoiceSnapshot(), bpm: bpm * (this.meter.pace ?? 1), tempoEffects:true,
         });
         applyBitonality(events,this.settings.tonality);
+        const registerShift = this.shiftRegisters(events, state, prev, bar);
         this.plan.set(bar, {
-            bar, chord, chordStart: final, state: { ...state, padVoicing, ...(developed&&final?{leadMidi:events.find(e=>e.role==='lead')?.midi??state.leadMidi,bassMidi:events.find(e=>e.role==='bass')?.midi??state.bassMidi}:{}) }, events,
+            bar, chord, chordStart: final, state: { ...state, padVoicing, registerShift, ...(developed&&final?{leadMidi:events.find(e=>e.role==='lead')?.midi??state.leadMidi,bassMidi:events.find(e=>e.role==='bass')?.midi??state.bassMidi}:{}) }, events,
             ...(developed?{boundaries:planBoundaries(state,bar,this.endBar)}:{}),
             music, upcoming: prev.upcoming, nextMusic: music, bpm, tone: prev.tone, ending: true,
         });
@@ -1874,10 +1896,18 @@ class Generator {
         return copy;
     }
 
+    // Moves the parts of voices with a narrow range into it, by the octave and a phrase at a time (composition/registerShift.js). Without such a voice this does nothing.
+    shiftRegisters(events, state, prev, bar) {
+        const roles = rangedRoles(this.grooveVoices ?? this.grooveVoiceSnapshot());
+        if (!Object.keys(roles).length) return undefined;
+        const start = state.composition?.phrase?.start ?? bar - bar % 8, last = prev?.state.registerShift;
+        return applyRegisterShift(events, last?.start === start ? last : planRegisterShift(start, roles, last, state.ranges), roles);
+    }
+
     grooveVoiceSnapshot() {
         return Object.fromEntries(['lead', 'counter', 'pad', 'bass', 'rhythm'].map(role => {
             const voice = this.roles?.[role], preset = voice?.instrument.preset ?? {};
-            return [role, { name: voice?.presetName ?? '', preset: { stringModel: preset.stringModel, gainAttack: preset.gainAttack, gainSustain:preset.gainSustain, vibratoDepth: preset.vibratoDepth } }];
+            return [role, { name: voice?.presetName ?? '', preset: { stringModel: preset.stringModel, gainAttack: preset.gainAttack, gainSustain:preset.gainSustain, vibratoDepth: preset.vibratoDepth, glide: preset.glide, range: preset.range } }];
         }));
     }
 
@@ -2191,6 +2221,7 @@ class Generator {
                 const at = Math.max(start, this.AC.currentTime), length = connected?.duration ?? seconds(e);
                 for (const [role, by] of Object.entries(duckedBy(this.settings.layers))) if (by[e.role]) this.roles[role].ducker?.note(at, at + length, duckFloor(role, e.role, this.settings.ducking, this.settings.layers));
             }
+            if (this.roles[e.role].playedLive) return;      // someone is playing this voice (playAlong)
             const instrument = this.roles[e.role].instrument;
             // a sequencer hit names its machine track; the other kits play the nearest drum
             if (e.track && instrument.hitTrack) instrument.hitTrack(e.track, e.midi, Math.max(start, this.AC.currentTime), e.velocity);

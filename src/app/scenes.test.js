@@ -45,7 +45,7 @@ test('every scene is valid as it stands: modes, presets, settings that survive s
 test('every scene is in a category, every category has scenes, and the list is long enough to browse', () => {
     const ids = SCENE_CATEGORIES.map((c) => c.id);
     expect(new Set(ids).size).toBe(ids.length);
-    SCENES.forEach((scene) => expect(ids).toContain(scene.category));
+    BROWSABLE_SCENES.forEach((scene) => expect(ids).toContain(scene.category));
     expect(BROWSABLE_SCENES.length).toBeGreaterThan(40);
     ids.forEach((id) => expect(BROWSABLE_SCENES.filter((s) => s.category === id).length).toBeGreaterThanOrEqual(1));
     ['ftl', 'metroid', 'f-zero', 'altp', 'stardew', 'terraria'].forEach((tag) =>

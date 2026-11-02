@@ -49,7 +49,8 @@ function voiceByLabId(id){return LAB_VOICES.find(v=>v.id===id);}
 const libraryNames=new Set(['Felt Keys',...WASM_VOICES.map(v=>v.name)]);
 const stringNames=new Set(['Nylon Guitar','Soft Harp','Harp Pluck','Kalimba Pluck','Upright Pluck']);
 for(const [category,presets]of [...Object.entries(PRESET_CATEGORIES),['unCAGED',presetData]])for(const [name,raw]of Object.entries(presets)){
- if(name==='- INIT -'||HIDDEN_PRESETS.has(name)||libraryNames.has(name))continue;libraryNames.add(name);
+ if(name==='- INIT -'||HIDDEN_PRESETS.has(name)||libraryNames.has(name)||raw.iowa)continue; // an Iowa voice has its own page and level pass (/synths/iowa)
+ libraryNames.add(name);
  const patch=breathPatch(name,pianoPatch(name,stringPatch(name,raw))),family=instrumentFamily(name,category);
  LAB_VOICES.push({id:'library-'+encodeURIComponent(name),name,presetName:name,family,kind:'legacy',patch,availability:needsNativeSource(patch)?'previous':'both',isNew:false,origin:category==='unCAGED'?'Existing unCAGED library':'Existing calmbgm library'});
  if(stringNames.has(name)){const classic=name+' (classic)';LAB_VOICES.push({id:'library-'+encodeURIComponent(classic),name:classic,presetName:classic,family,kind:'legacy',patch:{...raw,stringModel:'oscillator'},availability:'both',isNew:false,origin:'Original oscillator library · before prepared-string adaptation'});}

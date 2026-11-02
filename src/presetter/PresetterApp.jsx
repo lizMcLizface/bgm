@@ -2,6 +2,7 @@
 // each and a verdict and a note, and dump them to a file to bake into the library (tools/applyPresetChanges.mjs). Development only:
 // the page's dev hook (GenerativeApp window.__bgm) is what loads a preset and reads it back, and this page is left out of the public build.
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { instrumentsToCheck, TO_CHECK_MARK } from './toCheck';
 import { SCENE_BROWSE_ORDER, SCENE_CATEGORIES, normalizeScene, sceneVoiceSpec } from '../app/scenes';
 import { voiceLayers } from '../app/arranger';
 import { applyChange, describeChange, leafPaths } from './changes';
@@ -157,6 +158,7 @@ export default function PresetterApp() {
                 <select value={filter.sort} onChange={(e) => setFilter({ ...filter, sort: e.target.value })} aria-label="Order" title="From the audio judgements (tools/judgeLibrary.mjs)">
                     {Object.entries(SORTS).map(([k, label]) => <option key={k} value={k}>{label}</option>)}
                 </select>
+                <label className="ps-check" title="Presets using an older Measured voice, which an Iowa or VSCO instrument may now do better"><input type="checkbox" checked={!!filter.toCheck} onChange={(e) => setFilter({ ...filter, toCheck: e.target.checked })} />{TO_CHECK_MARK}</label>
                 <span className="ps-muted">{rows.length} of {SCENES.length} · {judged} judged · {changedCount} with changes</span>
                 <span className="ps-spacer" />
                 <button type="button" onClick={exportFile} disabled={!judged && !changedCount && !Object.keys(store.presets).length}>Dump to file</button>
@@ -176,7 +178,7 @@ export default function PresetterApp() {
                                 <tr key={s.name} className={`ps-row${s.name === selected ? ' is-selected' : ''}${e.change ? ' has-change' : ''}${e.status ? ` is-${e.status}` : ''}`}
                                     onClick={(ev) => { if (!ev.target.closest('select,input,textarea,button')) open(s.name); }}>
                                     <td className="ps-dot" title={e.heardAt ? `Opened ${ago(e.heardAt, now)}` : 'Not opened yet'}>{e.heardAt ? '●' : '○'}</td>
-                                    <td className="ps-name">{s.name}</td>
+                                    <td className="ps-name">{s.name}{instrumentsToCheck(s).length > 0 && <span className="ps-to-check" title={instrumentsToCheck(s).join(', ')}> {TO_CHECK_MARK}</span>}</td>
                                     <td className="ps-muted">{CATEGORY_LABEL[s.category] ?? s.category}</td>
                                     <td>{LAYER_LABEL[layers] ?? layers}{s.settings.layerFlow?.mode && s.settings.layerFlow.mode !== 'off' ? ' · flow' : ''}</td>
                                     <td className="ps-muted">{nameOf(sceneVoiceSpec(s, 'pad', layers))} / {nameOf(sceneVoiceSpec(s, 'rhythm', layers)) || '-'}</td>

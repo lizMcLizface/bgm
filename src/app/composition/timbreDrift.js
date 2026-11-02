@@ -11,7 +11,7 @@ const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
 /** Whether a role's sound may drift at all. */
 export function canDrift(preset) {
-    if (!preset || preset.wasmVoice || preset.classics || preset.diy) return false;
+    if (!preset || preset.wasmVoice || preset.classics || preset.diy || preset.iowa) return false;
     if (preset.stringModel && preset.stringModel !== 'oscillator') return false;
     return !(preset.fmIndex > 0 || preset.fmEnvAmount > 0);
 }

@@ -68,7 +68,8 @@ vi.mock('./engine/wasmDrumKit',()=>({default:class {
  setVoicePreset(id){this.voicePreset=id;}
  connect(){} scheduleNote(){} silence(){} flushTails(){} dispose(){}
 }}));
-import Generator from './Generator';
+import Generator, { externalSource } from './Generator';
+import { findPreset } from './editor/presetStore';
 
 test('optional rulebook tracing records actual borrowing without changing notes or the baseline chord shape',()=>{
     const g=new Generator({...defaultSettings(),seed:42,chordBorrow:1,sections:{mode:'gentle',phrases:2}});
@@ -1236,6 +1237,85 @@ test('parent chord labels use seven degrees, selected colours and Original stay 
     g.set('harmonyScale','selected');const selected=g.buildChord(music,'vi');expect(selected.root).toBe('C');expect(selected.harmonyPcs).toBeUndefined();
     g.set('generation','legacy');g.set('harmonyScale','auto');expect(g.buildChord(music,'vi')).toEqual(selected);
     g.set('generation','latest');g.set('harmonyScale','minor');expect(g.buildChord({...music,mode:'Pentatonic-5'},'I').pitchClasses).toEqual([0,3,7]);
+});
+
+test('a voice with a narrow range hears its part moved in whole octaves, one shift a phrase, and only its part',()=>{
+    const settings={...defaultSettings(),seed:42,leadActivity:1,ornaments:0,sections:{mode:'off',phrases:4}},range=[84,108];
+    const voices=(lead)=>({lead,counter:{name:'Reed Lead'},pad:{name:'Piano'},bass:{name:'Chip'}});
+    const plain=new Generator(settings),ranged=new Generator(settings);
+    plain.grooveVoices=voices({name:'Crotales'});ranged.grooveVoices=voices({name:'Crotales',preset:{range}});
+    const pitches=(g,bar,keep)=>g.plan.get(bar).events.filter(keep).map(e=>e.midi),byPhrase=new Map();
+    let lead=0;
+    for(let bar=0;bar<48;bar++){
+        plain.planBar(bar);ranged.planBar(bar);
+        // nothing but the lead changes; the state carries the plan through bars and re-plans as plain data
+        expect(pitches(ranged,bar,e=>e.role!=='lead')).toEqual(pitches(plain,bar,e=>e.role!=='lead'));
+        expect(JSON.parse(JSON.stringify(ranged.plan.get(bar).state.registerShift))).toEqual(ranged.plan.get(bar).state.registerShift);
+        const moved=pitches(ranged,bar,e=>e.role==='lead'),written=pitches(plain,bar,e=>e.role==='lead');
+        expect(moved).toHaveLength(written.length);
+        moved.forEach((midi,i)=>{
+            lead++;
+            expect(midi).toBeGreaterThanOrEqual(range[0]);expect(midi).toBeLessThanOrEqual(range[1]);
+            expect((midi-written[i])%12).toBe(0);
+        });
+        const {start,shifts}=ranged.plan.get(bar).state.registerShift;
+        if(byPhrase.has(start))expect(shifts).toEqual(byPhrase.get(start));
+        byPhrase.set(start,shifts);
+    }
+    expect(lead).toBeGreaterThan(20);expect(byPhrase.size).toBeGreaterThan(1);
+});
+
+test('a voice from recordings is an instrument of its own: the generator swaps to it, and keeps its range',()=>{
+    const preset=findPreset('Iowa Crotales');
+    expect(externalSource(preset)).toBe(true);expect(preset.range).toEqual([84,108]);
+    const g=new Generator({...defaultSettings(),seed:42}),swapped=[];
+    g.setRoleSource=(role,source,name)=>{swapped.push([role,source.iowa,name]);return Promise.resolve();};
+    expect(g.loadRolePreset('lead','Iowa Crotales')).toBe(true);
+    expect(swapped).toEqual([['lead','crotales','Iowa Crotales']]);expect(g.roles.lead.presetName).toBe('Iowa Crotales');
+});
+
+describe('playing along with a muted voice',()=>{
+    const setup=()=>{
+        const g=new Generator({...defaultSettings(),seed:42}),r=g.roles.lead,levels=[];
+        r.gain.gain.setTargetAtTime=(value)=>levels.push(value);
+        r.instrument.silence=vi.fn();r.instrument.startNote=vi.fn(()=>7);r.instrument.stopNote=vi.fn();
+        return {g,r,levels};
+    };
+    it('a mute alone changes nothing: the channel is shut and the voice is not stopped',()=>{
+        const {g,r,levels}=setup();
+        g.setRoleMix('lead',{mute:true});
+        expect(levels.at(-1)).toBe(0);expect(r.instrument.silence).not.toHaveBeenCalled();expect(r.playedLive).toBeFalsy();
+    });
+    it('the first played note stops the notes the voice was given and opens its channel, once, and the note sounds',()=>{
+        const {g,r,levels}=setup();
+        g.setRoleMix('lead',{mute:true});
+        expect(g.liveNoteOn('lead',60,.8)).toBe(7);
+        expect(r.instrument.silence).toHaveBeenCalledTimes(1);expect(r.playedLive).toBe(true);expect(levels.at(-1)).toBe(r.volume);
+        expect(r.instrument.startNote).toHaveBeenCalledWith(60,.8);
+        g.liveNoteOff('lead',7);g.liveNoteOn('lead',62,.8);
+        expect(r.instrument.silence).toHaveBeenCalledTimes(1);expect(levels.at(-1)).toBe(r.volume);
+    });
+    it('unmuting gives the part back, and muting again shuts the channel',()=>{
+        const {g,r,levels}=setup();
+        g.setRoleMix('lead',{mute:true});g.liveNoteOn('lead',60,.8);
+        g.setRoleMix('lead',{mute:false});
+        expect(r.playedLive).toBe(false);expect(levels.at(-1)).toBe(r.volume);
+        g.setRoleMix('lead',{mute:true});
+        expect(levels.at(-1)).toBe(0);
+    });
+    it('playing a voice that is heard takes nothing over, and a voice left out by a solo elsewhere can be played too',()=>{
+        const {g,r}=setup();
+        g.liveNoteOn('lead',60,.8);
+        expect(r.playedLive).toBeFalsy();expect(r.instrument.silence).not.toHaveBeenCalled();
+        g.setRoleMix('pad',{solo:true});g.liveNoteOn('lead',62,.8);
+        expect(r.playedLive).toBe(true);
+    });
+});
+
+test('voices without a range plan exactly as before, with no trace in the state',()=>{
+    const settings={...defaultSettings(),seed:7,leadActivity:1,sections:{mode:'off',phrases:4}},g=new Generator(settings);
+    g.grooveVoices={lead:{name:'Reed Lead'},counter:{name:'Reed Lead'},pad:{name:'Piano'},bass:{name:'Chip'}};
+    for(let bar=0;bar<16;bar++){g.planBar(bar);expect(g.plan.get(bar).state.registerShift).toBeUndefined();}
 });
 
 test('held wind expression copies independently and preserves written notes and Original',()=>{

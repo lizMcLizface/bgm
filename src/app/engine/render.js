@@ -255,6 +255,7 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
                     ? await (await import('./classicsInstrument')).default.create({ context: ctx, preset: gen.roles.perc.instrument.preset, polyphony: 16 })
                     : role === 'perc'
                     ? new (gen.percussionEngine && gen.percussionEngine !== 'native' ? WasmDrumKit : DrumKit)({ context: ctx, model:gen.percussionEngine })
+                    : presets[role]?.iowa?await (await import('./iowaInstrument')).default.create({context:ctx,preset:presets[role],polyphony:gen.getRolePolyphony(role)})
                     : presets[role]?.classics?await (await import('./classicsInstrument')).default.create({context:ctx,preset:presets[role],polyphony:gen.getRolePolyphony(role)})
                     : presets[role]?.diy?await (await import('./wasmInstrument')).default.create({polyphony:gen.getRolePolyphony(role),preset:presets[role],spec:(await import('./diySource')).diySpec(presets[role].diy,gen.getRolePolyphony(role)),context:ctx,roomPool,notes:notes.filter(n=>n.role===role&&n.time>=from&&n.time<end+(last?0:CROSSFADE)).map(n=>({...n,time:n.time-from}))})
                     : Wasm?await Wasm.create({polyphony:gen.getRolePolyphony(role),preset:presets[role],context:ctx,roomPool,dynamics:applyFeel(gen.settings).dynamics,notes:notes.filter(n=>n.role===role&&n.time>=from&&n.time<end+(last?0:CROSSFADE)).map(n=>({...n,time:n.time-from}))})

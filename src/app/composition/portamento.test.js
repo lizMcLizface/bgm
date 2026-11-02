@@ -1,6 +1,13 @@
-import { glideNotes } from './portamento';
+import { glideNotes, roleGlides } from './portamento';
 
 const note = (role, midi, beat, length = 0.5) => ({ role, midi, beat, length, velocity: 0.8 });
+
+test('a voice can glide by itself, most on the lead, and the setting can only add to that', () => {
+    const flute = { preset: { glide: 0.4 } };
+    expect(roleGlides({ lead: 0, counter: 0, bass: 0 }, { lead: flute, counter: flute, bass: {} })).toEqual({ lead: 0.4, counter: 0.2, bass: 0 });
+    expect(roleGlides({ lead: 0.7, counter: 0, bass: 0.1 }, { lead: flute })).toEqual({ lead: 0.7, counter: 0, bass: 0.1 });
+    expect(roleGlides(undefined, undefined)).toEqual({ lead: 0, counter: 0, bass: 0 });
+});
 
 test('a close following note glides from the one before it, and the glide scales with the amount', () => {
     const events = [note('bass', 40, 0, 0.9), note('bass', 47, 1, 0.9), note('bass', 40, 2, 0.9)];

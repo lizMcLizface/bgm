@@ -1546,7 +1546,7 @@ const GenerativeApp = () => {
         if (!import.meta.env.DEV) return undefined;
         // (a preset is taken at once and its piece starts from the top, never carried over from the last one at a chord)
         window.__bgm = { applyScene: (scene) => cutToScene(scene), capture: () => captureSetup({ name: soundScene.current?.name ?? '' }), loadedName: () => soundScene.current?.name ?? '',
-            running: () => gen.isRunning, pendingChange: () => !!gen.pendingChange };
+            running: () => gen.isRunning, pendingChange: () => !!gen.pendingChange, play: () => { if (!gen.isRunning) play(); }, roleNames: () => Object.fromEntries(Object.entries(gen.roles).filter(([role]) => role !== 'perc').map(([role, r]) => [role, r.presetName])) };
         return () => { delete window.__bgm; };
     });
     const setupActions = {

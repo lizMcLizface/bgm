@@ -30,8 +30,8 @@ import {percussionVoice} from './percussionVoices';
 import { cleanBook } from './rulebook/session';
 import { cleanRef, MACHINE_SYNTHS } from './shareExtras';
 
-/** The picker's categories, in order: [{ id, label, blurb }]. */
-export const SCENE_CATEGORIES = library.categories;
+/** The picker's categories, in order: [{ id, label, blurb }]. One whose presets are all retired (Feel demos) is left out; those presets still open from their links. */
+export const SCENE_CATEGORIES = library.categories.filter((category) => [...library.scenes, ...WEATHER_SCENES].some((scene) => scene.category === category.id && !scene.hidden));
 /** Where setups of your own go. */
 export const MINE = { id: 'mine', label: 'Mine', blurb: 'Saved from this page' };
 

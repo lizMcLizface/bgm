@@ -191,6 +191,14 @@ const BY_CATEGORY = {
 // "Name (previous piano)", "Name v1" and "Name · Bossa" share the landscape of "Name".
 const baseName = (name) => name.replace(/\s*\((previous[^)]*|tonal|v\d+)\)$/i, '').replace(/\s+v\d+$/i, '').replace(/\s+·\s+.*$/, '').trim();
 
+// The presets of From Recordings take the landscape of the preset each was written from, until they join their categories.
+const FROM_RECORDINGS = {
+    'Clarinet at the Kitchen Table': 'Morning coffee', 'Violin on the Fire Escape': 'Late-night brushes', 'Alto Sax, Last Train': 'Deep night', 'Marimba Study Hall': 'Clockwork',
+    'Bowed Bars at Dusk': 'Slow motion', 'Bass Flute Watch Rotation': 'Plotting a Course', 'Oboe Overworld': 'Heroic Field Trip', 'Tuba and Turnips': 'Turnip Town',
+    'Guitar Under the Interview': 'Gentle Interview', 'Horn Call Over the Ridge': 'Real Hero Hours', 'Harmon Mute Hallway': 'Ice Cave Echoes', 'Mallet Machine': 'Pocket Circuit',
+};
+for (const [name, base] of Object.entries(FROM_RECORDINGS)) BY_NAME[name] = BY_NAME[base];
+
 export function landscapeForScene(name, category) {
     return BY_NAME[name] || BY_NAME[baseName(name)] || BY_CATEGORY[category] || null;
 }

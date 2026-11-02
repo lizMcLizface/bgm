@@ -7,6 +7,9 @@
 const PRESET_DEFAULTS = {
     masterVolume: 0.75,
     wasmVoice: '',
+    iowa: '',            // a voice measured from recordings (engine/iowaModel/patches.js), and where they came from
+    iowaSource: '',
+    range: [],           // MIDI [low, high] an instrument can really play; its part stays inside (composition/registerShift.js)
     polyphony: 8,
     portamentoSpeed: 0,
     masterFilterType: 'lowpass',

@@ -607,3 +607,6 @@ label.inline.toggle{min-height:32px;}label.inline.toggle em{font-style:normal;co
 .dock-chords small{color:var(--muted);font-size:11px;}
 .dock-keys{margin:0;color:var(--muted);font-size:11px;line-height:1.4;}
 @media (max-width:640px){.dock-context{margin-left:0;}.dock-sounds{display:none;}}
+
+/* /synths/iowa: every instrument in view, not in a sideways scroller */
+.iowa .presets{flex-wrap:wrap;overflow:visible}

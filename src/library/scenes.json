@@ -56,6 +56,11 @@
       "blurb": "Melodic synth nostalgia, sequencer journeys and long progressive-house builds"
     },
     {
+      "id": "recordings",
+      "label": "From Recordings",
+      "blurb": "New instruments measured from the Iowa and VSCO recordings, each in a piece that could later join one of the other categories"
+    },
+    {
       "id": "wasm",
       "label": "Wasm showcases",
       "blurb": "New native FM and subtractive voices: strings, keys and synth motion"
@@ -13989,6 +13994,1244 @@
       }
     },
     {
+      "name": "Clarinet at the Kitchen Table",
+      "category": "recordings",
+      "blurb": "A clarinet over fingerpicked guitar and a plucked bass",
+      "isNew": true,
+      "tags": [
+        "iowa",
+        "fits:cozy"
+      ],
+      "settings": {
+        "tonic": 0,
+        "mode": "Major-1",
+        "bpm": 94,
+        "progression": 1,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 26,
+          "pulse": 52,
+          "arpeggio": 16,
+          "sequence": 0,
+          "rolled": 6,
+          "stacked": 0
+        },
+        "drums": {
+          "style": "lofi",
+          "activity": 0.31,
+          "variation": 0.57,
+          "sprinkle": 0.09
+        },
+        "swing": 0.2,
+        "leadActivity": 0.56,
+        "leadDensity": 0.24,
+        "leadLeaps": 0.34,
+        "leadRepeat": 0.38,
+        "humanize": {
+          "timing": 11,
+          "velocity": 0.1,
+          "detune": 1
+        },
+        "dynamics": {
+          "level": 0.95,
+          "range": 0.9,
+          "attack": 0.3,
+          "brightness": 0.3
+        },
+        "rubato": 0.4,
+        "ornaments": 0.3,
+        "ducking": 0.4,
+        "evenLoudness": 0.4,
+        "sectionSpace": 0.4,
+        "keyLift": 0,
+        "timbreDrift": 0.3,
+        "bassWeights": {
+          "whole": 42,
+          "half": 50,
+          "walking": 8,
+          "drive": 0
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.586,
+          "bass": 0.513,
+          "lead": 0.476,
+          "counter": 0.205,
+          "perc": 0.213,
+          "rhythm": 0.733
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "chordColour": {
+          "mode": "add6",
+          "amount": 0.2
+        },
+        "leadSyncopation": 0.2,
+        "melodyPlan": "change",
+        "melodyStyle": "lounge"
+      },
+      "voices": {
+        "pad": "Iowa Guitar",
+        "bass": "Iowa Double Bass Pizzicato",
+        "lead": "Iowa Bb Clarinet"
+      }
+    },
+    {
+      "name": "Violin on the Fire Escape",
+      "category": "recordings",
+      "blurb": "Bowed violin, soft vibraphone and brushes, late",
+      "isNew": true,
+      "tags": [
+        "iowa",
+        "fits:cozy"
+      ],
+      "settings": {
+        "tonic": 5,
+        "mode": "Major-2",
+        "bpm": 84,
+        "progression": 16,
+        "padNotes": 5,
+        "barsPerChord": 2,
+        "padWeights": {
+          "sustain": 42,
+          "pulse": 32,
+          "arpeggio": 18,
+          "sequence": 0,
+          "rolled": 8,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 10,
+          "half": 30,
+          "walking": 60,
+          "drive": 0
+        },
+        "drums": {
+          "style": "jazz",
+          "activity": 0.56,
+          "variation": 0.64,
+          "sprinkle": 0.09,
+          "kit": "felt"
+        },
+        "swing": 0.5,
+        "counter": {
+          "mode": "answer",
+          "activity": 0.44
+        },
+        "ambience": {
+          "fire": 0.3
+        },
+        "playAmbience": true,
+        "leadActivity": 0.56,
+        "leadDensity": 0.22,
+        "leadLeaps": 0.36,
+        "leadRepeat": 0.32,
+        "humanize": {
+          "timing": 15,
+          "velocity": 0.11,
+          "detune": 2
+        },
+        "dynamics": {
+          "level": 0.95,
+          "range": 0.9,
+          "attack": 0.3,
+          "brightness": 0.3
+        },
+        "rubato": 0.45,
+        "ornaments": 0.35,
+        "ducking": 0.4,
+        "evenLoudness": 0.4,
+        "sectionSpace": 0.4,
+        "keyLift": 0,
+        "timbreDrift": 0.3,
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "padRoot": "never",
+        "volumes": {
+          "pad": 0.8,
+          "bass": 0.7,
+          "lead": 0.65,
+          "counter": 0.55,
+          "perc": 0.5,
+          "rhythm": 0.76
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.2
+        },
+        "ambienceVolume": 0.66,
+        "leadSyncopation": 0.3,
+        "melodyPlan": "change",
+        "melodyStyle": "lounge"
+      },
+      "voices": {
+        "pad": "Iowa Vibraphone",
+        "bass": "Iowa Double Bass Pizzicato",
+        "lead": "Iowa Violin"
+      }
+    },
+    {
+      "name": "Alto Sax, Last Train",
+      "category": "recordings",
+      "blurb": "An alto sax over bowed bars and a low reed",
+      "isNew": true,
+      "tags": [
+        "iowa",
+        "fits:night"
+      ],
+      "settings": {
+        "padVibrato": 0.3,
+        "progressionMode": "generated",
+        "progressionMood": {
+          "brightness": 0.1,
+          "stability": 0.3,
+          "adventure": 0.5
+        },
+        "progressionWander": 0.5,
+        "tonic": 9,
+        "mode": "Major-6",
+        "bpm": 58,
+        "progression": 6,
+        "barsPerChord": 2,
+        "leadActivity": 0.36,
+        "drums": {
+          "style": "heartbeat",
+          "activity": 0.36,
+          "variation": 0.485,
+          "sprinkle": 0.06
+        },
+        "sections": {
+          "mode": "strong",
+          "phrases": 2
+        },
+        "sectionTone": true,
+        "ambience": {
+          "rain": 0.3,
+          "thunder": 0.25
+        },
+        "playAmbience": true,
+        "leadDensity": 0.08,
+        "leadLeaps": 0.3,
+        "leadRepeat": 0.42,
+        "humanize": {
+          "timing": 9,
+          "velocity": 0.07,
+          "detune": 2
+        },
+        "dynamics": {
+          "level": 0.9,
+          "range": 0.75,
+          "attack": 0.5,
+          "brightness": 0.4
+        },
+        "rubato": 0.5,
+        "ornaments": 0.2,
+        "ducking": 0.4,
+        "evenLoudness": 0.5,
+        "sectionSpace": 0.6,
+        "keyLift": 0,
+        "timbreDrift": 0.4,
+        "arc": {
+          "shape": "winddown",
+          "minutes": 30
+        },
+        "padWeights": {
+          "sustain": 60,
+          "pulse": 28,
+          "arpeggio": 12,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 84,
+          "half": 16,
+          "walking": 0,
+          "drive": 0
+        },
+        "padMotion": {
+          "lean": 0.22,
+          "fast": 0.04,
+          "swell": 0.08
+        },
+        "volumes": {
+          "pad": 0.8,
+          "bass": 0.7,
+          "lead": 0.65,
+          "counter": 0.48,
+          "perc": 0.44,
+          "rhythm": 0.78
+        },
+        "ambienceVolume": 0.72,
+        "melodyPlan": "change",
+        "melodyStyle": "cinema"
+      },
+      "voices": {
+        "pad": "Iowa Bowed Vibraphone",
+        "bass": "Iowa Bass Clarinet",
+        "lead": "Iowa Alto Sax"
+      }
+    },
+    {
+      "name": "Marimba Study Hall",
+      "category": "recordings",
+      "blurb": "Yarn mallets and a straight flute, nothing to distract",
+      "isNew": true,
+      "tags": [
+        "iowa",
+        "fits:focus"
+      ],
+      "settings": {
+        "leadSyncopation": 0.2,
+        "tonic": 9,
+        "mode": "Major-1",
+        "bpm": 80,
+        "meter": "5/4",
+        "progression": 15,
+        "padWeights": {
+          "sustain": 12,
+          "pulse": 8,
+          "arpeggio": 76,
+          "sequence": 0,
+          "rolled": 4,
+          "stacked": 0
+        },
+        "drums": {
+          "style": "shaker",
+          "activity": 0.36,
+          "variation": 0.4,
+          "sprinkle": 0.09
+        },
+        "counter": {
+          "mode": "answer",
+          "activity": 0.34
+        },
+        "leadActivity": 0.56,
+        "leadDensity": 0.24,
+        "leadLeaps": 0.38,
+        "leadRepeat": 0.48,
+        "humanize": {
+          "timing": 5,
+          "velocity": 0.07,
+          "detune": 1
+        },
+        "dynamics": {
+          "level": 0.9,
+          "range": 0.6,
+          "attack": 0.35,
+          "brightness": 0.2
+        },
+        "rubato": 0,
+        "ornaments": 0.1,
+        "ducking": 0.5,
+        "evenLoudness": 0.8,
+        "sectionSpace": 0.3,
+        "keyLift": 0,
+        "timbreDrift": 0.2,
+        "bassWeights": {
+          "whole": 42,
+          "half": 50,
+          "walking": 8,
+          "drive": 0
+        },
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.8,
+          "bass": 0.7,
+          "lead": 0.65,
+          "counter": 0.48,
+          "perc": 0.5,
+          "rhythm": 0.76
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "melodyPlan": "change",
+        "melodyStyle": "lounge"
+      },
+      "voices": {
+        "pad": "Iowa Marimba, yarn",
+        "bass": "Iowa Cello Pizzicato",
+        "lead": "Iowa Flute, no vibrato"
+      }
+    },
+    {
+      "name": "Bowed Bars at Dusk",
+      "category": "recordings",
+      "blurb": "Bowed vibraphone with the odd crotale high above",
+      "isNew": true,
+      "tags": [
+        "iowa",
+        "fits:ambience"
+      ],
+      "settings": {
+        "padVibrato": 0.3,
+        "progressionMode": "generated",
+        "progressionMood": {
+          "brightness": 0.1,
+          "stability": 0.3,
+          "adventure": 0.5
+        },
+        "progressionWander": 0.5,
+        "tonic": 5,
+        "mode": "Major-4",
+        "bpm": 52,
+        "progression": 10,
+        "barsPerChord": 4,
+        "leadActivity": 0.3,
+        "padNotes": 5,
+        "padWeights": {
+          "sustain": 100,
+          "pulse": 0,
+          "arpeggio": 0,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "sections": {
+          "mode": "strong",
+          "phrases": 2
+        },
+        "sectionTone": true,
+        "leadDensity": 0.1,
+        "leadLeaps": 0.24,
+        "leadRepeat": 0.4,
+        "humanize": {
+          "timing": 8,
+          "velocity": 0.07,
+          "detune": 2
+        },
+        "dynamics": {
+          "level": 0.9,
+          "range": 0.75,
+          "attack": 0.5,
+          "brightness": 0.4
+        },
+        "rubato": 0.5,
+        "ornaments": 0.2,
+        "ducking": 0.4,
+        "evenLoudness": 0.5,
+        "sectionSpace": 0.6,
+        "keyLift": 0,
+        "timbreDrift": 0.4,
+        "arc": {
+          "shape": "winddown",
+          "minutes": 30
+        },
+        "bassWeights": {
+          "whole": 84,
+          "half": 16,
+          "walking": 0,
+          "drive": 0
+        },
+        "padMotion": {
+          "lean": 0.22,
+          "fast": 0.04,
+          "swell": 0.08
+        },
+        "volumes": {
+          "pad": 0.8,
+          "bass": 0.7,
+          "lead": 0.65,
+          "counter": 0.36,
+          "perc": 0.33,
+          "rhythm": 0.72
+        },
+        "melodyPlan": "change",
+        "melodyStyle": "cinema"
+      },
+      "voices": {
+        "pad": "Iowa Bowed Vibraphone",
+        "bass": "Iowa Cello",
+        "lead": "Iowa Crotales"
+      }
+    },
+    {
+      "name": "Bass Flute Watch Rotation",
+      "category": "recordings",
+      "blurb": "Breathy bass flute and low brass on a long quiet shift",
+      "isNew": true,
+      "tags": [
+        "iowa",
+        "fits:starship"
+      ],
+      "settings": {
+        "tonic": 2,
+        "mode": "Major-6",
+        "bpm": 88,
+        "progression": 17,
+        "barsPerChord": 4,
+        "padNotes": 4,
+        "chordSpread": "open",
+        "padWeights": {
+          "sustain": 10,
+          "pulse": 0,
+          "arpeggio": 50,
+          "sequence": 40,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "arpWeights": {
+          "bounce": 30,
+          "up": 40,
+          "down": 10,
+          "broken": 20
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0,
+          "drive": 0
+        },
+        "pedal": {
+          "mode": "tonic",
+          "amount": 0.6
+        },
+        "chordColour": {
+          "mode": "add9",
+          "amount": 0.4
+        },
+        "leadActivity": 1,
+        "leadDensity": 0.05,
+        "leadLeaps": 0.3,
+        "leadRepeat": 0.55,
+        "leadScale": "pentatonic",
+        "leadEnding": "open",
+        "counter": {
+          "mode": "line",
+          "activity": 0.25
+        },
+        "drums": {
+          "style": "off",
+          "activity": 0,
+          "variation": 0,
+          "sprinkle": 0
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "humanize": {
+          "timing": 6,
+          "velocity": 0.08,
+          "detune": 1
+        },
+        "dynamics": {
+          "level": 1,
+          "range": 0.8,
+          "attack": 0.15,
+          "brightness": 0.3
+        },
+        "rubato": 0.1,
+        "ornaments": 0.1,
+        "ducking": 0.3,
+        "evenLoudness": 0.5,
+        "sectionSpace": 0.5,
+        "keyLift": 0.15,
+        "timbreDrift": 0.5,
+        "padMotion": {
+          "lean": 0.2,
+          "fast": 0.15,
+          "swell": 0.08
+        },
+        "volumes": {
+          "pad": 0.8,
+          "bass": 0.7,
+          "lead": 0.65,
+          "counter": 0.63,
+          "perc": 0,
+          "rhythm": 0.62
+        },
+        "ambience": {},
+        "playAmbience": false,
+        "arc": {
+          "shape": "wave",
+          "minutes": 15
+        },
+        "melodyPlan": "change",
+        "melodyStyle": "cinema"
+      },
+      "voices": {
+        "pad": "Iowa Viola",
+        "bass": "Iowa Bass Trombone",
+        "lead": "Iowa Bass Flute"
+      }
+    },
+    {
+      "name": "Oboe Overworld",
+      "category": "recordings",
+      "blurb": "An old adventure tune for real woodwinds and harp",
+      "isNew": true,
+      "tags": [
+        "iowa",
+        "fits:classics"
+      ],
+      "settings": {
+        "leadInertia": 0.4,
+        "padContour": 0.4,
+        "leadTendency": 0.5,
+        "tonic": 10,
+        "mode": "Major-1",
+        "bpm": 124,
+        "progression": 14,
+        "barsPerChord": 1,
+        "padNotes": 3,
+        "leadActivity": 0.8,
+        "padWeights": {
+          "sustain": 10,
+          "pulse": 75,
+          "arpeggio": 15,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 80,
+          "walking": 20,
+          "drive": 0
+        },
+        "drums": {
+          "style": "drive",
+          "activity": 0.25,
+          "variation": 0.25,
+          "sprinkle": 0.05,
+          "kit": "crisp"
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "sectionTone": true,
+        "counter": {
+          "mode": "answer",
+          "activity": 0.25
+        },
+        "drumKit": {
+          "room": 0.15,
+          "sizzle": {
+            "level": 0.3
+          },
+          "hat": {
+            "level": 0.4
+          },
+          "clap": {
+            "level": 0.55
+          },
+          "tom": {
+            "level": 1.1
+          },
+          "ride": {
+            "level": 0.4
+          }
+        },
+        "leadDensity": 0.25,
+        "leadLeaps": 0.55,
+        "leadRepeat": 0.65,
+        "humanize": {
+          "timing": 5,
+          "velocity": 0.08,
+          "detune": 1
+        },
+        "dynamics": {
+          "level": 1,
+          "range": 1.1,
+          "attack": 0,
+          "brightness": 0.4
+        },
+        "rubato": 0.15,
+        "ornaments": 0.4,
+        "ducking": 0.3,
+        "evenLoudness": 0.4,
+        "sectionSpace": 0.3,
+        "keyLift": 0.5,
+        "timbreDrift": 0.1,
+        "padMotion": {
+          "lean": 0.2,
+          "fast": 0,
+          "swell": 0.04
+        },
+        "volumes": {
+          "pad": 0.56,
+          "bass": 0.49,
+          "lead": 0.455,
+          "counter": 0.14,
+          "perc": 0.28,
+          "rhythm": 0.35
+        },
+        "pulseWeights": {
+          "groups": 60,
+          "beats": 25,
+          "push": 0,
+          "split": 15
+        },
+        "chordColour": {
+          "mode": "plain",
+          "amount": 0
+        },
+        "chordBorrow": 0,
+        "leadSyncopation": 0.25,
+        "padRoot": "unlessBass",
+        "melodyPlan": "change",
+        "melodyStyle": "song"
+      },
+      "voices": {
+        "pad": "VSCO Harp",
+        "bass": "Iowa Bassoon",
+        "lead": "Iowa Oboe"
+      }
+    },
+    {
+      "name": "Tuba and Turnips",
+      "category": "recordings",
+      "blurb": "Marimba, a tuba walking and a piccolo that will not sit still",
+      "isNew": true,
+      "tags": [
+        "iowa",
+        "fits:sandbox"
+      ],
+      "settings": {
+        "bassEuclid": 0.3,
+        "tonic": 7,
+        "mode": "Major-1",
+        "bpm": 104,
+        "progression": 1,
+        "barsPerChord": 1,
+        "padNotes": 3,
+        "leadActivity": 0.56,
+        "padWeights": {
+          "sustain": 18,
+          "pulse": 20,
+          "arpeggio": 54,
+          "sequence": 0,
+          "rolled": 8,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 15,
+          "half": 65,
+          "walking": 20,
+          "drive": 0
+        },
+        "drums": {
+          "style": "shaker",
+          "activity": 0.36,
+          "variation": 0.485,
+          "sprinkle": 0.09
+        },
+        "swing": 0.2,
+        "counter": {
+          "mode": "answer",
+          "activity": 0.34
+        },
+        "ambience": {
+          "wind": 0.1
+        },
+        "playAmbience": true,
+        "leadDensity": 0.28,
+        "leadLeaps": 0.3,
+        "leadRepeat": 0.46,
+        "humanize": {
+          "timing": 11,
+          "velocity": 0.11,
+          "detune": 2
+        },
+        "dynamics": {
+          "level": 0.95,
+          "range": 1,
+          "attack": 0.2,
+          "brightness": 0.3
+        },
+        "rubato": 0.3,
+        "ornaments": 0.5,
+        "ducking": 0.4,
+        "evenLoudness": 0.4,
+        "sectionSpace": 0.4,
+        "keyLift": 0.25,
+        "timbreDrift": 0.2,
+        "padMotion": {
+          "lean": 0.36,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.8,
+          "bass": 0.7,
+          "lead": 0.65,
+          "counter": 0.48,
+          "perc": 0.5,
+          "rhythm": 0.76
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "ambienceVolume": 0.66,
+        "leadSyncopation": 0.2,
+        "padRoot": "unlessBass",
+        "melodyPlan": "change",
+        "melodyStyle": "lounge"
+      },
+      "voices": {
+        "pad": "Iowa Marimba, rubber",
+        "bass": "Iowa Tuba",
+        "lead": "VSCO Piccolo"
+      }
+    },
+    {
+      "name": "Guitar Under the Interview",
+      "category": "recordings",
+      "blurb": "Guitar and soft vibraphone that keep out of the way of a voice",
+      "isNew": true,
+      "tags": [
+        "iowa",
+        "fits:podcast"
+      ],
+      "settings": {
+        "tonic": 5,
+        "mode": "Major-1",
+        "bpm": 82,
+        "progression": 1,
+        "barsPerChord": 2,
+        "padNotes": 3,
+        "leadActivity": 0.1,
+        "padWeights": {
+          "sustain": 60,
+          "pulse": 30,
+          "arpeggio": 6,
+          "sequence": 0,
+          "rolled": 4,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 80,
+          "half": 20,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "shaker",
+          "activity": 0.16,
+          "variation": 0.4,
+          "sprinkle": 0.03
+        },
+        "swing": 0.15,
+        "leadDensity": 0.06,
+        "leadLeaps": 0.22,
+        "leadRepeat": 0.52,
+        "humanize": {
+          "timing": 7,
+          "velocity": 0.06,
+          "detune": 1
+        },
+        "dynamics": {
+          "level": 0.85,
+          "range": 0.45,
+          "attack": 0.6,
+          "brightness": 0.15
+        },
+        "rubato": 0.2,
+        "ornaments": 0,
+        "ducking": 0.6,
+        "evenLoudness": 0.8,
+        "sectionSpace": 0.2,
+        "keyLift": 0,
+        "timbreDrift": 0.15,
+        "padMotion": {
+          "lean": 0.12,
+          "fast": 0,
+          "swell": 0.025
+        },
+        "volumes": {
+          "pad": 0.8,
+          "bass": 0.7,
+          "lead": 0.65,
+          "counter": 0.4,
+          "perc": 0.38,
+          "rhythm": 0.73
+        },
+        "sections": {
+          "mode": "gentle",
+          "phrases": 4
+        },
+        "melodyPlan": "change"
+      },
+      "voices": {
+        "pad": "Iowa Guitar",
+        "bass": "Iowa Cello Pizzicato",
+        "lead": "Iowa Vibraphone"
+      }
+    },
+    {
+      "name": "Horn Call Over the Ridge",
+      "category": "recordings",
+      "blurb": "Horn over low bowed strings, wide open",
+      "isNew": true,
+      "tags": [
+        "iowa",
+        "fits:cinema"
+      ],
+      "settings": {
+        "padContour": 0.4,
+        "padVibrato": 0.3,
+        "tonic": 9,
+        "mode": "Major-6",
+        "bpm": 72,
+        "progression": 8,
+        "barsPerChord": 2,
+        "padNotes": 4,
+        "padWeights": {
+          "sustain": 70,
+          "pulse": 20,
+          "arpeggio": 10,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 70,
+          "half": 30,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "downtempo",
+          "activity": 0.26,
+          "variation": 0.4,
+          "kit": "crisp",
+          "sprinkle": 0.09
+        },
+        "drumKit": {
+          "room": 0.2
+        },
+        "leadActivity": 0.8,
+        "leadDensity": 0.3,
+        "leadScale": "pentatonic",
+        "sections": {
+          "mode": "strong",
+          "phrases": 2
+        },
+        "sectionTone": true,
+        "chordColour": {
+          "mode": "sus4",
+          "amount": 0.25
+        },
+        "leadLeaps": 0.24,
+        "leadRepeat": 0.48,
+        "humanize": {
+          "timing": 6,
+          "velocity": 0.07,
+          "detune": 1
+        },
+        "dynamics": {
+          "level": 1,
+          "range": 1.4,
+          "attack": 0.35,
+          "brightness": 0.5
+        },
+        "rubato": 0.6,
+        "ornaments": 0.3,
+        "ducking": 0.4,
+        "evenLoudness": 0.3,
+        "sectionSpace": 0.7,
+        "keyLift": 0.4,
+        "timbreDrift": 0.35,
+        "padMotion": {
+          "lean": 0.3,
+          "fast": 0.12,
+          "swell": 0.055
+        },
+        "volumes": {
+          "pad": 0.8,
+          "bass": 0.7,
+          "lead": 0.65,
+          "counter": 0.48,
+          "perc": 0.5,
+          "rhythm": 0.76
+        },
+        "padRoot": "unlessBass",
+        "chordSize": "functional",
+        "melodyPlan": "change",
+        "melodyStyle": "cinema"
+      },
+      "voices": {
+        "pad": "Iowa Cello",
+        "bass": "Iowa Double Bass",
+        "lead": "Iowa French Horn"
+      }
+    },
+    {
+      "name": "Harmon Mute Hallway",
+      "category": "recordings",
+      "blurb": "A muted trumpet somewhere down the corridor",
+      "isNew": true,
+      "tags": [
+        "iowa",
+        "fits:unsettling"
+      ],
+      "settings": {
+        "tonic": 9,
+        "mode": "Major-6",
+        "bpm": 66,
+        "progression": 13,
+        "barsPerChord": 4,
+        "padNotes": 4,
+        "leadActivity": 0.75,
+        "padWeights": {
+          "sustain": 90,
+          "pulse": 0,
+          "arpeggio": 10,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 100,
+          "half": 0,
+          "walking": 0,
+          "drive": 0
+        },
+        "drums": {
+          "style": "off",
+          "activity": 0,
+          "variation": 0.2,
+          "sprinkle": 0,
+          "kit": "felt"
+        },
+        "counter": {
+          "mode": "line",
+          "activity": 0.15
+        },
+        "ambience": {
+          "wind": 0.2
+        },
+        "ambienceShape": {
+          "wind": {
+            "distance": 0.7
+          }
+        },
+        "playAmbience": true,
+        "sections": {
+          "mode": "gentle",
+          "phrases": 2
+        },
+        "sectionTone": true,
+        "leadDensity": 0.3,
+        "leadLeaps": 0.5,
+        "leadRepeat": 0.6,
+        "humanize": {
+          "timing": 8,
+          "velocity": 0.06,
+          "detune": 1
+        },
+        "dynamics": {
+          "level": 0.9,
+          "range": 1.3,
+          "attack": 0.45,
+          "brightness": 0.35
+        },
+        "rubato": 0.5,
+        "ornaments": 0.2,
+        "ducking": 0.3,
+        "evenLoudness": 0.3,
+        "sectionSpace": 0.8,
+        "keyLift": 0,
+        "timbreDrift": 0.6,
+        "padMotion": {
+          "lean": 0.1,
+          "fast": 0,
+          "swell": 0.08
+        },
+        "volumes": {
+          "pad": 1,
+          "bass": 1,
+          "lead": 0.973,
+          "counter": 0.314,
+          "perc": 0.374,
+          "rhythm": 1
+        },
+        "ambienceVolume": 0.45,
+        "chordBorrow": 0,
+        "leadEnding": "open",
+        "swing": 0,
+        "chordColour": {
+          "mode": "sus2",
+          "amount": 0.65
+        },
+        "chordSpread": "open",
+        "arc": {
+          "shape": "wave",
+          "minutes": 12
+        },
+        "melodyPlan": "change"
+      },
+      "voices": {
+        "pad": "Iowa Bowed Vibraphone",
+        "bass": "Iowa Bass Clarinet",
+        "lead": "VSCO Trumpet, harmon mute"
+      }
+    },
+    {
+      "name": "Mallet Machine",
+      "category": "recordings",
+      "blurb": "Rolled marimba chords and a rosewood xylophone on a dance beat",
+      "isNew": true,
+      "tags": [
+        "iowa",
+        "fits:electronic"
+      ],
+      "settings": {
+        "tonic": 7,
+        "mode": "Major-1",
+        "bpm": 116,
+        "progression": 10,
+        "barsPerChord": 2,
+        "padNotes": 3,
+        "padWeights": {
+          "sustain": 0,
+          "pulse": 100,
+          "arpeggio": 0,
+          "sequence": 0,
+          "rolled": 0,
+          "stacked": 0
+        },
+        "bassWeights": {
+          "whole": 0,
+          "half": 0,
+          "walking": 0,
+          "drive": 100
+        },
+        "leadActivity": 0.6,
+        "leadDensity": 0.15,
+        "leadLeaps": 0.2,
+        "leadRepeat": 0.8,
+        "chordColour": {
+          "mode": "plain",
+          "amount": 0
+        },
+        "chordBorrow": 0,
+        "humanize": {
+          "timing": 0,
+          "velocity": 0.03,
+          "detune": 0
+        },
+        "dynamics": {
+          "level": 1,
+          "range": 0.9,
+          "attack": 0.1,
+          "brightness": 0.4
+        },
+        "rubato": 0,
+        "ornaments": 0.15,
+        "ducking": 0.4,
+        "evenLoudness": 0.5,
+        "sectionSpace": 0.5,
+        "keyLift": 0.25,
+        "timbreDrift": 0.3,
+        "swing": 0,
+        "padMotion": {
+          "lean": 0.15,
+          "fast": 0,
+          "swell": 0.04
+        },
+        "counter": {
+          "mode": "answer",
+          "activity": 0.15
+        },
+        "sections": {
+          "mode": "off",
+          "phrases": 4
+        },
+        "sectionTone": false,
+        "volumes": {
+          "pad": 0.097,
+          "bass": 0.203,
+          "lead": 0.188,
+          "counter": 0.058,
+          "perc": 0.081,
+          "rhythm": 0.116
+        },
+        "drums": {
+          "style": "electro",
+          "activity": 0.1,
+          "variation": 0.05,
+          "sprinkle": 0,
+          "kit": "crisp"
+        },
+        "drumKit": {
+          "room": 0.12,
+          "punch": {
+            "level": 1,
+            "tone": -0.1
+          },
+          "sizzle": {
+            "level": 0.5,
+            "decay": 0.8
+          },
+          "hat": {
+            "level": 0.5,
+            "decay": 0.8
+          },
+          "clap": {
+            "level": 0.6
+          },
+          "rim": {
+            "level": 0.65
+          },
+          "ride": {
+            "level": 0.4
+          }
+        },
+        "arpWeights": {
+          "bounce": 20,
+          "up": 15,
+          "down": 10,
+          "broken": 55
+        },
+        "pulseWeights": {
+          "groups": 0,
+          "beats": 0,
+          "push": 0,
+          "split": 100
+        },
+        "ambience": {},
+        "playAmbience": false,
+        "thinPadUnderLead": false,
+        "breakdowns": {
+          "meter": "same",
+          "halfTime": true
+        },
+        "leadSyncopation": 0.25,
+        "padRoot": "unlessBass",
+        "melodyPlan": "change",
+        "melodyStyle": "hook"
+      },
+      "voices": {
+        "pad": "Iowa Marimba, roll",
+        "bass": "Sub Bass",
+        "lead": "Iowa Xylophone, rosewood"
+      }
+    },
+    {
       "name": "Glass Conservatory",
       "category": "wasm",
       "blurb": "Slow bowed-glass strings, silk chords and a distant air choir. A spacious native FM/string showcase.",
@@ -16930,7 +18173,8 @@
         "rhythm": "Kalimba Pluck",
         "bass": "Warm Bass",
         "lead": "Soft Flute"
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Demo: Layers over time",
@@ -16995,7 +18239,8 @@
         "rhythm": "Harp Pluck",
         "bass": "Upright Pluck",
         "lead": "Soft Flute"
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Demo: Breathing cadences",
@@ -17072,7 +18317,8 @@
             "enabled": false
           }
         }
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Demo: Strong and soft",
@@ -17153,7 +18399,8 @@
             "enabled": false
           }
         }
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Demo: Make room",
@@ -17235,7 +18482,8 @@
             "enabled": false
           }
         }
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Demo: Opening out",
@@ -17318,7 +18566,8 @@
             "enabled": false
           }
         }
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Demo: Groove slider",
@@ -17374,7 +18623,8 @@
         "pad": "Deep Pulse",
         "bass": "Neon Pulse Bass",
         "lead": "Bell Lead"
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Demo: Pad and bass",
@@ -17430,7 +18680,8 @@
         "pad": "Nylon Guitar",
         "bass": "Upright Pluck",
         "lead": "Measured Flute"
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Demo: Generated chords",
@@ -17491,7 +18742,8 @@
         "pad": "Soft Pad",
         "bass": "Warm Bass",
         "lead": "Measured Flute"
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Demo: Two-minute wave",
@@ -17571,7 +18823,8 @@
             "enabled": false
           }
         }
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Demo: Living colour",
@@ -17642,7 +18895,8 @@
             "enabled": false
           }
         }
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Demo: Shifting metre",
@@ -17727,7 +18981,8 @@
             "enabled": false
           }
         }
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Demo: Seven-eight",
@@ -17808,7 +19063,8 @@
             "enabled": false
           }
         }
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Solo Grand",
@@ -18929,7 +20185,8 @@
         "pad": "Arp Pluck",
         "bass": "Drive Bass",
         "lead": "Bell Lead"
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Demo: 5/8 downtempo",
@@ -18985,7 +20242,8 @@
         "pad": "Glass Pad",
         "bass": "Round Pluck Bass",
         "lead": "Soft Flute"
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Bossa in Seven",
@@ -19110,7 +20368,8 @@
         "pad": "Soft Pad",
         "bass": "Muted Pick Bass",
         "lead": "Glass Lead"
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Neon Overpass",
@@ -19235,7 +20494,8 @@
         "pad": "Ambient Piano v2",
         "bass": "Felt Bass",
         "lead": "Glass Grand v2"
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Demo: Struck leads, no trills",
@@ -19289,7 +20549,8 @@
         "pad": "Soft Pad",
         "bass": "Warm Bass",
         "lead": "Celesta"
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Demo: Song in lounge style",
@@ -19384,7 +20645,8 @@
       "layerVoices": {
         "pad": "Soft Pad",
         "rhythm": "Felt Keys (updated)"
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Demo: Song in hook style",
@@ -19605,7 +20867,8 @@
       "layerVoices": {
         "pad": "Outrun Lead",
         "rhythm": "Trance Chord"
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Demo: Song in game style",
@@ -19702,7 +20965,8 @@
       },
       "layerVoices": {
         "rhythm": "Soft Marimba"
-      }
+      },
+      "hidden": true
     },
     {
       "name": "Outrun After Midnight",
