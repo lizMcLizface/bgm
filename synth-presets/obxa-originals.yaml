@@ -162,7 +162,7 @@ programs:
       sync: 1
       fenvOsc2: 1
       noiseOn: 0
-      cutoff: 900
+      cutoff: 3600
       res: 0.2
       envAmount: 0.25
       poles: 1
@@ -302,7 +302,7 @@ programs:
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 1600
+      cutoff: 6400
       res: 0.05
       envAmount: 0.1
       poles: 0
@@ -442,7 +442,7 @@ programs:
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 700
+      cutoff: 2800
       res: 0.2
       envAmount: 0.3
       poles: 1
@@ -582,7 +582,7 @@ programs:
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 300
+      cutoff: 1200
       res: 0.1
       envAmount: 0.4
       poles: 1
@@ -722,7 +722,7 @@ programs:
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 250
+      cutoff: 1000
       res: 0.3
       envAmount: 0.5
       poles: 1
@@ -879,7 +879,7 @@ programs:
       lfoSine: 1
       lfoSquare: 0
       lfoSh: 0
-      lfoFreqDepth: 0.15
+      lfoFreqDepth: 0.28
       lfoToOsc1: 1
       lfoToOsc2: 1
       lfoToFilter: 0
@@ -1002,7 +1002,7 @@ programs:
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 500
+      cutoff: 2000
       res: 0.7
       envAmount: 0.1
       poles: 1
@@ -1019,7 +1019,7 @@ programs:
       lfoSine: 0
       lfoSquare: 0
       lfoSh: 1
-      lfoFreqDepth: 0.5
+      lfoFreqDepth: 0.63
       lfoToOsc1: 0
       lfoToOsc2: 0
       lfoToFilter: 1
@@ -1142,7 +1142,7 @@ programs:
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 140
+      cutoff: 560
       res: 0.3
       envAmount: 0.45
       poles: 1
@@ -1282,7 +1282,7 @@ programs:
       sync: 0
       fenvOsc2: 0
       noiseOn: 1
-      cutoff: 500
+      cutoff: 2000
       res: 0.6
       envAmount: 0.2
       poles: 1
@@ -1299,7 +1299,7 @@ programs:
       lfoSine: 1
       lfoSquare: 0
       lfoSh: 0
-      lfoFreqDepth: 0.4
+      lfoFreqDepth: 0.57
       lfoToOsc1: 0
       lfoToOsc2: 0
       lfoToFilter: 1
@@ -1562,7 +1562,7 @@ programs:
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 1600
+      cutoff: 6400
       res: 0.05
       envAmount: 0.1
       poles: 0
@@ -1702,7 +1702,7 @@ programs:
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 1600
+      cutoff: 6400
       res: 0.05
       envAmount: 0.1
       poles: 0
@@ -1837,7 +1837,7 @@ programs:
       osc2Saw: 1
       osc2Pulse: 0
       osc2Mix: 2
-      osc2Detune: 10.000000000000009
+      osc2Detune: 5.000000000000004
       pw: 0
       sync: 0
       fenvOsc2: 0
@@ -1879,7 +1879,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.502
+      volume: 0.496
       voices: 8
       width: 0.3
       spread: 0.3
@@ -1977,12 +1977,12 @@ programs:
       osc2Saw: 0
       osc2Pulse: 1
       osc2Mix: 2
-      osc2Detune: 19.999999999999996
+      osc2Detune: 9.999999999999998
       pw: 0.8
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 590.1937988353033
+      cutoff: 2360.775195341213
       res: 0
       envAmount: 0.5
       poles: 1
@@ -2019,7 +2019,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.887
+      volume: 0.864
       voices: 8
       width: 0.3
       spread: 0.3
@@ -2117,7 +2117,7 @@ programs:
       osc2Saw: 0
       osc2Pulse: 1
       osc2Mix: 2
-      osc2Detune: 10.000000000000009
+      osc2Detune: 5.000000000000004
       pw: 0
       sync: 0
       fenvOsc2: 0
@@ -2159,7 +2159,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.401
+      volume: 0.418
       voices: 8
       width: 0.3
       spread: 0.3
@@ -2262,7 +2262,7 @@ programs:
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 65.4
+      cutoff: 261.6
       res: 1
       envAmount: 0.05
       poles: 0
@@ -2542,7 +2542,7 @@ programs:
       sync: 1
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 777.0013149469229
+      cutoff: 3108.0052597876916
       res: 0.05
       envAmount: 0.05
       poles: 0
@@ -2579,7 +2579,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.306
+      volume: 0.305
       voices: 8
       width: 0.3
       spread: 0.3
@@ -2859,7 +2859,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.365
+      volume: 0.368
       voices: 8
       width: 0.3
       spread: 0.3
@@ -2999,7 +2999,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.406
+      volume: 0.411
       voices: 8
       width: 0.3
       spread: 0.3
@@ -3102,7 +3102,7 @@ programs:
       sync: 1
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 448.29875250267844
+      cutoff: 1793.1950100107138
       res: 0
       envAmount: 0.2
       poles: 0
@@ -3237,12 +3237,12 @@ programs:
       osc2Saw: 0
       osc2Pulse: 1
       osc2Mix: 2
-      osc2Detune: 10.000000000000009
+      osc2Detune: 5.000000000000004
       pw: 0.6
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 16000
+      cutoff: 40000
       res: 0.05
       envAmount: 1
       poles: 0
@@ -3279,7 +3279,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.418
+      volume: 0.42
       voices: 8
       width: 0.3
       spread: 0.3
@@ -3382,7 +3382,7 @@ programs:
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 16000
+      cutoff: 40000
       res: 0.05
       envAmount: 0.05
       poles: 1
@@ -3522,7 +3522,7 @@ programs:
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 448.29875250267844
+      cutoff: 1793.1950100107138
       res: 0
       envAmount: 0.35
       poles: 1
@@ -3699,7 +3699,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.45
+      volume: 0.455
       voices: 8
       width: 0.3
       spread: 0.3
@@ -3797,12 +3797,12 @@ programs:
       osc2Saw: 0
       osc2Pulse: 1
       osc2Mix: 2
-      osc2Detune: 10.000000000000009
+      osc2Detune: 5.000000000000004
       pw: 0.4
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 590.1937988353033
+      cutoff: 2360.775195341213
       res: 0
       envAmount: 0.1
       poles: 0
@@ -3839,7 +3839,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.776
+      volume: 0.768
       voices: 8
       width: 0.3
       spread: 0.3
@@ -3937,7 +3937,7 @@ programs:
       osc2Saw: 0
       osc2Pulse: 1
       osc2Mix: 2
-      osc2Detune: 19.999999999999996
+      osc2Detune: 9.999999999999998
       pw: 0
       sync: 0
       fenvOsc2: 0
@@ -3979,7 +3979,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.351
+      volume: 0.353
       voices: 8
       width: 0.3
       spread: 0.3
@@ -4077,12 +4077,12 @@ programs:
       osc2Saw: 1
       osc2Pulse: 0
       osc2Mix: 2
-      osc2Detune: 10.000000000000009
+      osc2Detune: 5.000000000000004
       pw: 0
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 65.4
+      cutoff: 261.6
       res: 0
       envAmount: 0.5
       poles: 1
@@ -4119,7 +4119,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.519
+      volume: 0.528
       voices: 8
       width: 0.3
       spread: 0.3
@@ -4217,7 +4217,7 @@ programs:
       osc2Saw: 0
       osc2Pulse: 1
       osc2Mix: 2
-      osc2Detune: 10.000000000000009
+      osc2Detune: 5.000000000000004
       pw: 0.6
       sync: 0
       fenvOsc2: 0
@@ -4259,7 +4259,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.428
+      volume: 0.433
       voices: 8
       width: 0.3
       spread: 0.3
@@ -4357,12 +4357,12 @@ programs:
       osc2Saw: 1
       osc2Pulse: 0
       osc2Mix: 2
-      osc2Detune: 19.999999999999996
+      osc2Detune: 9.999999999999998
       pw: 0
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 16000
+      cutoff: 40000
       res: 0
       envAmount: 0
       poles: 0
@@ -4399,7 +4399,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.471
+      volume: 0.474
       voices: 8
       width: 0.3
       spread: 0.3
@@ -4497,12 +4497,12 @@ programs:
       osc2Saw: 1
       osc2Pulse: 0
       osc2Mix: 2
-      osc2Detune: 10.000000000000009
+      osc2Detune: 5.000000000000004
       pw: 0.4
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 65.4
+      cutoff: 261.6
       res: 0
       envAmount: 1
       poles: 1
@@ -4539,7 +4539,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.631
+      volume: 0.643
       voices: 8
       width: 0.3
       spread: 0.3
@@ -4642,7 +4642,7 @@ programs:
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 1772.9769476822369
+      cutoff: 7091.9077907289475
       res: 0.6
       envAmount: 0.4
       poles: 0
@@ -4679,7 +4679,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.378
+      volume: 0.385
       voices: 8
       width: 0.3
       spread: 0.3
@@ -4782,7 +4782,7 @@ programs:
       sync: 0
       fenvOsc2: 1
       noiseOn: 0
-      cutoff: 1022.9369482035538
+      cutoff: 4091.7477928142152
       res: 0
       envAmount: 0.35
       poles: 0
@@ -4819,7 +4819,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.628
+      volume: 0.617
       voices: 8
       width: 0.3
       spread: 0.3
@@ -5057,7 +5057,7 @@ programs:
       osc2Saw: 1
       osc2Pulse: 0
       osc2Mix: 0
-      osc2Detune: -100
+      osc2Detune: -50
       pw: 0
       sync: 0
       fenvOsc2: 0
@@ -5202,7 +5202,7 @@ programs:
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 590.1937988353033
+      cutoff: 2360.775195341213
       res: 0
       envAmount: 0.4
       poles: 1
@@ -5239,7 +5239,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.483
+      volume: 0.481
       voices: 8
       width: 0.3
       spread: 0.3
@@ -5342,7 +5342,7 @@ programs:
       sync: 1
       fenvOsc2: 1
       noiseOn: 0
-      cutoff: 448.29875250267844
+      cutoff: 1793.1950100107138
       res: 0
       envAmount: 0.35
       poles: 1
@@ -5477,7 +5477,7 @@ programs:
       osc2Saw: 1
       osc2Pulse: 0
       osc2Mix: 2
-      osc2Detune: 10.000000000000009
+      osc2Detune: 5.000000000000004
       pw: 0
       sync: 0
       fenvOsc2: 0
@@ -5519,7 +5519,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.499
+      volume: 0.494
       voices: 8
       width: 0.3
       spread: 0.3
@@ -5897,7 +5897,7 @@ programs:
       osc2Saw: 1
       osc2Pulse: 0
       osc2Mix: 2
-      osc2Detune: -90
+      osc2Detune: -45
       pw: 0.6
       sync: 0
       fenvOsc2: 1
@@ -5939,7 +5939,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.353
+      volume: 0.358
       voices: 8
       width: 0.3
       spread: 0.3
@@ -6317,7 +6317,7 @@ programs:
       osc2Saw: 1
       osc2Pulse: 0
       osc2Mix: 2
-      osc2Detune: 60.00000000000001
+      osc2Detune: 30.000000000000004
       pw: 0
       sync: 0
       fenvOsc2: 0
@@ -6359,7 +6359,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.57
+      volume: 0.583
       voices: 8
       width: 0.3
       spread: 0.3
@@ -6597,12 +6597,12 @@ programs:
       osc2Saw: 1
       osc2Pulse: 0
       osc2Mix: 2
-      osc2Detune: 19.999999999999996
+      osc2Detune: 9.999999999999998
       pw: 0
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 65.4
+      cutoff: 261.6
       res: 0
       envAmount: 1
       poles: 1
@@ -6639,7 +6639,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.489
+      volume: 0.495
       voices: 8
       width: 0.3
       spread: 0.3
@@ -6737,12 +6737,12 @@ programs:
       osc2Saw: 0
       osc2Pulse: 1
       osc2Mix: 2
-      osc2Detune: 30.000000000000004
+      osc2Detune: 15.000000000000002
       pw: 0.35
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 448.29875250267844
+      cutoff: 1793.1950100107138
       res: 0
       envAmount: 0.45
       poles: 1
@@ -6779,7 +6779,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.419
+      volume: 0.408
       voices: 8
       width: 0.3
       spread: 0.3
@@ -6882,7 +6882,7 @@ programs:
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 340.5182702564112
+      cutoff: 1362.0730810256448
       res: 0.8
       envAmount: 0.15
       poles: 1
@@ -6919,7 +6919,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.559
+      volume: 0.56
       voices: 8
       width: 0.3
       spread: 0.3
@@ -7022,7 +7022,7 @@ programs:
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 448.29875250267844
+      cutoff: 1793.1950100107138
       res: 0
       envAmount: 0
       poles: 1
@@ -7059,7 +7059,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.445
+      volume: 0.444
       voices: 8
       width: 0.3
       spread: 0.3
@@ -7162,7 +7162,7 @@ programs:
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 1772.9769476822369
+      cutoff: 7091.9077907289475
       res: 0
       envAmount: 0.65
       poles: 1
@@ -7302,7 +7302,7 @@ programs:
       sync: 1
       fenvOsc2: 1
       noiseOn: 0
-      cutoff: 1772.9769476822369
+      cutoff: 7091.9077907289475
       res: 0
       envAmount: 1
       poles: 1
@@ -7442,7 +7442,7 @@ programs:
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 590.1937988353033
+      cutoff: 2360.775195341213
       res: 0
       envAmount: 0.35
       poles: 1
@@ -7479,7 +7479,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.382
+      volume: 0.39
       voices: 8
       width: 0.3
       spread: 0.3
@@ -7582,7 +7582,7 @@ programs:
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 16000
+      cutoff: 40000
       res: 0.5
       envAmount: 0
       poles: 0
@@ -7717,12 +7717,12 @@ programs:
       osc2Saw: 0
       osc2Pulse: 1
       osc2Mix: 2
-      osc2Detune: 19.999999999999996
+      osc2Detune: 9.999999999999998
       pw: 0.4
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 1772.9769476822369
+      cutoff: 7091.9077907289475
       res: 0
       envAmount: 0
       poles: 0
@@ -7759,7 +7759,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.488
+      volume: 0.499
       voices: 8
       width: 0.3
       spread: 0.3
@@ -7857,12 +7857,12 @@ programs:
       osc2Saw: 1
       osc2Pulse: 0
       osc2Mix: 2
-      osc2Detune: -19.999999999999996
+      osc2Detune: -9.999999999999998
       pw: 0.5
       sync: 0
       fenvOsc2: 1
       noiseOn: 0
-      cutoff: 1022.9369482035538
+      cutoff: 4091.7477928142152
       res: 0
       envAmount: 0.3
       poles: 1
@@ -8002,7 +8002,7 @@ programs:
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 590.1937988353033
+      cutoff: 2360.775195341213
       res: 1
       envAmount: 0
       poles: 0
@@ -8179,7 +8179,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.977
+      volume: 1
       voices: 8
       width: 0.3
       spread: 0.3
@@ -8282,7 +8282,7 @@ programs:
       sync: 1
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 65.4
+      cutoff: 261.6
       res: 1
       envAmount: 0.2
       poles: 1
@@ -8459,7 +8459,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.5
+      volume: 0.498
       voices: 8
       width: 0.3
       spread: 0.3
@@ -8562,7 +8562,7 @@ programs:
       sync: 0
       fenvOsc2: 1
       noiseOn: 0
-      cutoff: 590.1937988353033
+      cutoff: 2360.775195341213
       res: 0.05
       envAmount: 0.55
       poles: 0
@@ -8599,7 +8599,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.47
+      volume: 0.464
       voices: 8
       width: 0.3
       spread: 0.3
@@ -8739,7 +8739,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.39
+      volume: 0.426
       voices: 8
       width: 0.3
       spread: 0.3
@@ -8879,7 +8879,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.45
+      volume: 0.447
       voices: 8
       width: 0.3
       spread: 0.3
@@ -8977,12 +8977,12 @@ programs:
       osc2Saw: 0
       osc2Pulse: 1
       osc2Mix: 2
-      osc2Detune: 60.00000000000001
+      osc2Detune: 30.000000000000004
       pw: 0.4
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 448.29875250267844
+      cutoff: 1793.1950100107138
       res: 0
       envAmount: 0.3
       poles: 1
@@ -9122,7 +9122,7 @@ programs:
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 65.4
+      cutoff: 261.6
       res: 0.7
       envAmount: 0.75
       poles: 0
@@ -9159,7 +9159,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.427
+      volume: 0.43
       voices: 8
       width: 0.3
       spread: 0.3
@@ -9299,7 +9299,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.471
+      volume: 0.479
       voices: 8
       width: 0.3
       spread: 0.3
@@ -9439,7 +9439,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.457
+      volume: 0.473
       voices: 8
       width: 0.3
       spread: 0.3
@@ -9579,7 +9579,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.396
+      volume: 0.402
       voices: 8
       width: 0.3
       spread: 0.3
@@ -9822,7 +9822,7 @@ programs:
       sync: 0
       fenvOsc2: 1
       noiseOn: 0
-      cutoff: 1772.9769476822369
+      cutoff: 7091.9077907289475
       res: 0
       envAmount: 0.35
       poles: 1
@@ -9957,7 +9957,7 @@ programs:
       osc2Saw: 1
       osc2Pulse: 0
       osc2Mix: 2
-      osc2Detune: 19.999999999999996
+      osc2Detune: 9.999999999999998
       pw: 0
       sync: 0
       fenvOsc2: 0
@@ -9999,7 +9999,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.463
+      volume: 0.46
       voices: 8
       width: 0.3
       spread: 0.3
@@ -10102,7 +10102,7 @@ programs:
       sync: 1
       fenvOsc2: 1
       noiseOn: 0
-      cutoff: 1772.9769476822369
+      cutoff: 7091.9077907289475
       res: 0
       envAmount: 1
       poles: 0
@@ -10242,7 +10242,7 @@ programs:
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 16000
+      cutoff: 40000
       res: 0
       envAmount: 1
       poles: 0
@@ -10522,7 +10522,7 @@ programs:
       sync: 0
       fenvOsc2: 1
       noiseOn: 0
-      cutoff: 777.0013149469229
+      cutoff: 3108.0052597876916
       res: 0
       envAmount: 0.3
       poles: 1
@@ -10802,7 +10802,7 @@ programs:
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 1772.9769476822369
+      cutoff: 7091.9077907289475
       res: 1
       envAmount: 1
       poles: 0
@@ -10839,7 +10839,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.416
+      volume: 0.407
       voices: 8
       width: 0.3
       spread: 0.3
@@ -10942,7 +10942,7 @@ programs:
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 590.1937988353033
+      cutoff: 2360.775195341213
       res: 1
       envAmount: 0.75
       poles: 0
@@ -11119,7 +11119,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.532
+      volume: 0.523
       voices: 8
       width: 0.3
       spread: 0.3
@@ -11362,7 +11362,7 @@ programs:
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 777.0013149469229
+      cutoff: 3108.0052597876916
       res: 0
       envAmount: 0.4
       poles: 1
@@ -11502,7 +11502,7 @@ programs:
       sync: 1
       fenvOsc2: 1
       noiseOn: 0
-      cutoff: 590.1937988353033
+      cutoff: 2360.775195341213
       res: 1
       envAmount: 0.35
       poles: 1
@@ -11539,7 +11539,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.448
+      volume: 0.452
       voices: 8
       width: 0.3
       spread: 0.3
@@ -11782,7 +11782,7 @@ programs:
       sync: 0
       fenvOsc2: 1
       noiseOn: 0
-      cutoff: 65.4
+      cutoff: 261.6
       res: 0.6
       envAmount: 1
       poles: 0
@@ -11819,7 +11819,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.458
+      volume: 0.455
       voices: 8
       width: 0.3
       spread: 0.3
@@ -11922,7 +11922,7 @@ programs:
       sync: 0
       fenvOsc2: 0
       noiseOn: 1
-      cutoff: 590.1937988353033
+      cutoff: 2360.775195341213
       res: 0.2
       envAmount: 0.4
       poles: 0
@@ -12057,12 +12057,12 @@ programs:
       osc2Saw: 0
       osc2Pulse: 1
       osc2Mix: 2
-      osc2Detune: -30.000000000000004
+      osc2Detune: -15.000000000000002
       pw: 0
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 1772.9769476822369
+      cutoff: 7091.9077907289475
       res: 1
       envAmount: 0.2
       poles: 0
@@ -12099,7 +12099,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.402
+      volume: 0.401
       voices: 8
       width: 0.3
       spread: 0.3
@@ -12239,7 +12239,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.779
+      volume: 0.848
       voices: 8
       width: 0.3
       spread: 0.3
@@ -12379,7 +12379,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.487
+      volume: 0.49
       voices: 8
       width: 0.3
       spread: 0.3
@@ -12519,7 +12519,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.334
+      volume: 0.342
       voices: 8
       width: 0.3
       spread: 0.3
@@ -12622,7 +12622,7 @@ programs:
       sync: 0
       fenvOsc2: 1
       noiseOn: 0
-      cutoff: 448.29875250267844
+      cutoff: 1793.1950100107138
       res: 0
       envAmount: 1
       poles: 1
@@ -12659,7 +12659,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.671
+      volume: 0.678
       voices: 8
       width: 0.3
       spread: 0.3
@@ -12939,7 +12939,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.336
+      volume: 0.334
       voices: 8
       width: 0.3
       spread: 0.3
@@ -13079,7 +13079,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.381
+      volume: 0.383
       voices: 8
       width: 0.3
       spread: 0.3
@@ -13182,7 +13182,7 @@ programs:
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 1022.9369482035538
+      cutoff: 4091.7477928142152
       res: 0.75
       envAmount: 1
       poles: 0
@@ -13219,7 +13219,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.406
+      volume: 0.408
       voices: 8
       width: 0.3
       spread: 0.3
@@ -13317,7 +13317,7 @@ programs:
       osc2Saw: 0
       osc2Pulse: 1
       osc2Mix: 2
-      osc2Detune: 10.000000000000009
+      osc2Detune: 5.000000000000004
       pw: 0.4
       sync: 0
       fenvOsc2: 0
@@ -13359,7 +13359,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.401
+      volume: 0.41
       voices: 8
       width: 0.3
       spread: 0.3
@@ -13639,7 +13639,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.332
+      volume: 0.331
       voices: 8
       width: 0.3
       spread: 0.3
@@ -13737,12 +13737,12 @@ programs:
       osc2Saw: 1
       osc2Pulse: 0
       osc2Mix: 2
-      osc2Detune: -19.999999999999996
+      osc2Detune: -9.999999999999998
       pw: 0.2
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 65.4
+      cutoff: 261.6
       res: 0.4
       envAmount: 0.45
       poles: 1
@@ -13882,7 +13882,7 @@ programs:
       sync: 1
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 340.5182702564112
+      cutoff: 1362.0730810256448
       res: 1
       envAmount: 0.35
       poles: 0
@@ -14022,7 +14022,7 @@ programs:
       sync: 0
       fenvOsc2: 0
       noiseOn: 1
-      cutoff: 16000
+      cutoff: 40000
       res: 1
       envAmount: 1
       poles: 0
@@ -14162,7 +14162,7 @@ programs:
       sync: 1
       fenvOsc2: 1
       noiseOn: 0
-      cutoff: 65.4
+      cutoff: 261.6
       res: 1
       envAmount: 0.55
       poles: 0
@@ -14199,7 +14199,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.953
+      volume: 0.961
       voices: 8
       width: 0.3
       spread: 0.3
@@ -14297,12 +14297,12 @@ programs:
       osc2Saw: 0
       osc2Pulse: 1
       osc2Mix: 2
-      osc2Detune: -19.999999999999996
+      osc2Detune: -9.999999999999998
       pw: 0.6
       sync: 0
       fenvOsc2: 1
       noiseOn: 0
-      cutoff: 1022.9369482035538
+      cutoff: 4091.7477928142152
       res: 0
       envAmount: 0.2
       poles: 1
@@ -14339,7 +14339,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.427
+      volume: 0.438
       voices: 8
       width: 0.3
       spread: 0.3
@@ -14442,7 +14442,7 @@ programs:
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 590.1937988353033
+      cutoff: 2360.775195341213
       res: 0
       envAmount: 0.35
       poles: 0
@@ -14479,7 +14479,7 @@ programs:
       velFilter: 0.4
       velAmp: 0.5
       afterFilter: 0
-      volume: 0.49
+      volume: 0.479
       voices: 8
       width: 0.3
       spread: 0.3
@@ -14582,7 +14582,7 @@ programs:
       sync: 0
       fenvOsc2: 1
       noiseOn: 0
-      cutoff: 340.5182702564112
+      cutoff: 1362.0730810256448
       res: 0.7
       envAmount: 0.25
       poles: 0
@@ -15142,7 +15142,7 @@ programs:
       sync: 0
       fenvOsc2: 0
       noiseOn: 0
-      cutoff: 1772.9769476822369
+      cutoff: 7091.9077907289475
       res: 0.35
       envAmount: 0
       poles: 0
