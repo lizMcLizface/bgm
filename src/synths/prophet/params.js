@@ -46,11 +46,17 @@ export const {PARAMS,BY_KEY,defaultValues,clampValue,sanitize,toPairs}=definePar
  ['mixB',15,'Osc B',0,1,.8,'%','lin'],
  ['mixNoise',16,'Noise',0,1,0,'%','lin'],
  // Filter
- ['cutoff',17,'Cutoff',20,20000,750,'Hz','log'],
+ ['cutoff',17,'Cutoff',20,40000,1500,'Hz','log'],
  ['res',18,'Res',0,1,.1,'%','lin'],
  ['fEnv',21,'Env amt',0,1,.35,'%','lin'],
  ['track',19,'Kybd',0,2,1,'','step',['Off','Half','Full']],
  ['filterRev',20,'Rev',0,1,1,'','step',['1/2','3']],
+ // Additions from the comparison with UADx PolyMAX (not on the panel; the defaults keep the original sound):
+ // filter mode and slope (the original is a four-pole low-pass), pink noise, a triangle on Osc A
+ ['filterMode',72,'Mode',0,3,0,'','step',['LP','BP','HP','Notch']],
+ ['filterPoles',73,'Poles',0,1,1,'','step',['2','4']],
+ ['noiseColor',74,'Noise',0,1,0,'','step',['White','Pink']],
+ ['aTri',75,'Tri',0,1,0,'','step',ON],
  ['fAttack',22,'A',.001,30,.005,'s','log'],
  ['fDecay',23,'D',.002,100,.6,'s','log'],
  ['fSustain',24,'S',0,1,.4,'%','lin'],

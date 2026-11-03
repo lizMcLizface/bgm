@@ -1,9 +1,10 @@
 // Factory sounds: original patches in the Prophet-5 idiom, not copies of
 // Sequential's programs (those load from their own .syx file on the "P5 bank"
 // shelf). Each is a set of overrides on the defaults.
-import {sanitize} from './params';
+import {sanitize,BY_KEY} from './params';
 import {sheetEngineValues} from './sheets';
 import {SHEET_SOUNDS} from './sheetPresets';
+import {fromLowestKeyPivot,ladderMakeupVolume} from '../pivot';
 
 const RAW=[
  {name:'Poly Brass',category:'brass',styles:['detuned', 'velocity'],colour:'#e0a526',note:'Two detuned saws; the filter envelope blooms with velocity.',values:{
@@ -64,6 +65,11 @@ export const CATEGORIES=[
  {id:'init',label:'Init',blurb:'Neutral starting points'},
 ];
 // The patch-sheet sounds (sheetPresets.js) through the imported-program mapping (sheets.js).
-const SHEETS=SHEET_SOUNDS.map(({panel,volume,...p})=>({...p,note:'Read off a panel drawing and approximated.',values:{...sheetEngineValues(panel),reverbMix:.15,volume}}));
+const SHEETS=SHEET_SOUNDS.map(({panel,volume,...p})=>({...p,note:'Read off a panel drawing and approximated.',values:{...sheetEngineValues(panel),reverbMix:.15,volume:Math.min(1,volume*ladderMakeupVolume(sheetEngineValues(panel).res))}}));
 
-export const PRESETS=[...RAW,...SHEETS].map(p=>({...p,values:sanitize(p.values)}));
+// RAW was authored against the old C2 key-tracking pivot (src/synths/pivot.js): keep its sound under the middle-C pivot
+// (the old defaults were cutoff 750 and Half tracking).
+// and its levels, against the ladder's old make-up gain (pivot.js).
+const retracked=values=>({...values,cutoff:fromLowestKeyPivot(values.cutoff??750,[0,.5,1][values.track??1]??0,BY_KEY.cutoff.max),volume:Math.min(1,(values.volume??.55)*ladderMakeupVolume(values.res??.1))});
+
+export const PRESETS=[...RAW.map(p=>({...p,values:retracked(p.values)})),...SHEETS].map(p=>({...p,values:sanitize(p.values)}));

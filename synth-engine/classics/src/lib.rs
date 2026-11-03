@@ -17,6 +17,7 @@ mod prophet;
 mod seq;
 mod drums;
 mod tb303;
+mod wt;
 
 use dsp::{soft, DcBlock, MAX_BLOCK};
 
@@ -37,6 +38,7 @@ pub const MODEL_TR808: u32 = 8;
 pub const MODEL_TR909: u32 = 9;
 pub const MODEL_TR606: u32 = 10;
 pub const MODEL_TB303: u32 = 11;
+pub const MODEL_WT: u32 = 12;
 
 struct Host {
     sr: f32,
@@ -49,6 +51,7 @@ struct Host {
     dx7: dx7::Dx7,
     obxa: obxa::ObXa2,
     vs: vs::Vs,
+    wt: wt::Wt,
     drums: drums::Drums,
     bass: tb303::Tb303,
     bbd: fx::Bbd,
@@ -71,6 +74,7 @@ static mut HOST: Host = Host {
     dx7: dx7::Dx7::new(),
     obxa: obxa::ObXa2::new(),
     vs: vs::Vs::new(),
+    wt: wt::Wt::new(),
     drums: drums::Drums::new(),
     bass: tb303::Tb303::new(),
     bbd: fx::Bbd::new(),
@@ -115,6 +119,10 @@ macro_rules! model {
                 let $m = &mut $h.vs;
                 $body
             }
+            MODEL_WT => {
+                let $m = &mut $h.wt;
+                $body
+            }
             MODEL_TR808 | MODEL_TR909 | MODEL_TR606 => {
                 let $m = &mut $h.drums;
                 $body
@@ -148,6 +156,7 @@ pub extern "C" fn syn_param_count() -> u32 {
             MODEL_DX7 => dx7::PARAMS as u32,
             MODEL_OBXA => obxa::PAIR_PARAMS as u32,
             MODEL_VS => vs::PARAMS as u32,
+            MODEL_WT => wt::PARAMS as u32,
             MODEL_TR808 | MODEL_TR909 | MODEL_TR606 => drums::PARAMS as u32,
             MODEL_TB303 => tb303::PARAMS as u32,
             _ => cs80::PARAMS as u32,
@@ -157,7 +166,7 @@ pub extern "C" fn syn_param_count() -> u32 {
 
 #[no_mangle]
 pub extern "C" fn syn_init(sr: f32, model: u32) -> u32 {
-    if !(8000. ..=384000.).contains(&sr) || model > MODEL_TB303 {
+    if !(8000. ..=384000.).contains(&sr) || model > MODEL_WT {
         return 0;
     }
     unsafe {
@@ -171,6 +180,7 @@ pub extern "C" fn syn_init(sr: f32, model: u32) -> u32 {
             MODEL_DX7 => HOST.dx7.init(sr),
             MODEL_OBXA => HOST.obxa.init(sr),
             MODEL_VS => HOST.vs.init(sr),
+            MODEL_WT => HOST.wt.init(sr),
             MODEL_TR808 => HOST.drums.init(sr, drums::STYLE_808),
             MODEL_TR909 => HOST.drums.init(sr, drums::STYLE_909),
             MODEL_TR606 => HOST.drums.init(sr, drums::STYLE_606),
@@ -264,6 +274,8 @@ pub extern "C" fn syn_render(frames: u32) {
             h.obxa.render(left, right);
         } else if h.model == MODEL_VS {
             h.vs.render(left, right);
+        } else if h.model == MODEL_WT {
+            h.wt.render(left, right);
         } else if matches!(h.model, MODEL_TR808 | MODEL_TR909 | MODEL_TR606) {
             h.drums.render(left, right);
         } else if h.model == MODEL_TB303 {
@@ -300,8 +312,8 @@ pub extern "C" fn syn_seq(cmd: u32, a: u32, b: f32) {
     }
 }
 
-/// The shared wave buffer (the vector synthesizer's 128 waves × 128 samples, f32): the host
-/// writes it and then calls `syn_wave_commit`. Other models ignore it.
+/// The shared wave buffer (the vector synthesizer's 128 waves × 128 samples, f32; the wavetable synthesizer's four
+/// 2048-sample waves): the host writes it and then calls `syn_wave_commit`. Other models ignore it.
 #[no_mangle]
 pub extern "C" fn syn_wave_ptr() -> *mut f32 {
     vs::wave_ptr()
@@ -310,7 +322,13 @@ pub extern "C" fn syn_wave_ptr() -> *mut f32 {
 /// Builds the band-limited tables from the buffer. Takes a few tens of milliseconds.
 #[no_mangle]
 pub extern "C" fn syn_wave_commit() {
-    vs::commit();
+    unsafe {
+        if HOST.model == MODEL_WT {
+            wt::commit();
+        } else {
+            vs::commit();
+        }
+    }
 }
 
 #[no_mangle]

@@ -1,5 +1,5 @@
 // Runs the classic-synth kernel directly (no AudioWorklet): tests and audits.
-export const MODELS={cs80:0,juno:1,prophet5:2,jupiter8:3,minimoog:4,dx7:5,obxa:6,vs:7,tr808:8,tr909:9,tr606:10,tb303:11};
+export const MODELS={cs80:0,juno:1,prophet5:2,jupiter8:3,minimoog:4,dx7:5,obxa:6,vs:7,tr808:8,tr909:9,tr606:10,tb303:11,wt:12};
 export function createOfflineSynth(module,{sampleRate=48000,model=MODELS.cs80,params=[],waves=null}={}){
  const k=new WebAssembly.Instance(module,{}).exports;
  if(!k.syn_init(sampleRate,model))throw Error('Unsupported model or sample rate');

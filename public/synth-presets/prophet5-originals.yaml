@@ -41,11 +41,15 @@ programs:
       mixA: 1
       mixB: 0.9
       mixNoise: 0
-      cutoff: 210
+      cutoff: 420
       res: 0.12
       fEnv: 0.42
       track: 1
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.06
       fDecay: 0.9
       fSustain: 0.45
@@ -67,7 +71,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.57
+      volume: 0.6153888526777195
       voices: 5
       width: 0.3
       oversample: 1
@@ -140,11 +144,15 @@ programs:
       mixA: 1
       mixB: 0
       mixNoise: 0
-      cutoff: 650
+      cutoff: 2600
       res: 0.2
       fEnv: 0.25
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.002
       fDecay: 0.9
       fSustain: 0.3
@@ -166,7 +174,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.64
+      volume: 0.7229450878178784
       voices: 5
       width: 0.3
       oversample: 1
@@ -239,11 +247,15 @@ programs:
       mixA: 0.85
       mixB: 0.85
       mixNoise: 0
-      cutoff: 1050
+      cutoff: 2100
       res: 0.05
       fEnv: 0.1
       track: 1
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.6
       fDecay: 2
       fSustain: 0.8
@@ -265,7 +277,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.46
+      volume: 0.47560529854071226
       voices: 5
       width: 0.6
       oversample: 1
@@ -338,11 +350,15 @@ programs:
       mixA: 1
       mixB: 0.75
       mixNoise: 0
-      cutoff: 110
+      cutoff: 220
       res: 0.3
       fEnv: 0.4
       track: 1
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.001
       fDecay: 0.35
       fSustain: 0.15
@@ -364,7 +380,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.64
+      volume: 0.7610350846051712
       voices: 5
       width: 0.1
       oversample: 1
@@ -437,11 +453,15 @@ programs:
       mixA: 0.9
       mixB: 0
       mixNoise: 0
-      cutoff: 950
+      cutoff: 3800
       res: 0.08
       fEnv: 0.3
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.001
       fDecay: 2.2
       fSustain: 0
@@ -463,7 +483,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.645
+      volume: 0.6796720974116858
       voices: 5
       width: 0.3
       oversample: 1
@@ -536,11 +556,15 @@ programs:
       mixA: 1
       mixB: 0.6
       mixNoise: 0
-      cutoff: 65
+      cutoff: 260
       res: 0.62
       fEnv: 0.48
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.001
       fDecay: 0.32
       fSustain: 0
@@ -562,7 +586,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.92
+      volume: 1
       voices: 5
       width: 0.3
       oversample: 1
@@ -635,11 +659,15 @@ programs:
       mixA: 1
       mixB: 0.9
       mixNoise: 0
-      cutoff: 325
+      cutoff: 1300
       res: 0.25
       fEnv: 0.3
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.005
       fDecay: 0.6
       fSustain: 0.5
@@ -661,7 +689,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.54
+      volume: 0.626260329256133
       voices: 5
       width: 0.5
       oversample: 1
@@ -734,11 +762,15 @@ programs:
       mixA: 1
       mixB: 0
       mixNoise: 0
-      cutoff: 1050
+      cutoff: 4200
       res: 0
       fEnv: 0
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.005
       fDecay: 0.6
       fSustain: 0.4
@@ -833,11 +865,15 @@ programs:
       mixA: 1
       mixB: 0.7
       mixNoise: 0.08
-      cutoff: 90
+      cutoff: 180
       res: 0.45
       fEnv: 0.55
       track: 1
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 3
       fDecay: 4
       fSustain: 0.3
@@ -859,7 +895,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.62
+      volume: 0.7893746892319261
       voices: 5
       width: 0.7
       oversample: 1
@@ -932,11 +968,15 @@ programs:
       mixA: 0.9
       mixB: 0.5
       mixNoise: 0
-      cutoff: 225
+      cutoff: 900
       res: 0.1
       fEnv: 0.3
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.001
       fDecay: 1.4
       fSustain: 0.15
@@ -958,7 +998,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.69
+      volume: 0.7360718714908212
       voices: 8
       width: 0.3
       oversample: 1
@@ -1031,11 +1071,15 @@ programs:
       mixA: 0
       mixB: 0
       mixNoise: 1
-      cutoff: 350
+      cutoff: 700
       res: 0.72
       fEnv: 0.15
       track: 1
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 1.2
       fDecay: 3
       fSustain: 0.7
@@ -1057,7 +1101,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.73
+      volume: 1
       voices: 5
       width: 0.8
       oversample: 1
@@ -1130,11 +1174,15 @@ programs:
       mixA: 1
       mixB: 0.8
       mixNoise: 0
-      cutoff: 750
+      cutoff: 1500
       res: 0.1
       fEnv: 0.35
       track: 1
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.005
       fDecay: 0.6
       fSustain: 0.4
@@ -1156,7 +1204,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.55
+      volume: 0.5867239555361619
       voices: 5
       width: 0.3
       oversample: 1
@@ -1216,24 +1264,28 @@ programs:
       aFreq: -12
       aSaw: 1
       aPulse: 0
-      aPw: 0.2
+      aPw: 0.15
       sync: 0
       bFreq: 0
       bFine: 0
       bSaw: 0
       bTri: 0
       bPulse: 0
-      bPw: 0.2
+      bPw: 0.15
       bLow: 0
       bKybd: 1
       mixA: 1
       mixB: 1
       mixNoise: 0
-      cutoff: 20
+      cutoff: 80
       res: 0
       fEnv: 0.7
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.18382701197855306
       fDecay: 1.5848931924611143
       fSustain: 0.5
@@ -1243,7 +1295,7 @@ programs:
       aSustain: 0.55
       aRelease: 1
       release: 1
-      glide: 0.44562546906687284
+      glide: 0
       unison: 0
       unisonVoices: 5
       unisonDetune: 0.3
@@ -1315,24 +1367,28 @@ programs:
       aFreq: -12
       aSaw: 0
       aPulse: 1
-      aPw: 0.3
+      aPw: 0.25
       sync: 0
       bFreq: -12
       bFine: 15
       bSaw: 0
       bTri: 0
       bPulse: 1
-      bPw: 0.3
+      bPw: 0.25
       bLow: 0
       bKybd: 1
       mixA: 0.4
       mixB: 0.4
       mixNoise: 0
-      cutoff: 370.07952454176706
+      cutoff: 1046.7699651785965
       res: 0
       fEnv: 0
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.0029
       fDecay: 0.01
       fSustain: 0
@@ -1354,7 +1410,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.586
+      volume: 0.61
       voices: 5
       width: 0.3
       oversample: 1
@@ -1414,24 +1470,28 @@ programs:
       aFreq: -12
       aSaw: 0
       aPulse: 1
-      aPw: 0.1
+      aPw: 0
       sync: 0
       bFreq: -12
       bFine: 0
       bSaw: 0
       bTri: 0
       bPulse: 1
-      bPw: 0.15
+      bPw: 0.05
       bLow: 0
       bKybd: 1
       mixA: 0.95
       mixB: 1
       mixNoise: 0
-      cutoff: 370.07952454176706
+      cutoff: 261.69249129464913
       res: 0.3
       fEnv: 0.45
       track: 0
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.0029
       fDecay: 2.5118864315095797
       fSustain: 0.6
@@ -1513,7 +1573,7 @@ programs:
       aFreq: -5
       aSaw: 0
       aPulse: 1
-      aPw: 0.5
+      aPw: 0.45
       sync: 1
       bFreq: 0
       bFine: 0
@@ -1526,11 +1586,15 @@ programs:
       mixA: 1
       mixB: 1
       mixNoise: 0
-      cutoff: 46.26710039315442
+      cutoff: 130.866497214144
       res: 0.6
       fEnv: 0.25
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.0029
       fDecay: 6.30957344480193
       fSustain: 0.3
@@ -1552,7 +1616,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.494
+      volume: 0.6381607571764343
       voices: 5
       width: 0.3
       oversample: 1
@@ -1612,7 +1676,7 @@ programs:
       aFreq: 12
       aSaw: 1
       aPulse: 0
-      aPw: 0.5
+      aPw: 0.45
       sync: 0
       bFreq: 9
       bFine: 0
@@ -1625,11 +1689,15 @@ programs:
       mixA: 1
       mixB: 0
       mixNoise: 0
-      cutoff: 46.26710039315442
+      cutoff: 130.866497214144
       res: 0.05
       fEnv: 0.35
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.29149614062625256
       fDecay: 6.30957344480193
       fSustain: 0.7
@@ -1651,7 +1719,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.678
+      volume: 0.7444256846724191
       voices: 5
       width: 0.3
       oversample: 1
@@ -1711,24 +1779,28 @@ programs:
       aFreq: 0
       aSaw: 0
       aPulse: 1
-      aPw: 0.15
+      aPw: 0.05
       sync: 0
       bFreq: 12
       bFine: 0
       bSaw: 0
       bTri: 0
       bPulse: 1
-      bPw: 0.9
+      bPw: 1
       bLow: 0
       bKybd: 1
       mixA: 0.6
       mixB: 1
       mixNoise: 0
-      cutoff: 8372
+      cutoff: 33488
       res: 0.5
       fEnv: 0
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.0029
       fDecay: 0.01
       fSustain: 0
@@ -1750,7 +1822,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.488
+      volume: 0.9334
       voices: 5
       width: 0.3
       oversample: 1
@@ -1810,7 +1882,7 @@ programs:
       aFreq: -9
       aSaw: 1
       aPulse: 0
-      aPw: 0.5
+      aPw: 0.45
       sync: 1
       bFreq: -12
       bFine: 0
@@ -1823,11 +1895,15 @@ programs:
       mixA: 0.5
       mixB: 0.5
       mixNoise: 0
-      cutoff: 370.07952454176706
+      cutoff: 1046.7699651785965
       res: 0.2
       fEnv: 0
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.1159273335844629
       fDecay: 2.5118864315095797
       fSustain: 0
@@ -1837,7 +1913,7 @@ programs:
       aSustain: 1
       aRelease: 6.30957344480193
       release: 0
-      glide: 0.31547867224009657
+      glide: 0
       unison: 0
       unisonVoices: 5
       unisonDetune: 0.3
@@ -1849,7 +1925,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.878
+      volume: 1
       voices: 5
       width: 0.3
       oversample: 1
@@ -1909,7 +1985,7 @@ programs:
       aFreq: 19
       aSaw: 0
       aPulse: 1
-      aPw: 0.5
+      aPw: 0.45
       sync: 0
       bFreq: -12
       bFine: 0
@@ -1922,11 +1998,15 @@ programs:
       mixA: 0.4
       mixB: 0.7
       mixNoise: 0
-      cutoff: 92.5294273231138
+      cutoff: 261.71949268725376
       res: 0
       fEnv: 0.4
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.0029
       fDecay: 2.5118864315095797
       fSustain: 0.25
@@ -1948,7 +2028,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.687
+      volume: 0.736
       voices: 5
       width: 0.3
       oversample: 1
@@ -2008,24 +2088,28 @@ programs:
       aFreq: 0
       aSaw: 1
       aPulse: 0
-      aPw: 0.3
+      aPw: 0.25
       sync: 0
       bFreq: -12
       bFine: 0
       bSaw: 1
       bTri: 0
       bPulse: 0
-      bPw: 0.3
+      bPw: 0.25
       bLow: 0
       bKybd: 1
       mixA: 0.5
       mixB: 0.5
       mixNoise: 0
-      cutoff: 32.716624303536
+      cutoff: 92.53897449576012
       res: 0.65
       fEnv: 1
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.0029
       fDecay: 100
       fSustain: 1
@@ -2047,7 +2131,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.41
+      volume: 0.5646996546837973
       voices: 5
       width: 0.3
       oversample: 1
@@ -2107,7 +2191,7 @@ programs:
       aFreq: 0
       aSaw: 0
       aPulse: 1
-      aPw: 0.5
+      aPw: 0.45
       sync: 0
       bFreq: 0
       bFine: 20
@@ -2120,11 +2204,15 @@ programs:
       mixA: 0.3
       mixB: 0.3
       mixNoise: 0
-      cutoff: 740.1208672875142
+      cutoff: 2093.4319331440547
       res: 0
       fEnv: 0
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.0029
       fDecay: 0.01
       fSustain: 0.05
@@ -2146,7 +2234,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.654
+      volume: 0.667
       voices: 5
       width: 0.3
       oversample: 1
@@ -2206,24 +2294,28 @@ programs:
       aFreq: 0
       aSaw: 0
       aPulse: 1
-      aPw: 0.3
+      aPw: 0.25
       sync: 0
       bFreq: 0
       bFine: 0
       bSaw: 0
       bTri: 0
       bPulse: 1
-      bPw: 0.25
+      bPw: 0.2
       bLow: 0
       bKybd: 1
       mixA: 0.6
       mixB: 1
       mixNoise: 0
-      cutoff: 92.5294273231138
+      cutoff: 261.71949268725376
       res: 0.65
       fEnv: 0.35
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.0029
       fDecay: 0.01
       fSustain: 0.5
@@ -2233,7 +2325,7 @@ programs:
       aSustain: 0.65
       aRelease: 0.06309573444801933
       release: 1
-      glide: 0.31547867224009657
+      glide: 0
       unison: 0
       unisonVoices: 5
       unisonDetune: 0.3
@@ -2245,7 +2337,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.568
+      volume: 0.6624891070802598
       voices: 5
       width: 0.3
       oversample: 1
@@ -2305,7 +2397,7 @@ programs:
       aFreq: 12
       aSaw: 0
       aPulse: 1
-      aPw: 0.5
+      aPw: 0.45
       sync: 0
       bFreq: 12
       bFine: 26
@@ -2318,11 +2410,15 @@ programs:
       mixA: 0.5
       mixB: 0.95
       mixNoise: 0.05
-      cutoff: 32.716624303536
+      cutoff: 92.53897449576012
       res: 0.5
       fEnv: 0.5
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.0029
       fDecay: 2.5118864315095797
       fSustain: 0.7
@@ -2344,7 +2440,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.938
+      volume: 1
       voices: 5
       width: 0.3
       oversample: 1
@@ -2404,7 +2500,7 @@ programs:
       aFreq: 0
       aSaw: 1
       aPulse: 1
-      aPw: 0.5
+      aPw: 0.45
       sync: 0
       bFreq: 9
       bFine: 0
@@ -2417,11 +2513,15 @@ programs:
       mixA: 1
       mixB: 0
       mixNoise: 0
-      cutoff: 23.13474362394003
+      cutoff: 80
       res: 0
       fEnv: 0.45
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.29149614062625256
       fDecay: 6.30957344480193
       fSustain: 0.6
@@ -2431,7 +2531,7 @@ programs:
       aSustain: 1
       aRelease: 1
       release: 1
-      glide: 0.31547867224009657
+      glide: 0
       unison: 0
       unisonVoices: 5
       unisonDetune: 0.3
@@ -2503,7 +2603,7 @@ programs:
       aFreq: 0
       aSaw: 1
       aPulse: 0
-      aPw: 0.5
+      aPw: 0.45
       sync: 0
       bFreq: 0
       bFine: 0
@@ -2516,11 +2616,15 @@ programs:
       mixA: 0.95
       mixB: 0.95
       mixNoise: 0
-      cutoff: 46.26710039315442
+      cutoff: 130.866497214144
       res: 0.5
       fEnv: 0
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.1159273335844629
       fDecay: 2.5118864315095797
       fSustain: 0
@@ -2530,7 +2634,7 @@ programs:
       aSustain: 1
       aRelease: 2.5118864315095797
       release: 0
-      glide: 0.31547867224009657
+      glide: 0
       unison: 0
       unisonVoices: 5
       unisonDetune: 0.3
@@ -2542,7 +2646,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.534
+      volume: 0.8008000000000001
       voices: 5
       width: 0.3
       oversample: 1
@@ -2602,7 +2706,7 @@ programs:
       aFreq: 16
       aSaw: 0
       aPulse: 1
-      aPw: 0.5
+      aPw: 0.45
       sync: 1
       bFreq: 0
       bFine: 0
@@ -2615,11 +2719,15 @@ programs:
       mixA: 0.5
       mixB: 0.5
       mixNoise: 0
-      cutoff: 261.69249129464913
+      cutoff: 740.1972328492988
       res: 0
       fEnv: 0.15
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.018335464744449276
       fDecay: 0.01
       fSustain: 1
@@ -2629,7 +2737,7 @@ programs:
       aSustain: 0.6
       aRelease: 0.39810717055349737
       release: 1
-      glide: 0.44562546906687284
+      glide: 0
       unison: 0
       unisonVoices: 5
       unisonDetune: 0.3
@@ -2641,7 +2749,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.689
+      volume: 0.725
       voices: 5
       width: 0.3
       oversample: 1
@@ -2701,7 +2809,7 @@ programs:
       aFreq: -12
       aSaw: 1
       aPulse: 0
-      aPw: 0.5
+      aPw: 0.45
       sync: 0
       bFreq: -5
       bFine: 0
@@ -2714,11 +2822,15 @@ programs:
       mixA: 1
       mixB: 1
       mixNoise: 0
-      cutoff: 32.716624303536
+      cutoff: 92.53897449576012
       res: 0
       fEnv: 0.7
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.29149614062625256
       fDecay: 1.5848931924611143
       fSustain: 0.65
@@ -2740,7 +2852,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.538
+      volume: 0.55
       voices: 5
       width: 0.3
       oversample: 1
@@ -2800,7 +2912,7 @@ programs:
       aFreq: 12
       aSaw: 0
       aPulse: 0
-      aPw: 0.5
+      aPw: 0.45
       sync: 0
       bFreq: 12
       bFine: 0
@@ -2813,11 +2925,15 @@ programs:
       mixA: 0.8
       mixB: 0.8
       mixNoise: 0
-      cutoff: 65.42987317181344
+      cutoff: 185.0684015726177
       res: 0.5
       fEnv: 0.5
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.046104029518643265
       fDecay: 0.39810717055349737
       fSustain: 0.5
@@ -2899,7 +3015,7 @@ programs:
       aFreq: -12
       aSaw: 0
       aPulse: 1
-      aPw: 0.5
+      aPw: 0.45
       sync: 1
       bFreq: -12
       bFine: 0
@@ -2912,11 +3028,15 @@ programs:
       mixA: 0.4
       mixB: 0.4
       mixNoise: 0
-      cutoff: 92.5294273231138
+      cutoff: 261.71949268725376
       res: 0
       fEnv: 0.5
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.1159273335844629
       fDecay: 6.30957344480193
       fSustain: 0.3
@@ -2926,7 +3046,7 @@ programs:
       aSustain: 0.9
       aRelease: 0.01
       release: 1
-      glide: 0.31547867224009657
+      glide: 0
       unison: 0
       unisonVoices: 5
       unisonDetune: 0.3
@@ -2938,7 +3058,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.623
+      volume: 0.644
       voices: 5
       width: 0.3
       oversample: 1
@@ -2998,7 +3118,7 @@ programs:
       aFreq: 0
       aSaw: 0
       aPulse: 1
-      aPw: 0.5
+      aPw: 0.45
       sync: 1
       bFreq: 0
       bFine: 0
@@ -3011,11 +3131,15 @@ programs:
       mixA: 0.6
       mixB: 0.5
       mixNoise: 0
-      cutoff: 46.26710039315442
+      cutoff: 130.866497214144
       res: 0.2
       fEnv: 0.3
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.0029
       fDecay: 6.30957344480193
       fSustain: 0.3
@@ -3025,7 +3149,7 @@ programs:
       aSustain: 0
       aRelease: 6.30957344480193
       release: 1
-      glide: 0.007062687723113772
+      glide: 0
       unison: 0
       unisonVoices: 5
       unisonDetune: 0.3
@@ -3037,7 +3161,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.572
+      volume: 0.6529097824355213
       voices: 5
       width: 0.3
       oversample: 1
@@ -3097,24 +3221,28 @@ programs:
       aFreq: 12
       aSaw: 0
       aPulse: 1
-      aPw: 0.3
+      aPw: 0.25
       sync: 0
       bFreq: 12
       bFine: 10
       bSaw: 0
       bTri: 0
       bPulse: 1
-      bPw: 0.3
+      bPw: 0.25
       bLow: 0
       bKybd: 1
       mixA: 0.4
       mixB: 0.4
       mixNoise: 0
-      cutoff: 523.3579832860137
+      cutoff: 1480.3180981670682
       res: 0
       fEnv: 0.4
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 1.843005934343338
       fDecay: 6.30957344480193
       fSustain: 0.8
@@ -3136,7 +3264,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.583
+      volume: 0.6
       voices: 5
       width: 0.3
       oversample: 1
@@ -3196,7 +3324,7 @@ programs:
       aFreq: -12
       aSaw: 1
       aPulse: 0
-      aPw: 0.5
+      aPw: 0.45
       sync: 0
       bFreq: 0
       bFine: 0
@@ -3209,11 +3337,15 @@ programs:
       mixA: 0.4
       mixB: 0.4
       mixNoise: 0
-      cutoff: 8372
+      cutoff: 33488
       res: 0
       fEnv: 0
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.0029
       fDecay: 0.01
       fSustain: 0
@@ -3223,7 +3355,7 @@ programs:
       aSustain: 1
       aRelease: 2.5118864315095797
       release: 0
-      glide: 0.31547867224009657
+      glide: 0
       unison: 0
       unisonVoices: 5
       unisonDetune: 0.3
@@ -3302,17 +3434,21 @@ programs:
       bSaw: 0
       bTri: 0
       bPulse: 1
-      bPw: 0.8
+      bPw: 0.85
       bLow: 0
       bKybd: 1
       mixA: 0.8
       mixB: 0.8
       mixNoise: 0
-      cutoff: 740.1208672875142
+      cutoff: 2093.4319331440547
       res: 0.3
       fEnv: 0.2
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.046104029518643265
       fDecay: 0.01
       fSustain: 1
@@ -3334,7 +3470,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.643
+      volume: 0.8002759561551254
       voices: 5
       width: 0.3
       oversample: 1
@@ -3394,7 +3530,7 @@ programs:
       aFreq: 24
       aSaw: 0
       aPulse: 1
-      aPw: 0.5
+      aPw: 0.45
       sync: 0
       bFreq: -12
       bFine: 0
@@ -3407,11 +3543,15 @@ programs:
       mixA: 0.5
       mixB: 0.5
       mixNoise: 0
-      cutoff: 523.3579832860137
+      cutoff: 1480.3180981670682
       res: 0.35
       fEnv: 0.05
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.0029
       fDecay: 2.5118864315095797
       fSustain: 0
@@ -3421,7 +3561,7 @@ programs:
       aSustain: 1
       aRelease: 1
       release: 1
-      glide: 0.31547867224009657
+      glide: 0
       unison: 0
       unisonVoices: 5
       unisonDetune: 0.3
@@ -3433,7 +3573,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.608
+      volume: 0.6819595295910161
       voices: 5
       width: 0.3
       oversample: 1
@@ -3493,7 +3633,7 @@ programs:
       aFreq: 12
       aSaw: 1
       aPulse: 0
-      aPw: 0.5
+      aPw: 0.45
       sync: 0
       bFreq: 12
       bFine: 20
@@ -3506,11 +3646,15 @@ programs:
       mixA: 1
       mixB: 0
       mixNoise: 0
-      cutoff: 65.42987317181344
+      cutoff: 185.0684015726177
       res: 0
       fEnv: 0.35
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.0029
       fDecay: 1
       fSustain: 0.5
@@ -3532,7 +3676,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.808
+      volume: 0.877
       voices: 5
       width: 0.3
       oversample: 1
@@ -3592,7 +3736,7 @@ programs:
       aFreq: 0
       aSaw: 0
       aPulse: 1
-      aPw: 0.5
+      aPw: 0.45
       sync: 0
       bFreq: -9
       bFine: 0
@@ -3605,11 +3749,15 @@ programs:
       mixA: 1
       mixB: 0
       mixNoise: 0
-      cutoff: 185.0493082123247
+      cutoff: 523.411983285439
       res: 0.7
       fEnv: 0
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.0029
       fDecay: 0.01
       fSustain: 0
@@ -3631,7 +3779,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.588
+      volume: 0.6758320678985275
       voices: 5
       width: 0.3
       oversample: 1
@@ -3691,7 +3839,7 @@ programs:
       aFreq: 0
       aSaw: 0
       aPulse: 1
-      aPw: 0.2
+      aPw: 0.15
       sync: 1
       bFreq: 0
       bFine: 0
@@ -3709,6 +3857,10 @@ programs:
       fEnv: 1
       track: 0
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 2.9224710298562755
       fDecay: 6.30957344480193
       fSustain: 0
@@ -3730,7 +3882,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.704
+      volume: 0.738
       voices: 5
       width: 0.3
       oversample: 1
@@ -3790,24 +3942,28 @@ programs:
       aFreq: 0
       aSaw: 0
       aPulse: 1
-      aPw: 0.2
+      aPw: 0.15
       sync: 0
       bFreq: -5
       bFine: 0
       bSaw: 0
       bTri: 0
       bPulse: 1
-      bPw: 0.7
+      bPw: 0.75
       bLow: 0
       bKybd: 1
       mixA: 0.6
       mixB: 0.6
       mixNoise: 0
-      cutoff: 65.42987317181344
+      cutoff: 46.26710039315442
       res: 0.7
       fEnv: 0.8
       track: 0
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 4.63418850758736
       fDecay: 15.84893192461114
       fSustain: 0
@@ -3829,7 +3985,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.532
+      volume: 0.8412847318238932
       voices: 5
       width: 0.3
       oversample: 1
@@ -3889,7 +4045,7 @@ programs:
       aFreq: 0
       aSaw: 0
       aPulse: 1
-      aPw: 0.55
+      aPw: 0.5
       sync: 0
       bFreq: 9
       bFine: 0
@@ -3902,11 +4058,15 @@ programs:
       mixA: 0.5
       mixB: 0
       mixNoise: 0
-      cutoff: 1046.6619707510267
+      cutoff: 2960.483469150057
       res: 0.7
       fEnv: 0
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.0029
       fDecay: 0.01
       fSustain: 0
@@ -3928,7 +4088,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.751
+      volume: 1
       voices: 5
       width: 0.3
       oversample: 1
@@ -3988,24 +4148,28 @@ programs:
       aFreq: 0
       aSaw: 0
       aPulse: 1
-      aPw: 0.4
+      aPw: 0.35
       sync: 1
       bFreq: -24
       bFine: 0
       bSaw: 0
       bTri: 0
       bPulse: 1
-      bPw: 0.4
+      bPw: 0.35
       bLow: 0
       bKybd: 1
       mixA: 0.6
       mixB: 0.4
       mixNoise: 0
-      cutoff: 65.42987317181344
+      cutoff: 185.0684015726177
       res: 0
       fEnv: 0.8
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 4.63418850758736
       fDecay: 0.01
       fSustain: 1
@@ -4027,7 +4191,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.527
+      volume: 0.567
       voices: 5
       width: 0.3
       oversample: 1
@@ -4087,24 +4251,28 @@ programs:
       aFreq: -12
       aSaw: 1
       aPulse: 0
-      aPw: 0.3
+      aPw: 0.25
       sync: 0
       bFreq: 0
       bFine: 0
       bSaw: 0
       bTri: 0
       bPulse: 1
-      bPw: 0.2
+      bPw: 0.15
       bLow: 1
       bKybd: 0
       mixA: 0.6
       mixB: 0
       mixNoise: 0
-      cutoff: 32.716624303536
+      cutoff: 92.53897449576012
       res: 0
       fEnv: 0
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.0029
       fDecay: 0.01
       fSustain: 0
@@ -4126,7 +4294,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.928
+      volume: 1
       voices: 5
       width: 0.3
       oversample: 1
@@ -4186,7 +4354,7 @@ programs:
       aFreq: -12
       aSaw: 0
       aPulse: 1
-      aPw: 0.5
+      aPw: 0.45
       sync: 0
       bFreq: -24
       bFine: 0
@@ -4199,11 +4367,15 @@ programs:
       mixA: 0.7
       mixB: 0
       mixNoise: 0
-      cutoff: 261.69249129464913
+      cutoff: 740.1972328492988
       res: 0.5
       fEnv: 0
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.0045985559941253765
       fDecay: 100
       fSustain: 0.5
@@ -4225,7 +4397,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.642
+      volume: 0.8385
       voices: 5
       width: 0.3
       oversample: 1
@@ -4285,7 +4457,7 @@ programs:
       aFreq: 6
       aSaw: 0
       aPulse: 1
-      aPw: 0.5
+      aPw: 0.45
       sync: 0
       bFreq: -1
       bFine: 0
@@ -4298,11 +4470,15 @@ programs:
       mixA: 0.95
       mixB: 0.5
       mixNoise: 0
-      cutoff: 65.42987317181344
+      cutoff: 185.0684015726177
       res: 0.5
       fEnv: 0.3
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.0029
       fDecay: 6.30957344480193
       fSustain: 0.3
@@ -4324,7 +4500,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.59
+      volume: 0.7709
       voices: 5
       width: 0.3
       oversample: 1
@@ -4384,7 +4560,7 @@ programs:
       aFreq: -24
       aSaw: 0
       aPulse: 0
-      aPw: 0.5
+      aPw: 0.45
       sync: 0
       bFreq: 36
       bFine: 102
@@ -4397,11 +4573,15 @@ programs:
       mixA: 0
       mixB: 0
       mixNoise: 0
-      cutoff: 261.69249129464913
+      cutoff: 185.0493082123247
       res: 1
       fEnv: 0.1
       track: 0
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 29.300000000000004
       fDecay: 100
       fSustain: 0
@@ -4423,7 +4603,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.53
+      volume: 0.7867896796476171
       voices: 5
       width: 0.3
       oversample: 1
@@ -4483,7 +4663,7 @@ programs:
       aFreq: -24
       aSaw: 0
       aPulse: 0
-      aPw: 0.5
+      aPw: 0.45
       sync: 0
       bFreq: -24
       bFine: 0
@@ -4496,11 +4676,15 @@ programs:
       mixA: 0
       mixB: 0
       mixNoise: 1
-      cutoff: 65.42987317181344
+      cutoff: 185.0684015726177
       res: 0.6
       fEnv: 0
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.0029
       fDecay: 0.01
       fSustain: 0
@@ -4510,7 +4694,7 @@ programs:
       aSustain: 0.6
       aRelease: 100
       release: 1
-      glide: 0.007062687723113772
+      glide: 0
       unison: 1
       unisonVoices: 5
       unisonDetune: 0.3
@@ -4582,24 +4766,28 @@ programs:
       aFreq: -12
       aSaw: 0
       aPulse: 1
-      aPw: 0.5
+      aPw: 0.45
       sync: 0
       bFreq: -12
       bFine: 0
       bSaw: 0
       bTri: 1
       bPulse: 1
-      bPw: 0.3
+      bPw: 0.25
       bLow: 0
       bKybd: 1
       mixA: 1
       mixB: 0
       mixNoise: 0
-      cutoff: 32.716624303536
+      cutoff: 92.53897449576012
       res: 0.6
       fEnv: 0.3
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.0029
       fDecay: 15.84893192461114
       fSustain: 1
@@ -4621,7 +4809,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.52
+      volume: 0.6854819997636699
       voices: 5
       width: 0.3
       oversample: 1
@@ -4681,24 +4869,28 @@ programs:
       aFreq: -12
       aSaw: 0
       aPulse: 1
-      aPw: 0.4
+      aPw: 0.35
       sync: 0
       bFreq: 0
       bFine: 0
       bSaw: 0
       bTri: 0
       bPulse: 1
-      bPw: 0.4
+      bPw: 0.35
       bLow: 1
       bKybd: 1
       mixA: 0.7
       mixB: 0
       mixNoise: 0
-      cutoff: 261.69249129464913
+      cutoff: 740.1972328492988
       res: 0.6
       fEnv: 0.3
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.0045985559941253765
       fDecay: 39.810717055349734
       fSustain: 0.5
@@ -4720,7 +4912,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.55
+      volume: 0.743619526370845
       voices: 5
       width: 0.3
       oversample: 1
@@ -4780,7 +4972,7 @@ programs:
       aFreq: -24
       aSaw: 0
       aPulse: 1
-      aPw: 0.3
+      aPw: 0.25
       sync: 1
       bFreq: -8
       bFine: 0
@@ -4793,11 +4985,15 @@ programs:
       mixA: 1
       mixB: 0
       mixNoise: 0
-      cutoff: 370.07952454176706
+      cutoff: 261.69249129464913
       res: 0
       fEnv: 0
       track: 0
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.0029
       fDecay: 0.01
       fSustain: 0
@@ -4879,7 +5075,7 @@ programs:
       aFreq: -24
       aSaw: 0
       aPulse: 0
-      aPw: 0.5
+      aPw: 0.45
       sync: 0
       bFreq: 0
       bFine: 0
@@ -4892,11 +5088,15 @@ programs:
       mixA: 0
       mixB: 0
       mixNoise: 0
-      cutoff: 92.5294273231138
+      cutoff: 261.71949268725376
       res: 1
       fEnv: 0
       track: 2
       filterRev: 1
+      filterMode: 0
+      filterPoles: 1
+      noiseColor: 0
+      aTri: 0
       fAttack: 0.0029
       fDecay: 0.01
       fSustain: 0
@@ -4918,7 +5118,7 @@ programs:
       afterAmp: 0
       bendRange: 2
       vintage: 0.25
-      volume: 0.416
+      volume: 0.6525726166489059
       voices: 5
       width: 0.3
       oversample: 1

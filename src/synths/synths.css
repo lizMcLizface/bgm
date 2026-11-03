@@ -610,3 +610,19 @@ label.inline.toggle{min-height:32px;}label.inline.toggle em{font-style:normal;co
 
 /* /synths/iowa: every instrument in view, not in a sideways scroller */
 .iowa .presets{flex-wrap:wrap;overflow:visible}
+
+/* wavetable synthesizer: four wave editors around a joystick */
+.wt-panel>.panel-row{width:100%;max-width:2040px;margin:0 auto;}
+.wt-panel .wt-sources{display:grid;grid-template-columns:170px repeat(2,minmax(0,1fr));gap:8px;flex:none;}
+.wt-panel .wt-sources>.vector{grid-row:span 2;min-width:0;max-width:none;align-self:start;}
+.wt-panel .vector-pad svg{flex:none;width:150px;height:150px;}
+.wt-editor{display:flex;flex-direction:column;gap:4px;}
+.wt-wave{width:100%;height:auto;aspect-ratio:256/88;background:#10151c;border:1px solid #2a3340;border-radius:6px;touch-action:none;cursor:crosshair;}
+.wt-axis{stroke:#6f86a8;stroke-width:.5;opacity:.4;}
+.wt-outline{fill:none;stroke:#e0a526;stroke-width:1.6;stroke-linejoin:round;}
+.wt-bar{fill:#9b7fd1;opacity:.9;}
+.wt-editor-tools{display:flex;flex-wrap:wrap;gap:4px;align-items:center;}
+.wt-editor-tools button,.wt-editor-tools select{min-height:30px;font-size:12px;padding:2px 8px;background:#23211d;color:var(--text,#e8e4d9);border:1px solid var(--line,#3a372f);border-radius:6px;}
+.wt-editor-tools button.on{background:#3a3326;border-color:#e0a526;}
+.wt-modes{display:flex;gap:2px;}
+@media (max-width:720px){.wt-panel .wt-sources{grid-template-columns:minmax(0,1fr);}.wt-panel .wt-sources>.vector{grid-row:auto;}}

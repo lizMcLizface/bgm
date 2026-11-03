@@ -16,6 +16,8 @@ import {PRESETS as DX7_PRESETS,CATEGORIES as DX7_CATEGORIES,generate as DX7_GENE
 import * as obxaParams from './obxa/params';
 import {PRESETS as OBXA_PRESETS,CATEGORIES as OBXA_CATEGORIES} from './obxa/presets';
 import * as vsParams from './vs/params';
+import * as wtParams from './wt/params';
+import {PRESETS as WT_PRESETS,CATEGORIES as WT_CATEGORIES} from './wt/presets';
 import {PRESETS as VS_PRESETS,CATEGORIES as VS_CATEGORIES,generate as VS_GENERATE,GENERATES as VS_GENERATES} from './vs/presets';
 import {KITS,drumParams,drumPresets,CATEGORIES as DRUM_CATEGORIES} from './drums/kits';
 import * as tb303Params from './tb303/params';
@@ -35,6 +37,7 @@ export const SYNTHS={
  dx7:{id:'dx7',model:MODELS.dx7,name:'FM7',subtitle:'six-operator FM synth',params:dx7Params,presets:DX7_PRESETS,categories:DX7_CATEGORIES,generate:DX7_GENERATE,generates:DX7_GENERATES},
  obxa:{id:'obxa',model:MODELS.obxa,name:'Oberon Xa',subtitle:'analog polysynth',params:obxaParams,presets:OBXA_PRESETS,categories:OBXA_CATEGORIES},
  vs:{id:'vs',model:MODELS.vs,name:'VectorVS',subtitle:'vector synth',params:vsParams,presets:VS_PRESETS,categories:VS_CATEGORIES,generate:VS_GENERATE,generates:VS_GENERATES},
+ wt:{id:'wt',model:MODELS.wt,name:'Quadwave',subtitle:'four-wave wavetable synth',params:wtParams,presets:WT_PRESETS,categories:WT_CATEGORIES},
  tr808:drums(KITS.tr808),
  tr909:drums(KITS.tr909),
  tr606:drums(KITS.tr606),

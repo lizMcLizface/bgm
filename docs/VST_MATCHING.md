@@ -12,7 +12,9 @@ recording source that [SYNTHS_MATCHING.md](SYNTHS_MATCHING.md) was missing.
 | Pluto 8 `jupiter8` | EightyEight (parametric), Deep Jupiter (8 programs, 25 knobs) | baseline sweep only |
 | Oberon Xa `obxa` | OB-Xd 3 | baseline sweep only |
 
-Oracle 5, Analog 106, Mercury D, VectorVS have no VST here.
+| Oracle 5 `prophet5` | UADx PolyMAX Synth | a Prophet-style poly-mod polysynth (a software model, not hardware); see the Oracle 5 section |
+
+Analog 106 and Mercury D are lower priority (analogue, better hardware grounding, and judged not far off by ear); VectorVS, the TB-303 and the drum machines have no VST here.
 
 ## Setup (once)
 
@@ -147,8 +149,7 @@ worse than the sound is.
 
 ### Left alone, on purpose
 
-* **Key-follow pivot** (C2 here, middle C in OB-Xd): the engine comment says it is deliberate (lowest key of a 61-key
-  keyboard), and changing it would retune every preset that uses `track`. A cutoff offset of 2 octaves at track 1.
+* **Key-follow pivot** (C2 here, middle C in OB-Xd): left alone at first, changed in the Oracle 5 pass below once presets were confirmed unused on the main page.
 * **Four-pole stopband**: ours is 2-6 dB higher at harmonics 12-20 for a 1.6 kHz cutoff (55-45 dB below the fundamental;
   within 1 dB at 4.4 kHz and above). Not the input saturator (tested by removing it: no change); cause not found,
   small enough to leave.
@@ -247,6 +248,66 @@ Still different: **cross-mod above about .3** (the plugin's carrier stays a clea
 ours becomes sidebands, because our modulator is a free-running oscillator), the **V 80 resonance** `lpRes` below .5
 now does nothing (as in the plugin), and everything not measured (sync, Pluto 8 high-pass, which the plugin ignores).
 
+## Oracle 5 (prophet5) vs UADx PolyMAX (2026-11-03)
+
+Files: `cases/prophet5-spectral.json`, `-spectral2.json`, `-env.json`, `-lfo-rate.json`, `-lfo.json`. PolyMAX loads through
+its inner `Contents/x86_64-win/uaudio_polymax.vst3` and has no phantom note. Its oscillator shape is a morph: 0 triangle,
+.25 saw, .5 square, then .625 / .75 / .875 / 1 = pulse of duty .37 / .25 / .13 / .02. Its LFO routes to pitch and filter
+through `pitch_mod` / `filter_lfo_amt` (set `pitch_mod_source` to LFO; it defaults to the envelope).
+
+| Test | Result |
+|---|---|
+| Saw, square | harmonic error 0.8 / 1.0 dB |
+| Filter, 4-pole low-pass | fit cost 0.1-1.0 on all three of our filter revisions (rev 1 and 2 marginally best). Cutoff is exponential: knob .3 / .45 / .6 / .75 / .9 / 1 -> ours 119 / 382 / 1235 / 4258 / 13960 / >20k Hz |
+| Filter, 2-pole and other modes | did not match (fit cost 1.5-4): ours had no 2-pole mode nor BP / HP / notch. **Added** (below) |
+| Resonance (4-pole) | about 1:1 up to .8: knob .2 / .4 / .6 / .8 / .95 -> ours `res` .22 / .44 / .66 / .89 / .90 (0.6-1.1 dB cost) |
+| Pulse width | duty = 0.5 - 0.96 x (knob - 0.5); ours duty = `aPw` (symmetric about .5), so **`aPw` = that duty** |
+| Osc B saw and triangle | match (cost under 1 dB). The plugin's osc A also has a triangle and a morph between shapes; ours had saw and pulse switches on A (a triangle switch added, the morph left out) |
+| Mix knobs (osc 1, osc 2, noise) | linear in amplitude on both (.5 = -6 dB, .1 = -20 dB); same taper, no change needed |
+| Noise | the plugin's **white** noise has the same spectrum as ours within about 2 dB, and sits 1.1 dB under a full oscillator (ours 2.1 dB). **Pink** (the plugin's default) had no counterpart in ours: added (below) |
+| Filter envelope amount | ours `fEnv` = 0.0112 x amount %, i.e. knob .55 / .6 / .7 / .8 -> .115 / .22 / .45 / .69 (both saturate when the filter is open) |
+| Key follow (100 %) | slope matches (2.0x per octave, 12 dB/oct tracking); **pivot differed**: the plugin keeps the cutoff at note 60, ours counted from note 36 (C2), two octaves apart. Moved to note 60 (below), as for the Oberon Xa |
+| Not matched in this pass | osc B fine detune and sync (beating defeats the harmonic metric; the plugin's `osc_2_sync` is a 0-36 amount, not a switch), poly-mod FM, mod wheel, unison, arpeggiator |
+
+Amplitude envelope (knob .2 / .35 / .5 / .65 / .8 -> ours seconds, shapes match, fit cost 0.8-1.3):
+
+| Stage | .2 | .35 | .5 | .65 | .8 |
+|---|---|---|---|---|---|
+| attack -> `aAttack` | .032 | .22 | 1.1 | 5.5 | 17 |
+| decay -> `aDecay` | .27 | 1.4 | 5.2 | 16 | 34 |
+| release -> `aRelease` | .16 | .98 | 5.3 | 19 | 44 |
+
+LFO: **rate is exactly exponential, Hz = 0.05 x 1000^knob** (.3 / .5 / .7 / .9 -> 0.40 / 1.6 / 6.3 / 25 Hz); ours `lfoRate` is in Hz.
+Vibrato depth (plugin `pitch_mod`, knob .505 / .51 / .52 / .54 / .56 / .6 = 9.5 / 20 / 47 / 119 / 216 / 580 cents peak to
+peak) -> ours `lfoAmount` .066 / .10 / .155 / .24 / .32 / .49 (ours is about 1950 cents x amount^2). Filter LFO
+(`filter_lfo_amt` .55 / .6 / .7 / .8 -> centroid swing .65 / .81 / 1.9 / 3.4 octaves) -> ours `lfoAmount` .043 / .094 / .32 / .64.
+
+### Engine changes made from the Oracle 5 pass (Oracle 5 and Oberon Xa)
+
+The new controls are in the parameter table but **not on the panel** (the Oracle's normal controls are unchanged; their
+defaults give the old sound), so the filter mode, pole count, noise colour and triangle are reachable from presets and links.
+
+| Change | Where | Verified against the plugin |
+|---|---|---|
+| **Filter mode** LP / BP / HP / Notch and **poles** 2 / 4 (`filterMode` 72, `filterPoles` 73; defaults LP, 4-pole = the ladder as before) | `prophet.rs`, `prophet/params.js` | at zero resonance every LP / BP / HP, 2- and 4-pole response is within about 1-2 dB of the plugin's (corner of each stage at the cutoff: -6 dB for two poles, -12 for four; band-pass unity at the centre). Notch is a plain state-variable notch; the plugin's notch has no dip at zero resonance and is not matched |
+| **Resonance of the new modes** fitted from tables (damping per knob position; two-pole low-pass passband 1/(1+k); band-pass gain) | `prophet.rs` (`D_LOW`, `D_HIGH`, `PASSBAND`, `BAND_GAIN`) | two-pole low-pass passband loss within 0.2 dB at every knob position; high-pass peaks within 1 dB. The state-variable section saturates, so low-pass / band-pass peaks stop about 5 dB short at the top of the knob, and the plugin's band-pass high side does not narrow with resonance (ours does) |
+| **Ladder make-up gain `1 + 0.3 k` removed** | `prophet.rs` | the ladder's passband loss now equals the plugin's within 0.7 dB at every knob position (-5.6 / -9 / -11.4 / -13.3 / -14.7 dB against -6.3 / -9.9 / -11.9 / -13.5 / -14.8). Presets keep their level through `ladderMakeupVolume` (below) |
+| **Pink noise** (`noiseColor` 74, default White) | `prophet.rs` | flat in octave bands, within about 3 dB of the plugin's curve, 2.4 dB under white (the plugin 1.2 dB) |
+| **Osc A triangle** (`aTri` 75) | `prophet.rs` | harmonic error 0.4 dB against the plugin's shape 0 |
+| **Key-tracking pivot C2 -> middle C**, Oracle 5 and Oberon Xa; cutoff range to 40 kHz so shifted sounds fit | `prophet.rs`, `obxa.rs`, both `params.js` | the fitted cutoff against the plugins now stays within about 20 % of the base across notes 36-96 (it was off by a factor of 4); the Oracle's and Oberon's default cutoff move with it (Oracle 750 -> 1500) |
+
+**Presets**: every sound keeps the sound it had. `src/synths/pivot.js` shifts the cutoff by 2 octaves per unit of tracking
+(after the old table's 20 Hz clamp) wherever values are authored or decoded against the old pivot: the hand-written
+presets in `prophet/presets.js` and `obxa/presets.js`, `engineValues` in `prophet/sysex.js` (programs and patch sheets) and
+`obxa/book.js` (the patch book). Compared with the committed build, the 109 Oberon presets are unchanged and the 50
+Oracle presets are within 1 dB in level and 1.5 dB in brightness, except five (Resonant Pluck, Damped Clav, Tin Piano,
+Chiff Pipes, Noise Wash) that are 3-5 dB quieter because their volume was already at its maximum. The Oracle's
+volume is raised by `ladderMakeupVolume(res)` to make up the removed gain. Published banks `cs80`, `obxa`, `prophet5`
+regenerated (the V 80 one had been stale since the earlier volume change).
+
+Left as it was: the ladder's self-oscillation above resonance .87 (the plugin's low-pass never rings: its peak stops at
+about 9 dB from .85 up), because the factory resonance sounds rely on it.
+
 **Bug fixed during calibration**: `--fit` seeded its search with the model defaults, including `reverbMix` .25,
 so every earlier fit scored a reverberant sound and the final render had reverb on. Fits now start from the case's own
 values (dry). Earlier cutoff-fit numbers are void.
@@ -259,3 +320,9 @@ values (dry). Earlier cutoff-fit numbers are void.
 * Dexed's pedalboard readback is relative to the DX7 centre (pitch EG level 50 reads 0, transpose 24 reads 0) and the
   range metadata says 0..99; `pairs.mjs` applies the offsets.
 * A fit can only move the keys it is given and stops at local minima; read the cost, not just the values. Each key is scanned over its range (11 points) before local refinement, because the cost has ridges (a dark filter against a bright one). Pairs of coupled keys (cutoff with resonance or envelope amount) trade off; pin one when you can.
+
+## Surge XT (pair `wt`, Quadwave)
+* Host quirks: Surge has a phantom note 60 (note_off at t=0, as UNSTABLE/EightyEight), needs a 0.6 s silent
+  `SETTLE` block, and only parameters that differ from the base patch are restored.
+* Filter, waveshaper and comb type changes do not take effect through the harness, so filters are not compared.
+* Cutoff is exponential (13.75 Hz..25 kHz), not linear. Results are in `docs/WAVETABLE.md`.

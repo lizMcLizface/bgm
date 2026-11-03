@@ -25,7 +25,7 @@ const LAYER=[
  ['fenvOsc2',11,'Env → osc 2',0,1,0,'','step',ON],
  ['noiseOn',12,'Noise',0,1,0,'','step',ON],
  // filter
- ['cutoff',13,'Cutoff',20,20000,1200,'Hz','log'],
+ ['cutoff',13,'Cutoff',20,40000,1200,'Hz','log'],
  ['res',14,'Res',0,1,.1,'%','lin'],
  ['envAmount',15,'Env',0,1,.35,'%','lin'],
  ['poles',16,'Poles',0,1,1,'','step',['2','4']],

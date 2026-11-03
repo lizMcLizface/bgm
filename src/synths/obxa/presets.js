@@ -1,9 +1,10 @@
 // Our own sounds: hand-made patches in the OB-Xa idiom, then sounds approximated from the factory
 // patch book's drawings (bookPresets.js; the measured book itself loads locally on the "Patch book" shelf). Each is a set of overrides on the
 // defaults; the layered ones use both layers.
-import {sanitize,intoLayer} from './params';
+import {sanitize,intoLayer,BY_KEY} from './params';
 import {engineValues} from './book';
 import {BOOK_SOUNDS} from './bookPresets';
+import {fromLowestKeyPivot} from '../pivot';
 
 const RAW=[
  {name:'Classic Brass',category:'brass',styles:['fat', 'swell'],colour:'#e0a526',note:'Two saws, a swell on the 24 dB filter and a touch of detune: the classic brassy stack.',values:{
@@ -71,4 +72,8 @@ export const CATEGORIES=[
 // The patch-book sounds (bookPresets.js) through book.js's panel → engine mapping.
 const BOOK=BOOK_SOUNDS.map(({panel,volume,note,...p})=>({...p,note:note??'Read off a panel drawing and approximated.',values:{...engineValues(panel),reverbMix:.15,volume}}));
 
-export const PRESETS=[...RAW,...BOOK].map(p=>({...p,values:sanitize(p.values)}));
+// RAW was authored against the old C2 key-tracking pivot (src/synths/pivot.js): keep its sound under the middle-C pivot
+// (the old default cutoff was 1200, and tracking is off unless a sound sets it).
+const retracked=values=>({...values,cutoff:fromLowestKeyPivot(values.cutoff??1200,values.track??0,BY_KEY.cutoff.max)});
+
+export const PRESETS=[...RAW.map(p=>({...p,values:retracked(p.values)})),...BOOK].map(p=>({...p,values:sanitize(p.values)}));

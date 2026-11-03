@@ -58,4 +58,6 @@ export const PAIRS={
  cs80:{plugin:'unstable',model:'cs80'},
  jupiter8:{plugin:'eightyeight',model:'jupiter8',alsoPlugins:['deepjupiter']},
  obxa:{plugin:'obxd',model:'obxa'},
+ prophet5:{plugin:'polymax',model:'prophet5'},
+ wt:{plugin:'surge',model:'wt'},
 };

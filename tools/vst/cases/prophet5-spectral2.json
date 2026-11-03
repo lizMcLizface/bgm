@@ -1,0 +1,1899 @@
+{
+ "pair": "prophet5",
+ "defaults": {
+  "velocity": 100
+ },
+ "sweeps": [
+  {
+   "name": "envamt",
+   "vstParam": "filter_env_amt",
+   "norms": [
+    0.55,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    1
+   ],
+   "note": 60,
+   "hold": 1.5,
+   "tail": 0.4,
+   "window": [
+    0.3,
+    1.4
+   ],
+   "vst": {
+    "params": {
+     "polyphony": {
+      "norm": 0
+     },
+     "master_volume": {
+      "norm": 0.8
+     },
+     "osc_1_volume": 100,
+     "osc_2_volume": 0,
+     "noise_volume": 0,
+     "filter_cutoff_freq": {
+      "norm": 0.3
+     },
+     "filter_resonance": 0,
+     "filter_env_amt": 0,
+     "filter_lfo_amt": 0,
+     "filter_key_follow": 0,
+     "pitch_mod": 0,
+     "osc1_shape_mod": 0,
+     "osc2_shape_mod": 0,
+     "osc1_fm_mod": 0,
+     "osc2_sync_mod": 0,
+     "osc_1_fm_amount": 0,
+     "osc_2_sync": 0,
+     "mod_wheel_amt": 0,
+     "mod_fx_enable": false,
+     "space_fx_amount": 0,
+     "unison": {
+      "norm": 0
+     },
+     "glide_rate": 0,
+     "amp_env_attack": 0.001,
+     "amp_env_decay": 1,
+     "amp_env_sustain": 100,
+     "amp_env_release": 0.1,
+     "amp_env_velocity": 0,
+     "filter_env_velocity": 0,
+     "filter_mode": {
+      "norm": 0
+     },
+     "filter_slope": {
+      "norm": 1
+     },
+     "voice_panning": {
+      "norm": 0
+     },
+     "arp_enable": {
+      "norm": 0
+     },
+     "osc_1_coarse_tune": 0,
+     "osc_1_fine_tune": 0,
+     "osc_1_shape": {
+      "norm": 0.25
+     },
+     "filter_env_attack": 0.001,
+     "filter_env_sustain": 100,
+     "filter_env_decay": 1
+    }
+   },
+   "ours": {
+    "aSaw": 1,
+    "aPulse": 0,
+    "aPw": 0.5,
+    "aFreq": 0,
+    "mixA": 1,
+    "mixB": 0,
+    "mixNoise": 0,
+    "cutoff": 119,
+    "res": 0,
+    "fEnv": 0.1,
+    "track": 0,
+    "fAttack": 0.001,
+    "fSustain": 1,
+    "aAttack": 0.001,
+    "aDecay": 1,
+    "aSustain": 1,
+    "aRelease": 0.1,
+    "velFilter": 0,
+    "velAmp": 0,
+    "vintage": 0,
+    "width": 0,
+    "unison": 0,
+    "voices": 8,
+    "pmEnv": 0,
+    "pmOscB": 0,
+    "pmFreqA": 0,
+    "pmPwA": 0,
+    "pmFilter": 0,
+    "lfoAmount": 0,
+    "wheelMix": 0,
+    "sync": 0,
+    "filterRev": 2,
+    "fDecay": 1
+   },
+   "fit": [
+    "fEnv"
+   ]
+  },
+  {
+   "name": "kf1-note36",
+   "vstParam": "filter_key_follow",
+   "norms": [
+    1
+   ],
+   "note": 36,
+   "hold": 1.5,
+   "tail": 0.3,
+   "window": [
+    0.3,
+    1.4
+   ],
+   "vst": {
+    "params": {
+     "polyphony": {
+      "norm": 0
+     },
+     "master_volume": {
+      "norm": 0.8
+     },
+     "osc_1_volume": 100,
+     "osc_2_volume": 0,
+     "noise_volume": 0,
+     "filter_cutoff_freq": {
+      "norm": 0.6
+     },
+     "filter_resonance": 0,
+     "filter_env_amt": 0,
+     "filter_lfo_amt": 0,
+     "filter_key_follow": 0,
+     "pitch_mod": 0,
+     "osc1_shape_mod": 0,
+     "osc2_shape_mod": 0,
+     "osc1_fm_mod": 0,
+     "osc2_sync_mod": 0,
+     "osc_1_fm_amount": 0,
+     "osc_2_sync": 0,
+     "mod_wheel_amt": 0,
+     "mod_fx_enable": false,
+     "space_fx_amount": 0,
+     "unison": {
+      "norm": 0
+     },
+     "glide_rate": 0,
+     "amp_env_attack": 0.001,
+     "amp_env_decay": 1,
+     "amp_env_sustain": 100,
+     "amp_env_release": 0.1,
+     "amp_env_velocity": 0,
+     "filter_env_velocity": 0,
+     "filter_mode": {
+      "norm": 0
+     },
+     "filter_slope": {
+      "norm": 1
+     },
+     "voice_panning": {
+      "norm": 0
+     },
+     "arp_enable": {
+      "norm": 0
+     },
+     "osc_1_coarse_tune": 0,
+     "osc_1_fine_tune": 0,
+     "osc_1_shape": {
+      "norm": 0.25
+     }
+    }
+   },
+   "ours": {
+    "aSaw": 1,
+    "aPulse": 0,
+    "aPw": 0.5,
+    "aFreq": 0,
+    "mixA": 1,
+    "mixB": 0,
+    "mixNoise": 0,
+    "cutoff": 1235,
+    "res": 0,
+    "fEnv": 0,
+    "track": 0,
+    "fAttack": 0.001,
+    "fSustain": 1,
+    "aAttack": 0.001,
+    "aDecay": 1,
+    "aSustain": 1,
+    "aRelease": 0.1,
+    "velFilter": 0,
+    "velAmp": 0,
+    "vintage": 0,
+    "width": 0,
+    "unison": 0,
+    "voices": 8,
+    "pmEnv": 0,
+    "pmOscB": 0,
+    "pmFreqA": 0,
+    "pmPwA": 0,
+    "pmFilter": 0,
+    "lfoAmount": 0,
+    "wheelMix": 0,
+    "sync": 0,
+    "filterRev": 2
+   },
+   "fit": [
+    "cutoff"
+   ]
+  },
+  {
+   "name": "kf0-note36",
+   "vstParam": "filter_key_follow",
+   "norms": [
+    0
+   ],
+   "note": 36,
+   "hold": 1.5,
+   "tail": 0.3,
+   "window": [
+    0.3,
+    1.4
+   ],
+   "vst": {
+    "params": {
+     "polyphony": {
+      "norm": 0
+     },
+     "master_volume": {
+      "norm": 0.8
+     },
+     "osc_1_volume": 100,
+     "osc_2_volume": 0,
+     "noise_volume": 0,
+     "filter_cutoff_freq": {
+      "norm": 0.6
+     },
+     "filter_resonance": 0,
+     "filter_env_amt": 0,
+     "filter_lfo_amt": 0,
+     "filter_key_follow": 0,
+     "pitch_mod": 0,
+     "osc1_shape_mod": 0,
+     "osc2_shape_mod": 0,
+     "osc1_fm_mod": 0,
+     "osc2_sync_mod": 0,
+     "osc_1_fm_amount": 0,
+     "osc_2_sync": 0,
+     "mod_wheel_amt": 0,
+     "mod_fx_enable": false,
+     "space_fx_amount": 0,
+     "unison": {
+      "norm": 0
+     },
+     "glide_rate": 0,
+     "amp_env_attack": 0.001,
+     "amp_env_decay": 1,
+     "amp_env_sustain": 100,
+     "amp_env_release": 0.1,
+     "amp_env_velocity": 0,
+     "filter_env_velocity": 0,
+     "filter_mode": {
+      "norm": 0
+     },
+     "filter_slope": {
+      "norm": 1
+     },
+     "voice_panning": {
+      "norm": 0
+     },
+     "arp_enable": {
+      "norm": 0
+     },
+     "osc_1_coarse_tune": 0,
+     "osc_1_fine_tune": 0,
+     "osc_1_shape": {
+      "norm": 0.25
+     }
+    }
+   },
+   "ours": {
+    "aSaw": 1,
+    "aPulse": 0,
+    "aPw": 0.5,
+    "aFreq": 0,
+    "mixA": 1,
+    "mixB": 0,
+    "mixNoise": 0,
+    "cutoff": 1235,
+    "res": 0,
+    "fEnv": 0,
+    "track": 0,
+    "fAttack": 0.001,
+    "fSustain": 1,
+    "aAttack": 0.001,
+    "aDecay": 1,
+    "aSustain": 1,
+    "aRelease": 0.1,
+    "velFilter": 0,
+    "velAmp": 0,
+    "vintage": 0,
+    "width": 0,
+    "unison": 0,
+    "voices": 8,
+    "pmEnv": 0,
+    "pmOscB": 0,
+    "pmFreqA": 0,
+    "pmPwA": 0,
+    "pmFilter": 0,
+    "lfoAmount": 0,
+    "wheelMix": 0,
+    "sync": 0,
+    "filterRev": 2
+   },
+   "fit": [
+    "cutoff"
+   ]
+  },
+  {
+   "name": "kf1-note48",
+   "vstParam": "filter_key_follow",
+   "norms": [
+    1
+   ],
+   "note": 48,
+   "hold": 1.5,
+   "tail": 0.3,
+   "window": [
+    0.3,
+    1.4
+   ],
+   "vst": {
+    "params": {
+     "polyphony": {
+      "norm": 0
+     },
+     "master_volume": {
+      "norm": 0.8
+     },
+     "osc_1_volume": 100,
+     "osc_2_volume": 0,
+     "noise_volume": 0,
+     "filter_cutoff_freq": {
+      "norm": 0.6
+     },
+     "filter_resonance": 0,
+     "filter_env_amt": 0,
+     "filter_lfo_amt": 0,
+     "filter_key_follow": 0,
+     "pitch_mod": 0,
+     "osc1_shape_mod": 0,
+     "osc2_shape_mod": 0,
+     "osc1_fm_mod": 0,
+     "osc2_sync_mod": 0,
+     "osc_1_fm_amount": 0,
+     "osc_2_sync": 0,
+     "mod_wheel_amt": 0,
+     "mod_fx_enable": false,
+     "space_fx_amount": 0,
+     "unison": {
+      "norm": 0
+     },
+     "glide_rate": 0,
+     "amp_env_attack": 0.001,
+     "amp_env_decay": 1,
+     "amp_env_sustain": 100,
+     "amp_env_release": 0.1,
+     "amp_env_velocity": 0,
+     "filter_env_velocity": 0,
+     "filter_mode": {
+      "norm": 0
+     },
+     "filter_slope": {
+      "norm": 1
+     },
+     "voice_panning": {
+      "norm": 0
+     },
+     "arp_enable": {
+      "norm": 0
+     },
+     "osc_1_coarse_tune": 0,
+     "osc_1_fine_tune": 0,
+     "osc_1_shape": {
+      "norm": 0.25
+     }
+    }
+   },
+   "ours": {
+    "aSaw": 1,
+    "aPulse": 0,
+    "aPw": 0.5,
+    "aFreq": 0,
+    "mixA": 1,
+    "mixB": 0,
+    "mixNoise": 0,
+    "cutoff": 1235,
+    "res": 0,
+    "fEnv": 0,
+    "track": 0,
+    "fAttack": 0.001,
+    "fSustain": 1,
+    "aAttack": 0.001,
+    "aDecay": 1,
+    "aSustain": 1,
+    "aRelease": 0.1,
+    "velFilter": 0,
+    "velAmp": 0,
+    "vintage": 0,
+    "width": 0,
+    "unison": 0,
+    "voices": 8,
+    "pmEnv": 0,
+    "pmOscB": 0,
+    "pmFreqA": 0,
+    "pmPwA": 0,
+    "pmFilter": 0,
+    "lfoAmount": 0,
+    "wheelMix": 0,
+    "sync": 0,
+    "filterRev": 2
+   },
+   "fit": [
+    "cutoff"
+   ]
+  },
+  {
+   "name": "kf0-note48",
+   "vstParam": "filter_key_follow",
+   "norms": [
+    0
+   ],
+   "note": 48,
+   "hold": 1.5,
+   "tail": 0.3,
+   "window": [
+    0.3,
+    1.4
+   ],
+   "vst": {
+    "params": {
+     "polyphony": {
+      "norm": 0
+     },
+     "master_volume": {
+      "norm": 0.8
+     },
+     "osc_1_volume": 100,
+     "osc_2_volume": 0,
+     "noise_volume": 0,
+     "filter_cutoff_freq": {
+      "norm": 0.6
+     },
+     "filter_resonance": 0,
+     "filter_env_amt": 0,
+     "filter_lfo_amt": 0,
+     "filter_key_follow": 0,
+     "pitch_mod": 0,
+     "osc1_shape_mod": 0,
+     "osc2_shape_mod": 0,
+     "osc1_fm_mod": 0,
+     "osc2_sync_mod": 0,
+     "osc_1_fm_amount": 0,
+     "osc_2_sync": 0,
+     "mod_wheel_amt": 0,
+     "mod_fx_enable": false,
+     "space_fx_amount": 0,
+     "unison": {
+      "norm": 0
+     },
+     "glide_rate": 0,
+     "amp_env_attack": 0.001,
+     "amp_env_decay": 1,
+     "amp_env_sustain": 100,
+     "amp_env_release": 0.1,
+     "amp_env_velocity": 0,
+     "filter_env_velocity": 0,
+     "filter_mode": {
+      "norm": 0
+     },
+     "filter_slope": {
+      "norm": 1
+     },
+     "voice_panning": {
+      "norm": 0
+     },
+     "arp_enable": {
+      "norm": 0
+     },
+     "osc_1_coarse_tune": 0,
+     "osc_1_fine_tune": 0,
+     "osc_1_shape": {
+      "norm": 0.25
+     }
+    }
+   },
+   "ours": {
+    "aSaw": 1,
+    "aPulse": 0,
+    "aPw": 0.5,
+    "aFreq": 0,
+    "mixA": 1,
+    "mixB": 0,
+    "mixNoise": 0,
+    "cutoff": 1235,
+    "res": 0,
+    "fEnv": 0,
+    "track": 0,
+    "fAttack": 0.001,
+    "fSustain": 1,
+    "aAttack": 0.001,
+    "aDecay": 1,
+    "aSustain": 1,
+    "aRelease": 0.1,
+    "velFilter": 0,
+    "velAmp": 0,
+    "vintage": 0,
+    "width": 0,
+    "unison": 0,
+    "voices": 8,
+    "pmEnv": 0,
+    "pmOscB": 0,
+    "pmFreqA": 0,
+    "pmPwA": 0,
+    "pmFilter": 0,
+    "lfoAmount": 0,
+    "wheelMix": 0,
+    "sync": 0,
+    "filterRev": 2
+   },
+   "fit": [
+    "cutoff"
+   ]
+  },
+  {
+   "name": "kf1-note72",
+   "vstParam": "filter_key_follow",
+   "norms": [
+    1
+   ],
+   "note": 72,
+   "hold": 1.5,
+   "tail": 0.3,
+   "window": [
+    0.3,
+    1.4
+   ],
+   "vst": {
+    "params": {
+     "polyphony": {
+      "norm": 0
+     },
+     "master_volume": {
+      "norm": 0.8
+     },
+     "osc_1_volume": 100,
+     "osc_2_volume": 0,
+     "noise_volume": 0,
+     "filter_cutoff_freq": {
+      "norm": 0.6
+     },
+     "filter_resonance": 0,
+     "filter_env_amt": 0,
+     "filter_lfo_amt": 0,
+     "filter_key_follow": 0,
+     "pitch_mod": 0,
+     "osc1_shape_mod": 0,
+     "osc2_shape_mod": 0,
+     "osc1_fm_mod": 0,
+     "osc2_sync_mod": 0,
+     "osc_1_fm_amount": 0,
+     "osc_2_sync": 0,
+     "mod_wheel_amt": 0,
+     "mod_fx_enable": false,
+     "space_fx_amount": 0,
+     "unison": {
+      "norm": 0
+     },
+     "glide_rate": 0,
+     "amp_env_attack": 0.001,
+     "amp_env_decay": 1,
+     "amp_env_sustain": 100,
+     "amp_env_release": 0.1,
+     "amp_env_velocity": 0,
+     "filter_env_velocity": 0,
+     "filter_mode": {
+      "norm": 0
+     },
+     "filter_slope": {
+      "norm": 1
+     },
+     "voice_panning": {
+      "norm": 0
+     },
+     "arp_enable": {
+      "norm": 0
+     },
+     "osc_1_coarse_tune": 0,
+     "osc_1_fine_tune": 0,
+     "osc_1_shape": {
+      "norm": 0.25
+     }
+    }
+   },
+   "ours": {
+    "aSaw": 1,
+    "aPulse": 0,
+    "aPw": 0.5,
+    "aFreq": 0,
+    "mixA": 1,
+    "mixB": 0,
+    "mixNoise": 0,
+    "cutoff": 1235,
+    "res": 0,
+    "fEnv": 0,
+    "track": 0,
+    "fAttack": 0.001,
+    "fSustain": 1,
+    "aAttack": 0.001,
+    "aDecay": 1,
+    "aSustain": 1,
+    "aRelease": 0.1,
+    "velFilter": 0,
+    "velAmp": 0,
+    "vintage": 0,
+    "width": 0,
+    "unison": 0,
+    "voices": 8,
+    "pmEnv": 0,
+    "pmOscB": 0,
+    "pmFreqA": 0,
+    "pmPwA": 0,
+    "pmFilter": 0,
+    "lfoAmount": 0,
+    "wheelMix": 0,
+    "sync": 0,
+    "filterRev": 2
+   },
+   "fit": [
+    "cutoff"
+   ]
+  },
+  {
+   "name": "kf0-note72",
+   "vstParam": "filter_key_follow",
+   "norms": [
+    0
+   ],
+   "note": 72,
+   "hold": 1.5,
+   "tail": 0.3,
+   "window": [
+    0.3,
+    1.4
+   ],
+   "vst": {
+    "params": {
+     "polyphony": {
+      "norm": 0
+     },
+     "master_volume": {
+      "norm": 0.8
+     },
+     "osc_1_volume": 100,
+     "osc_2_volume": 0,
+     "noise_volume": 0,
+     "filter_cutoff_freq": {
+      "norm": 0.6
+     },
+     "filter_resonance": 0,
+     "filter_env_amt": 0,
+     "filter_lfo_amt": 0,
+     "filter_key_follow": 0,
+     "pitch_mod": 0,
+     "osc1_shape_mod": 0,
+     "osc2_shape_mod": 0,
+     "osc1_fm_mod": 0,
+     "osc2_sync_mod": 0,
+     "osc_1_fm_amount": 0,
+     "osc_2_sync": 0,
+     "mod_wheel_amt": 0,
+     "mod_fx_enable": false,
+     "space_fx_amount": 0,
+     "unison": {
+      "norm": 0
+     },
+     "glide_rate": 0,
+     "amp_env_attack": 0.001,
+     "amp_env_decay": 1,
+     "amp_env_sustain": 100,
+     "amp_env_release": 0.1,
+     "amp_env_velocity": 0,
+     "filter_env_velocity": 0,
+     "filter_mode": {
+      "norm": 0
+     },
+     "filter_slope": {
+      "norm": 1
+     },
+     "voice_panning": {
+      "norm": 0
+     },
+     "arp_enable": {
+      "norm": 0
+     },
+     "osc_1_coarse_tune": 0,
+     "osc_1_fine_tune": 0,
+     "osc_1_shape": {
+      "norm": 0.25
+     }
+    }
+   },
+   "ours": {
+    "aSaw": 1,
+    "aPulse": 0,
+    "aPw": 0.5,
+    "aFreq": 0,
+    "mixA": 1,
+    "mixB": 0,
+    "mixNoise": 0,
+    "cutoff": 1235,
+    "res": 0,
+    "fEnv": 0,
+    "track": 0,
+    "fAttack": 0.001,
+    "fSustain": 1,
+    "aAttack": 0.001,
+    "aDecay": 1,
+    "aSustain": 1,
+    "aRelease": 0.1,
+    "velFilter": 0,
+    "velAmp": 0,
+    "vintage": 0,
+    "width": 0,
+    "unison": 0,
+    "voices": 8,
+    "pmEnv": 0,
+    "pmOscB": 0,
+    "pmFreqA": 0,
+    "pmPwA": 0,
+    "pmFilter": 0,
+    "lfoAmount": 0,
+    "wheelMix": 0,
+    "sync": 0,
+    "filterRev": 2
+   },
+   "fit": [
+    "cutoff"
+   ]
+  },
+  {
+   "name": "kf1-note84",
+   "vstParam": "filter_key_follow",
+   "norms": [
+    1
+   ],
+   "note": 84,
+   "hold": 1.5,
+   "tail": 0.3,
+   "window": [
+    0.3,
+    1.4
+   ],
+   "vst": {
+    "params": {
+     "polyphony": {
+      "norm": 0
+     },
+     "master_volume": {
+      "norm": 0.8
+     },
+     "osc_1_volume": 100,
+     "osc_2_volume": 0,
+     "noise_volume": 0,
+     "filter_cutoff_freq": {
+      "norm": 0.6
+     },
+     "filter_resonance": 0,
+     "filter_env_amt": 0,
+     "filter_lfo_amt": 0,
+     "filter_key_follow": 0,
+     "pitch_mod": 0,
+     "osc1_shape_mod": 0,
+     "osc2_shape_mod": 0,
+     "osc1_fm_mod": 0,
+     "osc2_sync_mod": 0,
+     "osc_1_fm_amount": 0,
+     "osc_2_sync": 0,
+     "mod_wheel_amt": 0,
+     "mod_fx_enable": false,
+     "space_fx_amount": 0,
+     "unison": {
+      "norm": 0
+     },
+     "glide_rate": 0,
+     "amp_env_attack": 0.001,
+     "amp_env_decay": 1,
+     "amp_env_sustain": 100,
+     "amp_env_release": 0.1,
+     "amp_env_velocity": 0,
+     "filter_env_velocity": 0,
+     "filter_mode": {
+      "norm": 0
+     },
+     "filter_slope": {
+      "norm": 1
+     },
+     "voice_panning": {
+      "norm": 0
+     },
+     "arp_enable": {
+      "norm": 0
+     },
+     "osc_1_coarse_tune": 0,
+     "osc_1_fine_tune": 0,
+     "osc_1_shape": {
+      "norm": 0.25
+     }
+    }
+   },
+   "ours": {
+    "aSaw": 1,
+    "aPulse": 0,
+    "aPw": 0.5,
+    "aFreq": 0,
+    "mixA": 1,
+    "mixB": 0,
+    "mixNoise": 0,
+    "cutoff": 1235,
+    "res": 0,
+    "fEnv": 0,
+    "track": 0,
+    "fAttack": 0.001,
+    "fSustain": 1,
+    "aAttack": 0.001,
+    "aDecay": 1,
+    "aSustain": 1,
+    "aRelease": 0.1,
+    "velFilter": 0,
+    "velAmp": 0,
+    "vintage": 0,
+    "width": 0,
+    "unison": 0,
+    "voices": 8,
+    "pmEnv": 0,
+    "pmOscB": 0,
+    "pmFreqA": 0,
+    "pmPwA": 0,
+    "pmFilter": 0,
+    "lfoAmount": 0,
+    "wheelMix": 0,
+    "sync": 0,
+    "filterRev": 2
+   },
+   "fit": [
+    "cutoff"
+   ]
+  },
+  {
+   "name": "kf0-note84",
+   "vstParam": "filter_key_follow",
+   "norms": [
+    0
+   ],
+   "note": 84,
+   "hold": 1.5,
+   "tail": 0.3,
+   "window": [
+    0.3,
+    1.4
+   ],
+   "vst": {
+    "params": {
+     "polyphony": {
+      "norm": 0
+     },
+     "master_volume": {
+      "norm": 0.8
+     },
+     "osc_1_volume": 100,
+     "osc_2_volume": 0,
+     "noise_volume": 0,
+     "filter_cutoff_freq": {
+      "norm": 0.6
+     },
+     "filter_resonance": 0,
+     "filter_env_amt": 0,
+     "filter_lfo_amt": 0,
+     "filter_key_follow": 0,
+     "pitch_mod": 0,
+     "osc1_shape_mod": 0,
+     "osc2_shape_mod": 0,
+     "osc1_fm_mod": 0,
+     "osc2_sync_mod": 0,
+     "osc_1_fm_amount": 0,
+     "osc_2_sync": 0,
+     "mod_wheel_amt": 0,
+     "mod_fx_enable": false,
+     "space_fx_amount": 0,
+     "unison": {
+      "norm": 0
+     },
+     "glide_rate": 0,
+     "amp_env_attack": 0.001,
+     "amp_env_decay": 1,
+     "amp_env_sustain": 100,
+     "amp_env_release": 0.1,
+     "amp_env_velocity": 0,
+     "filter_env_velocity": 0,
+     "filter_mode": {
+      "norm": 0
+     },
+     "filter_slope": {
+      "norm": 1
+     },
+     "voice_panning": {
+      "norm": 0
+     },
+     "arp_enable": {
+      "norm": 0
+     },
+     "osc_1_coarse_tune": 0,
+     "osc_1_fine_tune": 0,
+     "osc_1_shape": {
+      "norm": 0.25
+     }
+    }
+   },
+   "ours": {
+    "aSaw": 1,
+    "aPulse": 0,
+    "aPw": 0.5,
+    "aFreq": 0,
+    "mixA": 1,
+    "mixB": 0,
+    "mixNoise": 0,
+    "cutoff": 1235,
+    "res": 0,
+    "fEnv": 0,
+    "track": 0,
+    "fAttack": 0.001,
+    "fSustain": 1,
+    "aAttack": 0.001,
+    "aDecay": 1,
+    "aSustain": 1,
+    "aRelease": 0.1,
+    "velFilter": 0,
+    "velAmp": 0,
+    "vintage": 0,
+    "width": 0,
+    "unison": 0,
+    "voices": 8,
+    "pmEnv": 0,
+    "pmOscB": 0,
+    "pmFreqA": 0,
+    "pmPwA": 0,
+    "pmFilter": 0,
+    "lfoAmount": 0,
+    "wheelMix": 0,
+    "sync": 0,
+    "filterRev": 2
+   },
+   "fit": [
+    "cutoff"
+   ]
+  },
+  {
+   "name": "kf1-note96",
+   "vstParam": "filter_key_follow",
+   "norms": [
+    1
+   ],
+   "note": 96,
+   "hold": 1.5,
+   "tail": 0.3,
+   "window": [
+    0.3,
+    1.4
+   ],
+   "vst": {
+    "params": {
+     "polyphony": {
+      "norm": 0
+     },
+     "master_volume": {
+      "norm": 0.8
+     },
+     "osc_1_volume": 100,
+     "osc_2_volume": 0,
+     "noise_volume": 0,
+     "filter_cutoff_freq": {
+      "norm": 0.6
+     },
+     "filter_resonance": 0,
+     "filter_env_amt": 0,
+     "filter_lfo_amt": 0,
+     "filter_key_follow": 0,
+     "pitch_mod": 0,
+     "osc1_shape_mod": 0,
+     "osc2_shape_mod": 0,
+     "osc1_fm_mod": 0,
+     "osc2_sync_mod": 0,
+     "osc_1_fm_amount": 0,
+     "osc_2_sync": 0,
+     "mod_wheel_amt": 0,
+     "mod_fx_enable": false,
+     "space_fx_amount": 0,
+     "unison": {
+      "norm": 0
+     },
+     "glide_rate": 0,
+     "amp_env_attack": 0.001,
+     "amp_env_decay": 1,
+     "amp_env_sustain": 100,
+     "amp_env_release": 0.1,
+     "amp_env_velocity": 0,
+     "filter_env_velocity": 0,
+     "filter_mode": {
+      "norm": 0
+     },
+     "filter_slope": {
+      "norm": 1
+     },
+     "voice_panning": {
+      "norm": 0
+     },
+     "arp_enable": {
+      "norm": 0
+     },
+     "osc_1_coarse_tune": 0,
+     "osc_1_fine_tune": 0,
+     "osc_1_shape": {
+      "norm": 0.25
+     }
+    }
+   },
+   "ours": {
+    "aSaw": 1,
+    "aPulse": 0,
+    "aPw": 0.5,
+    "aFreq": 0,
+    "mixA": 1,
+    "mixB": 0,
+    "mixNoise": 0,
+    "cutoff": 1235,
+    "res": 0,
+    "fEnv": 0,
+    "track": 0,
+    "fAttack": 0.001,
+    "fSustain": 1,
+    "aAttack": 0.001,
+    "aDecay": 1,
+    "aSustain": 1,
+    "aRelease": 0.1,
+    "velFilter": 0,
+    "velAmp": 0,
+    "vintage": 0,
+    "width": 0,
+    "unison": 0,
+    "voices": 8,
+    "pmEnv": 0,
+    "pmOscB": 0,
+    "pmFreqA": 0,
+    "pmPwA": 0,
+    "pmFilter": 0,
+    "lfoAmount": 0,
+    "wheelMix": 0,
+    "sync": 0,
+    "filterRev": 2
+   },
+   "fit": [
+    "cutoff"
+   ]
+  },
+  {
+   "name": "kf0-note96",
+   "vstParam": "filter_key_follow",
+   "norms": [
+    0
+   ],
+   "note": 96,
+   "hold": 1.5,
+   "tail": 0.3,
+   "window": [
+    0.3,
+    1.4
+   ],
+   "vst": {
+    "params": {
+     "polyphony": {
+      "norm": 0
+     },
+     "master_volume": {
+      "norm": 0.8
+     },
+     "osc_1_volume": 100,
+     "osc_2_volume": 0,
+     "noise_volume": 0,
+     "filter_cutoff_freq": {
+      "norm": 0.6
+     },
+     "filter_resonance": 0,
+     "filter_env_amt": 0,
+     "filter_lfo_amt": 0,
+     "filter_key_follow": 0,
+     "pitch_mod": 0,
+     "osc1_shape_mod": 0,
+     "osc2_shape_mod": 0,
+     "osc1_fm_mod": 0,
+     "osc2_sync_mod": 0,
+     "osc_1_fm_amount": 0,
+     "osc_2_sync": 0,
+     "mod_wheel_amt": 0,
+     "mod_fx_enable": false,
+     "space_fx_amount": 0,
+     "unison": {
+      "norm": 0
+     },
+     "glide_rate": 0,
+     "amp_env_attack": 0.001,
+     "amp_env_decay": 1,
+     "amp_env_sustain": 100,
+     "amp_env_release": 0.1,
+     "amp_env_velocity": 0,
+     "filter_env_velocity": 0,
+     "filter_mode": {
+      "norm": 0
+     },
+     "filter_slope": {
+      "norm": 1
+     },
+     "voice_panning": {
+      "norm": 0
+     },
+     "arp_enable": {
+      "norm": 0
+     },
+     "osc_1_coarse_tune": 0,
+     "osc_1_fine_tune": 0,
+     "osc_1_shape": {
+      "norm": 0.25
+     }
+    }
+   },
+   "ours": {
+    "aSaw": 1,
+    "aPulse": 0,
+    "aPw": 0.5,
+    "aFreq": 0,
+    "mixA": 1,
+    "mixB": 0,
+    "mixNoise": 0,
+    "cutoff": 1235,
+    "res": 0,
+    "fEnv": 0,
+    "track": 0,
+    "fAttack": 0.001,
+    "fSustain": 1,
+    "aAttack": 0.001,
+    "aDecay": 1,
+    "aSustain": 1,
+    "aRelease": 0.1,
+    "velFilter": 0,
+    "velAmp": 0,
+    "vintage": 0,
+    "width": 0,
+    "unison": 0,
+    "voices": 8,
+    "pmEnv": 0,
+    "pmOscB": 0,
+    "pmFreqA": 0,
+    "pmPwA": 0,
+    "pmFilter": 0,
+    "lfoAmount": 0,
+    "wheelMix": 0,
+    "sync": 0,
+    "filterRev": 2
+   },
+   "fit": [
+    "cutoff"
+   ]
+  },
+  {
+   "name": "noise-white",
+   "vstParam": "noise_volume",
+   "norms": [
+    0.25,
+    0.5,
+    0.75,
+    1
+   ],
+   "note": 60,
+   "hold": 1.5,
+   "tail": 0.4,
+   "window": [
+    0.3,
+    1.4
+   ],
+   "vst": {
+    "params": {
+     "polyphony": {
+      "norm": 0
+     },
+     "master_volume": {
+      "norm": 0.8
+     },
+     "osc_1_volume": 0,
+     "osc_2_volume": 0,
+     "noise_volume": 0,
+     "filter_cutoff_freq": {
+      "norm": 1
+     },
+     "filter_resonance": 0,
+     "filter_env_amt": 0,
+     "filter_lfo_amt": 0,
+     "filter_key_follow": 0,
+     "pitch_mod": 0,
+     "osc1_shape_mod": 0,
+     "osc2_shape_mod": 0,
+     "osc1_fm_mod": 0,
+     "osc2_sync_mod": 0,
+     "osc_1_fm_amount": 0,
+     "osc_2_sync": 0,
+     "mod_wheel_amt": 0,
+     "mod_fx_enable": false,
+     "space_fx_amount": 0,
+     "unison": {
+      "norm": 0
+     },
+     "glide_rate": 0,
+     "amp_env_attack": 0.001,
+     "amp_env_decay": 1,
+     "amp_env_sustain": 100,
+     "amp_env_release": 0.1,
+     "amp_env_velocity": 0,
+     "filter_env_velocity": 0,
+     "filter_mode": {
+      "norm": 0
+     },
+     "filter_slope": {
+      "norm": 1
+     },
+     "voice_panning": {
+      "norm": 0
+     },
+     "arp_enable": {
+      "norm": 0
+     },
+     "osc_1_coarse_tune": 0,
+     "osc_1_fine_tune": 0,
+     "osc_1_shape": {
+      "norm": 0.25
+     },
+     "noise_color": {
+      "norm": 1
+     }
+    }
+   },
+   "ours": {
+    "aSaw": 1,
+    "aPulse": 0,
+    "aPw": 0.5,
+    "aFreq": 0,
+    "mixA": 0,
+    "mixB": 0,
+    "mixNoise": 0.5,
+    "cutoff": 20000,
+    "res": 0,
+    "fEnv": 0,
+    "track": 0,
+    "fAttack": 0.001,
+    "fSustain": 1,
+    "aAttack": 0.001,
+    "aDecay": 1,
+    "aSustain": 1,
+    "aRelease": 0.1,
+    "velFilter": 0,
+    "velAmp": 0,
+    "vintage": 0,
+    "width": 0,
+    "unison": 0,
+    "voices": 8,
+    "pmEnv": 0,
+    "pmOscB": 0,
+    "pmFreqA": 0,
+    "pmPwA": 0,
+    "pmFilter": 0,
+    "lfoAmount": 0,
+    "wheelMix": 0,
+    "sync": 0,
+    "filterRev": 2
+   },
+   "fit": []
+  },
+  {
+   "name": "noise-pink",
+   "vstParam": "noise_volume",
+   "norms": [
+    0.25,
+    0.5,
+    0.75,
+    1
+   ],
+   "note": 60,
+   "hold": 1.5,
+   "tail": 0.4,
+   "window": [
+    0.3,
+    1.4
+   ],
+   "vst": {
+    "params": {
+     "polyphony": {
+      "norm": 0
+     },
+     "master_volume": {
+      "norm": 0.8
+     },
+     "osc_1_volume": 0,
+     "osc_2_volume": 0,
+     "noise_volume": 0,
+     "filter_cutoff_freq": {
+      "norm": 1
+     },
+     "filter_resonance": 0,
+     "filter_env_amt": 0,
+     "filter_lfo_amt": 0,
+     "filter_key_follow": 0,
+     "pitch_mod": 0,
+     "osc1_shape_mod": 0,
+     "osc2_shape_mod": 0,
+     "osc1_fm_mod": 0,
+     "osc2_sync_mod": 0,
+     "osc_1_fm_amount": 0,
+     "osc_2_sync": 0,
+     "mod_wheel_amt": 0,
+     "mod_fx_enable": false,
+     "space_fx_amount": 0,
+     "unison": {
+      "norm": 0
+     },
+     "glide_rate": 0,
+     "amp_env_attack": 0.001,
+     "amp_env_decay": 1,
+     "amp_env_sustain": 100,
+     "amp_env_release": 0.1,
+     "amp_env_velocity": 0,
+     "filter_env_velocity": 0,
+     "filter_mode": {
+      "norm": 0
+     },
+     "filter_slope": {
+      "norm": 1
+     },
+     "voice_panning": {
+      "norm": 0
+     },
+     "arp_enable": {
+      "norm": 0
+     },
+     "osc_1_coarse_tune": 0,
+     "osc_1_fine_tune": 0,
+     "osc_1_shape": {
+      "norm": 0.25
+     },
+     "noise_color": {
+      "norm": 0
+     }
+    }
+   },
+   "ours": {
+    "aSaw": 1,
+    "aPulse": 0,
+    "aPw": 0.5,
+    "aFreq": 0,
+    "mixA": 0,
+    "mixB": 0,
+    "mixNoise": 0.5,
+    "cutoff": 20000,
+    "res": 0,
+    "fEnv": 0,
+    "track": 0,
+    "fAttack": 0.001,
+    "fSustain": 1,
+    "aAttack": 0.001,
+    "aDecay": 1,
+    "aSustain": 1,
+    "aRelease": 0.1,
+    "velFilter": 0,
+    "velAmp": 0,
+    "vintage": 0,
+    "width": 0,
+    "unison": 0,
+    "voices": 8,
+    "pmEnv": 0,
+    "pmOscB": 0,
+    "pmFreqA": 0,
+    "pmPwA": 0,
+    "pmFilter": 0,
+    "lfoAmount": 0,
+    "wheelMix": 0,
+    "sync": 0,
+    "filterRev": 2
+   },
+   "fit": []
+  },
+  {
+   "name": "mixB",
+   "vstParam": "osc_2_volume",
+   "norms": [
+    0.25,
+    0.5,
+    0.75,
+    1
+   ],
+   "note": 60,
+   "hold": 1.5,
+   "tail": 0.4,
+   "window": [
+    0.3,
+    1.4
+   ],
+   "vst": {
+    "params": {
+     "polyphony": {
+      "norm": 0
+     },
+     "master_volume": {
+      "norm": 0.8
+     },
+     "osc_1_volume": 0,
+     "osc_2_volume": 0,
+     "noise_volume": 0,
+     "filter_cutoff_freq": {
+      "norm": 1
+     },
+     "filter_resonance": 0,
+     "filter_env_amt": 0,
+     "filter_lfo_amt": 0,
+     "filter_key_follow": 0,
+     "pitch_mod": 0,
+     "osc1_shape_mod": 0,
+     "osc2_shape_mod": 0,
+     "osc1_fm_mod": 0,
+     "osc2_sync_mod": 0,
+     "osc_1_fm_amount": 0,
+     "osc_2_sync": 0,
+     "mod_wheel_amt": 0,
+     "mod_fx_enable": false,
+     "space_fx_amount": 0,
+     "unison": {
+      "norm": 0
+     },
+     "glide_rate": 0,
+     "amp_env_attack": 0.001,
+     "amp_env_decay": 1,
+     "amp_env_sustain": 100,
+     "amp_env_release": 0.1,
+     "amp_env_velocity": 0,
+     "filter_env_velocity": 0,
+     "filter_mode": {
+      "norm": 0
+     },
+     "filter_slope": {
+      "norm": 1
+     },
+     "voice_panning": {
+      "norm": 0
+     },
+     "arp_enable": {
+      "norm": 0
+     },
+     "osc_1_coarse_tune": 0,
+     "osc_1_fine_tune": 0,
+     "osc_1_shape": {
+      "norm": 0.25
+     },
+     "osc_2_shape": {
+      "norm": 0.25
+     },
+     "osc_2_coarse_tune": 0,
+     "osc_2_fine_tune": 0
+    }
+   },
+   "ours": {
+    "aSaw": 1,
+    "aPulse": 0,
+    "aPw": 0.5,
+    "aFreq": 0,
+    "mixA": 0,
+    "mixB": 0.5,
+    "mixNoise": 0,
+    "cutoff": 20000,
+    "res": 0,
+    "fEnv": 0,
+    "track": 0,
+    "fAttack": 0.001,
+    "fSustain": 1,
+    "aAttack": 0.001,
+    "aDecay": 1,
+    "aSustain": 1,
+    "aRelease": 0.1,
+    "velFilter": 0,
+    "velAmp": 0,
+    "vintage": 0,
+    "width": 0,
+    "unison": 0,
+    "voices": 8,
+    "pmEnv": 0,
+    "pmOscB": 0,
+    "pmFreqA": 0,
+    "pmPwA": 0,
+    "pmFilter": 0,
+    "lfoAmount": 0,
+    "wheelMix": 0,
+    "sync": 0,
+    "filterRev": 2,
+    "bFreq": 0,
+    "bFine": 0,
+    "bSaw": 1
+   },
+   "fit": [
+    "mixB"
+   ]
+  },
+  {
+   "name": "detuneB",
+   "vstParam": "osc_2_fine_tune",
+   "norms": [
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7
+   ],
+   "note": 60,
+   "hold": 1.5,
+   "tail": 0.4,
+   "window": [
+    0.3,
+    1.4
+   ],
+   "vst": {
+    "params": {
+     "polyphony": {
+      "norm": 0
+     },
+     "master_volume": {
+      "norm": 0.8
+     },
+     "osc_1_volume": 100,
+     "osc_2_volume": 100,
+     "noise_volume": 0,
+     "filter_cutoff_freq": {
+      "norm": 1
+     },
+     "filter_resonance": 0,
+     "filter_env_amt": 0,
+     "filter_lfo_amt": 0,
+     "filter_key_follow": 0,
+     "pitch_mod": 0,
+     "osc1_shape_mod": 0,
+     "osc2_shape_mod": 0,
+     "osc1_fm_mod": 0,
+     "osc2_sync_mod": 0,
+     "osc_1_fm_amount": 0,
+     "osc_2_sync": 0,
+     "mod_wheel_amt": 0,
+     "mod_fx_enable": false,
+     "space_fx_amount": 0,
+     "unison": {
+      "norm": 0
+     },
+     "glide_rate": 0,
+     "amp_env_attack": 0.001,
+     "amp_env_decay": 1,
+     "amp_env_sustain": 100,
+     "amp_env_release": 0.1,
+     "amp_env_velocity": 0,
+     "filter_env_velocity": 0,
+     "filter_mode": {
+      "norm": 0
+     },
+     "filter_slope": {
+      "norm": 1
+     },
+     "voice_panning": {
+      "norm": 0
+     },
+     "arp_enable": {
+      "norm": 0
+     },
+     "osc_1_coarse_tune": 0,
+     "osc_1_fine_tune": 0,
+     "osc_1_shape": {
+      "norm": 0.25
+     },
+     "osc_2_shape": {
+      "norm": 0.25
+     },
+     "osc_2_coarse_tune": 0
+    }
+   },
+   "ours": {
+    "aSaw": 1,
+    "aPulse": 0,
+    "aPw": 0.5,
+    "aFreq": 0,
+    "mixA": 1,
+    "mixB": 1,
+    "mixNoise": 0,
+    "cutoff": 20000,
+    "res": 0,
+    "fEnv": 0,
+    "track": 0,
+    "fAttack": 0.001,
+    "fSustain": 1,
+    "aAttack": 0.001,
+    "aDecay": 1,
+    "aSustain": 1,
+    "aRelease": 0.1,
+    "velFilter": 0,
+    "velAmp": 0,
+    "vintage": 0,
+    "width": 0,
+    "unison": 0,
+    "voices": 8,
+    "pmEnv": 0,
+    "pmOscB": 0,
+    "pmFreqA": 0,
+    "pmPwA": 0,
+    "pmFilter": 0,
+    "lfoAmount": 0,
+    "wheelMix": 0,
+    "sync": 0,
+    "filterRev": 2,
+    "bFreq": 0,
+    "bFine": 52,
+    "bSaw": 1
+   },
+   "fit": [
+    "bFine"
+   ]
+  },
+  {
+   "name": "bshape-tri",
+   "vstParam": "osc_2_volume",
+   "norms": [
+    1
+   ],
+   "note": 60,
+   "hold": 1.5,
+   "tail": 0.4,
+   "window": [
+    0.3,
+    1.4
+   ],
+   "vst": {
+    "params": {
+     "polyphony": {
+      "norm": 0
+     },
+     "master_volume": {
+      "norm": 0.8
+     },
+     "osc_1_volume": 0,
+     "osc_2_volume": 0,
+     "noise_volume": 0,
+     "filter_cutoff_freq": {
+      "norm": 1
+     },
+     "filter_resonance": 0,
+     "filter_env_amt": 0,
+     "filter_lfo_amt": 0,
+     "filter_key_follow": 0,
+     "pitch_mod": 0,
+     "osc1_shape_mod": 0,
+     "osc2_shape_mod": 0,
+     "osc1_fm_mod": 0,
+     "osc2_sync_mod": 0,
+     "osc_1_fm_amount": 0,
+     "osc_2_sync": 0,
+     "mod_wheel_amt": 0,
+     "mod_fx_enable": false,
+     "space_fx_amount": 0,
+     "unison": {
+      "norm": 0
+     },
+     "glide_rate": 0,
+     "amp_env_attack": 0.001,
+     "amp_env_decay": 1,
+     "amp_env_sustain": 100,
+     "amp_env_release": 0.1,
+     "amp_env_velocity": 0,
+     "filter_env_velocity": 0,
+     "filter_mode": {
+      "norm": 0
+     },
+     "filter_slope": {
+      "norm": 1
+     },
+     "voice_panning": {
+      "norm": 0
+     },
+     "arp_enable": {
+      "norm": 0
+     },
+     "osc_1_coarse_tune": 0,
+     "osc_1_fine_tune": 0,
+     "osc_1_shape": {
+      "norm": 0.25
+     },
+     "osc_2_shape": {
+      "norm": 0
+     },
+     "osc_2_coarse_tune": 0,
+     "osc_2_fine_tune": 0
+    }
+   },
+   "ours": {
+    "aSaw": 1,
+    "aPulse": 0,
+    "aPw": 0.5,
+    "aFreq": 0,
+    "mixA": 0,
+    "mixB": 0.5,
+    "mixNoise": 0,
+    "cutoff": 20000,
+    "res": 0,
+    "fEnv": 0,
+    "track": 0,
+    "fAttack": 0.001,
+    "fSustain": 1,
+    "aAttack": 0.001,
+    "aDecay": 1,
+    "aSustain": 1,
+    "aRelease": 0.1,
+    "velFilter": 0,
+    "velAmp": 0,
+    "vintage": 0,
+    "width": 0,
+    "unison": 0,
+    "voices": 8,
+    "pmEnv": 0,
+    "pmOscB": 0,
+    "pmFreqA": 0,
+    "pmPwA": 0,
+    "pmFilter": 0,
+    "lfoAmount": 0,
+    "wheelMix": 0,
+    "sync": 0,
+    "filterRev": 2,
+    "bFreq": 0,
+    "bFine": 0,
+    "bSaw": 0,
+    "bTri": 1
+   },
+   "fit": [
+    "mixB"
+   ]
+  },
+  {
+   "name": "sync",
+   "vstParam": "osc_2_sync",
+   "norms": [
+    0.1,
+    0.3,
+    0.6,
+    1
+   ],
+   "note": 60,
+   "hold": 1.5,
+   "tail": 0.4,
+   "window": [
+    0.3,
+    1.4
+   ],
+   "vst": {
+    "params": {
+     "polyphony": {
+      "norm": 0
+     },
+     "master_volume": {
+      "norm": 0.8
+     },
+     "osc_1_volume": 100,
+     "osc_2_volume": 0,
+     "noise_volume": 0,
+     "filter_cutoff_freq": {
+      "norm": 1
+     },
+     "filter_resonance": 0,
+     "filter_env_amt": 0,
+     "filter_lfo_amt": 0,
+     "filter_key_follow": 0,
+     "pitch_mod": 0,
+     "osc1_shape_mod": 0,
+     "osc2_shape_mod": 0,
+     "osc1_fm_mod": 0,
+     "osc2_sync_mod": 0,
+     "osc_1_fm_amount": 0,
+     "osc_2_sync": 0,
+     "mod_wheel_amt": 0,
+     "mod_fx_enable": false,
+     "space_fx_amount": 0,
+     "unison": {
+      "norm": 0
+     },
+     "glide_rate": 0,
+     "amp_env_attack": 0.001,
+     "amp_env_decay": 1,
+     "amp_env_sustain": 100,
+     "amp_env_release": 0.1,
+     "amp_env_velocity": 0,
+     "filter_env_velocity": 0,
+     "filter_mode": {
+      "norm": 0
+     },
+     "filter_slope": {
+      "norm": 1
+     },
+     "voice_panning": {
+      "norm": 0
+     },
+     "arp_enable": {
+      "norm": 0
+     },
+     "osc_1_coarse_tune": 0,
+     "osc_1_fine_tune": 0,
+     "osc_1_shape": {
+      "norm": 0.25
+     },
+     "osc_2_coarse_tune": {
+      "norm": 0.6
+     },
+     "osc_2_fine_tune": 0
+    }
+   },
+   "ours": {
+    "aSaw": 1,
+    "aPulse": 0,
+    "aPw": 0.5,
+    "aFreq": 0,
+    "mixA": 1,
+    "mixB": 0,
+    "mixNoise": 0,
+    "cutoff": 20000,
+    "res": 0,
+    "fEnv": 0,
+    "track": 0,
+    "fAttack": 0.001,
+    "fSustain": 1,
+    "aAttack": 0.001,
+    "aDecay": 1,
+    "aSustain": 1,
+    "aRelease": 0.1,
+    "velFilter": 0,
+    "velAmp": 0,
+    "vintage": 0,
+    "width": 0,
+    "unison": 0,
+    "voices": 8,
+    "pmEnv": 0,
+    "pmOscB": 0,
+    "pmFreqA": 0,
+    "pmPwA": 0,
+    "pmFilter": 0,
+    "lfoAmount": 0,
+    "wheelMix": 0,
+    "sync": 1,
+    "filterRev": 2,
+    "bFreq": 7,
+    "bFine": 0
+   },
+   "fit": []
+  }
+ ]
+}

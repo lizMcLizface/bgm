@@ -4,6 +4,7 @@ import {createOfflineSynth,MODELS,rms,peak,brightness,pitchHz} from './offline';
 import {PARAMS,BY_KEY,toPairs,sanitize} from '../prophet/params';
 import {PRESETS} from '../prophet/presets';
 import {parseProphetSysex} from '../prophet/sysex';
+import {spectrumDb,spectralPeak} from '../ui/scopeMath';
 
 const module=new WebAssembly.Module(fs.readFileSync('public/synths/classics.wasm'));
 const synth=(values={},sampleRate=48000)=>createOfflineSynth(module,{sampleRate,model:MODELS.prophet5,params:toPairs(sanitize(values))});
@@ -25,9 +26,9 @@ function aliasDb(x,f){
 const noteOf=hz=>69+12*Math.log2(hz/440);
 
 test('the Prophet table fits the kernel ABI with unique ids and in-range defaults',()=>{
- const k=synth().k;expect(k.syn_param_count()).toBe(72);
+ const k=synth().k;expect(k.syn_param_count()).toBe(76);
  const ids=PARAMS.map(p=>p.id);expect(new Set(ids).size).toBe(ids.length);
- for(const p of PARAMS){expect(p.id<72||(p.id>=180&&p.id<196)||(p.id>=200&&p.id<216)).toBe(true);expect(p.default).toBeGreaterThanOrEqual(p.min);expect(p.default).toBeLessThanOrEqual(p.max);}
+ for(const p of PARAMS){expect(p.id<76||(p.id>=180&&p.id<196)||(p.id>=200&&p.id<216)).toBe(true);expect(p.default).toBeGreaterThanOrEqual(p.min);expect(p.default).toBeLessThanOrEqual(p.max);}
  expect(BY_KEY.track.options).toEqual(['Off','Half','Full']);
 });
 
@@ -145,4 +146,53 @@ test.skipIf(!fs.existsSync(FACTORY))('every program in the local factory file pl
 test('the bend is in semitones as the host sends it (the program bend range does not rescale it)',()=>{
  const v=synth({...SINE,bendRange:12});v.k.syn_note_on(1,69,1);v.seconds(.2);v.k.syn_control(CONTROL.bend,2);v.seconds(.3);
  expect(cents(pitchHz(v.seconds(.3)[0],48000),440*2**(2/12))).toBeLessThan(3);
+});
+
+// Additions fitted to UADx PolyMAX (docs/VST_MATCHING.md).
+const bandPower=(x,lo,hi,size=8192)=>{let p=0,n=0;for(let a=4096;a+size<=x.length;a+=size/2){const db=spectrumDb(x.subarray(a,a+size),size);for(let k=Math.ceil(lo*size/48000);k<hi*size/48000;k++)p+=10**(db[k]/10);n++;}return 10*Math.log10(p/n);};
+const NOISE={aSaw:0,mixA:0,mixB:0,mixNoise:.5,cutoff:20000,res:0,track:0,fEnv:0,aAttack:.001,aSustain:1,vintage:0,velAmp:0,velFilter:0,width:0,reverbMix:0,voices:8};
+
+test('filter modes: the corner of every stage sits at the cutoff, so 2 poles are 6 dB down there and 4 poles 12 dB',()=>{
+ const noise=v=>hold({...NOISE,...v},60,2.5);
+ const open=bandPower(noise({}),1000,1470),at=v=>bandPower(noise({cutoff:1235,...v}),1000,1470)-open;
+ expect(Math.abs(at({filterMode:0,filterPoles:0})+6)).toBeLessThan(2);   // 2-pole low-pass
+ expect(Math.abs(at({filterMode:0,filterPoles:1})+12)).toBeLessThan(2.5); // 4-pole low-pass (the ladder, the default)
+ expect(Math.abs(at({filterMode:2,filterPoles:0})+6)).toBeLessThan(2);   // 2-pole high-pass
+ expect(Math.abs(at({filterMode:2,filterPoles:1})+12)).toBeLessThan(2.5);
+ expect(Math.abs(at({filterMode:1,filterPoles:0}))).toBeLessThan(2);     // band-pass is unity at the centre
+ // and they cut where they should: the low-pass above, the high-pass below, the band-pass both
+ const far=(v,lo,hi)=>bandPower(noise({cutoff:1235,...v}),lo,hi)-bandPower(noise({}),lo,hi);
+ expect(far({filterMode:0,filterPoles:0},6000,8000)).toBeLessThan(-25);
+ expect(far({filterMode:2,filterPoles:0},100,200)).toBeLessThan(-25);
+ expect(far({filterMode:1,filterPoles:0},100,200)).toBeLessThan(-12);expect(far({filterMode:1,filterPoles:0},6000,8000)).toBeLessThan(-8);
+});
+
+test('the two-pole low-pass loses its passband with resonance as the plugin\'s does: 1 / (1 + k), about -10 dB at .4',()=>{
+ const noise=v=>hold({...NOISE,cutoff:1235,...v},60,2.5);
+ const low=v=>bandPower(noise(v),60,130);
+ const drop=low({filterPoles:0,res:.4})-low({filterPoles:0,res:0});
+ expect(Math.abs(drop+9.8)).toBeLessThan(2);
+ expect(Math.abs(low({filterPoles:1,res:.4})-low({filterPoles:1,res:0})+9.8)).toBeLessThan(2); // the ladder agrees
+});
+
+test('noise is white by default and pink on request, with pink a little under white',()=>{
+ // bands 4-8 kHz against 1-2 kHz (the output path rolls off a little below 1 kHz, as the plugin's does)
+ const tilt=v=>{const x=hold({...NOISE,...v},60,2.5);return bandPower(x,4000,8000)-bandPower(x,1000,2000);};
+ expect(tilt({})).toBeGreaterThan(4);expect(tilt({})).toBeLessThan(8);     // white: 4x the bandwidth
+ expect(Math.abs(tilt({noiseColor:1}))).toBeLessThan(3);                    // pink: flat in octave bands
+ expect(rms(hold({...NOISE,noiseColor:1},60,2.5))).toBeLessThan(rms(hold(NOISE,60,2.5)));
+});
+
+test('Osc A can be a triangle: odd harmonics falling as 1/h^2',()=>{
+ const x=hold({...CLEAN,aSaw:0,aTri:1},69,.5);
+ const lv=f=>{let re=0,im=0;for(let n=0;n<x.length;n++){const w=2*Math.PI*f*n/48000;re+=x[n]*Math.cos(w);im-=x[n]*Math.sin(w);}return Math.hypot(re,im);};
+ expect(lv(880)/lv(440)).toBeLessThan(.02);
+ expect(Math.abs(lv(1320)/lv(440)-1/9)).toBeLessThan(.03);
+});
+
+test('key tracking pivots at middle C: the cutoff control is the cutoff at C4, one octave per octave at Full',()=>{
+ const peakAt=note=>{const x=hold({...NOISE,mixNoise:1,cutoff:261.6,res:.7,track:2},note,1.5);return spectralPeak(spectrumDb(x,32768),48000,32768,60,3000).hz;};
+ expect(Math.abs(peakAt(60)/261.6-1)).toBeLessThan(.2);
+ expect(Math.abs(peakAt(72)/peakAt(60)-2)).toBeLessThan(.4);
+ expect(Math.abs(peakAt(48)/peakAt(60)-.5)).toBeLessThan(.1);
 });

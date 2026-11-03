@@ -1,0 +1,73 @@
+{
+ "pair": "wt",
+ "defaults": {
+  "velocity": 100
+ },
+ "sweeps": [
+  {
+   "name": "base",
+   "vstParam": "a_osc_1_octave",
+   "norms": [
+    0.5
+   ],
+   "note": 60,
+   "hold": 2,
+   "tail": 0.5,
+   "window": [
+    0.3,
+    1.8
+   ],
+   "vst": {
+    "params": {
+     "a_osc_2_volume": {
+      "norm": 0
+     },
+     "a_osc_3_volume": {
+      "norm": 0
+     },
+     "a_noise_volume": {
+      "norm": 0
+     },
+     "a_ring_modulation_1x2_volume": {
+      "norm": 0
+     },
+     "a_ring_modulation_2x3_volume": {
+      "norm": 0
+     },
+     "a_osc_1_type": "Modern",
+     "a_filter_1_type": "Off",
+     "a_filter_2_type": "Off",
+     "a_amp_eg_attack": {
+      "norm": 0
+     },
+     "a_amp_eg_decay": {
+      "norm": 0.5
+     },
+     "a_amp_eg_sustain": 100,
+     "a_amp_eg_release": {
+      "norm": 0.3
+     },
+     "a_amp_eg_envelope_mode": "Analog"
+    }
+   },
+   "ours": {
+    "joyX": 1,
+    "joyY": 0,
+    "cutoff": 20000,
+    "res": 0,
+    "keyFollow": 0,
+    "velAmp": 0,
+    "velFilter": 0,
+    "uniVoices": 1,
+    "volume": 0.5,
+    "aAttack": 0.001,
+    "aDecay": 0.5,
+    "aSustain": 1,
+    "aRelease": 0.3,
+    "reverbMix": 0,
+    "chorusMix": 0
+   },
+   "fit": []
+  }
+ ]
+}

@@ -26,14 +26,22 @@ PLUGINS = {
     'unstable': VST3 + 'UNSTABLE.vst3',
     'eightyeight': VST3 + 'EightyEight.vst3',
     'deepjupiter': VST3 + 'Deep Jupiter.vst3',
+    'surge': 'C:/dev/pianote/bgm/.tmp/surge-xt/Surge XT.vst3/Contents/x86_64-win/Surge XT.vst3',
+    'polymax': VST3 + 'uaudio_polymax.vst3/Contents/x86_64-win/uaudio_polymax.vst3',
 }
 
 
-# UNSTABLE and EightyEight start a phantom note 60 on their first block (even with no MIDI at all, -13 dB and -19 dB RMS)
+# UNSTABLE, EightyEight and Surge XT start a phantom note 60 on their first block (even with no MIDI at all, -13 dB and -19 dB RMS)
 # and never release it unless a note-off for 60 arrives. That phantom was the "two voices per note" seen earlier, and it
 # put a stray sustained C4 under every render at any other note. A note-off for 60 at t=0 removes it; a case can keep
 # the phantom with "phantom": true.
-PHANTOM_NOTE_OFF = {'unstable': 60, 'eightyeight': 60}
+PHANTOM_NOTE_OFF = {'unstable': 60, 'eightyeight': 60, 'surge': 60}
+
+
+# Surge XT builds a voice's filter, oscillator type and routing at note-on from the parameters it knows then, and it only
+# picks up parameter changes at the start of the next processed block, so a note in the very first block runs on the old
+# ones. These plugins get a silent settle block before the notes (trimmed from the output); a case can set "settle".
+SETTLE = {'surge': 0.6}
 
 
 class Quiet:
@@ -70,7 +78,7 @@ def set_param(plugin, name, value):
     if isinstance(value, dict):
         p.raw_value = float(value['norm'])
     elif isinstance(value, str):
-        p.string_value = value
+        setattr(plugin, name, value)  # pedalboard maps text onto discrete parameters through the attribute
     elif isinstance(value, bool):
         p.raw_value = 1.0 if value else 0.0
     elif p.min_value is None or isinstance(p.min_value, bool):
@@ -89,7 +97,10 @@ def run_case(plugin, base, case, sr, key=None):
     plugin.reset()
     with Quiet():
         for k, v in base.items():
-            plugin.parameters[k].raw_value = v
+            # Surge renames and hides oscillator parameters when the type changes: skip the ones that are gone
+            # Only the ones that differ: rewriting every parameter makes Surge re-initialise filter and oscillator state.
+            if k in plugin.parameters and abs(plugin.parameters[k].raw_value - v) > 1e-7:
+                plugin.parameters[k].raw_value = v
         if case.get('program') is not None:
             plugin.program = case['program']
         for k, v in (case.get('params') or {}).items():
@@ -102,9 +113,16 @@ def run_case(plugin, base, case, sr, key=None):
         events.append(Message('note_on', note=int(n['note']), velocity=int(n.get('velocity', 100)), time=float(n.get('start', 0)) + 0.001))
         events.append(Message('note_off', note=int(n['note']), velocity=0, time=float(n.get('start', 0)) + float(n['duration']) + 0.001))
     seconds = float(case.get('seconds', 3))
+    settle = float(case.get('settle', SETTLE.get(key, 0.)))
+    if settle:
+        for e in events:
+            e.time += settle
+        seconds += settle
     with Quiet():
         audio = plugin(events, seconds, sr, 2)
         audio = np.asarray(audio, dtype=np.float32)
+    if settle:
+        audio = audio[:, int(round(settle * sr)):]
     out = {'peak': float(np.abs(audio).max()), 'rms': float(np.sqrt((audio.astype(np.float64) ** 2).mean()))}
     if case.get('readback'):
         out['values'] = {k: (native(p) if k != 'program' else None) for k, p in plugin.parameters.items() if k not in ('program', 'bypass')}

@@ -1,0 +1,225 @@
+{
+ "pair": "wt",
+ "defaults": {
+  "note": 60,
+  "velocity": 100
+ },
+ "sweeps": [
+  {
+   "name": "attack",
+   "vstParam": "a_amp_eg_attack",
+   "norms": [
+    0.2,
+    0.35,
+    0.5,
+    0.65,
+    0.8
+   ],
+   "hold": 3,
+   "tail": 0.3,
+   "window": [
+    0,
+    3
+   ],
+   "vst": {
+    "params": {
+     "a_osc_2_volume": {
+      "norm": 0
+     },
+     "a_osc_3_volume": {
+      "norm": 0
+     },
+     "a_noise_volume": {
+      "norm": 0
+     },
+     "a_ring_modulation_1x2_volume": {
+      "norm": 0
+     },
+     "a_ring_modulation_2x3_volume": {
+      "norm": 0
+     },
+     "a_osc_1_type": "Modern",
+     "a_filter_1_type": "Off",
+     "a_filter_2_type": "Off",
+     "a_amp_eg_attack": {
+      "norm": 0
+     },
+     "a_amp_eg_decay": {
+      "norm": 0.3
+     },
+     "a_amp_eg_sustain": {
+      "norm": 1
+     },
+     "a_amp_eg_release": {
+      "norm": 0.3
+     },
+     "a_amp_eg_envelope_mode": "Analog"
+    }
+   },
+   "ours": {
+    "joyX": 1,
+    "joyY": 0,
+    "cutoff": 20000,
+    "res": 0,
+    "keyFollow": 0,
+    "velAmp": 0,
+    "velFilter": 0,
+    "uniVoices": 1,
+    "volume": 0.5,
+    "aAttack": 0.001,
+    "aDecay": 0.5,
+    "aSustain": 1,
+    "aRelease": 0.3,
+    "reverbMix": 0,
+    "chorusMix": 0
+   },
+   "fit": [
+    "aAttack"
+   ]
+  },
+  {
+   "name": "decay",
+   "vstParam": "a_amp_eg_decay",
+   "norms": [
+    0.2,
+    0.35,
+    0.5,
+    0.65,
+    0.8
+   ],
+   "hold": 3,
+   "tail": 0.3,
+   "window": [
+    0,
+    3
+   ],
+   "vst": {
+    "params": {
+     "a_osc_2_volume": {
+      "norm": 0
+     },
+     "a_osc_3_volume": {
+      "norm": 0
+     },
+     "a_noise_volume": {
+      "norm": 0
+     },
+     "a_ring_modulation_1x2_volume": {
+      "norm": 0
+     },
+     "a_ring_modulation_2x3_volume": {
+      "norm": 0
+     },
+     "a_osc_1_type": "Modern",
+     "a_filter_1_type": "Off",
+     "a_filter_2_type": "Off",
+     "a_amp_eg_attack": {
+      "norm": 0
+     },
+     "a_amp_eg_decay": {
+      "norm": 0.5
+     },
+     "a_amp_eg_sustain": {
+      "norm": 0
+     },
+     "a_amp_eg_release": {
+      "norm": 0.3
+     },
+     "a_amp_eg_envelope_mode": "Analog"
+    }
+   },
+   "ours": {
+    "joyX": 1,
+    "joyY": 0,
+    "cutoff": 20000,
+    "res": 0,
+    "keyFollow": 0,
+    "velAmp": 0,
+    "velFilter": 0,
+    "uniVoices": 1,
+    "volume": 0.5,
+    "aAttack": 0.001,
+    "aDecay": 0.5,
+    "aSustain": 0,
+    "aRelease": 0.3,
+    "reverbMix": 0,
+    "chorusMix": 0
+   },
+   "fit": [
+    "aDecay"
+   ]
+  },
+  {
+   "name": "release",
+   "vstParam": "a_amp_eg_release",
+   "norms": [
+    0.2,
+    0.35,
+    0.5,
+    0.65,
+    0.8
+   ],
+   "hold": 0.8,
+   "tail": 3,
+   "window": [
+    0.75,
+    3.8
+   ],
+   "vst": {
+    "params": {
+     "a_osc_2_volume": {
+      "norm": 0
+     },
+     "a_osc_3_volume": {
+      "norm": 0
+     },
+     "a_noise_volume": {
+      "norm": 0
+     },
+     "a_ring_modulation_1x2_volume": {
+      "norm": 0
+     },
+     "a_ring_modulation_2x3_volume": {
+      "norm": 0
+     },
+     "a_osc_1_type": "Modern",
+     "a_filter_1_type": "Off",
+     "a_filter_2_type": "Off",
+     "a_amp_eg_attack": {
+      "norm": 0
+     },
+     "a_amp_eg_decay": {
+      "norm": 0.5
+     },
+     "a_amp_eg_sustain": {
+      "norm": 1
+     },
+     "a_amp_eg_release": {
+      "norm": 0.3
+     },
+     "a_amp_eg_envelope_mode": "Analog"
+    }
+   },
+   "ours": {
+    "joyX": 1,
+    "joyY": 0,
+    "cutoff": 20000,
+    "res": 0,
+    "keyFollow": 0,
+    "velAmp": 0,
+    "velFilter": 0,
+    "uniVoices": 1,
+    "volume": 0.5,
+    "aAttack": 0.001,
+    "aDecay": 0.5,
+    "aSustain": 1,
+    "aRelease": 0.3,
+    "reverbMix": 0,
+    "chorusMix": 0
+   },
+   "fit": [
+    "aRelease"
+   ]
+  }
+ ]
+}

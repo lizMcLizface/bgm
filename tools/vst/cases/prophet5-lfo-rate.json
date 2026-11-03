@@ -1,0 +1,142 @@
+{
+ "pair": "prophet5",
+ "note": 60,
+ "hold": 8,
+ "window": [
+  0.4,
+  7.8
+ ],
+ "frames": {
+  "win": 0.032,
+  "hop": 0.005
+ },
+ "base": {
+  "vst": {
+   "polyphony": {
+    "norm": 0
+   },
+   "master_volume": {
+    "norm": 0.8
+   },
+   "osc_1_volume": 100,
+   "osc_2_volume": 0,
+   "noise_volume": 0,
+   "filter_cutoff_freq": {
+    "norm": 1
+   },
+   "filter_resonance": 0,
+   "filter_env_amt": 0,
+   "filter_lfo_amt": 0,
+   "filter_key_follow": 0,
+   "pitch_mod": 0,
+   "osc1_shape_mod": 0,
+   "osc2_shape_mod": 0,
+   "osc1_fm_mod": 0,
+   "osc2_sync_mod": 0,
+   "osc_1_fm_amount": 0,
+   "osc_2_sync": 0,
+   "mod_wheel_amt": 0,
+   "mod_fx_enable": false,
+   "space_fx_amount": 0,
+   "unison": {
+    "norm": 0
+   },
+   "glide_rate": 0,
+   "amp_env_attack": 0.001,
+   "amp_env_decay": 1,
+   "amp_env_sustain": 100,
+   "amp_env_release": 0.1,
+   "amp_env_velocity": 0,
+   "filter_env_velocity": 0,
+   "filter_mode": {
+    "norm": 0
+   },
+   "filter_slope": {
+    "norm": 1
+   },
+   "voice_panning": {
+    "norm": 0
+   },
+   "arp_enable": {
+    "norm": 0
+   },
+   "osc_1_coarse_tune": 0,
+   "osc_1_fine_tune": 0,
+   "osc_1_shape": {
+    "norm": 0.25
+   },
+   "filter_env_attack": 0.001,
+   "filter_env_sustain": 100,
+   "filter_env_decay": 1,
+   "lfo_shape": {
+    "norm": 0
+   },
+   "lfo_sync": false,
+   "pitch_mod_source": {
+    "norm": 0
+   }
+  },
+  "ours": {
+   "aSaw": 1,
+   "aPulse": 0,
+   "aPw": 0.5,
+   "aFreq": 0,
+   "mixA": 1,
+   "mixB": 0,
+   "mixNoise": 0,
+   "cutoff": 20000,
+   "res": 0,
+   "fEnv": 0.1,
+   "track": 0,
+   "fAttack": 0.001,
+   "fSustain": 1,
+   "aAttack": 0.001,
+   "aDecay": 1,
+   "aSustain": 1,
+   "aRelease": 0.1,
+   "velFilter": 0,
+   "velAmp": 0,
+   "vintage": 0,
+   "width": 0,
+   "unison": 0,
+   "voices": 8,
+   "pmEnv": 0,
+   "pmOscB": 0,
+   "pmFreqA": 0,
+   "pmPwA": 0,
+   "pmFilter": 0,
+   "lfoAmount": 0,
+   "wheelMix": 0,
+   "sync": 0,
+   "filterRev": 2,
+   "fDecay": 1,
+   "lfoTri": 1,
+   "lfoSaw": 0,
+   "lfoSquare": 0,
+   "wmFreqA": 1,
+   "wmFreqB": 1
+  }
+ },
+ "tests": [
+  {
+   "name": "lfo-rate",
+   "series": "pitchCents",
+   "mode": "rate",
+   "vstParam": "lfo_rate",
+   "norms": [
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9
+   ],
+   "vst": {
+    "pitch_mod": {
+     "norm": 0.52
+    }
+   }
+  }
+ ]
+}

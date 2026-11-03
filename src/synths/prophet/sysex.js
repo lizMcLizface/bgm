@@ -1,3 +1,4 @@
+import {fromLowestKeyPivot,ladderMakeupVolume} from '../pivot';
 // Prophet-5 / Prophet-10 (Rev 4, 2020–) program SysEx → named panel values.
 // See docs/P5_SYSEX_FORMAT.md. No Sequential data ships with the site: players
 // import a .syx file (Sequential's free factory download or their own dump).
@@ -119,7 +120,7 @@ const expMap=([lo,hi],x)=>lo*(hi/lo)**x;
 const flag=b=>b?1:0;
 
 /** A decoded program → values for the engine (src/synths/prophet/params.js keys). Plays dry, as the hardware. */
-export function engineValues(v,d){
+function engineValuesLowestKey(v,d){
  const C=CALIBRATION;
  const chord=v.unisonChord?v.chord.slice(0,10):[];
  return {
@@ -144,6 +145,12 @@ export function engineValues(v,d){
   bendRange:v.bendRange,vintage:v.vintage,
   chorusMix:0,reverbMix:0,
  };
+}
+
+/** engineValues with the cutoff shifted for the middle-C key-tracking pivot (src/synths/pivot.js). */
+export function engineValues(v,d){
+ const e=engineValuesLowestKey(v,d);
+ return {...e,cutoff:fromLowestKeyPivot(e.cutoff,[0,.5,1][e.track]??0),volume:Math.min(1,.55*ladderMakeupVolume(e.res))};
 }
 
 export const programName=d=>String.fromCharCode(...d.subarray(NAME_AT,NAME_AT+NAME_LENGTH)).replace(/[^\x20-\x7e]/g,' ').trim();

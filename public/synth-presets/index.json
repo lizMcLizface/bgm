@@ -22,7 +22,7 @@
       "synth": "cs80",
       "name": "bgm sounds",
       "kind": "original",
-      "count": 12,
+      "count": 13,
       "url": "synth-presets/cs80-originals.yaml"
     },
     {
@@ -80,6 +80,14 @@
       "kind": "original",
       "count": 109,
       "url": "synth-presets/vs-originals.yaml"
+    },
+    {
+      "id": "wt-originals",
+      "synth": "wt",
+      "name": "bgm sounds",
+      "kind": "original",
+      "count": 14,
+      "url": "synth-presets/wt-originals.yaml"
     },
     {
       "id": "tr808-originals",

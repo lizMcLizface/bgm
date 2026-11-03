@@ -76,9 +76,10 @@ test('the filter is 24 dB with four poles and 12 dB with two; neither mode self-
 
 test('key tracking moves the cutoff with the keyboard, and the envelope amount sweeps it',()=>{
  // Service manual pp.16-18 tunes the resonance peak using NOISE, not a
- // freely oscillating filter. Its octave names differ from MIDI's.
+ // freely oscillating filter. Its octave names differ from MIDI's. Tracking pivots at middle C, so the cutoff control is
+ // the cutoff at C4 (261.6 Hz).
  const resonantPeak=(note,poles)=>{
-  const x=hold({...CLEAN,osc1On:0,noiseOn:1,cutoff:65.4,res:1,track:1,poles},note,1);
+  const x=hold({...CLEAN,osc1On:0,noiseOn:1,cutoff:261.6,res:1,track:1,poles},note,1);
   return spectralPeak(spectrumDb(x,32768),48000,32768,100,1500).hz;
  };
  for(const poles of [0,1])expect(Math.abs(resonantPeak(60,poles)/resonantPeak(48,poles)-2)).toBeLessThan(.15);

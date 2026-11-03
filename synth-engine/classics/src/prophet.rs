@@ -13,7 +13,7 @@ use crate::alloc::{choose, KeyStack, Slot};
 use crate::dsp::*;
 
 pub const VOICES: usize = 16;
-pub const PARAMS: usize = 72;
+pub const PARAMS: usize = 76;
 const TICK: usize = 16;
 const CHORD_NOTES: usize = 10;
 
@@ -82,11 +82,17 @@ pub mod id {
     pub const CHORD: usize = 61;
     /// Ten chord-memory notes from here: semitones above the key, negative = empty.
     pub const CHORD_NOTE: usize = 62;
+    /// Additions found against UADx PolyMAX (docs/VST_MATCHING.md); the defaults keep the original sound.
+    pub const FILTER_MODE: usize = 72;
+    pub const FILTER_POLES: usize = 73;
+    pub const NOISE_COLOR: usize = 74;
+    pub const A_TRI: usize = 75;
 }
 
-const DEFAULTS: [(usize, f32); 34] = [
+const DEFAULTS: [(usize, f32); 35] = [
+    (id::FILTER_POLES, 1.),
     (id::A_SAW, 1.), (id::A_PW, 0.5), (id::B_FINE, 7.), (id::B_SAW, 1.), (id::B_PW, 0.5), (id::B_KYBD, 1.),
-    (id::MIX_A, 1.), (id::MIX_B, 0.8), (id::CUTOFF, 750.), (id::RES, 0.1), (id::TRACK, 1.), (id::FILTER_REV, 1.),
+    (id::MIX_A, 1.), (id::MIX_B, 0.8), (id::CUTOFF, 1500.), (id::RES, 0.1), (id::TRACK, 1.), (id::FILTER_REV, 1.),
     (id::F_ENV, 0.35), (id::F_ATTACK, 0.005), (id::F_DECAY, 0.6), (id::F_SUSTAIN, 0.4), (id::F_RELEASE, 0.4),
     (id::A_ATTACK, 0.003), (id::A_DECAY, 0.8), (id::A_SUSTAIN, 0.9), (id::A_RELEASE, 0.35), (id::RELEASE, 1.),
     (id::LFO_RATE, 5.), (id::LFO_TRI, 1.), (id::VINTAGE, 0.25), (id::VEL_FILTER, 0.4), (id::VEL_AMP, 0.5),
@@ -126,6 +132,28 @@ fn feedback(resonance: f32) -> f32 {
     4.6 * bound(resonance, 0., 1.)
 }
 
+/// Log-interpolation through measured points (x 0..1 -> positive y).
+fn through(x: f32, t: &[(f32, f32)]) -> f32 {
+    let x = bound(x, 0., 1.);
+    for i in 1..t.len() {
+        if x <= t[i].0 {
+            let (x0, y0) = t[i - 1];
+            let (x1, y1) = t[i];
+            return y0 * exp2((x - x0) / (x1 - x0) * log2(y1 / y0));
+        }
+    }
+    t[t.len() - 1].1
+}
+
+// State-variable damping (1/Q) of the first section per resonance, fitted to UADx PolyMAX's two-pole filters (noise through
+// the filter, docs/VST_MATCHING.md): the low-pass and band-pass peak above their passband by 6 / 12 / 20 / 28 / 29 dB at
+// .2 / .4 / .6 / .8 / .95, the high-pass much less.
+const D_LOW: [(f32, f32); 7] = [(0., 2.), (0.2, 0.5), (0.4, 0.24), (0.6, 0.104), (0.8, 0.04), (0.95, 0.037), (1., 0.03)];
+const D_HIGH: [(f32, f32); 6] = [(0., 2.), (0.4, 2.), (0.6, 0.64), (0.8, 0.23), (0.95, 0.2), (1., 0.19)];
+/// The two-pole low-pass loses its passband with resonance as the ladder does (1 / (1 + k)); the band-pass peak grows.
+const PASSBAND: [(f32, f32); 6] = [(0., 1.), (0.2, 0.507), (0.4, 0.32), (0.6, 0.224), (0.8, 0.195), (1., 0.2)];
+const BAND_GAIN: [(f32, f32); 6] = [(0., 1.), (0.2, 1.33), (0.4, 2.04), (0.6, 3.7), (0.8, 9.2), (1., 10.2)];
+
 /// What the per-sample loop needs, prepared when parameters change.
 #[derive(Clone, Copy)]
 struct Setup {
@@ -137,6 +165,15 @@ struct Setup {
     mix_a: f32,
     mix_b: f32,
     mix_n: f32,
+    /// pink instead of white noise
+    pink: bool,
+    /// 0 low-pass, 1 band-pass, 2 high-pass, 3 notch
+    fmode: u32,
+    /// four poles (the ladder for low-pass) rather than two
+    poles4: bool,
+    /// damping of the first state-variable section and the gain after it
+    kd: f32,
+    mode_gain: f32,
     drive: f32,
     /// audio-rate Poly-Mod from Osc B: octaves of Osc A, pulse width, octaves of cutoff
     pm_freq: f32,
@@ -153,7 +190,7 @@ struct Setup {
 }
 impl Setup {
     const ZERO: Self = Self {
-        os: 1, srv: 48000., wa: Waves::NONE, wb: Waves::NONE, sync: false, mix_a: 0., mix_b: 0., mix_n: 0., drive: 0.5,
+        os: 1, srv: 48000., wa: Waves::NONE, wb: Waves::NONE, sync: false, mix_a: 0., mix_b: 0., mix_n: 0., pink: false, fmode: 0, poles4: true, kd: 2., mode_gain: 1., drive: 0.5,
         pm_freq: 0., pm_pw: 0., pm_cut: 0., f_attack: 1., f_decay: 1., f_sustain: 0., f_release: 1., a_attack: 1.,
         a_decay: 1., a_sustain: 0., a_release: 1.,
     };
@@ -181,6 +218,10 @@ struct Voice {
     fenv: Adsr,
     aenv: Adsr,
     ladder: Ladder,
+    /// state-variable sections for the two-pole low-pass and every band-pass, high-pass and notch mode
+    svf1: Svf,
+    svf2: Svf,
+    pink: [f32; 3],
     dta: f32,
     dta_d: f32,
     dtb: f32,
@@ -211,7 +252,7 @@ impl Voice {
         onset: Onset::DONE,
         key: 0, note: 60., pitch: 60., velocity: 0., poly: 0., pressure: 0., down: false, held: false, active: false,
         fresh: true, stamp: 0, offset: 0., rng: Rng(1), a: VcOsc::ZERO, b: VcOsc::ZERO, fenv: Adsr::ZERO, aenv: Adsr::ZERO,
-        ladder: Ladder::ZERO, dta: 0., dta_d: 0., dtb: 0., dtb_d: 0., pwa: 0.5, pwa_d: 0., pwb: 0.5, pwb_d: 0., cut: 10.,
+        ladder: Ladder::ZERO, svf1: Svf::ZERO, svf2: Svf::ZERO, pink: [0.; 3], dta: 0., dta_d: 0., dtb: 0., dtb_d: 0., pwa: 0.5, pwa_d: 0., pwb: 0.5, pwb_d: 0., cut: 10.,
         cut_d: 0., g: 0., g_d: 0., gain: 0., gain_d: 0., k: 0., pan: (1., 1.), tune_a: 0., tune_b: 0., trim: 0., time: 1.,
         wander_a: Lfo::new(1), wander_b: Lfo::new(2), spread: 0.,
     };
@@ -307,6 +348,8 @@ impl Prophet {
             v.fresh = true;
             v.pressure = 0.;
             v.ladder = Ladder::ZERO;
+            v.svf1 = Svf::ZERO;
+            v.svf2 = Svf::ZERO;
             if ringing {
                 v.ladder.ring();
             }
@@ -478,6 +521,8 @@ impl Prophet {
             v.fenv = Adsr::ZERO;
             v.aenv = Adsr::ZERO;
             v.ladder = Ladder::ZERO;
+            v.svf1 = Svf::ZERO;
+            v.svf2 = Svf::ZERO;
         }
         self.stack = KeyStack::EMPTY;
         self.playing = None;
@@ -507,12 +552,21 @@ impl Prophet {
         self.setup = Setup {
             os,
             srv,
-            wa: Waves { saw: on(id::A_SAW), pulse: on(id::A_PULSE), tri: 0., sine: 0. },
+            wa: Waves { saw: on(id::A_SAW), pulse: on(id::A_PULSE), tri: 0.5 * on(id::A_TRI), sine: 0. },
             wb: Waves { saw: on(id::B_SAW), pulse: on(id::B_PULSE), tri: 0.5 * on(id::B_TRI), sine: 0. },
             sync,
             mix_a: bound(p[id::MIX_A], 0., 1.),
             mix_b: bound(p[id::MIX_B], 0., 1.),
             mix_n: bound(p[id::MIX_NOISE], 0., 1.),
+            pink: p[id::NOISE_COLOR] >= 0.5,
+            fmode: bound(p[id::FILTER_MODE], 0., 3.).round() as u32,
+            poles4: p[id::FILTER_POLES] >= 0.5,
+            kd: through(p[id::RES], if bound(p[id::FILTER_MODE], 0., 3.).round() as u32 == 2 { &D_HIGH } else { &D_LOW }),
+            mode_gain: match bound(p[id::FILTER_MODE], 0., 3.).round() as u32 {
+                0 => if p[id::FILTER_POLES] >= 0.5 { 1. } else { through(p[id::RES], &PASSBAND) },
+                1 => through(p[id::RES], &BAND_GAIN),
+                _ => 1.,
+            },
             // the Rev 1/2 filter is driven a little harder
             drive: if rev3 { 0.5 } else { 0.62 },
             pm_freq: if p[id::PM_FREQ_A] >= 0.5 { 4. * pm_b * pm_b } else { 0. },
@@ -599,14 +653,15 @@ impl Prophet {
         let detune = 0.25 * bound(p[id::UNISON_DETUNE], 0., 1.);
         let vintage = bound(p[id::VINTAGE], 0., 1.);
         let track = [0., 0.5, 1.][bound(p[id::TRACK], 0., 2.).round() as usize];
-        let base = log2(bound(p[id::CUTOFF], 10., 30000.)) + wm_cut + 1.5 * self.brightness - self.soft;
+        let base = log2(bound(p[id::CUTOFF], 10., 60000.)) + wm_cut + 1.5 * self.brightness - self.soft;
         let env_oct = 10. * bound(p[id::F_ENV], 0., 1.);
         let (vel_f, vel_a) = (bound(p[id::VEL_FILTER], 0., 1.), bound(p[id::VEL_AMP], 0., 1.));
         let (after_f, after_a) = (bound(p[id::AFTER_FILTER], 0., 1.), bound(p[id::AFTER_AMP], 0., 1.));
         let k = feedback(p[id::RES]) * if p[id::FILTER_REV] >= 0.5 { 1. } else { 1.03 };
         let stereo = bound(p[id::WIDTH], 0., 1.);
         let volume = bound(p[id::VOLUME], 0., 1.);
-        let master = volume * volume * self.expression_s * (1. - 0.35 * self.soft) * 0.5 * (1. + 0.3 * k);
+        // no make-up gain for the ladder's passband loss: the plugin's low-pass loses 1 / (1 + k) of its passband too
+        let master = volume * volume * self.expression_s * (1. - 0.35 * self.soft) * 0.5;
         let press_k = smoothing(0.025, rate);
         let channel_pressure = self.pressure;
         let inv = 1. / (TICK * s.os) as f32;
@@ -629,8 +684,10 @@ impl Prophet {
             let pa = (pwa + wm_pwa + pm_env_pw * fe).clamp(0.02, 0.98);
             let pb = (pwb + wm_pwb).clamp(0.02, 0.98);
             let velocity_env = 1. - vel_f * (1. - v.velocity);
-            // keyboard tracking counts up from the lowest key (C2 on the 5-octave keyboard), as the CV does
-            let cut = base + track * (v.pitch - 36.) / 12. + (env_oct * velocity_env + pm_env_cut) * fe
+            // keyboard tracking pivots at middle C, as UADx PolyMAX does (it was the lowest key, C2, as the CV counts);
+            // the cutoff control is therefore the cutoff at middle C. Programs decoded from hardware shift by 2 octaves per unit
+            // of tracking to keep their sound (src/synths/pivot.js)
+            let cut = base + track * (v.pitch - 60.) / 12. + (env_oct * velocity_env + pm_env_cut) * fe
                 + after_f * 3. * v.pressure + 0.3 * vintage * v.trim;
             let hz = exp2(cut);
             let g = warp(hz, srv);
@@ -719,11 +776,41 @@ fn render_voice(v: &mut Voice, s: &Setup, shapes: &[EnvShape; 2], vintage: f32, 
         let dta = if s.pm_freq != 0. { (v.dta * exp2(s.pm_freq * b)).min(0.45) } else { v.dta };
         let pwa = (v.pwa + s.pm_pw * b).clamp(0.02, 0.98);
         let (a, _) = v.a.step(dta, pwa, &s.wa, if s.sync { wrap } else { 0. });
-        let noise = v.rng.next();
+        let white = v.rng.next();
+        // pink: Paul Kellet's three-pole filter, trimmed to sit 2.5 dB under white as the plugin's does
+        let noise = if s.pink {
+            v.pink[0] = 0.99765 * v.pink[0] + white * 0.099_046;
+            v.pink[1] = 0.963 * v.pink[1] + white * 0.296_516_4;
+            v.pink[2] = 0.57 * v.pink[2] + white * 1.052_691_3;
+            0.23 * (v.pink[0] + v.pink[1] + v.pink[2] + white * 0.1848)
+        } else {
+            white
+        };
         let x = s.drive * (s.mix_a * a + s.mix_b * b + s.mix_n * noise);
         let g = if audio_cut { warp(exp2(v.cut + s.pm_cut * b), s.srv) } else { v.g };
         // a whisper of noise lets a fully resonant filter start singing on its own
-        let y = v.ladder.tick(x + 1e-5 * noise, g, v.k);
+        let xi = x + 1e-5 * noise;
+        let y = if s.fmode == 0 && s.poles4 {
+            v.ladder.tick(xi, g, v.k)
+        } else {
+            // Two cascaded one-pole stages (-6 dB at the cutoff) are a critically damped state-variable section; four are two of
+            // them, the first carrying the resonance. Band-pass has unity gain at the cutoff, as in the plugin.
+            let section = |f: &mut Svf, x: f32, d: f32| -> f32 {
+                let (lp, hp) = f.tick(x, g, d);
+                match s.fmode {
+                    0 => lp,
+                    1 => x - lp - hp,
+                    2 => hp,
+                    _ => lp + hp,
+                }
+            };
+            let first = section(&mut v.svf1, xi, s.kd) * s.mode_gain;
+            if s.poles4 {
+                section(&mut v.svf2, first, 2.)
+            } else {
+                first
+            }
+        };
         v.fenv.run(&shapes[1], &rf, fa, fd, s.f_sustain, fr, false);
         let e = v.aenv.run(&shapes[0], &ra, aa, ad, s.a_sustain, ar, false);
         let o = y * e * v.gain;

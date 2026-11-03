@@ -1,3 +1,4 @@
+import {fromLowestKeyPivot} from '../pivot';
 // The OB-Xa factory patch book (measured from the scanned drawings by tools/obxa-patch-book, which
 // writes the git-ignored banks/oberheim-ob-xa/patch-book.json) → engine values. Nothing from the
 // book ships with the site: the file is loaded on this machine, or picked by hand. The values are
@@ -25,7 +26,7 @@ export const CALIBRATION={
 
 const flag=b=>b?1:0;
 /** One patch of the book → engine values for one layer (plain keys). */
-export function engineValues(p){
+function engineValuesLowestKey(p){
  const C=CALIBRATION,o=p.oscillators,m=p.mixer,f=p.filter,fe=p.filter_envelope,ae=p.amp_envelope,l=p.lfo,c=p.control,w=p.performance;
  const env=(prefix,e)=>({[prefix+'Attack']:expMap(...C.attackS,e.attack),[prefix+'Decay']:expMap(...C.decayS,e.decay),[prefix+'Sustain']:knob(e.sustain),[prefix+'Release']:expMap(...C.decayS,e.release)});
  const osc1Off=p.pitch.osc1==='Off'||!m.osc1,osc2Mix=p.pitch.osc2==='Off'?0:{off:0,half:1,full:2}[m.osc2];
@@ -43,4 +44,10 @@ export function engineValues(p){
   bendOsc2Only:flag(w.bend.includes('osc2 only')),transpose:w.transpose.includes('up')?12:w.transpose.includes('down')?-12:0,
   chorusMix:0,reverbMix:0,
  };
+}
+
+/** engineValues with the cutoff shifted for the middle-C key-tracking pivot (src/synths/pivot.js). */
+export function engineValues(p){
+ const e=engineValuesLowestKey(p);
+ return {...e,cutoff:fromLowestKeyPivot(e.cutoff,e.track)};
 }

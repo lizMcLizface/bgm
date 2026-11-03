@@ -550,7 +550,7 @@ impl ObXa {
         let detune = 0.25 * bound(p[id::UNISON_DETUNE], 0., 1.);
         let spread = bound(p[id::SPREAD], 0., 1.);
         let track = bound(p[id::TRACK], 0., 1.2);
-        let base = log2(bound(p[id::CUTOFF], 10., 30000.)) + filter_mod;
+        let base = log2(bound(p[id::CUTOFF], 10., 60000.)) + filter_mod;
         let env_oct = 10. * bound(p[id::ENV_AMOUNT], 0., 1.);
         let (vel_f, vel_a) = (bound(p[id::VEL_FILTER], 0., 1.), bound(p[id::VEL_AMP], 0., 1.));
         let after_f = bound(p[id::AFTER_FILTER], 0., 1.);
@@ -573,8 +573,9 @@ impl ObXa {
             let dt2 = (note_hz(pitch + pitch2 + bend2 + lfo2 + wheel2 + fenv_osc2 * (fe - fenv_floor).max(0.)) / srv).min(0.45);
             let pw1 = (width + pw_l1).clamp(0.02, 0.98);
             let pw2 = (width + pw_l2).clamp(0.02, 0.98);
-            // key tracking counts from the lowest key (C2 on the 61-key keyboard)
-            let cut = base + track * (v.pitch - 36.) / 12. + env_oct * (1. - vel_f * (1. - v.velocity)) * fe + 3. * after_f * v.pressure
+            // key tracking pivots at middle C, as OB-Xd does (it was the lowest key, C2 on the 61-key keyboard, as the hardware's
+            // CV counts); the cutoff control is therefore the cutoff at middle C (src/synths/pivot.js)
+            let cut = base + track * (v.pitch - 60.) / 12. + env_oct * (1. - vel_f * (1. - v.velocity)) * fe + 3. * after_f * v.pressure
                 + 0.3 * spread * v.cut;
             let hz = exp2(cut);
             let g = warp(hz, srv);

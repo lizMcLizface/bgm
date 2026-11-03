@@ -11,7 +11,7 @@ const index=JSON.parse(fs.readFileSync('public/synth-presets/index.json','utf8')
 const bank=id=>parse(fs.readFileSync('public/synth-presets/'+id+'.yaml','utf8'));
 
 test('every published YAML bank has valid, complete engine values and stable program IDs',()=>{
- expect(index.banks).toHaveLength(14);
+ expect(index.banks).toHaveLength(15);
  expect(new Set(index.banks.map(b=>b.synth))).toEqual(new Set(Object.keys(SYNTHS)));
  let count=0;
  for(const entry of index.banks){
@@ -20,7 +20,7 @@ test('every published YAML bank has valid, complete engine values and stable pro
   expect(b.programs.length).toBe(entry.count);count+=b.programs.length;
   for(const p of b.programs)expect(p.values).toEqual(synth.params.sanitize(p.values));
  }
- expect(count).toBe(668);
+ expect(count).toBe(683);
 });
 
 test('drum banks keep their six existing program IDs and append the original Deep kick recipe',()=>{

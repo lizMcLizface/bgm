@@ -481,7 +481,7 @@ programs:
       ii.afterBrill: 0.35
       ii.afterLevel: 0.3
       ii.keytrack: 0.6
-      volume: 0.84
+      volume: 0.948
       balance: 0.5
       detune: 7
       brilliance: 0
@@ -585,7 +585,7 @@ programs:
       ii.afterBrill: 0.3
       ii.afterLevel: 0
       ii.keytrack: 0.9
-      volume: 0.76
+      volume: 0.941
       balance: 0.5
       detune: 2
       brilliance: 0
@@ -793,7 +793,7 @@ programs:
       ii.afterBrill: 0.3
       ii.afterLevel: 0
       ii.keytrack: 0.5
-      volume: 0.77
+      volume: 0.897
       balance: 0.5
       detune: 5
       brilliance: 0
@@ -1001,7 +1001,7 @@ programs:
       ii.afterBrill: 0.3
       ii.afterLevel: 0.2
       ii.keytrack: 0.7
-      volume: 0.63
+      volume: 0.779
       balance: 0.5
       detune: 8
       brilliance: 0
@@ -1151,6 +1151,110 @@ programs:
       reverbSize: 0.6
       reverbPredelay: 0.02
   - id: "12"
+    name: Soft Bow
+    values:
+      i.feet: 1
+      i.pw: 0.5
+      i.pwm: 0
+      i.pwmRate: 0.8
+      i.saw: 1
+      i.square: 0
+      i.noise: 0
+      i.sine: 0
+      i.hpf: 120
+      i.hpRes: 0.05
+      i.lpf: 2000
+      i.lpRes: 0.1
+      i.il: 0
+      i.al: 0.2
+      i.fa: 0.7
+      i.fd: 2
+      i.fr: 1.6
+      i.hpEg: 0
+      i.a: 0.45
+      i.d: 2
+      i.s: 0.92
+      i.r: 1.5
+      i.level: 0.75
+      i.initBrill: 0.2
+      i.initLevel: 0.35
+      i.afterBrill: 0.35
+      i.afterLevel: 0.35
+      i.keytrack: 0.8
+      ii.feet: 1
+      ii.pw: 0.5
+      ii.pwm: 0
+      ii.pwmRate: 0.8
+      ii.saw: 1
+      ii.square: 0
+      ii.noise: 0
+      ii.sine: 0
+      ii.hpf: 120
+      ii.hpRes: 0.05
+      ii.lpf: 2000
+      ii.lpRes: 0.1
+      ii.il: 0
+      ii.al: 0.2
+      ii.fa: 0.7
+      ii.fd: 2
+      ii.fr: 1.6
+      ii.hpEg: 0
+      ii.a: 0.45
+      ii.d: 2
+      ii.s: 0.92
+      ii.r: 1.5
+      ii.level: 0.75
+      ii.initBrill: 0.2
+      ii.initLevel: 0.35
+      ii.afterBrill: 0.35
+      ii.afterLevel: 0.35
+      ii.keytrack: 0.8
+      volume: 0.6
+      balance: 0.5
+      detune: 0
+      brilliance: 0
+      resonance: 0
+      subFunction: 0
+      subRate: 5.5
+      subVco: 0
+      subVcf: 0
+      subVca: 0
+      subDelay: 0
+      atPitch: 0
+      atVibrato: 0.15
+      portamento: 0
+      glissando: 0
+      ringSpeed: 30
+      ringDepth: 0
+      ringAttack: 0.01
+      ringDecay: 1
+      ringSweep: 0
+      brillLow: 0
+      brillHigh: 0
+      levelLow: 0
+      levelHigh: 0
+      drift: 0.3
+      width: 0.5
+      autoTouch: 0
+      autoTime: 1.5
+      voices: 8
+      ampShape: 0
+      ampCurveA: 0.1466
+      ampCurveD: 0.5
+      ampCurveR: 0.5
+      ampSmoothA: 0
+      ampSmoothD: 0
+      ampSmoothR: 0
+      ampSteps: 0
+      chorusMix: 0
+      chorusRate: 0.6
+      chorusDepth: 0.5
+      reverbMix: 0.25
+      reverbDecay: 4
+      reverbTone: 6000
+      reverbSize: 0.6
+      reverbPredelay: 0.02
+  - id: "13"
     name: Plain
     values:
       i.feet: 1
