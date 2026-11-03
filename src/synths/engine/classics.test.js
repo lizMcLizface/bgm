@@ -5,6 +5,7 @@ import {sourceHash} from '../../../tools/buildClassics.mjs';
 import {createOfflineSynth,rms,peak,brightness,pitchHz} from './offline';
 import {PARAMS,BY_KEY,defaultValues,toPairs,sanitize} from '../cs80/params';
 import {PRESETS} from '../cs80/presets';
+import {spectrumDb} from '../ui/scopeMath';
 
 const bytes=fs.readFileSync('public/synths/classics.wasm');
 const module=new WebAssembly.Module(bytes);
@@ -98,4 +99,17 @@ test('factory sounds are distinct, use known keys and sit within a few dB of eac
  expect(Math.max(...levels)-Math.min(...levels)).toBeLessThan(8);
  expect(new Set(PRESETS.map(p=>JSON.stringify(p.values))).size).toBe(PRESETS.length);
  for(const p of PRESETS)expect(Object.keys(p.values).sort()).toEqual(Object.keys(defaultValues()).sort());
+});
+
+// UNSTABLE's resonance does nothing until about .5, then climbs to 27 dB at 1 (noise through the filter, docs/VST_MATCHING.md).
+test('low-pass resonance follows the fitted taper: silent below .5, about 20 dB at .9, rising to the top',()=>{
+ const NOISE={...SAW,'i.saw':0,'i.noise':1,'i.lpf':460,'i.fa':.001,'i.fd':.001};
+ const spectrum=r=>{const v=synth({...NOISE,'i.lpRes':r});v.k.syn_note_on(1,60,1);v.seconds(.3);const x=v.seconds(2)[0],size=8192,p=new Float64Array(size/2);let n=0;
+  for(let a=0;a+size<=x.length;a+=size/2){const win=spectrumDb(x.subarray(a,a+size),size);for(let k=0;k<size/2;k++)p[k]+=10**(win[k]/10);n++;}return p.map(v=>v/n);};
+ const base=spectrum(0),peakGain=r=>{const s=spectrum(r);let m=-99;for(let k=8;k<400;k++){let a=0,b=0;for(let j=-6;j<=6;j++){a+=s[k+j];b+=base[k+j];}m=Math.max(m,10*Math.log10(a/b));}return m;};
+ const g=[.4,.6,.8,.9,1].map(peakGain);
+ expect(g[0]).toBeLessThan(1);
+ for(let i=1;i<g.length;i++)expect(g[i]).toBeGreaterThan(g[i-1]);
+ expect(g[3]).toBeGreaterThan(16);expect(g[3]).toBeLessThan(24);
+ expect(BY_KEY['i.pwmRate'].max).toBe(30);
 });

@@ -23,7 +23,7 @@ const LAYER=[
  // VCO-1
  ['crossMod',8,'Cross mod',0,1,0,'%','lin'],
  ['vco1Range',9,'Range',0,3,1,'','step',["16'","8'","4'","2'"]],
- ['vco1Wave',10,'Wave',0,3,1,'','step',['Tri','Saw','Pulse','Square']],
+ ['vco1Wave',10,'Wave',0,5,1,'','step',['Tri','Saw','Pulse','Square','Sine','Noise']],
  // VCO-2
  ['sync',11,'Sync',0,1,0,'','step',ON],
  ['vco2Range',12,'Range',-24,36,0,'st','lin'],

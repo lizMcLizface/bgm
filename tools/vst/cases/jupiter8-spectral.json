@@ -1,0 +1,3945 @@
+{
+ "pair": "jupiter8",
+ "defaults": {
+  "velocity": 100
+ },
+ "sweeps": [
+  {
+   "name": "cutoff",
+   "vstParam": "vcf_cutoff",
+   "norms": [
+    0.3,
+    0.5,
+    0.65,
+    0.8,
+    0.9,
+    1
+   ],
+   "note": 60,
+   "hold": 1.5,
+   "tail": 0.6,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 0.5
+     },
+     "vcf_slope": {
+      "norm": 0
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 1,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 2300,
+    "slope": 1
+   },
+   "fit": [
+    "cutoff"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "res",
+   "vstParam": "vcf_resonance",
+   "norms": [
+    0.2,
+    0.4,
+    0.6,
+    0.8,
+    0.95
+   ],
+   "note": 60,
+   "hold": 1.5,
+   "tail": 0.6,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 0.5
+     },
+     "vcf_slope": {
+      "norm": 0
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 1,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 2300,
+    "slope": 1
+   },
+   "fit": [
+    "res",
+    "cutoff"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "slope12-cutoff",
+   "vstParam": "vcf_cutoff",
+   "norms": [
+    0.4,
+    0.6,
+    0.8
+   ],
+   "note": 60,
+   "hold": 1.5,
+   "tail": 0.6,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 0.5
+     },
+     "vcf_slope": {
+      "norm": 1
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 1,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 2300,
+    "slope": 0
+   },
+   "fit": [
+    "cutoff"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "slope12-res",
+   "vstParam": "vcf_resonance",
+   "norms": [
+    0.3,
+    0.6,
+    0.9
+   ],
+   "note": 60,
+   "hold": 1.5,
+   "tail": 0.6,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 0.5
+     },
+     "vcf_slope": {
+      "norm": 1
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 1,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 2300,
+    "slope": 0
+   },
+   "fit": [
+    "res",
+    "cutoff"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "hpf",
+   "vstParam": "hpf",
+   "norms": [
+    0.3,
+    0.5,
+    0.7,
+    0.9
+   ],
+   "note": 36,
+   "hold": 1.5,
+   "tail": 0.6,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 1
+     },
+     "vcf_slope": {
+      "norm": 0
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 1,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 20000,
+    "slope": 1
+   },
+   "fit": [
+    "hpf"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "envamt",
+   "vstParam": "vcf_env_amount",
+   "norms": [
+    0.2,
+    0.4,
+    0.6,
+    0.8,
+    1
+   ],
+   "note": 60,
+   "hold": 1.5,
+   "tail": 0.6,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": {
+      "norm": 0
+     },
+     "env1_sustain": {
+      "norm": 1
+     },
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 0.3
+     },
+     "vcf_env_select": {
+      "norm": 0
+     },
+     "vcf_slope": {
+      "norm": 0
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 1,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 400,
+    "envSource": 0,
+    "e1Decay": 1,
+    "slope": 1
+   },
+   "fit": [
+    "envMod"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "pulse-pw",
+   "vstParam": "pulse_width",
+   "norms": [
+    0.1,
+    0.3,
+    0.5,
+    0.7,
+    0.9
+   ],
+   "note": 60,
+   "hold": 1.5,
+   "tail": 0.6,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.5
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 1
+     },
+     "vcf_slope": {
+      "norm": 0
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 2,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 20000,
+    "pwSource": 1,
+    "slope": 1
+   },
+   "fit": [
+    "pw"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "mix-vco2",
+   "vstParam": "vco_mix",
+   "norms": [
+    0,
+    0.25,
+    0.5,
+    0.75,
+    1
+   ],
+   "note": 60,
+   "hold": 1.5,
+   "tail": 0.6,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 1
+     },
+     "vco2_waveform": {
+      "norm": 0.25
+     },
+     "vco2_range": {
+      "norm": 0.6667
+     },
+     "vcf_slope": {
+      "norm": 0
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 1,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0.5,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 20000,
+    "vco2Wave": 1,
+    "vco2Range": 12,
+    "vco2Fine": 0,
+    "slope": 1
+   },
+   "fit": [
+    "sourceMix"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "wave-vst0-ours0",
+   "vstParam": "vco1_waveform",
+   "norms": [
+    0
+   ],
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 1
+     },
+     "vcf_slope": {
+      "norm": 0
+     },
+     "pulse_width": {
+      "norm": 0.5
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 0,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 20000,
+    "slope": 1,
+    "pw": 0.5
+   },
+   "fit": [
+    "pw"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "wave-vst0-ours1",
+   "vstParam": "vco1_waveform",
+   "norms": [
+    0
+   ],
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 1
+     },
+     "vcf_slope": {
+      "norm": 0
+     },
+     "pulse_width": {
+      "norm": 0.5
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 1,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 20000,
+    "slope": 1,
+    "pw": 0.5
+   },
+   "fit": [
+    "pw"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "wave-vst0-ours2",
+   "vstParam": "vco1_waveform",
+   "norms": [
+    0
+   ],
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 1
+     },
+     "vcf_slope": {
+      "norm": 0
+     },
+     "pulse_width": {
+      "norm": 0.5
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 2,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 20000,
+    "slope": 1,
+    "pw": 0.5
+   },
+   "fit": [
+    "pw"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "wave-vst0-ours3",
+   "vstParam": "vco1_waveform",
+   "norms": [
+    0
+   ],
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 1
+     },
+     "vcf_slope": {
+      "norm": 0
+     },
+     "pulse_width": {
+      "norm": 0.5
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 3,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 20000,
+    "slope": 1,
+    "pw": 0.5
+   },
+   "fit": [
+    "pw"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "wave-vst0.25-ours0",
+   "vstParam": "vco1_waveform",
+   "norms": [
+    0.25
+   ],
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 1
+     },
+     "vcf_slope": {
+      "norm": 0
+     },
+     "pulse_width": {
+      "norm": 0.5
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 0,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 20000,
+    "slope": 1,
+    "pw": 0.5
+   },
+   "fit": [
+    "pw"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "wave-vst0.25-ours1",
+   "vstParam": "vco1_waveform",
+   "norms": [
+    0.25
+   ],
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 1
+     },
+     "vcf_slope": {
+      "norm": 0
+     },
+     "pulse_width": {
+      "norm": 0.5
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 1,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 20000,
+    "slope": 1,
+    "pw": 0.5
+   },
+   "fit": [
+    "pw"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "wave-vst0.25-ours2",
+   "vstParam": "vco1_waveform",
+   "norms": [
+    0.25
+   ],
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 1
+     },
+     "vcf_slope": {
+      "norm": 0
+     },
+     "pulse_width": {
+      "norm": 0.5
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 2,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 20000,
+    "slope": 1,
+    "pw": 0.5
+   },
+   "fit": [
+    "pw"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "wave-vst0.25-ours3",
+   "vstParam": "vco1_waveform",
+   "norms": [
+    0.25
+   ],
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 1
+     },
+     "vcf_slope": {
+      "norm": 0
+     },
+     "pulse_width": {
+      "norm": 0.5
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 3,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 20000,
+    "slope": 1,
+    "pw": 0.5
+   },
+   "fit": [
+    "pw"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "wave-vst0.5-ours0",
+   "vstParam": "vco1_waveform",
+   "norms": [
+    0.5
+   ],
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 1
+     },
+     "vcf_slope": {
+      "norm": 0
+     },
+     "pulse_width": {
+      "norm": 0.5
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 0,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 20000,
+    "slope": 1,
+    "pw": 0.5
+   },
+   "fit": [
+    "pw"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "wave-vst0.5-ours1",
+   "vstParam": "vco1_waveform",
+   "norms": [
+    0.5
+   ],
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 1
+     },
+     "vcf_slope": {
+      "norm": 0
+     },
+     "pulse_width": {
+      "norm": 0.5
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 1,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 20000,
+    "slope": 1,
+    "pw": 0.5
+   },
+   "fit": [
+    "pw"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "wave-vst0.5-ours2",
+   "vstParam": "vco1_waveform",
+   "norms": [
+    0.5
+   ],
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 1
+     },
+     "vcf_slope": {
+      "norm": 0
+     },
+     "pulse_width": {
+      "norm": 0.5
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 2,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 20000,
+    "slope": 1,
+    "pw": 0.5
+   },
+   "fit": [
+    "pw"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "wave-vst0.5-ours3",
+   "vstParam": "vco1_waveform",
+   "norms": [
+    0.5
+   ],
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 1
+     },
+     "vcf_slope": {
+      "norm": 0
+     },
+     "pulse_width": {
+      "norm": 0.5
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 3,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 20000,
+    "slope": 1,
+    "pw": 0.5
+   },
+   "fit": [
+    "pw"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "wave-vst0.75-ours0",
+   "vstParam": "vco1_waveform",
+   "norms": [
+    0.75
+   ],
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 1
+     },
+     "vcf_slope": {
+      "norm": 0
+     },
+     "pulse_width": {
+      "norm": 0.5
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 0,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 20000,
+    "slope": 1,
+    "pw": 0.5
+   },
+   "fit": [
+    "pw"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "wave-vst0.75-ours1",
+   "vstParam": "vco1_waveform",
+   "norms": [
+    0.75
+   ],
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 1
+     },
+     "vcf_slope": {
+      "norm": 0
+     },
+     "pulse_width": {
+      "norm": 0.5
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 1,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 20000,
+    "slope": 1,
+    "pw": 0.5
+   },
+   "fit": [
+    "pw"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "wave-vst0.75-ours2",
+   "vstParam": "vco1_waveform",
+   "norms": [
+    0.75
+   ],
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 1
+     },
+     "vcf_slope": {
+      "norm": 0
+     },
+     "pulse_width": {
+      "norm": 0.5
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 2,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 20000,
+    "slope": 1,
+    "pw": 0.5
+   },
+   "fit": [
+    "pw"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "wave-vst0.75-ours3",
+   "vstParam": "vco1_waveform",
+   "norms": [
+    0.75
+   ],
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 1
+     },
+     "vcf_slope": {
+      "norm": 0
+     },
+     "pulse_width": {
+      "norm": 0.5
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 3,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 20000,
+    "slope": 1,
+    "pw": 0.5
+   },
+   "fit": [
+    "pw"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "wave-vst1-ours0",
+   "vstParam": "vco1_waveform",
+   "norms": [
+    1
+   ],
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 1
+     },
+     "vcf_slope": {
+      "norm": 0
+     },
+     "pulse_width": {
+      "norm": 0.5
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 0,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 20000,
+    "slope": 1,
+    "pw": 0.5
+   },
+   "fit": [
+    "pw"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "wave-vst1-ours1",
+   "vstParam": "vco1_waveform",
+   "norms": [
+    1
+   ],
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 1
+     },
+     "vcf_slope": {
+      "norm": 0
+     },
+     "pulse_width": {
+      "norm": 0.5
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 1,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 20000,
+    "slope": 1,
+    "pw": 0.5
+   },
+   "fit": [
+    "pw"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "wave-vst1-ours2",
+   "vstParam": "vco1_waveform",
+   "norms": [
+    1
+   ],
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 1
+     },
+     "vcf_slope": {
+      "norm": 0
+     },
+     "pulse_width": {
+      "norm": 0.5
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 2,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 20000,
+    "slope": 1,
+    "pw": 0.5
+   },
+   "fit": [
+    "pw"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "wave-vst1-ours3",
+   "vstParam": "vco1_waveform",
+   "norms": [
+    1
+   ],
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 1
+     },
+     "vcf_slope": {
+      "norm": 0
+     },
+     "pulse_width": {
+      "norm": 0.5
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 3,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 20000,
+    "slope": 1,
+    "pw": 0.5
+   },
+   "fit": [
+    "pw"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "keyfollow1-note36",
+   "vstParam": "vcf_key_follow",
+   "norms": [
+    1
+   ],
+   "note": 36,
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": {
+      "norm": 1
+     },
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 0.5
+     },
+     "vcf_slope": {
+      "norm": 0
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 1,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 2300,
+    "slope": 1
+   },
+   "fit": [
+    "cutoff"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "keyfollow0-note36",
+   "vstParam": "vcf_key_follow",
+   "norms": [
+    0
+   ],
+   "note": 36,
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 0.5
+     },
+     "vcf_slope": {
+      "norm": 0
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 1,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 2300,
+    "slope": 1
+   },
+   "fit": [
+    "cutoff"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "keyfollow1-note48",
+   "vstParam": "vcf_key_follow",
+   "norms": [
+    1
+   ],
+   "note": 48,
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": {
+      "norm": 1
+     },
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 0.5
+     },
+     "vcf_slope": {
+      "norm": 0
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 1,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 2300,
+    "slope": 1
+   },
+   "fit": [
+    "cutoff"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "keyfollow0-note48",
+   "vstParam": "vcf_key_follow",
+   "norms": [
+    0
+   ],
+   "note": 48,
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 0.5
+     },
+     "vcf_slope": {
+      "norm": 0
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 1,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 2300,
+    "slope": 1
+   },
+   "fit": [
+    "cutoff"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "keyfollow1-note72",
+   "vstParam": "vcf_key_follow",
+   "norms": [
+    1
+   ],
+   "note": 72,
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": {
+      "norm": 1
+     },
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 0.5
+     },
+     "vcf_slope": {
+      "norm": 0
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 1,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 2300,
+    "slope": 1
+   },
+   "fit": [
+    "cutoff"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "keyfollow0-note72",
+   "vstParam": "vcf_key_follow",
+   "norms": [
+    0
+   ],
+   "note": 72,
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 0.5
+     },
+     "vcf_slope": {
+      "norm": 0
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 1,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 2300,
+    "slope": 1
+   },
+   "fit": [
+    "cutoff"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "keyfollow1-note84",
+   "vstParam": "vcf_key_follow",
+   "norms": [
+    1
+   ],
+   "note": 84,
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": {
+      "norm": 1
+     },
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 0.5
+     },
+     "vcf_slope": {
+      "norm": 0
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 1,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 2300,
+    "slope": 1
+   },
+   "fit": [
+    "cutoff"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "keyfollow0-note84",
+   "vstParam": "vcf_key_follow",
+   "norms": [
+    0
+   ],
+   "note": 84,
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 0.5
+     },
+     "vcf_slope": {
+      "norm": 0
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 1,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 2300,
+    "slope": 1
+   },
+   "fit": [
+    "cutoff"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "keyfollow1-note96",
+   "vstParam": "vcf_key_follow",
+   "norms": [
+    1
+   ],
+   "note": 96,
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": {
+      "norm": 1
+     },
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 0.5
+     },
+     "vcf_slope": {
+      "norm": 0
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 1,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 2300,
+    "slope": 1
+   },
+   "fit": [
+    "cutoff"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "keyfollow0-note96",
+   "vstParam": "vcf_key_follow",
+   "norms": [
+    0
+   ],
+   "note": 96,
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 0.5
+     },
+     "vcf_slope": {
+      "norm": 0
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 1,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 2300,
+    "slope": 1
+   },
+   "fit": [
+    "cutoff"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "pwm-mode",
+   "vstParam": "pwm_mode",
+   "norms": [
+    0,
+    0.25,
+    0.5,
+    0.75,
+    1
+   ],
+   "note": 60,
+   "hold": 1.5,
+   "tail": 0.6,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.5
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": 0,
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 1
+     },
+     "vcf_slope": {
+      "norm": 0
+     },
+     "pulse_width": {
+      "norm": 0.3
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 2,
+    "sync": 0,
+    "crossMod": 0,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 20000,
+    "pwSource": 1,
+    "slope": 1,
+    "pw": 0.3
+   },
+   "fit": [
+    "pw"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "crossmod",
+   "vstParam": "cross_mod",
+   "norms": [
+    0.1,
+    0.2,
+    0.3,
+    0.5,
+    0.7,
+    1
+   ],
+   "note": 60,
+   "hold": 1.5,
+   "tail": 0.6,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0.25
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": {
+      "norm": 0
+     },
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 1
+     },
+     "vcf_slope": {
+      "norm": 0
+     },
+     "vco2_waveform": {
+      "norm": 0
+     },
+     "vco2_range": {
+      "norm": 0.3333
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 1,
+    "sync": 0,
+    "crossMod": 0.1,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 20000,
+    "slope": 1,
+    "vco2Wave": 0,
+    "vco2Range": 0,
+    "vco2Fine": 0
+   },
+   "fit": [
+    "crossMod"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "crossmod-sine",
+   "vstParam": "cross_mod",
+   "norms": [
+    0.02,
+    0.05,
+    0.08,
+    0.1,
+    0.12,
+    0.15,
+    0.2,
+    0.3,
+    0.5,
+    0.7,
+    1
+   ],
+   "note": 60,
+   "hold": 1.5,
+   "tail": 0.6,
+   "vst": {
+    "params": {
+     "vco1_waveform": {
+      "norm": 0
+     },
+     "vco1_range": {
+      "norm": 0.3333
+     },
+     "vco_mix": {
+      "norm": 0
+     },
+     "vco2_sync": 0,
+     "cross_mod": 0,
+     "vco_lfo_depth": 0,
+     "vco_freq_env": 0,
+     "hpf": 0,
+     "vcf_resonance": 0,
+     "vcf_env_amount": 0,
+     "vcf_key_follow": 0,
+     "vcf_lfo_amount": 0,
+     "env1_attack": 0,
+     "env1_sustain": 1,
+     "env2_attack": 0,
+     "env2_decay": 0,
+     "env2_sustain": 1,
+     "env2_release": {
+      "norm": 0.2
+     },
+     "vca_level": 100,
+     "vca_lfo_mod": 100,
+     "drive": 0,
+     "vintage": 0,
+     "color": 0,
+     "reverb_level": 0,
+     "delay_level": 0,
+     "chorus_wet": 0,
+     "main_volume": 100,
+     "glide": 0,
+     "vcf_cutoff": {
+      "norm": 1
+     },
+     "vcf_slope": {
+      "norm": 0
+     },
+     "vco2_waveform": {
+      "norm": 0
+     },
+     "vco2_range": {
+      "norm": 0.3333
+     }
+    }
+   },
+   "ours": {
+    "lfoRate": 5,
+    "vco1Range": 1,
+    "vco1Wave": 4,
+    "sync": 0,
+    "crossMod": 0.1,
+    "vcoModLfo": 0,
+    "vcoModEnv": 0,
+    "sourceMix": 0,
+    "hpf": 10,
+    "res": 0,
+    "envMod": 0,
+    "keyFollow": 0,
+    "vcfLfo": 0,
+    "e1Attack": 0.001,
+    "e1Sustain": 1,
+    "e2Attack": 0.02,
+    "e2Decay": 0.5,
+    "e2Sustain": 1,
+    "e2Release": 0.28,
+    "level": 1,
+    "unisonDetune": 0,
+    "velVcf": 0,
+    "velVca": 0,
+    "width": 0,
+    "spread": 0,
+    "assign": 2,
+    "voices": 8,
+    "cutoff": 20000,
+    "slope": 1,
+    "vco2Wave": 0,
+    "vco2Range": 0,
+    "vco2Fine": 0
+   },
+   "fit": [
+    "crossMod"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  }
+ ]
+}

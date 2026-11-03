@@ -89,7 +89,18 @@ const DEFAULTS: [(usize, f32); 26] = [
 fn feedback(resonance: f32) -> f32 {
     // Service manual, 3rd ed., p.18: back the resonance trimmer down until
     // oscillation stops. The 3.9 endpoint is an estimate below the k=4 threshold.
-    3.9 * bound(resonance, 0., 1.)
+    // The taper is fitted to OB-Xd's four-pole filter with tools/vstMatch.mjs: the res that matches the plugin's knob
+    // .2 / .4 / .6 / .8 / .95 is .19 / .34 / .38 / .50 / .56, so about 0.55 r^0.7 through the range, plus a steep last
+    // stretch to keep the near-oscillating end of the control.
+    let r = bound(resonance, 0., 1.);
+    if r < 1e-4 {
+        return 0.;
+    }
+    let r2 = r * r;
+    let r4 = r2 * r2;
+    let r8 = r4 * r4;
+    let r40 = r8 * r8 * r8 * r8 * r8;
+    3.9 * (0.55 * exp2(0.7 * log2(r)) + 0.45 * r40)
 }
 
 #[derive(Clone, Copy)]
@@ -129,8 +140,6 @@ struct Voice {
     stamp: u32,
     offset: f32,
     rng: Rng,
-    /// state of the pink-noise filter (the OB-Xa's noise source is pink)
-    pink: [f32; 3],
     o1: VcOsc,
     o2: VcOsc,
     fenv: Adsr,
@@ -162,7 +171,7 @@ impl Voice {
     const ZERO: Self = Self {
         onset: Onset::DONE,
         key: 0, note: 60., pitch: 60., velocity: 0., poly: 0., pressure: 0., down: false, held: false, active: false, fresh: true,
-        stamp: 0, offset: 0., rng: Rng(1), pink: [0.; 3], o1: VcOsc::ZERO, o2: VcOsc::ZERO, fenv: Adsr::ZERO, aenv: Adsr::ZERO, hp: 0.,
+        stamp: 0, offset: 0., rng: Rng(1), o1: VcOsc::ZERO, o2: VcOsc::ZERO, fenv: Adsr::ZERO, aenv: Adsr::ZERO, hp: 0.,
         ladder: Ladder::ZERO, svf: Svf::ZERO, dt1: 0., dt1_d: 0., dt2: 0., dt2_d: 0., pw1: 0.5, pw1_d: 0., pw2: 0.5, pw2_d: 0., g: 0., g_d: 0.,
         gain: 0., gain_d: 0., k: 0., pan: (1., 1.), tune: 0., cut: 0., trim: 0., time: 1., spread: 0.,
     };
@@ -657,11 +666,9 @@ fn render_voice(v: &mut Voice, s: &Setup, shapes: &[EnvShape; 2], vintage: f32, 
         let (o1, wrap) = v.o1.step(v.dt1, v.pw1, &s.w1, 0.);
         let (o2, _) = v.o2.step(v.dt2, v.pw2, &s.w2, if s.sync { wrap } else { 0. });
         let white = v.rng.next();
-        // Paul Kellet's three-pole pink filter, scaled to the white noise's loudness
-        v.pink[0] = 0.99765 * v.pink[0] + white * 0.099_046;
-        v.pink[1] = 0.963 * v.pink[1] + white * 0.296_516_4;
-        v.pink[2] = 0.57 * v.pink[2] + white * 1.052_691_3;
-        let noise = 0.35 * (v.pink[0] + v.pink[1] + v.pink[2] + white * 0.1848);
+        // White: OB-Xd's noise is white (flat in Hz, +3 dB/octave in a log-band plot), measured against the
+        // plugin with tools/vstMatch.mjs; the earlier pink source tilted the wrong way. Level: about the plugin's half-knob level (its maximum is 14 dB hotter), near the old loudness.
+        let noise = 1.16 * white;
         let x = 0.45 * (s.mix1 * o1 + s.mix2 * o2 + s.noise * noise);
         // The two-pole circuit (voice schematic 1520C, U5) is an SVF, not
         // an output tap of the four-pole circuit (U6), unlike the Jupiter-8.

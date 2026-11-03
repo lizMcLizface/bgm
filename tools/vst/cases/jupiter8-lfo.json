@@ -1,0 +1,216 @@
+{
+ "pair": "jupiter8",
+ "note": 60,
+ "hold": 4,
+ "window": [
+  0.4,
+  3.8
+ ],
+ "base": {
+  "vst": {
+   "vco1_waveform": {
+    "norm": 0.25
+   },
+   "vco1_range": {
+    "norm": 0.3333
+   },
+   "vco_mix": 0,
+   "vco2_sync": 0,
+   "cross_mod": 0,
+   "vco_lfo_depth": {
+    "norm": 0
+   },
+   "vco_freq_env": 0,
+   "hpf": 0,
+   "vcf_resonance": 0,
+   "vcf_env_amount": 0,
+   "vcf_key_follow": 0,
+   "vcf_lfo_amount": {
+    "norm": 0
+   },
+   "env1_attack": 0,
+   "env1_sustain": 1,
+   "env2_attack": 0,
+   "env2_decay": 0,
+   "env2_sustain": 1,
+   "env2_release": {
+    "norm": 0.2
+   },
+   "vca_level": 100,
+   "vca_lfo_mod": {
+    "norm": 1
+   },
+   "drive": 0,
+   "vintage": 0,
+   "color": 0,
+   "reverb_level": 0,
+   "delay_level": 0,
+   "chorus_wet": 0,
+   "main_volume": 100,
+   "glide": 0,
+   "vcf_cutoff": {
+    "norm": 1
+   },
+   "vcf_slope": {
+    "norm": 0
+   },
+   "lfo_delay": {
+    "norm": 0
+   },
+   "lfo_waveform": {
+    "norm": 0
+   },
+   "freq_mod_dest": 0
+  },
+  "ours": {
+   "lfoRate": 5,
+   "vco1Range": 1,
+   "vco1Wave": 1,
+   "sync": 0,
+   "crossMod": 0,
+   "vcoModLfo": 0,
+   "vcoModEnv": 0,
+   "sourceMix": 0,
+   "hpf": 10,
+   "res": 0,
+   "envMod": 0,
+   "keyFollow": 0,
+   "vcfLfo": 0,
+   "e1Attack": 0.001,
+   "e1Sustain": 1,
+   "e2Attack": 0.02,
+   "e2Decay": 0.5,
+   "e2Sustain": 1,
+   "e2Release": 0.28,
+   "level": 1,
+   "unisonDetune": 0,
+   "velVcf": 0,
+   "velVca": 0,
+   "width": 0,
+   "spread": 0,
+   "assign": 2,
+   "voices": 8,
+   "cutoff": 20000,
+   "slope": 1,
+   "lfoDelay": 0,
+   "lfoWave": 0,
+   "vcoModDest": 1,
+   "vcaLfo": 0
+  }
+ },
+ "tests": [
+  {
+   "name": "vibrato-depth",
+   "series": "pitchCents",
+   "mode": "depth",
+   "vstParam": "vco_lfo_depth",
+   "norms": [
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.7,
+    1
+   ],
+   "vst": {
+    "lfo_rate": {
+     "norm": 0.75
+    },
+    "vco1_waveform": {
+     "norm": 0
+    }
+   },
+   "ours": {
+    "lfoRate": 2.8,
+    "vco1Wave": 4
+   },
+   "oursKey": "vcoModLfo",
+   "oursValues": [
+    0.01,
+    0.02,
+    0.04,
+    0.07,
+    0.1,
+    0.15,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.7,
+    1
+   ]
+  },
+  {
+   "name": "filter-lfo-depth",
+   "series": "centroidOct",
+   "mode": "depth",
+   "vstParam": "vcf_lfo_amount",
+   "norms": [
+    0.1,
+    0.2,
+    0.4,
+    0.6,
+    0.8,
+    1
+   ],
+   "vst": {
+    "lfo_rate": {
+     "norm": 0.75
+    },
+    "vco1_waveform": {
+     "norm": 1
+    },
+    "vcf_cutoff": {
+     "norm": 0.6
+    }
+   },
+   "ours": {
+    "lfoRate": 2.8,
+    "vco1Wave": 5,
+    "cutoff": 1800
+   },
+   "oursKey": "vcfLfo",
+   "oursValues": [
+    0.02,
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.5,
+    0.7,
+    1
+   ]
+  },
+  {
+   "name": "tremolo-depth",
+   "series": "levelDb",
+   "mode": "depth",
+   "vstParam": "vca_lfo_mod",
+   "norms": [
+    0,
+    0.2,
+    0.4,
+    0.6,
+    0.8,
+    1
+   ],
+   "vst": {
+    "lfo_rate": {
+     "norm": 0.75
+    }
+   },
+   "ours": {
+    "lfoRate": 2.8
+   },
+   "oursKey": "vcaLfo",
+   "oursValues": [
+    0,
+    1,
+    2,
+    3
+   ]
+  }
+ ]
+}

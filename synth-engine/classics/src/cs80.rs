@@ -104,6 +104,22 @@ const DEFAULTS: [(usize, f32); 46] = [
 ];
 
 /// Coefficients that only change when parameters do.
+/// Low-pass resonance control to the value fed to `damping`. UNSTABLE does nothing below about .5, then rises steeply
+/// (peak gain 1.4 / 5 / 12 / 20 / 24 / 27 dB at .6 / .7 / .8 / .9 / .95 / 1); this taper gives our filter the same peaks
+/// (measured with noise through the filter, docs/VST_MATCHING.md).
+fn lp_resonance(r: f32) -> f32 {
+    const T: [(f32, f32); 9] = [(0., 0.), (0.4, 0.), (0.5, 0.02), (0.6, 0.07), (0.7, 0.25), (0.8, 0.51), (0.9, 0.75), (0.95, 0.85), (1., 1.)];
+    let r = bound(r, 0., 1.);
+    for i in 1..T.len() {
+        if r <= T[i].0 {
+            let (x0, y0) = T[i - 1];
+            let (x1, y1) = T[i];
+            return y0 + (y1 - y0) * (r - x0) / (x1 - x0);
+        }
+    }
+    1.
+}
+
 #[derive(Clone, Copy)]
 struct ChanSetup {
     attack: f32,
@@ -476,7 +492,7 @@ impl Cs80 {
         let function = bound(p[id::SUB_FUNCTION], 0., 6.).round() as u32;
         self.lfo = self.sub.step(bound(p[id::SUB_RATE], 0.02, 50.) * ts, function);
         for c in 0..2 {
-            self.pwm_value[c] = self.pwm[c].step(bound(p[c * id::CH2 + id::PWM_RATE], 0.01, 20.) * ts, LFO_TRIANGLE);
+            self.pwm_value[c] = self.pwm[c].step(bound(p[c * id::CH2 + id::PWM_RATE], 0.01, 40.) * ts, LFO_TRIANGLE);
         }
         self.ring_tick(ts);
 
@@ -555,7 +571,7 @@ impl Cs80 {
                 let hp = s.hpf + track + eg * bound(q(id::HP_EG), 0., 1.);
                 let lg = warp(exp2(lp), sr);
                 let hg = warp(exp2(hp), sr);
-                ch.lk = damping(q(id::LP_RES) + global_res);
+                ch.lk = damping(lp_resonance(q(id::LP_RES) + global_res));
                 ch.hk = damping(q(id::HP_RES));
                 // amplitude
                 let vel_gain = 1. - bound(q(id::INIT_LEVEL), 0., 1.) * (1. - v.velocity);

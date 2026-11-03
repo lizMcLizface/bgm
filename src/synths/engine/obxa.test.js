@@ -180,3 +180,23 @@ test('the book\'s typical settings stay in tune: a vibrato knob at 2 is about ±
  const v=synth(held);v.k.syn_note_on(1,57,1);v.seconds(.8);expect(cents(pitchHz(v.seconds(.3)[0]),220)).toBeLessThan(3);
  const blip=synth({...held,fSustain:0,fAttack:.001,fDecay:.2});blip.k.syn_note_on(1,57,1);blip.seconds(.004);expect(pitchHz(blip.seconds(.03)[0])).toBeGreaterThan(220*2**(3/12));
 });
+
+// Measured against OB-Xd (docs/VST_MATCHING.md): its noise is white, +3 dB per octave in log-spaced bands; the pink source
+// that was here before is flat in them. A white source puts more power in 4-8 kHz than in 250-500 Hz (16x the bandwidth).
+test('the noise source is white, not pink',()=>{
+ const x=hold({...CLEAN,osc1On:0,noiseOn:1},69,1);
+ const size=8192,db=spectrumDb(x.subarray(4096,4096+size),size),band=(lo,hi)=>{let p=0;for(let k=Math.ceil(lo*size/48000);k<hi*size/48000;k++)p+=10**(db[k]/10);return p;};
+ const ratioDb=10*Math.log10(band(4000,8000)/band(250,500));
+ expect(ratioDb).toBeGreaterThan(9);expect(ratioDb).toBeLessThan(15);
+});
+
+// Fitted to OB-Xd's four-pole filter: the plugin's resonance knob and our control agree through the middle of the range,
+// and the control keeps its near-oscillating top end.
+test('four-pole resonance follows the fitted taper and stays below self-oscillation',()=>{
+ const peakGain=res=>{const x=hold({...CLEAN,cutoff:1600,res,poles:1},60,.6),open=hold({...CLEAN,cutoff:1600,res:0,poles:1},60,.6);
+  const a=spectrumDb(x.subarray(0,8192),8192),b=spectrumDb(open.subarray(0,8192),8192);let m=-99;for(let k=60;k<400;k++)m=Math.max(m,a[k]-b[k]);return m;};
+ const g=[.2,.4,.6,.8,1].map(peakGain);
+ for(let i=1;i<g.length;i++)expect(g[i]).toBeGreaterThan(g[i-1]);
+ expect(g[0]).toBeGreaterThan(2);expect(g[3]).toBeLessThan(20);
+ const quiet=hold({...CLEAN,osc1On:0,noiseOn:0,cutoff:1000,res:1,poles:1},60,.4);expect(rms(quiet)).toBeLessThan(1e-4);
+});

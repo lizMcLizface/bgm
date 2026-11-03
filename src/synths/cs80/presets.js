@@ -31,18 +31,18 @@ const RAW=[
   ...both({saw:.5,square:.6,pw:.35,pwm:.4,hpf:420,hpRes:.45,lpf:1250,lpRes:.4,il:0,al:.1,fa:.8,fd:2,fr:2,a:.7,d:3,s:.95,r:2.2,initBrill:.15,initLevel:.3,afterBrill:.35,afterLevel:.3,keytrack:.6}),
   'i.pwmRate':.3,'ii.pwmRate':.47,'ii.hpf':650,'ii.lpf':1800,'ii.feet':1,
   detune:7,subRate:5.4,subDelay:1.4,subVco:.12,width:.75,drift:.6,voices:10,
-  chorusMix:.35,reverbMix:.5,reverbDecay:7.5,reverbSize:.9,volume:.84}},
+  chorusMix:.35,reverbMix:.5,reverbDecay:7.5,reverbSize:.9,volume:.948}},
  {name:'Funky Clav',category:'keys',styles:['percussive', 'velocity'],colour:'#e86a92',note:'Snappy resonant pluck; velocity sets the bite.',values:{
   ...both({saw:.3,square:1,pw:.18,hpf:180,hpRes:.2,lpf:500,lpRes:.62,il:0,al:.8,fa:.002,fd:.18,fr:.12,a:.002,d:.55,s:.15,r:.12,initBrill:.7,initLevel:.7,afterBrill:.3,afterLevel:0,keytrack:.9}),
   'ii.level':.35,'ii.feet':2,'ii.pw':.5,
-  detune:2,width:.3,drift:.2,voices:8,reverbMix:.12,reverbDecay:1.2,volume:.76}},
+  detune:2,width:.3,drift:.2,voices:8,reverbMix:.12,reverbDecay:1.2,volume:.941}},
  {name:'Silk Flute',category:'lead',styles:['breathy', 'soft'],colour:'#f3d38a',note:'Breathy sine and filtered noise; the vibrato arrives after a moment.',values:{
   ...both({saw:0,square:.12,pw:.5,noise:.25,sine:1,hpf:300,hpRes:.1,lpf:2400,lpRes:.25,il:-.2,al:.3,fa:.12,fd:1,fr:.4,a:.09,d:1,s:.9,r:.45,initBrill:.4,initLevel:.5,afterBrill:.3,afterLevel:.4,keytrack:1}),
   'ii.level':.25,'ii.feet':2,'ii.noise':.5,'ii.sine':0,'ii.square':0,'ii.hpf':1600,'ii.lpf':5000,
   subRate:5,subDelay:.7,subVco:.15,atVibrato:.3,drift:.3,width:.25,voices:6,reverbMix:.35,reverbDecay:4.5,volume:.59}},
  {name:'Deep Bass',category:'bass',styles:['deep'],colour:'#3f6b4f',note:'16-foot saw and square under a closing filter.',values:{
   ...both({feet:0,saw:1,square:.6,pw:.4,hpf:28,lpf:260,lpRes:.3,il:0,al:.55,fa:.003,fd:.6,fr:.2,a:.003,d:1.2,s:.7,r:.18,initBrill:.5,initLevel:.5,afterBrill:.3,afterLevel:0,keytrack:.5}),
-  'ii.level':.6,'ii.square':0,detune:5,width:.15,drift:.3,voices:4,reverbMix:.05,volume:.77}},
+  'ii.level':.6,'ii.square':0,detune:5,width:.15,drift:.3,voices:4,reverbMix:.05,volume:.897}},
  {name:'Electric Tines',category:'keys',styles:['tine', 'tremolo'],colour:'#d98b4a',note:'Sine bell with a touch of saw, gentle tremolo from the sub oscillator.',values:{
   ...both({saw:.2,square:0,sine:.9,hpf:60,lpf:1300,lpRes:.1,il:0,al:.5,fa:.002,fd:.7,fr:.4,a:.002,d:2.8,s:0,r:.6,initBrill:.6,initLevel:.75,afterBrill:0,afterLevel:0,keytrack:1}),
   'ii.feet':2,'ii.level':.3,'ii.saw':0,'ii.d':.6,
@@ -50,7 +50,7 @@ const RAW=[
  {name:'Sweep Pad',category:'pads',styles:['evolving'],colour:'#4a62b8',note:'A long filter sweep on both channels; hold a chord and let it bloom.',values:{
   ...both({saw:1,square:.4,pw:.3,pwm:.35,hpf:40,lpf:220,lpRes:.45,il:0,al:.85,fa:4,fd:7,fr:4,hpEg:.15,a:1.2,d:6,s:.85,r:3.5,initBrill:.1,initLevel:.25,afterBrill:.3,afterLevel:.2,keytrack:.7}),
   'ii.fa':5.5,'ii.lpf':300,'ii.feet':2,'ii.level':.45,
-  detune:8,width:.9,drift:.6,voices:10,chorusMix:.4,reverbMix:.48,reverbDecay:9,reverbSize:.95,volume:.63}},
+  detune:8,width:.9,drift:.6,voices:10,chorusMix:.4,reverbMix:.48,reverbDecay:9,reverbSize:.95,volume:.779}},
  {name:'Pipe Organ',category:'keys',styles:['organ'],colour:'#8a8f98',note:'Square stops at 8 and 4 feet; no touch response.',values:{
   ...both({saw:0,square:1,pw:.5,hpf:40,lpf:4200,lpRes:0,il:0,al:0,a:.02,d:1,s:1,r:.12,initBrill:0,initLevel:0,afterBrill:0,afterLevel:0,keytrack:1}),
   'ii.feet':2,'ii.level':.6,'ii.sine':.4,detune:1,drift:.15,width:.3,voices:12,reverbMix:.4,reverbDecay:4,volume:.39}},

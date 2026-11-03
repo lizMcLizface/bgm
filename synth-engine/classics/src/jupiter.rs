@@ -102,6 +102,22 @@ fn feedback(resonance: f32) -> f32 {
     4.4 * bound(resonance, 0., 1.)
 }
 
+/// Cross-mod control 0..1 to FM depth in octaves, interpolated through points measured on EightyEight.
+fn cross_mod_octaves(x: f32) -> f32 {
+    const T: [(f32, f32); 10] = [
+        (0., 0.), (0.02, 0.14), (0.05, 0.245), (0.08, 0.39), (0.1, 0.415), (0.15, 0.45), (0.2, 0.5), (0.3, 0.82), (0.5, 2.1), (1., 3.6),
+    ];
+    let x = bound(x, 0., 1.);
+    for i in 1..T.len() {
+        if x <= T[i].0 {
+            let (x0, y0) = T[i - 1];
+            let (x1, y1) = T[i];
+            return y0 + (y1 - y0) * (x - x0) / (x1 - x0);
+        }
+    }
+    T[T.len() - 1].1
+}
+
 #[derive(Clone, Copy)]
 struct Setup {
     os: usize,
@@ -111,6 +127,7 @@ struct Setup {
     pulse1: bool,
     pulse2: bool,
     noise2: bool,
+    noise1: bool,
     sync: bool,
     xmod: f32,
     mix1: f32,
@@ -122,7 +139,7 @@ struct Setup {
 }
 impl Setup {
     const ZERO: Self = Self {
-        os: 1, srv: 48000., w1: Waves::NONE, w2: Waves::NONE, pulse1: false, pulse2: false, noise2: false, sync: false,
+        os: 1, srv: 48000., w1: Waves::NONE, w2: Waves::NONE, pulse1: false, pulse2: false, noise2: false, noise1: false, sync: false,
         xmod: 0., mix1: 0., mix2: 0., hp_a: 0., two_pole: false, e1: [1., 1., 0., 1.], e2: [1., 1., 0., 1.],
     };
 }
@@ -521,7 +538,7 @@ impl Jupiter {
     fn prepare(&mut self) {
         let p = &self.p;
         let pick = |i: usize, n: f32| bound(p[i], 0., n).round() as u32;
-        let w1 = pick(id::VCO1_WAVE, 3.);
+        let w1 = pick(id::VCO1_WAVE, 5.);
         let w2 = pick(id::VCO2_WAVE, 3.);
         let sync = p[id::SYNC] >= 0.5;
         let xmod = bound(p[id::CROSS_MOD], 0., 1.);
@@ -545,16 +562,19 @@ impl Jupiter {
         self.setup = Setup {
             os,
             srv,
-            // VCO-1: triangle, saw, pulse (width from the PW section), square (fixed ½)
-            w1: Waves { tri: one(w1 == 0), saw: one(w1 == 1), pulse: one(w1 >= 2), sine: 0. },
+            // VCO-1: triangle, saw, pulse (width from the PW section), square (fixed ½); sine and noise (4, 5) are
+            // additions found missing against EightyEight (docs/VST_MATCHING.md)
+            w1: Waves { tri: one(w1 == 0), saw: one(w1 == 1), pulse: one(w1 == 2 || w1 == 3), sine: one(w1 == 4) },
             pulse1: w1 == 2,
+            noise1: w1 == 5,
             // VCO-2: sine, saw, pulse, noise
             w2: Waves { sine: one(w2 == 0), saw: one(w2 == 1), pulse: one(w2 == 2), tri: 0. },
             pulse2: w2 == 2,
             noise2: w2 == 3,
             sync,
-            // linear FM index from VCO-2 (an interpretation; the original's depth is not measured)
-            xmod: 4. * xmod * xmod,
+            // exponential (1 V/octave) FM from VCO-2, depth in octaves; fitted to EightyEight, whose fundamental rises with
+            // the depth for the same reason (docs/VST_MATCHING.md)
+            xmod: cross_mod_octaves(xmod),
             // a balance control: both sources full in the centre
             mix1: (2. * (1. - mix)).min(1.),
             mix2: (2. * mix).min(1.),
@@ -655,8 +675,9 @@ impl Jupiter {
             x * x
         };
         let invert = if on(id::E1_INVERT) { -1. } else { 1. };
-        // VCO modulation (depths are estimates; square law for fine control of vibrato)
-        let vm_lfo = 12. * sq(id::VCO_MOD_LFO) * lfo + bound(p[id::MOD_DEPTH], 0., 3.) * self.modulation_s * raw;
+        // VCO modulation (square law for fine control of vibrato). The LFO depth is fitted to EightyEight: 4650 cents
+        // peak-to-peak at full depth, i.e. 23 semitones either way (docs/VST_MATCHING.md)
+        let vm_lfo = 23. * sq(id::VCO_MOD_LFO) * lfo + bound(p[id::MOD_DEPTH], 0., 3.) * self.modulation_s * raw;
         let vm_env = 48. * sq(id::VCO_MOD_ENV) * invert;
         let dest = bound(p[id::VCO_MOD_DEST], 0., 2.).round() as u32;
         let (to1, to2) = (if dest <= 1 { 1. } else { 0. }, if dest >= 1 { 1. } else { 0. });
@@ -679,7 +700,8 @@ impl Jupiter {
         let follow = bound(p[id::KEY_FOLLOW], 0., 1.2);
         let (vel_vcf, vel_vca, after_vcf) = (bound(p[id::VEL_VCF], 0., 1.), bound(p[id::VEL_VCA], 0., 1.), bound(p[id::AFTER_VCF], 0., 1.));
         let k = feedback(p[id::RES]);
-        let tremolo = [0., 0.2, 0.45, 0.8][bound(p[id::VCA_LFO], 0., 3.).round() as usize] * lfo;
+        // steps fitted to EightyEight: its tremolo is 25.8 dB peak to peak when on; the middle steps are 3.3 and about 11 dB
+        let tremolo = [0., 0.2, 0.55, 0.955][bound(p[id::VCA_LFO], 0., 3.).round() as usize] * lfo;
         let level = bound(p[id::LEVEL], 0., 1.);
         let volume = bound(p[id::VOLUME], 0., 1.);
         let master = level * volume * volume * self.expression_s * (1. - 0.35 * self.soft) * 0.6 * (1. + 0.3 * k) * (1. + tremolo);
@@ -921,12 +943,12 @@ fn render_voice(v: &mut Voice, s: &Setup, shapes: &[EnvShape; 2], left: &mut [f3
         let pw1 = if s.pulse1 { v.pw } else { 0.5 };
         let pw2 = if s.pulse2 { v.pw } else { 0.5 };
         // cross-mod: VCO-2 (one sample back) moves VCO-1's frequency linearly; it never runs backwards
-        let dt1 = if s.xmod != 0. { (v.dt1 * (1. + s.xmod * v.out2)).clamp(0., 0.45) } else { v.dt1 };
+        let dt1 = if s.xmod != 0. { (v.dt1 * exp2(s.xmod * v.out2)).clamp(0., 0.45) } else { v.dt1 };
         // sync: VCO-1 restarts where VCO-2 wraps (the JP-8's SYNC slaves VCO-1, which is why the
         // factory sync patches sweep VCO-1 with the VCO modulator)
         let noise = v.rng.next();
         let (o2, wrap) = if s.noise2 { (noise, 0.) } else { v.o2.step(v.dt2, pw2, &s.w2, 0.) };
-        let (o1, _) = v.o1.step(dt1, pw1, &s.w1, if s.sync { wrap } else { 0. });
+        let (o1, _) = if s.noise1 { (0.85 * v.rng.next(), 0.) } else { v.o1.step(dt1, pw1, &s.w1, if s.sync { wrap } else { 0. }) };
         v.out2 = o2;
         let mut x = 0.5 * (s.mix1 * o1 + s.mix2 * o2);
         v.hp += (x - v.hp) * s.hp_a;

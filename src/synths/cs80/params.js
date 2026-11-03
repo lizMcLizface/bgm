@@ -11,7 +11,7 @@ const CHANNEL=[
  ['feet',0,'Feet',0,3,1,'','step',FEET],
  ['pw',1,'Width',.05,.95,.5,'%','lin'],
  ['pwm',2,'PWM',0,1,0,'%','lin'],
- ['pwmRate',3,'PWM speed',.05,12,.8,'Hz','log'],
+ ['pwmRate',3,'PWM speed',.05,30,.8,'Hz','log'],
  ['saw',4,'Saw',0,1,1,'%','lin'],
  ['square',5,'Square',0,1,0,'%','lin'],
  ['noise',6,'Noise',0,1,0,'%','lin'],

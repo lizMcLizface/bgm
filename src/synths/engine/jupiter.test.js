@@ -6,6 +6,7 @@ import {PRESETS} from '../jupiter/presets';
 import {decodeTape} from '../jupiter/tape';
 import {decodePatch,engineValues} from '../jupiter/patch';
 import {factoryName} from '../jupiter/names';
+import {spectrumDb} from '../ui/scopeMath';
 
 const module=new WebAssembly.Module(fs.readFileSync('public/synths/classics.wasm'));
 const synth=(values={},sampleRate=48000)=>createOfflineSynth(module,{sampleRate,model:MODELS.jupiter8,params:toPairs(sanitize(values))});
@@ -169,4 +170,42 @@ test('every layered preset stays finite and below full scale',()=>{
 test('the bend is in semitones as the host sends it',()=>{
  const v=synth(SINE);v.k.syn_note_on(1,69,1);v.seconds(.2);v.k.syn_control(CONTROL.bend,2);v.seconds(.3);
  expect(cents(pitchHz(v.seconds(.3)[0],48000),440*2**(2/12))).toBeLessThan(3);
+});
+
+// Added after comparing with EightyEight (docs/VST_MATCHING.md): the plugin's VCO 1 also has a sine and a noise.
+test('VCO-1 can be a pure sine or noise, at the levels of its saw',()=>{
+ const sine=hold({...CLEAN,vco1Wave:4}),saw=hold(CLEAN),noise=hold({...CLEAN,vco1Wave:5});
+ expect(cents(pitchHz(sine,48000),440)).toBeLessThan(1);
+ // a sine has no harmonics worth speaking of; the saw's third is 9.5 dB under its fundamental
+ expect(level(sine,1320)/level(sine,440)).toBeLessThan(.01);
+ expect(Math.abs(20*Math.log10(rms(sine)/rms(saw)))).toBeLessThan(3);
+ // the plugin's noise is also 3.4 dB under its saw
+ expect(Math.abs(20*Math.log10(rms(noise)/rms(saw))+3.4)).toBeLessThan(1);
+ // noise is broadband: plenty of energy far from any pitch
+ expect(level(noise,5000)).toBeGreaterThan(0);
+ expect(BY_KEY.vco1Wave.options).toEqual(['Tri','Saw','Pulse','Square','Sine','Noise']);
+});
+
+// Fitted to EightyEight (docs/VST_MATCHING.md).
+const frames=(x,sr,win,hop)=>{const out=[];for(let a=0;a+win<=x.length;a+=hop)out.push(x.subarray(a,a+win));return out;};
+test('vibrato depth matches the plugin: quadratic, 45 cents peak to peak at .1',()=>{
+ const x=hold({...CLEAN,vco1Wave:4,lfoRate:2.8,vcoModLfo:.1},69,1.6);
+ const hz=frames(x,48000,2400,480).slice(8).map(f=>pitchHz(f,48000)).filter(v=>v>0);
+ const cents=1200*Math.log2(Math.max(...hz)/Math.min(...hz));
+ expect(cents).toBeGreaterThan(30);expect(cents).toBeLessThan(65);
+});
+
+test('the top tremolo step swings about 26 dB, like the plugin\'s',()=>{
+ const x=hold({...CLEAN,lfoRate:2.8,vcaLfo:3},69,1.6);
+ const db=frames(x,48000,1440,480).slice(4).map(f=>20*Math.log10(rms(f)+1e-9));
+ const swing=Math.max(...db)-Math.min(...db);
+ expect(swing).toBeGreaterThan(22);expect(swing).toBeLessThan(34);
+});
+
+test('cross-mod is exponential FM: a depth that raises the fundamental by about 8 % at .3 and leaves it alone at 0',()=>{
+ const probe=crossMod=>{const x=hold({...CLEAN,vco1Wave:4,sourceMix:0,vco2Wave:0,vco2Fine:0,vco2Range:0,crossMod},60,.6);
+  const size=16384,db=spectrumDb(x.subarray(4000,4000+size),size);let best=2;for(let k=2;k<size/2;k++)if(db[k]>db[best])best=k;return best*48000/size;};
+ const plain=probe(0),fm=probe(.3);
+ expect(Math.abs(plain/261.6-1)).toBeLessThan(.01);
+ expect(fm/plain).toBeGreaterThan(1.05);expect(fm/plain).toBeLessThan(1.12);
 });

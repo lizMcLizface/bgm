@@ -1,0 +1,297 @@
+{
+ "pair": "cs80",
+ "note": 60,
+ "hold": 5,
+ "window": [
+  0.4,
+  4.8
+ ],
+ "frames": {
+  "win": 0.032,
+  "hop": 0.005
+ },
+ "base": {
+  "vst": {
+   "osc1_saw_level": 100,
+   "osc1_square_level": 0,
+   "osc1_noise_level": 0,
+   "osc2_saw_level": 0,
+   "osc2_square_level": 0,
+   "osc2_noise_level": 0,
+   "vcf1_hpf_cutoff": 0,
+   "vcf1_lpf_resonance": 0,
+   "vcf1_initial_level": 1,
+   "vcf1_attack_level": 1,
+   "vcf1_attack_s": 0,
+   "vcf1_decay_s": 0,
+   "vcf1_release_s": 5,
+   "vcf1_output_level": 100,
+   "vcf1_sine_mix": 0,
+   "vca1_attack_s": 0,
+   "vca1_decay_s": 0,
+   "vca1_sustain": 1,
+   "vca1_release_s": {
+    "norm": 0.2
+   },
+   "vca1_level": 100,
+   "vca2_level": 0,
+   "vcf1_velocity_response": 0,
+   "vca1_velocity_response": 0,
+   "vcf1_key_response": 0,
+   "vcf1_aftertouch_response": 0,
+   "reverb_send": 0,
+   "delay_send": 0,
+   "chorus_send": 0,
+   "drive": 0,
+   "voice_drift": 0,
+   "lfo_to_vcf": 0,
+   "lfo_to_vco": 0,
+   "lfo_to_vca": 0,
+   "ring_modulation": 0,
+   "osc1_feet": {
+    "norm": 1
+   },
+   "pitch_coarse": 0,
+   "pitch_fine": 0,
+   "initial_pitch_bend": 0,
+   "vcf1_lpf_cutoff": {
+    "norm": 1
+   },
+   "osc1_pwm_depth": 0,
+   "osc2_pwm_depth": 0,
+   "comp_mix": 0
+  },
+  "ours": {
+   "i.feet": 1,
+   "i.saw": 1,
+   "i.square": 0,
+   "i.sine": 0,
+   "i.noise": 0,
+   "i.hpf": 16,
+   "i.hpRes": 0,
+   "i.lpRes": 0,
+   "i.il": 0,
+   "i.al": 0,
+   "i.fa": 0.001,
+   "i.fd": 0.005,
+   "i.fr": 0.005,
+   "i.a": 0.001,
+   "i.d": 0.005,
+   "i.s": 1,
+   "i.r": 0.064,
+   "i.level": 1,
+   "i.initBrill": 0,
+   "i.afterBrill": 0,
+   "i.afterLevel": 0,
+   "i.initLevel": 0,
+   "i.keytrack": 0,
+   "ii.level": 0,
+   "balance": 0,
+   "detune": 0,
+   "drift": 0,
+   "volume": 0.68,
+   "i.lpf": 7100,
+   "subVco": 0,
+   "subVcf": 0,
+   "subVca": 0,
+   "subFunction": 0,
+   "subDelay": 0,
+   "i.pwm": 0,
+   "ii.pwm": 0
+  }
+ },
+ "tests": [
+  {
+   "name": "vibrato-depth",
+   "series": "pitchCents",
+   "mode": "depth",
+   "vstParam": "lfo_to_vco",
+   "norms": [
+    0.1,
+    0.2,
+    0.3,
+    0.5,
+    0.7,
+    1
+   ],
+   "vst": {
+    "lfo1_shape": {
+     "norm": 0.25
+    },
+    "lfo_speed_hz": {
+     "norm": 0.2
+    }
+   },
+   "ours": {
+    "subRate": 2.44
+   },
+   "oursKey": "subVco",
+   "oursValues": [
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.5,
+    0.7,
+    1,
+    1.5,
+    2,
+    3
+   ]
+  },
+  {
+   "name": "filter-lfo-depth",
+   "series": "centroidOct",
+   "mode": "depth",
+   "vstParam": "lfo_to_vcf",
+   "norms": [
+    0.05,
+    0.1,
+    0.2,
+    0.4,
+    0.7,
+    1
+   ],
+   "vst": {
+    "lfo1_shape": {
+     "norm": 0.25
+    },
+    "lfo_speed_hz": {
+     "norm": 0.2
+    },
+    "osc1_saw_level": 0,
+    "osc1_noise_level": 100,
+    "vcf1_lpf_cutoff": {
+     "norm": 0.9
+    }
+   },
+   "ours": {
+    "subRate": 2.44,
+    "i.saw": 0,
+    "i.noise": 1,
+    "i.lpf": 2068
+   },
+   "oursKey": "subVcf",
+   "oursValues": [
+    0.02,
+    0.05,
+    0.1,
+    0.2,
+    0.4,
+    0.7,
+    1,
+    1.5,
+    2,
+    3
+   ]
+  },
+  {
+   "name": "tremolo-depth",
+   "series": "levelDb",
+   "mode": "depth",
+   "vstParam": "lfo_to_vca",
+   "norms": [
+    0.1,
+    0.2,
+    0.4,
+    0.6,
+    0.8,
+    1
+   ],
+   "vst": {
+    "lfo1_shape": {
+     "norm": 0.25
+    },
+    "lfo_speed_hz": {
+     "norm": 0.2
+    }
+   },
+   "ours": {
+    "subRate": 2.44
+   },
+   "oursKey": "subVca",
+   "oursValues": [
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.8,
+    1
+   ]
+  },
+  {
+   "name": "pwm-depth",
+   "series": "centroidOct",
+   "mode": "depth",
+   "vstParam": "osc1_pwm_depth",
+   "norms": [
+    0.1,
+    0.25,
+    0.5,
+    0.75,
+    1
+   ],
+   "vst": {
+    "osc1_saw_level": 0,
+    "osc1_square_level": 100,
+    "osc1_pulse_width": {
+     "norm": 0.3
+    },
+    "osc1_pwm_speed": {
+     "norm": 0.1
+    },
+    "vcf1_lpf_cutoff": {
+     "norm": 1
+    }
+   },
+   "ours": {
+    "i.saw": 0,
+    "i.square": 1,
+    "i.pw": 0.65,
+    "i.pwmRate": 1,
+    "i.lpf": 7100
+   },
+   "oursKey": "i.pwm",
+   "oursValues": [
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.5,
+    0.7,
+    1
+   ]
+  },
+  {
+   "name": "pwm-speed",
+   "series": "centroidOct",
+   "mode": "rate",
+   "vstParam": "osc1_pwm_speed",
+   "norms": [
+    0.05,
+    0.1,
+    0.2,
+    0.3,
+    0.5,
+    0.7,
+    1
+   ],
+   "vst": {
+    "osc1_saw_level": 0,
+    "osc1_square_level": 100,
+    "osc1_pulse_width": {
+     "norm": 0.3
+    },
+    "osc1_pwm_depth": {
+     "norm": 0.8
+    },
+    "vcf1_lpf_cutoff": {
+     "norm": 1
+    }
+   }
+  }
+ ]
+}

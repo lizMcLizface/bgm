@@ -1,0 +1,15 @@
+{
+ "pair": "jupiter8",
+ "defaults": {"note": 60, "velocity": 100, "hold": 1.5, "tail": 1},
+ "sweeps": [
+  {"name": "cutoff", "vstParam": "vcf_cutoff", "norms": [0.3, 0.5, 0.65, 0.8, 0.9, 1],
+   "vst": {"params": {"vco1_waveform": {"norm": 0.25}, "vco1_range": {"norm": 0.3333}, "vco_mix": 0, "vco2_sync": 0, "cross_mod": 0, "vco_lfo_depth": 0, "vco_freq_env": 0,
+    "hpf": 0, "vcf_resonance": 0, "vcf_env_amount": 0, "vcf_key_follow": 0, "vcf_lfo_amount": 0, "env1_attack": 0, "env1_sustain": 1,
+    "env2_attack": 0, "env2_decay": 0, "env2_sustain": 1, "env2_release": 5, "vca_level": 100, "vca_lfo_mod": 100, "drive": 0, "vintage": 0, "color": 0,
+    "reverb_level": 0, "delay_level": 0, "chorus_wet": 0, "main_volume": 100, "glide": 0}},
+   "ours": {"lfoRate": 5, "vco1Range": 1, "vco1Wave": 1, "sync": 0, "crossMod": 0, "vcoModLfo": 0, "vcoModEnv": 0, "sourceMix": 0, "hpf": 10, "res": 0, "envMod": 0, "keyFollow": 0,
+    "vcfLfo": 0, "e1Attack": 0.001, "e1Sustain": 1, "e2Attack": 0.001, "e2Decay": 0.5, "e2Sustain": 1, "e2Release": 0.1, "level": 1, "unisonDetune": 0, "velVcf": 0, "velVca": 0, "width": 0, "spread": 0,
+    "assign": 2, "voices": 8},
+   "fit": ["cutoff"]}
+ ]
+}

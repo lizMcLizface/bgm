@@ -51,6 +51,8 @@
     "synths:check": "node tools/buildClassics.mjs --check",
     "synths:presets": "vite-node tools/buildSynthPresets.mjs",
     "audit:synths": "vite-node tools/auditClassics.mjs",
+    "vst:match": "vite-node tools/vstMatch.mjs --",
+    "vst:mod": "vite-node tools/vstMod.mjs --",
     "audit:synth-reference": "npm run synths:check && vite-node tools/matchSynthReference.mjs"
   },
   "dependencies": {

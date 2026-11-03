@@ -1,0 +1,1741 @@
+{
+ "pair": "cs80",
+ "defaults": {
+  "velocity": 100
+ },
+ "sweeps": [
+  {
+   "name": "lpf",
+   "vstParam": "vcf1_lpf_cutoff",
+   "norms": [
+    0.4,
+    0.6,
+    0.8,
+    0.9,
+    1
+   ],
+   "note": 60,
+   "hold": 1.5,
+   "tail": 0.6,
+   "vst": {
+    "params": {
+     "osc1_saw_level": 100,
+     "osc1_square_level": 0,
+     "osc1_noise_level": 0,
+     "osc2_saw_level": 0,
+     "osc2_square_level": 0,
+     "osc2_noise_level": 0,
+     "vcf1_hpf_cutoff": 0,
+     "vcf1_lpf_resonance": 0,
+     "vcf1_initial_level": 1,
+     "vcf1_attack_level": 1,
+     "vcf1_attack_s": 0,
+     "vcf1_decay_s": 0,
+     "vcf1_release_s": 5,
+     "vcf1_output_level": 100,
+     "vcf1_sine_mix": 0,
+     "vca1_attack_s": 0,
+     "vca1_decay_s": 0,
+     "vca1_sustain": 1,
+     "vca1_release_s": {
+      "norm": 0.2
+     },
+     "vca1_level": 100,
+     "vca2_level": 0,
+     "vcf1_velocity_response": 0,
+     "vca1_velocity_response": 0,
+     "vcf1_key_response": 0,
+     "vcf1_aftertouch_response": 0,
+     "reverb_send": 0,
+     "delay_send": 0,
+     "chorus_send": 0,
+     "drive": 0,
+     "voice_drift": 0,
+     "lfo_to_vcf": 0,
+     "lfo_to_vco": 0,
+     "lfo_to_vca": 0,
+     "ring_modulation": 0,
+     "osc1_feet": {
+      "norm": 1
+     },
+     "pitch_coarse": 0,
+     "pitch_fine": 0,
+     "initial_pitch_bend": 0,
+     "vcf1_lpf_cutoff": {
+      "norm": 0.8
+     },
+     "osc1_pwm_depth": 0,
+     "osc2_pwm_depth": 0,
+     "comp_mix": 0
+    }
+   },
+   "ours": {
+    "i.feet": 1,
+    "i.saw": 1,
+    "i.square": 0,
+    "i.sine": 0,
+    "i.noise": 0,
+    "i.hpf": 16,
+    "i.hpRes": 0,
+    "i.lpRes": 0,
+    "i.il": 0,
+    "i.al": 0,
+    "i.fa": 0.001,
+    "i.fd": 0.005,
+    "i.fr": 0.005,
+    "i.a": 0.001,
+    "i.d": 0.005,
+    "i.s": 1,
+    "i.r": 0.064,
+    "i.level": 1,
+    "i.initBrill": 0,
+    "i.afterBrill": 0,
+    "i.afterLevel": 0,
+    "i.initLevel": 0,
+    "i.keytrack": 0,
+    "ii.level": 0,
+    "balance": 0,
+    "detune": 0,
+    "drift": 0,
+    "volume": 0.68,
+    "i.lpf": 460
+   },
+   "fit": [
+    "i.lpf"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "lpf-res",
+   "vstParam": "vcf1_lpf_resonance",
+   "norms": [
+    0.2,
+    0.4,
+    0.6,
+    0.8,
+    0.95
+   ],
+   "note": 60,
+   "hold": 1.5,
+   "tail": 0.6,
+   "vst": {
+    "params": {
+     "osc1_saw_level": 100,
+     "osc1_square_level": 0,
+     "osc1_noise_level": 0,
+     "osc2_saw_level": 0,
+     "osc2_square_level": 0,
+     "osc2_noise_level": 0,
+     "vcf1_hpf_cutoff": 0,
+     "vcf1_lpf_resonance": 0,
+     "vcf1_initial_level": 1,
+     "vcf1_attack_level": 1,
+     "vcf1_attack_s": 0,
+     "vcf1_decay_s": 0,
+     "vcf1_release_s": 5,
+     "vcf1_output_level": 100,
+     "vcf1_sine_mix": 0,
+     "vca1_attack_s": 0,
+     "vca1_decay_s": 0,
+     "vca1_sustain": 1,
+     "vca1_release_s": {
+      "norm": 0.2
+     },
+     "vca1_level": 100,
+     "vca2_level": 0,
+     "vcf1_velocity_response": 0,
+     "vca1_velocity_response": 0,
+     "vcf1_key_response": 0,
+     "vcf1_aftertouch_response": 0,
+     "reverb_send": 0,
+     "delay_send": 0,
+     "chorus_send": 0,
+     "drive": 0,
+     "voice_drift": 0,
+     "lfo_to_vcf": 0,
+     "lfo_to_vco": 0,
+     "lfo_to_vca": 0,
+     "ring_modulation": 0,
+     "osc1_feet": {
+      "norm": 1
+     },
+     "pitch_coarse": 0,
+     "pitch_fine": 0,
+     "initial_pitch_bend": 0,
+     "vcf1_lpf_cutoff": {
+      "norm": 0.8
+     },
+     "osc1_pwm_depth": 0,
+     "osc2_pwm_depth": 0,
+     "comp_mix": 0
+    }
+   },
+   "ours": {
+    "i.feet": 1,
+    "i.saw": 1,
+    "i.square": 0,
+    "i.sine": 0,
+    "i.noise": 0,
+    "i.hpf": 16,
+    "i.hpRes": 0,
+    "i.lpRes": 0,
+    "i.il": 0,
+    "i.al": 0,
+    "i.fa": 0.001,
+    "i.fd": 0.005,
+    "i.fr": 0.005,
+    "i.a": 0.001,
+    "i.d": 0.005,
+    "i.s": 1,
+    "i.r": 0.064,
+    "i.level": 1,
+    "i.initBrill": 0,
+    "i.afterBrill": 0,
+    "i.afterLevel": 0,
+    "i.initLevel": 0,
+    "i.keytrack": 0,
+    "ii.level": 0,
+    "balance": 0,
+    "detune": 0,
+    "drift": 0,
+    "volume": 0.68,
+    "i.lpf": 460
+   },
+   "fit": [
+    "i.lpRes",
+    "i.lpf"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "hpf",
+   "vstParam": "vcf1_hpf_cutoff",
+   "norms": [
+    0.3,
+    0.5,
+    0.7,
+    0.9
+   ],
+   "note": 36,
+   "hold": 1.5,
+   "tail": 0.6,
+   "vst": {
+    "params": {
+     "osc1_saw_level": 100,
+     "osc1_square_level": 0,
+     "osc1_noise_level": 0,
+     "osc2_saw_level": 0,
+     "osc2_square_level": 0,
+     "osc2_noise_level": 0,
+     "vcf1_hpf_cutoff": 0,
+     "vcf1_lpf_resonance": 0,
+     "vcf1_initial_level": 1,
+     "vcf1_attack_level": 1,
+     "vcf1_attack_s": 0,
+     "vcf1_decay_s": 0,
+     "vcf1_release_s": 5,
+     "vcf1_output_level": 100,
+     "vcf1_sine_mix": 0,
+     "vca1_attack_s": 0,
+     "vca1_decay_s": 0,
+     "vca1_sustain": 1,
+     "vca1_release_s": {
+      "norm": 0.2
+     },
+     "vca1_level": 100,
+     "vca2_level": 0,
+     "vcf1_velocity_response": 0,
+     "vca1_velocity_response": 0,
+     "vcf1_key_response": 0,
+     "vcf1_aftertouch_response": 0,
+     "reverb_send": 0,
+     "delay_send": 0,
+     "chorus_send": 0,
+     "drive": 0,
+     "voice_drift": 0,
+     "lfo_to_vcf": 0,
+     "lfo_to_vco": 0,
+     "lfo_to_vca": 0,
+     "ring_modulation": 0,
+     "osc1_feet": {
+      "norm": 1
+     },
+     "pitch_coarse": 0,
+     "pitch_fine": 0,
+     "initial_pitch_bend": 0,
+     "vcf1_lpf_cutoff": {
+      "norm": 1
+     },
+     "osc1_pwm_depth": 0,
+     "osc2_pwm_depth": 0,
+     "comp_mix": 0
+    }
+   },
+   "ours": {
+    "i.feet": 1,
+    "i.saw": 1,
+    "i.square": 0,
+    "i.sine": 0,
+    "i.noise": 0,
+    "i.hpf": 16,
+    "i.hpRes": 0,
+    "i.lpRes": 0,
+    "i.il": 0,
+    "i.al": 0,
+    "i.fa": 0.001,
+    "i.fd": 0.005,
+    "i.fr": 0.005,
+    "i.a": 0.001,
+    "i.d": 0.005,
+    "i.s": 1,
+    "i.r": 0.064,
+    "i.level": 1,
+    "i.initBrill": 0,
+    "i.afterBrill": 0,
+    "i.afterLevel": 0,
+    "i.initLevel": 0,
+    "i.keytrack": 0,
+    "ii.level": 0,
+    "balance": 0,
+    "detune": 0,
+    "drift": 0,
+    "volume": 0.68,
+    "i.lpf": 7100
+   },
+   "fit": [
+    "i.hpf"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "hpf-res",
+   "vstParam": "vcf1_hpf_resonance",
+   "norms": [
+    0.3,
+    0.6,
+    0.9
+   ],
+   "note": 36,
+   "hold": 1.5,
+   "tail": 0.6,
+   "vst": {
+    "params": {
+     "osc1_saw_level": 100,
+     "osc1_square_level": 0,
+     "osc1_noise_level": 0,
+     "osc2_saw_level": 0,
+     "osc2_square_level": 0,
+     "osc2_noise_level": 0,
+     "vcf1_hpf_cutoff": {
+      "norm": 0.6
+     },
+     "vcf1_lpf_resonance": 0,
+     "vcf1_initial_level": 1,
+     "vcf1_attack_level": 1,
+     "vcf1_attack_s": 0,
+     "vcf1_decay_s": 0,
+     "vcf1_release_s": 5,
+     "vcf1_output_level": 100,
+     "vcf1_sine_mix": 0,
+     "vca1_attack_s": 0,
+     "vca1_decay_s": 0,
+     "vca1_sustain": 1,
+     "vca1_release_s": {
+      "norm": 0.2
+     },
+     "vca1_level": 100,
+     "vca2_level": 0,
+     "vcf1_velocity_response": 0,
+     "vca1_velocity_response": 0,
+     "vcf1_key_response": 0,
+     "vcf1_aftertouch_response": 0,
+     "reverb_send": 0,
+     "delay_send": 0,
+     "chorus_send": 0,
+     "drive": 0,
+     "voice_drift": 0,
+     "lfo_to_vcf": 0,
+     "lfo_to_vco": 0,
+     "lfo_to_vca": 0,
+     "ring_modulation": 0,
+     "osc1_feet": {
+      "norm": 1
+     },
+     "pitch_coarse": 0,
+     "pitch_fine": 0,
+     "initial_pitch_bend": 0,
+     "vcf1_lpf_cutoff": {
+      "norm": 1
+     },
+     "osc1_pwm_depth": 0,
+     "osc2_pwm_depth": 0,
+     "comp_mix": 0
+    }
+   },
+   "ours": {
+    "i.feet": 1,
+    "i.saw": 1,
+    "i.square": 0,
+    "i.sine": 0,
+    "i.noise": 0,
+    "i.hpf": 1000,
+    "i.hpRes": 0,
+    "i.lpRes": 0,
+    "i.il": 0,
+    "i.al": 0,
+    "i.fa": 0.001,
+    "i.fd": 0.005,
+    "i.fr": 0.005,
+    "i.a": 0.001,
+    "i.d": 0.005,
+    "i.s": 1,
+    "i.r": 0.064,
+    "i.level": 1,
+    "i.initBrill": 0,
+    "i.afterBrill": 0,
+    "i.afterLevel": 0,
+    "i.initLevel": 0,
+    "i.keytrack": 0,
+    "ii.level": 0,
+    "balance": 0,
+    "detune": 0,
+    "drift": 0,
+    "volume": 0.68,
+    "i.lpf": 7100
+   },
+   "fit": [
+    "i.hpRes",
+    "i.hpf"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "square-pw",
+   "vstParam": "osc1_pulse_width",
+   "norms": [
+    0,
+    0.25,
+    0.5,
+    0.75,
+    1
+   ],
+   "note": 60,
+   "hold": 1.5,
+   "tail": 0.6,
+   "vst": {
+    "params": {
+     "osc1_saw_level": 0,
+     "osc1_square_level": 100,
+     "osc1_noise_level": 0,
+     "osc2_saw_level": 0,
+     "osc2_square_level": 0,
+     "osc2_noise_level": 0,
+     "vcf1_hpf_cutoff": 0,
+     "vcf1_lpf_resonance": 0,
+     "vcf1_initial_level": 1,
+     "vcf1_attack_level": 1,
+     "vcf1_attack_s": 0,
+     "vcf1_decay_s": 0,
+     "vcf1_release_s": 5,
+     "vcf1_output_level": 100,
+     "vcf1_sine_mix": 0,
+     "vca1_attack_s": 0,
+     "vca1_decay_s": 0,
+     "vca1_sustain": 1,
+     "vca1_release_s": {
+      "norm": 0.2
+     },
+     "vca1_level": 100,
+     "vca2_level": 0,
+     "vcf1_velocity_response": 0,
+     "vca1_velocity_response": 0,
+     "vcf1_key_response": 0,
+     "vcf1_aftertouch_response": 0,
+     "reverb_send": 0,
+     "delay_send": 0,
+     "chorus_send": 0,
+     "drive": 0,
+     "voice_drift": 0,
+     "lfo_to_vcf": 0,
+     "lfo_to_vco": 0,
+     "lfo_to_vca": 0,
+     "ring_modulation": 0,
+     "osc1_feet": {
+      "norm": 1
+     },
+     "pitch_coarse": 0,
+     "pitch_fine": 0,
+     "initial_pitch_bend": 0,
+     "vcf1_lpf_cutoff": {
+      "norm": 1
+     },
+     "osc1_pwm_depth": 0,
+     "osc2_pwm_depth": 0,
+     "comp_mix": 0
+    }
+   },
+   "ours": {
+    "i.feet": 1,
+    "i.saw": 0,
+    "i.square": 1,
+    "i.sine": 0,
+    "i.noise": 0,
+    "i.hpf": 16,
+    "i.hpRes": 0,
+    "i.lpRes": 0,
+    "i.il": 0,
+    "i.al": 0,
+    "i.fa": 0.001,
+    "i.fd": 0.005,
+    "i.fr": 0.005,
+    "i.a": 0.001,
+    "i.d": 0.005,
+    "i.s": 1,
+    "i.r": 0.064,
+    "i.level": 1,
+    "i.initBrill": 0,
+    "i.afterBrill": 0,
+    "i.afterLevel": 0,
+    "i.initLevel": 0,
+    "i.keytrack": 0,
+    "ii.level": 0,
+    "balance": 0,
+    "detune": 0,
+    "drift": 0,
+    "volume": 0.68,
+    "i.lpf": 7100
+   },
+   "fit": [
+    "i.pw"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "sine-mix",
+   "vstParam": "vcf1_sine_mix",
+   "norms": [
+    0.2,
+    0.5,
+    0.8,
+    1
+   ],
+   "note": 60,
+   "hold": 1.5,
+   "tail": 0.6,
+   "vst": {
+    "params": {
+     "osc1_saw_level": 100,
+     "osc1_square_level": 0,
+     "osc1_noise_level": 0,
+     "osc2_saw_level": 0,
+     "osc2_square_level": 0,
+     "osc2_noise_level": 0,
+     "vcf1_hpf_cutoff": 0,
+     "vcf1_lpf_resonance": 0,
+     "vcf1_initial_level": 1,
+     "vcf1_attack_level": 1,
+     "vcf1_attack_s": 0,
+     "vcf1_decay_s": 0,
+     "vcf1_release_s": 5,
+     "vcf1_output_level": 100,
+     "vcf1_sine_mix": 0,
+     "vca1_attack_s": 0,
+     "vca1_decay_s": 0,
+     "vca1_sustain": 1,
+     "vca1_release_s": {
+      "norm": 0.2
+     },
+     "vca1_level": 100,
+     "vca2_level": 0,
+     "vcf1_velocity_response": 0,
+     "vca1_velocity_response": 0,
+     "vcf1_key_response": 0,
+     "vcf1_aftertouch_response": 0,
+     "reverb_send": 0,
+     "delay_send": 0,
+     "chorus_send": 0,
+     "drive": 0,
+     "voice_drift": 0,
+     "lfo_to_vcf": 0,
+     "lfo_to_vco": 0,
+     "lfo_to_vca": 0,
+     "ring_modulation": 0,
+     "osc1_feet": {
+      "norm": 1
+     },
+     "pitch_coarse": 0,
+     "pitch_fine": 0,
+     "initial_pitch_bend": 0,
+     "vcf1_lpf_cutoff": {
+      "norm": 1
+     },
+     "osc1_pwm_depth": 0,
+     "osc2_pwm_depth": 0,
+     "comp_mix": 0,
+     "osc1_pulse_width": {
+      "norm": 0
+     }
+    }
+   },
+   "ours": {
+    "i.feet": 1,
+    "i.saw": 1,
+    "i.square": 0,
+    "i.sine": 0,
+    "i.noise": 0,
+    "i.hpf": 16,
+    "i.hpRes": 0,
+    "i.lpRes": 0,
+    "i.il": 0,
+    "i.al": 0,
+    "i.fa": 0.001,
+    "i.fd": 0.005,
+    "i.fr": 0.005,
+    "i.a": 0.001,
+    "i.d": 0.005,
+    "i.s": 1,
+    "i.r": 0.064,
+    "i.level": 1,
+    "i.initBrill": 0,
+    "i.afterBrill": 0,
+    "i.afterLevel": 0,
+    "i.initLevel": 0,
+    "i.keytrack": 0,
+    "ii.level": 0,
+    "balance": 0,
+    "detune": 0,
+    "drift": 0,
+    "volume": 0.68,
+    "i.lpf": 7100
+   },
+   "fit": [
+    "i.sine"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "square-level",
+   "vstParam": "osc1_square_level",
+   "norms": [
+    0.25,
+    0.5,
+    0.75,
+    1
+   ],
+   "note": 60,
+   "hold": 1.5,
+   "tail": 0.6,
+   "vst": {
+    "params": {
+     "osc1_saw_level": 100,
+     "osc1_square_level": 0,
+     "osc1_noise_level": 0,
+     "osc2_saw_level": 0,
+     "osc2_square_level": 0,
+     "osc2_noise_level": 0,
+     "vcf1_hpf_cutoff": 0,
+     "vcf1_lpf_resonance": 0,
+     "vcf1_initial_level": 1,
+     "vcf1_attack_level": 1,
+     "vcf1_attack_s": 0,
+     "vcf1_decay_s": 0,
+     "vcf1_release_s": 5,
+     "vcf1_output_level": 100,
+     "vcf1_sine_mix": 0,
+     "vca1_attack_s": 0,
+     "vca1_decay_s": 0,
+     "vca1_sustain": 1,
+     "vca1_release_s": {
+      "norm": 0.2
+     },
+     "vca1_level": 100,
+     "vca2_level": 0,
+     "vcf1_velocity_response": 0,
+     "vca1_velocity_response": 0,
+     "vcf1_key_response": 0,
+     "vcf1_aftertouch_response": 0,
+     "reverb_send": 0,
+     "delay_send": 0,
+     "chorus_send": 0,
+     "drive": 0,
+     "voice_drift": 0,
+     "lfo_to_vcf": 0,
+     "lfo_to_vco": 0,
+     "lfo_to_vca": 0,
+     "ring_modulation": 0,
+     "osc1_feet": {
+      "norm": 1
+     },
+     "pitch_coarse": 0,
+     "pitch_fine": 0,
+     "initial_pitch_bend": 0,
+     "vcf1_lpf_cutoff": {
+      "norm": 1
+     },
+     "osc1_pwm_depth": 0,
+     "osc2_pwm_depth": 0,
+     "comp_mix": 0,
+     "osc1_pulse_width": {
+      "norm": 0
+     }
+    }
+   },
+   "ours": {
+    "i.feet": 1,
+    "i.saw": 1,
+    "i.square": 0,
+    "i.sine": 0,
+    "i.noise": 0,
+    "i.hpf": 16,
+    "i.hpRes": 0,
+    "i.lpRes": 0,
+    "i.il": 0,
+    "i.al": 0,
+    "i.fa": 0.001,
+    "i.fd": 0.005,
+    "i.fr": 0.005,
+    "i.a": 0.001,
+    "i.d": 0.005,
+    "i.s": 1,
+    "i.r": 0.064,
+    "i.level": 1,
+    "i.initBrill": 0,
+    "i.afterBrill": 0,
+    "i.afterLevel": 0,
+    "i.initLevel": 0,
+    "i.keytrack": 0,
+    "ii.level": 0,
+    "balance": 0,
+    "detune": 0,
+    "drift": 0,
+    "volume": 0.68,
+    "i.lpf": 7100
+   },
+   "fit": [
+    "i.square"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "keyresp1-note36",
+   "vstParam": "vcf1_key_response",
+   "norms": [
+    1
+   ],
+   "note": 36,
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "osc1_saw_level": 100,
+     "osc1_square_level": 0,
+     "osc1_noise_level": 0,
+     "osc2_saw_level": 0,
+     "osc2_square_level": 0,
+     "osc2_noise_level": 0,
+     "vcf1_hpf_cutoff": 0,
+     "vcf1_lpf_resonance": 0,
+     "vcf1_initial_level": 1,
+     "vcf1_attack_level": 1,
+     "vcf1_attack_s": 0,
+     "vcf1_decay_s": 0,
+     "vcf1_release_s": 5,
+     "vcf1_output_level": 100,
+     "vcf1_sine_mix": 0,
+     "vca1_attack_s": 0,
+     "vca1_decay_s": 0,
+     "vca1_sustain": 1,
+     "vca1_release_s": {
+      "norm": 0.2
+     },
+     "vca1_level": 100,
+     "vca2_level": 0,
+     "vcf1_velocity_response": 0,
+     "vca1_velocity_response": 0,
+     "vcf1_key_response": 100,
+     "vcf1_aftertouch_response": 0,
+     "reverb_send": 0,
+     "delay_send": 0,
+     "chorus_send": 0,
+     "drive": 0,
+     "voice_drift": 0,
+     "lfo_to_vcf": 0,
+     "lfo_to_vco": 0,
+     "lfo_to_vca": 0,
+     "ring_modulation": 0,
+     "osc1_feet": {
+      "norm": 1
+     },
+     "pitch_coarse": 0,
+     "pitch_fine": 0,
+     "initial_pitch_bend": 0,
+     "vcf1_lpf_cutoff": {
+      "norm": 0.8
+     },
+     "osc1_pwm_depth": 0,
+     "osc2_pwm_depth": 0,
+     "comp_mix": 0
+    }
+   },
+   "ours": {
+    "i.feet": 1,
+    "i.saw": 1,
+    "i.square": 0,
+    "i.sine": 0,
+    "i.noise": 0,
+    "i.hpf": 16,
+    "i.hpRes": 0,
+    "i.lpRes": 0,
+    "i.il": 0,
+    "i.al": 0,
+    "i.fa": 0.001,
+    "i.fd": 0.005,
+    "i.fr": 0.005,
+    "i.a": 0.001,
+    "i.d": 0.005,
+    "i.s": 1,
+    "i.r": 0.064,
+    "i.level": 1,
+    "i.initBrill": 0,
+    "i.afterBrill": 0,
+    "i.afterLevel": 0,
+    "i.initLevel": 0,
+    "i.keytrack": 0,
+    "ii.level": 0,
+    "balance": 0,
+    "detune": 0,
+    "drift": 0,
+    "volume": 0.68,
+    "i.lpf": 460
+   },
+   "fit": [
+    "i.lpf"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "keyresp0-note36",
+   "vstParam": "vcf1_key_response",
+   "norms": [
+    0.5
+   ],
+   "note": 36,
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "osc1_saw_level": 100,
+     "osc1_square_level": 0,
+     "osc1_noise_level": 0,
+     "osc2_saw_level": 0,
+     "osc2_square_level": 0,
+     "osc2_noise_level": 0,
+     "vcf1_hpf_cutoff": 0,
+     "vcf1_lpf_resonance": 0,
+     "vcf1_initial_level": 1,
+     "vcf1_attack_level": 1,
+     "vcf1_attack_s": 0,
+     "vcf1_decay_s": 0,
+     "vcf1_release_s": 5,
+     "vcf1_output_level": 100,
+     "vcf1_sine_mix": 0,
+     "vca1_attack_s": 0,
+     "vca1_decay_s": 0,
+     "vca1_sustain": 1,
+     "vca1_release_s": {
+      "norm": 0.2
+     },
+     "vca1_level": 100,
+     "vca2_level": 0,
+     "vcf1_velocity_response": 0,
+     "vca1_velocity_response": 0,
+     "vcf1_key_response": 0,
+     "vcf1_aftertouch_response": 0,
+     "reverb_send": 0,
+     "delay_send": 0,
+     "chorus_send": 0,
+     "drive": 0,
+     "voice_drift": 0,
+     "lfo_to_vcf": 0,
+     "lfo_to_vco": 0,
+     "lfo_to_vca": 0,
+     "ring_modulation": 0,
+     "osc1_feet": {
+      "norm": 1
+     },
+     "pitch_coarse": 0,
+     "pitch_fine": 0,
+     "initial_pitch_bend": 0,
+     "vcf1_lpf_cutoff": {
+      "norm": 0.8
+     },
+     "osc1_pwm_depth": 0,
+     "osc2_pwm_depth": 0,
+     "comp_mix": 0
+    }
+   },
+   "ours": {
+    "i.feet": 1,
+    "i.saw": 1,
+    "i.square": 0,
+    "i.sine": 0,
+    "i.noise": 0,
+    "i.hpf": 16,
+    "i.hpRes": 0,
+    "i.lpRes": 0,
+    "i.il": 0,
+    "i.al": 0,
+    "i.fa": 0.001,
+    "i.fd": 0.005,
+    "i.fr": 0.005,
+    "i.a": 0.001,
+    "i.d": 0.005,
+    "i.s": 1,
+    "i.r": 0.064,
+    "i.level": 1,
+    "i.initBrill": 0,
+    "i.afterBrill": 0,
+    "i.afterLevel": 0,
+    "i.initLevel": 0,
+    "i.keytrack": 0,
+    "ii.level": 0,
+    "balance": 0,
+    "detune": 0,
+    "drift": 0,
+    "volume": 0.68,
+    "i.lpf": 460
+   },
+   "fit": [
+    "i.lpf"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "keyresp1-note48",
+   "vstParam": "vcf1_key_response",
+   "norms": [
+    1
+   ],
+   "note": 48,
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "osc1_saw_level": 100,
+     "osc1_square_level": 0,
+     "osc1_noise_level": 0,
+     "osc2_saw_level": 0,
+     "osc2_square_level": 0,
+     "osc2_noise_level": 0,
+     "vcf1_hpf_cutoff": 0,
+     "vcf1_lpf_resonance": 0,
+     "vcf1_initial_level": 1,
+     "vcf1_attack_level": 1,
+     "vcf1_attack_s": 0,
+     "vcf1_decay_s": 0,
+     "vcf1_release_s": 5,
+     "vcf1_output_level": 100,
+     "vcf1_sine_mix": 0,
+     "vca1_attack_s": 0,
+     "vca1_decay_s": 0,
+     "vca1_sustain": 1,
+     "vca1_release_s": {
+      "norm": 0.2
+     },
+     "vca1_level": 100,
+     "vca2_level": 0,
+     "vcf1_velocity_response": 0,
+     "vca1_velocity_response": 0,
+     "vcf1_key_response": 100,
+     "vcf1_aftertouch_response": 0,
+     "reverb_send": 0,
+     "delay_send": 0,
+     "chorus_send": 0,
+     "drive": 0,
+     "voice_drift": 0,
+     "lfo_to_vcf": 0,
+     "lfo_to_vco": 0,
+     "lfo_to_vca": 0,
+     "ring_modulation": 0,
+     "osc1_feet": {
+      "norm": 1
+     },
+     "pitch_coarse": 0,
+     "pitch_fine": 0,
+     "initial_pitch_bend": 0,
+     "vcf1_lpf_cutoff": {
+      "norm": 0.8
+     },
+     "osc1_pwm_depth": 0,
+     "osc2_pwm_depth": 0,
+     "comp_mix": 0
+    }
+   },
+   "ours": {
+    "i.feet": 1,
+    "i.saw": 1,
+    "i.square": 0,
+    "i.sine": 0,
+    "i.noise": 0,
+    "i.hpf": 16,
+    "i.hpRes": 0,
+    "i.lpRes": 0,
+    "i.il": 0,
+    "i.al": 0,
+    "i.fa": 0.001,
+    "i.fd": 0.005,
+    "i.fr": 0.005,
+    "i.a": 0.001,
+    "i.d": 0.005,
+    "i.s": 1,
+    "i.r": 0.064,
+    "i.level": 1,
+    "i.initBrill": 0,
+    "i.afterBrill": 0,
+    "i.afterLevel": 0,
+    "i.initLevel": 0,
+    "i.keytrack": 0,
+    "ii.level": 0,
+    "balance": 0,
+    "detune": 0,
+    "drift": 0,
+    "volume": 0.68,
+    "i.lpf": 460
+   },
+   "fit": [
+    "i.lpf"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "keyresp0-note48",
+   "vstParam": "vcf1_key_response",
+   "norms": [
+    0.5
+   ],
+   "note": 48,
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "osc1_saw_level": 100,
+     "osc1_square_level": 0,
+     "osc1_noise_level": 0,
+     "osc2_saw_level": 0,
+     "osc2_square_level": 0,
+     "osc2_noise_level": 0,
+     "vcf1_hpf_cutoff": 0,
+     "vcf1_lpf_resonance": 0,
+     "vcf1_initial_level": 1,
+     "vcf1_attack_level": 1,
+     "vcf1_attack_s": 0,
+     "vcf1_decay_s": 0,
+     "vcf1_release_s": 5,
+     "vcf1_output_level": 100,
+     "vcf1_sine_mix": 0,
+     "vca1_attack_s": 0,
+     "vca1_decay_s": 0,
+     "vca1_sustain": 1,
+     "vca1_release_s": {
+      "norm": 0.2
+     },
+     "vca1_level": 100,
+     "vca2_level": 0,
+     "vcf1_velocity_response": 0,
+     "vca1_velocity_response": 0,
+     "vcf1_key_response": 0,
+     "vcf1_aftertouch_response": 0,
+     "reverb_send": 0,
+     "delay_send": 0,
+     "chorus_send": 0,
+     "drive": 0,
+     "voice_drift": 0,
+     "lfo_to_vcf": 0,
+     "lfo_to_vco": 0,
+     "lfo_to_vca": 0,
+     "ring_modulation": 0,
+     "osc1_feet": {
+      "norm": 1
+     },
+     "pitch_coarse": 0,
+     "pitch_fine": 0,
+     "initial_pitch_bend": 0,
+     "vcf1_lpf_cutoff": {
+      "norm": 0.8
+     },
+     "osc1_pwm_depth": 0,
+     "osc2_pwm_depth": 0,
+     "comp_mix": 0
+    }
+   },
+   "ours": {
+    "i.feet": 1,
+    "i.saw": 1,
+    "i.square": 0,
+    "i.sine": 0,
+    "i.noise": 0,
+    "i.hpf": 16,
+    "i.hpRes": 0,
+    "i.lpRes": 0,
+    "i.il": 0,
+    "i.al": 0,
+    "i.fa": 0.001,
+    "i.fd": 0.005,
+    "i.fr": 0.005,
+    "i.a": 0.001,
+    "i.d": 0.005,
+    "i.s": 1,
+    "i.r": 0.064,
+    "i.level": 1,
+    "i.initBrill": 0,
+    "i.afterBrill": 0,
+    "i.afterLevel": 0,
+    "i.initLevel": 0,
+    "i.keytrack": 0,
+    "ii.level": 0,
+    "balance": 0,
+    "detune": 0,
+    "drift": 0,
+    "volume": 0.68,
+    "i.lpf": 460
+   },
+   "fit": [
+    "i.lpf"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "keyresp1-note72",
+   "vstParam": "vcf1_key_response",
+   "norms": [
+    1
+   ],
+   "note": 72,
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "osc1_saw_level": 100,
+     "osc1_square_level": 0,
+     "osc1_noise_level": 0,
+     "osc2_saw_level": 0,
+     "osc2_square_level": 0,
+     "osc2_noise_level": 0,
+     "vcf1_hpf_cutoff": 0,
+     "vcf1_lpf_resonance": 0,
+     "vcf1_initial_level": 1,
+     "vcf1_attack_level": 1,
+     "vcf1_attack_s": 0,
+     "vcf1_decay_s": 0,
+     "vcf1_release_s": 5,
+     "vcf1_output_level": 100,
+     "vcf1_sine_mix": 0,
+     "vca1_attack_s": 0,
+     "vca1_decay_s": 0,
+     "vca1_sustain": 1,
+     "vca1_release_s": {
+      "norm": 0.2
+     },
+     "vca1_level": 100,
+     "vca2_level": 0,
+     "vcf1_velocity_response": 0,
+     "vca1_velocity_response": 0,
+     "vcf1_key_response": 100,
+     "vcf1_aftertouch_response": 0,
+     "reverb_send": 0,
+     "delay_send": 0,
+     "chorus_send": 0,
+     "drive": 0,
+     "voice_drift": 0,
+     "lfo_to_vcf": 0,
+     "lfo_to_vco": 0,
+     "lfo_to_vca": 0,
+     "ring_modulation": 0,
+     "osc1_feet": {
+      "norm": 1
+     },
+     "pitch_coarse": 0,
+     "pitch_fine": 0,
+     "initial_pitch_bend": 0,
+     "vcf1_lpf_cutoff": {
+      "norm": 0.8
+     },
+     "osc1_pwm_depth": 0,
+     "osc2_pwm_depth": 0,
+     "comp_mix": 0
+    }
+   },
+   "ours": {
+    "i.feet": 1,
+    "i.saw": 1,
+    "i.square": 0,
+    "i.sine": 0,
+    "i.noise": 0,
+    "i.hpf": 16,
+    "i.hpRes": 0,
+    "i.lpRes": 0,
+    "i.il": 0,
+    "i.al": 0,
+    "i.fa": 0.001,
+    "i.fd": 0.005,
+    "i.fr": 0.005,
+    "i.a": 0.001,
+    "i.d": 0.005,
+    "i.s": 1,
+    "i.r": 0.064,
+    "i.level": 1,
+    "i.initBrill": 0,
+    "i.afterBrill": 0,
+    "i.afterLevel": 0,
+    "i.initLevel": 0,
+    "i.keytrack": 0,
+    "ii.level": 0,
+    "balance": 0,
+    "detune": 0,
+    "drift": 0,
+    "volume": 0.68,
+    "i.lpf": 460
+   },
+   "fit": [
+    "i.lpf"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "keyresp0-note72",
+   "vstParam": "vcf1_key_response",
+   "norms": [
+    0.5
+   ],
+   "note": 72,
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "osc1_saw_level": 100,
+     "osc1_square_level": 0,
+     "osc1_noise_level": 0,
+     "osc2_saw_level": 0,
+     "osc2_square_level": 0,
+     "osc2_noise_level": 0,
+     "vcf1_hpf_cutoff": 0,
+     "vcf1_lpf_resonance": 0,
+     "vcf1_initial_level": 1,
+     "vcf1_attack_level": 1,
+     "vcf1_attack_s": 0,
+     "vcf1_decay_s": 0,
+     "vcf1_release_s": 5,
+     "vcf1_output_level": 100,
+     "vcf1_sine_mix": 0,
+     "vca1_attack_s": 0,
+     "vca1_decay_s": 0,
+     "vca1_sustain": 1,
+     "vca1_release_s": {
+      "norm": 0.2
+     },
+     "vca1_level": 100,
+     "vca2_level": 0,
+     "vcf1_velocity_response": 0,
+     "vca1_velocity_response": 0,
+     "vcf1_key_response": 0,
+     "vcf1_aftertouch_response": 0,
+     "reverb_send": 0,
+     "delay_send": 0,
+     "chorus_send": 0,
+     "drive": 0,
+     "voice_drift": 0,
+     "lfo_to_vcf": 0,
+     "lfo_to_vco": 0,
+     "lfo_to_vca": 0,
+     "ring_modulation": 0,
+     "osc1_feet": {
+      "norm": 1
+     },
+     "pitch_coarse": 0,
+     "pitch_fine": 0,
+     "initial_pitch_bend": 0,
+     "vcf1_lpf_cutoff": {
+      "norm": 0.8
+     },
+     "osc1_pwm_depth": 0,
+     "osc2_pwm_depth": 0,
+     "comp_mix": 0
+    }
+   },
+   "ours": {
+    "i.feet": 1,
+    "i.saw": 1,
+    "i.square": 0,
+    "i.sine": 0,
+    "i.noise": 0,
+    "i.hpf": 16,
+    "i.hpRes": 0,
+    "i.lpRes": 0,
+    "i.il": 0,
+    "i.al": 0,
+    "i.fa": 0.001,
+    "i.fd": 0.005,
+    "i.fr": 0.005,
+    "i.a": 0.001,
+    "i.d": 0.005,
+    "i.s": 1,
+    "i.r": 0.064,
+    "i.level": 1,
+    "i.initBrill": 0,
+    "i.afterBrill": 0,
+    "i.afterLevel": 0,
+    "i.initLevel": 0,
+    "i.keytrack": 0,
+    "ii.level": 0,
+    "balance": 0,
+    "detune": 0,
+    "drift": 0,
+    "volume": 0.68,
+    "i.lpf": 460
+   },
+   "fit": [
+    "i.lpf"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "keyresp1-note84",
+   "vstParam": "vcf1_key_response",
+   "norms": [
+    1
+   ],
+   "note": 84,
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "osc1_saw_level": 100,
+     "osc1_square_level": 0,
+     "osc1_noise_level": 0,
+     "osc2_saw_level": 0,
+     "osc2_square_level": 0,
+     "osc2_noise_level": 0,
+     "vcf1_hpf_cutoff": 0,
+     "vcf1_lpf_resonance": 0,
+     "vcf1_initial_level": 1,
+     "vcf1_attack_level": 1,
+     "vcf1_attack_s": 0,
+     "vcf1_decay_s": 0,
+     "vcf1_release_s": 5,
+     "vcf1_output_level": 100,
+     "vcf1_sine_mix": 0,
+     "vca1_attack_s": 0,
+     "vca1_decay_s": 0,
+     "vca1_sustain": 1,
+     "vca1_release_s": {
+      "norm": 0.2
+     },
+     "vca1_level": 100,
+     "vca2_level": 0,
+     "vcf1_velocity_response": 0,
+     "vca1_velocity_response": 0,
+     "vcf1_key_response": 100,
+     "vcf1_aftertouch_response": 0,
+     "reverb_send": 0,
+     "delay_send": 0,
+     "chorus_send": 0,
+     "drive": 0,
+     "voice_drift": 0,
+     "lfo_to_vcf": 0,
+     "lfo_to_vco": 0,
+     "lfo_to_vca": 0,
+     "ring_modulation": 0,
+     "osc1_feet": {
+      "norm": 1
+     },
+     "pitch_coarse": 0,
+     "pitch_fine": 0,
+     "initial_pitch_bend": 0,
+     "vcf1_lpf_cutoff": {
+      "norm": 0.8
+     },
+     "osc1_pwm_depth": 0,
+     "osc2_pwm_depth": 0,
+     "comp_mix": 0
+    }
+   },
+   "ours": {
+    "i.feet": 1,
+    "i.saw": 1,
+    "i.square": 0,
+    "i.sine": 0,
+    "i.noise": 0,
+    "i.hpf": 16,
+    "i.hpRes": 0,
+    "i.lpRes": 0,
+    "i.il": 0,
+    "i.al": 0,
+    "i.fa": 0.001,
+    "i.fd": 0.005,
+    "i.fr": 0.005,
+    "i.a": 0.001,
+    "i.d": 0.005,
+    "i.s": 1,
+    "i.r": 0.064,
+    "i.level": 1,
+    "i.initBrill": 0,
+    "i.afterBrill": 0,
+    "i.afterLevel": 0,
+    "i.initLevel": 0,
+    "i.keytrack": 0,
+    "ii.level": 0,
+    "balance": 0,
+    "detune": 0,
+    "drift": 0,
+    "volume": 0.68,
+    "i.lpf": 460
+   },
+   "fit": [
+    "i.lpf"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "keyresp0-note84",
+   "vstParam": "vcf1_key_response",
+   "norms": [
+    0.5
+   ],
+   "note": 84,
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "osc1_saw_level": 100,
+     "osc1_square_level": 0,
+     "osc1_noise_level": 0,
+     "osc2_saw_level": 0,
+     "osc2_square_level": 0,
+     "osc2_noise_level": 0,
+     "vcf1_hpf_cutoff": 0,
+     "vcf1_lpf_resonance": 0,
+     "vcf1_initial_level": 1,
+     "vcf1_attack_level": 1,
+     "vcf1_attack_s": 0,
+     "vcf1_decay_s": 0,
+     "vcf1_release_s": 5,
+     "vcf1_output_level": 100,
+     "vcf1_sine_mix": 0,
+     "vca1_attack_s": 0,
+     "vca1_decay_s": 0,
+     "vca1_sustain": 1,
+     "vca1_release_s": {
+      "norm": 0.2
+     },
+     "vca1_level": 100,
+     "vca2_level": 0,
+     "vcf1_velocity_response": 0,
+     "vca1_velocity_response": 0,
+     "vcf1_key_response": 0,
+     "vcf1_aftertouch_response": 0,
+     "reverb_send": 0,
+     "delay_send": 0,
+     "chorus_send": 0,
+     "drive": 0,
+     "voice_drift": 0,
+     "lfo_to_vcf": 0,
+     "lfo_to_vco": 0,
+     "lfo_to_vca": 0,
+     "ring_modulation": 0,
+     "osc1_feet": {
+      "norm": 1
+     },
+     "pitch_coarse": 0,
+     "pitch_fine": 0,
+     "initial_pitch_bend": 0,
+     "vcf1_lpf_cutoff": {
+      "norm": 0.8
+     },
+     "osc1_pwm_depth": 0,
+     "osc2_pwm_depth": 0,
+     "comp_mix": 0
+    }
+   },
+   "ours": {
+    "i.feet": 1,
+    "i.saw": 1,
+    "i.square": 0,
+    "i.sine": 0,
+    "i.noise": 0,
+    "i.hpf": 16,
+    "i.hpRes": 0,
+    "i.lpRes": 0,
+    "i.il": 0,
+    "i.al": 0,
+    "i.fa": 0.001,
+    "i.fd": 0.005,
+    "i.fr": 0.005,
+    "i.a": 0.001,
+    "i.d": 0.005,
+    "i.s": 1,
+    "i.r": 0.064,
+    "i.level": 1,
+    "i.initBrill": 0,
+    "i.afterBrill": 0,
+    "i.afterLevel": 0,
+    "i.initLevel": 0,
+    "i.keytrack": 0,
+    "ii.level": 0,
+    "balance": 0,
+    "detune": 0,
+    "drift": 0,
+    "volume": 0.68,
+    "i.lpf": 460
+   },
+   "fit": [
+    "i.lpf"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "keyresp1-note96",
+   "vstParam": "vcf1_key_response",
+   "norms": [
+    1
+   ],
+   "note": 96,
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "osc1_saw_level": 100,
+     "osc1_square_level": 0,
+     "osc1_noise_level": 0,
+     "osc2_saw_level": 0,
+     "osc2_square_level": 0,
+     "osc2_noise_level": 0,
+     "vcf1_hpf_cutoff": 0,
+     "vcf1_lpf_resonance": 0,
+     "vcf1_initial_level": 1,
+     "vcf1_attack_level": 1,
+     "vcf1_attack_s": 0,
+     "vcf1_decay_s": 0,
+     "vcf1_release_s": 5,
+     "vcf1_output_level": 100,
+     "vcf1_sine_mix": 0,
+     "vca1_attack_s": 0,
+     "vca1_decay_s": 0,
+     "vca1_sustain": 1,
+     "vca1_release_s": {
+      "norm": 0.2
+     },
+     "vca1_level": 100,
+     "vca2_level": 0,
+     "vcf1_velocity_response": 0,
+     "vca1_velocity_response": 0,
+     "vcf1_key_response": 100,
+     "vcf1_aftertouch_response": 0,
+     "reverb_send": 0,
+     "delay_send": 0,
+     "chorus_send": 0,
+     "drive": 0,
+     "voice_drift": 0,
+     "lfo_to_vcf": 0,
+     "lfo_to_vco": 0,
+     "lfo_to_vca": 0,
+     "ring_modulation": 0,
+     "osc1_feet": {
+      "norm": 1
+     },
+     "pitch_coarse": 0,
+     "pitch_fine": 0,
+     "initial_pitch_bend": 0,
+     "vcf1_lpf_cutoff": {
+      "norm": 0.8
+     },
+     "osc1_pwm_depth": 0,
+     "osc2_pwm_depth": 0,
+     "comp_mix": 0
+    }
+   },
+   "ours": {
+    "i.feet": 1,
+    "i.saw": 1,
+    "i.square": 0,
+    "i.sine": 0,
+    "i.noise": 0,
+    "i.hpf": 16,
+    "i.hpRes": 0,
+    "i.lpRes": 0,
+    "i.il": 0,
+    "i.al": 0,
+    "i.fa": 0.001,
+    "i.fd": 0.005,
+    "i.fr": 0.005,
+    "i.a": 0.001,
+    "i.d": 0.005,
+    "i.s": 1,
+    "i.r": 0.064,
+    "i.level": 1,
+    "i.initBrill": 0,
+    "i.afterBrill": 0,
+    "i.afterLevel": 0,
+    "i.initLevel": 0,
+    "i.keytrack": 0,
+    "ii.level": 0,
+    "balance": 0,
+    "detune": 0,
+    "drift": 0,
+    "volume": 0.68,
+    "i.lpf": 460
+   },
+   "fit": [
+    "i.lpf"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  },
+  {
+   "name": "keyresp0-note96",
+   "vstParam": "vcf1_key_response",
+   "norms": [
+    0.5
+   ],
+   "note": 96,
+   "hold": 1.5,
+   "tail": 0.3,
+   "vst": {
+    "params": {
+     "osc1_saw_level": 100,
+     "osc1_square_level": 0,
+     "osc1_noise_level": 0,
+     "osc2_saw_level": 0,
+     "osc2_square_level": 0,
+     "osc2_noise_level": 0,
+     "vcf1_hpf_cutoff": 0,
+     "vcf1_lpf_resonance": 0,
+     "vcf1_initial_level": 1,
+     "vcf1_attack_level": 1,
+     "vcf1_attack_s": 0,
+     "vcf1_decay_s": 0,
+     "vcf1_release_s": 5,
+     "vcf1_output_level": 100,
+     "vcf1_sine_mix": 0,
+     "vca1_attack_s": 0,
+     "vca1_decay_s": 0,
+     "vca1_sustain": 1,
+     "vca1_release_s": {
+      "norm": 0.2
+     },
+     "vca1_level": 100,
+     "vca2_level": 0,
+     "vcf1_velocity_response": 0,
+     "vca1_velocity_response": 0,
+     "vcf1_key_response": 0,
+     "vcf1_aftertouch_response": 0,
+     "reverb_send": 0,
+     "delay_send": 0,
+     "chorus_send": 0,
+     "drive": 0,
+     "voice_drift": 0,
+     "lfo_to_vcf": 0,
+     "lfo_to_vco": 0,
+     "lfo_to_vca": 0,
+     "ring_modulation": 0,
+     "osc1_feet": {
+      "norm": 1
+     },
+     "pitch_coarse": 0,
+     "pitch_fine": 0,
+     "initial_pitch_bend": 0,
+     "vcf1_lpf_cutoff": {
+      "norm": 0.8
+     },
+     "osc1_pwm_depth": 0,
+     "osc2_pwm_depth": 0,
+     "comp_mix": 0
+    }
+   },
+   "ours": {
+    "i.feet": 1,
+    "i.saw": 1,
+    "i.square": 0,
+    "i.sine": 0,
+    "i.noise": 0,
+    "i.hpf": 16,
+    "i.hpRes": 0,
+    "i.lpRes": 0,
+    "i.il": 0,
+    "i.al": 0,
+    "i.fa": 0.001,
+    "i.fd": 0.005,
+    "i.fr": 0.005,
+    "i.a": 0.001,
+    "i.d": 0.005,
+    "i.s": 1,
+    "i.r": 0.064,
+    "i.level": 1,
+    "i.initBrill": 0,
+    "i.afterBrill": 0,
+    "i.afterLevel": 0,
+    "i.initLevel": 0,
+    "i.keytrack": 0,
+    "ii.level": 0,
+    "balance": 0,
+    "detune": 0,
+    "drift": 0,
+    "volume": 0.68,
+    "i.lpf": 460
+   },
+   "fit": [
+    "i.lpf"
+   ],
+   "window": [
+    0.3,
+    1.4
+   ]
+  }
+ ]
+}
