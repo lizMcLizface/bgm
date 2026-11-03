@@ -80,7 +80,7 @@ Outputs default to `.tmp/synth-matching/<case>/`: a stereo `candidate.wav` for
 listening and `report.json` with file/kernel/wave hashes, complete parameters,
 20 ms RMS envelopes and averaged spectra. `--out directory` changes the folder.
 The tool supports the melodic models, including live TB-303 notes. Drum hits use
-`tools/auditDrumReference.mjs`; see the [recorded drum comparison](SYNTHS_DRUM_COMPARISON.md)
+`tools/auditDrumReference.mjs`; see the [recorded drum comparison](retired/SYNTHS_DRUM_COMPARISON.md)
 for its manifest, measured kick corrections and remaining voice differences.
 Drum-pattern matching and performance-controller sequences are outside the single-note tools.
 
