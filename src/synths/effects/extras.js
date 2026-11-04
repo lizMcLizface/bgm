@@ -32,6 +32,8 @@ const BUILDERS = {
     // amplitude tremolo; with stereo spread the right channel's modulation is delayed, so the sound sweeps between the sides
     tremolo(context) {
         const input = context.createGain(), split = context.createChannelSplitter(2), merge = context.createChannelMerger(2);
+        const wet = context.createGain(), dry = context.createGain(), output = context.createGain();
+        merge.connect(wet); wet.connect(output); input.connect(dry); dry.connect(output);
         const gains = [context.createGain(), context.createGain()], lfo = context.createOscillator(), depth = [context.createGain(), context.createGain()], offset = context.createDelay(5);
         lfo.frequency.value = 4; lfo.start();
         input.connect(split);
@@ -39,8 +41,10 @@ const BUILDERS = {
         lfo.connect(depth[0]); depth[0].connect(gains[0].gain);
         lfo.connect(offset); offset.connect(depth[1]); depth[1].connect(gains[1].gain);
         return {
-            input, output: merge, nodes: [input, split, merge, ...gains, ...depth, offset], oscillators: [lfo],
+            input, output, nodes: [input, split, merge, wet, dry, output, ...gains, ...depth, offset], oscillators: [lfo],
             patch(p, initial) {
+                const mix = p.mix ?? 1;
+                smooth(context, wet.gain, mix, initial); smooth(context, dry.gain, 1 - mix, initial);
                 smooth(context, lfo.frequency, p.rate, initial);
                 gains.forEach((g) => smooth(context, g.gain, 1 - p.depth / 2, initial));
                 depth.forEach((d) => smooth(context, d.gain, p.depth / 2, initial));

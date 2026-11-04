@@ -5,7 +5,7 @@ import Transport from '../seq/Transport';
 import {useSequencer} from '../seq/useSequencer';
 import DrumLibrary,{ShareDrums} from './DrumLibrary';
 import {readDrumLink,clearDrumLink} from './share';
-import {KITS,emptyPattern,validPattern,patternCommands,voiceColour,ACCENT_COLOUR} from './kits';
+import {KITS,emptyPattern,validPattern,patternCommands,voiceColour,ACCENT_COLOUR,chainToSong} from './kits';
 import useCoreClock from '../../seq/useCoreClock';
 import {load,save} from '../storage';
 import {DrumMachineTop,DrumMachineVoices,DrumVoicePanel} from './DrumMachine';
@@ -40,6 +40,9 @@ function StepGrid({kit,pattern,length,tool,selected,onSelect,onPad,onCell,headRe
  </section>;
 }
 
+// banks saved before songs had only a chain: show it as a song, which is now the one editor for the order
+const withSong=b=>b&&b.chain?.length&&!b.song?.length?{...b,song:chainToSong(b.chain),songOn:true,songLoop:true}:b;
+
 export function DrumPage({kit}){
  const synth=SYNTHS[kit.id];
  const n=kit.tracks.length;
@@ -50,7 +53,7 @@ export function DrumPage({kit}){
  const silentRef=useRef(silent);silentRef.current=silent;
  const seq=useSequencer({
   id:kit.id,empty:emptyPattern(kit),
-  valid:validPattern(kit),initialBank:shared.bank,onEdit:clearDrumLink,
+  valid:validPattern(kit),initialBank:withSong(shared.bank),onEdit:clearDrumLink,
   patternCommands:(i,p)=>patternCommands(kit,i,p,t=>silentRef.current(t)),copyPattern:p=>p.map(r=>[...r]),tempoId:synth.params.BY_KEY.tempo.id,
  });
  const {bank}=seq;
@@ -97,20 +100,22 @@ export function DrumPage({kit}){
   {({values,change})=>{
    valuesRef.current=values;
    // Two devices side by side, as on a desk: the sequencer sends notes, the drum machine plays them.
-   return <div className="split" key="split">
+   return <div className="split" key="split" style={{'--rows':n+1}}>
     <section className="device device-seq" aria-label="Sequencer">
      <header className="device-head"><h2>Sequencer</h2><span>{core?'sequencer core · timed notes':'built-in clock'}</span><span className="device-out">notes → {kit.name}</span></header>
-     <div className="device-top"><Transport seq={view}>
+     <div className="device-top"><Transport seq={view} chain={false}>
+      <label className="inline toggle" title="Experimental: the sequencer core books timed notes on the audio clock instead of the engine's own sequencer. Accent is approximated."><input type="checkbox" checked={core} onChange={e=>chooseClock(e.target.checked)}/> Core clock <em>for step edits, fills, loops</em></label>
+      {shared.error&&<span className="drum-link-error" role="alert">{shared.error}</span>}
+     </Transport><SongStrip seq={seq} core={core}/>
+     <div className="seq-tools">
       <span className="tool" role="radiogroup" aria-label="Step tool">
        <button type="button" role="radio" aria-checked={tool==='hit'} className={tool==='hit'?'on':''} onClick={()=>setTool('hit')}>Hit</button>
        <button type="button" role="radio" aria-checked={tool==='flam'} className={tool==='flam'?'on':''} onClick={()=>setTool('flam')} title="Paint flams: a quiet grace note before the beat">Flam</button>
        <button type="button" role="radio" aria-checked={tool==='edit'} className={tool==='edit'?'on':''} onClick={()=>setTool('edit')} title="Edit a lit step: velocity, chance, ratchet, nudge; and a voice's own loop length">Edit</button>
       </span>
       <button type="button" className={'fill-btn'+(filling?' on':'')} aria-pressed={filling} disabled={!core} title="Hold to play the steps conditioned 'only in a fill' and drop those 'not in a fill'" onPointerDown={()=>fill(true)} onPointerUp={()=>fill(false)} onPointerLeave={()=>fill(false)} onPointerCancel={()=>fill(false)} onKeyDown={e=>{if(e.key===' '||e.key==='Enter')fill(true);}} onKeyUp={()=>fill(false)}>Fill</button>
-      <label className="inline toggle" title="Experimental: the sequencer core books timed notes on the audio clock instead of the engine's own sequencer. Accent is approximated."><input type="checkbox" checked={core} onChange={e=>chooseClock(e.target.checked)}/> Core clock <em>for step edits, fills, loops</em></label>
       {bank.title&&<p className="drum-stage"><strong>{bank.title}</strong> · {seq.playing&&bank.chain.length?'Playing':'Editing'} {'ABCDEFGH'[bank.current]}{bank.names?.[bank.current]?`: ${bank.names[bank.current]}`:''}{seq.playing&&!bank.chain.length&&<> · Playing {'ABCDEFGH'[seq.playingPattern]}</>}</p>}
-      {shared.error&&<span className="drum-link-error" role="alert">{shared.error}</span>}
-     </Transport><SongStrip seq={seq} core={core}/></div>
+     </div></div>
      <div className="seq-body"><StepGrid kit={kit} pattern={bank.patterns[bank.current]} length={bank.lengths[bank.current]} tool={tool} selected={selected} onSelect={setSelected} onPad={pad} onCell={setCell} headRef={seq.head} locks={bank.locks?.[bank.current]} trackLengths={bank.trackLengths?.[bank.current]} picked={tool==='edit'?picked:null} onPick={setPicked}/>
      {tool==='edit'&&<StepEditor kit={kit} picked={{t:Math.min(selected,n-1),s:picked.t===selected?picked.s:-1}} lock={bank.locks?.[bank.current]?.[selected+':'+picked.s]} trackLength={bank.trackLengths?.[bank.current]?.[selected]} patternLength={bank.lengths[bank.current]} coreOn={core} onLock={seq.setLock} onTrackLength={seq.setTrackLength}/>}</div>
     </section>

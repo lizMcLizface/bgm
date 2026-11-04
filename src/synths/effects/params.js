@@ -20,6 +20,8 @@ const definitions=[
  ...[['amount','Width',0,2,.01,1.4]].map(d=>['width',d]),
  ...[['ceiling','Ceiling · dB',-18,0,.5,-1]].map(d=>['limiter',d]),
  ...['filter','tremolo','crusher','ring','pitch','width','limiter'].map(k=>['switch',[k,k,0,1,1,1]]),
+ // appended last so the ids of the parameters above stay put
+ ...[['mix','Mix',0,1,.01,1]].map(d=>['tremolo',d]),
 ];
 export const RACK_PARAMS=defineParams(definitions.map(([prefix,[key,label,min,max,step,value]],id)=>{
  const unit=/· cents/.test(label)?'decimal':/· semitones/.test(label)?'decimal':/· Hz/.test(label)?'Hz':/· s$|seconds$/.test(label)?'s':/· ms/.test(label)?'ms':/· dB/.test(label)?'dB':/· octaves/.test(label)?'oct':max<=1&&step!==1?'%':'decimal';

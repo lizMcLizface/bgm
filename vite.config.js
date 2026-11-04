@@ -3,6 +3,7 @@ import path from 'node:path';
 import { defineConfig } from 'vite';
 import { configDefaults } from 'vitest/config';
 import react from '@vitejs/plugin-react';
+import basicSsl from '@vitejs/plugin-basic-ssl';
 import { localRainReferences } from './tools/rainReferencesPlugin.mjs';
 import { startupPreload } from './tools/startupPreloadPlugin.mjs';
 
@@ -84,7 +85,9 @@ export default defineConfig(({ mode }) => {
   const isPublic = mode === 'public', outDir = isPublic ? 'dist-public' : 'dist';
   return {
     base: '/',
-    plugins: [react(), directorySlash(), localBanks(isPublic), localRainReferences(isPublic), startupPreload()],
+    plugins: [react(), directorySlash(), localBanks(isPublic), localRainReferences(isPublic), startupPreload(),
+        // DEV_HTTPS=1 serves the dev server over a self-signed certificate: other devices on the network need a secure origin for AudioWorklet
+        ...(process.env.DEV_HTTPS ? [basicSsl()] : [])],
     build: {
         outDir,
         rollupOptions: { input: { main: 'index.html', ambient: 'ambient/index.html', percussion: 'tools/percussion-engine.html', audioOutput: 'tools/audio-output.html', labs:'labs/index.html', labAll:'labs/all/index.html', labStrings:'labs/strings/index.html', labKeys:'labs/keys/index.html', labChoir:'labs/choir/index.html', labOrgans:'labs/organs/index.html', labDrones:'labs/drones/index.html', labBass:'labs/bass/index.html', labPlucks:'labs/plucks/index.html', labWinds:'labs/winds/index.html', labLeads:'labs/leads/index.html', labPads:'labs/pads/index.html', labLevels:'labs/levels/index.html', ...SYNTH_PAGES, synthLab: 'tools/synth-lab.html', currentSynth: 'tools/current-synth.html', effectsLab:'tools/effects.html', fmLab:'tools/fm.html', ensembleSynth:'tools/ensemble-synth.html', spectrum:'tools/spectrum.html', quality:'tools/quality.html', tone:'tools/tone.html', modulation:'tools/modulation.html', instrumentEffects:'tools/instrument-effects.html', acoustic:'tools/acoustic.html', sources:'tools/sources.html', behavior:'tools/behavior.html', stress:'tools/stress.html', scenery:'tools/scenery.html',

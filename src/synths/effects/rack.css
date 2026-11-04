@@ -237,3 +237,10 @@
 .rack-move button{min-width:34px;padding:2px 8px;}
 .rack-mix{flex-basis:130px;}
 .rackc{min-height:450px;}
+
+/* the compressor's gain-reduction meter sits beside its faders, on one row */
+.rack-body{display:contents;}
+.rack-body:not(.is-plain){display:flex;flex-wrap:nowrap;align-items:flex-start;gap:8px;width:100%;flex:1 1 100%;min-width:0;}
+.rack-body:not(.is-plain) .rack-reduction{flex:none;}
+.rack-body:not(.is-plain) .rack-controls{flex:1 1 0;width:auto;}
+.rack-body:not(.is-plain) .rack-reduction meter{height:118px;}

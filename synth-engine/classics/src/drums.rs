@@ -609,6 +609,9 @@ pub struct Drums {
     pub steals: u32,
     /// Per-hit overrides waiting for the next note on each track: accent, tune offset, decay offset.
     hit: [[f32; 3]; TRACKS],
+    /// Left/right gains last used per track, so a pan change ramps instead of stepping (a step crackles).
+    pan_g: [(f32, f32); TRACKS],
+    pan_ready: bool,
 }
 
 impl Drums {
@@ -630,11 +633,14 @@ impl Drums {
             pat: [[[0; MAX_STEPS]; TRACKS + 1]; MAX_PATTERNS],
             steals: 0,
             hit: [[0.; 3]; TRACKS],
+            pan_g: [(0., 0.); TRACKS],
+            pan_ready: false,
         }
     }
     pub fn init(&mut self, sr: f32, style: u8) {
         self.sr = sr;
         self.style = style;
+        self.pan_ready = false;
         self.seq.init(sr);
         self.seq.bpm = 120.;
         self.voices = [Voice::new(); TRACKS];
@@ -799,7 +805,15 @@ impl Drums {
     fn mix(&mut self, left: &mut [f32], right: &mut [f32], from: usize, to: usize) {
         let mut any_metal = self.voices.iter().any(|v| v.active && matches!(v.spec.kind, Kind::ClosedHat | Kind::OpenHat | Kind::Cymbal));
         let sr = self.sr;
-        let pans: [(f32, f32); TRACKS] = core::array::from_fn(|t| pan(self.knobs[t][PAN] + self.kit()[t].pan));
+        let target: [(f32, f32); TRACKS] = core::array::from_fn(|t| pan(self.knobs[t][PAN] + self.kit()[t].pan));
+        if !self.pan_ready {
+            self.pan_g = target;
+            self.pan_ready = true;
+        }
+        // ramp each track's gains from where they were to the target across this span
+        let span = (to - from).max(1) as f32;
+        let step: [(f32, f32); TRACKS] = core::array::from_fn(|t| ((target[t].0 - self.pan_g[t].0) / span, (target[t].1 - self.pan_g[t].1) / span));
+        let mut pans = self.pan_g;
         for n in from..to {
             if self.npend > 0 {
                 for i in 0..PENDING {
@@ -842,7 +856,12 @@ impl Drums {
             }
             left[n] = l * self.master;
             right[n] = r * self.master;
+            for t in 0..TRACKS {
+                pans[t].0 += step[t].0;
+                pans[t].1 += step[t].1;
+            }
         }
+        self.pan_g = target;
     }
     pub fn render(&mut self, left: &mut [f32], right: &mut [f32]) {
         let n = left.len();

@@ -93,8 +93,14 @@ export function beatPattern(kit,beat){
  }
  return pattern;
 }
+/** A chain as song blocks: runs of the same pattern become one block with a repeat count (at most 8 each). */
+export function chainToSong(chain){
+ const song=[];
+ for(const p of chain){const last=song[song.length-1];if(last&&last.p===p&&last.n<8)last.n++;else song.push({p,n:1});}
+ return song;
+}
 export function arrangementBank(kit,recipe){
- return {patterns:Array.from({length:8},(_,i)=>recipe.stages[i]?beatPattern(kit,recipe.stages[i]):emptyPattern(kit)()),lengths:Array(8).fill(16),tempos:Array(8).fill(0),chain:[...recipe.chain],current:0,title:recipe.name,names:Array.from({length:8},(_,i)=>recipe.stages[i]?.name??'')};
+ return {song:chainToSong(recipe.chain),songOn:true,songLoop:true,patterns:Array.from({length:8},(_,i)=>recipe.stages[i]?beatPattern(kit,recipe.stages[i]):emptyPattern(kit)()),lengths:Array(8).fill(16),tempos:Array(8).fill(0),chain:[...recipe.chain],current:0,title:recipe.name,names:Array.from({length:8},(_,i)=>recipe.stages[i]?.name??'')};
 }
 /** Engine commands for one pattern; `silent(track)` leaves a muted (or not soloed) voice out of what the engine plays. */
 export function patternCommands(kit,index,pattern,silent=()=>false){

@@ -62,7 +62,7 @@ export function useSequencer({id,empty,valid,patternCommands,copyPattern,tempoId
   /** One step's per-step values (see src/seq/core.js); null clears them. Only the core clock plays them. */
   setLock:(track,step,lock)=>{const b=bankRef.current,all={...(b.locks?.[b.current]??{})},key=track+':'+step;if(lock&&Object.keys(lock).length)all[key]=lock;else delete all[key];commit({...b,locks:setAt(b.locks,b.current,all)});},
   /** The song (see bank.js cleanSong); only the core clock plays it. */
-  setSong:(song)=>{commit({...bankRef.current,song});},
+  setSong:(song)=>{const list=song.flatMap(b=>Array(b.n).fill(b.p)).slice(0,16);commit({...bankRef.current,song,chain:list});send([[4,list.length,0],...list.map((p,i)=>[3,i,p])]);},
   setSongOn:(on)=>{commit({...bankRef.current,songOn:on});},
   setSongLoop:(loop)=>{commit({...bankRef.current,songLoop:loop});},
   /** A track's own loop length (polymeter); null puts it back on the pattern's length. */

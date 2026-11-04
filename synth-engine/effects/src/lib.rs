@@ -105,6 +105,9 @@ struct Effects {
     reverb_active: bool,
     reverb_quiet: u64,
     reverb_frames: u64,
+    /// A reverb type change waits here while the wet return fades out; `swap_g` is that fade (1 open, 0 shut).
+    next_type: Option<f32>,
+    swap_g: f32,
     headroom: headroom::Headroom,
 }
 impl Effects {
@@ -157,6 +160,8 @@ impl Effects {
             reverb_active: false,
             reverb_quiet: 0,
             reverb_frames: 0,
+            next_type: None,
+            swap_g: 1.,
             headroom: headroom::Headroom::new(),
         }
     }
@@ -189,6 +194,23 @@ impl Effects {
         self.internal = 0.;
         self.reverb_active = false;
         self.reverb_quiet = 0;
+        self.next_type = None;
+        self.swap_g = 1.;
+    }
+    /// Empties the reverb tank only (not the echo), for a type change.
+    fn clear_tank(&mut self) {
+        for b in &mut self.lines {
+            b.fill(0.);
+        }
+        for b in &mut self.early {
+            b.fill(0.);
+        }
+        for b in &mut self.diff {
+            b.fill(0.);
+        }
+        self.damp.fill(0.);
+        self.dc_in.fill(0.);
+        self.dc_out.fill(0.);
     }
     fn init(&mut self, sr: f32) {
         self.sr = if sr.is_finite() {
@@ -275,6 +297,20 @@ impl Effects {
             (0., 3.),
         ];
         let val = value.clamp(ranges[index].0, ranges[index].1);
+        if index == 20 {
+            // Switching type moves the decay gains, diffuser and line lengths at once, which bangs.
+            // While the reverb is sounding, fade the wet return out first and switch when it is silent.
+            if self.next_type.is_none() && self.p[20] == val {
+                return;
+            }
+            if self.asleep || !self.reverb_active || self.p[15] >= 0.5 {
+                self.next_type = None;
+                self.swap_g = 1.;
+            } else {
+                self.next_type = Some(val);
+                return;
+            }
+        }
         if self.p[index] == val {
             return;
         }
@@ -381,6 +417,18 @@ impl Effects {
                 self.reverb_active = true;
                 self.reverb_quiet = 0;
             }
+            if let Some(t) = self.next_type {
+                self.swap_g -= 1. / (self.sr * 0.015);
+                if self.swap_g <= 0. {
+                    self.swap_g = 0.;
+                    self.p[20] = t;
+                    self.refresh();
+                    self.clear_tank();
+                    self.next_type = None;
+                }
+            } else if self.swap_g < 1. {
+                self.swap_g = (self.swap_g + 1. / (self.sr * 0.015)).min(1.);
+            }
             let mut wet = [0.; 2];
             if self.reverb_active {
                 self.reverb_frames += 1;
@@ -485,7 +533,7 @@ impl Effects {
                 let reverb = [late[0] * 0.7 + early[0], late[1] * 0.7 + early[1]];
                 let mid = (reverb[0] + reverb[1]) * 0.5 * self.return_gain;
                 let side = (reverb[0] - reverb[1]) * 0.5 * self.p[7] * self.return_gain;
-                wet = [mid + side, mid - side];
+                wet = [(mid + side) * self.swap_g, (mid - side) * self.swap_g];
                 for ch in 0..2 {
                     reverb_peak = reverb_peak
                         .max(room[ch].abs())

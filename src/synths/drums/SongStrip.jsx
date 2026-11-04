@@ -33,7 +33,20 @@ export default function SongStrip({seq,core}){
   return ()=>cancelAnimationFrame(raf);
  },[]);// eslint-disable-line react-hooks/exhaustive-deps
  return <div className={'song-strip'+(on?' on':'')} ref={root} role="group" aria-label="Song">
-  <label className="inline toggle" title="Play the song below instead of the chain"><input type="checkbox" checked={on} disabled={!core} onChange={e=>seq.setSongOn(e.target.checked)}/> Song</label>
+  <div className="song-bar">
+   <label className="inline toggle song-toggle" title="Play the blocks below in order, each for its repeats"><input type="checkbox" checked={on} disabled={!core} onChange={e=>seq.setSongOn(e.target.checked)}/> Song</label>
+   <label className="inline toggle"><input type="checkbox" checked={bank.songLoop!==false} onChange={e=>seq.setSongLoop(e.target.checked)}/> Loop</label>
+   {song.length>0&&at>=0&&<span className="song-edit">
+    <select aria-label="Pattern of the selected block" value={song[at].p} onChange={e=>edit(at,{p:Number(e.target.value)})}>{[...LETTERS].map((l,i)=><option key={l} value={i}>{l}</option>)}</select>
+    <button type="button" aria-label="Fewer repeats" disabled={song[at].n<=1} onClick={()=>edit(at,{n:song[at].n-1})}>−</button>
+    <output>×{song[at].n}</output>
+    <button type="button" aria-label="More repeats" disabled={song[at].n>=8} onClick={()=>edit(at,{n:song[at].n+1})}>＋</button>
+    <button type="button" aria-label="Move block earlier" onClick={()=>move(at,-1)} disabled={at===0}>◀</button>
+    <button type="button" aria-label="Move block later" onClick={()=>move(at,1)} disabled={at===song.length-1}>▶</button>
+    <button type="button" aria-label="Remove block" onClick={()=>remove(at)}>✕</button>
+   </span>}
+   {!core&&<small className="se-note">Song needs the core clock.</small>}
+  </div>
   <span className="song-blocks">
    {song.length===0&&<em>empty · tap ＋ to add the current pattern</em>}
    {song.map((b,i)=><button type="button" key={i} data-n={b.n} className={'song-block'+(i===at?' sel':'')} style={{'--hue':HUES[b.p]}} aria-pressed={i===at} aria-label={`Block ${i+1}: pattern ${LETTERS[b.p]}, ${b.n} times`} onClick={()=>setSel(i)}>
@@ -41,16 +54,5 @@ export default function SongStrip({seq,core}){
    </button>)}
    {song.length<MAX_BLOCKS&&<button type="button" className="song-add" onClick={add} aria-label="Add the current pattern to the song">＋</button>}
   </span>
-  {song.length>0&&at>=0&&<span className="song-edit">
-   <select aria-label="Pattern of the selected block" value={song[at].p} onChange={e=>edit(at,{p:Number(e.target.value)})}>{[...LETTERS].map((l,i)=><option key={l} value={i}>{l}</option>)}</select>
-   <button type="button" aria-label="Fewer repeats" disabled={song[at].n<=1} onClick={()=>edit(at,{n:song[at].n-1})}>−</button>
-   <output>×{song[at].n}</output>
-   <button type="button" aria-label="More repeats" disabled={song[at].n>=8} onClick={()=>edit(at,{n:song[at].n+1})}>＋</button>
-   <button type="button" aria-label="Move block earlier" onClick={()=>move(at,-1)} disabled={at===0}>◀</button>
-   <button type="button" aria-label="Move block later" onClick={()=>move(at,1)} disabled={at===song.length-1}>▶</button>
-   <button type="button" aria-label="Remove block" onClick={()=>remove(at)}>✕</button>
-  </span>}
-  <label className="inline toggle"><input type="checkbox" checked={bank.songLoop!==false} onChange={e=>seq.setSongLoop(e.target.checked)}/> Loop</label>
-  {!core&&<small className="se-note">Song needs the core clock.</small>}
- </div>;
+  </div>;
 }

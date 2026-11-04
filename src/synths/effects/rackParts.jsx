@@ -15,7 +15,7 @@ export const BLOCKS=[
  {id:'delay',name:'Delay',colour:'#dca7cf',keys:[['effects.delay','Send'],['master.sync','Sync'],['effects.delayMs','Time'],['effects.feedback','Feedback'],['effects.feedbackLow','Low cut'],['effects.duck','Duck'],['effects.tone','Tone'],['effects.pingPong','Mode'],['effects.delayToReverb','To reverb']]},
  {id:'reverb',name:'Reverb',colour:'#9cbbb8',keys:[['effects.reverb','Send'],['effects.reverbReturn','Return'],['effects.reverbType','Type'],['effects.decay','Decay'],['effects.size','Size'],['effects.damping','Damping'],['effects.predelay','Pre-delay'],['effects.width','Width'],['effects.modulation','Motion'],['effects.reflections','Early refl.'],['effects.quality','Network']]},
  {id:'filter',name:'Filter',colour:'#e7c07a',keys:[['filter.low','Low cut'],['filter.high','High cut'],['filter.slope','Slope']]},
- {id:'tremolo',name:'Tremolo',colour:'#e59a9a',keys:[['tremolo.rate','Rate'],['tremolo.depth','Depth'],['tremolo.spread','Spread']]},
+ {id:'tremolo',name:'Tremolo',colour:'#e59a9a',keys:[['tremolo.mix','Mix'],['tremolo.rate','Rate'],['tremolo.depth','Depth'],['tremolo.spread','Spread']]},
  {id:'crusher',name:'Crusher',colour:'#a9b6c8',keys:[['crusher.bits','Bits'],['crusher.divide','Divide'],['crusher.mix','Mix']]},
  {id:'ring',name:'Ring mod',colour:'#d6a0e0',keys:[['ring.freq','Frequency'],['ring.mix','Mix']]},
  {id:'pitch',name:'Pitch',colour:'#8fd0e0',keys:[['pitch.semi','Shift'],['pitch.fine','Fine'],['pitch.mix','Mix']]},
@@ -35,7 +35,7 @@ export function RackControl({spec,value,label,block,onChange,disabled=false}){
  return <label className="rack-control" data-rack-param={key}>
   <span>{label}</span>
   {options?<select aria-label={aria} value={value} disabled={disabled} onChange={e=>set(Number(e.target.value))}>{options.map((s,i)=><option key={i} value={i}>{s}</option>)}</select>:<>
-   <input type="range" aria-label={aria} disabled={disabled} min="0" max="1" step="0.001" value={toPosition(spec,value)} style={{"--p":toPosition(spec,value)}} onChange={e=>set(Number(fromPosition(spec,Number(e.target.value)).toFixed(6)))}/>
+   <input type="range" aria-label={aria} disabled={disabled} min="0" max="1" step="0.001" value={toPosition(spec,value)} style={{"--p":toPosition(spec,value)}} title="Double-click to reset" onDoubleClick={()=>{if(Number.isFinite(spec.default))set(spec.default);}} onChange={e=>set(Number(fromPosition(spec,Number(e.target.value)).toFixed(6)))}/>
    <span className="rack-value"><input aria-label={aria+' value'} disabled={disabled} type="number" min={spec.min*scale} max={spec.max*scale} step={step} value={editing?draft:number} title="Enter or leave the field to apply" onFocus={()=>{setDraft(String(number));setEditing(true);}} onChange={e=>{setEditing(true);setDraft(e.target.value);}} onBlur={e=>{if(e.target.value!==''&&Number.isFinite(e.target.valueAsNumber))set(e.target.valueAsNumber/scale);setEditing(false);}} onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();e.currentTarget.blur();}else if(e.key==='Escape'){e.preventDefault();e.currentTarget.value=String(number);e.currentTarget.blur();}}}/><output>{display}</output></span>
   </>}
  </label>;
@@ -142,10 +142,12 @@ export function RackEffect({block,values,onChange,hidden,reduction=0,instrumentS
     <button type="button" aria-label={'Move '+block.name+' later'} disabled={!model.canMove(block.id,1)} onClick={()=>model.moveBy(block.id,1)} title="Move later in the chain">▶</button>
    </span>}
   </header>
+  <div className={block.id==='compressor'?'rack-body':'rack-body is-plain'}>
   {block.id==='compressor'&&<div className="rack-reduction"><span>Gain reduction</span><meter min="0" max="24" value={Math.min(24,Math.abs(reduction))}/><output>{Math.abs(reduction).toFixed(1)} dB</output></div>}
   <div className="rack-controls">{instrument
    ?instrumentSpecs.map(spec=><RackControl key={spec.key} spec={spec} value={values[spec.key]} label={spec.label} block="Instrument space" onChange={onChange}/>)
    :sliders.map(control)}</div>
+  </div>
   {choices.length>0&&<div className="rack-choices">{choices.map(control)}</div>}
   {block.id==='compressor'&&<p className="rack-note">Automatic level compensation · use Output trim to balance the return.</p>}
   {(block.id==='phaser'||block.id==='flanger'||block.id==='chorus')&&<p className="rack-note">Stereo effect: the left and right sides modulate out of step, so a mono sound comes out wide.</p>}

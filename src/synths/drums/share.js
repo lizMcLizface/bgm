@@ -25,6 +25,12 @@ function parameters(raw,table,defaults){
  }
  return out;
 }
+/** Song blocks from a flat [pattern, repeats, ...] list; [] when absent, null when malformed. */
+function songData(g){
+ if(g===undefined)return [];
+ if(!Array.isArray(g)||g.length%2||g.length>32||!g.every((n,i)=>Number.isInteger(n)&&(i%2?n>=1&&n<=8:n>=0&&n<8)))return null;
+ return Array.from({length:g.length/2},(_,i)=>({p:g[2*i],n:g[2*i+1]}));
+}
 function bankData(kit,b){
  if(!object(b)||!Array.isArray(b.patterns)||b.patterns.length!==8||!b.patterns.every(validPattern(kit)))return fail();
  if(!Array.isArray(b.lengths)||b.lengths.length!==8||!b.lengths.every(n=>Number.isInteger(n)&&n>=1&&n<=16))return fail();
@@ -42,7 +48,7 @@ export function encodeDrumState(kit,{bank,values,rack,name='Shared kit'}){
  const r=overrides(parameters(rack,RACK_PARAMS,cleanRack()),cleanRack());
  const data={v:2,k:kit.id,p:encode(bytes.subarray(0,end)),sound:String(name).slice(0,80),
   ...(b.lengths.some(n=>n!==16)?{l:b.lengths}:{}),...(b.tempos.some(Boolean)?{t:b.tempos}:{}),
-  ...(b.chain.length?{c:b.chain}:{}),...(b.current?{i:b.current}:{}),
+  ...(b.chain.length?{c:b.chain}:{}),...(b.song?.length?{g:b.song.flatMap(x=>[x.p,x.n]),...(b.songOn?{go:1}:{}),...(b.songLoop===false?{gl:0}:{})}:{}),...(b.current?{i:b.current}:{}),
   ...(b.title?{title:b.title}:{}),...(b.names.some(Boolean)?{n:b.names}:{}),
   ...(Object.keys(s).length?{s}:{}),...(Object.keys(r).length?{r}:{})};
  const raw=new TextEncoder().encode(JSON.stringify(data));if(raw.length>MAX_RAW)return fail();
@@ -76,7 +82,9 @@ export function decodeDrumState(kit,code){
  const patterns=Array.from({length:8},(_,p)=>Array.from({length:rows},(_,t)=>Array.from({length:16},(_,s)=>{
   const i=(p*rows+t)*16+s;return bytes[i>>2]>>((i%4)*2)&3;
  })));
- const bank=bankData(kit,{patterns,lengths:d.l,tempos:d.t,chain:d.c,current:d.i,title:d.title,names:d.n});
+ const song=songData(d.g);
+ if(song===null)return fail();
+ const bank=bankData(kit,{patterns,lengths:d.l,tempos:d.t,chain:d.c,current:d.i,title:d.title,names:d.n,...(song.length?{song,songOn:d.go===1,songLoop:d.gl!==0}:{})});
  const values=parameters(d.s,params,params.defaultValues()),rack=parameters(d.r,RACK_PARAMS,cleanRack());
  return {bank,patch:{name:d.sound,values,rack}};
 }

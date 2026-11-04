@@ -38,7 +38,8 @@ test('legacy links remain exact and are shortened when shared again',()=>{
   cells.forEach((v,i)=>bytes[i>>2]|=v<<(i%4)*2);
   const d={v:1,k:kit.id,p:bytes.toString('base64url'),l:s.bank.lengths,t:s.bank.tempos,c:s.bank.chain,i:s.bank.current,title:s.bank.title,n:s.bank.names,sound:s.name,s:s.values,r:s.rack};
   const legacy=Buffer.from(JSON.stringify(d)).toString('base64url'),restored=decodeDrumState(kit,legacy);
-  expect(restored).toEqual({bank:s.bank,patch:{name:s.name,values:s.values,rack:s.rack}});
+  const {song,songOn,songLoop,...plain}=s.bank;// links from before songs carry only the chain
+  expect(restored).toEqual({bank:plain,patch:{name:s.name,values:s.values,rack:s.rack}});
   const compact=encodeDrumState(kit,{bank:restored.bank,...restored.patch});
   expect(compact.length).toBeLessThan(legacy.length*.3);expect(decodeDrumState(kit,compact)).toEqual(restored);
  }
