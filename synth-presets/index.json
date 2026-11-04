@@ -114,6 +114,14 @@
       "url": "synth-presets/tr606-originals.yaml"
     },
     {
+      "id": "tr707-originals",
+      "synth": "tr707",
+      "name": "bgm sounds",
+      "kind": "original",
+      "count": 7,
+      "url": "synth-presets/tr707-originals.yaml"
+    },
+    {
       "id": "tb303-originals",
       "synth": "tb303",
       "name": "bgm sounds",
