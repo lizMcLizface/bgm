@@ -1,5 +1,5 @@
 import React,{useCallback,useEffect,useMemo,useRef,useState} from 'react';
-import {Fader,Choice,Ribbon,TouchPad} from './controls';
+import {Fader,Choice,Toggle,Lever,Dial,Ribbon,TouchPad} from './controls';
 import {startLiveSynth} from '../engine/liveSynth';
 import {Performer} from '../engine/performer';
 import {createPhraseRunner,phraseForCode} from './phraseRunner';
@@ -13,6 +13,7 @@ import SetupPopover from './SetupPopover';
 import StageKeys from './StageKeys';
 import ComparisonPresets from './ComparisonPresets';
 import EnvShapeEditor from './EnvShapeEditor';
+import useDraggable from './useDraggable';
 import SoundPicker,{soundList,nextSound} from './SoundPicker';
 import {SHAPE_KEYS} from './envShape';
 import RackPanel from '../effects/RackPanel';
@@ -51,7 +52,7 @@ export default function SynthShell(props){
  const embedded=useEnsemblePanel();
  return embedded?<EmbeddedShell {...props}/>:<StandaloneShell {...props}/>;
 }
-function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelClassName='',expand,libraries=[],startEngine=startLiveSynth,engineOptions,onEngine,onStats,onMidiRealtime,onComparisonWaves,initialPatch,onChoose,compactRack=true,keyboard=true,children}){
+function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelClassName='',expand,libraries=[],picker:Picker=SoundPicker,gridKeys=false,toggles=false,startEngine=startLiveSynth,engineOptions,onEngine,onStats,onMidiRealtime,onComparisonWaves,initialPatch,onChoose,compactRack=true,keyboard=true,children}){
  const {params:{BY_KEY,sanitize,toPairs},presets}=synth;
  const PATCH_KEY=`synths:${synth.id}:patch`,MINE_KEY=`synths:${synth.id}:mine`;
  const [patch,setPatch]=useState(()=>{
@@ -72,6 +73,8 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
  const [shapeOpen,setShapeOpen]=useState(null);
  const closeShape=useCallback(()=>setShapeOpen(null),[]);
  const SHELF_KEY=`synths:${synth.id}:shelf`;
+ // the instrument's case and the keyboard box can each be moved by their grip, and are remembered
+ const rigDrag=useDraggable(`synths:${synth.id}:rig-pos`),keysDrag=useDraggable('synths:keys-pos');
  const [shelf,setShelf]=useState(()=>{const s=load(SHELF_KEY,'sounds');return libraries.some(l=>l.id===s)?s:'sounds';});
  const pickShelf=id=>{setShelf(id);save(SHELF_KEY,id);};
  const library=libraries.find(l=>l.id===shelf);
@@ -178,7 +181,17 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
  // on a slider; MIDI Program Change picks a sound by number.
  const hotkeys=useRef(null);
  hotkeys.current={list:soundList(synth,presets,mine),current:patch.name.replace(/ \*$/,''),category:patch.category,choose};
- const stepSound=(dir,jump)=>{const h=hotkeys.current,next=nextSound(h.list,h.current,h.category,dir,jump);if(next)h.choose(next);return !!next;};
+ // gridKeys: the sounds sit in a bank-by-number grid (the Juno's), so ← → move along the row and ↑ ↓ to the bank above or below
+ const stepSound=(dir,jump)=>{
+  const h=hotkeys.current;
+  if(gridKeys){
+   const sounds=h.list.sounds.filter(p=>p.cat!=='mine'),n=sounds.length,at=sounds.findIndex(p=>p.name===h.current);
+   if(!n)return false;
+   const step=jump?8:1,i=at<0?(dir>0?0:n-1):jump&&dir>0&&at+8>=n?at%8:jump&&dir<0&&at-8<0?Math.floor((n-1-(at%8))/8)*8+(at%8):(at+dir*step+n)%n;
+   h.choose(sounds[Math.min(i,n-1)]);return true;
+  }
+  const next=nextSound(h.list,h.current,h.category,dir,jump);if(next)h.choose(next);return !!next;
+ };
  const makeSound=()=>{
   const h=hotkeys.current;if(!synth.generate)return false;
   const here=h.list.sounds.find(p=>p.name===h.current)?.cat??h.category;
@@ -228,12 +241,31 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
  const fullscreen=()=>{if(document.fullscreenElement)document.exitFullscreen?.();else document.documentElement.requestFullscreen?.().catch(()=>{});};
 
  // Keys are parameter keys, or [key, label] where the table's label is ambiguous.
- const control=(entry,tone,prefix='')=>{
+ const control=(entry,tone,prefix='',under=null)=>{
   const [key,label]=Array.isArray(entry)?[prefix+entry[0],entry[1]]:[prefix+entry];
   const spec=BY_KEY[key],short=label??spec.label;
+  if(Array.isArray(entry)&&entry[2]==='knob'&&!spec.options)return <Dial key={key} spec={spec} value={patch.values[key]} onChange={change} tone={tone} label={short}/>;
+  if(toggles&&Array.isArray(entry)&&entry[2]==='switch'&&spec.options?.length===2)return <Lever key={key} spec={spec} value={patch.values[key]} onChange={change} tone={tone} label={short}>{under}</Lever>;
+  if(isToggle(entry,prefix))return <Toggle key={key} spec={spec} value={patch.values[key]} onChange={change} tone={tone} label={short}/>;
   return spec.options
    ?<Choice key={key} spec={spec} value={patch.values[key]} options={spec.options} onChange={change} tone={tone} label={short}/>
    :<Fader key={key} spec={spec} value={patch.values[key]} onChange={change} tone={tone} label={short}/>;
+ };
+ // toggles: two-way choices are push buttons, and neighbours stack in one column
+ const isSwitch=(entry,prefix)=>toggles&&Array.isArray(entry)&&entry[2]==='switch'&&BY_KEY[prefix+entry[0]]?.options?.length===2;
+ const isToggle=(entry,prefix)=>toggles&&!isSwitch(entry,prefix)&&BY_KEY[prefix+(Array.isArray(entry)?entry[0]:entry)]?.options?.length===2;
+ // a toggle switch starts a column; the push buttons after it (and any run of them) stack beneath
+ const layout=(keys,tone,prefix)=>{
+  const out=[];
+  for(const k of keys){
+   const sw=isSwitch(k,prefix);
+   if(!sw&&!isToggle(k,prefix)){out.push(control(k,tone,prefix));continue;}
+   const last=out[out.length-1];
+   if(!sw&&last?.stack)last.items.push(k);else out.push({stack:true,items:[k]});
+  }
+  return out.map((o,i)=>!o.stack?o:isSwitch(o.items[0],prefix)
+   ?control(o.items[0],tone,prefix,o.items.length>1?o.items.slice(1).map(k=>control(k,tone,prefix)):null)
+   :<div className="toggle-stack" key={'t'+i}>{o.items.map(k=>control(k,tone,prefix))}</div>);
  };
  // shape: {env:'amp'|'filter', a, d, s, r} adds the envelope curve editor; stage
  // entries are keys (prefixed like the group's) or functions of (values, prefix).
@@ -244,7 +276,7 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
   const stage=key=>typeof key==='function'?key(patch.values,prefix):patch.values[prefix+key];
   return <section className="group" key={title} style={{'--n':keys.length}}>
    <h3>{title}{shaped&&<button type="button" className="shape-open" aria-expanded={!!open} title="Envelope curves" onClick={e=>{const anchor=e.currentTarget;setShapeOpen(o=>o?.id===id?null:{id,anchor});}}>Shape</button>}</h3>
-   <div className="group-controls">{keys.map(k=>control(k,tone,prefix))}</div>
+   <div className="group-controls">{layout(keys,tone,prefix)}</div>
    {open&&<EnvShapeEditor env={shape.env} title={title} values={patch.values} BY_KEY={BY_KEY} change={change} anchor={shapeOpen.anchor} onClose={closeShape}
     times={{A:stage(shape.a),D:stage(shape.d),R:stage(shape.r),sustain:stage(shape.s)}}/>}
   </section>;
@@ -274,13 +306,14 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
 
   {scope&&<Scope engine={engine} audio={audio.state} onClose={toggleScope}/>}
 
-  <div className="rig">
+  <div className="rig" ref={rigDrag.ref} style={rigDrag.style}>
+  <div className="grip rig-grip" {...rigDrag.handle} role="presentation"><i/></div>
   <nav className={'presets'+(library?' shelf-'+library.id:'')} aria-label="Sounds">
    {libraries.length>0&&<span className="shelf-switch" role="radiogroup" aria-label="Sound shelf">
     {[{id:'sounds',label:'Sounds'},...libraries].map(l=><button type="button" key={l.id} role="radio" aria-checked={shelf===l.id} onClick={()=>pickShelf(l.id)}>{l.label}</button>)}
    </span>}
    {library?library.render({choose,values:patch.values,current,rack:outboard}):<>
-   <SoundPicker synth={synth} presets={presets} mine={mine} current={current} currentCategory={patch.category} choose={choose} remove={removeMine}/>
+   <Picker synth={synth} presets={presets} mine={mine} current={current} currentCategory={patch.category} choose={choose} remove={removeMine}/>
    <button type="button" className="save" onClick={saveMine}>＋ Save sound</button>
    </>}
   </nav>
@@ -298,7 +331,7 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
   {showSetup&&<SetupPopover midi={midi} setup={setup} updateSetup={updateSetup} connectMidi={connectMidi} audio={audio} start={start} onClose={()=>setShowSetup(false)}/>}
 
   <footer className="perform">
-   {showKeys&&<StageKeys low={setup.keysLow} onLow={v=>updateSetup('keysLow',v)} notes={notes} context={context} chord={chordPick}
+   {showKeys&&<StageKeys drag={keysDrag} low={setup.keysLow} onLow={v=>updateSetup('keysLow',v)} notes={notes} context={context} chord={chordPick}
     onDown={(key,note,v)=>performer.down(key,note,velocity(v??.75))} onUp={key=>performer.up(key)} onMod={v=>performer.source('wheelMod',v)}
     head={<>
      <AutoPlay playing={phrasePlaying} onPlay={id=>{if(audio.state==='on')phrases.play(id);}} onStop={()=>phrases.stop()} sounds={{make:makeSound,canMake:!!synth.generate}}/>
@@ -306,7 +339,7 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
     </>}
     left={<Ribbon vertical range={setup.ribbonRange} onBend={b=>performer.source('ribbon',b)}/>}
     right={<TouchPad onTouch={(pressure,mod)=>{performer.source('pad',pressure);performer.source('padMod',mod);}}/>}/>}
-   {keyboard&&<p className="dock-keys stage-help">{`Keys: 1–5 phrases · Esc stops · ← → sound · ↑ ↓ kind${synth.generate?' · N new sound':''} · A S D F G H J K play notes (W E T Y U black keys) · Z X octave${midi.inputs.length?' · your MIDI keyboard plays too':''}`}</p>}
+   {keyboard&&<p className="dock-keys stage-help">{`Keys: 1–5 phrases · Esc stops · ${gridKeys?"← → patch · ↑ ↓ bank":"← → sound · ↑ ↓ kind"}${synth.generate?' · N new sound':''} · A S D F G H J K play notes (W E T Y U black keys) · Z X octave${midi.inputs.length?' · your MIDI keyboard plays too':''}`}</p>}
   </footer>
 
   {audio.state!=='on'&&<button type="button" className={'wake '+audio.state} onClick={start} disabled={comparisonPending}>

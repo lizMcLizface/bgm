@@ -37,6 +37,13 @@ export const {PARAMS,BY_KEY,defaultValues,clampValue,sanitize,toPairs}=definePar
  // chorus (BBD)
  ['chorus',23,'Chorus',0,3,1,'','step',['Off','I','II','I+II']],
  ['chorusNoise',24,'Hiss',0,1,.3,'%','lin'],
+ // performance section: portamento, voice mode, tune, hold (ids 35-40)
+ ['porta',36,'Porta',0,1,0,'','step',['Off','On']],
+ ['portaTime',35,'Time',0,5,.4,'s','sq'],
+ ['unison',37,'Mode',0,1,0,'','step',['Poly','Unison']],
+ ['unisonDetune',40,'Detune',0,1,.3,'%','lin'],
+ ['tune',38,'Tune',-100,100,0,'ct','lin'],
+ ['hold',39,'Hold',0,1,0,'','step',['Off','On']],
  // performance additions (the original has no velocity or aftertouch)
  ['bendDco',34,'Bend DCO',0,1,1,'%','lin'],
  ['bendVcf',25,'Bend VCF',0,1,0,'%','lin'],

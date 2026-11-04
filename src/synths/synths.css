@@ -103,6 +103,22 @@ a{color:var(--amber);}
 .juno{--ends:#0b0b0c;--rig-bg:linear-gradient(180deg,#1e1f21,#121314 30%);}
 .juno .brand{letter-spacing:.04em;}
 .juno .group{background:#18191b;border-color:#34363a;}
+/* the front panel: a framed performance block on the left (volume, portamento, bender, touch), the voice beside it, all
+   packed to the controls' own size */
+.jn-layout{flex:1 1 auto;min-height:0;display:flex;gap:8px;align-items:stretch;flex-wrap:nowrap;}
+.jn-main{display:grid;grid-template-rows:repeat(2,minmax(150px,235px));align-content:start;gap:5px;min-width:0;min-height:0;}
+.jn-perf{padding:5px;border:1px solid #6b6f7866;border-radius:10px;background:#0000002e;}
+.jn-row{display:flex;gap:5px;min-width:0;min-height:0;}
+.jn-row>.group,.jn-perf .jn-row>.group{flex:0 0 auto;}
+/* two-way choices are push buttons that stack in a column */
+.toggle-stack{display:flex;flex-direction:column;justify-content:center;gap:3px;padding:0 2px;}
+.toggle-key{width:74px;min-height:0;height:20px;padding:0 4px;font-size:10px;line-height:1;border-radius:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+ background:#26282c;border-color:#3d4046;color:#a7a399;box-shadow:0 2px 0 #0008;transform:none;}
+.toggle-key.on{background:var(--tone,#e3d9b8);border-color:var(--tone,#e3d9b8);color:#17140d;box-shadow:inset 0 2px 3px #0007;transform:translateY(1px);}
+.toggle-key.tone-cream{--tone:#e8dcb8;}.toggle-key.tone-amber{--tone:#e3a52a;}.toggle-key.tone-violet{--tone:#a07fd6;}.toggle-key.tone-red{--tone:#e0573d;}
+.toggle-key.tone-blue{--tone:#5b8fd9;}.toggle-key.tone-teal{--tone:#4ec4b4;}.toggle-key.tone-green{--tone:#5fae7a;}
+@media (max-width:1100px){.jn-layout{flex-wrap:wrap;flex:0 0 auto;}.jn-perf,.jn-main{display:flex;flex-direction:column;}.jn-row{flex-wrap:wrap;min-height:183px;}}
+.juno .factory{flex:1 1 auto;display:flex;align-items:center;padding:0 8px;}
 .prophet{--ends:#5a3a22;--rig-bg:linear-gradient(180deg,#1d1b1a,#121110 30%);}
 .prophet .brand{letter-spacing:.06em;font-style:italic;}
 .prophet .group{background:#171615;border-color:#3a3631;}
@@ -762,3 +778,107 @@ label.inline.toggle{min-height:32px;}label.inline.toggle em{font-style:normal;co
 .modwheel:focus-visible{outline:2px solid var(--focus);outline-offset:-2px;}
 .stage-row .ribbon.vertical{border-radius:0;}
 .stage-row>.modwheel{border-radius:10px 0 0 10px;}
+
+/* Juno patch selector: the bank browser's button rows, number buttons coloured by kind of sound */
+.pg{flex:1 1 auto;min-width:0;flex-wrap:wrap;}
+.pg .bank-buttons button:disabled{opacity:.35;}
+.pg-slot{background:color-mix(in srgb,var(--kind,#2a2c31) 32%,#17181b);border-color:color-mix(in srgb,var(--kind,#555) 55%,#000);color:#e9e4d8;}
+.pg-slot:hover:not(:disabled){background:color-mix(in srgb,var(--kind) 60%,#17181b);}
+.bank-buttons.numbers button.pg-slot.on{background:var(--kind);border-color:#fff;color:#14110c;box-shadow:inset 0 0 0 1px #fff;}
+.pg-kind{color:var(--muted);font-weight:400;}
+.pg-mine{display:flex;flex-wrap:wrap;gap:4px;}
+.pg-chip{display:inline-flex;}
+.pg-chip button{min-height:26px;font-size:12px;padding:0 8px;}
+.pg-chip button.on{border-color:var(--amber);}
+
+/* toggle switch: a column as tall as the faders beside it; the throw starts where a fader's track starts and the last option or
+   button ends where the track ends (--lever-above and --lever-below are the fader's value row and its label row) */
+.lever{--lever-above:30px;--lever-below:40px;min-width:42px;display:flex;flex-direction:column;align-items:center;flex:none;padding-bottom:var(--lever-below);box-sizing:border-box;}
+.lever-top{height:var(--lever-above);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;padding-bottom:3px;box-sizing:border-box;flex:none;}
+.lever-throw{flex:0 1 60px;min-height:36px;display:flex;justify-content:center;padding:0 2px;background:none;border:0;}
+.lever-slot{position:relative;width:16px;height:100%;border-radius:8px;background:#0b0c0d;border:1px solid #3a3d42;box-shadow:inset 0 2px 4px #000;}
+.lever-stem{position:absolute;left:50%;width:6px;margin-left:-3px;border-radius:3px;background:linear-gradient(90deg,#6b6f76,#c9ccd1,#6b6f76);height:30px;bottom:4px;transition:bottom .12s;}
+.lever.on .lever-stem{bottom:auto;top:4px;}
+.lever-knob{position:absolute;left:50%;width:22px;height:12px;margin-left:-11px;border-radius:5px;background:linear-gradient(color-mix(in srgb,var(--lv,#e8dcb8) 60%,#fff),var(--lv,#e8dcb8));box-shadow:0 2px 3px #000a;bottom:2px;transition:bottom .12s;}
+.lever.on .lever-knob{bottom:auto;top:2px;}
+.lever-end{font-size:10px;line-height:1;color:#6d6a62;white-space:nowrap;}
+.lever-end.now{color:#efe9d8;font-weight:700;}
+.lever-bottom{padding-top:3px;flex:none;}
+.lever-buttons{display:flex;flex-direction:column;gap:3px;margin-top:auto;padding-top:4px;}
+.lever-buttons .toggle-key.sq{width:42px;height:30px;}
+.lever-name{font-size:10px;line-height:1;color:var(--muted);white-space:nowrap;}
+.lever.tone-cream{--lv:#e8dcb8;}.lever.tone-amber{--lv:#e3a52a;}.lever.tone-violet{--lv:#a07fd6;}.lever.tone-red{--lv:#e0573d;}
+.lever.tone-blue{--lv:#5b8fd9;}.lever.tone-teal{--lv:#4ec4b4;}.lever.tone-green{--lv:#5fae7a;}
+/* the left-hand box: one column of full-width sections, four fader columns wide */
+.jn-perf{display:grid;grid-template-rows:auto 1fr 1fr;gap:5px;min-width:0;align-self:stretch;}
+.jn-perf .jn-row{display:block;min-height:0;}
+.jn-perf .jn-row>.group{width:100%;height:100%;box-sizing:border-box;}
+.jn-perf .group-controls{justify-content:space-evenly;gap:0;}
+.jn-perf .lever{width:42px;}
+.dial{display:flex;flex-direction:column;align-items:center;width:56px;flex:none;cursor:ns-resize;touch-action:none;}
+.dial:focus-visible{outline:2px solid var(--amber);outline-offset:2px;border-radius:6px;}
+.dial svg{display:block;margin:2px 0;}
+.dial-tick{stroke:#5b5f66;stroke-width:1.5;stroke-linecap:round;}
+.dial-tick.lit{stroke:var(--tone-line,#e3a52a);}
+.dial-skirt{fill:#0c0d0e;stroke:#3a3d42;stroke-width:1;}
+.dial-cap{fill:#26282c;stroke:#4a4d54;stroke-width:1;}
+.dial-pointer{stroke:#f2efe6;stroke-width:2.2;stroke-linecap:round;}
+.dial.tone-amber{--tone-line:#e3a52a;}.dial.tone-violet{--tone-line:#a07fd6;}
+
+/* on/off push buttons are square-ish; the DCO leaves room between its range switch and the LFO fader */
+.toggle-key.sq{width:42px;height:38px;font-size:10px;padding:0 2px;border-radius:6px;}
+.jn-main .jn-row:first-child>.group:nth-child(2) .choice:first-child{margin-right:18px;}
+
+/* a lever with its push buttons beneath it in one column (PWM over Pulse and Saw; Mode over Hold) */
+.toggle-stack{justify-content:center;}
+
+/* a switch on its own sits in the middle of the column; one with buttons keeps its throw at the top and the buttons at the foot */
+.lever.lone{justify-content:center;}
+.lever.lone .lever-top{height:auto;}
+/* a lone switch keeps its place but its name moves down to the row where the faders' labels are */
+.lever{position:relative;}
+.lever.lone .lever-name{visibility:hidden;}
+.lever-foot{position:absolute;left:-6px;right:-6px;bottom:0;height:var(--lever-below);box-sizing:border-box;padding-top:15px;text-align:center;white-space:nowrap;min-height:0;}
+.pg .bank-name{min-width:0;overflow:hidden;text-overflow:ellipsis;flex:none;}
+/* the Juno's case is only as big as its front panel */
+.juno .rig{width:max-content;max-width:100%;flex:0 0 auto;max-height:none;}
+.juno .rig>.panel{flex:0 0 auto;}
+.juno .jn-layout{flex:0 0 auto;}
+.pg .bank-name{display:flex;flex-direction:column;gap:2px;white-space:nowrap;}
+.pg-title{overflow:hidden;text-overflow:ellipsis;}
+.pg-kind{font-size:11px;}
+.juno .jn-layout{justify-content:center;}
+/* the left box is shorter than the voice area, so its faders get a smaller cap in proportion; groups share each row's spare
+   width, and their controls spread across it, so the controls fill the case */
+.jn-perf .fader{--cap:16px;}
+.jn-perf .fader-cap{width:30px;}
+.jn-main .jn-row>.group{flex:var(--n,1) 1 auto;}
+.juno .group-controls{justify-content:space-evenly;}
+.juno .jn-layout{justify-content:stretch;}
+.juno .jn-main{flex:1 1 auto;}
+.juno .jn-perf{flex:0 0 auto;}
+
+/* Juno flourish: black moulded end cheeks with a lit edge, a thin multicolour stripe along the top of the panel, a faintly
+   brushed faceplate and a nameplate strip along the foot (the CS-80 has its wood) */
+.juno .rig{border-width:0 18px;border-color:#0a0a0b;box-shadow:0 10px 28px #000a,inset 0 0 0 1px #000,
+ inset 18px 0 14px -16px #ffffff12,inset -18px 0 14px -16px #ffffff12;position:relative;}
+.juno .rig::before{content:'';display:block;flex:none;height:5px;
+ background:linear-gradient(90deg,#e0573d 0 16%,#e3a52a 16% 33%,#e8dcb8 33% 50%,#5fae7a 50% 66%,#4ec4b4 66% 83%,#5b8fd9 83% 100%);opacity:.9;}
+.juno .rig>.panel{background:repeating-linear-gradient(90deg,#ffffff05 0 1px,#0000 1px 3px),linear-gradient(180deg,#16171a,#101113);}
+.juno .rig::after{content:'ANALOG 106  ·  PROGRAMMABLE POLYPHONIC SYNTHESIZER';display:block;flex:none;text-align:center;font-size:10px;letter-spacing:.32em;
+ font-weight:600;color:#9a968a;padding:5px 0 6px;border-top:1px solid #2c2e33;background:linear-gradient(180deg,#1b1c1f,#0e0f10);text-shadow:0 1px 0 #000;}
+.juno .rig>nav.presets{box-shadow:inset 0 -1px 0 #0008;}
+.dial-tick.mid{stroke:#8a8d94;stroke-width:2;}
+.dial-tick.mid.lit{stroke:var(--tone-line,#e3a52a);}
+
+/* the grips that move the case and the keyboard box */
+.grip{flex:none;height:12px;display:grid;place-items:center;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;}
+.grip:active{cursor:grabbing;}
+.grip i{width:36px;height:4px;border-radius:2px;background:repeating-linear-gradient(90deg,#8a867c 0 4px,#0000 4px 8px);opacity:.45;}
+.grip:hover i{opacity:.9;}
+.drums .rig-grip{display:none;}
+.keys-grip{margin:-6px 0 -2px;}
+/* the Juno's grip is its stripe */
+.juno .rig::before{display:none;}
+.juno .rig-grip{height:10px;background:linear-gradient(90deg,#e0573d 0 16%,#e3a52a 16% 33%,#e8dcb8 33% 50%,#5fae7a 50% 66%,#4ec4b4 66% 83%,#5b8fd9 83% 100%);}
+.juno .rig-grip i{height:3px;width:30px;background:repeating-linear-gradient(90deg,#000 0 3px,#0000 3px 6px);opacity:.45;}

@@ -88,3 +88,19 @@ test('Juno sounds are distinct, use known keys and sit within a few dB of each o
  expect(new Set(PRESETS.map(p=>JSON.stringify(p.values))).size).toBe(PRESETS.length);
  for(const p of PRESETS)expect(Object.keys(p.values).sort()).toEqual(Object.keys(defaultValues()).sort());
 });
+
+test('tune, portamento, hold and unison work',()=>{
+ const pitch=(v,from=.1)=>{const s=synth({...CLEAN,...v});s.k.syn_note_on(1,69,.8);return pitchHz(s.seconds(.5)[0].subarray(48000*from),48000);};
+ expect(cents(pitch({tune:50}),440)-50).toBeLessThan(2);
+ // portamento: a second note starts at the first and slides up
+ const slide=porta=>{const s=synth({...CLEAN,porta,portaTime:1,voices:1});s.k.syn_note_on(1,57,.8);s.seconds(.3);s.k.syn_note_off(1);s.k.syn_note_on(2,69,.8);return pitchHz(s.seconds(.08)[0],48000);};
+ expect(slide(0)).toBeGreaterThan(400);expect(slide(1)).toBeLessThan(300);
+ // hold keeps a released note sounding until it is switched off
+ const s=synth({...CLEAN,hold:1,release:.05});s.k.syn_note_on(1,60,.8);s.seconds(.2);s.k.syn_note_off(1);s.seconds(.5);expect(s.k.syn_stat(0)).toBe(1);
+ s.k.syn_set_param?.(39,0);
+});
+
+test('unison stacks every voice on the newest key',()=>{
+ const s=synth({...CLEAN,unison:1,voices:6});s.k.syn_note_on(1,60,.8);s.k.syn_note_on(2,64,.8);s.seconds(.1);expect(s.k.syn_stat(0)).toBe(6);
+ s.k.syn_note_off(2);s.seconds(.1);expect(cents(pitchHz(s.seconds(.3)[0],48000),261.63)).toBeLessThan(30);
+});

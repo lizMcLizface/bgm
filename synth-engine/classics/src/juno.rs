@@ -6,7 +6,7 @@
 //! DCOs are stable (no drift); the filters and amplifiers vary slightly per voice.
 //! Velocity and pressure routes are additions for piano playing; the original had neither.
 //! An original interpretation, not a circuit model.
-use crate::alloc::{choose, Slot};
+use crate::alloc::{choose, KeyStack, Slot};
 use crate::dsp::*;
 
 pub const VOICES: usize = 16;
@@ -49,13 +49,20 @@ pub mod id {
     pub const SPREAD: usize = 32;
     pub const WIDTH: usize = 33;
     pub const BEND_DCO: usize = 34;
+    pub const PORTA_TIME: usize = 35;
+    pub const PORTA: usize = 36;
+    pub const UNISON: usize = 37;
+    pub const TUNE: usize = 38;
+    pub const HOLD: usize = 39;
+    pub const UNISON_DETUNE: usize = 40;
 }
 
-const DEFAULTS: [(usize, f32); 23] = [
+const DEFAULTS: [(usize, f32); 25] = [
     (id::RANGE, 1.), (id::PWM, 0.), (id::PWM_SOURCE, 1.), (id::SAW, 1.), (id::HPF, 1.), (id::CUTOFF, 3000.),
     (id::RES, 0.1), (id::ENV, 0.21), (id::KYBD, 0.6), (id::LEVEL, 0.8), (id::ATTACK, 0.005), (id::DECAY, 0.8),
     (id::SUSTAIN, 0.7), (id::RELEASE, 0.4), (id::LFO_RATE, 3.), (id::CHORUS, 1.), (id::CHORUS_NOISE, 0.3),
     (id::VEL_VCF, 0.3), (id::VEL_VCA, 0.4), (id::MOD_DEPTH, 0.5), (id::VOLUME, 0.68), (id::VOICES, 6.), (id::BEND_DCO, 1.),
+    (id::PORTA_TIME, 0.4), (id::UNISON_DETUNE, 0.3),
 ];
 
 #[derive(Clone, Copy)]
@@ -108,6 +115,8 @@ struct Voice {
     trim: f32,
     time: f32,
     spread: f32,
+    /// gliding pitch in semitones (the note itself without portamento)
+    pitch: f32,
 }
 impl Voice {
     const ZERO: Self = Self {
@@ -115,7 +124,7 @@ impl Voice {
         key: 0, note: 60., velocity: 0., poly: 0., pressure: 0., down: false, held: false, active: false, fresh: true,
         stamp: 0, rng: Rng(1), phase: 0., odd: false, env: Adsr::ZERO, gate: 0., hp: 0., ladder: Ladder::ZERO,
         dt: 0., dt_d: 0., pw: 0.5, pw_d: 0., g: 0., g_d: 0., gain: 0., gain_d: 0., k: 0., pan: (1., 1.), cut: 0.,
-        trim: 1., time: 1., spread: 0.,
+        trim: 1., time: 1., spread: 0., pitch: 60.,
     };
 }
 
@@ -138,6 +147,10 @@ pub struct Juno {
     brightness: f32,
     soft: f32,
     pedal: bool,
+    hold: bool,
+    unison: bool,
+    stack: KeyStack,
+    last_note: f32,
     pub steals: u32,
     shape_p: [f32; SHAPE_PARAMS],
     shape: EnvShape,
@@ -149,7 +162,7 @@ impl Juno {
             sr: 48000., p: [0.; PARAMS], dirty: true,
             setup: Setup { attack: 1., decay: 1., sustain: 0., release: 1., saw: false, pulse: false, sub: 0., noise: 0., hpf: 1, hp_a: 0., gate: false, gate_k: 1. },
             voices: [Voice::ZERO; VOICES], stamp: 0, until: 0, lfo: Lfo::new(0x2f6b_1e7d), fade: 1., bend_to: 0., bend: 0.,
-            pressure: 0., modulation: 0., expression: 1., expression_s: 1., brightness: 0., soft: 0., pedal: false, steals: 0,
+            pressure: 0., modulation: 0., expression: 1., expression_s: 1., brightness: 0., soft: 0., pedal: false, hold: false, unison: false, stack: KeyStack::EMPTY, last_note: 60., steals: 0,
             shape_p: [0.; SHAPE_PARAMS], shape: EnvShape::NATIVE,
         }
     }
@@ -208,21 +221,34 @@ impl Juno {
             self.prepare();
         }
         let note = note.clamp(0., 127.);
-        let n = (self.p[id::VOICES].round() as usize).clamp(1, VOICES);
-        let gate = self.setup.gate;
         // The LFO delay restarts when a phrase starts (no key held), as on the original.
         if !self.voices.iter().any(|v| v.down) {
             self.fade = 0.;
         }
+        if self.unison {
+            let first = self.stack.len == 0;
+            self.stack.push(key, note);
+            self.unison_play(key, note, velocity, first || !self.voices.iter().any(|v| v.down));
+            return;
+        }
+        let n = (self.p[id::VOICES].round() as usize).clamp(1, VOICES);
+        let gate = self.setup.gate;
         let mut slots = [Slot { active: false, down: false, held: false, note: 0., stamp: 0, level: 0. }; VOICES];
         for (slot, v) in slots.iter_mut().zip(self.voices.iter()) {
             *slot = Slot { active: v.active, down: v.down, held: v.held, note: v.note, stamp: v.stamp, level: Self::level(v, gate) };
         }
         let index = choose(&slots[..n], note);
-        let ringing = ladder_feedback(self.p[id::RES]) >= 3.95;
         if self.voices[index].active && self.voices[index].down && self.voices[index].note != note {
             self.steals += 1;
         }
+        self.start(index, key, note, velocity, true);
+    }
+
+    /// Starts (or retargets) one voice on a note.
+    fn start(&mut self, index: usize, key: u32, note: f32, velocity: f32, retrigger: bool) {
+        let ringing = ladder_feedback(self.p[id::RES]) >= 3.95;
+        let porta = self.p[id::PORTA] >= 0.5;
+        let from = self.last_note;
         self.stamp = self.stamp.wrapping_add(1);
         let v = &mut self.voices[index];
         if !v.active {
@@ -234,6 +260,10 @@ impl Juno {
                 v.ladder.ring();
             }
             v.gate = 0.;
+            // a new voice glides in from the previous note
+            v.pitch = if porta { from } else { note };
+        } else if !porta {
+            v.pitch = note;
         }
         v.key = key;
         v.note = note;
@@ -242,11 +272,26 @@ impl Juno {
         v.down = true;
         v.held = false;
         v.stamp = self.stamp;
-        v.env.attack();
+        if retrigger || !v.active {
+            v.env.attack();
+        }
         if !v.active {
             v.onset.arm();
         }
         v.active = true;
+        self.last_note = note;
+    }
+
+    /// Unison: every voice plays the newest key, spread by the detune.
+    fn unison_play(&mut self, key: u32, note: f32, velocity: f32, retrigger: bool) {
+        let n = (self.p[id::VOICES].round() as usize).clamp(1, VOICES);
+        for i in 0..VOICES {
+            if i < n {
+                self.start(i, key, note, velocity, retrigger);
+            } else if self.voices[i].down {
+                Self::release(&mut self.voices[i]);
+            }
+        }
     }
 
     fn release(v: &mut Voice) {
@@ -256,7 +301,15 @@ impl Juno {
     }
 
     pub fn note_off(&mut self, key: u32) {
-        let pedal = self.pedal;
+        let pedal = self.pedal || self.hold;
+        if self.unison {
+            self.stack.remove(key);
+            if let Some((k, n)) = self.stack.pick(1) {
+                let velocity = self.voices.iter().find(|v| v.down).map_or(0.6, |v| v.velocity);
+                self.unison_play(k, n, velocity, false);
+                return;
+            }
+        }
         for v in self.voices.iter_mut().filter(|v| v.active && v.down && v.key == key) {
             if pedal {
                 v.down = false;
@@ -287,7 +340,7 @@ impl Juno {
             SOFT => self.soft = value.clamp(0., 1.),
             SUSTAIN => {
                 self.pedal = value >= 0.5;
-                if !self.pedal {
+                if !self.pedal && !self.hold {
                     for v in self.voices.iter_mut().filter(|v| v.active && v.held) {
                         Self::release(v);
                     }
@@ -308,6 +361,7 @@ impl Juno {
             v.ladder = Ladder::ZERO;
         }
         self.pedal = false;
+        self.stack = KeyStack::EMPTY;
     }
 
     fn prepare(&mut self) {
@@ -329,6 +383,14 @@ impl Juno {
             gate_k: smoothing(0.0015, sr),
         };
         self.shape = EnvShape::new(&self.shape_p[..SHAPE_PER_ENV], sr);
+        let unison = p[id::UNISON] >= 0.5;
+        if unison != self.unison {
+            self.unison = unison;
+            self.stack = KeyStack::EMPTY;
+            for v in self.voices.iter_mut().filter(|v| v.active && v.down) {
+                Self::release(v);
+            }
+        }
         self.dirty = false;
     }
 
@@ -340,6 +402,18 @@ impl Juno {
         let ts = TICK as f32 / sr;
         let rate = sr / TICK as f32;
         let p = self.p;
+        let hold = p[id::HOLD] >= 0.5;
+        if self.hold && !hold && !self.pedal {
+            for v in self.voices.iter_mut().filter(|v| v.active && v.held) {
+                Self::release(v);
+            }
+        }
+        self.hold = hold;
+        let unison = self.unison;
+        let porta = p[id::PORTA] >= 0.5;
+        let porta_k = if porta { smoothing(bound(p[id::PORTA_TIME], 0., 5.) / 3. + 0.001, rate) } else { 1. };
+        let tune = bound(p[id::TUNE], -100., 100.) / 100.;
+        let detune = 0.25 * bound(p[id::UNISON_DETUNE], 0., 1.);
         let fast = smoothing(0.006, rate);
         self.bend += (self.bend_to - self.bend) * fast;
         self.expression_s += (self.expression - self.expression_s) * fast;
@@ -368,15 +442,18 @@ impl Juno {
         // the 4-pole loses passband as resonance rises; give back part of it
         let master = level * level * volume * volume * self.expression_s * (1. - 0.35 * self.soft) * 0.78 * (1. + 0.3 * k);
         let channel_pressure = self.pressure;
+        let n_uni = (p[id::VOICES].round() as usize).clamp(1, VOICES);
         let inv = 1. / TICK as f32;
         for v in self.voices.iter_mut().filter(|v| v.active) {
             v.pressure += (v.poly.max(channel_pressure) - v.pressure) * press_k;
-            let dt = (note_hz(v.note + range + bend_pitch + pitch_mod) / sr).min(0.45);
-            let oct = base + kybd * (v.note - 60.) / 12. + env_oct * v.env.value + vel_vcf * 3. * (v.velocity - 0.6)
+            v.pitch += (v.note - v.pitch) * porta_k;
+            let offset = if unison { detune * v.spread } else { 0. };
+            let dt = (note_hz(v.pitch + range + bend_pitch + pitch_mod + tune + offset) / sr).min(0.45);
+            let oct = base + kybd * (v.pitch - 60.) / 12. + env_oct * v.env.value + vel_vcf * 3. * (v.velocity - 0.6)
                 + after_vcf * 3. * v.pressure + 0.2 * spread * v.cut;
             let hz = exp2(oct);
             let g = warp(hz, sr);
-            let gain = master * (1. - vel_vca * (1. - v.velocity)) * (1. + spread * (v.trim - 1.));
+            let gain = master * if unison { 1. / (n_uni as f32).sqrt() } else { 1. } * (1. - vel_vca * (1. - v.velocity)) * (1. + spread * (v.trim - 1.));
             v.pan = pan(stereo * v.spread);
             // a cutoff pushed past the audio band keeps its resonant peak out of hearing
             // rather than ringing at the clamp just below Nyquist

@@ -39,9 +39,73 @@ export function Fader({spec,value,onChange,tone='cream',label=spec.label}){
 
 /** A stack of switch buttons for small choices (feet, LFO function, on/off). */
 export function Choice({spec,value,options,onChange,tone='cream',label=spec.label}){
- return <div className={'choice tone-'+tone+(options.length>4?' cols-2':'')} role="radiogroup" aria-label={label}>
+ return <div className={'choice tone-'+tone+(options.length>4?' cols-2':'')+(options.length===2?' two':'')} role="radiogroup" aria-label={label}>
   <div className="choice-buttons">{options.map((option,i)=><button type="button" key={option} role="radio" aria-checked={value===i} className={value===i?'on':''} onClick={()=>onChange(spec.key,i)}>{option}</button>)}</div>
   <span className="fader-label">{label}</span>
+ </div>;
+}
+
+/** A rotary knob in the style of the Juno's: ticks around a 270 degree sweep, a black skirted cap with a white pointer. Drag up or
+ *  down (shift for fine), wheel, arrow keys, double-tap for the default. The value shows above it and the label below, like a fader. */
+export function Dial({spec,value,onChange,tone='cream',label=spec.label}){
+ const drag=useRef(null),lastTap=useRef(0);
+ const position=toPosition(spec,value),angle=-135+position*270;
+ // a control that runs both ways from zero (tune) lights outward from the top, in whichever direction it is turned
+ const bipolar=spec.min<0&&spec.max>0,zero=bipolar?toPosition(spec,0):0;
+ const lit=t=>bipolar?(t>=Math.min(zero,position)-1e-6&&t<=Math.max(zero,position)+1e-6&&!(Math.abs(position-zero)<1e-6&&Math.abs(t-zero)>1e-6)):t<=position+1e-6;
+ const set=p=>onChange(spec.key,fromPosition(spec,Math.min(1,Math.max(0,p))));
+ const down=e=>{
+  if(e.button>0)return;e.preventDefault();e.currentTarget.setPointerCapture?.(e.pointerId);e.currentTarget.focus({preventScroll:true});
+  const now=performance.now();
+  if(now-lastTap.current<320){lastTap.current=0;drag.current=null;onChange(spec.key,spec.default);return;}
+  lastTap.current=now;drag.current={id:e.pointerId,y:e.clientY,start:position};
+ };
+ const move=e=>{const d=drag.current;if(d&&d.id===e.pointerId)set(d.start+(d.y-e.clientY)/(e.shiftKey?600:150));};
+ const up=e=>{if(drag.current?.id===e.pointerId)drag.current=null;};
+ const key=e=>{
+  const step={ArrowUp:.02,ArrowRight:.02,ArrowDown:-.02,ArrowLeft:-.02,PageUp:.1,PageDown:-.1}[e.key];
+  if(step!==undefined){e.preventDefault();set(position+step);}
+  else if(e.key==='Home'||e.key==='End'){e.preventDefault();set(e.key==='End'?1:0);}
+  else if(e.key==='Delete'||e.key==='Backspace'){e.preventDefault();onChange(spec.key,spec.default);}
+ };
+ const ticks=Array.from({length:11},(_,i)=>{const a=(-135+i*27)*Math.PI/180;return [28+Math.sin(a)*22,28-Math.cos(a)*22,28+Math.sin(a)*26,28-Math.cos(a)*26];});
+ return <div className={'dial tone-'+tone} role="slider" tabIndex={0} aria-label={label} aria-valuemin={spec.min} aria-valuemax={spec.max} aria-valuenow={+value.toFixed(4)} aria-valuetext={formatValue(spec,value)}
+  onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} onKeyDown={key}>
+  <span className="fader-value">{formatValue(spec,value)}</span>
+  <svg viewBox="0 0 56 56" width="56" height="56" aria-hidden="true">
+   {ticks.map((t,i)=><line key={i} x1={t[0]} y1={t[1]} x2={t[2]} y2={t[3]} className={'dial-tick'+(lit(i/10)?' lit':'')+(bipolar&&i===5?' mid':'')}/>)}
+   <g transform={`rotate(${angle} 28 28)`}>
+    <circle cx="28" cy="28" r="17" className="dial-skirt"/><circle cx="28" cy="28" r="13" className="dial-cap"/>
+    <line x1="28" y1="14" x2="28" y2="25" className="dial-pointer"/>
+   </g>
+  </svg>
+  <span className="fader-label">{label}</span>
+ </div>;
+}
+
+/** A two-way choice as one push button: lit and pressed in when on. On/off choices keep their label; any other pair shows the
+ *  current position beside it, so one button replaces a two-button switch and several can stack in a column. */
+export function Toggle({spec,value,onChange,tone='cream',label=spec.label}){
+ const onOff=spec.options[0]==='Off'&&spec.options[1]==='On',on=value===1;
+ return <button type="button" role="switch" aria-checked={on} aria-label={label} title={onOff?label:`${label}: ${spec.options[value]}`} className={'toggle-key tone-'+tone+(on?' on':'')+(onOff?' sq':'')} onClick={()=>onChange(spec.key,on?0:1)}>
+  {onOff?label:`${label}: ${spec.options[value]}`}
+ </button>;
+}
+
+/** A two-way choice as a toggle switch: the lever up selects the second option, down the first. Each option is printed directly
+ *  above or below its end of the throw (the current one brighter), the control's own name above the top option, and
+ *  any push buttons passed as children sit at the foot of the column. The throw is capped in height. The throw runs from where a fader's track starts down to where the
+ *  last thing above the name ends, so it lines up with the faders beside it. The cap takes the colour of the area it is in. */
+export function Lever({spec,value,onChange,tone='cream',label=spec.label,children}){
+ const on=value===1;
+ return <div className={'lever tone-'+tone+(on?' on':'')+(children?'':' lone')}>
+  <span className="lever-top"><span className="lever-name" aria-hidden={children?undefined:true}>{label}</span><span className={'lever-end'+(on?' now':'')}>{spec.options[1]}</span></span>
+  <button type="button" className="lever-throw" role="switch" aria-checked={on} aria-label={label} title={`${label}: ${spec.options[value]}`} onClick={()=>onChange(spec.key,on?0:1)}>
+   <span className="lever-slot"><span className="lever-stem"/><span className="lever-knob"/></span>
+  </button>
+  <span className={'lever-end lever-bottom'+(on?'':' now')}>{spec.options[0]}</span>
+  {children&&<span className="lever-buttons">{children}</span>}
+  {!children&&<span className="fader-label lever-foot">{label}</span>}
  </div>;
 }
 
