@@ -63,6 +63,29 @@ export function connectWindNotes(events, { voices, secondsPerBeat, previous = []
     return events;
 }
 
+const SLOW_ATTACK = .15, TRIM_PER_EXTRA_TONE = .07;
+/**
+ * Slow-attack chord voices: a short note is released before its swell finishes, so it sounds thin beside held chords whose
+ * stacked tones add up. A short note is asked to hold for the attack (at most twice what was written), and a chord of three
+ * or more simultaneous tones that does get to swell is trimmed a little. Pitches, timing and written gates stay.
+ */
+export function fitSlowAttacks(events, { voices, secondsPerBeat }) {
+    const stacked = new Map();
+    for (const e of events) if (e.role === 'pad' || e.role === 'rhythm') { const key = `${e.role}:${e.beat}`; stacked.set(key, (stacked.get(key) ?? 0) + 1); }
+    for (const event of events) {
+        if (event.role !== 'pad' && event.role !== 'rhythm') continue;
+        const attack = voices[event.role]?.preset?.gainAttack ?? 0;
+        if (attack < SLOW_ATTACK) continue;
+        const seconds = event.length * secondsPerBeat;
+        if (seconds < attack) event.expression = { ...event.expression, holdAtLeast: Math.min(attack, seconds * 2) };
+        else {
+            const tones = stacked.get(`${event.role}:${event.beat}`) ?? 1;
+            if (tones >= 3) event.velocity *= 1 / (1 + TRIM_PER_EXTRA_TONE * (tones - 1));
+        }
+    }
+    return events;
+}
+
 /** Timing choices are metadata, independent of pitch/rhythm and other expression rules. */
 export function timeSoundNotes(events, { voices, bpm, gateEnvelopes = false, tempoEffects = false }) {
     for (const event of events) {

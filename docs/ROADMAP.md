@@ -30,6 +30,7 @@ Nothing here is known to be right until it has been heard in the app.
 - Pedal / sympathetic resonance for the piano.
 - Single-room reverb mode on the shared bus; TB-303 as a bass source.
 - Drum-style share field is full (16 of 16): a 17th style needs a new appended field.
+- **Sequencer as a separate device** ([SEQUENCER_DEVICE_PLAN.md](SEQUENCER_DEVICE_PLAN.md), 2026-11-04, plan only): the sequencer emits timed events and the generator fills its tracks; drums, pad, bass etc. are targets with a control registry, modelled on the OXI One (chord steps, modulation lanes). First a read-only harmony lane above the beat grid on the main page, to find what the model cannot store or never generates; then a split sequencer / drum machine view on the /synths drum pages as the trial ground.
 
 ## 3. Parked
 - **Strings** (`docs/STRING_MODEL.md`, `/synths/strings/`): synthesizing them satisfyingly is impractical for now. The work (source-filter test, real-time worklet version, bow-noise bed) is committed and kept as-is. Long and Live were judged "pretty good"; Short, Pizzicato and ensembles are not to be tuned further in the current model.

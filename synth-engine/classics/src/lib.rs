@@ -39,6 +39,7 @@ pub const MODEL_TR909: u32 = 9;
 pub const MODEL_TR606: u32 = 10;
 pub const MODEL_TB303: u32 = 11;
 pub const MODEL_WT: u32 = 12;
+pub const MODEL_TR707: u32 = 13;
 
 struct Host {
     sr: f32,
@@ -123,7 +124,7 @@ macro_rules! model {
                 let $m = &mut $h.wt;
                 $body
             }
-            MODEL_TR808 | MODEL_TR909 | MODEL_TR606 => {
+            MODEL_TR808 | MODEL_TR909 | MODEL_TR606 | MODEL_TR707 => {
                 let $m = &mut $h.drums;
                 $body
             }
@@ -157,7 +158,7 @@ pub extern "C" fn syn_param_count() -> u32 {
             MODEL_OBXA => obxa::PAIR_PARAMS as u32,
             MODEL_VS => vs::PARAMS as u32,
             MODEL_WT => wt::PARAMS as u32,
-            MODEL_TR808 | MODEL_TR909 | MODEL_TR606 => drums::PARAMS as u32,
+            MODEL_TR808 | MODEL_TR909 | MODEL_TR606 | MODEL_TR707 => drums::PARAMS as u32,
             MODEL_TB303 => tb303::PARAMS as u32,
             _ => cs80::PARAMS as u32,
         }
@@ -166,7 +167,7 @@ pub extern "C" fn syn_param_count() -> u32 {
 
 #[no_mangle]
 pub extern "C" fn syn_init(sr: f32, model: u32) -> u32 {
-    if !(8000. ..=384000.).contains(&sr) || model > MODEL_WT {
+    if !(8000. ..=384000.).contains(&sr) || model > MODEL_TR707 {
         return 0;
     }
     unsafe {
@@ -184,6 +185,7 @@ pub extern "C" fn syn_init(sr: f32, model: u32) -> u32 {
             MODEL_TR808 => HOST.drums.init(sr, drums::STYLE_808),
             MODEL_TR909 => HOST.drums.init(sr, drums::STYLE_909),
             MODEL_TR606 => HOST.drums.init(sr, drums::STYLE_606),
+            MODEL_TR707 => HOST.drums.init(sr, drums::STYLE_707),
             MODEL_TB303 => HOST.bass.init(sr),
             _ => HOST.cs80.init(sr),
         }
@@ -276,7 +278,7 @@ pub extern "C" fn syn_render(frames: u32) {
             h.vs.render(left, right);
         } else if h.model == MODEL_WT {
             h.wt.render(left, right);
-        } else if matches!(h.model, MODEL_TR808 | MODEL_TR909 | MODEL_TR606) {
+        } else if matches!(h.model, MODEL_TR808 | MODEL_TR909 | MODEL_TR606 | MODEL_TR707) {
             h.drums.render(left, right);
         } else if h.model == MODEL_TB303 {
             h.bass.render(left, right);
@@ -305,7 +307,7 @@ pub extern "C" fn syn_render(frames: u32) {
 pub extern "C" fn syn_seq(cmd: u32, a: u32, b: f32) {
     unsafe {
         match HOST.model {
-            MODEL_TR808 | MODEL_TR909 | MODEL_TR606 => HOST.drums.command(cmd, a, b),
+            MODEL_TR808 | MODEL_TR909 | MODEL_TR606 | MODEL_TR707 => HOST.drums.command(cmd, a, b),
             MODEL_TB303 => HOST.bass.command(cmd, a, b),
             _ => {}
         }
@@ -352,7 +354,7 @@ pub extern "C" fn syn_stat(which: u32) -> f32 {
             3 => (HOST.frames / HOST.sr as f64) as f32,
             4 | 5 | 6 => {
                 let s = match HOST.model {
-                    MODEL_TR808 | MODEL_TR909 | MODEL_TR606 => &HOST.drums.seq,
+                    MODEL_TR808 | MODEL_TR909 | MODEL_TR606 | MODEL_TR707 => &HOST.drums.seq,
                     MODEL_TB303 => &HOST.bass.seq,
                     _ => return 0.,
                 };

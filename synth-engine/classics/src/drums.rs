@@ -42,6 +42,9 @@ struct Pending {
 pub const STYLE_808: u8 = 0;
 pub const STYLE_909: u8 = 1;
 pub const STYLE_606: u8 = 2;
+/// The TR-707: the 909's digital voice architecture (noise and plate metal rather than the 808's analog
+/// circuits), tuned shorter and brighter, plus a cowbell and a tambourine. Voices run as STYLE_909.
+pub const STYLE_707: u8 = 3;
 
 #[derive(Clone, Copy, PartialEq)]
 enum Kind {
@@ -58,6 +61,7 @@ enum Kind {
     Ride,
     Maracas,
     Claves,
+    Tambourine,
 }
 
 #[derive(Clone, Copy)]
@@ -123,7 +127,26 @@ const fn kit_606() -> [Spec; TRACKS] {
     k[6] = spec(Kind::Cymbal, 1., 0.135, 1.05, 0.);
     k
 }
+/// BD SD LT MT HT RS CP CB TB CH OH CR RD.
+const fn kit_707() -> [Spec; TRACKS] {
+    let mut k = [NONE; TRACKS];
+    k[0] = spec(Kind::Kick, 58., 0.052, 0.78, 0.);
+    k[1] = spec(Kind::Snare, 188., 0.034, 0.95, 0.);
+    k[2] = spec(Kind::Tom, 112., 0.068, 0.93, 0.);
+    k[3] = spec(Kind::Tom, 148., 0.055, 0.97, 0.);
+    k[4] = spec(Kind::Tom, 196., 0.046, 0.97, 0.);
+    k[5] = spec(Kind::Rim, 520., 0.008, 1.7, 0.);
+    k[6] = spec(Kind::Clap, 1500., 0.036, 1.05, 0.);
+    k[7] = spec(Kind::Cowbell, 590., 0.085, 0.95, 0.2);
+    k[8] = spec(Kind::Tambourine, 1., 0.13, 0.9, -0.25);
+    k[9] = spec(Kind::ClosedHat, 1., 0.030, 0.105, 0.);
+    k[10] = spec(Kind::OpenHat, 1., 0.075, 0.095, 0.);
+    k[11] = spec(Kind::Cymbal, 1., 0.30, 0.12, 0.);
+    k[12] = spec(Kind::Ride, 1., 0.24, 0.07, 0.);
+    k
+}
 static KIT_808: [Spec; TRACKS] = kit_808();
+static KIT_707: [Spec; TRACKS] = kit_707();
 static KIT_909: [Spec; TRACKS] = kit_909();
 static KIT_606: [Spec; TRACKS] = kit_606();
 
@@ -131,6 +154,7 @@ pub fn track_count(style: u8) -> usize {
     match style {
         STYLE_909 => 11,
         STYLE_606 => 7,
+        STYLE_707 => 13,
         _ => 16,
     }
 }
@@ -207,6 +231,7 @@ impl Voice {
         }
     }
     fn hit(&mut self, sr: f32, spec: Spec, style: u8, tune: f32, decay: f32, tone: f32, gain: f32, deep_kick: bool) {
+        let style = if style == STYLE_707 { STYLE_909 } else { style };
         let k = |tau: f32| (-1. / (tau.max(1e-4) * sr)).exp();
         self.spec = spec;
         self.style = style;
@@ -311,6 +336,13 @@ impl Voice {
                 self.k2 = 1. - k(0.004);
             }
             Kind::Claves => self.k1 = k(self.tau),
+            Kind::Tambourine => {
+                // noise through a band-pass: two quick shakes, then the jingles ringing out
+                self.k1 = k(self.tau);
+                self.k2 = k(0.004);
+                self.filters[0].set(6800. * (0.85 + 0.3 * tone), 1.3, sr);
+                self.filters[1].set(3000., 0.707, sr);
+            }
         }
     }
 
@@ -528,6 +560,19 @@ impl Voice {
                 }
                 hp * env * (1.8 + 1.0 * self.tone)
             }
+            Kind::Tambourine => {
+                let n = self.rng.next() * self.noise_scale;
+                let (_, band, _) = self.filters[0].tick(n);
+                let (_, _, hi) = self.filters[1].tick(band);
+                // two shakes 18 ms apart ride on the ringing tail
+                let shake = if self.t < 0.045 { (-(self.t % 0.018) / 0.0045).exp() } else { 0. };
+                let env = self.e1 * (0.45 + 0.55 * shake);
+                self.e1 *= self.k1;
+                if self.e1 < 1e-4 {
+                    self.active = false;
+                }
+                hi * env * 3.4
+            }
             Kind::Claves => {
                 self.ph[0] = (self.ph[0] + self.f * dt).fract();
                 let x = (sin_turns(self.ph[0]) + sin_turns(self.ph[0] * 2.) * 0.12) * self.e1;
@@ -562,6 +607,8 @@ pub struct Drums {
     /// Steps: pattern → track (16 = accent row) → step. 0 off, 1 on.
     pat: [[[u8; MAX_STEPS]; TRACKS + 1]; MAX_PATTERNS],
     pub steals: u32,
+    /// Per-hit overrides waiting for the next note on each track: accent, tune offset, decay offset.
+    hit: [[f32; 3]; TRACKS],
 }
 
 impl Drums {
@@ -582,6 +629,7 @@ impl Drums {
             metal_scale: 1.,
             pat: [[[0; MAX_STEPS]; TRACKS + 1]; MAX_PATTERNS],
             steals: 0,
+            hit: [[0.; 3]; TRACKS],
         }
     }
     pub fn init(&mut self, sr: f32, style: u8) {
@@ -604,17 +652,19 @@ impl Drums {
         self.npend = 0;
         self.metal_ph = [0.; 6];
         self.metal_scale = match style {
-            STYLE_909 => 1.28,
+            STYLE_909 | STYLE_707 => 1.28,
             STYLE_606 => 1.12,
             _ => 1.0,
         };
         self.pat = [[[0; MAX_STEPS]; TRACKS + 1]; MAX_PATTERNS];
         self.steals = 0;
+        self.hit = [[0.; 3]; TRACKS];
     }
     fn kit(&self) -> &'static [Spec; TRACKS] {
         match self.style {
             STYLE_909 => &KIT_909,
             STYLE_606 => &KIT_606,
+            STYLE_707 => &KIT_707,
             _ => &KIT_808,
         }
     }
@@ -641,7 +691,7 @@ impl Drums {
     pub fn active(&self) -> u32 {
         self.voices.iter().filter(|v| v.active).count() as u32
     }
-    fn trigger(&mut self, track: usize, velocity: f32, accent: f32) {
+    fn trigger(&mut self, track: usize, velocity: f32, accent: f32, tune_off: f32, decay_off: f32) {
         if track >= track_count(self.style) {
             return;
         }
@@ -650,12 +700,12 @@ impl Drums {
             // Preserve the original long, full-level kick for Deep and for saved
             // patches/URLs from before the calibrated Classic recipe was added.
             spec.decay = match self.style {
-                STYLE_909 => 0.34,
+                STYLE_909 | STYLE_707 => 0.34,
                 STYLE_606 => 0.2,
                 _ => 0.42,
             };
             spec.level = 1.0;
-            spec.f = match self.style { STYLE_909 => 52., STYLE_606 => 62., _ => 50. };
+            spec.f = match self.style { STYLE_909 | STYLE_707 => 52., STYLE_606 => 62., _ => 50. };
         }
         let k = self.knobs[track];
         let gain = k[LEVEL] * spec.level * (0.35 + 0.65 * velocity.clamp(0., 1.)) * (1. + 0.9 * self.accent * accent);
@@ -672,15 +722,25 @@ impl Drums {
         }
         let sr = self.sr;
         let style = self.style;
-        self.voices[track].hit(sr, spec, style, k[TUNE], k[DECAY], k[TONE], gain, self.deep_kick);
+        let (tune, decay) = ((k[TUNE] + 0.5 * tune_off).clamp(0., 1.), (k[DECAY] + 0.5 * decay_off).clamp(0., 1.));
+        self.voices[track].hit(sr, spec, style, tune, decay, k[TONE], gain, self.deep_kick);
     }
     /// Piano keys: each key from C2 is a pad, wrapping every two octaves.
     pub fn note_on(&mut self, _key: u32, note: f32, velocity: f32) {
         let t = (note.round() as i32 - 36).rem_euclid(24) as usize;
-        self.trigger(t, velocity.max(0.2), 0.);
+        let o = core::mem::replace(&mut self.hit[t], [0.; 3]);
+        self.trigger(t, velocity.max(0.2), o[0], o[1], o[2]);
     }
     pub fn note_off(&mut self, _key: u32) {}
-    pub fn poly_pressure(&mut self, _key: u32, _value: f32) {}
+    /// A per-hit override for the next note on a track: key = track * 4 + field (1 accent 0..1, 2 tune offset
+    /// -1..1, 3 decay offset -1..1), each applied on top of the knobs for that one hit. Hosts send it just
+    /// before the note, at the same time.
+    pub fn poly_pressure(&mut self, key: u32, value: f32) {
+        let (t, field) = ((key / 4) as usize, (key % 4) as usize);
+        if t < TRACKS && (1..=3).contains(&field) {
+            self.hit[t][field - 1] = if field == 1 { bound(value, 0., 1.) } else { bound(value, -1., 1.) };
+        }
+    }
     pub fn control(&mut self, _which: u32, _value: f32) {}
     pub fn panic(&mut self) {
         for v in self.voices.iter_mut() {
@@ -748,7 +808,7 @@ impl Drums {
                             let q = self.pend[i];
                             self.pend[i].on = false;
                             self.npend -= 1;
-                            self.trigger(q.track as usize, q.velocity, q.accent);
+                            self.trigger(q.track as usize, q.velocity, q.accent, 0., 0.);
                             any_metal = self.voices.iter().any(|v| v.active && matches!(v.spec.kind, Kind::ClosedHat | Kind::OpenHat | Kind::Cymbal));
                         } else {
                             self.pend[i].wait -= 1;

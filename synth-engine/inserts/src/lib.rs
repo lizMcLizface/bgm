@@ -5,7 +5,10 @@ mod denormal;
 use std::f32::consts::PI;
 const BLOCK: usize = 2048;
 const DELAY: usize = 8192;
-const PARAMS: usize = 24;
+const PARAMS: usize = 29;
+/// Parameters 24..=28 (appended): phaser spread, flanger spread, chorus spread (left/right LFO offset in cycles, 0 to 0.5),
+/// chorus feedback, phaser stages (2 to 12). Their defaults reproduce the earlier fixed values.
+const PHASER_STAGES: usize = 12;
 fn soft(x: f32) -> f32 {
     let x = x.clamp(-3., 3.);
     x * (27. + x * x) / (27. + 9. * x * x)
@@ -114,10 +117,11 @@ impl Delay {
         base: f32,
         feedback: f32,
         chorus: bool,
+        spread: f32,
     ) -> [f32; 2] {
         let mut out = input;
         for ch in 0..2 {
-            let modulation = (2. * PI * (self.phase + ch as f32 * 0.5)).sin();
+            let modulation = (2. * PI * (self.phase + ch as f32 * spread)).sin();
             let delay = ((base + depth * modulation) * 0.001 * sr).clamp(2., DELAY as f32 - 3.);
             let delayed = self.read(ch, delay);
             self.data[ch][self.position] = denormal::clean((input[ch] + delayed * feedback).clamp(-8., 8.));
@@ -144,7 +148,7 @@ struct Inserts {
     frame: u64,
     peak: f32,
     eq: [[Biquad; 3]; 2],
-    phaser: [[f32; 6]; 2],
+    phaser: [[f32; PHASER_STAGES]; 2],
     phaser_last: [f32; 2],
     phaser_phase: f32,
     phaser_g: [f32; 2],
@@ -168,7 +172,7 @@ impl Inserts {
             frame: 0,
             peak: 0.,
             eq: [[Biquad::ZERO; 3]; 2],
-            phaser: [[0.; 6]; 2],
+            phaser: [[0.; PHASER_STAGES]; 2],
             phaser_last: [0.; 2],
             phaser_phase: 0.,
             phaser_g: [0.; 2],
@@ -186,7 +190,7 @@ impl Inserts {
         self.sr = bound(sr, 8000., 192000.);
         self.p = [
             0., 0., 6., 0., 180., 0., 1000., 0.7, 0., 6000., 0., 0.15, 1.5, 700., 0.2, 0., 0.12,
-            1., 2., 0.35, 0., 0.35, 3.5, 0.,
+            1., 2., 0.35, 0., 0.35, 3.5, 0., 0.25, 0.5, 0.5, 0., 6.,
         ];
         self.s = self.p;
         self.alpha = 1. - (-1. / (self.sr * 0.02)).exp();
@@ -197,7 +201,7 @@ impl Inserts {
     }
     fn clear(&mut self) {
         self.eq = [[Biquad::ZERO; 3]; 2];
-        self.phaser = [[0.; 6]; 2];
+        self.phaser = [[0.; PHASER_STAGES]; 2];
         self.phaser_last = [0.; 2];
         self.phaser_phase = 0.;
         self.phaser_g = [0.; 2];
@@ -233,6 +237,9 @@ impl Inserts {
             20 => (0., 0.8),
             21 => (0.05, 10.),
             22 => (0., 8.),
+            24..=26 => (0., 0.5),
+            27 => (-0.6, 0.6),
+            28 => (2., PHASER_STAGES as f32),
             _ => (-18., 6.),
         };
         self.p[i] = v.clamp(lo, hi);
@@ -249,7 +256,7 @@ impl Inserts {
             }
             let hz = (self.s[13]
                 * 2_f32
-                    .powf(self.s[12] * (2. * PI * (self.phaser_phase + ch as f32 * 0.25)).sin()))
+                    .powf(self.s[12] * (2. * PI * (self.phaser_phase + ch as f32 * self.s[24])).sin()))
             .clamp(30., self.sr * 0.4);
             let t = (PI * hz / self.sr).tan();
             self.phaser_target[ch] = (t - 1.) / (t + 1.);
@@ -347,12 +354,13 @@ impl Inserts {
                 }
             }
             if self.s[10] > 1e-5 {
+                let stages = (self.p[28].round() as usize).clamp(2, PHASER_STAGES);
                 self.active[0] = true;
                 for ch in 0..2 {
                     self.phaser_g[ch] += (self.phaser_target[ch] - self.phaser_g[ch]) * self.alpha;
                     let g = self.phaser_g[ch];
                     let mut x = (out[ch] + self.phaser_last[ch] * self.s[14]).clamp(-8., 8.);
-                    for stage in &mut self.phaser[ch] {
+                    for stage in self.phaser[ch].iter_mut().take(stages) {
                         let y = g * x + *stage;
                         *stage = x - g * y;
                         x = y;
@@ -361,14 +369,14 @@ impl Inserts {
                     out[ch] = out[ch] * (1. - self.s[10] * 0.5) + x * self.s[10] * 0.5;
                 }
             } else if self.active[0] {
-                self.phaser = [[0.; 6]; 2];
+                self.phaser = [[0.; PHASER_STAGES]; 2];
                 self.phaser_last = [0.; 2];
                 self.active[0] = false;
             }
             if self.s[15] > 1e-5 {
                 self.active[1] = true;
                 out = self.flanger.tick(
-                    out, self.sr, self.s[15], self.s[16], self.s[17], self.s[18], self.s[19], false,
+                    out, self.sr, self.s[15], self.s[16], self.s[17], self.s[18], self.s[19], false, self.s[25],
                 );
             } else if self.active[1] {
                 self.flanger.clear();
@@ -377,7 +385,7 @@ impl Inserts {
             if self.s[20] > 1e-5 {
                 self.active[2] = true;
                 out = self.chorus.tick(
-                    out, self.sr, self.s[20], self.s[21], self.s[22], 12., 0., true,
+                    out, self.sr, self.s[20], self.s[21], self.s[22], 12., self.s[27], true, self.s[26],
                 );
             } else if self.active[2] {
                 self.chorus.clear();

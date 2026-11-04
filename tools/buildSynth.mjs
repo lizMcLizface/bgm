@@ -41,7 +41,9 @@ if(process.argv.includes('--check')) {
  const localCargo=path.join(cargoHome,'bin',process.platform==='win32'?'cargo.exe':'cargo');
  const cargo=process.env.SYNTH_CARGO||(fs.existsSync(localCargo)?localCargo:'cargo');
  const env={...process.env};if(cargo===localCargo){env.CARGO_HOME=cargoHome;env.RUSTUP_HOME=rustHome;env.PATH=path.dirname(cargo)+path.delimiter+env.PATH;}
- for(const kernel of kernels){
+ // --only=effects,inserts rebuilds just those kernels
+ const only=(process.argv.find(a=>a.startsWith('--only='))??'').slice(7).split(',').filter(Boolean);
+ for(const kernel of kernels.filter(k=>!only.length||only.includes(k.name))){
  const target=kernel.simd?path.join(root,kernel.fast?'.tmp/public-'+kernel.name+'-target':kernel.bank?'.tmp/public-fm-bank-target':'.tmp/public-fm-simd-target'):path.join(root,kernel.crate,'target');
  const args=['build','--manifest-path',`${kernel.crate}/Cargo.toml`,'--release','--target','wasm32-unknown-unknown',...(kernel.simd?['--features',kernel.fast?(kernel.bank?'multitimbral,simd-colour':'simd-colour'):kernel.bank?'multitimbral':'simd-voices','--target-dir',target]:[])];
  const buildEnv=kernel.simd?{...env,RUSTFLAGS:(env.RUSTFLAGS??'')+' -C target-feature=+simd128'+(kernel.fast&&!kernel.bank&&!kernel.acoustic?' -C no-vectorize-loops -C no-vectorize-slp':'')}:env;

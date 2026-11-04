@@ -7,7 +7,7 @@ test('moving the DIY effects to a common rack preserves all 22 native recipe pac
  for(const [id,schema]of [['poly',POLY],['fm',FM]])for(const preset of schema.presets){
   const original=schema.inflate(preset.values),rack=rackForPatch(SYNTHS[id],preset.values,cleanRack()),packet=rackPackets(rack);
   expect(packet.effects).toEqual(original.effects);expect(packet.inserts).toEqual(original.inserts);
-  expect(packet.compressor.enabled).toBe(0);expect(packet.master).toEqual({enabled:1,input:0,output:0});
+  expect(packet.compressor.enabled).toBe(0);expect(packet.master).toEqual({enabled:1,input:0,output:0,order:0,chain:127,sync:0});
   if(id==='poly')expect(rack['instrument.global.chorus']).toBe(original.global.chorus);
  }
 });

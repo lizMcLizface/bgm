@@ -9,7 +9,9 @@ const FDN: usize = 32768; // > 160 ms at 192 kHz
 const ECHO: usize = 384002; // two seconds at 192 kHz, including interpolation
 const EARLY: usize = 65536;
 const DIFF: usize = 8192;
-const PARAMS: usize = 18;
+const PARAMS: usize = 21;
+// Parameters 18..=20 (appended): echo low cut in the feedback (Hz, 0 off), echo ducking (0..1), reverb type (0 classic, 1 room, 2 hall, 3 plate).
+// Their defaults leave the earlier sound bit for bit as it was.
 // Denser early reflections, scaled by parameter 17 (off by default): offsets in ms after the pre-delay,
 // with their gains. The first four reflections (13, 27, 43 and 59 ms) are always on.
 const DENSE_MS: [f32; 8] = [5., 9., 17., 23., 33., 39., 49., 71.];
@@ -84,6 +86,17 @@ struct Effects {
     damping: f32,
     echo_alpha: f32,
     dc_r: f32,
+    fb_x: [f32; 2],
+    fb_y: [f32; 2],
+    fb_a: f32,
+    duck_env: f32,
+    duck_attack: f32,
+    duck_release: f32,
+    diff_coef: f32,
+    early_scale: f32,
+    size_k: f32,
+    mod_k: f32,
+    hf_ratio: f32,
     quiet: u64,
     asleep: bool,
     frame: u64,
@@ -125,6 +138,17 @@ impl Effects {
             damping: 0.,
             echo_alpha: 0.,
             dc_r: 0.,
+            fb_x: [0.; 2],
+            fb_y: [0.; 2],
+            fb_a: 0.,
+            duck_env: 0.,
+            duck_attack: 0.,
+            duck_release: 0.,
+            diff_coef: 0.65,
+            early_scale: 1.,
+            size_k: 1.,
+            mod_k: 1.,
+            hf_ratio: 0.5,
             quiet: 0,
             asleep: false,
             frame: 0,
@@ -154,6 +178,9 @@ impl Effects {
         self.dc_in.fill(0.);
         self.dc_out.fill(0.);
         self.echo_tone.fill(0.);
+        self.fb_x = [0.; 2];
+        self.fb_y = [0.; 2];
+        self.duck_env = 0.;
         self.smooth = [self.p[0], self.p[1], self.p[2]];
         self.return_gain = self.return_target;
         self.quiet = 0;
@@ -171,7 +198,7 @@ impl Effects {
         };
         self.headroom.init(self.sr);
         self.p = [
-            1., 0.22, 0.12, 8., 0.7, 6000., 25., 1., 0.3, 375., 0.4, 4500., 1., 0.2, 1., 0., 0., 0.,
+            1., 0.22, 0.12, 8., 0.7, 6000., 25., 1., 0.3, 375., 0.4, 4500., 1., 0.2, 1., 0., 0., 0., 0., 0., 0.,
         ];
         self.smooth = [self.p[0], self.p[1], self.p[2]];
         self.pos = 0;
@@ -196,13 +223,28 @@ impl Effects {
         self.echo_alpha = 1. - (-2. * PI * self.p[11].min(self.sr * 0.4) / self.sr).exp();
         self.dc_r = (-2. * PI * 8. / self.sr).exp();
         self.return_target = 10_f32.powf(self.p[16] / 20.);
+        self.fb_a = if self.p[18] > 0. { 1. / (1. + 2. * PI * self.p[18] / self.sr) } else { 1. };
+        self.duck_attack = 1. - (-1. / (self.sr * 0.004)).exp();
+        self.duck_release = 1. - (-1. / (self.sr * 0.25)).exp();
+        // reverb types: (diffuser coefficient, early-reflection level, delay-line scale, modulation scale, high-frequency decay ratio)
+        let (diff, early, size, modulation, hf) = match self.p[20].round() as u32 {
+            1 => (0.55, 1.5, 0.75, 0.8, 0.45),
+            2 => (0.7, 0.8, 1.3, 1., 0.6),
+            3 => (0.78, 0., 1., 1.6, 0.9),
+            _ => (0.65, 1., 1., 1., 0.5),
+        };
+        self.diff_coef = diff;
+        self.early_scale = early;
+        self.size_k = size;
+        self.mod_k = modulation;
+        self.hf_ratio = hf;
         for i in 0..LINES {
-            let seconds = TIMES[i] * (0.55 + self.p[4] * 0.65);
+            let seconds = TIMES[i] * (0.55 + self.p[4] * 0.65) * self.size_k;
             self.gain[i] = 10_f32.powf(-3. * seconds / self.p[3]);
             // Shelf loss follows the requested decay time, rather than applying
             // an unrelated low-pass loss on every traversal. High frequencies
             // decay in roughly half the time; damping sets the shelf corner.
-            self.high_gain[i] = 10_f32.powf(-3. * seconds / (self.p[3] * 0.5));
+            self.high_gain[i] = 10_f32.powf(-3. * seconds / (self.p[3] * self.hf_ratio));
         }
     }
     fn param(&mut self, index: usize, value: f32) {
@@ -228,6 +270,9 @@ impl Effects {
             (0., 1.),
             (-24., 18.),
             (0., 8.),
+            (0., 1000.),
+            (0., 1.),
+            (0., 3.),
         ];
         let val = value.clamp(ranges[index].0, ranges[index].1);
         if self.p[index] == val {
@@ -315,7 +360,15 @@ impl Effects {
             }
             self.fade = self.fade.saturating_sub(1);
             for ch in 0..2 {
-                let feedback = echo[if self.p[12] >= 0.5 { 1 - ch } else { ch }] * self.p[10];
+                let raw = echo[if self.p[12] >= 0.5 { 1 - ch } else { ch }] * self.p[10];
+                let feedback = if self.p[18] > 0. {
+                    let y = self.fb_a * (self.fb_y[ch] + raw - self.fb_x[ch]);
+                    self.fb_x[ch] = raw;
+                    self.fb_y[ch] = y;
+                    y
+                } else {
+                    raw
+                };
                 self.echoes[ch][self.echo_pos] =
                     unsafe { finite(INPUT[4 + ch][i]) } * self.smooth[2] + feedback;
             }
@@ -348,7 +401,7 @@ impl Effects {
                             &self.early[side],
                             self.early_pos,
                             (self.p[6] + ms) * 0.001 * self.sr,
-                        ) * [0.25, 0.18, -0.13, 0.09][j];
+                        ) * [0.25, 0.18, -0.13, 0.09][j] * self.early_scale;
                     }
                 }
                 for ch in 0..2 {
@@ -358,8 +411,8 @@ impl Effects {
                             .round()
                             .max(1.) as usize;
                         let read = (self.diff_pos + DIFF - delay) % DIFF;
-                        let y = self.diff[line][read] - 0.65 * room[ch];
-                        self.diff[line][self.diff_pos] = room[ch] + 0.65 * y;
+                        let y = self.diff[line][read] - self.diff_coef * room[ch];
+                        self.diff[line][self.diff_pos] = room[ch] + self.diff_coef * y;
                         room[ch] = y;
                     }
                 }
@@ -367,8 +420,8 @@ impl Effects {
                     for j in 0..count {
                         self.phase[j] =
                             (self.phase[j] + 32. * (0.11 + j as f32 * 0.007) / self.sr).fract();
-                        self.target[j] = TIMES[j] * (0.55 + self.p[4] * 0.65) * self.sr
-                            + (self.phase[j] * 2. * PI).sin() * self.p[8] * 0.0006 * self.sr;
+                        self.target[j] = TIMES[j] * (0.55 + self.p[4] * 0.65) * self.sr * self.size_k
+                            + (self.phase[j] * 2. * PI).sin() * self.p[8] * 0.0006 * self.sr * self.mod_k;
                     }
                 }
                 let mut reads = [0.; LINES];
@@ -453,8 +506,12 @@ impl Effects {
                 self.early_pos = (self.early_pos + 1) % EARLY;
                 self.diff_pos = (self.diff_pos + 1) % DIFF;
             }
+            let level = dry[0].abs().max(dry[1].abs());
+            let coef = if level > self.duck_env { self.duck_attack } else { self.duck_release };
+            self.duck_env += (level - self.duck_env) * coef;
+            let duck = 1. - self.p[19] * (self.duck_env * 6.).min(1.);
             let protected = self.headroom.tick(std::array::from_fn(|ch|
-                dry[ch] * self.smooth[0] + wet[ch] + echo[ch]));
+                dry[ch] * self.smooth[0] + wet[ch] + echo[ch] * duck));
             for ch in 0..2 {
                 let y = protected[ch];
                 unsafe {

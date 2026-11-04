@@ -41,5 +41,6 @@ export const SYNTHS={
  tr808:drums(KITS.tr808),
  tr909:drums(KITS.tr909),
  tr606:drums(KITS.tr606),
+ tr707:drums(KITS.tr707),
  tb303:{id:'tb303',model:MODELS.tb303,name:'Silverbox',subtitle:'bass line',params:tb303Params,presets:TB303_PRESETS,categories:TB303_CATEGORIES},
 };

@@ -18,6 +18,8 @@ export const EFFECTS = [
  ['bypass','Bypass effects',0,1,1,0],
  ['reverbReturn','Reverb return · dB',-24,18,.5,0],
  ['reflections','Early reflections',0,8,.01,0],
+ // appended with the kernel's parameters 18-20
+ ['feedbackLow','Echo low cut · Hz',0,1000,1,0],['duck','Echo ducking',0,1,.01,0],['reverbType','Reverb type',0,3,1,0],
 ];
 export const defaultEffects=()=>Object.fromEntries(EFFECTS.map(([key,,,,,value])=>[key,value]));
 export function sanitizeEffects(raw={}) {

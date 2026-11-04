@@ -239,6 +239,9 @@ programs:
       effects.bypass: 0
       effects.reverbReturn: 0
       effects.reflections: 0
+      effects.feedbackLow: 0
+      effects.duck: 0
+      effects.reverbType: 0
       inserts.bypass: 0
       inserts.saturation: 0
       inserts.drive: 6
@@ -263,6 +266,11 @@ programs:
       inserts.chorusRate: 0.35
       inserts.chorusDepth: 3.5
       inserts.gain: 0
+      inserts.phaserSpread: 0.25
+      inserts.flangerSpread: 0.5
+      inserts.chorusSpread: 0.5
+      inserts.chorusFeedback: 0
+      inserts.phaserStages: 6
       performance.mode: 0
       performance.portamento: 0
       performance.glide: 0
@@ -273,7 +281,7 @@ programs:
       global.polyphony: 8
       global.unison: 1
       global.spread: 8
-      global.gain: 0.28
+      global.gain: 0.55
       global.bend: 0
       global.wheel: 0
       global.pressure: 0
@@ -499,6 +507,9 @@ programs:
       effects.bypass: 0
       effects.reverbReturn: 0
       effects.reflections: 0
+      effects.feedbackLow: 0
+      effects.duck: 0
+      effects.reverbType: 0
       inserts.bypass: 0
       inserts.saturation: 0
       inserts.drive: 6
@@ -523,6 +534,11 @@ programs:
       inserts.chorusRate: 0.35
       inserts.chorusDepth: 3.5
       inserts.gain: 0
+      inserts.phaserSpread: 0.25
+      inserts.flangerSpread: 0.5
+      inserts.chorusSpread: 0.5
+      inserts.chorusFeedback: 0
+      inserts.phaserStages: 6
       performance.mode: 0
       performance.portamento: 0
       performance.glide: 0
@@ -533,11 +549,11 @@ programs:
       global.polyphony: 8
       global.unison: 1
       global.spread: 8
-      global.gain: 0.23
+      global.gain: 0.59
       global.bend: 0
       global.wheel: 0
       global.pressure: 0
-      global.chorus: 0
+      global.chorus: 0.3
       global.chorusRate: 0.3
       global.chorusDepth: 3
       global.width: 0.65
@@ -550,7 +566,7 @@ programs:
       layers.0.pulse: 0.5
       layers.0.sub: 0
       layers.0.noise: 0
-      layers.0.cutoff: 850
+      layers.0.cutoff: 700
       layers.0.resonance: 0.2
       layers.0.filter: 1
       layers.0.highpass: 120
@@ -558,10 +574,10 @@ programs:
       layers.0.filterAmount: 2.1
       layers.0.keytrack: 0.5
       layers.0.velocityTone: 1
-      layers.0.attack: 0.23
+      layers.0.attack: 0.55
       layers.0.decay: 1
       layers.0.sustain: 0.85
-      layers.0.release: 1.8
+      layers.0.release: 2.4
       layers.0.filterAttack: 0.7
       layers.0.filterDecay: 1.8
       layers.0.filterSustain: 0.4
@@ -650,7 +666,7 @@ programs:
       layers.1.pulse: 0.5
       layers.1.sub: 0
       layers.1.noise: 0
-      layers.1.cutoff: 1900
+      layers.1.cutoff: 1500
       layers.1.resonance: 0.2
       layers.1.filter: 1
       layers.1.highpass: 220
@@ -658,10 +674,10 @@ programs:
       layers.1.filterAmount: 1
       layers.1.keytrack: 0.5
       layers.1.velocityTone: 1
-      layers.1.attack: 0.5
+      layers.1.attack: 0.8
       layers.1.decay: 1.4
       layers.1.sustain: 0.55
-      layers.1.release: 2.3
+      layers.1.release: 2.8
       layers.1.filterAttack: 0.03
       layers.1.filterDecay: 0.4
       layers.1.filterSustain: 0.2
@@ -759,6 +775,9 @@ programs:
       effects.bypass: 0
       effects.reverbReturn: 0
       effects.reflections: 0
+      effects.feedbackLow: 0
+      effects.duck: 0
+      effects.reverbType: 0
       inserts.bypass: 0
       inserts.saturation: 0
       inserts.drive: 6
@@ -783,6 +802,11 @@ programs:
       inserts.chorusRate: 0.35
       inserts.chorusDepth: 3.5
       inserts.gain: 0
+      inserts.phaserSpread: 0.25
+      inserts.flangerSpread: 0.5
+      inserts.chorusSpread: 0.5
+      inserts.chorusFeedback: 0
+      inserts.phaserStages: 6
       performance.mode: 0
       performance.portamento: 0
       performance.glide: 0
@@ -1019,6 +1043,9 @@ programs:
       effects.bypass: 0
       effects.reverbReturn: 0
       effects.reflections: 0
+      effects.feedbackLow: 0
+      effects.duck: 0
+      effects.reverbType: 0
       inserts.bypass: 0
       inserts.saturation: 0
       inserts.drive: 6
@@ -1043,6 +1070,11 @@ programs:
       inserts.chorusRate: 0.35
       inserts.chorusDepth: 3.5
       inserts.gain: 0
+      inserts.phaserSpread: 0.25
+      inserts.flangerSpread: 0.5
+      inserts.chorusSpread: 0.5
+      inserts.chorusFeedback: 0
+      inserts.phaserStages: 6
       performance.mode: 0
       performance.portamento: 0
       performance.glide: 0
@@ -1279,6 +1311,9 @@ programs:
       effects.bypass: 0
       effects.reverbReturn: 0
       effects.reflections: 0
+      effects.feedbackLow: 0
+      effects.duck: 0
+      effects.reverbType: 0
       inserts.bypass: 0
       inserts.saturation: 0
       inserts.drive: 6
@@ -1303,6 +1338,11 @@ programs:
       inserts.chorusRate: 0.35
       inserts.chorusDepth: 3.5
       inserts.gain: 0
+      inserts.phaserSpread: 0.25
+      inserts.flangerSpread: 0.5
+      inserts.chorusSpread: 0.5
+      inserts.chorusFeedback: 0
+      inserts.phaserStages: 6
       performance.mode: 0
       performance.portamento: 0
       performance.glide: 0
@@ -1539,6 +1579,9 @@ programs:
       effects.bypass: 0
       effects.reverbReturn: 0
       effects.reflections: 0
+      effects.feedbackLow: 0
+      effects.duck: 0
+      effects.reverbType: 0
       inserts.bypass: 0
       inserts.saturation: 0
       inserts.drive: 6
@@ -1563,6 +1606,11 @@ programs:
       inserts.chorusRate: 0.35
       inserts.chorusDepth: 3.5
       inserts.gain: 0
+      inserts.phaserSpread: 0.25
+      inserts.flangerSpread: 0.5
+      inserts.chorusSpread: 0.5
+      inserts.chorusFeedback: 0
+      inserts.phaserStages: 6
       performance.mode: 0
       performance.portamento: 0
       performance.glide: 0
@@ -1799,6 +1847,9 @@ programs:
       effects.bypass: 0
       effects.reverbReturn: 0
       effects.reflections: 0
+      effects.feedbackLow: 0
+      effects.duck: 0
+      effects.reverbType: 0
       inserts.bypass: 0
       inserts.saturation: 0
       inserts.drive: 6
@@ -1823,6 +1874,11 @@ programs:
       inserts.chorusRate: 0.35
       inserts.chorusDepth: 3.5
       inserts.gain: 0
+      inserts.phaserSpread: 0.25
+      inserts.flangerSpread: 0.5
+      inserts.chorusSpread: 0.5
+      inserts.chorusFeedback: 0
+      inserts.phaserStages: 6
       performance.mode: 0
       performance.portamento: 0
       performance.glide: 0
@@ -1858,7 +1914,7 @@ programs:
       layers.0.filterAmount: 0.5
       layers.0.keytrack: 0.5
       layers.0.velocityTone: 1
-      layers.0.attack: 0.6
+      layers.0.attack: 0.1
       layers.0.decay: 1
       layers.0.sustain: 0.8
       layers.0.release: 2
@@ -2059,6 +2115,9 @@ programs:
       effects.bypass: 0
       effects.reverbReturn: 0
       effects.reflections: 0
+      effects.feedbackLow: 0
+      effects.duck: 0
+      effects.reverbType: 0
       inserts.bypass: 0
       inserts.saturation: 0
       inserts.drive: 6
@@ -2083,6 +2142,11 @@ programs:
       inserts.chorusRate: 0.35
       inserts.chorusDepth: 3.5
       inserts.gain: 0
+      inserts.phaserSpread: 0.25
+      inserts.flangerSpread: 0.5
+      inserts.chorusSpread: 0.5
+      inserts.chorusFeedback: 0
+      inserts.phaserStages: 6
       performance.mode: 0
       performance.portamento: 0
       performance.glide: 0
@@ -2093,7 +2157,7 @@ programs:
       global.polyphony: 8
       global.unison: 1
       global.spread: 8
-      global.gain: 0.2
+      global.gain: 0.41
       global.bend: 0
       global.wheel: 0
       global.pressure: 0
@@ -2319,6 +2383,9 @@ programs:
       effects.bypass: 0
       effects.reverbReturn: 0
       effects.reflections: 0
+      effects.feedbackLow: 0
+      effects.duck: 0
+      effects.reverbType: 0
       inserts.bypass: 0
       inserts.saturation: 0
       inserts.drive: 6
@@ -2343,6 +2410,11 @@ programs:
       inserts.chorusRate: 0.35
       inserts.chorusDepth: 3.5
       inserts.gain: 0
+      inserts.phaserSpread: 0.25
+      inserts.flangerSpread: 0.5
+      inserts.chorusSpread: 0.5
+      inserts.chorusFeedback: 0
+      inserts.phaserStages: 6
       performance.mode: 0
       performance.portamento: 0
       performance.glide: 0
@@ -2353,7 +2425,7 @@ programs:
       global.polyphony: 16
       global.unison: 1
       global.spread: 8
-      global.gain: 0.2
+      global.gain: 0.92
       global.bend: 0
       global.wheel: 0
       global.pressure: 0
@@ -2370,24 +2442,24 @@ programs:
       layers.0.pulse: 0.5
       layers.0.sub: 0
       layers.0.noise: 0
-      layers.0.cutoff: 2400
+      layers.0.cutoff: 3400
       layers.0.resonance: 0.12
       layers.0.filter: 0
       layers.0.highpass: 20
       layers.0.highResonance: 0
-      layers.0.filterAmount: 0.3
+      layers.0.filterAmount: 0.6
       layers.0.keytrack: 0.5
       layers.0.velocityTone: 1
-      layers.0.attack: 0.45
+      layers.0.attack: 0.16
       layers.0.decay: 1.5
       layers.0.sustain: 0.8
-      layers.0.release: 1.1
+      layers.0.release: 0.6
       layers.0.filterAttack: 0.03
       layers.0.filterDecay: 0.4
       layers.0.filterSustain: 0.2
       layers.0.filterRelease: 0.7
-      layers.0.lfoRate: 4.5
-      layers.0.lfoPitch: 0
+      layers.0.lfoRate: 5.6
+      layers.0.lfoPitch: 14
       layers.0.lfoFilter: 0
       layers.0.lfoPwm: 0
       layers.0.drift: 3
@@ -2402,11 +2474,11 @@ programs:
       layers.0.lfo2Amp: 0
       layers.0.drive: 0.2
       layers.0.envPwm: 0
-      layers.0.pressureTone: 0.4
+      layers.0.pressureTone: 0.5
       layers.0.velocityAmp: 1
       layers.0.coarseA: 0
       layers.0.lfoShape: 0
-      layers.0.lfoDelay: 0
+      layers.0.lfoDelay: 0.35
       layers.0.velocityAttack: 0
       layers.0.reservedB: 0
       layers.0.hardSync: 0
@@ -2448,18 +2520,18 @@ programs:
       layers.0.modTarget4: 0
       layers.0.modDepth4: 0
       layers.0.breath: 0
-      layers.0.bow: 0.4
-      layers.0.airBrightness: 2500
-      layers.0.noiseMotion: 0.35
+      layers.0.bow: 0.7
+      layers.0.airBrightness: 3500
+      layers.0.noiseMotion: 0.5
       layers.0.formant: 0
       layers.0.vowel: 0
       layers.0.formantShift: 0
-      layers.0.body: 0.65
+      layers.0.body: 0.8
       layers.0.bodyType: 2
       layers.0.bodyTune: 0
       layers.0.bodyDecay: 1
       layers.0.noisePressure: 0.3
-      layers.0.noiseAttack: 0.15
+      layers.0.noiseAttack: 0.3
       layers.0.legacyAmp: 0
       layers.1.waveA: 3
       layers.1.waveB: 4
@@ -2579,6 +2651,9 @@ programs:
       effects.bypass: 0
       effects.reverbReturn: 0
       effects.reflections: 0
+      effects.feedbackLow: 0
+      effects.duck: 0
+      effects.reverbType: 0
       inserts.bypass: 0
       inserts.saturation: 0
       inserts.drive: 6
@@ -2603,6 +2678,11 @@ programs:
       inserts.chorusRate: 0.35
       inserts.chorusDepth: 3.5
       inserts.gain: 0
+      inserts.phaserSpread: 0.25
+      inserts.flangerSpread: 0.5
+      inserts.chorusSpread: 0.5
+      inserts.chorusFeedback: 0
+      inserts.phaserStages: 6
       performance.mode: 0
       performance.portamento: 0
       performance.glide: 0
@@ -2613,7 +2693,7 @@ programs:
       global.polyphony: 16
       global.unison: 1
       global.spread: 8
-      global.gain: 0.2
+      global.gain: 0.6
       global.bend: 0
       global.wheel: 0
       global.pressure: 0
@@ -2839,6 +2919,9 @@ programs:
       effects.bypass: 0
       effects.reverbReturn: 0
       effects.reflections: 0
+      effects.feedbackLow: 0
+      effects.duck: 0
+      effects.reverbType: 0
       inserts.bypass: 0
       inserts.saturation: 0
       inserts.drive: 6
@@ -2863,6 +2946,11 @@ programs:
       inserts.chorusRate: 0.35
       inserts.chorusDepth: 3.5
       inserts.gain: 0
+      inserts.phaserSpread: 0.25
+      inserts.flangerSpread: 0.5
+      inserts.chorusSpread: 0.5
+      inserts.chorusFeedback: 0
+      inserts.phaserStages: 6
       performance.mode: 0
       performance.portamento: 0
       performance.glide: 0

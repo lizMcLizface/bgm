@@ -1,7 +1,8 @@
 import React from 'react';
 
 // Small hand-drawn rack companions, kept as SVG so they stay crisp on tablets.
-export default function RackGraphic({kind,on=true}){
+export default function RackGraphic({kind:unit,on=true}){
+ const kind=unit==='crusher'?'crush':unit;
  const face=(x,y)=><g className="rack-face"><circle cx={x-5} cy={y} r="1.8"/><circle cx={x+5} cy={y} r="1.8"/><path d={`M${x-3} ${y+5}q3 3 6 0`} fill="none"/></g>;
  return <svg className={'rack-graphic '+(on?'on':'')} viewBox="0 0 100 76" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
   {kind==='saturation'&&<><path d="M28 62V30Q14 15 31 11Q50 3 69 11Q86 15 72 30V62Z" fill="currentColor" fillOpacity=".12"/><path d="M24 65h52M37 30q-5 8 0 13m13-16q-5 8 0 13m13-10q-5 8 0 13"/>{face(50,48)}<path d="M13 43l-6 7m80-7 6 7"/></>}
@@ -19,5 +20,10 @@ export default function RackGraphic({kind,on=true}){
   {kind==='freeze'&&<><rect className="rack-float" x="28" y="18" width="44" height="42" rx="8" fill="var(--rack-bg)"/><path d="M34 26l8-4m22 6 2 6" opacity=".6"/>{face(50,42)}<path d="M14 18v16m-7-8h14m-12-5 10 10m0-10L9 31m79 17v12m-6-6h12" opacity=".8"/></>}
   {(kind==='reverb'||kind==='instrument')&&<><path d="M18 61V31L50 9l32 22v30Z" fill="currentColor" fillOpacity=".08"/><path d="M34 61V33q16-22 32 0v28M22 64h56"/><path d="M43 52q7-9 14 0m-18-8q11-14 22 0m-26-9q15-17 30 0"/><path className="rack-float" d="m80 8 2 5 5 2-5 2-2 5-2-5-5-2 5-2Z"/></>}
   {kind==='master'&&<><rect x="23" y="9" width="54" height="58" rx="9" fill="currentColor" fillOpacity=".08"/><circle cx="50" cy="46" r="15"/>{face(50,43)}<circle cx="50" cy="22" r="5"/><path d="m12 32-5 5 5 5m76-10 5 5-5 5"/></>}
+  {kind==='filter'&&<><path d="M8 60h14q12 0 16-26t14-18q10 0 14 26t26 22" opacity=".6"/><rect className="rack-float" x="30" y="24" width="40" height="34" rx="8" fill="var(--rack-bg)"/>{face(50,40)}<path d="M20 20l6 6m54-6-6 6" opacity=".6"/></>}
+  {kind==='ring'&&<><circle cx="38" cy="40" r="20"/><circle cx="62" cy="40" r="20"/><circle className="rack-float" cx="50" cy="40" r="9" fill="var(--rack-bg)"/>{face(50,39)}</>}
+  {kind==='pitch'&&<><path d="M18 58V22m0 0-8 9m8-9 8 9M82 18v36m0 0-8-9m8 9 8-9" opacity=".6"/><rect className="rack-float" x="32" y="22" width="36" height="36" rx="10" fill="var(--rack-bg)"/>{face(50,40)}</>}
+  {kind==='width'&&<><path d="M8 40h20m-8-8-8 8 8 8M92 40H72m8-8 8 8-8 8" opacity=".7"/><rect className="rack-float" x="32" y="20" width="36" height="40" rx="10" fill="var(--rack-bg)"/>{face(50,40)}</>}
+  {kind==='limiter'&&<><path d="M10 16h80" strokeDasharray="4 4" opacity=".7"/><path d="M10 54q10-30 20 0t20 0 20 0 20 0" opacity=".5"/><rect className="rack-float" x="30" y="22" width="40" height="30" rx="8" fill="var(--rack-bg)"/>{face(50,36)}</>}
  </svg>;
 }

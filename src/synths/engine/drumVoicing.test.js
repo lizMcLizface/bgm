@@ -34,7 +34,7 @@ test.each([44100,48000,96000])('kit articulation, brightness and balance stay ne
 });
 
 test('Deep still renders the original dry kick PCM after revoicing the rest of the kits',()=>{
- const expected={tr808:'2f9d6fda0f1055d7147e154f385e61a77365ed9952a3738105c41a2eea60011c',tr909:'db077e559b6b6cfd4e5705426c9036f27e8b89719964607e631c5fc7f5333cc2',tr606:'1753b4ea364680f1e45bdc0508ee134582a5c839267f91a3a201381754fad775'};
+ const expected={tr808:'2f9d6fda0f1055d7147e154f385e61a77365ed9952a3738105c41a2eea60011c',tr909:'db077e559b6b6cfd4e5705426c9036f27e8b89719964607e631c5fc7f5333cc2',tr707:'db077e559b6b6cfd4e5705426c9036f27e8b89719964607e631c5fc7f5333cc2',tr606:'1753b4ea364680f1e45bdc0508ee134582a5c839267f91a3a201381754fad775'};
  for(const kit of Object.values(KITS)){
   const params=drumParams(kit),s=createOfflineSynth(module,{model:kit.model,params:params.toPairs(params.sanitize({kickBody:1,reverbMix:0,chorusMix:0}))});
   s.k.syn_note_on(1,36,1);const channels=s.seconds(3),pcm=new Float32Array(channels[0].length*2);

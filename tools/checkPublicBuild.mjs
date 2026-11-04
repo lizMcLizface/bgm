@@ -6,7 +6,7 @@ import {parse} from 'yaml';
 const root='dist-public';
 if(!fs.existsSync(root)){console.error(`${root}/ is missing: run npm run build:public.`);process.exit(1);}
 const problems=[];
-const synths=['poly','fm','cs80','juno','prophet5','jupiter8','minimoog','dx7','obxa','vs','wt','tr808','tr909','tr606','tb303'];
+const synths=['poly','fm','cs80','juno','prophet5','jupiter8','minimoog','dx7','obxa','vs','wt','tr808','tr909','tr707','tr606','tb303'];
 for(const file of ['core.wasm','processor.js','fm.wasm','fm-processor.js','effects.wasm','effects-processor.js','inserts.wasm','inserts-processor.js','patch-transition.js'])if(!fs.existsSync(path.join(root,'synth-lab',file)))problems.push(`Missing synth-lab/${file}`);
 for(const file of ['synths/ensemble/index.html','synths/index.html','synths/effects/index.html','synths/classics.wasm','synths/classics-processor.js','synths/output-scope.js',...synths.map(s=>`synths/${s}/index.html`)])if(!fs.existsSync(path.join(root,file)))problems.push(`Missing ${file}`);
 const indexFile=path.join(root,'synth-presets/index.json');

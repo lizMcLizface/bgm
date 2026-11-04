@@ -14,6 +14,8 @@ import EnvShapeEditor from './EnvShapeEditor';
 import SoundPicker,{soundList,nextSound} from './SoundPicker';
 import {SHAPE_KEYS} from './envShape';
 import RackPanel from '../effects/RackPanel';
+import RackCompact from '../effects/RackCompact';
+import {syncedDelayMs} from '../effects/rackParts';
 import {RACK_PARAMS,SPACE_KEYS,cleanRack,rackForPatch,instrumentSpaceKeys,splitRackEdits} from '../effects/params';
 import {serveRack} from '../effects/connection';
 import EmbeddedShell,{useEnsemblePanel} from './EmbeddedShell';
@@ -45,7 +47,7 @@ export default function SynthShell(props){
  const embedded=useEnsemblePanel();
  return embedded?<EmbeddedShell {...props}/>:<StandaloneShell {...props}/>;
 }
-function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelClassName='',expand,libraries=[],startEngine=startLiveSynth,engineOptions,onEngine,onStats,onMidiRealtime,onComparisonWaves,initialPatch,onChoose,children}){
+function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelClassName='',expand,libraries=[],startEngine=startLiveSynth,engineOptions,onEngine,onStats,onMidiRealtime,onComparisonWaves,initialPatch,onChoose,compactRack=false,children}){
  const {params:{BY_KEY,sanitize,toPairs},presets}=synth;
  const PATCH_KEY=`synths:${synth.id}:patch`,MINE_KEY=`synths:${synth.id}:mine`;
  const [patch,setPatch]=useState(()=>{
@@ -56,6 +58,8 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
  const RACK_KEY=`synths:${synth.id}:rack`;
  const [outboard,setOutboard]=useState(()=>RACK_PARAMS.sanitize({...cleanRack(),...(initialPatch?.rack??load(RACK_KEY,{}))}));
  const [showEffects,setShowEffects]=useState(false);
+ // compactRack: the effects open as a small popover over the instrument instead of replacing its panel
+ const fullRack=showEffects&&!compactRack;
  const [sessionId]=useState(()=>globalThis.crypto?.randomUUID?.()??`rack-${Date.now()}-${Math.random().toString(36).slice(2)}`);
  const rackValues=useMemo(()=>rackForPatch(synth,patch.values,outboard),[synth,patch.values,outboard]);
  const instrumentSpecs=useMemo(()=>instrumentSpaceKeys(synth).map(k=>({...BY_KEY[k],key:'instrument.'+k,label:k.includes('chorus')?k.endsWith('Rate')?'Chorus rate':k.endsWith('Depth')?'Chorus depth':'Chorus mix':k==='reverbMix'?'Reverb mix':BY_KEY[k].label})),[synth,BY_KEY]);
@@ -111,6 +115,14 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
   setPatch(p=>({name:dirty(p.name),values:{...p.values,...native}}));
   if(Object.keys(extra).length)setOutboard(p=>({...p,...extra}));
  },[synth,BY_KEY]);
+  // a synced delay follows the instrument's tempo (the drum machines have one)
+ const rackTempo=typeof patch.values.tempo==='number'?patch.values.tempo:0;
+ useEffect(()=>{
+  const division=rackValues['master.sync'];
+  if(!division||!rackTempo)return;
+  const ms=syncedDelayMs(division,rackTempo);
+  if(ms&&Math.abs((rackValues['effects.delayMs']??0)-ms)>0.5)changeRack({'effects.delayMs':ms});
+ },[rackValues,rackTempo,changeRack]);
  rackApi.current={snapshot:()=>({synth:synth.id,name:synth.name,audio:audio.state,values:rackRef.current,instrumentSpecs,peak:statsRef.current.peak,reduction:statsRef.current.reduction??0}),edit:changeRack,clear:()=>engine.current?.clearRack()};
  useEffect(()=>{
   const relay=serveRack({id:sessionId,snapshot:()=>rackApi.current.snapshot(),edit:v=>rackApi.current.edit(v),clear:()=>rackApi.current.clear()});relayRef.current=relay;
@@ -236,7 +248,7 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
  const current=patch.name.replace(/ \*$/,'');
  const maxVoices=patch.values.voices??patch.values['global.polyphony']??(synth.id==='vs'?8:synth.id==='minimoog'?1:null);
 
- return <div className={'synth instrument '+className+(showEffects?' rack-open':'')}>
+ return <div className={'synth instrument '+className+(fullRack?' rack-open':'')+(showEffects&&compactRack?' rack-popover':'')}>
   <header className="synth-bar">
    <a className="back" href={import.meta.env.BASE_URL+'synths/'} aria-label="All synths">◂</a>
    <h1><span className="brand">{synth.name}</span><small>{synth.subtitle}</small></h1>
@@ -264,11 +276,13 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
   </nav>
 
   {scope&&<Scope engine={engine} audio={audio.state} onClose={toggleScope}/>}
-  {!showSetup&&!showEffects&&nav}
+  {!showSetup&&!fullRack&&nav}
 
-  <main className={'panel'+(showSetup?'':showEffects?' rack-panel':' '+panelClassName)}>
-   {!showSetup&&!showEffects&&children({values:patch.values,control,group,change,replaceValues,patch:patchRef})}
-   {!showSetup&&showEffects&&<RackPanel values={rackValues} onChange={changeRack} instrumentSpecs={instrumentSpecs} peak={stats.peak} reduction={stats.reduction??0}
+  <main className={'panel'+(showSetup?'':fullRack?' rack-panel':' '+panelClassName)}>
+   {!showSetup&&!fullRack&&children({values:patch.values,control,group,change,replaceValues,patch:patchRef})}
+   {!showSetup&&showEffects&&compactRack&&<RackCompact tempo={rackTempo} values={rackValues} onChange={changeRack} instrumentSpecs={instrumentSpecs} peak={stats.peak} reduction={stats.reduction??0} onClose={()=>setShowEffects(false)}
+    tools={<button type="button" onClick={()=>engine.current?.clearRack()}>Clear tails</button>}/>}
+   {!showSetup&&fullRack&&<RackPanel tempo={rackTempo} values={rackValues} onChange={changeRack} instrumentSpecs={instrumentSpecs} peak={stats.peak} reduction={stats.reduction??0}
     tools={<><button type="button" onClick={()=>engine.current?.clearRack()}>Clear rack tails</button><button type="button" onClick={()=>setShowEffects(false)}>Back to synth</button><a href={`${import.meta.env.BASE_URL}synths/effects/?target=${encodeURIComponent(sessionId)}`} target="_blank" rel="noopener noreferrer">Open in a tab ↗</a></>}/>}
    {showSetup&&<div className="setup">
     <section className="group wide setup-done"><h3>Setup</h3><button type="button" onClick={()=>setShowSetup(false)}>Done · back to the panel</button></section>

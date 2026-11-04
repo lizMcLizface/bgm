@@ -13,8 +13,21 @@ export function registerLevel(midi, bell = false) {
     return Math.max(FLOOR, 10 ** (-over * (bell ? BELL_DB_PER_SEMITONE : DB_PER_SEMITONE) / 20));
 }
 
+// The bass end of it: a bass is levelled around its own low notes, where the ear hears little, and a note a fifth or an
+// octave higher is far louder for the same level (a sine is the worst, with no harmonics to share the work: Sub Bass at F3).
+const BASS_ABOVE = 47; // B2
+const BASS_DB_PER_SEMITONE = 0.5, PURE_BASS_DB_PER_SEMITONE = 1.1, BASS_FLOOR = 0.35;
+const pure = (preset = {}) => (preset.vcoType === 'sine' || preset.vcoType === 'triangle') && (preset.osc2Amount ?? 0) < 0.5 && (preset.voiceCount ?? 1) < 2;
+
+export function bassRegisterLevel(midi, pureTone = false) {
+    const over = midi - BASS_ABOVE;
+    if (over <= 0) return 1;
+    return Math.max(BASS_FLOOR, 10 ** (-over * (pureTone ? PURE_BASS_DB_PER_SEMITONE : BASS_DB_PER_SEMITONE) / 20));
+}
+
 export function tameHighRegister(events, { voices = {} } = {}) {
     for (const e of events) {
+        if (e.role === 'bass') { e.velocity *= bassRegisterLevel(e.midi, pure(voices.bass?.preset)); continue; }
         if (e.role !== 'lead' && e.role !== 'counter') continue;
         e.velocity *= registerLevel(e.midi, BELLS.test(voices[e.role]?.name ?? ''));
     }

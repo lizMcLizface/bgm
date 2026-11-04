@@ -1,4 +1,5 @@
-import { expressNotes } from './noteExpression';
+import { expressNotes, fitSlowAttacks } from './noteExpression';
+import { cleanExpression, expressiveEnvelope } from '../engine/noteExpression';
 
 const note=(role,length,velocity=.7)=>({role,midi:72,beat:0,length,velocity});
 test('expression is deterministic metadata and preserves written notes, dynamics and percussion',()=>{
@@ -73,4 +74,15 @@ test('a slow attack and vibrato set on a note by its source (the sequencer\'s he
     expressNotes([held,stab],{voices:{pad:{name:'Felt piano'}},secondsPerBeat:.5,units:4});
     expect(held.expression).toMatchObject({attackScale:8,vibratoDepth:5,vibratoDelay:.4,vibratoRate:4.6});
     expect(stab.expression.attackScale).toBeLessThan(2);expect(stab.expression.vibratoDepth).toBeUndefined();
+});
+test('slow-attack pads hold short notes for their swell and trim stacked chord tones, and leave quick voices alone',()=>{
+    const voices={pad:{name:'Tape Pad',preset:{gainAttack:.8}},rhythm:{name:'Pluck',preset:{gainAttack:.01}}};
+    const short=note('pad',.5),chord=[0,1,2].map(i=>({...note('pad',4),midi:60+i})),quick=note('rhythm',.5);
+    fitSlowAttacks([short,...chord,quick],{voices,secondsPerBeat:.5});
+    expect(short.expression.holdAtLeast).toBeCloseTo(.5);
+    expect(short.velocity).toBe(.7);
+    expect(chord[0].velocity).toBeLessThan(.7);
+    expect(quick.expression).toBeUndefined();
+    const held=expressiveEnvelope({attack:.8,release:1,decay:.1},.25,cleanExpression({holdAtLeast:.5}));
+    expect(held.duration).toBeCloseTo(.5);
 });

@@ -1538,7 +1538,7 @@ const GenerativeApp = () => {
         rulebook: bookRef.current,
         voices: Object.fromEntries(Object.keys(ROLE_PRESETS).map((role) => [role, roles[role].external
             ? { name: roles[role].external.label, external: roles[role].external.ref }
-            : { name: gen.roles[role].presetName, synth: gen.getRolePreset(role) }])),
+            : { name: gen.roles[role].presetName, synth: gen.getRoleBasePreset(role) }])),
         percussion: percMachine?.ref,
     }, info);
     // Dev server only: the preset tool (/tools/presetter/) loads presets into this page and reads back what was changed on it.
@@ -1927,7 +1927,7 @@ const GenerativeApp = () => {
                 armed={armed === 'perc'} onArm={setArmed}
                 onVoice={choosePercussionVoice} voiceBusy={percussionBusy} voiceOpen={pickerRole==='perc'} onVoiceOpen={open=>choosePicker(open?'perc':null)} onDrums={(drums) => update('drums', drums)} onKit={(kit) => update('drumKit', kit)}
                 onVolume={(v) => setVolume('perc', v)} onMix={changeMix} onAudition={() => gen.audition('perc')} />}
-            {has(4) && <SequencerPanel seq={settings.sequencer} chords={PROGRESSIONS[settings.progression] ?? []} machine={percMachine} playhead={running ? sequencerPlayhead : null} onChange={(seq) => update('sequencer', seq)}
+            {has(4) && <SequencerPanel generator={gen} running={running} seq={settings.sequencer}chords={PROGRESSIONS[settings.progression] ?? []} machine={percMachine} playhead={running ? sequencerPlayhead : null} onChange={(seq) => update('sequencer', seq)}
                 onMachine={(synth, name = 'Room') => { void applyRef('perc', { synth, name }); }} />}
             {has(4) && <IntensityPanel push={settings.push} now={now.pushLevel ?? 0} onChange={(push) => update('push', push)} />}
 

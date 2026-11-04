@@ -1,18 +1,28 @@
 import {defineParams,SPACE} from '../params';
 import {EFFECTS} from '../../synth-lab/effectsConfig';
 import {INSERTS} from '../../synth-lab/insertsConfig';
+import {ORDER_COUNT,CHAIN_MAX,DEFAULT_CHAIN,chainUnits} from './order';
 
 const definitions=[
  ...INSERTS.map(d=>['inserts',d]),...EFFECTS.map(d=>['effects',d]),
  ...[
   ['enabled','Compressor',0,1,1,0],['threshold','Threshold · dB',-100,0,.5,-24],['ratio','Ratio',1,20,.1,4],['knee','Knee · dB',0,40,.5,12],
-  ['attack','Attack · s',.001,1,.001,.005],['release','Release · s',.01,1,.01,.1],['makeup','Output trim · dB',-18,18,.5,0],
+  ['attack','Attack · s',.001,1,.001,.005],['release','Release · s',.01,1,.01,.1],['makeup','Output trim · dB',-18,18,.5,0],['mix','Mix',0,1,.01,1],
  ].map(d=>['compressor',d]),
  ...['saturation','eq','phaser','flanger','chorus','delay','reverb'].map(k=>['switch',[k,k,0,1,1,1]]),
- ...[['enabled','Rack',0,1,1,1],['input','Input trim · dB',-24,12,.5,0],['output','Output trim · dB',-24,12,.5,0]].map(d=>['master',d]),
+ ...[['enabled','Rack',0,1,1,1],['input','Input trim · dB',-24,12,.5,0],['output','Output trim · dB',-24,12,.5,0],['order','Chain order',0,ORDER_COUNT-1,1,0],['chain','Chain units',0,CHAIN_MAX,1,DEFAULT_CHAIN],['sync','Delay sync',0,6,1,0]].map(d=>['master',d]),
+ // units added to the chain from the menu: plain Web Audio stages (extras.js)
+ ...[['low','Low cut · Hz',20,600,1,90],['high','High cut · Hz',1000,20000,10,14000],['slope','Slope',0,1,1,0]].map(d=>['filter',d]),
+ ...[['rate','Rate · Hz',.1,14,.01,4],['depth','Depth',0,1,.01,.5],['spread','Stereo spread',0,1,.01,0]].map(d=>['tremolo',d]),
+ ...[['bits','Bits',2,16,1,8],['divide','Sample divide',1,32,1,1],['mix','Mix',0,1,.01,1]].map(d=>['crusher',d]),
+ ...[['freq','Frequency · Hz',20,2000,1,300],['mix','Mix',0,1,.01,.5]].map(d=>['ring',d]),
+ ...[['semi','Shift · semitones',-24,24,1,-12],['fine','Fine · cents',-50,50,1,0],['mix','Mix',0,1,.01,.5]].map(d=>['pitch',d]),
+ ...[['amount','Width',0,2,.01,1.4]].map(d=>['width',d]),
+ ...[['ceiling','Ceiling · dB',-18,0,.5,-1]].map(d=>['limiter',d]),
+ ...['filter','tremolo','crusher','ring','pitch','width','limiter'].map(k=>['switch',[k,k,0,1,1,1]]),
 ];
 export const RACK_PARAMS=defineParams(definitions.map(([prefix,[key,label,min,max,step,value]],id)=>{
- const unit=/· Hz/.test(label)?'Hz':/· s$|seconds$/.test(label)?'s':/· ms/.test(label)?'ms':/· dB/.test(label)?'dB':/· octaves/.test(label)?'oct':max<=1&&step!==1?'%':'decimal';
+ const unit=/· cents/.test(label)?'decimal':/· semitones/.test(label)?'decimal':/· Hz/.test(label)?'Hz':/· s$|seconds$/.test(label)?'s':/· ms/.test(label)?'ms':/· dB/.test(label)?'dB':/· octaves/.test(label)?'oct':max<=1&&step!==1?'%':'decimal';
  return [`${prefix}.${key}`,id,label,min,max,value,unit,step===1?'step':min>0&&max/min>=100?'log':'lin'];
 }));
 export const SPACE_KEYS=SPACE.map(([key])=>key);
@@ -39,14 +49,19 @@ export function splitRackEdits(synth,changes){
  return {native,extra};
 }
 export function rackPackets(raw){
- const p=RACK_PARAMS.sanitize(raw),inserts={},effects={},compressor={},master={};
- for(const [key,v]of Object.entries(p)){const [scope,k]=key.split('.');if(scope==='inserts')inserts[k]=v;else if(scope==='effects')effects[k]=v;else if(scope==='compressor')compressor[k]=v;else if(scope==='master')master[k]=v;}
- if(!p['switch.saturation'])inserts.saturation=0;
- if(!p['switch.eq'])inserts.lowGain=inserts.midGain=inserts.highGain=0;
- for(const k of ['phaser','flanger','chorus'])if(!p['switch.'+k])inserts[k]=0;
- if(!p['switch.delay'])effects.delay=0;
- if(!p['switch.reverb'])effects.reverb=effects.delayToReverb=0;
- return {inserts,effects,compressor,master};
+ const p=RACK_PARAMS.sanitize(raw),inserts={},effects={},compressor={},master={},extras={};
+ const EXTRA=['filter','tremolo','crusher','ring','pitch','width','limiter'];
+ for(const [key,v]of Object.entries(p)){const [scope,k]=key.split('.');if(scope==='inserts')inserts[k]=v;else if(scope==='effects')effects[k]=v;else if(scope==='compressor')compressor[k]=v;else if(scope==='master')master[k]=v;else if(EXTRA.includes(scope))(extras[scope]??={})[k]=v;}
+ // a unit that is not in the chain does not run, whatever its settings; one that is in it can still be switched off
+ const inChain=chainUnits(master.chain),on=unit=>inChain.includes(unit);
+ if(!on('saturation')||!p['switch.saturation'])inserts.saturation=0;
+ if(!on('eq')||!p['switch.eq'])inserts.lowGain=inserts.midGain=inserts.highGain=0;
+ for(const k of ['phaser','flanger','chorus'])if(!on(k)||!p['switch.'+k])inserts[k]=0;
+ if(!on('compressor'))compressor.enabled=0;
+ if(!on('space')||!p['switch.delay'])effects.delay=0;
+ if(!on('space')||!p['switch.reverb'])effects.reverb=effects.delayToReverb=0;
+ for(const k of EXTRA)extras[k].on=on(k)&&!!p['switch.'+k];
+ return {inserts,effects,compressor,master,extras};
 }
 export const RACK_PRESETS=[
  {name:'Clean',values:cleanRack()},

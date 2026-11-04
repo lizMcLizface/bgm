@@ -108,7 +108,8 @@ export const BOOK_RULE_IDS=[
   "melody-style",
   "melody-plan",
   "melody-bass",
-  "melody-rhythm"
+  "melody-rhythm",
+  "slow-attack-notes"
 ];
 export const BOOK_GROUP_IDS=[
   "pad-register",

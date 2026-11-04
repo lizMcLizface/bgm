@@ -269,7 +269,7 @@ export function sequencerLanes({ meter, seq, chord, slotIndex = 0, bar = 0, seed
                 }
             }
         }
-        if ((low === 'x' || low === 'f') && (low === 'f' || v === 0 || rng() < 1 - 0.2 * v)) events.push({ role: 'bass', midi: low === 'f' ? root + 12 : root, beat: at, length: Math.min(gate * 1.2, 0.5 * meter.unitsPerBeat), velocity: low === 'f' ? 0.9 : 0.8, detune: 0 });
+        if ((low === 'x' || low === 'f') && (low === 'f' || v === 0 || rng() < 1 - 0.2 * v)) events.push({ role: 'bass', midi: low === 'f' ? root + 12 : root, beat: at, length: Math.min(gate * 1.2, 0.5 * meter.unitsPerBeat), velocity: 0.8, detune: 0 });
     }
     return events;
 }

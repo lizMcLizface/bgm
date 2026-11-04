@@ -6,12 +6,34 @@ import {MODELS} from '../engine/offline';
 // [key, short name, long name]
 const TRACKS_808=[['bd','BD','Bass drum'],['sd','SD','Snare drum'],['lt','LT','Low tom'],['mt','MT','Mid tom'],['ht','HT','High tom'],['lc','LC','Low conga'],['mc','MC','Mid conga'],['hc','HC','High conga'],['rs','RS','Rim shot'],['cl','CL','Claves'],['cp','CP','Hand clap'],['ma','MA','Maracas'],['cb','CB','Cowbell'],['cy','CY','Cymbal'],['oh','OH','Open hat'],['ch','CH','Closed hat']];
 const TRACKS_909=[['bd','BD','Bass drum'],['sd','SD','Snare drum'],['lt','LT','Low tom'],['mt','MT','Mid tom'],['ht','HT','High tom'],['rs','RS','Rim shot'],['cp','CP','Hand clap'],['ch','CH','Closed hat'],['oh','OH','Open hat'],['cr','CR','Crash'],['rd','RD','Ride']];
+const TRACKS_707=[['bd','BD','Bass drum'],['sd','SD','Snare drum'],['lt','LT','Low tom'],['mt','MT','Mid tom'],['ht','HT','High tom'],['rs','RS','Rim shot'],['cp','CP','Hand clap'],['cb','CB','Cowbell'],['tb','TB','Tambourine'],['ch','CH','Closed hat'],['oh','OH','Open hat'],['cr','CR','Crash'],['rd','RD','Ride']];
 const TRACKS_606=[['bd','BD','Bass drum'],['sd','SD','Snare drum'],['lt','LT','Low tom'],['ht','HT','High tom'],['ch','CH','Closed hat'],['oh','OH','Open hat'],['cy','CY','Cymbal']];
+
+// Each voice has a colour, shared by its step row, its fader and its panel: kicks and snares warm, toms orange, congas and
+// percussion green and pink, hats and cymbals cool (the 808's own step keys came in red, orange, yellow and cream).
+const VOICE_COLOURS={bd:'#ff5a36',sd:'#ffc233',lt:'#ff8a3d',mt:'#ff9d52',ht:'#ffb36b',lc:'#2fcfa4',mc:'#4fdcb4',hc:'#82e8c8',rs:'#f36fae',cl:'#e0488d',cp:'#ff7ab8',ma:'#a083ff',cb:'#ffd84a',cy:'#58b6ff',oh:'#45d3ea',ch:'#86e6f6',cr:'#6aa4ff',rd:'#8aa0ff'};
+// Each machine has its own palette, so the four pages do not read as one design: the 808 warm and sunny, the 909 steel with
+// orange and ice blue, the 606 pastel teal and pink, the 707 neon.
+const PALETTES={
+ tr808:VOICE_COLOURS,
+ tr909:{bd:'#ff6a1a',sd:'#ff9d2e',lt:'#ffc247',mt:'#ffd466',ht:'#ffe38a',rs:'#c9ccd1',cp:'#ff4d5e',ch:'#6fb1ff',oh:'#4c8dff',cr:'#9cc3ff',rd:'#7fa6ff'},
+ tr606:{bd:'#2fcfa4',sd:'#ff8fb3',lt:'#ffd36b',ht:'#ffb36b',ch:'#7ad7ff',oh:'#5bb8ff',cy:'#c4a3ff'},
+ tr707:{bd:'#ff3d81',sd:'#ffe14a',lt:'#ff9b3d',mt:'#ff7f50',ht:'#ff6b6b',rs:'#35e0ff',cp:'#ff5de1',cb:'#7dff7a',tb:'#00ffd0',ch:'#5ad1ff',oh:'#3d8bff',cr:'#b388ff',rd:'#8f7bff'},
+};
+export const voiceColour=(key,kitId='tr808')=>(PALETTES[kitId]??VOICE_COLOURS)[key]??'#e0a526';
+export const ACCENT_COLOUR='#ff4d6d';
 
 export const KITS={
  tr808:{id:'tr808',name:'808',subtitle:'analog drum machine',model:MODELS.tr808,tracks:TRACKS_808,tone:{bd:'Click',sd:'Snappy',cp:'Filter',ch:'Tone',oh:'Tone',cy:'Tone',cb:'Tone',lc:'Tone',mc:'Tone',hc:'Tone',ma:'Tone'}},
- tr909:{id:'tr909',name:'909',subtitle:'hybrid drum machine',model:MODELS.tr909,tracks:TRACKS_909,tone:{bd:'Attack',sd:'Snappy',cp:'Filter',ch:'Tone',oh:'Tone',cr:'Tone',rd:'Tone'}},
- tr606:{id:'tr606',name:'606',subtitle:'small analog drum machine',model:MODELS.tr606,tracks:TRACKS_606,tone:{bd:'Click',sd:'Snappy',ch:'Tone',oh:'Tone',cy:'Tone'}},
+ tr909:{id:'tr909',name:'909',subtitle:'hybrid drum machine',model:MODELS.tr909,tracks:TRACKS_909,tone:{bd:'Attack',sd:'Snappy',cp:'Filter',ch:'Tone',oh:'Tone',cr:'Tone',rd:'Tone'},
+  // the voice knobs of the original panel (the rest are extras of ours, under More): Level is every voice's fader
+  knobs:{bd:['Tune','Tone','Decay'],sd:['Tune','Tone'],lt:['Tune','Decay'],mt:['Tune','Decay'],ht:['Tune','Decay'],ch:['Decay'],oh:['Decay'],cr:['Tune'],rd:['Tune']}},
+ tr707:{id:'tr707',name:'707',subtitle:'digital drum machine',model:MODELS.tr707,tracks:TRACKS_707,tone:{bd:'Attack',sd:'Snappy',cp:'Filter',cb:'Tone',tb:'Tone',ch:'Tone',oh:'Tone',cr:'Tone',rd:'Tone'},
+  // The 707 was sampled, with a Level and Tune per drum and a Decay on the hats. The kernel's STYLE_707 (drums.rs) gives it the 909's
+  // digital voice architecture with shorter, brighter specs, plus a cowbell and a tambourine; no recordings are played back.
+  knobs:{bd:['Tune'],sd:['Tune'],lt:['Tune'],mt:['Tune'],ht:['Tune'],ch:['Decay'],oh:['Decay']}},
+ tr606:{id:'tr606',name:'606',subtitle:'small analog drum machine',model:MODELS.tr606,tracks:TRACKS_606,tone:{bd:'Click',sd:'Snappy',ch:'Tone',oh:'Tone',cy:'Tone'},
+  knobs:{bd:['Tune','Decay'],sd:['Tone'],lt:['Tune'],ht:['Tune'],oh:['Decay'],cy:['Tone']}},
 };
 
 const FIELDS=[['Level',0,'%','lin',0,1,.8],['Tune',1,'%','lin',0,1,.5],['Decay',2,'%','lin',0,1,.5],['Tone',3,'%','lin',0,1,.5],['Pan',4,'bi','lin',-1,1,0]];
@@ -48,6 +70,7 @@ const SOUNDS=[
 export function drumPresets(kit,params){
  return SOUNDS.map(({name,category,styles,colour,note,set,fx,global})=>{
   const values={};
+  for(const [track,fields] of Object.entries(kit.base??{}))for(const [f,v] of Object.entries(fields))values[track+f]=v;
   for(const [track,fields] of Object.entries(set))if(kit.tracks.some(t=>t[0]===track))for(const [f,v] of Object.entries(fields))values[track+f]=v;
   return {name,category,styles,colour,note,values:params.sanitize({...values,kickBody:0,...global,...fx})};
  });
@@ -73,9 +96,9 @@ export function beatPattern(kit,beat){
 export function arrangementBank(kit,recipe){
  return {patterns:Array.from({length:8},(_,i)=>recipe.stages[i]?beatPattern(kit,recipe.stages[i]):emptyPattern(kit)()),lengths:Array(8).fill(16),tempos:Array(8).fill(0),chain:[...recipe.chain],current:0,title:recipe.name,names:Array.from({length:8},(_,i)=>recipe.stages[i]?.name??'')};
 }
-/** Engine commands for one pattern. */
-export function patternCommands(kit,index,pattern){
+/** Engine commands for one pattern; `silent(track)` leaves a muted (or not soloed) voice out of what the engine plays. */
+export function patternCommands(kit,index,pattern,silent=()=>false){
  const cmds=[[7,index,0]];
- pattern.forEach((row,t)=>row.forEach((on,s)=>{if(on)cmds.push([1,index<<10|(t===kit.tracks.length?16:t)<<5|s,on]);}));
+ pattern.forEach((row,t)=>{if(t<kit.tracks.length&&silent(t))return;row.forEach((on,s)=>{if(on)cmds.push([1,index<<10|(t===kit.tracks.length?16:t)<<5|s,on]);});});
  return cmds;
 }

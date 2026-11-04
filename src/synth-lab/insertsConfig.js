@@ -4,6 +4,8 @@ export const INSERTS=[
  ['phaser','Phaser mix',0,1,.01,0],['phaserRate','Phaser rate · Hz',.02,5,.01,.15],['phaserDepth','Phaser sweep · octaves',0,3,.05,1.5],['phaserFreq','Phaser centre · Hz',100,4000,1,700],['phaserFeedback','Phaser feedback',-.75,.75,.01,.2],
  ['flanger','Flanger mix',0,1,.01,0],['flangerRate','Flanger rate · Hz',.02,5,.01,.12],['flangerDepth','Flanger depth · ms',0,4,.05,1],['flangerDelay','Flanger centre · ms',.3,20,.05,2],['flangerFeedback','Flanger feedback',-.85,.85,.01,.35],
  ['chorus','Chorus mix',0,.8,.01,0],['chorusRate','Chorus rate · Hz',.05,10,.01,.35],['chorusDepth','Chorus depth · ms',0,8,.1,3.5],['gain','Insert output trim · dB',-18,6,.5,0],
+ // appended with the kernel's parameters 24-28: the left/right offset of each modulation (cycles), chorus feedback, phaser stage count
+ ['phaserSpread','Phaser spread',0,.5,.01,.25],['flangerSpread','Flanger spread',0,.5,.01,.5],['chorusSpread','Chorus spread',0,.5,.01,.5],['chorusFeedback','Chorus feedback',-.6,.6,.01,0],['phaserStages','Phaser stages',2,12,2,6],
 ];
 export const defaultInserts=()=>Object.fromEntries(INSERTS.map(([id,,,,,v])=>[id,v]));
 export const sanitizeInserts=(raw={})=>Object.fromEntries(INSERTS.map(([id,,lo,hi,step,v])=>{const x=raw?.[id];return [id,typeof x==='number'&&Number.isFinite(x)?Math.max(lo,Math.min(hi,step===1?Math.round(x):x)):v];}));

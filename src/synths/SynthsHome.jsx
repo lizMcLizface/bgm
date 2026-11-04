@@ -20,13 +20,14 @@ const SYNTHS=[
  {id:'wt',name:'Quadwave',maker:'wavetable synth · original',colour:'#d9a05b',ready:true,line:'Four editable single-cycle waves blended by a joystick, with unison, a ladder or state-variable filter, three envelopes and two LFOs. Draw the waves or sculpt their harmonics.'},
  {id:'tr808',name:'808',maker:'analog drum machine · 1980',colour:'#d96a3a',ready:true,line:'Sixteen analog voices: the long sine kick, snare, toms, congas, clap, cowbell and the six-oscillator hats, on a 16-step sequencer with swing, accent and a pattern chain.'},
  {id:'tr909',name:'909',maker:'hybrid drum machine · 1983',colour:'#8a8f96',ready:true,line:'Punchier kick and snare, the 909 toms and clap, with synthesised stand-ins for its sampled hats, crash and ride.'},
+ {id:'tr707',name:'707',maker:'digital drum machine · 1984',colour:'#c9b27a',ready:true,line:'The 909's little sibling: short, bright, sampled-style kick, snare, toms, clap, hats, crash and ride. Voiced on the 909 engine, so it has no cowbell or tambourine yet.'},
  {id:'tr606',name:'606',maker:'analog drum machine · 1981',colour:'#6fb6a0',ready:true,line:'The small one: seven quick, dry voices on the same sequencer.'},
  {id:'tb303',name:'Silverbox',maker:'bass line · 1981',colour:'#e0a526',ready:true,line:'One oscillator into a squelching resonant filter, with accent, slide and tie on a 16-step pattern.'},
 ];
 const CATEGORIES=[
  {id:'vintage',name:'Vintage',description:'Experimental models for comparison with the original hardware. Sound and calibration are still being checked.',ids:['cs80','juno','prophet5','jupiter8','obxa','minimoog','dx7','vs','tb303']},
  {id:'diy',name:'DIY',description:'Our own synth engines, with their original recipes and a playable panel for exploring new sounds.',ids:['poly','fm','wt','piano','strings','iowa']},
- {id:'drums',name:'Drums',description:'Drum machines with hands-on voice controls and step sequencing.',ids:['tr808','tr909','tr606']},
+ {id:'drums',name:'Drums',description:'Drum machines with hands-on voice controls and step sequencing.',ids:['tr808','tr909','tr707','tr606']},
 ];
 
 export default function SynthsHome(){

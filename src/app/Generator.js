@@ -58,7 +58,7 @@ import { rangedRoles, planRegisterShift, applyRegisterShift } from './compositio
 import { slideNotes } from './composition/noteSlides';
 import { glideNotes, roleGlides } from './composition/portamento';
 import { SweepFilter, SWEEP_OPEN } from './engine/sweepFilter';
-import { expressNotes, expressHeldNotes, connectWindNotes, timeSoundNotes } from './composition/noteExpression';
+import { expressNotes, expressHeldNotes, connectWindNotes, timeSoundNotes, fitSlowAttacks } from './composition/noteExpression';
 import { applyDynamics, expressDynamics } from './composition/dynamics';
 import { planRubato, rubatoTime } from './composition/rubato';
 import { ornamentNotes } from './composition/ornaments';
@@ -1020,6 +1020,12 @@ class Generator {
         return { ...this.roles[role].instrument.preset };
     }
 
+    /** The preset as stored: an unedited string/piano/breath voice plays a per-generation variant of it (refreshStringPatches), which is not an edit. */
+    getRoleBasePreset(role) {
+        const r = this.roles[role];
+        return r.stringPatchBase && !r.edited ? { ...r.stringPatchBase.preset } : this.getRolePreset(role);
+    }
+
     getRolePolyphony(role) {
         return this.roles[role].instrument.polyphony;
     }
@@ -1753,6 +1759,9 @@ class Generator {
             voices: this.grooveVoices ?? this.grooveVoiceSnapshot(), bpm: bpm * (this.meter.pace ?? 1),
             gateEnvelopes:this.gateEnvelopes === true, tempoEffects:this.tempoEffects === true,
         });
+        if (!original && this.slowAttackNotes === true) fitSlowAttacks(events, {
+            voices: this.grooveVoices ?? this.grooveVoiceSnapshot(), secondsPerBeat: 60 / unitsPerMinute(this.meter, bpm),
+        });
         if (!original && (this.noteSlides === true || this.padPitchMotion === true || this.bassPitchMotion === true || this.chordSlides === true)) slideNotes(events, {
             previous:prev?.events ?? [], bar, units:this.meter.units, secondsPerBeat:60/unitsPerMinute(this.meter,bpm),
             noteSlides:this.noteSlides === true,padMotion:this.padPitchMotion === true,bassMotion:this.bassPitchMotion === true,chordSlides:this.chordSlides === true,
@@ -1844,7 +1853,7 @@ class Generator {
      * A copy that only plans: the piece Play would start with these
      * settings, bar by bar via planBar (for rendering to a file).
      */
-    planner({ heldPadGlides = this.heldPadGlides, heldBassGlides = this.heldBassGlides, padPitchMotion = this.padPitchMotion, bassPitchMotion = this.bassPitchMotion, noteSlides = this.noteSlides, chordSlides = this.chordSlides, tempoEffects = this.tempoEffects, gateEnvelopes = this.gateEnvelopes, noteConnection = this.noteConnection, heldExpression = this.heldExpression, noteExpression = this.noteExpression, ensembleCoordination = this.ensembleCoordination, formDevelopment = this.formDevelopment, phrasePerformance = this.phrasePerformance, themeDevelopment = this.themeDevelopment, phraseSearch = this.phraseSearch, longPhrases = this.longPhrases, phraseLength = this.phraseLength, noteResolution = this.noteResolution, registerLevel = this.registerLevel, contrastPhrases = this.contrastPhrases, duetInteraction = this.duetInteraction, rhythmDevelopment = this.rhythmDevelopment, rhythmGrammar = this.rhythmGrammar, partRhythmGrammar = this.partRhythmGrammar, padVariation = this.padVariation, instrumentGroove = this.instrumentGroove, jointCounterpoint = this.jointCounterpoint, sectionDevelopment = this.sectionDevelopment, sectionCadences = this.sectionCadences, sectionBridges = this.sectionBridges, harmonicRhythm = this.harmonicRhythm, transitionGestures = this.transitionGestures, leadTransitions = this.leadTransitions, leadPickups = this.leadPickups, sectionSuspensions = this.sectionSuspensions, formStrategies = this.formStrategies, sectionCurves = this.sectionCurves, harmonicDevelopment = this.harmonicDevelopment, formStrategy = this.formStrategy, endingDevelopment = this.endingDevelopment } = {}) {
+    planner({ heldPadGlides = this.heldPadGlides, heldBassGlides = this.heldBassGlides, padPitchMotion = this.padPitchMotion, bassPitchMotion = this.bassPitchMotion, noteSlides = this.noteSlides, chordSlides = this.chordSlides, tempoEffects = this.tempoEffects, gateEnvelopes = this.gateEnvelopes, slowAttackNotes = this.slowAttackNotes, noteConnection = this.noteConnection, heldExpression = this.heldExpression, noteExpression = this.noteExpression, ensembleCoordination = this.ensembleCoordination, formDevelopment = this.formDevelopment, phrasePerformance = this.phrasePerformance, themeDevelopment = this.themeDevelopment, phraseSearch = this.phraseSearch, longPhrases = this.longPhrases, phraseLength = this.phraseLength, noteResolution = this.noteResolution, registerLevel = this.registerLevel, contrastPhrases = this.contrastPhrases, duetInteraction = this.duetInteraction, rhythmDevelopment = this.rhythmDevelopment, rhythmGrammar = this.rhythmGrammar, partRhythmGrammar = this.partRhythmGrammar, padVariation = this.padVariation, instrumentGroove = this.instrumentGroove, jointCounterpoint = this.jointCounterpoint, sectionDevelopment = this.sectionDevelopment, sectionCadences = this.sectionCadences, sectionBridges = this.sectionBridges, harmonicRhythm = this.harmonicRhythm, transitionGestures = this.transitionGestures, leadTransitions = this.leadTransitions, leadPickups = this.leadPickups, sectionSuspensions = this.sectionSuspensions, formStrategies = this.formStrategies, sectionCurves = this.sectionCurves, harmonicDevelopment = this.harmonicDevelopment, formStrategy = this.formStrategy, endingDevelopment = this.endingDevelopment } = {}) {
         const copy = Object.create(Generator.prototype);
         copy.settings = JSON.parse(JSON.stringify(this.planningFrom ?? this.settings));
         // Comparison tooling can isolate the previous Latest arrangement.
@@ -1854,6 +1863,7 @@ class Generator {
         copy.noteConnection = noteConnection;
         copy.tempoEffects = tempoEffects;
         copy.gateEnvelopes = gateEnvelopes;
+        copy.slowAttackNotes = slowAttackNotes;
         copy.heldPadGlides = heldPadGlides;
         copy.heldBassGlides = heldBassGlides;
         copy.padPitchMotion = padPitchMotion;

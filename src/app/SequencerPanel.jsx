@@ -3,6 +3,9 @@ import { BEATS, ARRANGEMENTS, arrangementFor } from '../synths/drums/beats';
 import { KITS } from '../synths/drums/kits';
 import { SYNTHS } from '../synths/models';
 import { STAGE_NAMES, SEQ_MACHINES, LANES, MOVE_PARAMS, MOVE_MAX, SECTION_BARS, sequencerStages, stageForBar } from './sequencer';
+import HarmonyLane from './HarmonyLane';
+import PercussionView from './PercussionView';
+import BarRuler from './BarRuler';
 import './sequencer.css';
 
 const NEXT = { '.': 'x', x: 'f', f: '.' };
@@ -15,7 +18,7 @@ const CATEGORIES = [...new Set(BEATS.map((b) => b.category))];
  * eight stages editable step by step, and a stage for each chord of the progression.
  * @param {{ seq: object, chords: string[], onChange: (seq: object) => void, onMachine: (synth: string) => void }} props
  */
-export default function SequencerPanel({ seq, chords, machine, onChange, onMachine, playhead }) {
+export default function SequencerPanel({ seq, chords, machine, onChange, onMachine, playhead, generator, running }) {
     const [picked, setPicked] = useState(1);
     const [follow, setFollow] = useState(true);
     // where the music is: the stage and the step (a function of the generator, read each frame while it plays)
@@ -121,13 +124,19 @@ export default function SequencerPanel({ seq, chords, machine, onChange, onMachi
                 </>
             )}
             {recipe && (
-                <>
-                    <div className="seq-stages" role="tablist" aria-label="Stage">
-                        {playhead && seq.on && <button type="button" aria-pressed={follow} className={follow ? 'on' : ''} onClick={() => { setFollow(!follow); setPicked(stage); }}>Follow</button>}
-                        {STAGE_NAMES.map((name, i) => (
-                            <button key={name} type="button" role="tab" aria-selected={stage === i} className={`${stage === i ? 'on' : ''}${now && (now.stage === i || now.lanes === i) ? ' playing' : ''}`} onClick={() => setStage(i)}>{name}</button>
-                        ))}
-                    </div>
+                <div className="seq-stages" role="tablist" aria-label="Stage">
+                    {playhead && seq.on && <button type="button" aria-pressed={follow} className={follow ? 'on' : ''} onClick={() => { setFollow(!follow); setPicked(stage); }}>Follow</button>}
+                    {STAGE_NAMES.map((name, i) => (
+                        <button key={name} type="button" role="tab" aria-selected={stage === i} className={`${stage === i ? 'on' : ''}${now && (now.stage === i || now.lanes === i) ? ' playing' : ''}`} onClick={() => setStage(i)}>{name}</button>
+                    ))}
+                </div>
+            )}
+            {/* the ribbon, its bar ruler and the grid sit together on the same columns, nothing between them */}
+            <div className="seq-stack">
+                <HarmonyLane generator={generator} running={running} />
+                <BarRuler generator={generator} running={running} />
+                {!(seq.on && recipe) && <PercussionView generator={generator} running={running} />}
+                {recipe && (
                     <div className="seq-grid" role="grid" aria-label={`${STAGE_NAMES[stage]} pattern`}>
                         {kit.tracks.map(([key, short, long]) => (
                             <div className="seq-row" role="row" key={key}>
@@ -155,6 +164,10 @@ export default function SequencerPanel({ seq, chords, machine, onChange, onMachi
                             </div>
                         ))}
                     </div>
+                )}
+            </div>
+            {recipe && (
+                <>
                     {edited && <button type="button" className="gen-keys-button" onClick={() => set({ edits: {} })}>Reset my edits</button>}
                     <label className="gen-check seq-on">
                         <input type="checkbox" checked={!!seq.fills} onChange={(e) => set({ fills: e.target.checked })} />
