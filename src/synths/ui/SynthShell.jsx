@@ -1,14 +1,16 @@
 import React,{useCallback,useEffect,useMemo,useRef,useState} from 'react';
-import {Fader,Choice,Ribbon,TouchPad,Keys} from './controls';
+import {Fader,Choice,Ribbon,TouchPad} from './controls';
 import {startLiveSynth} from '../engine/liveSynth';
 import {Performer} from '../engine/performer';
 import {createPhraseRunner,phraseForCode} from './phraseRunner';
-import PhraseDock from './PhraseDock';
+import {AutoPlay,ChordChips} from './PhraseDock';
 import {recalledContext} from '../../app/auditionPhrases';
 import {buildContext,DEFAULT_HARMONY} from '../../app/harmonyContext';
 import {LabMidi,bindLabKeyboard,mapVelocity} from '../../labs/input';
 import {load,save} from '../storage';
 import Scope from './Scope';
+import SetupPopover from './SetupPopover';
+import StageKeys from './StageKeys';
 import ComparisonPresets from './ComparisonPresets';
 import EnvShapeEditor from './EnvShapeEditor';
 import SoundPicker,{soundList,nextSound} from './SoundPicker';
@@ -24,6 +26,8 @@ import EmbeddedShell,{useEnsemblePanel} from './EmbeddedShell';
 // sounds (factory + saved), setup, the ribbon/pad/keys strip and screen wake.
 // A page supplies its synth definition and draws its own panel.
 export const SETUP_KEY='synths:setup';
+// the comparison-bank bar (Compare presets) is hidden for now; its code stays
+const SHOW_COMPARISON=false;
 const SETUP={midiDevice:'all',midiChannel:'all',velocity:'normal',ribbonRange:12,wheelRange:2,latency:'interactive',keys:'auto',keysLow:48,keysCount:25};
 const CURVES={light:{curve:.6,floor:.08},normal:{curve:1,floor:.06},firm:{curve:1.6,floor:.04}};
 const dirty=name=>name.endsWith(' *')?name:name+' *';
@@ -47,7 +51,7 @@ export default function SynthShell(props){
  const embedded=useEnsemblePanel();
  return embedded?<EmbeddedShell {...props}/>:<StandaloneShell {...props}/>;
 }
-function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelClassName='',expand,libraries=[],startEngine=startLiveSynth,engineOptions,onEngine,onStats,onMidiRealtime,onComparisonWaves,initialPatch,onChoose,compactRack=false,children}){
+function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelClassName='',expand,libraries=[],startEngine=startLiveSynth,engineOptions,onEngine,onStats,onMidiRealtime,onComparisonWaves,initialPatch,onChoose,compactRack=true,keyboard=true,children}){
  const {params:{BY_KEY,sanitize,toPairs},presets}=synth;
  const PATCH_KEY=`synths:${synth.id}:patch`,MINE_KEY=`synths:${synth.id}:mine`;
  const [patch,setPatch]=useState(()=>{
@@ -72,7 +76,7 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
  const pickShelf=id=>{setShelf(id);save(SHELF_KEY,id);};
  const library=libraries.find(l=>l.id===shelf);
  const [audio,setAudio]=useState({state:'off',message:''});
- const [comparisonPending,setComparisonPending]=useState(()=>new URLSearchParams(window.location.search).has('bank'));
+ const [comparisonPending,setComparisonPending]=useState(()=>SHOW_COMPARISON&&new URLSearchParams(window.location.search).has('bank'));
  const [stats,setStats]=useState({active:0,peak:0});
  const [notes,setNotes]=useState([]);
  const [pedal,setPedal]=useState(false);
@@ -86,6 +90,7 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
  const performer=useMemo(()=>new Performer(null,{onNotes:setNotes}),[]);
  const [audition,setAudition]=useState(()=>({follow:true,...DEFAULT_HARMONY,...load('synths:audition',{})}));
  const [phrasePlaying,setPhrasePlaying]=useState(null);
+ const [chordPick,setChordPick]=useState(0); // 0: none, else the dock's chord (1-4) shown on the keys
  const context=useMemo(()=>audition.follow?recalledContext():buildContext(audition),[audition]);
  const contextRef=useRef(context);contextRef.current=context;
  const phrases=useMemo(()=>createPhraseRunner(performer,{context:()=>contextRef.current,onState:setPhrasePlaying}),[performer]);
@@ -185,7 +190,7 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
   const key=e=>{
    if(e.repeat||e.ctrlKey||e.metaKey||e.altKey||e.target?.closest?.('input,select,textarea,[contenteditable=true],[role=slider],.sp,.env-shape'))return;
    const phrase=phraseForCode(e.code);
-   if(phrase){if(audioOn.current){e.preventDefault();phrases.play(phrase);}return;}
+   if(phrase){if(!keyboard)return;if(audioOn.current){e.preventDefault();phrases.play(phrase);}return;}
    const arrow={ArrowLeft:[-1,false],ArrowRight:[1,false],ArrowUp:[-1,true],ArrowDown:[1,true]}[e.key];
    if(arrow){if(stepSound(...arrow))e.preventDefault();}
    else if(e.code==='KeyN'&&makeSound())e.preventDefault();
@@ -232,8 +237,9 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
  };
  // shape: {env:'amp'|'filter', a, d, s, r} adds the envelope curve editor; stage
  // entries are keys (prefixed like the group's) or functions of (values, prefix).
- const group=({title,tone,keys,shape},prefix='')=>{
-  if(keys.every(k=>SPACE_KEYS.includes(prefix+(Array.isArray(k)?k[0]:k))))return null;
+ const group=({title,tone,keys,shape,keep},prefix='')=>{
+  // keep: show the group even where the effects rack owns its keys (the V 80's chorus)
+  if(!keep&&keys.every(k=>SPACE_KEYS.includes(prefix+(Array.isArray(k)?k[0]:k))))return null;
   const shaped=shape&&BY_KEY[SHAPE_KEYS[shape.env].mode],id=title+'|'+prefix,open=shaped&&shapeOpen?.id===id;
   const stage=key=>typeof key==='function'?key(patch.values,prefix):patch.values[prefix+key];
   return <section className="group" key={title} style={{'--n':keys.length}}>
@@ -244,7 +250,7 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
   </section>;
  };
  // With a MIDI piano attached the on-screen keys only take space from the panel.
- const showKeys=setup.keys==='show'||setup.keys==='auto'&&midi.inputs.length===0;
+  const showKeys=keyboard&&setup.keys!=='hide'; // the header's keyboard button; on unless it was switched off
  const current=patch.name.replace(/ \*$/,'');
  const maxVoices=patch.values.voices??patch.values['global.polyphony']??(synth.id==='vs'?8:synth.id==='minimoog'?1:null);
 
@@ -256,15 +262,19 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
    <span className="meter" aria-label={`${stats.active} voices playing`}><span className="meter-fill" style={{width:Math.min(100,stats.peak*100)+'%'}}/><b>{stats.active}</b>{maxVoices!==null&&<>/{maxVoices}</>}</span>
    {pedal&&<span className="pill">Pedal</span>}
    {typeof headerExtras==='function'?headerExtras({values:patch.values,rack:outboard,name:patch.name}):headerExtras}
-   <button type="button" aria-pressed={showEffects} aria-label="Effects rack" onClick={()=>{setShowSetup(false);setShowEffects(v=>!v);}}>Effects</button>
+   <button type="button" aria-pressed={showEffects} aria-label="Effects rack" onClick={()=>setShowEffects(v=>!v)}>Effects</button>
    <button type="button" aria-pressed={scope} onClick={toggleScope} title="Oscilloscope and spectrum">Scope</button>
    <button type="button" aria-pressed={showSetup} onClick={()=>setShowSetup(v=>!v)} aria-label="Setup">⚙</button>
    <button type="button" onClick={()=>{phrases.stop();performer.panic();}} title="Silence everything (Esc)">Panic</button>
    <button type="button" onClick={fullscreen} aria-label="Full screen">⛶</button>
+   {keyboard&&<button type="button" className="keys-button" aria-pressed={showKeys} onClick={()=>updateSetup('keys',showKeys?'hide':'show')} aria-label="On-screen keyboard" title="Show or hide the on-screen keyboard">🎹</button>}
   </header>
 
-  <ComparisonPresets synth={synth} choose={choose} onWaves={onComparisonWaves} onBusy={setComparisonPending} patch={patch}/>
+  {SHOW_COMPARISON&&<ComparisonPresets synth={synth} choose={choose} onWaves={onComparisonWaves} onBusy={setComparisonPending} patch={patch}/>}
 
+  {scope&&<Scope engine={engine} audio={audio.state} onClose={toggleScope}/>}
+
+  <div className="rig">
   <nav className={'presets'+(library?' shelf-'+library.id:'')} aria-label="Sounds">
    {libraries.length>0&&<span className="shelf-switch" role="radiogroup" aria-label="Sound shelf">
     {[{id:'sounds',label:'Sounds'},...libraries].map(l=><button type="button" key={l.id} role="radio" aria-checked={shelf===l.id} onClick={()=>pickShelf(l.id)}>{l.label}</button>)}
@@ -275,62 +285,28 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
    </>}
   </nav>
 
-  {scope&&<Scope engine={engine} audio={audio.state} onClose={toggleScope}/>}
-  {!showSetup&&!fullRack&&nav}
+  {!fullRack&&nav}
 
-  <main className={'panel'+(showSetup?'':fullRack?' rack-panel':' '+panelClassName)}>
-   {!showSetup&&!fullRack&&children({values:patch.values,control,group,change,replaceValues,patch:patchRef})}
-   {!showSetup&&showEffects&&compactRack&&<RackCompact tempo={rackTempo} values={rackValues} onChange={changeRack} instrumentSpecs={instrumentSpecs} peak={stats.peak} reduction={stats.reduction??0} onClose={()=>setShowEffects(false)}
+  <main className={'panel'+(fullRack?' rack-panel':' '+panelClassName)}>
+   {!fullRack&&children({values:patch.values,control,group,change,replaceValues,patch:patchRef})}
+   {showEffects&&compactRack&&<RackCompact tempo={rackTempo} values={rackValues} onChange={changeRack} instrumentSpecs={instrumentSpecs} peak={stats.peak} reduction={stats.reduction??0} onClose={()=>setShowEffects(false)}
     tools={<button type="button" onClick={()=>engine.current?.clearRack()}>Clear tails</button>}/>}
-   {!showSetup&&fullRack&&<RackPanel tempo={rackTempo} values={rackValues} onChange={changeRack} instrumentSpecs={instrumentSpecs} peak={stats.peak} reduction={stats.reduction??0}
+   {fullRack&&<RackPanel tempo={rackTempo} values={rackValues} onChange={changeRack} instrumentSpecs={instrumentSpecs} peak={stats.peak} reduction={stats.reduction??0}
     tools={<><button type="button" onClick={()=>engine.current?.clearRack()}>Clear rack tails</button><button type="button" onClick={()=>setShowEffects(false)}>Back to synth</button><a href={`${import.meta.env.BASE_URL}synths/effects/?target=${encodeURIComponent(sessionId)}`} target="_blank" rel="noopener noreferrer">Open in a tab ↗</a></>}/>}
-   {showSetup&&<div className="setup">
-    <section className="group wide setup-done"><h3>Setup</h3><button type="button" onClick={()=>setShowSetup(false)}>Done · back to the panel</button></section>
-    <section className="group wide"><h3>MIDI piano</h3>
-     <p>{midi.status}</p>
-     <div className="row">
-      <button type="button" onClick={connectMidi}>Connect MIDI</button>
-      <label>Input<select value={setup.midiDevice} onChange={e=>updateSetup('midiDevice',e.target.value)}><option value="all">All inputs</option>{setup.midiDevice!=='all'&&!midi.inputs.some(i=>i.id===setup.midiDevice)&&<option value={setup.midiDevice}>Saved input</option>}{midi.inputs.map(i=><option key={i.id} value={i.id}>{i.name}</option>)}</select></label>
-      <label>Channel<select value={setup.midiChannel} onChange={e=>updateSetup('midiChannel',e.target.value)}><option value="all">All</option>{Array.from({length:16},(_,i)=><option key={i} value={String(i+1)}>{i+1}</option>)}</select></label>
-     </div>
-     <div className="row">
-      <label>Touch<select value={setup.velocity} onChange={e=>updateSetup('velocity',e.target.value)}><option value="light">Light (quiet playing speaks)</option><option value="normal">Normal</option><option value="firm">Firm (needs a strong touch)</option></select></label>
-      <label>Pitch wheel<select value={setup.wheelRange} onChange={e=>updateSetup('wheelRange',Number(e.target.value))}>{[1,2,5,7,12].map(n=><option key={n} value={n}>±{n} st</option>)}</select></label>
-     </div>
-     <p className="hint">Sustain pedal holds notes; the soft pedal darkens and softens. Channel or polyphonic aftertouch, mod wheel (vibrato), expression (CC11) and CC74 brightness work if your keyboard sends them.</p>
-    </section>
-    <section className="group wide"><h3>Touch screen</h3>
-     <div className="row">
-      <label>Ribbon range<select value={setup.ribbonRange} onChange={e=>updateSetup('ribbonRange',Number(e.target.value))}>{[1,2,5,7,12,24].map(n=><option key={n} value={n}>±{n} st</option>)}</select></label>
-      <label>On-screen keys<select value={setup.keys} onChange={e=>updateSetup('keys',e.target.value)}><option value="auto">Auto (hidden while MIDI is connected)</option><option value="show">Always show</option><option value="hide">Hide</option></select></label>
-      <label>Keys from<select value={setup.keysLow} onChange={e=>updateSetup('keysLow',Number(e.target.value))}>{[24,36,48,60,72].map(n=><option key={n} value={n}>C{n/12-1}</option>)}</select></label>
-     </div>
-    </section>
-    <section className="group wide"><h3>Audio</h3>
-     <p>{audio.state==='on'?audio.message:'Audio is off.'}</p>
-     <div className="row">
-      <label>Latency<select value={setup.latency} onChange={e=>updateSetup('latency',e.target.value)}><option value="interactive">Lowest (best for playing)</option><option value="balanced">Safer (if you hear crackles)</option></select></label>
-      <button type="button" onClick={start}>Restart audio</button>
-     </div>
-     <p className="hint">Changing latency takes effect when audio restarts. The engine runs in Rust/WebAssembly on the browser's audio thread. Settings here are shared by every synth on this device.</p>
-    </section>
-   </div>}
   </main>
+  </div>
+  {showSetup&&<SetupPopover midi={midi} setup={setup} updateSetup={updateSetup} connectMidi={connectMidi} audio={audio} start={start} onClose={()=>setShowSetup(false)}/>}
 
   <footer className="perform">
-   <PhraseDock audition={audition} onAudition={changeAudition} context={context} playing={phrasePlaying} onPlay={id=>{if(audio.state==='on')phrases.play(id);}} onStop={()=>phrases.stop()}
-    sounds={{step:stepSound,make:makeSound,canMake:!!synth.generate}}
-    keysHint={`Keys: 1–5 phrases · Esc stops · ← → sound · ↑ ↓ kind${synth.generate?' · N new sound':''} · A S D F G H J K play notes (W E T Y U black keys) · Z X octave${midi.inputs.length?' · your MIDI keyboard plays too':''}`}/>
-   <div className="perform-row">
-    <TouchPad onTouch={(pressure,mod)=>{performer.source('pad',pressure);performer.source('padMod',mod);}}/>
-    <Ribbon range={setup.ribbonRange} onBend={b=>performer.source('ribbon',b)}/>
-    <button type="button" className="keys-toggle" aria-pressed={showKeys} onClick={()=>updateSetup('keys',showKeys?'hide':'show')} aria-label={showKeys?'Hide on-screen keys':'Show on-screen keys'}>🎹</button>
-   </div>
-   {showKeys&&<div className="keys-row">
-    <button type="button" className="octave" aria-label="Keys down an octave" onClick={()=>updateSetup('keysLow',Math.max(24,setup.keysLow-12))}>−</button>
-    <Keys low={setup.keysLow} count={setup.keysCount} active={notes} onDown={(key,note,v)=>performer.down(key,note,velocity(v))} onUp={key=>performer.up(key)}/>
-    <button type="button" className="octave" aria-label="Keys up an octave" onClick={()=>updateSetup('keysLow',Math.min(84,setup.keysLow+12))}>+</button>
-   </div>}
+   {showKeys&&<StageKeys low={setup.keysLow} onLow={v=>updateSetup('keysLow',v)} notes={notes} context={context} chord={chordPick}
+    onDown={(key,note,v)=>performer.down(key,note,velocity(v??.75))} onUp={key=>performer.up(key)} onMod={v=>performer.source('wheelMod',v)}
+    head={<>
+     <AutoPlay playing={phrasePlaying} onPlay={id=>{if(audio.state==='on')phrases.play(id);}} onStop={()=>phrases.stop()} sounds={{make:makeSound,canMake:!!synth.generate}}/>
+     <ChordChips context={context} chordPick={chordPick} onChordPick={i=>setChordPick(p=>p===i?0:i)} audition={audition} onAudition={changeAudition}/>
+    </>}
+    left={<Ribbon vertical range={setup.ribbonRange} onBend={b=>performer.source('ribbon',b)}/>}
+    right={<TouchPad onTouch={(pressure,mod)=>{performer.source('pad',pressure);performer.source('padMod',mod);}}/>}/>}
+   {keyboard&&<p className="dock-keys stage-help">{`Keys: 1–5 phrases · Esc stops · ← → sound · ↑ ↓ kind${synth.generate?' · N new sound':''} · A S D F G H J K play notes (W E T Y U black keys) · Z X octave${midi.inputs.length?' · your MIDI keyboard plays too':''}`}</p>}
   </footer>
 
   {audio.state!=='on'&&<button type="button" className={'wake '+audio.state} onClick={start} disabled={comparisonPending}>

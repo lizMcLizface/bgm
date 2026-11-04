@@ -10,13 +10,14 @@ export const PHRASE_IDS=['bass-short','bass-slow','pad','arp','lead'];
 /** The phrase id for a key event's code (Digit1-5 or Numpad1-5), or null. */
 export const phraseForCode=code=>{const i=PHRASE_KEYS.indexOf(code.replace('Numpad','Digit'));return i<0?null:PHRASE_IDS[i];};
 
-export function createPhraseRunner(performer,{setTimer=setTimeout,clearTimer=clearTimeout,context=recalledContext,onState=()=>{}}={}){
+// A phrase repeats until it is stopped (loop), so the notes keep playing while its button is held down.
+export function createPhraseRunner(performer,{setTimer=setTimeout,clearTimer=clearTimeout,context=recalledContext,onState=()=>{},loop=true}={}){
  let timers=[],keys=[];
  const stop=()=>{timers.forEach(clearTimer);timers=[];keys.forEach(k=>performer.up(k));keys=[];onState(null);};
  const play=id=>{
   stop();
   const ctx=context();onState(id);
-  timers.push(setTimer(()=>onState(null),phraseSeconds(id,ctx)*1000));
+  timers.push(setTimer(()=>{if(loop)play(id);else onState(null);},phraseSeconds(id,ctx)*1000));
   phraseEvents(id,ctx).forEach(({midi,time,duration,velocity},i)=>{
    const key='phrase:'+i;
    timers.push(setTimer(()=>{performer.down(key,midi,velocity);keys.push(key);},time*1000));

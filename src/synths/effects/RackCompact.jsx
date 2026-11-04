@@ -1,4 +1,5 @@
 import React,{useEffect,useState} from 'react';
+import useFloating from '../ui/useFloating';
 import {cleanRack,RACK_PRESETS} from './params';
 import {useRackModel,RackChain,RackLevels,RackEffect,RackAdd,presetValues} from './rackParts';
 import './rack.css';
@@ -6,9 +7,11 @@ import './rack.css';
 // The compact, touch-first rack: a small popover with the signal chain and the three level sliders. Tapping an effect opens
 // its controls over the popover on a darkened background (after a short delay, so a double tap, which switches the effect on
 // or off, is not taken for a tap); tapping the dark area or pressing Escape puts it away again. Effects can be dragged
-// to reorder, as in the full rack (RackPanel).
+// to reorder, as in the full rack (RackPanel). The header drags the popover about the page (the place is remembered).
+const POS_KEY='synths:rack-pos';
 export default function RackCompact({values,onChange,instrumentSpecs=[],peak=0,reduction=0,tools=null,onClose,tempo=0}){
  const [open,setOpen]=useState('');
+ const float=useFloating(POS_KEY);
  const model=useRackModel({values,onChange,instrumentSpecs,tempo});
  const block=model.tiles.find(t=>t.id===open);
  useEffect(()=>{
@@ -16,8 +19,8 @@ export default function RackCompact({values,onChange,instrumentSpecs=[],peak=0,r
   window.addEventListener('keydown',key);return ()=>window.removeEventListener('keydown',key);
  },[open,onClose]);
  const applyPreset=name=>{const p=RACK_PRESETS.find(r=>r.name===name);if(p)onChange(presetValues(p,values));};
- return <div className="rackc" role="dialog" aria-label="Effects rack">
-  <header className="rackc-head">
+ return <div className="rackc" role="dialog" aria-label="Effects rack" ref={float.ref} style={float.style} onPointerDownCapture={float.raise}>
+  <header className="rackc-head" {...float.handle}>
    <h2>Effects</h2>
    <select aria-label="Rack presets" value="" onChange={e=>applyPreset(e.target.value)}><option value="" disabled>Select preset</option>{RACK_PRESETS.map(p=><option key={p.name} value={p.name}>{p.name}</option>)}</select>
    <RackAdd model={model} onAdded={setOpen}/>

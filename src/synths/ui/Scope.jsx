@@ -1,6 +1,7 @@
 import React,{useCallback,useEffect,useRef,useState} from 'react';
 import {findTrigger,levels,pitchOf,noteName,spectrumDb,spectrumTrace,spectralPeak,wavBytes} from './scopeMath';
 import {load,save} from '../storage';
+import useFloating from './useFloating';
 
 // Oscilloscope and spectrum analyser on the synth's output (left and right averaged). The audio
 // worklet keeps the last 1.3 s; this asks for a window about thirty times a second, finds the
@@ -100,6 +101,7 @@ function drawSpectrum(canvas,bins,hold,rate,cursor){
 }
 
 export default function Scope({engine,audio,onClose}){
+ const float=useFloating('synths:scope-pos');
  const [cfg,setCfg]=useState(()=>({...DEFAULTS,...(load(KEY,{})||{})}));
  const [status,setStatus]=useState({text:'',read:null});
  const [cursor,setCursor]=useState(null);       // scope cursor, 0..1 across the segment
@@ -219,23 +221,30 @@ export default function Scope({engine,audio,onClose}){
   const a=document.createElement('a');a.href=url;a.download=`scope-${Date.now()}.wav`;a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);
  };
  const showScope=cfg.view!=='spectrum',showSpec=cfg.view!=='scope';
- return <section className="scope" aria-label="Oscilloscope and spectrum">
+ return <section className="scope" aria-label="Oscilloscope and spectrum" ref={float.ref} style={float.style} onPointerDownCapture={float.raise}>
+  <header className="scope-head" {...float.handle}><h2>Scope</h2><button type="button" className="close" onClick={onClose} aria-label="Close the scope">×</button></header>
   <div className="scope-bar">
-   <span className="seg" role="radiogroup" aria-label="View">{[['both','Both'],['scope','Scope'],['spectrum','Spectrum']].map(([v,l])=><button type="button" key={v} role="radio" aria-checked={cfg.view===v} className={cfg.view===v?'on':''} onClick={()=>set({view:v})}>{l}</button>)}</span>
-   {showScope&&<>
-    <label>Time<select value={cfg.span} onChange={e=>set({span:Number(e.target.value)})}>{SPANS.map((s,i)=><option key={s} value={i}>{s} ms</option>)}</select></label>
-    <label>Zoom<select value={cfg.zoom} onChange={e=>set({zoom:Number(e.target.value)})}>{ZOOMS.map((z,i)=><option key={z} value={i}>{z?'×'+z:'Auto'}</option>)}</select></label>
-    <span className="seg" role="radiogroup" aria-label="Trigger mode">{[['auto','Auto'],['normal','Normal'],['single','Single']].map(([v,l])=><button type="button" key={v} role="radio" aria-checked={cfg.mode===v} className={cfg.mode===v?'on':''} onClick={()=>set({mode:v})}>{l}</button>)}</span>
-    {cfg.mode==='single'&&<button type="button" className={'arm'+(r.armed?' on':'')} onClick={arm}>{r.captured?'Re-arm':'Arm'}</button>}
-    <button type="button" aria-pressed={cfg.slope<0} onClick={()=>set({slope:-cfg.slope})} title="Trigger on a rising or falling edge">{cfg.slope>0?'↗ rising':'↘ falling'}</button>
-    <label className="level">Level<input type="range" min="-100" max="100" step="1" title="Trigger level as a fraction of the screen height" value={Math.round(cfg.level*100)} onChange={e=>set({level:Number(e.target.value)/100})}/><b>{Math.round(cfg.level*100)}%</b></label>
-    <button type="button" aria-pressed={cfg.hold} onClick={()=>set({hold:!cfg.hold})} title="Freeze the display">{cfg.hold?'Run':'Stop'}</button>
-    <button type="button" onClick={saveWav} title="Save what is on screen as a WAV file">Save WAV</button>
-   </>}
-   {showSpec&&<button type="button" aria-pressed={cfg.peakHold} onClick={()=>{set({peakHold:!cfg.peakHold});run.current.hold=null;}} title="Keep the highest level seen at each frequency">Peak hold</button>}
-   <button type="button" className="close" onClick={onClose} aria-label="Close the scope">×</button>
+   <div className="sb-row">
+    <span className="seg" role="radiogroup" aria-label="View">{[['both','Both'],['scope','Scope'],['spectrum','Spectrum']].map(([v,l])=><button type="button" key={v} role="radio" aria-checked={cfg.view===v} className={cfg.view===v?'on':''} onClick={()=>set({view:v})}>{l}</button>)}</span>
+    <span className="sb-spacer"/>
+    {showScope&&<button type="button" aria-pressed={cfg.hold} onClick={()=>set({hold:!cfg.hold})} title="Freeze the display">{cfg.hold?'▶ Run':'❚❚ Stop'}</button>}
+    {showScope&&<button type="button" onClick={saveWav} title="Save what is on screen as a WAV file">Save WAV</button>}
+    {showSpec&&<button type="button" aria-pressed={cfg.peakHold} onClick={()=>{set({peakHold:!cfg.peakHold});run.current.hold=null;}} title="Keep the highest level seen at each frequency">Peak hold</button>}
+   </div>
+   {showScope&&<div className="sb-row sb-settings">
+    <label className="sb-field"><span>Time</span><select value={cfg.span} onChange={e=>set({span:Number(e.target.value)})}>{SPANS.map((s,i)=><option key={s} value={i}>{s} ms</option>)}</select></label>
+    <label className="sb-field"><span>Zoom</span><select value={cfg.zoom} onChange={e=>set({zoom:Number(e.target.value)})}>{ZOOMS.map((z,i)=><option key={z} value={i}>{z?'×'+z:'Auto'}</option>)}</select></label>
+    <span className="sb-field"><span>Trigger</span>
+     <span className="sb-inline">
+      <span className="seg" role="radiogroup" aria-label="Trigger mode">{[['auto','Auto'],['normal','Normal'],['single','Single']].map(([v,l])=><button type="button" key={v} role="radio" aria-checked={cfg.mode===v} className={cfg.mode===v?'on':''} onClick={()=>set({mode:v})}>{l}</button>)}</span>
+      {cfg.mode==='single'&&<button type="button" className={'arm'+(r.armed?' on':'')} onClick={arm}>{r.captured?'Re-arm':'Arm'}</button>}
+      <button type="button" className="slope" aria-pressed={cfg.slope<0} onClick={()=>set({slope:-cfg.slope})} title="Trigger on a rising or falling edge">{cfg.slope>0?'↗':'↘'}</button>
+     </span>
+    </span>
+    <label className="sb-field level"><span>Level <b>{Math.round(cfg.level*100)}%</b></span><input type="range" min="-100" max="100" step="1" title="Trigger level as a fraction of the screen height" value={Math.round(cfg.level*100)} onChange={e=>set({level:Number(e.target.value)/100})}/></label>
+   </div>}
   </div>
-  <div className={'scope-views'+(cfg.view==='both'?' both':'')}>
+  <div className={'scope-views'}>
    {showScope&&<div className="scope-view">
     <canvas ref={scopeRef} onPointerDown={e=>{setCursor(point(e));e.currentTarget.setPointerCapture?.(e.pointerId);}} onPointerMove={e=>e.buttons&&setCursor(point(e))} aria-label="Waveform"/>
     <div className="scope-read">

@@ -47,23 +47,43 @@ export function Choice({spec,value,options,onChange,tone='cream',label=spec.labe
 
 // The CS-80 ribbon is relative: wherever you touch is "in tune", sliding
 // away bends. Releasing snaps back. range = semitones for half the strip.
-export function Ribbon({range,onBend}){
+// vertical: the strip stands upright, up bends up, and it carries no text.
+export function Ribbon({range,onBend,vertical=false}){
  const touch=useRef(null);const [mark,setMark]=useState(null);
+ const place=(e,r)=>Math.min(1,Math.max(0,vertical?1-(e.clientY-r.top)/r.height:(e.clientX-r.left)/r.width));
  const down=e=>{
   if(touch.current)return;e.preventDefault();e.currentTarget.setPointerCapture?.(e.pointerId);
-  const r=e.currentTarget.getBoundingClientRect(),origin=(e.clientX-r.left)/r.width;
-  touch.current={id:e.pointerId,left:r.left,width:r.width,origin};setMark({origin,at:origin});onBend(0);
+  const r=e.currentTarget.getBoundingClientRect(),origin=place(e,r);
+  touch.current={id:e.pointerId,r,origin};setMark({origin,at:origin});onBend(0);
  };
  const move=e=>{
   const t=touch.current;if(!t||t.id!==e.pointerId)return;
-  const at=Math.min(1,Math.max(0,(e.clientX-t.left)/t.width));setMark({origin:t.origin,at});
+  const at=place(e,t.r);setMark({origin:t.origin,at});
   onBend(Math.max(-2,Math.min(2,(at-t.origin)*2))*range);
  };
  const up=e=>{if(touch.current?.id!==e.pointerId)return;touch.current=null;setMark(null);onBend(0);};
- return <div className={'ribbon'+(mark?' touched':'')} role="slider" aria-label="Ribbon pitch bend" aria-valuemin={-range} aria-valuemax={range} aria-valuenow={mark?+((mark.at-mark.origin)*2*range).toFixed(2):0}
+ return <div className={'ribbon'+(vertical?' vertical':'')+(mark?' touched':'')} role="slider" title={vertical?`Ribbon: touch anywhere, slide up or down to bend (±${range} st)`:undefined} aria-label="Ribbon pitch bend" aria-valuemin={-range} aria-valuemax={range} aria-valuenow={mark?+((mark.at-mark.origin)*2*range).toFixed(2):0}
   onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} onLostPointerCapture={up}>
-  {mark&&<><div className="ribbon-span" style={{left:Math.min(mark.origin,mark.at)*100+'%',width:Math.abs(mark.at-mark.origin)*100+'%'}}/><div className="ribbon-origin" style={{left:mark.origin*100+'%'}}/><div className="ribbon-finger" style={{left:mark.at*100+'%'}}/></>}
-  <span className="ribbon-label">{mark?((mark.at-mark.origin)*2*range>=0?'+':'')+((mark.at-mark.origin)*2*range).toFixed(1)+' st':`Ribbon · touch anywhere, slide to bend (±${range} st)`}</span>
+  {mark&&(vertical
+   ?<><div className="ribbon-span" style={{bottom:Math.min(mark.origin,mark.at)*100+'%',height:Math.abs(mark.at-mark.origin)*100+'%'}}/><div className="ribbon-origin" style={{bottom:mark.origin*100+'%'}}/><div className="ribbon-finger" style={{bottom:mark.at*100+'%'}}/></>
+   :<><div className="ribbon-span" style={{left:Math.min(mark.origin,mark.at)*100+'%',width:Math.abs(mark.at-mark.origin)*100+'%'}}/><div className="ribbon-origin" style={{left:mark.origin*100+'%'}}/><div className="ribbon-finger" style={{left:mark.at*100+'%'}}/></>)}
+  {!vertical&&<span className="ribbon-label">{mark?((mark.at-mark.origin)*2*range>=0?'+':'')+((mark.at-mark.origin)*2*range).toFixed(1)+' st':`Ribbon · touch anywhere, slide to bend (±${range} st)`}</span>}
+ </div>;
+}
+
+// A mod wheel: drag it up and it stays where you leave it (like the real one, it does not spring back); double-click puts it to 0.
+export function ModWheel({onChange}){
+ const [v,setV]=useState(0),drag=useRef(null);
+ const set=x=>{const n=Math.min(1,Math.max(0,x));setV(n);onChange(n);};
+ const at=(e,r)=>set(1-(e.clientY-r.top)/r.height);
+ const down=e=>{e.preventDefault();e.currentTarget.setPointerCapture?.(e.pointerId);drag.current={id:e.pointerId,r:e.currentTarget.getBoundingClientRect()};at(e,drag.current.r);};
+ const move=e=>{if(drag.current?.id===e.pointerId)at(e,drag.current.r);};
+ const up=e=>{if(drag.current?.id===e.pointerId)drag.current=null;};
+ return <div className="modwheel" role="slider" aria-label="Mod wheel (vibrato)" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(v*100)} tabIndex={0} title="Mod wheel: drag up for vibrato; it stays where you leave it (double-click for 0)"
+  onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} onLostPointerCapture={up} onDoubleClick={()=>set(0)}
+  onKeyDown={e=>{if(e.key==='ArrowUp'){e.preventDefault();set(v+.05);}else if(e.key==='ArrowDown'){e.preventDefault();set(v-.05);}}}>
+  <div className="modwheel-fill" style={{height:v*100+'%'}}/><div className="modwheel-grip" style={{bottom:`calc(${v*100}% - 6px)`}}/>
+  <span className="modwheel-label">MOD</span>
  </div>;
 }
 

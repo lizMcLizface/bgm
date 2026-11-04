@@ -244,3 +244,8 @@
 .rack-body:not(.is-plain) .rack-reduction{flex:none;}
 .rack-body:not(.is-plain) .rack-controls{flex:1 1 0;width:auto;}
 .rack-body:not(.is-plain) .rack-reduction meter{height:118px;}
+
+/* the compact rack moves: its header is the handle */
+.rackc-head{cursor:grab;touch-action:none;user-select:none;}
+.rackc-head:active{cursor:grabbing;}
+.rackc-head button,.rackc-head select{cursor:pointer;}

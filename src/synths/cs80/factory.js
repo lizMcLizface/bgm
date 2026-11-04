@@ -3,7 +3,7 @@
 // the kinds of sound the original's preset rows offered (strings, brass, winds, keys, plucks, organ,
 // funk, bass) and are original estimates, not reproductions; the original presets were fixed
 // circuits and never documented as panel settings.
-import {defaultValues} from './params';
+import {defaultValues,CHANNEL_KEYS} from './params';
 
 // Every channel key, so a preset fully replaces its channel.
 const BASE={feet:1,pw:.5,pwm:0,pwmRate:.8,saw:0,square:0,noise:0,sine:0,hpf:20,hpRes:0,lpf:2000,lpRes:0,il:0,al:0,fa:.05,fd:.8,fr:.5,hpEg:0,
@@ -13,7 +13,7 @@ const STRINGS='#5b8fd9',BRASS='#d9772b',WOOD='#5fae7a',KEYS='#e3c04a',PLUCK='#9a
 
 export const ROW_I=[
  preset('Wide Bow',STRINGS,{saw:.7,square:.6,pw:.45,pwm:.4,pwmRate:.6,hpf:150,hpRes:.1,lpf:2400,lpRes:.1,al:.15,fa:.6,fd:2,fr:1.5,a:.4,d:2,s:.9,r:1.3,initBrill:.2,initLevel:.4,afterBrill:.35,afterLevel:.35}),
- preset('Shimmer Bow',STRINGS,{saw:.4,square:.8,pwm:.6,pwmRate:5.5,hpf:320,hpRes:.15,lpf:4200,lpRes:.05,al:.1,fa:.4,fd:1.5,fr:1.2,a:.3,d:1.5,s:.9,r:1.1,level:.75,initBrill:.2,initLevel:.35,afterBrill:.3,afterLevel:.3}),
+ preset('Shimmer',STRINGS,{saw:.4,square:.8,pwm:.6,pwmRate:5.5,hpf:320,hpRes:.15,lpf:4200,lpRes:.05,al:.1,fa:.4,fd:1.5,fr:1.2,a:.3,d:1.5,s:.9,r:1.1,level:.75,initBrill:.2,initLevel:.35,afterBrill:.3,afterLevel:.3}),
  preset('Swell Horn',BRASS,{saw:1,hpf:40,lpf:450,lpRes:.2,il:-.05,al:.55,fa:.12,fd:1.4,fr:.6,a:.07,d:1.2,s:.85,r:.45,level:.85,initBrill:.4,initLevel:.4,afterBrill:.5,afterLevel:.3,keytrack:.7}),
  preset('Breath',WOOD,{square:.15,noise:.18,sine:.9,hpf:350,hpRes:.1,lpf:2000,lpRes:.2,il:-.2,al:.25,fa:.12,fd:.8,fr:.35,a:.08,s:.9,r:.35,initBrill:.35,initLevel:.5,afterBrill:.3,afterLevel:.4,keytrack:1}),
  preset('Stop Organ',ORGAN,{square:1,sine:.4,hpf:30,lpf:2200,a:.01,s:1,r:.08,level:.75,afterBrill:.2,keytrack:1}),
@@ -44,6 +44,12 @@ export function neutralPanel(values){
  const out={...values};
  for(const key of Object.keys(d))if(!key.includes('.')&&!keep.has(key))out[key]=d[key];
  return {...out,detune:0,drift:.3,atVibrato:.15};
+}
+/** One channel at rest (the engine's defaults), with the panel's global controls at rest too: a clean start for a new tone. */
+export function neutralChannel(values,channel){
+ const d=defaultValues(),out=neutralPanel(values);
+ for(const key of CHANNEL_KEYS)out[channel+'.'+key]=d[channel+'.'+key];
+ return out;
 }
 /** Copies one row preset into its channel. */
 export const withChannel=(values,channel,p)=>({...values,...Object.fromEntries(Object.entries(p.values).map(([k,v])=>[channel+'.'+k,v]))});

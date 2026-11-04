@@ -96,7 +96,7 @@ export function DrumPage({kit}){
  const clock=useCoreClock({seq,kit,values:()=>valuesRef.current,enabled:core,silent:t=>silentRef.current(t),fill:()=>fillRef.current});
  const chooseClock=on=>{if(seq.playing)seq.togglePlay();save('synths:core-clock',on);setCore(on);};
  const view=core?{...seq,togglePlay:clock.toggle}:seq;
- return <SynthShell synth={synth} compactRack className={'drums '+kit.id} panelClassName="complete seq" libraries={libraries} initialPatch={shared.patch} headerExtras={props=><ShareDrums {...props} kit={kit} bank={bank}/>} onEngine={seq.onEngine} onStats={seq.onStats} onMidiRealtime={core?undefined:seq.onMidiRealtime}>
+ return <SynthShell synth={synth} compactRack keyboard={false} className={'drums '+kit.id} panelClassName="complete seq" libraries={libraries} initialPatch={shared.patch} headerExtras={props=><ShareDrums {...props} kit={kit} bank={bank}/>} onEngine={seq.onEngine} onStats={seq.onStats} onMidiRealtime={core?undefined:seq.onMidiRealtime}>
   {({values,change})=>{
    valuesRef.current=values;
    // Two devices side by side, as on a desk: the sequencer sends notes, the drum machine plays them.

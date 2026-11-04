@@ -1,6 +1,6 @@
 // @vitest-environment node
 import fs from 'node:fs';
-import {ROW_I,ROW_II,neutralPanel,withChannel,matchChannel} from './factory';
+import {ROW_I,ROW_II,neutralPanel,neutralChannel,withChannel,matchChannel} from './factory';
 import {CHANNEL_KEYS,sanitize,toPairs,defaultValues} from './params';
 import {PRESETS} from './presets';
 import {createOfflineSynth,rms,peak} from '../engine/offline';
@@ -8,7 +8,7 @@ import {createOfflineSynth,rms,peak} from '../engine/offline';
 const module=new WebAssembly.Module(fs.readFileSync('public/synths/classics.wasm'));
 
 test('the two tone rows hold eleven tones each, with names of their own',()=>{
- expect(ROW_I.map(p=>p.name)).toEqual(['Wide Bow','Shimmer Bow','Swell Horn','Breath','Stop Organ','Tine','Pluck Clav','Quill','Twang','Quack','Rubber']);
+ expect(ROW_I.map(p=>p.name)).toEqual(['Wide Bow','Shimmer','Swell Horn','Breath','Stop Organ','Tine','Pluck Clav','Quill','Twang','Quack','Rubber']);
  expect(ROW_II.map(p=>p.name)).toEqual(['Soft Bow','High Bow','Warm Horn','Low Horn','Flute Stop','Bright Clav','Quill Two','Nylon','Wah','Snap','Thump']);
 });
 
@@ -28,6 +28,13 @@ test('the neutral panel resets globals but keeps channels, volume and space',()=
  const calm=neutralPanel(busy);
  expect([calm.ringDepth,calm.subVco,calm.brilliance]).toEqual([0,0,defaultValues().brilliance]);
  expect([calm.volume,calm.reverbMix,calm['i.lpf']]).toEqual([.4,.6,busy['i.lpf']]);
+});
+
+test("a row's neutral puts its own channel and the panel at rest, and leaves the other channel alone",()=>{
+ const busy={...withChannel(withChannel(PRESETS[3].values,'i',ROW_I[2]),'ii',ROW_II[2]),ringDepth:.8,volume:.4};
+ const calm=neutralChannel(busy,'ii'),d=defaultValues();
+ expect([calm['ii.lpf'],calm['ii.saw'],calm.ringDepth,calm.volume]).toEqual([d['ii.lpf'],d['ii.saw'],0,.4]);
+ expect(calm['i.lpf']).toBe(busy['i.lpf']);
 });
 
 test('every row I + row II pairing renders finite, bounded and audible',()=>{
