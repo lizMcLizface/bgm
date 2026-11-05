@@ -3,6 +3,8 @@
 // wrapped so that switching it off crossfades to a straight through path, and each exposes patch(packet, initial) with the
 // unit's slice of the rack packet (see rackPackets in params.js).
 
+import { VoiceFx } from '../../app/engine/voiceFx';
+
 const moduleLoads = new WeakMap();
 const loadWorklets = (context) => {
     if (!moduleLoads.has(context)) moduleLoads.set(context, context.audioWorklet.addModule(`${import.meta.env.BASE_URL}rack-fx-processor.js?v=1`));
@@ -12,20 +14,38 @@ const loadWorklets = (context) => {
 const smooth = (context, param, value, initial) => (initial ? param.setValueAtTime(value, context.currentTime) : param.setTargetAtTime(value, context.currentTime, 0.02));
 const clampHz = (context, hz) => Math.max(10, Math.min(context.sampleRate * 0.45, hz));
 
+const FILTER_TYPES = [null, 'lowpass', 'highpass', 'bandpass', 'notch', 'lowshelf', 'highshelf'];
+const SHIMMER_NAMES = ['fifth', 'octave', 'twelfth', 'twoOctaves'];
+function voiceStage(context, key, toPreset) {
+    const fx = new VoiceFx(context, {}, [key]);
+    return { input: fx.input, output: fx.output, nodes: [fx.input, fx.output], fx, patch: (p) => fx.set(toPreset(p)), dispose: () => fx.dispose() };
+}
+
 const BUILDERS = {
     // low cut and high cut, 12 or 24 dB per octave (two biquads each in 24 dB mode; a neutral frequency makes the second a no-op)
     filter(context) {
         const biquad = (type) => { const f = context.createBiquadFilter(); f.type = type; f.Q.value = 0.707; return f; };
-        const input = context.createGain(), hp = [0, 1].map(() => biquad('highpass')), lp = [0, 1].map(() => biquad('lowpass'));
-        const chain = [...hp, ...lp];
+        // after the cuts, one filter of a chosen type (a peaking filter with no gain leaves the sound alone while the cuts are in use)
+        const input = context.createGain(), hp = [0, 1].map(() => biquad('highpass')), lp = [0, 1].map(() => biquad('lowpass')), main = biquad('peaking');
+        main.gain.value = 0;
+        const chain = [...hp, ...lp, main];
         input.connect(chain[0]);
         for (let i = 0; i < chain.length - 1; i++) chain[i].connect(chain[i + 1]);
         return {
             input, output: chain[chain.length - 1], nodes: [input, ...chain],
             patch(p, initial) {
-                const steep = p.slope >= 0.5;
-                smooth(context, hp[0].frequency, clampHz(context, p.low), initial); smooth(context, hp[1].frequency, steep ? clampHz(context, p.low) : 10, initial);
-                smooth(context, lp[0].frequency, clampHz(context, p.high), initial); smooth(context, lp[1].frequency, steep ? clampHz(context, p.high) : context.sampleRate * 0.45, initial);
+                const mode = Math.round(p.type ?? 0), steep = p.slope >= 0.5, open = context.sampleRate * 0.45;
+                if (mode === 0) {
+                    smooth(context, hp[0].frequency, clampHz(context, p.low), initial); smooth(context, hp[1].frequency, steep ? clampHz(context, p.low) : 10, initial);
+                    smooth(context, lp[0].frequency, clampHz(context, p.high), initial); smooth(context, lp[1].frequency, steep ? clampHz(context, p.high) : open, initial);
+                    main.type = 'peaking'; smooth(context, main.gain, 0, initial);
+                } else {
+                    // the cuts step aside; the one filter does the work
+                    smooth(context, hp[0].frequency, 10, initial); smooth(context, hp[1].frequency, 10, initial);
+                    smooth(context, lp[0].frequency, open, initial); smooth(context, lp[1].frequency, open, initial);
+                    main.type = FILTER_TYPES[mode] ?? 'lowpass';
+                    smooth(context, main.frequency, clampHz(context, p.cutoff), initial); smooth(context, main.Q, p.q, initial); smooth(context, main.gain, main.type.endsWith('shelf') ? p.gain : 0, initial);
+                }
             },
         };
     },
@@ -92,6 +112,10 @@ const BUILDERS = {
         const set = (name, v, initial) => smooth(context, node.parameters.get(name), v, initial);
         return { input: node, output: node, nodes: [node], worklets: [node], patch(p, initial) { set('semitones', p.semi, true); set('cents', p.fine, true); set('mix', p.mix, initial); } };
     },
+    // the calmbgm synth's own stages: each is a VoiceFx holding the one stage, which routes around itself while it does nothing
+    tape: (context) => voiceStage(context, 'tape', (p) => ({ tapeWow: p.wow, tapeWowRate: p.wowRate, tapeFlutter: p.flutter, tapeDrive: p.drive, tapeTone: p.tone })),
+    shimmer: (context) => voiceStage(context, 'shimmer', (p) => ({ shimmerMix: p.mix, shimmerDecay: p.decay, shimmerInterval: SHIMMER_NAMES[Math.round(p.interval)] ?? 'octave', shimmerClimb: p.climb, shimmerTone: p.tone })),
+    freeze: (context) => voiceStage(context, 'freeze', (p) => ({ freezeMix: p.mix, freezeLength: p.length, freezeFade: p.fade, freezeHold: p.hold >= 0.5 })),
 };
 
 export const EXTRA_KINDS = Object.keys(BUILDERS);
@@ -107,9 +131,11 @@ export async function createExtraStage(context, kind) {
             inner.patch(packet, initial);
             smooth(context, wet.gain, packet.on ? 1 : 0, initial); smooth(context, through.gain, packet.on ? 0 : 1, initial);
         },
+        clear() { inner.fx?.clear(); },
         dispose() {
             for (const o of inner.oscillators ?? []) { try { o.stop(); } catch { /* not started */ } }
             for (const w of inner.worklets ?? []) w.port.postMessage('stop');
+            inner.dispose?.();
             [input, output, through, wet, ...inner.nodes].forEach((n) => { try { n.disconnect(); } catch { /* already gone */ } });
         },
     };

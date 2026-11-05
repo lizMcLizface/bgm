@@ -17,7 +17,7 @@ export function spectralFixture(raw={}){
  const bin=Math.max(13,Math.round(config.hz*SPECTRAL_SIZE/config.rate)|1),fundamental=bin*config.rate/SPECTRAL_SIZE,midi=69+12*Math.log2(fundamental/440),patch=kind==='fm'?initialFM():initialPatch();
  if(kind==='fm'){
   Object.assign(patch.global,{operators:4,polyphony:1,gain:.18,quality:0,feedback:0,index:config.depth,pressure:0,keySync:1,width:0,vibrato:0,tremolo:0,lfoIndex:0,pitchStart:0});
-  patch.routes=Array.from({length:6},()=>Array(6).fill(0));patch.carriers=[0,1,0,0,0,0];
+  patch.routes=Array.from({length:8},()=>Array(8).fill(0));patch.carriers=[0,1,0,0,0,0,0,0];
   for(const op of patch.operators)Object.assign(op,{ratio:1,detune:0,level:.65,attack:.01,decay1:.01,decay2:.01,peak:1,breakpoint:1,sustain:1,release:.1,velocity:0,keyScale:0,rateScale:0,pressure:0,pan:0});
   if(config.test!=='fm-sine'){patch.operators[0].ratio=5;patch.operators[0].level=4;patch.routes[0][1]=1;}
   if(config.test==='fm-stack'){patch.operators[0].level=3;patch.operators[1].ratio=3;patch.operators[1].level=3;patch.routes[1][2]=1;patch.carriers=[0,0,1,0,0,0];}

@@ -16,7 +16,7 @@ mod simd;
 mod simd_voices;
 const VOICES: usize = 32;
 const UNISON: usize = 4;
-const PARAMS: usize = 106;
+const PARAMS: usize = 107;
 const QUEUE: usize = 4096;
 const BLOCK: usize = 2048;
 const LUT: usize = 2048;
@@ -202,6 +202,8 @@ fn segment_edges(
 struct Env {
     value: f32,
     linear: f32,
+    // the level the decay starts from: 1, or the hold level
+    start: f32,
     total: u32,
     stage: u8,
     left: u32,
@@ -215,6 +217,7 @@ impl Env {
     const ZERO: Self = Self {
         value: 0.,
         linear: 0.,
+        start: 1.,
         total: 1,
         stage: 0,
         left: 0,
@@ -267,19 +270,27 @@ impl Env {
                 self.linear += ((p[offset] * self.attack_scale).max(self.attack_min) * sr)
                     .max(1.)
                     .recip();
-                self.value = if p[curves] == 1. {
-                    self.linear
+                // with a hold, the attack rises to the hold level (parameter 106), which may sit below the sustain
+                let top = if offset == 17 && p[100] > 0. && p[106] > 0. {
+                    p[106]
                 } else {
-                    self.linear.clamp(0., 1.).powf(p[curves])
+                    1.
                 };
+                self.value = top
+                    * if p[curves] == 1. {
+                        self.linear
+                    } else {
+                        self.linear.clamp(0., 1.).powf(p[curves])
+                    };
                 if self.linear >= 1. {
-                    self.value = 1.;
-                    self.linear = 1.;
+                    self.value = top;
+                    self.linear = top;
                     if offset == 17 && p[100] > 0. {
                         // an optional hold at the peak before the decay (amp envelope only)
                         self.stage = 5;
                         self.left = (p[100] * sr).max(1.) as u32;
                     } else {
+                        self.start = 1.;
                         self.stage = 2;
                         self.left = (p[offset + 1] * sr).max(1.) as u32;
                         self.total = self.left;
@@ -287,9 +298,9 @@ impl Env {
                 }
             }
             5 => {
-                self.value = 1.;
                 self.left = self.left.saturating_sub(1);
                 if self.left == 0 {
+                    self.start = self.linear;
                     self.stage = 2;
                     self.left = (p[offset + 1] * sr).max(1.) as u32;
                     self.total = self.left;
@@ -302,7 +313,7 @@ impl Env {
                 self.value = if p[curves + 1] == 1. {
                     self.linear
                 } else {
-                    1. + (p[offset + 2] - 1.) * fraction.powf(p[curves + 1])
+                    self.start + (p[offset + 2] - self.start) * fraction.powf(p[curves + 1])
                 };
                 if self.left == 0 {
                     self.stage = 3;

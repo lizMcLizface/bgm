@@ -7,6 +7,8 @@ import {EFFECTS} from '../../synth-lab/effectsConfig';
 import {INSERTS} from '../../synth-lab/insertsConfig';
 import voices from '../../library/voices.json';
 import {translatedWasmVoice,needsNativeSource} from '../../app/engine/wasmPreset';
+import {cleanRack} from '../effects/params';
+import {DEFAULT_CHAIN,UNITS} from '../effects/order';
 
 // The front page's own sounds (src/library/voices.json), translated to these engines by the same code that plays them on
 // the front page's Wasm engine (app/engine/wasmPreset.js): subtractive ones become Poly patches, those with FM become FM
@@ -22,20 +24,22 @@ const FRONT_CATEGORIES=[
 ];
 const FRONT_FROM={Pads:'fp-pads',Bass:'fp-bass',Leads:'fp-leads','Keys & plucks':'fp-keys',Textures:'fp-textures','Classic keys':'fp-classic'};
 const HIDDEN=new Set(['Measured Violin','Measured Cello']);
+// The original's bit crusher belongs in the effects chain: its bit depth, its wet amount and its fixed quarter-rate sample hold, on the rack's Bit crusher unit.
+const crusherRack=raw=>raw.bitCrushAmount>0?{...cleanRack(),'master.chain':DEFAULT_CHAIN|1<<UNITS.indexOf('crusher'),'switch.crusher':1,'crusher.bits':raw.bitCrushDepth??8,'crusher.divide':4,'crusher.mix':Math.min(1,raw.bitCrushAmount)}:undefined;
 const FRONT_PAGE=Object.entries(FRONT_FROM).flatMap(([from,category])=>Object.entries(voices[from]??{})
- .filter(([name,raw])=>!HIDDEN.has(name)&&!needsNativeSource(raw))
- .map(([name,raw])=>({name,category,...translatedWasmVoice(raw,8,null)})));
+ .filter(([name,raw])=>!HIDDEN.has(name)&&!needsNativeSource(raw,{poly:true}))
+ .map(([name,raw])=>({name,category,...translatedWasmVoice(raw,8,null),rack:crusherRack(raw)})));
 
 function schema(fm){
  const fields=[];
  const add=(prefix,defs)=>defs.forEach(([key,label,min,max,step,value])=>fields.push({key:`${prefix}.${key}`,label,min,max,step,value}));
  add('global',fm?FM_GLOBAL:GLOBAL);
- for(let i=0;i<(fm?6:2);i++)add(`${fm?'operators':'layers'}.${i}`,fm?FM_OPERATOR:LAYER);
+ for(let i=0;i<(fm?8:2);i++)add(`${fm?'operators':'layers'}.${i}`,fm?FM_OPERATOR:LAYER);
  add('effects',EFFECTS);add('inserts',INSERTS);
  add('performance',[['mode','Voice mode',0,2,1,0],['portamento','Portamento · s',0,3,.01,0],['glide','Glide',0,1,1,0]]);
- if(fm)for(let i=0;i<6;i++){
+ if(fm)for(let i=0;i<8;i++){
   fields.push({key:`carriers.${i}`,label:`Operator ${i+1} to output`,min:0,max:1,step:.01,value:i%2});
-  for(let j=i+1;j<6;j++)fields.push({key:`routes.${i}.${j}`,label:`Operator ${i+1} → ${j+1}`,min:0,max:2,step:.01,value:j===i+1&&i%2===0?1:0});
+  for(let j=i+1;j<8;j++)fields.push({key:`routes.${i}.${j}`,label:`Operator ${i+1} → ${j+1}`,min:0,max:2,step:.01,value:j===i+1&&i%2===0?1:0});
  }
  const params=defineParams(fields.map((f,id)=>{
   const unit=/· Hz/.test(f.label)?'Hz':/· s$|seconds$/.test(f.label)?'s':/· ms/.test(f.label)?'ms':/· dB/.test(f.label)?'dB':/· cents/.test(f.label)?'ct':/· semitones/.test(f.label)?'st':/· octaves/.test(f.label)?'oct':f.step===1?'n':f.min<0?'bi':f.max<=1?'%':'decimal';
@@ -56,7 +60,7 @@ function schema(fm){
   return native(patch);
  };
  const own=(fm?FM_RECIPES:RECIPES).map(p=>({name:p.name,...(fm?FM_SOUNDS:POLY_SOUNDS)[p.name],values:flatten(native(p)),colour:fm?'#9b86e5':'#63c5b6'}));
- const front=FRONT_PAGE.filter(f=>f.kind===(fm?'fm':'subtractive')).map(f=>({name:f.name,category:f.category,styles:['front page'],note:'The front page sound of this name, translated to this synth.',values:flatten(native(f.patch)),colour:fm?'#9b86e5':'#63c5b6'}));
+ const front=FRONT_PAGE.filter(f=>f.kind===(fm?'fm':'subtractive')).map(f=>({name:f.name,category:f.category,styles:['front page'],note:'The front page sound of this name, translated to this synth.',values:flatten(native(f.patch)),...(f.rack?{rack:f.rack,rackLean:true}:{}),colour:fm?'#9b86e5':'#63c5b6'}));
  return {params,flatten,inflate,presets:[...own,...front],categories:[...(fm?FM_CATEGORIES:POLY_CATEGORIES),...FRONT_CATEGORIES.filter(c=>front.some(p=>p.category===c.id))]};
 }
 // Each DIY synth's own sound categories and where its recipes sit in them.
@@ -87,9 +91,9 @@ const FM_SOUNDS={
 export const POLY=schema(false),FM=schema(true);
 export function applyTopology(values,count,algorithm){
  const next={...values,'global.operators':count,'global.algorithm':algorithm},t=topology(count,algorithm);
- for(let i=0;i<6;i++){
+ for(let i=0;i<8;i++){
   next[`carriers.${i}`]=t.carriers[i];
-  for(let j=i+1;j<6;j++)next[`routes.${i}.${j}`]=t.routes[i][j];
+  for(let j=i+1;j<8;j++)next[`routes.${i}.${j}`]=t.routes[i][j];
  }
  next['global.feedbackOp']=Math.min(next['global.feedbackOp'],count-1);
  return next;

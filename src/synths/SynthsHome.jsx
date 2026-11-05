@@ -4,7 +4,7 @@ import SynthGraphic from './SynthGraphic';
 const BASE=import.meta.env.BASE_URL;
 const SYNTHS=[
  {id:'poly',name:'DI-Poly',maker:'calmbgm · subtractive',colour:'#63c5b6',ready:true,line:'Four polyphonic architectures, dual oscillators, optional two-layer voices, modulation routes, air and body colour, inserts and room effects.'},
- {id:'fm',name:'DIY FM',maker:'calmbgm · FM',colour:'#9b86e5',ready:true,line:'Four or six operators with editable routing, operator envelopes, feedback, expressive modulation and the original FM recipes.'},
+ {id:'fm',name:'DIY FM',maker:'calmbgm · FM',colour:'#7fa8f5',ready:true,line:'One to eight operators with editable routing, operator envelopes, feedback, expressive modulation and the original FM recipes.'},
  {id:'piano',name:'Grand & Upright',maker:'calmbgm · modelled strings',colour:'#d9b98a',ready:true,line:'A concert grand, a felted piano for cosy sounds and an old upright, modelled from stiff strings, felt hammers and a soundboard, with a choice of temperament, key and stretch.'},
  {id:'iowa',name:'Iowa instruments',maker:'calmbgm · measured recordings',colour:'#8fb3a0',ready:true,line:'Winds, brass, strings and mallets rebuilt from measurements of the University of Iowa recordings: harmonics through the attack, breath and bow noise, vibrato and how every partial decays.'},
  {id:'strings',name:'Strings',maker:'calmbgm · measured cello',colour:'#c9a15f',ready:true,line:'A cello rebuilt from measurements of a sampled one: long and live bowed notes, short notes and pizzicato, with the vibrato, bow attack and body resonances measured, not recorded.'},

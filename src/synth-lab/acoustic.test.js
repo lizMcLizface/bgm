@@ -17,7 +17,7 @@ function engine(kind,colour={},sr=48000){
  return {e,p,event:(...args)=>e[isFM?'fm_event':'engine_event'](...args),stat:i=>e[isFM?'fm_stat':'engine_stat'](i),render:(frames,chunk=128)=>{const out=new Float32Array(frames);for(let at=0;at<frames;at+=chunk){const n=Math.min(chunk,frames-at);e[isFM?'fm_render':'engine_render'](n);out.set(new Float32Array(e.memory.buffer,isFM?e.fm_output(0):e.engine_left(),n),at);}return out;},panic:()=>e[isFM?'fm_panic':'engine_panic']()};
 }
 test('acoustic parameters append to both formats with neutral old-patch defaults and safe bounds',()=>{
- expect(LAYER.slice(86,99)).toEqual(VOICE_COLOUR);expect(FM_GLOBAL.slice(41)).toEqual(VOICE_COLOUR);
+ expect(LAYER.slice(86,99)).toEqual(VOICE_COLOUR);expect(FM_GLOBAL.slice(41,54)).toEqual(VOICE_COLOUR);
  for(const p of [clonePatch({version:1}),cloneFM({version:1,kind:'fm'})]){const c=p.kind==='fm'?p.global:p.layers[0];expect([c.breath,c.bow,c.formant,c.body]).toEqual([0,0,0,0]);expect(patchColourTail(p)).toBe(0);}
  const p=initialPatch();Object.assign(p.layers[0],{body:10,bodyType:2.8,bodyDecay:-9,vowel:Infinity});const c=clonePatch(p).layers[0];expect([c.body,c.bodyType,c.bodyDecay,c.vowel]).toEqual([1,3,.3,0]);
  expect(voiceColourTail({body:1,bodyDecay:3,formant:1})).toBeCloseTo(10.9);

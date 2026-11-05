@@ -2,6 +2,7 @@ import React from 'react';
 import SynthShell from '../ui/SynthShell';
 import {SYNTHS} from '../models';
 import PatchGrid from './PatchGrid';
+import {chorusMode} from './params';
 
 // Laid out like the original front panel. On the left, in one framed block like the 106's own left-hand panel: volume and
 // portamento, the bender sensitivities, and the additions for playing from a piano (velocity and touch, stereo width). To
@@ -21,13 +22,13 @@ const VOICE=[
  [
   {title:'VCA',tone:'blue',keys:['level',['vcaMode','VCA','switch']]},
   {title:'ENV',tone:'amber',keys:['attack','decay','sustain','release'],shape:{env:'amp',a:'attack',d:'decay',s:'sustain',r:'release'}},
-  {title:'Chorus',tone:'green',keys:[['chorus','Mode'],'chorusNoise']},
+  {title:'Chorus',tone:'green',keys:[['chorus','Mode'],'chorusNoise',['chorusMix','Mix'],['chorusRate','Rate'],['chorusDepth','Depth']]},
   {title:'Voices',tone:'cream',keys:[['unison','Mode','switch'],'hold',['unisonDetune','Detune'],'voices',['spread','Spread']]},
  ],
 ];
 
 export default function JunoPage(){
- return <SynthShell synth={SYNTHS.juno} className="juno" panelClassName="complete" picker={PatchGrid} gridKeys toggles>
+ return <SynthShell synth={SYNTHS.juno} expand={(key,value)=>key==='chorus'?chorusMode(value):[key]} className="juno" helpInBar panelClassName="complete" picker={PatchGrid} gridKeys toggles>
   {({group})=><div className="jn-layout">
    <div className="jn-perf" role="group" aria-label="Performance">{PERFORMANCE.map((row,i)=><div className="jn-row" key={i}>{row.map(g=>group(g))}</div>)}</div>
    <div className="jn-main">{VOICE.map((row,i)=><div className="jn-row" key={i}>{row.map(g=>group(g))}</div>)}</div>

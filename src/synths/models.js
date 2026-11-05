@@ -28,7 +28,7 @@ const drums=kit=>{const params=drumParams(kit);return {id:kit.id,model:kit.model
 
 export const SYNTHS={
  poly:{id:'poly',name:'DI-Poly',subtitle:'polyphonic subtractive synth',params:POLY.params,presets:POLY.presets,categories:POLY.categories},
- fm:{id:'fm',name:'DIY FM',subtitle:'4 / 6 operator FM synth',params:FM.params,presets:FM.presets,categories:FM.categories},
+ fm:{id:'fm',name:'DIY FM',subtitle:'up to 8 operator FM synth',params:FM.params,presets:FM.presets,categories:FM.categories},
  cs80:{id:'cs80',model:MODELS.cs80,name:'V 80',subtitle:'two-tier polysynth',params:cs80Params,presets:CS80_PRESETS,categories:CS80_CATEGORIES},
  juno:{id:'juno',model:MODELS.juno,name:'Analog 106',subtitle:'DCO polysynth',params:junoParams,presets:JUNO_PRESETS,categories:JUNO_CATEGORIES},
  prophet5:{id:'prophet5',model:MODELS.prophet5,name:'Oracle 5',subtitle:'analog polysynth',params:prophetParams,presets:PROPHET_PRESETS,categories:PROPHET_CATEGORIES},

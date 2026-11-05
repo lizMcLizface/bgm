@@ -37,6 +37,7 @@ export const LAYER=[
  ['ampHold','Amp hold · s',0,4,.01,0],['noiseType','Noise colour',0,2,1,0],
  ['pitchEnvAmount','Pitch envelope · semitones',-24,24,.1,0],['pitchEnvDecay','Pitch envelope decay · s',.01,4,.01,.15],
  ['phaseLock','Restart oscillator phase',0,1,1,0],['bPhase','B start phase',0,1,.01,0],
+ ['ampHoldLevel','Amp hold level',.05,1,.01,1],
 ];
 export const MOD_SOURCES=['Off','LFO 1','LFO 2','Mod envelope','Amp envelope','Filter envelope','Velocity','Keyboard · centred on C4','Pressure','Mod wheel','Smooth random · per voice'];
 export const MOD_TARGETS=['Off','Pitch · ±100 cents','Cutoff · ±4 octaves','Pulse width · ±0.4','Amplitude · ±100%','Pan · ±full width'];

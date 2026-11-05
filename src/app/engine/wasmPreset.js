@@ -6,6 +6,8 @@ const wave=s=>({off:0,sine:1,triangle:10,sawtooth:3,square:4,square_dc:4,organ:5
 const curve=(shape,exponent)=>shape==='linear'?1:shape==='exponential'?exponent:1;
 const resonance=p=>Math.max(0,Math.min(1,(Math.SQRT2-1/(p.filterType==='bandpass'?Math.max(.1,p.filterQ):10**(p.filterQ/20)))/(Math.SQRT2-.15)));
 
+// A noise bed of its own: enough noise, its band-pass at the note on, and nothing else shaping the voice.
+const pitchedNoise=p=>p?.noiseMix>=.3&&!!p.noiseFilterEnabled&&(p.filterType??'lowpass')==='lowpass'&&(p.filterFreq??22050)>=11000&&!p.filterEnvAmount&&!p.filterLfoDepth;
 // `dynamics`: the scene's (settings.dynamics) - velocity → softer attack in the kernel, and velocity → filter on top of the sound's own.
 export function translatedWasmPreset(raw={},polyphony=8,dynamics=null){
  const p={...DEFAULTS,...raw},out=initialPatch(),l=out.layers[0];out.name='Translated voice';
@@ -17,9 +19,15 @@ export function translatedWasmPreset(raw={},polyphony=8,dynamics=null){
   attack:p.gainAttack,decay:p.gainDecay,sustain:p.gainSustain,release:p.gainRelease,legacyAmp:1,ampAttackCurve:curve(p.envelopeAttackShape,p.envelopeAttackExponent),ampDecayCurve:curve(p.envelopeDecayShape,p.envelopeDecayExponent),ampReleaseCurve:curve(p.envelopeReleaseShape,p.envelopeReleaseExponent),
   filterAttack:Math.max(.002,p.filterAttack),filterDecay:Math.max(.002,p.filterDecay*4.2),filterSustain:0,filterRelease:Math.max(.002,p.filterRelease),filterDecayCurve:.5,
   lfoPitch:p.vibratoDepth,lfoRate:Math.max(.01,p.vibratoRate),lfo2Filter:p.filterLfoDepth/1200,lfo2Rate:Math.max(.01,p.filterLfoRate),noise:p.noiseMix,breath:p.breathAmount,formant:p.formantAmount,vowel:p.formantVowel==='oo'?1:p.formantVowel==='ee'?2:0,formantShift:p.formantShift,
-  polyPitch:0,sub:0,drift:0,drive:0,pressureTone:0,highpass:p.masterFilterType==='highpass'?p.masterFilterFreq:10,highResonance:p.masterFilterType==='highpass'?(Math.SQRT2-1/10**(p.masterFilterQ/20))/(Math.SQRT2-.15):0});
+  noiseType:{white:0,pink:1,brown:2}[p.noiseType]??0,polyPitch:0,sub:0,drift:0,drive:0,pressureTone:0,highpass:p.masterFilterType==='highpass'?p.masterFilterFreq:10,highResonance:p.masterFilterType==='highpass'?(Math.SQRT2-1/10**(p.masterFilterQ/20))/(Math.SQRT2-.15):0});
  const d=dynamicsOf(dynamics);l.velocityAttack=d.attack;l.velocityTone=Math.min(4,l.velocityTone+d.brightness*1.5);
- if(p.pitchEnvAmount){Object.assign(l,{modAttack:.002,modDecay:Math.max(.002,p.pitchEnvDecay*1.3),modSustain:0,modRelease:.002,modDecayCurve:.25,modSource4:3,modTarget4:1,modDepth4:p.pitchEnvAmount/100});}
+ // The pitch sweep is the kernel's own: cents → semitones, and the original settles with time constant decay/3.
+ if(p.pitchEnvAmount)Object.assign(l,{pitchEnvAmount:Math.max(-24,Math.min(24,p.pitchEnvAmount/100)),pitchEnvDecay:Math.max(.01,p.pitchEnvDecay/3)});
+ // The original filters its noise alone with a band-pass sitting on the note. The kernel mixes noise ahead of the voice filter, so a noise bed
+ // whose own filter is the only one (the main filter wide open) becomes a key-tracked band-pass at the note: the oscillator is at that pitch and passes.
+ if(pitchedNoise(p)){Object.assign(l,{filter:2,cutoff:261.63,keytrack:1,filterAmount:0,velocityTone:0,resonance:Math.max(0,Math.min(1,(Math.SQRT2-1/Math.max(.1,p.noiseFilterQ))/(Math.SQRT2-.15)))});}
+ // The original rises to the hold level, holds, then moves to the sustain level (which can be above it: a swell). The kernel does the same.
+ if(p.gainHold>0)Object.assign(l,{ampHold:Math.min(4,p.gainHold),ampHoldLevel:Math.max(.05,Math.min(1,p.gainHoldLevel||1))});
  // The old sub is OFF at octave zero; active subs keep their actual shape.
  if(p.subOscOctaveOffset!==0&&p.subOscType!=='off'){
   out.global.model=2;out.layers[1]={...l,waveA:wave(p.subOscType),waveB:0,levelA:.5,levelB:0,coarseA:l.coarseA+p.subOscOctaveOffset*12,coarseB:0,fineB:0};
@@ -43,11 +51,12 @@ export function translatedWasmVoice(raw={},polyphony=8,dynamics=null){
   velocity:i===0?dynamicsOf(dynamics).brightness*.8:1,keyScale:0,rateScale:0,pan:0,legacyEnvelope:i===0?0:1,attackCurve:i===0?1:curve(p.envelopeAttackShape,p.envelopeAttackExponent),decayCurve:i===0?1:curve(p.envelopeDecayShape,p.envelopeDecayExponent),releaseCurve:i===0?4:curve(p.envelopeReleaseShape,p.envelopeReleaseExponent)});
  f.effects=base.effects;f.inserts=base.inserts;return {kind:'fm',patch:sanitizeFM(f)};
 }
-// The kernel's noise is white and unpitched. A trace of coloured noise is close enough, but a noise-dominant sound (wind, rain) stays on the original engine.
-const coloursNoise=p=>p?.noiseMix>=.3&&(p.noiseType!=='white'&&p.noiseType!==undefined||p.noiseFilterEnabled);
-// The kernel has no bit crusher either; a light touch is close enough, a clear one stays on the original engine.
-const crushes=p=>p?.bitCrushAmount>=.2;
-export const needsNativeSource=p=>p?.stringModel==='piano'||p?.stringModel==='plucked'||!!coloursNoise(p)||!!crushes(p);
+// The kernel's noise comes in white, pink and brown. Noise through a band-pass on the note is the pitched noise bed (wind, rain): DI-Poly takes it as a key-tracked
+// band-pass (`poly`), the front page's engine still plays it from the original. Noise with any other shaping around it stays on the original engine.
+const coloursNoise=(p,poly)=>p?.noiseMix>=.3&&p.noiseFilterEnabled&&!(poly&&pitchedNoise(p));
+// The kernel has no bit crusher; a light touch is close enough, a clear one stays on the original engine. DI-Poly puts it in the effects chain (`poly`).
+const crushes=(p,poly)=>!poly&&p?.bitCrushAmount>=.2;
+export const needsNativeSource=(p,{poly=false}={})=>p?.stringModel==='piano'||p?.stringModel==='plucked'||!!coloursNoise(p,poly)||!!crushes(p,poly);
 
 // Availability is not a fidelity claim. Keep unresolved mappings visible while
 // the original Instrument remains the reference for existing presets.
@@ -56,12 +65,11 @@ export function wasmMappingNotes(raw={}){
  if(p.reverbAmount>0)notes.push('FDN room replaces the original impulse response');
  if(p.chorusAmount>0||p.flangerAmount>0||p.phaserAmount>0)notes.push('modulation-effect topology differs');
  if(p.fmIndex>0||p.fmEnvAmount>0){if(p.vcoType!=='sine'||p.osc2Amount>0&&p.osc2Type!=='sine'||p.voiceCount>1)notes.push('FM waveform/unison mapping incomplete');if(p.filterType!=='lowpass'||p.filterFreq<11000||p.filterEnvAmount||p.filterLfoDepth)notes.push('FM filter mapping incomplete');}
- if(p.gainHold>0||[p.envelopeAttackShape,p.envelopeDecayShape,p.envelopeReleaseShape].some(s=>!['linear','exponential'].includes(s)))notes.push('hold/custom envelope shape not mapped');
+ if(p.fmIndex>0&&p.gainHold>0||[p.envelopeAttackShape,p.envelopeDecayShape,p.envelopeReleaseShape].some(s=>!['linear','exponential'].includes(s)))notes.push('hold/custom envelope shape not mapped');
  if(p.voiceCount>4)notes.push('unison limited to four');
  if(p.delayAmount>0&&p.pingPongAmount>0)notes.push('two delay chains reduced to one');
  if(p.octaveRatio!==2||Object.keys(p).some(k=>/^pitch[A-G]/.test(k)&&k!=='pitchEnvAmount'&&k!=='pitchEnvDecay'&&p[k]!==1))notes.push('custom note tuning not mapped');
- if(p.pitchEnvAmount)notes.push('pitch transient approximated');
- if(p.noiseMix>0&&(p.noiseType!=='white'||p.noiseFilterEnabled))notes.push('noise colour/filter not mapped');
+  if(p.noiseMix>=.3&&p.noiseFilterEnabled&&!pitchedNoise(p))notes.push('noise filter not mapped');
  if(p.bitCrushAmount>0)notes.push('bit crusher not mapped');
  return notes;
 }

@@ -10,7 +10,7 @@ static mut VECTOR: bool = true;
 static mut FRAMES: u64 = 0;
 static mut LANES: u64 = 0;
 struct Scratch {
-    expressions: [[[f32; 11]; VOICES]; SLOTS],
+    expressions: [[[f32; 13]; VOICES]; SLOTS],
     refresh: [[bool; VOICES]; SLOTS],
     colours: [[bool; VOICES]; SLOTS],
     output: [[[f32; OPS]; VOICES]; SLOTS],
@@ -20,7 +20,7 @@ struct Scratch {
 impl Scratch {
     fn new() -> Self {
         Self {
-            expressions: [[[0.; 11]; VOICES]; SLOTS],
+            expressions: [[[0.; 13]; VOICES]; SLOTS],
             refresh: [[false; VOICES]; SLOTS],
             colours: [[false; VOICES]; SLOTS],
             output: [[[0.; OPS]; VOICES]; SLOTS],
@@ -318,9 +318,16 @@ fn tick(
             v.glide -= 1;
         }
         let update = control || e.frame == v.age;
+        if update {
+            v.lfo_fade = if e.g[59] > 0. {
+                ((e.frame - v.age) as f32 / e.sr / e.g[59]).min(1.)
+            } else {
+                1.
+            };
+        }
         let pressure = v.pressure.max(e.g[12]);
         let random = v.expression.tick(&e.g, sr, expression_alpha, motion);
-        let mut targets = [0.; 11];
+        let mut targets = [0.; 13];
         if routes {
             for slot in 0..4 {
                 let at = 29 + slot * 3;
@@ -342,7 +349,7 @@ fn tick(
                 targets[destination - 1] += source * e.g[at + 2];
             }
         }
-        for k in 0..11 {
+        for k in 0..13 {
             if targets[k] != 0. || v.expression.routes[k] != 0. {
                 v.expression.routes[k] +=
                     (targets[k].clamp(-1., 1.) - v.expression.routes[k]) * expression_alpha;
@@ -359,8 +366,9 @@ fn tick(
                 * ((v.midi - 69.
                     + e.bend
                     + transient
-                    + lfo * (e.g[11] + e.g[9] * 35.) / 100.
-                    + (random * e.g[27] + expression[0] * 100.) / 100.)
+                    + (e.pitch1 * v.lfo_fade + e.pitch2)
+                    + (random * e.g[27] + expression[0] * 100.) / 100.
+                    + v.expression.fixed * e.g[58] / 100.)
                     / 12.)
                     .exp2();
             for op in 0..count {
@@ -447,8 +455,10 @@ fn tick(
                         one
                     }
                     * V::a(
-                        band.units
-                            .map(|(s, _, _)| 1. + lfos[s][0] * engines[s].g[18]),
+                        band.units.map(|(s, v, _)| {
+                            (1. + engines[s].idx1 * engines[s].voices[v].lfo_fade)
+                                + engines[s].idx2
+                        }),
                     )
                     / V::s(2. * PI),
         );
@@ -516,7 +526,7 @@ fn tick(
             if e.carriers[op] > 0. {
                 let p = &e.p[op];
                 let x = output[slot][voice_index][op] * e.carriers[op] / norm
-                    * (1. - e.g[17] * (lfo + 1.) * 0.5);
+                    * ((1. - e.amp1 * v.lfo_fade) - e.amp2);
                 for ch in 0..2 {
                     voice_out[ch] += x * e.pan[op][ch];
                 }
@@ -528,7 +538,7 @@ fn tick(
                         * (1. + expression[5 + op])
                         * e.carriers[op]
                         / norm
-                        * (1. - e.g[17] * (lfo + 1.) * 0.5);
+                        * ((1. - e.amp1 * v.lfo_fade) - e.amp2);
                     for ch in 0..2 {
                         noise_gain[ch] += level * e.pan[op][ch];
                     }
@@ -627,10 +637,8 @@ fn render_group(engines: &mut [Fm; SLOTS], slots: &[usize], n: usize, model: &mu
             for &s in slots {
                 let e = &mut engines[s];
                 e.bend += (e.g[8] - e.bend) * 0.002 / factor as f32;
-                lfos[s][0] = sin(&e.sine, e.lfo);
-                e.lfo = (e.lfo + e.g[10] / sr).fract();
-                lfos[s][1] = sin(&e.sine, e.lfo2);
-                e.lfo2 = (e.lfo2 + e.g[28] / sr).fract();
+                let (a, b) = e.lfo_tick(sr);
+                lfos[s] = [a, b];
             }
             let control = engines[slots[0]].frame % 16 == 0 && sub == 0;
             let out = tick(

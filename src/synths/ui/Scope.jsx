@@ -1,7 +1,8 @@
 import React,{useCallback,useEffect,useRef,useState} from 'react';
-import {findTrigger,levels,pitchOf,noteName,spectrumDb,spectrumTrace,spectralPeak,wavBytes} from './scopeMath';
+import {findTrigger,findPitchTrigger,refinePeriod,levels,pitchOf,noteName,spectrumDb,spectrumTrace,spectralPeak,wavBytes} from './scopeMath';
 import {load,save} from '../storage';
 import useFloating from './useFloating';
+import {onSynth} from './Desk';
 
 // Oscilloscope and spectrum analyser on the synth's output (left and right averaged). The audio
 // worklet keeps the last 1.3 s; this asks for a window about thirty times a second, finds the
@@ -100,15 +101,16 @@ function drawSpectrum(canvas,bins,hold,rate,cursor){
  }
 }
 
-export default function Scope({engine,audio,onClose}){
- const float=useFloating('synths:scope-pos');
+export default function Scope({engine,audio,onClose,keyHz}){
+ // it starts to the right of the instrument, below the effects
+ const float=useFloating('synths:scope-pos',s=>onSynth('diy-fm')?{x:s.w+24+80,y:520}:onSynth('cs80','juno')?{x:1644,y:587}:({x:s.w+215,y:Math.round(s.h*.64)}));
  const [cfg,setCfg]=useState(()=>({...DEFAULTS,...(load(KEY,{})||{})}));
  const [status,setStatus]=useState({text:'',read:null});
  const [cursor,setCursor]=useState(null);       // scope cursor, 0..1 across the segment
  const [fcursor,setFcursor]=useState(null);     // spectrum cursor, 0..1 across the log axis
  const scopeRef=useRef(null),specRef=useRef(null);
  const cfgRef=useRef(cfg),cursorRef=useRef(null),fcursorRef=useRef(null);
- const run=useRef({seg:null,rate:48000,bins:null,hold:null,armed:null,captured:null,last:0,busy:false,lastSpec:0,frozen:null,live:null,trigSeg:null});
+ const run=useRef({pt:{tpl:null},seg:null,rate:48000,bins:null,hold:null,armed:null,captured:null,last:0,busy:false,lastSpec:0,frozen:null,live:null,trigSeg:null});
  cfgRef.current=cfg;cursorRef.current=cursor;fcursorRef.current=fcursor;
  useEffect(()=>{const t=setTimeout(()=>save(KEY,cfg),300);return ()=>clearTimeout(t);},[cfg]);
  const set=patch=>setCfg(c=>({...c,...patch}));
@@ -158,9 +160,16 @@ export default function Scope({engine,audio,onClose}){
      setStatus({text:`Captured at frame ${(startAbs+t).toLocaleString()} (${(( startAbs+t)/rate).toFixed(3)} s) — Arm to capture again`,read:null});
     }
    }else if(c.mode!=='single'){
-    t=findTrigger(x,trigAmp,slope,pre,lastStart,true);
+    // Pitch: lock to the note's own period, so a wave full of harmonics sits still (the key played says which note, the audio refines it)
+    if(c.mode==='pitch'){
+     const key=keyHz?.()??0,det=r.hz??0;let f=key;
+     if(key>0&&det>0){const m=key*2**Math.round(Math.log2(det/key));f=Math.abs(det/m-1)<.06?m:det;}else if(!(f>0))f=det;
+     if(f>0){const guess=rate/f,per=refinePeriod(x,guess)||guess;t=findPitchTrigger(x,per,pre,lastStart,r.pt);}
+     else r.pt.tpl=null;
+    }
+    if(t<0)t=findTrigger(x,trigAmp,slope,pre,lastStart,true);
     if(t>=0){seg=x.subarray(t-pre,t-pre+spanN);trigged=true;}
-    else if(c.mode==='auto')seg=x.subarray(Math.max(0,x.length-spanN));
+    else if(c.mode==='auto'||c.mode==='pitch')seg=x.subarray(Math.max(0,x.length-spanN));
    }
    r.trigged=trigged;
    if(c.mode!=='single'||!r.captured)specSrc=x.subarray(Math.max(0,x.length-FFT));
@@ -236,7 +245,7 @@ export default function Scope({engine,audio,onClose}){
     <label className="sb-field"><span>Zoom</span><select value={cfg.zoom} onChange={e=>set({zoom:Number(e.target.value)})}>{ZOOMS.map((z,i)=><option key={z} value={i}>{z?'×'+z:'Auto'}</option>)}</select></label>
     <span className="sb-field"><span>Trigger</span>
      <span className="sb-inline">
-      <span className="seg" role="radiogroup" aria-label="Trigger mode">{[['auto','Auto'],['normal','Normal'],['single','Single']].map(([v,l])=><button type="button" key={v} role="radio" aria-checked={cfg.mode===v} className={cfg.mode===v?'on':''} onClick={()=>set({mode:v})}>{l}</button>)}</span>
+      <span className="seg" role="radiogroup" aria-label="Trigger mode">{[['auto','Auto'],['pitch','Pitch'],['normal','Normal'],['single','Single']].map(([v,l])=><button type="button" key={v} role="radio" aria-checked={cfg.mode===v} className={cfg.mode===v?'on':''} title={v==='pitch'?'Lock to the pitch of the note played, so the waveform holds still':undefined} onClick={()=>set({mode:v})}>{l}</button>)}</span>
       {cfg.mode==='single'&&<button type="button" className={'arm'+(r.armed?' on':'')} onClick={arm}>{r.captured?'Re-arm':'Arm'}</button>}
       <button type="button" className="slope" aria-pressed={cfg.slope<0} onClick={()=>set({slope:-cfg.slope})} title="Trigger on a rising or falling edge">{cfg.slope>0?'↗':'↘'}</button>
      </span>

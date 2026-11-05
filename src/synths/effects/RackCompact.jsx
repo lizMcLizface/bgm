@@ -1,7 +1,8 @@
 import React,{useEffect,useState} from 'react';
 import useFloating from '../ui/useFloating';
+import {onSynth} from '../ui/Desk';
 import {cleanRack,RACK_PRESETS} from './params';
-import {useRackModel,RackChain,RackLevels,RackEffect,RackAdd,presetValues} from './rackParts';
+import {useRackModel,RackChain,RackLevels,RackEffect,RackAdd,RackCleanUp,presetValues} from './rackParts';
 import './rack.css';
 
 // The compact, touch-first rack: a small popover with the signal chain and the three level sliders. Tapping an effect opens
@@ -11,7 +12,8 @@ import './rack.css';
 const POS_KEY='synths:rack-pos';
 export default function RackCompact({values,onChange,instrumentSpecs=[],peak=0,reduction=0,tools=null,onClose,tempo=0}){
  const [open,setOpen]=useState('');
- const float=useFloating(POS_KEY);
+ // it starts to the right of the instrument, level with its top
+ const float=useFloating(POS_KEY,s=>onSynth('diy-fm')?{x:s.w+24,y:6}:onSynth('cs80','juno')?{x:1535,y:17}:({x:s.w+47,y:0}));
  const model=useRackModel({values,onChange,instrumentSpecs,tempo});
  const block=model.tiles.find(t=>t.id===open);
  useEffect(()=>{
@@ -24,6 +26,7 @@ export default function RackCompact({values,onChange,instrumentSpecs=[],peak=0,r
    <h2>Effects</h2>
    <select aria-label="Rack presets" value="" onChange={e=>applyPreset(e.target.value)}><option value="" disabled>Select preset</option>{RACK_PRESETS.map(p=><option key={p.name} value={p.name}>{p.name}</option>)}</select>
    <RackAdd model={model} onAdded={setOpen}/>
+   <RackCleanUp model={model}/>
    <button type="button" aria-label="Bypass effects rack" aria-pressed={!values['master.enabled']} onClick={()=>onChange({'master.enabled':values['master.enabled']?0:1})}>{values['master.enabled']?'On':'Off'}</button>
    <button type="button" onClick={()=>onChange(cleanRack())}>Reset</button>
    {tools}

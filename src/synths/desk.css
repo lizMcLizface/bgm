@@ -1,0 +1,32 @@
+/* ---- the desk: one fixed layout the instrument is arranged on, scaled and moved as a whole ---- */
+.instrument{--desk-w:1500px;--desk-h:840px;}
+.desk-view{position:relative;flex:1 1 0;min-height:0;min-width:0;overflow:hidden;background:radial-gradient(ellipse at 50% 30%,#1b1a17,#0f0e0c 75%);}
+.desk-view:not(.is-touch){cursor:default;}
+/* the desk is a table: a surface with a faint cutting-mat grid, and the instrument on it at its natural size */
+.desk{position:absolute;left:0;top:0;transform-origin:0 0;background:
+ linear-gradient(#ffffff05 1px,#0000 1px) 0 0/80px 80px,linear-gradient(90deg,#ffffff05 1px,#0000 1px) 0 0/80px 80px,
+ linear-gradient(#ffffff03 1px,#0000 1px) 0 0/16px 16px,linear-gradient(90deg,#ffffff03 1px,#0000 1px) 0 0/16px 16px,
+ radial-gradient(ellipse at 50% 45%,#1d1b18,#12110f 70%);
+ box-shadow:0 0 0 1px #0007,0 20px 60px #000b;overflow:visible;will-change:transform;}
+/* the instrument, laid out as the page used to be: the rig fills, the keyboard sits below. It is the containing block for the panels that float, so they are placed relative to it */
+.desk-home{position:absolute;display:flex;flex-direction:column;contain:layout;max-width:none;}
+.desk-view.is-touch{flex:none;overflow:visible;}
+.desk-view.is-touch .desk{position:relative;will-change:auto;}
+.instrument:has(.desk-view.is-touch){height:auto;min-height:0;}
+/* panels that float on the desk are sized to the desk, not to the window */
+.desk-home .setup-pop{width:520px;max-height:calc(var(--desk-h) - 72px);}
+.desk-home .rackc{width:720px;max-height:calc(var(--desk-h) - 80px);}
+/* zoom buttons, in a corner of the window */
+.desk-zoom{position:absolute;right:12px;bottom:12px;z-index:90;display:flex;align-items:center;gap:2px;padding:3px;border-radius:12px;background:#17191bd9;border:1px solid #3a4244;box-shadow:0 6px 18px #000a;backdrop-filter:blur(4px);}
+.desk-zoom button{min-height:28px;min-width:30px;padding:0 8px;font-size:14px;line-height:1;}
+.desk-zoom .desk-zoom-fit{min-width:52px;font-size:12px;font-variant-numeric:tabular-nums;}
+.desk-zoom .desk-zoom-fit.is-fit{color:var(--muted);}
+.desk-zoom .desk-crop{font-size:12px;margin-left:4px;}
+/* on a touch screen the page is as wide as the desk, so the start prompt is sized to the part of it in view at first */
+.instrument:has(.desk-view.is-touch){position:relative;}
+.instrument:has(.desk-view.is-touch) .wake{position:absolute;inset:auto;left:0;top:0;width:var(--vv-w,100%);height:min(var(--vv-h,100%),100%);}
+
+/* the instrument sits straight on the desk: no block of its own colour behind it, and the keyboard's strip lets the table show */
+.desk-home .perform{background:none;border:0;}
+.desk-home .rig{flex:0 0 auto;max-height:none;}
+.desk-home .rig>.panel{flex:0 0 auto;min-height:auto;overflow:visible;}

@@ -11,7 +11,8 @@ const short=name=>name.split(' · ')[0].replace('Pulse width','PW').replace('Amp
 
 // [source index, destination index] → parameter, by the order of the mod source / target lists
 const POLY_BUILT_IN={'1,1':'lfoPitch','1,2':'lfoFilter','1,3':'lfoPwm','2,1':'lfo2Pitch','2,2':'lfo2Filter','2,4':'lfo2Amp','5,1':'envelopePitch','5,2':'filterAmount','5,3':'envPwm','6,2':'velocityTone','6,4':'velocityAmp','7,2':'keytrack','8,1':'pressurePitch','8,2':'pressureTone','8,4':'pressureAmp'};
-const FM_BUILT_IN={'1,1':'vibrato','1,2':'lfoIndex','1,4':'tremolo'};
+// the operators' own sensitivities are cells too: velocity, key position and pressure down the side, each operator's level across the top
+const FM_BUILT_IN={'1,1':'vibrato','1,2':'lfoIndex','1,4':'tremolo',...Object.fromEntries([...Array(8).keys()].flatMap(i=>[[`4,${6+i}`,`operators.${i}.velocity`],[`5,${6+i}`,`operators.${i}.keyScale`],[`6,${6+i}`,`operators.${i}.pressure`]]))};
 
 export default function RoutingMatrix({fm,values,specs,prefix,sources,targets,change}){
  const [full,setFull]=useState(false);
@@ -23,8 +24,8 @@ export default function RoutingMatrix({fm,values,specs,prefix,sources,targets,ch
  const depthSpec=n=>specs[`${pre}modDepth${n}`];
  // what a cell is and what it edits: a value (built-in or route), the amp envelope's fixed link, or nothing yet
  const find=(r,c)=>{
-  const key=built[`${r},${c}`];
-  if(key&&specs[pre+key])return {kind:'built',key:pre+key,spec:specs[pre+key]};
+  const name=built[`${r},${c}`],key=name&&(name.startsWith('operators.')?name:pre+name);
+  if(key&&specs[key])return {kind:'built',key,spec:specs[key]};
   if(!fm&&r===4&&c===4)return {kind:'fixed'};
   const mine=routes.find(x=>x.source===r&&x.target===c);
   if(mine)return {kind:'via',n:mine.n,key:`${pre}modDepth${mine.n}`,spec:depthSpec(mine.n),tag:'R'+mine.n};
@@ -104,5 +105,58 @@ export default function RoutingMatrix({fm,values,specs,prefix,sources,targets,ch
      <span className="rmx-text">{text}</span>{x.tag&&<small>{x.tag}</small>}
     </button>;})}
   </div>;})}
+ </div>;
+}
+
+/**
+ * The FM operators' wiring in the routing matrix's own design: a row is an operator, a column is what it feeds (a later operator, or the output). Drag a cell up or
+ * down to set the amount (shift for fine), double-click to clear, arrow keys when focused. The cell on the diagonal makes that operator the one with feedback.
+ */
+export function OperatorGrid({values,specs,count,change}){
+ const drag=useRef(null),lastTap=useRef(0);
+ // always the full six rows and columns, so the table does not change size: what the synth has no operator for is dark
+ const SLOTS=8,keyOf=(i,j)=>j===SLOTS?`carriers.${i}`:`routes.${i}.${j}`;
+ const down=(i,j,e)=>{
+  if(e.button>0)return;
+  const key=keyOf(i,j),spec=specs[key];if(!spec)return;
+  e.preventDefault();e.currentTarget.setPointerCapture?.(e.pointerId);e.currentTarget.focus({preventScroll:true});
+  const now=performance.now();
+  if(now-lastTap.current<320){lastTap.current=0;drag.current=null;change(key,0);return;}
+  lastTap.current=now;
+  drag.current={id:e.pointerId,key,spec,y:e.clientY,start:toPosition(spec,values[key])};
+ };
+ const move=e=>{
+  const d=drag.current;if(!d||d.id!==e.pointerId)return;
+  const p=Math.min(1,Math.max(0,d.start+(d.y-e.clientY)/(e.shiftKey?600:150)));
+  let v=fromPosition(d.spec,p);if(Math.abs(v)<.03)v=0;
+  change(d.key,Number(v.toFixed(3)));
+ };
+ const up=e=>{if(drag.current?.id===e.pointerId)drag.current=null;};
+ const keydown=(i,j,e)=>{
+  const key=keyOf(i,j),spec=specs[key];if(!spec)return;
+  if(e.key==='Delete'||e.key==='Backspace'){e.preventDefault();change(key,0);return;}
+  const step={ArrowUp:.02,ArrowRight:.02,ArrowDown:-.02,ArrowLeft:-.02,PageUp:.1,PageDown:-.1}[e.key];
+  if(step===undefined)return;
+  e.preventDefault();change(key,Number(fromPosition(spec,Math.min(1,Math.max(0,toPosition(spec,values[key])+step))).toFixed(3)));
+ };
+ const cols=Array.from({length:SLOTS+1},(_,j)=>j);
+ return <div className="rmx" role="grid" aria-label="Operator routing" style={{'--cols':SLOTS+1,'--cell':'50px'}}>
+  <div className="rmx-head" role="row"><span className="rmx-corner">From ↓ · To →</span>{cols.map(j=><span key={j} role="columnheader" style={j<SLOTS&&j>=count?{opacity:.35}:undefined}>{j===SLOTS?'Output':'Op '+(j+1)}</span>)}</div>
+  {Array.from({length:SLOTS},(_,i)=><div className="rmx-row" role="row" key={i}>
+   <span className="rmx-source" role="rowheader" style={i>=count?{opacity:.35}:undefined}>Op {i+1}</span>
+   {cols.map(j=>{
+    // no operator there (past the count, or at or below the diagonal): a dark, dead cell
+    if(i>=count||(j<SLOTS&&(j>=count||j<=i))){
+     if(i<count&&j===i)return <button type="button" key={j} role="gridcell" aria-label={`Feedback on operator ${i+1}`} aria-pressed={values['global.feedbackOp']===i} title={`Feedback: operator ${i+1} feeds its own pitch back (the amount is Feedback depth)`} className={'rmx-cell fb'+(values['global.feedbackOp']===i?' on':'')} style={{cursor:'pointer'}} onClick={()=>change('global.feedbackOp',i)}><span className="rmx-text">↻</span></button>;
+     return <span key={j} className="rmx-cell off" role="gridcell" aria-label="Unavailable"/>;
+    }
+    const key=keyOf(i,j),spec=specs[key],v=values[key],p=toPosition(spec,v);
+    return <button type="button" key={j} role="gridcell" aria-label={j===SLOTS?`Operator ${i+1} to the output`:`Operator ${i+1} to operator ${j+1}`} title={`${spec.label} · drag to set, double-click to clear`} className={'rmx-cell '+(j===SLOTS?'via':'built')+(v>0?' on':'')}
+     onPointerDown={e=>down(i,j,e)} onPointerMove={move} onPointerUp={up} onPointerCancel={up} onKeyDown={e=>keydown(i,j,e)}>
+     {v>0&&<i className="rmx-fill" style={{bottom:0,height:p*100+'%'}}/>}
+     <span className="rmx-text">{v>0?formatValue(spec,v):''}</span>
+    </button>;
+   })}
+  </div>)}
  </div>;
 }

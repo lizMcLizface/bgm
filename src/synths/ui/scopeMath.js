@@ -139,3 +139,52 @@ export function wavBytes(samples,sampleRate){
  for(let i=0;i<n;i++)v.setInt16(44+i*2,Math.round(Math.max(-1,Math.min(1,samples[i]))*32767),true);
  return new Uint8Array(buf);
 }
+
+/**
+ * The period in samples near `guess`, refined by autocorrelation of the newest samples (parabolic peak). The key played gives the guess; the search
+ * covers a few per cent either side, so detune, vibrato and glide are followed.
+ */
+export function refinePeriod(x,guess,spread=.05){
+ const n=Math.min(x.length,Math.max(1024,Math.min(8192,Math.round(guess*8))));
+ if(guess<4||x.length<guess*2.5)return 0;
+ const a=x.subarray(x.length-n),lo=Math.max(2,Math.floor(guess*(1-spread))),hi=Math.ceil(guess*(1+spread));
+ if(n<=hi+8)return 0;
+ const r=new Float64Array(hi+2);let best=lo,bestV=-Infinity;
+ for(let lag=lo-1;lag<=hi+1;lag++){
+  let s=0,e=0;for(let i=0;i+lag<n;i++){s+=a[i]*a[i+lag];e+=a[i]*a[i]+a[i+lag]*a[i+lag];}
+  r[lag]=e>0?2*s/e:0;
+  if(lag>=lo&&lag<=hi&&r[lag]>bestV){bestV=r[lag];best=lag;}
+ }
+ if(bestV<.5)return 0;
+ const y0=r[best-1],y1=r[best],y2=r[best+1],d=y0-2*y1+y2;
+ return best+(d<0?.5*(y0-y2)/d:0);
+}
+
+/**
+ * Trigger point that holds a note's waveform still: whatever the harmonics, each frame is drawn from the point that matches the picture of the last
+ * frame. `state.tpl` is that picture (one period, from its trigger); without a good match the trigger is the highest peak of the newest period, which is the
+ * same place in every cycle of a steady note. Returns the index, or -1 when the period is unknown. `period` is in samples, `lo` and `hi` bound the index.
+ */
+export function findPitchTrigger(x,period,lo,hi,state){
+ const L=Math.round(period);
+ if(!(period>=4)||x.length<L*2)return -1;
+ hi=Math.min(hi,x.length-L-1);lo=Math.max(1,lo);
+ if(hi<lo)return -1;
+ const from=Math.max(lo,hi-Math.ceil(period*1.5)),tpl=state.tpl;
+ if(tpl&&tpl.length===L){
+  const step=Math.max(1,Math.floor(L/300));let tplE=0;for(let j=0;j<L;j+=step)tplE+=tpl[j]*tpl[j];
+  const corr=new Float64Array(hi-from+1);let best=-Infinity;
+  for(let t=from;t<=hi;t++){
+   let s=0,e=0;for(let j=0;j<L;j+=step){const v=x[t+j];s+=v*tpl[j];e+=v*v;}
+   const c=e>0&&tplE>0?s/Math.sqrt(e*tplE):0;corr[t-from]=c;if(c>best)best=c;
+  }
+  if(best>.85){
+   // the newest of the equally good matches, the one nearest the end of the window, so the picture is as recent as it can be
+   let pick=-1;for(let k=corr.length-1;k>=0;k--)if(corr[k]>=best-.01&&(k===0||corr[k]>=corr[k-1])&&(k===corr.length-1||corr[k]>=corr[k+1])){pick=from+k;break;}
+   if(pick>=0){state.tpl=x.slice(pick,pick+L);return pick;}
+  }
+ }
+ let t=from,peak=-Infinity;for(let i=from;i<=hi&&i<from+L;i++)if(x[i]>peak){peak=x[i];t=i;}
+ // the peak must be the same one next time: use the latest period's
+ state.tpl=x.slice(t,t+L);return t;
+}

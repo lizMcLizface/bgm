@@ -121,18 +121,10 @@
 .rack-chain-finish{padding:4px 2px 0;text-align:left;}
 /* a grid of equal columns: the top row runs left to right, the bottom row right to left, so the last tile of the top row sits
    directly over the first of the bottom row and the arrow between them runs straight down */
-.rack-chain-grid{display:grid;grid-template-columns:repeat(var(--cols,5),minmax(0,1fr));grid-auto-rows:auto;gap:22px 16px;}
-.rack-cell{position:relative;min-width:0;}
-.rack-arrow{position:absolute;color:#6f8d84;font-style:normal;font-size:14px;line-height:1;pointer-events:none;top:50%;right:-15px;transform:translateY(-50%);}
-.rack-cell.is-back .rack-arrow{right:auto;left:-15px;}
-.rack-cell.is-turn .rack-arrow{top:auto;bottom:-19px;right:auto;left:50%;transform:translateX(-50%);}
 .rack-chain-row,.rack-chain-gap,.rack-chain-turn{display:none;}
-.rack-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:100%;min-height:58px;padding:4px 2px 4px;border-bottom-width:3px;}
-.rack-tile .rack-graphic{width:38px;height:30px;}
-.rack-tile b{font-size:11px;max-width:100%;overflow:hidden;text-overflow:ellipsis;}
 /* levels: horizontal sliders below the chain */
 .rack-globals{display:flex;flex-direction:column;gap:2px;margin:0;align-items:stretch;padding:8px 10px;background:#171b1d;border:1px solid #2f3739;border-radius:10px;}
-.rack-globals .rack-control{display:grid;grid-template-columns:52px minmax(0,1fr) 96px;align-items:center;gap:8px;width:auto;text-align:left;--rack-colour:#8dcbb7;}
+.rack-globals .rack-control{display:grid;grid-template-columns:62px minmax(0,1fr) 96px;align-items:center;gap:8px;width:auto;text-align:left;--rack-colour:#8dcbb7;}
 .rack-globals .rack-control>span:first-of-type{order:0;min-height:0;display:block;font-size:12px;}
 .rack-globals .rack-control input[type=range]{order:0;writing-mode:horizontal-tb;direction:ltr;width:100%;height:26px;}
 .rack-globals .rack-control input[type=range]::-webkit-slider-runnable-track{width:auto;height:8px;background:linear-gradient(to right,var(--rack-colour) calc(var(--p,.5) * 100%),#394143 0);}
@@ -148,13 +140,10 @@
 @media(max-width:900px){
  .rack-layout{grid-template-columns:minmax(0,1fr);}
  .rack-right{order:-1;}
- .rack-chain-grid{gap:20px 10px;}
  .rack-arrow{right:-11px;}
- .rack-cell.is-back .rack-arrow{left:-11px;}
- .rack-tile .rack-graphic{width:30px;height:24px;}
+  .rack-tile .rack-graphic{width:30px;height:24px;}
 }
 @media(max-width:560px){
- .rack-tile b{font-size:9.5px;}
  .rack-globals .rack-control{grid-template-columns:44px minmax(0,1fr) 84px;}
 }
 /* the effect's header sits on its own line so the faders get the whole width of the half */
@@ -174,7 +163,6 @@
 @media(max-width:900px){.rack-right{order:0;}.rack-right .rack-block{min-height:0;}}
 
 /* reordering: the drop target while a tile is dragged, the linked Delay + Reverb pair, the move buttons */
-.rack-cell.is-drop .rack-tile{box-shadow:0 0 0 2px #fff,0 0 14px #fff6;}
 .rack-tile{touch-action:none;}
 .rack-tile.is-pair{border-style:dashed;}
 .rack-move{margin-left:auto;display:flex;gap:6px;}
@@ -190,12 +178,8 @@
 .rackc-head button[aria-pressed=true]{border-color:#dcaf72;background:#433626;}
 .rackc-head .rack-signal{position:absolute;left:0;right:0;bottom:0;flex:none;border-radius:0;height:2px;}
 .rackc-body{padding:8px 12px 12px;overflow:auto;display:flex;flex-direction:column;gap:6px;}
-.rackc .rack-chain-grid{gap:18px 14px;}
-.rackc .rack-tile{min-height:44px;}
-.rackc .rack-tile .rack-graphic{width:30px;height:23px;}
-.rackc .rack-tile b{font-size:10px;}
 .rackc .rack-globals{padding:6px 8px;}
-.rackc .rack-globals .rack-control{grid-template-columns:44px minmax(0,1fr) 92px;}
+.rackc .rack-globals .rack-control{grid-template-columns:58px minmax(0,1fr) 92px;}
 .rackc .rack-chain-finish{font-size:9px;letter-spacing:.06em;text-transform:none;color:#7f918c;}
 .rackc-scrim{position:absolute;inset:0;background:#000b;display:grid;place-items:center;padding:12px;z-index:2;}
 .rackc-modal{width:100%;max-height:100%;overflow:auto;background:#14191b;border-radius:12px;box-shadow:0 10px 40px #000;display:flex;flex-direction:column;gap:8px;}
@@ -213,7 +197,6 @@
 .rack-control select:disabled,.rack-control input:disabled{opacity:.5;}
 .rackc-head .rack-add select{max-width:120px;min-height:30px;font-size:12px;}
 
-.rackc .rack-tile b{font-size:9px;}
 
 /* the Mix / Send slider sits in the header, the dropdowns in a row under the faders */
 .rack-mix{flex:1 1 170px;max-width:320px;margin-left:auto;min-width:0;}
@@ -249,3 +232,67 @@
 .rackc-head{cursor:grab;touch-action:none;user-select:none;}
 .rackc-head:active{cursor:grabbing;}
 .rackc-head button,.rackc-head select{cursor:pointer;}
+
+.rack-main{display:contents;}
+
+/* the faders on the left, a short list as pills and a latching Hold as a big button in a column on the right */
+.rack-main.has-aside{display:flex;align-items:stretch;gap:14px;width:100%;}
+.rack-main.has-aside .rack-body{flex:1;min-width:0;}
+.rack-main.has-aside .rack-controls{width:auto;}
+.rack-main.has-aside .rack-choices{flex:none;flex-direction:column;flex-wrap:nowrap;justify-content:center;align-items:stretch;gap:8px;margin-left:auto;}
+.rack-pills{display:flex;flex-direction:column;gap:5px;align-items:stretch;}
+.rack-pills small{font-size:10px;text-align:center;color:var(--muted);}
+.rack-pills button{min-height:0;height:34px;min-width:84px;padding:0 8px;font-size:12px;border-radius:5px;background:#26282c;border:1px solid #3d4046;color:#a7a399;}
+.rack-pills button.on{background:var(--rack-colour);border-color:var(--rack-colour);color:#10181a;font-weight:700;box-shadow:inset 0 2px 3px #0007;}
+.rack-hold{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:104px;height:104px;border-radius:12px;background:#1a1e20;border:2px solid #475054;color:#b9b4a6;cursor:pointer;box-shadow:inset 0 -3px 0 #0006,0 2px 0 #0008;font:inherit;}
+.rack-hold b{font-size:15px;font-weight:600;}.rack-hold span{font-size:11px;letter-spacing:.08em;text-transform:uppercase;}
+.rack-hold[aria-pressed=true]{background:var(--rack-colour);border-color:var(--rack-colour);color:#10181a;box-shadow:inset 0 3px 6px #0006,0 0 14px var(--rack-colour);transform:translateY(1px);}
+.rack-cleanup{min-height:32px;padding:2px 12px;font-size:12px;}
+.rack-cleanup:disabled{opacity:.45;}
+
+/* the chain as a display of fixed height (three rows of square tiles), so what is below it never moves. One row sits on the centre line,
+   two sit above and below it, three fill the height. The arrows between tiles stretch, which holds the first tile at the near end of
+   its row and the last (the output) at the far end of its. */
+.rack-display{--tile:80px;--gap:22px;--wire:#58736b;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:var(--gap);height:calc(3 * var(--tile) + 2 * var(--gap) + 28px);padding:14px 10px;background:linear-gradient(180deg,#0d1112,#111618);border:1px solid #2b3335;border-radius:10px;box-shadow:inset 0 2px 8px #000a;}
+.rack-display[data-rows="3"]{justify-content:space-between;}
+.rack-line{display:flex;align-items:center;min-width:0;}
+.rack-line.is-back{flex-direction:row-reverse;}
+.rack-cell{position:relative;flex:none;width:var(--tile);height:var(--tile);}
+.rack-display .rack-tile{width:100%;height:100%;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:4px 2px;border-bottom-width:3px;}
+.rack-display .rack-tile .rack-graphic{width:44px;height:34px;flex:none;}
+.rack-display .rack-tile b{font-size:10.5px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.rack-chain-end.rack-chain-start{padding-bottom:6px;}
+
+/* the header of the compact effects box on one line; it wraps only on a narrow screen */
+.rackc{width:min(720px,calc(100vw - 24px));}
+.rackc-head{flex-wrap:nowrap;}
+.rackc-head select,.rackc-head .rack-preset select{min-width:0;flex:0 1 auto;max-width:128px;}
+.rackc-head .rack-add{min-width:0;flex:0 1 auto;}
+.rackc-head button{flex:none;padding:2px 8px;white-space:nowrap;}
+.rackc-head h2{flex:none;}
+@media(max-width:760px){.rackc-head{flex-wrap:wrap;}}
+
+/* connectors: a line from the edge of one tile to the edge of the next with a head at the receiving end, and a turn from the foot of a
+   row to the head of the next */
+.rack-arrow{position:relative;flex:1 1 0;min-width:14px;height:14px;font-style:normal;}
+.rack-arrow::before{content:"";position:absolute;left:0;right:5px;top:50%;border-top:2px solid var(--wire);transform:translateY(-1px);}
+.rack-arrow::after{content:"";position:absolute;right:0;top:50%;transform:translateY(-50%);border-left:7px solid var(--wire);border-top:5px solid transparent;border-bottom:5px solid transparent;}
+.rack-line.is-back .rack-arrow::before{left:5px;right:0;}
+.rack-line.is-back .rack-arrow::after{left:0;right:auto;border-left:0;border-right:7px solid var(--wire);}
+.rack-turn{position:absolute;left:50%;top:100%;height:var(--gap);width:2px;margin-left:-1px;background:var(--wire);}
+.rack-turn::after{content:"";position:absolute;left:50%;bottom:-1px;transform:translateX(-50%);border-top:7px solid var(--wire);border-left:5px solid transparent;border-right:5px solid transparent;}
+/* picking a tile up: it follows the pointer, the place it left dims and the tile that will take the drop is outlined */
+.rack-tile.is-movable{cursor:grab;}
+.rack-display.is-dragging,.rack-display.is-dragging .rack-tile{cursor:grabbing;}
+.rack-cell.is-lifted .rack-tile{opacity:.3;}
+.rack-cell.is-drop .rack-tile{box-shadow:0 0 0 2px #fff,0 0 16px #fff7;}
+.rack-ghost{position:fixed;z-index:200;pointer-events:none;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:4px 2px;background:linear-gradient(160deg,#323a3c,#232a2c);border:1px solid #6a767a;border-bottom:3px solid var(--rack-colour);border-radius:8px;color:var(--rack-colour);box-shadow:0 12px 26px #000b;transform:scale(1.06) rotate(-2deg);}
+.rack-ghost .rack-graphic{width:44px;height:34px;flex:none;}
+.rack-ghost b{font-size:10.5px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+/* two units that are one stage (the delay and the reverb) side by side: drawn together in a box that takes no room of its own */
+.rack-group{position:relative;flex:none;display:flex;align-items:center;}
+.rack-group::before{content:"";position:absolute;inset:-8px -8px;border:1px solid #4b6a62;border-radius:12px;background:#ffffff06;pointer-events:none;}
+.rack-group::after{content:attr(data-label);position:absolute;left:14px;top:-15px;padding:0 6px;font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:#7f9a92;background:#0f1314;pointer-events:none;line-height:14px;}
+.rack-arrow.is-short{flex:none;width:30px;}
+.rack-line.is-back .rack-group{flex-direction:row-reverse;}

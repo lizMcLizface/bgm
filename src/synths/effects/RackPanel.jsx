@@ -1,6 +1,6 @@
 import React,{useState} from 'react';
 import {cleanRack,RACK_PRESETS} from './params';
-import {useRackModel,RackChain,RackLevels,RackEffect,RackControl,RackAdd,presetValues} from './rackParts';
+import {useRackModel,RackChain,RackLevels,RackEffect,RackControl,RackAdd,RackCleanUp,presetValues} from './rackParts';
 import './rack.css';
 
 export {RackControl};
@@ -18,6 +18,7 @@ export default function RackPanel({values,onChange,instrumentSpecs=[],peak=0,red
    <div><h2>Effects rack</h2></div>
    <label className="rack-preset"><span>Preset</span><select aria-label="Rack presets" value="" onChange={e=>applyPreset(e.target.value)}><option value="" disabled>Select preset</option>{RACK_PRESETS.map(p=><option key={p.name} value={p.name}>{p.name}</option>)}</select></label>
    <RackAdd model={model} onAdded={setSelected}/>
+   <RackCleanUp model={model}/>
    <div className="rack-toolbar-actions">
     <button type="button" aria-label="Bypass effects rack" aria-pressed={!values['master.enabled']} onClick={()=>onChange({'master.enabled':values['master.enabled']?0:1})}>{values['master.enabled']?'Rack on':'Rack bypassed'}</button>
     <button type="button" onClick={()=>onChange(cleanRack())}>Reset rack</button>{tools}

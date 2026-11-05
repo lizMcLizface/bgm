@@ -51,7 +51,7 @@ test('new engine output tap preserves stereo audio exactly and wraps mono scope 
 });
 
 test('the front page sounds appear translated: subtractive ones in Poly, FM ones in FM, none duplicated or left half-translated',()=>{
- for(const [schema,kind,count] of [[POLY,'subtractive',91],[FM,'fm',7]]){
+ for(const [schema,kind,count] of [[POLY,'subtractive',95],[FM,'fm',7]]){
   const translated=schema.presets.filter(p=>p.styles?.includes('front page'));
   expect(translated.length).toBe(count);
   expect(new Set(schema.presets.map(p=>p.name)).size).toBe(schema.presets.length);
@@ -59,4 +59,11 @@ test('the front page sounds appear translated: subtractive ones in Poly, FM ones
   for(const p of translated){expect(ids.has(p.category)).toBe(true);expect(schema.params.sanitize(p.values)).toEqual(p.values);}
  }
  expect(POLY.presets.slice(0,11).map(p=>p.name)).toContain('Layered noir');
+});
+
+it('puts a front page bit crusher in the effects chain as a rack unit, only on the sounds that have one',()=>{
+ const crushed=POLY.presets.find(p=>p.name==='Bit Haze');
+ expect(crushed.rack).toMatchObject({'switch.crusher':1,'crusher.divide':4,'crusher.mix':.3});
+ expect((crushed.rack['master.chain']>>9)&1).toBe(1);
+ expect(POLY.presets.find(p=>p.name==='Warm Strings').rack).toBeUndefined();
 });

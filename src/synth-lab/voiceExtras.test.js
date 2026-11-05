@@ -37,6 +37,15 @@ for(const kernel of ['core','core-acoustic']){
    expect(play(base({...shape,ampHold:0}),.5)).toEqual(plain);
   });
 
+  it('holds below the sustain and then swells to it when the hold has a level',()=>{
+   const shape={attack:.01,decay:.1,sustain:1,release:.1,ampHold:.2,ampHoldLevel:.3};
+   const d=play(base(shape),.7),at=(from,to)=>rms(d.slice(Math.round(from*48000),Math.round(to*48000)));
+   const held=at(.08,.18),after=at(.5,.65);
+   expect(held/after).toBeGreaterThan(.22);expect(held/after).toBeLessThan(.4); // held near 0.3 of the sustained level
+   // a full hold level is the old behaviour
+   expect(play(base({...shape,ampHoldLevel:1}),.5)).toEqual(play(base({...shape,ampHoldLevel:1,sustain:1}),.5));
+  });
+
   it('sweeps the pitch with the pitch envelope and settles on the note',()=>{
    const d=play(base({pitchEnvAmount:12,pitchEnvDecay:.1}),1);
    const start=hz(d,0,1500),end=hz(d,40000,48000);

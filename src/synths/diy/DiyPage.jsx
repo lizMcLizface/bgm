@@ -1,12 +1,11 @@
 import React,{useEffect,useRef,useState} from 'react';
 import SynthShell from '../ui/SynthShell';
 import {Lever,Fader} from '../ui/controls';
-import {PickButtons,OledPicker,PolyPicker,HToggle,waveIcon} from './DiyControls';
+import {PickButtons,OledPicker,FmPicker,PolyPicker,HToggle,waveIcon} from './DiyControls';
 import {Workspace,FloatBox} from './DiyWorkspace';
 import DiyEnvEditor from './DiyEnvEditor';
-import RoutingMatrix from './DiyMatrix';
+import RoutingMatrix,{OperatorGrid} from './DiyMatrix';
 import LabPanels from './LabPanels';
-import {LAB} from './lab';
 import {load,save} from '../storage';
 import {SYNTHS} from '../models';
 import {startDiySynth} from './live';
@@ -23,7 +22,7 @@ const SHORT={'State variable':'SVF','Feedback ladder (LP24)':'Ladder','B resets 
 const short=o=>SHORT[o]??o;
 const startPoly=options=>startDiySynth({...options,kind:'poly'}),startFM=options=>startDiySynth({...options,kind:'fm'});
 
-function Editor({fm,api,layer,setLayer,link,setLink,operator,setOperator,synth,lab,onLab}){
+function Editor({fm,api,layer,setLayer,link,setLink,operator,setOperator,synth}){
  const {values,control,change,replaceValues}=api;
  // with the layers linked, an edit to the layer being shown is repeated on the other one (a sound being loaded changes both, so is left alone)
  const before=useRef(values);
@@ -86,11 +85,15 @@ function Editor({fm,api,layer,setLayer,link,setLink,operator,setOperator,synth,l
   let options=OPTIONS[base];
   if(key==='effects.quality')options=['8 lines','16 lines'];
   if(key==='global.quality')options=['1×','2×','4×'];
-  if(key==='global.feedbackOp')options=Array.from({length:count},(_,i)=>`Operator ${i+1}`);
   if(base.startsWith('modSource'))options=fm?FM_MOD_SOURCES:MOD_SOURCES;
   if(base.startsWith('modTarget'))options=fm?FM_MOD_TARGETS:MOD_TARGETS;
   if(key==='performance.mode')options=['Polyphonic','Mono retrigger','Mono legato'];
   if(key==='performance.glide')options=['Overlapping notes','All mono notes'];
+  // an FM operator's wave, with Off built into the picker (the operator's switch)
+  if(fm&&base==='wave'&&key.startsWith('operators.')){
+   const on=key.replace(/wave$/,'enabled'),names=['Off','Sine','Half sine','Rectified','Double sine'],titles=['Operator off','Sine','Half sine: the positive half of the sine','Rectified sine: both halves positive','Double sine: a sine squared, twice the rate'];
+   return <PickButtons key={key} label="Wave" options={names} titles={titles} value={values[on]===0?0:values[key]+1} onChange={i=>{if(i===0)change(on,0);else{change(on,1);change(key,i-1);}}} columns={1} icons={names.map(waveIcon)} tone={tone}/>;
+  }
   if(base==='bPhase')return <Fader key={key} spec={synth.params.BY_KEY[key]} value={values[key]} onChange={(k,v)=>{change(k,v);change(k.replace('bPhase','phaseLock'),v>0?1:0);}} tone={tone} label={label??'Phase'}/>;
   return options?choice(key,label,options,base,tone):control([key,label??shortLabel(synth.params.BY_KEY[key].label)],tone);
  };
@@ -99,29 +102,29 @@ function Editor({fm,api,layer,setLayer,link,setLink,operator,setOperator,synth,l
  const lamp=hz=><i className="lamp" aria-hidden="true" style={{'--period':Math.max(.33,Math.min(20,1/Math.max(.01,hz)))+'s'}}/>;
  // every section is its own floating box
  const at=(pre,key)=>/^(global|performance|carriers|layers|operators)[.]/.test(key)?key:pre+key;
- const group=(id,title,keys,tone='cream',pre='',actions,after)=><FloatBox key={id} id={id} title={title} tone={tone} actions={actions}>{keys.map(k=>field(Array.isArray(k)?[at(pre,k[0]),k[1]]:at(pre,k),tone))}{after}</FloatBox>;
+ const group=(id,title,keys,tone='cream',pre='',actions,after)=><FloatBox key={id} id={id} title={title} tone={tone} actions={actions}>{keys.map(k=>k==='|'?<i className="ctl-split" key="split" aria-hidden="true"/>:field(Array.isArray(k)?[at(pre,k[0]),k[1]]:at(pre,k),tone))}{after}</FloatBox>;
  // two-way choices as horizontal switches, stacked in one column
  const switches=(pre,entries,tone)=><div className="htoggle-stack" key="switches">{entries.map(([k,label])=>{const key=at(pre,k),spec=synth.params.BY_KEY[key];return <HToggle key={key} spec={spec} options={OPTIONS[k].map(short)} titles={OPTIONS[k]} value={values[key]} onChange={change} tone={tone} label={label}/>;})}</div>;
  // an envelope box: its stages as faders and a Shape button that opens the curve editor (the three stage curves live there)
- const envBox=(id,title,keys,tone,pre,{curves,times,sustain,timing})=>{
+ const envBox=(id,title,keys,tone,pre,{curves,times,sustain,timing,hold})=>{
   const open=shapeOpen?.id===id,all=k=>pre+k;
   return <FloatBox key={id} id={id} title={title} tone={tone} actions={<><button type="button" className="shape-open" aria-expanded={open} title="Envelope curves" onClick={e=>{const anchor=e.currentTarget;setShapeOpen(o=>o?.id===id?null:{id,anchor});}}>Shape</button>
    {timing&&<span className="timing-radio" role="radiogroup" aria-label="Envelope timing">{['Current','Legacy'].map((name,i)=><button type="button" key={name} role="radio" aria-checked={values[pre+timing]===i} className={values[pre+timing]===i?'on':''} title={i?'The older envelope timing':'The current envelope timing'} onClick={()=>change(pre+timing,i)}>{name}</button>)}</span>}</>}>
    {keys.map(k=>field(Array.isArray(k)?[at(pre,k[0]),k[1]]:at(pre,k),tone))}
    {open&&<DiyEnvEditor title={title} anchor={shapeOpen.anchor} onClose={()=>setShapeOpen(null)} values={values} specs={synth.params.BY_KEY} change={change}
-    curves={curves.map(all)} times={Object.fromEntries(Object.entries(times).map(([s,k])=>[s,all(k)]))} sustain={all(sustain)}/>}
+    curves={curves.map(all)} times={Object.fromEntries(Object.entries(times).map(([s,k])=>[s,all(k)]))} sustain={all(sustain)} hold={hold&&{time:all(hold.time),level:all(hold.level)}}/>}
   </FloatBox>;
  };
- const lfo1=fm?[['lfoRate','Rate'],['vibrato','Vibrato'],['tremolo','Tremolo'],['lfoIndex','Index']]:[['lfoRate','Rate'],['lfoShape','Shape'],['lfoDelay','Fade'],['lfoPitch','Pitch'],['lfoFilter','Filter'],['lfoPwm','PWM']];
- const lfo2=fm?[['lfo2Rate','Rate']]:[['lfo2Rate','Rate'],['lfo2Pitch','Pitch'],['lfo2Filter','Filter'],['lfo2Amp','Trem']];
+ const lfo1=fm?[['lfoRate','Rate'],['lfoShape','Shape'],['lfoDelay','Fade'],'|',['vibrato','Pitch'],['tremolo','Amp'],['lfoIndex','Index']]:[['lfoRate','Rate'],['lfoShape','Shape'],['lfoDelay','Fade'],['lfoPitch','Pitch'],['lfoFilter','Filter'],['lfoPwm','PWM']];
+ const lfo2=fm?[['lfo2Rate','Rate'],'|',['lfo2Pitch','Pitch'],['lfo2Index','Index'],['lfo2Amp','Trem']]:[['lfo2Rate','Rate'],['lfo2Pitch','Pitch'],['lfo2Filter','Filter'],['lfo2Amp','Trem']];
  const adsr=(a,d,s,r)=>[[a,'A'],[d,'D'],[s,'S'],[r,'R']];
  const modEnv=adsr('modAttack','modDecay','modSustain','modRelease');
  // the per-note colour controls, in three boxes by what they do
  const excitation=[['breath','Breath'],['bow','Bow'],['airBrightness','Bright'],['noiseMotion','Rough'],['noisePressure','Pressure'],['noiseAttack','Attack']];
  const vowel=[['formant','Amount'],['vowel','Vowel'],['formantShift','Size']];
  const body=[['body','Amount'],['bodyType','Type'],['bodyTune','Tune'],['bodyDecay','Decay']];
- const operatorTone=['enabled','wave','ratio','fixed','detune','level','pan',[`carriers.${operator}`,'Carrier']];
- const operatorEnvelope=[['attack','A'],['peak','Peak'],['decay1','D1'],['breakpoint','Break'],['decay2','D2'],['sustain','S'],['release','R'],['legacyEnvelope','Timing']];
+ const operatorTone=['wave','ratio','fixed','detune','level','pan',['rateScale','Key rate']];
+ const operatorEnvelope=[['attack','A'],['peak','Peak'],['decay1','D1'],['breakpoint','Break'],['decay2','D2'],['sustain','S'],['release','R']];
  const oscA=[['waveA','Wave'],['levelA','Level'],['coarseA','Tune'],['pulseA','PW offset']];
  const oscB=[['waveB','Wave'],['levelB','Level'],['coarseB','Tune'],['fineB','Fine'],['bPhase','Phase'],['pulseB','PW offset']];
  const oscCommon=[['pulse','Width'],['sub','Sub'],['noise','Noise'],['noiseType','Colour']];
@@ -130,11 +133,10 @@ function Editor({fm,api,layer,setLayer,link,setLink,operator,setOperator,synth,l
  const amp=[['attack','A'],['ampHold','H'],['decay','D'],['sustain','S'],['release','R']],filterEnv=adsr('filterAttack','filterDecay','filterSustain','filterRelease');
  const oscRouting=[['hardSync','Sync'],['ring','Ring'],['polyPitch','B → A freq'],['polyPwm','B → A PW'],['polyFilter','B → filter']];
  // boxes group a thing by what it does: voice handling, output, drift, expression
- const voices=fm?['performance.mode','performance.glide','performance.portamento','global.polyphony','global.keySync']:['performance.mode','performance.glide','performance.portamento','global.polyphony','global.unison','global.spread'];
+ const voices=fm?['performance.mode','performance.glide','performance.portamento','global.polyphony']:['performance.mode','performance.glide','performance.portamento','global.polyphony','global.unison','global.spread'];
  const output=fm?['global.gain','global.width','global.quality']:['global.gain','global.width',prefix+'mix',prefix+'pan'];
- const fmCore=['global.index','global.feedback','global.feedbackOp'];
- const driftKeys=fm?[['global.wanderRate','Rate'],['global.wanderCents','Depth']]:[[prefix+'drift','Voice'],[prefix+'wanderRate','Rate'],[prefix+'wanderCents','Depth']];
- const sensitivity=['velocity','keyScale','rateScale','pressure'];
+ const fmCore=['global.index','global.feedback'];
+ const driftKeys=fm?[['global.voiceDrift','Voice'],['global.wanderRate','Rate'],['global.wanderCents','Depth']]:[[prefix+'drift','Voice'],[prefix+'wanderRate','Rate'],[prefix+'wanderCents','Depth']];
  const layerBox=<FloatBox id="layer" title="Layer" tone="teal"><div className="arch">
     <div className="arch-layers">
      <PickButtons stack compact label="Layer" options={['I','II']} titles={['Layer 1','Layer 2']} value={layer} disabled={values['global.model']!==2} onChange={setLayer}/>
@@ -149,11 +151,6 @@ function Editor({fm,api,layer,setLayer,link,setLink,operator,setOperator,synth,l
     <Lever spec={{key:'hpLink',options:['Free','Link']}} value={hpLink.on?1:0} onChange={(_,v)=>linkHighpass(v===1)} tone="red" label="Follow LP"/>
    </FloatBox>;
  const matrixBox=<FloatBox id="matrix" title="Routing matrix" tone="violet"><RoutingMatrix fm={fm} values={values} specs={synth.params.BY_KEY} prefix={prefix} sources={fm?FM_MOD_SOURCES:MOD_SOURCES} targets={fm?FM_MOD_TARGETS:MOD_TARGETS} change={change}/></FloatBox>;
- const masterBox=fm?null:<FloatBox key="master" id="master" title="Master filter" tone="red">
-  <Lever spec={LAB.BY_KEY.masterOn} value={lab.masterOn} onChange={onLab} tone="red" label="On"/>
-  <PickButtons label="Type" options={['LP','HP','BP','NT','LS','HS']} titles={LAB.BY_KEY.masterType.options} value={lab.masterType} onChange={i=>onLab('masterType',i)} columns={2} square tone="red"/>
-  {['masterFreq','masterQ','masterGain'].map(k=><Fader key={k} spec={LAB.BY_KEY[k]} value={lab[k]} onChange={onLab} tone="red" label={{masterFreq:'Cutoff',masterQ:'Q',masterGain:'Gain'}[k]}/>)}
- </FloatBox>;
  const frame=(name,...boxes)=><div className={'pf-frame pf-'+name}>{boxes}</div>;
  // Poly: a fixed front-panel layout, rows 8 px apart as on the CS-80. The oscillators, LFOs, envelopes, filter and body each sit in
  // a frame; the routing matrix stands at the right of the first two rows.
@@ -167,7 +164,7 @@ function Editor({fm,api,layer,setLayer,link,setLink,operator,setOperator,synth,l
     </div>
     <div className="pf-row">
      {frame('lfo',group('lfo1','LFO 1',lfo1,'violet',prefix,lamp(values[prefix+'lfoRate'])),group('lfo2','LFO 2',lfo2,'violet',prefix,lamp(values[prefix+'lfo2Rate'])),group('drift','Drift',driftKeys,'violet','',lamp(values[prefix+'wanderRate']*2)))}
-     {frame('env',envBox('amp-env','Amp',amp,'amber',prefix,{curves:['ampAttackCurve','ampDecayCurve','ampReleaseCurve'],times:{A:'attack',D:'decay',R:'release'},sustain:'sustain',timing:'legacyAmp'}),envBox('filter-env','Filter',filterEnv,'amber',prefix,{curves:['filterAttackCurve','filterDecayCurve','filterReleaseCurve'],times:{A:'filterAttack',D:'filterDecay',R:'filterRelease'},sustain:'filterSustain'}),envBox('mod-env','Mod',modEnv,'amber',prefix,{curves:['modAttackCurve','modDecayCurve','modReleaseCurve'],times:{A:'modAttack',D:'modDecay',R:'modRelease'},sustain:'modSustain'}),group('pitch-env','Pitch',[['pitchEnvAmount','Amount'],['pitchEnvDecay','Decay']],'amber',prefix))}
+     {frame('env',envBox('amp-env','Amp',amp,'amber',prefix,{curves:['ampAttackCurve','ampDecayCurve','ampReleaseCurve'],times:{A:'attack',D:'decay',R:'release'},sustain:'sustain',timing:'legacyAmp',hold:{time:'ampHold',level:'ampHoldLevel'}}),envBox('filter-env','Filter',filterEnv,'amber',prefix,{curves:['filterAttackCurve','filterDecayCurve','filterReleaseCurve'],times:{A:'filterAttack',D:'filterDecay',R:'filterRelease'},sustain:'filterSustain'}),envBox('mod-env','Mod',modEnv,'amber',prefix,{curves:['modAttackCurve','modDecayCurve','modReleaseCurve'],times:{A:'modAttack',D:'modDecay',R:'modRelease'},sustain:'modSustain'}),group('pitch-env','Pitch',[['pitchEnvAmount','Amount'],['pitchEnvDecay','Decay']],'amber',prefix))}
     </div>
    </div>
    {matrixBox}
@@ -175,49 +172,66 @@ function Editor({fm,api,layer,setLayer,link,setLink,operator,setOperator,synth,l
   <div className="pf-row pf-last">
    {frame('filter',group('lowpass','Low-pass',lowpass,'red',prefix),highpassBox,group('filter-mod','Filter mod',filterMod,'red',prefix))}
    {frame('body',group('excitation','Air & bow',excitation,'teal',colourPrefix),group('body','Body',body,'teal',colourPrefix),group('vowel','Vowel',vowel,'teal',colourPrefix))}
-   {frame('out',group('output','Output',output,'teal'),masterBox)}
+   {frame('out',group('output','Output',output,'teal'))}
   </div>
  </div>;
- return <Workspace storeKey="synths:diy:fm:box:">
-  <FloatBox id="topology" title="Topology" tone="teal">
-    <PickButtons row label="Operators" options={['4','6']} titles={['4 operators','6 operators']} value={count===4?0:1} onChange={i=>replaceValues(applyTopology(values,i?6:4,values['global.algorithm']))}/>
-    <label className="diy-select wide">Starting topology<select aria-label="Starting topology" value={values['global.algorithm']} onChange={e=>replaceValues(applyTopology(values,count,Number(e.target.value)))}>{FM_ALGORITHMS.map((name,i)=><option key={i} value={i}>{name}</option>)}</select></label>
-    <button type="button" onClick={()=>replaceValues(applyTopology(values,count,values['global.algorithm']))}>Reset routing</button>
-    <span className="hint">Choosing a topology replaces custom routes.</span>
-   </FloatBox>
-  <FloatBox id="operators" title="Edit operator" tone="violet">
-   <div className="diy-operators" role="group" aria-label="Edit operator">{Array.from({length:count},(_,i)=><button type="button" key={i} aria-pressed={operator===i} onClick={()=>setOperator(i)}><b>OP {i+1}</b><span>{values[`operators.${i}.fixed`]>0?`${Math.round(values[`operators.${i}.fixed`])} Hz`:`${values[`operators.${i}.ratio`]}×`}</span><small>{values[`operators.${i}.enabled`]===0?'Muted':values[`carriers.${i}`]>0?'Carrier':'Modulator'}</small></button>)}</div>
+ // the starting arrangement, in four rows with a column on the right: the operator and its envelope, the oscillators' modulation, the voice's controls, the colour.
+ // Every row is brought to the same width by spreading the spare room over its boxes (their controls spread to suit), and every box in a row to the same height; the
+ // operator routing sits beside the first two rows and the routing matrix beside the last two, one width, one left edge.
+ const arrange=sizes=>{
+  const G=12,at={};
+  const rows=[['operators','op-osc','op-env'],['fm-core','lfo1','lfo2','drift'],['voices','mod-env','pitch-env','output'],['vowel','body','excitation']].map(r=>r.filter(id=>sizes[id]));
+  const widthOf=r=>r.reduce((t,id)=>t+sizes[id].w,0)+G*Math.max(0,r.length-1);
+  const W=Math.max(...rows.map(widthOf));
+  const heights=rows.map(r=>Math.max(0,...r.map(id=>sizes[id].h)));
+  // the column on the right needs its own height: the rows beside it make it up
+  if(sizes.routing)heights[1]=Math.max(heights[1],sizes.routing.h-heights[0]-G);
+  if(sizes.matrix)heights[3]=Math.max(heights[3],sizes.matrix.h-heights[2]-G);
+  const tops=[];let y=0;
+  rows.forEach((r,n)=>{
+   tops[n]=y;const share=(W-widthOf(r))/Math.max(1,r.length);let x=0;
+   for(const id of r){const w=Math.round(sizes[id].w+share);at[id]={x,y,h:heights[n],w};x+=w+G;}
+   y+=heights[n]+G;
+  });
+  const R=Math.max(sizes.routing?.w??0,sizes.matrix?.w??0),X=W+G;
+  if(sizes.routing)at.routing={x:X,y:0,h:tops[1]+heights[1],w:R};
+  if(sizes.matrix)at.matrix={x:X,y:tops[2],h:tops[3]+heights[3]-tops[2],w:R};
+  return at;
+ };
+ return <Workspace storeKey="synths:diy:fm:box:" arrange={arrange} fixed>
+  <FloatBox id="operators" title="Operator" tone="violet">
+   <div className="diy-operators" role="group" aria-label="Operator">{/* always eight places in one row, so the box does not change as the count does: the ones the synth has no operator for are dark */Array.from({length:8},(_,i)=>i>=count?<button type="button" key={i} disabled aria-label={`Operator ${i+1} not in use`}><b>OP{i+1}</b></button>:<button type="button" key={i} aria-pressed={operator===i} title={`Operator ${i+1}: ${values[`operators.${i}.enabled`]===0?'muted':values[`carriers.${i}`]>0?'carrier':'modulator'}, ${values[`operators.${i}.fixed`]>0?`${Math.round(values[`operators.${i}.fixed`])} Hz`:`ratio ${values[`operators.${i}.ratio`]}×`}, gain ${values[`operators.${i}.level`]}`} onClick={()=>setOperator(i)}><b>OP{i+1}</b><span>{values[`operators.${i}.enabled`]===0?'off':(Math.round(values[`operators.${i}.level`]*100)/100).toString()}</span></button>)}</div>
   </FloatBox>
   {group('voices','Voices',voices,'teal')}
   {group('fm-core','FM',fmCore,'violet')}
   {group('output','Output',output,'teal')}
-  {group('op-osc',`Operator ${operator+1} · oscillator`,operatorTone,'violet',prefix)}
-  {envBox('op-env',`Operator ${operator+1} · envelope`,operatorEnvelope,'amber',prefix,{curves:['attackCurve','decayCurve','releaseCurve'],times:{A:'attack',D:'decay1',R:'release'},sustain:'sustain'})}
-  {group('op-response',`Operator ${operator+1} · sensitivity`,sensitivity,'amber',prefix)}
-  {group('lfo1','LFO 1',lfo1,'violet','global.')}
-  {group('lfo2','LFO 2',lfo2,'violet','global.')}
-  {group('drift','Drift',driftKeys,'violet')}
-  {envBox('mod-env','Modulation envelope',modEnv,'amber','global.',{curves:['modAttackCurve','modDecayCurve','modReleaseCurve'],times:{A:'modAttack',D:'modDecay',R:'modRelease'},sustain:'modSustain'})}
+  {group('op-osc',`Operator ${operator+1} · oscillator`,operatorTone,'violet',prefix,<span className="timing-radio" role="radiogroup" aria-label="Operator phase">{['Free','Reset'].map((name,i)=><button type="button" key={name} role="radio" aria-checked={values['global.keySync']===i} className={values['global.keySync']===i?'on':''} title={i?'Every operator starts each note at the start of its cycle: the same attack every time':'Operators keep running between notes: each note starts at a different point'} onClick={()=>change('global.keySync',i)}>{name}</button>)}</span>)}
+  {envBox('op-env',`Operator ${operator+1} · stages`,operatorEnvelope,'amber',prefix,{curves:['attackCurve','decayCurve','releaseCurve'],times:{A:'attack',D:'decay1',R:'release'},sustain:'sustain',timing:'legacyEnvelope'})}
+  {group('lfo1','LFO 1',lfo1,'violet','global.',lamp(values['global.lfoRate']))}
+  {group('lfo2','LFO 2',lfo2,'violet','global.',lamp(values['global.lfo2Rate']))}
+  {group('drift','Drift',driftKeys,'violet','',lamp(values['global.wanderRate']*2))}
+  {envBox('mod-env','Modulation',modEnv,'amber','global.',{curves:['modAttackCurve','modDecayCurve','modReleaseCurve'],times:{A:'modAttack',D:'modDecay',R:'modRelease'},sustain:'modSustain'})}
   <FloatBox id="matrix" title="Routing matrix" tone="violet"><RoutingMatrix fm={fm} values={values} specs={synth.params.BY_KEY} prefix={prefix} sources={fm?FM_MOD_SOURCES:MOD_SOURCES} targets={fm?FM_MOD_TARGETS:MOD_TARGETS} change={change}/></FloatBox>
-  {group('pitch-env','Pitch envelope',['pitchStart','pitchTime'],'amber','global.')}
+  {group('pitch-env','Pitch',[['pitchStart','Amount'],['pitchTime','Decay']],'amber','global.')}
   {group('excitation','Air & bow',excitation,'teal',colourPrefix)}
   {group('vowel','Vowel',vowel,'teal',colourPrefix)}
   {group('body','Body',body,'teal',colourPrefix)}
-  <FloatBox id="routing" title="Operator routing" tone="violet"><div className="diy-routing"><p className="hint">Rows modulate columns. Zero disconnects; carrier levels send operators to the output. Feedback uses the selected operator.</p><div className="diy-routing-scroll"><table><thead><tr><th scope="col">From ↓ / To →</th>{Array.from({length:count},(_,i)=><th scope="col" key={i}>OP {i+1}</th>)}<th scope="col">Output</th></tr></thead><tbody>{Array.from({length:count},(_,i)=><tr key={i}><th scope="row">OP {i+1}</th>{Array.from({length:count},(_,j)=><td key={j}>{j>i?<input aria-label={`Operator ${i+1} to ${j+1}`} type="number" min="0" max="2" step="0.05" value={values[`routes.${i}.${j}`]} onChange={e=>change(`routes.${i}.${j}`,Math.max(0,Math.min(2,Number(e.target.value))))}/>:<span aria-label="Unavailable">—</span>}</td>)}<td><input aria-label={`Operator ${i+1} carrier level`} type="number" min="0" max="1" step="0.05" value={values[`carriers.${i}`]} onChange={e=>change(`carriers.${i}`,Math.max(0,Math.min(1,Number(e.target.value))))}/></td></tr>)}</tbody></table></div></div></FloatBox>
+  <FloatBox id="routing" title="Operator routing" tone="violet"><OperatorGrid values={values} specs={synth.params.BY_KEY} count={count} change={change}/></FloatBox>
  </Workspace>;
 }
 
 function DiyPage({fm=false}){
  const synth=SYNTHS[fm?'fm':'poly'];
  const [layer,setLayer]=useState(0),[link,setLink]=useState(false),[operator,setOperator]=useState(0);
- // the lab: effects and filters being tried out, in floating windows beside the panel (see LabPanels)
- const [engine,setEngine]=useState(null),[labOpen,setLabOpen]=useState(()=>load('synths:diy:lab-open',false)),[lab,setLab]=useState(()=>LAB.defaultValues());
- useEffect(()=>{engine?.setLab(lab);},[engine,lab]);
- const toggleLab=()=>setLabOpen(o=>{save('synths:diy:lab-open',!o);return !o;});
- return <SynthShell synth={synth} className={'diy '+(fm?'diy-fm':'diy-poly')} panelClassName="diy-panel" picker={fm?OledPicker:PolyPicker} helpInBar onEngine={setEngine}
-  headerExtras={<button type="button" aria-pressed={labOpen} title="Tape, shimmer, freeze, master filter and tuning: floating test windows" onClick={toggleLab}>Lab</button>} startEngine={fm?startFM:startPoly}>
-  {api=><><Editor fm={fm} api={api} layer={api.values['global.model']===2?layer:0} setLayer={setLayer} link={link} setLink={setLink} operator={Math.min(operator,(api.values['global.operators']??6)-1)} setOperator={setOperator} synth={synth} lab={lab} onLab={(key,value)=>setLab(l=>({...l,[key]:value}))}/>
-   {labOpen&&<LabPanels values={lab} onChange={(key,value)=>setLab(l=>({...l,[key]:value}))} onClose={toggleLab}/>}</>}
+ // the tuning window, open until it is closed
+ // the tuning window starts open on the DI-Poly and closed on FM, and each remembers its own
+ const TUNING_KEY=fm?'synths:diy:fm:tuning-open':'synths:diy:tuning-open';
+ const [labOpen,setLabOpen]=useState(()=>load(TUNING_KEY,!fm));
+ const toggleLab=()=>setLabOpen(o=>{save(TUNING_KEY,!o);return !o;});
+ return <SynthShell synth={synth} className={'diy '+(fm?'diy-fm':'diy-poly')} panelClassName="diy-panel" picker={fm?FmPicker:PolyPicker} helpInBar
+  headerExtras={<button type="button" aria-pressed={labOpen} title="The tuning window: scale, tonic, octave, A4, shift and chord auto-tune" onClick={toggleLab}>Tuning</button>} startEngine={fm?startFM:startPoly}>
+  {api=><><Editor fm={fm} api={api} layer={api.values['global.model']===2?layer:0} setLayer={setLayer} link={link} setLink={setLink} operator={Math.min(operator,(api.values['global.operators']??6)-1)} setOperator={setOperator} synth={synth}/>
+   {labOpen&&<LabPanels onClose={toggleLab}/>}</>}
  </SynthShell>;
 }
 export function PolyPage(){return <DiyPage/>;}

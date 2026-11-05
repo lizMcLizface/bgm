@@ -20,6 +20,7 @@ import {EXTRA_KINDS,createExtraStage} from './extras';
 export async function createRack(context,values,{onError=()=>{}}={}){
  const pool=[]; // inserts kernel instances, created as the order needs them
  const extra={}; // added units' stages, created when first put in the chain
+ const split={}; // the reverb and the delay on a bus each, made when the reverb is put before the delay
  let effects,metering=false,wired='',latest=values,busy=false,disposed=false,failed=false;
  const nodes=[],gain=()=>{const n=context.createGain();nodes.push(n);return n;};
  const input=gain(),trim=gain(),processed=gain(),bypass=gain(),output=gain();
@@ -28,7 +29,7 @@ export async function createRack(context,values,{onError=()=>{}}={}){
  let links=[];
  const link=(from,to)=>{from.connect(to);links.push([from,to]);};
  const unlink=()=>{for(const [from,to] of links){try{from.disconnect(to);}catch{/* already gone */}}links=[];};
- const dispose=()=>{disposed=true;pool.forEach(i=>i.dispose());Object.values(extra).forEach(s=>s.dispose());effects?.dispose();nodes.forEach(n=>n.disconnect());};
+ const dispose=()=>{disposed=true;pool.forEach(i=>i.dispose());Object.values(extra).forEach(s=>s.dispose());Object.values(split).forEach(b=>b.dispose());effects?.dispose();nodes.forEach(n=>n.disconnect());};
  // the inserts packet for one run of effects: the effects outside the run are zeroed, the output trim belongs to the last run
  const runPacket=(inserts,units,last)=>{
   const p={...inserts};
@@ -38,7 +39,7 @@ export async function createRack(context,values,{onError=()=>{}}={}){
   if(!last)p.gain=0;
   return p;
  };
- const stagesOf=raw=>{const {master}=rackPackets(raw);return stagesFor(orderFromCode(master.order),chainUnits(master.chain));};
+ const stagesOf=raw=>{const {master}=rackPackets(raw);return stagesFor(orderFromCode(master.order),chainUnits(master.chain),master.reverbFirst>=.5);};
  const signature=stages=>stages.map(s=>s.kind==='inserts'?'i:'+s.units.join('+'):s.kind).join('|');
  const patch=(raw,initial=false)=>{
   latest=raw;
@@ -48,8 +49,10 @@ export async function createRack(context,values,{onError=()=>{}}={}){
   pool.forEach((inst,k)=>{const run=runs[k];inst.patch(run?runPacket(i,run.units,k===runs.length-1):{...i,saturation:0,lowGain:0,midGain:0,highGain:0,phaser:0,flanger:0,chorus:0,gain:0});});
   for(const [kind,stage] of Object.entries(extra))stage.patch(x[kind],initial);
   effects.patch(e);
+  // the two halves of the space unit when the reverb comes first: the reverb keeps the dry level, the delay passes what it is given
+  split.reverb?.patch({...e,delay:0,delayToReverb:0});split.delay?.patch({...e,reverb:0,dry:1});
   const set=(param,v)=>initial?param.setValueAtTime(v,context.currentTime):param.setTargetAtTime(v,context.currentTime,.012);
-  set(trim.gain,10**(m.input/20));set(processed.gain,m.enabled&&!busy?10**(m.output/20):0);set(bypass.gain,m.enabled?0:1);
+  set(trim.gain,10**(m.input/20));set(processed.gain,m.enabled&&!busy?m.mix*10**(m.output/20):0);set(bypass.gain,m.enabled?(1-m.mix)*10**((m.input+m.output)/20):1);
   // the compressor's mix blends the compressed signal with the dry one (parallel compression)
   set(clean.gain,c.enabled?1-c.mix:1);set(compressed.gain,c.enabled?c.mix*10**(c.makeup/20):0);
   for(const key of ['threshold','ratio','knee','attack','release'])set(compressor.getNode()[key],c[key]);
@@ -59,6 +62,7 @@ export async function createRack(context,values,{onError=()=>{}}={}){
  const ensure=async stages=>{
   const runs=stages.filter(s=>s.kind==='inserts');
   while(pool.length<runs.length){const inst=await createInstrumentInserts(context,rackPackets(latest).inserts,{onError});if(disposed){inst.dispose();return false;}pool.push(inst);}
+  for(const stage of stages)if((stage.kind==='reverb'||stage.kind==='delay')&&!split[stage.kind]){const bus=await createEffectsBus(context,rackPackets(latest).effects,{onError});if(disposed){bus.dispose();return false;}split[stage.kind]=bus;}
   for(const stage of stages)if(EXTRA_KINDS.includes(stage.kind)&&!extra[stage.kind]){const made=await createExtraStage(context,stage.kind);if(disposed){made.dispose();return false;}extra[stage.kind]=made;made.patch(rackPackets(latest).extras[stage.kind],true);}
   return true;
  };
@@ -73,6 +77,7 @@ export async function createRack(context,values,{onError=()=>{}}={}){
    if(stage.kind==='inserts'){const inst=pool[k++];into=inst.input;out=inst.node;}
    else if(stage.kind==='compressor'){into=compIn;out=compOut;}
    else if(stage.kind==='space'){into=effects.input;out=effects.node;}
+   else if(stage.kind==='reverb'||stage.kind==='delay'){into=split[stage.kind].input;out=split[stage.kind].node;}
    else{into=extra[stage.kind].input;out=extra[stage.kind].output;}
    link(from,into);from=out;
   }
@@ -102,6 +107,6 @@ export async function createRack(context,values,{onError=()=>{}}={}){
   if(!await ensure(stages))return null;
   wire(stages);
   patch(values,true);
-  return {input,node:output,patch,connect:destination=>output.connect(destination),clear(){pool.forEach(i=>i.clear());effects.clear();},get reduction(){return metering?compressor.getNode().reduction:0;},dispose};
+  return {input,node:output,patch,connect:destination=>output.connect(destination),clear(){pool.forEach(i=>i.clear());Object.values(extra).forEach(s=>s.clear?.());Object.values(split).forEach(b=>b.clear());effects.clear();},get reduction(){return metering?compressor.getNode().reduction:0;},dispose};
  }catch(error){dispose();throw error;}
 }

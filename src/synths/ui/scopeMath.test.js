@@ -1,5 +1,5 @@
 // @vitest-environment node
-import {findTrigger,levels,pitchOf,noteName,fft,spectrumDb,spectrumTrace,spectralPeak,wavBytes} from './scopeMath';
+import {findPitchTrigger,refinePeriod,findTrigger,levels,pitchOf,noteName,fft,spectrumDb,spectrumTrace,spectralPeak,wavBytes} from './scopeMath';
 
 const sine=(hz,n,sr=48000,amp=1)=>Float32Array.from({length:n},(_,i)=>amp*Math.sin(2*Math.PI*hz*i/sr+.01));
 
@@ -62,4 +62,23 @@ test('the display preserves an isolated high-frequency peak when many bins share
   const trace=spectrumTrace(db,48000,width,115,180);
   for(let i=1;i<trace.length;i++)expect(trace[i]).toBeLessThanOrEqual(trace[i-1]+1e-4);
  }
+});
+
+test('the pitch trigger holds a harmonic-rich wave on the same phase from frame to frame, where a level trigger jumps',()=>{
+ const rate=48000,f=220.5,P=rate/f,n=8000;
+ // a fundamental with a stronger second and third harmonic, so the level crossings fall in several places in each cycle
+ const wave=(off)=>Float32Array.from({length:n},(_,i)=>{const t=(i+off)/rate*f*2*Math.PI;return .35*Math.sin(t)+.5*Math.sin(2*t+1)+.4*Math.sin(3*t+2);});
+ const per=refinePeriod(wave(0),rate/(f*1.02));
+ expect(Math.abs(per-P)).toBeLessThan(.5);
+ const state={tpl:null},phases=[];
+ for(let frame=0;frame<12;frame++){
+  const off=frame*997.3,x=wave(off),t=findPitchTrigger(x,per,100,n-1500,state);
+  expect(t).toBeGreaterThan(0);
+  const phase=(((t+off)/P)%1+1)%1;phases.push(phase);
+ }
+ const spread=Math.max(...phases.map(p=>Math.min(Math.abs(p-phases[0]),1-Math.abs(p-phases[0]))));
+ expect(spread).toBeLessThan(.02);
+ // a level trigger on the same frames lands on different phases
+ const lv=[];for(let frame=0;frame<12;frame++){const off=frame*997.3,x=wave(off),t=findTrigger(x,.1,1,100,n-1500,true);lv.push((((t+off)/P)%1+1)%1);}
+ expect(Math.max(...lv)-Math.min(...lv)).toBeGreaterThan(.02);
 });

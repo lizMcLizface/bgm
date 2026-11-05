@@ -12,7 +12,7 @@ export class Performer {
  setTarget(target){this.target=target;this.sent={};this.sync();}
  down(key,note,velocity){
   if(this.keys.has(key))this.up(key);
-  const id=++this.next;this.keys.set(key,{id,note});
+  const id=++this.next;this.keys.set(key,{id,note});this.lastNote=note;
   this.target?.noteOn(id,note,velocity);this.onNotes(this.notes());
  }
  up(key){

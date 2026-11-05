@@ -32,7 +32,7 @@ impl Fm {
                     0.
                 }
             })));
-            let mut expressions = [[0.; 11]; 4];
+            let mut expressions = [[0.; 13]; 4];
             for (j, &voice_index) in group.iter().enumerate() {
                 let v = &mut self.voices[voice_index];
                 if !v.active {
@@ -60,9 +60,16 @@ impl Fm {
                     v.glide -= 1;
                 }
                 let update = control || self.frame == v.age;
+                if update {
+                    v.lfo_fade = if self.g[59] > 0. {
+                        ((self.frame - v.age) as f32 / self.sr / self.g[59]).min(1.)
+                    } else {
+                        1.
+                    };
+                }
                 let pressure = v.pressure.max(self.g[12]);
                 let random = v.expression.tick(&self.g, sr, expression_alpha, motion);
-                let mut targets = [0.; 11];
+                let mut targets = [0.; 13];
                 if routes {
                     for slot in 0..4 {
                         let at = 29 + slot * 3;
@@ -84,7 +91,7 @@ impl Fm {
                         targets[destination - 1] += source * self.g[at + 2];
                     }
                 }
-                for k in 0..11 {
+                for k in 0..13 {
                     if targets[k] != 0. || v.expression.routes[k] != 0. {
                         v.expression.routes[k] +=
                             (targets[k].clamp(-1., 1.) - v.expression.routes[k]) * expression_alpha;
@@ -101,8 +108,9 @@ impl Fm {
                         * ((v.midi - 69.
                             + self.bend
                             + transient
-                            + lfo * (self.g[11] + self.g[9] * 35.) / 100.
-                            + (random * self.g[27] + expression[0] * 100.) / 100.)
+                            + (self.pitch1 * v.lfo_fade + self.pitch2)
+                            + (random * self.g[27] + expression[0] * 100.) / 100.
+                            + v.expression.fixed * self.g[58] / 100.)
                             / 12.)
                             .exp2();
                     for op in 0..count {
@@ -139,10 +147,12 @@ impl Fm {
                 let p = &self.p[op];
                 let mut scales = [0.; 4];
                 let mut steps = [0.; 4];
+                let mut fades = [1.; 4];
                 for (j, &i) in group.iter().enumerate() {
                     let v = &mut self.voices[i];
                     scales[j] = v.scale[op];
                     steps[j] = v.step[op];
+                    fades[j] = v.lfo_fade;
                 }
                 let env = state.env[op].tick(p, mask);
                 let stages = state.env[op].stage.array();
@@ -176,7 +186,7 @@ impl Fm {
                         + modulation
                             * V::s(self.smooth[2])
                             * V::a(expressions.map(|e| 1. + e[1]))
-                            * V::s(1. + lfo * self.g[18])
+                            * V::a(fades.map(|f| (1. + self.idx1 * f) + self.idx2))
                             / V::s(2. * PI),
                 );
                 let shaped = match p[17] as u32 {
@@ -194,7 +204,7 @@ impl Fm {
                 state.previous[op][pos] = mask.choose(outputs[op], state.previous[op][pos]);
                 if self.carriers[op] > 0. {
                     let x = outputs[op] * V::s(self.carriers[op]) / V::s(norm)
-                        * V::s(1. - self.g[17] * (lfo + 1.) * 0.5);
+                        * V::a(fades.map(|f| (1. - self.amp1 * f) - self.amp2));
                     for ch in 0..2 {
                         sum[ch] += x * V::s(self.pan[op][ch]);
                     }
@@ -206,7 +216,7 @@ impl Fm {
                             * expression
                             * V::s(self.carriers[op])
                             / V::s(norm)
-                            * V::s(1. - self.g[17] * (lfo + 1.) * 0.5);
+                            * V::a(fades.map(|f| (1. - self.amp1 * f) - self.amp2));
                         for ch in 0..2 {
                             noise[ch] += level * V::s(self.pan[op][ch]);
                         }
@@ -388,10 +398,7 @@ impl Fm {
             }
             for sub in 0..factor {
                 self.bend += (self.g[8] - self.bend) * 0.002 / factor as f32;
-                let lfo = sin(&self.sine, self.lfo);
-                self.lfo = (self.lfo + self.g[10] / sr).fract();
-                let lfo2 = sin(&self.sine, self.lfo2);
-                self.lfo2 = (self.lfo2 + self.g[28] / sr).fract();
+                let (lfo, lfo2) = self.lfo_tick(sr);
                 let control = self.frame % 16 == 0 && sub == 0;
                 let mut out = [0.; 2];
                 if !voice_idle {

@@ -127,6 +127,7 @@ programs:
       layers.0.pitchEnvDecay: 0.15
       layers.0.phaseLock: 0
       layers.0.bPhase: 0
+      layers.0.ampHoldLevel: 1
       layers.1.waveA: 3
       layers.1.waveB: 4
       layers.1.levelA: 0.65
@@ -233,6 +234,7 @@ programs:
       layers.1.pitchEnvDecay: 0.15
       layers.1.phaseLock: 0
       layers.1.bPhase: 0
+      layers.1.ampHoldLevel: 1
       effects.dry: 1
       effects.reverb: 0.22
       effects.delay: 0.12
@@ -407,6 +409,7 @@ programs:
       layers.0.pitchEnvDecay: 0.15
       layers.0.phaseLock: 0
       layers.0.bPhase: 0
+      layers.0.ampHoldLevel: 1
       layers.1.waveA: 3
       layers.1.waveB: 4
       layers.1.levelA: 0.65
@@ -513,6 +516,7 @@ programs:
       layers.1.pitchEnvDecay: 0.15
       layers.1.phaseLock: 0
       layers.1.bPhase: 0
+      layers.1.ampHoldLevel: 1
       effects.dry: 1
       effects.reverb: 0.22
       effects.delay: 0.12
@@ -687,6 +691,7 @@ programs:
       layers.0.pitchEnvDecay: 0.15
       layers.0.phaseLock: 0
       layers.0.bPhase: 0
+      layers.0.ampHoldLevel: 1
       layers.1.waveA: 4
       layers.1.waveB: 0
       layers.1.levelA: 0.7
@@ -793,6 +798,7 @@ programs:
       layers.1.pitchEnvDecay: 0.15
       layers.1.phaseLock: 0
       layers.1.bPhase: 0
+      layers.1.ampHoldLevel: 1
       effects.dry: 1
       effects.reverb: 0.22
       effects.delay: 0.12
@@ -967,6 +973,7 @@ programs:
       layers.0.pitchEnvDecay: 0.15
       layers.0.phaseLock: 0
       layers.0.bPhase: 0
+      layers.0.ampHoldLevel: 1
       layers.1.waveA: 3
       layers.1.waveB: 4
       layers.1.levelA: 0.65
@@ -1073,6 +1080,7 @@ programs:
       layers.1.pitchEnvDecay: 0.15
       layers.1.phaseLock: 0
       layers.1.bPhase: 0
+      layers.1.ampHoldLevel: 1
       effects.dry: 1
       effects.reverb: 0.22
       effects.delay: 0.12
@@ -1247,6 +1255,7 @@ programs:
       layers.0.pitchEnvDecay: 0.15
       layers.0.phaseLock: 0
       layers.0.bPhase: 0
+      layers.0.ampHoldLevel: 1
       layers.1.waveA: 3
       layers.1.waveB: 4
       layers.1.levelA: 0.65
@@ -1353,6 +1362,7 @@ programs:
       layers.1.pitchEnvDecay: 0.15
       layers.1.phaseLock: 0
       layers.1.bPhase: 0
+      layers.1.ampHoldLevel: 1
       effects.dry: 1
       effects.reverb: 0.22
       effects.delay: 0.12
@@ -1527,6 +1537,7 @@ programs:
       layers.0.pitchEnvDecay: 0.15
       layers.0.phaseLock: 0
       layers.0.bPhase: 0
+      layers.0.ampHoldLevel: 1
       layers.1.waveA: 2
       layers.1.waveB: 0
       layers.1.levelA: 0.6
@@ -1633,6 +1644,7 @@ programs:
       layers.1.pitchEnvDecay: 0.15
       layers.1.phaseLock: 0
       layers.1.bPhase: 0
+      layers.1.ampHoldLevel: 1
       effects.dry: 1
       effects.reverb: 0.22
       effects.delay: 0.12
@@ -1807,6 +1819,7 @@ programs:
       layers.0.pitchEnvDecay: 0.15
       layers.0.phaseLock: 0
       layers.0.bPhase: 0
+      layers.0.ampHoldLevel: 1
       layers.1.waveA: 3
       layers.1.waveB: 4
       layers.1.levelA: 0.65
@@ -1913,6 +1926,7 @@ programs:
       layers.1.pitchEnvDecay: 0.15
       layers.1.phaseLock: 0
       layers.1.bPhase: 0
+      layers.1.ampHoldLevel: 1
       effects.dry: 1
       effects.reverb: 0.22
       effects.delay: 0.12
@@ -2087,6 +2101,7 @@ programs:
       layers.0.pitchEnvDecay: 0.15
       layers.0.phaseLock: 0
       layers.0.bPhase: 0
+      layers.0.ampHoldLevel: 1
       layers.1.waveA: 3
       layers.1.waveB: 4
       layers.1.levelA: 0.65
@@ -2193,6 +2208,7 @@ programs:
       layers.1.pitchEnvDecay: 0.15
       layers.1.phaseLock: 0
       layers.1.bPhase: 0
+      layers.1.ampHoldLevel: 1
       effects.dry: 1
       effects.reverb: 0.22
       effects.delay: 0.12
@@ -2367,6 +2383,7 @@ programs:
       layers.0.pitchEnvDecay: 0.15
       layers.0.phaseLock: 0
       layers.0.bPhase: 0
+      layers.0.ampHoldLevel: 1
       layers.1.waveA: 3
       layers.1.waveB: 4
       layers.1.levelA: 0.65
@@ -2473,6 +2490,7 @@ programs:
       layers.1.pitchEnvDecay: 0.15
       layers.1.phaseLock: 0
       layers.1.bPhase: 0
+      layers.1.ampHoldLevel: 1
       effects.dry: 1
       effects.reverb: 0.22
       effects.delay: 0.12
@@ -2647,6 +2665,7 @@ programs:
       layers.0.pitchEnvDecay: 0.15
       layers.0.phaseLock: 0
       layers.0.bPhase: 0
+      layers.0.ampHoldLevel: 1
       layers.1.waveA: 3
       layers.1.waveB: 4
       layers.1.levelA: 0.65
@@ -2753,6 +2772,7 @@ programs:
       layers.1.pitchEnvDecay: 0.15
       layers.1.phaseLock: 0
       layers.1.bPhase: 0
+      layers.1.ampHoldLevel: 1
       effects.dry: 1
       effects.reverb: 0.22
       effects.delay: 0.12
@@ -2927,6 +2947,7 @@ programs:
       layers.0.pitchEnvDecay: 0.15
       layers.0.phaseLock: 0
       layers.0.bPhase: 0
+      layers.0.ampHoldLevel: 1
       layers.1.waveA: 3
       layers.1.waveB: 4
       layers.1.levelA: 0.65
@@ -3033,6 +3054,7 @@ programs:
       layers.1.pitchEnvDecay: 0.15
       layers.1.phaseLock: 0
       layers.1.bPhase: 0
+      layers.1.ampHoldLevel: 1
       effects.dry: 1
       effects.reverb: 0.22
       effects.delay: 0.12

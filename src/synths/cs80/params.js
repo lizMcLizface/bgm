@@ -78,4 +78,8 @@ export const {PARAMS,BY_KEY,defaultValues,clampValue,sanitize,toPairs}=definePar
  ...shapeRows('amp'),
  ...SPACE,
 ]);
+// The V 80's reverb is the rack's Reverb (effects/params.js moves it): its own reverb stays at nothing in the engine
+const REVERB_MIX=BY_KEY.reverbMix.id;
+const basePairs=toPairs;
+export const toEnginePairs=values=>basePairs(values).map(([id,v])=>id===REVERB_MIX?[id,0]:[id,v]);
 export {toPosition,fromPosition,formatValue};

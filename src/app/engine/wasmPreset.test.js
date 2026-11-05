@@ -41,11 +41,22 @@ it('carries the mid EQ band and the room controls into the translated patch',()=
  expect(p.effects).toMatchObject({decay:3,size:.4,damping:2500,predelay:60});expect(p.inserts).toMatchObject({midGain:-4,midFreq:800,midQ:1.2});
  expect(translatedWasmPreset({reverbAmount:.3}).effects).toMatchObject({decay:8,size:.7,damping:6000,predelay:25});
 });
-it('keeps coloured or pitch-filtered noise beds on the original engine',()=>{
- for(const name of ['Wind Pad','Pitched Rain'])expect(needsNativeSource(preset(name))).toBe(true);
+it('keeps pitch-filtered noise beds on the original engine, but DI-Poly takes the simple ones',()=>{
+ for(const name of ['Wind Pad','Pitched Rain']){
+  expect(needsNativeSource(preset(name))).toBe(true);expect(needsNativeSource(preset(name),{poly:true})).toBe(false);
+  expect(translatedWasmPreset(preset(name)).layers[0]).toMatchObject({filter:2,cutoff:262,keytrack:1,noise:preset(name).noiseMix});
+ }
+ expect(translatedWasmPreset(preset('Wind Pad')).layers[0].noiseType).toBe(2);expect(translatedWasmPreset(preset('Pitched Rain')).layers[0].noiseType).toBe(1);
+ // other shaping around the noise filter stays on the original engine, here and in DI-Poly
+ expect(needsNativeSource({noiseMix:.5,noiseFilterEnabled:true,filterFreq:900},{poly:true})).toBe(true);
  expect(needsNativeSource({noiseMix:.4,noiseType:'white'})).toBe(false);expect(needsNativeSource({noiseMix:0,noiseType:'brown'})).toBe(false);expect(needsNativeSource(preset('Breathy Choir'))).toBe(false);
+ expect(translatedWasmPreset(preset('Breathy Choir')).layers[0]).toMatchObject({noiseType:1,filter:0});
+});
+it('uses the kernel pitch envelope for pitch transients',()=>{
+ const l=translatedWasmPreset(preset('Thump Bass')).layers[0];
+ expect(l.pitchEnvAmount).toBeCloseTo(7);expect(l.pitchEnvDecay).toBeCloseTo(preset('Thump Bass').pitchEnvDecay/3);expect(l.modDepth4).toBe(0);
 });
 it('keeps clearly bit-crushed voices on the original engine',()=>{
- for(const name of ['Bit Haze','Chip Bass'])expect(needsNativeSource(preset(name))).toBe(true);
+ for(const name of ['Bit Haze','Chip Bass']){expect(needsNativeSource(preset(name))).toBe(true);expect(needsNativeSource(preset(name),{poly:true})).toBe(false);}
  expect(needsNativeSource(preset('Lo-fi Tape Pad'))).toBe(false);expect(wasmMappingNotes(preset('Lo-fi Tape Pad'))).toContain('bit crusher not mapped');
 });

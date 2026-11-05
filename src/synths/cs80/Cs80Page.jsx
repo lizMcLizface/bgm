@@ -52,7 +52,7 @@ export default function Cs80Page(){
   <label className="toggle"><input type="checkbox" checked={linked} onChange={e=>setLinked(e.target.checked)}/> Link I + II</label>
   <button type="button" onClick={()=>{const next={...values};for(const key of Object.keys(next))if(key.startsWith(c+'.'))next[other(c)+key.slice(c.length)]=next[key];replaceValues(next);}}>Copy to {roman(other(c))}</button>
  </>;
- return <SynthShell synth={SYNTHS.cs80} className="cs80" panelClassName="complete" expand={expand} libraries={LIBRARIES}>
+ return <SynthShell synth={SYNTHS.cs80} className="cs80" helpInBar panelClassName="complete" expand={expand} libraries={LIBRARIES}>
   {({values,group,replaceValues})=><>
    <div className="cs-layout">
     <div className="voice-frame" role="group" aria-label={'Channel '+roman(channel)}>

@@ -18,8 +18,12 @@ import SoundPicker,{soundList,nextSound} from './SoundPicker';
 import {SHAPE_KEYS} from './envShape';
 import RackPanel from '../effects/RackPanel';
 import RackCompact from '../effects/RackCompact';
+import Desk,{onSynth} from './Desk';
+import {leanChain} from '../effects/rackParts';
+import {maskFromUnits,chainUnits,DEFAULT_CHAIN} from '../effects/order';
 import {syncedDelayMs} from '../effects/rackParts';
-import {RACK_PARAMS,SPACE_KEYS,cleanRack,rackForPatch,instrumentSpaceKeys,splitRackEdits} from '../effects/params';
+import {RACK_PARAMS,SPACE_KEYS,cleanRack,rackForPatch,instrumentSpecKeys,spaceUnitsUsed,rackPlayedKeys,splitRackEdits} from '../effects/params';
+const MOVED={moved:true};
 import {serveRack} from '../effects/connection';
 import EmbeddedShell,{useEnsemblePanel} from './EmbeddedShell';
 
@@ -41,7 +45,7 @@ function clearComparisonLink(){
 
 /**
  * synth: entry from ../models. children({values,control,group,replaceValues}) draws the panel.
- * expand(key) may return several keys to edit together (CS-80 channel linking).
+ * expand(key,value) may return several keys to edit together (CS-80 channel linking), or an object of keys with their own values (the 106's chorus mode).
  * libraries: extra shelves beside the sound buttons, [{id,label,render({choose,values,current})}].
  * startEngine(options): optional host for another existing engine, using the
  * same note/control/scope contract as startLiveSynth.
@@ -53,7 +57,7 @@ export default function SynthShell(props){
  return embedded?<EmbeddedShell {...props}/>:<StandaloneShell {...props}/>;
 }
 function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelClassName='',expand,libraries=[],picker:Picker=SoundPicker,gridKeys=false,toggles=false,startEngine=startLiveSynth,engineOptions,onEngine,onStats,onMidiRealtime,onComparisonWaves,initialPatch,onChoose,compactRack=true,keyboard=true,helpInBar=false,children}){
- const {params:{BY_KEY,sanitize,toPairs},presets}=synth;
+ const {params:{BY_KEY,sanitize},presets}=synth,toPairs=synth.params.toEnginePairs??synth.params.toPairs;
  const PATCH_KEY=`synths:${synth.id}:patch`,MINE_KEY=`synths:${synth.id}:mine`;
  const [patch,setPatch]=useState(()=>{
   const stored=initialPatch??load(PATCH_KEY,null);
@@ -61,20 +65,31 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
  });
  const [mine,setMine]=useState(()=>(load(MINE_KEY,[])||[]).filter(p=>p?.name&&p.values).map(p=>({name:String(p.name),values:sanitize(p.values),...(p.rack?{rack:RACK_PARAMS.sanitize(p.rack)}:{})})));
  const RACK_KEY=`synths:${synth.id}:rack`;
- const [outboard,setOutboard]=useState(()=>RACK_PARAMS.sanitize({...cleanRack(),...(initialPatch?.rack??load(RACK_KEY,{}))}));
- const [showEffects,setShowEffects]=useState(false);
+ // a rack that came with a sound (its own crusher) belongs to that sound: it is not kept for the next one, nor stored
+ const ownedRack=useRef(false);
+ // a rack that has not been touched holds only the effects the sound uses, not every unit with its mix at nothing
+ const [outboard,setOutboard]=useState(()=>{
+  const stored=initialPatch?.rack??load(RACK_KEY,null),rack=RACK_PARAMS.sanitize({...cleanRack(),...(stored??{})});
+  // a sound's own crusher (divide 4, a mix of 15, 20 or 30%) was once kept in the rack for every sound after it: let it go
+  if(stored&&rack['crusher.divide']===4&&[.15,.2,.3].some(m=>Math.abs(rack['crusher.mix']-m)<.001))rack['master.chain']=maskFromUnits(chainUnits(rack['master.chain']).filter(u=>u!=='crusher'));
+  return stored?rack:{...rack,'master.chain':leanChain(rackForPatch(synth,patch.values,rack,MOVED))};
+ });
+ // the effects box stays as it was left across a refresh
+ const EFFECTS_KEY=`synths:${synth.id}:effects-open`;
+ const [showEffects,setShowEffectsNow]=useState(()=>!!load(EFFECTS_KEY,false));
+ const setShowEffects=useCallback(next=>setShowEffectsNow(v=>{const open=typeof next==='function'?next(v):next;save(EFFECTS_KEY,open);return open;}),[EFFECTS_KEY]);
  // compactRack: the effects open as a small popover over the instrument instead of replacing its panel
  const fullRack=showEffects&&!compactRack;
  const [sessionId]=useState(()=>globalThis.crypto?.randomUUID?.()??`rack-${Date.now()}-${Math.random().toString(36).slice(2)}`);
- const rackValues=useMemo(()=>rackForPatch(synth,patch.values,outboard),[synth,patch.values,outboard]);
- const instrumentSpecs=useMemo(()=>instrumentSpaceKeys(synth).map(k=>({...BY_KEY[k],key:'instrument.'+k,label:k.includes('chorus')?k.endsWith('Rate')?'Chorus rate':k.endsWith('Depth')?'Chorus depth':'Chorus mix':k==='reverbMix'?'Reverb mix':BY_KEY[k].label})),[synth,BY_KEY]);
+ const rackValues=useMemo(()=>rackForPatch(synth,patch.values,outboard,MOVED),[synth,patch.values,outboard]);
+ const instrumentSpecs=useMemo(()=>instrumentSpecKeys(synth).map(k=>({...BY_KEY[k],key:'instrument.'+k,label:k.includes('chorus')?k.endsWith('Rate')?'Chorus rate':k.endsWith('Depth')?'Chorus depth':'Chorus mix':k==='reverbMix'?'Reverb mix':BY_KEY[k].label})),[synth,BY_KEY]);
  const [setup,setSetup]=useState(()=>{const stored={...SETUP,...load(SETUP_KEY,{})};if(!['auto','show','hide'].includes(stored.keys))stored.keys='auto';return stored;});
  const [showSetup,setShowSetup]=useState(false);
  const [shapeOpen,setShapeOpen]=useState(null);
  const closeShape=useCallback(()=>setShapeOpen(null),[]);
  const SHELF_KEY=`synths:${synth.id}:shelf`;
  // the instrument's case and the keyboard box can each be moved by their grip, and are remembered
- const rigDrag=useDraggable(`synths:${synth.id}:rig-pos`),keysDrag=useDraggable('synths:keys-pos');
+ const rigDrag=useDraggable(`synths:${synth.id}:rig-pos`),keysDrag=useDraggable('synths:keys-pos',s=>onSynth('diy-fm')?{x:0,y:10}:onSynth('cs80','juno')?{x:0,y:73}:({x:Math.round(s.w*.222),y:Math.round(s.h*.208)}));
  const [showHelp,setShowHelp]=useState(false),helpRef=useRef(null);
  useEffect(()=>{
   if(!showHelp)return undefined;
@@ -109,24 +124,36 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
 
  // persistence (debounced: faders change values many times a second)
  useEffect(()=>{const t=setTimeout(()=>save(PATCH_KEY,patch),300);return ()=>clearTimeout(t);},[patch,PATCH_KEY]);
- useEffect(()=>{const t=setTimeout(()=>save(RACK_KEY,outboard),300);return ()=>clearTimeout(t);},[outboard,RACK_KEY]);
+ useEffect(()=>{if(ownedRack.current)return undefined;const t=setTimeout(()=>save(RACK_KEY,outboard),300);return ()=>clearTimeout(t);},[outboard,RACK_KEY]);
  useEffect(()=>{engine.current?.setRack(rackValues);relayRef.current?.publish();},[rackValues]);
  useEffect(()=>{save(SETUP_KEY,{...load(SETUP_KEY,{}),...setup});},[setup]);
 
  const change=useCallback((key,value)=>{
   clearComparisonLink();
-  const keys=expandRef.current?.(key)??[key];
-  setPatch(p=>{const values={...p.values};for(const k of keys)values[k]=value;return {name:dirty(p.name),values};});
-  for(const k of keys)engine.current?.setParam(BY_KEY[k].id,value);
- },[BY_KEY]);
+  // expand may name more keys to edit with it (the same value), or give each its own value
+  const more=expandRef.current?.(key,value)??[key],edits=Array.isArray(more)?Object.fromEntries(more.map(k=>[k,value])):more;
+  setPatch(p=>({name:dirty(p.name),values:{...p.values,...edits}}));
+  for(const [k,v]of Object.entries(edits))if(!(synth.params.silentKeys??rackPlayedKeys(synth)).includes(k))engine.current?.setParam(BY_KEY[k].id,v);
+ },[BY_KEY,synth]);
  const replaceValues=useCallback(values=>{clearComparisonLink();engine.current?.setParams(toPairs(values));setPatch(p=>({name:dirty(p.name),values}));},[toPairs]);
  const onChooseRef=useRef(onChoose);onChooseRef.current=onChoose;
- const choose=useCallback(next=>{onChooseRef.current?.(next);if(!next.comparison)clearComparisonLink();if(next.comparison)setOutboard(cleanRack());else if(next.rack)setOutboard(RACK_PARAMS.sanitize(next.rack));setPatch({name:next.name,category:next.cat??next.category,values:{...next.values},...(next.comparison?{comparison:next.comparison}:{})});engine.current?.setParams(toPairs(next.values));},[toPairs]);
+ const choose=useCallback(next=>{onChooseRef.current?.(next);if(!next.comparison)clearComparisonLink();if(next.comparison)setOutboard(cleanRack());
+  else if(next.rack){const rack=RACK_PARAMS.sanitize(next.rack);ownedRack.current=!!next.rackLean;setOutboard(next.rackLean?{...rack,'master.chain':leanChain(rackForPatch(synth,next.values,rack,MOVED))}:rack);}
+  // choosing a sound leaves the rack's settings and order and keeps in the chain only the effects the sound uses (and any the player has turned up)
+  else{
+   // the sound before it brought its own rack: start again from a clean one
+   const fresh=ownedRack.current;ownedRack.current=false;
+   setOutboard(o=>{
+    const base=fresh?cleanRack():{...o};
+    // a sound with a reverb of its own brings the rack's reverb into the chain, even if the last sound had none
+    if(spaceUnitsUsed(synth,next.values).length)base['master.chain']=maskFromUnits([...new Set([...chainUnits(base['master.chain']??DEFAULT_CHAIN),...spaceUnitsUsed(synth,next.values)])]);
+    return {...base,'master.chain':leanChain(rackForPatch(synth,next.values,base,MOVED))};});
+  }setPatch({name:next.name,category:next.cat??next.category,values:{...next.values},...(next.comparison?{comparison:next.comparison}:{})});engine.current?.setParams(toPairs(next.values));},[toPairs,synth]);
  const changeRack=useCallback(changes=>{
-  const {native,extra}=splitRackEdits(synth,changes);
+  const {native,extra}=splitRackEdits(synth,changes,MOVED);
   if(!Object.keys(native).length&&!Object.keys(extra).length)return;
   clearComparisonLink();
-  for(const [key,v]of Object.entries(native))engine.current?.setParam(BY_KEY[key].id,v);
+  for(const [key,v]of Object.entries(native))if(!(synth.params.silentKeys??rackPlayedKeys(synth)).includes(key))engine.current?.setParam(BY_KEY[key].id,v);
   setPatch(p=>({name:dirty(p.name),values:{...p.values,...native}}));
   if(Object.keys(extra).length)setOutboard(p=>({...p,...extra}));
  },[synth,BY_KEY]);
@@ -314,9 +341,10 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
    {keyboard&&<button type="button" className="keys-button" aria-pressed={showKeys} onClick={()=>updateSetup('keys',showKeys?'hide':'show')} aria-label="On-screen keyboard" title="Show or hide the on-screen keyboard">🎹</button>}
   </header>
 
+  <Desk>
   {SHOW_COMPARISON&&<ComparisonPresets synth={synth} choose={choose} onWaves={onComparisonWaves} onBusy={setComparisonPending} patch={patch}/>}
 
-  {scope&&<Scope engine={engine} audio={audio.state} onClose={toggleScope}/>}
+  {scope&&<Scope engine={engine} audio={audio.state} onClose={toggleScope} keyHz={()=>performer.lastNote==null?0:440*2**((performer.lastNote-69)/12)}/>}
 
   <div className="rig" ref={rigDrag.ref} style={rigDrag.style}>
   <div className="grip rig-grip" {...rigDrag.handle} role="presentation"><i/></div>
@@ -325,7 +353,7 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
     {[{id:'sounds',label:'Sounds'},...libraries].map(l=><button type="button" key={l.id} role="radio" aria-checked={shelf===l.id} onClick={()=>pickShelf(l.id)}>{l.label}</button>)}
    </span>}
    {library?library.render({choose,values:patch.values,current,rack:outboard}):<>
-   <Picker synth={synth} presets={presets} mine={mine} current={current} currentCategory={patch.category} choose={choose} remove={removeMine} values={patch.values} change={change}/>
+   <Picker synth={synth} presets={presets} mine={mine} current={current} currentCategory={patch.category} choose={choose} remove={removeMine} values={patch.values} change={change} replaceValues={replaceValues}/>
    <button type="button" className="save" onClick={saveMine}>＋ Save sound</button>
    </>}
   </nav>
@@ -353,6 +381,7 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
     right={<TouchPad onTouch={(pressure,mod)=>{performer.source('pad',pressure);performer.source('padMod',mod);}}/>}/>}
    {keyboard&&!helpInBar&&<p className="dock-keys stage-help">`Keys: 1–5 phrases · Esc stops · ${gridKeys?"← → patch · ↑ ↓ bank":"← → sound · ↑ ↓ kind"}${synth.generate?' · N new sound':''} · A S D F G H J K play notes (W E T Y U black keys) · Z X octave${midi.inputs.length?' · your MIDI keyboard plays too':''}`</p>}
   </footer>
+  </Desk>
 
   {audio.state!=='on'&&<button type="button" className={'wake '+audio.state} onClick={start} disabled={comparisonPending}>
    <span className="wake-title">{comparisonPending?'Loading comparison…':audio.state==='starting'?'Starting…':audio.state==='error'?'Tap to try again':'Tap to start'}</span>

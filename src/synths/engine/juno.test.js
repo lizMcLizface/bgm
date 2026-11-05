@@ -1,7 +1,7 @@
 // @vitest-environment node
 import fs from 'node:fs';
 import {createOfflineSynth,MODELS,rms,peak,brightness,pitchHz} from './offline';
-import {PARAMS,BY_KEY,defaultValues,toPairs,sanitize} from '../juno/params';
+import {PARAMS,BY_KEY,defaultValues,toPairs,sanitizeEngine as sanitize} from '../juno/params';
 import {PRESETS} from '../juno/presets';
 import {BOOK_SOUNDS} from '../juno/bookPresets';
 

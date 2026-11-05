@@ -22,6 +22,17 @@ const definitions=[
  ...['filter','tremolo','crusher','ring','pitch','width','limiter'].map(k=>['switch',[k,k,0,1,1,1]]),
  // appended last so the ids of the parameters above stay put
  ...[['mix','Mix',0,1,.01,1]].map(d=>['tremolo',d]),
+ // tape, shimmer and freeze: the calmbgm synth's own stages (app/engine/voiceFx.js), appended last as well
+ ...[['wow','Wow',0,1,.01,.25],['wowRate','Wow rate · Hz',.1,3,.01,.6],['flutter','Flutter',0,1,.01,.15],['drive','Saturation',0,1,.01,.2],['tone','Tone · Hz',2000,16000,10,9000]].map(d=>['tape',d]),
+ ...[['mix','Mix',0,1,.01,.35],['decay','Decay · s',1,20,.1,6],['interval','Interval',0,3,1,1],['climb','Climb',0,.9,.01,.5],['tone','Tone · Hz',2000,16000,10,7000]].map(d=>['shimmer',d]),
+ ...[['mix','Mix',0,1,.01,.5],['length','Length · s',.25,4,.01,2],['fade','Fade · s',.05,4,.01,1],['hold','Hold',0,1,1,0]].map(d=>['freeze',d]),
+ ...['tape','shimmer','freeze'].map(k=>['switch',[k,k,0,1,1,1]]),
+ // how much of the sound goes through the chain: 0 is the sound as it came in, 1 is all of it through the effects
+ ...[['mix','Wet / dry mix',0,1,.01,1]].map(d=>['master',d]),
+ // the space unit's two halves in the other order: reverb first, then the delay
+ ...[['reverbFirst','Reverb before delay',0,1,1,0]].map(d=>['master',d]),
+ // the filter unit's single-filter modes (type 0 is its original low cut and high cut pair): low-pass, high-pass, band-pass, notch and the two shelves
+ ...[['type','Type',0,6,1,0],['cutoff','Cutoff · Hz',20,18000,1,8000],['q','Q',.1,20,.01,.707],['gain','Gain · dB',-24,24,.5,0]].map(d=>['filter',d]),
 ];
 export const RACK_PARAMS=defineParams(definitions.map(([prefix,[key,label,min,max,step,value]],id)=>{
  const unit=/· cents/.test(label)?'decimal':/· semitones/.test(label)?'decimal':/· Hz/.test(label)?'Hz':/· s$|seconds$/.test(label)?'s':/· ms/.test(label)?'ms':/· dB/.test(label)?'dB':/· octaves/.test(label)?'oct':max<=1&&step!==1?'%':'decimal';
@@ -31,18 +42,34 @@ export const SPACE_KEYS=SPACE.map(([key])=>key);
 export const instrumentSpaceKeys=synth=>synth.id==='poly'?['global.chorus','global.chorusRate','global.chorusDepth']:synth.id==='fm'?[]:SPACE_KEYS.filter(k=>synth.params.BY_KEY[k]);
 export const isDiy=synth=>synth.id==='poly'||synth.id==='fm';
 export function cleanRack(){return {...RACK_PARAMS.defaultValues(),'effects.reverb':0,'effects.delay':0};}
-export function rackForPatch(synth,values,stored){
+// Synths whose own reverb lives in the rack's Reverb instead: the sound keeps its reverb settings (so presets and saved patches carry
+// on), and the rack shows and edits them as its reverb. The synth's own reverb is silent (its toPairs, see cs80/params.js).
+const REVERB_MAP={reverbMix:['effects.reverb',1],reverbDecay:['effects.decay',1],reverbTone:['effects.damping',1],reverbSize:['effects.size',1],reverbPredelay:['effects.predelay',1000]};
+// both keep their chorus on the panel
+const MOVED_MAPS={cs80:REVERB_MAP,juno:REVERB_MAP};
+export const movesSpace=synth=>!!MOVED_MAPS[synth.id];
+/** The rack units a sound's own space settings call for, so choosing the sound brings them into the chain. */
+export const spaceUnitsUsed=(synth,values)=>movesSpace(synth)?[...(values.reverbMix>0?['space']:[]),]:[];
+/** Space settings the engine must not play itself (the rack plays them). */
+export const rackPlayedKeys=synth=>movesSpace(synth)?['reverbMix']:[];
+export const instrumentSpecKeys=synth=>movesSpace(synth)?[]:instrumentSpaceKeys(synth);
+export function rackForPatch(synth,values,stored,{moved=false}={}){
  const rack=RACK_PARAMS.sanitize({...cleanRack(),...stored});
+ if(moved&&movesSpace(synth)){
+  for(const [k,[key,scale]]of Object.entries(MOVED_MAPS[synth.id]))if(values[k]!==undefined)rack[key]=values[k]*scale;
+  return RACK_PARAMS.sanitize(rack);
+ }
  if(isDiy(synth)){
   for(const key of Object.keys(rack))if(key.startsWith('inserts.')||key.startsWith('effects.'))rack[key]=values[key]??rack[key];
  }
  for(const key of instrumentSpaceKeys(synth))rack['instrument.'+key]=values[key];
  return rack;
 }
-export function splitRackEdits(synth,changes){
- const native={},extra={};
+export function splitRackEdits(synth,changes,{moved=false}={}){
+ const native={},extra={},back=moved&&movesSpace(synth)?Object.fromEntries(Object.entries(MOVED_MAPS[synth.id]).map(([k,[key,scale]])=>[key,[k,scale]])):{};
  for(const [key,value]of Object.entries(changes)){
   if(typeof value!=='number'||!Number.isFinite(value))continue;
+  if(back[key]){const [k,scale]=back[key];native[k]=synth.params.clampValue(k,RACK_PARAMS.clampValue(key,value)/scale);continue;}
   if(RACK_PARAMS.BY_KEY[key]){
    const v=RACK_PARAMS.clampValue(key,value);
    if(isDiy(synth)&&synth.params.BY_KEY[key])native[key]=v;else extra[key]=v;
@@ -52,7 +79,7 @@ export function splitRackEdits(synth,changes){
 }
 export function rackPackets(raw){
  const p=RACK_PARAMS.sanitize(raw),inserts={},effects={},compressor={},master={},extras={};
- const EXTRA=['filter','tremolo','crusher','ring','pitch','width','limiter'];
+ const EXTRA=['filter','tremolo','crusher','ring','pitch','width','limiter','tape','shimmer','freeze'];
  for(const [key,v]of Object.entries(p)){const [scope,k]=key.split('.');if(scope==='inserts')inserts[k]=v;else if(scope==='effects')effects[k]=v;else if(scope==='compressor')compressor[k]=v;else if(scope==='master')master[k]=v;else if(EXTRA.includes(scope))(extras[scope]??={})[k]=v;}
  // a unit that is not in the chain does not run, whatever its settings; one that is in it can still be switched off
  const inChain=chainUnits(master.chain),on=unit=>inChain.includes(unit);

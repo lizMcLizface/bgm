@@ -43,11 +43,11 @@ a{color:var(--amber);}
 /* The DIY panels wrap the lab engines; groups keep a natural height and the
    edit panel scrolls independently of the performance controls. */
 .diy{--ends:#152c2a;--track:126px;}
-.diy-fm{--ends:#29213d;}
+.diy-fm{--ends:#1c2845;}
 .diy .brand{color:#80d5c8;}
-.diy-fm .brand{color:#bcacf0;}
+.diy-fm .brand{color:#9bbcff;}
 .diy button[aria-pressed=true]{background:#29413b;border-color:#63c5b6;}
-.diy-fm button[aria-pressed=true]{background:#372d4b;border-color:#9b86e5;}
+.diy-fm button[aria-pressed=true]{background:#223457;border-color:#5b8def;}
 /* the panel is a free workspace of floating boxes */
 .panel.diy-panel{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));align-content:start;align-items:start;gap:12px;}
 /* DI-Poly and DIY FM lay their own boxes out; the other pages that share the class keep the grid above */
@@ -61,6 +61,12 @@ a{color:var(--amber);}
 .diy-box h3.box-handle{cursor:grab;margin:0 0 6px;padding:0;user-select:none;-webkit-user-select:none;touch-action:none;}
 .diy-box h3.box-handle:active{cursor:grabbing;}
 .diy-box.static{position:relative;box-shadow:none;}
+.diy-box.is-fixed h3.box-handle,.diy-box.is-fixed h3.box-handle:active{cursor:default;}
+/* DIY FM: a wide case, so the boxes have room to be spread out */
+.diy-fm .rig{width:max-content;max-width:none;min-width:0;margin:6px 0;}
+/* the FM instrument is only as wide as its case: it sits at the top left of the desk, the keyboard centred under it, the effects and scope to its right */
+.diy-fm .desk-home{min-width:0!important;}
+.diy-fm .keybox{align-self:center;}
 .diy-box.static h3.box-handle,.diy-box.static h3.box-handle:active{cursor:default;}
 /* Poly's fixed layout: rows 8 px apart like the CS-80, and a frame round each region */
 .poly-fixed{display:flex;flex-direction:column;gap:8px;}
@@ -76,7 +82,16 @@ a{color:var(--amber);}
 .pf-top>.diy-box{align-self:stretch;}
 .diy-box.static .arch{height:100%;}
 .diy-box .group-controls{gap:6px 4px;align-items:flex-start;max-width:640px;}
+/* the routing matrices are wider than a row of faders */
+.diy-box .group-controls:has(>.rmx){max-width:none;}
+.diy-box .group-controls>.rmx{flex:1 1 auto;}
+/* on the FM page's free workspace the matrices take the width their box is given */
+.workspace .rmx-head,.workspace .rmx-row{grid-template-columns:78px repeat(var(--cols),minmax(46px,1fr));}
+/* a box that has been given more room than it needs spreads its controls evenly across it */
+.workspace .diy-box .group-controls{justify-content:space-evenly;}
 .diy-box .hint{max-width:240px;font-size:11px;color:var(--muted);}
+/* in the LFO boxes: the LFO's own controls on the left, what it is sent to on the right, parted by a thin line (no width of its own beyond a hairline, so nothing else shifts) */
+.ctl-split{align-self:stretch;flex:none;width:0;margin:0 5px;border-left:1px solid #5a554c99;}
 /* sliders: the CS-80 / Juno 106 size and proportions */
 .diy .fader{flex:0 0 42px;width:42px;}
 .diy .fader-track{flex:none;height:var(--track);min-height:var(--track);}
@@ -122,17 +137,21 @@ a{color:var(--amber);}
 .rmx-text{position:relative;z-index:1;}
 .rmx-fill{position:absolute;left:3px;right:3px;border-radius:2px;background:currentColor;opacity:.22;pointer-events:none;}
 .rmx-foot .warn{color:#e0573d;}
+/* the operator grid: nothing to wire below the diagonal, and the diagonal chooses the feedback operator */
+.rmx-cell.off{display:block;background:#171613;border-color:#211f1b;cursor:default;}
+.rmx-cell.fb{background:#13120f;color:#6d6a62;font-size:15px;}
+.rmx-cell.fb.on{color:#d7c9f5;border-color:#7b66c4;background:#2a2340;}
 .rmx-cell:focus{outline:none;}
 .rmx-cell:focus-visible{outline:1px solid #c9c4d8;outline-offset:1px;}
 .rmx-cell small{position:absolute;right:2px;top:0;font-size:7px;line-height:1.3;color:#c9a24f;}
 .rmx-foot{position:absolute;right:10px;top:8px;display:flex;gap:14px;color:var(--muted);font-size:10px;}
 .swatch{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:-1px;}
 .swatch.built{background:#7b66c4;}.swatch.via{background:#c9a24f;}
-.diy-operators{display:grid;grid-template-columns:repeat(3,minmax(78px,1fr));gap:6px;}
-.diy-operators button{display:flex;align-items:flex-start;flex-direction:column;gap:3px;text-align:left;padding:7px 10px;}
-.diy-operators b{font-size:14px;}
-.diy-operators span{font-size:12px;color:var(--text);}
-.diy-operators small{color:var(--muted);font-size:10px;}
+.diy-operators{display:grid;grid-template-columns:repeat(2,44px);grid-auto-rows:44px;gap:5px;}
+.diy-operators button{display:flex;align-items:flex-start;flex-direction:column;justify-content:center;gap:1px;text-align:center;align-items:center;height:44px;min-height:0;padding:2px;overflow:hidden;}
+.diy-operators b{font-size:11px;}
+.diy-operators span{font-size:9px;color:var(--muted);white-space:nowrap;}
+.diy-operators button:disabled{background:#171613;border-color:#211f1b;color:#4a473f;opacity:1;box-shadow:none;}
 .diy-routing-scroll{overflow-x:auto;}
 .diy-routing table{border-collapse:collapse;text-align:center;font-size:12px;}
 .diy-routing th,.diy-routing td{padding:5px;border-bottom:1px solid var(--line);}
@@ -143,6 +162,9 @@ a{color:var(--amber);}
  box-shadow:inset 0 0 0 1px #1c2a30,inset 0 0 14px #000,0 0 8px #5ee1ff14;font-family:ui-monospace,Consolas,monospace;color:#7fe7ff;text-shadow:0 0 6px #4fd8ff99;overflow:hidden;
  background-image:repeating-linear-gradient(0deg,#0000 0 1px,#00000055 1px 2px);}
 .oled:hover,.oled:focus-visible{border-color:#2d5a66;}
+.seg7.oled{width:44px;align-items:center;padding:3px 0;}
+.seg7 path{fill:none;stroke:#0f2a30;stroke-width:3.4;stroke-linecap:round;}
+.seg7 path.lit{stroke:#7fe3f2;filter:drop-shadow(0 0 3px #4aa6b8);}
 .oled-cat{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#4aa6b8;white-space:nowrap;}
 .oled-name{font-size:14px;line-height:1.1;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .preset-knob{width:40px;height:40px;flex:none;cursor:ns-resize;touch-action:none;user-select:none;-webkit-user-select:none;border-radius:50%;}
@@ -573,7 +595,7 @@ label.inline.toggle{min-height:32px;}label.inline.toggle em{font-style:normal;co
 .env-shape-handle:focus-visible{outline:none;stroke-width:3.5;}
 .env-shape-label{fill:var(--muted);font-size:9px;text-anchor:middle;}
 .env-shape-controls{display:grid;grid-template-columns:1fr;gap:2px;margin-top:8px;font-size:12px;color:var(--muted);}
-.env-shape-controls label{display:grid;grid-template-columns:92px 1fr 30px;align-items:center;gap:8px;}
+.env-shape-controls label{display:grid;grid-template-columns:92px 1fr 44px;align-items:center;gap:8px;}
 .env-shape-controls input[type=range]{width:100%;accent-color:var(--focus);min-height:28px;}
 .env-shape-controls output{text-align:right;color:var(--text);font-variant-numeric:tabular-nums;}
 .env-shape-controls select{min-height:30px;padding:3px 6px;justify-self:start;}
@@ -723,6 +745,10 @@ label.inline.toggle{min-height:32px;}label.inline.toggle em{font-style:normal;co
 .cs80 .g-row>.group{flex:var(--n,1) 1 auto;}
 .cs80 .globals .group-controls{justify-content:space-evenly;gap:2px;}
 .cs80 .globals .complete .fader,.cs80 .globals .fader{width:46px;}
+/* fixed fader travel, like the DI-Poly, instead of squeezing the faders into whatever height the rows leave */
+.cs80{--track:126px;}
+.cs80 .complete .fader-track{flex:none;height:var(--track);min-height:var(--track);}
+.cs80 .voice-frame,.cs80 .globals{grid-template-rows:repeat(3,auto);align-content:start;}
 .cs80 .channel-pick{min-width:118px;}
 .cs80 .channel-tools .toggle{font-size:11px;}
 .cs80 .channel-buttons{flex:none;flex-direction:row;}
@@ -978,7 +1004,7 @@ label.inline.toggle{min-height:32px;}label.inline.toggle em{font-style:normal;co
  .pf-frame:focus-within,.pf-frame:hover{border-color:#6b6f78aa;background:#00000040;}
  .diy .brand{background:linear-gradient(90deg,#80d5c8,#d5f5ee,#80d5c8);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:brandShine 8s ease-in-out infinite;}
  @keyframes brandShine{50%{background-position:100% 0;}}
- .diy-fm .brand{background-image:linear-gradient(90deg,#bcacf0,#ece6ff,#bcacf0);}
+ .diy-fm .brand{background-image:linear-gradient(90deg,#9bbcff,#e6f0ff,#9bbcff);}
 }
 .oled{position:relative;overflow:hidden;padding-left:14px;border-color:#1d6676;
  background:repeating-linear-gradient(0deg,#0000 0 1px,#00000040 1px 2px),radial-gradient(120% 150% at 12% 0%,#0d4a5a 0%,#06232d 45%,#02080c 100%);
@@ -995,14 +1021,16 @@ label.inline.toggle{min-height:32px;}label.inline.toggle em{font-style:normal;co
 
 /* the DIY cases: a slim coloured frame all the way round, a tinted face and a striped grip; the name sits at the left of the top row */
 .diy{--ends:#1f5a53;--face-a:#12201f;--face-b:#0e1514;}
-.diy-fm{--ends:#43337a;--face-a:#1a1526;--face-b:#120f1b;}
+.diy-fm{--ends:#2f4f93;--face-a:#101a2e;--face-b:#0b121f;}
+/* FM's desk is plain: no cutting-mat grid */
+.diy-fm .desk{background:radial-gradient(ellipse at 50% 45%,#161c2b,#0c101a 70%);}
 .diy .rig{border-width:3px;border-radius:14px;box-shadow:0 10px 28px #000a;}
 .diy .rig>.panel{background:linear-gradient(180deg,var(--face-a),var(--face-b));}
 .diy .rig-grip{height:6px;background:linear-gradient(90deg,#4ec4b4 0 20%,#5b8fd9 20% 40%,#a07fd6 40% 60%,#e3a52a 60% 80%,#e0573d 80% 100%);}
 .diy .rig-grip i{height:2px;width:30px;background:repeating-linear-gradient(90deg,#000 0 3px,#0000 3px 6px);opacity:.4;}
 .diy .rig>nav.presets{justify-content:flex-end;background:color-mix(in srgb,var(--ends) 14%,#161513);}
 .diy-poly .rig>nav.presets::before{content:'DI-POLY  ·  POLYPHONIC SUBTRACTIVE SYNTHESIZER';}
-.diy-fm .rig>nav.presets::before{content:'DIY FM  ·  4 / 6 OPERATOR FREQUENCY MODULATION SYNTHESIZER';}
+.diy-fm .rig>nav.presets::before{content:'DIY FM  ·  UP TO 8 OPERATOR FREQUENCY MODULATION SYNTHESIZER';}
 .diy .rig>nav.presets::before{margin-right:auto;font-size:10px;letter-spacing:.3em;font-weight:600;white-space:nowrap;color:color-mix(in srgb,var(--ends) 40%,#c9d6d3);}
 @media (max-width:900px){.diy .rig>nav.presets::before{display:none;}}
 
@@ -1022,13 +1050,16 @@ label.inline.toggle{min-height:32px;}label.inline.toggle em{font-style:normal;co
 .lab-window.wide{width:auto;max-width:calc(100vw - 16px);}
 .lab-row{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;}
 .lab-faders{gap:4px;}
-.lab-tuning .hint{max-width:none;margin:2px 0 0;}
+/* top row: scale and tonic as larger keys filling the height of the faders, the three tuning faders at the right */
+.lab-tuning>.lab-row:first-child{align-items:stretch;flex-wrap:nowrap;}
+.lab-tuning>.lab-row:first-child>.lab-faders{margin-left:auto;align-self:flex-start;flex-wrap:nowrap;}
+.lab-tuning>.lab-row:first-child>.pick{flex:none;}
+.lab-tuning>.lab-row:first-child>.pick .pick-grid{flex:1;height:auto;min-height:150px;grid-auto-rows:1fr;gap:5px;}
+.lab-tuning>.lab-row:first-child>.pick button{height:100%;min-width:84px;font-size:12px;}
+.lab-tuning>.lab-row:first-child>.pick[aria-label=Tonic] button{min-width:52px;}
 .lab-window .pick-grid{height:auto;}
 .lab-window .pick.row{flex-direction:column-reverse;}
 
-.lab-window.lab-rack{padding:0;background:none;border:0;box-shadow:none;width:min(560px,calc(100vw - 16px));}
-.lab-window.lab-rack .rack-block>header{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;}
-.lab-window.lab-rack .rack-block{box-shadow:0 12px 32px #000a;}
 
 .pick.narrow button{min-width:30px;width:30px;padding:0;}
 
@@ -1082,3 +1113,14 @@ label.inline.toggle{min-height:32px;}label.inline.toggle em{font-style:normal;co
 .diy-box[data-box=layer] .arch,.diy-box[data-box=layer] .arch-layers{align-items:center;width:100%;}
 .diy-box[data-box=layer] .pick{align-items:center;}
 .diy-box[data-box=filter-env] .group-controls,.diy-box[data-box=mod-env] .group-controls{column-gap:3px;}
+
+.lab-auto{--rack-colour:#4ec4b4;width:104px;height:104px;min-height:0;align-self:center;margin-left:6px;flex:none;}
+.lab-auto span:first-of-type{text-transform:none;letter-spacing:0;font-size:11px;}
+
+/* a value being applied over the fader's own (chord auto-tune): a marker on the track, the readout lit */
+.fader-live{position:absolute;left:-3px;right:-3px;height:0;border-top:2px solid #4ec4b4;box-shadow:0 0 6px #4ec4b4;transform:translateY(1px);pointer-events:none;z-index:2;}
+.fader-value.is-live{color:#4ec4b4;font-weight:700;}
+
+.lab-hold{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:104px;min-height:104px;border-radius:12px;background:#1a1e20;border:2px solid #475054;color:#b9b4a6;cursor:pointer;box-shadow:inset 0 -3px 0 #0006,0 2px 0 #0008;font:inherit;}
+.lab-hold b{font-size:15px;font-weight:600;}.lab-hold span{font-size:11px;letter-spacing:.08em;text-transform:uppercase;}
+.lab-hold[aria-pressed=true]{background:var(--rack-colour);border-color:var(--rack-colour);color:#10181a;box-shadow:inset 0 3px 6px #0006,0 0 14px var(--rack-colour);transform:translateY(1px);}

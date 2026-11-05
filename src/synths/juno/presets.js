@@ -103,6 +103,8 @@ export const CATEGORIES=[
  {id:'init',colour:'#c9c3b4',label:'Init',blurb:'Neutral starting points'},
 ];
 // The patch-book sounds (bookPresets.js) through the imported-patch mapping (book.js).
-const BOOK=BOOK_SOUNDS.map(({panel,volume,note,...p})=>({...p,note:note??'Read off a panel drawing and approximated.',values:{...bookEngineValues(panel),reverbMix:.15,volume}}));
+// A drawing read with the filter shut (a 40 Hz cutoff and nothing to open it) is silent: these are opened to where the sound is meant to be
+const OPENED={'Section Strings Two':{cutoff:3200},'Little Bells':{cutoff:2400}};
+const BOOK=BOOK_SOUNDS.map(({panel,volume,note,...p})=>({...p,note:note??'Read off a panel drawing and approximated.',values:{...bookEngineValues(panel),reverbMix:.15,volume,...OPENED[p.name]}}));
 
 export const PRESETS=[...RAW,...BOOK].map(p=>({...p,values:sanitize(p.values)}));

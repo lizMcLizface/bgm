@@ -3,7 +3,8 @@ import {toPosition,fromPosition,formatValue} from '../params';
 
 // Vertical fader, like the CS-80's levers. Drags are relative (a touch never
 // jumps the value), double-tap restores the default, arrow keys step it.
-export function Fader({spec,value,onChange,tone='cream',label=spec.label}){
+/** `live` is a value being applied on top of the fader's own (a chord's tuning over the scale): shown as a marker and in the readout, the cap stays where it was set. */
+export function Fader({spec,value,onChange,tone='cream',label=spec.label,live=null}){
  const drag=useRef(null),lastTap=useRef(0);
  const position=toPosition(spec,value);
  const bipolar=spec.min<0&&spec.max>0,zero=bipolar?toPosition(spec,0):0;
@@ -27,10 +28,11 @@ export function Fader({spec,value,onChange,tone='cream',label=spec.label}){
  const from=Math.min(zero,position),to=Math.max(zero,position);
  return <div className={'fader tone-'+tone} role="slider" tabIndex={0} aria-label={label} aria-valuemin={spec.min} aria-valuemax={spec.max} aria-valuenow={+value.toFixed(4)} aria-valuetext={formatValue(spec,value)}
   onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} onKeyDown={key}>
-  <span className="fader-value">{formatValue(spec,value)}</span>
+  <span className={'fader-value'+(live!=null?' is-live':'')}>{formatValue(spec,live??value)}</span>
   <div className="fader-track">
    {bipolar&&<div className="fader-zero" style={{bottom:zero*100+'%'}}/>}
    <div className="fader-fill" style={{bottom:from*100+'%',height:(to-from)*100+'%'}}/>
+   {live!=null&&<div className="fader-live" style={{bottom:toPosition(spec,live)*100+'%'}}/>}
    <div className="fader-cap" style={{bottom:position*100+'%'}}/>
   </div>
   <span className="fader-label">{label}</span>

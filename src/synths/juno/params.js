@@ -1,10 +1,10 @@
 // Juno-106 parameter table. Ids must match synth-engine/classics/src/juno.rs; the
 // shared space effects (ids from 200) come from ../params. Append-only: saved
 // patches use keys. Row format: see defineParams.
-import {defineParams,SPACE} from '../params';
+import {defineParams,SPACE,toPosition,fromPosition,formatValue} from '../params';
 import {shapeRows} from '../ui/envShape';
 
-export const {PARAMS,BY_KEY,defaultValues,clampValue,sanitize,toPairs}=defineParams([
+const defined=defineParams([
  // LFO (one, global, with delayed onset)
  ['lfoRate',21,'Rate',.1,30,3,'Hz','log'],
  ['lfoDelay',22,'Delay',0,3,0,'s','sq'],
@@ -60,3 +60,19 @@ export const {PARAMS,BY_KEY,defaultValues,clampValue,sanitize,toPairs}=definePar
  ...shapeRows('amp',{linearAttack:true}),
  ...SPACE,
 ]);
+export const {PARAMS,BY_KEY,defaultValues,clampValue,toPairs}=defined;
+/** The values as the engine has them (the chorus mode only a mode): what the published comparison banks hold. */
+export const sanitizeEngine=defined.sanitize;
+// The 106's chorus (off, I, II, I+II) is played by the shared space chorus, so it has a mix, rate and depth like any other: choosing a mode sets them to what
+// that mode sounds like (I and II the slow, wide pair, I+II the fast, shallow shimmer), and a sound that only names a mode gets them when it is loaded.
+// The engine's own BBD chorus and reverb stay off; the rack plays the reverb.
+const BBD=[{rate:.6,depth:.5,mix:0},{rate:.513,depth:2.5,mix:.5},{rate:.863,depth:3.5,mix:.5},{rate:9.75,depth:.7,mix:.5}];
+export const chorusMode=mode=>{const c=BBD[Math.max(0,Math.min(3,Math.round(mode)))];return {chorus:Math.round(mode),chorusMix:c.mix,chorusRate:c.rate,chorusDepth:Math.min(1,c.depth/8)};};
+export function sanitize(values={}){
+ const out=defined.sanitize(values);
+ if(Math.round(out.chorus)>0&&!(out.chorusMix>0))Object.assign(out,chorusMode(out.chorus));
+ return out;
+}
+export const silentKeys=['reverbMix','chorus'];
+export const toEnginePairs=values=>toPairs(values).map(([id,v])=>id===BY_KEY.reverbMix.id||id===BY_KEY.chorus.id?[id,0]:[id,v]);
+export {toPosition,fromPosition,formatValue};

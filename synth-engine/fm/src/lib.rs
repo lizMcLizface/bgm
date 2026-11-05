@@ -15,9 +15,9 @@ mod simd;
 #[cfg(feature = "simd-voices")]
 mod simd_voices;
 const VOICES: usize = 32;
-const OPS: usize = 6;
+const OPS: usize = 8;
 const OP_PARAMS: usize = 22;
-const GLOBAL: usize = 54;
+const GLOBAL: usize = 60;
 const LUT: usize = 4096;
 const BLOCK: usize = 2048;
 const QUEUE: usize = 4096;
@@ -114,9 +114,11 @@ struct Expression {
     stage: u8,
     random: u32,
     random_phase: f32,
+    // a fixed random detune for this note, from its id (voice drift)
+    fixed: f32,
     from: f32,
     to: f32,
-    routes: [f32; 11],
+    routes: [f32; 13],
 }
 impl Expression {
     const ZERO: Self = Self {
@@ -126,14 +128,16 @@ impl Expression {
         stage: 0,
         random: 0,
         random_phase: 0.,
+        fixed: 0.,
         from: 0.,
         to: 0.,
-        routes: [0.; 11],
+        routes: [0.; 13],
     };
     fn trigger(&mut self, id: u32) {
         *self = Self {
             stage: 1,
             random: id.wrapping_mul(2654435761).max(1),
+            fixed: (id.wrapping_mul(2246822519) >> 8) as f32 / 8388608. - 1.,
             ..Self::ZERO
         };
         self.to = self.random();
@@ -213,6 +217,8 @@ struct Voice {
     last: [f32; 2],
     tail: [f32; 2],
     fade: u32,
+    // how far LFO 1 has faded in for this note (1 when it does not fade)
+    lfo_fade: f32,
 }
 impl Voice {
     const ZERO: Self = Self {
@@ -238,6 +244,7 @@ impl Voice {
         last: [0.; 2],
         tail: [0.; 2],
         fade: 0,
+        lfo_fade: 1.,
     };
 }
 #[derive(Clone, Copy)]
@@ -258,6 +265,16 @@ impl Event {
     };
 }
 struct Fm {
+    // what the two LFOs do this sample, worked out once: pitch (semitones), modulation index, carrier level
+    // the two LFOs' parts, kept apart so LFO 1 can fade in for each note: pitch (semitones), modulation index and carrier level
+    pitch1: f32,
+    pitch2: f32,
+    idx1: f32,
+    idx2: f32,
+    amp1: f32,
+    amp2: f32,
+    hold: f32,
+    hold_rng: u32,
     colours: [colour::Colour; VOICES],
     output: [[f32; BLOCK]; 2],
     idle_reference: bool,
@@ -326,6 +343,14 @@ impl Fm {
             sine: [0.; LUT + 1],
             lfo: 0.,
             lfo2: 0.,
+            pitch1: 0.,
+            pitch2: 0.,
+            idx1: 0.,
+            idx2: 0.,
+            amp1: 0.,
+            amp2: 0.,
+            hold: 0.,
+            hold_rng: 2463534242,
             bend: 0.,
             fir: [0.; 63],
             history: [[0.; 64]; 2],
@@ -347,11 +372,7 @@ impl Fm {
         }
     }
     fn count(&self) -> usize {
-        if self.g[0] >= 5. {
-            6
-        } else {
-            4
-        }
+        (self.g[0].round() as usize).clamp(1, OPS)
     }
     fn init(&mut self, sr: f32) {
         self.idle_reference = false;
@@ -388,6 +409,8 @@ impl Fm {
         self.frame = 0;
         self.lfo = 0.;
         self.lfo2 = 0.;
+        self.hold = 0.;
+        self.hold_rng = 2463534242;
         self.bend = 0.;
         self.steals = 0;
         self.dropped = 0;
@@ -434,12 +457,46 @@ impl Fm {
             self.fir[i] /= sum;
         }
     }
+    /// One sample of both LFOs. LFO 1 has a shape (sine, triangle, square, saw, sample and hold); LFO 2 is a sine. What they do to the sound
+    /// (pitch, modulation index, carrier level) is worked out here, once, and read by every voice.
+    fn lfo_tick(&mut self, sr: f32) -> (f32, f32) {
+        let phase = self.lfo;
+        let lfo = match self.g[54] as u32 {
+            1 => 1. - 4. * (phase - 0.5).abs(),
+            2 => {
+                if phase < 0.5 {
+                    1.
+                } else {
+                    -1.
+                }
+            }
+            3 => 2. * phase - 1.,
+            4 => self.hold,
+            _ => sin(&self.sine, phase),
+        };
+        self.lfo = (phase + self.g[10] / sr).fract();
+        if self.lfo < phase {
+            self.hold_rng ^= self.hold_rng << 13;
+            self.hold_rng ^= self.hold_rng >> 17;
+            self.hold_rng ^= self.hold_rng << 5;
+            self.hold = (self.hold_rng as f64 / u32::MAX as f64) as f32 * 2. - 1.;
+        }
+        let lfo2 = sin(&self.sine, self.lfo2);
+        self.lfo2 = (self.lfo2 + self.g[28] / sr).fract();
+        self.pitch1 = lfo * (self.g[11] + self.g[9] * 35.) / 100.;
+        self.pitch2 = lfo2 * self.g[55] / 100.;
+        self.idx1 = lfo * self.g[18];
+        self.idx2 = lfo2 * self.g[56];
+        self.amp1 = self.g[17] * (lfo + 1.) * 0.5;
+        self.amp2 = self.g[57] * (lfo2 + 1.) * 0.5;
+        (lfo, lfo2)
+    }
     fn param(&mut self, index: usize, value: f32) {
         if index >= GLOBAL || !value.is_finite() {
             return;
         }
         let bounds = [
-            (4., 6.),
+            (1., 8.),
             (0., 5.),
             (1., 32.),
             (0., 0.6),
@@ -470,14 +527,19 @@ impl Fm {
                 27 => (0., 20.),
                 28 => (0.01, 10.),
                 41..=53 => colour::range(index - 41),
+                54 => (0., 4.),
+                59 => (0., 3.),
+                55 => (0., 100.),
+                56 | 57 => (0., 1.),
+                58 => (0., 50.),
                 _ => match (index - 29) % 3 {
                     0 => (0., 8.),
-                    1 => (0., 11.),
+                    1 => (0., 13.),
                     _ => (-1., 1.),
                 },
             }
         };
-        let discrete = ((29..=40).contains(&index) && (index - 29) % 3 != 2) || index == 49;
+        let discrete = ((29..=40).contains(&index) && (index - 29) % 3 != 2) || index == 49 || index == 54 || index == 0;
         let v = if discrete {
             value.round().clamp(lo, hi)
         } else {
@@ -847,10 +909,7 @@ impl Fm {
             }
             for sub in 0..factor {
                 self.bend += (self.g[8] - self.bend) * 0.002 / factor as f32;
-                let lfo = sin(&self.sine, self.lfo);
-                self.lfo = (self.lfo + self.g[10] / sr).fract();
-                let lfo2 = sin(&self.sine, self.lfo2);
-                self.lfo2 = (self.lfo2 + self.g[28] / sr).fract();
+                let (lfo, lfo2) = self.lfo_tick(sr);
                 let control = self.frame % 16 == 0 && sub == 0;
                 let mut out = [0.; 2];
                 if !voice_idle {
@@ -880,9 +939,16 @@ impl Fm {
                             v.glide -= 1;
                         }
                         let update = control || self.frame == v.age;
+                        if update {
+                            v.lfo_fade = if self.g[59] > 0. {
+                                ((self.frame - v.age) as f32 / self.sr / self.g[59]).min(1.)
+                            } else {
+                                1.
+                            };
+                        }
                         let pressure = v.pressure.max(self.g[12]);
                         let random = v.expression.tick(&self.g, sr, expression_alpha, motion);
-                        let mut targets = [0.; 11];
+                        let mut targets = [0.; 13];
                         if routes {
                             for slot in 0..4 {
                                 let at = 29 + slot * 3;
@@ -904,7 +970,7 @@ impl Fm {
                                 targets[destination - 1] += source * self.g[at + 2];
                             }
                         }
-                        for k in 0..11 {
+                        for k in 0..13 {
                             if targets[k] != 0. || v.expression.routes[k] != 0. {
                                 v.expression.routes[k] += (targets[k].clamp(-1., 1.)
                                     - v.expression.routes[k])
@@ -922,8 +988,9 @@ impl Fm {
                                 * ((v.midi - 69.
                                     + self.bend
                                     + transient
-                                    + lfo * (self.g[11] + self.g[9] * 35.) / 100.
-                                    + (random * self.g[27] + expression[0] * 100.) / 100.)
+                                    + (self.pitch1 * v.lfo_fade + self.pitch2)
+                                    + (random * self.g[27] + expression[0] * 100.) / 100.
+                                    + v.expression.fixed * self.g[58] / 100.)
                                     / 12.)
                                     .exp2();
                             for op in 0..count {
@@ -977,7 +1044,7 @@ impl Fm {
                                     + modulation
                                         * self.smooth[2]
                                         * (1. + expression[1])
-                                        * (1. + lfo * self.g[18])
+                                        * ((1. + self.idx1 * v.lfo_fade) + self.idx2)
                                         / (2. * PI),
                             );
                             let shaped = match p[17] as u32 {
@@ -996,7 +1063,7 @@ impl Fm {
                             v.previous[op][v.feedback_pos] = output[op];
                             if self.carriers[op] > 0. {
                                 let x = output[op] * self.carriers[op] / norm
-                                    * (1. - self.g[17] * (lfo + 1.) * 0.5);
+                                    * ((1. - self.amp1 * v.lfo_fade) - self.amp2);
                                 voice_out[0] += x * self.pan[op][0];
                                 voice_out[1] += x * self.pan[op][1];
                                 if coloured {
@@ -1007,7 +1074,7 @@ impl Fm {
                                         * (1. + expression[5 + op])
                                         * self.carriers[op]
                                         / norm
-                                        * (1. - self.g[17] * (lfo + 1.) * 0.5);
+                                        * ((1. - self.amp1 * v.lfo_fade) - self.amp2);
                                     noise_gain[0] += level * self.pan[op][0];
                                     noise_gain[1] += level * self.pan[op][1];
                                 }
@@ -1129,7 +1196,7 @@ pub extern "C" fn fm_op(o: u32, i: u32, v: f32) {
 }
 #[no_mangle]
 pub extern "C" fn fm_route(from: u32, to: u32, v: f32) {
-    if from < to && to < 6 {
+    if from < to && (to as usize) < OPS {
         unsafe {
             FM.routing[from as usize][to as usize] = bounded(v, 0., 2.);
         }
@@ -1137,7 +1204,7 @@ pub extern "C" fn fm_route(from: u32, to: u32, v: f32) {
 }
 #[no_mangle]
 pub extern "C" fn fm_carrier(op: u32, value: f32) {
-    if op < 6 {
+    if (op as usize) < OPS {
         unsafe {
             FM.carriers[op as usize] = bounded(value, 0., 1.);
         }

@@ -7,7 +7,7 @@ function engine(p,rate=48000){const e=new WebAssembly.Instance(module,{}).export
 function render(e,frames,chunk=128){const out=[new Float32Array(frames),new Float32Array(frames)];for(let at=0;at<frames;at+=chunk){const n=Math.min(chunk,frames-at);e.fm_render(n);for(let ch=0;ch<2;ch++)out[ch].set(new Float32Array(e.memory.buffer,e.fm_output(ch),n),at);}return out;}
 const rms=x=>Math.sqrt(x.reduce((s,v)=>s+v*v,0)/x.length);
 test('FM expression patch import keeps compatible defaults and clamps append-only routes',()=>{
- const p=sanitizeFM({version:1,kind:'fm'});expect(p.global).toMatchObject({wanderCents:0,modSource1:0,modDepth4:0});expect(p.operators[0]).toMatchObject({attackCurve:1,decayCurve:1,releaseCurve:1});p.global.modTarget1=999;p.global.modDepth2=Infinity;p.operators[0].attackCurve=-1;expect(cloneFM(p)).toMatchObject({global:{modTarget1:11,modDepth2:0},operators:[{attackCurve:.25},{},{},{},{},{}]});
+ const p=sanitizeFM({version:1,kind:'fm'});expect(p.global).toMatchObject({wanderCents:0,modSource1:0,modDepth4:0});expect(p.operators[0]).toMatchObject({attackCurve:1,decayCurve:1,releaseCurve:1});p.global.modTarget1=999;p.global.modDepth2=Infinity;p.operators[0].attackCurve=-1;expect(cloneFM(p)).toMatchObject({global:{modTarget1:13,modDepth2:0},operators:[{attackCurve:.25},{},{},{},{},{},{},{}]});
 });
 test('operator curves change the attack while preserving the held body and release endpoint',()=>{
  const p=patch(),q=cloneFM(p);q.operators[0].attackCurve=2;q.operators[0].releaseCurve=2;

@@ -1,0 +1,102 @@
+
+/* ---- devices: the tuner, the effects rack and the keyboard as boxes with faceplates, screws, lamps and a little life ---- */
+:root{
+ --screws:linear-gradient(#0000 38%,#121417 38% 62%,#0000 62%) left 8px top 8px/7px 7px no-repeat,radial-gradient(circle 5.5px at 50% 50%,#f1f3f5 0,#b4b9be 2.4px,#5f646b 4.5px,#2a2e33 5.3px,#0000 5.6px) left 6px top 6px/11px 11px no-repeat,linear-gradient(90deg,#0000 38%,#121417 38% 62%,#0000 62%) right 8px top 8px/7px 7px no-repeat,radial-gradient(circle 5.5px at 50% 50%,#f1f3f5 0,#b4b9be 2.4px,#5f646b 4.5px,#2a2e33 5.3px,#0000 5.6px) right 6px top 6px/11px 11px no-repeat,linear-gradient(90deg,#0000 38%,#121417 38% 62%,#0000 62%) left 8px bottom 8px/7px 7px no-repeat,radial-gradient(circle 5.5px at 50% 50%,#f1f3f5 0,#b4b9be 2.4px,#5f646b 4.5px,#2a2e33 5.3px,#0000 5.6px) left 6px bottom 6px/11px 11px no-repeat,linear-gradient(#0000 38%,#121417 38% 62%,#0000 62%) right 8px bottom 8px/7px 7px no-repeat,radial-gradient(circle 5.5px at 50% 50%,#f1f3f5 0,#b4b9be 2.4px,#5f646b 4.5px,#2a2e33 5.3px,#0000 5.6px) right 6px bottom 6px/11px 11px no-repeat;
+ --grain:repeating-linear-gradient(90deg,#ffffff07 0 1px,#0000 1px 3px);
+ --bevel:inset 0 1px 0 #ffffff24,inset 0 -2px 0 #0009,inset 1px 0 0 #ffffff0f,inset -1px 0 0 #0006;
+ --lamp-off:#2a2d2b;
+}
+@keyframes lamp-breathe{0%,100%{opacity:.78}50%{opacity:1}}
+
+/* ---------- the tuner ---------- */
+.lab-window{position:fixed;padding:12px 16px 12px;border-radius:14px;border:1px solid #5c564a;
+ background:var(--screws),var(--grain),linear-gradient(180deg,#2e2c27 0,#211f1b 46%,#191815 100%);
+ box-shadow:var(--bevel),0 2px 0 #0008,0 18px 40px #000b;}
+.lab-window::before{content:"";position:absolute;left:34px;right:34px;top:0;height:3px;border-radius:0 0 3px 3px;background:linear-gradient(90deg,#c9a45a,#e8d29a,#c9a45a);opacity:.85;}
+.lab-window h3{position:relative;justify-content:flex-start;gap:10px;margin:0 0 8px;padding:0 0 6px 0;font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:#d9c89b;text-shadow:0 1px 0 #000c,0 -1px 0 #ffffff18;border-bottom:1px solid #00000066;box-shadow:0 1px 0 #ffffff12;}
+.lab-window h3 .lab-close{margin-left:auto;}
+/* a power lamp: amber until the chord auto-tune is on, then green */
+.lab-window h3::before{content:"";flex:none;width:9px;height:9px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe3a1,#d8902f 55%,#6e4310);box-shadow:0 0 8px #e0a23a99,inset 0 -1px 2px #0006;animation:lamp-breathe 3.2s ease-in-out infinite;}
+.lab-window:has(.lab-auto[aria-pressed=true]) h3::before{background:radial-gradient(circle at 35% 30%,#d6ffe9,#3fd39a 55%,#145c43);box-shadow:0 0 10px #3fd39aaa,inset 0 -1px 2px #0006;}
+.lab-window h3 .lab-close::after{content:none;}
+.lab-window .group-controls{position:relative;}
+.lab-window .lab-tuning{background:#13120e;border:1px solid #3b382f;border-radius:10px;box-shadow:inset 0 3px 8px #000c,0 1px 0 #ffffff14;}
+@media (prefers-reduced-motion:reduce){.lab-window h3::before{animation:none;}}
+
+
+/* keys of the device: the two big buttons become domed, lit push-buttons */
+.lab-hold{background:radial-gradient(ellipse at 50% 18%,#33393b 0,#1a1e20 62%,#121516 100%);border-color:#4b5558;box-shadow:inset 0 2px 0 #ffffff1a,inset 0 -4px 0 #0007,0 3px 0 #000a,0 6px 10px #0008;}
+.lab-hold[aria-pressed=true]{background:radial-gradient(ellipse at 50% 28%,color-mix(in srgb,var(--rack-colour) 70%,#fff) 0,var(--rack-colour) 55%,color-mix(in srgb,var(--rack-colour) 55%,#000) 100%);box-shadow:inset 0 3px 8px #0007,0 1px 0 #000a,0 0 18px color-mix(in srgb,var(--rack-colour) 70%,transparent);transform:translateY(2px);}
+
+/* ---------- the effects rack ---------- */
+.rackc{padding:0 22px;border-radius:12px;border:1px solid #3d4b4b;
+ background:var(--screws),var(--grain),linear-gradient(180deg,#20292b 0,#161c1d 40%,#101415 100%);
+ box-shadow:var(--bevel),0 2px 0 #0008,0 20px 50px #000c;}
+/* the rack ears: a strip down each side with the mounting slots in it */
+.rackc::before{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;z-index:0;
+ background:
+  radial-gradient(ellipse 4px 9px at 11px 24%,#07090a 0 70%,#0000 75%),radial-gradient(ellipse 4px 9px at calc(100% - 11px) 24%,#07090a 0 70%,#0000 75%),
+  radial-gradient(ellipse 4px 9px at 11px 76%,#07090a 0 70%,#0000 75%),radial-gradient(ellipse 4px 9px at calc(100% - 11px) 76%,#07090a 0 70%,#0000 75%),
+  linear-gradient(90deg,#2d393b 0,#222c2e 21px,#0000 22px calc(100% - 22px),#222c2e calc(100% - 21px),#2d393b 100%);}
+.rackc>*{position:relative;z-index:1;}
+.rackc-head{padding:10px 8px 10px;border-bottom:1px solid #00000099;box-shadow:0 1px 0 #ffffff10;background:linear-gradient(180deg,#ffffff08,#0000);}
+.rackc-head h2{display:flex;align-items:center;gap:9px;font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:#b9d3cd;text-shadow:0 1px 0 #000c,0 -1px 0 #ffffff14;}
+.rackc-head h2::before{content:"";flex:none;width:9px;height:9px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#d6ffe9,#3fd39a 55%,#145c43);box-shadow:0 0 9px #3fd39a99,inset 0 -1px 2px #0006;animation:lamp-breathe 3.6s ease-in-out infinite;}
+/* the rack's lamp goes red when it is bypassed */
+.rackc:has(.rackc-head button[aria-label="Bypass effects rack"][aria-pressed=true]) .rackc-head h2::before{background:radial-gradient(circle at 35% 30%,#ffd0c9,#e0503f 55%,#6e1b12);box-shadow:0 0 9px #e0503f99,inset 0 -1px 2px #0006;animation:none;}
+.rackc-head button,.rackc-head select{box-shadow:inset 0 1px 0 #ffffff1c,0 2px 0 #0008;}
+.rackc-head .rack-signal{height:6px;bottom:-3px;background:repeating-linear-gradient(90deg,#17211f 0 7px,#0000 7px 9px);}
+.rackc-head .rack-signal span{display:block;height:100%;background:linear-gradient(90deg,#4ec4b4,#6fe0a2 70%,#e0b84a 85%,#e0603f);-webkit-mask:repeating-linear-gradient(90deg,#000 0 7px,#0000 7px 9px);mask:repeating-linear-gradient(90deg,#000 0 7px,#0000 7px 9px);}
+.rackc-body{padding:12px 8px 14px;}
+.rackc .rack-chain-end{font-size:9px;letter-spacing:.3em;color:#7d9a92;text-shadow:0 1px 0 #000a;}
+
+/* the chain display: a screen set into the panel, with a bezel, a faint scan and a hint of glare */
+.rack-display{position:relative;border:0;border-radius:12px;background:radial-gradient(ellipse at 50% 40%,#10201e 0,#0a1111 70%,#070b0b 100%);
+ box-shadow:0 0 0 3px #080b0c,0 0 0 4px #3c4a4a,0 0 0 5px #0a0d0d,inset 0 0 36px #0000009e,inset 0 3px 10px #000d,0 2px 0 5px #ffffff0c;overflow:visible;}
+.rack-display::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:3;
+ background:repeating-linear-gradient(0deg,#0000 0 3px,#00000030 3px 4px),linear-gradient(115deg,#0000 0 40%,#ffffff08 46%,#0000 52%);}
+.rack-display .rack-line{position:relative;z-index:1;}
+@media (prefers-reduced-motion:reduce){.rackc-head h2::before{animation:none;}}
+/* each effect a little module: a glossy top edge and a lamp that shows whether it is in circuit */
+.rack-display .rack-tile{position:relative;background:linear-gradient(180deg,#323b3d 0,#222a2c 46%,#171d1f 100%);box-shadow:inset 0 1px 0 #ffffff26,inset 0 -1px 0 #0008,0 3px 0 #0009,0 6px 8px #0007;}
+.rack-display .rack-tile::after{content:"";position:absolute;top:6px;right:6px;width:6px;height:6px;border-radius:50%;background:var(--rack-colour);box-shadow:0 0 6px var(--rack-colour);}
+.rack-display .rack-tile.is-bypassed::after{background:#313635;box-shadow:none;}
+.rack-display .rack-tile:hover{background:linear-gradient(180deg,#3a4446,#283133 46%,#1b2123);}
+.rack-display .rack-tile.is-selected{box-shadow:0 0 0 2px color-mix(in srgb,var(--rack-colour) 78%,transparent),inset 0 1px 0 #ffffff30,0 6px 14px #000a;}
+.rack-display .rack-tile:active{transform:translateY(2px);box-shadow:inset 0 2px 5px #000a,0 1px 0 #0009;}
+.rack-group::before{background:linear-gradient(180deg,#ffffff0a,#ffffff03);border-color:#5a7e75;box-shadow:inset 0 0 0 1px #00000066,0 0 14px #4ec4b41a;}
+.rack-group::after{background:#0a1111;color:#8fb3a9;letter-spacing:.14em;}
+.rack-arrow::before{box-shadow:0 0 6px #4ec4b455;}
+.rackc .rack-globals{background:linear-gradient(180deg,#0f1415,#141a1b);border:1px solid #2c3637;box-shadow:inset 0 3px 8px #000c,0 1px 0 #ffffff12;border-radius:10px;}
+.rackc .rack-globals .rack-control>span:first-of-type{letter-spacing:.14em;text-transform:uppercase;font-size:10px;color:#a7c3bb;text-shadow:0 1px 0 #000;}
+
+/* ---------- the keyboard ---------- */
+.keybox{position:relative;border-color:#33291f;border-radius:12px;
+ background:linear-gradient(180deg,#1f1c18 0,#151311 55%,#0f0e0c 100%);
+ box-shadow:inset 0 1px 0 #ffffff1c,inset 0 -3px 0 #000a,0 3px 0 #0009,0 14px 30px #000a;}
+/* the walnut end cheeks either side, with a screw at each end of them */
+.keybox::before,.keybox::after{content:"";position:absolute;top:-3px;bottom:-5px;width:17px;pointer-events:none;
+ background:
+  radial-gradient(circle 5.5px at 50% 12px,#f1f3f5 0,#b4b9be 2.4px,#5f646b 4.5px,#2a2e33 5.3px,#0000 5.6px),
+  radial-gradient(circle 5.5px at 50% calc(100% - 12px),#f1f3f5 0,#b4b9be 2.4px,#5f646b 4.5px,#2a2e33 5.3px,#0000 5.6px),
+  repeating-linear-gradient(87deg,#0000 0 4px,#00000030 4px 5px,#ffffff08 5px 7px),
+  linear-gradient(90deg,#7a5238,#5c3c28 45%,#46291a);
+ box-shadow:inset 0 2px 0 #ffffff2a,inset 0 -3px 0 #0008,0 6px 12px #0009;}
+.keybox::before{left:-15px;border-radius:12px 3px 3px 12px;}
+/* the right cheek is its own mirror image (drawn the other way round, not flipped, so its rounded corners stay on the outside) */
+.keybox::after{right:-15px;border-radius:3px 12px 12px 3px;
+ background:
+  radial-gradient(circle 5.5px at 50% 12px,#f1f3f5 0,#b4b9be 2.4px,#5f646b 4.5px,#2a2e33 5.3px,#0000 5.6px),
+  radial-gradient(circle 5.5px at 50% calc(100% - 12px),#f1f3f5 0,#b4b9be 2.4px,#5f646b 4.5px,#2a2e33 5.3px,#0000 5.6px),
+  repeating-linear-gradient(93deg,#0000 0 4px,#00000030 4px 5px,#ffffff08 5px 7px),
+  linear-gradient(270deg,#7a5238,#5c3c28 45%,#46291a);}
+.keybox .dock-label{letter-spacing:.2em;font-size:10px;color:#cdb98a;text-shadow:0 1px 0 #000c,0 -1px 0 #ffffff12;}
+/* a felt strip along the back of the keys */
+.keybox .keys{box-shadow:0 -4px 0 #7b2231,0 -5px 0 #0007,0 -7px 6px -3px #00000099;border-radius:2px 2px 4px 4px;}
+.keybox .dock-chords>button,.keybox .dock-chords>span{box-shadow:inset 0 1px 0 #ffffff1a,0 2px 0 #0008;}
+.keybox-head button{box-shadow:inset 0 1px 0 #ffffff1c,0 2px 0 #0008;}
+.keybox-head button:active{transform:translateY(1px);box-shadow:inset 0 2px 4px #0009;}
+
+/* the twelve degree faders always share one row, spread across the window's width, whatever the window or text size */
+.lab-window .lab-tuning>.lab-row.lab-faders{flex-wrap:nowrap;justify-content:space-between;gap:0;min-width:calc(12 * 46px);}
+.lab-window .lab-tuning>.lab-row.lab-faders .fader{flex:1 1 0;width:auto;min-width:0;}

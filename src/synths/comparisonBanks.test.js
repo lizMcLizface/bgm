@@ -18,7 +18,7 @@ test('every published YAML bank has valid, complete engine values and stable pro
   const b=bank(entry.id),synth=SYNTHS[b.synth];
   expect(validateComparisonBank(b,synth)).toBe(b);
   expect(b.programs.length).toBe(entry.count);count+=b.programs.length;
-  for(const p of b.programs)expect(p.values).toEqual(synth.params.sanitize(p.values));
+  for(const p of b.programs)expect(p.values).toEqual((synth.params.sanitizeEngine??synth.params.sanitize)(p.values));
  }
  expect(count).toBe(705);
 });

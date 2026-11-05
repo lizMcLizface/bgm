@@ -221,7 +221,7 @@ impl Fm {
         model: &mut Model,
         pos: usize,
     ) -> [f32; 2] {
-        let mut expressions = [[0.; 11]; VOICES];
+        let mut expressions = [[0.; 13]; VOICES];
         let mut refresh = [false; VOICES];
         let mut expressed = false;
         let mut colours = [false; VOICES];
@@ -251,9 +251,16 @@ impl Fm {
                 v.glide -= 1;
             }
             let update = control || self.frame == v.age;
+            if update {
+                v.lfo_fade = if self.g[59] > 0. {
+                    ((self.frame - v.age) as f32 / self.sr / self.g[59]).min(1.)
+                } else {
+                    1.
+                };
+            }
             let pressure = v.pressure.max(self.g[12]);
             let random = v.expression.tick(&self.g, sr, expression_alpha, motion);
-            let mut targets = [0.; 11];
+            let mut targets = [0.; 13];
             if routes {
                 for slot in 0..4 {
                     let at = 29 + slot * 3;
@@ -275,7 +282,7 @@ impl Fm {
                     targets[destination - 1] += source * self.g[at + 2];
                 }
             }
-            for k in 0..11 {
+            for k in 0..13 {
                 if targets[k] != 0. || v.expression.routes[k] != 0. {
                     v.expression.routes[k] +=
                         (targets[k].clamp(-1., 1.) - v.expression.routes[k]) * expression_alpha;
@@ -292,8 +299,9 @@ impl Fm {
                     * ((v.midi - 69.
                         + self.bend
                         + transient
-                        + lfo * (self.g[11] + self.g[9] * 35.) / 100.
-                        + (random * self.g[27] + expression[0] * 100.) / 100.)
+                        + (self.pitch1 * v.lfo_fade + self.pitch2)
+                        + (random * self.g[27] + expression[0] * 100.) / 100.
+                        + v.expression.fixed * self.g[58] / 100.)
                         / 12.)
                         .exp2();
                 for op in 0..count {
@@ -380,7 +388,7 @@ impl Fm {
                         } else {
                             one
                         }
-                        * V::s(1. + lfo * self.g[18])
+                        * V::a(band.units.map(|(v, _)| (1. + self.idx1 * self.voices[v].lfo_fade) + self.idx2))
                         / V::s(2. * PI),
             );
             let shaped = match band.shape {
@@ -441,7 +449,7 @@ impl Fm {
                 if self.carriers[op] > 0. {
                     let p = &self.p[op];
                     let x = output[voice_index][op] * self.carriers[op] / norm
-                        * (1. - self.g[17] * (lfo + 1.) * 0.5);
+                        * ((1. - self.amp1 * v.lfo_fade) - self.amp2);
                     for ch in 0..2 {
                         voice_out[ch] += x * self.pan[op][ch];
                     }
@@ -453,7 +461,7 @@ impl Fm {
                             * (1. + expression[5 + op])
                             * self.carriers[op]
                             / norm
-                            * (1. - self.g[17] * (lfo + 1.) * 0.5);
+                            * ((1. - self.amp1 * v.lfo_fade) - self.amp2);
                         for ch in 0..2 {
                             noise_gain[ch] += level * self.pan[op][ch];
                         }
@@ -542,10 +550,7 @@ impl Fm {
             }
             for sub in 0..factor {
                 self.bend += (self.g[8] - self.bend) * 0.002 / factor as f32;
-                let lfo = sin(&self.sine, self.lfo);
-                self.lfo = (self.lfo + self.g[10] / sr).fract();
-                let lfo2 = sin(&self.sine, self.lfo2);
-                self.lfo2 = (self.lfo2 + self.g[28] / sr).fract();
+                let (lfo, lfo2) = self.lfo_tick(sr);
                 let control = self.frame % 16 == 0 && sub == 0;
                 let mut out = [0.; 2];
                 if !voice_idle {
