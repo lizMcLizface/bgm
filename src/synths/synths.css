@@ -307,8 +307,8 @@ a{color:var(--amber);}
 .matrix-dests{display:flex;flex-wrap:wrap;gap:3px;}
 .matrix-dests button{min-height:26px;font-size:10px;padding:2px 6px;}
 .matrix-dests button.on{background:var(--violet,#9b7fd1);border-color:var(--violet,#9b7fd1);color:#16121f;}
-.alg-diagram{flex:1;min-height:0;width:100%;max-width:190px;color:#8fb8c7;align-self:center;}
-.group.algorithm{min-width:130px;}
+.alg-diagram{flex:none;width:232px;height:auto;color:#8fb8c7;align-self:center;}
+.group.algorithm{flex:none;width:262px;min-width:262px;}
 .alg-op rect{fill:#1d2428;stroke:currentColor;stroke-width:1.2;cursor:pointer;}
 .alg-op text{fill:currentColor;font-size:12px;font-weight:700;pointer-events:none;}
 .alg-op.carrier rect{fill:#26343b;}
@@ -597,6 +597,7 @@ label.inline.toggle{min-height:32px;}label.inline.toggle em{font-style:normal;co
 .env-shape-controls{display:grid;grid-template-columns:1fr;gap:2px;margin-top:8px;font-size:12px;color:var(--muted);}
 .env-shape-controls label{display:grid;grid-template-columns:92px 1fr 44px;align-items:center;gap:8px;}
 .env-shape-controls input[type=range]{width:100%;accent-color:var(--focus);min-height:28px;}
+.env-shape-controls label.shaped{grid-template-columns:92px auto 1fr 44px;}
 .env-shape-controls output{text-align:right;color:var(--text);font-variant-numeric:tabular-nums;}
 .env-shape-controls select{min-height:30px;padding:3px 6px;justify-self:start;}
 .env-shape-hint{margin:6px 0 0;font-size:11px;color:var(--muted);}
@@ -707,8 +708,6 @@ label.inline.toggle{min-height:32px;}label.inline.toggle em{font-style:normal;co
 .dock-keys{margin:0;color:var(--muted);font-size:11px;line-height:1.4;}
 @media (max-width:640px){.dock-context{margin-left:0;}.dock-sounds{display:none;}}
 
-/* /synths/iowa: every instrument in view, not in a sideways scroller */
-.iowa .presets{flex-wrap:wrap;overflow:visible}
 
 /* wavetable synthesizer: four wave editors around a joystick */
 .wt-panel>.panel-row{width:100%;max-width:2040px;margin:0 auto;}
@@ -1028,11 +1027,12 @@ label.inline.toggle{min-height:32px;}label.inline.toggle em{font-style:normal;co
 .diy .rig>.panel{background:linear-gradient(180deg,var(--face-a),var(--face-b));}
 .diy .rig-grip{height:6px;background:linear-gradient(90deg,#4ec4b4 0 20%,#5b8fd9 20% 40%,#a07fd6 40% 60%,#e3a52a 60% 80%,#e0573d 80% 100%);}
 .diy .rig-grip i{height:2px;width:30px;background:repeating-linear-gradient(90deg,#000 0 3px,#0000 3px 6px);opacity:.4;}
-.diy .rig>nav.presets{justify-content:flex-end;background:color-mix(in srgb,var(--ends) 14%,#161513);}
+.diy .rig>nav.presets,.dx7 .rig>nav.presets{justify-content:flex-end;background:color-mix(in srgb,var(--ends) 14%,#161513);}
 .diy-poly .rig>nav.presets::before{content:'DI-POLY  ·  POLYPHONIC SUBTRACTIVE SYNTHESIZER';}
+.dx7 .rig>nav.presets::before{content:'FM7  ·  SIX OPERATOR FREQUENCY MODULATION SYNTHESIZER';}
 .diy-fm .rig>nav.presets::before{content:'DIY FM  ·  UP TO 8 OPERATOR FREQUENCY MODULATION SYNTHESIZER';}
-.diy .rig>nav.presets::before{margin-right:auto;font-size:10px;letter-spacing:.3em;font-weight:600;white-space:nowrap;color:color-mix(in srgb,var(--ends) 40%,#c9d6d3);}
-@media (max-width:900px){.diy .rig>nav.presets::before{display:none;}}
+.diy .rig>nav.presets::before,.dx7 .rig>nav.presets::before{margin-right:auto;font-size:10px;letter-spacing:.3em;font-weight:600;white-space:nowrap;color:color-mix(in srgb,var(--ends) 40%,#c9d6d3);}
+@media (max-width:900px){.diy .rig>nav.presets::before,.dx7 .rig>nav.presets::before{display:none;}}
 
 /* the lab: floating test windows beside the DIY panels */
 .lab-window{position:fixed;z-index:70;box-sizing:border-box;padding:8px 10px 6px;background:#1a1916;border:1px solid #6b6f78;border-radius:10px;box-shadow:0 12px 32px #000a;}
@@ -1124,3 +1124,103 @@ label.inline.toggle{min-height:32px;}label.inline.toggle em{font-style:normal;co
 .lab-hold{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:104px;min-height:104px;border-radius:12px;background:#1a1e20;border:2px solid #475054;color:#b9b4a6;cursor:pointer;box-shadow:inset 0 -3px 0 #0006,0 2px 0 #0008;font:inherit;}
 .lab-hold b{font-size:15px;font-weight:600;}.lab-hold span{font-size:11px;letter-spacing:.08em;text-transform:uppercase;}
 .lab-hold[aria-pressed=true]{background:var(--rack-colour);border-color:var(--rack-colour);color:#10181a;box-shadow:inset 0 3px 6px #0006,0 0 14px var(--rack-colour);transform:translateY(1px);}
+
+.oled-fixed{width:150px;flex:none;}
+
+/* FM7: the same row height as the V 80 (fixed fader tracks), small operator keys, and hold-style on/off keys */
+.dx7{--track:112px;}
+.dx7 .complete .fader-track{flex:none;height:var(--track);min-height:var(--track);}
+.dx7 .complete .group-controls{align-items:flex-start;}
+.dx7 .panel-row{flex:none;min-height:0;}
+.dx7 .op-pick .group-controls{justify-content:center;}
+.dx7 .op-pick .pick-grid{height:auto;}
+.dx7 .complete .pick,.dx7 .complete .htoggle{align-self:flex-start;}
+.dx7 .complete .pick-grid{height:calc(var(--track) + 40px);}
+.dx7 .complete .pick.compact .pick-grid{height:auto;}
+.dx7 .complete .pick button{min-width:46px;}
+.dx7 .complete .pick.square button{min-width:30px;width:36px;}
+.onoff-key{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;flex:none;width:54px;height:54px;min-height:0;padding:0;border-radius:10px;border:2px solid #475054;background:radial-gradient(ellipse at 50% 18%,#33393b 0,#1a1e20 62%,#121516 100%);color:#b9b4a6;box-shadow:inset 0 2px 0 #ffffff1a,inset 0 -3px 0 #0007,0 3px 0 #000a;font:inherit;cursor:pointer;--key:#e8dcb8;}
+.onoff-key b{font-size:12px;font-weight:600;line-height:1;}
+.onoff-key span{font-size:9px;letter-spacing:.1em;text-transform:uppercase;line-height:1;opacity:.75;}
+.onoff-key[aria-pressed=true]{background:radial-gradient(ellipse at 50% 28%,color-mix(in srgb,var(--key) 70%,#fff) 0,var(--key) 55%,color-mix(in srgb,var(--key) 55%,#000) 100%);border-color:var(--key);color:#10181a;box-shadow:inset 0 3px 8px #0007,0 1px 0 #000a,0 0 14px color-mix(in srgb,var(--key) 65%,transparent);transform:translateY(1px);}
+.onoff-key[aria-pressed=true] span{opacity:.8;}
+.onoff-key.tone-amber{--key:#e3a52a;}.onoff-key.tone-violet{--key:#a07fd6;}.onoff-key.tone-red{--key:#e0573d;}.onoff-key.tone-blue{--key:#5b8fd9;}.onoff-key.tone-teal{--key:#4ec4b4;}.onoff-key.tone-green{--key:#5fae7a;}
+.dx7 .op-switches .group-controls{gap:8px;justify-content:flex-start;padding:0 6px;}
+.dx7 .complete .pick:not(.compact):not(.square) .pick-grid{grid-auto-rows:1fr;align-content:stretch;gap:4px;}
+.dx7 .complete .pick:not(.compact):not(.square) button{height:100%;min-width:52px;font-size:11px;}
+.dx7 .group.op-switches{flex:none;}
+.dx7 .complete .group.op-pick{flex:none;}
+.dx7 .complete .onoff-key{align-self:center;}
+.dx7 .op-switches .group-controls{align-items:center;}
+.dx7 .complete .choice{align-self:stretch;}
+
+/* Mercury D: the same ribbon as the DIY synths and the same row height as the V 80 */
+.minimoog{--track:126px;}
+.minimoog .complete .fader-track{flex:none;height:var(--track);min-height:var(--track);}
+.minimoog .panel-row{flex:none;min-height:0;}
+.minimoog .rig>nav.presets{justify-content:flex-end;background:color-mix(in srgb,var(--ends,#24262b) 14%,#161513);}
+.minimoog .rig>nav.presets::before{content:'MERCURY D  ·  ANALOG MONOSYNTH';margin-right:auto;font-size:10px;letter-spacing:.3em;font-weight:600;white-space:nowrap;color:color-mix(in srgb,var(--ends,#24262b) 40%,#c9d6d3);}
+@media (max-width:900px){.minimoog .rig>nav.presets::before{display:none;}}
+
+/* The analog polysynths: the same ribbon as the DIY synths and the same row height as the V 80 */
+.prophet,.jupiter,.obxa{--track:126px;}
+.prophet .complete .fader-track,.jupiter .complete .fader-track,.obxa .complete .fader-track{flex:none;height:var(--track);min-height:var(--track);}
+.prophet .panel-row,.jupiter .panel-row,.obxa .panel-row{flex:none;min-height:0;}
+.prophet .rig>nav.presets,.jupiter .rig>nav.presets,.obxa .rig>nav.presets{justify-content:flex-end;background:color-mix(in srgb,var(--ends,#24262b) 14%,#161513);}
+.prophet .rig>nav.presets::before,.jupiter .rig>nav.presets::before,.obxa .rig>nav.presets::before{margin-right:auto;font-size:10px;letter-spacing:.3em;font-weight:600;white-space:nowrap;color:color-mix(in srgb,var(--ends,#24262b) 40%,#c9d6d3);}
+.prophet .rig>nav.presets::before{content:'ORACLE 5  ·  ANALOG POLYSYNTH';}
+.jupiter .rig>nav.presets::before{content:'PLUTO 8  ·  ANALOG POLYSYNTH';}
+.obxa .rig>nav.presets::before{content:'OBERON XA  ·  ANALOG POLYSYNTH';}
+@media (max-width:900px){.prophet .rig>nav.presets::before,.jupiter .rig>nav.presets::before,.obxa .rig>nav.presets::before{display:none;}}
+
+/* Silverbox on the drum machines' two-device layout: one voice, so a narrow strip rather than sixteen */
+.drums.tb303 .split{--pad:clamp(17px,1.5vw,22px);}
+.drums.tb303 .dm-voices{justify-content:center;gap:28px;}
+.drums.tb303 .dm-voice{flex:0 0 64px;}
+.drums.tb303 .dm-voice.hit{background:#2a2620;}
+
+/* Grand & Upright: a small box on the desk, the ribbon on top, the tuning, input and test-line windows beside it */
+.piano .rig{width:max-content;min-width:min(100%,560px);}
+.piano{--track:126px;--ends:#2a2018;}
+.piano .complete .fader-track{flex:none;height:var(--track);min-height:var(--track);}
+.piano .panel-row{flex:none;min-height:0;}
+.piano .rig>nav.presets{justify-content:flex-end;background:color-mix(in srgb,var(--ends) 14%,#161513);}
+.piano .rig>nav.presets::before{content:'GRAND & UPRIGHT  ·  MODELLED ACOUSTIC PIANOS';margin-right:auto;font-size:10px;letter-spacing:.3em;font-weight:600;white-space:nowrap;color:color-mix(in srgb,var(--ends) 40%,#c9d6d3);}
+@media (max-width:900px){.piano .rig>nav.presets::before{display:none;}}
+.piano-select{display:flex;flex-direction:column;gap:4px;font-size:11px;color:var(--muted);align-self:center;}
+.piano-select select{min-width:150px;}
+.piano .group.piano-instrument{flex:none;}
+.piano-tuning .tuning{margin-top:6px;}
+.piano-input{display:grid;gap:8px;width:300px;}
+.piano-input .input-probe{max-width:none;}
+.piano-input .hint{margin:0;}
+.piano-lines{display:grid;grid-template-columns:repeat(2,minmax(130px,1fr));gap:6px;}
+.piano-lines button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;}
+.piano-lines button small{font-size:11px;color:var(--muted);}
+.piano-lines button.on{outline:2px solid var(--amber);}
+.piano-tuning>.lab-row:first-child>.pick .pick-grid{min-height:190px;}
+.piano-tuning>.lab-row:first-child>.pick button{min-width:70px;font-size:11px;}
+.piano-input .fader-track{height:64px;min-height:64px;}
+/* /synths/iowa (Measured instruments): the piano's case (the page also carries the .piano class), with its own title on the ribbon */
+.iowa .rig>nav.presets::before{content:none;display:none;}
+.iowa .rig-title{margin-right:auto;font-size:10px;letter-spacing:.3em;font-weight:600;text-transform:uppercase;white-space:nowrap;color:color-mix(in srgb,var(--ends) 40%,#c9d6d3);}
+.iowa .learn-more{color:inherit;text-decoration:underline;text-underline-offset:3px;cursor:pointer;}
+.iowa .learn-more:hover,.iowa .learn-more[aria-pressed=true]{color:var(--cream);}
+@media (max-width:900px){.iowa .rig-title{display:none;}}
+.piano-tuning .fader-track{height:100px;min-height:100px;}
+.setup .row label input[type=range]{width:min(200px,50vw);accent-color:var(--amber);}
+.setup .row label output{font-size:11px;color:var(--cream);}
+.piano-model-note{font-size:11px;color:var(--muted);}
+.dock-lines{display:inline-flex;align-items:center;gap:6px;}
+.dock-lines select{max-width:190px;font-size:12px;min-height:26px;padding:0 6px;}
+.piano-instrument .group-controls{justify-content:center;align-items:center;}
+/* the piano's model display: a small one, two rows of text */
+.piano-model .oled{width:132px;height:36px;padding:2px 8px 2px 10px;}
+.piano-model .oled-name{font-size:12px;}
+.piano-model .preset-knob{width:32px;height:32px;}
+.piano-model .preset-knob svg{width:32px;height:32px;}
+.piano .group.piano-instrument{min-width:0;}
+.piano-model .oled-picker{flex-direction:column;gap:6px;}
+/* the keys keep their width whatever surrounds them: controls add width to the box, and a box wider than its row centres the row */
+.stage-row{justify-content:center;}
+.stage-row[style*="--keys-w"] .lab-piano{flex:0 1 var(--keys-w);}

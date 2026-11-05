@@ -1,4 +1,5 @@
 import React,{useState} from 'react';
+import {OledPicker} from '../diy/DiyControls';
 import SynthShell from '../ui/SynthShell';
 import {SYNTHS} from '../models';
 import {LAYER_KEYS,LOWER} from './params';
@@ -27,7 +28,7 @@ const ROWS=[
 ];
 const KEY_MODE={title:'Key mode',tone:'green',keys:[['keyMode','Mode'],['splitPoint','Split'],['balance','Balance']]};
 const CHARACTER={title:'Character',tone:'amber',keys:['volume','width','spread',['oversample','2× rate'],'tune']};
-const REVERB={title:'Reverb',tone:'blue',keys:['reverbMix','reverbDecay','reverbTone','reverbSize','reverbPredelay']};
+const CHORUS={title:'Chorus',tone:'blue',keep:true,keys:[['chorusMix','Mix'],['chorusRate','Rate'],['chorusDepth','Depth']]};
 const NAMES={upper:'Upper',lower:'Lower'};
 
 /** Copies one layer's patch onto the other. */
@@ -42,7 +43,7 @@ function copyLayer(values,from){
 export default function ObxaPage(){
  const [layer,setLayer]=useState('upper');
  const libraries=[{id:'book',label:'Patch book',render:({choose,values,current})=><BookBrowser choose={choose} values={values} current={current} layer={layer}/>}];
- return <SynthShell synth={SYNTHS.obxa} className="obxa" panelClassName="complete" libraries={libraries}>
+ return <SynthShell synth={SYNTHS.obxa} className="obxa" panelClassName="complete" libraries={libraries} helpInBar picker={OledPicker}>
   {({group,values,replaceValues})=>{
    const prefix=layer==='lower'?LOWER:'';
    const silent=values.keyMode===0&&layer==='lower';
@@ -61,7 +62,7 @@ export default function ObxaPage(){
     {row.map(g=>group(g,prefix))}
     {i===0&&group(KEY_MODE)}
     {i===1&&group(CHARACTER)}
-    {i===1&&group(REVERB)}
+    {i===1&&group(CHORUS)}
    </div>);
   }}
  </SynthShell>;

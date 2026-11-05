@@ -66,6 +66,8 @@ export default class PianoPlayer {
         this.dry.connect(this.master); this.send.connect(this.room); this.room.connect(this.wet); this.wet.connect(this.master); this.master.connect(this.limiter); this.limiter.connect(this.meter); this.limiter.connect(context.destination);
         this.settings = null; this.voices = new Map(); this.pedal = false; this.sustained = new Set();
     }
+    /** Sends the output somewhere other than the speakers (the effects rack and the output monitor). */
+    route(target) { this.limiter.disconnect(); this.limiter.connect(this.meter); this.limiter.connect(target); }
     set(settings, level = .9, room = .2) {
         this.settings = settings; this.master.gain.value = level; this.wet.gain.value = room * 1.6;
     }

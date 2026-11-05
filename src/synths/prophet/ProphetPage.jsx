@@ -2,6 +2,7 @@ import React from 'react';
 import SynthShell from '../ui/SynthShell';
 import {SYNTHS} from '../models';
 import BankBrowser from './BankBrowser';
+import {OledPicker} from '../diy/DiyControls';
 
 // Laid out after the original front panel in three rows that fit a tablet:
 // modulation (Poly-Mod, LFO/wheel-mod, glide/unison), sources (oscillators, mixer,
@@ -22,14 +23,14 @@ const ROWS=[
   {title:'Filter',tone:'red',keys:['cutoff','res',['fEnv','Env amt'],['track','Kybd'],['filterRev','Rev'],['fAttack','A'],['fDecay','D'],['fSustain','S'],['fRelease','R']],shape:{env:'filter',a:'fAttack',d:'fDecay',s:'fSustain',r:'fRelease'}},
   {title:'Amplifier',tone:'amber',keys:[['aAttack','A'],['aDecay','D'],['aSustain','S'],['aRelease','R'],'release'],shape:{env:'amp',a:'aAttack',d:'aDecay',s:'aSustain',r:'aRelease'}},
   {title:'Character',tone:'amber',keys:['vintage','volume','voices','width',['oversample','2× rate']]},
-  {title:'Reverb',tone:'blue',keys:['reverbMix','reverbDecay','reverbTone','reverbSize','reverbPredelay']},
+    {title:'Chorus',tone:'blue',keep:true,keys:[['chorusMix','Mix'],['chorusRate','Rate'],['chorusDepth','Depth']]},
  ],
 ];
 
 const LIBRARIES=[{id:'bank',label:'Programs',render:({choose,current})=><BankBrowser choose={choose} current={current}/>}];
 
 export default function ProphetPage(){
- return <SynthShell synth={SYNTHS.prophet5} className="prophet" panelClassName="complete" libraries={LIBRARIES}>
+ return <SynthShell synth={SYNTHS.prophet5} className="prophet" panelClassName="complete" libraries={LIBRARIES} helpInBar picker={OledPicker}>
   {({group})=>ROWS.map((row,i)=><div className="panel-row" key={i}>{row.map(g=>group(g))}</div>)}
  </SynthShell>;
 }

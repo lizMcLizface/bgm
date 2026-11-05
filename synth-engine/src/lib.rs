@@ -15,8 +15,8 @@ mod simd;
 #[cfg(feature = "simd-voices")]
 mod simd_voices;
 const VOICES: usize = 32;
-const UNISON: usize = 4;
-const PARAMS: usize = 107;
+const UNISON: usize = 8;
+const PARAMS: usize = 116;
 const QUEUE: usize = 4096;
 const BLOCK: usize = 2048;
 const LUT: usize = 2048;
@@ -198,6 +198,15 @@ fn segment_edges(
         }
     }
 }
+/// The progress of an envelope stage along its curve: 0 is the power curve (the stage's own exponent), 1 the same curve
+/// mirrored (fast start, slow end: the original synth's logarithmic shape), 2 a quarter sine raised to the exponent.
+fn shaped(x: f32, c: f32, mode: u8) -> f32 {
+    match mode {
+        1 => 1. - (1. - x).powf(c),
+        2 => (x * PI * 0.5).sin().powf(c),
+        _ => x.powf(c),
+    }
+}
 #[derive(Clone, Copy)]
 struct Env {
     value: f32,
@@ -264,7 +273,8 @@ impl Env {
         }
     }
     #[cfg_attr(feature = "profile-sections", inline(never))]
-    fn next(&mut self, p: &[f32; PARAMS], offset: usize, curves: usize, sr: f32) -> f32 {
+    fn next(&mut self, p: &[f32; PARAMS], offset: usize, curves: usize, shapes: usize, sr: f32) -> f32 {
+        let mode = |stage: usize| p[shapes + stage].round() as u8;
         match self.stage {
             1 => {
                 self.linear += ((p[offset] * self.attack_scale).max(self.attack_min) * sr)
@@ -277,7 +287,9 @@ impl Env {
                     1.
                 };
                 self.value = top
-                    * if p[curves] == 1. {
+                    * if mode(0) != 0 {
+                        shaped(self.linear.clamp(0., 1.), p[curves], mode(0))
+                    } else if p[curves] == 1. {
                         self.linear
                     } else {
                         self.linear.clamp(0., 1.).powf(p[curves])
@@ -310,10 +322,10 @@ impl Env {
                 self.linear += (p[offset + 2] - self.linear) / (self.left.max(1) as f32);
                 self.left = self.left.saturating_sub(1);
                 let fraction = 1. - self.left as f32 / self.total.max(1) as f32;
-                self.value = if p[curves + 1] == 1. {
+                self.value = if mode(1) == 0 && p[curves + 1] == 1. {
                     self.linear
                 } else {
-                    self.start + (p[offset + 2] - self.start) * fraction.powf(p[curves + 1])
+                    self.start + (p[offset + 2] - self.start) * shaped(fraction, p[curves + 1], mode(1))
                 };
                 if self.left == 0 {
                     self.stage = 3;
@@ -326,8 +338,8 @@ impl Env {
             4 => {
                 self.left = self.left.saturating_sub(1);
                 let fraction = self.left as f32 / self.release_total as f32;
-                self.value = if offset == 17 && p[99] >= 0.5 {
-                    self.release_start * (1. - (1. - fraction).powf(p[curves + 2]))
+                self.value = if mode(2) != 0 || (offset == 17 && p[99] >= 0.5) {
+                    self.release_start * (1. - shaped(1. - fraction, p[curves + 2], mode(2)))
                 } else if p[curves + 2] == 2. {
                     self.release_start * fraction * fraction
                 } else {
@@ -852,7 +864,7 @@ impl Engine {
             let ranges = [
                 (0., 3.),
                 (1., 32.),
-                (1., 4.),
+                (1., 8.),
                 (0., 40.),
                 (0., 0.8),
                 (-12., 12.),
@@ -908,11 +920,12 @@ impl Engine {
                 101 => (0., 2.),
                 102 => (-24., 24.),
                 103 => (0.01, 4.),
+                107..=115 => (0., 2.),
                 _ => (0., 1.),
             };
             let l = scope as usize - 1;
             let discrete =
-                ((74..=85).contains(&index) && (index - 74) % 3 != 2) || index == 94 || index == 99 || index == 101 || index == 104;
+                ((74..=85).contains(&index) && (index - 74) % 3 != 2) || index == 94 || index == 99 || index == 101 || index == 104 || (107..=115).contains(&index);
             self.p[l][index] = if discrete {
                 value.round().clamp(lo, hi)
             } else {
@@ -1277,13 +1290,13 @@ impl Engine {
                     let coloured = colour::enabled(&p[86..99]) || colour.engaged();
                     let mut layer_out = [0.; 2];
                     let mut noise_gain = [0.; 2];
-                    let amp = v.amp[l].next(p, 17, 59, self.sr);
+                    let amp = v.amp[l].next(p, 17, 59, 107, self.sr);
                     let fe = if mode == 3 {
                         amp
                     } else {
-                        v.filter_env[l].next(p, 21, 62, self.sr)
+                        v.filter_env[l].next(p, 21, 62, 110, self.sr)
                     };
-                    let me = v.mod_env[l].next(p, 65, 69, self.sr);
+                    let me = v.mod_env[l].next(p, 65, 69, 113, self.sr);
                     alive |= v.amp[l].stage > 0;
                     let age = (self.frame - v.age) as f32 / self.sr;
                     let fade_lfo = if p[45] > 0.001 {

@@ -103,7 +103,7 @@ function drawSpectrum(canvas,bins,hold,rate,cursor){
 
 export default function Scope({engine,audio,onClose,keyHz}){
  // it starts to the right of the instrument, below the effects
- const float=useFloating('synths:scope-pos',s=>onSynth('diy-fm')?{x:s.w+24+80,y:520}:onSynth('cs80','juno')?{x:1644,y:587}:({x:s.w+215,y:Math.round(s.h*.64)}));
+ const float=useFloating('synths:scope-pos',s=>onSynth('iowa')?{x:Math.round((s.w-830)/2)+900,y:-494}:onSynth('piano')?{x:s.w+106,y:-494}:onSynth('diy-fm','dx7','minimoog','prophet','jupiter','obxa')?{x:s.w+24+80,y:520}:onSynth('cs80','juno')?{x:1644,y:587}:({x:s.w+215,y:Math.round(s.h*.64)}));
  const [cfg,setCfg]=useState(()=>({...DEFAULTS,...(load(KEY,{})||{})}));
  const [status,setStatus]=useState({text:'',read:null});
  const [cursor,setCursor]=useState(null);       // scope cursor, 0..1 across the segment

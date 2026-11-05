@@ -1,21 +1,22 @@
 import React,{useEffect,useLayoutEffect,useRef,useState} from 'react';
 import {createPortal} from 'react-dom';
 import {formatValue} from '../params';
+import {SHAPE_NAMES,stageShape,exponentAt} from './envShapes';
 
 // A pop-out curve editor for one DIY envelope, in the style of the Juno's envelope shape editor. The three stage handles bend
 // the stage's curve exponent: drag one up or down to move that stage's midpoint (1 is a straight line). The plot uses the
 // engine's own stage formulas: attack rises as progress^c, decay falls from 1 to the sustain level as progress^c, and release
-// falls from where it started as remaining^c. The amp envelope also has a hold: the attack rises to the hold level, stays there for
+// falls from where it started as remaining^c. A stage can instead be logarithmic (the same curve mirrored) or a sine, when the patch has shapes. The amp envelope also has a hold: the attack rises to the hold level, stays there for
 // the hold time, and the decay then moves from that level to the sustain (which can be above it, a swell).
 const W=300,H=120,PAD=8,MIN=.25,MAX=4,HALF=Math.log(.5);
 const STAGES=[['A','Attack'],['D','Decay'],['R','Release']];
 const clamp=(x,lo,hi)=>Math.min(hi,Math.max(lo,x));
-const toCurve=q=>+clamp(Math.round(Math.log(clamp(q,.0625,.84))/HALF/.05)*.05,MIN,MAX).toFixed(2);
+const toCurve=(q,mode=0)=>+clamp(Math.round(exponentAt(q,mode)/.05)*.05,MIN,MAX).toFixed(2);
 
-export default function DiyEnvEditor({title,anchor,onClose,values,specs,change,curves,times,sustain:sustainKey,hold}){
+export default function DiyEnvEditor({title,anchor,onClose,values,specs,change,curves,times,sustain:sustainKey,hold,shapes}){
  const box=useRef(null),drag=useRef(null);
  const [place,setPlace]=useState(null);
- const c=curves.map(k=>values[k]),sustain=clamp(values[sustainKey]??1,0,1);
+ const c=curves.map(k=>values[k]),m=curves.map((_,i)=>shapes?Math.round(values[shapes[i]]??0):0),sustain=clamp(values[sustainKey]??1,0,1);
  const holding=!!hold&&values[hold.time]>0,top=holding?clamp(values[hold.level]??1,.05,1):1;
  // where each stage sits along the width: a hold takes a share only while it is on
  const at=holding?{A:[0,.18],H:[.18,.34],D:[.34,.62],S:[.62,.76],R:[.76,1]}:{A:[0,.25],D:[.25,.5],S:[.5,.75],R:[.75,1]};
@@ -33,13 +34,13 @@ export default function DiyEnvEditor({title,anchor,onClose,values,specs,change,c
  },[anchor,onClose]);
 
  const stage=(i,[x0,x1],n=40)=>Array.from({length:n+1},(_,j)=>{
-  const f=j/n,y=i===0?top*f**c[0]:i===1?top+(sustain-top)*f**c[1]:sustain*(1-f)**c[2];
+  const f=j/n,y=i===0?top*stageShape(f,c[0],m[0]):i===1?top+(sustain-top)*stageShape(f,c[1],m[1]):m[2]?sustain*(1-stageShape(f,c[2],m[2])):sustain*(1-f)**c[2];
   return [x0+f*(x1-x0),y];
  });
  const pts=[...stage(0,at.A),...(holding?[[at.H[1],top]]:[]),...stage(1,at.D),[at.S[1],sustain],...stage(2,at.R).slice(1)];
  const sx=x=>PAD+x*(W-2*PAD),sy=y=>H-PAD-y*(H-2*PAD);
  const path=pts.map(([x,y],i)=>(i?'L':'M')+sx(x).toFixed(1)+' '+sy(y).toFixed(1)).join('');
- const mid=([a,b])=>(a+b)/2,handles=[[mid(at.A),top*.5**c[0]],[mid(at.D),top+(sustain-top)*.5**c[1]],[mid(at.R),sustain*.5**c[2]],...(holding?[[mid(at.H),top]]:[])];
+ const mid=([a,b])=>(a+b)/2,handles=[[mid(at.A),top*stageShape(.5,c[0],m[0])],[mid(at.D),top+(sustain-top)*stageShape(.5,c[1],m[1])],[mid(at.R),m[2]?sustain*(1-stageShape(.5,c[2],m[2])):sustain*.5**c[2]],...(holding?[[mid(at.H),top]]:[])];
  const down=(i,e)=>{e.preventDefault();e.currentTarget.setPointerCapture?.(e.pointerId);drag.current={i,id:e.pointerId};};
  const move=e=>{
   const d=drag.current;if(!d||d.id!==e.pointerId)return;
@@ -50,10 +51,11 @@ export default function DiyEnvEditor({title,anchor,onClose,values,specs,change,c
   if(d.i===0)q=level/top;
   else if(d.i===1){if(Math.abs(top-sustain)<.03)return;q=(level-top)/(sustain-top);}
   else{if(sustain<.03)return;q=level/sustain;}
-  change(curves[d.i],toCurve(q));
+  // q is how far along its stage the handle sits (the release's, how much of the sustain is left); the exponent that puts the midpoint there depends on the shape
+  change(curves[d.i],toCurve(d.i===2&&m[2]?1-q:q,m[d.i]));
  };
  const up=e=>{if(drag.current?.id===e.pointerId)drag.current=null;};
- const reset=()=>curves.forEach(k=>change(k,specs[k].default));
+ const reset=()=>{curves.forEach(k=>change(k,specs[k].default));shapes?.forEach(k=>change(k,specs[k].default));};
  const time=key=>key?formatValue(specs[key],values[key]):'';
  return createPortal(<div className="env-shape" ref={box} role="dialog" aria-label={title+' shape'} style={place?{left:place.left,top:place.top}:{visibility:'hidden'}}>
   <div className="env-shape-head">
@@ -74,12 +76,13 @@ export default function DiyEnvEditor({title,anchor,onClose,values,specs,change,c
     onKeyDown={e=>{if(i===3){const d=e.key==='ArrowUp'?.05:e.key==='ArrowDown'?-.05:0;if(d){e.preventDefault();change(hold.level,+clamp(top+d,.05,1).toFixed(2));}return;}const step=e.key==='ArrowUp'?.05:e.key==='ArrowDown'?-.05:0;if(step){e.preventDefault();change(curves[i],+clamp(c[i]+(i===1?step:-step),MIN,MAX).toFixed(2));}}}/>)}
   </svg>
   <div className="env-shape-controls">
-   {STAGES.map(([s,name],i)=><label key={s}><span>{name} curve</span>
+   {STAGES.map(([s,name],i)=><label key={s} className={shapes?'shaped':undefined}><span>{name} curve</span>
+    {shapes&&<select aria-label={name+' shape'} value={m[i]} onChange={e=>change(shapes[i],Number(e.target.value))}>{SHAPE_NAMES.map((n,k)=><option key={n} value={k}>{n}</option>)}</select>}
     <input type="range" min={MIN} max={MAX} step=".05" value={c[i]} onChange={e=>change(curves[i],Number(e.target.value))}/>
     <output>{c[i].toFixed(2)}</output></label>)}
    {hold&&<><label><span>Hold time</span><input type="range" min="0" max="4" step=".01" aria-label="Hold time" value={values[hold.time]} onChange={e=>change(hold.time,Number(e.target.value))}/><output>{values[hold.time].toFixed(2)} s</output></label>
     <label><span>Hold level</span><input type="range" min=".05" max="1" step=".01" aria-label="Hold level" disabled={!holding} value={top} onChange={e=>change(hold.level,Number(e.target.value))}/><output>{top.toFixed(2)}</output></label></>}
   </div>
-  <p className="env-shape-hint">Drag a handle to bend its stage. 1.00 is a straight line.{hold?' A hold keeps the attack at its level for a while before the decay; below the sustain it makes a swell.':''}</p>
+  <p className="env-shape-hint">Drag a handle to bend its stage. 1.00 is a straight line.{shapes?' Logarithmic mirrors the curve, so a decay falls fast and settles slowly.':''}{hold?' A hold keeps the attack at its level for a while before the decay; below the sustain it makes a swell.':''}</p>
  </div>,document.body);
 }

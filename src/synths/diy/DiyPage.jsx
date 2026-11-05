@@ -106,13 +106,13 @@ function Editor({fm,api,layer,setLayer,link,setLink,operator,setOperator,synth})
  // two-way choices as horizontal switches, stacked in one column
  const switches=(pre,entries,tone)=><div className="htoggle-stack" key="switches">{entries.map(([k,label])=>{const key=at(pre,k),spec=synth.params.BY_KEY[key];return <HToggle key={key} spec={spec} options={OPTIONS[k].map(short)} titles={OPTIONS[k]} value={values[key]} onChange={change} tone={tone} label={label}/>;})}</div>;
  // an envelope box: its stages as faders and a Shape button that opens the curve editor (the three stage curves live there)
- const envBox=(id,title,keys,tone,pre,{curves,times,sustain,timing,hold})=>{
+ const envBox=(id,title,keys,tone,pre,{curves,times,sustain,timing,hold,shapes})=>{
   const open=shapeOpen?.id===id,all=k=>pre+k;
   return <FloatBox key={id} id={id} title={title} tone={tone} actions={<><button type="button" className="shape-open" aria-expanded={open} title="Envelope curves" onClick={e=>{const anchor=e.currentTarget;setShapeOpen(o=>o?.id===id?null:{id,anchor});}}>Shape</button>
    {timing&&<span className="timing-radio" role="radiogroup" aria-label="Envelope timing">{['Current','Legacy'].map((name,i)=><button type="button" key={name} role="radio" aria-checked={values[pre+timing]===i} className={values[pre+timing]===i?'on':''} title={i?'The older envelope timing':'The current envelope timing'} onClick={()=>change(pre+timing,i)}>{name}</button>)}</span>}</>}>
    {keys.map(k=>field(Array.isArray(k)?[at(pre,k[0]),k[1]]:at(pre,k),tone))}
    {open&&<DiyEnvEditor title={title} anchor={shapeOpen.anchor} onClose={()=>setShapeOpen(null)} values={values} specs={synth.params.BY_KEY} change={change}
-    curves={curves.map(all)} times={Object.fromEntries(Object.entries(times).map(([s,k])=>[s,all(k)]))} sustain={all(sustain)} hold={hold&&{time:all(hold.time),level:all(hold.level)}}/>}
+    curves={curves.map(all)} times={Object.fromEntries(Object.entries(times).map(([s,k])=>[s,all(k)]))} sustain={all(sustain)} hold={hold&&{time:all(hold.time),level:all(hold.level)}} shapes={shapes?.map(all)}/>}
   </FloatBox>;
  };
  const lfo1=fm?[['lfoRate','Rate'],['lfoShape','Shape'],['lfoDelay','Fade'],'|',['vibrato','Pitch'],['tremolo','Amp'],['lfoIndex','Index']]:[['lfoRate','Rate'],['lfoShape','Shape'],['lfoDelay','Fade'],['lfoPitch','Pitch'],['lfoFilter','Filter'],['lfoPwm','PWM']];
@@ -164,7 +164,7 @@ function Editor({fm,api,layer,setLayer,link,setLink,operator,setOperator,synth})
     </div>
     <div className="pf-row">
      {frame('lfo',group('lfo1','LFO 1',lfo1,'violet',prefix,lamp(values[prefix+'lfoRate'])),group('lfo2','LFO 2',lfo2,'violet',prefix,lamp(values[prefix+'lfo2Rate'])),group('drift','Drift',driftKeys,'violet','',lamp(values[prefix+'wanderRate']*2)))}
-     {frame('env',envBox('amp-env','Amp',amp,'amber',prefix,{curves:['ampAttackCurve','ampDecayCurve','ampReleaseCurve'],times:{A:'attack',D:'decay',R:'release'},sustain:'sustain',timing:'legacyAmp',hold:{time:'ampHold',level:'ampHoldLevel'}}),envBox('filter-env','Filter',filterEnv,'amber',prefix,{curves:['filterAttackCurve','filterDecayCurve','filterReleaseCurve'],times:{A:'filterAttack',D:'filterDecay',R:'filterRelease'},sustain:'filterSustain'}),envBox('mod-env','Mod',modEnv,'amber',prefix,{curves:['modAttackCurve','modDecayCurve','modReleaseCurve'],times:{A:'modAttack',D:'modDecay',R:'modRelease'},sustain:'modSustain'}),group('pitch-env','Pitch',[['pitchEnvAmount','Amount'],['pitchEnvDecay','Decay']],'amber',prefix))}
+     {frame('env',envBox('amp-env','Amp',amp,'amber',prefix,{curves:['ampAttackCurve','ampDecayCurve','ampReleaseCurve'],times:{A:'attack',D:'decay',R:'release'},sustain:'sustain',timing:'legacyAmp',hold:{time:'ampHold',level:'ampHoldLevel'},shapes:['ampAttackShape','ampDecayShape','ampReleaseShape']}),envBox('filter-env','Filter',filterEnv,'amber',prefix,{curves:['filterAttackCurve','filterDecayCurve','filterReleaseCurve'],times:{A:'filterAttack',D:'filterDecay',R:'filterRelease'},sustain:'filterSustain',shapes:['filterAttackShape','filterDecayShape','filterReleaseShape']}),envBox('mod-env','Mod',modEnv,'amber',prefix,{curves:['modAttackCurve','modDecayCurve','modReleaseCurve'],times:{A:'modAttack',D:'modDecay',R:'modRelease'},sustain:'modSustain',shapes:['modAttackShape','modDecayShape','modReleaseShape']}),group('pitch-env','Pitch',[['pitchEnvAmount','Amount'],['pitchEnvDecay','Decay']],'amber',prefix))}
     </div>
    </div>
    {matrixBox}

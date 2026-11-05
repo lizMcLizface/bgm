@@ -1,4 +1,5 @@
 import React,{useState} from 'react';
+import {OledPicker} from '../diy/DiyControls';
 import SynthShell from '../ui/SynthShell';
 import {SYNTHS} from '../models';
 import {LAYER_KEYS,LOWER} from './params';
@@ -32,7 +33,7 @@ const ROWS=[
  ],
 ];
 const KEY_MODE={title:'Key mode',tone:'green',keys:[['keyMode','Mode'],['splitPoint','Split'],['balance','Balance']]};
-const REVERB={title:'Reverb',tone:'blue',keys:['reverbMix','reverbDecay','reverbTone','reverbSize','reverbPredelay']};
+const CHORUS={title:'Chorus',tone:'blue',keep:true,keys:[['chorusMix','Mix'],['chorusRate','Rate'],['chorusDepth','Depth']]};
 const NAMES={upper:'Upper',lower:'Lower'};
 
 /** Copies one layer's patch onto the other. */
@@ -47,7 +48,7 @@ function copyLayer(values,from){
 export default function JupiterPage(){
  const [layer,setLayer]=useState('upper');
  const libraries=[{id:'tape',label:'Tape',render:({choose,values,current})=><TapeBrowser choose={choose} values={values} current={current} layer={layer}/>}];
- return <SynthShell synth={SYNTHS.jupiter8} className="jupiter" panelClassName="complete" libraries={libraries}>
+ return <SynthShell synth={SYNTHS.jupiter8} className="jupiter" panelClassName="complete" libraries={libraries} helpInBar picker={OledPicker}>
   {({group,values,replaceValues})=>{
    const prefix=layer==='lower'?LOWER:'';
    const silent=values.keyMode===0&&layer==='lower';
@@ -65,7 +66,7 @@ export default function JupiterPage(){
     {i===0&&picker}
     {i===2&&group(KEY_MODE)}
     {row.map(g=>group(g,prefix))}
-    {i===0&&group(REVERB)}
+    {i===0&&group(CHORUS)}
    </div>);
   }}
  </SynthShell>;

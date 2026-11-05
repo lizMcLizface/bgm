@@ -30,11 +30,10 @@ import EmbeddedShell,{useEnsemblePanel} from './EmbeddedShell';
 // Everything a /synths page shares: audio start, MIDI piano, computer keys,
 // sounds (factory + saved), setup, the ribbon/pad/keys strip and screen wake.
 // A page supplies its synth definition and draws its own panel.
-export const SETUP_KEY='synths:setup';
+import {SETUP_KEY,SETUP,CURVES,computerKeyVelocity} from './setup';
+export {SETUP_KEY};
 // the comparison-bank bar (Compare presets) is hidden for now; its code stays
 const SHOW_COMPARISON=false;
-const SETUP={midiDevice:'all',midiChannel:'all',velocity:'normal',ribbonRange:12,wheelRange:2,latency:'interactive',keys:'auto',keysLow:48,keysCount:25};
-const CURVES={light:{curve:.6,floor:.08},normal:{curve:1,floor:.06},firm:{curve:1.6,floor:.04}};
 const dirty=name=>name.endsWith(' *')?name:name+' *';
 function clearComparisonLink(){
  const url=new URL(window.location.href);
@@ -89,7 +88,7 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
  const closeShape=useCallback(()=>setShapeOpen(null),[]);
  const SHELF_KEY=`synths:${synth.id}:shelf`;
  // the instrument's case and the keyboard box can each be moved by their grip, and are remembered
- const rigDrag=useDraggable(`synths:${synth.id}:rig-pos`),keysDrag=useDraggable('synths:keys-pos',s=>onSynth('diy-fm')?{x:0,y:10}:onSynth('cs80','juno')?{x:0,y:73}:({x:Math.round(s.w*.222),y:Math.round(s.h*.208)}));
+ const rigDrag=useDraggable(`synths:${synth.id}:rig-pos`),keysDrag=useDraggable('synths:keys-pos',s=>onSynth('diy-fm','dx7','minimoog','prophet','jupiter','obxa')?{x:0,y:10}:onSynth('cs80','juno')?{x:0,y:73}:({x:Math.round(s.w*.222),y:Math.round(s.h*.208)}));
  const [showHelp,setShowHelp]=useState(false),helpRef=useRef(null);
  useEffect(()=>{
   if(!showHelp)return undefined;
@@ -203,7 +202,7 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
    onStatus:inputs=>setMidi({inputs,status:inputs.length?`${inputs.length} MIDI input${inputs.length>1?'s':''} connected.`:'MIDI ready · plug in your piano.'}),
   });
   m.selected=setupRef.current.midiDevice;m.channel=setupRef.current.midiChannel;midiRef.current=m;
-  const keyboard=bindLabKeyboard(window,{on:(key,note)=>performer.down(key,note,.75),off:key=>performer.up(key),panic:()=>performer.panic(),octave:()=>Math.floor(setupRef.current.keysLow/12)-1,shift:d=>setSetup(s=>({...s,keysLow:Math.min(84,Math.max(24,s.keysLow+12*d))}))});
+  const keyboard=bindLabKeyboard(window,{on:(key,note)=>performer.down(key,note,computerKeyVelocity(setupRef.current)),off:key=>performer.up(key),panic:()=>performer.panic(),octave:()=>Math.floor(setupRef.current.keysLow/12)-1,shift:d=>setSetup(s=>({...s,keysLow:Math.min(84,Math.max(24,s.keysLow+12*d))}))});
   const blur=()=>performer.releaseLocal();window.addEventListener('blur',blur);
   return ()=>{keyboard();m.dispose();window.removeEventListener('blur',blur);performer.panic();engine.current?.close();engine.current=null;};
  },[performer,velocity]);
@@ -239,7 +238,7 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
    const phrase=phraseForCode(e.code);
    if(phrase){if(!keyboard)return;if(audioOn.current){e.preventDefault();phrases.play(phrase);}return;}
    const arrow={ArrowLeft:[-1,false],ArrowRight:[1,false],ArrowUp:[-1,true],ArrowDown:[1,true]}[e.key];
-   if(arrow){if(stepSound(...arrow))e.preventDefault();}
+   if(arrow){if(!e.target?.closest?.('.sound-grid')&&stepSound(...arrow))e.preventDefault();}
    else if(e.code==='KeyN'&&makeSound())e.preventDefault();
   };
   const escape=e=>{if(e.key==='Escape')phrases.stop();};
@@ -371,7 +370,7 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
   {showSetup&&<SetupPopover midi={midi} setup={setup} updateSetup={updateSetup} connectMidi={connectMidi} audio={audio} start={start} onClose={()=>setShowSetup(false)}/>}
 
   <footer className="perform">
-   {showKeys&&<StageKeys drag={keysDrag} low={setup.keysLow} onLow={v=>updateSetup('keysLow',v)} notes={notes} context={context} chord={chordPick}
+   {showKeys&&<StageKeys drag={keysDrag} size={setup.keysSize} controls={setup.keysControls} onLayout={updateSetup} low={setup.keysLow} onLow={v=>updateSetup('keysLow',v)} notes={notes} context={context} chord={chordPick}
     onDown={(key,note,v)=>performer.down(key,note,velocity(v??.75))} onUp={key=>performer.up(key)} onMod={v=>performer.source('wheelMod',v)}
     head={<>
      <AutoPlay playing={phrasePlaying} onPlay={id=>{if(audio.state==='on')phrases.play(id);}} onStop={()=>phrases.stop()} sounds={{make:makeSound,canMake:!!synth.generate}}/>

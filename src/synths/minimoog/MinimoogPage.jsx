@@ -1,6 +1,7 @@
 import React from 'react';
 import SynthShell from '../ui/SynthShell';
 import {SYNTHS} from '../models';
+import {OledPicker} from '../diy/DiyControls';
 
 // Laid out after the original panel: controllers, the oscillator bank, the mixer, then
 // the modifiers (filter, contours); the additions for playing it from a piano come last.
@@ -21,12 +22,12 @@ const ROWS=[
   {title:'Loudness contour',tone:'amber',keys:[['aAttack','A'],['aDecay','D'],['aSustain','S'],['decayOn','Decay']],shape:{env:'amp',a:'aAttack',d:'aDecay',s:'aSustain',r:v=>v.decayOn>=.5?v.aDecay:.012}},
   {title:'Touch (additions)',tone:'violet',keys:[['velContour','Vel → contour'],['velLevel','Vel → level'],['afterFilter','Touch → filter']]},
   {title:'Output',tone:'blue',keys:['volume',['oversample','2× rate']]},
-  {title:'Reverb',tone:'blue',keys:['reverbMix','reverbDecay','reverbTone','reverbSize','reverbPredelay']},
+  {title:'Chorus',tone:'blue',keep:true,keys:[['chorusMix','Mix'],['chorusRate','Rate'],['chorusDepth','Depth']]},
  ],
 ];
 
 export default function MinimoogPage(){
- return <SynthShell synth={SYNTHS.minimoog} className="minimoog" panelClassName="complete">
+ return <SynthShell synth={SYNTHS.minimoog} className="minimoog" panelClassName="complete" helpInBar picker={OledPicker}>
   {({group})=>ROWS.map((row,i)=><div className="panel-row" key={i}>{row.map(g=>group(g))}</div>)}
  </SynthShell>;
 }

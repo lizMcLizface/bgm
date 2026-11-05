@@ -1,5 +1,7 @@
 import React,{useRef,useState} from 'react';
 import SoundPicker,{soundList,nextSound} from '../ui/SoundPicker';
+import SoundGrid from '../ui/SoundGrid';
+import {load,save} from '../storage';
 import {MODELS} from '../../synth-lab/patch';
 import {topology,FM_ALGORITHMS} from '../../synth-lab/fmPatch';
 import {applyTopology} from './patches';
@@ -19,11 +21,15 @@ export function OledPicker(props){
  const {synth,presets,mine,current,currentCategory,choose}=props;
  const list=soundList(synth,presets,mine);
  const step=dir=>{const next=nextSound(list,current,currentCategory,dir,false);if(next)choose(next);};
+ const GRID_KEY='synths:'+synth.id+':grid-open',[grid,setGrid]=useState(()=>load(GRID_KEY,false));
+ const toggleGrid=()=>setGrid(g=>{save(GRID_KEY,!g);return !g;});
  return <div className="oled-picker">
  <PresetKnob onStep={step}/>
   <SoundPicker {...props} display={({open,ref,category,name,expanded,active})=><button ref={ref} type="button" className="oled" style={{'--accent':active?.colour}} aria-haspopup="dialog" aria-expanded={expanded} onClick={open} title="Browse every sound">
    <span className="oled-cat">{category}</span><span className="oled-name" key={name} style={{'--n':Math.min(name.length,22)}}>{name}</span>
   </button>}/>
+  <button type="button" className="oled-grid" aria-pressed={grid} aria-label="Sound grid" title="Every sound in one movable grid, coloured by category" onClick={toggleGrid}>▦</button>
+  {grid&&<SoundGrid {...props} onClose={toggleGrid}/>}
   </div>;
 }
 

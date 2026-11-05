@@ -1,7 +1,7 @@
 // Prophet-5 parameter table. Ids must match synth-engine/classics/src/prophet.rs; the
 // shared space effects (ids from 200) come from ../params. Append-only: saved
 // patches use keys. Row format: see defineParams.
-import {defineParams,SPACE} from '../params';
+import {defineParams,SPACE_DRY} from '../params';
 import {shapeRows} from '../ui/envShape';
 
 const ON=['Off','On'];
@@ -90,5 +90,10 @@ export const {PARAMS,BY_KEY,defaultValues,clampValue,sanitize,toPairs}=definePar
  // envelope shapes (ids 180–195, one set for the whole patch)
  ...shapeRows('amp'),
  ...shapeRows('filter'),
- ...SPACE,
+ ...SPACE_DRY,
 ]);
+
+// The reverb is the rack's Reverb (effects/params.js moves it): the engine's own stays at nothing. The chorus stays on the panel.
+const REVERB_MIX=BY_KEY.reverbMix.id;
+const basePairs=toPairs;
+export const toEnginePairs=values=>basePairs(values).map(([id,v])=>id===REVERB_MIX?[id,0]:[id,v]);

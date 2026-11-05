@@ -1,8 +1,14 @@
-import React,{useRef} from 'react';
+import React,{useEffect,useRef,useState} from 'react';
 import SynthShell from '../ui/SynthShell';
 import {SYNTHS} from '../models';
 import Transport from '../seq/Transport';
 import {useSequencer} from '../seq/useSequencer';
+import useCoreClock from '../../seq/useCoreClock';
+import {BASS_KEY} from '../../seq/targets/bass';
+import {load,save} from '../storage';
+import SongStrip from '../drums/SongStrip';
+import {BassMachineTop,BassMachineVoice,BassVoicePanel} from './BassMachine';
+import '../drums/drums.css';
 import {LINES,emptyPattern,validPattern,linePattern,patternCommands,stepWord} from './presets';
 
 const NOTE_NAMES=['C','C♯','D','D♯','E','F','F♯','G','G♯','A','A♯','B','C'];
@@ -25,7 +31,7 @@ function BassGrid({pattern,length,onStep,headRef}){
   const st=pattern[s];
   onStep(s,paint.current==='off'?{...st,kind:0}:{...st,kind:1,note:row});
  };
- return <section className="group wide seq-grid bass-grid" onPointerUp={()=>{paint.current=null;}} onPointerLeave={()=>{paint.current=null;}}>
+ return <section className="group wide seq-grid bass-grid" style={{'--voice':'#e0a526'}} onPointerUp={()=>{paint.current=null;}} onPointerLeave={()=>{paint.current=null;}}>
   <div className="seq-names">
    {ROWS.map((r,i)=><span key={i} className={'seq-name piano'+(BLACK.includes(r)?' black':'')}>{NOTE_NAMES[r]}</span>)}
    <span className="seq-name piano tie">TIE</span>
@@ -62,18 +68,51 @@ export default function Tb303Page(){
   seq.replacePattern(b.current,pattern.map((x,i)=>i===s?step:x));
   seq.send([[1,b.current*16+s,stepWord(step)]]);
  };
+ // a light on the bass voice when a note starts, read from the playhead so it follows either clock
+ const machine=useRef(null);
+ useEffect(()=>{
+  let raf,last=-1;
+  const frame=()=>{
+   raf=requestAnimationFrame(frame);
+   const head=seq.head.current,root=machine.current;if(!head||!root)return;
+   const step=Number(head.style.getPropertyValue('--step'));
+   if(step===last)return;
+   last=step;if(!(step>=0))return;
+   const b=seq.bankRef.current;
+   if(b.patterns[b.current][step]?.kind===1){const el=root.querySelector('[data-track="0"]');if(el){el.classList.remove('hit');void el.offsetWidth;el.classList.add('hit');setTimeout(()=>el.classList.remove('hit'),140);}}
+  };
+  raf=requestAnimationFrame(frame);
+  return ()=>cancelAnimationFrame(raf);
+ },[]);// eslint-disable-line react-hooks/exhaustive-deps
+ const pad=()=>{const live=seq.live.current;if(!live)return;live.noteOn(BASS_KEY+1,48,.9);setTimeout(()=>live.noteOff(BASS_KEY+1),260);};
+ // The sequencer core (src/seq) books the notes on the audio clock, with slides and ties as overlapping notes; the engine's own sequencer is the fallback.
+ const [core,setCore]=useState(()=>load('synths:core-clock',true)!==false);
+ const valuesRef=useRef({});
+ const clock=useCoreClock({seq,bass:true,values:()=>valuesRef.current,enabled:core});
+ const chooseClock=on=>{if(seq.playing)seq.togglePlay();save('synths:core-clock',on);setCore(on);};
+ const view=core?{...seq,togglePlay:clock.toggle}:seq;
  const libraries=[{id:'lines',label:'Lines',render:()=><>{LINES.map(l=><button type="button" key={l.name} title="Replaces the pattern you are editing" onClick={()=>seq.load(linePattern(l))}>{l.name}</button>)}</>}];
- return <SynthShell synth={synth} className="tb303" panelClassName="complete seq" libraries={libraries} onEngine={seq.onEngine} onStats={seq.onStats} onMidiRealtime={seq.onMidiRealtime}>
-  {({group})=>[
-   <div className="panel-row knobs" key="0">
-    {group({title:'Tuning',tone:'cream',keys:['tune',['wave','Wave']]})}
-    {group({title:'Filter',tone:'red',keys:['cutoff','resonance','envMod','decay','accent']})}
-    {group({title:'Output',tone:'blue',keys:['slide','drive','volume']})}
-    {group({title:'Tempo',tone:'amber',keys:['tempo','swing']})}
-    {group({title:'Reverb',tone:'blue',keys:['reverbMix','reverbDecay','reverbTone']})}
-   </div>,
-   <div className="panel-row" key="1"><Transport seq={seq}/></div>,
-   <div className="panel-row" key="2"><BassGrid pattern={bank.patterns[bank.current]} length={bank.lengths[bank.current]} onStep={setStep} headRef={seq.head}/></div>,
-  ]}
+ return <SynthShell synth={synth} compactRack keyboard={false} className="drums tb303" panelClassName="complete seq" libraries={libraries} onEngine={seq.onEngine} onStats={seq.onStats} onMidiRealtime={core?undefined:seq.onMidiRealtime}>
+  {({values,change})=>{
+   valuesRef.current=values;
+   // Two devices side by side, as on a desk: the sequencer sends notes, the bass machine plays them.
+   return <div className="split" key="split" style={{'--rows':ROWS.length+1+FLAGS.length}}>
+    <section className="device device-seq" aria-label="Sequencer">
+     <header className="device-head"><h2>Sequencer</h2><span>{core?'sequencer core · timed notes':'built-in clock'}</span><span className="device-out">notes → {synth.name}</span></header>
+     <div className="device-top"><Transport seq={view} chain={false}>
+      <label className="inline toggle" title="The sequencer core books timed notes on the audio clock instead of the engine's own sequencer; slides and ties are notes that overlap."><input type="checkbox" checked={core} onChange={e=>chooseClock(e.target.checked)}/> Core clock <em>for songs and steady timing</em></label>
+     </Transport><SongStrip seq={seq} core={core}/></div>
+     <div className="seq-body"><BassGrid pattern={bank.patterns[bank.current]} length={bank.lengths[bank.current]} onStep={setStep} headRef={seq.head}/></div>
+    </section>
+    <section className="device device-machine" ref={machine} aria-label={synth.name+' bass machine'}>
+     <header className="device-head"><h2>{synth.name} bass machine</h2><span>{synth.subtitle}</span></header>
+     <BassMachineTop synth={synth} values={values} change={change}/>
+     <div className="dm-lower">
+      <BassMachineVoice synth={synth} values={values} change={change} onPad={pad}/>
+      <BassVoicePanel synth={synth} values={values} change={change}/>
+     </div>
+    </section>
+   </div>;
+  }}
  </SynthShell>;
 }

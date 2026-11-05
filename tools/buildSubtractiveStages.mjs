@@ -22,7 +22,7 @@ function outline(start,end,name,outputs=[]){
  source=source.slice(0,a)+(outputs.length?'let '+result+' = ':'')+name+'(|| {\n'+body+'\n'+result+'\n});\n'+source.slice(b);
 }
 if(!trial){
-outline('                    let amp = v.amp[l].next(p, 17, 59, self.sr);','                    for u in 0..unison {','profile_stage_modulation',['amp','fe','pressure','modulation','env_pitch','pitch','pwm','vel','update']);
+outline('                    let amp = v.amp[l].next(p, 17, 59, 107, self.sr);','                    for u in 0..unison {','profile_stage_modulation',['amp','fe','pressure','modulation','env_pitch','pitch','pwm','vel','update']);
 outline('                        if update {\n                            let position','                        let [dt_a, dt_b] = lane.dt;','profile_stage_control');
 outline('                        let [dt_a, dt_b] = lane.dt;','                        lane.g += (lane.target_g - lane.g)','profile_stage_oscillators',['x','raw_b']);
 outline('                        lane.g += (lane.target_g - lane.g)','                        let amp = amp\n','profile_stage_filters',['filtered']);

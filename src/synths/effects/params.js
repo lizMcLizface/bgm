@@ -45,8 +45,8 @@ export function cleanRack(){return {...RACK_PARAMS.defaultValues(),'effects.reve
 // Synths whose own reverb lives in the rack's Reverb instead: the sound keeps its reverb settings (so presets and saved patches carry
 // on), and the rack shows and edits them as its reverb. The synth's own reverb is silent (its toPairs, see cs80/params.js).
 const REVERB_MAP={reverbMix:['effects.reverb',1],reverbDecay:['effects.decay',1],reverbTone:['effects.damping',1],reverbSize:['effects.size',1],reverbPredelay:['effects.predelay',1000]};
-// both keep their chorus on the panel
-const MOVED_MAPS={cs80:REVERB_MAP,juno:REVERB_MAP};
+// all of them keep their chorus on the panel (the FM7 and Mercury D have no delay of their own, only a reverb)
+const MOVED_MAPS={cs80:REVERB_MAP,juno:REVERB_MAP,dx7:REVERB_MAP,minimoog:REVERB_MAP,prophet5:REVERB_MAP,jupiter8:REVERB_MAP,obxa:REVERB_MAP};
 export const movesSpace=synth=>!!MOVED_MAPS[synth.id];
 /** The rack units a sound's own space settings call for, so choosing the sound brings them into the chain. */
 export const spaceUnitsUsed=(synth,values)=>movesSpace(synth)?[...(values.reverbMix>0?['space']:[]),]:[];

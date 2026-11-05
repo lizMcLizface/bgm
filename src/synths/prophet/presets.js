@@ -21,7 +21,7 @@ const RAW=[
  {name:'Fifths Bass',category:'bass',styles:['fifths'],colour:'#3f6b4f',note:'Osc B a fifth above Osc A, tight envelope, half key tracking.',values:{
   aSaw:1,aFreq:-12,bSaw:1,bPulse:1,bPw:.4,bFreq:-5,bFine:3,mixA:1,mixB:.75,cutoff:110,res:.3,fEnv:.4,track:1,
   fAttack:.001,fDecay:.35,fSustain:.15,fRelease:.12,aAttack:.001,aDecay:.6,aSustain:.7,aRelease:.08,velFilter:.5,velAmp:.4,
-  voices:5,width:.1,reverbMix:.03,volume:.64}},
+  voices:5,width:.1,volume:.64}},
  {name:'Poly-Mod Bell',category:'bells',styles:['metallic', 'poly-mod'],colour:'#9b7fd1',note:'Osc B frequency-modulates Osc A at audio rate: clangorous, bell-like partials.',values:{
   aSaw:0,aPulse:1,aPw:.5,bTri:1,bSaw:0,bFreq:19,bFine:0,mixA:.9,mixB:0,pmOscB:.55,pmFreqA:1,cutoff:950,res:.08,fEnv:.3,track:2,fAttack:.001,fDecay:2.2,fSustain:0,fRelease:1.2,
   pmEnv:0,aAttack:.001,aDecay:3.5,aSustain:0,aRelease:1.8,velFilter:.5,velAmp:.5,reverbMix:.35,reverbDecay:5,volume:.645}},

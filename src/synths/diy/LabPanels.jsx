@@ -13,7 +13,7 @@ const TUNE=defineParams([
  ['octave',12,'Octave',1.5,2.5,2,'decimal','lin'],['a4',13,'A4',400,480,440,'Hz','lin'],['shift',14,'Shift',-100,100,0,'ct','lin'],
 ]);
 
-function Window({id,title,home,onClose,children,wide}){
+export function Window({id,title,home,onClose,children,wide}){
  const float=useFloating('synths:diy:lab:'+id,home),desk=useDesk();
  // on the desk, so it moves and scales with the rest
  return createPortal(<section ref={float.ref} className={'group lab-window'+(wide?' wide':'')} style={float.style} onPointerDownCapture={float.raise}>

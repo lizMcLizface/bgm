@@ -26,14 +26,22 @@ it('preserves organ/hollow waveforms and active sine subs rather than substituti
 });
 it('carries the requested delay tone and modulation rates into the translated effect chain',()=>{
  const p=translatedWasmPreset({chorusAmount:.3,chorusRate:.8,chorusDepth:.002,flangerAmount:.2,flangerRate:.1,flangerDepth:.003,flangerDelay:.006,flangerFeedback:.6,delayAmount:.24,delayTime:.3,delayFeedback:.75,delayTone:7775});
- expect(p.inserts).toMatchObject({chorus:.3,chorusRate:.8,chorusDepth:2,flanger:.2,flangerRate:.1,flangerDepth:3,flangerDelay:6,flangerFeedback:.6});expect(p.effects).toMatchObject({delay:.24,feedback:.75,tone:7775,delayMs:300,pingPong:0,delayToReverb:0});
+ expect(p.inserts).toMatchObject({chorus:.375,chorusRate:.8,chorusDepth:2.3,flanger:.4,flangerRate:.1,flangerDepth:3,flangerDelay:6,flangerFeedback:.6});expect(p.effects).toMatchObject({delay:.24,feedback:.75,tone:7775,delayMs:300,pingPong:0,delayToReverb:0});
+});
+it('maps the original modulation effects onto the kernels: half-wet mixes, twelve phaser stages, and the level the original loses to its chorus',()=>{
+ const p=translatedWasmPreset({phaserAmount:.25,phaserRate:.15,phaserDepth:800,phaserFrequency:800,phaserFeedback:.3});
+ // six second-order allpasses are twelve first-order ones; the sweep is the same range of Hz, in octaves about its geometric centre
+ expect(p.inserts).toMatchObject({phaser:.625,phaserStages:12});expect(p.inserts.phaserDepth).toBeCloseTo(.5*Math.log2(9),6);expect(p.inserts.phaserFreq).toBeCloseTo(480,6);
+ const level=(raw)=>translatedWasmPreset(raw).inserts.gain-translatedWasmPreset({...raw,chorusAmount:0}).inserts.gain;
+ // the original's chorus is quieter the more of it there is: 3 dB at 0.3, 5 dB at 0.5
+ expect(level({chorusAmount:.3})).toBeCloseTo(-2.9,0);expect(level({chorusAmount:.5})).toBeCloseTo(-5,0);expect(level({chorusAmount:0})).toBe(0);
 });
 it('exposes unresolved source/effect mappings instead of treating availability as parity',()=>{
  expect(wasmMappingNotes({vcoType:'sine'})).toEqual([]);
- expect(wasmMappingNotes({vcoType:'triangle',fmIndex:1,voiceCount:6,gainHold:1,reverbAmount:.3})).toEqual(expect.arrayContaining(['FM waveform/unison mapping incomplete','hold/custom envelope shape not mapped','unison limited to four','FDN room replaces the original impulse response']));
+ expect(wasmMappingNotes({vcoType:'triangle',fmIndex:1,voiceCount:10,gainHold:1,reverbAmount:.3})).toEqual(expect.arrayContaining(['FM waveform/unison mapping incomplete','hold/custom envelope shape not mapped','unison limited to eight','FDN room replaces the original impulse response']));
 });
 it('translates oscillator/envelope/effect controls into bounded source parameters',()=>{
- const {kind,patch:p}=translatedWasmVoice({vcoType:'sawtooth',osc2Type:'square',gainAttack:.7,gainRelease:2,filterFreq:1400,pingPongAmount:.4,pingPongDelayTime:.6,voiceCount:8},32);expect(kind).toBe('subtractive');expect(p.global.polyphony).toBe(16);expect(p.global.unison).toBe(4);expect(p.layers[0]).toMatchObject({waveA:3,waveB:4,attack:.7,release:2,cutoff:1400});expect(p.effects).toMatchObject({pingPong:1,delayMs:600});expect(Object.values(p.global).every(Number.isFinite)).toBe(true);
+ const {kind,patch:p}=translatedWasmVoice({vcoType:'sawtooth',osc2Type:'square',gainAttack:.7,gainRelease:2,filterFreq:1400,pingPongAmount:.4,pingPongDelayTime:.6,voiceCount:8},32);expect(kind).toBe('subtractive');expect(p.global.polyphony).toBe(16);expect(p.global.unison).toBe(8);expect(p.layers[0]).toMatchObject({waveA:3,waveB:4,attack:.7,release:2,cutoff:1400});expect(p.effects).toMatchObject({pingPong:1,delayMs:600});expect(Object.values(p.global).every(Number.isFinite)).toBe(true);
 });
 
 it('carries the mid EQ band and the room controls into the translated patch',()=>{

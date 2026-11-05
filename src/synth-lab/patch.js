@@ -5,7 +5,7 @@ import {VOICE_COLOUR} from './voiceColour';
 import {sanitizeNoteBehavior} from './noteBehavior';
 // Append-only ABI parameter IDs shared with synth-engine/src/lib.rs.
 export const GLOBAL=[
- ['model','Architecture',0,3,1,0],['polyphony','Note voices',1,32,1,8],['unison','Unison per note',1,4,1,1],['spread','Unison detune · cents',0,40,.5,8],
+ ['model','Architecture',0,3,1,0],['polyphony','Note voices',1,32,1,8],['unison','Unison per note',1,8,1,1],['spread','Unison detune · cents',0,40,.5,8],
  ['gain','Output gain',0,2,.01,.28],['bend','Pitch bend · semitones',-12,12,.1,0],['wheel','Mod wheel',0,1,.01,0],['pressure','Channel pressure',0,1,.01,0],
  ['chorus','Stereo chorus',0,.8,.01,0],['chorusRate','Chorus rate · Hz',.05,2,.01,.3],['chorusDepth','Chorus depth · ms',0,8,.1,3],['width','Unison width',0,1,.01,.65]
 ];
@@ -38,6 +38,10 @@ export const LAYER=[
  ['pitchEnvAmount','Pitch envelope · semitones',-24,24,.1,0],['pitchEnvDecay','Pitch envelope decay · s',.01,4,.01,.15],
  ['phaseLock','Restart oscillator phase',0,1,1,0],['bPhase','B start phase',0,1,.01,0],
  ['ampHoldLevel','Amp hold level',.05,1,.01,1],
+ // the stages' curve shapes: 0 power (the curve exponent), 1 mirrored (logarithmic), 2 sine; appended, so the ids above stay put
+ ['ampAttackShape','Amp attack shape',0,2,1,0],['ampDecayShape','Amp decay shape',0,2,1,0],['ampReleaseShape','Amp release shape',0,2,1,0],
+ ['filterAttackShape','Filter attack shape',0,2,1,0],['filterDecayShape','Filter decay shape',0,2,1,0],['filterReleaseShape','Filter release shape',0,2,1,0],
+ ['modAttackShape','Mod attack shape',0,2,1,0],['modDecayShape','Mod decay shape',0,2,1,0],['modReleaseShape','Mod release shape',0,2,1,0],
 ];
 export const MOD_SOURCES=['Off','LFO 1','LFO 2','Mod envelope','Amp envelope','Filter envelope','Velocity','Keyboard · centred on C4','Pressure','Mod wheel','Smooth random · per voice'];
 export const MOD_TARGETS=['Off','Pitch · ±100 cents','Cutoff · ±4 octaves','Pulse width · ±0.4','Amplitude · ±100%','Pan · ±full width'];

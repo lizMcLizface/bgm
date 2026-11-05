@@ -51,13 +51,17 @@ test('new engine output tap preserves stereo audio exactly and wraps mono scope 
 });
 
 test('the front page sounds appear translated: subtractive ones in Poly, FM ones in FM, none duplicated or left half-translated',()=>{
- for(const [schema,kind,count] of [[POLY,'subtractive',95],[FM,'fm',7]]){
+ for(const [schema,kind,count] of [[POLY,'subtractive',108],[FM,'fm',14]]){
   const translated=schema.presets.filter(p=>p.styles?.includes('front page'));
   expect(translated.length).toBe(count);
   expect(new Set(schema.presets.map(p=>p.name)).size).toBe(schema.presets.length);
   const ids=new Set(schema.categories.map(c=>c.id));
   for(const p of translated){expect(ids.has(p.category)).toBe(true);expect(schema.params.sanitize(p.values)).toEqual(p.values);}
  }
+ // the measured set and the native Wasm voices are in too (the plucked-string cello stays on the string page)
+ const names=new Set([...POLY.presets,...FM.presets].map(p=>p.name));
+ for(const name of ['Measured Celesta','Measured Choir Ah','Measured Epic Strings','Wasm Rosin Silk','Wasm Air Choir','Wasm Drawbars','Wasm Round FM Bass'])expect(names.has(name),name).toBe(true);
+ expect(names.has('Measured Cello Pizzicato')).toBe(false);expect(names.has('Measured Violin')).toBe(false);expect(names.has('Measured Cello')).toBe(false);
  expect(POLY.presets.slice(0,11).map(p=>p.name)).toContain('Layered noir');
 });
 
@@ -66,4 +70,50 @@ it('puts a front page bit crusher in the effects chain as a rack unit, only on t
  expect(crushed.rack).toMatchObject({'switch.crusher':1,'crusher.divide':4,'crusher.mix':.3});
  expect((crushed.rack['master.chain']>>9)&1).toBe(1);
  expect(POLY.presets.find(p=>p.name==='Warm Strings').rack).toBeUndefined();
+});
+
+describe('the DIY FM sound library',()=>{
+ const bytes=fs.readFileSync('public/synth-lab/fm.wasm'),wasm=new WebAssembly.Module(bytes);
+ const library=FM.presets.filter(p=>!p.styles?.includes('front page')&&!FM_RECIPES.some(r=>r.name===p.name));
+ const play=(patch,midi,velocity)=>{
+  const e=new WebAssembly.Instance(wasm,{}).exports;e.fm_init(48000);const k=fmPacket(patch);
+  for(const a of k.globals)e.fm_param(...a);for(const a of k.operators)e.fm_op(...a);for(const a of k.routes)e.fm_route(...a);for(const a of k.carriers)e.fm_carrier(...a);
+  e.fm_event(0,1,0,midi,velocity);e.fm_event(1,1,48000,0,0);
+  const out=new Float32Array(48000*2);for(let at=0;at<out.length;at+=128){e.fm_render(128);out.set(new Float32Array(e.memory.buffer,e.fm_output(0),128),at);}
+  return out;
+ };
+ it('has a bank the size of the other synths, spread across two to eight operators',()=>{
+  expect(library.length).toBeGreaterThanOrEqual(64);
+  for(let n=2;n<=8;n++)expect(library.filter(p=>p.values['global.operators']===n).length,`${n} operators`).toBeGreaterThanOrEqual(6);
+  expect(new Set(FM.presets.map(p=>p.name)).size).toBe(FM.presets.length);
+  const ids=new Set(FM.categories.map(c=>c.id));
+  for(const p of library){expect(ids.has(p.category),p.name).toBe(true);expect(FM.params.sanitize(p.values),p.name).toEqual(p.values);}
+ });
+ it('gives every sound its own space instead of the synth default, and uses the rack beyond reverb and delay',()=>{
+  const defaults=FM.params.defaultValues();
+  for(const p of library)expect(p.values['effects.reverb']!==defaults['effects.reverb']||p.values['effects.delay']!==defaults['effects.delay']||p.values['effects.decay']!==defaults['effects.decay'],p.name).toBe(true);
+  expect(library.filter(p=>p.rack).length).toBeGreaterThan(library.length*.7);
+  const units=new Set(library.flatMap(p=>Object.keys(p.rack??{}).filter(k=>k.startsWith('switch.')&&p.rack[k]===1).map(k=>k.slice(7))));
+  for(const u of ['tremolo','tape','shimmer','pitch','filter','width','ring','crusher'])expect(units.has(u),u).toBe(true);
+ });
+ it('plays every sound audibly, finite and below clipping, at a low, a middle and a high note',()=>{
+  for(const p of library){
+   const patch=FM.inflate(p.values);
+   for(const midi of [36,60,84]){
+    const data=play(patch,midi,.9);
+    expect(data.every(Number.isFinite),p.name+' '+midi).toBe(true);
+    const peak=data.reduce((m,v)=>Math.max(m,Math.abs(v)),0),rms=Math.sqrt(data.slice(0,24000).reduce((s,v)=>s+v*v,0)/24000);
+    expect(peak,p.name+' '+midi).toBeLessThan(.95);expect(rms,p.name+' '+midi).toBeGreaterThan(.004);
+   }
+  }
+ });
+});
+
+it('colours every DIY sound by its category, so the sound grid is colour-coded',()=>{
+ for(const schema of [POLY,FM]){
+  const byCategory=new Map();
+  for(const p of schema.presets){expect(p.colour,p.name).toMatch(/^#[0-9a-f]{6}$/i);byCategory.set(p.category,new Set([...(byCategory.get(p.category)??[]),p.colour]));}
+  for(const [category,colours] of byCategory)expect(colours.size,category).toBe(1);
+ }
+ expect(new Set(FM.presets.map(p=>p.colour)).size).toBeGreaterThan(8);
 });

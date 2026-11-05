@@ -38,7 +38,7 @@ const RAW=[
  {name:'Bass',category:'bass',styles:['round'],colour:'#3f6b4f',note:'Two low saws, snappy filter, 12 dB for a rounder tone.',values:{
   osc1Pitch:-12,osc2Pitch:-12,osc2Detune:5,cutoff:140,res:.3,envAmount:.45,poles:1,track:1,
   fAttack:.001,fDecay:.35,fSustain:.15,fRelease:.1,aAttack:.001,aDecay:.6,aSustain:.7,aRelease:.08,velFilter:.5,velAmp:.4,
-  voices:4,width:.1,reverbMix:.03,volume:.76}},
+  voices:4,width:.1,volume:.76}},
  {name:'Wind',category:'fx',styles:['noise'],colour:'#4a62b8',note:'Noise only through a swept resonant filter.',values:{
   osc1On:0,osc2Mix:0,noiseOn:1,cutoff:500,res:.6,envAmount:.2,poles:1,track:1,fAttack:1.2,fDecay:3,fSustain:.6,fRelease:2,
   aAttack:1.2,aDecay:3,aSustain:.85,aRelease:2.2,lfoRate:.15,lfoFreqDepth:.57,lfoToFilter:1,width:.8,reverbMix:.45,reverbDecay:7,volume:.93}},

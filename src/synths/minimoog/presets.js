@@ -6,7 +6,7 @@ const RAW=[
  {name:'Fat Bass',category:'bass',styles:['fat', 'punchy'],colour:'#b07a4a',note:'Two saws and a square, all at 16 feet; a snappy filter contour with a little emphasis.',values:{
   osc1Range:2,osc1Wave:2,osc2Range:2,osc2Wave:2,osc2Tune:.08,osc3Range:1,osc3Wave:3,mix1:.6,mix2:.55,mix3On:1,mix3:.5,drive:.45,
   cutoff:170,emphasis:.3,contour:.5,kbdThird:1,kbdTwoThirds:0,fAttack:.002,fDecay:.35,fSustain:.15,aAttack:.002,aDecay:.4,aSustain:.75,decayOn:0,
-  velContour:.5,velLevel:.4,volume:.71,reverbMix:.03}},
+  velContour:.5,velLevel:.4,volume:.71}},
  {name:'Classic Lead',category:'lead',styles:['glide', 'legato'],colour:'#c8452b',note:'Two saws a hair apart with glide; play legato for the single-trigger glide.',values:{
   osc1Range:3,osc2Range:3,osc2Tune:.1,osc3Range:3,osc3Wave:3,osc3Tune:7,mix3On:1,mix3:.3,drive:.4,
   cutoff:1100,emphasis:.3,contour:.35,kbdThird:1,kbdTwoThirds:1,fDecay:.6,fSustain:.5,aSustain:.9,glideOn:1,glide:.08,
@@ -18,7 +18,7 @@ const RAW=[
  {name:'Wow Bass',category:'bass',styles:['wobble'],colour:'#3f6b4f',note:'Oscillator 3 free-runs as an LFO on the filter: a rolling wow.',values:{
   osc1Range:2,osc1Wave:2,osc2Range:2,osc2Wave:3,osc2Tune:-.05,mix2:.45,
   osc3Range:0,osc3Wave:0,osc3Kbd:0,osc3Tune:1,modFilter:1,modOsc:0,modAmount:.45,modMix:0,
-  cutoff:300,emphasis:.45,contour:.25,kbdThird:1,kbdTwoThirds:0,fDecay:.5,fSustain:.5,aSustain:.9,drive:.4,volume:.7,reverbMix:.04}},
+  cutoff:300,emphasis:.45,contour:.25,kbdThird:1,kbdTwoThirds:0,fDecay:.5,fSustain:.5,aSustain:.9,drive:.4,volume:.7}},
  {name:'Pluck Pulse',category:'fx',styles:['percussive'],colour:'#e86a92',note:'Narrow pulses and a quick, resonant contour; short and percussive.',values:{
   osc1Range:3,osc1Wave:5,osc2Range:4,osc2Wave:4,osc2Tune:.05,mix1:.55,mix2:.45,
   cutoff:260,emphasis:.45,contour:.6,kbdThird:1,kbdTwoThirds:1,fAttack:.001,fDecay:.22,fSustain:0,aAttack:.001,aDecay:.3,aSustain:0,decayOn:1,
@@ -41,7 +41,7 @@ const RAW=[
   cutoff:5000,emphasis:0,contour:0,kbdThird:1,kbdTwoThirds:1,aAttack:.003,aDecay:.3,aSustain:1,decayOn:0,reverbMix:.25,volume:.62}},
  {name:'Overdrive Growl',category:'bass',styles:['driven', 'gritty'],colour:'#d98b4a',note:'Everything up: the mixer overloads the filter and the output is fed back in.',values:{
   osc1Range:2,osc1Wave:2,osc2Range:2,osc2Wave:2,osc2Tune:.15,mix1:1,mix2:1,mix3On:1,mix3:.8,osc3Range:1,drive:1,feedback:.35,
-  cutoff:420,emphasis:.4,contour:.3,kbdThird:1,kbdTwoThirds:0,fDecay:.4,fSustain:.4,aSustain:.9,volume:.62,reverbMix:.05}},
+  cutoff:420,emphasis:.4,contour:.3,kbdThird:1,kbdTwoThirds:0,fDecay:.4,fSustain:.4,aSustain:.9,volume:.62}},
  {name:'Plain',category:'init',styles:['neutral'],colour:'#c9c3b4',note:'A neutral starting point: two saws and a half-open filter.',values:{}},
 ];
 
@@ -53,4 +53,5 @@ export const CATEGORIES=[
  {id:'fx',label:'Plucks & FX',blurb:'Zaps, wind and percussive pulses'},
  {id:'init',label:'Init',blurb:'Neutral starting points'},
 ];
-export const PRESETS=RAW.map(p=>({...p,values:sanitize(p.values)}));
+// A sound that does not ask for reverb has none (the rack's reverb is not in its chain), rather than the synth's default room.
+export const PRESETS=RAW.map(p=>({...p,values:sanitize({reverbMix:0,...p.values})}));

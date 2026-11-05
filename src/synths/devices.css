@@ -100,3 +100,17 @@
 /* the twelve degree faders always share one row, spread across the window's width, whatever the window or text size */
 .lab-window .lab-tuning>.lab-row.lab-faders{flex-wrap:nowrap;justify-content:space-between;gap:0;min-width:calc(12 * 46px);}
 .lab-window .lab-tuning>.lab-row.lab-faders .fader{flex:1 1 0;width:auto;min-width:0;}
+
+/* The sound grid: every sound as a small tile coloured by its category */
+.sound-grid{width:min(760px,92vw);min-width:320px;max-height:70vh;resize:both;overflow:auto;display:flex;flex-direction:column;}
+.sound-grid h3 small{font-size:10px;letter-spacing:.1em;color:#a99f86;}
+.sg-legend{display:flex;flex-wrap:wrap;gap:4px;margin:0 0 8px;}
+.sg-legend button{display:inline-flex;align-items:center;gap:6px;min-height:0;padding:2px 9px 2px 7px;border-radius:999px;font-size:11px;background:#13120e;border:1px solid #3b382f;color:#cfc6ad;}
+.sg-legend button::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--chip);box-shadow:0 0 5px var(--chip);}
+.sg-legend button.on{border-color:var(--chip);color:#fff;}
+.sg-grid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:4px;overflow-y:auto;min-height:0;}
+.sg-tile{width:100%;min-height:0;padding:5px 7px 5px 10px;border-radius:5px;border:1px solid color-mix(in srgb,var(--chip) 45%,#000);border-left:4px solid var(--chip);background:color-mix(in srgb,var(--chip) 16%,#14130f);color:#e8e1cc;font-size:11px;line-height:1.2;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sg-tile:hover{background:color-mix(in srgb,var(--chip) 30%,#14130f);}
+.sg-tile.on{background:var(--chip);color:#15130f;font-weight:600;box-shadow:0 0 8px color-mix(in srgb,var(--chip) 70%,transparent);}
+.sg-tile.dim{opacity:.28;}
+.oled-grid{width:auto;min-width:0;padding:0 8px;font-size:15px;line-height:1;}

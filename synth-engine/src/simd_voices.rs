@@ -89,13 +89,13 @@ impl Engine {
                 let colour = unsafe { &mut COLOURS[voice_index][l] };
                 let coloured = colour::enabled(&p[86..99]) || colour.engaged();
 
-                let amp = v.amp[l].next(p, 17, 59, self.sr);
+                let amp = v.amp[l].next(p, 17, 59, 107, self.sr);
                 let fe = if mode == 3 {
                     amp
                 } else {
-                    v.filter_env[l].next(p, 21, 62, self.sr)
+                    v.filter_env[l].next(p, 21, 62, 110, self.sr)
                 };
-                let me = v.mod_env[l].next(p, 65, 69, self.sr);
+                let me = v.mod_env[l].next(p, 65, 69, 113, self.sr);
                 alive[voice_index] |= v.amp[l].stage > 0;
                 let age = (self.frame - v.age) as f32 / self.sr;
                 let fade_lfo = if p[45] > 0.001 {

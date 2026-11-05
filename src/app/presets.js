@@ -17,7 +17,7 @@ import {WASM_PRESETS} from '../synth-lab/voiceLibrary';
 export const PRESET_CATEGORIES = {...voices,'Wasm voices':WASM_PRESETS};
 
 /** Still resolvable by name (share codes, saved links) but left out of the pickers: they don't sound right yet. */
-export const HIDDEN_PRESETS = new Set(['Measured Violin', 'Measured Cello']);
+export const HIDDEN_PRESETS = new Set(['Measured Violin', 'Measured Cello', 'Measured Cello Pizzicato']);
 
 /** All generator presets by name (names are unique across categories). */
 export const GENERATIVE_PRESETS = Object.assign({}, ...Object.values(PRESET_CATEGORIES));

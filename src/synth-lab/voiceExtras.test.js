@@ -46,6 +46,26 @@ for(const kernel of ['core','core-acoustic']){
    expect(play(base({...shape,ampHoldLevel:1}),.5)).toEqual(play(base({...shape,ampHoldLevel:1,sustain:1}),.5));
   });
 
+  it('bends a decay along a mirrored or sine curve when the stage has a shape',()=>{
+   // decay from 1 to 0 over .4 s; at the middle (f=.5) the power curve c=2 is at 1-f^2 = .75, the mirrored one at (1-f)^2 = .25, a sine at 1-sin(pi/4) = .29
+   const shape={attack:.001,decay:.4,sustain:0,release:.1,ampDecayCurve:2};
+   const at=d=>rms(d.slice(Math.round(.19*48000),Math.round(.21*48000)));
+   const power=at(play(base(shape),.5)),mirrored=at(play(base({...shape,ampDecayShape:1}),.5)),sine=at(play(base({...shape,ampDecayCurve:1,ampDecayShape:2}),.5));
+   expect(mirrored/power).toBeGreaterThan(.28);expect(mirrored/power).toBeLessThan(.4);
+   expect(sine/power).toBeGreaterThan(.3);expect(sine/power).toBeLessThan(.46);
+   // shape 0 is the curve the engine always had
+   expect(play(base({...shape,ampDecayShape:0}),.5)).toEqual(play(base(shape),.5));
+  });
+
+  it('plays up to eight unison voices per note',()=>{
+   const unison=n=>{const p=base();p.global.unison=n;p.global.spread=12;return play(p,.4);};
+   const four=unison(4),eight=unison(8);
+   expect(eight.every(Number.isFinite)).toBe(true);
+   expect(eight).not.toEqual(four);
+   // the sum is levelled by the number of voices, so more of them does not mean louder
+   expect(rms(eight.slice(4800))/rms(four.slice(4800))).toBeGreaterThan(.6);expect(rms(eight.slice(4800))/rms(four.slice(4800))).toBeLessThan(1.6);
+  });
+
   it('sweeps the pitch with the pitch envelope and settles on the note',()=>{
    const d=play(base({pitchEnvAmount:12,pitchEnvDecay:.1}),1);
    const start=hz(d,0,1500),end=hz(d,40000,48000);

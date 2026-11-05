@@ -54,3 +54,8 @@ export const {PARAMS,BY_KEY,defaultValues,clampValue,sanitize,toPairs}=definePar
  ...SPACE,
 ]);
 export const VOICE_KEYS=PARAMS.filter(p=>p.id<156).map(p=>p.key);
+
+// The FM7's reverb is the rack's Reverb (effects/params.js moves it): its own reverb stays at nothing in the engine. Its chorus stays on the panel.
+const REVERB_MIX=BY_KEY.reverbMix.id;
+const basePairs=toPairs;
+export const toEnginePairs=values=>basePairs(values).map(([id,v])=>id===REVERB_MIX?[id,0]:[id,v]);

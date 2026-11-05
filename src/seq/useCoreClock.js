@@ -1,27 +1,29 @@
 import {useEffect,useMemo,useRef} from 'react';
 import {createScheduler} from './scheduler';
 import {drumTarget,drumPattern} from './targets/drum';
+import {bassTarget,bassPattern,bassStepEvents} from './targets/bass';
 import {movePlayhead} from '../synths/seq/playhead';
 
 /**
- * Drives a drum page from the sequencer core (src/seq) instead of the engine's own sequencer: the core books
+ * Drives a drum page (or, with bass, the bass line) from the sequencer core (src/seq) instead of the engine's own sequencer: the core books
  * timed notes on the audio clock and the engine plays them. `seq` is the page's useSequencer API, `values()` the
  * machine's current knob values, as a function returning {tempo, swing, flam, accent}. Experimental: see docs/SEQUENCER_DEVICE_PLAN.md.
  * Returns { toggle(), running } for the transport; `enabled` false leaves the engine's sequencer in charge.
  */
-export default function useCoreClock({seq,kit,values,enabled,silent,fill}){
+export default function useCoreClock({seq,kit,bass=false,values,enabled,silent,fill}){
  const fillRef=useRef(fill);fillRef.current=fill;
  const silentRef=useRef(silent);silentRef.current=silent;
  const seqRef=useRef(seq);seqRef.current=seq;
  const valuesRef=useRef(values);valuesRef.current=values;
  const timers=useRef(new Set());
  const scheduler=useMemo(()=>{
-  const target=drumTarget(kit,()=>seqRef.current.live.current,()=>valuesRef.current().accent??.5);
+  const target=bass?bassTarget(()=>seqRef.current.live.current):drumTarget(kit,()=>seqRef.current.live.current,()=>valuesRef.current().accent??.5);
   const live=()=>seqRef.current.live.current;
   return createScheduler({
    now:()=>live()?.context.currentTime??0,
    bank:()=>seqRef.current.bankRef.current,
-   pattern:drumPattern(kit,t=>silentRef.current?.(t)??false),
+   pattern:bass?bassPattern():drumPattern(kit,t=>silentRef.current?.(t)??false),
+   ...(bass?{events:bassStepEvents}:{}),
    tempo:()=>valuesRef.current().tempo??120,swing:()=>valuesRef.current().swing??.5,flam:()=>valuesRef.current().flam??.5,fill:()=>fillRef.current?.()??false,
    emit:events=>events.forEach(e=>target.trigger(e)),
    // a song that does not loop ends: stop the transport once its last step has been heard
@@ -34,7 +36,7 @@ export default function useCoreClock({seq,kit,values,enabled,silent,fill}){
     timers.current.add(id);
    },
   });
- },[kit]);
+ },[kit,bass]);
  const clear=()=>{timers.current.forEach(clearTimeout);timers.current.clear();};
  const stop=()=>{scheduler.stop();clear();if(seqRef.current.head.current)delete seqRef.current.head.current.dataset.count;seqRef.current.setTransport(false);};
  const start=()=>{

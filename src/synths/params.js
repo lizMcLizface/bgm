@@ -16,6 +16,9 @@ export const SPACE=[
  ['reverbPredelay',207,'Pre-delay',0,.12,.02,'s','lin'],
 ];
 
+// The same effects with the reverb at nothing by default, for synths whose reverb is the rack's: a sound that does not ask for one has none.
+export const SPACE_DRY=SPACE.map(row=>row[0]==='reverbMix'?[...row.slice(0,5),0,...row.slice(6)]:row);
+
 export function defineParams(rows){
  const PARAMS=rows.map(([key,id,label,min,max,value,unit,curve,options])=>({key,id,label,min,max,default:value,unit:options?'choice':unit,curve:options?'step':curve,options}));
  const BY_KEY=Object.fromEntries(PARAMS.map(p=>[p.key,p]));

@@ -1,5 +1,6 @@
 import React,{useEffect} from 'react';
 import useFloating from './useFloating';
+import {KEY_SIZES} from './setup';
 
 // The setup (MIDI, touch screen, audio) as a floating panel under the header, over the page instead of in place of the
 // synth's controls. The header drags it; Escape or the close button puts it away.
@@ -22,11 +23,18 @@ export default function SetupPopover({midi,setup,updateSetup,connectMidi,audio,s
      </div>
      <p className="hint">Sustain pedal holds notes; the soft pedal darkens and softens. Channel or polyphonic aftertouch, mod wheel (vibrato), expression (CC11) and CC74 brightness work if your keyboard sends them.</p>
     </section>
-    <section className="group wide"><h3>Touch screen</h3>
+    <section className="group wide"><h3>Keyboard</h3>
      <div className="row">
+      <label>Keybed<select value={setup.keysSize} onChange={e=>updateSetup('keysSize',e.target.value==='fit'?'fit':Number(e.target.value))}>{KEY_SIZES.map(([v,l])=><option key={v} value={v}>{l}</option>)}</select></label>
+      <label className="check"><input type="checkbox" checked={setup.keysControls} onChange={e=>updateSetup('keysControls',e.target.checked)}/> Wheel, ribbon and pad</label>
       <label>Ribbon range<select value={setup.ribbonRange} onChange={e=>updateSetup('ribbonRange',Number(e.target.value))}>{[1,2,5,7,12,24].map(n=><option key={n} value={n}>±{n} st</option>)}</select></label>
-      <label>Keys from<select value={setup.keysLow} onChange={e=>updateSetup('keysLow',Number(e.target.value))}>{[24,36,48,60,72].map(n=><option key={n} value={n}>C{n/12-1}</option>)}</select></label>
+      {setup.keysSize==='fit'&&<label>Keys from<select value={setup.keysLow} onChange={e=>updateSetup('keysLow',Number(e.target.value))}>{[24,36,48,60,72].map(n=><option key={n} value={n}>C{n/12-1}</option>)}</select></label>}
      </div>
+     <div className="row">
+      <label>Computer key velocity<input type="range" min="1" max="127" step="1" value={setup.keyVelocity} onChange={e=>updateSetup('keyVelocity',Number(e.target.value))}/><output>{setup.keyVelocity}</output></label>
+      <label>Random variation<input type="range" min="0" max="40" step="1" value={setup.keyVariation} onChange={e=>updateSetup('keyVariation',Number(e.target.value))}/><output>±{setup.keyVariation}</output></label>
+     </div>
+     <p className="hint">Computer keys have no touch, so they send the velocity above, varied a little each time. A whole keybed (49 to 88 keys) is shown in full; the controls beside it are the mod wheel, ribbon and touch pad, for the synths that use them. Shared by every synth on this device.</p>
     </section>
     <section className="group wide"><h3>Audio</h3>
      <p>{audio.state==='on'?audio.message:'Audio is off.'}</p>

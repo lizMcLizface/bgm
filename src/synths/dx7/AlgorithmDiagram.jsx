@@ -3,17 +3,23 @@ import {algorithmGraph} from './algorithms';
 
 // The selected algorithm as a small signal-flow drawing: modulators above the operators they
 // drive, carriers (which reach the output) on the bottom row, a loop on the feedback operator.
+// Every algorithm is drawn on the same canvas, sized for the widest and the tallest of the 32, so the display
+// keeps its size and the operator boxes keep theirs as the algorithm changes; only the wiring moves.
+const W=32,H=20,GX=6,GY=13;
+const rowsOf=graph=>{const rows={};for(let op=1;op<=6;op++)(rows[graph.depth[op]]??=[]).push(op);return rows;};
+const CANVAS=(()=>{
+ let widest=1,levels=0;
+ for(let a=0;a<32;a++){const rows=rowsOf(algorithmGraph(a));widest=Math.max(widest,...Object.values(rows).map(r=>r.length));levels=Math.max(levels,...Object.keys(rows).map(Number));}
+ return {width:widest*(W+GX)+GX,height:(levels+1)*(H+GY)+GY,levels};
+})();
+
 export default function AlgorithmDiagram({algorithm,selected,onSelect}){
  const graph=useMemo(()=>algorithmGraph(algorithm),[algorithm]);
- const W=34,H=22,GX=12,GY=18;
- const rows={};
- for(let op=1;op<=6;op++)(rows[graph.depth[op]]??=[]).push(op);
- const levels=Math.max(...Object.keys(rows).map(Number)),widest=Math.max(...Object.values(rows).map(r=>r.length));
- const width=widest*(W+GX)+GX,height=(levels+1)*(H+GY)+GY;
- const at={};
+ const {width,height,levels}=CANVAS,rows=rowsOf(graph),at={};
  for(const [d,list] of Object.entries(rows)){
   list.sort((a,b)=>a-b);
   const span=list.length*(W+GX)-GX,left=(width-span)/2;
+  // carriers sit on the same bottom row whatever the algorithm, modulators above them
   list.forEach((op,i)=>{at[op]={x:left+i*(W+GX),y:GY/2+(levels-d)*(H+GY)};});
  }
  return <svg className="alg-diagram" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`Algorithm ${algorithm+1}`}>
