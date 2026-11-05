@@ -31,6 +31,7 @@ fn filter(x: V, g: V, k: f32, ic1: &mut V, ic2: &mut V, kind: u32) -> V {
     match kind {
         2 => v1,
         3 => x - V::s(k) * v1 - v2,
+        4 => x - V::s(k) * v1,
         _ => v2,
     }
 }
@@ -149,6 +150,12 @@ impl Engine {
                     + lfos[l][1] * p[36])
                     / 1200.;
                 let env_pitch = fe * p[34] / 12.;
+                // a pitch sweep that starts p[102] semitones away and settles with time constant p[103]
+                let sweep = if p[102] != 0. {
+                    p[102] * (-age / p[103].max(0.005)).exp() / 12.
+                } else {
+                    0.
+                };
                 let drift = if mode == 3 {
                     0.
                 } else {
@@ -157,6 +164,7 @@ impl Engine {
                 let pitch = if update {
                     (self.bend / 12.
                         + env_pitch
+                        + sweep
                         + drift
                         + lfo_pitch
                         + pressure * p[56] / 1200.
@@ -205,7 +213,9 @@ impl Engine {
                         lane.target_g = (PI * hz / self.sr).tan();
                     }
                     let noise = if p[8] > 0. {
-                        random(&mut v.rng) * p[8] * 0.3
+                        coloured_noise(&mut lane.noise, random(&mut v.rng), p[101] as u32)
+                            * p[8]
+                            * 0.3
                     } else {
                         0.
                     };
@@ -323,7 +333,7 @@ impl Engine {
                     let mut c = old.lq1;
                     let mut d = old.lq2;
                     let mut ladder = old.ladder;
-                    let mut result = if p[58] >= 0.5 && mode != 2 {
+                    let mut result = if p[58] >= 0.5 && mode != 2 && kind < 4 {
                         // The nonlinear ladder's four state poles are independent across voices too.
                         let g = g / (V::s(1.) + g);
                         let g2 = g * g;

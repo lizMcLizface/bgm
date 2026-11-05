@@ -325,7 +325,7 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
     {[{id:'sounds',label:'Sounds'},...libraries].map(l=><button type="button" key={l.id} role="radio" aria-checked={shelf===l.id} onClick={()=>pickShelf(l.id)}>{l.label}</button>)}
    </span>}
    {library?library.render({choose,values:patch.values,current,rack:outboard}):<>
-   <Picker synth={synth} presets={presets} mine={mine} current={current} currentCategory={patch.category} choose={choose} remove={removeMine}/>
+   <Picker synth={synth} presets={presets} mine={mine} current={current} currentCategory={patch.category} choose={choose} remove={removeMine} values={patch.values} change={change}/>
    <button type="button" className="save" onClick={saveMine}>＋ Save sound</button>
    </>}
   </nav>

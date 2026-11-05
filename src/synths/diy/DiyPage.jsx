@@ -1,10 +1,13 @@
 import React,{useEffect,useRef,useState} from 'react';
 import SynthShell from '../ui/SynthShell';
-import {Lever} from '../ui/controls';
-import {PickButtons,OledPicker} from './DiyControls';
+import {Lever,Fader} from '../ui/controls';
+import {PickButtons,OledPicker,PolyPicker,HToggle,waveIcon} from './DiyControls';
 import {Workspace,FloatBox} from './DiyWorkspace';
 import DiyEnvEditor from './DiyEnvEditor';
 import RoutingMatrix from './DiyMatrix';
+import LabPanels from './LabPanels';
+import {LAB} from './lab';
+import {load,save} from '../storage';
 import {SYNTHS} from '../models';
 import {startDiySynth} from './live';
 import {applyTopology} from './patches';
@@ -13,14 +16,14 @@ import {FM_ALGORITHMS,FM_MOD_SOURCES,FM_MOD_TARGETS} from '../../synth-lab/fmPat
 import {BODY_TYPES} from '../../synth-lab/voiceColour';
 
 const WAVES=['Off','Sine','Triangle','Saw','Pulse','Organ','Hollow','Choir','Glass','Reed','Band-limited triangle'];
-const OPTIONS={waveA:WAVES,waveB:WAVES,filter:['12 dB low-pass','24 dB low-pass','Band-pass','High-pass'],filterFamily:['State variable','Feedback ladder (LP24)'],lfoShape:['Sine','Triangle','Square','Saw','Sample & hold'],hardSync:['Off','B resets A'],bLow:['Audio range','Low range'],bKeytrack:['Fixed','Keyboard'],envelopeTarget:['A + B','A only'],bodyType:BODY_TYPES,enabled:['Muted','On'],wave:['Sine','Half sine','Absolute sine','Squared sine'],keySync:['Free running','Reset on key'],legacyEnvelope:['Current','Legacy'],legacyAmp:['Current','Legacy'],bypass:['Active','Bypassed'],pingPong:['Stereo','Ping-pong']};
+const OPTIONS={waveA:WAVES,waveB:WAVES,filter:['12 dB low-pass','24 dB low-pass','Band-pass','High-pass','Notch'],noiseType:['White','Pink','Brown'],phaseLock:['Free','Restart'],filterFamily:['State variable','Feedback ladder (LP24)'],lfoShape:['Sine','Triangle','Square','Saw','Sample & hold'],hardSync:['Off','B resets A'],bLow:['Audio range','Low range'],bKeytrack:['Fixed','Keyboard'],envelopeTarget:['A + B','A only'],bodyType:BODY_TYPES,enabled:['Muted','On'],wave:['Sine','Half sine','Absolute sine','Squared sine'],keySync:['Free running','Reset on key'],legacyEnvelope:['Current','Legacy'],legacyAmp:['Current','Legacy'],bypass:['Active','Bypassed'],pingPong:['Stereo','Ping-pong']};
 const shortLabel=label=>label.split(' · ')[0];
 // short names for the buttons and switch ends; the full name stays as the tooltip
-const SHORT={'State variable':'SVF','Feedback ladder (LP24)':'Ladder','B resets A':'Sync','Audio range':'Audio','Low range':'Low','Keyboard':'Key','A only':'A','A + B':'A+B','Free running':'Free','Reset on key':'Reset','Overlapping notes':'Overlap','All mono notes':'All','Active':'On','Bypassed':'Bypass','Muted':'Mute','Ping-pong':'Ping','Band-limited triangle':'BL tri','Low strings':'Low str','High strings':'High str','Hollow pipe':'Pipe','Metallic':'Metal','Sample & hold':'S&H','Half sine':'Half','Absolute sine':'Abs','Squared sine':'Squared','Polyphonic':'Poly','Mono retrigger':'Retrig','Mono legato':'Legato','12 dB low-pass':'LP12','24 dB low-pass':'LP24','Band-pass':'BP','High-pass':'HP'};
+const SHORT={'State variable':'SVF','Feedback ladder (LP24)':'Ladder','B resets A':'Sync','Audio range':'Audio','Low range':'Low','Keyboard':'Key','A only':'A','A + B':'A+B','Free running':'Free','Reset on key':'Reset','Overlapping notes':'Overlap','All mono notes':'All','Active':'On','Bypassed':'Bypass','Muted':'Mute','Ping-pong':'Ping','Band-limited triangle':'BL tri','White':'W','Pink':'P','Brown':'B','Low strings':'Low str','High strings':'High str','Hollow pipe':'Pipe','Metallic':'Metal','Sample & hold':'S&H','Half sine':'Half','Absolute sine':'Abs','Squared sine':'Squared','Polyphonic':'Poly','Mono retrigger':'Retrig','Mono legato':'Legato','12 dB low-pass':'LP12','24 dB low-pass':'LP24','Band-pass':'BP','High-pass':'HP'};
 const short=o=>SHORT[o]??o;
 const startPoly=options=>startDiySynth({...options,kind:'poly'}),startFM=options=>startDiySynth({...options,kind:'fm'});
 
-function Editor({fm,api,layer,setLayer,link,setLink,operator,setOperator,synth}){
+function Editor({fm,api,layer,setLayer,link,setLink,operator,setOperator,synth,lab,onLab}){
  const {values,control,change,replaceValues}=api;
  // with the layers linked, an edit to the layer being shown is repeated on the other one (a sound being loaded changes both, so is left alone)
  const before=useRef(values);
@@ -64,12 +67,22 @@ function Editor({fm,api,layer,setLayer,link,setLink,operator,setOperator,synth})
   const pick=columns=>(extra={})=><PickButtons key={key} label={text} options={shorts} titles={options} value={values[key]} onChange={i=>change(key,i)} columns={columns} tone={tone} {...extra}/>;
   if(options.length===2)return <Lever key={key} spec={{key,options:shorts}} value={values[key]} onChange={change} tone={tone} label={text}/>;
   if(base==='filter')return pick(1)({square:true});
-  if(base==='waveA'||base==='waveB')return pick(2)();
+  if(base==='waveA'||base==='waveB')return pick(2)({icons:options.map(waveIcon)});
+  if(base==='lfoShape')return pick(1)({icons:options.map(waveIcon)});
+  if(key==='performance.mode'){
+   const glide=['Overlapping notes','All mono notes'];
+   return <div className="pick-stack" key={key}>
+    <PickButtons stack label="Voice mode" options={shorts} titles={options} value={values[key]} onChange={i=>change(key,i)} tone={tone}/>
+    <PickButtons stack label="Glide" options={glide.map(short)} titles={glide} value={values['performance.glide']} onChange={i=>change('performance.glide',i)} tone={tone}/>
+   </div>;
+  }
+  if(base==='noiseType')return <PickButtons key={key} label={text} options={shorts} titles={options} value={values[key]} onChange={i=>change(key,i)} colours={['#ece8dc','#f08fb4','#b98a5e']} narrow tone={tone}/>;
   if(options.length<=5)return pick(1)();
   return select(key,label,options);
  };
  const field=(entry,tone='cream')=>{
   const [key,label]=Array.isArray(entry)?entry:[entry,null],base=key.split('.').at(-1);
+  if(key==='performance.glide')return null; // drawn under the voice mode
   let options=OPTIONS[base];
   if(key==='effects.quality')options=['8 lines','16 lines'];
   if(key==='global.quality')options=['1×','2×','4×'];
@@ -78,6 +91,7 @@ function Editor({fm,api,layer,setLayer,link,setLink,operator,setOperator,synth})
   if(base.startsWith('modTarget'))options=fm?FM_MOD_TARGETS:MOD_TARGETS;
   if(key==='performance.mode')options=['Polyphonic','Mono retrigger','Mono legato'];
   if(key==='performance.glide')options=['Overlapping notes','All mono notes'];
+  if(base==='bPhase')return <Fader key={key} spec={synth.params.BY_KEY[key]} value={values[key]} onChange={(k,v)=>{change(k,v);change(k.replace('bPhase','phaseLock'),v>0?1:0);}} tone={tone} label={label??'Phase'}/>;
   return options?choice(key,label,options,base,tone):control([key,label??shortLabel(synth.params.BY_KEY[key].label)],tone);
  };
  const [shapeOpen,setShapeOpen]=useState(null);
@@ -85,11 +99,14 @@ function Editor({fm,api,layer,setLayer,link,setLink,operator,setOperator,synth})
  const lamp=hz=><i className="lamp" aria-hidden="true" style={{'--period':Math.max(.33,Math.min(20,1/Math.max(.01,hz)))+'s'}}/>;
  // every section is its own floating box
  const at=(pre,key)=>/^(global|performance|carriers|layers|operators)[.]/.test(key)?key:pre+key;
- const group=(id,title,keys,tone='cream',pre='',actions)=><FloatBox key={id} id={id} title={title} tone={tone} actions={actions}>{keys.map(k=>field(Array.isArray(k)?[at(pre,k[0]),k[1]]:at(pre,k),tone))}</FloatBox>;
+ const group=(id,title,keys,tone='cream',pre='',actions,after)=><FloatBox key={id} id={id} title={title} tone={tone} actions={actions}>{keys.map(k=>field(Array.isArray(k)?[at(pre,k[0]),k[1]]:at(pre,k),tone))}{after}</FloatBox>;
+ // two-way choices as horizontal switches, stacked in one column
+ const switches=(pre,entries,tone)=><div className="htoggle-stack" key="switches">{entries.map(([k,label])=>{const key=at(pre,k),spec=synth.params.BY_KEY[key];return <HToggle key={key} spec={spec} options={OPTIONS[k].map(short)} titles={OPTIONS[k]} value={values[key]} onChange={change} tone={tone} label={label}/>;})}</div>;
  // an envelope box: its stages as faders and a Shape button that opens the curve editor (the three stage curves live there)
- const envBox=(id,title,keys,tone,pre,{curves,times,sustain})=>{
+ const envBox=(id,title,keys,tone,pre,{curves,times,sustain,timing})=>{
   const open=shapeOpen?.id===id,all=k=>pre+k;
-  return <FloatBox key={id} id={id} title={title} tone={tone} actions={<button type="button" className="shape-open" aria-expanded={open} title="Envelope curves" onClick={e=>{const anchor=e.currentTarget;setShapeOpen(o=>o?.id===id?null:{id,anchor});}}>Shape</button>}>
+  return <FloatBox key={id} id={id} title={title} tone={tone} actions={<><button type="button" className="shape-open" aria-expanded={open} title="Envelope curves" onClick={e=>{const anchor=e.currentTarget;setShapeOpen(o=>o?.id===id?null:{id,anchor});}}>Shape</button>
+   {timing&&<span className="timing-radio" role="radiogroup" aria-label="Envelope timing">{['Current','Legacy'].map((name,i)=><button type="button" key={name} role="radio" aria-checked={values[pre+timing]===i} className={values[pre+timing]===i?'on':''} title={i?'The older envelope timing':'The current envelope timing'} onClick={()=>change(pre+timing,i)}>{name}</button>)}</span>}</>}>
    {keys.map(k=>field(Array.isArray(k)?[at(pre,k[0]),k[1]]:at(pre,k),tone))}
    {open&&<DiyEnvEditor title={title} anchor={shapeOpen.anchor} onClose={()=>setShapeOpen(null)} values={values} specs={synth.params.BY_KEY} change={change}
     curves={curves.map(all)} times={Object.fromEntries(Object.entries(times).map(([s,k])=>[s,all(k)]))} sustain={all(sustain)}/>}
@@ -106,33 +123,37 @@ function Editor({fm,api,layer,setLayer,link,setLink,operator,setOperator,synth})
  const operatorTone=['enabled','wave','ratio','fixed','detune','level','pan',[`carriers.${operator}`,'Carrier']];
  const operatorEnvelope=[['attack','A'],['peak','Peak'],['decay1','D1'],['breakpoint','Break'],['decay2','D2'],['sustain','S'],['release','R'],['legacyEnvelope','Timing']];
  const oscA=[['waveA','Wave'],['levelA','Level'],['coarseA','Tune'],['pulseA','PW offset']];
- const oscB=[['waveB','Wave'],['levelB','Level'],['coarseB','Tune'],['fineB','Fine'],['pulseB','PW offset'],['bLow','Range'],['bKeytrack','Tracking']];
- const oscCommon=[['pulse','Width'],['sub','Sub'],['noise','Noise']];
+ const oscB=[['waveB','Wave'],['levelB','Level'],['coarseB','Tune'],['fineB','Fine'],['bPhase','Phase'],['pulseB','PW offset']];
+ const oscCommon=[['pulse','Width'],['sub','Sub'],['noise','Noise'],['noiseType','Colour']];
  const lowpass=[['filter','Type'],['filterFamily','Topology'],['cutoff','Cutoff'],['resonance','Res'],['drive','Drive']];
  const filterMod=[['filterAmount','Env'],['keytrack','Key'],['velocityTone','Vel']];
- const amp=[...adsr('attack','decay','sustain','release'),['legacyAmp','Timing']],filterEnv=adsr('filterAttack','filterDecay','filterSustain','filterRelease');
- const oscRouting=[['hardSync','Sync'],['ring','Ring'],['polyPitch','B → A freq'],['polyPwm','B → A PW'],['polyFilter','B → filter'],['envelopePitch','Env → pitch'],['envelopeTarget','Env to']];
+ const amp=[['attack','A'],['ampHold','H'],['decay','D'],['sustain','S'],['release','R']],filterEnv=adsr('filterAttack','filterDecay','filterSustain','filterRelease');
+ const oscRouting=[['hardSync','Sync'],['ring','Ring'],['polyPitch','B → A freq'],['polyPwm','B → A PW'],['polyFilter','B → filter']];
  // boxes group a thing by what it does: voice handling, output, drift, expression
  const voices=fm?['performance.mode','performance.glide','performance.portamento','global.polyphony','global.keySync']:['performance.mode','performance.glide','performance.portamento','global.polyphony','global.unison','global.spread'];
  const output=fm?['global.gain','global.width','global.quality']:['global.gain','global.width',prefix+'mix',prefix+'pan'];
  const fmCore=['global.index','global.feedback','global.feedbackOp'];
  const driftKeys=fm?[['global.wanderRate','Rate'],['global.wanderCents','Depth']]:[[prefix+'drift','Voice'],[prefix+'wanderRate','Rate'],[prefix+'wanderCents','Depth']];
  const sensitivity=['velocity','keyScale','rateScale','pressure'];
- const archBox=<FloatBox id="architecture" title="Architecture" tone="teal"><div className="arch">
-    <PickButtons row tall label="Architecture" options={['Prophet','Jupiter','Dual','Juno']} titles={MODELS.map(m=>m.name)} value={values['global.model']} onChange={i=>change('global.model',i)}/>
+ const layerBox=<FloatBox id="layer" title="Layer" tone="teal"><div className="arch">
     <div className="arch-layers">
-     <PickButtons row tall label="Layer" options={['I','II']} titles={['Layer 1','Layer 2']} value={layer} disabled={values['global.model']!==2} onChange={setLayer}/>
-     <div className="pick row tall tone-teal"><div className="pick-grid" style={{"--cols":2}}>
-      <button type="button" disabled={values['global.model']!==2} title={`Copy layer ${layer+1} onto layer ${2-layer}`} onClick={()=>{const next={...values};for(const [key,value] of Object.entries(values))if(key.startsWith(prefix))next[key.replace(prefix,`layers.${1-layer}.`)]=value;replaceValues(next);}}>{layer?'II → I':'I → II'}</button>
-      <button type="button" role="switch" aria-checked={link} className={link?'on':''} disabled={values['global.model']!==2} title="Edit both layers together: a change to one is repeated on the other" onClick={()=>setLink(!link)}>I + II</button>
-     </div><span className="fader-label">Copy · link</span></div>
+     <PickButtons stack compact label="Layer" options={['I','II']} titles={['Layer 1','Layer 2']} value={layer} disabled={values['global.model']!==2} onChange={setLayer}/>
+     <div className="pick row compact tone-teal"><div className="pick-grid" style={{"--cols":1}}>
+      <button type="button" disabled={values['global.model']!==2} title={`Copy layer ${layer+1} onto layer ${2-layer}`} onClick={()=>{const next={...values};for(const [key,value] of Object.entries(values))if(key.startsWith(prefix))next[key.replace(prefix,`layers.${1-layer}.`)]=value;replaceValues(next);}}>{layer?'2→1':'1→2'}</button>
+      <button type="button" role="switch" aria-checked={link} className={link?'on':''} disabled={values['global.model']!==2} title="Edit both layers together: a change to one is repeated on the other" onClick={()=>setLink(!link)}>1+2</button>
+     </div><span className="fader-label">Link</span></div>
     </div>
    </div></FloatBox>;
- const highpassBox=fm?null:<FloatBox id="highpass" title="High-pass" tone="red">
+ const highpassBox=fm?null:<FloatBox key="highpass" id="highpass" title="High-pass" tone="red">
     {field([prefix+'highpass','Cutoff'],'red')}{field([prefix+'highResonance','Res'],'red')}
     <Lever spec={{key:'hpLink',options:['Free','Link']}} value={hpLink.on?1:0} onChange={(_,v)=>linkHighpass(v===1)} tone="red" label="Follow LP"/>
    </FloatBox>;
  const matrixBox=<FloatBox id="matrix" title="Routing matrix" tone="violet"><RoutingMatrix fm={fm} values={values} specs={synth.params.BY_KEY} prefix={prefix} sources={fm?FM_MOD_SOURCES:MOD_SOURCES} targets={fm?FM_MOD_TARGETS:MOD_TARGETS} change={change}/></FloatBox>;
+ const masterBox=fm?null:<FloatBox key="master" id="master" title="Master filter" tone="red">
+  <Lever spec={LAB.BY_KEY.masterOn} value={lab.masterOn} onChange={onLab} tone="red" label="On"/>
+  <PickButtons label="Type" options={['LP','HP','BP','NT','LS','HS']} titles={LAB.BY_KEY.masterType.options} value={lab.masterType} onChange={i=>onLab('masterType',i)} columns={2} square tone="red"/>
+  {['masterFreq','masterQ','masterGain'].map(k=><Fader key={k} spec={LAB.BY_KEY[k]} value={lab[k]} onChange={onLab} tone="red" label={{masterFreq:'Cutoff',masterQ:'Q',masterGain:'Gain'}[k]}/>)}
+ </FloatBox>;
  const frame=(name,...boxes)=><div className={'pf-frame pf-'+name}>{boxes}</div>;
  // Poly: a fixed front-panel layout, rows 8 px apart as on the CS-80. The oscillators, LFOs, envelopes, filter and body each sit in
  // a frame; the routing matrix stands at the right of the first two rows.
@@ -140,21 +161,21 @@ function Editor({fm,api,layer,setLayer,link,setLink,operator,setOperator,synth})
   <div className="pf-top">
    <div className="pf-left">
     <div className="pf-row">
-     {archBox}
-     {frame('osc',group('osc-a',`Oscillator A${layerTag}`,oscA,'cream',prefix),group('osc-b',`Oscillator B${layerTag}`,oscB,'cream',prefix),group('osc-common',`Common${layerTag}`,oscCommon,'cream',prefix),group('interaction','Oscillator routing',oscRouting,'violet',prefix))}
+     {layerBox}
+     {group('voices','Voices',voices,'teal')}
+     {frame('osc',group('osc-a',`Oscillator A${layerTag}`,oscA,'cream',prefix),group('osc-b',`Oscillator B${layerTag}`,oscB,'cream',prefix,undefined,switches(prefix,[['bLow','Range'],['bKeytrack','Tracking'],['phaseLock','Phase']],'cream')),group('osc-common',`Common${layerTag}`,oscCommon,'cream',prefix),group('interaction','Oscillator routing',oscRouting,'violet',prefix))}
     </div>
     <div className="pf-row">
      {frame('lfo',group('lfo1','LFO 1',lfo1,'violet',prefix,lamp(values[prefix+'lfoRate'])),group('lfo2','LFO 2',lfo2,'violet',prefix,lamp(values[prefix+'lfo2Rate'])),group('drift','Drift',driftKeys,'violet','',lamp(values[prefix+'wanderRate']*2)))}
-     {frame('env',envBox('amp-env','Amp envelope',amp,'amber',prefix,{curves:['ampAttackCurve','ampDecayCurve','ampReleaseCurve'],times:{A:'attack',D:'decay',R:'release'},sustain:'sustain'}),envBox('filter-env','Filter envelope',filterEnv,'amber',prefix,{curves:['filterAttackCurve','filterDecayCurve','filterReleaseCurve'],times:{A:'filterAttack',D:'filterDecay',R:'filterRelease'},sustain:'filterSustain'}),envBox('mod-env','Modulation envelope',modEnv,'amber',prefix,{curves:['modAttackCurve','modDecayCurve','modReleaseCurve'],times:{A:'modAttack',D:'modDecay',R:'modRelease'},sustain:'modSustain'}))}
+     {frame('env',envBox('amp-env','Amp',amp,'amber',prefix,{curves:['ampAttackCurve','ampDecayCurve','ampReleaseCurve'],times:{A:'attack',D:'decay',R:'release'},sustain:'sustain',timing:'legacyAmp'}),envBox('filter-env','Filter',filterEnv,'amber',prefix,{curves:['filterAttackCurve','filterDecayCurve','filterReleaseCurve'],times:{A:'filterAttack',D:'filterDecay',R:'filterRelease'},sustain:'filterSustain'}),envBox('mod-env','Mod',modEnv,'amber',prefix,{curves:['modAttackCurve','modDecayCurve','modReleaseCurve'],times:{A:'modAttack',D:'modDecay',R:'modRelease'},sustain:'modSustain'}),group('pitch-env','Pitch',[['pitchEnvAmount','Amount'],['pitchEnvDecay','Decay']],'amber',prefix))}
     </div>
    </div>
    {matrixBox}
   </div>
-  <div className="pf-row">
+  <div className="pf-row pf-last">
    {frame('filter',group('lowpass','Low-pass',lowpass,'red',prefix),highpassBox,group('filter-mod','Filter mod',filterMod,'red',prefix))}
    {frame('body',group('excitation','Air & bow',excitation,'teal',colourPrefix),group('body','Body',body,'teal',colourPrefix),group('vowel','Vowel',vowel,'teal',colourPrefix))}
-   {group('output','Output',output,'teal')}
-   {group('voices','Voices',voices,'teal')}
+   {frame('out',group('output','Output',output,'teal'),masterBox)}
   </div>
  </div>;
  return <Workspace storeKey="synths:diy:fm:box:">
@@ -189,8 +210,14 @@ function Editor({fm,api,layer,setLayer,link,setLink,operator,setOperator,synth})
 function DiyPage({fm=false}){
  const synth=SYNTHS[fm?'fm':'poly'];
  const [layer,setLayer]=useState(0),[link,setLink]=useState(false),[operator,setOperator]=useState(0);
- return <SynthShell synth={synth} className={'diy '+(fm?'diy-fm':'diy-poly')} panelClassName="diy-panel" picker={OledPicker} helpInBar startEngine={fm?startFM:startPoly}>
-  {api=><Editor fm={fm} api={api} layer={api.values['global.model']===2?layer:0} setLayer={setLayer} link={link} setLink={setLink} operator={Math.min(operator,(api.values['global.operators']??6)-1)} setOperator={setOperator} synth={synth}/>}
+ // the lab: effects and filters being tried out, in floating windows beside the panel (see LabPanels)
+ const [engine,setEngine]=useState(null),[labOpen,setLabOpen]=useState(()=>load('synths:diy:lab-open',false)),[lab,setLab]=useState(()=>LAB.defaultValues());
+ useEffect(()=>{engine?.setLab(lab);},[engine,lab]);
+ const toggleLab=()=>setLabOpen(o=>{save('synths:diy:lab-open',!o);return !o;});
+ return <SynthShell synth={synth} className={'diy '+(fm?'diy-fm':'diy-poly')} panelClassName="diy-panel" picker={fm?OledPicker:PolyPicker} helpInBar onEngine={setEngine}
+  headerExtras={<button type="button" aria-pressed={labOpen} title="Tape, shimmer, freeze, master filter and tuning: floating test windows" onClick={toggleLab}>Lab</button>} startEngine={fm?startFM:startPoly}>
+  {api=><><Editor fm={fm} api={api} layer={api.values['global.model']===2?layer:0} setLayer={setLayer} link={link} setLink={setLink} operator={Math.min(operator,(api.values['global.operators']??6)-1)} setOperator={setOperator} synth={synth} lab={lab} onLab={(key,value)=>setLab(l=>({...l,[key]:value}))}/>
+   {labOpen&&<LabPanels values={lab} onChange={(key,value)=>setLab(l=>({...l,[key]:value}))} onClose={toggleLab}/>}</>}
  </SynthShell>;
 }
 export function PolyPage(){return <DiyPage/>;}

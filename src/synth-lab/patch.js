@@ -12,7 +12,7 @@ export const GLOBAL=[
 export const LAYER=[
  ['waveA','Oscillator A',0,10,1,3],['waveB','Oscillator B',0,10,1,4],['levelA','Oscillator A level',0,1,.01,.65],['levelB','Oscillator B level',0,1,.01,.35],
  ['coarseB','B relative tuning · semitones',-24,24,1,0],['fineB','B fine tune · cents',-50,50,.5,0],['pulse','Pulse width',.05,.95,.01,.5],['sub','Sub oscillator',0,1,.01,0],['noise','Noise',0,1,.01,0],
- ['cutoff','Low-pass cutoff · Hz',20,18000,1,1800],['resonance','Resonance',0,1,.01,.2],['filter','Filter response',0,3,1,1],['highpass','High-pass cutoff · Hz',10,5000,1,20],['highResonance','High-pass resonance',0,1,.01,0],
+ ['cutoff','Low-pass cutoff · Hz',20,18000,1,1800],['resonance','Resonance',0,1,.01,.2],['filter','Filter response',0,4,1,1],['highpass','High-pass cutoff · Hz',10,5000,1,20],['highResonance','High-pass resonance',0,1,.01,0],
  ['filterAmount','Filter envelope · octaves',-6,6,.05,2],['keytrack','Filter key tracking',0,1,.01,.5],['velocityTone','Velocity → filter · octaves',0,4,.05,1],
  ['attack','Amp attack · s',0,8,.001,.03],['decay','Amp decay · s',0,8,.01,.3],['sustain','Amp sustain',0,1,.01,.65],['release','Amp release · s',0,8,.01,.7],
  ['filterAttack','Filter attack · s',.002,8,.001,.03],['filterDecay','Filter decay · s',.002,8,.01,.4],['filterSustain','Filter sustain',0,1,.01,.2],['filterRelease','Filter release · s',.002,8,.01,.7],
@@ -33,6 +33,10 @@ export const LAYER=[
  ]).flat(),
  ...VOICE_COLOUR,
  ['legacyAmp','Legacy envelope timing',0,1,1,0],
+ // appended after the colour block so the ids above stay put
+ ['ampHold','Amp hold · s',0,4,.01,0],['noiseType','Noise colour',0,2,1,0],
+ ['pitchEnvAmount','Pitch envelope · semitones',-24,24,.1,0],['pitchEnvDecay','Pitch envelope decay · s',.01,4,.01,.15],
+ ['phaseLock','Restart oscillator phase',0,1,1,0],['bPhase','B start phase',0,1,.01,0],
 ];
 export const MOD_SOURCES=['Off','LFO 1','LFO 2','Mod envelope','Amp envelope','Filter envelope','Velocity','Keyboard · centred on C4','Pressure','Mod wheel','Smooth random · per voice'];
 export const MOD_TARGETS=['Off','Pitch · ±100 cents','Cutoff · ±4 octaves','Pulse width · ±0.4','Amplitude · ±100%','Pan · ±full width'];

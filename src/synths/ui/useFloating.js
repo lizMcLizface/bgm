@@ -11,9 +11,9 @@ const clampPos=(p,el)=>{
  return {x:Math.min(Math.max(0,p.x),Math.max(0,window.innerWidth-Math.min(w,window.innerWidth))),y:Math.min(Math.max(0,p.y),Math.max(0,window.innerHeight-Math.min(h,window.innerHeight)))};
 };
 const same=(a,b)=>a.x===b.x&&a.y===b.y;
-export default function useFloating(key){
+export default function useFloating(key,home=null){
  const ref=useRef(null),drag=useRef(null);
- const [pos,setPos]=useState(()=>{const p=load(key,null);return p&&Number.isFinite(p.x)&&Number.isFinite(p.y)?p:null;});
+ const [pos,setPos]=useState(()=>{const p=load(key,null);return p&&Number.isFinite(p.x)&&Number.isFinite(p.y)?p:home;});
  const [z,setZ]=useState(()=>++top);
  const raise=()=>setZ(z0=>z0===top?z0:++top);
  const down=e=>{

@@ -27,7 +27,7 @@ export const BLOCKS=[
 export const GLOBAL=[['master.input','Input'],['master.output','Output'],['effects.dry','Dry']];
 const CHOICES={'effects.reverbType':['Classic','Room','Hall','Plate'],'filter.slope':['12 dB','24 dB'],'master.sync':['Free','1/4','1/8','1/8 dotted','1/16','1/8 triplet','1/2'],'effects.pingPong':['Stereo','Ping-pong'],'effects.quality':['8 lines','16 lines'],'inserts.bypass':['Active','Bypassed'],'effects.bypass':['Active','Bypassed']};
 export function RackControl({spec,value,label,block,onChange,disabled=false}){
- const key=spec.key,options=CHOICES[key],aria=`${block} · ${label}`,set=value=>onChange({[key]:Math.max(spec.min,Math.min(spec.max,value))});
+ const key=spec.key,options=CHOICES[key]??spec.options,aria=`${block} · ${label}`,set=value=>onChange({[key]:Math.max(spec.min,Math.min(spec.max,value))});
  const scale=spec.unit==='%'?100:1,step=scale===100?.1:spec.curve==='step'?1:spec.unit==='Hz'&&spec.max>100?1:spec.unit==='dB'?.1:.001;
  const number=Number((value*scale).toFixed(4)),[editing,setEditing]=useState(false),[draft,setDraft]=useState(String(number));
  useEffect(()=>{if(!editing)setDraft(String(number));},[number,editing]);
@@ -125,15 +125,16 @@ export function RackLevels({values,onChange}){
 }
 
 /** One effect's controls (faders in a row), with its on/off switch and, when it can move, earlier and later buttons. */
-export function RackEffect({block,values,onChange,hidden,reduction=0,instrumentSpecs=[],model,movable=true}){
+// specs: the parameter table the keys belong to (the rack's own unless a caller brings its own); headerProps: spread on the header, so a window can be dragged by it
+export function RackEffect({block,values,onChange,hidden,reduction=0,instrumentSpecs=[],model,movable=true,specs=RACK_PARAMS.BY_KEY,headerProps}){
  const instrument=block.id==='instrument';
  // the first Mix / Send goes up beside the header, the dropdowns go in a row under the sliders
  const keys=instrument?[]:block.keys.filter(([key])=>key!=='master.sync'||model?.tempo>0);
  const mix=keys.find(([,label])=>label==='Mix'||label==='Send');
- const sliders=keys.filter(k=>k!==mix&&!CHOICES[k[0]]),choices=keys.filter(k=>k!==mix&&CHOICES[k[0]]);
- const control=([key,label])=><RackControl key={key} spec={RACK_PARAMS.BY_KEY[key]} value={values[key]} label={label} block={block.name} onChange={onChange} disabled={key==='effects.delayMs'&&values['master.sync']>0}/>;
+ const choiceOf=k=>CHOICES[k[0]]??specs[k[0]]?.options,sliders=keys.filter(k=>k!==mix&&!choiceOf(k)),choices=keys.filter(k=>k!==mix&&choiceOf(k));
+ const control=([key,label])=><RackControl key={key} spec={specs[key]} value={values[key]} label={label} block={block.name} onChange={onChange} disabled={key==='effects.delayMs'&&values['master.sync']>0}/>;
  return <section className={'rack-block'+(block.on?'':' is-bypassed')+(instrument?' rack-instrument':'')} hidden={hidden} style={{'--rack-colour':block.colour}} aria-label={instrument?'Instrument space':block.name}>
-  <header><RackGraphic kind={block.id} on={block.on}/><div><h3>{instrument?'Instrument space':block.name}</h3></div>
+  <header {...headerProps}><RackGraphic kind={block.id} on={block.on}/><div><h3>{instrument?'Instrument space':block.name}</h3></div>
    {block.toggle&&<button type="button" aria-label={block.name+' enabled'} aria-pressed={block.on} onClick={()=>onChange({[block.toggle]:block.on?0:1})}><i/>{block.on?'On':'Off'}</button>}
    {model?.removeFromChain&&unitOf(block.id)&&<button type="button" className="rack-remove" aria-label={'Remove '+block.name+' from the chain'} title="Take it out of the chain (its settings are kept)" onClick={()=>model.removeFromChain(block.id)}>✕ Remove</button>}
    {mix&&<div className="rack-mix">{control(mix)}</div>}
@@ -149,6 +150,7 @@ export function RackEffect({block,values,onChange,hidden,reduction=0,instrumentS
    :sliders.map(control)}</div>
   </div>
   {choices.length>0&&<div className="rack-choices">{choices.map(control)}</div>}
+  {block.note&&<p className="rack-note">{block.note}</p>}
   {block.id==='compressor'&&<p className="rack-note">Automatic level compensation · use Output trim to balance the return.</p>}
   {(block.id==='phaser'||block.id==='flanger'||block.id==='chorus')&&<p className="rack-note">Stereo effect: the left and right sides modulate out of step, so a mono sound comes out wide.</p>}
  </section>;

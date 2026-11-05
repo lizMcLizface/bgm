@@ -16,7 +16,7 @@ mod simd;
 mod simd_voices;
 const VOICES: usize = 32;
 const UNISON: usize = 4;
-const PARAMS: usize = 100;
+const PARAMS: usize = 106;
 const QUEUE: usize = 4096;
 const BLOCK: usize = 2048;
 const LUT: usize = 2048;
@@ -275,6 +275,21 @@ impl Env {
                 if self.linear >= 1. {
                     self.value = 1.;
                     self.linear = 1.;
+                    if offset == 17 && p[100] > 0. {
+                        // an optional hold at the peak before the decay (amp envelope only)
+                        self.stage = 5;
+                        self.left = (p[100] * sr).max(1.) as u32;
+                    } else {
+                        self.stage = 2;
+                        self.left = (p[offset + 1] * sr).max(1.) as u32;
+                        self.total = self.left;
+                    }
+                }
+            }
+            5 => {
+                self.value = 1.;
+                self.left = self.left.saturating_sub(1);
+                if self.left == 0 {
                     self.stage = 2;
                     self.left = (p[offset + 1] * sr).max(1.) as u32;
                     self.total = self.left;
@@ -334,6 +349,7 @@ impl Filter {
         match mode {
             2 => v1,
             3 => x - k * v1 - v2,
+            4 => x - k * v1,
             _ => v2,
         }
     }
@@ -350,6 +366,8 @@ struct Lane {
     ladder: [f32; 4],
     sync_tail: f32,
     previous_width: f32,
+    // pink / brown noise filter state
+    noise: [f32; 3],
 }
 impl Lane {
     const ZERO: Self = Self {
@@ -363,8 +381,28 @@ impl Lane {
         ladder: [0.; 4],
         sync_tail: 0.,
         previous_width: 0.5,
+        noise: [0.; 3],
     };
 }
+/// White (0), pink (1) or brown (2) noise from one white sample, at about the level of the white.
+/// Pink is Paul Kellet's three-pole approximation; brown is a leaky integral.
+fn coloured_noise(state: &mut [f32; 3], white: f32, kind: u32) -> f32 {
+    match kind {
+        1 => {
+            state[0] = 0.99765 * state[0] + white * 0.099046;
+            state[1] = 0.963 * state[1] + white * 0.2965164;
+            state[2] = 0.57 * state[2] + white * 1.0526913;
+            (state[0] + state[1] + state[2] + white * 0.1848) * PINK_GAIN
+        }
+        2 => {
+            state[0] = (state[0] + 0.02 * white) / 1.02;
+            state[0] * BROWN_GAIN
+        }
+        _ => white,
+    }
+}
+const PINK_GAIN: f32 = 0.344;
+const BROWN_GAIN: f32 = 9.7;
 fn damping(resonance: f32, modern: bool) -> f32 {
     if modern {
         1.4142135 - resonance * (1.4142135 - 0.15)
@@ -825,7 +863,7 @@ impl Engine {
                 5 => (-50., 50.),
                 6 => (0.05, 0.95),
                 9 => (20., 18000.),
-                11 => (0., 3.),
+                11 => (0., 4.),
                 12 => (10., 5000.),
                 14 => (-6., 6.),
                 16 | 27 | 37 | 41 => (0., 4.),
@@ -855,11 +893,15 @@ impl Engine {
                     _ => (-1., 1.),
                 },
                 86..=98 => colour::range(index - 86),
+                100 => (0., 4.),
+                101 => (0., 2.),
+                102 => (-24., 24.),
+                103 => (0.01, 4.),
                 _ => (0., 1.),
             };
             let l = scope as usize - 1;
             let discrete =
-                ((74..=85).contains(&index) && (index - 74) % 3 != 2) || index == 94 || index == 99;
+                ((74..=85).contains(&index) && (index - 74) % 3 != 2) || index == 94 || index == 99 || index == 101 || index == 104;
             self.p[l][index] = if discrete {
                 value.round().clamp(lo, hi)
             } else {
@@ -1054,6 +1096,10 @@ impl Engine {
                             ((random(&mut v.rng) + 1.) * 0.5).fract(),
                             0.,
                         ];
+                        if self.p[l][104] >= 0.5 {
+                            // restart: A at the start of its cycle, B a set way into its own
+                            v.lanes[l][u].phase = [0., self.p[l][105].fract(), 0.];
+                        }
                         if self.global[0] as u32 == 3 {
                             v.lanes[l][u].phase[2] = v.lanes[l][u].phase[0] * 0.5;
                         }
@@ -1279,6 +1325,12 @@ impl Engine {
                         + lfos[l][1] * p[36])
                         / 1200.;
                     let env_pitch = fe * p[34] / 12.;
+                    // a pitch sweep that starts p[102] semitones away and settles with time constant p[103]
+                    let sweep = if p[102] != 0. {
+                        p[102] * (-age / p[103].max(0.005)).exp() / 12.
+                    } else {
+                        0.
+                    };
                     let drift = if mode == 3 {
                         0.
                     } else {
@@ -1287,6 +1339,7 @@ impl Engine {
                     let pitch = if update {
                         (self.bend / 12.
                             + env_pitch
+                            + sweep
                             + drift
                             + lfo_pitch
                             + pressure * p[56] / 1200.
@@ -1478,7 +1531,9 @@ impl Engine {
                         lane.previous_width = pwm_a;
                         let sub = wave(4, lane.phase[2], dt_a * 0.5, 0.5, &self.sine);
                         let noise = if p[8] > 0. {
-                            random(&mut v.rng) * p[8] * 0.3
+                            coloured_noise(&mut lane.noise, random(&mut v.rng), p[101] as u32)
+                                * p[8]
+                                * 0.3
                         } else {
                             0.
                         };
@@ -1523,7 +1578,7 @@ impl Engine {
                             filter_g,
                             p[10],
                             kind,
-                            p[58] >= 0.5 && mode != 2,
+                            p[58] >= 0.5 && mode != 2 && kind < 4,
                             self.modern_filters,
                         );
                         // Web Audio's band-pass has unity centre gain;

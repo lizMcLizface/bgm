@@ -65,17 +65,14 @@ a{color:var(--amber);}
 /* Poly's fixed layout: rows 8 px apart like the CS-80, and a frame round each region */
 .poly-fixed{display:flex;flex-direction:column;gap:8px;}
 .pf-top{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch;}
-.pf-left{display:flex;flex-direction:column;gap:8px;min-width:0;flex:1 1 auto;}
+.pf-left{display:flex;flex-direction:column;gap:8px;min-width:0;flex:0 0 auto;}
 .pf-row{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch;}
 .pf-frame{display:flex;flex-wrap:wrap;gap:8px;padding:5px;border:1px solid #6b6f7866;border-radius:10px;background:#0000002e;align-items:stretch;}
-/* the page is only as wide as the layout; what is left over in the shorter rows is shared out between their frames and boxes */
+/* the page is only as wide as the widest row; every box and frame keeps its own natural width, so the row that drives the width is easy to see */
 .diy-poly .rig{width:max-content;max-width:100%;}
-.pf-row>.pf-frame,.pf-row>.diy-box{flex:1 1 auto;}
-.pf-row>.pf-frame:first-child:not(:only-child),.pf-row>.diy-box:first-child:not(:only-child){flex-grow:0;}
-.pf-row>.pf-frame:first-child.pf-osc,.pf-row>.pf-frame:first-child.pf-lfo,.pf-row>.pf-frame:first-child.pf-filter{flex-grow:1;}
-.pf-frame>.diy-box{flex:1 1 auto;}
+.pf-row>.pf-frame,.pf-row>.diy-box,.pf-frame>.diy-box{flex:0 0 auto;}
 .diy-box.static{display:flex;flex-direction:column;}
-.diy-box.static>.group-controls{flex:1;max-width:none;justify-content:space-evenly;align-content:flex-start;}
+.diy-box.static>.group-controls{flex:1;max-width:none;justify-content:flex-start;align-content:flex-start;}
 .pf-top>.diy-box{align-self:stretch;}
 .diy-box.static .arch{height:100%;}
 .diy-box .group-controls{gap:6px 4px;align-items:flex-start;max-width:640px;}
@@ -105,7 +102,7 @@ a{color:var(--amber);}
 .pick.row button{min-width:44px;}
 .pick.tall button{width:50px;min-width:50px;height:50px;padding:0;font-size:12px;}
 .arch{display:flex;flex-direction:column;justify-content:space-between;gap:10px;height:calc(var(--track) + 68px);}
-.arch-layers{display:flex;gap:14px;align-items:flex-start;}
+.arch-layers{display:flex;flex-direction:column;gap:12px;align-items:flex-start;}
 .diy-box button.mini{min-height:0;height:20px;padding:0 8px;font-size:10px;line-height:1;border-radius:4px;background:#26282c;border-color:#3d4046;color:#a7a399;box-shadow:0 2px 0 #0008;align-self:flex-start;}
 .diy-box button.mini:disabled{opacity:.35;box-shadow:none;}
 /* a toggle lever keeps the 106's capped throw; its column is as tall as a fader so its name sits on the faders' label line */
@@ -1008,3 +1005,80 @@ label.inline.toggle{min-height:32px;}label.inline.toggle em{font-style:normal;co
 .diy-fm .rig>nav.presets::before{content:'DIY FM  ·  4 / 6 OPERATOR FREQUENCY MODULATION SYNTHESIZER';}
 .diy .rig>nav.presets::before{margin-right:auto;font-size:10px;letter-spacing:.3em;font-weight:600;white-space:nowrap;color:color-mix(in srgb,var(--ends) 40%,#c9d6d3);}
 @media (max-width:900px){.diy .rig>nav.presets::before{display:none;}}
+
+/* the lab: floating test windows beside the DIY panels */
+.lab-window{position:fixed;z-index:70;box-sizing:border-box;padding:8px 10px 6px;background:#1a1916;border:1px solid #6b6f78;border-radius:10px;box-shadow:0 12px 32px #000a;}
+.lab-window h3{cursor:grab;display:flex;align-items:center;justify-content:space-between;margin:0 0 6px;user-select:none;-webkit-user-select:none;touch-action:none;}
+.lab-window h3:active{cursor:grabbing;}
+.lab-close{min-height:0;width:22px;height:22px;padding:0;font-size:15px;line-height:1;border-radius:11px;}
+.lab-window .group-controls{gap:6px 4px;align-items:flex-start;max-width:none;}
+.lab-window .fader{flex:0 0 42px;width:42px;--cap:22px;}
+.lab-window .fader-track{flex:none;height:96px;min-height:96px;}
+.lab-window .fader-cap{width:34px;}
+.lab-window .fader-value{font-size:11px;min-height:14px;}
+.lab-window .fader-label{font-size:10px;min-height:24px;}
+.lab-window.wide{width:min(720px,calc(100vw - 16px));}
+.lab-tuning{display:flex;flex-direction:column;flex-wrap:nowrap;gap:8px;padding:8px 10px 6px;}
+.lab-window.wide{width:auto;max-width:calc(100vw - 16px);}
+.lab-row{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;}
+.lab-faders{gap:4px;}
+.lab-tuning .hint{max-width:none;margin:2px 0 0;}
+.lab-window .pick-grid{height:auto;}
+.lab-window .pick.row{flex-direction:column-reverse;}
+
+.lab-window.lab-rack{padding:0;background:none;border:0;box-shadow:none;width:min(560px,calc(100vw - 16px));}
+.lab-window.lab-rack .rack-block>header{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;}
+.lab-window.lab-rack .rack-block{box-shadow:0 12px 32px #000a;}
+
+.pick.narrow button{min-width:30px;width:30px;padding:0;}
+
+/* horizontal slide switches, stacked in one column */
+.htoggle-stack{display:flex;flex-direction:column;justify-content:space-evenly;align-self:stretch;gap:10px;padding:0 4px;}
+.htoggle{display:flex;flex-direction:column;align-items:center;gap:3px;width:78px;--lv:#e8dcb8;}
+.htoggle.tone-amber{--lv:#e3a52a;}.htoggle.tone-violet{--lv:#a07fd6;}.htoggle.tone-red{--lv:#e0573d;}.htoggle.tone-teal{--lv:#4ec4b4;}
+.htoggle-ends{display:flex;justify-content:space-between;width:100%;font-size:10px;line-height:1;color:#6d6a62;white-space:nowrap;}
+.htoggle-ends .now{color:#efe9d8;font-weight:700;}
+.htoggle-track{position:relative;width:46px;height:18px;min-height:0;padding:0;border-radius:9px;background:#0b0c0d;border:1px solid #3a3d42;box-shadow:inset 0 2px 4px #000;}
+.htoggle-knob{position:absolute;top:2px;left:3px;width:22px;height:12px;border-radius:5px;background:linear-gradient(color-mix(in srgb,var(--lv) 60%,#fff),var(--lv));box-shadow:0 2px 3px #000a;transition:left .12s;}
+.htoggle.on .htoggle-knob{left:calc(100% - 25px);}
+.htoggle .fader-label{min-height:0;}
+
+/* pictogram buttons: as wide as the filter keys */
+.pick.icons button{width:30px;min-width:30px;height:24px;padding:0;display:grid;place-items:center;}
+.pick.icons svg{width:22px;height:18px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;}
+
+/* the architecture keys in the sounds bar */
+.presets .pick{flex-direction:column-reverse;}
+.presets .pick .fader-label{display:none;}
+.presets .pick-grid{height:auto;}
+.presets .pick button{height:30px;min-width:60px;font-size:12px;}
+.presets .pick.row{margin-right:6px;}
+
+/* the Layer box: every key in one narrow column; voice mode and glide as two selectors in one column */
+.pick.compact button{width:30px;min-width:30px;height:30px;padding:0;font-size:10px;}
+.pick.compact .pick-grid{height:auto;}
+.diy-box.static .arch{height:auto;}
+.arch-layers{gap:6px;align-items:center;}
+.pick-stack{display:flex;flex-direction:column;gap:8px;align-items:center;}
+.pick-stack .pick-grid{height:auto;}
+
+/* the amp envelope's timing: a small two-way radio beside Shape */
+.timing-radio{display:inline-flex;float:right;margin-left:6px;vertical-align:1px;}
+.timing-radio button{min-height:0;padding:1px 6px;font-size:9px;letter-spacing:.04em;border-radius:0;line-height:1.5;text-transform:none;}
+.timing-radio button:first-child{border-radius:10px 0 0 10px;}
+.timing-radio button:last-child{border-radius:0 10px 10px 0;border-left:0;}
+.timing-radio button.on{background:#e3a52a;border-color:#e3a52a;color:#1b1914;font-weight:700;}
+
+/* row 2's faders sit a little closer, so rows 1 and 2 come to the same width; the last row is padded out to that width */
+.pf-lfo .fader,.pf-env .fader{flex:0 0 41px;width:41px;}
+.pf-last>.pf-frame,.pf-last>.diy-box{flex:1 1 auto;}
+.pf-last .pf-frame>.diy-box{flex:1 1 auto;}
+.pf-last .diy-box.static>.group-controls{justify-content:space-evenly;}
+
+
+.diy-box[data-box=amp-env] .group-controls{column-gap:3px;}
+/* the Layer box: stacked keys, centred across the box */
+.diy-box[data-box=layer] .group-controls{justify-content:center;}
+.diy-box[data-box=layer] .arch,.diy-box[data-box=layer] .arch-layers{align-items:center;width:100%;}
+.diy-box[data-box=layer] .pick{align-items:center;}
+.diy-box[data-box=filter-env] .group-controls,.diy-box[data-box=mod-env] .group-controls{column-gap:3px;}

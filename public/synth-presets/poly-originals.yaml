@@ -121,6 +121,12 @@ programs:
       layers.0.noisePressure: 0
       layers.0.noiseAttack: 0.25
       layers.0.legacyAmp: 0
+      layers.0.ampHold: 0
+      layers.0.noiseType: 0
+      layers.0.pitchEnvAmount: 0
+      layers.0.pitchEnvDecay: 0.15
+      layers.0.phaseLock: 0
+      layers.0.bPhase: 0
       layers.1.waveA: 3
       layers.1.waveB: 4
       layers.1.levelA: 0.65
@@ -221,6 +227,12 @@ programs:
       layers.1.noisePressure: 0
       layers.1.noiseAttack: 0.25
       layers.1.legacyAmp: 0
+      layers.1.ampHold: 0
+      layers.1.noiseType: 0
+      layers.1.pitchEnvAmount: 0
+      layers.1.pitchEnvDecay: 0.15
+      layers.1.phaseLock: 0
+      layers.1.bPhase: 0
       effects.dry: 1
       effects.reverb: 0.22
       effects.delay: 0.12
@@ -389,6 +401,12 @@ programs:
       layers.0.noisePressure: 0
       layers.0.noiseAttack: 0.25
       layers.0.legacyAmp: 0
+      layers.0.ampHold: 0
+      layers.0.noiseType: 0
+      layers.0.pitchEnvAmount: 0
+      layers.0.pitchEnvDecay: 0.15
+      layers.0.phaseLock: 0
+      layers.0.bPhase: 0
       layers.1.waveA: 3
       layers.1.waveB: 4
       layers.1.levelA: 0.65
@@ -489,6 +507,12 @@ programs:
       layers.1.noisePressure: 0
       layers.1.noiseAttack: 0.25
       layers.1.legacyAmp: 0
+      layers.1.ampHold: 0
+      layers.1.noiseType: 0
+      layers.1.pitchEnvAmount: 0
+      layers.1.pitchEnvDecay: 0.15
+      layers.1.phaseLock: 0
+      layers.1.bPhase: 0
       effects.dry: 1
       effects.reverb: 0.22
       effects.delay: 0.12
@@ -657,6 +681,12 @@ programs:
       layers.0.noisePressure: 0
       layers.0.noiseAttack: 0.25
       layers.0.legacyAmp: 0
+      layers.0.ampHold: 0
+      layers.0.noiseType: 0
+      layers.0.pitchEnvAmount: 0
+      layers.0.pitchEnvDecay: 0.15
+      layers.0.phaseLock: 0
+      layers.0.bPhase: 0
       layers.1.waveA: 4
       layers.1.waveB: 0
       layers.1.levelA: 0.7
@@ -757,6 +787,12 @@ programs:
       layers.1.noisePressure: 0
       layers.1.noiseAttack: 0.25
       layers.1.legacyAmp: 0
+      layers.1.ampHold: 0
+      layers.1.noiseType: 0
+      layers.1.pitchEnvAmount: 0
+      layers.1.pitchEnvDecay: 0.15
+      layers.1.phaseLock: 0
+      layers.1.bPhase: 0
       effects.dry: 1
       effects.reverb: 0.22
       effects.delay: 0.12
@@ -925,6 +961,12 @@ programs:
       layers.0.noisePressure: 0
       layers.0.noiseAttack: 0.25
       layers.0.legacyAmp: 0
+      layers.0.ampHold: 0
+      layers.0.noiseType: 0
+      layers.0.pitchEnvAmount: 0
+      layers.0.pitchEnvDecay: 0.15
+      layers.0.phaseLock: 0
+      layers.0.bPhase: 0
       layers.1.waveA: 3
       layers.1.waveB: 4
       layers.1.levelA: 0.65
@@ -1025,6 +1067,12 @@ programs:
       layers.1.noisePressure: 0
       layers.1.noiseAttack: 0.25
       layers.1.legacyAmp: 0
+      layers.1.ampHold: 0
+      layers.1.noiseType: 0
+      layers.1.pitchEnvAmount: 0
+      layers.1.pitchEnvDecay: 0.15
+      layers.1.phaseLock: 0
+      layers.1.bPhase: 0
       effects.dry: 1
       effects.reverb: 0.22
       effects.delay: 0.12
@@ -1193,6 +1241,12 @@ programs:
       layers.0.noisePressure: 0
       layers.0.noiseAttack: 0.25
       layers.0.legacyAmp: 0
+      layers.0.ampHold: 0
+      layers.0.noiseType: 0
+      layers.0.pitchEnvAmount: 0
+      layers.0.pitchEnvDecay: 0.15
+      layers.0.phaseLock: 0
+      layers.0.bPhase: 0
       layers.1.waveA: 3
       layers.1.waveB: 4
       layers.1.levelA: 0.65
@@ -1293,6 +1347,12 @@ programs:
       layers.1.noisePressure: 0
       layers.1.noiseAttack: 0.25
       layers.1.legacyAmp: 0
+      layers.1.ampHold: 0
+      layers.1.noiseType: 0
+      layers.1.pitchEnvAmount: 0
+      layers.1.pitchEnvDecay: 0.15
+      layers.1.phaseLock: 0
+      layers.1.bPhase: 0
       effects.dry: 1
       effects.reverb: 0.22
       effects.delay: 0.12
@@ -1461,6 +1521,12 @@ programs:
       layers.0.noisePressure: 0
       layers.0.noiseAttack: 0.25
       layers.0.legacyAmp: 0
+      layers.0.ampHold: 0
+      layers.0.noiseType: 0
+      layers.0.pitchEnvAmount: 0
+      layers.0.pitchEnvDecay: 0.15
+      layers.0.phaseLock: 0
+      layers.0.bPhase: 0
       layers.1.waveA: 2
       layers.1.waveB: 0
       layers.1.levelA: 0.6
@@ -1561,6 +1627,12 @@ programs:
       layers.1.noisePressure: 0
       layers.1.noiseAttack: 0.25
       layers.1.legacyAmp: 0
+      layers.1.ampHold: 0
+      layers.1.noiseType: 0
+      layers.1.pitchEnvAmount: 0
+      layers.1.pitchEnvDecay: 0.15
+      layers.1.phaseLock: 0
+      layers.1.bPhase: 0
       effects.dry: 1
       effects.reverb: 0.22
       effects.delay: 0.12
@@ -1729,6 +1801,12 @@ programs:
       layers.0.noisePressure: 0
       layers.0.noiseAttack: 0.25
       layers.0.legacyAmp: 0
+      layers.0.ampHold: 0
+      layers.0.noiseType: 0
+      layers.0.pitchEnvAmount: 0
+      layers.0.pitchEnvDecay: 0.15
+      layers.0.phaseLock: 0
+      layers.0.bPhase: 0
       layers.1.waveA: 3
       layers.1.waveB: 4
       layers.1.levelA: 0.65
@@ -1829,6 +1907,12 @@ programs:
       layers.1.noisePressure: 0
       layers.1.noiseAttack: 0.25
       layers.1.legacyAmp: 0
+      layers.1.ampHold: 0
+      layers.1.noiseType: 0
+      layers.1.pitchEnvAmount: 0
+      layers.1.pitchEnvDecay: 0.15
+      layers.1.phaseLock: 0
+      layers.1.bPhase: 0
       effects.dry: 1
       effects.reverb: 0.22
       effects.delay: 0.12
@@ -1997,6 +2081,12 @@ programs:
       layers.0.noisePressure: 0
       layers.0.noiseAttack: 0.25
       layers.0.legacyAmp: 0
+      layers.0.ampHold: 0
+      layers.0.noiseType: 0
+      layers.0.pitchEnvAmount: 0
+      layers.0.pitchEnvDecay: 0.15
+      layers.0.phaseLock: 0
+      layers.0.bPhase: 0
       layers.1.waveA: 3
       layers.1.waveB: 4
       layers.1.levelA: 0.65
@@ -2097,6 +2187,12 @@ programs:
       layers.1.noisePressure: 0
       layers.1.noiseAttack: 0.25
       layers.1.legacyAmp: 0
+      layers.1.ampHold: 0
+      layers.1.noiseType: 0
+      layers.1.pitchEnvAmount: 0
+      layers.1.pitchEnvDecay: 0.15
+      layers.1.phaseLock: 0
+      layers.1.bPhase: 0
       effects.dry: 1
       effects.reverb: 0.22
       effects.delay: 0.12
@@ -2265,6 +2361,12 @@ programs:
       layers.0.noisePressure: 0
       layers.0.noiseAttack: 0.25
       layers.0.legacyAmp: 0
+      layers.0.ampHold: 0
+      layers.0.noiseType: 0
+      layers.0.pitchEnvAmount: 0
+      layers.0.pitchEnvDecay: 0.15
+      layers.0.phaseLock: 0
+      layers.0.bPhase: 0
       layers.1.waveA: 3
       layers.1.waveB: 4
       layers.1.levelA: 0.65
@@ -2365,6 +2467,12 @@ programs:
       layers.1.noisePressure: 0
       layers.1.noiseAttack: 0.25
       layers.1.legacyAmp: 0
+      layers.1.ampHold: 0
+      layers.1.noiseType: 0
+      layers.1.pitchEnvAmount: 0
+      layers.1.pitchEnvDecay: 0.15
+      layers.1.phaseLock: 0
+      layers.1.bPhase: 0
       effects.dry: 1
       effects.reverb: 0.22
       effects.delay: 0.12
@@ -2533,6 +2641,12 @@ programs:
       layers.0.noisePressure: 0.3
       layers.0.noiseAttack: 0.3
       layers.0.legacyAmp: 0
+      layers.0.ampHold: 0
+      layers.0.noiseType: 0
+      layers.0.pitchEnvAmount: 0
+      layers.0.pitchEnvDecay: 0.15
+      layers.0.phaseLock: 0
+      layers.0.bPhase: 0
       layers.1.waveA: 3
       layers.1.waveB: 4
       layers.1.levelA: 0.65
@@ -2633,6 +2747,12 @@ programs:
       layers.1.noisePressure: 0
       layers.1.noiseAttack: 0.25
       layers.1.legacyAmp: 0
+      layers.1.ampHold: 0
+      layers.1.noiseType: 0
+      layers.1.pitchEnvAmount: 0
+      layers.1.pitchEnvDecay: 0.15
+      layers.1.phaseLock: 0
+      layers.1.bPhase: 0
       effects.dry: 1
       effects.reverb: 0.22
       effects.delay: 0.12
@@ -2801,6 +2921,12 @@ programs:
       layers.0.noisePressure: 0
       layers.0.noiseAttack: 0.65
       layers.0.legacyAmp: 0
+      layers.0.ampHold: 0
+      layers.0.noiseType: 0
+      layers.0.pitchEnvAmount: 0
+      layers.0.pitchEnvDecay: 0.15
+      layers.0.phaseLock: 0
+      layers.0.bPhase: 0
       layers.1.waveA: 3
       layers.1.waveB: 4
       layers.1.levelA: 0.65
@@ -2901,6 +3027,12 @@ programs:
       layers.1.noisePressure: 0
       layers.1.noiseAttack: 0.25
       layers.1.legacyAmp: 0
+      layers.1.ampHold: 0
+      layers.1.noiseType: 0
+      layers.1.pitchEnvAmount: 0
+      layers.1.pitchEnvDecay: 0.15
+      layers.1.phaseLock: 0
+      layers.1.bPhase: 0
       effects.dry: 1
       effects.reverb: 0.22
       effects.delay: 0.12
