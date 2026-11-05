@@ -5,6 +5,26 @@ import {GLOBAL,LAYER,RECIPES,initialPatch,sanitizePatch} from '../../synth-lab/p
 import {FM_GLOBAL,FM_OPERATOR,FM_RECIPES,initialFM,sanitizeFM,topology} from '../../synth-lab/fmPatch';
 import {EFFECTS} from '../../synth-lab/effectsConfig';
 import {INSERTS} from '../../synth-lab/insertsConfig';
+import voices from '../../library/voices.json';
+import {translatedWasmVoice,needsNativeSource} from '../../app/engine/wasmPreset';
+
+// The front page's own sounds (src/library/voices.json), translated to these engines by the same code that plays them on
+// the front page's Wasm engine (app/engine/wasmPreset.js): subtractive ones become Poly patches, those with FM become FM
+// patches. Sounds that need a physical source (pianos, plucked strings), the sampled Iowa voices, the Measured set and the
+// two hidden ones stay on the pages that play them.
+const FRONT_CATEGORIES=[
+ {id:'fp-pads',label:'Front page · Pads',blurb:'The front page pads, translated'},
+ {id:'fp-bass',label:'Front page · Bass',blurb:'The front page basses, translated'},
+ {id:'fp-leads',label:'Front page · Leads',blurb:'The front page leads, translated'},
+ {id:'fp-keys',label:'Front page · Keys & plucks',blurb:'The front page keys and plucks, translated'},
+ {id:'fp-textures',label:'Front page · Textures',blurb:'The front page textures, translated'},
+ {id:'fp-classic',label:'Front page · Classic keys',blurb:'The front page classic keys, translated'},
+];
+const FRONT_FROM={Pads:'fp-pads',Bass:'fp-bass',Leads:'fp-leads','Keys & plucks':'fp-keys',Textures:'fp-textures','Classic keys':'fp-classic'};
+const HIDDEN=new Set(['Measured Violin','Measured Cello']);
+const FRONT_PAGE=Object.entries(FRONT_FROM).flatMap(([from,category])=>Object.entries(voices[from]??{})
+ .filter(([name,raw])=>!HIDDEN.has(name)&&!needsNativeSource(raw))
+ .map(([name,raw])=>({name,category,...translatedWasmVoice(raw,8,null)})));
 
 function schema(fm){
  const fields=[];
@@ -35,7 +55,9 @@ function schema(fm){
   }
   return native(patch);
  };
- return {params,flatten,inflate,presets:(fm?FM_RECIPES:RECIPES).map(p=>({name:p.name,...(fm?FM_SOUNDS:POLY_SOUNDS)[p.name],values:flatten(native(p)),colour:fm?'#9b86e5':'#63c5b6'})),categories:fm?FM_CATEGORIES:POLY_CATEGORIES};
+ const own=(fm?FM_RECIPES:RECIPES).map(p=>({name:p.name,...(fm?FM_SOUNDS:POLY_SOUNDS)[p.name],values:flatten(native(p)),colour:fm?'#9b86e5':'#63c5b6'}));
+ const front=FRONT_PAGE.filter(f=>f.kind===(fm?'fm':'subtractive')).map(f=>({name:f.name,category:f.category,styles:['front page'],note:'The front page sound of this name, translated to this synth.',values:flatten(native(f.patch)),colour:fm?'#9b86e5':'#63c5b6'}));
+ return {params,flatten,inflate,presets:[...own,...front],categories:[...(fm?FM_CATEGORIES:POLY_CATEGORIES),...FRONT_CATEGORIES.filter(c=>front.some(p=>p.category===c.id))]};
 }
 // Each DIY synth's own sound categories and where its recipes sit in them.
 const POLY_CATEGORIES=[

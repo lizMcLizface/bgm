@@ -9,7 +9,7 @@ const VIEW={scale:true,chord:true,intervals:true,names:true};
 // The on-screen keyboard at the foot of a /synths page, in a box of its own: as many octaves as fit (up to the 61 keys of a
 // standard keybed, C to C), the ribbon attached to its left end and the touch pad to its right, `head` along the top of the box.
 // The key's scale is marked along the foot of each key and, when a chord is picked, its tones in their interval colours.
-const WHITE=30,ARROW=40,GAP=6,SIDE_L=88,SIDE_R=130,SIDE_R_MIN=56,PAD=24,MIN_WHITES=8,MAX_WHITES=36,MAX_BOX=1040,WHITE_PCS=[0,2,4,5,7,9,11];
+const WHITE=30,ARROW=40,GAP=6,SIDE_L=88,SIDE_R=130,SIDE_R_MIN=56,PAD=24,MIN_WHITES=8,MAX_WHITES=36,MAX_BOX=1400,WHITE_PCS=[0,2,4,5,7,9,11];
 const isWhite=n=>WHITE_PCS.includes(((n%12)+12)%12);
 // the top key for `whites` white keys counted from `low`
 const highFor=(low,whites)=>{let n=low,seen=isWhite(low)?1:0;while(seen<whites&&n<108){n++;if(isWhite(n))seen++;}return n;};

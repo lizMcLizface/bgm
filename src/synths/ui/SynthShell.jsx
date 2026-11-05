@@ -52,7 +52,7 @@ export default function SynthShell(props){
  const embedded=useEnsemblePanel();
  return embedded?<EmbeddedShell {...props}/>:<StandaloneShell {...props}/>;
 }
-function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelClassName='',expand,libraries=[],picker:Picker=SoundPicker,gridKeys=false,toggles=false,startEngine=startLiveSynth,engineOptions,onEngine,onStats,onMidiRealtime,onComparisonWaves,initialPatch,onChoose,compactRack=true,keyboard=true,children}){
+function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelClassName='',expand,libraries=[],picker:Picker=SoundPicker,gridKeys=false,toggles=false,startEngine=startLiveSynth,engineOptions,onEngine,onStats,onMidiRealtime,onComparisonWaves,initialPatch,onChoose,compactRack=true,keyboard=true,helpInBar=false,children}){
  const {params:{BY_KEY,sanitize,toPairs},presets}=synth;
  const PATCH_KEY=`synths:${synth.id}:patch`,MINE_KEY=`synths:${synth.id}:mine`;
  const [patch,setPatch]=useState(()=>{
@@ -75,6 +75,13 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
  const SHELF_KEY=`synths:${synth.id}:shelf`;
  // the instrument's case and the keyboard box can each be moved by their grip, and are remembered
  const rigDrag=useDraggable(`synths:${synth.id}:rig-pos`),keysDrag=useDraggable('synths:keys-pos');
+ const [showHelp,setShowHelp]=useState(false),helpRef=useRef(null);
+ useEffect(()=>{
+  if(!showHelp)return undefined;
+  const away=e=>{if(!helpRef.current?.contains(e.target))setShowHelp(false);},key=e=>{if(e.key==='Escape')setShowHelp(false);};
+  document.addEventListener('pointerdown',away);window.addEventListener('keydown',key);
+  return ()=>{document.removeEventListener('pointerdown',away);window.removeEventListener('keydown',key);};
+ },[showHelp]);
  const [shelf,setShelf]=useState(()=>{const s=load(SHELF_KEY,'sounds');return libraries.some(l=>l.id===s)?s:'sounds';});
  const pickShelf=id=>{setShelf(id);save(SHELF_KEY,id);};
  const library=libraries.find(l=>l.id===shelf);
@@ -283,6 +290,7 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
  };
  // With a MIDI piano attached the on-screen keys only take space from the panel.
   const showKeys=keyboard&&setup.keys!=='hide'; // the header's keyboard button; on unless it was switched off
+ const keyLines=['1–5 · phrases','Esc · stops',...(gridKeys?['← → · patch','↑ ↓ · bank']:['← → · sound','↑ ↓ · kind']),...(synth.generate?['N · new sound']:[]),'A S D F G H J K · play notes (W E T Y U for the black keys)','Z X · octave',...(midi.inputs.length?['Your MIDI keyboard plays too']:[])];
  const current=patch.name.replace(/ \*$/,'');
  const maxVoices=patch.values.voices??patch.values['global.polyphony']??(synth.id==='vs'?8:synth.id==='minimoog'?1:null);
 
@@ -299,6 +307,10 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
    <button type="button" aria-pressed={showSetup} onClick={()=>setShowSetup(v=>!v)} aria-label="Setup">⚙</button>
    <button type="button" onClick={()=>{phrases.stop();performer.panic();}} title="Silence everything (Esc)">Panic</button>
    <button type="button" onClick={fullscreen} aria-label="Full screen">⛶</button>
+   {keyboard&&helpInBar&&<span className="help-wrap" ref={helpRef}>
+    <button type="button" aria-pressed={showHelp} aria-expanded={showHelp} aria-label="Keyboard shortcuts" title="Keyboard shortcuts" onClick={()=>setShowHelp(v=>!v)}>?</button>
+    {showHelp&&<div className="help-pop" role="dialog" aria-label="Keyboard shortcuts"><b>Keys</b><ul>{keyLines.map(l=><li key={l}>{l}</li>)}</ul></div>}
+   </span>}
    {keyboard&&<button type="button" className="keys-button" aria-pressed={showKeys} onClick={()=>updateSetup('keys',showKeys?'hide':'show')} aria-label="On-screen keyboard" title="Show or hide the on-screen keyboard">🎹</button>}
   </header>
 
@@ -339,7 +351,7 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
     </>}
     left={<Ribbon vertical range={setup.ribbonRange} onBend={b=>performer.source('ribbon',b)}/>}
     right={<TouchPad onTouch={(pressure,mod)=>{performer.source('pad',pressure);performer.source('padMod',mod);}}/>}/>}
-   {keyboard&&<p className="dock-keys stage-help">{`Keys: 1–5 phrases · Esc stops · ${gridKeys?"← → patch · ↑ ↓ bank":"← → sound · ↑ ↓ kind"}${synth.generate?' · N new sound':''} · A S D F G H J K play notes (W E T Y U black keys) · Z X octave${midi.inputs.length?' · your MIDI keyboard plays too':''}`}</p>}
+   {keyboard&&!helpInBar&&<p className="dock-keys stage-help">`Keys: 1–5 phrases · Esc stops · ${gridKeys?"← → patch · ↑ ↓ bank":"← → sound · ↑ ↓ kind"}${synth.generate?' · N new sound':''} · A S D F G H J K play notes (W E T Y U black keys) · Z X octave${midi.inputs.length?' · your MIDI keyboard plays too':''}`</p>}
   </footer>
 
   {audio.state!=='on'&&<button type="button" className={'wake '+audio.state} onClick={start} disabled={comparisonPending}>

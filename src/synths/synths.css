@@ -42,52 +42,122 @@ a{color:var(--amber);}
 
 /* The DIY panels wrap the lab engines; groups keep a natural height and the
    edit panel scrolls independently of the performance controls. */
-.diy{--ends:#152c2a;}
+.diy{--ends:#152c2a;--track:126px;}
 .diy-fm{--ends:#29213d;}
 .diy .brand{color:#80d5c8;}
 .diy-fm .brand{color:#bcacf0;}
-.diy-tabs{display:flex;flex:none;gap:6px;padding:8px 12px;border-bottom:1px solid var(--line);overflow-x:auto;}
-.diy-tabs button{flex:none;min-height:36px;padding:6px 16px;}
 .diy button[aria-pressed=true]{background:#29413b;border-color:#63c5b6;}
 .diy-fm button[aria-pressed=true]{background:#372d4b;border-color:#9b86e5;}
+/* the panel is a free workspace of floating boxes */
 .panel.diy-panel{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));align-content:start;align-items:start;gap:12px;}
-.diy-context{grid-column:1/-1;display:flex;align-items:center;flex-wrap:wrap;gap:12px;padding:4px 0 8px;}
-.diy-context label,.diy-select{display:flex;flex-direction:column;gap:5px;min-width:0;font-size:12px;color:var(--muted);}
-.diy-context select{max-width:100%;}
-.diy-context>.diy-select{flex:0 1 440px;}
-.diy-switch{display:flex;gap:6px;flex-wrap:wrap;}
-.diy-group{min-width:0;padding:14px;}
-.diy-group h3{margin-bottom:14px;}
-.diy-group .group-controls{gap:12px 8px;align-items:flex-start;}
-.diy .fader{flex:0 0 50px;width:50px;}
-.diy .fader-track{flex:none;height:96px;min-height:96px;}
+/* DI-Poly and DIY FM lay their own boxes out; the other pages that share the class keep the grid above */
+.diy .panel.diy-panel{display:block;position:relative;padding:8px 10px;}
+.ws-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 2px 8px;font-size:11px;color:var(--muted);}
+.ws-bar button{min-height:24px;padding:2px 10px;font-size:11px;}
+.workspace{position:relative;}
+.workspace.flow{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;}
+.diy-box{position:relative;min-width:0;padding:8px 10px 6px;box-shadow:0 4px 14px #0008;}
+.workspace.pinned>.diy-box{position:absolute;}
+.diy-box h3.box-handle{cursor:grab;margin:0 0 6px;padding:0;user-select:none;-webkit-user-select:none;touch-action:none;}
+.diy-box h3.box-handle:active{cursor:grabbing;}
+.diy-box.static{position:relative;box-shadow:none;}
+.diy-box.static h3.box-handle,.diy-box.static h3.box-handle:active{cursor:default;}
+/* Poly's fixed layout: rows 8 px apart like the CS-80, and a frame round each region */
+.poly-fixed{display:flex;flex-direction:column;gap:8px;}
+.pf-top{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch;}
+.pf-left{display:flex;flex-direction:column;gap:8px;min-width:0;flex:1 1 auto;}
+.pf-row{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch;}
+.pf-frame{display:flex;flex-wrap:wrap;gap:8px;padding:5px;border:1px solid #6b6f7866;border-radius:10px;background:#0000002e;align-items:stretch;}
+/* the page is only as wide as the layout; what is left over in the shorter rows is shared out between their frames and boxes */
+.diy-poly .rig{width:max-content;max-width:100%;}
+.pf-row>.pf-frame,.pf-row>.diy-box{flex:1 1 auto;}
+.pf-row>.pf-frame:first-child:not(:only-child),.pf-row>.diy-box:first-child:not(:only-child){flex-grow:0;}
+.pf-row>.pf-frame:first-child.pf-osc,.pf-row>.pf-frame:first-child.pf-lfo,.pf-row>.pf-frame:first-child.pf-filter{flex-grow:1;}
+.pf-frame>.diy-box{flex:1 1 auto;}
+.diy-box.static{display:flex;flex-direction:column;}
+.diy-box.static>.group-controls{flex:1;max-width:none;justify-content:space-evenly;align-content:flex-start;}
+.pf-top>.diy-box{align-self:stretch;}
+.diy-box.static .arch{height:100%;}
+.diy-box .group-controls{gap:6px 4px;align-items:flex-start;max-width:640px;}
+.diy-box .hint{max-width:240px;font-size:11px;color:var(--muted);}
+/* sliders: the CS-80 / Juno 106 size and proportions */
+.diy .fader{flex:0 0 42px;width:42px;}
+.diy .fader-track{flex:none;height:var(--track);min-height:var(--track);}
 .diy .fader-cap{width:34px;}
-.diy-select{flex:1 1 125px;max-width:100%;}
+.diy .fader-value{font-size:11px;min-height:14px;}
+.diy .fader-label{font-size:10px;min-height:24px;}
+.diy-select{display:flex;flex-direction:column;gap:5px;min-width:0;font-size:12px;color:var(--muted);flex:1 1 125px;max-width:100%;}
+.diy .diy-select{flex-basis:150px;max-width:220px;}
+.diy-select.wide{flex-basis:200px;}
 .diy-select select{width:100%;font-size:13px;}
-.diy-operators{grid-column:1/-1;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;}
-.diy-operators button{display:flex;align-items:flex-start;flex-direction:column;gap:4px;text-align:left;padding:10px 14px;}
-.diy-operators b{font-size:15px;}
-.diy-operators span{font-size:13px;color:var(--text);}
-.diy-operators small{color:var(--muted);font-size:11px;}
-.diy-operator-select{display:none;}
-.diy-routing{grid-column:1/-1;min-width:0;padding:14px;}
+/* button groups (waves, filter response, short lists) */
+.pick{display:flex;flex-direction:column;align-items:center;gap:4px;touch-action:none;}
+.pick-grid{display:grid;grid-template-columns:repeat(var(--cols,1),auto);gap:3px;align-content:center;height:calc(var(--track) + 40px);}
+.pick.row .pick-grid{height:auto;}
+.pick.row{flex-direction:column-reverse;align-items:stretch;}
+.pick.row .fader-label{min-height:0;}
+.pick button{min-height:0;height:20px;min-width:52px;padding:0 4px;font-size:10px;line-height:1;border-radius:4px;white-space:nowrap;background:#26282c;border-color:#3d4046;color:#a7a399;box-shadow:0 2px 0 #0008;}
+.pick button.on{background:var(--tone,#e3d9b8);border-color:var(--tone,#e3d9b8);color:#17140d;font-weight:700;box-shadow:inset 0 2px 3px #0007;transform:translateY(1px);}
+.pick.square button{width:30px;min-width:30px;height:30px;font-size:10px;padding:0;border-radius:6px;}
+.pick.tone-cream{--tone:#e8dcb8;}.pick.tone-amber{--tone:#e3a52a;}.pick.tone-violet{--tone:#a07fd6;}.pick.tone-red{--tone:#e0573d;}
+.pick.tone-blue{--tone:#5b8fd9;}.pick.tone-teal{--tone:#4ec4b4;}.pick.tone-green{--tone:#5fae7a;}
+.pick button:disabled{opacity:.35;box-shadow:none;}
+.pick.row button{min-width:44px;}
+.pick.tall button{width:50px;min-width:50px;height:50px;padding:0;font-size:12px;}
+.arch{display:flex;flex-direction:column;justify-content:space-between;gap:10px;height:calc(var(--track) + 68px);}
+.arch-layers{display:flex;gap:14px;align-items:flex-start;}
+.diy-box button.mini{min-height:0;height:20px;padding:0 8px;font-size:10px;line-height:1;border-radius:4px;background:#26282c;border-color:#3d4046;color:#a7a399;box-shadow:0 2px 0 #0008;align-self:flex-start;}
+.diy-box button.mini:disabled{opacity:.35;box-shadow:none;}
+/* a toggle lever keeps the 106's capped throw; its column is as tall as a fader so its name sits on the faders' label line */
+.diy .lever{height:calc(var(--track) + 68px);--lever-below:24px;}
+.diy .lever-foot{padding-top:0;white-space:normal;left:-3px;right:-3px;}
+.rmx{display:flex;flex-direction:column;gap:3px;font-size:10px;}
+.rmx-head,.rmx-row{display:grid;grid-template-columns:78px repeat(var(--cols),46px);gap:3px;align-items:center;}
+.rmx-head span{text-align:center;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rmx-corner{text-align:left!important;font-size:9px;opacity:.7;}
+.rmx-source{color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rmx-cell{position:relative;width:100%;min-height:0;height:var(--cell,22px);padding:0;border-radius:4px;font-size:10px;font-variant-numeric:tabular-nums;background:#13120f;border:1px solid #2c2a25;color:#6d6a62;box-shadow:none;}
+.rmx-cell:hover{border-color:#5a554c;}
+.rmx-cell.built{background:#1e1b27;border-color:#3b3556;}
+.rmx-cell.built.on{color:#d7c9f5;border-color:#7b66c4;background:#2a2340;}
+.rmx-cell.via{background:#2a2216;border-color:#8a6a2a;color:#f0cf8a;}
+.rmx-cell{touch-action:none;overflow:hidden;cursor:ns-resize;}
+.rmx-text{position:relative;z-index:1;}
+.rmx-fill{position:absolute;left:3px;right:3px;border-radius:2px;background:currentColor;opacity:.22;pointer-events:none;}
+.rmx-foot .warn{color:#e0573d;}
+.rmx-cell:focus{outline:none;}
+.rmx-cell:focus-visible{outline:1px solid #c9c4d8;outline-offset:1px;}
+.rmx-cell small{position:absolute;right:2px;top:0;font-size:7px;line-height:1.3;color:#c9a24f;}
+.rmx-foot{position:absolute;right:10px;top:8px;display:flex;gap:14px;color:var(--muted);font-size:10px;}
+.swatch{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:-1px;}
+.swatch.built{background:#7b66c4;}.swatch.via{background:#c9a24f;}
+.diy-operators{display:grid;grid-template-columns:repeat(3,minmax(78px,1fr));gap:6px;}
+.diy-operators button{display:flex;align-items:flex-start;flex-direction:column;gap:3px;text-align:left;padding:7px 10px;}
+.diy-operators b{font-size:14px;}
+.diy-operators span{font-size:12px;color:var(--text);}
+.diy-operators small{color:var(--muted);font-size:10px;}
 .diy-routing-scroll{overflow-x:auto;}
-.diy-routing table{border-collapse:collapse;text-align:center;width:100%;max-width:900px;font-size:12px;}
-.diy-routing th,.diy-routing td{padding:7px;border-bottom:1px solid var(--line);}
-.diy-routing input{width:64px;min-height:38px;border:1px solid var(--line);background:var(--panel-2);border-radius:6px;padding:6px;}
+.diy-routing table{border-collapse:collapse;text-align:center;font-size:12px;}
+.diy-routing th,.diy-routing td{padding:5px;border-bottom:1px solid var(--line);}
+.diy-routing input{width:60px;min-height:34px;border:1px solid var(--line);background:var(--panel-2);border-radius:6px;padding:4px;}
+/* the preset display: a small OLED window and an endless knob */
+.oled-picker{display:inline-flex;align-items:center;gap:10px;}
+.oled{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;width:210px;height:44px;min-height:0;padding:3px 10px;border-radius:4px;border:1px solid #000;background:#02060a;
+ box-shadow:inset 0 0 0 1px #1c2a30,inset 0 0 14px #000,0 0 8px #5ee1ff14;font-family:ui-monospace,Consolas,monospace;color:#7fe7ff;text-shadow:0 0 6px #4fd8ff99;overflow:hidden;
+ background-image:repeating-linear-gradient(0deg,#0000 0 1px,#00000055 1px 2px);}
+.oled:hover,.oled:focus-visible{border-color:#2d5a66;}
+.oled-cat{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#4aa6b8;white-space:nowrap;}
+.oled-name{font-size:14px;line-height:1.1;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.preset-knob{width:40px;height:40px;flex:none;cursor:ns-resize;touch-action:none;user-select:none;-webkit-user-select:none;border-radius:50%;}
+.preset-knob:focus-visible{outline:2px solid var(--focus);outline-offset:2px;}
+.preset-knob .knob-grip{stroke:#55585e;stroke-width:1.4;stroke-linecap:round;}
 .diy .keys{height:clamp(80px,12vh,112px);}
 .diy .perform-row{height:clamp(48px,7vh,64px);}
 .diy .ribbon,.diy .touchpad{height:100%;}
 @media(max-width:700px){
- .diy-operators{display:none;}
- .diy-operator-select{grid-column:1/-1;display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);}
- .diy .comparison-presets>b{display:none;}
- .diy .comparison-presets label{flex:1 1 42%;display:flex;flex-direction:column;align-items:stretch;gap:3px;}
- .diy .comparison-presets select{width:100%;max-width:100%;}
- .diy .comparison-presets button,.diy .comparison-presets a{padding:5px;font-size:11px;}
- .diy .diy-tabs{padding:6px 8px;gap:4px;}
- .diy-tabs button{padding:6px 12px;}
  .panel.diy-panel{padding:8px;gap:8px;}
+ .diy .panel.diy-panel{padding:8px;}
+ .oled{width:160px;}
 }
 
 /* ---------- instrument shell ---------- */
@@ -756,6 +826,10 @@ label.inline.toggle{min-height:32px;}label.inline.toggle em{font-style:normal;co
 .scale-pop select{min-height:30px;font-size:13px;padding:2px 6px;max-width:190px;}
 .keybox-head .dock-phrases button.on{box-shadow:inset 0 2px 5px #0007;transform:translateY(1px);}
 .keys-button{font-size:18px;padding:0 10px;}
+.help-wrap{position:relative;display:inline-flex;}
+.help-pop{position:absolute;right:0;top:calc(100% + 8px);z-index:60;width:min(380px,90vw);box-sizing:border-box;padding:10px 14px 12px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.45);font-size:12px;color:var(--muted);}
+.help-pop b{color:var(--text);font-size:12px;letter-spacing:.06em;text-transform:uppercase;}
+.help-pop ul{margin:6px 0 0;padding:0;list-style:none;display:grid;gap:4px;line-height:1.4;}
 
 /* the stage may shrink below its contents, so the keyboard can drop keys */
 .perform{grid-template-columns:minmax(0,1fr);}
@@ -882,3 +956,55 @@ label.inline.toggle{min-height:32px;}label.inline.toggle em{font-style:normal;co
 .juno .rig::before{display:none;}
 .juno .rig-grip{height:10px;background:linear-gradient(90deg,#e0573d 0 16%,#e3a52a 16% 33%,#e8dcb8 33% 50%,#5fae7a 50% 66%,#4ec4b4 66% 83%,#5b8fd9 83% 100%);}
 .juno .rig-grip i{height:3px;width:30px;background:repeating-linear-gradient(90deg,#000 0 3px,#0000 3px 6px);opacity:.45;}
+
+/* DIY synths: a little life. Everything here is decoration and switched off for people who ask for reduced motion. */
+.lamp{display:inline-block;width:7px;height:7px;margin-left:8px;border-radius:50%;vertical-align:1px;background:#a07fd6;box-shadow:0 0 6px #a07fd6aa;opacity:.35;}
+@media (prefers-reduced-motion:no-preference){
+ .lamp{animation:lamp var(--period,1s) ease-in-out infinite alternate;}
+ @keyframes lamp{from{opacity:.15;transform:scale(.8);}to{opacity:1;transform:scale(1.15);}}
+ /* the display types each new sound's name in, with a cursor that blinks for a moment after */
+ .oled-name{animation:oledType .55s steps(var(--n,10)) both;}
+ @keyframes oledType{from{clip-path:inset(0 100% 0 0);}to{clip-path:inset(0 0 0 0);}}
+ .oled-name::after{content:"\258C";margin-left:2px;color:var(--accent,#7fe7ff);animation:oledCursor .5s step-end 5 .55s both;}
+ @keyframes oledCursor{0%,49%{opacity:1;}50%,100%{opacity:0;}}
+ /* caps lift a touch under the finger, keys press in with a small bounce, a new route pops into the matrix */
+ .diy .fader:hover .fader-cap{filter:brightness(1.12);}
+ .diy .fader:active .fader-cap{filter:brightness(1.2);box-shadow:0 0 10px color-mix(in srgb,var(--tone) 55%,transparent),0 2px 4px #000a;}
+ .pick button.on,.toggle-key.on{animation:keyDown .16s ease-out;}
+ @keyframes keyDown{0%{transform:translateY(-2px) scale(1.06);}100%{transform:translateY(1px) scale(1);}}
+ .rmx-cell.via{animation:rmxPop .35s cubic-bezier(.3,1.6,.5,1),rmxGlow 3.2s ease-in-out .4s infinite;}
+ @keyframes rmxPop{from{transform:scale(.7);}to{transform:scale(1);}}
+ @keyframes rmxGlow{50%{box-shadow:0 0 9px #c9a24f55;}}
+ .rmx-cell.built.on:hover{box-shadow:0 0 8px #7b66c488;}
+ /* frames brighten a little when you are working inside them */
+ .pf-frame{transition:border-color .25s,background .25s;}
+ .pf-frame:focus-within,.pf-frame:hover{border-color:#6b6f78aa;background:#00000040;}
+ .diy .brand{background:linear-gradient(90deg,#80d5c8,#d5f5ee,#80d5c8);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:brandShine 8s ease-in-out infinite;}
+ @keyframes brandShine{50%{background-position:100% 0;}}
+ .diy-fm .brand{background-image:linear-gradient(90deg,#bcacf0,#ece6ff,#bcacf0);}
+}
+.oled{position:relative;overflow:hidden;padding-left:14px;border-color:#1d6676;
+ background:repeating-linear-gradient(0deg,#0000 0 1px,#00000040 1px 2px),radial-gradient(120% 150% at 12% 0%,#0d4a5a 0%,#06232d 45%,#02080c 100%);
+ box-shadow:inset 0 0 0 1px #14505e,inset 0 0 20px #0f7c94aa,0 0 14px #3fd0e526;}
+.oled::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent,#4fd8ff);box-shadow:0 0 10px var(--accent,#4fd8ff);}
+.oled-cat{color:#6fd0e4;}
+.oled:hover,.oled:focus-visible{border-color:#3fb5cc;box-shadow:inset 0 0 0 1px #1f7f92,inset 0 0 24px #17a3c1bb,0 0 18px #3fd0e544;}
+
+/* an OLED has no backlight: pure black, and the colour is the lit pixels themselves, in the sound's own colour */
+.oled{background:#000;border-color:#1c1c1e;box-shadow:none;color:var(--accent,#7fe7ff);text-shadow:none;padding-left:10px;}
+.oled::before{left:10px;right:10px;top:auto;bottom:5px;width:auto;height:1px;background:var(--accent,#7fe7ff);opacity:.4;box-shadow:none;}
+.oled-cat{color:var(--accent,#7fe7ff);opacity:.65;}
+.oled:hover,.oled:focus-visible{border-color:#3a3a3f;box-shadow:none;}
+
+/* the DIY cases: a slim coloured frame all the way round, a tinted face and a striped grip; the name sits at the left of the top row */
+.diy{--ends:#1f5a53;--face-a:#12201f;--face-b:#0e1514;}
+.diy-fm{--ends:#43337a;--face-a:#1a1526;--face-b:#120f1b;}
+.diy .rig{border-width:3px;border-radius:14px;box-shadow:0 10px 28px #000a;}
+.diy .rig>.panel{background:linear-gradient(180deg,var(--face-a),var(--face-b));}
+.diy .rig-grip{height:6px;background:linear-gradient(90deg,#4ec4b4 0 20%,#5b8fd9 20% 40%,#a07fd6 40% 60%,#e3a52a 60% 80%,#e0573d 80% 100%);}
+.diy .rig-grip i{height:2px;width:30px;background:repeating-linear-gradient(90deg,#000 0 3px,#0000 3px 6px);opacity:.4;}
+.diy .rig>nav.presets{justify-content:flex-end;background:color-mix(in srgb,var(--ends) 14%,#161513);}
+.diy-poly .rig>nav.presets::before{content:'DI-POLY  ·  POLYPHONIC SUBTRACTIVE SYNTHESIZER';}
+.diy-fm .rig>nav.presets::before{content:'DIY FM  ·  4 / 6 OPERATOR FREQUENCY MODULATION SYNTHESIZER';}
+.diy .rig>nav.presets::before{margin-right:auto;font-size:10px;letter-spacing:.3em;font-weight:600;white-space:nowrap;color:color-mix(in srgb,var(--ends) 40%,#c9d6d3);}
+@media (max-width:900px){.diy .rig>nav.presets::before{display:none;}}

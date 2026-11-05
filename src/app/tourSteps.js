@@ -233,7 +233,7 @@ export const TOUR_STEPS = [
         stage: 4,
         selector: '.gen-rolebuttons button[title="Edit sound"]',
         title: 'The synth behind a voice',
-        text: '✎ opens a voice’s sound: the calmbgm synth on faders, DIY Poly and FM, or one of the classic synths, with its effects. While it is open your keyboard and MIDI play that voice, and the arrow keys step through sounds (← →) and categories (↑ ↓). Save, export and import presets there too.',
+        text: '✎ opens a voice’s sound: the calmbgm synth on faders, DI-Poly and DIY FM, or one of the classic synths, with its effects. While it is open your keyboard and MIDI play that voice, and the arrow keys step through sounds (← →) and categories (↑ ↓). Save, export and import presets there too.',
     },
 
     // ---- 4: arrangement ----

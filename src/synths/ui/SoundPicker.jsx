@@ -43,7 +43,8 @@ export function nextSound({sounds,categories},current,currentCategory,dir,jump){
 const matches=(p,words)=>{const hay=[p.name,p.note,...(p.styles??[]),p.categoryLabel].join(' ').toLowerCase();return words.every(w=>hay.includes(w));};
 
 // `container`: where the browser window opens (a host page that scopes the synths' styles passes its own).
-export default function SoundPicker({synth,presets,mine,current,currentCategory,choose,remove,container}){
+// `display`: a function that draws the opener itself ({open,ref,active,category,name}), replacing the button, New and the neighbour chips.
+export default function SoundPicker({synth,presets,mine,current,currentCategory,choose,remove,container,display}){
  const [open,setOpen]=useState(false);
  const [category,setCategory]=useState(ALL);
  const [query,setQuery]=useState('');
@@ -74,11 +75,13 @@ export default function SoundPicker({synth,presets,mine,current,currentCategory,
  const label=id=>categories.find(c=>c.id===id)?.label??id;
 
  return <>
+  {display?display({open:()=>setOpen(true),ref:trigger,active,category:active?.categoryLabel??(here?label(here):'Sounds'),name:current||'Pick one…',expanded:open}):<>
   <button ref={trigger} type="button" className="sp-trigger" aria-haspopup="dialog" aria-expanded={open} onClick={()=>setOpen(true)} title={`Browse every sound by category · keys: ← → sound, ↑ ↓ category${synth.generate?', N new':''}, 1-5 hear a bass line, chord, arpeggio or lead`}>
    <span className="sp-trigger-label">{active?.categoryLabel??(here?label(here):'Sounds')}</span><span className="sp-trigger-name">{current||'Pick one…'}</span><span aria-hidden="true">▾</span>
   </button>
   {here&&canMake(here)&&<button type="button" className="sp-new" onClick={()=>make(here)} title={`A fresh sound in ${label(here)}, generated now`}>✦ New</button>}
   {neighbours.map(p=><button type="button" key={p.cat+'/'+p.name} style={{'--chip':p.colour}} className={'sp-chip'+(p.name===current?' on':'')} onClick={()=>choose(p)} title={p.note}>{p.name}</button>)}
+  </>}
   {open&&createPortal(<div className="sp-backdrop" role="presentation" onMouseDown={e=>e.target===e.currentTarget&&close()}>
    <div className="sp" role="dialog" aria-modal="true" aria-label={synth.name+' sounds'}>
     <div className="sp-head">
