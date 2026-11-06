@@ -59,7 +59,7 @@ export function DrumMachineTop({kit,synth,values,change}){
  const slider=(key,label,className)=><label className={'dm-field '+(className??'')} key={key}><span>{label}</span><Slider spec={by[key]} value={values[key]} onChange={change} label={label}/></label>;
  return <div className="dm-master">
   <div className="dm-lcd" role="group" aria-label="Tempo">
-   <output className="dm-lcd-value" aria-label="Tempo in beats per minute">{Number(values.tempo).toFixed(1)}</output><small>BPM</small>
+   <output className="dm-lcd-value" data-mod-text="tempo" data-mod-fmt="fixed1" aria-label="Tempo in beats per minute">{Number(values.tempo).toFixed(1)}</output><small>BPM</small>
    <button type="button" className="dm-tap" title="Tap the tempo" onPointerDown={()=>{const bpm=tapTempo(taps.current,performance.now());if(bpm)change('tempo',Math.min(220,Math.max(40,bpm)));}}>Tap</button>
   </div>
   <label className="dm-field dm-tempo"><span>Tempo</span><Slider spec={by.tempo} value={values.tempo} onChange={change} label="Tempo"/></label>

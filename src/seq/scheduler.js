@@ -13,6 +13,7 @@ import { stepEvents } from './core';
  * tempo(), swing(), flam():  the global values
  * emit(events, info):  events for one step; info is { pattern, step, time }
  * now():     the audio clock in seconds
+ * bank.quantize: when picking another pattern takes effect while the sequencer plays the pattern alone: 'end' (end of the loop, default), 'bar', 'beat' or 'step'
  * clock:     optional global clock (clock.js): every booked step is recorded there, so followers read the position from one place
  *
  * Scope: the arranger plays the song ('song': the song when it is on, else the chain) and the sequencer plays the pattern being edited alone ('pattern': a
@@ -61,7 +62,16 @@ export function createScheduler({ now, bank, pattern = (p) => p, events: makeEve
         return true;
     };
     const lengthOf = () => Math.max(1, bank().lengths[current] || 16);
+    // Pattern change quantize (bank.quantize): while the pattern being edited alone is played, picking another pattern takes effect at the end of the loop ('end', the default),
+    // at the next bar ('bar'), beat ('beat') or step ('step'); a change before the end carries the step on into the new pattern.
+    const QUANTIZE = { step: () => true, beat: (s) => s % 4 === 0, bar: (s) => s % 16 === 0 };
+    const changePattern = (b) => {
+        if (scope !== 'pattern' || b.linear || songMode(b) || b.current === current || !QUANTIZE[b.quantize]?.(step)) return;
+        current = b.current;
+        step %= Math.max(1, b.lengths[current] || 16);
+    };
     const playStep = () => {
+        changePattern(bank());
         const b = bank(), len = lengthOf(), bpm = b.tempos[current] || tempo(), stepSec = 60 / bpm / 4;
         const events = makeEvents(pattern(b.patterns[current], { bank: b, index: current }), step, { time: nextTime, stepSec, swing: swing(), flam: flam(), count, cycle: slot, fill: fill(), length: len, free: !!b.freeRun });
         clock?.record({ count, time: nextTime, stepSec, pattern: current, step, length: len });

@@ -575,3 +575,5 @@
 .drums .dm-slider.modulated::-webkit-slider-thumb{box-shadow:0 0 7px 1px #ffd36a;border-color:#ffd36a;}
 .drums .dm-slider.modulated::-moz-range-thumb{box-shadow:0 0 7px 1px #ffd36a;border-color:#ffd36a;}
 .drums .dm-knob.modulated{filter:drop-shadow(0 0 4px #ffd36a);}
+.drums .enc-knob.modulated .dial-skirt{stroke:#ffd36a;stroke-width:2;}
+.drums .seq-cells .cell.head{outline:2px solid #fff;outline-offset:-2px;}

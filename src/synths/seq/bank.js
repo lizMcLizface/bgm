@@ -78,6 +78,8 @@ export function normalizeBank(s,{count=8,empty,valid,migrate=null}){
   song,songOn:s.songOn===true,songLoop:s.songLoop!==false,loopIn,loopOut,
   // playback: not looping the pattern being edited but going on through the patterns (linear); staying on the song's current block (holdBlock)
   linear:s.linear===true,holdBlock:s.holdBlock===true,freeRun:s.freeRun===true,
+  // when picking another pattern takes effect while one plays: 'end' of the loop, the next 'bar', 'beat' or 'step'
+  quantize:['bar','beat','step'].includes(s.quantize)?s.quantize:'end',
  };
  return migrate?migrate(bank):bank;
 }

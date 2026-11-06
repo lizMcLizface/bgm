@@ -8,11 +8,12 @@ import ArrangementFile from './ArrangementButtons';
 import ArrangerDevice from './ArrangerDevice';
 import {readDrumLink,clearDrumLink} from './share';
 import {BEATS,KITS,foldAccent,emptyPattern,validPattern,patternCommands,voiceColour,ACCENT_COLOUR,chainToSong} from './kits';
+import useRowHeads from '../seq/rowHeads';
 import useRackMoves from '../../seq/useRackMoves';
 import {cleanMoves,RACK_MOVES,MOVE_LOOPS} from '../../seq/moves';
 import useModulation from '../../seq/useModulation';
 import {paintModulation} from '../seq/modLive';
-import {cleanMod,SOURCES,LFO_SHAPES,MAX_LANE_STEPS} from '../../seq/mod';
+import {cleanMod,lanesFor,modForPattern,SOURCES,LFO_SHAPES,MAX_LANE_STEPS} from '../../seq/mod';
 import useCoreClock from '../../seq/useCoreClock';
 import {DIVISIONS,DIRECTIONS,trackWindow,directedIndex} from '../../seq/core';
 import {euclid,tile,randomRow,mutateRow,seeded,kitBar} from '../../seq/generate';
@@ -109,11 +110,25 @@ export function DrumPage({kit}){
  });
  // how loud a lit step is, 0 to 1, for its brightness: its velocity (full when none is set)
  const levelOf=(t,s)=>bank.locks?.[bank.current]?.[t+':'+s]?.velocity??1;
- const pickPattern=id=>{if(copyArmed){seq.copyTo(id);setCopyArmed(false);}else seq.select(id);};
+ // Copy copies the selected rows when some are selected (Edit, then a voice's button), the whole pattern with its lanes and effect moves when none are
+ const pickPattern=id=>{
+  if(!copyArmed){seq.select(id);return;}
+  const from=bank.current;
+  if(selRows.length)seq.copyTracks(id,selRows);
+  else{
+   seq.copyTo(id);
+   if(from!==id){
+    if(moves[from])setMoves(id,moves[from]);
+    if(mod.patterns?.[from])setMod(cleanMod({...mod,patterns:{...mod.patterns,[id]:mod.patterns[from]}}));
+   }
+  }
+  setCopyArmed(false);
+ };
 
  // the selection: what is lit in it, which columns it touches, what it is
  const curPattern=curPatternOf(bank);
  const selSteps=[...sel].map(parseKey).filter(([t,s])=>t<n&&s<MAX_STEPS);
+ const selRows=[...new Set(selSteps.map(([t])=>t))].sort((a,b)=>a-b);
  const litSel=selSteps.filter(([t,s])=>curPattern[t][s]>0),selCols=[...new Set(selSteps.map(([,s])=>s))].sort((a,b)=>a-b);
  const described=describeSelection(sel,n,patLen),stepEdit=sel.size>0&&mode!=='pattern'&&!muteMode&&!perfMode;
  const selVoice=selSteps.length?selSteps[0][0]:selected;
@@ -130,7 +145,7 @@ export function DrumPage({kit}){
   const what={step:`${voice} · STEP ${(described.s??0)+1}`,row:`${voice} · WHOLE ROW`,column:`COLUMN ${(described.s??0)+1} · ALL VOICES`,columns:`${described.count} COLUMNS · ALL VOICES`,rows:`${described.count} ROWS`,many:`${described.count} STEPS SELECTED`,none:''}[described.kind];
   return [`PATTERN ${patternName(cur)} · ${bank.lengths[cur]} STEPS · ${bank.tempos[cur]||Math.round(values.tempo)} BPM`,
    muteMode?'MUTE · TAP A ROW':perfMode?'PERF · TAP A PAD TO PLAY ITS VOICE':fillEdit?'FILL EDIT · EMPTY PAD: FILL ONLY · NOTE: NOT IN FILL':modMode&&modText()?modText():shownPage==='moves'?`MOVES · ${patternName(cur)} · ${(moves[cur]?.list??[]).length?`${moves[cur].list.length} ON · ${moves[cur].loops} LOOP${moves[cur].loops>1?'S':''}`:'NONE YET'}`:shownPage==='track'?`TRACK · ${trackLabel}`:shownPage==='gen'?`GENERATE · ${genRows.length===1?kit.tracks[genRows[0]][2].toUpperCase():genRows.length+' ROWS'}`:mode==='pattern'?(bank.names?.[cur]||'PATTERNS').toUpperCase():stepEdit?what:`${voice}${colMode?' · COLUMN':editLayer?' · EDIT':''}`,
-   copyArmed?`COPY ${patternName(cur)} TO… TAP A PATTERN`:shownPage==='gen'?'TAP GEN AGAIN TO GENERATE':mode==='pattern'?'TAP A PATTERN':stepEdit&&litSel.length<sel.size?`${litSel.length} OF ${sel.size} HAVE NOTES`:colMode?'COLUMN · TAP A PAD TO SELECT ITS COLUMN':editLayer?'EDIT · TAP TO SELECT · SHIFT ADDS':(bank.names?.[cur]||bank.title||(seq.playing?`PLAYING ${patternName(seq.playingPattern)}`:'STOPPED')).toUpperCase()];
+   copyArmed?`COPY ${selRows.length?selRows.map(t=>kit.tracks[t][1].toUpperCase()).join(' ')+' OF ':''}${patternName(cur)} TO… TAP A PATTERN`:shownPage==='gen'?'TAP GEN AGAIN TO GENERATE':mode==='pattern'?'TAP A PATTERN':stepEdit&&litSel.length<sel.size?`${litSel.length} OF ${sel.size} HAVE NOTES`:colMode?'COLUMN · TAP A PAD TO SELECT ITS COLUMN':editLayer?'EDIT · TAP TO SELECT · SHIFT ADDS':(bank.names?.[cur]||bank.title||(seq.playing?`PLAYING ${patternName(seq.playingPattern)}`:'STOPPED')).toUpperCase()];
  };
  // The encoders' pages: the pattern, the track, the groove and the voice; and the selection's own (velocity, type, chance, ratchet; nudge, tune, decay, accent; condition)
  const encoderPages=(values,change,beat,beatCats)=>{
@@ -144,7 +159,7 @@ export function DrumPage({kit}){
     onPosition:p=>{const v=min+p*(max-min),r=steps?Math.round(v):Math.round(v*100)/100;setLocks({[name]:r===DEFAULTS[name]?undefined:r});},onReset:()=>setLocks({[name]:undefined})};
   };
   const pct=v=>Math.round(v*100)+'%',signed=v=>(v>0?'+':'')+Math.round(v*100)+'%';
-  const param=(key,label)=>({label,display:formatValue(BY[key],values[key]),position:toPosition(BY[key],values[key]),onPosition:p=>change(key,fromPosition(BY[key],p)),onReset:()=>change(key,BY[key].default),onAssign:()=>{setModTarget(key);setModMode(true);setEncPage('assign');},assigned:!!mod.assigns[key]});
+  const param=(key,label)=>({label,display:formatValue(BY[key],values[key]),position:toPosition(BY[key],values[key]),onPosition:p=>change(key,fromPosition(BY[key],p)),onReset:()=>change(key,BY[key].default),onAssign:()=>{setModTarget(key);setModMode(true);setEncPage('assign');},modKey:key,assigned:!!mod.assigns[key]});
   const type=commonValue(litSel.map(([t,s])=>curPattern[t][s]),1),cnd=commonValue(litSel.map(st=>lockOf(st).cond??''),'');
   const cond=Math.max(0,CONDITIONS.findIndex(([v])=>v===cnd.value)),loop=bank.trackLengths?.[cur]?.[voice]??0,play=bank.trackPlay?.[cur]?.[voice]??{};
   return [
@@ -369,15 +384,16 @@ export function DrumPage({kit}){
  const modTargets=()=>{const t=kit.tracks[Math.min(selVoice,n-1)][0];return [...GLOBAL_MOD,...VOICE_MOD.map(f=>t+f)].filter(k=>synth.params.BY_KEY[k]);};
  const modKey=()=>{const keys=modTargets();return keys.includes(modTarget)?modTarget:keys[0];};
  const targetLabel=k=>{const tr=kit.tracks.find(t=>VOICE_MOD.some(f=>k===t[0]+f));return (tr?tr[1].toUpperCase()+' ':'')+synth.params.BY_KEY[k].label.toUpperCase();};
- const laneAt=i=>mod.lanes[i]??{steps:Array(16).fill(.5),div:4,smooth:0};
- const putLane=(i,lane)=>setMod(cleanMod({...mod,lanes:Array.from({length:Math.max(mod.lanes.length,i+1)},(_,j)=>j===i?lane:laneAt(j))}));
+ // lanes are per pattern: the ones the pattern being edited plays (its own, or the shared ones until it gets any)
+ const laneAt=i=>lanesFor(mod,bank.current)[i]??{steps:Array(16).fill(.5),div:4,smooth:0};
+ const putLane=(i,lane)=>{const have=lanesFor(mod,bank.current),next=Array.from({length:Math.max(have.length,i+1)},(_,j)=>j===i?lane:laneAt(j));setMod(cleanMod({...mod,patterns:{...mod.patterns,[bank.current]:next}}));};
  const putLfo=(i,patch)=>setMod(cleanMod({...mod,lfos:mod.lfos.map((l,j)=>j===i?{...l,...patch}:l)}));
  const signed=v=>(v>0?'+':'')+Math.round(v*100)+'%';
  const modText=()=>{
   if(shownPage==='assign'){const k=modKey(),a=mod.assigns[k];return `MOD · ${targetLabel(k)} · ${a?`${SRC_SHORT[a.source]} ${signed(a.amount)}`:'NOT ASSIGNED'}`;}
   if(shownPage==='lfo')return `LFO ${modLfo+1} · ${mod.lfos[modLfo].shape.toUpperCase()}`;
-  if(shownPage==='lane'){const l=laneAt(modLane);return `LANE ${modLane+1} · ${l.steps.length} STEPS · ${LANE_DIVS.find(d=>d[0]===l.div)?.[1]}`;}
-  if(shownPage==='steps'){const l=laneAt(modLane);return `LANE ${modLane+1} ${l.steps.slice(0,24).map(v=>BARS[Math.min(7,Math.floor(v*8))]).join('')}`;}
+  if(shownPage==='lane'){const l=laneAt(modLane);return `LANE ${modLane+1} · ${patternName(bank.current)} · ${l.steps.length} STEPS · ${LANE_DIVS.find(d=>d[0]===l.div)?.[1]}`;}
+  if(shownPage==='steps'){const l=laneAt(modLane),at=Math.min(modStep,l.steps.length-1),from=Math.floor(at/20)*20;return `L${modLane+1} ${l.steps.slice(from,from+20).map((v,k)=>{const c=BARS[Math.min(7,Math.floor(v*8))];return from+k===at?`[${c}]`:c;}).join('')}`;}
   return null;
  };
  const setAssign=(key,a)=>{const assigns={...mod.assigns};if(a)assigns[key]=a;else delete assigns[key];setMod(cleanMod({...mod,assigns}));};
@@ -385,7 +401,8 @@ export function DrumPage({kit}){
  const [moves,setMovesState]=useState(()=>cleanMoves(load(`synths:${kit.id}:moves`,null))),rackRef=useRef({});
  const setMoves=(pattern,entry)=>{const next={...moves};if(entry)next[pattern]=entry;else delete next[pattern];const clean=cleanMoves(next);setMovesState(clean);save(`synths:${kit.id}:moves`,clean);};
  useRackMoves({live:()=>seq.live.current,clock:()=>clock.clock,rack:()=>rackRef.current,entry:()=>moves[clock.clock.at(seq.live.current?.context.currentTime??0)?.pattern??seq.playingPattern],running:seq.playing});
- useModulation({live:()=>seq.live.current,clock:()=>clock.clock,mod,params:synth.params,values:()=>valuesRef.current,running:seq.playing,onOut:o=>{modOutRef.current=o;paintModulation(o,k=>synth.params.BY_KEY[k],k=>valuesRef.current[k]??synth.params.BY_KEY[k].default);}});
+ useRowHeads({live:()=>seq.live.current,clock:()=>clock.clock,root:()=>seq.head.current,bank:()=>seq.bankRef.current,tracks:n,running:seq.playing});
+ useModulation({live:()=>seq.live.current,clock:()=>clock.clock,mod:modForPattern(mod,seq.playingPattern),params:synth.params,values:()=>valuesRef.current,running:seq.playing,onOut:o=>{modOutRef.current=o;paintModulation(o,k=>synth.params.BY_KEY[k],k=>valuesRef.current[k]??synth.params.BY_KEY[k].default);}});
  const clock=useCoreClock({seq,kit,values:()=>({...valuesRef.current,...modOutRef.current}),enabled:core,silent:t=>silentRef.current(t),fill:()=>fillRef.current});
  const chooseClock=on=>{if(seq.playing)seq.togglePlay();save('synths:core-clock',on);setCore(on);};
 
@@ -416,6 +433,7 @@ export function DrumPage({kit}){
       <label className="inline toggle" title="Follow an external MIDI clock, start and stop (from a drum machine, DAW or keyboard)"><input type="checkbox" checked={seq.sync.on} onChange={e=>seq.setSync(e.target.checked)}/> MIDI clock{seq.sync.on&&<em>{seq.sync.bpm?` ${seq.sync.bpm} bpm`:' waiting…'}</em>}</label>
       <label className="inline toggle" title="Experimental: the sequencer core books timed notes on the audio clock instead of the engine's own sequencer. Accent is approximated."><input type="checkbox" checked={core} onChange={e=>chooseClock(e.target.checked)}/> Core clock <em>for step edits, fills, loops</em></label>
       <label className="inline toggle" title="Rows with their own length start again with the pattern, so every row meets at the bar. Switch this on to let them run past the bar and drift against each other, a polymeter."><input type="checkbox" checked={!!bank.freeRun} onChange={e=>seq.setFreeRun(e.target.checked)}/> Rows run free <em>past the bar</em></label>
+      <label className="inline" title="When picking another pattern takes effect while the sequencer plays: at the end of the loop, at the next bar, beat or step. Core clock only.">Pattern change <select value={bank.quantize??'end'} onChange={e=>seq.setQuantize(e.target.value)}><option value="end">at the end of the loop</option><option value="bar">next bar</option><option value="beat">next beat</option><option value="step">next step</option></select></label>
       {shared.error&&<span className="drum-link-error" role="alert">{shared.error}</span>}
      </SettingsPop></header>
      <div className="s8">
@@ -430,7 +448,7 @@ export function DrumPage({kit}){
        <div className="s8-keys" role="group" aria-label="Sequencer keys">
         {mode==='pattern'?<>
          <button type="button" className="on" aria-pressed="true" onClick={pressPattern} title="Back to the steps"><b>Pattern</b></button>
-         <button type="button" className={copyArmed?'on':''} aria-pressed={copyArmed} onClick={()=>{setCopyArmed(v=>!v);setLoading(false);}} title="Copy the lit pattern, then tap where it goes"><b>{copyArmed?'Copy to…':'Copy'}</b></button>
+         <button type="button" className={copyArmed?'on':''} aria-pressed={copyArmed} onClick={()=>{setCopyArmed(v=>!v);setLoading(false);}} title="Copy the lit pattern, then tap where it goes. With rows selected (Edit, then a voice's button) only those rows are copied."><b>{copyArmed?'Copy to…':'Copy'}</b></button>
          <button type="button" onClick={()=>{seq.clear();setCopyArmed(false);}} title="Empty the lit pattern"><b>Clear</b></button>
          <button type="button" className={loading?'on':''} aria-pressed={loading} onClick={()=>pressLoad(values,choose,current)} title={loading?'Put the chosen loop into the lit pattern':'Choose a loop from memory for the lit pattern'}><b>{loading?'Load ✓':'Load'}</b></button>
         </>:<>

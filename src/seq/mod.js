@@ -65,18 +65,34 @@ export function evaluate(mod, assigns, base, spec, beat) {
     return out;
 }
 
+function cleanLanes(raw) {
+    return (Array.isArray(raw) ? raw : []).slice(0, MAX_LANES).map((l) => ({
+        steps: (Array.isArray(l?.steps) ? l.steps : [0.5]).slice(0, MAX_LANE_STEPS).map((v) => clamp01(+v || 0)),
+        div: [1, 2, 4, 8].includes(l?.div) ? l.div : 4, smooth: clamp01(+l?.smooth || 0),
+    })).filter((l) => l.steps.length);
+}
+
 /** Stored modulation from anything: bad parts are dropped, the rest clamped. */
 export function cleanMod(raw) {
     const lfos = (Array.isArray(raw?.lfos) ? raw.lfos : []).slice(0, 2).map((l) => ({ shape: LFO_SHAPES.includes(l?.shape) ? l.shape : 'sine', rate: Math.min(16, Math.max(0.03125, +l?.rate || 1)), phase: clamp01(+l?.phase || 0) }));
     while (lfos.length < 2) lfos.push({ shape: 'sine', rate: lfos.length ? 0.25 : 1, phase: 0 });
-    const lanes = (Array.isArray(raw?.lanes) ? raw.lanes : []).slice(0, MAX_LANES).map((l) => ({
-        steps: (Array.isArray(l?.steps) ? l.steps : [0.5]).slice(0, MAX_LANE_STEPS).map((v) => clamp01(+v || 0)),
-        div: [1, 2, 4, 8].includes(l?.div) ? l.div : 4, smooth: clamp01(+l?.smooth || 0),
-    })).filter((l) => l.steps.length);
+    const lanes = cleanLanes(raw?.lanes);
+    // lanes of their own for a pattern: { pattern: [lane, ...] }; a pattern without any plays the shared `lanes`
+    const patterns = {};
+    for (const [p, list] of Object.entries(raw?.patterns && typeof raw.patterns === 'object' ? raw.patterns : {})) {
+        const i = Number(p);
+        if (Number.isInteger(i) && i >= 0 && i < 256 && Array.isArray(list)) patterns[i] = cleanLanes(list);
+    }
     const assigns = {};
     for (const [key, a] of Object.entries(raw?.assigns && typeof raw.assigns === 'object' ? raw.assigns : {})) {
         if (!SOURCES.includes(a?.source)) continue;
         assigns[key] = { source: a.source, amount: Math.min(1, Math.max(-1, +a.amount || 0)), offset: Math.min(1, Math.max(-1, +a.offset || 0)) };
     }
-    return { lfos, lanes, assigns };
+    return { lfos, lanes, patterns, assigns };
 }
+
+/** The lanes a pattern plays: its own, or the shared ones. */
+export const lanesFor = (mod, pattern) => mod.patterns?.[pattern] ?? mod.lanes;
+
+/** `mod` as pattern `pattern` plays it (what sourceValues and evaluate take). */
+export const modForPattern = (mod, pattern) => ({ ...mod, lanes: lanesFor(mod, pattern) });

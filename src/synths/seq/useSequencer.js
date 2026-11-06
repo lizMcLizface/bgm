@@ -77,6 +77,8 @@ export function useSequencer({id,empty,valid,patternCommands,copyPattern,tempoId
   setLoop:([a,b])=>{const song=bankRef.current.song??[],ok=n=>Number.isInteger(n)&&n>=0&&n<song.length;commit({...bankRef.current,loopIn:ok(a)?a:null,loopOut:ok(b)?b:null});},
   /** Playback: not looping the pattern being edited but going on through the patterns that have notes (linear); staying on the song's current block. Core clock only. */
   /** Whether rows with their own length run past the bar (a free-running polymeter) instead of starting again with the pattern. */
+  /** When picking another pattern takes effect while one plays (core clock): 'end' of the loop, the next 'bar', 'beat' or 'step'. */
+  setQuantize:q=>{commit({...bankRef.current,quantize:['bar','beat','step'].includes(q)?q:'end'});},
   setFreeRun:on=>{commit({...bankRef.current,freeRun:!!on});},
   setLinear:on=>{commit({...bankRef.current,linear:!!on});},
   setHoldBlock:on=>{commit({...bankRef.current,holdBlock:!!on});},
@@ -96,6 +98,24 @@ export function useSequencer({id,empty,valid,patternCommands,copyPattern,tempoId
    const lengths=b.lengths.map((n,i)=>i===to?b.lengths[b.current]:n),tempos=b.tempos.map((t,i)=>i===to?b.tempos[b.current]:t);
    commit({...b,patterns,lengths,tempos,locks:setAt(b.locks,to,b.locks?.[b.current]??{}),trackLengths:setAt(b.trackLengths,to,b.trackLengths?.[b.current]??{}),trackPlay:setAt(b.trackPlay,to,b.trackPlay?.[b.current]??{}),current:to});
    if(to<PER_LAYER)send([...patternCommands(to,patterns[to]),[5,Math.min(lengths[to],STEPS),to],[8,to,tempos[to]],[2,to,0]]);
+  },
+  /**
+   * Only some tracks of the pattern being edited, copied into pattern `to` (which is then the one being edited): their steps, step values, own length and how they
+   * play. The target's other tracks stay as they are; a target shorter than the source grows to fit (and its length with it).
+   */
+  copyTracks:(to,tracks)=>{
+   const b=bankRef.current,from=b.current;
+   if(!(to>=0&&to<b.patterns.length)||to===from||!tracks.length)return;
+   const src=b.patterns[from],width=Math.max(src[0].length,b.patterns[to][0].length);
+   const patterns=b.patterns.map((p,i)=>i===to?p.map((row,t)=>{const r=tracks.includes(t)?[...src[t]]:[...row];return r.concat(Array(Math.max(0,width-r.length)).fill(0));}):p);
+   const lengths=b.lengths.map((n,i)=>i===to?Math.max(n,b.lengths[from]):n);
+   const pick=(all,own)=>({...Object.fromEntries(Object.entries(all?.[to]??{}).filter(([k])=>!tracks.includes(+k))),...own});
+   const lockOf=Object.fromEntries(Object.entries(b.locks?.[from]??{}).filter(([k])=>tracks.includes(+k.split(':')[0])));
+   const lenOf=Object.fromEntries(Object.entries(b.trackLengths?.[from]??{}).filter(([k])=>tracks.includes(+k)));
+   const playOf=Object.fromEntries(Object.entries(b.trackPlay?.[from]??{}).filter(([k])=>tracks.includes(+k)));
+   const locks=Object.fromEntries(Object.entries(b.locks?.[to]??{}).filter(([k])=>!tracks.includes(+k.split(':')[0])));
+   commit({...b,patterns,lengths,locks:setAt(b.locks,to,{...locks,...lockOf}),trackLengths:setAt(b.trackLengths,to,pick(b.trackLengths,lenOf)),trackPlay:setAt(b.trackPlay,to,pick(b.trackPlay,playOf)),current:to});
+   if(to<PER_LAYER)send([...patternCommands(to,patterns[to]),[5,Math.min(lengths[to],STEPS),to],[2,to,0]]);
   },
   copy:()=>api.copyTo((bankRef.current.current+1)%bankRef.current.patterns.length),
   chain:list=>{commit({...bankRef.current,chain:list});const eng=list.filter(p=>p<PER_LAYER);send([[4,eng.length,0],...eng.map((p,i)=>[3,i,p])]);},

@@ -60,4 +60,10 @@ describe('pattern bank', () => {
         expect(validPattern(kit)(long.map((r) => r.slice(0, 20)))).toBe(false);
         expect(patternCommands(kit, 0, long).filter(([c]) => c === 1)).toHaveLength(1);
     });
+    it('keeps the pattern change setting, and falls back to the end of the loop', () => {
+        const base = { patterns: [empty()], lengths: [16], tempos: [0], chain: [], current: 0 };
+        expect(normalizeBank({ ...base, quantize: 'beat' }, { count: 8, empty, valid }).quantize).toBe('beat');
+        expect(normalizeBank({ ...base, quantize: 'sometime' }, { count: 8, empty, valid }).quantize).toBe('end');
+        expect(normalizeBank(base, { count: 8, empty, valid }).quantize).toBe('end');
+    });
 });

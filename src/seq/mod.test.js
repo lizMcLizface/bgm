@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { lfoValue, laneValue, sourceValues, modulated, evaluate, cleanMod } from './mod';
+import { lfoValue, laneValue, sourceValues, modulated, evaluate, cleanMod, lanesFor, modForPattern } from './mod';
 
 describe('modulation sources', () => {
     it('LFOs run 0..1 over a cycle', () => {
@@ -38,5 +38,13 @@ describe('assignments', () => {
         expect(Object.keys(mod.assigns)).toEqual(['a', 'b']);
         expect(evaluate(mod, mod.assigns, () => 50, () => spec, 0)).toEqual({ a: 100 });
         expect(mod.lfos).toHaveLength(2);
+    });
+    it('lets a pattern have lanes of its own, the others playing the shared ones', () => {
+        const mod = cleanMod({ lanes: [{ steps: [1] }], patterns: { 2: [{ steps: [0, 1], div: 2 }], x: [{ steps: [1] }], 3: 'no' } });
+        expect(lanesFor(mod, 0)).toEqual(mod.lanes);
+        expect(lanesFor(mod, 2)).toEqual([{ steps: [0, 1], div: 2, smooth: 0 }]);
+        expect(Object.keys(mod.patterns)).toEqual(['2']);
+        expect(sourceValues(modForPattern(mod, 2), 0).lane1).toBe(0);
+        expect(sourceValues(modForPattern(mod, 0), 0).lane1).toBe(1);
     });
 });

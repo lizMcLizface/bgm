@@ -317,3 +317,20 @@ describe('long patterns', () => {
         sch.stop();
     });
 });
+
+test('picking another pattern while playing waits for the end of the loop, or the bar, beat or step when asked', () => {
+    const pat = () => ({ rows: [Array(32).fill(1)] });
+    // the pattern is picked right after step 4 of pattern 0 is booked; what is played next, and where does pattern 1 begin?
+    const firstOfNew = (quantize) => {
+        const b = { patterns: [pat(), pat()], lengths: [32, 32], tempos: [0, 0], chain: [], current: 0, quantize }, seen = [];
+        const s = createScheduler({ now: () => 0, bank: () => b, tempo: () => 240, swing: () => 0.5, flam: () => 0.5, lookahead: 3, emit: () => {},
+            onStep: (info) => { seen.push([info.pattern, info.step]); if (info.count === 4) b.current = 1; }, timers: { set: () => 1, clear: () => {} } });
+        s.start(0, 'pattern');
+        return seen.find(([p]) => p === 1);
+    };
+    expect(firstOfNew('end')).toEqual([1, 0]);
+    expect(firstOfNew(undefined)).toEqual([1, 0]);
+    expect(firstOfNew('bar')).toEqual([1, 16]);
+    expect(firstOfNew('beat')).toEqual([1, 8]);
+    expect(firstOfNew('step')).toEqual([1, 5]);
+});
