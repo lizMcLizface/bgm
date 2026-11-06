@@ -4,14 +4,14 @@ import React,{useRef} from 'react';
 // wheel, or use the arrow keys; double-click puts it back. The caller maps position to a value and names the value.
 const clamp=x=>Math.min(1,Math.max(0,x));
 export default function Encoder({label,display,position,onPosition,onReset,disabled=false,step=.02,onAssign=null,assigned=false}){
- const drag=useRef(null),hold=useRef(null);
- const endHold=()=>{clearTimeout(hold.current);hold.current=null;};
- const down=e=>{if(disabled||e.button>0)return;e.preventDefault();e.currentTarget.setPointerCapture?.(e.pointerId);e.currentTarget.focus({preventScroll:true});drag.current={id:e.pointerId,y:e.clientY,p:position};if(onAssign){endHold();hold.current=setTimeout(()=>{hold.current=null;drag.current=null;onAssign();},600);}};
+ const drag=useRef(null),hold=useRef(null),knob=useRef(null);
+ const endHold=e=>{clearTimeout(hold.current);hold.current=null;(e?.currentTarget??knob.current)?.classList.remove('holding');};
+ const down=e=>{if(disabled||e.button>0)return;e.preventDefault();e.currentTarget.setPointerCapture?.(e.pointerId);e.currentTarget.focus({preventScroll:true});drag.current={id:e.pointerId,y:e.clientY,p:position};if(onAssign){endHold();e.currentTarget.classList.add('holding');hold.current=setTimeout(()=>{hold.current=null;drag.current=null;knob.current?.classList.remove('holding');onAssign();},600);}};
  const move=e=>{const d=drag.current;if(!d||d.id!==e.pointerId)return;if(Math.abs(d.y-e.clientY)>3)endHold();onPosition(clamp(d.p+(d.y-e.clientY)/170));};
  const up=e=>{endHold();if(drag.current?.id===e.pointerId)drag.current=null;};
  const angle=-135+270*clamp(position);
- return <div className={'enc'+(disabled?' off':'')+(assigned?' modded':'')}>
-  <div className="enc-knob" role="slider" tabIndex={disabled?-1:0} aria-label={label} aria-valuetext={display} aria-valuemin={0} aria-valuemax={1} aria-valuenow={position} aria-disabled={disabled}
+ return <div className={'enc'+(disabled?' off':'')+(onAssign?' assignable':'')+(assigned?' modded':'')}>
+  <div className="enc-knob" ref={knob} role="slider" tabIndex={disabled?-1:0} aria-label={label} aria-valuetext={display} aria-valuemin={0} aria-valuemax={1} aria-valuenow={position} aria-disabled={disabled}
    title={disabled?label:`${label}: drag, wheel or arrow keys · double-click resets${onAssign?' · hold to modulate':''}`}
    onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} onDoubleClick={()=>!disabled&&onReset?.()}
    onWheel={e=>{if(disabled)return;onPosition(clamp(position+(e.deltaY<0?1:-1)*step*2));}}

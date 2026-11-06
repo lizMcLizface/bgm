@@ -564,5 +564,9 @@
 .drums .lane-grid.filling .seq-cells .cell.fillonly.on{background:linear-gradient(180deg,color-mix(in srgb,var(--voice),#fff 28%),var(--voice) 70%);border-style:solid;}
 .drums .lane-grid.filling .seq-cells .cell.nofill.on{opacity:.3;}
 .drums .enc.modded .dial-skirt{stroke:var(--accent,#e0a526);stroke-width:2.5;}
+.drums .enc.assignable::before{content:'';position:absolute;top:3px;right:7px;width:5px;height:5px;border-radius:50%;border:1px solid #8d8472;box-sizing:border-box;}
+.drums .enc.modded::before{display:none;}
+.drums .enc-knob.holding .dial-skirt{stroke:var(--accent,#e0a526);stroke-width:3;stroke-dasharray:132;animation:enc-hold .6s linear forwards;}
+@keyframes enc-hold{from{stroke-dashoffset:132;}to{stroke-dashoffset:0;}}
 .drums .enc.modded::after{content:'';position:absolute;top:2px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--accent,#e0a526);}
 .drums .enc{position:relative;}
