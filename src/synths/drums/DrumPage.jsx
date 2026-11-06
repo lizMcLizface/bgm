@@ -11,8 +11,7 @@ import {BEATS,KITS,foldAccent,emptyPattern,validPattern,patternCommands,voiceCol
 import useRackMoves from '../../seq/useRackMoves';
 import {cleanMoves,RACK_MOVES,MOVE_LOOPS} from '../../seq/moves';
 import useModulation from '../../seq/useModulation';
-import {cleanMod} from '../../seq/mod';
-import ModPanel from '../seq/ModPanel';
+import {cleanMod,SOURCES,LFO_SHAPES,MAX_LANE_STEPS} from '../../seq/mod';
 import useCoreClock from '../../seq/useCoreClock';
 import {DIVISIONS,DIRECTIONS,trackWindow,directedIndex} from '../../seq/core';
 import {euclid,tile,randomRow,mutateRow,seeded,kitBar} from '../../seq/generate';
@@ -67,6 +66,8 @@ export function DrumPage({kit}){
  const [muteMode,setMuteMode]=useState(false),[perfMode,setPerfMode]=useState(false),[colMode,setColMode]=useState(false),[fillEdit,setFillEdit]=useState(false);
  const [copyArmed,setCopyArmed]=useState(false),[block,setBlock]=useState(0);
  const [encPage,setEncPage]=useState('pattern'),[mvSel,setMvSel]=useState(0);
+ // Mod mode (the Mod key): the display's pages become the modulation ones: Assign, LFO, Lane, Steps, Moves
+ const [modMode,setModMode]=useState(false),[modTarget,setModTarget]=useState('swing'),[modLfo,setModLfo]=useState(0),[modLane,setModLane]=useState(0),[modStep,setModStep]=useState(0),[modPre,setModPre]=useState(0);
  // the generator page: Euclid (pulses, rotation), random (density) or mutate (amount) over a cell of `cell` steps (0: the row's own length), applied to the selected rows
  const [gen,setGen]=useState({mode:0,pulses:4,density:.3,amount:.3,rot:0,cell:0,x:.3,y:.3,chaos:.1});
  const GEN_MODES=['EUCLID','RANDOM','MUTATE','KIT'];
@@ -119,7 +120,7 @@ export function DrumPage({kit}){
  const trackRows=stepEdit?[...new Set(selSteps.map(([t])=>t))].sort((a,b)=>a-b):Array.from({length:n},(_,i)=>i);
  const trackLabel=stepEdit?(trackRows.length===1?kit.tracks[trackRows[0]][2].toUpperCase():`${trackRows.length} ROWS`):'ALL ROWS';
  // the display always has four pages: Pattern, Track, Groove and Voice; a selection takes the first two for Step and Step 2 and moves Track to the third place; Load takes the first while loading
- const visible=[loading?'load':stepEdit?'step':'pattern',stepEdit?'step2':'track',stepEdit?'track':'groove','voice','gen','moves'],shownPage=visible.includes(encPage)?encPage:visible[0];
+ const visible=modMode?['assign','lfo','lane','steps','moves']:[loading?'load':stepEdit?'step':'pattern',stepEdit?'step2':'track',stepEdit?'track':'groove','voice','gen'],shownPage=visible.includes(encPage)?encPage:visible[0];
  const shownPages=(values,change,beat)=>encoderPages(values,change,beat,beatCats).filter(p=>visible.includes(p.id));
  const screenLines=(values,beat)=>{
   const cur=bank.current;
@@ -127,7 +128,7 @@ export function DrumPage({kit}){
   const voice=kit.tracks[Math.min(selVoice,n-1)][2].toUpperCase();
   const what={step:`${voice} · STEP ${(described.s??0)+1}`,row:`${voice} · WHOLE ROW`,column:`COLUMN ${(described.s??0)+1} · ALL VOICES`,columns:`${described.count} COLUMNS · ALL VOICES`,rows:`${described.count} ROWS`,many:`${described.count} STEPS SELECTED`,none:''}[described.kind];
   return [`PATTERN ${patternName(cur)} · ${bank.lengths[cur]} STEPS · ${bank.tempos[cur]||Math.round(values.tempo)} BPM`,
-   muteMode?'MUTE · TAP A ROW':perfMode?'PERF · TAP A PAD TO PLAY ITS VOICE':fillEdit?'FILL EDIT · EMPTY PAD: FILL ONLY · NOTE: NOT IN FILL':shownPage==='moves'?`MOVES · ${patternName(cur)} · ${(moves[cur]?.list??[]).length?`${moves[cur].list.length} ON · ${moves[cur].loops} LOOP${moves[cur].loops>1?'S':''}`:'NONE YET'}`:shownPage==='track'?`TRACK · ${trackLabel}`:shownPage==='gen'?`GENERATE · ${genRows.length===1?kit.tracks[genRows[0]][2].toUpperCase():genRows.length+' ROWS'}`:mode==='pattern'?(bank.names?.[cur]||'PATTERNS').toUpperCase():stepEdit?what:`${voice}${colMode?' · COLUMN':editLayer?' · EDIT':''}`,
+   muteMode?'MUTE · TAP A ROW':perfMode?'PERF · TAP A PAD TO PLAY ITS VOICE':fillEdit?'FILL EDIT · EMPTY PAD: FILL ONLY · NOTE: NOT IN FILL':modMode&&modText()?modText():shownPage==='moves'?`MOVES · ${patternName(cur)} · ${(moves[cur]?.list??[]).length?`${moves[cur].list.length} ON · ${moves[cur].loops} LOOP${moves[cur].loops>1?'S':''}`:'NONE YET'}`:shownPage==='track'?`TRACK · ${trackLabel}`:shownPage==='gen'?`GENERATE · ${genRows.length===1?kit.tracks[genRows[0]][2].toUpperCase():genRows.length+' ROWS'}`:mode==='pattern'?(bank.names?.[cur]||'PATTERNS').toUpperCase():stepEdit?what:`${voice}${colMode?' · COLUMN':editLayer?' · EDIT':''}`,
    copyArmed?`COPY ${patternName(cur)} TO… TAP A PATTERN`:shownPage==='gen'?'TAP GEN AGAIN TO GENERATE':mode==='pattern'?'TAP A PATTERN':stepEdit&&litSel.length<sel.size?`${litSel.length} OF ${sel.size} HAVE NOTES`:colMode?'COLUMN · TAP A PAD TO SELECT ITS COLUMN':editLayer?'EDIT · TAP TO SELECT · SHIFT ADDS':(bank.names?.[cur]||bank.title||(seq.playing?`PLAYING ${patternName(seq.playingPattern)}`:'STOPPED')).toUpperCase()];
  };
  // The encoders' pages: the pattern, the track, the groove and the voice; and the selection's own (velocity, type, chance, ratchet; nudge, tune, decay, accent; condition)
@@ -142,7 +143,7 @@ export function DrumPage({kit}){
     onPosition:p=>{const v=min+p*(max-min),r=steps?Math.round(v):Math.round(v*100)/100;setLocks({[name]:r===DEFAULTS[name]?undefined:r});},onReset:()=>setLocks({[name]:undefined})};
   };
   const pct=v=>Math.round(v*100)+'%',signed=v=>(v>0?'+':'')+Math.round(v*100)+'%';
-  const param=(key,label)=>({label,display:formatValue(BY[key],values[key]),position:toPosition(BY[key],values[key]),onPosition:p=>change(key,fromPosition(BY[key],p)),onReset:()=>change(key,BY[key].default),onAssign:()=>setAssigning(key),assigned:!!mod.assigns[key]});
+  const param=(key,label)=>({label,display:formatValue(BY[key],values[key]),position:toPosition(BY[key],values[key]),onPosition:p=>change(key,fromPosition(BY[key],p)),onReset:()=>change(key,BY[key].default),onAssign:()=>{setModTarget(key);setModMode(true);setEncPage('assign');},assigned:!!mod.assigns[key]});
   const type=commonValue(litSel.map(([t,s])=>curPattern[t][s]),1),cnd=commonValue(litSel.map(st=>lockOf(st).cond??''),'');
   const cond=Math.max(0,CONDITIONS.findIndex(([v])=>v===cnd.value)),loop=bank.trackLengths?.[cur]?.[voice]??0,play=bank.trackPlay?.[cur]?.[voice]??{};
   return [
@@ -173,6 +174,46 @@ export function DrumPage({kit}){
    })()},
    {id:'groove',label:'Groove',encoders:[param('swing','Swing'),param('flam','Flam'),param('tempo','Tempo'),param('master','Master')]},
    {id:'voice',label:'Voice',encoders:['Level','Tune','Decay','Pan'].map(f=>param(kit.tracks[voice][0]+f,f))},
+   // Mod mode (the Mod key). Assign: which knob (the machine's, or the selected voice's) follows which source; LFO and Lane make the sources; Steps draws a lane.
+   {id:'assign',label:'Assign',encoders:(()=>{
+    const keys=modTargets(),key=modKey(),a=mod.assigns[key],srcs=['',...SOURCES];
+    const set=patch=>setAssign(key,{source:'lane1',amount:.5,offset:0,...a,...patch});
+    return [
+     {label:'Target',display:targetLabel(key)+(a?' •':''),position:keys.indexOf(key)/(keys.length-1),step:1/(keys.length-1),onPosition:p=>setModTarget(keys[Math.round(p*(keys.length-1))]),onReset:()=>setModTarget(keys[0])},
+     {label:'Source',display:a?SRC_SHORT[a.source]:'OFF',position:srcs.indexOf(a?.source??'')/(srcs.length-1),step:1/(srcs.length-1),onPosition:p=>{const v=srcs[Math.round(p*(srcs.length-1))];if(v)set({source:v});else setAssign(key,null);},onReset:()=>setAssign(key,null)},
+     {label:'Amount',display:a?signed(a.amount):'—',position:a?(a.amount+1)/2:.5,step:.02,disabled:!a,onPosition:p=>set({amount:Math.round((p*2-1)*50)/50}),onReset:()=>set({amount:.5})},
+     {label:'Offset',display:a?signed(a.offset):'—',position:a?(a.offset+1)/2:.5,step:.02,disabled:!a,onPosition:p=>set({offset:Math.round((p*2-1)*50)/50}),onReset:()=>set({offset:0})},
+    ];
+   })()},
+   {id:'lfo',label:'LFO',encoders:(()=>{
+    const l=mod.lfos[modLfo],ri=Math.max(0,LFO_RATES.indexOf(l.rate));
+    return [
+     {label:'LFO',display:String(modLfo+1),position:modLfo,step:1,onPosition:p=>setModLfo(Math.round(p)),onReset:()=>setModLfo(0)},
+     {label:'Shape',display:l.shape.toUpperCase(),position:LFO_SHAPES.indexOf(l.shape)/(LFO_SHAPES.length-1),step:1/(LFO_SHAPES.length-1),onPosition:p=>putLfo(modLfo,{shape:LFO_SHAPES[Math.round(p*(LFO_SHAPES.length-1))]}),onReset:()=>putLfo(modLfo,{shape:'sine'})},
+     {label:'Rate',display:l.rate>=1?l.rate+'/BEAT':'1/'+1/l.rate+' BEATS',position:ri/(LFO_RATES.length-1),step:1/(LFO_RATES.length-1),onPosition:p=>putLfo(modLfo,{rate:LFO_RATES[Math.round(p*(LFO_RATES.length-1))]}),onReset:()=>putLfo(modLfo,{rate:modLfo?.25:1})},
+     {label:'Phase',display:pct(l.phase),position:l.phase/.95,step:.05,onPosition:p=>putLfo(modLfo,{phase:Math.round(p*19)/20}),onReset:()=>putLfo(modLfo,{phase:0})},
+    ];
+   })()},
+   {id:'lane',label:'Lane',encoders:(()=>{
+    const l=laneAt(modLane),di=Math.max(0,LANE_DIVS.findIndex(d=>d[0]===l.div));
+    const resize=len=>putLane(modLane,{...l,steps:Array.from({length:len},(_,i)=>l.steps[i]??.5)});
+    return [
+     {label:'Lane',display:String(modLane+1),position:modLane/7,step:1/7,onPosition:p=>setModLane(Math.round(p*7)),onReset:()=>setModLane(0)},
+     {label:'Length',display:l.steps.length+' STEPS',position:(l.steps.length-1)/(MAX_LANE_STEPS-1),step:1/(MAX_LANE_STEPS-1),onPosition:p=>resize(1+Math.round(p*(MAX_LANE_STEPS-1))),onReset:()=>resize(16)},
+     {label:'Rate',display:LANE_DIVS[di][1],position:di/(LANE_DIVS.length-1),step:1/(LANE_DIVS.length-1),onPosition:p=>putLane(modLane,{...l,div:LANE_DIVS[Math.round(p*(LANE_DIVS.length-1))][0]}),onReset:()=>putLane(modLane,{...l,div:4})},
+     {label:'Glide',display:pct(l.smooth),position:l.smooth,step:.05,onPosition:p=>putLane(modLane,{...l,smooth:Math.round(p*20)/20}),onReset:()=>putLane(modLane,{...l,smooth:0})},
+    ];
+   })()},
+   {id:'steps',label:'Steps',encoders:(()=>{
+    const l=laneAt(modLane),count=l.steps.length,at=Math.min(modStep,count-1),last=Math.max(1,count-1);
+    const make=i=>{const f=[null,j=>j/last,j=>1-j/last,j=>1-Math.abs(2*j/count-1),()=>Math.round(Math.random()*20)/20,()=>.5][i];return f?l.steps.map((_,j)=>f(j)):l.steps;};
+    return [
+     {label:'Lane',display:String(modLane+1),position:modLane/7,step:1/7,onPosition:p=>setModLane(Math.round(p*7)),onReset:()=>setModLane(0)},
+     {label:'Step',display:`${at+1} / ${count}`,position:count>1?at/(count-1):0,step:1/last,onPosition:p=>setModStep(Math.round(p*(count-1))),onReset:()=>setModStep(0)},
+     {label:'Value',display:pct(l.steps[at]),position:l.steps[at],step:.05,onPosition:p=>putLane(modLane,{...l,steps:l.steps.map((v,j)=>j===at?Math.round(p*20)/20:v)}),onReset:()=>putLane(modLane,{...l,steps:l.steps.map((v,j)=>j===at?.5:v)})},
+     {label:'Shape',display:LANE_SHAPES[modPre],position:modPre/(LANE_SHAPES.length-1),step:1/(LANE_SHAPES.length-1),onPosition:p=>{const i=Math.round(p*(LANE_SHAPES.length-1));setModPre(i);if(i)putLane(modLane,{...l,steps:make(i)});},onReset:()=>setModPre(0)},
+    ];
+   })()},
    // Moves: effects of the rack that sweep from Start to End over the pattern's loops (the front page has the same: "Effect moves while Build plays"). Effect picks which one the other
    // three encoders edit; turning Start or End makes it a move, double-clicking either removes it.
    {id:'moves',label:'Moves',encoders:(()=>{
@@ -210,6 +251,9 @@ export function DrumPage({kit}){
  };
  const fillRef=useRef(false),[filling,setFilling]=useState(false);
  const fill=on=>{fillRef.current=on;setFilling(on);};
+ // Fill edit keeps the fill on (you hear the fill-only steps while you place them); leaving it lets the fill go
+ const enterFillEdit=()=>{setFillEdit(true);setEditLayer(false);setColMode(false);setMuteMode(false);setPerfMode(false);setSel(new Set());};
+ useEffect(()=>{if(fillEdit)fill(true);else if(fillRef.current)fill(false);},[fillEdit]);// eslint-disable-line react-hooks/exhaustive-deps
  const setCells=changes=>{
   const b=seq.bankRef.current,pattern=b.patterns[b.current],todo=changes.filter(([t,s,v])=>pattern[t][s]!==v);
   if(!todo.length)return;
@@ -315,8 +359,26 @@ export function DrumPage({kit}){
  const [core,setCore]=useState(()=>load('synths:core-clock',true)!==false);
  const valuesRef=useRef({});
  // Modulation (src/seq/mod.js): LFOs and step lanes assigned to knobs by a long press; they sit on top of the knobs' own values while the sequencer plays
- const [mod,setModState]=useState(()=>cleanMod(load(`synths:${kit.id}:mod`,null))),[assigning,setAssigning]=useState(null);
+ const [mod,setModState]=useState(()=>cleanMod(load(`synths:${kit.id}:mod`,null)));
  const setMod=next=>{setModState(next);save(`synths:${kit.id}:mod`,next);};
+ // Mod mode's helpers: what can be assigned (the machine's knobs and the selected voice's), the sources' names, and the lanes and LFOs as stored
+ const GLOBAL_MOD=['swing','flam','tempo','master'],VOICE_MOD=['Level','Tune','Decay','Tone','Pan'];
+ const SRC_SHORT=Object.fromEntries(SOURCES.map(k=>[k,k==='rand'?'RANDOM':k.startsWith('lfo')?'LFO '+k.slice(3):'LANE '+k.slice(4)]));
+ const LFO_RATES=[.0625,.125,.25,.5,1,2,4,8],LANE_DIVS=[[1,'1/4'],[2,'1/8'],[4,'1/16'],[8,'1/32']],BARS='▁▂▃▄▅▆▇█',LANE_SHAPES=['—','RAMP','SAW','TRI','RANDOM','FLAT'];
+ const modTargets=()=>{const t=kit.tracks[Math.min(selVoice,n-1)][0];return [...GLOBAL_MOD,...VOICE_MOD.map(f=>t+f)].filter(k=>synth.params.BY_KEY[k]);};
+ const modKey=()=>{const keys=modTargets();return keys.includes(modTarget)?modTarget:keys[0];};
+ const targetLabel=k=>{const tr=kit.tracks.find(t=>VOICE_MOD.some(f=>k===t[0]+f));return (tr?tr[1].toUpperCase()+' ':'')+synth.params.BY_KEY[k].label.toUpperCase();};
+ const laneAt=i=>mod.lanes[i]??{steps:Array(16).fill(.5),div:4,smooth:0};
+ const putLane=(i,lane)=>setMod(cleanMod({...mod,lanes:Array.from({length:Math.max(mod.lanes.length,i+1)},(_,j)=>j===i?lane:laneAt(j))}));
+ const putLfo=(i,patch)=>setMod(cleanMod({...mod,lfos:mod.lfos.map((l,j)=>j===i?{...l,...patch}:l)}));
+ const signed=v=>(v>0?'+':'')+Math.round(v*100)+'%';
+ const modText=()=>{
+  if(shownPage==='assign'){const k=modKey(),a=mod.assigns[k];return `MOD · ${targetLabel(k)} · ${a?`${SRC_SHORT[a.source]} ${signed(a.amount)}`:'NOT ASSIGNED'}`;}
+  if(shownPage==='lfo')return `LFO ${modLfo+1} · ${mod.lfos[modLfo].shape.toUpperCase()}`;
+  if(shownPage==='lane'){const l=laneAt(modLane);return `LANE ${modLane+1} · ${l.steps.length} STEPS · ${LANE_DIVS.find(d=>d[0]===l.div)?.[1]}`;}
+  if(shownPage==='steps'){const l=laneAt(modLane);return `LANE ${modLane+1} ${l.steps.slice(0,24).map(v=>BARS[Math.min(7,Math.floor(v*8))]).join('')}`;}
+  return null;
+ };
  const setAssign=(key,a)=>{const assigns={...mod.assigns};if(a)assigns[key]=a;else delete assigns[key];setMod(cleanMod({...mod,assigns}));};
  // Effect moves (src/seq/moves.js): rack effects that sweep across a pattern, per pattern
  const [moves,setMovesState]=useState(()=>cleanMoves(load(`synths:${kit.id}:moves`,null))),rackRef=useRef({});
@@ -358,7 +420,6 @@ export function DrumPage({kit}){
      <div className="s8">
       <div className="s8-left">
        <SeqScreen accent={voiceColour(kit.tracks[Math.min(selVoice,n-1)][0],kit.id)} page={shownPage} onPage={setEncPage} pages={shownPages(values,change,beat)} lines={screenLines(values,beat)} actions={{gen:{title:'Tap again: fill the selected rows (or the selected voice) with a new row from these settings; each tap is a new one for Random and Mutate',onClick:generate}}}/>
-       {assigning&&synth.params.BY_KEY[assigning]&&<ModPanel paramLabel={synth.params.BY_KEY[assigning].label} assign={mod.assigns[assigning]} mod={mod} onAssign={a=>setAssign(assigning,a)} onMod={next=>setMod(cleanMod(next))} onClose={()=>setAssigning(null)}/>}
        <div className="s8-transport" role="group" aria-label="Transport">
         <button type="button" className={'tp play'+(transport.playing?' on':'')} aria-pressed={transport.playing} onClick={transport.play} title="Play"><b>▶</b><small>Play</small></button>
         <button type="button" className={'tp'+(transport.paused?' on':'')} aria-pressed={transport.paused} onClick={transport.pause} title="Pause here; play goes on from this place" disabled={!transport.playing&&!transport.paused}><b>⏸</b><small>Pause</small></button>
@@ -375,15 +436,15 @@ export function DrumPage({kit}){
          <button type="button" onClick={pressPattern} title="Show all sixty-four patterns"><small>Show</small><b>Pattern</b></button>
          <button type="button" className={muteMode?'on':''} aria-pressed={muteMode} onClick={()=>{setMuteMode(v=>!v);setPerfMode(false);setEditLayer(false);setColMode(false);setFillEdit(false);setSel(new Set());}} title="Mute mode: tap a row to mute or unmute that voice"><small>Voices</small><b>Mute</b></button>
          <button type="button" className={perfMode?'on':''} aria-pressed={perfMode} onClick={()=>{setPerfMode(v=>!v);setMuteMode(false);setEditLayer(false);setColMode(false);setFillEdit(false);setSel(new Set());}} title="Perform: tap any pad to play its voice, to play along or to drum on the grid. A voice's button always plays it."><small>Play</small><b>Perf</b></button>
-         <button type="button" className={'fill-btn'+(filling?' on':'')} aria-pressed={filling} disabled={!core} title="Hold to play the fill: the steps marked fill-only join in and the ones marked not-in-fill drop out" onPointerDown={()=>fill(true)} onPointerUp={()=>fill(false)} onPointerLeave={()=>fill(false)} onPointerCancel={()=>fill(false)} onKeyDown={e=>{if(e.key===' '||e.key==='Enter')fill(true);}} onKeyUp={()=>fill(false)}><small>Hold</small><b>Fill</b></button>
+         <button type="button" className={'fill-btn'+(filling?' on':'')} aria-pressed={filling} disabled={!core} title="Hold to play the fill: the steps marked fill-only join in and the ones marked not-in-fill drop out. Hold Fill and press Edit (or hold Shift and tap Fill) to edit the fill: Fill then stays on until you tap it again." onPointerDown={()=>{if(fillEdit){setFillEdit(false);return;}if(shiftRef.current){enterFillEdit();return;}fill(true);}} onPointerUp={()=>{if(!fillEdit)fill(false);}} onPointerLeave={()=>{if(!fillEdit)fill(false);}} onPointerCancel={()=>{if(!fillEdit)fill(false);}} onKeyDown={e=>{if(e.key===' '||e.key==='Enter')fill(true);}} onKeyUp={()=>{if(!fillEdit)fill(false);}}><small>Hold</small><b>Fill</b></button>
         </>}
        </div>
        <div className="s8-keys" role="group" aria-label="More sequencer keys">
         {mode==='pattern'?<><span/><span/><span/><span/></>:<>
-         <button type="button" className={editLayer?'on':''} aria-pressed={editLayer} onClick={()=>{setEditLayer(v=>!v);setColMode(false);setMuteMode(false);setPerfMode(false);setFillEdit(false);setSel(new Set());}} title="Edit layer: tap pads to select them and a voice's button or display to select its row. The encoders then edit the whole selection. Tap again to go back to drawing."><small>Layer</small><b>Edit</b></button>
+         <button type="button" className={editLayer?'on':''} aria-pressed={editLayer} onClick={()=>{if(filling&&!fillEdit){enterFillEdit();return;}setEditLayer(v=>!v);setColMode(false);setMuteMode(false);setPerfMode(false);setFillEdit(false);setSel(new Set());}} title="Edit layer: tap pads to select them and a voice's button or display to select its row. The encoders then edit the whole selection. Tap again to go back to drawing. With Fill held: edit the fill (Fill stays on)."><small>Layer</small><b>Edit</b></button>
          <button type="button" className={colMode?'on':''} aria-pressed={colMode} onClick={()=>{setColMode(v=>!v);setEditLayer(false);setMuteMode(false);setPerfMode(false);setFillEdit(false);setSel(new Set());}} title="Column select: tap any pad to select its whole column, for every voice. Shift adds more columns."><small>Select</small><b>Column</b></button>
          <button type="button" className={shiftHeld?'on':''} aria-pressed={shiftHeld} onPointerDown={()=>holdShift(true)} onPointerUp={()=>holdShift(false)} onPointerLeave={()=>holdShift(false)} onPointerCancel={()=>holdShift(false)} title="Hold while selecting to add to the selection (the Shift key does the same)"><small>Hold</small><b>Shift</b></button>
-         <button type="button" className={fillEdit?'on':''} aria-pressed={fillEdit} onClick={()=>{setFillEdit(v=>!v);setEditLayer(false);setColMode(false);setMuteMode(false);setPerfMode(false);setSel(new Set());}} title="Fill edit: tap an empty pad for a note that plays only in a fill; tap a note for one that does not play in a fill; tap either again to undo it."><small>Layer</small><b>Fill edit</b></button>
+         <button type="button" className={modMode?'on':''} aria-pressed={modMode} onClick={()=>setModMode(v=>!v)} title="Modulation: the display's pages become Assign (which knob follows which source), LFO, Lane, Steps (draw a lane) and Moves (effects that sweep over the pattern). Hold an encoder on the Groove or Voice page to jump to Assign for it."><small>LFO · FX</small><b>Mod</b></button>
         </>}
        </div>
       </div>
