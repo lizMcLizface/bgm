@@ -1,8 +1,9 @@
 // Pattern storage shared by the drum machines and the bass line: eight patterns (A–H), a chain,
 // each pattern's length and optional tempo, and the pattern being edited, kept in the browser.
 // The engine holds a copy; `chainCommands` sends everything but the steps.
-import {useEffect,useRef,useState} from 'react';
-import {load,save} from '../storage';
+import {useRef,useState} from 'react';
+import {load} from '../storage';
+import {useSaved} from '../useSaved';
 import {DIVISIONS,DIRECTIONS} from '../../seq/core';
 
 export const LETTERS='ABCDEFGH';
@@ -91,7 +92,7 @@ export function usePatternBank(id,empty,valid,initialBank,count=8,migrate=null){
  const KEY=`synths:${id}:patterns`;
  const [bank,setBank]=useState(()=>normalizeBank(initialBank??load(KEY,null),{count,empty,valid,migrate})??blankBank(count,empty));
  const ref=useRef(bank);ref.current=bank;
- useEffect(()=>{const t=setTimeout(()=>save(KEY,bank),300);return ()=>clearTimeout(t);},[bank,KEY]);
+ useSaved(KEY,bank);
  return [bank,setBank,ref];
 }
 

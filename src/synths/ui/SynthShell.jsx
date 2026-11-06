@@ -8,6 +8,7 @@ import {recalledContext} from '../../app/auditionPhrases';
 import {buildContext,DEFAULT_HARMONY} from '../../app/harmonyContext';
 import {LabMidi,bindLabKeyboard,mapVelocity} from '../../labs/input';
 import {load,save} from '../storage';
+import {useSaved} from '../useSaved';
 import Scope from './Scope';
 import SetupPopover from './SetupPopover';
 import StageKeys from './StageKeys';
@@ -122,8 +123,8 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
  const audioOn=useRef(false);audioOn.current=audio.state==='on';
 
  // persistence (debounced: faders change values many times a second)
- useEffect(()=>{const t=setTimeout(()=>save(PATCH_KEY,patch),300);return ()=>clearTimeout(t);},[patch,PATCH_KEY]);
- useEffect(()=>{if(ownedRack.current)return undefined;const t=setTimeout(()=>save(RACK_KEY,outboard),300);return ()=>clearTimeout(t);},[outboard,RACK_KEY]);
+ useSaved(PATCH_KEY,patch);
+ useSaved(RACK_KEY,outboard,{skip:()=>ownedRack.current});
  useEffect(()=>{engine.current?.setRack(rackValues);relayRef.current?.publish();},[rackValues]);
  useEffect(()=>{save(SETUP_KEY,{...load(SETUP_KEY,{}),...setup});},[setup]);
 

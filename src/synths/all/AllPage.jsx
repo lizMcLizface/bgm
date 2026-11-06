@@ -9,6 +9,8 @@ import SeqScreen from '../seq/SeqScreen';
 import LaneGrid from '../seq/LaneGrid';
 import {movePlayhead} from '../seq/playhead';
 import {createHost,SEQUENCERS,synthChoices,patchesOf} from './host';
+import {load} from '../storage';
+import {useSaved} from '../useSaved';
 import '../drums/drums.css';
 
 // /synths/all: the sequencers and the sound generators (docs/SEQUENCER_SYSTEM_PLAN.md). The song comes from the front page's own generator (a scene's settings, its progression,
@@ -18,16 +20,30 @@ const ROWS=8,STEPS=16;
 const COLOURS={lead:'#f2a33a',counter:'#e07a5f',rhythm:'#c98bdb',pad:'#5fc1c9',bass:'#7bd389'};
 const BAR_CHOICES=[8,16,32];
 const clamp=(x,lo,hi)=>Math.min(hi,Math.max(lo,x));
+// where the player left off: the scene, the song (every sequencer's pattern), the tempo, which sequencer was open, the mutes and the sound generators
+const STORE='synths:all:state';
+const readStored=()=>{
+ const s=load(STORE,null);
+ if(!s||typeof s!=='object')return {};
+ const p=s.project;
+ const project=p&&Number.isFinite(p.bars)&&Number.isFinite(p.stepsPerBar)&&p.key&&p.patterns&&typeof p.patterns==='object'?p:null;
+ return {scene:typeof s.scene==='string'?s.scene:null,bars:BAR_CHOICES.includes(s.bars)?s.bars:null,bpm:Number.isFinite(s.bpm)?clamp(Math.round(s.bpm),50,200):null,
+  selected:Number.isInteger(s.selected)&&s.selected>=0&&s.selected<SEQUENCERS.length?s.selected:null,mutes:s.mutes&&typeof s.mutes==='object'?s.mutes:null,
+  sounds:s.sounds&&typeof s.sounds==='object'?s.sounds:null,project};
+};
+
+const SYNTHS_BY_ID=id=>synthChoices().some(c=>c.id===id);
 
 export default function AllPage(){
  const sceneList=BROWSABLE_SCENES;
- const [sceneName,setSceneName]=useState(()=>sceneList.find(s=>/lofi|rain/i.test(s.name))?.name??sceneList[0].name);
+ const [stored]=useState(readStored);
+ const [sceneName,setSceneName]=useState(()=>sceneList.find(s=>s.name===stored.scene)?.name??sceneList.find(s=>/lofi|rain/i.test(s.name))?.name??sceneList[0].name);
  const scene=useMemo(()=>sceneList.find(s=>s.name===sceneName)??sceneList[0],[sceneName,sceneList]);
  const [status,setStatus]=useState('Tap Start to wake the orchestra'),[started,setStarted]=useState(false),[busy,setBusy]=useState(false);
- const [bars,setBars]=useState(16),[project,setProject]=useState(null),[playing,setPlaying]=useState(false);
- const [selected,setSelected]=useState(3);          // the sequencer being edited (an index of SEQUENCERS)
- const [sounds,setSounds]=useState({}),[mutes,setMutes]=useState({});
- const [viewTop,setViewTop]=useState({}),[col,setCol]=useState(0),[bpm,setBpm]=useState(90);
+ const [bars,setBars]=useState(stored.bars??16),[project,setProject]=useState(null),[playing,setPlaying]=useState(false);
+ const [selected,setSelected]=useState(stored.selected??3);          // the sequencer being edited (an index of SEQUENCERS)
+ const [sounds,setSounds]=useState({}),[mutes,setMutes]=useState(stored.mutes??{});
+ const [viewTop,setViewTop]=useState({}),[col,setCol]=useState(0),[bpm,setBpm]=useState(stored.bpm??90);
  const booked=useRef({}),host=useRef(null),scheduler=useRef(null),head=useRef(null),timers=useRef(new Set()),projectRef=useRef(null),bpmRef=useRef(90),mutesRef=useRef({});
  projectRef.current=project;bpmRef.current=bpm;mutesRef.current=mutes;
 
@@ -43,10 +59,18 @@ export default function AllPage(){
    await h.wake();
    h.applySceneVoices(scene);
    setStarted(true);
-   const song=h.capture({bars});
-   setProject(song);setBpm(Math.round(song.bpm));
+   // the song the player left, when it was for this scene; otherwise the generator plans one
+   const back=stored.project&&stored.scene===scene.name?stored.project:null;
+   const song=back??h.capture({bars});
+   setProject(song);setBpm(back&&stored.bpm?stored.bpm:Math.round(song.bpm));if(back)setBars(song.bars);
    setSounds(Object.fromEntries(SEQUENCERS.map(s=>[s.role,{synth:'calmbgm',name:h.loaded[s.role]?.name??''}])));
-   setStatus(`${scene.name} · ${song.chords.length} chords in ${song.bars} bars`);
+   setStatus(back?`${scene.name} · back where you left off`:`${scene.name} · ${song.chords.length} chords in ${song.bars} bars`);
+   // the sound generators the player had chosen
+   if(back)for(const s of SEQUENCERS){
+    const want=stored.sounds?.[s.role];
+    if(!want||want.synth==='calmbgm'||!SYNTHS_BY_ID(want.synth))continue;
+    try{const got=await h.setSound(s.role,{synth:want.synth,name:want.name});setSounds(x=>({...x,[s.role]:{synth:want.synth,name:got.name}}));}catch(error){console.error(error);}
+   }
   }catch(error){console.error(error);setStatus(error.message);}finally{setBusy(false);}
  }
  // a new song: the generator plans another one for the same settings (new seed) and the sequencers take it
@@ -74,6 +98,8 @@ export default function AllPage(){
   setBusy(true);setStatus(`Loading ${synth} for ${r}…`);
   try{const got=await h.setSound(r,{synth,name});setSounds(s=>({...s,[r]:{synth,name:got.name}}));setStatus(`${r}: ${synth==='calmbgm'?'calmbgm':synth} · ${got.name}`);}catch(error){console.error(error);setStatus(error.message);}finally{setBusy(false);}
  }
+
+ useSaved(STORE,{scene:sceneName,bars,bpm,selected,mutes,sounds,project},{skip:()=>!started||!project});
 
  // playback: the sequencer core books every sequencer's notes on the audio clock, and they sound on the generator's role instruments
  useEffect(()=>{

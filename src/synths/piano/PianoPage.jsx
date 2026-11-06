@@ -20,6 +20,7 @@ import { LabMidi, bindLabKeyboard, mapVelocity } from '../../labs/input';
 import { recalledContext } from '../../app/auditionPhrases';
 import { buildContext, DEFAULT_HARMONY } from '../../app/harmonyContext';
 import { load, save } from '../storage';
+import { useSaved } from '../useSaved';
 import { LINES, lineSeconds } from './lines';
 import PianoPlayer, { renderOptions, dynamics } from './player';
 import { pianoBuffer } from '../../app/engine/piano';
@@ -96,7 +97,7 @@ export default function PianoPage() {
     const toggleEffects = () => setShowEffects((v) => { save('synths:piano:effects-open', !v); return !v; });
     const toggleScope = () => setShowScope((v) => { save('synths:piano:scope-open', !v); return !v; });
     const changeRack = useCallback((changes) => { const { extra } = splitRackEdits(RACK_SYNTH, changes); if (Object.keys(extra).length) setOutboard((p) => ({ ...p, ...extra })); }, []);
-    useEffect(() => { const t = setTimeout(() => save(RACK_KEY, outboard), 300); return () => clearTimeout(t); }, [outboard]);
+    useSaved(RACK_KEY, outboard);
     useEffect(() => { engine.current?.setRack(rackValues); }, [rackValues]);
     // the setup is shared by every synth on this device (keybed, MIDI input, the computer keys' strength)
     const [setup, setSetup] = useState(() => ({ ...SETUP, ...load(SETUP_KEY, {}) }));
