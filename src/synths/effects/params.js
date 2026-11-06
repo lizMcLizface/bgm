@@ -1,4 +1,5 @@
 import {defineParams,SPACE} from '../params';
+import {ZPLANE_SHAPE_NAMES} from './zplaneShapes';
 import {EFFECTS} from '../../synth-lab/effectsConfig';
 import {INSERTS} from '../../synth-lab/insertsConfig';
 import {ORDER_COUNT,CHAIN_MAX,DEFAULT_CHAIN,chainUnits} from './order';
@@ -33,6 +34,10 @@ const definitions=[
  ...[['reverbFirst','Reverb before delay',0,1,1,0]].map(d=>['master',d]),
  // the filter unit's single-filter modes (type 0 is its original low cut and high cut pair): low-pass, high-pass, band-pass, notch and the two shelves
  ...[['type','Type',0,6,1,0],['cutoff','Cutoff · Hz',20,18000,1,8000],['q','Q',.1,20,.01,.707],['gain','Gain · dB',-24,24,.5,0]].map(d=>['filter',d]),
+
+ // the z-plane filter (zplaneShapes.js), appended last: two shapes and the morph between them
+ ...[['a','Shape A',0,ZPLANE_SHAPE_NAMES.length-1,1,0],['b','Shape B',0,ZPLANE_SHAPE_NAMES.length-1,1,2],['morph','Morph',0,1,.01,0],['shift','Shift · octaves',-1,1,.01,0],['q','Resonance',0,1,.01,.5],['mix','Mix',0,1,.01,1]].map(d=>['zplane',d]),
+ ...['zplane'].map(k=>['switch',[k,k,0,1,1,1]]),
 ];
 export const RACK_PARAMS=defineParams(definitions.map(([prefix,[key,label,min,max,step,value]],id)=>{
  const unit=/· cents/.test(label)?'decimal':/· semitones/.test(label)?'decimal':/· Hz/.test(label)?'Hz':/· s$|seconds$/.test(label)?'s':/· ms/.test(label)?'ms':/· dB/.test(label)?'dB':/· octaves/.test(label)?'oct':max<=1&&step!==1?'%':'decimal';
@@ -81,7 +86,7 @@ export function splitRackEdits(synth,changes,{moved=false}={}){
 }
 export function rackPackets(raw){
  const p=RACK_PARAMS.sanitize(raw),inserts={},effects={},compressor={},master={},extras={};
- const EXTRA=['filter','tremolo','crusher','ring','pitch','width','limiter','tape','shimmer','freeze'];
+ const EXTRA=['filter','tremolo','crusher','ring','pitch','width','limiter','tape','shimmer','freeze','zplane'];
  for(const [key,v]of Object.entries(p)){const [scope,k]=key.split('.');if(scope==='inserts')inserts[k]=v;else if(scope==='effects')effects[k]=v;else if(scope==='compressor')compressor[k]=v;else if(scope==='master')master[k]=v;else if(EXTRA.includes(scope))(extras[scope]??={})[k]=v;}
  // a unit that is not in the chain does not run, whatever its settings; one that is in it can still be switched off
  const inChain=chainUnits(master.chain),on=unit=>inChain.includes(unit);
@@ -108,5 +113,9 @@ export const RACK_PRESETS=[
  {name:'Bright plate',values:{...cleanRack(),'effects.reverb':.26,'effects.decay':2.4,'effects.size':.48,'effects.damping':10000,'effects.predelay':18,'effects.modulation':.12}},
  {name:'Dark hall',values:{...cleanRack(),'effects.reverb':.3,'effects.decay':7,'effects.size':.9,'effects.damping':2400,'effects.predelay':35,'effects.modulation':.2}},
  {name:'Ambient bloom',values:{...cleanRack(),'inserts.chorus':.2,'inserts.chorusRate':.12,'effects.delay':.18,'effects.delayMs':750,'effects.feedback':.5,'effects.reverb':.38,'effects.decay':14,'effects.size':1,'effects.damping':4200,'effects.predelay':60,'effects.delayToReverb':.5,'master.output':-3}},
+ {name:'Talking pad',values:{...cleanRack(),'zplane.a':0,'zplane.b':4,'zplane.morph':.5,'zplane.q':.6,'zplane.mix':1,'inserts.chorus':.2,'effects.reverb':.25,'effects.decay':3.5,'effects.predelay':20}},
+ {name:'Vowel choir',values:{...cleanRack(),'zplane.a':2,'zplane.b':3,'zplane.morph':.4,'zplane.q':.7,'zplane.mix':.85,'inserts.chorus':.3,'inserts.chorusRate':.2,'inserts.chorusDepth':3,'effects.reverb':.3,'effects.decay':5,'effects.size':.8}},
+ {name:'Wah sweep',values:{...cleanRack(),'zplane.a':10,'zplane.b':11,'zplane.morph':.3,'zplane.q':.65,'zplane.mix':1,'inserts.saturation':.15,'inserts.drive':3}},
+ {name:'Hollow room',values:{...cleanRack(),'zplane.a':6,'zplane.b':5,'zplane.morph':.25,'zplane.q':.5,'zplane.mix':.7,'effects.reverb':.2,'effects.decay':2}},
  {name:'Telephone',values:{...cleanRack(),'inserts.lowGain':-12,'inserts.lowFreq':600,'inserts.highGain':-12,'inserts.highFreq':1800,'inserts.midGain':3,'inserts.midFreq':1600,'inserts.midQ':1.4,'inserts.saturation':.18,'inserts.drive':5,'master.output':-3}},
 ];

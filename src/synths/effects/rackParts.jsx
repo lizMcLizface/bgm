@@ -2,7 +2,9 @@ import React,{useEffect,useLayoutEffect,useRef,useState} from 'react';
 import {createPortal} from 'react-dom';
 import {formatValue,toPosition,fromPosition} from '../params';
 import {RACK_PARAMS,cleanRack,RACK_PRESETS} from './params';
+import {ZPLANE_SHAPE_NAMES} from './zplaneShapes';
 import RackGraphic from './RackGraphic';
+import ZPlaneScope from './ZPlaneScope';
 import './rack.css';
 import {UNITS,TAIL_UNITS,DEFAULT_CHAIN,orderFromCode,codeFromOrder,moveUnit,cleanOrder,chainUnits,maskFromUnits,addUnit} from './order';
 
@@ -27,13 +29,14 @@ export const BLOCKS=[
  {id:'tape',name:'Tape',colour:'#d8b98c',keys:[['tape.wow','Wow'],['tape.wowRate','Wow rate'],['tape.flutter','Flutter'],['tape.drive','Saturation'],['tape.tone','Tone']]},
  {id:'shimmer',name:'Shimmer',colour:'#a9c8ec',keys:[['shimmer.mix','Mix'],['shimmer.decay','Decay'],['shimmer.interval','Interval'],['shimmer.climb','Climb'],['shimmer.tone','Tone']]},
  {id:'freeze',name:'Freeze',colour:'#9fd6e0',keys:[['freeze.mix','Mix'],['freeze.length','Length'],['freeze.fade','Fade'],['freeze.hold','Hold']]},
+ {id:'zplane',name:'Z-plane',colour:'#c9a0f0',keys:[['zplane.a','Shape A'],['zplane.b','Shape B'],['zplane.morph','Morph'],['zplane.shift','Shift'],['zplane.q','Resonance'],['zplane.mix','Mix']]},
  {id:'input',name:'Input',colour:'#c6b4a3',keys:[['master.input','Level']]},
  {id:'master',name:'Output',colour:'#d1c6a6',keys:[['master.output','Level'],['inserts.gain','Insert trim']]},
 ];
 // the always-in-reach controls, top right: level into the rack, level out of it, and the dry signal against the effects
 // the one level left under the chain: how much of the sound goes through it (the input and output levels are the Input and Output boxes)
 export const GLOBAL=[['master.mix','Wet/dry']];
-const CHOICES={'shimmer.interval':['Fifth','Octave','12th','2 oct'],'freeze.hold':['Off','On'],'effects.reverbType':['Classic','Room','Hall','Plate'],'filter.slope':['12 dB','24 dB'],'filter.type':['Cuts','Low-pass','High-pass','Band-pass','Notch','Low shelf','High shelf'],'master.sync':['Free','1/4','1/8','1/8 dotted','1/16','1/8 triplet','1/2'],'effects.pingPong':['Stereo','Ping-pong'],'effects.quality':['8 lines','16 lines'],'inserts.bypass':['Active','Bypassed'],'effects.bypass':['Active','Bypassed']};
+const CHOICES={'zplane.a':ZPLANE_SHAPE_NAMES,'zplane.b':ZPLANE_SHAPE_NAMES,'shimmer.interval':['Fifth','Octave','12th','2 oct'],'freeze.hold':['Off','On'],'effects.reverbType':['Classic','Room','Hall','Plate'],'filter.slope':['12 dB','24 dB'],'filter.type':['Cuts','Low-pass','High-pass','Band-pass','Notch','Low shelf','High shelf'],'master.sync':['Free','1/4','1/8','1/8 dotted','1/16','1/8 triplet','1/2'],'effects.pingPong':['Stereo','Ping-pong'],'effects.quality':['8 lines','16 lines'],'inserts.bypass':['Active','Bypassed'],'effects.bypass':['Active','Bypassed']};
 export function RackControl({spec,value,label,block,onChange,disabled=false}){
  const key=spec.key,options=CHOICES[key]??spec.options,aria=`${block} · ${label}`,set=value=>onChange({[key]:Math.max(spec.min,Math.min(spec.max,value))});
  const scale=spec.unit==='%'?100:1,step=scale===100?.1:spec.curve==='step'?1:spec.unit==='Hz'&&spec.max>100?1:spec.unit==='dB'?.1:.001;
@@ -54,8 +57,8 @@ export const syncedDelayMs=(division,bpm)=>{const beats=[0,1,.5,.75,.25,1/3,2][d
 
 /** The unit a tile moves with: Delay and Reverb are one unit ("space"); the instrument and the output do not move. */
 export const unitOf=id=>id==='delay'||id==='reverb'?'space':id==='master'||id==='instrument'||id==='input'?null:id;
-const UNIT_NAMES={space:'Delay + Reverb',saturation:'Saturation',eq:'Equalizer',phaser:'Phaser',flanger:'Flanger',chorus:'Chorus',compressor:'Compressor',filter:'Filter',tremolo:'Tremolo',crusher:'Bit crusher',ring:'Ring modulator',pitch:'Pitch shifter',width:'Stereo width',limiter:'Limiter',tape:'Tape',shimmer:'Shimmer',freeze:'Freeze'};
-const UNIT_NOTES={filter:'cuts, low-pass, high-pass, band-pass, notch, shelves',tremolo:'volume wobble, auto-pan',crusher:'lo-fi bits and sample rate',ring:'metallic, bell-like tones',pitch:'octave up or down, harmonies',width:'mono to extra wide',limiter:'stops peaks clipping',tape:'wow, flutter and warmth',shimmer:'a rising, pitch-shifted tail',freeze:'holds a moment as a pad',saturation:'drive and warmth',eq:'three-band tone',phaser:'swirling sweep',flanger:'jet sweep',chorus:'thicken and widen',compressor:'level and glue',space:'echo and room'};
+const UNIT_NAMES={space:'Delay + Reverb',saturation:'Saturation',eq:'Equalizer',phaser:'Phaser',flanger:'Flanger',chorus:'Chorus',compressor:'Compressor',filter:'Filter',tremolo:'Tremolo',crusher:'Bit crusher',ring:'Ring modulator',pitch:'Pitch shifter',width:'Stereo width',limiter:'Limiter',tape:'Tape',shimmer:'Shimmer',freeze:'Freeze',zplane:'Z-plane filter'};
+const UNIT_NOTES={filter:'cuts, low-pass, high-pass, band-pass, notch, shelves',tremolo:'volume wobble, auto-pan',crusher:'lo-fi bits and sample rate',ring:'metallic, bell-like tones',pitch:'octave up or down, harmonies',width:'mono to extra wide',limiter:'stops peaks clipping',tape:'wow, flutter and warmth',shimmer:'a rising, pitch-shifted tail',freeze:'holds a moment as a pad',zplane:'morphing vowels and filter shapes',saturation:'drive and warmth',eq:'three-band tone',phaser:'swirling sweep',flanger:'jet sweep',chorus:'thicken and widen',compressor:'level and glue',space:'echo and room'};
 /** The units a set of rack values actually uses (any control away from its default), so a preset can bring them into the chain. */
 export function unitsUsedBy(values){
  const clean=cleanRack(),used=[];
@@ -85,7 +88,7 @@ export function activeUnits(values){
   crusher:()=>v('crusher.mix')>0&&(v('crusher.bits')<16||v('crusher.divide')>1),
   ring:()=>v('ring.mix')>0,pitch:()=>v('pitch.mix')>0&&(v('pitch.semi')!==0||v('pitch.fine')!==0),
   width:()=>v('width.amount')!==1,limiter:()=>true,
-  tape:()=>v('tape.wow')>0||v('tape.flutter')>0||v('tape.drive')>0,shimmer:()=>v('shimmer.mix')>0,freeze:()=>v('freeze.mix')>0,
+  tape:()=>v('tape.wow')>0||v('tape.flutter')>0||v('tape.drive')>0,shimmer:()=>v('shimmer.mix')>0,freeze:()=>v('freeze.mix')>0,zplane:()=>v('zplane.mix')>0,
  };
  // only units in the chain can be active: a unit that is not in it is not running, whatever its settings
  return chainUnits(values['master.chain']??DEFAULT_CHAIN).filter(u=>on(u)&&active[u]());
@@ -249,7 +252,7 @@ export function RackEffect({block,values,onChange,hidden,reduction=0,instrumentS
  const keys=instrument?[]:block.keys.filter(([key])=>(key!=='master.sync'||model?.tempo>0)&&(!filterShows||key==='filter.type'||filterShows.includes(key.slice(7))));
  const instrumentMix=instrument?instrumentSpecs.find(isMix):null;
  const mix=keys.find(([,label])=>label==='Mix'||label==='Send'||label==='Level');
- const choiceOf=k=>CHOICES[k[0]]??specs[k[0]]?.options,sliders=keys.filter(k=>k!==mix&&!choiceOf(k)),choices=keys.filter(k=>k!==mix&&choiceOf(k));
+ const choiceOf=k=>CHOICES[k[0]]??specs[k[0]]?.options,knobsOnly=block.id==='zplane',sliders=knobsOnly?[]:keys.filter(k=>k!==mix&&!choiceOf(k)),choices=knobsOnly?[]:keys.filter(k=>k!==mix&&choiceOf(k));
  // Hold is a big latching button and a short list is a column of pills, on the right of the faders
  const aside=k=>k[0]==='freeze.hold'||k[0]==='shimmer.interval';
  const special=([key,label])=>{
@@ -279,6 +282,7 @@ export function RackEffect({block,values,onChange,hidden,reduction=0,instrumentS
   </div>
   {choices.length>0&&<div className="rack-choices">{choices.map(k=>renderChoice?.(k)??(aside(k)?special(k):control(k)))}</div>}
   </div>
+  {block.id==='zplane'&&<ZPlaneScope values={values} onChange={onChange} faders={block.keys.filter(([k])=>/zplane\.(morph|shift|q)$/.test(k)).map(control)}/>}
   {block.note&&<p className="rack-note">{block.note}</p>}
   {block.id==='compressor'&&<p className="rack-note">Automatic level compensation · use Output trim to balance the return.</p>}
   {(block.id==='phaser'||block.id==='flanger'||block.id==='chorus')&&<p className="rack-note">Stereo effect: the left and right sides modulate out of step, so a mono sound comes out wide.</p>}

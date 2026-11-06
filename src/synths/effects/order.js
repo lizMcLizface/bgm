@@ -8,8 +8,8 @@
 // that is not in the chain is not wired and does not run, whatever its settings.
 
 export const BASE_UNITS = ['saturation', 'eq', 'phaser', 'flanger', 'chorus', 'compressor', 'space', 'filter', 'tremolo', 'crusher', 'ring', 'pitch', 'width', 'limiter'];
-/** Units that cannot be moved: they follow the others (tape, shimmer, freeze: the calmbgm synth's own stages, app/engine/voiceFx.js). */
-export const TAIL_UNITS = ['tape', 'shimmer', 'freeze'];
+/** Units that cannot be moved: they follow the others (tape, shimmer, freeze: the calmbgm synth's own stages, app/engine/voiceFx.js; and the z-plane filter). */
+export const TAIL_UNITS = ['tape', 'shimmer', 'freeze', 'zplane'];
 export const UNITS = [...BASE_UNITS, ...TAIL_UNITS];
 const withTail = (base) => (base[base.length - 1] === 'limiter' ? [...base.slice(0, -1), ...TAIL_UNITS, 'limiter'] : [...base, ...TAIL_UNITS]);
 export const INSERT_UNITS = ['saturation', 'eq', 'phaser', 'flanger', 'chorus'];
