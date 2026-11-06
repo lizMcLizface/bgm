@@ -560,5 +560,6 @@
 .drums .seq-cells .cell.flam.on::before{content:'';position:absolute;left:3px;top:22%;bottom:22%;width:5px;border-radius:2px;background:#0006;}
 .drums .seq-cells .cell.nofill.on{background:repeating-linear-gradient(135deg,var(--voice) 0 4px,color-mix(in srgb,var(--voice),#000 62%) 4px 8px);}
 .drums .seq-cells .cell.fillonly.on{background:radial-gradient(circle,var(--voice) 1.5px,transparent 1.9px) 0 0/6px 6px,#1d1b19;border-style:dashed;border-color:var(--voice);box-shadow:none;}
+.drums .seq-cells .cell.fixedstep.on{outline:2px solid #fff8;outline-offset:-3px;}
 .drums .lane-grid.filling .seq-cells .cell.fillonly.on{background:linear-gradient(180deg,color-mix(in srgb,var(--voice),#fff 28%),var(--voice) 70%);border-style:solid;}
 .drums .lane-grid.filling .seq-cells .cell.nofill.on{opacity:.3;}

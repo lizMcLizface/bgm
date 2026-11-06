@@ -25,7 +25,7 @@ export function cleanLocks(raw){
   if(!(Number.isInteger(t)&&t>=0&&t<32&&Number.isInteger(st)&&st>=0&&st<MAX_STEPS)||!lock||typeof lock!=='object')continue;
   const clean={};
   for(const [name,[lo,hi]] of Object.entries(RANGES))if(Number.isFinite(lock[name]))clean[name]=Math.min(hi,Math.max(lo,lock[name]));
-  if(typeof lock.cond==='string'&&/^([1-9]:[1-9]|fill|not-fill)$/.test(lock.cond))clean.cond=lock.cond;
+  if(typeof lock.cond==='string'&&/^([1-9]:[1-9]|fill|not-fill|fixed)$/.test(lock.cond))clean.cond=lock.cond;
   if(Object.keys(clean).length)out[key]=clean;
  }
  return out;

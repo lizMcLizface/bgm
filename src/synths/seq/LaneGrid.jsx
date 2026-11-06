@@ -56,7 +56,7 @@ export default function LaneGrid({lanes,pattern,length,selected,headRef,locks={}
       className={'cell pat'+(on?' on':'')+(full?' full':'')+(now?' now':'')+(queued?' queued':'')+(pm.armed&&on?' source':'')+(c%4===0?' beat':'')+(c>>2&1?' alt':'')} onClick={()=>pm.onPick(id)}/>;
     });
     return pattern[r.index].slice(offset,offset+steps).map((v,i)=>{const s=i+offset;return <button type="button" key={r.slot+'-'+i} data-cell={r.index+'-'+s} style={{'--voice':colour(r),...(v&&level?{'--lv':level(r.index,s)}:{})}} aria-label={`${r.long} step ${s+1}`} aria-pressed={!!v}
-      className={'cell'+(v?' on':'')+(v===2?' flam':'')+(locks[r.index+':'+s]?.cond==='fill'?' fillonly':locks[r.index+':'+s]?.cond==='not-fill'?' nofill':'')+(selection?.has(stepKey(r.index,s))?' picked':'')+(s%4===0?' beat':'')+(s>>2&1?' alt':'')+(quiet(r)?' silent':'')+(s>=(trackLengths[r.index]??length)?' out':'')}
+      className={'cell'+(v?' on':'')+(v===2?' flam':'')+(locks[r.index+':'+s]?.cond==='fixed'?' fixedstep':'')+(locks[r.index+':'+s]?.cond==='fill'?' fillonly':locks[r.index+':'+s]?.cond==='not-fill'?' nofill':'')+(selection?.has(stepKey(r.index,s))?' picked':'')+(s%4===0?' beat':'')+(s>>2&1?' alt':'')+(quiet(r)?' silent':'')+(s>=(trackLengths[r.index]??length)?' out':'')}
       onPointerDown={e=>{if(e.currentTarget.hasPointerCapture?.(e.pointerId))e.currentTarget.releasePointerCapture(e.pointerId);onStepDown?.(r.index,s);}} onPointerEnter={e=>{if(e.buttons)onStepOver?.(r.index,s);}}/>;});
    })}
    <div className="playhead"/>

@@ -112,6 +112,7 @@ test('conditions pick which loops a step plays on, and a held fill', () => {
     const plays = (cond, cycle, fill = false) => stepEvents({ ...base, locks: { 0: { 0: { cond } } } }, 0, { ...opts, cycle, fill }).length === 1;
     expect([0, 1, 2, 3].map((c) => plays('1:2', c))).toEqual([true, false, true, false]);
     expect([0, 1, 2, 3, 4, 5].map((c) => plays('3:3', c))).toEqual([false, false, true, false, false, true]);
+    expect([plays('fixed', 0), plays('fixed', 1, true)]).toEqual([true, true]);
     expect([plays('fill', 0), plays('fill', 0, true), plays('not-fill', 0), plays('not-fill', 0, true)]).toEqual([false, true, true, false]);
     expect(plays(undefined, 7)).toBe(true);
 });

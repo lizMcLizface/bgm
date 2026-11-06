@@ -19,6 +19,8 @@ export const MAX_RATCHET = 4;
 /** Whether a step's condition lets it play on loop `cycle` (counted from 0), with a fill held or not. */
 export function conditionHolds(cond, cycle, fill) {
     if (!cond) return true;
+    if (cond === 'fixed') return true;
+    if (cond === 'fixed') return true;
     if (cond === 'fill') return !!fill;
     if (cond === 'not-fill') return !fill;
     const [a, b] = String(cond).split(':').map(Number);

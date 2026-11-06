@@ -206,6 +206,7 @@ export function DrumPage({kit}){
    const L=Math.min(pattern[t].length,b.trackLengths?.[cur]?.[t]||b.lengths[cur]),old=pattern[t].slice(0,L),cell=Math.min(gen.cell||L,L);
    const row=gen.mode===0?tile(euclid(Math.min(gen.pulses,cell),cell,gen.rot),L):gen.mode===1?tile(randomRow(cell,gen.density,random),L):mutateRow(old,gen.amount,random);
    for(let s=0;s<L;s++){
+    if(condAt(t,s)==='fixed')continue;
     const next=row[s]?(old[s]||1):0;
     if(next!==old[s])changes.push([t,s,next]);
     if(old[s]&&!next)dropped.push([t,s]);
