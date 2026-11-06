@@ -563,3 +563,16 @@
 .drums .seq-cells .cell.fixedstep.on{outline:2px solid #fff8;outline-offset:-3px;}
 .drums .lane-grid.filling .seq-cells .cell.fillonly.on{background:linear-gradient(180deg,color-mix(in srgb,var(--voice),#fff 28%),var(--voice) 70%);border-style:solid;}
 .drums .lane-grid.filling .seq-cells .cell.nofill.on{opacity:.3;}
+.drums .enc.modded .dial-skirt{stroke:var(--accent,#e0a526);stroke-width:2.5;}
+.drums .enc.modded::after{content:'';position:absolute;top:2px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--accent,#e0a526);}
+.drums .enc{position:relative;}
+.drums .mod-panel{display:flex;flex-direction:column;gap:6px;padding:8px 10px;margin-top:6px;border:1px solid var(--accent,#e0a526);border-radius:6px;background:#161412;font-size:12px;}
+.drums .mod-panel header{display:flex;justify-content:space-between;align-items:center;}
+.drums .mod-panel header button{background:none;border:0;color:inherit;font-size:16px;cursor:pointer;}
+.drums .mod-panel label{display:flex;gap:8px;align-items:center;}
+.drums .mod-panel label>:first-child{min-width:0;}
+.drums .mod-panel input[type=range]{flex:1;}
+.drums .mod-lfo,.drums .mod-lane{display:flex;flex-wrap:wrap;gap:6px 12px;}
+.drums .mod-bars{display:flex;gap:2px;height:56px;width:100%;}
+.drums .mod-bar{flex:1;min-width:3px;display:flex;align-items:flex-end;background:#0d0c0b;cursor:ns-resize;touch-action:none;}
+.drums .mod-bar i{display:block;width:100%;background:var(--accent,#e0a526);pointer-events:none;}

@@ -3,15 +3,16 @@ import React,{useRef} from 'react';
 // An endless-feel rotary on a 0..1 position, like the OXI's encoders under its display: drag up or down, turn the
 // wheel, or use the arrow keys; double-click puts it back. The caller maps position to a value and names the value.
 const clamp=x=>Math.min(1,Math.max(0,x));
-export default function Encoder({label,display,position,onPosition,onReset,disabled=false,step=.02}){
- const drag=useRef(null);
- const down=e=>{if(disabled||e.button>0)return;e.preventDefault();e.currentTarget.setPointerCapture?.(e.pointerId);e.currentTarget.focus({preventScroll:true});drag.current={id:e.pointerId,y:e.clientY,p:position};};
- const move=e=>{const d=drag.current;if(!d||d.id!==e.pointerId)return;onPosition(clamp(d.p+(d.y-e.clientY)/170));};
- const up=e=>{if(drag.current?.id===e.pointerId)drag.current=null;};
+export default function Encoder({label,display,position,onPosition,onReset,disabled=false,step=.02,onAssign=null,assigned=false}){
+ const drag=useRef(null),hold=useRef(null);
+ const endHold=()=>{clearTimeout(hold.current);hold.current=null;};
+ const down=e=>{if(disabled||e.button>0)return;e.preventDefault();e.currentTarget.setPointerCapture?.(e.pointerId);e.currentTarget.focus({preventScroll:true});drag.current={id:e.pointerId,y:e.clientY,p:position};if(onAssign){endHold();hold.current=setTimeout(()=>{hold.current=null;drag.current=null;onAssign();},600);}};
+ const move=e=>{const d=drag.current;if(!d||d.id!==e.pointerId)return;if(Math.abs(d.y-e.clientY)>3)endHold();onPosition(clamp(d.p+(d.y-e.clientY)/170));};
+ const up=e=>{endHold();if(drag.current?.id===e.pointerId)drag.current=null;};
  const angle=-135+270*clamp(position);
- return <div className={'enc'+(disabled?' off':'')}>
+ return <div className={'enc'+(disabled?' off':'')+(assigned?' modded':'')}>
   <div className="enc-knob" role="slider" tabIndex={disabled?-1:0} aria-label={label} aria-valuetext={display} aria-valuemin={0} aria-valuemax={1} aria-valuenow={position} aria-disabled={disabled}
-   title={disabled?label:`${label}: drag, wheel or arrow keys · double-click resets`}
+   title={disabled?label:`${label}: drag, wheel or arrow keys · double-click resets${onAssign?' · hold to modulate':''}`}
    onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} onDoubleClick={()=>!disabled&&onReset?.()}
    onWheel={e=>{if(disabled)return;onPosition(clamp(position+(e.deltaY<0?1:-1)*step*2));}}
    onKeyDown={e=>{if(disabled)return;const d={ArrowUp:1,ArrowRight:1,ArrowDown:-1,ArrowLeft:-1}[e.key];if(d){e.preventDefault();onPosition(clamp(position+d*step));}}}>

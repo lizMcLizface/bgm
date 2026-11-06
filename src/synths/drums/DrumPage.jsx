@@ -8,6 +8,9 @@ import ArrangementFile from './ArrangementButtons';
 import ArrangerDevice from './ArrangerDevice';
 import {readDrumLink,clearDrumLink} from './share';
 import {BEATS,KITS,foldAccent,emptyPattern,validPattern,patternCommands,voiceColour,ACCENT_COLOUR,chainToSong} from './kits';
+import useModulation from '../../seq/useModulation';
+import {cleanMod} from '../../seq/mod';
+import ModPanel from '../seq/ModPanel';
 import useCoreClock from '../../seq/useCoreClock';
 import {DIVISIONS,DIRECTIONS,trackWindow,directedIndex} from '../../seq/core';
 import {euclid,tile,randomRow,mutateRow,seeded,kitBar} from '../../seq/generate';
@@ -137,7 +140,7 @@ export function DrumPage({kit}){
     onPosition:p=>{const v=min+p*(max-min),r=steps?Math.round(v):Math.round(v*100)/100;setLocks({[name]:r===DEFAULTS[name]?undefined:r});},onReset:()=>setLocks({[name]:undefined})};
   };
   const pct=v=>Math.round(v*100)+'%',signed=v=>(v>0?'+':'')+Math.round(v*100)+'%';
-  const param=(key,label)=>({label,display:formatValue(BY[key],values[key]),position:toPosition(BY[key],values[key]),onPosition:p=>change(key,fromPosition(BY[key],p)),onReset:()=>change(key,BY[key].default)});
+  const param=(key,label)=>({label,display:formatValue(BY[key],values[key]),position:toPosition(BY[key],values[key]),onPosition:p=>change(key,fromPosition(BY[key],p)),onReset:()=>change(key,BY[key].default),onAssign:()=>setAssigning(key),assigned:!!mod.assigns[key]});
   const type=commonValue(litSel.map(([t,s])=>curPattern[t][s]),1),cnd=commonValue(litSel.map(st=>lockOf(st).cond??''),'');
   const cond=Math.max(0,CONDITIONS.findIndex(([v])=>v===cnd.value)),loop=bank.trackLengths?.[cur]?.[voice]??0,play=bank.trackPlay?.[cur]?.[voice]??{};
   return [
@@ -294,6 +297,11 @@ export function DrumPage({kit}){
  // Experimental: the sequencer core (src/seq) books the notes instead of the engine's own sequencer.
  const [core,setCore]=useState(()=>load('synths:core-clock',true)!==false);
  const valuesRef=useRef({});
+ // Modulation (src/seq/mod.js): LFOs and step lanes assigned to knobs by a long press; they sit on top of the knobs' own values while the sequencer plays
+ const [mod,setModState]=useState(()=>cleanMod(load(`synths:${kit.id}:mod`,null))),[assigning,setAssigning]=useState(null);
+ const setMod=next=>{setModState(next);save(`synths:${kit.id}:mod`,next);};
+ const setAssign=(key,a)=>{const assigns={...mod.assigns};if(a)assigns[key]=a;else delete assigns[key];setMod(cleanMod({...mod,assigns}));};
+ useModulation({live:()=>seq.live.current,mod,params:synth.params,values:()=>valuesRef.current,tempo:()=>valuesRef.current.tempo,running:seq.playing});
  const clock=useCoreClock({seq,kit,values:()=>valuesRef.current,enabled:core,silent:t=>silentRef.current(t),fill:()=>fillRef.current});
  const chooseClock=on=>{if(seq.playing)seq.togglePlay();save('synths:core-clock',on);setCore(on);};
 
@@ -329,6 +337,7 @@ export function DrumPage({kit}){
      <div className="s8">
       <div className="s8-left">
        <SeqScreen accent={voiceColour(kit.tracks[Math.min(selVoice,n-1)][0],kit.id)} page={shownPage} onPage={setEncPage} pages={shownPages(values,change,beat)} lines={screenLines(values,beat)} actions={{gen:{title:'Tap again: fill the selected rows (or the selected voice) with a new row from these settings; each tap is a new one for Random and Mutate',onClick:generate}}}/>
+       {assigning&&synth.params.BY_KEY[assigning]&&<ModPanel paramLabel={synth.params.BY_KEY[assigning].label} assign={mod.assigns[assigning]} mod={mod} onAssign={a=>setAssign(assigning,a)} onMod={next=>setMod(cleanMod(next))} onClose={()=>setAssigning(null)}/>}
        <div className="s8-transport" role="group" aria-label="Transport">
         <button type="button" className={'tp play'+(transport.playing?' on':'')} aria-pressed={transport.playing} onClick={transport.play} title="Play"><b>▶</b><small>Play</small></button>
         <button type="button" className={'tp'+(transport.paused?' on':'')} aria-pressed={transport.paused} onClick={transport.pause} title="Pause here; play goes on from this place" disabled={!transport.playing&&!transport.paused}><b>⏸</b><small>Pause</small></button>
