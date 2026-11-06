@@ -78,4 +78,5 @@ export const drumPattern = (kit, silent = () => false) => (pattern, ctx) => ({
     accent: pattern[kit.tracks.length],
     locks: ctx?.bank?.locks?.[ctx.index] ? expandLocks(ctx.bank.locks[ctx.index]) : pattern.locks,
     lengths: ctx?.bank?.trackLengths?.[ctx.index],
+    play: ctx?.bank?.trackPlay?.[ctx.index],
 });

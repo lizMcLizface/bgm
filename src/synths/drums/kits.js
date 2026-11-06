@@ -102,6 +102,29 @@ export function chainToSong(chain){
 export function arrangementBank(kit,recipe){
  return {song:chainToSong(recipe.chain),songOn:true,songLoop:true,patterns:Array.from({length:8},(_,i)=>recipe.stages[i]?beatPattern(kit,recipe.stages[i]):emptyPattern(kit)()),lengths:Array(8).fill(16),tempos:Array(8).fill(0),chain:[...recipe.chain],current:0,title:recipe.name,names:Array.from({length:8},(_,i)=>recipe.stages[i]?.name??'')};
 }
+/**
+ * Folds the accent row into step velocity, so loudness is one thing. An accented hit was louder by a step of the machine's accent (about 3 dB at the
+ * default knob for the highest); now each lit step carries the velocity that gives the same contrast: the highest accent plays at full, an
+ * unaccented step in a pattern that has accents at 0.52, and the levels between at 0.68 and 0.84. A velocity the step already had is scaled by the same
+ * factor. The accent row is left empty, which makes the fold a no-op the second time. Returns a function of a bank, for `migrate`.
+ */
+export const ACCENT_VELOCITY=[.52,.68,.84,1];
+export const foldAccent=kit=>bank=>{
+ const n=kit.tracks.length;
+ if(!bank.patterns.some(p=>p[n]?.some(Boolean)))return bank;
+ const locks=Array.from({length:bank.patterns.length},(_,i)=>({...(bank.locks?.[i]??{})}));
+ const patterns=bank.patterns.map((pattern,i)=>{
+  const accent=pattern[n];
+  if(!accent.some(Boolean))return pattern;
+  for(let t=0;t<n;t++)pattern[t].forEach((hit,s)=>{
+   if(!hit)return;
+   const key=t+':'+s,old=locks[i][key]??{},v=Math.min(1,Math.max(.05,(old.velocity??1)*ACCENT_VELOCITY[accent[s]]));
+   locks[i][key]={...old,velocity:Math.round(v*100)/100};
+  });
+  return pattern.map((row,t)=>t===n?row.map(()=>0):row);
+ });
+ return {...bank,patterns,locks};
+};
 /** Engine commands for one pattern; `silent(track)` leaves a muted (or not soloed) voice out of what the engine plays. */
 export function patternCommands(kit,index,pattern,silent=()=>false){
  const cmds=[[7,index,0]];

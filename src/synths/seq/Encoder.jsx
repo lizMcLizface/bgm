@@ -1,0 +1,25 @@
+import React,{useRef} from 'react';
+
+// An endless-feel rotary on a 0..1 position, like the OXI's encoders under its display: drag up or down, turn the
+// wheel, or use the arrow keys; double-click puts it back. The caller maps position to a value and names the value.
+const clamp=x=>Math.min(1,Math.max(0,x));
+export default function Encoder({label,display,position,onPosition,onReset,disabled=false,step=.02}){
+ const drag=useRef(null);
+ const down=e=>{if(disabled||e.button>0)return;e.preventDefault();e.currentTarget.setPointerCapture?.(e.pointerId);e.currentTarget.focus({preventScroll:true});drag.current={id:e.pointerId,y:e.clientY,p:position};};
+ const move=e=>{const d=drag.current;if(!d||d.id!==e.pointerId)return;onPosition(clamp(d.p+(d.y-e.clientY)/170));};
+ const up=e=>{if(drag.current?.id===e.pointerId)drag.current=null;};
+ const angle=-135+270*clamp(position);
+ return <div className={'enc'+(disabled?' off':'')}>
+  <div className="enc-knob" role="slider" tabIndex={disabled?-1:0} aria-label={label} aria-valuetext={display} aria-valuemin={0} aria-valuemax={1} aria-valuenow={position} aria-disabled={disabled}
+   title={disabled?label:`${label}: drag, wheel or arrow keys · double-click resets`}
+   onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} onDoubleClick={()=>!disabled&&onReset?.()}
+   onWheel={e=>{if(disabled)return;onPosition(clamp(position+(e.deltaY<0?1:-1)*step*2));}}
+   onKeyDown={e=>{if(disabled)return;const d={ArrowUp:1,ArrowRight:1,ArrowDown:-1,ArrowLeft:-1}[e.key];if(d){e.preventDefault();onPosition(clamp(position+d*step));}}}>
+   <svg viewBox="0 0 48 48" width="46" height="46" aria-hidden="true">
+    <circle cx="24" cy="24" r="21" className="dial-skirt"/>
+    <g transform={`rotate(${angle} 24 24)`}><circle cx="24" cy="24" r="15" className="dial-cap"/><line x1="24" y1="6.5" x2="24" y2="16" className="dial-pointer"/></g>
+   </svg>
+  </div>
+  <span className="enc-label">{label}</span>
+ </div>;
+}

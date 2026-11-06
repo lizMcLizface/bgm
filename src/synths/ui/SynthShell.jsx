@@ -55,7 +55,7 @@ export default function SynthShell(props){
  const embedded=useEnsemblePanel();
  return embedded?<EmbeddedShell {...props}/>:<StandaloneShell {...props}/>;
 }
-function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelClassName='',expand,libraries=[],picker:Picker=SoundPicker,gridKeys=false,toggles=false,startEngine=startLiveSynth,engineOptions,onEngine,onStats,onMidiRealtime,onComparisonWaves,initialPatch,onChoose,compactRack=true,keyboard=true,helpInBar=false,children}){
+function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelClassName='',expand,libraries=[],picker:Picker=SoundPicker,gridKeys=false,toggles=false,startEngine=startLiveSynth,engineOptions,onEngine,onStats,onMidiRealtime,onComparisonWaves,initialPatch,onChoose,compactRack=true,keyboard=true,helpInBar=false,soundsInDevice=false,children}){
  const {params:{BY_KEY,sanitize},presets}=synth,toPairs=synth.params.toEnginePairs??synth.params.toPairs;
  const PATCH_KEY=`synths:${synth.id}:patch`,MINE_KEY=`synths:${synth.id}:mine`;
  const [patch,setPatch]=useState(()=>{
@@ -320,6 +320,18 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
  const current=patch.name.replace(/ \*$/,'');
  const maxVoices=patch.values.voices??patch.values['global.polyphony']??(synth.id==='vs'?8:synth.id==='minimoog'?1:null);
 
+ const soundBar=(
+  <nav className={'presets'+(library?' shelf-'+library.id:'')} aria-label="Sounds">
+   {libraries.length>0&&<span className="shelf-switch" role="radiogroup" aria-label="Sound shelf">
+    {[{id:'sounds',label:'Sounds'},...libraries].map(l=><button type="button" key={l.id} role="radio" aria-checked={shelf===l.id} onClick={()=>pickShelf(l.id)}>{l.label}</button>)}
+   </span>}
+   {library?library.render({choose,values:patch.values,current,rack:outboard}):<>
+   <Picker synth={synth} presets={presets} mine={mine} current={current} currentCategory={patch.category} choose={choose} remove={removeMine} values={patch.values} change={change} replaceValues={replaceValues} save={saveMine}/>
+   {!soundsInDevice&&<button type="button" className="save" onClick={saveMine}>＋ Save sound</button>}
+   </>}
+  </nav>
+ );
+
  return <div className={'synth instrument '+className+(fullRack?' rack-open':'')+(showEffects&&compactRack?' rack-popover':'')}>
   <header className="synth-bar">
    <a className="back" href={import.meta.env.BASE_URL+'synths/'} aria-label="All synths">◂</a>
@@ -327,7 +339,7 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
    <span className="patch-name" title={patch.name}>{patch.name}</span>
    <span className="meter" aria-label={`${stats.active} voices playing`}><span className="meter-fill" style={{width:Math.min(100,stats.peak*100)+'%'}}/><b>{stats.active}</b>{maxVoices!==null&&<>/{maxVoices}</>}</span>
    {pedal&&<span className="pill">Pedal</span>}
-   {typeof headerExtras==='function'?headerExtras({values:patch.values,rack:outboard,name:patch.name}):headerExtras}
+   {typeof headerExtras==='function'?headerExtras({values:patch.values,rack:outboard,name:patch.name,choose}):headerExtras}
    <button type="button" aria-pressed={showEffects} aria-label="Effects rack" onClick={()=>setShowEffects(v=>!v)}>Effects</button>
    <button type="button" aria-pressed={scope} onClick={toggleScope} title="Oscilloscope and spectrum">Scope</button>
    <button type="button" aria-pressed={showSetup} onClick={()=>setShowSetup(v=>!v)} aria-label="Setup">⚙</button>
@@ -347,20 +359,12 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
 
   <div className="rig" ref={rigDrag.ref} style={rigDrag.style}>
   <div className="grip rig-grip" {...rigDrag.handle} role="presentation"><i/></div>
-  <nav className={'presets'+(library?' shelf-'+library.id:'')} aria-label="Sounds">
-   {libraries.length>0&&<span className="shelf-switch" role="radiogroup" aria-label="Sound shelf">
-    {[{id:'sounds',label:'Sounds'},...libraries].map(l=><button type="button" key={l.id} role="radio" aria-checked={shelf===l.id} onClick={()=>pickShelf(l.id)}>{l.label}</button>)}
-   </span>}
-   {library?library.render({choose,values:patch.values,current,rack:outboard}):<>
-   <Picker synth={synth} presets={presets} mine={mine} current={current} currentCategory={patch.category} choose={choose} remove={removeMine} values={patch.values} change={change} replaceValues={replaceValues}/>
-   <button type="button" className="save" onClick={saveMine}>＋ Save sound</button>
-   </>}
-  </nav>
+  {!soundsInDevice&&soundBar}
 
   {!fullRack&&nav}
 
   <main className={'panel'+(fullRack?' rack-panel':' '+panelClassName)}>
-   {!fullRack&&children({values:patch.values,control,group,change,replaceValues,patch:patchRef})}
+   {!fullRack&&children({values:patch.values,control,group,change,replaceValues,patch:patchRef,choose,current,soundBar})}
    {showEffects&&compactRack&&<RackCompact tempo={rackTempo} values={rackValues} onChange={changeRack} instrumentSpecs={instrumentSpecs} peak={stats.peak} reduction={stats.reduction??0} onClose={()=>setShowEffects(false)}
     tools={<button type="button" onClick={()=>engine.current?.clearRack()}>Clear tails</button>}/>}
    {fullRack&&<RackPanel tempo={rackTempo} values={rackValues} onChange={changeRack} instrumentSpecs={instrumentSpecs} peak={stats.peak} reduction={stats.reduction??0}

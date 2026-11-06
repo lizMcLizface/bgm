@@ -4,8 +4,8 @@ import {voiceColour} from './kits';
 // Per-step values for one hit (the OXI's parameter locks) and the selected voice's own loop length. Opened with the Edit
 // tool: click a lit step. Only the sequencer core plays these; the built-in clock ignores them (the note says so).
 
-const DEFAULTS = { velocity: 1, prob: 1, ratchet: 1, nudge: 0, tune: 0, decay: 0 };
-const CONDITIONS = [['', 'every loop'], ['1:2', '1st of 2'], ['2:2', '2nd of 2'], ['1:3', '1st of 3'], ['2:3', '2nd of 3'], ['3:3', '3rd of 3'], ['1:4', '1st of 4'], ['2:4', '2nd of 4'], ['3:4', '3rd of 4'], ['4:4', '4th of 4'], ['fill', 'only in a fill'], ['not-fill', 'not in a fill']];
+export const DEFAULTS = { velocity: 1, prob: 1, ratchet: 1, nudge: 0, tune: 0, decay: 0 };
+export const CONDITIONS = [['', 'every loop'], ['1:2', '1st of 2'], ['2:2', '2nd of 2'], ['1:3', '1st of 3'], ['2:3', '2nd of 3'], ['3:3', '3rd of 3'], ['1:4', '1st of 4'], ['2:4', '2nd of 4'], ['3:4', '3rd of 4'], ['4:4', '4th of 4'], ['fill', 'only in a fill'], ['not-fill', 'not in a fill']];
 
 function Range({ label, value, min, max, step, onChange, format }) {
     const p = (value - min) / (max - min);

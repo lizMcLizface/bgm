@@ -1,4 +1,4 @@
-import {useEffect,useMemo,useRef} from 'react';
+import {useEffect,useMemo,useRef,useState} from 'react';
 import {createScheduler} from './scheduler';
 import {drumTarget,drumPattern} from './targets/drum';
 import {bassTarget,bassPattern,bassStepEvents} from './targets/bass';
@@ -15,7 +15,7 @@ export default function useCoreClock({seq,kit,bass=false,values,enabled,silent,f
  const silentRef=useRef(silent);silentRef.current=silent;
  const seqRef=useRef(seq);seqRef.current=seq;
  const valuesRef=useRef(values);valuesRef.current=values;
- const timers=useRef(new Set());
+ const timers=useRef(new Set()),[paused,setPaused]=useState(false),[scope,setScope]=useState('song');
  const scheduler=useMemo(()=>{
   const target=bass?bassTarget(()=>seqRef.current.live.current):drumTarget(kit,()=>seqRef.current.live.current,()=>valuesRef.current().accent??.5);
   const live=()=>seqRef.current.live.current;
@@ -38,14 +38,23 @@ export default function useCoreClock({seq,kit,bass=false,values,enabled,silent,f
   });
  },[kit,bass]);
  const clear=()=>{timers.current.forEach(clearTimeout);timers.current.clear();};
- const stop=()=>{scheduler.stop();clear();if(seqRef.current.head.current)delete seqRef.current.head.current.dataset.count;seqRef.current.setTransport(false);};
- const start=()=>{
+ const stop=(rewindSong=true)=>{scheduler.stop(rewindSong!==false);clear();if(seqRef.current.head.current)delete seqRef.current.head.current.dataset.count;seqRef.current.setTransport(false);setPaused(false);};
+ const start=(sc='song')=>{
   const s=seqRef.current;
   s.send([[0,0,0],[6,0,0]]); // the engine's own sequencer stays stopped and rewound
-  s.setExternal(true);s.setTransport(true);scheduler.start();
+  s.setExternal(true);s.setTransport(true);setPaused(false);setScope(sc);scheduler.start(0.06,sc);
  };
+ // pause keeps the place (and the playhead where it is); play goes on from it
+ const pause=()=>{if(!scheduler.running)return;scheduler.pause();seqRef.current.setTransport(false,{keepHead:true});setPaused(true);};
+ const resume=()=>{if(!scheduler.paused)return;const s=seqRef.current;s.setExternal(true);s.setTransport(true);setPaused(false);scheduler.resume();};
+ // `sc` is who is playing: 'pattern' (the sequencer: the pattern alone) or 'song' (the arranger). Pressing play from the other one while it runs changes what it follows.
+ const play=(sc='song')=>{if(scheduler.running){scheduler.setScope(sc);setScope(sc);return;}scheduler.setScope(sc);setScope(sc);if(scheduler.paused)resume();else start(sc);};
+ // stop from the sequencer leaves the song's place alone; from the arranger it goes back to the first block
+ const stopFrom=sc=>stop(sc!=='pattern');
+ // one step forward or back: while stopped or paused it plays that step; while playing it moves the place
+ const stepBy=delta=>{seqRef.current.setExternal(true);scheduler.stepBy(delta);setPaused(scheduler.paused);};
  // switching the clock off (or leaving the page) stops it and hands transport back to the engine
  useEffect(()=>()=>{scheduler.stop();clear();},[scheduler]);
  useEffect(()=>{if(!enabled&&scheduler.running)stop();seqRef.current.setExternal(enabled);},[enabled]);// eslint-disable-line react-hooks/exhaustive-deps
- return {toggle:()=>(scheduler.running?stop():start())};
+ return {toggle:()=>(scheduler.running?stop():start()),play,pause,resume,stop:stopFrom,stepBy,paused,scope,gotoBlock:i=>scheduler.gotoBlock(i),gotoPattern:p=>scheduler.gotoPattern(p)};
 }

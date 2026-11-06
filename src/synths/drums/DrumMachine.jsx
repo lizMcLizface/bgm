@@ -2,6 +2,31 @@ import React,{useRef} from 'react';
 import {toPosition,fromPosition,formatValue} from '../params';
 import {voiceColour,ACCENT_COLOUR} from './kits';
 import Knob from '../ui/Knob';
+import {useState} from 'react';
+import {soundList,nextSound} from '../ui/SoundPicker';
+import SoundGrid from '../ui/SoundGrid';
+import {PresetKnob} from '../diy/DiyControls';
+
+// The sound picker in the machine's title row: a knob steps through the sounds, the display names the current one and
+// opens the sound grid when tapped, and a floppy icon saves the current sound.
+export function DrumPicker(props){
+ const {synth,presets,mine,current,currentCategory,choose,save}=props;
+ const [grid,setGrid]=useState(false);
+ const list=soundList(synth,presets,mine);
+ const step=dir=>{const next=nextSound(list,current,currentCategory,dir,false);if(next)choose(next);};
+ const active=list.sounds.find(p=>p.name===current&&(p.cat==='mine')===(currentCategory==='mine'))??list.sounds.find(p=>p.name===current);
+ const category=active?.categoryLabel??list.categories.find(c=>c.id===currentCategory)?.label??'Sounds',name=current||'Pick one…';
+ return <div className="oled-picker drum-picker">
+  <PresetKnob onStep={step}/>
+  <button type="button" className="oled" style={{'--accent':active?.colour}} aria-haspopup="dialog" aria-expanded={grid} onClick={()=>setGrid(g=>!g)} title="Every sound in one grid">
+   <span className="oled-cat">{category}</span><span className="oled-name" key={name} style={{'--n':Math.min(name.length,22)}}>{name}</span>
+  </button>
+  <button type="button" className="oled-save" onClick={save} aria-label="Save sound" title="Save this sound">
+   <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round"><path d="M4 3h13l3 3v15H4z"/><path d="M7 3v6h9V3"/><rect x="7" y="13" width="10" height="8"/></svg>
+  </button>
+  {grid&&<SoundGrid {...props} onClose={()=>setGrid(false)}/>}
+ </div>;
+}
 
 // The drum machine device, laid out after a hardware box (Behringer RD-8 MKII): a master strip with a tempo
 // display and the shared controls, then one row per voice, every voice's main controls in view at once. SELECT

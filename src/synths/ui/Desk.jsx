@@ -34,7 +34,7 @@ export const useDesk=()=>useContext(DeskContext)??LIVE;
 /** Forget where everything was put (the desk, its view, the rig, keyboard and every floating panel) and start over from the defaults. */
 export const RESET_EVENT='synths:reset-layout';
 export const resetLayout=()=>{
- try{Object.keys(window.localStorage).filter(k=>/^synths:(desk|scope-pos|keys-pos|rack-pos|setup-pos|diy:)/.test(k)||/^synths:[^:]+:rig-pos$/.test(k)).forEach(k=>window.localStorage.removeItem(k));}catch{/* storage unavailable */}
+ try{Object.keys(window.localStorage).filter(k=>/^synths:(desk|scope-pos|keys-pos|rack-pos|setup-pos|diy:)/.test(k)||/^synths:[^:]+:(rig|seq|machine|arranger)-pos$/.test(k)).forEach(k=>window.localStorage.removeItem(k));}catch{/* storage unavailable */}
  window.dispatchEvent(new Event(RESET_EVENT));
 };
 export const onSynth=(...classes)=>typeof document!=='undefined'&&classes.some(cls=>!!document.querySelector('.instrument.'+cls));

@@ -1,5 +1,5 @@
 import {useMemo,useRef,useState} from 'react';
-import {usePatternBank,chainCommands} from './bank';
+import {usePatternBank,chainCommands,cleanTrackPlay,normalizeBank,PER_LAYER} from './bank';
 import {movePlayhead} from './playhead';
 import {createClockSync} from './clockSync';
 
@@ -9,9 +9,9 @@ import {createClockSync} from './clockSync';
  * patternCommands(index, pattern) lists the engine commands for one pattern; empty() and valid()
  * make and check a pattern; copyPattern(pattern) clones one; tempoId is the tempo parameter.
  */
-const setAt=(list,i,value)=>Array.from({length:8},(_,j)=>j===i?value:(list?.[j]??{}));
-export function useSequencer({id,empty,valid,patternCommands,copyPattern,tempoId,initialBank,onEdit}){
- const [bank,setBank,bankRef]=usePatternBank(id,empty,valid,initialBank);
+const setAt=(list,i,value,count=8)=>Array.from({length:Math.max(count,list?.length??0)},(_,j)=>j===i?value:(list?.[j]??{}));
+export function useSequencer({id,empty,valid,patternCommands,copyPattern,tempoId,initialBank,onEdit,count=8,migrate=null}){
+ const [bank,setBank,bankRef]=usePatternBank(id,empty,valid,initialBank,count,migrate);
  const [playing,setPlaying]=useState(false);
  const [playingPattern,setPlayingPattern]=useState(0),patternRef=useRef(0);
  const [sync,setSync]=useState({on:false,bpm:0});
@@ -21,13 +21,13 @@ export function useSequencer({id,empty,valid,patternCommands,copyPattern,tempoId
  const commit=next=>{onEdit?.();bankRef.current=next;setBank(next);};
  const replacePattern=(index,pattern)=>commit({...bankRef.current,patterns:bankRef.current.patterns.map((p,i)=>i===index?pattern:p)});
  const transport=on=>{awaitingStop.current=!on;playingRef.current=on;setPlaying(on);if(!on)movePlayhead(head.current,{running:false,step:0});};
- const onEngine=l=>{live.current=l;awaitingStop.current=false;playingRef.current=false;setPlaying(false);const b=bankRef.current;send([...b.patterns.flatMap((p,i)=>patternCommands(i,p)),...chainCommands(b)]);};
+ const onEngine=l=>{live.current=l;awaitingStop.current=false;playingRef.current=false;setPlaying(false);const b=bankRef.current;send([...b.patterns.slice(0,PER_LAYER).flatMap((p,i)=>patternCommands(i,p)),...chainCommands(b)]);};
  // The pattern that is playing, shown in the page; while a chain runs the editor follows it. This is a display
  // update only: selecting through api.select would queue the page in the engine and disrupt the chain.
  const showPattern=(pattern,running)=>{
   if(Number.isInteger(pattern)&&pattern!==patternRef.current){patternRef.current=pattern;setPlayingPattern(pattern);}
   const b=bankRef.current;
-  if(running&&b.chain.length&&Number.isInteger(pattern)&&pattern>=0&&pattern<8&&b.current!==pattern){
+  if(running&&(b.chain.length||b.linear)&&Number.isInteger(pattern)&&pattern>=0&&pattern<b.patterns.length&&b.current!==pattern){
    const next={...b,current:pattern};bankRef.current=next;setBank(next);
   }
  };
@@ -55,35 +55,61 @@ export function useSequencer({id,empty,valid,patternCommands,copyPattern,tempoId
   setExternal:on=>{external.current=on;},
   showPattern,
   /** Sets the transport state without sending anything to the engine (for an external clock). */
-  setTransport:on=>{playingRef.current=on;awaitingStop.current=false;setPlaying(on);if(!on)movePlayhead(head.current,{running:false,step:0});},
+  setTransport:(on,{keepHead=false}={})=>{playingRef.current=on;awaitingStop.current=false;setPlaying(on);if(!on&&!keepHead)movePlayhead(head.current,{running:false,step:0});},
   togglePlay:()=>{const on=!playingRef.current;transport(on);send([[0,on?1:0,0]]);},
-  select:i=>{commit({...bankRef.current,current:i});send([[2,i,0]]);},
-  clear:()=>{const b=bankRef.current;commit({...b,patterns:b.patterns.map((p,i)=>i===b.current?empty():p),locks:setAt(b.locks,b.current,{}),trackLengths:setAt(b.trackLengths,b.current,{})});send([[7,b.current,0]]);},
+  select:i=>{commit({...bankRef.current,current:i});if(i<PER_LAYER)send([[2,i,0]]);},
+  clear:()=>{const b=bankRef.current;commit({...b,patterns:b.patterns.map((p,i)=>i===b.current?empty():p),locks:setAt(b.locks,b.current,{}),trackLengths:setAt(b.trackLengths,b.current,{}),trackPlay:setAt(b.trackPlay,b.current,{})});if(b.current<PER_LAYER)send([[7,b.current,0]]);},
   /** One step's per-step values (see src/seq/core.js); null clears them. Only the core clock plays them. */
   setLock:(track,step,lock)=>{const b=bankRef.current,all={...(b.locks?.[b.current]??{})},key=track+':'+step;if(lock&&Object.keys(lock).length)all[key]=lock;else delete all[key];commit({...b,locks:setAt(b.locks,b.current,all)});},
   /** The song (see bank.js cleanSong); only the core clock plays it. */
-  setSong:(song)=>{const list=song.flatMap(b=>Array(b.n).fill(b.p)).slice(0,16);commit({...bankRef.current,song,chain:list});send([[4,list.length,0],...list.map((p,i)=>[3,i,p])]);},
+  setSong:(song)=>{const list=song.flatMap(b=>Array(b.n).fill(b.p)).slice(0,16);const b0=bankRef.current,ok=n=>Number.isInteger(n)&&n<song.length?n:null;commit({...b0,song,chain:list,loopIn:ok(b0.loopIn),loopOut:ok(b0.loopOut)});const eng=list.filter(p=>p<PER_LAYER);send([[4,eng.length,0],...eng.map((p,i)=>[3,i,p])]);},
+  /** Per-step values for many steps at once: `steps` is a list of [track, step], `patch` a set of values (undefined puts one back to its default and removes it). */
+  setLocks:(steps,patch)=>{
+   const b=bankRef.current,all={...(b.locks?.[b.current]??{})};
+   for(const [t,s] of steps){
+    const key=t+':'+s,next={...(all[key]??{}),...patch};
+    for(const name of Object.keys(next))if(next[name]===undefined)delete next[name];
+    if(Object.keys(next).length)all[key]=next;else delete all[key];
+   }
+   commit({...b,locks:setAt(b.locks,b.current,all)});
+  },
+  /** The song blocks to loop between, [in, out] (indexes, in <= out), or [null, null] for the whole song. */
+  setLoop:([a,b])=>{const song=bankRef.current.song??[],ok=n=>Number.isInteger(n)&&n>=0&&n<song.length;commit({...bankRef.current,loopIn:ok(a)?a:null,loopOut:ok(b)?b:null});},
+  /** Playback: not looping the pattern being edited but going on through the patterns that have notes (linear); staying on the song's current block. Core clock only. */
+  /** Whether rows with their own length run past the bar (a free-running polymeter) instead of starting again with the pattern. */
+  setFreeRun:on=>{commit({...bankRef.current,freeRun:!!on});},
+  setLinear:on=>{commit({...bankRef.current,linear:!!on});},
+  setHoldBlock:on=>{commit({...bankRef.current,holdBlock:!!on});},
   setSongOn:(on)=>{commit({...bankRef.current,songOn:on});},
   setSongLoop:(loop)=>{commit({...bankRef.current,songLoop:loop});},
   /** A track's own loop length (polymeter); null puts it back on the pattern's length. */
   setTrackLength:(track,n)=>{const b=bankRef.current,all={...(b.trackLengths?.[b.current]??{})};if(n)all[track]=n;else delete all[track];commit({...b,trackLengths:setAt(b.trackLengths,b.current,all)});},
-  copy:()=>{
-   const b=bankRef.current,to=(b.current+1)%8;
+  /** The loop length of several rows at once (null: with the pattern), and how several rows play ({ div, dir }, an undefined part going back to its default). */
+  setTrackLengths:(rows,n)=>{const b=bankRef.current,all={...(b.trackLengths?.[b.current]??{})};for(const t of rows){if(n)all[t]=n;else delete all[t];}commit({...b,trackLengths:setAt(b.trackLengths,b.current,all)});},
+  setTrackPlays:(rows,patch)=>{const b=bankRef.current,all={...(b.trackPlay?.[b.current]??{})};for(const t of rows){const clean=cleanTrackPlay({[t]:{...(all[t]??{}),...patch}});if(clean[t])all[t]=clean[t];else delete all[t];}commit({...b,trackPlay:setAt(b.trackPlay,b.current,all)});},
+  /** How a track plays in the pattern being edited: { div, dir } (src/seq/core.js); null puts it back to the defaults. Only the core clock plays it. */
+  setTrackPlay:(track,play)=>{const b=bankRef.current,all={...(b.trackPlay?.[b.current]??{})},clean=cleanTrackPlay({[track]:play??{}});if(clean[track])all[track]=clean[track];else delete all[track];commit({...b,trackPlay:setAt(b.trackPlay,b.current,all)});},
+  /** The pattern being edited, with its length, tempo, step values and track settings, copied into pattern `to`, which is then the one being edited. */
+  copyTo:to=>{
+   const b=bankRef.current;if(!(to>=0&&to<b.patterns.length)||to===b.current)return;
    const patterns=b.patterns.map((p,i)=>i===to?copyPattern(b.patterns[b.current]):p);
    const lengths=b.lengths.map((n,i)=>i===to?b.lengths[b.current]:n),tempos=b.tempos.map((t,i)=>i===to?b.tempos[b.current]:t);
-   commit({...b,patterns,lengths,tempos,locks:setAt(b.locks,to,b.locks?.[b.current]??{}),trackLengths:setAt(b.trackLengths,to,b.trackLengths?.[b.current]??{}),current:to});
-   send([...patternCommands(to,patterns[to]),[5,lengths[to],to],[8,to,tempos[to]],[2,to,0]]);
+   commit({...b,patterns,lengths,tempos,locks:setAt(b.locks,to,b.locks?.[b.current]??{}),trackLengths:setAt(b.trackLengths,to,b.trackLengths?.[b.current]??{}),trackPlay:setAt(b.trackPlay,to,b.trackPlay?.[b.current]??{}),current:to});
+   if(to<PER_LAYER)send([...patternCommands(to,patterns[to]),[5,lengths[to],to],[8,to,tempos[to]],[2,to,0]]);
   },
-  chain:list=>{commit({...bankRef.current,chain:list});send([[4,list.length,0],...list.map((p,i)=>[3,i,p])]);},
-  setLength:n=>{const b=bankRef.current;commit({...b,lengths:b.lengths.map((x,i)=>i===b.current?n:x)});send([[5,n,b.current]]);},
-  setTempo:bpm=>{const b=bankRef.current;commit({...b,tempos:b.tempos.map((x,i)=>i===b.current?bpm:x)});send([[8,b.current,bpm]]);},
+  copy:()=>api.copyTo((bankRef.current.current+1)%bankRef.current.patterns.length),
+  chain:list=>{commit({...bankRef.current,chain:list});const eng=list.filter(p=>p<PER_LAYER);send([[4,eng.length,0],...eng.map((p,i)=>[3,i,p])]);},
+  setLength:n=>{const b=bankRef.current;commit({...b,lengths:b.lengths.map((x,i)=>i===b.current?n:x)});if(b.current<PER_LAYER)send([[5,n,b.current]]);},
+  setTempo:bpm=>{const b=bankRef.current;commit({...b,tempos:b.tempos.map((x,i)=>i===b.current?bpm:x)});if(b.current<PER_LAYER)send([[8,b.current,bpm]]);},
   /** Arrangements rewind; loading a loop can keep the transport and step clock running. */
-  loadBank:(next,{keepPlaying=false}={})=>{
-   commit(next);send([...(keepPlaying?[]:[[0,0,0]]),...next.patterns.flatMap((p,i)=>patternCommands(i,p)),...chainCommands(next),...(keepPlaying?[]:[[6,0,0]])]);
+  loadBank:(loaded,{keepPlaying=false}={})=>{
+   // a bank of eight patterns (an arrangement recipe, an older file) is filled up to the bank's size
+   const next=normalizeBank(loaded,{count:bankRef.current.patterns.length,empty,valid,migrate})??loaded;
+   commit(next);send([...(keepPlaying?[]:[[0,0,0]]),...next.patterns.slice(0,PER_LAYER).flatMap((p,i)=>patternCommands(i,p)),...chainCommands(next),...(keepPlaying?[]:[[6,0,0]])]);
    if(!keepPlaying)transport(false);
   },
   /** Replaces the pattern being edited. */
-  load:pattern=>{const b=bankRef.current;replacePattern(b.current,pattern);send(patternCommands(b.current,pattern));},
+  load:pattern=>{const b=bankRef.current;replacePattern(b.current,pattern);if(b.current<PER_LAYER)send(patternCommands(b.current,pattern));},
  };
  return api;
 }
