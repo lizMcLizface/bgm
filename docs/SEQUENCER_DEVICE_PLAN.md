@@ -283,6 +283,6 @@ Replaces the retailer-listing guesses above. What the manual says that matters f
 
 **Effect on the order**
 - 1 longer patterns: done; 64 vs 128 is a one-line cap if wanted.
-- 2 generators: built (Euclid, random, mutate). Add: Fixed/Locked steps, Invert, a second Euclid layer with logic, Human, and a kit generator (X/Y style map with chaos and per-voice density).
+- 2 generators: built (Euclid, random, mutate, Fixed steps, kit generator: 3x3 style map + busy + chaos for kick/snare/hat; Fixed = the step condition `fixed`, plays every loop and generators skip it; no separate Locked, no per-voice density yet). Add: Invert, a second Euclid layer with logic, Human, and a kit generator (X/Y style map with chaos and per-voice density).
 - 3 mod lanes: copy Quick Assign (tagged parameters, source/amount/offset), lanes with their own length and division.
 - 4 per-track: swing, groove, loop-in-pattern, mute/solo, per-lane arranger slots.
