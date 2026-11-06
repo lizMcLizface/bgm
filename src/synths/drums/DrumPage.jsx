@@ -9,8 +9,7 @@ import ArrangerDevice from './ArrangerDevice';
 import {readDrumLink,clearDrumLink} from './share';
 import {BEATS,KITS,foldAccent,emptyPattern,validPattern,patternCommands,voiceColour,ACCENT_COLOUR,chainToSong} from './kits';
 import useRackMoves from '../../seq/useRackMoves';
-import {cleanMoves} from '../../seq/moves';
-import MovesPanel from '../seq/MovesPanel';
+import {cleanMoves,RACK_MOVES,MOVE_LOOPS} from '../../seq/moves';
 import useModulation from '../../seq/useModulation';
 import {cleanMod} from '../../seq/mod';
 import ModPanel from '../seq/ModPanel';
@@ -67,7 +66,7 @@ export function DrumPage({kit}){
 
  const [muteMode,setMuteMode]=useState(false),[perfMode,setPerfMode]=useState(false),[colMode,setColMode]=useState(false),[fillEdit,setFillEdit]=useState(false);
  const [copyArmed,setCopyArmed]=useState(false),[block,setBlock]=useState(0);
- const [encPage,setEncPage]=useState('pattern');
+ const [encPage,setEncPage]=useState('pattern'),[mvSel,setMvSel]=useState(0);
  // the generator page: Euclid (pulses, rotation), random (density) or mutate (amount) over a cell of `cell` steps (0: the row's own length), applied to the selected rows
  const [gen,setGen]=useState({mode:0,pulses:4,density:.3,amount:.3,rot:0,cell:0,x:.3,y:.3,chaos:.1});
  const GEN_MODES=['EUCLID','RANDOM','MUTATE','KIT'];
@@ -120,7 +119,7 @@ export function DrumPage({kit}){
  const trackRows=stepEdit?[...new Set(selSteps.map(([t])=>t))].sort((a,b)=>a-b):Array.from({length:n},(_,i)=>i);
  const trackLabel=stepEdit?(trackRows.length===1?kit.tracks[trackRows[0]][2].toUpperCase():`${trackRows.length} ROWS`):'ALL ROWS';
  // the display always has four pages: Pattern, Track, Groove and Voice; a selection takes the first two for Step and Step 2 and moves Track to the third place; Load takes the first while loading
- const visible=[loading?'load':stepEdit?'step':'pattern',stepEdit?'step2':'track',stepEdit?'track':'groove','voice','gen'],shownPage=visible.includes(encPage)?encPage:visible[0];
+ const visible=[loading?'load':stepEdit?'step':'pattern',stepEdit?'step2':'track',stepEdit?'track':'groove','voice','gen','moves'],shownPage=visible.includes(encPage)?encPage:visible[0];
  const shownPages=(values,change,beat)=>encoderPages(values,change,beat,beatCats).filter(p=>visible.includes(p.id));
  const screenLines=(values,beat)=>{
   const cur=bank.current;
@@ -128,7 +127,7 @@ export function DrumPage({kit}){
   const voice=kit.tracks[Math.min(selVoice,n-1)][2].toUpperCase();
   const what={step:`${voice} · STEP ${(described.s??0)+1}`,row:`${voice} · WHOLE ROW`,column:`COLUMN ${(described.s??0)+1} · ALL VOICES`,columns:`${described.count} COLUMNS · ALL VOICES`,rows:`${described.count} ROWS`,many:`${described.count} STEPS SELECTED`,none:''}[described.kind];
   return [`PATTERN ${patternName(cur)} · ${bank.lengths[cur]} STEPS · ${bank.tempos[cur]||Math.round(values.tempo)} BPM`,
-   muteMode?'MUTE · TAP A ROW':perfMode?'PERF · TAP A PAD TO PLAY ITS VOICE':fillEdit?'FILL EDIT · EMPTY PAD: FILL ONLY · NOTE: NOT IN FILL':shownPage==='track'?`TRACK · ${trackLabel}`:shownPage==='gen'?`GENERATE · ${genRows.length===1?kit.tracks[genRows[0]][2].toUpperCase():genRows.length+' ROWS'}`:mode==='pattern'?(bank.names?.[cur]||'PATTERNS').toUpperCase():stepEdit?what:`${voice}${colMode?' · COLUMN':editLayer?' · EDIT':''}`,
+   muteMode?'MUTE · TAP A ROW':perfMode?'PERF · TAP A PAD TO PLAY ITS VOICE':fillEdit?'FILL EDIT · EMPTY PAD: FILL ONLY · NOTE: NOT IN FILL':shownPage==='moves'?`MOVES · ${patternName(cur)} · ${(moves[cur]?.list??[]).length?`${moves[cur].list.length} ON · ${moves[cur].loops} LOOP${moves[cur].loops>1?'S':''}`:'NONE YET'}`:shownPage==='track'?`TRACK · ${trackLabel}`:shownPage==='gen'?`GENERATE · ${genRows.length===1?kit.tracks[genRows[0]][2].toUpperCase():genRows.length+' ROWS'}`:mode==='pattern'?(bank.names?.[cur]||'PATTERNS').toUpperCase():stepEdit?what:`${voice}${colMode?' · COLUMN':editLayer?' · EDIT':''}`,
    copyArmed?`COPY ${patternName(cur)} TO… TAP A PATTERN`:shownPage==='gen'?'TAP GEN AGAIN TO GENERATE':mode==='pattern'?'TAP A PATTERN':stepEdit&&litSel.length<sel.size?`${litSel.length} OF ${sel.size} HAVE NOTES`:colMode?'COLUMN · TAP A PAD TO SELECT ITS COLUMN':editLayer?'EDIT · TAP TO SELECT · SHIFT ADDS':(bank.names?.[cur]||bank.title||(seq.playing?`PLAYING ${patternName(seq.playingPattern)}`:'STOPPED')).toUpperCase()];
  };
  // The encoders' pages: the pattern, the track, the groove and the voice; and the selection's own (velocity, type, chance, ratchet; nudge, tune, decay, accent; condition)
@@ -174,6 +173,21 @@ export function DrumPage({kit}){
    })()},
    {id:'groove',label:'Groove',encoders:[param('swing','Swing'),param('flam','Flam'),param('tempo','Tempo'),param('master','Master')]},
    {id:'voice',label:'Voice',encoders:['Level','Tune','Decay','Pan'].map(f=>param(kit.tracks[voice][0]+f,f))},
+   // Moves: effects of the rack that sweep from Start to End over the pattern's loops (the front page has the same: "Effect moves while Build plays"). Effect picks which one the other
+   // three encoders edit; turning Start or End makes it a move, double-clicking either removes it.
+   {id:'moves',label:'Moves',encoders:(()=>{
+    const keys=Object.keys(RACK_MOVES),key=keys[Math.min(mvSel,keys.length-1)],r=RACK_MOVES[key],entry=moves[cur],list=entry?.list??[],mv=list.find(x=>x.key===key),loops=entry?.loops??1;
+    const pos=v=>r.log?Math.log(v/r.min)/Math.log(r.max/r.min):(v-r.min)/(r.max-r.min),val=p=>Math.min(r.max,Math.max(r.min,r.log?r.min*(r.max/r.min)**p:r.min+(r.max-r.min)*p));
+    const fmt=v=>/^filter/.test(key)?(v>=1000?(v/1000).toFixed(1)+'k':String(Math.round(v)))+'Hz':key==='effects.delayMs'?Math.round(v)+'ms':Math.round(v*100)+'%';
+    const rest=list.filter(x=>x.key!==key);
+    const put=patch=>setMoves(cur,patch?{loops,list:[...rest,{...(mv??{key,from:r.min,to:r.max}),...patch}]}:rest.length?{loops,list:rest}:null);
+    const end=(name,label)=>({label,display:mv?fmt(mv[name]):'OFF',position:mv?pos(mv[name]):0,step:.02,onPosition:p=>put({[name]:val(p)}),onReset:()=>put(null)});
+    return [
+     {label:'Effect',display:r.label.replace(' (Hz)','').replace(' filter','').toUpperCase()+(mv?' •':''),position:keys.indexOf(key)/(keys.length-1),step:1/(keys.length-1),onPosition:p=>setMvSel(Math.round(p*(keys.length-1))),onReset:()=>setMvSel(0)},
+     end('from','Start'),end('to','End'),
+     {label:'Loops',display:entry?String(loops):'—',position:MOVE_LOOPS.indexOf(loops)/(MOVE_LOOPS.length-1),step:1/(MOVE_LOOPS.length-1),disabled:!entry,onPosition:p=>setMoves(cur,{...entry,loops:MOVE_LOOPS[Math.round(p*(MOVE_LOOPS.length-1))]}),onReset:()=>setMoves(cur,{...entry,loops:1})},
+    ];
+   })()},
    // Generate: Mode, its main value, Rotate (Euclid) and Cell (how many steps one pass covers; it repeats to fill the row); the key below applies it to the selected rows
    {id:'gen',label:'Gen',encoders:(()=>{
     const cellLen=gen.cell||len,set=patch=>setGen(g=>({...g,...patch}));
@@ -345,7 +359,6 @@ export function DrumPage({kit}){
       <div className="s8-left">
        <SeqScreen accent={voiceColour(kit.tracks[Math.min(selVoice,n-1)][0],kit.id)} page={shownPage} onPage={setEncPage} pages={shownPages(values,change,beat)} lines={screenLines(values,beat)} actions={{gen:{title:'Tap again: fill the selected rows (or the selected voice) with a new row from these settings; each tap is a new one for Random and Mutate',onClick:generate}}}/>
        {assigning&&synth.params.BY_KEY[assigning]&&<ModPanel paramLabel={synth.params.BY_KEY[assigning].label} assign={mod.assigns[assigning]} mod={mod} onAssign={a=>setAssign(assigning,a)} onMod={next=>setMod(cleanMod(next))} onClose={()=>setAssigning(null)}/>}
-       <details className="seq-moves-box"><summary>Effect moves{moves[bank.current]?' ·  on':''}</summary><MovesPanel title={`While ${patternName(bank.current)} plays`} entry={moves[bank.current]} onChange={e=>setMoves(bank.current,e)}/></details>
        <div className="s8-transport" role="group" aria-label="Transport">
         <button type="button" className={'tp play'+(transport.playing?' on':'')} aria-pressed={transport.playing} onClick={transport.play} title="Play"><b>▶</b><small>Play</small></button>
         <button type="button" className={'tp'+(transport.paused?' on':'')} aria-pressed={transport.paused} onClick={transport.pause} title="Pause here; play goes on from this place" disabled={!transport.playing&&!transport.paused}><b>⏸</b><small>Pause</small></button>
