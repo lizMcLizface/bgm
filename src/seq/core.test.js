@@ -298,3 +298,21 @@ test('rows with their own length meet at every bar, unless they are set to run f
     expect(at(16, { free: true })).toEqual([0]);             // run free, the three-step row is a step behind
     expect(at(48, { free: true })).toEqual([0, 1]);          // and meets the bar again after 3 x 16 steps
 });
+
+describe('long patterns', () => {
+    it('plays the steps past the first page and wraps at the pattern length', () => {
+        const rows = [Array(48).fill(0)];
+        rows[0][37] = 1;
+        const events = [];
+        let t = 0;
+        const sch = createScheduler({
+            now: () => t, bank: () => ({ patterns: [{ rows }], lengths: [40], tempos: [0], chain: [], current: 0 }), pattern: (p) => p,
+            tempo: () => 120, swing: () => 0.5, flam: () => 0.5, emit: (e, info) => events.push(info.step), lookahead: 100,
+            timers: { set: () => 1, clear: () => {} },
+        });
+        sch.start(0, 'pattern');
+        expect(events).toContain(37);
+        expect(Math.max(...events)).toBeLessThan(48);
+        sch.stop();
+    });
+});

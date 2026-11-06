@@ -234,3 +234,55 @@ A column is only another way to select steps (the Column key): every page edits 
 - **Scopes**: the scheduler plays in 'pattern' scope (the sequencer: only the pattern being edited, a song and chain ignored; it repeats, or with Loop off goes on through the patterns with notes) or 'song' scope (the arranger). Stop from the sequencer leaves the song's place alone; stop from the arranger rewinds the song. Pressing play from the other one while it runs changes what it follows. Each play key is lit only for its own scope.
 - Open: whether rows with their own length should restart at the pattern's first step (no drift) or run free as a polymeter (today).
 - Rows with their own length now start again with the pattern (they meet at every bar); the sequencer's settings cog has "Rows run free past the bar" for a free-running polymeter (`bank.freeRun`, `free` in `trackWindow`). Rate and direction were already bar-aligned.
+
+## Roadmap after the eight-track device (2026-11-06)
+
+Compared with the OXI One (specs from retailer listings and memory, not its manual). Agreed order:
+
+1. **Longer patterns.** Up to 64 steps per pattern (OXI: 128). The grid stays 16 columns; a Page knob scrolls the window a beat (4 steps) at a time. The four displays over the pads show the bars/beats of the visible window; the playhead page can be followed. Old banks stay valid (16 is just a length).
+2. **Generators.** Euclidean (pulses, rotation), random (density, seeded), mutate; applied to the selected rows. Output is ordinary notes.
+3. **Mod lanes.** A target registry per device (name, range, curve; the drum target's `DRUM_PARAMS`, `src/synths/params.js`), lanes with LFO (existing LFO logic) or step values, two destinations with min/max, learn mode on screen (arm a lane, touch a control). External CC later on the same bus. Must be scheduled on the audio clock, not through React; the kernel has timed pressure events for per-hit overrides only, so continuous lanes need a worklet-side LFO or a timed parameter event. Decide that first.
+4. **Per-track things.** Per-track copy, patterns, playhead, pattern-change quantize.
+5. **Track modes.** Note, chord (holds), arpeggio, as for the main page's chord stage.
+6. **Live performance tools.** Transpose, rotate, etc. Need an instrument that can be transposed, so after the track modes.
+
+
+### Longer patterns (2026-11-06, uncommitted)
+- A pattern may be 1-64 steps. Rows are stored in whole pages of 16 (`capacityFor`; `validPattern` accepts 16/32/48/64 wide rows, all equal); `setLength` grows them when needed and never shrinks them, so steps past a shortened length are kept, only dimmed. Per-step values and per-track lengths accept steps up to 63.
+- The grid still shows 16 columns: a window starting at `colEff`, moved a beat (4 steps) at a time by the Page knob next to the Voices knob. The four displays over the pads read bar.beat and the first step of their beat when the pattern is longer than one bar. While playing, the window follows the playhead page by page (display: FOLLOW) until the knob is turned; double-click it to follow again and go back to the start. `LaneGrid` takes `offset` and `pages`; all handlers still receive absolute step numbers; the playhead is hidden while outside the window (`--off`, `data-out`).
+- The engine's own sequencer plays only the first 16 steps of a pattern (commands and length are clamped); the core clock, which is the default, plays all of it.
+- Checked in headless Chrome on /synths/tr808/: a 40-step pattern, the window following 0 -> 16 -> 24 and wrapping, no console errors. Not heard.
+- Not yet: bar/beat labels for track lengths other than the pattern's, a pattern length stepper in whole bars, Euclidean / random generators (next).
+
+### Generators (2026-11-06, uncommitted)
+- `src/seq/generate.js` (pure, seedable; tests in `generate.test.js`): `bjorklund` / `euclid(pulses, steps, rotation)`, `randomRow(length, density)`, `mutateRow(row, amount)` (drops, nudges a note a step either way, grows a few new ones around the same density), `tile`.
+- UI: a fifth display page, **Gen** (Mode Euclid / Random / Mutate; Pulses / Density / Amount; Rotate for Euclid; Cell = how many steps one pass covers, repeated to fill the row, 0 = the row's own length) and no key of its own: tapping the Gen tab again generates (a separate button shifted the layout). It fills the selected rows, or the selected voice's row when nothing is selected, over each row's own length. The output is ordinary notes: a note that stays keeps its type and step values, one that goes takes them with it. Each press of Random / Mutate is a new roll; there is no undo yet (nothing else in the sequencer has one).
+- Whole-row selections and the "row" description now cover the pattern's length, not 16 steps.
+- Checked in headless Chrome on /synths/tr808/ (E(4,16), E(7,16) = x..x.x.x..x.x.x., rotation, random, mutate; no console errors). Not heard.
+- Not yet: generating a whole kit (a style-aware pattern across voices), velocity shaping for random off-beats, a `source: generated` flag, an undo for generator results.
+
+## OXI ONE MKII manual check (2026-11-06, manual v2.2.5b, read by the user's PDF)
+
+Replaces the retailer-listing guesses above. What the manual says that matters for the drum device:
+
+**Corrections to what was said earlier**
+- The OXI does generate a kit: Multitrack mode has a *drum pattern generator* on tracks 1-3 (kick, snare, hat): an X/Y position in a table of rhythm patterns (0-127 each), a Chaos amount, and a per-track Density; non-destructive, tuned for 32 steps, existing steps are kept. So a style-aware kit generator is not beyond the OXI; it is a Grids-style map. (p.143-145)
+- Generators are not just per track Euclid: two Euclidean layers (length, pulses, rotation each) combined with OR / AND / XOR / Accent, plus Density, Invert, note and octave randomisation, tie %, velocity variation; steps set to Fixed or Locked are left alone. The random generator has Human (nudge/gate jitter, adds no notes), Order, Pitch and Flip modifiers that act on the existing pattern. Undo covers the last 15 actions. (p.78-82)
+- 128 steps per pattern, 16-step pages, a Follow mode (Shift + Track) that can be switched off: the same model as the longer-pattern window built today (ours: 64 steps, follow stays on until the Page knob is turned).
+
+**Ahead of us, drum-relevant (candidate list, not a plan)**
+- Step conditions: A:B (2:2 to 8:8), !A:B, PRE / !PRE (depends on the previous trig), 1st / !1st, Flow / !Flow, Fixed, Locked. We have A:B, fill, not-fill. Fixed/Locked matter once generators exist: they protect hand-made steps.
+- Repeats: 1-15 repeats over 1-15 steps, velocity ramp +-70 %, acceleration +-28 %, repeat probability, plus retrigger 1-8. Ours: ratchet x1-4 with a fixed decay.
+- Track directions: forward, reverse, pendulum (end steps twice), pong (once), drunk, random; also drunk pong. Ours: forward, reverse, ping-pong, random. Time division also has bar, 1/32T, 1/64 and a randomised division amount.
+- Per track: swing (10-90), groove template (16-step velocity + timing), loop within the pattern, mute/solo, random perform (non-destructive velocity/gate/retrig/trig variation), fills of several intensities, loop capture pads, rolls at a chosen division.
+- Per sequencer: nudge +-100 ms and time bend +-12 %.
+- Modulation: 8 lanes per sequencer, each with its own length and division (independent of the notes), min/max/offset/random, smoothing, 2 MIDI and 2 internal destinations, recorded live from the knobs; 2 LFOs per sequencer with 24 shapes, retrigger and phase. **Quick Assign**: parameters that can be modulated carry a corner tag; Shift + long press on one opens a page with Source (off, LFO 1/2, random S&H, mod lane 1-8, MIDI learn), Amount, Offset and Adapt (fits the range to the target). This is the on-screen "learn" the roadmap's mod-lane stage should copy.
+- Arranger: 32 slots, per-lane patterns (each lane picks its own pattern per slot), repeats 1-19 or infinite, Next (next, previous, first, random, other), a master lane that drives the others, launch quantisation, clip launch while playing, program/bank change per slot. Ours: one pattern per song block, 16 blocks, repeats 1-8, loop in/out.
+
+**Ahead of the OXI (they do not have)**: the sound (it is only a sequencer), per-step tune and decay on a drum voice, fill-only and not-in-fill notes edited on the grid, kit-specific voice panels.
+
+**Effect on the order**
+- 1 longer patterns: done; 64 vs 128 is a one-line cap if wanted.
+- 2 generators: built (Euclid, random, mutate). Add: Fixed/Locked steps, Invert, a second Euclid layer with logic, Human, and a kit generator (X/Y style map with chaos and per-voice density).
+- 3 mod lanes: copy Quick Assign (tagged parameters, source/amount/offset), lanes with their own length and division.
+- 4 per-track: swing, groove, loop-in-pattern, mute/solo, per-lane arranger slots.

@@ -78,9 +78,9 @@ export function drumPresets(kit,params){
 
 export {BEATS,ARRANGEMENTS} from './beats';
 
-/** A pattern is an array of (tracks + 1) rows of sixteen values: 0 off, 1 on, 2 flam; the last row is the accent row (0–3). */
+/** A pattern is an array of (tracks + 1) rows of 16, 32, 48 or 64 values (a pattern's length is kept apart, in the bank): 0 off, 1 on, 2 flam; the last row is the accent row (0–3). */
 export const emptyPattern=kit=>()=>Array.from({length:kit.tracks.length+1},()=>Array(16).fill(0));
-export const validPattern=kit=>p=>Array.isArray(p)&&p.length===kit.tracks.length+1&&p.every((r,t)=>Array.isArray(r)&&r.length===16&&r.every(v=>Number.isInteger(v)&&v>=0&&v<=(t===kit.tracks.length?3:2)));
+export const validPattern=kit=>p=>Array.isArray(p)&&p.length===kit.tracks.length+1&&Array.isArray(p[0])&&[16,32,48,64].includes(p[0].length)&&p.every((r,t)=>Array.isArray(r)&&r.length===p[0].length&&r.every(v=>Number.isInteger(v)&&v>=0&&v<=(t===kit.tracks.length?3:2)));
 // Substitute only when the source instrument is absent, merging simultaneous hits.
 // This keeps percussion and clap-led recipes useful on the smaller 606/909 kits.
 const FALLBACK={cp:['sd'],rs:['sd'],cl:['rs','sd'],lc:['lt'],mc:['mt','lt'],hc:['ht'],mt:['ht'],cb:['rd','cy','ht'],ma:['ch'],cy:['cr'],cr:['cy'],rd:['cy','ch']};
@@ -128,6 +128,6 @@ export const foldAccent=kit=>bank=>{
 /** Engine commands for one pattern; `silent(track)` leaves a muted (or not soloed) voice out of what the engine plays. */
 export function patternCommands(kit,index,pattern,silent=()=>false){
  const cmds=[[7,index,0]];
- pattern.forEach((row,t)=>{if(t<kit.tracks.length&&silent(t))return;row.forEach((on,s)=>{if(on)cmds.push([1,index<<10|(t===kit.tracks.length?16:t)<<5|s,on]);});});
+ pattern.forEach((row,t)=>{if(t<kit.tracks.length&&silent(t))return;row.forEach((on,s)=>{if(on&&s<16)cmds.push([1,index<<10|(t===kit.tracks.length?16:t)<<5|s,on]);});});
  return cmds;
 }

@@ -35,7 +35,8 @@
 .drums .seq-grid{grid-template-columns:auto max-content;justify-content:start;align-self:start;}
 .drums .seq-cells{grid-template-columns:repeat(16,var(--pad));grid-auto-rows:var(--pad);overflow:visible;}
 .drums .seq-names{grid-auto-rows:var(--pad);}
-.drums .playhead{left:calc(var(--step) * (var(--pad) + 2px));width:var(--pad);}
+.drums .playhead{left:calc((var(--step) - var(--off,0)) * (var(--pad) + 2px));width:var(--pad);}
+.drums .seq-cells[data-out="1"] .playhead{display:none;}
 /* the drum machine: master strip, then a row per voice */
 .dm-master{display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:6px 12px;align-items:center;align-content:start;}
 .dm-lcd{grid-row:span 2;display:flex;align-items:baseline;gap:6px;padding:6px 10px;background:#0b0a08;border:1px solid #3a352d;border-radius:6px;box-shadow:inset 0 0 12px #000;}

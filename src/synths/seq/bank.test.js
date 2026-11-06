@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { blankBank, normalizeBank, patternName, patternId, layerOf, letterOf, chainCommands } from './bank';
+import { blankBank, normalizeBank, patternName, patternId, layerOf, letterOf, chainCommands, capacityFor, MAX_STEPS, cleanLocks } from './bank';
+import { validPattern, emptyPattern, patternCommands } from '../drums/kits';
+import { KITS } from '../drums/kits';
 
 const empty = () => [[0, 0], [0, 0]];
 const valid = (p) => Array.isArray(p) && p.length === 2;
@@ -39,5 +41,23 @@ describe('pattern bank', () => {
         expect(cmds.filter(([c]) => c === 5)).toHaveLength(8);
         expect(cmds).toContainEqual([4, 2, 0]);
         expect(cmds.some(([c]) => c === 2)).toBe(false);
+    });
+    it('keeps patterns of up to sixty-four steps and gives the engine only the first page', () => {
+        expect([1, 16, 17, 40, 64, 99].map(capacityFor)).toEqual([16, 16, 32, 48, 64, 64]);
+        const bank = normalizeBank({ patterns: [empty()], lengths: [40, 99] }, { count: 8, empty, valid });
+        expect(bank.lengths.slice(0, 2)).toEqual([40, 16]);
+        expect(chainCommands({ ...bank, chain: [] }).filter(([c]) => c === 5)[0]).toEqual([5, 16, 0]);
+        expect(Object.keys(cleanLocks({ '0:63': { velocity: 0.5 }, '0:64': { velocity: 0.5 } }))).toEqual(['0:63']);
+        expect(MAX_STEPS).toBe(64);
+    });
+    it('accepts drum patterns of whole pages and sends the engine only the first', () => {
+        const kit = Object.values(KITS)[0], rows = kit.tracks.length + 1;
+        const long = Array.from({ length: rows }, () => Array(48).fill(0));
+        long[0][3] = 1; long[0][40] = 1;
+        expect(validPattern(kit)(long)).toBe(true);
+        expect(validPattern(kit)(emptyPattern(kit)())).toBe(true);
+        expect(validPattern(kit)(long.map((r, i) => (i ? r : r.slice(0, 16))))).toBe(false);
+        expect(validPattern(kit)(long.map((r) => r.slice(0, 20)))).toBe(false);
+        expect(patternCommands(kit, 0, long).filter(([c]) => c === 1)).toHaveLength(1);
     });
 });

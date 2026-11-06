@@ -10,7 +10,10 @@ export const LETTERS='ABCDEFGH';
 export const PER_LAYER=8,LAYERS=8,MAX_PATTERNS=PER_LAYER*LAYERS;
 export const layerOf=i=>i>>3,letterOf=i=>i&7,patternId=(layer,letter)=>layer*PER_LAYER+letter;
 export const patternName=i=>`${layerOf(i)+1}${LETTERS[letterOf(i)]}`;
-export const STEPS=16;
+/** A page of steps (what the grid shows at once, and the engine's own sequencer plays); a pattern may be up to MAX_STEPS long, in pages. */
+export const STEPS=16,MAX_STEPS=64;
+/** The step count a pattern's rows need for length `n`: whole pages of STEPS. */
+export const capacityFor=n=>Math.min(MAX_STEPS,Math.max(STEPS,Math.ceil(n/STEPS)*STEPS));
 
 /** Per-step values of a pattern, keyed 'track:step' (see src/seq/core.js for what they mean); bad entries are dropped. */
 const RANGES={velocity:[.05,1],prob:[0,1],ratchet:[1,4],nudge:[-.5,.5],tune:[-1,1],decay:[-1,1]};
@@ -19,7 +22,7 @@ export function cleanLocks(raw){
  if(!raw||typeof raw!=='object')return out;
  for(const [key,lock] of Object.entries(raw)){
   const [t,st]=key.split(':').map(Number);
-  if(!(Number.isInteger(t)&&t>=0&&t<32&&Number.isInteger(st)&&st>=0&&st<STEPS)||!lock||typeof lock!=='object')continue;
+  if(!(Number.isInteger(t)&&t>=0&&t<32&&Number.isInteger(st)&&st>=0&&st<MAX_STEPS)||!lock||typeof lock!=='object')continue;
   const clean={};
   for(const [name,[lo,hi]] of Object.entries(RANGES))if(Number.isFinite(lock[name]))clean[name]=Math.min(hi,Math.max(lo,lock[name]));
   if(typeof lock.cond==='string'&&/^([1-9]:[1-9]|fill|not-fill)$/.test(lock.cond))clean.cond=lock.cond;
@@ -35,7 +38,7 @@ export function cleanSong(raw,count=8){
 export function cleanTrackLengths(raw){
  const out={};
  if(!raw||typeof raw!=='object')return out;
- for(const [t,n] of Object.entries(raw))if(Number.isInteger(+t)&&+t>=0&&+t<32&&Number.isInteger(+n)&&+n>=1&&+n<STEPS)out[t]=+n;
+ for(const [t,n] of Object.entries(raw))if(Number.isInteger(+t)&&+t>=0&&+t<32&&Number.isInteger(+n)&&+n>=1&&+n<MAX_STEPS)out[t]=+n;
  return out;
 }
 
@@ -66,7 +69,7 @@ export function normalizeBank(s,{count=8,empty,valid,migrate=null}){
  if(loopIn!==null&&loopOut!==null&&loopOut<loopIn)[loopIn,loopOut]=[loopOut,loopIn];
  const bank={
   patterns:each(i=>s.patterns[i]??empty()),
-  lengths:each(i=>{const n=Number(s.lengths?.[i]);return n>=1&&n<=STEPS?Math.round(n):STEPS;}),
+  lengths:each(i=>{const n=Number(s.lengths?.[i]);return n>=1&&n<=MAX_STEPS?Math.round(n):STEPS;}),
   tempos:each(i=>{const n=Number(s.tempos?.[i]);return n>=30&&n<=300?n:0;}),
   chain:(Array.isArray(s.chain)?s.chain:[]).filter(n=>Number.isInteger(n)&&n>=0&&n<count).slice(0,16),
   current:Math.min(count-1,Math.max(0,s.current|0)),title:String(s.title??'').slice(0,80),
@@ -95,7 +98,7 @@ export function chainCommands(bank){
  // the engine's own sequencer holds the first eight patterns; the others are played by the sequencer core
  const chain=bank.chain.filter(p=>p<PER_LAYER);
  return [
-  ...bank.lengths.slice(0,PER_LAYER).map((n,p)=>[5,n,p]),
+  ...bank.lengths.slice(0,PER_LAYER).map((n,p)=>[5,Math.min(n,STEPS),p]),
   ...bank.tempos.slice(0,PER_LAYER).map((t,p)=>[8,p,t]),
   [4,chain.length,0],...chain.map((p,i)=>[3,i,p]),...(bank.current<PER_LAYER?[[2,bank.current,0]]:[]),
  ];

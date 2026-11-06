@@ -1,5 +1,5 @@
 import {useMemo,useRef,useState} from 'react';
-import {usePatternBank,chainCommands,cleanTrackPlay,normalizeBank,PER_LAYER} from './bank';
+import {usePatternBank,chainCommands,cleanTrackPlay,normalizeBank,capacityFor,PER_LAYER,STEPS} from './bank';
 import {movePlayhead} from './playhead';
 import {createClockSync} from './clockSync';
 
@@ -95,11 +95,17 @@ export function useSequencer({id,empty,valid,patternCommands,copyPattern,tempoId
    const patterns=b.patterns.map((p,i)=>i===to?copyPattern(b.patterns[b.current]):p);
    const lengths=b.lengths.map((n,i)=>i===to?b.lengths[b.current]:n),tempos=b.tempos.map((t,i)=>i===to?b.tempos[b.current]:t);
    commit({...b,patterns,lengths,tempos,locks:setAt(b.locks,to,b.locks?.[b.current]??{}),trackLengths:setAt(b.trackLengths,to,b.trackLengths?.[b.current]??{}),trackPlay:setAt(b.trackPlay,to,b.trackPlay?.[b.current]??{}),current:to});
-   if(to<PER_LAYER)send([...patternCommands(to,patterns[to]),[5,lengths[to],to],[8,to,tempos[to]],[2,to,0]]);
+   if(to<PER_LAYER)send([...patternCommands(to,patterns[to]),[5,Math.min(lengths[to],STEPS),to],[8,to,tempos[to]],[2,to,0]]);
   },
   copy:()=>api.copyTo((bankRef.current.current+1)%bankRef.current.patterns.length),
   chain:list=>{commit({...bankRef.current,chain:list});const eng=list.filter(p=>p<PER_LAYER);send([[4,eng.length,0],...eng.map((p,i)=>[3,i,p])]);},
-  setLength:n=>{const b=bankRef.current;commit({...b,lengths:b.lengths.map((x,i)=>i===b.current?n:x)});if(b.current<PER_LAYER)send([[5,n,b.current]]);},
+  // a pattern longer than its rows grows them (by whole pages); a shorter one keeps its steps, which are only hidden. The engine's own sequencer plays the first page.
+  setLength:n=>{
+   const b=bankRef.current,cap=capacityFor(n),pattern=b.patterns[b.current],have=pattern[0]?.length??STEPS;
+   const patterns=cap>have?b.patterns.map((p,i)=>i===b.current?p.map(r=>[...r,...Array(cap-have).fill(0)]):p):b.patterns;
+   commit({...b,patterns,lengths:b.lengths.map((x,i)=>i===b.current?n:x)});
+   if(b.current<PER_LAYER)send([[5,Math.min(n,STEPS),b.current]]);
+  },
   setTempo:bpm=>{const b=bankRef.current;commit({...b,tempos:b.tempos.map((x,i)=>i===b.current?bpm:x)});if(b.current<PER_LAYER)send([[8,b.current,bpm]]);},
   /** Arrangements rewind; loading a loop can keep the transport and step clock running. */
   loadBank:(loaded,{keepPlaying=false}={})=>{

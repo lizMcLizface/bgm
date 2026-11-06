@@ -10,13 +10,14 @@ import {readDrumLink,clearDrumLink} from './share';
 import {BEATS,KITS,foldAccent,emptyPattern,validPattern,patternCommands,voiceColour,ACCENT_COLOUR,chainToSong} from './kits';
 import useCoreClock from '../../seq/useCoreClock';
 import {DIVISIONS,DIRECTIONS,trackWindow,directedIndex} from '../../seq/core';
+import {euclid,tile,randomRow,mutateRow,seeded} from '../../seq/generate';
 import {load,save} from '../storage';
 import {DrumPicker,DrumMachineTop,DrumMachineVoices,DrumVoicePanel} from './DrumMachine';
 import {DEFAULTS,CONDITIONS} from './StepEditor';
 import SeqScreen from '../seq/SeqScreen';
 import SettingsPop from '../seq/SettingsPop';
 import {toPosition,fromPosition,formatValue} from '../params';
-import {LETTERS,MAX_PATTERNS,PER_LAYER,LAYERS,layerOf,letterOf,patternId,patternName} from '../seq/bank';
+import {LETTERS,MAX_PATTERNS,MAX_STEPS,STEPS,PER_LAYER,LAYERS,layerOf,letterOf,patternId,patternName} from '../seq/bank';
 import LaneGrid from '../seq/LaneGrid';
 import {stepKey,parseKey,rowKeys,columnKeys,chooseKeys,describeSelection,commonValue} from '../seq/selection';
 import {LANES,drumLaneWindow,maxOffset,revealRow,windowLabel} from '../seq/lanes';
@@ -52,10 +53,18 @@ export function DrumPage({kit}){
  // eight lanes at a time: a window the knob above the voices slides over them (a kit with more voices scrolls); picking a voice scrolls it into view
  const [offset,setOffset]=useState(0),maxOff=maxOffset(n);
  const selectVoice=t=>{setSelected(t);setOffset(o=>revealRow(n,o,t));};
+ // a pattern may be up to 64 steps; the grid shows sixteen of them, a window a knob slides a beat (four steps) at a time. While it plays the window follows
+ // the playhead from page to page, until the knob is turned by hand (double-click the knob to follow again).
+ const [col,setCol]=useState(0),[follow,setFollow]=useState(true);
+ const patLen=bank.lengths[bank.current],maxCol=Math.max(0,Math.ceil(patLen/4)*4-STEPS),colEff=Math.min(col,maxCol);
+ const windowRef=useRef({colEff:0,maxCol:0,follow:true});windowRef.current={colEff,maxCol,follow};
 
  const [muteMode,setMuteMode]=useState(false),[perfMode,setPerfMode]=useState(false),[colMode,setColMode]=useState(false),[fillEdit,setFillEdit]=useState(false);
  const [copyArmed,setCopyArmed]=useState(false),[block,setBlock]=useState(0);
  const [encPage,setEncPage]=useState('pattern');
+ // the generator page: Euclid (pulses, rotation), random (density) or mutate (amount) over a cell of `cell` steps (0: the row's own length), applied to the selected rows
+ const [gen,setGen]=useState({mode:0,pulses:4,density:.3,amount:.3,rot:0,cell:0});
+ const GEN_MODES=['EUCLID','RANDOM','MUTATE'];
  // The grid has two layers. Draw (the default): a tap on a pad adds or removes a note, and a new note comes up on the display. Edit: a tap
  // selects (Shift adds to the selection), a voice's button selects its whole row and a column's head its whole column, and the encoders then
  // edit everything selected together. Properties of a step are velocity, type, chance, ratchet, nudge, tune, decay, condition; accent
@@ -69,7 +78,7 @@ export function DrumPage({kit}){
   return ()=>{window.removeEventListener('keydown',down);window.removeEventListener('keyup',up);window.removeEventListener('blur',blur);};
  },[]);
  // a pattern of its own: the selection belongs to the pattern it was made in
- useEffect(()=>{setSel(new Set());},[bank.current]);
+ useEffect(()=>{setSel(new Set());setCol(0);},[bank.current]);
  // Pattern mode shows all sixty-four patterns in place of the steps; the same four keys then copy, clear and load. Load takes a loop
  // from the library (beats.js) through the display: Style and Beat on the encoders, the key again to put it in the lit pattern.
  const [mode,setMode]=useState('steps'),[loading,setLoading]=useState(false),[loadCat,setLoadCat]=useState(0),[loadIdx,setLoadIdx]=useState(0);
@@ -86,22 +95,26 @@ export function DrumPage({kit}){
   return {top:kit.tracks[t][2].toUpperCase(),bottom:['N'+(36+t),own&&own+'ST',play.div,ARROW[play.dir]].filter(Boolean).join(' ')};
  };
  // the four displays over the pads: beat numbers, or in pattern mode the pattern being edited, its name, its length and its tempo
- const rulerWords=()=>mode==='pattern'?[[patternName(bank.current),'PATTERN',''],[bank.names?.[bank.current]||'—','NAME',''],[bank.lengths[bank.current]+' ST','LENGTH',''],[bank.tempos[bank.current]?bank.tempos[bank.current]+' BPM':'GLOBAL','TEMPO','']]:['1','2','3','4'].map(w=>[w,'','']);
+ const rulerWords=()=>mode==='pattern'?[[patternName(bank.current),'PATTERN',''],[bank.names?.[bank.current]||'—','NAME',''],[bank.lengths[bank.current]+' ST','LENGTH',''],[bank.tempos[bank.current]?bank.tempos[bank.current]+' BPM':'GLOBAL','TEMPO','']]:[0,1,2,3].map(i=>{
+  // beats of the visible window; a pattern of more than one bar numbers them bar.beat
+  const beat=colEff/4+i;
+  return patLen>STEPS?[`${(beat>>2)+1}.${(beat&3)+1}`,`STEP ${beat*4+1}`,beat*4>=patLen?'PAST END':'']:[String(i+1),'',''];
+ });
  // how loud a lit step is, 0 to 1, for its brightness: its velocity (full when none is set)
  const levelOf=(t,s)=>bank.locks?.[bank.current]?.[t+':'+s]?.velocity??1;
  const pickPattern=id=>{if(copyArmed){seq.copyTo(id);setCopyArmed(false);}else seq.select(id);};
 
  // the selection: what is lit in it, which columns it touches, what it is
  const curPattern=curPatternOf(bank);
- const selSteps=[...sel].map(parseKey).filter(([t,s])=>t<n&&s<16);
+ const selSteps=[...sel].map(parseKey).filter(([t,s])=>t<n&&s<MAX_STEPS);
  const litSel=selSteps.filter(([t,s])=>curPattern[t][s]>0),selCols=[...new Set(selSteps.map(([,s])=>s))].sort((a,b)=>a-b);
- const described=describeSelection(sel,n),stepEdit=sel.size>0&&mode!=='pattern'&&!muteMode&&!perfMode;
+ const described=describeSelection(sel,n,patLen),stepEdit=sel.size>0&&mode!=='pattern'&&!muteMode&&!perfMode;
  const selVoice=selSteps.length?selSteps[0][0]:selected;
  // the Track page edits the rows of the selection, or every row when nothing is selected
  const trackRows=stepEdit?[...new Set(selSteps.map(([t])=>t))].sort((a,b)=>a-b):Array.from({length:n},(_,i)=>i);
  const trackLabel=stepEdit?(trackRows.length===1?kit.tracks[trackRows[0]][2].toUpperCase():`${trackRows.length} ROWS`):'ALL ROWS';
  // the display always has four pages: Pattern, Track, Groove and Voice; a selection takes the first two for Step and Step 2 and moves Track to the third place; Load takes the first while loading
- const visible=[loading?'load':stepEdit?'step':'pattern',stepEdit?'step2':'track',stepEdit?'track':'groove','voice'],shownPage=visible.includes(encPage)?encPage:visible[0];
+ const visible=[loading?'load':stepEdit?'step':'pattern',stepEdit?'step2':'track',stepEdit?'track':'groove','voice','gen'],shownPage=visible.includes(encPage)?encPage:visible[0];
  const shownPages=(values,change,beat)=>encoderPages(values,change,beat,beatCats).filter(p=>visible.includes(p.id));
  const screenLines=(values,beat)=>{
   const cur=bank.current;
@@ -109,8 +122,8 @@ export function DrumPage({kit}){
   const voice=kit.tracks[Math.min(selVoice,n-1)][2].toUpperCase();
   const what={step:`${voice} · STEP ${(described.s??0)+1}`,row:`${voice} · WHOLE ROW`,column:`COLUMN ${(described.s??0)+1} · ALL VOICES`,columns:`${described.count} COLUMNS · ALL VOICES`,rows:`${described.count} ROWS`,many:`${described.count} STEPS SELECTED`,none:''}[described.kind];
   return [`PATTERN ${patternName(cur)} · ${bank.lengths[cur]} STEPS · ${bank.tempos[cur]||Math.round(values.tempo)} BPM`,
-   muteMode?'MUTE · TAP A ROW':perfMode?'PERF · TAP A PAD TO PLAY ITS VOICE':fillEdit?'FILL EDIT · EMPTY PAD: FILL ONLY · NOTE: NOT IN FILL':shownPage==='track'?`TRACK · ${trackLabel}`:mode==='pattern'?(bank.names?.[cur]||'PATTERNS').toUpperCase():stepEdit?what:`${voice}${colMode?' · COLUMN':editLayer?' · EDIT':''}`,
-   copyArmed?`COPY ${patternName(cur)} TO… TAP A PATTERN`:mode==='pattern'?'TAP A PATTERN':stepEdit&&litSel.length<sel.size?`${litSel.length} OF ${sel.size} HAVE NOTES`:colMode?'COLUMN · TAP A PAD TO SELECT ITS COLUMN':editLayer?'EDIT · TAP TO SELECT · SHIFT ADDS':(bank.names?.[cur]||bank.title||(seq.playing?`PLAYING ${patternName(seq.playingPattern)}`:'STOPPED')).toUpperCase()];
+   muteMode?'MUTE · TAP A ROW':perfMode?'PERF · TAP A PAD TO PLAY ITS VOICE':fillEdit?'FILL EDIT · EMPTY PAD: FILL ONLY · NOTE: NOT IN FILL':shownPage==='track'?`TRACK · ${trackLabel}`:shownPage==='gen'?`GENERATE · ${genRows.length===1?kit.tracks[genRows[0]][2].toUpperCase():genRows.length+' ROWS'}`:mode==='pattern'?(bank.names?.[cur]||'PATTERNS').toUpperCase():stepEdit?what:`${voice}${colMode?' · COLUMN':editLayer?' · EDIT':''}`,
+   copyArmed?`COPY ${patternName(cur)} TO… TAP A PATTERN`:shownPage==='gen'?'TAP GEN AGAIN TO GENERATE':mode==='pattern'?'TAP A PATTERN':stepEdit&&litSel.length<sel.size?`${litSel.length} OF ${sel.size} HAVE NOTES`:colMode?'COLUMN · TAP A PAD TO SELECT ITS COLUMN':editLayer?'EDIT · TAP TO SELECT · SHIFT ADDS':(bank.names?.[cur]||bank.title||(seq.playing?`PLAYING ${patternName(seq.playingPattern)}`:'STOPPED')).toUpperCase()];
  };
  // The encoders' pages: the pattern, the track, the groove and the voice; and the selection's own (velocity, type, chance, ratchet; nudge, tune, decay, accent; condition)
  const encoderPages=(values,change,beat,beatCats)=>{
@@ -131,7 +144,7 @@ export function DrumPage({kit}){
    {id:'pattern',label:'Pattern',encoders:[
     {label:'Layer',display:String(layerOf(cur)+1),position:layerOf(cur)/(LAYERS-1),step:1/(LAYERS-1),onPosition:p=>seq.select(patternId(Math.round(p*(LAYERS-1)),letterOf(cur))),onReset:()=>seq.select(patternId(0,letterOf(cur)))},
     {label:'Pattern',display:LETTERS[letterOf(cur)],position:letterOf(cur)/(PER_LAYER-1),step:1/(PER_LAYER-1),onPosition:p=>seq.select(patternId(layerOf(cur),Math.round(p*(PER_LAYER-1)))),onReset:()=>seq.select(patternId(layerOf(cur),0))},
-    {label:'Steps',display:String(len),position:(len-1)/15,step:1/15,onPosition:p=>seq.setLength(Math.round(1+p*15)),onReset:()=>seq.setLength(16)},
+    {label:'Steps',display:String(len),position:(len-1)/(MAX_STEPS-1),step:1/(MAX_STEPS-1),onPosition:p=>seq.setLength(Math.round(1+p*(MAX_STEPS-1))),onReset:()=>seq.setLength(16)},
     {label:'Tempo',display:tempo?String(tempo):'global',position:tempo?(tempo-30)/270:0,onPosition:p=>seq.setTempo(p<.01?0:Math.round(30+p*270)),onReset:()=>seq.setTempo(0)},
     ]},
    {id:'step',label:'Step',encoders:[lin('Velocity','velocity',.05,1,0,pct),
@@ -155,6 +168,19 @@ export function DrumPage({kit}){
    })()},
    {id:'groove',label:'Groove',encoders:[param('swing','Swing'),param('flam','Flam'),param('tempo','Tempo'),param('master','Master')]},
    {id:'voice',label:'Voice',encoders:['Level','Tune','Decay','Pan'].map(f=>param(kit.tracks[voice][0]+f,f))},
+   // Generate: Mode, its main value, Rotate (Euclid) and Cell (how many steps one pass covers; it repeats to fill the row); the key below applies it to the selected rows
+   {id:'gen',label:'Gen',encoders:(()=>{
+    const cellLen=gen.cell||len,set=patch=>setGen(g=>({...g,...patch}));
+    const main=gen.mode===0?{label:'Pulses',display:String(Math.min(gen.pulses,cellLen)),position:Math.min(gen.pulses,cellLen)/cellLen,step:1/cellLen,onPosition:p=>set({pulses:Math.round(p*cellLen)}),onReset:()=>set({pulses:4})}
+     :gen.mode===1?{label:'Density',display:pct(gen.density),position:gen.density,step:.02,onPosition:p=>set({density:Math.round(p*100)/100}),onReset:()=>set({density:.3})}
+     :{label:'Amount',display:pct(gen.amount),position:gen.amount,step:.02,onPosition:p=>set({amount:Math.round(p*100)/100}),onReset:()=>set({amount:.3})};
+    return [
+     {label:'Mode',display:GEN_MODES[gen.mode],position:gen.mode/2,step:.5,onPosition:p=>set({mode:Math.round(p*2)}),onReset:()=>set({mode:0})},
+     main,
+     {label:'Rotate',display:gen.mode===0?String(gen.rot%cellLen):'—',position:gen.mode===0?(gen.rot%cellLen)/Math.max(1,cellLen-1):0,step:1/Math.max(1,cellLen-1),disabled:gen.mode!==0,onPosition:p=>set({rot:Math.round(p*(cellLen-1))}),onReset:()=>set({rot:0})},
+     {label:'Cell',display:gen.mode===2?'—':gen.cell?String(gen.cell):'ROW',position:gen.cell/MAX_STEPS,step:1/MAX_STEPS,disabled:gen.mode===2,onPosition:p=>set({cell:Math.round(p*MAX_STEPS)}),onReset:()=>set({cell:0})},
+    ];
+   })()},
    ...(loading?[{id:'load',label:'Load',encoders:[
     {label:'Style',display:beatCats[loadCat],position:loadCat/(beatCats.length-1),step:1/(beatCats.length-1),onPosition:p=>{setLoadCat(Math.round(p*(beatCats.length-1)));setLoadIdx(0);},onReset:()=>{setLoadCat(0);setLoadIdx(0);}},
     {label:'Loop',display:beat.name,position:beatList.length>1?Math.min(loadIdx,beatList.length-1)/(beatList.length-1):0,step:beatList.length>1?1/(beatList.length-1):.1,disabled:beatList.length<2,onPosition:p=>setLoadIdx(Math.round(p*(beatList.length-1))),onReset:()=>setLoadIdx(0)},
@@ -168,9 +194,27 @@ export function DrumPage({kit}){
   const b=seq.bankRef.current,pattern=b.patterns[b.current],todo=changes.filter(([t,s,v])=>pattern[t][s]!==v);
   if(!todo.length)return;
   seq.replacePattern(b.current,pattern.map((row,t)=>row.map((x,s)=>{const c=todo.find(([ct,cs])=>ct===t&&cs===s);return c?c[2]:x;})));
-  if(b.current<PER_LAYER)seq.send(todo.filter(([t])=>t===n||!silent(t)).map(([t,s,v])=>[1,b.current<<10|(t===n?16:t)<<5|s,v]));
+  if(b.current<PER_LAYER)seq.send(todo.filter(([t,s])=>s<STEPS&&(t===n||!silent(t))).map(([t,s,v])=>[1,b.current<<10|(t===n?16:t)<<5|s,v]));
  };
  const setCell=(t,s,v)=>setCells([[t,s,v]]);
+ // Generate: fills the selected rows (the selected voice's row when nothing is selected) with a Euclidean, random or mutated row, as ordinary notes.
+ // Each row is generated over its own length; a note that stays keeps its type and step values, one that goes takes its step values with it.
+ const genRows=selSteps.length?[...new Set(selSteps.map(([t])=>t))].sort((a,b)=>a-b):[Math.min(selected,n-1)];
+ const generate=()=>{
+  const b=seq.bankRef.current,cur=b.current,pattern=b.patterns[cur],random=seeded((Date.now()^(Math.random()*4294967296))>>>0),changes=[],dropped=[];
+  for(const t of genRows){
+   const L=Math.min(pattern[t].length,b.trackLengths?.[cur]?.[t]||b.lengths[cur]),old=pattern[t].slice(0,L),cell=Math.min(gen.cell||L,L);
+   const row=gen.mode===0?tile(euclid(Math.min(gen.pulses,cell),cell,gen.rot),L):gen.mode===1?tile(randomRow(cell,gen.density,random),L):mutateRow(old,gen.amount,random);
+   for(let s=0;s<L;s++){
+    const next=row[s]?(old[s]||1):0;
+    if(next!==old[s])changes.push([t,s,next]);
+    if(old[s]&&!next)dropped.push([t,s]);
+   }
+  }
+  if(!changes.length)return;
+  setCells(changes);
+  if(dropped.length)seq.setLocks(dropped,Object.fromEntries(LOCK_NAMES.map(k=>[k,undefined])));
+ };
  const flip=(set,setter,t)=>{const next=new Set(set);if(!next.delete(t))next.add(t);setter(next);};
  // what a tap means (see the grid's two layers above)
  const showStep=()=>setEncPage(p=>['step','step2'].includes(p)?p:'step');
@@ -210,13 +254,13 @@ export function DrumPage({kit}){
  // a voice's button plays it (in the edit layer it selects the row); the display beside it selects the voice for the Voice and Track pages
  const laneDown=t=>{
   if(muteMode){flip(muted,setMuted,t);return;}
-  if(editLayer||colMode){selectVoice(t);chooseSel(rowKeys(t));return;}
+  if(editLayer||colMode){selectVoice(t);chooseSel(rowKeys(t,patLen));return;}
   pad(t);
  };
  const laneSelect=t=>{
   if(muteMode){flip(muted,setMuted,t);return;}
   selectVoice(t);
-  if(editLayer||colMode)chooseSel(rowKeys(t));else setSel(new Set());
+  if(editLayer||colMode)chooseSel(rowKeys(t,patLen));else setSel(new Set());
  };
  // a changed mute or solo is sent to the engine as the patterns it should play
  useEffect(()=>{const b=seq.bankRef.current;seq.send(b.patterns.slice(0,PER_LAYER).flatMap((p,i)=>patternCommands(kit,i,p,t=>silentRef.current(t))));},[muted,solo]);// eslint-disable-line react-hooks/exhaustive-deps
@@ -230,6 +274,8 @@ export function DrumPage({kit}){
    const step=Number(head.style.getPropertyValue('--step'));
    if(step===last)return;
    last=step;if(!(step>=0))return;
+   const w=windowRef.current;
+   if(w.follow&&head.dataset.running==='1'&&(step<w.colEff||step>=w.colEff+STEPS)){head.style.setProperty('--off',Math.min(w.maxCol,Math.floor(step/STEPS)*STEPS));head.dataset.out='0';setCol(Math.min(w.maxCol,Math.floor(step/STEPS)*STEPS));}
    const b=seq.bankRef.current,pattern=b.patterns[b.current],count=Number(head.dataset.count??step),own=b.trackLengths?.[b.current]??{},play=b.trackPlay?.[b.current]??{},len=b.lengths[b.current];
    for(let t=0;t<n;t++){
     // the step each voice plays now, which depends on its own length, rate and direction
@@ -279,7 +325,7 @@ export function DrumPage({kit}){
      </SettingsPop></header>
      <div className="s8">
       <div className="s8-left">
-       <SeqScreen accent={voiceColour(kit.tracks[Math.min(selVoice,n-1)][0],kit.id)} page={shownPage} onPage={setEncPage} pages={shownPages(values,change,beat)} lines={screenLines(values,beat)}/>
+       <SeqScreen accent={voiceColour(kit.tracks[Math.min(selVoice,n-1)][0],kit.id)} page={shownPage} onPage={setEncPage} pages={shownPages(values,change,beat)} lines={screenLines(values,beat)} actions={{gen:{title:'Tap again: fill the selected rows (or the selected voice) with a new row from these settings; each tap is a new one for Random and Mutate',onClick:generate}}}/>
        <div className="s8-transport" role="group" aria-label="Transport">
         <button type="button" className={'tp play'+(transport.playing?' on':'')} aria-pressed={transport.playing} onClick={transport.play} title="Play"><b>▶</b><small>Play</small></button>
         <button type="button" className={'tp'+(transport.paused?' on':'')} aria-pressed={transport.paused} onClick={transport.pause} title="Pause here; play goes on from this place" disabled={!transport.playing&&!transport.paused}><b>⏸</b><small>Pause</small></button>
@@ -309,7 +355,7 @@ export function DrumPage({kit}){
        </div>
       </div>
       <div className="s8-right">
-       <LaneGrid lanes={drumLaneWindow(kit,offset).map(l=>l&&{...l,...laneInfo(l.index)})} pattern={curPattern} length={bank.lengths[bank.current]} selected={selected} headRef={seq.head} locks={bank.locks?.[bank.current]} trackLengths={bank.trackLengths?.[bank.current]} colour={l=>voiceColour(l.key,kit.id)} level={levelOf}
+       <LaneGrid lanes={drumLaneWindow(kit,offset).map(l=>l&&{...l,...laneInfo(l.index)})} pattern={curPattern} length={bank.lengths[bank.current]} offset={colEff} pages={{label:'Page',display:maxCol?(follow&&seq.playing?'FOLLOW':`${colEff+1}–${colEff+STEPS}`):'1–16',position:maxCol?colEff/maxCol:0,step:maxCol?4/maxCol:.1,disabled:!maxCol,onPosition:p=>{setFollow(false);setCol(Math.round((p*maxCol)/4)*4);},onReset:()=>{setFollow(true);setCol(0);}}} selected={selected} headRef={seq.head} locks={bank.locks?.[bank.current]} trackLengths={bank.trackLengths?.[bank.current]} colour={l=>voiceColour(l.key,kit.id)} level={levelOf}
         selection={mode==='pattern'?null:sel} onStepDown={stepDown} onStepOver={stepOver} onLaneDown={laneDown} onLaneSelect={laneSelect} filling={filling} scroll={{label:'Voices',display:windowLabel(n,offset),position:maxOff?offset/maxOff:0,step:maxOff?1/maxOff:.1,disabled:!maxOff,onPosition:p=>setOffset(Math.round(p*maxOff)),onReset:()=>setOffset(0),above:offset,below:Math.max(0,n-LANES-offset)}} onPaintEnd={()=>{paint.current=null;}}
         ruler={rulerWords()} muting={muteMode&&mode!=='pattern'} silent={silent} patternMode={mode==='pattern'?{bank,playing:seq.playing,playingPattern:seq.playingPattern,armed:copyArmed,song:clock.scope==='song'&&(bank.songOn||bank.chain.length>0),onPick:pickPattern}:null}/>
       </div>
