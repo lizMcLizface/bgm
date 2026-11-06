@@ -13,6 +13,7 @@ import { stepEvents } from './core';
  * tempo(), swing(), flam():  the global values
  * emit(events, info):  events for one step; info is { pattern, step, time }
  * now():     the audio clock in seconds
+ * clock:     optional global clock (clock.js): every booked step is recorded there, so followers read the position from one place
  *
  * Scope: the arranger plays the song ('song': the song when it is on, else the chain) and the sequencer plays the pattern being edited alone ('pattern': a
  * song is ignored, the pattern repeats or, with `linear`, goes on through the patterns). The song's place is kept while the pattern alone is played and through
@@ -24,7 +25,7 @@ import { stepEvents } from './core';
  */
 const hasNotes = (p) => { const rows = Array.isArray(p) ? p : p?.rows; return !Array.isArray(rows) || rows.some((r) => !Array.isArray(r) || r.some(Boolean)); };
 
-export function createScheduler({ now, bank, pattern = (p) => p, events: makeEvents = stepEvents, tempo, swing, flam, fill = () => false, emit, onStep, onEnd, lookahead = 0.12, interval = 25, timers = { set: (fn, ms) => setInterval(fn, ms), clear: (id) => clearInterval(id) } }) {
+export function createScheduler({ now, bank, pattern = (p) => p, events: makeEvents = stepEvents, tempo, swing, flam, fill = () => false, emit, onStep, clock = null, onEnd, lookahead = 0.12, interval = 25, timers = { set: (fn, ms) => setInterval(fn, ms), clear: (id) => clearInterval(id) } }) {
     let timer = null, nextTime = 0, step = 0, slot = 0, current = 0, count = 0, songAt = 0, rep = 0, primed = false, paused = false, scope = 'song', songValid = false;
     // Song mode: the bank's song is a list of { p: pattern, n: repeats }; it replaces the chain while bank.songOn is set
     const songMode = (b) => scope === 'song' && !!(b.songOn && b.song?.length);
@@ -63,6 +64,7 @@ export function createScheduler({ now, bank, pattern = (p) => p, events: makeEve
     const playStep = () => {
         const b = bank(), len = lengthOf(), bpm = b.tempos[current] || tempo(), stepSec = 60 / bpm / 4;
         const events = makeEvents(pattern(b.patterns[current], { bank: b, index: current }), step, { time: nextTime, stepSec, swing: swing(), flam: flam(), count, cycle: slot, fill: fill(), length: len, free: !!b.freeRun });
+        clock?.record({ count, time: nextTime, stepSec, pattern: current, step, length: len });
         const info = { pattern: current, step, time: nextTime, count, song: songMode(b) ? { index: songAt, rep } : null };
         if (events.length) emit(events, info);
         onStep?.(info);
@@ -70,10 +72,10 @@ export function createScheduler({ now, bank, pattern = (p) => p, events: makeEve
         if (++step >= len) wrap();
     };
     // the song ended (loop off): stop booking; the host stops its transport when the last step has sounded
-    const endSong = () => { if (timer !== null) { timers.clear(timer); timer = null; } primed = false; paused = false; songValid = false; onEnd?.({ time: nextTime }); };
+    const endSong = () => { if (timer !== null) { timers.clear(timer); timer = null; } primed = false; paused = false; songValid = false; clock?.halt(now(), { forget: true }); onEnd?.({ time: nextTime }); };
     const tick = () => { const horizon = now() + lookahead; while (timer !== null && nextTime < horizon) playStep(); };
     const prime = () => {
-        step = 0; slot = 0; count = 0;
+        step = 0; slot = 0; count = 0; clock?.reset();
         const first = bank();
         // the song's place is kept while the pattern alone is played and through a stop from the sequencer; a stop from the arranger rewinds it
         if (!songValid) { rep = 0; songAt = first.song?.length ? firstBlock(first) : 0; songValid = true; }
@@ -92,9 +94,9 @@ export function createScheduler({ now, bank, pattern = (p) => p, events: makeEve
             scope = startScope === 'pattern' ? 'pattern' : 'song';
             prime(); paused = false; run(delay);
         },
-        pause() { if (timer === null) return; timers.clear(timer); timer = null; paused = true; },
+        pause() { if (timer === null) return; timers.clear(timer); timer = null; paused = true; clock?.halt(now()); },
         resume(delay = 0.06) { if (timer !== null || !primed) return; paused = false; run(delay); },
-        stop(rewindSong = true) { if (timer !== null) { timers.clear(timer); timer = null; } primed = false; paused = false; if (rewindSong) songValid = false; },
+        stop(rewindSong = true) { if (timer !== null) { timers.clear(timer); timer = null; } clock?.halt(now(), { forget: true }); primed = false; paused = false; if (rewindSong) songValid = false; },
         stepBy(delta) {
             const running = timer !== null;
             if (!primed) prime();

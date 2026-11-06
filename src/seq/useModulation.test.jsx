@@ -4,10 +4,10 @@ import useModulation from './useModulation';
 import {cleanMod} from './mod';
 
 const params={BY_KEY:{cut:{id:7,min:0,max:100,default:50,curve:'lin'}}};
-let root,element,time,engine,sets;
-function Harness({running,mod}){useModulation({live:()=>engine,mod,params,values:()=>({cut:40}),tempo:()=>120,running});return null;}
+let root,element,time,engine,sets,clock;
+function Harness({running,mod}){useModulation({live:()=>engine,clock:()=>clock,mod,params,values:()=>({cut:40}),running});return null;}
 beforeEach(()=>{
- vi.useFakeTimers();globalThis.IS_REACT_ACT_ENVIRONMENT=true;time=0;sets=[];
+ vi.useFakeTimers();globalThis.IS_REACT_ACT_ENVIRONMENT=true;time=0;sets=[];clock={at:()=>({beat:0.1})};
  engine={context:{get currentTime(){return time;}},setParams:p=>sets.push(p)};
  element=document.createElement('div');document.body.append(element);root=createRoot(element);
 });

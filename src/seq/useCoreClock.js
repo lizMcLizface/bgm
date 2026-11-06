@@ -1,5 +1,6 @@
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {createScheduler} from './scheduler';
+import {createClock} from './clock';
 import {drumTarget,drumPattern} from './targets/drum';
 import {bassTarget,bassPattern,bassStepEvents} from './targets/bass';
 import {movePlayhead} from '../synths/seq/playhead';
@@ -16,11 +17,12 @@ export default function useCoreClock({seq,kit,bass=false,values,enabled,silent,f
  const seqRef=useRef(seq);seqRef.current=seq;
  const valuesRef=useRef(values);valuesRef.current=values;
  const timers=useRef(new Set()),[paused,setPaused]=useState(false),[scope,setScope]=useState('song');
+ const clock=useMemo(()=>createClock(),[]);
  const scheduler=useMemo(()=>{
   const target=bass?bassTarget(()=>seqRef.current.live.current):drumTarget(kit,()=>seqRef.current.live.current,()=>valuesRef.current().accent??.5);
   const live=()=>seqRef.current.live.current;
   return createScheduler({
-   now:()=>live()?.context.currentTime??0,
+   clock,now:()=>live()?.context.currentTime??0,
    bank:()=>seqRef.current.bankRef.current,
    pattern:bass?bassPattern():drumPattern(kit,t=>silentRef.current?.(t)??false),
    ...(bass?{events:bassStepEvents}:{}),
@@ -56,5 +58,5 @@ export default function useCoreClock({seq,kit,bass=false,values,enabled,silent,f
  // switching the clock off (or leaving the page) stops it and hands transport back to the engine
  useEffect(()=>()=>{scheduler.stop();clear();},[scheduler]);
  useEffect(()=>{if(!enabled&&scheduler.running)stop();seqRef.current.setExternal(enabled);},[enabled]);// eslint-disable-line react-hooks/exhaustive-deps
- return {toggle:()=>(scheduler.running?stop():start()),play,pause,resume,stop:stopFrom,stepBy,paused,scope,gotoBlock:i=>scheduler.gotoBlock(i),gotoPattern:p=>scheduler.gotoPattern(p)};
+ return {clock,toggle:()=>(scheduler.running?stop():start()),play,pause,resume,stop:stopFrom,stepBy,paused,scope,gotoBlock:i=>scheduler.gotoBlock(i),gotoPattern:p=>scheduler.gotoPattern(p)};
 }

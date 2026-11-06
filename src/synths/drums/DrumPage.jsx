@@ -307,8 +307,8 @@ export function DrumPage({kit}){
  // Effect moves (src/seq/moves.js): rack effects that sweep across a pattern, per pattern
  const [moves,setMovesState]=useState(()=>cleanMoves(load(`synths:${kit.id}:moves`,null))),rackRef=useRef({});
  const setMoves=(pattern,entry)=>{const next={...moves};if(entry)next[pattern]=entry;else delete next[pattern];const clean=cleanMoves(next);setMovesState(clean);save(`synths:${kit.id}:moves`,clean);};
- useRackMoves({live:()=>seq.live.current,head:seq.head,rack:()=>rackRef.current,entry:()=>moves[seq.playingPattern],length:()=>seq.bankRef.current.lengths[seq.playingPattern]||16,tempo:()=>valuesRef.current.tempo,running:seq.playing});
- useModulation({live:()=>seq.live.current,mod,params:synth.params,values:()=>valuesRef.current,tempo:()=>valuesRef.current.tempo,running:seq.playing});
+ useRackMoves({live:()=>seq.live.current,clock:()=>clock.clock,rack:()=>rackRef.current,entry:()=>moves[clock.clock.at(seq.live.current?.context.currentTime??0)?.pattern??seq.playingPattern],running:seq.playing});
+ useModulation({live:()=>seq.live.current,clock:()=>clock.clock,mod,params:synth.params,values:()=>valuesRef.current,running:seq.playing});
  const clock=useCoreClock({seq,kit,values:()=>valuesRef.current,enabled:core,silent:t=>silentRef.current(t),fill:()=>fillRef.current});
  const chooseClock=on=>{if(seq.playing)seq.togglePlay();save('synths:core-clock',on);setCore(on);};
 
