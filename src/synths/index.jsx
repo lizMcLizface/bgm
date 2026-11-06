@@ -9,6 +9,7 @@ const PAGES={cs80:lazy(()=>import('./cs80/Cs80Page')),juno:lazy(()=>import('./ju
 const Home=lazy(()=>import('./SynthsHome'));
 PAGES.effects=lazy(()=>import('./effects/EffectsPage'));
 PAGES.ensemble=lazy(()=>import('./ensemble/EnsemblePage'));
+PAGES.all=lazy(()=>import('./all/AllPage'));
 PAGES.poly=lazy(()=>import('./diy/DiyPage').then(m=>({default:m.PolyPage})));
 PAGES.piano=lazy(()=>import('./piano/PianoPage'));
 PAGES.strings=lazy(()=>import('./strings/StringsPage'));
