@@ -1,14 +1,14 @@
 // The z-plane filter's sections as numbers, for the display (the sound is made by the 'rack-zplane' worklet in
 // public/rack-fx-processor.js, which does the same sums; zplane.test.js checks that the two agree).
-import {ZPLANE_SHAPES} from './zplaneShapes';
+import {ZPLANE_SHAPES,ZPLANE_CUSTOM} from './zplaneShapes';
 
 const SR = 48000;
 const AUDIBLE = [60, 10000];
-const shapeAt = (i) => ZPLANE_SHAPES[Math.max(0, Math.min(ZPLANE_SHAPES.length - 1, Math.round(i)))].sections;
+const shapeAt = (i, rows) => (Math.round(i) >= ZPLANE_CUSTOM && rows ? rows : ZPLANE_SHAPES[Math.max(0, Math.min(ZPLANE_SHAPES.length - 1, Math.round(i)))].sections);
 
-/** The six sections for two shapes, a morph, a shift in octaves and a resonance: frequency, pole bandwidth, boost, and the pole and zero radius and angle. */
-export function zplaneSections(a, b, morph, shift, q, sr = SR) {
-    const A = shapeAt(a), B = shapeAt(b);
+/** The six sections for two shapes (`custom`: { a, b } rows for a side that uses its custom shape), a morph, a shift in octaves and a resonance: frequency, pole bandwidth, boost, and the pole and zero radius and angle. */
+export function zplaneSections(a, b, morph, shift, q, sr = SR, custom = {}) {
+    const A = shapeAt(a, custom.a), B = shapeAt(b, custom.b);
     const widen = 9 ** (0.5 - q), octave = 2 ** shift, nyquist = 0.45 * sr;
     return A.map(([fa, wa, da], s) => {
         const [fb, wb, db] = B[s];
@@ -29,7 +29,8 @@ const sectionDb = (s, w) => {
 
 /** The response in dB at the given frequencies, with the level compensation the worklet applies (the average dB over the audible range taken out). */
 export function zplaneResponse(sections, freqs, sr = SR) {
-    const total = (hz) => sections.reduce((db, s) => db + sectionDb(s, 2 * Math.PI * Math.min(hz, 0.45 * sr) / sr), 0);
+    const used = sections.filter((s) => Math.abs(s.boost) >= 0.05); // a section with no boost does nothing
+    const total = (hz) => used.reduce((db, s) => db + sectionDb(s, 2 * Math.PI * Math.min(hz, 0.45 * sr) / sr), 0);
     const points = 40, mean = Array.from({ length: points }, (_, i) => total(AUDIBLE[0] * (AUDIBLE[1] / AUDIBLE[0]) ** (i / (points - 1)))).reduce((x, y) => x + y, 0) / points;
     return freqs.map((hz) => total(hz) - mean);
 }

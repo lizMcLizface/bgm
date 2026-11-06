@@ -1,6 +1,6 @@
 // @vitest-environment node
 import {readFileSync} from 'node:fs';
-import {ZPLANE_SHAPES,ZPLANE_SHAPE_NAMES} from './zplaneShapes';
+import {ZPLANE_SHAPES,ZPLANE_SHAPE_NAMES,ZPLANE_CUSTOM,FLAT_ROWS,customRows,shapeRows,cleanNodes,padNodes,insertNode,dropNode,resizeNodes,nodesOf,sortRows} from './zplaneShapes';
 import {RACK_PARAMS,RACK_PRESETS,cleanRack,rackPackets} from './params';
 import {UNITS,maskFromUnits} from './order';
 import {zplaneSections,zplaneResponse} from './zplaneMath';
@@ -15,8 +15,9 @@ function loadProcessor(){
  return Processor;
 }
 // steady-state gain (dB) of the filter for a sine at `hz`
-function gainAt(P,hz,{a=0,b=2,morph=0,shift=0,q=.5}={}){
+function gainAt(P,hz,{a=0,b=2,morph=0,shift=0,q=.5,custom=null}={}){
  const node=new P({processorOptions:{shapes:ZPLANE_SHAPES}}),n=128,total=SR/2;
+ if(custom)node.port.onmessage({data:{custom}});
  const params={a:[a],b:[b],morph:[morph],shift:[shift],q:[q],mix:[1]};
  let inE=0,outE=0;
  for(let start=0;start<total;start+=n){
@@ -27,8 +28,8 @@ function gainAt(P,hz,{a=0,b=2,morph=0,shift=0,q=.5}={}){
  return 10*Math.log10(outE/inE);
 }
 
-test('every shape has six sections and the rack knows their names',()=>{
- expect(ZPLANE_SHAPES.every(s=>s.sections.length===6)).toBe(true);
+test('every shape has twelve sections (the unused ones neutral) and the rack knows their names',()=>{
+ expect(ZPLANE_SHAPES.every(s=>s.sections.length===12 && s.sections.filter(r=>r[2]!==0).length<=6)).toBe(true);
  expect(RACK_PARAMS.BY_KEY['zplane.a'].max).toBe(ZPLANE_SHAPE_NAMES.length-1);
 });
 
@@ -81,4 +82,57 @@ test("the display's response agrees with what the worklet does", () => {
         const freqs = [150, 500, 1000, 2500, 6000], shown = zplaneResponse(zplaneSections(a, b, morph, shift, q), freqs);
         freqs.forEach((hz, i) => expect(Math.abs(gainAt(P, hz, { a, b, morph, shift, q }) - shown[i])).toBeLessThan(1.2));
     }
+});
+
+test('a custom shape is the last stop, its numbers are rack parameters, and the worklet and the display agree on it',()=>{
+ expect(ZPLANE_SHAPE_NAMES[ZPLANE_CUSTOM]).toBe('Custom');
+ expect(RACK_PARAMS.BY_KEY['zplane.a'].max).toBe(ZPLANE_CUSTOM);
+ const rack=cleanRack(),get=k=>rack['zplane.'+k];
+ expect(customRows(get,'a')).toEqual(FLAT_ROWS);
+ expect(shapeRows(ZPLANE_CUSTOM,'b',get)).toEqual(FLAT_ROWS);
+ expect(shapeRows(0,'a',get)).toBe(ZPLANE_SHAPES[0].sections);
+ // a peak at 1.5 kHz in A's custom shape
+ const rows=FLAT_ROWS.map((r,i)=>(i===5?[1500,200,15]:r));
+ const custom={a:rows,b:rows},P=loadProcessor(),freqs=[300,1500,6000];
+ const shown=zplaneResponse(zplaneSections(ZPLANE_CUSTOM,ZPLANE_CUSTOM,0,0,.5,undefined,custom),freqs);
+ freqs.forEach((hz,i)=>expect(Math.abs(gainAt(P,hz,{a:ZPLANE_CUSTOM,b:ZPLANE_CUSTOM,custom})-shown[i])).toBeLessThan(1.2));
+ expect(shown[1]).toBeGreaterThan(shown[0]+8);
+});
+
+test('nodes: saved shapes are cleaned, laid into rows in order of frequency, and counted',()=>{
+ expect(cleanNodes([[1,2,3,4]])).toBeNull();
+ expect(cleanNodes([])).toBeNull();
+ expect(cleanNodes([[100,1,'x']])).toBeNull();
+ const clean=cleanNodes([[999999,1,99],[500,100,-3]]);
+ expect(clean.count).toBe(2);expect(clean.rows).toHaveLength(12);
+ expect(clean.rows[0]).toEqual([500,100,-3]);expect(clean.rows[1]).toEqual([12000,8,30]);
+ expect(clean.rows.slice(2).every(r=>r[2]===0)).toBe(true);
+ expect(sortRows([[900,1,0],[100,1,0],[500,1,0]]).map(r=>r[0])).toEqual([100,500,900]);
+});
+
+test('nodes can be added, taken out and resized; a built-in shape counts the nodes it really uses',()=>{
+ const base=padNodes([[300,100,6],[2000,300,-6]]);
+ const more=insertNode(base.rows,base.count,[900,200,3]);
+ expect(more.count).toBe(3);expect(more.rows.slice(0,3).map(r=>r[0])).toEqual([300,900,2000]);
+ expect(dropNode(more.rows,more.count,1).rows.slice(0,2).map(r=>r[0])).toEqual([300,2000]);
+ expect(dropNode(padNodes([[300,1,1]]).rows,1,0)).toBeNull();
+ expect(insertNode(padNodes(FLAT_ROWS).rows,12,[1,1,1])).toBeNull();
+ const six=resizeNodes(base.rows,base.count,6);
+ expect(six.count).toBe(6);expect(six.rows.slice(0,6).every((r,i,all)=>!i||all[i-1][0]<=r[0])).toBe(true);
+ // growing keeps the existing nodes and adds flat ones; shrinking takes out the ones doing the least
+ expect(six.rows.slice(0,6).filter(r=>r[2]!==0)).toHaveLength(2);
+ const back=resizeNodes(six.rows,six.count,2);
+ expect(back.rows.slice(0,2).map(r=>r[2])).toEqual([6,-6]);
+ const get=k=>cleanRack()['zplane.'+k];
+ expect(nodesOf(0,'a',get).count).toBe(5);       // Ah uses five formants
+ expect(nodesOf(ZPLANE_CUSTOM,'a',get).count).toBe(6);
+ expect(RACK_PARAMS.BY_KEY['zplane.can'].max).toBe(12);
+});
+
+test('twelve nodes run in the worklet, and sections with no boost are skipped without changing the sound',()=>{
+ const P=loadProcessor(),rows=FLAT_ROWS.map((r,i)=>[r[0],r[1],i%2?5:-5]),custom={a:rows,b:rows};
+ const shown=zplaneResponse(zplaneSections(ZPLANE_CUSTOM,ZPLANE_CUSTOM,0,0,.5,undefined,custom),[200,1000,5000]);
+ [200,1000,5000].forEach((hz,i)=>expect(Math.abs(gainAt(P,hz,{a:ZPLANE_CUSTOM,b:ZPLANE_CUSTOM,custom})-shown[i])).toBeLessThan(1.5));
+ const flat={a:FLAT_ROWS,b:FLAT_ROWS};
+ expect(Math.abs(gainAt(P,1000,{a:ZPLANE_CUSTOM,b:ZPLANE_CUSTOM,custom:flat}))).toBeLessThan(.2);
 });

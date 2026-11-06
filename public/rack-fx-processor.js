@@ -91,14 +91,14 @@ class RackPitch extends AudioWorkletProcessor {
 }
 registerProcessor('rack-pitch', RackPitch);
 
-// Z-plane filter: six cascaded biquad sections, each a pole pair and a zero pair at one angle on the z-plane (the E-mu way of
+// Z-plane filter: up to twelve cascaded biquad sections (the ones with no boost or cut are skipped), each a pole pair and a zero pair at one angle on the z-plane (the E-mu way of
 // describing a filter). A shape gives each section a centre frequency, a pole bandwidth and a boost in dB (see
 // src/synths/effects/zplaneShapes.js, passed in as processorOptions.shapes); the filter morphs by sliding those values between
 // shape a and shape b. Poles sit at radius exp(-pi bw / fs), zeros at the same angle with the bandwidth scaled by the boost, so a
 // section is a peak when the zeros are wider than the poles and a notch when narrower. The level is held steady by taking the
 // average dB over the audible range back out. Coefficients follow the parameters once per block; the sections run transposed
 // direct form II, which stays well behaved while coefficients move.
-const ZP_SECTIONS = 6, ZP_POINTS = 40;
+const ZP_SECTIONS = 12, ZP_POINTS = 40;
 class RackZPlane extends AudioWorkletProcessor {
     static get parameterDescriptors() {
         return [
@@ -114,24 +114,33 @@ class RackZPlane extends AudioWorkletProcessor {
     constructor(options) {
         super();
         this.shapes = options?.processorOptions?.shapes ?? [];
+        this.custom = { a: null, b: null }; // the custom shapes' rows, sent by message
         this.coef = new Float64Array(ZP_SECTIONS * 5); // b0 b1 b2 a1 a2 per section
         this.state = [new Float64Array(ZP_SECTIONS * 2), new Float64Array(ZP_SECTIONS * 2)];
         this.gain = 1;
+        this.used = []; // the sections that do something
         this.last = [NaN, NaN, NaN, NaN, NaN];
         this.points = Array.from({ length: ZP_POINTS }, (_, i) => 2 * Math.PI * Math.min(0.45 * sampleRate, 60 * (10000 / 60) ** (i / (ZP_POINTS - 1))) / sampleRate);
         this.stopped = false;
-        this.port.onmessage = (e) => { if (e.data === 'stop') this.stopped = true; };
+        this.port.onmessage = (e) => {
+            if (e.data === 'stop') this.stopped = true;
+            else if (e.data?.custom) { this.custom = e.data.custom; this.last = [NaN, NaN, NaN, NaN, NaN]; }
+        };
     }
 
     update(a, b, morph, shift, q) {
-        const A = this.shapes[Math.max(0, Math.min(this.shapes.length - 1, a))], B = this.shapes[Math.max(0, Math.min(this.shapes.length - 1, b))];
+        // a shape index past the built-in ones is the side's custom shape
+        const rows = (side, i) => (i >= this.shapes.length ? this.custom[side] : this.shapes[Math.max(0, i)]?.sections);
+        const A = rows('a', a), B = rows('b', b);
         if (!A || !B) return;
         const widen = 9 ** (0.5 - q), octave = 2 ** shift, nyquist = 0.45 * sampleRate;
+        this.used = [];
         for (let s = 0; s < ZP_SECTIONS; s++) {
-            const [fa, wa, da] = A.sections[s], [fb, wb, db] = B.sections[s];
+            const [fa, wa, da] = A[s], [fb, wb, db] = B[s];
             const freq = Math.max(20, Math.min(nyquist, Math.exp(Math.log(fa) * (1 - morph) + Math.log(fb) * morph) * octave));
             const bandwidth = Math.max(8, Math.min(8000, Math.exp(Math.log(wa) * (1 - morph) + Math.log(wb) * morph) * widen));
             const boost = Math.max(-30, Math.min(30, da + (db - da) * morph));
+            if (Math.abs(boost) >= 0.05) this.used.push(s);
             const zeroBandwidth = Math.max(1, Math.min(20000, bandwidth * 10 ** (boost / 20)));
             const theta = 2 * Math.PI * freq / sampleRate, c = Math.cos(theta);
             const rp = Math.min(0.9995, Math.exp(-Math.PI * bandwidth / sampleRate)), rz = Math.min(0.9995, Math.exp(-Math.PI * zeroBandwidth / sampleRate));
@@ -143,7 +152,7 @@ class RackZPlane extends AudioWorkletProcessor {
         for (const w of this.points) {
             const cw = Math.cos(w), sw = Math.sin(w), c2 = Math.cos(2 * w), s2 = Math.sin(2 * w);
             let db = 0;
-            for (let s = 0; s < ZP_SECTIONS; s++) {
+            for (const s of this.used) {
                 const k = s * 5;
                 const nr = this.coef[k] + this.coef[k + 1] * cw + this.coef[k + 2] * c2, ni = -(this.coef[k + 1] * sw + this.coef[k + 2] * s2);
                 const dr = 1 + this.coef[k + 3] * cw + this.coef[k + 4] * c2, di = -(this.coef[k + 3] * sw + this.coef[k + 4] * s2);
@@ -159,14 +168,14 @@ class RackZPlane extends AudioWorkletProcessor {
         const input = inputs[0], output = outputs[0];
         const now = [Math.round(parameters.a[0]), Math.round(parameters.b[0]), parameters.morph[0], parameters.shift[0], parameters.q[0]];
         if (now.some((v, i) => v !== this.last[i])) { this.update(...now); this.last = now; }
-        const mix = parameters.mix[0], g = this.gain, coef = this.coef;
+        const mix = parameters.mix[0], g = this.gain, coef = this.coef, used = this.used;
         const n = output[0]?.length ?? 0;
         for (let ch = 0; ch < output.length; ch++) {
             const st = this.state[ch], src = input[ch], out = output[ch];
             for (let i = 0; i < n; i++) {
                 const dry = src ? src[i] : 0;
                 let x = dry;
-                for (let s = 0; s < ZP_SECTIONS; s++) {
+                for (const s of used) {
                     const k = s * 5, j = s * 2;
                     const y = coef[k] * x + st[j];
                     st[j] = coef[k + 1] * x - coef[k + 3] * y + st[j + 1];

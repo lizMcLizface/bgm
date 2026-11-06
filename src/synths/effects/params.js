@@ -1,5 +1,5 @@
 import {defineParams,SPACE} from '../params';
-import {ZPLANE_SHAPE_NAMES} from './zplaneShapes';
+import {ZPLANE_SHAPE_NAMES,FLAT_ROWS,ZPLANE_MAX_NODES,DEFAULT_NODES} from './zplaneShapes';
 import {EFFECTS} from '../../synth-lab/effectsConfig';
 import {INSERTS} from '../../synth-lab/insertsConfig';
 import {ORDER_COUNT,CHAIN_MAX,DEFAULT_CHAIN,chainUnits} from './order';
@@ -38,6 +38,8 @@ const definitions=[
  // the z-plane filter (zplaneShapes.js), appended last: two shapes and the morph between them
  ...[['a','Shape A',0,ZPLANE_SHAPE_NAMES.length-1,1,0],['b','Shape B',0,ZPLANE_SHAPE_NAMES.length-1,1,2],['morph','Morph',0,1,.01,0],['shift','Shift · octaves',-1,1,.01,0],['q','Resonance',0,1,.01,.5],['mix','Mix',0,1,.01,1]].map(d=>['zplane',d]),
  ...['zplane'].map(k=>['switch',[k,k,0,1,1,1]]),
+ // the two custom shapes of the z-plane filter (zplaneShapes.js): up to twelve nodes each of frequency, bandwidth and boost, and how many nodes, appended last
+ ...['a','b'].flatMap(side=>[...FLAT_ROWS.flatMap((row,i)=>[[`c${side}${i}f`,`Custom ${side.toUpperCase()} ${i+1} · Hz`,20,12000,1,row[0]],[`c${side}${i}w`,`Custom ${side.toUpperCase()} ${i+1} width · Hz`,8,8000,1,row[1]],[`c${side}${i}d`,`Custom ${side.toUpperCase()} ${i+1} boost · dB`,-30,30,.1,row[2]]]),[`c${side}n`,`Custom ${side.toUpperCase()} nodes`,1,ZPLANE_MAX_NODES,1,DEFAULT_NODES]]).map(d=>['zplane',d]),
 ];
 export const RACK_PARAMS=defineParams(definitions.map(([prefix,[key,label,min,max,step,value]],id)=>{
  const unit=/· cents/.test(label)?'decimal':/· semitones/.test(label)?'decimal':/· Hz/.test(label)?'Hz':/· s$|seconds$/.test(label)?'s':/· ms/.test(label)?'ms':/· dB/.test(label)?'dB':/· octaves/.test(label)?'oct':max<=1&&step!==1?'%':'decimal';

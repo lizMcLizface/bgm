@@ -4,7 +4,7 @@
 // unit's slice of the rack packet (see rackPackets in params.js).
 
 import { VoiceFx } from '../../app/engine/voiceFx';
-import { ZPLANE_SHAPES } from './zplaneShapes';
+import { ZPLANE_SHAPES, customRows } from './zplaneShapes';
 
 const moduleLoads = new WeakMap();
 const loadWorklets = (context) => {
@@ -118,7 +118,9 @@ const BUILDERS = {
         await loadWorklets(context);
         const node = new AudioWorkletNode(context, 'rack-zplane', { numberOfInputs: 1, numberOfOutputs: 1, channelCount: 2, channelCountMode: 'explicit', outputChannelCount: [2], processorOptions: { shapes: ZPLANE_SHAPES } });
         const set = (name, v, initial) => smooth(context, node.parameters.get(name), v, initial);
-        return { input: node, output: node, nodes: [node], worklets: [node], patch(p, initial) { set('a', p.a, true); set('b', p.b, true); set('morph', p.morph, initial); set('shift', p.shift, initial); set('q', p.q, initial); set('mix', p.mix, initial); } };
+        // the custom shapes travel by message, whenever their numbers change
+        let sent = '';
+        return { input: node, output: node, nodes: [node], worklets: [node], patch(p, initial) { const custom = { a: customRows((k) => p[k], 'a'), b: customRows((k) => p[k], 'b') }, text = JSON.stringify(custom); if (text !== sent) { sent = text; node.port.postMessage({ custom }); } set('a', p.a, true); set('b', p.b, true); set('morph', p.morph, initial); set('shift', p.shift, initial); set('q', p.q, initial); set('mix', p.mix, initial); } };
     },
     // the calmbgm synth's own stages: each is a VoiceFx holding the one stage, which routes around itself while it does nothing
     tape: (context) => voiceStage(context, 'tape', (p) => ({ tapeWow: p.wow, tapeWowRate: p.wowRate, tapeFlutter: p.flutter, tapeDrive: p.drive, tapeTone: p.tone })),
