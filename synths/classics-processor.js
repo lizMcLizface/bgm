@@ -5,7 +5,7 @@ const RING=65536; // the scope's history: the last 1.3 s of output at 48 kHz
 const FIRST_SEQUENCED=8; // the drum machines and the bass line report their playhead often
 class ClassicsProcessor extends AudioWorkletProcessor {
  constructor({processorOptions:o}){
-  super();this.failed=false;this.pending=o.events??[];this.held=new Set();this.polyphony=o.polyphony??Infinity;this.report=0;this.ring=new Float32Array(RING);this.rw=0;this.total=0;this.every=o.model>=FIRST_SEQUENCED?sampleRate/40:sampleRate/4;
+  super();this.model=o.model;this.failed=false;this.pending=o.events??[];this.held=new Set();this.polyphony=o.polyphony??Infinity;this.report=0;this.ring=new Float32Array(RING);this.rw=0;this.total=0;this.every=o.model>=FIRST_SEQUENCED||o.model===12?sampleRate/40:sampleRate/4;
   try{
    this.k=new WebAssembly.Instance(o.module,{}).exports;
    if(this.k.syn_api()!==1)throw Error('Synth kernel API mismatch. Reload the page.');
@@ -64,7 +64,7 @@ class ClassicsProcessor extends AudioWorkletProcessor {
     at+=count;
    }
    this.report+=n;
-   if(this.report>=this.every){this.report=0;const k=this.k;this.port.postMessage({type:'stats',active:k.syn_stat(0),steals:k.syn_stat(1),peak:k.syn_stat(2),step:k.syn_stat(4),pattern:k.syn_stat(5),running:k.syn_stat(6)});}
+   if(this.report>=this.every){this.report=0;const k=this.k;this.port.postMessage({type:'stats',active:k.syn_stat(0),steals:k.syn_stat(1),peak:k.syn_stat(2),step:k.syn_stat(4),pattern:k.syn_stat(5),running:k.syn_stat(6),joyX:k.syn_stat(7),joyY:k.syn_stat(8),joyOn:k.syn_stat(9),trace:this.model===12?new Float32Array(k.memory.buffer,k.syn_joy_ptr(),k.syn_joy_info(0)*k.syn_joy_info(1)).slice():null});}
    return true;
   }catch(error){this.fail(error);return false;}
  }

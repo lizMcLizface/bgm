@@ -81,18 +81,27 @@ programs:
       layers.0.ring: 0
       layers.0.filterFamily: 0
       layers.0.ampAttackCurve: 1
+      layers.0.ampAttackShape: 0
       layers.0.ampDecayCurve: 1
+      layers.0.ampDecayShape: 0
       layers.0.ampReleaseCurve: 2
+      layers.0.ampReleaseShape: 0
       layers.0.filterAttackCurve: 1
+      layers.0.filterAttackShape: 0
       layers.0.filterDecayCurve: 1
+      layers.0.filterDecayShape: 0
       layers.0.filterReleaseCurve: 2
+      layers.0.filterReleaseShape: 0
       layers.0.modAttack: 1.5
       layers.0.modDecay: 2
       layers.0.modSustain: 0.5
       layers.0.modRelease: 2
       layers.0.modAttackCurve: 1
+      layers.0.modAttackShape: 0
       layers.0.modDecayCurve: 1
+      layers.0.modDecayShape: 0
       layers.0.modReleaseCurve: 2
+      layers.0.modReleaseShape: 0
       layers.0.wanderRate: 0.15
       layers.0.wanderCents: 0
       layers.0.modSource1: 0
@@ -121,6 +130,13 @@ programs:
       layers.0.noisePressure: 0
       layers.0.noiseAttack: 0.25
       layers.0.legacyAmp: 0
+      layers.0.ampHold: 0
+      layers.0.noiseType: 0
+      layers.0.pitchEnvAmount: 0
+      layers.0.pitchEnvDecay: 0.15
+      layers.0.phaseLock: 0
+      layers.0.bPhase: 0
+      layers.0.ampHoldLevel: 1
       layers.1.waveA: 3
       layers.1.waveB: 4
       layers.1.levelA: 0.65
@@ -181,18 +197,27 @@ programs:
       layers.1.ring: 0
       layers.1.filterFamily: 0
       layers.1.ampAttackCurve: 1
+      layers.1.ampAttackShape: 0
       layers.1.ampDecayCurve: 1
+      layers.1.ampDecayShape: 0
       layers.1.ampReleaseCurve: 2
+      layers.1.ampReleaseShape: 0
       layers.1.filterAttackCurve: 1
+      layers.1.filterAttackShape: 0
       layers.1.filterDecayCurve: 1
+      layers.1.filterDecayShape: 0
       layers.1.filterReleaseCurve: 2
+      layers.1.filterReleaseShape: 0
       layers.1.modAttack: 1.5
       layers.1.modDecay: 2
       layers.1.modSustain: 0.5
       layers.1.modRelease: 2
       layers.1.modAttackCurve: 1
+      layers.1.modAttackShape: 0
       layers.1.modDecayCurve: 1
+      layers.1.modDecayShape: 0
       layers.1.modReleaseCurve: 2
+      layers.1.modReleaseShape: 0
       layers.1.wanderRate: 0.15
       layers.1.wanderCents: 0
       layers.1.modSource1: 0
@@ -221,6 +246,13 @@ programs:
       layers.1.noisePressure: 0
       layers.1.noiseAttack: 0.25
       layers.1.legacyAmp: 0
+      layers.1.ampHold: 0
+      layers.1.noiseType: 0
+      layers.1.pitchEnvAmount: 0
+      layers.1.pitchEnvDecay: 0.15
+      layers.1.phaseLock: 0
+      layers.1.bPhase: 0
+      layers.1.ampHoldLevel: 1
       effects.dry: 1
       effects.reverb: 0.22
       effects.delay: 0.12
@@ -349,18 +381,27 @@ programs:
       layers.0.ring: 0
       layers.0.filterFamily: 0
       layers.0.ampAttackCurve: 1
+      layers.0.ampAttackShape: 0
       layers.0.ampDecayCurve: 1
+      layers.0.ampDecayShape: 0
       layers.0.ampReleaseCurve: 2
+      layers.0.ampReleaseShape: 0
       layers.0.filterAttackCurve: 1
+      layers.0.filterAttackShape: 0
       layers.0.filterDecayCurve: 1
+      layers.0.filterDecayShape: 0
       layers.0.filterReleaseCurve: 2
+      layers.0.filterReleaseShape: 0
       layers.0.modAttack: 1.5
       layers.0.modDecay: 2
       layers.0.modSustain: 0.5
       layers.0.modRelease: 2
       layers.0.modAttackCurve: 1
+      layers.0.modAttackShape: 0
       layers.0.modDecayCurve: 1
+      layers.0.modDecayShape: 0
       layers.0.modReleaseCurve: 2
+      layers.0.modReleaseShape: 0
       layers.0.wanderRate: 0.15
       layers.0.wanderCents: 0
       layers.0.modSource1: 0
@@ -389,6 +430,13 @@ programs:
       layers.0.noisePressure: 0
       layers.0.noiseAttack: 0.25
       layers.0.legacyAmp: 0
+      layers.0.ampHold: 0
+      layers.0.noiseType: 0
+      layers.0.pitchEnvAmount: 0
+      layers.0.pitchEnvDecay: 0.15
+      layers.0.phaseLock: 0
+      layers.0.bPhase: 0
+      layers.0.ampHoldLevel: 1
       layers.1.waveA: 3
       layers.1.waveB: 4
       layers.1.levelA: 0.65
@@ -449,18 +497,27 @@ programs:
       layers.1.ring: 0
       layers.1.filterFamily: 0
       layers.1.ampAttackCurve: 1
+      layers.1.ampAttackShape: 0
       layers.1.ampDecayCurve: 1
+      layers.1.ampDecayShape: 0
       layers.1.ampReleaseCurve: 2
+      layers.1.ampReleaseShape: 0
       layers.1.filterAttackCurve: 1
+      layers.1.filterAttackShape: 0
       layers.1.filterDecayCurve: 1
+      layers.1.filterDecayShape: 0
       layers.1.filterReleaseCurve: 2
+      layers.1.filterReleaseShape: 0
       layers.1.modAttack: 1.5
       layers.1.modDecay: 2
       layers.1.modSustain: 0.5
       layers.1.modRelease: 2
       layers.1.modAttackCurve: 1
+      layers.1.modAttackShape: 0
       layers.1.modDecayCurve: 1
+      layers.1.modDecayShape: 0
       layers.1.modReleaseCurve: 2
+      layers.1.modReleaseShape: 0
       layers.1.wanderRate: 0.15
       layers.1.wanderCents: 0
       layers.1.modSource1: 0
@@ -489,6 +546,13 @@ programs:
       layers.1.noisePressure: 0
       layers.1.noiseAttack: 0.25
       layers.1.legacyAmp: 0
+      layers.1.ampHold: 0
+      layers.1.noiseType: 0
+      layers.1.pitchEnvAmount: 0
+      layers.1.pitchEnvDecay: 0.15
+      layers.1.phaseLock: 0
+      layers.1.bPhase: 0
+      layers.1.ampHoldLevel: 1
       effects.dry: 1
       effects.reverb: 0.22
       effects.delay: 0.12
@@ -617,18 +681,27 @@ programs:
       layers.0.ring: 0
       layers.0.filterFamily: 0
       layers.0.ampAttackCurve: 1
+      layers.0.ampAttackShape: 0
       layers.0.ampDecayCurve: 1
+      layers.0.ampDecayShape: 0
       layers.0.ampReleaseCurve: 2
+      layers.0.ampReleaseShape: 0
       layers.0.filterAttackCurve: 1
+      layers.0.filterAttackShape: 0
       layers.0.filterDecayCurve: 1
+      layers.0.filterDecayShape: 0
       layers.0.filterReleaseCurve: 2
+      layers.0.filterReleaseShape: 0
       layers.0.modAttack: 1.5
       layers.0.modDecay: 2
       layers.0.modSustain: 0.5
       layers.0.modRelease: 2
       layers.0.modAttackCurve: 1
+      layers.0.modAttackShape: 0
       layers.0.modDecayCurve: 1
+      layers.0.modDecayShape: 0
       layers.0.modReleaseCurve: 2
+      layers.0.modReleaseShape: 0
       layers.0.wanderRate: 0.15
       layers.0.wanderCents: 0
       layers.0.modSource1: 0
@@ -657,6 +730,13 @@ programs:
       layers.0.noisePressure: 0
       layers.0.noiseAttack: 0.25
       layers.0.legacyAmp: 0
+      layers.0.ampHold: 0
+      layers.0.noiseType: 0
+      layers.0.pitchEnvAmount: 0
+      layers.0.pitchEnvDecay: 0.15
+      layers.0.phaseLock: 0
+      layers.0.bPhase: 0
+      layers.0.ampHoldLevel: 1
       layers.1.waveA: 4
       layers.1.waveB: 0
       layers.1.levelA: 0.7
@@ -717,18 +797,27 @@ programs:
       layers.1.ring: 0
       layers.1.filterFamily: 0
       layers.1.ampAttackCurve: 1
+      layers.1.ampAttackShape: 0
       layers.1.ampDecayCurve: 1
+      layers.1.ampDecayShape: 0
       layers.1.ampReleaseCurve: 2
+      layers.1.ampReleaseShape: 0
       layers.1.filterAttackCurve: 1
+      layers.1.filterAttackShape: 0
       layers.1.filterDecayCurve: 1
+      layers.1.filterDecayShape: 0
       layers.1.filterReleaseCurve: 2
+      layers.1.filterReleaseShape: 0
       layers.1.modAttack: 1.5
       layers.1.modDecay: 2
       layers.1.modSustain: 0.5
       layers.1.modRelease: 2
       layers.1.modAttackCurve: 1
+      layers.1.modAttackShape: 0
       layers.1.modDecayCurve: 1
+      layers.1.modDecayShape: 0
       layers.1.modReleaseCurve: 2
+      layers.1.modReleaseShape: 0
       layers.1.wanderRate: 0.15
       layers.1.wanderCents: 0
       layers.1.modSource1: 0
@@ -757,6 +846,13 @@ programs:
       layers.1.noisePressure: 0
       layers.1.noiseAttack: 0.25
       layers.1.legacyAmp: 0
+      layers.1.ampHold: 0
+      layers.1.noiseType: 0
+      layers.1.pitchEnvAmount: 0
+      layers.1.pitchEnvDecay: 0.15
+      layers.1.phaseLock: 0
+      layers.1.bPhase: 0
+      layers.1.ampHoldLevel: 1
       effects.dry: 1
       effects.reverb: 0.22
       effects.delay: 0.12
@@ -885,18 +981,27 @@ programs:
       layers.0.ring: 0
       layers.0.filterFamily: 0
       layers.0.ampAttackCurve: 1
+      layers.0.ampAttackShape: 0
       layers.0.ampDecayCurve: 1
+      layers.0.ampDecayShape: 0
       layers.0.ampReleaseCurve: 2
+      layers.0.ampReleaseShape: 0
       layers.0.filterAttackCurve: 1
+      layers.0.filterAttackShape: 0
       layers.0.filterDecayCurve: 1
+      layers.0.filterDecayShape: 0
       layers.0.filterReleaseCurve: 2
+      layers.0.filterReleaseShape: 0
       layers.0.modAttack: 1.5
       layers.0.modDecay: 2
       layers.0.modSustain: 0.5
       layers.0.modRelease: 2
       layers.0.modAttackCurve: 1
+      layers.0.modAttackShape: 0
       layers.0.modDecayCurve: 1
+      layers.0.modDecayShape: 0
       layers.0.modReleaseCurve: 2
+      layers.0.modReleaseShape: 0
       layers.0.wanderRate: 0.15
       layers.0.wanderCents: 0
       layers.0.modSource1: 0
@@ -925,6 +1030,13 @@ programs:
       layers.0.noisePressure: 0
       layers.0.noiseAttack: 0.25
       layers.0.legacyAmp: 0
+      layers.0.ampHold: 0
+      layers.0.noiseType: 0
+      layers.0.pitchEnvAmount: 0
+      layers.0.pitchEnvDecay: 0.15
+      layers.0.phaseLock: 0
+      layers.0.bPhase: 0
+      layers.0.ampHoldLevel: 1
       layers.1.waveA: 3
       layers.1.waveB: 4
       layers.1.levelA: 0.65
@@ -985,18 +1097,27 @@ programs:
       layers.1.ring: 0
       layers.1.filterFamily: 0
       layers.1.ampAttackCurve: 1
+      layers.1.ampAttackShape: 0
       layers.1.ampDecayCurve: 1
+      layers.1.ampDecayShape: 0
       layers.1.ampReleaseCurve: 2
+      layers.1.ampReleaseShape: 0
       layers.1.filterAttackCurve: 1
+      layers.1.filterAttackShape: 0
       layers.1.filterDecayCurve: 1
+      layers.1.filterDecayShape: 0
       layers.1.filterReleaseCurve: 2
+      layers.1.filterReleaseShape: 0
       layers.1.modAttack: 1.5
       layers.1.modDecay: 2
       layers.1.modSustain: 0.5
       layers.1.modRelease: 2
       layers.1.modAttackCurve: 1
+      layers.1.modAttackShape: 0
       layers.1.modDecayCurve: 1
+      layers.1.modDecayShape: 0
       layers.1.modReleaseCurve: 2
+      layers.1.modReleaseShape: 0
       layers.1.wanderRate: 0.15
       layers.1.wanderCents: 0
       layers.1.modSource1: 0
@@ -1025,6 +1146,13 @@ programs:
       layers.1.noisePressure: 0
       layers.1.noiseAttack: 0.25
       layers.1.legacyAmp: 0
+      layers.1.ampHold: 0
+      layers.1.noiseType: 0
+      layers.1.pitchEnvAmount: 0
+      layers.1.pitchEnvDecay: 0.15
+      layers.1.phaseLock: 0
+      layers.1.bPhase: 0
+      layers.1.ampHoldLevel: 1
       effects.dry: 1
       effects.reverb: 0.22
       effects.delay: 0.12
@@ -1153,18 +1281,27 @@ programs:
       layers.0.ring: 0
       layers.0.filterFamily: 0
       layers.0.ampAttackCurve: 1
+      layers.0.ampAttackShape: 0
       layers.0.ampDecayCurve: 1
+      layers.0.ampDecayShape: 0
       layers.0.ampReleaseCurve: 2
+      layers.0.ampReleaseShape: 0
       layers.0.filterAttackCurve: 1
+      layers.0.filterAttackShape: 0
       layers.0.filterDecayCurve: 1
+      layers.0.filterDecayShape: 0
       layers.0.filterReleaseCurve: 2
+      layers.0.filterReleaseShape: 0
       layers.0.modAttack: 1.5
       layers.0.modDecay: 2
       layers.0.modSustain: 0.5
       layers.0.modRelease: 2
       layers.0.modAttackCurve: 1
+      layers.0.modAttackShape: 0
       layers.0.modDecayCurve: 1
+      layers.0.modDecayShape: 0
       layers.0.modReleaseCurve: 2
+      layers.0.modReleaseShape: 0
       layers.0.wanderRate: 0.15
       layers.0.wanderCents: 0
       layers.0.modSource1: 0
@@ -1193,6 +1330,13 @@ programs:
       layers.0.noisePressure: 0
       layers.0.noiseAttack: 0.25
       layers.0.legacyAmp: 0
+      layers.0.ampHold: 0
+      layers.0.noiseType: 0
+      layers.0.pitchEnvAmount: 0
+      layers.0.pitchEnvDecay: 0.15
+      layers.0.phaseLock: 0
+      layers.0.bPhase: 0
+      layers.0.ampHoldLevel: 1
       layers.1.waveA: 3
       layers.1.waveB: 4
       layers.1.levelA: 0.65
@@ -1253,18 +1397,27 @@ programs:
       layers.1.ring: 0
       layers.1.filterFamily: 0
       layers.1.ampAttackCurve: 1
+      layers.1.ampAttackShape: 0
       layers.1.ampDecayCurve: 1
+      layers.1.ampDecayShape: 0
       layers.1.ampReleaseCurve: 2
+      layers.1.ampReleaseShape: 0
       layers.1.filterAttackCurve: 1
+      layers.1.filterAttackShape: 0
       layers.1.filterDecayCurve: 1
+      layers.1.filterDecayShape: 0
       layers.1.filterReleaseCurve: 2
+      layers.1.filterReleaseShape: 0
       layers.1.modAttack: 1.5
       layers.1.modDecay: 2
       layers.1.modSustain: 0.5
       layers.1.modRelease: 2
       layers.1.modAttackCurve: 1
+      layers.1.modAttackShape: 0
       layers.1.modDecayCurve: 1
+      layers.1.modDecayShape: 0
       layers.1.modReleaseCurve: 2
+      layers.1.modReleaseShape: 0
       layers.1.wanderRate: 0.15
       layers.1.wanderCents: 0
       layers.1.modSource1: 0
@@ -1293,6 +1446,13 @@ programs:
       layers.1.noisePressure: 0
       layers.1.noiseAttack: 0.25
       layers.1.legacyAmp: 0
+      layers.1.ampHold: 0
+      layers.1.noiseType: 0
+      layers.1.pitchEnvAmount: 0
+      layers.1.pitchEnvDecay: 0.15
+      layers.1.phaseLock: 0
+      layers.1.bPhase: 0
+      layers.1.ampHoldLevel: 1
       effects.dry: 1
       effects.reverb: 0.22
       effects.delay: 0.12
@@ -1421,18 +1581,27 @@ programs:
       layers.0.ring: 0
       layers.0.filterFamily: 0
       layers.0.ampAttackCurve: 1
+      layers.0.ampAttackShape: 0
       layers.0.ampDecayCurve: 1
+      layers.0.ampDecayShape: 0
       layers.0.ampReleaseCurve: 2
+      layers.0.ampReleaseShape: 0
       layers.0.filterAttackCurve: 1
+      layers.0.filterAttackShape: 0
       layers.0.filterDecayCurve: 1
+      layers.0.filterDecayShape: 0
       layers.0.filterReleaseCurve: 2
+      layers.0.filterReleaseShape: 0
       layers.0.modAttack: 1.5
       layers.0.modDecay: 2
       layers.0.modSustain: 0.5
       layers.0.modRelease: 2
       layers.0.modAttackCurve: 1
+      layers.0.modAttackShape: 0
       layers.0.modDecayCurve: 1
+      layers.0.modDecayShape: 0
       layers.0.modReleaseCurve: 2
+      layers.0.modReleaseShape: 0
       layers.0.wanderRate: 0.15
       layers.0.wanderCents: 0
       layers.0.modSource1: 0
@@ -1461,6 +1630,13 @@ programs:
       layers.0.noisePressure: 0
       layers.0.noiseAttack: 0.25
       layers.0.legacyAmp: 0
+      layers.0.ampHold: 0
+      layers.0.noiseType: 0
+      layers.0.pitchEnvAmount: 0
+      layers.0.pitchEnvDecay: 0.15
+      layers.0.phaseLock: 0
+      layers.0.bPhase: 0
+      layers.0.ampHoldLevel: 1
       layers.1.waveA: 2
       layers.1.waveB: 0
       layers.1.levelA: 0.6
@@ -1521,18 +1697,27 @@ programs:
       layers.1.ring: 0
       layers.1.filterFamily: 0
       layers.1.ampAttackCurve: 1
+      layers.1.ampAttackShape: 0
       layers.1.ampDecayCurve: 1
+      layers.1.ampDecayShape: 0
       layers.1.ampReleaseCurve: 2
+      layers.1.ampReleaseShape: 0
       layers.1.filterAttackCurve: 1
+      layers.1.filterAttackShape: 0
       layers.1.filterDecayCurve: 1
+      layers.1.filterDecayShape: 0
       layers.1.filterReleaseCurve: 2
+      layers.1.filterReleaseShape: 0
       layers.1.modAttack: 1.5
       layers.1.modDecay: 2
       layers.1.modSustain: 0.5
       layers.1.modRelease: 2
       layers.1.modAttackCurve: 1
+      layers.1.modAttackShape: 0
       layers.1.modDecayCurve: 1
+      layers.1.modDecayShape: 0
       layers.1.modReleaseCurve: 2
+      layers.1.modReleaseShape: 0
       layers.1.wanderRate: 0.15
       layers.1.wanderCents: 0
       layers.1.modSource1: 0
@@ -1561,6 +1746,13 @@ programs:
       layers.1.noisePressure: 0
       layers.1.noiseAttack: 0.25
       layers.1.legacyAmp: 0
+      layers.1.ampHold: 0
+      layers.1.noiseType: 0
+      layers.1.pitchEnvAmount: 0
+      layers.1.pitchEnvDecay: 0.15
+      layers.1.phaseLock: 0
+      layers.1.bPhase: 0
+      layers.1.ampHoldLevel: 1
       effects.dry: 1
       effects.reverb: 0.22
       effects.delay: 0.12
@@ -1689,18 +1881,27 @@ programs:
       layers.0.ring: 0
       layers.0.filterFamily: 1
       layers.0.ampAttackCurve: 1
+      layers.0.ampAttackShape: 0
       layers.0.ampDecayCurve: 1
+      layers.0.ampDecayShape: 0
       layers.0.ampReleaseCurve: 2
+      layers.0.ampReleaseShape: 0
       layers.0.filterAttackCurve: 1
+      layers.0.filterAttackShape: 0
       layers.0.filterDecayCurve: 1
+      layers.0.filterDecayShape: 0
       layers.0.filterReleaseCurve: 2
+      layers.0.filterReleaseShape: 0
       layers.0.modAttack: 1.5
       layers.0.modDecay: 2
       layers.0.modSustain: 0.5
       layers.0.modRelease: 2
       layers.0.modAttackCurve: 1
+      layers.0.modAttackShape: 0
       layers.0.modDecayCurve: 1
+      layers.0.modDecayShape: 0
       layers.0.modReleaseCurve: 2
+      layers.0.modReleaseShape: 0
       layers.0.wanderRate: 0.15
       layers.0.wanderCents: 0
       layers.0.modSource1: 0
@@ -1729,6 +1930,13 @@ programs:
       layers.0.noisePressure: 0
       layers.0.noiseAttack: 0.25
       layers.0.legacyAmp: 0
+      layers.0.ampHold: 0
+      layers.0.noiseType: 0
+      layers.0.pitchEnvAmount: 0
+      layers.0.pitchEnvDecay: 0.15
+      layers.0.phaseLock: 0
+      layers.0.bPhase: 0
+      layers.0.ampHoldLevel: 1
       layers.1.waveA: 3
       layers.1.waveB: 4
       layers.1.levelA: 0.65
@@ -1789,18 +1997,27 @@ programs:
       layers.1.ring: 0
       layers.1.filterFamily: 0
       layers.1.ampAttackCurve: 1
+      layers.1.ampAttackShape: 0
       layers.1.ampDecayCurve: 1
+      layers.1.ampDecayShape: 0
       layers.1.ampReleaseCurve: 2
+      layers.1.ampReleaseShape: 0
       layers.1.filterAttackCurve: 1
+      layers.1.filterAttackShape: 0
       layers.1.filterDecayCurve: 1
+      layers.1.filterDecayShape: 0
       layers.1.filterReleaseCurve: 2
+      layers.1.filterReleaseShape: 0
       layers.1.modAttack: 1.5
       layers.1.modDecay: 2
       layers.1.modSustain: 0.5
       layers.1.modRelease: 2
       layers.1.modAttackCurve: 1
+      layers.1.modAttackShape: 0
       layers.1.modDecayCurve: 1
+      layers.1.modDecayShape: 0
       layers.1.modReleaseCurve: 2
+      layers.1.modReleaseShape: 0
       layers.1.wanderRate: 0.15
       layers.1.wanderCents: 0
       layers.1.modSource1: 0
@@ -1829,6 +2046,13 @@ programs:
       layers.1.noisePressure: 0
       layers.1.noiseAttack: 0.25
       layers.1.legacyAmp: 0
+      layers.1.ampHold: 0
+      layers.1.noiseType: 0
+      layers.1.pitchEnvAmount: 0
+      layers.1.pitchEnvDecay: 0.15
+      layers.1.phaseLock: 0
+      layers.1.bPhase: 0
+      layers.1.ampHoldLevel: 1
       effects.dry: 1
       effects.reverb: 0.22
       effects.delay: 0.12
@@ -1957,18 +2181,27 @@ programs:
       layers.0.ring: 0
       layers.0.filterFamily: 1
       layers.0.ampAttackCurve: 1
+      layers.0.ampAttackShape: 0
       layers.0.ampDecayCurve: 1
+      layers.0.ampDecayShape: 0
       layers.0.ampReleaseCurve: 2
+      layers.0.ampReleaseShape: 0
       layers.0.filterAttackCurve: 1
+      layers.0.filterAttackShape: 0
       layers.0.filterDecayCurve: 1
+      layers.0.filterDecayShape: 0
       layers.0.filterReleaseCurve: 2
+      layers.0.filterReleaseShape: 0
       layers.0.modAttack: 1.5
       layers.0.modDecay: 2
       layers.0.modSustain: 0.5
       layers.0.modRelease: 2
       layers.0.modAttackCurve: 1
+      layers.0.modAttackShape: 0
       layers.0.modDecayCurve: 1
+      layers.0.modDecayShape: 0
       layers.0.modReleaseCurve: 2
+      layers.0.modReleaseShape: 0
       layers.0.wanderRate: 0.15
       layers.0.wanderCents: 0
       layers.0.modSource1: 0
@@ -1997,6 +2230,13 @@ programs:
       layers.0.noisePressure: 0
       layers.0.noiseAttack: 0.25
       layers.0.legacyAmp: 0
+      layers.0.ampHold: 0
+      layers.0.noiseType: 0
+      layers.0.pitchEnvAmount: 0
+      layers.0.pitchEnvDecay: 0.15
+      layers.0.phaseLock: 0
+      layers.0.bPhase: 0
+      layers.0.ampHoldLevel: 1
       layers.1.waveA: 3
       layers.1.waveB: 4
       layers.1.levelA: 0.65
@@ -2057,18 +2297,27 @@ programs:
       layers.1.ring: 0
       layers.1.filterFamily: 0
       layers.1.ampAttackCurve: 1
+      layers.1.ampAttackShape: 0
       layers.1.ampDecayCurve: 1
+      layers.1.ampDecayShape: 0
       layers.1.ampReleaseCurve: 2
+      layers.1.ampReleaseShape: 0
       layers.1.filterAttackCurve: 1
+      layers.1.filterAttackShape: 0
       layers.1.filterDecayCurve: 1
+      layers.1.filterDecayShape: 0
       layers.1.filterReleaseCurve: 2
+      layers.1.filterReleaseShape: 0
       layers.1.modAttack: 1.5
       layers.1.modDecay: 2
       layers.1.modSustain: 0.5
       layers.1.modRelease: 2
       layers.1.modAttackCurve: 1
+      layers.1.modAttackShape: 0
       layers.1.modDecayCurve: 1
+      layers.1.modDecayShape: 0
       layers.1.modReleaseCurve: 2
+      layers.1.modReleaseShape: 0
       layers.1.wanderRate: 0.15
       layers.1.wanderCents: 0
       layers.1.modSource1: 0
@@ -2097,6 +2346,13 @@ programs:
       layers.1.noisePressure: 0
       layers.1.noiseAttack: 0.25
       layers.1.legacyAmp: 0
+      layers.1.ampHold: 0
+      layers.1.noiseType: 0
+      layers.1.pitchEnvAmount: 0
+      layers.1.pitchEnvDecay: 0.15
+      layers.1.phaseLock: 0
+      layers.1.bPhase: 0
+      layers.1.ampHoldLevel: 1
       effects.dry: 1
       effects.reverb: 0.22
       effects.delay: 0.12
@@ -2225,18 +2481,27 @@ programs:
       layers.0.ring: 0
       layers.0.filterFamily: 0
       layers.0.ampAttackCurve: 1.6
+      layers.0.ampAttackShape: 0
       layers.0.ampDecayCurve: 1
+      layers.0.ampDecayShape: 0
       layers.0.ampReleaseCurve: 2
+      layers.0.ampReleaseShape: 0
       layers.0.filterAttackCurve: 1
+      layers.0.filterAttackShape: 0
       layers.0.filterDecayCurve: 1
+      layers.0.filterDecayShape: 0
       layers.0.filterReleaseCurve: 2
+      layers.0.filterReleaseShape: 0
       layers.0.modAttack: 2.5
       layers.0.modDecay: 3
       layers.0.modSustain: 0.45
       layers.0.modRelease: 2
       layers.0.modAttackCurve: 1
+      layers.0.modAttackShape: 0
       layers.0.modDecayCurve: 1
+      layers.0.modDecayShape: 0
       layers.0.modReleaseCurve: 2
+      layers.0.modReleaseShape: 0
       layers.0.wanderRate: 0.18
       layers.0.wanderCents: 4
       layers.0.modSource1: 10
@@ -2265,6 +2530,13 @@ programs:
       layers.0.noisePressure: 0
       layers.0.noiseAttack: 0.25
       layers.0.legacyAmp: 0
+      layers.0.ampHold: 0
+      layers.0.noiseType: 0
+      layers.0.pitchEnvAmount: 0
+      layers.0.pitchEnvDecay: 0.15
+      layers.0.phaseLock: 0
+      layers.0.bPhase: 0
+      layers.0.ampHoldLevel: 1
       layers.1.waveA: 3
       layers.1.waveB: 4
       layers.1.levelA: 0.65
@@ -2325,18 +2597,27 @@ programs:
       layers.1.ring: 0
       layers.1.filterFamily: 0
       layers.1.ampAttackCurve: 1
+      layers.1.ampAttackShape: 0
       layers.1.ampDecayCurve: 1
+      layers.1.ampDecayShape: 0
       layers.1.ampReleaseCurve: 2
+      layers.1.ampReleaseShape: 0
       layers.1.filterAttackCurve: 1
+      layers.1.filterAttackShape: 0
       layers.1.filterDecayCurve: 1
+      layers.1.filterDecayShape: 0
       layers.1.filterReleaseCurve: 2
+      layers.1.filterReleaseShape: 0
       layers.1.modAttack: 1.5
       layers.1.modDecay: 2
       layers.1.modSustain: 0.5
       layers.1.modRelease: 2
       layers.1.modAttackCurve: 1
+      layers.1.modAttackShape: 0
       layers.1.modDecayCurve: 1
+      layers.1.modDecayShape: 0
       layers.1.modReleaseCurve: 2
+      layers.1.modReleaseShape: 0
       layers.1.wanderRate: 0.15
       layers.1.wanderCents: 0
       layers.1.modSource1: 0
@@ -2365,6 +2646,13 @@ programs:
       layers.1.noisePressure: 0
       layers.1.noiseAttack: 0.25
       layers.1.legacyAmp: 0
+      layers.1.ampHold: 0
+      layers.1.noiseType: 0
+      layers.1.pitchEnvAmount: 0
+      layers.1.pitchEnvDecay: 0.15
+      layers.1.phaseLock: 0
+      layers.1.bPhase: 0
+      layers.1.ampHoldLevel: 1
       effects.dry: 1
       effects.reverb: 0.22
       effects.delay: 0.12
@@ -2493,18 +2781,27 @@ programs:
       layers.0.ring: 0
       layers.0.filterFamily: 0
       layers.0.ampAttackCurve: 1.6
+      layers.0.ampAttackShape: 0
       layers.0.ampDecayCurve: 1
+      layers.0.ampDecayShape: 0
       layers.0.ampReleaseCurve: 2
+      layers.0.ampReleaseShape: 0
       layers.0.filterAttackCurve: 1
+      layers.0.filterAttackShape: 0
       layers.0.filterDecayCurve: 1
+      layers.0.filterDecayShape: 0
       layers.0.filterReleaseCurve: 2
+      layers.0.filterReleaseShape: 0
       layers.0.modAttack: 2.5
       layers.0.modDecay: 3
       layers.0.modSustain: 0.45
       layers.0.modRelease: 2
       layers.0.modAttackCurve: 1
+      layers.0.modAttackShape: 0
       layers.0.modDecayCurve: 1
+      layers.0.modDecayShape: 0
       layers.0.modReleaseCurve: 2
+      layers.0.modReleaseShape: 0
       layers.0.wanderRate: 0.18
       layers.0.wanderCents: 4
       layers.0.modSource1: 10
@@ -2533,6 +2830,13 @@ programs:
       layers.0.noisePressure: 0.3
       layers.0.noiseAttack: 0.3
       layers.0.legacyAmp: 0
+      layers.0.ampHold: 0
+      layers.0.noiseType: 0
+      layers.0.pitchEnvAmount: 0
+      layers.0.pitchEnvDecay: 0.15
+      layers.0.phaseLock: 0
+      layers.0.bPhase: 0
+      layers.0.ampHoldLevel: 1
       layers.1.waveA: 3
       layers.1.waveB: 4
       layers.1.levelA: 0.65
@@ -2593,18 +2897,27 @@ programs:
       layers.1.ring: 0
       layers.1.filterFamily: 0
       layers.1.ampAttackCurve: 1
+      layers.1.ampAttackShape: 0
       layers.1.ampDecayCurve: 1
+      layers.1.ampDecayShape: 0
       layers.1.ampReleaseCurve: 2
+      layers.1.ampReleaseShape: 0
       layers.1.filterAttackCurve: 1
+      layers.1.filterAttackShape: 0
       layers.1.filterDecayCurve: 1
+      layers.1.filterDecayShape: 0
       layers.1.filterReleaseCurve: 2
+      layers.1.filterReleaseShape: 0
       layers.1.modAttack: 1.5
       layers.1.modDecay: 2
       layers.1.modSustain: 0.5
       layers.1.modRelease: 2
       layers.1.modAttackCurve: 1
+      layers.1.modAttackShape: 0
       layers.1.modDecayCurve: 1
+      layers.1.modDecayShape: 0
       layers.1.modReleaseCurve: 2
+      layers.1.modReleaseShape: 0
       layers.1.wanderRate: 0.15
       layers.1.wanderCents: 0
       layers.1.modSource1: 0
@@ -2633,6 +2946,13 @@ programs:
       layers.1.noisePressure: 0
       layers.1.noiseAttack: 0.25
       layers.1.legacyAmp: 0
+      layers.1.ampHold: 0
+      layers.1.noiseType: 0
+      layers.1.pitchEnvAmount: 0
+      layers.1.pitchEnvDecay: 0.15
+      layers.1.phaseLock: 0
+      layers.1.bPhase: 0
+      layers.1.ampHoldLevel: 1
       effects.dry: 1
       effects.reverb: 0.22
       effects.delay: 0.12
@@ -2761,18 +3081,27 @@ programs:
       layers.0.ring: 0
       layers.0.filterFamily: 0
       layers.0.ampAttackCurve: 1
+      layers.0.ampAttackShape: 0
       layers.0.ampDecayCurve: 1
+      layers.0.ampDecayShape: 0
       layers.0.ampReleaseCurve: 2
+      layers.0.ampReleaseShape: 0
       layers.0.filterAttackCurve: 1
+      layers.0.filterAttackShape: 0
       layers.0.filterDecayCurve: 1
+      layers.0.filterDecayShape: 0
       layers.0.filterReleaseCurve: 2
+      layers.0.filterReleaseShape: 0
       layers.0.modAttack: 1.5
       layers.0.modDecay: 2
       layers.0.modSustain: 0.5
       layers.0.modRelease: 2
       layers.0.modAttackCurve: 1
+      layers.0.modAttackShape: 0
       layers.0.modDecayCurve: 1
+      layers.0.modDecayShape: 0
       layers.0.modReleaseCurve: 2
+      layers.0.modReleaseShape: 0
       layers.0.wanderRate: 0.15
       layers.0.wanderCents: 0
       layers.0.modSource1: 0
@@ -2801,6 +3130,13 @@ programs:
       layers.0.noisePressure: 0
       layers.0.noiseAttack: 0.65
       layers.0.legacyAmp: 0
+      layers.0.ampHold: 0
+      layers.0.noiseType: 0
+      layers.0.pitchEnvAmount: 0
+      layers.0.pitchEnvDecay: 0.15
+      layers.0.phaseLock: 0
+      layers.0.bPhase: 0
+      layers.0.ampHoldLevel: 1
       layers.1.waveA: 3
       layers.1.waveB: 4
       layers.1.levelA: 0.65
@@ -2861,18 +3197,27 @@ programs:
       layers.1.ring: 0
       layers.1.filterFamily: 0
       layers.1.ampAttackCurve: 1
+      layers.1.ampAttackShape: 0
       layers.1.ampDecayCurve: 1
+      layers.1.ampDecayShape: 0
       layers.1.ampReleaseCurve: 2
+      layers.1.ampReleaseShape: 0
       layers.1.filterAttackCurve: 1
+      layers.1.filterAttackShape: 0
       layers.1.filterDecayCurve: 1
+      layers.1.filterDecayShape: 0
       layers.1.filterReleaseCurve: 2
+      layers.1.filterReleaseShape: 0
       layers.1.modAttack: 1.5
       layers.1.modDecay: 2
       layers.1.modSustain: 0.5
       layers.1.modRelease: 2
       layers.1.modAttackCurve: 1
+      layers.1.modAttackShape: 0
       layers.1.modDecayCurve: 1
+      layers.1.modDecayShape: 0
       layers.1.modReleaseCurve: 2
+      layers.1.modReleaseShape: 0
       layers.1.wanderRate: 0.15
       layers.1.wanderCents: 0
       layers.1.modSource1: 0
@@ -2901,6 +3246,13 @@ programs:
       layers.1.noisePressure: 0
       layers.1.noiseAttack: 0.25
       layers.1.legacyAmp: 0
+      layers.1.ampHold: 0
+      layers.1.noiseType: 0
+      layers.1.pitchEnvAmount: 0
+      layers.1.pitchEnvDecay: 0.15
+      layers.1.phaseLock: 0
+      layers.1.bPhase: 0
+      layers.1.ampHoldLevel: 1
       effects.dry: 1
       effects.reverb: 0.22
       effects.delay: 0.12

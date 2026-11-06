@@ -30,7 +30,7 @@
       "synth": "juno",
       "name": "bgm sounds",
       "kind": "original",
-      "count": 111,
+      "count": 126,
       "url": "synth-presets/juno-originals.yaml"
     },
     {
@@ -86,7 +86,7 @@
       "synth": "wt",
       "name": "bgm sounds",
       "kind": "original",
-      "count": 14,
+      "count": 87,
       "url": "synth-presets/wt-originals.yaml"
     },
     {

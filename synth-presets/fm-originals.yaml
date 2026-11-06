@@ -28,6 +28,12 @@ programs:
       global.pitchTime: 0.15
       global.tremolo: 0
       global.lfoIndex: 0
+      global.lfoShape: 0
+      global.lfo2Pitch: 0
+      global.lfo2Index: 0
+      global.lfo2Amp: 0
+      global.voiceDrift: 0
+      global.lfoDelay: 0
       global.modAttack: 1.5
       global.modDecay: 2
       global.modSustain: 0.5
@@ -269,6 +275,65 @@ programs:
       carriers.4: 0
       routes.4.5: 1
       carriers.5: 1
+      operators.6.ratio: 1
+      operators.6.fixed: 0
+      operators.6.detune: 0
+      operators.6.level: 1
+      operators.6.attack: 0.005
+      operators.6.decay1: 0.6
+      operators.6.peak: 1
+      operators.6.decay2: 2
+      operators.6.breakpoint: 0.5
+      operators.6.sustain: 0.3
+      operators.6.release: 0.8
+      operators.6.velocity: 0.5
+      operators.6.keyScale: 0
+      operators.6.rateScale: 0
+      operators.6.pressure: 0
+      operators.6.pan: 0
+      operators.6.enabled: 1
+      operators.6.wave: 0
+      operators.6.attackCurve: 1
+      operators.6.decayCurve: 1
+      operators.6.releaseCurve: 1
+      operators.6.legacyEnvelope: 0
+      operators.7.ratio: 1
+      operators.7.fixed: 0
+      operators.7.detune: 0
+      operators.7.level: 1
+      operators.7.attack: 0.005
+      operators.7.decay1: 0.6
+      operators.7.peak: 1
+      operators.7.decay2: 2
+      operators.7.breakpoint: 0.5
+      operators.7.sustain: 0.3
+      operators.7.release: 0.8
+      operators.7.velocity: 0.5
+      operators.7.keyScale: 0
+      operators.7.rateScale: 0
+      operators.7.pressure: 0
+      operators.7.pan: 0
+      operators.7.enabled: 1
+      operators.7.wave: 0
+      operators.7.attackCurve: 1
+      operators.7.decayCurve: 1
+      operators.7.releaseCurve: 1
+      operators.7.legacyEnvelope: 0
+      routes.0.6: 0
+      routes.0.7: 0
+      routes.1.6: 0
+      routes.1.7: 0
+      routes.2.6: 0
+      routes.2.7: 0
+      routes.3.6: 0
+      routes.3.7: 0
+      routes.4.6: 0
+      routes.4.7: 0
+      routes.5.6: 0
+      routes.5.7: 0
+      carriers.6: 0
+      routes.6.7: 1
+      carriers.7: 1
   - id: "2"
     name: Glass satellites
     values:
@@ -291,6 +356,12 @@ programs:
       global.pitchTime: 0.15
       global.tremolo: 0
       global.lfoIndex: 0
+      global.lfoShape: 0
+      global.lfo2Pitch: 0
+      global.lfo2Index: 0
+      global.lfo2Amp: 0
+      global.voiceDrift: 0
+      global.lfoDelay: 0
       global.modAttack: 1.5
       global.modDecay: 2
       global.modSustain: 0.5
@@ -532,6 +603,65 @@ programs:
       carriers.4: 0
       routes.4.5: 1
       carriers.5: 1
+      operators.6.ratio: 1
+      operators.6.fixed: 0
+      operators.6.detune: 0
+      operators.6.level: 1
+      operators.6.attack: 0.005
+      operators.6.decay1: 0.6
+      operators.6.peak: 1
+      operators.6.decay2: 2
+      operators.6.breakpoint: 0.5
+      operators.6.sustain: 0.3
+      operators.6.release: 0.8
+      operators.6.velocity: 0.5
+      operators.6.keyScale: 0
+      operators.6.rateScale: 0
+      operators.6.pressure: 0
+      operators.6.pan: 0
+      operators.6.enabled: 1
+      operators.6.wave: 0
+      operators.6.attackCurve: 1
+      operators.6.decayCurve: 1
+      operators.6.releaseCurve: 1
+      operators.6.legacyEnvelope: 0
+      operators.7.ratio: 1
+      operators.7.fixed: 0
+      operators.7.detune: 0
+      operators.7.level: 1
+      operators.7.attack: 0.005
+      operators.7.decay1: 0.6
+      operators.7.peak: 1
+      operators.7.decay2: 2
+      operators.7.breakpoint: 0.5
+      operators.7.sustain: 0.3
+      operators.7.release: 0.8
+      operators.7.velocity: 0.5
+      operators.7.keyScale: 0
+      operators.7.rateScale: 0
+      operators.7.pressure: 0
+      operators.7.pan: 0
+      operators.7.enabled: 1
+      operators.7.wave: 0
+      operators.7.attackCurve: 1
+      operators.7.decayCurve: 1
+      operators.7.releaseCurve: 1
+      operators.7.legacyEnvelope: 0
+      routes.0.6: 0
+      routes.0.7: 0
+      routes.1.6: 0
+      routes.1.7: 0
+      routes.2.6: 0
+      routes.2.7: 0
+      routes.3.6: 0
+      routes.3.7: 0
+      routes.4.6: 0
+      routes.4.7: 0
+      routes.5.6: 0
+      routes.5.7: 0
+      carriers.6: 0
+      routes.6.7: 1
+      carriers.7: 1
   - id: "3"
     name: Four-op round bass
     values:
@@ -554,6 +684,12 @@ programs:
       global.pitchTime: 0.15
       global.tremolo: 0
       global.lfoIndex: 0
+      global.lfoShape: 0
+      global.lfo2Pitch: 0
+      global.lfo2Index: 0
+      global.lfo2Amp: 0
+      global.voiceDrift: 0
+      global.lfoDelay: 0
       global.modAttack: 1.5
       global.modDecay: 2
       global.modSustain: 0.5
@@ -795,6 +931,65 @@ programs:
       carriers.4: 0
       routes.4.5: 0
       carriers.5: 0
+      operators.6.ratio: 1
+      operators.6.fixed: 0
+      operators.6.detune: 0
+      operators.6.level: 1
+      operators.6.attack: 0.005
+      operators.6.decay1: 0.6
+      operators.6.peak: 1
+      operators.6.decay2: 2
+      operators.6.breakpoint: 0.5
+      operators.6.sustain: 0.3
+      operators.6.release: 0.8
+      operators.6.velocity: 0.5
+      operators.6.keyScale: 0
+      operators.6.rateScale: 0
+      operators.6.pressure: 0
+      operators.6.pan: 0
+      operators.6.enabled: 1
+      operators.6.wave: 0
+      operators.6.attackCurve: 1
+      operators.6.decayCurve: 1
+      operators.6.releaseCurve: 1
+      operators.6.legacyEnvelope: 0
+      operators.7.ratio: 1
+      operators.7.fixed: 0
+      operators.7.detune: 0
+      operators.7.level: 1
+      operators.7.attack: 0.005
+      operators.7.decay1: 0.6
+      operators.7.peak: 1
+      operators.7.decay2: 2
+      operators.7.breakpoint: 0.5
+      operators.7.sustain: 0.3
+      operators.7.release: 0.8
+      operators.7.velocity: 0.5
+      operators.7.keyScale: 0
+      operators.7.rateScale: 0
+      operators.7.pressure: 0
+      operators.7.pan: 0
+      operators.7.enabled: 1
+      operators.7.wave: 0
+      operators.7.attackCurve: 1
+      operators.7.decayCurve: 1
+      operators.7.releaseCurve: 1
+      operators.7.legacyEnvelope: 0
+      routes.0.6: 0
+      routes.0.7: 0
+      routes.1.6: 0
+      routes.1.7: 0
+      routes.2.6: 0
+      routes.2.7: 0
+      routes.3.6: 0
+      routes.3.7: 0
+      routes.4.6: 0
+      routes.4.7: 0
+      routes.5.6: 0
+      routes.5.7: 0
+      carriers.6: 0
+      routes.6.7: 1
+      carriers.7: 1
   - id: "4"
     name: Breathing FM brass
     values:
@@ -817,6 +1012,12 @@ programs:
       global.pitchTime: 0.15
       global.tremolo: 0
       global.lfoIndex: 0
+      global.lfoShape: 0
+      global.lfo2Pitch: 0
+      global.lfo2Index: 0
+      global.lfo2Amp: 0
+      global.voiceDrift: 0
+      global.lfoDelay: 0
       global.modAttack: 1.5
       global.modDecay: 2
       global.modSustain: 0.5
@@ -1058,6 +1259,65 @@ programs:
       carriers.4: 0
       routes.4.5: 1
       carriers.5: 1
+      operators.6.ratio: 1
+      operators.6.fixed: 0
+      operators.6.detune: 0
+      operators.6.level: 1
+      operators.6.attack: 0.005
+      operators.6.decay1: 0.6
+      operators.6.peak: 1
+      operators.6.decay2: 2
+      operators.6.breakpoint: 0.5
+      operators.6.sustain: 0.3
+      operators.6.release: 0.8
+      operators.6.velocity: 0.5
+      operators.6.keyScale: 0
+      operators.6.rateScale: 0
+      operators.6.pressure: 0
+      operators.6.pan: 0
+      operators.6.enabled: 1
+      operators.6.wave: 0
+      operators.6.attackCurve: 1
+      operators.6.decayCurve: 1
+      operators.6.releaseCurve: 1
+      operators.6.legacyEnvelope: 0
+      operators.7.ratio: 1
+      operators.7.fixed: 0
+      operators.7.detune: 0
+      operators.7.level: 1
+      operators.7.attack: 0.005
+      operators.7.decay1: 0.6
+      operators.7.peak: 1
+      operators.7.decay2: 2
+      operators.7.breakpoint: 0.5
+      operators.7.sustain: 0.3
+      operators.7.release: 0.8
+      operators.7.velocity: 0.5
+      operators.7.keyScale: 0
+      operators.7.rateScale: 0
+      operators.7.pressure: 0
+      operators.7.pan: 0
+      operators.7.enabled: 1
+      operators.7.wave: 0
+      operators.7.attackCurve: 1
+      operators.7.decayCurve: 1
+      operators.7.releaseCurve: 1
+      operators.7.legacyEnvelope: 0
+      routes.0.6: 0
+      routes.0.7: 0
+      routes.1.6: 0
+      routes.1.7: 0
+      routes.2.6: 0
+      routes.2.7: 0
+      routes.3.6: 0
+      routes.3.7: 0
+      routes.4.6: 0
+      routes.4.7: 0
+      routes.5.6: 0
+      routes.5.7: 0
+      carriers.6: 0
+      routes.6.7: 1
+      carriers.7: 1
   - id: "5"
     name: Bowed glass pad
     values:
@@ -1080,6 +1340,12 @@ programs:
       global.pitchTime: 0.15
       global.tremolo: 0
       global.lfoIndex: 0.06
+      global.lfoShape: 0
+      global.lfo2Pitch: 0
+      global.lfo2Index: 0
+      global.lfo2Amp: 0
+      global.voiceDrift: 0
+      global.lfoDelay: 0
       global.modAttack: 1.5
       global.modDecay: 2
       global.modSustain: 0.5
@@ -1321,6 +1587,65 @@ programs:
       carriers.4: 0
       routes.4.5: 1
       carriers.5: 1
+      operators.6.ratio: 1
+      operators.6.fixed: 0
+      operators.6.detune: 0
+      operators.6.level: 1
+      operators.6.attack: 0.005
+      operators.6.decay1: 0.6
+      operators.6.peak: 1
+      operators.6.decay2: 2
+      operators.6.breakpoint: 0.5
+      operators.6.sustain: 0.3
+      operators.6.release: 0.8
+      operators.6.velocity: 0.5
+      operators.6.keyScale: 0
+      operators.6.rateScale: 0
+      operators.6.pressure: 0
+      operators.6.pan: 0
+      operators.6.enabled: 1
+      operators.6.wave: 0
+      operators.6.attackCurve: 1
+      operators.6.decayCurve: 1
+      operators.6.releaseCurve: 1
+      operators.6.legacyEnvelope: 0
+      operators.7.ratio: 1
+      operators.7.fixed: 0
+      operators.7.detune: 0
+      operators.7.level: 1
+      operators.7.attack: 0.005
+      operators.7.decay1: 0.6
+      operators.7.peak: 1
+      operators.7.decay2: 2
+      operators.7.breakpoint: 0.5
+      operators.7.sustain: 0.3
+      operators.7.release: 0.8
+      operators.7.velocity: 0.5
+      operators.7.keyScale: 0
+      operators.7.rateScale: 0
+      operators.7.pressure: 0
+      operators.7.pan: 0
+      operators.7.enabled: 1
+      operators.7.wave: 0
+      operators.7.attackCurve: 1
+      operators.7.decayCurve: 1
+      operators.7.releaseCurve: 1
+      operators.7.legacyEnvelope: 0
+      routes.0.6: 0
+      routes.0.7: 0
+      routes.1.6: 0
+      routes.1.7: 0
+      routes.2.6: 0
+      routes.2.7: 0
+      routes.3.6: 0
+      routes.3.7: 0
+      routes.4.6: 0
+      routes.4.7: 0
+      routes.5.6: 0
+      routes.5.7: 0
+      carriers.6: 0
+      routes.6.7: 1
+      carriers.7: 1
   - id: "6"
     name: Parallel drawbars
     values:
@@ -1343,6 +1668,12 @@ programs:
       global.pitchTime: 0.15
       global.tremolo: 0
       global.lfoIndex: 0
+      global.lfoShape: 0
+      global.lfo2Pitch: 0
+      global.lfo2Index: 0
+      global.lfo2Amp: 0
+      global.voiceDrift: 0
+      global.lfoDelay: 0
       global.modAttack: 1.5
       global.modDecay: 2
       global.modSustain: 0.5
@@ -1584,6 +1915,65 @@ programs:
       carriers.4: 1
       routes.4.5: 0
       carriers.5: 1
+      operators.6.ratio: 1
+      operators.6.fixed: 0
+      operators.6.detune: 0
+      operators.6.level: 1
+      operators.6.attack: 0.005
+      operators.6.decay1: 0.6
+      operators.6.peak: 1
+      operators.6.decay2: 2
+      operators.6.breakpoint: 0.5
+      operators.6.sustain: 0.3
+      operators.6.release: 0.8
+      operators.6.velocity: 0.5
+      operators.6.keyScale: 0
+      operators.6.rateScale: 0
+      operators.6.pressure: 0
+      operators.6.pan: 0
+      operators.6.enabled: 1
+      operators.6.wave: 0
+      operators.6.attackCurve: 1
+      operators.6.decayCurve: 1
+      operators.6.releaseCurve: 1
+      operators.6.legacyEnvelope: 0
+      operators.7.ratio: 1
+      operators.7.fixed: 0
+      operators.7.detune: 0
+      operators.7.level: 1
+      operators.7.attack: 0.005
+      operators.7.decay1: 0.6
+      operators.7.peak: 1
+      operators.7.decay2: 2
+      operators.7.breakpoint: 0.5
+      operators.7.sustain: 0.3
+      operators.7.release: 0.8
+      operators.7.velocity: 0.5
+      operators.7.keyScale: 0
+      operators.7.rateScale: 0
+      operators.7.pressure: 0
+      operators.7.pan: 0
+      operators.7.enabled: 1
+      operators.7.wave: 0
+      operators.7.attackCurve: 1
+      operators.7.decayCurve: 1
+      operators.7.releaseCurve: 1
+      operators.7.legacyEnvelope: 0
+      routes.0.6: 0
+      routes.0.7: 0
+      routes.1.6: 0
+      routes.1.7: 0
+      routes.2.6: 0
+      routes.2.7: 0
+      routes.3.6: 0
+      routes.3.7: 0
+      routes.4.6: 0
+      routes.4.7: 0
+      routes.5.6: 0
+      routes.5.7: 0
+      carriers.6: 0
+      routes.6.7: 1
+      carriers.7: 1
   - id: "7"
     name: Fixed orbit bells
     values:
@@ -1606,6 +1996,12 @@ programs:
       global.pitchTime: 0.15
       global.tremolo: 0
       global.lfoIndex: 0
+      global.lfoShape: 0
+      global.lfo2Pitch: 0
+      global.lfo2Index: 0
+      global.lfo2Amp: 0
+      global.voiceDrift: 0
+      global.lfoDelay: 0
       global.modAttack: 1.5
       global.modDecay: 2
       global.modSustain: 0.5
@@ -1847,6 +2243,65 @@ programs:
       carriers.4: 0
       routes.4.5: 0
       carriers.5: 0
+      operators.6.ratio: 1
+      operators.6.fixed: 0
+      operators.6.detune: 0
+      operators.6.level: 1
+      operators.6.attack: 0.005
+      operators.6.decay1: 0.6
+      operators.6.peak: 1
+      operators.6.decay2: 2
+      operators.6.breakpoint: 0.5
+      operators.6.sustain: 0.3
+      operators.6.release: 0.8
+      operators.6.velocity: 0.5
+      operators.6.keyScale: 0
+      operators.6.rateScale: 0
+      operators.6.pressure: 0
+      operators.6.pan: 0
+      operators.6.enabled: 1
+      operators.6.wave: 0
+      operators.6.attackCurve: 1
+      operators.6.decayCurve: 1
+      operators.6.releaseCurve: 1
+      operators.6.legacyEnvelope: 0
+      operators.7.ratio: 1
+      operators.7.fixed: 0
+      operators.7.detune: 0
+      operators.7.level: 1
+      operators.7.attack: 0.005
+      operators.7.decay1: 0.6
+      operators.7.peak: 1
+      operators.7.decay2: 2
+      operators.7.breakpoint: 0.5
+      operators.7.sustain: 0.3
+      operators.7.release: 0.8
+      operators.7.velocity: 0.5
+      operators.7.keyScale: 0
+      operators.7.rateScale: 0
+      operators.7.pressure: 0
+      operators.7.pan: 0
+      operators.7.enabled: 1
+      operators.7.wave: 0
+      operators.7.attackCurve: 1
+      operators.7.decayCurve: 1
+      operators.7.releaseCurve: 1
+      operators.7.legacyEnvelope: 0
+      routes.0.6: 0
+      routes.0.7: 0
+      routes.1.6: 0
+      routes.1.7: 0
+      routes.2.6: 0
+      routes.2.7: 0
+      routes.3.6: 0
+      routes.3.7: 0
+      routes.4.6: 0
+      routes.4.7: 0
+      routes.5.6: 0
+      routes.5.7: 0
+      carriers.6: 0
+      routes.6.7: 1
+      carriers.7: 1
   - id: "8"
     name: Four-op hollow reed
     values:
@@ -1869,6 +2324,12 @@ programs:
       global.pitchTime: 0.15
       global.tremolo: 0
       global.lfoIndex: 0
+      global.lfoShape: 0
+      global.lfo2Pitch: 0
+      global.lfo2Index: 0
+      global.lfo2Amp: 0
+      global.voiceDrift: 0
+      global.lfoDelay: 0
       global.modAttack: 1.5
       global.modDecay: 2
       global.modSustain: 0.5
@@ -2110,6 +2571,65 @@ programs:
       carriers.4: 0
       routes.4.5: 0
       carriers.5: 0
+      operators.6.ratio: 1
+      operators.6.fixed: 0
+      operators.6.detune: 0
+      operators.6.level: 1
+      operators.6.attack: 0.005
+      operators.6.decay1: 0.6
+      operators.6.peak: 1
+      operators.6.decay2: 2
+      operators.6.breakpoint: 0.5
+      operators.6.sustain: 0.3
+      operators.6.release: 0.8
+      operators.6.velocity: 0.5
+      operators.6.keyScale: 0
+      operators.6.rateScale: 0
+      operators.6.pressure: 0
+      operators.6.pan: 0
+      operators.6.enabled: 1
+      operators.6.wave: 0
+      operators.6.attackCurve: 1
+      operators.6.decayCurve: 1
+      operators.6.releaseCurve: 1
+      operators.6.legacyEnvelope: 0
+      operators.7.ratio: 1
+      operators.7.fixed: 0
+      operators.7.detune: 0
+      operators.7.level: 1
+      operators.7.attack: 0.005
+      operators.7.decay1: 0.6
+      operators.7.peak: 1
+      operators.7.decay2: 2
+      operators.7.breakpoint: 0.5
+      operators.7.sustain: 0.3
+      operators.7.release: 0.8
+      operators.7.velocity: 0.5
+      operators.7.keyScale: 0
+      operators.7.rateScale: 0
+      operators.7.pressure: 0
+      operators.7.pan: 0
+      operators.7.enabled: 1
+      operators.7.wave: 0
+      operators.7.attackCurve: 1
+      operators.7.decayCurve: 1
+      operators.7.releaseCurve: 1
+      operators.7.legacyEnvelope: 0
+      routes.0.6: 0
+      routes.0.7: 0
+      routes.1.6: 0
+      routes.1.7: 0
+      routes.2.6: 0
+      routes.2.7: 0
+      routes.3.6: 0
+      routes.3.7: 0
+      routes.4.6: 0
+      routes.4.7: 0
+      routes.5.6: 0
+      routes.5.7: 0
+      carriers.6: 0
+      routes.6.7: 1
+      carriers.7: 1
   - id: "9"
     name: Living glass
     values:
@@ -2132,6 +2652,12 @@ programs:
       global.pitchTime: 0.15
       global.tremolo: 0
       global.lfoIndex: 0.06
+      global.lfoShape: 0
+      global.lfo2Pitch: 0
+      global.lfo2Index: 0
+      global.lfo2Amp: 0
+      global.voiceDrift: 0
+      global.lfoDelay: 0
       global.modAttack: 2
       global.modDecay: 3
       global.modSustain: 0.4
@@ -2373,6 +2899,65 @@ programs:
       carriers.4: 0
       routes.4.5: 1
       carriers.5: 1
+      operators.6.ratio: 1
+      operators.6.fixed: 0
+      operators.6.detune: 0
+      operators.6.level: 1
+      operators.6.attack: 0.005
+      operators.6.decay1: 0.6
+      operators.6.peak: 1
+      operators.6.decay2: 2
+      operators.6.breakpoint: 0.5
+      operators.6.sustain: 0.3
+      operators.6.release: 0.8
+      operators.6.velocity: 0.5
+      operators.6.keyScale: 0
+      operators.6.rateScale: 0
+      operators.6.pressure: 0
+      operators.6.pan: 0
+      operators.6.enabled: 1
+      operators.6.wave: 0
+      operators.6.attackCurve: 1
+      operators.6.decayCurve: 1
+      operators.6.releaseCurve: 1
+      operators.6.legacyEnvelope: 0
+      operators.7.ratio: 1
+      operators.7.fixed: 0
+      operators.7.detune: 0
+      operators.7.level: 1
+      operators.7.attack: 0.005
+      operators.7.decay1: 0.6
+      operators.7.peak: 1
+      operators.7.decay2: 2
+      operators.7.breakpoint: 0.5
+      operators.7.sustain: 0.3
+      operators.7.release: 0.8
+      operators.7.velocity: 0.5
+      operators.7.keyScale: 0
+      operators.7.rateScale: 0
+      operators.7.pressure: 0
+      operators.7.pan: 0
+      operators.7.enabled: 1
+      operators.7.wave: 0
+      operators.7.attackCurve: 1
+      operators.7.decayCurve: 1
+      operators.7.releaseCurve: 1
+      operators.7.legacyEnvelope: 0
+      routes.0.6: 0
+      routes.0.7: 0
+      routes.1.6: 0
+      routes.1.7: 0
+      routes.2.6: 0
+      routes.2.7: 0
+      routes.3.6: 0
+      routes.3.7: 0
+      routes.4.6: 0
+      routes.4.7: 0
+      routes.5.6: 0
+      routes.5.7: 0
+      carriers.6: 0
+      routes.6.7: 1
+      carriers.7: 1
   - id: "10"
     name: Air choir
     values:
@@ -2395,6 +2980,12 @@ programs:
       global.pitchTime: 0.15
       global.tremolo: 0
       global.lfoIndex: 0
+      global.lfoShape: 0
+      global.lfo2Pitch: 0
+      global.lfo2Index: 0
+      global.lfo2Amp: 0
+      global.voiceDrift: 0
+      global.lfoDelay: 0
       global.modAttack: 1.5
       global.modDecay: 2
       global.modSustain: 0.5
@@ -2636,6 +3227,65 @@ programs:
       carriers.4: 0
       routes.4.5: 1
       carriers.5: 1
+      operators.6.ratio: 1
+      operators.6.fixed: 0
+      operators.6.detune: 0
+      operators.6.level: 1
+      operators.6.attack: 0.005
+      operators.6.decay1: 0.6
+      operators.6.peak: 1
+      operators.6.decay2: 2
+      operators.6.breakpoint: 0.5
+      operators.6.sustain: 0.3
+      operators.6.release: 0.8
+      operators.6.velocity: 0.5
+      operators.6.keyScale: 0
+      operators.6.rateScale: 0
+      operators.6.pressure: 0
+      operators.6.pan: 0
+      operators.6.enabled: 1
+      operators.6.wave: 0
+      operators.6.attackCurve: 1
+      operators.6.decayCurve: 1
+      operators.6.releaseCurve: 1
+      operators.6.legacyEnvelope: 0
+      operators.7.ratio: 1
+      operators.7.fixed: 0
+      operators.7.detune: 0
+      operators.7.level: 1
+      operators.7.attack: 0.005
+      operators.7.decay1: 0.6
+      operators.7.peak: 1
+      operators.7.decay2: 2
+      operators.7.breakpoint: 0.5
+      operators.7.sustain: 0.3
+      operators.7.release: 0.8
+      operators.7.velocity: 0.5
+      operators.7.keyScale: 0
+      operators.7.rateScale: 0
+      operators.7.pressure: 0
+      operators.7.pan: 0
+      operators.7.enabled: 1
+      operators.7.wave: 0
+      operators.7.attackCurve: 1
+      operators.7.decayCurve: 1
+      operators.7.releaseCurve: 1
+      operators.7.legacyEnvelope: 0
+      routes.0.6: 0
+      routes.0.7: 0
+      routes.1.6: 0
+      routes.1.7: 0
+      routes.2.6: 0
+      routes.2.7: 0
+      routes.3.6: 0
+      routes.3.7: 0
+      routes.4.6: 0
+      routes.4.7: 0
+      routes.5.6: 0
+      routes.5.7: 0
+      carriers.6: 0
+      routes.6.7: 1
+      carriers.7: 1
   - id: "11"
     name: Air reed
     values:
@@ -2658,6 +3308,12 @@ programs:
       global.pitchTime: 0.15
       global.tremolo: 0
       global.lfoIndex: 0
+      global.lfoShape: 0
+      global.lfo2Pitch: 0
+      global.lfo2Index: 0
+      global.lfo2Amp: 0
+      global.voiceDrift: 0
+      global.lfoDelay: 0
       global.modAttack: 1.5
       global.modDecay: 2
       global.modSustain: 0.5
@@ -2899,3 +3555,62 @@ programs:
       carriers.4: 0
       routes.4.5: 0
       carriers.5: 0
+      operators.6.ratio: 1
+      operators.6.fixed: 0
+      operators.6.detune: 0
+      operators.6.level: 1
+      operators.6.attack: 0.005
+      operators.6.decay1: 0.6
+      operators.6.peak: 1
+      operators.6.decay2: 2
+      operators.6.breakpoint: 0.5
+      operators.6.sustain: 0.3
+      operators.6.release: 0.8
+      operators.6.velocity: 0.5
+      operators.6.keyScale: 0
+      operators.6.rateScale: 0
+      operators.6.pressure: 0
+      operators.6.pan: 0
+      operators.6.enabled: 1
+      operators.6.wave: 0
+      operators.6.attackCurve: 1
+      operators.6.decayCurve: 1
+      operators.6.releaseCurve: 1
+      operators.6.legacyEnvelope: 0
+      operators.7.ratio: 1
+      operators.7.fixed: 0
+      operators.7.detune: 0
+      operators.7.level: 1
+      operators.7.attack: 0.005
+      operators.7.decay1: 0.6
+      operators.7.peak: 1
+      operators.7.decay2: 2
+      operators.7.breakpoint: 0.5
+      operators.7.sustain: 0.3
+      operators.7.release: 0.8
+      operators.7.velocity: 0.5
+      operators.7.keyScale: 0
+      operators.7.rateScale: 0
+      operators.7.pressure: 0
+      operators.7.pan: 0
+      operators.7.enabled: 1
+      operators.7.wave: 0
+      operators.7.attackCurve: 1
+      operators.7.decayCurve: 1
+      operators.7.releaseCurve: 1
+      operators.7.legacyEnvelope: 0
+      routes.0.6: 0
+      routes.0.7: 0
+      routes.1.6: 0
+      routes.1.7: 0
+      routes.2.6: 0
+      routes.2.7: 0
+      routes.3.6: 0
+      routes.3.7: 0
+      routes.4.6: 0
+      routes.4.7: 0
+      routes.5.6: 0
+      routes.5.7: 0
+      carriers.6: 0
+      routes.6.7: 1
+      carriers.7: 1
