@@ -934,7 +934,7 @@ test('Original generation reference fixtures', () => {
     const fixtures = ['4/4', '3/4', '6/8'].map((meter, index) => {
         const gen = new Generator({ ...defaultSettings(), generation: 'legacy', seed: 1234 + index, meter,
             drums: { style: 'lofi', activity: 0.5, variation: 0.5, sprinkle: 0.35, kit: 'felt' }, sections: { mode: 'strong', phrases: 2 } });
-        return fingerprint(play(gen, 48).map(b => ({ events: b.events, chord: b.chord, section: b.state.phrase.section })));
+        return fingerprint(play(gen, 48).map(b => ({ events: b.events.map(({chordSource,...event})=>event), chord: b.chord, section: b.state.phrase.section })));
     });
     // (6/8 changed with its pace, meter.js)
     expect(fixtures).toEqual(['5b9bc750', 'ed5448a7', '692f3d06']);
@@ -972,7 +972,7 @@ test('previous Latest reference for ensemble comparisons', () => {
     const fingerprints=['4/4','6/8'].map((meter,i)=>{
         const gen=new Generator({...defaultSettings(),generation:'latest',seed:741+i,meter,leadActivity:.8,drums:{style:'lofi',activity:.5,variation:.5,sprinkle:.35,kit:'felt'}});
         gen.registerLevel=false;gen.gateEnvelopes=false;gen.noteConnection=false;gen.heldExpression=false;gen.noteExpression=false;gen.rhythmGrammar=false;gen.ensembleCoordination=false;gen.formDevelopment=false;gen.themeDevelopment=false;gen.phraseSearch=false;gen.longPhrases=false;gen.contrastPhrases=false;gen.padVariation=false;gen.reset();
-        let h=2166136261;for(const c of JSON.stringify(play(gen,32).map(b=>b.events)))h=Math.imul(h^c.charCodeAt(0),16777619);
+        let h=2166136261;for(const c of JSON.stringify(play(gen,32).map(b=>b.events.map(({chordSource,...event})=>event))))h=Math.imul(h^c.charCodeAt(0),16777619);
         return(h>>>0).toString(16);
     });
     // (6/8 changed with its pace, meter.js)

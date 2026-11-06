@@ -23,11 +23,13 @@ export function splitHarmony(events, { at, chord, meter }) {
             // a bass approach into the next bar keeps its pitch
             if (bass && e.beat > at + EPS && e.beat >= meter.units - meter.unitsPerBeat) continue;
             const target = bass && Math.abs(e.beat - at) < EPS ? [root] : pcs;
-            if (e.beat >= at - EPS) { e.midi = nearest(e.midi, target); continue; }
+            if (e.beat >= at - EPS) { e.midi = nearest(e.midi, target); if (!bass) delete e.chordSource; continue; }
             if (end <= at + 0.1 || (!bass && pcs.includes(pc(e.midi)))) continue;
             // sounding across the split: ends there, and the new chord's tone starts
             e.length = Math.max(0.05, at - e.beat - 0.05);
-            added.push({ ...e, beat: at, length: end - at, midi: nearest(e.midi, bass ? [root] : pcs), velocity: e.velocity * 0.9 });
+            const next = { ...e, beat: at, length: end - at, midi: nearest(e.midi, bass ? [root] : pcs), velocity: e.velocity * 0.9 };
+            if (!bass) delete next.chordSource;
+            added.push(next);
         } else if ((e.role === 'lead' || e.role === 'counter') && e.beat >= at - EPS && clashes(e.midi, pcs)) {
             e.midi = nearest(e.midi, pcs);
         }

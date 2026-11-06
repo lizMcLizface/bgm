@@ -211,6 +211,47 @@ test('pause keeps the place and resume goes on from it', () => {
     expect(s.paused).toBe(false);
 });
 
+test('repositioning a running scheduler preserves the audio-clock step timing', () => {
+    const clock = fakeClock(), booked = [];
+    let b = bank({ patterns: [{ rows: [row(0)] }], lengths: [4], tempos: [0], chain: [0], current: 0 });
+    const s = createScheduler({ now: () => clock.t, bank: () => b, tempo: () => 240, swing: () => 0.5, flam: () => 0.5, emit: () => {}, onStep: (info) => booked.push(info), timers: clock.timers });
+    s.start(0, 'pattern');
+    expect(s.position.step).toBe(2);
+    b = bank({ chain: [0, 1] });
+    s.reposition({ pattern: 1, step: 5 }, 'song');
+    clock.advance(0.2);
+    expect(booked[2]).toMatchObject({ pattern: 1, step: 5 });
+    expect(booked[2].time - booked[1].time).toBeCloseTo(60 / 240 / 4);
+    expect(s.running).toBe(true);
+    clock.advance(1);
+    expect(booked.find(info => info.pattern === 0 && info.time > booked[2].time)).toMatchObject({ pattern: 0, step: 0 });
+    s.stop();
+});
+
+test('repositioning a paused scheduler resumes at the requested step', () => {
+    const clock = fakeClock(), booked = [];
+    const s = scheduler(clock, bank({chain:[0,1]}), booked);
+    s.start(0, 'pattern');
+    s.pause();
+    s.reposition({pattern:1,step:5}, 'song');
+    expect(s.paused).toBe(true);
+    const before = booked.length;
+    s.resume(0);
+    expect(booked[before]).toMatchObject({pattern:1,step:5});
+    s.stop();
+    expect(() => s.reposition({pattern:0,step:0}, 'pattern')).toThrow('Cannot reposition a stopped scheduler');
+});
+
+test('repositioning to step zero does not report a pending wrap', () => {
+    const clock = fakeClock(), booked = [];
+    const s = scheduler(clock, bank({lengths:[2,16]}), booked);
+    s.start(0, 'pattern');
+    expect(s.position.wrapped).toBe(true);
+    s.reposition({pattern:0,step:0}, 'pattern');
+    expect(s.position.wrapped).toBe(false);
+    s.stop();
+});
+
 test('while stopped, stepping walks the pattern a step at a time, forward and back', () => {
     const clock = fakeClock(), booked = [];
     const s = scheduler(clock, bank(), booked);

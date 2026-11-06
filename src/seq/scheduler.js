@@ -27,7 +27,7 @@ import { stepEvents } from './core';
 const hasNotes = (p) => { const rows = Array.isArray(p) ? p : p?.rows; return !Array.isArray(rows) || rows.some((r) => !Array.isArray(r) || r.some(Boolean)); };
 
 export function createScheduler({ now, bank, pattern = (p) => p, events: makeEvents = stepEvents, tempo, swing, flam, fill = () => false, emit, onStep, clock = null, onEnd, lookahead = 0.12, interval = 25, timers = { set: (fn, ms) => setInterval(fn, ms), clear: (id) => clearInterval(id) } }) {
-    let timer = null, nextTime = 0, step = 0, slot = 0, current = 0, count = 0, songAt = 0, rep = 0, primed = false, paused = false, scope = 'song', songValid = false;
+    let timer = null, nextTime = 0, step = 0, slot = 0, current = 0, count = 0, songAt = 0, rep = 0, primed = false, paused = false, scope = 'song', songValid = false, wrapped = false;
     // Song mode: the bank's song is a list of { p: pattern, n: repeats }; it replaces the chain while bank.songOn is set
     const songMode = (b) => scope === 'song' && !!(b.songOn && b.song?.length);
     // the blocks the song plays between: all of them, or the loop region the bank names (loopIn..loopOut)
@@ -43,7 +43,7 @@ export function createScheduler({ now, bank, pattern = (p) => p, events: makeEve
     };
     // the end of a pattern: on to the next repeat, block or pattern. False when a song that does not loop has ended.
     const wrap = () => {
-        step = 0; slot++;
+        step = 0; slot++; wrapped = true;
         const after = bank();
         if (songMode(after)) {
             rep++;
@@ -78,31 +78,54 @@ export function createScheduler({ now, bank, pattern = (p) => p, events: makeEve
         const info = { pattern: current, step, time: nextTime, count, song: songMode(b) ? { index: songAt, rep } : null };
         if (events.length) emit(events, info);
         onStep?.(info);
-        nextTime += stepSec; count++;
+        nextTime += stepSec; count++; wrapped = false;
         if (++step >= len) wrap();
     };
     // the song ended (loop off): stop booking; the host stops its transport when the last step has sounded
     const endSong = () => { if (timer !== null) { timers.clear(timer); timer = null; } primed = false; paused = false; songValid = false; clock?.halt(now(), { forget: true }); onEnd?.({ time: nextTime }); };
     const tick = () => { const horizon = now() + lookahead; while (timer !== null && nextTime < horizon) playStep(); };
     const prime = () => {
-        step = 0; slot = 0; count = 0; clock?.reset();
+        step = 0; slot = 0; count = 0; wrapped = false; clock?.reset();
         const first = bank();
         // the song's place is kept while the pattern alone is played and through a stop from the sequencer; a stop from the arranger rewinds it
         if (!songValid) { rep = 0; songAt = first.song?.length ? firstBlock(first) : 0; songValid = true; }
         current = choose(true); primed = true;
     };
     const run = (delay) => { nextTime = now() + delay; timer = timers.set(tick, interval); tick(); };
+    const setPosition = (position, nextScope) => {
+        const b = bank(), index = position.pattern;
+        if (!Number.isInteger(index) || index < 0 || index >= b.patterns.length || !Number.isInteger(position.step) || position.step < 0 || position.step >= b.lengths[index]) {
+            throw new Error('Invalid scheduler start position');
+        }
+        const block = nextScope === 'song' && b.songOn && b.song?.length ? b.song.findIndex(x => x.p === index) : null;
+        const chainSlot = nextScope === 'song' && block === null && b.chain.length ? b.chain.indexOf(index) : null;
+        if (block === -1) throw new Error('Pattern is not in the song');
+        if (chainSlot === -1) throw new Error('Pattern is not in the chain');
+        scope = nextScope;
+        if (block !== null) { songAt = block; rep = 0; }
+        if (chainSlot !== null) slot = chainSlot;
+        current = index; step = position.step; wrapped = false;
+    };
     return {
         get running() { return timer !== null; },
         get scope() { return scope; },
         setScope(next) { scope = next === 'pattern' ? 'pattern' : 'song'; },
         get paused() { return primed && timer === null && paused; },
-        /** Where the next step will be played: { pattern, step, block, rep }. */
-        get position() { return { pattern: current, step, block: songAt, rep }; },
-        start(delay = 0.06, startScope = 'song') {
+        /** Where the next step will be played; wrapped indicates a pending loop boundary. */
+        get position() { return { pattern: current, step, block: songAt, rep, wrapped }; },
+        start(delay = 0.06, startScope = 'song', position = null) {
             if (timer !== null) return;
             scope = startScope === 'pattern' ? 'pattern' : 'song';
-            prime(); paused = false; run(delay);
+            prime();
+            if (position) {
+                try { setPosition(position, scope); } catch (error) { primed = false; throw error; }
+            }
+            paused = false; run(delay);
+        },
+        /** Change the next unbooked step without changing the audio-clock schedule or paused state. */
+        reposition(position, nextScope = scope) {
+            if (!primed) throw new Error('Cannot reposition a stopped scheduler');
+            setPosition(position, nextScope === 'pattern' ? 'pattern' : 'song');
         },
         pause() { if (timer === null) return; timers.clear(timer); timer = null; paused = true; clock?.halt(now()); },
         resume(delay = 0.06) { if (timer !== null || !primed) return; paused = false; run(delay); },
@@ -112,6 +135,7 @@ export function createScheduler({ now, bank, pattern = (p) => p, events: makeEve
             if (!primed) prime();
             const len = lengthOf();
             if (running) {
+                wrapped = false;
                 if (delta > 0) { step++; if (step >= len) wrap(); } else step = (step - 1 + len) % len;
                 return;
             }
@@ -123,8 +147,8 @@ export function createScheduler({ now, bank, pattern = (p) => p, events: makeEve
         gotoBlock(i) {
             const b = bank();
             if (!primed || !songMode(b)) return;
-            songAt = Math.max(0, Math.min(i, b.song.length - 1)); rep = 0; step = 0; current = choose();
+            songAt = Math.max(0, Math.min(i, b.song.length - 1)); rep = 0; step = 0; wrapped = false; current = choose();
         },
-        gotoPattern(p) { if (primed) { step = 0; current = p; } },
+        gotoPattern(p) { if (primed) { step = 0; wrapped = false; current = p; } },
     };
 }

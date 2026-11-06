@@ -489,7 +489,7 @@ const bounce = (i, n) => {
 };
 
 // Alberti-style order over n voices: low, top, next, top, ... (0,2,1,2).
-function brokenOrder(n) {
+export function brokenOrder(n) {
     if (n < 3) return [...Array(n).keys()];
     const order = [0];
     for (let i = 1; i < n - 1; i++) order.push(n - 1, i);
@@ -789,6 +789,7 @@ export function arrangeBar({ bar, meter, chord, nextChord, scalePcs, chordStart,
             range,
             swell: padSwell(padMotionOf(settings).swell, bar - phrase.start),
         });
+        for (const event of events) event.chordSource = { root: chord.pitchClasses[0], style, pattern, step };
         return { voicing, events };
     };
     const layers = phrase.layers ?? 'combined';

@@ -21,6 +21,11 @@ describe('note steps', () => {
         const cut = pattern([{ n: [{ d: 0 }], len: 4 }, null, { n: [{ d: 1 }] }, null], { gate: 1 });
         expect(heldSteps(cut, 0)).toBe(2);
     });
+    it('holds individual notes independently across other onsets', () => {
+        const p = pattern([{ n: [{ d: 0, len: 4 }, { d: 2, len: 2 }] }, { n: [{ d: 4 }] }, null, null], { gate: 1 });
+        expect(noteStepEvents(p, 0, ctx).map(e => [e.note, e.duration])).toEqual([[60, 2], [64, 1]]);
+        expect(noteStepEvents(p, 1, ctx)[0].note).toBe(67);
+    });
     it('are shifted by the pattern\'s octave and fitted into its range, notes together', () => {
         const p = pattern([{ n: [{ d: 0 }, { d: 2 }, { d: 4 }] }], { octave: -2, range: [48, 72] });
         expect(noteStepEvents(p, 0, ctx).map((e) => e.note)).toEqual([48, 52, 55]);

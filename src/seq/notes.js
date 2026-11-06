@@ -5,6 +5,7 @@
 // of harmony.js), with
 //   vel 0..1, gate 0..1 (of the step; the pattern's by default), len (steps held: a tie, ended by the next step), nudge (-0.5..0.5 of a step), strum (-1..1: the notes begin one
 //   after the other, low to high when positive, high to low when negative, over that share of the step), rept (1..8 repeats within the step), prob (0..1), cond (core.js conditions).
+// Individual notes may also have `len`, an independent duration that is not cut by other steps.
 // An event is { track, time, note, duration, velocity, params }, one per sounding note; times are seconds on the caller's clock.
 import { conditionHolds, swingDelay } from './core';
 import { chordTones, fitToRange, harmonyFromPattern, resolveNote } from './harmony';
@@ -35,20 +36,27 @@ export function stepPitches(pattern, step, { key, harmony = null, harmonyStep = 
 export function noteStepEvents(pattern, step, { time, stepSec, swing = 0.5, cycle = 0, fill = false, key, harmony = null, harmonyStep = step, track = 0, random = Math.random }) {
     const s = pattern.steps[step];
     if (!s) return [];
-    if (s.prob !== undefined && random() >= s.prob) return [];
+    const individualChance = !!s.n?.some(note => note.prob !== undefined);
+    if (!individualChance && s.prob !== undefined && random() >= s.prob) return [];
     if (!conditionHolds(s.cond, cycle, fill)) return [];
     const pitches = stepPitches(pattern, step, { key, harmony, harmonyStep });
     if (!pitches.length) return [];
     const rept = clamp(Math.round(s.rept ?? 1), 1, MAX_REPT), held = rept > 1 ? 1 : heldSteps(pattern, step);
     const gate = clamp(s.gate ?? pattern.gate ?? 0.8, 0.05, 1), velocity = clamp(s.vel ?? 0.8, 0.02, 1);
     const start = time + swingDelay(step, stepSec, swing) + (s.nudge ?? 0) * stepSec;
-    const sub = stepSec / rept, duration = rept > 1 ? gate * sub : (held - 1) * stepSec + gate * stepSec;
-    const strum = clamp(s.strum ?? 0, -1, 1), spread = Math.abs(strum) * stepSec * 0.9, ordered = strum < 0 ? [...pitches].reverse() : pitches;
+    const sub = stepSec / rept;
+    const strum = clamp(s.strum ?? 0, -1, 1), spread = Math.abs(strum) * stepSec * 0.9;
+    const ordered = pitches.map((note, i) => ({ note, data: s.chord ? null : s.n?.[i], len: s.chord ? held : Math.max(1, Math.round(s.n?.[i]?.len ?? held)) }));
+    if (strum < 0) ordered.reverse();
     const events = [];
     for (let r = 0; r < rept; r++) {
-        ordered.forEach((note, i) => {
+        ordered.forEach(({ note, len, data }, i) => {
+            const chance = individualChance ? (data?.prob ?? s.prob) : undefined;
+            if (chance !== undefined && random() >= chance) return;
             const offset = ordered.length > 1 ? (spread * i) / (ordered.length - 1) : 0;
-            events.push({ track, time: start + r * sub + offset, note, duration: Math.max(0.01, duration - offset), velocity, params: {} });
+            const noteGate = clamp(data?.gate ?? gate, 0.05, 1), noteVelocity = clamp(data?.vel ?? velocity, 0.02, 1);
+            const duration = rept > 1 ? noteGate * sub : (len - 1) * stepSec + noteGate * stepSec;
+            events.push({ track, time: start + r * sub + offset, note, duration: Math.max(0.01, duration - offset), velocity: noteVelocity, params: {} });
         });
     }
     return events;

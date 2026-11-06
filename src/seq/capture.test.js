@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { capturePattern, captureChords, captureProject, NOTE_ROLES } from './capture';
+import { capturePattern, captureChords, captureDrums, captureProgressions, captureProject, NOTE_ROLES } from './capture';
 import { makeKey, degreeToMidi } from './harmony';
 
 const key = makeKey('Major-1', 0);
@@ -36,5 +36,22 @@ describe('capture', () => {
         expect(project.bars).toBe(1);
         expect(NOTE_ROLES).not.toContain('perc');
         expect(captureProject([])).toBeNull();
+    });
+    it('captures each progression cycle as a bar range, including repeated chords at cycle boundaries', () => {
+        const records = [
+            { ...rec([]), music: { ...rec([]).music, cycleStart: 0 } },
+            { ...rec([], { name: 'G', numeral: 'V' }), music: { ...rec([]).music, cycleStart: 0 } },
+            { ...rec([], { name: 'G', numeral: 'V' }), music: { ...rec([]).music, cycleStart: 2 } },
+        ];
+        expect(captureProgressions(records)).toEqual([
+            { startBar: 0, bars: 2, chords: [{ bar: 0, name: 'C', numeral: 'I' }, { bar: 1, name: 'G', numeral: 'V' }] },
+            { startBar: 2, bars: 1, chords: [{ bar: 0, name: 'G', numeral: 'V' }] },
+        ]);
+    });
+    it('captures simultaneous percussion as drum hits rather than pitched notes', () => {
+        const records=[rec([ev('perc',0,1,0.5,0.7),{...ev('perc',4,1,0.25,0.6),track:'ch'},ev('perc',99,1)])];
+        const drums=captureDrums(records,{stepsPerBar:16});
+        expect(drums.steps[4].hits).toEqual([{drum:0,velocity:0.7,duration:2},{drum:4,velocity:0.6,duration:1,track:'ch'}]);
+        expect(captureProject(records).patterns.perc).toEqual(drums);
     });
 });

@@ -1,0 +1,156 @@
+import React from 'react';
+import GridControls from './GridControls';
+import {noteName} from '../../labs/Piano';
+import {getIntervalColor} from '../../labs/piano/intervals';
+import {DRUMS,DRUM_LABELS} from '../../app/percussion';
+import {soundingNotes} from './gridTiming';
+import {chordRoot} from './chordEditing';
+import {generatedChords,placedChordTones} from './placedChords';
+import {degreeToMidi} from '../../seq/harmony';
+
+const mod=(n,m)=>((n%m)+m)%m;
+const intervalNames=['Root','Minor second','Major second','Minor third','Major third','Perfect fourth','Diminished fifth','Perfect fifth','Minor sixth','Major sixth','Minor seventh','Major seventh'];
+const pitchName=pc=>noteName(60+mod(pc,12)).replace(/\d+$/,'');
+const pitchColour=(pc,chord,key,colour)=>{
+ const root=chordRoot(chord)??key.tonic;
+ const scale=chord?.scalePcs??key.scale.map(n=>mod(key.tonic+n,12));
+ return chord?.pitchClasses?.includes(pc)?getIntervalColor(pc-root):scale.includes(pc)?getIntervalColor(pc-(scale[0]??key.tonic)):colour;
+};
+const octaveColour=(colour,difference)=>{
+ if(!difference)return colour;
+ const value=difference<0?Math.max(.35,1+difference*.18):Math.min(.6,difference*.18);
+ const rgb=colour.match(/^#([0-9a-f]{6})$/i);
+ if(!rgb)return colour;
+ const n=parseInt(rgb[1],16),channels=[n>>16,(n>>8)&255,n&255];
+ const mixed=channels.map(c=>Math.round(difference<0?c*value:c+(255-c)*value));
+ return `#${mixed.map(c=>c.toString(16).padStart(2,'0')).join('')}`;
+};
+
+/** Scale and non-scale pitches keep their order regardless of chord selection. */
+export function pitchClasses(key, offScale) {
+ const scale=key.scale.map(n=>mod(key.tonic+n,12));
+ if(!offScale)return scale;
+ return Array.from({length:12},(_,i)=>mod(key.tonic+i,12)).filter(pc=>!scale.includes(pc));
+}
+
+export default function ProgressionGrid({project,pattern,part,colour,offset,onOffset,headRef,view,offScale,onOffScale,octave,onOctave,octaveFilter=null,shiftHeld=false,onFilterOctave=()=>{},pitch,onPitch,onToggleNote,drumMode=false,drumOffset=0,onDrumOffset,onToggleDrum,stepSize=1,focus=null,onFocus=()=>{},onShiftChord=()=>{},chordMode=false,deleteMode=false,editMode=false,copyMode=false,onEditPad=()=>{},onCopyPad=()=>{},onChordPad=()=>{},onDeletePad=()=>{},selectedPlaced=null,selectedDelete=null,selectedEdit=[]}) {
+ const drag=React.useRef(null),suppressClick=React.useRef(false);
+ const [preview,setPreview]=React.useState(null);
+ React.useEffect(()=>()=>{if(drag.current)clearTimeout(drag.current.hold);},[]);
+ const start=part.startBar*project.stepsPerBar, end=(part.startBar+part.bars)*project.stepsPerBar;
+ const max=Math.max(start,end-16*stepSize), at=Math.min(max,Math.max(start,start+Math.floor((offset-start)/stepSize)*stepSize));
+ const chords=project.chords.filter(c=>c.bar<part.startBar+part.bars);
+ const focusChord=chords.find(c=>c.bar===focus);
+ const pcs=pitchClasses(project.key,offScale);
+ const chosenPitch=pcs.includes(pitch)?pitch:pcs[0];
+ const steps=Array.from({length:16},(_,i)=>at+i*stepSize);
+ const generated=chordMode?generatedChords(pattern,project.key):[];
+ const placedByStep=steps.map(step=>[...(pattern?.chords??[]),...generated].filter(c=>c.start<Math.min(end,step+stepSize)&&c.start+c.len>step).map(c=>({...c,rootMidi:degreeToMidi(project.key,c.root),tones:placedChordTones(project.key,c)})));
+ const notesByStep=steps.map((step,i)=>{
+  if(step>=end)return [];
+  const notes=soundingNotes(pattern,step,Math.min(end,step+stepSize),project.key);
+  if(!chordMode)for(const chord of placedByStep[i]){
+   notes.push(...chord.tones.map(midi=>({midi,start:chord.start,end:chord.start+chord.len})));
+  }
+  return notes;
+ });
+ const maxDrumOffset=Math.max(0,DRUMS.length-8), drumAt=Math.min(maxDrumOffset,drumOffset);
+ const chordAt=step=>[...chords].reverse().find(c=>c.bar*project.stepsPerBar<=step);
+ const labelRoot=chordRoot(focusChord)??project.key.tonic;
+ const labelColour=pc=>offScale?colour:getIntervalColor(pc-labelRoot);
+ const interval=pc=>intervalNames[mod(pc-labelRoot,12)];
+ const spans=chords.map((chord,i)=>({chord,start:Math.max(at,chord.bar*project.stepsPerBar),end:Math.min(at+16*stepSize,end,(chords[i+1]?.bar??part.startBar+part.bars)*project.stepsPerBar)})).filter(s=>s.start<s.end);
+ const gridView=chordMode?'octave':view;
+ const labels=Array.from({length:8},(_,row)=>{
+  if(drumMode){
+   const drum=DRUMS[drumAt+row];
+   return drum?{top:DRUM_LABELS[drum].toUpperCase(),bottom:`DRUM ${drumAt+row+1}`,short:String(drumAt+row+1),press:()=>{}}:null;
+  }
+  if(row===7)return chordMode?{top:'CHORD ROOT',bottom:'PROGRESSION',short:'♪',disabled:true}:{top:'PITCH SET',bottom:offScale?'OFF SCALE':'SCALE',short:offScale?'♯':'♪',active:offScale,press:()=>onOffScale(!offScale)};
+  if(chordMode)return {top:`OCTAVE ${8-row}`,bottom:'PROGRESSION ROOT',short:String(8-row),disabled:true};
+  if(gridView==='scale'){
+   const n=8-row;
+   const pc=pcs[pcs.length-1-row];
+   return {top:pc===undefined?'—':pitchName(pc),bottom:pc===undefined?'—':interval(pc),short:String(n),pc,active:octave===n,press:()=>onOctave(n)};
+  }
+  const pc=pcs[pcs.length-1-row];
+  return pc===undefined?{top:`OCTAVE ${8-row}`,bottom:'—',short:'—',disabled:true}:{top:`OCTAVE ${8-row}`,bottom:`${pitchName(pc)} · ${interval(pc)}`,short:pitchName(pc),pc,active:chosenPitch===pc,press:()=>onPitch(pc)};
+ });
+ const lanePc=row=>pcs[pcs.length-1-row];
+ const laneOctave=row=>8-row;
+ const sounding=(index,row)=>{
+  return notesByStep[index].filter(({midi})=>{
+   const noteOctave=Math.floor(midi/12)-1;
+   return gridView==='scale'?mod(midi,12)===lanePc(row)&&(octaveFilter===null||noteOctave===octaveFilter):noteOctave===laneOctave(row);
+  });
+ };
+ const dragColumn=(e,d)=>{
+  const rect=d.grid.getBoundingClientRect();
+  if(!rect.width)return d.current;
+  return Math.max(0,Math.min(15,Math.ceil((end-at)/stepSize)-1,Math.floor((e.clientX-rect.left)*16/rect.width)));
+ };
+ const dragDown=(e,row,i,midi)=>{
+  if(e.button!==0||drag.current)return;
+  suppressClick.current=false;
+  const d={id:e.pointerId,row,start:i,current:i,midi,grid:e.currentTarget.parentElement,moved:false};
+  drag.current=d;
+  if(deleteMode)d.hold=setTimeout(()=>{if(drag.current!==d)return;d.deleted=true;suppressClick.current=true;onDeletePad(at+i*stepSize,Math.min(end,at+(i+1)*stepSize),row,true);},600);
+  e.currentTarget.setPointerCapture?.(e.pointerId);
+ };
+ const dragMove=e=>{
+  const d=drag.current;if(!d||d.id!==e.pointerId)return;
+  const col=dragColumn(e,d);
+  if(col!==d.start){d.moved=true;clearTimeout(d.hold);}
+  d.current=col;
+  if(d.moved)setPreview({row:d.row,from:Math.min(d.start,col),to:Math.max(d.start,col)});
+ };
+ const dragEnd=(e,cancelled=false)=>{
+  const d=drag.current;if(!d||d.id!==e.pointerId)return;
+  drag.current=null;clearTimeout(d.hold);setPreview(null);
+  if(d.moved){suppressClick.current=true;if(!cancelled&&!deleteMode&&!editMode&&!copyMode){const col=dragColumn(e,d),from=at+Math.min(d.start,col)*stepSize,to=Math.min(end,at+(Math.max(d.start,col)+1)*stepSize);if(chordMode)onChordPad(from,to,d.row,true);else onToggleNote(from,d.midi,to,true);}}
+ };
+ return <section className="group wide seq-grid lane-grid progression-grid" aria-label="Progression editor">
+  <GridControls horizontal={{label:'Page',display:`${(at-start)/stepSize+1}–${Math.ceil((Math.min(end,at+16*stepSize)-start)/stepSize)}`,position:max>start?(at-start)/(max-start):0,step:max>start?Math.min(1,4*stepSize/(max-start)):0.1,disabled:max===start,onPosition:p=>onOffset(Math.min(max,start+Math.round(p*(max-start)/stepSize)*stepSize)),onReset:()=>onOffset(start)}}
+   vertical={{label:'Voices',display:drumMode?`${drumAt+1}–${Math.min(DRUMS.length,drumAt+8)}`:'—',position:drumMode?drumAt/maxDrumOffset:0,step:1/maxDrumOffset,disabled:!drumMode,onPosition:p=>onDrumOffset(Math.round(p*maxDrumOffset)),onReset:()=>onDrumOffset(0)}}/>
+  <div className="grid-display progression-ruler" aria-label="Chord timeline">
+   {spans.map(({chord,start:from,end:to})=><button type="button" key={chord.bar} onClick={e=>{if(shiftHeld||e.shiftKey)onShiftChord(chord.bar);else onFocus(focus===chord.bar?null:chord.bar);}} aria-pressed={focus===chord.bar} aria-label={`Focus chord ${chord.name}, bar ${chord.bar+1}`}
+    className={'chord-span'+(focus===chord.bar?' focused':'')} style={{left:`${(from-at)*100/(16*stepSize)}%`,width:`${(to-from)*100/(16*stepSize)}%`}}><b>{chord.name}</b></button>)}
+   {steps.map((step,i)=>step<end&&step%project.stepsPerBar===0?<span key={step} className="bar-tick" style={{left:`${i*100/16}%`}}><small>{Math.floor(step/project.stepsPerBar)-part.startBar+1}</small></span>:null)}
+  </div>
+  <div className="seq-info">
+   {labels.map((l,i)=>l?<span className={'lane-info'+(!drumMode&&gridView==='octave'&&l.pc!==undefined?' octave-label':'')} key={i} style={{'--voice':l.pc===undefined?colour:labelColour(l.pc)}}><b>{l.top}</b><i>{l.bottom}</i></span>:<span className="lane-info empty" key={i}/>)}
+  </div>
+  <div className="seq-names">
+   {labels.map((l,i)=>l?<button type="button" key={i} className={'seq-name'+((!chordMode&&view==='scale'&&octaveFilter!==null&&i!==7?octaveFilter===8-i:l.active)?' on':'')} style={{'--voice':!drumMode&&gridView==='octave'&&l.pc!==undefined?labelColour(l.pc):colour}} aria-label={drumMode?`Audition ${DRUM_LABELS[DRUMS[drumAt+i]]}`:chordMode?i===7?'Progression chord root':`Chord octave ${8-i}`:i===7?'Toggle off-scale notes':view==='scale'?`Select octave ${8-i}`:`Select ${l.short}`} disabled={l.disabled} aria-pressed={!!(!chordMode&&view==='scale'&&octaveFilter!==null&&i!==7?octaveFilter===8-i:l.active)} onClick={e=>{if(drumMode)onToggleDrum(null,drumAt+i);else if(!chordMode&&view==='scale'&&i!==7&&(shiftHeld||e.shiftKey))onFilterOctave(8-i);else l.press();}}>{l.short}</button>:<span className="seq-name empty" key={i}/>)}
+  </div>
+  <div className="seq-cells" ref={headRef} style={{'--rows':8,'--off':at/stepSize,'--step-size':stepSize}}>
+   {Array.from({length:8},(_,row)=>steps.map((step,i)=>{
+    const pc=lanePc(row), oct=laneOctave(row);
+    if(drumMode){
+     const drum=drumAt+row, name=DRUMS[drum];
+     if(step>=end||!name)return <span key={`${row}-${i}`} className="cell void" aria-hidden="true"/>;
+     const active=!!pattern?.steps.slice(step,Math.min(end,step+stepSize)).some(s=>s?.hits?.some(hit=>hit.drum===drum));
+     return <button type="button" key={`${row}-${i}`} className={'cell'+(active?' on':'')+(step%project.stepsPerBar===0?' beat':'')} style={{'--voice':colour}} aria-label={`${DRUM_LABELS[name]} step ${(step-start)/stepSize+1}`} aria-pressed={active} onClick={()=>onToggleDrum(step,drum,Math.min(end,step+stepSize))}/>;
+    }
+    if(step>=end||!project.key||(gridView==='scale'&&pc===undefined&&row!==7))return <span key={`${row}-${i}`} className="cell void" aria-hidden="true"/>;
+    if(row===7){
+     const scale=new Set(project.key.scale.map(n=>mod(project.key.tonic+n,12)));
+     const hasOff=notesByStep[i].some(n=>!scale.has(mod(n.midi,12))&&(gridView!=='scale'||octaveFilter===null||Math.floor(n.midi/12)-1===octaveFilter));
+     return <span key={`${row}-${i}`} className={'cell off-indicator'+(hasOff?' on':'')} style={{'--voice':colour}} role="img" aria-label={`Step ${(step-start)/stepSize+1}: ${hasOff?'contains':'no'} off-scale notes`}/>;
+    }
+    const midi=gridView==='scale'?12*(octave+1)+pc:12*(oct+1)+chosenPitch;
+    const placed=placedByStep[i].filter(item=>(chordMode?[item.rootMidi]:item.tones).some(midi=>gridView==='scale'?mod(midi,12)===pc&&(octaveFilter===null||Math.floor(midi/12)-1===octaveFilter):Math.floor(midi/12)-1===oct));
+    const notes=sounding(i,row), chord=chordAt(step);
+    const colours=[...new Set([...notes.map(note=>octaveColour(pitchColour(mod(note.midi,12),chord,project.key,colour),gridView==='scale'?Math.floor(note.midi/12)-1-octave:0)),...(chordMode?placed.map(item=>pitchColour(mod(item.rootMidi,12),chord,project.key,colour)):[])])];
+    const held=(notes.length>0||placed.length>0)&&notes.every(note=>note.start<step)&&placed.every(note=>note.start<step);
+    const paint=colours.length>1?`linear-gradient(90deg,${colours.map((c,j)=>`${c} ${j*100/colours.length}% ${(j+1)*100/colours.length}%`).join(',')})`:undefined;
+    const previewed=preview?.row===row&&i>=preview.from&&i<=preview.to;
+    return <button type="button" key={`${row}-${i}`} className={'cell note-cell'+(notes.length||placed.length?' on':'')+(held?' held':'')+(placed.some(x=>x.id===selectedPlaced)||selectedDelete?.row===row&&selectedDelete.start===step||selectedEdit.some(x=>x.row===row&&x.step===step)?' picked':'')+(previewed?' drag-preview':'')+(step%project.stepsPerBar===0?' beat':'')+(Math.floor(step/4)%2?' alt':'')}
+     style={{'--voice':colours[0]??colour,...(paint?{background:paint}:{})}} aria-label={`${gridView==='scale'?pitchName(pc):`Octave ${oct}`} step ${(step-start)/stepSize+1}${held?', held':''}`} aria-pressed={!!(notes.length||placed.length)}
+     onPointerDown={e=>dragDown(e,row,i,midi)} onPointerMove={dragMove} onPointerUp={dragEnd} onPointerCancel={e=>dragEnd(e,true)} onLostPointerCapture={e=>dragEnd(e,true)}
+     onClick={e=>{if(suppressClick.current&&e.detail!==0){suppressClick.current=false;return;}const to=Math.min(end,step+stepSize);if(deleteMode)onDeletePad(step,to,row,false);else if(editMode)onEditPad(step,to,row,shiftHeld||e.shiftKey);else if(copyMode)onCopyPad(step,to,row,midi);else if(chordMode)onChordPad(step,to,row,shiftHeld||e.shiftKey);else onToggleNote(step,midi,to);}}/>;
+   }))}
+   <div className="playhead"/>
+  </div>
+ </section>;
+}
