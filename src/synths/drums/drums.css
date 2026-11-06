@@ -570,3 +570,8 @@
 @keyframes enc-hold{from{stroke-dashoffset:132;}to{stroke-dashoffset:0;}}
 .drums .enc.modded::after{content:'';position:absolute;top:2px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--accent,#e0a526);}
 .drums .enc{position:relative;}
+
+/* a control that is being modulated moves with the live value and glows (seq/modLive.js) */
+.drums .dm-slider.modulated::-webkit-slider-thumb{box-shadow:0 0 7px 1px #ffd36a;border-color:#ffd36a;}
+.drums .dm-slider.modulated::-moz-range-thumb{box-shadow:0 0 7px 1px #ffd36a;border-color:#ffd36a;}
+.drums .dm-knob.modulated{filter:drop-shadow(0 0 4px #ffd36a);}

@@ -11,6 +11,7 @@ import {BEATS,KITS,foldAccent,emptyPattern,validPattern,patternCommands,voiceCol
 import useRackMoves from '../../seq/useRackMoves';
 import {cleanMoves,RACK_MOVES,MOVE_LOOPS} from '../../seq/moves';
 import useModulation from '../../seq/useModulation';
+import {paintModulation} from '../seq/modLive';
 import {cleanMod,SOURCES,LFO_SHAPES,MAX_LANE_STEPS} from '../../seq/mod';
 import useCoreClock from '../../seq/useCoreClock';
 import {DIVISIONS,DIRECTIONS,trackWindow,directedIndex} from '../../seq/core';
@@ -384,7 +385,7 @@ export function DrumPage({kit}){
  const [moves,setMovesState]=useState(()=>cleanMoves(load(`synths:${kit.id}:moves`,null))),rackRef=useRef({});
  const setMoves=(pattern,entry)=>{const next={...moves};if(entry)next[pattern]=entry;else delete next[pattern];const clean=cleanMoves(next);setMovesState(clean);save(`synths:${kit.id}:moves`,clean);};
  useRackMoves({live:()=>seq.live.current,clock:()=>clock.clock,rack:()=>rackRef.current,entry:()=>moves[clock.clock.at(seq.live.current?.context.currentTime??0)?.pattern??seq.playingPattern],running:seq.playing});
- useModulation({live:()=>seq.live.current,clock:()=>clock.clock,mod,params:synth.params,values:()=>valuesRef.current,running:seq.playing,onOut:o=>{modOutRef.current=o;}});
+ useModulation({live:()=>seq.live.current,clock:()=>clock.clock,mod,params:synth.params,values:()=>valuesRef.current,running:seq.playing,onOut:o=>{modOutRef.current=o;paintModulation(o,k=>synth.params.BY_KEY[k],k=>valuesRef.current[k]??synth.params.BY_KEY[k].default);}});
  const clock=useCoreClock({seq,kit,values:()=>({...valuesRef.current,...modOutRef.current}),enabled:core,silent:t=>silentRef.current(t),fill:()=>fillRef.current});
  const chooseClock=on=>{if(seq.playing)seq.togglePlay();save('synths:core-clock',on);setCore(on);};
 

@@ -1,4 +1,5 @@
-import React,{useRef} from 'react';
+import React,{useRef,useLayoutEffect} from 'react';
+import {holdModulation} from '../seq/modLive';
 import {toPosition,fromPosition,formatValue} from '../params';
 import {voiceColour,ACCENT_COLOUR} from './kits';
 import Knob from '../ui/Knob';
@@ -36,8 +37,9 @@ export function DrumPicker(props){
 // A horizontal slider on a parameter's own curve (native range: keyboard, touch and screen readers for free).
 // Double-click restores the default.
 export function Slider({spec,value,onChange,label,className=''}){
- const position=toPosition(spec,value),bipolar=spec.min<0&&spec.max>0;
- return <input type="range" className={'dm-slider'+(bipolar?' bipolar':'')+(className?' '+className:'')} min="0" max="1" step="0.005" value={position}
+ const position=toPosition(spec,value),bipolar=spec.min<0&&spec.max>0,ref=useRef(null);
+ useLayoutEffect(()=>holdModulation(ref.current,spec.key));
+ return <input ref={ref} data-mod-key={spec.key} type="range" className={'dm-slider'+(bipolar?' bipolar':'')+(className?' '+className:'')} min="0" max="1" step="0.005" value={position}
   style={{'--p':position}} aria-label={label} aria-valuetext={formatValue(spec,value)} title={`${label}: ${formatValue(spec,value)}`}
   onChange={e=>onChange(spec.key,fromPosition(spec,Number(e.target.value)))} onDoubleClick={()=>onChange(spec.key,spec.default)}/>;
 }

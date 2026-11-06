@@ -1,4 +1,5 @@
-import React,{useRef} from 'react';
+import React,{useRef,useLayoutEffect} from 'react';
+import {holdModulation} from '../seq/modLive';
 import {toPosition,fromPosition,formatValue} from '../params';
 import './knob.css';
 
@@ -8,9 +9,10 @@ import './knob.css';
  */
 export default function Knob({spec,value,onChange,label,className=''}){
  const position=toPosition(spec,value);
- const drag=useRef(null);
+ const drag=useRef(null),ref=useRef(null);
+ useLayoutEffect(()=>holdModulation(ref.current,spec.key));
  const set=p=>onChange(spec.key,fromPosition(spec,Math.min(1,Math.max(0,p))));
- return <div role="slider" tabIndex={0} className={'dm-knob'+(className?' '+className:'')} aria-label={label} aria-valuemin={0} aria-valuemax={1} aria-valuenow={Number(position.toFixed(3))} aria-valuetext={formatValue(spec,value)} title={`${label}: ${formatValue(spec,value)}`}
+ return <div ref={ref} data-mod-key={spec.key} role="slider" tabIndex={0} className={'dm-knob'+(className?' '+className:'')} aria-label={label} aria-valuemin={0} aria-valuemax={1} aria-valuenow={Number(position.toFixed(3))} aria-valuetext={formatValue(spec,value)} title={`${label}: ${formatValue(spec,value)}`}
   style={{'--p':position}}
   onPointerDown={e=>{e.currentTarget.setPointerCapture?.(e.pointerId);drag.current={y:e.clientY,p:position};}}
   onPointerMove={e=>{if(drag.current)set(drag.current.p+(drag.current.y-e.clientY)/(e.shiftKey?500:140));}}
