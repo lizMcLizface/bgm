@@ -60,3 +60,33 @@ export function mutateRow(row, amount, random = Math.random) {
     row.forEach((v, i) => { if (!v && !out[i] && random() < a * density * 0.5) out[i] = 1; });
     return out;
 }
+
+// ---- Kit generator: a Grids-style map of drum patterns. Nine style nodes on a 3x3 map (x: straight -> broken -> electro, y: sparse -> busy);
+// each is a bar of 16 levels (0-9) for kick, snare and hat. A position blends the four nearest nodes' levels; a voice plays a step when its
+// level (plus chaos noise) is above a threshold set by the voice's density.
+const NODE = (kick, snare, hat) => ({ kick, snare, hat });
+const KIT_MAP = [
+    [NODE('9...9...9...9...', '....9.......9...', '..9...9...9...9.'), NODE('9.....5...9.5...', '....9.......9...', '8.6.8.6.8.6.8.6.'), NODE('9.....9...9.....', '....9..5.5..9...', '8.8.8.8.8.8.8.8.')],
+    [NODE('9...9...9...9...', '....9.......9.4.', '6.9.6.9.6.9.6.9.'), NODE('9..5..5...9..5..', '....9..4.4..9..4', '7.7.7.7.7.7.7.7.'), NODE('9.....6...5..9..', '........9.......', '9.5.9.5.9.5.9.9.')],
+    [NODE('9...9...9...9...', '....9.......9...', '9.9.9.9.9.9.9.9.'), NODE('9..9..5..9..5...', '....9..5..5.9..5', '9.99.9.99.9.99.9'), NODE('9..5.5..9..5..5.', '....9.....5.9...', '8.9.8.9.8.9.8.9.')],
+];
+const levelsOf = (s) => [...s].map((c) => (c === '.' ? 0 : +c));
+
+/**
+ * One bar of kick, snare and hat from a map position: `x` and `y` in 0..1, `chaos` 0..1 (random noise on the levels), `density` per voice
+ * (0..1, default 0.5: levels of 5+ play). Returns { kick, snare, hat }, each 16 values of 0 / 1.
+ */
+export function kitBar(x, y, chaos = 0, density = { kick: 0.5, snare: 0.5, hat: 0.5 }, random = Math.random) {
+    const fx = Math.min(1, Math.max(0, x)) * 2, fy = Math.min(1, Math.max(0, y)) * 2;
+    const x0 = Math.min(1, Math.floor(fx)), y0 = Math.min(1, Math.floor(fy)), tx = fx - x0, ty = fy - y0;
+    const out = {};
+    for (const voice of ['kick', 'snare', 'hat']) {
+        const [a, b, c, d] = [KIT_MAP[y0][x0], KIT_MAP[y0][x0 + 1], KIT_MAP[y0 + 1][x0], KIT_MAP[y0 + 1][x0 + 1]].map((n) => levelsOf(n[voice]));
+        const threshold = 9 * (1 - Math.min(1, Math.max(0, density[voice] ?? 0.5)));
+        out[voice] = a.map((_, i) => {
+            const level = (a[i] * (1 - tx) + b[i] * tx) * (1 - ty) + (c[i] * (1 - tx) + d[i] * tx) * ty + (random() - 0.5) * chaos * 18;
+            return level > threshold && level > 0 ? 1 : 0;
+        });
+    }
+    return out;
+}

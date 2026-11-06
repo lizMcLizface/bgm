@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { bjorklund, euclid, tile, randomRow, mutateRow, seeded } from './generate';
+import { bjorklund, euclid, tile, randomRow, mutateRow, seeded, kitBar } from './generate';
 
 const show = (row) => row.map((v) => (v ? 'x' : '.')).join('');
 
@@ -32,5 +32,18 @@ describe('generators', () => {
         expect(changed).toHaveLength(16);
         expect(changed).not.toEqual(row);
         expect(Math.abs(changed.filter(Boolean).length - 5)).toBeLessThanOrEqual(4);
+    });
+});
+
+describe('kit generator', () => {
+    it('plays four on the floor at the straight corner, and chaos only adds noise', () => {
+        const bar = kitBar(0, 0, 0);
+        expect(show(bar.kick)).toBe('x...x...x...x...');
+        expect(show(bar.snare)).toBe('....x.......x...');
+        expect(kitBar(0, 0, 0)).toEqual(bar);
+        const noisy = kitBar(0, 0, 1, undefined, seeded(3));
+        expect(noisy.kick).toHaveLength(16);
+        expect(kitBar(0.5, 0.5, 0, { kick: 0, snare: 0, hat: 0 }).kick.some(Boolean)).toBe(false);
+        expect(kitBar(0.5, 0.5, 0, { kick: 1, snare: 1, hat: 1 }).hat.filter(Boolean).length).toBeGreaterThan(kitBar(0.5, 0.5, 0).hat.filter(Boolean).length - 1);
     });
 });

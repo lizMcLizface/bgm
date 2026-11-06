@@ -10,7 +10,7 @@ import {readDrumLink,clearDrumLink} from './share';
 import {BEATS,KITS,foldAccent,emptyPattern,validPattern,patternCommands,voiceColour,ACCENT_COLOUR,chainToSong} from './kits';
 import useCoreClock from '../../seq/useCoreClock';
 import {DIVISIONS,DIRECTIONS,trackWindow,directedIndex} from '../../seq/core';
-import {euclid,tile,randomRow,mutateRow,seeded} from '../../seq/generate';
+import {euclid,tile,randomRow,mutateRow,seeded,kitBar} from '../../seq/generate';
 import {load,save} from '../storage';
 import {DrumPicker,DrumMachineTop,DrumMachineVoices,DrumVoicePanel} from './DrumMachine';
 import {DEFAULTS,CONDITIONS} from './StepEditor';
@@ -63,8 +63,8 @@ export function DrumPage({kit}){
  const [copyArmed,setCopyArmed]=useState(false),[block,setBlock]=useState(0);
  const [encPage,setEncPage]=useState('pattern');
  // the generator page: Euclid (pulses, rotation), random (density) or mutate (amount) over a cell of `cell` steps (0: the row's own length), applied to the selected rows
- const [gen,setGen]=useState({mode:0,pulses:4,density:.3,amount:.3,rot:0,cell:0});
- const GEN_MODES=['EUCLID','RANDOM','MUTATE'];
+ const [gen,setGen]=useState({mode:0,pulses:4,density:.3,amount:.3,rot:0,cell:0,x:.3,y:.3,chaos:.1});
+ const GEN_MODES=['EUCLID','RANDOM','MUTATE','KIT'];
  // The grid has two layers. Draw (the default): a tap on a pad adds or removes a note, and a new note comes up on the display. Edit: a tap
  // selects (Shift adds to the selection), a voice's button selects its whole row and a column's head its whole column, and the encoders then
  // edit everything selected together. Properties of a step are velocity, type, chance, ratchet, nudge, tune, decay, condition; accent
@@ -175,10 +175,10 @@ export function DrumPage({kit}){
      :gen.mode===1?{label:'Density',display:pct(gen.density),position:gen.density,step:.02,onPosition:p=>set({density:Math.round(p*100)/100}),onReset:()=>set({density:.3})}
      :{label:'Amount',display:pct(gen.amount),position:gen.amount,step:.02,onPosition:p=>set({amount:Math.round(p*100)/100}),onReset:()=>set({amount:.3})};
     return [
-     {label:'Mode',display:GEN_MODES[gen.mode],position:gen.mode/2,step:.5,onPosition:p=>set({mode:Math.round(p*2)}),onReset:()=>set({mode:0})},
-     main,
-     {label:'Rotate',display:gen.mode===0?String(gen.rot%cellLen):'—',position:gen.mode===0?(gen.rot%cellLen)/Math.max(1,cellLen-1):0,step:1/Math.max(1,cellLen-1),disabled:gen.mode!==0,onPosition:p=>set({rot:Math.round(p*(cellLen-1))}),onReset:()=>set({rot:0})},
-     {label:'Cell',display:gen.mode===2?'—':gen.cell?String(gen.cell):'ROW',position:gen.cell/MAX_STEPS,step:1/MAX_STEPS,disabled:gen.mode===2,onPosition:p=>set({cell:Math.round(p*MAX_STEPS)}),onReset:()=>set({cell:0})},
+     {label:'Mode',display:GEN_MODES[gen.mode],position:gen.mode/3,step:1/3,onPosition:p=>set({mode:Math.round(p*3)}),onReset:()=>set({mode:0})},
+     gen.mode===3?{label:'Style',display:pct(gen.x),position:gen.x,step:.02,onPosition:p=>set({x:Math.round(p*100)/100}),onReset:()=>set({x:.3})}:main,
+     gen.mode===3?{label:'Busy',display:pct(gen.y),position:gen.y,step:.02,onPosition:p=>set({y:Math.round(p*100)/100}),onReset:()=>set({y:.3})}:{label:'Rotate',display:gen.mode===0?String(gen.rot%cellLen):'—',position:gen.mode===0?(gen.rot%cellLen)/Math.max(1,cellLen-1):0,step:1/Math.max(1,cellLen-1),disabled:gen.mode!==0,onPosition:p=>set({rot:Math.round(p*(cellLen-1))}),onReset:()=>set({rot:0})},
+     gen.mode===3?{label:'Chaos',display:pct(gen.chaos),position:gen.chaos,step:.02,onPosition:p=>set({chaos:Math.round(p*100)/100}),onReset:()=>set({chaos:.1})}:{label:'Cell',display:gen.mode===2?'—':gen.cell?String(gen.cell):'ROW',position:gen.cell/MAX_STEPS,step:1/MAX_STEPS,disabled:gen.mode===2,onPosition:p=>set({cell:Math.round(p*MAX_STEPS)}),onReset:()=>set({cell:0})},
     ];
    })()},
    ...(loading?[{id:'load',label:'Load',encoders:[
@@ -199,12 +199,14 @@ export function DrumPage({kit}){
  const setCell=(t,s,v)=>setCells([[t,s,v]]);
  // Generate: fills the selected rows (the selected voice's row when nothing is selected) with a Euclidean, random or mutated row, as ordinary notes.
  // Each row is generated over its own length; a note that stays keeps its type and step values, one that goes takes its step values with it.
- const genRows=selSteps.length?[...new Set(selSteps.map(([t])=>t))].sort((a,b)=>a-b):[Math.min(selected,n-1)];
+ const kitRows=['bd',kit.tracks.some(t=>t[0]==='sd')?'sd':'cp','ch'].map(k=>kit.tracks.findIndex(t=>t[0]===k));
+ const genRows=gen.mode===3?kitRows.filter(t=>t>=0):selSteps.length?[...new Set(selSteps.map(([t])=>t))].sort((a,b)=>a-b):[Math.min(selected,n-1)];
  const generate=()=>{
   const b=seq.bankRef.current,cur=b.current,pattern=b.patterns[cur],random=seeded((Date.now()^(Math.random()*4294967296))>>>0),changes=[],dropped=[];
+  const bar=gen.mode===3?kitBar(gen.x,gen.y,gen.chaos,undefined,random):null;
   for(const t of genRows){
    const L=Math.min(pattern[t].length,b.trackLengths?.[cur]?.[t]||b.lengths[cur]),old=pattern[t].slice(0,L),cell=Math.min(gen.cell||L,L);
-   const row=gen.mode===0?tile(euclid(Math.min(gen.pulses,cell),cell,gen.rot),L):gen.mode===1?tile(randomRow(cell,gen.density,random),L):mutateRow(old,gen.amount,random);
+   const row=bar?tile(bar[['kick','snare','hat'][kitRows.indexOf(t)]],L):gen.mode===0?tile(euclid(Math.min(gen.pulses,cell),cell,gen.rot),L):gen.mode===1?tile(randomRow(cell,gen.density,random),L):mutateRow(old,gen.amount,random);
    for(let s=0;s<L;s++){
     if(condAt(t,s)==='fixed')continue;
     const next=row[s]?(old[s]||1):0;
