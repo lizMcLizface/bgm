@@ -1,7 +1,7 @@
 // @vitest-environment node
 import {SYNTHS} from '../models';
 import {POLY,FM} from '../diy/patches';
-import {cleanRack,rackForPatch,rackPackets,splitRackEdits} from './params';
+import {cleanRack,rackForPatch,rackPackets,splitRackEdits,spaceUnitsUsed,rackPlayedKeys,instrumentSpecKeys} from './params';
 
 test('moving the DIY effects to a common rack preserves all 22 native recipe packets',()=>{
  for(const [id,schema]of [['poly',POLY],['fm',FM]])for(const preset of schema.presets){
@@ -31,4 +31,24 @@ test('controller edits reach the proper native schema and reject unknown, non-fi
  const changes={'effects.reverb':.35,'instrument.reverbMix':.4,'compressor.threshold':-900,'instrument.cutoff':700,'bogus':1,'master.output':Infinity};
  expect(splitRackEdits(SYNTHS.juno,changes)).toEqual({native:{reverbMix:.4},extra:{'effects.reverb':.35,'compressor.threshold':-100}});
  expect(splitRackEdits(SYNTHS.poly,{...changes,'instrument.global.chorus':.6})).toEqual({native:{'effects.reverb':.35,'global.chorus':.6},extra:{'compressor.threshold':-100}});
+});
+
+test('the wavetable synthesizer has no space of its own: its reverb and chorus are the rack\'s, and an unused chorus brings no unit',()=>{
+ const synth=SYNTHS.wt,moved={moved:true};
+ const values=synth.params.sanitize({reverbMix:.3,reverbDecay:6,reverbTone:5000,reverbSize:.7,reverbPredelay:.03,chorusMix:.5,chorusRate:.4,chorusDepth:.5});
+ const rack=rackForPatch(synth,values,cleanRack(),moved);
+ expect(rack['effects.reverb']).toBeCloseTo(.3);expect(rack['effects.decay']).toBeCloseTo(6);expect(rack['effects.predelay']).toBeCloseTo(30);
+ expect(rack['inserts.chorus']).toBeCloseTo(.4);expect(rack['inserts.chorusRate']).toBeCloseTo(.4);expect(rack['inserts.chorusDepth']).toBeCloseTo(4);
+ expect(Object.keys(rack).some(k=>k.startsWith('instrument.'))).toBe(false);
+ expect(spaceUnitsUsed(synth,values).sort()).toEqual(['chorus','space']);
+ expect(spaceUnitsUsed(synth,{...values,chorusMix:0})).toEqual(['space']);
+ expect(rackPlayedKeys(synth)).toEqual(['reverbMix','chorusMix']);
+ // an edit of the rack's chorus or reverb goes back to the sound's own values
+ const back=splitRackEdits(synth,{'inserts.chorus':.8,'inserts.chorusDepth':8,'effects.reverb':.5},moved);
+ expect(back.native.chorusMix).toBeCloseTo(1);expect(back.native.chorusDepth).toBeCloseTo(1);expect(back.native.reverbMix).toBeCloseTo(.5);
+ // and the engine plays neither
+ const pairs=Object.fromEntries(synth.params.toEnginePairs(values));
+ expect(pairs[synth.params.BY_KEY.reverbMix.id]).toBe(0);expect(pairs[synth.params.BY_KEY.chorusMix.id]).toBe(0);
+ expect(synth.instrumentSpecs?.length??0).toBe(0);
+ expect(instrumentSpecKeys(synth)).toEqual([]);
 });

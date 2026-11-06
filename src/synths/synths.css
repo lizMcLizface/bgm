@@ -63,10 +63,10 @@ a{color:var(--amber);}
 .diy-box.static{position:relative;box-shadow:none;}
 .diy-box.is-fixed h3.box-handle,.diy-box.is-fixed h3.box-handle:active{cursor:default;}
 /* DIY FM: a wide case, so the boxes have room to be spread out */
-.diy-fm .rig{width:max-content;max-width:none;min-width:0;margin:6px 0;}
+.diy-fm .rig,.wt .rig{width:max-content;max-width:none;min-width:0;margin:6px 0;}
 /* the FM instrument is only as wide as its case: it sits at the top left of the desk, the keyboard centred under it, the effects and scope to its right */
-.diy-fm .desk-home{min-width:0!important;}
-.diy-fm .keybox{align-self:center;}
+.diy-fm .desk-home,.wt .desk-home{min-width:0!important;}
+.diy-fm .keybox,.wt .keybox{align-self:center;}
 .diy-box.static h3.box-handle,.diy-box.static h3.box-handle:active{cursor:default;}
 /* Poly's fixed layout: rows 8 px apart like the CS-80, and a frame round each region */
 .poly-fixed{display:flex;flex-direction:column;gap:8px;}
@@ -293,6 +293,7 @@ a{color:var(--amber);}
 .vector-pad{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;gap:4px;}
 .vector-pad svg{flex:1;min-height:0;max-height:100%;aspect-ratio:1;touch-action:none;cursor:crosshair;}
 .vp-diamond{fill:#10151c;stroke:#6f86a8;stroke-width:1;}
+.vp-field{fill:none;stroke:#6f86a8;stroke-width:.5;stroke-dasharray:1.5 2;opacity:.45;}
 .vp-axis{stroke:#6f86a8;stroke-width:.4;opacity:.4;}
 .vp-corner{fill:#9fb4d1;font-size:7px;font-weight:700;}
 .vp-path{fill:none;stroke:#9b7fd1;stroke-width:.8;opacity:.8;}
@@ -710,21 +711,27 @@ label.inline.toggle{min-height:32px;}label.inline.toggle em{font-style:normal;co
 
 
 /* wavetable synthesizer: four wave editors around a joystick */
-.wt-panel>.panel-row{width:100%;max-width:2040px;margin:0 auto;}
-.wt-panel .wt-sources{display:grid;grid-template-columns:170px repeat(2,minmax(0,1fr));gap:8px;flex:none;}
-.wt-panel .wt-sources>.vector{grid-row:span 2;min-width:0;max-width:none;align-self:start;}
-.wt-panel .vector-pad svg{flex:none;width:150px;height:150px;}
 .wt-editor{display:flex;flex-direction:column;gap:4px;}
-.wt-wave{width:100%;height:auto;aspect-ratio:256/88;background:#10151c;border:1px solid #2a3340;border-radius:6px;touch-action:none;cursor:crosshair;}
+.wt-wave{width:100%;height:146px;background:#10151c;border:1px solid #2a3340;border-radius:6px;touch-action:none;cursor:crosshair;}
 .wt-axis{stroke:#6f86a8;stroke-width:.5;opacity:.4;}
+.wt-wave *{vector-effect:non-scaling-stroke;}
 .wt-outline{fill:none;stroke:#e0a526;stroke-width:1.6;stroke-linejoin:round;}
 .wt-bar{fill:#9b7fd1;opacity:.9;}
-.wt-editor-tools{display:flex;flex-wrap:wrap;gap:4px;align-items:center;}
-.wt-editor-tools button,.wt-editor-tools select{min-height:30px;font-size:12px;padding:2px 8px;background:#23211d;color:var(--text,#e8e4d9);border:1px solid var(--line,#3a372f);border-radius:6px;}
-.wt-editor-tools button.on{background:#3a3326;border-color:#e0a526;}
-.wt-modes{display:flex;gap:2px;}
-@media (max-width:720px){.wt-panel .wt-sources{grid-template-columns:minmax(0,1fr);}.wt-panel .wt-sources>.vector{grid-row:auto;}}
-
+.wt-head{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;}
+.wt-head h3{margin:0;}
+.wt-head .timing-radio{float:none;margin:0;}
+.wt-knob{display:inline-flex;align-items:center;gap:4px;}
+.wt-head .fader-value,.wt-head .fader-label,.wt-head .dial-tick,.wt-ctl .fader-value,.wt-ctl .fader-label,.wt-ctl .dial-tick{display:none;}
+.wt-head .dial,.wt-ctl .dial{width:36px;height:36px;justify-content:center;}
+.wt-head .dial svg,.wt-ctl .dial svg{width:56px;height:56px;margin:-10px;flex:none;}
+.wt-head>.wt-knob:first-of-type{margin-left:auto;}
+.wt-lcd{min-width:44px;padding:3px 6px;text-align:right;font:12px/1.2 ui-monospace,Consolas,monospace;color:#e0a526;background:#10151c;border:1px solid #2a3340;border-radius:4px;}
+.wt-lcd.wide{min-width:78px;text-align:left;}
+.wt-icons{display:inline-flex;gap:4px;}
+.wt-icons button{background:#23211d;border:1px solid var(--line,#3a372f);border-radius:6px;cursor:pointer;min-height:0;width:40px;height:26px;padding:2px 4px;}
+.wt-icons svg{width:100%;height:100%;fill:none;stroke-linecap:round;}
+.wt-ico{stroke:#e0a526;stroke-width:1.6;}
+.wt-ico-faint{stroke:#8a8372;stroke-width:1;opacity:.6;}
 /* V 80, one page: the selected channel's controls are one framed block (oscillator / filter + amplifier / envelope + touch),
    the global groups fill three rows beside it */
 .cs80 .perform .keys{height:clamp(80px,12vh,112px);}
@@ -1031,6 +1038,7 @@ label.inline.toggle{min-height:32px;}label.inline.toggle em{font-style:normal;co
 .diy-poly .rig>nav.presets::before{content:'DI-POLY  ·  POLYPHONIC SUBTRACTIVE SYNTHESIZER';}
 .dx7 .rig>nav.presets::before{content:'FM7  ·  SIX OPERATOR FREQUENCY MODULATION SYNTHESIZER';}
 .diy-fm .rig>nav.presets::before{content:'DIY FM  ·  UP TO 8 OPERATOR FREQUENCY MODULATION SYNTHESIZER';}
+.wt .rig>nav.presets::before{content:'QUADWAVE  ·  FOUR-WAVE WAVETABLE SYNTHESIZER';}
 .diy .rig>nav.presets::before,.dx7 .rig>nav.presets::before{margin-right:auto;font-size:10px;letter-spacing:.3em;font-weight:600;white-space:nowrap;color:color-mix(in srgb,var(--ends) 40%,#c9d6d3);}
 @media (max-width:900px){.diy .rig>nav.presets::before,.dx7 .rig>nav.presets::before{display:none;}}
 
@@ -1224,3 +1232,90 @@ label.inline.toggle{min-height:32px;}label.inline.toggle em{font-style:normal;co
 /* the keys keep their width whatever surrounds them: controls add width to the box, and a box wider than its row centres the row */
 .stage-row{justify-content:center;}
 .stage-row[style*="--keys-w"] .lab-piano{flex:0 1 var(--keys-w);}
+
+.lfo-shapes{display:grid;grid-template-columns:40px;gap:3px;align-self:flex-start;margin-top:14px;}
+.lfo-shapes button{min-height:0;height:24px;padding:2px 4px;background:#23211d;border:1px solid var(--line,#3a372f);border-radius:5px;cursor:pointer;}
+.lfo-shapes button.on{background:#2a2340;border-color:#a07fd6;}
+.lfo-shapes svg{width:100%;height:100%;fill:none;stroke:#8a8372;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+.lfo-shapes button.on svg{stroke:#d7c9f5;}
+.wt .workspace .rmx-head,.wt .workspace .rmx-row{grid-template-columns:78px repeat(var(--cols),minmax(32px,1fr));}
+.wt .workspace .diy-box .group-controls{justify-content:flex-start;}
+
+.wt .diy-box .wt-editor{flex:1 1 100%;}
+.wt .diy-box[data-box=joy]{display:flex;flex-direction:column;}
+.wt .diy-box[data-box=joy]>.group-controls{flex:1;align-items:center;justify-content:center;}
+.wt .vector-pad svg{flex:none;width:100px;height:100px;}
+/* Quadwave: room round the boxes to shuffle them in, wave boxes wide enough for their control row, a filter type picker no taller than the faders */
+.wt .workspace.pinned{box-sizing:content-box;padding:0;}
+.wt .diy-box[data-box=venv] .group-controls{gap:2px 0;}
+.wt .diy-box[data-box^=wave]{width:600px;}
+.wt .choice-buttons{height:calc(var(--track) + 40px);}
+.vp-live{fill:var(--voice,#4ec4b4);stroke:#0d1f1c;stroke-width:.6;pointer-events:none;}
+.vp-trace{fill:none;stroke:var(--voice,#4ec4b4);stroke-width:1.1;stroke-linecap:round;stroke-linejoin:round;pointer-events:none;}
+.lfo-side{display:flex;flex-direction:column;gap:5px;align-self:flex-start;margin-top:14px;}
+.lfo-side .lfo-shapes{margin-top:0;}
+.lfo-sync{min-height:0;height:20px;width:40px;padding:0;font-size:10px;border-radius:5px;background:#23211d;border:1px solid var(--line,#3a372f);color:#a7a399;cursor:pointer;}
+.lfo-sync.on{background:#2a2340;border-color:#a07fd6;color:#d7c9f5;}
+.wt .diy-box .wt-editor{flex:1 1 100%;display:flex;flex-direction:row;gap:8px;align-items:stretch;}
+.wt .wt-wave{flex:1 1 0;width:auto;min-width:200px;height:auto;aspect-ratio:auto;align-self:stretch;min-height:0;}
+.wt-ctl{display:flex;flex-direction:column;gap:4px;flex:none;}
+.wt-row{display:flex;align-items:center;gap:6px;}
+.wt-tag{width:36px;flex:none;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+.wt-lcd.big{min-width:96px;height:26px;text-align:left;font-size:13px;cursor:pointer;}
+.wt-lcd.big:hover{border-color:#e0a526;}
+.wt-icons{margin-left:6px;}
+.diy-box h3 .wt-icons{float:right;margin-left:4px;}
+.wt-icons button{width:34px;height:20px;}
+.wt-shape-row{align-items:stretch;gap:8px;}
+.wt-lcd.tall{display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;min-width:130px;height:64px;padding:6px 8px;font-size:14px;text-align:left;cursor:pointer;}
+.wt-lcd.tall svg{width:100%;height:20px;fill:none;stroke:#e0a526;stroke-width:1.2;vector-effect:non-scaling-stroke;}
+.wt-lcd.tall svg *{vector-effect:non-scaling-stroke;}
+.wt-lcd.tall:hover{border-color:#e0a526;}
+.wt-shape-row .dial{align-self:center;}
+.wt-shape-menu{position:fixed;z-index:60;display:grid;grid-template-columns:repeat(3,150px);gap:4px;padding:8px;background:#1a1916;border:1px solid #3a372f;border-radius:10px;box-shadow:0 10px 28px #000a;}
+.wt-shape-menu button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-height:0;padding:4px 8px;font-size:11px;background:#23211d;border:1px solid #33312b;border-radius:6px;color:#cfc9b8;cursor:pointer;}
+.wt-shape-menu button.on{border-color:#e0a526;color:#f3d38a;}
+.wt-shape-menu button:hover{border-color:#8a8372;}
+.wt-shape-menu svg{width:100%;height:18px;fill:none;stroke:#e0a526;stroke-width:1.2;}
+.wt-lcd.tall{width:140px;min-width:140px;max-width:140px;height:44px;align-items:flex-start;justify-content:center;}
+.wt-shape-row{justify-content:space-between;}
+.wt-shape-row .dial{margin-left:auto;}
+.sub-shapes{margin-top:14px;}
+.wt .choice.cols-2 .choice-buttons{display:flex;flex-direction:column;justify-content:center;gap:3px;}
+.wt .choice.cols-2{width:auto;}
+.wt .choice button{min-height:0;height:21px;width:50px;padding:0 4px;font-size:11px;}
+/* the waveform fills a box that is as tall as the controls beside it, whatever the browser does with a drawing's own proportions */
+.wt .wt-wavebox{position:relative;flex:1 1 0;min-width:200px;align-self:stretch;}
+.wt .wt-wavebox>.wt-wave{position:absolute;inset:0;width:100%;height:100%;min-width:0;min-height:0;}
+/* a wave box is as tall as the fader boxes beside it: the waveform takes the extra height and the controls spread over it */
+.wt .diy-box[data-box^=wave]{display:flex;flex-direction:column;box-sizing:border-box;min-height:232px;}
+.wt .diy-box[data-box^=wave]>.group-controls{flex:1;align-items:stretch;}
+.wt .diy-box[data-box^=wave] .wt-editor{align-self:stretch;}
+.wt .wt-ctl{justify-content:space-between;}
+/* the joystick box is a square as tall as the row, and the diamond fills it */
+.wt .diy-box[data-box=joy]{width:232px;height:232px;box-sizing:border-box;}
+.wt .diy-box[data-box=joy]>.group-controls{flex:1;min-height:0;align-items:stretch;justify-content:stretch;max-width:none;}
+.wt .diy-box[data-box=joy] .vector-pad{flex:1;width:100%;min-height:0;}
+.wt .diy-box[data-box=joy] .vector-pad svg{flex:1;width:100%;height:100%;max-height:none;}
+.wt .diy-box[data-box=joy] .vector-pad{align-items:center;justify-content:center;}
+.wt .diy-box[data-box=joy] .vector-pad svg{flex:none;width:auto;height:100%;aspect-ratio:1;max-width:100%;}
+.wt .diy-box[data-box=joy] .vector-pad{flex:none;width:auto;height:100%;aspect-ratio:1;}
+.wt .diy-box[data-box=joy] .vector-pad svg{width:100%;height:100%;aspect-ratio:auto;}
+.wt .diy-box[data-box=joy]>.group-controls{justify-content:center;align-items:center;}
+.wt .diy-box[data-box=joy] .vector-pad{height:100%;}
+.wt .diy-box[data-box=joy] .vector-pad svg{overflow:visible;}
+/* the joystick's own small matrix, with its two offset knobs to the right */
+.wt-padmx{display:flex;gap:10px;align-items:flex-start;}
+.wt .workspace .wt-padmx .rmx-head,.wt .workspace .wt-padmx .rmx-row{grid-template-columns:70px repeat(var(--cols),28px);}
+.wt-padknobs{display:flex;flex-direction:column;gap:14px;align-self:center;}
+.wt-padknobs .dial .fader-value,.wt-padknobs .dial .fader-label,.wt-padknobs .dial .dial-tick{display:none;}
+.wt-padknobs .dial{width:36px;height:36px;justify-content:center;}
+.wt-padknobs .dial svg{width:56px;height:56px;margin:-10px;flex:none;}
+.wt .diy-box[data-box=padoffs]>.group-controls{flex-direction:column;align-items:flex-start;gap:4px;}
+.wt-padrow{display:flex;flex-direction:column;gap:0;}
+.wt-padrow .wt-tag{width:auto;font-size:9px;line-height:1;}
+.wt .diy-box[data-box=padoffs] .dial .fader-value,.wt .diy-box[data-box=padoffs] .dial .fader-label,.wt .diy-box[data-box=padoffs] .dial .dial-tick{display:none;}
+.wt .diy-box[data-box=padoffs] .dial{width:36px;height:36px;justify-content:center;}
+.wt .diy-box[data-box=padoffs] .dial svg{width:56px;height:56px;margin:-10px;flex:none;}
+/* the panel is all controls: a drag on it never selects text */
+.wt .workspace,.wt .workspace *{-webkit-user-select:none;user-select:none;}

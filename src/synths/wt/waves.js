@@ -86,12 +86,31 @@ export function toDrawing(def){
  return Array.from({length:DRAW_POINTS},(_,i)=>(w[Math.floor(i/DRAW_POINTS*CYCLE)]-mean)/pk);
 }
 
+/** A wave with its edges rounded off, or turned upside down, as an outline. */
+const outlineOf=def=>def.t==='draw'?def.y:toDrawing(def);
+export const smoothed=def=>{const y=outlineOf(def);return drawn(y.map((_,i)=>(y[(i-1+y.length)%y.length]+2*y[i]+y[(i+1)%y.length])/4));};
+export const inverted=def=>drawn(outlineOf(def).map(v=>-v));
+
 /** Sine, triangle, saw, square: the starting set (matches the kernel's own defaults). */
 export const DEFAULT_WAVES=[shape('sine'),shape('tri'),shape('saw'),shape('square')];
 
+// The stock waves: the classic shapes, then built from harmonics: organ drawbars, vowels (formants of a voice at 110 Hz), reed, glass, bell and the like.
+const spectrum=f=>harmonics(Array.from({length:HARMONICS},(_,i)=>+Math.max(0,f(i+1)).toFixed(4)));
+const formants=peaks=>spectrum(h=>{let a=0.04/Math.sqrt(h);for(const [f,g,w] of peaks)a+=g*Math.exp(-(((h*110-f)/w)**2));return a/Math.pow(h,0.35);});
+const drawbars=bars=>spectrum(h=>bars[h]??0);
+const steps=n=>drawn(Array.from({length:DRAW_POINTS},(_,i)=>2*Math.floor(i/DRAW_POINTS*n)/(n-1)-1));
 export const SHAPES=[
  ['Sine',shape('sine')],['Triangle',shape('tri')],['Saw',shape('saw')],['Ramp',shape('ramp')],['Square',shape('square')],
  ['Pulse 25 %',shape('pulse',.25)],['Pulse 12 %',shape('pulse',.125)],['Half sine',shape('halfsine')],['Sine²',shape('sinesq')],
+ ['Organ',drawbars({1:1,2:.8,3:.6,4:.5,6:.3,8:.25})],['Organ 2',drawbars({1:1,3:.7,5:.5,7:.3,9:.2})],['Flute',drawbars({1:1,2:.12,3:.05})],
+ ['Vowel A',formants([[800,1,110],[1150,.6,130],[2900,.25,200]])],['Vowel E',formants([[400,1,90],[1600,.6,130],[2700,.3,200]])],
+ ['Vowel I',formants([[270,1,80],[2300,.5,150],[3000,.3,200]])],['Vowel O',formants([[450,1,90],[800,.7,110],[2830,.2,200]])],
+ ['Vowel U',formants([[325,1,80],[700,.5,100],[2530,.15,200]])],
+ ['Reed',spectrum(h=>h%2?1/Math.pow(h,.7):.15/h)],['Soft saw',spectrum(h=>1/Math.pow(h,1.5))],['Hollow',spectrum(h=>h%2?1/h:0)],
+ ['Round square',spectrum(h=>h%2?1/Math.pow(h,1.7):0)],['Glass',drawbars({1:.4,3:1,5:.7,7:.5,9:.3,11:.2})],
+ ['Bell',drawbars({1:1,2:.2,3:.7,4:.1,5:.5,7:.4,9:.2,11:.15,13:.1})],['Clav',drawbars({1:1,2:.9,3:.7,5:.8,7:.5,9:.4,11:.2})],
+ ['Buzz',spectrum(h=>h<=16?1:0)],['Comb',spectrum(h=>h%4===1?1/Math.sqrt(h):0)],['Digital',drawbars({1:1,2:.3,3:.9,5:.2,7:.7,8:.5,11:.6,13:.3})],
+ ['Stairs 4',steps(4)],['Stairs 8',steps(8)],
 ];
 
 const KEY='calmbgm.wt.waves';

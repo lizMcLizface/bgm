@@ -1,6 +1,7 @@
 // Factory sounds for the wavetable synthesizer. Each is a set of overrides on the defaults plus the four waves it plays.
 import {sanitize} from './params';
 import {shape,harmonics,DEFAULT_WAVES} from './waves';
+import {BANK,BANK_CATEGORIES} from './bank';
 
 // harmonic amplitude lists
 const odd=(n,f=h=>1/h)=>Array.from({length:n},(_,i)=>(i+1)%2?f(i+1):0);
@@ -63,6 +64,7 @@ export const CATEGORIES=[
  {id:'winds',label:'Winds',blurb:'Reeds and breath'},
  {id:'texture',label:'Textures',blurb:'Drones and motion'},
  {id:'init',label:'Init',blurb:'Neutral starting points'},
+ ...BANK_CATEGORIES,
 ];
 
-export const PRESETS=RAW.map(p=>({...p,values:sanitize(p.values)}));
+export const PRESETS=[...RAW,...BANK].map(p=>({...p,values:sanitize(p.values)}));

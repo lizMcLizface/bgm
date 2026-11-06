@@ -88,7 +88,7 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
  const closeShape=useCallback(()=>setShapeOpen(null),[]);
  const SHELF_KEY=`synths:${synth.id}:shelf`;
  // the instrument's case and the keyboard box can each be moved by their grip, and are remembered
- const rigDrag=useDraggable(`synths:${synth.id}:rig-pos`),keysDrag=useDraggable('synths:keys-pos',s=>onSynth('diy-fm','dx7','minimoog','prophet','jupiter','obxa')?{x:0,y:10}:onSynth('cs80','juno')?{x:0,y:73}:({x:Math.round(s.w*.222),y:Math.round(s.h*.208)}));
+ const rigDrag=useDraggable(`synths:${synth.id}:rig-pos`),keysDrag=useDraggable('synths:keys-pos',s=>onSynth('diy-fm','wt','dx7','minimoog','prophet','jupiter','obxa')?{x:0,y:10}:onSynth('cs80','juno')?{x:0,y:73}:({x:Math.round(s.w*.222),y:Math.round(s.h*.208)}));
  const [showHelp,setShowHelp]=useState(false),helpRef=useRef(null);
  useEffect(()=>{
   if(!showHelp)return undefined;

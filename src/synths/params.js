@@ -69,6 +69,7 @@ export function formatValue(p,value){
   case 'n':return String(value);
   case 'decimal':return Number(value.toFixed(2)).toString();
   case 'dB':return (value>0?'+':'')+Number(value.toFixed(1))+' dB';
+  case 'deg':return (value>0?'+':'')+Math.round(value)+'°';
   case 'ms':return Number(value.toFixed(2))+'ms';
   case 'bpm':return String(Math.round(value));
   case 'swing':return Math.round(value*100)+'%';

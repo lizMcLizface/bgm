@@ -20,7 +20,7 @@ test('every published YAML bank has valid, complete engine values and stable pro
   expect(b.programs.length).toBe(entry.count);count+=b.programs.length;
   for(const p of b.programs)expect(p.values).toEqual((synth.params.sanitizeEngine??synth.params.sanitize)(p.values));
  }
- expect(count).toBe(705);
+ expect(count).toBe(778);
 });
 
 test('drum banks keep their six existing program IDs and append the original Deep kick recipe',()=>{

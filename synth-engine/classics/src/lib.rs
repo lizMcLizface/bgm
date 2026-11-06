@@ -214,6 +214,7 @@ pub extern "C" fn syn_param(id: u32, value: f32) {
                     MODEL_JUPITER => HOST.jupiter.set_shape(i, value),
                     MODEL_MINIMOOG => HOST.minimoog.set_shape(i, value),
                     MODEL_OBXA => HOST.obxa.set_shape(i, value),
+                    MODEL_WT => HOST.wt.set_shape(i, value),
                     _ => {}
                 }
             }
@@ -321,6 +322,21 @@ pub extern "C" fn syn_wave_ptr() -> *mut f32 {
     vs::wave_ptr()
 }
 
+/// The wavetable synthesizer's joystick paths: per voice [sounding, next slot, then TRACE (x, y) pairs]; `which` 0 is the voice count, 1 the width of a voice.
+#[no_mangle]
+pub extern "C" fn syn_joy_ptr() -> *const f32 {
+    unsafe { HOST.wt.trace.as_ptr() }
+}
+
+#[no_mangle]
+pub extern "C" fn syn_joy_info(which: u32) -> u32 {
+    if which == 0 {
+        wt::VOICES as u32
+    } else {
+        wt::TRACE_WIDTH as u32
+    }
+}
+
 /// Builds the band-limited tables from the buffer. Takes a few tens of milliseconds.
 #[no_mangle]
 pub extern "C" fn syn_wave_commit() {
@@ -352,6 +368,8 @@ pub extern "C" fn syn_stat(which: u32) -> f32 {
             1 => model!(HOST, m => m.steals) as f32,
             2 => HOST.peak,
             3 => (HOST.frames / HOST.sr as f64) as f32,
+            // the wavetable synthesizer's joystick as the newest voice has it, and whether a voice sounds
+            7 | 8 | 9 => HOST.wt.joy[(which - 7) as usize],
             4 | 5 | 6 => {
                 let s = match HOST.model {
                     MODEL_TR808 | MODEL_TR909 | MODEL_TR606 | MODEL_TR707 => &HOST.drums.seq,
