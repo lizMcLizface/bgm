@@ -8,6 +8,9 @@ import ArrangementFile from './ArrangementButtons';
 import ArrangerDevice from './ArrangerDevice';
 import {readDrumLink,clearDrumLink} from './share';
 import {BEATS,KITS,foldAccent,emptyPattern,validPattern,patternCommands,voiceColour,ACCENT_COLOUR,chainToSong} from './kits';
+import useRackMoves from '../../seq/useRackMoves';
+import {cleanMoves} from '../../seq/moves';
+import MovesPanel from '../seq/MovesPanel';
 import useModulation from '../../seq/useModulation';
 import {cleanMod} from '../../seq/mod';
 import ModPanel from '../seq/ModPanel';
@@ -301,6 +304,10 @@ export function DrumPage({kit}){
  const [mod,setModState]=useState(()=>cleanMod(load(`synths:${kit.id}:mod`,null))),[assigning,setAssigning]=useState(null);
  const setMod=next=>{setModState(next);save(`synths:${kit.id}:mod`,next);};
  const setAssign=(key,a)=>{const assigns={...mod.assigns};if(a)assigns[key]=a;else delete assigns[key];setMod(cleanMod({...mod,assigns}));};
+ // Effect moves (src/seq/moves.js): rack effects that sweep across a pattern, per pattern
+ const [moves,setMovesState]=useState(()=>cleanMoves(load(`synths:${kit.id}:moves`,null))),rackRef=useRef({});
+ const setMoves=(pattern,entry)=>{const next={...moves};if(entry)next[pattern]=entry;else delete next[pattern];const clean=cleanMoves(next);setMovesState(clean);save(`synths:${kit.id}:moves`,clean);};
+ useRackMoves({live:()=>seq.live.current,head:seq.head,rack:()=>rackRef.current,entry:()=>moves[seq.playingPattern],length:()=>seq.bankRef.current.lengths[seq.playingPattern]||16,tempo:()=>valuesRef.current.tempo,running:seq.playing});
  useModulation({live:()=>seq.live.current,mod,params:synth.params,values:()=>valuesRef.current,tempo:()=>valuesRef.current.tempo,running:seq.playing});
  const clock=useCoreClock({seq,kit,values:()=>valuesRef.current,enabled:core,silent:t=>silentRef.current(t),fill:()=>fillRef.current});
  const chooseClock=on=>{if(seq.playing)seq.togglePlay();save('synths:core-clock',on);setCore(on);};
@@ -322,8 +329,8 @@ export function DrumPage({kit}){
   else{const id=(b.current+d+MAX_PATTERNS)%MAX_PATTERNS;seq.select(id);transport.gotoPattern(id);}
  };
  return <SynthShell synth={synth} compactRack keyboard={false} className={'drums '+kit.id} panelClassName="complete seq" soundsInDevice picker={DrumPicker} initialPatch={shared.patch} headerExtras={props=><ArrangementFile {...props} kit={kit} synth={synth} seq={seq}/>} onEngine={seq.onEngine} onStats={seq.onStats} onMidiRealtime={core?undefined:seq.onMidiRealtime}>
-  {({values,change,choose,current,soundBar})=>{
-   valuesRef.current=values;
+  {({values,change,choose,current,soundBar,rack})=>{
+   valuesRef.current=values;rackRef.current=rack;
    // Two devices side by side, as on a desk: the sequencer sends notes, the drum machine plays them.
    return <div className="split" key="split" style={{'--rows':LANES+1}}>
     <section className="device device-seq" aria-label="Sequencer" ref={seqDrag.ref} style={seqDrag.style}>
@@ -338,6 +345,7 @@ export function DrumPage({kit}){
       <div className="s8-left">
        <SeqScreen accent={voiceColour(kit.tracks[Math.min(selVoice,n-1)][0],kit.id)} page={shownPage} onPage={setEncPage} pages={shownPages(values,change,beat)} lines={screenLines(values,beat)} actions={{gen:{title:'Tap again: fill the selected rows (or the selected voice) with a new row from these settings; each tap is a new one for Random and Mutate',onClick:generate}}}/>
        {assigning&&synth.params.BY_KEY[assigning]&&<ModPanel paramLabel={synth.params.BY_KEY[assigning].label} assign={mod.assigns[assigning]} mod={mod} onAssign={a=>setAssign(assigning,a)} onMod={next=>setMod(cleanMod(next))} onClose={()=>setAssigning(null)}/>}
+       <details className="seq-moves-box"><summary>Effect moves{moves[bank.current]?' ·  on':''}</summary><MovesPanel title={`While ${patternName(bank.current)} plays`} entry={moves[bank.current]} onChange={e=>setMoves(bank.current,e)}/></details>
        <div className="s8-transport" role="group" aria-label="Transport">
         <button type="button" className={'tp play'+(transport.playing?' on':'')} aria-pressed={transport.playing} onClick={transport.play} title="Play"><b>▶</b><small>Play</small></button>
         <button type="button" className={'tp'+(transport.paused?' on':'')} aria-pressed={transport.paused} onClick={transport.pause} title="Pause here; play goes on from this place" disabled={!transport.playing&&!transport.paused}><b>⏸</b><small>Pause</small></button>

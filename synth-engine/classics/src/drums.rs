@@ -597,6 +597,8 @@ pub struct Drums {
     voices: [Voice; TRACKS],
     knobs: [[f32; STRIDE]; TRACKS],
     master: f32,
+    /// The master gain actually applied: glides to `master` (about 10 ms) so a modulated knob does not step.
+    master_g: f32,
     accent: f32,
     flam: f32,
     deep_kick: bool,
@@ -623,6 +625,7 @@ impl Drums {
             voices: [Voice::new(); TRACKS],
             knobs: [[0.; STRIDE]; TRACKS],
             master: 0.8,
+            master_g: 0.8,
             accent: 0.5,
             flam: 0.5,
             deep_kick: true,
@@ -651,6 +654,7 @@ impl Drums {
             *k = [0.8, 0.5, 0.5, 0.5, 0., 0., 0., 0.];
         }
         self.master = 0.8;
+        self.master_g = 0.8;
         self.accent = 0.5;
         self.flam = 0.5;
         self.deep_kick = true;
@@ -814,6 +818,7 @@ impl Drums {
         let span = (to - from).max(1) as f32;
         let step: [(f32, f32); TRACKS] = core::array::from_fn(|t| ((target[t].0 - self.pan_g[t].0) / span, (target[t].1 - self.pan_g[t].1) / span));
         let mut pans = self.pan_g;
+        let (mut master_g, master_k) = (self.master_g, crate::dsp::smoothing(0.01, sr));
         for n in from..to {
             if self.npend > 0 {
                 for i in 0..PENDING {
@@ -854,14 +859,16 @@ impl Drums {
                     r += x * pans[t].1;
                 }
             }
-            left[n] = l * self.master;
-            right[n] = r * self.master;
+            master_g += (self.master - master_g) * master_k;
+            left[n] = l * master_g;
+            right[n] = r * master_g;
             for t in 0..TRACKS {
                 pans[t].0 += step[t].0;
                 pans[t].1 += step[t].1;
             }
         }
         self.pan_g = target;
+        self.master_g = master_g;
     }
     pub fn render(&mut self, left: &mut [f32], right: &mut [f32]) {
         let n = left.len();

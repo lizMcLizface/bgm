@@ -364,7 +364,7 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
   {!fullRack&&nav}
 
   <main className={'panel'+(fullRack?' rack-panel':' '+panelClassName)}>
-   {!fullRack&&children({values:patch.values,control,group,change,replaceValues,patch:patchRef,choose,current,soundBar})}
+   {!fullRack&&children({values:patch.values,control,group,change,replaceValues,patch:patchRef,choose,current,soundBar,rack:rackValues})}
    {showEffects&&compactRack&&<RackCompact tempo={rackTempo} values={rackValues} onChange={changeRack} instrumentSpecs={instrumentSpecs} peak={stats.peak} reduction={stats.reduction??0} onClose={()=>setShowEffects(false)}
     tools={<button type="button" onClick={()=>engine.current?.clearRack()}>Clear tails</button>}/>}
    {fullRack&&<RackPanel tempo={rackTempo} values={rackValues} onChange={changeRack} instrumentSpecs={instrumentSpecs} peak={stats.peak} reduction={stats.reduction??0}

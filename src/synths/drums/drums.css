@@ -576,3 +576,11 @@
 .drums .mod-bars{display:flex;gap:2px;height:56px;width:100%;}
 .drums .mod-bar{flex:1;min-width:3px;display:flex;align-items:flex-end;background:#0d0c0b;cursor:ns-resize;touch-action:none;}
 .drums .mod-bar i{display:block;width:100%;background:var(--accent,#e0a526);pointer-events:none;}
+.drums .seq-moves-box{margin-top:6px;font-size:12px;}
+.drums .seq-moves-box summary{cursor:pointer;color:#cfc6b8;}
+.drums .seq-moves{display:flex;flex-direction:column;gap:6px;border:1px solid #3a342c;border-radius:6px;padding:6px 8px;margin:4px 0 0;}
+.drums .seq-moves legend{padding:0 4px;color:#cfc6b8;}
+.drums .seq-move{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.drums .seq-move label{display:flex;align-items:center;gap:4px;}
+.drums .seq-move input[type=range]{width:90px;}
+.drums .seq-moves small{opacity:.7;}
