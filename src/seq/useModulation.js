@@ -4,10 +4,11 @@ import {evaluate} from './mod';
 /**
  * Plays a modulation set (src/seq/mod.js) on top of a device's knobs: while `running`, every 20 ms the assigned parameters are evaluated at
  * the current beat and sent to the engine with setParams; when it stops (or an assignment goes) the knobs' own values are sent back.
+ * `onOut(values)` gets the modulated values ({key: value}) each tick, and {} when they stop: for things that read a knob in JavaScript instead of the engine (the core clock's swing, flam and tempo).
  * The beat is the global clock's (src/seq/clock.js: `clock()`), so lanes start with the pattern and follow tempo changes and pauses. `values()` are the knobs' own values.
  */
-export default function useModulation({live,clock,mod,params,values,running}){
- const ref=useRef({});ref.current={live,clock,mod,params,values};
+export default function useModulation({live,clock,mod,params,values,running,onOut}){
+ const ref=useRef({});ref.current={live,clock,mod,params,values,onOut};
  useEffect(()=>{
   const sent=new Set();
   const restore=keys=>{
@@ -27,9 +28,10 @@ export default function useModulation({live,clock,mod,params,values,running}){
    const pairs=Object.entries(out).map(([k,val])=>[p.BY_KEY[k].id,val]);
    Object.keys(out).forEach(k=>sent.add(k));
    if(pairs.length)eng.setParams(pairs);
+   ref.current.onOut?.(out);
   };
-  if(!running){restore([...sent]);return undefined;}
+  if(!running){restore([...sent]);ref.current.onOut?.({});return undefined;}
   const id=setInterval(tick,20);
-  return ()=>{clearInterval(id);restore([...sent]);};
+  return ()=>{clearInterval(id);restore([...sent]);ref.current.onOut?.({});};
  },[running,Object.keys(mod.assigns).join()]);// eslint-disable-line react-hooks/exhaustive-deps
 }

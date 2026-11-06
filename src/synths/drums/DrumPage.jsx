@@ -357,7 +357,7 @@ export function DrumPage({kit}){
  const pad=t=>seq.live.current?.noteOn(900+t,36+t,.9);
  // Experimental: the sequencer core (src/seq) books the notes instead of the engine's own sequencer.
  const [core,setCore]=useState(()=>load('synths:core-clock',true)!==false);
- const valuesRef=useRef({});
+ const valuesRef=useRef({}),modOutRef=useRef({});// modOutRef: the modulated knob values, for what the core clock reads in JavaScript (swing, flam, tempo)
  // Modulation (src/seq/mod.js): LFOs and step lanes assigned to knobs by a long press; they sit on top of the knobs' own values while the sequencer plays
  const [mod,setModState]=useState(()=>cleanMod(load(`synths:${kit.id}:mod`,null)));
  const setMod=next=>{setModState(next);save(`synths:${kit.id}:mod`,next);};
@@ -384,8 +384,8 @@ export function DrumPage({kit}){
  const [moves,setMovesState]=useState(()=>cleanMoves(load(`synths:${kit.id}:moves`,null))),rackRef=useRef({});
  const setMoves=(pattern,entry)=>{const next={...moves};if(entry)next[pattern]=entry;else delete next[pattern];const clean=cleanMoves(next);setMovesState(clean);save(`synths:${kit.id}:moves`,clean);};
  useRackMoves({live:()=>seq.live.current,clock:()=>clock.clock,rack:()=>rackRef.current,entry:()=>moves[clock.clock.at(seq.live.current?.context.currentTime??0)?.pattern??seq.playingPattern],running:seq.playing});
- useModulation({live:()=>seq.live.current,clock:()=>clock.clock,mod,params:synth.params,values:()=>valuesRef.current,running:seq.playing});
- const clock=useCoreClock({seq,kit,values:()=>valuesRef.current,enabled:core,silent:t=>silentRef.current(t),fill:()=>fillRef.current});
+ useModulation({live:()=>seq.live.current,clock:()=>clock.clock,mod,params:synth.params,values:()=>valuesRef.current,running:seq.playing,onOut:o=>{modOutRef.current=o;}});
+ const clock=useCoreClock({seq,kit,values:()=>({...valuesRef.current,...modOutRef.current}),enabled:core,silent:t=>silentRef.current(t),fill:()=>fillRef.current});
  const chooseClock=on=>{if(seq.playing)seq.togglePlay();save('synths:core-clock',on);setCore(on);};
 
  // Transport: the core clock plays, pauses (keeping the place), stops (forgetting it), steps one step at a time and jumps to a block or pattern;
