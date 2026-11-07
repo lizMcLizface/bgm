@@ -2,6 +2,10 @@ import React, { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import { makeKey } from '../../seq/harmony';
 
+// the desk the page sits on measures itself with a ResizeObserver, which jsdom does not have
+globalThis.ResizeObserver??=class{observe(){}unobserve(){}disconnect(){}};
+window.matchMedia??=()=>({matches:false,addEventListener(){},removeEventListener(){},addListener(){},removeListener(){}});
+
 const mocks = vi.hoisted(() => ({ scheduler: null, capture: vi.fn() }));
 vi.mock('../../seq/scheduler', () => ({
  createScheduler: options => {
@@ -14,7 +18,7 @@ vi.mock('../../seq/scheduler', () => ({
 vi.mock('./host', () => {
  const SEQUENCERS = [{role:'lead',label:'Lead',short:'LD'},{role:'counter',label:'Second lead',short:'2L'},{role:'rhythm',label:'Rhythm',short:'RH'},{role:'pad',label:'Pad',short:'PD'},{role:'bass',label:'Bass',short:'BS'},{role:'perc',label:'Drums',short:'DR'}];
  return {
-  SEQUENCERS, synthChoices: () => [{id:'calmbgm',name:'calmbgm'}], patchesOf: () => [],
+  SEQUENCERS, synthChoices: () => [{id:'calmbgm',name:'calmbgm'}], patchesOf: () => [], isNative: () => false, synthForPreset: () => null,
   createHost: () => ({
    settings:{seed:1}, loaded:{}, context:{currentTime:0}, g:{AC:{outputLatency:0},roles:{}},
    wake:async()=>{}, applySceneVoices:()=>{}, dispose:()=>{}, note:()=>{},drum:vi.fn(),

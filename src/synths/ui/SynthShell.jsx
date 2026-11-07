@@ -10,6 +10,7 @@ import {LabMidi,bindLabKeyboard,mapVelocity} from '../../labs/input';
 import {load,save} from '../storage';
 import {useSaved} from '../useSaved';
 import Scope from './Scope';
+import {usePanelKit} from './panelKit';
 import SetupPopover from './SetupPopover';
 import StageKeys from './StageKeys';
 import ComparisonPresets from './ComparisonPresets';
@@ -54,7 +55,36 @@ function clearComparisonLink(){
  */
 export default function SynthShell(props){
  const embedded=useEnsemblePanel();
- return embedded?<EmbeddedShell {...props}/>:<StandaloneShell {...props}/>;
+ return embedded?(embedded.bound?<BoundShell {...props}/>:<EmbeddedShell {...props}/>):<StandaloneShell {...props}/>;
+}
+// The page's own panel (its sound bar, its nav and its boxes of controls: the `.rig` of the standalone page) driven by a host that owns the values and the sound, with none of
+// the page's audio, header, desk or keyboard. /synths/all draws a voice's synth this way. The host's `effects` ({open,values,onChange,instrumentSpecs,tools}) shows the effects
+// rack in place of the panel, as the page's Effects button does.
+function BoundShell({synth,className='',panelClassName='',expand,nav=null,libraries=[],picker:Picker=SoundPicker,soundsInDevice=false,toggles=false,children}){
+ const host=useEnsemblePanel(),{values,effects}=host,{params:{BY_KEY},presets}=synth;
+ const replaceValues=next=>host.onChange(synth.params.sanitize(next));
+ const change=(key,value)=>{const more=expand?.(key,value)??[key],edits=Array.isArray(more)?Object.fromEntries(more.map(k=>[k,value])):more;replaceValues({...values,...edits});};
+ const {control,group}=usePanelKit({BY_KEY,values,change,toggles});
+ const [shelf,setShelf]=useState('sounds'),library=libraries.find(l=>l.id===shelf),current=host.current;
+ const open=!!effects?.open;
+ const soundBar=(
+  <nav className={'presets'+(library?' shelf-'+library.id:'')} aria-label="Sounds">
+   {libraries.length>0&&<span className="shelf-switch" role="radiogroup" aria-label="Sound shelf">
+    {[{id:'sounds',label:'Sounds'},...libraries].map(l=><button type="button" key={l.id} role="radio" aria-checked={shelf===l.id} onClick={()=>setShelf(l.id)}>{l.label}</button>)}
+   </span>}
+   {library?library.render({choose:host.choose,values,current,rack:effects?.values??{}}):<Picker synth={synth} presets={presets} mine={[]} current={current} currentCategory={host.category} choose={host.choose} remove={()=>{}} values={values} change={change} replaceValues={replaceValues} save={()=>{}}/>}
+  </nav>
+ );
+ return <div className={'synth instrument bound '+className+(open?' rack-open':'')}>
+  <div className="rig">
+   {!soundsInDevice&&soundBar}
+   {!open&&nav}
+   <main className={'panel'+(open?' rack-panel':' '+panelClassName)}>
+    {!open&&children({values,control,group,change,replaceValues,patch:{current:{name:current,values}},choose:host.choose,current,soundBar,rack:effects?.values??{}})}
+    {open&&<RackPanel values={effects.values} onChange={effects.onChange} instrumentSpecs={effects.instrumentSpecs??[]} tools={effects.tools}/>}
+   </main>
+  </div>
+ </div>;
 }
 function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelClassName='',expand,libraries=[],picker:Picker=SoundPicker,gridKeys=false,toggles=false,startEngine=startLiveSynth,engineOptions,onEngine,onStats,onMidiRealtime,onComparisonWaves,initialPatch,onChoose,compactRack=true,keyboard=true,helpInBar=false,soundsInDevice=false,children}){
  const {params:{BY_KEY,sanitize},presets}=synth,toPairs=synth.params.toEnginePairs??synth.params.toPairs;
@@ -85,8 +115,6 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
  const instrumentSpecs=useMemo(()=>instrumentSpecKeys(synth).map(k=>({...BY_KEY[k],key:'instrument.'+k,label:k.includes('chorus')?k.endsWith('Rate')?'Chorus rate':k.endsWith('Depth')?'Chorus depth':'Chorus mix':k==='reverbMix'?'Reverb mix':BY_KEY[k].label})),[synth,BY_KEY]);
  const [setup,setSetup]=useState(()=>{const stored={...SETUP,...load(SETUP_KEY,{})};if(!['auto','show','hide'].includes(stored.keys))stored.keys='auto';return stored;});
  const [showSetup,setShowSetup]=useState(false);
- const [shapeOpen,setShapeOpen]=useState(null);
- const closeShape=useCallback(()=>setShapeOpen(null),[]);
  const SHELF_KEY=`synths:${synth.id}:shelf`;
  // the instrument's case and the keyboard box can each be moved by their grip, and are remembered
  const rigDrag=useDraggable(`synths:${synth.id}:rig-pos`),keysDrag=useDraggable('synths:keys-pos',s=>onSynth('diy-fm','wt','dx7','minimoog','prophet','jupiter','obxa')?{x:0,y:10}:onSynth('cs80','juno')?{x:0,y:73}:({x:Math.round(s.w*.222),y:Math.round(s.h*.208)}));
@@ -274,47 +302,7 @@ function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelCla
  };
  const fullscreen=()=>{if(document.fullscreenElement)document.exitFullscreen?.();else document.documentElement.requestFullscreen?.().catch(()=>{});};
 
- // Keys are parameter keys, or [key, label] where the table's label is ambiguous.
- const control=(entry,tone,prefix='',under=null)=>{
-  const [key,label]=Array.isArray(entry)?[prefix+entry[0],entry[1]]:[prefix+entry];
-  const spec=BY_KEY[key],short=label??spec.label;
-  if(Array.isArray(entry)&&entry[2]==='knob'&&!spec.options)return <Dial key={key} spec={spec} value={patch.values[key]} onChange={change} tone={tone} label={short}/>;
-  if(toggles&&Array.isArray(entry)&&entry[2]==='switch'&&spec.options?.length===2)return <Lever key={key} spec={spec} value={patch.values[key]} onChange={change} tone={tone} label={short}>{under}</Lever>;
-  if(isToggle(entry,prefix))return <Toggle key={key} spec={spec} value={patch.values[key]} onChange={change} tone={tone} label={short}/>;
-  return spec.options
-   ?<Choice key={key} spec={spec} value={patch.values[key]} options={spec.options} onChange={change} tone={tone} label={short}/>
-   :<Fader key={key} spec={spec} value={patch.values[key]} onChange={change} tone={tone} label={short}/>;
- };
- // toggles: two-way choices are push buttons, and neighbours stack in one column
- const isSwitch=(entry,prefix)=>toggles&&Array.isArray(entry)&&entry[2]==='switch'&&BY_KEY[prefix+entry[0]]?.options?.length===2;
- const isToggle=(entry,prefix)=>toggles&&!isSwitch(entry,prefix)&&BY_KEY[prefix+(Array.isArray(entry)?entry[0]:entry)]?.options?.length===2;
- // a toggle switch starts a column; the push buttons after it (and any run of them) stack beneath
- const layout=(keys,tone,prefix)=>{
-  const out=[];
-  for(const k of keys){
-   const sw=isSwitch(k,prefix);
-   if(!sw&&!isToggle(k,prefix)){out.push(control(k,tone,prefix));continue;}
-   const last=out[out.length-1];
-   if(!sw&&last?.stack)last.items.push(k);else out.push({stack:true,items:[k]});
-  }
-  return out.map((o,i)=>!o.stack?o:isSwitch(o.items[0],prefix)
-   ?control(o.items[0],tone,prefix,o.items.length>1?o.items.slice(1).map(k=>control(k,tone,prefix)):null)
-   :<div className="toggle-stack" key={'t'+i}>{o.items.map(k=>control(k,tone,prefix))}</div>);
- };
- // shape: {env:'amp'|'filter', a, d, s, r} adds the envelope curve editor; stage
- // entries are keys (prefixed like the group's) or functions of (values, prefix).
- const group=({title,tone,keys,shape,keep},prefix='')=>{
-  // keep: show the group even where the effects rack owns its keys (the V 80's chorus)
-  if(!keep&&keys.every(k=>SPACE_KEYS.includes(prefix+(Array.isArray(k)?k[0]:k))))return null;
-  const shaped=shape&&BY_KEY[SHAPE_KEYS[shape.env].mode],id=title+'|'+prefix,open=shaped&&shapeOpen?.id===id;
-  const stage=key=>typeof key==='function'?key(patch.values,prefix):patch.values[prefix+key];
-  return <section className="group" key={title} style={{'--n':keys.length}}>
-   <h3>{title}{shaped&&<button type="button" className="shape-open" aria-expanded={!!open} title="Envelope curves" onClick={e=>{const anchor=e.currentTarget;setShapeOpen(o=>o?.id===id?null:{id,anchor});}}>Shape</button>}</h3>
-   <div className="group-controls">{layout(keys,tone,prefix)}</div>
-   {open&&<EnvShapeEditor env={shape.env} title={title} values={patch.values} BY_KEY={BY_KEY} change={change} anchor={shapeOpen.anchor} onClose={closeShape}
-    times={{A:stage(shape.a),D:stage(shape.d),R:stage(shape.r),sustain:stage(shape.s)}}/>}
-  </section>;
- };
+ const {control,group}=usePanelKit({BY_KEY,values:patch.values,change,toggles});
  // With a MIDI piano attached the on-screen keys only take space from the panel.
   const showKeys=keyboard&&setup.keys!=='hide'; // the header's keyboard button; on unless it was switched off
  const keyLines=['1–5 · phrases','Esc · stops',...(gridKeys?['← → · patch','↑ ↓ · bank']:['← → · sound','↑ ↓ · kind']),...(synth.generate?['N · new sound']:[]),'A S D F G H J K · play notes (W E T Y U for the black keys)','Z X · octave',...(midi.inputs.length?['Your MIDI keyboard plays too']:[])];

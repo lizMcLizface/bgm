@@ -27,8 +27,8 @@ const until = async (condition, ms) => {
 /** RMS level in dB of `preset` playing `role`'s phrase. */
 export async function measureLoudness(preset, role) {
     if(preset.classics){
-        const [{loadKernel},{createOfflineSynth},{SYNTHS},{builtinWaves}]=await Promise.all([import('../../synths/engine/liveSynth'),import('../../synths/engine/offline'),import('../../synths/models'),import('../../synths/vs/waves')]);
-        const spec=preset.classics,synth=SYNTHS[spec.synth],engine=createOfflineSynth(await loadKernel(),{sampleRate:SR,model:synth.model,params:synth.params.toPairs(spec.values),waves:synth.id==='vs'?builtinWaves():null});
+        const [{loadKernel},{createOfflineSynth},{SYNTHS},{builtinWaves},{packWaves,DEFAULT_WAVES}]=await Promise.all([import('../../synths/engine/liveSynth'),import('../../synths/engine/offline'),import('../../synths/models'),import('../../synths/vs/waves'),import('../../synths/wt/waves')]);
+        const spec=preset.classics,synth=SYNTHS[spec.synth],engine=createOfflineSynth(await loadKernel(),{sampleRate:SR,model:synth.model,params:synth.params.toPairs(spec.values),waves:synth.id==='vs'?builtinWaves():synth.id==='wt'?packWaves(spec.waves??DEFAULT_WAVES):null});
         const events=PHRASES[role].flatMap(([midi,start,duration],id)=>[[Math.round(start*SR),true,id+1,midi],[Math.round((start+duration)*SR),false,id+1,midi]]).sort((a,b)=>a[0]-b[0]);
         let frame=0,sum=0;
         for(const [at,on,id,midi]of [...events,[SR*SECONDS,false,0,0]]){

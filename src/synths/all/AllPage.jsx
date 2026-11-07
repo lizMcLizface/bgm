@@ -10,11 +10,31 @@ import {followPlayback} from './followPlayback';
 import {COMPLEXITIES,DIRECTIONS,FLAVOURS,NOTE_LENGTHS,RATES,STYLES,chordStack,chordStrikes,deleteItems,generatedChords,insertChord,itemsAt,materializeGeneratedChord,newPlacedChord,nextChordId,omitOptions,placedChordEvents,placedChordTones,stackNames} from './placedChords';
 import {RATE_PATTERNS} from './ratePatterns';
 import SeqScreen from '../seq/SeqScreen';
+import GeneratorBox from './GeneratorBox';
+import ChannelMixer from './ChannelMixer';
+import AmbienceBox from './AmbienceBox';
+import FloatBox from './FloatBox';
+import {VoiceWindow} from './VoiceWindows';
+import Scope from '../ui/Scope';
+import {PRESET_CATEGORIES} from '../../app/presets';
+import useDraggable from '../ui/useDraggable';
+import Desk from '../ui/Desk';
+import StageKeys from '../ui/StageKeys';
+import SetupPopover from '../ui/SetupPopover';
+import {SETUP,SETUP_KEY,CURVES,computerKeyVelocity} from '../ui/setup';
+import {LabMidi,bindLabKeyboard,mapVelocity} from '../../labs/input';
+import {buildContext,DEFAULT_HARMONY} from '../../app/harmonyContext';
+import {Performer} from '../engine/performer';
+import {createPhraseRunner,phraseForCode} from '../ui/phraseRunner';
+import {AutoPlay,ChordChips} from '../ui/PhraseDock';
+import {Ribbon,TouchPad} from '../ui/controls';
+import {recalledContext} from '../../app/auditionPhrases';
 import ProgressionGrid,{pitchClasses} from './ProgressionGrid';
 import ArrangementGrid from './ArrangementGrid';
 import {movePlayhead} from '../seq/playhead';
-import {createHost,SEQUENCERS,synthChoices,patchesOf} from './host';
-import {load} from '../storage';
+import {createHost,SEQUENCERS,synthChoices,patchesOf,isNative,synthForPreset} from './host';
+import {SYNTHS} from '../models';
+import {load,save} from '../storage';
 import {useSaved} from '../useSaved';
 import {noteName} from '../../labs/Piano';
 import {degreeToMidi,midiToDegree} from '../../seq/harmony';
@@ -118,14 +138,91 @@ export default function AllPage(){
    const song=h.capture({progressions:progressionCount});setProject(song);setBpm(Math.round(song.bpm));setProgression(0);setArrOffset(0);setCol(0);setSounds(Object.fromEntries(SEQUENCERS.filter(s=>s.role!=='perc').map(s=>[s.role,{synth:'calmbgm',name:h.loaded[s.role]?.name??''}])));restoreSounds.current=null;setStatus(`${next.name}`);setHostVersion(v=>v+1);
   }catch(error){console.error(error);setStatus(error.message);}
  }
- async function chooseSound(r,synth,name){
+ async function chooseSound(r,synth,name,values){
   const h=host.current;if(!h)return;
   if(restoreSounds.current){const next={...restoreSounds.current};delete next[r];restoreSounds.current=next;}
   setSounds(s=>({...s,[r]:{synth,name:name??s[r]?.name??''}}));
   setBusy(true);setStatus(`Loading ${synth} for ${r}…`);
-  try{const got=await h.setSound(r,{synth,name});setSounds(s=>({...s,[r]:{synth,name:got.name}}));setStatus(`${r}: ${synth==='calmbgm'?'calmbgm':synth} · ${got.name}`);}catch(error){console.error(error);setStatus(error.message);}finally{setBusy(false);}
+  try{const got=await h.setSound(r,{synth,name,values});setSounds(s=>({...s,[r]:{synth,name:got.name}}));setStatus(`${r}: ${synth==='calmbgm'?'calmbgm':synth} · ${got.name}`);}catch(error){console.error(error);setStatus(error.message);}finally{setBusy(false);setVoiceVersion(v=>v+1);}
  }
+ // the floating windows of the voices (their synth and their effects) and the scope
+ const [wins,setWins]=useState({}),[voiceVersion,setVoiceVersion]=useState(0);
+ const toggleWin=id=>setWins(w=>({...w,[id]:!w[id]}));
+ const editVoice=(r,values)=>{host.current?.editValues(r,values);setVoiceVersion(v=>v+1);};
+ const editNativeVoice=(r,changes)=>{host.current?.editNative(r,changes);setVoiceVersion(v=>v+1);};
+ const editVoiceFx=(r,changes)=>{Promise.resolve(host.current?.editRack(r,changes)).finally(()=>setVoiceVersion(v=>v+1));};
+ const [scopeOn,setScopeOn]=useState(()=>load('synths:scope:open',false)===true),scopeEngine=useRef(null);
+ const toggleScope=()=>setScopeOn(v=>{save('synths:scope:open',!v);return !v;});
+ useEffect(()=>{
+  if(!scopeOn||!started||!host.current)return undefined;
+  let alive=true,made=null;
+  host.current.openMonitor().then(m=>{if(alive){made=m;scopeEngine.current=m;}else m.dispose();}).catch(e=>console.error(e));
+  return ()=>{alive=false;scopeEngine.current=null;made?.dispose();};
+ },[scopeOn,started,sceneName,hostVersion]);
 
+ const keysDrag=useDraggable('synths:all:keys-pos',{x:417,y:-278});
+ // the desk's setup (MIDI, keybed, computer keys) and the keyboard's lit keys, as on every /synths page
+ const [setup,setSetup]=useState(()=>{const s={...SETUP,...load(SETUP_KEY,{})};if(!['auto','show','hide'].includes(s.keys))s.keys='auto';return s;});
+ const [showSetup,setShowSetup]=useState(false),[midi,setMidi]=useState({inputs:[],status:'Not connected.'}),[awake,setAwake]=useState(false),[litNotes,setLitNotes]=useState([]);
+ const setupRef=useRef(setup),midiRef=useRef(null),lit=useRef(new Map());setupRef.current=setup;
+ useEffect(()=>{save(SETUP_KEY,{...load(SETUP_KEY,{}),...setup});},[setup]);
+
+ // The keyboard is the other pages' keyboard, connected to one of the voices: the connected voice is a preview of its sound, so any phrase or key plays through it.
+ const [voice,setVoice]=useState(()=>{const r=SEQUENCERS[stored.selected??3]?.role;return r&&r!=='perc'?r:'lead';});
+ const [held,setHeld]=useState([]),[phrasePlaying,setPhrasePlaying]=useState(null),[chordPick,setChordPick]=useState(0);
+ const [audition,setAudition]=useState(()=>({follow:true,...DEFAULT_HARMONY,...load('synths:audition',{})}));
+ const changeAudition=next=>{setAudition(next);save('synths:audition',next);};
+ const voiceRef=useRef(voice);voiceRef.current=voice;
+ const contextRef=useRef(null);
+ // what the Performer plays on: the connected voice's instrument, a note held for as long as the key is down where the instrument can hold one
+ const performer=useMemo(()=>{
+  const ids=new Map();
+  const target={
+   noteOn(id,note,velocity){
+    const h=host.current,r=voiceRef.current,instrument=h?.g.roles[r]?.instrument;if(!instrument)return;
+    if(typeof instrument.startNote==='function')ids.set(id,{instrument,note:instrument.startNote(note,velocity)});
+    else h.note(r,note,h.context.currentTime+.01,1.2,velocity);
+   },
+   noteOff(id){const e=ids.get(id);if(e){e.instrument.stopNote(e.note);ids.delete(id);}},
+   pressure(){},control(){},
+   panic(){for(const e of ids.values())e.instrument.stopNote(e.note);ids.clear();},
+  };
+  return new Performer(target,{onNotes:setHeld});
+ },[]);
+ const phrases=useMemo(()=>createPhraseRunner(performer,{context:()=>contextRef.current,onState:setPhrasePlaying}),[performer]);
+ // the sequencers' notes light the keys too, in time with the sound
+ function light(midi,delay,dur){
+  const on=setTimeout(()=>{
+   timers.current.delete(on);lit.current.set(midi,(lit.current.get(midi)||0)+1);setLitNotes([...lit.current.keys()]);
+   const off=setTimeout(()=>{timers.current.delete(off);const n=(lit.current.get(midi)||1)-1;if(n>0)lit.current.set(midi,n);else lit.current.delete(midi);setLitNotes([...lit.current.keys()]);},dur);
+   timers.current.add(off);
+  },Math.max(0,delay));
+  timers.current.add(on);
+ }
+ function dark(){if(lit.current.size){lit.current.clear();setLitNotes([]);}}
+ // audio starts with the first key or phrase
+ const wake=()=>{const h=host.current;return h?h.wake().then(()=>setAwake(true)):Promise.resolve();};
+ const playPhrase=id=>{wake().then(()=>phrases.play(id));};
+ const down=(k,n,v)=>{wake().then(()=>performer.down(k,n,v));};
+ const downRef=useRef(down);downRef.current=down;
+ function panic(){phrases.stop();performer.panic();Object.values(host.current?.g.roles??{}).forEach(r=>r.instrument?.silence?.());dark();}
+ const connectMidi=async()=>{try{await midiRef.current.connect();}catch(e){setMidi(m=>({...m,status:e.message}));}};
+ const updateSetup=(k,v)=>{setSetup(x=>({...x,[k]:v}));if(k==='midiDevice'){performer.releaseAll();midiRef.current.selected=v;}if(k==='midiChannel'){performer.releaseAll();midiRef.current.channel=v;}};
+ useEffect(()=>{
+  const m=new LabMidi({on:(k,n,v)=>downRef.current(k,n,mapVelocity(v,CURVES[setupRef.current.velocity]??CURVES.normal)),off:k=>performer.up(k),sustain:()=>{},control:()=>{},panic:()=>performer.panic(),
+   onStatus:inputs=>setMidi({inputs,status:inputs.length?`${inputs.length} MIDI input${inputs.length>1?'s':''} connected.`:'MIDI ready · plug in your piano.'})});
+  m.selected=setupRef.current.midiDevice;m.channel=setupRef.current.midiChannel;midiRef.current=m;
+  const kb=bindLabKeyboard(window,{on:(k,n)=>downRef.current(k,n,computerKeyVelocity(setupRef.current)),off:k=>performer.up(k),panic:()=>performer.panic(),octave:()=>Math.floor(setupRef.current.keysLow/12)-1,
+   shift:d=>setSetup(x=>({...x,keysLow:Math.min(84,Math.max(24,x.keysLow+12*d))}))});
+  // 1-5 play the audition phrases on the connected voice, Escape stops them
+  const phraseKey=e=>{
+   if(e.repeat||e.ctrlKey||e.metaKey||e.altKey||e.target?.closest?.('input,select,textarea,[contenteditable=true],[role=slider]'))return;
+   const id=phraseForCode(e.code);
+   if(id){e.preventDefault();playPhrase(id);}else if(e.key==='Escape')phrases.stop();
+  };
+  window.addEventListener('keydown',phraseKey);
+  return ()=>{kb();m.dispose();window.removeEventListener('keydown',phraseKey);phrases.stop();performer.panic();};
+ },[]);// eslint-disable-line react-hooks/exhaustive-deps
  useSaved(STORE,{scene:sceneName,progressionCount,bpm,selected,mutes,solos,sounds,chordOverlap,project},{skip:()=>!project});
 
  // playback: the sequencer core books every sequencer's notes on the audio clock, and they sound on the generator's role instruments
@@ -147,7 +244,7 @@ export default function AllPage(){
     return [...notes,...hits.map(hit=>({track:drumIndex,hit,time:c.time,stepSec:c.stepSec}))];
    },
    tempo:()=>bpmRef.current,swing:()=>0.5,flam:()=>0.5,
-   emit:events=>events.forEach(e=>{const r=SEQUENCERS[e.track].role;if(r==='perc')h.drum(e.hit,e.time,e.stepSec);else h.note(r,e.note,e.time,e.duration,e.velocity);booked.current[r]=(booked.current[r]||0)+1;}),
+   emit:events=>events.forEach(e=>{const r=SEQUENCERS[e.track].role;if(r==='perc')h.drum(e.hit,e.time,e.stepSec);else{h.note(r,e.note,e.time,e.duration,e.velocity);light(e.note,(e.time-h.context.currentTime+(h.g.AC.outputLatency||0))*1000,Math.max(60,e.duration*1000));}booked.current[r]=(booked.current[r]||0)+1;}),
    onStep:({pattern:part,step,time})=>{
     const wait=Math.max(0,(time-h.context.currentTime+(h.g.AC.outputLatency||0))*1000);
     const absolute=bank().patterns[part].startBar*projectRef.current.stepsPerBar+step;
@@ -164,12 +261,12 @@ export default function AllPage(){
    },
   });
   scheduler.current=sched;
-  return ()=>{sched.stop();scheduler.current=null;timers.current.forEach(clearTimeout);timers.current.clear();};
+  return ()=>{sched.stop();scheduler.current=null;timers.current.forEach(clearTimeout);timers.current.clear();dark();};
  },[started,hostVersion]);// eslint-disable-line react-hooks/exhaustive-deps
  const stop=()=>{
   const s=scheduler.current;if(!s)return;
   temporaryChord.current=false;
-  s.stop();timers.current.forEach(clearTimeout);timers.current.clear();playingRef.current=false;movePlayhead(head.current,{running:false,step:0});Object.values(host.current.g.roles).forEach(r=>r.instrument?.silence?.());setPlaying(false);setPaused(false);
+  s.stop();timers.current.forEach(clearTimeout);timers.current.clear();dark();playingRef.current=false;movePlayhead(head.current,{running:false,step:0});Object.values(host.current.g.roles).forEach(r=>r.instrument?.silence?.());setPlaying(false);setPaused(false);
  };
  const play=async(mode=loop)=>{
   const s=scheduler.current;if(!s||playing)return;
@@ -193,7 +290,7 @@ export default function AllPage(){
    playingRef.current=true;setPlaying(true);setPaused(false);
   }catch(error){console.error(error);setStatus(error.message);}finally{setBusy(false);}
  };
- const pause=()=>{if(!playing)return;scheduler.current?.pause();timers.current.forEach(clearTimeout);timers.current.clear();playingRef.current=false;setPlaying(false);setPaused(true);};
+ const pause=()=>{if(!playing)return;scheduler.current?.pause();timers.current.forEach(clearTimeout);timers.current.clear();dark();playingRef.current=false;setPlaying(false);setPaused(true);};
  const chooseProgression=i=>{setProgression(i);setCol(progressionsOf(project)[i].startBar*project.stepsPerBar);if(!playing){playheadRef.current=progressionsOf(project)[i].startBar*project.stepsPerBar;repeatRef.current=null;}setFocusChord(null);setScreenPage('seq');};
  const changeRepeat=()=>{
   const modes=['pattern','song','bar','chord'],next=modes[(modes.indexOf(loop)+1)%modes.length];
@@ -207,7 +304,7 @@ export default function AllPage(){
   const s=scheduler.current,p=projectRef.current,parts=progressionsOf(p);
   const index=parts.findIndex(part=>step>=part.startBar*p.stepsPerBar&&step<(part.startBar+part.bars)*p.stepsPerBar);
   if(index<0)throw new Error('Playhead is outside the song');
-  s.stop();timers.current.forEach(clearTimeout);timers.current.clear();Object.values(host.current.g.roles).forEach(r=>r.instrument?.silence?.());
+  s.stop();timers.current.forEach(clearTimeout);timers.current.clear();dark();Object.values(host.current.g.roles).forEach(r=>r.instrument?.silence?.());
   progressionRef.current=index;setProgression(index);playheadRef.current=step;
   repeatRef.current=mode==='bar'||mode==='chord'?repeatRange(p,step,mode):null;
   const start=repeatRef.current?repeatRef.current.startBar*p.stepsPerBar:parts[index].startBar*p.stepsPerBar;
@@ -532,30 +629,77 @@ export default function AllPage(){
  const bar=project?Math.floor(col/project.stepsPerBar)+1:1;
 
  if(typeof window!=='undefined')window.__allBooked=booked.current;// notes booked per role, for checking the page
- return <main className="all-page" style={{padding:'14px 16px',maxWidth:1500,margin:'0 auto',display:'grid',gap:12}}>
-  <header style={{display:'flex',flexWrap:'wrap',gap:10,alignItems:'center'}}>
-   <h1 style={{margin:0,fontSize:20}}>All · sequencers and sound generators</h1>
-   <span style={{opacity:.7,fontSize:13}}>{status}</span>
-  </header>
-  <section style={{display:'flex',flexWrap:'wrap',gap:10,alignItems:'center'}} aria-label="Song">
-   <label>Scene <select value={sceneName} disabled={busy} onChange={e=>chooseScene(e.target.value)}>{SCENE_CATEGORIES.map(c=><optgroup key={c.id} label={c.label}>{sceneList.filter(s=>s.category===c.id).map(s=><option key={s.name} value={s.name}>{s.name}</option>)}</optgroup>)}</select></label>
-   <label>Progressions <select value={progressionCount} disabled={busy||!started} onChange={e=>{const n=+e.target.value;setProgressionCount(n);newSong({progressions:n});}}>{PROGRESSION_CHOICES.map(n=><option key={n} value={n}>{n}</option>)}</select></label>
-   <button type="button" disabled={!started||busy} onClick={()=>newSong()} title="The generator plans another song for this scene's settings and the sequencers take it">New song</button>
-   <button type="button" disabled={!started||busy} onClick={()=>newSong({seed:host.current.settings.seed})} title="The scene's own song">Scene's song</button>
-   {chordMode&&role!=='perc'&&<label>Chord overlap <select aria-label="Chord overlap" value={chordOverlap} onChange={e=>setChordOverlap(e.target.value)}><option value="replace">Replace in octave</option><option value="layer">Layer</option></select></label>}
-  </section>
-  <section aria-label="Sound generators" style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:8}}>
+ const voices=<section className="gbox voicebox" aria-label="Sound generators"><header className="gb-head"><h2>Voices</h2><span className="gb-hint">which sound plays each sequencer</span></header>
+  <div className="voice-grid">
    {SEQUENCERS.map((s,i)=>{const sound=sounds[s.role]??{synth:'calmbgm',name:''};return <div key={s.role} style={{border:`1px solid ${COLOURS[s.role]}55`,borderRadius:6,padding:8,display:'grid',gap:4,background:selected===i?'#ffffff10':'transparent'}}>
     <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}><b style={{color:COLOURS[s.role]}}>SEQ {i+1} · {s.label}</b>
      <span><label><input type="checkbox" checked={!!mutes[s.role]} onChange={e=>setMutes(m=>({...m,[s.role]:e.target.checked}))}/> mute</label>{' '}
      <label><input type="checkbox" checked={!!solos[s.role]} onChange={e=>setSolos(m=>({...m,[s.role]:e.target.checked}))}/> solo</label></span></div>
     {s.role==='perc'?<small>Scene drum kit</small>:<><select aria-label={`${s.label} sound generator`} value={sound.synth} disabled={!started||busy} onChange={e=>chooseSound(s.role,e.target.value)}>{synthChoices().map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select>
     {sound.synth==='calmbgm'
-     ?<small style={{opacity:.7}}>{sound.name||'the scene\'s voice'}</small>
-     :<select aria-label={`${s.label} patch`} value={sound.name} disabled={!started||busy} onChange={e=>chooseSound(s.role,sound.synth,e.target.value)}>{patchesOf(sound.synth).map(p=><option key={p.name} value={p.name}>{p.name}</option>)}</select>}
+     ?<select aria-label={`${s.label} preset`} value={sound.name} disabled={!started||busy} onChange={e=>chooseSound(s.role,synthForPreset(e.target.value)??'calmbgm',e.target.value)}>
+       {!Object.values(PRESET_CATEGORIES).some(c=>sound.name in c)&&<option value={sound.name}>{sound.name||'the scene\'s voice'}</option>}
+       {Object.entries(PRESET_CATEGORIES).map(([cat,list])=><optgroup key={cat} label={cat}>{Object.keys(list).filter(n=>!list[n].wasmVoice).map(n=><option key={n} value={n}>{n}</option>)}</optgroup>)}
+      </select>
+     :<select aria-label={`${s.label} patch`} value={sound.name} disabled={!started||busy} onChange={e=>chooseSound(s.role,sound.synth,e.target.value)}>
+       {!patchesOf(sound.synth).some(p=>p.name===sound.name)&&<option value={sound.name}>{sound.name}</option>}
+       {patchesOf(sound.synth).map(p=><option key={p.name} value={p.name}>{p.name}</option>)}</select>}
+    <span className="voice-tools">
+     <button type="button" aria-pressed={!!wins['synth:'+s.role]} disabled={sound.synth==='calmbgm'&&!synthForPreset(sound.name)} title={sound.synth==='calmbgm'?(synthForPreset(sound.name)?'Play this sound through its synth, to edit it':'Choose a synth to open its panel'):'Open this synth in a window'} onClick={()=>{if(sound.synth==='calmbgm'){chooseSound(s.role,synthForPreset(sound.name),sound.name).then(()=>setWins(w=>({...w,['synth:'+s.role]:true})));}else toggleWin('synth:'+s.role);}}>Synth</button>
+     <button type="button" aria-pressed={!!wins['fx:'+s.role]} disabled={!started} title="This voice's effects chain" onClick={()=>toggleWin('fx:'+s.role)}>Effects</button>
+    </span>
     </>}
    </div>;})}
-  </section>
+  </div>
+  </section>;
+ const showKeys=setup.keys!=='hide';
+ // the keyboard's scale and chords are this page's song (its key and scale, the chords of the progression open) unless "My own" is chosen
+ const songContext=useMemo(()=>{
+  try{
+   const base=key?buildContext({tonic:key.tonic,mode:key.scaleId,progression:0}):recalledContext();
+   if(!project)return base;
+   const part=progressionsOf(project)[progression]??progressionsOf(project)[0];
+   const chords=project.chords.filter(c=>c.bar>=part.startBar&&c.bar<part.startBar+part.bars&&Array.isArray(c.pitchClasses)).slice(0,4).map(c=>({name:c.name,numeral:c.numeral,pitchClasses:c.pitchClasses}));
+   return chords.length?{...base,chords}:base;
+  }catch{return recalledContext();}
+ },[key,project,progression]);
+ const context=useMemo(()=>audition.follow?songContext:buildContext(audition),[audition,songContext]);
+ contextRef.current=context;
+ // the generator box shows and sets the sequencers' song: its key and scale, the chords of the progression open, the tempo and meter
+ const generatorSettings=host.current?.g.settings;
+ const seqState=useMemo(()=>{
+  if(!project||!key||!generatorSettings)return undefined;
+  const part=progressionsOf(project)[progression]??progressionsOf(project)[0],list=project.chords.filter(c=>c.bar>=part.startBar&&c.bar<part.startBar+part.bars);
+  return {tonic:key.tonic,mode:key.scaleId,progression:generatorSettings.progression,barsPerChord:generatorSettings.barsPerChord,bpm,meter:project.meter??generatorSettings.meter,
+   generated:generatorSettings.progressionMode==='generated',
+   chords:list.map((c,i)=>({name:c.name,numeral:c.numeral,bars:(list[i+1]?.bar??part.startBar+part.bars)-c.bar}))};
+ },[project,key,progression,bpm,hostVersion]);// eslint-disable-line react-hooks/exhaustive-deps
+ // a tempo change is only the tempo; anything else (the key, the scale, the progression, the meter) is a different plan, so the generator plans the song again with the same seed
+ const changeGenerator=patch=>{
+  const h=host.current;if(!h)return;
+  if('bpm' in patch){setBpm(patch.bpm);return;}
+  h.g.setMany(patch);newSong({seed:project?.seed});
+ };
+ return <div className="synth instrument all-instrument">
+  <header className="synth-bar">
+   <a className="back" href={import.meta.env.BASE_URL+'synths/'} aria-label="All synths">◂</a>
+   <h1><span className="brand">All</span><small>sequencers and sound generators</small></h1>
+   <label className="bar-scene">Scene <select value={sceneName} disabled={busy} onChange={e=>chooseScene(e.target.value)}>{SCENE_CATEGORIES.map(c=><optgroup key={c.id} label={c.label}>{sceneList.filter(s=>s.category===c.id).map(s=><option key={s.name} value={s.name}>{s.name}</option>)}</optgroup>)}</select></label>
+   <span className="patch-name" title={status}>{status}</span>
+   {chordMode&&role!=='perc'&&<label>Chord overlap <select aria-label="Chord overlap" value={chordOverlap} onChange={e=>setChordOverlap(e.target.value)}><option value="replace">Replace in octave</option><option value="layer">Layer</option></select></label>}
+   <span className="meter" aria-label={`${litNotes.length} notes sounding`}><b>{litNotes.length}</b></span>
+   <button type="button" aria-pressed={scopeOn} onClick={toggleScope} title="Oscilloscope and spectrum of the mix">Scope</button>
+   <button type="button" aria-pressed={showSetup} onClick={()=>setShowSetup(v=>!v)} aria-label="Setup" title="Setup: MIDI, the keybed and the computer keys">⚙</button>
+   <button type="button" onClick={panic} title="Silence everything">Panic</button>
+   <button type="button" onClick={()=>{if(document.fullscreenElement)document.exitFullscreen?.();else document.documentElement.requestFullscreen?.().catch(()=>{});}} aria-label="Full screen">⛶</button>
+   <button type="button" className="keys-button" aria-pressed={showKeys} onClick={()=>updateSetup('keys',showKeys?'hide':'show')} aria-label="On-screen keyboard" title="Show or hide the on-screen keyboard">🎹</button>
+  </header>
+  <Desk>
+   <FloatBox id="generator" label="Generator" className="box-generator" home={{x:0,y:0}}><GeneratorBox seq={seqState} onSeq={changeGenerator} info={{status:playing?'PLAYING':'STOPPED'}} song={{count:progressionCount,choices:PROGRESSION_CHOICES,disabled:!started||busy,onCount:n=>{setProgressionCount(n);newSong({progressions:n});},onNew:()=>newSong(),onScene:()=>newSong({seed:host.current.settings.seed})}}/></FloatBox>
+   <FloatBox id="voices" label="Voices" className="box-voices" home={{x:1840,y:1070}}>{voices}</FloatBox>
+   <FloatBox id="ambience" label="Ambience" className="box-ambience" home={{x:834,y:0}}><AmbienceBox/></FloatBox>
+   <FloatBox id="mixer" label="Mixer" className="box-mixer" home={{x:1420,y:0}}><ChannelMixer channels={SEQUENCERS} colours={COLOURS}/></FloatBox>
+   <FloatBox id="sequencer" label="Sequencer" className="all-page box-sequencer" home={{x:0,y:557}}>
   <div className="drums"><div className="split" style={{'--rows':ROWS+1}}><section className="device device-seq" aria-label="Sequencer" style={{position:'relative'}}>
    <header className="device-head"><h2>Sequencer</h2><span>{project?`${seqInfo.label} · bar ${bar} of ${project.bars}${pattern?'':' · empty'}`:'start the orchestra'}</span></header>
    <div className="s8">
@@ -594,7 +738,27 @@ export default function AllPage(){
     </div>
    </div>
   </section></div></div>
- </main>;
+   </FloatBox>
+   <div className="all-stage" aria-hidden="true"/>
+   {SEQUENCERS.filter(x=>x.role!=='perc').map((x,i)=>(wins['synth:'+x.role]||wins['fx:'+x.role])&&<VoiceWindow key={x.role} role={x.role} index={i} host={host.current} version={voiceVersion} fx={!!wins['fx:'+x.role]}
+    onChoose={chooseSound} onEdit={editVoice} onEditNative={editNativeVoice} onEditFx={editVoiceFx} onCloseFx={()=>setWins(w=>({...w,['fx:'+x.role]:false,['synth:'+x.role]:true}))}/>)}
+   {scopeOn&&<Scope engine={scopeEngine} audio={awake?'on':'off'} onClose={toggleScope} keyHz={()=>litNotes.length?440*2**((litNotes[litNotes.length-1]-69)/12):0}/>}
+   {showSetup&&<SetupPopover midi={midi} setup={setup} updateSetup={updateSetup} connectMidi={connectMidi} audio={{state:awake?'on':'off',message:'Audio runs when the song plays or a key is pressed.'}} start={()=>host.current?.wake().then(()=>setAwake(true))} onClose={()=>setShowSetup(false)}/>}
+   <footer className="perform">
+    {showKeys&&<StageKeys drag={keysDrag} size={setup.keysSize} controls={setup.keysControls} low={setup.keysLow} onLow={v=>updateSetup('keysLow',v)} onLayout={updateSetup} notes={[...new Set([...litNotes,...held])]} context={context} chord={chordPick}
+     onDown={(k,n,v)=>down(k,n,mapVelocity(v??.75,CURVES[setup.velocity]??CURVES.normal))} onUp={k=>performer.up(k)}
+     onMod={v=>performer.source('wheelMod',v)} left={<Ribbon vertical range={setup.ribbonRange} onBend={b=>performer.source('ribbon',b)}/>}
+     right={<TouchPad onTouch={(pressure,mod)=>{performer.source('pad',pressure);performer.source('padMod',mod);}}/>}
+     head={<>
+      <span className="shelf-switch" role="radiogroup" aria-label="Voice the keyboard plays">
+       {SEQUENCERS.filter(x=>x.role!=='perc').map(x=><button type="button" key={x.role} role="radio" aria-checked={voice===x.role} onClick={()=>{performer.releaseAll();setVoice(x.role);}}>{x.label}</button>)}
+      </span>
+      <AutoPlay playing={phrasePlaying} onPlay={playPhrase} onStop={()=>phrases.stop()}/>
+      <ChordChips context={context} chordPick={chordPick} onChordPick={i=>setChordPick(p=>p===i?0:i)} audition={audition} onAudition={changeAudition} followLabel="This page’s song"/>
+     </>}/>}
+   </footer>
+  </Desk>
+ </div>;
 }
 
 function progressionsOf(project){

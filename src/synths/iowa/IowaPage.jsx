@@ -59,6 +59,29 @@ const IOWA_RACK = { ...cleanRack(), 'effects.reverb': .18, 'effects.decay': 2.8,
 // the recordings of the no-vibrato instruments still carry a little wobble of the player's: choosing one turns the vibrato right off
 const isStraight = (p) => /no vibrato/i.test(p.name);
 
+/** The measured instruments' own panel (its sound picker and its boxes of controls): the page draws it on its desk, and the voices of /synths/all draw the same one in a window. */
+export function IowaRig({ voice, current, about = false, onAbout = () => {}, onChoose, onVoice, children }) {
+    const fader = (key, tone, label) => <Fader key={key} spec={SPECS[key]} value={voice[key]} onChange={onVoice} tone={tone} label={label ?? SPECS[key].label} />;
+    const box = (title, tone, keys) => <section className="group" key={title} style={{ '--n': keys.length }}><h3>{title}</h3><div className="group-controls">{keys.map((k) => fader(k, tone))}</div></section>;
+
+    return (
+        <>
+                <nav className="presets" aria-label="Sounds">
+                    <span className="rig-title"><a href="#about" className="learn-more" aria-pressed={about} title="Learn more: where these sounds come from" onClick={(e) => { e.preventDefault(); onAbout(); }}>Measured</a> instruments</span>
+                    <OledPicker synth={SYNTH} presets={SOUNDS} mine={[]} current={current?.name} currentCategory={current?.family} choose={onChoose} remove={() => {}} />
+                </nav>
+                <main className="panel complete piano-panel">
+                    <div className="panel-row">
+                        {box('Voice', 'amber', ['vibrato', 'tune'])}
+                        {box('Room', 'blue', ['room'])}
+                        {box('Level', 'red', ['volume'])}
+                    </div>
+                    {children}
+                </main>
+        </>
+    );
+}
+
 export default function IowaPage() {
     const saved = useMemo(() => load(KEY, {}), []);
     const [patch, setPatch] = useState(PATCHES.some((p) => p.id === saved.patch) ? saved.patch : 'flute');
@@ -233,9 +256,6 @@ export default function IowaPage() {
     const setVoiceValue = (key, value) => setVoice((v) => ({ ...v, [key]: value }));
     const current = PATCHES.find((p) => p.id === patch);
 
-    const fader = (key, tone, label) => <Fader key={key} spec={SPECS[key]} value={voice[key]} onChange={setVoiceValue} tone={tone} label={label ?? SPECS[key].label} />;
-    const box = (title, tone, keys) => <section className="group" key={title} style={{ '--n': keys.length }}><h3>{title}</h3><div className="group-controls">{keys.map((k) => fader(k, tone))}</div></section>;
-
     return <div className="synth instrument piano iowa">
         <header className="synth-bar">
             <a className="back" href={import.meta.env.BASE_URL + 'synths/'} aria-label="All synths">◂</a>
@@ -274,19 +294,10 @@ export default function IowaPage() {
 
             <div className="rig" ref={rigDrag.ref} style={rigDrag.style}>
                 <div className="grip rig-grip" {...rigDrag.handle} role="presentation"><i /></div>
-                <nav className="presets" aria-label="Sounds">
-                    <span className="rig-title"><a href="#about" className="learn-more" aria-pressed={open.about} title="Learn more: where these sounds come from" onClick={(e) => { e.preventDefault(); toggleGadget('about'); }}>Measured</a> instruments</span>
-                    <OledPicker synth={SYNTH} presets={SOUNDS} mine={[]} current={current?.name} currentCategory={current?.family} choose={choose} remove={() => {}} />
-                </nav>
-                <main className="panel complete piano-panel">
-                    <div className="panel-row">
-                        {box('Voice', 'amber', ['vibrato', 'tune'])}
-                        {box('Room', 'blue', ['room'])}
-                        {box('Level', 'red', ['volume'])}
-                    </div>
+                <IowaRig voice={voice} current={current} about={open.about} onAbout={() => toggleGadget('about')} onChoose={choose} onVoice={setVoiceValue}>
                     {showEffects && <RackCompact tempo={0} values={rackValues} onChange={changeRack} instrumentSpecs={[]} peak={rackStats.peak} reduction={rackStats.reduction} onClose={toggleEffects}
                         tools={<button type="button" onClick={() => engine.current?.clearRack()}>Clear tails</button>} />}
-                </main>
+                </IowaRig>
             </div>
 
             {showSetup && <SetupPopover midi={midi} setup={setup} updateSetup={updateSetup} connectMidi={connectMidi} audio={audio} start={start} onClose={() => setShowSetup(false)} />}

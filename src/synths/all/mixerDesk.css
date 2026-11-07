@@ -1,0 +1,74 @@
+/* The mixing desk box (proof of concept), after an X32: grey chassis, small LCD per strip, channel colour bars, a master section. */
+.mixdesk{--ch:#888;background:linear-gradient(#25282c,#1a1c1f);}
+.dk-lcd{display:flex;flex-direction:column;gap:1px;padding:4px 8px;background:#02060a;border:1px solid #000;border-radius:4px;box-shadow:inset 0 0 0 1px #1c1c1e;font:11px/1.25 ui-monospace,Consolas,monospace;color:#7fe7ff;text-align:left;}
+.dk-lcd small{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#4aa6b8;}
+.dk-lcd b{font-size:13px;color:var(--ch,#a8f0ff);letter-spacing:.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.dk-lcd span{color:#6fb4c3;font-size:10px;}
+.dk-lcd.mini{width:100%;box-sizing:border-box;cursor:pointer;}
+.dk-lcd.master b{color:#e3a52a;}
+.dk-sends{display:grid;grid-template-columns:230px minmax(0,1fr);gap:12px;align-items:center;padding:8px;border-radius:8px;background:#121416;border:1px solid #000;box-shadow:inset 0 0 0 1px #2a2e33;}
+.dk-sends .dk-lcd{min-height:64px;justify-content:center;}
+.dk-send-knobs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px;}
+.dk-body{display:grid;grid-template-columns:minmax(0,1fr) 128px;gap:10px;}
+.dk-strips{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;}
+.dk-strip,.dk-master{--ch:#888;position:relative;display:flex;flex-direction:column;align-items:center;gap:7px;padding:6px 4px 12px;border-radius:6px;background:linear-gradient(#2d3034,#222427);border:1px solid #000;box-shadow:inset 0 1px 0 #ffffff14;color:#a5a4a0;}
+.dk-strip.sel{box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--ch) 70%,transparent);}
+.dk-strip.silent{opacity:.6;}
+.dk-bar{position:absolute;left:4px;right:4px;bottom:4px;height:4px;border-radius:2px;background:var(--ch);}
+.dk-bar.master{background:#e3a52a;}
+.dk-pot{display:flex;flex-direction:column;align-items:center;gap:1px;}
+.dk-pot small{font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:#8c8f94;}
+.dk-pot-knob{cursor:ns-resize;touch-action:none;outline-offset:2px;}
+.dk-skirt{fill:#0f1012;stroke:#4a4d52;stroke-width:1.5;}
+.dk-cap{fill:#3b3e43;stroke:#000;}
+.dk-ptr{stroke:#f2f2f2;stroke-width:2.5;stroke-linecap:round;}
+.dk-tick{stroke:#8c8f94;stroke-width:2;}
+.dk-filt,.dk-eq{display:flex;align-items:center;gap:4px;}
+.dk-filt{width:100%;justify-content:space-between;padding:0 2px;}
+.dk-filt button{min-height:20px;padding:0 5px;border:1px solid #000;border-radius:3px;background:#17181a;color:#8c8f94;font:700 9px ui-monospace,Consolas,monospace;cursor:pointer;}
+.dk-filt button.on{background:#3a6f9c;color:#fff;}
+.dk-eq{flex-direction:column;gap:2px;padding:3px 0;border-top:1px solid #0006;border-bottom:1px solid #0006;width:100%;}
+.dk-btns{display:flex;flex-direction:column;gap:3px;width:100%;}
+.dk-btns button{min-height:22px;border:1px solid #000;border-radius:3px;background:#17181a;color:#9a9da2;font:700 9px ui-monospace,Consolas,monospace;letter-spacing:.06em;cursor:pointer;}
+.dk-btns .sel.on{background:#e8e8e8;color:#111;}
+.dk-btns .solo.on{background:#e3a52a;color:#1b1206;}
+.dk-btns .mute.on{background:#d2492f;color:#fff;}
+.dk-btns .lim.on{background:#5fae7a;color:#04140a;}
+.dk-fader-row{display:flex;align-items:stretch;gap:5px;height:150px;}
+.dk-fader-row.master{height:180px;}
+.dk-meter{display:flex;flex-direction:column-reverse;gap:1px;width:6px;}
+.dk-meter i{flex:1;background:#101214;border-radius:1px;}
+.dk-meter i.on{background:#3cff7a;}.dk-meter i.mid{background:#e3d02a;}.dk-meter i.hot{background:#ff4a3a;}
+.dk-fader{position:relative;width:46px;touch-action:none;cursor:pointer;outline-offset:2px;}
+.dk-slot{position:absolute;left:50%;top:0;bottom:0;width:5px;margin-left:-2.5px;background:#050506;border-radius:3px;box-shadow:0 0 0 1px #3a3d42;}
+.dk-cap-f{position:absolute;left:50%;width:32px;height:24px;margin-left:-16px;border-radius:3px;background:linear-gradient(#5a5e64,#2c2e32);border:1px solid #000;box-shadow:inset 0 0 0 1px #ffffff22;}
+.dk-cap-f::after{content:'';position:absolute;left:3px;right:3px;top:50%;height:2px;margin-top:-1px;background:var(--ch);}
+.dk-scale b{position:absolute;left:0;font:8px ui-monospace,Consolas,monospace;color:#6f7378;transform:translateY(50%);font-weight:400;}
+.dk-db{font:10px ui-monospace,Consolas,monospace;color:#7fe7ff;background:#02060a;border:1px solid #000;border-radius:3px;padding:1px 6px;}
+.dk-master{background:linear-gradient(#34302a,#262320);}
+@media (max-width:760px){
+ .dk-sends{grid-template-columns:1fr;}
+ .dk-send-knobs{grid-template-columns:repeat(3,minmax(0,1fr));}
+ .dk-body{grid-template-columns:1fr;}
+ .dk-strips{overflow-x:auto;grid-template-columns:repeat(8,84px);}
+}
+/* the ambience box */
+.ambbox .gb-head{gap:10px;}
+.ambbox .gb-head .gb-hint{flex:1;}
+.amb-run{min-height:26px;padding:0 12px;border:1px solid #000;border-radius:4px;background:#17181a;color:#9a9da2;font:700 10px ui-monospace,Consolas,monospace;letter-spacing:.08em;cursor:pointer;}
+.amb-run.on{background:#5fae7a;color:#04140a;}
+.amb-top{grid-template-columns:200px minmax(0,1fr);}
+.amb-knobs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;}
+.amb-faders{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;}
+.amb-ch{--ch:#888;position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;padding:6px 3px 12px;border-radius:6px;background:linear-gradient(#2d3034,#222427);border:1px solid #000;box-shadow:inset 0 1px 0 #ffffff14;}
+.amb-ch.sel{box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--ch) 70%,transparent);}
+.amb-ch.overall{background:linear-gradient(#34302a,#262320);}
+.amb-name{width:100%;min-height:22px;border:0;background:#02060a;border-radius:3px;color:var(--ch);font:700 9px ui-monospace,Consolas,monospace;letter-spacing:.04em;text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;cursor:pointer;}
+b.amb-name{display:grid;place-items:center;cursor:default;}
+.dk-fader-row.short{height:120px;}
+.dk-fader-row.short .dk-fader{width:40px;}
+@media (max-width:760px){.amb-top{grid-template-columns:1fr;}.amb-faders{grid-template-columns:repeat(4,minmax(0,1fr));}}
+.dk-pot.side{flex-direction:row;gap:5px;}
+.dk-pot.side small{font-size:9px;}
+.dk-filt{gap:3px;}
+.dk-eq{align-items:flex-start;padding:3px 4px;}

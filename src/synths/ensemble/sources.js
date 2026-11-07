@@ -7,7 +7,7 @@ const levels=new Map();
 export const DIY_SYNTHS=['poly','fm'];
 const isDiy=sound=>DIY_SYNTHS.includes(sound.synth);
 // The sound alone at level 1, as measureLoudness takes it.
-const probe=sound=>isDiy(sound)?{diy:{...sound,level:1}}:{classics:{synth:sound.synth,values:sound.values}};
+const probe=sound=>isDiy(sound)?{diy:{...sound,level:1}}:{classics:{synth:sound.synth,values:sound.values,waves:sound.waves}};
 /** The gain that brings `sound` (a classic or DIY patch) to the loudness of the role's reference voice. */
 export async function matchedLevel(sound,id){
  const key=JSON.stringify([id,sound.synth,sound.values]);
@@ -23,5 +23,5 @@ export function soundSource(sound,id,light){
 export function classicsSource(sound,id,light){
  const values={...sound.values};
  if(light){if('oversample'in values)values.oversample=0;if('voices'in values)values.voices=Math.min(values.voices,id==='pad'?4:2);}
- return {classics:{synth:sound.synth,name:sound.name,values,rack:sound.rack,light},masterVolume:sound.level??1};
+ return {classics:{synth:sound.synth,name:sound.name,values,rack:sound.rack,light,waves:sound.waves,...(sound.moved?{moved:true}:{})},masterVolume:sound.level??1};
 }

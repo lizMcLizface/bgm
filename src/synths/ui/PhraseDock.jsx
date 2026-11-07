@@ -9,11 +9,11 @@ import {SCALE_FAMILIES,TONIC_NAMES} from '../../app/theory';
 const progressionLabel=i=>PROGRESSIONS[i].join(' ');
 
 // The play-over settings: where the key and chords come from, and, for "My own", the key, scale and progression.
-function PlayOver({audition,onAudition}){
+function PlayOver({audition,onAudition,followLabel='Main page’s'}){
  const set=changes=>onAudition({...audition,...changes});
  return <div className="scale-pop" role="dialog" aria-label="Play over">
   <label>Chords<select value={audition.follow?'main':'own'} onChange={e=>set({follow:e.target.value==='main'})} aria-label="Where the key and chords come from">
-   <option value="main">Main page’s</option><option value="own">My own</option></select></label>
+   <option value="main">{followLabel}</option><option value="own">My own</option></select></label>
   {!audition.follow&&<>
    <label>Key<select value={audition.tonic} onChange={e=>set({tonic:Number(e.target.value)})}>{TONIC_NAMES.map((n,pc)=><option key={pc} value={pc}>{n}</option>)}</select></label>
    <label>Scale<select value={audition.mode} onChange={e=>set({mode:e.target.value})}>{SCALE_FAMILIES.map(f=><optgroup key={f.family} label={f.family}>{f.modes.map(m=><option key={m.id} value={m.id}>{m.name}</option>)}</optgroup>)}</select></label>
@@ -31,7 +31,7 @@ export function AutoPlay({playing,onPlay,onStop,sounds}){
  </span>;
 }
 
-export function ChordChips({context,chordPick=0,onChordPick,audition,onAudition}){
+export function ChordChips({context,chordPick=0,onChordPick,audition,onAudition,followLabel}){
  const [open,setOpen]=useState(false),box=useRef(null);
  useEffect(()=>{
   if(!open)return;
@@ -41,7 +41,7 @@ export function ChordChips({context,chordPick=0,onChordPick,audition,onAudition}
  },[open]);
  return <span className="dock-context" ref={box}>
   <button type="button" className="scale-name" aria-expanded={open} aria-haspopup="dialog" title="Key, scale and chords the phrases play over: click to change" onClick={()=>setOpen(o=>!o)}>{context.key} <i aria-hidden="true">▾</i></button>
-  {open&&<PlayOver audition={audition} onAudition={onAudition}/>}
+  {open&&<PlayOver audition={audition} onAudition={onAudition} followLabel={followLabel}/>}
   <span className="dock-chords" role="group" aria-label="Show a chord on the keys">{context.chords.map((c,i)=><button type="button" key={i} aria-pressed={chordPick===i+1} title="Show this chord on the keys" onClick={()=>onChordPick?.(i+1)}><b>{c.name}</b><small>{c.numeral}</small></button>)}</span>
  </span>;
 }

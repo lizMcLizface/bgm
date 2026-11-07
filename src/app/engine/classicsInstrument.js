@@ -2,6 +2,9 @@ import {startLiveSynth,loadKernel,loadClassicsWorklet} from '../../synths/engine
 import {createRack} from '../../synths/effects/graph';
 import {SYNTHS} from '../../synths/models';
 import {builtinWaves} from '../../synths/vs/waves';
+import {packWaves,DEFAULT_WAVES} from '../../synths/wt/waves';
+// the waves a synth plays with: the vector synth's own, the wavetable synth's four (a patch brings them), else none
+const wavesOf=(synth,spec)=>synth.id==='vs'?builtinWaves():synth.id==='wt'?packWaves(spec.waves??DEFAULT_WAVES):null;
 import {rackPackets} from '../../synths/effects/params';
 import {effectTail} from '../../synth-lab/effectsConfig';
 import {insertsTail} from '../../synth-lab/insertsConfig';
@@ -28,14 +31,14 @@ export default class ClassicsInstrument {
     [inst.module]=await Promise.all([loadKernel(),loadClassicsWorklet(context)]);inst.offlineEvents=[];
     inst.outboard=await createRack(context,preset.classics.rack,{onError:error=>{inst.error=error;}});inst.outboard.connect(inst.output);inst.output.gain.value=preset.masterVolume??1;return inst;
    }
-   const start=()=>startLiveSynth({context,destination:inst.output,model:synth.model,polyphony,params:inst.pairs(preset.classics.values),waves:synth.id==='vs'?builtinWaves():null,rack:preset.classics.rack,onStats:s=>{inst.stats=s;},onError:error=>{inst.error=error;}});
+   const start=()=>startLiveSynth({context,destination:inst.output,model:synth.model,polyphony,params:inst.pairs(preset.classics.values),waves:wavesOf(synth,preset.classics),rack:preset.classics.rack,onStats:s=>{inst.stats=s;},onError:error=>{inst.error=error;}});
    inst.lives=await Promise.all(Array.from({length:MONO.has(synth.id)&&polyphony>2?Math.min(polyphony,preset.classics.light?2:4):1},start));inst.live=inst.lives[0];inst.freeAt=inst.lives.map(()=>0);
    inst.output.gain.value=preset.masterVolume??1;
    return inst;
   }catch(error){inst.dispose();throw error;}
  }
  constructor(context,preset,polyphony){this.AC=context;this.preset={gainRelease:.5,...preset};this.polyphony=polyphony;this.output=context.createGain();this.nextId=1;this.reverb={settled:true,hear(){}};this.drums=drumNotes(preset.classics.synth);this.kit=null;this.held=new Map();}
- pairs(values){const synth=SYNTHS[this.preset.classics.synth],effective={...values};if('voices'in effective)effective.voices=Math.min(effective.voices,this.polyphony);if(this.preset.classics.light&&'oversample'in effective)effective.oversample=0;return synth.params.toPairs(effective);}
+ pairs(values){const synth=SYNTHS[this.preset.classics.synth],effective={...values};if('voices'in effective)effective.voices=Math.min(effective.voices,this.polyphony);if(this.preset.classics.light&&'oversample'in effective)effective.oversample=0;return (this.preset.classics.moved?synth.params.toEnginePairs??synth.params.toPairs:synth.params.toPairs)(effective);}
  connect(node){this.output.connect(node);}
  /** The kernel for a note from `start` to `end`: the first that is free by then, else the one freed soonest. */
  voiceFor(start,end){
@@ -55,7 +58,7 @@ export default class ClassicsInstrument {
  prepareOffline(){
   if(!this.offlineEvents||this.offlineNode)return;
   const synth=SYNTHS[this.preset.classics.synth];
-  this.offlineNode=new AudioWorkletNode(this.AC,'calmbgm-classics',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{module:this.module,model:synth.model,params:this.pairs(this.preset.classics.values),polyphony:this.polyphony,waves:synth.id==='vs'?builtinWaves():null,events:this.offlineEvents.sort((a,b)=>a[4]-b[4])}});
+  this.offlineNode=new AudioWorkletNode(this.AC,'calmbgm-classics',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{module:this.module,model:synth.model,params:this.pairs(this.preset.classics.values),polyphony:this.polyphony,waves:wavesOf(synth,this.preset.classics),events:this.offlineEvents.sort((a,b)=>a[4]-b[4])}});
   this.offlineNode.port.onmessage=({data})=>{if(data.type==='error')this.error=Error(data.message);};this.offlineNode.connect(this.outboard.input);
  }
  /** One drum: its pad, at the kit's level for that drum (settings.drumKit), or nothing when it is off. */

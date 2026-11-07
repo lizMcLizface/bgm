@@ -34,7 +34,7 @@ import library from '../../library/voices.json';
 // monitor a gadget. MIDI, the keybed and the computer keys' strength are in Setup, like every synth; the phrases and the
 // test lines play from the keybed.
 const KEY = 'synths:piano';
-const DEFAULTS = { pianoType: 'grand', pianoDecay: 2.5, pianoBrightness: .5, pianoHammer: .4, pianoUnison: .3, pianoResonance: .5, pianoWear: 0, pianoSeed: 11,
+export const DEFAULTS = { pianoType: 'grand', pianoDecay: 2.5, pianoBrightness: .5, pianoHammer: .4, pianoUnison: .3, pianoResonance: .5, pianoWear: 0, pianoSeed: 11,
     pianoTemperament: 'equal', pianoTonic: 'C', pianoA4: 440, pianoStretch: 0 };
 // the front page's piano-model sounds that sit among its keys (Soft Keys, Felt Keys, the Starmap pianos) are pianos here too
 const PIANO_KEYS = Object.fromEntries(Object.entries(library['Keys & plucks']).filter(([, p]) => p.stringModel === 'piano'));
@@ -63,7 +63,7 @@ const CATEGORIES = [
     { id: 'soft', label: 'Soft & ambient', blurb: 'Felted, ambient, glass and subdued', colour: '#7fb3d9' },
     { id: 'measured', label: 'Measured', blurb: 'Rebuilt from measurements of real pianos', colour: '#5fae7a' },
 ];
-const categoryOf = (type) => (isCalibratedPiano(type) ? 'measured' : type === 'upright' ? 'upright' : ['grand', 'concert'].includes(type) ? 'grand' : 'soft');
+export const categoryOf = (type) => (isCalibratedPiano(type) ? 'measured' : type === 'upright' ? 'upright' : ['grand', 'concert'].includes(type) ? 'grand' : 'soft');
 const SYNTH = { id: 'piano', name: 'Grand & Upright', categories: CATEGORIES };
 const SOUNDS = Object.entries(PRESETS).map(([name, p]) => {
     const category = categoryOf(p.pianoType);
@@ -73,6 +73,47 @@ const SOUNDS = Object.entries(PRESETS).map(([name, p]) => {
 const NAMES = ['C', 'C♯', 'D', 'E♭', 'E', 'F', 'F♯', 'G', 'A♭', 'A', 'B♭', 'B'];
 const noteName = (n) => NAMES[n % 12] + (Math.floor(n / 12) - 1);
 const GADGETS = { tuning: 'synths:piano:tuning-open', input: 'synths:piano:input-open' };
+
+/** The piano's own panel (its sound picker and its boxes of controls): the page draws it on its desk, and the voices of /synths/all draw the same one in a window. `children` go in the panel under the boxes. */
+export function PianoRig({ settings, room, current, category, onChoose, onChange, onRoom, rackValues, onRack, children }) {
+    const modelCategory = CATEGORIES.find((c) => c.id === categoryOf(settings.pianoType));
+    const stepModel = (dir) => onChange('pianoType', TYPE_KEYS[(TYPE_KEYS.indexOf(settings.pianoType) + dir + TYPE_KEYS.length) % TYPE_KEYS.length]);
+    // a fader on the page's own state: the piano's settings or the room
+    const fader = (key, tone, label) => {
+        const spec = SPECS[key];
+        return <Fader key={key} spec={spec} value={key === 'room' ? room : settings[key]} onChange={key === 'room' ? (_, v) => onRoom(v) : onChange} tone={tone} label={label ?? spec.label} />;
+    };
+    // the rack's reverb and delay, as faders in the box (a send and its character each)
+    const rackFader = (key, tone, label) => <Fader key={key} spec={RACK_PARAMS.BY_KEY[key]} value={rackValues[key]} onChange={(k, v) => onRack({ [k]: v })} tone={tone} label={label} />;
+    const rackBox = (title, tone, entries) => <section className="group" key={title} style={{ '--n': entries.length }}><h3>{title}</h3><div className="group-controls">{entries.map(([key, label]) => rackFader(key, tone, label))}</div></section>;
+    const box = (title, tone, keys) => <section className="group" key={title} style={{ '--n': keys.length || 1 }}><h3>{title}</h3><div className="group-controls">{keys.map((k) => fader(k, tone))}</div></section>;
+
+    return (
+        <>
+                <nav className="presets" aria-label="Sounds">
+                    <OledPicker synth={SYNTH} presets={SOUNDS} mine={[]} current={current} currentCategory={category} choose={onChoose} remove={() => {}} />
+                </nav>
+                <main className="panel complete piano-panel">
+                    <div className="panel-row">
+                        <section className="group piano-instrument" key="instrument"><h3>Model</h3><div className="group-controls piano-model">
+                            <div className="oled-picker">
+                                <PresetKnob onStep={stepModel} label="Step through the piano models" />
+                                <div className="oled" role="status" title="The piano model: turn the knob to change it" style={{ '--accent': modelCategory?.colour }}>
+                                    <span className="oled-cat">{modelCategory?.label ?? 'Model'}</span><span className="oled-name" key={settings.pianoType} style={{ '--n': Math.min(shortModel(settings.pianoType).length, 22) }}>{shortModel(settings.pianoType)}</span>
+                                </div>
+                            </div>
+                        </div></section>
+                        {box('Body', 'amber', ['pianoDecay', 'pianoResonance', 'pianoWear'])}
+                        {box('Touch', 'red', ['pianoBrightness', 'pianoHammer', 'pianoUnison'])}
+                        {box('Room', 'blue', ['room'])}
+                        {rackBox('Reverb', 'blue', [['effects.reverb', 'Send'], ['effects.decay', 'Decay']])}
+                        {rackBox('Delay', 'teal', [['effects.delay', 'Send'], ['effects.delayMs', 'Time'], ['effects.feedback', 'Feedback']])}
+                    </div>
+                    {children}
+                </main>
+        </>
+    );
+}
 
 export default function PianoPage() {
     const saved = useMemo(() => load(KEY, {}), []);
@@ -226,21 +267,15 @@ export default function PianoPage() {
 
     const choose = (sound) => { setName(sound.name); setSettings({ ...DEFAULTS, ...PRESETS[sound.name] }); };
     const change = (key, value) => { setName((n) => n.replace(/ \*$/, '') + ' *'); setSettings((s) => ({ ...s, [key]: value })); };
-    const stepModel = (dir) => change('pianoType', TYPE_KEYS[(TYPE_KEYS.indexOf(settings.pianoType) + dir + TYPE_KEYS.length) % TYPE_KEYS.length]);
     const deviation = useMemo(() => temperamentOffsets(settings.pianoTemperament, settings.pianoTonic), [settings.pianoTemperament, settings.pianoTonic]);
     const current = name.replace(/ \*$/, '');
     const category = SOUNDS.find((s) => s.name === current)?.category ?? categoryOf(settings.pianoType);
-    const modelCategory = CATEGORIES.find((c) => c.id === categoryOf(settings.pianoType));
 
-    // a fader on the page's own state: the piano's settings or the room
+    // a fader on the page's own state (the tuning window's)
     const fader = (key, tone, label) => {
         const spec = SPECS[key];
         return <Fader key={key} spec={spec} value={key === 'room' ? room : settings[key]} onChange={key === 'room' ? (_, v) => setRoom(v) : change} tone={tone} label={label ?? spec.label} />;
     };
-    // the rack's reverb and delay, as faders in the box (a send and its character each)
-    const rackFader = (key, tone, label) => <Fader key={key} spec={RACK_PARAMS.BY_KEY[key]} value={rackValues[key]} onChange={(k, v) => changeRack({ [k]: v })} tone={tone} label={label} />;
-    const rackBox = (title, tone, entries) => <section className="group" key={title} style={{ '--n': entries.length }}><h3>{title}</h3><div className="group-controls">{entries.map(([key, label]) => rackFader(key, tone, label))}</div></section>;
-    const box = (title, tone, keys) => <section className="group" key={title} style={{ '--n': keys.length || 1 }}><h3>{title}</h3><div className="group-controls">{keys.map((k) => fader(k, tone))}</div></section>;
 
     // the test lines sit with the keybed's phrases: a line is a short piece for judging the sound, and the pause button stops it
     const playingLine = phrasePlaying?.startsWith('line:') ? phrasePlaying : '';
@@ -300,28 +335,10 @@ export default function PianoPage() {
 
             <div className="rig" ref={rigDrag.ref} style={rigDrag.style}>
                 <div className="grip rig-grip" {...rigDrag.handle} role="presentation"><i /></div>
-                <nav className="presets" aria-label="Sounds">
-                    <OledPicker synth={SYNTH} presets={SOUNDS} mine={[]} current={current} currentCategory={category} choose={choose} remove={() => {}} />
-                </nav>
-                <main className="panel complete piano-panel">
-                    <div className="panel-row">
-                        <section className="group piano-instrument" key="instrument"><h3>Model</h3><div className="group-controls piano-model">
-                            <div className="oled-picker">
-                                <PresetKnob onStep={stepModel} label="Step through the piano models" />
-                                <div className="oled" role="status" title="The piano model: turn the knob to change it" style={{ '--accent': modelCategory?.colour }}>
-                                    <span className="oled-cat">{modelCategory?.label ?? 'Model'}</span><span className="oled-name" key={settings.pianoType} style={{ '--n': Math.min(shortModel(settings.pianoType).length, 22) }}>{shortModel(settings.pianoType)}</span>
-                                </div>
-                            </div>
-                        </div></section>
-                        {box('Body', 'amber', ['pianoDecay', 'pianoResonance', 'pianoWear'])}
-                        {box('Touch', 'red', ['pianoBrightness', 'pianoHammer', 'pianoUnison'])}
-                        {box('Room', 'blue', ['room'])}
-                        {rackBox('Reverb', 'blue', [['effects.reverb', 'Send'], ['effects.decay', 'Decay']])}
-                        {rackBox('Delay', 'teal', [['effects.delay', 'Send'], ['effects.delayMs', 'Time'], ['effects.feedback', 'Feedback']])}
-                    </div>
+                <PianoRig settings={settings} room={room} current={current} category={category} onChoose={choose} onChange={change} onRoom={setRoom} rackValues={rackValues} onRack={changeRack}>
                     {showEffects && <RackCompact tempo={0} values={rackValues} onChange={changeRack} instrumentSpecs={[]} peak={rackStats.peak} reduction={rackStats.reduction} onClose={toggleEffects}
                         tools={<button type="button" onClick={() => engine.current?.clearRack()}>Clear tails</button>} />}
-                </main>
+                </PianoRig>
             </div>
 
             {showSetup && <SetupPopover midi={midi} setup={setup} updateSetup={updateSetup} connectMidi={connectMidi} audio={audio} start={start} onClose={() => setShowSetup(false)} />}
