@@ -83,3 +83,7 @@
 /* Chord mode: each chord slot at the top glows faintly in the colour of its root's place in the key. */
 .drums .progression-grid .progression-ruler .chord-span.glow { background: linear-gradient(180deg, color-mix(in srgb, var(--glow, #888) 24%, transparent), transparent 85%); box-shadow: inset 0 0 14px -5px var(--glow, #888); }
 .drums .progression-grid .progression-ruler .chord-span.glow.focused { background: linear-gradient(180deg, color-mix(in srgb, var(--glow, #888) 38%, #302719), #302719 90%); }
+.all-drum-kit{display:grid;grid-template-columns:repeat(3,minmax(150px,1fr));gap:8px;max-height:70vh;overflow:auto;padding:12px;background:#282722;color:#eee}
+.all-drum-kit .gen-drum{display:grid;gap:4px;min-width:0;border:1px solid #5b584e}
+.all-drum-kit .gen-field{display:grid;gap:2px;font-size:12px}
+.all-drum-kit .gen-field input{width:100%}

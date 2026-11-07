@@ -1,5 +1,6 @@
 import {degreeToMidi,midiToDegree} from '../../seq/harmony';
 import {heldSteps} from '../../seq/notes';
+import {matchesDrumLane} from './drumLanes';
 
 // Captured projects use four steps per meter unit, regardless of its denominator.
 export function gridResolutions(meter='4/4') {
@@ -46,18 +47,18 @@ export function editPitch(pattern,key,start,end,midi,{replace=false}={}) {
  return {...pattern,mode:'poly',steps};
 }
 
-export function editDrum(pattern,start,end,drum) {
+export function editDrum(pattern,start,end,drum,track) {
  const steps=[...pattern.steps];
- const hits=steps.slice(start,end).flatMap(s=>s?.hits??[]).filter(hit=>hit.drum===drum);
- const remove=hits.length===1&&steps[start]?.hits?.some(hit=>hit.drum===drum);
+ const lane={drum,track},hits=steps.slice(start,end).flatMap(s=>s?.hits??[]).filter(hit=>matchesDrumLane(hit,lane));
+ const remove=hits.length===1&&steps[start]?.hits?.some(hit=>matchesDrumLane(hit,lane));
  for(let i=start;i<end;i++){
   if(!steps[i])continue;
-  const remaining=steps[i].hits.filter(hit=>hit.drum!==drum);
+  const remaining=steps[i].hits.filter(hit=>!matchesDrumLane(hit,lane));
   steps[i]=remaining.length?{...steps[i],hits:remaining}:null;
  }
  if(!remove){
   const step=steps[start]??{hits:[]};
-  steps[start]={...step,hits:[...step.hits,{drum,velocity:.8,duration:1}]};
+  steps[start]={...step,hits:[...step.hits,{drum,velocity:.8,duration:1,...(track?{track}:{})}]};
  }
  return {...pattern,steps};
 }

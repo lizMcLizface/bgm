@@ -1,11 +1,12 @@
 import VoiceBrowser from './editor/VoiceBrowser';
 import PercussionPresetPicker from './PercussionPresetPicker';
-import {percussionVoice,percussionPads,percussionEdited,percussionKeyHint} from './percussionVoices';
+import {percussionVoice,percussionEdited,percussionKeyHint} from './percussionVoices';
 import {percussionFromSearch,withPercussion} from '../audio/percussionChoice';
 import {mediaHelperFromSearch,withMediaHelper} from '../audio/mediaHelperChoice';
 import React, { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Generator, { ROLES, PERC_ROLE } from './Generator';
-import { DRUM_STYLES, DRUM_PARAMS, randomDrums } from './percussion';
+import { DRUM_STYLES, randomDrums } from './percussion';
+import DrumKitPads from './DrumKitPads';
 import { SCALE_FAMILIES, TONIC_NAMES, scaleById } from './theory';
 import ChordTimeline from './ChordTimeline';
 import Rulebook from './rulebook/Rulebook';
@@ -778,30 +779,13 @@ const WanderPanel = ({ wander, shown, update }) => {
 // Percussion (percussion.js, engine/drumKit.js): what plays - style,
 // activity, variation - and its level; under More options the room and
 // each drum's sound (on, level, tone, length).
-const DRUM_VALUE = { level: pct, tone: (v) => (v === 0 ? 'neutral' : v < 0 ? `darker ${Math.round(-v * 100)}%` : `brighter ${Math.round(v * 100)}%`), decay: (v) => `${v.toFixed(2)}x` };
 const PercussionPanel = ({ drums, kit, volume, mix, armed, onArm, onDrums, onKit, onVoice, voiceBusy, voiceOpen, onVoiceOpen, onVolume, onMix, onAudition }) => {
-    const setDrum = (name, patch) => onKit({ ...kit, [name]: { ...kit[name], ...patch } });
     const more = (
         <>
             <Field label={`Room ${pct(kit.room)}`}>
                 <input type="range" min="0" max="0.5" step="0.05" value={kit.room} onChange={(e) => onKit({ ...kit, room: Number(e.target.value) })} />
             </Field>
-            {percussionPads(drums.kit).map(({name,label}) => (
-                <fieldset key={name} className="gen-weights gen-drum">
-                    <legend>
-                        <label className="gen-check">
-                            <input type="checkbox" checked={kit[name].on} onChange={(e) => setDrum(name, { on: e.target.checked })} />
-                            {label}
-                        </label>
-                    </legend>
-                    {Object.entries(DRUM_PARAMS).map(([key, { min, max, step, label }]) => (
-                        <Field key={key} label={`${label} ${DRUM_VALUE[key](kit[name][key])}`}>
-                            <input type="range" min={min} max={max} step={step} value={kit[name][key]} disabled={!kit[name].on}
-                                onChange={(e) => setDrum(name, { [key]: Number(e.target.value) })} />
-                        </Field>
-                    ))}
-                </fieldset>
-            ))}
+            <DrumKitPads voice={drums.kit} kit={kit} onKit={onKit} Field={Field}/>
         </>
     );
     return (

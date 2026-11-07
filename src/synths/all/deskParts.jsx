@@ -47,6 +47,5 @@ export function Fader({v,onChange,label,colour}){
 
 export function Meter({level,silent}){
  const on=silent?0:Math.round(level*14);
- return <div className="dk-meter" aria-hidden="true">{Array.from({length:14},(_,i)=><i key={i} className={i<on?(i>11?'hot':i>8?'mid':'on'):''} style={{order:-i}}/>)}</div>;
+ return <div className="dk-meter" aria-hidden="true">{Array.from({length:14},(_,i)=><i key={i} className={i<on?(i>11?'hot':i>8?'mid':'on'):''}/>)}</div>;
 }
-

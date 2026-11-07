@@ -2,15 +2,30 @@
 // main and ensemble pages load them (scene voices; a classic synth or DIY patch as a source, level-matched), and the song is planned by its planner, so the progression, voicings
 // and lines are the generator's. The sequencers then play those same role instruments.
 import Generator, { ROLES } from '../../app/Generator';
-import { sceneSettings, sceneVoiceSpec } from '../../app/scenes';
+import { BROWSABLE_SCENES, sceneSettings, sceneVoiceSpec } from '../../app/scenes';
+import { PERCUSSION_VOICES, percussionPresetKit } from '../../app/percussionVoices';
+import { defaultDrumKit } from '../../app/percussion';
+import { sanitizeSettings } from '../../app/settings';
 import { seeded } from '../../app/random';
 import { SYNTHS } from '../models';
 import library from '../../library/voices.json';
 import { matchedLevel, soundSource } from '../ensemble/sources';
 import { ROLE_PICKS } from '../ensemble/state';
 import { cleanRack, rackForPatch, splitRackEdits } from '../effects/params';
+import { RACK_PARAMS } from '../effects/params';
 import { createOutputMonitor } from '../effects/outputMonitor';
 import { leanChain } from '../effects/rackParts';
+import { nativeRackDefaults } from '../effects/nativeRacks';
+import { diySpec } from '../../app/engine/diySource';
+import { PATCHES as IOWA_PATCHES } from '../../app/engine/iowaModel/patches';
+import { tuning } from '../tuning';
+import { findPreset } from '../../app/editor/presetStore';
+import { translatedWasmPreset } from '../../app/engine/wasmPreset';
+import { nativeWasmVoice } from '../../synth-lab/voiceLibrary';
+import {instrumentRack,mixerRack,mixerEdits,mixerSpace,isMixerSpaceKey} from './mixerEffects';
+import {chainUnits,maskFromUnits} from '../effects/order';
+import {createMeter,meterLevel} from './meter';
+import {masterBus} from '../../audio/bus';
 
 // as on the pages (ui/SynthShell): the instrument's own space controls are moved into the rack, and a rack that has not been touched holds only the effects the sound uses
 const MOVED = { moved: true };
@@ -31,32 +46,116 @@ export const GENERATOR_ROLES = Object.keys(ROLES);
 /** A voice the generator can play a role with: its own synth (a preset by name), a classic synth or a DIY synth (a patch of it). */
 /** The generator's own instruments that have a page of their own: the pianos (the piano page's list: the pianos and the front page's piano-model keys) and the instruments measured from recordings (preset.iowa). Each plays one of the front page's sounds (library/voices.json). */
 const PIANOS = { ...library.Pianos, ...Object.fromEntries(Object.entries(library['Keys & plucks']).filter(([, p]) => p.stringModel === 'piano')) };
-const MEASURED = library['Iowa & VSCO'];
+const MEASURED = { ...Object.fromEntries(IOWA_PATCHES.map(p => [p.name, Object.values(library['Iowa & VSCO']).find(v => v.iowa === p.id)])), ...library['Iowa & VSCO'] };
 export const NATIVE = { piano: { name: 'Piano', presets: PIANOS }, iowa: { name: 'Measured instruments', presets: MEASURED } };
 export const isNative = (synth) => synth in NATIVE;
 /** The synth that plays a front page sound as an instrument of its own, or as a patch it can be edited in (DI-Poly): null when the generator's own voice is all there is. */
-export const synthForPreset = (name) => (!name ? null : name in PIANOS ? 'piano' : name in MEASURED ? 'iowa' : SYNTHS.poly.presets.some((p) => p.name === name) ? 'poly' : null);
+export const synthForPreset = (name) => (!name ? null : name in PIANOS ? 'piano' : name in MEASURED ? 'iowa' : ['poly', 'fm'].find(id => SYNTHS[id].presets.some(p => p.name === name)) ?? null);
 export const synthChoices = () => [{ id: 'calmbgm', name: 'calmbgm' }, ...Object.entries(NATIVE).map(([id, n]) => ({ id, name: n.name })), ...['poly', 'fm', 'cs80', 'juno', 'prophet5', 'jupiter8', 'minimoog', 'dx7', 'obxa', 'vs', 'wt'].map((id) => ({ id, name: SYNTHS[id].name }))];
 export const patchesOf = (synthId) => (synthId === 'calmbgm' ? [] : isNative(synthId) ? Object.keys(NATIVE[synthId].presets).map((name) => ({ name })) : SYNTHS[synthId].presets);
+const stableValue=value=>Array.isArray(value)?value.map(stableValue):value&&typeof value==='object'?Object.fromEntries(Object.keys(value).sort().map(key=>[key,stableValue(value[key])])):value;
+const sceneDrumKey=scene=>{
+ const settings=sceneSettings(scene,0);
+ return JSON.stringify(stableValue({voice:settings.drums.kit,kit:settings.drumKit,machine:scene.percussion??null}));
+};
+const sceneDrumGroups=()=>{
+ const groups=new Map();
+ for(const scene of BROWSABLE_SCENES){
+  const key=sceneDrumKey(scene),group=groups.get(key);
+  if(group)group.scenes.push(scene.name);
+  else groups.set(key,{id:scene.name,scenes:[scene.name]});
+ }
+ return [...groups.values()];
+};
+const SCENE_DRUM_GROUPS=sceneDrumGroups();
+export const sceneDrumPatch=name=>SCENE_DRUM_GROUPS.find(group=>group.scenes.includes(name))?.id??name;
+export const drumChoices = () => [{id:'scene',name:'Scene kits'},{id:'kit',name:'Basic kits'},...['tr808','tr909','tr707','tr606'].map(id=>({id,name:SYNTHS[id].name}))];
+export const drumPatches = id => id==='scene'?SCENE_DRUM_GROUPS.map(group=>({id:group.id,name:group.scenes.length>1?`${group.id} (${group.scenes.length} scenes)`:group.id})):id==='kit'?Object.values(PERCUSSION_VOICES).map(v=>({name:v.name,id:v.id})):SYNTHS[id]?.kit?SYNTHS[id].presets:[];
 
-export function createHost(scene) {
-    const settings = sceneSettings(scene);
+export function createHost(scene, {seed,settings:storedSettings} = {}) {
+    const settings = storedSettings ? sanitizeSettings(storedSettings,sceneSettings(scene,seed)) : sceneSettings(scene, seed);
     const g = new Generator(settings);
     const loaded = {};
     const sounds = {}; // role -> the classic or DIY patch playing it: { synth, name, category, values, rack, level }
     const racks = {}; // role -> the effects of a calmbgm voice
+    const spaces = {}; // role -> independent mixer delay and reverb settings
     const natives = {}; // role -> { synth, name, preset } for a piano, measured-instrument or string voice (the preset as edited)
     const hostScene = { scene };
+    loaded.perc = {synth:'scene',name:scene.name};
+    const meterTaps = new Set();
+    let drumMask = null, drumMix={muted:[],solo:[]};
+    if (g.settings.drumKit) {
+        const rack = RACK_PARAMS.sanitize({ ...cleanRack(), 'effects.reverb': g.settings.drumKit.room });
+        racks.perc = { ...rack, 'master.chain': leanChain(rack) };
+        spaces.perc = mixerSpace(rack);
+    }
+    let disposed = false;
+    let tempo = settings.bpm;
+    const ensureActive = () => { if (disposed) throw new Error('Sound host was closed while loading'); };
 
     /** The scene's voices on the roles, as the main page does when a scene is chosen. */
-    function applySceneVoices(next = scene) {
+    async function applySceneVoices(next = scene) {
         for (const role of GENERATOR_ROLES) {
-            const spec = sceneVoiceSpec(next, role, g.settings.layers);
-            if (!spec) continue;
-            if (typeof spec === 'string') g.loadRolePreset(role, spec);
-            else g.loadRolePreset(role, spec.name, spec.synth);
-            loaded[role] = { synth: 'calmbgm', name: typeof spec === 'string' ? spec : spec.name };
+            const spec = sceneVoiceSpec(next, role, g.settings.layers) ?? ROLES[role].preset;
+            const name = typeof spec === 'string' ? spec : spec.name;
+            const synth = spec.external?.synth ?? synthForPreset(name);
+            if (synth) await setSound(role, { synth, name: spec.external?.name ?? name });
+            else {
+                await setPreset(role, name, 'calmbgm', typeof spec === 'string' ? undefined : spec.synth);
+            }
         }
+        if(next.percussion)await setDrumSound({synth:'scene',name:next.name});
+    }
+
+    async function setDrumSound({synth,name,values,rack:storedRack,drumKit,kit:storedKit}) {
+            const previousMachine=sounds.perc?.synth;
+            if(synth==='scene'||synth==='kit') {
+                const chosen=synth==='scene'?BROWSABLE_SCENES.find(s=>s.name===name):null;
+                if(synth==='scene'&&!chosen)throw new Error(`Unknown scene kit: ${name}`);
+                if(chosen?.percussion){
+                    const ref=chosen.percussion;
+                    await setDrumSound({...ref,values:{...ref.values,...values},rack:storedRack??ref.rack,drumKit:sceneSettings(chosen).drumKit});
+                    loaded.perc={...loaded.perc,synth:'scene',name:chosen.name};
+                    return loaded.perc;
+                }
+                const voice=synth==='scene'?sceneSettings(chosen).drums.kit:name;
+                if(!PERCUSSION_VOICES[voice])throw new Error(`Unknown drum kit: ${voice}`);
+                const base=structuredClone(synth==='scene'?sceneSettings(chosen).drumKit:percussionPresetKit(voice));
+                const kit=storedKit?sanitizeSettings({drumKit:storedKit},{...g.settings,drumKit:base}).drumKit:base;
+                if(g.roles.perc.machine){
+                    const before={drums:g.settings.drums,drumKit:g.settings.drumKit};
+                    try{await g.loadPercussionVoice(voice);await g.setPercussionSource(null);}
+                    catch(error){g.setMany(before);throw error;}
+                }else await g.loadPercussionVoice(voice);
+                ensureActive();
+                g.settings.drumKit={...kit,room:0};
+                g.roles.perc.instrument.setKit(g.settings.drumKit);
+                delete sounds.perc;
+                const rack=RACK_PARAMS.sanitize({...cleanRack(),'effects.reverb':kit.room});
+                racks.perc={...rack,'master.chain':leanChain(rack)};
+                spaces.perc=mixerSpace(racks.perc);
+                loaded.perc={synth,name:synth==='scene'?chosen.name:voice,...(storedKit?{kit}: {})};
+            } else {
+                const model=SYNTHS[synth];
+                if(!model?.kit)throw new Error(`Unknown drum machine: ${synth}`);
+                const patch=model.presets.find(p=>p.name===name)??model.presets[0];
+                const clean=model.params.sanitize({...patch.values,...values});
+                const rack=RACK_PARAMS.sanitize({...cleanRack(),'effects.reverb':clean.reverbMix,'effects.decay':clean.reverbDecay,'effects.damping':clean.reverbTone,'effects.size':clean.reverbSize,'effects.predelay':clean.reverbPredelay*1000,...storedRack});
+                const full={...rack,'master.chain':storedRack?.['master.chain']??leanChain(rack)};
+                const audioValues={...clean,reverbMix:0};
+                await g.setPercussionSource({classics:{synth,name:patch.name,values:audioValues,rack:{...cleanRack(),'master.chain':0},moved:true},masterVolume:1});
+                ensureActive();
+                g.settings.drumKit={...(drumKit??defaultDrumKit()),room:0};
+                g.roles.perc.instrument.setKit(g.settings.drumKit);
+                sounds.perc={synth,name:patch.name,category:patch.category,values:clean,rack:full};
+                spaces.perc=mixerSpace(full);
+                loaded.perc={synth,name:patch.name,values:clean,rack:full};
+            }
+            if(previousMachine!==sounds.perc?.synth){drumMask=null;drumMix={muted:[],solo:[]};}
+            else applyDrumValues();
+            g.roles.perc.ensembleRack?.patch(instrumentRack(rackValues('perc')));
+            updateMixer('perc');
+            return loaded.perc;
     }
 
     /** The effects of a calmbgm voice: its own rack between the instrument and the role's mix (as the ensemble page does it). */
@@ -65,6 +164,7 @@ export function createHost(scene) {
         if (!r.ensembleRack) {
             const { createRack } = await import('../effects/graph');
             const rack = await createRack(g.AC, values);
+            if (disposed) { rack.dispose(); ensureActive(); }
             r.instrument.output.disconnect();
             if (r.instrument.destinations) r.instrument.destinations = [];
             r.instrument.connect(rack.input);
@@ -73,48 +173,117 @@ export function createHost(scene) {
         } else r.ensembleRack.patch(values);
     }
     const dropRack = (role) => { g.roles[role].ensembleRack?.dispose(); g.roles[role].ensembleRack = null; };
+    const updateMixer = role => { const r=g.roles[role]; if(r.mixerRack)r.mixerRack.patch(mixerRack(rackValues(role),tempo)); };
+
+    async function setupMixer() {
+        if(g.percussionReady)await g.percussionReady;
+        if(g.settings.drumKit)g.roles.perc.instrument.setKit({...g.settings.drumKit,room:0});
+        const {createRack}=await import('../effects/graph');
+        for(const role of SEQUENCERS.map(s=>s.role)) {
+            const r=g.roles[role],from=r.tone??r.gain,to=r.tone?r.gain:r.wander.input;
+            const rack=await createRack(g.AC,mixerRack(rackValues(role),tempo),{onError:error=>console.error('Mixer effects failed',error)});
+            if(disposed){rack.dispose();ensureActive();}
+            from.disconnect(to);
+            if(role==='perc'){
+                const insert=await createRack(g.AC,instrumentRack(rackValues(role)));
+                if(disposed){insert.dispose();rack.dispose();ensureActive();}
+                from.connect(insert.input);insert.connect(rack.input);r.ensembleRack=insert;
+            }else from.connect(rack.input);
+            rack.connect(to);r.mixerRack=rack;
+        }
+    }
+
+    function openMeters() {
+            const meters=Object.fromEntries(SEQUENCERS.map(({role})=>[role,createMeter(g.AC,g.roles[role].wander.output)]));
+            meters.ambience=createMeter(g.AC,g.ambienceOut);
+            const splitter=g.AC.createChannelSplitter(2);
+            masterBus.connect(splitter);
+            const left=g.AC.createAnalyser(),right=g.AC.createAnalyser();
+            left.fftSize=right.fftSize=1024;
+            splitter.connect(left,0);splitter.connect(right,1);
+            const l=new Float32Array(left.fftSize),r=new Float32Array(right.fftSize);
+            let closed=false;
+            const tap={
+                read() {
+                    left.getFloatTimeDomainData(l);right.getFloatTimeDomainData(r);
+                    return {...Object.fromEntries(Object.entries(meters).map(([role,meter])=>[role,meter.read()])),left:meterLevel(l),right:meterLevel(r)};
+                },
+                dispose() {if(closed)return;closed=true;meterTaps.delete(tap);Object.values(meters).forEach(m=>m.dispose());masterBus.disconnect(splitter);splitter.disconnect();left.disconnect();right.disconnect();},
+            };
+            meterTaps.add(tap);
+            return tap;
+    }
 
     /** One of the generator's own presets for a role; `kind` names the page it belongs to (a piano, measured instruments, strings), else it is a plain calmbgm voice. */
-    async function setPreset(role, name, kind = 'calmbgm') {
+    async function setPreset(role, name, kind = 'calmbgm', override) {
+        const source = override ?? (kind === 'calmbgm' ? findPreset(name) : NATIVE[kind].presets[name]);
+        if (!source) throw new Error(`Unknown ${kind} preset: ${name}`);
+        const preset = structuredClone(source);
+        const audioPreset = { ...preset, reverbAmount: 0, delayAmount: 0, pingPongAmount: 0, mixerSpaceMoved: true };
+        await g.setRoleSource(role, audioPreset, name);
+        ensureActive();
         dropRack(role);
-        const preset = kind === 'calmbgm' ? undefined : structuredClone(NATIVE[kind].presets[name]);
-        g.loadRolePreset(role, name, preset);
         loaded[role] = { synth: kind, name };
         delete sounds[role];
         if (kind === 'calmbgm') delete natives[role]; else natives[role] = { synth: kind, name, preset };
-        if (racks[role]) await nativeRack(role, racks[role]);
+        const base = kind === 'calmbgm' ? cleanRack() : nativeRackDefaults(kind);
+        const nativeEffects = kind === 'calmbgm' ? (nativeWasmVoice(preset)?.patch.effects ?? translatedWasmPreset(preset).effects) : null;
+        const moved = nativeEffects
+            ? Object.fromEntries(Object.entries(nativeEffects).map(([key,value])=>['effects.'+key,value]))
+            : { 'effects.reverb': preset.reverbAmount ?? (kind === 'iowa' ? .25 : .2) };
+        const rack = RACK_PARAMS.sanitize({ ...base, ...moved });
+        racks[role] = { ...rack, 'master.chain': leanChain(rack) };
+        spaces[role] = mixerSpace(racks[role]);
+        await nativeRack(role, instrumentRack(racks[role]));
+        updateMixer(role);
         return loaded[role];
     }
     /** The preset a piano, measured-instrument or string voice plays now, as edited (null for any other voice). */
     const nativeOf = (role) => natives[role] ?? null;
     /** A control of such a voice moved: the preset is loaded again with it. */
-    function editNative(role, changes) {
+    async function editNative(role, changes) {
         const entry = natives[role];
         if (!entry) return;
         entry.preset = { ...entry.preset, ...changes };
-        g.loadRolePreset(role, entry.name, structuredClone(entry.preset));
+        if ('reverbAmount' in changes) await editMixer(role, { 'effects.reverb': changes.reverbAmount });
+        if (Object.keys(changes).some(key=>key!=='reverbAmount'))
+            g.roles[role].instrument.applyPreset({ ...structuredClone(entry.preset), reverbAmount: 0, delayAmount: 0, pingPongAmount: 0, mixerSpaceMoved: true });
     }
 
     /** A role's sound: { synth: 'calmbgm' } keeps the scene's voice, with a name it is one of the generator's presets; otherwise a patch of a classic or DIY synth (by name, or with its values when it comes from a library; the first when it is not found), with its level matched. */
-    async function setSound(role, { synth, name, values }) {
+    async function setSound(role, { synth, name, values, rack, kit, patch: chosen }) {
+        if(role==='perc')return setDrumSound({synth,name,values,rack:chosen?.rack??rack,kit});
         if (isNative(synth)) return setPreset(role, name && NATIVE[synth].presets[name] ? name : Object.keys(NATIVE[synth].presets)[0], synth);
         if (synth === 'calmbgm') {
-            if (name) return setPreset(role, name);
-            Object.keys(sounds).forEach((r) => delete sounds[r]);
-            Object.keys(natives).forEach((r) => delete natives[r]);
-            Object.keys(racks).forEach(dropRack);
-            applySceneVoices(hostScene.scene);
-            return loaded[role];
+            if (name) {
+                const mapped = synthForPreset(name);
+                return mapped ? setSound(role, { synth: mapped, name }) : setPreset(role, name);
+            }
+            const spec = sceneVoiceSpec(hostScene.scene, role, g.settings.layers) ?? ROLES[role].preset;
+            const sceneName = typeof spec === 'string' ? spec : spec.name;
+            const mapped = spec.external?.synth ?? synthForPreset(sceneName);
+            return mapped ? setSound(role, { synth: mapped, name: spec.external?.name ?? sceneName }) : setPreset(role, sceneName);
         }
         // without a name: the sound this synth has curated for the role (the ensemble page's picks), the rhythm layer taking the pad's
         const model = SYNTHS[synth], pick = name ?? ROLE_PICKS[synth]?.[role === 'rhythm' ? 'pad' : role];
-        const patch = values ? { name, category: 'library', values } : model.presets.find((p) => p.name === pick) ?? model.presets[0];
-        const clean = model.params.sanitize(patch.values), sound = { synth, name: patch.name, category: patch.category, values: clean, rack: leanRack(model, clean, cleanRack()), ...(patch.waves ? { waves: patch.waves } : {}) };
-        const level = await matchedLevel(sound, role);
+        const patch = chosen?.values ? chosen : values ? { name, category: 'library', values } : model.presets.find((p) => p.name === pick) ?? model.presets[0];
+        const clean = model.params.sanitize(patch.values);
+        const base = RACK_PARAMS.sanitize({ ...cleanRack(), ...patch.rack });
+        const patchRack = patch.rack && !patch.rackLean ? base : leanRack(model, clean, base);
+        const sound = { synth, name: patch.name, category: patch.category ?? patch.cat, values: clean, rack:patchRack, ...(patch.waves ? { waves: patch.waves } : {}) };
+        const level = Number.isFinite(chosen?.level) ? chosen.level : await matchedLevel(sound, role);
+        ensureActive();
+        const diy = synth === 'poly' || synth === 'fm';
+        const audioRack = diy ? { ...cleanRack(), 'master.chain': 0 } : instrumentRack(rackForPatch(model, clean, patchRack, MOVED));
+        await g.setRoleSource(role, soundSource({ ...sound, rack: audioRack, moved: true, level, matched: true }, role, false), patch.name);
+        ensureActive();
         dropRack(role);
-        await g.setRoleSource(role, soundSource({ ...sound, rack: rackForPatch(model, clean, sound.rack, MOVED), moved: true, level, matched: true }, role, false), patch.name);
+        if (diy) await nativeRack(role, instrumentRack(rackForPatch(model, clean, patchRack, MOVED)));
         loaded[role] = { synth, name: patch.name };
         sounds[role] = { ...sound, level };
+        delete natives[role];
+        spaces[role] = mixerSpace(rackForPatch(model, clean, patchRack, MOVED));
+        updateMixer(role);
         return loaded[role];
     }
 
@@ -123,28 +292,116 @@ export function createHost(scene) {
     /** A knob of the voice's own synth moved. */
     function editValues(role, values) {
         if (!sounds[role]) return;
+        if(role==='perc'){
+            const sound=sounds.perc,clean=SYNTHS[sound.synth].params.sanitize(values);
+            sounds.perc={...sound,values:clean};
+            loaded.perc={...loaded.perc,values:clean};
+            applyDrumValues();
+            updateMixer(role);
+            return;
+        }
         const model = SYNTHS[sounds[role].synth];
+        const previous=rackForPatch(model,sounds[role].values,sounds[role].rack,MOVED);
+        const next=rackForPatch(model,values,sounds[role].rack,MOVED);
+        const changed=Object.fromEntries(Object.entries(mixerSpace(next)).filter(([key,value])=>value!==previous[key]));
+        spaces[role]={...spaces[role],...changed};
         sounds[role] = { ...sounds[role], values };
-        g.roles[role].instrument.setValues?.(values);
-        g.roles[role].instrument.setRack?.(rackForPatch(model, values, sounds[role].rack, MOVED));
+        const instrument = g.roles[role].instrument;
+        if (sounds[role].synth === 'poly' || sounds[role].synth === 'fm') {
+            instrument.setSpec(diySpec({ ...sounds[role], rack: { ...cleanRack(), 'master.chain': 0 } }, instrument.polyphony));
+            g.roles[role].ensembleRack.patch(instrumentRack(rackForPatch(model, values, sounds[role].rack, MOVED)));
+        } else {
+            instrument.setValues(values);
+            instrument.setRack(instrumentRack(rackForPatch(model, values, sounds[role].rack, MOVED)));
+        }
+        updateMixer(role);
+    }
+    function applyDrumValues() {
+        const sound=sounds.perc;if(!sound)return;
+        const values={...sound.values,reverbMix:0};
+        if(drumMask)for(const [key] of SYNTHS[sound.synth].kit.tracks)if(!drumMask.has(key))values[key+'Level']=0;
+        g.roles.perc.instrument.setValues(values);
+    }
+    function setDrumMix(muted,solo) {
+        const sound=sounds.perc;if(!sound)return;
+        drumMix={muted:[...muted],solo:[...solo]};
+        drumMask=new Set(SYNTHS[sound.synth].kit.tracks.filter((_,t)=>solo.size?solo.has(t):!muted.has(t)).map(([key])=>key));
+        applyDrumValues();
+    }
+    const getDrumMix=()=>drumMix;
+    function snapshotSounds() {
+        return Object.fromEntries(SEQUENCERS.map(({role})=>{
+            const sound=sounds[role],native=natives[role];
+            return [role,{selection:loaded[role],...(sound?{sound}:{}),...(native?{native}:{}),...(role!=='perc'&&!sound&&!native?{preset:g.getRolePreset(role)}:{}),rack:rackValues(role),...(role==='perc'?{kit:g.settings.drumKit,mix:drumMix}:{})}];
+        }));
+    }
+    async function restoreSounds(saved) {
+        for(const {role} of SEQUENCERS){
+            const entry=saved[role];
+            if(entry.native)await setPreset(role,entry.native.name,entry.native.synth,entry.native.preset);
+            else if(entry.preset)await setPreset(role,entry.selection.name,'calmbgm',entry.preset);
+            else if(entry.sound&&role!=='perc')await setSound(role,{synth:entry.sound.synth,name:entry.sound.name,patch:entry.sound});
+            else await setSound(role,{...entry.selection,...(role==='perc'&&entry.sound?{values:entry.sound.values,rack:entry.sound.rack}: {})});
+            if(role==='perc'&&entry.kit){
+                g.settings.drumKit=sanitizeSettings({drumKit:entry.kit},g.settings).drumKit;
+                g.roles.perc.instrument.setKit(g.settings.drumKit);
+                if(entry.sound)setDrumMix(new Set(entry.mix.muted),new Set(entry.mix.solo));
+            }
+            await editRack(role,entry.rack);
+        }
+    }
+    function editDrumKit(kit) {
+        const clean=sanitizeSettings({drumKit:kit},g.settings).drumKit;
+        g.settings.drumKit={...clean,room:0};
+        g.roles.perc.instrument.setKit(g.settings.drumKit);
+        loaded.perc={...loaded.perc,kit:g.settings.drumKit};
     }
     /** The effects chain of a voice, as the rack panel shows it. */
-    const rackValues = (role) => (sounds[role] ? rackForPatch(SYNTHS[sounds[role].synth], sounds[role].values, sounds[role].rack, MOVED) : racks[role] ?? { ...cleanRack(), 'master.chain': leanChain(cleanRack()) });
+    const rackValues = (role) => ({...(sounds[role] ? role==='perc'?sounds[role].rack:rackForPatch(SYNTHS[sounds[role].synth], sounds[role].values, sounds[role].rack, MOVED) : racks[role] ?? { ...cleanRack(), 'master.chain': leanChain(cleanRack()) }),...spaces[role]});
     /** An effect of the voice changed (a classic keeps the instrument's own space controls in its values). */
     async function editRack(role, changes) {
+        const space=Object.fromEntries(Object.entries(mixerSpace(changes)).filter(([key,value])=>RACK_PARAMS.BY_KEY[key]&&typeof value==='number'&&Number.isFinite(value)).map(([key,value])=>[key,RACK_PARAMS.clampValue(key,value)]));
+        spaces[role]={...mixerSpace(rackValues(role)),...space};
+        changes=Object.fromEntries(Object.entries(changes).filter(([key])=>!isMixerSpaceKey(key)));
         const sound = sounds[role];
-        if (sound) {
+        if (role==='perc'&&sound) {
+            sounds.perc={...sound,rack:{...sound.rack,...changes}};
+            loaded.perc={...loaded.perc,rack:sounds.perc.rack};
+            g.roles.perc.ensembleRack?.patch(instrumentRack(rackValues(role)));
+        } else if (sound) {
             const model = SYNTHS[sound.synth], { native, extra } = splitRackEdits(model, changes, MOVED);
             const values = { ...sound.values, ...native }, rack = { ...sound.rack, ...extra };
             sounds[role] = { ...sound, values, rack };
             const instrument = g.roles[role].instrument;
-            instrument.setValues?.(values);
-            instrument.setRack?.(rackForPatch(model, values, rack, MOVED));
+            if (sound.synth === 'poly' || sound.synth === 'fm') {
+                instrument.setSpec(diySpec({ ...sound, values, rack: { ...cleanRack(), 'master.chain': 0 } }, instrument.polyphony));
+                g.roles[role].ensembleRack.patch(instrumentRack(rackForPatch(model, values, rack, MOVED)));
+            } else {
+                instrument.setValues(values);
+                instrument.setRack(instrumentRack(rackForPatch(model, values, rack, MOVED)));
+            }
         } else {
             racks[role] = { ...(racks[role] ?? { ...cleanRack(), 'master.chain': leanChain(cleanRack()) }), ...changes };
-            await nativeRack(role, racks[role]);
+            if(role==='perc')g.roles.perc.ensembleRack?.patch(instrumentRack(rackValues(role)));
+            else await nativeRack(role, instrumentRack(racks[role]));
+        }
+        updateMixer(role);
+    }
+    const editMixer = (role,changes) => editRack(role,mixerEdits(rackValues(role),changes));
+    const mixerSnapshot = () => Object.fromEntries(SEQUENCERS.map(({role})=>{
+        const rack=rackValues(role);
+        return [role,{...mixerSpace(rack),'master.output':rack['master.output'],space:chainUnits(rack['master.chain']).includes('space')}];
+    }));
+    async function restoreMixer(saved) {
+        for(const {role} of SEQUENCERS) {
+            const entry=saved?.[role];
+            if(!entry||typeof entry!=='object')continue;
+            const chain=chainUnits(rackValues(role)['master.chain']).filter(unit=>unit!=='space');
+            if(entry.space===true)chain.push('space');
+            await editRack(role,{...mixerSpace(entry),'master.output':entry['master.output'],'master.chain':maskFromUnits(chain)});
         }
     }
+    const setTempo = bpm => { tempo=bpm; for(const s of SEQUENCERS)updateMixer(s.role); };
     /** An output meter on the generator's mix for the scope: { context, requestScope }. */
     async function openMonitor() {
         const monitor = await createOutputMonitor(g.AC);
@@ -169,20 +426,25 @@ export function createHost(scene) {
     /** One note on a role's instrument, as the generator books its own. */
     function note(role, midi, time, duration, velocity) {
         const instrument = g.roles[role]?.instrument;
-        if (instrument?.scheduleNote) instrument.scheduleNote(midi, Math.max(time, g.AC.currentTime), duration, velocity);
+        if (instrument?.scheduleNote) instrument.scheduleNote(tunedNote(role,midi), Math.max(time, g.AC.currentTime), duration, velocity);
     }
+    const tunedNote = (role, midi, held) => ['poly','fm'].includes(sounds[role]?.synth) ? tuning.note(midi,held) : midi;
 
     function drum(hit, time, stepSec) {
         const instrument = g.roles.perc.instrument, start = Math.max(time, g.AC.currentTime);
         if (hit.track && instrument.hitTrack) instrument.hitTrack(hit.track, hit.drum, start, hit.velocity);
         else instrument.scheduleNote(hit.drum, start, hit.duration * stepSec, hit.velocity, hit.vary ?? 0);
     }
+    function drumTrack(track) {
+        const instrument=g.roles.perc.instrument;
+        if(instrument.hitTrack)instrument.hitTrack(track,0,g.AC.currentTime+.02,.8);
+    }
 
     return {
-        g, settings, loaded, applySceneVoices, setSound, setPreset, soundOf, nativeOf, editNative, editValues, rackValues, editRack, openMonitor, capture, note, drum,
+        g, settings, loaded, applySceneVoices, setSound, setPreset, soundOf, nativeOf, editNative, editValues, editDrumKit, rackValues, editRack, editMixer, mixerSnapshot, restoreMixer, snapshotSounds, restoreSounds, setupMixer, setTempo, openMonitor, openMeters, capture, note, tunedNote, drum, drumTrack, setDrumMix, getDrumMix,
         get context() { return g.AC; },
         async wake() { await g.AC.resume(); if (g.percussionReady) await g.percussionReady; g.endStopFade?.(); },
         setScene(next) { hostScene.scene = next; },
-        dispose() { g.stopAll?.(); Object.values(g.roles).forEach((r) => { r.instrument?.dispose?.(); r.ensembleRack?.dispose?.(); r.wander?.dispose?.(); }); },
+        dispose() { disposed=true; meterTaps.forEach(tap=>tap.dispose());g.stopAll?.(); Object.values(g.roles).forEach((r) => { r.sourceRevision=(r.sourceRevision??0)+1; r.instrument?.dispose?.(); r.ensembleRack?.dispose?.(); r.mixerRack?.dispose?.(); r.wander?.dispose?.(); }); },
     };
 }

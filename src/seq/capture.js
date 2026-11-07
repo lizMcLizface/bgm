@@ -42,13 +42,13 @@ export function planProgressions(plan, count) {
  * The pattern of one role over `records` (consecutive bars from 0): { mode, follow: 'scale', length, steps }. A step holds the notes that begin on it ({ n: [{ d, o, a }] }) with the
  * longest of their lengths in steps (`len`, a tie) and the loudest velocity. Several notes on a step make it a poly step; a role that never has more than one is a note pattern.
  */
-export function capturePattern(records, role, { key, stepsPerBar }) {
+export function capturePattern(records, role, { key, stepsPerBar, preserveTails = false }) {
     const length = records.length * stepsPerBar, steps = Array(length).fill(null);
     records.forEach((record, bar) => {
         for (const e of record.events ?? []) {
             if (e.role !== role || !Number.isFinite(e.midi)) continue;
             const at = bar * stepsPerBar + clamp(Math.round(e.beat * STEPS_PER_UNIT), 0, stepsPerBar - 1);
-            const len = clamp(Math.round(e.length * STEPS_PER_UNIT), 1, length - at);
+            const len = Math.max(1, preserveTails ? Math.round(e.length * STEPS_PER_UNIT) : clamp(Math.round(e.length * STEPS_PER_UNIT), 1, length - at));
             const note = midiToDegree(key, e.midi), step = steps[at] ??= { n: [], vel: 0, len: 1 };
             if (step.n.some((x) => x.d === note.d && x.a === note.a)) continue;
             const source=e.chordSource;
@@ -136,12 +136,12 @@ export function captureProgressions(records) {
  * A project from the generator's plan records: { key, bars, stepsPerBar, chords, patterns: { role: pattern } }. The key is the first bar's tonic and mode (a later key lift
  * shows up as accidentals). Roles with no notes are left out.
  */
-export function captureProject(records, { stepsPerBar = 16 } = {}) {
+export function captureProject(records, { stepsPerBar = 16, key: suppliedKey, preserveTails = false } = {}) {
     if (!records.length) return null;
-    const { tonic, mode } = records[0].music, key = makeKey(mode, tonic);
+    const { tonic, mode } = records[0].music, key = suppliedKey ?? makeKey(mode, tonic);
     const patterns = {};
     for (const role of NOTE_ROLES) {
-        const p = capturePattern(records, role, { key, stepsPerBar });
+        const p = capturePattern(records, role, { key, stepsPerBar, preserveTails });
         if (p.steps.some(Boolean)) patterns[role] = p;
     }
     const drums = captureDrums(records, { stepsPerBar });

@@ -22,7 +22,7 @@ export function Window({id,title,home,onClose,children,wide}){
  </section>,desk.el??document.body);
 }
 
-export default function LabPanels({values,onChange,onClose}){
+export default function LabPanels({values,onChange,onClose,id='tuning'}){
  const [t,setT]=useState(tuning.get()),[live,setLive]=useState(tuning.liveCents());
  useEffect(()=>tuning.subscribe(setT),[]);
  // what a chord is doing to the sounding notes, so the faders show it as it changes (auto play included: it plays through the same keys)
@@ -33,7 +33,7 @@ export default function LabPanels({values,onChange,onClose}){
  const named=tuning.named();
  const deg=i=>(t.tonic+i)%12;
  return <>
-  <Window id="tuning" title="Tuning" home={at.tuning} onClose={onClose} wide>
+  <Window id={id} title="Tuning" home={at.tuning} onClose={onClose} wide>
    <div className="lab-tuning pf-frame">
     <div className="lab-row">
      <PickButtons label="Scale" options={Object.keys(PRESETS).map(n=>n.replace('Equal temperament','12-TET').replace('Just intonation','Just').replace('Quarter-comma meantone','Meantone'))} titles={Object.keys(PRESETS)}

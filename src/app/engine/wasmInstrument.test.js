@@ -1,9 +1,17 @@
 const state=vi.hoisted(()=>({create:vi.fn()}));
 vi.mock('../../labs/voice',()=>({LabVoice:{create:state.create}}));
 import WasmInstrument from './wasmInstrument';
+import {WASM_PRESETS} from '../../synth-lab/voiceLibrary';
 const ctx={currentTime:0,createGain:()=>({connect:vi.fn(),disconnect:vi.fn()})};
 const voice=()=>({connect:vi.fn(),dispose:vi.fn(),panic:vi.fn(),on:vi.fn(()=>7),off:vi.fn(),schedule:vi.fn(),spec:{kind:'legacy'},native:{setWander:vi.fn()},keys:new Map()});
 beforeEach(()=>state.create.mockReset());
+it('removes native Wasm space only when it is assigned to the mixer',()=>{
+ const preset=Object.values(WASM_PRESETS)[0];
+ const original=new WasmInstrument(ctx,preset,8).spec();
+ const moved=new WasmInstrument(ctx,{...preset,mixerSpaceMoved:true},8).spec();
+ expect(original.patch.effects.reverb).toBeGreaterThan(0);
+ expect(moved.patch.effects).toMatchObject({reverb:0,delay:0,delayToReverb:0});
+});
 it('cancels a released manual note and a stopped scheduled note while a source is loading',async()=>{
  const a=voice(),b=voice();state.create.mockResolvedValueOnce(a);const i=await WasmInstrument.create({context:ctx});let resolve;state.create.mockImplementationOnce(()=>new Promise(r=>{resolve=r;}));i.applyPreset({stringModel:'piano'});const id=i.startNote(60,.7);i.stopNote(id);i.scheduleNote(64,1,1,.7);i.silence();resolve(b);await i.ready;await Promise.resolve();expect(b.on).not.toHaveBeenCalled();expect(b.schedule).not.toHaveBeenCalled();i.dispose();
 });
@@ -24,4 +32,14 @@ it('keeps shared-room endpoints stable across shared and private preset replacem
 it('retains runtime processor errors after a preset replacement succeeds',async()=>{
  state.create.mockResolvedValueOnce(voice());const i=await WasmInstrument.create({context:ctx});state.create.mockResolvedValueOnce(voice());i.applyPreset({fmIndex:2});await i.ready;
  const log=vi.spyOn(console,'error').mockImplementation(()=>{});try{state.create.mock.calls.at(-1)[2].onError(Error('processor failed'));expect(i.error.message).toBe('processor failed');}finally{log.mockRestore();i.dispose();}
+});
+
+it('retunes held notes, including notes still waiting for a source',async()=>{
+ const a={...voice(),backend:{retune:vi.fn()}},b={...voice(),backend:{retune:vi.fn()}};
+ state.create.mockResolvedValueOnce(a);const i=await WasmInstrument.create({context:ctx});
+ let resolve;state.create.mockImplementationOnce(()=>new Promise(r=>{resolve=r;}));i.applyPreset({fmIndex:2});
+ const id=i.startNote(60,.7);i.retuneNote(id,60.2);resolve(b);await i.ready;await Promise.resolve();
+ expect(b.on).toHaveBeenCalledWith(60.2,.7);
+ i.retuneNote(id,60.3,.03);expect(b.backend.retune).toHaveBeenCalledWith(7,60.3,.03);
+ i.stopNote(id);i.dispose();
 });

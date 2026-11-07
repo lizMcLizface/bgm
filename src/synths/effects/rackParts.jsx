@@ -36,7 +36,7 @@ export const BLOCKS=[
 // the always-in-reach controls, top right: level into the rack, level out of it, and the dry signal against the effects
 // the one level left under the chain: how much of the sound goes through it (the input and output levels are the Input and Output boxes)
 export const GLOBAL=[['master.mix','Wet/dry']];
-const CHOICES={'zplane.a':ZPLANE_SHAPE_NAMES,'zplane.b':ZPLANE_SHAPE_NAMES,'shimmer.interval':['Fifth','Octave','12th','2 oct'],'freeze.hold':['Off','On'],'effects.reverbType':['Classic','Room','Hall','Plate'],'filter.slope':['12 dB','24 dB'],'filter.type':['Cuts','Low-pass','High-pass','Band-pass','Notch','Low shelf','High shelf'],'master.sync':['Free','1/4','1/8','1/8 dotted','1/16','1/8 triplet','1/2'],'effects.pingPong':['Stereo','Ping-pong'],'effects.quality':['8 lines','16 lines'],'inserts.bypass':['Active','Bypassed'],'effects.bypass':['Active','Bypassed']};
+export const CHOICES={'zplane.a':ZPLANE_SHAPE_NAMES,'zplane.b':ZPLANE_SHAPE_NAMES,'shimmer.interval':['Fifth','Octave','12th','2 oct'],'freeze.hold':['Off','On'],'effects.reverbType':['Classic','Room','Hall','Plate'],'filter.slope':['12 dB','24 dB'],'filter.type':['Cuts','Low-pass','High-pass','Band-pass','Notch','Low shelf','High shelf'],'master.sync':['Free','1/4','1/8','1/8 dotted','1/16','1/8 triplet','1/2'],'effects.pingPong':['Stereo','Ping-pong'],'effects.quality':['8 lines','16 lines'],'inserts.bypass':['Active','Bypassed'],'effects.bypass':['Active','Bypassed']};
 export function RackControl({spec,value,label,block,onChange,disabled=false}){
  const key=spec.key,options=CHOICES[key]??spec.options,aria=`${block} · ${label}`,set=value=>onChange({[key]:Math.max(spec.min,Math.min(spec.max,value))});
  const scale=spec.unit==='%'?100:1,step=scale===100?.1:spec.curve==='step'?1:spec.unit==='Hz'&&spec.max>100?1:spec.unit==='dB'?.1:.001;
@@ -102,7 +102,7 @@ export const leanChain=values=>maskFromUnits(activeUnits(values));
  */
 // The instrument's own space (the voice's chorus, and a reverb on the synths that have one): its mix controls are the ones that make it audible
 const isMix=spec=>/(chorusMix|reverbMix|global\.chorus)$/.test(spec.key);
-export function useRackModel({values,onChange,instrumentSpecs=[],tempo=0}){
+export function useRackModel({values,onChange,instrumentSpecs=[],tempo=0,excludedUnits=[]}){
  const order=orderFromCode(values['master.order']??0),chain=chainUnits(values['master.chain']??DEFAULT_CHAIN);
  const blocks=BLOCKS.map(block=>{const toggle=block.id==='compressor'?'compressor.enabled':block.id==='master'||block.id==='input'?null:'switch.'+block.id;return {...block,toggle,on:toggle?values[toggle]===1:true};});
  const byId=Object.fromEntries(blocks.map(b=>[b.id,b]));
@@ -111,10 +111,10 @@ export function useRackModel({values,onChange,instrumentSpecs=[],tempo=0}){
  const instrumentName=chorusOnly?(chain.includes('chorus')?'Voice chorus':'Chorus'):'Instrument';
  const instrumentOn=instrumentSpecs.length>0&&(!mixSpecs.length||mixSpecs.some(m=>values[m.key]>0));
  const reverbFirst=values['master.reverbFirst']>=.5;
- const tiles=[byId.input,...(instrumentOn?[{id:'instrument',name:instrumentName,colour:'#c6b4a3',toggle:null,on:true,graphic:chorusOnly?'chorus':'instrument'}]:[]),...order.filter(u=>chain.includes(u)).flatMap(u=>u==='space'?(reverbFirst?['reverb','delay']:['delay','reverb']):[u]).map(id=>byId[id]),byId.master];
+ const tiles=[byId.input,...(instrumentOn?[{id:'instrument',name:instrumentName,colour:'#c6b4a3',toggle:null,on:true,graphic:chorusOnly?'chorus':'instrument'}]:[]),...order.filter(u=>chain.includes(u)&&!excludedUnits.includes(u)).flatMap(u=>u==='space'?(reverbFirst?['reverb','delay']:['delay','reverb']):[u]).map(id=>byId[id]),byId.master];
  const setOrder=next=>onChange({'master.order':codeFromOrder(cleanOrder(next))});
  // moves are among the units in the chain; the ones out of it keep their places at the end
- const visible=order.filter(u=>chain.includes(u)&&!TAIL_UNITS.includes(u));
+ const visible=order.filter(u=>chain.includes(u)&&!excludedUnits.includes(u)&&!TAIL_UNITS.includes(u));
  const moveBy=(id,d)=>{const u=unitOf(id);if(!u||TAIL_UNITS.includes(u))return;const to=visible[visible.indexOf(u)+d];if(to)setOrder(moveUnit(order,u,order.indexOf(to)));};
  const moveTo=(id,targetId)=>{
   // the two halves of the space unit trade places
@@ -122,12 +122,12 @@ export function useRackModel({values,onChange,instrumentSpecs=[],tempo=0}){
   const u=unitOf(id),t=unitOf(targetId);if(u&&t&&u!==t&&!TAIL_UNITS.includes(u)&&!TAIL_UNITS.includes(t))setOrder(moveUnit(order,u,order.indexOf(t)));};
  const canMove=(id,d)=>{const u=unitOf(id);if(!u||TAIL_UNITS.includes(u))return false;const i=visible.indexOf(u);return d<0?i>0:i<visible.length-1;};
  // adding puts a unit beside the one it usually follows, removing takes it out of the chain (its settings stay)
- const available=[...(instrumentSpecs.length&&!instrumentOn?[{unit:'instrument',name:instrumentName,note:chorusOnly?"the voice's own chorus":"the voice's own space",tile:'instrument'}]:[]),...UNITS.filter(u=>!chain.includes(u)).map(u=>({unit:u,name:UNIT_NAMES[u],note:UNIT_NOTES[u],tile:u==='space'?'delay':u}))];
+ const available=[...(instrumentSpecs.length&&!instrumentOn?[{unit:'instrument',name:instrumentName,note:chorusOnly?"the voice's own chorus":"the voice's own space",tile:'instrument'}]:[]),...UNITS.filter(u=>!chain.includes(u)&&!excludedUnits.includes(u)).map(u=>({unit:u,name:UNIT_NAMES[u],note:UNIT_NOTES[u],tile:u==='space'?'delay':u}))];
 // putting the voice's chorus back is turning its mix up
  const addToChain=u=>{if(u==='instrument'){const m=mixSpecs[0];if(m)onChange({[m.key]:m.default>0?m.default:.4});return 'instrument';}onChange({'master.chain':maskFromUnits([...chain,u]),'master.order':codeFromOrder(addUnit(order,u))});return u==='space'?'delay':u;};
  const removeFromChain=id=>{if(id==='instrument'){const m=mixSpecs[0];if(m)onChange({[m.key]:0});return;}const u=unitOf(id);if(u)onChange({'master.chain':maskFromUnits(chain.filter(c=>c!==u))});};
  // clean up: take out every unit that is in the chain but doing nothing (their settings are kept)
- const idle=chain.filter(u=>!activeUnits(values).includes(u));
+ const idle=chain.filter(u=>!excludedUnits.includes(u)&&!activeUnits(values).includes(u));
  const cleanUp=()=>{if(idle.length)onChange({'master.chain':maskFromUnits(chain.filter(c=>!idle.includes(c)))});};
  return {order,chain,blocks,tiles,tempo,instrumentName,moveBy,moveTo,canMove,available,addToChain,removeFromChain,idle,cleanUp};
 }

@@ -8,7 +8,7 @@
 .dk-lcd.master b{color:#e3a52a;}
 .dk-sends{display:grid;grid-template-columns:230px minmax(0,1fr);gap:12px;align-items:center;padding:8px;border-radius:8px;background:#121416;border:1px solid #000;box-shadow:inset 0 0 0 1px #2a2e33;}
 .dk-sends .dk-lcd{min-height:64px;justify-content:center;}
-.dk-send-knobs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px;}
+.dk-send-knobs{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;}
 .dk-body{display:grid;grid-template-columns:minmax(0,1fr) 128px;gap:10px;}
 .dk-strips{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;}
 .dk-strip,.dk-master{--ch:#888;position:relative;display:flex;flex-direction:column;align-items:center;gap:7px;padding:6px 4px 12px;border-radius:6px;background:linear-gradient(#2d3034,#222427);border:1px solid #000;box-shadow:inset 0 1px 0 #ffffff14;color:#a5a4a0;}

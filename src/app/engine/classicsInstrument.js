@@ -10,13 +10,10 @@ import {effectTail} from '../../synth-lab/effectsConfig';
 import {insertsTail} from '../../synth-lab/insertsConfig';
 import {KITS} from '../../synths/drums/kits';
 import {DRUMS} from '../percussion';
+import {DRUM_TRACKS} from '../drumMappings';
 
 // Drum machines as the percussion role: each of the generator's drums (percussion.js DRUMS)
 // plays one of the machine's pads, which sit at MIDI 36 + track (drums.rs note_on).
-const DRUM_TRACKS={
- tr808:{kick:'bd',punch:'bd',brush:'sd',snare:'sd',shaker:'ma',rim:'rs',hat:'ch',sizzle:'ch',swish:'oh',tom:'lt',clap:'cp',ride:'cy',crash:'cy',bell:'cb'},
- tr909:{kick:'bd',punch:'bd',brush:'sd',snare:'sd',shaker:'ch',rim:'rs',hat:'ch',sizzle:'ch',swish:'oh',tom:'lt',clap:'cp',ride:'rd',crash:'cr',bell:'rd'},
-};
 const drumNotes=id=>DRUM_TRACKS[id]&&DRUMS.map(name=>36+KITS[id].tracks.findIndex(([key])=>key===DRUM_TRACKS[id][name]));
 // Monophonic synths play chord parts as a stack of single-voice kernels, one per held note;
 // single lines keep one kernel, with its own legato and glide.

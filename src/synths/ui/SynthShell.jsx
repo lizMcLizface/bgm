@@ -59,14 +59,14 @@ export default function SynthShell(props){
 }
 // The page's own panel (its sound bar, its nav and its boxes of controls: the `.rig` of the standalone page) driven by a host that owns the values and the sound, with none of
 // the page's audio, header, desk or keyboard. /synths/all draws a voice's synth this way. The host's `effects` ({open,values,onChange,instrumentSpecs,tools}) shows the effects
-// rack in place of the panel, as the page's Effects button does.
-function BoundShell({synth,className='',panelClassName='',expand,nav=null,libraries=[],picker:Picker=SoundPicker,soundsInDevice=false,toggles=false,children}){
+// rack alongside the panel, as the page's Effects button does.
+function BoundShell({synth,className='',panelClassName='',expand,nav=null,libraries=[],picker:Picker=SoundPicker,soundsInDevice=false,toggles=false,compactRack=true,children}){
  const host=useEnsemblePanel(),{values,effects}=host,{params:{BY_KEY},presets}=synth;
  const replaceValues=next=>host.onChange(synth.params.sanitize(next));
  const change=(key,value)=>{const more=expand?.(key,value)??[key],edits=Array.isArray(more)?Object.fromEntries(more.map(k=>[k,value])):more;replaceValues({...values,...edits});};
  const {control,group}=usePanelKit({BY_KEY,values,change,toggles});
  const [shelf,setShelf]=useState('sounds'),library=libraries.find(l=>l.id===shelf),current=host.current;
- const open=!!effects?.open;
+ const open=!!effects?.open,fullRack=open&&!compactRack;
  const soundBar=(
   <nav className={'presets'+(library?' shelf-'+library.id:'')} aria-label="Sounds">
    {libraries.length>0&&<span className="shelf-switch" role="radiogroup" aria-label="Sound shelf">
@@ -75,13 +75,14 @@ function BoundShell({synth,className='',panelClassName='',expand,nav=null,librar
    {library?library.render({choose:host.choose,values,current,rack:effects?.values??{}}):<Picker synth={synth} presets={presets} mine={[]} current={current} currentCategory={host.category} choose={host.choose} remove={()=>{}} values={values} change={change} replaceValues={replaceValues} save={()=>{}}/>}
   </nav>
  );
- return <div className={'synth instrument bound '+className+(open?' rack-open':'')}>
+ return <div className={'synth instrument bound '+className+(fullRack?' rack-open':'')}>
   <div className="rig">
    {!soundsInDevice&&soundBar}
-   {!open&&nav}
-   <main className={'panel'+(open?' rack-panel':' '+panelClassName)}>
-    {!open&&children({values,control,group,change,replaceValues,patch:{current:{name:current,values}},choose:host.choose,current,soundBar,rack:effects?.values??{}})}
-    {open&&<RackPanel values={effects.values} onChange={effects.onChange} instrumentSpecs={effects.instrumentSpecs??[]} tools={effects.tools}/>}
+   {!fullRack&&nav}
+   <main className={'panel'+(fullRack?' rack-panel':' '+panelClassName)}>
+    {!fullRack&&children({values,control,group,change,replaceValues,patch:{current:{name:current,values}},choose:host.choose,current,soundBar,rack:effects?.values??{}})}
+    {open&&compactRack&&<RackCompact values={effects.values} onChange={effects.onChange} instrumentSpecs={effects.instrumentSpecs??[]} tools={effects.tools} onClose={effects.onClose} posKey={effects.posKey} home={effects.home}/>}
+    {fullRack&&<RackPanel values={effects.values} onChange={effects.onChange} instrumentSpecs={effects.instrumentSpecs??[]} tools={effects.tools}/>}
    </main>
   </div>
  </div>;

@@ -13,7 +13,7 @@ export default class WasmInstrument {
   catch(e){i.dispose();throw e;}
  }
  constructor(context,preset,polyphony){this.AC=context;this.polyphony=polyphony;this.preset={...DEFAULTS,...preset};this.output=context.createGain();this.roomOutput=context.createGain();this.roomInput=context.createGain();this.ready=Promise.resolve();this.revision=0;this.disposed=false;this.reverb={settled:true,hear(){},setLevel(){}};this.held=new Map();this.nextId=1;this.syncEnvelope();}
- spec(){return this.overrideSpec??nativeWasmVoice(this.preset,this.polyphony)??(needsNativeSource(this.preset)?{kind:'legacy',patch:this.preset,polyphony:this.polyphony}:{...translatedWasmVoice(this.preset,this.polyphony,this.dynamics),fx:this.preset});}
+ spec(){const native=nativeWasmVoice(this.preset,this.polyphony);if(native&&this.preset.mixerSpaceMoved)native.patch.effects={...native.patch.effects,reverb:0,delay:0,delayToReverb:0};return this.overrideSpec??native??(needsNativeSource(this.preset)?{kind:'legacy',patch:this.preset,polyphony:this.polyphony}:{...translatedWasmVoice(this.preset,this.polyphony,this.dynamics),fx:this.preset});}
  /** Timbre drift (composition/timbreDrift.js): the source patched live from the preset and these values, the preset unchanged. */
  setDrift(values,seconds=.5){if(!this.voice||this.loading)return;const spec=this.spec();if(spec.kind==='legacy'){this.voice.native?.setDrift?.(values);return;}if(this.overrideSpec||spec.kind!=='subtractive'||this.preset.wasmVoice)return;const drifted=values?translatedWasmVoice({...this.preset,...values},this.polyphony,this.dynamics):spec;if(drifted.kind!==spec.kind||JSON.stringify([drifted.patch.effects,drifted.patch.inserts])!==JSON.stringify([spec.patch.effects,spec.patch.inserts]))return;this.voice.patchSource(drifted.patch,{seconds});}
  /** The scene's dynamics (settings.dynamics): part of the translated patch, patched live where only the source changes. */
@@ -54,7 +54,8 @@ export default class WasmInstrument {
  }
  async afterReady(action){let pending;do{pending=this.ready;await pending;}while(!this.disposed&&pending!==this.ready);if(!this.disposed)action();}
  scheduleNote(midi,time,duration,velocity=.7,detune=0,expression){const until=time+duration,epoch=this.epoch??0;void this.afterReady(()=>{if(epoch!==(this.epoch??0)||until<=this.AC.currentTime)return;const start=Math.max(time,this.AC.currentTime+.003);this.voice.schedule(midi,start,Math.max(.005,until-start),velocity,detune,expression);});}
- startNote(midi,velocity){const id=this.nextId++,record={voice:null,note:null};this.held.set(id,record);void this.afterReady(()=>{if(this.held.get(id)===record){record.voice=this.voice;record.note=this.voice.on(midi,velocity);}});return id;}
+ startNote(midi,velocity){const id=this.nextId++,record={voice:null,note:null,midi};this.held.set(id,record);void this.afterReady(()=>{if(this.held.get(id)===record){record.voice=this.voice;record.note=this.voice.on(record.midi,velocity);}});return id;}
+ retuneNote(id,midi,seconds=.12){const record=this.held.get(id);if(!record)return;record.midi=midi;record.voice?.backend?.retune?.(record.note,midi,seconds);}
  stopNote(id){const record=this.held.get(id);record?.voice?.off(record.note);this.held.delete(id);}
  silence(){this.epoch=(this.epoch??0)+1;this.held.clear();this.voice?.panic();}
  flushTails(){this.voice?.panic();}

@@ -31,6 +31,16 @@ it('plays the generator drums on a drum machine’s pads, at the kit level, skip
  i.scheduleNote(0,2,.1,.8);i.scheduleNote(4,2,.1,.8);i.scheduleNote(7,2.5,.1,.6);
  expect(l.noteOn.mock.calls).toEqual([[1,36,.4,2],[2,42,.6,2.5]]);expect(l.noteOff.mock.calls).toEqual([[1,2.05],[2,2.55]]);
 });
+it.each(['tr808','tr909','tr707','tr606'])('maps every common drum to a valid %s pad and falls back for missing tracks',async synth=>{
+ const l=live();host.start.mockResolvedValue(l);
+ const i=await ClassicsInstrument.create({context:ctx,preset:{classics:{synth,values:SYNTHS[synth].presets[0].values}}});
+ for(let drum=0;drum<14;drum++)i.scheduleNote(drum,2,.1,.8);
+ expect(l.noteOn).toHaveBeenCalledTimes(14);
+ for(const [,note] of l.noteOn.mock.calls)expect(note).toBeGreaterThanOrEqual(36);
+ i.hitTrack('not-a-track',6,3,.8);
+ expect(l.noteOn).toHaveBeenLastCalledWith(15,i.drums[6],.8,3);
+ i.dispose();
+});
 it('stacks single-voice kernels for chords on a monophonic synth',async()=>{
  const lives=[live(),live(),live(),live()];lives.forEach(l=>host.start.mockResolvedValueOnce(l));
  const i=await ClassicsInstrument.create({context:ctx,preset:{classics:{synth:'minimoog',values:{...SYNTHS.minimoog.presets[0].values}}},polyphony:8});

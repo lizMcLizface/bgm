@@ -14,6 +14,7 @@ import { createRack } from '../effects/graph';
 import { createOutputMonitor } from '../effects/outputMonitor';
 import { RACK_PARAMS, cleanRack, splitRackEdits } from '../effects/params';
 import { leanChain } from '../effects/rackParts';
+import { nativeRackBase } from '../effects/nativeRacks';
 import { Window } from '../diy/LabPanels';
 import { defineParams } from '../params';
 import { LabMidi, bindLabKeyboard, mapVelocity } from '../../labs/input';
@@ -47,7 +48,7 @@ const shortModel = (type) => TYPES[type].replace(/^Measured: /, '');
 const RACK_SYNTH = { id: 'piano', params: { BY_KEY: {} } };
 // the piano starts with a reverb and an echo in its chain (a new key, so the choice of an earlier visit does not hide them)
 const RACK_KEY = 'synths:piano:rack-2';
-const PIANO_RACK = { ...cleanRack(), 'effects.reverb': .2, 'effects.decay': 3.2, 'effects.size': .6, 'effects.delay': .12, 'effects.delayMs': 420, 'effects.feedback': .32, 'effects.tone': 3800, 'effects.pingPong': 1 };
+const PIANO_RACK = nativeRackBase('piano');
 
 // The faders, as parameter specs like the other synths' (the Room is not a piano setting but the page's own)
 const SPECS = defineParams([
@@ -73,6 +74,26 @@ const SOUNDS = Object.entries(PRESETS).map(([name, p]) => {
 const NAMES = ['C', 'C♯', 'D', 'E♭', 'E', 'F', 'F♯', 'G', 'A♭', 'A', 'B♭', 'B'];
 const noteName = (n) => NAMES[n % 12] + (Math.floor(n / 12) - 1);
 const GADGETS = { tuning: 'synths:piano:tuning-open', input: 'synths:piano:input-open' };
+
+export function PianoTuning({settings,onChange,onClose,id='piano-tuning'}) {
+    const deviation = temperamentOffsets(settings.pianoTemperament, settings.pianoTonic);
+    const fader = key => <Fader key={key} spec={SPECS[key]} value={settings[key]} onChange={onChange} tone="cream" />;
+    return <Window id={id} title="Tuning" home={() => ({ x: -662, y: -494 })} onClose={onClose} wide>
+        <div className="lab-tuning pf-frame piano-tuning">
+            <div className="lab-row">
+                <PickButtons label="Temperament" options={Object.keys(TEMPERAMENTS).map((k) => TEMPERAMENTS[k].replace('Quarter-comma meantone', 'Meantone').replace(' III', ''))} titles={Object.values(TEMPERAMENTS)}
+                    value={Object.keys(TEMPERAMENTS).indexOf(settings.pianoTemperament)} onChange={(i) => onChange('pianoTemperament', Object.keys(TEMPERAMENTS)[i])} columns={2} tone="teal" />
+                <PickButtons label="Centred on" options={TONICS.map((t) => t.replace('b', '♭').replace('#', '♯'))} titles={TONICS} value={TONICS.indexOf(settings.pianoTonic)} onChange={(i) => onChange('pianoTonic', TONICS[i])} columns={3} tone="teal" />
+                <div className="lab-row lab-faders">{fader('pianoA4')}{fader('pianoStretch')}</div>
+            </div>
+            <div className="tuning" role="img" aria-label="Deviation of each note from equal temperament, in cents">
+                {deviation.map((c, pc) => <span key={pc} className="tuning-note">
+                    <i style={{ height: Math.max(1, Math.min(44, Math.abs(c) * 1.6)) + 'px' }} className={c < 0 ? 'flat' : 'sharp'} />
+                    <b>{NAMES[pc]}</b><small>{c > 0 ? '+' : ''}{c.toFixed(0)}</small></span>)}
+            </div>
+        </div>
+    </Window>;
+}
 
 /** The piano's own panel (its sound picker and its boxes of controls): the page draws it on its desk, and the voices of /synths/all draw the same one in a window. `children` go in the panel under the boxes. */
 export function PianoRig({ settings, room, current, category, onChoose, onChange, onRoom, rackValues, onRack, children }) {
@@ -267,15 +288,8 @@ export default function PianoPage() {
 
     const choose = (sound) => { setName(sound.name); setSettings({ ...DEFAULTS, ...PRESETS[sound.name] }); };
     const change = (key, value) => { setName((n) => n.replace(/ \*$/, '') + ' *'); setSettings((s) => ({ ...s, [key]: value })); };
-    const deviation = useMemo(() => temperamentOffsets(settings.pianoTemperament, settings.pianoTonic), [settings.pianoTemperament, settings.pianoTonic]);
     const current = name.replace(/ \*$/, '');
     const category = SOUNDS.find((s) => s.name === current)?.category ?? categoryOf(settings.pianoType);
-
-    // a fader on the page's own state (the tuning window's)
-    const fader = (key, tone, label) => {
-        const spec = SPECS[key];
-        return <Fader key={key} spec={spec} value={key === 'room' ? room : settings[key]} onChange={key === 'room' ? (_, v) => setRoom(v) : change} tone={tone} label={label ?? spec.label} />;
-    };
 
     // the test lines sit with the keybed's phrases: a line is a short piece for judging the sound, and the pause button stops it
     const playingLine = phrasePlaying?.startsWith('line:') ? phrasePlaying : '';
@@ -303,21 +317,7 @@ export default function PianoPage() {
         </header>
 
         <Desk>
-            {open.tuning && <Window id="piano-tuning" title="Tuning" home={() => ({ x: -662, y: -494 })} onClose={() => toggleGadget('tuning')} wide>
-                <div className="lab-tuning pf-frame piano-tuning">
-                    <div className="lab-row">
-                        <PickButtons label="Temperament" options={Object.keys(TEMPERAMENTS).map((k) => TEMPERAMENTS[k].replace('Quarter-comma meantone', 'Meantone').replace(' III', ''))} titles={Object.values(TEMPERAMENTS)}
-                            value={Object.keys(TEMPERAMENTS).indexOf(settings.pianoTemperament)} onChange={(i) => change('pianoTemperament', Object.keys(TEMPERAMENTS)[i])} columns={2} tone="teal" />
-                        <PickButtons label="Centred on" options={TONICS.map((t) => t.replace('b', '♭').replace('#', '♯'))} titles={TONICS} value={TONICS.indexOf(settings.pianoTonic)} onChange={(i) => change('pianoTonic', TONICS[i])} columns={3} tone="teal" />
-                        <div className="lab-row lab-faders">{fader('pianoA4', 'cream')}{fader('pianoStretch', 'cream')}</div>
-                    </div>
-                    <div className="tuning" role="img" aria-label="Deviation of each note from equal temperament, in cents">
-                        {deviation.map((c, pc) => <span key={pc} className="tuning-note">
-                            <i style={{ height: Math.max(1, Math.min(44, Math.abs(c) * 1.6)) + 'px' }} className={c < 0 ? 'flat' : 'sharp'} />
-                            <b>{NAMES[pc]}</b><small>{c > 0 ? '+' : ''}{c.toFixed(0)}</small></span>)}
-                    </div>
-                </div>
-            </Window>}
+            {open.tuning && <PianoTuning settings={settings} onChange={change} onClose={() => toggleGadget('tuning')}/>}
 
             {open.input && <Window id="piano-input" title="Input monitor" home={() => ({ x: -662, y: 200 })} onClose={() => toggleGadget('input')}>
                 <div className="piano-input">

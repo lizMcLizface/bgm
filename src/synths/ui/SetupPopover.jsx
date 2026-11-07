@@ -4,12 +4,13 @@ import {KEY_SIZES} from './setup';
 
 // The setup (MIDI, touch screen, audio) as a floating panel under the header, over the page instead of in place of the
 // synth's controls. The header drags it; Escape or the close button puts it away.
-export default function SetupPopover({midi,setup,updateSetup,connectMidi,audio,start,onClose}){
+export default function SetupPopover({midi,setup,updateSetup,connectMidi,audio,start,onClose,children}){
  const float=useFloating('synths:setup-pos');
  useEffect(()=>{const key=e=>{if(e.key==='Escape')onClose();};window.addEventListener('keydown',key);return ()=>window.removeEventListener('keydown',key);},[onClose]);
  return <div className="setup-pop" role="dialog" aria-label="Setup" ref={float.ref} style={float.style} onPointerDownCapture={float.raise}>
   <header className="setup-pop-head" {...float.handle}><h2>Setup</h2><button type="button" className="close" onClick={onClose} aria-label="Close setup">×</button></header>
   <div className="setup">
+    {children}
     <section className="group wide"><h3>MIDI piano</h3>
      <p>{midi.status}</p>
      <div className="row">

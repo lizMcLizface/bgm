@@ -13,6 +13,7 @@ import {applyTopology} from './patches';
 import {MODELS,MOD_SOURCES,MOD_TARGETS} from '../../synth-lab/patch';
 import {FM_ALGORITHMS,FM_MOD_SOURCES,FM_MOD_TARGETS} from '../../synth-lab/fmPatch';
 import {BODY_TYPES} from '../../synth-lab/voiceColour';
+import {useEnsemblePanel} from '../ui/EmbeddedShell';
 
 const WAVES=['Off','Sine','Triangle','Saw','Pulse','Organ','Hollow','Choir','Glass','Reed','Band-limited triangle'];
 const OPTIONS={waveA:WAVES,waveB:WAVES,filter:['12 dB low-pass','24 dB low-pass','Band-pass','High-pass','Notch'],noiseType:['White','Pink','Brown'],phaseLock:['Free','Restart'],filterFamily:['State variable','Feedback ladder (LP24)'],lfoShape:['Sine','Triangle','Square','Saw','Sample & hold'],hardSync:['Off','B resets A'],bLow:['Audio range','Low range'],bKeytrack:['Fixed','Keyboard'],envelopeTarget:['A + B','A only'],bodyType:BODY_TYPES,enabled:['Muted','On'],wave:['Sine','Half sine','Absolute sine','Squared sine'],keySync:['Free running','Reset on key'],legacyEnvelope:['Current','Legacy'],legacyAmp:['Current','Legacy'],bypass:['Active','Bypassed'],pingPong:['Stereo','Ping-pong']};
@@ -222,6 +223,7 @@ function Editor({fm,api,layer,setLayer,link,setLink,operator,setOperator,synth})
 
 function DiyPage({fm=false}){
  const synth=SYNTHS[fm?'fm':'poly'];
+ const embedded=useEnsemblePanel();
  const [layer,setLayer]=useState(0),[link,setLink]=useState(false),[operator,setOperator]=useState(0);
  // the tuning window, open until it is closed
  // the tuning window starts open on the DI-Poly and closed on FM, and each remembers its own
@@ -231,7 +233,7 @@ function DiyPage({fm=false}){
  return <SynthShell synth={synth} className={'diy '+(fm?'diy-fm':'diy-poly')} panelClassName="diy-panel" picker={fm?FmPicker:PolyPicker} helpInBar
   headerExtras={<button type="button" aria-pressed={labOpen} title="The tuning window: scale, tonic, octave, A4, shift and chord auto-tune" onClick={toggleLab}>Tuning</button>} startEngine={fm?startFM:startPoly}>
   {api=><><Editor fm={fm} api={api} layer={api.values['global.model']===2?layer:0} setLayer={setLayer} link={link} setLink={setLink} operator={Math.min(operator,(api.values['global.operators']??6)-1)} setOperator={setOperator} synth={synth}/>
-   {labOpen&&<LabPanels onClose={toggleLab}/>}</>}
+   {!embedded?.bound&&labOpen&&<LabPanels onClose={toggleLab}/>}</>}
  </SynthShell>;
 }
 export function PolyPage(){return <DiyPage/>;}

@@ -908,22 +908,28 @@ class Generator {
      */
     async setPercussionSource(source) {
         const r = this.roles.perc, revision = r.sourceRevision = (r.sourceRevision ?? 0) + 1;
-        let instrument;
+        let instrument, nextEngine = this.percussionEngine;
         if (source?.classics) {
             const Classics = (await import('./engine/classicsInstrument')).default;
             instrument = await Classics.create({ context: this.AC, preset: source, polyphony: 16 });
         } else {
             if (!r.machine) return;
-            const Kit = this.percussionEngine === 'native' ? DrumKit : WasmDrumKit;
-            instrument = new Kit({ context: this.AC, reverbHub: this.reverbHub, model: this.percussionEngine });
-            if (instrument.ready) await instrument.ready;
+            if (percussionVoice(this.settings.drums.kit).wasmOnly) nextEngine = 'wasm';
+            const Kit = nextEngine === 'native' ? DrumKit : WasmDrumKit;
+            instrument = new Kit({ context: this.AC, reverbHub: this.reverbHub, model: nextEngine });
+            try {
+                if (instrument.ready) await instrument.ready;
+                instrument.setKit(this.settings.drumKit);
+                instrument.setVoicePreset(this.settings.drums.kit);
+            }
+            catch (error) { instrument.dispose(); throw error; }
         }
         if (revision !== r.sourceRevision) { instrument.dispose(); return; }
-        instrument.setKit(this.settings.drumKit);
+        if (source?.classics) instrument.setKit(this.settings.drumKit);
         r.instrument.silence?.();r.instrument.dispose();
         r.instrument = instrument;r.machine = !!source?.classics;instrument.connect(r.gain);
         r.presetName = source?.classics?.name ?? percussionVoice(this.settings.drums.kit).name;
-        if (!r.machine) { instrument.setVoicePreset(this.settings.drums.kit); await this.syncPercussionVoice(); }
+        if (!r.machine) { this.percussionEngine=nextEngine; await this.syncPercussionVoice(); }
         this.applyMix();
     }
 

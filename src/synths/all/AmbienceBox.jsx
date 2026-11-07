@@ -1,4 +1,4 @@
-import React,{useState} from 'react';
+import React,{forwardRef,useImperativeHandle,useState} from 'react';
 import Encoder from '../seq/Encoder';
 import {dbText,panText,Fader,Meter} from './deskParts';
 import './generatorBox.css';
@@ -10,11 +10,12 @@ import './mixerDesk.css';
 const SOURCES=[['rain','Rain','#6fa8d6'],['thunder','Thunder','#9a8fd6'],['wind','Wind','#8fd6c8'],['waves','Waves','#58a0b9'],['fire','Fireplace','#e0894a'],['vinyl','Vinyl','#c9b98a']];
 const NEW=()=>({level:0,distance:.3,pan:.5,width:.6});
 
-export default function AmbienceBox(){
+const AmbienceBox=forwardRef(function AmbienceBox(_props,ref){
  const [run,setRun]=useState(false);
  const [sel,setSel]=useState(0);
  const [src,setSrc]=useState(()=>Object.fromEntries(SOURCES.map(([id])=>[id,{...NEW(),level:id==='rain'?.6:0}])));
  const [overall,setOverall]=useState(.8);
+ useImperativeHandle(ref,()=>({snapshot:()=>({run,selected:sel,sources:src,overall}),restore:state=>{setRun(state.run);setSel(state.selected);setSrc(state.sources);setOverall(state.overall);}}),[run,sel,src,overall]);
  const set=(id,p)=>setSrc(s=>({...s,[id]:{...s[id],...p}}));
  const [id,name,colour]=SOURCES[sel],c=src[id];
  const active=SOURCES.filter(([i])=>src[i].level>0).length;
@@ -44,4 +45,5 @@ export default function AmbienceBox(){
    </div>
   </div>
  </section>;
-}
+});
+export default AmbienceBox;

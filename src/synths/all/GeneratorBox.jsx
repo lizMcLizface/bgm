@@ -56,7 +56,7 @@ function Display({section,values,pressed,seq}){
  return <div className="gb-embed"><div>The front page's control panel lives here:<br/>the quick panel (feel pad, intensity, mood) and the full control sheets, in the display.</div></div>;
 }
 
-export default function GeneratorBox({info,song,seq,onSeq}){
+export default function GeneratorBox({info,song,seq,onSeq,presets}){
  const [section,setSection]=useState('scale');
  const [local,setLocal]=useState(INITIAL_VALUES);
  const [draft,setDraft]=useState({}),draftRef=useRef({}),timer=useRef(null),seqRef=useRef(onSeq);seqRef.current=onSeq;
@@ -67,6 +67,7 @@ export default function GeneratorBox({info,song,seq,onSeq}){
  const pressed={...pressedLocal,generated:!!song_.generated};
  const sec=SECTIONS.find(s=>s.id===section);
  useEffect(()=>()=>clearTimeout(timer.current),[]);
+ useEffect(()=>{if(song?.disabled){clearTimeout(timer.current);draftRef.current={};setDraft({});}},[song?.disabled]);
  const commit=()=>{
   const turned=draftRef.current,all={...seqValues(song_),...turned};let patch={};
   for(const id of Object.keys(turned))Object.assign(patch,seqPatch(id,all));
@@ -95,12 +96,13 @@ export default function GeneratorBox({info,song,seq,onSeq}){
  return <section className="gbox" aria-label="Generator box">
   <header className="gb-head"><h2>Generator</h2>
   {song&&<div className="gb-songbar" role="group" aria-label="Song">
+   <label className="gb-lcd"><small>Mode</small><select aria-label="Generator mode" value={song.continuous?'continuous':'song'} disabled={song.disabled} onChange={e=>song.onMode(e.target.value==='continuous')}><option value="song">Song</option><option value="continuous">Continuous</option></select></label>
    <label className="gb-lcd"><small>Progressions</small>
-    <select aria-label="Progressions" value={song.count} disabled={song.disabled} onChange={e=>song.onCount(+e.target.value)}>{song.choices.map(n=><option key={n} value={n}>{n}</option>)}</select></label>
+    <select aria-label="Progressions" value={song.count} disabled={song.disabled||song.continuous} onChange={e=>song.onCount(+e.target.value)}>{song.choices.map(n=><option key={n} value={n}>{n}</option>)}</select></label>
    <button type="button" className="gb-key" disabled={song.disabled} onClick={song.onNew} title="The generator plans another song for this scene's settings and the sequencers take it"><small>Generate</small><b>New song</b></button>
    <button type="button" className="gb-key" disabled={song.disabled} onClick={song.onScene} title="The scene's own song"><small>Back to</small><b>Scene's song</b></button>
   </div>}
-  <span className="gb-preset"><span className="gb-preset-screen" role="status"><small>Preset</small><b>{info?.preset??'Rainy Window'}</b></span><Encoder label="Preset" display="" position={.3} onPosition={()=>{}} onReset={()=>{}}/></span></header>
+  {presets&&<span className="gb-preset"><span className="gb-preset-screen" role="status"><small>Scene</small><b>{presets.current}</b></span><Encoder label="Scene preset" display={presets.current} position={Math.max(0,presets.names.indexOf(presets.current))/Math.max(1,presets.names.length-1)} step={1/Math.max(1,presets.names.length-1)} disabled={presets.disabled} onPosition={p=>presets.onChoose(presets.names[Math.round(p*(presets.names.length-1))])} onReset={()=>presets.onChoose(presets.names[0])}/></span>}</header>
   <div className="gb-body">
    <nav className="gb-sections" aria-label="Generator sections">
     {SECTIONS.map(s=><button type="button" key={s.id} className={s.id===section?'on':''} aria-pressed={s.id===section} onClick={()=>setSection(s.id)}>{s.label}{s.onOff&&<i className={pressed[s.id==='evolution'?'evoOn':'wanOn']?'dot on':'dot'}/>}</button>)}

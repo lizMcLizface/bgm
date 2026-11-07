@@ -14,6 +14,7 @@ import { createRack } from '../effects/graph';
 import { createOutputMonitor } from '../effects/outputMonitor';
 import { RACK_PARAMS, cleanRack, splitRackEdits } from '../effects/params';
 import { leanChain } from '../effects/rackParts';
+import { nativeRackBase } from '../effects/nativeRacks';
 import { Window } from '../diy/LabPanels';
 import { defineParams } from '../params';
 import { LabMidi, bindLabKeyboard, mapVelocity } from '../../labs/input';
@@ -55,7 +56,7 @@ const RACK_SYNTH = { id: 'iowa', params: { BY_KEY: {} } };
 // a new key, so the choice of an earlier visit does not hide the reverb
 const RACK_KEY = 'synths:iowa:rack-2';
 // the recordings are dry, so the chain starts with a reverb of its own on top of the instrument's room
-const IOWA_RACK = { ...cleanRack(), 'effects.reverb': .18, 'effects.decay': 2.8, 'effects.size': .6 };
+const IOWA_RACK = nativeRackBase('iowa');
 // the recordings of the no-vibrato instruments still carry a little wobble of the player's: choosing one turns the vibrato right off
 const isStraight = (p) => /no vibrato/i.test(p.name);
 

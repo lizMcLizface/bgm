@@ -17,11 +17,12 @@ export default class IowaInstrument {
         this.output = context.createGain(); this.output.gain.value = preset.masterVolume ?? 1;
         this.player = new IowaPlayer(context).connect(this.output);
         this.player.setRoom(preset.reverbAmount ?? DEFAULT_ROOM);
+        this.player.setVibrato(preset.vibrato ?? 1);
         this.reverb = { settled: true }; this.held = new Map(); this.lastUntil = 0;
     }
     connect(node) { this.output.connect(node); }
     scheduleNote(midi, start, duration, velocity = .7, detune = 0, expression) {
-        const until = start + duration * (expression?.gateScale ?? 1), tune = 2 ** ((detune + 100 * (expression?.bend ?? 0)) / 1200);
+        const until = start + duration * (expression?.gateScale ?? 1), tune = 2 ** ((detune + (this.preset.tune ?? 0) + 100 * (expression?.bend ?? 0)) / 1200);
         this.lastUntil = Math.max(this.lastUntil, until);
         // portamento and the other slides (composition/portamento.js); a struck note cannot bend, so its voice ignores this
         const from = expression?.slideFromMidi, cents = Number.isFinite(from) ? Math.max(-2400, Math.min(2400, 100 * (from - Math.round(midi)))) : 0;
@@ -29,7 +30,7 @@ export default class IowaInstrument {
         return this.player.start(this.preset.iowa, Math.round(midi), velocity, { at: start, until, tune, slide })?.id ?? null;
     }
     startNote(midi, velocity = .7) {
-        const handle = this.player.start(this.preset.iowa, Math.round(midi), velocity);
+        const handle = this.player.start(this.preset.iowa, Math.round(midi), velocity, { tune: 2 ** ((this.preset.tune ?? 0) / 1200) });
         if (!handle) return null;
         this.held.set(handle.id, handle);
         return handle.id;
@@ -40,12 +41,14 @@ export default class IowaInstrument {
         this.preset = { ...this.preset, [key]: value };
         if (key === 'masterVolume') this.output.gain.value = value;
         if (key === 'reverbAmount') this.player.setRoom(value);
+        if (key === 'vibrato') this.player.setVibrato(value);
     }
     applyPreset(preset) {
         if (preset.iowa !== this.preset.iowa) return;
         this.preset = preset;
         this.output.gain.value = preset.masterVolume ?? 1;
         this.player.setRoom(preset.reverbAmount ?? DEFAULT_ROOM);
+        this.player.setVibrato(preset.vibrato ?? 1);
     }
     morphTo(preset) { this.applyPreset(preset); }
     prepareOffline() { this.player.prepareOffline(); }

@@ -7,6 +7,7 @@ import PROGRESSIONS from './progressions';
 import { defaultSettings } from './settings';
 import { METERS, beatStarts, groupStarts, chordBars, splitBeat } from './meter';
 import { defaultSequencer } from './sequencer';
+import {createContinuous} from '../synths/all/continuous';
 
 vi.mock('../audio/context', () => ({
     audioContext: {
@@ -70,6 +71,42 @@ vi.mock('./engine/wasmDrumKit',()=>({default:class {
 }}));
 import Generator, { externalSource } from './Generator';
 import { findPreset } from './editor/presetStore';
+
+test('a saved continuous planner resumes exactly after the original voice and meter change',()=>{
+ const settings={...defaultSettings(),seed:1234,meter:'6/8'};
+ const first=new Generator(settings),stream=createContinuous({g:first},1234);
+ let project=stream.next();
+ for(let i=0;i<5;i++)project=stream.next(project.key);
+ const saved=JSON.parse(JSON.stringify(stream.snapshot()));
+ const expected=stream.next(project.key);
+ const second=new Generator({...settings,meter:'4/4'});
+ const restored=createContinuous({g:second},saved.seed,saved.settings,saved.groveVoices);
+ for(let i=0;i<saved.count;i++)restored.next(project.key);
+ expect(restored.next(project.key)).toEqual(expected);
+});
+
+test('restoring a Wasm-only kit from a drum machine prepares it before replacing the machine',async()=>{
+ const g=new Generator(defaultSettings()),old=g.roles.perc.instrument;
+ old.dispose=vi.fn();g.roles.perc.machine=true;g.percussionEngine='native';g.settings.drums={...g.settings.drums,kit:'hand'};
+ await g.setPercussionSource(null);
+ expect(g.percussionEngine).toBe('wasm');
+ expect(g.roles.perc.instrument.voicePreset).toBe('hand');
+ expect(g.roles.perc.machine).toBe(false);
+ expect(old.dispose).toHaveBeenCalledOnce();
+});
+
+test('a failed Wasm kit restore leaves the drum machine in place',async()=>{
+ const g=new Generator(defaultSettings()),old=g.roles.perc.instrument;
+ old.dispose=vi.fn();g.roles.perc.machine=true;g.percussionEngine='native';g.settings.drums={...g.settings.drums,kit:'hand'};
+ percussionMock.fail=true;
+ try{
+  await expect(g.setPercussionSource(null)).rejects.toThrow('Kernel unavailable');
+  expect(g.roles.perc.instrument).toBe(old);
+  expect(g.roles.perc.machine).toBe(true);
+  expect(g.percussionEngine).toBe('native');
+  expect(old.dispose).not.toHaveBeenCalled();
+ }finally{percussionMock.fail=false;}
+});
 
 test('optional rulebook tracing records actual borrowing without changing notes or the baseline chord shape',()=>{
     const g=new Generator({...defaultSettings(),seed:42,chordBorrow:1,sections:{mode:'gentle',phrases:2}});

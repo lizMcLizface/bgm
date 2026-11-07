@@ -2,7 +2,7 @@ import React from 'react';
 import GridControls from './GridControls';
 import {noteName} from '../../labs/Piano';
 import {getIntervalColor} from '../../labs/piano/intervals';
-import {DRUMS,DRUM_LABELS} from '../../app/percussion';
+import {DRUM_LANES,drumLaneLabel,matchesDrumLane} from './drumLanes';
 import {soundingNotes} from './gridTiming';
 import {chordRoot} from './chordEditing';
 import {generatedChords,placedChordTones} from './placedChords';
@@ -34,7 +34,7 @@ export function pitchClasses(key, offScale) {
  return Array.from({length:12},(_,i)=>mod(key.tonic+i,12)).filter(pc=>!scale.includes(pc));
 }
 
-export default function ProgressionGrid({project,pattern,part,colour,offset,onOffset,headRef,view,offScale,onOffScale,octave,onOctave,octaveFilter=null,shiftHeld=false,onFilterOctave=()=>{},pitch,onPitch,onToggleNote,drumMode=false,drumOffset=0,onDrumOffset,onToggleDrum,stepSize=1,focus=null,onFocus=()=>{},onShiftChord=()=>{},chordMode=false,deleteMode=false,editMode=false,copyMode=false,onEditPad=()=>{},onCopyPad=()=>{},onChordPad=()=>{},onDeletePad=()=>{},selectedPlaced=null,selectedDelete=null,selectedEdit=[]}) {
+export default function ProgressionGrid({project,pattern,part,colour,offset,onOffset,headRef,view,offScale,onOffScale,octave,onOctave,octaveFilter=null,shiftHeld=false,onFilterOctave=()=>{},pitch,onPitch,onToggleNote,drumMode=false,drumSound=null,drumVoice='felt',drumOffset=0,onDrumOffset,onToggleDrum,stepSize=1,focus=null,onFocus=()=>{},onShiftChord=()=>{},chordMode=false,deleteMode=false,editMode=false,copyMode=false,onEditPad=()=>{},onCopyPad=()=>{},onChordPad=()=>{},onDeletePad=()=>{},selectedPlaced=null,selectedDelete=null,selectedEdit=[]}) {
  const drag=React.useRef(null),suppressClick=React.useRef(false);
  const [preview,setPreview]=React.useState(null);
  React.useEffect(()=>()=>{if(drag.current)clearTimeout(drag.current.hold);},[]);
@@ -55,7 +55,7 @@ export default function ProgressionGrid({project,pattern,part,colour,offset,onOf
   }
   return notes;
  });
- const maxDrumOffset=Math.max(0,DRUMS.length-8), drumAt=Math.min(maxDrumOffset,drumOffset);
+ const maxDrumOffset=Math.max(0,DRUM_LANES.length-8), drumAt=Math.min(maxDrumOffset,drumOffset);
  const chordAt=step=>[...chords].reverse().find(c=>c.bar*project.stepsPerBar<=step);
  const labelRoot=chordRoot(focusChord)??project.key.tonic;
  const tonicColour=pc=>getIntervalColor(pc-project.key.tonic);
@@ -85,8 +85,8 @@ export default function ProgressionGrid({project,pattern,part,colour,offset,onOf
  };
  const labels=Array.from({length:8},(_,row)=>{
   if(drumMode){
-   const drum=DRUMS[drumAt+row];
-   return drum?{top:DRUM_LABELS[drum].toUpperCase(),bottom:`DRUM ${drumAt+row+1}`,short:String(drumAt+row+1),press:()=>{}}:null;
+   const lane=DRUM_LANES[drumAt+row];
+   return lane?{top:drumLaneLabel(lane,drumSound,drumVoice).toUpperCase(),bottom:`DRUM ${drumAt+row+1}`,short:String(drumAt+row+1),press:()=>{}}:null;
   }
   if(row===7)return chordMode?{...legendBox(7),top:legendBox(7).top||'CHORD ROOT',bottom:legendBox(7).bottom||'PROGRESSION',short:'♪',disabled:true}:{top:'PITCH SET',bottom:offScale?'OFF SCALE':'SCALE',short:offScale?'♯':'♪',active:offScale,press:()=>onOffScale(!offScale)};
   if(chordMode)return {...legendBox(row),short:String(8-row),disabled:true};
@@ -133,7 +133,7 @@ export default function ProgressionGrid({project,pattern,part,colour,offset,onOf
  };
  return <section className="group wide seq-grid lane-grid progression-grid" aria-label="Progression editor">
   <GridControls horizontal={{label:'Page',display:`${(at-start)/stepSize+1}–${Math.ceil((Math.min(end,at+16*stepSize)-start)/stepSize)}`,position:max>start?(at-start)/(max-start):0,step:max>start?Math.min(1,4*stepSize/(max-start)):0.1,disabled:max===start,onPosition:p=>onOffset(Math.min(max,start+Math.round(p*(max-start)/stepSize)*stepSize)),onReset:()=>onOffset(start)}}
-   vertical={{label:'Voices',display:drumMode?`${drumAt+1}–${Math.min(DRUMS.length,drumAt+8)}`:'—',position:drumMode?drumAt/maxDrumOffset:0,step:1/maxDrumOffset,disabled:!drumMode,onPosition:p=>onDrumOffset(Math.round(p*maxDrumOffset)),onReset:()=>onDrumOffset(0)}}/>
+   vertical={{label:'Voices',display:drumMode?`${drumAt+1}–${Math.min(DRUM_LANES.length,drumAt+8)}`:'—',position:drumMode?drumAt/maxDrumOffset:0,step:1/maxDrumOffset,disabled:!drumMode,onPosition:p=>onDrumOffset(Math.round(p*maxDrumOffset)),onReset:()=>onDrumOffset(0)}}/>
   <div className="grid-display progression-ruler" aria-label="Chord timeline">
    {spans.map(({chord,start:from,end:to})=><button type="button" key={chord.bar} onClick={e=>{if(shiftHeld||e.shiftKey)onShiftChord(chord.bar);else onFocus(focus===chord.bar?null:chord.bar);}} aria-pressed={focus===chord.bar} aria-label={`Focus chord ${chord.name}, bar ${chord.bar+1}`}
     className={'chord-span'+(focus===chord.bar?' focused':'')+(chordMode?' glow':'')} style={{...(chordMode&&chordRoot(chord)!==null?{'--glow':tonicColour(chordRoot(chord))}:{}),left:`${(from-at)*100/(16*stepSize)}%`,width:`${(to-from)*100/(16*stepSize)}%`}}><b>{chord.name}</b></button>)}
@@ -143,16 +143,16 @@ export default function ProgressionGrid({project,pattern,part,colour,offset,onOf
    {labels.map((l,i)=>l?<span className={'lane-info'+(l.legend?' legend':'')+(!drumMode&&gridView==='octave'&&l.pc!==undefined?' octave-label':'')} key={i} style={{'--voice':l.plain?'transparent':l.pc===undefined?colour:labelColour(l.pc)}}><b>{l.top}</b><i>{l.bottom}</i></span>:<span className="lane-info empty" key={i}/>)}
   </div>
   <div className="seq-names">
-   {labels.map((l,i)=>l?<button type="button" key={i} className={'seq-name'+((!chordMode&&view==='scale'&&filterOct!==null&&i!==7?octaveFilter===8-i:l.active)?' on':'')} style={{'--voice':!drumMode&&!chordMode&&gridView==='octave'&&l.pc!==undefined?labelColour(l.pc):colour}} aria-label={drumMode?`Audition ${DRUM_LABELS[DRUMS[drumAt+i]]}`:chordMode?i===7?'Progression chord root':`Chord octave ${8-i}`:i===7?'Toggle off-scale notes':view==='scale'?`Select octave ${8-i}`:`Select ${l.short}`} disabled={l.disabled} aria-pressed={!!(!chordMode&&view==='scale'&&filterOct!==null&&i!==7?octaveFilter===8-i:l.active)} onClick={e=>{if(drumMode)onToggleDrum(null,drumAt+i);else if(!chordMode&&view==='scale'&&i!==7&&(shiftHeld||e.shiftKey))onFilterOctave(8-i);else l.press();}}>{l.short}</button>:<span className="seq-name empty" key={i}/>)}
+   {labels.map((l,i)=>l?<button type="button" key={i} className={'seq-name'+((!chordMode&&view==='scale'&&filterOct!==null&&i!==7?octaveFilter===8-i:l.active)?' on':'')} style={{'--voice':!drumMode&&!chordMode&&gridView==='octave'&&l.pc!==undefined?labelColour(l.pc):colour}} aria-label={drumMode?`Audition ${drumLaneLabel(DRUM_LANES[drumAt+i],drumSound,drumVoice)}`:chordMode?i===7?'Progression chord root':`Chord octave ${8-i}`:i===7?'Toggle off-scale notes':view==='scale'?`Select octave ${8-i}`:`Select ${l.short}`} disabled={l.disabled} aria-pressed={!!(!chordMode&&view==='scale'&&filterOct!==null&&i!==7?octaveFilter===8-i:l.active)} onClick={e=>{if(drumMode)onToggleDrum(null,DRUM_LANES[drumAt+i]);else if(!chordMode&&view==='scale'&&i!==7&&(shiftHeld||e.shiftKey))onFilterOctave(8-i);else l.press();}}>{l.short}</button>:<span className="seq-name empty" key={i}/>)}
   </div>
   <div className="seq-cells" ref={headRef} style={{'--rows':8,'--off':at/stepSize,'--step-size':stepSize}}>
    {Array.from({length:8},(_,row)=>steps.map((step,i)=>{
     const pc=lanePc(row), oct=laneOctave(row);
     if(drumMode){
-     const drum=drumAt+row, name=DRUMS[drum];
-     if(step>=end||!name)return <span key={`${row}-${i}`} className="cell void" aria-hidden="true"/>;
-     const active=!!pattern?.steps.slice(step,Math.min(end,step+stepSize)).some(s=>s?.hits?.some(hit=>hit.drum===drum));
-     return <button type="button" key={`${row}-${i}`} className={'cell'+(active?' on':'')+(step%project.stepsPerBar===0?' beat':'')} style={{'--voice':colour}} aria-label={`${DRUM_LABELS[name]} step ${(step-start)/stepSize+1}`} aria-pressed={active} onClick={()=>onToggleDrum(step,drum,Math.min(end,step+stepSize))}/>;
+     const lane=DRUM_LANES[drumAt+row];
+     if(step>=end||!lane)return <span key={`${row}-${i}`} className="cell void" aria-hidden="true"/>;
+     const active=!!pattern?.steps.slice(step,Math.min(end,step+stepSize)).some(s=>s?.hits?.some(hit=>matchesDrumLane(hit,lane)));
+     return <button type="button" key={`${row}-${i}`} className={'cell'+(active?' on':'')+(step%project.stepsPerBar===0?' beat':'')} style={{'--voice':colour}} aria-label={`${drumLaneLabel(lane,drumSound,drumVoice)} step ${(step-start)/stepSize+1}`} aria-pressed={active} onClick={()=>onToggleDrum(step,lane,Math.min(end,step+stepSize))}/>;
     }
     if(step>=end||!project.key||(gridView==='scale'&&pc===undefined&&row!==7))return <span key={`${row}-${i}`} className="cell void" aria-hidden="true"/>;
     if(row===7){

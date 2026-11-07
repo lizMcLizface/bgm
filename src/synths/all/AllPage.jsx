@@ -32,13 +32,16 @@ import {recalledContext} from '../../app/auditionPhrases';
 import ProgressionGrid,{pitchClasses} from './ProgressionGrid';
 import ArrangementGrid from './ArrangementGrid';
 import {movePlayhead} from '../seq/playhead';
-import {createHost,SEQUENCERS,synthChoices,patchesOf,isNative,synthForPreset} from './host';
+import {createHost,SEQUENCERS,synthChoices,patchesOf,isNative,synthForPreset,drumChoices,drumPatches,sceneDrumPatch} from './host';
 import {SYNTHS} from '../models';
 import {load,save} from '../storage';
 import {useSaved} from '../useSaved';
 import {noteName} from '../../labs/Piano';
 import {degreeToMidi,midiToDegree} from '../../seq/harmony';
 import {heldSteps} from '../../seq/notes';
+import {tuning} from '../tuning';
+import {createContinuous,appendProgression,trimProgressions} from './continuous';
+import {encodeSetup,decodeSetup,setupFileName,MAX_BYTES} from './setupFile';
 import '../drums/drums.css';
 import './all.css';
 
@@ -58,7 +61,7 @@ const readStored=()=>{
  const project=p&&Number.isFinite(p.bars)&&Number.isFinite(p.stepsPerBar)&&p.key&&p.patterns&&typeof p.patterns==='object'?p:null;
  return {scene:typeof s.scene==='string'?s.scene:null,progressionCount:PROGRESSION_CHOICES.includes(s.progressionCount)?s.progressionCount:null,bpm:Number.isFinite(s.bpm)?clamp(Math.round(s.bpm),50,200):null,
   selected:Number.isInteger(s.selected)&&s.selected>=0&&s.selected<SEQUENCERS.length?s.selected:null,mutes:s.mutes&&typeof s.mutes==='object'?s.mutes:null,solos:s.solos&&typeof s.solos==='object'?s.solos:null,
-  sounds:s.sounds&&typeof s.sounds==='object'?s.sounds:null,chordOverlap:s.chordOverlap==='layer'?'layer':'replace',project};
+  sounds:s.sounds&&typeof s.sounds==='object'?s.sounds:null,mixer:s.mixer&&typeof s.mixer==='object'?s.mixer:null,chordOverlap:s.chordOverlap==='layer'?'layer':'replace',project};
 };
 
 const SYNTHS_BY_ID=id=>synthChoices().some(c=>c.id===id);
@@ -70,9 +73,12 @@ export default function AllPage(){
  const scene=useMemo(()=>sceneList.find(s=>s.name===sceneName)??sceneList[0],[sceneName,sceneList]);
  const [status,setStatus]=useState('Preparing song…'),[started,setStarted]=useState(false),[busy,setBusy]=useState(false),[hostVersion,setHostVersion]=useState(0);
  const [progressionCount,setProgressionCount]=useState(stored.progressionCount??4),[project,setProject]=useState(null),[playing,setPlaying]=useState(false);
+ const [continuous,setContinuous]=useState(()=>!(stored.project&&stored.scene===scene.name));
+ const [panels,setPanels]=useState({generator:true,ambience:true});
+ const [bufferConfig,setBufferConfig]=useState(()=>{const s=load('synths:all:continuous-buffer',{});return {ahead:[1,2,4,8,16,32,64].includes(s.ahead)?s.ahead:4,history:[0,1,2,3,4,8,16,32,64,'infinite'].includes(s.history)?s.history:3};});
  const [selected,setSelected]=useState(stored.selected??3);          // the sequencer being edited (an index of SEQUENCERS)
  const [sounds,setSounds]=useState({}),[mutes,setMutes]=useState(stored.mutes??{});
- const [solos,setSolos]=useState(stored.solos??{}),[progression,setProgression]=useState(0),[arrangement,setArrangement]=useState(false),[arrOffset,setArrOffset]=useState(0),[rowAction,setRowAction]=useState(null),[loop,setLoop]=useState('pattern'),[paused,setPaused]=useState(false);
+ const [solos,setSolos]=useState(stored.solos??{}),[progression,setProgression]=useState(0),[arrangement,setArrangement]=useState(false),[arrOffset,setArrOffset]=useState(0),[rowAction,setRowAction]=useState(null),[loop,setLoop]=useState(()=>continuous?'song':'pattern'),[paused,setPaused]=useState(false);
  const [col,setCol]=useState(0),[bpm,setBpm]=useState(stored.bpm??90);
  const [view,setView]=useState('scale'),[offScale,setOffScale]=useState(false),[insertOctave,setInsertOctave]=useState(4),[pitch,setPitch]=useState(null),[screenPage,setScreenPage]=useState('seq'),[drumOffset,setDrumOffset]=useState(0);
  const [resolution,setResolution]=useState('1/16');
@@ -81,11 +87,14 @@ export default function AllPage(){
  const [editMode,setEditMode]=useState(false),[copyMode,setCopyMode]=useState(false),[editSelection,setEditSelection]=useState([]),[copySource,setCopySource]=useState(null);
  const shiftPointer=useRef(null),keyboardShift=useRef(false);
  const [focusChord,setFocusChord]=useState(null);
- const booked=useRef({}),host=useRef(null),scheduler=useRef(null),head=useRef(null),timers=useRef(new Set()),projectRef=useRef(null),bpmRef=useRef(90),mutesRef=useRef({}),solosRef=useRef({}),progressionRef=useRef(0),restoreSounds=useRef(null);
+ const booked=useRef({}),host=useRef(null),scheduler=useRef(null),head=useRef(null),timers=useRef(new Set()),projectRef=useRef(null),bpmRef=useRef(90),mutesRef=useRef({}),solosRef=useRef({}),progressionRef=useRef(0);
  const repeatRef=useRef(null),playheadRef=useRef(0);
  const gridSizeRef=useRef(1),playingRef=useRef(false);
- const temporaryChord=useRef(false),releaseChord=useRef(()=>{});
+ const temporaryChord=useRef(false),releaseChord=useRef(()=>{}),sceneLoading=useRef(false);
+ const stream=useRef(null),bufferRef=useRef(bufferConfig);bufferRef.current=bufferConfig;
+ const setupInput=useRef(null),deskRef=useRef(null),ambienceRef=useRef(null);
  projectRef.current=project;bpmRef.current=bpm;mutesRef.current=mutes;solosRef.current=solos;progressionRef.current=progression;
+ useEffect(()=>{save('synths:all:continuous-buffer',bufferConfig);},[bufferConfig]);
 
  const seqInfo=SEQUENCERS[selected],role=seqInfo.role;
  const pattern=project?.patterns[role];
@@ -99,58 +108,131 @@ export default function AllPage(){
  },[]);
 
  useEffect(()=>{
-  try{
+  let alive=true;
+  (async()=>{try{
+   setBusy(true);
    const h=createHost(scene);
    host.current=h;
-   h.applySceneVoices(scene);
+   await h.applySceneVoices(scene);
    const back=stored.project&&stored.scene===scene.name?stored.project:null;
-   const song=back?{...back,meter:back.meter??sceneSettings(scene).meter}:h.capture({progressions:progressionCount});
+   if(back&&stored.sounds)for(const s of SEQUENCERS){
+    const saved=stored.sounds[s.role];
+    if(saved&&(s.role==='perc'?drumChoices().some(c=>c.id===saved.synth):SYNTHS_BY_ID(saved.synth)))await h.setSound(s.role,saved);
+   }
+   if(back&&stored.mixer)await h.restoreMixer(stored.mixer);
+   await h.setupMixer();
+   if(!alive)return;
+   const song=back?{...back,meter:back.meter??sceneSettings(scene).meter}:startStream(h,h.settings.seed);
    setProject(song);setBpm(back&&stored.bpm?stored.bpm:Math.round(song.bpm));
-   setSounds(Object.fromEntries(SEQUENCERS.filter(s=>s.role!=='perc').map(s=>{
-    const saved=back&&stored.sounds?.[s.role];
-    return [s.role,saved&&SYNTHS_BY_ID(saved.synth)?saved:{synth:'calmbgm',name:h.loaded[s.role]?.name??''}];
+   setSounds(Object.fromEntries(SEQUENCERS.map(s=>{
+    return [s.role,h.loaded[s.role]??(s.role==='perc'?{synth:'scene',name:scene.name}:{synth:'calmbgm',name:''})];
    })));
-   restoreSounds.current=back?stored.sounds:null;
    setStatus(back?`${scene.name} · back where you left off`:`${scene.name} · ${progressionsOf(song).length} progressions`);setStarted(true);setHostVersion(v=>v+1);
-  }catch(error){console.error(error);setStatus(error.message);}
-  return ()=>{host.current?.dispose();host.current=null;};
+  }catch(error){console.error(error);if(alive)setStatus(error.message);}finally{if(alive)setBusy(false);}})();
+  return ()=>{alive=false;host.current?.dispose();host.current=null;};
  },[]);// eslint-disable-line react-hooks/exhaustive-deps
  // a new song: the generator plans another one for the same settings (new seed) and the sequencers take it
  function newSong(extra={}){
   const h=host.current;if(!h)return;
   stop();
   const seed=extra.seed??Math.floor(Math.random()*2**31),n=extra.progressions??progressionCount;
-  const song=h.capture({progressions:n,seed});
+  const song=continuous?startStream(h,seed):h.capture({progressions:n,seed});
   setPlacedId(null);setDeleteStack(null);
   setProject(song);setBpm(Math.round(song.bpm));setCol(0);setProgression(0);setArrOffset(0);setFocusChord(null);setScreenPage('seq');playheadRef.current=0;repeatRef.current=null;
   setStatus(`${scene.name} · seed ${seed} · ${song.chords.map(c=>c.name).slice(0,6).join(' ')}…`);
  }
- function chooseScene(name){
-  setSceneName(name);
-  setPlacedId(null);setDeleteStack(null);
-  setFocusChord(null);setScreenPage('seq');playheadRef.current=0;repeatRef.current=null;
-  if(!host.current)return;
-  stop();
-  const next=sceneList.find(s=>s.name===name);
-  host.current.dispose();
+ function startStream(h,seed){
+  const generator=createContinuous(h,seed);
+  let song=null;
+  for(let i=0;i<=bufferRef.current.ahead;i++)song=appendProgression(song,generator.next(song?.key));
+  stream.current={generator,baseSteps:0};
+  return song;
+ }
+ function changeMode(enabled){
+  const h=host.current;if(!h)return;
   try{
-   const h=createHost(next);host.current=h;h.applySceneVoices(next);
-   const song=h.capture({progressions:progressionCount});setProject(song);setBpm(Math.round(song.bpm));setProgression(0);setArrOffset(0);setCol(0);setSounds(Object.fromEntries(SEQUENCERS.filter(s=>s.role!=='perc').map(s=>[s.role,{synth:'calmbgm',name:h.loaded[s.role]?.name??''}])));restoreSounds.current=null;setStatus(`${next.name}`);setHostVersion(v=>v+1);
+   stop();
+   const seed=projectRef.current?.seed??h.settings.seed;
+   const song=enabled?startStream(h,seed):h.capture({progressions:progressionCount,seed});
+   if(!enabled)stream.current=null;
+   projectRef.current=song;progressionRef.current=0;playheadRef.current=0;repeatRef.current=null;
+   setContinuous(enabled);setProject(song);setProgression(0);setCol(0);setArrOffset(0);setLoop(enabled?'song':'pattern');
+   setStatus(enabled?'Continuous generation · live buffer':'Song mode');
   }catch(error){console.error(error);setStatus(error.message);}
  }
- async function chooseSound(r,synth,name,values){
+ async function chooseScene(name,{seed}={}){
+  const old=host.current,next=sceneList.find(s=>s.name===name);
+  if(!old||!next||sceneLoading.current)return;
+  sceneLoading.current=true;
+  stop();
+  let h;
+  try{
+   setBusy(true);setStarted(false);
+   h=createHost(next,{seed});await h.applySceneVoices(next);await h.setupMixer();
+   if(host.current!==old){h.dispose();return;}
+   const song=continuous?startStream(h,h.settings.seed):h.capture({progressions:progressionCount});
+   old.dispose();host.current=h;
+   setSceneName(next.name);setPlacedId(null);setDeleteStack(null);setFocusChord(null);setScreenPage('seq');playheadRef.current=0;repeatRef.current=null;
+   setProject(song);setBpm(Math.round(song.bpm));setProgression(0);setArrOffset(0);setCol(0);setSounds(Object.fromEntries(SEQUENCERS.map(s=>[s.role,h.loaded[s.role]??(s.role==='perc'?{synth:'scene',name:next.name}:{synth:'calmbgm',name:''})])));setStatus(`${next.name}`);setStarted(true);setHostVersion(v=>v+1);
+  }catch(error){h?.dispose();console.error(error);setStatus(`Could not load ${name}: ${error.message}`);if(host.current===old)setStarted(true);}finally{sceneLoading.current=false;setBusy(false);}
+ }
+ function saveSetupFile(){
+  try{
+   const h=host.current;if(!h||!projectRef.current)throw new Error('The setup is not ready yet.');
+   const text=encodeSetup({scene:sceneName,settings:h.g.settings,project:projectRef.current,sounds:h.snapshotSounds(),stream:stream.current?.generator.snapshot()??null,tuning:tuning.get(),
+    desk:deskRef.current.snapshot(),ambience:ambienceRef.current.snapshot(),
+    ui:{selected,progression:progressionRef.current,bpm,progressionCount,mutes,solos,chordOverlap,loop,continuous,buffer:bufferConfig,panels,arrangement,view,offScale,insertOctave,pitch,resolution,drumOffset}});
+   decodeSetup(text);
+   const url=URL.createObjectURL(new Blob([text],{type:'application/json'})),a=document.createElement('a');
+   a.href=url;a.download=setupFileName(sceneName);document.body.append(a);a.click();a.remove();
+   setTimeout(()=>URL.revokeObjectURL(url),1000);setStatus(`Saved ${a.download}`);
+  }catch(error){console.error(error);setStatus(`Could not save setup: ${error.message}`);}
+ }
+ async function openSetupFile(e){
+  const file=e.target.files?.[0];e.target.value='';if(!file||sceneLoading.current)return;
+  const old=host.current;let h;
+  sceneLoading.current=true;setBusy(true);
+  try{
+   if(file.size>MAX_BYTES)throw new Error('This setup file is too large (maximum 16 MB).');
+   const data=decodeSetup(await file.text()),next=sceneList.find(s=>s.name===data.scene);
+   h=createHost(next,{seed:data.settings.seed,settings:data.settings});
+   await h.applySceneVoices(next);await h.restoreSounds(data.sounds);await h.setupMixer();
+   let restoredStream=null;
+   if(data.ui.continuous){
+    const generator=createContinuous(h,data.stream.seed,data.stream.settings,data.stream.grooveVoices);
+    for(let i=0;i<data.stream.count;i++){
+     generator.next(data.project.key);
+     if(i%16===15)await new Promise(resolve=>setTimeout(resolve,0));
+    }
+    restoredStream={generator,baseSteps:0};
+   }
+   if(host.current!==old)throw new Error('The current setup changed while the file was loading.');
+   stop();setStarted(false);old.dispose();host.current=h;h=null;
+   stream.current=restoredStream;projectRef.current=data.project;progressionRef.current=data.ui.progression;
+   playheadRef.current=(data.project.progressions?.[data.ui.progression]?.startBar??0)*data.project.stepsPerBar;repeatRef.current=null;
+   setSceneName(data.scene);setProject(data.project);setBpm(data.ui.bpm);setProgressionCount(data.ui.progressionCount);setSelected(data.ui.selected);
+   setProgression(data.ui.progression);setMutes(data.ui.mutes);setSolos(data.ui.solos);setChordOverlap(data.ui.chordOverlap);setLoop(data.ui.loop);setContinuous(data.ui.continuous);setBufferConfig(data.ui.buffer);
+   setPanels(data.ui.panels);setArrangement(data.ui.arrangement);setView(data.ui.view);setOffScale(data.ui.offScale);setInsertOctave(data.ui.insertOctave);setPitch(data.ui.pitch);setResolution(data.ui.resolution);setDrumOffset(data.ui.drumOffset);
+   setCol(playheadRef.current);setArrOffset(0);setPlacedId(null);setDeleteStack(null);setFocusChord(null);setEditSelection([]);setCopySource(null);setScreenPage('seq');setWins({});
+   setSounds({...host.current.loaded});deskRef.current.restore(data.desk);ambienceRef.current.restore(data.ambience);tuning.set(data.tuning);
+   setHostVersion(v=>v+1);setStarted(true);setStatus(`Opened ${file.name}`);
+  }catch(error){h?.dispose();console.error(error);setStatus(`Could not open setup: ${error.message}`);}
+  finally{sceneLoading.current=false;setBusy(false);}
+ }
+ async function chooseSound(r,synth,name,values,patch){
   const h=host.current;if(!h)return;
-  if(restoreSounds.current){const next={...restoreSounds.current};delete next[r];restoreSounds.current=next;}
-  setSounds(s=>({...s,[r]:{synth,name:name??s[r]?.name??''}}));
   setBusy(true);setStatus(`Loading ${synth} for ${r}…`);
-  try{const got=await h.setSound(r,{synth,name,values});setSounds(s=>({...s,[r]:{synth,name:got.name}}));setStatus(`${r}: ${synth==='calmbgm'?'calmbgm':synth} · ${got.name}`);}catch(error){console.error(error);setStatus(error.message);}finally{setBusy(false);setVoiceVersion(v=>v+1);}
+  try{const got=await h.setSound(r,{synth,name,values,patch});setSounds(s=>({...s,[r]:got}));setStatus(`${r}: ${got.synth} · ${got.name}`);}catch(error){console.error(error);setStatus(error.message);}finally{setBusy(false);setVoiceVersion(v=>v+1);}
  }
  // the floating windows of the voices (their synth and their effects) and the scope
  const [wins,setWins]=useState({}),[voiceVersion,setVoiceVersion]=useState(0);
  const toggleWin=id=>setWins(w=>({...w,[id]:!w[id]}));
- const editVoice=(r,values)=>{host.current?.editValues(r,values);setVoiceVersion(v=>v+1);};
- const editNativeVoice=(r,changes)=>{host.current?.editNative(r,changes);setVoiceVersion(v=>v+1);};
- const editVoiceFx=(r,changes)=>{Promise.resolve(host.current?.editRack(r,changes)).finally(()=>setVoiceVersion(v=>v+1));};
+ const editVoice=(r,values)=>{host.current?.editValues(r,values);if(r==='perc')setSounds(s=>({...s,perc:{...host.current.loaded.perc}}));setVoiceVersion(v=>v+1);};
+ const editNativeVoice=(r,changes)=>{Promise.resolve(host.current?.editNative(r,changes)).catch(error=>{console.error(error);setStatus(error.message);}).finally(()=>setVoiceVersion(v=>v+1));};
+ const editDrumKit=kit=>{try{host.current.editDrumKit(kit);setSounds(s=>({...s,perc:{...host.current.loaded.perc}}));setVoiceVersion(v=>v+1);}catch(error){console.error(error);setStatus(error.message);}};
+ const editVoiceFx=(r,changes)=>{Promise.resolve(host.current?.editRack(r,changes)).catch(error=>{console.error(error);setStatus(error.message);}).finally(()=>setVoiceVersion(v=>v+1));};
+ const editMixerFx=(r,changes)=>{Promise.resolve(host.current?.editMixer(r,changes)).catch(error=>{console.error(error);setStatus(error.message);}).finally(()=>setVoiceVersion(v=>v+1));};
+ useEffect(()=>{if(started)host.current?.setTempo(bpm);},[bpm,started,hostVersion]);
  const [scopeOn,setScopeOn]=useState(()=>load('synths:scope:open',false)===true),scopeEngine=useRef(null);
  const toggleScope=()=>setScopeOn(v=>{save('synths:scope:open',!v);return !v;});
  useEffect(()=>{
@@ -180,15 +262,20 @@ export default function AllPage(){
   const target={
    noteOn(id,note,velocity){
     const h=host.current,r=voiceRef.current,instrument=h?.g.roles[r]?.instrument;if(!instrument)return;
-    if(typeof instrument.startNote==='function')ids.set(id,{instrument,note:instrument.startNote(note,velocity)});
+    const held=[...ids.values()].map(e=>e.key).concat(note);
+    if(typeof instrument.startNote==='function')ids.set(id,{instrument,role:r,key:note,note:instrument.startNote(h.tunedNote?.(r,note,held)??note,velocity)});
     else h.note(r,note,h.context.currentTime+.01,1.2,velocity);
+    retune();
    },
-   noteOff(id){const e=ids.get(id);if(e){e.instrument.stopNote(e.note);ids.delete(id);}},
+   noteOff(id){const e=ids.get(id);if(e){e.instrument.stopNote(e.note);ids.delete(id);retune();}},
    pressure(){},control(){},
-   panic(){for(const e of ids.values())e.instrument.stopNote(e.note);ids.clear();},
+   panic(){for(const e of ids.values())e.instrument.stopNote(e.note);ids.clear();tuning.setHeld([]);},
   };
+  const retune=()=>{const held=[...ids.values()].map(e=>e.key);tuning.setHeld(held);for(const e of ids.values())e.instrument.retuneNote?.(e.note,host.current?.tunedNote?.(e.role,e.key,held)??e.key);};
+  target.retune=retune;
   return new Performer(target,{onNotes:setHeld});
  },[]);
+ useEffect(()=>{const off=tuning.subscribe(()=>performer.target.retune());return ()=>{off();tuning.setHeld([]);};},[performer]);
  const phrases=useMemo(()=>createPhraseRunner(performer,{context:()=>contextRef.current,onState:setPhrasePlaying}),[performer]);
  // the sequencers' notes light the keys too, in time with the sound
  function light(midi,delay,dur){
@@ -223,7 +310,7 @@ export default function AllPage(){
   window.addEventListener('keydown',phraseKey);
   return ()=>{kb();m.dispose();window.removeEventListener('keydown',phraseKey);phrases.stop();performer.panic();};
  },[]);// eslint-disable-line react-hooks/exhaustive-deps
- useSaved(STORE,{scene:sceneName,progressionCount,bpm,selected,mutes,solos,sounds,chordOverlap,project},{skip:()=>!project});
+ useSaved(STORE,{scene:sceneName,progressionCount,bpm,selected,mutes,solos,sounds,chordOverlap,project,mixer:started?host.current?.mixerSnapshot?.():undefined},{skip:()=>!project||!started||continuous});
 
  // playback: the sequencer core books every sequencer's notes on the audio clock, and they sound on the generator's role instruments
  useEffect(()=>{
@@ -247,15 +334,34 @@ export default function AllPage(){
    emit:events=>events.forEach(e=>{const r=SEQUENCERS[e.track].role;if(r==='perc')h.drum(e.hit,e.time,e.stepSec);else{h.note(r,e.note,e.time,e.duration,e.velocity);light(e.note,(e.time-h.context.currentTime+(h.g.AC.outputLatency||0))*1000,Math.max(60,e.duration*1000));}booked.current[r]=(booked.current[r]||0)+1;}),
    onStep:({pattern:part,step,time})=>{
     const wait=Math.max(0,(time-h.context.currentTime+(h.g.AC.outputLatency||0))*1000);
-    const absolute=bank().patterns[part].startBar*projectRef.current.stepsPerBar+step;
+    const absolute=bank().patterns[part].startBar*projectRef.current.stepsPerBar+step+(stream.current?.baseSteps??0);
     const id=setTimeout(()=>{
-     timers.current.delete(id);playheadRef.current=absolute;
-     const project=projectRef.current,parts=progressionsOf(project),index=parts.findIndex(p=>absolute>=p.startBar*project.stepsPerBar&&absolute<(p.startBar+p.bars)*project.stepsPerBar);
-     if(index>=0){
-      if(index!==progressionRef.current){progressionRef.current=index;setProgression(index);setFocusChord(null);setScreenPage('seq');}
-      setCol(previous=>followPlayback(previous,absolute,parts[index],project.stepsPerBar,gridSizeRef.current));
+     timers.current.delete(id);
+     let local=absolute-(stream.current?.baseSteps??0),project=projectRef.current,parts=progressionsOf(project);
+     let index=parts.findIndex(p=>local>=p.startBar*project.stepsPerBar&&local<(p.startBar+p.bars)*project.stepsPerBar);
+     if(index>=0&&stream.current&&!repeatRef.current){
+      try{
+       let next=project;
+       while(next.progressions.length-index-1<bufferRef.current.ahead)next=appendProgression(next,stream.current.generator.next(next.key));
+       const history=bufferRef.current.history,drop=history==='infinite'?0:Math.max(0,index-history);
+       if(drop){
+        const removed=next.progressions[drop].startBar*next.stepsPerBar,position=sched.position;
+        if(position.pattern>=drop){
+         next=trimProgressions(next,drop);projectRef.current=next;
+         sched.reposition({pattern:position.pattern-drop,step:position.step},sched.scope);
+         stream.current.baseSteps+=removed;local-=removed;index-=drop;
+         setCol(c=>Math.max(0,c-removed));setArrOffset(c=>Math.max(0,c-drop));
+        }
+       }
+       if(next!==project){project=next;parts=progressionsOf(project);projectRef.current=project;setProject(project);}
+      }catch(error){console.error(error);sched.stop();playingRef.current=false;setPlaying(false);setStatus(`Continuous generation failed: ${error.message}`);return;}
      }
-     movePlayhead(head.current,{running:true,step:absolute});
+     playheadRef.current=local;
+     if(index>=0){
+      if(index!==progressionRef.current){progressionRef.current=index;setProgression(index);if(stream.current)setArrOffset(offset=>index<offset?index:index>=offset+16?index-15:offset);setFocusChord(null);setScreenPage('seq');}
+      setCol(previous=>followPlayback(previous,local,parts[index],project.stepsPerBar,gridSizeRef.current));
+     }
+     movePlayhead(head.current,{running:true,step:local});
     },wait);
     timers.current.add(id);
    },
@@ -273,25 +379,16 @@ export default function AllPage(){
   const h=host.current;setBusy(true);
   try{
    await h.wake();
-   if(restoreSounds.current){
-    const saved=restoreSounds.current;
-    for(const entry of SEQUENCERS){
-     const want=saved[entry.role];
-     if(!want||want.synth==='calmbgm'||!SYNTHS_BY_ID(want.synth))continue;
-     const got=await h.setSound(entry.role,{synth:want.synth,name:want.name});
-     setSounds(x=>({...x,[entry.role]:{synth:want.synth,name:got.name}}));
-    }
-    restoreSounds.current=null;
-   }
    if(paused)s.resume(0.08);else {
     repeatRef.current=mode==='bar'||mode==='chord'?repeatRange(projectRef.current,playheadRef.current,mode):null;
-    s.start(0.08,mode==='song'?'song':'pattern');
+    if(stream.current&&mode==='song')s.start(0.08,'song',{pattern:progressionRef.current,step:0});
+    else s.start(0.08,mode==='song'?'song':'pattern');
    }
    playingRef.current=true;setPlaying(true);setPaused(false);
   }catch(error){console.error(error);setStatus(error.message);}finally{setBusy(false);}
  };
  const pause=()=>{if(!playing)return;scheduler.current?.pause();timers.current.forEach(clearTimeout);timers.current.clear();dark();playingRef.current=false;setPlaying(false);setPaused(true);};
- const chooseProgression=i=>{setProgression(i);setCol(progressionsOf(project)[i].startBar*project.stepsPerBar);if(!playing){playheadRef.current=progressionsOf(project)[i].startBar*project.stepsPerBar;repeatRef.current=null;}setFocusChord(null);setScreenPage('seq');};
+ const chooseProgression=i=>{setProgression(i);setCol(progressionsOf(project)[i].startBar*project.stepsPerBar);if(!playing){playheadRef.current=progressionsOf(project)[i].startBar*project.stepsPerBar;repeatRef.current=null;if(stream.current&&paused){scheduler.current?.reposition({pattern:i,step:0},'song');setLoop('song');}}setFocusChord(null);setScreenPage('seq');};
  const changeRepeat=()=>{
   const modes=['pattern','song','bar','chord'],next=modes[(modes.indexOf(loop)+1)%modes.length];
   try{
@@ -494,13 +591,14 @@ export default function AllPage(){
   edit(role,p=>editPitch(p,key,s,end,midi,{replace}));
   host.current?.note(role,midi,host.current.context.currentTime+0.02,0.4,0.8);
  };
- const toggleDrum=(s,drum,end=s+1)=>{
-  if(s===null){host.current?.drum({drum,velocity:0.8,duration:1},host.current.context.currentTime+0.02,0.125);return;}
+ const toggleDrum=(s,lane,end=s+1)=>{
+  const {drum,track}=lane,hit={drum,...(track?{track}:{}),velocity:0.8,duration:1};
+  if(s===null){host.current?.drum(hit,host.current.context.currentTime+0.02,0.125);return;}
   setProject(p=>{
    const current=p.patterns.perc??{mode:'drums',length:p.bars*p.stepsPerBar,steps:Array(p.bars*p.stepsPerBar).fill(null)};
-   return {...p,patterns:{...p.patterns,perc:editDrum(current,s,end,drum)}};
+   return {...p,patterns:{...p.patterns,perc:editDrum(current,s,end,drum,track)}};
   });
-  host.current?.drum({drum,velocity:0.8,duration:1},host.current.context.currentTime+0.02,0.125);
+  host.current?.drum(hit,host.current.context.currentTime+0.02,0.125);
  };
 
  const encoders=[
@@ -635,7 +733,11 @@ export default function AllPage(){
     <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}><b style={{color:COLOURS[s.role]}}>SEQ {i+1} · {s.label}</b>
      <span><label><input type="checkbox" checked={!!mutes[s.role]} onChange={e=>setMutes(m=>({...m,[s.role]:e.target.checked}))}/> mute</label>{' '}
      <label><input type="checkbox" checked={!!solos[s.role]} onChange={e=>setSolos(m=>({...m,[s.role]:e.target.checked}))}/> solo</label></span></div>
-    {s.role==='perc'?<small>Scene drum kit</small>:<><select aria-label={`${s.label} sound generator`} value={sound.synth} disabled={!started||busy} onChange={e=>chooseSound(s.role,e.target.value)}>{synthChoices().map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select>
+    {s.role==='perc'?<>
+     <select aria-label="Drums sound generator" value={sound.synth} disabled={!started||busy} onChange={e=>{const id=e.target.value;setWins(w=>({...w,'synth:perc':false}));chooseSound('perc',id,id==='scene'?scene.name:id==='kit'?'felt':undefined);}}>{drumChoices().map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select>
+     <select aria-label="Drums patch" value={sound.synth==='scene'?sceneDrumPatch(sound.name):sound.name} disabled={!started||busy} onChange={e=>{if(sound.synth==='scene')setWins(w=>({...w,'synth:perc':false}));chooseSound('perc',sound.synth,e.target.value);}}>{drumPatches(sound.synth).map(p=><option key={p.id??p.name} value={p.id??p.name}>{p.name}</option>)}</select>
+     <span className="voice-tools"><button type="button" aria-pressed={!!wins['synth:perc']} disabled={!started} onClick={()=>toggleWin('synth:perc')}>Synth</button><button type="button" aria-pressed={!!wins['fx:perc']} disabled={!started} onClick={()=>toggleWin('fx:perc')}>Effects</button></span>
+    </>:<><select aria-label={`${s.label} sound generator`} value={sound.synth} disabled={!started||busy} onChange={e=>chooseSound(s.role,e.target.value)}>{synthChoices().map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select>
     {sound.synth==='calmbgm'
      ?<select aria-label={`${s.label} preset`} value={sound.name} disabled={!started||busy} onChange={e=>chooseSound(s.role,synthForPreset(e.target.value)??'calmbgm',e.target.value)}>
        {!Object.values(PRESET_CATEGORIES).some(c=>sound.name in c)&&<option value={sound.name}>{sound.name||'the scene\'s voice'}</option>}
@@ -647,6 +749,7 @@ export default function AllPage(){
     <span className="voice-tools">
      <button type="button" aria-pressed={!!wins['synth:'+s.role]} disabled={sound.synth==='calmbgm'&&!synthForPreset(sound.name)} title={sound.synth==='calmbgm'?(synthForPreset(sound.name)?'Play this sound through its synth, to edit it':'Choose a synth to open its panel'):'Open this synth in a window'} onClick={()=>{if(sound.synth==='calmbgm'){chooseSound(s.role,synthForPreset(sound.name),sound.name).then(()=>setWins(w=>({...w,['synth:'+s.role]:true})));}else toggleWin('synth:'+s.role);}}>Synth</button>
      <button type="button" aria-pressed={!!wins['fx:'+s.role]} disabled={!started} title="This voice's effects chain" onClick={()=>toggleWin('fx:'+s.role)}>Effects</button>
+     {['poly','fm','piano'].includes(sound.synth)&&<button type="button" aria-pressed={!!wins['tuning:'+s.role]} disabled={!started} title="This synth's tuning window" onClick={()=>toggleWin('tuning:'+s.role)}>Tuning</button>}
     </span>
     </>}
    </div>;})}
@@ -686,6 +789,11 @@ export default function AllPage(){
    <h1><span className="brand">All</span><small>sequencers and sound generators</small></h1>
    <label className="bar-scene">Scene <select value={sceneName} disabled={busy} onChange={e=>chooseScene(e.target.value)}>{SCENE_CATEGORIES.map(c=><optgroup key={c.id} label={c.label}>{sceneList.filter(s=>s.category===c.id).map(s=><option key={s.name} value={s.name}>{s.name}</option>)}</optgroup>)}</select></label>
    <span className="patch-name" title={status}>{status}</span>
+   <button type="button" disabled={!started||busy} onClick={saveSetupFile}>Save setup</button>
+   <button type="button" disabled={!started||busy} onClick={()=>setupInput.current?.click()}>Open setup…</button>
+   <input ref={setupInput} type="file" accept=".json,application/json" hidden onChange={openSetupFile}/>
+   <button type="button" aria-expanded={panels.generator} aria-controls="all-panel-generator" onClick={()=>setPanels(p=>({...p,generator:!p.generator}))}>Generator</button>
+   <button type="button" aria-expanded={panels.ambience} aria-controls="all-panel-ambience" onClick={()=>setPanels(p=>({...p,ambience:!p.ambience}))}>Ambience</button>
    {chordMode&&role!=='perc'&&<label>Chord overlap <select aria-label="Chord overlap" value={chordOverlap} onChange={e=>setChordOverlap(e.target.value)}><option value="replace">Replace in octave</option><option value="layer">Layer</option></select></label>}
    <span className="meter" aria-label={`${litNotes.length} notes sounding`}><b>{litNotes.length}</b></span>
    <button type="button" aria-pressed={scopeOn} onClick={toggleScope} title="Oscilloscope and spectrum of the mix">Scope</button>
@@ -695,10 +803,10 @@ export default function AllPage(){
    <button type="button" className="keys-button" aria-pressed={showKeys} onClick={()=>updateSetup('keys',showKeys?'hide':'show')} aria-label="On-screen keyboard" title="Show or hide the on-screen keyboard">🎹</button>
   </header>
   <Desk>
-   <FloatBox id="generator" label="Generator" className="box-generator" home={{x:0,y:0}}><GeneratorBox seq={seqState} onSeq={changeGenerator} info={{status:playing?'PLAYING':'STOPPED'}} song={{count:progressionCount,choices:PROGRESSION_CHOICES,disabled:!started||busy,onCount:n=>{setProgressionCount(n);newSong({progressions:n});},onNew:()=>newSong(),onScene:()=>newSong({seed:host.current.settings.seed})}}/></FloatBox>
+   <FloatBox id="generator" label="Generator" className="box-generator" home={{x:0,y:0}} visible={panels.generator}><GeneratorBox seq={seqState} onSeq={changeGenerator} info={{status:playing?'PLAYING':'STOPPED'}} presets={{current:sceneName,names:sceneList.map(s=>s.name),disabled:!started||busy,onChoose:chooseScene}} song={{count:progressionCount,choices:PROGRESSION_CHOICES,continuous,onMode:changeMode,disabled:!started||busy,onCount:n=>{setProgressionCount(n);newSong({progressions:n});},onNew:()=>newSong(),onScene:()=>chooseScene(sceneName,{seed:host.current.settings.seed})}}/></FloatBox>
    <FloatBox id="voices" label="Voices" className="box-voices" home={{x:1840,y:1070}}>{voices}</FloatBox>
-   <FloatBox id="ambience" label="Ambience" className="box-ambience" home={{x:834,y:0}}><AmbienceBox/></FloatBox>
-   <FloatBox id="mixer" label="Mixer" className="box-mixer" home={{x:1420,y:0}}><ChannelMixer channels={SEQUENCERS} colours={COLOURS}/></FloatBox>
+   <FloatBox id="ambience" label="Ambience" className="box-ambience" home={{x:834,y:0}} visible={panels.ambience}><AmbienceBox ref={ambienceRef}/></FloatBox>
+   <FloatBox id="mixer" label="Mixer" className="box-mixer" home={{x:1420,y:0}}><ChannelMixer ref={deskRef} channels={SEQUENCERS} colours={COLOURS} host={started?host.current:null} tempo={bpm} onEdit={editMixerFx}/></FloatBox>
    <FloatBox id="sequencer" label="Sequencer" className="all-page box-sequencer" home={{x:0,y:557}}>
   <div className="drums"><div className="split" style={{'--rows':ROWS+1}}><section className="device device-seq" aria-label="Sequencer" style={{position:'relative'}}>
    <header className="device-head"><h2>Sequencer</h2><span>{project?`${seqInfo.label} · bar ${bar} of ${project.bars}${pattern?'':' · empty'}`:'start the orchestra'}</span></header>
@@ -733,17 +841,22 @@ export default function AllPage(){
      :project?<ProgressionGrid key={progression} project={project} pattern={pattern} part={part} colour={COLOURS[role]} offset={col} onOffset={setCol} headRef={head} focus={focusChord} onFocus={selectChord} onShiftChord={jumpChord}
       view={view} offScale={offScale} onOffScale={setOffScale} octave={insertOctave} onOctave={setInsertOctave} octaveFilter={octaveFilter} shiftHeld={shiftHeld} onFilterOctave={setOctaveFilter} pitch={pitch} onPitch={setPitch} stepSize={gridSize}
       onToggleNote={toggleNote} chordMode={chordMode&&role!=='perc'} deleteMode={deleteMode&&role!=='perc'} editMode={editMode&&role!=='perc'} copyMode={copyMode&&role!=='perc'} onEditPad={selectPad} onCopyPad={copyPad} onChordPad={chordPad} onDeletePad={deletePad} selectedPlaced={placedId} selectedDelete={deleteStack} selectedEdit={editSelection}
-      drumMode={role==='perc'} drumOffset={drumOffset} onDrumOffset={setDrumOffset} onToggleDrum={toggleDrum}/>
+      drumMode={role==='perc'} drumSound={host.current?.soundOf('perc')??sounds.perc} drumVoice={host.current?.g.settings?.drums?.kit} drumOffset={drumOffset} onDrumOffset={setDrumOffset} onToggleDrum={toggleDrum}/>
      :<div className="progression-empty">Start the orchestra to open the progression editor.</div>}
     </div>
    </div>
   </section></div></div>
    </FloatBox>
    <div className="all-stage" aria-hidden="true"/>
-   {SEQUENCERS.filter(x=>x.role!=='perc').map((x,i)=>(wins['synth:'+x.role]||wins['fx:'+x.role])&&<VoiceWindow key={x.role} role={x.role} index={i} host={host.current} version={voiceVersion} fx={!!wins['fx:'+x.role]}
-    onChoose={chooseSound} onEdit={editVoice} onEditNative={editNativeVoice} onEditFx={editVoiceFx} onCloseFx={()=>setWins(w=>({...w,['fx:'+x.role]:false,['synth:'+x.role]:true}))}/>)}
+   {SEQUENCERS.map((x,i)=>(wins['synth:'+x.role]||wins['fx:'+x.role]||wins['tuning:'+x.role])&&<VoiceWindow key={x.role+':'+hostVersion} role={x.role} index={i} host={host.current} version={voiceVersion} showSynth={!!wins['synth:'+x.role]} fx={!!wins['fx:'+x.role]} tuning={!!wins['tuning:'+x.role]}
+    onChoose={chooseSound} onEdit={editVoice} onEditNative={editNativeVoice} onEditDrum={editDrumKit} onEditFx={editVoiceFx} onCloseFx={()=>setWins(w=>({...w,['fx:'+x.role]:false}))} onCloseTuning={()=>setWins(w=>({...w,['tuning:'+x.role]:false}))}/>)}
    {scopeOn&&<Scope engine={scopeEngine} audio={awake?'on':'off'} onClose={toggleScope} keyHz={()=>litNotes.length?440*2**((litNotes[litNotes.length-1]-69)/12):0}/>}
-   {showSetup&&<SetupPopover midi={midi} setup={setup} updateSetup={updateSetup} connectMidi={connectMidi} audio={{state:awake?'on':'off',message:'Audio runs when the song plays or a key is pressed.'}} start={()=>host.current?.wake().then(()=>setAwake(true))} onClose={()=>setShowSetup(false)}/>}
+   {showSetup&&<SetupPopover midi={midi} setup={setup} updateSetup={updateSetup} connectMidi={connectMidi} audio={{state:awake?'on':'off',message:'Audio runs when the song plays or a key is pressed.'}} start={()=>host.current?.wake().then(()=>setAwake(true))} onClose={()=>setShowSetup(false)}>
+    <section className="group wide"><h3>Continuous generator</h3><div className="row">
+     <label>Progressions ahead<select aria-label="Progressions ahead" value={bufferConfig.ahead} onChange={e=>setBufferConfig(c=>({...c,ahead:Number(e.target.value)}))}>{[1,2,4,8,16,32,64].map(n=><option key={n} value={n}>{n}</option>)}</select></label>
+     <label>History retained<select aria-label="History retained" value={bufferConfig.history} onChange={e=>setBufferConfig(c=>({...c,history:e.target.value==='infinite'?'infinite':Number(e.target.value)}))}>{[0,1,2,3,4,8,16,32,64,'infinite'].map(n=><option key={n} value={n}>{n==='infinite'?'Unlimited':n}</option>)}</select></label>
+    </div><p className="hint">Unlimited history grows in memory. Lookahead is finite. Continuous sessions are not saved as songs.</p></section>
+   </SetupPopover>}
    <footer className="perform">
     {showKeys&&<StageKeys drag={keysDrag} size={setup.keysSize} controls={setup.keysControls} low={setup.keysLow} onLow={v=>updateSetup('keysLow',v)} onLayout={updateSetup} notes={[...new Set([...litNotes,...held])]} context={context} chord={chordPick}
      onDown={(k,n,v)=>down(k,n,mapVelocity(v??.75,CURVES[setup.velocity]??CURVES.normal))} onUp={k=>performer.up(k)}
