@@ -14,6 +14,23 @@ export const HOME_W=1500,HOME_H=840;
 export const BASE_W=3840,BASE_H=2160;
 const MIN_ZOOM=.25,MAX_ZOOM=2.5,VIEW_KEY='synths:desk',LAYOUT_KEY='synths:desk:layout',GROW_PAD=160,CONTENT_MARGIN=48;
 const clamp=(x,lo,hi)=>Math.min(hi,Math.max(lo,x));
+export const isVisibleDeskItem=el=>{
+ for(let node=el;node;node=node.parentElement){
+  const style=getComputedStyle(node);
+  if(node.getAttribute('aria-hidden')==='true'||style.display==='none'||style.visibility!=='visible')return false;
+ }
+ return true;
+};
+export function measureVisibleDesk(home,zoom,includeHome=true){
+ const o=home.getBoundingClientRect();let l=Infinity,t=Infinity,r=-Infinity,b=-Infinity;
+ const items=home.querySelectorAll('[data-desk-item],.rig,.keybox,.rackc,.setup-pop,.scope,.help-pop,.lab-window');
+ for(const el of includeHome?[home,...items]:items){
+  if(!isVisibleDeskItem(el))continue;
+  const q=el.getBoundingClientRect();if(!q.width||!q.height)continue;
+  l=Math.min(l,(q.left-o.left)/zoom);t=Math.min(t,(q.top-o.top)/zoom);r=Math.max(r,(q.right-o.left)/zoom);b=Math.max(b,(q.bottom-o.top)/zoom);
+ }
+ return Number.isFinite(l)?{l,t,r,b}:null;
+}
 
 const FALLBACK={zoom:1,el:null,limits:(w,h)=>({minX:0,minY:0,maxX:window.innerWidth-Math.min(w,window.innerWidth),maxY:window.innerHeight-Math.min(h,window.innerHeight)}),
  origin:()=>({left:0,top:0}),grow:()=>{},report:()=>{},fixedWidth:false,ready:true,
@@ -34,7 +51,7 @@ export const useDesk=()=>useContext(DeskContext)??LIVE;
 /** Forget where everything was put (the desk, its view, the rig, keyboard and every floating panel) and start over from the defaults. */
 export const RESET_EVENT='synths:reset-layout';
 export const resetLayout=()=>{
- try{Object.keys(window.localStorage).filter(k=>/^synths:(desk|scope-pos|keys-pos|rack-pos|setup-pos|diy:|all:)/.test(k)||/^synths:[^:]+:(rig|seq|machine|arranger|generator|mixer|ambience|voices|sequencer)-pos$/.test(k)).forEach(k=>window.localStorage.removeItem(k));}catch{/* storage unavailable */}
+ try{Object.keys(window.localStorage).filter(k=>/^synths:(desk|scope-pos|keys-pos|rack-pos|setup-pos|diy:)/.test(k)||/^synths:all:(generator|voices|ambience|mixer|sequencer|keys-pos|scope-pos|win-.+|rack-.+)$/.test(k)||/^synths:[^:]+:(rig|seq|machine|arranger|generator|mixer|ambience|voices|sequencer)-pos$/.test(k)).forEach(k=>window.localStorage.removeItem(k));}catch{/* storage unavailable */}
  window.dispatchEvent(new Event(RESET_EVENT));
 };
 export const onSynth=(...classes)=>typeof document!=='undefined'&&classes.some(cls=>!!document.querySelector('.instrument.'+cls));
@@ -46,7 +63,7 @@ const defaultLayout=(box,homeW=HOME_W,homeH=HOME_H)=>{
  return {w,h,x:Math.round((w-homeW)/2),y:Math.round((h-homeH)/2)};
 };
 
-export default function Desk({children}){
+export default function Desk({children,includeHomeInFit=true}){
  const view=useRef(null),homeRef=useRef(null),deskRef=useRef(null),[homeEl,setHomeEl]=useState(null);
  const touch=useMemo(isTouchScreen,[]);
  // a ref callback that stays the same between renders: a new one each time would null the element in the middle of a drag
@@ -102,16 +119,12 @@ export default function Desk({children}){
  },[box]);
  // What is on the desk, measured from the elements themselves (the instrument, the rig and keyboard wherever they have been moved to, every floating panel),
  // in desk units. Done when it is needed (fit, and the start of a move), so it is always what is really there.
- const measure=()=>{
+ const measure=(includeHome=true)=>{
   const home=homeRef.current,dk=deskRef.current;if(!home||!dk)return contentRef.current;
-  const o=home.getBoundingClientRect(),z=zoomRef.current,L=layoutRef.current;let l=Infinity,t=Infinity,r=-Infinity,b=-Infinity;
-  for(const el of [home,...home.querySelectorAll('[data-desk-item],.rig,.keybox,.rackc,.setup-pop,.scope,.help-pop,.lab-window')]){
-   const q=el.getBoundingClientRect();if(!q.width||!q.height)continue;
-   l=Math.min(l,(q.left-o.left)/z);t=Math.min(t,(q.top-o.top)/z);r=Math.max(r,(q.right-o.left)/z);b=Math.max(b,(q.bottom-o.top)/z);
-  }
-  if(!Number.isFinite(l))return contentRef.current;
+  const bounds=measureVisibleDesk(home,zoomRef.current,includeHome),L=layoutRef.current;
+  if(!bounds)return contentRef.current;
   // measured from the instrument, so it does not depend on where the desk's own edge is (which moves as the desk grows)
-  return {l:L.x+l-CONTENT_MARGIN,t:L.y+t-CONTENT_MARGIN,r:L.x+r+CONTENT_MARGIN,b:L.y+b+CONTENT_MARGIN};
+  return {l:L.x+bounds.l-CONTENT_MARGIN,t:L.y+bounds.t-CONTENT_MARGIN,r:L.x+bounds.r+CONTENT_MARGIN,b:L.y+bounds.b+CONTENT_MARGIN};
  };
  // by default the instrument is centred across the window, and down it when it all fits, else it starts at the top
  const centred=z=>({x:box.w/2-(layout.x+homeW/2)*z,y:homeH*z<=box.h?box.h/2-(layout.y+homeH/2)*z:-(layout.y-12)*z});
@@ -154,10 +167,10 @@ export default function Desk({children}){
  const reset=useCallback(()=>{setManual(null);save(VIEW_KEY,{});},[]);
  // zoom to fit: everything on the desk (the instrument and every panel) in the window at once, as large as it can be without going past 1:1
  const fitAll=useCallback(()=>{
-  const c=measure(),cw=c.r-c.l,ch=c.b-c.t;
+  const c=measure(includeHomeInFit),cw=c.r-c.l,ch=c.b-c.t;
   const z=clamp(Math.min(box.w/cw,box.h/ch),MIN_ZOOM,1);
   commit(z,(box.w-cw*z)/2-c.l*z,(box.h-ch*z)/2-c.t*z);
- },[box,commit]);
+ },[box,commit,includeHomeInFit]);
 
  // the first time on this device the view starts on everything that is on the desk (the instrument and the panels around it)
  // after a reset the desk is laid out afresh and the view starts on everything again (the panels put themselves back)

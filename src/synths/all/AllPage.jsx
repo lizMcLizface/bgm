@@ -1,5 +1,7 @@
 import React,{useEffect,useMemo,useRef,useState} from 'react';
-import {BROWSABLE_SCENES,SCENE_CATEGORIES,sceneSettings} from '../../app/scenes';
+import {BROWSABLE_SCENES,SCENES,SCENE_CATEGORIES,sceneSettings,sceneSlug,normalizeScene} from '../../app/scenes';
+import {generationFromSearch} from '../../app/generation';
+import {frontPageLink,parseFrontPageInput} from './frontPageLink';
 import {TONIC_NAMES} from '../../app/theory';
 import {createScheduler} from '../../seq/scheduler';
 import {projectStepEvents} from '../../seq/notes';
@@ -59,29 +61,46 @@ const readStored=()=>{
  if(!s||typeof s!=='object')return {};
  const p=s.project;
  const project=p&&Number.isFinite(p.bars)&&Number.isFinite(p.stepsPerBar)&&p.key&&p.patterns&&typeof p.patterns==='object'?p:null;
- return {scene:typeof s.scene==='string'?s.scene:null,progressionCount:PROGRESSION_CHOICES.includes(s.progressionCount)?s.progressionCount:null,bpm:Number.isFinite(s.bpm)?clamp(Math.round(s.bpm),50,200):null,
+ return {scene:typeof s.scene==='string'?s.scene:null,sceneData:normalizeScene(s.sceneData),progressionCount:PROGRESSION_CHOICES.includes(s.progressionCount)?s.progressionCount:null,bpm:Number.isFinite(s.bpm)?clamp(Math.round(s.bpm),50,200):null,
   selected:Number.isInteger(s.selected)&&s.selected>=0&&s.selected<SEQUENCERS.length?s.selected:null,mutes:s.mutes&&typeof s.mutes==='object'?s.mutes:null,solos:s.solos&&typeof s.solos==='object'?s.solos:null,
   sounds:s.sounds&&typeof s.sounds==='object'?s.sounds:null,mixer:s.mixer&&typeof s.mixer==='object'?s.mixer:null,chordOverlap:s.chordOverlap==='layer'?'layer':'replace',project};
 };
 
 const SYNTHS_BY_ID=id=>synthChoices().some(c=>c.id===id);
+const takeHostMutes=h=>{
+ const muted={...h.g.settings.muted};
+ if(Object.values(muted).some(Boolean))h.g.set('muted',Object.fromEntries(Object.keys(muted).map(role=>[role,false])));
+ return muted;
+};
+
+export function defaultSequencer(project){
+ const roles=['pad','rhythm'],part=progressionsOf(project)[0],end=(part.startBar+part.bars)*project.stepsPerBar;
+ const hasNotes=role=>{
+  const pattern=project.patterns[role],start=part.startBar*project.stepsPerBar;
+  return pattern?.steps.slice(start,end).some(Boolean)||pattern?.chords?.some(c=>c.start<end&&c.start+c.len>start);
+ };
+ const role=roles.find(hasNotes)??roles.find(r=>project.patterns[r])??'pad';
+ return SEQUENCERS.findIndex(s=>s.role===role);
+}
 
 export default function AllPage(){
  const sceneList=BROWSABLE_SCENES;
- const [stored]=useState(readStored);
- const [sceneName,setSceneName]=useState(()=>sceneList.find(s=>s.name===stored.scene)?.name??sceneList.find(s=>/lofi|rain/i.test(s.name))?.name??sceneList[0].name);
- const scene=useMemo(()=>sceneList.find(s=>s.name===sceneName)??sceneList[0],[sceneName,sceneList]);
+ const [initialLink]=useState(()=>{try{return {link:frontPageLink(window.location)};}catch(error){return {error};}});
+ const [stored]=useState(()=>initialLink.link||initialLink.error?{}:readStored());
+ const [customScene,setCustomScene]=useState(()=>initialLink.link&&!initialLink.link.scene?normalizeScene({name:'Front-page settings',settings:initialLink.link.share.settings,voices:{}}):stored.sceneData?.name===stored.scene?stored.sceneData:null);
+ const [sceneName,setSceneName]=useState(()=>initialLink.link?.scene?.name??customScene?.name??SCENES.find(s=>s.name===stored.scene)?.name??sceneList.find(s=>/lofi|rain/i.test(s.name))?.name??sceneList[0].name);
+ const scene=useMemo(()=>customScene?.name===sceneName?customScene:SCENES.find(s=>s.name===sceneName)??sceneList[0],[sceneName,sceneList,customScene]);
  const [status,setStatus]=useState('Preparing song…'),[started,setStarted]=useState(false),[busy,setBusy]=useState(false),[hostVersion,setHostVersion]=useState(0);
  const [progressionCount,setProgressionCount]=useState(stored.progressionCount??4),[project,setProject]=useState(null),[playing,setPlaying]=useState(false);
  const [continuous,setContinuous]=useState(()=>!(stored.project&&stored.scene===scene.name));
- const [panels,setPanels]=useState({generator:true,ambience:true});
+ const [panels,setPanels]=useState({generator:false,ambience:false});
  const [bufferConfig,setBufferConfig]=useState(()=>{const s=load('synths:all:continuous-buffer',{});return {ahead:[1,2,4,8,16,32,64].includes(s.ahead)?s.ahead:4,history:[0,1,2,3,4,8,16,32,64,'infinite'].includes(s.history)?s.history:3};});
  const [selected,setSelected]=useState(stored.selected??3);          // the sequencer being edited (an index of SEQUENCERS)
  const [sounds,setSounds]=useState({}),[mutes,setMutes]=useState(stored.mutes??{});
  const [solos,setSolos]=useState(stored.solos??{}),[progression,setProgression]=useState(0),[arrangement,setArrangement]=useState(false),[arrOffset,setArrOffset]=useState(0),[rowAction,setRowAction]=useState(null),[loop,setLoop]=useState(()=>continuous?'song':'pattern'),[paused,setPaused]=useState(false);
  const [col,setCol]=useState(0),[bpm,setBpm]=useState(stored.bpm??90);
  const [view,setView]=useState('scale'),[offScale,setOffScale]=useState(false),[insertOctave,setInsertOctave]=useState(4),[pitch,setPitch]=useState(null),[screenPage,setScreenPage]=useState('seq'),[drumOffset,setDrumOffset]=useState(0);
- const [resolution,setResolution]=useState('1/16');
+ const [resolution,setResolution]=useState(null);
  const [shiftHeld,setShiftHeld]=useState(false),[octaveFilter,setOctaveFilter]=useState(null);
  const [chordMode,setChordMode]=useState(false),[deleteMode,setDeleteMode]=useState(false),[chordOverlap,setChordOverlap]=useState(stored.chordOverlap??'replace'),[placedId,setPlacedId]=useState(null),[deleteStack,setDeleteStack]=useState(null),[strikeIndex,setStrikeIndex]=useState(0);
  const [editMode,setEditMode]=useState(false),[copyMode,setCopyMode]=useState(false),[editSelection,setEditSelection]=useState([]),[copySource,setCopySource]=useState(null);
@@ -93,9 +112,14 @@ export default function AllPage(){
  const temporaryChord=useRef(false),releaseChord=useRef(()=>{}),sceneLoading=useRef(false);
  const stream=useRef(null),bufferRef=useRef(bufferConfig);bufferRef.current=bufferConfig;
  const setupInput=useRef(null),deskRef=useRef(null),ambienceRef=useRef(null);
+ const [linkText,setLinkText]=useState('');
  projectRef.current=project;bpmRef.current=bpm;mutesRef.current=mutes;solosRef.current=solos;progressionRef.current=progression;
  useEffect(()=>{save('synths:all:continuous-buffer',bufferConfig);},[bufferConfig]);
 
+ function selectDefaultSequencer(song){
+  const index=defaultSequencer(song);
+  setSelected(index);deskRef.current?.select(SEQUENCERS[index].role);
+ }
  const seqInfo=SEQUENCERS[selected],role=seqInfo.role;
  const pattern=project?.patterns[role];
  useEffect(()=>{
@@ -111,9 +135,12 @@ export default function AllPage(){
   let alive=true;
   (async()=>{try{
    setBusy(true);
-   const h=createHost(scene);
+   const link=initialLink.link;
+   const base=link&&!link.scene?{...scene,voices:{},layerVoices:{},percussion:null}:scene;
+   const h=createHost(base,{seed:link?.scene&&link.share?.phrase?link.share.settings.seed:undefined,settings:link&&!link.scene?link.share?.settings:undefined});
    host.current=h;
-   await h.applySceneVoices(scene);
+   await h.applySceneVoices(base);
+   if(link){h.g.set('generation',generationFromSearch(link.search));await h.applyFrontPageLink(link);}
    const back=stored.project&&stored.scene===scene.name?stored.project:null;
    if(back&&stored.sounds)for(const s of SEQUENCERS){
     const saved=stored.sounds[s.role];
@@ -122,12 +149,15 @@ export default function AllPage(){
    if(back&&stored.mixer)await h.restoreMixer(stored.mixer);
    await h.setupMixer();
    if(!alive)return;
+   const sceneMutes=takeHostMutes(h);
+   if(!back)setMutes(sceneMutes);
    const song=back?{...back,meter:back.meter??sceneSettings(scene).meter}:startStream(h,h.settings.seed);
+   if(!back)selectDefaultSequencer(song);
    setProject(song);setBpm(back&&stored.bpm?stored.bpm:Math.round(song.bpm));
    setSounds(Object.fromEntries(SEQUENCERS.map(s=>{
     return [s.role,h.loaded[s.role]??(s.role==='perc'?{synth:'scene',name:scene.name}:{synth:'calmbgm',name:''})];
    })));
-   setStatus(back?`${scene.name} · back where you left off`:`${scene.name} · ${progressionsOf(song).length} progressions`);setStarted(true);setHostVersion(v=>v+1);
+   setStatus(initialLink.error?`Could not read link: ${initialLink.error.message}`:back?`${scene.name} · back where you left off`:`${scene.name} · ${progressionsOf(song).length} progressions`);setStarted(true);setHostVersion(v=>v+1);
   }catch(error){console.error(error);if(alive)setStatus(error.message);}finally{if(alive)setBusy(false);}})();
   return ()=>{alive=false;host.current?.dispose();host.current=null;};
  },[]);// eslint-disable-line react-hooks/exhaustive-deps
@@ -168,20 +198,44 @@ export default function AllPage(){
   let h;
   try{
    setBusy(true);setStarted(false);
-   h=createHost(next,{seed});await h.applySceneVoices(next);await h.setupMixer();
+   h=createHost(next,{seed});await h.applySceneVoices(next);await h.applyFrontPageLink({scene:next,search:''});await h.setupMixer();
    if(host.current!==old){h.dispose();return;}
+   const sceneMutes=takeHostMutes(h);
    const song=continuous?startStream(h,h.settings.seed):h.capture({progressions:progressionCount});
    old.dispose();host.current=h;
-   setSceneName(next.name);setPlacedId(null);setDeleteStack(null);setFocusChord(null);setScreenPage('seq');playheadRef.current=0;repeatRef.current=null;
+   selectDefaultSequencer(song);
+   setCustomScene(null);setSceneName(next.name);setMutes(sceneMutes);setSolos({});setPlacedId(null);setDeleteStack(null);setFocusChord(null);setScreenPage('seq');playheadRef.current=0;repeatRef.current=null;
    setProject(song);setBpm(Math.round(song.bpm));setProgression(0);setArrOffset(0);setCol(0);setSounds(Object.fromEntries(SEQUENCERS.map(s=>[s.role,h.loaded[s.role]??(s.role==='perc'?{synth:'scene',name:next.name}:{synth:'calmbgm',name:''})])));setStatus(`${next.name}`);setStarted(true);setHostVersion(v=>v+1);
+   const url=new URL(window.location.href);url.search='';url.searchParams.set('preset',sceneSlug(next.name));window.history.replaceState(window.history.state,'',url);
   }catch(error){h?.dispose();console.error(error);setStatus(`Could not load ${name}: ${error.message}`);if(host.current===old)setStarted(true);}finally{sceneLoading.current=false;setBusy(false);}
+ }
+ async function openFrontPageLink(e){
+  e.preventDefault();if(sceneLoading.current||!host.current)return;
+  const old=host.current;let h;
+  sceneLoading.current=true;setBusy(true);
+  try{
+   const link=parseFrontPageInput(linkText),next=link.scene??normalizeScene({name:'Front-page settings',settings:link.share.settings,voices:{}});
+   const base=link.scene?next:{...next,voices:{},layerVoices:{},percussion:null};
+   h=createHost(base,{seed:link.scene&&link.share?.phrase?link.share.settings.seed:undefined,settings:link.scene?undefined:link.share?.settings});
+   await h.applySceneVoices(base);
+   h.g.set('generation',generationFromSearch(link.search));
+   await h.applyFrontPageLink(link);await h.setupMixer();
+   if(host.current!==old)throw new Error('The current setup changed while the link was loading.');
+   const sceneMutes=takeHostMutes(h);
+   const song=continuous?startStream(h,h.g.settings.seed):h.capture({progressions:progressionCount,seed:h.g.settings.seed});
+   stop();old.dispose();host.current=h;h=null;
+   setCustomScene(link.custom||!link.scene?next:null);setSceneName(next.name);setProject(song);setBpm(Math.round(song.bpm));selectDefaultSequencer(song);setMutes(sceneMutes);setSolos({});
+   setProgression(0);setArrOffset(0);setCol(0);setPlacedId(null);setDeleteStack(null);setFocusChord(null);setArrangement(false);setScreenPage('seq');playheadRef.current=0;repeatRef.current=null;
+   setSounds({...host.current.loaded});setWins({});setStarted(true);setHostVersion(v=>v+1);setStatus(link.scene?`Opened ${next.name}`:'Opened front-page settings');
+  }catch(error){h?.dispose();console.error(error);setStatus(`Could not open link: ${error.message}`);}
+  finally{sceneLoading.current=false;setBusy(false);}
  }
  function saveSetupFile(){
   try{
    const h=host.current;if(!h||!projectRef.current)throw new Error('The setup is not ready yet.');
-   const text=encodeSetup({scene:sceneName,settings:h.g.settings,project:projectRef.current,sounds:h.snapshotSounds(),stream:stream.current?.generator.snapshot()??null,tuning:tuning.get(),
+   const text=encodeSetup({scene:sceneName,...(customScene?{sceneData:customScene}:{}),settings:h.g.settings,project:projectRef.current,sounds:h.snapshotSounds(),stream:stream.current?.generator.snapshot()??null,tuning:tuning.get(),
     desk:deskRef.current.snapshot(),ambience:ambienceRef.current.snapshot(),
-    ui:{selected,progression:progressionRef.current,bpm,progressionCount,mutes,solos,chordOverlap,loop,continuous,buffer:bufferConfig,panels,arrangement,view,offScale,insertOctave,pitch,resolution,drumOffset}});
+    ui:{selected,progression:progressionRef.current,bpm,progressionCount,mutes,solos,chordOverlap,loop,continuous,buffer:bufferConfig,panels,arrangement,view,offScale,insertOctave,pitch,resolution:resolution??gridResolutions(projectRef.current.meter)[0].label,drumOffset}});
    decodeSetup(text);
    const url=URL.createObjectURL(new Blob([text],{type:'application/json'})),a=document.createElement('a');
    a.href=url;a.download=setupFileName(sceneName);document.body.append(a);a.click();a.remove();
@@ -194,9 +248,10 @@ export default function AllPage(){
   sceneLoading.current=true;setBusy(true);
   try{
    if(file.size>MAX_BYTES)throw new Error('This setup file is too large (maximum 16 MB).');
-   const data=decodeSetup(await file.text()),next=sceneList.find(s=>s.name===data.scene);
+   const data=decodeSetup(await file.text()),next=data.sceneData??SCENES.find(s=>s.name===data.scene);
    h=createHost(next,{seed:data.settings.seed,settings:data.settings});
    await h.applySceneVoices(next);await h.restoreSounds(data.sounds);await h.setupMixer();
+   takeHostMutes(h);
    let restoredStream=null;
    if(data.ui.continuous){
     const generator=createContinuous(h,data.stream.seed,data.stream.settings,data.stream.grooveVoices);
@@ -210,7 +265,7 @@ export default function AllPage(){
    stop();setStarted(false);old.dispose();host.current=h;h=null;
    stream.current=restoredStream;projectRef.current=data.project;progressionRef.current=data.ui.progression;
    playheadRef.current=(data.project.progressions?.[data.ui.progression]?.startBar??0)*data.project.stepsPerBar;repeatRef.current=null;
-   setSceneName(data.scene);setProject(data.project);setBpm(data.ui.bpm);setProgressionCount(data.ui.progressionCount);setSelected(data.ui.selected);
+   setCustomScene(data.sceneData??null);setSceneName(data.scene);setProject(data.project);setBpm(data.ui.bpm);setProgressionCount(data.ui.progressionCount);setSelected(data.ui.selected);
    setProgression(data.ui.progression);setMutes(data.ui.mutes);setSolos(data.ui.solos);setChordOverlap(data.ui.chordOverlap);setLoop(data.ui.loop);setContinuous(data.ui.continuous);setBufferConfig(data.ui.buffer);
    setPanels(data.ui.panels);setArrangement(data.ui.arrangement);setView(data.ui.view);setOffScale(data.ui.offScale);setInsertOctave(data.ui.insertOctave);setPitch(data.ui.pitch);setResolution(data.ui.resolution);setDrumOffset(data.ui.drumOffset);
    setCol(playheadRef.current);setArrOffset(0);setPlacedId(null);setDeleteStack(null);setFocusChord(null);setEditSelection([]);setCopySource(null);setScreenPage('seq');setWins({});
@@ -233,16 +288,16 @@ export default function AllPage(){
  const editVoiceFx=(r,changes)=>{Promise.resolve(host.current?.editRack(r,changes)).catch(error=>{console.error(error);setStatus(error.message);}).finally(()=>setVoiceVersion(v=>v+1));};
  const editMixerFx=(r,changes)=>{Promise.resolve(host.current?.editMixer(r,changes)).catch(error=>{console.error(error);setStatus(error.message);}).finally(()=>setVoiceVersion(v=>v+1));};
  useEffect(()=>{if(started)host.current?.setTempo(bpm);},[bpm,started,hostVersion]);
- const [scopeOn,setScopeOn]=useState(()=>load('synths:scope:open',false)===true),scopeEngine=useRef(null);
- const toggleScope=()=>setScopeOn(v=>{save('synths:scope:open',!v);return !v;});
+ const [scopeOn,setScopeOn]=useState(false),scopeEngine=useRef(null);
+ const toggleScope=()=>setScopeOn(v=>!v);
  useEffect(()=>{
   if(!scopeOn||!started||!host.current)return undefined;
   let alive=true,made=null;
-  host.current.openMonitor().then(m=>{if(alive){made=m;scopeEngine.current=m;}else m.dispose();}).catch(e=>console.error(e));
+  host.current.openMonitor().then(m=>{if(alive){made=m;scopeEngine.current=m;}else m.dispose();}).catch(error=>{console.error(error);if(alive)setStatus(`Could not open scope: ${error.message}`);});
   return ()=>{alive=false;scopeEngine.current=null;made?.dispose();};
  },[scopeOn,started,sceneName,hostVersion]);
 
- const keysDrag=useDraggable('synths:all:keys-pos',{x:417,y:-278});
+ const keysDrag=useDraggable('synths:all:keys-pos',{x:-100,y:-320});
  // the desk's setup (MIDI, keybed, computer keys) and the keyboard's lit keys, as on every /synths page
  const [setup,setSetup]=useState(()=>{const s={...SETUP,...load(SETUP_KEY,{})};if(!['auto','show','hide'].includes(s.keys))s.keys='auto';return s;});
  const [showSetup,setShowSetup]=useState(false),[midi,setMidi]=useState({inputs:[],status:'Not connected.'}),[awake,setAwake]=useState(false),[litNotes,setLitNotes]=useState([]);
@@ -310,7 +365,7 @@ export default function AllPage(){
   window.addEventListener('keydown',phraseKey);
   return ()=>{kb();m.dispose();window.removeEventListener('keydown',phraseKey);phrases.stop();performer.panic();};
  },[]);// eslint-disable-line react-hooks/exhaustive-deps
- useSaved(STORE,{scene:sceneName,progressionCount,bpm,selected,mutes,solos,sounds,chordOverlap,project,mixer:started?host.current?.mixerSnapshot?.():undefined},{skip:()=>!project||!started||continuous});
+ useSaved(STORE,{scene:sceneName,...(customScene?{sceneData:customScene}:{}),progressionCount,bpm,selected,mutes,solos,sounds,chordOverlap,project,mixer:started?host.current?.mixerSnapshot?.():undefined},{skip:()=>!project||!started||continuous});
 
  // playback: the sequencer core books every sequencer's notes on the audio clock, and they sound on the generator's role instruments
  useEffect(()=>{
@@ -376,9 +431,9 @@ export default function AllPage(){
  };
  const play=async(mode=loop)=>{
   const s=scheduler.current;if(!s||playing)return;
-  const h=host.current;setBusy(true);
+  setBusy(true);
   try{
-   await h.wake();
+   await wake();
    if(paused)s.resume(0.08);else {
     repeatRef.current=mode==='bar'||mode==='chord'?repeatRange(projectRef.current,playheadRef.current,mode):null;
     if(stream.current&&mode==='song')s.start(0.08,'song',{pattern:progressionRef.current,step:0});
@@ -440,7 +495,7 @@ export default function AllPage(){
 
  const key=project?.key;
  function edit(roleName,fn){setProject(p=>p&&{...p,patterns:{...p.patterns,[roleName]:fn(p.patterns[roleName]??{mode:'note',follow:'scale',length:p.bars*p.stepsPerBar,steps:Array(p.bars*p.stepsPerBar).fill(null)})}});}
- const resolutions=gridResolutions(project?.meter),foundResolution=resolutions.findIndex(r=>r.label===resolution),resolutionIndex=foundResolution<0?resolutions.length-1:foundResolution,gridSize=resolutions[resolutionIndex].steps;
+ const resolutions=gridResolutions(project?.meter),foundResolution=resolutions.findIndex(r=>r.label===resolution),resolutionIndex=resolution===null?0:foundResolution<0?resolutions.length-1:foundResolution,gridSize=resolutions[resolutionIndex].steps;
  gridSizeRef.current=gridSize;
  useEffect(()=>{if(playingRef.current)movePlayhead(head.current,{running:true,step:playheadRef.current});},[col,gridSize,progression,arrangement]);
  const part=project?progressionsOf(project)[progression]:null;
@@ -604,7 +659,7 @@ export default function AllPage(){
  const encoders=[
   {label:'Gate',display:pattern&&role!=='perc'?Math.round((pattern.gate??0.8)*100)+'%':'—',position:pattern?((pattern.gate??0.8)-0.1)/0.9:0,step:0.05,disabled:!pattern||role==='perc',onPosition:p=>edit(role,q=>({...q,gate:Math.round((0.1+p*0.9)*20)/20})),onReset:()=>edit(role,q=>({...q,gate:undefined}))},
   {label:'Tempo',display:String(bpm),position:(bpm-50)/150,step:0.01,onPosition:p=>setBpm(Math.round(50+p*150)),onReset:()=>setBpm(Math.round(project?.bpm??90))},
-  {label:'Resolution',display:resolutions[resolutionIndex].label,position:resolutionIndex/(resolutions.length-1),step:1/(resolutions.length-1),onPosition:p=>setResolution(resolutions[Math.round(p*(resolutions.length-1))].label),onReset:()=>setResolution('1/16')},
+  {label:'Resolution',display:resolutions[resolutionIndex].label,position:resolutionIndex/(resolutions.length-1),step:1/(resolutions.length-1),onPosition:p=>setResolution(resolutions[Math.round(p*(resolutions.length-1))].label),onReset:()=>setResolution(null)},
  ];
  const chordEncoders=selectedChord?[
   {label:'Octave',display:`${selectedChord.octaveShift??0}`,position:((selectedChord.octaveShift??0)+4)/8,step:1/8,onPosition:p=>{const target=Math.round(p*8)-4,delta=target-(selectedChord.octaveShift??0);if(delta&&changeChord(x=>transposeChord(x,part,focusChord,0,delta))&&selectedSpan.start!==focusChord)setFocusChord(selectedSpan.start);}},
@@ -727,10 +782,12 @@ export default function AllPage(){
  const bar=project?Math.floor(col/project.stepsPerBar)+1:1;
 
  if(typeof window!=='undefined')window.__allBooked=booked.current;// notes booked per role, for checking the page
+ const selectSequencer=i=>{setSelected(i);setArrangement(false);};
+ const selectChannel=id=>{const i=SEQUENCERS.findIndex(s=>s.role===id);if(i>=0)selectSequencer(i);};
  const voices=<section className="gbox voicebox" aria-label="Sound generators"><header className="gb-head"><h2>Voices</h2><span className="gb-hint">which sound plays each sequencer</span></header>
   <div className="voice-grid">
-   {SEQUENCERS.map((s,i)=>{const sound=sounds[s.role]??{synth:'calmbgm',name:''};return <div key={s.role} style={{border:`1px solid ${COLOURS[s.role]}55`,borderRadius:6,padding:8,display:'grid',gap:4,background:selected===i?'#ffffff10':'transparent'}}>
-    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}><b style={{color:COLOURS[s.role]}}>SEQ {i+1} · {s.label}</b>
+   {SEQUENCERS.map((s,i)=>{const sound=sounds[s.role]??{synth:'calmbgm',name:''};return <div key={s.role} className="voice-card" onClick={e=>{if(!e.target.closest('button,select,input,label'))selectSequencer(i);}} style={{border:`1px solid ${COLOURS[s.role]}55`,borderRadius:6,padding:8,display:'grid',gap:4,background:selected===i?'#ffffff10':'transparent'}}>
+    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}><button type="button" className="voice-select" aria-label={`Open ${s.label} sequencer`} aria-pressed={selected===i} style={{color:COLOURS[s.role]}} onClick={()=>selectSequencer(i)}>SEQ {i+1} · {s.label}</button>
      <span><label><input type="checkbox" checked={!!mutes[s.role]} onChange={e=>setMutes(m=>({...m,[s.role]:e.target.checked}))}/> mute</label>{' '}
      <label><input type="checkbox" checked={!!solos[s.role]} onChange={e=>setSolos(m=>({...m,[s.role]:e.target.checked}))}/> solo</label></span></div>
     {s.role==='perc'?<>
@@ -787,11 +844,12 @@ export default function AllPage(){
   <header className="synth-bar">
    <a className="back" href={import.meta.env.BASE_URL+'synths/'} aria-label="All synths">◂</a>
    <h1><span className="brand">All</span><small>sequencers and sound generators</small></h1>
-   <label className="bar-scene">Scene <select value={sceneName} disabled={busy} onChange={e=>chooseScene(e.target.value)}>{SCENE_CATEGORIES.map(c=><optgroup key={c.id} label={c.label}>{sceneList.filter(s=>s.category===c.id).map(s=><option key={s.name} value={s.name}>{s.name}</option>)}</optgroup>)}</select></label>
+   <label className="bar-scene">Scene <select value={sceneName} disabled={busy} onChange={e=>chooseScene(e.target.value)}>{!sceneList.includes(scene)&&<option value={scene.name}>{scene.name}</option>}{SCENE_CATEGORIES.map(c=><optgroup key={c.id} label={c.label}>{sceneList.filter(s=>s.category===c.id).map(s=><option key={s.name} value={s.name}>{s.name}</option>)}</optgroup>)}</select></label>
    <span className="patch-name" title={status}>{status}</span>
    <button type="button" disabled={!started||busy} onClick={saveSetupFile}>Save setup</button>
    <button type="button" disabled={!started||busy} onClick={()=>setupInput.current?.click()}>Open setup…</button>
    <input ref={setupInput} type="file" accept=".json,application/json" hidden onChange={openSetupFile}/>
+   <details className="all-link"><summary>Open front-page setup…</summary><form onSubmit={openFrontPageLink}><label>Preset name, URL or copied setup <textarea value={linkText} onChange={e=>setLinkText(e.target.value)} /></label><button type="submit" disabled={!started||busy}>Open</button></form></details>
    <button type="button" aria-expanded={panels.generator} aria-controls="all-panel-generator" onClick={()=>setPanels(p=>({...p,generator:!p.generator}))}>Generator</button>
    <button type="button" aria-expanded={panels.ambience} aria-controls="all-panel-ambience" onClick={()=>setPanels(p=>({...p,ambience:!p.ambience}))}>Ambience</button>
    {chordMode&&role!=='perc'&&<label>Chord overlap <select aria-label="Chord overlap" value={chordOverlap} onChange={e=>setChordOverlap(e.target.value)}><option value="replace">Replace in octave</option><option value="layer">Layer</option></select></label>}
@@ -802,11 +860,11 @@ export default function AllPage(){
    <button type="button" onClick={()=>{if(document.fullscreenElement)document.exitFullscreen?.();else document.documentElement.requestFullscreen?.().catch(()=>{});}} aria-label="Full screen">⛶</button>
    <button type="button" className="keys-button" aria-pressed={showKeys} onClick={()=>updateSetup('keys',showKeys?'hide':'show')} aria-label="On-screen keyboard" title="Show or hide the on-screen keyboard">🎹</button>
   </header>
-  <Desk>
+  <Desk includeHomeInFit={false}>
    <FloatBox id="generator" label="Generator" className="box-generator" home={{x:0,y:0}} visible={panels.generator}><GeneratorBox seq={seqState} onSeq={changeGenerator} info={{status:playing?'PLAYING':'STOPPED'}} presets={{current:sceneName,names:sceneList.map(s=>s.name),disabled:!started||busy,onChoose:chooseScene}} song={{count:progressionCount,choices:PROGRESSION_CHOICES,continuous,onMode:changeMode,disabled:!started||busy,onCount:n=>{setProgressionCount(n);newSong({progressions:n});},onNew:()=>newSong(),onScene:()=>chooseScene(sceneName,{seed:host.current.settings.seed})}}/></FloatBox>
-   <FloatBox id="voices" label="Voices" className="box-voices" home={{x:1840,y:1070}}>{voices}</FloatBox>
-   <FloatBox id="ambience" label="Ambience" className="box-ambience" home={{x:834,y:0}} visible={panels.ambience}><AmbienceBox ref={ambienceRef}/></FloatBox>
-   <FloatBox id="mixer" label="Mixer" className="box-mixer" home={{x:1420,y:0}}><ChannelMixer ref={deskRef} channels={SEQUENCERS} colours={COLOURS} host={started?host.current:null} tempo={bpm} onEdit={editMixerFx}/></FloatBox>
+   <FloatBox id="voices" label="Voices" className="box-voices" home={{x:1360,y:930}}>{voices}</FloatBox>
+   <FloatBox id="ambience" label="Ambience" className="box-ambience" home={{x:2230,y:960}} visible={panels.ambience}><AmbienceBox ref={ambienceRef}/></FloatBox>
+   <FloatBox id="mixer" label="Mixer" className="box-mixer" home={{x:1360,y:70}}><ChannelMixer ref={deskRef} channels={SEQUENCERS} colours={COLOURS} initialChannel={seqInfo.role} host={started?host.current:null} tempo={bpm} onEdit={editMixerFx} onSelectChannel={selectChannel}/></FloatBox>
    <FloatBox id="sequencer" label="Sequencer" className="all-page box-sequencer" home={{x:0,y:557}}>
   <div className="drums"><div className="split" style={{'--rows':ROWS+1}}><section className="device device-seq" aria-label="Sequencer" style={{position:'relative'}}>
    <header className="device-head"><h2>Sequencer</h2><span>{project?`${seqInfo.label} · bar ${bar} of ${project.bars}${pattern?'':' · empty'}`:'start the orchestra'}</span></header>
@@ -837,7 +895,7 @@ export default function AllPage(){
     </div>
     <div className="s8-right">
      {arrangement&&project?<ArrangementGrid project={project} sequencers={SEQUENCERS} colours={COLOURS} selected={selected} progression={progression} offset={arrOffset} onOffset={setArrOffset} rowAction={rowAction} mutes={mutes} solos={solos}
-      onMute={r=>setMutes(m=>({...m,[r]:!m[r]}))} onSolo={r=>setSolos(m=>({...m,[r]:!m[r]}))} onSelectRow={setSelected} onSelect={(i,j)=>{setSelected(i);chooseProgression(j);}}/>
+      onMute={r=>setMutes(m=>({...m,[r]:!m[r]}))} onSolo={r=>setSolos(m=>({...m,[r]:!m[r]}))} onSelectRow={selectSequencer} onSelect={(i,j)=>{setSelected(i);chooseProgression(j);}}/>
      :project?<ProgressionGrid key={progression} project={project} pattern={pattern} part={part} colour={COLOURS[role]} offset={col} onOffset={setCol} headRef={head} focus={focusChord} onFocus={selectChord} onShiftChord={jumpChord}
       view={view} offScale={offScale} onOffScale={setOffScale} octave={insertOctave} onOctave={setInsertOctave} octaveFilter={octaveFilter} shiftHeld={shiftHeld} onFilterOctave={setOctaveFilter} pitch={pitch} onPitch={setPitch} stepSize={gridSize}
       onToggleNote={toggleNote} chordMode={chordMode&&role!=='perc'} deleteMode={deleteMode&&role!=='perc'} editMode={editMode&&role!=='perc'} copyMode={copyMode&&role!=='perc'} onEditPad={selectPad} onCopyPad={copyPad} onChordPad={chordPad} onDeletePad={deletePad} selectedPlaced={placedId} selectedDelete={deleteStack} selectedEdit={editSelection}
@@ -850,7 +908,7 @@ export default function AllPage(){
    <div className="all-stage" aria-hidden="true"/>
    {SEQUENCERS.map((x,i)=>(wins['synth:'+x.role]||wins['fx:'+x.role]||wins['tuning:'+x.role])&&<VoiceWindow key={x.role+':'+hostVersion} role={x.role} index={i} host={host.current} version={voiceVersion} showSynth={!!wins['synth:'+x.role]} fx={!!wins['fx:'+x.role]} tuning={!!wins['tuning:'+x.role]}
     onChoose={chooseSound} onEdit={editVoice} onEditNative={editNativeVoice} onEditDrum={editDrumKit} onEditFx={editVoiceFx} onCloseFx={()=>setWins(w=>({...w,['fx:'+x.role]:false}))} onCloseTuning={()=>setWins(w=>({...w,['tuning:'+x.role]:false}))}/>)}
-   {scopeOn&&<Scope engine={scopeEngine} audio={awake?'on':'off'} onClose={toggleScope} keyHz={()=>litNotes.length?440*2**((litNotes[litNotes.length-1]-69)/12):0}/>}
+   {scopeOn&&<Scope engine={scopeEngine} audio={awake?'on':'off'} onClose={toggleScope} positionKey="synths:all:scope-pos" home={{x:2410,y:70}} keyHz={()=>litNotes.length?440*2**((litNotes[litNotes.length-1]-69)/12):0}/>}
    {showSetup&&<SetupPopover midi={midi} setup={setup} updateSetup={updateSetup} connectMidi={connectMidi} audio={{state:awake?'on':'off',message:'Audio runs when the song plays or a key is pressed.'}} start={()=>host.current?.wake().then(()=>setAwake(true))} onClose={()=>setShowSetup(false)}>
     <section className="group wide"><h3>Continuous generator</h3><div className="row">
      <label>Progressions ahead<select aria-label="Progressions ahead" value={bufferConfig.ahead} onChange={e=>setBufferConfig(c=>({...c,ahead:Number(e.target.value)}))}>{[1,2,4,8,16,32,64].map(n=><option key={n} value={n}>{n}</option>)}</select></label>

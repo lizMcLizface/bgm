@@ -26,6 +26,8 @@ import {instrumentRack,mixerRack,mixerEdits,mixerSpace,isMixerSpaceKey} from './
 import {chainUnits,maskFromUnits} from '../effects/order';
 import {createMeter,meterLevel} from './meter';
 import {masterBus} from '../../audio/bus';
+import {presetFromEdit} from '../../app/editor/presetEdits';
+import {readBook,withPresetBook,applyBook} from '../../app/rulebook/session';
 
 // as on the pages (ui/SynthShell): the instrument's own space controls are moved into the rack, and a rack that has not been touched holds only the effects the sound uses
 const MOVED = { moved: true };
@@ -81,7 +83,7 @@ export function createHost(scene, {seed,settings:storedSettings} = {}) {
     const spaces = {}; // role -> independent mixer delay and reverb settings
     const natives = {}; // role -> { synth, name, preset } for a piano, measured-instrument or string voice (the preset as edited)
     const hostScene = { scene };
-    loaded.perc = {synth:'scene',name:scene.name};
+    loaded.perc = BROWSABLE_SCENES.includes(scene)?{synth:'scene',name:scene.name}:{synth:'kit',name:settings.drums.kit,kit:settings.drumKit};
     const meterTaps = new Set();
     let drumMask = null, drumMix={muted:[],solo:[]};
     if (g.settings.drumKit) {
@@ -99,12 +101,44 @@ export function createHost(scene, {seed,settings:storedSettings} = {}) {
             const spec = sceneVoiceSpec(next, role, g.settings.layers) ?? ROLES[role].preset;
             const name = typeof spec === 'string' ? spec : spec.name;
             const synth = spec.external?.synth ?? synthForPreset(name);
-            if (synth) await setSound(role, { synth, name: spec.external?.name ?? name });
+            if (spec.external) await setReference(role,spec.external);
+            else if (typeof spec !== 'string' && spec.synth) await setPreset(role,name,isNative(synth)?synth:'calmbgm',spec.synth);
+            else if (synth) await setSound(role, { synth, name });
             else {
                 await setPreset(role, name, 'calmbgm', typeof spec === 'string' ? undefined : spec.synth);
             }
         }
-        if(next.percussion)await setDrumSound({synth:'scene',name:next.name});
+        if(next.percussion){
+            await setReference('perc',next.percussion);
+            if(BROWSABLE_SCENES.includes(next))loaded.perc={...loaded.perc,synth:'scene',name:next.name};
+        }
+    }
+
+    async function setReference(role,ref) {
+        const {soundFromRef,machineFromRef}=await import('../../app/editor/soundRefs');
+        if(role==='perc'){
+            const machine=machineFromRef(ref);
+            return setDrumSound({synth:machine.synth,name:machine.name,values:machine.values,rack:machine.rack,drumKit:g.settings.drumKit});
+        }
+        const sound=soundFromRef(ref,role);
+        const {level,matched,...patch}=sound;
+        return setSound(role,{synth:sound.synth,name:sound.name,patch:{...patch,...(matched?{level}:{})}});
+    }
+
+    async function applyFrontPageLink(link) {
+        applyBook(g,withPresetBook(link.scene?.rulebook,readBook(link.search)));
+        for(const [role,preset] of Object.entries(link.share?.presets??{})){
+            if(!SEQUENCERS.some(s=>s.role===role))throw new Error(`Unknown voice: ${role}`);
+            if(preset?.external||preset?.machine)await setReference(role,preset.external??preset.machine);
+            else if(preset?.edit){
+                const mapped=synthForPreset(preset.edit.name);
+                await setPreset(role,preset.edit.name,isNative(mapped)?mapped:'calmbgm',presetFromEdit(preset.edit));
+            }else if(preset?.generated){
+                const {prepareSound}=await import('../../app/engine/prepareSound');
+                const sound=await prepareSound(preset.generated,g.settings.generation);
+                await setPreset(role,sound.name,'calmbgm',sound.preset);
+            }else await setSound(role,{synth:'calmbgm',name:preset});
+        }
     }
 
     async function setDrumSound({synth,name,values,rack:storedRack,drumKit,kit:storedKit}) {
@@ -402,15 +436,17 @@ export function createHost(scene, {seed,settings:storedSettings} = {}) {
         }
     }
     const setTempo = bpm => { tempo=bpm; for(const s of SEQUENCERS)updateMixer(s.role); };
-    /** An output meter on the generator's mix for the scope: { context, requestScope }. */
+    /** A silent scope tap after all channels and the master gain. */
     async function openMonitor() {
         const monitor = await createOutputMonitor(g.AC);
+        if(disposed){monitor.dispose();ensureActive();}
         const silent = g.AC.createGain();
         silent.gain.value = 0;
-        g.output.connect(monitor.node);
+        masterBus.connect(monitor.node);
         monitor.node.connect(silent);
         silent.connect(g.AC.destination);
-        return { context: g.AC, requestScope: monitor.requestScope, dispose() { try { g.output.disconnect(monitor.node); } catch { /* already gone */ } monitor.dispose(); silent.disconnect(); } };
+        let closed=false;
+        return { context: g.AC, requestScope: monitor.requestScope, dispose() { if(closed)return;closed=true;masterBus.disconnect(monitor.node);monitor.dispose();silent.disconnect(); } };
     }
 
     /** Plan the requested number of complete progression cycles. */
@@ -441,7 +477,7 @@ export function createHost(scene, {seed,settings:storedSettings} = {}) {
     }
 
     return {
-        g, settings, loaded, applySceneVoices, setSound, setPreset, soundOf, nativeOf, editNative, editValues, editDrumKit, rackValues, editRack, editMixer, mixerSnapshot, restoreMixer, snapshotSounds, restoreSounds, setupMixer, setTempo, openMonitor, openMeters, capture, note, tunedNote, drum, drumTrack, setDrumMix, getDrumMix,
+        g, settings, loaded, applySceneVoices, applyFrontPageLink, setSound, setPreset, soundOf, nativeOf, editNative, editValues, editDrumKit, rackValues, editRack, editMixer, mixerSnapshot, restoreMixer, snapshotSounds, restoreSounds, setupMixer, setTempo, openMonitor, openMeters, capture, note, tunedNote, drum, drumTrack, setDrumMix, getDrumMix,
         get context() { return g.AC; },
         async wake() { await g.AC.resume(); if (g.percussionReady) await g.percussionReady; g.endStopFade?.(); },
         setScene(next) { hostScene.scene = next; },

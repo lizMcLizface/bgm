@@ -1,11 +1,11 @@
 import {vi,describe,it,expect} from 'vitest';
 
-const mocks = vi.hoisted(() => ({ racks: [], sources: [], failPercussion:false }));
+const mocks = vi.hoisted(() => ({ racks: [], sources: [], failPercussion:false,monitors:[] }));
 vi.mock('../../app/Generator', () => {
  const roles = Object.fromEntries(['lead','counter','rhythm','pad','bass'].map(role => [role,{preset:'Soft Pad',polyphony:8}]));
  return { ROLES: roles, default: class {
   constructor() {
-   this.settings={...defaultSettings(),layers:'combined',drumKit:{...defaultDrumKit(),room:.16}}; this.AC={currentTime:0};
+   this.settings={...defaultSettings(),layers:'combined',drumKit:{...defaultDrumKit(),room:.16}}; this.AC={currentTime:0,destination:{},createGain:()=>({gain:{value:1},connect:vi.fn(),disconnect:vi.fn()})};
    const node=()=>({connect:vi.fn(),disconnect:vi.fn()});
    this.roles=Object.fromEntries([...Object.keys(roles),'perc'].map(role=>[role,{...(role==='perc'?{}:{tone:node()}),gain:node(),wander:{input:node(),dispose:vi.fn()},instrument:{output:node(),connect:vi.fn(),dispose:vi.fn(),applyPreset:vi.fn(),setKit:vi.fn(),setSpec:vi.fn(),setValues:vi.fn(),setRack:vi.fn(),scheduleNote:vi.fn(),hitTrack:vi.fn(),polyphony:8}}]));
   }
@@ -13,6 +13,7 @@ vi.mock('../../app/Generator', () => {
   async setPercussionSource(source) { if(mocks.failPercussion)throw Error('kit unavailable');mocks.sources.push({role:'perc',source});this.roles.perc.machine=!!source; }
   async loadPercussionVoice(id) {this.settings.drums={...this.settings.drums,kit:id};}
   setMany(patch) {Object.assign(this.settings,patch);}
+  replan() {}
   loadRolePreset() {}
   stopAll() {}
  }};
@@ -28,6 +29,7 @@ vi.mock('../effects/graph', () => ({
  },
 }));
 vi.mock('../../audio/bus',()=>({masterBus:{connect:vi.fn(),disconnect:vi.fn()}}));
+vi.mock('../effects/outputMonitor',()=>({createOutputMonitor:async()=>{const monitor={node:{connect:vi.fn()},requestScope:vi.fn(),dispose:vi.fn()};mocks.monitors.push(monitor);return monitor;}}));
 
 import {createHost,synthForPreset,patchesOf,drumPatches,sceneDrumPatch} from './host';
 import {SYNTHS} from '../models';
@@ -39,8 +41,34 @@ import {WASM_PRESETS,wasmVoiceById} from '../../synth-lab/voiceLibrary';
 import {instrumentRack,mixerRack} from './mixerEffects';
 import {defaultSettings} from '../../app/settings';
 import {defaultDrumKit} from '../../app/percussion';
+import {masterBus} from '../../audio/bus';
 
 describe('all-page sound host', () => {
+ it('restores linked edited voices and external patch values and levels',async()=>{
+  const host=createHost(BROWSABLE_SCENES[0]),patch=SYNTHS.poly.presets[0];
+  try{
+   const key=Object.keys(patch.values)[0],value=patch.values[key];
+   await host.applyFrontPageLink({scene:null,search:'',share:{presets:{
+    lead:{external:{synth:'poly',name:patch.name,values:{[key]:value},level:.37}},
+    bass:{edit:{name:'Soft Pad',values:{masterVolume:.4}}},
+   }}});
+   expect(host.soundOf('lead')).toMatchObject({synth:'poly',name:patch.name,level:.37,values:{[key]:value}});
+   expect(mocks.sources.findLast(s=>s.role==='bass').source.masterVolume).toBe(.4);
+  }finally{host.dispose();}
+ });
+ it('taps the master bus without changing the audible route and disconnects only its own monitor',async()=>{
+  const host=createHost(BROWSABLE_SCENES[0]);
+  const tap=await host.openMonitor(),monitor=mocks.monitors.at(-1);
+  expect(masterBus.connect).toHaveBeenCalledWith(monitor.node);
+  const silent=monitor.node.connect.mock.calls[0][0];
+  expect(silent.gain.value).toBe(0);
+  expect(silent.connect).toHaveBeenCalledWith(host.g.AC.destination);
+  tap.dispose();tap.dispose();
+  expect(masterBus.disconnect).toHaveBeenCalledWith(monitor.node);
+  expect(monitor.dispose).toHaveBeenCalledOnce();
+  expect(silent.disconnect).toHaveBeenCalledOnce();
+  host.dispose();
+ });
  it('groups identical scene kits while preserving every distinct configuration',()=>{
   const options=drumPatches('scene'),byId=new Map(options.map(option=>[option.id,BROWSABLE_SCENES.find(scene=>scene.name===option.id)]));
   expect(options.length).toBeLessThan(BROWSABLE_SCENES.length);

@@ -1,4 +1,4 @@
-import {BROWSABLE_SCENES} from '../../app/scenes';
+import {SCENES,normalizeScene} from '../../app/scenes';
 import {SYNTHS} from '../models';
 import {SEQUENCERS,drumChoices,synthChoices} from './host';
 import {MIXER_PROPERTY_COUNT} from './ChannelMixer';
@@ -44,7 +44,9 @@ export function decodeSetup(text){
  try{data=JSON.parse(text);}catch{throw new Error('This file is not valid JSON.');}
  if(!object(data)||data.format!==FORMAT)throw new Error('This is not an all-page setup file.');
  if(data.version!==VERSION)throw new Error('This setup file version is not supported.');
- if(!numericTree(data)||!BROWSABLE_SCENES.some(s=>s.name===data.scene)||!object(data.settings)||!Object.hasOwn(METERS,data.settings.meter)||!Number.isFinite(data.settings.seed)||!object(data.project)||!object(data.sounds))fail();
+ const custom=data.sceneData===undefined?null:normalizeScene(data.sceneData);
+ if(!numericTree(data)||(data.sceneData!==undefined?custom?.name!==data.scene:!SCENES.some(s=>s.name===data.scene))||!object(data.settings)||!Object.hasOwn(METERS,data.settings.meter)||!Number.isFinite(data.settings.seed)||!object(data.project)||!object(data.sounds))fail();
+ if(custom)data.sceneData=custom;
  const p=data.project,steps=p.bars*p.stepsPerBar;
  if(!integer(p.bars,1,100000)||!integer(p.stepsPerBar,1,64)||steps>1000000||!object(p.key)||!integer(p.key.tonic,0,11)||!Array.isArray(p.key.scale)||!p.key.scale.length||!p.key.scale.every(n=>integer(n,0,11))||!Array.isArray(p.chords)||!p.chords.every(c=>chord(c)&&c.bar<p.bars)||!object(p.patterns))fail();
  if(p.meter!==undefined&&!Object.hasOwn(METERS,p.meter))fail();

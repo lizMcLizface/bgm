@@ -75,10 +75,10 @@ const NAMES = ['C', 'C♯', 'D', 'E♭', 'E', 'F', 'F♯', 'G', 'A♭', 'A', 'B�
 const noteName = (n) => NAMES[n % 12] + (Math.floor(n / 12) - 1);
 const GADGETS = { tuning: 'synths:piano:tuning-open', input: 'synths:piano:input-open' };
 
-export function PianoTuning({settings,onChange,onClose,id='piano-tuning'}) {
+export function PianoTuning({settings,onChange,onClose,id='piano-tuning',home,anchor}) {
     const deviation = temperamentOffsets(settings.pianoTemperament, settings.pianoTonic);
     const fader = key => <Fader key={key} spec={SPECS[key]} value={settings[key]} onChange={onChange} tone="cream" />;
-    return <Window id={id} title="Tuning" home={() => ({ x: -662, y: -494 })} onClose={onClose} wide>
+    return <Window id={id} title="Tuning" home={home??(() => ({ x: -662, y: -494 }))} anchor={anchor} onClose={onClose} wide>
         <div className="lab-tuning pf-frame piano-tuning">
             <div className="lab-row">
                 <PickButtons label="Temperament" options={Object.keys(TEMPERAMENTS).map((k) => TEMPERAMENTS[k].replace('Quarter-comma meantone', 'Meantone').replace(' III', ''))} titles={Object.values(TEMPERAMENTS)}

@@ -11,7 +11,7 @@ vi.mock('../piano/PianoPage',()=>({
 }));
 vi.mock('../iowa/IowaPage',()=>({IowaRig:()=> <div data-testid="iowa"/>}));
 vi.mock('./host',()=>({NATIVE:{iowa:{presets:{}}}}));
-import {VoiceWindow} from './VoiceWindows';
+import {VoiceWindow,panelHome} from './VoiceWindows';
 
 globalThis.ResizeObserver??=class{observe(){}disconnect(){}};
 let root,container;
@@ -42,4 +42,13 @@ it('opens and closes effects and tuning independently from the synth',()=>{
  expect(container.querySelector('[data-testid="synth-panel"]')).toBeTruthy();
  expect(container.querySelector('[data-testid="rack"]')).toBeNull();
  expect(container.querySelector('[data-testid="tuner"]')).toBeNull();
+});
+
+it('positions panels around the measured sequencer and rack',()=>{
+ const seq={x:100,y:700,w:1200,h:500};
+ expect(panelHome('synth',seq,{w:1600,h:400})).toEqual({x:-300,y:268});
+ expect(panelHome('synth',seq,{w:800,h:400})).toEqual({x:300,y:268});
+ expect(panelHome('effects',seq,{w:700,h:400})).toEqual({x:-632,y:750});
+ expect(panelHome('tuning',{x:-632,y:750,w:700,h:400},{w:500,h:300})).toEqual({x:-532,y:1182});
+ expect(panelHome('synth',seq,{w:0,h:400})).toBeNull();
 });

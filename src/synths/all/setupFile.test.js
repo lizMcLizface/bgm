@@ -30,6 +30,12 @@ describe('all-page setup files',()=>{
   expect(decoded).toMatchObject(state);
   expect(setupFileName('Morning coffee')).toBe('morning-coffee.calmbgm-setup.json');
  });
+ it('round-trips an imported front-page scene and rejects mismatched scene data',()=>{
+  const state={...fixture(),scene:'Imported',sceneData:{name:'Imported',settings:{bpm:95},voices:{lead:'Soft Pad'}}};
+  expect(decodeSetup(encodeSetup(state)).sceneData).toMatchObject(state.sceneData);
+  state.sceneData.name='Other';
+  expect(()=>decodeSetup(encodeSetup(state))).toThrow('damaged');
+ });
  it('rejects invalid formats, versions, JSON and excessive files',()=>{
   expect(()=>decodeSetup('{')).toThrow('not valid JSON');
   expect(()=>decodeSetup('{}')).toThrow('not an all-page');

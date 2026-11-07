@@ -13,8 +13,8 @@ const TUNE=defineParams([
  ['octave',12,'Octave',1.5,2.5,2,'decimal','lin'],['a4',13,'A4',400,480,440,'Hz','lin'],['shift',14,'Shift',-100,100,0,'ct','lin'],
 ]);
 
-export function Window({id,title,home,onClose,children,wide}){
- const float=useFloating('synths:diy:lab:'+id,home),desk=useDesk();
+export function Window({id,title,home,onClose,children,wide,anchor}){
+ const float=useFloating('synths:diy:lab:'+id,home,{anchor}),desk=useDesk();
  // on the desk, so it moves and scales with the rest
  return createPortal(<section ref={float.ref} className={'group lab-window'+(wide?' wide':'')} style={float.style} onPointerDownCapture={float.raise}>
   <h3 {...float.handle}>{title}<button type="button" className="lab-close" aria-label={`Close ${title}`} onClick={onClose}>×</button></h3>
@@ -22,7 +22,7 @@ export function Window({id,title,home,onClose,children,wide}){
  </section>,desk.el??document.body);
 }
 
-export default function LabPanels({values,onChange,onClose,id='tuning'}){
+export default function LabPanels({values,onChange,onClose,id='tuning',home,anchor}){
  const [t,setT]=useState(tuning.get()),[live,setLive]=useState(tuning.liveCents());
  useEffect(()=>tuning.subscribe(setT),[]);
  // what a chord is doing to the sounding notes, so the faders show it as it changes (auto play included: it plays through the same keys)
@@ -33,7 +33,7 @@ export default function LabPanels({values,onChange,onClose,id='tuning'}){
  const named=tuning.named();
  const deg=i=>(t.tonic+i)%12;
  return <>
-  <Window id={id} title="Tuning" home={at.tuning} onClose={onClose} wide>
+  <Window id={id} title="Tuning" home={home??at.tuning} anchor={anchor} onClose={onClose} wide>
    <div className="lab-tuning pf-frame">
     <div className="lab-row">
      <PickButtons label="Scale" options={Object.keys(PRESETS).map(n=>n.replace('Equal temperament','12-TET').replace('Just intonation','Just').replace('Quarter-comma meantone','Meantone'))} titles={Object.keys(PRESETS)}

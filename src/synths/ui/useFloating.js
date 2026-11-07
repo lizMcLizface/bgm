@@ -15,8 +15,9 @@ const clampPos=(p,el,desk)=>{
 };
 const same=(a,b)=>a.x===b.x&&a.y===b.y;
 // `home` is where a panel with no remembered place starts: a point, or a function of the instrument's size ({w,h}) once the desk has measured it
-export default function useFloating(key,home=null){
+export default function useFloating(key,home=null,{anchor=null}={}){
  const ref=useRef(null),drag=useRef(null),desk=useDesk();
+ const current=useRef({home,desk});current.current={home,desk};
  const [pos,setPos]=useState(()=>{const p=load(key,null);return p&&Number.isFinite(p.x)&&Number.isFinite(p.y)?p:typeof home==='function'?null:home;});
  const [z,setZ]=useState(()=>++top);
  // no remembered place and a default that depends on the instrument's size: put it there as soon as the desk knows that, and keep it there as the instrument
@@ -24,12 +25,33 @@ export default function useFloating(key,home=null){
  const auto=useRef(false);
  useLayoutEffect(()=>{
   if(typeof home!=='function'||!desk.ready||(pos&&!auto.current))return;
-  const h=home(desk.home);
+  const h=home(desk.home,ref.current,desk);
   if(h&&(!pos||h.x!==pos.x||h.y!==pos.y)){auto.current=true;setPos(h);}
  },[pos,desk.ready,desk.home.w,desk.home.h]);// eslint-disable-line react-hooks/exhaustive-deps
+ useLayoutEffect(()=>{
+  if(!anchor)return undefined;
+  const el=ref.current,root=current.current.desk.el;
+  const targets=anchor.map(selector=>root?.querySelector(selector)).filter(Boolean);
+  const update=()=>{
+   const {home:place,desk:d}=current.current;
+   if(typeof place!=='function'||!d.ready)return;
+   setPos(p=>{
+    if(p&&!auto.current)return p;
+    const h=place(d.home,el,d);
+    if(!h||p&&same(p,h))return p;
+    auto.current=true;return h;
+   });
+  };
+  const ro=typeof ResizeObserver==='function'?new ResizeObserver(update):null;
+  if(el)ro?.observe(el);targets.forEach(target=>ro?.observe(target));
+  const mo=typeof MutationObserver==='function'?new MutationObserver(update):null;
+  targets.forEach(target=>mo?.observe(target,{attributes:true,attributeFilter:['style']}));
+  update();
+  return ()=>{ro?.disconnect();mo?.disconnect();};
+ },[anchor?.join('|'),desk.el,desk.ready]);// eslint-disable-line react-hooks/exhaustive-deps
  // the layout was reset: back to the default place
  useEffect(()=>{
-  const reset=()=>{const h=typeof home==='function'?(desk.ready?home(desk.home):null):home;auto.current=typeof home==='function';setPos(h??null);if(h)desk.report(key,{x:h.x,y:h.y,w:ref.current?.offsetWidth??0,h:ref.current?.offsetHeight??0});else desk.report(key,null);};
+  const reset=()=>{const {home:place,desk:d}=current.current;const h=typeof place==='function'?(d.ready?place(d.home,ref.current,d):null):place;auto.current=typeof place==='function';setPos(h??null);if(h)d.report(key,{x:h.x,y:h.y,w:ref.current?.offsetWidth??0,h:ref.current?.offsetHeight??0});else d.report(key,null);};
   window.addEventListener(RESET_EVENT,reset);return ()=>window.removeEventListener(RESET_EVENT,reset);
  },[]);// eslint-disable-line react-hooks/exhaustive-deps
  const raise=()=>setZ(z0=>z0===top?z0:++top);

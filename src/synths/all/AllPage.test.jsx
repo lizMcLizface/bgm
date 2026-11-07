@@ -7,7 +7,8 @@ import {sceneSettings} from '../../app/scenes';
 globalThis.ResizeObserver??=class{observe(){}unobserve(){}disconnect(){}};
 window.matchMedia??=()=>({matches:false,addEventListener(){},removeEventListener(){},addListener(){},removeListener(){}});
 
-const mocks = vi.hoisted(() => ({ scheduler: null, capture: vi.fn(), hosts: [], failScene: false }));
+const mocks = vi.hoisted(() => ({ scheduler: null, capture: vi.fn(), hosts: [], failScene: false, continuousRole:'lead' }));
+vi.mock('../ui/Scope',()=>({default:({audio})=><div aria-label="Oscilloscope and spectrum" data-audio={audio}/>}));
 vi.mock('../../seq/scheduler', () => ({
  createScheduler: options => {
   mocks.scheduler = { options, stop: vi.fn(), pause: vi.fn(), resume: vi.fn(), scope:'pattern', position:{pattern:0,step:4,wrapped:false} };
@@ -22,13 +23,14 @@ vi.mock('./host', () => {
   SEQUENCERS, synthChoices: () => [{id:'calmbgm',name:'calmbgm'}], patchesOf: () => [], isNative: () => false, synthForPreset: () => null,
   drumChoices:()=>[{id:'scene',name:'Scene kits'},{id:'kit',name:'Basic kits'},{id:'tr808',name:'808'}],drumPatches:id=>id==='kit'?[{id:'felt',name:'Felt'},{id:'hand',name:'Hand percussion'}]:id==='tr808'?[{name:'Classic'},{name:'Room'}]:[{name:'Rainy café'}],
   sceneDrumPatch:name=>name,
-  createHost: scene => {
+  createHost: (scene,options={}) => {
    const host={
-   scene,
-   settings:{seed:1}, loaded:{}, context:{currentTime:0}, g:{settings:sceneSettings(scene,1),AC:{outputLatency:0},roles:{},planner:()=>({settings:{meter:'4/4',bpm:90},meter:{units:4},plan:new Map(),planBar(bar){this.plan.set(bar,{bar,music:{tonic:0,mode:'Major-1',cycleStart:bar},nextMusic:{cycleStart:bar+1},chord:{name:'C',pitchClasses:[0,4,7]},events:[{role:'lead',midi:60,beat:0,length:1,velocity:.8}]});}})},
-   wake:async()=>{}, applySceneVoices:async()=>{if(mocks.failScene)throw Error('voice loading failed');}, setupMixer:async()=>{}, setSound:async(role,sound)=>{const entry={...sound,name:sound.name??(sound.synth==='tr808'?'Classic':'')};host.loaded[role]=entry;return entry;}, soundOf:()=>null, setTempo:()=>{}, rackValues:()=>null, dispose:vi.fn(), note:()=>{},drum:vi.fn(),
+   scene,options,
+   settings:{seed:options.seed??1}, loaded:{}, context:{currentTime:0}, g:{settings:options.settings??sceneSettings(scene,options.seed??1),set(key,value){this.settings[key]=value;},AC:{outputLatency:0},roles:{},planner:()=>({settings:{meter:'4/4',bpm:90},meter:{units:4},plan:new Map(),planBar(bar){this.plan.set(bar,{bar,music:{tonic:0,mode:'Major-1',cycleStart:bar},nextMusic:{cycleStart:bar+1},chord:{name:'C',pitchClasses:[0,4,7]},events:[{role:mocks.continuousRole,midi:60,beat:0,length:1,velocity:.8}]});}})},
+   wake:async()=>{}, applySceneVoices:async()=>{if(mocks.failScene)throw Error('voice loading failed');}, applyFrontPageLink:async()=>{}, setupMixer:async()=>{}, setSound:async(role,sound)=>{const entry={...sound,name:sound.name??(sound.synth==='tr808'?'Classic':'')};host.loaded[role]=entry;return entry;}, soundOf:()=>null, setTempo:()=>{}, rackValues:()=>null, dispose:vi.fn(), note:()=>{},drum:vi.fn(),
    snapshotSounds:()=>Object.fromEntries(SEQUENCERS.map(({role})=>[role,{selection:host.loaded[role]??{synth:role==='perc'?'scene':'calmbgm',name:scene.name},rack:{},...(role==='perc'?{kit:{},mix:{muted:[],solo:[]}}:{})}])),
    restoreSounds:async(saved)=>{host.loaded=Object.fromEntries(Object.entries(saved).map(([role,entry])=>[role,entry.selection]));},
+   openMonitor:async()=>({dispose:vi.fn()}),
    capture:(options)=>{mocks.capture(options);return {
     bars:2,stepsPerBar:16,bpm:90,key:makeKey(),chords:[{bar:0,name:'C',pitchClasses:[0,4,7],scalePcs:[0,2,4,5,7,9,11]},{bar:1,name:'G',pitchClasses:[7,11,2],scalePcs:[0,2,4,5,7,9,11]}],
     progressions:[{startBar:0,bars:1},{startBar:1,bars:1}],
@@ -37,26 +39,33 @@ vi.mock('./host', () => {
   };mocks.hosts.push(host);return host;},
  };
 });
-import AllPage from './AllPage';
+import AllPage,{defaultSequencer} from './AllPage';
 
 let root, container;
 const button = name => [...container.querySelectorAll('button')].find(x => x.textContent.trim() === name);
 beforeEach(async () => {
  globalThis.IS_REACT_ACT_ENVIRONMENT = true;
  localStorage.clear();
+ window.history.replaceState(null,'','/');
  mocks.capture.mockClear();
- mocks.hosts=[];mocks.failScene=false;
+ mocks.hosts=[];mocks.failScene=false;mocks.continuousRole='lead';
  container = document.createElement('div'); document.body.append(container);
  root = createRoot(container);
  await act(async () => root.render(<AllPage/>));
  const mode=container.querySelector('[aria-label="Generator mode"]');
  await act(async()=>{mode.value='song';mode.dispatchEvent(new Event('change',{bubbles:true}));});
+ const resolution=container.querySelector('[aria-label="Resolution"]');
+ act(()=>resolution.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowUp',bubbles:true})));
+ act(()=>resolution.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowUp',bubbles:true})));
  mocks.scheduler.stop.mockClear();
 });
 
 test('ribbon buttons hide and restore independent panels without resetting their controls',()=>{
  const generator=container.querySelector('[aria-controls="all-panel-generator"]'),ambience=container.querySelector('[aria-controls="all-panel-ambience"]');
  const generatorPanel=container.querySelector('#all-panel-generator'),ambiencePanel=container.querySelector('#all-panel-ambience');
+ expect(generator.getAttribute('aria-expanded')).toBe('false');
+ expect(ambience.getAttribute('aria-expanded')).toBe('false');
+ act(()=>{generator.click();ambience.click();});
  act(()=>ambiencePanel.querySelector('.amb-run').click());
  act(()=>{generator.click();ambience.click();});
  expect(generator.getAttribute('aria-expanded')).toBe('false');
@@ -70,11 +79,30 @@ test('ribbon buttons hide and restore independent panels without resetting their
  expect(generatorPanel.getAttribute('aria-hidden')).toBe('false');
 });
 
+test('scope starts closed and becomes active when song playback wakes audio',async()=>{
+ expect(container.querySelector('[aria-label="Oscilloscope and spectrum"]')).toBeNull();
+ await act(async()=>button('Scope').click());
+ expect(container.querySelector('[aria-label="Oscilloscope and spectrum"]').dataset.audio).toBe('off');
+ await act(async()=>button('▶Play').click());
+ expect(container.querySelector('[aria-label="Oscilloscope and spectrum"]').dataset.audio).toBe('on');
+});
+test('scope starts closed even when it was left open on another synth page',async()=>{
+ act(()=>root.unmount());
+ localStorage.setItem('synths:scope:open',JSON.stringify(true));
+ root=createRoot(container);
+ await act(async()=>root.render(<AllPage/>));
+ expect(button('Scope').getAttribute('aria-pressed')).toBe('false');
+ expect(container.querySelector('[aria-label="Oscilloscope and spectrum"]')).toBeNull();
+});
+
 test('scene selector and generator preset knob load the same scene and restore the scene song',async()=>{
  const scene=container.querySelector('.bar-scene select'),knob=container.querySelector('[aria-label="Scene preset"]');
+ act(()=>container.querySelector('[aria-label="Mixing desk"] button[title^="Lead:"]').click());
  const before=scene.value,next=[...scene.options].find(o=>o.value!==before).value;
  await act(async()=>{scene.value=next;scene.dispatchEvent(new Event('change',{bubbles:true}));});
  expect(scene.value).toBe(next);
+ expect(container.querySelector('[aria-label="Channel"]').getAttribute('aria-valuetext')).toBe('Pad');
+ expect(container.querySelector('.device-seq .device-head span').textContent).toContain('Pad');
  expect(knob.getAttribute('aria-valuetext')).toBe(next);
  expect(mocks.hosts.at(-1).scene.name).toBe(next);
  expect(mocks.hosts[0].dispose).toHaveBeenCalledOnce();
@@ -85,6 +113,44 @@ test('scene selector and generator preset knob load the same scene and restore t
  await act(async()=>button("Back toScene's song").click());
  expect(mocks.hosts).toHaveLength(count+1);
  expect(mocks.hosts.at(-1).scene.name).toBe(scene.value);
+});
+
+test('opening a copied front-page setup preserves its mutes and leaves the address alone until a scene is chosen',async()=>{
+ const original=location.href,old=mocks.hosts.at(-1),input=container.querySelector('.all-link textarea');
+ const enter=async value=>{
+  await act(async()=>{
+   Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set.call(input,value);
+   input.dispatchEvent(new Event('input',{bubbles:true}));
+  });
+  await act(async()=>input.form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true})));
+ };
+ await enter(JSON.stringify({name:'Imported',settings:{muted:{lead:true}},voices:{lead:'Soft Pad'}}));
+ expect(container.querySelector('.bar-scene select').value).toBe('Imported');
+ expect(container.querySelector('.voice-card input[type=checkbox]').checked).toBe(true);
+ expect(mocks.hosts.at(-1).g.settings.muted.lead).toBe(false);
+ expect(location.href).toBe(original);
+ expect(old.dispose).toHaveBeenCalledOnce();
+ const current=mocks.hosts.at(-1);
+ await enter('not a real preset');
+ expect(mocks.hosts.at(-1)).toBe(current);
+ expect(current.dispose).not.toHaveBeenCalled();
+ expect(container.querySelector('.patch-name').textContent).toContain('Could not open link');
+ const select=container.querySelector('.bar-scene select'),next=[...select.options].find(o=>o.value!=='Imported').value;
+ await act(async()=>{select.value=next;select.dispatchEvent(new Event('change',{bubbles:true}));});
+ expect(new URL(location.href).searchParams.get('preset')).toBeTruthy();
+ expect(location.pathname).toBe(new URL(original).pathname);
+});
+
+test('an address with a front-page preset takes precedence over a saved song',async()=>{
+ const savedScene=mocks.hosts.at(-1).scene.name,project=mocks.hosts.at(-1).capture({});
+ act(()=>root.unmount());
+ localStorage.setItem('synths:all:state',JSON.stringify({scene:savedScene,project,selected:0}));
+ window.history.replaceState(null,'','/?preset=rainy-cafe');
+ root=createRoot(container);
+ await act(async()=>root.render(<AllPage/>));
+ expect(container.querySelector('.bar-scene select').value).toBe('Rainy café');
+ expect(container.querySelector('[aria-label="Generator mode"]').value).toBe('continuous');
+ expect(location.search).toBe('?preset=rainy-cafe');
 });
 
 test('failed scene loading keeps the current scene and host usable',async()=>{
@@ -116,6 +182,7 @@ test('setup files restore the scene and leave the current host intact on invalid
  };
  try{
   const initial=container.querySelector('.bar-scene select').value;
+  act(()=>container.querySelector('[aria-label="Mixing desk"] button[title^="Ambience:"]').click());
   act(()=>button('Save setup').click());
   const text=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsText(blob);});
   const select=container.querySelector('.bar-scene select'),next=[...select.options].find(o=>o.value!==initial).value;
@@ -134,6 +201,8 @@ test('setup files restore the scene and leave the current host intact on invalid
   expect(old.dispose).toHaveBeenCalledOnce();
   expect(select.value).toBe(initial);
   expect(container.querySelector('.patch-name').textContent).toContain('Opened setup.json');
+  expect(container.querySelector('[aria-label="Channel"]').getAttribute('aria-valuetext')).toBe('Ambience');
+  expect(container.querySelector('.device-seq .device-head span').textContent).toContain('Pad');
  }finally{await new Promise(resolve=>setTimeout(resolve,1100));URL.createObjectURL=previousCreate;URL.revokeObjectURL=previousRevoke;click.mockRestore();log.mockRestore();}
 });
 afterEach(() => {
@@ -149,12 +218,38 @@ test('a fresh page starts continuous playback with the default lookahead',async(
  root=createRoot(container);
  await act(async()=>root.render(<AllPage/>));
  expect(container.querySelector('[aria-label="Generator mode"]').value).toBe('continuous');
+ expect(container.querySelector('[aria-label="Channel"]').getAttribute('aria-valuetext')).toBe('Pad');
+ expect(container.querySelector('[aria-label="Resolution"]').getAttribute('aria-valuetext')).toBe('1/4');
  expect(container.querySelector('[aria-label="Repeat song"]')).toBeTruthy();
  expect(mocks.scheduler.options.bank().patterns).toHaveLength(5);
  expect(mocks.capture).not.toHaveBeenCalled();
  expect(mocks.scheduler.start).not.toHaveBeenCalled();
  await act(async()=>button('▶Play').click());
  expect(mocks.scheduler.start).toHaveBeenLastCalledWith(.08,'song',{pattern:0,step:0});
+});
+
+test('a fresh rhythm-only progression selects rhythm in the sequencer and mixer',async()=>{
+ act(()=>root.unmount());
+ localStorage.clear();mocks.continuousRole='rhythm';
+ root=createRoot(container);
+ await act(async()=>root.render(<AllPage/>));
+ expect(container.querySelector('.device-seq .device-head span').textContent).toContain('Rhythm');
+ expect(container.querySelector('[aria-label="Channel"]').getAttribute('aria-valuetext')).toBe('Rhythm');
+});
+
+test('default sequencer favours an audible pad or rhythm in the first progression',()=>{
+ const pattern=steps=>({steps,chords:[]}),project={bars:2,stepsPerBar:2,progressions:[{startBar:0,bars:1},{startBar:1,bars:1}],patterns:{
+  lead:pattern([{n:[{d:0}]},null,null,null]),
+  pad:pattern([null,null,{n:[{d:0}]},null]),
+  rhythm:pattern([{n:[{d:1}]},null,null,null]),
+ }};
+ expect(defaultSequencer(project)).toBe(2);
+ project.patterns.pad.steps[0]={n:[{d:0}]};
+ expect(defaultSequencer(project)).toBe(3);
+ delete project.patterns.pad;
+ expect(defaultSequencer(project)).toBe(2);
+ delete project.patterns.rhythm;
+ expect(defaultSequencer(project)).toBe(3);
 });
 
 test('a fresh continuous session uses saved buffer preferences',async()=>{
@@ -179,6 +274,16 @@ test('a saved finite song is restored in song mode',async()=>{
  expect(mocks.scheduler.options.bank().patterns).toHaveLength(2);
  expect(container.querySelector('.patch-name').textContent).toContain('back where you left off');
  expect(JSON.parse(localStorage.getItem('synths:all:state')).project).toEqual(saved.project);
+});
+
+test('the default resolution uses the coarsest grid for an eighth-note meter',async()=>{
+ act(()=>window.dispatchEvent(new Event('pagehide')));
+ const saved=JSON.parse(localStorage.getItem('synths:all:state'));
+ act(()=>root.unmount());
+ localStorage.setItem('synths:all:state',JSON.stringify({...saved,project:{...saved.project,meter:'6/8'}}));
+ root=createRoot(container);
+ await act(async()=>root.render(<AllPage/>));
+ expect(container.querySelector('[aria-label="Resolution"]').getAttribute('aria-valuetext')).toBe('1/8');
 });
 
 test('a saved song for an unavailable scene starts a fresh continuous session',async()=>{
@@ -347,7 +452,6 @@ test('keeps the display and knob slots shared when switching grid views',()=>{
 test('resolution edits a quarter note and displays its sustain at sixteenth resolution',()=>{
  act(()=>button('ViewArrange').click());
  act(()=>container.querySelector('[aria-label="Select Lead sequencer"]').click());
- act(()=>button('ViewArrange').click());
  const knob=container.querySelector('[aria-label="Resolution"]');
  expect(knob.getAttribute('aria-valuetext')).toBe('1/16');
  act(()=>knob.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowDown',bubbles:true})));
@@ -370,7 +474,6 @@ test('resolution edits a quarter note and displays its sustain at sixteenth reso
 test('holds Shift to filter an octave and restores all octaves on release',()=>{
  act(()=>button('ViewArrange').click());
  act(()=>container.querySelector('[aria-label="Select Lead sequencer"]').click());
- act(()=>button('ViewArrange').click());
  const grid=container.querySelector('[aria-label="Progression editor"]');
  act(()=>grid.querySelector('[aria-label="C step 2"]').click());
  act(()=>grid.querySelector('[aria-label="Select octave 5"]').click());
@@ -464,7 +567,6 @@ test('places a held progression-root chord and edits both chord pages',()=>{
 test('layers chords, cycles deletion across a stack, and holds to delete all',()=>{
  act(()=>button('ViewArrange').click());
  act(()=>container.querySelector('[aria-label="Select Lead sequencer"]').click());
- act(()=>button('ViewArrange').click());
  act(()=>button('InsertNote').click());
  const select=container.querySelector('[aria-label="Chord overlap"]');
  expect(select.value).toBe('replace');
@@ -501,7 +603,6 @@ test('layers chords, cycles deletion across a stack, and holds to delete all',()
 test('delete mode can select the entire stack and delete chord tones from note view',()=>{
  act(()=>button('ViewArrange').click());
  act(()=>container.querySelector('[aria-label="Select Lead sequencer"]').click());
- act(()=>button('ViewArrange').click());
  act(()=>button('InsertNote').click());
  const select=container.querySelector('[aria-label="Chord overlap"]');
  act(()=>{select.value='layer';select.dispatchEvent(new Event('change',{bubbles:true}));});
@@ -531,7 +632,6 @@ test('delete mode can select the entire stack and delete chord tones from note v
 test('edit mode selects generated notes without changing them and edits independent metadata',()=>{
  act(()=>button('ViewArrange').click());
  act(()=>container.querySelector('[aria-label="Select Lead sequencer"]').click());
- act(()=>button('ViewArrange').click());
  const grid=container.querySelector('[aria-label="Progression editor"]');
  act(()=>button('LayerEdit').click());
  act(()=>grid.querySelector('[aria-label="C step 1"]').click());
@@ -577,7 +677,6 @@ test('generated chord provenance is selectable and original playback survives un
 test('copy mode picks a source then pastes a note repeatedly at target pitch and time',()=>{
  act(()=>button('ViewArrange').click());
  act(()=>container.querySelector('[aria-label="Select Lead sequencer"]').click());
- act(()=>button('ViewArrange').click());
  const grid=container.querySelector('[aria-label="Progression editor"]');
  act(()=>button('ModeCopy').click());
  act(()=>grid.querySelector('[aria-label="C step 1"]').click());
@@ -632,7 +731,6 @@ test('note page edits held chord length and velocity in playback',()=>{
 test('dragging inserts a sustained note and suppresses the subsequent click',()=>{
  act(()=>button('ViewArrange').click());
  act(()=>container.querySelector('[aria-label="Select Lead sequencer"]').click());
- act(()=>button('ViewArrange').click());
  const grid=container.querySelector('[aria-label="Progression editor"]'),cells=grid.querySelector('.seq-cells');
  cells.getBoundingClientRect=()=>({left:0,width:1600});
  const pad=grid.querySelector('[aria-label="C step 2"]');
@@ -679,7 +777,6 @@ test('selects and deselects a chord, and transposes notes and chord across seque
 test('drums can be selected, scrolled, edited, and scheduled', async()=>{
  act(()=>button('ViewArrange').click());
  act(()=>container.querySelector('[aria-label="Select Drums sequencer"]').click());
- act(()=>button('ViewArrange').click());
  const grid=container.querySelector('[aria-label="Progression editor"]');
  expect(grid.querySelector('[aria-label="Felt kick step 1"]').getAttribute('aria-pressed')).toBe('true');
  const initialBank=mocks.scheduler.options.bank(),initial=mocks.scheduler.options.pattern(initialBank.patterns[0]);
@@ -712,7 +809,6 @@ test('switches drum kits without changing the song and restores the chosen kit',
 test('extra machine tracks stay separate from the common drum lane',async()=>{
  act(()=>button('ViewArrange').click());
  act(()=>container.querySelector('[aria-label="Select Drums sequencer"]').click());
- act(()=>button('ViewArrange').click());
  const grid=container.querySelector('[aria-label="Progression editor"]'),knob=grid.querySelector('[aria-label="Voices"]');
  for(let i=0;i<8;i++)act(()=>knob.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowUp',bubbles:true})));
  act(()=>grid.querySelector('[aria-label="Mid tom step 2"]').click());
@@ -726,7 +822,6 @@ test('selects a sequencer in arrangement, transposes the grid view, and preserve
  expect(container.querySelectorAll('[role="tab"]')).toHaveLength(5);
  act(()=>button('ViewArrange').click());
  act(()=>container.querySelector('[aria-label="Select Lead sequencer"]').click());
- act(()=>button('ViewArrange').click());
  const grid=container.querySelector('[aria-label="Progression editor"]');
  expect(grid.querySelector('[aria-label="C step 1"]').style.getPropertyValue('--voice')).toBe('#ff4d4d');
  expect(grid.querySelector('[aria-label="Select octave 4"]')).toBeTruthy();
@@ -751,21 +846,50 @@ test('selects a sequencer in arrangement, transposes the grid view, and preserve
 test('arrangement row controls return to voice selection after mute or solo mode is turned off',()=>{
  act(()=>button('ViewArrange').click());
  const grid=container.querySelector('[aria-label="Arrangement"]');
- act(()=>grid.querySelector('[aria-label="Select Lead sequencer"]').click());
- expect(grid.querySelector('[aria-label="Select Lead sequencer"]').getAttribute('aria-pressed')).toBe('true');
  act(()=>button('RowsMute').click());
  act(()=>grid.querySelector('[aria-label="Mute Lead"]').click());
  expect(grid.querySelector('[aria-label="Mute Lead"]').getAttribute('aria-pressed')).toBe('true');
  act(()=>button('RowsMute').click());
- act(()=>grid.querySelector('[aria-label="Select Drums sequencer"]').click());
- expect(grid.querySelector('[aria-label="Select Drums sequencer"]').getAttribute('aria-pressed')).toBe('true');
  expect(grid.querySelector('[aria-label="Lead sequencer display"]').textContent).toContain('MUTED');
  act(()=>button('RowsSolo').click());
  act(()=>grid.querySelector('[aria-label="Solo Drums"]').click());
+ expect(grid.querySelector('[aria-label="Solo Drums"]').getAttribute('aria-pressed')).toBe('true');
  act(()=>button('RowsSolo').click());
- expect(grid.querySelector('[aria-label="Select Drums sequencer"]').getAttribute('aria-pressed')).toBe('true');
- act(()=>button('ViewArrange').click());
+ act(()=>grid.querySelector('[aria-label="Select Drums sequencer"]').click());
+ expect(container.querySelector('[aria-label="Arrangement"]')).toBeNull();
  expect(container.querySelector('[aria-label="Felt kick step 1"]')).toBeTruthy();
+});
+test('arrangement display buttons open the sequencer even in a row-action mode',()=>{
+ act(()=>button('ViewArrange').click());
+ act(()=>button('RowsMute').click());
+ act(()=>container.querySelector('[aria-label="Lead sequencer display"]').click());
+ expect(container.querySelector('[aria-label="Arrangement"]')).toBeNull();
+ expect(container.querySelector('[aria-label="Progression editor"]')).toBeTruthy();
+ expect(container.querySelector('[aria-label="C step 1"]')).toBeTruthy();
+});
+test('voice cards and their accessible labels open the corresponding sequencer without triggering on controls',()=>{
+ const cards=container.querySelectorAll('.voice-card');
+ act(()=>cards[0].click());
+ expect(container.querySelector('.device-seq .device-head span').textContent).toContain('Lead');
+ act(()=>button('ViewArrange').click());
+ act(()=>cards[1].querySelector('[aria-label="Open Second lead sequencer"]').click());
+ expect(container.querySelector('[aria-label="Arrangement"]')).toBeNull();
+ expect(container.querySelector('.device-seq .device-head span').textContent).toContain('Second lead');
+ act(()=>cards[2].querySelector('input[type="checkbox"]').click());
+ expect(container.querySelector('.device-seq .device-head span').textContent).toContain('Second lead');
+});
+test('mixer channel selection opens its sequencer, while non-sequencer channels leave it unchanged',()=>{
+ const mixer=container.querySelector('[aria-label="Mixing desk"]');
+ act(()=>button('ViewArrange').click());
+ act(()=>mixer.querySelector('button[title^="Bass:"]').click());
+ expect(container.querySelector('[aria-label="Arrangement"]')).toBeNull();
+ expect(container.querySelector('.device-seq .device-head span').textContent).toContain('Bass');
+ act(()=>mixer.querySelector('button[title^="Ambience:"]').click());
+ expect(container.querySelector('.device-seq .device-head span').textContent).toContain('Bass');
+ act(()=>mixer.querySelectorAll('.dk-strip')[5].querySelector('.sel').click());
+ expect(container.querySelector('.device-seq .device-head span').textContent).toContain('Drums');
+ act(()=>mixer.querySelector('[aria-label="Channel"]').dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowLeft',bubbles:true})));
+ expect(container.querySelector('.device-seq .device-head span').textContent).toContain('Bass');
 });
 test('changing progression count generates immediately before playback',()=>{
  const select=container.querySelector('select[aria-label="Progressions"]')??[...container.querySelectorAll('select')].find(x=>x.parentElement.textContent.includes('Progressions'));

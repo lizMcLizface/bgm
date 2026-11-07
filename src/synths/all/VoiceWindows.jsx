@@ -15,10 +15,23 @@ import DrumKitPads from '../../app/DrumKitPads';
 // on its top edge like the panels of the other pages. It reads and writes the host's sound of the voice (host.soundOf / nativeOf / editValues / editNative), so a sound
 // picked here shows on the voice's card and one picked on the card shows here. The Effects button shows the voice's effects in it the way the page's own Effects button does.
 // `version` changes whenever the host's sound did, to draw again.
-const at=index=>({x:120+index*36,y:160+index*36});
+const GAP=32,SEQUENCER='#all-panel-sequencer';
+const bounds=(selector,desk)=>{
+ const el=desk.el?.querySelector(selector);
+ if(!el)return null;
+ const rect=el.getBoundingClientRect(),origin=desk.origin(),zoom=desk.zoom;
+ return {x:(rect.left-origin.left)/zoom,y:(rect.top-origin.top)/zoom,w:el.offsetWidth,h:el.offsetHeight};
+};
+export const panelHome=(kind,anchor,size)=>{
+ if(!anchor||!size.w||!size.h)return null;
+ if(kind==='synth')return {x:Math.round(anchor.x+(size.w<anchor.w?(anchor.w-size.w)/2:anchor.w-size.w)),y:Math.round(anchor.y-size.h-GAP)};
+ if(kind==='effects')return {x:Math.round(anchor.x-size.w-GAP),y:Math.round(anchor.y+(anchor.h-size.h)/2)};
+ return {x:Math.round(anchor.x+(anchor.w-size.w)/2),y:Math.round(anchor.y+anchor.h+GAP)};
+};
+const homeFor=(kind,selector)=>(s,el,desk)=>panelHome(kind,bounds(selector,desk),{w:el?.offsetWidth??0,h:el?.offsetHeight??0});
 
-function Rig({id,index,children}){
- const float=useFloating('synths:all:win-'+id,at(index));
+function Rig({id,children}){
+ const float=useFloating('synths:all:win-'+id,homeFor('synth',SEQUENCER),{anchor:[SEQUENCER]});
  return <div className="all-win" ref={float.ref} style={{position:'absolute',...float.style}} onPointerDownCapture={float.raise}>
   <div className="grip rig-grip" {...float.handle} role="presentation"><i/></div>
   {children}
@@ -45,7 +58,9 @@ export function VoiceWindow({role,index,host,showSynth,fx,tuning,onChoose,onEdit
  if(!host)return null;
  const sound=host.soundOf(role),entry=host.nativeOf(role);
  const tools=<button type="button" onClick={()=>host.g.roles[role].instrument.flushTails?.()}>Clear tails</button>;
- const rack=fx&&<RackCompact tempo={0} values={host.rackValues(role)} onChange={changes=>onEditFx(role,changes)} instrumentSpecs={[]} excludedUnits={['space']} onClose={onCloseFx} posKey={'synths:all:rack-'+role} home={at(index+2)} tools={tools}/>;
+ const rackId='all-rack-'+role,rackSelector='#'+rackId;
+ const rack=(fx||tuning)&&<RackCompact tempo={0} values={host.rackValues(role)} onChange={changes=>onEditFx(role,changes)} instrumentSpecs={[]} excludedUnits={['space']} onClose={onCloseFx} posKey={'synths:all:rack-'+role} home={homeFor('effects',SEQUENCER)} anchor={[SEQUENCER]} layoutId={rackId} hidden={!fx} tools={tools}/>;
+ const tuningHome=homeFor('tuning',rackSelector),tuningAnchor=[rackSelector];
  if(sound){
   const synth=SYNTHS[sound.synth];
   if(role==='perc')return <>{showSynth&&<Rig id={role} index={index}><DrumRig key={sound.synth} sound={sound} host={host} onEdit={onEdit}/></Rig>}{rack}</>;
@@ -55,7 +70,7 @@ export function VoiceWindow({role,index,host,showSynth,fx,tuning,onChoose,onEdit
     <VoicePanel id={sound.synth} role={role} values={sound.values} onChange={values=>onEdit(role,values)} choose={choose} current={sound.name} full bound={{category:sound.category}}/>
    </Rig>}
    {rack}
-   {tuning&&['poly','fm'].includes(sound.synth)&&<LabPanels id={'all-tuning-'+role} onClose={onCloseTuning}/>}
+   {tuning&&['poly','fm'].includes(sound.synth)&&<LabPanels id={'all-tuning-'+role} home={tuningHome} anchor={tuningAnchor} onClose={onCloseTuning}/>}
   </>;
  }
  if(entry){
@@ -66,7 +81,7 @@ export function VoiceWindow({role,index,host,showSynth,fx,tuning,onChoose,onEdit
     <PianoRig settings={settings} room={host.rackValues(role)['effects.reverb']} current={entry.name} category={categoryOf(settings.pianoType)} onChoose={s=>choose(s.name)} onChange={(key,value)=>onEditNative(role,{[key]:value})}
      onRoom={v=>onEditNative(role,{reverbAmount:v})} rackValues={host.rackValues(role)} onRack={changes=>onEditFx(role,changes)}/>
    </div></div></Rig>}
-   {rack}{tuning&&<PianoTuning id={'all-piano-tuning-'+role} settings={settings} onChange={(key,value)=>onEditNative(role,{[key]:value})} onClose={onCloseTuning}/>}</>;
+   {rack}{tuning&&<PianoTuning id={'all-piano-tuning-'+role} settings={settings} home={tuningHome} anchor={tuningAnchor} onChange={(key,value)=>onEditNative(role,{[key]:value})} onClose={onCloseTuning}/>}</>;
   }
   const names=Object.entries(NATIVE.iowa.presets);
   return <>{showSynth&&<Rig id={role} index={index}><div className="piano iowa"><div className="rig">

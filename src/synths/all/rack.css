@@ -4,6 +4,7 @@
 .all-box.box-ambience{width:560px;}
 .all-box.box-mixer{width:980px;}
 .all-box.box-sequencer{width:max-content;}
+.all-page .drums .split{grid-template-columns:var(--seq-w);}
 .box-grip{position:absolute;z-index:3;left:0;right:0;top:0;height:12px;}
 .box-grip i{width:44px;height:4px;}
 .voicebox .voice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(2,auto);gap:8px;}
@@ -11,10 +12,19 @@
 .voicebox .voice-grid>div{min-width:0;}
 .voicebox .voice-grid>div>div:first-child{flex-wrap:wrap;gap:2px 6px;}
 .voicebox .voice-grid b{font-size:12px;}
+.voicebox .voice-card{cursor:pointer;}
+.voicebox .voice-select{padding:0;border:0;background:transparent;font-family:inherit;font-size:12px;font-weight:700;text-align:left;cursor:pointer;}
+.voicebox .voice-select:focus-visible{outline:2px solid currentColor;outline-offset:2px;}
 .voicebox .voice-grid label{font-size:11px;white-space:nowrap;}
 .voicebox .voice-grid input[type=checkbox]{margin:0 2px 0 0;}
 .all-instrument .all-stage{height:1400px;flex:none;}
 .all-instrument .bar-scene{display:inline-flex;align-items:center;gap:6px;font-size:13px;}
+.all-link{position:relative;font-size:12px;}
+.all-link summary{cursor:pointer;white-space:nowrap;}
+.all-link form{position:absolute;z-index:100;top:100%;right:0;width:340px;padding:12px;background:#1a1e20;border:1px solid #59605d;border-radius:8px;box-shadow:0 8px 24px #000a;}
+.all-link label{display:grid;gap:6px;}
+.all-link textarea{box-sizing:border-box;width:100%;min-height:90px;resize:vertical;}
+.all-link form button{margin-top:8px;}
 .voice-tools{display:flex;gap:6px;}
 .voice-tools button{flex:1;min-height:24px;border:1px solid #000;border-radius:4px;background:#26292d;color:#cfc7b4;font:700 10px system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;}
 .voice-tools button[aria-pressed=true]{background:#e3a52a;color:#1b1206;}
