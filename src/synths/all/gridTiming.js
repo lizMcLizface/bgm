@@ -17,7 +17,7 @@ export function soundingNotes(pattern,start,end,key) {
   if(!step?.n)continue;
   for(const note of step.n){
    const len=note.len??heldSteps(pattern,i);
-   if(i+len>start)notes.push({midi:degreeToMidi(key,note)+12*(pattern.octave??0),start:i,end:Math.min(pattern.steps.length,i+len)});
+   if(i+len>start)notes.push({midi:degreeToMidi(key,note)+12*(pattern.octave??0),start:i,end:Math.min(pattern.steps.length,i+len),...(note.chordSource?.group?{group:note.chordSource.group}:{})});
   }
  }
  return notes;

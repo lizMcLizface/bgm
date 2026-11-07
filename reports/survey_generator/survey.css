@@ -1,0 +1,60 @@
+:root { color-scheme: dark; font-family: system-ui, sans-serif; background: #111827; color: #e5e7eb; line-height: 1.5; }
+body { margin: 0; }
+main { max-width: 1280px; margin: auto; padding: 2rem 1.2rem 5rem; }
+h1, h2, h3 { color: #f9fafb; line-height: 1.2; }
+h2 { margin-top: 3rem; border-bottom: 1px solid #475569; padding-bottom: .5rem; }
+a { color: #93c5fd; }
+nav { display: flex; flex-wrap: wrap; gap: .75rem; }
+.lead { font-size: 1.1rem; max-width: 80ch; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: .75rem; }
+.card, details { background: #1e293b; border: 1px solid #334155; border-radius: .5rem; padding: .8rem; }
+.card strong { display: block; font-size: 1.6rem; }
+details { margin: .6rem 0; }
+summary { cursor: pointer; font-weight: 650; }
+.scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+th, td { padding: .45rem .55rem; border-bottom: 1px solid #334155; text-align: left; vertical-align: top; }
+th { color: #cbd5e1; }
+.number { text-align: right; white-space: nowrap; }
+.bar-row { display: grid; grid-template-columns: minmax(160px, 240px) minmax(160px, 1fr) 4.5rem; align-items: center; gap: .5rem; margin: .3rem 0; font-size: .85rem; }
+.bar { display: flex; height: 1rem; background: #334155; min-width: 0; }
+.bar span { height: 100%; }
+.legend { display: flex; flex-wrap: wrap; gap: .8rem; margin: 1rem 0; }
+.swatch { display: inline-block; width: .8rem; height: .8rem; margin-right: .25rem; }
+.muted { color: #cbd5e1; }
+input, select { font: inherit; background: #0f172a; color: inherit; border: 1px solid #64748b; border-radius: .3rem; padding: .5rem; width: min(100%, 28rem); box-sizing: border-box; }
+.wide { overflow-wrap: anywhere; }
+.chart-grid, .rule-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr)); gap: .8rem; }
+.chart { background: #182334; border: 1px solid #334155; border-radius: .5rem; padding: .8rem; margin: .6rem 0; min-width: 0; }
+.chart-grid .chart, .rule .chart { margin: 0; }
+.chart figcaption { display: flex; justify-content: space-between; gap: .5rem; align-items: baseline; }
+.chart figcaption span, .chart-hint, .rule-meta { color: #b6c4d6; font-size: .8rem; }
+.chart p { margin: .5rem 0; font-size: .85rem; }
+.split-track { display: flex; height: 1.15rem; overflow: hidden; background: #334155; border-radius: .25rem; margin: .65rem 0; }
+.split-track span { height: 100%; }
+.chart-legend { display: flex; flex-wrap: wrap; gap: .35rem .8rem; font-size: .82rem; }
+.chart-legend span { display: inline-flex; align-items: baseline; gap: .25rem; }
+.chart-legend i { width: .65rem; height: .65rem; border-radius: .15rem; flex: none; }
+.chart-legend small { color: #b6c4d6; }
+.scatter-chart svg { display: block; width: 100%; max-height: 170px; overflow: visible; }
+.scatter-chart svg text { fill: #cbd5e1; font-size: 11px; }
+.scatter-chart svg .axis { stroke: #94a3b8; stroke-width: 1; }
+.scatter-chart svg circle { fill: #60a5fa; stroke: #dbeafe; stroke-width: 1; }
+.chart-details { background: transparent; padding: .35rem 0 0; border: 0; font-size: .8rem; }
+.rule-controls { display: flex; flex-wrap: wrap; gap: 1rem; margin: 1.25rem 0; }
+.rule-controls label { display: grid; gap: .3rem; min-width: min(100%, 240px); }
+.rule-chapter { margin: 2rem 0; }
+.rule { background: #1e293b; border: 1px solid #334155; border-radius: .5rem; padding: 1rem; min-width: 0; }
+.rule h4 { margin: 0; font-size: 1rem; }
+.rule > p { font-size: .86rem; }
+.rule .chart + .chart { margin-top: .6rem; }
+.rule details { padding: .5rem; font-size: .8rem; overflow-wrap: anywhere; }
+.matrix-scroll { overflow: auto; max-height: 34rem; border: 1px solid #475569; border-radius: .4rem; }
+.matrix { width: max-content; table-layout: auto; border-collapse: separate; border-spacing: 1px; font-size: .7rem; }
+.matrix th, .matrix td { padding: .25rem; border: 0; white-space: nowrap; text-align: center; }
+.matrix thead th { position: sticky; top: 0; z-index: 2; background: #1e293b; }
+.matrix tbody th { position: sticky; left: 0; z-index: 1; background: #1e293b; text-align: left; }
+.matrix thead th:first-child { left: 0; z-index: 3; }
+.matrix td { min-width: 2.2rem; color: #fff; }
+.matrix td:focus { outline: 2px solid #fff; outline-offset: -2px; }
+@media (max-width: 600px) { .bar-row { grid-template-columns: minmax(90px, 125px) minmax(90px, 1fr) 3rem; } main { padding: 1rem .75rem 3rem; } }

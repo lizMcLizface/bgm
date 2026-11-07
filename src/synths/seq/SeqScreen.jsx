@@ -10,10 +10,10 @@ export default function SeqScreen({lines,pages,page,onPage,accent,actions={}}){
  return <div className="seq-screen" style={{'--accent':accent}}>
   <div className="oled-window" role="status">
    {lines.map((l,i)=><div key={i} className={'oled-line l'+i}>{l}</div>)}
-   <div className="oled-values">{current.encoders.map((e,i)=><span key={i} className={e.disabled?'dim':''}><small>{e.label}</small><b data-mod-text={e.modKey??undefined}>{e.display}</b></span>)}</div>
+   <div className="oled-values">{current.encoders.map((e,i)=><span key={i} className={e.disabled?'dim':e.grey?'grey':''}><small>{e.label}</small><b data-mod-text={e.modKey??undefined}>{e.display}</b></span>)}</div>
   </div>
   <div className="screen-tabs" role="tablist" aria-label="Encoder page">
-   {pages.map(p=><button type="button" key={p.id} role="tab" disabled={p.disabled} aria-selected={current.id===p.id} className={current.id===p.id?'on':''} title={actions[p.id]&&current.id===p.id?actions[p.id].title:undefined} onClick={()=>{if(current.id===p.id&&actions[p.id])actions[p.id].onClick();else onPage(p.id);}}>{p.label}</button>)}
+   {pages.map(p=><button type="button" key={p.id} role="tab" disabled={p.disabled} className={(p.blank?'blank ':'')+(current.id===p.id?'on':'')} aria-label={p.blank?'Unused':undefined} aria-selected={current.id===p.id} title={actions[p.id]&&current.id===p.id?actions[p.id].title:undefined} onClick={()=>{if(current.id===p.id&&actions[p.id])actions[p.id].onClick();else onPage(p.id);}}>{p.label}</button>)}
   </div>
   <div className="encoders">{current.encoders.map((e,i)=><Encoder key={current.id+i} {...e}/>)}</div>
  </div>;

@@ -1,0 +1,8 @@
+.support-yes { color: #86efac; }
+.support-new { color: #fcd34d; }
+.support-no { color: #fca5a5; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.knob { margin: 1.6rem 0; }
+.knob h4 { margin-bottom: .2rem; }
+.knob .note { margin: .1rem 0 .6rem; color: #94a3b8; max-width: 90ch; }
+.legend-line { color: #94a3b8; font-size: .85rem; }

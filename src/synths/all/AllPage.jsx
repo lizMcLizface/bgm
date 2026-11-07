@@ -7,7 +7,8 @@ import {gridResolutions,editPitch,editDrum} from './gridTiming';
 import {chordSpan,chordBoundaries,rootDegree,transposeChord,resizeChord} from './chordEditing';
 import {repeatRange,repeatNoteEvents} from './repeat';
 import {followPlayback} from './followPlayback';
-import {COLOURS as CHORD_COLOURS,COMPLEXITIES,DIRECTIONS,HOLDS,RATES,ROOTS,deleteItems,generatedChords,insertChord,itemsAt,materializeGeneratedChord,newPlacedChord,nextChordId,placedChordEvents,placedChordTones} from './placedChords';
+import {COMPLEXITIES,DIRECTIONS,FLAVOURS,NOTE_LENGTHS,RATES,STYLES,chordStack,chordStrikes,deleteItems,generatedChords,insertChord,itemsAt,materializeGeneratedChord,newPlacedChord,nextChordId,omitOptions,placedChordEvents,placedChordTones,stackNames} from './placedChords';
+import {RATE_PATTERNS} from './ratePatterns';
 import SeqScreen from '../seq/SeqScreen';
 import ProgressionGrid,{pitchClasses} from './ProgressionGrid';
 import ArrangementGrid from './ArrangementGrid';
@@ -56,7 +57,7 @@ export default function AllPage(){
  const [view,setView]=useState('scale'),[offScale,setOffScale]=useState(false),[insertOctave,setInsertOctave]=useState(4),[pitch,setPitch]=useState(null),[screenPage,setScreenPage]=useState('seq'),[drumOffset,setDrumOffset]=useState(0);
  const [resolution,setResolution]=useState('1/16');
  const [shiftHeld,setShiftHeld]=useState(false),[octaveFilter,setOctaveFilter]=useState(null);
- const [chordMode,setChordMode]=useState(false),[deleteMode,setDeleteMode]=useState(false),[chordOverlap,setChordOverlap]=useState(stored.chordOverlap??'replace'),[placedId,setPlacedId]=useState(null),[deleteStack,setDeleteStack]=useState(null);
+ const [chordMode,setChordMode]=useState(false),[deleteMode,setDeleteMode]=useState(false),[chordOverlap,setChordOverlap]=useState(stored.chordOverlap??'replace'),[placedId,setPlacedId]=useState(null),[deleteStack,setDeleteStack]=useState(null),[strikeIndex,setStrikeIndex]=useState(0);
  const [editMode,setEditMode]=useState(false),[copyMode,setCopyMode]=useState(false),[editSelection,setEditSelection]=useState([]),[copySource,setCopySource]=useState(null);
  const shiftPointer=useRef(null),keyboardShift=useRef(false);
  const [focusChord,setFocusChord]=useState(null);
@@ -265,25 +266,32 @@ export default function AllPage(){
  };
  const selectChord=bar=>{setPlacedId(null);setEditSelection([]);setDeleteStack(null);setFocusChord(bar);setScreenPage(bar===null?'seq':'timeline');};
  useEffect(()=>{setPlacedId(null);setEditSelection([]);setCopySource(null);setDeleteStack(null);setScreenPage('seq');},[selected,progression]);
- const placedChord=pattern?.chords?.find(c=>c.id===placedId)??generatedChords(pattern,key).find(c=>c.id===placedId);
- const setPlacedOption=(name,value)=>{
+ const placedChord=pattern?.chords?.find(c=>c.id===placedId)??generatedChords(pattern,key,project?.stepsPerBar).find(c=>c.id===placedId);
+ // The chord menu's fields. A generated chord kept as an exact voicing (grey chord fields) or exact strikes (grey play fields) turns into plain settings
+ // for the fields that are touched; the rest of what it plays is unchanged until then.
+ const VOICING_FIELDS=['complexity','colour','quality','omit','inversion','add','root'],TIMING_FIELDS=['playMode','direction','rate','mask','noteLen','spill','hold','endAsOne','phase'];
+ const patchPlaced=(patch)=>{
   try{
-   const next={...placedChord,[name]:value};
-   const count=placedChordTones(key,{...next,rootVoicing:'on',inversion:0}).length;
-   next.inversion=Math.min(next.inversion??0,count-1);
+   const next={...placedChord,...patch};
+   if(Object.keys(patch).some(k=>VOICING_FIELDS.includes(k)))delete next.voicing;
+   if(Object.keys(patch).some(k=>TIMING_FIELDS.includes(k)))delete next.strikes;
+   const count=chordStack(key,{...next,voicing:undefined}).stack.length-(next.omit?.length??0);
+   next.inversion=Math.min(next.inversion??0,Math.max(0,count-1));
+   if(next.mask&&next.mask.length!==Math.round(project.stepsPerBar/(next.rate??1)))delete next.mask;
    placedChordTones(key,next);
    if(placedChord.sourceGroup){
     const converted=materializeGeneratedChord(pattern,key,next);
     setProject(p=>({...p,patterns:{...p.patterns,[role]:converted.pattern}}));
     setPlacedId(converted.id);
     setEditSelection(selection=>selection.map(item=>item.id===placedId?{...item,type:'chord',id:converted.id}:item));
-    setStatus('Generated chord converted to editable voicing');
+    setStatus('Generated chord converted to editable settings');
    }else edit(role,p=>({...p,chords:p.chords.map(c=>c.id===placedId?next:c)}));
   }catch(error){console.error(error);setStatus(error.message);}
  };
+ const setPlacedOption=(name,value)=>patchPlaced({[name]:value});
  const gridItems=(start,end,row)=> {
   const pcs=pitchClasses(key,offScale);
-  return itemsAt(pattern,key,start,end,{view:chordMode?'octave':view,rowPc:pcs[pcs.length-1-row],octave:8-row,octaveFilter:chordMode?null:octaveFilter,chordRootsOnly:chordMode});
+  return itemsAt(pattern,key,start,end,{view:chordMode?'octave':view,rowPc:pcs[pcs.length-1-row],octave:8-row,octaveFilter:chordMode?null:octaveFilter,chordRootsOnly:chordMode,stepsPerBar:project.stepsPerBar});
  };
  const chordPad=(start,end,row,dragged)=>{
   const found=gridItems(start,end,row).filter(item=>item.type==='chord'||item.type==='generated');
@@ -325,7 +333,7 @@ export default function AllPage(){
   setEditSelection(add?[...editSelection.filter(x=>!(x.row===row&&x.step===start)),chosen]:[chosen]);
   setPlacedId(next.type!=='note'?next.id:null);setFocusChord(null);setScreenPage(next.type!=='note'?'placed':'meta');
  };
- const selectedData=editSelection.map(item=>item.type==='generated'?generatedChords(pattern,key).find(c=>c.id===item.id):item.type==='chord'?pattern?.chords?.find(c=>c.id===item.id):pattern?.steps[item.start]?.n?.[item.index]).filter(Boolean);
+ const selectedData=editSelection.map(item=>item.type==='generated'?generatedChords(pattern,key,project?.stepsPerBar).find(c=>c.id===item.id):item.type==='chord'?pattern?.chords?.find(c=>c.id===item.id):pattern?.steps[item.start]?.n?.[item.index]).filter(Boolean);
  const setMetadata=(field,value)=>{
   edit(role,p=>{
    const steps=p.steps.map((s,i)=>{
@@ -342,7 +350,7 @@ export default function AllPage(){
    const item=gridItems(start,end,row)[0];
    if(!item){setStatus('Select a note or chord to copy');return;}
    if(item.type==='generated'){
-    const group=generatedChords(pattern,key).find(c=>c.id===item.id);
+    const group=generatedChords(pattern,key,project?.stepsPerBar).find(c=>c.id===item.id);
     const notes=group.items.map(x=>({offset:x.start-group.start,data:{...pattern.steps[x.start].n[x.index],len:pattern.steps[x.start].n[x.index].len??heldSteps(pattern,x.start),vel:pattern.steps[x.start].n[x.index].vel??pattern.steps[x.start].vel??.8,gate:pattern.steps[x.start].n[x.index].gate??pattern.steps[x.start].gate??pattern.gate??.8,prob:pattern.steps[x.start].n[x.index].prob??pattern.steps[x.start].prob??1}}));
     setCopySource({type:'generated',midi:item.midi,notes});setStatus('Copy source selected · tap destinations');return;
    }
@@ -409,22 +417,55 @@ export default function AllPage(){
   {label:'Start',display:`bar ${selectedSpan.start-part.startBar+1}`,position:startMax>startMin?(selectedSpan.start-startMin)/(startMax-startMin):0,step:startMax>startMin?1/(startMax-startMin):1,disabled:!boundaries.selected||startMax<=startMin,onPosition:p=>{const target=startMin+Math.round(p*(startMax-startMin));if(target!==selectedSpan.start){let bar;const changed=changeChord(x=>{const result=resizeChord(x,part,focusChord,'start',target);bar=result.bar;return result.project;});if(changed)setFocusChord(bar);}}},
   {label:'End',display:`bar ${selectedSpan.end-part.startBar}`,position:endMax>endMin?(selectedSpan.end-endMin)/(endMax-endMin):0,step:endMax>endMin?1/(endMax-endMin):1,disabled:boundaries.selected===boundaries.entries.length-1||endMax<=endMin,onPosition:p=>{const target=endMin+Math.round(p*(endMax-endMin));if(target!==selectedSpan.end)changeChord(x=>resizeChord(x,part,focusChord,'end',target).project);}},
  ]:[];
- const optionEncoder=(label,values,value,display,name)=>({
-  label,display:display(value),position:Math.max(0,values.indexOf(value))/(values.length-1),step:1/(values.length-1),
-  onPosition:p=>setPlacedOption(name,values[Math.round(p*(values.length-1))]),
-  onReset:()=>setPlacedOption(name,values[0]),
- });
+ const greyChord=!!placedChord?.voicing,greyPlay=!!placedChord?.strikes;
+ const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
+ const pick=(label,values,value,display,patchOf,{grey=false,disabled=false}={})=>{
+  const index=values.findIndex(v=>same(v,value)),last=Math.max(1,values.length-1);
+  return {label,display:grey?'custom':display(value),grey,disabled,position:Math.max(0,index)/last,step:1/last,
+   onPosition:p=>patchPlaced(patchOf(values[Math.round(p*(values.length-1))])),onReset:()=>patchPlaced(patchOf(values[0]))};
+ };
+ const toneNames=placedChord?stackNames(key,{...placedChord,voicing:undefined}):[];
+ const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+ const BORROW=[{label:'In key'},{label:'−2 st',shift:-2},{label:'−1 st',shift:-1},{label:'+1 st',shift:1},{label:'+2 st',shift:2},{label:'Major',quality:'major'},{label:'Minor',quality:'minor'},{label:'Dim',quality:'dim'},{label:'Aug',quality:'aug'}];
+ const borrowNow=placedChord?(BORROW.find(b=>(b.quality??undefined)===(placedChord.quality??undefined)&&(b.quality?true:(b.shift??0)===(placedChord.root.a??0)))??{label:`${placedChord.root.a>0?'+':''}${placedChord.root.a} st${placedChord.quality?' · '+cap(placedChord.quality):''}`}):null;
+ const stackSize=placedChord?chordStack(key,{...placedChord,voicing:undefined}).stack.length:0;
  const placedEncoders=placedChord?[
-  optionEncoder('Root',ROOTS,placedChord.rootVoicing??'on',x=>({'on':'On','-1':'−1 oct','-2':'−2 oct','off':'Off'}[x]),'rootVoicing'),
-  optionEncoder('Colour',CHORD_COLOURS,placedChord.colour??'plain',x=>({'plain':'Normal','sus2':'Sus2','sus4':'Sus4','add7':'Add7','add9':'Add9'}[x]),'colour'),
-  optionEncoder('Complexity',COMPLEXITIES,placedChord.complexity??'triad',x=>({power:'Power',triad:'Triad',seven:'Seventh'}[x]),'complexity'),
-  optionEncoder('Inversion',placedChordTones(key,{...placedChord,rootVoicing:'on',inversion:0}).map((_,i)=>i),placedChord.inversion??0,x=>String(x),'inversion'),
+  pick('Length',COMPLEXITIES,placedChord.complexity??'triad',x=>({power:'Diad',triad:'Triad',seven:'Seventh'}[x]),v=>({complexity:v}),{grey:greyChord}),
+  pick('Borrow',BORROW,borrowNow,b=>b.label,b=>b.quality?{quality:b.quality}:{quality:undefined,root:{...placedChord.root,a:b.shift??0}},{grey:greyChord}),
+  pick('Flavour',FLAVOURS,placedChord.colour??'plain',x=>({plain:'Natural',sus2:'Sus2',sus4:'Sus4',add6:'Add6',add9:'Add9',flat2:'♭9',add7:'Add7'}[x]??x),v=>({colour:v}),{grey:greyChord}),
+  pick('Inversion',Array.from({length:Math.max(1,stackSize-(placedChord.omit?.length??0))},(_,i)=>i),placedChord.inversion??0,x=>String(x),v=>({inversion:v}),{grey:greyChord}),
  ]:[];
+ const styleOf=placedChord?.strikes?'custom':placedChord?.playMode??'chord',running=['arp','roll','pulse'].includes(placedChord?.playMode??'chord');
+ const cycle=placedChord&&project?Math.round(project.stepsPerBar/(placedChord.rate??1)):0;
+ const patterns=['straight',...(RATE_PATTERNS[cycle]??[])],maskNow=placedChord?.mask??'straight';
+ if(placedChord&&!patterns.includes(maskNow))patterns.push(maskNow);
+ const maskText=m=>m==='straight'?'Straight':m.replace(/\./g,'·');
  const playEncoders=placedChord?[
-  optionEncoder('Play mode',['chord','arp'],placedChord.playMode??'chord',x=>x==='chord'?'At once':'Arpeggio','playMode'),
-  optionEncoder('Direction',DIRECTIONS,placedChord.direction??'up',x=>({up:'Up',down:'Down',random:'Random',upDown:'Up/down',downUp:'Down/up',broken:'Broken'}[x]),'direction'),
-  optionEncoder('Arp hold',HOLDS,placedChord.hold??1,x=>x==='end'?'To end':`${x} note${x===1?'':'s'}`,'hold'),
-  optionEncoder('Arp rate',RATES,placedChord.rate??1,x=>`${x} step${x===1?'':'s'}`,'rate'),
+  pick('Style',STYLES,placedChord.playMode??'chord',x=>({chord:'Sustain',arp:'Arpeggio',roll:'Roll',pulse:'Pulse'}[x]),v=>({playMode:v}),{grey:greyPlay}),
+  pick('Direction',DIRECTIONS,placedChord.direction??'up',x=>({up:'Up',down:'Down',random:'Random',upDown:'Up/down',downUp:'Down/up',broken:'Broken',out:'Out',in:'In'}[x]),v=>({direction:v}),{grey:greyPlay,disabled:!['arp','roll'].includes(placedChord.playMode??'chord')}),
+  pick('Note length',['auto',...NOTE_LENGTHS],placedChord.noteLen??'auto',x=>x==='auto'?'Auto':x==='tie'?'To next':x==='end'?'To end':`${x} step${x===1?'':'s'}`,v=>({noteLen:v==='auto'?undefined:v}),{grey:greyPlay}),
+  pick('Rate',RATES,placedChord.rate??1,x=>`${x} step${x===1?'':'s'}`,v=>({rate:v}),{grey:greyPlay,disabled:!running}),
+ ]:[];
+ const omits=omitOptions(stackSize,3);
+ const addNow=placedChord?.add?.[0];
+ const rhythmEncoders=placedChord?[
+  pick('Pattern',patterns,maskNow,maskText,v=>({mask:v==='straight'?undefined:v}),{grey:greyPlay,disabled:!['arp','pulse'].includes(placedChord.playMode??'chord')}),
+  pick('Omit',omits,placedChord.omit??(placedChord.rootVoicing==='off'?[0]:[]),x=>x.length?x.map(n=>cap(toneNames[n]??`#${n+1}`)).join(' + '):'None',v=>({omit:v}),{grey:greyChord}),
+  pick('Add',[null,...toneNames.map((_,i)=>i)],addNow?addNow.tone:null,x=>x===null?'None':cap(toneNames[x]??`#${x+1}`),v=>({omit:placedChord.omit??[],add:v===null?[]:[{tone:v,oct:addNow?.oct??1}]}),{grey:greyChord}),
+  pick('Added octave',[-2,-1,1,2],addNow?.oct??1,x=>(x>0?'+':'')+x,v=>({omit:placedChord.omit??[],add:addNow?[{...addNow,oct:v}]:[]}),{grey:greyChord,disabled:!addNow}),
+ ]:[];
+ // custom strikes: every note the chord plays, as it plays it; touching one freezes the chord's playing as exactly these strikes
+ const chordTones=placedChord?placedChordTones(key,placedChord):[];
+ const strikeList=placedChord?chordStrikes(key,placedChord).map(s=>({at:s.at,tone:chordTones.indexOf(s.note),len:Math.max(1,Math.round(Math.min(s.len,placedChord.len-s.at))),...(s.vel!==undefined?{vel:s.vel}:{})})):[];
+ if(!placedChord?.strikes)strikeList.sort((a,b)=>a.at-b.at||a.tone-b.tone);
+ const strikeAt=Math.min(strikeIndex,Math.max(0,strikeList.length-1)),strike=strikeList[strikeAt];
+ const editStrike=change=>patchPlaced({strikes:strikeList.map((s,i)=>i===strikeAt?{...s,...change}:s)});
+ const customEncoders=placedChord&&strike?[
+  {label:'Strike',display:`${strikeAt+1}/${strikeList.length} ${noteName(chordTones[strike.tone])}`,position:strikeList.length>1?strikeAt/(strikeList.length-1):0,step:1/Math.max(1,strikeList.length-1),disabled:strikeList.length<2,
+   onPosition:p=>setStrikeIndex(Math.round(p*(strikeList.length-1))),onReset:()=>setStrikeIndex(0)},
+  {label:'Offset',display:`${strike.at} step${strike.at===1?'':'s'}`,position:strike.at/Math.max(1,placedChord.len-1),step:1/Math.max(1,placedChord.len-1),onPosition:p=>editStrike({at:Math.round(p*(placedChord.len-1))}),onReset:()=>editStrike({at:0})},
+  {label:'Length',display:`${strike.len} step${strike.len===1?'':'s'}`,position:(strike.len-1)/15,step:1/15,onPosition:p=>editStrike({len:1+Math.round(p*15)}),onReset:()=>editStrike({len:1})},
+  {label:'Velocity',display:`${Math.round((strike.vel??placedChord.vel??.8)*100)}%`,position:((strike.vel??placedChord.vel??.8)-.05)/.95,step:.05,onPosition:p=>editStrike({vel:Math.round((.05+p*.95)*20)/20}),onReset:()=>editStrike({vel:undefined})},
  ]:[];
  const firstItem=editSelection[0],firstData=selectedData[0],firstNote=firstItem?.type==='generated'?firstItem.items[0]:firstItem,firstStep=firstNote?.type==='note'?pattern?.steps[firstNote.start]:null;
  const firstMeta=firstItem?.type==='generated'?firstStep?.n?.[firstNote.index]:firstData;
@@ -441,11 +482,53 @@ export default function AllPage(){
   metaEncoder('Note gate','gate',firstMeta?.gate??firstStep?.gate??(firstItem.type==='chord'?1:pattern.gate??.8),.05,1,x=>`${Math.round(x*100)}%`,.05),
   metaEncoder('Chance','prob',firstMeta?.prob??firstStep?.prob??1,0,1,x=>`${Math.round(x*100)}%`,.05),
  ]:[];
+ // The tab buttons keep a fixed count; what they open depends on what is being edited: a chord's five pages, a note's level page, a bar's chord, or the pattern.
+ const SCREEN_SLOTS=5;
+ const contextPages=placedChord?[
+  {id:'placed',label:'Chord',encoders:placedEncoders},
+  {id:'play',label:'Play',encoders:playEncoders},
+  {id:'rhythm',label:'Rhythm',encoders:rhythmEncoders},
+  {id:'custom',label:'Custom',encoders:customEncoders,disabled:!strike},
+  {id:'meta',label:'Level',encoders:metaEncoders,disabled:!firstData},
+ ]:selectedChord?[{id:'timeline',label:'Bars',encoders:chordEncoders}]
+  :firstData?[{id:'meta',label:'Note',encoders:metaEncoders}]
+  :[{id:'seq',label:'Seq',encoders:[encoders[1],encoders[2],encoders[0]]}];
+ const screenPages=[...contextPages,...Array.from({length:SCREEN_SLOTS-contextPages.length},(_,i)=>({id:'unused'+i,label:'',blank:true,disabled:true,encoders:[]}))];
  const stackChoice=deleteStack&&(deleteStack.index===deleteStack.items.length?'ALL':deleteStack.items[deleteStack.index].type!=='note'?`CHORD ${noteName(deleteStack.items[deleteStack.index].midi)}`:`NOTE ${noteName(deleteStack.items[deleteStack.index].midi)}`);
  const keyName=key?`${TONIC_NAMES[key.tonic]} ${key.scaleId.replace('-',' ')}`:'—';
+ // The window names what is selected (its chord, when in the sequence it plays, what it does), not the song: the song is shown only when nothing is selected.
+ const spb=project?.stepsPerBar??16;
+ const when=step=>`BAR ${Math.floor(step/spb)+1} · BEAT ${Math.floor((step%spb)/4)+1}${step%4?`.${step%4+1}`:''}`;
+ const howLong=len=>len%spb===0?`${len/spb} BAR${len===spb?'':'S'}`:`${len} STEP${len===1?'':'S'}`;
+ const progressionAt=step=>project?[...project.chords].reverse().find(c=>c.bar*spb<=step):null;
+ const chordSummary=c=>{
+  if(!c)return '';
+  const parts=[];
+  const mode=c.strikes?'EXACT STRIKES':({chord:'SUSTAIN',arp:`ARPEGGIO ${(c.direction??'up').toUpperCase()}`,roll:`ROLL ${(c.direction??'up').toUpperCase()}`,pulse:'PULSE'}[c.playMode??'chord']);
+  parts.push(mode);
+  if(!c.strikes&&['arp','roll','pulse'].includes(c.playMode))parts.push(`EVERY ${c.rate??1} STEP${(c.rate??1)===1?'':'S'}${c.mask?' · '+c.mask.replace(/./g,'·'):''}`);
+  if(c.voicing)parts.push('EXACT VOICING');
+  else{
+   parts.push({power:'DIAD',triad:'TRIAD',seven:'SEVENTH'}[c.complexity??'triad']);
+   if(c.colour&&c.colour!=='plain')parts.push(c.colour.replace('flat2','♭9').toUpperCase());
+   if(c.quality)parts.push(c.quality.toUpperCase());
+   if(c.inversion)parts.push(`INVERSION ${c.inversion}`);
+   if(c.omit?.length)parts.push('NO '+c.omit.map(i=>(toneNames[i]??'tone').toUpperCase()).join(' + '));
+   if(c.add?.length)parts.push('+ '+c.add.map(x=>(toneNames[x.tone]??'tone').toUpperCase()+(x.oct>0?' ↑':' ↓')).join(' '));
+  }
+  return parts.join(' · ');
+ };
+ const owner=`SEQ ${selected+1} · ${seqInfo.label.toUpperCase()}`;
+ const placedName=placedChord?(progressionAt(placedChord.start)?.name??noteName(degreeToMidi(key,placedChord.root))):'';
  const lines=arrangement
   ?['ARRANGEMENT · SEQUENCERS × PROGRESSIONS',project?`${keyName} · ${project.bars} BARS · ${bpm} BPM`:'NO SONG YET',`ROW BUTTONS: ${(rowAction??'select').toUpperCase()} · TAP A PAD TO SELECT`]
-  :[`SEQ ${selected+1} · ${seqInfo.label.toUpperCase()} · ${chordMode?'CHORD':(pattern?.mode??'empty').toUpperCase()}`,project?`${keyName} · ${project.bars} BARS · ${bpm} BPM`:'NO SONG YET',deleteStack?`DELETE ${stackChoice} (${deleteStack.index+1}/${deleteStack.items.length+1})`:copyMode?copySource?'COPY · TAP DESTINATIONS':'COPY · SELECT SOURCE':editSelection.length>1?`${editSelection.length} ITEMS SELECTED`:placedChord?`${placedChord.sourceGroup?'GENERATED':'PLACED'} CHORD ${noteName(degreeToMidi(key,placedChord.root))} · ${placedChord.len} STEPS`:firstItem?`NOTE ${noteName(firstItem.midi)} · ${firstLen} STEPS`:selectedChord?`CHORD ${selectedChord.name} · BARS ${selectedSpan.start+1}–${selectedSpan.end}`:editMode?'EDIT · TAP TO SELECT':playing?'PLAYING':'STOPPED'];
+  :deleteStack?[`${owner} · DELETE MODE`,`DELETE ${stackChoice} (${deleteStack.index+1}/${deleteStack.items.length+1})`,'PRESS DELETE TO CONFIRM · TAP THE PAD AGAIN FOR THE NEXT']
+  :copyMode?[`${owner} · COPY`,copySource?'TAP DESTINATIONS':'SELECT A SOURCE','']
+  :editSelection.length>1?[`${owner} · SELECTION`,`${editSelection.length} ITEMS`,'EDIT THEM TOGETHER ON THE LEVEL PAGE']
+  :placedChord?[`${owner} · ${placedChord.sourceGroup?'GENERATED':'PLACED'} CHORD`,`${placedName} · ${when(placedChord.start)} · ${howLong(placedChord.len)}`,chordSummary(placedChord)]
+  :firstItem?[`${owner} · NOTE`,`${noteName(firstItem.midi)} · ${when(firstItem.start)} · ${howLong(firstLen)}`,`VELOCITY ${Math.round((firstMeta?.vel??firstStep?.vel??.8)*100)}%`]
+  :selectedChord?[`${owner} · PROGRESSION CHORD`,`${selectedChord.name} · BARS ${selectedSpan.start+1}–${selectedSpan.end}`,`${selectedChord.numeral?selectedChord.numeral+' · ':''}${keyName}`]
+  :[`${owner} · ${chordMode?'CHORD':(pattern?.mode??'empty').toUpperCase()}`,project?`${keyName} · ${project.bars} BARS · ${bpm} BPM`:'NO SONG YET',editMode?'EDIT · TAP TO SELECT':playing?'PLAYING':'STOPPED'];
  const bar=project?Math.floor(col/project.stepsPerBar)+1:1;
 
  if(typeof window!=='undefined')window.__allBooked=booked.current;// notes booked per role, for checking the page
@@ -477,13 +560,7 @@ export default function AllPage(){
    <header className="device-head"><h2>Sequencer</h2><span>{project?`${seqInfo.label} · bar ${bar} of ${project.bars}${pattern?'':' · empty'}`:'start the orchestra'}</span></header>
    <div className="s8">
     <div className="s8-left">
-     <SeqScreen accent={COLOURS[role]} page={screenPage} onPage={setScreenPage} pages={[
-      {id:'seq',label:'Seq',encoders:[encoders[1],encoders[2]]},
-      {id:'sound',label:'Gate',encoders:[encoders[0]]},
-      {id:selectedChord?'timeline':'placed',label:selectedChord?'Bars':'Chord',encoders:selectedChord?chordEncoders:placedEncoders,disabled:!selectedChord&&!placedChord},
-      {id:'arp',label:'Arp',encoders:playEncoders,disabled:!placedChord},
-      {id:'meta',label:'Note',encoders:metaEncoders,disabled:!firstData},
-     ]} lines={lines}/>
+     <SeqScreen accent={COLOURS[role]} page={screenPage} onPage={setScreenPage} pages={screenPages} lines={lines}/>
      <div className="s8-transport" role="group" aria-label="Transport">
       <button type="button" className={'tp play'+(playing?' on':'')} aria-pressed={playing} disabled={!started||!project} onClick={()=>play()}><b>▶</b><small>Play</small></button>
       <button type="button" className={'tp'+(paused?' on':'')} aria-pressed={paused} disabled={!playing} onClick={pause}><b>⏸</b><small>Pause</small></button>

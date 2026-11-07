@@ -4,6 +4,7 @@
 // beats and lengths are in the meter's units (a unit is a beat), and a step is a quarter of a unit (sixteenths in a bar of quarter notes).
 import { makeKey, midiToDegree } from './harmony';
 import { DRUMS } from '../app/percussion';
+import { parsePattern } from '../synths/all/chordParse';
 
 export const STEPS_PER_UNIT = 4;
 /** The parts the generator plays with notes (the percussion is the drum sequencer's). */
@@ -59,7 +60,23 @@ export function capturePattern(records, role, { key, stepsPerBar }) {
     const poly = steps.some((s) => s && s.n.length > 1);
     // a note that holds into the next step's start is cut there (heldSteps); a rest after it is the tie
     for (const s of steps) if (s) { s.n.sort((a, b) => a.d * 12 + a.a - (b.d * 12 + b.a)); s.vel = Math.round(s.vel * 100) / 100; if (s.len === 1) delete s.len; }
-    return { mode: poly ? 'poly' : 'note', follow: 'scale', length, steps };
+    const pattern = { mode: poly ? 'poly' : 'note', follow: 'scale', length, steps };
+    return role === 'pad' || role === 'rhythm' ? withoutLines(pattern, key, stepsPerBar) : pattern;
+}
+
+/**
+ * A generated chord part that is a figure (a composed rhythm of single notes) rather than a chord is a note line: it keeps its notes but loses its chord tag,
+ * so the sequencer shows and edits it as notes (synths/all/chordParse.js decides).
+ */
+function withoutLines(pattern, key, stepsPerBar) {
+    const lines = new Set(parsePattern(pattern, key, stepsPerBar).filter((g) => g.kind === 'line').map((g) => g.group));
+    if (!lines.size) return pattern;
+    const steps = pattern.steps.map((s) => s?.n ? { ...s, n: s.n.map((note) => {
+        if (!lines.has(note.chordSource?.group)) return note;
+        const { chordSource, ...plain } = note;
+        return plain;
+    }) } : s);
+    return { ...pattern, steps };
 }
 
 /** The chords by bar, for the display: [{ bar, name, numeral }] (a bar is listed when the chord changes). */
