@@ -1,1 +1,0 @@
-function n(r,t){try{const e=window.localStorage.getItem(r);return e===null?t:JSON.parse(e)}catch{return t}}function a(r,t){try{return window.localStorage.setItem(r,JSON.stringify(t)),!0}catch{return!1}}export{n as l,a as s};
