@@ -26,7 +26,7 @@ import { stepEvents } from './core';
  */
 const hasNotes = (p) => { const rows = Array.isArray(p) ? p : p?.rows; return !Array.isArray(rows) || rows.some((r) => !Array.isArray(r) || r.some(Boolean)); };
 
-export function createScheduler({ now, bank, pattern = (p) => p, events: makeEvents = stepEvents, tempo, swing, flam, fill = () => false, emit, onStep, clock = null, onEnd, lookahead = 0.12, interval = 25, timers = { set: (fn, ms) => setInterval(fn, ms), clear: (id) => clearInterval(id) } }) {
+export function createScheduler({ now, bank, pattern = (p) => p, events: makeEvents = stepEvents, tempo, swing, flam, fill = () => false, emit, onStep, beforeStep, clock = null, onEnd, lookahead = 0.12, interval = 25, timers = { set: (fn, ms) => setInterval(fn, ms), clear: (id) => clearInterval(id) } }) {
     let timer = null, nextTime = 0, step = 0, slot = 0, current = 0, count = 0, songAt = 0, rep = 0, primed = false, paused = false, scope = 'song', songValid = false, wrapped = false;
     // Song mode: the bank's song is a list of { p: pattern, n: repeats }; it replaces the chain while bank.songOn is set
     const songMode = (b) => scope === 'song' && !!(b.songOn && b.song?.length);
@@ -72,6 +72,9 @@ export function createScheduler({ now, bank, pattern = (p) => p, events: makeEve
     };
     const playStep = () => {
         changePattern(bank());
+        // Hosts can atomically publish a prepared bank at a sequence boundary.
+        // Read its length, tempo, key and notes afterwards, keeping this clock.
+        beforeStep?.({ pattern: current, step, time: nextTime, count, cycle: slot });
         const b = bank(), len = lengthOf(), bpm = b.tempos[current] || tempo(), stepSec = 60 / bpm / 4;
         const events = makeEvents(pattern(b.patterns[current], { bank: b, index: current }), step, { time: nextTime, stepSec, swing: swing(), flam: flam(), count, cycle: slot, fill: fill(), length: len, free: !!b.freeRun });
         clock?.record({ count, time: nextTime, stepSec, pattern: current, step, length: len });

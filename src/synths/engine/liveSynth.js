@@ -26,7 +26,9 @@ export function loadKernel(){
 export function startLiveSynth({model=MODELS.cs80,params=[],waves=null,rack=cleanRack(),latency='interactive',context:sharedContext,destination,polyphony,onStats=()=>{},onError=()=>{}}={}){
  const Context=window.AudioContext||window.webkitAudioContext;
  const context=sharedContext??new Context({latencyHint:latency});
- const resumed=Number.isFinite(context.length)?Promise.resolve():context.resume().catch(()=>{});
+ // A shared context belongs to its host, which wakes it on Play. Awaiting its
+ // resume here deadlocks setup restoration behind the browser's gesture gate.
+ const resumed=sharedContext||Number.isFinite(context.length)?Promise.resolve():context.resume().catch(()=>{});
  let outboard,monitor,node;
  return (async()=>{
   if(!context.audioWorklet)throw Error('Audio needs a secure page: open this over https:// (or localhost), not plain http.');

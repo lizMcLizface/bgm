@@ -45,6 +45,7 @@ export function planProgressions(plan, count) {
 export function capturePattern(records, role, { key, stepsPerBar, preserveTails = false }) {
     const length = records.length * stepsPerBar, steps = Array(length).fill(null);
     records.forEach((record, bar) => {
+        const local=record.music?makeKey(record.music.mode,record.music.tonic):key,different=local.tonic!==key.tonic||JSON.stringify(local.scale)!==JSON.stringify(key.scale);
         for (const e of record.events ?? []) {
             if (e.role !== role || !Number.isFinite(e.midi)) continue;
             const at = bar * stepsPerBar + clamp(Math.round(e.beat * STEPS_PER_UNIT), 0, stepsPerBar - 1);
@@ -52,7 +53,7 @@ export function capturePattern(records, role, { key, stepsPerBar, preserveTails 
             const note = midiToDegree(key, e.midi), step = steps[at] ??= { n: [], vel: 0, len: 1 };
             if (step.n.some((x) => x.d === note.d && x.a === note.a)) continue;
             const source=e.chordSource;
-            step.n.push({ d: note.d, o: 0, a: note.a, ...(source&&Number.isInteger(source.root)?{chordSource:{...source,group:`${role}:${bar}`}}:{}) });
+            step.n.push({ d: note.d, o: 0, a: note.a, ...(different?{transposeDegree:{...midiToDegree(local,e.midi),key:`${local.tonic}:${local.scale.join(',')}`}}:{}), ...(source&&Number.isInteger(source.root)?{chordSource:{...source,group:`${role}:${bar}`}}:{}) });
             step.vel = Math.max(step.vel, clamp(e.velocity ?? 0.8, 0.05, 1));
             step.len = Math.max(step.len, len);
         }
@@ -122,13 +123,13 @@ export function captureProgressions(records) {
         const cycle = record.music?.cycleStart;
         const current = progressions[progressions.length - 1];
         if (!current || (cycle !== undefined && cycle !== current.cycle)) {
-            progressions.push({ startBar: bar, bars: 1, cycle });
+            progressions.push({ startBar: bar, bars: 1, cycle, ...(record.music?{key:makeKey(record.music.mode,record.music.tonic)}:{}) });
         } else {
             current.bars++;
         }
     });
-    return progressions.map(({ startBar, bars }) => ({
-        startBar, bars, chords: captureChords(records.slice(startBar, startBar + bars)),
+    return progressions.map(({ startBar, bars, key }) => ({
+        startBar, bars, ...(key?{key}:{}), chords: captureChords(records.slice(startBar, startBar + bars)),
     }));
 }
 

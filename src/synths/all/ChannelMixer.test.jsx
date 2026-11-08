@@ -32,7 +32,7 @@ it('exposes every delay and reverb property, edits it, and disables unavailable 
  act(()=>container.querySelector('button[title^="Ambience:"]').click());
  expect(slider('Property value').getAttribute('aria-disabled')).toBe('true');
  expect(slider('Reverb').getAttribute('aria-disabled')).toBe('true');
- expect(container.textContent).toContain('other controls are visual only');
+ expect(container.textContent).not.toContain('visual only');
 });
 
 it('disables manual delay time when synchronized',()=>{

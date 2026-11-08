@@ -27,7 +27,11 @@ import {chainUnits,maskFromUnits} from '../effects/order';
 import {createMeter,meterLevel} from './meter';
 import {masterBus} from '../../audio/bus';
 import {presetFromEdit} from '../../app/editor/presetEdits';
-import {readBook,withPresetBook,applyBook} from '../../app/rulebook/session';
+import {createMixerAudio,createDeskLimiter} from './mixerAudio';
+import {readBook,withPresetBook,applyBook,cleanBook,baselineChoice,withoutSettings} from '../../app/rulebook/session';
+import {RULES} from '../../app/rulebook/model';
+import {DRUM_TRACKS} from '../../app/drumMappings';
+import {DRUMS} from '../../app/percussion';
 
 // as on the pages (ui/SynthShell): the instrument's own space controls are moved into the rack, and a rack that has not been touched holds only the effects the sound uses
 const MOVED = { moved: true };
@@ -83,8 +87,23 @@ export function createHost(scene, {seed,settings:storedSettings} = {}) {
     const spaces = {}; // role -> independent mixer delay and reverb settings
     const natives = {}; // role -> { synth, name, preset } for a piano, measured-instrument or string voice (the preset as edited)
     const hostScene = { scene };
+    let book=withPresetBook(scene.rulebook,{rules:{},baseline:{}});
+    applyBook(g,book);
+    function restoreBook(saved){book=cleanBook({version:1,...saved});applyBook(g,book);}
+    function editSettings(patch){
+        const clean=sanitizeSettings(patch,g.settings);
+        const edits=Object.fromEntries(Object.keys(patch).map(key=>[key,clean[key]]).filter(([,value])=>value!==undefined));
+        book=withoutSettings(book,edits,g.settings);g.setMany(edits);
+    }
+    function editRule(id,choice){
+        const rule=RULES.find(r=>r.id===id);if(!rule)return;
+        const rules={...book.rules},baseline={...book.baseline};
+        if(choice){if(rule.path&&!baseline[id])baseline[id]=baselineChoice(rule,g.settings);rules[id]=choice;}else delete rules[id];
+        applyBook(g,{...book,rules,baseline});if(!choice)delete baseline[id];book={...book,rules,baseline};
+    }
     loaded.perc = BROWSABLE_SCENES.includes(scene)?{synth:'scene',name:scene.name}:{synth:'kit',name:settings.drums.kit,kit:settings.drumKit};
     const meterTaps = new Set();
+    let deskAudio=null,deskState=null;
     let drumMask = null, drumMix={muted:[],solo:[]};
     if (g.settings.drumKit) {
         const rack = RACK_PARAMS.sanitize({ ...cleanRack(), 'effects.reverb': g.settings.drumKit.room });
@@ -126,7 +145,7 @@ export function createHost(scene, {seed,settings:storedSettings} = {}) {
     }
 
     async function applyFrontPageLink(link) {
-        applyBook(g,withPresetBook(link.scene?.rulebook,readBook(link.search)));
+        book=withPresetBook(link.scene?.rulebook,readBook(link.search));applyBook(g,book);
         for(const [role,preset] of Object.entries(link.share?.presets??{})){
             if(!SEQUENCERS.some(s=>s.role===role))throw new Error(`Unknown voice: ${role}`);
             if(preset?.external||preset?.machine)await setReference(role,preset.external??preset.machine);
@@ -225,11 +244,31 @@ export function createHost(scene, {seed,settings:storedSettings} = {}) {
             }else from.connect(rack.input);
             rack.connect(to);r.mixerRack=rack;
         }
+        const limiter=await createDeskLimiter(g.AC);
+        if(disposed){limiter.disconnect();ensureActive();}
+        deskAudio=createMixerAudio(g.AC,SEQUENCERS.map(s=>s.role),limiter);
+        g.mixReturn=deskAudio.channels.headroom.input;
+        for(const {role} of SEQUENCERS){
+            const output=g.roles[role].wander.output;
+            output.disconnect(g.output);output.connect(deskAudio.channels[role].input);
+            g.roles[role].mixOutput=deskAudio.channels[role].output;
+            deskAudio.channels[role].output.connect(deskAudio.channels.headroom.input);
+        }
+        // Migrate completed racks now. Pending racks resolve the same routing
+        // when they finish, without holding the desk open during loading.
+        g.routeSharedEffects?.();
+        deskAudio.channels.headroom.output.connect(g.output);
+        g.levelTrim.disconnect(masterBus);g.levelTrim.connect(deskAudio.input);
+        g.ambienceOut.disconnect(masterBus);g.ambienceOut.connect(deskAudio.channels.ambience.input);
+        deskAudio.channels.ambience.output.connect(deskAudio.input);
+        deskAudio.output.connect(masterBus);deskAudio.patch(deskState);
     }
+    function applyDesk(state){deskState=state;deskAudio?.patch(state);}
 
     function openMeters() {
-            const meters=Object.fromEntries(SEQUENCERS.map(({role})=>[role,createMeter(g.AC,g.roles[role].wander.output)]));
-            meters.ambience=createMeter(g.AC,g.ambienceOut);
+            const meters=Object.fromEntries(SEQUENCERS.map(({role})=>[role,createMeter(g.AC,deskAudio?.channels[role].output??g.roles[role].wander.output)]));
+            meters.ambience=createMeter(g.AC,deskAudio?.channels.ambience.output??g.ambienceOut);
+            if(deskAudio)meters.headroom=createMeter(g.AC,deskAudio.channels.headroom.output);
             const splitter=g.AC.createChannelSplitter(2);
             masterBus.connect(splitter);
             const left=g.AC.createAnalyser(),right=g.AC.createAnalyser();
@@ -277,7 +316,10 @@ export function createHost(scene, {seed,settings:storedSettings} = {}) {
     /** A control of such a voice moved: the preset is loaded again with it. */
     async function editNative(role, changes) {
         const entry = natives[role];
-        if (!entry) return;
+        if (!entry) {
+            if(!sounds[role]&&role!=='perc')for(const [key,value] of Object.entries(changes))g.setRoleParam(role,key,value);
+            return;
+        }
         entry.preset = { ...entry.preset, ...changes };
         if ('reverbAmount' in changes) await editMixer(role, { 'effects.reverb': changes.reverbAmount });
         if (Object.keys(changes).some(key=>key!=='reverbAmount'))
@@ -335,6 +377,7 @@ export function createHost(scene, {seed,settings:storedSettings} = {}) {
             return;
         }
         const model = SYNTHS[sounds[role].synth];
+        values=model.params.sanitize(values);
         const previous=rackForPatch(model,sounds[role].values,sounds[role].rack,MOVED);
         const next=rackForPatch(model,values,sounds[role].rack,MOVED);
         const changed=Object.fromEntries(Object.entries(mixerSpace(next)).filter(([key,value])=>value!==previous[key]));
@@ -468,7 +511,11 @@ export function createHost(scene, {seed,settings:storedSettings} = {}) {
 
     function drum(hit, time, stepSec) {
         const instrument = g.roles.perc.instrument, start = Math.max(time, g.AC.currentTime);
-        if (hit.track && instrument.hitTrack) instrument.hitTrack(hit.track, hit.drum, start, hit.velocity);
+        const track=hit.track??DRUM_TRACKS[sounds.perc?.synth]?.[DRUMS[hit.drum]];
+        if (track && instrument.hitTrack) {
+            if(hit.params&&Object.keys(hit.params).length)instrument.hitTrack(track,hit.drum,start,hit.velocity,hit.params);
+            else instrument.hitTrack(track, hit.drum, start, hit.velocity);
+        }
         else instrument.scheduleNote(hit.drum, start, hit.duration * stepSec, hit.velocity, hit.vary ?? 0);
     }
     function drumTrack(track) {
@@ -477,10 +524,10 @@ export function createHost(scene, {seed,settings:storedSettings} = {}) {
     }
 
     return {
-        g, settings, loaded, applySceneVoices, applyFrontPageLink, setSound, setPreset, soundOf, nativeOf, editNative, editValues, editDrumKit, rackValues, editRack, editMixer, mixerSnapshot, restoreMixer, snapshotSounds, restoreSounds, setupMixer, setTempo, openMonitor, openMeters, capture, note, tunedNote, drum, drumTrack, setDrumMix, getDrumMix,
+        g, settings, loaded, editSettings,editRule,restoreBook,get book(){return book;}, applySceneVoices, applyFrontPageLink, setSound, setPreset, soundOf, nativeOf, editNative, editValues, editDrumKit, rackValues, editRack, editMixer, mixerSnapshot, restoreMixer, snapshotSounds, restoreSounds, setupMixer, applyDesk, setTempo, openMonitor, openMeters, capture, note, tunedNote, drum, drumTrack, setDrumMix, getDrumMix,
         get context() { return g.AC; },
         async wake() { await g.AC.resume(); if (g.percussionReady) await g.percussionReady; g.endStopFade?.(); },
         setScene(next) { hostScene.scene = next; },
-        dispose() { disposed=true; meterTaps.forEach(tap=>tap.dispose());g.stopAll?.(); Object.values(g.roles).forEach((r) => { r.sourceRevision=(r.sourceRevision??0)+1; r.instrument?.dispose?.(); r.ensembleRack?.dispose?.(); r.mixerRack?.dispose?.(); r.wander?.dispose?.(); }); },
+        dispose() { if(disposed)return;disposed=true; meterTaps.forEach(tap=>tap.dispose());g.stopAll?.();g.disposeSharedEffects?.();deskAudio?.dispose();g.output?.disconnect();g.levelTrim?.disconnect();g.ambienceOut?.disconnect(); Object.values(g.roles).forEach((r) => { r.sourceRevision=(r.sourceRevision??0)+1; r.instrument?.dispose?.(); r.ensembleRack?.dispose?.(); r.mixerRack?.dispose?.(); r.wander?.dispose?.(); }); },
     };
 }

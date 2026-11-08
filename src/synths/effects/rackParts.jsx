@@ -7,6 +7,7 @@ import RackGraphic from './RackGraphic';
 import ZPlaneScope from './ZPlaneScope';
 import './rack.css';
 import {UNITS,TAIL_UNITS,DEFAULT_CHAIN,orderFromCode,codeFromOrder,moveUnit,cleanOrder,chainUnits,maskFromUnits,addUnit} from './order';
+import {BOX_UNITS,logicalOrder,logicalChain,routingPatch} from './routing';
 
 // a tile of the chain display is TILE px square; at least MIN_GAP px between two
 const TILE=80,MIN_GAP=28;
@@ -30,6 +31,7 @@ export const BLOCKS=[
  {id:'shimmer',name:'Shimmer',colour:'#a9c8ec',keys:[['shimmer.mix','Mix'],['shimmer.decay','Decay'],['shimmer.interval','Interval'],['shimmer.climb','Climb'],['shimmer.tone','Tone']]},
  {id:'freeze',name:'Freeze',colour:'#9fd6e0',keys:[['freeze.mix','Mix'],['freeze.length','Length'],['freeze.fade','Fade'],['freeze.hold','Hold']]},
  {id:'zplane',name:'Z-plane',colour:'#c9a0f0',keys:[['zplane.a','Shape A'],['zplane.b','Shape B'],['zplane.morph','Morph'],['zplane.shift','Shift'],['zplane.q','Resonance'],['zplane.mix','Mix']]},
+ {id:'vibrato',name:'Vibrato',colour:'#a0c8ca',keys:[['vibrato.rate','Rate'],['vibrato.depth','Depth']]},
  {id:'input',name:'Input',colour:'#c6b4a3',keys:[['master.input','Level']]},
  {id:'master',name:'Output',colour:'#d1c6a6',keys:[['master.output','Level'],['inserts.gain','Insert trim']]},
 ];
@@ -55,15 +57,15 @@ export function RackControl({spec,value,label,block,onChange,disabled=false}){
 /** Delay time in milliseconds for a sync division (the 'master.sync' choices: 0 free, then 1/4, 1/8, dotted 1/8, 1/16, triplet 1/8, 1/2) at a tempo. */
 export const syncedDelayMs=(division,bpm)=>{const beats=[0,1,.5,.75,.25,1/3,2][division];return beats&&bpm>0?60000/bpm*beats:0;};
 
-/** The unit a tile moves with: Delay and Reverb are one unit ("space"); the instrument and the output do not move. */
-export const unitOf=id=>id==='delay'||id==='reverb'?'space':id==='master'||id==='instrument'||id==='input'?null:id;
-const UNIT_NAMES={space:'Delay + Reverb',saturation:'Saturation',eq:'Equalizer',phaser:'Phaser',flanger:'Flanger',chorus:'Chorus',compressor:'Compressor',filter:'Filter',tremolo:'Tremolo',crusher:'Bit crusher',ring:'Ring modulator',pitch:'Pitch shifter',width:'Stereo width',limiter:'Limiter',tape:'Tape',shimmer:'Shimmer',freeze:'Freeze',zplane:'Z-plane filter'};
-const UNIT_NOTES={filter:'cuts, low-pass, high-pass, band-pass, notch, shelves',tremolo:'volume wobble, auto-pan',crusher:'lo-fi bits and sample rate',ring:'metallic, bell-like tones',pitch:'octave up or down, harmonies',width:'mono to extra wide',limiter:'stops peaks clipping',tape:'wow, flutter and warmth',shimmer:'a rising, pitch-shifted tail',freeze:'holds a moment as a pad',zplane:'morphing vowels and filter shapes',saturation:'drive and warmth',eq:'three-band tone',phaser:'swirling sweep',flanger:'jet sweep',chorus:'thicken and widen',compressor:'level and glue',space:'echo and room'};
+/** Independent face identity. The legacy model below adapts delay/reverb to its shared space unit. */
+export const unitOf=id=>id==='master'||id==='instrument'||id==='input'?null:id;
+const UNIT_NAMES={vibrato:'Vibrato',space:'Delay + Reverb',saturation:'Saturation',eq:'Equalizer',phaser:'Phaser',flanger:'Flanger',chorus:'Chorus',compressor:'Compressor',filter:'Filter',tremolo:'Tremolo',crusher:'Bit crusher',ring:'Ring modulator',pitch:'Pitch shifter',width:'Stereo width',limiter:'Limiter',tape:'Tape',shimmer:'Shimmer',freeze:'Freeze',zplane:'Z-plane filter'};
+const UNIT_NOTES={vibrato:'stereo pitch movement',filter:'cuts, low-pass, high-pass, band-pass, notch, shelves',tremolo:'volume wobble, auto-pan',crusher:'lo-fi bits and sample rate',ring:'metallic, bell-like tones',pitch:'octave up or down, harmonies',width:'mono to extra wide',limiter:'stops peaks clipping',tape:'wow, flutter and warmth',shimmer:'a rising, pitch-shifted tail',freeze:'holds a moment as a pad',zplane:'morphing vowels and filter shapes',saturation:'drive and warmth',eq:'three-band tone',phaser:'swirling sweep',flanger:'jet sweep',chorus:'thicken and widen',compressor:'level and glue',space:'echo and room'};
 /** The units a set of rack values actually uses (any control away from its default), so a preset can bring them into the chain. */
 export function unitsUsedBy(values){
  const clean=cleanRack(),used=[];
  for(const unit of UNITS){
-  const keys=BLOCKS.filter(b=>unitOf(b.id)===unit).flatMap(b=>b.keys.map(k=>k[0])).concat(unit==='compressor'?['compressor.enabled']:[]);
+  const keys=BLOCKS.filter(b=>(['delay','reverb'].includes(b.id)?'space':unitOf(b.id))===unit).flatMap(b=>b.keys.map(k=>k[0])).concat(unit==='compressor'?['compressor.enabled']:[]);
   if(keys.some(k=>values[k]!==undefined&&values[k]!==clean[k]))used.push(unit);
  }
  return used;
@@ -91,10 +93,11 @@ export function activeUnits(values){
   tape:()=>v('tape.wow')>0||v('tape.flutter')>0||v('tape.drive')>0,shimmer:()=>v('shimmer.mix')>0,freeze:()=>v('freeze.mix')>0,zplane:()=>v('zplane.mix')>0,
  };
  // only units in the chain can be active: a unit that is not in it is not running, whatever its settings
+ if(values['master.routing']===1){active.delay=()=>v('effects.delay')>0;active.reverb=()=>v('effects.reverb')>0||v('effects.dry')!==1;return logicalChain(values).filter(u=>on(u)&&active[u]());}
  return chainUnits(values['master.chain']??DEFAULT_CHAIN).filter(u=>on(u)&&active[u]());
 }
 /** The chain mask with only the units that are doing something. */
-export const leanChain=values=>maskFromUnits(activeUnits(values));
+export const leanChain=values=>maskFromUnits(activeUnits(values).map(id=>id==='delay'||id==='reverb'?'space':id));
 
 /**
  * The rack as the panels show it: the tiles in signal order (the instrument first when the synth has instrument space, then
@@ -102,7 +105,8 @@ export const leanChain=values=>maskFromUnits(activeUnits(values));
  */
 // The instrument's own space (the voice's chorus, and a reverb on the synths that have one): its mix controls are the ones that make it audible
 const isMix=spec=>/(chorusMix|reverbMix|global\.chorus)$/.test(spec.key);
-export function useRackModel({values,onChange,instrumentSpecs=[],tempo=0,excludedUnits=[]}){
+function legacyRackModel({values,onChange,instrumentSpecs=[],tempo=0,excludedUnits=[]}){
+ const unitOf=id=>id==='delay'||id==='reverb'?'space':id==='master'||id==='instrument'||id==='input'?null:id;
  const order=orderFromCode(values['master.order']??0),chain=chainUnits(values['master.chain']??DEFAULT_CHAIN);
  const blocks=BLOCKS.map(block=>{const toggle=block.id==='compressor'?'compressor.enabled':block.id==='master'||block.id==='input'?null:'switch.'+block.id;return {...block,toggle,on:toggle?values[toggle]===1:true};});
  const byId=Object.fromEntries(blocks.map(b=>[b.id,b]));
@@ -131,11 +135,38 @@ export function useRackModel({values,onChange,instrumentSpecs=[],tempo=0,exclude
  const cleanUp=()=>{if(idle.length)onChange({'master.chain':maskFromUnits(chain.filter(c=>!idle.includes(c)))});};
  return {order,chain,blocks,tiles,tempo,instrumentName,moveBy,moveTo,canMove,available,addToChain,removeFromChain,idle,cleanUp};
 }
+export function useRackModel(options){return options.independentSpace||options.values['master.routing']===1?independentRackModel(options):legacyRackModel(options);}
+function independentRackModel({values,onChange,instrumentSpecs=[],tempo=0,excludedUnits=[]}){
+ const order=logicalOrder(values),chain=logicalChain(values),excluded=id=>excludedUnits.includes(id)||(['delay','reverb'].includes(id)&&excludedUnits.includes('space'));
+ const blocks=BLOCKS.map(block=>{const toggle=block.id==='compressor'?'compressor.enabled':block.id==='master'||block.id==='input'?null:'switch.'+block.id;return {...block,toggle,on:toggle?values[toggle]===1:true};});
+ const byId=Object.fromEntries(blocks.map(b=>[b.id,b]));
+ // it is a chorus when chorus is all it has, and it leaves the chain, like any effect, while its mix is at nothing
+ const mixSpecs=instrumentSpecs.filter(isMix),chorusOnly=mixSpecs.length>0&&mixSpecs.every(m=>/chorus/i.test(m.key));
+ const instrumentName=chorusOnly?(chain.includes('chorus')?'Voice chorus':'Chorus'):'Instrument';
+ const instrumentOn=instrumentSpecs.length>0&&(!mixSpecs.length||mixSpecs.some(m=>values[m.key]>0));
+ const tiles=[byId.input,...(instrumentOn?[{id:'instrument',name:instrumentName,colour:'#c6b4a3',toggle:null,on:true,graphic:chorusOnly?'chorus':'instrument'}]:[]),...order.filter(u=>chain.includes(u)&&!excluded(u)).map(id=>byId[id]),byId.master];
+ const setOrder=next=>onChange(routingPatch(values,{order:next}));
+ // moves are among the units in the chain; the ones out of it keep their places at the end
+ const visible=order.filter(u=>chain.includes(u)&&!excluded(u)&&!TAIL_UNITS.includes(u));
+ const moveBy=(id,d)=>{const u=unitOf(id);if(!u||TAIL_UNITS.includes(u))return;const to=visible[visible.indexOf(u)+d];if(to)setOrder(moveUnit(order,u,order.indexOf(to)));};
+ const moveTo=(id,targetId)=>{
+  const u=unitOf(id),t=unitOf(targetId);if(u&&t&&u!==t&&!TAIL_UNITS.includes(u)&&!TAIL_UNITS.includes(t))setOrder(moveUnit(order,u,order.indexOf(t)));};
+ const canMove=(id,d)=>{const u=unitOf(id);if(!u||TAIL_UNITS.includes(u))return false;const i=visible.indexOf(u);return d<0?i>0:i<visible.length-1;};
+ // adding puts a unit beside the one it usually follows, removing takes it out of the chain (its settings stay)
+ const available=[...(instrumentSpecs.length&&!instrumentOn?[{unit:'instrument',name:instrumentName,note:chorusOnly?"the voice's own chorus":"the voice's own space",tile:'instrument'}]:[]),...BOX_UNITS.filter(u=>!chain.includes(u)&&!excluded(u)).map(u=>({unit:u,name:UNIT_NAMES[u]??byId[u].name,note:UNIT_NOTES[u]??(u==='delay'?'echo, feedback and ping-pong':'room, hall and plate'),tile:u}))];
+// putting the voice's chorus back is turning its mix up
+ const addToChain=u=>{if(u==='instrument'){const m=mixSpecs[0];if(m)onChange({[m.key]:m.default>0?m.default:.4});return 'instrument';}if(!BOX_UNITS.includes(u))return;onChange(routingPatch(values,{chain:[...new Set([...chain,u])],order:addUnit(order,u)}));return u;};
+ const removeFromChain=id=>{if(id==='instrument'){const m=mixSpecs[0];if(m)onChange({[m.key]:0});return;}const u=unitOf(id);if(u)onChange(routingPatch(values,{chain:chain.filter(c=>c!==u)}));};
+ // clean up: take out every unit that is in the chain but doing nothing (their settings are kept)
+ const active=activeUnits({...values,...routingPatch(values)}),idle=chain.filter(u=>!excluded(u)&&!active.includes(u));
+ const cleanUp=()=>{if(idle.length)onChange(routingPatch(values,{chain:chain.filter(c=>!idle.includes(c))}));};
+ return {order,chain,blocks,tiles,tempo,instrumentName,moveBy,moveTo,canMove,available,addToChain,removeFromChain,idle,cleanUp};
+}
 
 /**
  * The signal chain as a loop: the top row runs left to right, the bottom row right to left, so the last tile of the top row
  * sits over the first of the bottom row. A tap selects a tile (after `tapDelay` ms, so that a second tap can be told apart), a
- * double tap switches it on or off, and a tile can be dragged onto another to move it (Delay and Reverb move together).
+ * double tap switches it on or off, and a tile can be dragged onto another to move it. The model owns routing semantics.
  */
 export function RackChain({tiles,selected,onSelect,onToggle,onMoveTo,movable=true,tapDelay=0}){
  const wrap=useRef(null),last=useRef({id:'',at:0,timer:0}),press=useRef(null),suppress=useRef(false),[fit,setFit]=useState(6),[drag,setDrag]=useState(null);
@@ -244,7 +275,7 @@ export function RackLevels({values,onChange}){
 
 /** One effect's controls (faders in a row), with its on/off switch and, when it can move, earlier and later buttons. */
 // specs: the parameter table the keys belong to (the rack's own unless a caller brings its own); headerProps: spread on the header, so a window can be dragged by it
-export function RackEffect({block,values,onChange,hidden,reduction=0,instrumentSpecs=[],model,movable=true,specs=RACK_PARAMS.BY_KEY,headerProps,renderChoice}){
+export function RackEffect({block,values,onChange,hidden,reduction=0,instrumentSpecs=[],model,movable=true,specs=RACK_PARAMS.BY_KEY,headerProps,renderChoice,controlsOnly=false}){
  const instrument=block.id==='instrument';
  // the first Mix / Send goes up beside the header, the dropdowns go in a row under the sliders
  // the filter shows the controls of its type: the cut pair, a cutoff and Q, or a cutoff and gain for the shelves
@@ -263,7 +294,7 @@ export function RackEffect({block,values,onChange,hidden,reduction=0,instrumentS
  };
  const control=([key,label])=><RackControl key={key} spec={specs[key]} value={values[key]} label={label} block={block.name} onChange={onChange} disabled={key==='effects.delayMs'&&values['master.sync']>0}/>;
  return <section className={'rack-block'+(block.on?'':' is-bypassed')+(instrument?' rack-instrument':'')} hidden={hidden} style={{'--rack-colour':block.colour}} aria-label={instrument?'Instrument space':block.name}>
-  <header {...headerProps}><RackGraphic kind={block.graphic??block.id} on={block.on}/><div><h3>{block.name}</h3></div>
+  {!controlsOnly&&<header {...headerProps}><RackGraphic kind={block.graphic??block.id} on={block.on}/><div><h3>{block.name}</h3></div>
    {block.toggle&&<button type="button" aria-label={block.name+' enabled'} aria-pressed={block.on} onClick={()=>onChange({[block.toggle]:block.on?0:1})}><i/>{block.on?'On':'Off'}</button>}
    {model?.removeFromChain&&(unitOf(block.id)||instrument)&&<button type="button" className="rack-remove" aria-label={'Remove '+block.name+' from the chain'} title="Take it out of the chain (its settings are kept)" onClick={()=>model.removeFromChain(block.id)}>✕ Remove</button>}
    {mix&&<div className="rack-mix">{control(mix)}</div>}
@@ -272,7 +303,8 @@ export function RackEffect({block,values,onChange,hidden,reduction=0,instrumentS
     <button type="button" aria-label={'Move '+block.name+' earlier'} disabled={!model.canMove(block.id,-1)} onClick={()=>model.moveBy(block.id,-1)} title="Move earlier in the chain">◀</button>
     <button type="button" aria-label={'Move '+block.name+' later'} disabled={!model.canMove(block.id,1)} onClick={()=>model.moveBy(block.id,1)} title="Move later in the chain">▶</button>
    </span>}
-  </header>
+  </header>}
+  {controlsOnly&&mix&&<div className="rack-mix">{control(mix)}</div>}
   <div className={'rack-main'+(choices.some(aside)?' has-aside':'')}>
   <div className={block.id==='compressor'?'rack-body':'rack-body is-plain'}>
   {block.id==='compressor'&&<div className="rack-reduction"><span>Gain reduction</span><meter min="0" max="24" value={Math.min(24,Math.abs(reduction))}/><output>{Math.abs(reduction).toFixed(1)} dB</output></div>}
@@ -306,6 +338,7 @@ export function RackCleanUp({model}){
 
 /** A preset that keeps the player's order and chain, and adds any unit the preset itself uses. */
 export function presetValues(preset,values){
+ if(values['master.routing']===1){const used=unitsUsedBy(preset.values).flatMap(u=>u==='space'?['delay','reverb']:[u]);return {...preset.values,...routingPatch(values,{chain:[...new Set([...logicalChain(values),...used])]})};}
  const mask=maskFromUnits([...new Set([...chainUnits(values['master.chain']??DEFAULT_CHAIN),...unitsUsedBy(preset.values)])]);
  return {...preset.values,'master.order':values['master.order']??0,'master.chain':mask};
 }

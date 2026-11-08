@@ -1,13 +1,13 @@
 import {WasmBackend} from '../../synth-lab/backend';
 import {FMBackend} from '../../synth-lab/fmBackend';
-import {createRack} from '../effects/graph';
+import {createWorkbenchRack} from '../effects/workbenchRack';
 import {createOutputMonitor} from '../effects/outputMonitor';
 import {POLY,FM} from './patches';
 import {tuning} from '../tuning';
 
 // Same source, inserts and FDN effects as the pre-existing lab renderers.
 // Only event IDs, flat panel parameters and the output scope are adapted.
-export function startDiySynth({kind,params=[],rack,latency='interactive',onStats=()=>{},onError=()=>{}}){
+export function startDiySynth({kind,params=[],rack,instances=null,parallel=null,latency='interactive',onStats=()=>{},onError=()=>{}}){
  const context=new (window.AudioContext||window.webkitAudioContext)({latencyHint:latency});
  const resumed=context.resume();
  const schema=kind==='fm'?FM:POLY,values=schema.params.defaultValues();
@@ -38,9 +38,9 @@ export function startDiySynth({kind,params=[],rack,latency='interactive',onStats
   const patch=effective();
   backend=await (kind==='fm'?FMBackend:WasmBackend).create(context,patch,{onStats:s=>{active=s.active;},onError});
   const initialRack=rack??Object.fromEntries([...Object.entries(patch.inserts).map(([k,v])=>['inserts.'+k,v]),...Object.entries(patch.effects).map(([k,v])=>['effects.'+k,v])]);
-  outboard=await createRack(context,initialRack,{onError});
+  outboard=await createWorkbenchRack(context,initialRack,{onError,instances,parallel});
   output=context.createGain();output.gain.value=.7;
-  monitor=await createOutputMonitor(context,peak=>onStats({active,peak,reduction:outboard.reduction}));
+  monitor=await createOutputMonitor(context,peak=>onStats({active,peak,reduction:outboard.reduction,...outboard.meters}));
   // rack -> output
   backend.connect(outboard.input);outboard.connect(output);output.connect(monitor.node);monitor.node.connect(context.destination);
   unsubscribe=tuning.subscribe(()=>retuneAll());
@@ -55,8 +55,11 @@ export function startDiySynth({kind,params=[],rack,latency='interactive',onStats
     const key=['bend','pressure','mod','expression','brightness',null,'soft'][which];
     if(key){controls[key]=value;queue();}
    },
-   setRack:values=>outboard.patch(values),clearRack:()=>{outboard.clear();},
+   setRack:(values,instances,parallel=null)=>outboard.patch(values,false,instances,parallel),clearRack:()=>{outboard.clear();},
+   applyDesk:state=>outboard.applyDesk(state),openMeters:()=>outboard.openMeters(output),
+   setRackInstances:next=>outboard.setInstances(next),
    requestScope:monitor.requestScope,
+   requestStereoScope:monitor.requestStereoScope,
    panic(){ids.clear();played.clear();tuning.setHeld([]);backend.panic();outboard.clear();active=0;},close,
   };
  })().catch(async error=>{await close();throw error;});

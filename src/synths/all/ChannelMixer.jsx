@@ -6,9 +6,9 @@ import {BLOCKS,CHOICES,syncedDelayMs} from '../effects/rackParts';
 import {toPosition,fromPosition,formatValue} from '../params';
 import './generatorBox.css';
 import './mixerDesk.css';
+import {stripDefaults,masterDefaults,cleanDesk,ceilingDb} from './mixerAudio';
 
-// The channel effects and output gain drive the audio; the remaining desk controls are still a visual mock-up.
-const NEW=()=>({gain:.33,hpOn:false,hp:.2,lpOn:false,lp:.9,hi:.5,mid:.5,lo:.5,pan:.5,vol:.75,mute:false,solo:false,rev:.2,revSize:.5,dly:0,dlyTime:.4,dlyFb:.3});
+const NEW=stripDefaults;
 const PROPERTIES=[
  ...BLOCKS.filter(b=>b.id==='reverb'||b.id==='delay').flatMap(b=>b.keys.map(([key,label])=>({key,label:`${b.name} · ${label}`}))),
  {key:'effects.bypass',label:'Space bypass'},{key:'switch.delay',label:'Delay enabled'},{key:'switch.reverb',label:'Reverb enabled'},
@@ -17,15 +17,17 @@ const PROPERTIES=[
 export const MIXER_PROPERTY_COUNT=PROPERTIES.length;
 const valueText=(key,value)=>CHOICES[key]?.[value]??(key.startsWith('switch.')||key==='master.reverbFirst'?(value?'On':'Off'):formatValue(RACK_PARAMS.BY_KEY[key],value)+(RACK_PARAMS.BY_KEY[key].unit==='%'?'%':''));
 
-const ChannelMixer=forwardRef(function ChannelMixer({channels,colours,host,onEdit,onSelectChannel,initialChannel,tempo=0},ref){
- const strips=[...channels.map(c=>({id:c.role,label:c.label.replace('Second lead','2nd lead'),short:c.short,colour:colours[c.role]})),
-  {id:'ambience',label:'Ambience',short:'AM',colour:'#58b9ad'},{id:'headroom',label:'Headroom',short:'HR',colour:'#9a9fa6'}];
- const [st,setSt]=useState(()=>Object.fromEntries(strips.map(s=>[s.id,NEW()])));
- const [sel,setSel]=useState(()=>strips.some(s=>s.id===initialChannel)?initialChannel:strips[0].id);
+const ChannelMixer=forwardRef(function ChannelMixer({channels,colours,host,onEdit,onSelectChannel,initialChannel,tempo=0,onStateChange,auxiliary=true,channelRacks=true,initialState=null,caseProps={},gripProps={}},ref){
+ const strips=[...channels.map(c=>({id:c.role,label:c.label.replace('Second lead','2nd lead'),short:c.short,colour:colours[c.role],unpatched:c.unpatched})),
+  ...(auxiliary?[{id:'ambience',label:'Ambience',short:'AM',colour:'#58b9ad'},{id:'headroom',label:'Music bus',short:'MU',colour:'#9a9fa6'}]:[])];
+ const [st,setSt]=useState(()=>initialState?cleanDesk(initialState,strips.map(s=>s.id)).strips:Object.fromEntries(strips.map(s=>[s.id,NEW()])));
+ const [sel,setSel]=useState(()=>strips.some(s=>s.id===(initialState?.selected??initialChannel))?(initialState?.selected??initialChannel):strips[0].id);
  const [property,setProperty]=useState(0);
- const [master,setMaster]=useState({vol:.75,width:.5,bal:.5,limit:true,ceil:.85,mono:false,dim:false});
+ const [master,setMaster]=useState(()=>initialState?cleanDesk(initialState,[]).master:masterDefaults());
  const [levels,setLevels]=useState({});
- useImperativeHandle(ref,()=>({snapshot:()=>({strips:st,selected:sel,property,master}),select:id=>{if(strips.some(s=>s.id===id))setSel(id);},restore:state=>{setSt(state.strips);setSel(state.selected);setProperty(state.property);setMaster(state.master);}}),[st,sel,property,master]);
+ useImperativeHandle(ref,()=>({snapshot:()=>({strips:st,selected:sel,property,master}),select:id=>{if(strips.some(s=>s.id===id))setSel(id);},restore:state=>{const clean=cleanDesk(state,strips.map(s=>s.id));setSt(clean.strips);setSel(strips.some(s=>s.id===state.selected)?state.selected:strips[0].id);setProperty(Math.max(0,Math.min(PROPERTIES.length-1,state.property??0)));setMaster(clean.master);}}),[st,sel,property,master]);
+ useEffect(()=>{host?.applyDesk?.({strips:st,master});},[host,st,master]);
+ useEffect(()=>{onStateChange?.({strips:st,master,selected:sel,property});},[st,master,sel,property]);
  useEffect(()=>{
   if(!host?.openMeters){setLevels({});return undefined;}
   const meters=host.openMeters();let frame,last=0,display={};
@@ -42,14 +44,14 @@ const ChannelMixer=forwardRef(function ChannelMixer({channels,colours,host,onEdi
  const anySolo=Object.values(st).some(s=>s.solo);
  const cur=strips.find(s=>s.id===sel);
  const idx=strips.findIndex(s=>s.id===sel);
- const live=!!host&&channels.some(s=>s.role===sel),raw=live?(host.rackValues(sel)??cleanRack()):cleanRack();
+ const live=channelRacks&&!!host&&channels.some(s=>s.role===sel),raw=live?(host.rackValues(sel)??cleanRack()):cleanRack();
  const synced=syncedDelayMs(raw['master.sync'],tempo),rack=synced?{...raw,'effects.delayMs':synced}:raw;
  const prop=PROPERTIES[property],spec=RACK_PARAMS.BY_KEY[prop.key],v=rack[prop.key];
  const edit=(key,value)=>onEdit?.(sel,{[key]:RACK_PARAMS.clampValue(key,value)});
  const encoder=(key,label)=>{const p=RACK_PARAMS.BY_KEY[key],value=rack[key];return <Encoder label={label} display={valueText(key,value)} position={toPosition(p,value)} disabled={!live||(key==='effects.delayMs'&&!!synced)} step={p.curve==='step'?1/(p.max-p.min):.02} onPosition={x=>edit(key,fromPosition(p,x))} onReset={()=>edit(key,p.default)}/>;};
- return <section className="gbox mixdesk" aria-label="Mixing desk">
-  <header className="gb-head"><h2>Mixer</h2><span className="gb-hint">Voice gain, delay and reverb are live · other controls are visual only</span></header>
-  <div className="dk-sends" style={{'--ch':cur.colour}}>
+ return <section {...caseProps} className={'gbox mixdesk '+(caseProps.className??'')} aria-label="Mixing desk">
+  <header className="gb-head" {...gripProps}><h2>Mixer</h2><span className="gb-hint">{auxiliary?'Channel processing · music subgroup · stereo master':'Parallel inputs · master insert · stereo output'}</span></header>
+  {channelRacks&&<div className="dk-sends" style={{'--ch':cur.colour}}>
    <div className="dk-lcd" role="status"><small>Sends · channel {idx+1}</small><b>{cur.label}</b>
     <span>{live?`${prop.label}: ${valueText(prop.key,v)}`:'Effects unavailable on this channel'}</span><span>REV {valueText('effects.reverb',rack['effects.reverb'])} · SIZE {valueText('effects.size',rack['effects.size'])}</span><span>DLY {valueText('effects.delay',rack['effects.delay'])} · {valueText('effects.delayMs',rack['effects.delayMs'])} · FB {valueText('effects.feedback',rack['effects.feedback'])}</span></div>
    <div className="dk-send-knobs">
@@ -58,13 +60,13 @@ const ChannelMixer=forwardRef(function ChannelMixer({channels,colours,host,onEdi
     <Encoder label="Effect property" display={prop.label} position={property/(PROPERTIES.length-1)} step={1/(PROPERTIES.length-1)} disabled={!live} onPosition={p=>setProperty(Math.round(p*(PROPERTIES.length-1)))} onReset={()=>setProperty(0)}/>
     <Encoder label="Property value" display={valueText(prop.key,v)} position={toPosition(spec,v)} disabled={!live||(prop.key==='effects.delayMs'&&!!synced)} step={spec.curve==='step'?1/(spec.max-spec.min):.02} onPosition={p=>edit(prop.key,fromPosition(spec,p))} onReset={()=>edit(prop.key,spec.default)}/>
    </div>
-  </div>
+  </div>}
   <div className="dk-body">
    <div className="dk-strips">
-    {strips.map((s,i)=>{const x=st[s.id];const silent=x.mute||(anySolo&&!x.solo);
-     return <div key={s.id} className={'dk-strip'+(s.id===sel?' sel':'')+(silent?' silent':'')} style={{'--ch':s.colour}}>
-      <button type="button" className="dk-lcd mini" onClick={()=>select(s.id)} title={`${s.label}: show its sends`}><small>{i+1} · {panText(x.pan)}</small><b>{s.label}</b></button>
-      {host&&channels.some(ch=>ch.role===s.id)?(()=>{const p=RACK_PARAMS.BY_KEY['master.output'],value=host.rackValues(s.id)?.['master.output']??0;return <Pot side size={44} label={`${s.label} gain`} v={toPosition(p,value)} def={toPosition(p,0)} onChange={v=>onEdit(s.id,{'master.output':fromPosition(p,v)})} tip={`Gain ${formatValue(p,value)}`}/>;})():<Pot side size={44} label="Gain" v={x.gain} def={.33} onChange={v=>set(s.id,{gain:v})} tip={`Gain ${gainText(x.gain)} (visual only)`}/>}
+    {strips.map((s,i)=>{const x=st[s.id];const groupMember=channels.some(c=>c.role===s.id),groupSolo=st.headroom?.solo,voiceSolo=channels.some(c=>st[c.role]?.solo);const silent=x.mute||(anySolo&&!x.solo&&!(groupMember&&groupSolo)&&!(s.id==='headroom'&&voiceSolo));
+     return <div key={s.id} role="group" aria-label={`${s.label} channel`} className={'dk-strip'+(s.id===sel?' sel':'')+(silent?' silent':'')} style={{'--ch':s.colour}}>
+      <button type="button" className="dk-lcd mini" onClick={()=>select(s.id)} title={`${s.label}: ${s.unpatched?'no source connected':channelRacks?'show its sends':'select input'}`}><small>{i+1} · {s.unpatched?'Unpatched':panText(x.pan)}</small><b>{s.label}</b></button>
+      {channelRacks&&host&&channels.some(ch=>ch.role===s.id)?(()=>{const p=RACK_PARAMS.BY_KEY['master.output'],value=host.rackValues(s.id)?.['master.output']??0;return <Pot side size={44} label={`${s.label} gain`} v={toPosition(p,value)} def={toPosition(p,0)} onChange={v=>onEdit(s.id,{'master.output':fromPosition(p,v)})} tip={`Gain ${formatValue(p,value)}`}/>;})():<Pot side size={44} label={channelRacks?'Gain':`${s.label} gain`} v={x.gain} def={.25} onChange={v=>set(s.id,{gain:v})} tip={`Gain ${gainText(x.gain)}`}/>}
       <div className="dk-filt"><button type="button" className={x.hpOn?'on':''} aria-pressed={x.hpOn} onClick={()=>set(s.id,{hpOn:!x.hpOn})}>HP</button><Pot label="Hz" v={x.hp} def={.2} onChange={v=>set(s.id,{hp:v,hpOn:true})} size={38} side tip={`High-pass ${hz(LOG(x.hp,20,600))} Hz`}/></div>
       <div className="dk-filt"><button type="button" className={x.lpOn?'on':''} aria-pressed={x.lpOn} onClick={()=>set(s.id,{lpOn:!x.lpOn})}>LP</button><Pot label="Hz" v={x.lp} def={.9} onChange={v=>set(s.id,{lp:v,lpOn:true})} size={38} side tip={`Low-pass ${hz(LOG(x.lp,1000,20000))} Hz`}/></div>
       <div className="dk-eq"><Pot side label="Hi" v={x.hi} onChange={v=>set(s.id,{hi:v})} size={36} centre tip={`High ${((x.hi-.5)*24).toFixed(1)} dB`}/><Pot side label="Mid" v={x.mid} onChange={v=>set(s.id,{mid:v})} size={36} centre tip={`Mid ${((x.mid-.5)*24).toFixed(1)} dB`}/><Pot side label="Lo" v={x.lo} onChange={v=>set(s.id,{lo:v})} size={36} centre tip={`Low ${((x.lo-.5)*24).toFixed(1)} dB`}/></div>
@@ -83,7 +85,7 @@ const ChannelMixer=forwardRef(function ChannelMixer({channels,colours,host,onEdi
     <div className="dk-lcd mini master"><small>Main · L R</small><b>Master</b></div>
     <Pot side size={44} label="Width" v={master.width} def={.5} onChange={v=>setMaster(m=>({...m,width:v}))} tip="Stereo width"/>
     <Pot side size={44} label="Balance" v={master.bal} def={.5} centre onChange={v=>setMaster(m=>({...m,bal:v}))} tip={`Balance ${panText(master.bal)}`}/>
-    <Pot side size={44} label="Ceiling" v={master.ceil} def={.85} onChange={v=>setMaster(m=>({...m,ceil:v}))} tip="Limiter ceiling"/>
+    <Pot side size={44} label="Ceiling" v={master.ceil} def={.85} onChange={v=>setMaster(m=>({...m,ceil:v}))} tip={`Sample-peak ceiling ${ceilingDb(master.ceil).toFixed(1)} dB · 3 ms lookahead`}/>
     <div className="dk-btns">
      <button type="button" className={master.limit?'on lim':''} aria-pressed={master.limit} onClick={()=>setMaster(m=>({...m,limit:!m.limit}))}>LIMIT</button>
      <button type="button" className={master.mono?'on sel':''} aria-pressed={master.mono} onClick={()=>setMaster(m=>({...m,mono:!m.mono}))}>MONO</button>

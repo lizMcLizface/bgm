@@ -2,6 +2,8 @@ import React, { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import { makeKey } from '../../seq/harmony';
 import {sceneSettings} from '../../app/scenes';
+import {sanitizeSettings} from '../../app/settings';
+import {METERS} from '../../app/meter';
 
 // the desk the page sits on measures itself with a ResizeObserver, which jsdom does not have
 globalThis.ResizeObserver??=class{observe(){}unobserve(){}disconnect(){}};
@@ -26,6 +28,7 @@ vi.mock('./host', () => {
   createHost: (scene,options={}) => {
    const host={
    scene,options,
+   editSettings:vi.fn(patch=>{host.g.settings=sanitizeSettings(patch,host.g.settings);}),
    settings:{seed:options.seed??1}, loaded:{}, context:{currentTime:0}, g:{settings:options.settings??sceneSettings(scene,options.seed??1),set(key,value){this.settings[key]=value;},AC:{outputLatency:0},roles:{},planner:()=>({settings:{meter:'4/4',bpm:90},meter:{units:4},plan:new Map(),planBar(bar){this.plan.set(bar,{bar,music:{tonic:0,mode:'Major-1',cycleStart:bar},nextMusic:{cycleStart:bar+1},chord:{name:'C',pitchClasses:[0,4,7]},events:[{role:mocks.continuousRole,midi:60,beat:0,length:1,velocity:.8}]});}})},
    wake:async()=>{}, applySceneVoices:async()=>{if(mocks.failScene)throw Error('voice loading failed');}, applyFrontPageLink:async()=>{}, setupMixer:async()=>{}, setSound:async(role,sound)=>{const entry={...sound,name:sound.name??(sound.synth==='tr808'?'Classic':'')};host.loaded[role]=entry;return entry;}, soundOf:()=>null, setTempo:()=>{}, rackValues:()=>null, dispose:vi.fn(), note:()=>{},drum:vi.fn(),
    snapshotSounds:()=>Object.fromEntries(SEQUENCERS.map(({role})=>[role,{selection:host.loaded[role]??{synth:role==='perc'?'scene':'calmbgm',name:scene.name},rack:{},...(role==='perc'?{kit:{},mix:{muted:[],solo:[]}}:{})}])),
@@ -42,7 +45,7 @@ vi.mock('./host', () => {
 import AllPage,{defaultSequencer} from './AllPage';
 
 let root, container;
-const button = name => [...container.querySelectorAll('button')].find(x => x.textContent.trim() === name);
+const button = name => [...container.querySelectorAll('button')].find(x => (x.getAttribute('aria-label') === name || x.textContent.trim() === name));
 beforeEach(async () => {
  globalThis.IS_REACT_ACT_ENVIRONMENT = true;
  localStorage.clear();
@@ -53,7 +56,7 @@ beforeEach(async () => {
  root = createRoot(container);
  await act(async () => root.render(<AllPage/>));
  const mode=container.querySelector('[aria-label="Generator mode"]');
- await act(async()=>{mode.value='song';mode.dispatchEvent(new Event('change',{bubbles:true}));});
+ await act(async()=>{mode.dispatchEvent(new KeyboardEvent('keydown',{key:'Home',bubbles:true}));});
  const resolution=container.querySelector('[aria-label="Resolution"]');
  act(()=>resolution.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowUp',bubbles:true})));
  act(()=>resolution.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowUp',bubbles:true})));
@@ -77,6 +80,31 @@ test('ribbon buttons hide and restore independent panels without resetting their
  expect(generatorPanel.getAttribute('aria-hidden')).toBe('true');
  act(()=>generator.click());
  expect(generatorPanel.getAttribute('aria-hidden')).toBe('false');
+});
+
+test('generator, mixer and ambience edits survive a finite-song page reload',async()=>{
+ const press=(node,key)=>act(()=>node.dispatchEvent(new KeyboardEvent('keydown',{key,bubbles:true})));
+ act(()=>container.querySelector('[aria-controls="all-panel-generator"]').click());
+ act(()=>button('Evolution').click());press(container.querySelector('.gb-knobs [aria-label="Home pull"]'),'End');
+ expect(mocks.hosts.at(-1).g.settings.drift.homePull).toBe(1);
+ act(()=>button('Wander').click());press(container.querySelector('.gb-knobs [aria-label="Wander pitch"]'),'ArrowRight');
+ expect(mocks.hosts.at(-1).g.settings.wander.pitch).toBe(6);
+ act(()=>container.querySelector('.gb-sections button:last-child').click());
+ const mixInput=container.querySelector('.gb-knobs [aria-label="Swing"]');
+ expect(mixInput).toBeTruthy();
+ press(mixInput,'Home');
+ expect(mocks.hosts.at(-1).editSettings).toHaveBeenLastCalledWith({swing:0});
+ press(container.querySelector('[aria-label="Mixing desk"] [aria-label="Lead level"]'),'ArrowDown');
+ const rain=+container.querySelector('[aria-label="Rain level"]').getAttribute('aria-valuenow')-.02;
+ press(container.querySelector('[aria-label="Rain level"]'),'ArrowDown');
+ act(()=>window.dispatchEvent(new Event('pagehide')));
+ const saved=JSON.parse(localStorage.getItem('synths:all:state'));
+ expect(saved.desk.strips.lead.vol).toBe(.73);
+ expect(saved.settings.drift.homePull).toBe(1);expect(saved.ambience.sources.rain.level).toBeCloseTo(rain);
+ act(()=>root.unmount());root=createRoot(container);await act(async()=>root.render(<AllPage/>));
+ expect(mocks.hosts.at(-1).options.settings.drift.homePull).toBe(1);
+ expect(container.querySelector('[aria-label="Lead level"]').getAttribute('aria-valuenow')).toBe('0.73');
+ expect(+container.querySelector('[aria-label="Rain level"]').getAttribute('aria-valuenow')).toBeCloseTo(rain);
 });
 
 test('scope starts closed and becomes active when song playback wakes audio',async()=>{
@@ -110,7 +138,7 @@ test('scene selector and generator preset knob load the same scene and restore t
  expect(scene.value).toBe(knob.getAttribute('aria-valuetext'));
  expect(mocks.hosts.at(-1).scene.name).toBe(scene.value);
  const count=mocks.hosts.length;
- await act(async()=>button("Back toScene's song").click());
+ await act(async()=>button('Reset scene').click());
  expect(mocks.hosts).toHaveLength(count+1);
  expect(mocks.hosts.at(-1).scene.name).toBe(scene.value);
 });
@@ -149,7 +177,7 @@ test('an address with a front-page preset takes precedence over a saved song',as
  root=createRoot(container);
  await act(async()=>root.render(<AllPage/>));
  expect(container.querySelector('.bar-scene select').value).toBe('Rainy café');
- expect(container.querySelector('[aria-label="Generator mode"]').value).toBe('continuous');
+ expect(container.querySelector('[aria-label="Generator mode"]').getAttribute('aria-valuetext')).toBe('Continuous');
  expect(location.search).toBe('?preset=rainy-cafe');
 });
 
@@ -185,6 +213,9 @@ test('setup files restore the scene and leave the current host intact on invalid
   act(()=>container.querySelector('[aria-label="Mixing desk"] button[title^="Ambience:"]').click());
   act(()=>button('Save setup').click());
   const text=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsText(blob);});
+  const exported=JSON.parse(text),savedSeq=exported.workbench.objects.find(o=>o.binding==='surface:sequencer');
+  expect(exported.version).toBe(2);expect(savedSeq.id).toBe(container.querySelector('#all-panel-sequencer').dataset.deskObjectId);
+  const moved=structuredClone(exported);moved.workbench.objects.find(o=>o.binding==='surface:sequencer').pose={x:-640,y:560,angle:25};
   const select=container.querySelector('.bar-scene select'),next=[...select.options].find(o=>o.value!==initial).value;
   await act(async()=>{select.value=next;select.dispatchEvent(new Event('change',{bubbles:true}));});
   const old=mocks.hosts.at(-1);
@@ -197,8 +228,9 @@ test('setup files restore the scene and leave the current host intact on invalid
   expect(mocks.hosts.at(-1).dispose).toHaveBeenCalledOnce();
   expect(select.value).toBe(next);
   mocks.failScene=false;
-  await upload(text);
+  await upload(JSON.stringify(moved));
   expect(old.dispose).toHaveBeenCalledOnce();
+  const restoredSeq=container.querySelector('#all-panel-sequencer');expect(restoredSeq.dataset.deskObjectId).toBe(savedSeq.id);expect(restoredSeq.style.left).toBe('-640px');expect(restoredSeq.style.top).toBe('560px');expect(restoredSeq.style.transform).toBe('rotate(25deg)');
   expect(select.value).toBe(initial);
   expect(container.querySelector('.patch-name').textContent).toContain('Opened setup.json');
   expect(container.querySelector('[aria-label="Channel"]').getAttribute('aria-valuetext')).toBe('Ambience');
@@ -217,7 +249,7 @@ test('a fresh page starts continuous playback with the default lookahead',async(
  mocks.capture.mockClear();
  root=createRoot(container);
  await act(async()=>root.render(<AllPage/>));
- expect(container.querySelector('[aria-label="Generator mode"]').value).toBe('continuous');
+ expect(container.querySelector('[aria-label="Generator mode"]').getAttribute('aria-valuetext')).toBe('Continuous');
  expect(container.querySelector('[aria-label="Channel"]').getAttribute('aria-valuetext')).toBe('Pad');
  expect(container.querySelector('[aria-label="Resolution"]').getAttribute('aria-valuetext')).toBe('1/4');
  expect(container.querySelector('[aria-label="Repeat song"]')).toBeTruthy();
@@ -258,7 +290,7 @@ test('a fresh continuous session uses saved buffer preferences',async()=>{
  localStorage.setItem('synths:all:continuous-buffer',JSON.stringify({ahead:2,history:3}));
  root=createRoot(container);
  await act(async()=>root.render(<AllPage/>));
- expect(container.querySelector('[aria-label="Generator mode"]').value).toBe('continuous');
+ expect(container.querySelector('[aria-label="Generator mode"]').getAttribute('aria-valuetext')).toBe('Continuous');
  expect(mocks.scheduler.options.bank().patterns).toHaveLength(3);
 });
 
@@ -269,7 +301,7 @@ test('a saved finite song is restored in song mode',async()=>{
  act(()=>root.unmount());
  root=createRoot(container);
  await act(async()=>root.render(<AllPage/>));
- expect(container.querySelector('[aria-label="Generator mode"]').value).toBe('song');
+ expect(container.querySelector('[aria-label="Generator mode"]').getAttribute('aria-valuetext')).toBe('Song');
  expect(container.querySelector('[aria-label="Repeat pattern"]')).toBeTruthy();
  expect(mocks.scheduler.options.bank().patterns).toHaveLength(2);
  expect(container.querySelector('.patch-name').textContent).toContain('back where you left off');
@@ -294,7 +326,7 @@ test('a saved song for an unavailable scene starts a fresh continuous session',a
  mocks.capture.mockClear();
  root=createRoot(container);
  await act(async()=>root.render(<AllPage/>));
- expect(container.querySelector('[aria-label="Generator mode"]').value).toBe('continuous');
+ expect(container.querySelector('[aria-label="Generator mode"]').getAttribute('aria-valuetext')).toBe('Continuous');
  expect(mocks.scheduler.options.bank().patterns).toHaveLength(5);
  expect(mocks.capture).not.toHaveBeenCalled();
 });
@@ -331,7 +363,7 @@ test('selects progression loops, switches to arrangement playback, and applies s
 
 test('continuous playback retains a rolling buffer and resumes from a selected history progression',async()=>{
  const mode=container.querySelector('[aria-label="Generator mode"]');
- await act(async()=>{mode.value='continuous';mode.dispatchEvent(new Event('change',{bubbles:true}));});
+ await act(async()=>{mode.dispatchEvent(new KeyboardEvent('keydown',{key:'End',bubbles:true}));});
  expect(mocks.scheduler.options.bank().patterns).toHaveLength(5);
  await act(async()=>button('▶Play').click());
  expect(mocks.scheduler.start).toHaveBeenLastCalledWith(.08,'song',{pattern:0,step:0});
@@ -355,7 +387,7 @@ test('continuous buffer settings apply finite lookahead and unlimited history',a
  const ahead=container.querySelector('[aria-label="Progressions ahead"]'),history=container.querySelector('[aria-label="History retained"]');
  act(()=>{ahead.value='2';ahead.dispatchEvent(new Event('change',{bubbles:true}));history.value='infinite';history.dispatchEvent(new Event('change',{bubbles:true}));});
  const mode=container.querySelector('[aria-label="Generator mode"]');
- await act(async()=>{mode.value='continuous';mode.dispatchEvent(new Event('change',{bubbles:true}));});
+ await act(async()=>{mode.dispatchEvent(new KeyboardEvent('keydown',{key:'End',bubbles:true}));});
  expect(mocks.scheduler.options.bank().patterns).toHaveLength(3);
  await act(async()=>button('▶Play').click());
  for(let index=1;index<=6;index++){
@@ -635,7 +667,7 @@ test('edit mode selects generated notes without changing them and edits independ
  const grid=container.querySelector('[aria-label="Progression editor"]');
  act(()=>button('LayerEdit').click());
  act(()=>grid.querySelector('[aria-label="C step 1"]').click());
- expect([...container.querySelectorAll('[role="tab"]')].map(t=>t.textContent)).toEqual(['Note','','','','']);
+ expect([...container.querySelectorAll('[role="tab"]')].map(t=>t.textContent)).toEqual(['Note','Scale','','','','']);
  expect(container.querySelector('[role="tab"][aria-selected="true"]').textContent).toBe('Note');
  const key=name=>act(()=>container.querySelector(`[aria-label="${name}"]`).dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowUp',bubbles:true})));
  key('Length');key('Velocity');key('Note gate');
@@ -819,7 +851,7 @@ test('extra machine tracks stay separate from the common drum lane',async()=>{
 test('selects a sequencer in arrangement, transposes the grid view, and preserves stacked octave notes', async () => {
  expect(container.querySelector('[aria-label="Sequencer select"]')).toBeNull();
  expect(container.querySelector('.stack-mode')).toBeNull();
- expect(container.querySelectorAll('[role="tab"]')).toHaveLength(5);
+ expect(container.querySelectorAll('[role="tab"]')).toHaveLength(6);
  act(()=>button('ViewArrange').click());
  act(()=>container.querySelector('[aria-label="Select Lead sequencer"]').click());
  const grid=container.querySelector('[aria-label="Progression editor"]');
@@ -892,11 +924,129 @@ test('mixer channel selection opens its sequencer, while non-sequencer channels 
  expect(container.querySelector('.device-seq .device-head span').textContent).toContain('Bass');
 });
 test('changing progression count generates immediately before playback',()=>{
- const select=container.querySelector('select[aria-label="Progressions"]')??[...container.querySelectorAll('select')].find(x=>x.parentElement.textContent.includes('Progressions'));
- expect(select.value).toBe('4');
- act(()=>{select.value='8';select.dispatchEvent(new Event('change',{bubbles:true}));});
+ const select=container.querySelector('.gb-head [aria-label="Progressions"]');
+ expect(select.getAttribute('aria-valuetext')).toBe('4');
+ act(()=>select.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true})));
  expect(mocks.capture).toHaveBeenLastCalledWith(expect.objectContaining({progressions:8}));
  expect(container.querySelector('[aria-label="Progression editor"]')).toBeTruthy();
  expect(container.querySelector('[aria-label="Grid view: octave"]')).toBeNull();
  expect(container.querySelectorAll('[aria-label^="Grid view:"]')).toHaveLength(1);
+});
+
+test('restores visible surfaces and the selected generator bank without starting audio',async()=>{
+ act(()=>{container.querySelector('[aria-controls="all-panel-generator"]').click();container.querySelector('[aria-controls="all-panel-ambience"]').click();button('Scope').click();container.querySelector('[aria-label="Setup"]').click();button('Control').click();});
+ act(()=>button('Control').click());
+ act(()=>{window.dispatchEvent(new Event('pagehide'));});
+ expect(JSON.parse(localStorage.getItem('synths:all:visibility'))).toMatchObject({panels:{generator:true,ambience:true},scope:true,setup:true});
+ act(()=>root.unmount());root=createRoot(container);await act(async()=>root.render(<AllPage/>));
+ expect(container.querySelector('[aria-controls="all-panel-generator"]').getAttribute('aria-expanded')).toBe('true');
+ expect(container.querySelector('[aria-controls="all-panel-ambience"]').getAttribute('aria-expanded')).toBe('true');
+ expect(button('Scope').getAttribute('aria-pressed')).toBe('true');
+ expect(container.querySelector('[aria-label="Setup"]').getAttribute('aria-pressed')).toBe('true');
+ expect(container.querySelector('.gb-title>span').textContent).toBe('Band');
+ expect(container.querySelector('[aria-label="Oscilloscope and spectrum"]').dataset.audio).toBe('off');
+ expect(mocks.scheduler.start).not.toHaveBeenCalled();
+});
+
+function responsivePlanner(host){
+ host.g.planner=()=>({settings:{...host.g.settings},plan:new Map(),get meter(){return METERS[this.settings.meter];},planBar(bar){
+  const tonic=this.settings.tonic??0;
+  this.plan.set(bar,{bar,music:{tonic,mode:this.settings.mode??'Major-1',cycleStart:bar},nextMusic:{cycleStart:bar+1},chord:{name:'new root',pitchClasses:[tonic]},events:[{role:'lead',midi:60+tonic,beat:0,length:1,velocity:.8}]});
+ }});
+}
+const turnGeneratorKey=async()=>{
+ act(()=>container.querySelector('.gb-sections [aria-label="Scale"]').click());
+ await act(async()=>{container.querySelector('.gb-knobs [aria-label="Key"]').dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true}));await new Promise(r=>setTimeout(r,380));});
+};
+test('queues a finite generator edit until the next unbooked sequence without stopping or rewinding',async()=>{
+ const host=mocks.hosts.at(-1);responsivePlanner(host);
+ await act(async()=>button('▶Play').click());
+ mocks.scheduler.position={pattern:0,step:6,wrapped:false};
+ const options=mocks.scheduler.options,old=options.pattern(options.bank().patterns[0]),oldStep=structuredClone(old.sequencers[0].pattern.steps[0]);
+ await turnGeneratorKey();
+ expect(mocks.scheduler.stop).not.toHaveBeenCalled();expect(mocks.scheduler.start).toHaveBeenCalledTimes(1);expect(mocks.scheduler.reposition).not.toHaveBeenCalled();
+ act(()=>window.dispatchEvent(new Event('pagehide')));expect(JSON.parse(localStorage.getItem('synths:all:state')).pendingGenerator).toBe(true);
+ act(()=>options.beforeStep({pattern:0,step:7}));expect(options.pattern(options.bank().patterns[0]).sequencers[0].pattern.steps[0]).toEqual(oldStep);
+ mocks.scheduler.position={pattern:1,step:0,wrapped:false};act(()=>options.beforeStep({pattern:1,step:0}));
+ expect(options.pattern(options.bank().patterns[0]).sequencers[0].pattern.steps[0]).toEqual(oldStep);
+ const next=options.pattern(options.bank().patterns[1]),events=options.events(next,0,{time:1,stepSec:.125,count:16,cycle:1});
+ expect(events.find(e=>e.track===0).note).toBe(60+host.g.settings.tonic);
+ expect(button('▶Play').getAttribute('aria-pressed')).toBe('true');expect(mocks.scheduler.position).toEqual({pattern:1,step:0,wrapped:false});
+ act(()=>window.dispatchEvent(new Event('pagehide')));expect(JSON.parse(localStorage.getItem('synths:all:state')).pendingGenerator).toBe(false);
+});
+test('replaces continuous lookahead at the next boundary while a paused transport keeps its resume point',async()=>{
+ await act(async()=>container.querySelector('[aria-label="Generator mode"]').dispatchEvent(new KeyboardEvent('keydown',{key:'End',bubbles:true})));
+ responsivePlanner(mocks.hosts.at(-1));mocks.scheduler.stop.mockClear();
+ await act(async()=>button('▶Play').click());act(()=>button('⏸Pause').click());
+ mocks.scheduler.position={pattern:0,step:6,wrapped:false};const options=mocks.scheduler.options;
+ await turnGeneratorKey();expect(options.bank().patterns).toHaveLength(5);
+ expect(mocks.scheduler.stop).not.toHaveBeenCalled();expect(mocks.scheduler.resume).not.toHaveBeenCalled();
+ await act(async()=>button('▶Play').click());expect(mocks.scheduler.resume).toHaveBeenCalledOnce();
+ act(()=>options.beforeStep({pattern:0,step:6}));expect(options.bank().patterns).toHaveLength(5);
+ mocks.scheduler.position={pattern:1,step:0,wrapped:false};act(()=>options.beforeStep({pattern:1,step:0}));
+ expect(options.bank().patterns).toHaveLength(6);expect(mocks.scheduler.start).toHaveBeenCalledOnce();expect(mocks.scheduler.reposition).not.toHaveBeenCalled();
+ expect(mocks.scheduler.position).toEqual({pattern:1,step:0,wrapped:false});expect(button('▶Play').getAttribute('aria-pressed')).toBe('true');
+});
+test('restores an unapplied finite generator change and applies it on the first sequence',async()=>{
+ responsivePlanner(mocks.hosts.at(-1));await turnGeneratorKey();act(()=>window.dispatchEvent(new Event('pagehide')));
+ expect(JSON.parse(localStorage.getItem('synths:all:state')).pendingGenerator).toBe(true);
+ act(()=>root.unmount());root=createRoot(container);await act(async()=>root.render(<AllPage/>));
+ expect(mocks.scheduler.start).not.toHaveBeenCalled();act(()=>mocks.scheduler.options.beforeStep({pattern:0,step:0}));
+ act(()=>window.dispatchEvent(new Event('pagehide')));expect(JSON.parse(localStorage.getItem('synths:all:state')).pendingGenerator).toBe(false);
+});
+
+const openSequenceScale=()=>act(()=>[...container.querySelectorAll('.seq-screen [role="tab"]')].find(t=>t.textContent==='Scale').click());
+const turnSequence=async(label,key='ArrowRight')=>{
+ await act(async()=>{container.querySelector(`[aria-label="Sequence ${label}"]`).dispatchEvent(new KeyboardEvent('keydown',{key,bubbles:true}));await new Promise(r=>setTimeout(r,300));});
+};
+const savedSong=()=>{act(()=>window.dispatchEvent(new Event('pagehide')));return JSON.parse(localStorage.getItem('synths:all:state')).project;};
+test('sequencer scale edits transpose the whole finite song without regenerating or resetting playback and survive reload',async()=>{
+ await act(async()=>button('▶Play').click());const old=savedSong(),captures=mocks.capture.mock.calls.length;
+ openSequenceScale();await turnSequence('key');await turnSequence('mode');
+ const next=savedSong();expect(next.key).toMatchObject({tonic:1,scaleId:'Major-2'});
+ expect(next.patterns.lead.steps[16].n[0].d).toBe(4);expect(next.patterns.perc).toEqual(old.patterns.perc);
+ const options=mocks.scheduler.options,p=options.pattern(options.bank().patterns[0]);
+ expect(options.events(p,8,{time:1,stepSec:.125,count:8,cycle:0}).filter(e=>e.track===3).map(e=>e.note)).toEqual([61,64,68]);
+ expect(mocks.capture).toHaveBeenCalledTimes(captures);expect(mocks.scheduler.stop).not.toHaveBeenCalled();expect(mocks.scheduler.start).toHaveBeenCalledOnce();expect(mocks.scheduler.reposition).not.toHaveBeenCalled();
+ expect(button('▶Play').getAttribute('aria-pressed')).toBe('true');
+ act(()=>root.unmount());root=createRoot(container);await act(async()=>root.render(<AllPage/>));
+ expect(savedSong().patterns).toEqual(next.patterns);expect(container.querySelector('[aria-label="Sequence key"]').getAttribute('aria-valuetext')).toBe('C♯/D♭');
+ expect(button('▶Play').getAttribute('aria-pressed')).toBe('false');
+});
+test('continuous sequencer transposition preserves history, edits every pitched voice in the current progression and replans future',async()=>{
+ responsivePlanner(mocks.hosts.at(-1));await act(async()=>container.querySelector('[aria-label="Generator mode"]').dispatchEvent(new KeyboardEvent('keydown',{key:'End',bubbles:true})));
+ const options=mocks.scheduler.options;act(()=>button('ViewArrange').click());
+ act(()=>container.querySelector('[aria-label^="Lead, progression 2,"]').click());
+ act(()=>button('ViewArrange').click());
+ await act(async()=>button('▶Play').click());mocks.scheduler.position={pattern:1,step:4,wrapped:false};
+ mocks.scheduler.stop.mockClear();mocks.scheduler.reposition.mockClear();
+ const previous=options.pattern(options.bank().patterns[0]),first=structuredClone(previous.sequencers[0].pattern.steps.slice(0,16));
+ openSequenceScale();await turnSequence('key');
+ const bank=options.bank(),current=options.pattern(bank.patterns[1]),past=options.pattern(bank.patterns[0]);
+ expect(past.sequencers[0].pattern.steps.slice(0,16)).toEqual(first);
+ expect(options.events(current,0,{time:1,stepSec:.125,count:16,cycle:1}).find(e=>e.track===0).note).toBe(63);
+ expect(options.events(options.pattern(bank.patterns[2]),0,{time:2,stepSec:.125,count:32,cycle:2}).find(e=>e.track===0).note).toBe(63);
+ act(()=>container.querySelector('[aria-label="Grid view: octave"]')?.click());
+ expect([...container.querySelectorAll('[aria-label="Progression editor"] .cell')].map(e=>e.getAttribute('aria-label'))).toContain('E♭ step 1');
+ expect(mocks.scheduler.stop).not.toHaveBeenCalled();expect(mocks.scheduler.reposition).not.toHaveBeenCalled();
+});
+
+test('Spread arranges visible objects without changing the song and restores object poses and IDs locally',async()=>{
+ const old=savedSong(),seq=container.querySelector('#all-panel-sequencer'),keyboard=container.querySelector('.keybox'),hidden=container.querySelector('#all-panel-generator');
+ const seqId=seq.dataset.deskObjectId,keyId=keyboard.dataset.deskObjectId;
+ expect(seqId).toMatch(/^obj-/);expect(keyId).toMatch(/^obj-/);expect(seqId).not.toContain('sequencer');
+ for(const el of container.querySelectorAll('[data-desk-object-id]'))Object.defineProperties(el,{offsetWidth:{configurable:true,value:700},offsetHeight:{configurable:true,value:400}});
+ act(()=>hidden.querySelector('.box-grip').dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true})));
+ const hiddenPose={left:hidden.style.left,top:hidden.style.top,transform:hidden.style.transform};
+ act(()=>button('Spread').click());expect(savedSong()).toEqual(old);expect(mocks.scheduler.stop).not.toHaveBeenCalled();
+ expect(seq.style.left).toBe('0px');expect(seq.style.top).toBe('0px');expect(seq.style.transform).toBe('rotate(0deg)');
+ expect({left:hidden.style.left,top:hidden.style.top,transform:hidden.style.transform}).toEqual(hiddenPose);
+ act(()=>seq.querySelector('.box-grip').dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true})));
+ act(()=>window.dispatchEvent(new Event('pagehide')));const pose={left:seq.style.left,top:seq.style.top,transform:seq.style.transform,zIndex:seq.style.zIndex};
+ act(()=>root.unmount());
+ // A desk object may legitimately sit below the current browser window.
+ const layout=JSON.parse(localStorage.getItem('synths:all:objects'));layout.objects.find(o=>o.binding==='keyboard').pose.y=2400;localStorage.setItem('synths:all:objects',JSON.stringify(layout));
+ root=createRoot(container);await act(async()=>root.render(<AllPage/>));
+ const restored=container.querySelector('#all-panel-sequencer');expect(restored.dataset.deskObjectId).toBe(seqId);expect(container.querySelector('.keybox').dataset.deskObjectId).toBe(keyId);expect(container.querySelector('.keybox').style.top).toBe('2400px');
+ expect({left:restored.style.left,top:restored.style.top,transform:restored.style.transform,zIndex:restored.style.zIndex}).toEqual(pose);
 });

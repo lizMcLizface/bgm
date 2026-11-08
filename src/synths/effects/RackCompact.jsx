@@ -10,10 +10,10 @@ import './rack.css';
 // or off, is not taken for a tap); tapping the dark area or pressing Escape puts it away again. Effects can be dragged
 // to reorder, as in the full rack (RackPanel). The header drags the popover about the page (the place is remembered).
 const POS_KEY='synths:rack-pos';
-export default function RackCompact({values,onChange,instrumentSpecs=[],peak=0,reduction=0,tools=null,onClose,tempo=0,posKey=POS_KEY,home=null,excludedUnits=[],anchor=null,hidden=false,layoutId}){
+export default function RackCompact({values,onChange,instrumentSpecs=[],peak=0,reduction=0,tools=null,onClose,tempo=0,posKey=POS_KEY,home=null,excludedUnits=[],anchor=null,hidden=false,layoutId,physical=false}){
  const [open,setOpen]=useState('');
  // it starts to the right of the instrument, level with its top
- const float=useFloating(posKey,home??(s=>onSynth('iowa')?{x:Math.round((s.w-830)/2)-23,y:-494}:onSynth('piano')?{x:0,y:-494}:onSynth('diy-fm','wt','dx7','minimoog','prophet','jupiter','obxa')?{x:s.w+24,y:6}:onSynth('cs80','juno')?{x:1535,y:17}:({x:s.w+47,y:0})),{anchor});
+ const float=useFloating(posKey,home??(s=>onSynth('iowa')?{x:Math.round((s.w-830)/2)-23,y:-494}:onSynth('piano')?{x:0,y:-494}:onSynth('diy-fm','wt','dx7','minimoog','prophet','jupiter','obxa')?{x:s.w+24,y:6}:onSynth('cs80','juno')?{x:1535,y:17}:({x:s.w+47,y:0})),{anchor,spawnOnly:physical,rotatable:physical});
  const model=useRackModel({values,onChange,instrumentSpecs,tempo,excludedUnits});
  const block=model.tiles.find(t=>t.id===open);
  useEffect(()=>{

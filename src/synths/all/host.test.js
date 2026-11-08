@@ -5,19 +5,25 @@ vi.mock('../../app/Generator', () => {
  const roles = Object.fromEntries(['lead','counter','rhythm','pad','bass'].map(role => [role,{preset:'Soft Pad',polyphony:8}]));
  return { ROLES: roles, default: class {
   constructor() {
-   this.settings={...defaultSettings(),layers:'combined',drumKit:{...defaultDrumKit(),room:.16}}; this.AC={currentTime:0,destination:{},createGain:()=>({gain:{value:1},connect:vi.fn(),disconnect:vi.fn()})};
+   const param=value=>({value,cancelScheduledValues:vi.fn(),setTargetAtTime:vi.fn()});
+   const audioNode=()=>({gain:param(1),frequency:param(1000),Q:param(1),pan:param(0),connect:vi.fn(),disconnect:vi.fn()});
+   this.settings={...defaultSettings(),layers:'combined',drumKit:{...defaultDrumKit(),room:.16}}; this.AC={currentTime:0,sampleRate:48000,destination:{},createGain:audioNode,createBiquadFilter:audioNode,createStereoPanner:audioNode,createChannelSplitter:audioNode,createChannelMerger:audioNode};
+   this.output=audioNode();this.levelTrim=audioNode();this.ambienceOut=audioNode();
    const node=()=>({connect:vi.fn(),disconnect:vi.fn()});
-   this.roles=Object.fromEntries([...Object.keys(roles),'perc'].map(role=>[role,{...(role==='perc'?{}:{tone:node()}),gain:node(),wander:{input:node(),dispose:vi.fn()},instrument:{output:node(),connect:vi.fn(),dispose:vi.fn(),applyPreset:vi.fn(),setKit:vi.fn(),setSpec:vi.fn(),setValues:vi.fn(),setRack:vi.fn(),scheduleNote:vi.fn(),hitTrack:vi.fn(),polyphony:8}}]));
+   this.roles=Object.fromEntries([...Object.keys(roles),'perc'].map(role=>[role,{...(role==='perc'?{}:{tone:node()}),gain:node(),wander:{input:node(),output:node(),dispose:vi.fn()},instrument:{output:node(),connect:vi.fn(),dispose:vi.fn(),applyPreset:vi.fn(),setKit:vi.fn(),setSpec:vi.fn(),setValues:vi.fn(),setRack:vi.fn(),scheduleNote:vi.fn(),hitTrack:vi.fn(),polyphony:8}}]));
   }
-  async setRoleSource(role,source,name) { mocks.sources.push({role,source,name}); }
+  async setRoleSource(role,source,name) { mocks.sources.push({role,source,name});this.roles[role].instrument.preset=structuredClone(source); }
   async setPercussionSource(source) { if(mocks.failPercussion)throw Error('kit unavailable');mocks.sources.push({role:'perc',source});this.roles.perc.machine=!!source; }
   async loadPercussionVoice(id) {this.settings.drums={...this.settings.drums,kit:id};}
   setMany(patch) {Object.assign(this.settings,patch);}
   replan() {}
   loadRolePreset() {}
+  setRoleParam=vi.fn((role,key,value)=>{this.roles[role].instrument.preset[key]=value;});
+  getRolePreset(role){return {...this.roles[role].instrument.preset};}
   stopAll() {}
  }};
 });
+vi.mock('./mixerAudio',async importOriginal=>({...await importOriginal(),createDeskLimiter:async()=>({connect:vi.fn(),disconnect:vi.fn(),port:{postMessage:vi.fn()}})}));
 vi.mock('../ensemble/sources', () => ({
  matchedLevel:async()=>1,
  soundSource:sound=>sound.synth==='fm'||sound.synth==='poly'?{diy:sound}:{classics:sound},
@@ -44,6 +50,27 @@ import {defaultDrumKit} from '../../app/percussion';
 import {masterBus} from '../../audio/bus';
 
 describe('all-page sound host', () => {
+ it('edits a generator voice on the active instrument and restores its edited preset',async()=>{
+  const original=createHost(BROWSABLE_SCENES[0]),restored=createHost(BROWSABLE_SCENES[0]);
+  try{
+   await original.applySceneVoices();await original.setPreset('lead','custom','calmbgm',{gainAttack:.1,masterVolume:.7});
+   await original.editNative('lead',{gainAttack:.5,masterVolume:.4});
+   expect(original.g.setRoleParam).toHaveBeenCalledWith('lead','gainAttack',.5);
+   const saved=structuredClone(original.snapshotSounds());
+   expect(saved.lead.preset).toMatchObject({gainAttack:.5,masterVolume:.4});
+   await restored.restoreSounds(saved);
+   expect(restored.g.getRolePreset('lead')).toMatchObject({gainAttack:.5,masterVolume:.4,reverbAmount:0,mixerSpaceMoved:true});
+   restored.note('lead',60,1,.2,.8);
+   expect(restored.g.roles.lead.instrument.scheduleNote).toHaveBeenCalledWith(60,1,.2,.8);
+  }finally{original.dispose();restored.dispose();}
+ });
+ it('forwards drum-machine tune and decay locks with the scheduled hit time',async()=>{
+  const h=createHost(BROWSABLE_SCENES[0]);try{
+   await h.setSound('perc',{synth:'tr808'});
+   h.drum({drum:0,velocity:.5,duration:1,params:{tune:.2,decay:-.3}},2,.1);
+   expect(h.g.roles.perc.instrument.hitTrack).toHaveBeenLastCalledWith('bd',0,2,.5,{tune:.2,decay:-.3});
+  }finally{h.dispose();}
+ });
  it('restores linked edited voices and external patch values and levels',async()=>{
   const host=createHost(BROWSABLE_SCENES[0]),patch=SYNTHS.poly.presets[0];
   try{

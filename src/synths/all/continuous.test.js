@@ -7,6 +7,40 @@ function planner(){
  }};
 }
 describe('continuous progression buffer',()=>{
+ it('replays setting and rule edits, including coalesced and pending changes, using whitelisted flags',()=>{
+  const host={g:{planner:()=>{
+   const p=planner(),plan=p.planBar;p.noteResolution=true;
+   p.planBar=function(bar){plan.call(this,bar);this.plan.get(bar).events[0].midi=this.noteResolution?60:67;this.plan.get(bar).events[0].velocity=this.settings.level??.8;};return p;
+  }}};
+  const stream=createContinuous(host,42),first=stream.next();
+  stream.update({meter:'4/4',bpm:120,level:.4},{noteResolution:false,planBar:false});
+  stream.update({meter:'4/4',bpm:130,level:.6});
+  stream.next(first.key);
+  stream.update({meter:'4/4',bpm:140,level:.3},{noteResolution:true});
+  const saved=JSON.parse(JSON.stringify(stream.snapshot()));
+  expect(saved.flags).toMatchObject({noteResolution:true});
+  expect(saved.changes).toHaveLength(2);expect(saved.changes[0].flags).toMatchObject({noteResolution:false});
+  expect(saved.changes[0].flags).not.toHaveProperty('planBar');
+  const restored=createContinuous(host,saved.seed,saved.settings,saved.grooveVoices,saved.flags);
+  for(let i=0;i<saved.count;i++){
+   const change=saved.changes.find(c=>c.at===i);if(change)restored.update(change.settings,change.flags);
+   restored.next(first.key);
+  }
+  const pending=saved.changes.find(c=>c.at===saved.count);restored.update(pending.settings,pending.flags);
+  expect(restored.next(first.key)).toEqual(stream.next(first.key));
+  expect(()=>stream.update({meter:'6/8'})).toThrow('meter change');
+ });
+ it('restores unset rule defaults instead of inheriting a later host override',()=>{
+  const host=flag=>({g:{planner:()=>{
+   const p=planner(),plan=p.planBar;p.noteResolution=flag;
+   p.planBar=function(bar){plan.call(this,bar);this.plan.get(bar).events[0].midi=this.noteResolution===false?70:60;};return p;
+  }}});
+  const original=createContinuous(host(undefined),17);original.next();
+  const saved=JSON.parse(JSON.stringify(original.snapshot()));expect(saved.flags.noteResolution).toBeNull();
+  const restored=createContinuous(host(false),saved.seed,saved.settings,saved.grooveVoices,saved.flags);
+  for(let i=0;i<saved.count;i++)restored.next();
+  expect(restored.next()).toEqual(original.next());
+ });
  it('plans sequential cycles, appends edits, and trims old history',()=>{
   const plan=planner(),stream=createContinuous({g:{planner:()=>plan}},1);
   let project=stream.next();

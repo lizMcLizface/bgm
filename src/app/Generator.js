@@ -810,18 +810,51 @@ class Generator {
         this.sweep.set({ lowpass: active?.['filter.lowpass'] ?? SWEEP_OPEN.lowpass, highpass: active?.['filter.highpass'] ?? SWEEP_OPEN.highpass, resonance: active?.['filter.resonance'] ?? SWEEP_OPEN.resonance }, wants ? secondsPerBeat / 2 : 0.05);
     }
 
+    // Shared returns and post-fader sends can be moved into a desk while a rack
+    // is loading. Resolve their destinations at completion, rather than keeping
+    // the destination captured before the asynchronous work began.
+    routeSharedEffects() {
+        for (const [rack, key, sourceKey] of [[this.busRack, 'send', 'sendSource'], [this.spaceRack, 'spaceSend', 'spaceSendSource']]) {
+            if (!rack) continue;
+            rack.node.disconnect();
+            rack.connect(this.mixReturn ?? this.output);
+            for (const r of Object.values(this.roles)) {
+                if (!r[key]) continue;
+                const source = r.mixOutput ?? r.wander.output;
+                if (r[sourceKey] === source) continue;
+                (r[sourceKey] ?? r.wander.output).disconnect(r[key]);
+                source.connect(r[key]);
+                r[sourceKey] = source;
+            }
+        }
+    }
+
+    disposeSharedEffects() {
+        this.sharedEffectsClosed = true;
+        this.busRack?.dispose();
+        this.spaceRack?.dispose();
+        for (const r of Object.values(this.roles)) {
+            r.send?.disconnect();
+            r.spaceSend?.disconnect();
+        }
+    }
+
     applyBus() {
+        if (this.sharedEffectsClosed) return;
         const bus = this.settings.bus, moves = this.moveState ?? {}, wantsMoves = this.settings.sequencer?.on && Object.keys(this.settings.sequencer.moves ?? {}).length > 0;
         if (!this.busRack) {
             if (!(busActive(bus) || wantsMoves) || this.busLoading) return;
-            this.busLoading = createBusRack(this.AC, bus.rack, this.output).then((rack) => {
+            this.busLoading = createBusRack(this.AC, bus.rack, this.mixReturn ?? this.output).then((rack) => {
+                if (this.sharedEffectsClosed) { rack.dispose(); return; }
                 this.busRack = rack;
                 for (const r of Object.values(this.roles)) {
                     r.send = this.AC.createGain();
                     r.send.gain.value = 0;
-                    r.wander.output.connect(r.send);
+                    r.sendSource = r.mixOutput ?? r.wander.output;
+                    r.sendSource.connect(r.send);
                     r.send.connect(rack.input);
                 }
+                this.routeSharedEffects();
                 this.applyBus();
             }).catch((error) => console.error('Could not build the effects bus', error)).finally(() => { this.busLoading = null; });
             return;
@@ -847,16 +880,20 @@ class Generator {
     // The section space (composition/sectionSpace.js): built on first use, then each role's send
     // follows the bar's section, gliding over about two bars.
     applySpace(level, time, barSeconds) {
+        if (this.sharedEffectsClosed) return;
         if (!this.spaceRack) {
             if (!(level > 0) || this.spaceLoading) return;
-            this.spaceLoading = createBusRack(this.AC, SPACE_RACK, this.output).then((rack) => {
+            this.spaceLoading = createBusRack(this.AC, SPACE_RACK, this.mixReturn ?? this.output).then((rack) => {
+                if (this.sharedEffectsClosed) { rack.dispose(); return; }
                 this.spaceRack = rack;
                 for (const r of Object.values(this.roles)) {
                     r.spaceSend = this.AC.createGain();
                     r.spaceSend.gain.value = 0;
-                    r.wander.output.connect(r.spaceSend);
+                    r.spaceSendSource = r.mixOutput ?? r.wander.output;
+                    r.spaceSendSource.connect(r.spaceSend);
                     r.spaceSend.connect(rack.input);
                 }
+                this.routeSharedEffects();
             }).catch((error) => console.error('Could not build the section space', error)).finally(() => { this.spaceLoading = null; });
             return;
         }

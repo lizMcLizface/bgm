@@ -1,4 +1,4 @@
-import React,{createContext,useContext,useState} from 'react';
+import React,{createContext,useContext,useRef,useState} from 'react';
 import {Choice,Fader} from './controls';
 import EnvShapeEditor from './EnvShapeEditor';
 import {SHAPE_KEYS} from './envShape';
@@ -15,8 +15,9 @@ function Libraries({libraries,values,host}){
 }
 export default function EmbeddedShell({synth,className='',panelClassName='',children,expand,nav,libraries=[]}){
  const host=useEnsemblePanel(),{values,onChange}=host,[shapeOpen,setShapeOpen]=useState(null),BY_KEY=synth.params.BY_KEY;
- const replaceValues=next=>onChange(synth.params.sanitize(next));
- const change=(key,value)=>{const next={...values};for(const k of expand?.(key)??[key])next[k]=value;replaceValues(next);};
+ const draft=useRef(values);draft.current=values;
+ const replaceValues=next=>{const clean=synth.params.sanitize(next);draft.current=clean;onChange(clean);};
+ const change=(key,value)=>{const next={...draft.current};for(const k of expand?.(key)??[key])next[k]=value;replaceValues(next);};
  const control=(entry,tone,prefix='')=>{
   const [key,label]=Array.isArray(entry)?[prefix+entry[0],entry[1]]:[prefix+entry],spec=BY_KEY[key];
   return spec.options?<Choice key={key} spec={spec} value={values[key]} options={spec.options} onChange={change} tone={tone} label={label??spec.label}/>:<Fader key={key} spec={spec} value={values[key]} onChange={change} tone={tone} label={label??spec.label}/>;

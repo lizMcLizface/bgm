@@ -14,6 +14,7 @@ import {MODELS,MOD_SOURCES,MOD_TARGETS} from '../../synth-lab/patch';
 import {FM_ALGORITHMS,FM_MOD_SOURCES,FM_MOD_TARGETS} from '../../synth-lab/fmPatch';
 import {BODY_TYPES} from '../../synth-lab/voiceColour';
 import {useEnsemblePanel} from '../ui/EmbeddedShell';
+import './polyFinish.css';
 
 const WAVES=['Off','Sine','Triangle','Saw','Pulse','Organ','Hollow','Choir','Glass','Reed','Band-limited triangle'];
 const OPTIONS={waveA:WAVES,waveB:WAVES,filter:['12 dB low-pass','24 dB low-pass','Band-pass','High-pass','Notch'],noiseType:['White','Pink','Brown'],phaseLock:['Free','Restart'],filterFamily:['State variable','Feedback ladder (LP24)'],lfoShape:['Sine','Triangle','Square','Saw','Sample & hold'],hardSync:['Off','B resets A'],bLow:['Audio range','Low range'],bKeytrack:['Fixed','Keyboard'],envelopeTarget:['A + B','A only'],bodyType:BODY_TYPES,enabled:['Muted','On'],wave:['Sine','Half sine','Absolute sine','Squared sine'],keySync:['Free running','Reset on key'],legacyEnvelope:['Current','Legacy'],legacyAmp:['Current','Legacy'],bypass:['Active','Bypassed'],pingPong:['Stereo','Ping-pong']};

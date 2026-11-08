@@ -68,11 +68,12 @@ export default class ClassicsInstrument {
   return id;
  }
  /** One of the machine's own tracks by key (bd, mt, cl, ...), for the step sequencer; `drum` is the nearest generator drum, for its level. */
- hitTrack(key,drum,start,velocity){
+ hitTrack(key,drum,start,velocity,params={}){
   const index=KITS[this.preset.classics.synth]?.tracks.findIndex(([k])=>k===key);
   if(!this.drums||index===undefined||index<0)return this.hit(drum,start,velocity);
   const pad=this.kit?.[DRUMS[drum]];if(pad?.on===false)return null;
   const id=this.nextId++,note=36+index,v=Math.min(1,velocity*(pad?.level??1));
+  for(const [name,field] of [['accent',1],['tune',2],['decay',3]])if(Number.isFinite(params[name])&&params[name]!==0)this.pressure(index*4+field,params[name],start);
   if(this.offlineEvents)this.offlineEvents.push([0,id,note,v,start],[1,id,0,0,start+.05]);
   else{this.live.noteOn(id,note,v,start);this.live.noteOff(id,start+.05);}
   return id;

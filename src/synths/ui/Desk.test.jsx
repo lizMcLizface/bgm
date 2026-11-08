@@ -1,7 +1,44 @@
 import {describe,it,expect} from 'vitest';
+import React,{act} from 'react';
+import {createRoot} from 'react-dom/client';
+import Desk from './Desk';
 import {isVisibleDeskItem,measureVisibleDesk,resetLayout} from './Desk';
 
 describe('reset layout',()=>{
+ it('only applies a requested arrangement once, while reset can restore the page-specific physical layout',async()=>{
+  globalThis.IS_REACT_ACT_ENVIRONMENT=true;vi.stubGlobal('ResizeObserver',class{observe(){}disconnect(){}});
+  localStorage.clear();const container=document.createElement('div');document.body.append(container);const root=createRoot(container);
+  const first=vi.fn(),reset=vi.fn(),objects={spread:vi.fn(),clearPoses:vi.fn()};
+  try{
+   act(()=>root.render(<Desk storageKey="test:rig" objects={objects} arrangeRequest={1} arrangeObjects={first} resetObjects={reset}><div>Instrument</div></Desk>));
+   await vi.waitFor(()=>expect(first).toHaveBeenCalledOnce());
+   act(()=>root.render(<Desk storageKey="test:rig" objects={objects} arrangeRequest={1} arrangeObjects={null} resetObjects={reset}><div>Serial mode</div></Desk>));
+   await new Promise(resolve=>setTimeout(resolve,40));expect(objects.spread).not.toHaveBeenCalled();
+   act(()=>container.querySelectorAll('.desk-crop')[1].click());await vi.waitFor(()=>expect(reset).toHaveBeenCalledWith(objects));expect(objects.clearPoses).toHaveBeenCalledWith({apply:true});
+  }finally{act(()=>root.unmount());container.remove();localStorage.clear();vi.unstubAllGlobals();delete globalThis.IS_REACT_ACT_ENVIRONMENT;}
+ });
+ it('leaves horizontal scrolling inside panels to the panel instead of panning the desk',()=>{
+  globalThis.IS_REACT_ACT_ENVIRONMENT=true;vi.stubGlobal('ResizeObserver',class{observe(){}disconnect(){}});
+  localStorage.clear();const container=document.createElement('div');document.body.append(container);const root=createRoot(container);
+  try{
+   act(()=>root.render(<Desk><div data-testid="scroller" style={{overflowX:'auto'}}><span>Choices</span></div></Desk>));
+   const child=container.querySelector('[data-testid=scroller]');Object.defineProperties(child,{clientWidth:{value:100},scrollWidth:{value:500}});
+   const e=new WheelEvent('wheel',{deltaX:60,bubbles:true,cancelable:true});act(()=>child.dispatchEvent(e));expect(e.defaultPrevented).toBe(false);
+  }finally{act(()=>root.unmount());container.remove();localStorage.clear();vi.unstubAllGlobals();delete globalThis.IS_REACT_ACT_ENVIRONMENT;}
+ });
+ it('clears native focus-scroll offsets when fitting or restoring the camera',()=>{
+  globalThis.IS_REACT_ACT_ENVIRONMENT=true;
+  vi.stubGlobal('ResizeObserver',class{observe(){}disconnect(){}});
+  localStorage.clear();const container=document.createElement('div');document.body.append(container);const root=createRoot(container);
+  try{
+   act(()=>root.render(<Desk><div>Instrument</div></Desk>));
+   const view=container.querySelector('.desk-view');
+   for(const button of [container.querySelector('.desk-crop'),container.querySelector('[aria-label="Back to the instrument"]')]){
+    view.scrollTop=80;view.scrollLeft=40;
+    act(()=>button.click());expect(view.scrollTop).toBe(0);expect(view.scrollLeft).toBe(0);
+   }
+  }finally{act(()=>root.unmount());container.remove();localStorage.clear();vi.unstubAllGlobals();delete globalThis.IS_REACT_ACT_ENVIRONMENT;}
+ });
  it('resets all-page positions without deleting saved songs or generator preferences',()=>{
   localStorage.clear();
   for(const key of ['generator','mixer','keys-pos','scope-pos','win-lead','rack-bass','state','continuous-buffer'])

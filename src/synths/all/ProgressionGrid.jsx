@@ -34,7 +34,7 @@ export function pitchClasses(key, offScale) {
  return Array.from({length:12},(_,i)=>mod(key.tonic+i,12)).filter(pc=>!scale.includes(pc));
 }
 
-export default function ProgressionGrid({project,pattern,part,colour,offset,onOffset,headRef,view,offScale,onOffScale,octave,onOctave,octaveFilter=null,shiftHeld=false,onFilterOctave=()=>{},pitch,onPitch,onToggleNote,drumMode=false,drumSound=null,drumVoice='felt',drumOffset=0,onDrumOffset,onToggleDrum,stepSize=1,focus=null,onFocus=()=>{},onShiftChord=()=>{},chordMode=false,deleteMode=false,editMode=false,copyMode=false,onEditPad=()=>{},onCopyPad=()=>{},onChordPad=()=>{},onDeletePad=()=>{},selectedPlaced=null,selectedDelete=null,selectedEdit=[]}) {
+export default function ProgressionGrid({project,displayKey=project.key,pattern,part,colour,offset,onOffset,headRef,view,offScale,onOffScale,octave,onOctave,octaveFilter=null,shiftHeld=false,onFilterOctave=()=>{},pitch,onPitch,onToggleNote,drumMode=false,drumSound=null,drumVoice='felt',drumOffset=0,onDrumOffset,onToggleDrum,stepSize=1,focus=null,onFocus=()=>{},onShiftChord=()=>{},chordMode=false,deleteMode=false,editMode=false,copyMode=false,onEditPad=()=>{},onCopyPad=()=>{},onChordPad=()=>{},onDeletePad=()=>{},selectedPlaced=null,selectedDelete=null,selectedEdit=[]}) {
  const drag=React.useRef(null),suppressClick=React.useRef(false);
  const [preview,setPreview]=React.useState(null);
  React.useEffect(()=>()=>{if(drag.current)clearTimeout(drag.current.hold);},[]);
@@ -42,7 +42,7 @@ export default function ProgressionGrid({project,pattern,part,colour,offset,onOf
  const max=Math.max(start,end-16*stepSize), at=Math.min(max,Math.max(start,start+Math.floor((offset-start)/stepSize)*stepSize));
  const chords=project.chords.filter(c=>c.bar<part.startBar+part.bars);
  const focusChord=chords.find(c=>c.bar===focus);
- const pcs=pitchClasses(project.key,offScale);
+ const pcs=pitchClasses(displayKey,offScale);
  const chosenPitch=pcs.includes(pitch)?pitch:pcs[0];
  const steps=Array.from({length:16},(_,i)=>at+i*stepSize);
  const generated=chordMode?generatedChords(pattern,project.key,project.stepsPerBar):[];
@@ -57,24 +57,24 @@ export default function ProgressionGrid({project,pattern,part,colour,offset,onOf
  });
  const maxDrumOffset=Math.max(0,DRUM_LANES.length-8), drumAt=Math.min(maxDrumOffset,drumOffset);
  const chordAt=step=>[...chords].reverse().find(c=>c.bar*project.stepsPerBar<=step);
- const labelRoot=chordRoot(focusChord)??project.key.tonic;
- const tonicColour=pc=>getIntervalColor(pc-project.key.tonic);
+ const labelRoot=chordRoot(focusChord)??displayKey.tonic;
+ const tonicColour=pc=>getIntervalColor(pc-displayKey.tonic);
  const labelColour=pc=>chordMode?tonicColour(pc):offScale?colour:getIntervalColor(pc-labelRoot);
  const interval=pc=>intervalNames[mod(pc-labelRoot,12)];
  const spans=chords.map((chord,i)=>({chord,start:Math.max(at,chord.bar*project.stepsPerBar),end:Math.min(at+16*stepSize,end,(chords[i+1]?.bar??part.startBar+part.bars)*project.stepsPerBar)})).filter(s=>s.start<s.end);
  const gridView=chordMode?'octave':view;
  const filterOct=chordMode?null:octaveFilter;
- const scaleSet=new Set(project.key.scale.map(n=>mod(project.key.tonic+n,12)));
+ const scaleSet=new Set(displayKey.scale.map(n=>mod(displayKey.tonic+n,12)));
  const ROMAN=['I','II','III','IV','V','VI','VII','VIII'];
  // the key's chord on each degree: the progression's own name for it when it plays one, else the diatonic seventh chord
  const degreeChord=pc=>{
-  const degree=project.key.scale.findIndex(n=>mod(project.key.tonic+n,12)===pc);
+  const degree=displayKey.scale.findIndex(n=>mod(displayKey.tonic+n,12)===pc);
   if(degree<0)return null;
   const used=project.chords.find(c=>chordRoot(c)===pc);
-  const offsets=diatonicChord(project.key.scale,degree+1,4),start=project.key.scale[degree];
+  const offsets=diatonicChord(displayKey.scale,degree+1,4),start=displayKey.scale[degree];
   const intervals=offsets.map(x=>x-start),minor=intervals[1]===3;
   const numeral=minor?ROMAN[degree].toLowerCase():ROMAN[degree];
-  return {name:used?.name??spellScale(project.key.tonic,project.key.scale)[degree]+chordSymbol(intervals),numeral:numeral+(intervals[2]===6?'°':''),degree};
+  return {name:used?.name??spellScale(displayKey.tonic,displayKey.scale)[degree]+chordSymbol(intervals),numeral:numeral+(intervals[2]===6?'°':''),degree};
  };
  // In chord mode the boxes beside the rows are a legend, not row names: the rows stay octaves (their buttons say so), the boxes list the key's chord on each degree,
  // one line down from the top, so they visibly do not line up with the rows.
@@ -156,14 +156,14 @@ export default function ProgressionGrid({project,pattern,part,colour,offset,onOf
     }
     if(step>=end||!project.key||(gridView==='scale'&&pc===undefined&&row!==7))return <span key={`${row}-${i}`} className="cell void" aria-hidden="true"/>;
     if(row===7){
-     const scale=new Set(project.key.scale.map(n=>mod(project.key.tonic+n,12)));
+     const scale=new Set(displayKey.scale.map(n=>mod(displayKey.tonic+n,12)));
      const hasOff=notesByStep[i].some(n=>!scale.has(mod(n.midi,12))&&(gridView!=='scale'||filterOct===null||Math.floor(n.midi/12)-1===octaveFilter));
      return <span key={`${row}-${i}`} className={'cell off-indicator'+(hasOff?' on':'')+(chordMode?' dark':'')} style={{'--voice':colour}} role="img" aria-label={`Step ${(step-start)/stepSize+1}: ${hasOff?'contains':'no'} off-scale notes`}/>;
     }
     const midi=gridView==='scale'?12*(octave+1)+pc:12*(oct+1)+chosenPitch;
     const placed=placedByStep[i].filter(item=>(chordMode?[item.rootMidi]:item.tones).some(midi=>gridView==='scale'?mod(midi,12)===pc&&(filterOct===null||Math.floor(midi/12)-1===octaveFilter):Math.floor(midi/12)-1===oct));
     const notes=sounding(i,row), chord=chordAt(step);
-    const colours=[...new Set([...notes.map(note=>octaveColour(chordMode?tonicColour(mod(note.midi,12)):pitchColour(mod(note.midi,12),chord,project.key,colour),gridView==='scale'?Math.floor(note.midi/12)-1-octave:0)),...(chordMode?placed.map(item=>tonicColour(mod(item.rootMidi,12))):[])])];
+    const colours=[...new Set([...notes.map(note=>octaveColour(chordMode?tonicColour(mod(note.midi,12)):pitchColour(mod(note.midi,12),chord,displayKey,colour),gridView==='scale'?Math.floor(note.midi/12)-1-octave:0)),...(chordMode?placed.map(item=>tonicColour(mod(item.rootMidi,12))):[])])];
     const held=(notes.length>0||placed.length>0)&&notes.every(note=>note.start<step)&&placed.every(note=>note.start<step);
     const paint=colours.length>1?`linear-gradient(90deg,${colours.map((c,j)=>`${c} ${j*100/colours.length}% ${(j+1)*100/colours.length}%`).join(',')})`:undefined;
     const previewed=preview?.row===row&&i>=preview.from&&i<=preview.to;

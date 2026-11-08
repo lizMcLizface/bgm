@@ -98,7 +98,7 @@ function ShapeRow({side,index,count,custom,editing,library,onEdit,onIndex,onCoun
  </div>;
 }
 
-export default function ZPlaneScope({values,onChange,faders}){
+export default function ZPlaneScope({values,onChange,faders,sideControls=false}){
  const v=k=>values['zplane.'+k],get=k=>v(k),a=Math.round(v('a')),b=Math.round(v('b')),morph=v('morph'),shift=v('shift'),q=v('q');
  const idx={a,b};
  const set=(key,value)=>{const spec=RACK_PARAMS.BY_KEY['zplane.'+key];onChange({['zplane.'+key]:Math.max(spec.min,Math.min(spec.max,value))});};
@@ -239,6 +239,6 @@ export default function ZPlaneScope({values,onChange,faders}){
     onCount={n=>{commitNodes(side,resizeNodes(nodes[side].rows,nodes[side].count,n));turnOn(side);}}/>)}
   </div>
   </div>
-  <div className="rack-controls zp-faders">{faders}</div>
+  <div className={sideControls?'zp-side-knobs':'rack-controls zp-faders'}>{faders}</div>
  </div>;
 }

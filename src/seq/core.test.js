@@ -35,6 +35,19 @@ const fakeClock = () => {
 };
 const bank = (overrides = {}) => ({ patterns: [{ rows: [row(0, 4, 8, 12)], accent: null }, { rows: [row(2)], accent: null }], lengths: [16, 16], tempos: [0, 0], chain: [], current: 0, ...overrides });
 
+test('publishes a new bank at a boundary without resetting clock, step count or the running timer',()=>{
+ const clock=fakeClock(),played=[];let version='old',length=4,bpm=120;
+ const s=createScheduler({now:()=>clock.t,bank:()=>({patterns:[version],lengths:[length],tempos:[],chain:[],current:0}),tempo:()=>bpm,swing:()=>.5,flam:()=>.5,
+  beforeStep:({step,count})=>{if(step===0&&count===4){version='new';length=3;bpm=60;}},
+  events:(pattern,step,c)=>[{pattern,step,time:c.time,count:c.count}],emit:events=>played.push(...events),timers:clock.timers});
+ s.start(0);clock.advance(1.3);
+ expect(s.running).toBe(true);expect(clock.fns).toHaveLength(1);
+ expect(played.slice(0,8).map(e=>[e.pattern,e.step,+e.time.toFixed(3),e.count])).toEqual([
+  ['old',0,0,0],['old',1,.125,1],['old',2,.25,2],['old',3,.375,3],
+  ['new',0,.5,4],['new',1,.75,5],['new',2,1,6],['new',0,1.25,7],
+ ]);s.stop();
+});
+
 test('the scheduler books quarter notes at the tempo, ahead of the clock', () => {
     const clock = fakeClock(), booked = [];
     const s = createScheduler({ now: () => clock.t, bank: () => bank(), tempo: () => 120, swing: () => 0.5, flam: () => 0.5, emit: (events) => booked.push(...events), timers: clock.timers });

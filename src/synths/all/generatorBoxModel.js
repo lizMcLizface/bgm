@@ -1,6 +1,7 @@
-// The generator box (docs/GENERATOR_BOX_PLAN.md): the front page's generator as one hardware-style box. Seven section buttons
-// on the left, a display in the middle, four knobs under it. This file is the data of the box: what every section's four knobs
-// are. Scale, Progression and Tempo are bound to the sequencers' song (seqValues / seqPatch below); Evolution, Wander and Rules are still the box's own proof-of-concept state.
+// Section metadata and the generator's bound song-control recipes. Every page
+// shares one fixed display and four encoders. GeneratorControls assigns the
+// live Control, Evolution, Wander and Rules banks; seqValues / seqPatch bind
+// Scale, Progression and Tempo to the captured song.
 //
 import { SCALE_FAMILIES, TONIC_NAMES } from '../../app/theory';
 import BANK from '../../app/progressions';

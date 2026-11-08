@@ -44,8 +44,8 @@ describe('capture', () => {
             { ...rec([], { name: 'G', numeral: 'V' }), music: { ...rec([]).music, cycleStart: 2 } },
         ];
         expect(captureProgressions(records)).toEqual([
-            { startBar: 0, bars: 2, chords: [{ bar: 0, name: 'C', numeral: 'I' }, { bar: 1, name: 'G', numeral: 'V' }] },
-            { startBar: 2, bars: 1, chords: [{ bar: 0, name: 'G', numeral: 'V' }] },
+            { startBar: 0, bars: 2, key, chords: [{ bar: 0, name: 'C', numeral: 'I' }, { bar: 1, name: 'G', numeral: 'V' }] },
+            { startBar: 2, bars: 1, key, chords: [{ bar: 0, name: 'G', numeral: 'V' }] },
         ]);
     });
     it('captures simultaneous percussion as drum hits rather than pitched notes', () => {
@@ -54,4 +54,9 @@ describe('capture', () => {
         expect(drums.steps[4].hits).toEqual([{drum:0,velocity:0.7,duration:2},{drum:4,velocity:0.6,duration:1,track:'ch'}]);
         expect(captureProject(records).patterns.perc).toEqual(drums);
     });
+});
+it('captures a minimal legacy record without inventing historical key provenance',()=>{
+ const records=[{chord:{name:'C'},events:[ev('lead',60,0)]}];
+ expect(captureProgressions(records)).toEqual([{startBar:0,bars:1,chords:[{bar:0,name:'C',numeral:undefined}]}]);
+ expect(capturePattern(records,'lead',{key,stepsPerBar:16}).steps[0].n).toEqual([{d:0,o:0,a:0}]);
 });

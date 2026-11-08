@@ -3,6 +3,7 @@ import {ZPLANE_SHAPE_NAMES,FLAT_ROWS,ZPLANE_MAX_NODES,DEFAULT_NODES} from './zpl
 import {EFFECTS} from '../../synth-lab/effectsConfig';
 import {INSERTS} from '../../synth-lab/insertsConfig';
 import {ORDER_COUNT,CHAIN_MAX,DEFAULT_CHAIN,chainUnits} from './order';
+import {BOX_ORDER_COUNT,BOX_CHAIN_MAX,logicalChain} from './routing';
 
 const definitions=[
  ...INSERTS.map(d=>['inserts',d]),...EFFECTS.map(d=>['effects',d]),
@@ -40,6 +41,11 @@ const definitions=[
  ...['zplane'].map(k=>['switch',[k,k,0,1,1,1]]),
  // the two custom shapes of the z-plane filter (zplaneShapes.js): up to twelve nodes each of frequency, bandwidth and boost, and how many nodes, appended last
  ...['a','b'].flatMap(side=>[...FLAT_ROWS.flatMap((row,i)=>[[`c${side}${i}f`,`Custom ${side.toUpperCase()} ${i+1} · Hz`,20,12000,1,row[0]],[`c${side}${i}w`,`Custom ${side.toUpperCase()} ${i+1} width · Hz`,8,8000,1,row[1]],[`c${side}${i}d`,`Custom ${side.toUpperCase()} ${i+1} boost · dB`,-30,30,.1,row[2]]]),[`c${side}n`,`Custom ${side.toUpperCase()} nodes`,1,ZPLANE_MAX_NODES,1,DEFAULT_NODES]]).map(d=>['zplane',d]),
+ // Independent delay/reverb routing; old numeric parameter IDs stay unchanged.
+ ...[['routing','Routing version',0,1,1,0],['boxOrder','Independent effect order',0,BOX_ORDER_COUNT-1,1,0],['boxChain','Independent effect units',0,BOX_CHAIN_MAX,1,0]].map(d=>['master',d]),
+ // Append-only: old rack parameter IDs and order codes retain their meaning.
+ ...[['rate','Rate · Hz',.5,10,.01,4.5],['depth','Depth · cents',0,50,.1,12]].map(d=>['vibrato',d]),
+ ['switch',['vibrato','Vibrato',0,1,1,1]],
 ];
 export const RACK_PARAMS=defineParams(definitions.map(([prefix,[key,label,min,max,step,value]],id)=>{
  const unit=/· cents/.test(label)?'decimal':/· semitones/.test(label)?'decimal':/· Hz/.test(label)?'Hz':/· s$|seconds$/.test(label)?'s':/· ms/.test(label)?'ms':/· dB/.test(label)?'dB':/· octaves/.test(label)?'oct':max<=1&&step!==1?'%':'decimal';
@@ -88,16 +94,16 @@ export function splitRackEdits(synth,changes,{moved=false}={}){
 }
 export function rackPackets(raw){
  const p=RACK_PARAMS.sanitize(raw),inserts={},effects={},compressor={},master={},extras={};
- const EXTRA=['filter','tremolo','crusher','ring','pitch','width','limiter','tape','shimmer','freeze','zplane'];
+ const EXTRA=['filter','tremolo','crusher','ring','pitch','width','limiter','tape','shimmer','freeze','zplane','vibrato'];
  for(const [key,v]of Object.entries(p)){const [scope,k]=key.split('.');if(scope==='inserts')inserts[k]=v;else if(scope==='effects')effects[k]=v;else if(scope==='compressor')compressor[k]=v;else if(scope==='master')master[k]=v;else if(EXTRA.includes(scope))(extras[scope]??={})[k]=v;}
  // a unit that is not in the chain does not run, whatever its settings; one that is in it can still be switched off
- const inChain=chainUnits(master.chain),on=unit=>inChain.includes(unit);
+ const inChain=logicalChain(p),on=unit=>inChain.includes(unit);
  if(!on('saturation')||!p['switch.saturation'])inserts.saturation=0;
  if(!on('eq')||!p['switch.eq'])inserts.lowGain=inserts.midGain=inserts.highGain=0;
  for(const k of ['phaser','flanger','chorus'])if(!on(k)||!p['switch.'+k])inserts[k]=0;
  if(!on('compressor'))compressor.enabled=0;
- if(!on('space')||!p['switch.delay'])effects.delay=0;
- if(!on('space')||!p['switch.reverb'])effects.reverb=effects.delayToReverb=0;
+ if(!on('delay')||!p['switch.delay'])effects.delay=0;
+ if(!on('reverb')||!p['switch.reverb']){effects.reverb=effects.delayToReverb=0;if(master.routing===1)effects.dry=1;}
  for(const k of EXTRA)extras[k].on=on(k)&&!!p['switch.'+k];
  return {inserts,effects,compressor,master,extras};
 }

@@ -17,7 +17,7 @@ test('a unit that is not in the chain does not run, whatever its settings', () =
 
 test('the added units are off until they are put in the chain', () => {
     const extras = rackPackets(cleanRack()).extras;
-    expect(Object.keys(extras).sort()).toEqual(['crusher', 'filter', 'freeze', 'limiter', 'pitch', 'ring', 'shimmer', 'tape', 'tremolo', 'width', 'zplane']);
+    expect(Object.keys(extras).sort()).toEqual(['crusher', 'filter', 'freeze', 'limiter', 'pitch', 'ring', 'shimmer', 'tape', 'tremolo', 'vibrato', 'width', 'zplane']);
     expect(Object.values(extras).every((e) => e.on === false)).toBe(true);
     const added = rackPackets(RACK_PARAMS.sanitize({ ...cleanRack(), 'master.chain': DEFAULT_CHAIN | (1 << 7) })).extras;
     expect(added.filter.on).toBe(true);

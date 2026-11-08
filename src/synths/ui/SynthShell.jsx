@@ -16,6 +16,7 @@ import StageKeys from './StageKeys';
 import ComparisonPresets from './ComparisonPresets';
 import EnvShapeEditor from './EnvShapeEditor';
 import useDraggable from './useDraggable';
+import FloatingInstrumentCase from './FloatingInstrumentCase';
 import SoundPicker,{soundList,nextSound} from './SoundPicker';
 import {SHAPE_KEYS} from './envShape';
 import RackPanel from '../effects/RackPanel';
@@ -62,8 +63,9 @@ export default function SynthShell(props){
 // rack alongside the panel, as the page's Effects button does.
 function BoundShell({synth,className='',panelClassName='',expand,nav=null,libraries=[],picker:Picker=SoundPicker,soundsInDevice=false,toggles=false,compactRack=true,children}){
  const host=useEnsemblePanel(),{values,effects}=host,{params:{BY_KEY},presets}=synth;
- const replaceValues=next=>host.onChange(synth.params.sanitize(next));
- const change=(key,value)=>{const more=expand?.(key,value)??[key],edits=Array.isArray(more)?Object.fromEntries(more.map(k=>[k,value])):more;replaceValues({...values,...edits});};
+ const draft=useRef(values);draft.current=values;
+ const replaceValues=next=>{const clean=synth.params.sanitize(next);draft.current=clean;host.onChange(clean);};
+ const change=(key,value)=>{const more=expand?.(key,value)??[key],edits=Array.isArray(more)?Object.fromEntries(more.map(k=>[k,value])):more;replaceValues({...draft.current,...edits});};
  const {control,group}=usePanelKit({BY_KEY,values,change,toggles});
  const [shelf,setShelf]=useState('sounds'),library=libraries.find(l=>l.id===shelf),current=host.current;
  const open=!!effects?.open,fullRack=open&&!compactRack;
@@ -75,8 +77,7 @@ function BoundShell({synth,className='',panelClassName='',expand,nav=null,librar
    {library?library.render({choose:host.choose,values,current,rack:effects?.values??{}}):<Picker synth={synth} presets={presets} mine={[]} current={current} currentCategory={host.category} choose={host.choose} remove={()=>{}} values={values} change={change} replaceValues={replaceValues} save={()=>{}}/>}
   </nav>
  );
- return <div className={'synth instrument bound '+className+(fullRack?' rack-open':'')}>
-  <div className="rig">
+ const body=<>
    {!soundsInDevice&&soundBar}
    {!fullRack&&nav}
    <main className={'panel'+(fullRack?' rack-panel':' '+panelClassName)}>
@@ -84,8 +85,10 @@ function BoundShell({synth,className='',panelClassName='',expand,nav=null,librar
     {open&&compactRack&&<RackCompact values={effects.values} onChange={effects.onChange} instrumentSpecs={effects.instrumentSpecs??[]} tools={effects.tools} onClose={effects.onClose} posKey={effects.posKey} home={effects.home}/>}
     {fullRack&&<RackPanel values={effects.values} onChange={effects.onChange} instrumentSpecs={effects.instrumentSpecs??[]} tools={effects.tools}/>}
    </main>
-  </div>
- </div>;
+ </>;
+ const caseClass=className+(fullRack?' rack-open':'');
+ return host.caseObject?<FloatingInstrumentCase object={host.caseObject} className={caseClass}>{body}</FloatingInstrumentCase>
+  :<div className={'synth instrument bound '+caseClass}><div className="rig">{body}</div></div>;
 }
 function StandaloneShell({synth,className='',headerExtras=null,nav=null,panelClassName='',expand,libraries=[],picker:Picker=SoundPicker,gridKeys=false,toggles=false,startEngine=startLiveSynth,engineOptions,onEngine,onStats,onMidiRealtime,onComparisonWaves,initialPatch,onChoose,compactRack=true,keyboard=true,helpInBar=false,soundsInDevice=false,children}){
  const {params:{BY_KEY,sanitize},presets}=synth,toPairs=synth.params.toEnginePairs??synth.params.toPairs;

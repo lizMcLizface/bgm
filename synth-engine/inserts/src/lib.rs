@@ -160,6 +160,12 @@ struct Inserts {
     dc_out: [f32; 2],
     drive: f32,
     trim: f32,
+    // Coefficients are shared; each channel retains independent filter history.
+    eq_keys: [[f32; 3]; 3],
+    drive_db: f32,
+    trim_db: f32,
+    drive_root: f32,
+    dc_r: f32,
 }
 impl Inserts {
     const fn new() -> Self {
@@ -184,6 +190,13 @@ impl Inserts {
             dc_out: [0.; 2],
             drive: 0.,
             trim: 0.,
+            // Keep the static tail zero-initialized so the large delay state
+            // remains in Wasm BSS. clear() invalidates these caches at runtime.
+            eq_keys: [[0.; 3]; 3],
+            drive_db: 0.,
+            trim_db: 0.,
+            drive_root: 0.,
+            dc_r: 0.,
         }
     }
     fn init(&mut self, sr: f32) {
@@ -194,6 +207,7 @@ impl Inserts {
         ];
         self.s = self.p;
         self.alpha = 1. - (-1. / (self.sr * 0.02)).exp();
+        self.dc_r = (-2. * PI * 10. / self.sr).exp();
         self.wet = 1.;
         self.frame = 0;
         self.clear();
@@ -201,6 +215,9 @@ impl Inserts {
     }
     fn clear(&mut self) {
         self.eq = [[Biquad::ZERO; 3]; 2];
+        self.eq_keys = [[f32::NAN; 3]; 3];
+        self.drive_db = f32::NAN;
+        self.trim_db = f32::NAN;
         self.phaser = [[0.; PHASER_STAGES]; 2];
         self.phaser_last = [0.; 2];
         self.phaser_phase = 0.;
@@ -245,15 +262,19 @@ impl Inserts {
         self.p[i] = v.clamp(lo, hi);
     }
     fn refresh(&mut self) {
-        for ch in 0..2 {
-            for band in 0..3 {
-                let (gain, hz, q) = match band {
-                    0 => (self.s[3], self.s[4], 0.7),
-                    1 => (self.s[5], self.s[6], self.s[7]),
-                    _ => (self.s[8], self.s[9], 0.7),
-                };
-                self.eq[ch][band].configure(band, gain, hz, q, self.sr);
+        for band in 0..3 {
+            let key = match band {
+                0 => [self.s[3], self.s[4], 0.7],
+                1 => [self.s[5], self.s[6], self.s[7]],
+                _ => [self.s[8], self.s[9], 0.7],
+            };
+            if self.eq_keys[band] != key {
+                self.eq[0][band].configure(band, key[0], key[1], key[2], self.sr);
+                self.eq[1][band].c = self.eq[0][band].c;
+                self.eq_keys[band] = key;
             }
+        }
+        for ch in 0..2 {
             let hz = (self.s[13]
                 * 2_f32
                     .powf(self.s[12] * (2. * PI * (self.phaser_phase + ch as f32 * self.s[24])).sin()))
@@ -261,8 +282,15 @@ impl Inserts {
             let t = (PI * hz / self.sr).tan();
             self.phaser_target[ch] = (t - 1.) / (t + 1.);
         }
-        self.drive = 10_f32.powf(self.s[2] / 20.);
-        self.trim = 10_f32.powf(self.s[23] / 20.);
+        if self.drive_db != self.s[2] {
+            self.drive = 10_f32.powf(self.s[2] / 20.);
+            self.drive_root = self.drive.sqrt();
+            self.drive_db = self.s[2];
+        }
+        if self.trim_db != self.s[23] {
+            self.trim = 10_f32.powf(self.s[23] / 20.);
+            self.trim_db = self.s[23];
+        }
     }
     fn render(&mut self, n: usize) {
         denormal::flush(&mut self.dc_in);
@@ -295,7 +323,7 @@ impl Inserts {
             self.frame += n.min(BLOCK) as u64;
             return;
         }
-        let dc = (-2. * PI * 10. / self.sr).exp();
+        let dc = self.dc_r;
         for i in 0..n.min(BLOCK) {
             let input = unsafe { [INPUT[0][i], INPUT[1][i]] };
             for k in 1..PARAMS {
@@ -331,7 +359,7 @@ impl Inserts {
             let mut out = input;
             if self.s[1] > 0. {
                 for ch in 0..2 {
-                    let shaped = soft(out[ch] * self.drive) / self.drive.sqrt();
+                    let shaped = soft(out[ch] * self.drive) / self.drive_root;
                     let filtered = shaped - self.dc_in[ch] + dc * self.dc_out[ch];
                     self.dc_in[ch] = shaped;
                     self.dc_out[ch] = filtered;
@@ -457,5 +485,41 @@ pub extern "C" fn inserts_stat(i: u32) -> f64 {
             1 => FX.frame as f64,
             _ => 0.,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn shared_coefficients_keep_independent_stereo_history_and_reset() {
+        let mut fx = Inserts::new();
+        fx.init(48000.);
+        fx.s[3] = 6.;
+        fx.refresh();
+        assert_eq!(fx.eq[0][0].c, fx.eq[1][0].c);
+        fx.eq[0][0].tick(0.25);
+        assert_eq!(fx.eq[1][0].x, [0.; 2]);
+        let before = fx.eq[0][0].c;
+        fx.refresh();
+        assert_eq!(fx.eq[0][0].c, before);
+        fx.clear();
+        assert_eq!(fx.eq[0][0].c, before);
+        assert_eq!(fx.eq[0][0].x, [0.; 2]);
+        fx.init(96000.);
+        fx.s[3] = 6.;fx.refresh();
+        assert_ne!(fx.eq[0][0].c, before);
+    }
+
+    #[test]
+    fn trim_and_drive_refresh_after_settle_and_reinitialization() {
+        let mut fx = Inserts::new();fx.init(48000.);
+        fx.s[2]=12.;fx.s[23]=-6.;fx.refresh();
+        assert_eq!(fx.drive_root,fx.drive.sqrt());
+        assert!((fx.trim-10_f32.powf(-6./20.)).abs()<1e-7);
+        fx.init(44100.);
+        assert_eq!(fx.trim,1.);
+        assert_eq!(fx.dc_r,(-2.*PI*10./44100.).exp());
     }
 }

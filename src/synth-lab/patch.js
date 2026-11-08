@@ -69,6 +69,8 @@ export const RECIPES=[
 ];
 const rosin=JSON.parse(JSON.stringify(RECIPES[8]));rosin.name='Rosin silk';Object.assign(rosin.global,{polyphony:16,gain:.92,chorus:0});Object.assign(rosin.layers[0],{waveA:3,waveB:3,attack:.16,release:.6,cutoff:3400,filterAmount:.6,lfoPitch:14,lfoRate:5.6,lfoDelay:.35,bow:.7,airBrightness:3500,noiseMotion:.5,body:.8,bodyType:2,bodyDecay:1,noisePressure:.3,noiseAttack:.3,pressureTone:.5});RECIPES.push(rosin);
 const wood=JSON.parse(JSON.stringify(RECIPES[4]));wood.name='Wooden pulse';Object.assign(wood.global,{polyphony:16,gain:.6});Object.assign(wood.layers[0],{waveA:2,waveB:0,levelB:0,sub:0,cutoff:2600,resonance:.1,filterAmount:.5,attack:.003,decay:.18,sustain:0,release:.12,bow:.12,body:.85,bodyType:0,bodyDecay:1.2,noiseAttack:.65});RECIPES.push(wood);
+// Direct LFO destinations make both modulation sections audible on held notes.
+RECIPES.push(recipe('LFO Motion',1,{polyphony:8,gain:.32},{waveA:4,waveB:3,levelA:.75,levelB:.16,fineB:-7,cutoff:1400,resonance:.27,filter:0,filterAmount:.4,attack:.08,decay:.4,sustain:.8,release:1.2,lfoRate:1.2,lfoShape:1,lfoFilter:1,lfoPwm:.16,lfo2Rate:.19,lfo2Filter:.4,lfo2Amp:.3}));
 export const clonePatch=p=>sanitizePatch(JSON.parse(JSON.stringify(p)));
 export function parameterTriples(patch){return [patch.global,...patch.layers].flatMap((values,scope)=>(scope===0?GLOBAL:LAYER).map(([key],index)=>[scope,index,values[key]]));}
 

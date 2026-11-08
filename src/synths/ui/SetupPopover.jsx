@@ -1,14 +1,37 @@
-import React,{useEffect} from 'react';
+import React,{useEffect,useLayoutEffect,useRef,useState} from 'react';
+import {createPortal} from 'react-dom';
 import useFloating from './useFloating';
 import {KEY_SIZES} from './setup';
 
-// The setup (MIDI, touch screen, audio) as a floating panel under the header, over the page instead of in place of the
-// synth's controls. The header drags it; Escape or the close button puts it away.
-export default function SetupPopover({midi,setup,updateSetup,connectMidi,audio,start,onClose,children}){
- const float=useFloating('synths:setup-pos');
+// Shared setup controls: a movable panel by default, or a ribbon dropdown when
+// an anchor is supplied. The dropdown stays outside the scaled desk surface.
+export default function SetupPopover(props){
+ return props.anchorRef?<AnchoredSetup {...props}/>:<FloatingSetup {...props}/>;
+}
+function FloatingSetup({positionKey='synths:setup-pos',home=null,...props}){
+ const float=useFloating(positionKey,home);
+ return <SetupPanel {...props} shell={{ref:float.ref,style:float.style,onPointerDownCapture:float.raise}} grip={float.handle}/>;
+}
+function AnchoredSetup({anchorRef,onClose,id,...props}){
+ const ref=useRef(null),[style,setStyle]=useState({visibility:'hidden'});
+ useLayoutEffect(()=>{
+  const place=()=>{const anchor=anchorRef.current;if(!anchor)return;const r=anchor.getBoundingClientRect(),width=Math.min(520,Math.max(0,window.innerWidth-24)),top=r.bottom+8;setStyle({position:'fixed',left:Math.max(12,Math.min(r.left,window.innerWidth-width-12)),right:'auto',top,width,maxHeight:Math.max(0,window.innerHeight-top-12),zIndex:200000});};
+  place();window.addEventListener('resize',place);window.addEventListener('scroll',place,true);
+  const observer=new ResizeObserver(place);if(anchorRef.current)observer.observe(anchorRef.current);if(anchorRef.current?.closest('header'))observer.observe(anchorRef.current.closest('header'));
+  return ()=>{observer.disconnect();window.removeEventListener('resize',place);window.removeEventListener('scroll',place,true);};
+ },[anchorRef]);
+ useEffect(()=>{
+  const away=e=>{if(!ref.current?.contains(e.target)&&!anchorRef.current?.contains(e.target))onClose();};
+  const escape=e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation();onClose();anchorRef.current?.focus({preventScroll:true});}};
+  document.addEventListener('pointerdown',away);window.addEventListener('keydown',escape,true);
+  return ()=>{document.removeEventListener('pointerdown',away);window.removeEventListener('keydown',escape,true);};
+ },[anchorRef,onClose]);
+ return createPortal(<SetupPanel {...props} onClose={onClose} shell={{id,ref,style}} anchored/>,document.body);
+}
+function SetupPanel({midi,setup,updateSetup,connectMidi,audio,start,onClose,children,shared=true,shell,grip={},anchored=false}){
  useEffect(()=>{const key=e=>{if(e.key==='Escape')onClose();};window.addEventListener('keydown',key);return ()=>window.removeEventListener('keydown',key);},[onClose]);
- return <div className="setup-pop" role="dialog" aria-label="Setup" ref={float.ref} style={float.style} onPointerDownCapture={float.raise}>
-  <header className="setup-pop-head" {...float.handle}><h2>Setup</h2><button type="button" className="close" onClick={onClose} aria-label="Close setup">×</button></header>
+ return <div className={'setup-pop'+(anchored?' setup-dropdown':'')} role="dialog" aria-label="Setup" {...shell}>
+  <header className="setup-pop-head" {...grip}><h2>Setup</h2><button type="button" className="close" onClick={onClose} aria-label="Close setup">×</button></header>
   <div className="setup">
     {children}
     <section className="group wide"><h3>MIDI piano</h3>
@@ -43,7 +66,7 @@ export default function SetupPopover({midi,setup,updateSetup,connectMidi,audio,s
       <label>Latency<select value={setup.latency} onChange={e=>updateSetup('latency',e.target.value)}><option value="interactive">Lowest (best for playing)</option><option value="balanced">Safer (if you hear crackles)</option></select></label>
       <button type="button" onClick={start}>Restart audio</button>
      </div>
-     <p className="hint">Changing latency takes effect when audio restarts. The engine runs in Rust/WebAssembly on the browser's audio thread. Settings here are shared by every synth on this device.</p>
+     <p className="hint">{shared?"Changing latency takes effect when audio restarts. The engine runs in Rust/WebAssembly on the browser's audio thread. Settings here are shared by every synth on this device.":'Latency changes take effect when audio restarts. These settings are saved with this desk.'}</p>
     </section>
   </div>
  </div>;

@@ -5,6 +5,7 @@
 
 import { VoiceFx } from '../../app/engine/voiceFx';
 import { ZPLANE_SHAPES, customRows } from './zplaneShapes';
+import {createVibrato} from './vibrato';
 
 const moduleLoads = new WeakMap();
 const loadWorklets = (context) => {
@@ -23,6 +24,7 @@ function voiceStage(context, key, toPreset) {
 }
 
 const BUILDERS = {
+    vibrato: createVibrato,
     // low cut and high cut, 12 or 24 dB per octave (two biquads each in 24 dB mode; a neutral frequency makes the second a no-op)
     filter(context) {
         const biquad = (type) => { const f = context.createBiquadFilter(); f.type = type; f.Q.value = 0.707; return f; };
@@ -99,7 +101,7 @@ const BUILDERS = {
     limiter(context) {
         const node = context.createDynamicsCompressor();
         node.knee.value = 0; node.ratio.value = 20; node.attack.value = 0.002; node.release.value = 0.09;
-        return { input: node, output: node, nodes: [node], patch(p, initial) { smooth(context, node.threshold, p.ceiling, initial); } };
+        return { input: node, output: node, nodes: [node],get reduction(){return node.reduction;}, patch(p, initial) { smooth(context, node.threshold, p.ceiling, initial); } };
     },
     async crusher(context) {
         await loadWorklets(context);
@@ -137,6 +139,7 @@ export async function createExtraStage(context, kind) {
     input.connect(inner.input); inner.output.connect(wet); wet.connect(output); input.connect(through); through.connect(output);
     return {
         input, output,
+        get reduction(){return inner.reduction??0;},
         patch(packet, initial = false) {
             inner.patch(packet, initial);
             smooth(context, wet.gain, packet.on ? 1 : 0, initial); smooth(context, through.gain, packet.on ? 0 : 1, initial);

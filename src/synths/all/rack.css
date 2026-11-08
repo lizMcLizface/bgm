@@ -37,7 +37,11 @@
 .all-native-pick select{flex:1;min-width:0;}
 .all-native-row{display:flex;gap:10px;}
 .all-win{width:max-content;max-width:none;}
-.all-win>.grip{height:12px;}
+.all-instrument .all-win>.rig-grip{box-sizing:border-box;position:relative;z-index:5;display:flex;justify-content:space-between;gap:16px;height:32px;min-height:32px;padding:0 12px;border:1px solid #59605f;border-bottom-color:#2c3438;border-radius:7px 7px 0 0;background:linear-gradient(#343d42,#222a30);color:#c4d2d5;font:11px system-ui,sans-serif;box-shadow:inset 0 1px #ffffff12;touch-action:none}
+.all-win>.rig-grip>span{font-weight:600;letter-spacing:.04em}
+.all-win>.rig-grip>small{font-size:10px;color:#94acb6}
+.all-win>.rig-grip>i{position:absolute;left:calc(50% - 18px);pointer-events:none}
+.all-win .synth-bar,.all-win .synth-title,.all-win .all-native-voice>h2{cursor:grab;touch-action:none}
 .all-win .rig{margin:0;}
 .all-instrument .bound.instrument{height:auto;min-height:0;display:block;background:none;}
 .all-instrument .bound .rig{flex:0 0 auto;max-height:none;margin:0;}

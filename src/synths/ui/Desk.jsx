@@ -12,7 +12,7 @@ import {load,save} from '../storage';
 // instrument's width as its layout viewport, so the browser's own pinch zoom and panning move around it.
 export const HOME_W=1500,HOME_H=840;
 export const BASE_W=3840,BASE_H=2160;
-const MIN_ZOOM=.25,MAX_ZOOM=2.5,VIEW_KEY='synths:desk',LAYOUT_KEY='synths:desk:layout',GROW_PAD=160,CONTENT_MARGIN=48;
+const MIN_ZOOM=.25,MAX_ZOOM=2.5,GROW_PAD=160,CONTENT_MARGIN=48;
 const clamp=(x,lo,hi)=>Math.min(hi,Math.max(lo,x));
 export const isVisibleDeskItem=el=>{
  for(let node=el;node;node=node.parentElement){
@@ -51,7 +51,7 @@ export const useDesk=()=>useContext(DeskContext)??LIVE;
 /** Forget where everything was put (the desk, its view, the rig, keyboard and every floating panel) and start over from the defaults. */
 export const RESET_EVENT='synths:reset-layout';
 export const resetLayout=()=>{
- try{Object.keys(window.localStorage).filter(k=>/^synths:(desk|scope-pos|keys-pos|rack-pos|setup-pos|diy:)/.test(k)||/^synths:all:(generator|voices|ambience|mixer|sequencer|keys-pos|scope-pos|win-.+|rack-.+)$/.test(k)||/^synths:[^:]+:(rig|seq|machine|arranger|generator|mixer|ambience|voices|sequencer)-pos$/.test(k)).forEach(k=>window.localStorage.removeItem(k));}catch{/* storage unavailable */}
+ try{Object.keys(window.localStorage).filter(key=>{const k=key.replace(/:angle$/,'');return /^synths:(desk|scope-pos|keys-pos|rack-pos|setup-pos|diy:)/.test(k)||/^synths:all:(generator|voices|ambience|mixer|sequencer|keys-pos|scope-pos|win-.+|rack-.+)$/.test(k)||/^synths:[^:]+:(rig|seq|machine|arranger|generator|mixer|ambience|voices|sequencer)-pos$/.test(k);}).forEach(k=>window.localStorage.removeItem(k));}catch{/* storage unavailable */}
  window.dispatchEvent(new Event(RESET_EVENT));
 };
 export const onSynth=(...classes)=>typeof document!=='undefined'&&classes.some(cls=>!!document.querySelector('.instrument.'+cls));
@@ -63,7 +63,8 @@ const defaultLayout=(box,homeW=HOME_W,homeH=HOME_H)=>{
  return {w,h,x:Math.round((w-homeW)/2),y:Math.round((h-homeH)/2)};
 };
 
-export default function Desk({children,includeHomeInFit=true}){
+export default function Desk({children,includeHomeInFit=true,objects=null,storageKey='synths:desk',arrangeRequest=0,arrangeWidth=3000,arrangeObjects=null,resetObjects=null,minZoom=MIN_ZOOM}){
+ const VIEW_KEY=storageKey,LAYOUT_KEY=storageKey+':layout';
  const view=useRef(null),homeRef=useRef(null),deskRef=useRef(null),[homeEl,setHomeEl]=useState(null);
  const touch=useMemo(isTouchScreen,[]);
  // a ref callback that stays the same between renders: a new one each time would null the element in the middle of a drag
@@ -74,7 +75,7 @@ export default function Desk({children,includeHomeInFit=true}){
  const itemsRef=useRef(new Map()),[,setItemsVersion]=useState(0);
  const [stored]=useState(()=>{const s=load(LAYOUT_KEY,null);return s&&Number.isFinite(s.w)&&Number.isFinite(s.h)&&Number.isFinite(s.x)&&Number.isFinite(s.y)&&s.w>=HOME_W&&s.h>=HOME_H?s:null;});
  const [layoutState,setLayout]=useState(stored);
- const [manual,setManual]=useState(()=>{const v=load(VIEW_KEY,null);return v&&Number.isFinite(v.zoom)?{zoom:clamp(v.zoom,MIN_ZOOM,MAX_ZOOM),x:v.x??0,y:v.y??0}:null;});
+ const [manual,setManual]=useState(()=>{const v=load(VIEW_KEY,null);return v&&Number.isFinite(v.zoom)?{zoom:clamp(v.zoom,minZoom,MAX_ZOOM),x:v.x??0,y:v.y??0}:null;});
  // a touch screen has no desk beyond the instrument
  const layout=touch?{w:homeW,h:homeH,x:0,y:0}:layoutState??defaultLayout(box,homeW,homeH);
  const layoutRef=useRef(layout);layoutRef.current=layout;
@@ -94,7 +95,7 @@ export default function Desk({children,includeHomeInFit=true}){
  useEffect(()=>{if(touch||!box.measured||!homeReady||layoutState)return;const l=defaultLayout(box,homeW,homeH);setLayout(l);save(LAYOUT_KEY,l);},[touch,box,layoutState,homeW,homeH,homeReady]);
 
  // zoom: the instrument's width at 1:1 when it fits the window, else fitted to the width; a window too short for all of it moves up and down
- const fitHome=clamp(box.w/(homeW+60),MIN_ZOOM,1);
+ const fitHome=clamp(box.w/(homeW+60),minZoom,1);
  const zoom=touch?1:manual?manual.zoom:fitHome;
  const zoomRef=useRef(zoom);zoomRef.current=zoom;
 
@@ -157,24 +158,38 @@ export default function Desk({children,includeHomeInFit=true}){
   return ()=>meta.setAttribute('content',old);
  },[touch,homeW]);
 
- const commit=useCallback((z,x,y)=>{const next={zoom:clamp(z,MIN_ZOOM,MAX_ZOOM),x,y};setManual(next);save(VIEW_KEY,next);},[]);
+ const clearNativeScroll=useCallback(()=>{if(view.current){view.current.scrollTop=0;view.current.scrollLeft=0;}},[]);
+ const commit=useCallback((z,x,y)=>{clearNativeScroll();const next={zoom:clamp(z,minZoom,MAX_ZOOM),x,y};setManual(next);save(VIEW_KEY,next);},[clearNativeScroll,minZoom]);
  // zoom about a point of the window (or its middle)
  const zoomTo=useCallback((z,px=box.w/2,py=box.h/2)=>{
-  const old=zoomRef.current,next=clamp(z,MIN_ZOOM,MAX_ZOOM),a=atRef.current;
+  const old=zoomRef.current,next=clamp(z,minZoom,MAX_ZOOM),a=atRef.current;
   const dx=(px-a.x)/old,dy=(py-a.y)/old;
   commit(next,px-dx*next,py-dy*next);
- },[box,commit]);
- const reset=useCallback(()=>{setManual(null);save(VIEW_KEY,{});},[]);
+ },[box,commit,minZoom]);
+ const reset=useCallback(()=>{clearNativeScroll();setManual(null);save(VIEW_KEY,{});},[clearNativeScroll]);
  // zoom to fit: everything on the desk (the instrument and every panel) in the window at once, as large as it can be without going past 1:1
  const fitAll=useCallback(()=>{
   const c=measure(includeHomeInFit),cw=c.r-c.l,ch=c.b-c.t;
-  const z=clamp(Math.min(box.w/cw,box.h/ch),MIN_ZOOM,1);
+  const z=clamp(Math.min(box.w/cw,box.h/ch),minZoom,1);
   commit(z,(box.w-cw*z)/2-c.l*z,(box.h-ch*z)/2-c.t*z);
- },[box,commit,includeHomeInFit]);
+ },[box,commit,includeHomeInFit,minZoom]);
 
  // the first time on this device the view starts on everything that is on the desk (the instrument and the panels around it)
  // after a reset the desk is laid out afresh and the view starts on everything again (the panels put themselves back)
  const fitRef=useRef(fitAll);fitRef.current=fitAll;
+ const arranger=useRef(arrangeObjects);arranger.current=arrangeObjects;
+ const spreadOptions=()=>arrangeWidth==='auto'?{aspect:box.w/Math.max(1,box.h),gap:64}:{width:arrangeWidth};
+ useEffect(()=>{
+  if(!arrangeRequest||!objects)return;
+  let fit;
+  const arrange=requestAnimationFrame(()=>{if(arranger.current)arranger.current(objects);else objects.spread(spreadOptions());fit=requestAnimationFrame(()=>fitRef.current());});
+  return ()=>{cancelAnimationFrame(arrange);if(fit)cancelAnimationFrame(fit);};
+ },[arrangeRequest,arrangeWidth,objects]);
+ const resetThisLayout=()=>{
+  if(storageKey==='synths:desk'){resetLayout();return;}
+  objects?.clearPoses({apply:true});setManual(null);setLayout(null);save(VIEW_KEY,{});save(LAYOUT_KEY,null);
+  requestAnimationFrame(()=>{if(objects&&resetObjects)resetObjects(objects);fitRef.current();});
+ };
  const firstFit=useRef(false);
  useEffect(()=>{
   const reset=()=>{firstFit.current=false;setLayout(null);setManual(null);setTimeout(()=>{if(!firstFit.current){firstFit.current=true;fitRef.current();}},250);};
@@ -193,7 +208,7 @@ export default function Desk({children,includeHomeInFit=true}){
    if(e.ctrlKey||e.metaKey){e.preventDefault();zoomTo(zoomRef.current*Math.exp(-e.deltaY*(e.deltaMode?.05:.0022)),e.clientX-r.left,e.clientY-r.top);return;}
    // the wheel moves the desk, except over something that scrolls itself
    const z=zoomRef.current;
-   for(let n=e.target;n&&n!==el;n=n.parentElement){const s=getComputedStyle(n);if(/(auto|scroll)/.test(s.overflowY)&&n.scrollHeight>n.clientHeight+1)return;}
+   for(let n=e.target;n&&n!==el;n=n.parentElement){const s=getComputedStyle(n);if(/(auto|scroll)/.test(s.overflowY)&&n.scrollHeight>n.clientHeight+1||/(auto|scroll)/.test(s.overflowX)&&n.scrollWidth>n.clientWidth+1)return;}
    const a=atRef.current,L=latest.current,n=L.place(z,{x:a.x-e.deltaX,y:a.y-e.deltaY},a,L.measure());e.preventDefault();commit(z,n.x,n.y);
   };
   el.addEventListener('wheel',wheel,{passive:false});
@@ -261,7 +276,8 @@ export default function Desk({children,includeHomeInFit=true}){
    <button type="button" className={'desk-zoom-fit'+(isFit?' is-fit':'')} aria-label="Back to the instrument" title="Back to the instrument at the default zoom" onClick={reset}>{percent}%</button>
    <button type="button" aria-label="Zoom in" title="Zoom in (Ctrl + wheel)" onClick={()=>zoomTo(zoomRef.current*1.15)}>+</button>
    <button type="button" className="desk-crop" title="Zoom to fit everything on the desk in the window" onClick={fitAll}>Fit all</button>
-   <button type="button" className="desk-crop" title="Put the instrument, keyboard and panels back where they start" onClick={resetLayout}>Reset layout</button>
+   <button type="button" className="desk-crop" title="Put the instrument, keyboard and panels back where they start" onClick={resetThisLayout}>Reset layout</button>
   </div>}
+  {objects&&<button type="button" className="desk-spread" title="Arrange visible boxes without changing their sound or connections" onClick={()=>{objects.spread(spreadOptions());requestAnimationFrame(()=>fitRef.current());}}>Spread</button>}
  </div>;
 }

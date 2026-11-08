@@ -87,3 +87,12 @@
 .all-drum-kit .gen-drum{display:grid;gap:4px;min-width:0;border:1px solid #5b584e}
 .all-drum-kit .gen-field{display:grid;gap:2px;font-size:12px}
 .all-drum-kit .gen-field input{width:100%}
+.all-instrument .box-grip,.all-instrument .rig-grip{display:flex;align-items:center;justify-content:center;gap:18px;min-height:25px}
+.all-native-voice{width:1100px;padding:16px;background:#242724;border:2px solid #6b725c;border-radius:8px;color:#eee}
+.all-native-voice h2{font:16px ui-monospace,monospace;margin:0 0 12px}
+.all-drum-tools{max-width:1200px;box-sizing:border-box;margin-top:10px;padding:16px;border:1px solid #7b6744;border-radius:8px;background:#1c211f;color:#e6d9bc;font:13px system-ui,sans-serif}
+.all-drum-tools>header,.all-drum-actions{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+.all-drum-tools>header{justify-content:space-between}
+.all-drum-tools button,.all-drum-tools select{padding:7px;border:1px solid #665a46;border-radius:4px;background:#292d28;color:#ead7ab;cursor:pointer}
+.all-drum-tools .se-fields{display:grid;grid-template-columns:repeat(4,minmax(130px,1fr));gap:18px}
+.all-drum-tools .step-editor{position:static;border:0;padding:0;background:transparent}

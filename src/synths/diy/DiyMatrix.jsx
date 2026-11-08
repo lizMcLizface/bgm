@@ -16,7 +16,7 @@ const FM_BUILT_IN={'1,1':'vibrato','1,2':'lfoIndex','1,4':'tremolo',...Object.fr
 
 export default function RoutingMatrix({fm,values,specs,prefix,sources,targets,change}){
  const [full,setFull]=useState(false);
- const drag=useRef(null),lastTap=useRef(0);
+ const drag=useRef(null),lastTap=useRef(null);
  const built=fm?FM_BUILT_IN:POLY_BUILT_IN,pre=fm?'global.':prefix;
  const rows=sources.slice(1),cols=targets.slice(1);
  const used=n=>values[`${pre}modSource${n}`]>0&&values[`${pre}modTarget${n}`]>0;
@@ -43,21 +43,22 @@ export default function RoutingMatrix({fm,values,specs,prefix,sources,targets,ch
   if(x.kind==='fixed')return;
   e.preventDefault();e.currentTarget.setPointerCapture?.(e.pointerId);e.currentTarget.focus({preventScroll:true});
   const now=performance.now();
-  if(now-lastTap.current<320){
-   lastTap.current=0;drag.current=null;
+  if(lastTap.current&&lastTap.current.r===r&&lastTap.current.c===c&&now-lastTap.current.time<320){
+   lastTap.current=null;drag.current=null;
    if(x.kind==='built')change(x.key,x.spec.default);else if(x.kind==='via')freeSlot(x.n);
    return;
   }
-  lastTap.current=now;
+  lastTap.current={r,c,time:now};
   drag.current={id:e.pointerId,r,c,y:e.clientY,x,start:x.kind==='empty'?null:toPosition(x.spec,values[x.key]),last:null};
  };
  const move=e=>{
   const d=drag.current;if(!d||d.id!==e.pointerId)return;
+  if(Math.abs(e.clientY-d.y)>=3)lastTap.current=null;
   if(d.x.kind==='empty'){
    if(Math.abs(e.clientY-d.y)<3)return;
    const n=free();
    if(!n){drag.current=null;flash();return;}
-   d.x=take(n,d.r,d.c);d.start=toPosition(d.x.spec,0);d.y=e.clientY;
+   d.x=take(n,d.r,d.c);d.start=toPosition(d.x.spec,0);
   }
   const p=Math.min(1,Math.max(0,d.start+(d.y-e.clientY)/(e.shiftKey?600:150)));
   let v=fromPosition(d.x.spec,p);

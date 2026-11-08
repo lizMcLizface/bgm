@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{useEffect,useRef} from 'react';
 import useFloating from '../ui/useFloating';
 import './rack.css';
 
@@ -6,9 +6,12 @@ import './rack.css';
 // on the desk; the place is remembered under `synths:all:<id>`, is kept in view and goes back with the desk's "Reset layout". `home` is where it
 // starts, in the instrument's coordinates.
 export default function FloatBox({id,label,home,className='',children,visible=true}){
- const float=useFloating('synths:all:'+id,home);
+ const float=useFloating('synths:all:'+id,home,{rotatable:true});
+ // A restored/opened surface may already be mounted behind another object.
+ const wasVisible=useRef(visible);
+ useEffect(()=>{if(visible&&!wasVisible.current)float.raise();wasVisible.current=visible;},[visible]);// eslint-disable-line react-hooks/exhaustive-deps
  return <section id={'all-panel-'+id} className={'all-box '+className} aria-label={label} aria-hidden={!visible} ref={float.ref} style={{...float.style,...(!visible?{visibility:'hidden',pointerEvents:'none'}:{})}} onPointerDownCapture={float.raise}>
-  <div className="grip box-grip" {...float.handle} role="presentation"><i/></div>
+  <div className="grip box-grip" {...float.handle} role="group"><i/></div>
   {children}
  </section>;
 }

@@ -25,6 +25,25 @@ function fixture(continuous=false){
  };
 }
 describe('all-page setup files',()=>{
+ it('round-trips an unapplied generator change and rejects invalid queue markers',()=>{
+  const state={...fixture(),pendingGenerator:true};expect(decodeSetup(encodeSetup(state)).pendingGenerator).toBe(true);
+  state.pendingGenerator='yes';expect(()=>decodeSetup(encodeSetup(state))).toThrow('damaged');
+ });
+ it('round-trips initial rule flags and an ordered continuous settings timeline',()=>{
+  const state=fixture(true);state.stream.flags={noteResolution:false};
+  state.stream.changes=[{at:0,settings:{meter:'4/4',bpm:110},flags:{noteResolution:true}},{at:1,settings:{meter:'4/4',bpm:120},flags:{noteResolution:false}}];
+  expect(decodeSetup(encodeSetup(state)).stream).toEqual(state.stream);
+ });
+ it.each([
+  s=>{s.stream.flags={planBar:false};},
+  s=>{s.stream.flags={noteResolution:1};},
+  s=>{s.stream.changes=[{at:2,settings:{meter:'4/4'},flags:{}}];},
+  s=>{s.stream.changes=[{at:0,settings:{meter:'6/8'},flags:{}}];},
+  s=>{s.stream.changes=[{at:0,settings:{meter:'4/4'},flags:{plan:false}}];},
+  s=>{s.stream.changes=Array(2).fill({at:0,settings:{meter:'4/4'},flags:{}});},
+ ])('rejects invalid continuous flags or timelines before creating a host',damage=>{
+  const state=fixture(true);damage(state);expect(()=>decodeSetup(encodeSetup(state))).toThrow('damaged');
+ });
  it.each([false,true])('round-trips an edited project in continuous mode %s',continuous=>{
   const state=fixture(continuous),decoded=decodeSetup(encodeSetup(state));
   expect(decoded).toMatchObject(state);
@@ -55,4 +74,21 @@ describe('all-page setup files',()=>{
   const state=fixture(true);damage(state);
   expect(()=>decodeSetup(encodeSetup(state))).toThrow('damaged');
  });
+});
+
+it('round-trips scoped scale transformations including their relative-pitch provenance',async()=>{
+ const {transposeProjectScale}=await import('./scaleTransform');
+ const state=fixture(true);state.project.patterns.lead.steps[0].range=[24,96];
+ state.project=transposeProjectScale(state.project,makeKey('Major-2',2),{startBar:0,endBar:1,whole:false});
+ expect(decodeSetup(encodeSetup(state)).project).toEqual(state.project);
+ for(const damage of [s=>{s.project.patterns.lead.steps[0].n[0].transposeDegree.d=Infinity;},s=>{s.project.progressions[0].key.scale=[0,2,2];},s=>{s.project.patterns.lead.steps[0].range=[100,20];}]){
+  const bad=structuredClone(state);damage(bad);expect(()=>decodeSetup(encodeSetup(bad))).toThrow('damaged');
+ }
+});
+
+it('exports versioned object layouts, accepts old setups and rejects duplicate object identities',()=>{
+ const state=fixture();state.workbench={version:1,objects:[{id:'obj-synth',binding:'instrument:lead',kind:'instrument',label:'Lead',pose:{x:-100,y:200,angle:25},size:{w:720,h:420},visible:true,z:95}]};
+ expect(decodeSetup(encodeSetup(state)).workbench).toEqual(state.workbench);
+ const legacy=JSON.parse(encodeSetup(fixture()));legacy.version=1;expect(decodeSetup(JSON.stringify(legacy)).version).toBe(2);expect(decodeSetup(JSON.stringify(legacy)).workbench).toBeUndefined();
+ state.workbench.objects.push({...state.workbench.objects[0],binding:'instrument:bass'});expect(()=>decodeSetup(encodeSetup(state))).toThrow('damaged');
 });

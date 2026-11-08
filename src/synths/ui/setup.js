@@ -2,7 +2,7 @@
 export const SETUP_KEY='synths:setup';
 export const SETUP={midiDevice:'all',midiChannel:'all',velocity:'normal',ribbonRange:12,wheelRange:2,latency:'interactive',keys:'auto',keysLow:48,keysCount:25,
  // the keybed: 'fit' fills the box as before; 49, 61, 76 and 88 are whole keybeds. Controls are the mod wheel, ribbon and touch pad beside the keys.
- keysSize:'fit',keysControls:true,
+ keysSize:88,keysControls:true,
  // what the computer keys send: a velocity (1-127) and how far it wanders from it each time
  keyVelocity:95,keyVariation:0};
 export const CURVES={light:{curve:.6,floor:.08},normal:{curve:1,floor:.06},firm:{curve:1.6,floor:.04}};

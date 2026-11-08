@@ -29,7 +29,7 @@ export function stepPitches(pattern, step, { key, harmony = null, harmonyStep = 
     const notes = s.chord
         ? chordTones(key, s.chord).map((x) => x + 12 * octave)
         : (s.n ?? []).map((note) => resolveNote(note, { follow: pattern.follow ?? 'scale', key, harmony, step: harmonyStep, octave }));
-    return fitToRange(notes, pattern.range);
+    return fitToRange(notes, s.range??pattern.range);
 }
 
 /** The events a step plays. `step` is the step within the pattern; `count` the steps since the start (the repeats of a step use `cycle` for conditions). */

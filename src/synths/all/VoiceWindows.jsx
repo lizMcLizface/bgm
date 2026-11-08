@@ -10,6 +10,7 @@ import {SYNTHS} from '../models';
 import {NATIVE} from './host';
 import {DrumMachineVoices,DrumVoicePanel} from '../drums/DrumMachine';
 import DrumKitPads from '../../app/DrumKitPads';
+import NativePanel from '../../app/editor/NativePanel';
 
 // A voice's synth on /synths/all is its own page's panel, the `.rig` of that page (its sound bar and its boxes of controls) and nothing else, floated on the desk by a grip
 // on its top edge like the panels of the other pages. It reads and writes the host's sound of the voice (host.soundOf / nativeOf / editValues / editNative), so a sound
@@ -31,9 +32,12 @@ export const panelHome=(kind,anchor,size)=>{
 const homeFor=(kind,selector)=>(s,el,desk)=>panelHome(kind,bounds(selector,desk),{w:el?.offsetWidth??0,h:el?.offsetHeight??0});
 
 function Rig({id,children}){
- const float=useFloating('synths:all:win-'+id,homeFor('synth',SEQUENCER),{anchor:[SEQUENCER]});
- return <div className="all-win" ref={float.ref} style={{position:'absolute',...float.style}} onPointerDownCapture={float.raise}>
-  <div className="grip rig-grip" {...float.handle} role="presentation"><i/></div>
+ const float=useFloating('synths:all:win-'+id,homeFor('synth',SEQUENCER),{anchor:[SEQUENCER],spawnOnly:true,rotatable:true});
+ // Both the explicit chrome and blank parts of an instrument's title bar move
+ // its window. Actual controls retain their own pointer gestures.
+ const titleDown=e=>{if(e.target.closest('.synth-bar,.synth-title,.presets,.all-native-voice>h2'))float.handle.onPointerDown(e);};
+ return <div className="all-win" ref={float.ref} style={{position:'absolute',...float.style}} onPointerDownCapture={float.raise} onPointerDown={titleDown} onContextMenu={e=>{if(e.target.closest('.synth-bar,.synth-title,.presets,.all-native-voice>h2'))float.handle.onContextMenu(e);}} onPointerMove={float.handle.onPointerMove} onPointerUp={float.handle.onPointerUp} onPointerCancel={float.handle.onPointerCancel} onLostPointerCapture={float.handle.onLostPointerCapture}>
+  <div className="grip rig-grip" {...float.handle} role="group"><span>{{lead:'Lead',counter:'Second lead',rhythm:'Rhythm',pad:'Pad',bass:'Bass',perc:'Drums'}[id]} synth</span><i/><small>Drag to move · right-drag to rotate</small></div>
   {children}
  </div>;
 }
@@ -59,7 +63,7 @@ export function VoiceWindow({role,index,host,showSynth,fx,tuning,onChoose,onEdit
  const sound=host.soundOf(role),entry=host.nativeOf(role);
  const tools=<button type="button" onClick={()=>host.g.roles[role].instrument.flushTails?.()}>Clear tails</button>;
  const rackId='all-rack-'+role,rackSelector='#'+rackId;
- const rack=(fx||tuning)&&<RackCompact tempo={0} values={host.rackValues(role)} onChange={changes=>onEditFx(role,changes)} instrumentSpecs={[]} excludedUnits={['space']} onClose={onCloseFx} posKey={'synths:all:rack-'+role} home={homeFor('effects',SEQUENCER)} anchor={[SEQUENCER]} layoutId={rackId} hidden={!fx} tools={tools}/>;
+ const rack=(fx||tuning)&&<RackCompact tempo={0} values={host.rackValues(role)} onChange={changes=>onEditFx(role,changes)} instrumentSpecs={[]} excludedUnits={['space']} onClose={onCloseFx} posKey={'synths:all:rack-'+role} home={homeFor('effects',SEQUENCER)} anchor={[SEQUENCER]} physical layoutId={rackId} hidden={!fx} tools={tools}/>;
  const tuningHome=homeFor('tuning',rackSelector),tuningAnchor=[rackSelector];
  if(sound){
   const synth=SYNTHS[sound.synth];
@@ -91,5 +95,5 @@ export function VoiceWindow({role,index,host,showSynth,fx,tuning,onChoose,onEdit
   </div></div></Rig>}{rack}</>;
  }
  if(role==='perc')return <>{showSynth&&<Rig id={role} index={index}><div className="all-drum-kit" aria-label="Drum kit controls"><DrumKitPads voice={host.g.settings.drums.kit} kit={host.g.settings.drumKit} onKit={onEditDrum}/></div></Rig>}{rack}</>;
- return rack;
+ return <>{showSynth&&<Rig id={role}><div className="all-native-voice"><h2>{host.loaded?.[role]?.name??'Generator synth'}</h2><NativePanel preset={host.g.getRolePreset(role)} part="instrument" polyphony={host.g.getRolePolyphony?.(role)??8} engine={host.g.getRoleEngine?.(role)??'native'} onChange={changes=>onEditNative(role,Object.fromEntries(changes))}/></div></Rig>}{rack}</>;
 }

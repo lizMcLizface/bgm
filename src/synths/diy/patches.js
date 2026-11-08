@@ -87,6 +87,7 @@ const POLY_CATEGORIES=[
  {id:'pulse',label:'Pulses & sequences',blurb:'Woody and resonant, for patterns'},
 ];
 const POLY_SOUNDS={
+ 'LFO Motion':{category:'pads',styles:['lfo','motion']},
  'Five-voice brass':{category:'brass',styles:['warm']},'Slow pressure lead':{category:'brass',styles:['touch','lead']},'Sync sweep':{category:'brass',styles:['sync','sweep']},
  'Eight-voice silk':{category:'strings',styles:['soft','wide']},'Living silk':{category:'strings',styles:['evolving']},'Rosin silk':{category:'strings',styles:['bowed']},
  'Layered noir':{category:'pads',styles:['dark','layered']},'DCO chorus pad':{category:'pads',styles:['warm','chorus']},'Independent poly motion':{category:'pads',styles:['evolving']},

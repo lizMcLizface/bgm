@@ -28,7 +28,7 @@ for(const v of LAB_VOICES)if(v.kind!=='legacy'){v.patch.effects={...v.patch.effe
 for(const v of LAB_VOICES)Object.assign(v,{availability:v.kind==='legacy'?'previous':'wasm',isNew:v.kind!=='legacy',origin:v.kind==='legacy'?'Existing instrument library':'New synth laboratory'});
 Object.assign(LAB_VOICES.find(v=>v.id==='felt-keys'),{name:'Felt Keys',presetName:'Felt Keys'});
 // Keep the original lab IDs, then expose every remaining standalone recipe.
-for(const [i,family]of [[0,'winds'],[4,'leads'],[6,'leads'],[7,'pads'],[8,'strings'],[10,'plucks']]){const v=sub('core-'+i,family,i,RECIPES[i].name);Object.assign(v,{availability:'wasm',isNew:true,origin:'New subtractive laboratory'});LAB_VOICES.push(v);}
+for(const [i,family]of [[0,'winds'],[4,'leads'],[6,'leads'],[7,'pads'],[8,'strings'],[10,'plucks'],[RECIPES.findIndex(p=>p.name==='LFO Motion'),'pads']]){const v=sub('core-'+i,family,i,RECIPES[i].name);Object.assign(v,{availability:'wasm',isNew:true,origin:'New subtractive laboratory'});LAB_VOICES.push(v);}
 for(const [i,family]of [[2,'bass'],[3,'winds'],[6,'keys'],[10,'winds']]){const v=fm('fm-'+i,family,i,FM_RECIPES[i].name);Object.assign(v,{availability:'wasm',isNew:true,origin:'New FM laboratory'});LAB_VOICES.push(v);}
 for(const [i,p]of PROCEDURAL_RECIPES.entries())if(p.family!=='drums')LAB_VOICES.push({id:'prepared-'+i,family:p.family==='piano'?'keys':p.string.bodyType==='bass'?'bass':'plucks',name:p.name,kind:'procedural',patch:(patch=>{applyTrim('prepared-'+i,patch,1);return patch;})(preparedPatch(p)),sourceRecipe:p.name,availability:'wasm',isNew:true,origin:'Prepared source · rounded contact · Wasm effects'});
 

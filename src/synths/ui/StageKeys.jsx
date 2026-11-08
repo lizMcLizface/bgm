@@ -20,7 +20,7 @@ const highFor=(low,whites)=>{let n=low,seen=isWhite(low)?1:0;while(seen<whites&&
 const MIN_HEAD_BOX=1240;
 const FIXED={49:[36,84],61:[36,96],76:[28,103],88:[21,108]};
 const whitesBetween=(a,b)=>{let n=0;for(let k=a;k<=b;k++)if(isWhite(k))n++;return n;};
-export default function StageKeys({drag,low,onLow,notes,context,chord,onDown,onUp,onMod,head,left,right,size='fit',controls=true,onLayout}){
+export default function StageKeys({drag,low,onLow,notes,context,chord,onDown,onUp,onMod,head,left,right,size=88,controls=true,onLayout}){
  // an instrument with no wheel, ribbon or pad of its own (the piano) has no strip to reserve room for, whatever the setting
  const hasControls=!!(onMod||left||right),shown=controls&&hasControls;
  const SL=shown?SIDE_L:0,SR=shown?SIDE_R:0,fixed=FIXED[size];
@@ -52,7 +52,7 @@ export default function StageKeys({drag,low,onLow,notes,context,chord,onDown,onU
  const scale=context.scalePcs,tonic=scale[0],picked=chord?context.chords[chord-1]:null;
  const rowWidth=SL+sideR+whites*WHITE+(full?0:2*(ARROW+GAP));
  return <div className="stage" ref={box}>
-  <div className="keybox" ref={drag?.ref} style={{width:Math.min(width,Math.max(rowWidth+PAD,head?MIN_HEAD_BOX:0)),...drag?.style}}>
+  <div className="keybox" ref={drag?.ref} style={{width:fixed?Math.max(rowWidth+PAD,head?MIN_HEAD_BOX:0):Math.min(width,Math.max(rowWidth+PAD,head?MIN_HEAD_BOX:0)),...(fixed?{maxWidth:'none',flexShrink:0}:{}),...drag?.style}}>
    {drag&&<div className="grip keys-grip" {...drag.handle} role="presentation"><i/></div>}
    <div className="keybox-head">{head}
     <span className="keybox-cog" ref={cogRef}>

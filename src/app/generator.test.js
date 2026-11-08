@@ -80,9 +80,37 @@ test('a saved continuous planner resumes exactly after the original voice and me
  const saved=JSON.parse(JSON.stringify(stream.snapshot()));
  const expected=stream.next(project.key);
  const second=new Generator({...settings,meter:'4/4'});
- const restored=createContinuous({g:second},saved.seed,saved.settings,saved.groveVoices);
+ const restored=createContinuous({g:second},saved.seed,saved.settings,saved.grooveVoices);
  for(let i=0;i<saved.count;i++)restored.next(project.key);
  expect(restored.next(project.key)).toEqual(expected);
+});
+
+test('continuous replay preserves real composition and rule changes across save and resume',()=>{
+ const settings={...defaultSettings(),seed:421,meter:'4/4'},first=new Generator(settings);
+ const stream=createContinuous({g:first},421);
+ let project=stream.next();stream.next(project.key);
+ stream.update({...settings,bpm:115,ornaments:.7},{noteResolution:false,phrasePerformance:false});
+ stream.next(project.key);stream.next(project.key);
+ stream.update({...settings,bpm:125,ornaments:.2},{noteResolution:true});
+ const saved=JSON.parse(JSON.stringify(stream.snapshot())),expected=stream.next(project.key);
+ const second=new Generator({...settings,bpm:90});second.noteResolution=false;
+ const restored=createContinuous({g:second},saved.seed,saved.settings,saved.grooveVoices,saved.flags);
+ let index=0;
+ for(let count=0;count<saved.count;count++){
+  const change=saved.changes[index];if(change?.at===count){restored.update(change.settings,change.flags);index++;}
+  restored.next(project.key);
+ }
+ const pending=saved.changes[index];if(pending)restored.update(pending.settings,pending.flags);
+ expect(restored.next(project.key)).toEqual(expected);
+});
+
+test('forking continuous lookahead applies a new home at that progression and leaves its source unchanged',()=>{
+ const settings={...defaultSettings(),seed:425,tonic:0,mode:'Major-1',drift:{...defaultSettings().drift,mode:'off'}},g=new Generator(settings),source=createContinuous({g},425);
+ const key=source.next().key;for(let i=0;i<4;i++)source.next(key);
+ const before=source.snapshot(),changed=source.fork(1,{...settings,tonic:5,mode:'Major-2'},{}),next=changed.next(key);
+ expect(source.snapshot()).toEqual(before);
+ expect(next.chords[0].scalePcs).toEqual([5,7,8,10,0,2,3]);
+ expect(changed.snapshot().changes[0]).toMatchObject({at:1,settings:{tonic:5,mode:'Major-2'}});
 });
 
 test('restoring a Wasm-only kit from a drum machine prepares it before replacing the machine',async()=>{
@@ -1870,7 +1898,9 @@ test('every sequencer preset plans a long stretch of exact drums with finite not
 
 test('intensity (settings.push): overdrive plays faster and busier than calm, and a program follows each bar\'s place in music time', async () => {
     const { pushLevel } = await import('./composition/push');
-    const plan = (push, bars = 40) => { const g = new Generator({ ...defaultSettings(), push }); const p = g.planner(); for (let b = 0; b < bars; b++) p.planBar(b); return [...p.plan.values()].sort((a, z) => a.bar - z.bar); };
+    // Compare one reproducible composition at each intensity, rather than
+    // three unrelated random songs from defaultSettings().
+    const plan = (push, bars = 40) => { const g = new Generator({ ...defaultSettings(), seed: 1, push }); const p = g.planner(); for (let b = 0; b < bars; b++) p.planBar(b); return [...p.plan.values()].sort((a, z) => a.bar - z.bar); };
     const off = { mode: 'off' };
     const calm = plan({ level: -1, program: off }), plain = plan({ level: 0, program: off }), hard = plan({ level: 1, program: off });
     expect(hard.at(-1).bpm).toBeGreaterThan(plain.at(-1).bpm * 1.1); expect(calm.at(-1).bpm).toBeLessThan(plain.at(-1).bpm * 0.9);
