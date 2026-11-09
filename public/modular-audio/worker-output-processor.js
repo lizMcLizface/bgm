@@ -10,18 +10,18 @@ function workerOptions(raw = {}) {
   o.bufferBytes = o.blockFrames * BUS_COUNT * 2 * 4;
   return o;
 }
-function sourceViews(g) {
-  const views = Array.from({ length: 6 }, (_, i) => g.outputs.get(i + 1));
+function sourceViews(g, ids = null) {
+  const views = Array.from({ length: 6 }, (_, i) => !ids || ids.includes(i + 1) ? g.outputs.get(i + 1) : null);
   views.push(g.kicks.get(6));
-  if (views.some((x) => !x)) throw Error("Worker requires six-role source ports");
+  if (ids ? ids.some((id) => !views[id - 1]) || ids.includes(6) && !views[6] : views.some((x) => !x)) throw Error("Worker requires declared source ports");
   return views;
 }
-function graphSnapshot(g) {
+function graphSnapshot(g, ids = null) {
   return {
     graph: g.stats(),
     meters: g.meters(),
     memoryBytes: g.engine.memory.buffer.byteLength,
-    roles: Array.from({ length: 6 }, (_, i) => i === 5 ? g.percussionStats(i + 1) : g.pitchedStats(i + 1))
+    roles: Array.from({ length: 6 }, (_, i) => ids && !ids.includes(i + 1) ? null : i === 5 ? g.percussionStats(i + 1) : g.pitchedStats(i + 1))
   };
 }
 var WorkerPcmQueue = class {

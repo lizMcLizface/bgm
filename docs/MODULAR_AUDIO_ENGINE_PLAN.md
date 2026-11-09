@@ -2,15 +2,18 @@
 
 Agreed direction: 2026-11-09. Status: **M0/M1, the opt-in M2 percussion/sidechain
 slice, M3a's actual six-role serial baseline, M3b owned FM, M3c owned core,
-M3d pitched DAG and M3e bounded single-worker transport delivered**.
+M3d pitched DAG, M3e bounded single-worker transport and M3f three-worker source pool delivered**.
 All six source engines have owned mutable Rust state; core's read-only additive
 tables are safely shared after preparation. External stereo host inputs and
 graph program/key compression exist. All six sources now also run inside one
 prepared, block-capable Rust DAG. M3e optionally moves that whole graph into one
 dedicated worker with bounded PCM publication and serial startup fallback.
-Workbench migration and a parallel multi-worker executor remain future work.
-Foundation through M3c committed locally as `bc4e35d`, M3d as `fa634f5`;
-M3e is subsequent working-tree work. No push/deployment.
+M3f partitions the sources across three workers and keeps the dependent Rust
+master in the worklet. General graph distribution and workbench migration remain
+future work. Foundation through M3c committed locally as `bc4e35d`, M3d as
+`fa634f5`, M3e as `646183d`. Each completed verified step is committed locally
+under the user's standing instruction. No push/deployment.
+See [three-worker contracts and evidence](MODULAR_AUDIO_ENGINE_M3F_SOURCE_POOL.md).
 See [bounded worker contracts and evidence](MODULAR_AUDIO_ENGINE_M3E_WORKER.md).
 See [pitched DAG contracts and evidence](MODULAR_AUDIO_ENGINE_M3D_PITCHED_DAG.md).
 See [owned core contracts and evidence](MODULAR_AUDIO_ENGINE_M3C_OWNED_CORE.md).
@@ -603,6 +606,40 @@ foreground target-device measurements of equivalent processing jobs. The M3e
 message transport still allocates JS messages and can suffer dispatch jitter;
 consider shared memory/hosting separately. Keep the serial reference and all
 workbench defaults. No broad migration or locked-phone fix is claimed.
+
+### M3f delivery: three-worker sources with dependent Rust master (2026-11-09)
+
+See [M3f contracts and evidence](MODULAR_AUDIO_ENGINE_M3F_SOURCE_POOL.md).
+M3e was committed as `646183d` before this step; the user's standing instruction
+now commits every completed verified step locally. No push/deployment.
+
+- Fixed source groups: lead+bass, second+rhythm, pad+drums, each with private
+  Wasm/state. A separate Rust master in the worklet retains original program/
+  kick/mixer/compressor/output dependencies. Planner/owner restrictions make
+  this a bounded source cut rather than general graph distribution.
+- Three fixed pools total 786,432 PCM bytes. Same 4096-frame added latency,
+  all-group priming, generation/frame publication and serial startup fallback.
+  Missing any group silences all program/key inputs at that frame; clocks
+  advance and expired results discard/trim without stale replay.
+- Actual Node/browser pools match every original raw source, key and master
+  stereo sample at 44.1/48/96 kHz for full scores, future cancellation and
+  partial blocks. Independent complete pools pass. Full suite **382 files /
+  2,736 tests passed**, 135.67 s; public packaging/build checks pass, Rust/Wasm
+  DSP bytes unchanged. Native test execution remains blocked as before.
+  Twelve source/master Wasm allocator audits pass with zero Rust allocation/
+  reclamation or memory growth after preparation; JS transport is outside scope.
+- Live 48 kHz one/three-worker comparison has zero misses and complete source
+  events in both paths. Pool 44.1/96 kHz also has zero transport misses. Delaying
+  just one worker proves coherent silence/discard/recovery. The pool has a real
+  memory cost and different worker-timer CPU scope; no speedup or callback
+  headroom claim. Fixture/persistence, serial fallback and existing defaults
+  remain authoritative. See the detailed report links and actual limits.
+
+**Next: repeated opt-in buffering/latency profiles** on the same foreground
+workload and fixed plan, retaining conservative defaults, misses and memory/
+event-lead costs. Separate worker task timings from worklet/device timing and
+mark unavailable scopes. Shared-memory hosting, distributed-owner transactions,
+adaptive partitioning and broad desk migration remain separate decisions.
 
 ### Sidechain acceptance retained for workbench integration
 

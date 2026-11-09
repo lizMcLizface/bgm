@@ -71,7 +71,9 @@
     "vst:match": "vite-node tools/vstMatch.mjs --",
     "vst:mod": "vite-node tools/vstMod.mjs --",
     "audit:synth-reference": "npm run synths:check && vite-node tools/matchSynthReference.mjs",
-    "graph:audit-worker": "vite-node tools/auditGraphWorker.mjs"
+    "graph:audit-worker": "vite-node tools/auditGraphWorker.mjs",
+    "graph:audit-pool": "vite-node tools/auditGraphPool.mjs",
+    "graph:audit-pool-alloc": "vite-node tools/auditGraphPoolAlloc.mjs"
   },
   "dependencies": {
     "fflate": "^0.8.3",

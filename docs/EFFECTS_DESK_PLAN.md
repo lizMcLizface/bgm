@@ -23,9 +23,12 @@ now owns all six sources, timed notes, prepared transitions, mixing and keyed
 compression in one Rust graph. The comparison retains existing local/master
 effects; a separate dry Rust mix can be auditioned. [M3e bounded worker transport](MODULAR_AUDIO_ENGINE_M3E_WORKER.md)
 now runs that complete graph in one dedicated worker with explicit buffering,
-miss/drop counters and serial startup fallback. Parallel multi-worker execution
-and desk migration remain future work. Foundation through M3c committed locally
-as `bc4e35d`, M3d as `fa634f5`; M3e is subsequent working-tree work. No push/deployment.
+miss/drop counters and serial startup fallback. [M3f three-worker sources](MODULAR_AUDIO_ENGINE_M3F_SOURCE_POOL.md)
+now adds a bounded source partition with coherent frame publication and a
+dependent Rust master in the worklet. General distribution and desk migration
+remain future work. Foundation through M3c committed locally as `bc4e35d`, M3d
+as `fa634f5`, M3e as `646183d`; every completed step now ends with a local
+commit. No push/deployment.
 
 ## Next phase: sidechain and device connection contract (2026-11-09)
 

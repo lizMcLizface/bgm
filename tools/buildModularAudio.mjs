@@ -10,7 +10,7 @@ const hash=b=>crypto.createHash('sha256').update(b).digest('hex');
 const read=p=>fs.readFileSync(path.join(root,p));
 const text=p=>read(p).toString().replace(/\r\n/g,'\n');
 const runtimeText=()=>buildSync({absWorkingDir:root,entryPoints:['src/modular-audio/runtime.js'],bundle:true,format:'esm',platform:'browser',write:false}).outputFiles[0].text;
-const workerEntries=[['graph-worker.js','graphWorker.js'],['worker-output-processor.js','workerOutputProcessor.js']];
+const workerEntries=[['graph-worker.js','graphWorker.js'],['worker-output-processor.js','workerOutputProcessor.js'],['pool-output-processor.js','poolOutputProcessor.js']];
 const workerText=entry=>buildSync({absWorkingDir:root,entryPoints:['src/modular-audio/'+entry],bundle:true,external:['./runtime.js'],format:'esm',platform:'browser',write:false}).outputFiles[0].text.replace(/\.\/runtime\.js/,`./runtime.js?v=${hash(runtimeText()).slice(0,16)}`);
 function sources(dir) { return fs.readdirSync(path.join(root,dir),{withFileTypes:true}).flatMap(e=>e.isDirectory()?e.name==='target'?[]:sources(`${dir}/${e.name}`): /\.(rs|toml|lock)$/.test(e.name)?[`${dir}/${e.name}`]:[]).sort(); }
 const sourceHash=()=>hash([...sources(crate),...sources('synth-engine/percussion'),...sources('synth-engine/fm'),'synth-engine/Cargo.toml','synth-engine/Cargo.lock',...sources('synth-engine/src'),...['colour','notes','headroom','denormal'].map(n=>'synth-engine/common/'+n+'.rs')].map(p=>p+'\n'+text(p)).join('\n'));

@@ -5,10 +5,11 @@ step, then continue**. This authorizes local commits of verified steps without
 another confirmation. Keep the existing checkout and work; no push/deployment
 is authorized. Record verification, limitations and the next task in each step.
 
-Prepared and implemented through opt-in M3e bounded worker transport on 2026-11-09. Read the working tree, this file and
+Prepared and implemented through opt-in M3f source worker pool on 2026-11-09. Read the working tree, this file and
 [MODULAR_AUDIO_ENGINE_PLAN.md](MODULAR_AUDIO_ENGINE_PLAN.md) first. This is an
 implementation handoff. **M0/M1, owned percussion/sidechain M2 and the actual
-six-role M3a baseline, M3b owned FM, M3c owned core, M3d pitched DAG and M3e single-worker transport now exist. Next is a measured multi-worker source executor.** Read
+six-role M3a baseline, M3b owned FM, M3c owned core, M3d pitched DAG, M3e single-worker transport and M3f three-worker source pool now exist.** Read
+[three-worker contracts and evidence](MODULAR_AUDIO_ENGINE_M3F_SOURCE_POOL.md),
 [bounded worker contracts and evidence](MODULAR_AUDIO_ENGINE_M3E_WORKER.md),
 [pitched DAG contracts and evidence](MODULAR_AUDIO_ENGINE_M3D_PITCHED_DAG.md),
 [owned core contracts and evidence](MODULAR_AUDIO_ENGINE_M3C_OWNED_CORE.md),
@@ -22,7 +23,9 @@ The user subsequently requested **commit then continue**. Completed work through
 M3c was committed locally as **`bc4e35d`**, `Add owned modular audio foundations
 and six-source harness`. The later request **commit and keep iterating** committed
 M3d locally as **`fa634f5`**, `Integrate six owned sources into the Rust audio DAG`.
-M3e is subsequent uncommitted work; no push/deployment.
+M3e was then committed locally as **`646183d`**. Each completed verified step
+now ends with a local commit under the user's standing instruction; consult
+the final checkpoint and local Git log. No push/deployment.
 Earlier statements below about no commit describe their historical checkpoints.
 
 The older checkpoints are historical. In particular, M2 rebuilds the percussion
@@ -1119,3 +1122,122 @@ foreground target devices and retain failures. Shared-memory/isolation hosting
 is a separate decision; current transfer messaging still adds JS allocation and
 dispatch jitter. No speedup, complete worker-pool migration, broad effect/desk
 port or locked-phone fix is established by this checkpoint.
+
+## M3f delivery checkpoint (2026-11-09)
+
+M3e was committed locally as **`646183d`** at the start of this step. The user's
+standing workflow now requires a local commit at the end of every verified
+step; M3f ends with its own commit after the checks below. Consult local Git
+log for that checkpoint ID. No push/deployment. Read
+[M3f contracts and evidence](MODULAR_AUDIO_ENGINE_M3F_SOURCE_POOL.md).
+
+### Implemented
+
+- `poolPlan.js` derives a bounded six-source cut: worker 0 lead/core + bass/FM,
+  worker 1 second/FM + rhythm/core, worker 2 pad/core + drums/percussion. Each
+  owns a private Wasm/source graph; no shared mutable Rust state or raw pointers.
+  Source graphs retain IDs, settings, transitions, timestamps and owner-local
+  events. Compiled source order includes every owned source, including taps
+  outside the source graph's required output connection.
+- The dependent Rust master stays in one AudioWorklet: six program host inputs,
+  separate kick input, original five mixers, keyed compressor and output.
+  Exposed master levels: `[1..7]`, `[11,12,13]`, `[14]`, `[15]`, `[17]`, `[18]`.
+  No independent dispatch of dependent program/key/master nodes. Planner rejects
+  unsupported cross-stage inputs, non-audio links, unsupported master kinds and
+  owners spanning worker groups. This is a fixed six-source prototype, not a
+  general graph distributor or adaptive load balancer.
+- `AlignedSourcePool` requires matching-frame results from every worker. Missing
+  any group silences **all six programs plus kick** at that source sample;
+  source/master clocks advance, late blocks discard/trim, and recovery resumes
+  the current frame without stale replay. Per-worker availability and coherent
+  delivered/missing counters are distinct. No wait or source catch-up in the
+  render callback. Raw/key taps are published before Rust clears consumed
+  host-input storage; master output is published after render.
+- Default pools 3 × 4 × 1024 frames / eight stereo buses = **786,432 PCM bytes**.
+  Added buffering remains **4096 frames** (92.88 / 85.33 / 42.67 ms at three
+  rates), plus instrument/device latency. Each source/master stage has its own
+  prepared Rust memory; core's immutable table is repeated across Wasm contexts.
+- `poolBrowser.js` handles all-group priming, per-worker control/telemetry,
+  bounded owner locality/requests, lifecycle and explicit serial startup
+  fallback. A failed worker after partial construction disposes all resources;
+  fallback uses the original serial graph with the same delay and visible
+  reason. Runtime failures stop the run; no seamless state reconstruction.
+  Live source events/cancellation stay local to an owner group; distributed
+  owner transactions and live master controls are not supported.
+- Same **4175** worker page adds **Play three-worker mix**, **Verify pool PCM ·
+  all rates**, **Test pool fallback**, and **Compare one / three workers ·
+  48 kHz**. Comparison uses the same score, audible Rust mix and delay, one
+  finite run each; Stop cancels the remaining run. Original modular/six-role
+  navigation now names M3e/M3f. Existing defaults/desk effects stay intact.
+
+### Checks and measured evidence
+
+- Actual Node and browser three-worker pools match **all eight stereo buses
+  exactly**, nonfinite 0, over the complete 17.5 s score at 44.1/48/96 kHz.
+  Future cancellation at frame 32768 and past/lookahead rejection pass. The
+  cancellation produces **289 / 289 / 287 applied events**; worker/master
+  totals equal the original serial graph. Two independent complete pools /
+  generations pass. `reports/modular_audio/m3f-pool-thread.json`,
+  `m3f-browser-pool-pcm.json`. Consumer-paced, not deadline measurements.
+- Full suite **382 files / 2,736 tests passed**, **135.67 s**:
+  `.tmp/modular-audio-m3f-suite.log`. Protocol coherent silence/recovery/stale
+  publication, actual Rust master worklet raw/key/final clipping/disposal and
+  host three-worker/owner/fallback tests pass. All old legacy, optional SIMD/
+  acoustic/FM-bank and M1–M3e tests remain active. Public build passed with
+  curated-bank/exclusion and new pool-asset checks, final **43.36 s**:
+  `.tmp/modular-audio-m3f-build.log`; existing chunk advisory.
+- Rust/Wasm/legacy DSP bytes unchanged; graph **296,101 bytes**, SHA256
+  `a5c3d4b70b57d63094d84fe539d2ec0effe30d5eea5fc59034fbb9a1ff462293`.
+  New worker assets set runtime version **`ebcf61aba7fd0ac7`**. Native test
+  executables remain blocked by Application Control; no bypass/new native run.
+- `m3f-live-comparison-48000.json`: one foreground path each after background
+  checks finished, complete single worker / three workers. Both deliver all
+  **840,000 source frames**, **zero transport misses**, all six role taps
+  nonzero, same sampled main peak **.05186479538679123**, **357 source events**,
+  expected second/FM 14 steals, no reported graph late/drop/overflow.
+- Single-worker render+copy total/max **4026.9 / 13.9 ms**. Pool workers:
+  **878.4 / 4.1**, **2296.9 / 6.5**, **1275.8 / 4.5 ms**. Pool master runs in
+  the AudioWorklet and is not in those worker timers. Fixed order, one sample
+  each, uncontrolled external load and different timer CPU scopes: **no speedup,
+  CPU-utilization or callback-deadline claim** follows from these numbers.
+- At 48 kHz pool worker Wasm **2,883,584 / 2,883,584 / 4,128,768**, master
+  **1,703,936** = **11,599,872 Wasm + 786,432 PCM bytes**. Single path:
+  **5,177,344 Wasm + 262,144 PCM bytes**. JS/code/browser overhead excluded;
+  memory cost of separate contexts/tables/bridges is real, not silently shared.
+- `m3f-live-pool-stall.json`: group 0 delayed 250 ms at producer frame 7168.
+  **830,016 coherent delivered + 9,984 silent = 840,000**, **78 miss quanta**,
+  **two recoveries**, **9 expired group-0 blocks**. Other groups have all samples
+  available; coherent policy silences them for the missing spans. Every worker
+  and master finishes at 840,000, source events **104 + 162 + 91 = 357**, no
+  reported Rust late/drop/overflow or stale/malformed publications.
+- `m3f-live-pool-96000.json`: all **1,680,000 frames**, zero transport misses,
+  1641 accepted blocks/group, full 357 source events; master at the same frame.
+  No stale/expired/invalid blocks, all six source peaks nonzero. Non-isolated
+  Chrome 157. This is foreground session evidence, not locked-phone headroom.
+- `m3f-live-pool-44100.json`: all **771,750 frames**, zero transport misses or
+  expired/stale/malformed blocks in every group/coherent output, full 357 source
+  events, all six role peaks nonzero, master/source clocks finish together.
+- `m3f-pool-allocation.json`: **12 instrumented Wasm allocator audits** cover
+  all three source graphs and seven-input master at three rates, full score and
+  enqueue/cancel/reset/rebook/pause. **Zero Rust allocation/reclamation calls
+  and no memory growth after preparation**; JS/transport allocations excluded.
+  Current source rebuilt with allocator feature, no native test runner.
+- Fixture saved, page reloaded and fixture restored **with audio stopped**.
+  `m3f-live-pool-fallback.json`: requested pool / actual serial / zero workers,
+  explicit reason, same delay, nonzero all-six/main activity, **840,000 frames /
+  357 events**, no reported late/drop/overflow. Partial construction failure is
+  separately tested. Same preview left **48 kHz, stopped**; screenshot
+  `.tmp/modular-audio-m3f-browser.png`. No physical loopback/listening/device-
+  underrun or screen-lock claim. Prior M3e overload/failure evidence retained.
+
+### Next task after M3f
+
+Measure repeated **buffering/latency profiles** on the same foreground workload
+and fixed worker plan before changing defaults. Compare conservative 4096-frame
+buffering with smaller opt-in profiles; retain misses, stale blocks, event-lead
+constraints and memory costs. Record worker task distributions separately from
+worklet/device timing; mark unavailable timing scopes explicitly. Preserve
+sample-exact sources/master, owner-local controls, coherent key dependency and
+serial startup fallback. Shared-memory hosting/capability, distributed owner
+transactions, adaptive repartitioning and broad desk migration remain separate
+tasks. Do not claim background/mobile headroom or chase screen-lock crackling.

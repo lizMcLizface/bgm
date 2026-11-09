@@ -10,25 +10,25 @@ function workerOptions(raw = {}) {
   o2.bufferBytes = o2.blockFrames * BUS_COUNT * 2 * 4;
   return o2;
 }
-function sourceViews(g2) {
-  const views2 = Array.from({ length: 6 }, (_, i) => g2.outputs.get(i + 1));
+function sourceViews(g2, ids = null) {
+  const views2 = Array.from({ length: 6 }, (_, i) => !ids || ids.includes(i + 1) ? g2.outputs.get(i + 1) : null);
   views2.push(g2.kicks.get(6));
-  if (views2.some((x) => !x)) throw Error("Worker requires six-role source ports");
+  if (ids ? ids.some((id) => !views2[id - 1]) || ids.includes(6) && !views2[6] : views2.some((x) => !x)) throw Error("Worker requires declared source ports");
   return views2;
 }
-function copyGraph(g2, views2, pcm, frames) {
+function copyGraph(g2, views2, pcm, frames, partial = false) {
   for (let bus = 0; bus < BUS_COUNT; bus++) for (let i = 0; i < frames; i++) {
     const to = (bus * frames + i) * 2;
-    pcm[to] = bus === 7 ? g2.left[i] : views2[bus][i * 2];
-    pcm[to + 1] = bus === 7 ? g2.right[i] : views2[bus][i * 2 + 1];
+    pcm[to] = bus === 7 ? partial ? 0 : g2.left[i] : views2[bus]?.[i * 2] ?? 0;
+    pcm[to + 1] = bus === 7 ? partial ? 0 : g2.right[i] : views2[bus]?.[i * 2 + 1] ?? 0;
   }
 }
-function graphSnapshot(g2) {
+function graphSnapshot(g2, ids = null) {
   return {
     graph: g2.stats(),
     meters: g2.meters(),
     memoryBytes: g2.engine.memory.buffer.byteLength,
-    roles: Array.from({ length: 6 }, (_, i) => i === 5 ? g2.percussionStats(i + 1) : g2.pitchedStats(i + 1))
+    roles: Array.from({ length: 6 }, (_, i) => ids && !ids.includes(i + 1) ? null : i === 5 ? g2.percussionStats(i + 1) : g2.pitchedStats(i + 1))
   };
 }
 
@@ -37,6 +37,7 @@ var g;
 var views;
 var o;
 var port;
+var sourceIds = null;
 var end = 0;
 var frame = 0;
 var free = [];
@@ -51,7 +52,7 @@ var rejectedEvents = 0;
 var badRecycles = 0;
 var histogram = new Uint32Array(32);
 function snapshot() {
-  return { generation: o.generation, frame, blocks, renderMs, maxRenderMs, blockMsHistogramLog2Us: Array.from(histogram), rejectedEvents, badRecycles, freeBuffers: free.length, inFlightBuffers: inFlight.filter(Boolean).length, ...graphSnapshot(g) };
+  return { generation: o.generation, sourceIds, frame, blocks, renderMs, maxRenderMs, blockMsHistogramLog2Us: Array.from(histogram), rejectedEvents, badRecycles, freeBuffers: free.length, inFlightBuffers: inFlight.filter(Boolean).length, ...graphSnapshot(g, sourceIds) };
 }
 function fail(e) {
   stopped = true;
@@ -71,7 +72,7 @@ function pump() {
   try {
     const slot = free.pop(), n = Math.min(o.blockFrames, end - frame), pcm = new Float32Array(slot.buffer), start = performance.now();
     g.render(n);
-    copyGraph(g, views, pcm, n);
+    copyGraph(g, views, pcm, n, !!sourceIds);
     const elapsed = performance.now() - start;
     renderMs += elapsed;
     maxRenderMs = Math.max(maxRenderMs, elapsed);
@@ -93,8 +94,10 @@ globalThis.onmessage = ({ data: d }) => {
       if (!Number.isSafeInteger(d.endFrame) || d.endFrame < 1) throw Error("Invalid score end");
       end = d.endFrame;
       port = d.port;
+      sourceIds = d.sourceIds ?? null;
+      if (sourceIds && (!Array.isArray(sourceIds) || !sourceIds.length || sourceIds.length > 6 || new Set(sourceIds).size !== sourceIds.length || sourceIds.some((id) => !Number.isInteger(id) || id < 1 || id > 6))) throw Error("Invalid source group");
       g = new ReferenceGraph(new WebAssembly.Instance(d.module, {}).exports, d.patch, d.contracts, d.rate, o.blockFrames);
-      views = sourceViews(g);
+      views = sourceViews(g, sourceIds);
       inFlight = Array(o.poolBlocks).fill(false);
       free = Array.from({ length: o.poolBlocks }, (_, slot) => ({ slot, buffer: new ArrayBuffer(o.bufferBytes) }));
       port.onmessage = ({ data: b }) => {

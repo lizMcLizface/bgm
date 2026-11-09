@@ -1,0 +1,9 @@
+import fs from 'node:fs';
+import {verifyPool} from '../src/modular-audio/poolVerification.js';
+import {BrowserThreadWorker,MessageChannel} from './workerNodeAdapter.mjs';
+globalThis.MessageChannel=MessageChannel;
+const manifest=JSON.parse(fs.readFileSync('public/modular-audio/build.json')),assets={fixture:JSON.parse(fs.readFileSync('public/modular-audio/six-role-fixture.json')),contracts:JSON.parse(fs.readFileSync('public/modular-audio/contracts.json')),modules:{graph:new WebAssembly.Module(fs.readFileSync('public/modular-audio/graph.wasm'))}},results=[];
+for(const rate of [44100,48000,96000])results.push(await verifyPool(assets,rate,{makeWorker:()=>new BrowserThreadWorker()}));
+const independent=await Promise.all([21,22].map(generation=>verifyPool(assets,48000,{generation,seconds:1.01,makeWorker:()=>new BrowserThreadWorker()})));
+const report={pass:[...results,...independent].every(r=>r.pass),graphVersion:manifest.version,fixtureId:assets.fixture.id,scope:'Actual three-worker source pools with dependent Rust master; full-score eight-bus exactness against original serial DAG, cancellation/late-event rejection and independent pools. Consumer-paced, no deadline or speedup claim.',results,independent};
+fs.writeFileSync('reports/modular_audio/m3f-pool-thread.json',JSON.stringify(report,null,2)+'\n');if(!report.pass)throw Error('Pool verification failed');console.log('Three-rate source pools and two independent pool generations pass exact PCM/control checks.');

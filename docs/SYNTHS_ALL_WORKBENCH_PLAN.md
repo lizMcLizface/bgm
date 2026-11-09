@@ -23,9 +23,11 @@ now runs all six sources and explicit mixing/keyed compression inside one Rust
 graph, preserving the opt-in desk comparison and adding a dry Rust mix audition.
 [M3e bounded worker transport](MODULAR_AUDIO_ENGINE_M3E_WORKER.md) now supplies an
 opt-in complete-graph worker, explicit buffered publication and serial startup
-fallback. Next is a measured multi-worker source executor before broad workbench
-migration. Foundation through M3c committed locally as `bc4e35d`, M3d as
-`fa634f5`; M3e is subsequent working-tree work. No push/deployment.
+fallback. [M3f source pool](MODULAR_AUDIO_ENGINE_M3F_SOURCE_POOL.md) now partitions
+the six sources across three workers with a dependent Rust master and coherent
+publication. General distribution and broad workbench migration remain later.
+Foundation through M3c committed locally as `bc4e35d`, M3d as `fa634f5`, M3e as
+`646183d`; every completed step now ends with a local commit. No push/deployment.
 
 ## 1. Establish the playback and persistence contract
 

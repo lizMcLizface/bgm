@@ -7,22 +7,22 @@ export function workerOptions(raw = {}) {
   o.bufferBytes = o.blockFrames * BUS_COUNT * 2 * 4;
   return o;
 }
-export function sourceViews(g) {
-  const views = Array.from({length:6}, (_,i)=>g.outputs.get(i+1));
+export function sourceViews(g,ids=null) {
+  const views = Array.from({length:6}, (_,i)=>!ids||ids.includes(i+1)?g.outputs.get(i+1):null);
   views.push(g.kicks.get(6));
-  if (views.some(x=>!x)) throw Error('Worker requires six-role source ports');
+  if (ids?ids.some(id=>!views[id-1])||ids.includes(6)&&!views[6]:views.some(x=>!x)) throw Error('Worker requires declared source ports');
   return views;
 }
-export function copyGraph(g, views, pcm, frames) {
+export function copyGraph(g, views, pcm, frames,partial=false) {
   for (let bus=0;bus<BUS_COUNT;bus++) for (let i=0;i<frames;i++) {
     const to=(bus*frames+i)*2;
-    pcm[to]=bus===7?g.left[i]:views[bus][i*2];
-    pcm[to+1]=bus===7?g.right[i]:views[bus][i*2+1];
+    pcm[to]=bus===7?(partial?0:g.left[i]):views[bus]?.[i*2]??0;
+    pcm[to+1]=bus===7?(partial?0:g.right[i]):views[bus]?.[i*2+1]??0;
   }
 }
-export function graphSnapshot(g) {
+export function graphSnapshot(g,ids=null) {
   return {graph:g.stats(), meters:g.meters(), memoryBytes:g.engine.memory.buffer.byteLength,
-    roles:Array.from({length:6},(_,i)=>i===5?g.percussionStats(i+1):g.pitchedStats(i+1))};
+    roles:Array.from({length:6},(_,i)=>ids&&!ids.includes(i+1)?null:i===5?g.percussionStats(i+1):g.pitchedStats(i+1))};
 }
 
 // No waiting, sorting, DSP, or typed-view creation in consume(). Views are made

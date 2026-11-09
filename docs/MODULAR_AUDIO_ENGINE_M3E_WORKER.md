@@ -4,6 +4,10 @@ Implemented 2026-11-09 after the user requested **commit and keep iterating**.
 M3d was committed locally as **`fa634f5`**, `Integrate six owned sources into the
 Rust audio DAG`. M3e is subsequent working-tree work. No push/deployment.
 
+Historical checkpoint: M3e was subsequently committed locally as **`646183d`**
+before [M3f three-worker source execution](MODULAR_AUDIO_ENGINE_M3F_SOURCE_POOL.md).
+The user now requests a local commit at the end of every completed step.
+
 ## Delivered boundary
 
 One dedicated worker exclusively owns the complete prepared six-source Rust
