@@ -5,10 +5,11 @@ step, then continue**. This authorizes local commits of verified steps without
 another confirmation. Keep the existing checkout and work; no push/deployment
 is authorized. Record verification, limitations and the next task in each step.
 
-Prepared and implemented through opt-in M3i scheduling experiment on 2026-11-09. Read the working tree, this file and
+Prepared and implemented through opt-in M3j arrival/headroom diagnostics on 2026-11-09. Read the working tree, this file and
 [MODULAR_AUDIO_ENGINE_PLAN.md](MODULAR_AUDIO_ENGINE_PLAN.md) first. This is an
 implementation handoff. **M0/M1, owned percussion/sidechain M2 and the actual
-six-role M3a baseline, M3b owned FM, M3c owned core, M3d pitched DAG, M3e single-worker transport, M3f source pool, M3g buffering profiles and M3h queue-lead observability now exist.** Read
+six-role M3a baseline, M3b owned FM, M3c owned core, M3d pitched DAG, M3e single-worker transport, M3f source pool, M3g buffering profiles, M3h queue-lead observability, M3i opt-in scheduling and M3j packet-arrival/headroom diagnostics now exist.** Read
+[arrival/headroom results](MODULAR_AUDIO_ENGINE_M3J_ARRIVAL_HEADROOM.md),
 [opt-in scheduling results and negative experiment](MODULAR_AUDIO_ENGINE_M3I_TASK_PUMP.md),
 [queue-lead contracts and results](MODULAR_AUDIO_ENGINE_M3H_QUEUE_LEAD.md),
 [profile contracts and measurements](MODULAR_AUDIO_ENGINE_M3G_BUFFER_PROFILES.md),
@@ -27,7 +28,7 @@ M3c was committed locally as **`bc4e35d`**, `Add owned modular audio foundations
 and six-source harness`. The later request **commit and keep iterating** committed
 M3d locally as **`fa634f5`**, `Integrate six owned sources into the Rust audio DAG`.
 M3e was then committed locally as **`646183d`**, M3f as **`714ce43`**,
-M3g as **`733c2e6`**, and M3h as **`c8ff2bb`**. Each completed verified step
+M3g as **`733c2e6`**, M3h as **`c8ff2bb`**, and M3i as **`b358bd9`**. Each completed verified step
 now ends with a local commit under the user's standing instruction; consult
 the final checkpoint and local Git log. No push/deployment.
 Earlier statements below about no commit describe their historical checkpoints.
@@ -1448,3 +1449,55 @@ cause. Compare explicit extra headroom against Short / 96 kHz without changing
 its original profile/default or hiding latency. Keep user listening evidence,
 failed reports, dependencies and exact same-cadence PCM. Shared memory,
 distributed owners and broad migration remain separate work.
+
+## M3j delivery checkpoint (2026-11-09)
+
+[Packet-arrival and headroom contracts/results](MODULAR_AUDIO_ENGINE_M3J_ARRIVAL_HEADROOM.md)
+now govern the next task. Added bounded per-queue and any-group source-frame
+gaps, open consumption spans, steady/drain histograms and first-32 diagnostic
+trace. Valid expired traffic counts; malformed/stale/duplicate traffic does not.
+Any-group callbacks do not imply coherent readiness. No wall-clock/CPU/device
+cause is inferred. Extra PCM slots are explicit **0 / 2 / 4**, with unchanged
+producer cadence and corresponding declared startup delay. Original profiles,
+timers, owned Rust, graph dependencies and legacy desk/All DSP remain intact.
+
+- Final **21 files / 128 modular tests**, **176.48 s**, pass. Both schedulers,
+  three-rate PCM/controls, independent instances, worklets, original percussion
+  goldens/sidechain remain covered. Six/eight-slot Short pools retain strict
+  same-cadence raw PCM maximum error **0** at all three rates, including full
+  96 kHz scores and independent capacities/generations. No new full-repository
+  test run is implied. Public build/package checks pass, Vite **33.63 s**.
+- Runtime **`5e3eede4bd16e076`**; Rust/Wasm still **296,101 bytes**, unchanged
+  SHA256 `a5c3d4b70b57d63094d84fe539d2ec0effe30d5eea5fc59034fbb9a1ff462293`.
+- Live timer-scheduled Short / 96 kHz matrix: **3 warmups + 9 rotated measured
+  full scores**, all **1,680,000 frames / 357 events**, visible throughout,
+  six/main analyser peaks, unavailable worklet clock. Original four slots
+  **0/3**, **169,728** measured missed frames; +2 and +4 slots each **3/3**,
+  zero misses/expiry, minimum steady ready lead **512 / 1,024 frames**.
+  Delays **10.67 / 16 / 21.33 ms**, PCM **192 / 288 / 384 KiB**. Failed
+  baseline/aggregate pass flags remain false; all 12 arrival/lead invariants pass.
+- Max group closed gap and consumed span are **1,024 source frames** in every
+  capacity. Span <= capacity does not guarantee ready PCM: callbacks can refill
+  only part of a queue. Initial baseline shortage appears with span **512**,
+  lead **0**. The comparison supports extra headroom in this desktop environment,
+  not a phone/device cause or universally safe minimum. Instrumentation can
+  affect scheduling and its worklet CPU cost remains unmeasured.
+- Separate message-scheduled Short +2 / 96 kHz 250 ms stall control completes
+  after **23,424** coherent silent frames / one recovery; group 0 gap **23,936**
+  frames, 91 expired publications, one histogram-overflow entry. Explicit serial
+  fallback preserves +2 at 48 kHz (**1,536 frames / 32 ms**, complete 840,000 /
+  357). Default / 48 kHz / timers / zero extra slots completes with zero misses,
+  minimum ready lead **2,816 frames**. Control invariants pass.
+- Session/UI old-default and explicit +4 save/fresh default/stopped Load verified.
+  Page and saved session left **Default / 48 kHz / timers / no extra headroom,
+  stopped**. New reports `reports/modular_audio/m3j-*.json`; screenshots
+  `.tmp/modular-audio-m3j-headroom-browser.png`, `.tmp/modular-audio-m3j-browser.png`.
+- M3i committed as `b358bd9`; every verified step ends with a local commit.
+  No push/deployment or native Application Control bypass.
+
+**Next:** add a local listening-verdict/export record bound to exact fixture,
+build, rate, profile, headroom, scheduling and delivery/lead/gap data. This
+supports target-phone Short / 96 kHz +2 versus original capacity, retaining
+historical feedback. Do not auto-promote headroom or claim clean physical /
+locked-phone / Bluetooth output from desktop counters. Shared memory,
+distributed owners and broad workbench migration remain separate.

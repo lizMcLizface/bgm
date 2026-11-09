@@ -1,0 +1,167 @@
+{
+  "version": 1,
+  "fixtureId": "six-role-reference-v1",
+  "fixtureHash": "77ce180861239426c0c63037235cf98d74a2bbfa09a2a46ee3da3353bb29a7df",
+  "graphVersion": "5e3eede4bd16e076",
+  "crossOriginIsolated": false,
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36",
+  "hardwareConcurrency": 32,
+  "listeningFeedback": {
+    "source": "User listening report",
+    "date": "2026-11-09",
+    "profile": "short",
+    "rate": 96000,
+    "result": "Crackly; other tested combinations worked well",
+    "device": null,
+    "outputRoute": null,
+    "cause": null
+  },
+  "requestedScheduling": "timer",
+  "passScope": "Pass fields are specific to the method; transport/PCM counters do not certify audible device output",
+  "method": "Finite live dry Rust DAG mix; analyser observations, not device loopback",
+  "profile": "short",
+  "extraBlocks": 2,
+  "phase": "manual",
+  "iteration": 0,
+  "rate": 48000,
+  "prepareMs": 88.20000000298023,
+  "executor": {
+    "requested": "pool",
+    "actual": "serial",
+    "fallbackReason": "Error: Pool serial fallback explicitly selected",
+    "scheduling": null,
+    "blockFrames": 256,
+    "poolBlocks": 6,
+    "renderAheadCapacityFrames": 1536,
+    "bufferingLatencyFrames": 1536,
+    "bufferingLatencyMs": 32,
+    "pcmPoolBytes": 0,
+    "transport": "in-worklet serial Rust; no PCM transport",
+    "workers": 0
+  },
+  "observedPeak": 0.12932388484477997,
+  "rolePeaks": [
+    0.18322885036468506,
+    0.14383864402770996,
+    0.18233691155910492,
+    0.37114036083221436,
+    0.09897934645414352,
+    1.1232361793518066
+  ],
+  "observations": 176,
+  "stalls": [],
+  "visibilityStart": "visible",
+  "visibilityEnd": "visible",
+  "visibilityChanges": [],
+  "baseLatency": 0.01,
+  "outputLatency": 0.04,
+  "pass": true,
+  "delivery": {
+    "complete": true,
+    "appliedEvents": 357,
+    "eventPass": true
+  },
+  "stats": {
+    "output": {
+      "type": "stats",
+      "mode": "serial",
+      "generation": 1,
+      "outputFrame": 841600,
+      "sourceFrame": 840000,
+      "delayFrames": 1536,
+      "processTiming": {
+        "available": false,
+        "scope": "process() wall time including copy/DSP and preemption; not callback scheduling, CPU utilization or device underruns",
+        "reason": "Monotonic performance.now() is unavailable or failed in this worklet",
+        "calls": null,
+        "totalMs": null,
+        "maxMs": null,
+        "overQuantumPeriod": null,
+        "histogramLog2Us": null
+      },
+      "queue": null,
+      "serial": {
+        "graph": {
+          "frame": 840000,
+          "late": 0,
+          "overflow": 0,
+          "applied": 357
+        },
+        "meters": {
+          "17": {
+            "inputPeak": 0,
+            "keyPeak": 1.7796490496925177e-43,
+            "reductionDb": 3.731329174323642e-29,
+            "outputPeak": 0,
+            "missingKey": 0,
+            "externalKey": 1
+          }
+        },
+        "memoryBytes": 5242880,
+        "roles": [
+          {
+            "active": 0,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 840000,
+            "peak": 0,
+            "latencyFrames": 0,
+            "peakActive": 7
+          },
+          {
+            "active": 0,
+            "steals": 14,
+            "dropped": 0,
+            "late": 0,
+            "frame": 840000,
+            "peak": 0,
+            "latencyFrames": 7.5,
+            "peakActive": 8
+          },
+          {
+            "active": 0,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 840000,
+            "peak": 0,
+            "latencyFrames": 0,
+            "peakActive": 2
+          },
+          {
+            "active": 0,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 840000,
+            "peak": 0,
+            "latencyFrames": 0,
+            "peakActive": 8
+          },
+          {
+            "active": 0,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 840000,
+            "peak": 0,
+            "latencyFrames": 7.5,
+            "peakActive": 2
+          },
+          {
+            "active": 0,
+            "queued": 0,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 840000,
+            "peakActive": 4
+          }
+        ]
+      }
+    },
+    "worker": null,
+    "error": null
+  }
+}

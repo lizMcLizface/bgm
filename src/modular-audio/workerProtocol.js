@@ -1,5 +1,6 @@
 // Fixed-size transferable pool. This is not shared Wasm memory or a worker pool.
 import {contiguousLeadFrames,QueueLead} from './queueLead.js';
+import {ArrivalGaps} from './arrivalGaps.js';
 export const BUS_COUNT = 8;
 export function workerScheduling(value='timer'){if(!['timer','message'].includes(value))throw Error('Invalid worker scheduling');return value;}
 export function workerOptions(raw = {}) {
@@ -31,17 +32,19 @@ export function graphSnapshot(g,ids=null) {
 // No waiting, sorting, DSP, or typed-view creation in consume(). Views are made
 // when a transferred block arrives. Misses advance the clock and emit silence.
 export class WorkerPcmQueue {
-  constructor(options, endFrame, recycle) {
+  constructor(options, endFrame, recycle, onArrival=null) {
     this.o=workerOptions(options);
     if (!Number.isSafeInteger(endFrame+this.o.delayFrames)||endFrame<1) throw Error('Invalid worker end frame');
     this.end=endFrame; this.recycle=recycle; this.frame=0; this.count=0;this.wasMissing=false;
     this.slots=Array(this.o.poolBlocks).fill(null);
     this.lead=new QueueLead(this.o.delayFrames,this.o.blockFrames);
+    this.arrivals=new ArrivalGaps(this.o.delayFrames,endFrame);this.onArrival=onArrival;
     this.counters={deliveredFrames:0,underrunFrames:0,underrunQuanta:0,recoveries:0,lateBlocks:0,staleGeneration:0,rejectedBlocks:0,acceptedBlocks:0,queueHighWater:0};
   }
   contiguousLead(){return contiguousLeadFrames(this.slots,this.frame,this.o.delayFrames);}
-  observeLead(needed){const lead=this.contiguousLead();this.lead.observe(lead,needed,this.end-this.frame,this.frame);return lead;}
-  stats(){return {...this.counters,queuedBlocks:this.count,lead:this.lead.snapshot()};}
+  observeLead(needed){const lead=this.contiguousLead();this.lead.observe(lead,needed,this.end-this.frame,this.frame);this.arrivals.observe(this.frame,needed,this.end-this.frame,lead);return lead;}
+  stats(){return {...this.counters,queuedBlocks:this.count,lead:this.lead.snapshot(),arrivals:this.arrivals.snapshot()};}
+  publication(b,expired){this.arrivals.arrive(this.frame,b.frame,b.n,expired);this.onArrival?.(b,expired);}
   release(slot) {
     const b=this.slots[slot]; if(!b)return;
     this.slots[slot]=null; this.count--;
@@ -51,10 +54,11 @@ export class WorkerPcmQueue {
     const o=this.o;
     if(b.generation!==o.generation){this.counters.staleGeneration++;return false;}
     if(!Number.isInteger(b.slot)||b.slot<0||b.slot>=o.poolBlocks||this.slots[b.slot]||!Number.isSafeInteger(b.frame)||b.frame<0||b.frame%o.blockFrames||!Number.isInteger(b.n)||b.n!==Math.min(o.blockFrames,this.end-b.frame)||b.n<1||b.buffer?.byteLength!==o.bufferBytes){this.counters.rejectedBlocks++;return false;}
-    if(b.frame+b.n<=this.frame){this.counters.lateBlocks++;this.recycle(b);return false;}
+    if(b.frame+b.n<=this.frame){this.publication(b,true);this.counters.lateBlocks++;this.recycle(b);return false;}
     // Protocol sender owns one in-flight buffer per slot. Reject overlapping
     // publication even with a different slot; never replay duplicate frames.
     for(const prior of this.slots)if(prior&&prior.frame===b.frame){this.counters.rejectedBlocks++;return false;}
+    this.publication(b,false);
     b.pcm=new Float32Array(b.buffer);this.slots[b.slot]=b;this.count++;
     this.counters.acceptedBlocks++;this.counters.queueHighWater=Math.max(this.counters.queueHighWater,this.count);return true;
   }

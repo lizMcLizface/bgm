@@ -1,5 +1,6 @@
 import {WorkerPcmQueue,workerOptions} from './workerProtocol.js';
 import {QueueLead} from './queueLead.js';
+import {ArrivalGaps} from './arrivalGaps.js';
 
 // Coherent publication: all groups must supply the current source sample.
 // Otherwise every program/key input is zero for that sample; never mix a stale
@@ -7,13 +8,14 @@ import {QueueLead} from './queueLead.js';
 export class AlignedSourcePool {
   constructor(options,end,groups,recycle){
     this.o=workerOptions(options);this.groups=groups;this.frame=0;this.end=end;
-    this.queues=groups.map((_,i)=>new WorkerPcmQueue(this.o,end,b=>recycle(i,b)));
+    this.arrivals=new ArrivalGaps(this.o.delayFrames,end);
+    this.queues=groups.map((_,i)=>new WorkerPcmQueue(this.o,end,b=>recycle(i,b),(b,expired)=>this.arrivals.arrive(this.frame,b.frame,b.n,expired,i)));
     this.blocks=Array(groups.length).fill(null);this.missing=Array(groups.length).fill(false);
     this.counters={deliveredFrames:0,underrunFrames:0,underrunQuanta:0,recoveries:0};this.wasMissing=false;
     this.lead=new QueueLead(this.o.delayFrames,this.o.blockFrames);
   }
   accept(group,b){if(!Number.isInteger(group)||!this.queues[group])return false;return this.queues[group].accept(b);}
-  observeLead(needed){let minimum=this.o.delayFrames;for(let g=0;g<this.queues.length;g++)minimum=Math.min(minimum,this.queues[g].observeLead(needed));this.lead.observe(minimum,needed,this.end-this.frame,this.frame);return minimum;}
+  observeLead(needed){let minimum=this.o.delayFrames;for(let g=0;g<this.queues.length;g++)minimum=Math.min(minimum,this.queues[g].observeLead(needed));this.lead.observe(minimum,needed,this.end-this.frame,this.frame);this.arrivals.observe(this.frame,needed,this.end-this.frame,minimum);return minimum;}
   fill(inputs,n){
     let missed=false;this.missing.fill(false);
     for(let i=0;i<n;i++,this.frame++){
@@ -38,6 +40,6 @@ export class AlignedSourcePool {
     if(missed)this.counters.underrunQuanta++;
     for(let g=0;g<this.queues.length;g++)if(this.missing[g])this.queues[g].counters.underrunQuanta++;
   }
-  stats(){return {...this.counters,lead:this.lead.snapshot(),groups:this.queues.map(q=>q.stats())};}
+  stats(){return {...this.counters,lead:this.lead.snapshot(),arrivals:this.arrivals.snapshot(),groups:this.queues.map(q=>q.stats())};}
   dispose(){this.queues.forEach(q=>q.dispose());}
 }

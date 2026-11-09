@@ -1,5 +1,11 @@
 # Effects desk and independent effect boxes
 
+M3j update: [packet-arrival diagnostics and explicit headroom](MODULAR_AUDIO_ENGINE_M3J_ARRIVAL_HEADROOM.md)
+retain original defaults. Short / 96 kHz with +2 or +4 PCM blocks passed three
+measured desktop trials each without transport misses; original capacity failed
+all three. +2 declares 16 ms buffering. Phone listening remains unverified.
+Legacy desk/All DSP remains intact.
+
 M3i update: [message-task scheduling](MODULAR_AUDIO_ENGINE_M3I_TASK_PUMP.md) is
 an explicit experiment; existing timers remain the harness default. It did not
 remove Short / 96 kHz misses. Negative trials are retained; no quality or

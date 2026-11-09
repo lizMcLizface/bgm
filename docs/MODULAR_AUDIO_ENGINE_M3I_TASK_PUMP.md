@@ -140,3 +140,8 @@ workbench migration remain separate. No default switch, push or deployment.
 
 Commands: `npm.cmd run graph:build`, `npm.cmd run build:public`,
 `npm.cmd test -- src/modular-audio --maxWorkers=4 --minWorkers=1`.
+
+The packet-arrival/headroom task above is delivered as [M3j](MODULAR_AUDIO_ENGINE_M3J_ARRIVAL_HEADROOM.md).
+M3i committed locally as `b358bd9`. M3j retains timers/original capacity as
+defaults and records the positive desktop headroom result separately from the
+negative scheduler experiment.

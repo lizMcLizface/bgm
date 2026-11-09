@@ -3,7 +3,7 @@
 Agreed direction: 2026-11-09. Status: **M0/M1, the opt-in M2 percussion/sidechain
 slice, M3a's actual six-role serial baseline, M3b owned FM, M3c owned core,
 M3d pitched DAG, M3e bounded single-worker transport, M3f three-worker source pool
-and M3g opt-in buffering profiles plus M3h queue-lead observability and M3i opt-in scheduling experiment delivered**.
+and M3g opt-in buffering profiles plus M3h queue-lead observability and M3i opt-in scheduling experiment plus M3j packet-arrival/headroom diagnostics delivered**.
 All six source engines have owned mutable Rust state; core's read-only additive
 tables are safely shared after preparation. External stereo host inputs and
 graph program/key compression exist. All six sources now also run inside one
@@ -12,8 +12,9 @@ dedicated worker with bounded PCM publication and serial startup fallback.
 M3f partitions the sources across three workers and keeps the dependent Rust
 master in the worklet. General graph distribution and workbench migration remain
 future work. Foundation through M3c committed locally as `bc4e35d`, M3d as
-`fa634f5`, M3e as `646183d`, M3f as `714ce43`, M3g as `733c2e6`, M3h as `c8ff2bb`. Each completed verified step is committed locally
+`fa634f5`, M3e as `646183d`, M3f as `714ce43`, M3g as `733c2e6`, M3h as `c8ff2bb`, M3i as `b358bd9`. Each completed verified step is committed locally
 under the user's standing instruction. No push/deployment.
+See [arrival/headroom results](MODULAR_AUDIO_ENGINE_M3J_ARRIVAL_HEADROOM.md).
 See [opt-in scheduling results](MODULAR_AUDIO_ENGINE_M3I_TASK_PUMP.md).
 See [queue-lead contracts and results](MODULAR_AUDIO_ENGINE_M3H_QUEUE_LEAD.md).
 See [profile contracts and measurements](MODULAR_AUDIO_ENGINE_M3G_BUFFER_PROFILES.md).
@@ -746,3 +747,23 @@ explicit message/Medium/96 kHz recovers from the injected stall and completes.
 Old-session/default and explicit experiment save/reload pass. See handoff's
 final checkpoint for exact scopes/counts and the next bounded packet-arrival
 measurement. No default buffering change, push or deployment.
+
+## M3j: packet gaps and explicit headroom delivered (2026-11-09)
+
+See [contracts, exact results and next task](MODULAR_AUDIO_ENGINE_M3J_ARRIVAL_HEADROOM.md)
+and the final handoff checkpoint. The worker harness records bounded source-frame
+arrival gaps/open spans and a first-32 diagnostic trace, and offers explicit
+0/+2/+4 PCM slots at unchanged producer cadence with declared added delay.
+Original profile/timer/default and legacy DSP behavior remain preserved.
+
+**21 files / 128 modular tests** and public build pass; larger pools retain
+three-rate exact same-cadence PCM/control and independent state. Timer-scheduled
+Short / 96 kHz: +2 and +4 each pass **3/3** measured full-score desktop trials,
+zero transport misses, at **16 / 21.33 ms** buffering; original capacity passes
+**0/3** at 10.67 ms. Source-frame gaps alone do not certify readiness or a device
+cause. New accounting, overflow/recovery, explicit fallback, default playback
+and session restore are verified. Runtime `5e3eede4bd16e076`; Rust unchanged.
+
+Next: explicit listening verdict/export tied to full run provenance, before any
+headroom policy or target-device quality claim. No auto-default change, push,
+deployment, shared-memory migration or distributed owner changes.
