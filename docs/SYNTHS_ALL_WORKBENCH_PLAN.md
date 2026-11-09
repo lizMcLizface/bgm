@@ -876,3 +876,12 @@ and phone worker cause remain unknown. Focused UI/worker regressions and public
 build/package checks pass; see linked document for overlapping test counts.
 Next: physical phone usability and compact guarded-worker evidence before more
 roles or speculative tuning. Keep HTTPS LAN preview running; no deployment.
+
+The subsequent phone compact report establishes an actual **delivery-gap**:
+nine blocks / 4,608 frames accepted, then 128 missing frames and guarded stop.
+Runtime `2dd834c6b07330cb`, actual worker/Bass/Message/six slots/64 ms. Reported
+Android/mobile Chrome 156; precise device, route, lock state and listening
+verdict remain unspecified. [Correlated failure and cross-thread audit](MODULAR_AUDIO_ENGINE_M4A_PHONE_DELIVERY.md)
+retain the original failed report and explain the later worker snapshot.
+No buffering/default/code change in this evidence step. Next implementation is
+bounded producer waiting/last-accepted-packet diagnostics before transport tuning.

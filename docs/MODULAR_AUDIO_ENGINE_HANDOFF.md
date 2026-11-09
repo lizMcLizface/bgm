@@ -1722,3 +1722,36 @@ this build. Obtain only the compact report from a future guarded phone run,
 bound to actual source/build/browser/settings, before tuning or multi-role
 expansion. The working serial path is available meanwhile. No deployment/push,
 firewall/trust change or Application Control bypass. Commit every verified step.
+
+## M4a first correlated phone delivery failure (2026-11-09)
+
+After `fe52433`, the user successfully supplies compact diagnostics for run
+`e0382044-e0e8-4aec-8538-7ce9c084f14b`, host `all-preview-delivery-v1`, runtime
+`2dd834c6b07330cb`. [Exact report analysis and boundary](MODULAR_AUDIO_ENGINE_M4A_PHONE_DELIVERY.md)
+preserve this new evidence separately from the earlier uncorrelated listening
+failure. Reported UA is Android/mobile Chrome 156; device model, output route,
+lock state and this exact run's listening verdict remain unknown.
+
+Actual worker/Bass/Message/512 x six/64 ms: all nine accepted blocks cover
+**4,608 frames**, then **128 missing frames / one quantum**. The guard stops at
+source **4,736**, output **7,808**, incomplete and failed. Zero rejected/stale/
+late packets, bad recycles, late events or overflow. Maximum consumption since
+an arrival is **2,944 frames**, near nominal capacity; zero over-capacity count
+does not mean actual queue lead was sufficient.
+
+The worker's **15 blocks / 7,680 frames**, **7.20 ms total / 1.30 ms max render**
+are later statistics. Host finish waits 30 ms before querying independent
+worker/output snapshots; rendering can advance after output has stopped.
+These data confirm PCM transport starvation, but cannot attribute the miss to
+worker compute, tasks, recycle/PCM message delivery or audio callback bursts.
+Normal PCM/recycle ports do not relay through the main thread. No Bluetooth
+cause, CPU headroom or larger-buffer cure is established.
+
+Exact payload: `m4a-phone-worker-delivery-gap.json`; independent frame/block/
+delay checks pass in `m4a-phone-delivery-accounting.json`, without changing the
+run's `pass:false`. No code/DSP/default/public-build change in this evidence
+step. Serial stays initial and the existing HTTPS LAN build remains available;
+no replay of bad audio, push or deployment. **Next bounded implementation:**
+producer task/recycle waiting observations plus last-accepted-packet producer
+snapshot, clearly distinct from the later worker query, before transport tuning
+or further source migration. Keep diagnostics bounded and PCM/control behavior.

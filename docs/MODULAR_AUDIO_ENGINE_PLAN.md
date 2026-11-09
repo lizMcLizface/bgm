@@ -857,3 +857,20 @@ unassessed, native clipboard payload readback and physical phone gestures remain
 unverified. Next: confirm phone usability and capture compact diagnostics for
 the actual guarded worker failure before transport tuning or multi-role work.
 Keep the confirmed local HTTPS preview running. No push/deployment.
+
+### M4a correlated phone failure evidence (2026-11-09)
+
+The compact report now captures a real phone PCM delivery gap on the tested
+`2dd834c6b07330cb` worker build: nine accepted 512-frame blocks exhausted at
+source **4,608**, **128 frames** missing, guard stops incomplete at **4,736**.
+Actual Message / six slots / 64 ms; no fallback or packet/protocol rejection.
+UA reports Android/mobile Chrome 156. This is not retroactively attached to the
+earlier listening failure. [Report, exact accounting and cross-thread audit](MODULAR_AUDIO_ENGINE_M4A_PHONE_DELIVERY.md)
+explain why the later 15-block worker snapshot and short render times cannot
+locate the delay at the failing quantum. Independent accounting passes while
+the original run remains failed. No runtime/buffering/default change.
+
+Next: bounded producer task/recycle-wait telemetry and last accepted packet's
+producer snapshot, separated from asynchronous post-stop worker statistics.
+Then a controlled explicit delivery comparison; preserve the working serial
+phone path and existing legacy/harness behavior. No deployment or broad migration.

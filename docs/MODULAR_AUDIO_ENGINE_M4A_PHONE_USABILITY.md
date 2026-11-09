@@ -101,6 +101,11 @@ worker speedup or larger-buffer cure is claimed. Layout fixes and copy controls
 must be checked on the physical phone; native pinch zoom is not added to the
 contained camera (use its +/- controls and Move desk).
 
+Subsequent evidence supersedes the unknown-counter status: the user supplies
+an actual guarded worker `delivery-gap` run. See [correlated phone failure,
+cross-thread audit and next measurement](MODULAR_AUDIO_ENGINE_M4A_PHONE_DELIVERY.md).
+The underlying scheduling/delivery cause and physical output verdict remain open.
+
 Keep the confirmed **HTTPS LAN preview** running at
 `https://192.168.0.228:4176/synths/all/`. No deployment or firewall change.
 Next: use the working serial path and obtain **compact** diagnostics from any
