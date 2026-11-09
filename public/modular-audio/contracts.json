@@ -3,7 +3,7 @@
   "patchVersion": 1,
   "maxNodes": 64,
   "maxEdges": 128,
-  "maxEvents": 256,
+  "maxEvents": 4096,
   "maxBlock": 2048,
   "modules": [
     {
@@ -553,6 +553,108 @@
       ],
       "parameters": [],
       "events": []
+    },
+    {
+      "type": "legacy.core",
+      "code": 8,
+      "version": 1,
+      "hostInput": false,
+      "latencyFrames": 0,
+      "tailFrames": -1,
+      "tailPolicy": "patch and held-note dependent",
+      "bypass": "unsupported",
+      "reset": "phase and voices cleared; compressor gain reset",
+      "ports": [
+        {
+          "id": "audio.out",
+          "code": 0,
+          "direction": "out",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": false
+        }
+      ],
+      "parameters": [
+        {
+          "id": "gain",
+          "code": 0,
+          "unit": "linear",
+          "min": 0,
+          "max": 2,
+          "default": 1,
+          "rate": "audio",
+          "modulation": true,
+          "smoothingMs": 0
+        }
+      ],
+      "events": [
+        "parameter",
+        "modulation",
+        "note",
+        "cancel"
+      ],
+      "processing": "prepared blocks",
+      "configuration": "owned pitched spec v1; notes in graph events",
+      "maxNoteEvents": 4000,
+      "maxAutomationPoints": 65536,
+      "latencyPolicy": "query prepared instance; FM reconstruction depends on quality"
+    },
+    {
+      "type": "legacy.fm",
+      "code": 9,
+      "version": 1,
+      "hostInput": false,
+      "latencyFrames": null,
+      "tailFrames": -1,
+      "tailPolicy": "patch and held-note dependent",
+      "bypass": "unsupported",
+      "reset": "phase and voices cleared; compressor gain reset",
+      "ports": [
+        {
+          "id": "audio.out",
+          "code": 0,
+          "direction": "out",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": false
+        }
+      ],
+      "parameters": [
+        {
+          "id": "gain",
+          "code": 0,
+          "unit": "linear",
+          "min": 0,
+          "max": 2,
+          "default": 1,
+          "rate": "audio",
+          "modulation": true,
+          "smoothingMs": 0
+        }
+      ],
+      "events": [
+        "parameter",
+        "modulation",
+        "note",
+        "cancel"
+      ],
+      "processing": "prepared blocks",
+      "configuration": "owned pitched spec v1; notes in graph events",
+      "maxNoteEvents": 4000,
+      "maxAutomationPoints": 65536,
+      "latencyPolicy": "query prepared instance; FM reconstruction depends on quality"
     }
   ]
 }

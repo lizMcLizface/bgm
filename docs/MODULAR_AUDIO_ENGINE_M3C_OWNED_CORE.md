@@ -5,6 +5,10 @@ The [pinned M3a fixture](MODULAR_AUDIO_ENGINE_M3A_BASELINE.md) and existing desk
 defaults remain the reference. All six source engines now have owned mutable
 Rust state. Pitched DAG integration and optional workers remain unfinished.
 
+This is the historical M3c checkpoint. [M3d pitched DAG integration](MODULAR_AUDIO_ENGINE_M3D_PITCHED_DAG.md)
+is now delivered; optional workers remain next. Foundation through M3c was
+committed locally as `bc4e35d` before continuing M3d.
+
 ## Ownership boundary
 
 `synth-engine/src/engine.rs` contains the original subtractive/core DSP as a

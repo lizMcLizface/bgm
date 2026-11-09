@@ -35,6 +35,17 @@ impl Notes {
     pub fn clear(&mut self) {
         *self = Self::new();
     }
+    pub fn contains(&self, id: u32) -> bool { self.keys[..self.len].iter().any(|k| k.id == id) }
+    /// Forget one key even while the pedal is held, retaining last-key priority.
+    pub fn cancel(&mut self, id: u32) -> Action {
+        let before = self.selected().map(|k| k.id);
+        if let Some(i) = self.keys[..self.len].iter().position(|k| k.id == id) { self.remove(i); }
+        match self.selected() {
+            Some(k) if Some(k.id) != before => Action::Select(k),
+            None if before.is_some() => Action::Release,
+            _ => Action::None,
+        }
+    }
     fn selected(&self) -> Option<Key> {
         self.keys[..self.len]
             .iter()

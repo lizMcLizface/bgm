@@ -18,8 +18,12 @@ defaults remain intact. The [actual six-role M3a serial baseline](MODULAR_AUDIO_
 is now measured with the existing mixer/local/master effects and an opt-in
 kick-keyed route. The [M3b owned FM adapter](MODULAR_AUDIO_ENGINE_M3B_OWNED_FM.md)
 now supplies second/bass in an opt-in shared-instance worklet. [M3c owned core](MODULAR_AUDIO_ENGINE_M3C_OWNED_CORE.md)
-supplies lead/rhythm/pad. Next is pitched DAG integration, before workers or
-broad workbench migration.
+supplies lead/rhythm/pad. [M3d pitched DAG](MODULAR_AUDIO_ENGINE_M3D_PITCHED_DAG.md)
+now runs all six sources and explicit mixing/keyed compression inside one Rust
+graph, preserving the opt-in desk comparison and adding a dry Rust mix audition.
+Next is bounded optional worker execution before broad workbench migration.
+Foundation through M3c committed locally as `bc4e35d`; M3d is subsequent
+working-tree work. No push/deployment.
 
 ## 1. Establish the playback and persistence contract
 

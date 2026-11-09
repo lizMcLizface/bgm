@@ -18,8 +18,12 @@ the [actual six-role serial baseline](MODULAR_AUDIO_ENGINE_M3A_BASELINE.md),
 including real Web Audio program/key inputs and a kick-keyed full-route variant.
 The [M3b owned FM adapter](MODULAR_AUDIO_ENGINE_M3B_OWNED_FM.md) now supplies
 second/bass in an opt-in paired worklet. [M3c owned core](MODULAR_AUDIO_ENGINE_M3C_OWNED_CORE.md)
-now supplies lead/rhythm/pad in an opt-in trio. Pitched DAG nodes come next;
-worker execution and desk migration remain future work.
+now supplies lead/rhythm/pad in an opt-in trio. [M3d pitched DAG](MODULAR_AUDIO_ENGINE_M3D_PITCHED_DAG.md)
+now owns all six sources, timed notes, prepared transitions, mixing and keyed
+compression in one Rust graph. The comparison retains existing local/master
+effects; a separate dry Rust mix can be auditioned. Worker execution and desk
+migration remain future work. Foundation through M3c committed locally as
+`bc4e35d`; M3d is subsequent working-tree work. No push/deployment.
 
 ## Next phase: sidechain and device connection contract (2026-11-09)
 

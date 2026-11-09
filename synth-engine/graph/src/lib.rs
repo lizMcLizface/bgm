@@ -4,6 +4,7 @@ use std::f64::consts::TAU;
 #[cfg(feature = "allocation-audit")]
 mod allocation_audit;
 mod compressor;
+mod pitched;
 #[cfg(target_arch = "wasm32")]
 mod fm_abi;
 #[cfg(target_arch = "wasm32")]
@@ -12,7 +13,7 @@ pub use calmbgm_percussion::Hit;
 
 pub const MAX_NODES: usize = 64;
 pub const MAX_EDGES: usize = 128;
-pub const MAX_EVENTS: usize = 256;
+pub const MAX_EVENTS: usize = 4096;
 pub const MAX_BLOCK: usize = 2048;
 pub const MAX_FRAME: u64 = (1u64 << 53) - 1;
 
@@ -27,6 +28,8 @@ pub enum Kind {
     Percussion = 5,
     Compressor = 6,
     HostInput = 7,
+    Core = 8,
+    Fm = 9,
 }
 impl Kind {
     pub fn from_code(code: u32) -> Result<Self> {
@@ -39,6 +42,8 @@ impl Kind {
             5 => Ok(Self::Percussion),
             6 => Ok(Self::Compressor),
             7 => Ok(Self::HostInput),
+            8 => Ok(Self::Core),
+            9 => Ok(Self::Fm),
             _ => Err(Error::Contract),
         }
     }
@@ -52,6 +57,8 @@ impl Kind {
             Self::Percussion => "legacy.percussion",
             Self::Compressor => "graph.compressor",
             Self::HostInput => "host.audio",
+            Self::Core => "legacy.core",
+            Self::Fm => "legacy.fm",
         }
     }
     fn params(self) -> &'static [Param] {
@@ -64,6 +71,7 @@ impl Kind {
             Self::Percussion => &PERCUSSION_PARAMS,
             Self::Compressor => &COMPRESSOR_PARAMS,
             Self::HostInput => &[],
+            Self::Core | Self::Fm => &PITCH_PARAMS,
         }
     }
     fn ports(self) -> &'static [Port] {
@@ -76,6 +84,7 @@ impl Kind {
             Self::Percussion => &PERCUSSION_PORTS,
             Self::Compressor => &COMPRESSOR_PORTS,
             Self::HostInput => &TONE_PORTS,
+            Self::Core | Self::Fm => &TONE_PORTS,
         }
     }
 }
@@ -88,6 +97,7 @@ struct Param {
     default: f32,
     modulation: bool,
 }
+const PITCH_PARAMS: [Param;1] = [Param{id:"gain",unit:"linear",min:0.,max:2.,default:1.,modulation:true}];
 const TONE_PARAMS: [Param; 2] = [
     Param {
         id: "frequency",
@@ -326,6 +336,8 @@ pub fn descriptors_json() -> String {
         Kind::Percussion,
         Kind::Compressor,
         Kind::HostInput,
+        Kind::Core,
+        Kind::Fm,
     ] {
         let params: Vec<_> = kind.params().iter().enumerate().map(|(code,p)| format!(r#"{{"id":"{}","code":{},"unit":"{}","min":{},"max":{},"default":{},"rate":"{}","modulation":{},"smoothingMs":{}}}"#,p.id,code,p.unit,p.min,p.max,p.default,if p.unit=="boolean"||p.unit=="enum"{"event"}else{"audio"},p.modulation,if kind==Kind::Compressor && [5,6,9].contains(&code){5}else{0})).collect();
         let ports: Vec<_> = kind.ports().iter().enumerate().map(|(code,p)| format!(r#"{{"id":"{}","code":{},"direction":"{}","family":"{}","channels":{},"unit":"{}","reference":"{}","rate":"audio","normalization":"none","fanIn":1,"role":"{}","required":{}}}"#,p.id,code,p.direction,p.family,p.channels,if p.family=="audio" {"linear PCM"} else {"bipolar"},if p.family=="audio" {"1 = digital full scale"} else {"-1..1"},p.role,p.required)).collect();
@@ -345,7 +357,9 @@ pub fn descriptors_json() -> String {
         if kind == Kind::Compressor {
             events.push("\"connection\"");
         }
-        modules.push(format!(r#"{{"type":"{}","code":{},"version":1,"hostInput":{},"latencyFrames":0,"tailFrames":{},"tailPolicy":"{}","bypass":"{}","reset":"phase and voices cleared; compressor gain reset","ports":[{}],"parameters":[{}],"events":[{}]}}"#,kind.name(),kind as u32,kind==Kind::HostInput,if kind==Kind::Percussion{-1}else{0},if kind==Kind::Percussion{"event dependent, at most 8.1 seconds; -1 denotes variable frames"}else{"none"},if kind==Kind::Compressor{"5 ms unity crossfade"}else{"unsupported"},ports.join(","),params.join(","),events.join(",")));
+        if matches!(kind,Kind::Core|Kind::Fm) {events.push("\"note\"");events.push("\"cancel\"");}
+        let processing=if matches!(kind,Kind::Core|Kind::Fm){",\"processing\":\"prepared blocks\",\"configuration\":\"owned pitched spec v1; notes in graph events\",\"maxNoteEvents\":4000,\"maxAutomationPoints\":65536,\"latencyPolicy\":\"query prepared instance; FM reconstruction depends on quality\""}else{""};
+        modules.push(format!(r#"{{"type":"{}","code":{},"version":1,"hostInput":{},"latencyFrames":{},"tailFrames":{},"tailPolicy":"{}","bypass":"{}","reset":"phase and voices cleared; compressor gain reset","ports":[{}],"parameters":[{}],"events":[{}]{}}}"#,kind.name(),kind as u32,kind==Kind::HostInput,if kind==Kind::Fm{"null"}else{"0"},if matches!(kind,Kind::Percussion|Kind::Core|Kind::Fm){-1}else{0},if kind==Kind::Percussion{"event dependent, at most 8.1 seconds; -1 denotes variable frames"}else if matches!(kind,Kind::Core|Kind::Fm){"patch and held-note dependent"}else{"none"},if kind==Kind::Compressor{"5 ms unity crossfade"}else{"unsupported"},ports.join(","),params.join(","),events.join(","),processing));
     }
     format!(
         r#"{{"api":1,"patchVersion":1,"maxNodes":{},"maxEdges":{},"maxEvents":{},"maxBlock":{},"modules":[{}]}}"#,
@@ -369,6 +383,10 @@ pub enum Error {
     QueueFull = 7,
     Frame = 8,
 }
+fn valid_note(k:u32,id:u32,a:f32,b:f32)->bool {
+ if k>6||!a.is_finite()||!b.is_finite(){return false;}
+ match k {0=>id>0&&(0. ..=127.).contains(&a)&&(0. ..=1.).contains(&b),1=>id>0,2|3=>(0. ..=1.).contains(&a),4=>true,5=>id>0&&(0. ..=127.).contains(&a)&&(0. ..=8.).contains(&b),6=>id<=2&&(0. ..=3.).contains(&a)&&(0. ..=1.).contains(&b),_=>false}
+}
 type Result<T> = std::result::Result<T, Error>;
 
 struct Node {
@@ -381,6 +399,7 @@ struct Node {
     kick: Vec<[f32; 2]>,
     percussion: Option<Box<calmbgm_percussion::Engine>>,
     compressor: Option<Box<compressor::Compressor>>,
+    pitched: Option<Box<pitched::Pitched>>,
 }
 /// Audio links always connect matching stereo buses. Mod links explicitly map bipolar control.
 #[derive(Clone, Copy, Debug)]
@@ -411,6 +430,8 @@ pub enum Action {
     ModEnabled { edge: u32, enabled: bool },
     ConnectionEnabled { edge: u32, enabled: bool },
     Hit(Hit),
+    Note { kind:u32, id:u32, a:f32, b:f32 },
+    Cancel,
 }
 #[derive(Clone, Copy, Debug)]
 pub struct Event {
@@ -513,7 +534,9 @@ impl Graph {
         for (i, p) in kind.params().iter().enumerate() {
             base[i] = p.default;
         }
+        if matches!(kind,Kind::Core|Kind::Fm)&&self.nodes.iter().filter(|n|matches!(n.kind,Kind::Core|Kind::Fm)).count()>=8{return Err(Error::Bounds);}
         self.nodes.push(Node {
+            pitched: if matches!(kind,Kind::Core|Kind::Fm){Some(Box::new(pitched::Pitched::new(kind==Kind::Fm,self.sample_rate as f32)))}else{None},
             id,
             kind,
             base,
@@ -737,6 +760,7 @@ impl Graph {
             });
             self.order.push(next);
         }
+        if self.nodes.iter().any(|n|n.pitched.as_ref().is_some_and(|p|!p.ready)){return Err(Error::Contract);}
         self.output = outputs[0];
         self.prepared = true;
         Ok(())
@@ -744,6 +768,18 @@ impl Graph {
     pub fn schedule(&self) -> &[ScheduleEntry] {
         &self.schedule
     }
+    pub fn pitch_config(&mut self,id:u32,scope:u32,index:u32,value:f64)->Result<()> {
+        self.editable()?;let i=self.index(id)?;self.nodes[i].pitched.as_mut().ok_or(Error::Contract)?.configure(pitched::Setting{scope,index,value})
+    }
+    pub fn pitch_performance(&mut self,id:u32,mode:u32,portamento:f32,always:bool)->Result<()> {
+        self.editable()?;let i=self.index(id)?;self.nodes[i].pitched.as_mut().ok_or(Error::Contract)?.set_performance(mode,portamento,always)
+    }
+    pub fn pitch_point(&mut self,id:u32,frame:u64,scope:u32,index:u32,value:f64,extra:f32)->Result<()> {
+        self.editable()?;let i=self.index(id)?;self.nodes[i].pitched.as_mut().ok_or(Error::Contract)?.point(frame,pitched::Setting{scope,index,value},extra)
+    }
+    pub fn pitch_stat(&self,id:u32,index:u32)->Result<f64> {let i=self.index(id)?;Ok(self.nodes[i].pitched.as_ref().ok_or(Error::Contract)?.stat(index))}
+    pub fn percussion_stat(&self,id:u32,index:u32)->Result<f64> {let i=self.index(id)?;Ok(self.nodes[i].percussion.as_ref().ok_or(Error::Contract)?.stat(index))}
+    pub fn node_buffer(&self,id:u32)->Result<&[[f32;2]]> {Ok(&self.nodes[self.index(id)?].buffer)}
     pub fn enqueue(&mut self, mut e: Event) -> Result<()> {
         if !self.prepared {
             return Err(Error::State);
@@ -752,7 +788,14 @@ impl Graph {
             return Err(Error::Frame);
         }
         let i = self.index(e.target)?;
+        if e.owner==0{return Err(Error::Contract);}
         match e.action {
+            Action::Cancel=>{if self.nodes[i].pitched.is_none(){return Err(Error::Contract);}}
+            Action::Note{kind,id,a,b}=>{
+                let p=self.nodes[i].pitched.as_ref().ok_or(Error::Contract)?;
+                if !valid_note(kind,id,a,b)||(matches!(kind,0|1|3|5)&&id!=0&&(p.conflict(id,e.owner)||self.events.iter().any(|x|x.target==e.target&&x.owner!=e.owner&&matches!(x.action,Action::Note{kind:k,id:n,..} if matches!(k,0|1|3|5)&&n==id)))){return Err(Error::Contract);}
+                if self.events.iter().filter(|x|x.target==e.target&&matches!(x.action,Action::Note{..})).count()>=4000{return Err(Error::QueueFull);}
+            }
             Action::Param { param, value } => self.valid_param(i, param, value)?,
             Action::Gate(_) => {
                 if self.nodes[i].kind != Kind::Tone || e.owner == 0 {
@@ -833,6 +876,7 @@ impl Graph {
     pub fn cancel_owner(&mut self, owner: u32) {
         self.events.retain(|e| e.owner != owner);
         for n in &mut self.nodes {
+            if let Some(p)=&mut n.pitched {p.cancel(owner);}
             if let Some(p) = &mut n.percussion {
                 p.cancel_owner(owner);
             }
@@ -846,6 +890,7 @@ impl Graph {
         self.stats = Stats::default();
         self.events.clear();
         for n in &mut self.nodes {
+            if let Some(p)=&mut n.pitched {p.reset();}
             n.buffer.fill([0.; 2]);
             n.kick.fill([0.; 2]);
             if let Some(p) = &mut n.percussion {
@@ -905,6 +950,7 @@ impl Graph {
         }
         if self.paused {
             self.clear_host_inputs();
+            for n in &mut self.nodes {n.buffer[..frames].fill([0.;2]);if !n.kick.is_empty(){n.kick[..frames].fill([0.;2]);}}
             self.left[..frames].fill(0.);
             self.right[..frames].fill(0.);
             return Ok(());
@@ -914,7 +960,8 @@ impl Graph {
                 c.begin_block();
             }
         }
-        for sample in 0..frames {
+        let mut start=0;
+        while start<frames {
             while self.events.first().is_some_and(|e| e.frame <= self.frame) {
                 let e = self.events.remove(0);
                 let i = self.index(e.target)?;
@@ -937,10 +984,15 @@ impl Graph {
                     Action::ConnectionEnabled { edge, enabled } => {
                         self.set_detector_connection(edge, enabled)?;
                     }
+                    Action::Cancel=>self.cancel_owner(e.owner),
+                    Action::Note{kind,id,a,b}=>{if kind==4 {self.events.retain(|x|!(x.target==e.target&&matches!(x.action,Action::Note{..})));self.nodes[i].pitched.as_mut().unwrap().panic();}else{self.nodes[i].pitched.as_mut().unwrap().note(kind,id,e.owner,e.frame,a,b)?;}}
                     Action::Hit(_) => {} // The owned engine executes its booked hit in tick().
                 }
                 self.stats.applied += 1;
             }
+            let length=(frames-start).min(self.events.first().map_or(usize::MAX,|e|(e.frame-self.frame)as usize));
+            for n in &mut self.nodes {if let Some(p)=&mut n.pitched{p.render(self.frame,&mut n.buffer[start..start+length])?;}}
+            for sample in start..start+length {
             for &i in &self.order {
                 // Preserve separate program/key-capable input buses. Only Mix sums
                 // them; future detector ports must never enter an implicit sum.
@@ -1003,6 +1055,7 @@ impl Graph {
                         (inputs[0][1] + inputs[1][1]) * n.base[0],
                     ],
                     Kind::Output => inputs[0],
+                    Kind::Core|Kind::Fm=>{let gain=(n.base[0]+modulation).clamp(0.,2.);[n.buffer[sample][0]*gain,n.buffer[sample][1]*gain]},
                     Kind::HostInput => n.buffer[sample].map(|v| if v.is_finite() { v } else { 0. }),
                     Kind::Percussion => {
                         let (audio, kick) = n.percussion.as_mut().unwrap().tick_with_kick();
@@ -1029,6 +1082,8 @@ impl Graph {
             self.left[sample] = self.nodes[self.output].buffer[sample][0];
             self.right[sample] = self.nodes[self.output].buffer[sample][1];
             self.frame += 1;
+            }
+            start+=length;
         }
         self.clear_host_inputs();
         Ok(())

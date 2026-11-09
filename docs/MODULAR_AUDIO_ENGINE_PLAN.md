@@ -1,11 +1,14 @@
 # Modular audio engine and parallel rendering plan
 
 Agreed direction: 2026-11-09. Status: **M0/M1, the opt-in M2 percussion/sidechain
-slice, M3a's actual six-role serial baseline, M3b owned FM and M3c owned core delivered**.
+slice, M3a's actual six-role serial baseline, M3b owned FM, M3c owned core and M3d pitched DAG delivered**.
 All six source engines have owned mutable Rust state; core's read-only additive
 tables are safely shared after preparation. External stereo host inputs and
-graph program/key compression exist. Pitched DAG nodes, workbench migration
-and worker scheduling remain future work.
+graph program/key compression exist. All six sources now also run inside one
+prepared, block-capable Rust DAG. Workbench migration and worker scheduling
+remain future work. Foundation through M3c committed locally as `bc4e35d`;
+M3d is subsequent working-tree work. No push/deployment.
+See [pitched DAG contracts and evidence](MODULAR_AUDIO_ENGINE_M3D_PITCHED_DAG.md).
 See [owned core contracts and evidence](MODULAR_AUDIO_ENGINE_M3C_OWNED_CORE.md).
 See [owned FM contracts and evidence](MODULAR_AUDIO_ENGINE_M3B_OWNED_FM.md).
 See [M3a measurements and limits](MODULAR_AUDIO_ENGINE_M3A_BASELINE.md). Read
@@ -515,6 +518,49 @@ cancellation, latency metadata and insert batching. Only after matching the
 six-source owned reference should bounded optional workers be evaluated for
 actual deadlines/stalls, latency, hosting/capability and serial fallback.
 No worker performance, broad migration or screen-lock fix is claimed by M3c.
+
+### M3d delivery: block-capable pitched Rust DAG (2026-11-09)
+
+See [the M3d record](MODULAR_AUDIO_ENGINE_M3D_PITCHED_DAG.md) for contracts,
+bounded preparation, exact evidence and browser results. Foundation through
+M3c was committed locally as `bc4e35d` at the user's request, then work continued
+on M3d. No push or deployment.
+
+- `legacy.core` / `legacy.fm` are owned DAG nodes with prepared instrument
+  packets/transitions, timestamped notes/controllers, explicit note owners and
+  immediate/timed cancellation. Graph rendering splits at event/configuration
+  boundaries and renders pitched spans in blocks. Sustained peers and mono
+  fallback keys survive cancellation of another owner. Reset restores prepared
+  state; the host explicitly rebooks notes for replay.
+- The actual pinned six-role score runs inside one 13-node Rust graph: six
+  sources, five mixers, kick-keyed compressor and output. One source worklet
+  exposes six raw stereo taps, actual kick and final Rust stereo mix. The desk
+  comparison retains existing local/master effects and channel mixing; direct
+  **Play Rust mix (dry)** separately auditions the Rust sum/compressor output.
+  Current remains the page default; no workbench route/default migration.
+- **132 original-golden pitched DAG PCM comparisons**, standalone **75 core /
+  57 FM** comparisons and exact legacy export inventories pass. **21 allocator
+  audits** pass, including full DAG transitions/cancellation/reset/replay:
+  no Rust allocation/reclamation/growth after preparation. FM latency remains
+  quality-dependent (7.5 / 7.75 frames), with no new automatic alignment.
+- **375 files / 2,710 tests passed**, 129.74 s; public build and curated-bank/
+  exclusion checks passed. Native cargo check passed; Application Control still
+  blocks native test execution. Graph **296,101 bytes**, version
+  **`eb07d368174d0159`**. Durable stage reports are linked in the M3d record.
+- Actual browser: **18 measured renders + 6 warmups**, all six stems exact,
+  full desk mix difference **2.9802322387695312e-8** at every rate under retained
+  1e-6 tolerance. Fixture save/reload restores stopped. Both finite 48 kHz desk
+  and direct Rust mix playbacks have nonzero main/all-six source activity and
+  finish at 840,000 frames / 357 graph events without reported late/drop/
+  overflow. These are analyser/output-path observations, not device loopback.
+
+**Next: bounded optional worker execution**, using this serial graph and the
+pinned fixture as reference. Specify frame/generation publication, owned state/
+event transfer, added buffering/latency, nonblocking reads, stale/missed-result
+policy, hosting/capability checks and serial fallback before measuring actual
+callback deadlines/stalls. No worker speedup or device-underrun claim follows
+from these offline wall times. Broad migration and locked-phone crackling stay
+outside this checkpoint.
 
 ### Sidechain acceptance retained for workbench integration
 

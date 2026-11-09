@@ -1,15 +1,21 @@
 # Modular audio engine handoff
 
-Prepared and implemented through opt-in M3c owned core on 2026-11-09. Read the working tree, this file and
+Prepared and implemented through opt-in M3d pitched DAG on 2026-11-09. Read the working tree, this file and
 [MODULAR_AUDIO_ENGINE_PLAN.md](MODULAR_AUDIO_ENGINE_PLAN.md) first. This is an
 implementation handoff. **M0/M1, owned percussion/sidechain M2 and the actual
-six-role M3a baseline, M3b owned FM and M3c owned core now exist. Next is pitched DAG integration.** Read
+six-role M3a baseline, M3b owned FM, M3c owned core and M3d pitched DAG now exist. Next is a bounded optional worker prototype.** Read
+[pitched DAG contracts and evidence](MODULAR_AUDIO_ENGINE_M3D_PITCHED_DAG.md),
 [owned core contracts and evidence](MODULAR_AUDIO_ENGINE_M3C_OWNED_CORE.md),
 [owned FM contracts and evidence](MODULAR_AUDIO_ENGINE_M3B_OWNED_FM.md) and
 [M3a's measured baseline](MODULAR_AUDIO_ENGINE_M3A_BASELINE.md). Preserve
 the completed workbench and all existing changes. The original assignment and
 historical release notes below are retained; use the delivery checkpoint at the
 end for current results and limits.
+
+The user subsequently requested **commit then continue**. Completed work through
+M3c was committed locally as **`bc4e35d`**, `Add owned modular audio foundations
+and six-source harness`. M3d is subsequent uncommitted work; no push/deployment.
+Earlier statements below about no commit describe their historical checkpoints.
 
 The older checkpoints are historical. In particular, M2 rebuilds the percussion
 legacy ABI after owned-state extraction and adds Wasm allocation instrumentation;
@@ -861,3 +867,123 @@ Previous M3a/M3b reports were retained. New DOM reports were saved directly,
 avoiding the slow browser download-path mechanism. Next is M3d block-capable
 pitched DAG integration, followed later by optional measured workers. Locked-
 phone crackling remains deferred; its cause is not established.
+
+## M3d delivery checkpoint (2026-11-09)
+
+The user requested **commit then continue**. Completed work through M3c was
+committed locally as **`bc4e35d`**, `Add owned modular audio foundations and
+six-source harness`, on the existing `main` branch. The working tree was clean
+after that checkpoint. M3d below is subsequent uncommitted work. No push or
+deployment was performed. Preserve the new working-tree implementation.
+
+Read [M3d's contracts and detailed evidence](MODULAR_AUDIO_ENGINE_M3D_PITCHED_DAG.md)
+before continuing. Main changes:
+
+- `synth-engine/graph/src/pitched.rs`: owned core/FM nodes, prepared keyframes,
+  original transition semantics, bounded note-owner registry and cancellation.
+  Core/FM `cancel_note` removes a named key even under sustain and preserves
+  remaining mono priority/legato. Ordinary legacy ABI note execution stays
+  compatible. The original retained goldens remain authoritative.
+- Graph ABI adds pitched configuration/performance/point/note/stat APIs and
+  prepared source views. Graph event capacity 4096, eight pitched nodes max,
+  4000 pending notes/controllers/node, 65,536 automation/gain points/node,
+  32 performance transitions. Preparation rejects oversized work. Render spans
+  split at graph events and prepared config boundaries; gain automation does
+  not force a full DSP call for every sample. Pause zeros all taps/freezes time;
+  reset restores prepared config, then host explicitly rebooks events.
+- `pitchedCompiler.js` bakes the original host transition helper at preparation.
+  The graph builder bundles canonical runtime/compiler/validators with installed
+  esbuild, versions worklet imports and checks source/runtime/Wasm provenance.
+- `sixSourceDag()` uses the pinned real roles in one 13-node graph with explicit
+  binary mixing (final sum gain 1/8), actual kick key, compressor and output.
+  `dag-sources-processor.js` exposes eight stereo outputs: roles 0–5, kick 6,
+  Rust final mix 7. Source/counter stats are actual instrument stats, with
+  aggregate graph/compressor telemetry separately named `sourceDag`.
+- The six-role page adds **Six-source Rust DAG · M3d**, **Compare Rust DAG · all
+  rates** and **Play Rust mix (dry)**. Selected playback/comparison retains the
+  existing desk local/master inserts, native mixer and final limiter. Direct
+  Rust mix playback deliberately omits those desk effects; it is a separate
+  reference sum/compressor, not their Rust migration. Current stays the default.
+- Regression coverage checks the actual browser route's selected constructors,
+  six port connections, kick port 6 and final mix port 7. The first browser
+  comparison caught missing source-worklet construction plus a skipped desk
+  compressor in the new option; both were fixed before final verification.
+
+### M3d executable checks
+
+- **132** exact pitched-DAG/original float PCM cases at 44.1/48/96 kHz, including
+  legacy recipes, additive shapes, note/voice behavior, prepared transitions,
+  irregular/partial blocks and actual pitched score parts:
+  `reports/modular_audio/m3d-pitched-dag-compatibility.json`.
+- Standalone legacy/owned **75 core + 57 FM** comparisons pass, with separate
+  `m3d-core-compatibility.json` / `m3d-fm-compatibility.json` reports. All seven
+  rebuilt legacy export sets match `bc4e35d`; most rebuilt bytes differ,
+  percussion bytes match. See `m3d-legacy-binaries.json`. Earlier reports and
+  goldens were not overwritten to accept changes.
+- **21 allocator audits** pass, including full six-source DAG playback,
+  transitions, live enqueue/cancel, reset/pause/rebook/replay: zero Rust
+  allocation/reclamation and no memory growth after preparation. DAG capacity
+  **5,242,880 / 5,242,880 / 5,701,632 bytes** at 44.1/48/96 kHz.
+  `reports/modular_audio/m3d-allocation.json`. JS/browser allocation is outside
+  this instrumentation. Independent compressor equation checks pass.
+- Full suite **375 files / 2,710 tests passed**, **129.74 s**:
+  `.tmp/modular-audio-m3d-suite.log`. Optional scalar/SIMD/acoustic/FM-bank tests
+  remain active. Public build passed with bank/exclusion checks, about 69 s
+  while the suite ran concurrently: `.tmp/modular-audio-m3d-build.log`.
+  Existing chunk advisory remains. Native cargo check passed; native test
+  executables remain blocked by Application Control and were not bypassed.
+- Graph **296,101 bytes**, version **`eb07d368174d0159`**, Wasm SHA256
+  **`a5c3d4b70b57d63094d84fe539d2ec0effe30d5eea5fc59034fbb9a1ff462293`**,
+  rustc 1.99.1. `graph:check`, `ensemble:check` and whitespace checks pass.
+
+### M3d actual browser comparison and reload
+
+Same existing preview: `http://127.0.0.1:4175/tools/modular-ensemble.html`.
+Chrome 157, non-isolated, unchanged pinned fixture/hash, graph
+`eb07d368174d0159`. `reports/modular_audio/m3d-browser-dag-comparison.json`:
+
+- **18 measured renders + 6 full warmups**, M3c owned source groups versus M3d
+  source DAG at 44.1/48/96 kHz × 3 repeats. All six post-local-insert stems
+  exactly match direct legacy Wasm on first measured runs and retain identical
+  repeat/reference hashes. Actual source stats identify every DAG owner.
+- Full desk mix comparison maximum **2.9802322387695312e-8 at every rate**;
+  largest repeat maximum the same, below retained **1e-6** tolerance. Finite,
+  nonzero audio, every final-half-second tail RMS 0/0, all source stats present,
+  no reported late/drop/overflow. Each 48 kHz DAG source/graph ends at exactly
+  **840,000 frames**, **357 aggregate events**, expected second/FM 14 steals,
+  others zero. Actual key is nonzero and external-key meters are connected.
+- Offline median render ms, M3c / M3d: **6993.1 / 5749.7** (44.1),
+  **5214.3 / 5856.7** (48), **9509.0 / 10404.6** (96). Uncontrolled background
+  load, including partial test-suite overlap; only three repeats. Both capture
+  16 channels/stats and run existing local/master FX, native mixer and limiter;
+  M3d additionally computes its internal reference sum/compressor. These are
+  elapsed observations, not a controlled speedup or callback deadline result.
+- Saved locally, reloaded, loaded the pinned fixture **with playback stopped**,
+  selected M3d / 48 kHz and played the finite desk route. It stopped and closed
+  automatically. `reports/modular_audio/m3d-live-desk.json`: **177** analyser
+  polls, main sampled peak **.11402103304862976**, all six role peaks nonzero,
+  sources/graph **840,000 frames**, no reported timing/drop/overflow. Reported
+  base/output latency **10/40 ms**. This verifies output-path activity; it is
+  not direct listening, device loopback or a screen-lock test.
+- **Play Rust mix (dry)** also passed a finite 48 kHz run and stopped/closed:
+  `reports/modular_audio/m3d-live-rust-mix.json`. **177 polls**, main sampled
+  peak **.05186479538679123**, all six raw tap peaks nonzero. All six sources /
+  `sourceDag` finish **840,000 frames / 357 graph events**, expected steals,
+  no reported late/drop/overflow. Its audible compressor is Rust node 17;
+  the disconnected auxiliary desk compressor stays at frame 0 as expected.
+  Reported base/output latency 10/40 ms. Same evidence limits as the desk run.
+- Preview left **Six-source Rust DAG · M3d / 48 kHz, stopped**, after both runs.
+  Screenshot `.tmp/modular-audio-m3d-browser.png`. Original harness navigation
+  names M3d. DOM reports saved directly; no slow browser downloads. Earlier
+  reports are retained. Locked-phone crackling stays deferred, cause unproved.
+
+### Next task after M3d
+
+Specify and prototype bounded optional workers against this serial DAG and
+pinned fixture. Establish frame/generation publication, source ownership and
+event transfer, memory/table ownership, added buffering/latency, nonblocking
+render consumption, stale/missed-result policy and a tested serial fallback.
+Measure actual deadlines/stalls and capability/hosting/non-isolated behavior;
+do not infer parallel speedup from source worklet count or offline elapsed time.
+Keep compatible inserts batched. No broad workbench migration, complete effect
+port, deployment or screen-lock investigation is bundled into this checkpoint.

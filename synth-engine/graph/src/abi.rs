@@ -25,6 +25,25 @@ fn status(result: Result<()>) -> u32 {
     result.err().map_or(0, |e| e as u32)
 }
 #[no_mangle]
+pub extern "C" fn graph_pitch_config(g:&mut Graph,id:u32,scope:u32,index:u32,value:f64)->u32 {status(g.pitch_config(id,scope,index,value))}
+#[no_mangle]
+pub extern "C" fn graph_pitch_performance(g:&mut Graph,id:u32,mode:u32,portamento:f32,always:u32)->u32 {if always>1{return Error::Contract as u32;}status(g.pitch_performance(id,mode,portamento,always!=0))}
+#[no_mangle]
+pub extern "C" fn graph_pitch_point(g:&mut Graph,id:u32,frame:f64,scope:u32,index:u32,value:f64,extra:f32)->u32 {
+    if !frame.is_finite()||frame<0.||frame.fract()!=0.||frame>MAX_FRAME as f64{return Error::Frame as u32;}status(g.pitch_point(id,frame as u64,scope,index,value,extra))
+}
+#[no_mangle]
+pub extern "C" fn graph_pitch_stat(g:&Graph,id:u32,index:u32)->f64 {g.pitch_stat(id,index).unwrap_or(f64::NAN)}
+#[no_mangle]
+pub extern "C" fn graph_percussion_stat(g:&Graph,id:u32,index:u32)->f64 {g.percussion_stat(id,index).unwrap_or(f64::NAN)}
+#[no_mangle]
+pub extern "C" fn graph_node_ptr(g:&Graph,id:u32)->*const f32 {g.node_buffer(id).map_or(std::ptr::null(),|b|b.as_ptr().cast())}
+#[no_mangle]
+pub extern "C" fn graph_note(g:&mut Graph,frame:f64,target:u32,owner:u32,kind:u32,id:u32,a:f32,b:f32)->u32 {
+    if !frame.is_finite()||frame<0.||frame.fract()!=0.||frame>MAX_FRAME as f64{return Error::Frame as u32;}
+    status(g.enqueue(Event{frame:frame as u64,target,owner,action:Action::Note{kind,id,a,b}}))
+}
+#[no_mangle]
 pub unsafe extern "C" fn graph_input_ptr(g: &mut Graph, id: u32) -> *mut f32 {
     g.input_buffer(id)
         .map_or(std::ptr::null_mut(), |b| b.as_mut_ptr().cast())
@@ -179,6 +198,7 @@ pub unsafe extern "C" fn graph_event(
             edge: index,
             enabled: value == 1.,
         },
+        4 => Action::Cancel,
         _ => return Error::Contract as u32,
     };
     status(g.enqueue(Event {

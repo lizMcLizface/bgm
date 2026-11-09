@@ -21,6 +21,8 @@
     "graph:audit-alloc": "node tools/auditModularAlloc.mjs",
     "graph:audit-compressor": "node tools/auditModularAlloc.mjs && node tools/auditModularCompressor.mjs",
     "graph:audit-legacy": "node tools/auditPercussionOwned.mjs",
+    "graph:audit-dag": "vite-node tools/auditPitchedDag.mjs",
+    "graph:audit-dag-alloc": "node tools/auditModularAlloc.mjs && vite-node tools/auditDagAlloc.mjs",
     "graph:audit-core": "vite-node tools/auditCoreOwned.mjs",
     "graph:audit-fm": "vite-node tools/auditFmOwned.mjs",
     "synth:build": "node tools/buildSynth.mjs",

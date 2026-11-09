@@ -1,0 +1,4639 @@
+{
+  "version": 1,
+  "pass": true,
+  "method": "Actual OfflineAudioContext legacy Web Audio route. Owned drum bridge and compressor are opt-in variants; no workers.",
+  "fixtureId": "six-role-reference-v1",
+  "fixtureHash": "77ce180861239426c0c63037235cf98d74a2bbfa09a2a46ee3da3353bb29a7df",
+  "graphVersion": "eb07d368174d0159",
+  "builds": {
+    "core": {
+      "api": 1,
+      "source": "5e2e1fa5587326ed10348f77f7d3972ceee74b51425b4e66c5b9c34cb2d06de2",
+      "wasm": "3612d7d58548d22bfc51f2cd998394f31bf75f11ee2a347206834dc8fb3b2737",
+      "bytes": 379991,
+      "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)"
+    },
+    "fm": {
+      "api": 1,
+      "source": "d564c68b9504212a4dc73508d19e97b273de0f8952d2376ec27417af12646756",
+      "wasm": "76af9b8fd0d73fb04624297838509ad9a181022eae178f4c1621b891eede4ffd",
+      "bytes": 265108,
+      "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)"
+    },
+    "percussion": {
+      "api": 1,
+      "source": "a7d20c6674443af06517fb2e5e6dde70de207c6f8051d82f32b9da2a8099b3cd",
+      "wasm": "a0137cdb5805902ab3f8e5d67512ed591a32b5c22420fde2c53ab04fb7cb064f",
+      "bytes": 92363,
+      "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)"
+    },
+    "inserts": {
+      "api": 1,
+      "source": "e54c3787f2966c7496a8acf5ddb92e66774865bec78d727f3ddcc50ad697a712",
+      "wasm": "3dac67271f175014ae84affecc3d57d6700caac9e056794f8b9f9ede2ce368c8",
+      "bytes": 63253,
+      "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)"
+    },
+    "effects": {
+      "api": 1,
+      "source": "3de7ea688447b8ce0e70c9176dfd029576431b7c92f12f2ca35a4ab4a7d228f8",
+      "wasm": "3a130c7432ff5a1da7eaa5644a20a6b00477db4f0d02a2fcdbfb4edb1ed6bae7",
+      "bytes": 5888114,
+      "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)"
+    }
+  },
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36",
+  "hardwareConcurrency": 32,
+  "crossOriginIsolated": false,
+  "assetLoadMs": 114.30000000074506,
+  "runs": [
+    {
+      "variant": "owned-all",
+      "rate": 44100,
+      "frames": 771750,
+      "prepareMs": 262.30000000074506,
+      "renderMs": 6888.599999997765,
+      "renderAudioRatio": 0.393634285714158,
+      "output": {
+        "frames": 771750,
+        "peak": 0.15604333579540253,
+        "rms": [
+          0.0231717565413333,
+          0.02132813722710938
+        ],
+        "nonFinite": 0,
+        "firstFrame": 11158,
+        "lastFrame": 612612
+      },
+      "outputHash": "ae6c7fffd3543d0698b41a2a4498a101f8031f09f81ec9cfb06f7f71736d8ce9",
+      "tailLastHalfSecond": {
+        "frames": 22050,
+        "peak": 0,
+        "rms": [
+          0,
+          0
+        ],
+        "nonFinite": 0,
+        "firstFrame": -1,
+        "lastFrame": -1
+      },
+      "key": {
+        "frames": 771750,
+        "peak": 0.651549220085144,
+        "rms": [
+          0.09516242608589282,
+          0.09516242608589282
+        ],
+        "nonFinite": 0,
+        "firstFrame": 11026,
+        "lastFrame": 446732
+      },
+      "stems": [
+        {
+          "role": "lead",
+          "kind": "core",
+          "frames": 771750,
+          "peak": 0.285362184047699,
+          "rms": [
+            0.02824347110304872,
+            0.028025033330737907
+          ],
+          "nonFinite": 0,
+          "firstFrame": 11025,
+          "lastFrame": 508159,
+          "hash": "458c0092191e58ac8a42d33be0e74ce23580a93d7b5d8eeb7c01f13d8c505923",
+          "directLegacyMaxDifference": 0
+        },
+        {
+          "role": "second",
+          "kind": "fm",
+          "frames": 771750,
+          "peak": 0.15165379643440247,
+          "rms": [
+            0.02871533496249204,
+            0.02696001935423264
+          ],
+          "nonFinite": 0,
+          "firstFrame": 17640,
+          "lastFrame": 541695,
+          "hash": "bdc4d86bb731c47fc24f0e3a9719663aa41f8c29abe3da6860622170698a4145",
+          "directLegacyMaxDifference": 0
+        },
+        {
+          "role": "rhythm",
+          "kind": "core",
+          "frames": 771750,
+          "peak": 0.18186506628990173,
+          "rms": [
+            0.020978553510912264,
+            0.020978350943631416
+          ],
+          "nonFinite": 0,
+          "firstFrame": 14333,
+          "lastFrame": 476671,
+          "hash": "17315ee67ba691671c26d4520364d278028651a3b942139842ebcd126806cff5",
+          "directLegacyMaxDifference": 0
+        },
+        {
+          "role": "pad",
+          "kind": "core",
+          "frames": 771750,
+          "peak": 0.4872949719429016,
+          "rms": [
+            0.07712861352002619,
+            0.08274499447305425
+          ],
+          "nonFinite": 0,
+          "firstFrame": 11025,
+          "lastFrame": 535006,
+          "hash": "e9812bc45c48cd44d857e8b6c798816ac1fc81cd8f1a4c5012486fc45f7aad15",
+          "directLegacyMaxDifference": 0
+        },
+        {
+          "role": "bass",
+          "kind": "fm",
+          "frames": 771750,
+          "peak": 0.09898416697978973,
+          "rms": [
+            0.028148149787478347,
+            0.028148149787478347
+          ],
+          "nonFinite": 0,
+          "firstFrame": 11025,
+          "lastFrame": 498559,
+          "hash": "1b6e7a743593f04cb401a585f6ce5d657d06ec4afd5196f153ccd63c5ab8b922",
+          "directLegacyMaxDifference": 0
+        },
+        {
+          "role": "drums",
+          "kind": "percussion",
+          "frames": 771750,
+          "peak": 1.0345467329025269,
+          "rms": [
+            0.09639303262889906,
+            0.09607054993318956
+          ],
+          "nonFinite": 0,
+          "firstFrame": 11026,
+          "lastFrame": 448937,
+          "hash": "82b34508b5e14a0b916101c1be067361f1cc36d554540ebc7c2bb0b929621c87",
+          "directLegacyMaxDifference": 0
+        }
+      ],
+      "sourceStats": {
+        "lead": {
+          "active": 0,
+          "peakActive": 7,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "latencyFrames": 0,
+          "owned": true,
+          "sharedInstanceMemory": 3014656
+        },
+        "rhythm": {
+          "active": 0,
+          "peakActive": 2,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "latencyFrames": 0,
+          "owned": true,
+          "sharedInstanceMemory": 3014656
+        },
+        "pad": {
+          "active": 0,
+          "peakActive": 8,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "latencyFrames": 0,
+          "owned": true,
+          "sharedInstanceMemory": 3014656
+        },
+        "second": {
+          "active": 0,
+          "peakActive": 8,
+          "steals": 14,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "latencyFrames": 7.5,
+          "owned": true,
+          "sharedInstanceMemory": 1572864
+        },
+        "bass": {
+          "active": 0,
+          "peakActive": 2,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "latencyFrames": 7.5,
+          "owned": true,
+          "sharedInstanceMemory": 1572864
+        },
+        "compressor": {
+          "type": "stats",
+          "frame": 771750,
+          "origin": 0,
+          "late": 0,
+          "overflow": 0,
+          "applied": 0,
+          "meters": {
+            "203": {
+              "inputPeak": 0,
+              "keyPeak": 1.639519203260036e-43,
+              "reductionDb": 3.690438672338763e-29,
+              "outputPeak": 0,
+              "missingKey": 0,
+              "externalKey": 1
+            }
+          },
+          "memory": 1507328
+        },
+        "drums": {
+          "type": "stats",
+          "frame": 771750,
+          "origin": 0,
+          "late": 0,
+          "overflow": 0,
+          "applied": 57,
+          "meters": {},
+          "memory": 2949120
+        }
+      },
+      "missingSourceStats": [],
+      "counterScope": "Legacy percussion has no offline final stats message; direct-kernel/PCM checks cover it. No audio-device underrun counter.",
+      "limiterLatencyFrames": 132,
+      "iteration": 0
+    },
+    {
+      "variant": "owned-all",
+      "rate": 44100,
+      "frames": 771750,
+      "prepareMs": 99.80000000074506,
+      "renderMs": 7035,
+      "renderAudioRatio": 0.402,
+      "output": {
+        "frames": 771750,
+        "peak": 0.15604333579540253,
+        "rms": [
+          0.023171756538512535,
+          0.02132813722718661
+        ],
+        "nonFinite": 0,
+        "firstFrame": 11158,
+        "lastFrame": 612612
+      },
+      "outputHash": "0dfe64cd86df850d6ee7104fb8b6ca09a45db43145f50f8b447a7445d4871701",
+      "tailLastHalfSecond": {
+        "frames": 22050,
+        "peak": 0,
+        "rms": [
+          0,
+          0
+        ],
+        "nonFinite": 0,
+        "firstFrame": -1,
+        "lastFrame": -1
+      },
+      "key": {
+        "frames": 771750,
+        "peak": 0.651549220085144,
+        "rms": [
+          0.09516242608589282,
+          0.09516242608589282
+        ],
+        "nonFinite": 0,
+        "firstFrame": 11026,
+        "lastFrame": 446732
+      },
+      "stems": [
+        {
+          "role": "lead",
+          "kind": "core",
+          "frames": 771750,
+          "peak": 0.285362184047699,
+          "rms": [
+            0.02824347110304872,
+            0.028025033330737907
+          ],
+          "nonFinite": 0,
+          "firstFrame": 11025,
+          "lastFrame": 508159,
+          "hash": "458c0092191e58ac8a42d33be0e74ce23580a93d7b5d8eeb7c01f13d8c505923",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "second",
+          "kind": "fm",
+          "frames": 771750,
+          "peak": 0.15165379643440247,
+          "rms": [
+            0.02871533496249204,
+            0.02696001935423264
+          ],
+          "nonFinite": 0,
+          "firstFrame": 17640,
+          "lastFrame": 541695,
+          "hash": "bdc4d86bb731c47fc24f0e3a9719663aa41f8c29abe3da6860622170698a4145",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "rhythm",
+          "kind": "core",
+          "frames": 771750,
+          "peak": 0.18186506628990173,
+          "rms": [
+            0.020978553510912264,
+            0.020978350943631416
+          ],
+          "nonFinite": 0,
+          "firstFrame": 14333,
+          "lastFrame": 476671,
+          "hash": "17315ee67ba691671c26d4520364d278028651a3b942139842ebcd126806cff5",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "pad",
+          "kind": "core",
+          "frames": 771750,
+          "peak": 0.4872949719429016,
+          "rms": [
+            0.07712861352002619,
+            0.08274499447305425
+          ],
+          "nonFinite": 0,
+          "firstFrame": 11025,
+          "lastFrame": 535006,
+          "hash": "e9812bc45c48cd44d857e8b6c798816ac1fc81cd8f1a4c5012486fc45f7aad15",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "bass",
+          "kind": "fm",
+          "frames": 771750,
+          "peak": 0.09898416697978973,
+          "rms": [
+            0.028148149787478347,
+            0.028148149787478347
+          ],
+          "nonFinite": 0,
+          "firstFrame": 11025,
+          "lastFrame": 498559,
+          "hash": "1b6e7a743593f04cb401a585f6ce5d657d06ec4afd5196f153ccd63c5ab8b922",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "drums",
+          "kind": "percussion",
+          "frames": 771750,
+          "peak": 1.0345467329025269,
+          "rms": [
+            0.09639303262889906,
+            0.09607054993318956
+          ],
+          "nonFinite": 0,
+          "firstFrame": 11026,
+          "lastFrame": 448937,
+          "hash": "82b34508b5e14a0b916101c1be067361f1cc36d554540ebc7c2bb0b929621c87",
+          "directLegacyMaxDifference": null
+        }
+      ],
+      "sourceStats": {
+        "second": {
+          "active": 0,
+          "peakActive": 8,
+          "steals": 14,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "latencyFrames": 7.5,
+          "owned": true,
+          "sharedInstanceMemory": 1572864
+        },
+        "bass": {
+          "active": 0,
+          "peakActive": 2,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "latencyFrames": 7.5,
+          "owned": true,
+          "sharedInstanceMemory": 1572864
+        },
+        "lead": {
+          "active": 0,
+          "peakActive": 7,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "latencyFrames": 0,
+          "owned": true,
+          "sharedInstanceMemory": 3014656
+        },
+        "rhythm": {
+          "active": 0,
+          "peakActive": 2,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "latencyFrames": 0,
+          "owned": true,
+          "sharedInstanceMemory": 3014656
+        },
+        "pad": {
+          "active": 0,
+          "peakActive": 8,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "latencyFrames": 0,
+          "owned": true,
+          "sharedInstanceMemory": 3014656
+        },
+        "compressor": {
+          "type": "stats",
+          "frame": 771750,
+          "origin": 0,
+          "late": 0,
+          "overflow": 0,
+          "applied": 0,
+          "meters": {
+            "203": {
+              "inputPeak": 0,
+              "keyPeak": 1.639519203260036e-43,
+              "reductionDb": 3.690438672338763e-29,
+              "outputPeak": 0,
+              "missingKey": 0,
+              "externalKey": 1
+            }
+          },
+          "memory": 1507328
+        },
+        "drums": {
+          "type": "stats",
+          "frame": 771750,
+          "origin": 0,
+          "late": 0,
+          "overflow": 0,
+          "applied": 57,
+          "meters": {},
+          "memory": 2949120
+        }
+      },
+      "missingSourceStats": [],
+      "counterScope": "Legacy percussion has no offline final stats message; direct-kernel/PCM checks cover it. No audio-device underrun counter.",
+      "limiterLatencyFrames": 132,
+      "iteration": 1,
+      "repeatAgreement": {
+        "maxAbs": 2.9802322387695312e-8,
+        "rms": 1.7616565951535162e-9
+      }
+    },
+    {
+      "variant": "owned-all",
+      "rate": 44100,
+      "frames": 771750,
+      "prepareMs": 90.5,
+      "renderMs": 6993.10000000149,
+      "renderAudioRatio": 0.39960571428579944,
+      "output": {
+        "frames": 771750,
+        "peak": 0.15604333579540253,
+        "rms": [
+          0.02317175654503044,
+          0.021328137230583317
+        ],
+        "nonFinite": 0,
+        "firstFrame": 11158,
+        "lastFrame": 612612
+      },
+      "outputHash": "ef024486bbda1e79cbdaa358c8eb1dc918b97ec27800612bf5351192fde67649",
+      "tailLastHalfSecond": {
+        "frames": 22050,
+        "peak": 0,
+        "rms": [
+          0,
+          0
+        ],
+        "nonFinite": 0,
+        "firstFrame": -1,
+        "lastFrame": -1
+      },
+      "key": {
+        "frames": 771750,
+        "peak": 0.651549220085144,
+        "rms": [
+          0.09516242608589282,
+          0.09516242608589282
+        ],
+        "nonFinite": 0,
+        "firstFrame": 11026,
+        "lastFrame": 446732
+      },
+      "stems": [
+        {
+          "role": "lead",
+          "kind": "core",
+          "frames": 771750,
+          "peak": 0.285362184047699,
+          "rms": [
+            0.02824347110304872,
+            0.028025033330737907
+          ],
+          "nonFinite": 0,
+          "firstFrame": 11025,
+          "lastFrame": 508159,
+          "hash": "458c0092191e58ac8a42d33be0e74ce23580a93d7b5d8eeb7c01f13d8c505923",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "second",
+          "kind": "fm",
+          "frames": 771750,
+          "peak": 0.15165379643440247,
+          "rms": [
+            0.02871533496249204,
+            0.02696001935423264
+          ],
+          "nonFinite": 0,
+          "firstFrame": 17640,
+          "lastFrame": 541695,
+          "hash": "bdc4d86bb731c47fc24f0e3a9719663aa41f8c29abe3da6860622170698a4145",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "rhythm",
+          "kind": "core",
+          "frames": 771750,
+          "peak": 0.18186506628990173,
+          "rms": [
+            0.020978553510912264,
+            0.020978350943631416
+          ],
+          "nonFinite": 0,
+          "firstFrame": 14333,
+          "lastFrame": 476671,
+          "hash": "17315ee67ba691671c26d4520364d278028651a3b942139842ebcd126806cff5",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "pad",
+          "kind": "core",
+          "frames": 771750,
+          "peak": 0.4872949719429016,
+          "rms": [
+            0.07712861352002619,
+            0.08274499447305425
+          ],
+          "nonFinite": 0,
+          "firstFrame": 11025,
+          "lastFrame": 535006,
+          "hash": "e9812bc45c48cd44d857e8b6c798816ac1fc81cd8f1a4c5012486fc45f7aad15",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "bass",
+          "kind": "fm",
+          "frames": 771750,
+          "peak": 0.09898416697978973,
+          "rms": [
+            0.028148149787478347,
+            0.028148149787478347
+          ],
+          "nonFinite": 0,
+          "firstFrame": 11025,
+          "lastFrame": 498559,
+          "hash": "1b6e7a743593f04cb401a585f6ce5d657d06ec4afd5196f153ccd63c5ab8b922",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "drums",
+          "kind": "percussion",
+          "frames": 771750,
+          "peak": 1.0345467329025269,
+          "rms": [
+            0.09639303262889906,
+            0.09607054993318956
+          ],
+          "nonFinite": 0,
+          "firstFrame": 11026,
+          "lastFrame": 448937,
+          "hash": "82b34508b5e14a0b916101c1be067361f1cc36d554540ebc7c2bb0b929621c87",
+          "directLegacyMaxDifference": null
+        }
+      ],
+      "sourceStats": {
+        "second": {
+          "active": 0,
+          "peakActive": 8,
+          "steals": 14,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "latencyFrames": 7.5,
+          "owned": true,
+          "sharedInstanceMemory": 1572864
+        },
+        "bass": {
+          "active": 0,
+          "peakActive": 2,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "latencyFrames": 7.5,
+          "owned": true,
+          "sharedInstanceMemory": 1572864
+        },
+        "lead": {
+          "active": 0,
+          "peakActive": 7,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "latencyFrames": 0,
+          "owned": true,
+          "sharedInstanceMemory": 3014656
+        },
+        "rhythm": {
+          "active": 0,
+          "peakActive": 2,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "latencyFrames": 0,
+          "owned": true,
+          "sharedInstanceMemory": 3014656
+        },
+        "pad": {
+          "active": 0,
+          "peakActive": 8,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "latencyFrames": 0,
+          "owned": true,
+          "sharedInstanceMemory": 3014656
+        },
+        "compressor": {
+          "type": "stats",
+          "frame": 771750,
+          "origin": 0,
+          "late": 0,
+          "overflow": 0,
+          "applied": 0,
+          "meters": {
+            "203": {
+              "inputPeak": 0,
+              "keyPeak": 1.639519203260036e-43,
+              "reductionDb": 3.690438672338763e-29,
+              "outputPeak": 0,
+              "missingKey": 0,
+              "externalKey": 1
+            }
+          },
+          "memory": 1507328
+        },
+        "drums": {
+          "type": "stats",
+          "frame": 771750,
+          "origin": 0,
+          "late": 0,
+          "overflow": 0,
+          "applied": 57,
+          "meters": {},
+          "memory": 2949120
+        }
+      },
+      "missingSourceStats": [],
+      "counterScope": "Legacy percussion has no offline final stats message; direct-kernel/PCM checks cover it. No audio-device underrun counter.",
+      "limiterLatencyFrames": 132,
+      "iteration": 2,
+      "repeatAgreement": {
+        "maxAbs": 2.9802322387695312e-8,
+        "rms": 1.8812041095144073e-9
+      }
+    },
+    {
+      "variant": "dag",
+      "rate": 44100,
+      "frames": 771750,
+      "prepareMs": 121.89999999850988,
+      "renderMs": 7476.60000000149,
+      "renderAudioRatio": 0.4272342857143709,
+      "output": {
+        "frames": 771750,
+        "peak": 0.15604333579540253,
+        "rms": [
+          0.023171756533062617,
+          0.021328137227908755
+        ],
+        "nonFinite": 0,
+        "firstFrame": 11158,
+        "lastFrame": 612612
+      },
+      "outputHash": "c0530eda5c437d914bf9a0390aef4c72c1f1577abb1d284cce7299abc74aea38",
+      "tailLastHalfSecond": {
+        "frames": 22050,
+        "peak": 0,
+        "rms": [
+          0,
+          0
+        ],
+        "nonFinite": 0,
+        "firstFrame": -1,
+        "lastFrame": -1
+      },
+      "key": {
+        "frames": 771750,
+        "peak": 0.651549220085144,
+        "rms": [
+          0.09516242608589282,
+          0.09516242608589282
+        ],
+        "nonFinite": 0,
+        "firstFrame": 11026,
+        "lastFrame": 446732
+      },
+      "stems": [
+        {
+          "role": "lead",
+          "kind": "core",
+          "frames": 771750,
+          "peak": 0.285362184047699,
+          "rms": [
+            0.02824347110304872,
+            0.028025033330737907
+          ],
+          "nonFinite": 0,
+          "firstFrame": 11025,
+          "lastFrame": 508159,
+          "hash": "458c0092191e58ac8a42d33be0e74ce23580a93d7b5d8eeb7c01f13d8c505923",
+          "directLegacyMaxDifference": 0
+        },
+        {
+          "role": "second",
+          "kind": "fm",
+          "frames": 771750,
+          "peak": 0.15165379643440247,
+          "rms": [
+            0.02871533496249204,
+            0.02696001935423264
+          ],
+          "nonFinite": 0,
+          "firstFrame": 17640,
+          "lastFrame": 541695,
+          "hash": "bdc4d86bb731c47fc24f0e3a9719663aa41f8c29abe3da6860622170698a4145",
+          "directLegacyMaxDifference": 0
+        },
+        {
+          "role": "rhythm",
+          "kind": "core",
+          "frames": 771750,
+          "peak": 0.18186506628990173,
+          "rms": [
+            0.020978553510912264,
+            0.020978350943631416
+          ],
+          "nonFinite": 0,
+          "firstFrame": 14333,
+          "lastFrame": 476671,
+          "hash": "17315ee67ba691671c26d4520364d278028651a3b942139842ebcd126806cff5",
+          "directLegacyMaxDifference": 0
+        },
+        {
+          "role": "pad",
+          "kind": "core",
+          "frames": 771750,
+          "peak": 0.4872949719429016,
+          "rms": [
+            0.07712861352002619,
+            0.08274499447305425
+          ],
+          "nonFinite": 0,
+          "firstFrame": 11025,
+          "lastFrame": 535006,
+          "hash": "e9812bc45c48cd44d857e8b6c798816ac1fc81cd8f1a4c5012486fc45f7aad15",
+          "directLegacyMaxDifference": 0
+        },
+        {
+          "role": "bass",
+          "kind": "fm",
+          "frames": 771750,
+          "peak": 0.09898416697978973,
+          "rms": [
+            0.028148149787478347,
+            0.028148149787478347
+          ],
+          "nonFinite": 0,
+          "firstFrame": 11025,
+          "lastFrame": 498559,
+          "hash": "1b6e7a743593f04cb401a585f6ce5d657d06ec4afd5196f153ccd63c5ab8b922",
+          "directLegacyMaxDifference": 0
+        },
+        {
+          "role": "drums",
+          "kind": "percussion",
+          "frames": 771750,
+          "peak": 1.0345467329025269,
+          "rms": [
+            0.09639303262889906,
+            0.09607054993318956
+          ],
+          "nonFinite": 0,
+          "firstFrame": 11026,
+          "lastFrame": 448937,
+          "hash": "82b34508b5e14a0b916101c1be067361f1cc36d554540ebc7c2bb0b929621c87",
+          "directLegacyMaxDifference": 0
+        }
+      ],
+      "sourceStats": {
+        "lead": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 7,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5177344
+        },
+        "second": {
+          "active": 0,
+          "steals": 14,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "peak": 0,
+          "latencyFrames": 7.5,
+          "peakActive": 8,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5177344
+        },
+        "rhythm": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 2,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5177344
+        },
+        "pad": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 8,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5177344
+        },
+        "bass": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "peak": 0,
+          "latencyFrames": 7.5,
+          "peakActive": 2,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5177344
+        },
+        "drums": {
+          "active": 0,
+          "queued": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "peakActive": 4,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5177344
+        },
+        "sourceDag": {
+          "frame": 771750,
+          "late": 0,
+          "overflow": 0,
+          "applied": 357,
+          "meters": {
+            "17": {
+              "inputPeak": 0,
+              "keyPeak": 1.639519203260036e-43,
+              "reductionDb": 3.690438672338763e-29,
+              "outputPeak": 0,
+              "missingKey": 0,
+              "externalKey": 1
+            }
+          },
+          "memory": 5177344
+        },
+        "compressor": {
+          "type": "stats",
+          "frame": 771750,
+          "origin": 0,
+          "late": 0,
+          "overflow": 0,
+          "applied": 0,
+          "meters": {
+            "203": {
+              "inputPeak": 0,
+              "keyPeak": 1.639519203260036e-43,
+              "reductionDb": 3.690438672338763e-29,
+              "outputPeak": 0,
+              "missingKey": 0,
+              "externalKey": 1
+            }
+          },
+          "memory": 1507328
+        }
+      },
+      "missingSourceStats": [],
+      "counterScope": "Legacy percussion has no offline final stats message; direct-kernel/PCM checks cover it. No audio-device underrun counter.",
+      "limiterLatencyFrames": 132,
+      "iteration": 0
+    },
+    {
+      "variant": "dag",
+      "rate": 44100,
+      "frames": 771750,
+      "prepareMs": 95.79999999701977,
+      "renderMs": 5749.70000000298,
+      "renderAudioRatio": 0.328554285714456,
+      "output": {
+        "frames": 771750,
+        "peak": 0.15604333579540253,
+        "rms": [
+          0.023171756538111557,
+          0.02132813722977574
+        ],
+        "nonFinite": 0,
+        "firstFrame": 11158,
+        "lastFrame": 612612
+      },
+      "outputHash": "32725e5df2abb4e5fb886f83c49dc45eaeca9dcf73d05e885eb0c27dcf513255",
+      "tailLastHalfSecond": {
+        "frames": 22050,
+        "peak": 0,
+        "rms": [
+          0,
+          0
+        ],
+        "nonFinite": 0,
+        "firstFrame": -1,
+        "lastFrame": -1
+      },
+      "key": {
+        "frames": 771750,
+        "peak": 0.651549220085144,
+        "rms": [
+          0.09516242608589282,
+          0.09516242608589282
+        ],
+        "nonFinite": 0,
+        "firstFrame": 11026,
+        "lastFrame": 446732
+      },
+      "stems": [
+        {
+          "role": "lead",
+          "kind": "core",
+          "frames": 771750,
+          "peak": 0.285362184047699,
+          "rms": [
+            0.02824347110304872,
+            0.028025033330737907
+          ],
+          "nonFinite": 0,
+          "firstFrame": 11025,
+          "lastFrame": 508159,
+          "hash": "458c0092191e58ac8a42d33be0e74ce23580a93d7b5d8eeb7c01f13d8c505923",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "second",
+          "kind": "fm",
+          "frames": 771750,
+          "peak": 0.15165379643440247,
+          "rms": [
+            0.02871533496249204,
+            0.02696001935423264
+          ],
+          "nonFinite": 0,
+          "firstFrame": 17640,
+          "lastFrame": 541695,
+          "hash": "bdc4d86bb731c47fc24f0e3a9719663aa41f8c29abe3da6860622170698a4145",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "rhythm",
+          "kind": "core",
+          "frames": 771750,
+          "peak": 0.18186506628990173,
+          "rms": [
+            0.020978553510912264,
+            0.020978350943631416
+          ],
+          "nonFinite": 0,
+          "firstFrame": 14333,
+          "lastFrame": 476671,
+          "hash": "17315ee67ba691671c26d4520364d278028651a3b942139842ebcd126806cff5",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "pad",
+          "kind": "core",
+          "frames": 771750,
+          "peak": 0.4872949719429016,
+          "rms": [
+            0.07712861352002619,
+            0.08274499447305425
+          ],
+          "nonFinite": 0,
+          "firstFrame": 11025,
+          "lastFrame": 535006,
+          "hash": "e9812bc45c48cd44d857e8b6c798816ac1fc81cd8f1a4c5012486fc45f7aad15",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "bass",
+          "kind": "fm",
+          "frames": 771750,
+          "peak": 0.09898416697978973,
+          "rms": [
+            0.028148149787478347,
+            0.028148149787478347
+          ],
+          "nonFinite": 0,
+          "firstFrame": 11025,
+          "lastFrame": 498559,
+          "hash": "1b6e7a743593f04cb401a585f6ce5d657d06ec4afd5196f153ccd63c5ab8b922",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "drums",
+          "kind": "percussion",
+          "frames": 771750,
+          "peak": 1.0345467329025269,
+          "rms": [
+            0.09639303262889906,
+            0.09607054993318956
+          ],
+          "nonFinite": 0,
+          "firstFrame": 11026,
+          "lastFrame": 448937,
+          "hash": "82b34508b5e14a0b916101c1be067361f1cc36d554540ebc7c2bb0b929621c87",
+          "directLegacyMaxDifference": null
+        }
+      ],
+      "sourceStats": {
+        "lead": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 7,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5177344
+        },
+        "second": {
+          "active": 0,
+          "steals": 14,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "peak": 0,
+          "latencyFrames": 7.5,
+          "peakActive": 8,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5177344
+        },
+        "rhythm": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 2,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5177344
+        },
+        "pad": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 8,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5177344
+        },
+        "bass": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "peak": 0,
+          "latencyFrames": 7.5,
+          "peakActive": 2,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5177344
+        },
+        "drums": {
+          "active": 0,
+          "queued": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "peakActive": 4,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5177344
+        },
+        "sourceDag": {
+          "frame": 771750,
+          "late": 0,
+          "overflow": 0,
+          "applied": 357,
+          "meters": {
+            "17": {
+              "inputPeak": 0,
+              "keyPeak": 1.639519203260036e-43,
+              "reductionDb": 3.690438672338763e-29,
+              "outputPeak": 0,
+              "missingKey": 0,
+              "externalKey": 1
+            }
+          },
+          "memory": 5177344
+        },
+        "compressor": {
+          "type": "stats",
+          "frame": 771750,
+          "origin": 0,
+          "late": 0,
+          "overflow": 0,
+          "applied": 0,
+          "meters": {
+            "203": {
+              "inputPeak": 0,
+              "keyPeak": 1.639519203260036e-43,
+              "reductionDb": 3.690438672338763e-29,
+              "outputPeak": 0,
+              "missingKey": 0,
+              "externalKey": 1
+            }
+          },
+          "memory": 1507328
+        }
+      },
+      "missingSourceStats": [],
+      "counterScope": "Legacy percussion has no offline final stats message; direct-kernel/PCM checks cover it. No audio-device underrun counter.",
+      "limiterLatencyFrames": 132,
+      "iteration": 1,
+      "repeatAgreement": {
+        "maxAbs": 2.9802322387695312e-8,
+        "rms": 1.7970132743798701e-9
+      }
+    },
+    {
+      "variant": "dag",
+      "rate": 44100,
+      "frames": 771750,
+      "prepareMs": 99.69999999925494,
+      "renderMs": 5141.10000000149,
+      "renderAudioRatio": 0.293777142857228,
+      "output": {
+        "frames": 771750,
+        "peak": 0.15604333579540253,
+        "rms": [
+          0.023171756537729987,
+          0.021328137222973807
+        ],
+        "nonFinite": 0,
+        "firstFrame": 11158,
+        "lastFrame": 612612
+      },
+      "outputHash": "bdb0c91f384f3d7580a8001b0d70058c504f1f88fdcba253647c2d993e20c2a0",
+      "tailLastHalfSecond": {
+        "frames": 22050,
+        "peak": 0,
+        "rms": [
+          0,
+          0
+        ],
+        "nonFinite": 0,
+        "firstFrame": -1,
+        "lastFrame": -1
+      },
+      "key": {
+        "frames": 771750,
+        "peak": 0.651549220085144,
+        "rms": [
+          0.09516242608589282,
+          0.09516242608589282
+        ],
+        "nonFinite": 0,
+        "firstFrame": 11026,
+        "lastFrame": 446732
+      },
+      "stems": [
+        {
+          "role": "lead",
+          "kind": "core",
+          "frames": 771750,
+          "peak": 0.285362184047699,
+          "rms": [
+            0.02824347110304872,
+            0.028025033330737907
+          ],
+          "nonFinite": 0,
+          "firstFrame": 11025,
+          "lastFrame": 508159,
+          "hash": "458c0092191e58ac8a42d33be0e74ce23580a93d7b5d8eeb7c01f13d8c505923",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "second",
+          "kind": "fm",
+          "frames": 771750,
+          "peak": 0.15165379643440247,
+          "rms": [
+            0.02871533496249204,
+            0.02696001935423264
+          ],
+          "nonFinite": 0,
+          "firstFrame": 17640,
+          "lastFrame": 541695,
+          "hash": "bdc4d86bb731c47fc24f0e3a9719663aa41f8c29abe3da6860622170698a4145",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "rhythm",
+          "kind": "core",
+          "frames": 771750,
+          "peak": 0.18186506628990173,
+          "rms": [
+            0.020978553510912264,
+            0.020978350943631416
+          ],
+          "nonFinite": 0,
+          "firstFrame": 14333,
+          "lastFrame": 476671,
+          "hash": "17315ee67ba691671c26d4520364d278028651a3b942139842ebcd126806cff5",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "pad",
+          "kind": "core",
+          "frames": 771750,
+          "peak": 0.4872949719429016,
+          "rms": [
+            0.07712861352002619,
+            0.08274499447305425
+          ],
+          "nonFinite": 0,
+          "firstFrame": 11025,
+          "lastFrame": 535006,
+          "hash": "e9812bc45c48cd44d857e8b6c798816ac1fc81cd8f1a4c5012486fc45f7aad15",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "bass",
+          "kind": "fm",
+          "frames": 771750,
+          "peak": 0.09898416697978973,
+          "rms": [
+            0.028148149787478347,
+            0.028148149787478347
+          ],
+          "nonFinite": 0,
+          "firstFrame": 11025,
+          "lastFrame": 498559,
+          "hash": "1b6e7a743593f04cb401a585f6ce5d657d06ec4afd5196f153ccd63c5ab8b922",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "drums",
+          "kind": "percussion",
+          "frames": 771750,
+          "peak": 1.0345467329025269,
+          "rms": [
+            0.09639303262889906,
+            0.09607054993318956
+          ],
+          "nonFinite": 0,
+          "firstFrame": 11026,
+          "lastFrame": 448937,
+          "hash": "82b34508b5e14a0b916101c1be067361f1cc36d554540ebc7c2bb0b929621c87",
+          "directLegacyMaxDifference": null
+        }
+      ],
+      "sourceStats": {
+        "lead": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 7,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5177344
+        },
+        "second": {
+          "active": 0,
+          "steals": 14,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "peak": 0,
+          "latencyFrames": 7.5,
+          "peakActive": 8,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5177344
+        },
+        "rhythm": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 2,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5177344
+        },
+        "pad": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 8,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5177344
+        },
+        "bass": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "peak": 0,
+          "latencyFrames": 7.5,
+          "peakActive": 2,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5177344
+        },
+        "drums": {
+          "active": 0,
+          "queued": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "peakActive": 4,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5177344
+        },
+        "sourceDag": {
+          "frame": 771750,
+          "late": 0,
+          "overflow": 0,
+          "applied": 357,
+          "meters": {
+            "17": {
+              "inputPeak": 0,
+              "keyPeak": 1.639519203260036e-43,
+              "reductionDb": 3.690438672338763e-29,
+              "outputPeak": 0,
+              "missingKey": 0,
+              "externalKey": 1
+            }
+          },
+          "memory": 5177344
+        },
+        "compressor": {
+          "type": "stats",
+          "frame": 771750,
+          "origin": 0,
+          "late": 0,
+          "overflow": 0,
+          "applied": 0,
+          "meters": {
+            "203": {
+              "inputPeak": 0,
+              "keyPeak": 1.639519203260036e-43,
+              "reductionDb": 3.690438672338763e-29,
+              "outputPeak": 0,
+              "missingKey": 0,
+              "externalKey": 1
+            }
+          },
+          "memory": 1507328
+        }
+      },
+      "missingSourceStats": [],
+      "counterScope": "Legacy percussion has no offline final stats message; direct-kernel/PCM checks cover it. No audio-device underrun counter.",
+      "limiterLatencyFrames": 132,
+      "iteration": 2,
+      "repeatAgreement": {
+        "maxAbs": 2.9802322387695312e-8,
+        "rms": 1.7719392909877084e-9
+      }
+    },
+    {
+      "variant": "owned-all",
+      "rate": 48000,
+      "frames": 840000,
+      "prepareMs": 88.90000000223517,
+      "renderMs": 5155.199999999255,
+      "renderAudioRatio": 0.29458285714281457,
+      "output": {
+        "frames": 840000,
+        "peak": 0.1614825278520584,
+        "rms": [
+          0.02317420526384804,
+          0.021331292770574595
+        ],
+        "nonFinite": 0,
+        "firstFrame": 12144,
+        "lastFrame": 666767
+      },
+      "outputHash": "c251bd13266858305929303eea00140f73b3884130ea9f8cd12d54f37ce21de4",
+      "tailLastHalfSecond": {
+        "frames": 24000,
+        "peak": 0,
+        "rms": [
+          0,
+          0
+        ],
+        "nonFinite": 0,
+        "firstFrame": -1,
+        "lastFrame": -1
+      },
+      "key": {
+        "frames": 840000,
+        "peak": 0.6485030651092529,
+        "rms": [
+          0.09516252024851841,
+          0.09516252024851841
+        ],
+        "nonFinite": 0,
+        "firstFrame": 12001,
+        "lastFrame": 486239
+      },
+      "stems": [
+        {
+          "role": "lead",
+          "kind": "core",
+          "frames": 840000,
+          "peak": 0.28822043538093567,
+          "rms": [
+            0.028287083576423025,
+            0.028069763255119097
+          ],
+          "nonFinite": 0,
+          "firstFrame": 12000,
+          "lastFrame": 553087,
+          "hash": "9f84d23340e7898babac063b750b74c502b440a460bb1002de6d3e5d6d2414e3",
+          "directLegacyMaxDifference": 0
+        },
+        {
+          "role": "second",
+          "kind": "fm",
+          "frames": 840000,
+          "peak": 0.15140078961849213,
+          "rms": [
+            0.02871816865006813,
+            0.026962681840547016
+          ],
+          "nonFinite": 0,
+          "firstFrame": 19200,
+          "lastFrame": 589439,
+          "hash": "0b4a1ead86e950f7ae4a74efe32b81e682664a486a247a282b80958b5952cba9",
+          "directLegacyMaxDifference": 0
+        },
+        {
+          "role": "rhythm",
+          "kind": "core",
+          "frames": 840000,
+          "peak": 0.1825425624847412,
+          "rms": [
+            0.020983227610664564,
+            0.02098340101188521
+          ],
+          "nonFinite": 0,
+          "firstFrame": 15600,
+          "lastFrame": 518783,
+          "hash": "bcbd6274722d77e8cc04e570f41d4118139fbab4b18c7822682fdae165d69515",
+          "directLegacyMaxDifference": 0
+        },
+        {
+          "role": "pad",
+          "kind": "core",
+          "frames": 840000,
+          "peak": 0.48755380511283875,
+          "rms": [
+            0.07710919741875145,
+            0.0827524704252593
+          ],
+          "nonFinite": 0,
+          "firstFrame": 12000,
+          "lastFrame": 582317,
+          "hash": "4e30cafd6377de08abfa0413e016b43d770007c6bd7ee17eecc82ef1e7e1aab0",
+          "directLegacyMaxDifference": 0
+        },
+        {
+          "role": "bass",
+          "kind": "fm",
+          "frames": 840000,
+          "peak": 0.09897934645414352,
+          "rms": [
+            0.028146825840232564,
+            0.028146825840232564
+          ],
+          "nonFinite": 0,
+          "firstFrame": 12000,
+          "lastFrame": 542207,
+          "hash": "16b0082f82c3c6a8d99937fa7739b35cf52d389fe1864d97a328f847d5dad5e0",
+          "directLegacyMaxDifference": 0
+        },
+        {
+          "role": "drums",
+          "kind": "percussion",
+          "frames": 840000,
+          "peak": 1.165629506111145,
+          "rms": [
+            0.09672421444485016,
+            0.09631287834285784
+          ],
+          "nonFinite": 0,
+          "firstFrame": 12001,
+          "lastFrame": 488639,
+          "hash": "66f24596b9dab250d17764bb7f55416883a4792cfc8daf8c0f0808d144a38336",
+          "directLegacyMaxDifference": 0
+        }
+      ],
+      "sourceStats": {
+        "second": {
+          "active": 0,
+          "peakActive": 8,
+          "steals": 14,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "latencyFrames": 7.5,
+          "owned": true,
+          "sharedInstanceMemory": 1572864
+        },
+        "bass": {
+          "active": 0,
+          "peakActive": 2,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "latencyFrames": 7.5,
+          "owned": true,
+          "sharedInstanceMemory": 1572864
+        },
+        "lead": {
+          "active": 0,
+          "peakActive": 7,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "latencyFrames": 0,
+          "owned": true,
+          "sharedInstanceMemory": 3014656
+        },
+        "rhythm": {
+          "active": 0,
+          "peakActive": 2,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "latencyFrames": 0,
+          "owned": true,
+          "sharedInstanceMemory": 3014656
+        },
+        "pad": {
+          "active": 0,
+          "peakActive": 8,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "latencyFrames": 0,
+          "owned": true,
+          "sharedInstanceMemory": 3014656
+        },
+        "compressor": {
+          "type": "stats",
+          "frame": 840000,
+          "origin": 0,
+          "late": 0,
+          "overflow": 0,
+          "applied": 0,
+          "meters": {
+            "203": {
+              "inputPeak": 0,
+              "keyPeak": 1.7796490496925177e-43,
+              "reductionDb": 3.731329174323642e-29,
+              "outputPeak": 0,
+              "missingKey": 0,
+              "externalKey": 1
+            }
+          },
+          "memory": 1507328
+        },
+        "drums": {
+          "type": "stats",
+          "frame": 840000,
+          "origin": 0,
+          "late": 0,
+          "overflow": 0,
+          "applied": 57,
+          "meters": {},
+          "memory": 2949120
+        }
+      },
+      "missingSourceStats": [],
+      "counterScope": "Legacy percussion has no offline final stats message; direct-kernel/PCM checks cover it. No audio-device underrun counter.",
+      "limiterLatencyFrames": 144,
+      "iteration": 0
+    },
+    {
+      "variant": "owned-all",
+      "rate": 48000,
+      "frames": 840000,
+      "prepareMs": 98.10000000149012,
+      "renderMs": 5352.89999999851,
+      "renderAudioRatio": 0.30587999999991483,
+      "output": {
+        "frames": 840000,
+        "peak": 0.1614825278520584,
+        "rms": [
+          0.023174205272586866,
+          0.021331292770843988
+        ],
+        "nonFinite": 0,
+        "firstFrame": 12144,
+        "lastFrame": 666767
+      },
+      "outputHash": "6c1dbd71eaf8df9af112ac804b00231c2579249e79367878ef6ad25692f828e2",
+      "tailLastHalfSecond": {
+        "frames": 24000,
+        "peak": 0,
+        "rms": [
+          0,
+          0
+        ],
+        "nonFinite": 0,
+        "firstFrame": -1,
+        "lastFrame": -1
+      },
+      "key": {
+        "frames": 840000,
+        "peak": 0.6485030651092529,
+        "rms": [
+          0.09516252024851841,
+          0.09516252024851841
+        ],
+        "nonFinite": 0,
+        "firstFrame": 12001,
+        "lastFrame": 486239
+      },
+      "stems": [
+        {
+          "role": "lead",
+          "kind": "core",
+          "frames": 840000,
+          "peak": 0.28822043538093567,
+          "rms": [
+            0.028287083576423025,
+            0.028069763255119097
+          ],
+          "nonFinite": 0,
+          "firstFrame": 12000,
+          "lastFrame": 553087,
+          "hash": "9f84d23340e7898babac063b750b74c502b440a460bb1002de6d3e5d6d2414e3",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "second",
+          "kind": "fm",
+          "frames": 840000,
+          "peak": 0.15140078961849213,
+          "rms": [
+            0.02871816865006813,
+            0.026962681840547016
+          ],
+          "nonFinite": 0,
+          "firstFrame": 19200,
+          "lastFrame": 589439,
+          "hash": "0b4a1ead86e950f7ae4a74efe32b81e682664a486a247a282b80958b5952cba9",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "rhythm",
+          "kind": "core",
+          "frames": 840000,
+          "peak": 0.1825425624847412,
+          "rms": [
+            0.020983227610664564,
+            0.02098340101188521
+          ],
+          "nonFinite": 0,
+          "firstFrame": 15600,
+          "lastFrame": 518783,
+          "hash": "bcbd6274722d77e8cc04e570f41d4118139fbab4b18c7822682fdae165d69515",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "pad",
+          "kind": "core",
+          "frames": 840000,
+          "peak": 0.48755380511283875,
+          "rms": [
+            0.07710919741875145,
+            0.0827524704252593
+          ],
+          "nonFinite": 0,
+          "firstFrame": 12000,
+          "lastFrame": 582317,
+          "hash": "4e30cafd6377de08abfa0413e016b43d770007c6bd7ee17eecc82ef1e7e1aab0",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "bass",
+          "kind": "fm",
+          "frames": 840000,
+          "peak": 0.09897934645414352,
+          "rms": [
+            0.028146825840232564,
+            0.028146825840232564
+          ],
+          "nonFinite": 0,
+          "firstFrame": 12000,
+          "lastFrame": 542207,
+          "hash": "16b0082f82c3c6a8d99937fa7739b35cf52d389fe1864d97a328f847d5dad5e0",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "drums",
+          "kind": "percussion",
+          "frames": 840000,
+          "peak": 1.165629506111145,
+          "rms": [
+            0.09672421444485016,
+            0.09631287834285784
+          ],
+          "nonFinite": 0,
+          "firstFrame": 12001,
+          "lastFrame": 488639,
+          "hash": "66f24596b9dab250d17764bb7f55416883a4792cfc8daf8c0f0808d144a38336",
+          "directLegacyMaxDifference": null
+        }
+      ],
+      "sourceStats": {
+        "second": {
+          "active": 0,
+          "peakActive": 8,
+          "steals": 14,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "latencyFrames": 7.5,
+          "owned": true,
+          "sharedInstanceMemory": 1572864
+        },
+        "bass": {
+          "active": 0,
+          "peakActive": 2,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "latencyFrames": 7.5,
+          "owned": true,
+          "sharedInstanceMemory": 1572864
+        },
+        "lead": {
+          "active": 0,
+          "peakActive": 7,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "latencyFrames": 0,
+          "owned": true,
+          "sharedInstanceMemory": 3014656
+        },
+        "rhythm": {
+          "active": 0,
+          "peakActive": 2,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "latencyFrames": 0,
+          "owned": true,
+          "sharedInstanceMemory": 3014656
+        },
+        "pad": {
+          "active": 0,
+          "peakActive": 8,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "latencyFrames": 0,
+          "owned": true,
+          "sharedInstanceMemory": 3014656
+        },
+        "compressor": {
+          "type": "stats",
+          "frame": 840000,
+          "origin": 0,
+          "late": 0,
+          "overflow": 0,
+          "applied": 0,
+          "meters": {
+            "203": {
+              "inputPeak": 0,
+              "keyPeak": 1.7796490496925177e-43,
+              "reductionDb": 3.731329174323642e-29,
+              "outputPeak": 0,
+              "missingKey": 0,
+              "externalKey": 1
+            }
+          },
+          "memory": 1507328
+        },
+        "drums": {
+          "type": "stats",
+          "frame": 840000,
+          "origin": 0,
+          "late": 0,
+          "overflow": 0,
+          "applied": 57,
+          "meters": {},
+          "memory": 2949120
+        }
+      },
+      "missingSourceStats": [],
+      "counterScope": "Legacy percussion has no offline final stats message; direct-kernel/PCM checks cover it. No audio-device underrun counter.",
+      "limiterLatencyFrames": 144,
+      "iteration": 1,
+      "repeatAgreement": {
+        "maxAbs": 2.9802322387695312e-8,
+        "rms": 1.62677281812058e-9
+      }
+    },
+    {
+      "variant": "owned-all",
+      "rate": 48000,
+      "frames": 840000,
+      "prepareMs": 92.09999999776483,
+      "renderMs": 5214.300000000745,
+      "renderAudioRatio": 0.2979600000000426,
+      "output": {
+        "frames": 840000,
+        "peak": 0.1614825278520584,
+        "rms": [
+          0.023174205268620154,
+          0.02133129277121903
+        ],
+        "nonFinite": 0,
+        "firstFrame": 12144,
+        "lastFrame": 666767
+      },
+      "outputHash": "caf8b6f7dec4986b5b96bab309031e256b4b92ed5c4727f4c484be0ade9f5fe2",
+      "tailLastHalfSecond": {
+        "frames": 24000,
+        "peak": 0,
+        "rms": [
+          0,
+          0
+        ],
+        "nonFinite": 0,
+        "firstFrame": -1,
+        "lastFrame": -1
+      },
+      "key": {
+        "frames": 840000,
+        "peak": 0.6485030651092529,
+        "rms": [
+          0.09516252024851841,
+          0.09516252024851841
+        ],
+        "nonFinite": 0,
+        "firstFrame": 12001,
+        "lastFrame": 486239
+      },
+      "stems": [
+        {
+          "role": "lead",
+          "kind": "core",
+          "frames": 840000,
+          "peak": 0.28822043538093567,
+          "rms": [
+            0.028287083576423025,
+            0.028069763255119097
+          ],
+          "nonFinite": 0,
+          "firstFrame": 12000,
+          "lastFrame": 553087,
+          "hash": "9f84d23340e7898babac063b750b74c502b440a460bb1002de6d3e5d6d2414e3",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "second",
+          "kind": "fm",
+          "frames": 840000,
+          "peak": 0.15140078961849213,
+          "rms": [
+            0.02871816865006813,
+            0.026962681840547016
+          ],
+          "nonFinite": 0,
+          "firstFrame": 19200,
+          "lastFrame": 589439,
+          "hash": "0b4a1ead86e950f7ae4a74efe32b81e682664a486a247a282b80958b5952cba9",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "rhythm",
+          "kind": "core",
+          "frames": 840000,
+          "peak": 0.1825425624847412,
+          "rms": [
+            0.020983227610664564,
+            0.02098340101188521
+          ],
+          "nonFinite": 0,
+          "firstFrame": 15600,
+          "lastFrame": 518783,
+          "hash": "bcbd6274722d77e8cc04e570f41d4118139fbab4b18c7822682fdae165d69515",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "pad",
+          "kind": "core",
+          "frames": 840000,
+          "peak": 0.48755380511283875,
+          "rms": [
+            0.07710919741875145,
+            0.0827524704252593
+          ],
+          "nonFinite": 0,
+          "firstFrame": 12000,
+          "lastFrame": 582317,
+          "hash": "4e30cafd6377de08abfa0413e016b43d770007c6bd7ee17eecc82ef1e7e1aab0",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "bass",
+          "kind": "fm",
+          "frames": 840000,
+          "peak": 0.09897934645414352,
+          "rms": [
+            0.028146825840232564,
+            0.028146825840232564
+          ],
+          "nonFinite": 0,
+          "firstFrame": 12000,
+          "lastFrame": 542207,
+          "hash": "16b0082f82c3c6a8d99937fa7739b35cf52d389fe1864d97a328f847d5dad5e0",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "drums",
+          "kind": "percussion",
+          "frames": 840000,
+          "peak": 1.165629506111145,
+          "rms": [
+            0.09672421444485016,
+            0.09631287834285784
+          ],
+          "nonFinite": 0,
+          "firstFrame": 12001,
+          "lastFrame": 488639,
+          "hash": "66f24596b9dab250d17764bb7f55416883a4792cfc8daf8c0f0808d144a38336",
+          "directLegacyMaxDifference": null
+        }
+      ],
+      "sourceStats": {
+        "lead": {
+          "active": 0,
+          "peakActive": 7,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "latencyFrames": 0,
+          "owned": true,
+          "sharedInstanceMemory": 3014656
+        },
+        "rhythm": {
+          "active": 0,
+          "peakActive": 2,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "latencyFrames": 0,
+          "owned": true,
+          "sharedInstanceMemory": 3014656
+        },
+        "pad": {
+          "active": 0,
+          "peakActive": 8,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "latencyFrames": 0,
+          "owned": true,
+          "sharedInstanceMemory": 3014656
+        },
+        "second": {
+          "active": 0,
+          "peakActive": 8,
+          "steals": 14,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "latencyFrames": 7.5,
+          "owned": true,
+          "sharedInstanceMemory": 1572864
+        },
+        "bass": {
+          "active": 0,
+          "peakActive": 2,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "latencyFrames": 7.5,
+          "owned": true,
+          "sharedInstanceMemory": 1572864
+        },
+        "compressor": {
+          "type": "stats",
+          "frame": 840000,
+          "origin": 0,
+          "late": 0,
+          "overflow": 0,
+          "applied": 0,
+          "meters": {
+            "203": {
+              "inputPeak": 0,
+              "keyPeak": 1.7796490496925177e-43,
+              "reductionDb": 3.731329174323642e-29,
+              "outputPeak": 0,
+              "missingKey": 0,
+              "externalKey": 1
+            }
+          },
+          "memory": 1507328
+        },
+        "drums": {
+          "type": "stats",
+          "frame": 840000,
+          "origin": 0,
+          "late": 0,
+          "overflow": 0,
+          "applied": 57,
+          "meters": {},
+          "memory": 2949120
+        }
+      },
+      "missingSourceStats": [],
+      "counterScope": "Legacy percussion has no offline final stats message; direct-kernel/PCM checks cover it. No audio-device underrun counter.",
+      "limiterLatencyFrames": 144,
+      "iteration": 2,
+      "repeatAgreement": {
+        "maxAbs": 2.9802322387695312e-8,
+        "rms": 1.8981371671320315e-9
+      }
+    },
+    {
+      "variant": "dag",
+      "rate": 48000,
+      "frames": 840000,
+      "prepareMs": 97.5,
+      "renderMs": 5941.099999997765,
+      "renderAudioRatio": 0.3394914285713008,
+      "output": {
+        "frames": 840000,
+        "peak": 0.1614825427532196,
+        "rms": [
+          0.023174205271448648,
+          0.021331292772144662
+        ],
+        "nonFinite": 0,
+        "firstFrame": 12144,
+        "lastFrame": 666767
+      },
+      "outputHash": "da427b1516b5adec4bac834e6e16a571a9e069ab4afcdf9be1876adf1d7dce43",
+      "tailLastHalfSecond": {
+        "frames": 24000,
+        "peak": 0,
+        "rms": [
+          0,
+          0
+        ],
+        "nonFinite": 0,
+        "firstFrame": -1,
+        "lastFrame": -1
+      },
+      "key": {
+        "frames": 840000,
+        "peak": 0.6485030651092529,
+        "rms": [
+          0.09516252024851841,
+          0.09516252024851841
+        ],
+        "nonFinite": 0,
+        "firstFrame": 12001,
+        "lastFrame": 486239
+      },
+      "stems": [
+        {
+          "role": "lead",
+          "kind": "core",
+          "frames": 840000,
+          "peak": 0.28822043538093567,
+          "rms": [
+            0.028287083576423025,
+            0.028069763255119097
+          ],
+          "nonFinite": 0,
+          "firstFrame": 12000,
+          "lastFrame": 553087,
+          "hash": "9f84d23340e7898babac063b750b74c502b440a460bb1002de6d3e5d6d2414e3",
+          "directLegacyMaxDifference": 0
+        },
+        {
+          "role": "second",
+          "kind": "fm",
+          "frames": 840000,
+          "peak": 0.15140078961849213,
+          "rms": [
+            0.02871816865006813,
+            0.026962681840547016
+          ],
+          "nonFinite": 0,
+          "firstFrame": 19200,
+          "lastFrame": 589439,
+          "hash": "0b4a1ead86e950f7ae4a74efe32b81e682664a486a247a282b80958b5952cba9",
+          "directLegacyMaxDifference": 0
+        },
+        {
+          "role": "rhythm",
+          "kind": "core",
+          "frames": 840000,
+          "peak": 0.1825425624847412,
+          "rms": [
+            0.020983227610664564,
+            0.02098340101188521
+          ],
+          "nonFinite": 0,
+          "firstFrame": 15600,
+          "lastFrame": 518783,
+          "hash": "bcbd6274722d77e8cc04e570f41d4118139fbab4b18c7822682fdae165d69515",
+          "directLegacyMaxDifference": 0
+        },
+        {
+          "role": "pad",
+          "kind": "core",
+          "frames": 840000,
+          "peak": 0.48755380511283875,
+          "rms": [
+            0.07710919741875145,
+            0.0827524704252593
+          ],
+          "nonFinite": 0,
+          "firstFrame": 12000,
+          "lastFrame": 582317,
+          "hash": "4e30cafd6377de08abfa0413e016b43d770007c6bd7ee17eecc82ef1e7e1aab0",
+          "directLegacyMaxDifference": 0
+        },
+        {
+          "role": "bass",
+          "kind": "fm",
+          "frames": 840000,
+          "peak": 0.09897934645414352,
+          "rms": [
+            0.028146825840232564,
+            0.028146825840232564
+          ],
+          "nonFinite": 0,
+          "firstFrame": 12000,
+          "lastFrame": 542207,
+          "hash": "16b0082f82c3c6a8d99937fa7739b35cf52d389fe1864d97a328f847d5dad5e0",
+          "directLegacyMaxDifference": 0
+        },
+        {
+          "role": "drums",
+          "kind": "percussion",
+          "frames": 840000,
+          "peak": 1.165629506111145,
+          "rms": [
+            0.09672421444485016,
+            0.09631287834285784
+          ],
+          "nonFinite": 0,
+          "firstFrame": 12001,
+          "lastFrame": 488639,
+          "hash": "66f24596b9dab250d17764bb7f55416883a4792cfc8daf8c0f0808d144a38336",
+          "directLegacyMaxDifference": 0
+        }
+      ],
+      "sourceStats": {
+        "lead": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 7,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5242880
+        },
+        "second": {
+          "active": 0,
+          "steals": 14,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "peak": 0,
+          "latencyFrames": 7.5,
+          "peakActive": 8,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5242880
+        },
+        "rhythm": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 2,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5242880
+        },
+        "pad": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 8,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5242880
+        },
+        "bass": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "peak": 0,
+          "latencyFrames": 7.5,
+          "peakActive": 2,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5242880
+        },
+        "drums": {
+          "active": 0,
+          "queued": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "peakActive": 4,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5242880
+        },
+        "sourceDag": {
+          "frame": 840000,
+          "late": 0,
+          "overflow": 0,
+          "applied": 357,
+          "meters": {
+            "17": {
+              "inputPeak": 0,
+              "keyPeak": 1.7796490496925177e-43,
+              "reductionDb": 3.731329174323642e-29,
+              "outputPeak": 0,
+              "missingKey": 0,
+              "externalKey": 1
+            }
+          },
+          "memory": 5242880
+        },
+        "compressor": {
+          "type": "stats",
+          "frame": 840000,
+          "origin": 0,
+          "late": 0,
+          "overflow": 0,
+          "applied": 0,
+          "meters": {
+            "203": {
+              "inputPeak": 0,
+              "keyPeak": 1.7796490496925177e-43,
+              "reductionDb": 3.731329174323642e-29,
+              "outputPeak": 0,
+              "missingKey": 0,
+              "externalKey": 1
+            }
+          },
+          "memory": 1507328
+        }
+      },
+      "missingSourceStats": [],
+      "counterScope": "Legacy percussion has no offline final stats message; direct-kernel/PCM checks cover it. No audio-device underrun counter.",
+      "limiterLatencyFrames": 144,
+      "iteration": 0
+    },
+    {
+      "variant": "dag",
+      "rate": 48000,
+      "frames": 840000,
+      "prepareMs": 121.30000000074506,
+      "renderMs": 5784.800000000745,
+      "renderAudioRatio": 0.3305600000000426,
+      "output": {
+        "frames": 840000,
+        "peak": 0.1614825278520584,
+        "rms": [
+          0.023174205271141633,
+          0.021331292771033992
+        ],
+        "nonFinite": 0,
+        "firstFrame": 12144,
+        "lastFrame": 666767
+      },
+      "outputHash": "65f6bb70dcaeb704b24d62800173080a0e3344026c30d5fb3fd1986dab061a25",
+      "tailLastHalfSecond": {
+        "frames": 24000,
+        "peak": 0,
+        "rms": [
+          0,
+          0
+        ],
+        "nonFinite": 0,
+        "firstFrame": -1,
+        "lastFrame": -1
+      },
+      "key": {
+        "frames": 840000,
+        "peak": 0.6485030651092529,
+        "rms": [
+          0.09516252024851841,
+          0.09516252024851841
+        ],
+        "nonFinite": 0,
+        "firstFrame": 12001,
+        "lastFrame": 486239
+      },
+      "stems": [
+        {
+          "role": "lead",
+          "kind": "core",
+          "frames": 840000,
+          "peak": 0.28822043538093567,
+          "rms": [
+            0.028287083576423025,
+            0.028069763255119097
+          ],
+          "nonFinite": 0,
+          "firstFrame": 12000,
+          "lastFrame": 553087,
+          "hash": "9f84d23340e7898babac063b750b74c502b440a460bb1002de6d3e5d6d2414e3",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "second",
+          "kind": "fm",
+          "frames": 840000,
+          "peak": 0.15140078961849213,
+          "rms": [
+            0.02871816865006813,
+            0.026962681840547016
+          ],
+          "nonFinite": 0,
+          "firstFrame": 19200,
+          "lastFrame": 589439,
+          "hash": "0b4a1ead86e950f7ae4a74efe32b81e682664a486a247a282b80958b5952cba9",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "rhythm",
+          "kind": "core",
+          "frames": 840000,
+          "peak": 0.1825425624847412,
+          "rms": [
+            0.020983227610664564,
+            0.02098340101188521
+          ],
+          "nonFinite": 0,
+          "firstFrame": 15600,
+          "lastFrame": 518783,
+          "hash": "bcbd6274722d77e8cc04e570f41d4118139fbab4b18c7822682fdae165d69515",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "pad",
+          "kind": "core",
+          "frames": 840000,
+          "peak": 0.48755380511283875,
+          "rms": [
+            0.07710919741875145,
+            0.0827524704252593
+          ],
+          "nonFinite": 0,
+          "firstFrame": 12000,
+          "lastFrame": 582317,
+          "hash": "4e30cafd6377de08abfa0413e016b43d770007c6bd7ee17eecc82ef1e7e1aab0",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "bass",
+          "kind": "fm",
+          "frames": 840000,
+          "peak": 0.09897934645414352,
+          "rms": [
+            0.028146825840232564,
+            0.028146825840232564
+          ],
+          "nonFinite": 0,
+          "firstFrame": 12000,
+          "lastFrame": 542207,
+          "hash": "16b0082f82c3c6a8d99937fa7739b35cf52d389fe1864d97a328f847d5dad5e0",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "drums",
+          "kind": "percussion",
+          "frames": 840000,
+          "peak": 1.165629506111145,
+          "rms": [
+            0.09672421444485016,
+            0.09631287834285784
+          ],
+          "nonFinite": 0,
+          "firstFrame": 12001,
+          "lastFrame": 488639,
+          "hash": "66f24596b9dab250d17764bb7f55416883a4792cfc8daf8c0f0808d144a38336",
+          "directLegacyMaxDifference": null
+        }
+      ],
+      "sourceStats": {
+        "lead": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 7,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5242880
+        },
+        "second": {
+          "active": 0,
+          "steals": 14,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "peak": 0,
+          "latencyFrames": 7.5,
+          "peakActive": 8,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5242880
+        },
+        "rhythm": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 2,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5242880
+        },
+        "pad": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 8,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5242880
+        },
+        "bass": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "peak": 0,
+          "latencyFrames": 7.5,
+          "peakActive": 2,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5242880
+        },
+        "drums": {
+          "active": 0,
+          "queued": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "peakActive": 4,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5242880
+        },
+        "sourceDag": {
+          "frame": 840000,
+          "late": 0,
+          "overflow": 0,
+          "applied": 357,
+          "meters": {
+            "17": {
+              "inputPeak": 0,
+              "keyPeak": 1.7796490496925177e-43,
+              "reductionDb": 3.731329174323642e-29,
+              "outputPeak": 0,
+              "missingKey": 0,
+              "externalKey": 1
+            }
+          },
+          "memory": 5242880
+        },
+        "compressor": {
+          "type": "stats",
+          "frame": 840000,
+          "origin": 0,
+          "late": 0,
+          "overflow": 0,
+          "applied": 0,
+          "meters": {
+            "203": {
+              "inputPeak": 0,
+              "keyPeak": 1.7796490496925177e-43,
+              "reductionDb": 3.731329174323642e-29,
+              "outputPeak": 0,
+              "missingKey": 0,
+              "externalKey": 1
+            }
+          },
+          "memory": 1507328
+        }
+      },
+      "missingSourceStats": [],
+      "counterScope": "Legacy percussion has no offline final stats message; direct-kernel/PCM checks cover it. No audio-device underrun counter.",
+      "limiterLatencyFrames": 144,
+      "iteration": 1,
+      "repeatAgreement": {
+        "maxAbs": 2.9802322387695312e-8,
+        "rms": 1.7142235334725064e-9
+      }
+    },
+    {
+      "variant": "dag",
+      "rate": 48000,
+      "frames": 840000,
+      "prepareMs": 95.60000000149012,
+      "renderMs": 5856.699999999255,
+      "renderAudioRatio": 0.33466857142852885,
+      "output": {
+        "frames": 840000,
+        "peak": 0.1614825278520584,
+        "rms": [
+          0.02317420526796577,
+          0.021331292770448828
+        ],
+        "nonFinite": 0,
+        "firstFrame": 12144,
+        "lastFrame": 666767
+      },
+      "outputHash": "5f0a9011dd20ef342bac96c6958c2715ef8da913d9aeae16b5edf8669305aac4",
+      "tailLastHalfSecond": {
+        "frames": 24000,
+        "peak": 0,
+        "rms": [
+          0,
+          0
+        ],
+        "nonFinite": 0,
+        "firstFrame": -1,
+        "lastFrame": -1
+      },
+      "key": {
+        "frames": 840000,
+        "peak": 0.6485030651092529,
+        "rms": [
+          0.09516252024851841,
+          0.09516252024851841
+        ],
+        "nonFinite": 0,
+        "firstFrame": 12001,
+        "lastFrame": 486239
+      },
+      "stems": [
+        {
+          "role": "lead",
+          "kind": "core",
+          "frames": 840000,
+          "peak": 0.28822043538093567,
+          "rms": [
+            0.028287083576423025,
+            0.028069763255119097
+          ],
+          "nonFinite": 0,
+          "firstFrame": 12000,
+          "lastFrame": 553087,
+          "hash": "9f84d23340e7898babac063b750b74c502b440a460bb1002de6d3e5d6d2414e3",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "second",
+          "kind": "fm",
+          "frames": 840000,
+          "peak": 0.15140078961849213,
+          "rms": [
+            0.02871816865006813,
+            0.026962681840547016
+          ],
+          "nonFinite": 0,
+          "firstFrame": 19200,
+          "lastFrame": 589439,
+          "hash": "0b4a1ead86e950f7ae4a74efe32b81e682664a486a247a282b80958b5952cba9",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "rhythm",
+          "kind": "core",
+          "frames": 840000,
+          "peak": 0.1825425624847412,
+          "rms": [
+            0.020983227610664564,
+            0.02098340101188521
+          ],
+          "nonFinite": 0,
+          "firstFrame": 15600,
+          "lastFrame": 518783,
+          "hash": "bcbd6274722d77e8cc04e570f41d4118139fbab4b18c7822682fdae165d69515",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "pad",
+          "kind": "core",
+          "frames": 840000,
+          "peak": 0.48755380511283875,
+          "rms": [
+            0.07710919741875145,
+            0.0827524704252593
+          ],
+          "nonFinite": 0,
+          "firstFrame": 12000,
+          "lastFrame": 582317,
+          "hash": "4e30cafd6377de08abfa0413e016b43d770007c6bd7ee17eecc82ef1e7e1aab0",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "bass",
+          "kind": "fm",
+          "frames": 840000,
+          "peak": 0.09897934645414352,
+          "rms": [
+            0.028146825840232564,
+            0.028146825840232564
+          ],
+          "nonFinite": 0,
+          "firstFrame": 12000,
+          "lastFrame": 542207,
+          "hash": "16b0082f82c3c6a8d99937fa7739b35cf52d389fe1864d97a328f847d5dad5e0",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "drums",
+          "kind": "percussion",
+          "frames": 840000,
+          "peak": 1.165629506111145,
+          "rms": [
+            0.09672421444485016,
+            0.09631287834285784
+          ],
+          "nonFinite": 0,
+          "firstFrame": 12001,
+          "lastFrame": 488639,
+          "hash": "66f24596b9dab250d17764bb7f55416883a4792cfc8daf8c0f0808d144a38336",
+          "directLegacyMaxDifference": null
+        }
+      ],
+      "sourceStats": {
+        "lead": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 7,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5242880
+        },
+        "second": {
+          "active": 0,
+          "steals": 14,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "peak": 0,
+          "latencyFrames": 7.5,
+          "peakActive": 8,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5242880
+        },
+        "rhythm": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 2,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5242880
+        },
+        "pad": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 8,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5242880
+        },
+        "bass": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "peak": 0,
+          "latencyFrames": 7.5,
+          "peakActive": 2,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5242880
+        },
+        "drums": {
+          "active": 0,
+          "queued": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "peakActive": 4,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5242880
+        },
+        "sourceDag": {
+          "frame": 840000,
+          "late": 0,
+          "overflow": 0,
+          "applied": 357,
+          "meters": {
+            "17": {
+              "inputPeak": 0,
+              "keyPeak": 1.7796490496925177e-43,
+              "reductionDb": 3.731329174323642e-29,
+              "outputPeak": 0,
+              "missingKey": 0,
+              "externalKey": 1
+            }
+          },
+          "memory": 5242880
+        },
+        "compressor": {
+          "type": "stats",
+          "frame": 840000,
+          "origin": 0,
+          "late": 0,
+          "overflow": 0,
+          "applied": 0,
+          "meters": {
+            "203": {
+              "inputPeak": 0,
+              "keyPeak": 1.7796490496925177e-43,
+              "reductionDb": 3.731329174323642e-29,
+              "outputPeak": 0,
+              "missingKey": 0,
+              "externalKey": 1
+            }
+          },
+          "memory": 1507328
+        }
+      },
+      "missingSourceStats": [],
+      "counterScope": "Legacy percussion has no offline final stats message; direct-kernel/PCM checks cover it. No audio-device underrun counter.",
+      "limiterLatencyFrames": 144,
+      "iteration": 2,
+      "repeatAgreement": {
+        "maxAbs": 2.9802322387695312e-8,
+        "rms": 1.856925346544422e-9
+      }
+    },
+    {
+      "variant": "owned-all",
+      "rate": 96000,
+      "frames": 1680000,
+      "prepareMs": 84.40000000223517,
+      "renderMs": 9509,
+      "renderAudioRatio": 0.5433714285714286,
+      "output": {
+        "frames": 1680000,
+        "peak": 0.1525624841451645,
+        "rms": [
+          0.023141298415827277,
+          0.021328245754352278
+        ],
+        "nonFinite": 0,
+        "firstFrame": 24288,
+        "lastFrame": 1333535
+      },
+      "outputHash": "448f96d2bcbfcc2f7429dab044b866e78fc260281e66be22b004303b0f010c5d",
+      "tailLastHalfSecond": {
+        "frames": 48000,
+        "peak": 0,
+        "rms": [
+          0,
+          0
+        ],
+        "nonFinite": 0,
+        "firstFrame": -1,
+        "lastFrame": -1
+      },
+      "key": {
+        "frames": 1680000,
+        "peak": 0.647862434387207,
+        "rms": [
+          0.09515919650202988,
+          0.09515919650202988
+        ],
+        "nonFinite": 0,
+        "firstFrame": 24001,
+        "lastFrame": 972479
+      },
+      "stems": [
+        {
+          "role": "lead",
+          "kind": "core",
+          "frames": 1680000,
+          "peak": 0.28703585267066956,
+          "rms": [
+            0.02842454128884005,
+            0.028212266504985543
+          ],
+          "nonFinite": 0,
+          "firstFrame": 24000,
+          "lastFrame": 1106303,
+          "hash": "f23e7e4c41748f367ace3712f4bb9cbda3ab29b2e832d42c6b7ae0a53b9e55ac",
+          "directLegacyMaxDifference": 0
+        },
+        {
+          "role": "second",
+          "kind": "fm",
+          "frames": 1680000,
+          "peak": 0.15150690078735352,
+          "rms": [
+            0.028708739450580823,
+            0.026953836252942086
+          ],
+          "nonFinite": 0,
+          "firstFrame": 38400,
+          "lastFrame": 1179007,
+          "hash": "b7095329fac77fc52ab563ddd48eb7fd64302298672d1b7cd5fdb72bbc85a87f",
+          "directLegacyMaxDifference": 0
+        },
+        {
+          "role": "rhythm",
+          "kind": "core",
+          "frames": 1680000,
+          "peak": 0.18471075594425201,
+          "rms": [
+            0.020996801820183812,
+            0.02099689119602876
+          ],
+          "nonFinite": 0,
+          "firstFrame": 31200,
+          "lastFrame": 1037439,
+          "hash": "47dba9b55f0e35f7d505e66bb6d5607850e147675d0251ce37d085564ed03af0",
+          "directLegacyMaxDifference": 0
+        },
+        {
+          "role": "pad",
+          "kind": "core",
+          "frames": 1680000,
+          "peak": 0.4918452799320221,
+          "rms": [
+            0.07693707222417363,
+            0.08293994937420476
+          ],
+          "nonFinite": 0,
+          "firstFrame": 24000,
+          "lastFrame": 1164622,
+          "hash": "49dfeeee464c9a9d47a3178deef474d67c7ba15d8ea1af395d407d701a2a8e2f",
+          "directLegacyMaxDifference": 0
+        },
+        {
+          "role": "bass",
+          "kind": "fm",
+          "frames": 1680000,
+          "peak": 0.09895368665456772,
+          "rms": [
+            0.02813940619936698,
+            0.02813940619936698
+          ],
+          "nonFinite": 0,
+          "firstFrame": 24000,
+          "lastFrame": 1085695,
+          "hash": "3755e0a1019fd5d059c11d2df1aa330ba23cb370909b94477fa83c260b14ca89",
+          "directLegacyMaxDifference": 0
+        },
+        {
+          "role": "drums",
+          "kind": "percussion",
+          "frames": 1680000,
+          "peak": 1.08505380153656,
+          "rms": [
+            0.09672168365333246,
+            0.09631062848747347
+          ],
+          "nonFinite": 0,
+          "firstFrame": 24001,
+          "lastFrame": 977279,
+          "hash": "7e5096676339e1dcef85040c1fc15b16d89cdd9804eaf136968d5d1bdaa867a4",
+          "directLegacyMaxDifference": 0
+        }
+      ],
+      "sourceStats": {
+        "lead": {
+          "active": 0,
+          "peakActive": 7,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "latencyFrames": 0,
+          "owned": true,
+          "sharedInstanceMemory": 3014656
+        },
+        "rhythm": {
+          "active": 0,
+          "peakActive": 2,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "latencyFrames": 0,
+          "owned": true,
+          "sharedInstanceMemory": 3014656
+        },
+        "pad": {
+          "active": 0,
+          "peakActive": 8,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "latencyFrames": 0,
+          "owned": true,
+          "sharedInstanceMemory": 3014656
+        },
+        "second": {
+          "active": 0,
+          "peakActive": 8,
+          "steals": 14,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "latencyFrames": 7.5,
+          "owned": true,
+          "sharedInstanceMemory": 1572864
+        },
+        "bass": {
+          "active": 0,
+          "peakActive": 2,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "latencyFrames": 7.5,
+          "owned": true,
+          "sharedInstanceMemory": 1572864
+        },
+        "compressor": {
+          "type": "stats",
+          "frame": 1680000,
+          "origin": 0,
+          "late": 0,
+          "overflow": 0,
+          "applied": 0,
+          "meters": {
+            "203": {
+              "inputPeak": 0,
+              "keyPeak": 3.5592980993850354e-43,
+              "reductionDb": 3.744959642578489e-29,
+              "outputPeak": 0,
+              "missingKey": 0,
+              "externalKey": 1
+            }
+          },
+          "memory": 1507328
+        },
+        "drums": {
+          "type": "stats",
+          "frame": 1680000,
+          "origin": 0,
+          "late": 0,
+          "overflow": 0,
+          "applied": 57,
+          "meters": {},
+          "memory": 3342336
+        }
+      },
+      "missingSourceStats": [],
+      "counterScope": "Legacy percussion has no offline final stats message; direct-kernel/PCM checks cover it. No audio-device underrun counter.",
+      "limiterLatencyFrames": 288,
+      "iteration": 0
+    },
+    {
+      "variant": "owned-all",
+      "rate": 96000,
+      "frames": 1680000,
+      "prepareMs": 85,
+      "renderMs": 9425.70000000298,
+      "renderAudioRatio": 0.5386114285715988,
+      "output": {
+        "frames": 1680000,
+        "peak": 0.1525624692440033,
+        "rms": [
+          0.02314129842233313,
+          0.021328245754328783
+        ],
+        "nonFinite": 0,
+        "firstFrame": 24288,
+        "lastFrame": 1333535
+      },
+      "outputHash": "cc27cc1aa6d61f2ebfe1a32721688465de0028cc2c982e445947856eb99c91ec",
+      "tailLastHalfSecond": {
+        "frames": 48000,
+        "peak": 0,
+        "rms": [
+          0,
+          0
+        ],
+        "nonFinite": 0,
+        "firstFrame": -1,
+        "lastFrame": -1
+      },
+      "key": {
+        "frames": 1680000,
+        "peak": 0.647862434387207,
+        "rms": [
+          0.09515919650202988,
+          0.09515919650202988
+        ],
+        "nonFinite": 0,
+        "firstFrame": 24001,
+        "lastFrame": 972479
+      },
+      "stems": [
+        {
+          "role": "lead",
+          "kind": "core",
+          "frames": 1680000,
+          "peak": 0.28703585267066956,
+          "rms": [
+            0.02842454128884005,
+            0.028212266504985543
+          ],
+          "nonFinite": 0,
+          "firstFrame": 24000,
+          "lastFrame": 1106303,
+          "hash": "f23e7e4c41748f367ace3712f4bb9cbda3ab29b2e832d42c6b7ae0a53b9e55ac",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "second",
+          "kind": "fm",
+          "frames": 1680000,
+          "peak": 0.15150690078735352,
+          "rms": [
+            0.028708739450580823,
+            0.026953836252942086
+          ],
+          "nonFinite": 0,
+          "firstFrame": 38400,
+          "lastFrame": 1179007,
+          "hash": "b7095329fac77fc52ab563ddd48eb7fd64302298672d1b7cd5fdb72bbc85a87f",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "rhythm",
+          "kind": "core",
+          "frames": 1680000,
+          "peak": 0.18471075594425201,
+          "rms": [
+            0.020996801820183812,
+            0.02099689119602876
+          ],
+          "nonFinite": 0,
+          "firstFrame": 31200,
+          "lastFrame": 1037439,
+          "hash": "47dba9b55f0e35f7d505e66bb6d5607850e147675d0251ce37d085564ed03af0",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "pad",
+          "kind": "core",
+          "frames": 1680000,
+          "peak": 0.4918452799320221,
+          "rms": [
+            0.07693707222417363,
+            0.08293994937420476
+          ],
+          "nonFinite": 0,
+          "firstFrame": 24000,
+          "lastFrame": 1164622,
+          "hash": "49dfeeee464c9a9d47a3178deef474d67c7ba15d8ea1af395d407d701a2a8e2f",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "bass",
+          "kind": "fm",
+          "frames": 1680000,
+          "peak": 0.09895368665456772,
+          "rms": [
+            0.02813940619936698,
+            0.02813940619936698
+          ],
+          "nonFinite": 0,
+          "firstFrame": 24000,
+          "lastFrame": 1085695,
+          "hash": "3755e0a1019fd5d059c11d2df1aa330ba23cb370909b94477fa83c260b14ca89",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "drums",
+          "kind": "percussion",
+          "frames": 1680000,
+          "peak": 1.08505380153656,
+          "rms": [
+            0.09672168365333246,
+            0.09631062848747347
+          ],
+          "nonFinite": 0,
+          "firstFrame": 24001,
+          "lastFrame": 977279,
+          "hash": "7e5096676339e1dcef85040c1fc15b16d89cdd9804eaf136968d5d1bdaa867a4",
+          "directLegacyMaxDifference": null
+        }
+      ],
+      "sourceStats": {
+        "lead": {
+          "active": 0,
+          "peakActive": 7,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "latencyFrames": 0,
+          "owned": true,
+          "sharedInstanceMemory": 3014656
+        },
+        "rhythm": {
+          "active": 0,
+          "peakActive": 2,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "latencyFrames": 0,
+          "owned": true,
+          "sharedInstanceMemory": 3014656
+        },
+        "pad": {
+          "active": 0,
+          "peakActive": 8,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "latencyFrames": 0,
+          "owned": true,
+          "sharedInstanceMemory": 3014656
+        },
+        "second": {
+          "active": 0,
+          "peakActive": 8,
+          "steals": 14,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "latencyFrames": 7.5,
+          "owned": true,
+          "sharedInstanceMemory": 1572864
+        },
+        "bass": {
+          "active": 0,
+          "peakActive": 2,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "latencyFrames": 7.5,
+          "owned": true,
+          "sharedInstanceMemory": 1572864
+        },
+        "compressor": {
+          "type": "stats",
+          "frame": 1680000,
+          "origin": 0,
+          "late": 0,
+          "overflow": 0,
+          "applied": 0,
+          "meters": {
+            "203": {
+              "inputPeak": 0,
+              "keyPeak": 3.5592980993850354e-43,
+              "reductionDb": 3.744959642578489e-29,
+              "outputPeak": 0,
+              "missingKey": 0,
+              "externalKey": 1
+            }
+          },
+          "memory": 1507328
+        },
+        "drums": {
+          "type": "stats",
+          "frame": 1680000,
+          "origin": 0,
+          "late": 0,
+          "overflow": 0,
+          "applied": 57,
+          "meters": {},
+          "memory": 3342336
+        }
+      },
+      "missingSourceStats": [],
+      "counterScope": "Legacy percussion has no offline final stats message; direct-kernel/PCM checks cover it. No audio-device underrun counter.",
+      "limiterLatencyFrames": 288,
+      "iteration": 1,
+      "repeatAgreement": {
+        "maxAbs": 2.9802322387695312e-8,
+        "rms": 1.9329596520885845e-9
+      }
+    },
+    {
+      "variant": "owned-all",
+      "rate": 96000,
+      "frames": 1680000,
+      "prepareMs": 85.5,
+      "renderMs": 9699.199999999255,
+      "renderAudioRatio": 0.5542399999999574,
+      "output": {
+        "frames": 1680000,
+        "peak": 0.1525624692440033,
+        "rms": [
+          0.023141298418632765,
+          0.02132824575858268
+        ],
+        "nonFinite": 0,
+        "firstFrame": 24288,
+        "lastFrame": 1333535
+      },
+      "outputHash": "f0f65bdd5100ccfbd807eb175086b677888c2697729a116b38279ce7d91c6081",
+      "tailLastHalfSecond": {
+        "frames": 48000,
+        "peak": 0,
+        "rms": [
+          0,
+          0
+        ],
+        "nonFinite": 0,
+        "firstFrame": -1,
+        "lastFrame": -1
+      },
+      "key": {
+        "frames": 1680000,
+        "peak": 0.647862434387207,
+        "rms": [
+          0.09515919650202988,
+          0.09515919650202988
+        ],
+        "nonFinite": 0,
+        "firstFrame": 24001,
+        "lastFrame": 972479
+      },
+      "stems": [
+        {
+          "role": "lead",
+          "kind": "core",
+          "frames": 1680000,
+          "peak": 0.28703585267066956,
+          "rms": [
+            0.02842454128884005,
+            0.028212266504985543
+          ],
+          "nonFinite": 0,
+          "firstFrame": 24000,
+          "lastFrame": 1106303,
+          "hash": "f23e7e4c41748f367ace3712f4bb9cbda3ab29b2e832d42c6b7ae0a53b9e55ac",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "second",
+          "kind": "fm",
+          "frames": 1680000,
+          "peak": 0.15150690078735352,
+          "rms": [
+            0.028708739450580823,
+            0.026953836252942086
+          ],
+          "nonFinite": 0,
+          "firstFrame": 38400,
+          "lastFrame": 1179007,
+          "hash": "b7095329fac77fc52ab563ddd48eb7fd64302298672d1b7cd5fdb72bbc85a87f",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "rhythm",
+          "kind": "core",
+          "frames": 1680000,
+          "peak": 0.18471075594425201,
+          "rms": [
+            0.020996801820183812,
+            0.02099689119602876
+          ],
+          "nonFinite": 0,
+          "firstFrame": 31200,
+          "lastFrame": 1037439,
+          "hash": "47dba9b55f0e35f7d505e66bb6d5607850e147675d0251ce37d085564ed03af0",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "pad",
+          "kind": "core",
+          "frames": 1680000,
+          "peak": 0.4918452799320221,
+          "rms": [
+            0.07693707222417363,
+            0.08293994937420476
+          ],
+          "nonFinite": 0,
+          "firstFrame": 24000,
+          "lastFrame": 1164622,
+          "hash": "49dfeeee464c9a9d47a3178deef474d67c7ba15d8ea1af395d407d701a2a8e2f",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "bass",
+          "kind": "fm",
+          "frames": 1680000,
+          "peak": 0.09895368665456772,
+          "rms": [
+            0.02813940619936698,
+            0.02813940619936698
+          ],
+          "nonFinite": 0,
+          "firstFrame": 24000,
+          "lastFrame": 1085695,
+          "hash": "3755e0a1019fd5d059c11d2df1aa330ba23cb370909b94477fa83c260b14ca89",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "drums",
+          "kind": "percussion",
+          "frames": 1680000,
+          "peak": 1.08505380153656,
+          "rms": [
+            0.09672168365333246,
+            0.09631062848747347
+          ],
+          "nonFinite": 0,
+          "firstFrame": 24001,
+          "lastFrame": 977279,
+          "hash": "7e5096676339e1dcef85040c1fc15b16d89cdd9804eaf136968d5d1bdaa867a4",
+          "directLegacyMaxDifference": null
+        }
+      ],
+      "sourceStats": {
+        "lead": {
+          "active": 0,
+          "peakActive": 7,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "latencyFrames": 0,
+          "owned": true,
+          "sharedInstanceMemory": 3014656
+        },
+        "rhythm": {
+          "active": 0,
+          "peakActive": 2,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "latencyFrames": 0,
+          "owned": true,
+          "sharedInstanceMemory": 3014656
+        },
+        "pad": {
+          "active": 0,
+          "peakActive": 8,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "latencyFrames": 0,
+          "owned": true,
+          "sharedInstanceMemory": 3014656
+        },
+        "second": {
+          "active": 0,
+          "peakActive": 8,
+          "steals": 14,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "latencyFrames": 7.5,
+          "owned": true,
+          "sharedInstanceMemory": 1572864
+        },
+        "bass": {
+          "active": 0,
+          "peakActive": 2,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "latencyFrames": 7.5,
+          "owned": true,
+          "sharedInstanceMemory": 1572864
+        },
+        "compressor": {
+          "type": "stats",
+          "frame": 1680000,
+          "origin": 0,
+          "late": 0,
+          "overflow": 0,
+          "applied": 0,
+          "meters": {
+            "203": {
+              "inputPeak": 0,
+              "keyPeak": 3.5592980993850354e-43,
+              "reductionDb": 3.744959642578489e-29,
+              "outputPeak": 0,
+              "missingKey": 0,
+              "externalKey": 1
+            }
+          },
+          "memory": 1507328
+        },
+        "drums": {
+          "type": "stats",
+          "frame": 1680000,
+          "origin": 0,
+          "late": 0,
+          "overflow": 0,
+          "applied": 57,
+          "meters": {},
+          "memory": 3342336
+        }
+      },
+      "missingSourceStats": [],
+      "counterScope": "Legacy percussion has no offline final stats message; direct-kernel/PCM checks cover it. No audio-device underrun counter.",
+      "limiterLatencyFrames": 288,
+      "iteration": 2,
+      "repeatAgreement": {
+        "maxAbs": 2.9802322387695312e-8,
+        "rms": 1.7207997621102445e-9
+      }
+    },
+    {
+      "variant": "dag",
+      "rate": 96000,
+      "frames": 1680000,
+      "prepareMs": 91.30000000074506,
+      "renderMs": 10414.89999999851,
+      "renderAudioRatio": 0.5951371428570577,
+      "output": {
+        "frames": 1680000,
+        "peak": 0.1525624692440033,
+        "rms": [
+          0.023141298417800934,
+          0.021328245759042495
+        ],
+        "nonFinite": 0,
+        "firstFrame": 24288,
+        "lastFrame": 1333535
+      },
+      "outputHash": "5bd6ef5c0e34930b764e0ab161591448fcdaca5ca04641f7cb1647289c43e247",
+      "tailLastHalfSecond": {
+        "frames": 48000,
+        "peak": 0,
+        "rms": [
+          0,
+          0
+        ],
+        "nonFinite": 0,
+        "firstFrame": -1,
+        "lastFrame": -1
+      },
+      "key": {
+        "frames": 1680000,
+        "peak": 0.647862434387207,
+        "rms": [
+          0.09515919650202988,
+          0.09515919650202988
+        ],
+        "nonFinite": 0,
+        "firstFrame": 24001,
+        "lastFrame": 972479
+      },
+      "stems": [
+        {
+          "role": "lead",
+          "kind": "core",
+          "frames": 1680000,
+          "peak": 0.28703585267066956,
+          "rms": [
+            0.02842454128884005,
+            0.028212266504985543
+          ],
+          "nonFinite": 0,
+          "firstFrame": 24000,
+          "lastFrame": 1106303,
+          "hash": "f23e7e4c41748f367ace3712f4bb9cbda3ab29b2e832d42c6b7ae0a53b9e55ac",
+          "directLegacyMaxDifference": 0
+        },
+        {
+          "role": "second",
+          "kind": "fm",
+          "frames": 1680000,
+          "peak": 0.15150690078735352,
+          "rms": [
+            0.028708739450580823,
+            0.026953836252942086
+          ],
+          "nonFinite": 0,
+          "firstFrame": 38400,
+          "lastFrame": 1179007,
+          "hash": "b7095329fac77fc52ab563ddd48eb7fd64302298672d1b7cd5fdb72bbc85a87f",
+          "directLegacyMaxDifference": 0
+        },
+        {
+          "role": "rhythm",
+          "kind": "core",
+          "frames": 1680000,
+          "peak": 0.18471075594425201,
+          "rms": [
+            0.020996801820183812,
+            0.02099689119602876
+          ],
+          "nonFinite": 0,
+          "firstFrame": 31200,
+          "lastFrame": 1037439,
+          "hash": "47dba9b55f0e35f7d505e66bb6d5607850e147675d0251ce37d085564ed03af0",
+          "directLegacyMaxDifference": 0
+        },
+        {
+          "role": "pad",
+          "kind": "core",
+          "frames": 1680000,
+          "peak": 0.4918452799320221,
+          "rms": [
+            0.07693707222417363,
+            0.08293994937420476
+          ],
+          "nonFinite": 0,
+          "firstFrame": 24000,
+          "lastFrame": 1164622,
+          "hash": "49dfeeee464c9a9d47a3178deef474d67c7ba15d8ea1af395d407d701a2a8e2f",
+          "directLegacyMaxDifference": 0
+        },
+        {
+          "role": "bass",
+          "kind": "fm",
+          "frames": 1680000,
+          "peak": 0.09895368665456772,
+          "rms": [
+            0.02813940619936698,
+            0.02813940619936698
+          ],
+          "nonFinite": 0,
+          "firstFrame": 24000,
+          "lastFrame": 1085695,
+          "hash": "3755e0a1019fd5d059c11d2df1aa330ba23cb370909b94477fa83c260b14ca89",
+          "directLegacyMaxDifference": 0
+        },
+        {
+          "role": "drums",
+          "kind": "percussion",
+          "frames": 1680000,
+          "peak": 1.08505380153656,
+          "rms": [
+            0.09672168365333246,
+            0.09631062848747347
+          ],
+          "nonFinite": 0,
+          "firstFrame": 24001,
+          "lastFrame": 977279,
+          "hash": "7e5096676339e1dcef85040c1fc15b16d89cdd9804eaf136968d5d1bdaa867a4",
+          "directLegacyMaxDifference": 0
+        }
+      ],
+      "sourceStats": {
+        "lead": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 7,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5701632
+        },
+        "second": {
+          "active": 0,
+          "steals": 14,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "peak": 0,
+          "latencyFrames": 7.5,
+          "peakActive": 8,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5701632
+        },
+        "rhythm": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 2,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5701632
+        },
+        "pad": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 8,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5701632
+        },
+        "bass": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "peak": 0,
+          "latencyFrames": 7.5,
+          "peakActive": 2,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5701632
+        },
+        "drums": {
+          "active": 0,
+          "queued": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "peakActive": 4,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5701632
+        },
+        "sourceDag": {
+          "frame": 1680000,
+          "late": 0,
+          "overflow": 0,
+          "applied": 357,
+          "meters": {
+            "17": {
+              "inputPeak": 0,
+              "keyPeak": 3.5592980993850354e-43,
+              "reductionDb": 3.744959642578489e-29,
+              "outputPeak": 0,
+              "missingKey": 0,
+              "externalKey": 1
+            }
+          },
+          "memory": 5701632
+        },
+        "compressor": {
+          "type": "stats",
+          "frame": 1680000,
+          "origin": 0,
+          "late": 0,
+          "overflow": 0,
+          "applied": 0,
+          "meters": {
+            "203": {
+              "inputPeak": 0,
+              "keyPeak": 3.5592980993850354e-43,
+              "reductionDb": 3.744959642578489e-29,
+              "outputPeak": 0,
+              "missingKey": 0,
+              "externalKey": 1
+            }
+          },
+          "memory": 1507328
+        }
+      },
+      "missingSourceStats": [],
+      "counterScope": "Legacy percussion has no offline final stats message; direct-kernel/PCM checks cover it. No audio-device underrun counter.",
+      "limiterLatencyFrames": 288,
+      "iteration": 0
+    },
+    {
+      "variant": "dag",
+      "rate": 96000,
+      "frames": 1680000,
+      "prepareMs": 88,
+      "renderMs": 10317.300000000745,
+      "renderAudioRatio": 0.5895600000000426,
+      "output": {
+        "frames": 1680000,
+        "peak": 0.1525624841451645,
+        "rms": [
+          0.023141298418096572,
+          0.021328245755170262
+        ],
+        "nonFinite": 0,
+        "firstFrame": 24288,
+        "lastFrame": 1333535
+      },
+      "outputHash": "d16a0d28d699e1b425b051ab770395aa77578746c1ff70ccf4bf0752c60f9277",
+      "tailLastHalfSecond": {
+        "frames": 48000,
+        "peak": 0,
+        "rms": [
+          0,
+          0
+        ],
+        "nonFinite": 0,
+        "firstFrame": -1,
+        "lastFrame": -1
+      },
+      "key": {
+        "frames": 1680000,
+        "peak": 0.647862434387207,
+        "rms": [
+          0.09515919650202988,
+          0.09515919650202988
+        ],
+        "nonFinite": 0,
+        "firstFrame": 24001,
+        "lastFrame": 972479
+      },
+      "stems": [
+        {
+          "role": "lead",
+          "kind": "core",
+          "frames": 1680000,
+          "peak": 0.28703585267066956,
+          "rms": [
+            0.02842454128884005,
+            0.028212266504985543
+          ],
+          "nonFinite": 0,
+          "firstFrame": 24000,
+          "lastFrame": 1106303,
+          "hash": "f23e7e4c41748f367ace3712f4bb9cbda3ab29b2e832d42c6b7ae0a53b9e55ac",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "second",
+          "kind": "fm",
+          "frames": 1680000,
+          "peak": 0.15150690078735352,
+          "rms": [
+            0.028708739450580823,
+            0.026953836252942086
+          ],
+          "nonFinite": 0,
+          "firstFrame": 38400,
+          "lastFrame": 1179007,
+          "hash": "b7095329fac77fc52ab563ddd48eb7fd64302298672d1b7cd5fdb72bbc85a87f",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "rhythm",
+          "kind": "core",
+          "frames": 1680000,
+          "peak": 0.18471075594425201,
+          "rms": [
+            0.020996801820183812,
+            0.02099689119602876
+          ],
+          "nonFinite": 0,
+          "firstFrame": 31200,
+          "lastFrame": 1037439,
+          "hash": "47dba9b55f0e35f7d505e66bb6d5607850e147675d0251ce37d085564ed03af0",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "pad",
+          "kind": "core",
+          "frames": 1680000,
+          "peak": 0.4918452799320221,
+          "rms": [
+            0.07693707222417363,
+            0.08293994937420476
+          ],
+          "nonFinite": 0,
+          "firstFrame": 24000,
+          "lastFrame": 1164622,
+          "hash": "49dfeeee464c9a9d47a3178deef474d67c7ba15d8ea1af395d407d701a2a8e2f",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "bass",
+          "kind": "fm",
+          "frames": 1680000,
+          "peak": 0.09895368665456772,
+          "rms": [
+            0.02813940619936698,
+            0.02813940619936698
+          ],
+          "nonFinite": 0,
+          "firstFrame": 24000,
+          "lastFrame": 1085695,
+          "hash": "3755e0a1019fd5d059c11d2df1aa330ba23cb370909b94477fa83c260b14ca89",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "drums",
+          "kind": "percussion",
+          "frames": 1680000,
+          "peak": 1.08505380153656,
+          "rms": [
+            0.09672168365333246,
+            0.09631062848747347
+          ],
+          "nonFinite": 0,
+          "firstFrame": 24001,
+          "lastFrame": 977279,
+          "hash": "7e5096676339e1dcef85040c1fc15b16d89cdd9804eaf136968d5d1bdaa867a4",
+          "directLegacyMaxDifference": null
+        }
+      ],
+      "sourceStats": {
+        "lead": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 7,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5701632
+        },
+        "second": {
+          "active": 0,
+          "steals": 14,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "peak": 0,
+          "latencyFrames": 7.5,
+          "peakActive": 8,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5701632
+        },
+        "rhythm": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 2,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5701632
+        },
+        "pad": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 8,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5701632
+        },
+        "bass": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "peak": 0,
+          "latencyFrames": 7.5,
+          "peakActive": 2,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5701632
+        },
+        "drums": {
+          "active": 0,
+          "queued": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "peakActive": 4,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5701632
+        },
+        "sourceDag": {
+          "frame": 1680000,
+          "late": 0,
+          "overflow": 0,
+          "applied": 357,
+          "meters": {
+            "17": {
+              "inputPeak": 0,
+              "keyPeak": 3.5592980993850354e-43,
+              "reductionDb": 3.744959642578489e-29,
+              "outputPeak": 0,
+              "missingKey": 0,
+              "externalKey": 1
+            }
+          },
+          "memory": 5701632
+        },
+        "compressor": {
+          "type": "stats",
+          "frame": 1680000,
+          "origin": 0,
+          "late": 0,
+          "overflow": 0,
+          "applied": 0,
+          "meters": {
+            "203": {
+              "inputPeak": 0,
+              "keyPeak": 3.5592980993850354e-43,
+              "reductionDb": 3.744959642578489e-29,
+              "outputPeak": 0,
+              "missingKey": 0,
+              "externalKey": 1
+            }
+          },
+          "memory": 1507328
+        }
+      },
+      "missingSourceStats": [],
+      "counterScope": "Legacy percussion has no offline final stats message; direct-kernel/PCM checks cover it. No audio-device underrun counter.",
+      "limiterLatencyFrames": 288,
+      "iteration": 1,
+      "repeatAgreement": {
+        "maxAbs": 2.9802322387695312e-8,
+        "rms": 1.9244909525331543e-9
+      }
+    },
+    {
+      "variant": "dag",
+      "rate": 96000,
+      "frames": 1680000,
+      "prepareMs": 95.30000000074506,
+      "renderMs": 10404.60000000149,
+      "renderAudioRatio": 0.5945485714286566,
+      "output": {
+        "frames": 1680000,
+        "peak": 0.1525624841451645,
+        "rms": [
+          0.02314129842107616,
+          0.021328245753869497
+        ],
+        "nonFinite": 0,
+        "firstFrame": 24288,
+        "lastFrame": 1333535
+      },
+      "outputHash": "92acd1a2425d5e01caed13977c6d11d862078e51f59d2ae17b25f02813df73f0",
+      "tailLastHalfSecond": {
+        "frames": 48000,
+        "peak": 0,
+        "rms": [
+          0,
+          0
+        ],
+        "nonFinite": 0,
+        "firstFrame": -1,
+        "lastFrame": -1
+      },
+      "key": {
+        "frames": 1680000,
+        "peak": 0.647862434387207,
+        "rms": [
+          0.09515919650202988,
+          0.09515919650202988
+        ],
+        "nonFinite": 0,
+        "firstFrame": 24001,
+        "lastFrame": 972479
+      },
+      "stems": [
+        {
+          "role": "lead",
+          "kind": "core",
+          "frames": 1680000,
+          "peak": 0.28703585267066956,
+          "rms": [
+            0.02842454128884005,
+            0.028212266504985543
+          ],
+          "nonFinite": 0,
+          "firstFrame": 24000,
+          "lastFrame": 1106303,
+          "hash": "f23e7e4c41748f367ace3712f4bb9cbda3ab29b2e832d42c6b7ae0a53b9e55ac",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "second",
+          "kind": "fm",
+          "frames": 1680000,
+          "peak": 0.15150690078735352,
+          "rms": [
+            0.028708739450580823,
+            0.026953836252942086
+          ],
+          "nonFinite": 0,
+          "firstFrame": 38400,
+          "lastFrame": 1179007,
+          "hash": "b7095329fac77fc52ab563ddd48eb7fd64302298672d1b7cd5fdb72bbc85a87f",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "rhythm",
+          "kind": "core",
+          "frames": 1680000,
+          "peak": 0.18471075594425201,
+          "rms": [
+            0.020996801820183812,
+            0.02099689119602876
+          ],
+          "nonFinite": 0,
+          "firstFrame": 31200,
+          "lastFrame": 1037439,
+          "hash": "47dba9b55f0e35f7d505e66bb6d5607850e147675d0251ce37d085564ed03af0",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "pad",
+          "kind": "core",
+          "frames": 1680000,
+          "peak": 0.4918452799320221,
+          "rms": [
+            0.07693707222417363,
+            0.08293994937420476
+          ],
+          "nonFinite": 0,
+          "firstFrame": 24000,
+          "lastFrame": 1164622,
+          "hash": "49dfeeee464c9a9d47a3178deef474d67c7ba15d8ea1af395d407d701a2a8e2f",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "bass",
+          "kind": "fm",
+          "frames": 1680000,
+          "peak": 0.09895368665456772,
+          "rms": [
+            0.02813940619936698,
+            0.02813940619936698
+          ],
+          "nonFinite": 0,
+          "firstFrame": 24000,
+          "lastFrame": 1085695,
+          "hash": "3755e0a1019fd5d059c11d2df1aa330ba23cb370909b94477fa83c260b14ca89",
+          "directLegacyMaxDifference": null
+        },
+        {
+          "role": "drums",
+          "kind": "percussion",
+          "frames": 1680000,
+          "peak": 1.08505380153656,
+          "rms": [
+            0.09672168365333246,
+            0.09631062848747347
+          ],
+          "nonFinite": 0,
+          "firstFrame": 24001,
+          "lastFrame": 977279,
+          "hash": "7e5096676339e1dcef85040c1fc15b16d89cdd9804eaf136968d5d1bdaa867a4",
+          "directLegacyMaxDifference": null
+        }
+      ],
+      "sourceStats": {
+        "lead": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 7,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5701632
+        },
+        "second": {
+          "active": 0,
+          "steals": 14,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "peak": 0,
+          "latencyFrames": 7.5,
+          "peakActive": 8,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5701632
+        },
+        "rhythm": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 2,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5701632
+        },
+        "pad": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 8,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5701632
+        },
+        "bass": {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "peak": 0,
+          "latencyFrames": 7.5,
+          "peakActive": 2,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5701632
+        },
+        "drums": {
+          "active": 0,
+          "queued": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "peakActive": 4,
+          "owned": true,
+          "dag": true,
+          "sharedInstanceMemory": 5701632
+        },
+        "sourceDag": {
+          "frame": 1680000,
+          "late": 0,
+          "overflow": 0,
+          "applied": 357,
+          "meters": {
+            "17": {
+              "inputPeak": 0,
+              "keyPeak": 3.5592980993850354e-43,
+              "reductionDb": 3.744959642578489e-29,
+              "outputPeak": 0,
+              "missingKey": 0,
+              "externalKey": 1
+            }
+          },
+          "memory": 5701632
+        },
+        "compressor": {
+          "type": "stats",
+          "frame": 1680000,
+          "origin": 0,
+          "late": 0,
+          "overflow": 0,
+          "applied": 0,
+          "meters": {
+            "203": {
+              "inputPeak": 0,
+              "keyPeak": 3.5592980993850354e-43,
+              "reductionDb": 3.744959642578489e-29,
+              "outputPeak": 0,
+              "missingKey": 0,
+              "externalKey": 1
+            }
+          },
+          "memory": 1507328
+        }
+      },
+      "missingSourceStats": [],
+      "counterScope": "Legacy percussion has no offline final stats message; direct-kernel/PCM checks cover it. No audio-device underrun counter.",
+      "limiterLatencyFrames": 288,
+      "iteration": 2,
+      "repeatAgreement": {
+        "maxAbs": 2.9802322387695312e-8,
+        "rms": 1.8219602656270927e-9
+      }
+    }
+  ],
+  "summaries": [
+    {
+      "rate": 44100,
+      "variant": "owned-all",
+      "repeats": 3,
+      "warmupFullRuns": 1,
+      "prepareMs": {
+        "count": 3,
+        "p50": 99.80000000074506,
+        "p95": 262.30000000074506,
+        "p99": 262.30000000074506,
+        "max": 262.30000000074506,
+        "mean": 150.86666666716337
+      },
+      "renderMs": {
+        "count": 3,
+        "p50": 6993.10000000149,
+        "p95": 7035,
+        "p99": 7035,
+        "max": 7035,
+        "mean": 6972.233333333085
+      },
+      "renderAudioRatio": {
+        "count": 3,
+        "p50": 0.39960571428579944,
+        "p95": 0.402,
+        "p99": 0.402,
+        "max": 0.402,
+        "mean": 0.39841333333331913
+      },
+      "peak": 0.15604333579540253,
+      "tailRms": [
+        0,
+        0
+      ],
+      "missingSourceStats": []
+    },
+    {
+      "rate": 44100,
+      "variant": "dag",
+      "repeats": 3,
+      "warmupFullRuns": 1,
+      "prepareMs": {
+        "count": 3,
+        "p50": 99.69999999925494,
+        "p95": 121.89999999850988,
+        "p99": 121.89999999850988,
+        "max": 121.89999999850988,
+        "mean": 105.79999999826153
+      },
+      "renderMs": {
+        "count": 3,
+        "p50": 5749.70000000298,
+        "p95": 7476.60000000149,
+        "p99": 7476.60000000149,
+        "max": 7476.60000000149,
+        "mean": 6122.4666666686535
+      },
+      "renderAudioRatio": {
+        "count": 3,
+        "p50": 0.328554285714456,
+        "p95": 0.4272342857143709,
+        "p99": 0.4272342857143709,
+        "max": 0.4272342857143709,
+        "mean": 0.34985523809535163
+      },
+      "peak": 0.15604333579540253,
+      "tailRms": [
+        0,
+        0
+      ],
+      "missingSourceStats": []
+    },
+    {
+      "rate": 48000,
+      "variant": "owned-all",
+      "repeats": 3,
+      "warmupFullRuns": 1,
+      "prepareMs": {
+        "count": 3,
+        "p50": 92.09999999776483,
+        "p95": 98.10000000149012,
+        "p99": 98.10000000149012,
+        "max": 98.10000000149012,
+        "mean": 93.03333333383004
+      },
+      "renderMs": {
+        "count": 3,
+        "p50": 5214.300000000745,
+        "p95": 5352.89999999851,
+        "p99": 5352.89999999851,
+        "max": 5352.89999999851,
+        "mean": 5240.799999999504
+      },
+      "renderAudioRatio": {
+        "count": 3,
+        "p50": 0.2979600000000426,
+        "p95": 0.30587999999991483,
+        "p99": 0.30587999999991483,
+        "max": 0.30587999999991483,
+        "mean": 0.2994742857142573
+      },
+      "peak": 0.1614825278520584,
+      "tailRms": [
+        0,
+        0
+      ],
+      "missingSourceStats": []
+    },
+    {
+      "rate": 48000,
+      "variant": "dag",
+      "repeats": 3,
+      "warmupFullRuns": 1,
+      "prepareMs": {
+        "count": 3,
+        "p50": 97.5,
+        "p95": 121.30000000074506,
+        "p99": 121.30000000074506,
+        "max": 121.30000000074506,
+        "mean": 104.80000000074506
+      },
+      "renderMs": {
+        "count": 3,
+        "p50": 5856.699999999255,
+        "p95": 5941.099999997765,
+        "p99": 5941.099999997765,
+        "max": 5941.099999997765,
+        "mean": 5860.866666665922
+      },
+      "renderAudioRatio": {
+        "count": 3,
+        "p50": 0.33466857142852885,
+        "p95": 0.3394914285713008,
+        "p99": 0.3394914285713008,
+        "max": 0.3394914285713008,
+        "mean": 0.3349066666666241
+      },
+      "peak": 0.1614825427532196,
+      "tailRms": [
+        0,
+        0
+      ],
+      "missingSourceStats": []
+    },
+    {
+      "rate": 96000,
+      "variant": "owned-all",
+      "repeats": 3,
+      "warmupFullRuns": 1,
+      "prepareMs": {
+        "count": 3,
+        "p50": 85,
+        "p95": 85.5,
+        "p99": 85.5,
+        "max": 85.5,
+        "mean": 84.96666666741173
+      },
+      "renderMs": {
+        "count": 3,
+        "p50": 9509,
+        "p95": 9699.199999999255,
+        "p99": 9699.199999999255,
+        "max": 9699.199999999255,
+        "mean": 9544.633333334079
+      },
+      "renderAudioRatio": {
+        "count": 3,
+        "p50": 0.5433714285714286,
+        "p95": 0.5542399999999574,
+        "p99": 0.5542399999999574,
+        "max": 0.5542399999999574,
+        "mean": 0.5454076190476617
+      },
+      "peak": 0.1525624841451645,
+      "tailRms": [
+        0,
+        0
+      ],
+      "missingSourceStats": []
+    },
+    {
+      "rate": 96000,
+      "variant": "dag",
+      "repeats": 3,
+      "warmupFullRuns": 1,
+      "prepareMs": {
+        "count": 3,
+        "p50": 91.30000000074506,
+        "p95": 95.30000000074506,
+        "p99": 95.30000000074506,
+        "max": 95.30000000074506,
+        "mean": 91.53333333383004
+      },
+      "renderMs": {
+        "count": 3,
+        "p50": 10404.60000000149,
+        "p95": 10414.89999999851,
+        "p99": 10414.89999999851,
+        "max": 10414.89999999851,
+        "mean": 10378.933333333582
+      },
+      "renderAudioRatio": {
+        "count": 3,
+        "p50": 0.5945485714286566,
+        "p95": 0.5951371428570577,
+        "p99": 0.5951371428570577,
+        "max": 0.5951371428570577,
+        "mean": 0.5930819047619189
+      },
+      "peak": 0.1525624692440033,
+      "tailRms": [
+        0,
+        0
+      ],
+      "missingSourceStats": []
+    }
+  ],
+  "agreements": [
+    {
+      "rate": 44100,
+      "ownedAllVsDag": true,
+      "stemsExact": true,
+      "maxAbs": 2.9802322387695312e-8,
+      "rms": 1.8531410992715651e-9,
+      "tolerance": 0.000001
+    },
+    {
+      "rate": 48000,
+      "ownedAllVsDag": true,
+      "stemsExact": true,
+      "maxAbs": 2.9802322387695312e-8,
+      "rms": 1.881743978105539e-9,
+      "tolerance": 0.000001
+    },
+    {
+      "rate": 96000,
+      "ownedAllVsDag": true,
+      "stemsExact": true,
+      "maxAbs": 2.9802322387695312e-8,
+      "rms": 1.9143540085995104e-9,
+      "tolerance": 0.000001
+    }
+  ],
+  "limits": "No callback duration distribution, CPU attribution, device-loopback latency, streaming underrun count, worker result or production isolation measurement. Offline wall times include six sources, local/master effects, native mixer/filters and limiter. Capture channels and observational worklet stats are enabled equally for all variants.",
+  "outputAgreementTolerance": 0.000001,
+  "agreementPolicy": "Raw source/local-insert stems must be exact. Native mixer/master path repeats use absolute 1e-6 (-120 dBFS) tolerance; actual differences are recorded."
+}

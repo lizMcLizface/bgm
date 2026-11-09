@@ -1,0 +1,154 @@
+{
+  "pass": true,
+  "graphVersion": "eb07d368174d0159",
+  "scope": "Rust only, prepared six-source DAG render/transitions/live enqueue/owner cancellation/reset/pause/replay, plus previous audits",
+  "results": [
+    {
+      "fixture": "reference-patch.json",
+      "rate": 44100,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1572864,
+      "grew": false
+    },
+    {
+      "fixture": "reference-patch.json",
+      "rate": 48000,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1572864,
+      "grew": false
+    },
+    {
+      "fixture": "reference-patch.json",
+      "rate": 96000,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1572864,
+      "grew": false
+    },
+    {
+      "fixture": "sidechain-patch.json",
+      "rate": 44100,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2949120,
+      "grew": false
+    },
+    {
+      "fixture": "sidechain-patch.json",
+      "rate": 48000,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 3014656,
+      "grew": false
+    },
+    {
+      "fixture": "sidechain-patch.json",
+      "rate": 96000,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 3342336,
+      "grew": false
+    },
+    {
+      "fixture": "external-program-key-host",
+      "rate": 44100,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1507328,
+      "grew": false
+    },
+    {
+      "fixture": "external-program-key-host",
+      "rate": 48000,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1507328,
+      "grew": false
+    },
+    {
+      "fixture": "external-program-key-host",
+      "rate": 96000,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1507328,
+      "grew": false
+    },
+    {
+      "fixture": "two-owned-fm-handles",
+      "rate": 44100,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1572864,
+      "grew": false
+    },
+    {
+      "fixture": "two-owned-fm-handles",
+      "rate": 48000,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1572864,
+      "grew": false
+    },
+    {
+      "fixture": "two-owned-fm-handles",
+      "rate": 96000,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1572864,
+      "grew": false
+    },
+    {
+      "fixture": "three-owned-core-handles",
+      "rate": 44100,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 3014656,
+      "grew": false
+    },
+    {
+      "fixture": "three-owned-core-handles",
+      "rate": 48000,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 3014656,
+      "grew": false
+    },
+    {
+      "fixture": "three-owned-core-handles",
+      "rate": 96000,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 3014656,
+      "grew": false
+    },
+    {
+      "fixture": "six-owned-sources-one-wasm",
+      "rate": 44100,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 4915200,
+      "grew": false
+    },
+    {
+      "fixture": "six-owned-sources-one-wasm",
+      "rate": 48000,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 4915200,
+      "grew": false
+    },
+    {
+      "fixture": "six-owned-sources-one-wasm",
+      "rate": 96000,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 5308416,
+      "grew": false
+    },
+    {
+      "fixture": "six-source-pitched-dag",
+      "rate": 44100,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 5242880,
+      "grew": false
+    },
+    {
+      "fixture": "six-source-pitched-dag",
+      "rate": 48000,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 5242880,
+      "grew": false
+    },
+    {
+      "fixture": "six-source-pitched-dag",
+      "rate": 96000,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 5701632,
+      "grew": false
+    }
+  ]
+}

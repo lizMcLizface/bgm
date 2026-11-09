@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import {buildSync} from 'esbuild';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import {spawnSync} from 'node:child_process';
@@ -8,9 +9,10 @@ const crate='synth-engine/graph', out='public/modular-audio';
 const hash=b=>crypto.createHash('sha256').update(b).digest('hex');
 const read=p=>fs.readFileSync(path.join(root,p));
 const text=p=>read(p).toString().replace(/\r\n/g,'\n');
+const runtimeText=()=>buildSync({absWorkingDir:root,entryPoints:['src/modular-audio/runtime.js'],bundle:true,format:'esm',platform:'browser',write:false}).outputFiles[0].text;
 function sources(dir) { return fs.readdirSync(path.join(root,dir),{withFileTypes:true}).flatMap(e=>e.isDirectory()?e.name==='target'?[]:sources(`${dir}/${e.name}`): /\.(rs|toml|lock)$/.test(e.name)?[`${dir}/${e.name}`]:[]).sort(); }
 const sourceHash=()=>hash([...sources(crate),...sources('synth-engine/percussion'),...sources('synth-engine/fm'),'synth-engine/Cargo.toml','synth-engine/Cargo.lock',...sources('synth-engine/src'),...['colour','notes','headroom','denormal'].map(n=>'synth-engine/common/'+n+'.rs')].map(p=>p+'\n'+text(p)).join('\n'));
-const processors=['processor.js','ensemble-bridge-processor.js'];
+const processors=['processor.js','ensemble-bridge-processor.js','dag-sources-processor.js'];
 const runtimeHash=()=>hash([...processors,'owned-core-processor.js','owned-core.js','owned-fm-processor.js','owned-fm.js','legacyPatchTransition.js','runtime.js','contracts.json','reference-patch.json','sidechain-patch.json','six-role-fixture.json'].map(f=>f+'\n'+text(`${out}/${f}`)).join('\n')+'\nlegacy-transition\n'+text('public/synth-lab/patch-transition.js'));
 const manifestPath=path.join(root,out,'build.json');
 const local=path.join(root,'.tmp/rust-tools'), env={...process.env,CARGO_HOME:path.join(local,'cargo'),RUSTUP_HOME:path.join(local,'rustup')};
@@ -23,7 +25,7 @@ else if(process.argv.includes('--check')) {
  if(text('src/modular-audio/ownedFm.js')!==text(`${out}/owned-fm.js`)||text('public/synth-lab/patch-transition.js')!==text(`${out}/legacyPatchTransition.js`)||!text(`${out}/owned-fm-processor.js`).includes(`./owned-fm.js?v=${hash(text(`${out}/owned-fm.js`)).slice(0,16)}`))throw Error('Owned FM assets stale; run graph:build');
  if(text('src/modular-audio/legacyPatchTransition.js')!==text('public/synth-lab/patch-transition.js'))throw Error('Legacy host transition copy stale; run graph:build');
  const m=JSON.parse(read(`${out}/build.json`));
- if(text('src/modular-audio/runtime.js')!==text(`${out}/runtime.js`)||m.source!==sourceHash()||m.wasm!==hash(read(`${out}/graph.wasm`))||m.runtime!==runtimeHash()||m.version!==hash(m.wasm+m.runtime).slice(0,16)||processors.some(f=>!text(`${out}/${f}`).includes(`./runtime.js?v=${hash(text(`${out}/runtime.js`)).slice(0,16)}`))) throw Error('Reference graph assets stale; run npm.cmd run graph:build');
+ if(runtimeText()!==text(`${out}/runtime.js`)||m.source!==sourceHash()||m.wasm!==hash(read(`${out}/graph.wasm`))||m.runtime!==runtimeHash()||m.version!==hash(m.wasm+m.runtime).slice(0,16)||processors.some(f=>!text(`${out}/${f}`).includes(`./runtime.js?v=${hash(text(`${out}/runtime.js`)).slice(0,16)}`))) throw Error('Reference graph assets stale; run npm.cmd run graph:build');
  console.log('Reference graph Rust, contracts, fixture, worklet and cache provenance match.');
 } else {
  fs.writeFileSync(path.join(root,'src/modular-audio/legacyPatchTransition.js'),text('public/synth-lab/patch-transition.js'));
@@ -40,7 +42,7 @@ else if(process.argv.includes('--check')) {
  try { contracts=new TextDecoder().decode(new Uint8Array(engine.memory.buffer,engine.graph_contracts_ptr(descriptor),engine.graph_contracts_len(descriptor))); }
  finally { engine.graph_contracts_free(descriptor); }
  fs.mkdirSync(path.join(root,out),{recursive:true});
- fs.writeFileSync(path.join(root,out,'runtime.js'),text('src/modular-audio/runtime.js'));
+ fs.writeFileSync(path.join(root,out,'runtime.js'),runtimeText());
  fs.writeFileSync(path.join(root,out,'contracts.json'),JSON.stringify(JSON.parse(contracts),null,2)+'\n');
  fs.writeFileSync(path.join(root,out,'graph.wasm'),wasm);
  for(const f of processors)fs.writeFileSync(path.join(root,out,f),text(`${out}/${f}`).replace(/\.\/runtime\.js(?:\?v=[a-f0-9]+)?/,`./runtime.js?v=${hash(text(`${out}/runtime.js`)).slice(0,16)}`));

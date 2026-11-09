@@ -1,3 +1,4 @@
+import {sixSourceDag} from './pitchedFixture';
 import {kernelAsset} from '../synth-lab/kernelAssets';
 import {createInstrumentInserts} from '../synth-lab/inserts';
 import {insertsActive} from '../synth-lab/insertsConfig';
@@ -17,18 +18,19 @@ export async function loadSixAssets(){
 }
 const registered=new WeakMap();
 export function comparePcm(a,b){if(a.length!==b.length||a[0].length!==b[0].length)throw Error('Mismatched PCM dimensions');let maxAbs=0,energy=0;for(let ch=0;ch<a.length;ch++)for(let i=0;i<a[ch].length;i++){const d=Math.abs(a[ch][i]-b[ch][i]);maxAbs=Math.max(maxAbs,d);energy+=d*d;}return {maxAbs,rms:Math.sqrt(energy/(a.length*a[0].length))};}
-async function register(context,assets){if(!registered.has(context)){const p=Promise.all([context.audioWorklet.addModule(kernelAsset('core','processor.js')),context.audioWorklet.addModule(kernelAsset('fm','fm-processor.js')),context.audioWorklet.addModule(kernelAsset('percussion','percussion-processor.js')),context.audioWorklet.addModule(base+`owned-core-processor.js?v=${assets.manifest.version}`),context.audioWorklet.addModule(base+`owned-fm-processor.js?v=${assets.manifest.version}`),context.audioWorklet.addModule(base+`ensemble-bridge-processor.js?v=${assets.manifest.version}`)]);registered.set(context,p);}await registered.get(context);}
+async function register(context,assets){if(!registered.has(context)){const p=Promise.all([context.audioWorklet.addModule(kernelAsset('core','processor.js')),context.audioWorklet.addModule(kernelAsset('fm','fm-processor.js')),context.audioWorklet.addModule(kernelAsset('percussion','percussion-processor.js')),context.audioWorklet.addModule(base+`dag-sources-processor.js?v=${assets.manifest.version}`),context.audioWorklet.addModule(base+`owned-core-processor.js?v=${assets.manifest.version}`),context.audioWorklet.addModule(base+`owned-fm-processor.js?v=${assets.manifest.version}`),context.audioWorklet.addModule(base+`ensemble-bridge-processor.js?v=${assets.manifest.version}`)]);registered.set(context,p);}await registered.get(context);}
 function observedNode(context,name,options,state,role){const node=new AudioWorkletNode(context,name,options);state.nodes.push(node);let resolveReady;const ready=new Promise(r=>resolveReady=r);node.port.onmessage=({data})=>{if(data.type==='error')state.errors.push(`${role}: ${data.message}`);if(data.type==='stats'){if(data.roles)Object.assign(state.stats,data.roles);else state.stats[role]=data;state.pending.get(role)?.(data);state.pending.delete(role);}if(data.type==='ready')resolveReady(data);};node.onprocessorerror=()=>state.errors.push(`${role}: processorerror`);return {node,ready};}
 async function bridge(context,assets,patch,mode,total,state,role){const n=observedNode(context,'calmbgm-ensemble-bridge',{numberOfInputs:mode==='compressor'?2:0,numberOfOutputs:mode==='percussion'?2:1,outputChannelCount:mode==='percussion'?[2,2]:[2],channelCount:2,channelCountMode:'explicit',processorOptions:{module:assets.modules.graph,contracts:assets.contracts,patch,mode,sourceId:101,endFrame:total}},state,role);await Promise.race([n.ready,new Promise((_,reject)=>setTimeout(()=>reject(Error(`${role} bridge initialization timeout`)),10000))]);state.requests.set(n.node,role);return n.node;}
 export async function createSixRoute(context,assets,fixture,variant,{capture=false}={}){
- validateSixFixture(fixture);if(!['current','bridge','keyed','owned-fm','owned-all'].includes(variant))throw Error('Unknown baseline variant');
- const total=Math.round(fixture.totalSeconds*context.sampleRate),state={nodes:[],stats:{},pending:new Map(),requests:new Map(),errors:[]},owned=[],trims=[],splits=[];let mixer,limiter,fx,compressor,merger,fmPair,coreTrio;
+ validateSixFixture(fixture);if(!['current','bridge','keyed','owned-fm','owned-all','dag'].includes(variant))throw Error('Unknown baseline variant');
+ const total=Math.round(fixture.totalSeconds*context.sampleRate),state={nodes:[],stats:{},pending:new Map(),requests:new Map(),errors:[]},owned=[],trims=[],splits=[];let mixer,limiter,fx,compressor,merger,fmPair,coreTrio,sourceDag;
  const dispose=()=>{for(const n of state.nodes){n.port.postMessage({type:'dispose'});n.disconnect();n.port.onmessage=null;setTimeout(()=>n.port.close(),100);}trims.forEach(n=>n.disconnect());splits.forEach(n=>n.disconnect());owned.forEach(n=>n.dispose());mixer?.dispose();if(!mixer){limiter?.port.postMessage({dispose:true});limiter?.disconnect();}fx?.dispose();merger?.disconnect();};
  try{await register(context,assets);
   limiter=await createDeskLimiter(context);fx=await createEffectsBus(context,fixture.master,{onError:e=>state.errors.push(String(e))});
   if(['owned-fm','owned-all'].includes(variant)){const parts=fixture.parts.filter(p=>p.kind==='fm').map(p=>({role:p.role,spec:fmSpecForPart(fixture,p,context.sampleRate)})),n=observedNode(context,'calmbgm-owned-fm-pair',{numberOfInputs:0,numberOfOutputs:2,outputChannelCount:[2,2],processorOptions:{module:assets.modules.graph,parts,endFrame:total}},state,'fm-pair');await Promise.race([n.ready,new Promise((_,reject)=>setTimeout(()=>reject(Error('Owned FM initialization timeout')),10000))]);fmPair=n.node;state.requests.set(fmPair,'fm-pair');}
   if(variant==='owned-all'){const parts=fixture.parts.filter(p=>p.kind==='core').map(p=>({role:p.role,spec:coreSpecForPart(fixture,p,context.sampleRate)})),n=observedNode(context,'calmbgm-owned-core-trio',{numberOfInputs:0,numberOfOutputs:3,outputChannelCount:[2,2,2],processorOptions:{module:assets.modules.graph,parts,endFrame:total}},state,'core-trio');await Promise.race([n.ready,new Promise((_,reject)=>setTimeout(()=>reject(Error('Owned core initialization timeout')),10000))]);coreTrio=n.node;state.requests.set(coreTrio,'core-trio');}
-  if(['keyed','owned-fm','owned-all'].includes(variant))compressor=await bridge(context,assets,compressorPatch(fixture),'compressor',total,state,'compressor');
+  if(variant==='dag'){const n=observedNode(context,'calmbgm-dag-sources',{numberOfInputs:0,numberOfOutputs:8,outputChannelCount:Array(8).fill(2),processorOptions:{module:assets.modules.graph,contracts:assets.contracts,patch:sixSourceDag(fixture,context.sampleRate),roles:fixture.parts.map(p=>p.role),endFrame:total}},state,'sourceDag');await Promise.race([n.ready,new Promise((_,reject)=>setTimeout(()=>reject(Error('Source DAG initialization timeout')),10000))]);sourceDag=n.node;state.requests.set(sourceDag,'sourceDag');}
+  if(['keyed','owned-fm','owned-all','dag'].includes(variant))compressor=await bridge(context,assets,compressorPatch(fixture),'compressor',total,state,'compressor');
   const insert={input:compressor??fx.input,connect(to){if(compressor)compressor.connect(fx.input);fx.connect(to);}};
   mixer=createMixerAudio(context,fixture.parts.map(p=>p.role),limiter,{auxiliary:false,trimRoles:false,masterInsert:insert});
   mixer.patch({strips:Object.fromEntries(fixture.parts.map(p=>[p.role,p.channel])),master:fixture.mixerMaster});
@@ -37,7 +39,8 @@ export async function createSixRoute(context,assets,fixture,variant,{capture=fal
   }else mixer.output.connect(context.destination);
   for(let index=0;index<fixture.parts.length;index++){
    const p=fixture.parts[index],rate=context.sampleRate;let source,sourcePort=0;
-   if(p.kind==='core'&&coreTrio){source=coreTrio;sourcePort=['lead','rhythm','pad'].indexOf(p.role);}
+   if(sourceDag){source=sourceDag;sourcePort=index;}
+   else if(p.kind==='core'&&coreTrio){source=coreTrio;sourcePort=['lead','rhythm','pad'].indexOf(p.role);}
    else if(p.kind==='fm'&&fmPair){source=fmPair;sourcePort=p.role==='second'?0:1;}
    else if(p.kind==='percussion'&&variant!=='current')source=await bridge(context,assets,percussionPatch(fixture,rate),'percussion',total,state,p.role);
    else if(p.kind==='percussion'){const messages=drumEvents(fixture,p,rate).map(h=>({type:'hit',values:[h.drum,h.frame,h.duration,h.velocity,h.vary,h.tone,h.decay,h.hit,h.model]}));source=observedNode(context,'calmbgm-percussion',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{module:assets.modules.percussion,messages,endFrame:total}},state,p.role).node;}
@@ -45,14 +48,14 @@ export async function createSixRoute(context,assets,fixture,variant,{capture=fal
     source=observedNode(context,p.kind==='core'?'calmbgm-subtractive':'calmbgm-fm',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{...common,...(p.kind==='core'?{parameters:p.packet,patches:p.edits.map(e=>({values:e.packet,frame:tickFrame(fixture,e.tick,rate),seconds:e.seconds}))}:{patch:p.packet,patches:p.edits.map(e=>({patch:e.packet,frame:tickFrame(fixture,e.tick,rate),seconds:e.seconds})),simd:false})}},state,p.role).node;
    }
    if(p.kind==='percussion'&&variant!=='current'){
-    if(compressor)source.connect(compressor,1,1);
-    if(capture){const split=context.createChannelSplitter(2);splits.push(split);source.connect(split,1);split.connect(merger,0,14);split.connect(merger,1,15);}
+    if(compressor)source.connect(compressor,sourceDag?6:1,1);
+    if(capture){const split=context.createChannelSplitter(2);splits.push(split);source.connect(split,sourceDag?6:1);split.connect(merger,0,14);split.connect(merger,1,15);}
    }
    let output=source,outputPort=sourcePort;if(insertsActive(p.inserts)){const local=await createInstrumentInserts(context,p.inserts,{onError:e=>state.errors.push(String(e))});owned.push(local);source.connect(local.input,sourcePort);output=local.node;outputPort=0;}
    if(capture){const split=context.createChannelSplitter(2);splits.push(split);output.connect(split,outputPort);split.connect(merger,0,2+index*2);split.connect(merger,1,3+index*2);}
    const trim=context.createGain();trim.gain.value=p.trim;trims.push(trim);output.connect(trim,outputPort);trim.connect(mixer.channels[p.role].input);mixer.channels[p.role].output.connect(mixer.input);
   }
-  return {dispose,state,total,mixer,check(){if(state.errors.length)throw Error(state.errors.join('\n'));},async stats(){await Promise.all([...state.requests].map(([n,role])=>new Promise(resolve=>{state.pending.set(role,resolve);n.port.postMessage({type:'stats'});setTimeout(resolve,1000);})));return state.stats;}};
+  return {dispose,state,total,mixer,rustOutput:sourceDag?{node:sourceDag,port:7}:null,check(){if(state.errors.length)throw Error(state.errors.join('\n'));},async stats(){await Promise.all([...state.requests].map(([n,role])=>new Promise(resolve=>{state.pending.set(role,resolve);n.port.postMessage({type:'stats'});setTimeout(resolve,1000);})));return state.stats;}};
  }catch(e){dispose();throw e;}
 }
 export function pcmMetrics(channels){let peak=0,nonFinite=0,first=-1,last=-1;const energy=channels.map(()=>0),n=channels[0].length;for(let i=0;i<n;i++)for(let ch=0;ch<channels.length;ch++){const v=channels[ch][i];if(!Number.isFinite(v)){nonFinite++;continue;}energy[ch]+=v*v;peak=Math.max(peak,Math.abs(v));if(v!==0){if(first<0)first=i;last=i;}}return {frames:n,peak,rms:energy.map(e=>Math.sqrt(e/n)),nonFinite,firstFrame:first,lastFrame:last};}

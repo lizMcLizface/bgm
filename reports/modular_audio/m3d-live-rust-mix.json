@@ -1,0 +1,136 @@
+{
+  "version": 1,
+  "pass": true,
+  "method": "Finite direct Rust DAG mix; raw source analyser taps, not device loopback",
+  "fixtureId": "six-role-reference-v1",
+  "graphVersion": "eb07d368174d0159",
+  "sampleRate": 48000,
+  "variant": "dag-main",
+  "observedPeak": 0.05186479538679123,
+  "rolePeaks": {
+    "lead": 0.2123255431652069,
+    "second": 0.14760184288024902,
+    "rhythm": 0.1777171492576599,
+    "pad": 0.42136961221694946,
+    "bass": 0.09860694408416748,
+    "drums": 0.6401951313018799
+  },
+  "observations": 177,
+  "baseLatency": 0.01,
+  "outputLatency": 0.04,
+  "sourceStats": {
+    "lead": {
+      "active": 0,
+      "steals": 0,
+      "dropped": 0,
+      "late": 0,
+      "frame": 840000,
+      "peak": 0,
+      "latencyFrames": 0,
+      "peakActive": 7,
+      "owned": true,
+      "dag": true,
+      "sharedInstanceMemory": 5242880
+    },
+    "second": {
+      "active": 0,
+      "steals": 14,
+      "dropped": 0,
+      "late": 0,
+      "frame": 840000,
+      "peak": 0,
+      "latencyFrames": 7.5,
+      "peakActive": 8,
+      "owned": true,
+      "dag": true,
+      "sharedInstanceMemory": 5242880
+    },
+    "rhythm": {
+      "active": 0,
+      "steals": 0,
+      "dropped": 0,
+      "late": 0,
+      "frame": 840000,
+      "peak": 0,
+      "latencyFrames": 0,
+      "peakActive": 2,
+      "owned": true,
+      "dag": true,
+      "sharedInstanceMemory": 5242880
+    },
+    "pad": {
+      "active": 0,
+      "steals": 0,
+      "dropped": 0,
+      "late": 0,
+      "frame": 840000,
+      "peak": 0,
+      "latencyFrames": 0,
+      "peakActive": 8,
+      "owned": true,
+      "dag": true,
+      "sharedInstanceMemory": 5242880
+    },
+    "bass": {
+      "active": 0,
+      "steals": 0,
+      "dropped": 0,
+      "late": 0,
+      "frame": 840000,
+      "peak": 0,
+      "latencyFrames": 7.5,
+      "peakActive": 2,
+      "owned": true,
+      "dag": true,
+      "sharedInstanceMemory": 5242880
+    },
+    "drums": {
+      "active": 0,
+      "queued": 0,
+      "steals": 0,
+      "dropped": 0,
+      "late": 0,
+      "frame": 840000,
+      "peakActive": 4,
+      "owned": true,
+      "dag": true,
+      "sharedInstanceMemory": 5242880
+    },
+    "sourceDag": {
+      "frame": 840000,
+      "late": 0,
+      "overflow": 0,
+      "applied": 357,
+      "meters": {
+        "17": {
+          "inputPeak": 0,
+          "keyPeak": 1.7796490496925177e-43,
+          "reductionDb": 3.731329174323642e-29,
+          "outputPeak": 0,
+          "missingKey": 0,
+          "externalKey": 1
+        }
+      },
+      "memory": 5242880
+    },
+    "compressor": {
+      "type": "stats",
+      "frame": 0,
+      "origin": null,
+      "late": 0,
+      "overflow": 0,
+      "applied": 0,
+      "meters": {
+        "203": {
+          "inputPeak": 0,
+          "keyPeak": 0,
+          "reductionDb": 0,
+          "outputPeak": 0,
+          "missingKey": 0,
+          "externalKey": 0
+        }
+      },
+      "memory": 1507328
+    }
+  }
+}

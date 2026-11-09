@@ -8,6 +8,21 @@ const QUEUE: usize = 4096;
 /// Fully owned scalar FM DSP. Prepare outside the audio callback.
 impl Engine {
     pub fn prepared(sr: f32) -> Self { let mut e = Self::new(); e.init(sr); e }
+    pub fn performance(&mut self, mode: u32, portamento: f32, always: bool) {
+        self.event(Event { kind: 6, id: mode, frame: self.frame, a: portamento, b: if always {1.} else {0.} });
+    }
+    pub fn has_note(&self, id: u32) -> bool { self.voices.iter().any(|v| v.active && v.id == id) || self.notes.contains(id) }
+    pub fn cancel_note(&mut self, id: u32) {
+        let mut to = 0;
+        for at in self.head..self.len { let e = self.queue[at]; if e.id != id || !matches!(e.kind,0|1|3|5) { self.queue[to] = e; to += 1; } }
+        self.head = 0; self.len = to;
+        let selected = self.notes.cancel(id);
+        if self.note_mode != 0 { if let notes::Action::Select(k) = selected { self.event(Event {kind:0,id:k.id,frame:self.frame,a:k.midi,b:k.velocity}); } }
+        let pedal = self.pedal; self.pedal = false;
+        for i in 0..VOICES { if self.voices[i].active && self.voices[i].id == id { self.release(i); } }
+        self.pedal = pedal;
+
+    }
     pub fn set_frame(&mut self, frame: u64) { self.frame = frame; }
     pub fn route(&mut self, from: usize, to: usize, value: f32) {
         if from < to && to < OPS { self.routing[from][to] = bounded(value, 0., 2.); }

@@ -1,0 +1,47 @@
+{
+  "baselineCommit": "bc4e35d",
+  "results": [
+    {
+      "name": "core",
+      "byteIdentical": false,
+      "exportCount": 22,
+      "exportSetExact": true
+    },
+    {
+      "name": "core-acoustic",
+      "byteIdentical": false,
+      "exportCount": 22,
+      "exportSetExact": true
+    },
+    {
+      "name": "fm",
+      "byteIdentical": false,
+      "exportCount": 14,
+      "exportSetExact": true
+    },
+    {
+      "name": "fm-simd",
+      "byteIdentical": false,
+      "exportCount": 15,
+      "exportSetExact": true
+    },
+    {
+      "name": "fm-bank",
+      "byteIdentical": false,
+      "exportCount": 30,
+      "exportSetExact": true
+    },
+    {
+      "name": "fm-fast",
+      "byteIdentical": false,
+      "exportCount": 30,
+      "exportSetExact": true
+    },
+    {
+      "name": "percussion",
+      "byteIdentical": true,
+      "exportCount": 13,
+      "exportSetExact": true
+    }
+  ]
+}

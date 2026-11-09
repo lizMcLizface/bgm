@@ -1281,6 +1281,10 @@ impl Engine {
             }
         }
     }
+    pub fn stat(&self, index:u32)->f64 {match index {
+        0=>self.voices.iter().filter(|v|v.count>0).count()as f64,1=>self.queue.len()as f64,
+        2=>self.steals as f64,3=>self.dropped as f64,4=>self.late as f64,5=>self.frame as f64,6=>self.peak_active as f64,_=>0.
+    }}
     pub fn reset(&mut self) {
         self.frame = 0;
         self.queue.clear();
