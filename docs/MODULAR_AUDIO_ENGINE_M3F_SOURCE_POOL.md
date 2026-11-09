@@ -4,6 +4,9 @@ Implemented 2026-11-09, after committing M3e locally as **`646183d`**,
 `Add bounded Rust graph worker transport and fallback`. User workflow: commit
 at the end of every verified step, then continue. No push/deployment.
 
+Historical checkpoint: M3f was committed locally as **`714ce43`** before
+[M3g buffering profiles](MODULAR_AUDIO_ENGINE_M3G_BUFFER_PROFILES.md).
+
 ## Execution cut
 
 The pinned six-role graph now has an optional **three-worker source pool**:

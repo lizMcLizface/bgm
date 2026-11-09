@@ -1,0 +1,3684 @@
+{
+  "pass": false,
+  "graphVersion": "1c3863ec8913dbd8",
+  "fixtureId": "six-role-reference-v1",
+  "scope": "Retained failed initial fixed-1024 cross-cadence check: primary criterion was normalRangeMaxAbs === 0, with separate both-subnormal classification. Tiny source residuals can propagate into normal-valued master samples. All raw results and pass flags are unchanged; final acceptance uses exact same-cadence references.",
+  "rows": [
+    {
+      "profile": "default",
+      "pass": true,
+      "rate": 44100,
+      "frames": 771750,
+      "blocks": 754,
+      "referenceBlockFrames": 1024,
+      "comparisonPolicy": "Exact normal-range f32 sample values. Differences are separately classified only when both values are zero/subnormal (abs < 2^-126), matching existing recursive-state flushing at render boundaries. Raw maxima/counts remain recorded; no general amplitude tolerance.",
+      "rawExact": true,
+      "maxAbs": 0,
+      "maxByBus": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "normalRangeMaxAbs": 0,
+      "subnormalDifferences": 0,
+      "firstDifference": null,
+      "nonFinite": 0,
+      "rejectedPast": true,
+      "acceptedFuture": true,
+      "groups": [
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          6
+        ]
+      ],
+      "masterLevels": [
+        [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        [
+          11,
+          12,
+          13
+        ],
+        [
+          14
+        ],
+        [
+          15
+        ],
+        [
+          17
+        ],
+        [
+          18
+        ]
+      ],
+      "workers": [
+        {
+          "type": "stats",
+          "request": 99,
+          "generation": 1,
+          "sourceIds": [
+            1,
+            5
+          ],
+          "frame": 771750,
+          "blocks": 754,
+          "renderMs": 429.79859999999337,
+          "maxRenderMs": 1.753500000000031,
+          "blockMsHistogramLog2Us": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            319,
+            13,
+            347,
+            74,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "rejectedEvents": 1,
+          "badRecycles": 0,
+          "freeBuffers": 4,
+          "inFlightBuffers": 0,
+          "graph": {
+            "frame": 771750,
+            "late": 0,
+            "overflow": 0,
+            "applied": 36
+          },
+          "meters": {},
+          "memoryBytes": 2883584,
+          "roles": [
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 771750,
+              "peak": 0,
+              "latencyFrames": 0,
+              "peakActive": 2
+            },
+            null,
+            null,
+            null,
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 771750,
+              "peak": 0,
+              "latencyFrames": 7.5,
+              "peakActive": 2
+            },
+            null
+          ]
+        },
+        {
+          "type": "stats",
+          "request": 99,
+          "generation": 1,
+          "sourceIds": [
+            2,
+            3
+          ],
+          "frame": 771750,
+          "blocks": 754,
+          "renderMs": 1572.9042999999951,
+          "maxRenderMs": 4.313799999999901,
+          "blockMsHistogramLog2Us": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            288,
+            3,
+            3,
+            48,
+            403,
+            8,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "rejectedEvents": 0,
+          "badRecycles": 0,
+          "freeBuffers": 4,
+          "inFlightBuffers": 0,
+          "graph": {
+            "frame": 771750,
+            "late": 0,
+            "overflow": 0,
+            "applied": 162
+          },
+          "meters": {},
+          "memoryBytes": 2883584,
+          "roles": [
+            null,
+            {
+              "active": 0,
+              "steals": 14,
+              "dropped": 0,
+              "late": 0,
+              "frame": 771750,
+              "peak": 0,
+              "latencyFrames": 7.5,
+              "peakActive": 8
+            },
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 771750,
+              "peak": 0,
+              "latencyFrames": 0,
+              "peakActive": 2
+            },
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "type": "stats",
+          "request": 99,
+          "generation": 1,
+          "sourceIds": [
+            4,
+            6
+          ],
+          "frame": 771750,
+          "blocks": 754,
+          "renderMs": 874.4686999999989,
+          "maxRenderMs": 2.8260999999999967,
+          "blockMsHistogramLog2Us": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            272,
+            1,
+            328,
+            152,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "rejectedEvents": 0,
+          "badRecycles": 0,
+          "freeBuffers": 4,
+          "inFlightBuffers": 0,
+          "graph": {
+            "frame": 771750,
+            "late": 0,
+            "overflow": 0,
+            "applied": 91
+          },
+          "meters": {},
+          "memoryBytes": 3997696,
+          "roles": [
+            null,
+            null,
+            null,
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 771750,
+              "peak": 0,
+              "latencyFrames": 0,
+              "peakActive": 8
+            },
+            null,
+            {
+              "active": 0,
+              "queued": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 771750,
+              "peakActive": 4
+            }
+          ]
+        }
+      ],
+      "master": {
+        "frame": 771750,
+        "late": 0,
+        "overflow": 0,
+        "applied": 0
+      },
+      "serial": {
+        "frame": 771750,
+        "late": 0,
+        "overflow": 0,
+        "applied": 289
+      },
+      "queue": {
+        "deliveredFrames": 771750,
+        "underrunFrames": 0,
+        "underrunQuanta": 0,
+        "recoveries": 0,
+        "groups": [
+          {
+            "deliveredFrames": 771750,
+            "underrunFrames": 0,
+            "underrunQuanta": 0,
+            "recoveries": 0,
+            "lateBlocks": 0,
+            "staleGeneration": 0,
+            "rejectedBlocks": 0,
+            "acceptedBlocks": 754,
+            "queueHighWater": 4,
+            "queuedBlocks": 0
+          },
+          {
+            "deliveredFrames": 771750,
+            "underrunFrames": 0,
+            "underrunQuanta": 0,
+            "recoveries": 0,
+            "lateBlocks": 0,
+            "staleGeneration": 0,
+            "rejectedBlocks": 0,
+            "acceptedBlocks": 754,
+            "queueHighWater": 4,
+            "queuedBlocks": 0
+          },
+          {
+            "deliveredFrames": 771750,
+            "underrunFrames": 0,
+            "underrunQuanta": 0,
+            "recoveries": 0,
+            "lateBlocks": 0,
+            "staleGeneration": 0,
+            "rejectedBlocks": 0,
+            "acceptedBlocks": 754,
+            "queueHighWater": 4,
+            "queuedBlocks": 0
+          }
+        ]
+      },
+      "options": {
+        "blockFrames": 1024,
+        "poolBlocks": 4,
+        "generation": 1,
+        "delayFrames": 4096,
+        "bufferBytes": 65536
+      }
+    },
+    {
+      "profile": "default",
+      "pass": true,
+      "rate": 48000,
+      "frames": 840000,
+      "blocks": 821,
+      "referenceBlockFrames": 1024,
+      "comparisonPolicy": "Exact normal-range f32 sample values. Differences are separately classified only when both values are zero/subnormal (abs < 2^-126), matching existing recursive-state flushing at render boundaries. Raw maxima/counts remain recorded; no general amplitude tolerance.",
+      "rawExact": true,
+      "maxAbs": 0,
+      "maxByBus": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "normalRangeMaxAbs": 0,
+      "subnormalDifferences": 0,
+      "firstDifference": null,
+      "nonFinite": 0,
+      "rejectedPast": true,
+      "acceptedFuture": true,
+      "groups": [
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          6
+        ]
+      ],
+      "masterLevels": [
+        [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        [
+          11,
+          12,
+          13
+        ],
+        [
+          14
+        ],
+        [
+          15
+        ],
+        [
+          17
+        ],
+        [
+          18
+        ]
+      ],
+      "workers": [
+        {
+          "type": "stats",
+          "request": 99,
+          "generation": 1,
+          "sourceIds": [
+            1,
+            5
+          ],
+          "frame": 840000,
+          "blocks": 821,
+          "renderMs": 464.04679999999917,
+          "maxRenderMs": 1.6828999999997905,
+          "blockMsHistogramLog2Us": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            361,
+            3,
+            392,
+            64,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "rejectedEvents": 1,
+          "badRecycles": 0,
+          "freeBuffers": 4,
+          "inFlightBuffers": 0,
+          "graph": {
+            "frame": 840000,
+            "late": 0,
+            "overflow": 0,
+            "applied": 36
+          },
+          "meters": {},
+          "memoryBytes": 2883584,
+          "roles": [
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 840000,
+              "peak": 0,
+              "latencyFrames": 0,
+              "peakActive": 2
+            },
+            null,
+            null,
+            null,
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 840000,
+              "peak": 0,
+              "latencyFrames": 7.5,
+              "peakActive": 2
+            },
+            null
+          ]
+        },
+        {
+          "type": "stats",
+          "request": 99,
+          "generation": 1,
+          "sourceIds": [
+            2,
+            3
+          ],
+          "frame": 840000,
+          "blocks": 821,
+          "renderMs": 1716.308600000003,
+          "maxRenderMs": 4.7794999999996435,
+          "blockMsHistogramLog2Us": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            316,
+            3,
+            3,
+            51,
+            436,
+            11,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "rejectedEvents": 0,
+          "badRecycles": 0,
+          "freeBuffers": 4,
+          "inFlightBuffers": 0,
+          "graph": {
+            "frame": 840000,
+            "late": 0,
+            "overflow": 0,
+            "applied": 162
+          },
+          "meters": {},
+          "memoryBytes": 2883584,
+          "roles": [
+            null,
+            {
+              "active": 0,
+              "steals": 14,
+              "dropped": 0,
+              "late": 0,
+              "frame": 840000,
+              "peak": 0,
+              "latencyFrames": 7.5,
+              "peakActive": 8
+            },
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 840000,
+              "peak": 0,
+              "latencyFrames": 0,
+              "peakActive": 2
+            },
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "type": "stats",
+          "request": 99,
+          "generation": 1,
+          "sourceIds": [
+            4,
+            6
+          ],
+          "frame": 840000,
+          "blocks": 821,
+          "renderMs": 949.9314000000031,
+          "maxRenderMs": 2.8560999999999694,
+          "blockMsHistogramLog2Us": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            297,
+            2,
+            360,
+            161,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "rejectedEvents": 0,
+          "badRecycles": 0,
+          "freeBuffers": 4,
+          "inFlightBuffers": 0,
+          "graph": {
+            "frame": 840000,
+            "late": 0,
+            "overflow": 0,
+            "applied": 91
+          },
+          "meters": {},
+          "memoryBytes": 4128768,
+          "roles": [
+            null,
+            null,
+            null,
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 840000,
+              "peak": 0,
+              "latencyFrames": 0,
+              "peakActive": 8
+            },
+            null,
+            {
+              "active": 0,
+              "queued": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 840000,
+              "peakActive": 4
+            }
+          ]
+        }
+      ],
+      "master": {
+        "frame": 840000,
+        "late": 0,
+        "overflow": 0,
+        "applied": 0
+      },
+      "serial": {
+        "frame": 840000,
+        "late": 0,
+        "overflow": 0,
+        "applied": 289
+      },
+      "queue": {
+        "deliveredFrames": 840000,
+        "underrunFrames": 0,
+        "underrunQuanta": 0,
+        "recoveries": 0,
+        "groups": [
+          {
+            "deliveredFrames": 840000,
+            "underrunFrames": 0,
+            "underrunQuanta": 0,
+            "recoveries": 0,
+            "lateBlocks": 0,
+            "staleGeneration": 0,
+            "rejectedBlocks": 0,
+            "acceptedBlocks": 821,
+            "queueHighWater": 4,
+            "queuedBlocks": 0
+          },
+          {
+            "deliveredFrames": 840000,
+            "underrunFrames": 0,
+            "underrunQuanta": 0,
+            "recoveries": 0,
+            "lateBlocks": 0,
+            "staleGeneration": 0,
+            "rejectedBlocks": 0,
+            "acceptedBlocks": 821,
+            "queueHighWater": 4,
+            "queuedBlocks": 0
+          },
+          {
+            "deliveredFrames": 840000,
+            "underrunFrames": 0,
+            "underrunQuanta": 0,
+            "recoveries": 0,
+            "lateBlocks": 0,
+            "staleGeneration": 0,
+            "rejectedBlocks": 0,
+            "acceptedBlocks": 821,
+            "queueHighWater": 4,
+            "queuedBlocks": 0
+          }
+        ]
+      },
+      "options": {
+        "blockFrames": 1024,
+        "poolBlocks": 4,
+        "generation": 1,
+        "delayFrames": 4096,
+        "bufferBytes": 65536
+      }
+    },
+    {
+      "profile": "default",
+      "pass": true,
+      "rate": 96000,
+      "frames": 1680000,
+      "blocks": 1641,
+      "referenceBlockFrames": 1024,
+      "comparisonPolicy": "Exact normal-range f32 sample values. Differences are separately classified only when both values are zero/subnormal (abs < 2^-126), matching existing recursive-state flushing at render boundaries. Raw maxima/counts remain recorded; no general amplitude tolerance.",
+      "rawExact": true,
+      "maxAbs": 0,
+      "maxByBus": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "normalRangeMaxAbs": 0,
+      "subnormalDifferences": 0,
+      "firstDifference": null,
+      "nonFinite": 0,
+      "rejectedPast": true,
+      "acceptedFuture": true,
+      "groups": [
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          6
+        ]
+      ],
+      "masterLevels": [
+        [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        [
+          11,
+          12,
+          13
+        ],
+        [
+          14
+        ],
+        [
+          15
+        ],
+        [
+          17
+        ],
+        [
+          18
+        ]
+      ],
+      "workers": [
+        {
+          "type": "stats",
+          "request": 99,
+          "generation": 1,
+          "sourceIds": [
+            1,
+            5
+          ],
+          "frame": 1680000,
+          "blocks": 1641,
+          "renderMs": 914.5567000000001,
+          "maxRenderMs": 1.602999999999156,
+          "blockMsHistogramLog2Us": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            725,
+            4,
+            767,
+            144,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "rejectedEvents": 1,
+          "badRecycles": 0,
+          "freeBuffers": 4,
+          "inFlightBuffers": 0,
+          "graph": {
+            "frame": 1680000,
+            "late": 0,
+            "overflow": 0,
+            "applied": 34
+          },
+          "meters": {},
+          "memoryBytes": 2883584,
+          "roles": [
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 1680000,
+              "peak": 0,
+              "latencyFrames": 0,
+              "peakActive": 1
+            },
+            null,
+            null,
+            null,
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 1680000,
+              "peak": 0,
+              "latencyFrames": 7.5,
+              "peakActive": 2
+            },
+            null
+          ]
+        },
+        {
+          "type": "stats",
+          "request": 99,
+          "generation": 1,
+          "sourceIds": [
+            2,
+            3
+          ],
+          "frame": 1680000,
+          "blocks": 1641,
+          "renderMs": 3438.7466999999688,
+          "maxRenderMs": 4.561299999999392,
+          "blockMsHistogramLog2Us": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            632,
+            9,
+            1,
+            97,
+            875,
+            26,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "rejectedEvents": 0,
+          "badRecycles": 0,
+          "freeBuffers": 4,
+          "inFlightBuffers": 0,
+          "graph": {
+            "frame": 1680000,
+            "late": 0,
+            "overflow": 0,
+            "applied": 162
+          },
+          "meters": {},
+          "memoryBytes": 2883584,
+          "roles": [
+            null,
+            {
+              "active": 0,
+              "steals": 14,
+              "dropped": 0,
+              "late": 0,
+              "frame": 1680000,
+              "peak": 0,
+              "latencyFrames": 7.5,
+              "peakActive": 8
+            },
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 1680000,
+              "peak": 0,
+              "latencyFrames": 0,
+              "peakActive": 2
+            },
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "type": "stats",
+          "request": 99,
+          "generation": 1,
+          "sourceIds": [
+            4,
+            6
+          ],
+          "frame": 1680000,
+          "blocks": 1641,
+          "renderMs": 1895.2075000000677,
+          "maxRenderMs": 2.6567999999988388,
+          "blockMsHistogramLog2Us": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            592,
+            5,
+            749,
+            294,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "rejectedEvents": 0,
+          "badRecycles": 0,
+          "freeBuffers": 4,
+          "inFlightBuffers": 0,
+          "graph": {
+            "frame": 1680000,
+            "late": 0,
+            "overflow": 0,
+            "applied": 91
+          },
+          "meters": {},
+          "memoryBytes": 4390912,
+          "roles": [
+            null,
+            null,
+            null,
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 1680000,
+              "peak": 0,
+              "latencyFrames": 0,
+              "peakActive": 8
+            },
+            null,
+            {
+              "active": 0,
+              "queued": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 1680000,
+              "peakActive": 4
+            }
+          ]
+        }
+      ],
+      "master": {
+        "frame": 1680000,
+        "late": 0,
+        "overflow": 0,
+        "applied": 0
+      },
+      "serial": {
+        "frame": 1680000,
+        "late": 0,
+        "overflow": 0,
+        "applied": 287
+      },
+      "queue": {
+        "deliveredFrames": 1680000,
+        "underrunFrames": 0,
+        "underrunQuanta": 0,
+        "recoveries": 0,
+        "groups": [
+          {
+            "deliveredFrames": 1680000,
+            "underrunFrames": 0,
+            "underrunQuanta": 0,
+            "recoveries": 0,
+            "lateBlocks": 0,
+            "staleGeneration": 0,
+            "rejectedBlocks": 0,
+            "acceptedBlocks": 1641,
+            "queueHighWater": 4,
+            "queuedBlocks": 0
+          },
+          {
+            "deliveredFrames": 1680000,
+            "underrunFrames": 0,
+            "underrunQuanta": 0,
+            "recoveries": 0,
+            "lateBlocks": 0,
+            "staleGeneration": 0,
+            "rejectedBlocks": 0,
+            "acceptedBlocks": 1641,
+            "queueHighWater": 4,
+            "queuedBlocks": 0
+          },
+          {
+            "deliveredFrames": 1680000,
+            "underrunFrames": 0,
+            "underrunQuanta": 0,
+            "recoveries": 0,
+            "lateBlocks": 0,
+            "staleGeneration": 0,
+            "rejectedBlocks": 0,
+            "acceptedBlocks": 1641,
+            "queueHighWater": 4,
+            "queuedBlocks": 0
+          }
+        ]
+      },
+      "options": {
+        "blockFrames": 1024,
+        "poolBlocks": 4,
+        "generation": 1,
+        "delayFrames": 4096,
+        "bufferBytes": 65536
+      }
+    },
+    {
+      "profile": "medium",
+      "pass": true,
+      "rate": 44100,
+      "frames": 771750,
+      "blocks": 1508,
+      "referenceBlockFrames": 1024,
+      "comparisonPolicy": "Exact normal-range f32 sample values. Differences are separately classified only when both values are zero/subnormal (abs < 2^-126), matching existing recursive-state flushing at render boundaries. Raw maxima/counts remain recorded; no general amplitude tolerance.",
+      "rawExact": false,
+      "maxAbs": 5.571942446039305e-39,
+      "maxByBus": [
+        0,
+        0,
+        5.571942446039305e-39,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "normalRangeMaxAbs": 0,
+      "subnormalDifferences": 1024,
+      "firstDifference": {
+        "frame": 476672,
+        "bus": 2,
+        "channel": 0,
+        "actual": 0,
+        "expected": 5.571942446039305e-39
+      },
+      "nonFinite": 0,
+      "rejectedPast": true,
+      "acceptedFuture": true,
+      "groups": [
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          6
+        ]
+      ],
+      "masterLevels": [
+        [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        [
+          11,
+          12,
+          13
+        ],
+        [
+          14
+        ],
+        [
+          15
+        ],
+        [
+          17
+        ],
+        [
+          18
+        ]
+      ],
+      "workers": [
+        {
+          "type": "stats",
+          "request": 99,
+          "generation": 1,
+          "sourceIds": [
+            1,
+            5
+          ],
+          "frame": 771750,
+          "blocks": 1508,
+          "renderMs": 459.9977999999646,
+          "maxRenderMs": 1.0368000000016764,
+          "blockMsHistogramLog2Us": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            571,
+            98,
+            644,
+            193,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "rejectedEvents": 1,
+          "badRecycles": 0,
+          "freeBuffers": 4,
+          "inFlightBuffers": 0,
+          "graph": {
+            "frame": 771750,
+            "late": 0,
+            "overflow": 0,
+            "applied": 36
+          },
+          "meters": {},
+          "memoryBytes": 2883584,
+          "roles": [
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 771750,
+              "peak": 0,
+              "latencyFrames": 0,
+              "peakActive": 2
+            },
+            null,
+            null,
+            null,
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 771750,
+              "peak": 0,
+              "latencyFrames": 7.5,
+              "peakActive": 2
+            },
+            null
+          ]
+        },
+        {
+          "type": "stats",
+          "request": 99,
+          "generation": 1,
+          "sourceIds": [
+            2,
+            3
+          ],
+          "frame": 771750,
+          "blocks": 1508,
+          "renderMs": 1657.7788999999757,
+          "maxRenderMs": 2.591899999999441,
+          "blockMsHistogramLog2Us": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            478,
+            110,
+            1,
+            71,
+            707,
+            140,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "rejectedEvents": 0,
+          "badRecycles": 0,
+          "freeBuffers": 4,
+          "inFlightBuffers": 0,
+          "graph": {
+            "frame": 771750,
+            "late": 0,
+            "overflow": 0,
+            "applied": 162
+          },
+          "meters": {},
+          "memoryBytes": 2883584,
+          "roles": [
+            null,
+            {
+              "active": 0,
+              "steals": 14,
+              "dropped": 0,
+              "late": 0,
+              "frame": 771750,
+              "peak": 0,
+              "latencyFrames": 7.5,
+              "peakActive": 8
+            },
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 771750,
+              "peak": 0,
+              "latencyFrames": 0,
+              "peakActive": 2
+            },
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "type": "stats",
+          "request": 99,
+          "generation": 1,
+          "sourceIds": [
+            4,
+            6
+          ],
+          "frame": 771750,
+          "blocks": 1508,
+          "renderMs": 940.827499999974,
+          "maxRenderMs": 2.0129999999990105,
+          "blockMsHistogramLog2Us": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            537,
+            9,
+            642,
+            319,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "rejectedEvents": 0,
+          "badRecycles": 0,
+          "freeBuffers": 4,
+          "inFlightBuffers": 0,
+          "graph": {
+            "frame": 771750,
+            "late": 0,
+            "overflow": 0,
+            "applied": 91
+          },
+          "meters": {},
+          "memoryBytes": 3997696,
+          "roles": [
+            null,
+            null,
+            null,
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 771750,
+              "peak": 0,
+              "latencyFrames": 0,
+              "peakActive": 8
+            },
+            null,
+            {
+              "active": 0,
+              "queued": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 771750,
+              "peakActive": 4
+            }
+          ]
+        }
+      ],
+      "master": {
+        "frame": 771750,
+        "late": 0,
+        "overflow": 0,
+        "applied": 0
+      },
+      "serial": {
+        "frame": 771750,
+        "late": 0,
+        "overflow": 0,
+        "applied": 289
+      },
+      "queue": {
+        "deliveredFrames": 771750,
+        "underrunFrames": 0,
+        "underrunQuanta": 0,
+        "recoveries": 0,
+        "groups": [
+          {
+            "deliveredFrames": 771750,
+            "underrunFrames": 0,
+            "underrunQuanta": 0,
+            "recoveries": 0,
+            "lateBlocks": 0,
+            "staleGeneration": 0,
+            "rejectedBlocks": 0,
+            "acceptedBlocks": 1508,
+            "queueHighWater": 4,
+            "queuedBlocks": 0
+          },
+          {
+            "deliveredFrames": 771750,
+            "underrunFrames": 0,
+            "underrunQuanta": 0,
+            "recoveries": 0,
+            "lateBlocks": 0,
+            "staleGeneration": 0,
+            "rejectedBlocks": 0,
+            "acceptedBlocks": 1508,
+            "queueHighWater": 4,
+            "queuedBlocks": 0
+          },
+          {
+            "deliveredFrames": 771750,
+            "underrunFrames": 0,
+            "underrunQuanta": 0,
+            "recoveries": 0,
+            "lateBlocks": 0,
+            "staleGeneration": 0,
+            "rejectedBlocks": 0,
+            "acceptedBlocks": 1508,
+            "queueHighWater": 4,
+            "queuedBlocks": 0
+          }
+        ]
+      },
+      "options": {
+        "blockFrames": 512,
+        "poolBlocks": 4,
+        "generation": 1,
+        "delayFrames": 2048,
+        "bufferBytes": 32768
+      }
+    },
+    {
+      "profile": "medium",
+      "pass": false,
+      "rate": 48000,
+      "frames": 840000,
+      "blocks": 1641,
+      "referenceBlockFrames": 1024,
+      "comparisonPolicy": "Exact normal-range f32 sample values. Differences are separately classified only when both values are zero/subnormal (abs < 2^-126), matching existing recursive-state flushing at render boundaries. Raw maxima/counts remain recorded; no general amplitude tolerance.",
+      "rawExact": false,
+      "maxAbs": 1.1506732912535485e-38,
+      "maxByBus": [
+        0,
+        0,
+        7.792135910841651e-39,
+        5.165359900510852e-39,
+        1.1506732912535485e-38,
+        0,
+        0,
+        6.455389661574421e-40
+      ],
+      "normalRangeMaxAbs": 6.455389661574421e-40,
+      "subnormalDifferences": 2560,
+      "firstDifference": {
+        "frame": 518656,
+        "bus": 2,
+        "channel": 0,
+        "actual": 0,
+        "expected": 7.792135910841651e-39
+      },
+      "nonFinite": 0,
+      "rejectedPast": true,
+      "acceptedFuture": true,
+      "groups": [
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          6
+        ]
+      ],
+      "masterLevels": [
+        [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        [
+          11,
+          12,
+          13
+        ],
+        [
+          14
+        ],
+        [
+          15
+        ],
+        [
+          17
+        ],
+        [
+          18
+        ]
+      ],
+      "workers": [
+        {
+          "type": "stats",
+          "request": 99,
+          "generation": 1,
+          "sourceIds": [
+            1,
+            5
+          ],
+          "frame": 840000,
+          "blocks": 1641,
+          "renderMs": 501.01500000007945,
+          "maxRenderMs": 0.9398999999975786,
+          "blockMsHistogramLog2Us": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            616,
+            113,
+            710,
+            202,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "rejectedEvents": 1,
+          "badRecycles": 0,
+          "freeBuffers": 4,
+          "inFlightBuffers": 0,
+          "graph": {
+            "frame": 840000,
+            "late": 0,
+            "overflow": 0,
+            "applied": 36
+          },
+          "meters": {},
+          "memoryBytes": 2883584,
+          "roles": [
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 840000,
+              "peak": 0,
+              "latencyFrames": 0,
+              "peakActive": 2
+            },
+            null,
+            null,
+            null,
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 840000,
+              "peak": 0,
+              "latencyFrames": 7.5,
+              "peakActive": 2
+            },
+            null
+          ]
+        },
+        {
+          "type": "stats",
+          "request": 99,
+          "generation": 1,
+          "sourceIds": [
+            2,
+            3
+          ],
+          "frame": 840000,
+          "blocks": 1641,
+          "renderMs": 1792.3835000001418,
+          "maxRenderMs": 2.84780000000319,
+          "blockMsHistogramLog2Us": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            527,
+            112,
+            4,
+            75,
+            806,
+            117,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "rejectedEvents": 0,
+          "badRecycles": 0,
+          "freeBuffers": 4,
+          "inFlightBuffers": 0,
+          "graph": {
+            "frame": 840000,
+            "late": 0,
+            "overflow": 0,
+            "applied": 162
+          },
+          "meters": {},
+          "memoryBytes": 2883584,
+          "roles": [
+            null,
+            {
+              "active": 0,
+              "steals": 14,
+              "dropped": 0,
+              "late": 0,
+              "frame": 840000,
+              "peak": 0,
+              "latencyFrames": 7.5,
+              "peakActive": 8
+            },
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 840000,
+              "peak": 0,
+              "latencyFrames": 0,
+              "peakActive": 2
+            },
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "type": "stats",
+          "request": 99,
+          "generation": 1,
+          "sourceIds": [
+            4,
+            6
+          ],
+          "frame": 840000,
+          "blocks": 1641,
+          "renderMs": 1022.9357000000964,
+          "maxRenderMs": 1.4082999999955064,
+          "blockMsHistogramLog2Us": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            588,
+            9,
+            695,
+            348,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "rejectedEvents": 0,
+          "badRecycles": 0,
+          "freeBuffers": 4,
+          "inFlightBuffers": 0,
+          "graph": {
+            "frame": 840000,
+            "late": 0,
+            "overflow": 0,
+            "applied": 91
+          },
+          "meters": {},
+          "memoryBytes": 3997696,
+          "roles": [
+            null,
+            null,
+            null,
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 840000,
+              "peak": 0,
+              "latencyFrames": 0,
+              "peakActive": 8
+            },
+            null,
+            {
+              "active": 0,
+              "queued": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 840000,
+              "peakActive": 4
+            }
+          ]
+        }
+      ],
+      "master": {
+        "frame": 840000,
+        "late": 0,
+        "overflow": 0,
+        "applied": 0
+      },
+      "serial": {
+        "frame": 840000,
+        "late": 0,
+        "overflow": 0,
+        "applied": 289
+      },
+      "queue": {
+        "deliveredFrames": 840000,
+        "underrunFrames": 0,
+        "underrunQuanta": 0,
+        "recoveries": 0,
+        "groups": [
+          {
+            "deliveredFrames": 840000,
+            "underrunFrames": 0,
+            "underrunQuanta": 0,
+            "recoveries": 0,
+            "lateBlocks": 0,
+            "staleGeneration": 0,
+            "rejectedBlocks": 0,
+            "acceptedBlocks": 1641,
+            "queueHighWater": 4,
+            "queuedBlocks": 0
+          },
+          {
+            "deliveredFrames": 840000,
+            "underrunFrames": 0,
+            "underrunQuanta": 0,
+            "recoveries": 0,
+            "lateBlocks": 0,
+            "staleGeneration": 0,
+            "rejectedBlocks": 0,
+            "acceptedBlocks": 1641,
+            "queueHighWater": 4,
+            "queuedBlocks": 0
+          },
+          {
+            "deliveredFrames": 840000,
+            "underrunFrames": 0,
+            "underrunQuanta": 0,
+            "recoveries": 0,
+            "lateBlocks": 0,
+            "staleGeneration": 0,
+            "rejectedBlocks": 0,
+            "acceptedBlocks": 1641,
+            "queueHighWater": 4,
+            "queuedBlocks": 0
+          }
+        ]
+      },
+      "options": {
+        "blockFrames": 512,
+        "poolBlocks": 4,
+        "generation": 1,
+        "delayFrames": 2048,
+        "bufferBytes": 32768
+      }
+    },
+    {
+      "profile": "medium",
+      "pass": false,
+      "rate": 96000,
+      "frames": 1680000,
+      "blocks": 3282,
+      "referenceBlockFrames": 1024,
+      "comparisonPolicy": "Exact normal-range f32 sample values. Differences are separately classified only when both values are zero/subnormal (abs < 2^-126), matching existing recursive-state flushing at render boundaries. Raw maxima/counts remain recorded; no general amplitude tolerance.",
+      "rawExact": false,
+      "maxAbs": 1.0951140492206124e-38,
+      "maxByBus": [
+        1.0374370248185422e-38,
+        1.0951140492206124e-38,
+        0,
+        8.390594051194708e-39,
+        1.000186447871242e-38,
+        0,
+        0,
+        1.3688920360388414e-39
+      ],
+      "normalRangeMaxAbs": 1.0489335576795559e-39,
+      "subnormalDifferences": 4608,
+      "firstDifference": {
+        "frame": 159232,
+        "bus": 0,
+        "channel": 0,
+        "actual": 0,
+        "expected": -1.0374370248185422e-38
+      },
+      "nonFinite": 0,
+      "rejectedPast": true,
+      "acceptedFuture": true,
+      "groups": [
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          6
+        ]
+      ],
+      "masterLevels": [
+        [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        [
+          11,
+          12,
+          13
+        ],
+        [
+          14
+        ],
+        [
+          15
+        ],
+        [
+          17
+        ],
+        [
+          18
+        ]
+      ],
+      "workers": [
+        {
+          "type": "stats",
+          "request": 99,
+          "generation": 1,
+          "sourceIds": [
+            1,
+            5
+          ],
+          "frame": 1680000,
+          "blocks": 3282,
+          "renderMs": 980.6327999999266,
+          "maxRenderMs": 0.8643000000010943,
+          "blockMsHistogramLog2Us": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            1219,
+            239,
+            1460,
+            363,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "rejectedEvents": 1,
+          "badRecycles": 0,
+          "freeBuffers": 4,
+          "inFlightBuffers": 0,
+          "graph": {
+            "frame": 1680000,
+            "late": 0,
+            "overflow": 0,
+            "applied": 34
+          },
+          "meters": {},
+          "memoryBytes": 2883584,
+          "roles": [
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 1680000,
+              "peak": 0,
+              "latencyFrames": 0,
+              "peakActive": 1
+            },
+            null,
+            null,
+            null,
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 1680000,
+              "peak": 0,
+              "latencyFrames": 7.5,
+              "peakActive": 2
+            },
+            null
+          ]
+        },
+        {
+          "type": "stats",
+          "request": 99,
+          "generation": 1,
+          "sourceIds": [
+            2,
+            3
+          ],
+          "frame": 1680000,
+          "blocks": 3282,
+          "renderMs": 3618.541300000499,
+          "maxRenderMs": 3.5309999999881256,
+          "blockMsHistogramLog2Us": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1000,
+            285,
+            0,
+            161,
+            1511,
+            324,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "rejectedEvents": 0,
+          "badRecycles": 0,
+          "freeBuffers": 4,
+          "inFlightBuffers": 0,
+          "graph": {
+            "frame": 1680000,
+            "late": 0,
+            "overflow": 0,
+            "applied": 162
+          },
+          "meters": {},
+          "memoryBytes": 2883584,
+          "roles": [
+            null,
+            {
+              "active": 0,
+              "steals": 14,
+              "dropped": 0,
+              "late": 0,
+              "frame": 1680000,
+              "peak": 0,
+              "latencyFrames": 7.5,
+              "peakActive": 8
+            },
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 1680000,
+              "peak": 0,
+              "latencyFrames": 0,
+              "peakActive": 2
+            },
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "type": "stats",
+          "request": 99,
+          "generation": 1,
+          "sourceIds": [
+            4,
+            6
+          ],
+          "frame": 1680000,
+          "blocks": 3282,
+          "renderMs": 2040.5255000005345,
+          "maxRenderMs": 1.8391999999948894,
+          "blockMsHistogramLog2Us": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            1184,
+            12,
+            1395,
+            690,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "rejectedEvents": 0,
+          "badRecycles": 0,
+          "freeBuffers": 4,
+          "inFlightBuffers": 0,
+          "graph": {
+            "frame": 1680000,
+            "late": 0,
+            "overflow": 0,
+            "applied": 91
+          },
+          "meters": {},
+          "memoryBytes": 4390912,
+          "roles": [
+            null,
+            null,
+            null,
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 1680000,
+              "peak": 0,
+              "latencyFrames": 0,
+              "peakActive": 8
+            },
+            null,
+            {
+              "active": 0,
+              "queued": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 1680000,
+              "peakActive": 4
+            }
+          ]
+        }
+      ],
+      "master": {
+        "frame": 1680000,
+        "late": 0,
+        "overflow": 0,
+        "applied": 0
+      },
+      "serial": {
+        "frame": 1680000,
+        "late": 0,
+        "overflow": 0,
+        "applied": 287
+      },
+      "queue": {
+        "deliveredFrames": 1680000,
+        "underrunFrames": 0,
+        "underrunQuanta": 0,
+        "recoveries": 0,
+        "groups": [
+          {
+            "deliveredFrames": 1680000,
+            "underrunFrames": 0,
+            "underrunQuanta": 0,
+            "recoveries": 0,
+            "lateBlocks": 0,
+            "staleGeneration": 0,
+            "rejectedBlocks": 0,
+            "acceptedBlocks": 3282,
+            "queueHighWater": 4,
+            "queuedBlocks": 0
+          },
+          {
+            "deliveredFrames": 1680000,
+            "underrunFrames": 0,
+            "underrunQuanta": 0,
+            "recoveries": 0,
+            "lateBlocks": 0,
+            "staleGeneration": 0,
+            "rejectedBlocks": 0,
+            "acceptedBlocks": 3282,
+            "queueHighWater": 4,
+            "queuedBlocks": 0
+          },
+          {
+            "deliveredFrames": 1680000,
+            "underrunFrames": 0,
+            "underrunQuanta": 0,
+            "recoveries": 0,
+            "lateBlocks": 0,
+            "staleGeneration": 0,
+            "rejectedBlocks": 0,
+            "acceptedBlocks": 3282,
+            "queueHighWater": 4,
+            "queuedBlocks": 0
+          }
+        ]
+      },
+      "options": {
+        "blockFrames": 512,
+        "poolBlocks": 4,
+        "generation": 1,
+        "delayFrames": 2048,
+        "bufferBytes": 32768
+      }
+    },
+    {
+      "profile": "short",
+      "pass": true,
+      "rate": 44100,
+      "frames": 771750,
+      "blocks": 3015,
+      "referenceBlockFrames": 1024,
+      "comparisonPolicy": "Exact normal-range f32 sample values. Differences are separately classified only when both values are zero/subnormal (abs < 2^-126), matching existing recursive-state flushing at render boundaries. Raw maxima/counts remain recorded; no general amplitude tolerance.",
+      "rawExact": false,
+      "maxAbs": 9.62969922476625e-39,
+      "maxByBus": [
+        8.112269551508977e-39,
+        0,
+        9.62969922476625e-39,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "normalRangeMaxAbs": 0,
+      "subnormalDifferences": 2048,
+      "firstDifference": {
+        "frame": 90880,
+        "bus": 0,
+        "channel": 0,
+        "actual": 0,
+        "expected": -8.112269551508977e-39
+      },
+      "nonFinite": 0,
+      "rejectedPast": true,
+      "acceptedFuture": true,
+      "groups": [
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          6
+        ]
+      ],
+      "masterLevels": [
+        [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        [
+          11,
+          12,
+          13
+        ],
+        [
+          14
+        ],
+        [
+          15
+        ],
+        [
+          17
+        ],
+        [
+          18
+        ]
+      ],
+      "workers": [
+        {
+          "type": "stats",
+          "request": 99,
+          "generation": 1,
+          "sourceIds": [
+            1,
+            5
+          ],
+          "frame": 771750,
+          "blocks": 3015,
+          "renderMs": 528.8400000000547,
+          "maxRenderMs": 2.947599999984959,
+          "blockMsHistogramLog2Us": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            299,
+            972,
+            1243,
+            496,
+            2,
+            2,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "rejectedEvents": 1,
+          "badRecycles": 0,
+          "freeBuffers": 4,
+          "inFlightBuffers": 0,
+          "graph": {
+            "frame": 771750,
+            "late": 0,
+            "overflow": 0,
+            "applied": 36
+          },
+          "meters": {},
+          "memoryBytes": 2883584,
+          "roles": [
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 771750,
+              "peak": 0,
+              "latencyFrames": 0,
+              "peakActive": 2
+            },
+            null,
+            null,
+            null,
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 771750,
+              "peak": 0,
+              "latencyFrames": 7.5,
+              "peakActive": 2
+            },
+            null
+          ]
+        },
+        {
+          "type": "stats",
+          "request": 99,
+          "generation": 1,
+          "sourceIds": [
+            2,
+            3
+          ],
+          "frame": 771750,
+          "blocks": 3015,
+          "renderMs": 1822.4367000001366,
+          "maxRenderMs": 2.2347000000008848,
+          "blockMsHistogramLog2Us": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            210,
+            900,
+            59,
+            131,
+            908,
+            806,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "rejectedEvents": 0,
+          "badRecycles": 0,
+          "freeBuffers": 4,
+          "inFlightBuffers": 0,
+          "graph": {
+            "frame": 771750,
+            "late": 0,
+            "overflow": 0,
+            "applied": 162
+          },
+          "meters": {},
+          "memoryBytes": 2883584,
+          "roles": [
+            null,
+            {
+              "active": 0,
+              "steals": 14,
+              "dropped": 0,
+              "late": 0,
+              "frame": 771750,
+              "peak": 0,
+              "latencyFrames": 7.5,
+              "peakActive": 8
+            },
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 771750,
+              "peak": 0,
+              "latencyFrames": 0,
+              "peakActive": 2
+            },
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "type": "stats",
+          "request": 99,
+          "generation": 1,
+          "sourceIds": [
+            4,
+            6
+          ],
+          "frame": 771750,
+          "blocks": 3015,
+          "renderMs": 1059.863000000958,
+          "maxRenderMs": 3.797500000015134,
+          "blockMsHistogramLog2Us": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            772,
+            292,
+            1210,
+            730,
+            8,
+            3,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "rejectedEvents": 0,
+          "badRecycles": 0,
+          "freeBuffers": 4,
+          "inFlightBuffers": 0,
+          "graph": {
+            "frame": 771750,
+            "late": 0,
+            "overflow": 0,
+            "applied": 91
+          },
+          "meters": {},
+          "memoryBytes": 3997696,
+          "roles": [
+            null,
+            null,
+            null,
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 771750,
+              "peak": 0,
+              "latencyFrames": 0,
+              "peakActive": 8
+            },
+            null,
+            {
+              "active": 0,
+              "queued": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 771750,
+              "peakActive": 4
+            }
+          ]
+        }
+      ],
+      "master": {
+        "frame": 771750,
+        "late": 0,
+        "overflow": 0,
+        "applied": 0
+      },
+      "serial": {
+        "frame": 771750,
+        "late": 0,
+        "overflow": 0,
+        "applied": 289
+      },
+      "queue": {
+        "deliveredFrames": 771750,
+        "underrunFrames": 0,
+        "underrunQuanta": 0,
+        "recoveries": 0,
+        "groups": [
+          {
+            "deliveredFrames": 771750,
+            "underrunFrames": 0,
+            "underrunQuanta": 0,
+            "recoveries": 0,
+            "lateBlocks": 0,
+            "staleGeneration": 0,
+            "rejectedBlocks": 0,
+            "acceptedBlocks": 3015,
+            "queueHighWater": 4,
+            "queuedBlocks": 0
+          },
+          {
+            "deliveredFrames": 771750,
+            "underrunFrames": 0,
+            "underrunQuanta": 0,
+            "recoveries": 0,
+            "lateBlocks": 0,
+            "staleGeneration": 0,
+            "rejectedBlocks": 0,
+            "acceptedBlocks": 3015,
+            "queueHighWater": 4,
+            "queuedBlocks": 0
+          },
+          {
+            "deliveredFrames": 771750,
+            "underrunFrames": 0,
+            "underrunQuanta": 0,
+            "recoveries": 0,
+            "lateBlocks": 0,
+            "staleGeneration": 0,
+            "rejectedBlocks": 0,
+            "acceptedBlocks": 3015,
+            "queueHighWater": 4,
+            "queuedBlocks": 0
+          }
+        ]
+      },
+      "options": {
+        "blockFrames": 256,
+        "poolBlocks": 4,
+        "generation": 1,
+        "delayFrames": 1024,
+        "bufferBytes": 16384
+      }
+    },
+    {
+      "profile": "short",
+      "pass": false,
+      "rate": 48000,
+      "frames": 840000,
+      "blocks": 3282,
+      "referenceBlockFrames": 1024,
+      "comparisonPolicy": "Exact normal-range f32 sample values. Differences are separately classified only when both values are zero/subnormal (abs < 2^-126), matching existing recursive-state flushing at render boundaries. Raw maxima/counts remain recorded; no general amplitude tolerance.",
+      "rawExact": false,
+      "maxAbs": 1.1506732912535485e-38,
+      "maxByBus": [
+        8.668754598960113e-39,
+        1.0118322190187063e-38,
+        7.792135910841651e-39,
+        8.538927098837347e-39,
+        1.1506732912535485e-38,
+        0,
+        0,
+        1.2647895731241507e-39
+      ],
+      "normalRangeMaxAbs": 1.0672289104297807e-39,
+      "subnormalDifferences": 4352,
+      "firstDifference": {
+        "frame": 96000,
+        "bus": 0,
+        "channel": 0,
+        "actual": 0,
+        "expected": -8.528670995376954e-39
+      },
+      "nonFinite": 0,
+      "rejectedPast": true,
+      "acceptedFuture": true,
+      "groups": [
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          6
+        ]
+      ],
+      "masterLevels": [
+        [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        [
+          11,
+          12,
+          13
+        ],
+        [
+          14
+        ],
+        [
+          15
+        ],
+        [
+          17
+        ],
+        [
+          18
+        ]
+      ],
+      "workers": [
+        {
+          "type": "stats",
+          "request": 99,
+          "generation": 1,
+          "sourceIds": [
+            1,
+            5
+          ],
+          "frame": 840000,
+          "blocks": 3282,
+          "renderMs": 1566.5084000002244,
+          "maxRenderMs": 17.40539999998873,
+          "blockMsHistogramLog2Us": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            2,
+            1146,
+            154,
+            1412,
+            303,
+            144,
+            79,
+            34,
+            6,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "rejectedEvents": 1,
+          "badRecycles": 0,
+          "freeBuffers": 4,
+          "inFlightBuffers": 0,
+          "graph": {
+            "frame": 840000,
+            "late": 0,
+            "overflow": 0,
+            "applied": 36
+          },
+          "meters": {},
+          "memoryBytes": 2883584,
+          "roles": [
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 840000,
+              "peak": 0,
+              "latencyFrames": 0,
+              "peakActive": 2
+            },
+            null,
+            null,
+            null,
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 840000,
+              "peak": 0,
+              "latencyFrames": 7.5,
+              "peakActive": 2
+            },
+            null
+          ]
+        },
+        {
+          "type": "stats",
+          "request": 99,
+          "generation": 1,
+          "sourceIds": [
+            2,
+            3
+          ],
+          "frame": 840000,
+          "blocks": 3282,
+          "renderMs": 3798.7588999995787,
+          "maxRenderMs": 17.139300000009825,
+          "blockMsHistogramLog2Us": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            1142,
+            96,
+            34,
+            197,
+            1480,
+            246,
+            66,
+            19,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "rejectedEvents": 0,
+          "badRecycles": 0,
+          "freeBuffers": 4,
+          "inFlightBuffers": 0,
+          "graph": {
+            "frame": 840000,
+            "late": 0,
+            "overflow": 0,
+            "applied": 162
+          },
+          "meters": {},
+          "memoryBytes": 2883584,
+          "roles": [
+            null,
+            {
+              "active": 0,
+              "steals": 14,
+              "dropped": 0,
+              "late": 0,
+              "frame": 840000,
+              "peak": 0,
+              "latencyFrames": 7.5,
+              "peakActive": 8
+            },
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 840000,
+              "peak": 0,
+              "latencyFrames": 0,
+              "peakActive": 2
+            },
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "type": "stats",
+          "request": 99,
+          "generation": 1,
+          "sourceIds": [
+            4,
+            6
+          ],
+          "frame": 840000,
+          "blocks": 3282,
+          "renderMs": 2033.5981999996875,
+          "maxRenderMs": 26.722000000008848,
+          "blockMsHistogramLog2Us": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            564,
+            578,
+            616,
+            1171,
+            263,
+            64,
+            17,
+            6,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "rejectedEvents": 0,
+          "badRecycles": 0,
+          "freeBuffers": 4,
+          "inFlightBuffers": 0,
+          "graph": {
+            "frame": 840000,
+            "late": 0,
+            "overflow": 0,
+            "applied": 91
+          },
+          "meters": {},
+          "memoryBytes": 3997696,
+          "roles": [
+            null,
+            null,
+            null,
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 840000,
+              "peak": 0,
+              "latencyFrames": 0,
+              "peakActive": 8
+            },
+            null,
+            {
+              "active": 0,
+              "queued": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 840000,
+              "peakActive": 4
+            }
+          ]
+        }
+      ],
+      "master": {
+        "frame": 840000,
+        "late": 0,
+        "overflow": 0,
+        "applied": 0
+      },
+      "serial": {
+        "frame": 840000,
+        "late": 0,
+        "overflow": 0,
+        "applied": 289
+      },
+      "queue": {
+        "deliveredFrames": 840000,
+        "underrunFrames": 0,
+        "underrunQuanta": 0,
+        "recoveries": 0,
+        "groups": [
+          {
+            "deliveredFrames": 840000,
+            "underrunFrames": 0,
+            "underrunQuanta": 0,
+            "recoveries": 0,
+            "lateBlocks": 0,
+            "staleGeneration": 0,
+            "rejectedBlocks": 0,
+            "acceptedBlocks": 3282,
+            "queueHighWater": 4,
+            "queuedBlocks": 0
+          },
+          {
+            "deliveredFrames": 840000,
+            "underrunFrames": 0,
+            "underrunQuanta": 0,
+            "recoveries": 0,
+            "lateBlocks": 0,
+            "staleGeneration": 0,
+            "rejectedBlocks": 0,
+            "acceptedBlocks": 3282,
+            "queueHighWater": 4,
+            "queuedBlocks": 0
+          },
+          {
+            "deliveredFrames": 840000,
+            "underrunFrames": 0,
+            "underrunQuanta": 0,
+            "recoveries": 0,
+            "lateBlocks": 0,
+            "staleGeneration": 0,
+            "rejectedBlocks": 0,
+            "acceptedBlocks": 3282,
+            "queueHighWater": 4,
+            "queuedBlocks": 0
+          }
+        ]
+      },
+      "options": {
+        "blockFrames": 256,
+        "poolBlocks": 4,
+        "generation": 1,
+        "delayFrames": 1024,
+        "bufferBytes": 16384
+      }
+    },
+    {
+      "profile": "short",
+      "pass": false,
+      "rate": 96000,
+      "frames": 1680000,
+      "blocks": 6563,
+      "referenceBlockFrames": 1024,
+      "comparisonPolicy": "Exact normal-range f32 sample values. Differences are separately classified only when both values are zero/subnormal (abs < 2^-126), matching existing recursive-state flushing at render boundaries. Raw maxima/counts remain recorded; no general amplitude tolerance.",
+      "rawExact": false,
+      "maxAbs": 1.1436481616623489e-38,
+      "maxByBus": [
+        1.0374370248185422e-38,
+        1.0951140492206124e-38,
+        1.008749782786731e-38,
+        1.0788058778226466e-38,
+        1.1436481616623489e-38,
+        0,
+        0,
+        1.3688920360388414e-39
+      ],
+      "normalRangeMaxAbs": 1.3484751174136288e-39,
+      "subnormalDifferences": 5888,
+      "firstDifference": {
+        "frame": 159232,
+        "bus": 0,
+        "channel": 0,
+        "actual": 0,
+        "expected": -1.0374370248185422e-38
+      },
+      "nonFinite": 0,
+      "rejectedPast": true,
+      "acceptedFuture": true,
+      "groups": [
+        [
+          1,
+          5
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          6
+        ]
+      ],
+      "masterLevels": [
+        [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        [
+          11,
+          12,
+          13
+        ],
+        [
+          14
+        ],
+        [
+          15
+        ],
+        [
+          17
+        ],
+        [
+          18
+        ]
+      ],
+      "workers": [
+        {
+          "type": "stats",
+          "request": 99,
+          "generation": 1,
+          "sourceIds": [
+            1,
+            5
+          ],
+          "frame": 1680000,
+          "blocks": 6563,
+          "renderMs": 2096.459700000065,
+          "maxRenderMs": 21.408900000009453,
+          "blockMsHistogramLog2Us": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1068,
+            1772,
+            180,
+            3016,
+            315,
+            116,
+            66,
+            25,
+            4,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "rejectedEvents": 1,
+          "badRecycles": 0,
+          "freeBuffers": 4,
+          "inFlightBuffers": 0,
+          "graph": {
+            "frame": 1680000,
+            "late": 0,
+            "overflow": 0,
+            "applied": 34
+          },
+          "meters": {},
+          "memoryBytes": 2883584,
+          "roles": [
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 1680000,
+              "peak": 0,
+              "latencyFrames": 0,
+              "peakActive": 1
+            },
+            null,
+            null,
+            null,
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 1680000,
+              "peak": 0,
+              "latencyFrames": 7.5,
+              "peakActive": 2
+            },
+            null
+          ]
+        },
+        {
+          "type": "stats",
+          "request": 99,
+          "generation": 1,
+          "sourceIds": [
+            2,
+            3
+          ],
+          "frame": 1680000,
+          "blocks": 6563,
+          "renderMs": 7545.750500000315,
+          "maxRenderMs": 32.32420000000275,
+          "blockMsHistogramLog2Us": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            975,
+            1504,
+            82,
+            75,
+            448,
+            2828,
+            471,
+            134,
+            34,
+            12,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "rejectedEvents": 0,
+          "badRecycles": 0,
+          "freeBuffers": 4,
+          "inFlightBuffers": 0,
+          "graph": {
+            "frame": 1680000,
+            "late": 0,
+            "overflow": 0,
+            "applied": 162
+          },
+          "meters": {},
+          "memoryBytes": 2883584,
+          "roles": [
+            null,
+            {
+              "active": 0,
+              "steals": 14,
+              "dropped": 0,
+              "late": 0,
+              "frame": 1680000,
+              "peak": 0,
+              "latencyFrames": 7.5,
+              "peakActive": 8
+            },
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 1680000,
+              "peak": 0,
+              "latencyFrames": 0,
+              "peakActive": 2
+            },
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "type": "stats",
+          "request": 99,
+          "generation": 1,
+          "sourceIds": [
+            4,
+            6
+          ],
+          "frame": 1680000,
+          "blocks": 6563,
+          "renderMs": 3460.6265999996976,
+          "maxRenderMs": 17.020199999999022,
+          "blockMsHistogramLog2Us": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1880,
+            500,
+            1311,
+            2453,
+            318,
+            69,
+            24,
+            6,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "rejectedEvents": 0,
+          "badRecycles": 0,
+          "freeBuffers": 4,
+          "inFlightBuffers": 0,
+          "graph": {
+            "frame": 1680000,
+            "late": 0,
+            "overflow": 0,
+            "applied": 91
+          },
+          "meters": {},
+          "memoryBytes": 4390912,
+          "roles": [
+            null,
+            null,
+            null,
+            {
+              "active": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 1680000,
+              "peak": 0,
+              "latencyFrames": 0,
+              "peakActive": 8
+            },
+            null,
+            {
+              "active": 0,
+              "queued": 0,
+              "steals": 0,
+              "dropped": 0,
+              "late": 0,
+              "frame": 1680000,
+              "peakActive": 4
+            }
+          ]
+        }
+      ],
+      "master": {
+        "frame": 1680000,
+        "late": 0,
+        "overflow": 0,
+        "applied": 0
+      },
+      "serial": {
+        "frame": 1680000,
+        "late": 0,
+        "overflow": 0,
+        "applied": 287
+      },
+      "queue": {
+        "deliveredFrames": 1680000,
+        "underrunFrames": 0,
+        "underrunQuanta": 0,
+        "recoveries": 0,
+        "groups": [
+          {
+            "deliveredFrames": 1680000,
+            "underrunFrames": 0,
+            "underrunQuanta": 0,
+            "recoveries": 0,
+            "lateBlocks": 0,
+            "staleGeneration": 0,
+            "rejectedBlocks": 0,
+            "acceptedBlocks": 6563,
+            "queueHighWater": 4,
+            "queuedBlocks": 0
+          },
+          {
+            "deliveredFrames": 1680000,
+            "underrunFrames": 0,
+            "underrunQuanta": 0,
+            "recoveries": 0,
+            "lateBlocks": 0,
+            "staleGeneration": 0,
+            "rejectedBlocks": 0,
+            "acceptedBlocks": 6563,
+            "queueHighWater": 4,
+            "queuedBlocks": 0
+          },
+          {
+            "deliveredFrames": 1680000,
+            "underrunFrames": 0,
+            "underrunQuanta": 0,
+            "recoveries": 0,
+            "lateBlocks": 0,
+            "staleGeneration": 0,
+            "rejectedBlocks": 0,
+            "acceptedBlocks": 6563,
+            "queueHighWater": 4,
+            "queuedBlocks": 0
+          }
+        ]
+      },
+      "options": {
+        "blockFrames": 256,
+        "poolBlocks": 4,
+        "generation": 1,
+        "delayFrames": 1024,
+        "bufferBytes": 16384
+      }
+    }
+  ],
+  "single": {
+    "pass": false,
+    "rate": 48000,
+    "frames": 840000,
+    "blocks": 3282,
+    "referenceBlockFrames": 1024,
+    "comparisonPolicy": "Exact normal-range f32 sample values. Differences are separately classified only when both values are zero/subnormal (abs < 2^-126), matching existing recursive-state flushing at render boundaries. Raw maxima/counts remain recorded; no general amplitude tolerance.",
+    "rawExact": false,
+    "maxAbs": 1.1506732912535485e-38,
+    "normalRangeMaxAbs": 1.0672289104297807e-39,
+    "subnormalDifferences": 4352,
+    "nonFinite": 0,
+    "rejectedPast": true,
+    "acceptedFuture": true,
+    "worker": {
+      "type": "stats",
+      "request": 99,
+      "generation": 1,
+      "sourceIds": null,
+      "frame": 840000,
+      "blocks": 3282,
+      "renderMs": 3543.2018000001262,
+      "maxRenderMs": 2.910200000012992,
+      "blockMsHistogramLog2Us": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        386,
+        855,
+        159,
+        1835,
+        46,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "rejectedEvents": 1,
+      "badRecycles": 0,
+      "freeBuffers": 4,
+      "inFlightBuffers": 0,
+      "graph": {
+        "frame": 840000,
+        "late": 0,
+        "overflow": 0,
+        "applied": 289
+      },
+      "meters": {
+        "17": {
+          "inputPeak": 0,
+          "keyPeak": 1.7796490496925177e-43,
+          "reductionDb": 3.731329174323642e-29,
+          "outputPeak": 0,
+          "missingKey": 0,
+          "externalKey": 1
+        }
+      },
+      "memoryBytes": 5177344,
+      "roles": [
+        {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 2
+        },
+        {
+          "active": 0,
+          "steals": 14,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "peak": 0,
+          "latencyFrames": 7.5,
+          "peakActive": 8
+        },
+        {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 2
+        },
+        {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 8
+        },
+        {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "peak": 0,
+          "latencyFrames": 7.5,
+          "peakActive": 2
+        },
+        {
+          "active": 0,
+          "queued": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 840000,
+          "peakActive": 4
+        }
+      ]
+    },
+    "options": {
+      "blockFrames": 256,
+      "poolBlocks": 4,
+      "generation": 1,
+      "delayFrames": 1024,
+      "bufferBytes": 16384
+    }
+  }
+}

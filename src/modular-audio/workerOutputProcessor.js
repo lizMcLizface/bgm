@@ -1,9 +1,10 @@
 import {ReferenceGraph} from './runtime.js';
 import {workerOptions,WorkerPcmQueue,sourceViews,graphSnapshot} from './workerProtocol.js';
+import {ProcessTiming} from './processTiming.js';
 
 class WorkerOutput extends AudioWorkletProcessor {
   constructor({processorOptions:p}) {
-    super();this.stopped=false;this.outputFrame=0;this.sourceFrame=0;this.primed=false;
+    super();this.stopped=false;this.outputFrame=0;this.sourceFrame=0;this.primed=false;this.timing=new ProcessTiming();
     try{
       this.o=workerOptions(p.options);this.end=p.endFrame;this.mode=p.mode;
       if(!Number.isSafeInteger(this.end+this.o.delayFrames)||this.end<1||!['worker','serial'].includes(this.mode))throw Error('Invalid worker output');
@@ -19,10 +20,11 @@ class WorkerOutput extends AudioWorkletProcessor {
     }catch(e){this.fail(e);}
   }
   fail(e){this.stopped=true;this.port.postMessage({type:'error',message:String(e)});}
-  stats(){this.port.postMessage({type:'stats',mode:this.mode,generation:this.o.generation,outputFrame:this.outputFrame,sourceFrame:this.sourceFrame,delayFrames:this.o.delayFrames,queue:this.queue?{...this.queue.counters,queuedBlocks:this.queue.count}:null,serial:this.g?graphSnapshot(this.g):null});}
+  stats(){this.port.postMessage({type:'stats',mode:this.mode,generation:this.o.generation,outputFrame:this.outputFrame,sourceFrame:this.sourceFrame,delayFrames:this.o.delayFrames,processTiming:this.timing.snapshot(),queue:this.queue?{...this.queue.counters,queuedBlocks:this.queue.count}:null,serial:this.g?graphSnapshot(this.g):null});}
   process(_inputs,outputs){
     // The worklet never waits for the worker, executes a catch-up render, or
     // replays an old block. A missing span is silent and advances source time.
+    const started=this.timing.start(),quantum=outputs[0]?.[0]?.length??0;
     for(const bus of outputs)for(const ch of bus)ch.fill(0);
     if(this.stopped)return false;
     try{
@@ -40,7 +42,7 @@ class WorkerOutput extends AudioWorkletProcessor {
       this.outputFrame+=length;
       if(this.sourceFrame>=this.end){this.stopped=true;this.stats();this.port.postMessage({type:'finished'});return false;}
       return true;
-    }catch(e){this.fail(e);return false;}
+    }catch(e){this.fail(e);return false;}finally{this.timing.stop(started,quantum,sampleRate);}
   }
 }
 registerProcessor('calmbgm-worker-output',WorkerOutput);

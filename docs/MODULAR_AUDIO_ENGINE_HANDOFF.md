@@ -5,10 +5,11 @@ step, then continue**. This authorizes local commits of verified steps without
 another confirmation. Keep the existing checkout and work; no push/deployment
 is authorized. Record verification, limitations and the next task in each step.
 
-Prepared and implemented through opt-in M3f source worker pool on 2026-11-09. Read the working tree, this file and
+Prepared and implemented through opt-in M3g buffering profiles on 2026-11-09. Read the working tree, this file and
 [MODULAR_AUDIO_ENGINE_PLAN.md](MODULAR_AUDIO_ENGINE_PLAN.md) first. This is an
 implementation handoff. **M0/M1, owned percussion/sidechain M2 and the actual
-six-role M3a baseline, M3b owned FM, M3c owned core, M3d pitched DAG, M3e single-worker transport and M3f three-worker source pool now exist.** Read
+six-role M3a baseline, M3b owned FM, M3c owned core, M3d pitched DAG, M3e single-worker transport, M3f source pool and M3g buffering profiles now exist.** Read
+[profile contracts and measurements](MODULAR_AUDIO_ENGINE_M3G_BUFFER_PROFILES.md),
 [three-worker contracts and evidence](MODULAR_AUDIO_ENGINE_M3F_SOURCE_POOL.md),
 [bounded worker contracts and evidence](MODULAR_AUDIO_ENGINE_M3E_WORKER.md),
 [pitched DAG contracts and evidence](MODULAR_AUDIO_ENGINE_M3D_PITCHED_DAG.md),
@@ -23,7 +24,7 @@ The user subsequently requested **commit then continue**. Completed work through
 M3c was committed locally as **`bc4e35d`**, `Add owned modular audio foundations
 and six-source harness`. The later request **commit and keep iterating** committed
 M3d locally as **`fa634f5`**, `Integrate six owned sources into the Rust audio DAG`.
-M3e was then committed locally as **`646183d`**. Each completed verified step
+M3e was then committed locally as **`646183d`**, M3f as **`714ce43`**. Each completed verified step
 now ends with a local commit under the user's standing instruction; consult
 the final checkpoint and local Git log. No push/deployment.
 Earlier statements below about no commit describe their historical checkpoints.
@@ -1241,3 +1242,120 @@ sample-exact sources/master, owner-local controls, coherent key dependency and
 serial startup fallback. Shared-memory hosting/capability, distributed owner
 transactions, adaptive repartitioning and broad desk migration remain separate
 tasks. Do not claim background/mobile headroom or chase screen-lock crackling.
+
+## M3g delivery checkpoint (2026-11-09)
+
+Started from clean M3f commit **`714ce43`**. Under the standing user instruction,
+this verified step ends with a local commit; consult local Git log for its ID.
+No push/deployment. Read
+[M3g profiles and exact measurement scopes](MODULAR_AUDIO_ENGINE_M3G_BUFFER_PROFILES.md).
+
+### Implemented and checked
+
+- Same 4175 worker harness adds three explicit profiles: **1024×4 = 4096 frames**
+  (unchanged default), **512×4 = 2048**, **256×4 = 1024**. At 48 kHz added
+  buffering is **85.33 / 42.67 / 21.33 ms**, with **786,432 / 393,216 /
+  196,608 PCM bytes** for three workers. Source groups, program/key/master,
+  score, intrinsic latency and production/workbench defaults are unchanged.
+  Serial startup fallback preserves the selected profile's delay.
+- `bufferProfiles.js` owns choices, bounded schedule and versioned session
+  validation. Explicit Save/Load stores pinned fixture + profile + rate;
+  fresh reload stays stopped at default/48 kHz. Fixture-only legacy storage
+  remains readable. Ports/worker/engine state are not persisted.
+- Profile measurement uses the fixed three-worker plan/full 17.5 s score:
+  one warmup/profile, then three measured repeats/profile in rotated order
+  (default/medium/short, medium/short/default, short/default/medium). Raw warmups,
+  failures, incomplete runs, misses, visibility/changes and fallback remain.
+  Summaries exclude warmups; fallback is not a pool result. Stop cancels the
+  remaining schedule. Initial selector settings restore after the batch.
+- `profileMetrics.js` checks complete output **and source/master DSP clocks /
+  event totals**, rather than accepting sampled audio or output-clock completion
+  alone. Table shows passed/attempted, missed/incomplete runs, silent frames,
+  expired blocks and clock availability. Preparation wall time and actual Wasm /
+  PCM capacities are separate from worker render+copy timings.
+- Optional `ProcessTiming` uses a prepared 32-bin histogram only when the
+  worklet has a functioning monotonic performance.now(). Absent/failed clocks
+  report **available=false and null durations/counts**, not zero CPU. Failure
+  does not affect audio. Body wall time includes observation/copy/DSP/preemption;
+  it is not scheduling lateness, CPU utilization or physical device underruns.
+  Worker histograms exclude dispatch/postMessage/queue wait and Rust master;
+  quantiles are bucket upper bounds. JS/transport allocation remains real.
+- Event render-ahead capacity is explicit in metadata. Live events must target
+  the owning worker's next unrendered frame; smaller capacity is not a guaranteed
+  MIDI lead time because dispatch can advance that boundary. Owner locality,
+  past rejection, coherent silence/drop/recovery and generation lifecycle remain.
+- Full suite **384 files / 2,749 tests passed**, **126.61 s**:
+  `.tmp/modular-audio-m3g-suite.log`. Includes full 48 kHz profile scores,
+  three-rate controls, independent medium/short instances, selected-delay
+  fallback, session validation, rotated schedule, incomplete/failure assessment,
+  histogram bounds and clock absence/failure. Old legacy/SIMD/acoustic/FM-bank
+  and M1–M3f tests stay active. Public build/package/bank/exclusion checks pass;
+  existing chunk advisory. Rust/legacy DSP bytes unchanged; no native runner
+  bypassed Application Control.
+- Runtime **`1c3863ec8913dbd8`**; graph still **296,101 bytes**, SHA256
+  `a5c3d4b70b57d63094d84fe539d2ec0effe30d5eea5fc59034fbb9a1ff462293`.
+
+### PCM qualification and persistence evidence
+
+- `m3g-profile-pcm.json` / `m3g-browser-profile-pcm.json`: **nine full-score
+  profile/rate combinations** on real Node/browser three-worker pools, all
+  **eight stereo buses raw-equal against original same-cadence serial PCM**,
+  sameCadenceMaxAbs 0, nonfinite 0. Fixed-frame 32768 future cancellation and
+  rejection of past/lookahead events pass. Node also checks full short-profile
+  single-worker 48 kHz; separate tests prove independent profile generations.
+- A second fixed-1024 reference is retained as a cross-cadence diagnostic.
+  Existing core/FM `denormal::flush` zeros recursive DC state at render
+  boundaries, so different cadences produce different subnormal tails. Those
+  differences also propagate into final normal-valued mix samples. Largest
+  observed raw difference **1.1506732912535485e-38**, propagated master difference
+  **1.3484751174136288e-39**; source normal-range difference 0 in these cases.
+  Default/fixed-cadence raw maximum is 0. No old golden or DSP algorithm changed.
+- `m3g-raw-cross-cadence-diagnostic.json` and `m3g-cross-cadence-pcm.json` retain
+  the initial **failed** raw/classification checks. Only descriptive metadata
+  was clarified; values/pass flags are unchanged. The final acceptance is
+  strict raw same-cadence equality, **not an amplitude tolerance**. Do not claim
+  raw-bit-exact smaller-profile output across different render cadences.
+- `m3g-short-fallback.json`: requested pool / actual serial at short/48 kHz,
+  **1024-frame / 21.33 ms** buffering, six source peaks nonzero, **840,000 /
+  357 events**, full completion/event checks. Worklet timing unavailable, all
+  duration/count fields null. `m3g-session-reload.json`: fixture-only legacy
+  load, saved short/96 kHz session, fresh default/48 kHz reload and explicit
+  stopped restore of short/96 kHz verified through visible UI.
+
+### Repeated live profile results
+
+`reports/modular_audio/m3g-live-profiles-48000.json`, same 4175 preview, Chrome
+157, non-isolated. Full heavy checks/PCM verification finished before the batch;
+external system load not controlled. All 12 rows have document visible at
+start/end with no visibility changes.
+
+- **3 warmups + 9 measured runs**, all pass. Per profile **3/3** measured passes,
+  **zero transport misses / expired blocks / incomplete DSP**, no substituted
+  fallback, **840,000 frames / 357 events**, all six peaks/main nonzero and
+  expected FM steals, no reported Rust late/drop/overflow. Selectors restore
+  **default / 48 kHz, stopped** and the completed table stays visible.
+- Buffering **85.33 / 42.67 / 21.33 ms**. Wasm capacities **11,599,872 /
+  11,468,800 / 11,468,800 bytes** plus PCM **786,432 / 393,216 / 196,608**.
+  These exclude JS/code/browser overhead. Default remains unchanged.
+- Source-worker p95 upper-bound buckets (groups 0/1/2): default **4.096 / 8.192 /
+  4.096 ms**, medium **2.048 / 4.096 / 2.048**, short **1.024 / 2.048 / 1.024**.
+  Maxima: default **3.6 / 6.4 / 4.4**, medium **2.1 / 4.2 / 2.0**, short
+  **1.2 / 2.5 / 1.7 ms**. Different-sized tasks, excluding transport/master /
+  scheduling; not a speedup or callback-margin result. Median preparation wall
+  ms **121.5 / 131.2 / 123.0**, only three samples each.
+- Worklet clock **unavailable in every row**; duration and over-quantum values
+  null. Physical output/device underruns and CPU attribution are not measured.
+  Three successful foreground desktop trials/profile do not establish phone /
+  background headroom. Screenshot `.tmp/modular-audio-m3g-browser.png`.
+
+### Next task after M3g
+
+Add bounded **contiguous queue-lead** watermarks/histograms in source frames
+at quantum boundaries, per worker and coherent minimum, across the same profiles.
+This measures actual buffering margin without a worklet wall clock; zero misses
+alone does not show how near starvation a run came. Keep defaults conservative
+until target-device evidence supports changing them. Shared-memory hosting /
+capability, distributed owner transactions, repartitioning and broad desk
+migration remain separate. Preserve coherent key/program dependencies, strict
+same-cadence PCM and honest cross-cadence/failure diagnostics. Do not infer
+speedup from unlike timer scopes or investigate locked-phone crackling here.

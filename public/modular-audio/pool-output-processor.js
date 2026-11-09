@@ -179,6 +179,47 @@ var AlignedSourcePool = class {
   }
 };
 
+// src/modular-audio/processTiming.js
+var ProcessTiming = class {
+  constructor(clock = globalThis.performance) {
+    this.clock = typeof clock?.now === "function" ? clock : null;
+    this.calls = 0;
+    this.totalMs = 0;
+    this.maxMs = 0;
+    this.overQuantumPeriod = 0;
+    this.bins = new Uint32Array(32);
+  }
+  start() {
+    if (!this.clock) return 0;
+    try {
+      return this.clock.now();
+    } catch {
+      this.clock = null;
+      return 0;
+    }
+  }
+  stop(start, frames, rate) {
+    if (!this.clock) return;
+    try {
+      const ms = this.clock.now() - start;
+      if (!Number.isFinite(ms) || ms < 0) {
+        this.clock = null;
+        return;
+      }
+      this.calls++;
+      this.totalMs += ms;
+      this.maxMs = Math.max(this.maxMs, ms);
+      if (ms > frames / rate * 1e3) this.overQuantumPeriod++;
+      this.bins[Math.min(31, Math.max(0, Math.ceil(Math.log2(Math.max(1, ms * 1e3)))))]++;
+    } catch {
+      this.clock = null;
+    }
+  }
+  snapshot() {
+    return { available: !!this.clock, scope: "process() wall time including copy/DSP and preemption; not callback scheduling, CPU utilization or device underruns", reason: this.clock ? null : "Monotonic performance.now() is unavailable or failed in this worklet", calls: this.clock ? this.calls : null, totalMs: this.clock ? this.totalMs : null, maxMs: this.clock ? this.maxMs : null, overQuantumPeriod: this.clock ? this.overQuantumPeriod : null, histogramLog2Us: this.clock ? Array.from(this.bins) : null };
+  }
+};
+
 // src/modular-audio/poolOutputProcessor.js
 var PoolOutput = class extends AudioWorkletProcessor {
   constructor({ processorOptions: p }) {
@@ -187,6 +228,7 @@ var PoolOutput = class extends AudioWorkletProcessor {
     this.frame = 0;
     this.outputFrame = 0;
     this.primed = false;
+    this.timing = new ProcessTiming();
     try {
       this.o = workerOptions(p.options);
       this.end = p.endFrame;
@@ -243,9 +285,10 @@ var PoolOutput = class extends AudioWorkletProcessor {
     this.port.postMessage({ type: "error", message: String(e) });
   }
   stats() {
-    this.port.postMessage({ type: "stats", mode: "pool", generation: this.o.generation, sourceFrame: this.frame, outputFrame: this.outputFrame, delayFrames: this.o.delayFrames, queue: this.pool.stats(), master: graphSnapshot(this.g, []) });
+    this.port.postMessage({ type: "stats", mode: "pool", generation: this.o.generation, sourceFrame: this.frame, outputFrame: this.outputFrame, delayFrames: this.o.delayFrames, processTiming: this.timing.snapshot(), queue: this.pool.stats(), master: graphSnapshot(this.g, []) });
   }
   process(_inputs, outputs) {
+    const started = this.timing.start(), quantum = outputs[0]?.[0]?.length ?? 0;
     for (const bus of outputs) for (const ch of bus) ch.fill(0);
     if (this.stopped) return false;
     try {
@@ -268,6 +311,8 @@ var PoolOutput = class extends AudioWorkletProcessor {
     } catch (e) {
       this.fail(e);
       return false;
+    } finally {
+      this.timing.stop(started, quantum, sampleRate);
     }
   }
 };

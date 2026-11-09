@@ -73,7 +73,8 @@
     "audit:synth-reference": "npm run synths:check && vite-node tools/matchSynthReference.mjs",
     "graph:audit-worker": "vite-node tools/auditGraphWorker.mjs",
     "graph:audit-pool": "vite-node tools/auditGraphPool.mjs",
-    "graph:audit-pool-alloc": "vite-node tools/auditGraphPoolAlloc.mjs"
+    "graph:audit-pool-alloc": "vite-node tools/auditGraphPoolAlloc.mjs",
+    "graph:audit-profiles": "vite-node tools/auditGraphProfiles.mjs"
   },
   "dependencies": {
     "fflate": "^0.8.3",

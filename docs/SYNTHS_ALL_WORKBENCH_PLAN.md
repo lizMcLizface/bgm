@@ -27,7 +27,10 @@ fallback. [M3f source pool](MODULAR_AUDIO_ENGINE_M3F_SOURCE_POOL.md) now partiti
 the six sources across three workers with a dependent Rust master and coherent
 publication. General distribution and broad workbench migration remain later.
 Foundation through M3c committed locally as `bc4e35d`, M3d as `fa634f5`, M3e as
-`646183d`; every completed step now ends with a local commit. No push/deployment.
+`646183d`, M3f as `714ce43`; every completed step ends with a local commit.
+[M3g buffering profiles](MODULAR_AUDIO_ENGINE_M3G_BUFFER_PROFILES.md) adds
+experimental smaller delays and repeated measurement/session persistence in
+the opt-in harness. Default buffering and All routes stay unchanged. No push/deployment.
 
 ## 1. Establish the playback and persistence contract
 

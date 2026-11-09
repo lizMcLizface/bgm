@@ -1,10 +1,11 @@
 import {ReferenceGraph} from './runtime.js';
 import {workerOptions,graphSnapshot} from './workerProtocol.js';
 import {AlignedSourcePool} from './poolProtocol.js';
+import {ProcessTiming} from './processTiming.js';
 
 class PoolOutput extends AudioWorkletProcessor {
   constructor({processorOptions:p}){
-    super();this.stopped=false;this.frame=0;this.outputFrame=0;this.primed=false;
+    super();this.stopped=false;this.frame=0;this.outputFrame=0;this.primed=false;this.timing=new ProcessTiming();
     try{
       this.o=workerOptions(p.options);this.end=p.endFrame;this.groups=p.groups;
       if(!Number.isSafeInteger(this.end+this.o.delayFrames)||this.end<1||this.groups.length<2||this.groups.length>6)throw Error('Invalid pool output');
@@ -26,8 +27,9 @@ class PoolOutput extends AudioWorkletProcessor {
     }catch(e){this.fail(e);}
   }
   fail(e){this.stopped=true;this.port.postMessage({type:'error',message:String(e)});}
-  stats(){this.port.postMessage({type:'stats',mode:'pool',generation:this.o.generation,sourceFrame:this.frame,outputFrame:this.outputFrame,delayFrames:this.o.delayFrames,queue:this.pool.stats(),master:graphSnapshot(this.g,[])});}
+  stats(){this.port.postMessage({type:'stats',mode:'pool',generation:this.o.generation,sourceFrame:this.frame,outputFrame:this.outputFrame,delayFrames:this.o.delayFrames,processTiming:this.timing.snapshot(),queue:this.pool.stats(),master:graphSnapshot(this.g,[])});}
   process(_inputs,outputs){
+    const started=this.timing.start(),quantum=outputs[0]?.[0]?.length??0;
     for(const bus of outputs)for(const ch of bus)ch.fill(0);if(this.stopped)return false;
     try{
       const length=outputs[0]?.[0]?.length??0,at=Math.min(length,Math.max(0,this.o.delayFrames-this.outputFrame)),n=Math.min(length-at,this.end-this.frame);
@@ -40,7 +42,7 @@ class PoolOutput extends AudioWorkletProcessor {
         this.frame+=n;
       }
       this.outputFrame+=length;if(this.frame>=this.end){this.stopped=true;this.stats();this.port.postMessage({type:'finished'});return false;}return true;
-    }catch(e){this.fail(e);return false;}
+    }catch(e){this.fail(e);return false;}finally{this.timing.stop(started,quantum,sampleRate);}
   }
 }
 registerProcessor('calmbgm-pool-output',PoolOutput);

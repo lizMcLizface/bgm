@@ -1,0 +1,11 @@
+import fs from 'node:fs';
+import {verifyPool} from '../src/modular-audio/poolVerification.js';
+import {verifyWorker} from '../src/modular-audio/workerVerification.js';
+import {BUFFER_PROFILES,profileOptions} from '../src/modular-audio/bufferProfiles.js';
+import {BrowserThreadWorker,MessageChannel} from './workerNodeAdapter.mjs';
+globalThis.MessageChannel=MessageChannel;
+const manifest=JSON.parse(fs.readFileSync('public/modular-audio/build.json')),assets={fixture:JSON.parse(fs.readFileSync('public/modular-audio/six-role-fixture.json')),contracts:JSON.parse(fs.readFileSync('public/modular-audio/contracts.json')),modules:{graph:new WebAssembly.Module(fs.readFileSync('public/modular-audio/graph.wasm'))}},rows=[];
+for(const profile of BUFFER_PROFILES)for(const rate of [44100,48000,96000])rows.push({profile:profile.id,...await verifyPool(assets,rate,{options:profileOptions(profile.id),makeWorker:()=>new BrowserThreadWorker()})});
+const single=await verifyWorker(assets,48000,{options:profileOptions('short'),makeWorker:()=>new BrowserThreadWorker()});
+const report={pass:rows.every(r=>r.pass)&&single.pass,graphVersion:manifest.version,fixtureId:assets.fixture.id,scope:'Three profiles × three rates, full-score threaded pools; exact raw PCM on eight buses against the original serial graph at the selected cadence. Fixed-1024 reference diagnostics retain subnormal-flush and propagated mix differences. Fixed-frame cancellation/lookahead rejection and short single-worker check. Consumer-paced, no real-time performance claim.',rows,single};
+fs.writeFileSync('reports/modular_audio/m3g-profile-pcm.json',JSON.stringify(report,null,2)+'\n');if(!report.pass)throw Error('Profile PCM verification failed');console.log('Nine full-score profile/rate pools plus short single-worker check pass exact same-cadence PCM/control; cross-cadence diagnostics retained.');

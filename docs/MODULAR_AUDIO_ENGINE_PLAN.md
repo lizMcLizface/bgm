@@ -2,7 +2,8 @@
 
 Agreed direction: 2026-11-09. Status: **M0/M1, the opt-in M2 percussion/sidechain
 slice, M3a's actual six-role serial baseline, M3b owned FM, M3c owned core,
-M3d pitched DAG, M3e bounded single-worker transport and M3f three-worker source pool delivered**.
+M3d pitched DAG, M3e bounded single-worker transport, M3f three-worker source pool
+and M3g opt-in buffering profiles delivered**.
 All six source engines have owned mutable Rust state; core's read-only additive
 tables are safely shared after preparation. External stereo host inputs and
 graph program/key compression exist. All six sources now also run inside one
@@ -11,8 +12,9 @@ dedicated worker with bounded PCM publication and serial startup fallback.
 M3f partitions the sources across three workers and keeps the dependent Rust
 master in the worklet. General graph distribution and workbench migration remain
 future work. Foundation through M3c committed locally as `bc4e35d`, M3d as
-`fa634f5`, M3e as `646183d`. Each completed verified step is committed locally
+`fa634f5`, M3e as `646183d`, M3f as `714ce43`. Each completed verified step is committed locally
 under the user's standing instruction. No push/deployment.
+See [profile contracts and measurements](MODULAR_AUDIO_ENGINE_M3G_BUFFER_PROFILES.md).
 See [three-worker contracts and evidence](MODULAR_AUDIO_ENGINE_M3F_SOURCE_POOL.md).
 See [bounded worker contracts and evidence](MODULAR_AUDIO_ENGINE_M3E_WORKER.md).
 See [pitched DAG contracts and evidence](MODULAR_AUDIO_ENGINE_M3D_PITCHED_DAG.md).
@@ -640,6 +642,33 @@ workload and fixed plan, retaining conservative defaults, misses and memory/
 event-lead costs. Separate worker task timings from worklet/device timing and
 mark unavailable scopes. Shared-memory hosting, distributed-owner transactions,
 adaptive partitioning and broad desk migration remain separate decisions.
+
+### M3g delivery: measured opt-in buffering profiles (2026-11-09)
+
+See [profiles and complete evidence](MODULAR_AUDIO_ENGINE_M3G_BUFFER_PROFILES.md).
+Default 4096 frames stays unchanged; opt-in 2048/1024-frame profiles add
+42.67/21.33 ms at 48 kHz with the same groups/source/master. Session Save/Load
+restores profile/rate explicitly while fresh reload stays default and stopped.
+Fallback preserves selected delay; event lead remains worker-boundary based.
+
+- Real Node/browser verification: nine full-score profile/rate cases match all
+  eight raw stereo buses against the original **same-cadence** serial graph.
+  Fixed-1024 diagnostics retain existing denormal-flush tail differences and
+  propagated master residuals; failed initial checks remain failed artifacts.
+  No DSP, old golden or amplitude tolerance was changed to force a pass.
+- **384 files / 2,749 tests passed**, 126.61 s; public build/package checks pass.
+  Rust/Wasm DSP bytes unchanged. Optional worklet timing reports unavailable
+  clocks with null values; source histograms have explicit CPU scopes/bounds.
+- Live fixed-plan **3 warmups + 9 rotated measured trials** after heavy checks:
+  **3/3 measured passes/profile**, zero misses/expired blocks/incomplete DSP,
+  full 840,000 frames/357 events, all six source activity, visible document.
+  Smallest profile works here at 21.33 ms added buffering; defaults stay unchanged.
+  No phone/background/device-underrun or speedup claim follows from this sample.
+
+**Next: contiguous source-frame queue-lead watermarks/histograms** at quantum
+boundaries, per worker and coherent minimum, to quantify buffering margin with
+the same profiles even without a worklet clock. Keep transport changes, shared
+memory/hosting, distributed controls and broad desk migration separate.
 
 ### Sidechain acceptance retained for workbench integration
 

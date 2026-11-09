@@ -42,7 +42,7 @@ export async function createPoolRoute(context,assets,patch,{options={},groups,fo
       node.port.postMessage({type:'connect',group,port:channel.port2},[channel.port2]);
       worker.postMessage({type:'init',module:assets.modules.graph,contracts:assets.contracts,patch:plan.sources[group],sourceIds,rate:context.sampleRate,endFrame:end,options:o,port:channel.port1},[channel.port1]);
     }))));await deadline(primed);
-    return {node,end,options:o,executor:{requested:'pool',actual:'pool',workers:workers.length,groups:plan.groups,masterLevels:plan.levels,bufferingLatencyFrames:o.delayFrames,bufferingLatencyMs:o.delayFrames/context.sampleRate*1000,pcmPoolBytes:o.bufferBytes*o.poolBlocks*workers.length,transport:`${workers.length} independent worker PCM pools; Rust master in worklet`,fallbackReason:null},
+    return {node,end,options:o,executor:{requested:'pool',actual:'pool',workers:workers.length,groups:plan.groups,masterLevels:plan.levels,blockFrames:o.blockFrames,poolBlocks:o.poolBlocks,renderAheadCapacityFrames:o.delayFrames,bufferingLatencyFrames:o.delayFrames,bufferingLatencyMs:o.delayFrames/context.sampleRate*1000,pcmPoolBytes:o.bufferBytes*o.poolBlocks*workers.length,transport:`${workers.length} independent worker PCM pools; Rust master in worklet`,fallbackReason:null},
       check(){if(error)throw Error(error);},
       async stats(){
         if(pending.has('output')||pending.size+workers.length+1>64)throw Error('Pool stats already pending or control capacity exceeded');

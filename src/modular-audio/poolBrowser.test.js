@@ -4,6 +4,7 @@ import {it,expect,vi,afterEach} from 'vitest';
 import {MessageChannel} from 'node:worker_threads';
 import {createPoolRoute} from './poolBrowser';
 import {sixSourceDag} from './pitchedFixture';
+import {profileOptions,profileDetails} from './bufferProfiles';
 const assets={fixture:JSON.parse(fs.readFileSync('public/modular-audio/six-role-fixture.json')),contracts:JSON.parse(fs.readFileSync('public/modular-audio/contracts.json')),modules:{},manifest:{version:'test'}};
 afterEach(()=>{vi.useRealTimers();vi.unstubAllGlobals();});
 function setup(failAt=0){
@@ -21,3 +22,4 @@ it('constructs exactly three source workers and a dependent Rust master with loc
 it.each(['forced','partial-startup'])('disposes partial resources and exposes serial fallback for %s',async scenario=>{
   const s=setup(scenario==='partial-startup'?2:0),route=await createPoolRoute(s.context,assets,sixSourceDag(assets.fixture,48000),{forceFallback:scenario==='forced'});try{expect(route.executor).toMatchObject({requested:'pool',actual:'serial',workers:0,bufferingLatencyFrames:4096});expect(route.executor.fallbackReason).toMatch(scenario==='forced'?/explicitly/:/unavailable/);expect(route.node.name).toBe('calmbgm-worker-output');expect(s.workers.every(w=>w.terminate.mock.calls.length===1)).toBe(true);}finally{route.dispose();vi.runAllTimers();}
 });
+it.each(['medium','short'])('preserves the selected %s delay through pool startup fallback',async profile=>{const s=setup(),options=profileOptions(profile),route=await createPoolRoute(s.context,assets,sixSourceDag(assets.fixture,48000),{forceFallback:true,options});try{expect(route.executor.actual).toBe('serial');expect(route.executor.bufferingLatencyFrames).toBe(profileDetails(profile,48000).delayFrames);expect(route.node.options.processorOptions.options.blockFrames).toBe(options.blockFrames);}finally{route.dispose();vi.runAllTimers();}});

@@ -28,7 +28,10 @@ now adds a bounded source partition with coherent frame publication and a
 dependent Rust master in the worklet. General distribution and desk migration
 remain future work. Foundation through M3c committed locally as `bc4e35d`, M3d
 as `fa634f5`, M3e as `646183d`; every completed step now ends with a local
-commit. No push/deployment.
+commit. [M3g buffering profiles](MODULAR_AUDIO_ENGINE_M3G_BUFFER_PROFILES.md) adds
+explicit smaller opt-in delays, repeated delivery measurements and session
+persistence; default buffering and desk routes remain unchanged. M3f checkpoint:
+`714ce43`. No push/deployment.
 
 ## Next phase: sidechain and device connection contract (2026-11-09)
 

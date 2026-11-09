@@ -48,7 +48,7 @@ export async function createWorkerRoute(context,assets,patch,{mode='worker',opti
       }catch(e){fallbackReason=String(e);discard();worker=null;channel=null;error=null;actual='serial';await withTimeout(makeNode('serial').ready);}
     }else if(mode==='serial')await withTimeout(makeNode('serial').ready);
     else throw Error('Invalid executor mode');
-    return {node,end,options:o,executor:{requested:mode,actual,fallbackReason,bufferingLatencyFrames:o.delayFrames,bufferingLatencyMs:o.delayFrames/context.sampleRate*1000,pcmPoolBytes:actual==='worker'?o.bufferBytes*o.poolBlocks:0,transport:actual==='worker'?'transferable MessagePort; no shared Wasm memory':'in-worklet serial Rust; no PCM transport'},
+    return {node,end,options:o,executor:{requested:mode,actual,fallbackReason,blockFrames:o.blockFrames,poolBlocks:o.poolBlocks,renderAheadCapacityFrames:o.delayFrames,bufferingLatencyFrames:o.delayFrames,bufferingLatencyMs:o.delayFrames/context.sampleRate*1000,pcmPoolBytes:actual==='worker'?o.bufferBytes*o.poolBlocks:0,transport:actual==='worker'?'transferable MessagePort; no shared Wasm memory':'in-worklet serial Rust; no PCM transport'},
       check(){if(error)throw Error(error);},
       async stats(){
         if(pending.has('output')||pending.size>=63)throw Error('Worker stats request already pending or control capacity exceeded');
