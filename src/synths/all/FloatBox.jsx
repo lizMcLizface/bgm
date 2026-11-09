@@ -1,6 +1,5 @@
 import React,{useEffect,useRef} from 'react';
 import useFloating from '../ui/useFloating';
-import './rack.css';
 
 // A box of /synths/all placed on the desk like the other pages' floating panels (ui/useFloating): its grip, along the top edge, drags it anywhere
 // on the desk; the place is remembered under `synths:all:<id>`, is kept in view and goes back with the desk's "Reset layout". `home` is where it

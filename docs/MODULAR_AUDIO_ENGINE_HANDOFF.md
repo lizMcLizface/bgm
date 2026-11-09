@@ -1652,3 +1652,32 @@ physical/audio-quality result is claimed. User's existing desktop tab and
 workbench are retained. **Next:** phone retry at `?_reload=20261109-startup2`;
 if it works, return to actual All route listening records. If it fails, diagnose
 the newly displayed full error/asset URL, without deploying or clearing data.
+
+## M4a repeated embedded CSS failure / LAN preview (2026-11-09)
+
+The phone's ChatGPT-app retry of `e21547e` **failed** on a full remote-preview
+AllPage CSS URL. Bundling the identical 8,287-character All rack/sequence rules
+with its page JS removes that request; a stronger CSS-blocking test opens styled
+where the previous build fails. **68 tests** and public build pass (**51.45 s**).
+The package guard now prevents a separate AllPage stylesheet from reappearing.
+But the phone's subsequent retry **fails on shared `generative-ybgFc-ZW.css`**:
+this is not a complete phone-preview fix. Preserve both failures and do not
+infer anything about Rust/audio from them. No new audio result is claimed.
+
+At the user's explicit request, a separate public-build **HTTPS LAN preview**
+is running at **`https://192.168.0.228:4176/synths/all/`**. Use Safari/Chrome on
+the same LAN, outside ChatGPT's embedded preview. Existing ignored local TLS
+certificate/key are reused; a self-signed warning may require user action, never
+an agent bypass. No firewall/trust changes or deployment; original HTTP 4175
+and desktop workbench are retained. Config/PID/logs are under `.tmp/https/`.
+
+Host-side exact-CA TLS checks: page **200 / text/html** and the failing shared
+stylesheet **200 / text/css / 56,397 bytes**. Host checks alone do not prove
+firewall/browser access. The user then
+confirms the normal-browser page opens and works after proceeding through the
+certificate warning themselves. No agent trust/security bypass was performed.
+This is connectivity/page confirmation, not a new run-bound listening verdict. See
+[updated startup evidence and commands](SYNTHS_STARTUP_RECOVERY.md),
+`m4a-inline-style-{browser,payload}.json`, `m4a-lan-https-preview.json`.
+**Next:** use the confirmed normal-browser LAN route for actual All listening records.
+Keep the LAN preview running for the user. Do not deploy to test the app proxy.

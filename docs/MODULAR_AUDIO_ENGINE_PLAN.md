@@ -820,3 +820,14 @@ Next: run-bound listening evidence for this actual one-role All route, then
 bounded eligible multi-role capture with coherent failure and unchanged FX/
 owner authority. Continuous transport, drum-kit translation and broad rack
 migration remain separate gates. No push/deployment.
+
+The subsequent phone startup investigation found repeated CSS delivery failures
+inside ChatGPT's embedded remote preview, independent of Rust/audio. All's page
+styles are bundled with its JS and verified unchanged; a shared stylesheet still
+fails through that proxy. At the user's request a public-build LAN HTTPS preview
+now runs at `https://192.168.0.228:4176/synths/all/`; the user confirms it opens
+and works in a normal phone browser after their own certificate-warning action.
+See [startup results, negative evidence and LAN instructions](SYNTHS_STARTUP_RECOVERY.md).
+The latest 68 focused tests and public build pass; no deployment/firewall change
+or new audio-quality verdict. Keep this confirmed access route available for
+the next run-bound All listening-evidence step.

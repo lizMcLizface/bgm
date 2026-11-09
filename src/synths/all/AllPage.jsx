@@ -55,7 +55,8 @@ import {createContinuous,appendProgression,trimProgressions} from './continuous'
 import {prepareGeneratorChange,publishGeneratorChange,liveGeneratorKeys} from './generatorChange';
 import {encodeSetup,decodeSetup,setupFileName,MAX_BYTES} from './setupFile';
 import '../drums/drums.css';
-import './all.css';
+import rackStyles from './rack.css?inline';
+import allStyles from './all.css?inline';
 
 // /synths/all: the sequencers and the sound generators (docs/SEQUENCER_SYSTEM_PLAN.md). The song comes from the front page's own generator (a scene's settings, its progression,
 // voicings and lines), captured as patterns the sequencers hold; the sound generators are the generator's role instruments, loaded as presets (the scene's voices, or a patch of
@@ -95,7 +96,9 @@ export function defaultSequencer(project){
 
 export default function AllPage(){
  const [objects]=useState(createAllDeskObjects);
- return <DeskObjectsProvider store={objects}><AllWorkbench/></DeskObjectsProvider>;
+ // Keep this route's small style payload with its lazy JS module. Remote
+ // previews can serve that module while rejecting a separate lazy CSS request.
+ return <><style data-all-workbench-styles>{rackStyles+'\n'+allStyles}</style><DeskObjectsProvider store={objects}><AllWorkbench/></DeskObjectsProvider></>;
 }
 function AllWorkbench(){
  const objects=useDeskObjects();

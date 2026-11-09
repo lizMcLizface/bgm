@@ -8,7 +8,11 @@ if(!fs.existsSync(root)){console.error(`${root}/ is missing: run npm run build:p
 const problems=[];
 const synths=['poly','fm','cs80','juno','prophet5','jupiter8','minimoog','dx7','obxa','vs','wt','tr808','tr909','tr707','tr606','tb303'];
 for(const file of ['core.wasm','processor.js','fm.wasm','fm-processor.js','effects.wasm','effects-processor.js','inserts.wasm','inserts-processor.js','patch-transition.js'])if(!fs.existsSync(path.join(root,'synth-lab',file)))problems.push(`Missing synth-lab/${file}`);
-for(const file of ['synths/ensemble/index.html','synths/index.html','synths/effects/index.html','synths/classics.wasm','synths/classics-processor.js','synths/output-scope.js',...synths.map(s=>`synths/${s}/index.html`)])if(!fs.existsSync(path.join(root,file)))problems.push(`Missing ${file}`);
+for(const file of ['synths/ensemble/index.html','synths/index.html','synths/all/index.html','synths/effects/index.html','synths/classics.wasm','synths/classics-processor.js','synths/output-scope.js',...synths.map(s=>`synths/${s}/index.html`)])if(!fs.existsSync(path.join(root,file)))problems.push(`Missing ${file}`);
+const assets=path.join(root,'assets'),assetNames=fs.readdirSync(assets),allScripts=assetNames.filter(name=>/^AllPage-.*\.js$/.test(name));
+if(allScripts.length!==1)problems.push('Expected one All workbench page module');
+else{const source=fs.readFileSync(path.join(assets,allScripts[0]),'utf8');if(!source.includes('.all-box.box-voices')||!source.includes('.all-drum-tools'))problems.push('All page is missing its bundled workbench styles');}
+if(assetNames.some(name=>/^AllPage-.*\.css$/.test(name)))problems.push('All page must not depend on a separate lazy AllPage stylesheet');
 for(const file of ['tools/modular-audio.html','tools/modular-ensemble.html','tools/modular-worker.html','modular-audio/graph-worker.js','modular-audio/worker-output-processor.js','modular-audio/pool-output-processor.js'])if(!fs.existsSync(path.join(root,file)))problems.push(`Missing ${file}`);
 const modularHarness=path.join(root,'tools/modular-audio.html');
 if(fs.existsSync(modularHarness)&&!fs.readFileSync(modularHarness,'utf8').includes('href="./modular-ensemble.html"'))problems.push('Missing six-role navigation in built modular audio harness');

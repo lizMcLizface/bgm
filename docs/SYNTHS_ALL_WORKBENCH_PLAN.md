@@ -843,3 +843,14 @@ now cover long/failed page loading and preserve forwarded module asset paths.
 Proxy-style failure/recovery, direct startup, 100 page tests, five final loader/
 URL tests and public build pass. Phone retry is pending; no deployment, storage
 clear, DSP/default or setup schema change is part of this fix.
+
+Phone follow-up: module-relative URLs still fail through the embedded remote
+preview. Bundling All's identical page styles removes its separate CSS request,
+with 68 tests/build and a stronger CSS-blocking browser test passing, but the
+phone then fails on shared generative CSS. This is not a confirmed proxy fix.
+At the user's request, public-only LAN HTTPS preview now runs at
+`https://192.168.0.228:4176/synths/all/` for a normal phone browser. Exact-CA
+host checks return 200 for the page and shared stylesheet. The user confirms
+the phone page opens and works after handling the self-signed certificate
+warning themselves. No deployment, firewall change, DSP/default or setup
+migration. Keep the HTTPS preview running for actual All listening evidence.
