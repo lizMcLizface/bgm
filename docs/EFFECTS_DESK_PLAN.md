@@ -1385,3 +1385,16 @@ viewport, with Escape/outside dismissal verified. Original source, routing,
 MIDI settings, object IDs and poses were restored and compared; audio is stopped.
 Evidence: `.tmp/midi-dropdown-{tests,full,build}.log`,
 `.tmp/midi-ribbon-dropdown.png`, and `.tmp/midi-dropdown-{before,after}.json`.
+
+### Modular All source boundary (2026-11-09)
+
+[M4a](MODULAR_AUDIO_ENGINE_M4A_WORKBENCH_SOURCE.md) adds an opt-in finite selected
+core/FM sequence preview in All / Setup. Its raw owned Rust source enters before
+the existing voice inserts/FX/sends/output trim and passes through the existing
+role/music/master processing. These effects are not ported or bypassed. Live
+keyboard and normal transport retain their current engines; no desk/object ID,
+patch/setup format or default buffering change. One worker or serial, 48 kHz,
+64 ms source capacity, explicit stopped switching. Actual channel attenuation,
+master activity, keyboard coexistence and legacy playback pass; no physical
+listening/CPU or lock-screen guarantee. The modular plan/handoff records exact
+tests, reports, persistence limits and the next listening-evidence gate.

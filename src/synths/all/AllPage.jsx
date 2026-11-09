@@ -106,6 +106,8 @@ function AllWorkbench(){
  const [sceneName,setSceneName]=useState(()=>initialLink.link?.scene?.name??customScene?.name??SCENES.find(s=>s.name===stored.scene)?.name??sceneList.find(s=>/lofi|rain/i.test(s.name))?.name??sceneList[0].name);
  const scene=useMemo(()=>customScene?.name===sceneName?customScene:SCENES.find(s=>s.name===sceneName)??sceneList[0],[sceneName,sceneList,customScene]);
  const [status,setStatus]=useState('Preparing song…'),[started,setStarted]=useState(false),[busy,setBusy]=useState(false),[hostVersion,setHostVersion]=useState(0);
+ const previewRef=useRef(null),[previewPhase,setPreviewPhase]=useState('idle'),[previewMode,setPreviewMode]=useState('worker'),[previewMessage,setPreviewMessage]=useState('One supported pitched sequencer, one current progression, one pass.'),[previewReport,setPreviewReport]=useState(null);
+ const previewActive=previewPhase!=='idle';
  const [progressionCount,setProgressionCount]=useState(stored.progressionCount??4),[project,setProject]=useState(null),[playing,setPlaying]=useState(false);
  const [continuous,setContinuous]=useState(()=>!(stored.project&&stored.scene===scene.name));
  const [visibility]=useState(()=>objectVisibility(objects,cleanVisibility(load(VISIBILITY_KEY,{}))));
@@ -381,7 +383,7 @@ function AllWorkbench(){
  const playPhrase=id=>{wake().then(()=>phrases.play(id));};
  const down=(k,n,v)=>{wake().then(()=>performer.down(k,n,v));};
  const downRef=useRef(down);downRef.current=down;
- function panic(){phrases.stop();performer.panic();Object.values(host.current?.g.roles??{}).forEach(r=>r.instrument?.silence?.());dark();}
+ function panic(){void previewRef.current?.stop();phrases.stop();performer.panic();Object.values(host.current?.g.roles??{}).forEach(r=>r.instrument?.silence?.());dark();}
  const connectMidi=async()=>{try{await midiRef.current.connect();}catch(e){setMidi(m=>({...m,status:e.message}));}};
  const updateSetup=(k,v)=>{setSetup(x=>({...x,[k]:v}));if(k==='midiDevice'){performer.releaseAll();midiRef.current.selected=v;}if(k==='midiChannel'){performer.releaseAll();midiRef.current.channel=v;}};
  useEffect(()=>{
@@ -462,12 +464,13 @@ function AllWorkbench(){
   return ()=>{sched.stop();scheduler.current=null;timers.current.forEach(clearTimeout);timers.current.clear();dark();};
  },[started,hostVersion]);// eslint-disable-line react-hooks/exhaustive-deps
  const stop=()=>{
+  void previewRef.current?.stop();
   const s=scheduler.current;if(!s)return;
   temporaryChord.current=false;
   s.stop();timers.current.forEach(clearTimeout);timers.current.clear();dark();playingRef.current=false;movePlayhead(head.current,{running:false,step:0});Object.values(host.current.g.roles).forEach(r=>r.instrument?.silence?.());setPlaying(false);setPaused(false);
  };
  const play=async(mode=loop)=>{
-  const s=scheduler.current;if(!s||playing)return;
+  const s=scheduler.current;if(!s||playing||previewRef.current)return;
   setBusy(true);
   try{
    await wake();
@@ -479,6 +482,23 @@ function AllWorkbench(){
    playingRef.current=true;setPlaying(true);setPaused(false);
   }catch(error){console.error(error);setStatus(error.message);}finally{setBusy(false);}
  };
+ async function startSourcePreview(){
+  if(!started||playing||paused||busy||previewRef.current)return;
+  setPreviewPhase('preparing');setPreviewMessage('Preparing an owned source snapshot…');setPreviewReport(null);
+  const pending={stop(){if(previewRef.current===pending){previewRef.current=null;setPreviewPhase('idle');setPreviewMessage('Source preview preparation cancelled.');}}};previewRef.current=pending;
+  let controller;
+  try{
+   const {createWorkbenchPreview}=await import('../../modular-audio/workbenchPreview');
+   if(previewRef.current!==pending)return;
+   const h=host.current,r=SEQUENCERS[selected].role,p=projectRef.current,part=progressionsOf(p)[progressionRef.current];
+   await wake();
+   if(previewRef.current!==pending)return;
+   controller=createWorkbenchPreview({host:h,project:p,part,role:r,bpm:bpmRef.current,mode:previewMode,muted:!!mutesRef.current[r]||(Object.values(solosRef.current).some(Boolean)&&!solosRef.current[r]),onState:phase=>{if(previewRef.current===controller)setPreviewPhase(phase==='stopped'?'idle':phase);},onDone:report=>{if(previewRef.current!==controller)return;previewRef.current=null;setPreviewPhase('idle');setPreviewReport(report);setPreviewMessage(report.error?report.error:report.reason==='completed'?(report.pass?'Owned source preview completed.':'Preview ended with delivery or signal checks to review.'):'Source preview stopped. Live keyboard remains on its existing engine.');}});
+   previewRef.current=controller;const executor=await controller.ready;
+   if(previewRef.current===controller&&executor)setPreviewMessage(`Playing ${r} · ${executor.actual==='worker'?'one worker':'serial'} · 64 ms source buffering${executor.fallbackReason?' · '+executor.fallbackReason:''}`);
+  }catch(error){if(previewRef.current===pending||previewRef.current===controller){previewRef.current=null;setPreviewPhase('idle');setPreviewMessage(error.message);}}
+ }
+ useEffect(()=>()=>{void previewRef.current?.stop();},[project,bpm,hostVersion,progression,selected,mutes,solos]);
  const pause=()=>{if(!playing)return;scheduler.current?.pause();timers.current.forEach(clearTimeout);timers.current.clear();dark();playingRef.current=false;setPlaying(false);setPaused(true);};
  const chooseProgression=i=>{setProgression(i);setCol(progressionsOf(project)[i].startBar*project.stepsPerBar);if(!playing){playheadRef.current=progressionsOf(project)[i].startBar*project.stepsPerBar;repeatRef.current=null;if(stream.current&&paused){scheduler.current?.reposition({pattern:i,step:0},'song');setLoop('song');}}setFocusChord(null);setScreenPage('seq');};
  const changeRepeat=()=>{
@@ -988,7 +1008,7 @@ function AllWorkbench(){
     <div className="s8-left">
      <SeqScreen accent={COLOURS[role]} page={screenPage} onPage={setScreenPage} pages={screenPages} lines={lines}/>
      <div className="s8-transport" role="group" aria-label="Transport">
-      <button type="button" className={'tp play'+(playing?' on':'')} aria-pressed={playing} disabled={!started||!project} onClick={()=>play()}><b>▶</b><small>Play</small></button>
+      <button type="button" className={'tp play'+(playing?' on':'')} aria-pressed={playing} disabled={!started||!project||previewActive} onClick={()=>play()}><b>▶</b><small>Play</small></button>
       <button type="button" className={'tp'+(paused?' on':'')} aria-pressed={paused} disabled={!playing} onClick={pause}><b>⏸</b><small>Pause</small></button>
       <button type="button" className="tp" disabled={!started} onClick={stop}><b>■</b><small>Stop</small></button>
       <button type="button" className={'tp'+(loop!=='song'?' on':'')} aria-label={`Repeat ${loop}`} disabled={!started} onClick={changeRepeat}><b>⟲</b><small>{loop==='pattern'?'Pattern':loop==='song'?'Song':loop==='bar'?'Bar':'Chord'}</small></button>
@@ -1032,6 +1052,14 @@ function AllWorkbench(){
      <label>Progressions ahead<select aria-label="Progressions ahead" value={bufferConfig.ahead} onChange={e=>setBufferConfig(c=>({...c,ahead:Number(e.target.value)}))}>{[1,2,4,8,16,32,64].map(n=><option key={n} value={n}>{n}</option>)}</select></label>
      <label>History retained<select aria-label="History retained" value={bufferConfig.history} onChange={e=>setBufferConfig(c=>({...c,history:e.target.value==='infinite'?'infinite':Number(e.target.value)}))}>{[0,1,2,3,4,8,16,32,64,'infinite'].map(n=><option key={n} value={n}>{n==='infinite'?'Unlimited':n}</option>)}</select></label>
     </div><p className="hint">Unlimited history grows in memory. Lookahead is finite. Continuous sessions are not saved as songs.</p></section>
+    <section className="group wide" aria-label="Owned Rust sequence preview"><h3>Owned Rust sequence preview</h3>
+     <p className="hint">Selected pitched sequencer, current progression, one pass. Scalar core/FM sources only; FM requires 2x quality and 48 kHz is required. One worker or serial source feeds the existing voice inserts, mixer and effects. Normal song playback stays stopped; the live keyboard uses its current engine. Source/score/tempo changes stop this snapshot. No loop or pause.</p>
+     <label>Preview executor<select aria-label="Rust preview executor" value={previewMode} disabled={previewActive} onChange={e=>setPreviewMode(e.target.value)}><option value="worker">One worker · 64 ms</option><option value="serial">Serial reference · 64 ms</option></select></label>
+     <button type="button" aria-label="Play selected Rust sequence" disabled={!started||!project||busy||playing||paused||previewActive||SEQUENCERS[selected].role==='perc'} onClick={startSourcePreview}>Play selected sequence via Rust</button>
+     <button type="button" aria-label="Stop Rust sequence preview" disabled={!previewActive} onClick={()=>{void previewRef.current?.stop();}}>Stop source preview</button>
+     <p role="status" aria-label="Rust source preview status">{previewMessage}</p>
+     {previewReport&&<pre aria-label="Rust source preview report" style={{maxHeight:220,overflow:'auto',fontSize:11}}>{JSON.stringify(previewReport,null,2)}</pre>}
+    </section>
    </SetupPopover>}
    <footer className="perform">
     {showKeys&&<WorkbenchKeys size={setup.keysSize} controls={setup.keysControls} low={setup.keysLow} onLow={v=>updateSetup('keysLow',v)} onLayout={updateSetup} notes={[...new Set([...litNotes,...held])]} context={context} chord={chordPick}

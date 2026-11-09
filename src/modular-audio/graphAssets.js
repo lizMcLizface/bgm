@@ -1,0 +1,3 @@
+const base=`${import.meta.env.BASE_URL}modular-audio/`;
+let pending;
+export function loadGraphAssets(){if(!pending)pending=(async()=>{const get=async url=>{const r=await fetch(url);if(!r.ok)throw Error('Missing graph asset: '+url);return r;},manifest=await(await get(base+'build.json')).json(),contracts=await(await get(base+`contracts.json?v=${manifest.version}`)).json(),bytes=await(await get(base+`graph.wasm?v=${manifest.version}`)).arrayBuffer(),hash=[...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(n=>n.toString(16).padStart(2,'0')).join('');if(hash!==manifest.wasm)throw Error('Stale graph Wasm');return {manifest,contracts,modules:{graph:await WebAssembly.compile(bytes)}};})().catch(e=>{pending=null;throw e;});return pending;}

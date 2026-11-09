@@ -3,7 +3,9 @@
 Agreed direction: 2026-11-09. Status: **M0/M1, the opt-in M2 percussion/sidechain
 slice, M3a's actual six-role serial baseline, M3b owned FM, M3c owned core,
 M3d pitched DAG, M3e bounded single-worker transport, M3f three-worker source pool
-and M3g opt-in buffering profiles plus M3h queue-lead observability and M3i opt-in scheduling experiment plus M3j packet-arrival/headroom diagnostics and M3k run-bound listening records delivered**.
+and M3g opt-in buffering profiles plus M3h queue-lead observability and M3i opt-in scheduling experiment plus M3j packet-arrival/headroom diagnostics and M3k run-bound listening records delivered**. The [M3 decision gate](MODULAR_AUDIO_ENGINE_M3_DECISION_GATE.md)
+authorizes only the [M4a finite All source preview](MODULAR_AUDIO_ENGINE_M4A_WORKBENCH_SOURCE.md);
+normal transport/default backend migration remains gated.
 All six source engines have owned mutable Rust state; core's read-only additive
 tables are safely shared after preparation. External stereo host inputs and
 graph program/key compression exist. All six sources now also run inside one
@@ -794,3 +796,27 @@ Next: M3 go/no-go decision, then a narrow opt-in 48 kHz sequenced source adapter
 into the existing All mixer/effects, preserving current live MIDI/keyboard and
 legacy defaults. See handoff for scope, latency caveats and browser download-wait
 restriction. No broad DSP migration, push or deployment.
+
+## M4a: finite All source preview delivered (2026-11-09)
+
+The [M3 decision gate](MODULAR_AUDIO_ENGINE_M3_DECISION_GATE.md) is committed as
+`3670f50`: GO for a narrow opt-in comparison, NO-GO for defaults/full transport
+or an unmeasured CPU-speedup claim. See [M4a contracts, evidence and limitations](MODULAR_AUDIO_ENGINE_M4A_WORKBENCH_SOURCE.md).
+All / Setup can render one supported pitched role's actual current progression
+through a private scalar core/FM graph and its existing inserts/sends/mixer/
+master path. One worker or explicit/startup-fallback serial, 48 kHz, Message
+tasks, Medium +2 capacity / 64 ms. Keyboard/MIDI and normal transport retain
+their existing engines. Explicit arm, independent Stop, global Panic and
+snapshot invalidation are implemented; unsupported sources fail clearly.
+
+Full regression **396 files / 2,815 tests** passes; final follow-up focused
+**36 + 81 tests** and public build pass. Actual All worker/core, serial/core and
+worker/FM complete all frames/events with zero transport misses and real
+source/channel/master activity. Mixer attenuation, source replacement,
+keyboard coexistence and normal legacy playback are verified. Wasm/golden DSP
+are unchanged, runtime `31d4ba7553a47868`. No physical/locked-phone/CPU guarantee.
+
+Next: run-bound listening evidence for this actual one-role All route, then
+bounded eligible multi-role capture with coherent failure and unchanged FX/
+owner authority. Continuous transport, drum-kit translation and broad rack
+migration remain separate gates. No push/deployment.

@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "kind": "all.owned-source-preview",
+  "scope": "One selected finite source snapshot through existing All FX/mixer; peaks may include legacy keyboard/shared output, not isolated wet PCM or physical audio.",
+  "role": "pad",
+  "mode": "worker",
+  "startedAtUtc": "2026-11-09T20:32:59.707Z",
+  "completedAtUtc": "2026-11-09T20:32:59.707Z",
+  "reason": "error",
+  "error": "Error: Select a ready core or FM voice for the Rust source preview.",
+  "engineVersion": null,
+  "executor": null,
+  "plan": null,
+  "peaks": {
+    "source": 0,
+    "channel": 0,
+    "master": 0
+  },
+  "stats": null,
+  "complete": false,
+  "eventPass": false,
+  "pass": false
+}

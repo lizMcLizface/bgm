@@ -19,6 +19,13 @@ it('changes active FM quality without replacing its node, held keys, macros or d
  const v=await LabVoice.create(context(),{kind:'fm',patch:initialFM()}),source=v.backend;
  try{const id=v.on(60,.8);v.controls({bend:2,texture:.3});writeWasmPerformance('economy');expect(v.backend).toBe(source);expect(v.keys.get(id)).toBe(60);expect(source.off).not.toHaveBeenCalled();expect(source.patch.mock.calls.at(-1)[0].global).toMatchObject({quality:0,bend:2});expect(v.patch.global.quality).toBe(1);v.controls({bend:3});expect(source.patch.mock.calls.at(-1)[0].global).toMatchObject({quality:0,bend:3});writeWasmPerformance('full');expect(source.patch.mock.calls.at(-1)[0].global).toMatchObject({quality:1,bend:3});}finally{v.dispose();}const calls=source.patch.mock.calls.length;writeWasmPerformance('economy');expect(source.patch).toHaveBeenCalledTimes(calls);
 });
+it('keeps legacy notes connected through the pre-effects summing seam and disconnects only owned source nodes on disposal',async()=>{
+ const v=await LabVoice.create(context(),{kind:'fm',patch:initialFM()}),b=v.backend;
+ const external={};v.sourceInput.connect(external);const id=v.on(64,.6);
+ expect(b.node.connect).toHaveBeenCalledWith(v.sourceInput);expect(v.sourceInput.gain.value).toBe(1);
+ expect(v.keys.get(id)).toBe(64);v.off(id);expect(b.off).toHaveBeenCalledWith(id);
+ v.dispose();expect(b.dispose).toHaveBeenCalledTimes(1);expect(v.sourceInput.disconnect).toHaveBeenCalledTimes(1);
+});
 it('starts offline renders at device quality but does not change them partway through',async()=>{
  writeWasmPerformance('economy');const p=initialFM(),v=await LabVoice.create({...context(),length:48000},{kind:'fm',patch:p});
  try{expect(state.create.mock.calls[0][1].global.quality).toBe(0);expect(v.patch.global.quality).toBe(1);writeWasmPerformance('full');expect(v.backend.patch).not.toHaveBeenCalled();}finally{v.dispose();}

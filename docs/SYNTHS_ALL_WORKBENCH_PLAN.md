@@ -818,3 +818,21 @@ are delivered, while repeated kinds within one bus, arbitrary node taps,
 typed/free cable patching, physical cables and the shared tabletop remain
 future work. Detailed acceptance evidence and limits are recorded in
 `EFFECTS_DESK_PLAN.md`.
+
+### Opt-in owned source preview (2026-11-09)
+
+All / Setup now offers a separate **Owned Rust sequence preview**: one selected
+ready core/FM role, current progression, one pass at 48 kHz, one worker or serial
+reference, 64 ms declared source buffering. It captures the actual patch,
+notes/tempo/tuning and uses the existing inserts/sends/mixer/master path. Normal
+Play is excluded during preview, while keyboard/MIDI keeps its current engine.
+Independent Stop, global Panic and snapshot invalidation are supported; native,
+procedural, classic and percussion sources are rejected without substitution.
+Existing workbench objects, presets/setup format, transport and backend defaults
+remain intact. See [M4a exact results/limits](MODULAR_AUDIO_ENGINE_M4A_WORKBENCH_SOURCE.md)
+and the modular handoff. Actual source/channel/master audio, mixer attenuation,
+keyboard coexistence, source replacement and normal playback are verified.
+Reload preserves voices/poses and stopped/default experiment state; Continuous
+mode still regenerates its grid on ordinary reload. This is not a full transport
+migration or target-device quality/CPU proof. Run-bound listening evidence for
+this actual route is next, before eligible multi-role expansion.

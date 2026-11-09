@@ -1,0 +1,19 @@
+// @vitest-environment node
+import fs from 'node:fs';
+import {it,expect} from 'vitest';
+import {compileWorkbenchSource} from './workbenchPlan';
+import {ReferenceGraph} from './runtime';
+import {OwnedCore,legacyOwnedCoreExports} from '../../tools/coreOwnedVerification.mjs';
+import {OwnedFm,legacyOwnedExports} from '../../tools/fmOwnedVerification.mjs';
+import {clonePatch,RECIPES} from '../synth-lab/patch';
+import {cloneFM,FM_RECIPES} from '../synth-lab/fmPatch';
+const project=()=>({bars:2,stepsPerBar:16,seed:4,key:{tonic:0,scale:[0,2,4,5,7,9,11]},patterns:{lead:{mode:'note',follow:'off',length:32,steps:Array.from({length:32},(_,i)=>i===16?{n:[{midi:60}],len:2,vel:.7}:i===20?{n:[{midi:67}],vel:.6}:null)}}});
+const source=fm=>({kind:fm?'fm':'subtractive',patch:fm?cloneFM(FM_RECIPES[0]):clonePatch(RECIPES[0])});
+const make=fm=>compileWorkbenchSource({project:project(),part:{startBar:1,bars:1},role:'lead',bpm:120,source:source(fm),tune:n=>n+.1});
+it('repeats probability deterministically and rejects a dense plan before exceeding the 4,000 source-event capacity',()=>{const p=project();p.patterns.lead.steps=Array.from({length:32},()=>({n:[{midi:60}],prob:.5}));const capture=()=>compileWorkbenchSource({project:p,part:{startBar:0,bars:2},role:'lead',bpm:120,source:source(false)});expect(capture()).toEqual(capture());p.bars=16;p.patterns.lead.length=256;p.patterns.lead.steps=Array.from({length:256},()=>({n:Array.from({length:7},(_,i)=>({midi:60+i})),rept:8}));expect(()=>compileWorkbenchSource({project:p,part:{startBar:0,bars:16},role:'lead',bpm:200,source:source(false)})).toThrow('note capacity');});
+it('captures only the selected progression at the actual tempo/tuning with bounded stable note identities',()=>{const p=make(false);expect(p.notes).toHaveLength(2);expect(p.notes[0]).toMatchObject({midi:60.1,time:.125,duration:.225,velocity:.7});expect(p.graph.events[0]).toMatchObject({frame:6000,a:60.1,note:1,target:1,owner:1});expect(p.graph.events.find(e=>e.event===1&&e.note===1).frame).toBe(16800);expect(p.role).toBe('lead');expect(p.sampleRate).toBe(48000);expect(make(false)).toEqual(p);});
+it('rejects unsupported, muted, empty and unbounded sources instead of silently replacing sounds',()=>{for(const options of [{role:'perc'},{muted:true},{bpm:NaN},{part:{startBar:99,bars:1}},{part:{startBar:0,bars:17}},{source:{kind:'legacy'}}])expect(()=>compileWorkbenchSource({project:project(),part:{startBar:1,bars:1},role:'lead',bpm:120,source:source(false),...options})).toThrow();expect(()=>compileWorkbenchSource({project:project(),part:{startBar:0,bars:1},role:'lead',bpm:120,source:source(false)})).toThrow('no notes');});
+it.each([false,true])('renders core/FM actual captured notes raw-equal to the unchanged legacy ABI at the same cadence (FM=%s)',fm=>{
+ const p=make(fm),module=new WebAssembly.Module(fs.readFileSync('public/modular-audio/graph.wasm')),contracts=JSON.parse(fs.readFileSync('public/modular-audio/contracts.json')),g=new ReferenceGraph(new WebAssembly.Instance(module,{}).exports,p.graph,contracts,48000,512),legacyModule=new WebAssembly.Module(fs.readFileSync(`public/synth-lab/${fm?'fm':'core'}.wasm`)),spec={...p.graph.modules[0].config,events:p.graph.events.map(e=>[e.event,e.note,e.frame,e.a,e.b])},old=new (fm?OwnedFm:OwnedCore)(fm?legacyOwnedExports(legacyModule):legacyOwnedCoreExports(legacyModule),spec,48000);
+ try{let diff=0,peak=0;for(let at=0;at<p.endFrame;at+=512){const n=Math.min(512,p.endFrame-at);g.render(n);old.render(n);for(let i=0;i<n;i++){diff=Math.max(diff,Math.abs(g.left[i]-old.left[i]),Math.abs(g.right[i]-old.right[i]));peak=Math.max(peak,Math.abs(g.left[i]),Math.abs(g.right[i]));}}expect(diff).toBe(0);expect(peak).toBeGreaterThan(.001);expect(g.stats()).toMatchObject({frame:p.endFrame,applied:4,late:0,overflow:0});}finally{old.dispose();g.dispose();}
+});

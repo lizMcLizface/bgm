@@ -22,7 +22,10 @@ export class LabVoice {
   this.patch=this.spec.kind==='fm'?cloneFM(this.patch):this.spec.kind==='procedural'?preparedPatch(this.patch):clonePatch(this.patch);
   const Type=this.spec.kind==='fm'?FMBackend:this.spec.kind==='procedural'?PreparedSource:WasmBackend,sourcePatch=sourcePerformance(this.patch);this.backend=await Type.create(c,sourcePatch,{notes,offline:Number.isFinite(c.length),events:noteEvents(notes,c.sampleRate),onStats:s=>{this.stats={...s,reportedAt:c.currentTime};},onError});
   if(this.spec.kind==='fm'&&!Number.isFinite(c.length)){this.performanceChange=()=>this.patchSource(this.effectivePatch??this.patch,{seconds:.04});window.addEventListener(WASM_PERFORMANCE_EVENT,this.performanceChange);if(sourcePerformance(this.patch).global.quality!==sourcePatch.global.quality)this.performanceChange();}
-  let source=this.backend.node;
+  // Unity summing seam: an opt-in owned source can enter before this voice's
+  // existing inserts/FX/room/output trim, without replacing the live backend.
+  this.sourceInput=c.createGain();this.sourceInput.gain.value=1;this.backend.node.connect(this.sourceInput);
+  let source=this.sourceInput;
   if(insertsActive(this.patch.inserts)){this.insert=await createInstrumentInserts(c,this.patch.inserts,{onError});source.connect(this.insert.input);source=this.insert.node;}
   // the calmbgm synth's tape, tremolo, compressor, shimmer and freeze (app/engine/voiceFx.js)
   if(this.spec.fx){this.fx=new VoiceFx(c,this.spec.fx);source.connect(this.fx.input);source=this.fx.output;}
@@ -60,5 +63,5 @@ export class LabVoice {
   this.patchSource(p,{seconds:.06});
  }
  panic(){if(this.disposed)return;this.keys.clear();this.released.clear();this.pedal=false;this.native?.silence();this.native?.flushTails();this.backend?.panic();this.room?.clear?.();this.echo?.clear?.();this.insert?.clear?.();this.fx?.clear();}
- dispose(){if(this.disposed)return;this.disposed=true;if(this.performanceChange)window.removeEventListener(WASM_PERFORMANCE_EVENT,this.performanceChange);this.keys.clear();this.released.clear();this.native?.dispose();this.channel?.dispose();this.echo?.dispose();this.room?.dispose();this.insert?.dispose();this.fx?.dispose();this.backend?.dispose();this.output.disconnect();}
+ dispose(){if(this.disposed)return;this.disposed=true;if(this.performanceChange)window.removeEventListener(WASM_PERFORMANCE_EVENT,this.performanceChange);this.keys.clear();this.released.clear();this.native?.dispose();this.channel?.dispose();this.echo?.dispose();this.room?.dispose();this.insert?.dispose();this.fx?.dispose();this.backend?.dispose();this.sourceInput?.disconnect();this.output.disconnect();}
 }

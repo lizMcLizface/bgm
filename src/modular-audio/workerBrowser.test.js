@@ -4,6 +4,11 @@ import {MessageChannel} from 'node:worker_threads';
 import {createWorkerRoute} from './workerBrowser';
 afterEach(()=>{vi.useRealTimers();vi.unstubAllGlobals();});
 describe('explicit worker startup fallback',()=>{
+ it('retains explicit partial-source, finite end and manual arm through serial startup fallback',async()=>{
+  vi.useFakeTimers();vi.stubGlobal('AudioWorkletNode',class{constructor(_c,_n,options){this.options=options;this.port={postMessage:vi.fn(),close:vi.fn()};this.disconnect=vi.fn();queueMicrotask(()=>this.port.onmessage({data:{type:'ready'}}));}});
+  const context={sampleRate:48000,audioWorklet:{addModule:vi.fn()}},assets={modules:{},contracts:{},manifest:{version:'test'}},route=await createWorkerRoute(context,assets,{}, {forceFallback:true,sourceIds:[1],endFrame:131,startPaused:true,options:{blockFrames:512,poolBlocks:6,scheduling:'message'}});
+  expect(route.executor).toMatchObject({actual:'serial',sourceIds:[1],manualStart:true,bufferingLatencyFrames:3072});expect(route.node.options.processorOptions).toMatchObject({sourceIds:[1],startPaused:true,endFrame:131});route.start();expect(route.node.port.postMessage).toHaveBeenCalledWith({type:'start'});expect(()=>route.start()).toThrow();route.dispose();vi.runAllTimers();
+ });
  it('bounds outstanding controls and rejects them when disposed',async()=>{
   vi.useFakeTimers();vi.stubGlobal('MessageChannel',MessageChannel);
   vi.stubGlobal('Worker',class{postMessage(d){if(d.type==='init')queueMicrotask(()=>this.onmessage({data:{type:'ready'}}));}terminate(){}});

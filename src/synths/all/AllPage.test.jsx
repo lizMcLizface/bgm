@@ -42,6 +42,8 @@ vi.mock('./host', () => {
   };mocks.hosts.push(host);return host;},
  };
 });
+const previewMock=vi.hoisted(()=>({calls:[]}));
+vi.mock('../../modular-audio/workbenchPreview',()=>({createWorkbenchPreview:options=>{const controller={stop:vi.fn(async()=>{options.onState('stopped');options.onDone({reason:'stopped',pass:false});}),ready:Promise.resolve({actual:'worker',bufferingLatencyFrames:3072})};previewMock.calls.push({options,controller});return controller;}}));
 import AllPage,{defaultSequencer} from './AllPage';
 
 let root, container;
@@ -1049,4 +1051,21 @@ test('Spread arranges visible objects without changing the song and restores obj
  root=createRoot(container);await act(async()=>root.render(<AllPage/>));
  const restored=container.querySelector('#all-panel-sequencer');expect(restored.dataset.deskObjectId).toBe(seqId);expect(container.querySelector('.keybox').dataset.deskObjectId).toBe(keyId);expect(container.querySelector('.keybox').style.top).toBe('2400px');
  expect({left:restored.style.left,top:restored.style.top,transform:restored.style.transform,zIndex:restored.style.zIndex}).toEqual(pose);
+});
+
+test('owned preview keeps normal transport stopped and stops independently of its keyboard/legacy host',async()=>{
+ act(()=>container.querySelector('[aria-label="Setup"]').click());
+ await act(async()=>button('Play selected Rust sequence').click());
+ expect(previewMock.calls.length).toBeGreaterThan(0);const entry=previewMock.calls.at(-1);
+ expect(container.querySelector('.tp.play').disabled).toBe(true);mocks.scheduler.stop.mockClear();
+ await act(async()=>button('Stop Rust sequence preview').click());
+ expect(entry.controller.stop).toHaveBeenCalled();expect(mocks.scheduler.stop).not.toHaveBeenCalled();expect(mocks.hosts.at(-1).dispose).not.toHaveBeenCalled();expect(container.querySelector('.tp.play').disabled).toBe(false);
+});
+test('changing the selected sequence cancels the owned snapshot rather than leaving stale source audio',async()=>{
+ act(()=>container.querySelector('[aria-label="Setup"]').click());await act(async()=>button('Play selected Rust sequence').click());const entry=previewMock.calls.at(-1);
+ await act(async()=>container.querySelector('[aria-label="Open Drums sequencer"]').click());expect(entry.controller.stop).toHaveBeenCalled();expect(button('Play selected Rust sequence').disabled).toBe(true);
+});
+test('Panic stops the owned preview as well as the existing instruments',async()=>{
+ act(()=>container.querySelector('[aria-label="Setup"]').click());await act(async()=>button('Play selected Rust sequence').click());const entry=previewMock.calls.at(-1);
+ await act(async()=>button('Panic').click());expect(entry.controller.stop).toHaveBeenCalled();expect(container.querySelector('.tp.play').disabled).toBe(false);
 });

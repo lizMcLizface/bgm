@@ -1,0 +1,13 @@
+// @vitest-environment node
+import fs from 'node:fs';
+import {it,expect} from 'vitest';
+import {BrowserThreadWorker,MessageChannel} from '../../tools/workerNodeAdapter.mjs';
+import {ReferenceGraph} from './runtime';
+import {compileWorkbenchSource} from './workbenchPlan';
+import {clonePatch,RECIPES} from '../synth-lab/patch';
+import {cloneFM,FM_RECIPES} from '../synth-lab/fmPatch';
+it.each([false,true])('publishes a real selected-source worker with exact PCM and zero unused buses (FM=%s)',async fm=>{
+ const plan=compileWorkbenchSource({project:{bars:1,stepsPerBar:16,seed:4,key:{tonic:0,scale:[0,2,4,5,7,9,11]},patterns:{lead:{mode:'note',follow:'off',length:16,steps:[{n:[{midi:60}],len:2},...Array(15).fill(null)]}}},part:{startBar:0,bars:1},role:'lead',bpm:120,source:{kind:fm?'fm':'subtractive',patch:fm?cloneFM(FM_RECIPES[0]):clonePatch(RECIPES[0])}}),module=new WebAssembly.Module(fs.readFileSync('public/modular-audio/graph.wasm')),contracts=JSON.parse(fs.readFileSync('public/modular-audio/contracts.json')),g=new ReferenceGraph(new WebAssembly.Instance(module,{}).exports,plan.graph,contracts,48000,512),w=new BrowserThreadWorker(),c=new MessageChannel();let frame=0,diff=0,peak=0,timer;
+ try{const stats=await new Promise((resolve,reject)=>{timer=setTimeout(()=>reject(Error('Selected source worker timeout')),30000);w.onerror=reject;w.onmessage=({data:d})=>{if(d.type==='error')reject(Error(d.message));if(d.type==='stats')resolve(d);};c.port2.onmessage=({data:b})=>{try{if(b.type!=='block')return;expect(b.frame).toBe(frame);g.render(b.n);const pcm=new Float32Array(b.buffer);for(let bus=0;bus<8;bus++)for(let i=0;i<b.n;i++)for(let ch=0;ch<2;ch++){const expected=bus===0?(ch?g.right[i]:g.left[i]):0,v=pcm[(bus*b.n+i)*2+ch];diff=Math.max(diff,Math.abs(v-expected));peak=Math.max(peak,Math.abs(v));}frame+=b.n;c.port2.postMessage({type:'recycle',generation:77,slot:b.slot,buffer:b.buffer},[b.buffer]);if(frame===plan.endFrame)w.postMessage({type:'stats',generation:77,request:99});}catch(e){reject(e);}};w.postMessage({type:'init',module,contracts,patch:plan.graph,sourceIds:[1],rate:48000,endFrame:plan.endFrame,options:{blockFrames:512,poolBlocks:6,generation:77,scheduling:'message'},port:c.port1},[c.port1]);});expect(diff).toBe(0);expect(peak).toBeGreaterThan(.001);expect(stats).toMatchObject({sourceIds:[1],frame:plan.endFrame,badRecycles:0});expect(stats.roles.slice(1).every(r=>r===null)).toBe(true);}
+ finally{clearTimeout(timer);w.terminate();c.port2.close();g.dispose();}
+},40000);

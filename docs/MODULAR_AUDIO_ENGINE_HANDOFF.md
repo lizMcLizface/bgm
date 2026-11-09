@@ -5,10 +5,12 @@ step, then continue**. This authorizes local commits of verified steps without
 another confirmation. Keep the existing checkout and work; no push/deployment
 is authorized. Record verification, limitations and the next task in each step.
 
-Prepared and implemented through opt-in M3k listening records on 2026-11-09. Read the working tree, this file and
+Prepared and implemented through the opt-in M4a finite All source preview on 2026-11-09. Read the working tree, this file and
 [MODULAR_AUDIO_ENGINE_PLAN.md](MODULAR_AUDIO_ENGINE_PLAN.md) first. This is an
 implementation handoff. **M0/M1, owned percussion/sidechain M2 and the actual
 six-role M3a baseline, M3b owned FM, M3c owned core, M3d pitched DAG, M3e single-worker transport, M3f source pool, M3g buffering profiles, M3h queue-lead observability, M3i opt-in scheduling M3j packet-arrival/headroom diagnostics and M3k run-bound listening records now exist.** Read
+[the M3 decision gate](MODULAR_AUDIO_ENGINE_M3_DECISION_GATE.md),
+[M4a workbench source contracts and results](MODULAR_AUDIO_ENGINE_M4A_WORKBENCH_SOURCE.md),
 [listening records and target-device evidence](MODULAR_AUDIO_ENGINE_M3K_LISTENING.md),
 [arrival/headroom results](MODULAR_AUDIO_ENGINE_M3J_ARRIVAL_HEADROOM.md),
 [opt-in scheduling results and negative experiment](MODULAR_AUDIO_ENGINE_M3I_TASK_PUMP.md),
@@ -1562,3 +1564,65 @@ not a new default or CPU-speedup proof. Its 64 ms buffering needs an explicit
 live-event policy; retain current live keyboard/MIDI authority until tested.
 No broad rack/effect migration, shared memory, arbitrary repartitioning or
 distributed owner controls in this first integration slice.
+
+## M4a delivery checkpoint (2026-11-09)
+
+The [M3 measured decision gate](MODULAR_AUDIO_ENGINE_M3_DECISION_GATE.md) is
+committed as `3670f50`. The [M4a contract/results](MODULAR_AUDIO_ENGINE_M4A_WORKBENCH_SOURCE.md)
+now govern the next task. All / Setup / **Owned Rust sequence preview** captures
+one supported pitched role and current progression, then runs one finite pass
+through the existing voice inserts/sends, mixer and master path. Actual core/FM
+patch/tuning/notes, private graph state, 48 kHz, one worker or serial/startup
+fallback, Message tasks / 512 frames / six slots / **64 ms**. FM requires 2x
+quality; native/procedural/classic/percussion sources are rejected explicitly.
+
+- Preparation is disarmed until connected. Cancel disposes late-created routes;
+  Stop affects only the preview, Panic includes it, and source/host/tuning/
+  score/tempo/selection/mute/solo changes invalidate the snapshot. Normal song
+  Play cannot overlap the preview. Keyboard/MIDI retains its existing engine.
+  Existing source level/trim and role/setup IDs are preserved. No new saved
+  backend default or full-song/continuous/live-edit promise.
+- Full suite **396 files / 2,815 tests**, **386.29 s**, passes. Final follow-ups
+  **36 tests / seven files** (2.75 s) and **81 tests / two files** (55.87 s)
+  cover last bounds/quality/failure/Panic changes. Public build passes, Vite
+  **44.66 s**. Source core/FM plan PCM is raw-exact against scalar legacy ABI
+  and real workers at equal cadence. Existing independent worker/pool, three-
+  rate comparisons, setup-file restore and legacy DSP regressions pass.
+- Live All Thump Bass worker and serial each complete **668,956 frames / 18
+  events**, zero late/overflow/missing frames, nonzero source/channel/master.
+  Existing mixer **-16 dB** reduces channel peak **0.10053 -> 0.01590** while
+  source peak remains **0.38111**. Live level edits do not stop the snapshot.
+  Four-op round bass FM worker completes **698,716 frames / 18 events**, zero
+  misses and three signal peaks. Replacing its source stops it incomplete at
+  **23,296 frames**; preview Stop leaves a legacy Chord phrase running.
+  Normal full-song Play/Stop still produces actual note/meter activity.
+- Original Thump Bass configuration and captured notes compare exactly after
+  restoration. Save setup is clicked without native download waits/path reads.
+  Reload preserves original voice choices, object IDs/poses, selected Pad and
+  stopped transport; transient report clears and serial choice resets to worker.
+  Session is **Continuous**: ordinary reload regenerates the grid, whose
+  comparison is false. Do not claim an exact browser setup-file round trip;
+  existing finite/continuous file restoration tests pass. A fresh post-reload
+  worker completes **668,956 frames / 14 events**, zero misses, fresh generation
+  1. Source/normal transport left stopped, originals restored. New evidence
+  `reports/modular_audio/m4a-*.json`; screenshot `.tmp/modular-audio-m4a-browser.png`.
+- Runtime **`31d4ba7553a47868`**, unchanged **296,101-byte** Wasm SHA256
+  `a5c3d4b70b57d63094d84fe539d2ec0effe30d5eea5fc59034fbb9a1ff462293`.
+  No Rust ABI/source, golden DSP or fixed fixture change. Existing Application
+  Control native-executable restriction is not bypassed. No push/deployment.
+
+**Limitations:** analyser peaks are activity, may include shared tails/keyboard,
+and are not isolated wet PCM/physical listening or CPU evidence. This is one
+worker, not the user's three-worker lock-screen rig; target-device quality is
+unassessed. Scalar core/FM reference does not switch/claim equality with optional
+legacy SIMD/acoustic/banked variants. Native exported bytes were not reuploaded.
+The source snapshot is bounded to 16 bars, 2,000 notes and 120 seconds; source
+tails include body/formant ringing. Keep all default routes/profiles unchanged.
+
+**Next:** add run-bound listening capture/export for the actual All one-role
+preview (include source/score snapshot, exact host build, actual executor and
+delivery/timing), then collect target-phone evidence before promoting it.
+Only after that gate expand to several captured eligible pitched roles with
+coherent failure, one owner per patch and current FX paths. Unsupported drum-kit
+translation, normal continuous transport, arbitrary racks/shared memory and
+distributed owners remain separate tasks. Commit every verified step locally.

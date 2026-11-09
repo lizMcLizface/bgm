@@ -28,6 +28,7 @@ import {createMeter,meterLevel} from './meter';
 import {masterBus} from '../../audio/bus';
 import {presetFromEdit} from '../../app/editor/presetEdits';
 import {createMixerAudio,createDeskLimiter} from './mixerAudio';
+import {sourceStemTap} from './sourceStemTap';
 import {readBook,withPresetBook,applyBook,cleanBook,baselineChoice,withoutSettings} from '../../app/rulebook/session';
 import {RULES} from '../../app/rulebook/model';
 import {DRUM_TRACKS} from '../../app/drumMappings';
@@ -103,6 +104,7 @@ export function createHost(scene, {seed,settings:storedSettings} = {}) {
     }
     loaded.perc = BROWSABLE_SCENES.includes(scene)?{synth:'scene',name:scene.name}:{synth:'kit',name:settings.drums.kit,kit:settings.drumKit};
     const meterTaps = new Set();
+    const sourceTaps = new Set();
     let deskAudio=null,deskState=null;
     let drumMask = null, drumMix={muted:[],solo:[]};
     if (g.settings.drumKit) {
@@ -264,6 +266,13 @@ export function createHost(scene, {seed,settings:storedSettings} = {}) {
         deskAudio.output.connect(masterBus);deskAudio.patch(deskState);
     }
     function applyDesk(state){deskState=state;deskAudio?.patch(state);}
+
+    function openSourceStem(role,onClose=()=>{}){
+        ensureActive();const instrument=g.roles[role]?.instrument,tuningKey=JSON.stringify(tuning.get());let closed=false;
+        const tap=sourceStemTap(instrument,()=>{ensureActive();if(closed||g.roles[role]?.instrument!==instrument||JSON.stringify(tuning.get())!==tuningKey)throw Error('The source host or tuning changed.');});
+        const lease={...tap,role,context:g.AC,channelOutput:g.roles[role].mixOutput??g.roles[role].wander.output,masterOutput:deskAudio?.output??g.levelTrim,tune:midi=>tunedNote(role,midi),release(){if(closed)return;closed=true;sourceTaps.delete(lease);},close(){if(closed)return;lease.release();onClose();}};
+        sourceTaps.add(lease);return lease;
+    }
 
     function openMeters() {
             const meters=Object.fromEntries(SEQUENCERS.map(({role})=>[role,createMeter(g.AC,deskAudio?.channels[role].output??g.roles[role].wander.output)]));
@@ -524,10 +533,10 @@ export function createHost(scene, {seed,settings:storedSettings} = {}) {
     }
 
     return {
-        g, settings, loaded, editSettings,editRule,restoreBook,get book(){return book;}, applySceneVoices, applyFrontPageLink, setSound, setPreset, soundOf, nativeOf, editNative, editValues, editDrumKit, rackValues, editRack, editMixer, mixerSnapshot, restoreMixer, snapshotSounds, restoreSounds, setupMixer, applyDesk, setTempo, openMonitor, openMeters, capture, note, tunedNote, drum, drumTrack, setDrumMix, getDrumMix,
+        g, settings, loaded, editSettings,editRule,restoreBook,get book(){return book;}, applySceneVoices, applyFrontPageLink, setSound, setPreset, soundOf, nativeOf, editNative, editValues, editDrumKit, rackValues, editRack, editMixer, mixerSnapshot, restoreMixer, snapshotSounds, restoreSounds, setupMixer, applyDesk, openSourceStem, setTempo, openMonitor, openMeters, capture, note, tunedNote, drum, drumTrack, setDrumMix, getDrumMix,
         get context() { return g.AC; },
         async wake() { await g.AC.resume(); if (g.percussionReady) await g.percussionReady; g.endStopFade?.(); },
         setScene(next) { hostScene.scene = next; },
-        dispose() { if(disposed)return;disposed=true; meterTaps.forEach(tap=>tap.dispose());g.stopAll?.();g.disposeSharedEffects?.();deskAudio?.dispose();g.output?.disconnect();g.levelTrim?.disconnect();g.ambienceOut?.disconnect(); Object.values(g.roles).forEach((r) => { r.sourceRevision=(r.sourceRevision??0)+1; r.instrument?.dispose?.(); r.ensembleRack?.dispose?.(); r.mixerRack?.dispose?.(); r.wander?.dispose?.(); }); },
+        dispose() { if(disposed)return;disposed=true;sourceTaps.forEach(t=>t.close()); meterTaps.forEach(tap=>tap.dispose());g.stopAll?.();g.disposeSharedEffects?.();deskAudio?.dispose();g.output?.disconnect();g.levelTrim?.disconnect();g.ambienceOut?.disconnect(); Object.values(g.roles).forEach((r) => { r.sourceRevision=(r.sourceRevision??0)+1; r.instrument?.dispose?.(); r.ensembleRack?.dispose?.(); r.mixerRack?.dispose?.(); r.wander?.dispose?.(); }); },
     };
 }

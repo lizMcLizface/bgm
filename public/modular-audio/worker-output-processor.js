@@ -169,6 +169,11 @@ var ArrivalGaps = class {
 
 // src/modular-audio/workerProtocol.js
 var BUS_COUNT = 8;
+function sourceSelection(ids = null) {
+  if (ids === null) return null;
+  if (!Array.isArray(ids) || !ids.length || ids.length > 6 || new Set(ids).size !== ids.length || ids.some((id) => !Number.isInteger(id) || id < 1 || id > 6)) throw Error("Invalid source selection");
+  return ids.slice();
+}
 function workerScheduling(value = "timer") {
   if (!["timer", "message"].includes(value)) throw Error("Invalid worker scheduling");
   return value;
@@ -348,10 +353,13 @@ var WorkerOutput = class extends AudioWorkletProcessor {
       this.o = workerOptions(p.options);
       this.end = p.endFrame;
       this.mode = p.mode;
+      this.sourceIds = sourceSelection(p.sourceIds ?? null);
+      this.armed = !p.startPaused;
+      if (p.startPaused !== void 0 && typeof p.startPaused !== "boolean") throw Error("Invalid manual start");
       if (!Number.isSafeInteger(this.end + this.o.delayFrames) || this.end < 1 || !["worker", "serial"].includes(this.mode)) throw Error("Invalid worker output");
       if (this.mode === "serial") {
         this.g = new ReferenceGraph(new WebAssembly.Instance(p.module, {}).exports, p.patch, p.contracts, sampleRate);
-        this.views = sourceViews(this.g);
+        this.views = sourceViews(this.g, this.sourceIds);
       } else this.queue = new WorkerPcmQueue(this.o, this.end, (b) => this.link.postMessage({ type: "recycle", generation: b.generation, slot: b.slot, buffer: b.buffer }, [b.buffer]));
       this.port.onmessage = ({ data: d }) => {
         try {
@@ -369,6 +377,7 @@ var WorkerOutput = class extends AudioWorkletProcessor {
             };
           }
           if (d.type === "stats") this.stats();
+          if (d.type === "start") this.armed = true;
           if (d.type === "failure") {
             this.stopped = true;
             this.queue?.dispose();
@@ -397,12 +406,13 @@ var WorkerOutput = class extends AudioWorkletProcessor {
     this.port.postMessage({ type: "error", message: String(e) });
   }
   stats() {
-    this.port.postMessage({ type: "stats", mode: this.mode, generation: this.o.generation, outputFrame: this.outputFrame, sourceFrame: this.sourceFrame, delayFrames: this.o.delayFrames, processTiming: this.timing.snapshot(), queue: this.queue ? this.queue.stats() : null, serial: this.g ? graphSnapshot(this.g) : null });
+    this.port.postMessage({ type: "stats", mode: this.mode, generation: this.o.generation, armed: this.armed, sourceIds: this.sourceIds, outputFrame: this.outputFrame, sourceFrame: this.sourceFrame, delayFrames: this.o.delayFrames, processTiming: this.timing.snapshot(), queue: this.queue ? this.queue.stats() : null, serial: this.g ? graphSnapshot(this.g, this.sourceIds) : null });
   }
   process(_inputs, outputs) {
     const started = this.timing.start(), quantum = outputs[0]?.[0]?.length ?? 0;
     for (const bus of outputs) for (const ch of bus) ch.fill(0);
     if (this.stopped) return false;
+    if (!this.armed) return true;
     try {
       const length = outputs[0]?.[0]?.length ?? 0;
       let at = Math.min(length, Math.max(0, this.o.delayFrames - this.outputFrame));
@@ -413,7 +423,7 @@ var WorkerOutput = class extends AudioWorkletProcessor {
           this.queue.consume(outputs, at, n);
         } else {
           this.g.render(n);
-          for (let bus = 0; bus < outputs.length; bus++) for (let ch = 0; ch < outputs[bus].length; ch++) for (let i = 0; i < n; i++) outputs[bus][ch][at + i] = bus === 7 ? ch === 0 ? this.g.left[i] : this.g.right[i] : this.views[bus][i * 2 + Math.min(ch, 1)];
+          for (let bus = 0; bus < outputs.length; bus++) for (let ch = 0; ch < outputs[bus].length; ch++) for (let i = 0; i < n; i++) outputs[bus][ch][at + i] = bus === 7 ? this.sourceIds ? 0 : ch === 0 ? this.g.left[i] : this.g.right[i] : this.views[bus]?.[i * 2 + Math.min(ch, 1)] ?? 0;
         }
         this.sourceFrame += n;
       }

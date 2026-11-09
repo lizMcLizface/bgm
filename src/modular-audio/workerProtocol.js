@@ -2,6 +2,7 @@
 import {contiguousLeadFrames,QueueLead} from './queueLead.js';
 import {ArrivalGaps} from './arrivalGaps.js';
 export const BUS_COUNT = 8;
+export function sourceSelection(ids=null){if(ids===null)return null;if(!Array.isArray(ids)||!ids.length||ids.length>6||new Set(ids).size!==ids.length||ids.some(id=>!Number.isInteger(id)||id<1||id>6))throw Error('Invalid source selection');return ids.slice();}
 export function workerScheduling(value='timer'){if(!['timer','message'].includes(value))throw Error('Invalid worker scheduling');return value;}
 export function workerOptions(raw = {}) {
   const o = {blockFrames:1024, poolBlocks:4, generation:1, scheduling:'timer', ...raw};
