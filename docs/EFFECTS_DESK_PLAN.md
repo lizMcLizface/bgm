@@ -1,5 +1,11 @@
 # Effects desk and independent effect boxes
 
+M3h update (2026-11-09): the opt-in worker harness now measures contiguous
+ready PCM lead per worker and coherently, with terminal drain separate and
+selected-rate profile trials. The user reports Short / 96 kHz crackling; the
+other tested combinations work well. Defaults and desk DSP remain unchanged.
+See [queue-lead evidence and next task](MODULAR_AUDIO_ENGINE_M3H_QUEUE_LEAD.md).
+
 ## Engine foundation update (2026-11-09)
 
 The next phase is specified in

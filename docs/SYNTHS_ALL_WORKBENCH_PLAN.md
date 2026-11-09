@@ -1,5 +1,11 @@
 # Synths/all workbench pass
 
+M3h update (2026-11-09): the opt-in worker harness now measures contiguous
+ready PCM lead per worker and coherently, with terminal drain separate and
+selected-rate profile trials. The user reports Short / 96 kHz crackling; the
+other tested combinations work well. Defaults and desk DSP remain unchanged.
+See [queue-lead evidence and next task](MODULAR_AUDIO_ENGINE_M3H_QUEUE_LEAD.md).
+
 Prepared 2026-11-08, before implementation. This is the working order for the
 requested audit, repairs and route to a physical tabletop. Existing sequencer,
 generator and synth plans remain useful design history; this document records

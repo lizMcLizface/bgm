@@ -1,6 +1,70 @@
 // src/modular-audio/poolOutputProcessor.js
 import { ReferenceGraph } from "./runtime.js?v=f2251aa547f5b85b";
 
+// src/modular-audio/queueLead.js
+function contiguousLeadFrames(slots, frame, capacity) {
+  let cursor = frame;
+  for (let hop = 0; hop < slots.length; hop++) {
+    let end = cursor;
+    for (let i = 0; i < slots.length; i++) {
+      const b = slots[i];
+      if (b && b.frame <= cursor && b.frame + b.n > end) end = b.frame + b.n;
+    }
+    if (end === cursor) break;
+    cursor = end;
+  }
+  return Math.min(capacity, Math.max(0, cursor - frame));
+}
+var LeadWindow = class {
+  constructor(capacity, blockFrames) {
+    this.capacity = capacity;
+    this.blockFrames = blockFrames;
+    this.bins = new Uint32Array(Math.floor(capacity / 128) + 1);
+    this.samples = 0;
+    this.min = Infinity;
+    this.max = 0;
+    this.zeros = 0;
+    this.underQuantum = 0;
+    this.underBlock = 0;
+    this.firstZero = null;
+    this.minNeeded = Infinity;
+    this.maxNeeded = 0;
+  }
+  observe(lead, needed, frame) {
+    this.samples++;
+    this.min = Math.min(this.min, lead);
+    this.max = Math.max(this.max, lead);
+    this.minNeeded = Math.min(this.minNeeded, needed);
+    this.maxNeeded = Math.max(this.maxNeeded, needed);
+    if (lead === 0) {
+      this.zeros++;
+      if (this.firstZero === null) this.firstZero = frame;
+    }
+    if (lead < needed) this.underQuantum++;
+    if (lead < this.blockFrames) this.underBlock++;
+    this.bins[Math.floor(lead / 128)]++;
+  }
+  snapshot() {
+    return { samples: this.samples, minFrames: this.samples ? this.min : null, maxFrames: this.samples ? this.max : null, zeroLeadQuanta: this.zeros, belowQuantumQuanta: this.underQuantum, belowBlockQuanta: this.underBlock, firstZeroSourceFrame: this.firstZero, minNeededFrames: this.samples ? this.minNeeded : null, maxNeededFrames: this.samples ? this.maxNeeded : null, histogram: Array.from(this.bins) };
+  }
+};
+var QueueLead = class {
+  constructor(capacity, blockFrames) {
+    if (!Number.isInteger(capacity) || capacity < 1 || capacity > 16384 || !Number.isInteger(blockFrames) || blockFrames < 1 || blockFrames > capacity) throw Error("Invalid queue-lead capacity");
+    this.capacity = capacity;
+    this.blockFrames = blockFrames;
+    this.steady = new LeadWindow(capacity, blockFrames);
+    this.drain = new LeadWindow(capacity, blockFrames);
+  }
+  observe(lead, needed, remaining, frame) {
+    if (needed <= 0) return;
+    (remaining >= this.capacity ? this.steady : this.drain).observe(Math.min(this.capacity, Math.max(0, lead)), needed, frame);
+  }
+  snapshot() {
+    return { scope: "Contiguous ready source frames at active-consumption quantum entry; startup delay excluded; final capacity window reported separately; not device output quality", capacityFrames: this.capacity, blockFrames: this.blockFrames, histogramBucketFrames: 128, observations: this.steady.samples + this.drain.samples, steady: this.steady.snapshot(), drain: this.drain.snapshot() };
+  }
+};
+
 // src/modular-audio/workerProtocol.js
 var BUS_COUNT = 8;
 function workerOptions(raw = {}) {
@@ -28,7 +92,19 @@ var WorkerPcmQueue = class {
     this.count = 0;
     this.wasMissing = false;
     this.slots = Array(this.o.poolBlocks).fill(null);
+    this.lead = new QueueLead(this.o.delayFrames, this.o.blockFrames);
     this.counters = { deliveredFrames: 0, underrunFrames: 0, underrunQuanta: 0, recoveries: 0, lateBlocks: 0, staleGeneration: 0, rejectedBlocks: 0, acceptedBlocks: 0, queueHighWater: 0 };
+  }
+  contiguousLead() {
+    return contiguousLeadFrames(this.slots, this.frame, this.o.delayFrames);
+  }
+  observeLead(needed) {
+    const lead = this.contiguousLead();
+    this.lead.observe(lead, needed, this.end - this.frame, this.frame);
+    return lead;
+  }
+  stats() {
+    return { ...this.counters, queuedBlocks: this.count, lead: this.lead.snapshot() };
   }
   release(slot) {
     const b = this.slots[slot];
@@ -102,15 +178,23 @@ var AlignedSourcePool = class {
     this.o = workerOptions(options);
     this.groups = groups;
     this.frame = 0;
+    this.end = end;
     this.queues = groups.map((_, i) => new WorkerPcmQueue(this.o, end, (b) => recycle(i, b)));
     this.blocks = Array(groups.length).fill(null);
     this.missing = Array(groups.length).fill(false);
     this.counters = { deliveredFrames: 0, underrunFrames: 0, underrunQuanta: 0, recoveries: 0 };
     this.wasMissing = false;
+    this.lead = new QueueLead(this.o.delayFrames, this.o.blockFrames);
   }
   accept(group, b) {
     if (!Number.isInteger(group) || !this.queues[group]) return false;
     return this.queues[group].accept(b);
+  }
+  observeLead(needed) {
+    let minimum = this.o.delayFrames;
+    for (let g = 0; g < this.queues.length; g++) minimum = Math.min(minimum, this.queues[g].observeLead(needed));
+    this.lead.observe(minimum, needed, this.end - this.frame, this.frame);
+    return minimum;
   }
   fill(inputs, n) {
     let missed = false;
@@ -172,7 +256,7 @@ var AlignedSourcePool = class {
     for (let g = 0; g < this.queues.length; g++) if (this.missing[g]) this.queues[g].counters.underrunQuanta++;
   }
   stats() {
-    return { ...this.counters, groups: this.queues.map((q) => ({ ...q.counters, queuedBlocks: q.count })) };
+    return { ...this.counters, lead: this.lead.snapshot(), groups: this.queues.map((q) => q.stats()) };
   }
   dispose() {
     this.queues.forEach((q) => q.dispose());
@@ -294,6 +378,7 @@ var PoolOutput = class extends AudioWorkletProcessor {
     try {
       const length = outputs[0]?.[0]?.length ?? 0, at = Math.min(length, Math.max(0, this.o.delayFrames - this.outputFrame)), n = Math.min(length - at, this.end - this.frame);
       if (n > 0) {
+        this.pool.observeLead(n);
         this.pool.fill(this.inputs, n);
         for (let bus = 0; bus < 7; bus++) for (let ch = 0; ch < outputs[bus].length; ch++) for (let i = 0; i < n; i++) outputs[bus][ch][at + i] = this.inputs[bus][i * 2 + Math.min(ch, 1)];
         this.g.render(n);

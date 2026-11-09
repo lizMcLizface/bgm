@@ -33,7 +33,7 @@ class PoolOutput extends AudioWorkletProcessor {
     for(const bus of outputs)for(const ch of bus)ch.fill(0);if(this.stopped)return false;
     try{
       const length=outputs[0]?.[0]?.length??0,at=Math.min(length,Math.max(0,this.o.delayFrames-this.outputFrame)),n=Math.min(length-at,this.end-this.frame);
-      if(n>0){this.pool.fill(this.inputs,n);
+      if(n>0){this.pool.observeLead(n);this.pool.fill(this.inputs,n);
         // Rust clears host-input storage after consuming it. Publish raw taps
         // before render, then publish only the dependent master output after.
         for(let bus=0;bus<7;bus++)for(let ch=0;ch<outputs[bus].length;ch++)for(let i=0;i<n;i++)outputs[bus][ch][at+i]=this.inputs[bus][i*2+Math.min(ch,1)];

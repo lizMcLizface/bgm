@@ -4,6 +4,8 @@ export const BUFFER_PROFILES=Object.freeze([
   Object.freeze({id:'medium',label:'Experimental · 2048 frames',blockFrames:512,poolBlocks:4}),
   Object.freeze({id:'short',label:'Experimental · 1024 frames',blockFrames:256,poolBlocks:4})
 ]);
+export const RECORDED_LISTENING_FEEDBACK=Object.freeze({source:'User listening report',date:'2026-11-09',profile:'short',rate:96000,result:'Crackly; other tested combinations worked well',device:null,outputRoute:null,cause:null});
+export function profileListeningNote(id,rate){return id==='short'&&rate===96000?'Recorded listening feedback: Short / 96 kHz crackled; other tested combinations worked well. Cause and output route are unconfirmed. Queue counters do not certify clean device output.':'';}
 export function bufferProfile(id='default'){
   const profile=BUFFER_PROFILES.find(p=>p.id===id);if(!profile)throw Error('Unknown buffering profile');return profile;
 }

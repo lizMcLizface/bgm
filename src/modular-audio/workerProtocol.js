@@ -1,4 +1,5 @@
 // Fixed-size transferable pool. This is not shared Wasm memory or a worker pool.
+import {contiguousLeadFrames,QueueLead} from './queueLead.js';
 export const BUS_COUNT = 8;
 export function workerOptions(raw = {}) {
   const o = {blockFrames:1024, poolBlocks:4, generation:1, ...raw};
@@ -33,8 +34,12 @@ export class WorkerPcmQueue {
     if (!Number.isSafeInteger(endFrame+this.o.delayFrames)||endFrame<1) throw Error('Invalid worker end frame');
     this.end=endFrame; this.recycle=recycle; this.frame=0; this.count=0;this.wasMissing=false;
     this.slots=Array(this.o.poolBlocks).fill(null);
+    this.lead=new QueueLead(this.o.delayFrames,this.o.blockFrames);
     this.counters={deliveredFrames:0,underrunFrames:0,underrunQuanta:0,recoveries:0,lateBlocks:0,staleGeneration:0,rejectedBlocks:0,acceptedBlocks:0,queueHighWater:0};
   }
+  contiguousLead(){return contiguousLeadFrames(this.slots,this.frame,this.o.delayFrames);}
+  observeLead(needed){const lead=this.contiguousLead();this.lead.observe(lead,needed,this.end-this.frame,this.frame);return lead;}
+  stats(){return {...this.counters,queuedBlocks:this.count,lead:this.lead.snapshot()};}
   release(slot) {
     const b=this.slots[slot]; if(!b)return;
     this.slots[slot]=null; this.count--;

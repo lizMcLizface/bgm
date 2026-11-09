@@ -1,0 +1,14 @@
+{
+  "source": "User message; listening feedback, not an automated capture",
+  "date": "2026-11-09",
+  "quote": "96k with the short buffer is crackly but the others work well, continue",
+  "profile": "short",
+  "sampleRate": 96000,
+  "result": "crackly",
+  "otherTestedCombinations": "work well",
+  "executor": null,
+  "device": null,
+  "outputRoute": null,
+  "cause": null,
+  "decision": "Keep the conservative default; preserve this listening result separately from transport metrics. No cause or fix is inferred."
+}

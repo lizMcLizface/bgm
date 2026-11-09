@@ -3,7 +3,7 @@
 Agreed direction: 2026-11-09. Status: **M0/M1, the opt-in M2 percussion/sidechain
 slice, M3a's actual six-role serial baseline, M3b owned FM, M3c owned core,
 M3d pitched DAG, M3e bounded single-worker transport, M3f three-worker source pool
-and M3g opt-in buffering profiles delivered**.
+and M3g opt-in buffering profiles plus M3h queue-lead observability delivered**.
 All six source engines have owned mutable Rust state; core's read-only additive
 tables are safely shared after preparation. External stereo host inputs and
 graph program/key compression exist. All six sources now also run inside one
@@ -12,8 +12,9 @@ dedicated worker with bounded PCM publication and serial startup fallback.
 M3f partitions the sources across three workers and keeps the dependent Rust
 master in the worklet. General graph distribution and workbench migration remain
 future work. Foundation through M3c committed locally as `bc4e35d`, M3d as
-`fa634f5`, M3e as `646183d`, M3f as `714ce43`. Each completed verified step is committed locally
+`fa634f5`, M3e as `646183d`, M3f as `714ce43`, M3g as `733c2e6`. Each completed verified step is committed locally
 under the user's standing instruction. No push/deployment.
+See [queue-lead contracts and results](MODULAR_AUDIO_ENGINE_M3H_QUEUE_LEAD.md).
 See [profile contracts and measurements](MODULAR_AUDIO_ENGINE_M3G_BUFFER_PROFILES.md).
 See [three-worker contracts and evidence](MODULAR_AUDIO_ENGINE_M3F_SOURCE_POOL.md).
 See [bounded worker contracts and evidence](MODULAR_AUDIO_ENGINE_M3E_WORKER.md).
@@ -705,3 +706,25 @@ when implementing. These establish capabilities, not project benchmark results.
 - [Chrome AudioWorklet design patterns](https://developer.chrome.com/blog/audio-worklet-design-pattern): Wasm, shared buffers, worker scheduling and nonblocking consumption.
 - [wasm-bindgen-rayon](https://docs.rs/wasm-bindgen-rayon/latest/wasm_bindgen_rayon/): worker/shared-memory integration, isolation and build prerequisites; not a real-time scheduler endorsement.
 - [Web Audio: DynamicsCompressorNode](https://www.w3.org/TR/webaudio/#DynamicsCompressorNode): external sidechain limitation.
+
+## M3h: queue-lead observability delivered (2026-11-09)
+
+See [exact contracts, evidence and next task](MODULAR_AUDIO_ENGINE_M3H_QUEUE_LEAD.md)
+and the handoff's final checkpoint. Bounded read-only active-quantum lead
+measurement now reports each worker/coherent minimum, separate terminal drain,
+null unobserved data and percentile ranges without an audio clock. Selected-rate
+profile batches retain failures and user listening evidence separately.
+
+Full suite **385 files / 2,755 tests** and public build pass; Rust/legacy bytes
+and fresh Default / 48 kHz remain unchanged. Live Short / 48 kHz passes with
+512-frame minimum lead. Three measured 96 kHz repeats/profile: Default and
+Medium **3/3**, zero misses; Short **0/3**, **168,192** total missed frames,
+with all score clocks/events complete. Independent lead accounting passes all
+14 live rows including the retained failed/incomplete stall trial. Short / 96
+kHz remains reported as crackly by the user; physical output is unmeasured.
+
+Next: compare a one-pending-task / one-block-per-task MessageChannel pump against
+the current nested worker timers, preserving controls, injected stalls,
+ownership, PCM, bounds and defaults. Timer clamping is a testable delivery risk,
+not a proven cause of the user's output-route symptoms. See M3h for the timer
+contract reference and exact acceptance scope.

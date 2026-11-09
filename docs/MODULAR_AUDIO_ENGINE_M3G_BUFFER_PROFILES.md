@@ -195,7 +195,10 @@ npm.cmd test -- src/modular-audio/bufferProfiles.test.js src/modular-audio/profi
 npm.cmd run build:public
 ```
 
-## Next task
+## Next task (delivered by M3h)
+
+See [M3h queue-lead contracts and results](MODULAR_AUDIO_ENGINE_M3H_QUEUE_LEAD.md).
+M3g was committed locally as `733c2e6`. The following was its handoff task.
 
 Add bounded **contiguous queue-lead measurements in source frames** at quantum
 boundaries for each worker and the coherent minimum. Use clock-independent

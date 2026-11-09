@@ -20,7 +20,7 @@ class WorkerOutput extends AudioWorkletProcessor {
     }catch(e){this.fail(e);}
   }
   fail(e){this.stopped=true;this.port.postMessage({type:'error',message:String(e)});}
-  stats(){this.port.postMessage({type:'stats',mode:this.mode,generation:this.o.generation,outputFrame:this.outputFrame,sourceFrame:this.sourceFrame,delayFrames:this.o.delayFrames,processTiming:this.timing.snapshot(),queue:this.queue?{...this.queue.counters,queuedBlocks:this.queue.count}:null,serial:this.g?graphSnapshot(this.g):null});}
+  stats(){this.port.postMessage({type:'stats',mode:this.mode,generation:this.o.generation,outputFrame:this.outputFrame,sourceFrame:this.sourceFrame,delayFrames:this.o.delayFrames,processTiming:this.timing.snapshot(),queue:this.queue?this.queue.stats():null,serial:this.g?graphSnapshot(this.g):null});}
   process(_inputs,outputs){
     // The worklet never waits for the worker, executes a catch-up render, or
     // replays an old block. A missing span is silent and advances source time.
@@ -32,7 +32,7 @@ class WorkerOutput extends AudioWorkletProcessor {
       let at=Math.min(length,Math.max(0,this.o.delayFrames-this.outputFrame));
       const n=Math.min(length-at,this.end-this.sourceFrame);
       if(n>0){
-        if(this.queue)this.queue.consume(outputs,at,n);
+        if(this.queue){this.queue.observeLead(n);this.queue.consume(outputs,at,n);}
         else{
           this.g.render(n);
           for(let bus=0;bus<outputs.length;bus++)for(let ch=0;ch<outputs[bus].length;ch++)for(let i=0;i<n;i++)outputs[bus][ch][at+i]=bus===7?(ch===0?this.g.left[i]:this.g.right[i]):this.views[bus][i*2+Math.min(ch,1)];

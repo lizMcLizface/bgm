@@ -5,10 +5,11 @@ step, then continue**. This authorizes local commits of verified steps without
 another confirmation. Keep the existing checkout and work; no push/deployment
 is authorized. Record verification, limitations and the next task in each step.
 
-Prepared and implemented through opt-in M3g buffering profiles on 2026-11-09. Read the working tree, this file and
+Prepared and implemented through opt-in M3h queue-lead observability on 2026-11-09. Read the working tree, this file and
 [MODULAR_AUDIO_ENGINE_PLAN.md](MODULAR_AUDIO_ENGINE_PLAN.md) first. This is an
 implementation handoff. **M0/M1, owned percussion/sidechain M2 and the actual
-six-role M3a baseline, M3b owned FM, M3c owned core, M3d pitched DAG, M3e single-worker transport, M3f source pool and M3g buffering profiles now exist.** Read
+six-role M3a baseline, M3b owned FM, M3c owned core, M3d pitched DAG, M3e single-worker transport, M3f source pool, M3g buffering profiles and M3h queue-lead observability now exist.** Read
+[queue-lead contracts and results](MODULAR_AUDIO_ENGINE_M3H_QUEUE_LEAD.md),
 [profile contracts and measurements](MODULAR_AUDIO_ENGINE_M3G_BUFFER_PROFILES.md),
 [three-worker contracts and evidence](MODULAR_AUDIO_ENGINE_M3F_SOURCE_POOL.md),
 [bounded worker contracts and evidence](MODULAR_AUDIO_ENGINE_M3E_WORKER.md),
@@ -24,7 +25,8 @@ The user subsequently requested **commit then continue**. Completed work through
 M3c was committed locally as **`bc4e35d`**, `Add owned modular audio foundations
 and six-source harness`. The later request **commit and keep iterating** committed
 M3d locally as **`fa634f5`**, `Integrate six owned sources into the Rust audio DAG`.
-M3e was then committed locally as **`646183d`**, M3f as **`714ce43`**. Each completed verified step
+M3e was then committed locally as **`646183d`**, M3f as **`714ce43`**,
+and M3g as **`733c2e6`**. Each completed verified step
 now ends with a local commit under the user's standing instruction; consult
 the final checkpoint and local Git log. No push/deployment.
 Earlier statements below about no commit describe their historical checkpoints.
@@ -1348,7 +1350,7 @@ start/end with no visibility changes.
   Three successful foreground desktop trials/profile do not establish phone /
   background headroom. Screenshot `.tmp/modular-audio-m3g-browser.png`.
 
-### Next task after M3g
+### Next task after M3g (delivered by M3h below)
 
 Add bounded **contiguous queue-lead** watermarks/histograms in source frames
 at quantum boundaries, per worker and coherent minimum, across the same profiles.
@@ -1359,3 +1361,48 @@ capability, distributed owner transactions, repartitioning and broad desk
 migration remain separate. Preserve coherent key/program dependencies, strict
 same-cadence PCM and honest cross-cadence/failure diagnostics. Do not infer
 speedup from unlike timer scopes or investigate locked-phone crackling here.
+
+## M3h delivery checkpoint (2026-11-09)
+
+Implemented [queue-lead observability](MODULAR_AUDIO_ENGINE_M3H_QUEUE_LEAD.md)
+for the opt-in worker/pool harness. At each active quantum, record bounded
+contiguous ready frames per worker and coherent minimum; exclude startup and
+separate planned terminal drain. Exact minima, fixed 128-frame histograms,
+zero/under-quantum/under-block counters and p05 ranges require no worklet clock.
+Read-only inspection preserves existing consumption and coherent key/program
+silence/recovery. The profile batch now measures the selected rate. Fresh
+Default / 48 kHz and all desk/legacy DSP remain unchanged.
+
+- User listening evidence retained verbatim: Short / 96 kHz crackles, other
+  tested combinations work well; device/executor/route/cause unspecified.
+  Selecting that combination displays the feedback. Delivery counters do not
+  override it or certify audible output.
+- Full suite **385 files / 2,755 tests**, **308.91 s**, passes with four workers
+  after an initial unexpected test-worker exit; both logs retained. Public
+  build and graph/fixture/package checks pass. Rust/Wasm unchanged, runtime
+  **`8c06ec0578a84abf`**. Focused actual-worklet/protocol tests pass. No native
+  Application Control bypass, push or deployment.
+- Live Short / 48 kHz: full **840,000 frames / 357 events**, six/main peaks,
+  zero misses, steady minimum **512 frames / 10.67 ms**.
+- Repeated selected **96 kHz** pool batch: three warmups + nine measured full
+  scores. Default/Medium each **3/3** measured passes, minimum steady lead
+  **2,304 / 768 frames**, zero misses. Short **0/3**, **56,064** missed frames
+  each (**168,192** total); warmup also fails. All 12 complete clocks/events,
+  no expired blocks, visible throughout. Worklet duration remains unavailable.
+- Separate Short / 96 kHz stall trial **fails** with incomplete group-0 DSP;
+  first zero lead predates the injection, so it is not isolated recovery proof.
+  Failed rows/pass flags remain intact. All **14** live rows pass independent
+  histogram/active/drain and shortage-to-underrun accounting checks. Session
+  save/fresh defaults/explicit stopped reload also verified.
+- Reports: `reports/modular_audio/m3h-*.json`; exact results, p05 ranges,
+  limitations and source links are in the M3h document. Screenshot:
+  `.tmp/modular-audio-m3h-browser.png`. M3g committed as `733c2e6`.
+
+**Next:** test a bounded MessageChannel worker task pump in place of recursively
+scheduled zero-delay timers. Nested-timer clamping is a concrete risk because
+Short / 96 kHz needs one 256-frame block every 2.67 ms; causality remains a
+hypothesis until the controlled change is compared. Keep one pending task and
+one block per task, retain explicit stall timers, control fairness, private
+ownership and coherent silence/no replay. Compare PCM, independent instances,
+96 kHz delivery and recovery. No default switch or phone/device crackle claim.
+Shared memory, distributed owners and broad desk migration remain separate.
