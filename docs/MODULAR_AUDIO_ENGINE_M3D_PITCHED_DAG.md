@@ -5,6 +5,9 @@ The completed foundation through M3c was committed locally as **`bc4e35d`**,
 `Add owned modular audio foundations and six-source harness`. M3d is subsequent
 working-tree work. No push or deployment was requested or performed.
 
+Historical checkpoint: the next **commit and keep iterating** request committed
+M3d locally as **`fa634f5`** before [M3e bounded worker transport](MODULAR_AUDIO_ENGINE_M3E_WORKER.md).
+
 ## Graph integration
 
 `legacy.core` and `legacy.fm` are now real version-1 DAG node kinds, backed by

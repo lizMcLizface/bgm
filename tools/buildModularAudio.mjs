@@ -10,9 +10,11 @@ const hash=b=>crypto.createHash('sha256').update(b).digest('hex');
 const read=p=>fs.readFileSync(path.join(root,p));
 const text=p=>read(p).toString().replace(/\r\n/g,'\n');
 const runtimeText=()=>buildSync({absWorkingDir:root,entryPoints:['src/modular-audio/runtime.js'],bundle:true,format:'esm',platform:'browser',write:false}).outputFiles[0].text;
+const workerEntries=[['graph-worker.js','graphWorker.js'],['worker-output-processor.js','workerOutputProcessor.js']];
+const workerText=entry=>buildSync({absWorkingDir:root,entryPoints:['src/modular-audio/'+entry],bundle:true,external:['./runtime.js'],format:'esm',platform:'browser',write:false}).outputFiles[0].text.replace(/\.\/runtime\.js/,`./runtime.js?v=${hash(runtimeText()).slice(0,16)}`);
 function sources(dir) { return fs.readdirSync(path.join(root,dir),{withFileTypes:true}).flatMap(e=>e.isDirectory()?e.name==='target'?[]:sources(`${dir}/${e.name}`): /\.(rs|toml|lock)$/.test(e.name)?[`${dir}/${e.name}`]:[]).sort(); }
 const sourceHash=()=>hash([...sources(crate),...sources('synth-engine/percussion'),...sources('synth-engine/fm'),'synth-engine/Cargo.toml','synth-engine/Cargo.lock',...sources('synth-engine/src'),...['colour','notes','headroom','denormal'].map(n=>'synth-engine/common/'+n+'.rs')].map(p=>p+'\n'+text(p)).join('\n'));
-const processors=['processor.js','ensemble-bridge-processor.js','dag-sources-processor.js'];
+const processors=['processor.js','ensemble-bridge-processor.js','dag-sources-processor.js',...workerEntries.map(([out])=>out)];
 const runtimeHash=()=>hash([...processors,'owned-core-processor.js','owned-core.js','owned-fm-processor.js','owned-fm.js','legacyPatchTransition.js','runtime.js','contracts.json','reference-patch.json','sidechain-patch.json','six-role-fixture.json'].map(f=>f+'\n'+text(`${out}/${f}`)).join('\n')+'\nlegacy-transition\n'+text('public/synth-lab/patch-transition.js'));
 const manifestPath=path.join(root,out,'build.json');
 const local=path.join(root,'.tmp/rust-tools'), env={...process.env,CARGO_HOME:path.join(local,'cargo'),RUSTUP_HOME:path.join(local,'rustup')};
@@ -21,6 +23,7 @@ const cargo=path.join(local,'cargo/bin',process.platform==='win32'?'cargo.exe':'
 function run(args) { const r=spawnSync(cargo,[...args,'--manifest-path',`${crate}/Cargo.toml`,'--offline'],{cwd:root,env,encoding:'utf8'}); if(r.stderr) process.stderr.write(r.stderr); if(r.error) throw r.error; if(r.status) { if(r.stdout)process.stdout.write(r.stdout); process.exit(r.status); } return r.stdout; }
 if(process.argv.includes('--test')) { process.stdout.write(run(['test'])); }
 else if(process.argv.includes('--check')) {
+ if(workerEntries.some(([file,entry])=>text(`public/modular-audio/${file}`)!==workerText(entry)))throw Error('Worker assets stale; run graph:build');
  if(text('src/modular-audio/ownedCore.js')!==text(`${out}/owned-core.js`)||!text(`${out}/owned-core-processor.js`).includes(`./owned-core.js?v=${hash(text(`${out}/owned-core.js`)).slice(0,16)}`))throw Error('Owned core assets stale; run graph:build');
  if(text('src/modular-audio/ownedFm.js')!==text(`${out}/owned-fm.js`)||text('public/synth-lab/patch-transition.js')!==text(`${out}/legacyPatchTransition.js`)||!text(`${out}/owned-fm-processor.js`).includes(`./owned-fm.js?v=${hash(text(`${out}/owned-fm.js`)).slice(0,16)}`))throw Error('Owned FM assets stale; run graph:build');
  if(text('src/modular-audio/legacyPatchTransition.js')!==text('public/synth-lab/patch-transition.js'))throw Error('Legacy host transition copy stale; run graph:build');
@@ -43,6 +46,7 @@ else if(process.argv.includes('--check')) {
  finally { engine.graph_contracts_free(descriptor); }
  fs.mkdirSync(path.join(root,out),{recursive:true});
  fs.writeFileSync(path.join(root,out,'runtime.js'),runtimeText());
+ for(const [file,entry]of workerEntries)fs.writeFileSync(path.join(root,out,file),workerText(entry));
  fs.writeFileSync(path.join(root,out,'contracts.json'),JSON.stringify(JSON.parse(contracts),null,2)+'\n');
  fs.writeFileSync(path.join(root,out,'graph.wasm'),wasm);
  for(const f of processors)fs.writeFileSync(path.join(root,out,f),text(`${out}/${f}`).replace(/\.\/runtime\.js(?:\?v=[a-f0-9]+)?/,`./runtime.js?v=${hash(text(`${out}/runtime.js`)).slice(0,16)}`));

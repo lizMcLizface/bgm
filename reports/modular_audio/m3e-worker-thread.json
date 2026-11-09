@@ -1,0 +1,720 @@
+{
+  "pass": true,
+  "graphVersion": "e2a03ea6b3d766e4",
+  "fixtureId": "six-role-reference-v1",
+  "scope": "Actual Node worker threads running unchanged browser worker entry; eight stereo buses exact against serial Rust, finite full-score cancellation/control and independent generations. Consumer-paced; no callback/deadline claim.",
+  "results": [
+    {
+      "pass": true,
+      "rate": 44100,
+      "frames": 771750,
+      "blocks": 754,
+      "maxAbs": 0,
+      "nonFinite": 0,
+      "rejectedPast": true,
+      "acceptedFuture": true,
+      "worker": {
+        "type": "stats",
+        "request": 99,
+        "generation": 1,
+        "frame": 771750,
+        "blocks": 754,
+        "renderMs": 3417.2669999999903,
+        "maxRenderMs": 11.109600000000228,
+        "blockMsHistogramLog2Us": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          99,
+          180,
+          32,
+          392,
+          51,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "rejectedEvents": 1,
+        "badRecycles": 0,
+        "freeBuffers": 4,
+        "inFlightBuffers": 0,
+        "graph": {
+          "frame": 771750,
+          "late": 0,
+          "overflow": 0,
+          "applied": 289
+        },
+        "meters": {
+          "17": {
+            "inputPeak": 0,
+            "keyPeak": 1.639519203260036e-43,
+            "reductionDb": 3.690438672338763e-29,
+            "outputPeak": 0,
+            "missingKey": 0,
+            "externalKey": 1
+          }
+        },
+        "memoryBytes": 5177344,
+        "roles": [
+          {
+            "active": 0,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 771750,
+            "peak": 0,
+            "latencyFrames": 0,
+            "peakActive": 2
+          },
+          {
+            "active": 0,
+            "steals": 14,
+            "dropped": 0,
+            "late": 0,
+            "frame": 771750,
+            "peak": 0,
+            "latencyFrames": 7.5,
+            "peakActive": 8
+          },
+          {
+            "active": 0,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 771750,
+            "peak": 0,
+            "latencyFrames": 0,
+            "peakActive": 2
+          },
+          {
+            "active": 0,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 771750,
+            "peak": 0,
+            "latencyFrames": 0,
+            "peakActive": 8
+          },
+          {
+            "active": 0,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 771750,
+            "peak": 0,
+            "latencyFrames": 7.5,
+            "peakActive": 2
+          },
+          {
+            "active": 0,
+            "queued": 0,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 771750,
+            "peakActive": 4
+          }
+        ]
+      },
+      "options": {
+        "blockFrames": 1024,
+        "poolBlocks": 4,
+        "generation": 1,
+        "delayFrames": 4096,
+        "bufferBytes": 65536
+      }
+    },
+    {
+      "pass": true,
+      "rate": 48000,
+      "frames": 840000,
+      "blocks": 821,
+      "maxAbs": 0,
+      "nonFinite": 0,
+      "rejectedPast": true,
+      "acceptedFuture": true,
+      "worker": {
+        "type": "stats",
+        "request": 99,
+        "generation": 1,
+        "frame": 840000,
+        "blocks": 821,
+        "renderMs": 4333.691800000021,
+        "maxRenderMs": 13.801400000000285,
+        "blockMsHistogramLog2Us": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          109,
+          196,
+          31,
+          276,
+          208,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "rejectedEvents": 1,
+        "badRecycles": 0,
+        "freeBuffers": 4,
+        "inFlightBuffers": 0,
+        "graph": {
+          "frame": 840000,
+          "late": 0,
+          "overflow": 0,
+          "applied": 289
+        },
+        "meters": {
+          "17": {
+            "inputPeak": 0,
+            "keyPeak": 1.7796490496925177e-43,
+            "reductionDb": 3.731329174323642e-29,
+            "outputPeak": 0,
+            "missingKey": 0,
+            "externalKey": 1
+          }
+        },
+        "memoryBytes": 5177344,
+        "roles": [
+          {
+            "active": 0,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 840000,
+            "peak": 0,
+            "latencyFrames": 0,
+            "peakActive": 2
+          },
+          {
+            "active": 0,
+            "steals": 14,
+            "dropped": 0,
+            "late": 0,
+            "frame": 840000,
+            "peak": 0,
+            "latencyFrames": 7.5,
+            "peakActive": 8
+          },
+          {
+            "active": 0,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 840000,
+            "peak": 0,
+            "latencyFrames": 0,
+            "peakActive": 2
+          },
+          {
+            "active": 0,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 840000,
+            "peak": 0,
+            "latencyFrames": 0,
+            "peakActive": 8
+          },
+          {
+            "active": 0,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 840000,
+            "peak": 0,
+            "latencyFrames": 7.5,
+            "peakActive": 2
+          },
+          {
+            "active": 0,
+            "queued": 0,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 840000,
+            "peakActive": 4
+          }
+        ]
+      },
+      "options": {
+        "blockFrames": 1024,
+        "poolBlocks": 4,
+        "generation": 1,
+        "delayFrames": 4096,
+        "bufferBytes": 65536
+      }
+    },
+    {
+      "pass": true,
+      "rate": 96000,
+      "frames": 1680000,
+      "blocks": 1641,
+      "maxAbs": 0,
+      "nonFinite": 0,
+      "rejectedPast": true,
+      "acceptedFuture": true,
+      "worker": {
+        "type": "stats",
+        "request": 99,
+        "generation": 1,
+        "frame": 1680000,
+        "blocks": 1641,
+        "renderMs": 8542.377900000054,
+        "maxRenderMs": 13.93630000000121,
+        "blockMsHistogramLog2Us": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          346,
+          263,
+          63,
+          571,
+          398,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "rejectedEvents": 1,
+        "badRecycles": 0,
+        "freeBuffers": 4,
+        "inFlightBuffers": 0,
+        "graph": {
+          "frame": 1680000,
+          "late": 0,
+          "overflow": 0,
+          "applied": 287
+        },
+        "meters": {
+          "17": {
+            "inputPeak": 0,
+            "keyPeak": 3.5592980993850354e-43,
+            "reductionDb": 3.744959642578489e-29,
+            "outputPeak": 0,
+            "missingKey": 0,
+            "externalKey": 1
+          }
+        },
+        "memoryBytes": 5570560,
+        "roles": [
+          {
+            "active": 0,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 1680000,
+            "peak": 0,
+            "latencyFrames": 0,
+            "peakActive": 1
+          },
+          {
+            "active": 0,
+            "steals": 14,
+            "dropped": 0,
+            "late": 0,
+            "frame": 1680000,
+            "peak": 0,
+            "latencyFrames": 7.5,
+            "peakActive": 8
+          },
+          {
+            "active": 0,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 1680000,
+            "peak": 0,
+            "latencyFrames": 0,
+            "peakActive": 2
+          },
+          {
+            "active": 0,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 1680000,
+            "peak": 0,
+            "latencyFrames": 0,
+            "peakActive": 8
+          },
+          {
+            "active": 0,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 1680000,
+            "peak": 0,
+            "latencyFrames": 7.5,
+            "peakActive": 2
+          },
+          {
+            "active": 0,
+            "queued": 0,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 1680000,
+            "peakActive": 4
+          }
+        ]
+      },
+      "options": {
+        "blockFrames": 1024,
+        "poolBlocks": 4,
+        "generation": 1,
+        "delayFrames": 4096,
+        "bufferBytes": 65536
+      }
+    }
+  ],
+  "independent": [
+    {
+      "pass": true,
+      "rate": 48000,
+      "frames": 48480,
+      "blocks": 48,
+      "maxAbs": 0,
+      "nonFinite": 0,
+      "rejectedPast": true,
+      "acceptedFuture": true,
+      "worker": {
+        "type": "stats",
+        "request": 99,
+        "generation": 11,
+        "frame": 48480,
+        "blocks": 48,
+        "renderMs": 234.19170000000304,
+        "maxRenderMs": 8.441700000003038,
+        "blockMsHistogramLog2Us": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2,
+          9,
+          5,
+          31,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "rejectedEvents": 1,
+        "badRecycles": 0,
+        "freeBuffers": 4,
+        "inFlightBuffers": 0,
+        "graph": {
+          "frame": 48480,
+          "late": 0,
+          "overflow": 0,
+          "applied": 31
+        },
+        "meters": {
+          "17": {
+            "inputPeak": 0.06591139733791351,
+            "keyPeak": 0.10959301888942719,
+            "reductionDb": 6.714969635009766,
+            "outputPeak": 0.03873535245656967,
+            "missingKey": 0,
+            "externalKey": 1
+          }
+        },
+        "memoryBytes": 5177344,
+        "roles": [
+          {
+            "active": 2,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 48480,
+            "peak": 0.009713953360915184,
+            "latencyFrames": 0,
+            "peakActive": 2
+          },
+          {
+            "active": 6,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 48480,
+            "peak": 0.14276078343391418,
+            "latencyFrames": 7.5,
+            "peakActive": 6
+          },
+          {
+            "active": 2,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 48480,
+            "peak": 0.13241156935691833,
+            "latencyFrames": 0,
+            "peakActive": 2
+          },
+          {
+            "active": 4,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 48480,
+            "peak": 0.36066028475761414,
+            "latencyFrames": 0,
+            "peakActive": 4
+          },
+          {
+            "active": 1,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 48480,
+            "peak": 0.06041119992733002,
+            "latencyFrames": 7.5,
+            "peakActive": 2
+          },
+          {
+            "active": 3,
+            "queued": 51,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 48480,
+            "peakActive": 4
+          }
+        ]
+      },
+      "options": {
+        "blockFrames": 1024,
+        "poolBlocks": 4,
+        "generation": 11,
+        "delayFrames": 4096,
+        "bufferBytes": 65536
+      }
+    },
+    {
+      "pass": true,
+      "rate": 48000,
+      "frames": 48480,
+      "blocks": 48,
+      "maxAbs": 0,
+      "nonFinite": 0,
+      "rejectedPast": true,
+      "acceptedFuture": true,
+      "worker": {
+        "type": "stats",
+        "request": 99,
+        "generation": 12,
+        "frame": 48480,
+        "blocks": 48,
+        "renderMs": 226.443299999999,
+        "maxRenderMs": 9.69510000000082,
+        "blockMsHistogramLog2Us": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4,
+          7,
+          5,
+          30,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "rejectedEvents": 1,
+        "badRecycles": 0,
+        "freeBuffers": 4,
+        "inFlightBuffers": 0,
+        "graph": {
+          "frame": 48480,
+          "late": 0,
+          "overflow": 0,
+          "applied": 31
+        },
+        "meters": {
+          "17": {
+            "inputPeak": 0.06591139733791351,
+            "keyPeak": 0.10959301888942719,
+            "reductionDb": 6.714969635009766,
+            "outputPeak": 0.03873535245656967,
+            "missingKey": 0,
+            "externalKey": 1
+          }
+        },
+        "memoryBytes": 5177344,
+        "roles": [
+          {
+            "active": 2,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 48480,
+            "peak": 0.009713953360915184,
+            "latencyFrames": 0,
+            "peakActive": 2
+          },
+          {
+            "active": 6,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 48480,
+            "peak": 0.14276078343391418,
+            "latencyFrames": 7.5,
+            "peakActive": 6
+          },
+          {
+            "active": 2,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 48480,
+            "peak": 0.13241156935691833,
+            "latencyFrames": 0,
+            "peakActive": 2
+          },
+          {
+            "active": 4,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 48480,
+            "peak": 0.36066028475761414,
+            "latencyFrames": 0,
+            "peakActive": 4
+          },
+          {
+            "active": 1,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 48480,
+            "peak": 0.06041119992733002,
+            "latencyFrames": 7.5,
+            "peakActive": 2
+          },
+          {
+            "active": 3,
+            "queued": 51,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 48480,
+            "peakActive": 4
+          }
+        ]
+      },
+      "options": {
+        "blockFrames": 1024,
+        "poolBlocks": 4,
+        "generation": 12,
+        "delayFrames": 4096,
+        "bufferBytes": 65536
+      }
+    }
+  ]
+}

@@ -1,0 +1,181 @@
+{
+  "version": 1,
+  "pass": true,
+  "method": "Finite live dry Rust DAG mix; analyser observations, not device loopback",
+  "fixtureId": "six-role-reference-v1",
+  "fixtureHash": "77ce180861239426c0c63037235cf98d74a2bbfa09a2a46ee3da3353bb29a7df",
+  "graphVersion": "e2a03ea6b3d766e4",
+  "rate": 44100,
+  "executor": {
+    "requested": "worker",
+    "actual": "worker",
+    "fallbackReason": null,
+    "bufferingLatencyFrames": 4096,
+    "bufferingLatencyMs": 92.87981859410431,
+    "pcmPoolBytes": 262144,
+    "transport": "transferable MessagePort; no shared Wasm memory"
+  },
+  "observedPeak": 0.1089126244187355,
+  "rolePeaks": [
+    0.1825447678565979,
+    0.1433584839105606,
+    0.18039751052856445,
+    0.42142051458358765,
+    0.09898416697978973,
+    0.965412974357605
+  ],
+  "observations": 176,
+  "stalls": [],
+  "baseLatency": 0.01,
+  "outputLatency": 0.04,
+  "crossOriginIsolated": false,
+  "stats": {
+    "output": {
+      "type": "stats",
+      "mode": "worker",
+      "generation": 5,
+      "outputFrame": 775936,
+      "sourceFrame": 771750,
+      "delayFrames": 4096,
+      "queue": {
+        "deliveredFrames": 771750,
+        "underrunFrames": 0,
+        "underrunQuanta": 0,
+        "recoveries": 0,
+        "lateBlocks": 0,
+        "staleGeneration": 0,
+        "rejectedBlocks": 0,
+        "acceptedBlocks": 754,
+        "queueHighWater": 4,
+        "queuedBlocks": 0
+      },
+      "serial": null
+    },
+    "worker": {
+      "type": "stats",
+      "request": 1,
+      "generation": 5,
+      "frame": 771750,
+      "blocks": 754,
+      "renderMs": 6350.100000020117,
+      "maxRenderMs": 39.5,
+      "blockMsHistogramLog2Us": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        32,
+        232,
+        26,
+        60,
+        333,
+        68,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "rejectedEvents": 0,
+      "badRecycles": 0,
+      "freeBuffers": 4,
+      "inFlightBuffers": 0,
+      "graph": {
+        "frame": 771750,
+        "late": 0,
+        "overflow": 0,
+        "applied": 357
+      },
+      "meters": {
+        "17": {
+          "inputPeak": 0,
+          "keyPeak": 1.639519203260036e-43,
+          "reductionDb": 3.690438672338763e-29,
+          "outputPeak": 0,
+          "missingKey": 0,
+          "externalKey": 1
+        }
+      },
+      "memoryBytes": 5177344,
+      "roles": [
+        {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 7
+        },
+        {
+          "active": 0,
+          "steals": 14,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "peak": 0,
+          "latencyFrames": 7.5,
+          "peakActive": 8
+        },
+        {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 2
+        },
+        {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 8
+        },
+        {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "peak": 0,
+          "latencyFrames": 7.5,
+          "peakActive": 2
+        },
+        {
+          "active": 0,
+          "queued": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 771750,
+          "peakActive": 4
+        }
+      ]
+    },
+    "error": null
+  }
+}

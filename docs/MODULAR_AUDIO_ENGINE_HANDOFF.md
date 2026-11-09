@@ -1,9 +1,15 @@
 # Modular audio engine handoff
 
-Prepared and implemented through opt-in M3d pitched DAG on 2026-11-09. Read the working tree, this file and
+User workflow instruction (2026-11-09): **commit at the end of every completed
+step, then continue**. This authorizes local commits of verified steps without
+another confirmation. Keep the existing checkout and work; no push/deployment
+is authorized. Record verification, limitations and the next task in each step.
+
+Prepared and implemented through opt-in M3e bounded worker transport on 2026-11-09. Read the working tree, this file and
 [MODULAR_AUDIO_ENGINE_PLAN.md](MODULAR_AUDIO_ENGINE_PLAN.md) first. This is an
 implementation handoff. **M0/M1, owned percussion/sidechain M2 and the actual
-six-role M3a baseline, M3b owned FM, M3c owned core and M3d pitched DAG now exist. Next is a bounded optional worker prototype.** Read
+six-role M3a baseline, M3b owned FM, M3c owned core, M3d pitched DAG and M3e single-worker transport now exist. Next is a measured multi-worker source executor.** Read
+[bounded worker contracts and evidence](MODULAR_AUDIO_ENGINE_M3E_WORKER.md),
 [pitched DAG contracts and evidence](MODULAR_AUDIO_ENGINE_M3D_PITCHED_DAG.md),
 [owned core contracts and evidence](MODULAR_AUDIO_ENGINE_M3C_OWNED_CORE.md),
 [owned FM contracts and evidence](MODULAR_AUDIO_ENGINE_M3B_OWNED_FM.md) and
@@ -14,7 +20,9 @@ end for current results and limits.
 
 The user subsequently requested **commit then continue**. Completed work through
 M3c was committed locally as **`bc4e35d`**, `Add owned modular audio foundations
-and six-source harness`. M3d is subsequent uncommitted work; no push/deployment.
+and six-source harness`. The later request **commit and keep iterating** committed
+M3d locally as **`fa634f5`**, `Integrate six owned sources into the Rust audio DAG`.
+M3e is subsequent uncommitted work; no push/deployment.
 Earlier statements below about no commit describe their historical checkpoints.
 
 The older checkpoints are historical. In particular, M2 rebuilds the percussion
@@ -987,3 +995,127 @@ Measure actual deadlines/stalls and capability/hosting/non-isolated behavior;
 do not infer parallel speedup from source worklet count or offline elapsed time.
 Keep compatible inserts batched. No broad workbench migration, complete effect
 port, deployment or screen-lock investigation is bundled into this checkpoint.
+
+## M3e delivery checkpoint (2026-11-09)
+
+The user requested **commit and keep iterating**. M3d was committed locally as
+**`fa634f5`**, `Integrate six owned sources into the Rust audio DAG`. Working tree
+was clean afterward. M3e below is subsequent uncommitted work. No push/deploy.
+Read [M3e contracts/results](MODULAR_AUDIO_ENGINE_M3E_WORKER.md) before continuing.
+
+### Implemented
+
+- Canonical `src/modular-audio/graphWorker.js` owns one prepared six-role Rust
+  graph/Wasm instance. `workerOutputProcessor.js` consumes eight stereo buses
+  through a direct transferred MessagePort. `workerProtocol.js` bounds and
+  validates generation/frame/slot/block publication. No cross-thread raw Rust
+  pointers or shared mutable engine state. This is one complete-graph worker,
+  not yet a parallel worker pool or broad desk/effect migration.
+- Default 4 × 1024-frame buffers, 262,144 PCM bytes. Allowed block sizes
+  256/512/1024/2048, pool 2–8. Worker renders one block per task, tracking a
+  fixed in-flight pool. AudioWorklet never waits or runs catch-up DSP; missing
+  frames are silent, expired blocks discarded and partially late blocks trimmed.
+  Source clock advances on misses. Generation mismatches/duplicates/malformed
+  publications cannot replace current slots. Transport counters are separate
+  from graph event counters and are not physical device-underrun measurements.
+- Added buffering is explicitly **4096 frames** by default: **92.88 / 85.33 /
+  42.67 ms** at 44.1/48/96 kHz, plus original instrument/device latency. Startup
+  primes the bounded pool outside playback. Serial fallback prepends the same
+  delay. Output clock includes delay and final quantum padding; source clock
+  does not. Message dispatch/recycling still allocates JS messages/views;
+  fixed PCM capacity does not mean allocation-free JavaScript.
+- Worker configuration/score is prepared once; worker owns live graph events.
+  Future event/cancellation is sample-timed; frames already rendered into
+  lookahead are rejected. At most 64 control requests outstanding, 3 s timeout.
+  Reset/reload creates fresh graph/worker/generation. Startup absence/failure/
+  clone/priming timeout exposes actual serial executor/reason. Runtime error
+  stops the run; no concealed synchronous reconstruction in `process()`.
+- `workerBrowser.js` handles preparation/controls/lifecycle; `workerHarness.js`
+  and `tools/modular-worker.html` provide opt-in finite dry mix playback,
+  reference/fallback, stall injection, real browser worker PCM verification and
+  local fixture save/reload. Existing original/six-role pages link to it;
+  existing desk routes/defaults remain intact. No shared memory/isolation
+  headers or hosting/deployment change. New assets are bundled/version-checked
+  by graph builder; public packaging checks require worker page/assets.
+
+### Executable checks
+
+- `reports/modular_audio/m3e-worker-thread.json`: actual Node threads run the
+  unchanged browser worker entry using only a Worker API adapter. Full 17.5 s
+  workload, all eight stereo buses, **max difference 0 / nonfinite 0** at
+  44.1/48/96 kHz, future cancellation/past-event rejection. Two independent
+  workers/generations also pass. Consumer-paced, not a deadline benchmark.
+- `m3e-browser-worker-pcm.json`: same full-score eight-bus exactness/control
+  checks in real browser workers at three rates. **754 / 821 / 1641 blocks**,
+  final partial blocks included. Worker capacity **5,177,344 / 5,177,344 /
+  5,570,560 bytes**, plus the fixed 262,144-byte pool. Non-isolated Chrome 157.
+- Full suite **378 files / 2,725 tests passed**, **130.04 s**,
+  `.tmp/modular-audio-m3e-suite.log`; focused final host/protocol checks **11
+  tests passed**, `.tmp/modular-audio-m3e-focused.log`. Tests include all bus
+  layouts, irregular/final blocks, exact startup delay, stale/duplicate/bounds,
+  missing-span silence, late trim/discard/recovery, disposal/fail-closed,
+  independent workers and explicit/missing/failed startup fallback. Older
+  legacy/SIMD/acoustic/FM-bank/M1/M2/M3d tests remain active.
+- Final public build **44.72 s**, packaging/bank/exclusion checks pass,
+  `.tmp/modular-audio-m3e-build.log`. Existing chunk advisory remains.
+- Rust/Wasm/legacy DSP code is unchanged from committed M3d. Graph Wasm remains
+  **296,101 bytes**, SHA256
+  **`a5c3d4b70b57d63094d84fe539d2ec0effe30d5eea5fc59034fbb9a1ff462293`**.
+  Full runtime manifest is now **`e2a03ea6b3d766e4`** because worker assets are
+  included in provenance. Prior reports retain their historical versions.
+  Native executable tests remain blocked by Application Control, not bypassed.
+
+### Live transport evidence and limits
+
+All reports under `reports/modular_audio/`; original pinned fixture/hash
+unchanged. Same **4175** preview; actual worker and serial output paths, analyser
+observations rather than direct listening, physical loopback or screen-lock.
+
+- `m3e-live-worker-44100.json` / `m3e-live-worker-48000.json`: finite main and
+  all-six source activity, zero misses/expired/stale/malformed blocks, queue
+  high-water 4. Both worker and source output end **771,750 / 840,000 frames**,
+  **357 events**, expected FM 14 steals only, no reported graph late/drop/
+  overflow. Worker render+copy maximum **39.5 / 29.8 ms**, with some concurrent
+  suite/build load. No controlled CPU attribution or stress-tolerance claim.
+- `m3e-live-stall.json`: 250 ms stall injected at worker frame 8192, 48 kHz.
+  **829,248 delivered + 10,752 silent = 840,000 frames**; 84 miss quanta,
+  10 expired blocks, one recovery, no stale/invalid publications. Worker catches
+  up to 840,000 / 357 events. This passes the explicit starvation/recovery
+  policy and deliberately contains silence during the producer stall.
+- `m3e-live-fallback.json`: explicit requested-worker/actual-serial startup
+  fallback, visible reason, same 4096-frame delay; nonzero main/all six sources,
+  840,000 / 357 events and no reported graph late/drop/overflow. Actual missing
+  Worker/construction failure is separately tested. No seamless runtime
+  handover is claimed.
+- **Retained failure** `m3e-live-worker-96000-stress.json`: during uncontrolled
+  concurrent suite/build load, worker starvation caused **1,619,456 silent /
+  60,544 delivered frames**, 12,652 miss quanta, 792 expired blocks, six
+  recoveries. Output reaches 1,680,000 source frames while worker is only at
+  **875,520 / 326 events**; max block 44.3 ms. `pass=false` is retained. The
+  UI now states missing transport frames explicitly. No pool increase or
+  relaxed pass criterion was used to hide this failed run.
+- `m3e-live-worker-96000.json`: repeat after background checks finish passes
+  with **1,680,000 delivered frames**, **zero misses/expired/stale/malformed**,
+  1641 blocks, queue high-water 4, worker **357 events**, all six source peaks
+  nonzero, max worker block **11.5 ms**. Same fixed pool and pass criteria.
+  This working foreground run does not erase the retained overload failure or
+  establish locked-phone/mobile headroom.
+- Fixture saved locally, page reloaded, fixture restored **with audio stopped**.
+  New playback creates a fresh generation/graph. Base/output latency is
+  reported separately (10/40 ms at 48 kHz), with transport buffering additional.
+- Final fallback run was repeated with the final host bundle; metadata names
+  actual serial / no PCM transport. New page left **48 kHz, stopped** at
+  `http://127.0.0.1:4175/tools/modular-worker.html`. Screenshot:
+  `.tmp/modular-audio-m3e-browser.png`. User's original modular page links here.
+
+### Next task after M3e
+
+Specify and prototype measured **multi-worker source execution**, using this
+serial graph/transport correctness baseline and pinned fixture. Keep compiled
+dependency/master/key levels explicit; define per-worker state/table ownership,
+event fan-out, frame/generation publication, chosen added buffering, nonblocking
+miss/stale policy and tested fallback. Measure equivalent processing jobs on
+foreground target devices and retain failures. Shared-memory/isolation hosting
+is a separate decision; current transfer messaging still adds JS allocation and
+dispatch jitter. No speedup, complete worker-pool migration, broad effect/desk
+port or locked-phone fix is established by this checkpoint.

@@ -21,9 +21,11 @@ now supplies second/bass in an opt-in shared-instance worklet. [M3c owned core](
 supplies lead/rhythm/pad. [M3d pitched DAG](MODULAR_AUDIO_ENGINE_M3D_PITCHED_DAG.md)
 now runs all six sources and explicit mixing/keyed compression inside one Rust
 graph, preserving the opt-in desk comparison and adding a dry Rust mix audition.
-Next is bounded optional worker execution before broad workbench migration.
-Foundation through M3c committed locally as `bc4e35d`; M3d is subsequent
-working-tree work. No push/deployment.
+[M3e bounded worker transport](MODULAR_AUDIO_ENGINE_M3E_WORKER.md) now supplies an
+opt-in complete-graph worker, explicit buffered publication and serial startup
+fallback. Next is a measured multi-worker source executor before broad workbench
+migration. Foundation through M3c committed locally as `bc4e35d`, M3d as
+`fa634f5`; M3e is subsequent working-tree work. No push/deployment.
 
 ## 1. Establish the playback and persistence contract
 

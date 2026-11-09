@@ -1,13 +1,17 @@
 # Modular audio engine and parallel rendering plan
 
 Agreed direction: 2026-11-09. Status: **M0/M1, the opt-in M2 percussion/sidechain
-slice, M3a's actual six-role serial baseline, M3b owned FM, M3c owned core and M3d pitched DAG delivered**.
+slice, M3a's actual six-role serial baseline, M3b owned FM, M3c owned core,
+M3d pitched DAG and M3e bounded single-worker transport delivered**.
 All six source engines have owned mutable Rust state; core's read-only additive
 tables are safely shared after preparation. External stereo host inputs and
 graph program/key compression exist. All six sources now also run inside one
-prepared, block-capable Rust DAG. Workbench migration and worker scheduling
-remain future work. Foundation through M3c committed locally as `bc4e35d`;
-M3d is subsequent working-tree work. No push/deployment.
+prepared, block-capable Rust DAG. M3e optionally moves that whole graph into one
+dedicated worker with bounded PCM publication and serial startup fallback.
+Workbench migration and a parallel multi-worker executor remain future work.
+Foundation through M3c committed locally as `bc4e35d`, M3d as `fa634f5`;
+M3e is subsequent working-tree work. No push/deployment.
+See [bounded worker contracts and evidence](MODULAR_AUDIO_ENGINE_M3E_WORKER.md).
 See [pitched DAG contracts and evidence](MODULAR_AUDIO_ENGINE_M3D_PITCHED_DAG.md).
 See [owned core contracts and evidence](MODULAR_AUDIO_ENGINE_M3C_OWNED_CORE.md).
 See [owned FM contracts and evidence](MODULAR_AUDIO_ENGINE_M3B_OWNED_FM.md).
@@ -561,6 +565,44 @@ policy, hosting/capability checks and serial fallback before measuring actual
 callback deadlines/stalls. No worker speedup or device-underrun claim follows
 from these offline wall times. Broad migration and locked-phone crackling stay
 outside this checkpoint.
+
+### M3e delivery: bounded optional single-worker transport (2026-11-09)
+
+See [the M3e record](MODULAR_AUDIO_ENGINE_M3E_WORKER.md). M3d was committed locally
+as `fa634f5` before this iteration. This stage moves the whole serial Rust graph
+to one dedicated worker; multi-worker source execution remains next.
+
+- Fixed transferable PCM pool, direct worker/worklet MessageChannel, exclusive
+  graph/Wasm ownership, generation/frame/slot publication. Default 4 × 1024
+  frames, eight stereo buses, 256 KiB pool; explicit 4096-frame buffering and
+  equal-delay serial startup fallback. No shared-memory/header changes.
+- Nonblocking consumer: missing spans become silence, expired blocks are
+  discarded, partially late blocks are trimmed, source time advances. Startup
+  failures expose a serial fallback reason; runtime failures stop the run.
+  Future live events retain ownership and sample timestamps; events inside
+  rendered lookahead are rejected. Reset/reload creates a new generation.
+- Real Node and browser workers match all eight serial Rust stereo buses exactly
+  for the full score at three rates, including cancellation/past-event rejection;
+  independent worker generations pass. Protocol, fallback and failure tests pass.
+  Full suite **378 files / 2,725 tests passed**, 130.04 s; final host/protocol
+  focused rerun 11 tests passed. Public build passed; Rust DSP bytes unchanged.
+- Opt-in `tools/modular-worker.html` adds live worker/serial/fallback playback,
+  stall injection, worker PCM verification and fixture persistence. Live 44.1/
+  48 kHz transport runs have no misses. A 250 ms scheduling stall demonstrably
+  silences missing frames, discards old blocks and recovers without replay.
+  A failed 96 kHz run during concurrent suite/build load is retained: worker
+  starvation is observable, not hidden as a claimed speedup or device underrun.
+  The 96 kHz repeat after those checks finish delivers all 1,680,000 frames
+  with zero transport misses using the same pool/criteria. Save/reload restores
+  the fixture with audio stopped. No background/mobile headroom is established.
+
+**Next: measured multi-worker source execution**, with explicit compiled
+dependency/master/key levels, per-worker state/table ownership, event fan-out,
+generation/frame publication, chosen added latency, tested misses/fallback and
+foreground target-device measurements of equivalent processing jobs. The M3e
+message transport still allocates JS messages and can suffer dispatch jitter;
+consider shared memory/hosting separately. Keep the serial reference and all
+workbench defaults. No broad migration or locked-phone fix is claimed.
 
 ### Sidechain acceptance retained for workbench integration
 

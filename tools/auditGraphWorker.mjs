@@ -1,0 +1,13 @@
+import fs from 'node:fs';
+import {verifyWorker} from '../src/modular-audio/workerVerification.js';
+import {BrowserThreadWorker,MessageChannel} from './workerNodeAdapter.mjs';
+globalThis.MessageChannel=MessageChannel;
+const manifest=JSON.parse(fs.readFileSync('public/modular-audio/build.json'));
+const assets={fixture:JSON.parse(fs.readFileSync('public/modular-audio/six-role-fixture.json')),contracts:JSON.parse(fs.readFileSync('public/modular-audio/contracts.json')),modules:{graph:new WebAssembly.Module(fs.readFileSync('public/modular-audio/graph.wasm'))}};
+const results=[];
+for(const rate of [44100,48000,96000])results.push(await verifyWorker(assets,rate,{makeWorker:()=>new BrowserThreadWorker()}));
+const independent=await Promise.all([11,12].map(generation=>verifyWorker(assets,48000,{generation,seconds:1.01,makeWorker:()=>new BrowserThreadWorker()})));
+const report={pass:[...results,...independent].every(r=>r.pass),graphVersion:manifest.version,fixtureId:assets.fixture.id,scope:'Actual Node worker threads running unchanged browser worker entry; eight stereo buses exact against serial Rust, finite full-score cancellation/control and independent generations. Consumer-paced; no callback/deadline claim.',results,independent};
+fs.writeFileSync('reports/modular_audio/m3e-worker-thread.json',JSON.stringify(report,null,2)+'\n');
+if(!report.pass)throw Error('Worker verification failed');
+console.log('Three full-score threaded PCM/control checks and two independent instances passed.');
