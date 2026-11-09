@@ -854,3 +854,25 @@ host checks return 200 for the page and shared stylesheet. The user confirms
 the phone page opens and works after handling the self-signed certificate
 warning themselves. No deployment, firewall change, DSP/default or setup
 migration. Keep the HTTPS preview running for actual All listening evidence.
+
+### Phone navigation and concise diagnostics (2026-11-09)
+
+The phone user reports serial source preview works, one worker badly breaks up,
+and desktop one worker works. Full report selection/posting was impractical;
+the floating Setup, overlapping first-open panels and document-wide scrolling
+also blocked use. [Contracts and exact verification](MODULAR_AUDIO_ENGINE_M4A_PHONE_USABILITY.md)
+now cover a top-bar Setup dropdown, contained camera navigation with Move desk /
+Go to…, one-time measured fresh narrow layout, and compact copy/selectable text.
+Existing IDs/poses remain; use Spread once for an existing overlapping layout.
+
+Serial is the initial opt-in preview choice. Explicit worker playback stops at
+its first missing PCM span and records failure. No mid-run engine substitution
+or buffering retune; ordinary transport/keyboard/FX and generic harness defaults
+stay intact. Per-run browser/build identity and actual delivery counters are
+separate from listening assessment. Final live desktop serial: **668,956 frames /
+22 events**, zero late/overflow, a **986-character** matching compact report.
+390 x 844 browser layout and pose reload pass; physical touch/pull-to-refresh
+and phone worker cause remain unknown. Focused UI/worker regressions and public
+build/package checks pass; see linked document for overlapping test counts.
+Next: physical phone usability and compact guarded-worker evidence before more
+roles or speculative tuning. Keep HTTPS LAN preview running; no deployment.

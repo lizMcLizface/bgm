@@ -63,10 +63,11 @@ const defaultLayout=(box,homeW=HOME_W,homeH=HOME_H)=>{
  return {w,h,x:Math.round((w-homeW)/2),y:Math.round((h-homeH)/2)};
 };
 
-export default function Desk({children,includeHomeInFit=true,objects=null,storageKey='synths:desk',arrangeRequest=0,arrangeWidth=3000,arrangeObjects=null,resetObjects=null,minZoom=MIN_ZOOM}){
+export default function Desk({children,includeHomeInFit=true,objects=null,storageKey='synths:desk',arrangeRequest=0,arrangeWidth=3000,arrangeObjects=null,resetObjects=null,minZoom=MIN_ZOOM,containedNavigation=false}){
  const VIEW_KEY=storageKey,LAYOUT_KEY=storageKey+':layout';
  const view=useRef(null),homeRef=useRef(null),deskRef=useRef(null),[homeEl,setHomeEl]=useState(null);
- const touch=useMemo(isTouchScreen,[]);
+ const coarse=useMemo(isTouchScreen,[]),touch=coarse&&!containedNavigation;
+ const [moving,setMoving]=useState(false);
  // a ref callback that stays the same between renders: a new one each time would null the element in the middle of a drag
  const setHome=useCallback(n=>{homeRef.current=n;if(n)setHomeEl(n);},[]);
  const [box,setBox]=useState({w:HOME_W,h:HOME_H,measured:false});
@@ -170,9 +171,10 @@ export default function Desk({children,includeHomeInFit=true,objects=null,storag
  // zoom to fit: everything on the desk (the instrument and every panel) in the window at once, as large as it can be without going past 1:1
  const fitAll=useCallback(()=>{
   const c=measure(includeHomeInFit),cw=c.r-c.l,ch=c.b-c.t;
-  const z=clamp(Math.min(box.w/cw,box.h/ch),minZoom,1);
-  commit(z,(box.w-cw*z)/2-c.l*z,(box.h-ch*z)/2-c.t*z);
- },[box,commit,includeHomeInFit,minZoom]);
+  const nav=containedNavigation?(view.current?.querySelector('.desk-zoom')?.getBoundingClientRect().height??0)+12:0,height=Math.max(1,box.h-nav);
+  const z=clamp(Math.min(box.w/cw,height/ch),minZoom,1);
+  commit(z,(box.w-cw*z)/2-c.l*z,(height-ch*z)/2-c.t*z);
+ },[box,commit,includeHomeInFit,minZoom,containedNavigation]);
 
  // the first time on this device the view starts on everything that is on the desk (the instrument and the panels around it)
  // after a reset the desk is laid out afresh and the view starts on everything again (the panels put themselves back)
@@ -219,7 +221,8 @@ export default function Desk({children,includeHomeInFit=true,objects=null,storag
  const pan=useRef(null);
  const down=e=>{
   if(touch||(e.button!==0&&e.button!==1))return;
-  if(e.button===0&&e.target.closest?.(INTERACTIVE))return;
+  if(e.target.closest?.('.desk-zoom,.desk-spread'))return;
+  if(e.button===0&&!moving&&e.target.closest?.(INTERACTIVE))return;
   const z=zoomRef.current;
   const a=atRef.current,L=layoutRef.current;
   // the pan is anchored to the desk's origin as it is on screen (the view and the desk's own corner both move when the desk grows on the left or top, but this does not)
@@ -232,6 +235,14 @@ export default function Desk({children,includeHomeInFit=true,objects=null,storag
   const n=place(z,{x:p.ax+(e.clientX-p.px)-L.x*z,y:p.ay+(e.clientY-p.py)-L.y*z},{x:cur.x,y:cur.y},measure());commit(z,n.x,n.y);
  };
  const up=e=>{if(pan.current?.id===e.pointerId)pan.current=null;};
+ const focusObject=binding=>{
+  const object=objects?.get(binding),el=object&&homeRef.current?.querySelector(`[data-desk-object-id="${object.id}"]`);
+  if(!el||!isVisibleDeskItem(el))return;
+  const r=el.getBoundingClientRect(),v=view.current.getBoundingClientRect(),z=zoomRef.current,a=atRef.current;
+  if(!r.width||!r.height)return;
+  const w=r.width/z,h=r.height/z,nav=view.current.querySelector('.desk-zoom')?.getBoundingClientRect().height??0,available=Math.max(1,box.h-nav-24),next=clamp(Math.min((box.w-24)/w,available/h),minZoom,1);
+  objects.focus(binding);setMoving(false);commit(next,(box.w-w*next)/2-(r.left-v.left-a.x)/z*next,(available-h*next)/2-(r.top-v.top-a.y)/z*next);
+ };
 
  const api=useMemo(()=>({
   get zoom(){return zoomRef.current;},el:homeEl,fixedWidth:true,ready:homeReady,home:{w:homeW,h:homeH},subscribe:fn=>{listeners.add(fn);if(homeReady)fn();return ()=>listeners.delete(fn);},
@@ -265,19 +276,22 @@ export default function Desk({children,includeHomeInFit=true,objects=null,storag
  useEffect(()=>{live=api;if(api.ready)listeners.forEach(fn=>fn());return ()=>{if(live===api)live=null;};},[api]);
  const style=touch?{width:homeW,height:homeH}:{width:layout.w,height:layout.h,transform:`translate(${at.x}px,${at.y}px) scale(${zoom})`};
  const percent=Math.round(zoom*100),isFit=!manual;
- return <div className={'desk-view'+(touch?' is-touch':'')} ref={view} onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}>
+ return <div className={'desk-view'+(touch?' is-touch':'')+(containedNavigation?' is-contained':'')+(moving?' is-moving':'')} ref={view} onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}>
   <DeskContext.Provider value={api}>
    <div className="desk" ref={deskRef} style={style} data-zoom={zoom.toFixed(2)} data-size={layout.w+'x'+layout.h}>
     <div className="desk-home" ref={setHome} style={{left:layout.x,top:layout.y,width:'max-content',minWidth:HOME_W,minHeight:HOME_H}}>{children}</div>
    </div>
   </DeskContext.Provider>
   {!touch&&<div className="desk-zoom" role="group" aria-label="Zoom the desk">
+   {containedNavigation&&objects?.list&&<select aria-label="Go to desk object" value="" onChange={e=>focusObject(e.target.value)}><option value="">Go to…</option>{objects.list().filter(o=>o.visible&&o.size.w>0&&o.size.h>0).map(o=><option key={o.id} value={o.binding}>{o.label}</option>)}</select>}
+   {containedNavigation&&<button type="button" aria-pressed={moving} onClick={()=>setMoving(v=>!v)} title="Move the view by dragging anywhere; switch off to use instrument controls">Move desk</button>}
    <button type="button" aria-label="Zoom out" title="Zoom out (Ctrl + wheel)" onClick={()=>zoomTo(zoomRef.current/1.15)}>−</button>
    <button type="button" className={'desk-zoom-fit'+(isFit?' is-fit':'')} aria-label="Back to the instrument" title="Back to the instrument at the default zoom" onClick={reset}>{percent}%</button>
    <button type="button" aria-label="Zoom in" title="Zoom in (Ctrl + wheel)" onClick={()=>zoomTo(zoomRef.current*1.15)}>+</button>
    <button type="button" className="desk-crop" title="Zoom to fit everything on the desk in the window" onClick={fitAll}>Fit all</button>
    <button type="button" className="desk-crop" title="Put the instrument, keyboard and panels back where they start" onClick={resetThisLayout}>Reset layout</button>
+   {objects&&containedNavigation&&<button type="button" className="desk-crop" title="Arrange visible boxes without changing their sound or connections" onClick={()=>{objects.spread(spreadOptions());requestAnimationFrame(()=>fitRef.current());}}>Spread</button>}
   </div>}
-  {objects&&<button type="button" className="desk-spread" title="Arrange visible boxes without changing their sound or connections" onClick={()=>{objects.spread(spreadOptions());requestAnimationFrame(()=>fitRef.current());}}>Spread</button>}
+  {objects&&!containedNavigation&&<button type="button" className="desk-spread" title="Arrange visible boxes without changing their sound or connections" onClick={()=>{objects.spread(spreadOptions());requestAnimationFrame(()=>fitRef.current());}}>Spread</button>}
  </div>;
 }

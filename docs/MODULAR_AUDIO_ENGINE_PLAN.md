@@ -831,3 +831,29 @@ See [startup results, negative evidence and LAN instructions](SYNTHS_STARTUP_REC
 The latest 68 focused tests and public build pass; no deployment/firewall change
 or new audio-quality verdict. Keep this confirmed access route available for
 the next run-bound All listening-evidence step.
+
+### M4a phone usability and guarded delivery follow-up (2026-11-09)
+
+The user reports phone serial works, phone one worker badly breaks up, desktop
+one worker works; no matching counters/device/browser are supplied. Full JSON
+is too large for chat. [Exact changes/results/limits](MODULAR_AUDIO_ENGINE_M4A_PHONE_USABILITY.md)
+record All's anchored Setup dropdown, contained desk navigation, fresh narrow
+packing, compact copy/manual text and per-run provenance. Existing saved poses
+are preserved; Spread repairs an already-overlapping layout on request.
+
+Only the opt-in All experiment now initially selects serial and requests worker
+stop-on-first-missing-span. Generic harness defaults/recovery and legacy DSP
+remain unchanged, as do 48 kHz / Message / 512 x six / 64 ms settings. No automatic
+mid-run engine replacement. A phone scheduling cause or buffering cure is not
+established. Runtime `2dd834c6b07330cb`; Rust/Wasm unchanged. Focused generated
+worklet/controller/UI checks and **66 actual worker/core/FM/Effects/host tests**
+pass; final public build/package checks pass (**39.56 s**).
+
+Real desktop browser at 390 x 844 has viewport-width document, no fresh-panel
+overlaps and a 366 px fixed Setup; camera-only panning and saved pose reload
+pass. Final serial completes **668,956 frames / 22 events**, zero late/overflow;
+the matching selectable compact report is **986 characters**. Listening remains
+unassessed, native clipboard payload readback and physical phone gestures remain
+unverified. Next: confirm phone usability and capture compact diagnostics for
+the actual guarded worker failure before transport tuning or multi-role work.
+Keep the confirmed local HTTPS preview running. No push/deployment.

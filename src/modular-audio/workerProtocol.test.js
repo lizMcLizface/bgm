@@ -8,6 +8,16 @@ import {coreCases} from '../../tools/coreOwnedVerification.mjs';
 const outputs=n=>Array.from({length:8},()=>[new Float32Array(n),new Float32Array(n)]);
 function block(slot,frame,n=256,generation=1){const buffer=new ArrayBuffer(256*16*4),pcm=new Float32Array(buffer);for(let b=0;b<8;b++)for(let i=0;i<n;i++){pcm[(b*n+i)*2]=frame+i+b/16;pcm[(b*n+i)*2+1]=-frame-i-b/16;}return {slot,frame,n,generation,buffer};}
 describe('bounded worker PCM publication',()=>{
+ it.each([false,true])('keeps recovery by default and optionally stops on the first missing span (stop=%s)',stopOnUnderrun=>{
+  let Type;const messages=[],ctx=vm.createContext({ReferenceGraph:class{constructor(){throw Error('Worker output must not render locally');}},Float32Array,Array,Math,Number,Error,Object,Uint32Array,sampleRate:48000,AudioWorkletProcessor:class{constructor(){this.port={postMessage:d=>messages.push(d),close(){}};}},registerProcessor:(_,c)=>Type=c});
+  vm.runInContext(fs.readFileSync('public/modular-audio/worker-output-processor.js','utf8').replace(/^import[^;]+;\s*$/gm,''),ctx);
+  const p=new Type({processorOptions:{mode:'worker',stopOnUnderrun,endFrame:1024,options:{blockFrames:256,poolBlocks:2}}}),out=outputs(128),link={postMessage(){},close(){}};p.port.onmessage({data:{type:'connect',port:link}});
+  for(let i=0;i<4;i++)expect(p.process([],out)).toBe(true);
+  expect(p.process([],out)).toBe(!stopOnUnderrun);expect(p.sourceFrame).toBe(128);expect(out.every(bus=>bus.every(ch=>ch.every(v=>v===0)))).toBe(true);
+  if(stopOnUnderrun){expect(messages.find(d=>d.type==='stats')).toMatchObject({sourceFrame:128,finishReason:'delivery-gap',queue:{underrunFrames:128}});expect(messages.filter(d=>d.type==='finished')).toEqual([{type:'finished',reason:'delivery-gap'}]);link.onmessage({data:{type:'block',...block(0,0)}});expect(p.process([],out)).toBe(false);expect(p.sourceFrame).toBe(128);}
+  else{link.onmessage({data:{type:'block',...block(0,0)}});expect(p.process([],out)).toBe(true);expect(out[0][0][0]).toBe(128);expect(p.queue.counters.recoveries).toBe(1);expect(messages.some(d=>d.type==='finished')).toBe(false);}
+  p.port.onmessage({data:{type:'dispose'}});
+ });
  it('holds a partial serial graph at frame zero until armed, then emits only its selected source and clips the final quantum',()=>{
   const module=new WebAssembly.Module(fs.readFileSync('public/modular-audio/graph.wasm')),contracts=JSON.parse(fs.readFileSync('public/modular-audio/contracts.json')),patch=pitchedPatch({...coreCases()[0].spec,events:[[0,1,0,60,.8]],edits:[]},false);let Type;const messages=[],ctx=vm.createContext({ReferenceGraph,WebAssembly,Float32Array,Array,Math,Number,Error,Object,Uint32Array,sampleRate:48000,AudioWorkletProcessor:class{constructor(){this.port={postMessage:d=>messages.push(d),close(){}};}},registerProcessor:(_,c)=>Type=c});
   vm.runInContext(fs.readFileSync('public/modular-audio/worker-output-processor.js','utf8').replace(/^import[^;]+;\s*$/gm,''),ctx);

@@ -53,6 +53,7 @@ import {flagKeys} from '../../app/rulebook/session';
 import {tuning} from '../tuning';
 import {createContinuous,appendProgression,trimProgressions} from './continuous';
 import {prepareGeneratorChange,publishGeneratorChange,liveGeneratorKeys} from './generatorChange';
+import WorkbenchPreviewReport from '../../modular-audio/WorkbenchPreviewReport';
 import {encodeSetup,decodeSetup,setupFileName,MAX_BYTES} from './setupFile';
 import '../drums/drums.css';
 import rackStyles from './rack.css?inline';
@@ -96,11 +97,12 @@ export function defaultSequencer(project){
 
 export default function AllPage(){
  const [objects]=useState(createAllDeskObjects);
+ const [initialArrange]=useState(()=>window.innerWidth<=700&&!objects.list().some(o=>o.pose));
  // Keep this route's small style payload with its lazy JS module. Remote
  // previews can serve that module while rejecting a separate lazy CSS request.
- return <><style data-all-workbench-styles>{rackStyles+'\n'+allStyles}</style><DeskObjectsProvider store={objects}><AllWorkbench/></DeskObjectsProvider></>;
+ return <><style data-all-workbench-styles>{rackStyles+'\n'+allStyles}</style><DeskObjectsProvider store={objects}><AllWorkbench initialArrange={initialArrange}/></DeskObjectsProvider></>;
 }
-function AllWorkbench(){
+function AllWorkbench({initialArrange=false}){
  const objects=useDeskObjects();
  const sceneList=BROWSABLE_SCENES;
  const [initialLink]=useState(()=>{try{return {link:frontPageLink(window.location)};}catch(error){return {error};}});
@@ -109,7 +111,7 @@ function AllWorkbench(){
  const [sceneName,setSceneName]=useState(()=>initialLink.link?.scene?.name??customScene?.name??SCENES.find(s=>s.name===stored.scene)?.name??sceneList.find(s=>/lofi|rain/i.test(s.name))?.name??sceneList[0].name);
  const scene=useMemo(()=>customScene?.name===sceneName?customScene:SCENES.find(s=>s.name===sceneName)??sceneList[0],[sceneName,sceneList,customScene]);
  const [status,setStatus]=useState('Preparing song…'),[started,setStarted]=useState(false),[busy,setBusy]=useState(false),[hostVersion,setHostVersion]=useState(0);
- const previewRef=useRef(null),[previewPhase,setPreviewPhase]=useState('idle'),[previewMode,setPreviewMode]=useState('worker'),[previewMessage,setPreviewMessage]=useState('One supported pitched sequencer, one current progression, one pass.'),[previewReport,setPreviewReport]=useState(null);
+ const previewRef=useRef(null),[previewPhase,setPreviewPhase]=useState('idle'),[previewMode,setPreviewMode]=useState('serial'),[previewMessage,setPreviewMessage]=useState('Start with Serial reference. One supported pitched sequencer, one current progression, one pass.'),[previewReport,setPreviewReport]=useState(null);
  const previewActive=previewPhase!=='idle';
  const [progressionCount,setProgressionCount]=useState(stored.progressionCount??4),[project,setProject]=useState(null),[playing,setPlaying]=useState(false);
  const [continuous,setContinuous]=useState(()=>!(stored.project&&stored.scene===scene.name));
@@ -135,7 +137,7 @@ function AllWorkbench(){
  const pendingGenerator=useRef(null),generationRevision=useRef(0),commitGenerator=useRef(()=>{});
  const [sequenceScaleDraft,setSequenceScaleDraft]=useState(null),sequenceScaleTimer=useRef(null),applySequenceScale=useRef(()=>{});
  const stream=useRef(null),bufferRef=useRef(bufferConfig);bufferRef.current=bufferConfig;
- const setupInput=useRef(null),deskRef=useRef(null),ambienceRef=useRef(null);
+ const setupInput=useRef(null),setupAnchor=useRef(null),deskRef=useRef(null),ambienceRef=useRef(null);
  const [linkText,setLinkText]=useState('');
  projectRef.current=project;bpmRef.current=bpm;mutesRef.current=mutes;solosRef.current=solos;progressionRef.current=progression;
  useEffect(()=>{clearTimeout(sequenceScaleTimer.current);setSequenceScaleDraft(null);return ()=>clearTimeout(sequenceScaleTimer.current);},[hostVersion,continuous]);
@@ -917,7 +919,7 @@ function AllWorkbench(){
  useEffect(()=>{
   for(const name of ['generator','ambience'])objects.update('surface:'+name,{visible:panels[name]});
   for(const {role:r} of SEQUENCERS){objects.update('instrument:'+r,{visible:!!wins['synth:'+r]});objects.update('effects:'+r,{visible:!!wins['fx:'+r]});objects.update('tuning:'+r,{visible:!!wins['tuning:'+r]});}
-  objects.update('keyboard',{visible:showKeys});objects.update('scope',{visible:scopeOn});objects.update('setup',{visible:showSetup});
+  objects.update('keyboard',{visible:showKeys});objects.update('scope',{visible:scopeOn});objects.update('setup',{visible:false});
  },[objects,panels,wins,showKeys,scopeOn,showSetup]);
  // the keyboard's scale and chords are this page's song (its key and scale, the chords of the progression open) unless "My own" is chosen
  const songContext=useMemo(()=>{
@@ -983,6 +985,7 @@ function AllWorkbench(){
   <header className="synth-bar">
    <a className="back" href={import.meta.env.BASE_URL+'synths/'} aria-label="All synths">◂</a>
    <h1><span className="brand">All</span><small>sequencers and sound generators</small></h1>
+   <button ref={setupAnchor} type="button" aria-expanded={showSetup} aria-controls="all-midi-setup" onClick={()=>setShowSetup(v=>!v)} aria-label="Setup" title="Setup: MIDI, the keybed and the computer keys">⚙</button>
    <label className="bar-scene">Scene <select value={sceneName} disabled={busy} onChange={e=>chooseScene(e.target.value)}>{!sceneList.includes(scene)&&<option value={scene.name}>{scene.name}</option>}{SCENE_CATEGORIES.map(c=><optgroup key={c.id} label={c.label}>{sceneList.filter(s=>s.category===c.id).map(s=><option key={s.name} value={s.name}>{s.name}</option>)}</optgroup>)}</select></label>
    <span className="patch-name" title={status}>{status}</span>
    <button type="button" disabled={!started||busy} onClick={saveSetupFile}>Save setup</button>
@@ -994,12 +997,11 @@ function AllWorkbench(){
    {chordMode&&role!=='perc'&&<label>Chord overlap <select aria-label="Chord overlap" value={chordOverlap} onChange={e=>setChordOverlap(e.target.value)}><option value="replace">Replace in octave</option><option value="layer">Layer</option></select></label>}
    <span className="meter" aria-label={`${litNotes.length} notes sounding`}><b>{litNotes.length}</b></span>
    <button type="button" aria-pressed={scopeOn} onClick={toggleScope} title="Oscilloscope and spectrum of the mix">Scope</button>
-   <button type="button" aria-pressed={showSetup} onClick={()=>setShowSetup(v=>!v)} aria-label="Setup" title="Setup: MIDI, the keybed and the computer keys">⚙</button>
    <button type="button" onClick={panic} title="Silence everything">Panic</button>
    <button type="button" onClick={()=>{if(document.fullscreenElement)document.exitFullscreen?.();else document.documentElement.requestFullscreen?.().catch(()=>{});}} aria-label="Full screen">⛶</button>
    <button type="button" className="keys-button" aria-pressed={showKeys} onClick={()=>updateSetup('keys',showKeys?'hide':'show')} aria-label="On-screen keyboard" title="Show or hide the on-screen keyboard">🎹</button>
   </header>
-  <Desk includeHomeInFit={false} objects={objects}>
+  <Desk includeHomeInFit={false} objects={objects} containedNavigation minZoom={.1} arrangeRequest={initialArrange&&started?1:0} arrangeWidth="auto">
    <FloatBox id="generator" label="Generator" className="box-generator" home={{x:0,y:0}} visible={panels.generator}><GeneratorBox seq={seqState} onSeq={changeGenerator} settings={generatorSettings} onSettings={changeSettings} generator={host.current?.g} book={host.current?.book} onRule={changeRule} info={{status:playing?'PLAYING':'STOPPED'}} presets={{current:sceneName,names:sceneList.map(s=>s.name),disabled:!started||busy,onChoose:chooseScene}} song={{count:progressionCount,choices:PROGRESSION_CHOICES,continuous,onMode:changeMode,disabled:!started||busy,onCount:n=>{setProgressionCount(n);newSong({progressions:n});},onNew:()=>newSong(),onScene:()=>chooseScene(sceneName,{seed:host.current.settings.seed})}}/></FloatBox>
    <FloatBox id="voices" label="Voices" className="box-voices" home={{x:1360,y:930}}>{voices}</FloatBox>
    <FloatBox id="ambience" label="Ambience" className="box-ambience" home={{x:2230,y:960}} visible={panels.ambience}><AmbienceBox ref={ambienceRef} host={started?host.current:null} onError={error=>setStatus(error.message)} onStateChange={()=>setVoiceVersion(v=>v+1)}/></FloatBox>
@@ -1050,18 +1052,19 @@ function AllWorkbench(){
    {started&&SEQUENCERS.map((x,i)=>(wins['synth:'+x.role]||wins['fx:'+x.role]||wins['tuning:'+x.role])&&<VoiceWindow key={x.role+':'+hostVersion} role={x.role} index={i} host={host.current} version={voiceVersion} showSynth={!!wins['synth:'+x.role]} fx={!!wins['fx:'+x.role]} tuning={!!wins['tuning:'+x.role]}
     onChoose={chooseSound} onEdit={editVoice} onEditNative={editNativeVoice} onEditDrum={editDrumKit} onEditFx={editVoiceFx} onCloseFx={()=>setWins(w=>({...w,['fx:'+x.role]:false}))} onCloseTuning={()=>setWins(w=>({...w,['tuning:'+x.role]:false}))}/>)}
    {scopeOn&&<Scope engine={scopeEngine} audio={awake?'on':'off'} onClose={toggleScope} positionKey="synths:all:scope-pos" home={{x:2410,y:70}} keyHz={()=>litNotes.length?440*2**((litNotes[litNotes.length-1]-69)/12):0}/>}
-   {showSetup&&<SetupPopover midi={midi} setup={setup} updateSetup={updateSetup} connectMidi={connectMidi} audio={{state:awake?'on':'off',message:'Audio runs when the song plays or a key is pressed.'}} start={()=>host.current?.wake().then(()=>setAwake(true))} onClose={()=>setShowSetup(false)}>
+   {showSetup&&<SetupPopover id="all-midi-setup" anchorRef={setupAnchor} midi={midi} setup={setup} updateSetup={updateSetup} connectMidi={connectMidi} audio={{state:awake?'on':'off',message:'Audio runs when the song plays or a key is pressed.'}} start={()=>host.current?.wake().then(()=>setAwake(true))} onClose={()=>setShowSetup(false)}>
     <section className="group wide"><h3>Continuous generator</h3><div className="row">
      <label>Progressions ahead<select aria-label="Progressions ahead" value={bufferConfig.ahead} onChange={e=>setBufferConfig(c=>({...c,ahead:Number(e.target.value)}))}>{[1,2,4,8,16,32,64].map(n=><option key={n} value={n}>{n}</option>)}</select></label>
      <label>History retained<select aria-label="History retained" value={bufferConfig.history} onChange={e=>setBufferConfig(c=>({...c,history:e.target.value==='infinite'?'infinite':Number(e.target.value)}))}>{[0,1,2,3,4,8,16,32,64,'infinite'].map(n=><option key={n} value={n}>{n==='infinite'?'Unlimited':n}</option>)}</select></label>
     </div><p className="hint">Unlimited history grows in memory. Lookahead is finite. Continuous sessions are not saved as songs.</p></section>
     <section className="group wide" aria-label="Owned Rust sequence preview"><h3>Owned Rust sequence preview</h3>
-     <p className="hint">Selected pitched sequencer, current progression, one pass. Scalar core/FM sources only; FM requires 2x quality and 48 kHz is required. One worker or serial source feeds the existing voice inserts, mixer and effects. Normal song playback stays stopped; the live keyboard uses its current engine. Source/score/tempo changes stop this snapshot. No loop or pause.</p>
-     <label>Preview executor<select aria-label="Rust preview executor" value={previewMode} disabled={previewActive} onChange={e=>setPreviewMode(e.target.value)}><option value="worker">One worker · 64 ms</option><option value="serial">Serial reference · 64 ms</option></select></label>
+     <p className="hint">One pitched sequencer, current progression, one pass at 48 kHz. Core/FM only (FM requires 2x quality), through the existing mixer and effects. Keyboard stays on its current engine. Source/score/tempo changes stop this snapshot.</p>
+     <p className="hint">Current phone report: Serial works; one worker breaks up. Desktop worker works. Cause unconfirmed. A worker delivery gap stops the preview; select Serial for a new run.</p>
+     <label>Preview executor<select aria-label="Rust preview executor" value={previewMode} disabled={previewActive} onChange={e=>setPreviewMode(e.target.value)}><option value="serial">Serial reference · 64 ms</option><option value="worker">One worker · experimental · 64 ms</option></select></label>
      <button type="button" aria-label="Play selected Rust sequence" disabled={!started||!project||busy||playing||paused||previewActive||SEQUENCERS[selected].role==='perc'} onClick={startSourcePreview}>Play selected sequence via Rust</button>
      <button type="button" aria-label="Stop Rust sequence preview" disabled={!previewActive} onClick={()=>{void previewRef.current?.stop();}}>Stop source preview</button>
      <p role="status" aria-label="Rust source preview status">{previewMessage}</p>
-     {previewReport&&<pre aria-label="Rust source preview report" style={{maxHeight:220,overflow:'auto',fontSize:11}}>{JSON.stringify(previewReport,null,2)}</pre>}
+     {previewReport&&<WorkbenchPreviewReport key={previewReport.runId??previewReport.startedAtUtc} report={previewReport}/>}
     </section>
    </SetupPopover>}
    <footer className="perform">

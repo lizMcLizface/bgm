@@ -1681,3 +1681,44 @@ This is connectivity/page confirmation, not a new run-bound listening verdict. S
 `m4a-inline-style-{browser,payload}.json`, `m4a-lan-https-preview.json`.
 **Next:** use the confirmed normal-browser LAN route for actual All listening records.
 Keep the LAN preview running for the user. Do not deploy to test the app proxy.
+
+## M4a phone usability / guarded delivery (2026-11-09)
+
+The user confirms serial works on the phone while one worker badly breaks up;
+desktop one-worker playback works. Exact device/browser/run/counters remain
+unknown. The full report was too large for chat and difficult to select. See
+[phone usability contracts, verification and limits](MODULAR_AUDIO_ENGINE_M4A_PHONE_USABILITY.md).
+
+- All's Setup is now a top-ribbon dropdown outside the desk transform. A
+  contained viewport, Move desk and Go to… camera controls address page scrolling;
+  fresh narrow layouts pack once after measurement. Existing IDs/poses stay
+  intact. Use Spread once for an already-overlapping saved layout.
+- All's opt-in preview initially selects **Serial reference**. Explicit worker
+  runs stop on their first missing PCM span and report `delivery-gap`; they do
+  not reconstruct/replay serial. Generic worker-harness recovery/defaults and
+  legacy DSP stay operational. Rate/cadence/capacity remain 48 kHz / Message /
+  512 x six / 64 ms. No speculative buffering change or phone-cause claim.
+- Each actual run has an ID/browser/host revision and a delivery summary that
+  separates listening from counters. **Copy compact diagnostics**, always
+  selectable short text, separate full-copy disclosure and copy-failure fallback
+  replace the always-visible large JSON. Nothing is transmitted automatically.
+- Focused checks: 117 tests / seven files; final UI checks 75 / three, seven
+  final Desk checks and four final report checks. Actual workers/core/FM,
+  independent state, three-rate PCM, Effects/host regressions: **66 / five**.
+  These overlap earlier runs; do not sum. Public build/package checks pass,
+  final Vite **39.56 s**. Runtime **`2dd834c6b07330cb`**, unchanged Rust/Wasm hash.
+- Real desktop browser at **390 x 844**: document width 390, fresh panels do not
+  overlap and fit above navigation; fixed Setup width 366. Pan changes only
+  camera; IDs/poses survive reload. Final serial Bass run completes **668,956
+  frames / 22 events**, zero late/overflow, three nonzero signal taps. Compact
+  report **986 characters**, correct run ID, selectable in full. Copy UI reports
+  success; native clipboard payload readback is not verified. Reports
+  `m4a-mobile-ui-*.json`, screenshot `.tmp/workbench-mobile-diagnostics.png`.
+
+**Limits / next:** Physical phone layout/pull-to-refresh and worker listening
+remain unverified. No phone cause, CPU improvement or wet/physical output quality
+is inferred. Keep `https://192.168.0.228:4176/synths/all/` running; refresh for
+this build. Obtain only the compact report from a future guarded phone run,
+bound to actual source/build/browser/settings, before tuning or multi-role
+expansion. The working serial path is available meanwhile. No deployment/push,
+firewall/trust change or Application Control bypass. Commit every verified step.

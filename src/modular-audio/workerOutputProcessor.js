@@ -4,10 +4,11 @@ import {ProcessTiming} from './processTiming.js';
 
 class WorkerOutput extends AudioWorkletProcessor {
   constructor({processorOptions:p}) {
-    super();this.stopped=false;this.outputFrame=0;this.sourceFrame=0;this.primed=false;this.timing=new ProcessTiming();
+    super();this.stopped=false;this.outputFrame=0;this.sourceFrame=0;this.primed=false;this.finishReason=null;this.timing=new ProcessTiming();
     try{
       this.o=workerOptions(p.options);this.end=p.endFrame;this.mode=p.mode;this.sourceIds=sourceSelection(p.sourceIds??null);this.armed=!p.startPaused;
       if(p.startPaused!==undefined&&typeof p.startPaused!=='boolean')throw Error('Invalid manual start');
+      if(p.stopOnUnderrun!==undefined&&typeof p.stopOnUnderrun!=='boolean')throw Error('Invalid delivery gap policy');this.stopOnUnderrun=!!p.stopOnUnderrun;
       if(!Number.isSafeInteger(this.end+this.o.delayFrames)||this.end<1||!['worker','serial'].includes(this.mode))throw Error('Invalid worker output');
       if(this.mode==='serial'){this.g=new ReferenceGraph(new WebAssembly.Instance(p.module,{}).exports,p.patch,p.contracts,sampleRate);this.views=sourceViews(this.g,this.sourceIds);}
       else this.queue=new WorkerPcmQueue(this.o,this.end,b=>this.link.postMessage({type:'recycle',generation:b.generation,slot:b.slot,buffer:b.buffer},[b.buffer]));
@@ -15,14 +16,14 @@ class WorkerOutput extends AudioWorkletProcessor {
         if(d.type==='connect'&&this.mode==='worker'&&!this.link){this.link=d.port;this.link.onmessage=({data:b})=>{if(this.stopped)return;if(b.type==='block'){this.queue.accept(b);if(!this.primed&&this.queue.count>=Math.min(this.o.poolBlocks,Math.ceil(this.end/this.o.blockFrames))){this.primed=true;this.port.postMessage({type:'primed'});}}};}
         if(d.type==='stats')this.stats();
         if(d.type==='start')this.armed=true;
-        if(d.type==='failure'){this.stopped=true;this.queue?.dispose();this.stats();this.port.postMessage({type:'finished'});}
+        if(d.type==='failure'){this.stopped=true;this.finishReason='failed';this.queue?.dispose();this.stats();this.port.postMessage({type:'finished',reason:this.finishReason});}
         if(d.type==='dispose'){this.stopped=true;this.queue?.dispose();this.link?.close();this.g?.dispose();this.port.postMessage({type:'disposed'});this.port.close();}
       }catch(e){this.fail(e);}};
       this.port.postMessage({type:'ready',mode:this.mode,options:this.o});
     }catch(e){this.fail(e);}
   }
   fail(e){this.stopped=true;this.port.postMessage({type:'error',message:String(e)});}
-  stats(){this.port.postMessage({type:'stats',mode:this.mode,generation:this.o.generation,armed:this.armed,sourceIds:this.sourceIds,outputFrame:this.outputFrame,sourceFrame:this.sourceFrame,delayFrames:this.o.delayFrames,processTiming:this.timing.snapshot(),queue:this.queue?this.queue.stats():null,serial:this.g?graphSnapshot(this.g,this.sourceIds):null});}
+  stats(){this.port.postMessage({type:'stats',mode:this.mode,generation:this.o.generation,armed:this.armed,stopOnUnderrun:this.stopOnUnderrun,finishReason:this.finishReason,sourceIds:this.sourceIds,outputFrame:this.outputFrame,sourceFrame:this.sourceFrame,delayFrames:this.o.delayFrames,processTiming:this.timing.snapshot(),queue:this.queue?this.queue.stats():null,serial:this.g?graphSnapshot(this.g,this.sourceIds):null});}
   process(_inputs,outputs){
     // The worklet never waits for the worker, executes a catch-up render, or
     // replays an old block. A missing span is silent and advances source time.
@@ -43,7 +44,8 @@ class WorkerOutput extends AudioWorkletProcessor {
         this.sourceFrame+=n;
       }
       this.outputFrame+=length;
-      if(this.sourceFrame>=this.end){this.stopped=true;this.stats();this.port.postMessage({type:'finished'});return false;}
+      if(this.stopOnUnderrun&&this.queue?.counters.underrunFrames){this.stopped=true;this.finishReason='delivery-gap';this.stats();this.port.postMessage({type:'finished',reason:this.finishReason});return false;}
+      if(this.sourceFrame>=this.end){this.stopped=true;this.finishReason='completed';this.stats();this.port.postMessage({type:'finished',reason:this.finishReason});return false;}
       return true;
     }catch(e){this.fail(e);return false;}finally{this.timing.stop(started,quantum,sampleRate);}
   }

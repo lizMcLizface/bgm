@@ -2,9 +2,20 @@ import {describe,it,expect} from 'vitest';
 import React,{act} from 'react';
 import {createRoot} from 'react-dom/client';
 import Desk from './Desk';
-import {isVisibleDeskItem,measureVisibleDesk,resetLayout} from './Desk';
+import {isVisibleDeskItem,measureVisibleDesk,resetLayout,useDesk} from './Desk';
 
 describe('reset layout',()=>{
+ it('contains coarse-pointer navigation without rewriting the page viewport or clamping objects onto each other',()=>{
+  globalThis.IS_REACT_ACT_ENVIRONMENT=true;vi.stubGlobal('ResizeObserver',class{observe(){}disconnect(){}});vi.stubGlobal('matchMedia',()=>({matches:true}));localStorage.clear();
+  const meta=document.createElement('meta');meta.name='viewport';meta.content='width=device-width, initial-scale=1';document.head.append(meta);
+  const container=document.createElement('div');document.body.append(container);const root=createRoot(container),limits=[];
+  function Probe(){const desk=useDesk();limits.push(desk.limits(850,400));return <button className="test-control">Control</button>;}
+  const pointer=(type,x,y)=>{const e=new MouseEvent(type,{button:0,clientX:x,clientY:y,bubbles:true,cancelable:true});Object.defineProperty(e,'pointerId',{value:3});Object.defineProperty(e,'pointerType',{value:'touch'});return e;};
+  try{act(()=>root.render(<Desk containedNavigation storageKey="test:contained" minZoom={.1}><Probe/></Desk>));const view=container.querySelector('.desk-view');expect(view.classList.contains('is-touch')).toBe(false);expect(view.classList.contains('is-contained')).toBe(true);expect(meta.content).toBe('width=device-width, initial-scale=1');expect(limits.at(-1).maxX).toBe(Infinity);
+   const control=container.querySelector('.test-control'),initial=localStorage.getItem('test:contained');act(()=>{control.dispatchEvent(pointer('pointerdown',10,10));control.dispatchEvent(pointer('pointerup',10,10));});expect(localStorage.getItem('test:contained')).toBe(initial);
+   act(()=>[...container.querySelectorAll('button')].find(b=>b.textContent==='Move desk').click());expect(view.classList.contains('is-moving')).toBe(true);const down=pointer('pointerdown',10,10);act(()=>{control.dispatchEvent(down);view.dispatchEvent(pointer('pointermove',80,100));view.dispatchEvent(pointer('pointerup',80,100));});expect(down.defaultPrevented).toBe(true);expect(JSON.parse(localStorage.getItem('test:contained')).zoom).toBeGreaterThan(0);
+  }finally{act(()=>root.unmount());container.remove();meta.remove();localStorage.clear();vi.unstubAllGlobals();delete globalThis.IS_REACT_ACT_ENVIRONMENT;}
+ });
  it('only applies a requested arrangement once, while reset can restore the page-specific physical layout',async()=>{
   globalThis.IS_REACT_ACT_ENVIRONMENT=true;vi.stubGlobal('ResizeObserver',class{observe(){}disconnect(){}});
   localStorage.clear();const container=document.createElement('div');document.body.append(container);const root=createRoot(container);

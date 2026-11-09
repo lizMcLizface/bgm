@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "source": "User report, no correlated run diagnostics supplied yet",
+  "date": "2026-11-09",
+  "quote": "trying the one worker horribly breaks the sound, serial worker works just fine. on desktop one worker works as well",
+  "observations": [
+    {"device": "phone", "requestedExecutor": "one worker", "result": "horribly breaks the sound"},
+    {"device": "phone", "requestedExecutor": "serial", "result": "works just fine"},
+    {"device": "desktop", "requestedExecutor": "one worker", "result": "works"}
+  ],
+  "context": "All owned source preview, after normal-browser HTTPS LAN access was confirmed",
+  "diagnosticCaptureObstacles": [
+    "User requests Setup as a top-bar dropdown instead of a floating panel",
+    "User reports first-open panel overlap, difficult desk panning, horizontal document scrolling from the wide ribbon, and upward gestures reloading the page",
+    "User managed to highlight the output but the full report is too long to post in chat"
+  ],
+  "runId": null,
+  "engineVersion": null,
+  "deviceModel": null,
+  "browser": null,
+  "outputRoute": null,
+  "actualExecutor": null,
+  "sampleRate": null,
+  "buffering": null,
+  "missingFrames": null,
+  "cause": null,
+  "qualification": "The adapter requires 48 kHz and previously offered 64 ms buffering, but no exact report is retroactively attached. Successful desktop counters do not supersede the phone listening failure."
+}

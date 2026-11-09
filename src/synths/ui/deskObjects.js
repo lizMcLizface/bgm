@@ -68,6 +68,7 @@ export function createDeskObjects({storageKey,definitions=[],read=load,write=sav
  const apply=binding=>{const o=find(binding);if(o)elements.get(o.binding)?.apply(o);};
  return {
   get:find,
+  list:()=>document.objects.slice(),
   snapshot(){for(const binding of elements.keys())measure(binding);return structuredClone(document);},
   update,
   raise(binding){const z=Math.max(60,...document.objects.map(o=>o.z))+1;update(binding,{z});return z;},

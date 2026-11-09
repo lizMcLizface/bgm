@@ -1,0 +1,102 @@
+{
+  "version": 1,
+  "date": "2026-11-09",
+  "scope": "Desktop Chromium at 390x844; not a physical phone, touch or listening assessment",
+  "layout": {
+    "bodyWidth": 390,
+    "boxes": [
+      {
+        "h": 85.68828582763672,
+        "label": "Voices",
+        "left": "0px",
+        "top": "2597px",
+        "w": 167.9774932861328,
+        "x": 16.94386100769043,
+        "y": 594.7064819335938
+      },
+      {
+        "h": 307.1221618652344,
+        "label": "Mixer",
+        "left": "0px",
+        "top": "979px",
+        "w": 193.66815185546875,
+        "x": 16.94386100769043,
+        "y": 274.95635986328125
+      },
+      {
+        "h": 180.8623504638672,
+        "label": "Sequencer",
+        "left": "0px",
+        "top": "0px",
+        "w": 258.092529296875,
+        "x": 16.94386100769043,
+        "y": 81.48579406738281
+      },
+      {
+        "h": 43.79277420043945,
+        "label": "Keyboard",
+        "left": "0px",
+        "top": "3095px",
+        "w": 356.1123046875,
+        "x": 16.94386100769043,
+        "y": 693.1215209960938
+      }
+    ],
+    "contentBottom": 736.9142951965332,
+    "documentWidth": 390,
+    "height": 844,
+    "navTop": 746.4000244140625,
+    "overlaps": [],
+    "ready": true,
+    "viewport": "width=device-width, initial-scale=1.0, viewport-fit=cover",
+    "width": 390
+  },
+  "pan": {
+    "cameraChanged": true,
+    "posesUnchanged": true,
+    "documentWidth": 390
+  },
+  "savedPosesSurviveReload": true,
+  "initialPreviewExecutor": "serial",
+  "dropdown": {
+    "clientHeight": 774,
+    "height": 776,
+    "outsideDesk": true,
+    "position": "fixed",
+    "scrollHeight": 2270,
+    "scrollTop": 681.5999755859375,
+    "width": 366,
+    "x": 12,
+    "y": 56
+  },
+  "runId": "92feee46-2d7c-42cc-9187-8203309bd974",
+  "serial": {
+    "complete": true,
+    "pass": true,
+    "frames": {
+      "planned": 668956,
+      "consumed": 668956,
+      "output": 672128,
+      "rendered": 668956
+    },
+    "events": {
+      "applied": 22,
+      "late": 0,
+      "overflow": 0
+    }
+  },
+  "compact": {
+    "characters": 986,
+    "runIdMatches": true,
+    "readonlyManualText": true,
+    "selectsEntirePayloadOnFocus": true,
+    "uiCopyStatus": "Compact diagnostics copied.",
+    "nativeClipboardReadbackVerified": false
+  },
+  "limitations": [
+    "No actual phone worker report supplied; cause unknown",
+    "Document containment verified; physical pull-to-refresh not tested",
+    "No subjective audio-quality verdict inferred",
+    "Continuous reload regenerates score; this comparison verifies object identity and poses"
+  ]
+}

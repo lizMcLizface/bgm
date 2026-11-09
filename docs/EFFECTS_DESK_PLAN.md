@@ -1398,3 +1398,13 @@ patch/setup format or default buffering change. One worker or serial, 48 kHz,
 master activity, keyboard coexistence and legacy playback pass; no physical
 listening/CPU or lock-screen guarantee. The modular plan/handoff records exact
 tests, reports, persistence limits and the next listening-evidence gate.
+
+All's subsequent [phone usability / delivery follow-up](MODULAR_AUDIO_ENGINE_M4A_PHONE_USABILITY.md)
+reuses the existing anchored Setup mechanism, adds opt-in contained desk camera
+navigation and concise run diagnostics, initially selects serial in the All
+experiment, and stops explicit worker runs on missing PCM. Existing effects,
+inserts/sends/mixer/output, keyboard and generic harness defaults remain intact;
+actual worker/core/FM/Effects/host regressions and public package checks pass.
+Desktop phone-sized layout and live serial are verified; phone worker cause and
+physical output quality remain unknown. Obtain compact target-device evidence
+before tuning or expanding the modular migration. No deployment.

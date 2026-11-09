@@ -96,3 +96,19 @@
 .all-drum-tools button,.all-drum-tools select{padding:7px;border:1px solid #665a46;border-radius:4px;background:#292d28;color:#ead7ab;cursor:pointer}
 .all-drum-tools .se-fields{display:grid;grid-template-columns:repeat(4,minmax(130px,1fr));gap:18px}
 .all-drum-tools .step-editor{position:static;border:0;padding:0;background:transparent}
+
+/* All owns a bounded view on phones too: header scroll never enlarges the page,
+   and desk gestures never become document scrolling or pull-to-refresh. */
+html:has(.all-instrument),body:has(.all-instrument),#root:has(.all-instrument){height:100%;overflow:hidden;overscroll-behavior:none;}
+.all-instrument{width:100%;max-width:100%;min-width:0;overflow:hidden;overscroll-behavior:none;}
+.all-instrument>.synth-bar{flex:0 0 auto;flex-wrap:nowrap;max-width:100%;overflow-x:auto;overscroll-behavior:contain;touch-action:pan-x;}
+.all-instrument>.synth-bar>*{flex-shrink:0;}
+.all-instrument>.synth-bar .bar-scene select{max-width:220px;}
+.all-instrument>.synth-bar .patch-name{flex-shrink:1;}
+.all-instrument .desk-view.is-contained{touch-action:none;overscroll-behavior:none;}
+.all-instrument .desk-view.is-moving .desk{pointer-events:none;}
+.all-instrument .desk-zoom{max-width:calc(100% - 24px);flex-wrap:wrap;justify-content:flex-end;}
+.all-instrument .desk-zoom select{max-width:150px;min-height:30px;padding:3px;font-size:12px;}
+#all-midi-setup{overscroll-behavior:contain;touch-action:pan-y;user-select:text;-webkit-user-select:text;}
+#all-midi-setup textarea,#all-midi-setup pre{user-select:text;-webkit-user-select:text;}
+@media(max-width:700px){.all-instrument>.synth-bar{gap:6px}.all-instrument .desk-zoom button{min-height:38px;}.all-instrument>.synth-bar .bar-scene select{max-width:160px;}}

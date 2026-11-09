@@ -47,7 +47,7 @@ vi.mock('../../modular-audio/workbenchPreview',()=>({createWorkbenchPreview:opti
 import AllPage,{defaultSequencer} from './AllPage';
 
 let root, container;
-const button = name => [...container.querySelectorAll('button')].find(x => (x.getAttribute('aria-label') === name || x.textContent.trim() === name));
+const button = name => [...document.querySelectorAll('button')].find(x => (x.getAttribute('aria-label') === name || x.textContent.trim() === name));
 beforeEach(async () => {
  globalThis.IS_REACT_ACT_ENVIRONMENT = true;
  localStorage.clear();
@@ -386,7 +386,7 @@ test('continuous playback retains a rolling buffer and resumes from a selected h
 
 test('continuous buffer settings apply finite lookahead and unlimited history',async()=>{
  act(()=>container.querySelector('[aria-label="Setup"]').click());
- const ahead=container.querySelector('[aria-label="Progressions ahead"]'),history=container.querySelector('[aria-label="History retained"]');
+ const ahead=document.querySelector('[aria-label="Progressions ahead"]'),history=document.querySelector('[aria-label="History retained"]');
  act(()=>{ahead.value='2';ahead.dispatchEvent(new Event('change',{bubbles:true}));history.value='infinite';history.dispatchEvent(new Event('change',{bubbles:true}));});
  const mode=container.querySelector('[aria-label="Generator mode"]');
  await act(async()=>{mode.dispatchEvent(new KeyboardEvent('keydown',{key:'End',bubbles:true}));});
@@ -936,15 +936,16 @@ test('changing progression count generates immediately before playback',()=>{
 });
 
 test('restores visible surfaces and the selected generator bank without starting audio',async()=>{
- act(()=>{container.querySelector('[aria-controls="all-panel-generator"]').click();container.querySelector('[aria-controls="all-panel-ambience"]').click();button('Scope').click();container.querySelector('[aria-label="Setup"]').click();button('Control').click();});
+ act(()=>{container.querySelector('[aria-controls="all-panel-generator"]').click();container.querySelector('[aria-controls="all-panel-ambience"]').click();button('Scope').click();button('Control').click();});
  act(()=>button('Control').click());
+ act(()=>container.querySelector('[aria-label="Setup"]').click());
  act(()=>{window.dispatchEvent(new Event('pagehide'));});
  expect(JSON.parse(localStorage.getItem('synths:all:visibility'))).toMatchObject({panels:{generator:true,ambience:true},scope:true,setup:true});
  act(()=>root.unmount());root=createRoot(container);await act(async()=>root.render(<AllPage/>));
  expect(container.querySelector('[aria-controls="all-panel-generator"]').getAttribute('aria-expanded')).toBe('true');
  expect(container.querySelector('[aria-controls="all-panel-ambience"]').getAttribute('aria-expanded')).toBe('true');
  expect(button('Scope').getAttribute('aria-pressed')).toBe('true');
- expect(container.querySelector('[aria-label="Setup"]').getAttribute('aria-pressed')).toBe('true');
+ expect(container.querySelector('[aria-label="Setup"]').getAttribute('aria-expanded')).toBe('true');
  expect(container.querySelector('.gb-title>span').textContent).toBe('Band');
  expect(container.querySelector('[aria-label="Oscilloscope and spectrum"]').dataset.audio).toBe('off');
  expect(mocks.scheduler.start).not.toHaveBeenCalled();
@@ -1055,11 +1056,20 @@ test('Spread arranges visible objects without changing the song and restores obj
 
 test('owned preview keeps normal transport stopped and stops independently of its keyboard/legacy host',async()=>{
  act(()=>container.querySelector('[aria-label="Setup"]').click());
+ expect(document.querySelector('[aria-label="Rust preview executor"]').value).toBe('serial');
  await act(async()=>button('Play selected Rust sequence').click());
  expect(previewMock.calls.length).toBeGreaterThan(0);const entry=previewMock.calls.at(-1);
+ expect(entry.options.mode).toBe('serial');
  expect(container.querySelector('.tp.play').disabled).toBe(true);mocks.scheduler.stop.mockClear();
  await act(async()=>button('Stop Rust sequence preview').click());
  expect(entry.controller.stop).toHaveBeenCalled();expect(mocks.scheduler.stop).not.toHaveBeenCalled();expect(mocks.hosts.at(-1).dispose).not.toHaveBeenCalled();expect(container.querySelector('.tp.play').disabled).toBe(false);
+});
+test('Setup opens outside the transformed desk, preserves its parked object identity and closes on Escape',()=>{
+ act(()=>window.dispatchEvent(new Event('pagehide')));const before=JSON.parse(localStorage.getItem('synths:all:objects')).objects.find(o=>o.binding==='setup');
+ const anchor=container.querySelector('[aria-label="Setup"]');act(()=>anchor.click());const dialog=document.querySelector('#all-midi-setup');
+ expect(dialog.classList.contains('setup-dropdown')).toBe(true);expect(container.contains(dialog)).toBe(false);expect(dialog.style.position).toBe('fixed');expect(anchor.getAttribute('aria-expanded')).toBe('true');
+ act(()=>window.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true,cancelable:true})));expect(document.querySelector('#all-midi-setup')).toBeNull();expect(document.activeElement).toBe(anchor);
+ act(()=>window.dispatchEvent(new Event('pagehide')));const after=JSON.parse(localStorage.getItem('synths:all:objects')).objects.find(o=>o.binding==='setup');expect(after.id).toBe(before.id);expect(after.pose).toEqual(before.pose);expect(after.visible).toBe(false);
 });
 test('changing the selected sequence cancels the owned snapshot rather than leaving stale source audio',async()=>{
  act(()=>container.querySelector('[aria-label="Setup"]').click());await act(async()=>button('Play selected Rust sequence').click());const entry=previewMock.calls.at(-1);
