@@ -106,6 +106,11 @@ an actual guarded worker `delivery-gap` run. See [correlated phone failure,
 cross-thread audit and next measurement](MODULAR_AUDIO_ENGINE_M4A_PHONE_DELIVERY.md).
 The underlying scheduling/delivery cause and physical output verdict remain open.
 
+The user's physical navigation feedback remains negative: a mixer filling the
+view traps touch navigation. [Panel pan follow-up](MODULAR_AUDIO_ENGINE_M4A_PHONE_PAN.md)
+adds surface dragging and two-finger panning across controls. The earlier desktop
+check is not relabeled as a physical phone usability pass.
+
 Keep the confirmed **HTTPS LAN preview** running at
 `https://192.168.0.228:4176/synths/all/`. No deployment or firewall change.
 Next: use the working serial path and obtain **compact** diagnostics from any

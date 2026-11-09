@@ -885,3 +885,19 @@ verdict remain unspecified. [Correlated failure and cross-thread audit](MODULAR_
 retain the original failed report and explain the later worker snapshot.
 No buffering/default/code change in this evidence step. Next implementation is
 bounded producer waiting/last-accepted-packet diagnostics before transport tuning.
+
+### Escaping a mixer-filled phone view (2026-11-09)
+
+The user confirms navigation is still awkward when a panel covers the viewport.
+[Panel pan follow-up](MODULAR_AUDIO_ENGINE_M4A_PHONE_PAN.md) permits one-finger
+dragging on panel surfaces and two-finger panning over controls, with a visible
+hint. It cancels the control drag, consumes leftover fingers/clicks, retains
+keyboard multi-touch and defers touch-fader jumps until a tap/actual drag.
+Move desk / Go to… remain available; existing poses, setup and audio stay intact.
+
+Candidate **111 tests / six files**, final **15 / three** (overlapping), and
+public build/package checks (**36.43 s**) pass. Native single-pointer drag over
+a mixer filling a 390 x 844 desktop browser changes only the camera; all mixer
+values/poses remain. Physical Android gesture/capture remains to be confirmed.
+No engine/worker/default change or deployment. Then resume bounded worker-wait
+diagnostics for the previously retained actual delivery failure.

@@ -1,5 +1,6 @@
 import React,{createContext,useCallback,useContext,useEffect,useLayoutEffect,useMemo,useRef,useState} from 'react';
 import {load,save} from '../storage';
+import useDeskTouchPan from './useDeskTouchPan';
 
 // The play area. An instrument sits on a desk: a large surface (4K at least, as large as the window when that is bigger) with the
 // instrument laid out on it at its own size (at least HOME_W by HOME_H, and as wide and tall as its design needs) and never re-flowed to the window. The panels that float
@@ -57,6 +58,7 @@ export const resetLayout=()=>{
 export const onSynth=(...classes)=>typeof document!=='undefined'&&classes.some(cls=>!!document.querySelector('.instrument.'+cls));
 
 const INTERACTIVE='button,input,select,textarea,a,label,[role=slider],[role=radio],[role=spinbutton],[role=dialog],.fader,.keys,.ribbon,.touchpad,.pick,.grip,.preset-knob,canvas,.lab-window,.rackc,.setup-pop,.help-pop,.scope,[data-desk-item],.synth-graphic';
+const SURFACE_CONTROLS='button,input,select,textarea,a,label,[contenteditable=true],[role=slider],[role=radio],[role=spinbutton],[role=dialog],.fader,.keys,.ribbon,.touchpad,.pick,.grip,.rig-grip,.box-grip,.preset-knob,canvas,.setup-pop,.help-pop,.synth-graphic';
 const isTouchScreen=()=>typeof matchMedia==='function'&&matchMedia('(pointer:coarse)').matches;
 const defaultLayout=(box,homeW=HOME_W,homeH=HOME_H)=>{
  const w=Math.max(BASE_W,Math.ceil(box.w)),h=Math.max(BASE_H,Math.ceil(box.h));
@@ -217,17 +219,19 @@ export default function Desk({children,includeHomeInFit=true,objects=null,storag
   return ()=>el.removeEventListener('wheel',wheel);
  },[touch,zoomTo,commit]);
 
- // moving the desk: drag on anything that is not a control
+ // A panel surface can pan too; its actual controls keep one-finger editing.
  const pan=useRef(null);
- const down=e=>{
-  if(touch||(e.button!==0&&e.button!==1))return;
-  if(e.target.closest?.('.desk-zoom,.desk-spread'))return;
-  if(e.button===0&&!moving&&e.target.closest?.(INTERACTIVE))return;
+ const beginPan=e=>{
   const z=zoomRef.current;
   const a=atRef.current,L=layoutRef.current;
   // the pan is anchored to the desk's origin as it is on screen (the view and the desk's own corner both move when the desk grows on the left or top, but this does not)
   pan.current={id:e.pointerId,px:e.clientX,py:e.clientY,ax:a.x+L.x*z,ay:a.y+L.y*z};
-  e.currentTarget.setPointerCapture?.(e.pointerId);e.preventDefault();
+ };
+ const down=e=>{
+  if(touch||(e.button!==0&&e.button!==1))return;
+  if(e.target.closest?.('.desk-zoom,.desk-spread'))return;
+  if(e.button===0&&!moving&&(containedNavigation?e.defaultPrevented||e.target.closest?.(SURFACE_CONTROLS):e.target.closest?.(INTERACTIVE)))return;
+  beginPan(e);e.currentTarget.setPointerCapture?.(e.pointerId);e.preventDefault();
  };
  const move=e=>{
   const p=pan.current;if(p?.id!==e.pointerId)return;
@@ -235,6 +239,7 @@ export default function Desk({children,includeHomeInFit=true,objects=null,storag
   const n=place(z,{x:p.ax+(e.clientX-p.px)-L.x*z,y:p.ay+(e.clientY-p.py)-L.y*z},{x:cur.x,y:cur.y},measure());commit(z,n.x,n.y);
  };
  const up=e=>{if(pan.current?.id===e.pointerId)pan.current=null;};
+ useDeskTouchPan(view,containedNavigation,{start:beginPan,move,end:()=>{if(pan.current?.id==='touch-pan')pan.current=null;}});
  const focusObject=binding=>{
   const object=objects?.get(binding),el=object&&homeRef.current?.querySelector(`[data-desk-object-id="${object.id}"]`);
   if(!el||!isVisibleDeskItem(el))return;
@@ -283,6 +288,7 @@ export default function Desk({children,includeHomeInFit=true,objects=null,storag
    </div>
   </DeskContext.Provider>
   {!touch&&<div className="desk-zoom" role="group" aria-label="Zoom the desk">
+   {containedNavigation&&<span className="desk-touch-hint">Drag surfaces · 2 fingers over controls</span>}
    {containedNavigation&&objects?.list&&<select aria-label="Go to desk object" value="" onChange={e=>focusObject(e.target.value)}><option value="">Go to…</option>{objects.list().filter(o=>o.visible&&o.size.w>0&&o.size.h>0).map(o=><option key={o.id} value={o.binding}>{o.label}</option>)}</select>}
    {containedNavigation&&<button type="button" aria-pressed={moving} onClick={()=>setMoving(v=>!v)} title="Move the view by dragging anywhere; switch off to use instrument controls">Move desk</button>}
    <button type="button" aria-label="Zoom out" title="Zoom out (Ctrl + wheel)" onClick={()=>zoomTo(zoomRef.current/1.15)}>−</button>

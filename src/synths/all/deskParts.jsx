@@ -32,11 +32,13 @@ export function Pot({label,v,onChange,def=.5,tip,size=30,centre=false,side=false
 
 /** A vertical fader: a track with a cap, 0..1 from the bottom. */
 export function Fader({v,onChange,label,colour}){
- const track=useRef(null);
+ const track=useRef(null),drag=useRef(null);
  const set=e=>{const r=track.current.getBoundingClientRect();onChange(clamp(1-(e.clientY-r.top)/r.height));};
  return <div className="dk-fader" ref={track} role="slider" tabIndex={0} aria-label={label} aria-valuemin={0} aria-valuemax={1} aria-valuenow={v} aria-valuetext={dbText(v)+' dB'} style={{'--ch':colour}}
-  onPointerDown={e=>{e.preventDefault();e.currentTarget.setPointerCapture?.(e.pointerId);set(e);}}
-  onPointerMove={e=>{if(e.buttons)set(e);}}
+  onPointerDown={e=>{if(e.button>0)return;e.preventDefault();e.currentTarget.setPointerCapture?.(e.pointerId);drag.current={id:e.pointerId,touch:e.pointerType==='touch',y:e.clientY,moved:false};if(!drag.current.touch)set(e);}}
+  onPointerMove={e=>{const d=drag.current;if(d?.id!==e.pointerId||!e.buttons)return;if(d.touch&&!d.moved&&Math.abs(e.clientY-d.y)<4)return;d.moved=true;set(e);}}
+  onPointerUp={e=>{const d=drag.current;if(d?.id!==e.pointerId)return;drag.current=null;if(d.touch&&!d.moved)set(e);}}
+  onPointerCancel={()=>{drag.current=null;}} onLostPointerCapture={()=>{drag.current=null;}}
   onDoubleClick={()=>onChange(.75)}
   onKeyDown={e=>{const d={ArrowUp:1,ArrowRight:1,ArrowDown:-1,ArrowLeft:-1}[e.key];if(d){e.preventDefault();onChange(clamp(v+d*.02));}}}>
   <i className="dk-scale">{[10,5,0,-5,-10,-20,-30,-40,-60].map(d=><b key={d} style={{bottom:`${(d>=0?.75+d/10*.25:.75*(1+d/60))*100}%`}}>{d===0?'0':d>0?'+'+d:d}</b>)}</i>

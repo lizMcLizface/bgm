@@ -874,3 +874,13 @@ Next: bounded producer task/recycle-wait telemetry and last accepted packet's
 producer snapshot, separated from asynchronous post-stop worker statistics.
 Then a controlled explicit delivery comparison; preserve the working serial
 phone path and existing legacy/harness behavior. No deployment or broad migration.
+
+Phone navigation remains a gate: the user then reports the mixer can trap the
+viewport because gestures over its controls cannot pan. [Panel navigation
+follow-up](MODULAR_AUDIO_ENGINE_M4A_PHONE_PAN.md) adds one-finger surface dragging,
+two-finger panning over controls and deferred touch-fader jumps, retaining
+multi-touch keyboard notes and existing poses. Candidate **111** and final
+**15** overlapping UI tests pass; public package checks pass (**36.43 s**).
+Native desktop single-pointer panning over the mixer at 390 x 844 preserves
+values/poses; physical Android multi-touch remains unverified. Engine/worker/
+buffering unchanged. Confirm phone usability, then resume producer-wait telemetry.

@@ -1755,3 +1755,30 @@ no replay of bad audio, push or deployment. **Next bounded implementation:**
 producer task/recycle waiting observations plus last-accepted-packet producer
 snapshot, clearly distinct from the later worker query, before transport tuning
 or further source migration. Keep diagnostics bounded and PCM/control behavior.
+
+## M4a phone mixer navigation follow-up (2026-11-09)
+
+The user reports the phone is **still awkward**: if the mixer covers the screen,
+touching controls cannot move the view away. Prior desktop layout checks did
+not establish physical phone usability. [Panel panning contracts and results](MODULAR_AUDIO_ENGINE_M4A_PHONE_PAN.md)
+record the fix: one-finger dragging on non-control panel surfaces, two-finger
+panning over controls, and a visible gesture hint. Capture cancels the original
+control and prevents remaining fingers/clicks from editing it. Keyboard keybox
+multi-touch and navigation remain outside gesture initiation. Touch faders
+defer their initial jump until tap release or a four-pixel drag; mouse and
+keyboard control remain. Edits made before the second touch are not rolled back.
+
+Candidate All/Effects/Desk/keyboard/mixer regression: **111 tests / six files**,
+63.84 s; final gesture/fader/Desk/mixer **15 / three**, 1.57 s, pass (overlapping).
+Final public build/package checks pass, Vite **36.43 s**. Actual native browser
+single-pointer drag over a mixer filling a **390 x 844** view changes camera
+with Move desk off, preserving all mixer values/object poses and width 390;
+Go to… escapes and Setup opens. Report `m4a-phone-panel-pan-browser.json`,
+screenshot `.tmp/workbench-phone-panel-pan.png`. No audio played; runtime still
+`2dd834c6b07330cb`, Rust/worker assets unchanged. No deployment or trust change.
+
+**Next:** physical Android two-finger/capture usability confirmation. Automated
+tests simulate PointerEvents; browser automation verifies single-pointer input
+only. Keep LAN HTTPS running and do not claim physical gesture success yet.
+Once usable, resume producer-wait/last-accepted-packet diagnostics above; the
+correlated worker failure and working serial route are unchanged.
