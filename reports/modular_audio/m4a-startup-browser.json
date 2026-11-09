@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "kind": "synth-page-startup-recovery",
+  "phoneReportedError": "Unable to preload CSS for /assets/AllPage-I1eM8As7.css",
+  "phoneContext": "ChatGPT app local preview; user reports deployed public page works; no deployment authorized or performed",
+  "phoneFixConfirmation": "pending",
+  "prefixProbe": {
+    "method": "Separate loopback server rewrites HTML asset URLs under /preview/session/assets/ and rejects unforwarded /assets/ requests",
+    "before": {
+      "state": "error",
+      "error": "Unable to preload CSS for /assets/FirefoxAndroidNotice-DKaQuPAK.css"
+    },
+    "after": {
+      "url": "http://127.0.0.1:63013/synths/all/?_reload=1794259328004",
+      "workbenchHeadings": 1,
+      "startupErrors": 0,
+      "stylesheets": [
+        "http://127.0.0.1:63013/preview/session/assets/FirefoxAndroidNotice-DKaQuPAK.css",
+        "http://127.0.0.1:63013/preview/session/assets/index-BFZFR4xq.css",
+        "http://127.0.0.1:63013/preview/session/assets/Piano-BSKPn5GW.css",
+        "http://127.0.0.1:63013/preview/session/assets/DrumMachine-8_AVVSKp.css",
+        "http://127.0.0.1:63013/preview/session/assets/rackParts-C2TNwUk-.css",
+        "http://127.0.0.1:63013/preview/session/assets/ChannelMixer-DvLi3YVA.css",
+        "http://127.0.0.1:63013/preview/session/assets/AllPage-I1eM8As7.css",
+        "http://127.0.0.1:63013/preview/session/assets/generative-ybgFc-ZW.css"
+      ]
+    }
+  },
+  "slowProbe": {
+    "noticeObserved": "slow",
+    "lateWorkbenchHeadings": 1
+  },
+  "failedProbe": {
+    "state": "error",
+    "error": "Failed to fetch dynamically imported module: http://127.0.0.1:63011/assets/AllPage-DBsDHqGo.js"
+  },
+  "direct": {
+    "url": "http://127.0.0.1:4175/synths/all/?_reload=20261109-startup2",
+    "workbenchHeadings": 1,
+    "startupErrors": 0,
+    "playEnabled": true,
+    "normalPlayPressed": "false"
+  },
+  "audioScope": "No DSP changes or new live-audio result in this startup follow-up; M4a audio results remain historical."
+}

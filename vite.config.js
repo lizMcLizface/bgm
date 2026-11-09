@@ -6,6 +6,7 @@ import react from '@vitejs/plugin-react';
 import basicSsl from '@vitejs/plugin-basic-ssl';
 import { localRainReferences } from './tools/rainReferencesPlugin.mjs';
 import { startupPreload } from './tools/startupPreloadPlugin.mjs';
+import { moduleAssetUrl } from './tools/moduleAssetUrls.mjs';
 
 // GitHub Pages redirects /labs/strings to /labs/strings/; Vite's dev and preview
 // servers instead fall back to the main app. Mirror the Pages redirect locally.
@@ -85,6 +86,7 @@ export default defineConfig(({ mode }) => {
   const isPublic = mode === 'public', outDir = isPublic ? 'dist-public' : 'dist';
   return {
     base: '/',
+    experimental: { renderBuiltUrl: moduleAssetUrl },
     plugins: [react(), directorySlash(), localBanks(isPublic), localRainReferences(isPublic), startupPreload(),
         // DEV_HTTPS=1 serves the dev server over a self-signed certificate: other devices on the network need a secure origin for AudioWorklet
         ...(process.env.DEV_HTTPS ? [basicSsl()] : [])],

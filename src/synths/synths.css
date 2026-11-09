@@ -16,6 +16,8 @@ button:focus-visible,select:focus-visible,[role=slider]:focus-visible,a:focus-vi
 select{background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:8px;min-height:40px;}
 a{color:var(--amber);}
 .synth.loading{padding:40px;color:var(--muted);}
+.synth.loading{max-width:760px;margin:0 auto;overflow-wrap:anywhere;}
+.startup-error{white-space:pre-wrap;overflow-wrap:anywhere;color:var(--text);font-size:13px;}
 
 /* ---------- hub ---------- */
 .home{max-width:960px;margin:0 auto;padding:max(24px,env(safe-area-inset-top)) 16px 40px;}

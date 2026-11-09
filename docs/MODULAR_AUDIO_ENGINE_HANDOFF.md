@@ -1626,3 +1626,29 @@ Only after that gate expand to several captured eligible pitched roles with
 coherent failure, one owner per patch and current FX paths. Unsupported drum-kit
 translation, normal continuous transport, arbitrary racks/shared memory and
 distributed owners remain separate tasks. Commit every verified step locally.
+
+## M4a phone startup follow-up (2026-11-09)
+
+M4a is committed as `20e3f56`. The phone's ChatGPT-app local preview stalled at
+Warming up while the public deployed page worked. **Do not deploy for testing.**
+[Startup recovery and forwarded asset URL results](SYNTHS_STARTUP_RECOVERY.md)
+record the actual revealed error, `Unable to preload CSS for
+/assets/AllPage-I1eM8As7.css`, the fix and remaining phone confirmation.
+
+The shared synth entry now shows a ten-second slow-loading notice and actual
+startup errors with an explicit fresh-page retry. Late successful imports can
+still finish. Saved setup/query/hash are retained; unsaved Continuous sequences
+still restart on reload. JS-emitted build assets resolve beside their importing
+module, preserving forwarded paths; configured site/public audio URL base and
+all DSP stay unchanged. A separate proxy-style server reproduces the old CSS
+failure and successfully opens All after the fix via the real retry control.
+Separate delayed/failed module checks verify slow notice/late success/error UI.
+The live 4175 preview and deployed public site were not fault-injected.
+
+**100 focused tests** and final **five startup/URL tests** pass; final public
+build passes (**49.45 s**). Evidence `m4a-startup-browser.json` and the linked
+document. The direct fresh All route opens stopped with Play enabled. No new
+physical/audio-quality result is claimed. User's existing desktop tab and
+workbench are retained. **Next:** phone retry at `?_reload=20261109-startup2`;
+if it works, return to actual All route listening records. If it fails, diagnose
+the newly displayed full error/asset URL, without deploying or clearing data.

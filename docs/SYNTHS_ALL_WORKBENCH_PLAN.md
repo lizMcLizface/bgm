@@ -836,3 +836,10 @@ Reload preserves voices/poses and stopped/default experiment state; Continuous
 mode still regenerates its grid on ordinary reload. This is not a full transport
 migration or target-device quality/CPU proof. Run-bound listening evidence for
 this actual route is next, before eligible multi-role expansion.
+
+The subsequent phone startup check exposed a local ChatGPT-preview CSS preload
+failure. [Startup recovery and module-relative built assets](SYNTHS_STARTUP_RECOVERY.md)
+now cover long/failed page loading and preserve forwarded module asset paths.
+Proxy-style failure/recovery, direct startup, 100 page tests, five final loader/
+URL tests and public build pass. Phone retry is pending; no deployment, storage
+clear, DSP/default or setup schema change is part of this fix.
