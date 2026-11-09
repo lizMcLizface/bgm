@@ -25,7 +25,7 @@ const checked=spawnSync(process.execPath,['tools/buildSynth.mjs','--check'],{cwd
 fs.mkdirSync(output,{recursive:true});const manifests={};
 for(const [name,crate,binary]of kernels){
  const target=path.join(output,name+'-target'),args=['build','--manifest-path',crate+'/Cargo.toml','--release','--target','wasm32-unknown-unknown','--target-dir',target,'--offline','--locked','--config','profile.release.strip=false','--config','profile.release.debug=1'];
- if(uncachedColour&&name==='fm')args.push('--no-default-features');
+ if(uncachedColour&&name==='fm')args.push('--no-default-features','--features','legacy-abi');
  if(sections&&['core','fm'].includes(name))args.push('--features','profile-sections');
  if(simd&&['core','fm'].includes(name))args.push('--features','simd-voices');
  if(optLevel)args.push('--config','profile.release.opt-level='+JSON.stringify(optLevel==='2'?2:optLevel));

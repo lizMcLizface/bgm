@@ -13,6 +13,7 @@ synth-engine/inserts/target/
 synth-engine/percussion/target/
 
 synth-engine/classics/target/
+synth-engine/graph/target/
 
 # Working YAML exports; only the explicit public/synth-presets/ bundle is published
 patches/

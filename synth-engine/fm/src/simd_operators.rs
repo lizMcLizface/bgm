@@ -684,6 +684,6 @@ impl Envelope4 {
     }
 }
 
-#[cfg(feature = "multitimbral")]
+#[cfg(all(feature = "multitimbral", feature = "legacy-abi"))]
 #[path = "bank.rs"]
 mod bank;

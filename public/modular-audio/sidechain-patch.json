@@ -1,0 +1,28 @@
+{
+ "version":1,
+ "modules":[
+  {"id":11,"type":"ref.tone","version":1,"parameters":{"frequency":220,"amplitude":0.2}},
+  {"id":12,"type":"ref.lfo","version":1,"parameters":{"frequency":2}},
+  {"id":13,"type":"legacy.percussion","version":1,"parameters":{"gain":0.15,"mute":0,"soloExcluded":0,"ghost":0}},
+  {"id":14,"type":"graph.compressor","version":1,"parameters":{"threshold":-30,"ratio":6,"knee":6,"attack":0.003,"release":0.12,"output":0,"blend":1,"detectorHp":0,"keyMode":2,"bypass":0}},
+  {"id":15,"type":"ref.mix","version":1,"parameters":{"gain":0.7}},
+  {"id":16,"type":"ref.output","version":1,"parameters":{}}
+ ],
+ "connections":[
+  {"id":21,"kind":"audio","from":{"module":11,"port":"audio.out"},"to":{"module":14,"port":"program.in"}},
+  {"id":22,"kind":"modulation","from":{"module":12,"port":"control.out"},"to":{"module":13,"parameter":"gain"},"mapping":"unipolar","depth":0.1,"offset":0},
+  {"id":23,"kind":"audio","from":{"module":13,"port":"kick.out"},"to":{"module":14,"port":"detector.in"}},
+  {"id":24,"kind":"audio","from":{"module":14,"port":"audio.out"},"to":{"module":15,"port":"a.in"}},
+  {"id":25,"kind":"audio","from":{"module":13,"port":"audio.out"},"to":{"module":15,"port":"b.in"}},
+  {"id":26,"kind":"audio","from":{"module":15,"port":"audio.out"},"to":{"module":16,"port":"program.in"}}
+ ],
+ "events":[
+  {"frame":37,"target":11,"owner":1,"kind":"gate","value":true},
+  {"frame":4003,"target":13,"owner":2,"kind":"hit","drum":0,"velocity":0.8,"duration":0.25,"vary":0,"tone":0,"decay":1,"hit":1,"model":1},
+  {"frame":16007,"target":13,"owner":2,"kind":"hit","drum":0,"velocity":0.8,"duration":0.25,"vary":0,"tone":0,"decay":1,"hit":2,"model":1},
+  {"frame":24017,"target":14,"owner":1,"kind":"connection","edge":23,"value":false},
+  {"frame":28019,"target":13,"owner":2,"kind":"hit","drum":0,"velocity":0.8,"duration":0.25,"vary":0,"tone":0,"decay":1,"hit":3,"model":1},
+  {"frame":30023,"target":14,"owner":1,"kind":"connection","edge":23,"value":true},
+  {"frame":42023,"target":11,"owner":1,"kind":"gate","value":false}
+ ]
+}

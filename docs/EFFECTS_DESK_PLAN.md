@@ -1,5 +1,215 @@
 # Effects desk and independent effect boxes
 
+## Engine foundation update (2026-11-09)
+
+The next phase is specified in
+[MODULAR_AUDIO_ENGINE_PLAN.md](MODULAR_AUDIO_ENGINE_PLAN.md), with a fresh-session
+[implementation handoff](MODULAR_AUDIO_ENGINE_HANDOFF.md). Establish portable
+contracts and a small single-thread Rust graph, prove real synth modulation and
+sidechain, then benchmark six-engine worker rendering before broad migration.
+The catalogue below remains the device-level port specification; the engine
+plan supersedes its implementation order. **M0 audit/M1 reference graph are now
+delivered** in an opt-in tool; see the engine plan's delivery record. Existing
+desk DSP/defaults remain intact. The opt-in M2 slice now adds an owned real
+percussion adapter, actual kick tap and separate program/key compressor with
+validated timing/persistence. These are not yet wired into the effects desk;
+the device integration acceptance below remains applicable. M3a now supplies
+the [actual six-role serial baseline](MODULAR_AUDIO_ENGINE_M3A_BASELINE.md),
+including real Web Audio program/key inputs and a kick-keyed full-route variant.
+The [M3b owned FM adapter](MODULAR_AUDIO_ENGINE_M3B_OWNED_FM.md) now supplies
+second/bass in an opt-in paired worklet. [M3c owned core](MODULAR_AUDIO_ENGINE_M3C_OWNED_CORE.md)
+now supplies lead/rhythm/pad in an opt-in trio. Pitched DAG nodes come next;
+worker execution and desk migration remain future work.
+
+## Next phase: sidechain and device connection contract (2026-11-09)
+
+This is the current forward plan. The chronological records below describe
+delivered work and superseded design iterations. The ports in this section are
+proposed virtual connections; they are not implemented jacks or hardware CV.
+No new DSP or graph implementation is claimed by this planning update.
+
+### Current inventory and remaining work
+
+All 23 current processors have bench boxes: Clean Boost, Overdrive, Fuzz,
+Saturation, Equalizer, Filter, Z-plane, Compressor, Limiter, Phaser, Flanger,
+Chorus, Tremolo, Vibrato, Ring mod, Delay, Reverb, Shimmer, Freeze, Pitch,
+Width, Crusher and Tape. Scope and Spectrum are two additional monitor devices.
+Delay and reverb are independent, as are repeated kinds across parallel buses.
+This does not mean all future capabilities are implemented: the compressor has
+no external sidechain, the limiter pedal remains a native compressor-based
+approximation, and the separate desk limiter is sample-peak, not true-peak.
+
+Original device-level order (now preceded by the engine foundation above):
+
+1. **Real sidechain compression and a real key tap.** Establish program versus
+   detector inputs, connection state, latency and tap semantics before cables.
+2. **Port descriptors and one routing authority.** Expose actual connections in
+   headers; adapt existing serial/parallel files into the same versioned model.
+3. **Independent arbitrary instances, mixer sends/returns and modulation.**
+   Remove the one-kind-per-bus limit; support useful split, sum and monitor taps.
+4. **Patch editing with static cables and accessible menus.** Add/remove devices,
+   repatch while playing, validate before swapping graphs, preserve tails/notes.
+5. **Shared table and cable physics.** Keep simulation off the audio thread and
+   offer static/reduced-motion cables. Layout remains independent of routing.
+
+The remaining sequencer backlog is separate: assignable independent tracks,
+common length/rate and expression workflows, quantized launch/snapshots,
+automation recording, track MIDI/clock routing, note capture and MIDI files.
+Two global LFOs/eight modulation lanes already have a software foundation; that
+is not yet a general patchable control system or two LFOs per arbitrary track.
+
+### Sidechain milestone: build before general patching
+
+Upgrade the compressor contract to `program.in` (mono/stereo audio),
+`detector.in` (mono/stereo audio, detector-only role), and `audio.out` (stereo).
+A detector cable is an audio edge with a detector purpose; it never becomes
+another audible input to the output mixer. The current native
+DynamicsCompressorNode cannot accept an external sidechain
+([Web Audio specification](https://www.w3.org/TR/webaudio/#DynamicsCompressorNode)).
+Implement owned Rust DSP under the common module contract, with a two-input
+AudioWorklet adapter where needed and no render allocations. Reuse existing
+engine/build conventions without creating an incompatible routing model.
+
+- Keep threshold, ratio, knee, attack, release, output and blend. Add key mode
+  Internal / External / Auto, detector HP filter and clear program/key/reduction
+  meters. Peak detection first; RMS/hold and key listening can follow when their
+  processing/monitor paths exist. Keep manual output gain predictable.
+- Link gain reduction across L/R. Detect stereo key energy without averaging
+  signed samples, so anti-phase key material cannot cancel its own detection.
+- Auto selects External when the graph has a detector cable and Internal when
+  it does not. Silence or an empty worklet input buffer must not switch sources.
+  Explicit External with a missing cable releases gain reduction and shows a
+  missing-key state. Repatch and mode changes are smoothed.
+- Carry connection state separately from sample buffers. Report fixed latency
+  in samples; delay the parallel dry path equally when using lookahead/blend.
+  General parallel latency compensation is a later graph task; modulation's
+  changing phase/delay cannot be presented as automatically corrected.
+- Preserve the old native compressor for legacy files unless explicitly
+  migrated to the new DSP version. Do not silently change an existing sound.
+- Add an actual kick/key tap first. Default key tap is post-mute, pre-solo and
+  pre-fader: the kick fader does not change ducking, muting it does, and soloing
+  the pad does not destroy its detector. An explicit pre-mute Ghost option may
+  keep inaudible triggers; ordinary sends follow their documented mute policy.
+- First UI can select a source/tap from a connection menu. Persist that detector
+  edge with stable IDs now, so cables later edit this same routing information.
+  Include detector dependencies in cycle validation; post-compressor feedback
+  into its own detector is not an unrestricted first-pass connection.
+
+Acceptance: a steady stereo program ducks to an independent pulsed key; the
+key is never audible unless a deliberate listening path is enabled. Verify
+anti-phase keys, silent/absent keys, equal L/R reduction, attack/release/knee,
+level/blend, bypass, key mute/solo/fader policies, hot rewire, disposal,
+save/reload and legacy sound preservation at 44.1/48/96 kHz. Include source/key
+timing and latency in the native audit, rather than just checking GUI values.
+
+### Common port rules
+
+Each port has stable object-local ID, direction, signal family, channel count,
+units/range where applicable, supported rate, fan-in policy and semantic role.
+Connections refer to instance/port IDs, never labels, positions or chain indices.
+Graph edges also carry channel mapping, modulation depth/polarity/offset and
+tap point where needed. Distinguish these signal families:
+
+| Family | Contract |
+| --- | --- |
+| Audio | Mono or stereo PCM; program and detector roles share the audio type but have different destinations. No implicit stereo-to-mono sum. |
+| CV/control | Pitch in semitones or a declared normalized/bipolar control range. Convert to a parameter through an explicit mapping, attenuation and clamp. |
+| Gate/trigger | Gate is held state, trigger is an edge/pulse. Declare thresholds/pulse width and reset state on disconnect. |
+| Clock/transport | Timed clock, reset, run/start/stop and phase; declare pulse resolution and one elected clock authority. |
+| MIDI/event | Timestamped notes, releases, channel, CC, bend, pressure and optional clock; preserve note ownership and prevent echo loops. |
+| Power | A later virtual supply/enable contract, independent of signal routing. Model it only when disconnection actually changes device operation safely. |
+| Pattern/harmony | Generator-to-sequencer pattern/harmony data with quantized handover; neither audio nor an extra stream of duplicate live notes. |
+
+L, R and Stereo are views of one stereo bus, not three separately mixed outputs.
+L/R breakouts may legitimately branch elsewhere. Reject overlapping alias
+connections into the same destination channel, which would double its level.
+Mono into stereo uses an explicit/declared normalization policy; L-only input
+can feed both processing channels, while a connected R preserves real stereo.
+An ordinary input takes one source. Summing uses a mixer/merge node; source
+fan-out is allowed without changing its gain or making duplicate target paths.
+
+Internal CV is not an electrical output. A hardware bridge would need supported
+hardware, calibration, voltage/polarity ranges and a separate implementation.
+MIDI software ports likewise need explicit bridges to selected hardware ports.
+Hide unsupported sockets rather than drawing active dummy jacks.
+
+### Proposed device connections
+
+| Device | Inputs | Outputs and constraints |
+| --- | --- | --- |
+| Keyboard/controller | Hardware/virtual MIDI IN; optional clock/reset for its arp | MIDI OUT for locally played/arp notes, MIDI THRU for received events; optional mono pitch CV, gate and velocity CV follower. No audio output. |
+| Pitched synth | MIDI IN; pitch CV IN + gate IN + velocity CV IN; MOD IN 1–4; power later | Main Stereo OUT with L/R views. MIDI OUT only for actual generated events/CC feedback; MIDI THRU only when forwarding is implemented. Optional note-CV/gate OUT and envelope/LFO OUT need defined mono/voice-selection or poly-bundle semantics. Audio IN only for synths that actually process external audio. |
+| Drum synth/machine | MIDI IN, clock/reset, named trigger inputs and selected CV parameters | Main Stereo OUT; isolated voice outs where the engine supports them, prioritizing a kick/key tap. MIDI OUT for generated notes only; THRU for received events. A sequencer trigger is not itself a kick audio signal. |
+| Sequencer | MIDI IN for record/control/clock; clock/reset/run IN; transpose CV and optional fill/record trigger | Exactly eight assignable CV OUT and eight gate/trigger OUT initially; MIDI OUT and THRU; clock/reset/run OUT. The internal LFO/lane sources can be assigned to these CV sockets or explicit software modulation links. No audio output. |
+| Generator/arranger | Clock/transport reference and explicit musical settings/data | Pattern/harmony link into the sequencer. Generation does not independently sound the same notes through another MIDI cable. |
+| Eight-channel mixer | Eight mono/stereo channel inputs, two stereo aux returns initially, master insert return; channel insert returns when implemented; optional MIDI control | Master Stereo OUT with L/R views, monitor/cue OUT, eight direct/tap OUT, two stereo aux-send OUT, master insert send, optional channel insert sends/subgroups. Expand auxes only with real buses. CV/MIDI mapping for faders/pan/mutes needs the same parameter-target layer as pedals. |
+| Ordinary pedal | Main mono/stereo IN with L/R views, one or two assignable MOD/EXP IN where useful; power later | Main Stereo OUT with L/R views. Channel behavior belongs to the processor descriptor; a mono source must not accidentally discard an existing stereo image. |
+| Sidechain compressor | Program mono/stereo IN; separate mono/stereo KEY IN; optional parameter CV | Stereo OUT with linked reduction; detector/envelope telemetry may become a declared control OUT later. Key does not enter the program sum. |
+| Scope/spectrum | Stereo monitor IN with L/R views; optional scope trigger IN | Terminal tap by default, with no audio output needed. Optional hard THRU must be an explicit pass-through alias. Removing/hiding the monitor must not interrupt the source. |
+| Output/interface bridge | Main stereo audio IN, optional cue IN | Selected browser audio destination; optional real hardware channel/device routing only where supported. Monitor meters must describe their actual tap. |
+| Splitter/mult | One typed audio/CV/event input | Several equivalent outputs; no hidden gain change. MIDI fan-out needs loop protection. |
+| Stereo breakout/merge | One stereo pair or two mono channels | Explicit L/R extraction/assembly; a merge is not the same as summing L and R to mono. |
+| CV utility | CV plus optional trigger/clock | Attenuvert/offset, scale, clamp, quantize, sample/hold or slew output. Add an envelope follower for audio-to-CV and an explicit trigger-to-envelope/duck adapter. |
+
+Pitch CV + gate initially represents a monophonic voice stream. MIDI continues
+to carry chords. Polyphonic CV needs explicit voice bundles/allocator semantics;
+it must not silently choose or average arbitrary notes. Existing per-voice synth
+LFOs/envelopes cannot be advertised as one global output without specifying
+which voice, or adding a separate device-global source.
+
+MIDI OUT contains local generated events and explicitly enabled soft-thru;
+THRU forwards incoming events without generating a second copy of local notes.
+Never enable both paths into the same synth by default. Disconnecting an event
+route releases only notes/sustain owned by that route and cancels its scheduled
+events. Reject event echo loops as well as unprotected audio/control cycles.
+
+### Pedal channel and control capabilities
+
+| Group | Audio contract | Additional useful connections |
+| --- | --- | --- |
+| Boost, overdrive, fuzz, saturation, EQ, filter, crusher, ring, tape, pitch, vibrato | Stereo-capable in/out; mono-compatible. Specify dual-mono versus linked controls and actual latency. | MOD/EXP targets such as drive, cutoff, rate, depth or interval. External ring carrier is a later extra audio input, not something the present oscillator-only ring pedal already supports. |
+| Phaser, flanger, chorus, tremolo | Stereo in/out, preserving defined stereo spread/phase behavior | Rate/depth CV, clock/tap input; phase-reset input only when implemented. |
+| Delay, reverb, shimmer, freeze | Stereo input/output contract; explicitly audit each algorithm's channel and tail behavior | Delay clock/tap; freeze hold/capture trigger; decay/mix/size CV as appropriate. Do not require every pedal to expose every kind of timing input. |
+| Width | Stereo in/out; mono can pass but cannot be treated as an existing wide image | Width CV; correlation/mono checks remain important. |
+| Compressor/limiter | Stereo-linked gain handling; mono-compatible | Compressor KEY input; detector HP control. A future true-peak limiter is a separate algorithm milestone. |
+
+MIDI IN on a pedal is useful when CC/program/clock handling is implemented.
+Ordinary pedals do not all need MIDI OUT/THRU or note CV/gate inputs. General
+MOD/EXP ports map to stable parameter IDs through per-cable amount/inversion;
+they do not add meaningless rows of permanently unused sockets.
+
+### Sequencer LFO and automation routing
+
+Reuse the existing two LFOs, eight step lanes and random source. At present they
+are software/control-rate modulation, evaluated by a 20 ms timer against the
+audio clock; they are not exported, sample-accurate CV cables. Preserve those
+saved assignments as adapters while introducing the port model.
+
+Example: assign CV OUT 7 to LFO 1, patch it to the synth's MOD IN 1 and map that
+input to cutoff with a bounded depth. Assign CV OUT 8 to LFO 2 and patch it to
+chorus rate. The other six CV outputs remain available for pitch/other sources;
+MIDI note tracks can still play chords independently. An eight-step lane may
+drive any of the same assignable CV sockets instead. A later expander can add
+sockets; this is not an implicit promise of 8 pitch + 8 extra modulation outs.
+
+Transport-synced LFOs carry tempo, phase and reset policy; free-running LFOs
+explicitly ignore transport reset. UI rendering is not the signal clock. Smooth
+control-rate targets on the audio timeline; use render-thread signals for
+sample-accurate gates and any advertised audio-rate modulation. Targets must
+declare supported rate and units, with Hz/log/dB/pitch conversion handled by the
+mapping layer. Not every existing Wasm parameter can accept audio-rate CV.
+
+Effective parameter values combine the saved knob setting with mapped control
+offsets, with saturation/clamping and a live indicator. Disconnect restores the
+base value without rewriting it. Multiple sources require explicit summing or
+distinct modulation inputs, with an amount per connection. The same source can
+fan out to several targets with independent amounts. Persist source, target,
+mapping and clock/reset behavior, not frame-by-frame generated control values.
+
+These connections should be usable through menus before cable gestures exist.
+Sidechain, aux sends and modulation then exercise one graph contract, instead
+of becoming three incompatible routing systems later.
+
 ## Parallel wet/dry demonstration — implementation plan
 
 Requested after the single-case DI-Poly correction. Implement in this order:

@@ -1,0 +1,553 @@
+# Modular audio engine and parallel rendering plan
+
+Agreed direction: 2026-11-09. Status: **M0/M1, the opt-in M2 percussion/sidechain
+slice, M3a's actual six-role serial baseline, M3b owned FM and M3c owned core delivered**.
+All six source engines have owned mutable Rust state; core's read-only additive
+tables are safely shared after preparation. External stereo host inputs and
+graph program/key compression exist. Pitched DAG nodes, workbench migration
+and worker scheduling remain future work.
+See [owned core contracts and evidence](MODULAR_AUDIO_ENGINE_M3C_OWNED_CORE.md).
+See [owned FM contracts and evidence](MODULAR_AUDIO_ENGINE_M3B_OWNED_FM.md).
+See [M3a measurements and limits](MODULAR_AUDIO_ENGINE_M3A_BASELINE.md). Read
+[the handoff](MODULAR_AUDIO_ENGINE_HANDOFF.md) and
+[the boundary/API audit](MODULAR_AUDIO_ENGINE_M0_AUDIT.md) before continuing.
+
+This document governs the next engine phase. It advances the order in
+[the effects plan](EFFECTS_DESK_PLAN.md): establish processing contracts and a
+small working graph first, prove modulation and sidechain against them, then
+prove six-engine parallelism before broad DSP migration. The device port
+catalogue there remains applicable. Existing workbench behavior, saved sounds
+and arrangements are the compatibility baseline.
+
+## Outcome and boundaries
+
+Build one portable Rust processing core for instruments, effects, mixing,
+continuous modulation and timed events. Browser UI, persistence and device
+access remain host responsibilities. An AudioWorklet connects the core to
+browser audio; a future native/plugin host can use the same processing API.
+Native/plugin integration is future work, not an automatic result of Wasm reuse.
+
+A logical module is not a separate worklet, Wasm instance or operating-system
+thread. Many modules should share a runtime and reusable buffers. Existing
+complete synths can be composite modules; a later Eurorack interface can expose
+oscillator, envelope, filter, VCA and utility modules using the same contracts.
+Preserve useful high-level pedal/synth interfaces on today's desk.
+
+Keep the current engine available while opt-in paths prove correctness,
+compatibility, performance and latency. Generation/arranging and UI logic need
+not move to Rust. Cable physics, electrical CV and a full Eurorack editor follow
+later; do not start with a complete rewrite.
+
+## Current implementation facts
+
+- Subtractive, FM, percussion, classics, inserts and ambience/effects already
+  contain substantial Rust/Wasm DSP. `public/synth-lab/processor.js` already
+  bridges Rust sample generation and scheduled events into an AudioWorklet.
+- `src/synths/effects/graph.js`, `workbenchRack.js` and
+  `src/synths/all/mixerAudio.js` combine Wasm with native Web Audio gains,
+  filters, dynamics and other nodes. Compatible contiguous inserts already
+  share a kernel. Preserve such batching opportunities.
+- `src/seq/useModulation.js` uses a 20 ms JavaScript timer for external
+  sequencer modulation. This is distinct from synth-internal Rust LFOs. The
+  limitation is the scheduling/parameter contract, not lack of Web Audio
+  per-sample processing. Scalar setters do not automatically consume control
+  buffers at audio rates.
+- Exported cores include singleton mutable state and buffers, for example
+  `static mut ENGINE`, `COLOURS`, `LEFT` and `RIGHT` in the subtractive engine.
+  They cannot simply become concurrent instances sharing that state. Separate
+  owned instance state from the legacy ABI; audit helper statics and table
+  initialization too. Read-only tables can be shared after safe preparation.
+- Native compressor has no external key input. Pedal limiter is an
+  approximation; the separate desk limiter is sample-peak, not true-peak.
+
+## Architecture
+
+```text
+Desk / pedal / future Eurorack UI
+              |
+Versioned patch model, parameter edits and timestamped events
+              |
+Validation + preparation + schedule compiler (outside render callback)
+              |
+Portable Rust modules, buffers, transport and execution plan
+              |
+Single-thread executor OR dependency-aware parallel executor
+              |
+Browser AudioWorklet / external audio and MIDI bridges
+Future native host / audio-device or plugin integration
+```
+
+Keep patch data, prepared DSP state and layout separate. Use one routing
+authority; adapt existing serial and three-bus setups into it. Temporary Web
+Audio adapters must disclose rate/latency/capability limits and preserve sound.
+
+### Module, parameter and connection contracts
+
+- Stable module type/version, instance ID, port IDs and parameter IDs. Identity
+  does not depend on labels, indices or positions. Define a machine-readable
+  descriptor boundary so JS and Rust schemas cannot drift.
+- Ports declare direction, signal family, channels, units/reference, supported
+  rate, normalization, fan-in and semantic role. Detector is an audio role,
+  not an audible mix input. L/R/stereo aliases refer to one underlying bus.
+- Audio and continuous control can interoperate through declared mappings;
+  do not force modulation through MIDI or prohibit audio-rate CV by design.
+  Reject unsupported links; require explicit sum/conversion where needed.
+- Parameters retain saved base values. Combine base with per-edge
+  depth/polarity/offset, apply scaling/clamping and smooth appropriately.
+  Disconnect restores base without overwriting it. Declare audio-rate targets
+  separately from block/event-rate targets.
+- Events carry absolute sample positions and ownership. Define same-sample
+  ordering, late-event handling, bounded overflow, sustain/note release and
+  route removal. Define tempo/pause/reset and free-running versus synchronized
+  LFO behavior. UI refresh and worker wakeups are not signal clocks.
+- Use one authoritative sample clock. Sequencer/generator lookahead can remain
+  host-side initially, sending timestamped events; modulation/gates execute in
+  DSP. Keep long-range arrangement data distinct from immediate render events.
+- Processing declares resource bounds, maximum block size, latency, channel
+  behavior, reset, bypass, tails and disposal. Handle actual frame counts;
+  avoid a hardcoded 128-frame assumption throughout the new core.
+- Version patch schema and DSP algorithms separately. Preserve legacy sounds
+  until an explicit migration selects new DSP. Persist connections/mappings,
+  not every generated LFO sample.
+
+### Real-time and graph lifecycle
+
+Prepare, allocate and validate off the render path. Processing uses bounded,
+preallocated memory: no blocking locks, allocation, logging, network, thread
+creation or unbounded queues in the audio callback. Prewarm resources. Defer
+retired graph destruction and memory reclamation off the callback too.
+
+Publish prepared schedules at defined frame/block boundaries. Preserve state
+for unchanged instance IDs; define fades, note releases and effect-tail policy
+for edits/removals. Budget temporary transition cost rather than silently
+processing two full graphs during every crossfade.
+
+Initial execution is a DAG. Reject unsupported cycles, including detector,
+event and modulation cycles. Feedback inside a proven processor remains valid.
+Future explicit delay/feedback edges require a suitable scheduler: inserting a
+delay object alone does not make a cyclic block schedule executable. Define
+minimum delay and sample/block semantics before permitting graph feedback;
+zero-delay algebraic loops are out of initial scope.
+
+Track fixed path latency; align parallel program/key and mix paths. Report
+scheduler buffering, algorithmic lookahead, device latency and musical lookahead
+separately. Phase modulation and changing delay are audible effect behavior,
+not something generic latency compensation can remove.
+
+## Parallel rendering strategy
+
+All custom AudioWorklet processors in one AudioContext share its rendering
+thread. Multiple Wasm kernels/worklets alone do not provide parallel rendering.
+Browser parallelism needs initialized Web Workers, shared memory and an explicit
+scheduler. Rust modules remain independent of that host mechanism.
+
+Provide a single-thread reference executor and optional bounded worker-pool
+executor. Start with coarse tasks: an instrument plus local effects or another
+substantial independent subgraph. Lead, second voice, rhythm, pad, bass and drum
+branches can run concurrently until dependencies converge. Mixing/master
+inserts follow ready inputs. Sidechain and cross-branch control edges count as
+dependencies; tight feedback stays inside one supported processing unit.
+
+Browser workers render a short, bounded distance ahead into shared timestamped
+buffers. Worklet output consumes complete matching frames and never blocks
+waiting for workers. Use block sequence/generation IDs and explicit buffer
+ownership/publication ordering. Never mix an old branch block with new ones.
+Define bounded underrun concealment/recovery, report every miss, and avoid
+unbounded buffering or silently rescheduled notes.
+
+Do not drop a general-purpose Rayon iterator/join into the callback. Parallel
+throughput is not proof of deadline safety. Initialize worker/thread-local state
+before playback. Use a small configurable pool informed by measured cost and
+CPU availability; logical CPU count is a hint, not permission to occupy every
+core. Retain a single-thread/no-shared-memory path with capability detection.
+
+Worker scheduling is less predictable than the audio callback. Buffering may
+increase throughput at a live-playing latency cost. At 48 kHz, 256 frames are
+5.33 ms and 512 frames are 10.67 ms; these illustrate durations, not selected
+defaults or guarantees. Timestamp live MIDI/edits at the earliest valid frame
+when audio is already rendered, report late events, and bound buffering per
+mode. Live external audio cannot be computed before it arrives.
+
+Shared memory requires cross-origin isolation. Verify dev, preview and actual
+production headers/resource policies and `crossOriginIsolated`; do not assume
+the current GitHub Pages deployment supplies the needed headers. Investigate
+hosting before claiming production threading. A deployment change or service
+worker workaround needs its own design; preserve the non-isolated site and
+fallback. Future native execution can use an appropriate real-time worker pool,
+but still has deadlines, dependency limits and host integration work.
+
+### Performance experiment and decision gate
+
+Use six actual engine instances: lead, second, rhythm, pad, bass and drums,
+with representative patches, fixed seeds, realistic polyphony, local effects,
+shared mixer/master and a drum-keyed compressor variant. Synthetic sources are
+smoke tests, not evidence of real six-engine capacity.
+
+Compare current routing, new single-thread and worker-pool execution with the
+same events, DSP, sample rates, buffer policies and quality settings. Separate
+algorithm changes from executor changes. Keep reduction/mixing order stable
+and RNG instance-owned so worker scheduling does not change sound. If singleton
+engines cannot yet be reused, first extract an owned engine API and label the
+remaining coverage instead of calling six clones a mixed-engine benchmark.
+
+Record hardware, OS/browser/compiler/build, worker count, frame sizes, warmup
+and repeated-run conditions. Measure per-branch/end-to-end duration distributions
+(p50/p95/p99/max), total CPU where observable, memory, buffer occupancy, missed
+deadlines, underruns, late events and added latency. Sink callback duration alone
+hides worker DSP cost. Include dense chords, edits, UI load, silence/tails,
+shared-master bottlenecks and live MIDI. Separate offline throughput from
+sustained real-time behavior. Test 44.1/48/96 kHz.
+
+Require output agreement with the reference: exact PCM for unchanged DSP and
+arithmetic where feasible, otherwise a stated justified tolerance plus timing,
+stereo and level checks. Deliberately stall a worker and verify bounded recovery
+without deadlock, stale-block reuse or a hidden success report.
+
+Write a measured go/no-go recommendation before broad migration: useful
+capacity/headroom gain, extra latency, browser/hosting support and fallback.
+Set an explicit workload/latency budget from baseline evidence; do not invent
+a universal speedup or guarantee glitch-free worker scheduling.
+
+## Delivery milestones
+
+| Milestone | Deliverable and acceptance |
+| --- | --- |
+| M0: baseline and seams | Inventory DSP/state/ABI boundaries; establish reproducible current six-engine workload/costs where available. Record toolchain, browser headers and saved fixtures; label unmeasured conditions. |
+| M1: contracts/reference graph | Small portable Rust graph with owned state, deterministic source, LFO, VCA, explicit stereo mix/output, timed parameter/gate events, validator and versioned patch fixture. Native tests plus opt-in AudioWorklet harness prove audible modulation and sample timing. No default-page replacement. |
+| M2: real synth/sidechain | Adapt one existing Rust synth through owned reusable state while preserving its legacy ABI/sound. Add render-thread modulation of a declared target and stereo-linked compressor with separate program/key inputs and real kick tap. Source selectors precede cables. |
+| M3: six-engine parallel prototype | Extend adapters to the actual mixed-engine workload; add bounded optional worker executor. Compare sound, deadlines, latency, hosting and fallback against reference/current rig before broad migration. |
+| M4: workbench migration | Incrementally adapt serial/parallel racks, mixer, sends/returns, monitors and sequencer control links to one authority. Preserve IDs, presets, UI and save/reload. Port DSP in tested groups; expose arbitrary instances when lifecycle/routing support them. |
+| M5: patch editing | Real connection headers/menus, static cables, safe add/remove/repatch, typed split/mix/conversion utilities. Cables edit the same graph; layout remains independent. |
+| M6: modular expansion | Composite synth internals, low-level Eurorack modules, supported feedback/polyphonic CV, then tabletop/cable physics. Native/plugin hosts and electrical CV remain separately scoped. |
+
+M0/M1 are now delivered to the scope recorded below. M2 sidechain precedes
+general patching UI; M3 performance evidence precedes broad processor migration.
+Keep reporting baseline/browser gaps and update this plan/handoff after each
+slice rather than restarting the workbench.
+
+### M0/M1 delivery (2026-11-09)
+
+Historical checkpoint; the M2 record below supersedes current file sizes,
+allocation evidence and the next task.
+
+- Audited all six Rust core families, mutable helper tables/buffers, legacy
+  Wasm isolation, timed/scalar parameter boundaries, insert batching, rack/mixer
+  authority and external 20 ms modulation. See the linked M0 audit for exact
+  seams and extraction constraints. Existing Rust/JS audio implementations,
+  Wasm assets, default pages and saved-workbench formats are unchanged.
+- Added dependency-free `synth-engine/graph`: owned module state, sample clock,
+  typed contracts, DAG compilation/validation, resource bounds and a stable
+  dependency/level schedule. Separate audio input identities survive execution;
+  only the explicit stereo mixer sums them. This reserves the program/key seam
+  without exposing an unimplemented sidechain port or worker pool.
+- Delivered deterministic stereo tone, mono bipolar LFO, sample-rate VCA,
+  two-bus stereo mixer and output. Versioned bases/mappings, signed depth,
+  offset, bipolar/unipolar scaling and clamping work in DSP. Timestamped gate,
+  parameter and modulation-disconnect/reconnect events execute at sample
+  offsets; bounded overflow/late counters, owner release/cancellation,
+  pause/reset and disposal have explicit semantics.
+- Rust generates machine-readable contracts from the compiled Wasm. Host
+  `ReferenceGraph` validates versioned patch JSON and owns trusted ABI handles;
+  saved bases/connections/events replay bit identically after reload. Persistence
+  is restart/replay, not an in-flight voice/tail/transport snapshot. Rendering
+  supports actual block sizes rather than assuming 128 throughout the core.
+- Opt-in `/tools/modular-audio.html` works in dev and the public production
+  bundle. Verify renders actual AudioWorklets at 44.1/48/96 kHz and compares
+  PCM to direct Wasm and save/reload. Play measures live L/R output. No existing
+  page selects this reference. `graph:build/check/test/render` are documented
+  in the audit; normal/public builds verify source/binary/cache provenance,
+  including the worklet's transitive runtime import.
+
+Final verification:
+
+| Evidence | Result |
+| --- | --- |
+| Full JS/legacy suite | **369 files / 2,664 tests passed**, 109.60 s; `.tmp/modular-audio-suite-verified.log` |
+| Focused actual-Wasm/bridge regressions | **10 passed**; independent equations, three rates, varied block sizes, same-instance handles, mappings/clamps, overflow/late events, contracts, persistence and worklet teardown/partial final quantum; `.tmp/modular-audio-focused-final.log` |
+| Native reference graph | **4 passed** after the input-bus change; `.tmp/modular-audio-native-reference.log` |
+| Full native/allocator instrumentation | **Blocked**, not passed: Windows Application Control error 4551 for library/allocator runners. `.tmp/modular-audio-native.log`, `.tmp/modular-audio-native-allocation.log`. Native descriptor helper was also blocked; normal builds now generate descriptors through Wasm. |
+| Public build | **Passed**, 59.66 s; existing large-chunk advisory; 16 YAML banks included, raw banks/recordings excluded. `.tmp/modular-audio-build-public-final.log` |
+| Browser worklet PCM, dev and final public preview | **Exact float PCM** versus direct reference and reloaded patch at all three rates; frame 37 first audio, 42022 last audio, 7 events applied, 0 late/overflow; two nodes in one context had 0 silent-branch output |
+| Live AudioContext output | 48 kHz, 80 analyser observations, L/R observed peaks **0.16130538 / 0.16797364**, 7 events, 0 late/overflow; reported base/output latency **10 / 40 ms**. No device-loopback or direct-listening claim. |
+| Browser persistence | Edited tone to **277 Hz**, saved, reloaded stopped, then verified exact replay at three rates. Restored the default 220 Hz reference fixture afterwards. No workbench storage was edited. |
+| Existing effects desk, built preview | Starmap Void, Dark Shape A, wet Chorus/Vibrato/Delay, independent master Delay/Reverb and muted Dry retained. Legacy Chord audition produced scope **L −17.7 / R −17.3 dBFS**, correlation **0.34**. Stopped audio and cleared audition afterwards. |
+
+At 48 kHz the default fixture's offline L/R RMS is
+**0.05487677317 / 0.05482676268**, peak **0.16797363758**. The final reference
+Wasm is **68,605 bytes**, asset version `9c0a7a88029f513c`; descriptor formatting
+code is included, not called in render. `.tmp/modular-audio-reference.wav` is a
+stereo PCM16 listening artifact; `.tmp/modular-audio-pcm.json` contains float
+measurements. Worklet and reload comparisons use the float buffers.
+
+Limits: reference DSP is synthetic and unsmoothed (0-frame smoothing declared),
+with mono gates, zero module latency/tails and immutable prepared topology. No
+hot graph/state transfer, sustain/polyphonic events, sync LFOs, legacy synth
+adapter, detector/compressor, arbitrary cable UI, latency compensation or
+workers were implemented. The counting-allocator native test remains unrun;
+source inspection confirms bounded preallocated render code, but is not a
+substitute for that test. Dev/preview are non-isolated (no COOP/COEP/CORP).
+Production hosting isolation remains unverified; a direct production header
+request failed. The current ensemble tool is 2/4/8 subtractive/FM parts, not the
+six real-role fixture: its required cost/deadline baseline is still outstanding.
+Offline wall times are not real-time performance evidence. No speedup is claimed.
+
+**Next task: M2.** Extract one real legacy synth into an owned adapter while
+preserving its ABI and PCM; add a declared render-thread target plus a
+stereo-linked program/key compressor and actual post-mute/pre-solo/pre-fader
+kick tap. Prove key identity/anti-phase behavior, absence/silence, envelope and
+blend latency, owner release/repatch, save/reload and old PCM at three rates.
+Use selectors before cables. Then capture the actual six-engine fixture/costs
+before beginning M3 workers. No commit, push or deployment was performed.
+
+### M2 delivery and Application Control mitigation (2026-11-09)
+
+Continued without changing Windows Application Control or executing blocked
+native helpers. The normal build already reads descriptors through Wasm. Added
+an **audit-only Wasm counting allocator** so enqueue/render/cancel/reset can be
+instrumented without a generated native executable. Native execution remains
+blocked; this is separate Wasm evidence, not a claim of native test execution.
+
+- Extracted the real percussion core into
+  `synth-engine/percussion/src/engine.rs`, with public owned `Engine`/`Hit`.
+  Noise, tables, voices, queue, serials, smoothing and residuals belong to the
+  instance. The default `legacy-abi` feature preserves all original exports in
+  `abi.rs`; the graph dependency disables it. The graph Wasm has no legacy
+  singleton exports. Legacy percussion Wasm/cache provenance was rebuilt.
+- Added `legacy.percussion` version 1 with semantic timestamped hits, separate
+  `audio.out` and **actual kick-only `kick.out`**, owner cancellation and reset.
+  Receive-order serials are reserved when booking hits, preserving legacy voice
+  stealing even with out-of-order future timestamps. The module's output `gain`
+  is a declared audio-rate LFO target; it does not silently change the core's
+  existing smoothed per-drum level setters.
+- The kick tap is post source-mute, pre source-solo exclusion and pre output
+  gain/fader/modulation. Explicit Ghost makes it pre-mute. Snare/hats never
+  become kick key audio. These policies are implemented in this opt-in module;
+  existing desk mixer/track controls have not been migrated to it.
+- Added `graph.compressor` version 1 with distinct required stereo program and
+  optional detector buses. Internal / External / Auto uses graph connection
+  state. Missing External releases reduction and reports `missingKey`; a
+  connected silent key remains external. Max absolute L/R detection preserves
+  anti-phase keys; one gain is applied to both program channels. Detector audio
+  never enters the audible mix unless a separate program route requests it.
+- Threshold, ratio, soft knee, attack/release, output, blend, detector HP and
+  smoothed bypass work, with real input/key/output peaks, wet reduction and
+  missing/external flags. **Zero lookahead/zero module latency** is intentional;
+  dry blend and bypass use the same program sample. Output/blend/bypass edits
+  smooth over 5 ms; detector repatching follows the reduction attack/release.
+  This is not a limiter or a lookahead-compressor implementation.
+- Audio edges now retain their source output bus as well as destination input.
+  Timestamped connection events can enable/disable a precompiled detector edge;
+  its dependency remains in cycle validation/scheduling. Source selection in
+  the harness stops/reprepares the graph; arbitrary hot topology swaps and tail
+  transfer are not implemented. Key-mode/source selections and automation save
+  with the existing patch schema and DSP identities.
+- The harness adds **Percussion / sidechain**, real key/source selectors and
+  compressor meters in its reports. The original LFO/VCA reference remains the
+  fresh-page default. The canonical JS host runtime now lives in
+  `src/modular-audio/runtime.js`; the build copies/checks the public worklet
+  runtime, avoiding a Vite dev import through the public directory. Transitive
+  percussion sources and both fixtures are included in graph provenance.
+
+Evidence and limitations:
+
+- **27 exact stereo-float comparisons** against preserved pre-M2 Wasm, across
+  44.1/48/96 kHz, all three models/all 14 drums, dense stealing and reordered
+  future bookings. Both rebuilt legacy ABI and graph adapter match. Committed
+  golden hashes: `src/modular-audio/percussionLegacyPcm.json`; audit:
+  `npm.cmd run graph:audit-legacy`, `.tmp/modular-audio-m2-legacy-pcm.json`.
+- **Six Wasm allocation audits passed:** original and sidechain patches at all
+  three rates, including live hit enqueue, rendering, owner cancellation and
+  reset: **0 allocation/reclamation calls, 0 memory growth** after preparation.
+  M1 memory: 1,310,720 bytes; M2: 2,686,976 bytes at 44.1/48 kHz and 3,080,192 at
+  96 kHz. This counts the Rust allocator, not JavaScript/browser allocations.
+  Command: `npm.cmd run graph:audit-alloc`; evidence:
+  `.tmp/modular-audio-allocation-wasm.json`. The instrumented build/probes stay
+  under `.tmp/graph-allocation-target`, outside the public runtime.
+- `npm.cmd run graph:audit-compressor` passed independent equation checks at
+  three rates: an anti-phase unit key gives **~15 dB** reduction; 48 kHz attack
+  at 240 frames gives **9.481838 dB** versus **9.481808 dB** expected; missing-key
+  release over 4,800 frames gives **3.488067 dB** versus **3.488173 dB** expected.
+  Knee at threshold: **1.125 dB**. Stereo linking, detector-HP DC rejection and
+  same-sample dry/bypass also passed. `.tmp/modular-audio-m2-compressor.json`.
+- **22 focused tests passed**, covering the original reference, real-source
+  modulation/taps, owner cancellation, silent/missing/Auto policy, exact event
+  disconnect, persistence, validation, channels and independent real instances.
+  `.tmp/modular-audio-m2-focused-final.log`. Native
+  `cargo check --offline --tests` passed; new native executables were not run.
+- Actual built-browser worklets matched direct Wasm/reloaded M2 PCM exactly at
+  all three rates, including independent silent-node output of 0. At 48 kHz the
+  default M2 fixture peak is **0.14000000060**, L/R RMS
+  **0.04447046852 / 0.04480246336**, 7 events, 0 late/overflow. Audio starts at
+  frame 37; kick tails continue through the 48,000-frame observation window.
+  External + Disconnected was saved/reloaded stopped and verified with
+  **missingKey=1, reduction=0**, exact replay and 5 events at all three rates.
+  Final browser/build/suite results are recorded in the handoff.
+- Final full suite: **370 files / 2,676 passed** (111.02 s),
+  `.tmp/modular-audio-m2-suite-verified.log`; public build passed (59.52 s),
+  `.tmp/modular-audio-m2-build-verified.log`. Final graph: **119,891 bytes**,
+  version **`bc2415256b648fc6`**. Live 48 kHz observed L/R peak **0.14000000060**
+  each over 80 polls, 7 events, 0 late/overflow; no device-loopback claim.
+  A two-second 48 kHz PCM16 listening artifact is available through
+  `npm.cmd run graph:render -- --sidechain`.
+
+At the M2 checkpoint the graph did not yet accept external Web Audio program/key inputs, migrate
+existing workbench routing or offer arbitrary live source rewiring. One actual
+percussion engine is not the six-engine performance fixture. No worker, CPU
+headroom, real-time deadline or physical loopback claim follows from these
+audits. Production isolation/hosting remains unverified.
+
+Phone follow-up (user report, 2026-11-09): remote phone access with Bluetooth
+headphones produced cut/crackly beginnings/endings in the short harness; the
+latest effects page worked cleanly on that phone. Exact device/browser/access
+path and asset versions are unknown. Defer this lower-priority audition-boundary
+investigation; do not attribute it to Bluetooth or call it a measured DSP
+underrun. Abrupt reference gates/timed shutdown are candidate causes to separate
+from device behavior in a later lifecycle pass. This user report remains deferred.
+
+### M3a delivery: six actual roles and serial baseline (2026-11-09)
+
+See the [complete baseline](MODULAR_AUDIO_ENGINE_M3A_BASELINE.md) for pinned
+patches, score/initialization seeds, capacities, effects/key routing, raw reports,
+timing tables and precise measurement limits. M3 overall is still incomplete.
+
+- Added an opt-in six-role harness with actual DI-Poly lead/rhythm/pad, FM
+  second/bass and percussion drums. It reuses existing worklets, local inserts,
+  six-strip desk mixer, shared delay/reverb and final limiter. The versioned
+  17.5-second fixture saves/reloads stopped in a separate local store.
+- Added prepared `host.audio` stereo input buffers and the real same-instance
+  kick buffer bridge. The current route, owned-drum bridge and kick-keyed
+  compressor route all remain serial. No legacy algorithms/defaults changed.
+- **27 measured browser runs**, three rates × three variants × three repeats,
+  after one warmup each. All six source/local-insert stems exactly match direct
+  legacy Wasm. Full mixes use explicit 1e-6 tolerance: maximum current/bridge
+  difference 4.47035e-8; largest repeat difference 5.96046e-8. They are not
+  bit-identical complete browser mixes.
+- 48 kHz full-route offline render medians for 17.5 s of audio:
+  current **4101.8 ms**, bridge **4182.9 ms**, keyed **4407.6 ms**. Direct-source
+  block timings and 96 kHz offline budget crossings are separately reported;
+  these are not device underruns, callback CPU or worker headroom evidence.
+- Production preview restored the fixture stopped and passed the selected
+  48 kHz keyed check with six exact stems. Live synthesis produced all six
+  roles over 178 analyser polls, master peak .1265905350, no reported
+  late/drop/overflow, and stopped after its finite score/tail. No loopback claim.
+- **371 files / 2,684 tests passed**, public build passed, native cargo check
+  passed. **Nine** Wasm allocation audits found 0 allocation/reclamation/growth;
+  compressor equation audits passed. Native test executables remain blocked
+  by Application Control. Graph **120,773 bytes**, version `394279c8033e0aaa`.
+
+**Next: M3b, owned FM extraction**, preserving original ABI, PCM, event/voice
+behavior and quality-1 7.5-frame latency; then owned subtractive/core for the
+other three pitched roles. Use this pinned actual workload for comparisons.
+Only then add bounded optional workers and measure deadlines, latency, stalls
+and non-isolated fallback. Keep the desk authoritative until its migration
+milestone. No commit, push or deployment was performed.
+
+### M3b delivery: owned FM adapter (2026-11-09)
+
+The [owned FM record](MODULAR_AUDIO_ENGINE_M3B_OWNED_FM.md) describes the exact
+API, host contract, browser evidence and limits. The original scalar DSP now
+lives in an owned Rust `Engine`; its default-enabled `legacy-abi` wrapper
+retains the existing C exports. Optional bank globals stay behind that ABI.
+The graph links the rlib without legacy singleton exports and exposes separate
+`fm_owned_*` handles. Two independent owners share one Wasm instance in the
+opt-in paired worklet. This is not yet a pitched `Graph::Kind` module: the
+sample-oriented DAG and block-oriented pitched scheduling remain separate.
+
+- **57 exact original/rebuilt/owned PCM comparisons** pass at three rates,
+  including all recipes, additional quality tiers, dense reordered stealing,
+  sustain/pressure/glide/mono/legato, patch transition and actual second/bass.
+  Original snapshots and versioned float hashes are retained. FM quality 1's
+  intrinsic **7.5-frame** latency is unchanged.
+- Shared-instance tests pass through independent reset/panic/disposal; the
+  graph binary has no legacy `fm_init` export. Scalar/SIMD/bank/fast legacy
+  export sets are unchanged. Existing optional SIMD/bank tests remain active.
+- **Twelve Wasm allocation audits** find no Rust allocation/reclamation or
+  memory growth after preparation. Paired FM linear-memory capacity is
+  **1,507,328 bytes** at all three rates. JS/browser storage is not included.
+- Versioned FM packet/performance/events/transitions validate and save/reload.
+  Queue bounds reserve initial performance and transition events. The six-role
+  page adds **Owned FM pair + kick key · M3b** and an all-rate FM comparison;
+  Current remains the default. Existing workbench routes/defaults are intact.
+- Full suite **372 files / 2,690 tests passed**, 109.49 s; public build passed,
+  31.58 s; native cargo check passed. Old source-inventory and named diagnostic
+  artifact checks were updated/rebuilt, not disabled. Native test execution
+  remains blocked by Application Control. Graph **163,099 bytes**, version
+  **`52ec483d8de9ec1c`**. Browser results are recorded in the linked M3b record.
+
+**Next: owned subtractive/core** for lead/rhythm/pad, then prepared block-capable
+pitched DAG nodes with explicit timed note ownership/cancellation and latency
+metadata. Keep compatible inserts batched. M3 workers, broad workbench migration
+and screen-lock playback investigation remain later; no worker speedup or
+deadline claim is made by this extraction.
+
+### M3c delivery: owned subtractive/core (2026-11-09)
+
+See the [owned core record](MODULAR_AUDIO_ENGINE_M3C_OWNED_CORE.md) for exact
+contracts, retained references, memory figures and browser results.
+
+- Original scalar and optional SIMD DSP now use per-engine voices, colours,
+  outputs, chorus/filter/headroom/DC, RNG, events and counters. Additive tables
+  are prepared once with `OnceLock`, then read without mutation or lazy render
+  initialization. Default-enabled `legacy-abi` retains the singleton/probes;
+  the owned graph build excludes them and exposes `core_owned_*` handles.
+- **75 exact original/rebuilt/owned core PCM cases** pass at three rates,
+  including all recipes, six additive shapes, note/voice behavior, transitions
+  and actual lead/rhythm/pad. The current graph also passes **57 FM** cases.
+  Independent trio reset/panic/disposal and versioned spec persistence validate.
+- All six actual source engines can coexist in one Wasm memory and match
+  independent legacy L/R samples exactly for the full 48 kHz score. This host-
+  driven test is not a pitched DAG scheduler or a parallel executor.
+- **18 allocation audits** pass: zero Rust allocation/reclamation/growth after
+  preparation, including the full score/transitions and reset/replay. Three core
+  owners use 3,014,656 linear-memory bytes; six-source totals are separately
+  reported for each rate, not multiplied per owner.
+- The six-role page adds **All six owned + kick key · M3c** and **Compare all
+  owned · all rates** on the same 4175 preview. Existing mixer/local/master FX,
+  real key and limiter remain; Current stays the fresh-page default.
+- **373 files / 2,697 tests passed** (119.91 s); public build passed (36.05 s)
+  with bank/exclusion checks. Native cargo check passed; executable tests remain
+  blocked by Application Control. Graph **279,049 bytes**, version
+  **`1bb61c9f8351fcb5`**. Scalar/acoustic legacy export sets remain exact.
+
+**Next: block-capable pitched DAG integration (M3d)** with prepared core/FM
+configuration, sample-timed notes/controls/transitions, explicit note-owner
+cancellation, latency metadata and insert batching. Only after matching the
+six-source owned reference should bounded optional workers be evaluated for
+actual deadlines/stalls, latency, hosting/capability and serial fallback.
+No worker performance, broad migration or screen-lock fix is claimed by M3c.
+
+### Sidechain acceptance retained for workbench integration
+
+Use owned Rust DSP with a multi-input browser adapter as needed. Internal /
+External / Auto selects from graph connection state, not silence. Explicit
+External without a key releases reduction safely and shows missing-key status.
+Detect stereo magnitude/energy without signed-channel cancellation; apply
+linked L/R reduction. Include threshold, ratio, knee, attack, release, output,
+blend, detector HP and truthful meters. Align dry blend with declared lookahead
+latency. Detector never enters the audible sum accidentally.
+
+Real kick tap defaults post-mute, pre-solo, pre-fader; explicit Ghost can use
+pre-mute. Verify anti-phase/stereo keys, silence/absence, envelope timing,
+mute/solo/fader behavior, repatching, teardown, persistence and legacy sounds.
+Keep native legacy compressor available under its existing DSP identity.
+
+## Future Eurorack compatibility decisions
+
+Reserve explicit pitch units/reference and conversion to a virtual 1 V/oct
+representation; no implication of electrical voltage. Distinguish held gate,
+trigger pulse and event; declare thresholds/reset. Start with mono pitch/gate
+and MIDI chords; polyphonic bundles/voice allocation are explicit extensions.
+Synth LFO/envelope outputs need global versus selected/per-voice semantics:
+audit each engine rather than assuming all existing LFOs are per-voice. Do not
+tie DSP type identity to a pedal face or physical jack position.
+
+## Sources
+
+Primary sources consulted 2026-11-09; recheck platform/toolchain requirements
+when implementing. These establish capabilities, not project benchmark results.
+
+- [Web Audio: AudioWorkletGlobalScope](https://www.w3.org/TR/webaudio-1.1/#AudioWorkletGlobalScope): scope/rendering thread per context.
+- [Web Audio: AudioParam](https://www.w3.org/TR/webaudio/#AudioParam): per-sample versus block parameter processing.
+- [Chrome AudioWorklet design patterns](https://developer.chrome.com/blog/audio-worklet-design-pattern): Wasm, shared buffers, worker scheduling and nonblocking consumption.
+- [wasm-bindgen-rayon](https://docs.rs/wasm-bindgen-rayon/latest/wasm_bindgen_rayon/): worker/shared-memory integration, isolation and build prerequisites; not a real-time scheduler endorsement.
+- [Web Audio: DynamicsCompressorNode](https://www.w3.org/TR/webaudio/#DynamicsCompressorNode): external sidechain limitation.

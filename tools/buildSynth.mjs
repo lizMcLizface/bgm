@@ -5,7 +5,7 @@ import {spawnSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const kernels=[
- {name:'percussion',crate:'synth-engine/percussion',binary:'calmbgm_percussion'},
+ {name:'percussion',crate:'synth-engine/percussion',binary:'calmbgm_percussion',shared:['synth-engine/percussion/src/engine.rs','synth-engine/percussion/src/abi.rs']},
  {name:'core',crate:'synth-engine',binary:'calmbgm_synth',shared:['synth-engine/common/colour.rs','synth-engine/common/notes.rs','synth-engine/common/headroom.rs','synth-engine/common/denormal.rs']},
  {name:'effects',crate:'synth-engine/effects',binary:'calmbgm_effects',shared:['synth-engine/common/headroom.rs']},
  {name:'fm',crate:'synth-engine/fm',binary:'calmbgm_fm',shared:['synth-engine/common/colour.rs','synth-engine/common/notes.rs','synth-engine/common/headroom.rs','synth-engine/common/denormal.rs']},
@@ -15,7 +15,7 @@ const kernels=[
  {name:'fm-fast',simd:true,bank:true,fast:true,crate:'synth-engine/fm',binary:'calmbgm_fm',shared:['synth-engine/common/colour.rs','synth-engine/common/notes.rs','synth-engine/common/headroom.rs','synth-engine/common/denormal.rs']},
  {name:'inserts',crate:'synth-engine/inserts',binary:'calmbgm_inserts',shared:['synth-engine/common/denormal.rs']},
 ];
-const sourceHash=kernel=>crypto.createHash('sha256').update([`${kernel.crate}/Cargo.toml`,`${kernel.crate}/src/lib.rs`,...(['core','fm','fm-simd','fm-bank','core-acoustic','fm-fast'].includes(kernel.name)?[`${kernel.crate}/src/simd_voices.rs`,'synth-engine/common/simd.rs']:[]),...(kernel.crate==='synth-engine/fm'?[`${kernel.crate}/src/simd_operators.rs`]:[]),...(kernel.bank?[`${kernel.crate}/src/bank.rs`]:[]),...(kernel.shared??[])].map(f=>fs.readFileSync(path.join(root,f),'utf8').replace(/\r\n/g,'\n')).join('\n')+(kernel.simd?'\n'+(kernel.fast?(kernel.bank?'multitimbral,simd-colour':'simd-colour'):kernel.bank?'multitimbral':'simd-voices')+';+simd128'+(kernel.fast&&!kernel.bank&&!kernel.acoustic?';no-auto-vectorize':''):'')).digest('hex');
+const sourceHash=kernel=>crypto.createHash('sha256').update([`${kernel.crate}/Cargo.toml`,`${kernel.crate}/src/lib.rs`,...(['core','fm','fm-simd','fm-bank','core-acoustic','fm-fast'].includes(kernel.name)?[`${kernel.crate}/src/simd_voices.rs`,'synth-engine/common/simd.rs']:[]),...(kernel.crate==='synth-engine/fm'?[`${kernel.crate}/src/simd_operators.rs`]:[]),...(kernel.bank?[`${kernel.crate}/src/bank.rs`]:[]),...(kernel.crate==='synth-engine/fm'?['synth-engine/fm/src/engine.rs','synth-engine/fm/src/abi.rs']:[]),...(kernel.crate==='synth-engine'?['synth-engine/src/engine.rs','synth-engine/src/abi.rs','synth-engine/src/tables.rs']:[]),...(kernel.shared??[])].map(f=>fs.readFileSync(path.join(root,f),'utf8').replace(/\r\n/g,'\n')).join('\n')+(kernel.simd?'\n'+(kernel.fast?(kernel.bank?'multitimbral,simd-colour':'simd-colour'):kernel.bank?'multitimbral':'simd-voices')+';+simd128'+(kernel.fast&&!kernel.bank&&!kernel.acoustic?';no-auto-vectorize':''):'')).digest('hex');
 const output=path.join(root,'public/synth-lab');
 const hash=buffer=>crypto.createHash('sha256').update(buffer).digest('hex');
 const versionsPath=path.join(root,'src/synth-lab/kernelVersions.json');

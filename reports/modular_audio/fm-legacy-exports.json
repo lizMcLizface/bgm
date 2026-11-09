@@ -1,0 +1,25 @@
+{
+  "pass": true,
+  "comparisons": [
+    {
+      "name": "fm",
+      "exportCount": 14,
+      "exact": true
+    },
+    {
+      "name": "fm-simd",
+      "exportCount": 15,
+      "exact": true
+    },
+    {
+      "name": "fm-bank",
+      "exportCount": 30,
+      "exact": true
+    },
+    {
+      "name": "fm-fast",
+      "exportCount": 30,
+      "exact": true
+    }
+  ]
+}

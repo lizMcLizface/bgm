@@ -86,7 +86,7 @@ impl Engine {
 
             for l in 0..layers {
                 let p = &self.p[l];
-                let colour = unsafe { &mut COLOURS[voice_index][l] };
+                let colour = { &mut self.colours[voice_index][l] };
                 let coloured = colour::enabled(&p[86..99]) || colour.engaged();
 
                 let amp = v.amp[l].next(p, 17, 59, 107, self.sr);
@@ -427,7 +427,7 @@ impl Engine {
             for l in 0..layers {
                 let p = &self.p[l];
                 let coloured = flags[voice_index][l];
-                let colour = unsafe { &mut COLOURS[voice_index][l] };
+                let colour = { &mut self.colours[voice_index][l] };
                 let mut layer_out = [0.; 2];
                 let mut noise_gain = [0.; 2];
                 for u in 0..unison {
@@ -717,11 +717,11 @@ impl Engine {
             for ch in 0..2 {
                 let y = protected[ch];
                 self.peak = self.peak.max(y.abs());
-                unsafe {
+                {
                     if ch == 0 {
-                        LEFT[sample] = y;
+                        self.left[sample] = y;
                     } else {
-                        RIGHT[sample] = y;
+                        self.right[sample] = y;
                     }
                 }
             }

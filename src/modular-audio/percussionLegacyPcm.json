@@ -1,0 +1,221 @@
+{
+  "provenance": "Captured from pre-M2 legacy percussion Wasm; exact stereo float SHA-256, L then R",
+  "fixtures": [
+    {
+      "rate": 44100,
+      "model": 0,
+      "dense": false,
+      "reordered": false,
+      "total": 24000,
+      "sha256": "422d4e25ec902388d03701d8766ccb10c699ff375d12b8c16114c217ea707ef6"
+    },
+    {
+      "rate": 44100,
+      "model": 0,
+      "dense": true,
+      "reordered": false,
+      "total": 24000,
+      "sha256": "1c1fa940a976158446a0bdfd0f375db98b623a8422c88759e7f927ec850b07d7"
+    },
+    {
+      "rate": 44100,
+      "model": 0,
+      "dense": true,
+      "reordered": true,
+      "total": 24000,
+      "sha256": "dea66c40551266955fdf5d8a5e8c410e2ac3b91002f82fc1d23dc533b536a0d9"
+    },
+    {
+      "rate": 44100,
+      "model": 1,
+      "dense": false,
+      "reordered": false,
+      "total": 24000,
+      "sha256": "d2a506de04dd2fd8a105820b6a68a974d6d5479d267bac68c67bdae46de9976f"
+    },
+    {
+      "rate": 44100,
+      "model": 1,
+      "dense": true,
+      "reordered": false,
+      "total": 24000,
+      "sha256": "10166b7388b7129cd824b49e409b038bd4a61d51b96960e4f1a02e61d62510d6"
+    },
+    {
+      "rate": 44100,
+      "model": 1,
+      "dense": true,
+      "reordered": true,
+      "total": 24000,
+      "sha256": "7ad1fdd41d00d8cb6ee80124f942190305907e14483073691225775a6d082957"
+    },
+    {
+      "rate": 44100,
+      "model": 2,
+      "dense": false,
+      "reordered": false,
+      "total": 24000,
+      "sha256": "9cd7856282a6745107b163aa3fd5240469456f9990c4f8ed3e9ee0d3b546b254"
+    },
+    {
+      "rate": 44100,
+      "model": 2,
+      "dense": true,
+      "reordered": false,
+      "total": 24000,
+      "sha256": "65ed1389f66e36015085fb286083bca0b032956e95514bfc0e72c730c04d39ca"
+    },
+    {
+      "rate": 44100,
+      "model": 2,
+      "dense": true,
+      "reordered": true,
+      "total": 24000,
+      "sha256": "f2f88c53d75f22ed86f2c06cec38555a2e18352a2d7775f3c40f50ab9445956c"
+    },
+    {
+      "rate": 48000,
+      "model": 0,
+      "dense": false,
+      "reordered": false,
+      "total": 24000,
+      "sha256": "fd1bfd8e69b5430339670ad9751586e6f03ad748a50e2987559606a9153da9f2"
+    },
+    {
+      "rate": 48000,
+      "model": 0,
+      "dense": true,
+      "reordered": false,
+      "total": 24000,
+      "sha256": "ecca4965858eb432f242a12bb2cb61b8079a2fcc2e0c5cdc03bcc4a05fc09dd6"
+    },
+    {
+      "rate": 48000,
+      "model": 0,
+      "dense": true,
+      "reordered": true,
+      "total": 24000,
+      "sha256": "8b03ad45c66a9c5448c60499ad41e24fa529e654c9c33ea14de225bca263ac05"
+    },
+    {
+      "rate": 48000,
+      "model": 1,
+      "dense": false,
+      "reordered": false,
+      "total": 24000,
+      "sha256": "39b56431dfad41c1f113a6dbeb0639a975af7912fc7c009221cc2da2b3326d86"
+    },
+    {
+      "rate": 48000,
+      "model": 1,
+      "dense": true,
+      "reordered": false,
+      "total": 24000,
+      "sha256": "90e4caabba036ef7d3c27441284e75ce42f0e7059e6a65f5ebe3c5d6ebeb4edc"
+    },
+    {
+      "rate": 48000,
+      "model": 1,
+      "dense": true,
+      "reordered": true,
+      "total": 24000,
+      "sha256": "061f959f7f29ff12b41bf9500fb44d648899a31245018de2a867ebb2d424d465"
+    },
+    {
+      "rate": 48000,
+      "model": 2,
+      "dense": false,
+      "reordered": false,
+      "total": 24000,
+      "sha256": "bb8bc9d17c028b5ee78736fa80caaea27e4d8fd3b1f35f3c02460b6215f9fd54"
+    },
+    {
+      "rate": 48000,
+      "model": 2,
+      "dense": true,
+      "reordered": false,
+      "total": 24000,
+      "sha256": "a2c516e35605469f6b4aad07bdc215261bc3ff7265ea3180cb9ab36af180304d"
+    },
+    {
+      "rate": 48000,
+      "model": 2,
+      "dense": true,
+      "reordered": true,
+      "total": 24000,
+      "sha256": "06b26ace59d192940ae5ed0fd8d0677f7974bac11a158712ff06ebdcd9f2d0fa"
+    },
+    {
+      "rate": 96000,
+      "model": 0,
+      "dense": false,
+      "reordered": false,
+      "total": 24000,
+      "sha256": "9d01a5df2742d60a9e3e7b289424570ccc84a518978b129b7fb1c5d0eda9c583"
+    },
+    {
+      "rate": 96000,
+      "model": 0,
+      "dense": true,
+      "reordered": false,
+      "total": 24000,
+      "sha256": "85b48ec7cbd002bc59ba70767167bf6cd8ce1a1fe9bd6ef0f6473873ce4f6d77"
+    },
+    {
+      "rate": 96000,
+      "model": 0,
+      "dense": true,
+      "reordered": true,
+      "total": 24000,
+      "sha256": "354780404cb806233ccc9b4f3f7aeae9f94bcaa45ea041ef642810ed5a2f1f97"
+    },
+    {
+      "rate": 96000,
+      "model": 1,
+      "dense": false,
+      "reordered": false,
+      "total": 24000,
+      "sha256": "e4c63f8f18deb99066592d2050c72741f739deb1cf63be40a23c5db559f00e0a"
+    },
+    {
+      "rate": 96000,
+      "model": 1,
+      "dense": true,
+      "reordered": false,
+      "total": 24000,
+      "sha256": "2d97cbe3a0a6edd931617e6a6c73f24757c347903250822a17c53528f9933599"
+    },
+    {
+      "rate": 96000,
+      "model": 1,
+      "dense": true,
+      "reordered": true,
+      "total": 24000,
+      "sha256": "4d44bf692eb4805980c7eacb00a8eba4092e4ce54e9a973d06996780fa91ab65"
+    },
+    {
+      "rate": 96000,
+      "model": 2,
+      "dense": false,
+      "reordered": false,
+      "total": 24000,
+      "sha256": "fc77a070c0d08d3722830cc8b141a0b6df6414e14d9e02de738fb42820b7b76f"
+    },
+    {
+      "rate": 96000,
+      "model": 2,
+      "dense": true,
+      "reordered": false,
+      "total": 24000,
+      "sha256": "8ddfed4e2a5844d6ef4477a5d0c471678f32285aa5713dffc255483d6d7d8fea"
+    },
+    {
+      "rate": 96000,
+      "model": 2,
+      "dense": true,
+      "reordered": true,
+      "total": 24000,
+      "sha256": "a6338f843b726761f99fba40f288820a93962c5acdbb3249922e7baec4c59f60"
+    }
+  ]
+}

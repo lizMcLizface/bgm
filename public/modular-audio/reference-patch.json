@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "modules": [
+    {"id": 11, "type": "ref.tone", "version": 1, "parameters": {"frequency": 220, "amplitude": 0.2}},
+    {"id": 12, "type": "ref.lfo", "version": 1, "parameters": {"frequency": 2}},
+    {"id": 13, "type": "ref.vca", "version": 1, "parameters": {"gain": 0.5}},
+    {"id": 14, "type": "ref.tone", "version": 1, "parameters": {"frequency": 330, "amplitude": 0.05}},
+    {"id": 15, "type": "ref.mix", "version": 1, "parameters": {"gain": 0.7}},
+    {"id": 16, "type": "ref.output", "version": 1, "parameters": {}}
+  ],
+  "connections": [
+    {"id": 21, "kind": "audio", "from": {"module": 11, "port": "audio.out"}, "to": {"module": 13, "port": "program.in"}},
+    {"id": 22, "kind": "modulation", "from": {"module": 12, "port": "control.out"}, "to": {"module": 13, "parameter": "gain"}, "mapping": "bipolar", "depth": 0.45, "offset": 0},
+    {"id": 23, "kind": "audio", "from": {"module": 13, "port": "audio.out"}, "to": {"module": 15, "port": "a.in"}},
+    {"id": 24, "kind": "audio", "from": {"module": 14, "port": "audio.out"}, "to": {"module": 15, "port": "b.in"}},
+    {"id": 25, "kind": "audio", "from": {"module": 15, "port": "audio.out"}, "to": {"module": 16, "port": "program.in"}}
+  ],
+  "events": [
+    {"frame": 37, "target": 11, "owner": 1, "kind": "gate", "value": true},
+    {"frame": 37, "target": 14, "owner": 2, "kind": "gate", "value": true},
+    {"frame": 12013, "target": 13, "owner": 1, "kind": "parameter", "parameter": "gain", "value": 0.4},
+    {"frame": 24017, "target": 13, "owner": 1, "kind": "modulation", "edge": 22, "value": false},
+    {"frame": 30019, "target": 13, "owner": 1, "kind": "modulation", "edge": 22, "value": true},
+    {"frame": 42023, "target": 11, "owner": 1, "kind": "gate", "value": false},
+    {"frame": 42023, "target": 14, "owner": 2, "kind": "gate", "value": false}
+  ]
+}

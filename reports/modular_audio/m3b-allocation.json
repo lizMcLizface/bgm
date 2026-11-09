@@ -1,0 +1,91 @@
+{
+  "pass": true,
+  "scope": "Rust enqueue/render/cancel/reset after preparation, including external host I/O and two owned FM instances; Wasm counting allocator, not native runner",
+  "results": [
+    {
+      "fixture": "reference-patch.json",
+      "rate": 44100,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1310720,
+      "grew": false
+    },
+    {
+      "fixture": "reference-patch.json",
+      "rate": 48000,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1310720,
+      "grew": false
+    },
+    {
+      "fixture": "reference-patch.json",
+      "rate": 96000,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1310720,
+      "grew": false
+    },
+    {
+      "fixture": "sidechain-patch.json",
+      "rate": 44100,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2686976,
+      "grew": false
+    },
+    {
+      "fixture": "sidechain-patch.json",
+      "rate": 48000,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2686976,
+      "grew": false
+    },
+    {
+      "fixture": "sidechain-patch.json",
+      "rate": 96000,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 3080192,
+      "grew": false
+    },
+    {
+      "fixture": "external-program-key-host",
+      "rate": 44100,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1245184,
+      "grew": false
+    },
+    {
+      "fixture": "external-program-key-host",
+      "rate": 48000,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1245184,
+      "grew": false
+    },
+    {
+      "fixture": "external-program-key-host",
+      "rate": 96000,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1245184,
+      "grew": false
+    },
+    {
+      "fixture": "two-owned-fm-handles",
+      "rate": 44100,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1507328,
+      "grew": false
+    },
+    {
+      "fixture": "two-owned-fm-handles",
+      "rate": 48000,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1507328,
+      "grew": false
+    },
+    {
+      "fixture": "two-owned-fm-handles",
+      "rate": 96000,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1507328,
+      "grew": false
+    }
+  ],
+  "graphVersion": "52ec483d8de9ec1c"
+}

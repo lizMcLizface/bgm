@@ -1,0 +1,122 @@
+{
+  "version": 1,
+  "pass": true,
+  "method": "Finite live synthesis through the same six-role graph; analyser samples, not device loopback",
+  "fixtureId": "six-role-reference-v1",
+  "graphVersion": "394279c8033e0aaa",
+  "sampleRate": 48000,
+  "variant": "keyed",
+  "observedPeak": 0.1265905350446701,
+  "rolePeaks": {
+    "lead": 0.10455585271120071,
+    "second": 0.0679258331656456,
+    "rhythm": 0.06553275883197784,
+    "pad": 0.20691101253032684,
+    "bass": 0.042204372584819794,
+    "drums": 0.11481459438800812
+  },
+  "observations": 178,
+  "baseLatency": 0.01,
+  "outputLatency": 0.04,
+  "sourceStats": {
+    "bass": {
+      "type": "stats",
+      "resyncs": 0,
+      "skippedFrames": 0,
+      "final": true,
+      "active": 0,
+      "peakActive": 2,
+      "steals": 0,
+      "dropped": 0,
+      "late": 0,
+      "frame": 840064,
+      "memory": 1245184,
+      "simdFrames": 0
+    },
+    "lead": {
+      "type": "stats",
+      "resyncs": 0,
+      "skippedFrames": 0,
+      "final": true,
+      "active": 0,
+      "peakActive": 7,
+      "steals": 0,
+      "dropped": 0,
+      "late": 0,
+      "frame": 840064,
+      "memory": 2162688,
+      "simdFrames": 0
+    },
+    "second": {
+      "type": "stats",
+      "resyncs": 0,
+      "skippedFrames": 0,
+      "final": true,
+      "active": 0,
+      "peakActive": 8,
+      "steals": 14,
+      "dropped": 0,
+      "late": 0,
+      "frame": 840064,
+      "memory": 1245184,
+      "simdFrames": 0
+    },
+    "rhythm": {
+      "type": "stats",
+      "resyncs": 0,
+      "skippedFrames": 0,
+      "final": true,
+      "active": 0,
+      "peakActive": 2,
+      "steals": 0,
+      "dropped": 0,
+      "late": 0,
+      "frame": 840064,
+      "memory": 2162688,
+      "simdFrames": 0
+    },
+    "pad": {
+      "type": "stats",
+      "resyncs": 0,
+      "skippedFrames": 0,
+      "final": true,
+      "active": 0,
+      "peakActive": 8,
+      "steals": 0,
+      "dropped": 0,
+      "late": 0,
+      "frame": 840064,
+      "memory": 2162688,
+      "simdFrames": 0
+    },
+    "compressor": {
+      "type": "stats",
+      "frame": 840000,
+      "origin": 0,
+      "late": 0,
+      "overflow": 0,
+      "applied": 0,
+      "meters": {
+        "203": {
+          "inputPeak": 0,
+          "keyPeak": 1.7796490496925177e-43,
+          "reductionDb": 3.731329174323642e-29,
+          "outputPeak": 0,
+          "missingKey": 0,
+          "externalKey": 1
+        }
+      },
+      "memory": 1245184
+    },
+    "drums": {
+      "type": "stats",
+      "frame": 840000,
+      "origin": 0,
+      "late": 0,
+      "overflow": 0,
+      "applied": 57,
+      "meters": {},
+      "memory": 2686976
+    }
+  }
+}

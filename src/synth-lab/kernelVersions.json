@@ -1,11 +1,11 @@
 {
-  "percussion": "5c916640dd4bf334",
-  "core": "461f102171415d19",
+  "percussion": "97e06d50c3abf918",
+  "core": "e6fe04aa01bfa7de",
   "effects": "6a3def9a36b9140c",
-  "fm": "dc5782ebe2441886",
-  "fm-simd": "24d6575fcac5f0ba",
-  "fm-bank": "0c217fe71931758a",
-  "core-acoustic": "01592f49c6fbf176",
-  "fm-fast": "f54641f26762e6a0",
+  "fm": "e7b40d1d76f8014c",
+  "fm-simd": "0645be605d880fc5",
+  "fm-bank": "5d46800ae436255e",
+  "core-acoustic": "fbb4c4b4f801a97e",
+  "fm-fast": "edec860f51496226",
   "inserts": "00bfaf6abc7235dd"
 }

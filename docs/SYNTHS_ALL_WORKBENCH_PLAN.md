@@ -5,6 +5,22 @@ requested audit, repairs and route to a physical tabletop. Existing sequencer,
 generator and synth plans remain useful design history; this document records
 the cross-cutting work and its acceptance criteria.
 
+Current next-phase direction (2026-11-09):
+[modular Rust engine and parallel rendering](MODULAR_AUDIO_ENGINE_PLAN.md), with
+[fresh-session handoff](MODULAR_AUDIO_ENGINE_HANDOFF.md). This precedes broad
+processor migration and cable UI: contracts/reference graph, real modulation
+and sidechain, then a measured six-engine parallel prototype. Delivered work
+below remains the compatibility baseline. The opt-in **M0/M1 Rust reference
+graph is delivered**; see the engine plan's exact tests, limits and next M2
+synth/sidechain task. M2 is now delivered in that opt-in harness using owned
+percussion and real kick-keyed compression; current All audio routes and
+defaults remain intact. The [actual six-role M3a serial baseline](MODULAR_AUDIO_ENGINE_M3A_BASELINE.md)
+is now measured with the existing mixer/local/master effects and an opt-in
+kick-keyed route. The [M3b owned FM adapter](MODULAR_AUDIO_ENGINE_M3B_OWNED_FM.md)
+now supplies second/bass in an opt-in shared-instance worklet. [M3c owned core](MODULAR_AUDIO_ENGINE_M3C_OWNED_CORE.md)
+supplies lead/rhythm/pad. Next is pitched DAG integration, before workers or
+broad workbench migration.
+
 ## 1. Establish the playback and persistence contract
 
 - Audit `/synths/all`, the standalone drum device, the shared sequencer modules,
@@ -98,7 +114,7 @@ page agree on nine, so use those for the comparison.
 | Performance | Arrangement, mute/solo, repeat | Non-destructive fill/probability macros and snapshot/return; avoid editing stored notes during performance | P2 |
 | Generative modes | Front-page composition generator | Deterministic Euclidean drum fill first, then stochastic pitch/rhythm with clear constraints; defer proprietary mode parity | P1/P2 |
 | MIDI and projects | MIDI audition, setup JSON | Clock input/output, per-track MIDI output and note capture; MIDI file import/export after stable track model | P2 |
-| Scale/hardware breadth | Musical scales and browser instruments | Custom scales useful; CV/gate, USB host, SD and battery simulation are outside the browser instrument's scope | Deferred |
+| Scale/hardware breadth | Musical scales and browser instruments | Custom scales useful; virtual CV/gate and typed control ports are now planned in the effects connection contract; electrical CV/USB host/SD/battery hardware remains separate | P1 virtual ports; hardware deferred |
 
 OXI advertises eight sequencers/up to 64 tracks, nine modes, eight modulation
 lanes per sequencer, two LFOs per sequencer, groove/repeat tools and MIDI import.
@@ -121,11 +137,17 @@ existing setups.
    distinct designs, conventional effect controls and output level where gain
    changes need compensation. Keep delay/reverb wet/dry and feedback bounded;
    preserve order and saved settings when migrating a legacy chain.
-3. **Typed patch graph:** separate audio, MIDI and power ports/cables. Enforce
+3. **Typed patch graph:** separate audio, CV/gate, MIDI/clock and power ports/cables. Enforce
    port direction/type, reject unsupported audio feedback, prevent duplicate
    paths and make repatching atomic. Audio follows graph edges; MIDI transports
    note/control events; power is a deliberate enable state with fades, not a
    second audio connection. Show only cables backed by real connections.
+   After the common engine contracts/reference graph, prove external sidechain
+   compression and a real key tap before general patching UI: program
+   and detector are distinct audio inputs, and detector edges participate in
+   validation without being summed audibly. The 2026-11-09 connection contract
+   at the top of `EFFECTS_DESK_PLAN.md` specifies the device ports and CV/LFO
+   mapping, including the sequencer's eight assignable CV and eight gate outs.
 4. **Cable geometry and physics:** compute jack positions from object-local
    coordinates and rotation. Use a bounded Verlet/position-based chain with
    fixed endpoints, length constraints, damping, table friction and a fixed

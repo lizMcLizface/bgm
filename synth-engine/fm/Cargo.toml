@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 license = "MIT"
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "rlib"]
 [profile.release]
 opt-level = 3
 lto = true
@@ -14,9 +14,10 @@ strip = true
 
 [features]
 profile-sections = []
-# Exact coefficient reuse. Disable default features for the original reference path.
+# Exact coefficient reuse. Uncached ABI reference: --no-default-features --features legacy-abi.
 cache-colour-coefficients = []
-default = ["cache-colour-coefficients"]
+legacy-abi = []
+default = ["cache-colour-coefficients", "legacy-abi"]
 
 # Experimental explicit Wasm SIMD128 voice batching; requires a separate SIMD build.
 simd-voices = []

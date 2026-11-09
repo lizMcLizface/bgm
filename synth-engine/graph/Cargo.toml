@@ -1,0 +1,23 @@
+[package]
+name = "calmbgm-graph"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+
+[lib]
+crate-type = ["rlib", "cdylib"]
+
+[dependencies]
+calmbgm_percussion = { path = "../percussion", default-features = false }
+calmbgm_fm = { path = "../fm", default-features = false, features = ["cache-colour-coefficients"] }
+calmbgm_core = { package = "calmbgm-synth", path = "..", default-features = false }
+
+[features]
+allocation-audit = []
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
