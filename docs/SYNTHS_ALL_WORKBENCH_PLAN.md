@@ -1,5 +1,12 @@
 # Synths/all workbench pass
 
+M3k update: [run-bound listening records](MODULAR_AUDIO_ENGINE_M3K_LISTENING.md)
+now support local save/review/JSON export without changing playback settings or
+automated results. User reports Short / 96 kHz / +2 helps while open but is
+insufficient locked; Default and Medium / 48 kHz / Message tasks / +2 / three
+workers work while locked (128 / 64 ms declared buffering). These reports lack
+a matching run export; no cause/default change is inferred. Legacy DSP stays intact.
+
 M3j update: [packet-arrival diagnostics and explicit headroom](MODULAR_AUDIO_ENGINE_M3J_ARRIVAL_HEADROOM.md)
 retain original defaults. Short / 96 kHz with +2 or +4 PCM blocks passed three
 measured desktop trials each without transport misses; original capacity failed

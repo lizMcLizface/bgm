@@ -5,10 +5,11 @@ step, then continue**. This authorizes local commits of verified steps without
 another confirmation. Keep the existing checkout and work; no push/deployment
 is authorized. Record verification, limitations and the next task in each step.
 
-Prepared and implemented through opt-in M3j arrival/headroom diagnostics on 2026-11-09. Read the working tree, this file and
+Prepared and implemented through opt-in M3k listening records on 2026-11-09. Read the working tree, this file and
 [MODULAR_AUDIO_ENGINE_PLAN.md](MODULAR_AUDIO_ENGINE_PLAN.md) first. This is an
 implementation handoff. **M0/M1, owned percussion/sidechain M2 and the actual
-six-role M3a baseline, M3b owned FM, M3c owned core, M3d pitched DAG, M3e single-worker transport, M3f source pool, M3g buffering profiles, M3h queue-lead observability, M3i opt-in scheduling and M3j packet-arrival/headroom diagnostics now exist.** Read
+six-role M3a baseline, M3b owned FM, M3c owned core, M3d pitched DAG, M3e single-worker transport, M3f source pool, M3g buffering profiles, M3h queue-lead observability, M3i opt-in scheduling M3j packet-arrival/headroom diagnostics and M3k run-bound listening records now exist.** Read
+[listening records and target-device evidence](MODULAR_AUDIO_ENGINE_M3K_LISTENING.md),
 [arrival/headroom results](MODULAR_AUDIO_ENGINE_M3J_ARRIVAL_HEADROOM.md),
 [opt-in scheduling results and negative experiment](MODULAR_AUDIO_ENGINE_M3I_TASK_PUMP.md),
 [queue-lead contracts and results](MODULAR_AUDIO_ENGINE_M3H_QUEUE_LEAD.md),
@@ -28,7 +29,7 @@ M3c was committed locally as **`bc4e35d`**, `Add owned modular audio foundations
 and six-source harness`. The later request **commit and keep iterating** committed
 M3d locally as **`fa634f5`**, `Integrate six owned sources into the Rust audio DAG`.
 M3e was then committed locally as **`646183d`**, M3f as **`714ce43`**,
-M3g as **`733c2e6`**, M3h as **`c8ff2bb`**, and M3i as **`b358bd9`**. Each completed verified step
+M3g as **`733c2e6`**, M3h as **`c8ff2bb`**, M3i as **`b358bd9`**, and M3j as **`7dea6bc`**. Each completed verified step
 now ends with a local commit under the user's standing instruction; consult
 the final checkpoint and local Git log. No push/deployment.
 Earlier statements below about no commit describe their historical checkpoints.
@@ -1501,3 +1502,63 @@ supports target-phone Short / 96 kHz +2 versus original capacity, retaining
 historical feedback. Do not auto-promote headroom or claim clean physical /
 locked-phone / Bluetooth output from desktop counters. Shared memory,
 distributed owners and broad workbench migration remain separate.
+
+## M3k delivery checkpoint (2026-11-09)
+
+[Run-bound listening records and clarified target-device evidence](MODULAR_AUDIO_ENGINE_M3K_LISTENING.md)
+now govern the next task. Host-only form supports separate verdict/playback
+state/device/route/notes, bounded local save/review and JSON download. Each
+individual playback has run ID, host timestamps, exact engine/fixture and hashed
+host-module provenance. Snapshots preserve actual completed-run settings and
+raw diagnostics after controls are edited. A new run resets to Not assessed;
+loading a record never changes playback settings or starts audio. Failed and
+incomplete run checks remain unchanged, independent of subjective verdicts.
+
+- Exact user observations and clarification preserved in
+  `reports/modular_audio/m3k-user-listening-feedback.json`: Short / 96 kHz / +2
+  **helps while open, insufficient locked**, at 16 ms declared buffering.
+  **Default and Medium / 48 kHz / Message tasks / +2 / three workers work locked**,
+  at **128 / 64 ms** respectively. The 2048m clarification maps to Medium's
+  original-capacity selector. Rate and available buffering both differ; no
+  isolated cause or universal screen-lock guarantee is inferred.
+- Device/browser/output route, exact build/run/repeat count and 96 kHz scheduler/
+  worker count remain unspecified. The chat observations are not retroactively
+  attached to a matching run. Earlier feedback/failures remain intact. Visible
+  notices distinguish the clarified settings, foreground and lock-screen reports.
+- **5 files / 28 focused tests pass**, **1.61 s**: real-page DOM workflows,
+  immutable binding, synthetic clean-hearing versus failed-DSP separation,
+  incomplete preservation, busy/reset controls, safe historical load, bounded
+  records/schema/storage, corrupt/quota failures, text escaping, native Blob URL
+  cleanup and feedback/latency/session checks. No engine code changed; M3j's
+  128-test result and earlier full-suite results remain historical. Public
+  build/package/provenance checks pass, Vite **35.73 s**.
+- Engine runtime remains **`5e3eede4bd16e076`**, Wasm **296,101 bytes**, unchanged
+  SHA256 `a5c3d4b70b57d63094d84fe539d2ec0effe30d5eea5fc59034fbb9a1ff462293`.
+  Host `m3k-listening-v1`, final module `modularWorker-B5WbJWiW.js`. Existing
+  DSP, scheduler/buffering defaults and fixture/session keys remain unchanged.
+- Actual foreground Medium / 48 kHz / Message tasks / +2 and unchanged Default /
+  48 kHz / timers / zero extras each complete **840,000 frames / 357 events**,
+  six/main analyser peaks and zero misses. This is not a lock-screen reproduction.
+- Actual save/native download event/reload keeps the original 48 kHz Medium
+  snapshot after controls change to 96 kHz Default. Saved/reloaded data and
+  saved/download-preview run payloads compare exactly. An early-stopped run
+  retains pass:false / complete:false. Automation annotations are **Not assessed**
+  with explicit UI-test notes; no audible verdict is fabricated. Invariants in
+  `m3k-record-invariants.json`, workflow and per-run `m3k-*.json` reports.
+- Page/main saved session left **Default / 48 kHz / timers / no extras, stopped**.
+  Two unassessed automation records remain in the new separate listening history.
+  Screenshot `.tmp/modular-audio-m3k-browser.png`. Native browser download-event
+  wait took ~864 s despite a requested 10 s timeout; avoid repeating download
+  waits/path retrieval. Preview/serialization and event were verified; no native
+  path was requested. This did not occur during active audio.
+- M3j committed as `7dea6bc`. Every verified step ends with a local commit;
+  no push/deployment or native Application Control bypass.
+
+**Next:** close M3's measured go/no-go gate and begin one isolated opt-in 48 kHz
+**sequenced-playback source-stem adapter** into All's existing mixer/local/master
+FX path. Preserve IDs, patches/setup files, transport, legacy route and explicit
+stopped switching. Medium / +2 / Message tasks is the clarified user reference,
+not a new default or CPU-speedup proof. Its 64 ms buffering needs an explicit
+live-event policy; retain current live keyboard/MIDI authority until tested.
+No broad rack/effect migration, shared memory, arbitrary repartitioning or
+distributed owner controls in this first integration slice.

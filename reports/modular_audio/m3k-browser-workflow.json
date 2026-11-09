@@ -1,0 +1,26 @@
+{
+  "method": "Visible form and actual finite playback on desktop; annotations deliberately Not assessed, no audible verdict",
+  "downloadEventObserved": true,
+  "downloadWaitLimitation": "Native download-event observation took unexpectedly long; no download path was requested and no physical-audio assessment was made.",
+  "savedRunId": "827ea2ac-ced5-4dd3-8a71-4aa02f79d5d9",
+  "downloadRunId": "827ea2ac-ced5-4dd3-8a71-4aa02f79d5d9",
+  "reloadedRunId": "827ea2ac-ced5-4dd3-8a71-4aa02f79d5d9",
+  "originalRunId": "827ea2ac-ced5-4dd3-8a71-4aa02f79d5d9",
+  "boundRate": 48000,
+  "editedRateControl": 96000,
+  "reloadDidNotStartAudio": true,
+  "reloadKeptFreshDefaultControls": true,
+  "incompletePreserved": {
+    "pass": false,
+    "complete": false,
+    "verdict": "not-assessed"
+  },
+  "final": {
+    "pass": true,
+    "profile": "default",
+    "rate": 48000,
+    "extraBlocks": 0,
+    "scheduling": "timer",
+    "verdict": "not-assessed"
+  }
+}

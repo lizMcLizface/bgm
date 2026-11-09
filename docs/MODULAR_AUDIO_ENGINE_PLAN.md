@@ -3,7 +3,7 @@
 Agreed direction: 2026-11-09. Status: **M0/M1, the opt-in M2 percussion/sidechain
 slice, M3a's actual six-role serial baseline, M3b owned FM, M3c owned core,
 M3d pitched DAG, M3e bounded single-worker transport, M3f three-worker source pool
-and M3g opt-in buffering profiles plus M3h queue-lead observability and M3i opt-in scheduling experiment plus M3j packet-arrival/headroom diagnostics delivered**.
+and M3g opt-in buffering profiles plus M3h queue-lead observability and M3i opt-in scheduling experiment plus M3j packet-arrival/headroom diagnostics and M3k run-bound listening records delivered**.
 All six source engines have owned mutable Rust state; core's read-only additive
 tables are safely shared after preparation. External stereo host inputs and
 graph program/key compression exist. All six sources now also run inside one
@@ -12,8 +12,9 @@ dedicated worker with bounded PCM publication and serial startup fallback.
 M3f partitions the sources across three workers and keeps the dependent Rust
 master in the worklet. General graph distribution and workbench migration remain
 future work. Foundation through M3c committed locally as `bc4e35d`, M3d as
-`fa634f5`, M3e as `646183d`, M3f as `714ce43`, M3g as `733c2e6`, M3h as `c8ff2bb`, M3i as `b358bd9`. Each completed verified step is committed locally
+`fa634f5`, M3e as `646183d`, M3f as `714ce43`, M3g as `733c2e6`, M3h as `c8ff2bb`, M3i as `b358bd9`, M3j as `7dea6bc`. Each completed verified step is committed locally
 under the user's standing instruction. No push/deployment.
+See [listening records and target-device evidence](MODULAR_AUDIO_ENGINE_M3K_LISTENING.md).
 See [arrival/headroom results](MODULAR_AUDIO_ENGINE_M3J_ARRIVAL_HEADROOM.md).
 See [opt-in scheduling results](MODULAR_AUDIO_ENGINE_M3I_TASK_PUMP.md).
 See [queue-lead contracts and results](MODULAR_AUDIO_ENGINE_M3H_QUEUE_LEAD.md).
@@ -767,3 +768,29 @@ and session restore are verified. Runtime `5e3eede4bd16e076`; Rust unchanged.
 Next: explicit listening verdict/export tied to full run provenance, before any
 headroom policy or target-device quality claim. No auto-default change, push,
 deployment, shared-memory migration or distributed owner changes.
+
+## M3k: run-bound listening records delivered (2026-11-09)
+
+See [record contracts, target-device feedback and exact verification](MODULAR_AUDIO_ENGINE_M3K_LISTENING.md).
+The harness now supports local verdict/context/notes bound to each actual run,
+bounded saved-record review and JSON export. Editing playback controls cannot
+relabel a completed snapshot; loading history cannot start audio or change the
+route. A new run is Not assessed, and subjective verdicts do not rewrite run
+check failures or incomplete clocks.
+
+User reports Short / 96 kHz / +2 helps open but remains insufficient locked.
+Clarified working lock-screen cases are Default and Medium / 48 kHz / Message
+tasks / +2 / three workers, with **128 / 64 ms** buffering versus Short/96's
+16 ms. These are uncorrelated reports, not a controlled rate-only comparison.
+Unknown device/route/build and 96 kHz worker mode remain unknown.
+
+**28 focused tests / five files** and public build pass. Real desktop Medium /
+48 kHz / Message / +2 and unchanged Default/48 complete 840,000 frames / 357
+events without misses. Actual edit/save/download-event/reload and early-stop
+failure preservation are verified; automation verdicts remain unassessed. No
+engine asset changes: runtime `5e3eede4bd16e076`, host `m3k-listening-v1`.
+
+Next: M3 go/no-go decision, then a narrow opt-in 48 kHz sequenced source adapter
+into the existing All mixer/effects, preserving current live MIDI/keyboard and
+legacy defaults. See handoff for scope, latency caveats and browser download-wait
+restriction. No broad DSP migration, push or deployment.

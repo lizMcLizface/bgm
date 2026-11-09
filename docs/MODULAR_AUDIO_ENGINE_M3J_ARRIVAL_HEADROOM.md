@@ -149,3 +149,9 @@ The desktop zero-miss result does not establish clean phone/headphone audio or
 locked/background behavior. Shared memory, distributed
 event owners, arbitrary repartitioning and broad workbench migration remain
 separate. No push/deployment or native Application Control bypass.
+
+The listening-record/export task is delivered as [M3k](MODULAR_AUDIO_ENGINE_M3K_LISTENING.md).
+M3j committed as `7dea6bc`. M3k records the newer user clarification: 48 kHz,
+Message tasks, +2 blocks, three workers, Default and Medium work on lock screen;
+96 kHz Short +2 helps while open but is insufficient locked. No matching build/run
+export was supplied, and the two rates also differ in declared buffering.

@@ -1,0 +1,6 @@
+{
+  "short96": "User report: Short / 96 kHz / +2 helps while the app is open, but is insufficient on the lock screen. The 96 kHz scheduling mode was not specified; no matching run export is available.",
+  "medium48": "User-reported lock-screen playback worked with three workers at these settings (64 ms declared buffering). Device/output route and a matching run export were not supplied.",
+  "default48": "User-reported lock-screen playback worked with three workers at these settings (128 ms declared buffering). Device/output route and a matching run export were not supplied.",
+  "scope": "Visible user-report notices, not automated confirmation of lock-screen audio"
+}

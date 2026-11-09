@@ -1,0 +1,21 @@
+import {captureListeningRun,createListeningRecord,loadListeningRecords,saveListeningRecord,serializeListeningRecord,newListeningId} from './listeningRecord.js';
+export function downloadListeningRecord(text,filename){const url=URL.createObjectURL(new Blob([text],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download=filename;try{document.body.append(a);a.click();}finally{a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}}
+export function createListeningPanel({root=document,storage={getItem:key=>localStorage.getItem(key),setItem:(key,value)=>localStorage.setItem(key,value)},download=downloadListeningRecord,now=()=>new Date().toISOString(),id=newListeningId}={}){
+  const $=name=>root.getElementById('listening-'+name),inputs=['verdict','playback','device','route','notes'];let target=null,saved=[],busy=false;
+  const state=text=>$('state').textContent=text;
+  const values=()=>({verdict:$('verdict').value,playbackState:$('playback').value,device:$('device').value,outputRoute:$('route').value,notes:$('notes').value});
+  function controls(){for(const name of [...inputs,'save','export'])$(name).disabled=busy||!target;$('saved').disabled=busy||!saved.length;$('load').disabled=busy||!saved.length;}
+  function describe(){const e=target.executor;$('target').textContent=`Run ${target.runId} · ${target.completedAtUtc} · ${target.rate/1000} kHz · ${target.profile} / +${target.extraBlocks} blocks · ${e.actual} / ${e.scheduling??'no worker scheduling'} · ${(e.bufferingLatencyFrames/target.rate*1000).toFixed(2)} ms buffering · score ${target.delivery.complete?'complete':'incomplete'} · run checks ${target.pass?'passed':'failed'} · build ${target.graphVersion}`;}
+  function populate(records){saved=records;const select=$('saved');select.replaceChildren();for(const record of records){const option=root.createElement('option');option.value=record.recordId;option.textContent=`${record.recordedAtUtc} · ${record.run.rate/1000} kHz · ${record.run.profile} +${record.run.extraBlocks} · ${record.listening.playbackState} · ${record.listening.verdict}`;select.append(option);}controls();}
+  function draft(){if(!target)throw Error('Complete a playback run or load a saved listening record first.');return createListeningRecord(target,values(),{recordId:id(),recordedAtUtc:now()});}
+  function preview(record){$('report').textContent=serializeListeningRecord(record);$('report').hidden=false;}
+  function action(name,fn){$(name).onclick=()=>{try{fn();}catch(e){state(String(e));}finally{controls();}};}
+  action('save',()=>{const record=draft(),records=saveListeningRecord(storage,record);populate(records);preview(record);state('Listening record saved locally. Automated delivery result unchanged.');});
+  action('export',()=>{const record=draft();preview(record);download(serializeListeningRecord(record),`modular-listening-${record.recordId}.json`);state('Listening JSON download requested. Nothing uploaded; automated delivery result unchanged.');});
+  action('load',()=>{const selected=$('saved').value,records=loadListeningRecords(storage),record=records.find(r=>r.recordId===selected);if(!record)throw Error('Saved listening record unavailable.');target=captureListeningRun(record.run);for(const [name,key] of [['verdict','verdict'],['playback','playbackState'],['device','device'],['route','outputRoute'],['notes','notes']])$(name).value=record.listening[key];populate(records);$('saved').value=record.recordId;describe();preview(record);state('Saved listening record loaded for review. Playback settings and audio unchanged.');});
+  try{populate(loadListeningRecords(storage));}catch(e){state('Saved listening data could not be read: '+String(e));controls();}
+  return {
+    setBusy(value){busy=value;controls();},
+    setRun(run){try{target=captureListeningRun(run);$('verdict').value='not-assessed';$('playback').value='unknown';for(const name of ['device','route','notes'])$(name).value='';$('report').hidden=true;$('report').textContent='';describe();state('Latest individual playback selected. Listening has not been assessed.');}catch(e){target=null;$('report').hidden=true;$('report').textContent='';$('target').textContent='Playback report unavailable for listening annotation.';state(String(e));}controls();}
+  };
+}
