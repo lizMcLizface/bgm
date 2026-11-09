@@ -132,3 +132,8 @@ user's device crackle. Compare unchanged PCM, bounded work/control fairness,
 buffering defaults or introduce automatic switching. Shared-memory hosting,
 distributed owner transactions, arbitrary repartitioning and broad desk
 migration remain separate work.
+
+The scheduling experiment above is now delivered as [M3i](MODULAR_AUDIO_ENGINE_M3I_TASK_PUMP.md).
+It did not remove Short / 96 kHz misses; it remains opt-in and timers remain
+the default. See M3i for negative trials and the next packet-arrival diagnostic.
+M3h committed locally as `c8ff2bb`.

@@ -9,9 +9,9 @@ export function assessDelivery(stats,end,expectedEvents){
   const eventPass=applied===expectedEvents&&graphs.every(g=>g&&!g.late&&!g.overflow)&&(!master||!master.late&&!master.overflow)&&roles.every(s=>!s.late&&!s.dropped);
   return {complete:output?.sourceFrame===end&&sourceComplete&&masterComplete,appliedEvents:applied,eventPass};
 }
-export function summarizeProfiles(rows,rate){
+export function summarizeProfiles(rows,rate,scheduling='timer'){
   return BUFFER_PROFILES.map(p=>{
-    const runs=rows.filter(r=>r.profile===p.id&&r.phase==='measured'),actual=runs.filter(r=>r.executor?.actual==='pool'&&r.rate===rate);
+    const runs=rows.filter(r=>r.profile===p.id&&r.phase==='measured'),actual=runs.filter(r=>r.executor?.actual==='pool'&&r.rate===rate&&(r.executor.scheduling??'timer')===scheduling);
     const workers=[0,1,2].map(group=>{const stats=actual.map(r=>r.stats?.workers?.[group]).filter(Boolean),bins=Array(32).fill(0);for(const s of stats)for(let i=0;i<32;i++)bins[i]+=s.blockMsHistogramLog2Us[i];return {group,renderAndCopyTotalMs:distribution(stats.map(s=>s.renderMs)),maxBlockMs:stats.length?Math.max(...stats.map(s=>s.maxRenderMs)):null,...histogramBounds(bins)};});
     const timers=actual.map(r=>r.stats?.output?.processTiming).filter(t=>t?.available),timingBins=Array(32).fill(0);for(const t of timers)for(let i=0;i<32;i++)timingBins[i]+=t.histogramLog2Us[i];
     const queueLead=summarizeQueueLead(actual.map(r=>r.stats?.output?.queue?.lead),rate),groupLead=[0,1,2].map(group=>summarizeQueueLead(actual.map(r=>r.stats?.output?.queue?.groups?.[group]?.lead),rate));

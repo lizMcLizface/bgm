@@ -5,10 +5,11 @@ step, then continue**. This authorizes local commits of verified steps without
 another confirmation. Keep the existing checkout and work; no push/deployment
 is authorized. Record verification, limitations and the next task in each step.
 
-Prepared and implemented through opt-in M3h queue-lead observability on 2026-11-09. Read the working tree, this file and
+Prepared and implemented through opt-in M3i scheduling experiment on 2026-11-09. Read the working tree, this file and
 [MODULAR_AUDIO_ENGINE_PLAN.md](MODULAR_AUDIO_ENGINE_PLAN.md) first. This is an
 implementation handoff. **M0/M1, owned percussion/sidechain M2 and the actual
 six-role M3a baseline, M3b owned FM, M3c owned core, M3d pitched DAG, M3e single-worker transport, M3f source pool, M3g buffering profiles and M3h queue-lead observability now exist.** Read
+[opt-in scheduling results and negative experiment](MODULAR_AUDIO_ENGINE_M3I_TASK_PUMP.md),
 [queue-lead contracts and results](MODULAR_AUDIO_ENGINE_M3H_QUEUE_LEAD.md),
 [profile contracts and measurements](MODULAR_AUDIO_ENGINE_M3G_BUFFER_PROFILES.md),
 [three-worker contracts and evidence](MODULAR_AUDIO_ENGINE_M3F_SOURCE_POOL.md),
@@ -26,7 +27,7 @@ M3c was committed locally as **`bc4e35d`**, `Add owned modular audio foundations
 and six-source harness`. The later request **commit and keep iterating** committed
 M3d locally as **`fa634f5`**, `Integrate six owned sources into the Rust audio DAG`.
 M3e was then committed locally as **`646183d`**, M3f as **`714ce43`**,
-and M3g as **`733c2e6`**. Each completed verified step
+M3g as **`733c2e6`**, and M3h as **`c8ff2bb`**. Each completed verified step
 now ends with a local commit under the user's standing instruction; consult
 the final checkpoint and local Git log. No push/deployment.
 Earlier statements below about no commit describe their historical checkpoints.
@@ -1406,3 +1407,44 @@ one block per task, retain explicit stall timers, control fairness, private
 ownership and coherent silence/no replay. Compare PCM, independent instances,
 96 kHz delivery and recovery. No default switch or phone/device crackle claim.
 Shared memory, distributed owners and broad desk migration remain separate.
+
+## M3i delivery checkpoint (2026-11-09)
+
+[Opt-in scheduling contracts and negative results](MODULAR_AUDIO_ENGINE_M3I_TASK_PUMP.md)
+now govern the next task. The harness exposes **Worker scheduling**. Existing
+**timers stay the default**; message-task pumping is explicit and experimental.
+One pending task / one block per task avoids nested worker timers, retains
+bounded PCM/control ownership and supports real injected-stall timers. The
+experiment does **not** establish better delivery or audible quality.
+
+- Same-session corrected-candidate 96 kHz batch: Default **2/3** measured
+  passes with **128** missed frames, Medium **3/3** with zero, Short **0/3**
+  with **168,192** total missed frames (the same as M3h). Failed rows and the
+  initial native timer-receiver error remain intact. Native timer wrappers
+  were corrected, regression-tested and verified by actual stall recovery.
+- Because the candidate did not remove starvation, its pump is **not promoted
+  to the default**. Candidate runtimes/reports are distinct from final opt-in
+  runtime **`44de39f7ca5b0904`**. Rust/Wasm and legacy DSP remain unchanged.
+- Final **18 files / 116 modular tests pass**, **98.65 s**: both modes' real
+  three-rate single/pool PCM, future controls, independent instances,
+  worklets, fallback, mode/session validation and accounting. Public build
+  passes (**39.86 s** Vite), graph/fixture/package checks pass. Earlier M3h
+  whole-repository **385 / 2,755** result remains historical, not a fresh run.
+- Final UI explicit message/Medium/96 kHz stall: full **1,680,000 frames /
+  357 events**, **25,088** coherent silent frames, one recovery, no executor
+  error; default timer/48 kHz: full **840,000 / 357**, zero misses, minimum
+  steady lead **2,816 frames**. Six/main analyser peaks nonzero. Final live
+  accounting checks pass, physical audio unmeasured.
+- Old sessions retain timers. Explicit experiment save/fresh default/explicit
+  stopped restore verified. Page and saved session left **Default / 48 kHz /
+  timers, stopped**, screenshot `.tmp/modular-audio-m3i-browser.png`.
+- M3h committed as `c8ff2bb`; each verified step ends with a local commit.
+  No push/deployment or Application Control bypass.
+
+**Next:** measure source-frame consumption between packet-arrival callbacks,
+with bounded per-queue/coherent counters and a small trace. This can test ready
+capacity needed across message-delivery gaps without assigning a CPU/device
+cause. Compare explicit extra headroom against Short / 96 kHz without changing
+its original profile/default or hiding latency. Keep user listening evidence,
+failed reports, dependencies and exact same-cadence PCM. Shared memory,
+distributed owners and broad migration remain separate work.

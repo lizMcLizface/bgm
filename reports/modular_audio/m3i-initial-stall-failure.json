@@ -1,0 +1,407 @@
+{
+  "version": 1,
+  "fixtureId": "six-role-reference-v1",
+  "fixtureHash": "77ce180861239426c0c63037235cf98d74a2bbfa09a2a46ee3da3353bb29a7df",
+  "graphVersion": "7e61362bc8730c4d",
+  "crossOriginIsolated": false,
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36",
+  "hardwareConcurrency": 32,
+  "listeningFeedback": {
+    "source": "User listening report",
+    "date": "2026-11-09",
+    "profile": "short",
+    "rate": 96000,
+    "result": "Crackly; other tested combinations worked well",
+    "device": null,
+    "outputRoute": null,
+    "cause": null
+  },
+  "passScope": "Pass fields are specific to the method; transport/PCM counters do not certify audible device output",
+  "method": "Finite live dry Rust DAG mix; analyser observations, not device loopback",
+  "profile": "short",
+  "phase": "manual",
+  "iteration": 0,
+  "rate": 96000,
+  "prepareMs": 100.89999999850988,
+  "executor": {
+    "requested": "pool",
+    "actual": "pool",
+    "workers": 3,
+    "groups": [
+      [
+        1,
+        5
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        4,
+        6
+      ]
+    ],
+    "masterLevels": [
+      [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      [
+        11,
+        12,
+        13
+      ],
+      [
+        14
+      ],
+      [
+        15
+      ],
+      [
+        17
+      ],
+      [
+        18
+      ]
+    ],
+    "blockFrames": 256,
+    "poolBlocks": 4,
+    "renderAheadCapacityFrames": 1024,
+    "bufferingLatencyFrames": 1024,
+    "bufferingLatencyMs": 10.666666666666666,
+    "pcmPoolBytes": 196608,
+    "transport": "3 independent worker PCM pools; Rust master in worklet",
+    "fallbackReason": null
+  },
+  "observedPeak": 0,
+  "rolePeaks": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "observations": 1,
+  "stalls": [
+    {
+      "type": "stalled",
+      "request": 1,
+      "ms": 250,
+      "frame": 9472
+    }
+  ],
+  "visibilityStart": "visible",
+  "visibilityEnd": "visible",
+  "visibilityChanges": [],
+  "baseLatency": 0.01,
+  "outputLatency": 0.04,
+  "pass": false,
+  "delivery": {
+    "complete": false,
+    "appliedEvents": 0,
+    "eventPass": false
+  },
+  "stats": {
+    "output": {
+      "type": "stats",
+      "mode": "pool",
+      "generation": 2,
+      "sourceFrame": 9600,
+      "outputFrame": 10624,
+      "delayFrames": 1024,
+      "processTiming": {
+        "available": false,
+        "scope": "process() wall time including copy/DSP and preemption; not callback scheduling, CPU utilization or device underruns",
+        "reason": "Monotonic performance.now() is unavailable or failed in this worklet",
+        "calls": null,
+        "totalMs": null,
+        "maxMs": null,
+        "overQuantumPeriod": null,
+        "histogramLog2Us": null
+      },
+      "queue": {
+        "deliveredFrames": 9216,
+        "underrunFrames": 384,
+        "underrunQuanta": 3,
+        "recoveries": 2,
+        "lead": {
+          "scope": "Contiguous ready source frames at active-consumption quantum entry; startup delay excluded; final capacity window reported separately; not device output quality",
+          "capacityFrames": 1024,
+          "blockFrames": 256,
+          "histogramBucketFrames": 128,
+          "observations": 75,
+          "steady": {
+            "samples": 75,
+            "minFrames": 0,
+            "maxFrames": 1024,
+            "zeroLeadQuanta": 3,
+            "belowQuantumQuanta": 3,
+            "belowBlockQuanta": 10,
+            "firstZeroSourceFrame": 1792,
+            "minNeededFrames": 128,
+            "maxNeededFrames": 128,
+            "histogram": [
+              3,
+              7,
+              10,
+              10,
+              10,
+              10,
+              10,
+              10,
+              5
+            ]
+          },
+          "drain": {
+            "samples": 0,
+            "minFrames": null,
+            "maxFrames": null,
+            "zeroLeadQuanta": 0,
+            "belowQuantumQuanta": 0,
+            "belowBlockQuanta": 0,
+            "firstZeroSourceFrame": null,
+            "minNeededFrames": null,
+            "maxNeededFrames": null,
+            "histogram": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "groups": [
+          {
+            "deliveredFrames": 9216,
+            "underrunFrames": 384,
+            "underrunQuanta": 3,
+            "recoveries": 2,
+            "lateBlocks": 0,
+            "staleGeneration": 0,
+            "rejectedBlocks": 0,
+            "acceptedBlocks": 37,
+            "queueHighWater": 4,
+            "queuedBlocks": 0,
+            "lead": {
+              "scope": "Contiguous ready source frames at active-consumption quantum entry; startup delay excluded; final capacity window reported separately; not device output quality",
+              "capacityFrames": 1024,
+              "blockFrames": 256,
+              "histogramBucketFrames": 128,
+              "observations": 75,
+              "steady": {
+                "samples": 75,
+                "minFrames": 0,
+                "maxFrames": 1024,
+                "zeroLeadQuanta": 3,
+                "belowQuantumQuanta": 3,
+                "belowBlockQuanta": 10,
+                "firstZeroSourceFrame": 1792,
+                "minNeededFrames": 128,
+                "maxNeededFrames": 128,
+                "histogram": [
+                  3,
+                  7,
+                  10,
+                  10,
+                  10,
+                  10,
+                  10,
+                  10,
+                  5
+                ]
+              },
+              "drain": {
+                "samples": 0,
+                "minFrames": null,
+                "maxFrames": null,
+                "zeroLeadQuanta": 0,
+                "belowQuantumQuanta": 0,
+                "belowBlockQuanta": 0,
+                "firstZeroSourceFrame": null,
+                "minNeededFrames": null,
+                "maxNeededFrames": null,
+                "histogram": [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            }
+          },
+          {
+            "deliveredFrames": 9216,
+            "underrunFrames": 384,
+            "underrunQuanta": 3,
+            "recoveries": 2,
+            "lateBlocks": 0,
+            "staleGeneration": 0,
+            "rejectedBlocks": 0,
+            "acceptedBlocks": 41,
+            "queueHighWater": 4,
+            "queuedBlocks": 0,
+            "lead": {
+              "scope": "Contiguous ready source frames at active-consumption quantum entry; startup delay excluded; final capacity window reported separately; not device output quality",
+              "capacityFrames": 1024,
+              "blockFrames": 256,
+              "histogramBucketFrames": 128,
+              "observations": 75,
+              "steady": {
+                "samples": 75,
+                "minFrames": 0,
+                "maxFrames": 1024,
+                "zeroLeadQuanta": 3,
+                "belowQuantumQuanta": 3,
+                "belowBlockQuanta": 10,
+                "firstZeroSourceFrame": 1792,
+                "minNeededFrames": 128,
+                "maxNeededFrames": 128,
+                "histogram": [
+                  3,
+                  7,
+                  10,
+                  10,
+                  10,
+                  10,
+                  10,
+                  10,
+                  5
+                ]
+              },
+              "drain": {
+                "samples": 0,
+                "minFrames": null,
+                "maxFrames": null,
+                "zeroLeadQuanta": 0,
+                "belowQuantumQuanta": 0,
+                "belowBlockQuanta": 0,
+                "firstZeroSourceFrame": null,
+                "minNeededFrames": null,
+                "maxNeededFrames": null,
+                "histogram": [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            }
+          },
+          {
+            "deliveredFrames": 9216,
+            "underrunFrames": 384,
+            "underrunQuanta": 3,
+            "recoveries": 2,
+            "lateBlocks": 0,
+            "staleGeneration": 0,
+            "rejectedBlocks": 0,
+            "acceptedBlocks": 41,
+            "queueHighWater": 4,
+            "queuedBlocks": 0,
+            "lead": {
+              "scope": "Contiguous ready source frames at active-consumption quantum entry; startup delay excluded; final capacity window reported separately; not device output quality",
+              "capacityFrames": 1024,
+              "blockFrames": 256,
+              "histogramBucketFrames": 128,
+              "observations": 75,
+              "steady": {
+                "samples": 75,
+                "minFrames": 0,
+                "maxFrames": 1024,
+                "zeroLeadQuanta": 3,
+                "belowQuantumQuanta": 3,
+                "belowBlockQuanta": 10,
+                "firstZeroSourceFrame": 1792,
+                "minNeededFrames": 128,
+                "maxNeededFrames": 128,
+                "histogram": [
+                  3,
+                  7,
+                  10,
+                  10,
+                  10,
+                  10,
+                  10,
+                  10,
+                  5
+                ]
+              },
+              "drain": {
+                "samples": 0,
+                "minFrames": null,
+                "maxFrames": null,
+                "zeroLeadQuanta": 0,
+                "belowQuantumQuanta": 0,
+                "belowBlockQuanta": 0,
+                "firstZeroSourceFrame": null,
+                "minNeededFrames": null,
+                "maxNeededFrames": null,
+                "histogram": [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "master": {
+        "graph": {
+          "frame": 9600,
+          "late": 0,
+          "overflow": 0,
+          "applied": 0
+        },
+        "meters": {
+          "17": {
+            "inputPeak": 0,
+            "keyPeak": 0,
+            "reductionDb": 0,
+            "outputPeak": 0,
+            "missingKey": 0,
+            "externalKey": 1
+          }
+        },
+        "memoryBytes": 1703936,
+        "roles": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      }
+    },
+    "workers": [],
+    "error": "Uncaught TypeError: Illegal invocation"
+  }
+}

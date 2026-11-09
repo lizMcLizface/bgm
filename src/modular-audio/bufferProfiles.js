@@ -1,4 +1,4 @@
-import {workerOptions} from './workerProtocol.js';
+import {workerOptions,workerScheduling} from './workerProtocol.js';
 export const BUFFER_PROFILES=Object.freeze([
   Object.freeze({id:'default',label:'Default · 4096 frames',blockFrames:1024,poolBlocks:4}),
   Object.freeze({id:'medium',label:'Experimental · 2048 frames',blockFrames:512,poolBlocks:4}),
@@ -21,5 +21,5 @@ export function profileSchedule(repeats=3){
   for(let round=0;round<repeats;round++)for(let offset=0;offset<BUFFER_PROFILES.length;offset++)jobs.push({profile:BUFFER_PROFILES[(round+offset)%BUFFER_PROFILES.length].id,phase:'measured',iteration:round+1});
   return jobs;
 }
-export function saveWorkerSession(fixture,profile,rate){bufferProfile(profile);profileDetails(profile,rate);return JSON.stringify({version:1,fixture,profile,rate},null,2)+'\n';}
-export function loadWorkerSession(text,validateFixture){const s=JSON.parse(text);if(s?.version!==1)throw Error('Invalid worker session version');profileDetails(s.profile,s.rate);return {...s,fixture:validateFixture(s.fixture)};}
+export function saveWorkerSession(fixture,profile,rate,scheduling='timer'){bufferProfile(profile);profileDetails(profile,rate);return JSON.stringify({version:1,fixture,profile,rate,scheduling:workerScheduling(scheduling)},null,2)+'\n';}
+export function loadWorkerSession(text,validateFixture){const s=JSON.parse(text);if(s?.version!==1)throw Error('Invalid worker session version');profileDetails(s.profile,s.rate);return {...s,scheduling:workerScheduling(s.scheduling),fixture:validateFixture(s.fixture)};}

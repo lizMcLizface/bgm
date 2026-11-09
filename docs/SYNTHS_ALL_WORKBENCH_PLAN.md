@@ -1,5 +1,10 @@
 # Synths/all workbench pass
 
+M3i update: [message-task scheduling](MODULAR_AUDIO_ENGINE_M3I_TASK_PUMP.md) is
+an explicit experiment; existing timers remain the harness default. It did not
+remove Short / 96 kHz misses. Negative trials are retained; no quality or
+performance improvement is claimed. Legacy desk/All audio remains intact.
+
 M3h update (2026-11-09): the opt-in worker harness now measures contiguous
 ready PCM lead per worker and coherently, with terminal drain separate and
 selected-rate profile trials. The user reports Short / 96 kHz crackling; the

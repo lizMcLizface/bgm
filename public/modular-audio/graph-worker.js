@@ -3,8 +3,13 @@ import { ReferenceGraph } from "./runtime.js?v=f2251aa547f5b85b";
 
 // src/modular-audio/workerProtocol.js
 var BUS_COUNT = 8;
+function workerScheduling(value = "timer") {
+  if (!["timer", "message"].includes(value)) throw Error("Invalid worker scheduling");
+  return value;
+}
 function workerOptions(raw = {}) {
-  const o2 = { blockFrames: 1024, poolBlocks: 4, generation: 1, ...raw };
+  const o2 = { blockFrames: 1024, poolBlocks: 4, generation: 1, scheduling: "timer", ...raw };
+  workerScheduling(o2.scheduling);
   if (![256, 512, 1024, 2048].includes(o2.blockFrames) || !Number.isInteger(o2.poolBlocks) || o2.poolBlocks < 2 || o2.poolBlocks > 8 || !Number.isInteger(o2.generation) || o2.generation < 1 || o2.generation > 4294967295) throw Error("Invalid worker bounds");
   o2.delayFrames = o2.blockFrames * o2.poolBlocks;
   o2.bufferBytes = o2.blockFrames * BUS_COUNT * 2 * 4;
@@ -32,11 +37,62 @@ function graphSnapshot(g2, ids = null) {
   };
 }
 
+// src/modular-audio/workerTaskPump.js
+var WorkerTaskPump = class {
+  constructor(run, { makeChannel = () => new MessageChannel(), setTimer = (fn, delay) => setTimeout(fn, delay), clearTimer = (id) => clearTimeout(id) } = {}) {
+    this.run = run;
+    this.setTimer = setTimer;
+    this.clearTimer = clearTimer;
+    this.channel = makeChannel();
+    this.pending = false;
+    this.timer = null;
+    this.disposed = false;
+    this.posted = 0;
+    this.handled = 0;
+    this.waits = 0;
+    this.channel.port1.onmessage = () => {
+      this.pending = false;
+      if (this.disposed) return;
+      this.handled++;
+      this.run();
+    };
+  }
+  schedule(delay = 0) {
+    if (this.disposed || this.pending || this.timer !== null) return false;
+    if (!Number.isFinite(delay) || delay < 0) throw Error("Invalid pump delay");
+    if (delay > 0) {
+      this.waits++;
+      this.timer = this.setTimer(() => {
+        this.timer = null;
+        this.schedule();
+      }, delay);
+    } else {
+      this.pending = true;
+      this.posted++;
+      this.channel.port2.postMessage(0);
+    }
+    return true;
+  }
+  snapshot() {
+    return { kind: "message-channel", pendingTask: this.pending, waitingForStall: this.timer !== null, postedTasks: this.posted, handledTasks: this.handled, stallTimers: this.waits, disposed: this.disposed };
+  }
+  dispose() {
+    if (this.disposed) return;
+    this.disposed = true;
+    if (this.timer !== null) this.clearTimer(this.timer);
+    this.timer = null;
+    this.pending = false;
+    this.channel.port1.close();
+    this.channel.port2.close();
+  }
+};
+
 // src/modular-audio/graphWorker.js
 var g;
 var views;
 var o;
 var port;
+var tasks;
 var sourceIds = null;
 var end = 0;
 var frame = 0;
@@ -52,15 +108,24 @@ var rejectedEvents = 0;
 var badRecycles = 0;
 var histogram = new Uint32Array(32);
 function snapshot() {
-  return { generation: o.generation, sourceIds, frame, blocks, renderMs, maxRenderMs, blockMsHistogramLog2Us: Array.from(histogram), rejectedEvents, badRecycles, freeBuffers: free.length, inFlightBuffers: inFlight.filter(Boolean).length, ...graphSnapshot(g, sourceIds) };
+  return { generation: o.generation, sourceIds, frame, blocks, renderMs, maxRenderMs, blockMsHistogramLog2Us: Array.from(histogram), rejectedEvents, badRecycles, freeBuffers: free.length, inFlightBuffers: inFlight.filter(Boolean).length, scheduler: tasks ? tasks.snapshot() : { kind: "timer", pendingTimer: timer !== null }, ...graphSnapshot(g, sourceIds) };
+}
+function stopPump() {
+  clearTimeout(timer);
+  timer = null;
+  tasks?.dispose();
 }
 function fail(e) {
   stopped = true;
-  clearTimeout(timer);
+  stopPump();
   postMessage({ type: "error", message: String(e) });
 }
 function schedule() {
-  if (!stopped && timer === null && free.length && frame < end) timer = setTimeout(pump, Math.max(0, stallUntil - performance.now()));
+  if (!stopped && free.length && frame < end) {
+    const delay = Math.max(0, stallUntil - performance.now());
+    if (tasks) tasks.schedule(delay);
+    else if (timer === null) timer = setTimeout(pump, delay);
+  }
 }
 function pump() {
   timer = null;
@@ -98,6 +163,7 @@ globalThis.onmessage = ({ data: d }) => {
       if (sourceIds && (!Array.isArray(sourceIds) || !sourceIds.length || sourceIds.length > 6 || new Set(sourceIds).size !== sourceIds.length || sourceIds.some((id) => !Number.isInteger(id) || id < 1 || id > 6))) throw Error("Invalid source group");
       g = new ReferenceGraph(new WebAssembly.Instance(d.module, {}).exports, d.patch, d.contracts, d.rate, o.blockFrames);
       views = sourceViews(g, sourceIds);
+      if (o.scheduling === "message") tasks = new WorkerTaskPump(pump);
       inFlight = Array(o.poolBlocks).fill(false);
       free = Array.from({ length: o.poolBlocks }, (_, slot) => ({ slot, buffer: new ArrayBuffer(o.bufferBytes) }));
       port.onmessage = ({ data: b }) => {
@@ -116,7 +182,7 @@ globalThis.onmessage = ({ data: d }) => {
     }
     if (d.type === "dispose") {
       stopped = true;
-      clearTimeout(timer);
+      stopPump();
       g?.dispose();
       port?.close();
       postMessage({ type: "disposed" });

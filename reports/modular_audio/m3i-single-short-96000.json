@@ -1,0 +1,280 @@
+{
+  "version": 1,
+  "fixtureId": "six-role-reference-v1",
+  "fixtureHash": "77ce180861239426c0c63037235cf98d74a2bbfa09a2a46ee3da3353bb29a7df",
+  "graphVersion": "a3994fb2118b6908",
+  "crossOriginIsolated": false,
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36",
+  "hardwareConcurrency": 32,
+  "listeningFeedback": {
+    "source": "User listening report",
+    "date": "2026-11-09",
+    "profile": "short",
+    "rate": 96000,
+    "result": "Crackly; other tested combinations worked well",
+    "device": null,
+    "outputRoute": null,
+    "cause": null
+  },
+  "passScope": "Pass fields are specific to the method; transport/PCM counters do not certify audible device output",
+  "method": "Finite live dry Rust DAG mix; analyser observations, not device loopback",
+  "profile": "short",
+  "phase": "manual",
+  "iteration": 0,
+  "rate": 96000,
+  "prepareMs": 97.60000000149012,
+  "executor": {
+    "requested": "worker",
+    "actual": "worker",
+    "fallbackReason": null,
+    "blockFrames": 256,
+    "poolBlocks": 4,
+    "renderAheadCapacityFrames": 1024,
+    "bufferingLatencyFrames": 1024,
+    "bufferingLatencyMs": 10.666666666666666,
+    "pcmPoolBytes": 65536,
+    "transport": "transferable MessagePort; no shared Wasm memory"
+  },
+  "observedPeak": 0.049672722816467285,
+  "rolePeaks": [
+    0.1824345588684082,
+    0.14766743779182434,
+    0.16744570434093475,
+    0.4216850996017456,
+    0.09216278046369553,
+    0.4680757522583008
+  ],
+  "observations": 175,
+  "stalls": [],
+  "visibilityStart": "visible",
+  "visibilityEnd": "visible",
+  "visibilityChanges": [],
+  "baseLatency": 0.01,
+  "outputLatency": 0.04,
+  "pass": false,
+  "delivery": {
+    "complete": true,
+    "appliedEvents": 357,
+    "eventPass": true
+  },
+  "stats": {
+    "output": {
+      "type": "stats",
+      "mode": "worker",
+      "generation": 1,
+      "outputFrame": 1681024,
+      "sourceFrame": 1680000,
+      "delayFrames": 1024,
+      "processTiming": {
+        "available": false,
+        "scope": "process() wall time including copy/DSP and preemption; not callback scheduling, CPU utilization or device underruns",
+        "reason": "Monotonic performance.now() is unavailable or failed in this worklet",
+        "calls": null,
+        "totalMs": null,
+        "maxMs": null,
+        "overQuantumPeriod": null,
+        "histogramLog2Us": null
+      },
+      "queue": {
+        "deliveredFrames": 1623680,
+        "underrunFrames": 56320,
+        "underrunQuanta": 440,
+        "recoveries": 437,
+        "lateBlocks": 1,
+        "staleGeneration": 0,
+        "rejectedBlocks": 0,
+        "acceptedBlocks": 6561,
+        "queueHighWater": 4,
+        "queuedBlocks": 0,
+        "lead": {
+          "scope": "Contiguous ready source frames at active-consumption quantum entry; startup delay excluded; final capacity window reported separately; not device output quality",
+          "capacityFrames": 1024,
+          "blockFrames": 256,
+          "histogramBucketFrames": 128,
+          "observations": 13125,
+          "steady": {
+            "samples": 13118,
+            "minFrames": 0,
+            "maxFrames": 1024,
+            "zeroLeadQuanta": 439,
+            "belowQuantumQuanta": 439,
+            "belowBlockQuanta": 1750,
+            "firstZeroSourceFrame": 1536,
+            "minNeededFrames": 128,
+            "maxNeededFrames": 128,
+            "histogram": [
+              439,
+              1311,
+              1749,
+              1749,
+              1749,
+              1749,
+              1748,
+              1749,
+              875
+            ]
+          },
+          "drain": {
+            "samples": 7,
+            "minFrames": 0,
+            "maxFrames": 768,
+            "zeroLeadQuanta": 1,
+            "belowQuantumQuanta": 1,
+            "belowBlockQuanta": 2,
+            "firstZeroSourceFrame": 1679872,
+            "minNeededFrames": 128,
+            "maxNeededFrames": 128,
+            "histogram": [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              0,
+              0
+            ]
+          }
+        }
+      },
+      "serial": null
+    },
+    "worker": {
+      "type": "stats",
+      "request": 1,
+      "generation": 1,
+      "sourceIds": null,
+      "frame": 1680000,
+      "blocks": 6563,
+      "renderMs": 6871.700000979006,
+      "maxRenderMs": 2.5999999940395355,
+      "blockMsHistogramLog2Us": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        247,
+        1395,
+        874,
+        372,
+        3581,
+        94,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "rejectedEvents": 0,
+      "badRecycles": 0,
+      "freeBuffers": 3,
+      "inFlightBuffers": 1,
+      "scheduler": {
+        "kind": "message-channel",
+        "pendingTask": false,
+        "waitingForStall": false,
+        "postedTasks": 6563,
+        "handledTasks": 6563,
+        "stallTimers": 0,
+        "disposed": false
+      },
+      "graph": {
+        "frame": 1680000,
+        "late": 0,
+        "overflow": 0,
+        "applied": 357
+      },
+      "meters": {
+        "17": {
+          "inputPeak": 0,
+          "keyPeak": 3.5592980993850354e-43,
+          "reductionDb": 3.744959642578489e-29,
+          "outputPeak": 0,
+          "missingKey": 0,
+          "externalKey": 1
+        }
+      },
+      "memoryBytes": 5570560,
+      "roles": [
+        {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 7
+        },
+        {
+          "active": 0,
+          "steals": 14,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "peak": 0,
+          "latencyFrames": 7.5,
+          "peakActive": 8
+        },
+        {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 2
+        },
+        {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 8
+        },
+        {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "peak": 0,
+          "latencyFrames": 7.5,
+          "peakActive": 2
+        },
+        {
+          "active": 0,
+          "queued": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 1680000,
+          "peakActive": 4
+        }
+      ]
+    },
+    "error": null
+  }
+}

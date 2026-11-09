@@ -3,7 +3,7 @@
 Agreed direction: 2026-11-09. Status: **M0/M1, the opt-in M2 percussion/sidechain
 slice, M3a's actual six-role serial baseline, M3b owned FM, M3c owned core,
 M3d pitched DAG, M3e bounded single-worker transport, M3f three-worker source pool
-and M3g opt-in buffering profiles plus M3h queue-lead observability delivered**.
+and M3g opt-in buffering profiles plus M3h queue-lead observability and M3i opt-in scheduling experiment delivered**.
 All six source engines have owned mutable Rust state; core's read-only additive
 tables are safely shared after preparation. External stereo host inputs and
 graph program/key compression exist. All six sources now also run inside one
@@ -12,8 +12,9 @@ dedicated worker with bounded PCM publication and serial startup fallback.
 M3f partitions the sources across three workers and keeps the dependent Rust
 master in the worklet. General graph distribution and workbench migration remain
 future work. Foundation through M3c committed locally as `bc4e35d`, M3d as
-`fa634f5`, M3e as `646183d`, M3f as `714ce43`, M3g as `733c2e6`. Each completed verified step is committed locally
+`fa634f5`, M3e as `646183d`, M3f as `714ce43`, M3g as `733c2e6`, M3h as `c8ff2bb`. Each completed verified step is committed locally
 under the user's standing instruction. No push/deployment.
+See [opt-in scheduling results](MODULAR_AUDIO_ENGINE_M3I_TASK_PUMP.md).
 See [queue-lead contracts and results](MODULAR_AUDIO_ENGINE_M3H_QUEUE_LEAD.md).
 See [profile contracts and measurements](MODULAR_AUDIO_ENGINE_M3G_BUFFER_PROFILES.md).
 See [three-worker contracts and evidence](MODULAR_AUDIO_ENGINE_M3F_SOURCE_POOL.md).
@@ -728,3 +729,20 @@ the current nested worker timers, preserving controls, injected stalls,
 ownership, PCM, bounds and defaults. Timer clamping is a testable delivery risk,
 not a proven cause of the user's output-route symptoms. See M3h for the timer
 contract reference and exact acceptance scope.
+
+## M3i: explicit scheduling experiment delivered (2026-11-09)
+
+See [contracts, negative results and final verification](MODULAR_AUDIO_ENGINE_M3I_TASK_PUMP.md).
+The harness offers timer/message scheduling, validates and persists the explicit
+selection, and separates modes in reports. Existing timers remain the default:
+the message candidate did not remove Short / 96 kHz misses (0/3), and Default
+had one 128-frame miss (2/3). Medium passed 3/3. There is no established quality
+or performance improvement; all failures are retained.
+
+Final runtime `44de39f7ca5b0904`, unchanged Rust/Wasm. **18 files / 116 modular
+tests** and public build pass. Both scheduling modes retain actual three-rate
+PCM/control/instance behavior. Final live default/48 kHz passes without misses;
+explicit message/Medium/96 kHz recovers from the injected stall and completes.
+Old-session/default and explicit experiment save/reload pass. See handoff's
+final checkpoint for exact scopes/counts and the next bounded packet-arrival
+measurement. No default buffering change, push or deployment.

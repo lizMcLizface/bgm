@@ -1,0 +1,755 @@
+{
+  "version": 1,
+  "fixtureId": "six-role-reference-v1",
+  "fixtureHash": "77ce180861239426c0c63037235cf98d74a2bbfa09a2a46ee3da3353bb29a7df",
+  "graphVersion": "44de39f7ca5b0904",
+  "crossOriginIsolated": false,
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36",
+  "hardwareConcurrency": 32,
+  "listeningFeedback": {
+    "source": "User listening report",
+    "date": "2026-11-09",
+    "profile": "short",
+    "rate": 96000,
+    "result": "Crackly; other tested combinations worked well",
+    "device": null,
+    "outputRoute": null,
+    "cause": null
+  },
+  "requestedScheduling": "message",
+  "passScope": "Pass fields are specific to the method; transport/PCM counters do not certify audible device output",
+  "method": "Finite live dry Rust DAG mix; analyser observations, not device loopback",
+  "profile": "medium",
+  "phase": "manual",
+  "iteration": 0,
+  "rate": 96000,
+  "prepareMs": 118.29999999701977,
+  "executor": {
+    "requested": "pool",
+    "actual": "pool",
+    "scheduling": "message",
+    "workers": 3,
+    "groups": [
+      [
+        1,
+        5
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        4,
+        6
+      ]
+    ],
+    "masterLevels": [
+      [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      [
+        11,
+        12,
+        13
+      ],
+      [
+        14
+      ],
+      [
+        15
+      ],
+      [
+        17
+      ],
+      [
+        18
+      ]
+    ],
+    "blockFrames": 512,
+    "poolBlocks": 4,
+    "renderAheadCapacityFrames": 2048,
+    "bufferingLatencyFrames": 2048,
+    "bufferingLatencyMs": 21.333333333333332,
+    "pcmPoolBytes": 393216,
+    "transport": "3 independent worker PCM pools; Rust master in worklet",
+    "fallbackReason": null
+  },
+  "observedPeak": 0.05153103917837143,
+  "rolePeaks": [
+    0.21272465586662292,
+    0.13728035986423492,
+    0.1788349598646164,
+    0.3716253936290741,
+    0.09750771522521973,
+    0.621036171913147
+  ],
+  "observations": 175,
+  "stalls": [
+    {
+      "type": "stalled",
+      "request": 1,
+      "ms": 250,
+      "frame": 19968
+    }
+  ],
+  "visibilityStart": "visible",
+  "visibilityEnd": "visible",
+  "visibilityChanges": [],
+  "baseLatency": 0.01,
+  "outputLatency": 0.064,
+  "pass": true,
+  "delivery": {
+    "complete": true,
+    "appliedEvents": 357,
+    "eventPass": true
+  },
+  "stats": {
+    "output": {
+      "type": "stats",
+      "mode": "pool",
+      "generation": 1,
+      "sourceFrame": 1680000,
+      "outputFrame": 1682048,
+      "delayFrames": 2048,
+      "processTiming": {
+        "available": false,
+        "scope": "process() wall time including copy/DSP and preemption; not callback scheduling, CPU utilization or device underruns",
+        "reason": "Monotonic performance.now() is unavailable or failed in this worklet",
+        "calls": null,
+        "totalMs": null,
+        "maxMs": null,
+        "overQuantumPeriod": null,
+        "histogramLog2Us": null
+      },
+      "queue": {
+        "deliveredFrames": 1654912,
+        "underrunFrames": 25088,
+        "underrunQuanta": 196,
+        "recoveries": 1,
+        "lead": {
+          "scope": "Contiguous ready source frames at active-consumption quantum entry; startup delay excluded; final capacity window reported separately; not device output quality",
+          "capacityFrames": 2048,
+          "blockFrames": 512,
+          "histogramBucketFrames": 128,
+          "observations": 13125,
+          "steady": {
+            "samples": 13110,
+            "minFrames": 0,
+            "maxFrames": 2048,
+            "zeroLeadQuanta": 196,
+            "belowQuantumQuanta": 196,
+            "belowBlockQuanta": 199,
+            "firstZeroSourceFrame": 19968,
+            "minNeededFrames": 128,
+            "maxNeededFrames": 128,
+            "histogram": [
+              196,
+              1,
+              1,
+              1,
+              1,
+              1,
+              216,
+              648,
+              1077,
+              1505,
+              1721,
+              1721,
+              1721,
+              1721,
+              1290,
+              859,
+              430
+            ]
+          },
+          "drain": {
+            "samples": 15,
+            "minFrames": 128,
+            "maxFrames": 1792,
+            "zeroLeadQuanta": 0,
+            "belowQuantumQuanta": 0,
+            "belowBlockQuanta": 3,
+            "firstZeroSourceFrame": null,
+            "minNeededFrames": 128,
+            "maxNeededFrames": 128,
+            "histogram": [
+              0,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              2,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              0,
+              0
+            ]
+          }
+        },
+        "groups": [
+          {
+            "deliveredFrames": 1654912,
+            "underrunFrames": 25088,
+            "underrunQuanta": 196,
+            "recoveries": 1,
+            "lateBlocks": 49,
+            "staleGeneration": 0,
+            "rejectedBlocks": 0,
+            "acceptedBlocks": 3233,
+            "queueHighWater": 4,
+            "queuedBlocks": 0,
+            "lead": {
+              "scope": "Contiguous ready source frames at active-consumption quantum entry; startup delay excluded; final capacity window reported separately; not device output quality",
+              "capacityFrames": 2048,
+              "blockFrames": 512,
+              "histogramBucketFrames": 128,
+              "observations": 13125,
+              "steady": {
+                "samples": 13110,
+                "minFrames": 0,
+                "maxFrames": 2048,
+                "zeroLeadQuanta": 196,
+                "belowQuantumQuanta": 196,
+                "belowBlockQuanta": 199,
+                "firstZeroSourceFrame": 19968,
+                "minNeededFrames": 128,
+                "maxNeededFrames": 128,
+                "histogram": [
+                  196,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  216,
+                  648,
+                  1077,
+                  1505,
+                  1721,
+                  1721,
+                  1721,
+                  1721,
+                  1290,
+                  859,
+                  430
+                ]
+              },
+              "drain": {
+                "samples": 15,
+                "minFrames": 128,
+                "maxFrames": 1792,
+                "zeroLeadQuanta": 0,
+                "belowQuantumQuanta": 0,
+                "belowBlockQuanta": 3,
+                "firstZeroSourceFrame": null,
+                "minNeededFrames": 128,
+                "maxNeededFrames": 128,
+                "histogram": [
+                  0,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  2,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  0,
+                  0
+                ]
+              }
+            }
+          },
+          {
+            "deliveredFrames": 1680000,
+            "underrunFrames": 0,
+            "underrunQuanta": 0,
+            "recoveries": 0,
+            "lateBlocks": 0,
+            "staleGeneration": 0,
+            "rejectedBlocks": 0,
+            "acceptedBlocks": 3282,
+            "queueHighWater": 4,
+            "queuedBlocks": 0,
+            "lead": {
+              "scope": "Contiguous ready source frames at active-consumption quantum entry; startup delay excluded; final capacity window reported separately; not device output quality",
+              "capacityFrames": 2048,
+              "blockFrames": 512,
+              "histogramBucketFrames": 128,
+              "observations": 13125,
+              "steady": {
+                "samples": 13110,
+                "minFrames": 768,
+                "maxFrames": 2048,
+                "zeroLeadQuanta": 0,
+                "belowQuantumQuanta": 0,
+                "belowBlockQuanta": 0,
+                "firstZeroSourceFrame": null,
+                "minNeededFrames": 128,
+                "maxNeededFrames": 128,
+                "histogram": [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  218,
+                  656,
+                  1093,
+                  1529,
+                  1748,
+                  1748,
+                  1748,
+                  1748,
+                  1311,
+                  874,
+                  437
+                ]
+              },
+              "drain": {
+                "samples": 15,
+                "minFrames": 128,
+                "maxFrames": 1792,
+                "zeroLeadQuanta": 0,
+                "belowQuantumQuanta": 0,
+                "belowBlockQuanta": 3,
+                "firstZeroSourceFrame": null,
+                "minNeededFrames": 128,
+                "maxNeededFrames": 128,
+                "histogram": [
+                  0,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  2,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  0,
+                  0
+                ]
+              }
+            }
+          },
+          {
+            "deliveredFrames": 1680000,
+            "underrunFrames": 0,
+            "underrunQuanta": 0,
+            "recoveries": 0,
+            "lateBlocks": 0,
+            "staleGeneration": 0,
+            "rejectedBlocks": 0,
+            "acceptedBlocks": 3282,
+            "queueHighWater": 4,
+            "queuedBlocks": 0,
+            "lead": {
+              "scope": "Contiguous ready source frames at active-consumption quantum entry; startup delay excluded; final capacity window reported separately; not device output quality",
+              "capacityFrames": 2048,
+              "blockFrames": 512,
+              "histogramBucketFrames": 128,
+              "observations": 13125,
+              "steady": {
+                "samples": 13110,
+                "minFrames": 768,
+                "maxFrames": 2048,
+                "zeroLeadQuanta": 0,
+                "belowQuantumQuanta": 0,
+                "belowBlockQuanta": 0,
+                "firstZeroSourceFrame": null,
+                "minNeededFrames": 128,
+                "maxNeededFrames": 128,
+                "histogram": [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  218,
+                  656,
+                  1093,
+                  1529,
+                  1748,
+                  1748,
+                  1748,
+                  1748,
+                  1311,
+                  874,
+                  437
+                ]
+              },
+              "drain": {
+                "samples": 15,
+                "minFrames": 128,
+                "maxFrames": 1792,
+                "zeroLeadQuanta": 0,
+                "belowQuantumQuanta": 0,
+                "belowBlockQuanta": 3,
+                "firstZeroSourceFrame": null,
+                "minNeededFrames": 128,
+                "maxNeededFrames": 128,
+                "histogram": [
+                  0,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  2,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  0,
+                  0
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "master": {
+        "graph": {
+          "frame": 1680000,
+          "late": 0,
+          "overflow": 0,
+          "applied": 0
+        },
+        "meters": {
+          "17": {
+            "inputPeak": 0,
+            "keyPeak": 3.5592980993850354e-43,
+            "reductionDb": 3.744959642578489e-29,
+            "outputPeak": 0,
+            "missingKey": 0,
+            "externalKey": 1
+          }
+        },
+        "memoryBytes": 1703936,
+        "roles": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      }
+    },
+    "workers": [
+      {
+        "type": "stats",
+        "request": 2,
+        "generation": 1,
+        "sourceIds": [
+          1,
+          5
+        ],
+        "frame": 1680000,
+        "blocks": 3282,
+        "renderMs": 1935.6999999135733,
+        "maxRenderMs": 1.8000000044703484,
+        "blockMsHistogramLog2Us": [
+          19,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          532,
+          757,
+          200,
+          1317,
+          457,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "rejectedEvents": 0,
+        "badRecycles": 0,
+        "freeBuffers": 4,
+        "inFlightBuffers": 0,
+        "scheduler": {
+          "kind": "message-channel",
+          "pendingTask": false,
+          "waitingForStall": false,
+          "postedTasks": 3282,
+          "handledTasks": 3282,
+          "stallTimers": 1,
+          "disposed": false
+        },
+        "graph": {
+          "frame": 1680000,
+          "late": 0,
+          "overflow": 0,
+          "applied": 104
+        },
+        "meters": {},
+        "memoryBytes": 2883584,
+        "roles": [
+          {
+            "active": 0,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 1680000,
+            "peak": 0,
+            "latencyFrames": 0,
+            "peakActive": 7
+          },
+          null,
+          null,
+          null,
+          {
+            "active": 0,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 1680000,
+            "peak": 0,
+            "latencyFrames": 7.5,
+            "peakActive": 2
+          },
+          null
+        ]
+      },
+      {
+        "type": "stats",
+        "request": 3,
+        "generation": 1,
+        "sourceIds": [
+          2,
+          3
+        ],
+        "frame": 1680000,
+        "blocks": 3282,
+        "renderMs": 4505.299999780953,
+        "maxRenderMs": 3.600000001490116,
+        "blockMsHistogramLog2Us": [
+          13,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          452,
+          729,
+          92,
+          80,
+          906,
+          1010,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "rejectedEvents": 0,
+        "badRecycles": 0,
+        "freeBuffers": 4,
+        "inFlightBuffers": 0,
+        "scheduler": {
+          "kind": "message-channel",
+          "pendingTask": false,
+          "waitingForStall": false,
+          "postedTasks": 3282,
+          "handledTasks": 3282,
+          "stallTimers": 0,
+          "disposed": false
+        },
+        "graph": {
+          "frame": 1680000,
+          "late": 0,
+          "overflow": 0,
+          "applied": 162
+        },
+        "meters": {},
+        "memoryBytes": 2883584,
+        "roles": [
+          null,
+          {
+            "active": 0,
+            "steals": 14,
+            "dropped": 0,
+            "late": 0,
+            "frame": 1680000,
+            "peak": 0,
+            "latencyFrames": 7.5,
+            "peakActive": 8
+          },
+          {
+            "active": 0,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 1680000,
+            "peak": 0,
+            "latencyFrames": 0,
+            "peakActive": 2
+          },
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "type": "stats",
+        "request": 4,
+        "generation": 1,
+        "sourceIds": [
+          4,
+          6
+        ],
+        "frame": 1680000,
+        "blocks": 3282,
+        "renderMs": 2535.799999691546,
+        "maxRenderMs": 1.9000000059604645,
+        "blockMsHistogramLog2Us": [
+          15,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          219,
+          685,
+          338,
+          1232,
+          793,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "rejectedEvents": 0,
+        "badRecycles": 0,
+        "freeBuffers": 4,
+        "inFlightBuffers": 0,
+        "scheduler": {
+          "kind": "message-channel",
+          "pendingTask": false,
+          "waitingForStall": false,
+          "postedTasks": 3282,
+          "handledTasks": 3282,
+          "stallTimers": 0,
+          "disposed": false
+        },
+        "graph": {
+          "frame": 1680000,
+          "late": 0,
+          "overflow": 0,
+          "applied": 91
+        },
+        "meters": {},
+        "memoryBytes": 4390912,
+        "roles": [
+          null,
+          null,
+          null,
+          {
+            "active": 0,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 1680000,
+            "peak": 0,
+            "latencyFrames": 0,
+            "peakActive": 8
+          },
+          null,
+          {
+            "active": 0,
+            "queued": 0,
+            "steals": 0,
+            "dropped": 0,
+            "late": 0,
+            "frame": 1680000,
+            "peakActive": 4
+          }
+        ]
+      }
+    ],
+    "error": null
+  }
+}

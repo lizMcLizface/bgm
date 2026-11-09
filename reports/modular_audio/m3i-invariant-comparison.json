@@ -1,0 +1,331 @@
+{
+  "pass": true,
+  "scope": "Report accounting and scheduler-contract checks; delivery failures remain failures. Not an audible-output verdict or timer-cause proof.",
+  "version": "a3994fb2118b6908",
+  "rows": [
+    {
+      "file": "m3i-medium-96000-stall.json",
+      "profile": "medium",
+      "phase": "manual",
+      "iteration": 0,
+      "executor": "pool",
+      "deliveryPass": true,
+      "missingFrames": 23296,
+      "underrunQuanta": 182,
+      "recoveries": 1,
+      "minReadyFrames": 0,
+      "minReadyMs": 0,
+      "stallTimers": [
+        1,
+        0,
+        0
+      ],
+      "frame": 1680000,
+      "events": 357,
+      "observations": 13125
+    },
+    {
+      "file": "m3i-single-short-96000.json",
+      "profile": "short",
+      "phase": "manual",
+      "iteration": 0,
+      "executor": "worker",
+      "deliveryPass": false,
+      "missingFrames": 56320,
+      "underrunQuanta": 440,
+      "recoveries": 437,
+      "minReadyFrames": 0,
+      "minReadyMs": 0,
+      "stallTimers": [
+        0
+      ],
+      "frame": 1680000,
+      "events": 357,
+      "observations": 13125
+    },
+    {
+      "file": "m3i-live-profiles-96000.json",
+      "profile": "default",
+      "phase": "warmup",
+      "iteration": 0,
+      "executor": "pool",
+      "deliveryPass": true,
+      "missingFrames": 0,
+      "underrunQuanta": 0,
+      "recoveries": 0,
+      "minReadyFrames": 2304,
+      "minReadyMs": 24,
+      "stallTimers": [
+        0,
+        0,
+        0
+      ],
+      "frame": 1680000,
+      "events": 357,
+      "observations": 13125
+    },
+    {
+      "file": "m3i-live-profiles-96000.json",
+      "profile": "medium",
+      "phase": "warmup",
+      "iteration": 0,
+      "executor": "pool",
+      "deliveryPass": true,
+      "missingFrames": 0,
+      "underrunQuanta": 0,
+      "recoveries": 0,
+      "minReadyFrames": 768,
+      "minReadyMs": 8,
+      "stallTimers": [
+        0,
+        0,
+        0
+      ],
+      "frame": 1680000,
+      "events": 357,
+      "observations": 13125
+    },
+    {
+      "file": "m3i-live-profiles-96000.json",
+      "profile": "short",
+      "phase": "warmup",
+      "iteration": 0,
+      "executor": "pool",
+      "deliveryPass": false,
+      "missingFrames": 56064,
+      "underrunQuanta": 438,
+      "recoveries": 437,
+      "minReadyFrames": 0,
+      "minReadyMs": 0,
+      "stallTimers": [
+        0,
+        0,
+        0
+      ],
+      "frame": 1680000,
+      "events": 357,
+      "observations": 13125
+    },
+    {
+      "file": "m3i-live-profiles-96000.json",
+      "profile": "default",
+      "phase": "measured",
+      "iteration": 1,
+      "executor": "pool",
+      "deliveryPass": true,
+      "missingFrames": 0,
+      "underrunQuanta": 0,
+      "recoveries": 0,
+      "minReadyFrames": 2304,
+      "minReadyMs": 24,
+      "stallTimers": [
+        0,
+        0,
+        0
+      ],
+      "frame": 1680000,
+      "events": 357,
+      "observations": 13125
+    },
+    {
+      "file": "m3i-live-profiles-96000.json",
+      "profile": "medium",
+      "phase": "measured",
+      "iteration": 1,
+      "executor": "pool",
+      "deliveryPass": true,
+      "missingFrames": 0,
+      "underrunQuanta": 0,
+      "recoveries": 0,
+      "minReadyFrames": 768,
+      "minReadyMs": 8,
+      "stallTimers": [
+        0,
+        0,
+        0
+      ],
+      "frame": 1680000,
+      "events": 357,
+      "observations": 13125
+    },
+    {
+      "file": "m3i-live-profiles-96000.json",
+      "profile": "short",
+      "phase": "measured",
+      "iteration": 1,
+      "executor": "pool",
+      "deliveryPass": false,
+      "missingFrames": 56064,
+      "underrunQuanta": 438,
+      "recoveries": 437,
+      "minReadyFrames": 0,
+      "minReadyMs": 0,
+      "stallTimers": [
+        0,
+        0,
+        0
+      ],
+      "frame": 1680000,
+      "events": 357,
+      "observations": 13125
+    },
+    {
+      "file": "m3i-live-profiles-96000.json",
+      "profile": "medium",
+      "phase": "measured",
+      "iteration": 2,
+      "executor": "pool",
+      "deliveryPass": true,
+      "missingFrames": 0,
+      "underrunQuanta": 0,
+      "recoveries": 0,
+      "minReadyFrames": 768,
+      "minReadyMs": 8,
+      "stallTimers": [
+        0,
+        0,
+        0
+      ],
+      "frame": 1680000,
+      "events": 357,
+      "observations": 13125
+    },
+    {
+      "file": "m3i-live-profiles-96000.json",
+      "profile": "short",
+      "phase": "measured",
+      "iteration": 2,
+      "executor": "pool",
+      "deliveryPass": false,
+      "missingFrames": 56064,
+      "underrunQuanta": 438,
+      "recoveries": 437,
+      "minReadyFrames": 0,
+      "minReadyMs": 0,
+      "stallTimers": [
+        0,
+        0,
+        0
+      ],
+      "frame": 1680000,
+      "events": 357,
+      "observations": 13125
+    },
+    {
+      "file": "m3i-live-profiles-96000.json",
+      "profile": "default",
+      "phase": "measured",
+      "iteration": 2,
+      "executor": "pool",
+      "deliveryPass": false,
+      "missingFrames": 128,
+      "underrunQuanta": 1,
+      "recoveries": 1,
+      "minReadyFrames": 0,
+      "minReadyMs": 0,
+      "stallTimers": [
+        0,
+        0,
+        0
+      ],
+      "frame": 1680000,
+      "events": 357,
+      "observations": 13125
+    },
+    {
+      "file": "m3i-live-profiles-96000.json",
+      "profile": "short",
+      "phase": "measured",
+      "iteration": 3,
+      "executor": "pool",
+      "deliveryPass": false,
+      "missingFrames": 56064,
+      "underrunQuanta": 438,
+      "recoveries": 437,
+      "minReadyFrames": 0,
+      "minReadyMs": 0,
+      "stallTimers": [
+        0,
+        0,
+        0
+      ],
+      "frame": 1680000,
+      "events": 357,
+      "observations": 13125
+    },
+    {
+      "file": "m3i-live-profiles-96000.json",
+      "profile": "default",
+      "phase": "measured",
+      "iteration": 3,
+      "executor": "pool",
+      "deliveryPass": true,
+      "missingFrames": 0,
+      "underrunQuanta": 0,
+      "recoveries": 0,
+      "minReadyFrames": 2304,
+      "minReadyMs": 24,
+      "stallTimers": [
+        0,
+        0,
+        0
+      ],
+      "frame": 1680000,
+      "events": 357,
+      "observations": 13125
+    },
+    {
+      "file": "m3i-live-profiles-96000.json",
+      "profile": "medium",
+      "phase": "measured",
+      "iteration": 3,
+      "executor": "pool",
+      "deliveryPass": true,
+      "missingFrames": 0,
+      "underrunQuanta": 0,
+      "recoveries": 0,
+      "minReadyFrames": 768,
+      "minReadyMs": 8,
+      "stallTimers": [
+        0,
+        0,
+        0
+      ],
+      "frame": 1680000,
+      "events": 357,
+      "observations": 13125
+    }
+  ],
+  "comparison": [
+    {
+      "profile": "default",
+      "measuredRuns": 3,
+      "beforeDeliveryPasses": 3,
+      "afterDeliveryPasses": 2,
+      "beforeMissingFrames": 0,
+      "afterMissingFrames": 128,
+      "beforeMinimumReadyFrames": 2304,
+      "afterMinimumReadyFrames": 0
+    },
+    {
+      "profile": "medium",
+      "measuredRuns": 3,
+      "beforeDeliveryPasses": 3,
+      "afterDeliveryPasses": 3,
+      "beforeMissingFrames": 0,
+      "afterMissingFrames": 0,
+      "beforeMinimumReadyFrames": 768,
+      "afterMinimumReadyFrames": 768
+    },
+    {
+      "profile": "short",
+      "measuredRuns": 3,
+      "beforeDeliveryPasses": 0,
+      "afterDeliveryPasses": 0,
+      "beforeMissingFrames": 168192,
+      "afterMissingFrames": 168192,
+      "beforeMinimumReadyFrames": 0,
+      "afterMinimumReadyFrames": 0
+    }
+  ]
+}
