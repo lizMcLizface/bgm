@@ -11,6 +11,8 @@ An explicit [selected-patch test-note audition](MODULAR_AUDIO_ENGINE_M4B_VOICE_A
 now activates sparse roles without editing the user's song. Phone Lead/counter /
 Bass full diagnostic delivery and listening are clean; other families and
 real-song acceptance stay separate gates.
+[Owned percussion kit configuration](MODULAR_AUDIO_ENGINE_M4C_KIT_CONFIGURATION.md)
+is delivered; the finite Wasm-kit All lease/compiler is next.
 Normal transport/default backend migration remains gated.
 All six source engines have owned mutable Rust state; core's read-only additive
 tables are safely shared after preparation. External stereo host inputs and
@@ -1073,3 +1075,20 @@ real-song and background/lock-screen acceptance remain separate gates. Exact
 evidence is in the audition doc. This clears the requested three-voice
 diagnostic gate. Next immutable owned kit preparation and exact configured
 legacy parity before Wasm-kit-only All percussion integration.
+
+### M4c owned basic-kit configuration delivered
+
+Module2/config-version1 selected palette + 14-slot on/level/tone/decay snapshots now
+prepare in the owned Rust graph, validate in Rust/JS, persist and restart
+exactly. Preparation-only ABI rejects edits after prepare. Absent-config raw
+module1 fixtures and the byte-identical legacy ABI remain compatible; actual
+old JS/Wasm reject module2 rather than silently ignoring its configuration. **56 exact
+configured PCM comparisons** across all palettes/slots/44.1/48/96 kHz, reset /
+save-reload/independence and actual threaded drum/kick output pass; **30 Wasm
+allocation audits**, **322 broad tests** including **9 kit checks**, and public
+build pass. [Exact contracts/results](MODULAR_AUDIO_ENGINE_M4C_KIT_CONFIGURATION.md).
+Graph version62315b4104f2fc7e; no new All Drums eligibility, defaults or browser /
+phone acceptance. Next ready Wasm basic-kit-only finite lease/compiler, dry
+existing percussion role input, ID6/six-stem diagnostics and <=4,000 combined
+events, then real silent/audible/device gates. Native/classic sources remain
+unsupported; no sound substitution or broad migration.

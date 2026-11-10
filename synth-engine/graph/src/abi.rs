@@ -37,6 +37,13 @@ pub extern "C" fn graph_pitch_stat(g:&Graph,id:u32,index:u32)->f64 {g.pitch_stat
 #[no_mangle]
 pub extern "C" fn graph_percussion_stat(g:&Graph,id:u32,index:u32)->f64 {g.percussion_stat(id,index).unwrap_or(f64::NAN)}
 #[no_mangle]
+pub extern "C" fn graph_percussion_config(g:&mut Graph,id:u32,version:u32,voice:u32)->u32 {status(g.percussion_config(id,version,KitConfig::new(voice)))}
+#[no_mangle]
+pub extern "C" fn graph_percussion_drum(g:&mut Graph,id:u32,drum:usize,on:u32,level:f32,tone:f32,decay:f32)->u32 {
+    if on>1 {return Error::Bounds as u32;}
+    status(g.percussion_drum(id,drum,DrumConfig{on:on!=0,level,tone,decay}))
+}
+#[no_mangle]
 pub extern "C" fn graph_node_ptr(g:&Graph,id:u32)->*const f32 {g.node_buffer(id).map_or(std::ptr::null(),|b|b.as_ptr().cast())}
 #[no_mangle]
 pub extern "C" fn graph_note(g:&mut Graph,frame:f64,target:u32,owner:u32,kind:u32,id:u32,a:f32,b:f32)->u32 {

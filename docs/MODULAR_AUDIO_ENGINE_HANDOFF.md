@@ -13,6 +13,9 @@ classics and percussion adapters/normal transport remain separate gates.
 The [selected-patch test-note audition](MODULAR_AUDIO_ENGINE_M4B_VOICE_AUDITION.md)
 now activates sparse voices without changing the song. Phone Lead/counter/Bass
 delivery and listening are clean for this material; exact checkpoints follow.
+[Owned basic-kit configuration](MODULAR_AUDIO_ENGINE_M4C_KIT_CONFIGURATION.md)
+now passes configured legacy PCM/persistence/independence/allocation checks.
+Next is its Wasm-kit-only finite All lease/hit compiler, not a default switch.
 
 Prepared and implemented through the opt-in M4a finite All source preview on 2026-11-09. Read the working tree, this file and
 [MODULAR_AUDIO_ENGINE_PLAN.md](MODULAR_AUDIO_ENGINE_PLAN.md) first. This is an
@@ -2248,3 +2251,52 @@ Next **owned kit preparation configuration** under the committed percussion
 audit, then exact configured legacy PCM/independence/persistence/allocation
 checks and Wasm-kit-only finite All integration. No further phone audition
 request is pending for this three-voice diagnostic. No latency work/deployment.
+
+## M4c owned basic-kit configuration delivered (2026-11-10)
+
+After `57f00ee`, [versioned kit preparation](MODULAR_AUDIO_ENGINE_M4C_KIT_CONFIGURATION.md)
+closes the audited gap: `legacy.percussion` module2 requires config version1,
+selected Felt/Crisp/basic808/Hand palette and exactly 14 on/level/tone/decay rows.
+Rust/JS validation, generated descriptor and owned preparation ABI enforce
+kind/version/bounds and immutability after prepare. Module1 keeps raw fixtures;
+module2/missing config and module1/config combinations reject. Actual old
+d6a JS/Wasm reject module2 instead of ignoring its kit. Graph owns each
+kit; reset retains it and restores initial legacy unity-to-target smoothing.
+Save/reload and independent reset/cancel are exact. No live-state transplantation,
+global state, new algorithm or legacy singleton change.
+
+Graph **62315b4104f2fc7e**, **311,626 bytes**, source/runtime/cache manifests
+refreshed. Legacy percussion rebuild is **byte-identical** at **92,363 bytes** /
+SHA256 **a0137cdb5805902ab3f8e5d67512ed591a32b5c22420fde2c53ab04fb7cb064f**;
+only its source manifest changes. Original 27 raw PCM goldens remain exact.
+
+**322 tests / 38 files (110.12 s)** pass, including **9 kit checks** that
+cover **56 exact configured stereo PCM comparisons**, all four palettes and
+historical slots, edited/disabled levels/tone/decay, receive order/choke/long
+swish tails, 44.1/48/96 kHz, save/reload/reset, immutable/invalid configuration,
+independent handles and actual threaded drum/kick buses (**80,037 frames**, all
+18 events, no errors). Final independent reset/cancel source comparison is
+also checked. **30 Wasm allocation audits**, including 12 configured kits,
+report zero allocation/reclamation/growth during render/enqueue/cancel/reset.
+Final public package/provenance build **47.50 s** passes. A comment-only stale
+legacy source manifest was caught and rebuilt before final success; bytes
+remain unchanged. Version2 also exposed a type-only descriptor lookup, fixed
+to use type/version before the final full rerun. No native executable/AC bypass
+or new browser/phone run.
+
+Artifacts `m4c-kit-configured-pcm.json`, `m4c-kit-allocation.json`, and
+`m4c-percussion-seam-configured-audit.json`; original negative seam evidence
+preserved. Source PCM is not wet effects, browser queue or physical listening.
+Phone v9/d6a three-voice listening remains its own prior build/material gate.
+LAN HTTPS PID8368 stays running, local build refreshed; no deployment.
+
+**Next bounded implementation:** actual ready **Wasm basic-kit-only** host lease
+and finite drum compiler, capturing current kit/palette/private hit-ID policy,
+shared All `drumStepEvents` expression and honest existing basic-kit sound-lock
+limits. Host-owned dry percussion role input preserves external inserts/mixer
+and avoids unrelated live-kit sleep timers. Extend explicit group/report to
+source ID6/six stems and combined <=4,000 events with longest tail; preserve
+Stop/Panic/source invalidation/legacy drum pads and worker/twelve option. Native
+Web Audio/classic machines stay named unsupported, with no automatic source
+substitution. Full silent browser/guarded audible phone checks follow before
+any acceptance. No normal transport migration or latency experiment.

@@ -1,5 +1,12 @@
 # Effects desk and independent effect boxes
 
+M4c foundation update (2026-11-10): [owned basic-kit configuration](MODULAR_AUDIO_ENGINE_M4C_KIT_CONFIGURATION.md)
+prepares selected palettes/per-drum controls in the opt-in graph, retaining the
+actual kick bus and byte-identical legacy percussion ABI. Exact configured PCM,
+reset/persistence/independence, worker buses and allocation checks pass. This
+does not change effects desk audio or add a new desk sidechain. Next is the
+finite All Wasm-kit adapter through its existing external effects/mixer path.
+
 M3k update: [run-bound listening records](MODULAR_AUDIO_ENGINE_M3K_LISTENING.md)
 now support local save/review/JSON export without changing playback settings or
 automated results. User reports Short / 96 kHz / +2 helps while open but is

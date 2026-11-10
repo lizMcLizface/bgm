@@ -6,6 +6,13 @@ audit, with listening feedback still pending. **No percussion adapter or UI
 eligibility change is implemented by this checkpoint.** Longer phone lookahead
 remains acceptable; startup-delay work stays deferred.
 
+Update: [owned kit configuration](MODULAR_AUDIO_ENGINE_M4C_KIT_CONFIGURATION.md)
+now closes the preparation gap measured below. This audit/report retains its
+historical negative results. The current reproduction tool writes a separate
+configured result, with the 0.25-level case now exact and malformed config
+rejected. Phone three-voice listening was subsequently confirmed clean; see
+the audition checkpoint. Actual All percussion integration remains next.
+
 ## Current authorities and incompatible families
 
 - `src/synths/all/host.js` creates `new Generator(settings)` with the existing

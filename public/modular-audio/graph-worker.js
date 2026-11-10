@@ -1,5 +1,5 @@
 // src/modular-audio/graphWorker.js
-import { ReferenceGraph } from "./runtime.js?v=f2251aa547f5b85b";
+import { ReferenceGraph } from "./runtime.js?v=20a8d8695d994f12";
 
 // src/modular-audio/workerDeliveryTiming.js
 var WorkerDeliveryTiming = class {

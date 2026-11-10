@@ -1019,3 +1019,13 @@ run-bound separately from automated verdicts. Records and limitations are in
 the audition doc. Setup hint reflects this bounded result. Next owned basic-kit
 configuration/persistence/parity, then actual Wasm-kit finite integration;
 native Piano/classics/real-song and lock-screen tests remain separate.
+
+[Owned basic-kit configuration](MODULAR_AUDIO_ENGINE_M4C_KIT_CONFIGURATION.md)
+now supplies the next prerequisite: validated/persisted selected palette and
+14 per-drum controls, immutable after graph preparation and retained on reset.
+56 configured PCM comparisons, independent instances, actual worker drum/kick
+buses, 30 allocation audits, 322 broad checks including 9 kit checks and public
+build pass. Legacy percussion Wasm stays byte-identical. All Drums eligibility /
+backend/defaults are unchanged. Next real Wasm-kit-only lease/shared-expression
+compiler and six-stem reporting, preserving external FX/mixer/legacy pads and
+explicit native/classic exclusions, before browser/phone acceptance.

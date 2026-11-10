@@ -9,7 +9,7 @@ mod pitched;
 mod fm_abi;
 #[cfg(target_arch = "wasm32")]
 mod core_abi;
-pub use calmbgm_percussion::Hit;
+pub use calmbgm_percussion::{DrumConfig, Hit, KitConfig};
 
 pub const MAX_NODES: usize = 64;
 pub const MAX_EDGES: usize = 128;
@@ -358,8 +358,13 @@ pub fn descriptors_json() -> String {
             events.push("\"connection\"");
         }
         if matches!(kind,Kind::Core|Kind::Fm) {events.push("\"note\"");events.push("\"cancel\"");}
-        let processing=if matches!(kind,Kind::Core|Kind::Fm){",\"processing\":\"prepared blocks\",\"configuration\":\"owned pitched spec v1; notes in graph events\",\"maxNoteEvents\":4000,\"maxAutomationPoints\":65536,\"latencyPolicy\":\"query prepared instance; FM reconstruction depends on quality\""}else{""};
-        modules.push(format!(r#"{{"type":"{}","code":{},"version":1,"hostInput":{},"latencyFrames":{},"tailFrames":{},"tailPolicy":"{}","bypass":"{}","reset":"phase and voices cleared; compressor gain reset","ports":[{}],"parameters":[{}],"events":[{}]{}}}"#,kind.name(),kind as u32,kind==Kind::HostInput,if kind==Kind::Fm{"null"}else{"0"},if matches!(kind,Kind::Percussion|Kind::Core|Kind::Fm){-1}else{0},if kind==Kind::Percussion{"event dependent, at most 8.1 seconds; -1 denotes variable frames"}else if matches!(kind,Kind::Core|Kind::Fm){"patch and held-note dependent"}else{"none"},if kind==Kind::Compressor{"5 ms unity crossfade"}else{"unsupported"},ports.join(","),params.join(","),events.join(","),processing));
+        let processing=if matches!(kind,Kind::Core|Kind::Fm){",\"processing\":\"prepared blocks\",\"configuration\":\"owned pitched spec v1; notes in graph events\",\"maxNoteEvents\":4000,\"maxAutomationPoints\":65536,\"latencyPolicy\":\"query prepared instance; FM reconstruction depends on quality\""}else if kind==Kind::Percussion{r#", "kitConfiguration":{"version":1,"voices":["felt","crisp","tr808","hand"],"slots":14,"immutableAfterPrepare":true,"absent":"raw hits; event model/tone/decay","initialLevels":"unity; legacy 20 ms target smoothing","reset":"retain kit; restore initial unity levels","fields":{"level":{"min":0,"max":2},"tone":{"min":-1,"max":1},"decay":{"min":0.5,"max":2}}}"#}else{""};
+        let descriptor=format!(r#"{{"type":"{}","code":{},"version":1,"hostInput":{},"latencyFrames":{},"tailFrames":{},"tailPolicy":"{}","bypass":"{}","reset":"phase and voices cleared; compressor gain reset","ports":[{}],"parameters":[{}],"events":[{}]{}}}"#,kind.name(),kind as u32,kind==Kind::HostInput,if kind==Kind::Fm{"null"}else{"0"},if matches!(kind,Kind::Percussion|Kind::Core|Kind::Fm){-1}else{0},if kind==Kind::Percussion{"event dependent, at most 8.1 seconds; -1 denotes variable frames"}else if matches!(kind,Kind::Core|Kind::Fm){"patch and held-note dependent"}else{"none"},if kind==Kind::Compressor{"5 ms unity crossfade"}else{"unsupported"},ports.join(","),params.join(","),events.join(","),processing);
+        if kind==Kind::Percussion {
+            // v1 stays raw. v2 requires the kit so older runtimes fail closed.
+            modules.push(descriptor.replace(processing,""));
+            modules.push(descriptor.replacen("\"version\":1","\"version\":2",1));
+        } else { modules.push(descriptor); }
     }
     format!(
         r#"{{"api":1,"patchVersion":1,"maxNodes":{},"maxEdges":{},"maxEvents":{},"maxBlock":{},"modules":[{}]}}"#,
@@ -391,6 +396,7 @@ type Result<T> = std::result::Result<T, Error>;
 
 struct Node {
     id: u32,
+    version: u32,
     kind: Kind,
     base: [f32; 10],
     phase: f64,
@@ -398,6 +404,7 @@ struct Node {
     buffer: Vec<[f32; 2]>,
     kick: Vec<[f32; 2]>,
     percussion: Option<Box<calmbgm_percussion::Engine>>,
+    percussion_kit: Option<KitConfig>,
     compressor: Option<Box<compressor::Compressor>>,
     pitched: Option<Box<pitched::Pitched>>,
 }
@@ -511,7 +518,7 @@ impl Graph {
     }
     pub fn add_node(&mut self, id: u32, kind: Kind, version: u32) -> Result<()> {
         self.editable()?;
-        if version != 1 || id == 0 {
+        if !(version == 1 || kind == Kind::Percussion && version == 2) || id == 0 {
             return Err(Error::Contract);
         }
         if self.nodes.len() == MAX_NODES {
@@ -538,6 +545,7 @@ impl Graph {
         self.nodes.push(Node {
             pitched: if matches!(kind,Kind::Core|Kind::Fm){Some(Box::new(pitched::Pitched::new(kind==Kind::Fm,self.sample_rate as f32)))}else{None},
             id,
+            version,
             kind,
             base,
             phase: 0.,
@@ -555,6 +563,7 @@ impl Graph {
             } else {
                 None
             },
+            percussion_kit: None,
             compressor: if kind == Kind::Compressor {
                 Some(Box::new(compressor::Compressor::new(
                     self.sample_rate as f32,
@@ -564,6 +573,24 @@ impl Graph {
             },
         });
         Ok(())
+    }
+    /// Immutable source configuration, never a timed/live kit edit.
+    pub fn percussion_config(&mut self, id: u32, version: u32, kit: KitConfig) -> Result<()> {
+        self.editable()?;
+        let i = self.index(id)?;
+        if version != 1 || self.nodes[i].kind != Kind::Percussion || self.nodes[i].version != 2 { return Err(Error::Contract); }
+        if !kit.valid() { return Err(Error::Bounds); }
+        self.nodes[i].percussion.as_mut().unwrap().configure_kit(kit);
+        self.nodes[i].percussion_kit = Some(kit);
+        Ok(())
+    }
+    pub fn percussion_drum(&mut self, id: u32, drum: usize, value: DrumConfig) -> Result<()> {
+        self.editable()?;
+        let i = self.index(id)?;
+        if self.nodes[i].kind != Kind::Percussion { return Err(Error::Contract); }
+        let mut kit = self.nodes[i].percussion_kit.ok_or(Error::State)?;
+        *kit.drums.get_mut(drum).ok_or(Error::Bounds)? = value;
+        self.percussion_config(id, 1, kit)
     }
     fn valid_param(&self, index: usize, param: usize, value: f32) -> Result<()> {
         let p = self.nodes[index]
@@ -713,6 +740,7 @@ impl Graph {
             return Err(Error::Contract);
         }
         for (i, n) in self.nodes.iter().enumerate() {
+            if n.kind == Kind::Percussion && n.version == 2 && n.percussion_kit.is_none() { return Err(Error::Contract); }
             for (port, p) in n.kind.ports().iter().enumerate() {
                 if p.required
                     && !self
@@ -895,6 +923,7 @@ impl Graph {
             n.kick.fill([0.; 2]);
             if let Some(p) = &mut n.percussion {
                 p.reset();
+                if let Some(kit) = n.percussion_kit { p.configure_kit(kit); }
             }
             if let Some(c) = &mut n.compressor {
                 c.reset();

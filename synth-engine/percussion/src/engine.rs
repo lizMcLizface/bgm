@@ -1241,6 +1241,32 @@ fn hand(v: &mut Voice, e: Event, b: f32, l: f32, sr: f32) {
 #[path = "abi.rs"]
 mod abi;
 
+/// Preparation-only basic kit snapshot. Voice codes match the preserved legacy
+/// ABI: Felt=1, Crisp=2, 808-inspired=3, Hand=4. Absence keeps raw-hit mode.
+#[derive(Clone, Copy, Debug)]
+pub struct DrumConfig {
+    pub on: bool,
+    pub level: f32,
+    pub tone: f32,
+    pub decay: f32,
+}
+impl Default for DrumConfig {
+    fn default() -> Self { Self { on: true, level: 1., tone: 0., decay: 1. } }
+}
+#[derive(Clone, Copy, Debug)]
+pub struct KitConfig {
+    pub voice: u32,
+    pub drums: [DrumConfig; 14],
+}
+impl KitConfig {
+    pub fn new(voice: u32) -> Self { Self { voice, drums: [DrumConfig::default(); 14] } }
+    pub fn valid(&self) -> bool {
+        (1..=4).contains(&self.voice) && self.drums.iter().all(|d|
+            d.level.is_finite() && (0. ..=2.).contains(&d.level)
+            && d.tone.is_finite() && (-1. ..=1.).contains(&d.tone)
+            && d.decay.is_finite() && (0.5..=2.).contains(&d.decay))
+    }
+}
 /// Semantic hit data. Engine resources, phase, noise and voices are instance owned.
 #[derive(Clone, Copy, Debug)]
 pub struct Hit {
@@ -1254,6 +1280,20 @@ pub struct Hit {
     pub model: u32,
 }
 impl Engine {
+    /// Called only by a preparing graph, or after its reset. Preserve the
+    /// legacy init -> kit messages ramp: levels start at unity, targets are
+    /// the captured kit. No live-kit smoothing/phase state is transplanted.
+    pub fn configure_kit(&mut self, kit: KitConfig) -> bool {
+        if !kit.valid() { return false; }
+        self.voice_preset = kit.voice;
+        self.levels = [1.; 14];
+        for (i, d) in kit.drums.iter().enumerate() {
+            self.targets[i] = if d.on { d.level } else { 0. };
+            self.tones[i] = d.tone;
+            self.decays[i] = d.decay;
+        }
+        true
+    }
     pub fn trigger(&mut self, frame: u64, owner: u32, hit: Hit) -> bool {
         if hit.drum >= 14 || frame > 9007199254740991 {
             return false;

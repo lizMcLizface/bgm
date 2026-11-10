@@ -355,6 +355,126 @@
       ]
     },
     {
+      "type": "legacy.percussion",
+      "code": 5,
+      "version": 2,
+      "hostInput": false,
+      "latencyFrames": 0,
+      "tailFrames": -1,
+      "tailPolicy": "event dependent, at most 8.1 seconds; -1 denotes variable frames",
+      "bypass": "unsupported",
+      "reset": "phase and voices cleared; compressor gain reset",
+      "ports": [
+        {
+          "id": "audio.out",
+          "code": 0,
+          "direction": "out",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": false
+        },
+        {
+          "id": "kick.out",
+          "code": 1,
+          "direction": "out",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "detector source",
+          "required": false
+        }
+      ],
+      "parameters": [
+        {
+          "id": "gain",
+          "code": 0,
+          "unit": "linear",
+          "min": 0,
+          "max": 2,
+          "default": 1,
+          "rate": "audio",
+          "modulation": true,
+          "smoothingMs": 0
+        },
+        {
+          "id": "mute",
+          "code": 1,
+          "unit": "boolean",
+          "min": 0,
+          "max": 1,
+          "default": 0,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "soloExcluded",
+          "code": 2,
+          "unit": "boolean",
+          "min": 0,
+          "max": 1,
+          "default": 0,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "ghost",
+          "code": 3,
+          "unit": "boolean",
+          "min": 0,
+          "max": 1,
+          "default": 0,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        }
+      ],
+      "events": [
+        "parameter",
+        "modulation",
+        "hit"
+      ],
+      "kitConfiguration": {
+        "version": 1,
+        "voices": [
+          "felt",
+          "crisp",
+          "tr808",
+          "hand"
+        ],
+        "slots": 14,
+        "immutableAfterPrepare": true,
+        "absent": "raw hits; event model/tone/decay",
+        "initialLevels": "unity; legacy 20 ms target smoothing",
+        "reset": "retain kit; restore initial unity levels",
+        "fields": {
+          "level": {
+            "min": 0,
+            "max": 2
+          },
+          "tone": {
+            "min": -1,
+            "max": 1
+          },
+          "decay": {
+            "min": 0.5,
+            "max": 2
+          }
+        }
+      }
+    },
+    {
       "type": "graph.compressor",
       "code": 6,
       "version": 1,

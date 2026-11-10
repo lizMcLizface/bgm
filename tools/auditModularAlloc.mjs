@@ -5,6 +5,7 @@ import {spawnSync} from 'node:child_process';
 import {OwnedFm} from '../public/modular-audio/owned-fm.js';
 import {OwnedCore} from '../public/modular-audio/owned-core.js';
 import {ReferenceGraph} from '../public/modular-audio/runtime.js';
+import {kit as percussionKit,hits as percussionHits,patch as percussionPatch,voices as percussionVoices} from './percussionKitCases.mjs';
 const local=path.resolve('.tmp/rust-tools'),env={...process.env,CARGO_HOME:path.join(local,'cargo'),RUSTUP_HOME:path.join(local,'rustup')};env.PATH=path.join(local,'cargo/bin')+path.delimiter+env.PATH;
 const run=spawnSync(path.join(local,'cargo/bin',process.platform==='win32'?'cargo.exe':'cargo'),['build','--offline','--release','--target','wasm32-unknown-unknown','--manifest-path','synth-engine/graph/Cargo.toml','--features','allocation-audit','--target-dir','.tmp/graph-allocation-target'],{env,stdio:'inherit'});if(run.error)throw run.error;if(run.status)process.exit(run.status);
 const module=new WebAssembly.Module(fs.readFileSync('.tmp/graph-allocation-target/wasm32-unknown-unknown/release/calmbgm_graph.wasm')),contracts=JSON.parse(fs.readFileSync('public/modular-audio/contracts.json')),results=[];
@@ -42,4 +43,11 @@ for(const mixed of [false,true])for(const rate of [44100,48000,96000]){
  for(const d of dsps){d.panic();d.reset();d.render(128);}g?.cancel(6);g?.reset();g?.render(128);
  const count=e.graph_alloc_count();e.graph_alloc_watch(0);if(count||e.memory.buffer.byteLength!==memory)throw Error('Owned core/six-source processing allocated/grew');dsps.forEach(d=>d.dispose());g?.dispose();results.push({fixture:mixed?'six-owned-sources-one-wasm':'three-owned-core-handles',rate,allocationOrReclamationCalls:count,memoryBytes:memory,grew:false});
 }
-fs.writeFileSync('.tmp/modular-audio-allocation-wasm.json',JSON.stringify({pass:true,scope:'Rust enqueue/render/cancel/reset after preparation, including external host I/O, owned FM/core and six owned sources sharing Wasm; Wasm counting allocator, not native runner',results},null,2)+'\n');console.log(`${results.length} Wasm allocation audits passed: zero allocation/reclamation calls or memory growth.`);
+for(const rate of [44100,48000,96000])for(const voice of percussionVoices){
+ const e=new WebAssembly.Instance(module,{}).exports,p=percussionPatch(percussionKit(voice),percussionHits(rate,true)),g=new ReferenceGraph(e,p,contracts,rate,512),memory=e.memory.buffer.byteLength;
+ e.graph_alloc_watch(1);
+ for(let at=0;at<Math.ceil(rate*9.25);){const n=Math.min(509,Math.ceil(rate*9.25)-at);g.render(n);at+=n;}
+ g.cancel(6);g.reset();for(const event of p.events)g.enqueue(event);g.render(511);g.cancel(6);g.reset();g.render(127);
+ const count=e.graph_alloc_count();e.graph_alloc_watch(0);if(count||e.memory.buffer.byteLength!==memory)throw Error('Configured percussion processing allocated/grew');g.dispose();results.push({fixture:'configured-owned-percussion',voice,rate,allocationOrReclamationCalls:count,memoryBytes:memory,grew:false});
+}
+fs.writeFileSync('.tmp/modular-audio-allocation-wasm.json',JSON.stringify({pass:true,scope:'Rust enqueue/render/cancel/reset after preparation, including configured owned percussion, external host I/O, owned FM/core and six owned sources sharing Wasm; Wasm counting allocator, not native runner',results},null,2)+'\n');console.log(`${results.length} Wasm allocation audits passed: zero allocation/reclamation calls or memory growth.`);

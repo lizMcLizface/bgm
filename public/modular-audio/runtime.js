@@ -210,6 +210,18 @@ function compilePitched(raw, fm, rate) {
   return { base, performance: p.performance, points, gains };
 }
 
+// src/modular-audio/percussionConfig.js
+function validatePercussionConfig(c, definition) {
+  if (c === void 0) return void 0;
+  const keys = (v, names) => v && typeof v === "object" && !Array.isArray(v) && Object.keys(v).length === names.length && names.every((k) => Object.hasOwn(v, k));
+  if (!definition || !keys(c, ["version", "voice", "drums"]) || c.version !== definition.version || !definition.voices.includes(c.voice) || !Array.isArray(c.drums) || c.drums.length !== definition.slots) throw Error("Invalid percussion kit configuration");
+  for (const d of c.drums) {
+    if (!keys(d, ["on", "level", "tone", "decay"]) || typeof d.on !== "boolean") throw Error("Invalid percussion drum configuration");
+    for (const [key, bounds] of Object.entries(definition.fields)) if (typeof d[key] !== "number" || !Number.isFinite(d[key]) || d[key] < bounds.min || d[key] > bounds.max) throw Error(`Invalid percussion ${key}`);
+  }
+  return c;
+}
+
 // src/modular-audio/runtime.js
 var checked = (code) => {
   if (code) throw Error(`Graph rejected operation (${code})`);
@@ -230,6 +242,10 @@ function validatePatch(raw, contracts) {
     }
     modules.set(n.id, d);
     if (["legacy.core", "legacy.fm"].includes(d.type)) n.config = validatePitchedConfig(n.config, d.type === "legacy.fm");
+    if (d.type === "legacy.percussion") {
+      if (n.version === 1 && n.config !== void 0 || n.version === 2 && n.config === void 0) throw Error("Invalid percussion kit: requires module version 2 and complete configuration");
+      if (n.version === 2) n.config = validatePercussionConfig(n.config, d.kitConfiguration);
+    }
     dependencies.set(n.id, /* @__PURE__ */ new Set());
   }
   for (const e of p.connections) {
@@ -306,7 +322,7 @@ var ReferenceGraph = class {
     if (!Number.isInteger(maxBlock) || maxBlock < 1 || maxBlock > contracts.maxBlock) throw Error("Invalid block size");
     this.patch = validatePatch(patch, contracts);
     this.contracts = contracts;
-    this.modules = new Map(this.patch.modules.map((n) => [n.id, contracts.modules.find((d) => d.type === n.type)]));
+    this.modules = new Map(this.patch.modules.map((n) => [n.id, contracts.modules.find((d) => d.type === n.type && d.version === n.version)]));
     if (engine.graph_api() !== contracts.api) throw Error("Graph ABI mismatch");
     this.handle = engine.graph_new(sampleRate, maxBlock);
     if (!this.handle) throw Error("Invalid sample rate/block size");
@@ -316,6 +332,11 @@ var ReferenceGraph = class {
         const d = this.modules.get(n.id);
         checked(engine.graph_node(this.handle, n.id, d.code, n.version));
         for (const [key, value] of Object.entries(n.parameters)) checked(engine.graph_base(this.handle, n.id, d.parameters.find((p) => p.id === key).code, value));
+        if (d.type === "legacy.percussion" && n.config) {
+          const c = n.config;
+          checked(engine.graph_percussion_config(this.handle, n.id, c.version, d.kitConfiguration.voices.indexOf(c.voice) + 1));
+          c.drums.forEach((v, i) => checked(engine.graph_percussion_drum(this.handle, n.id, i, Number(v.on), v.level, v.tone, v.decay)));
+        }
         if (["legacy.core", "legacy.fm"].includes(d.type)) {
           const c = compilePitched(n.config, d.type === "legacy.fm", sampleRate);
           for (const [scope, index, value] of c.base) checked(engine.graph_pitch_config(this.handle, n.id, scope, index, value));
