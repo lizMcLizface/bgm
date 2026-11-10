@@ -27,6 +27,22 @@ fn status(result: Result<()>) -> u32 {
 fn piano_status(g:&mut Graph,id:u32,f:impl FnOnce(&mut calmbgm_piano::voice::Engine)->bool)->u32 {
     match g.piano_edit(id){Ok(p)=>if f(p){0}else{Error::Contract as u32},Err(e)=>e as u32}
 }
+fn iowa_status(g:&mut Graph,id:u32,f:impl FnOnce(&mut calmbgm_iowa::Engine)->bool)->u32 {match g.iowa_edit(id){Ok(p)=>if f(p){0}else{Error::Contract as u32},Err(e)=>e as u32}}
+#[no_mangle]
+pub extern "C" fn graph_iowa_config(g:&mut Graph,id:u32,voices:usize)->u32{iowa_status(g,id,|p|p.configure(voices))}
+#[no_mangle]
+pub extern "C" fn graph_iowa_spec(g:&mut Graph,id:u32,spec:u32,kind:u32,f0:f64,seconds:f64,rate:f64,depth:f64,tremolo:f64,pitch:f64,level:f64)->u32{if kind>1{return Error::Contract as u32;}iowa_status(g,id,|p|p.spec(calmbgm_iowa::Spec::new(spec,kind==1,f0,seconds,rate,depth,tremolo,pitch,level)))}
+#[no_mangle]
+pub extern "C" fn graph_iowa_note_spec(g:&mut Graph,id:u32,note:u32,spec:u32,midi:f32,velocity:f32,gain:f64,tune:f64,ring:u32,roll_rate:f64,roll_level:f64,roll_timing:f64,slide_cents:f64,slide_seconds:f64)->u32{if ring>1{return Error::Contract as u32;}iowa_status(g,id,|p|p.note_spec(calmbgm_iowa::Note{id:note,spec:0,midi,velocity,gain,tune,ring:ring!=0,roll:[roll_rate,roll_level,roll_timing],slide:[slide_cents,slide_seconds]},spec))}
+// Preparation-only trusted-host scratch handles. Never retained by the engine.
+#[no_mangle]
+pub extern "C" fn graph_iowa_buffer_new(length:usize)->*mut Vec<f64>{if length>262144{return std::ptr::null_mut();}Box::into_raw(Box::new(vec![0.;length]))}
+#[no_mangle]
+pub extern "C" fn graph_iowa_buffer_ptr(b:&mut Vec<f64>)->*mut f64{b.as_mut_ptr()}
+#[no_mangle]
+pub unsafe extern "C" fn graph_iowa_buffer_free(b:*mut Vec<f64>){if !b.is_null(){drop(Box::from_raw(b));}}
+#[no_mangle]
+pub extern "C" fn graph_iowa_data(g:&mut Graph,id:u32,spec:u32,field:u32,b:&Vec<f64>)->u32{iowa_status(g,id,|p|p.data(spec,field,b))}
 #[no_mangle]
 pub extern "C" fn graph_piano_config(g:&mut Graph,id:u32,voices:usize,cutoff:f64,q:f64,pitch:f64,decay:f64)->u32 {piano_status(g,id,|p|p.configure(voices,cutoff,q,pitch,decay))}
 #[no_mangle]

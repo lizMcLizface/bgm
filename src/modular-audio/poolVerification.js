@@ -6,8 +6,8 @@ import {AlignedSourcePool} from './poolProtocol';
 import {subnormalPair,CROSS_CADENCE_POLICY} from './pcmComparison';
 const base=`${import.meta.env.BASE_URL}modular-audio/`;
 
-export async function verifyPool(assets,rate,{makeWorker=()=>new Worker(base+`graph-worker.js?v=${assets.manifest.version}`,{type:'module'}),generation=1,seconds=assets.fixture.totalSeconds,options:requestedOptions={}}={}){
-  const o=workerOptions({...requestedOptions,generation}),patch=sixSourceDag(assets.fixture,rate),plan=planSourcePool(patch,assets.contracts),end=Math.round(seconds*rate),workers=plan.groups.map(()=>makeWorker()),channels=workers.map(()=>new MessageChannel());
+export async function verifyPool(assets,rate,{makeWorker=()=>new Worker(base+`graph-worker.js?v=${assets.manifest.version}`,{type:'module'}),generation=1,seconds=assets.fixture.totalSeconds,options:requestedOptions={},patch:requestedPatch=null}={}){
+  const o=workerOptions({...requestedOptions,generation}),patch=requestedPatch??sixSourceDag(assets.fixture,rate),plan=planSourcePool(patch,assets.contracts),end=Math.round(seconds*rate),workers=plan.groups.map(()=>makeWorker()),channels=workers.map(()=>new MessageChannel());
   const referenceBlockFrames=Math.max(1024,o.blockFrames),master=new ReferenceGraph(new WebAssembly.Instance(assets.modules.graph,{}).exports,plan.master,assets.contracts,rate,o.blockFrames),serial=new ReferenceGraph(new WebAssembly.Instance(assets.modules.graph,{}).exports,patch,assets.contracts,rate,referenceBlockFrames);
   const inputs=Array.from({length:7},(_,i)=>master.inputs.get(i+1)),reference=sourceViews(serial),actual=new Float32Array(o.bufferBytes/4),expected=new Float32Array(referenceBlockFrames*16);
   const sameCadence=o.blockFrames===referenceBlockFrames?serial:new ReferenceGraph(new WebAssembly.Instance(assets.modules.graph,{}).exports,patch,assets.contracts,rate,o.blockFrames),sameViews=sourceViews(sameCadence),sameExpected=sameCadence===serial?expected:new Float32Array(o.bufferBytes/4);

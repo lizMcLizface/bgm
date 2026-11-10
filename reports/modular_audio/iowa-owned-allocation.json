@@ -1,0 +1,81 @@
+{
+  "kind": "iowa.owned-dsp-allocation",
+  "version": 1,
+  "engineVersion": "67dc7a260e3e0ae7",
+  "pass": true,
+  "scope": "Wasm counting allocator; two handles share memory; prepared held/decay/roll rendering, 32-voice stealing, release, enqueue, reset, owner cancellation and partial-tick pause; no native runner.",
+  "results": [
+    {
+      "id": "flute",
+      "rate": 44100,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 8847360,
+      "grew": false,
+      "handles": 2
+    },
+    {
+      "id": "flute",
+      "rate": 48000,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 8847360,
+      "grew": false,
+      "handles": 2
+    },
+    {
+      "id": "flute",
+      "rate": 96000,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 8847360,
+      "grew": false,
+      "handles": 2
+    },
+    {
+      "id": "guitar",
+      "rate": 44100,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 7929856,
+      "grew": false,
+      "handles": 2
+    },
+    {
+      "id": "guitar",
+      "rate": 48000,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 7929856,
+      "grew": false,
+      "handles": 2
+    },
+    {
+      "id": "guitar",
+      "rate": 96000,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 7929856,
+      "grew": false,
+      "handles": 2
+    },
+    {
+      "id": "marimba-roll",
+      "rate": 44100,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 7995392,
+      "grew": false,
+      "handles": 2
+    },
+    {
+      "id": "marimba-roll",
+      "rate": 48000,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 7995392,
+      "grew": false,
+      "handles": 2
+    },
+    {
+      "id": "marimba-roll",
+      "rate": 96000,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 7995392,
+      "grew": false,
+      "handles": 2
+    }
+  ]
+}

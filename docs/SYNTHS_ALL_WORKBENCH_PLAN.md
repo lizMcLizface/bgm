@@ -1114,3 +1114,15 @@ core/FM/Hand, with modulation and forced stealing. All four local full-path case
 pass with zero worker delivery gaps. Existing default preparation and All storage
 stay unchanged. Physical listening is the next gate; Iowa's actual held/decay/roll
 voice contract follows. Other source families and host migration remain separate.
+
+2026-11-10: [M4j](MODULAR_AUDIO_ENGINE_M4J_IOWA_VOICES.md) makes actual ready Iowa
+sources eligible for the finite owned graph preview, capturing their settled
+tables/settings and routing at the original pre-room bus. The new fixed mixed
+page tools/iowa-voice.html batches Held/Roll, piano, core/FM and Hand without desk
+navigation or settings matching. All four built-in-browser serial/worker cases
+and separate audible routed output pass, with zero worker underruns/late blocks.
+Source arrays persist in saved graphs; oversized diagnostic arrays are summarized
+while complete input fingerprints remain. Existing All song/settings/defaults
+are preserved.405 local reference comparisons cover all45 patches. No new phone
+gate per family: next is portable Iowa measurement/FFT preparation; live dynamics,
+other native sources and host FX/mixer migration stay explicit follow-up work.

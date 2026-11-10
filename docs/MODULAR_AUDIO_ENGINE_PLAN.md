@@ -1156,3 +1156,19 @@ finite-song and explicit preset precedence remain intact. Continue larger local
 source-integration milestones before requesting a new meaningful audible/device
 check. Next native Piano ownership/contract audit; no automatic source replacement
 or full transport migration. Exact results/limits are in the linked document.
+
+### M4j — Iowa owned realtime voices (2026-11-10)
+
+[M4j](MODULAR_AUDIO_ENGINE_M4J_IOWA_VOICES.md) delivers the actual Held/Decay/Roll
+realtime DSP as legacy.iowa with immutable numeric banks, canonical128-frame note
+clocks, owned RNG/voices/roll hits, validation, stereo output/gain modulation and
+save/reload. Default/native playback remains.405 original-worklet comparisons
+across45 patches/three rates pass (403 bit-exact; max4.656612873077393e-10), nine
+new allocation cases have zero render allocations/frees/growth, and mixed one/
+three-worker source+sidechain verification is exact. The built-in-browser serial/
+worker audition/progression batch and separate audible mixed output pass without
+worker delivery gaps. Broad553 tests and focused128/66 overlapping suites pass;
+public packaging/provenance pass. There is no new per-preset phone gate.
+Next boundary: Rust Iowa measurement interpolation, settling, FFT/wavetable and
+noise/burst preparation; existing JS preparation remains explicit outside render.
+Live expression, other native families and portable host FX/mixer are still open.

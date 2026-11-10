@@ -5,6 +5,10 @@ vi.mock('./iowaModel/player',()=>({default:class {
 }}));
 import IowaInstrument from './iowaInstrument';
 
+it('retains a leased source effects route and releases it idempotently, including disposal',async()=>{
+ const context={currentTime:100,createGain:()=>({gain:{value:0},disconnect:vi.fn()})},i=await IowaInstrument.create({context,preset:{iowa:'flute'}});
+ expect(i.effectsAwake()).toBe(false);const first=i.holdSourceInput(),second=i.holdSourceInput();expect(i.effectsAwake()).toBe(true);first();first();expect(i.sourceInputs).toBe(1);second();expect(i.effectsAwake()).toBe(false);const after=i.holdSourceInput();i.dispose();after();expect(i.sourceInputs).toBe(0);i.dispose();expect(state.player.dispose).toHaveBeenCalledOnce();expect(()=>i.holdSourceInput()).toThrow('Disposed');
+});
 it('applies the measured instrument tuning and vibrato to scheduled and played notes',async()=>{
  const context={createGain:()=>({gain:{value:0},disconnect:vi.fn()})};
  const instrument=await IowaInstrument.create({context,preset:{iowa:'flute',tune:25,vibrato:.4}});

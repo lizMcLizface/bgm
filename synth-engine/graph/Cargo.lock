@@ -8,6 +8,7 @@ version = "0.1.0"
 dependencies = [
  "calmbgm-synth",
  "calmbgm_fm",
+ "calmbgm_iowa",
  "calmbgm_percussion",
  "calmbgm_piano",
 ]
@@ -18,6 +19,10 @@ version = "0.1.0"
 
 [[package]]
 name = "calmbgm_fm"
+version = "0.1.0"
+
+[[package]]
+name = "calmbgm_iowa"
 version = "0.1.0"
 
 [[package]]

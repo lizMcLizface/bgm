@@ -19,6 +19,7 @@ export default class IowaInstrument {
         this.player.setRoom(preset.reverbAmount ?? DEFAULT_ROOM);
         this.player.setVibrato(preset.vibrato ?? 1);
         this.reverb = { settled: true }; this.held = new Map(); this.lastUntil = 0;
+        this.disposed=false;this.sourceInputs=0;
     }
     connect(node) { this.output.connect(node); }
     scheduleNote(midi, start, duration, velocity = .7, detune = 0, expression) {
@@ -60,7 +61,8 @@ export default class IowaInstrument {
     futureBookings() { return []; }
     tailSeconds() { return 4; }
     awakeVoices() { return this.AC.currentTime < this.lastUntil + this.tailSeconds() ? 1 : 0; }
-    effectsAwake() { return this.awakeVoices() > 0; }
+    effectsAwake() { return this.sourceInputs>0||this.awakeVoices() > 0; }
+    holdSourceInput(){if(this.disposed)throw Error('Disposed Iowa instrument');this.sourceInputs++;let released=false;return()=>{if(released)return;released=true;this.sourceInputs=Math.max(0,this.sourceInputs-1);};}
     activeEffects() { return ['Measured voice', 'Room']; }
-    dispose() { this.player.dispose(); this.output.disconnect(); }
+    dispose() { if(this.disposed)return;this.disposed=true;this.sourceInputs=0;this.player.dispose(); this.output.disconnect(); }
 }

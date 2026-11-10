@@ -943,6 +943,61 @@
       "maxAutomationPoints": 65536,
       "stealing": "prepared 10 ms fade; same-slot onsets closer than 10 ms rejected",
       "resampling": "linear; approximate native AudioBufferSource parity"
+    },
+    {
+      "type": "legacy.iowa",
+      "code": 11,
+      "version": 1,
+      "hostInput": false,
+      "latencyFrames": 0,
+      "tailFrames": -1,
+      "tailPolicy": "prepared release, decay lifetime and roll dependent",
+      "bypass": "unsupported",
+      "reset": "phase and voices cleared; compressor gain reset",
+      "ports": [
+        {
+          "id": "audio.out",
+          "code": 0,
+          "direction": "out",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": false
+        }
+      ],
+      "parameters": [
+        {
+          "id": "gain",
+          "code": 0,
+          "unit": "linear",
+          "min": 0,
+          "max": 2,
+          "default": 1,
+          "rate": "audio",
+          "modulation": true,
+          "smoothingMs": 0
+        }
+      ],
+      "events": [
+        "parameter",
+        "modulation",
+        "note",
+        "cancel"
+      ],
+      "processing": "owned Held/Decay/Roll on canonical 128-frame ticks",
+      "configuration": "prepared immutable Iowa spec v1; host preparation remains separate",
+      "eventQuantumFrames": 128,
+      "maxPreparedSpecs": 96,
+      "maxNotes": 2000,
+      "maxVoices": 32,
+      "maxRollHits": 12,
+      "maxPreparedBytes": 67108864,
+      "timingPolicy": "on/off at legacy quantum; arbitrary executor blocks do not alter voice ticks"
     }
   ]
 }

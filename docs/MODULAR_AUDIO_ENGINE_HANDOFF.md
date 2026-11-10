@@ -2716,3 +2716,38 @@ family. Request listening only for transport behavior changes, live-path
 migration, or a concrete sound discrepancy that local capture cannot resolve.
 Default live playback is still the existing path, so its continued operation is
 expected while the opt-in graph is being ported. Continue Iowa Held/Decay/Roll.
+
+## 2026-11-10 — M4j owned Iowa realtime voices
+
+[M4j](MODULAR_AUDIO_ENGINE_M4J_IOWA_VOICES.md) ports the original Held/Decay/Roll
+DSP into owned Rust, with immutable prepared banks, strict typed validation,
+legacy 128-frame note clocks, gain modulation, stereo source buses, owner
+cancellation, FIFO stealing, reset/pause and complete graph persistence. The All
+lease uses the actual pre-room player.bus and keeps the effects route awake.
+Default/native playback stays operational; measurement/FFT preparation remains
+JS outside render and is the next explicit porting boundary.
+
+Graph 67dc7a260e3e0ae7 /996483 bytes passes provenance. All45 patches pass405
+original-worklet comparisons at44.1/48/96kHz;403 bit-exact, maximum sample error
+4.656612873077393e-10. Save/load, irregular partitions, independent shared-memory
+handles, owner cancellation, tuning/slides, timing, stealing and raw ABI checks
+pass. One/three-worker mixed Held/Roll+piano+core/FM/drums plus sidechain output
+are exact at matching cadence. Nine new two-handle allocation cases and30 prior
+cases report zero allocations/frees/growth. Broad553/68 and focused128/9 tests
+pass; final66/5 transition tests pass (overlapping runs, not additive). Final
+public build/package validation passes in39.41s. No deploy/push.
+
+Built-in-browser four-case full-path batch passes:942000-frame audition and
+726000-frame progression, serial/actual worker, no worker underruns/late blocks.
+A separate audible942000-frame worker audition has all six source/channel peaks
+positive and master0.13780248165130615, with no delivery errors. Evidence:
+iowa-full-path-browser.json, iowa-audible-browser.json, iowa-owned-compatibility.json,
+iowa-owned-allocation.json and iowa-mixed-browser.png under reports/modular_audio.
+This records output/counters, not physical listening. The initial Chrome fallback
+was blocked; the completed verification used the restored built-in browser.
+
+The fixed tools/iowa-voice.html needs no settings matching. Per user steering,
+continue larger automated batches; there is no new preset/family phone gate.
+Next: port Iowa measurement/interpolation/FFT preparation behind the immutable
+prepared contract, with local table parity and resource tests. Live dynamic
+expression, other native families and host FX/mixer remain separate tasks.

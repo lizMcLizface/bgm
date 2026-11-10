@@ -1484,3 +1484,13 @@ measured-table piano families to preparation and the owned graph. Actual tables,
 interpolation and modal/noise DSP are preserved. 552 tests,32 native comparisons,
 52 allocation audits and the measured serial/worker full-path batch pass. Existing
 host effects/mixer boundaries remain. Next: measured listening, then Iowa voices.
+
+2026-11-10: [M4j](MODULAR_AUDIO_ENGINE_M4J_IOWA_VOICES.md) adds owned Iowa Held/
+Decay/Roll realtime DSP through the actual pre-room player.bus and existing role
+FX/mixer/master. A source lease keeps its effects route awake and rejects stale
+settings. The mixed Iowa+measured piano+core/FM/Hand built-in-browser serial/
+worker batch and audible source/channel/master output pass with no worker gaps.
+405 reference comparisons and nine new allocation cases pass. Defaults and host
+FX ownership remain unchanged. Iowa measurement/FFT preparation is still JS and
+is next; portable host FX/mixer and live backend migration remain later work.
+Device checks are reserved for meaningful behavior/transport changes, per user.

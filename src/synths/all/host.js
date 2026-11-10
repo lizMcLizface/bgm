@@ -30,6 +30,7 @@ import {presetFromEdit} from '../../app/editor/presetEdits';
 import {createMixerAudio,createDeskLimiter} from './mixerAudio';
 import {sourceStemTap} from './sourceStemTap';
 import {pianoStemTap} from './pianoStemTap';
+import {iowaStemTap} from './iowaStemTap';
 import {percussionStemTap} from './percussionStemTap';
 import {readBook,withPresetBook,applyBook,cleanBook,baselineChoice,withoutSettings} from '../../app/rulebook/session';
 import {RULES} from '../../app/rulebook/model';
@@ -269,7 +270,7 @@ export function createHost(scene, {seed,settings:storedSettings} = {}) {
     }
     function applyDesk(state){deskState=state;deskAudio?.patch(state);}
 
-    const stemTap=(role,instrument,guard)=>role==='perc'?percussionStemTap(instrument,{input:g.roles.perc.gain,machine:g.roles.perc.machine},guard):(instrument?.voice?.native??(instrument?.synthMix?instrument:null))?.preset?.stringModel==='piano'?pianoStemTap(instrument,guard):sourceStemTap(instrument,guard);
+    const stemTap=(role,instrument,guard)=>role==='perc'?percussionStemTap(instrument,{input:g.roles.perc.gain,machine:g.roles.perc.machine},guard):(instrument?.voice?.native??(instrument?.synthMix?instrument:null))?.preset?.stringModel==='piano'?pianoStemTap(instrument,guard):instrument?.preset?.iowa?iowaStemTap(instrument,guard):sourceStemTap(instrument,guard);
     function sourcePreviewStatus(role){try{ensureActive();const tap=stemTap(role,g.roles[role]?.instrument,ensureActive);return {eligible:true,kind:tap.kind};}catch(e){return {eligible:false,reason:e.message};}}
     function openSourceStem(role,onClose=()=>{}){
         ensureActive();const instrument=g.roles[role]?.instrument,sourceRevision=g.roles[role]?.sourceRevision,tuningKey=JSON.stringify(tuning.get());let closed=false;

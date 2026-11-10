@@ -12,6 +12,7 @@ calmbgm_percussion = { path = "../percussion", default-features = false }
 calmbgm_fm = { path = "../fm", default-features = false, features = ["cache-colour-coefficients"] }
 calmbgm_core = { package = "calmbgm-synth", path = "..", default-features = false }
 calmbgm_piano = { path = "../piano" }
+calmbgm_iowa = { path = "../iowa" }
 
 [features]
 allocation-audit = []

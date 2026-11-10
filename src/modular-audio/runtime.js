@@ -3,6 +3,7 @@
 import {compilePitched,validatePitchedConfig} from './pitchedCompiler.js';
 import {validatePercussionConfig} from './percussionConfig.js';
 import {validatePianoConfig,PIANO_TYPES} from './pianoConfig.js';
+import {validateIowaConfig,iowaFields} from './iowaConfig.js';
 export const checked = code => { if (code) throw Error(`Graph rejected operation (${code})`); };
 const uint = n => Number.isInteger(n) && n > 0 && n <= 0xffffffff;
 const frame = n => Number.isSafeInteger(n) && n >= 0;
@@ -23,6 +24,7 @@ export function validatePatch(raw, contracts) {
     modules.set(n.id, d);
     if(['legacy.core','legacy.fm'].includes(d.type))n.config=validatePitchedConfig(n.config,d.type==='legacy.fm');
     if(d.type==='legacy.piano'){n.config=validatePianoConfig(n.config);if(n.version!==n.config.version)throw Error('Piano module/configuration version mismatch');}
+    if(d.type==='legacy.iowa')n.config=validateIowaConfig(n.config);
     if(d.type==='legacy.percussion'){
       if(n.version===1&&n.config!==undefined||n.version===2&&n.config===undefined)throw Error('Invalid percussion kit: requires module version 2 and complete configuration');
       if(n.version===2)n.config=validatePercussionConfig(n.config,d.kitConfiguration);
@@ -49,7 +51,7 @@ export function validatePatch(raw, contracts) {
     dependencies.get(e.to.module).add(e.from.module);
   }
   if(p.modules.filter(n=>n.type==='legacy.percussion').length>8)throw Error('Percussion instance limit exceeded');
-  if(p.modules.filter(n=>['legacy.core','legacy.fm','legacy.piano'].includes(n.type)).length>8)throw Error('Pitched instance limit exceeded');
+  if(p.modules.filter(n=>['legacy.core','legacy.fm','legacy.piano','legacy.iowa'].includes(n.type)).length>8)throw Error('Pitched instance limit exceeded');
   if([...modules.values()].filter(d=>d.type==='ref.output').length!==1)throw Error('Exactly one output is required');
   for(const [id,d] of modules)for(const port of d.ports)if(port.required&&!inputs.has(`${id}:${port.id}`))throw Error('Missing required input');
   const ready=new Set();
@@ -65,6 +67,7 @@ export function validatePatch(raw, contracts) {
        if(ends.length>=n.config.voices)throw Error('Piano voice-steal fade is not supported');ends.push(e.frame+v.gain.at(-1)[1]);}
     }
   }
+  for(const n of p.modules.filter(n=>n.type==='legacy.iowa')){const used=new Set();for(const e of p.events.filter(e=>e.target===n.id&&e.kind==='note'&&e.event!==4)){const v=n.config.notes.find(v=>v.id===e.note);if(!v||e.event===0&&(used.has(v.id)||Math.fround(e.a)!==Math.fround(v.midi)||Math.fround(e.b)!==Math.fround(v.velocity)))throw Error('Iowa trigger/configuration mismatch');if(e.event===0)used.add(v.id);}}
   for(const n of p.modules)if(p.events.filter(e=>e.target===n.id&&e.kind==='note').length>4000)throw Error('Pitched note capacity exceeded');
   return p;
 }
@@ -72,7 +75,8 @@ export function validatePatch(raw, contracts) {
 function eventPacket(e, modules, connections) {
   const d = modules.get(e.target);
   if (!frame(e.frame) || !uint(e.owner) || !d) throw Error('Invalid event frame/ownership/target');
-  if(['legacy.core','legacy.fm','legacy.piano'].includes(d.type)){
+  if(['legacy.core','legacy.fm','legacy.piano','legacy.iowa'].includes(d.type)){
+    if(d.type==='legacy.iowa'&&e.kind==='note'&&(![0,1,4].includes(e.event)||e.frame%128!==0))throw Error('Iowa notes require canonical 128-frame ticks');
     if(d.type==='legacy.piano'&&e.kind==='note'&&![0,4].includes(e.event))throw Error('Unsupported finite piano event');
     if(e.kind==='cancel')return [e.frame,e.target,e.owner,4,0,0];
     if(e.kind==='note'&&Number.isInteger(e.event)&&e.event>=0&&e.event<=6&&Number.isInteger(e.note)&&e.note>=0&&e.note<=0xffffffff&&finite(e.a)&&finite(e.b)){
@@ -101,6 +105,7 @@ export class ReferenceGraph {
     if (!Number.isInteger(maxBlock) || maxBlock < 1 || maxBlock > contracts.maxBlock) throw Error('Invalid block size');
     this.patch = validatePatch(patch, contracts);
     if(this.patch.modules.some(n=>n.type==='legacy.piano')&&sampleRate!==48000)throw Error('Prepared piano v1 requires 48 kHz');
+    if(this.patch.modules.some(n=>n.type==='legacy.iowa'&&n.config.sampleRate!==sampleRate))throw Error('Prepared Iowa sample rate mismatch');
     this.contracts = contracts;
     this.modules = new Map(this.patch.modules.map(n => [n.id, contracts.modules.find(d => d.type === n.type && d.version === n.version)]));
     if (engine.graph_api() !== contracts.api) throw Error('Graph ABI mismatch');
@@ -117,7 +122,13 @@ export class ReferenceGraph {
           checked(engine.graph_percussion_config(this.handle,n.id,c.version,d.kitConfiguration.voices.indexOf(c.voice)+1));
           c.drums.forEach((v,i)=>checked(engine.graph_percussion_drum(this.handle,n.id,i,Number(v.on),v.level,v.tone,v.decay)));
         }
+        if(d.type==='legacy.iowa'){
+          const c=n.config;checked(engine.graph_iowa_config(this.handle,n.id,c.voices));
+          for(const s of c.banks){checked(engine.graph_iowa_spec(this.handle,n.id,s.id,Number(s.kind==='decay'),s.f0??0,s.seconds??0,s.rate??0,s.depth??0,s.tremolo??0,s.pitchWander??0,s.levelWander??0));for(const [field,a]of iowaFields(s)){const ptr=engine.graph_iowa_buffer_new(a.length);if(!ptr)throw Error('Iowa preparation scratch bound exceeded');try{new Float64Array(engine.memory.buffer,engine.graph_iowa_buffer_ptr(ptr),a.length).set(a);checked(engine.graph_iowa_data(this.handle,n.id,s.id,field,ptr));}finally{engine.graph_iowa_buffer_free(ptr);}}}
+          for(const v of c.notes)checked(engine.graph_iowa_note_spec(this.handle,n.id,v.id,v.bank,v.midi,v.velocity,v.gain,v.tune,Number(v.ring),v.roll?.rate??0,v.roll?.level??0,v.roll?.timing??0,v.slide?.cents??0,v.slide?.seconds??0));
+        }
         if(d.type==='legacy.piano'){
+
           const c=n.config;checked(engine.graph_piano_config(this.handle,n.id,c.voices,c.cutoff,c.q,c.pitch,c.pitchDecay));
           for(const [i,m]of (c.controls??[]).entries()){checked(engine.graph_piano_control(this.handle,n.id,Number(m.axis==='filter'),Number(m.kind==='linear'),m.phase,m.frequency,m.initialDepth,m.targetDepth,m.tauFrames));for(const [frame,value]of m.points)checked(engine.graph_piano_control_point(this.handle,n.id,i,frame,value));}
           for(const b of c.banks)checked(engine.graph_piano_bank(this.handle,n.id,b.frequency,PIANO_TYPES.indexOf(b.type),b.decay,b.brightness,b.hammer,b.unison,b.velocity,b.seed,b.resonance,b.softness,b.sustain,b.wear));
@@ -163,7 +174,7 @@ export class ReferenceGraph {
   alive() { if (!this.handle) throw Error('Disposed graph'); }
   render(frames) { this.alive(); if (!Number.isInteger(frames) || frames < 0 || frames > this.maxBlock) throw Error('Invalid frame count'); checked(this.engine.graph_render(this.handle,frames)); }
   stats() { this.alive(); return Object.fromEntries(['frame','late','overflow','applied'].map((key,i) => [key,this.engine.graph_stat(this.handle,i)])); }
-  pitchedStats(id){this.alive();if(!['legacy.core','legacy.fm','legacy.piano'].includes(this.modules.get(id)?.type))throw Error('Not a pitched node');return Object.fromEntries(['active','steals','dropped','late','frame','peak','latencyFrames','peakActive'].map((key,i)=>[key,this.engine.graph_pitch_stat(this.handle,id,i)]));}
+  pitchedStats(id){this.alive();if(!['legacy.core','legacy.fm','legacy.piano','legacy.iowa'].includes(this.modules.get(id)?.type))throw Error('Not a pitched node');return Object.fromEntries(['active','steals','dropped','late','frame','peak','latencyFrames','peakActive'].map((key,i)=>[key,this.engine.graph_pitch_stat(this.handle,id,i)]));}
   percussionStats(id){this.alive();if(this.modules.get(id)?.type!=='legacy.percussion')throw Error('Not percussion');return Object.fromEntries(['active','queued','steals','dropped','late','frame','peakActive'].map((key,i)=>[key,this.engine.graph_percussion_stat(this.handle,id,i)]));}
   meters() {this.alive();return Object.fromEntries([...this.modules].filter(([,d])=>d.type==='graph.compressor').map(([id])=>[id,Object.fromEntries(['inputPeak','keyPeak','reductionDb','outputPeak','missingKey','externalKey'].map((key,i)=>[key,this.engine.graph_meter(this.handle,id,i)]))]));}
   pause(value) { this.alive(); this.engine.graph_pause(this.handle,Number(value)); }

@@ -7,7 +7,7 @@ export function planSourcePool(raw,contracts,groups=DEFAULT_SOURCE_GROUPS){
   const patch=validatePatch(raw,contracts),sourceIds=[1,2,3,4,5,6];
   groups=groups.map(g=>[...g]);
   if(groups.length<2||groups.length>6||groups.some(g=>!g.length)||groups.flat().length!==6||new Set(groups.flat()).size!==6||groups.flat().some(id=>!sourceIds.includes(id)))throw Error('Pool must partition all six sources exactly once');
-  for(const id of sourceIds){const n=patch.modules.find(n=>n.id===id);if(!n||!['legacy.core','legacy.fm','legacy.piano','legacy.percussion'].includes(n.type)||(id===6)!==(n.type==='legacy.percussion'))throw Error('Unsupported source partition');}
+  for(const id of sourceIds){const n=patch.modules.find(n=>n.id===id);if(!n||!['legacy.core','legacy.fm','legacy.piano','legacy.iowa','legacy.percussion'].includes(n.type)||(id===6)!==(n.type==='legacy.percussion'))throw Error('Unsupported source partition');}
   if(patch.modules.some(n=>!sourceIds.includes(n.id)&&!['ref.mix','graph.compressor','ref.output'].includes(n.type))||patch.connections.some(e=>e.kind!=='audio'||sourceIds.includes(e.to.module)||sourceIds.includes(e.from.module)&&!['audio.out','kick.out'].includes(e.from.port)))throw Error('Unsupported cross-stage dependency');
   if(patch.modules.some(n=>n.id===7))throw Error('Reserved kick host ID');
   const owners=new Map(),sourceGroup=new Map(groups.flatMap((g,i)=>g.map(id=>[id,i])));
