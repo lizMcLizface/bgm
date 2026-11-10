@@ -2528,3 +2528,14 @@ pass and final public build/package checks pass (43.04s). QA browser/viewport is
 cleaned up; loopback server is stopped, existing LAN HTTPS remains available.
 Phone mixed-piano listening is requested on the fixed page; do not infer it from
 desktop counters. Next port remains shared native modulation and steal-fade parity.
+
+## 2026-11-10 — phone M4e listening gate passed
+
+User supplied the `piano.fixed-full-path` report for graph d68f9dc21e528d44:
+all four cases pass, with942000-frame audition and726000-frame captured-score
+runs on serial and worker; both workers report zero underruns and late blocks.
+The explicit listening reply is **"Checks pass and audio is clean"** to the
+fixed six-source individual-entry/overlap question. Preserve this separately
+from the muted counters: `piano-phone-acceptance.json`. No new user-agent capture
+or lock-screen/other-settings acceptance is inferred. Next: owned shared piano
+voice modulation and the native pre-onset steal fade, with larger local batches.

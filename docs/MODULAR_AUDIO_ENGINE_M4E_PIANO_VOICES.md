@@ -112,3 +112,13 @@ still requires its own positive audio evidence. Comparison players pause on Stop
 and release blob URLs on rerun/exit. Native disposal guards prevent late sleep
 callbacks or external-hold release from reviving disposed processing.31 targeted
 lifecycle/controller/legacy tests and final public package build pass.
+
+## Phone acceptance, 2026-11-10
+
+The user pasted the graph d68f9dc21e528d44 fixed-page report: all four cases
+pass; worker audition942000frames and captured progression726000frames both
+have zero underruns/late blocks. They then explicitly answered **"Checks pass
+and audio is clean"** to the individual-entry/overlap listening question.
+`piano-phone-acceptance.json` retains those separate pieces of evidence without
+inventing a user-agent or lock-screen result. The mixed-piano phone gate is
+passed; continue with shared voice modulation and native steal-fade parity.
