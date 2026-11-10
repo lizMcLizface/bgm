@@ -1,5 +1,11 @@
 # Calibrated piano model
 
+Rust port update, 2026-11-10: the eight shipped tables and the normal note
+preparation path now also run in owned Rust/Wasm. See
+[M4i](MODULAR_AUDIO_ENGINE_M4I_MEASURED_PIANOS.md) for the immutable table build,
+exact supported scope, comparison results and remaining live release contracts.
+The analysis/fitting tools and original JS renderer below remain operational.
+
 The acoustic piano (`src/app/engine/acousticPiano.js`) is a modal model with about a dozen global knobs,
 so every note of a type shares one recipe and none of them can match a particular piano. This is the
 infrastructure for replacing the recipe with measurements of a real piano, following the sinusoids-plus-noise

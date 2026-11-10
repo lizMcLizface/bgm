@@ -1,6 +1,6 @@
 // This is note preparation, outside the audio callback. Existing native voices
 // still own envelopes, filters, stereo placement, effects and scheduling.
-const TYPES={felt:0,electric:1,grand:2,felted:3,upright:4,ambient:5,glass:6,drama:7,soft:8,subdued:9,concert:10};
+const TYPES={felt:0,electric:1,grand:2,felted:3,upright:4,ambient:5,glass:6,drama:7,soft:8,subdued:9,concert:10,measured:11,measuredAmbient:12,measuredDrama:13,measuredGlass:14,measuredHouse:15,measuredRavel:16,measuredSoft:17,measuredSubdued:18};
 export const supportsRustPiano=({type='felt'}={})=>Object.hasOwn(TYPES,type);
 export const supportsRustPianoBody=({type='felt'}={})=>type==='felt'||type==='electric';
 export function createRustPiano(module){

@@ -60,8 +60,8 @@ test('a Rust worker failure caches the actual original note and reports one expl
 test('Rust preparation without Workers still prepares asynchronously and owns its output',async()=>{
  delete globalThis.Worker;resetPianoPool();writePianoPreparation('rust');const r=rustPiano.createRustPiano(wasm);vi.spyOn(rustPiano,'loadRustPiano').mockResolvedValue({renderer:r,version:'main-test'});try{const later=pianoBufferLater(context,220,options);expect(later).toBeInstanceOf(Promise);await later;expect(r.activeHandles).toBe(0);expect(pianoPreparationStats()).toMatchObject({rustNotes:1,rustBodies:1,fallbacks:0,version:'main-test'});}finally{r.dispose();}
 });
-test('matched acoustic models use the real Rust worker without inventing a held body',async()=>{
- writePianoPreparation('rust');globalThis.Worker=RustWorker;resetPianoPool();for(const type of ['ambient','glass','drama','soft','subdued','concert'])await pianoBufferLater(context,220,{...options,type});expect(pianoPreparationStats()).toMatchObject({requested:'rust',rustNotes:6,rustBodies:0,legacyNotes:0,unsupported:0,fallbacks:0});
+test('fitted and measured acoustic models use the real Rust renderer in the worker dispatch without inventing a held body',async()=>{
+ writePianoPreparation('rust');globalThis.Worker=RustWorker;resetPianoPool();for(const type of ['ambient','glass','drama','soft','subdued','concert','measured','measuredAmbient','measuredDrama','measuredGlass','measuredHouse','measuredRavel','measuredSoft','measuredSubdued'])await pianoBufferLater(context,220,{...options,type});expect(pianoPreparationStats()).toMatchObject({requested:'rust',rustNotes:14,rustBodies:0,legacyNotes:0,unsupported:0,fallbacks:0});
 });
 
 test('the actual felted acoustic family uses Rust strikes without inventing a looping modal body',async()=>{

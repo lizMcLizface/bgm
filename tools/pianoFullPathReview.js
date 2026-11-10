@@ -6,8 +6,8 @@ const roles=['lead','counter','rhythm','pad','bass','perc'],status=document.quer
 let host=null,pending=null,active=null,epoch=0;
 const copy=document.querySelector('#copy'),summary=document.querySelector('#path-summary');
 copy.onclick=async()=>{try{await navigator.clipboard.writeText(summary.textContent);copy.textContent='Copied compact result';}catch{copy.textContent='Copy unavailable; expand diagnostics';}};
-const selections=[['lead','poly','Soft Pad'],['counter','fm','FM Rhodes'],['rhythm','piano','Ambient Piano'],['pad','piano','Soft Piano'],['bass','piano','Studio Concert'],['perc','kit','hand']];
-const fixedScope={profileRevision:'piano-matched-controls-steals-v1',selections,voiceWander:'captured sine on Rhythm, captured Brownian on Pad; live vibrato/filter LFO on Bass',pianoPolyphony:{rhythm:1,pad:2},songAndSettings:'All storage unchanged',worker:{blockFrames:512,poolBlocks:12,scheduling:'message'}};
+const selections=[['lead','poly','Soft Pad'],['counter','fm','FM Rhodes'],['rhythm','piano','House Piano'],['pad','piano','Ravel'],['bass','piano','Studio Concert v2'],['perc','kit','hand']];
+const fixedScope={profileRevision:'piano-measured-controls-steals-v1',selections,voiceWander:'captured sine on Rhythm, captured Brownian on Pad; live vibrato/filter LFO on Bass',pianoPolyphony:{rhythm:1,pad:2},songAndSettings:'All storage unchanged',worker:{blockFrames:512,poolBlocks:12,scheduling:'message'}};
 async function prepare(){
  if(pending)return pending;
  pending=(async()=>{const base={...BROWSABLE_SCENES[0],voices:{},layerVoices:{},percussion:null};host=createHost(base,{seed:109});

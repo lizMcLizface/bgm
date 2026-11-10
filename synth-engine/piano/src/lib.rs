@@ -1,7 +1,8 @@
-//! Owned preparation buffers for the existing felt/electric modal piano.
+//! Owned preparation buffers for modal, acoustic and measured-table pianos.
 //! This renders note material off the audio callback, not a voice/FX graph.
 use std::f64::consts::{PI, TAU};
 mod acoustic;
+mod measured;
 pub mod control;
 pub mod voice;
 
@@ -61,8 +62,10 @@ impl Piano {
     pub fn note(sr: f64, freq: f64, kind: u32, settings: Settings, wear: f64) -> Self {
         if kind < 2 {
             Self::strike(sr, freq, settings)
-        } else {
+        } else if kind < 11 {
             acoustic::render(sr, freq, kind, settings, wear)
+        } else {
+            measured::render(sr, freq, kind, settings)
         }
     }
     pub fn strike(sample_rate: f64, frequency: f64, s: Settings) -> Self {
@@ -260,7 +263,7 @@ pub extern "C" fn piano_note_new(
     softness: f64,
     wear: f64,
 ) -> *mut Piano {
-    if kind > 10 {
+    if kind > 18 {
         return std::ptr::null_mut();
     }
     let settings = Settings {
@@ -274,11 +277,7 @@ pub extern "C" fn piano_note_new(
         resonance,
         softness,
     };
-    let note = if kind < 2 {
-        Piano::strike(sr, freq, settings)
-    } else {
-        acoustic::render(sr, freq, kind, settings, wear)
-    };
+    let note = Piano::note(sr, freq, kind, settings, wear);
     Box::into_raw(Box::new(note))
 }
 #[no_mangle]

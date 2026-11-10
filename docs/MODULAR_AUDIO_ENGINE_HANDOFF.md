@@ -2656,3 +2656,49 @@ Rust DSP. Do not request another tiny phone checkpoint for this shape extension.
 Separate audible matched progression:726000 frames, three Rhythm steals, zero
 worker underruns, all six source/channel peaks positive, master peak0.10635.
 See piano-matched-audible-browser.json. Physical listening remains unassessed.
+
+## 2026-11-10 — M4i eight measured-table pianos
+
+[M4i](MODULAR_AUDIO_ENGINE_M4I_MEASURED_PIANOS.md) ports the actual eight packed
+tables and their sound-producing preparation path: pitch interpolation, sparse
+partial selection, hammer curves, anchor normalization, default treble tidy,
+two-stage/beating envelopes, shaped noise and body floors. It extends the same
+owned piano voices and finite modulation/stealing contracts. No replacement
+preset, recorded PCM upload or mutable singleton is introduced. Existing original
+JS defaults and explicitly reported preparation fallback remain operational.
+
+Generated measured_tables.rs is checked against all eight source JSON files in
+both graph and piano builds/checks. Kind codes 11–18 extend the previous 0–10.
+The prepared PCM cap stays 64 MiB; preflight allows the original measured 9-second
+bank duration. The tables are read-only; model, filter, RNG and PCM state is owned.
+The original Float64 seed multiplication before ToUint32 is preserved explicitly.
+
+Preparation 534ac58cc4da8c0b /655226 bytes and graph 92cca7d693913923 /961175 bytes
+pass 288 measured PCM comparisons across six sample rates, with 248 bit-exact and
+maximum sample error 3.725290298461914e-9. All 32 actual native dry comparisons
+pass; measured preset relative RMS errors are 1.02e-7–1.54e-7, unchanged tolerances.
+All 552 tests /72 files pass (128.64 s), including legacy model/tuning, All74,
+graph/persistence/worker/pool and all piano families. 30 previous and22 piano
+allocation audits report zero render allocation/reclamation/growth. Public build
+and package validation pass (40.24 s). Source/binary/table provenance is checked.
+
+The fixed profile is piano-measured-controls-steals-v1: House Piano/Ravel/Studio
+Concert v2 plus core/FM/Hand, with sine/walk/vibrato and one/two-slot stress.
+All four full-path cases pass:942000-frame audition and726000-frame captured
+progression on serial and actual worker; progressions record three Rhythm steals,
+workers report zero underruns/late blocks. Evidence: piano-native-measured-browser,
+piano-measured-rust-compatibility and piano-measured-full-path-browser.json.
+
+Next gate is physical listening for this larger measured-family batch, using the
+fixed page's “Listen to stealing stress” button. No desk/settings matching or
+another long muted phone batch is needed. Prior phone acceptance stays tied to
+M4g. After the gate, audit/port Iowa's actual Held/Decay/Roll voices, tables and
+event/release clocks. Classic/plucked/native fallback families, dense piano steals
+below10 ms, live release/pedal/retune and portable host FX/mixer migration remain.
+Do not deploy; retain the existing LAN HTTPS preview and commit each verified step.
+
+Final separate measured audible progression also passes:726000 frames, three
+Rhythm steals, zero worker underruns, all six source/channel peaks positive and
+master peak0.266908. Evidence: piano-measured-audible-browser.json. This records
+actual routed output, not new physical listening acceptance. The next phone
+request is only the fixed stress playback, with compact diagnostics on failure.

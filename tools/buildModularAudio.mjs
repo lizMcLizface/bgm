@@ -4,6 +4,8 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import {spawnSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
+import {checkPianoTables} from './buildPianoTables.mjs';
+checkPianoTables();
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const crate='synth-engine/graph', out='public/modular-audio';
 const hash=b=>crypto.createHash('sha256').update(b).digest('hex');

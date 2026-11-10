@@ -1478,3 +1478,9 @@ listening is the next gate, followed by matched acoustic preparation.
 adds all six fitted acoustic shapes to the same Rust source/voice path.24 native
 comparisons and the matched six-source serial/worker full-path batch pass. Host
 effects and mixer boundaries remain; measured-table preparation is next.
+
+2026-11-10: [M4i](MODULAR_AUDIO_ENGINE_M4I_MEASURED_PIANOS.md) adds all eight
+measured-table piano families to preparation and the owned graph. Actual tables,
+interpolation and modal/noise DSP are preserved. 552 tests,32 native comparisons,
+52 allocation audits and the measured serial/worker full-path batch pass. Existing
+host effects/mixer boundaries remain. Next: measured listening, then Iowa voices.

@@ -77,7 +77,9 @@
     "graph:audit-profiles": "vite-node tools/auditGraphProfiles.mjs",
     "piano:build": "node tools/buildPiano.mjs",
     "piano:check": "node tools/buildPiano.mjs --check",
-    "piano:audit": "vite-node tools/auditPiano.mjs"
+    "piano:audit": "vite-node tools/auditPiano.mjs",
+    "piano:audit-measured": "vite-node tools/auditMeasuredPiano.mjs",
+    "piano:tables": "node tools/buildPianoTables.mjs"
   },
   "dependencies": {
     "fflate": "^0.8.3",

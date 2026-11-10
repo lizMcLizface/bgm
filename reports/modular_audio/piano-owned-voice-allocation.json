@@ -2,7 +2,7 @@
   "kind": "piano.owned-voice-allocation",
   "version": 1,
   "pass": true,
-  "graphVersion": "67531999ec42dded",
+  "graphVersion": "92cca7d693913923",
   "scope": "Prepared finite Rust piano render including sine/walk modulation, independent handles, save/reload, reset, enqueue, owner cancellation and pause. Excludes preparation and host JS/browser deadlines.",
   "results": [
     {
@@ -13,7 +13,7 @@
       "saveReloadExact": true,
       "independentHandles": 2,
       "allocationOrReclamationCalls": 0,
-      "memoryBytes": 2621440,
+      "memoryBytes": 3211264,
       "grew": false
     },
     {
@@ -24,7 +24,7 @@
       "saveReloadExact": true,
       "independentHandles": 2,
       "allocationOrReclamationCalls": 0,
-      "memoryBytes": 2621440,
+      "memoryBytes": 3211264,
       "grew": false
     },
     {
@@ -35,7 +35,7 @@
       "saveReloadExact": true,
       "independentHandles": 2,
       "allocationOrReclamationCalls": 0,
-      "memoryBytes": 6488064,
+      "memoryBytes": 7077888,
       "grew": false
     },
     {
@@ -46,7 +46,7 @@
       "saveReloadExact": true,
       "independentHandles": 2,
       "allocationOrReclamationCalls": 0,
-      "memoryBytes": 3670016,
+      "memoryBytes": 4259840,
       "grew": false
     },
     {
@@ -57,7 +57,7 @@
       "saveReloadExact": true,
       "independentHandles": 2,
       "allocationOrReclamationCalls": 0,
-      "memoryBytes": 3932160,
+      "memoryBytes": 4521984,
       "grew": false
     },
     {
@@ -68,7 +68,7 @@
       "saveReloadExact": true,
       "independentHandles": 2,
       "allocationOrReclamationCalls": 0,
-      "memoryBytes": 5832704,
+      "memoryBytes": 6422528,
       "grew": false
     },
     {
@@ -79,7 +79,7 @@
       "saveReloadExact": true,
       "independentHandles": 2,
       "allocationOrReclamationCalls": 0,
-      "memoryBytes": 6815744,
+      "memoryBytes": 7405568,
       "grew": false
     },
     {
@@ -90,7 +90,7 @@
       "saveReloadExact": true,
       "independentHandles": 2,
       "allocationOrReclamationCalls": 0,
-      "memoryBytes": 6488064,
+      "memoryBytes": 7077888,
       "grew": false
     },
     {
@@ -101,7 +101,7 @@
       "saveReloadExact": true,
       "independentHandles": 2,
       "allocationOrReclamationCalls": 0,
-      "memoryBytes": 11534336,
+      "memoryBytes": 12124160,
       "grew": false
     },
     {
@@ -112,7 +112,7 @@
       "saveReloadExact": true,
       "independentHandles": 2,
       "allocationOrReclamationCalls": 0,
-      "memoryBytes": 12124160,
+      "memoryBytes": 12713984,
       "grew": false
     },
     {
@@ -123,7 +123,95 @@
       "saveReloadExact": true,
       "independentHandles": 2,
       "allocationOrReclamationCalls": 0,
-      "memoryBytes": 9568256,
+      "memoryBytes": 10158080,
+      "grew": false
+    },
+    {
+      "type": "measured",
+      "sampleRate": 48000,
+      "frames": 60000,
+      "peak": 0.10126065462827682,
+      "saveReloadExact": true,
+      "independentHandles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 9437184,
+      "grew": false
+    },
+    {
+      "type": "measuredAmbient",
+      "sampleRate": 48000,
+      "frames": 60000,
+      "peak": 0.17600518465042114,
+      "saveReloadExact": true,
+      "independentHandles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 9437184,
+      "grew": false
+    },
+    {
+      "type": "measuredDrama",
+      "sampleRate": 48000,
+      "frames": 60000,
+      "peak": 0.1290554702281952,
+      "saveReloadExact": true,
+      "independentHandles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 9437184,
+      "grew": false
+    },
+    {
+      "type": "measuredGlass",
+      "sampleRate": 48000,
+      "frames": 60000,
+      "peak": 0.26996925473213196,
+      "saveReloadExact": true,
+      "independentHandles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 9437184,
+      "grew": false
+    },
+    {
+      "type": "measuredHouse",
+      "sampleRate": 48000,
+      "frames": 60000,
+      "peak": 0.20618189871311188,
+      "saveReloadExact": true,
+      "independentHandles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 9437184,
+      "grew": false
+    },
+    {
+      "type": "measuredRavel",
+      "sampleRate": 48000,
+      "frames": 60000,
+      "peak": 0.2605965733528137,
+      "saveReloadExact": true,
+      "independentHandles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 9437184,
+      "grew": false
+    },
+    {
+      "type": "measuredSoft",
+      "sampleRate": 48000,
+      "frames": 60000,
+      "peak": 0.10488437116146088,
+      "saveReloadExact": true,
+      "independentHandles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 8257536,
+      "grew": false
+    },
+    {
+      "type": "measuredSubdued",
+      "sampleRate": 48000,
+      "frames": 60000,
+      "peak": 0.13950003683567047,
+      "saveReloadExact": true,
+      "independentHandles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 9437184,
       "grew": false
     },
     {
@@ -134,7 +222,7 @@
       "saveReloadExact": true,
       "independentHandles": 2,
       "allocationOrReclamationCalls": 0,
-      "memoryBytes": 2621440,
+      "memoryBytes": 3211264,
       "grew": false
     },
     {
@@ -145,7 +233,7 @@
       "saveReloadExact": true,
       "independentHandles": 2,
       "allocationOrReclamationCalls": 0,
-      "memoryBytes": 2621440,
+      "memoryBytes": 3211264,
       "grew": false
     },
     {
@@ -156,7 +244,7 @@
       "saveReloadExact": true,
       "independentHandles": 2,
       "allocationOrReclamationCalls": 0,
-      "memoryBytes": 2621440,
+      "memoryBytes": 3211264,
       "grew": false
     }
   ]

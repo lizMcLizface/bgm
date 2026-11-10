@@ -2,9 +2,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import {spawnSync} from 'node:child_process';
+import {checkPianoTables} from './buildPianoTables.mjs';
+checkPianoTables();
 const root=process.cwd(),crate='synth-engine/piano',out='public/piano-preparation',local=path.join(root,'.tmp/rust-tools');
 const hash=b=>crypto.createHash('sha256').update(b).digest('hex'),read=p=>fs.readFileSync(path.join(root,p)),text=p=>read(p).toString().replace(/\r\n/g,'\n');
-const sources=[`${crate}/Cargo.toml`,`${crate}/Cargo.lock`,`${crate}/src/lib.rs`,`${crate}/src/acoustic.rs`,`${crate}/src/voice.rs`,`${crate}/src/control.rs`];
+const sources=[`${crate}/Cargo.toml`,`${crate}/Cargo.lock`,`${crate}/src/lib.rs`,`${crate}/src/acoustic.rs`,`${crate}/src/voice.rs`,`${crate}/src/control.rs`,`${crate}/src/measured.rs`,`${crate}/src/measured_tables.rs`];
 const source=()=>hash(sources.map(p=>p+'\n'+text(p)).join('\n'));
 if(process.argv.includes('--check')){
  const m=JSON.parse(read(`${out}/build.json`));if(m.api!==1||m.source!==source()||m.wasm!==hash(read(`${out}/piano.wasm`))||m.version!==hash(m.source+m.wasm).slice(0,16))throw Error('Piano preparation provenance stale; run npm.cmd run piano:build');

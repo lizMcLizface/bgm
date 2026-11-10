@@ -27,7 +27,9 @@ adds frozen sine, vibrato, filter-LFO and seeded-walk snapshots to v2.
 slot lifetimes and the native pre-onset fade; same-slot steals below10 ms remain
 rejected. [M4h fitted acoustic variants](MODULAR_AUDIO_ENGINE_M4H_MATCHED_ACOUSTIC.md)
 adds all six matched shapes to preparation and owned graph playback.
-Calibrated/Iowa/classic adapters remain.
+[M4i measured-table pianos](MODULAR_AUDIO_ENGINE_M4I_MEASURED_PIANOS.md) adds the
+eight actual measured families, with immutable portable tables and owned note
+DSP. Iowa/classic/plucked adapters and live/host-effects migration remain.
 All six source engines have owned mutable Rust state; core's read-only additive
 tables are safely shared after preparation. External stereo host inputs and
 graph program/key compression exist. All six sources now also run inside one

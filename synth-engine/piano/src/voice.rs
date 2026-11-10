@@ -113,7 +113,7 @@ impl Engine {
             || self.banks.len() >= 128
             || !freq.is_finite()
             || !(10. ..=self.sr / 6.).contains(&freq)
-            || kind > 10
+            || kind > 18
             || !sustain.is_finite()
             || !(0. ..=1.).contains(&sustain)
             || !wear.is_finite()
@@ -145,7 +145,7 @@ impl Engine {
             return false;
         }
         // Worst-case bound is checked before preparing temporary buffers too.
-        if self.bytes + ((self.sr * 7.).ceil() as usize + 2048) * 4 > MAX_BYTES {
+        if self.bytes + ((self.sr * if kind>=11 {9.}else{7.}).ceil() as usize + 2048) * 4 > MAX_BYTES {
             return false;
         }
         let strike = Piano::note(self.sr, (freq * 100.).round() / 100., kind, s, wear).samples;

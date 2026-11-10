@@ -1107,3 +1107,10 @@ adds all six fitted acoustic variants to opt-in preparation and finite graph
 sources. The isolated page now fixes Ambient/Soft/Concert with core/FM/Hand;
 modulation, stealing, serial and worker checks pass without changing All settings.
 The earlier phone result is not relabelled; measured-table preparation is next.
+
+2026-11-10: [M4i](MODULAR_AUDIO_ENGINE_M4I_MEASURED_PIANOS.md) ports all eight
+measured-table pianos. The fixed page now uses House/Ravel/Studio Concert v2 plus
+core/FM/Hand, with modulation and forced stealing. All four local full-path cases
+pass with zero worker delivery gaps. Existing default preparation and All storage
+stay unchanged. Physical listening is the next gate; Iowa's actual held/decay/roll
+voice contract follows. Other source families and host migration remain separate.
