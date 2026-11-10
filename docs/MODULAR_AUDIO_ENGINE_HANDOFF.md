@@ -2768,3 +2768,16 @@ now use owned Rust preparation and dispose preparation handles after compilation
 native defaults stay unchanged.47 focused preparation/controller tests pass.
 The combined overnight browser check is pending; prior browser/device evidence
 is not relabelled. Existing non-Iowa cancellation timing is preserved.
+
+## 2026-11-10 overnight — owned insert/send-effects extraction
+
+The existing inserts and shared send-effects kernels now expose owned reusable
+state and explicit I/O buffers, with legacy ABI default features retained.
+See MODULAR_AUDIO_ENGINE_OWNED_EFFECTS.md.96 original-Wasm/rebuilt-legacy/owned
+comparisons are bit-exact at matching partitions;6 independent two-handle
+allocator cases report zero allocations/frees/growth.6 permanent tests cover
+replay, send identity, pending target reset, independence and atomic validation.
+Legacy effects/inserts binaries and cache/source manifests are rebuilt; current
+host/default routing remains unchanged. Canonical128-frame graph adapters with
+explicit128-frame latency are the next parent integration step, preserving the
+original kernels' block-sensitive wake/sleep and denormal behavior.

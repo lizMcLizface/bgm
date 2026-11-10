@@ -3,13 +3,13 @@
 use std::f32::consts::PI;
 #[path = "../../common/headroom.rs"]
 mod headroom;
-const BLOCK: usize = 2048;
+pub const BLOCK: usize = 2048;
 const LINES: usize = 16;
 const FDN: usize = 32768; // > 160 ms at 192 kHz
 const ECHO: usize = 384002; // two seconds at 192 kHz, including interpolation
 const EARLY: usize = 65536;
 const DIFF: usize = 8192;
-const PARAMS: usize = 21;
+pub const PARAMS: usize = 21;
 // Parameters 18..=20 (appended): echo low cut in the feedback (Hz, 0 off), echo ducking (0..1), reverb type (0 classic, 1 room, 2 hall, 3 plate).
 // Their defaults leave the earlier sound bit for bit as it was.
 // Denser early reflections, scaled by parameter 17 (off by default): offsets in ms after the pre-delay,
@@ -111,6 +111,7 @@ struct Effects {
     headroom: headroom::Headroom,
 }
 impl Effects {
+    #[cfg(feature = "legacy-abi")]
     const fn new() -> Self {
         Self {
             sr: 0.,
@@ -163,6 +164,66 @@ impl Effects {
             next_type: None,
             swap_g: 1.,
             headroom: headroom::Headroom::new(),
+        }
+    }
+    // Each field is initialized before assume_init. Zero writes apply only to
+    // f32 arrays; Option/headroom/scalars use typed writes. No multi-megabyte
+    // preparation stack temporary is constructed.
+    fn boxed() -> Box<Self> {
+        let mut value = Box::<Self>::new_uninit();
+        let ptr = value.as_mut_ptr();
+        unsafe {
+            std::ptr::addr_of_mut!((*ptr).sr).write(0.);
+            std::ptr::addr_of_mut!((*ptr).p).write([0.; PARAMS]);
+            std::ptr::addr_of_mut!((*ptr).smooth).write([0.; 3]);
+            std::ptr::addr_of_mut!((*ptr).lines).write_bytes(0, 1);
+            std::ptr::addr_of_mut!((*ptr).pos).write(0);
+            std::ptr::addr_of_mut!((*ptr).delay).write([0.; LINES]);
+            std::ptr::addr_of_mut!((*ptr).target).write([0.; LINES]);
+            std::ptr::addr_of_mut!((*ptr).gain).write([0.; LINES]);
+            std::ptr::addr_of_mut!((*ptr).high_gain).write([0.; LINES]);
+            std::ptr::addr_of_mut!((*ptr).return_gain).write(0.);
+            std::ptr::addr_of_mut!((*ptr).return_target).write(0.);
+            std::ptr::addr_of_mut!((*ptr).damp).write([0.; LINES]);
+            std::ptr::addr_of_mut!((*ptr).dc_in).write([0.; LINES]);
+            std::ptr::addr_of_mut!((*ptr).dc_out).write([0.; LINES]);
+            std::ptr::addr_of_mut!((*ptr).phase).write([0.; LINES]);
+            std::ptr::addr_of_mut!((*ptr).echoes).write_bytes(0, 1);
+            std::ptr::addr_of_mut!((*ptr).echo_pos).write(0);
+            std::ptr::addr_of_mut!((*ptr).echo_tone).write([0.; 2]);
+            std::ptr::addr_of_mut!((*ptr).echo_delay).write(0.);
+            std::ptr::addr_of_mut!((*ptr).old_echo_delay).write(0.);
+            std::ptr::addr_of_mut!((*ptr).fade).write(0);
+            std::ptr::addr_of_mut!((*ptr).early).write_bytes(0, 1);
+            std::ptr::addr_of_mut!((*ptr).early_pos).write(0);
+            std::ptr::addr_of_mut!((*ptr).diff).write_bytes(0, 1);
+            std::ptr::addr_of_mut!((*ptr).diff_pos).write(0);
+            std::ptr::addr_of_mut!((*ptr).damping).write(0.);
+            std::ptr::addr_of_mut!((*ptr).echo_alpha).write(0.);
+            std::ptr::addr_of_mut!((*ptr).dc_r).write(0.);
+            std::ptr::addr_of_mut!((*ptr).fb_x).write([0.; 2]);
+            std::ptr::addr_of_mut!((*ptr).fb_y).write([0.; 2]);
+            std::ptr::addr_of_mut!((*ptr).fb_a).write(0.);
+            std::ptr::addr_of_mut!((*ptr).duck_env).write(0.);
+            std::ptr::addr_of_mut!((*ptr).duck_attack).write(0.);
+            std::ptr::addr_of_mut!((*ptr).duck_release).write(0.);
+            std::ptr::addr_of_mut!((*ptr).diff_coef).write(0.65);
+            std::ptr::addr_of_mut!((*ptr).early_scale).write(1.);
+            std::ptr::addr_of_mut!((*ptr).size_k).write(1.);
+            std::ptr::addr_of_mut!((*ptr).mod_k).write(1.);
+            std::ptr::addr_of_mut!((*ptr).hf_ratio).write(0.5);
+            std::ptr::addr_of_mut!((*ptr).quiet).write(0);
+            std::ptr::addr_of_mut!((*ptr).asleep).write(false);
+            std::ptr::addr_of_mut!((*ptr).frame).write(0);
+            std::ptr::addr_of_mut!((*ptr).peak).write(0.);
+            std::ptr::addr_of_mut!((*ptr).internal).write(0.);
+            std::ptr::addr_of_mut!((*ptr).reverb_active).write(false);
+            std::ptr::addr_of_mut!((*ptr).reverb_quiet).write(0);
+            std::ptr::addr_of_mut!((*ptr).reverb_frames).write(0);
+            std::ptr::addr_of_mut!((*ptr).next_type).write(None);
+            std::ptr::addr_of_mut!((*ptr).swap_g).write(1.);
+            std::ptr::addr_of_mut!((*ptr).headroom).write(headroom::Headroom::new());
+            value.assume_init()
         }
     }
     fn clear(&mut self) {
@@ -220,7 +281,8 @@ impl Effects {
         };
         self.headroom.init(self.sr);
         self.p = [
-            1., 0.22, 0.12, 8., 0.7, 6000., 25., 1., 0.3, 375., 0.4, 4500., 1., 0.2, 1., 0., 0., 0., 0., 0., 0.,
+            1., 0.22, 0.12, 8., 0.7, 6000., 25., 1., 0.3, 375., 0.4, 4500., 1., 0.2, 1., 0., 0.,
+            0., 0., 0., 0.,
         ];
         self.smooth = [self.p[0], self.p[1], self.p[2]];
         self.pos = 0;
@@ -245,7 +307,11 @@ impl Effects {
         self.echo_alpha = 1. - (-2. * PI * self.p[11].min(self.sr * 0.4) / self.sr).exp();
         self.dc_r = (-2. * PI * 8. / self.sr).exp();
         self.return_target = 10_f32.powf(self.p[16] / 20.);
-        self.fb_a = if self.p[18] > 0. { 1. / (1. + 2. * PI * self.p[18] / self.sr) } else { 1. };
+        self.fb_a = if self.p[18] > 0. {
+            1. / (1. + 2. * PI * self.p[18] / self.sr)
+        } else {
+            1.
+        };
         self.duck_attack = 1. - (-1. / (self.sr * 0.004)).exp();
         self.duck_release = 1. - (-1. / (self.sr * 0.25)).exp();
         // reverb types: (diffuser coefficient, early-reflection level, delay-line scale, modulation scale, high-frequency decay ratio)
@@ -331,16 +397,21 @@ impl Effects {
             self.return_gain = self.return_target;
         }
     }
-    fn render(&mut self, n: usize) {
+    fn render(
+        &mut self,
+        n: usize,
+        input_bus: &[[f32; BLOCK]; 6],
+        output_bus: &mut [[f32; BLOCK]; 2],
+    ) {
         let n = n.min(BLOCK);
         let count = if self.p[14] >= 0.5 { 16 } else { 8 };
         let norm = (count as f32).sqrt().recip();
         let mut input_peak = 0_f32;
         let mut reverb_input_peak = 0_f32;
         for i in 0..n {
-            unsafe {
+            {
                 for c in 0..6 {
-                    let level = finite(INPUT[c][i]).abs();
+                    let level = finite(input_bus[c][i]).abs();
                     input_peak = input_peak.max(level);
                     if c == 2 || c == 3 {
                         reverb_input_peak =
@@ -359,9 +430,9 @@ impl Effects {
         }
         if self.p[15] >= 0.5 || self.asleep {
             for i in 0..n {
-                unsafe {
-                    OUTPUT[0][i] = finite(INPUT[0][i]) * self.p[0];
-                    OUTPUT[1][i] = finite(INPUT[1][i]) * self.p[0];
+                {
+                    output_bus[0][i] = finite(input_bus[0][i]) * self.p[0];
+                    output_bus[1][i] = finite(input_bus[1][i]) * self.p[0];
                 }
             }
             self.frame += n as u64;
@@ -382,7 +453,7 @@ impl Effects {
             let mut room = [0.; 2];
             let mut dry = [0.; 2];
             for ch in 0..2 {
-                dry[ch] = unsafe { finite(INPUT[ch][i]) };
+                dry[ch] = finite(input_bus[ch][i]);
                 let current = tap(&self.echoes[ch], self.echo_pos, self.echo_delay);
                 let value = if self.fade > 0 {
                     let t = (self.fade as f32 / (self.sr * 0.03)).clamp(0., 1.);
@@ -406,11 +477,11 @@ impl Effects {
                     raw
                 };
                 self.echoes[ch][self.echo_pos] =
-                    unsafe { finite(INPUT[4 + ch][i]) } * self.smooth[2] + feedback;
+                    { finite(input_bus[4 + ch][i]) } * self.smooth[2] + feedback;
             }
             let reverb_input = [
-                unsafe { finite(INPUT[2][i]) } * self.smooth[1] + echo[0] * self.p[13],
-                unsafe { finite(INPUT[3][i]) } * self.smooth[1] + echo[1] * self.p[13],
+                { finite(input_bus[2][i]) } * self.smooth[1] + echo[0] * self.p[13],
+                { finite(input_bus[3][i]) } * self.smooth[1] + echo[1] * self.p[13],
             ];
             let input_level = reverb_input[0].abs().max(reverb_input[1].abs());
             if input_level > 1e-12 {
@@ -449,7 +520,8 @@ impl Effects {
                             &self.early[side],
                             self.early_pos,
                             (self.p[6] + ms) * 0.001 * self.sr,
-                        ) * [0.25, 0.18, -0.13, 0.09][j] * self.early_scale;
+                        ) * [0.25, 0.18, -0.13, 0.09][j]
+                            * self.early_scale;
                     }
                 }
                 for ch in 0..2 {
@@ -468,8 +540,13 @@ impl Effects {
                     for j in 0..count {
                         self.phase[j] =
                             (self.phase[j] + 32. * (0.11 + j as f32 * 0.007) / self.sr).fract();
-                        self.target[j] = TIMES[j] * (0.55 + self.p[4] * 0.65) * self.sr * self.size_k
-                            + (self.phase[j] * 2. * PI).sin() * self.p[8] * 0.0006 * self.sr * self.mod_k;
+                        self.target[j] =
+                            TIMES[j] * (0.55 + self.p[4] * 0.65) * self.sr * self.size_k
+                                + (self.phase[j] * 2. * PI).sin()
+                                    * self.p[8]
+                                    * 0.0006
+                                    * self.sr
+                                    * self.mod_k;
                     }
                 }
                 let mut reads = [0.; LINES];
@@ -555,15 +632,20 @@ impl Effects {
                 self.diff_pos = (self.diff_pos + 1) % DIFF;
             }
             let level = dry[0].abs().max(dry[1].abs());
-            let coef = if level > self.duck_env { self.duck_attack } else { self.duck_release };
+            let coef = if level > self.duck_env {
+                self.duck_attack
+            } else {
+                self.duck_release
+            };
             self.duck_env += (level - self.duck_env) * coef;
             let duck = 1. - self.p[19] * (self.duck_env * 6.).min(1.);
-            let protected = self.headroom.tick(std::array::from_fn(|ch|
-                dry[ch] * self.smooth[0] + wet[ch] + echo[ch] * duck));
+            let protected = self.headroom.tick(std::array::from_fn(|ch| {
+                dry[ch] * self.smooth[0] + wet[ch] + echo[ch] * duck
+            }));
             for ch in 0..2 {
                 let y = protected[ch];
-                unsafe {
-                    OUTPUT[ch][i] = y;
+                {
+                    output_bus[ch][i] = y;
                 }
                 self.peak = self.peak.max(y.abs());
                 self.internal = self.internal.max(echo[ch].abs()).max(room[ch].abs());
@@ -578,70 +660,268 @@ impl Effects {
         }
     }
 }
-static mut FX: Effects = Effects::new();
-static mut INPUT: [[f32; BLOCK]; 6] = [[0.; BLOCK]; 6];
-static mut OUTPUT: [[f32; BLOCK]; 2] = [[0.; BLOCK]; 2];
+/// Exact legacy parameter bounds. Values outside them fail at the owned contract.
+pub const PARAMETER_RANGES: [(f32, f32); PARAMS] = [
+    (0f32, 1f32),
+    (0f32, 0.8f32),
+    (0f32, 0.8f32),
+    (0.3f32, 30f32),
+    (0.2f32, 1f32),
+    (500f32, 16000f32),
+    (0f32, 150f32),
+    (0f32, 1f32),
+    (0f32, 1f32),
+    (40f32, 2000f32),
+    (0f32, 0.85f32),
+    (300f32, 14000f32),
+    (0f32, 1f32),
+    (0f32, 1f32),
+    (0f32, 1f32),
+    (0f32, 1f32),
+    (-24f32, 18f32),
+    (0f32, 8f32),
+    (0f32, 1000f32),
+    (0f32, 1f32),
+    (0f32, 3f32),
+];
+/// One independent fixed-storage processor plus preparation-owned I/O buffers.
+/// All construction/disposal occurs outside render. Buffers and DSP state belong
+/// to this instance; no singleton ABI or browser object is referenced here.
+pub struct Engine {
+    dsp: Box<Effects>,
+    input: [[f32; BLOCK]; 6],
+    output: [[f32; BLOCK]; 2],
+}
+impl Engine {
+    pub fn new(rate: f32) -> Option<Box<Self>> {
+        if !rate.is_finite() || !(8000. ..=192000.).contains(&rate) {
+            return None;
+        }
+        let mut dsp = Effects::boxed();
+        dsp.init(rate);
+        Some(Box::new(Self {
+            dsp,
+            input: [[0.; BLOCK]; 6],
+            output: [[0.; BLOCK]; 2],
+        }))
+    }
+    pub fn param(&mut self, index: usize, value: f32) -> bool {
+        let Some(&(lo, hi)) = PARAMETER_RANGES.get(index) else {
+            return false;
+        };
+        if !value.is_finite() || value < lo || value > hi {
+            return false;
+        }
+        self.dsp.param(index, value);
+        true
+    }
+    pub fn parameters(&self) -> [f32; PARAMS] {
+        let mut p = self.dsp.p;
+        if let Some(target) = self.dsp.next_type {
+            p[20] = target;
+        }
+        p
+    }
+    pub fn input_mut(&mut self, channel: usize) -> Option<&mut [f32; BLOCK]> {
+        self.input.get_mut(channel)
+    }
+    pub fn output(&self, channel: usize) -> Option<&[f32; BLOCK]> {
+        self.output.get(channel)
+    }
+    pub fn render(&mut self, frames: usize) -> bool {
+        if frames > BLOCK {
+            return false;
+        }
+        self.dsp.render(frames, &self.input, &mut self.output);
+        true
+    }
+    pub fn clear(&mut self) {
+        self.dsp.clear();
+    }
+    /// Restart at sample zero with the current target parameters. This is a
+    /// fresh-instance replay, not an in-flight delay/filter snapshot.
+    pub fn reset(&mut self) {
+        let p = self.parameters();
+        self.dsp.init(self.dsp.sr);
+        for (i, v) in p.into_iter().enumerate() {
+            self.dsp.param(i, v);
+        }
+        self.input.iter_mut().for_each(|b| b.fill(0.));
+        self.output.iter_mut().for_each(|b| b.fill(0.));
+    }
+    pub fn stat(&self, index: u32) -> f64 {
+        match index {
+            0 => self.dsp.peak as f64,
+            1 => self.dsp.asleep as u32 as f64,
+            2 => self.dsp.frame as f64,
+            3 => self.dsp.internal as f64,
+            4 => self.dsp.reverb_active as u32 as f64,
+            5 => self.dsp.reverb_frames as f64,
+            _ => 0.,
+        }
+    }
+}
 #[no_mangle]
-pub extern "C" fn fx_api() -> u32 {
+pub extern "C" fn fx_owned_api() -> u32 {
     1
 }
 #[no_mangle]
-pub extern "C" fn fx_init(sr: f32) {
-    unsafe {
-        FX.init(sr);
+pub extern "C" fn fx_owned_new(rate: f32) -> *mut Engine {
+    Engine::new(rate).map_or(std::ptr::null_mut(), Box::into_raw)
+}
+#[no_mangle]
+pub unsafe extern "C" fn fx_owned_free(engine: *mut Engine) {
+    if !engine.is_null() {
+        drop(Box::from_raw(engine));
     }
 }
 #[no_mangle]
-pub extern "C" fn fx_param(index: u32, value: f32) {
-    unsafe {
-        FX.param(index as usize, value);
-    }
+pub extern "C" fn fx_owned_param(engine: &mut Engine, index: usize, value: f32) -> u32 {
+    engine.param(index, value) as u32
 }
 #[no_mangle]
-pub extern "C" fn fx_clear() {
-    unsafe {
-        FX.clear();
-    }
+pub extern "C" fn fx_owned_input(engine: &mut Engine, channel: usize) -> *mut f32 {
+    engine
+        .input_mut(channel)
+        .map_or(std::ptr::null_mut(), |b| b.as_mut_ptr())
 }
 #[no_mangle]
-pub extern "C" fn fx_input(channel: u32) -> *mut f32 {
-    unsafe { INPUT[(channel as usize).min(5)].as_mut_ptr() }
+pub extern "C" fn fx_owned_output(engine: &Engine, channel: usize) -> *const f32 {
+    engine
+        .output(channel)
+        .map_or(std::ptr::null(), |b| b.as_ptr())
 }
 #[no_mangle]
-pub extern "C" fn fx_output(channel: u32) -> *const f32 {
-    unsafe { OUTPUT[(channel as usize).min(1)].as_ptr() }
+pub extern "C" fn fx_owned_render(engine: &mut Engine, frames: usize) -> u32 {
+    engine.render(frames) as u32
 }
 #[no_mangle]
-pub extern "C" fn fx_render(n: u32) {
-    unsafe {
-        FX.render(n as usize);
-    }
+pub extern "C" fn fx_owned_clear(engine: &mut Engine) {
+    engine.clear();
 }
 #[no_mangle]
-pub extern "C" fn fx_stat(index: u32) -> f64 {
-    unsafe {
-        match index {
-            0 => FX.peak as f64,
-            1 => {
-                if FX.asleep {
-                    1.
-                } else {
-                    0.
-                }
+pub extern "C" fn fx_owned_reset(engine: &mut Engine) {
+    engine.reset();
+}
+#[no_mangle]
+pub extern "C" fn fx_owned_stat(engine: &Engine, index: u32) -> f64 {
+    engine.stat(index)
+}
+#[cfg(feature = "allocation-audit")]
+mod allocation {
+    use std::alloc::{GlobalAlloc, Layout, System};
+    use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+    struct Counting;
+    static WATCH: AtomicBool = AtomicBool::new(false);
+    static COUNT: AtomicUsize = AtomicUsize::new(0);
+    unsafe impl GlobalAlloc for Counting {
+        unsafe fn alloc(&self, l: Layout) -> *mut u8 {
+            if WATCH.load(Ordering::Relaxed) {
+                COUNT.fetch_add(1, Ordering::Relaxed);
             }
-            2 => FX.frame as f64,
-            3 => FX.internal as f64,
-            // Independent FDN activity and cumulative processed samples let
-            // callers distinguish echo-only work from actual reverb DSP.
-            4 => {
-                if FX.reverb_active {
-                    1.
-                } else {
-                    0.
-                }
+            System.alloc(l)
+        }
+        unsafe fn alloc_zeroed(&self, l: Layout) -> *mut u8 {
+            if WATCH.load(Ordering::Relaxed) {
+                COUNT.fetch_add(1, Ordering::Relaxed);
             }
-            5 => FX.reverb_frames as f64,
-            _ => 0.,
+            System.alloc_zeroed(l)
+        }
+        unsafe fn realloc(&self, p: *mut u8, l: Layout, n: usize) -> *mut u8 {
+            if WATCH.load(Ordering::Relaxed) {
+                COUNT.fetch_add(1, Ordering::Relaxed);
+            }
+            System.realloc(p, l, n)
+        }
+        unsafe fn dealloc(&self, p: *mut u8, l: Layout) {
+            if WATCH.load(Ordering::Relaxed) {
+                COUNT.fetch_add(1, Ordering::Relaxed);
+            }
+            System.dealloc(p, l)
+        }
+    }
+    #[global_allocator]
+    static ALLOCATOR: Counting = Counting;
+    #[no_mangle]
+    pub extern "C" fn fx_owned_alloc_watch(watch: u32) {
+        COUNT.store(0, Ordering::Relaxed);
+        WATCH.store(watch != 0, Ordering::Relaxed);
+    }
+    #[no_mangle]
+    pub extern "C" fn fx_owned_alloc_count() -> usize {
+        COUNT.load(Ordering::Relaxed)
+    }
+}
+
+#[cfg(feature = "legacy-abi")]
+mod legacy {
+    use super::*;
+
+    static mut FX: Effects = Effects::new();
+    static mut INPUT: [[f32; BLOCK]; 6] = [[0.; BLOCK]; 6];
+    static mut OUTPUT: [[f32; BLOCK]; 2] = [[0.; BLOCK]; 2];
+    #[no_mangle]
+    pub extern "C" fn fx_api() -> u32 {
+        1
+    }
+    #[no_mangle]
+    pub extern "C" fn fx_init(sr: f32) {
+        unsafe {
+            FX.init(sr);
+        }
+    }
+    #[no_mangle]
+    pub extern "C" fn fx_param(index: u32, value: f32) {
+        unsafe {
+            FX.param(index as usize, value);
+        }
+    }
+    #[no_mangle]
+    pub extern "C" fn fx_clear() {
+        unsafe {
+            FX.clear();
+        }
+    }
+    #[no_mangle]
+    pub extern "C" fn fx_input(channel: u32) -> *mut f32 {
+        unsafe { INPUT[(channel as usize).min(5)].as_mut_ptr() }
+    }
+    #[no_mangle]
+    pub extern "C" fn fx_output(channel: u32) -> *const f32 {
+        unsafe { OUTPUT[(channel as usize).min(1)].as_ptr() }
+    }
+    #[no_mangle]
+    pub extern "C" fn fx_render(n: u32) {
+        unsafe {
+            FX.render(n as usize, &INPUT, &mut OUTPUT);
+        }
+    }
+    #[no_mangle]
+    pub extern "C" fn fx_stat(index: u32) -> f64 {
+        unsafe {
+            match index {
+                0 => FX.peak as f64,
+                1 => {
+                    if FX.asleep {
+                        1.
+                    } else {
+                        0.
+                    }
+                }
+                2 => FX.frame as f64,
+                3 => FX.internal as f64,
+                // Independent FDN activity and cumulative processed samples let
+                // callers distinguish echo-only work from actual reverb DSP.
+                4 => {
+                    if FX.reverb_active {
+                        1.
+                    } else {
+                        0.
+                    }
+                }
+                5 => FX.reverb_frames as f64,
+                _ => 0.,
+            }
         }
     }
 }

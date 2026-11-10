@@ -3,9 +3,9 @@
 #[path = "../../common/denormal.rs"]
 mod denormal;
 use std::f32::consts::PI;
-const BLOCK: usize = 2048;
+pub const BLOCK: usize = 2048;
 const DELAY: usize = 8192;
-const PARAMS: usize = 29;
+pub const PARAMS: usize = 29;
 /// Parameters 24..=28 (appended): phaser spread, flanger spread, chorus spread (left/right LFO offset in cycles, 0 to 0.5),
 /// chorus feedback, phaser stages (2 to 12). Their defaults reproduce the earlier fixed values.
 const PHASER_STAGES: usize = 12;
@@ -124,7 +124,8 @@ impl Delay {
             let modulation = (2. * PI * (self.phase + ch as f32 * spread)).sin();
             let delay = ((base + depth * modulation) * 0.001 * sr).clamp(2., DELAY as f32 - 3.);
             let delayed = self.read(ch, delay);
-            self.data[ch][self.position] = denormal::clean((input[ch] + delayed * feedback).clamp(-8., 8.));
+            self.data[ch][self.position] =
+                denormal::clean((input[ch] + delayed * feedback).clamp(-8., 8.));
             let wet = mix * 0.5;
             let dry = 1. - wet;
             let gain = if chorus {
@@ -276,8 +277,9 @@ impl Inserts {
         }
         for ch in 0..2 {
             let hz = (self.s[13]
-                * 2_f32
-                    .powf(self.s[12] * (2. * PI * (self.phaser_phase + ch as f32 * self.s[24])).sin()))
+                * 2_f32.powf(
+                    self.s[12] * (2. * PI * (self.phaser_phase + ch as f32 * self.s[24])).sin(),
+                ))
             .clamp(30., self.sr * 0.4);
             let t = (PI * hz / self.sr).tan();
             self.phaser_target[ch] = (t - 1.) / (t + 1.);
@@ -292,13 +294,21 @@ impl Inserts {
             self.trim_db = self.s[23];
         }
     }
-    fn render(&mut self, n: usize) {
+    fn render(
+        &mut self,
+        n: usize,
+        input_bus: &[[f32; BLOCK]; 2],
+        output_bus: &mut [[f32; BLOCK]; 2],
+    ) {
         denormal::flush(&mut self.dc_in);
         denormal::flush(&mut self.dc_out);
         denormal::flush(&mut self.phaser_last);
         for ch in 0..2 {
             denormal::flush(&mut self.phaser[ch]);
-            for band in &mut self.eq[ch] { denormal::flush(&mut band.x); denormal::flush(&mut band.y); }
+            for band in &mut self.eq[ch] {
+                denormal::flush(&mut band.x);
+                denormal::flush(&mut band.y);
+            }
         }
         self.peak = 0.;
         if self.p[0] < 0.5
@@ -313,9 +323,9 @@ impl Inserts {
             self.s = self.p;
             for i in 0..n.min(BLOCK) {
                 for ch in 0..2 {
-                    let x = unsafe { INPUT[ch][i] };
-                    unsafe {
-                        OUTPUT[ch][i] = x;
+                    let x = { input_bus[ch][i] };
+                    {
+                        output_bus[ch][i] = x;
                     }
                     self.peak = self.peak.max(x.abs());
                 }
@@ -325,7 +335,7 @@ impl Inserts {
         }
         let dc = self.dc_r;
         for i in 0..n.min(BLOCK) {
-            let input = unsafe { [INPUT[0][i], INPUT[1][i]] };
+            let input = { [input_bus[0][i], input_bus[1][i]] };
             for k in 1..PARAMS {
                 let diff = self.p[k] - self.s[k];
                 if diff.abs() < 1e-5 {
@@ -343,9 +353,9 @@ impl Inserts {
                 if self.active.iter().any(|x| *x) {
                     self.clear();
                 }
-                unsafe {
-                    OUTPUT[0][i] = input[0];
-                    OUTPUT[1][i] = input[1];
+                {
+                    output_bus[0][i] = input[0];
+                    output_bus[1][i] = input[1];
                 }
                 self.peak = self.peak.max(input[0].abs()).max(input[1].abs());
                 self.frame += 1;
@@ -404,7 +414,8 @@ impl Inserts {
             if self.s[15] > 1e-5 {
                 self.active[1] = true;
                 out = self.flanger.tick(
-                    out, self.sr, self.s[15], self.s[16], self.s[17], self.s[18], self.s[19], false, self.s[25],
+                    out, self.sr, self.s[15], self.s[16], self.s[17], self.s[18], self.s[19],
+                    false, self.s[25],
                 );
             } else if self.active[1] {
                 self.flanger.clear();
@@ -413,7 +424,8 @@ impl Inserts {
             if self.s[20] > 1e-5 {
                 self.active[2] = true;
                 out = self.chorus.tick(
-                    out, self.sr, self.s[20], self.s[21], self.s[22], 12., self.s[27], true, self.s[26],
+                    out, self.sr, self.s[20], self.s[21], self.s[22], 12., self.s[27], true,
+                    self.s[26],
                 );
             } else if self.active[2] {
                 self.chorus.clear();
@@ -421,8 +433,8 @@ impl Inserts {
             }
             for ch in 0..2 {
                 let x = input[ch] + (out[ch] * self.trim - input[ch]) * self.wet;
-                unsafe {
-                    OUTPUT[ch][i] = x;
+                {
+                    output_bus[ch][i] = x;
                 }
                 self.peak = self.peak.max(x.abs());
             }
@@ -430,60 +442,268 @@ impl Inserts {
         }
     }
 }
-static mut FX: Inserts = Inserts::new();
-static mut INPUT: [[f32; BLOCK]; 2] = [[0.; BLOCK]; 2];
-static mut OUTPUT: [[f32; BLOCK]; 2] = [[0.; BLOCK]; 2];
+/// Exact legacy parameter bounds. Values outside them fail at the owned contract.
+pub const PARAMETER_RANGES: [(f32, f32); PARAMS] = [
+    (0f32, 1f32),
+    (0f32, 1f32),
+    (0f32, 24f32),
+    (-12f32, 12f32),
+    (60f32, 600f32),
+    (-12f32, 12f32),
+    (200f32, 6000f32),
+    (0.2f32, 4f32),
+    (-12f32, 12f32),
+    (1500f32, 12000f32),
+    (0f32, 1f32),
+    (0.02f32, 5f32),
+    (0f32, 3f32),
+    (100f32, 4000f32),
+    (-0.75f32, 0.75f32),
+    (0f32, 1f32),
+    (0.02f32, 5f32),
+    (0f32, 4f32),
+    (0.3f32, 20f32),
+    (-0.85f32, 0.85f32),
+    (0f32, 0.8f32),
+    (0.05f32, 10f32),
+    (0f32, 8f32),
+    (-18f32, 6f32),
+    (0f32, 0.5f32),
+    (0f32, 0.5f32),
+    (0f32, 0.5f32),
+    (-0.6f32, 0.6f32),
+    (2f32, 12f32),
+];
+/// One independent fixed-storage processor plus preparation-owned I/O buffers.
+/// All construction/disposal occurs outside render. Buffers and DSP state belong
+/// to this instance; no singleton ABI or browser object is referenced here.
+pub struct Engine {
+    dsp: Box<Inserts>,
+    input: [[f32; BLOCK]; 2],
+    output: [[f32; BLOCK]; 2],
+}
+impl Engine {
+    pub fn new(rate: f32) -> Option<Box<Self>> {
+        if !rate.is_finite() || !(8000. ..=192000.).contains(&rate) {
+            return None;
+        }
+        let mut dsp = Box::new(Inserts::new());
+        dsp.init(rate);
+        Some(Box::new(Self {
+            dsp,
+            input: [[0.; BLOCK]; 2],
+            output: [[0.; BLOCK]; 2],
+        }))
+    }
+    pub fn param(&mut self, index: usize, value: f32) -> bool {
+        let Some(&(lo, hi)) = PARAMETER_RANGES.get(index) else {
+            return false;
+        };
+        if !value.is_finite() || value < lo || value > hi {
+            return false;
+        }
+        self.dsp.param(index, value);
+        true
+    }
+    pub fn parameters(&self) -> [f32; PARAMS] {
+        self.dsp.p
+    }
+    pub fn input_mut(&mut self, channel: usize) -> Option<&mut [f32; BLOCK]> {
+        self.input.get_mut(channel)
+    }
+    pub fn output(&self, channel: usize) -> Option<&[f32; BLOCK]> {
+        self.output.get(channel)
+    }
+    pub fn render(&mut self, frames: usize) -> bool {
+        if frames > BLOCK {
+            return false;
+        }
+        self.dsp.render(frames, &self.input, &mut self.output);
+        true
+    }
+    pub fn clear(&mut self) {
+        self.dsp.clear();
+    }
+    pub fn settle(&mut self) {
+        self.dsp.s = self.dsp.p;
+        self.dsp.wet = if self.dsp.p[0] >= 0.5 { 0. } else { 1. };
+        self.dsp.refresh();
+    }
+    /// Restart at sample zero with the current target parameters. This is a
+    /// fresh-instance replay, not an in-flight delay/filter snapshot.
+    pub fn reset(&mut self) {
+        let p = self.dsp.p;
+        self.dsp.init(self.dsp.sr);
+        for (i, v) in p.into_iter().enumerate() {
+            self.dsp.param(i, v);
+        }
+        self.settle();
+        self.input.iter_mut().for_each(|b| b.fill(0.));
+        self.output.iter_mut().for_each(|b| b.fill(0.));
+    }
+    pub fn stat(&self, index: u32) -> f64 {
+        match index {
+            0 => self.dsp.peak as f64,
+            1 => self.dsp.frame as f64,
+            _ => 0.,
+        }
+    }
+}
 #[no_mangle]
-pub extern "C" fn inserts_api() -> u32 {
+pub extern "C" fn inserts_owned_api() -> u32 {
     1
 }
 #[no_mangle]
-pub extern "C" fn inserts_init(sr: f32) {
-    unsafe {
-        FX.init(sr);
+pub extern "C" fn inserts_owned_new(rate: f32) -> *mut Engine {
+    Engine::new(rate).map_or(std::ptr::null_mut(), Box::into_raw)
+}
+#[no_mangle]
+pub unsafe extern "C" fn inserts_owned_free(engine: *mut Engine) {
+    if !engine.is_null() {
+        drop(Box::from_raw(engine));
     }
 }
 #[no_mangle]
-pub extern "C" fn inserts_param(i: u32, v: f32) {
-    unsafe {
-        FX.param(i as usize, v);
+pub extern "C" fn inserts_owned_param(engine: &mut Engine, index: usize, value: f32) -> u32 {
+    engine.param(index, value) as u32
+}
+#[no_mangle]
+pub extern "C" fn inserts_owned_input(engine: &mut Engine, channel: usize) -> *mut f32 {
+    engine
+        .input_mut(channel)
+        .map_or(std::ptr::null_mut(), |b| b.as_mut_ptr())
+}
+#[no_mangle]
+pub extern "C" fn inserts_owned_output(engine: &Engine, channel: usize) -> *const f32 {
+    engine
+        .output(channel)
+        .map_or(std::ptr::null(), |b| b.as_ptr())
+}
+#[no_mangle]
+pub extern "C" fn inserts_owned_render(engine: &mut Engine, frames: usize) -> u32 {
+    engine.render(frames) as u32
+}
+#[no_mangle]
+pub extern "C" fn inserts_owned_clear(engine: &mut Engine) {
+    engine.clear();
+}
+#[no_mangle]
+pub extern "C" fn inserts_owned_reset(engine: &mut Engine) {
+    engine.reset();
+}
+#[no_mangle]
+pub extern "C" fn inserts_owned_settle(engine: &mut Engine) {
+    engine.settle();
+}
+#[no_mangle]
+pub extern "C" fn inserts_owned_stat(engine: &Engine, index: u32) -> f64 {
+    engine.stat(index)
+}
+#[cfg(feature = "allocation-audit")]
+mod allocation {
+    use std::alloc::{GlobalAlloc, Layout, System};
+    use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+    struct Counting;
+    static WATCH: AtomicBool = AtomicBool::new(false);
+    static COUNT: AtomicUsize = AtomicUsize::new(0);
+    unsafe impl GlobalAlloc for Counting {
+        unsafe fn alloc(&self, l: Layout) -> *mut u8 {
+            if WATCH.load(Ordering::Relaxed) {
+                COUNT.fetch_add(1, Ordering::Relaxed);
+            }
+            System.alloc(l)
+        }
+        unsafe fn alloc_zeroed(&self, l: Layout) -> *mut u8 {
+            if WATCH.load(Ordering::Relaxed) {
+                COUNT.fetch_add(1, Ordering::Relaxed);
+            }
+            System.alloc_zeroed(l)
+        }
+        unsafe fn realloc(&self, p: *mut u8, l: Layout, n: usize) -> *mut u8 {
+            if WATCH.load(Ordering::Relaxed) {
+                COUNT.fetch_add(1, Ordering::Relaxed);
+            }
+            System.realloc(p, l, n)
+        }
+        unsafe fn dealloc(&self, p: *mut u8, l: Layout) {
+            if WATCH.load(Ordering::Relaxed) {
+                COUNT.fetch_add(1, Ordering::Relaxed);
+            }
+            System.dealloc(p, l)
+        }
+    }
+    #[global_allocator]
+    static ALLOCATOR: Counting = Counting;
+    #[no_mangle]
+    pub extern "C" fn inserts_owned_alloc_watch(watch: u32) {
+        COUNT.store(0, Ordering::Relaxed);
+        WATCH.store(watch != 0, Ordering::Relaxed);
+    }
+    #[no_mangle]
+    pub extern "C" fn inserts_owned_alloc_count() -> usize {
+        COUNT.load(Ordering::Relaxed)
     }
 }
-#[no_mangle]
-pub extern "C" fn inserts_input(c: u32) -> *mut f32 {
-    unsafe { INPUT[(c as usize).min(1)].as_mut_ptr() }
-}
-#[no_mangle]
-pub extern "C" fn inserts_output(c: u32) -> *const f32 {
-    unsafe { OUTPUT[(c as usize).min(1)].as_ptr() }
-}
-#[no_mangle]
-pub extern "C" fn inserts_render(n: u32) {
-    unsafe {
-        FX.render(n as usize);
+
+#[cfg(feature = "legacy-abi")]
+mod legacy {
+    use super::*;
+
+    static mut FX: Inserts = Inserts::new();
+    static mut INPUT: [[f32; BLOCK]; 2] = [[0.; BLOCK]; 2];
+    static mut OUTPUT: [[f32; BLOCK]; 2] = [[0.; BLOCK]; 2];
+    #[no_mangle]
+    pub extern "C" fn inserts_api() -> u32 {
+        1
     }
-}
-#[no_mangle]
-pub extern "C" fn inserts_clear() {
-    unsafe {
-        FX.clear();
+    #[no_mangle]
+    pub extern "C" fn inserts_init(sr: f32) {
+        unsafe {
+            FX.init(sr);
+        }
     }
-}
-#[no_mangle]
-pub extern "C" fn inserts_settle() {
-    unsafe {
-        FX.s = FX.p;
-        FX.wet = if FX.p[0] >= 0.5 { 0. } else { 1. };
-        FX.refresh();
+    #[no_mangle]
+    pub extern "C" fn inserts_param(i: u32, v: f32) {
+        unsafe {
+            FX.param(i as usize, v);
+        }
     }
-}
-#[no_mangle]
-pub extern "C" fn inserts_stat(i: u32) -> f64 {
-    unsafe {
-        match i {
-            0 => FX.peak as f64,
-            1 => FX.frame as f64,
-            _ => 0.,
+    #[no_mangle]
+    pub extern "C" fn inserts_input(c: u32) -> *mut f32 {
+        unsafe { INPUT[(c as usize).min(1)].as_mut_ptr() }
+    }
+    #[no_mangle]
+    pub extern "C" fn inserts_output(c: u32) -> *const f32 {
+        unsafe { OUTPUT[(c as usize).min(1)].as_ptr() }
+    }
+    #[no_mangle]
+    pub extern "C" fn inserts_render(n: u32) {
+        unsafe {
+            FX.render(n as usize, &INPUT, &mut OUTPUT);
+        }
+    }
+    #[no_mangle]
+    pub extern "C" fn inserts_clear() {
+        unsafe {
+            FX.clear();
+        }
+    }
+    #[no_mangle]
+    pub extern "C" fn inserts_settle() {
+        unsafe {
+            FX.s = FX.p;
+            FX.wet = if FX.p[0] >= 0.5 { 0. } else { 1. };
+            FX.refresh();
+        }
+    }
+    #[no_mangle]
+    pub extern "C" fn inserts_stat(i: u32) -> f64 {
+        unsafe {
+            match i {
+                0 => FX.peak as f64,
+                1 => FX.frame as f64,
+                _ => 0.,
+            }
         }
     }
 }
@@ -508,18 +728,22 @@ mod tests {
         assert_eq!(fx.eq[0][0].c, before);
         assert_eq!(fx.eq[0][0].x, [0.; 2]);
         fx.init(96000.);
-        fx.s[3] = 6.;fx.refresh();
+        fx.s[3] = 6.;
+        fx.refresh();
         assert_ne!(fx.eq[0][0].c, before);
     }
 
     #[test]
     fn trim_and_drive_refresh_after_settle_and_reinitialization() {
-        let mut fx = Inserts::new();fx.init(48000.);
-        fx.s[2]=12.;fx.s[23]=-6.;fx.refresh();
-        assert_eq!(fx.drive_root,fx.drive.sqrt());
-        assert!((fx.trim-10_f32.powf(-6./20.)).abs()<1e-7);
+        let mut fx = Inserts::new();
+        fx.init(48000.);
+        fx.s[2] = 12.;
+        fx.s[23] = -6.;
+        fx.refresh();
+        assert_eq!(fx.drive_root, fx.drive.sqrt());
+        assert!((fx.trim - 10_f32.powf(-6. / 20.)).abs() < 1e-7);
         fx.init(44100.);
-        assert_eq!(fx.trim,1.);
-        assert_eq!(fx.dc_r,(-2.*PI*10./44100.).exp());
+        assert_eq!(fx.trim, 1.);
+        assert_eq!(fx.dc_r, (-2. * PI * 10. / 44100.).exp());
     }
 }

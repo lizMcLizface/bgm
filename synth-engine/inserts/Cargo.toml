@@ -5,7 +5,12 @@ edition = "2021"
 license = "MIT"
 
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["rlib", "cdylib"]
+
+[features]
+default = ["legacy-abi"]
+legacy-abi = []
+allocation-audit = []
 
 [profile.release]
 opt-level = 3

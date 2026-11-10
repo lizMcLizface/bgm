@@ -1184,3 +1184,11 @@ without changing the native player/defaults; complete numeric banks persist.
 passes1680 exact preset/rate comparisons and36 allocation cases (682cdff).
 Remaining: VS/WT resource extraction, effects/mixer graph migration and live
 integration. Browser acceptance is recorded at the combined overnight checkpoint.
+
+### Owned effects extraction — overnight 2026-11-10
+
+Existing insert and send-effects kernels now have instance-owned state/buffers,
+rlib APIs and preserved default legacy exports.96 exact matching-cadence legacy
+comparisons and6 zero-allocation independent-instance cases pass. See
+MODULAR_AUDIO_ENGINE_OWNED_EFFECTS.md. Graph adoption is a separate step because
+native block-entry behavior must be preserved; no default host route is replaced.
