@@ -947,7 +947,12 @@ combination. Host v5 / runtime d6a0341e5edf2d57, identical Rust/Wasm. **97 check
 normal / reset checks pass. Matching-input normal completes 668,956 / 16 events
 with no misses. Actual phone twelve-slot probe now completes 96,000 / 188 packets
 with zero misses/late/rejected/stale/bad recycles, 1,152 minimum steady lead, while
-the 4,864-frame gap remains. User additionally reports audible playback sounded
-fine; its exact run report is pending and must remain separate from muted probe
-verdicts. Next collect existing audible diagnostics, assess explicit 128 ms
-tradeoff, then matched-input muted pair if needed. Defaults stay Serial/six.
+the 4,864-frame gap remains. The subsequent ordinary phone run
+`3c2c7faf-e696-499d-9e57-95493ec3bff3` now completes **668,956 frames / 16 events /
+1,307 blocks**, zero delivery errors, ordinary guard true and complete/pass true,
+matching the muted phone input hash. User reports it sounded fine; that statement
+is linked separately while raw generated listening remains unassessed. Twelve
+is an explicit working sequenced-preview option for this one bass run, not
+lock-screen/all-role acceptance. Next implement a repeatable captured-input
+six/twelve muted pair before further transport experiments; assess 128 ms cost.
+Defaults stay Serial/six. This evidence-only follow-up adds no new test/build run.

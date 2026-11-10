@@ -81,21 +81,42 @@ these maxima; they are not required one-way buffering or CPU measures. The
 worklet clock remains unavailable. Probe full-score complete/pass stays false
 and listening unassessed, as required for a muted partial diagnostic.
 
-The user additionally reports **“I also ran it with sound and it sounded fine”**.
-This is separate affirmative phone listening evidence. The audible run's exact
-report/run ID/frame completion is not yet provided; do not attach that judgment
-to the muted probe or invent full-score counters. Existing audible compact
-diagnostics are requested without asking for another replay. Lock-screen,
-long-duration, other roles and keyboard latency are unverified for this capacity.
+The user additionally reports **“I also ran it with sound and it sounded fine”**,
+then supplies that audible run's compact report:
+**3c2c7faf-e696-499d-9e57-95493ec3bff3**, started **09:28:49.880 UTC**, retained
+verbatim by value in `reports/modular_audio/m4a-phone-worker-twelve-audible.json`.
+It is actual worker / Message / 512 x 12 / 128 ms, **ordinary first-miss guard
+true**, no probe/fallback, **reason completed, complete/pass true**. Full
+**668,956 planned/consumed/rendered source frames** (13.9366 s), **675,200 output
+frames**, **16 events applied / zero late/overflow**, **1,307 accepted/rendered
+blocks**, zero missing/late/rejected/stale/bad-recycle counters. Minimum steady
+lead stays **1,152 / 24 ms**, largest arrival gap **4,864 / 101.33 ms**, no
+zero/below-quantum lead or over-capacity observations.
+
+Audible and muted phone reports have the **same source fingerprint**
+`c0840313ad73bdd877411106781862d8720d780a25b6f1f788ce1f389f1f27eb`, host v5,
+runtime d6a0341e5edf2d57, role, browser UA and executor/capacity. This links the
+affirmative listening report to the ordinary full run without modifying either
+raw report's automatically generated **listening:not assessed**. It establishes
+one clean phone full-score bass run at this explicit capacity, not a clean
+six/twelve controlled pair, all-role acceptance or a physical output recording.
+
+Full-run worker total render **2,954.20 ms / max 23.40 ms**, ready-task wait max
+**2.30 ms**, pool-wait max **186.20 ms**, slot RTT max **284.40 ms**. These are
+producer-local observations including holding/startup; they do not measure a
+one-way message leg or establish per-block deadlines/CPU attribution. Worklet
+process timing remains unavailable. Lock-screen, long-duration, other roles
+and live keyboard latency are unverified for this capacity. No replay was needed
+to collect the existing audible report.
 
 ## Next target-device check
 
-Collect the already-played ordinary run's report if still available, linking
-actual guard/frames/events and unique run identity to the supplied listening
-judgment. Then repeat a deliberately captured same-input six/twelve **muted**
-comparison if causal isolation is needed. Assess this explicit 128 ms tradeoff
-before considering a smaller-latency transport experiment or default change.
-A clean partial probe does not imply full-score, locked-screen, device-output
-or keyboard latency acceptance. Retain six/eight negative evidence and source
-fingerprints; do not promote buffering defaults.
+The full guarded phone run and listening link are now captured. Preserve twelve
+as an explicit working 128 ms sequenced-preview option and Serial/six defaults.
+Next bounded implementation: repeatable captured-input six/twelve **muted**
+comparison, retaining one source/score snapshot across trials, so future capacity
+or lower-latency message-leg experiments have controlled input. Assess the
+128 ms tradeoff before any default promotion; do not expand the normal live
+keyboard path or migrate more roles on the strength of one bass run. Retain all
+negative evidence. Lock-screen and longer-session acceptance remain separate.
 No deployment, firewall/trust change, Application Control bypass or migration.

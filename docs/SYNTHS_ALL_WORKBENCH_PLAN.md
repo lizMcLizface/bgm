@@ -936,7 +936,11 @@ adds 128 ms at the same 512-frame cadence, with Serial/six unchanged. **97 check
 **eight pool regressions**, public build and desktop muted/normal/reset pass.
 Host v5 / runtime d6a0341e5edf2d57; Wasm unchanged. Phone twelve-slot probe now
 completes all 96,000 / 188 packets with zero delivery errors and 1,152 minimum
-steady lead despite the same 4,864-frame arrival gap. User separately says an
-audible run sounded fine; collect that existing report to link its full counters
-and listening before further acceptance. No default promotion, schema change,
-deployment or broad workbench migration. Explicit buffering remains 128 ms.
+steady lead despite the same 4,864-frame arrival gap. The supplied ordinary
+audible report now links that same captured input to **668,956 frames / 16 events /
+1,307 blocks, zero errors, guard true and complete/pass true**, plus the user's
+**sounded fine** judgment. Exact run ID/evidence and remaining limits are in the
+linked doc. One bass run is accepted at explicit 128 ms; lock-screen, other roles
+and longer sessions remain unverified. Next is repeatable same-input six/twelve
+muted comparison before lower-latency experiments. No default promotion, schema
+change, deployment or broad workbench migration.

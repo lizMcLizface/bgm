@@ -1941,14 +1941,25 @@ Phone unique v5 twelve-slot probe **63fa43b8-f202-4794-9833-950a2a8a622e** now
 completes 96,000 frames / 188 packets with **zero missing/late/rejected/stale /
 bad-recycle counters**. Largest arrival gap stays **4,864 frames**, minimum steady
 lead **1,152 / 24 ms**. Headroom covers this observed run. Exact raw report:
-`m4a-phone-worker-twelve-probe.json`. The user also ran audible playback and says
-it sounded fine; that run's ID/full counters are pending, so this statement is
-retained separately from the muted probe's false full-score pass/unassessed
-listening. No matched-input six/twelve pair or lock-screen guarantee is claimed.
+`m4a-phone-worker-twelve-probe.json`. The subsequent audible report is now
+**3c2c7faf-e696-499d-9e57-95493ec3bff3**, retained in
+`m4a-phone-worker-twelve-audible.json`: **668,956 planned/consumed/rendered frames,
+16 events, 1,307 blocks, zero delivery/event errors, complete/pass true**. Actual
+worker / Message / twelve / 128 ms, ordinary guard true, no probe/fallback.
+Minimum steady lead 1,152 / 24 ms and largest gap 4,864 / 101.33 ms persist. Its
+source fingerprint matches the phone muted probe. The user's **sounded fine**
+statement is linked to this ordinary run in the evidence doc; raw generated
+listening stays unassessed. This is one clean full-score bass run with user
+listening, not a matched-input six/twelve pair or lock-screen guarantee.
 
-**Next:** collect the already-played audible run's compact report if available,
-linking guard/full frames/events/run ID to the affirmative listening report;
-no replay requested. Assess explicit 128 ms tradeoff. If causal isolation is
-needed, capture a same-input six/twelve muted pair before a lower-latency
-message-leg experiment. Do not blindly increase defaults, assert a Chromium
-timing guarantee or broaden migration. Preserve serial, ordinary guard and LAN.
+**Next bounded implementation:** repeatable same-input six/twelve muted
+comparison, retaining one captured source/score across trials, before a
+lower-latency message-leg experiment. The existing full phone report is captured;
+no repeat audible run is needed for this checkpoint. Assess the explicit 128 ms
+tradeoff before default promotion. Do not assert a Chromium timing guarantee or
+broaden migration. Preserve Serial/six, ordinary guard, legacy keyboard and LAN.
+
+Evidence-only follow-up after `84b6916`: parsed and cross-checked phone reports
+for exact input/build/capacity identity, guard/probe distinction, full frame/event
+completion and zero delivery errors. Prior 105 checks/build are historical,
+not rerun or relabeled; no executable/browser/server change in this follow-up.

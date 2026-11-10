@@ -1,0 +1,108 @@
+{
+  "kind": "all.source-preview.diagnostics",
+  "version": 2,
+  "runId": "3c2c7faf-e696-499d-9e57-95493ec3bff3",
+  "hostRevision": "all-preview-delivery-v5",
+  "sourceFingerprint": "c0840313ad73bdd877411106781862d8720d780a25b6f1f788ce1f389f1f27eb",
+  "diagnosticProbe": null,
+  "probeTrace": null,
+  "engineVersion": "d6a0341e5edf2d57",
+  "startedAtUtc": "2026-11-10T09:28:49.880Z",
+  "browserUserAgent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Mobile Safari/537.36",
+  "sampleRate": 48000,
+  "role": "bass",
+  "reason": "completed",
+  "error": null,
+  "complete": true,
+  "pass": true,
+  "listening": "not assessed",
+  "executor": {
+    "requested": "worker",
+    "actual": "worker",
+    "scheduling": "message",
+    "blockFrames": 512,
+    "poolBlocks": 12,
+    "bufferingLatencyMs": 128,
+    "stopOnUnderrun": true,
+    "deliveryDiagnostics": true
+  },
+  "fallbackReason": null,
+  "frames": {
+    "planned": 668956,
+    "consumed": 668956,
+    "output": 675200,
+    "rendered": 668956
+  },
+  "events": {
+    "applied": 16,
+    "late": 0,
+    "overflow": 0
+  },
+  "delivery": {
+    "underrunFrames": 0,
+    "underrunQuanta": 0,
+    "recoveries": 0,
+    "lateBlocks": 0,
+    "rejectedBlocks": 0,
+    "staleGeneration": 0,
+    "acceptedBlocks": 1307
+  },
+  "lead": {
+    "minFrames": 1152,
+    "zeroLeadQuanta": 0,
+    "belowQuantumQuanta": 0,
+    "firstZeroSourceFrame": null
+  },
+  "arrival": {
+    "maxGapFrames": 4864,
+    "maxConsumedSinceArrivalFrames": 4864,
+    "overCapacityQuanta": 0
+  },
+  "worker": {
+    "blocks": 1307,
+    "renderMs": 2954.2000004053116,
+    "maxRenderMs": 23.400000005960464,
+    "badRecycles": 0
+  },
+  "timingScope": "Last packet: producer at send; worker/producerLater: queried later. No synchronized clocks.",
+  "lastPacket": {
+    "packetFrame": 668672,
+    "frames": 284,
+    "sourceFrameAtArrival": 665088,
+    "producer": {
+      "version": 1,
+      "available": true,
+      "frame": 668956,
+      "blocks": 1307,
+      "freeBuffers": 0,
+      "inFlightBuffers": 12,
+      "elapsedMs": 13987.699999988079,
+      "taskWaits": 1307,
+      "taskWaitMs": 0.09999999403953552,
+      "taskWaitMaxMs": 2.2999999821186066,
+      "poolWaits": 1246,
+      "poolWaitMs": 2.300000011920929,
+      "poolWaitMaxMs": 186.19999998807907,
+      "recycleRttMs": 110.09999999403954,
+      "recycleRttMaxMs": 284.39999997615814,
+      "lastRecycleConsumerFrame": 663039,
+      "renderMs": 1,
+      "maxRenderMs": 23.400000005960464
+    }
+  },
+  "producerLater": {
+    "available": true,
+    "taskWaitMaxMs": 2.2999999821186066,
+    "poolWaitMaxMs": 186.19999998807907,
+    "recycleRttMaxMs": 284.39999997615814,
+    "lastRecycleConsumerFrame": 668955,
+    "readyTaskAgeMs": null,
+    "poolEmptyAgeMs": null
+  },
+  "outputProcess": {
+    "available": false,
+    "calls": null,
+    "maxMs": null,
+    "overQuantumPeriod": null
+  }
+}
