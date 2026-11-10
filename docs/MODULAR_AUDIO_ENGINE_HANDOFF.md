@@ -2539,3 +2539,39 @@ fixed six-source individual-entry/overlap question. Preserve this separately
 from the muted counters: `piano-phone-acceptance.json`. No new user-agent capture
 or lock-screen/other-settings acceptance is inferred. Next: owned shared piano
 voice modulation and the native pre-onset steal fade, with larger local batches.
+
+## 2026-11-10 — M4f shared piano control snapshot implementation
+
+[M4f](MODULAR_AUDIO_ENGINE_M4F_PIANO_CONTROLS.md) adds owned v2 shared pitch and
+filter controls: sine/vibrato/filter-LFO snapshots, seeded walk knots, remaining
+depth ramps and future frequency points. V1 stays compatible; wrong versions,
+unbounded tables, nonuniform pitch wiring and non-lowpass filters fail closed.
+Snapshot replay owns a fresh finite graph clock, not a running keyboard voice.
+Native timers/edits after capture are outside that owner; normal playback remains.
+
+Audit discoveries: native sine phase freezes without reachable voice consumers;
+k-rate detune pulls from the whole first128-frame quantum; the oscillator helper
+schedules frequency1ms ahead. Initial nonzero native vibrato can be unwired from
+piano buffers despite the global flag, whereas a live edit connects it. Capture
+preserves those actual connections and their phase intervals. It does not fake
+parity by attaching a probe that wakes a sleeping oscillator. A1024-frame native
+origin aligns the native/owned test clocks without changing the dry path.
+
+Thirteen native comparisons pass on graph e904b017d4f34cd9 /352592bytes. New cold /
+warm vibrato errors are about1.1e-6 relative RMS, sine1.44e-7, Brownian9.18e-5,
+smoothed Brownian7.79e-4. Existing0.5% RMS/.99998 correlation thresholds stay.
+Real-worker modulated mixed-source PCM is exact; save/reload/reset/instances pass.
+494 tests /70 files pass plus final focused activation tests.30 previous and7
+piano allocation audits report zero render alloc/reclaim/growth. The source page
+now enables the three modulation paths in one fixed batch. Next is native steal-
+fade ownership after finishing this batch; keep larger local checks, not tiny
+phone-setting requests. The user's clean M4e phone acceptance is retained separately.
+
+M4f final checkpoint: graph800313e1223adcff /352592bytes passes all13 native
+comparisons,32 final focused tests, seven zero-allocation piano audits and public
+packaging. The final change accepts a native walk endpoint one epsilon beyond1.2.
+The preceding e904b017d4f34cd9 build passes all four modulated full-path cases
+(942000/726000frames, serial/worker) and a separate audible942000-frame six-source
+run with positive source/channel/master peaks and zero worker delivery gaps.
+These are local measured results; no new phone listening acceptance is inferred.
+Evidence is in the three piano modulation browser reports and allocation report.

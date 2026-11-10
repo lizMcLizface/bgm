@@ -14,6 +14,7 @@ import PRESET_DEFAULTS from './presetDefaults';
 import { gainEnvelopePoints, filterEnvelopeEvents, releasePoints, cancelAndHold } from './envelope';
 import { minTime } from '../../util/util';
 import { wanderLfo } from './wander';
+import {ControlClock} from './controlSnapshot';
 import { MIN_WET } from '../../nodes/reverb';
 import { SendReverb } from '../../nodes/sharedReverb';
 import FdnRoom, { fdnRoomSupported } from './fdnRoom';
@@ -126,8 +127,9 @@ const PARAM_SETTERS = {
     tremoloDepth: (inst, v) => inst.motion.setTremoloDepth(v),
     autoPanRate: (inst, v) => inst.motion.setAutoPanRate(v),
     autoPanDepth: (inst, v) => inst.motion.setAutoPanDepth(v),
-    filterLfoRate: (inst, v) => inst.filterLfo.frequency.setValueAtTime(Math.max(0.01, v), inst.AC.currentTime),
+    filterLfoRate: (inst, v) => {const rate=Math.max(.01,v);inst.filterLfoCapture.rate(rate,inst.AC.currentTime);inst.filterLfo.frequency.setValueAtTime(rate, inst.AC.currentTime);},
     filterLfoDepth: (inst, v) => {
+        inst.filterLfoCapture.depth(v,inst.AC.currentTime);
         inst.filterLfoDepth.gain.setValueAtTime(v, inst.AC.currentTime);
         inst.setFilterLfoConnected(v > 0);
     },
@@ -208,6 +210,7 @@ class Instrument {
         // Filter LFO, in cents on every voice's cutoff (wired only while it
         // has depth - see setFilterLfoConnected).
         this.filterLfo = this.AC.createOscillator();
+        this.filterLfoCapture = new ControlClock(this.AC.currentTime,440);
         this.filterLfoDepth = this.AC.createGain();
         this.filterLfoDepth.gain.value = 0;
         this.filterLfo.connect(this.filterLfoDepth);
@@ -240,6 +243,7 @@ class Instrument {
         this.synthMix.setRatio(20);
 
         const startTime = this.AC.currentTime + 0.01;
+        this.voiceOscillatorStartTime=startTime;
         this.voices = Array.from({ length: polyphony }, () => {
             const synth = new MonoSynth(this.AC);
             // Voices start asleep (disconnected); see wake()/sleepIdle().
@@ -252,6 +256,8 @@ class Instrument {
             return synth;
         });
         this.vibrato.start();
+        this.vibrato.captureClock.setActive(false,this.AC.currentTime);
+        this.filterLfoCapture.setActive(false,this.AC.currentTime);
         this.vibratoConnected = true;
 
         // Per voice: when its last booked note (incl. release) goes silent.
@@ -414,6 +420,7 @@ class Instrument {
                 item.pitchConnected = connected;
             }
         });
+        this.setVoiceControlActive(this.awake.some(Boolean));
     }
 
     // Same for the filter LFO on the voices' cutoff: a filter whose detune
@@ -426,6 +433,7 @@ class Instrument {
             if (connected) this.filterLfoDepth.connect(detune);
             else this.filterLfoDepth.disconnect(detune);
         });
+        this.setVoiceControlActive(this.awake.some(Boolean));
     }
 
     // Wires the wander in cents to every voice's cutoff, like the filter LFO.
@@ -438,6 +446,7 @@ class Instrument {
             if (connected) depth.connect(detune);
             else depth.disconnect(detune);
         });
+        this.setVoiceControlActive(this.awake.some(Boolean));
     }
 
     /**
@@ -454,18 +463,19 @@ class Instrument {
                 if (!cents) return;
                 lfo = wanderLfo(this.AC, { period: periods[kind], phase: phases[kind], seed: seeds[kind], mode, offset });
                 this.wanderLfos[kind] = lfo;
+                lfo.setActive(false,now);
                 if (kind === 'pitch') lfo.depth.connect(this.pitchWanderOut);
             }
             lfo.setMode(mode);
             lfo.setPeriod(periods[kind]);
-            if (immediate) lfo.depth.gain.value = cents;
-            else lfo.depth.gain.setTargetAtTime(cents, now, 0.3);
+            lfo.setDepth(cents,immediate);
         });
         this.filterWanderOn = filter > 0;
         this.pitchWanderOn = pitch > 0;
         if (this.filterWanderOn) this.setFilterWanderConnected(true);
         if (this.pitchWanderOn) this.setVibratoConnected(this.preset.vibratoDepth > 0);
         if ((this.wanderLfos.filter && !filter) || (this.wanderLfos.pitch && !pitch)) this.unwireWanderSoon();
+        this.setVoiceControlActive(this.awake.some(Boolean));
     }
 
     // Once a stopped movement has eased out, unwires it (a wired detune costs).
@@ -475,6 +485,20 @@ class Instrument {
             if (!this.filterWanderOn && this.wanderLfos.filter) this.setFilterWanderConnected(false);
             if (!this.pitchWanderOn) this.setVibratoConnected(this.preset.vibratoDepth > 0);
         }, 1500);
+    }
+
+    voiceModulationSettings() {
+        return {stringPitch:this.voices.map(v=>Boolean(v.stringPitchEnabled)),vibrato:this.vibrato.captureSettings(),filter:this.filterLfoCapture.settings(),wander:Object.fromEntries(Object.entries(this.wanderLfos).map(([k,lfo])=>[k,lfo.captureSettings()]))};
+    }
+    captureVoiceModulation(time=this.AC.currentTime) {
+        const controls=[];
+        const add=(axis,c)=>{if(c.initialDepth||c.targetDepth)controls.push({axis,...c});};
+        const pitch=this.voices.some(v=>v.stringPitchEnabled);
+        if(pitch&&this.vibratoConnected)add('pitch',this.vibrato.captureControl(time));
+        if(this.filterLfoConnected)add('filter',this.filterLfoCapture.capture(time));
+        if(this.filterWanderConnected)add('filter',this.wanderLfos.filter.captureControl(time));
+        if(pitch&&this.vibratoConnected&&this.wanderLfos.pitch)add('pitch',this.wanderLfos.pitch.captureControl(time));
+        return controls;
     }
 
     updateFm() {
@@ -814,6 +838,7 @@ class Instrument {
 
     wake(index) {
         this.wakeEffects();
+        if(!this.awake.some(Boolean))this.setVoiceControlActive(true,index);
         if (!this.awake[index]) {
             this.voices[index].volume.getNode().connect(this.synthMix.getNode());
             this.awake[index] = true;
@@ -834,6 +859,7 @@ class Instrument {
                 this.awake[i] = false;
             }
         });
+        if(!this.awake.some(Boolean))this.setVoiceControlActive(false);
         if (this.chainAwake && !this.externalSourceInputs && !this.awake.some(Boolean) && this.silentFrom() < now) {
             this.output.disconnect();
             this.chainAwake = false;
@@ -855,6 +881,14 @@ class Instrument {
         const delay = Math.max(0.05, at - this.AC.currentTime);
         if (this.sleepTimer) clearTimeout(this.sleepTimer);
         this.sleepTimer = setTimeout(() => this.sleepIdle(), delay * 1000);
+    }
+    setVoiceControlActive(on,index) {
+        const now=this.AC.currentTime,strings=this.voices.flatMap((v,i)=>this.awake[i]||i===index?[...(v.stringSources??[])].map(s=>s.start):[]);
+        // k-rate detune pulls its input for the whole first render quantum,
+        // including the silent samples before a source's fractional onset.
+        const first=Math.min(this.voiceOscillatorStartTime,...strings),pitchStart=Math.max(now,Math.floor(first*this.AC.sampleRate/128)*128/this.AC.sampleRate);
+        this.vibrato.captureClock.setActive(on&&this.vibratoConnected,now,pitchStart);this.filterLfoCapture.setActive(on&&this.filterLfoConnected,now);
+        for(const [kind,lfo]of Object.entries(this.wanderLfos))lfo.setActive(on&&(kind==='pitch'?this.vibratoConnected:this.filterWanderConnected),now,kind==='pitch'?pitchStart:now);
     }
 
     // When the effects will have nothing left to play.

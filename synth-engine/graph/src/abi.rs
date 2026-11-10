@@ -38,6 +38,10 @@ pub extern "C" fn graph_piano_spec(g:&mut Graph,id:u32,note:u32,bank:usize,midi:
 #[no_mangle]
 pub extern "C" fn graph_piano_point(g:&mut Graph,id:u32,note:u32,kind:u32,frame:f64,value:f64,tau:f64)->u32 {piano_status(g,id,|p|p.point(note,calmbgm_piano::voice::Point{kind,frame,value,tau}))}
 #[no_mangle]
+pub extern "C" fn graph_piano_control(g:&mut Graph,id:u32,axis:u32,kind:u32,phase:f64,frequency:f64,initial:f64,target:f64,tau:f64)->u32 {match g.piano_control_edit(id){Ok(p)=>if p.control(calmbgm_piano::control::Control{axis,kind,phase,frequency,initial,target,tau,points:Vec::new()}){0}else{Error::Contract as u32},Err(e)=>e as u32}}
+#[no_mangle]
+pub extern "C" fn graph_piano_control_point(g:&mut Graph,id:u32,index:usize,frame:f64,value:f64)->u32 {match g.piano_control_edit(id){Ok(p)=>if p.control_point(index,frame,value){0}else{Error::Contract as u32},Err(e)=>e as u32}}
+#[no_mangle]
 pub extern "C" fn graph_pitch_config(g:&mut Graph,id:u32,scope:u32,index:u32,value:f64)->u32 {status(g.pitch_config(id,scope,index,value))}
 #[no_mangle]
 pub extern "C" fn graph_pitch_performance(g:&mut Graph,id:u32,mode:u32,portamento:f32,always:u32)->u32 {if always>1{return Error::Contract as u32;}status(g.pitch_performance(id,mode,portamento,always!=0))}

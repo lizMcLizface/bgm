@@ -14,6 +14,7 @@ export function compilePianoNotes(source,notes,rate=48000){
   const offset=p.filterKeyTrack*(n.midi-60)*100+p.filterVelocity*(n.velocity-.6);
   prepared.push({id:i+1,bank,midi:n.midi,velocity:n.velocity,gain:points.map(([t,v])=>[0,t*rate,v,0]),filter:filterEnvelopeEvents(p.filterEnv,n.duration).map(e=>[e.type==='set'?1:2,e.time*rate,e.value+offset,(e.timeConstant??0)*rate])});
  }
- const config=validatePianoConfig({version:1,voices:p.voices,cutoff:p.cutoff,q:p.q,pitch:p.pitch,pitchDecay:p.pitchDecay,banks,notes:prepared});
+ const controls=(p.controls??[]).map(c=>({...c,tauFrames:c.tau*rate,points:c.points.map(([time,value])=>[time*rate,value])}));for(const c of controls)delete c.tau;
+ const config=validatePianoConfig({version:controls.length?2:1,voices:p.voices,cutoff:p.cutoff,q:p.q,pitch:p.pitch,pitchDecay:p.pitchDecay,banks,notes:prepared,...(controls.length?{controls}:{})});
  return {config,tail:Math.max(1,p.gainEnv.release+1)};
 }

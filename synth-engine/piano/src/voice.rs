@@ -46,6 +46,7 @@ pub struct Engine {
     pitch: f64,
     pitch_tau: f64,
     pub bytes: usize,
+    controls: Vec<crate::control::Control>,
     peak_active: usize,
     peak: f64,
     frame: u64,
@@ -64,6 +65,7 @@ impl Engine {
             pitch: 0.,
             pitch_tau: 48.,
             bytes: 0,
+            controls: Vec::new(),
             peak_active: 0,
             peak: 0.,
             frame: 0,
@@ -219,6 +221,7 @@ impl Engine {
     }
     pub fn prepare(&mut self) -> bool {
         if self.slots.is_empty()
+            || self.controls.iter().any(|c| !c.ready())
             || self.notes.iter().any(|n| {
                 n.gain.len() < 2
                     || n.gain[0].frame != 0.
@@ -241,6 +244,36 @@ impl Engine {
                     .notes
                     .iter()
                     .any(|n| n.id == id && n.midi == a && n.velocity == b)
+    }
+    pub fn control(&mut self, c: crate::control::Control) -> bool {
+        if self.ready || self.controls.len() >= 4 || !c.valid() {
+            return false;
+        }
+        self.controls.push(c);
+        true
+    }
+    pub fn control_point(&mut self, index: usize, frame: f64, value: f64) -> bool {
+        if self.ready
+            || !frame.is_finite()
+            || !(0. ..=5_952_000.).contains(&frame)
+            || !value.is_finite()
+        {
+            return false;
+        }
+        let Some(c) = self.controls.get_mut(index) else {
+            return false;
+        };
+        if (if c.kind == 0 {
+            !(0. ..=44100.).contains(&value)
+        } else {
+            value.abs() > 1.2 + f64::EPSILON
+        }) || c.points.len() >= 128
+            || c.points.last().is_some_and(|p| p.0 >= frame)
+        {
+            return false;
+        }
+        c.points.push((frame, value));
+        true
     }
     pub fn conflict(&self, id: u32, owner: u32) -> bool {
         self.slots
@@ -314,8 +347,21 @@ impl Engine {
         self.peak = 0.;
         for (i, o) in out.iter_mut().enumerate() {
             let now = frame + i as u64;
+            let key_frame = now / 128 * 128;
+            let mut pitch_control = 0.;
+            let mut filter_control = 0.;
+            for c in &self.controls {
+                if c.axis == 0 {
+                    pitch_control += c.at(key_frame as f64, self.sr);
+                } else {
+                    filter_control += c.at(now as f64, self.sr);
+                }
+            }
             let mut sum = 0f32;
             for v in &mut self.slots {
+                if v.note.is_none() {
+                    continue;
+                }
                 let mut input = 0.;
                 let mut detune = 0.;
                 if let Some(index) = v.note {
@@ -332,12 +378,15 @@ impl Engine {
                         // AudioBufferSource detune is k-rate, on the absolute
                         // render quantum clock; source cursors remain owned.
                         let kt = (now / 128 * 128).saturating_sub(v.start) as f64;
-                        let rate = 2f64.powf(self.pitch * (-kt / self.pitch_tau).exp() / 1200.);
+                        let rate = 2f64.powf(
+                            (self.pitch * (-kt / self.pitch_tau).exp() + pitch_control) / 1200.,
+                        );
                         v.position += rate;
                         v.body += rate * bank.rate;
                     }
                 }
-                let hz = (self.cutoff * 2f64.powf(detune / 1200.)).clamp(0., self.sr / 2.);
+                let hz = (self.cutoff * 2f64.powf((detune + filter_control) / 1200.))
+                    .clamp(0., self.sr / 2.);
                 if hz != v.hz {
                     let w = std::f64::consts::TAU * hz / self.sr;
                     let c = w.cos();

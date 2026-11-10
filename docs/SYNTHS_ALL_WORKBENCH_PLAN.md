@@ -1087,3 +1087,9 @@ pairs. It creates an isolated host and never writes All storage or song data.
 Four browser serial/worker cases pass, and separate audible worker playback has
 all six raw/channel peaks positive with zero gaps. See M4e for exact versions,
 reports, bounds, remaining families and the next phone listening/modulation gate.
+
+2026-11-10 follow-up: the M4e phone counter/listening gate is accepted. [M4f](MODULAR_AUDIO_ENGINE_M4F_PIANO_CONTROLS.md)
+adds eligible finite piano modulation snapshots (sine, random walk, vibrato and
+filter LFO), preserving actual native phase/wiring behavior. The isolated fixed
+page combines all three modulation paths without changing All settings. Live
+transport, native steal fades and further model families remain separate work.

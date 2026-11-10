@@ -368,7 +368,7 @@ pub fn descriptors_json() -> String {
             // v1 stays raw. v2 requires the kit so older runtimes fail closed.
             modules.push(descriptor.replace(processing,""));
             modules.push(descriptor.replacen("\"version\":1","\"version\":2",1));
-        } else { modules.push(descriptor); }
+        } else if kind==Kind::Piano { modules.push(descriptor.clone());modules.push(descriptor.replacen("\"version\":1","\"version\":2",1).replace("piano spec v1;", "piano spec v2; four frozen shared controls;")); } else { modules.push(descriptor); }
     }
     format!(
         r#"{{"api":1,"patchVersion":1,"maxNodes":{},"maxEdges":{},"maxEvents":{},"maxBlock":{},"modules":[{}]}}"#,
@@ -524,7 +524,7 @@ impl Graph {
     pub fn add_node(&mut self, id: u32, kind: Kind, version: u32) -> Result<()> {
         self.editable()?;
         if kind==Kind::Piano && self.sample_rate!=48000. {return Err(Error::Contract);}
-        if !(version == 1 || kind == Kind::Percussion && version == 2) || id == 0 {
+        if !(version == 1 || matches!(kind,Kind::Percussion|Kind::Piano) && version == 2) || id == 0 {
             return Err(Error::Contract);
         }
         if self.nodes.len() == MAX_NODES {
@@ -815,6 +815,7 @@ impl Graph {
     }
     pub fn pitch_stat(&self,id:u32,index:u32)->Result<f64> {let i=self.index(id)?;let n=&self.nodes[i];if let Some(p)=&n.piano{Ok(p.stat(index))}else{Ok(n.pitched.as_ref().ok_or(Error::Contract)?.stat(index))}}
     pub fn piano_edit(&mut self,id:u32)->Result<&mut calmbgm_piano::voice::Engine>{self.editable()?;let i=self.index(id)?;self.nodes[i].piano.as_mut().map(|p|p.as_mut()).ok_or(Error::Contract)}
+    pub fn piano_control_edit(&mut self,id:u32)->Result<&mut calmbgm_piano::voice::Engine>{let i=self.index(id)?;if self.nodes[i].version!=2{return Err(Error::Contract);}self.piano_edit(id)}
     pub fn percussion_stat(&self,id:u32,index:u32)->Result<f64> {let i=self.index(id)?;Ok(self.nodes[i].percussion.as_ref().ok_or(Error::Contract)?.stat(index))}
     pub fn node_buffer(&self,id:u32)->Result<&[[f32;2]]> {Ok(&self.nodes[self.index(id)?].buffer)}
     pub fn enqueue(&mut self, mut e: Event) -> Result<()> {

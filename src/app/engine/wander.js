@@ -22,6 +22,7 @@
 // pure function of its seed, so a render can start anywhere in it.
 
 import { seeded, normal } from '../random';
+import {ControlClock} from './controlSnapshot';
 
 export const WANDER_MODES = { sine: 'Smooth waves', brownian: 'Random walk' };
 
@@ -88,7 +89,9 @@ const fold = (x) => {
  */
 export class WalkPath {
     constructor(seed, period) {
-        this.rng = seeded(seed);
+        this.seed = seed;
+        const source=seeded(seed);this.draws=0;
+        this.rng=()=>{this.draws++;return source();};
         this.knots = [normal(this.rng, WALK_SIGMA)];
         this.setPeriod(period);
     }
@@ -113,6 +116,12 @@ export class WalkPath {
         const i = Math.floor(x);
         const f = x - i;
         return this.knot(i) * (1 - f) + this.knot(i + 1) * f;
+    }
+    clone() {
+        // Retain history even when a zero-variance knot consumed no RNG draws.
+        const copy=new WalkPath(this.seed,60);
+        while(copy.draws<this.draws)copy.rng();
+        copy.knots=this.knots.slice();copy.decay=this.decay;return copy;
     }
 }
 
@@ -146,6 +155,7 @@ function walkSource(ctx, { seed, period, offset = 0 }) {
     let timer = null;
     return {
         node: source,
+        capture(time,seconds=120){const copy=path.clone(),at=Math.max(0,piece(time)),points=[[0,copy.valueAt(at)]];for(let i=Math.floor(at/WALK_STEP)+1;i*WALK_STEP<=at+seconds+WALK_STEP;i++)points.push([i*WALK_STEP-at,copy.knot(i)]);return points;},
         start() {
             if (offline) {
                 book(ctx.length / ctx.sampleRate + WALK_STEP);
@@ -181,6 +191,7 @@ function sineWave(ctx, phase) {
  *   (seconds elapsed), seed (of the walk), mode
  */
 export function wanderLfo(ctx, { period, phase, offset = 0, seed = 1, mode = 'sine' }) {
+    const clock=new ControlClock(ctx.currentTime,1/period,phase+offset/period);
     const osc = ctx.createOscillator();
     osc.setPeriodicWave(sineWave(ctx, phase + offset / period));
     osc.frequency.value = 1 / period;
@@ -190,10 +201,16 @@ export function wanderLfo(ctx, { period, phase, offset = 0, seed = 1, mode = 'si
     let walk = null;
     let walkGain = null;
     let current = null;
+    let consumers = false;
     const lfo = {
         osc,
         depth,
+        setActive:(on,time,notBefore=time)=>{consumers=on;clock.setActive(on&&current==='sine',time,notBefore);},
+        captureSettings:()=>({...clock.settings(),mode:current}),
+        setDepth(value,immediate=false){clock.depth(value,ctx.currentTime,immediate?0:.3);if(immediate)depth.gain.value=value;else depth.gain.setTargetAtTime(value,ctx.currentTime,.3);},
+        captureControl(time){const c=clock.capture(time);return current==='brownian'?{...c,kind:'linear',points:walk.capture(time)}:c;},
         setPeriod: (seconds) => {
+            clock.rate(1/seconds,ctx.currentTime);
             period = seconds;
             osc.frequency.value = 1 / seconds;
             if (walk) walk.setPeriod(seconds);
@@ -202,6 +219,7 @@ export function wanderLfo(ctx, { period, phase, offset = 0, seed = 1, mode = 'si
         setMode: (next) => {
             next = next === 'brownian' ? 'brownian' : 'sine';
             if (next === current) return;
+            clock.setActive(consumers&&next==='sine',ctx.currentTime);
             current = next;
             if (next === 'brownian') {
                 if (!walk) {

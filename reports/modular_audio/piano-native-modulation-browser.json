@@ -1,0 +1,233 @@
+{
+  "kind": "piano.native-voice-comparison",
+  "version": 1,
+  "engineVersion": "800313e1223adcff",
+  "sampleRate": 48000,
+  "scope": "Native dry voice before shared compressor/FX; approximate SRC parity, not bit identity or listening",
+  "checksPassed": true,
+  "limits": {
+    "relativeRmsError": 0.005,
+    "correlation": 0.99998
+  },
+  "notes": [
+    {
+      "midi": 48,
+      "time": 0.125,
+      "duration": 0.4,
+      "velocity": 0.3
+    },
+    {
+      "midi": 60,
+      "time": 0.625,
+      "duration": 0.5,
+      "velocity": 0.6
+    },
+    {
+      "midi": 67,
+      "time": 0.625,
+      "duration": 0.5,
+      "velocity": 0.45
+    },
+    {
+      "midi": 72,
+      "time": 1.375,
+      "duration": 0.7,
+      "velocity": 0.8
+    }
+  ],
+  "results": [
+    {
+      "name": "Felt Keys (updated)",
+      "warm": false,
+      "controls": [],
+      "cutoff": 11000,
+      "pitchCents": 2,
+      "peak": 0.14758160710334778,
+      "maxError": 0.0005052350461483002,
+      "relativeRmsError": 0.0010044290756716786,
+      "correlation": 0.9999994955609595
+    },
+    {
+      "name": "Starmap Piano",
+      "warm": false,
+      "controls": [],
+      "cutoff": 1400,
+      "pitchCents": 0,
+      "peak": 0.3194833993911743,
+      "maxError": 0.0002778246998786926,
+      "relativeRmsError": 0.00016060668239091674,
+      "correlation": 0.9999999882231773
+    },
+    {
+      "name": "Felted Piano",
+      "warm": false,
+      "controls": [],
+      "cutoff": 11000,
+      "pitchCents": 2,
+      "peak": 0.1519729197025299,
+      "maxError": 0.0005143694579601288,
+      "relativeRmsError": 0.0010327738225920312,
+      "correlation": 0.9999994666891241
+    },
+    {
+      "name": "Studio Grand",
+      "warm": false,
+      "controls": [],
+      "cutoff": 11000,
+      "pitchCents": 3,
+      "peak": 0.11234410107135773,
+      "maxError": 0.0008771335706114769,
+      "relativeRmsError": 0.0012690084874510856,
+      "correlation": 0.9999991948257481
+    },
+    {
+      "name": "Electric recipe",
+      "warm": false,
+      "controls": [],
+      "cutoff": 1400,
+      "pitchCents": 0,
+      "peak": 0.31563466787338257,
+      "maxError": 0.00027654506266117096,
+      "relativeRmsError": 0.00015999892095350094,
+      "correlation": 0.999999988316619
+    },
+    {
+      "name": "Upright recipe",
+      "warm": false,
+      "controls": [],
+      "cutoff": 11000,
+      "pitchCents": 2,
+      "peak": 0.13181431591510773,
+      "maxError": 0.0007631294429302216,
+      "relativeRmsError": 0.0010140016204224808,
+      "correlation": 0.9999994859003215
+    },
+    {
+      "name": "Felt Keys without pitch envelope",
+      "warm": false,
+      "controls": [],
+      "cutoff": 11000,
+      "pitchCents": 0,
+      "peak": 0.1477450132369995,
+      "maxError": 4.470348358154297e-8,
+      "relativeRmsError": 9.666673678922234e-8,
+      "correlation": 0.9999999999999801
+    },
+    {
+      "name": "Initial preset vibrato wiring",
+      "warm": false,
+      "controls": [
+        {
+          "axis": "filter",
+          "kind": "sine"
+        }
+      ],
+      "cutoff": 11000,
+      "pitchCents": 0,
+      "peak": 0.14775972068309784,
+      "maxError": 2.5331974029541016e-7,
+      "relativeRmsError": 0.0000010742229693410964,
+      "correlation": 0.9999999999993867
+    },
+    {
+      "name": "Live edited vibrato and filter LFO",
+      "warm": false,
+      "controls": [
+        {
+          "axis": "pitch",
+          "kind": "sine"
+        },
+        {
+          "axis": "filter",
+          "kind": "sine"
+        }
+      ],
+      "cutoff": 11000,
+      "pitchCents": 0,
+      "peak": 0.14773835241794586,
+      "maxError": 2.5331974029541016e-7,
+      "relativeRmsError": 0.0000010833558780377572,
+      "correlation": 0.999999999999373
+    },
+    {
+      "name": "Warm live vibrato and filter LFO",
+      "warm": true,
+      "controls": [
+        {
+          "axis": "pitch",
+          "kind": "sine"
+        },
+        {
+          "axis": "filter",
+          "kind": "sine"
+        }
+      ],
+      "cutoff": 11000,
+      "pitchCents": 0,
+      "peak": 0.14766862988471985,
+      "maxError": 2.2351741790771484e-7,
+      "relativeRmsError": 0.0000010382888932882025,
+      "correlation": 0.9999999999994044
+    },
+    {
+      "name": "Sine voice wander",
+      "warm": false,
+      "controls": [
+        {
+          "axis": "filter",
+          "kind": "sine"
+        },
+        {
+          "axis": "pitch",
+          "kind": "sine"
+        }
+      ],
+      "cutoff": 11000,
+      "pitchCents": 0,
+      "peak": 0.14784087240695953,
+      "maxError": 4.470348358154297e-8,
+      "relativeRmsError": 1.4155449586143687e-7,
+      "correlation": 0.9999999999999458
+    },
+    {
+      "name": "Brownian voice wander",
+      "warm": false,
+      "controls": [
+        {
+          "axis": "filter",
+          "kind": "linear"
+        },
+        {
+          "axis": "pitch",
+          "kind": "linear"
+        }
+      ],
+      "cutoff": 11000,
+      "pitchCents": 0,
+      "peak": 0.14892491698265076,
+      "maxError": 0.000014633871614933014,
+      "relativeRmsError": 0.00009178911565840778,
+      "correlation": 0.999999995795875
+    },
+    {
+      "name": "Smoothed Brownian voice wander",
+      "warm": false,
+      "controls": [
+        {
+          "axis": "filter",
+          "kind": "linear"
+        },
+        {
+          "axis": "pitch",
+          "kind": "linear"
+        }
+      ],
+      "cutoff": 11000,
+      "pitchCents": 0,
+      "peak": 0.1488950550556183,
+      "maxError": 0.00009415531530976295,
+      "relativeRmsError": 0.0007788446932639236,
+      "correlation": 0.9999996970288169
+    }
+  ]
+}

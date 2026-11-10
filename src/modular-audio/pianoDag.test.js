@@ -2,7 +2,7 @@
 import fs from 'node:fs';
 import {it,expect} from 'vitest';
 import {ReferenceGraph,savePatch,loadPatch,validatePatch} from './runtime';
-import {pianoFixture} from './pianoFixture';
+import {pianoFixture,modulatedPianoFixture} from './pianoFixture';
 import {sixSourceDag} from './pitchedFixture';
 import {verifyWorker} from './workerVerification';
 import {BrowserThreadWorker,MessageChannel} from '../../tools/workerNodeAdapter.mjs';
@@ -22,9 +22,19 @@ it('rejects malformed banks, automation, ambiguous triggers and unsupported stea
  for(const edit of [p=>p.modules[0].config.banks[0].frequency=NaN,p=>p.modules[0].config.notes[0].gain[1][1]=-1,p=>p.events.push({...p.events[0]}),p=>p.events[0].a=61,p=>p.modules[0].config.voices=1,p=>p.events[0].event=1]){const p=pianoFixture();edit(p);expect(()=>validatePatch(p,contracts)).toThrow();}
  const g=make(pianoFixture());try{expect(()=>g.enqueue({...pianoFixture().events[0],note:999})).toThrow();}finally{g.dispose();}
 });
+it.each(['sine','linear'])('owns %s shared modulation across blocks and persisted instances',kind=>{
+ const p=modulatedPianoFixture('electric',kind);
+ const a=make(p),b=make(loadPatch(savePatch(p,contracts),contracts)),dry=make(pianoFixture('electric',2));try{const pcm=render(a,60000),other=render(b,60000,[37,127,203]);expect(other).toEqual(pcm);expect(render(dry,60000)).not.toEqual(pcm);a.reset();for(const e of p.events)a.enqueue(e);expect(render(a,60000,[128])).toEqual(pcm);}finally{a.dispose();b.dispose();dry.dispose();}
+});
+it('rejects unsupported control schemas, versions and unbounded walk snapshots',()=>{
+ const p=pianoFixture();p.modules[0].version=p.modules[0].config.version=2;const control={axis:'pitch',kind:'linear',phase:0,frequency:.1,initialDepth:0,targetDepth:8,tauFrames:14400,points:[[0,0],[5760000,.5]]};p.modules[0].config.controls=[control];expect(()=>validatePatch(p,contracts)).not.toThrow();
+ for(const change of [p=>p.modules[0].version=1,p=>p.modules[0].config.controls[0].phase=1,p=>p.modules[0].config.controls[0].points[1][0]=300,p=>p.modules[0].config.controls[0].points[1][1]=2]){const invalid=structuredClone(p);change(invalid);expect(()=>validatePatch(invalid,contracts)).toThrow();}
+ const e=new WebAssembly.Instance(module,{}).exports,g=make(pianoFixture(),e);try{expect(e.graph_piano_control(g.handle,1,0,0,0,1,0,8,14400)).not.toBe(0);}finally{g.dispose();}
+});
+it('accepts the native clamped three-sigma walk endpoint including its final floating-point bit',()=>{const p=modulatedPianoFixture('electric','linear');p.modules[0].config.controls[0].points[0][1]=-1.2000000000000002;const g=make(p);try{expect(render(g,8000).some(v=>v!==0)).toBe(true);}finally{g.dispose();}});
 it('publishes two pianos, core, FM and drums with exact eight-bus serial/worker PCM through the sidechain master',async()=>{
  const fixture=JSON.parse(fs.readFileSync('public/modular-audio/six-role-fixture.json')),patch=sixSourceDag(fixture,48000);
- for(const [id,type]of [[3,'felted'],[4,'electric']]){const p=pianoFixture(type,2);patch.modules=patch.modules.map(n=>n.id===id?{...p.modules[0],id}:n);patch.events=patch.events.filter(e=>e.target!==id).concat(p.events.map(e=>({...e,target:id,owner:id})));}
+ for(const [id,type]of [[3,'felted'],[4,'electric']]){const p=modulatedPianoFixture(type,id===3?'sine':'linear');patch.modules=patch.modules.map(n=>n.id===id?{...p.modules[0],id}:n);patch.events=patch.events.filter(e=>e.target!==id).concat(p.events.map(e=>({...e,target:id,owner:id})));}
  globalThis.MessageChannel=MessageChannel;
  const r=await verifyWorker({fixture,contracts,modules:{graph:module}},48000,{patch,seconds:3,options:{blockFrames:512,poolBlocks:12,scheduling:'message'},makeWorker:()=>new BrowserThreadWorker()});
  expect(r.pass).toBe(true);expect(r.sameCadenceMaxAbs).toBe(0);expect(r.nonFinite).toBe(0);expect(r.worker.roles[2].peakActive).toBe(3);expect(r.worker.roles[3].peakActive).toBe(3);

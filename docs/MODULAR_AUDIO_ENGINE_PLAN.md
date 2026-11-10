@@ -21,8 +21,9 @@ modal felt/electric and base grand/felted/upright note generation into owned
 Rust/Wasm, opt-in through the existing native piano worker/voice chain. This is
 now extended by [M4e prepared owned piano voices](MODULAR_AUDIO_ENGINE_M4E_PIANO_VOICES.md):
 finite per-voice playback, gain/filter envelopes, pitch, stereo-bus output and
-owned allocation/release state. Voice stealing and shared native modulation
-remain explicitly rejected. Matched acoustic/calibrated/Iowa/classic adapters remain.
+owned allocation/release state. [M4f shared piano controls](MODULAR_AUDIO_ENGINE_M4F_PIANO_CONTROLS.md)
+adds frozen sine, vibrato, filter-LFO and seeded-walk snapshots to v2. Native
+voice stealing remains explicitly rejected. Matched acoustic/calibrated/Iowa/classic adapters remain.
 All six source engines have owned mutable Rust state; core's read-only additive
 tables are safely shared after preparation. External stereo host inputs and
 graph program/key compression exist. All six sources now also run inside one

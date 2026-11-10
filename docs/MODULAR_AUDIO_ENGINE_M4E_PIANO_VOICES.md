@@ -122,3 +122,9 @@ and audio is clean"** to the individual-entry/overlap listening question.
 `piano-phone-acceptance.json` retains those separate pieces of evidence without
 inventing a user-agent or lock-screen result. The mixed-piano phone gate is
 passed; continue with shared voice modulation and native steal-fade parity.
+
+M4e's phone gate is now accepted (user report and explicit clean listening reply).
+[M4f](MODULAR_AUDIO_ENGINE_M4F_PIANO_CONTROLS.md) extends the finite source with
+owned shared control snapshots and native phase/wiring capture. It preserves
+the actual initial-vibrato wiring quirk and leaves live/normal transport alone.
+Voice stealing is the next bounded port; further model families remain separate.

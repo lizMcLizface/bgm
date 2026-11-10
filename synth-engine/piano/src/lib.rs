@@ -2,6 +2,7 @@
 //! This renders note material off the audio callback, not a voice/FX graph.
 use std::f64::consts::{PI, TAU};
 mod acoustic;
+pub mod control;
 pub mod voice;
 
 fn clamp(x: f64, lo: f64, hi: f64) -> f64 {

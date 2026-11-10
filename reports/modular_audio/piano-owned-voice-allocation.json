@@ -2,8 +2,8 @@
   "kind": "piano.owned-voice-allocation",
   "version": 1,
   "pass": true,
-  "graphVersion": "d68f9dc21e528d44",
-  "scope": "Prepared finite Rust piano render, independent handles, save/reload, reset, enqueue, owner cancellation and pause. Excludes preparation and host JS/browser deadlines.",
+  "graphVersion": "800313e1223adcff",
+  "scope": "Prepared finite Rust piano render including sine/walk modulation, independent handles, save/reload, reset, enqueue, owner cancellation and pause. Excludes preparation and host JS/browser deadlines.",
   "results": [
     {
       "type": "felt",
@@ -58,6 +58,28 @@
       "independentHandles": 2,
       "allocationOrReclamationCalls": 0,
       "memoryBytes": 3932160,
+      "grew": false
+    },
+    {
+      "type": "sine",
+      "sampleRate": 48000,
+      "frames": 60000,
+      "peak": 0.21012331545352936,
+      "saveReloadExact": true,
+      "independentHandles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2621440,
+      "grew": false
+    },
+    {
+      "type": "linear",
+      "sampleRate": 48000,
+      "frames": 60000,
+      "peak": 0.2091985046863556,
+      "saveReloadExact": true,
+      "independentHandles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2621440,
       "grew": false
     }
   ]

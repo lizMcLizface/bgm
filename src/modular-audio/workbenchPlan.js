@@ -28,7 +28,7 @@ export function compileWorkbenchSource({project,part,role,bpm,source,tune=n=>n,m
   const {config,tail}=compilePianoNotes(source,notes,rate),seconds=Math.max(preroll+length*stepSec,...notes.map(n=>n.time+n.duration))+tail;
   if(seconds>120)throw Error('Piano preview exceeds 120 seconds');
   const events=notes.map((n,i)=>({kind:'note',target:1,owner:1,event:0,note:i+1,frame:Math.round(n.time*rate),a:n.midi,b:n.velocity}));
-  return {version:1,role,part:structuredClone(part),bpm,sampleRate:rate,preroll,tailSeconds:tail,endFrame:Math.ceil(seconds*rate),noteCount:notes.length,notes,graph:{version:1,modules:[{id:1,type:'legacy.piano',version:1,parameters:{gain:1},config},{id:18,type:'ref.output',version:1,parameters:{}}],connections:[{id:1,kind:'audio',from:{module:1,port:'audio.out'},to:{module:18,port:'program.in'}}],events}};
+  return {version:1,role,part:structuredClone(part),bpm,sampleRate:rate,preroll,tailSeconds:tail,endFrame:Math.ceil(seconds*rate),noteCount:notes.length,notes,graph:{version:1,modules:[{id:1,type:'legacy.piano',version:config.version,parameters:{gain:1},config},{id:18,type:'ref.output',version:1,parameters:{}}],connections:[{id:1,kind:'audio',from:{module:1,port:'audio.out'},to:{module:18,port:'program.in'}}],events}};
  }
  const patch=structuredClone(source.patch),fm=source.kind==='fm',release=Math.max(0,...(fm?patch.operators.slice(0,patch.global.operators).map(o=>o.release):patch.layers.slice(0,patch.global.model===2?2:1).map(l=>l.release))),tail=Math.max(1,release+patchColourTail(patch)+1),seconds=Math.max(preroll+length*stepSec,...notes.map(n=>n.time+n.duration))+tail;
  if(tail>30||!Number.isFinite(seconds)||seconds>WORKBENCH_SOURCE_BUDGET.maxSeconds)throw Error('Source preview duration exceeds 120 seconds');

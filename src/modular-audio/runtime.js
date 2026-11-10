@@ -22,7 +22,7 @@ export function validatePatch(raw, contracts) {
     }
     modules.set(n.id, d);
     if(['legacy.core','legacy.fm'].includes(d.type))n.config=validatePitchedConfig(n.config,d.type==='legacy.fm');
-    if(d.type==='legacy.piano')n.config=validatePianoConfig(n.config);
+    if(d.type==='legacy.piano'){n.config=validatePianoConfig(n.config);if(n.version!==n.config.version)throw Error('Piano module/configuration version mismatch');}
     if(d.type==='legacy.percussion'){
       if(n.version===1&&n.config!==undefined||n.version===2&&n.config===undefined)throw Error('Invalid percussion kit: requires module version 2 and complete configuration');
       if(n.version===2)n.config=validatePercussionConfig(n.config,d.kitConfiguration);
@@ -118,6 +118,7 @@ export class ReferenceGraph {
         }
         if(d.type==='legacy.piano'){
           const c=n.config;checked(engine.graph_piano_config(this.handle,n.id,c.voices,c.cutoff,c.q,c.pitch,c.pitchDecay));
+          for(const [i,m]of (c.controls??[]).entries()){checked(engine.graph_piano_control(this.handle,n.id,Number(m.axis==='filter'),Number(m.kind==='linear'),m.phase,m.frequency,m.initialDepth,m.targetDepth,m.tauFrames));for(const [frame,value]of m.points)checked(engine.graph_piano_control_point(this.handle,n.id,i,frame,value));}
           for(const b of c.banks)checked(engine.graph_piano_bank(this.handle,n.id,b.frequency,PIANO_TYPES.indexOf(b.type),b.decay,b.brightness,b.hammer,b.unison,b.velocity,b.seed,b.resonance,b.softness,b.sustain,b.wear));
           for(const v of c.notes){checked(engine.graph_piano_spec(this.handle,n.id,v.id,v.bank,v.midi,v.velocity));for(const p of [...v.gain,...v.filter])checked(engine.graph_piano_point(this.handle,n.id,v.id,...p));}
         }

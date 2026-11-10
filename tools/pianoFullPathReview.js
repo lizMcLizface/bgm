@@ -7,14 +7,14 @@ let host=null,pending=null,active=null,epoch=0;
 const copy=document.querySelector('#copy'),summary=document.querySelector('#path-summary');
 copy.onclick=async()=>{try{await navigator.clipboard.writeText(summary.textContent);copy.textContent='Copied compact result';}catch{copy.textContent='Copy unavailable; expand diagnostics';}};
 const selections=[['lead','poly','Soft Pad'],['counter','fm','FM Rhodes'],['rhythm','piano','Felt Keys (updated)'],['pad','piano','Starmap Piano'],['bass','piano','Studio Grand'],['perc','kit','hand']];
-const fixedScope={selections,voiceWander:'disabled only in this isolated host',songAndSettings:'All storage unchanged',worker:{blockFrames:512,poolBlocks:12,scheduling:'message'}};
+const fixedScope={selections,voiceWander:'captured sine on Rhythm, captured Brownian on Pad; live vibrato/filter LFO on Bass',songAndSettings:'All storage unchanged',worker:{blockFrames:512,poolBlocks:12,scheduling:'message'}};
 async function prepare(){
  if(pending)return pending;
  pending=(async()=>{const base={...BROWSABLE_SCENES[0],voices:{},layerVoices:{},percussion:null};host=createHost(base,{seed:109});
   if(host.context.sampleRate!==48000)throw Error('This fixed batch requires 48 kHz.');
   await host.wake();
   for(const [role,kind,name]of selections){status.textContent=`Preparing ${name}`;await host.setSound(role,{synth:kind,name});}
-  for(const role of roles){const i=host.g.roles[role].instrument,native=i?.voice?.native??(i?.synthMix?i:null);if(!native)continue;native.setWander({filter:0,pitch:0,periods:{filter:60,pitch:60},phases:{filter:0,pitch:0},immediate:true});native.setFilterWanderConnected(false);native.setVibratoConnected(false);}
+  for(const role of ['rhythm','pad','bass']){const i=host.g.roles[role].instrument,native=i?.voice?.native??(i?.synthMix?i:null);if(!native)throw Error('Missing native piano in fixed profile');native.setWander({filter:role==='bass'?0:480,pitch:role==='bass'?0:5,periods:{filter:15,pitch:18},phases:{filter:.2,pitch:.3},seeds:{filter:109,pitch:137},mode:role==='pad'?'brownian':'sine',offset:13.25,immediate:false});if(role==='bass'){native.set('vibratoDepth',6);native.set('vibratoRate',4);native.set('filterLfoDepth',300);native.set('filterLfoRate',.7);}}
   for(const role of roles){const s=host.sourcePreviewStatus(role);if(!s.eligible)throw Error(`${role}: ${s.reason}`);}
   await host.setupMixer();return host;
  })().catch(e=>{host?.dispose();host=null;pending=null;throw e;});return pending;

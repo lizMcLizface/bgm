@@ -1,4 +1,4 @@
-import {ReferenceGraph} from './runtime.js?v=cabfdffb0677f32f';
+import {ReferenceGraph} from './runtime.js?v=b883cc9bc5a4d066';
 // Opt-in host I/O only. Existing synth/effects processors remain unchanged.
 class EnsembleBridge extends AudioWorkletProcessor{
  constructor({processorOptions:o}){super();this.stopped=false;this.origin=null;try{

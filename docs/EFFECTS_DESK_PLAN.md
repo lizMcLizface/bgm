@@ -1459,3 +1459,9 @@ zero delivery gaps. Source and shared FX PCM remain separate evidence: these
 are not isolated wet equivalence or physical listening claims. Fixed test page
 `tools/piano-voice.html` avoids desk navigation and edits no All settings.
 Shared native voice modulation and piano steal fades are explicitly gated.
+
+2026-11-10 follow-up: [M4f](MODULAR_AUDIO_ENGINE_M4F_PIANO_CONTROLS.md) adds shared
+piano pitch/filter controls as owned finite snapshots. Existing effects/mixer
+routing and input holds remain. Native phase follows reachable voice intervals;
+initial vibrato wiring is captured as observed. Thirteen native dry comparisons
+pass; this does not establish isolated wet equivalence or live clock continuation.

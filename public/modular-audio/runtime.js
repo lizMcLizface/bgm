@@ -229,7 +229,16 @@ var fail = () => {
   throw Error("Invalid prepared piano configuration");
 };
 function validatePianoConfig(c) {
-  if (c?.version !== 1 || !Number.isInteger(c.voices) || !range(c.voices, 1, 32) || !range(c.cutoff, 0, 24e3) || !range(c.q, 0, 100) || !range(c.pitch, -2400, 2400) || !range(c.pitchDecay, 0, 30) || !Array.isArray(c.banks) || c.banks.length > 128 || !Array.isArray(c.notes) || c.notes.length > 2e3) fail();
+  if (![1, 2].includes(c?.version) || !Number.isInteger(c.voices) || !range(c.voices, 1, 32) || !range(c.cutoff, 0, 24e3) || !range(c.q, 0, 100) || !range(c.pitch, -2400, 2400) || !range(c.pitchDecay, 0, 30) || !Array.isArray(c.banks) || c.banks.length > 128 || !Array.isArray(c.notes) || c.notes.length > 2e3) fail();
+  if (c.version === 1 && c.controls !== void 0 || c.version === 2 && (!Array.isArray(c.controls) || c.controls.length > 4)) fail();
+  for (const m of c.controls ?? []) {
+    if (!["pitch", "filter"].includes(m.axis) || !["sine", "linear"].includes(m.kind) || (!range(m.phase, 0, 1) || m.phase === 1) || !range(m.frequency, 0, 44100) || !range(m.initialDepth, -24e3, 24e3) || !range(m.targetDepth, -24e3, 24e3) || !range(m.tauFrames, 0, 144e4) || !Array.isArray(m.points) || m.points.length > 128 || m.kind === "linear" && (m.points.length < 2 || m.points[0][0] !== 0 || m.points.at(-1)[0] < 576e4)) fail();
+    let last = -1;
+    for (const p of m.points) {
+      if (!Array.isArray(p) || p.length !== 2 || !range(p[0], 0, 5952e3) || p[0] <= last || !range(p[1], m.kind === "sine" ? 0 : -(1.2 + Number.EPSILON), m.kind === "sine" ? 44100 : 1.2 + Number.EPSILON)) fail();
+      last = p[0];
+    }
+  }
   for (const b of c.banks) {
     if (!range(b.frequency, 10, 8e3) || !PIANO_TYPES.includes(b.type) || !range(b.decay, 0.3, 5) || ["brightness", "hammer", "unison", "velocity", "resonance", "softness", "sustain", "wear"].some((k) => !range(b[k], 0, 1)) || !Number.isInteger(b.seed) || !range(b.seed, 0, 4294967295) || PIANO_TYPES.indexOf(b.type) >= 2 && b.sustain !== 0) fail();
   }
@@ -272,7 +281,10 @@ function validatePatch(raw, contracts) {
     }
     modules.set(n.id, d);
     if (["legacy.core", "legacy.fm"].includes(d.type)) n.config = validatePitchedConfig(n.config, d.type === "legacy.fm");
-    if (d.type === "legacy.piano") n.config = validatePianoConfig(n.config);
+    if (d.type === "legacy.piano") {
+      n.config = validatePianoConfig(n.config);
+      if (n.version !== n.config.version) throw Error("Piano module/configuration version mismatch");
+    }
     if (d.type === "legacy.percussion") {
       if (n.version === 1 && n.config !== void 0 || n.version === 2 && n.config === void 0) throw Error("Invalid percussion kit: requires module version 2 and complete configuration");
       if (n.version === 2) n.config = validatePercussionConfig(n.config, d.kitConfiguration);
@@ -384,6 +396,10 @@ var ReferenceGraph = class {
         if (d.type === "legacy.piano") {
           const c = n.config;
           checked(engine.graph_piano_config(this.handle, n.id, c.voices, c.cutoff, c.q, c.pitch, c.pitchDecay));
+          for (const [i, m] of (c.controls ?? []).entries()) {
+            checked(engine.graph_piano_control(this.handle, n.id, Number(m.axis === "filter"), Number(m.kind === "linear"), m.phase, m.frequency, m.initialDepth, m.targetDepth, m.tauFrames));
+            for (const [frame4, value] of m.points) checked(engine.graph_piano_control_point(this.handle, n.id, i, frame4, value));
+          }
           for (const b of c.banks) checked(engine.graph_piano_bank(this.handle, n.id, b.frequency, PIANO_TYPES.indexOf(b.type), b.decay, b.brightness, b.hammer, b.unison, b.velocity, b.seed, b.resonance, b.softness, b.sustain, b.wear));
           for (const v of c.notes) {
             checked(engine.graph_piano_spec(this.handle, n.id, v.id, v.bank, v.midi, v.velocity));
