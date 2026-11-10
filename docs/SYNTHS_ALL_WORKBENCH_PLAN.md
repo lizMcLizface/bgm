@@ -999,3 +999,14 @@ Stop and reload defaults verified. Host v9, engine unchanged. Phone full silent
 active-voice probe requested; audible phone/music acceptance remains pending.
 Next actual percussion kit/hit/lock/FX audit; native piano/classics remain
 separate adapters. Existing normal playback/setup/backend stay operational.
+
+[The percussion seam audit](MODULAR_AUDIO_ENGINE_M4C_PERCUSSION_AUDIT.md) now
+identifies selected kit configuration as the next prerequisite. Raw owned
+percussion agrees exactly with legacy Wasm, but graph preparation lacks the
+actual per-drum levels/palette; default hits would change some selected sounds.
+Keep native/basic/classic families distinct and capture the actual instrument.
+Next immutable owned kit configuration and parity/persistence checks, then a
+Wasm-kit-only finite All lease/hit compiler/six-stem report. Reuse All expression
+and external insert/mixer routing; avoid the legacy kit's sleep timer. Audit
+has **27 exact baseline comparisons**, seven positive/negative seam experiments
+and **30 existing checks** passing. No new Drums eligibility or default switch.

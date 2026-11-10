@@ -1043,3 +1043,18 @@ requested. Exact contracts/artifacts/limits are in the linked audition doc.
 Next phone active-voice gate, then guarded listening; meanwhile audit the
 actual All percussion kit/hit/lock/FX seam before extending the finite adapter.
 No defaults/backend/schema/deployment change or latency work.
+
+### M4c percussion audit, before adapter implementation
+
+[Actual All percussion boundaries](MODULAR_AUDIO_ENGINE_M4C_PERCUSSION_AUDIT.md)
+are audited after `2d3ca5f`. Raw graph kernels pass existing **27 exact PCM
+comparisons**; **30 existing expression/palette/engine checks** pass. Seven
+new source experiments demonstrate correct raw/resolved attacks and the
+missing per-drum configuration authority. Do not reuse a default fixture kit
+or confuse basic 808 with classic TR-808. Next versioned immutable owned kit
+preparation with validation/persistence/exact configured legacy parity, then
+Wasm-kit-only finite All integration/source ID6. Native/classic paths stay
+explicitly unsupported, with dry role input preserving current external FX
+and avoiding legacy kit sleep timers. Phone full muted/audible audition reports
+arrived clean; subjective listening remains pending separately;
+no adapter/default/backend/deployment change is delivered by the audit.

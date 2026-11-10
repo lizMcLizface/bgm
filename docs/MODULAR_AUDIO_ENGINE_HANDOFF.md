@@ -2187,3 +2187,32 @@ linkage. Pending phone evidence does not block a read-only audit of actual All
 percussion kit/hit/locks/per-role FX routing for the next finite adapter.
 Native piano/classics and normal transport migration stay gated. Keep longer
 phone lookahead; startup-delay experiments remain deferred.
+
+## M4c percussion seam audit (2026-11-10)
+
+After `2d3ca5f`, [the actual All percussion audit](MODULAR_AUDIO_ENGINE_M4C_PERCUSSION_AUDIT.md)
+finds a necessary configuration gap before adapter work: owned raw hits are
+correct, but graph preparation cannot yet carry per-drum kit levels/palette.
+Scene/basic/classic identity must be resolved from the actual instrument;
+basic 808 and classic TR-808 are different kernels. All currently defaults to
+native Felt/Crisp and does not pass a query percussion override to Generator.
+Initial adapter must explicitly accept ready actual Wasm basic kits, retaining
+native/classic exclusions. Reuse All drumStepEvents expression and report the
+legacy basic-kit sound-lock limitations. No automatic source replacement.
+
+Reproducible `tools/auditAllPercussionSeam.mjs`: seven source PCM experiments,
+four exact agreements and three expected configuration/mapping mismatches,
+48 kHz / 48,000 frames / one timed event, different render partitions. A .25
+kit level produces legacy peak **0.137166** versus unconfigured graph
+**0.546370**. Raw report `m4c-percussion-seam-audit.json`. Existing **27 exact
+golden PCM comparisons** and **30 tests / five files (11.58 s)** pass. No DSP,
+browser/build/device or generated asset change; legacy DSP remains unchanged.
+
+Next implement validated versioned immutable **owned kit preparation config**
+with Rust/JS/ABI/save-reload, absent-config compatibility and exact configured
+legacy parity/allocation/independent-instance checks, before All integration.
+Then actual Wasm-kit lease, dry percussion role-gain input (avoid live-kit sleep
+timers), finite hit compiler/source ID6 and six-stem diagnostics. Phone v9 full
+pitched muted/audible reports arrived clean; listening feedback remains pending.
+Record those runs in the audition checkpoint separately; this foundation does not depend
+on its listening result. No default promotion, latency work or deployment.
