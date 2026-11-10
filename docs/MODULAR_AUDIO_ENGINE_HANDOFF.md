@@ -1893,3 +1893,29 @@ that uses existing recovery behavior to observe subsequent arrivals/misses
 without repeatedly playing broken audio. Preserve normal first-miss guard,
 six-slot and serial defaults. No more speculative default buffer increases or
 broader source migration. Keep normal-user HTTPS server running.
+
+## M4a muted recovery probe: actual phone evidence (2026-11-10)
+
+[Probe contracts and exact results](MODULAR_AUDIO_ENGINE_M4A_SILENT_PROBE.md)
+implement a separate opt-in two-source-second worker diagnostic. Own gain is
+zero before connection/arming; only this path allows recovery after misses.
+Normal audible preview retains the first-miss guard; serial/six remain defaults.
+Probe completion is separate from a full-score pass. Host v4; engine unchanged.
+**96 tests / five files (58.40 s)** and public package build **44.30 s** pass.
+Actual desktop probe renders 96,000 muted frames; immediately subsequent normal
+preview completes 668,956 / 16 events with three signal peaks and no misses.
+Both full input hashes match (independently checked); repeat/reload checks pass.
+
+Phone unique run **34cae2c4-49bc-4044-b421-077d96bfdaab** completes the muted
+96,000-frame probe, but has **36,608 missing frames, 19 recoveries, 67 late /
+121 accepted packets**. First zero lead remains 4,608; largest arrival gap is
+**4,864 / 101.33 ms**, above six/eight capacity. Producer is repeatedly resuming,
+not permanently stuck. Worklet timing remains unavailable; no message-leg/browser
+cause, physical listening pass or matched-input prior phone pair is claimed.
+Exact report is `m4a-phone-worker-silent-probe.json`; failed full-score verdicts
+remain intact. Normal-user HTTPS PID8368 stays up; temporary QA server is stopped.
+
+**Next:** explicit twelve-slot / 128 ms comparison at unchanged cadence to test
+headroom above the observed gap. Start with muted phone probe; request guarded
+audible listening only after clean delivery counters. Do not change defaults,
+promote a partial probe to a music-quality pass, deploy, or migrate more roles.

@@ -921,3 +921,12 @@ real-worker tests** and public build pass. Desktop pairs match source/score and
 complete; the phone eight-slot run still fails at the same source frame 4,736.
 Retain that negative result. Next is a short muted delivery/recovery probe,
 preserving normal first-miss guard, legacy DSP and current setup format.
+
+The [separate silent two-second worker probe](MODULAR_AUDIO_ENGINE_M4A_SILENT_PROBE.md)
+is implemented and verified (96 checks / five files, public build, desktop
+muted/normal/reload). Own gain stays zero before connect; ordinary playback keeps
+the first-miss guard. Phone probe shows **19 recoveries / 36,608 missing frames**
+and **4,864-frame max arrival gap** across its 96,000-frame window. Delivery
+resumes repeatedly; no audio-quality fix or browser cause is claimed. Next is
+an explicit twelve-slot / 128 ms comparison, muted first, retaining serial/six
+defaults, legacy DSP and setup schemas. Host v4, engine unchanged; no deployment.

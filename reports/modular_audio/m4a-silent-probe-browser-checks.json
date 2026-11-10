@@ -1,0 +1,37 @@
+{
+  "kind": "m4a.silent-probe.browser-checks",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "probeRunId": "c3eb0af2-79b0-41b2-8a29-23595c1c7732",
+  "probeFrames": 96000,
+  "probeSourcePeak": 0,
+  "probeMisses": 0,
+  "probePass": false,
+  "normalRunId": "2ce6f035-540c-4e1a-96e0-8c940817b67d",
+  "normalFrames": 668956,
+  "normalEvents": 16,
+  "normalGuard": true,
+  "normalPass": true,
+  "normalPeaks": {
+    "source": 0.3450146019458771,
+    "channel": 0.09313894808292389,
+    "master": 0.09313894808292389
+  },
+  "sameSourceFingerprint": true,
+  "repeatProbe": {
+    "runId": "a41593f7-c5a2-4f3c-83a8-b6e8e9642de1",
+    "reason": "probe-completed",
+    "targetFrames": 96000,
+    "consumed": 96000,
+    "sourcePeak": 0,
+    "missing": 0
+  },
+  "reload": {
+    "executor": "serial",
+    "capacity": "6",
+    "reportCount": 0
+  },
+  "limitations": "Desktop browser and DOM report evidence; physical phone behavior and listening pending. Other legacy/shared audio is not muted by the probe."
+}

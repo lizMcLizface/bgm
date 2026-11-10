@@ -928,3 +928,14 @@ the last acceptance aligns with six at output frame **4,864** despite different
 startup delays. Keep this negative result; phone v3 six input hash is unavailable.
 Host v3, engine unchanged, defaults preserved. Next: short muted recovery probe
 to observe delivery cadence beyond the first miss, not another default retune.
+
+The [muted two-second probe](MODULAR_AUDIO_ENGINE_M4A_SILENT_PROBE.md) now exists:
+host v4, source gain zero before connection, recovery enabled only explicitly,
+separate partial diagnostic completion. **96 tests / five files** and public
+build **44.30 s** pass. Desktop muted/normal/reload checks pass; matching input
+normal playback completes 668,956 frames / 16 events without misses. Actual phone
+six-slot probe completes 96,000 frames but records **36,608 missing**, **19
+recoveries**, **67 late packets** and a **4,864-frame maximum arrival gap**.
+This proves recurring recovery, not a stuck producer; cause/listening remain
+unassessed. Next: explicit twelve-slot / 128 ms headroom comparison above that
+observed gap, starting muted. Serial/six defaults and ordinary guard remain.

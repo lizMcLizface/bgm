@@ -1065,6 +1065,12 @@ test('owned preview keeps normal transport stopped and stops independently of it
  expect(entry.controller.stop).toHaveBeenCalled();expect(mocks.scheduler.stop).not.toHaveBeenCalled();expect(mocks.hosts.at(-1).dispose).not.toHaveBeenCalled();expect(container.querySelector('.tp.play').disabled).toBe(false);
 });
 
+test('offers an explicit silent worker probe while the normal button keeps ordinary guarded playback',async()=>{
+ act(()=>container.querySelector('[aria-label="Setup"]').click());expect(document.querySelector('[aria-label="Run silent Rust delivery probe"]')).toBeNull();const mode=document.querySelector('[aria-label="Rust preview executor"]');act(()=>{mode.value='worker';mode.dispatchEvent(new Event('change',{bubbles:true}));});
+ await act(async()=>button('Run silent Rust delivery probe').click());expect(previewMock.calls.at(-1).options).toMatchObject({mode:'worker',silentProbe:true,workerPoolBlocks:6});expect(button('Run silent Rust delivery probe').disabled).toBe(true);expect(container.querySelector('.tp.play').disabled).toBe(true);
+ await act(async()=>button('Stop Rust sequence preview').click());await act(async()=>button('Play selected Rust sequence').click());expect(previewMock.calls.at(-1).options.silentProbe).toBe(false);await act(async()=>button('Stop Rust sequence preview').click());
+});
+
 test('requires an explicit eight-slot worker comparison, disables capacity while active and resets experiments on reload',async()=>{
  act(()=>container.querySelector('[aria-label="Setup"]').click());let mode=document.querySelector('[aria-label="Rust preview executor"]');
  expect(mode.value).toBe('serial');expect(document.querySelector('[aria-label="Rust worker PCM capacity"]')).toBeNull();

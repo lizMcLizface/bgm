@@ -112,5 +112,6 @@ html:has(.all-instrument),body:has(.all-instrument),#root:has(.all-instrument){h
 .all-instrument .desk-touch-hint{display:none;}
 #all-midi-setup{overscroll-behavior:contain;touch-action:pan-y;user-select:text;-webkit-user-select:text;}
 #all-midi-setup textarea,#all-midi-setup pre{user-select:text;-webkit-user-select:text;}
+#all-midi-setup .source-preview-field{display:flex;flex-direction:column;align-items:flex-start;gap:4px;margin:8px 0;}
 @media(max-width:700px){.all-instrument>.synth-bar{gap:6px}.all-instrument .desk-zoom button{min-height:38px;}.all-instrument>.synth-bar .bar-scene select{max-width:160px;}}
 @media(pointer:coarse),(max-width:700px){.all-instrument .desk-touch-hint{display:block;flex:0 0 100%;font-size:11px;text-align:center;color:#c4d2d5;}}
