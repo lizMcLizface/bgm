@@ -1,0 +1,10 @@
+{
+  "kind": "piano.phone-listening-acceptance",
+  "version": 1,
+  "recordedAt": "2026-11-10",
+  "profileRevision": "piano-controls-steals-v1",
+  "requestedEngineVersion": "7f5888b007e0c3b2",
+  "provenance": "Explicit user answer to the phone Chrome fixed-page Listen to stealing stress question. Build/profile identify the requested workflow; no new device report or user-agent was supplied.",
+  "listening": {"verbatim": "Clean playback", "result": "clean"},
+  "scope": "Combined shared piano modulation and prepared voice stealing through the fixed six-source effects/mixer path, using the requested 12-block worker profile. No new counter, lock-screen, live-keyboard or arbitrary-settings acceptance is inferred."
+}

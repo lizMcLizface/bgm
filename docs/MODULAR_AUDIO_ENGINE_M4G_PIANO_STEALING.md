@@ -75,3 +75,7 @@ Next is the combined modulation/stealing phone listening gate, then matched
 acoustic preparation. Earlier M4e phone listening acceptance does not imply
 acceptance of this expanded profile. Portable effects/mixer migration and other
 families remain later work; existing native/legacy paths are operational.
+
+Phone follow-up: the user answered “Clean playback” to the combined stress
+workflow. See piano-stealing-phone-acceptance.json for its exact scope and
+provenance. Matched acoustic preparation is now the next port.

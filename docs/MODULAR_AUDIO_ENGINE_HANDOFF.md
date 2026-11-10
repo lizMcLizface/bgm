@@ -2611,3 +2611,13 @@ After that gate, port the matched acoustic preparation family with native parity
 tests, then remaining calibrated/Iowa/classic adapters. Dense-steal timeline,
 live release/pedal/retune and portable host FX/mixer migration remain explicit
 later tasks, with the existing native/legacy paths operational.
+
+## 2026-11-10 — combined modulation/stealing phone gate accepted
+
+The user explicitly answered **"Clean playback"** to the phone Chrome fixed-page
+“Listen to stealing stress” request. This accepts the requested
+piano-controls-steals-v1 listening workflow; graph7f5888b007e0c3b2 is the requested
+build, not a newly supplied device capture. No new counters, user-agent or lock-
+screen behavior are inferred. Evidence: piano-stealing-phone-acceptance.json.
+Continue matched acoustic preparation, owned graph integration and native parity
+in a substantial local batch; retain the existing defaults and legacy renderers.
