@@ -1782,3 +1782,26 @@ tests simulate PointerEvents; browser automation verifies single-pointer input
 only. Keep LAN HTTPS running and do not claim physical gesture success yet.
 Once usable, resume producer-wait/last-accepted-packet diagnostics above; the
 correlated worker failure and working serial route are unchanged.
+
+## Mixer display / HTTPS restart (2026-11-10)
+
+Restarted public-only HTTPS preview at `https://192.168.0.228:4176/synths/all/`
+using the existing local certificate/config; exact-CA host check returns 200
+with authorized TLS. Keep it running. No deployment or firewall/trust change.
+
+The user's image partly crops the top due to camera pan/zoom, but the mixer
+also has a genuine viewport-breakpoint mismatch: on a phone its fixed 980 px
+face gets a full-width LCD, three knob columns and master below the strips.
+The narrow mixer rules now use its named **panel-width container** (760 px),
+preserving desktop arrangement when a phone camera views the full-width mixer.
+Ambience is excluded and retains its existing responsive policy.
+
+Existing mixer/Effects checks: **35 tests / two files**, 11.25 s; public build/
+package checks pass, Vite **33.58 s**. Actual browser 390 x 844 and 1280 x 900:
+same 230 px LCD column beside eight knobs, master beside strips, no LCD text
+overflow; phone document width 390. IDs/poses/mixer values survive reload
+unchanged. Report `m4a-mixer-panel-display.json`, screenshots
+`.tmp/mixer-display-{phone,desktop}.png`. No audio, engine/worker/default change.
+Narrow embedded-container fallback retained but not exercised by this fixed face.
+Next: physical phone usability confirmation, then resume the bounded producer
+waiting / last-accepted-packet measurements for the retained worker failure.

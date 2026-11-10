@@ -68,3 +68,37 @@ claim it reproduces the two-finger hardware gesture. No additional worker
 quality result is implied. Keep the confirmed HTTPS LAN preview running and do
 not deploy. Once phone navigation is usable, resume the bounded producer-wait /
 last-accepted-packet diagnostics in `MODULAR_AUDIO_ENGINE_M4A_PHONE_DELIVERY.md`.
+
+## Mixer display follow-up (2026-11-10)
+
+The user requests the HTTPS server again and flags the mixer top display in
+the preceding image. Restarted the existing public-only preview, same LAN IP,
+port and local certificate; exact-CA host check returns HTTP 200 with authorized
+TLS. No deployment, firewall or trust change.
+
+The image partly clips the top because the camera is zoomed/panned. Separately,
+the phone viewport breakpoint incorrectly reflows the fixed **980 px mixer**:
+it stretches the LCD across **935 px** of internal width, spreads eight knobs
+over three columns, and moves the master below the strips. The desktop keeps
+a 230 px LCD beside eight knobs and the master beside the channel strips.
+
+The mixer now establishes a named inline-size container; its narrow layout
+uses a **760 px panel-width container query**, not the phone viewport. A fixed
+desk mixer keeps the same face when zoomed on a phone. A genuinely narrow
+mixer can still use the stacked rules. Ambience is excluded from the new
+container and keeps its existing responsive policy. DSP, control values,
+object IDs/poses, schemas and engine/worker assets do not change.
+
+Existing mixer and Effects regression: **35 tests / two files pass**, 11.25 s.
+Final public build/package/provenance checks pass, Vite **33.58 s**. Physical
+phone gestures and the previous worker failure remain separate open gates.
+
+Browser comparison at **390 x 844** and **1280 x 900** confirms identical
+`230px 693.2px` sends columns, eight knobs in one row, and master beside the
+strips. Phone document width stays 390; no LCD text overflow. Object IDs/poses
+and all mixer slider values compare exactly across reload. Evidence:
+`reports/modular_audio/m4a-mixer-panel-display.json`,
+`.tmp/mixer-display-{phone,desktop}.png`. No audio was played. The retained
+narrow-container fallback was not exercised by the fixed-width production
+mixer. QA tab/server are closed and viewport override reset; HTTPS LAN preview
+remains running, PID recorded under `.tmp/https/`.

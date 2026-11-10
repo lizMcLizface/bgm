@@ -901,3 +901,13 @@ a mixer filling a 390 x 844 desktop browser changes only the camera; all mixer
 values/poses remain. Physical Android gesture/capture remains to be confirmed.
 No engine/worker/default change or deployment. Then resume bounded worker-wait
 diagnostics for the previously retained actual delivery failure.
+
+2026-11-10 display follow-up: the phone breakpoint was reflowing the fixed 980 px
+mixer as though its panel were narrow, stretching the LCD and wrapping knobs /
+master section. A named panel-width container query now keeps its desktop face
+when viewed through a phone camera. Ambience responsive rules are unchanged.
+**35 mixer/Effects checks** and public package build (**33.58 s**) pass; real
+390 px and 1280 px browser layouts have matching LCD/eight-knob arrangement,
+master beside strips, no text overflow and unchanged values/poses. See
+[exact display evidence](MODULAR_AUDIO_ENGINE_M4A_PHONE_PAN.md). The existing
+HTTPS LAN server is restarted and left running; no deployment or audio change.

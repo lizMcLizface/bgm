@@ -884,3 +884,12 @@ multi-touch keyboard notes and existing poses. Candidate **111** and final
 Native desktop single-pointer panning over the mixer at 390 x 844 preserves
 values/poses; physical Android multi-touch remains unverified. Engine/worker/
 buffering unchanged. Confirm phone usability, then resume producer-wait telemetry.
+
+2026-11-10: restarted the same public-only LAN HTTPS preview. The mixer now uses
+panel-width container queries rather than phone viewport breakpoints, retaining
+its 230 px top LCD beside eight knobs and the master beside strips on the fixed
+980 px face. Ambience policy, values/poses, engine and worker remain unchanged.
+**35 mixer/Effects tests** and public build/package checks (**33.58 s**) pass;
+390 x 844 and 1280 x 900 browser geometry agree, no LCD overflow. See the
+[display comparison and limits](MODULAR_AUDIO_ENGINE_M4A_PHONE_PAN.md).
+Physical phone gesture and worker-wait measurement gates remain. No deployment.
