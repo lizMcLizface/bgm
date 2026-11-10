@@ -1,0 +1,34 @@
+{
+  "kind": "all.voice-audition.artifact-checks",
+  "version": 1,
+  "checkedAtUtc": "2026-11-10T14:22:33.943Z",
+  "planHashesIndependentlyVerified": true,
+  "auditionHash": "8f2fd39f113cff1ffe396c9780d96ffb8a56793fb842eb7bf9ee8fbd1d024a86",
+  "songHash": "f75b8be3c842ec4458995e36f8f81b9d2352db8c3aa3e755ee80fdb4fda2e9d5",
+  "sourcePacketsUnchanged": true,
+  "frames": 282000,
+  "events": 12,
+  "sourceIds": [
+    1,
+    2,
+    5
+  ],
+  "noteCounts": [
+    2,
+    2,
+    2
+  ],
+  "worker": {
+    "runId": "b8a61359-af42-4dd7-b09d-3ee0ea119f41",
+    "poolBlocks": 12,
+    "latencyMs": 128,
+    "acceptedBlocks": 551,
+    "masterPeak": 0.062136903405189514
+  },
+  "serial": {
+    "runId": "c774aaad-d240-4607-90e4-14fb8452943f",
+    "masterPeak": 0.06279048323631287
+  },
+  "physicalListening": "not assessed",
+  "phone": "pending"
+}

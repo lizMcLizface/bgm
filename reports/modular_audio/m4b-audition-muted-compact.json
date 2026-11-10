@@ -1,0 +1,172 @@
+{
+  "kind": "all.source-preview.diagnostics",
+  "version": 2,
+  "material": "voice-audition",
+  "audition": {
+    "version": 1,
+    "material": "diagnostic-test-notes",
+    "schedule": "individual-attacks-then-overlap",
+    "songUnchanged": true,
+    "soloSlotFrames": 36000,
+    "soloGateFrames": 24000,
+    "overlapFrame": 114000,
+    "overlapGateFrames": 96000
+  },
+  "stems": [
+    {
+      "role": "lead",
+      "sourceId": 1,
+      "kind": "subtractive",
+      "noteCount": 2,
+      "peaks": {
+        "source": 0,
+        "channel": 0
+      }
+    },
+    {
+      "role": "counter",
+      "sourceId": 2,
+      "kind": "subtractive",
+      "noteCount": 2,
+      "peaks": {
+        "source": 0,
+        "channel": 0
+      }
+    },
+    {
+      "role": "bass",
+      "sourceId": 5,
+      "kind": "subtractive",
+      "noteCount": 2,
+      "peaks": {
+        "source": 0,
+        "channel": 0
+      }
+    }
+  ],
+  "excludedRoles": [],
+  "runId": "478e10ce-a98e-40e1-baac-fc6a722c25c3",
+  "hostRevision": "all-preview-delivery-v9",
+  "sourceFingerprint": "8f2fd39f113cff1ffe396c9780d96ffb8a56793fb842eb7bf9ee8fbd1d024a86",
+  "diagnosticProbe": {
+    "muted": true,
+    "targetFrames": 282000,
+    "complete": true
+  },
+  "probeTrace": [
+    [
+      512,
+      512,
+      null
+    ],
+    [
+      2944,
+      896,
+      null
+    ],
+    [
+      276096,
+      512,
+      null
+    ]
+  ],
+  "engineVersion": "d6a0341e5edf2d57",
+  "startedAtUtc": "2026-11-10T14:19:43.279Z",
+  "browserUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36",
+  "sampleRate": 48000,
+  "role": "pitched-set",
+  "reason": "probe-completed",
+  "error": null,
+  "complete": false,
+  "pass": false,
+  "listening": "not assessed",
+  "executor": {
+    "requested": "worker",
+    "actual": "worker",
+    "scheduling": "message",
+    "blockFrames": 512,
+    "poolBlocks": 12,
+    "bufferingLatencyMs": 128,
+    "stopOnUnderrun": false,
+    "deliveryDiagnostics": true
+  },
+  "fallbackReason": null,
+  "frames": {
+    "planned": 282000,
+    "consumed": 282000,
+    "output": 288256,
+    "rendered": 282000
+  },
+  "events": {
+    "applied": 12,
+    "late": 0,
+    "overflow": 0
+  },
+  "delivery": {
+    "underrunFrames": 0,
+    "underrunQuanta": 0,
+    "recoveries": 0,
+    "lateBlocks": 0,
+    "rejectedBlocks": 0,
+    "staleGeneration": 0,
+    "acceptedBlocks": 551
+  },
+  "lead": {
+    "minFrames": 5376,
+    "zeroLeadQuanta": 0,
+    "belowQuantumQuanta": 0,
+    "firstZeroSourceFrame": null
+  },
+  "arrival": {
+    "maxGapFrames": 896,
+    "maxConsumedSinceArrivalFrames": 896,
+    "overCapacityQuanta": 0
+  },
+  "worker": {
+    "blocks": 551,
+    "renderMs": 240.0000000037253,
+    "maxRenderMs": 0.9000000022351742,
+    "badRecycles": 0
+  },
+  "timingScope": "Last packet: producer at send; worker/producerLater: queried later. No synchronized clocks.",
+  "lastPacket": {
+    "packetFrame": 281600,
+    "frames": 400,
+    "sourceFrameAtArrival": 276096,
+    "producer": {
+      "version": 1,
+      "available": true,
+      "frame": 282000,
+      "blocks": 551,
+      "freeBuffers": 0,
+      "inFlightBuffers": 12,
+      "elapsedMs": 5888.800000000745,
+      "taskWaits": 551,
+      "taskWaitMs": 0,
+      "taskWaitMaxMs": 0.30000000074505806,
+      "poolWaits": 539,
+      "poolWaitMs": 10.699999999254942,
+      "poolWaitMaxMs": 137,
+      "recycleRttMs": 129.39999999850988,
+      "recycleRttMaxMs": 256.30000000074506,
+      "lastRecycleConsumerFrame": 275967,
+      "renderMs": 0.30000000074505806,
+      "maxRenderMs": 0.9000000022351742
+    }
+  },
+  "producerLater": {
+    "available": true,
+    "taskWaitMaxMs": 0.30000000074505806,
+    "poolWaitMaxMs": 137,
+    "recycleRttMaxMs": 256.30000000074506,
+    "lastRecycleConsumerFrame": 281999,
+    "readyTaskAgeMs": null,
+    "poolEmptyAgeMs": null
+  },
+  "outputProcess": {
+    "available": false,
+    "calls": null,
+    "maxMs": null,
+    "overQuantumPeriod": null
+  }
+}

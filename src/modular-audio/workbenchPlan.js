@@ -38,3 +38,12 @@ export function compileWorkbenchSet({project,part,bpm,sources}){
  modules.push({id:18,type:'ref.output',version:1,parameters:{}});edge(sum,18,'program.in');
  return {version:1,role:'pitched-set',roles:captured.map(s=>s.role),part:structuredClone(part),bpm,sampleRate:48000,endFrame,noteCount,sources:captured,graph:{version:1,modules,connections,events}};
 }
+// Explicit diagnostic material; never reads or edits the user's song. Current
+// patches and tuning still pass through exactly the same source compiler.
+export function compileWorkbenchAudition({sources}){
+ if(!Array.isArray(sources)||!sources.length||sources.length>5)throw Error('Select one to five pitched voices for audition.');
+ const pitches={lead:72,counter:64,rhythm:60,pad:55,bass:36},overlap=sources.length*6,length=overlap+16;
+ const patterns=Object.fromEntries(sources.map((s,i)=>{const steps=Array(length).fill(null);steps[i*6]={n:[{midi:pitches[s.role]}],len:4,gate:1,vel:.45};steps[overlap]={n:[{midi:pitches[s.role]}],len:16,gate:1,vel:.35};return [s.role,{mode:'note',follow:'off',gate:1,length,steps}];}));
+ const plan=compileWorkbenchSet({project:{bars:1,stepsPerBar:length,key:{tonic:0,scale:[0,2,4,5,7,9,11]},patterns},part:{startBar:0,bars:1},bpm:120,sources});
+ return {...plan,audition:{version:1,material:'diagnostic-test-notes',schedule:'individual-attacks-then-overlap',songUnchanged:true,soloSlotFrames:36000,soloGateFrames:24000,overlapFrame:6000+overlap*6000,overlapGateFrames:96000}};
+}

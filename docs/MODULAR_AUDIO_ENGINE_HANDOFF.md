@@ -10,6 +10,9 @@ and wants other voices/full-path behavior first. Lower-startup-delay experiments
 are deferred. [M4b finite pitched sets](MODULAR_AUDIO_ENGINE_M4B_PITCHED_SET.md)
 now extend the explicit preview; read the latest checkpoint below. Native piano,
 classics and percussion adapters/normal transport remain separate gates.
+The [selected-patch test-note audition](MODULAR_AUDIO_ENGINE_M4B_VOICE_AUDITION.md)
+now activates sparse voices without changing the song; phone active-voice
+acceptance is pending, with the exact desktop checkpoint at the end.
 
 Prepared and implemented through the opt-in M4a finite All source preview on 2026-11-09. Read the working tree, this file and
 [MODULAR_AUDIO_ENGINE_PLAN.md](MODULAR_AUDIO_ENGINE_PLAN.md) first. This is an
@@ -2141,3 +2144,46 @@ acceptance, per-role signals/identity, current twelve-slot option, ordinary guar
 and legacy keyboard. Then audit actual All percussion seam/kit/hit translation;
 native piano/classics remain separate adapter gates. Longer phone lookahead
 remains acceptable; defer startup-delay work. No default switch or deployment.
+
+## M4b selected-patch audition delivered (2026-11-10)
+
+After `70ee524`, explicit group Material **Test-note voice audition · song
+untouched** activates every selected current core/FM voice with diagnostic
+notes, retaining actual patches/tuning/source leases and per-role FX/mixer.
+Individual 0.5 s attacks in 0.75 s slots, then two seconds together, fixed test
+120 BPM. No song edits or fixture patch substitution. Worker **Silent full
+audition probe** observes the entire schedule/tails; normal score probe remains
+two seconds. Material/metadata and test-note labels appear in full/compact v2
+reports. All muted probes keep full complete/pass false. Host **v9**, engine
+**d6a0341e5edf2d57** and Wasm unchanged. Original defaults/schema/keyboard remain.
+
+[Exact contracts and results](MODULAR_AUDIO_ENGINE_M4B_VOICE_AUDITION.md):
+**31 focused checks (2.27 s)** including actual five-source threaded raw equality,
+**146 regression checks / nine files (63.88 s)** and public build/package checks
+(**48.67 s** Vite) pass. Actual 390 px browser original Lead/counter/Bass
+IDs **[1,2,5]**, each **two notes**, completes **282,000 frames / 12 events** in
+both worker/twelve and explicit Serial. Worker full muted and audible runs
+both accept **551** blocks with no delivery/late/overflow/recycle errors.
+Audible source/channel signals positive for all three, master **0.062137**;
+Serial master **0.062790**. Silent source/channel/master peaks zero, top verdicts
+false; physical listening unassessed. Same full audition hash across all three
+independently checked. Actual source patches equal original score packets.
+
+Ordinary score probes before/after preserve exact full hash and **0/0/11**
+notes. Later silent probe has only an existing **8.85e-7** shared wet tail;
+all probe sources remain zero. Private Stop leaves legacy Pad/Piano Chord
+active; own Pause works. All original generator/patch selectors unchanged;
+reload clears report, starts no audio and restores selected/Serial/six/current
+progression. Continuous regenerates on reload; no setup-file byte claim.
+Artifacts `reports/modular_audio/m4b-audition-*.json`, screenshot
+`.tmp/m4b-voice-audition-signals.png`. QA tab/viewport/loopback server cleaned;
+normal-user LAN HTTPS PID8368 serves refreshed local build, no deployment.
+
+**Next:** phone full silent active-voice audition requested at worker/twelve;
+check each selected role two notes, all planned/consumed/rendered frames and
+events, no misses/late/recycle errors, host v9/material voice-audition. Only
+after clean counters request guarded audible listening, preserving run/hash
+linkage. Pending phone evidence does not block a read-only audit of actual All
+percussion kit/hit/locks/per-role FX routing for the next finite adapter.
+Native piano/classics and normal transport migration stay gated. Keep longer
+phone lookahead; startup-delay experiments remain deferred.

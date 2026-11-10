@@ -1,17 +1,17 @@
-import {compileWorkbenchSource,compileWorkbenchSet,WORKBENCH_PITCHED_ROLES,hashWorkbenchPlan} from './workbenchPlan';
+import {compileWorkbenchSource,compileWorkbenchSet,compileWorkbenchAudition,WORKBENCH_PITCHED_ROLES,hashWorkbenchPlan} from './workbenchPlan';
 import {loadGraphAssets} from './graphAssets';
 import {createWorkerRoute} from './workerBrowser';
 import {newListeningId} from './listeningRecord';
-export function createWorkbenchPreview({host,project,part,role,roles=null,mutedRoles=[],bpm,muted=false,mode='serial',workerPoolBlocks=6,silentProbe=false,onState=()=>{},onDone=()=>{},loadAssets=loadGraphAssets,makeRoute=createWorkerRoute,compilePlan=compileWorkbenchSource}){
+export function createWorkbenchPreview({host,project,part,role,roles=null,mutedRoles=[],bpm,muted=false,audition=false,mode='serial',workerPoolBlocks=6,silentProbe=false,onState=()=>{},onDone=()=>{},loadAssets=loadGraphAssets,makeRoute=createWorkerRoute,compilePlan=compileWorkbenchSource}){
  let closed=false,finishing=null,route=null,timer=null,assets=null,plan=null,probe=null,sourceHash=Promise.resolve(null),armed=false;const leases=[],gains=[],bindings=[],excludedRoles=[],stemPeaks={},requestedRoles=Array.isArray(roles)?roles.slice():roles,taps=[],peaks={source:0,channel:0,master:0},context=host.context,runId=newListeningId(),startedAtUtc=new Date().toISOString(),browserUserAgent=globalThis.navigator?.userAgent??null;
  const checkLeases=()=>leases.forEach(l=>l.assertCurrent());
  function cleanup(){clearInterval(timer);route?.dispose();for(const g of gains)g.disconnect();for(const tap of taps){try{tap.from.disconnect(tap.node);}catch{}tap.node.disconnect();}for(const l of leases)l.release();}
  async function finish(reason='stopped',error=null){
   if(finishing)return finishing;if(closed)return null;closed=true;onState('stopping');clearInterval(timer);for(const g of gains)g.gain.setTargetAtTime(0,context.currentTime,.005);
   finishing=(async()=>{let stats=null;try{if(gains.length&&reason!=='completed')await new Promise(resolve=>setTimeout(resolve,30));if(route)stats=await route.stats();if(reason==='completed')checkLeases();}catch(e){error??=String(e);}finally{cleanup();}
-   const output=stats?.output,engine=stats?.worker?.graph??output?.serial?.graph??output?.serial,complete=!!plan&&output?.sourceFrame===plan.endFrame&&engine?.frame===plan.endFrame,eventPass=!!plan&&engine?.applied===plan.graph.events.length&&!engine?.late&&!engine?.overflow;
+   const output=stats?.output,engine=stats?.worker?.graph??output?.serial?.graph??output?.serial,complete=!silentProbe&&!!plan&&output?.sourceFrame===plan.endFrame&&engine?.frame===plan.endFrame,eventPass=!!plan&&engine?.applied===plan.graph.events.length&&!engine?.late&&!engine?.overflow;
    const stems=plan?.sources?.map(s=>({role:s.role,sourceId:s.sourceId,kind:s.kind,noteCount:s.noteCount,peaks:{...stemPeaks[s.role]}}))??null,stemPass=!stems||stems.every(s=>!s.noteCount||s.peaks.source>0&&s.peaks.channel>0);
-   const report={version:1,kind:'all.owned-source-preview',hostRevision:'all-preview-delivery-v8',diagnosticProbe:probe?{...probe,complete:reason==='probe-completed'&&output?.sourceFrame===probe.targetFrames}:null,sourceFingerprint:await sourceHash,runId,browserUserAgent,sampleRate:context.sampleRate,scope:'Captured finite source stems through existing per-role FX/mixer and shared master; channel/master peaks may include legacy keyboard/shared tails, not isolated wet PCM or physical listening.',role:roles===null?role:'pitched-set',requestedRoles,excludedRoles,stems,mode,startedAtUtc,completedAtUtc:new Date().toISOString(),reason,error:error??stats?.error??null,engineVersion:assets?.manifest.version??null,executor:route?.executor??null,plan,peaks:{...peaks},stats,complete,eventPass,pass:reason==='completed'&&!error&&!stats?.error&&complete&&eventPass&&stemPass&&!(output?.queue?.underrunFrames)&&Object.values(peaks).every(p=>p>0)};
+   const report={version:1,kind:'all.owned-source-preview',hostRevision:'all-preview-delivery-v9',material:audition?'voice-audition':'captured-score',audition:plan?.audition??null,diagnosticProbe:probe?{...probe,complete:reason==='probe-completed'&&output?.sourceFrame===probe.targetFrames}:null,sourceFingerprint:await sourceHash,runId,browserUserAgent,sampleRate:context.sampleRate,scope:'Captured finite source stems through existing per-role FX/mixer and shared master; channel/master peaks may include legacy keyboard/shared tails, not isolated wet PCM or physical listening.',role:roles===null?role:'pitched-set',requestedRoles,excludedRoles,stems,mode,startedAtUtc,completedAtUtc:new Date().toISOString(),reason,error:error??stats?.error??null,engineVersion:assets?.manifest.version??null,executor:route?.executor??null,plan,peaks:{...peaks},stats,complete,eventPass,pass:reason==='completed'&&!error&&!stats?.error&&complete&&eventPass&&stemPass&&!(output?.queue?.underrunFrames)&&Object.values(peaks).every(p=>p>0)};
    onState('stopped');onDone(report);return report;
   })();return finishing;
  }
@@ -19,13 +19,14 @@ export function createWorkbenchPreview({host,project,part,role,roles=null,mutedR
   if(context.sampleRate!==48000)throw Error('Rust source preview requires an existing 48 kHz AudioContext.');
   if(![6,8,12].includes(workerPoolBlocks))throw Error('Rust source preview worker capacity must be six, eight or twelve blocks.');
   if(typeof silentProbe!=='boolean'||silentProbe&&mode!=='worker')throw Error('Silent delivery probe requires the worker executor.');
+  if(typeof audition!=='boolean'||audition&&roles===null)throw Error('Voice audition requires an explicit pitched set.');
   if(roles!==null){
    if(!Array.isArray(requestedRoles)||!requestedRoles.length||requestedRoles.length>5||new Set(requestedRoles).size!==requestedRoles.length||requestedRoles.some(r=>!WORKBENCH_PITCHED_ROLES.includes(r))||!Array.isArray(mutedRoles))throw Error('Select one to five distinct pitched roles.');
    for(const r of requestedRoles){if(mutedRoles.includes(r)){excludedRoles.push({role:r,reason:'muted or excluded by solo'});continue;}let l;try{l=host.openSourceStem(r,()=>{void finish('host-closed');});}catch(e){throw Error(`${r}: ${e.message}`);}leases.push(l);bindings.push({role:r,sourceId:WORKBENCH_PITCHED_ROLES.indexOf(r)+1,lease:l});}
    if(!bindings.length)throw Error('No selected pitched roles are audible under mute/solo.');
-   plan=compileWorkbenchSet({project,part,bpm,sources:bindings.map(b=>({role:b.role,source:b.lease,tune:b.lease.tune}))});
+   plan=(audition?compileWorkbenchAudition:compileWorkbenchSet)({project,part,bpm,sources:bindings.map(b=>({role:b.role,source:b.lease,tune:b.lease.tune}))});
   }else{const l=host.openSourceStem(role,()=>{void finish('host-closed');});leases.push(l);bindings.push({role,sourceId:1,lease:l});plan=compilePlan({project,part,role,bpm,source:l,tune:l.tune,muted});}
-  if(silentProbe)probe={muted:true,targetFrames:Math.min(plan.endFrame,96000)};
+  if(silentProbe)probe={muted:true,targetFrames:audition?plan.endFrame:Math.min(plan.endFrame,96000)};
   sourceHash=hashWorkbenchPlan(plan);
   assets=await loadAssets();if(closed)return null;checkLeases();
   route=await makeRoute(context,assets,plan.graph,{mode,options:{blockFrames:512,poolBlocks:mode==='worker'?workerPoolBlocks:6,scheduling:'message'},sourceIds:bindings.map(b=>b.sourceId),endFrame:probe?.targetFrames??plan.endFrame,startPaused:true,stopOnUnderrun:!silentProbe,deliveryDiagnostics:true,onFinished:d=>{if(armed)void finish(d?.reason==='delivery-gap'?'delivery-gap':d?.reason==='failed'?'error':silentProbe?'probe-completed':'completed',d?.reason==='delivery-gap'?'One-worker delivery missed audio frames. Use Serial reference; the preview has stopped.':null);}});
@@ -49,7 +50,7 @@ export function createWorkbenchCapacityComparison({host,project,part,role,bpm,mu
   if(finishing)return finishing;closed=true;onState('stopping');
   finishing=(async()=>{try{retain(await active?.stop());}catch(e){error??=String(e);}finally{lease?.release();}
    const fingerprint=await sourceHash,complete=reason==='comparison-completed'&&trials.length===2&&trials.every(t=>t.diagnosticProbe?.complete&&!t.error&&t.executor?.actual==='worker');
-   const report={kind:'all.owned-source-capacity-comparison',version:1,hostRevision:'all-preview-delivery-v8',runId,startedAtUtc,completedAtUtc:new Date().toISOString(),browserUserAgent:globalThis.navigator?.userAgent??null,sampleRate:context.sampleRate,role,engineVersion:assets?.manifest.version??null,sourceFingerprint:fingerprint,reason,error,comparison:{muted:true,order,capacities,targetFrames:plan?Math.min(plan.endFrame,96000):null,complete,sameCapturedInput:!!plan,fingerprintsMatch:fingerprint&&trials.length?trials.every(t=>t.sourceFingerprint===fingerprint):null},trials,complete:false,pass:false};
+   const report={kind:'all.owned-source-capacity-comparison',version:1,hostRevision:'all-preview-delivery-v9',runId,startedAtUtc,completedAtUtc:new Date().toISOString(),browserUserAgent:globalThis.navigator?.userAgent??null,sampleRate:context.sampleRate,role,engineVersion:assets?.manifest.version??null,sourceFingerprint:fingerprint,reason,error,comparison:{muted:true,order,capacities,targetFrames:plan?Math.min(plan.endFrame,96000):null,complete,sameCapturedInput:!!plan,fingerprintsMatch:fingerprint&&trials.length?trials.every(t=>t.sourceFingerprint===fingerprint):null},trials,complete:false,pass:false};
    readyResolve(null);onState('stopped');onDone(report);return report;
   })();return finishing;
  }

@@ -985,3 +985,17 @@ actual-patch audition with clearly labeled test notes, preserving the user's
 score, for accessible phone voice testing. Percussion seam audit follows that
 active-voice gate. Host v8, engine unchanged; no default/backend migration,
 deployment or low-latency detour. Raw probe and limitations are in the linked doc.
+
+[Explicit selected-patch voice audition](MODULAR_AUDIO_ENGINE_M4B_VOICE_AUDITION.md)
+is delivered under group Material, initially Current progression. Test notes
+activate each actual ready core/FM voice individually then together without
+editing the song or patches. Worker silent audition covers the entire schedule,
+not just its first two seconds; full/compact reports clearly label test material.
+**31 focused / 146 regression checks**, public build and actual 390 px browser
+worker/twelve + Serial pass: three current voices each two notes, **282,000
+frames / 12 events**, no delivery errors, positive audible per-role/master
+signals. Original score hash before/after, source selectors, keyboard coexistence,
+Stop and reload defaults verified. Host v9, engine unchanged. Phone full silent
+active-voice probe requested; audible phone/music acceptance remains pending.
+Next actual percussion kit/hit/lock/FX audit; native piano/classics remain
+separate adapters. Existing normal playback/setup/backend stay operational.

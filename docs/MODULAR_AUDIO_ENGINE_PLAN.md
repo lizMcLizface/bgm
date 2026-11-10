@@ -7,6 +7,9 @@ and M3g opt-in buffering profiles plus M3h queue-lead observability and M3i opt-
 led to the [M4a finite All source preview](MODULAR_AUDIO_ENGINE_M4A_WORKBENCH_SOURCE.md).
 On 2026-11-10 the user prioritized other voices/full-path behavior over lower
 latency, extending the opt-in finite adapter to [M4b pitched sets](MODULAR_AUDIO_ENGINE_M4B_PITCHED_SET.md).
+An explicit [selected-patch test-note audition](MODULAR_AUDIO_ENGINE_M4B_VOICE_AUDITION.md)
+now activates sparse roles without editing the user's song; active phone
+acceptance remains the next device gate.
 Normal transport/default backend migration remains gated.
 All six source engines have owned mutable Rust state; core's read-only additive
 tables are safely shared after preparation. External stereo host inputs and
@@ -1021,3 +1024,22 @@ coverage. Keep song preview distinct. Then audit real All percussion seam /
 kit/hit translation into its owned Rust engine; native piano is a separate gate.
 Preserve the finite scope and existing instruments; no default replacement,
 latency chase, fixture substitution, deployment or broad migration.
+
+### Selected-patch audition aid delivered
+
+M4b group Material now explicitly chooses captured song or diagnostic test
+notes with actual patches/tuning. Individual attacks then shared overlap, one
+owned graph/common clock, same existing FX/mixer. No project edits. Silent
+audition covers its entire finite plan; captured-score probes remain two
+seconds. Reports label material/schedule and keep muted full verdicts false.
+Host v9, engine unchanged. **31 focused / 146 regression tests**, public build
+and actual browser original three active voices pass: **282,000 frames / 12
+events**, worker/twelve **551** blocks, zero delivery/event/recycle errors,
+positive audible per-role/master signals. Explicit Serial, legacy keyboard /
+private Stop, original source selectors and reload defaults pass. Independent
+full hashes prove audition worker/Serial input parity and unchanged original
+score before/after. Physical listening unassessed; phone full muted audition
+requested. Exact contracts/artifacts/limits are in the linked audition doc.
+Next phone active-voice gate, then guarded listening; meanwhile audit the
+actual All percussion kit/hit/lock/FX seam before extending the finite adapter.
+No defaults/backend/schema/deployment change or latency work.

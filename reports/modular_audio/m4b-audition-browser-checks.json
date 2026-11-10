@@ -1,0 +1,108 @@
+{
+  "kind": "all.voice-audition.browser-checks",
+  "version": 1,
+  "checkedAtUtc": "2026-11-10T14:21:38.371Z",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "songBeforeRun": "3eb76d1b-debf-4670-bb92-b881d7fbedc3",
+  "songAfterRun": "73da1792-12d6-4c0e-a6b6-190dabd23b6e",
+  "songFingerprintUnchanged": true,
+  "originalSongNoteCounts": [
+    {
+      "role": "lead",
+      "noteCount": 0
+    },
+    {
+      "role": "counter",
+      "noteCount": 0
+    },
+    {
+      "role": "bass",
+      "noteCount": 11
+    }
+  ],
+  "mutedRun": "478e10ce-a98e-40e1-baac-fc6a722c25c3",
+  "workerRun": "b8a61359-af42-4dd7-b09d-3ee0ea119f41",
+  "serialRun": "c774aaad-d240-4607-90e4-14fb8452943f",
+  "auditionFingerprintsMatch": true,
+  "stopRun": "4d7078d8-6334-4498-8d4c-19d0b955ce21",
+  "keyboardChordAfterPrivateStop": true,
+  "keyboardOwnPauseWorked": true,
+  "originalSources": [
+    {
+      "label": "Lead sound generator",
+      "text": "DI-Poly",
+      "value": "poly"
+    },
+    {
+      "label": "Lead patch",
+      "text": "Measured Flute",
+      "value": "Measured Flute"
+    },
+    {
+      "label": "Second lead sound generator",
+      "text": "DI-Poly",
+      "value": "poly"
+    },
+    {
+      "label": "Second lead patch",
+      "text": "Soft Flute",
+      "value": "Soft Flute"
+    },
+    {
+      "label": "Rhythm sound generator",
+      "text": "Piano",
+      "value": "piano"
+    },
+    {
+      "label": "Rhythm patch",
+      "text": "Felt Keys (updated)",
+      "value": "Felt Keys (updated)"
+    },
+    {
+      "label": "Pad sound generator",
+      "text": "Piano",
+      "value": "piano"
+    },
+    {
+      "label": "Pad patch",
+      "text": "Felt Keys (updated)",
+      "value": "Felt Keys (updated)"
+    },
+    {
+      "label": "Bass sound generator",
+      "text": "DI-Poly",
+      "value": "poly"
+    },
+    {
+      "label": "Bass patch",
+      "text": "Thump Bass",
+      "value": "Thump Bass"
+    },
+    {
+      "label": "Drums sound generator",
+      "text": "Scene kits",
+      "value": "scene"
+    },
+    {
+      "label": "Drums patch",
+      "text": "Rainy café (99 scenes)",
+      "value": "Rainy café"
+    }
+  ],
+  "sourceSelectionsUnchanged": true,
+  "reload": {
+    "scope": "selected",
+    "mode": "serial",
+    "reportCount": 0,
+    "status": "Start with Serial reference. One supported pitched sequencer, one current progression, one pass.",
+    "material": "captured-score",
+    "pool": "6",
+    "originalSources": true
+  },
+  "copy": "UI confirmation and DOM compact text verified; native clipboard payload not read back",
+  "physicalListening": "not assessed",
+  "screenshot": ".tmp/m4b-voice-audition-signals.png"
+}
