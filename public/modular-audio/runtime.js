@@ -223,7 +223,7 @@ function validatePercussionConfig(c, definition) {
 }
 
 // src/modular-audio/pianoConfig.js
-var PIANO_TYPES = Object.freeze(["felt", "electric", "grand", "felted", "upright"]);
+var PIANO_TYPES = Object.freeze(["felt", "electric", "grand", "felted", "upright", "ambient", "glass", "drama", "soft", "subdued", "concert"]);
 var range = (v, a, b) => typeof v === "number" && Number.isFinite(v) && v >= a && v <= b;
 var fail = () => {
   throw Error("Invalid prepared piano configuration");

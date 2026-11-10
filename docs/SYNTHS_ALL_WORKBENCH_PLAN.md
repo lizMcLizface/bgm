@@ -1101,3 +1101,9 @@ and separate audible output complete cleanly. A “Listen to stealing stress” 
 requires no settings matching. Existing All storage/defaults remain unchanged.
 Combined modulation/stealing phone listening is pending; matched acoustic
 preparation is next. Live notes, dense steals below10 ms and other families remain.
+
+2026-11-10: M4g phone listening is accepted. [M4h](MODULAR_AUDIO_ENGINE_M4H_MATCHED_ACOUSTIC.md)
+adds all six fitted acoustic variants to opt-in preparation and finite graph
+sources. The isolated page now fixes Ambient/Soft/Concert with core/FM/Hand;
+modulation, stealing, serial and worker checks pass without changing All settings.
+The earlier phone result is not relabelled; measured-table preparation is next.

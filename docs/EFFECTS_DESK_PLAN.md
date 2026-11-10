@@ -1473,3 +1473,8 @@ and worker, with zero worker delivery gaps.18 native comparisons and38 allocatio
 audits pass. Dense steals below10 ms and live stealing remain rejected; effects
 and mixer themselves still use their existing host boundaries. Combined phone
 listening is the next gate, followed by matched acoustic preparation.
+
+2026-11-10: the M4g phone stress playback is accepted as clean. [M4h](MODULAR_AUDIO_ENGINE_M4H_MATCHED_ACOUSTIC.md)
+adds all six fitted acoustic shapes to the same Rust source/voice path.24 native
+comparisons and the matched six-source serial/worker full-path batch pass. Host
+effects and mixer boundaries remain; measured-table preparation is next.

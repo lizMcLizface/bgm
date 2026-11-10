@@ -1,0 +1,1275 @@
+{
+  "kind": "piano.native-voice-comparison",
+  "version": 1,
+  "engineVersion": "67531999ec42dded",
+  "sampleRate": 48000,
+  "scope": "Native dry voice before shared compressor/FX; approximate SRC parity, not bit identity or listening",
+  "checksPassed": true,
+  "limits": {
+    "relativeRmsError": 0.005,
+    "correlation": 0.99998
+  },
+  "notes": [
+    {
+      "midi": 48,
+      "time": 0.125,
+      "duration": 0.4,
+      "velocity": 0.3
+    },
+    {
+      "midi": 60,
+      "time": 0.625,
+      "duration": 0.5,
+      "velocity": 0.6
+    },
+    {
+      "midi": 67,
+      "time": 0.625,
+      "duration": 0.5,
+      "velocity": 0.45
+    },
+    {
+      "midi": 72,
+      "time": 1.375,
+      "duration": 0.7,
+      "velocity": 0.8
+    }
+  ],
+  "results": [
+    {
+      "name": "Felt Keys (updated)",
+      "polyphony": 8,
+      "configVersion": 1,
+      "voiceStats": {
+        "active": 0,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 144000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 3
+      },
+      "notes": [
+        {
+          "midi": 48,
+          "time": 0.125,
+          "duration": 0.4,
+          "velocity": 0.3
+        },
+        {
+          "midi": 60,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.6
+        },
+        {
+          "midi": 67,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.45
+        },
+        {
+          "midi": 72,
+          "time": 1.375,
+          "duration": 0.7,
+          "velocity": 0.8
+        }
+      ],
+      "warm": false,
+      "controls": [],
+      "cutoff": 11000,
+      "pitchCents": 2,
+      "peak": 0.14758160710334778,
+      "maxError": 0.0005052369087934494,
+      "relativeRmsError": 0.0010044294660212442,
+      "correlation": 0.999999495560564
+    },
+    {
+      "name": "Starmap Piano",
+      "polyphony": 8,
+      "configVersion": 1,
+      "voiceStats": {
+        "active": 0,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 144000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 3
+      },
+      "notes": [
+        {
+          "midi": 48,
+          "time": 0.125,
+          "duration": 0.4,
+          "velocity": 0.3
+        },
+        {
+          "midi": 60,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.6
+        },
+        {
+          "midi": 67,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.45
+        },
+        {
+          "midi": 72,
+          "time": 1.375,
+          "duration": 0.7,
+          "velocity": 0.8
+        }
+      ],
+      "warm": false,
+      "controls": [],
+      "cutoff": 1400,
+      "pitchCents": 0,
+      "peak": 0.3194833993911743,
+      "maxError": 0.0002778246998786926,
+      "relativeRmsError": 0.00016060668239091674,
+      "correlation": 0.9999999882231773
+    },
+    {
+      "name": "Felted Piano",
+      "polyphony": 8,
+      "configVersion": 1,
+      "voiceStats": {
+        "active": 0,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 144000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 3
+      },
+      "notes": [
+        {
+          "midi": 48,
+          "time": 0.125,
+          "duration": 0.4,
+          "velocity": 0.3
+        },
+        {
+          "midi": 60,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.6
+        },
+        {
+          "midi": 67,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.45
+        },
+        {
+          "midi": 72,
+          "time": 1.375,
+          "duration": 0.7,
+          "velocity": 0.8
+        }
+      ],
+      "warm": false,
+      "controls": [],
+      "cutoff": 11000,
+      "pitchCents": 2,
+      "peak": 0.1519729197025299,
+      "maxError": 0.000514371320605278,
+      "relativeRmsError": 0.0010327734644072861,
+      "correlation": 0.9999994666894904
+    },
+    {
+      "name": "Studio Grand",
+      "polyphony": 8,
+      "configVersion": 1,
+      "voiceStats": {
+        "active": 0,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 144000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 3
+      },
+      "notes": [
+        {
+          "midi": 48,
+          "time": 0.125,
+          "duration": 0.4,
+          "velocity": 0.3
+        },
+        {
+          "midi": 60,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.6
+        },
+        {
+          "midi": 67,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.45
+        },
+        {
+          "midi": 72,
+          "time": 1.375,
+          "duration": 0.7,
+          "velocity": 0.8
+        }
+      ],
+      "warm": false,
+      "controls": [],
+      "cutoff": 11000,
+      "pitchCents": 3,
+      "peak": 0.11234410107135773,
+      "maxError": 0.0008771335706114769,
+      "relativeRmsError": 0.001269008779797889,
+      "correlation": 0.9999991948253834
+    },
+    {
+      "name": "Electric recipe",
+      "polyphony": 8,
+      "configVersion": 1,
+      "voiceStats": {
+        "active": 0,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 144000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 3
+      },
+      "notes": [
+        {
+          "midi": 48,
+          "time": 0.125,
+          "duration": 0.4,
+          "velocity": 0.3
+        },
+        {
+          "midi": 60,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.6
+        },
+        {
+          "midi": 67,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.45
+        },
+        {
+          "midi": 72,
+          "time": 1.375,
+          "duration": 0.7,
+          "velocity": 0.8
+        }
+      ],
+      "warm": false,
+      "controls": [],
+      "cutoff": 1400,
+      "pitchCents": 0,
+      "peak": 0.31563466787338257,
+      "maxError": 0.00027654506266117096,
+      "relativeRmsError": 0.00015999888105569602,
+      "correlation": 0.999999988316613
+    },
+    {
+      "name": "Upright recipe",
+      "polyphony": 8,
+      "configVersion": 1,
+      "voiceStats": {
+        "active": 0,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 144000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 3
+      },
+      "notes": [
+        {
+          "midi": 48,
+          "time": 0.125,
+          "duration": 0.4,
+          "velocity": 0.3
+        },
+        {
+          "midi": 60,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.6
+        },
+        {
+          "midi": 67,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.45
+        },
+        {
+          "midi": 72,
+          "time": 1.375,
+          "duration": 0.7,
+          "velocity": 0.8
+        }
+      ],
+      "warm": false,
+      "controls": [],
+      "cutoff": 11000,
+      "pitchCents": 2,
+      "peak": 0.13181431591510773,
+      "maxError": 0.0007631294429302216,
+      "relativeRmsError": 0.0010140014378933991,
+      "correlation": 0.9999994859005049
+    },
+    {
+      "name": "Felt Keys without pitch envelope",
+      "polyphony": 8,
+      "configVersion": 1,
+      "voiceStats": {
+        "active": 0,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 144000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 3
+      },
+      "notes": [
+        {
+          "midi": 48,
+          "time": 0.125,
+          "duration": 0.4,
+          "velocity": 0.3
+        },
+        {
+          "midi": 60,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.6
+        },
+        {
+          "midi": 67,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.45
+        },
+        {
+          "midi": 72,
+          "time": 1.375,
+          "duration": 0.7,
+          "velocity": 0.8
+        }
+      ],
+      "warm": false,
+      "controls": [],
+      "cutoff": 11000,
+      "pitchCents": 0,
+      "peak": 0.1477450132369995,
+      "maxError": 4.470348358154297e-8,
+      "relativeRmsError": 9.545607331155823e-8,
+      "correlation": 0.9999999999999808
+    },
+    {
+      "name": "Initial preset vibrato wiring",
+      "polyphony": 8,
+      "configVersion": 2,
+      "voiceStats": {
+        "active": 0,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 144000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 3
+      },
+      "notes": [
+        {
+          "midi": 48,
+          "time": 0.125,
+          "duration": 0.4,
+          "velocity": 0.3
+        },
+        {
+          "midi": 60,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.6
+        },
+        {
+          "midi": 67,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.45
+        },
+        {
+          "midi": 72,
+          "time": 1.375,
+          "duration": 0.7,
+          "velocity": 0.8
+        }
+      ],
+      "warm": false,
+      "controls": [
+        {
+          "axis": "filter",
+          "kind": "sine"
+        }
+      ],
+      "cutoff": 11000,
+      "pitchCents": 0,
+      "peak": 0.14775972068309784,
+      "maxError": 2.384185791015625e-7,
+      "relativeRmsError": 0.0000010740974552929891,
+      "correlation": 0.999999999999388
+    },
+    {
+      "name": "Live edited vibrato and filter LFO",
+      "polyphony": 8,
+      "configVersion": 2,
+      "voiceStats": {
+        "active": 0,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 144000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 3
+      },
+      "notes": [
+        {
+          "midi": 48,
+          "time": 0.125,
+          "duration": 0.4,
+          "velocity": 0.3
+        },
+        {
+          "midi": 60,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.6
+        },
+        {
+          "midi": 67,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.45
+        },
+        {
+          "midi": 72,
+          "time": 1.375,
+          "duration": 0.7,
+          "velocity": 0.8
+        }
+      ],
+      "warm": false,
+      "controls": [
+        {
+          "axis": "pitch",
+          "kind": "sine"
+        },
+        {
+          "axis": "filter",
+          "kind": "sine"
+        }
+      ],
+      "cutoff": 11000,
+      "pitchCents": 0,
+      "peak": 0.14773835241794586,
+      "maxError": 2.682209014892578e-7,
+      "relativeRmsError": 0.000001082515305669698,
+      "correlation": 0.999999999999374
+    },
+    {
+      "name": "Warm live vibrato and filter LFO",
+      "polyphony": 8,
+      "configVersion": 2,
+      "voiceStats": {
+        "active": 0,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 144000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 3
+      },
+      "notes": [
+        {
+          "midi": 48,
+          "time": 0.125,
+          "duration": 0.4,
+          "velocity": 0.3
+        },
+        {
+          "midi": 60,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.6
+        },
+        {
+          "midi": 67,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.45
+        },
+        {
+          "midi": 72,
+          "time": 1.375,
+          "duration": 0.7,
+          "velocity": 0.8
+        }
+      ],
+      "warm": true,
+      "controls": [
+        {
+          "axis": "pitch",
+          "kind": "sine"
+        },
+        {
+          "axis": "filter",
+          "kind": "sine"
+        }
+      ],
+      "cutoff": 11000,
+      "pitchCents": 0,
+      "peak": 0.14766862988471985,
+      "maxError": 2.2351741790771484e-7,
+      "relativeRmsError": 0.0000010382888932882025,
+      "correlation": 0.9999999999994044
+    },
+    {
+      "name": "Sine voice wander",
+      "polyphony": 8,
+      "configVersion": 2,
+      "voiceStats": {
+        "active": 0,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 144000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 3
+      },
+      "notes": [
+        {
+          "midi": 48,
+          "time": 0.125,
+          "duration": 0.4,
+          "velocity": 0.3
+        },
+        {
+          "midi": 60,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.6
+        },
+        {
+          "midi": 67,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.45
+        },
+        {
+          "midi": 72,
+          "time": 1.375,
+          "duration": 0.7,
+          "velocity": 0.8
+        }
+      ],
+      "warm": false,
+      "controls": [
+        {
+          "axis": "filter",
+          "kind": "sine"
+        },
+        {
+          "axis": "pitch",
+          "kind": "sine"
+        }
+      ],
+      "cutoff": 11000,
+      "pitchCents": 0,
+      "peak": 0.14784087240695953,
+      "maxError": 4.470348358154297e-8,
+      "relativeRmsError": 1.3893201825276093e-7,
+      "correlation": 0.9999999999999449
+    },
+    {
+      "name": "Brownian voice wander",
+      "polyphony": 8,
+      "configVersion": 2,
+      "voiceStats": {
+        "active": 0,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 144000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 3
+      },
+      "notes": [
+        {
+          "midi": 48,
+          "time": 0.125,
+          "duration": 0.4,
+          "velocity": 0.3
+        },
+        {
+          "midi": 60,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.6
+        },
+        {
+          "midi": 67,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.45
+        },
+        {
+          "midi": 72,
+          "time": 1.375,
+          "duration": 0.7,
+          "velocity": 0.8
+        }
+      ],
+      "warm": false,
+      "controls": [
+        {
+          "axis": "filter",
+          "kind": "linear"
+        },
+        {
+          "axis": "pitch",
+          "kind": "linear"
+        }
+      ],
+      "cutoff": 11000,
+      "pitchCents": 0,
+      "peak": 0.14892491698265076,
+      "maxError": 0.000014633871614933014,
+      "relativeRmsError": 0.00009178880762430487,
+      "correlation": 0.999999995795916
+    },
+    {
+      "name": "Smoothed Brownian voice wander",
+      "polyphony": 8,
+      "configVersion": 2,
+      "voiceStats": {
+        "active": 0,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 144000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 3
+      },
+      "notes": [
+        {
+          "midi": 48,
+          "time": 0.125,
+          "duration": 0.4,
+          "velocity": 0.3
+        },
+        {
+          "midi": 60,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.6
+        },
+        {
+          "midi": 67,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.45
+        },
+        {
+          "midi": 72,
+          "time": 1.375,
+          "duration": 0.7,
+          "velocity": 0.8
+        }
+      ],
+      "warm": false,
+      "controls": [
+        {
+          "axis": "filter",
+          "kind": "linear"
+        },
+        {
+          "axis": "pitch",
+          "kind": "linear"
+        }
+      ],
+      "cutoff": 11000,
+      "pitchCents": 0,
+      "peak": 0.1488950550556183,
+      "maxError": 0.00009415531530976295,
+      "relativeRmsError": 0.000778845078125054,
+      "correlation": 0.9999996970285301
+    },
+    {
+      "name": "One-slot modal stealing",
+      "polyphony": 1,
+      "configVersion": 3,
+      "voiceStats": {
+        "active": 0,
+        "steals": 3,
+        "dropped": 0,
+        "late": 0,
+        "frame": 144000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 1
+      },
+      "notes": [
+        {
+          "midi": 48,
+          "time": 0.125,
+          "duration": 0.9,
+          "velocity": 0.3
+        },
+        {
+          "midi": 60,
+          "time": 0.525,
+          "duration": 0.6,
+          "velocity": 0.6
+        },
+        {
+          "midi": 67,
+          "time": 0.925,
+          "duration": 0.8,
+          "velocity": 0.45
+        },
+        {
+          "midi": 72,
+          "time": 1.325,
+          "duration": 0.45,
+          "velocity": 0.8
+        }
+      ],
+      "warm": false,
+      "controls": [],
+      "cutoff": 1400,
+      "pitchCents": 0,
+      "peak": 0.24928155541419983,
+      "maxError": 0.00012073665857315063,
+      "relativeRmsError": 0.00007305505828192789,
+      "correlation": 0.9999999983274513
+    },
+    {
+      "name": "Two-slot acoustic stealing",
+      "polyphony": 2,
+      "configVersion": 3,
+      "voiceStats": {
+        "active": 0,
+        "steals": 1,
+        "dropped": 0,
+        "late": 0,
+        "frame": 144000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 2
+      },
+      "notes": [
+        {
+          "midi": 48,
+          "time": 0.125,
+          "duration": 0.9,
+          "velocity": 0.3
+        },
+        {
+          "midi": 60,
+          "time": 0.525,
+          "duration": 0.6,
+          "velocity": 0.6
+        },
+        {
+          "midi": 67,
+          "time": 0.925,
+          "duration": 0.8,
+          "velocity": 0.45
+        },
+        {
+          "midi": 72,
+          "time": 1.325,
+          "duration": 0.45,
+          "velocity": 0.8
+        }
+      ],
+      "warm": false,
+      "controls": [],
+      "cutoff": 11000,
+      "pitchCents": 0,
+      "peak": 0.12456852942705154,
+      "maxError": 0.0017534815706312656,
+      "relativeRmsError": 0.0025043271434247558,
+      "correlation": 0.9999968641839557
+    },
+    {
+      "name": "Modulated one-slot stealing",
+      "polyphony": 1,
+      "configVersion": 3,
+      "voiceStats": {
+        "active": 0,
+        "steals": 3,
+        "dropped": 0,
+        "late": 0,
+        "frame": 144000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 1
+      },
+      "notes": [
+        {
+          "midi": 48,
+          "time": 0.125,
+          "duration": 0.9,
+          "velocity": 0.3
+        },
+        {
+          "midi": 60,
+          "time": 0.525,
+          "duration": 0.6,
+          "velocity": 0.6
+        },
+        {
+          "midi": 67,
+          "time": 0.925,
+          "duration": 0.8,
+          "velocity": 0.45
+        },
+        {
+          "midi": 72,
+          "time": 1.325,
+          "duration": 0.45,
+          "velocity": 0.8
+        }
+      ],
+      "warm": false,
+      "controls": [
+        {
+          "axis": "filter",
+          "kind": "sine"
+        },
+        {
+          "axis": "pitch",
+          "kind": "sine"
+        }
+      ],
+      "cutoff": 11000,
+      "pitchCents": 0,
+      "peak": 0.14768098294734955,
+      "maxError": 3.725290298461914e-8,
+      "relativeRmsError": 1.243958861846721e-7,
+      "correlation": 0.999999999999971
+    },
+    {
+      "name": "Steal during slow attack",
+      "polyphony": 1,
+      "configVersion": 3,
+      "voiceStats": {
+        "active": 0,
+        "steals": 3,
+        "dropped": 0,
+        "late": 0,
+        "frame": 144000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 1
+      },
+      "notes": [
+        {
+          "midi": 48,
+          "time": 0.125,
+          "duration": 0.9,
+          "velocity": 0.3
+        },
+        {
+          "midi": 60,
+          "time": 0.525,
+          "duration": 0.6,
+          "velocity": 0.6
+        },
+        {
+          "midi": 67,
+          "time": 0.925,
+          "duration": 0.8,
+          "velocity": 0.45
+        },
+        {
+          "midi": 72,
+          "time": 1.325,
+          "duration": 0.45,
+          "velocity": 0.8
+        }
+      ],
+      "warm": false,
+      "controls": [],
+      "cutoff": 11000,
+      "pitchCents": 0,
+      "peak": 0.005896552931517363,
+      "maxError": 7.450580596923828e-9,
+      "relativeRmsError": 3.8456781822155437e-7,
+      "correlation": 0.9999999999998915
+    },
+    {
+      "name": "Exact 10 ms steals",
+      "polyphony": 1,
+      "configVersion": 3,
+      "voiceStats": {
+        "active": 0,
+        "steals": 3,
+        "dropped": 0,
+        "late": 0,
+        "frame": 144000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 1
+      },
+      "notes": [
+        {
+          "midi": 48,
+          "time": 0.125,
+          "duration": 0.9,
+          "velocity": 0.3
+        },
+        {
+          "midi": 60,
+          "time": 0.135,
+          "duration": 0.6,
+          "velocity": 0.6
+        },
+        {
+          "midi": 67,
+          "time": 0.145,
+          "duration": 0.8,
+          "velocity": 0.45
+        },
+        {
+          "midi": 72,
+          "time": 0.155,
+          "duration": 0.45,
+          "velocity": 0.8
+        }
+      ],
+      "warm": false,
+      "controls": [],
+      "cutoff": 1400,
+      "pitchCents": 0,
+      "peak": 0.24928155541419983,
+      "maxError": 0.00012069940567016602,
+      "relativeRmsError": 0.00007071150027730128,
+      "correlation": 0.9999999978067172
+    },
+    {
+      "name": "Ambient Piano",
+      "polyphony": 8,
+      "configVersion": 1,
+      "voiceStats": {
+        "active": 0,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 144000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 3
+      },
+      "notes": [
+        {
+          "midi": 36,
+          "time": 0.125,
+          "duration": 0.4,
+          "velocity": 0.3
+        },
+        {
+          "midi": 48,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.6
+        },
+        {
+          "midi": 55,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.45
+        },
+        {
+          "midi": 60,
+          "time": 1.375,
+          "duration": 0.7,
+          "velocity": 0.8
+        }
+      ],
+      "warm": false,
+      "controls": [],
+      "cutoff": 11000,
+      "pitchCents": 5,
+      "peak": 0.14269569516181946,
+      "maxError": 0.0013409294188022614,
+      "relativeRmsError": 0.0016084739571027437,
+      "correlation": 0.9999987064075945
+    },
+    {
+      "name": "Glass Grand",
+      "polyphony": 8,
+      "configVersion": 1,
+      "voiceStats": {
+        "active": 0,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 144000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 3
+      },
+      "notes": [
+        {
+          "midi": 36,
+          "time": 0.125,
+          "duration": 0.4,
+          "velocity": 0.3
+        },
+        {
+          "midi": 48,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.6
+        },
+        {
+          "midi": 55,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.45
+        },
+        {
+          "midi": 60,
+          "time": 1.375,
+          "duration": 0.7,
+          "velocity": 0.8
+        }
+      ],
+      "warm": false,
+      "controls": [],
+      "cutoff": 11000,
+      "pitchCents": 5,
+      "peak": 0.15473023056983948,
+      "maxError": 0.001574961468577385,
+      "relativeRmsError": 0.0019145342482535213,
+      "correlation": 0.9999981672779157
+    },
+    {
+      "name": "Soft Drama",
+      "polyphony": 8,
+      "configVersion": 1,
+      "voiceStats": {
+        "active": 0,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 144000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 3
+      },
+      "notes": [
+        {
+          "midi": 36,
+          "time": 0.125,
+          "duration": 0.4,
+          "velocity": 0.3
+        },
+        {
+          "midi": 48,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.6
+        },
+        {
+          "midi": 55,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.45
+        },
+        {
+          "midi": 60,
+          "time": 1.375,
+          "duration": 0.7,
+          "velocity": 0.8
+        }
+      ],
+      "warm": false,
+      "controls": [],
+      "cutoff": 11000,
+      "pitchCents": 5,
+      "peak": 0.10952898114919662,
+      "maxError": 0.0008780723437666893,
+      "relativeRmsError": 0.0012718407361624233,
+      "correlation": 0.9999991912105101
+    },
+    {
+      "name": "Soft Piano",
+      "polyphony": 8,
+      "configVersion": 1,
+      "voiceStats": {
+        "active": 0,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 144000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 3
+      },
+      "notes": [
+        {
+          "midi": 36,
+          "time": 0.125,
+          "duration": 0.4,
+          "velocity": 0.3
+        },
+        {
+          "midi": 48,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.6
+        },
+        {
+          "midi": 55,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.45
+        },
+        {
+          "midi": 60,
+          "time": 1.375,
+          "duration": 0.7,
+          "velocity": 0.8
+        }
+      ],
+      "warm": false,
+      "controls": [],
+      "cutoff": 11000,
+      "pitchCents": 5,
+      "peak": 0.08480960130691528,
+      "maxError": 0.00040108803659677505,
+      "relativeRmsError": 0.0007568217364233641,
+      "correlation": 0.9999997136131933
+    },
+    {
+      "name": "Subdued Piano",
+      "polyphony": 8,
+      "configVersion": 1,
+      "voiceStats": {
+        "active": 0,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 144000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 3
+      },
+      "notes": [
+        {
+          "midi": 36,
+          "time": 0.125,
+          "duration": 0.4,
+          "velocity": 0.3
+        },
+        {
+          "midi": 48,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.6
+        },
+        {
+          "midi": 55,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.45
+        },
+        {
+          "midi": 60,
+          "time": 1.375,
+          "duration": 0.7,
+          "velocity": 0.8
+        }
+      ],
+      "warm": false,
+      "controls": [],
+      "cutoff": 11000,
+      "pitchCents": 5,
+      "peak": 0.0873715728521347,
+      "maxError": 0.0005844859406352043,
+      "relativeRmsError": 0.0008872142851076416,
+      "correlation": 0.9999996064279811
+    },
+    {
+      "name": "Studio Concert",
+      "polyphony": 8,
+      "configVersion": 1,
+      "voiceStats": {
+        "active": 0,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 144000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 3
+      },
+      "notes": [
+        {
+          "midi": 36,
+          "time": 0.125,
+          "duration": 0.4,
+          "velocity": 0.3
+        },
+        {
+          "midi": 48,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.6
+        },
+        {
+          "midi": 55,
+          "time": 0.625,
+          "duration": 0.5,
+          "velocity": 0.45
+        },
+        {
+          "midi": 60,
+          "time": 1.375,
+          "duration": 0.7,
+          "velocity": 0.8
+        }
+      ],
+      "warm": false,
+      "controls": [],
+      "cutoff": 11000,
+      "pitchCents": 5,
+      "peak": 0.16107246279716492,
+      "maxError": 0.0020137280225753784,
+      "relativeRmsError": 0.0022332069334931523,
+      "correlation": 0.9999975064511891
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-//! The existing three acoustic models; matched/table models are separate.
+//! The existing three acoustic models and six fitted acoustic variants.
 use super::{clamp, Piano, Settings};
 use std::f64::consts::{PI, TAU};
 struct Kind {
@@ -19,6 +19,10 @@ struct Kind {
     high: f64,
     q: [f64; 2],
     gain: f64,
+    dark: Option<[f64; 3]>,
+    fund: f64,
+    ripple: f64,
+    stiff_low: f64,
 }
 fn kind(code: u32) -> Kind {
     match code {
@@ -40,6 +44,10 @@ fn kind(code: u32) -> Kind {
             high: 2200.,
             q: [7., 16.],
             gain: 1.,
+            dark: None,
+            fund: 0.,
+            ripple: 0.,
+            stiff_low: 1.,
         },
         3 => Kind {
             strike: 0.131,
@@ -59,7 +67,12 @@ fn kind(code: u32) -> Kind {
             high: 900.,
             q: [6., 12.],
             gain: 0.9,
+            dark: None,
+            fund: 0.,
+            ripple: 0.,
+            stiff_low: 1.,
         },
+        5..=10 => matched(code),
         _ => Kind {
             strike: 0.135,
             contact: 0.8,
@@ -78,8 +91,50 @@ fn kind(code: u32) -> Kind {
             high: 1500.,
             q: [10., 26.],
             gain: 1.6,
+            dark: None,
+            fund: 0.,
+            ripple: 0.,
+            stiff_low: 1.,
         },
     }
+}
+// Same fitted shapes as acousticPianoMatched.js. Codes 0..4 retain their ABI.
+fn matched(code: u32) -> Kind {
+    let mut k = kind(2);
+    let [strike, contact, loss, inharm, stiff_low, decay, slow, knee, lead, dark_hz, dark_order, fund] =
+        match code {
+            5 => [
+                0.119, 0.661, 0.5, 0.832, 0.453, 1.23, 3.41, 68., 0.775, 250., 0.3, -12.5,
+            ],
+            6 => [
+                0.128, 1.09, 0.5, 1.06, 0.839, 1.2, 4.66, 90.3, 0.8, 4000., 0.2, -14.3,
+            ],
+            7 => [
+                0.119, 2.83, 0.5, 1.02, 0.357, 1.23, 4.42, 57.8, 0.375, 4000., 0.2, -14.8,
+            ],
+            8 => [
+                0.136, 3.77, 1.75, 0.673, 1.29, 1.89, 6.06, 127., 0.55, 563., 1.79, -10.1,
+            ],
+            9 => [
+                0.12, 2.95, 1.75, 0.873, 0.514, 1.89, 6.84, 78.1, 0.6, 1910., 1.44, -5.94,
+            ],
+            _ => [
+                0.128, 0.844, 0.5, 0.861, 0.744, 1.3, 7., 57.8, 0.4, 4000., 0.2, -12.5,
+            ],
+        };
+    k.strike = strike;
+    k.contact = contact;
+    k.loss = loss;
+    k.inharm = inharm;
+    k.stiff_low = stiff_low;
+    k.decay = decay;
+    k.slow = slow;
+    k.knee = knee;
+    k.lead = lead;
+    k.dark = Some([dark_hz, dark_order, 72.]);
+    k.fund = fund;
+    k.ripple = 7.;
+    k
 }
 struct Random(u32);
 impl Random {
@@ -197,7 +252,8 @@ pub fn render(sr: f64, freq: f64, code: u32, s: Settings, wear: f64) -> Piano {
     let stiffness =
         (8e-5 + 3e-4 * 2f64.powf((midi - 60.) / 7.5) + 3e-4 * 2f64.powf((30. - midi) / 6.))
             * k.inharm
-            * (1. + wear * 0.25);
+            * (1. + wear * 0.25)
+            * (1. + (k.stiff_low - 1.) * clamp((44. - midi) / 16., 0., 1.));
     let limit = (sr * 0.45).min(12000. * (0.5 + brightness));
     let strings = if midi < 30. {
         1
@@ -221,6 +277,12 @@ pub fn render(sr: f64, freq: f64, code: u32, s: Settings, wear: f64) -> Piano {
         })
         .collect();
     let per_string = 1. / (strings as f64).powf(0.7);
+    let mut ripple = Random::new(
+        s.seed
+            .wrapping_mul(131)
+            .wrapping_add((f0 * 10.).round() as u32)
+            .wrapping_add(7),
+    );
     for n in 1.. {
         let nf = n as f64;
         let partial = nf * ((1. + stiffness * nf * nf) / (1. + stiffness)).sqrt();
@@ -228,7 +290,25 @@ pub fn render(sr: f64, freq: f64, code: u32, s: Settings, wear: f64) -> Piano {
             break;
         }
         let reach = f0 * partial;
-        let level = (PI * nf * k.strike).sin().abs()
+        let bass_weight = if k.dark.is_some() || k.fund != 0. || k.ripple != 0. {
+            clamp((k.dark.map_or(72., |d| d[2]) - midi) / 24., 0., 1.)
+        } else {
+            0.
+        };
+        let mut shaped = 1.;
+        if bass_weight != 0. {
+            if let Some(d) = k.dark {
+                shaped *= (1. + bass_weight * (reach / d[0]).powf(2.)).powf(-d[1]);
+            }
+            if n == 1 && k.fund != 0. {
+                shaped *= 10f64.powf(k.fund * clamp((48. - midi) / 20., 0., 1.) / 20.);
+            }
+            if k.ripple != 0. && n > 1 {
+                shaped *= 10f64.powf(k.ripple * bass_weight * ripple.next() / 20.);
+            }
+        }
+        let level = shaped
+            * (PI * nf * k.strike).sin().abs()
             * (1. + (reach * contact / 1.6).powf(2.)).powf(-order)
             * nf.powf(-tilt)
             / (1. + (k.knee / reach).powf(6.)).sqrt()

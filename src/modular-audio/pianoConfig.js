@@ -1,4 +1,4 @@
-export const PIANO_TYPES=Object.freeze(['felt','electric','grand','felted','upright']);
+export const PIANO_TYPES=Object.freeze(['felt','electric','grand','felted','upright','ambient','glass','drama','soft','subdued','concert']);
 const range=(v,a,b)=>typeof v==='number'&&Number.isFinite(v)&&v>=a&&v<=b;
 const fail=()=>{throw Error('Invalid prepared piano configuration');};
 // Serialized finite material, never host pointers, PCM, timers or singleton state.

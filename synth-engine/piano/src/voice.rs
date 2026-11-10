@@ -113,7 +113,7 @@ impl Engine {
             || self.banks.len() >= 128
             || !freq.is_finite()
             || !(10. ..=self.sr / 6.).contains(&freq)
-            || kind > 4
+            || kind > 10
             || !sustain.is_finite()
             || !(0. ..=1.).contains(&sustain)
             || !wear.is_finite()

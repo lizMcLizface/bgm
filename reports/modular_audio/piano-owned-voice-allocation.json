@@ -2,7 +2,7 @@
   "kind": "piano.owned-voice-allocation",
   "version": 1,
   "pass": true,
-  "graphVersion": "7f5888b007e0c3b2",
+  "graphVersion": "67531999ec42dded",
   "scope": "Prepared finite Rust piano render including sine/walk modulation, independent handles, save/reload, reset, enqueue, owner cancellation and pause. Excludes preparation and host JS/browser deadlines.",
   "results": [
     {
@@ -58,6 +58,72 @@
       "independentHandles": 2,
       "allocationOrReclamationCalls": 0,
       "memoryBytes": 3932160,
+      "grew": false
+    },
+    {
+      "type": "ambient",
+      "sampleRate": 48000,
+      "frames": 60000,
+      "peak": 0.14692802727222443,
+      "saveReloadExact": true,
+      "independentHandles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 5832704,
+      "grew": false
+    },
+    {
+      "type": "glass",
+      "sampleRate": 48000,
+      "frames": 60000,
+      "peak": 0.14490942656993866,
+      "saveReloadExact": true,
+      "independentHandles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 6815744,
+      "grew": false
+    },
+    {
+      "type": "drama",
+      "sampleRate": 48000,
+      "frames": 60000,
+      "peak": 0.1425011307001114,
+      "saveReloadExact": true,
+      "independentHandles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 6488064,
+      "grew": false
+    },
+    {
+      "type": "soft",
+      "sampleRate": 48000,
+      "frames": 60000,
+      "peak": 0.12603887915611267,
+      "saveReloadExact": true,
+      "independentHandles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 11534336,
+      "grew": false
+    },
+    {
+      "type": "subdued",
+      "sampleRate": 48000,
+      "frames": 60000,
+      "peak": 0.1249028742313385,
+      "saveReloadExact": true,
+      "independentHandles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 12124160,
+      "grew": false
+    },
+    {
+      "type": "concert",
+      "sampleRate": 48000,
+      "frames": 60000,
+      "peak": 0.14695240557193756,
+      "saveReloadExact": true,
+      "independentHandles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 9568256,
       "grew": false
     },
     {

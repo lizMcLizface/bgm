@@ -25,7 +25,9 @@ owned allocation/release state. [M4f shared piano controls](MODULAR_AUDIO_ENGINE
 adds frozen sine, vibrato, filter-LFO and seeded-walk snapshots to v2.
 [M4g prepared voice stealing](MODULAR_AUDIO_ENGINE_M4G_PIANO_STEALING.md) adds v3
 slot lifetimes and the native pre-onset fade; same-slot steals below10 ms remain
-rejected. Matched acoustic/calibrated/Iowa/classic adapters remain.
+rejected. [M4h fitted acoustic variants](MODULAR_AUDIO_ENGINE_M4H_MATCHED_ACOUSTIC.md)
+adds all six matched shapes to preparation and owned graph playback.
+Calibrated/Iowa/classic adapters remain.
 All six source engines have owned mutable Rust state; core's read-only additive
 tables are safely shared after preparation. External stereo host inputs and
 graph program/key compression exist. All six sources now also run inside one

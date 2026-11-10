@@ -260,7 +260,7 @@ pub extern "C" fn piano_note_new(
     softness: f64,
     wear: f64,
 ) -> *mut Piano {
-    if kind > 4 {
+    if kind > 10 {
         return std::ptr::null_mut();
     }
     let settings = Settings {

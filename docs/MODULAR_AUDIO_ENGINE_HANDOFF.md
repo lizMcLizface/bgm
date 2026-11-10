@@ -2621,3 +2621,38 @@ build, not a newly supplied device capture. No new counters, user-agent or lock-
 screen behavior are inferred. Evidence: piano-stealing-phone-acceptance.json.
 Continue matched acoustic preparation, owned graph integration and native parity
 in a substantial local batch; retain the existing defaults and legacy renderers.
+
+## 2026-11-10 — M4h fitted acoustic variants
+
+[M4h](MODULAR_AUDIO_ENGINE_M4H_MATCHED_ACOUSTIC.md) adds all six fitted shapes
+to the existing portable acoustic renderer, normal opt-in preparation and graph
+banks. Codes0–4 remain,5–10 add Ambient/Glass/Drama/Soft/Subdued/Concert. Fitted
+bass darkening, fundamental gain, independent seeded ripple and low-string
+stiffness preserve acousticPianoMatched.js. Native defaults remain original JS;
+calibrated/Iowa/classic are not substituted. No modal body is added to acoustics.
+
+Preparation b8a432b4637a68b5 /50306bytes and graph67531999ec42dded /356798bytes
+pass582 preparation comparisons (360 new fitted cases),414 bit-exact strikes,
+maximum sample error2.9802322387695312e-8 and108 bit-exact held bodies. All24
+native dry comparisons pass; matched errors0.000757–0.002233 relative RMS meet
+unchanged tolerances.30 existing and14 piano allocation audits report no render
+allocation/reclamation/growth. Real-worker mixed eight-bus PCM remains exact,
+including matched modulation/stealing and the existing sidechain master.
+
+The broad run verifies534 tests with one obsolete UI-copy assertion failing;
+that assertion said piano was absent from the graph. It is removed, with all11
+focused preparation-control/source-capture checks passing. No functional test
+gate is relaxed. Public packaging passes. Reports include piano-rust-compatibility,
+piano-native-matched-browser and piano-matched-full-path-browser.
+
+The fixed matched profile uses Ambient/Soft/Concert plus core/FM/Hand, keeping
+sine/walk/vibrato and one/two-slot stress. All four full-path cases pass:
+942000-frame audition /726000-frame progression, serial and actual worker;
+progressions execute three Rhythm steals, workers have zero underruns/late blocks.
+This is local evidence; the prior M4g phone acceptance keeps its original scope.
+Continue measured-table preparation next, using actual measured models and owned
+Rust DSP. Do not request another tiny phone checkpoint for this shape extension.
+
+Separate audible matched progression:726000 frames, three Rhythm steals, zero
+worker underruns, all six source/channel peaks positive, master peak0.10635.
+See piano-matched-audible-browser.json. Physical listening remains unassessed.
