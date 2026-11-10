@@ -1,5 +1,5 @@
 // src/modular-audio/workerOutputProcessor.js
-import { ReferenceGraph } from "./runtime.js?v=b883cc9bc5a4d066";
+import { ReferenceGraph } from "./runtime.js?v=3608e7e522d935a3";
 
 // src/modular-audio/queueLead.js
 function contiguousLeadFrames(slots, frame, capacity) {

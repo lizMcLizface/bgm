@@ -38,6 +38,8 @@ pub extern "C" fn graph_piano_spec(g:&mut Graph,id:u32,note:u32,bank:usize,midi:
 #[no_mangle]
 pub extern "C" fn graph_piano_point(g:&mut Graph,id:u32,note:u32,kind:u32,frame:f64,value:f64,tau:f64)->u32 {piano_status(g,id,|p|p.point(note,calmbgm_piano::voice::Point{kind,frame,value,tau}))}
 #[no_mangle]
+pub extern "C" fn graph_piano_lifetime(g:&mut Graph,id:u32,note:u32,voice:usize,onset:f64,fade:f64,cut:f64)->u32 {match g.piano_lifetime_edit(id){Ok(p)=>if p.lifetime(note,voice,onset,fade,cut){0}else{Error::Contract as u32},Err(e)=>e as u32}}
+#[no_mangle]
 pub extern "C" fn graph_piano_control(g:&mut Graph,id:u32,axis:u32,kind:u32,phase:f64,frequency:f64,initial:f64,target:f64,tau:f64)->u32 {match g.piano_control_edit(id){Ok(p)=>if p.control(calmbgm_piano::control::Control{axis,kind,phase,frequency,initial,target,tau,points:Vec::new()}){0}else{Error::Contract as u32},Err(e)=>e as u32}}
 #[no_mangle]
 pub extern "C" fn graph_piano_control_point(g:&mut Graph,id:u32,index:usize,frame:f64,value:f64)->u32 {match g.piano_control_edit(id){Ok(p)=>if p.control_point(index,frame,value){0}else{Error::Contract as u32},Err(e)=>e as u32}}

@@ -1,4 +1,4 @@
-import {ReferenceGraph} from './runtime.js?v=b883cc9bc5a4d066';
+import {ReferenceGraph} from './runtime.js?v=3608e7e522d935a3';
 
 class ReferenceProcessor extends AudioWorkletProcessor {
   constructor({processorOptions: o}) {

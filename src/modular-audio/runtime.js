@@ -57,11 +57,12 @@ export function validatePatch(raw, contracts) {
   const owners=new Map();
   for (const e of p.events) {eventPacket(e, modules, p.connections);if(e.kind==='note'&&e.note&&[0,1,3,5].includes(e.event)){const k=e.target+':'+e.note;if(owners.has(k)&&owners.get(k)!==e.owner)throw Error('Pitched note owner conflict');owners.set(k,e.owner);}}
   for(const n of p.modules.filter(n=>n.type==='legacy.piano')){
-    const used=new Set(),ends=[];
+    const used=new Set(),ends=[],slots=[];
     for(const e of p.events.filter(e=>e.target===n.id&&e.kind==='note'&&e.event===0).sort((a,b)=>a.frame-b.frame)){
       const v=n.config.notes.find(v=>v.id===e.note);if(!v||used.has(v.id)||Math.fround(e.a)!==Math.fround(v.midi)||Math.fround(e.b)!==Math.fround(v.velocity))throw Error('Piano trigger/configuration mismatch');used.add(v.id);
-      for(let i=ends.length-1;i>=0;i--)if(ends[i]<=e.frame)ends.splice(i,1);
-      if(ends.length>=n.config.voices)throw Error('Piano voice-steal fade is not supported');ends.push(e.frame+v.gain.at(-1)[1]);
+      if(n.config.version===3){const prior=slots[v.voice];if(v.onsetFrame!==e.frame||prior&&prior.onsetFrame+prior.cutFrame>e.frame)throw Error('Piano slot lifetime/trigger mismatch');slots[v.voice]=v;}
+      else{for(let i=ends.length-1;i>=0;i--)if(ends[i]<=e.frame)ends.splice(i,1);
+       if(ends.length>=n.config.voices)throw Error('Piano voice-steal fade is not supported');ends.push(e.frame+v.gain.at(-1)[1]);}
     }
   }
   for(const n of p.modules)if(p.events.filter(e=>e.target===n.id&&e.kind==='note').length>4000)throw Error('Pitched note capacity exceeded');
@@ -120,7 +121,7 @@ export class ReferenceGraph {
           const c=n.config;checked(engine.graph_piano_config(this.handle,n.id,c.voices,c.cutoff,c.q,c.pitch,c.pitchDecay));
           for(const [i,m]of (c.controls??[]).entries()){checked(engine.graph_piano_control(this.handle,n.id,Number(m.axis==='filter'),Number(m.kind==='linear'),m.phase,m.frequency,m.initialDepth,m.targetDepth,m.tauFrames));for(const [frame,value]of m.points)checked(engine.graph_piano_control_point(this.handle,n.id,i,frame,value));}
           for(const b of c.banks)checked(engine.graph_piano_bank(this.handle,n.id,b.frequency,PIANO_TYPES.indexOf(b.type),b.decay,b.brightness,b.hammer,b.unison,b.velocity,b.seed,b.resonance,b.softness,b.sustain,b.wear));
-          for(const v of c.notes){checked(engine.graph_piano_spec(this.handle,n.id,v.id,v.bank,v.midi,v.velocity));for(const p of [...v.gain,...v.filter])checked(engine.graph_piano_point(this.handle,n.id,v.id,...p));}
+          for(const v of c.notes){checked(engine.graph_piano_spec(this.handle,n.id,v.id,v.bank,v.midi,v.velocity));for(const p of [...v.gain,...v.filter])checked(engine.graph_piano_point(this.handle,n.id,v.id,...p));if(c.version===3)checked(engine.graph_piano_lifetime(this.handle,n.id,v.id,v.voice,v.onsetFrame,v.fadeFrame??-1,v.cutFrame));}
         }
         if(['legacy.core','legacy.fm'].includes(d.type)){
           const c=compilePitched(n.config,d.type==='legacy.fm',sampleRate);

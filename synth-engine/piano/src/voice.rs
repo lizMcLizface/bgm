@@ -16,6 +16,10 @@ pub struct Note {
     pub velocity: f32,
     pub gain: Vec<Point>,
     pub filter: Vec<Point>,
+    voice: Option<usize>,
+    onset: u64,
+    fade: Option<f64>,
+    cut: f64,
 }
 pub struct Bank {
     strike: Vec<f32>,
@@ -47,12 +51,14 @@ pub struct Engine {
     pitch_tau: f64,
     pub bytes: usize,
     controls: Vec<crate::control::Control>,
+    planned: bool,
     peak_active: usize,
+    steals: usize,
     peak: f64,
     frame: u64,
 }
 impl Engine {
-    pub fn new(sr: f64) -> Self {
+    pub fn new(sr: f64, planned: bool) -> Self {
         Self {
             sr,
             banks: Vec::new(),
@@ -66,7 +72,9 @@ impl Engine {
             pitch_tau: 48.,
             bytes: 0,
             controls: Vec::new(),
+            planned,
             peak_active: 0,
+            steals: 0,
             peak: 0.,
             frame: 0,
         }
@@ -183,6 +191,10 @@ impl Engine {
             velocity,
             gain: Vec::new(),
             filter: Vec::new(),
+            voice: None,
+            onset: 0,
+            fade: None,
+            cut: 0.,
         });
         true
     }
@@ -219,6 +231,36 @@ impl Engine {
         list.push(p);
         true
     }
+    pub fn lifetime(&mut self, id: u32, voice: usize, onset: f64, fade: f64, cut: f64) -> bool {
+        if self.ready
+            || voice >= self.slots.len()
+            || !onset.is_finite()
+            || onset.fract() != 0.
+            || !(0. ..=5_760_000.).contains(&onset)
+            || !fade.is_finite()
+            || !cut.is_finite()
+        {
+            return false;
+        }
+        let Some(n) = self.notes.iter_mut().find(|n| n.id == id) else {
+            return false;
+        };
+        let Some(last) = n.gain.last() else {
+            return false;
+        };
+        if n.voice.is_some()
+            || !(0. ..=last.frame).contains(&cut)
+            || (fade == -1. && cut != last.frame)
+            || (fade != -1. && (fade < 0. || cut - fade != 480.))
+        {
+            return false;
+        }
+        n.voice = Some(voice);
+        n.onset = onset as u64;
+        n.fade = if fade == -1. { None } else { Some(fade) };
+        n.cut = cut;
+        true
+    }
     pub fn prepare(&mut self) -> bool {
         if self.slots.is_empty()
             || self.controls.iter().any(|c| !c.ready())
@@ -230,20 +272,38 @@ impl Engine {
                     || n.filter.is_empty()
                     || n.filter[0].frame != 0.
                     || n.filter[0].kind != 1
+                    || self.planned
+                        && (n.voice.is_none()
+                            || n.cut > n.gain.last().unwrap().frame
+                            || n.fade.is_none() && n.cut != n.gain.last().unwrap().frame)
             })
+        {
+            return false;
+        }
+        if self.planned
+            && (self.notes.iter().any(|n| n.voice.is_none())
+                || self.notes.iter().enumerate().any(|(i, n)| {
+                    self.notes[..i].iter().any(|p| {
+                        p.voice == n.voice
+                            && (p.onset as f64) < n.onset as f64 + n.cut
+                            && (n.onset as f64) < p.onset as f64 + p.cut
+                    })
+                }))
         {
             return false;
         }
         self.ready = true;
         true
     }
-    pub fn valid(&self, k: u32, id: u32, a: f32, b: f32) -> bool {
+    pub fn valid(&self, k: u32, id: u32, a: f32, b: f32, frame: u64) -> bool {
         k == 4
             || (k == 0)
-                && self
-                    .notes
-                    .iter()
-                    .any(|n| n.id == id && n.midi == a && n.velocity == b)
+                && self.notes.iter().any(|n| {
+                    n.id == id
+                        && n.midi == a
+                        && n.velocity == b
+                        && (!self.planned || n.onset == frame)
+                })
     }
     pub fn control(&mut self, c: crate::control::Control) -> bool {
         if self.ready || self.controls.len() >= 4 || !c.valid() {
@@ -288,26 +348,43 @@ impl Engine {
         let Some(index) = self.notes.iter().position(|n| n.id == id) else {
             return false;
         };
-        // Finite compilation rejects steals rather than silently changing the
-        // original pre-onset fade. The same bound is enforced at the ABI seam.
-        let Some(v) = (0..self.slots.len())
+        let planned = self.notes[index].voice;
+        let available = (0..self.slots.len())
             .map(|i| (self.next + i) % self.slots.len())
             .find(|&i| {
                 self.slots[i].note.is_none_or(|n| {
                     frame as f64
                         >= self.slots[i].start as f64 + self.notes[n].gain.last().unwrap().frame
                 })
-            })
-        else {
+            });
+        let Some(v) = planned.or(available) else {
             return false;
         };
+        if planned.is_some()
+            && (self.notes[index].onset != frame
+                || self.slots[v].note.is_some_and(|n| {
+                    (frame as f64) < self.slots[v].start as f64 + self.notes[n].cut
+                }))
+        {
+            return false;
+        }
+        if planned.is_some()
+            && self.slots[v].note.is_some_and(|n| {
+                (frame as f64)
+                    < self.slots[v].start as f64 + self.notes[n].gain.last().unwrap().frame
+            })
+        {
+            self.steals += 1;
+        }
         let s = &mut self.slots[v];
         s.note = Some(index);
         s.owner = owner;
         s.start = frame;
         s.position = 0.;
         s.body = 0.;
-        self.next = (v + 1) % self.slots.len();
+        if planned.is_none() {
+            self.next = (v + 1) % self.slots.len();
+        }
         true
     }
     pub fn cancel(&mut self, owner: u32) {
@@ -325,6 +402,7 @@ impl Engine {
         self.frame = 0;
         self.peak = 0.;
         self.peak_active = 0;
+        self.steals = 0;
     }
     pub fn stat(&self, index: u32) -> f64 {
         match index {
@@ -332,11 +410,11 @@ impl Engine {
                 .slots
                 .iter()
                 .filter(|v| {
-                    v.note.is_some_and(|n| {
-                        ((self.frame - v.start) as f64) < self.notes[n].gain.last().unwrap().frame
-                    })
+                    v.note
+                        .is_some_and(|n| ((self.frame - v.start) as f64) < end(&self.notes[n]))
                 })
                 .count() as f64,
+            1 => self.steals as f64,
             4 => self.frame as f64,
             5 => self.peak,
             7 => self.peak_active as f64,
@@ -368,12 +446,16 @@ impl Engine {
                     let n = &self.notes[index];
                     let t = (now - v.start) as f64;
                     detune = target(&n.filter, t);
-                    if t < n.gain.last().unwrap().frame {
+                    if t < end(n) {
                         let bank = &self.banks[n.bank];
                         let strike = interpolate(&bank.strike, v.position, false);
                         let body = interpolate(&bank.body, v.body, true);
-                        input = (((strike + body) as f32 * 2.5) as f64 * gain(&n.gain, t)) as f32
-                            as f64;
+                        let amplitude = if let Some(f) = n.fade.filter(|f| t >= *f) {
+                            gain(&n.gain, f) * (-(t - f) / 96.).exp()
+                        } else {
+                            gain(&n.gain, t)
+                        };
+                        input = (((strike + body) as f32 * 2.5) as f64 * amplitude) as f32 as f64;
                         detune = target(&n.filter, t);
                         // AudioBufferSource detune is k-rate, on the absolute
                         // render quantum clock; source cursors remain owned.
@@ -410,9 +492,8 @@ impl Engine {
                 self.slots
                     .iter()
                     .filter(|v| {
-                        v.note.is_some_and(|n| {
-                            ((now - v.start) as f64) < self.notes[n].gain.last().unwrap().frame
-                        })
+                        v.note
+                            .is_some_and(|n| ((now - v.start) as f64) < end(&self.notes[n]))
                     })
                     .count(),
             );
@@ -420,6 +501,13 @@ impl Engine {
             *o = [sum, sum];
         }
         self.frame = frame + out.len() as u64;
+    }
+}
+fn end(n: &Note) -> f64 {
+    if n.voice.is_some() {
+        n.cut
+    } else {
+        n.gain.last().unwrap().frame
     }
 }
 fn interpolate(a: &[f32], p: f64, looped: bool) -> f64 {

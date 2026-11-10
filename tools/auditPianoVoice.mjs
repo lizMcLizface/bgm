@@ -3,8 +3,8 @@ import fs from 'node:fs';
 import {ReferenceGraph,savePatch,loadPatch} from '../src/modular-audio/runtime.js';
 import {pianoFixture,modulatedPianoFixture} from '../src/modular-audio/pianoFixture.js';
 const module=new WebAssembly.Module(fs.readFileSync('.tmp/graph-allocation-target/wasm32-unknown-unknown/release/calmbgm_graph.wasm')),contracts=JSON.parse(fs.readFileSync('public/modular-audio/contracts.json')),results=[];
-for(const type of ['felt','electric','grand','felted','upright','sine','linear']){
- const e=new WebAssembly.Instance(module,{}).exports,p=['sine','linear'].includes(type)?modulatedPianoFixture('electric',type):pianoFixture(type,2),saved=savePatch(p,contracts),a=new ReferenceGraph(e,p,contracts,48000,512),b=new ReferenceGraph(e,loadPatch(saved,contracts),contracts,48000,512);a.refresh();b.refresh();
+for(const type of ['felt','electric','grand','felted','upright','sine','linear','steal']){
+ const e=new WebAssembly.Instance(module,{}).exports,p=type==='steal'?pianoFixture('electric',2,1):['sine','linear'].includes(type)?modulatedPianoFixture('electric',type):pianoFixture(type,2),saved=savePatch(p,contracts),a=new ReferenceGraph(e,p,contracts,48000,512),b=new ReferenceGraph(e,loadPatch(saved,contracts),contracts,48000,512);a.refresh();b.refresh();
  const memory=e.memory.buffer.byteLength;let exact=true,peak=0;e.graph_alloc_watch(1);
  for(let at=0;at<60000;){const n=Math.min(127,60000-at);a.render(n);b.render(n);for(let i=0;i<n;i++){exact&&=a.left[i]===b.left[i];peak=Math.max(peak,Math.abs(a.left[i]));}at+=n;}
  a.reset();for(const event of p.events)a.enqueue(event);a.render(512);a.cancel(1);a.render(127);a.pause(true);a.render(128);a.pause(false);a.render(128);

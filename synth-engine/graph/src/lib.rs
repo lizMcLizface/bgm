@@ -368,7 +368,7 @@ pub fn descriptors_json() -> String {
             // v1 stays raw. v2 requires the kit so older runtimes fail closed.
             modules.push(descriptor.replace(processing,""));
             modules.push(descriptor.replacen("\"version\":1","\"version\":2",1));
-        } else if kind==Kind::Piano { modules.push(descriptor.clone());modules.push(descriptor.replacen("\"version\":1","\"version\":2",1).replace("piano spec v1;", "piano spec v2; four frozen shared controls;")); } else { modules.push(descriptor); }
+        } else if kind==Kind::Piano { modules.push(descriptor.clone());modules.push(descriptor.replacen("\"version\":1","\"version\":2",1).replace("piano spec v1;", "piano spec v2; four frozen shared controls;"));modules.push(descriptor.replacen("\"version\":1","\"version\":3",1).replace("piano spec v1;", "piano spec v3; shared controls and prepared slot lifetimes;").replace("rejected; native pre-onset fade pending", "prepared 10 ms fade; same-slot onsets closer than 10 ms rejected")); } else { modules.push(descriptor); }
     }
     format!(
         r#"{{"api":1,"patchVersion":1,"maxNodes":{},"maxEdges":{},"maxEvents":{},"maxBlock":{},"modules":[{}]}}"#,
@@ -524,7 +524,7 @@ impl Graph {
     pub fn add_node(&mut self, id: u32, kind: Kind, version: u32) -> Result<()> {
         self.editable()?;
         if kind==Kind::Piano && self.sample_rate!=48000. {return Err(Error::Contract);}
-        if !(version == 1 || matches!(kind,Kind::Percussion|Kind::Piano) && version == 2) || id == 0 {
+        if !(version == 1 || matches!(kind,Kind::Percussion|Kind::Piano) && version == 2 || kind==Kind::Piano && version==3) || id == 0 {
             return Err(Error::Contract);
         }
         if self.nodes.len() == MAX_NODES {
@@ -549,7 +549,7 @@ impl Graph {
         }
         if matches!(kind,Kind::Core|Kind::Fm|Kind::Piano)&&self.nodes.iter().filter(|n|matches!(n.kind,Kind::Core|Kind::Fm|Kind::Piano)).count()>=8{return Err(Error::Bounds);}
         self.nodes.push(Node {
-            piano: if kind==Kind::Piano {Some(Box::new(calmbgm_piano::voice::Engine::new(self.sample_rate)))}else{None},
+            piano: if kind==Kind::Piano {Some(Box::new(calmbgm_piano::voice::Engine::new(self.sample_rate,version==3)))}else{None},
             pitched: if matches!(kind,Kind::Core|Kind::Fm){Some(Box::new(pitched::Pitched::new(kind==Kind::Fm,self.sample_rate as f32)))}else{None},
             id,
             version,
@@ -815,7 +815,8 @@ impl Graph {
     }
     pub fn pitch_stat(&self,id:u32,index:u32)->Result<f64> {let i=self.index(id)?;let n=&self.nodes[i];if let Some(p)=&n.piano{Ok(p.stat(index))}else{Ok(n.pitched.as_ref().ok_or(Error::Contract)?.stat(index))}}
     pub fn piano_edit(&mut self,id:u32)->Result<&mut calmbgm_piano::voice::Engine>{self.editable()?;let i=self.index(id)?;self.nodes[i].piano.as_mut().map(|p|p.as_mut()).ok_or(Error::Contract)}
-    pub fn piano_control_edit(&mut self,id:u32)->Result<&mut calmbgm_piano::voice::Engine>{let i=self.index(id)?;if self.nodes[i].version!=2{return Err(Error::Contract);}self.piano_edit(id)}
+    pub fn piano_control_edit(&mut self,id:u32)->Result<&mut calmbgm_piano::voice::Engine>{let i=self.index(id)?;if !matches!(self.nodes[i].version,2|3){return Err(Error::Contract);}self.piano_edit(id)}
+    pub fn piano_lifetime_edit(&mut self,id:u32)->Result<&mut calmbgm_piano::voice::Engine>{let i=self.index(id)?;if self.nodes[i].version!=3{return Err(Error::Contract);}self.piano_edit(id)}
     pub fn percussion_stat(&self,id:u32,index:u32)->Result<f64> {let i=self.index(id)?;Ok(self.nodes[i].percussion.as_ref().ok_or(Error::Contract)?.stat(index))}
     pub fn node_buffer(&self,id:u32)->Result<&[[f32;2]]> {Ok(&self.nodes[self.index(id)?].buffer)}
     pub fn enqueue(&mut self, mut e: Event) -> Result<()> {
@@ -830,7 +831,7 @@ impl Graph {
         match e.action {
             Action::Cancel=>{if self.nodes[i].piano.is_none()&&self.nodes[i].pitched.is_none(){return Err(Error::Contract);}}
             Action::Note{kind,id,a,b}=>{
-                let conflict=if let Some(p)=&self.nodes[i].piano {if !p.valid(kind,id,a,b){return Err(Error::Contract);}p.conflict(id,e.owner)}else{self.nodes[i].pitched.as_ref().ok_or(Error::Contract)?.conflict(id,e.owner)};
+                let conflict=if let Some(p)=&self.nodes[i].piano {if !p.valid(kind,id,a,b,e.frame){return Err(Error::Contract);}p.conflict(id,e.owner)}else{self.nodes[i].pitched.as_ref().ok_or(Error::Contract)?.conflict(id,e.owner)};
                 if !valid_note(kind,id,a,b)||(matches!(kind,0|1|3|5)&&id!=0&&(conflict||self.events.iter().any(|x|x.target==e.target&&x.owner!=e.owner&&matches!(x.action,Action::Note{kind:k,id:n,..} if matches!(k,0|1|3|5)&&n==id)))){return Err(Error::Contract);}
                 if self.events.iter().filter(|x|x.target==e.target&&matches!(x.action,Action::Note{..})).count()>=4000{return Err(Error::QueueFull);}
             }

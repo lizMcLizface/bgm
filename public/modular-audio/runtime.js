@@ -229,8 +229,8 @@ var fail = () => {
   throw Error("Invalid prepared piano configuration");
 };
 function validatePianoConfig(c) {
-  if (![1, 2].includes(c?.version) || !Number.isInteger(c.voices) || !range(c.voices, 1, 32) || !range(c.cutoff, 0, 24e3) || !range(c.q, 0, 100) || !range(c.pitch, -2400, 2400) || !range(c.pitchDecay, 0, 30) || !Array.isArray(c.banks) || c.banks.length > 128 || !Array.isArray(c.notes) || c.notes.length > 2e3) fail();
-  if (c.version === 1 && c.controls !== void 0 || c.version === 2 && (!Array.isArray(c.controls) || c.controls.length > 4)) fail();
+  if (![1, 2, 3].includes(c?.version) || !Number.isInteger(c.voices) || !range(c.voices, 1, 32) || !range(c.cutoff, 0, 24e3) || !range(c.q, 0, 100) || !range(c.pitch, -2400, 2400) || !range(c.pitchDecay, 0, 30) || !Array.isArray(c.banks) || c.banks.length > 128 || !Array.isArray(c.notes) || c.notes.length > 2e3) fail();
+  if (c.version === 1 && c.controls !== void 0 || c.version >= 2 && (!Array.isArray(c.controls) || c.controls.length > 4)) fail();
   for (const m of c.controls ?? []) {
     if (!["pitch", "filter"].includes(m.axis) || !["sine", "linear"].includes(m.kind) || (!range(m.phase, 0, 1) || m.phase === 1) || !range(m.frequency, 0, 44100) || !range(m.initialDepth, -24e3, 24e3) || !range(m.targetDepth, -24e3, 24e3) || !range(m.tauFrames, 0, 144e4) || !Array.isArray(m.points) || m.points.length > 128 || m.kind === "linear" && (m.points.length < 2 || m.points[0][0] !== 0 || m.points.at(-1)[0] < 576e4)) fail();
     let last = -1;
@@ -256,8 +256,19 @@ function validatePianoConfig(c) {
       }
     }
     if (n.gain[0][1] !== 0 || n.gain.at(-1)[2] !== 0 || n.filter[0][0] !== 1 || n.filter[0][1] !== 0) fail();
+    if (c.version === 3) {
+      if (!Number.isInteger(n.voice) || !range(n.voice, 0, c.voices - 1) || !Number.isInteger(n.onsetFrame) || !range(n.onsetFrame, 0, 576e4) || !range(n.cutFrame, 0, n.gain.at(-1)[1]) || n.fadeFrame !== null && (!range(n.fadeFrame, 0, n.cutFrame - 480) || n.cutFrame - n.fadeFrame !== 480) || n.fadeFrame === null && n.cutFrame !== n.gain.at(-1)[1]) fail();
+    } else if (["voice", "onsetFrame", "fadeFrame", "cutFrame"].some((k) => n[k] !== void 0)) fail();
   }
   if (points > 65536) fail();
+  if (c.version === 3) {
+    const slots = [];
+    for (const n of [...c.notes].sort((a, b) => a.onsetFrame - b.onsetFrame)) {
+      const prior = slots[n.voice];
+      if (prior && prior.onsetFrame + prior.cutFrame > n.onsetFrame) fail();
+      slots[n.voice] = n;
+    }
+  }
   return c;
 }
 
@@ -330,14 +341,20 @@ function validatePatch(raw, contracts) {
     }
   }
   for (const n of p.modules.filter((n2) => n2.type === "legacy.piano")) {
-    const used = /* @__PURE__ */ new Set(), ends = [];
+    const used = /* @__PURE__ */ new Set(), ends = [], slots = [];
     for (const e of p.events.filter((e2) => e2.target === n.id && e2.kind === "note" && e2.event === 0).sort((a, b) => a.frame - b.frame)) {
       const v = n.config.notes.find((v2) => v2.id === e.note);
       if (!v || used.has(v.id) || Math.fround(e.a) !== Math.fround(v.midi) || Math.fround(e.b) !== Math.fround(v.velocity)) throw Error("Piano trigger/configuration mismatch");
       used.add(v.id);
-      for (let i = ends.length - 1; i >= 0; i--) if (ends[i] <= e.frame) ends.splice(i, 1);
-      if (ends.length >= n.config.voices) throw Error("Piano voice-steal fade is not supported");
-      ends.push(e.frame + v.gain.at(-1)[1]);
+      if (n.config.version === 3) {
+        const prior = slots[v.voice];
+        if (v.onsetFrame !== e.frame || prior && prior.onsetFrame + prior.cutFrame > e.frame) throw Error("Piano slot lifetime/trigger mismatch");
+        slots[v.voice] = v;
+      } else {
+        for (let i = ends.length - 1; i >= 0; i--) if (ends[i] <= e.frame) ends.splice(i, 1);
+        if (ends.length >= n.config.voices) throw Error("Piano voice-steal fade is not supported");
+        ends.push(e.frame + v.gain.at(-1)[1]);
+      }
     }
   }
   for (const n of p.modules) if (p.events.filter((e) => e.target === n.id && e.kind === "note").length > 4e3) throw Error("Pitched note capacity exceeded");
@@ -404,6 +421,7 @@ var ReferenceGraph = class {
           for (const v of c.notes) {
             checked(engine.graph_piano_spec(this.handle, n.id, v.id, v.bank, v.midi, v.velocity));
             for (const p of [...v.gain, ...v.filter]) checked(engine.graph_piano_point(this.handle, n.id, v.id, ...p));
+            if (c.version === 3) checked(engine.graph_piano_lifetime(this.handle, n.id, v.id, v.voice, v.onsetFrame, v.fadeFrame ?? -1, v.cutFrame));
           }
         }
         if (["legacy.core", "legacy.fm"].includes(d.type)) {

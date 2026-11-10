@@ -2575,3 +2575,39 @@ The preceding e904b017d4f34cd9 build passes all four modulated full-path cases
 run with positive source/channel/master peaks and zero worker delivery gaps.
 These are local measured results; no new phone listening acceptance is inferred.
 Evidence is in the three piano modulation browser reports and allocation report.
+
+## 2026-11-10 — M4g prepared piano stealing verified
+
+[M4g](MODULAR_AUDIO_ENGINE_M4G_PIANO_STEALING.md) adds module/config v3 with
+explicit slot/onset/fade/cut lifetimes. Compilation follows native free-slot
+round-robin and earliest-release stealing, preserving the cursor on steals.
+The old gain holds480 frames before replacement and decays with a96-frame time
+constant; replacement keeps filter state. V1/v2 still reject stealing. V3 rejects
+same-slot onsets below10 ms, invalid slot overlaps and wrong-time triggers.
+It is prepared finite playback, not late/live keyboard stealing; future-owner
+cancellation does not rewrite an already-prepared earlier fade.
+
+Graph7f5888b007e0c3b2 /355135bytes passes18 native dry comparisons,483 tests /67
+files plus17 final focused tests,30 existing and8 piano zero-allocation audits,
+graph/piano provenance checks and public packaging. The real-worker eight-bus
+comparison includes a stealing, modulated piano and remains exact. Native new
+steal cases include one/two slots, slow attack and the exact10 ms boundary, with
+unchanged error tolerances. See piano-native-stealing-browser.json.
+
+The fixed page profile is piano-controls-steals-v1. All four full-path cases pass:
+942000-frame audition and726000-frame captured progression, serial and actual
+worker. Both progression runs record three Rhythm steals; worker gaps/late blocks
+are zero. A separate audible726000-frame stress run records three steals, zero
+underruns, positive source/channel peaks for all six roles and master peak0.16128.
+Reports: piano-stealing-full-path-browser.json and piano-stealing-audible-browser.json.
+Measured audible routing is not physical listening acceptance.
+
+The existing LAN HTTPS server serves the updated fixed page at
+https://192.168.0.228:4176/tools/piano-voice.html. No deployment or All default/
+storage change. The new “Listen to stealing stress” button needs no settings
+matching. Next target-device gate: this combined shared-modulation/stealing
+profile on phone Chrome. The earlier clean M4e phone result is retained separately.
+After that gate, port the matched acoustic preparation family with native parity
+tests, then remaining calibrated/Iowa/classic adapters. Dense-steal timeline,
+live release/pedal/retune and portable host FX/mixer migration remain explicit
+later tasks, with the existing native/legacy paths operational.

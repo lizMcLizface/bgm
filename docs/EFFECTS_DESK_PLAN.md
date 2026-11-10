@@ -1465,3 +1465,11 @@ piano pitch/filter controls as owned finite snapshots. Existing effects/mixer
 routing and input holds remain. Native phase follows reachable voice intervals;
 initial vibrato wiring is captured as observed. Thirteen native dry comparisons
 pass; this does not establish isolated wet equivalence or live clock continuation.
+
+2026-11-10 follow-up: [M4g](MODULAR_AUDIO_ENGINE_M4G_PIANO_STEALING.md) ports
+prepared native piano steal fades and slot ownership in v3. The fixed full-path
+progression forces three steals through existing effects/mixer/master on serial
+and worker, with zero worker delivery gaps.18 native comparisons and38 allocation
+audits pass. Dense steals below10 ms and live stealing remain rejected; effects
+and mixer themselves still use their existing host boundaries. Combined phone
+listening is the next gate, followed by matched acoustic preparation.

@@ -2,7 +2,7 @@
   "kind": "piano.owned-voice-allocation",
   "version": 1,
   "pass": true,
-  "graphVersion": "800313e1223adcff",
+  "graphVersion": "7f5888b007e0c3b2",
   "scope": "Prepared finite Rust piano render including sine/walk modulation, independent handles, save/reload, reset, enqueue, owner cancellation and pause. Excludes preparation and host JS/browser deadlines.",
   "results": [
     {
@@ -76,6 +76,17 @@
       "sampleRate": 48000,
       "frames": 60000,
       "peak": 0.2091985046863556,
+      "saveReloadExact": true,
+      "independentHandles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2621440,
+      "grew": false
+    },
+    {
+      "type": "steal",
+      "sampleRate": 48000,
+      "frames": 60000,
+      "peak": 0.19074086844921112,
       "saveReloadExact": true,
       "independentHandles": 2,
       "allocationOrReclamationCalls": 0,

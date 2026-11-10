@@ -1093,3 +1093,11 @@ adds eligible finite piano modulation snapshots (sine, random walk, vibrato and
 filter LFO), preserving actual native phase/wiring behavior. The isolated fixed
 page combines all three modulation paths without changing All settings. Live
 transport, native steal fades and further model families remain separate work.
+
+2026-11-10 follow-up: [M4g](MODULAR_AUDIO_ENGINE_M4G_PIANO_STEALING.md) adds finite
+prepared piano stealing. The isolated test page's captured progression now forces
+three Rhythm steals, using one Rhythm slot and two Pad slots; serial/worker cases
+and separate audible output complete cleanly. A “Listen to stealing stress” button
+requires no settings matching. Existing All storage/defaults remain unchanged.
+Combined modulation/stealing phone listening is pending; matched acoustic
+preparation is next. Live notes, dense steals below10 ms and other families remain.

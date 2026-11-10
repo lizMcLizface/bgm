@@ -1,4 +1,4 @@
-import {ReferenceGraph} from './runtime.js?v=b883cc9bc5a4d066';
+import {ReferenceGraph} from './runtime.js?v=3608e7e522d935a3';
 // One Rust DAG owns all six engines, explicit mixing and actual kick-key compression.
 class DagSources extends AudioWorkletProcessor {
  constructor({processorOptions:o}){super();this.stopped=false;this.frame=0;try{
