@@ -108,10 +108,42 @@ desktop tab are retained. **No deployment or firewall changes.**
   their own certificate action; the agent did not bypass a warning or change
   trust settings. It is not a new run-bound Rust/physical-audio quality verdict.
 
-To start the same preview again using the existing machine-local config:
+To start the same preview again using the existing machine-local config,
+run from the normal user's terminal. Agent execution must use the approved
+**outside-sandbox** path (`exec_command` with `sandbox_permissions:
+"require_escalated"`); a hidden `Start-Process` still inherits its parent's
+restricted user when started inside the sandbox:
 
 `npm.cmd run preview -- --mode public --config .tmp/https/vite.lan-preview.config.mjs`
 
 **Next:** use the confirmed LAN HTTPS route for M4a's actual All run-bound
 listening evidence. Keep this preview available for the user. Do not deploy to
 diagnose the embedded preview, whose shared CSS failure remains unresolved.
+
+## Restart timeout from sandbox ownership (2026-11-10)
+
+After restart, the host opens the page but the phone times out before any page
+loads. The user confirms normal Chrome, same home LAN/no VPN, phone
+`192.168.0.21`. The server is correctly bound to `192.168.0.228:4176`; host
+exact-CA HTTPS returns 200 in about 13 ms. These host checks alone do not prove
+remote reachability.
+
+Read-only Windows firewall/process inspection identifies the cause: PID 20492
+was launched under the Codex sandbox account whose SID is explicitly targeted
+by `codex_sandbox_offline_block_inbound` for non-loopback remote addresses.
+The existing Node Private-network allow rule is present, but the sandbox block
+still applies. The firewall rule was **not changed or disabled**.
+
+An initial outside-context Stop-Process attempt fails; its replacement exits
+because port 4176 is occupied. The verified sandbox-owned preview is then
+stopped from its original owning context and relaunched through approved
+outside-sandbox execution. Replacement **PID 8368** is verified under the
+normal user's distinct SID, listening at the same address. Same public build,
+config and certificate; exact-CA HTTPS again returns 200 with authorized TLS.
+The user confirms **"Page loads now"** from the phone.
+
+Evidence: `reports/modular_audio/m4a-lan-preview-sandbox-restart.json`; current
+PID/logs remain under `.tmp/https/`. No app/code/build, firewall/trust, buffering
+or deployment change. Keep this normal-user server running; future restarts
+must follow the execution-context instruction above. Resume phone layout and
+bounded worker-delivery diagnostics; access confirmation is not audio evidence.

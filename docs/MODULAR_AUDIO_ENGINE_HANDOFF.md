@@ -1805,3 +1805,23 @@ unchanged. Report `m4a-mixer-panel-display.json`, screenshots
 Narrow embedded-container fallback retained but not exercised by this fixed face.
 Next: physical phone usability confirmation, then resume the bounded producer
 waiting / last-accepted-packet measurements for the retained worker failure.
+
+## Confirmed phone timeout resolution (2026-11-10)
+
+The restarted PID 20492 serves host HTTPS correctly but times out from the
+phone's normal Chrome (`192.168.0.21`, same home LAN/no VPN). Read-only inspection
+finds the **sandbox-owned process SID** matches the existing
+`codex_sandbox_offline_block_inbound` rule. A Node Private allow rule already
+exists. Hidden Start-Process inside the sandbox inherits that restricted user;
+host-local HTTP 200 did not verify external reachability.
+
+Stopped only the verified owned preview and relaunched the same public-build
+HTTPS command through **approved outside-sandbox execution**. PID **8368** has
+the normal user's distinct SID, listens at `192.168.0.228:4176`, and passes
+exact-CA HTTPS status 200. The user confirms **"Page loads now"** on the phone.
+No firewall/security rule, trust, app/build, DSP/default or deployment change.
+Keep this server running. Future agent restarts must use `require_escalated`
+execution, not an ordinary sandboxed Start-Process. See
+[updated launch instructions](SYNTHS_STARTUP_RECOVERY.md) and
+`m4a-lan-preview-sandbox-restart.json` for exact attempts, ownership and limits.
+Next: phone usability, then bounded worker-wait/last-accepted-packet diagnostics.

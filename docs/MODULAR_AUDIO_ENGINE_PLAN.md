@@ -893,3 +893,11 @@ its 230 px top LCD beside eight knobs and the master beside strips on the fixed
 390 x 844 and 1280 x 900 browser geometry agree, no LCD overflow. See the
 [display comparison and limits](MODULAR_AUDIO_ENGINE_M4A_PHONE_PAN.md).
 Physical phone gesture and worker-wait measurement gates remain. No deployment.
+
+The subsequent phone page-load timeout is resolved: the preview was owned by
+the sandbox account targeted by its inbound-block rule. Relaunch through
+approved outside-sandbox execution preserves the same HTTPS address/build/cert;
+host checks pass and the user confirms **Page loads now**. No firewall rule or
+app/audio change. [Launch-context instructions](SYNTHS_STARTUP_RECOVERY.md) and
+handoff now require this execution path for future restarts. Resume the existing
+phone usability / worker-wait gates; page access is not a listening verdict.

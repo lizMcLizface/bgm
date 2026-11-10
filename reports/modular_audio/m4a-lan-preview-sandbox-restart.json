@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "date": "2026-11-10",
+  "url": "https://192.168.0.228:4176/synths/all/",
+  "phone": {
+    "userReportedBrowser": "Normal Chrome",
+    "userReportedAddress": "192.168.0.21",
+    "sameHomeNetwork": true,
+    "vpnOrGuestNetwork": false,
+    "initialResult": "Page load times out before anything loads",
+    "afterRestartConfirmed": true,
+    "afterRestartObservation": "Page loads now"
+  },
+  "oldServer": {
+    "pid": 20492,
+    "executable": "C:\\Program Files\\nodejs\\node.exe",
+    "boundAddress": "192.168.0.228",
+    "port": 4176,
+    "owner": "Codex sandbox account",
+    "localHttpsStatus": 200,
+    "localTlsAuthorized": true,
+    "sandboxRule": "codex_sandbox_offline_block_inbound",
+    "ruleMatchedOwnerSid": true,
+    "ruleScope": "Inbound non-loopback remote addresses, all ports/programs, restricted to sandbox local-user SID",
+    "existingNodePrivateAllowRule": true
+  },
+  "restart": {
+    "firstOutsideStopFailed": true,
+    "firstReplacementPid": 17004,
+    "firstReplacementResult": "Port 4176 already in use; process exited",
+    "oldServerStoppedFromItsOwningSandboxContext": true,
+    "replacementLaunchedWithApprovedOutsideSandboxExecution": true,
+    "replacementPid": 8368,
+    "replacementOwner": "Normal user, verified distinct from sandbox local-user rule",
+    "boundAddress": "192.168.0.228",
+    "port": 4176,
+    "localHttpsStatus": 200,
+    "localTlsAuthorized": true,
+    "establishedPhoneConnectionObserved": "192.168.0.21",
+    "samePublicBuildConfigAndCertificate": true
+  },
+  "firewallModified": false,
+  "securityRuleDisabled": false,
+  "certificateValidationBypassed": false,
+  "deployed": false,
+  "applicationCodeChanged": false,
+  "scope": "Host process ownership, read-only firewall inspection, listener and exact-CA HTTPS verification, plus user-confirmed normal-browser phone access; no new audio-quality verdict",
+  "next": "Future LAN preview restarts must use approved outside-sandbox execution, not ordinary sandboxed Start-Process. Resume phone UI and bounded worker-delivery diagnostics."
+}
