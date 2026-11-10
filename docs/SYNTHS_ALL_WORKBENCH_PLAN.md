@@ -957,3 +957,12 @@ source/build hashes and the same **4,864-frame gap**. Exact report/IDs and limit
 are retained in the linked doc. Next add explicit reverse trial order to check
 warmup/order before lower-latency transport work. Normal keyboard and setup
 persistence remain intact; no migration/default promotion or deployment.
+
+[Reverse-order worker comparison](MODULAR_AUDIO_ENGINE_M4A_REVERSE_ORDER.md)
+adds an explicit twelve-first choice and order metadata; six-first/Serial/six
+remain initial. **112 checks**, public build and desktop both-order/Stop/Serial /
+reload pass. Phone reverse reproduces twelve clean and six missing 36,608 frames,
+with identical per-capacity delivery/lead/gap counters to the forward pair.
+Host v7, engine unchanged. Next is an opt-in fixed twelve-slot pool with separate
+64/128-ms startup comparison, accurately retaining 128-ms render-ahead/live-edit
+constraints. No ordinary keyboard, schema, default or migration change.

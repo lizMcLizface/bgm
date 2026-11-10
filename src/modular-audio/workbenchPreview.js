@@ -9,7 +9,7 @@ export function createWorkbenchPreview({host,project,part,role,bpm,muted=false,m
   if(finishing)return finishing;if(closed)return null;closed=true;onState('stopping');clearInterval(timer);if(gain)gain.gain.setTargetAtTime(0,context.currentTime,.005);
   finishing=(async()=>{let stats=null;try{if(gain&&reason!=='completed')await new Promise(resolve=>setTimeout(resolve,30));if(route)stats=await route.stats();}catch(e){error??=String(e);}finally{cleanup();}
    const output=stats?.output,engine=stats?.worker?.graph??output?.serial?.graph??output?.serial,complete=!!plan&&output?.sourceFrame===plan.endFrame&&engine?.frame===plan.endFrame,eventPass=!!plan&&engine?.applied===plan.graph.events.length&&!engine?.late&&!engine?.overflow;
-   const report={version:1,kind:'all.owned-source-preview',hostRevision:'all-preview-delivery-v6',diagnosticProbe:probe?{...probe,complete:reason==='probe-completed'&&output?.sourceFrame===probe.targetFrames}:null,sourceFingerprint:await sourceHash,runId,browserUserAgent,sampleRate:context.sampleRate,scope:'One selected finite source snapshot through existing All FX/mixer; peaks may include legacy keyboard/shared output, not isolated wet PCM or physical audio. Listening is not assessed by these checks.',role,mode,startedAtUtc,completedAtUtc:new Date().toISOString(),reason,error:error??stats?.error??null,engineVersion:assets?.manifest.version??null,executor:route?.executor??null,plan,peaks:{...peaks},stats,complete,eventPass,pass:reason==='completed'&&!error&&!stats?.error&&complete&&eventPass&&!(output?.queue?.underrunFrames)&&Object.values(peaks).every(p=>p>0)};
+   const report={version:1,kind:'all.owned-source-preview',hostRevision:'all-preview-delivery-v7',diagnosticProbe:probe?{...probe,complete:reason==='probe-completed'&&output?.sourceFrame===probe.targetFrames}:null,sourceFingerprint:await sourceHash,runId,browserUserAgent,sampleRate:context.sampleRate,scope:'One selected finite source snapshot through existing All FX/mixer; peaks may include legacy keyboard/shared output, not isolated wet PCM or physical audio. Listening is not assessed by these checks.',role,mode,startedAtUtc,completedAtUtc:new Date().toISOString(),reason,error:error??stats?.error??null,engineVersion:assets?.manifest.version??null,executor:route?.executor??null,plan,peaks:{...peaks},stats,complete,eventPass,pass:reason==='completed'&&!error&&!stats?.error&&complete&&eventPass&&!(output?.queue?.underrunFrames)&&Object.values(peaks).every(p=>p>0)};
    onState('stopped');onDone(report);return report;
   })();return finishing;
  }
@@ -34,20 +34,22 @@ export function createWorkbenchPreview({host,project,part,role,bpm,muted=false,m
 
 // One lease and one serialized source/score capture, two fresh sequential owners.
 // The ordinary controller still owns all per-trial audio cleanup and guarding.
-export function createWorkbenchCapacityComparison({host,project,part,role,bpm,muted=false,onState=()=>{},onDone=()=>{},loadAssets=loadGraphAssets,makeRoute=createWorkerRoute}){
- let closed=false,finishing=null,active=null,lease=null,assets=null,plan=null,sourceHash=Promise.resolve(null),readyResolve,readyReject;
- const trials=[],capacities=[6,12],context=host.context,runId=newListeningId(),startedAtUtc=new Date().toISOString(),ready=new Promise((r,j)=>{readyResolve=r;readyReject=j;});
+export function createWorkbenchCapacityComparison({host,project,part,role,bpm,muted=false,comparisonOrder='six-first',onState=()=>{},onDone=()=>{},loadAssets=loadGraphAssets,makeRoute=createWorkerRoute}){
+ let closed=false,finishing=null,active=null,lease=null,assets=null,plan=null,order=null,capacities=[],sourceHash=Promise.resolve(null),readyResolve,readyReject;
+ const trials=[],context=host.context,runId=newListeningId(),startedAtUtc=new Date().toISOString(),ready=new Promise((r,j)=>{readyResolve=r;readyReject=j;});
  const retain=r=>{if(r&&!trials.some(t=>t.runId===r.runId))trials.push(r);};
  function finish(reason='stopped',error=null){
   if(finishing)return finishing;closed=true;onState('stopping');
   finishing=(async()=>{try{retain(await active?.stop());}catch(e){error??=String(e);}finally{lease?.release();}
    const fingerprint=await sourceHash,complete=reason==='comparison-completed'&&trials.length===2&&trials.every(t=>t.diagnosticProbe?.complete&&!t.error&&t.executor?.actual==='worker');
-   const report={kind:'all.owned-source-capacity-comparison',version:1,hostRevision:'all-preview-delivery-v6',runId,startedAtUtc,completedAtUtc:new Date().toISOString(),browserUserAgent:globalThis.navigator?.userAgent??null,sampleRate:context.sampleRate,role,engineVersion:assets?.manifest.version??null,sourceFingerprint:fingerprint,reason,error,comparison:{muted:true,capacities,targetFrames:plan?Math.min(plan.endFrame,96000):null,complete,sameCapturedInput:!!plan,fingerprintsMatch:fingerprint&&trials.length?trials.every(t=>t.sourceFingerprint===fingerprint):null},trials,complete:false,pass:false};
+   const report={kind:'all.owned-source-capacity-comparison',version:1,hostRevision:'all-preview-delivery-v7',runId,startedAtUtc,completedAtUtc:new Date().toISOString(),browserUserAgent:globalThis.navigator?.userAgent??null,sampleRate:context.sampleRate,role,engineVersion:assets?.manifest.version??null,sourceFingerprint:fingerprint,reason,error,comparison:{muted:true,order,capacities,targetFrames:plan?Math.min(plan.endFrame,96000):null,complete,sameCapturedInput:!!plan,fingerprintsMatch:fingerprint&&trials.length?trials.every(t=>t.sourceFingerprint===fingerprint):null},trials,complete:false,pass:false};
    readyResolve(null);onState('stopped');onDone(report);return report;
   })();return finishing;
  }
  void (async()=>{await Promise.resolve();try{
-  if(closed)return;if(context.sampleRate!==48000)throw Error('Rust source comparison requires an existing 48 kHz AudioContext.');
+  if(closed)return;if(!['six-first','twelve-first'].includes(comparisonOrder))throw Error('Invalid Rust capacity comparison order.');
+  order=comparisonOrder;capacities=order==='six-first'?[6,12]:[12,6];
+  if(context.sampleRate!==48000)throw Error('Rust source comparison requires an existing 48 kHz AudioContext.');
   lease=host.openSourceStem(role,()=>{void finish('host-closed');});plan=compileWorkbenchSource({project,part,role,bpm,source:lease,tune:lease.tune,muted});
   const captured=JSON.stringify(plan);sourceHash=hashWorkbenchPlan(plan);assets=await loadAssets();if(closed)return;lease.assertCurrent();
   for(const [index,poolBlocks]of capacities.entries()){

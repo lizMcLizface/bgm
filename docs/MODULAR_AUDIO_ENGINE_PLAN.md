@@ -973,3 +973,15 @@ muted comparison with order metadata to check warmup/order before lower-latency
 transport work. Pool capacity/startup delay and device conditions remain limits;
 Serial/six defaults and explicit twelve/128 ms stay. This evidence-only update
 runs artifact checks, not new DSP/browser/build tests.
+
+[Explicit reverse-order comparison](MODULAR_AUDIO_ENGINE_M4A_REVERSE_ORDER.md)
+is delivered: six-first initial, twelve-first opt-in; order/capacity metadata in
+full/compact reports, invalid-order and partial-stop handling. **112 checks**,
+public build **45.88 s** and actual desktop both-order/hash/Stop/Serial/reload
+checks pass. Host v7, engine unchanged. Phone reverse pair now reproduces the
+same per-capacity counters: twelve first clean / 1,152 minimum lead, six second
+36,608 missing / 67 late / 19 recoveries, both gap 4,864. This weakens a simple
+warmup explanation, preserving source/device-state limits. Next separate pool
+capacity from startup delay in an explicit twelve-slot / 64-vs-128-ms startup
+comparison, with accurate render-ahead versus live-event-latency semantics.
+Keep defaults, legacy DSP and ordinary guard; no broader migration/deployment.

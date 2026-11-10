@@ -2023,3 +2023,43 @@ reports. Keep current six-then-twelve initial choice. Check whether the capacity
 difference survives order/warmup before a lower-latency message-leg experiment.
 Preserve fresh owners, cancellation, false music-pass verdicts, Serial/six
 defaults and working explicit twelve/128 ms. No broader migration/deployment.
+
+## M4a reverse order implemented and phone replicated (2026-11-10)
+
+After `50a4fb3`, [reverse-order contracts and exact evidence](MODULAR_AUDIO_ENGINE_M4A_REVERSE_ORDER.md)
+add a worker-only transient order selector: six then twelve remains initial;
+reverse is explicit. Full/compact reports record `comparison.order` and bounded
+`comparison.capacities`, trial rows/summary follow execution order. Invalid
+orders fail before lease; Stop retains only actual trials. Reload returns to
+Serial/six/six-first. Existing capture/owners/muting/guards and legacy DSP/schema
+stay intact. Host **all-preview-delivery-v7**, engine **d6a0341e5edf2d57** unchanged.
+
+**112 tests / six files, 60.26 s**, focused overlapping **21 / two, 1.39 s**,
+public package/provenance build **45.88 s** pass. Actual 390 px desktop reverse
+and forward pairs each complete two muted 96,000-frame windows, no missing PCM,
+same independently verified input hash across all four trials. Metadata/copy
+status correct (compact 3,647 chars); ordinary capacity stays eight. Reverse Stop
+retains only incomplete twelve / 8,704 frames. Normal Serial afterward completes
+668,956 / 32 events, three nonzero peaks, guard/pass true. Reload defaults/report
+reset pass. Reports `m4a-reverse-*.json`, image `.tmp/m4a-reverse-summary.png`.
+QA tab/server/viewport cleaned; normal-user LAN HTTPS PID8368 remains running.
+
+**Phone reverse parent f324403f-9835-427b-ae2d-9479bd5691b6**: order twelve-first,
+capacities [12,6], matching supplied child/parent hashes/build, both 96,000-frame
+windows. **Twelve first clean**, 188 accepted / min lead 1,152; **six second
+36,608 missing / 286 quanta, 19 recoveries, 67 late / 121 accepted**, first zero
+lead 4,608. Both gaps 4,864 / 101.33 ms; no rejected/stale/bad recycles. Delivery,
+lead and arrival counters exactly match the forward pair per capacity. Raw
+report `m4a-phone-reverse-comparison.json` and artifact cross-checks retained.
+Source differs between pairs, not within either; phone full plans absent.
+Simple first-trial warmup is unlikely, but startup delay/pool size still vary
+together; no browser/CPU cause or lock-screen guarantee. Muted full-score
+verdicts remain false/unassessed; prior audible twelve run stays separate.
+
+**Next bounded implementation:** audit then explicitly separate twelve-slot
+render-ahead capacity (128 ms) from output startup delay; compare startup
+**64 vs 128 ms** with the same twelve-slot pool, capture, cadence and scheduling.
+Preserve existing defaults and accurate queue-capacity/latency metadata. Reduced
+startup must not be labeled reduced live-event latency: already-rendered state
+still imposes lookahead. Verify queue/clock contracts before muted phone test,
+then audible guarded listening only on clean delivery. No migration/deployment.
