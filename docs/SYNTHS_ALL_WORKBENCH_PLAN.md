@@ -911,3 +911,13 @@ when viewed through a phone camera. Ambience responsive rules are unchanged.
 master beside strips, no text overflow and unchanged values/poses. See
 [exact display evidence](MODULAR_AUDIO_ENGINE_M4A_PHONE_PAN.md). The existing
 HTTPS LAN server is restarted and left running; no deployment or audio change.
+
+The worker delivery investigation now provides [opt-in producer timing](MODULAR_AUDIO_ENGINE_M4A_DELIVERY_TIMING.md)
+and an [explicit six/eight capacity comparison](MODULAR_AUDIO_ENGINE_M4A_CAPACITY_COMPARISON.md).
+Six / 64 ms and initial Serial stay unchanged; eight / 85.33 ms is transient,
+disabled while active and reset on reload. Compact v2 host v3 records exact
+captured-source SHA256 identity and actual executor/capacity. **86 UI/controller /
+real-worker tests** and public build pass. Desktop pairs match source/score and
+complete; the phone eight-slot run still fails at the same source frame 4,736.
+Retain that negative result. Next is a short muted delivery/recovery probe,
+preserving normal first-miss guard, legacy DSP and current setup format.

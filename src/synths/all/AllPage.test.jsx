@@ -1064,6 +1064,15 @@ test('owned preview keeps normal transport stopped and stops independently of it
  await act(async()=>button('Stop Rust sequence preview').click());
  expect(entry.controller.stop).toHaveBeenCalled();expect(mocks.scheduler.stop).not.toHaveBeenCalled();expect(mocks.hosts.at(-1).dispose).not.toHaveBeenCalled();expect(container.querySelector('.tp.play').disabled).toBe(false);
 });
+
+test('requires an explicit eight-slot worker comparison, disables capacity while active and resets experiments on reload',async()=>{
+ act(()=>container.querySelector('[aria-label="Setup"]').click());let mode=document.querySelector('[aria-label="Rust preview executor"]');
+ expect(mode.value).toBe('serial');expect(document.querySelector('[aria-label="Rust worker PCM capacity"]')).toBeNull();
+ act(()=>{mode.value='worker';mode.dispatchEvent(new Event('change',{bubbles:true}));});let blocks=document.querySelector('[aria-label="Rust worker PCM capacity"]');expect(blocks.value).toBe('6');
+ act(()=>{blocks.value='8';blocks.dispatchEvent(new Event('change',{bubbles:true}));});await act(async()=>button('Play selected Rust sequence').click());expect(previewMock.calls.at(-1).options).toMatchObject({mode:'worker',workerPoolBlocks:8});expect(blocks.disabled).toBe(true);
+ await act(async()=>button('Stop Rust sequence preview').click());act(()=>root.unmount());root=createRoot(container);await act(async()=>root.render(<AllPage/>));
+ if(!document.querySelector('#all-midi-setup'))act(()=>container.querySelector('[aria-label="Setup"]').click());mode=document.querySelector('[aria-label="Rust preview executor"]');expect(mode.value).toBe('serial');act(()=>{mode.value='worker';mode.dispatchEvent(new Event('change',{bubbles:true}));});expect(document.querySelector('[aria-label="Rust worker PCM capacity"]').value).toBe('6');
+});
 test('Setup opens outside the transformed desk, preserves its parked object identity and closes on Escape',()=>{
  act(()=>window.dispatchEvent(new Event('pagehide')));const before=JSON.parse(localStorage.getItem('synths:all:objects')).objects.find(o=>o.binding==='setup');
  const anchor=container.querySelector('[aria-label="Setup"]');act(()=>anchor.click());const dialog=document.querySelector('#all-midi-setup');

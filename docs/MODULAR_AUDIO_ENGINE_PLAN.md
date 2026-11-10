@@ -918,3 +918,13 @@ missing. Last accepted producer snapshot has no free slots, recycles through
 This supports a bounded recycling/holding/delivery experiment, not an established
 cause or cure. Next: explicit six/eight slots at the same 512-frame cadence and
 64/85.33 ms, preserving defaults and run provenance. No deployment.
+
+The [explicit six/eight comparison](MODULAR_AUDIO_ENGINE_M4A_CAPACITY_COMPARISON.md)
+is implemented with source/score SHA256 identity and actual-latency reporting;
+**86 tests / five files** and public build (**50.12 s**) pass. Desktop six/eight
+have matching input hashes and complete clocks/events without misses. Phone
+eight still fails at source **4,736**, nine accepted packets and 128 missing;
+the last acceptance aligns with six at output frame **4,864** despite different
+startup delays. Keep this negative result; phone v3 six input hash is unavailable.
+Host v3, engine unchanged, defaults preserved. Next: short muted recovery probe
+to observe delivery cadence beyond the first miss, not another default retune.

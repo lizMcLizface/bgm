@@ -6,6 +6,11 @@ import {fmPacket} from '../synth-lab/fmPatch';
 import {sanitizeNoteBehavior} from '../synth-lab/noteBehavior';
 import {patchColourTail} from '../synth-lab/voiceColour';
 export const WORKBENCH_SOURCE_BUDGET=Object.freeze({sampleRate:48000,blockFrames:512,poolBlocks:6,scheduling:'message',maxNotes:2000,maxSeconds:120});
+// Hash only the captured source/score, not executor capacity or later counters.
+// Missing Web Crypto leaves identity unknown; it must not invent a match.
+export async function hashWorkbenchPlan(plan){
+ try{const bytes=new TextEncoder().encode(JSON.stringify(plan)),digest=await globalThis.crypto.subtle.digest('SHA-256',bytes);return [...new Uint8Array(digest)].map(n=>n.toString(16).padStart(2,'0')).join('');}catch{return null;}
+}
 export function compileWorkbenchSource({project,part,role,bpm,source,tune=n=>n,muted=false}){
  if(!project?.patterns?.[role]||role==='perc'||!['subtractive','fm'].includes(source?.kind))throw Error('Rust preview requires a pitched core/FM sequence.');
  if(muted)throw Error('The selected sequencer is muted or excluded by solo.');

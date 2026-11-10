@@ -1859,3 +1859,37 @@ pool/recycle maxima. Original failed/unassessed verdicts remain intact in
 actual capacity/source/build; do not silently increase buffering, promise a
 cure or migrate more roles. Keep confirmed normal-user LAN HTTPS PID available;
 no deployment, firewall/trust change or native Application Control bypass.
+
+## M4a explicit capacity comparison: negative phone result (2026-11-10)
+
+After `758a19e`, [six/eight comparison contracts and exact results](MODULAR_AUDIO_ENGINE_M4A_CAPACITY_COMPARISON.md)
+add an explicit All capacity selector: six / 64 ms remains default, eight /
+85.33 ms adds 21.33 ms at unchanged 512-frame / Message cadence. Serial remains
+initial; controls disable while active and reload returns to serial/six. No
+schema or engine-asset change. Host **all-preview-delivery-v3**, runtime still
+**2f9eed09e9122592**. Source/score SHA256 identity is included in compact v2;
+FX/mixer state is excluded and must remain unchanged during a comparison.
+
+**86 tests / five files**, **63.06 s**, public package build **50.12 s**, pass.
+Actual desktop six/eight each complete **668,956 frames / 22 events**, three
+signal taps, no misses, matching source fingerprints (independently hashed).
+Eight reports correct 4,096-frame / 85.33 ms / 262,144-byte pool; compact text
+2,787 chars. Reload pose/ID preservation and experiment reset pass. Reports
+`m4a-capacity-*.json`, screenshot `.tmp/m4a-capacity-comparison.png`.
+
+The phone returns **one unique eight-slot run** twice:
+**12ad3fdc-f878-4277-a59e-032b29bc6dc5**, retained once in
+`m4a-phone-worker-eight.json`. It still accepts **nine packets**, zero lead
+**4,608**, stops **4,736**, **128 missing**. Output is **8,832** due to the extra
+startup delay. Eight has one early handled recycle (511), versus six's three
+(1,535); last packet arrives at source 768 versus 1,792. Adding their initial
+delays gives identical active output cursor **4,864 / 101.33 ms** at that
+arrival. This is a batching clue, not a browser cause/100 ms guarantee. No
+matched six-slot v3 phone input hash was supplied; no exact-input phone pair is
+claimed. Eight's negative verdict remains failed/unassessed. Do not promote it.
+
+**Next bounded implementation:** a short explicitly muted worker delivery probe
+that uses existing recovery behavior to observe subsequent arrivals/misses
+without repeatedly playing broken audio. Preserve normal first-miss guard,
+six-slot and serial defaults. No more speculative default buffer increases or
+broader source migration. Keep normal-user HTTPS server running.

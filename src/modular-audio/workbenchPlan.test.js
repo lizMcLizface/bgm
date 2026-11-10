@@ -1,7 +1,7 @@
 // @vitest-environment node
 import fs from 'node:fs';
 import {it,expect} from 'vitest';
-import {compileWorkbenchSource} from './workbenchPlan';
+import {compileWorkbenchSource,hashWorkbenchPlan} from './workbenchPlan';
 import {ReferenceGraph} from './runtime';
 import {OwnedCore,legacyOwnedCoreExports} from '../../tools/coreOwnedVerification.mjs';
 import {OwnedFm,legacyOwnedExports} from '../../tools/fmOwnedVerification.mjs';
@@ -10,6 +10,11 @@ import {cloneFM,FM_RECIPES} from '../synth-lab/fmPatch';
 const project=()=>({bars:2,stepsPerBar:16,seed:4,key:{tonic:0,scale:[0,2,4,5,7,9,11]},patterns:{lead:{mode:'note',follow:'off',length:32,steps:Array.from({length:32},(_,i)=>i===16?{n:[{midi:60}],len:2,vel:.7}:i===20?{n:[{midi:67}],vel:.6}:null)}}});
 const source=fm=>({kind:fm?'fm':'subtractive',patch:fm?cloneFM(FM_RECIPES[0]):clonePatch(RECIPES[0])});
 const make=fm=>compileWorkbenchSource({project:project(),part:{startBar:1,bars:1},role:'lead',bpm:120,source:source(fm),tune:n=>n+.1});
+it('hashes the captured source and score independently of executor settings and leaves unavailable identity null',async()=>{
+ const plan=make(false),a=await hashWorkbenchPlan(plan);expect(a).toMatch(/^[a-f0-9]{64}$/);expect(await hashWorkbenchPlan(structuredClone(plan))).toBe(a);
+ plan.graph.events[0].a+=.1;expect(await hashWorkbenchPlan(plan)).not.toBe(a);
+ const previous=globalThis.crypto;try{Object.defineProperty(globalThis,'crypto',{value:undefined,configurable:true});expect(await hashWorkbenchPlan(plan)).toBeNull();}finally{Object.defineProperty(globalThis,'crypto',{value:previous,configurable:true});}
+});
 it('repeats probability deterministically and rejects a dense plan before exceeding the 4,000 source-event capacity',()=>{const p=project();p.patterns.lead.steps=Array.from({length:32},()=>({n:[{midi:60}],prob:.5}));const capture=()=>compileWorkbenchSource({project:p,part:{startBar:0,bars:2},role:'lead',bpm:120,source:source(false)});expect(capture()).toEqual(capture());p.bars=16;p.patterns.lead.length=256;p.patterns.lead.steps=Array.from({length:256},()=>({n:Array.from({length:7},(_,i)=>({midi:60+i})),rept:8}));expect(()=>compileWorkbenchSource({project:p,part:{startBar:0,bars:16},role:'lead',bpm:200,source:source(false)})).toThrow('note capacity');});
 it('captures only the selected progression at the actual tempo/tuning with bounded stable note identities',()=>{const p=make(false);expect(p.notes).toHaveLength(2);expect(p.notes[0]).toMatchObject({midi:60.1,time:.125,duration:.225,velocity:.7});expect(p.graph.events[0]).toMatchObject({frame:6000,a:60.1,note:1,target:1,owner:1});expect(p.graph.events.find(e=>e.event===1&&e.note===1).frame).toBe(16800);expect(p.role).toBe('lead');expect(p.sampleRate).toBe(48000);expect(make(false)).toEqual(p);});
 it('rejects unsupported, muted, empty and unbounded sources instead of silently replacing sounds',()=>{for(const options of [{role:'perc'},{muted:true},{bpm:NaN},{part:{startBar:99,bars:1}},{part:{startBar:0,bars:17}},{source:{kind:'legacy'}}])expect(()=>compileWorkbenchSource({project:project(),part:{startBar:1,bars:1},role:'lead',bpm:120,source:source(false),...options})).toThrow();expect(()=>compileWorkbenchSource({project:project(),part:{startBar:0,bars:1},role:'lead',bpm:120,source:source(false)})).toThrow('no notes');});
