@@ -2,10 +2,11 @@ import {compileWorkbenchSet,compileWorkbenchAudition,WORKBENCH_SOURCE_ROLES,hash
 import {loadGraphAssets} from './graphAssets';
 import {createWorkbenchPreview} from './workbenchPreview';
 import {newListeningId} from './listeningRecord';
+import {compileWithRustIowa} from './iowaWorkbenchPreparation';
 
 // Capture each actual source once. Four fresh owners replay two immutable plans;
 // no sound substitution, automatic audible playback or relaxed delivery guard.
-export function createWorkbenchTestSuite({host,project,part,roles,mutedRoles=[],bpm,onState=()=>{},onDone=()=>{},loadAssets=loadGraphAssets,makeRoute}){
+export function createWorkbenchTestSuite({host,project,part,roles,mutedRoles=[],bpm,onState=()=>{},onDone=()=>{},loadAssets=loadGraphAssets,loadIowaPreparation,makeRoute}){
  let closed=false,finishing=null,active=null,assets=null,resolveReady,rejectReady;
  const leases=[],bindings=[],excludedRoles=[],trials=[],plans={},fingerprints={},context=host.context;
  const runId=newListeningId(),startedAtUtc=new Date().toISOString(),ready=new Promise((r,j)=>{resolveReady=r;rejectReady=j;});
@@ -27,7 +28,8 @@ export function createWorkbenchTestSuite({host,project,part,roles,mutedRoles=[],
   for(const role of roles){if(mutedRoles.includes(role)){excludedRoles.push({role,reason:'muted or excluded by solo'});continue;}const lease=host.openSourceStem(role,()=>{void finish('host-closed');});leases.push(lease);bindings.push({role,lease});}
   if(!bindings.length)throw Error('No selected sources are audible under mute/solo.');
   const input={project,part,bpm,sources:bindings.map(b=>({role:b.role,source:b.lease,tune:b.lease.tune}))};
-  for(const [material,compile]of [['voice-audition',compileWorkbenchAudition],['captured-score',compileWorkbenchSet]]){const plan=compile(input);plans[material]=JSON.stringify(plan);fingerprints[material]=await hashWorkbenchPlan(plan);if(closed)return;check();}
+  const compiled=await compileWithRustIowa(input.sources,sources=>Object.fromEntries([['voice-audition',compileWorkbenchAudition],['captured-score',compileWorkbenchSet]].map(([material,compile])=>[material,compile({...input,sources})])),loadIowaPreparation);
+  for(const [material,plan]of Object.entries(compiled)){plans[material]=JSON.stringify(plan);fingerprints[material]=await hashWorkbenchPlan(plan);if(closed)return;check();}
   assets=await loadAssets();if(closed)return;check();
   const cases=[['voice-audition','serial'],['voice-audition','worker'],['captured-score','serial'],['captured-score','worker']];
   for(const [index,[material,mode]]of cases.entries()){

@@ -1,0 +1,19 @@
+import fs from 'node:fs';import crypto from 'node:crypto';import assert from 'node:assert/strict';
+import {createRustIowaPreparation} from '../src/modular-audio/iowaPreparation';
+import {settleLevels,pitchRange} from '../src/app/engine/iowaModel/model';
+import {prepareIowaBank} from '../src/modular-audio/iowaCompiler';
+import {iowaFields,validateIowaConfig} from '../src/modular-audio/iowaConfig';
+import {PATCHES} from '../src/app/engine/iowaModel/patches';
+const module=new WebAssembly.Module(fs.readFileSync('public/iowa-preparation/iowa.wasm')),renderer=createRustIowaPreparation(module),trials=[];
+const hash=value=>crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex');
+try{for(const patch of PATCHES){const raw=JSON.parse(fs.readFileSync(`src/library/iowaTables/${patch.uses??patch.id}.json`)),settled=settleLevels(structuredClone(raw)),range=pitchRange(settled),table=renderer.createTable(raw),captured=renderer.createTable(settled,{settled:true});
+ try{for(const rate of [44100,48000,96000])for(const edge of [0,.5,1]){const midi=Math.round(range[0]+edge*(range[1]-range[0])),velocity=[.12,.65,1][Math.round(edge*2)],strength=Math.max(1,Math.round(Math.round(velocity*12)/12*127)),seed=midi*31+strength;
+  const reference=prepareIowaBank(settled,midi,velocity,rate),actual=table.prepareBank(midi,strength,rate,{seed}),second=captured.prepareBank(midi,strength,rate,{seed}),fields=[];let max=0,exact=true;
+  assert.equal(reference.bank.kind,actual.bank.kind);assert.deepEqual(second,actual);
+  const ra=iowaFields(reference.bank),rb=iowaFields(actual.bank);for(let f=0;f<ra.length;f++){assert.equal(ra[f][0],rb[f][0]);assert.equal(ra[f][1].length,rb[f][1].length);let error=0,energy=0;for(let k=0;k<ra[f][1].length;k++){const a=ra[f][1][k],b=rb[f][1][k];assert.ok(Number.isFinite(b));const d=Math.abs(a-b);error=Math.max(error,d);energy+=d*d;}max=Math.max(max,error);exact&&=error===0;fields.push({id:ra[f][0],length:ra[f][1].length,maxAbsoluteError:error,rmsError:Math.sqrt(energy/Math.max(1,ra[f][1].length))});}
+  const scalars=Object.keys(reference.bank).filter(k=>typeof reference.bank[k]==='number');let scalarError=Math.abs(reference.level-actual.level);for(const k of scalars)scalarError=Math.max(scalarError,Math.abs(reference.bank[k]-actual.bank[k]));assert.ok(max<=1e-6,`${patch.id}/${rate}/${midi}: field error ${max}`);assert.ok(scalarError<=1e-9,`${patch.id}: metadata error ${scalarError}`);
+  validateIowaConfig({version:1,sampleRate:rate,quantumFrames:128,voices:1,banks:[actual.bank],notes:[{id:1,bank:1,midi,velocity,gain:1,tune:1,ring:!!patch.ring,roll:patch.roll?raw.roll:null,slide:null}]});
+  trials.push({id:patch.id,table:raw.id,rate,midi,velocity,strength,kind:actual.bank.kind,bitExact:exact&&scalarError===0,maxAbsoluteError:max,maxScalarError:scalarError,settledCaptureExact:true,referenceSha256:hash(reference),rustSha256:hash(actual),fields});
+ }}finally{table.dispose();captured.dispose();}}
+ assert.equal(renderer.activeNotes,0);assert.equal(renderer.activeTables,0);const report={kind:'iowa.rust-preparation-compatibility',version:1,engineVersion:JSON.parse(fs.readFileSync('public/iowa-preparation/build.json')).version,scope:'Original raw-table settling, pitch/velocity model interpolation and held/decay FFT preparation vs owned Rust Wasm. Prepared arrays before realtime voice DSP and host effects. Raw and already-settled capture modes both checked.',pass:true,patches:PATCHES.length,comparisons:trials.length,bitExact:trials.filter(t=>t.bitExact).length,maxAbsoluteError:Math.max(...trials.map(t=>t.maxAbsoluteError)),maxScalarError:Math.max(...trials.map(t=>t.maxScalarError)),memoryBytes:renderer.memoryBytes,trials};fs.writeFileSync('reports/modular_audio/iowa-preparation-compatibility.json',JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({...report,trials:undefined}));
+}finally{renderer.dispose();}

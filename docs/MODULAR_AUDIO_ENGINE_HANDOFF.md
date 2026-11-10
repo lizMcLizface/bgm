@@ -2751,3 +2751,20 @@ continue larger automated batches; there is no new preset/family phone gate.
 Next: port Iowa measurement/interpolation/FFT preparation behind the immutable
 prepared contract, with local table parity and resource tests. Live dynamic
 expression, other native families and host FX/mixer remain separate tasks.
+
+## 2026-11-10 overnight — owned classics and M4k Iowa preparation
+
+Parallel run baseline/control is in MODULAR_AUDIO_ENGINE_OVERNIGHT_2026_11_11.md.
+682cdff extracts12 non-wavetable classic backends with owned voices, effects,
+buffers and controls;1680 preset/rate cases match original Wasm exactly,36
+allocation cases are zero, and73 focused tests pass. Legacy/default ABI remains;
+VS/WT resources and modular graph source integration follow separately.
+
+[M4k](MODULAR_AUDIO_ENGINE_M4K_IOWA_PREPARATION.md) completes portable Iowa
+measurement/FFT preparation.115926-byte preparation build6e0c2bcde51edac3 passes
+405 cases/45 patches (282 bit-exact,max1.3877787807814457e-17 field error,scalar0).
+Raw and already-settled capture modes agree exactly. Opt-in owned All previews
+now use owned Rust preparation and dispose preparation handles after compilation;
+native defaults stay unchanged.47 focused preparation/controller tests pass.
+The combined overnight browser check is pending; prior browser/device evidence
+is not relabelled. Existing non-Iowa cancellation timing is preserved.

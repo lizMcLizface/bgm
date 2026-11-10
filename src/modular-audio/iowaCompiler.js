@@ -18,7 +18,7 @@ export function compileIowaNotes(source,notes,rate=48000){
  if(!Array.isArray(notes)||notes.length>2000||notes.some(n=>!Number.isFinite(n.midi)||n.midi<0||n.midi>127||!Number.isFinite(n.velocity)||n.velocity<0||n.velocity>1||!Number.isFinite(n.time)||n.time<0||!Number.isFinite(n.duration)||n.duration<=0||n.time+n.duration>120))throw Error('Invalid captured Iowa notes');
  const patch=PATCHES.find(s=>s.id===p.id);if(!patch)throw Error('Unknown captured Iowa patch');
  const banks=[],prepared=[],events=[],keys=new Map();let tail=1;
- notes.forEach((n,i)=>{const midi=Math.round(n.midi),v=iowaStrength(n.velocity),key=`${midi}:${v}`;let data=keys.get(key);if(!data){if(banks.length>=96)throw Error('Iowa preview exceeds 96 prepared note layers');data=prepareIowaBank(p.table,midi,n.velocity,rate,p.vibrato,banks.length+1);keys.set(key,data);banks.push(data.bank);}
+ notes.forEach((n,i)=>{const midi=Math.round(n.midi),v=iowaStrength(n.velocity),key=`${midi}:${v}`;let data=keys.get(key);if(!data){if(banks.length>=96)throw Error('Iowa preview exceeds 96 prepared note layers');data=(source.prepareIowaBank??prepareIowaBank)(p.table,midi,n.velocity,rate,p.vibrato,banks.length+1);keys.set(key,data);banks.push(data.bank);}
   const trim=(LEVELS[p.id]?.trim??0)+(LEVELS[p.id]?.curve?.[midi]??0),roll=patch.roll?structuredClone(p.table.roll):null;
   if(patch.roll&&!roll)throw Error('Missing measured Iowa roll timing');
   prepared.push({id:i+1,bank:data.bank.id,midi,velocity:n.velocity,gain:10**((data.level+trim)/20),tune:2**((p.tune??0)/1200),ring:!!patch.ring,roll,slide:null});

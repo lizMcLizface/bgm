@@ -1172,3 +1172,15 @@ public packaging/provenance pass. There is no new per-preset phone gate.
 Next boundary: Rust Iowa measurement interpolation, settling, FFT/wavetable and
 noise/burst preparation; existing JS preparation remains explicit outside render.
 Live expression, other native families and portable host FX/mixer are still open.
+
+### M4k — portable Iowa preparation (overnight 2026-11-10)
+
+[M4k](MODULAR_AUDIO_ENGINE_M4K_IOWA_PREPARATION.md) moves raw settling,
+pitch/velocity interpolation, FFT/wavetable and noise/burst preparation into an
+owned Rust preparation crate.405 actual-table cases pass; maximum field error
+1.3877787807814457e-17, metadata0. The opt-in All graph preview uses this backend
+without changing the native player/defaults; complete numeric banks persist.
+47 focused integration/controller tests pass. Parallel classic extraction also
+passes1680 exact preset/rate comparisons and36 allocation cases (682cdff).
+Remaining: VS/WT resource extraction, effects/mixer graph migration and live
+integration. Browser acceptance is recorded at the combined overnight checkpoint.

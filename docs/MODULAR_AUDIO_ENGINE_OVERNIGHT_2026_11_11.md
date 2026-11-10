@@ -67,3 +67,11 @@ reviewable rather than weakening validation or changing sounds to force a pass.
 - Add exact commits, outputs, checks, limitations and next tasks below as slices
   finish. Morning report belongs in `reports/modular_audio/overnight-2026-11-11.json`
   with a readable summary in the handoff.
+
+- ~23:35 UTC:682cdff commits12 owned classic backends;1680 exact preset/rate
+  comparisons,36 zero-allocation cases and73 focused tests pass. VS/WT resource
+  extraction is handed to the instrument agent; parent owns graph integration.
+- M4k Iowa preparation is locally verified (405 comparisons,47 final tests), with
+  explicit pending combined desktop-browser verification. Effects extraction
+  and mixer primitives are ready for parent integration while further independent
+  classic wave-table/rack-effect work continues.

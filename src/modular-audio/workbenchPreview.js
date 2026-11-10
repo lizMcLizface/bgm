@@ -2,8 +2,9 @@ import {compileWorkbenchSource,compileWorkbenchSet,compileWorkbenchAudition,WORK
 import {loadGraphAssets} from './graphAssets';
 import {createWorkerRoute} from './workerBrowser';
 import {newListeningId} from './listeningRecord';
+import {compileWithRustIowa} from './iowaWorkbenchPreparation';
 export {createWorkbenchTestSuite} from './workbenchTestSuite';
-export function createWorkbenchPreview({host,project,part,role,roles=null,mutedRoles=[],bpm,muted=false,audition=false,mode='serial',workerPoolBlocks=6,silentProbe=false,silentFullRun=false,compileSetPlan=null,onState=()=>{},onDone=()=>{},loadAssets=loadGraphAssets,makeRoute=createWorkerRoute,compilePlan=compileWorkbenchSource}){
+export function createWorkbenchPreview({host,project,part,role,roles=null,mutedRoles=[],bpm,muted=false,audition=false,mode='serial',workerPoolBlocks=6,silentProbe=false,silentFullRun=false,compileSetPlan=null,onState=()=>{},onDone=()=>{},loadAssets=loadGraphAssets,loadIowaPreparation,makeRoute=createWorkerRoute,compilePlan=compileWorkbenchSource}){
  let closed=false,finishing=null,route=null,timer=null,assets=null,plan=null,probe=null,sourceHash=Promise.resolve(null),armed=false;const activations=[],leases=[],gains=[],bindings=[],excludedRoles=[],stemPeaks={},requestedRoles=Array.isArray(roles)?roles.slice():roles,taps=[],peaks={source:0,channel:0,master:0},context=host.context,runId=newListeningId(),startedAtUtc=new Date().toISOString(),browserUserAgent=globalThis.navigator?.userAgent??null;
  const checkLeases=()=>leases.forEach(l=>l.assertCurrent());
  function cleanup(){clearInterval(timer);route?.dispose();for(const g of gains)g.disconnect();for(const tap of taps){try{tap.from.disconnect(tap.node);}catch{}tap.node.disconnect();}for(const release of activations)release();for(const l of leases)l.release();}
@@ -26,8 +27,10 @@ export function createWorkbenchPreview({host,project,part,role,roles=null,mutedR
    if(!Array.isArray(requestedRoles)||!requestedRoles.length||requestedRoles.length>6||new Set(requestedRoles).size!==requestedRoles.length||requestedRoles.some(r=>!WORKBENCH_SOURCE_ROLES.includes(r))||!Array.isArray(mutedRoles))throw Error('Select one to six distinct source roles.');
    for(const r of requestedRoles){if(mutedRoles.includes(r)){excludedRoles.push({role:r,reason:'muted or excluded by solo'});continue;}let l;try{l=host.openSourceStem(r,()=>{void finish('host-closed');});}catch(e){throw Error(`${r}: ${e.message}`);}leases.push(l);bindings.push({role:r,sourceId:WORKBENCH_SOURCE_ROLES.indexOf(r)+1,lease:l});}
    if(!bindings.length)throw Error('No selected pitched roles are audible under mute/solo.');
-   plan=(compileSetPlan??(audition?compileWorkbenchAudition:compileWorkbenchSet))({project,part,bpm,sources:bindings.map(b=>({role:b.role,source:b.lease,tune:b.lease.tune}))});
-  }else{const l=host.openSourceStem(role,()=>{void finish('host-closed');});leases.push(l);bindings.push({role,sourceId:role==='perc'?6:1,lease:l});plan=compilePlan({project,part,role,bpm,source:l,tune:l.tune,muted});}
+   const sources=bindings.map(b=>({role:b.role,source:b.lease,tune:b.lease.tune}));
+   const compile=sources=>(audition?compileWorkbenchAudition:compileWorkbenchSet)({project,part,bpm,sources});
+   plan=compileSetPlan?compileSetPlan({project,part,bpm,sources}):sources.some(s=>s.source.kind==='iowa')?await compileWithRustIowa(sources,compile,loadIowaPreparation):compile(sources);
+  }else{const l=host.openSourceStem(role,()=>{void finish('host-closed');});leases.push(l);bindings.push({role,sourceId:role==='perc'?6:1,lease:l});const compile=source=>compilePlan({project,part,role,bpm,source,tune:l.tune,muted});plan=l.kind==='iowa'?await compileWithRustIowa([{source:l}],([s])=>compile(s.source),loadIowaPreparation):compile(l);}
   if(silentProbe||silentFullRun)probe={muted:true,...(silentFullRun?{fullRun:true}:{}),targetFrames:silentFullRun||audition?plan.endFrame:Math.min(plan.endFrame,96000)};
   sourceHash=hashWorkbenchPlan(plan);
   assets=await loadAssets();if(closed)return null;checkLeases();
