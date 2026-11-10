@@ -1,0 +1,296 @@
+{
+  "kind": "classics.owned-allocation",
+  "version": 1,
+  "pass": true,
+  "scope": "Portable no-default-features Wasm; two independent handles; render/note/control/pedal/panic/reset after preparation, no native runner.",
+  "results": [
+    {
+      "model": 0,
+      "rate": 44100,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 0,
+      "rate": 48000,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 0,
+      "rate": 96000,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 1,
+      "rate": 44100,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 1,
+      "rate": 48000,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 1,
+      "rate": 96000,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 2,
+      "rate": 44100,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 2,
+      "rate": 48000,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 2,
+      "rate": 96000,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 3,
+      "rate": 44100,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 3,
+      "rate": 48000,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 3,
+      "rate": 96000,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 4,
+      "rate": 44100,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 4,
+      "rate": 48000,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 4,
+      "rate": 96000,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 5,
+      "rate": 44100,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 5,
+      "rate": 48000,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 5,
+      "rate": 96000,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 6,
+      "rate": 44100,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 6,
+      "rate": 48000,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 6,
+      "rate": 96000,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 8,
+      "rate": 44100,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 8,
+      "rate": 48000,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 8,
+      "rate": 96000,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 9,
+      "rate": 44100,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 9,
+      "rate": 48000,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 9,
+      "rate": 96000,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 10,
+      "rate": 44100,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 10,
+      "rate": 48000,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 10,
+      "rate": 96000,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 11,
+      "rate": 44100,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 11,
+      "rate": 48000,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 11,
+      "rate": 96000,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 13,
+      "rate": 44100,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 13,
+      "rate": 48000,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    },
+    {
+      "model": 13,
+      "rate": 96000,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2490368,
+      "grew": false
+    }
+  ]
+}

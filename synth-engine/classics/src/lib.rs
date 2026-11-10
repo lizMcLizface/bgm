@@ -10,6 +10,7 @@ mod fx;
 mod dx7;
 mod juno;
 mod obxa;
+#[cfg(feature="legacy-abi")]
 mod vs;
 mod minimoog;
 mod jupiter;
@@ -17,8 +18,13 @@ mod prophet;
 mod seq;
 mod drums;
 mod tb303;
+#[cfg(feature="legacy-abi")]
 mod wt;
+pub mod owned;
+#[cfg(feature="allocation-audit")]
+mod allocation_audit;
 
+#[cfg(feature="legacy-abi")]
 use dsp::{soft, DcBlock, MAX_BLOCK};
 
 pub const API: u32 = 1;
@@ -41,6 +47,7 @@ pub const MODEL_TB303: u32 = 11;
 pub const MODEL_WT: u32 = 12;
 pub const MODEL_TR707: u32 = 13;
 
+#[cfg(feature="legacy-abi")]
 struct Host {
     sr: f32,
     model: u32,
@@ -64,6 +71,7 @@ struct Host {
     frames: f64,
 }
 
+#[cfg(feature="legacy-abi")]
 static mut HOST: Host = Host {
     sr: 48000.,
     model: MODEL_CS80,
@@ -86,9 +94,11 @@ static mut HOST: Host = Host {
     peak: 0.,
     frames: 0.,
 };
+#[cfg(feature="legacy-abi")]
 static mut BUFFERS: fx::Buffers = fx::Buffers::ZERO;
 
 /// Forwards one call to whichever model is active.
+#[cfg(feature="legacy-abi")]
 macro_rules! model {
     ($h:expr, $m:ident => $body:expr) => {
         match $h.model {
@@ -140,12 +150,14 @@ macro_rules! model {
     };
 }
 
+#[cfg(feature="legacy-abi")]
 #[no_mangle]
 pub extern "C" fn syn_api() -> u32 {
     API
 }
 
 /// Number of parameter slots of the active model (ids 0..count); effect ids start at 200.
+#[cfg(feature="legacy-abi")]
 #[no_mangle]
 pub extern "C" fn syn_param_count() -> u32 {
     unsafe {
@@ -165,6 +177,7 @@ pub extern "C" fn syn_param_count() -> u32 {
     }
 }
 
+#[cfg(feature="legacy-abi")]
 #[no_mangle]
 pub extern "C" fn syn_init(sr: f32, model: u32) -> u32 {
     if !(8000. ..=384000.).contains(&sr) || model > MODEL_TR707 {
@@ -199,6 +212,7 @@ pub extern "C" fn syn_init(sr: f32, model: u32) -> u32 {
     1
 }
 
+#[cfg(feature="legacy-abi")]
 #[no_mangle]
 pub extern "C" fn syn_param(id: u32, value: f32) {
     unsafe {
@@ -224,27 +238,32 @@ pub extern "C" fn syn_param(id: u32, value: f32) {
     }
 }
 
+#[cfg(feature="legacy-abi")]
 #[no_mangle]
 pub extern "C" fn syn_note_on(key: u32, note: f32, velocity: f32) {
     unsafe { model!(HOST, m => m.note_on(key, note, velocity)) }
 }
 
+#[cfg(feature="legacy-abi")]
 #[no_mangle]
 pub extern "C" fn syn_note_off(key: u32) {
     unsafe { model!(HOST, m => m.note_off(key)) }
 }
 
+#[cfg(feature="legacy-abi")]
 #[no_mangle]
 pub extern "C" fn syn_pressure(key: u32, value: f32) {
     unsafe { model!(HOST, m => m.poly_pressure(key, value)) }
 }
 
+#[cfg(feature="legacy-abi")]
 #[no_mangle]
 pub extern "C" fn syn_control(which: u32, value: f32) {
     unsafe { model!(HOST, m => m.control(which, value)) }
 }
 
 /// Silence everything immediately, including effect tails.
+#[cfg(feature="legacy-abi")]
 #[no_mangle]
 pub extern "C" fn syn_panic() {
     unsafe {
@@ -255,6 +274,7 @@ pub extern "C" fn syn_panic() {
     }
 }
 
+#[cfg(feature="legacy-abi")]
 #[no_mangle]
 pub extern "C" fn syn_render(frames: u32) {
     unsafe {
@@ -304,6 +324,7 @@ pub extern "C" fn syn_render(frames: u32) {
 /// Sequencer commands for the drum machines and the bass line (see `seq.rs`, `drums.rs`,
 /// `tb303.rs`): 0 play/stop, 1 set a step, 2 pattern, 3 chain slot, 4 chain length,
 /// 5 pattern length, 6 rewind, 7 clear a pattern.
+#[cfg(feature="legacy-abi")]
 #[no_mangle]
 pub extern "C" fn syn_seq(cmd: u32, a: u32, b: f32) {
     unsafe {
@@ -317,17 +338,20 @@ pub extern "C" fn syn_seq(cmd: u32, a: u32, b: f32) {
 
 /// The shared wave buffer (the vector synthesizer's 128 waves × 128 samples, f32; the wavetable synthesizer's four
 /// 2048-sample waves): the host writes it and then calls `syn_wave_commit`. Other models ignore it.
+#[cfg(feature="legacy-abi")]
 #[no_mangle]
 pub extern "C" fn syn_wave_ptr() -> *mut f32 {
     vs::wave_ptr()
 }
 
 /// The wavetable synthesizer's joystick paths: per voice [sounding, next slot, then TRACE (x, y) pairs]; `which` 0 is the voice count, 1 the width of a voice.
+#[cfg(feature="legacy-abi")]
 #[no_mangle]
 pub extern "C" fn syn_joy_ptr() -> *const f32 {
     unsafe { HOST.wt.trace.as_ptr() }
 }
 
+#[cfg(feature="legacy-abi")]
 #[no_mangle]
 pub extern "C" fn syn_joy_info(which: u32) -> u32 {
     if which == 0 {
@@ -338,6 +362,7 @@ pub extern "C" fn syn_joy_info(which: u32) -> u32 {
 }
 
 /// Builds the band-limited tables from the buffer. Takes a few tens of milliseconds.
+#[cfg(feature="legacy-abi")]
 #[no_mangle]
 pub extern "C" fn syn_wave_commit() {
     unsafe {
@@ -349,17 +374,20 @@ pub extern "C" fn syn_wave_commit() {
     }
 }
 
+#[cfg(feature="legacy-abi")]
 #[no_mangle]
 pub extern "C" fn syn_left() -> *const f32 {
     unsafe { HOST.left.as_ptr() }
 }
 
+#[cfg(feature="legacy-abi")]
 #[no_mangle]
 pub extern "C" fn syn_right() -> *const f32 {
     unsafe { HOST.right.as_ptr() }
 }
 
 /// 0 active voices, 1 steals, 2 last block peak, 3 rendered seconds.
+#[cfg(feature="legacy-abi")]
 #[no_mangle]
 pub extern "C" fn syn_stat(which: u32) -> f32 {
     unsafe {
