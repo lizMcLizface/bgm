@@ -2120,9 +2120,24 @@ invariants independently checked. Reports `m4b-*.json`, image
 `.tmp/m4b-all-active-signals.png`. Physical listening/isolated wet PCM unassessed.
 QA tab/viewport/server cleaned; normal-user LAN HTTPS PID8368 stays running.
 
-**Next:** collect requested phone pitched-set probe, verify per-role note counts
-before claiming voice coverage, then guarded finite listening on clean delivery.
-Audit actual All percussion source seam/kit/hit translation for the next owned
-adapter. Native piano/classics remain explicit unsupported gates. Longer phone
-lookahead stays acceptable; defer startup-delay work. No normal backend switch,
-fixture substitution, deployment or broader migration.
+**Phone sparse set received:** run **51495cad-3673-4bda-b8f8-ada1ff6f6173**, host v8,
+48 kHz actual worker/twelve/128 ms. Lead/counter/bass IDs **[1,2,5]**, core source
+note counts **[0,0,8]**, no exclusions. Muted 96,000-source / 102,144-output-frame
+probe completes, 188 accepted/rendered blocks, no delivery/event errors, min
+steady lead 1,152 / 24 ms, max gap 4,864 / 101.33 ms, no zero/over-capacity
+observations. Exact report `m4b-phone-current-voices-probe.json`; hash recorded
+but full phone plan bytes absent. All peaks zero are expected under mute.
+This verifies Bass plus two silent instances, not active three-voice/FX/listening
+or full-score acceptance. Full-score complete/pass stays false, listening
+unassessed. Evidence-only follow-up after `80ea6b5`: artifact checks, no new
+DSP/browser/build runs, source/backend/default or server change.
+
+**Next bounded aid:** explicit selected-voice audition with the actual chosen
+patches/tuning and labeled diagnostic test notes, leaving the user's sparse
+score untouched. Distinguish test-note audition from captured-song preview in
+UI/reports; never substitute a fixture patch. This enables phone active-voice
+coverage without frustrating grid edits. Keep muted probe then guarded audible
+acceptance, per-role signals/identity, current twelve-slot option, ordinary guard
+and legacy keyboard. Then audit actual All percussion seam/kit/hit translation;
+native piano/classics remain separate adapter gates. Longer phone lookahead
+remains acceptable; defer startup-delay work. No default switch or deployment.

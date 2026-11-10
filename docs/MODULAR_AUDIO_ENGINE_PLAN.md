@@ -1011,8 +1011,13 @@ Mixer isolation, keyboard coexistence, source invalidation, original voice/fader
 restoration, legacy playback and default/report reset on reload pass. Physical
 listening and isolated wet-PCM/setup-file byte parity are not claimed.
 
-Next collect requested phone set probe/listening, checking which roles actually
-have notes. Then audit the real All percussion seam/kit/hit translation into
-its already-owned Rust engine; native piano remains a separate adapter gate.
+Phone set probe `51495cad-3673-4bda-b8f8-ada1ff6f6173` now completes 96,000 frames /
+188 blocks without delivery errors, min ready lead 1,152, gap 4,864. Its note
+counts are **lead/counter/bass 0/0/8**: Bass and two silent instances, not active
+multi-voice/listening acceptance. Raw muted/full-score verdicts are preserved.
+Next add an explicit selected-patch audition with reported diagnostic notes,
+leaving sparse user scores untouched, to enable actual active-voice phone
+coverage. Keep song preview distinct. Then audit real All percussion seam /
+kit/hit translation into its owned Rust engine; native piano is a separate gate.
 Preserve the finite scope and existing instruments; no default replacement,
 latency chase, fixture substitution, deployment or broad migration.

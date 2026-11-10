@@ -978,6 +978,10 @@ they are not replaced. Default single scope, legacy keyboard and setup stay.
 **286 broad tests**, **24 final overlapping checks**, public build and actual
 browser all-five-active worker/twelve (905,116 frames / 56 events / zero misses),
 channel attenuation, keyboard coexistence, source edit/Stop, original source /
-fader restoration, legacy playback and reload pass. Phone set evidence pending;
-next audit actual percussion adapter after its listening gate. Host v8, engine
-unchanged; no default/backend migration, deployment or low-latency detour.
+fader restoration, legacy playback and reload pass. Phone set probe now passes
+delivery but has only Bass note-bearing (lead/counter/bass counts 0/0/8); two
+silent slots do not establish active multi-voice listening. Next add an explicit
+actual-patch audition with clearly labeled test notes, preserving the user's
+score, for accessible phone voice testing. Percussion seam audit follows that
+active-voice gate. Host v8, engine unchanged; no default/backend migration,
+deployment or low-latency detour. Raw probe and limitations are in the linked doc.

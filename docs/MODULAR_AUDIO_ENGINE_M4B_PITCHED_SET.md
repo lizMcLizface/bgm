@@ -127,16 +127,46 @@ signals, source clocks/events, fallback identity and restore/reload assertions
 pass independently in Node. The group routes through existing per-role effects
 and shared output; no new effect-latency compensation or isolated wet-PCM parity
 is claimed. QA tab/viewport and temporary server are cleaned up. LAN PID8368
-remains up, serving final local build. Phone set diagnostics are requested and
-pending. No physical listening is inferred from browser/Node checks.
+remains up, serving final local build. No physical listening is inferred from
+browser/Node checks.
+
+## Phone sparse-set probe received
+
+User-supplied unique run **51495cad-3673-4bda-b8f8-ada1ff6f6173**, 12:55:03.574 UTC,
+Android-reported Chrome 156, host v8 / engine d6a0341e5edf2d57, 48 kHz actual
+worker / Message / 512 x 12 / 128 ms, no fallback. Raw report retained in
+`reports/modular_audio/m4b-phone-current-voices-probe.json` without changing its
+verdicts. Capture has core **lead 1 / counter 2 / bass 5**, note counts **0/0/8**,
+no mute/solo exclusions. Zero own-source/channel peaks are expected: this is
+explicitly muted, not an audible activity test.
+
+The probe renders/consumes **96,000** of **684,316 planned source frames**,
+**102,144 output frames**, **188 accepted/rendered blocks**, zero missing / late /
+rejected/stale PCM or bad recycles, no recoveries needed. Three applied events,
+zero late/overflow. Minimum steady ready lead **1,152 / 24 ms**, no zero /
+below-quantum observations; maximum gap remains **4,864 / 101.33 ms**, below the
+twelve-slot capacity, no over-capacity quanta. Worker render **446.10 ms total /
+21.80 ms max**, not CPU utilization. Worklet timing remains unavailable/null.
+
+This verifies clean delivery of the captured graph with one note-bearing Bass
+source and two silent core instances. It does **not** test three overlapping
+active voices, audible FX/mixer/master quality, the full score, native piano or
+drums. Full-score complete/pass stays **false**, listening **not assessed**.
+The compact phone report contains no full plan bytes, so its hash is recorded,
+not independently recomputed. Evidence-only follow-up after `80ea6b5`: JSON and
+frame/block/stem/verdict checks pass; no new DSP/browser/build test is claimed.
 
 ## Next target-device work
 
-Use the existing normal-Chrome LAN HTTPS page: choose pitched-set scope, inspect
-the selected ready voices, select One worker / twelve blocks, and run a silent
-probe before ordinary finite playback. Record per-role raw/channel activity,
-shared master, complete source/event clocks and delivery. Exercise per-role
-FX/mixer edits, keyboard coexistence, invalidation and Stop before expanding
-acceptance. Native piano and percussion need their own captured adapters and
-acceptance; no broader/default backend migration or lower-latency experiment
-is implied by this pitched-set slice. No deployment/security/AC bypass.
+The phone needs note-bearing voices beyond Bass for its active-voice gate. Next
+bounded aid: an explicitly labeled short **selected-voice audition** using each
+selected actual patch/tuning and clearly reported diagnostic test notes, without
+editing the user's score, replacing a patch or relabeling test notes as captured
+song playback. This avoids requiring awkward phone grid edits merely to activate
+silent slots. Preserve ordinary captured-score preview, twelve-slot option,
+normal first-miss guard, legacy keyboard and separate diagnostic/listening
+verdicts. First muted probe, then audible audition on clean delivery, with per-role
+activity and exact run identity. Existing desktop all-five-active evidence stays.
+After that phone active-voice check, audit actual All percussion seam/kit/hit
+translation; native piano remains a separate adapter. No broader/default backend
+migration or lower-latency experiment is implied. No deployment/security/AC bypass.
