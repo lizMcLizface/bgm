@@ -1070,3 +1070,20 @@ Existing native voice envelopes, filters, stereo, FX and routing are retained.
 222 strike and108 body comparisons validate preparation PCM; this does not yet
 make native piano eligible in the finite Rust graph. Next owned voice-chain
 integration, retaining the larger-batch/local-test workflow.
+
+### 2026-11-10: owned piano voice integration and fixed full-path tests
+
+[M4e](MODULAR_AUDIO_ENGINE_M4E_PIANO_VOICES.md) adds eligible finite piano voices
+beside owned core/FM/basic kits, preserving direct-native and Wasm-wrapper piano
+hosts. Each owns playback, envelopes, lowpass state, pitch cursor and release;
+its raw stem enters the existing instrument compressor/FX/mixer path. The normal
+keyboard, transport, sounds and default JS piano preparation stay operational.
+Source changes invalidate the private graph; unported shared voice modulation,
+non-lowpass filtering and over-polyphony stealing fail closed.
+
+The standalone `tools/piano-voice.html` fixes six sources and worker buffering,
+with one full muted batch, a separate listening audition and native/Rust dry
+pairs. It creates an isolated host and never writes All storage or song data.
+Four browser serial/worker cases pass, and separate audible worker playback has
+all six raw/channel peaks positive with zero gaps. See M4e for exact versions,
+reports, bounds, remaining families and the next phone listening/modulation gate.

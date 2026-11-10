@@ -275,6 +275,7 @@ class Instrument {
         // ends. It starts asleep; the first booked note wakes it.
         this.destinations = [];
         this.chainAwake = false;
+        this.externalSourceInputs = 0;
         this.soundUntil = 0;
         // Set by flushTails: the effects are silent from then on, whatever
         // their tail would have been. A new note clears it.
@@ -784,13 +785,35 @@ class Instrument {
         this.sleepTimer = setTimeout(() => this.sleepIdle(), 300);
     }
 
-    wake(index) {
+    wakeEffects() {
         this.reverb.hear();
         if (!this.chainAwake) {
             this.destinations.forEach((destination) => this.output.connect(destination));
             this.chainAwake = true;
             if (this.reverb.setAwake) this.reverb.setAwake(true);
         }
+    }
+
+    // A prepared Rust source feeds synthMix without waking legacy oscillators.
+    // Multiple owners keep the existing shared effects alive independently.
+    holdSourceInput() {
+        if (this.disposed) throw Error('Disposed instrument');
+        this.externalSourceInputs++;
+        this.wakeEffects();
+        let released = false;
+        return () => {
+            if (released) return;
+            released = true;
+            this.externalSourceInputs--;
+            if (this.disposed) return;
+            this.soundUntil = Math.max(this.soundUntil, this.AC.currentTime);
+            this.quietAt = Infinity;
+            this.scheduleSleep();
+        };
+    }
+
+    wake(index) {
+        this.wakeEffects();
         if (!this.awake[index]) {
             this.voices[index].volume.getNode().connect(this.synthMix.getNode());
             this.awake[index] = true;
@@ -810,7 +833,7 @@ class Instrument {
                 this.awake[i] = false;
             }
         });
-        if (this.chainAwake && !this.awake.some(Boolean) && this.silentFrom() < now) {
+        if (this.chainAwake && !this.externalSourceInputs && !this.awake.some(Boolean) && this.silentFrom() < now) {
             this.output.disconnect();
             this.chainAwake = false;
             if (this.reverb.setAwake) this.reverb.setAwake(false);
@@ -825,7 +848,7 @@ class Instrument {
         const due = this.busyUntil.filter((t, i) => this.awake[i] && Number.isFinite(t));
         let at;
         if (due.length) at = Math.min(...due) + 0.25;
-        else if (this.chainAwake && !this.awake.some(Boolean)) at = this.silentFrom() + 0.25;
+        else if (this.chainAwake && !this.externalSourceInputs && !this.awake.some(Boolean)) at = this.silentFrom() + 0.25;
         else return;
         const delay = Math.max(0.05, at - this.AC.currentTime);
         if (this.sleepTimer) clearTimeout(this.sleepTimer);
@@ -848,6 +871,7 @@ class Instrument {
     }
 
     dispose() {
+        this.disposed = true;
         if (this.morph) clearInterval(this.morph.timer);
         this.morph = null;
         if (this.sleepTimer) clearTimeout(this.sleepTimer);

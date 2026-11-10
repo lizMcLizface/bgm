@@ -1,0 +1,64 @@
+{
+  "kind": "piano.owned-voice-allocation",
+  "version": 1,
+  "pass": true,
+  "graphVersion": "d68f9dc21e528d44",
+  "scope": "Prepared finite Rust piano render, independent handles, save/reload, reset, enqueue, owner cancellation and pause. Excludes preparation and host JS/browser deadlines.",
+  "results": [
+    {
+      "type": "felt",
+      "sampleRate": 48000,
+      "frames": 60000,
+      "peak": 0.20938925445079803,
+      "saveReloadExact": true,
+      "independentHandles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2621440,
+      "grew": false
+    },
+    {
+      "type": "electric",
+      "sampleRate": 48000,
+      "frames": 60000,
+      "peak": 0.20927530527114868,
+      "saveReloadExact": true,
+      "independentHandles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2621440,
+      "grew": false
+    },
+    {
+      "type": "grand",
+      "sampleRate": 48000,
+      "frames": 60000,
+      "peak": 0.14711126685142517,
+      "saveReloadExact": true,
+      "independentHandles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 6488064,
+      "grew": false
+    },
+    {
+      "type": "felted",
+      "sampleRate": 48000,
+      "frames": 60000,
+      "peak": 0.18350107967853546,
+      "saveReloadExact": true,
+      "independentHandles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 3670016,
+      "grew": false
+    },
+    {
+      "type": "upright",
+      "sampleRate": 48000,
+      "frames": 60000,
+      "peak": 0.1530962437391281,
+      "saveReloadExact": true,
+      "independentHandles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 3932160,
+      "grew": false
+    }
+  ]
+}

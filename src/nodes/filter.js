@@ -9,6 +9,8 @@ class Filter {
         this.node = this.AC.createBiquadFilter();
 
         this.node.type = 'lowpass';
+        this.configuredFreq = MAX_FREQ;
+        this.configuredQ = this.node.Q.value;
         this.node.frequency.setValueAtTime(MAX_FREQ, this.AC.currentTime);
     }
 
@@ -27,6 +29,10 @@ class Filter {
     getQ = () => this.node.Q.value;
     getGain = () => this.node.gain.value;
     getDetune = () => this.node.detune.value;
+    // A disconnected/suspended node may not have processed its scheduled values.
+    // Portable source capture needs the accepted setting, not that stale value.
+    getConfiguredFreq = () => this.configuredFreq;
+    getConfiguredQ = () => this.configuredQ;
 
     // Setters
     setType = (type) => {
@@ -35,12 +41,14 @@ class Filter {
     }
     setFreq = (freq, time = 0) => {
         if (freq < 0 || freq > MAX_FREQ) return false;
+        this.configuredFreq = freq;
         time
             ? this.node.frequency.setTargetAtTime(freq, this.AC.currentTime, time)
             : this.node.frequency.setValueAtTime(freq, this.AC.currentTime);
     }
     setQ = (q, time = 0) => {
         if (q < 0 || q > MAX_Q) return false;
+        this.configuredQ = q;
         time
             ? this.node.Q.setTargetAtTime(q, this.AC.currentTime, time)
             : this.node.Q.setValueAtTime(q, this.AC.currentTime);

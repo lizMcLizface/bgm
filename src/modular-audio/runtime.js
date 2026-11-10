@@ -2,6 +2,7 @@
 // Preparation is outside process(). Trusted-host ABI pointers never leave here.
 import {compilePitched,validatePitchedConfig} from './pitchedCompiler.js';
 import {validatePercussionConfig} from './percussionConfig.js';
+import {validatePianoConfig,PIANO_TYPES} from './pianoConfig.js';
 export const checked = code => { if (code) throw Error(`Graph rejected operation (${code})`); };
 const uint = n => Number.isInteger(n) && n > 0 && n <= 0xffffffff;
 const frame = n => Number.isSafeInteger(n) && n >= 0;
@@ -21,6 +22,7 @@ export function validatePatch(raw, contracts) {
     }
     modules.set(n.id, d);
     if(['legacy.core','legacy.fm'].includes(d.type))n.config=validatePitchedConfig(n.config,d.type==='legacy.fm');
+    if(d.type==='legacy.piano')n.config=validatePianoConfig(n.config);
     if(d.type==='legacy.percussion'){
       if(n.version===1&&n.config!==undefined||n.version===2&&n.config===undefined)throw Error('Invalid percussion kit: requires module version 2 and complete configuration');
       if(n.version===2)n.config=validatePercussionConfig(n.config,d.kitConfiguration);
@@ -47,13 +49,21 @@ export function validatePatch(raw, contracts) {
     dependencies.get(e.to.module).add(e.from.module);
   }
   if(p.modules.filter(n=>n.type==='legacy.percussion').length>8)throw Error('Percussion instance limit exceeded');
-  if(p.modules.filter(n=>['legacy.core','legacy.fm'].includes(n.type)).length>8)throw Error('Pitched instance limit exceeded');
+  if(p.modules.filter(n=>['legacy.core','legacy.fm','legacy.piano'].includes(n.type)).length>8)throw Error('Pitched instance limit exceeded');
   if([...modules.values()].filter(d=>d.type==='ref.output').length!==1)throw Error('Exactly one output is required');
   for(const [id,d] of modules)for(const port of d.ports)if(port.required&&!inputs.has(`${id}:${port.id}`))throw Error('Missing required input');
   const ready=new Set();
   while(ready.size<modules.size){const next=[...dependencies].find(([id,deps])=>!ready.has(id)&&[...deps].every(id=>ready.has(id)));if(!next)throw Error('Unsupported graph cycle');ready.add(next[0]);}
   const owners=new Map();
   for (const e of p.events) {eventPacket(e, modules, p.connections);if(e.kind==='note'&&e.note&&[0,1,3,5].includes(e.event)){const k=e.target+':'+e.note;if(owners.has(k)&&owners.get(k)!==e.owner)throw Error('Pitched note owner conflict');owners.set(k,e.owner);}}
+  for(const n of p.modules.filter(n=>n.type==='legacy.piano')){
+    const used=new Set(),ends=[];
+    for(const e of p.events.filter(e=>e.target===n.id&&e.kind==='note'&&e.event===0).sort((a,b)=>a.frame-b.frame)){
+      const v=n.config.notes.find(v=>v.id===e.note);if(!v||used.has(v.id)||Math.fround(e.a)!==Math.fround(v.midi)||Math.fround(e.b)!==Math.fround(v.velocity))throw Error('Piano trigger/configuration mismatch');used.add(v.id);
+      for(let i=ends.length-1;i>=0;i--)if(ends[i]<=e.frame)ends.splice(i,1);
+      if(ends.length>=n.config.voices)throw Error('Piano voice-steal fade is not supported');ends.push(e.frame+v.gain.at(-1)[1]);
+    }
+  }
   for(const n of p.modules)if(p.events.filter(e=>e.target===n.id&&e.kind==='note').length>4000)throw Error('Pitched note capacity exceeded');
   return p;
 }
@@ -61,7 +71,8 @@ export function validatePatch(raw, contracts) {
 function eventPacket(e, modules, connections) {
   const d = modules.get(e.target);
   if (!frame(e.frame) || !uint(e.owner) || !d) throw Error('Invalid event frame/ownership/target');
-  if(['legacy.core','legacy.fm'].includes(d.type)){
+  if(['legacy.core','legacy.fm','legacy.piano'].includes(d.type)){
+    if(d.type==='legacy.piano'&&e.kind==='note'&&![0,4].includes(e.event))throw Error('Unsupported finite piano event');
     if(e.kind==='cancel')return [e.frame,e.target,e.owner,4,0,0];
     if(e.kind==='note'&&Number.isInteger(e.event)&&e.event>=0&&e.event<=6&&Number.isInteger(e.note)&&e.note>=0&&e.note<=0xffffffff&&finite(e.a)&&finite(e.b)){
       const k=e.event,id=e.note,a=e.a,b=e.b;
@@ -88,6 +99,7 @@ export class ReferenceGraph {
     this.engine = engine;
     if (!Number.isInteger(maxBlock) || maxBlock < 1 || maxBlock > contracts.maxBlock) throw Error('Invalid block size');
     this.patch = validatePatch(patch, contracts);
+    if(this.patch.modules.some(n=>n.type==='legacy.piano')&&sampleRate!==48000)throw Error('Prepared piano v1 requires 48 kHz');
     this.contracts = contracts;
     this.modules = new Map(this.patch.modules.map(n => [n.id, contracts.modules.find(d => d.type === n.type && d.version === n.version)]));
     if (engine.graph_api() !== contracts.api) throw Error('Graph ABI mismatch');
@@ -103,6 +115,11 @@ export class ReferenceGraph {
           const c=n.config;
           checked(engine.graph_percussion_config(this.handle,n.id,c.version,d.kitConfiguration.voices.indexOf(c.voice)+1));
           c.drums.forEach((v,i)=>checked(engine.graph_percussion_drum(this.handle,n.id,i,Number(v.on),v.level,v.tone,v.decay)));
+        }
+        if(d.type==='legacy.piano'){
+          const c=n.config;checked(engine.graph_piano_config(this.handle,n.id,c.voices,c.cutoff,c.q,c.pitch,c.pitchDecay));
+          for(const b of c.banks)checked(engine.graph_piano_bank(this.handle,n.id,b.frequency,PIANO_TYPES.indexOf(b.type),b.decay,b.brightness,b.hammer,b.unison,b.velocity,b.seed,b.resonance,b.softness,b.sustain,b.wear));
+          for(const v of c.notes){checked(engine.graph_piano_spec(this.handle,n.id,v.id,v.bank,v.midi,v.velocity));for(const p of [...v.gain,...v.filter])checked(engine.graph_piano_point(this.handle,n.id,v.id,...p));}
         }
         if(['legacy.core','legacy.fm'].includes(d.type)){
           const c=compilePitched(n.config,d.type==='legacy.fm',sampleRate);
@@ -144,7 +161,7 @@ export class ReferenceGraph {
   alive() { if (!this.handle) throw Error('Disposed graph'); }
   render(frames) { this.alive(); if (!Number.isInteger(frames) || frames < 0 || frames > this.maxBlock) throw Error('Invalid frame count'); checked(this.engine.graph_render(this.handle,frames)); }
   stats() { this.alive(); return Object.fromEntries(['frame','late','overflow','applied'].map((key,i) => [key,this.engine.graph_stat(this.handle,i)])); }
-  pitchedStats(id){this.alive();if(!['legacy.core','legacy.fm'].includes(this.modules.get(id)?.type))throw Error('Not a pitched node');return Object.fromEntries(['active','steals','dropped','late','frame','peak','latencyFrames','peakActive'].map((key,i)=>[key,this.engine.graph_pitch_stat(this.handle,id,i)]));}
+  pitchedStats(id){this.alive();if(!['legacy.core','legacy.fm','legacy.piano'].includes(this.modules.get(id)?.type))throw Error('Not a pitched node');return Object.fromEntries(['active','steals','dropped','late','frame','peak','latencyFrames','peakActive'].map((key,i)=>[key,this.engine.graph_pitch_stat(this.handle,id,i)]));}
   percussionStats(id){this.alive();if(this.modules.get(id)?.type!=='legacy.percussion')throw Error('Not percussion');return Object.fromEntries(['active','queued','steals','dropped','late','frame','peakActive'].map((key,i)=>[key,this.engine.graph_percussion_stat(this.handle,id,i)]));}
   meters() {this.alive();return Object.fromEntries([...this.modules].filter(([,d])=>d.type==='graph.compressor').map(([id])=>[id,Object.fromEntries(['inputPeak','keyPeak','reductionDb','outputPeak','missingKey','externalKey'].map((key,i)=>[key,this.engine.graph_meter(this.handle,id,i)]))]));}
   pause(value) { this.alive(); this.engine.graph_pause(this.handle,Number(value)); }

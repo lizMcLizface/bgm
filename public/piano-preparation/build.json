@@ -1,7 +1,7 @@
 {
   "api": 1,
-  "source": "3b24efa2d3285b7b687466cde11eca11ed4ba5040d67fa652298d078add5d7e3",
-  "wasm": "80029784b936d9e19566f6e900875b180f348d5fb79bf81b3e6bf397dfdffba2",
-  "bytes": 48561,
-  "version": "d592cc8a0af5164e"
+  "source": "e97b1c2da48b1c866b83985e3e3772bda8dfc6b3a6557edb2e71948b440b2159",
+  "wasm": "57c82ee6b88d68a9d9bac6a4e7a677393978be0bd470473b7739987dbda309fb",
+  "bytes": 48643,
+  "version": "76f3c23fe59deb22"
 }

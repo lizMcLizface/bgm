@@ -1,0 +1,8 @@
+// @vitest-environment node
+import {it,expect,vi} from 'vitest';
+import {pianoStemTap} from './pianoStemTap';
+const instrument=()=>({voice:{native:{preset:{stringModel:'piano',pianoType:'felted',pianoDecay:2.6,pianoBrightness:.35,pianoHammer:.2,pianoUnison:.3,pianoSeed:109},polyphony:8,voices:[{filter:{getType:()=> 'lowpass',getConfiguredFreq:()=>11000,getConfiguredQ:()=>0}}],gainEnv:{release:.35},filterEnv:{amount:0},noteInfo:m=>({freq:440*2**((m-69)/12)}),synthMix:{getNode:()=>input}}}});
+const input={};
+it('leases the pre-compressor piano seam without waking or replacing the native instrument',()=>{const i=instrument(),guard=vi.fn(),p=pianoStemTap(i,guard);expect(p.input).toBe(input);expect(p.kind).toBe('piano');expect(p.patch).toMatchObject({cutoff:11000,q:0,type:'felted',voices:8});expect(p.patch.frequencies[69]).toBe(440);p.assertCurrent();expect(guard).toHaveBeenCalledTimes(2);i.voice.native.preset.pianoDecay=3;expect(()=>p.assertCurrent()).toThrow('changed');});
+it('also captures the original direct native Instrument backend without replacing it',()=>{const i=instrument().voice.native,p=pianoStemTap(i);expect(p.input).toBe(input);expect(p.kind).toBe('piano');p.assertCurrent();i.disposed=true;expect(()=>p.assertCurrent()).toThrow();});
+it('invalidates source replacement and fails closed on unported models or modulation',()=>{for(const change of [i=>i.voice.native.preset.pianoType='ambient',i=>i.voice.native.preset.filterLfoDepth=1,i=>i.voice.native.voices[0].stringPitchEnabled=true,i=>i.loading=true]){const i=instrument();change(i);expect(()=>pianoStemTap(i)).toThrow();}const i=instrument(),p=pianoStemTap(i);i.voice={...i.voice};expect(()=>p.assertCurrent()).toThrow();});

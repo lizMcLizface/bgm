@@ -143,6 +143,11 @@ preview is retained with the checked local build; no deployment or phone request
 
 ## Next bounded task
 
+Update 2026-11-10: the finite owned voice-chain slice is implemented in
+[M4e](MODULAR_AUDIO_ENGINE_M4E_PIANO_VOICES.md). The remaining native modulation,
+steal fade and listening gates are listed there; the following paragraph records
+the original M4d handoff.
+
 Use this owned generator in a prepared piano graph module with owned per-voice
 playback, gain/filter envelopes, pitch, stereo allocation/stealing and release.
 First define that contract against actual native piano dry-chain captures,

@@ -2459,3 +2459,54 @@ and verified after reload. Raw browser records and222-case hashes retained;
 physical listening, device timing, wet PCM parity and full piano graph ownership
 are not claimed. QA tab/viewport/server cleaned, LAN HTTPS remains; no new phone
 check or deployment. Continue with owned piano voice-chain contracts/parity.
+
+## 2026-11-10 — M4e owned finite piano voice and full-path checkpoint
+
+Continue from [M4e](MODULAR_AUDIO_ENGINE_M4E_PIANO_VOICES.md). User explicitly
+requests sustained port work and commits with the configured **lizMcLizface**
+identity (`121907922+lizMcLizface@users.noreply.github.com`); no push/deploy.
+
+`legacy.piano` v1 now owns prepared buffers, note/owner contracts, finite gain
+and lowpass automation, pitch-envelope cursors, polyphonic slots and release.
+The five supported variants still share two synthesis routines. Typed persisted
+configs regenerate owned PCM; irregular-block/save/reload/reset replay is exact.
+Actual native source capture supports both direct Instrument and Wasm-wrapper
+native instances. Accepted filter bases avoid sleeping AudioParam defaults and
+preserve the existing 11 kHz ceiling. Input holds wake shared compressor/FX only,
+keep legacy oscillators asleep and retain tails on release. Existing defaults,
+normal transport, JS preparation choice and keyboard backend remain operational.
+
+Final graph **d68f9dc21e528d44 / 348,821 bytes**. Five new piano allocation audits
+and previous30 report zero render allocation/reclamation/growth. Mixed real worker
+PCM (two pianos/core/FM/drums + sidechain master) is exact against serial. Broad
+**489 tests /70 files** pass; later **88 tests /5 files** cover direct-native
+capture, piano DAG, Instrument behavior and All. Public package build passes.
+
+Seven actual browser dry comparisons pass: max relative RMS0.0012690086033075425,
+min correlation0.9999991948255997. Zero-pitch Felt acoustic max error4.470348e-8.
+This is approximate native SRC parity, explicitly not bit identity. Actual
+four-case All-host batch passes:942000-frame audition and726000-frame progression
+on serial and actual worker, matching input hashes, zero worker delivery gaps or
+bad recycles. Separate audible942000-frame worker run has all six raw/channel
+peaks positive, master0.15849483013153076, zero underruns/late blocks, pass true.
+Evidence is in `reports/modular_audio/piano-{native-voice,full-path-muted,full-path-audible}-browser.json`.
+
+`tools/piano-voice.html` is a fixed standalone test page: one full muted batch,
+one listening audition, dry reference comparisons, Stop and compact-copy output.
+It creates its own host; All storage/settings/song are untouched. Direct LAN URL
+is `https://192.168.0.228:4176/tools/piano-voice.html`; existing HTTPS server serves
+this local build. No remote-app asset proxy or deployment is needed.
+
+Limits:48kHz only; lowpass only; finite prepared note-on/panic/cancel, not live
+pedal/off/retune. Native shared pitch/filter wander/vibrato/LFO and voice-steal
+pre-fades are rejected, not dropped. Fixed test host explicitly disables voice
+wander.128 banks/64MiB retained PCM/source/2000notes/65536points/32slots, plus All
+120s and combined graph budgets. Serial preparation may do substantial work on
+the worklet thread; no production live-start deadline or CPU improvement claimed.
+Matched acoustic, calibrated tables, Iowa and classic adapters remain unported.
+
+Next: meaningful phone mixed-piano listening/counter gate on the fixed page,
+then shared native piano modulation and steal-fade parity. Keep batching local
+verification; do not resume tiny settings-matching phone requests or latency
+experiments. Human listening, lock-screen behavior and isolated wet PCM parity
+remain unassessed by these new reports.

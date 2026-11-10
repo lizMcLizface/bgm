@@ -2,6 +2,7 @@
 //! This renders note material off the audio callback, not a voice/FX graph.
 use std::f64::consts::{PI, TAU};
 mod acoustic;
+pub mod voice;
 
 fn clamp(x: f64, lo: f64, hi: f64) -> f64 {
     if x.is_finite() {
@@ -13,6 +14,7 @@ fn clamp(x: f64, lo: f64, hi: f64) -> f64 {
 pub struct Piano {
     pub samples: Vec<f32>,
 }
+#[derive(Clone, Copy, PartialEq)]
 pub struct Settings {
     pub electric: bool,
     pub decay: f64,
@@ -55,6 +57,13 @@ fn partial(out: &mut [f32], sr: f64, freq: f64, amp: f64, t60: f64, bloom: f64) 
     }
 }
 impl Piano {
+    pub fn note(sr: f64, freq: f64, kind: u32, settings: Settings, wear: f64) -> Self {
+        if kind < 2 {
+            Self::strike(sr, freq, settings)
+        } else {
+            acoustic::render(sr, freq, kind, settings, wear)
+        }
+    }
     pub fn strike(sample_rate: f64, frequency: f64, s: Settings) -> Self {
         let sr = clamp(sample_rate, 8000., 192000.);
         let freq = clamp(frequency, 10., sr / 6.);

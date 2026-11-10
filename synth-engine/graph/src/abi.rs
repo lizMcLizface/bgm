@@ -24,6 +24,19 @@ pub unsafe extern "C" fn graph_contracts_free(s: *mut String) {
 fn status(result: Result<()>) -> u32 {
     result.err().map_or(0, |e| e as u32)
 }
+fn piano_status(g:&mut Graph,id:u32,f:impl FnOnce(&mut calmbgm_piano::voice::Engine)->bool)->u32 {
+    match g.piano_edit(id){Ok(p)=>if f(p){0}else{Error::Contract as u32},Err(e)=>e as u32}
+}
+#[no_mangle]
+pub extern "C" fn graph_piano_config(g:&mut Graph,id:u32,voices:usize,cutoff:f64,q:f64,pitch:f64,decay:f64)->u32 {piano_status(g,id,|p|p.configure(voices,cutoff,q,pitch,decay))}
+#[no_mangle]
+pub extern "C" fn graph_piano_bank(g:&mut Graph,id:u32,freq:f64,kind:u32,decay:f64,brightness:f64,hammer:f64,unison:f64,velocity:f64,seed:u32,resonance:f64,softness:f64,sustain:f64,wear:f64)->u32 {
+    piano_status(g,id,|p|p.bank(freq,kind,calmbgm_piano::Settings{electric:kind==1,decay,brightness,hammer,unison,velocity,seed,resonance,softness},sustain,wear))
+}
+#[no_mangle]
+pub extern "C" fn graph_piano_spec(g:&mut Graph,id:u32,note:u32,bank:usize,midi:f32,velocity:f32)->u32 {piano_status(g,id,|p|p.note_spec(note,bank,midi,velocity))}
+#[no_mangle]
+pub extern "C" fn graph_piano_point(g:&mut Graph,id:u32,note:u32,kind:u32,frame:f64,value:f64,tau:f64)->u32 {piano_status(g,id,|p|p.point(note,calmbgm_piano::voice::Point{kind,frame,value,tau}))}
 #[no_mangle]
 pub extern "C" fn graph_pitch_config(g:&mut Graph,id:u32,scope:u32,index:u32,value:f64)->u32 {status(g.pitch_config(id,scope,index,value))}
 #[no_mangle]

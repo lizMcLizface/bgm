@@ -775,6 +775,62 @@
       "maxNoteEvents": 4000,
       "maxAutomationPoints": 65536,
       "latencyPolicy": "query prepared instance; FM reconstruction depends on quality"
+    },
+    {
+      "type": "legacy.piano",
+      "code": 10,
+      "version": 1,
+      "hostInput": false,
+      "latencyFrames": 0,
+      "tailFrames": -1,
+      "tailPolicy": "configured finite envelopes and lowpass state",
+      "bypass": "unsupported",
+      "reset": "phase and voices cleared; compressor gain reset",
+      "ports": [
+        {
+          "id": "audio.out",
+          "code": 0,
+          "direction": "out",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": false
+        }
+      ],
+      "parameters": [
+        {
+          "id": "gain",
+          "code": 0,
+          "unit": "linear",
+          "min": 0,
+          "max": 2,
+          "default": 1,
+          "rate": "audio",
+          "modulation": true,
+          "smoothingMs": 0
+        }
+      ],
+      "events": [
+        "parameter",
+        "modulation",
+        "note",
+        "cancel"
+      ],
+      "processing": "prepared finite mono piano voices, duplicated stereo",
+      "configuration": "piano spec v1; immutable banks and finite envelopes; graph note-on triggers",
+      "sampleRate": 48000,
+      "maxPreparedBanks": 128,
+      "maxPreparedPcmBytes": 67108864,
+      "maxNotes": 2000,
+      "maxVoices": 32,
+      "maxAutomationPoints": 65536,
+      "stealing": "rejected; native pre-onset fade pending",
+      "resampling": "linear; approximate native AudioBufferSource parity"
     }
   ]
 }

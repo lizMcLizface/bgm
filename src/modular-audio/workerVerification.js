@@ -6,8 +6,8 @@ const base=`${import.meta.env.BASE_URL}modular-audio/`;
 
 // Consumer-paced exact check in a real Worker. It is not an OfflineAudioContext
 // deadline benchmark (an offline context can outrun an asynchronous producer).
-export async function verifyWorker(assets,rate,{makeWorker=()=>new Worker(base+`graph-worker.js?v=${assets.manifest.version}`,{type:'module'}),generation=1,seconds=assets.fixture.totalSeconds,options:requestedOptions={}}={}) {
-  const options=workerOptions({...requestedOptions,generation}),endFrame=Math.round(seconds*rate),patch=sixSourceDag(assets.fixture,rate),worker=makeWorker(),channel=new MessageChannel();
+export async function verifyWorker(assets,rate,{makeWorker=()=>new Worker(base+`graph-worker.js?v=${assets.manifest.version}`,{type:'module'}),generation=1,seconds=assets.fixture.totalSeconds,options:requestedOptions={},patch:requestedPatch=null}={}) {
+  const options=workerOptions({...requestedOptions,generation}),endFrame=Math.round(seconds*rate),patch=requestedPatch??sixSourceDag(assets.fixture,rate),worker=makeWorker(),channel=new MessageChannel();
   const referenceBlockFrames=Math.max(1024,options.blockFrames),serial=new ReferenceGraph(new WebAssembly.Instance(assets.modules.graph,{}).exports,patch,assets.contracts,rate,referenceBlockFrames),views=sourceViews(serial),expected=new Float32Array(referenceBlockFrames*16);
   const sameCadence=options.blockFrames===referenceBlockFrames?serial:new ReferenceGraph(new WebAssembly.Instance(assets.modules.graph,{}).exports,patch,assets.contracts,rate,options.blockFrames),sameViews=sourceViews(sameCadence),sameExpected=sameCadence===serial?expected:new Float32Array(options.bufferBytes/4);
   let frame=0,blocks=0,maxAbs=0,sameCadenceMaxAbs=0,normalRangeMaxAbs=0,subnormalDifferences=0,nonFinite=0,rejectedPast=false,acceptedFuture=false,controlFrame=32768,appliedControl=false,timeout,referenceFrames=0;

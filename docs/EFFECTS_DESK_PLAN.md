@@ -1443,3 +1443,19 @@ buffers. The actual native per-voice filters/envelopes and current effects /
 mixer route remain intact; no effects DSP or sidechain route changes. Preparing
 the source is distinct from owning the whole piano voice or its wet chain.
 [Audit, compatibility and limits](MODULAR_AUDIO_ENGINE_M4D_PIANO_PREPARATION.md).
+
+### 2026-11-10: finite owned piano sources through the existing desk
+
+[M4e](MODULAR_AUDIO_ENGINE_M4E_PIANO_VOICES.md) feeds prepared owned piano raw
+stems into each actual native Instrument's synthMix before its existing shared
+compressor, instrument processing, external rack, sends, desk and master. Direct
+native and Wasm-wrapper hosts are supported. Reference-counted input holds keep
+only the effects path awake, then allow its existing tails to sleep. No desk,
+normal playback, effect-order or default backend migration is implied.
+
+Four actual browser full-path muted cases pass; separate audible six-source
+worker run (three pianos/core/FM/Hand) has positive raw/channel/master peaks and
+zero delivery gaps. Source and shared FX PCM remain separate evidence: these
+are not isolated wet equivalence or physical listening claims. Fixed test page
+`tools/piano-voice.html` avoids desk navigation and edits no All settings.
+Shared native voice modulation and piano steal fades are explicitly gated.
