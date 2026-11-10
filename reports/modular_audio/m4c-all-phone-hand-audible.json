@@ -1,0 +1,43 @@
+{
+  "kind": "all.source-preview.diagnostics",
+  "version": 2,
+  "material": "voice-audition",
+  "audition": {"version":1,"material":"diagnostic-test-notes","schedule":"individual-attacks-then-overlap","songUnchanged":true,"soloSlotFrames":36000,"soloGateFrames":24000,"overlapFrame":150000,"overlapGateFrames":96000},
+  "stems": [
+    {"role":"lead","sourceId":1,"kind":"subtractive","noteCount":2,"peaks":{"source":0.13152208924293518,"channel":0.04429110139608383}},
+    {"role":"counter","sourceId":2,"kind":"subtractive","noteCount":2,"peaks":{"source":0.11980519443750381,"channel":0.017152760177850723}},
+    {"role":"bass","sourceId":5,"kind":"subtractive","noteCount":2,"peaks":{"source":0.23618116974830627,"channel":0.06282433122396469}},
+    {"role":"perc","sourceId":6,"kind":"percussion","noteCount":0,"hitCount":17,"audibleHitCount":17,"kitVoice":"hand","hitIdBase":0,"ignoredSoundParams":[],"ignoredBasicKitTrackKeys":[],"peaks":{"source":0.3017127811908722,"channel":0.07844538986682892}}
+  ],
+  "excludedRoles": [],
+  "runId": "7a34d143-4191-4003-b87a-a1e7b00bea1a",
+  "hostRevision": "all-preview-delivery-v10",
+  "sourceFingerprint": "f5bde8992f6e2fefa3e4875a8ed70237583d0349138c39e4c3ae6e9f3f94c48d",
+  "diagnosticProbe": null,
+  "probeTrace": null,
+  "engineVersion": "62315b4104f2fc7e",
+  "startedAtUtc": "2026-11-10T15:28:11.713Z",
+  "browserUserAgent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Mobile Safari/537.36",
+  "sampleRate": 48000,
+  "role": "source-set",
+  "reason": "completed",
+  "error": null,
+  "complete": true,
+  "pass": true,
+  "listening": "not assessed",
+  "executor": {"requested":"worker","actual":"worker","scheduling":"message","blockFrames":512,"poolBlocks":12,"bufferingLatencyMs":128,"stopOnUnderrun":true,"deliveryDiagnostics":true},
+  "fallbackReason": null,
+  "frames": {"planned":634800,"consumed":634800,"output":641024,"rendered":634800},
+  "events": {"applied":29,"late":0,"overflow":0},
+  "delivery": {"underrunFrames":0,"underrunQuanta":0,"recoveries":0,"lateBlocks":0,"rejectedBlocks":0,"staleGeneration":0,"acceptedBlocks":1240},
+  "lead": {"minFrames":1152,"zeroLeadQuanta":0,"belowQuantumQuanta":0,"firstZeroSourceFrame":null},
+  "arrival": {"maxGapFrames":4864,"maxConsumedSinceArrivalFrames":4864,"overCapacityQuanta":0},
+  "worker": {"blocks":1240,"renderMs":3817.4999994039536,"maxRenderMs":28.69999998807907,"badRecycles":0},
+  "timingScope": "Last packet: producer at send; worker/producerLater: queried later. No synchronized clocks.",
+  "lastPacket": {
+    "packetFrame":634368,"frames":432,"sourceFrameAtArrival":631040,
+    "producer":{"version":1,"available":true,"frame":634800,"blocks":1240,"freeBuffers":0,"inFlightBuffers":12,"elapsedMs":13310.700000017881,"taskWaits":1240,"taskWaitMs":0.10000002384185791,"taskWaitMaxMs":3.0999999940395355,"poolWaits":1136,"poolWaitMs":0.29999998211860657,"poolWaitMaxMs":126.30000001192093,"recycleRttMs":111.69999998807907,"recycleRttMaxMs":238.5,"lastRecycleConsumerFrame":628735,"renderMs":2,"maxRenderMs":28.69999998807907}
+  },
+  "producerLater":{"available":true,"taskWaitMaxMs":3.0999999940395355,"poolWaitMaxMs":126.30000001192093,"recycleRttMaxMs":238.5,"lastRecycleConsumerFrame":634799,"readyTaskAgeMs":null,"poolEmptyAgeMs":null},
+  "outputProcess":{"available":false,"calls":null,"maxMs":null,"overQuantumPeriod":null}
+}

@@ -2,6 +2,9 @@ import React,{act} from 'react';
 import {createRoot} from 'react-dom/client';
 import {it,expect,vi,afterEach} from 'vitest';
 import WorkbenchPreviewReport,{previewDeliverySummary,compactPreviewDiagnostics} from './WorkbenchPreviewReport';
+it('keeps the sixth drum stem and bounded kit/hit metadata, with hits separate from pitched notes',()=>{
+ const r=report();r.stems=Array.from({length:6},(_,i)=>({role:i===5?'perc':'voice'+i,sourceId:i+1,kind:i===5?'percussion':'subtractive',noteCount:i===5?0:2,hitCount:i===5?17:undefined,audibleHitCount:i===5?17:undefined,kitVoice:'hand',hitIdPolicy:{base:41},expression:{ignoredSoundParams:['tune'],ignoredBasicKitTrackKeys:['mt']},peaks:{source:.2,channel:.1}}));const compact=compactPreviewDiagnostics(r);expect(compact.stems).toHaveLength(6);expect(compact.stems[5]).toMatchObject({role:'perc',sourceId:6,noteCount:0,hitCount:17,audibleHitCount:17,kitVoice:'hand',hitIdBase:41,ignoredSoundParams:['tune'],ignoredBasicKitTrackKeys:['mt']});mount(r);expect(container.querySelector('table').textContent).toContain('Hits');expect(container.querySelector('tbody').lastElementChild.textContent).toContain('perc017');
+});
 let root,container;const savedAct=globalThis.IS_REACT_ACT_ENVIRONMENT;
 afterEach(()=>{act(()=>root?.unmount());container?.remove();vi.unstubAllGlobals();globalThis.IS_REACT_ACT_ENVIRONMENT=savedAct;});
 const report=()=>({runId:'test-run',startedAtUtc:'2026-11-09T00:00:00.000Z',mode:'worker',executor:{actual:'worker',requested:'worker',bufferingLatencyMs:64},plan:{endFrame:1000,graph:{events:[{},{}]}},stats:{output:{sourceFrame:128,queue:{underrunFrames:128,lateBlocks:2}},worker:{graph:{applied:1}}},complete:false,pass:false});

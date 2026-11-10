@@ -1029,3 +1029,15 @@ build pass. Legacy percussion Wasm stays byte-identical. All Drums eligibility /
 backend/defaults are unchanged. Next real Wasm-kit-only lease/shared-expression
 compiler and six-stem reporting, preserving external FX/mixer/legacy pads and
 explicit native/classic exclusions, before browser/phone acceptance.
+
+[Finite All kit integration](MODULAR_AUDIO_ENGINE_M4C_ALL_KITS.md) is delivered:
+ready actual Wasm basic kits join chosen sources with the current external
+inserts/mixer, source ID6, combined event budget and six-stem hit diagnostics.
+Native/classic sources remain excluded, never substituted. Shared All drum
+expression and private hit IDs preserve the song/live pads; kit edits stop all
+private sources coherently. 163 checks, build and actual all-six worker/Serial
+paths pass, including fader isolation, original restoration and legacy playback.
+Phone Hand +three core diagnostic also completes without errors and the user
+confirms clean drum entry/overlap. Hostv10, engine62315 unchanged. Next full
+captured progression with those selected sources; silent score slots and
+omitted native Piano roles are not full-song acceptance or default migration.

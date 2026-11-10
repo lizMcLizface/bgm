@@ -12,7 +12,9 @@ now activates sparse roles without editing the user's song. Phone Lead/counter /
 Bass full diagnostic delivery and listening are clean; other families and
 real-song acceptance stay separate gates.
 [Owned percussion kit configuration](MODULAR_AUDIO_ENGINE_M4C_KIT_CONFIGURATION.md)
-is delivered; the finite Wasm-kit All lease/compiler is next.
+and the [finite All kit lease/compiler](MODULAR_AUDIO_ENGINE_M4C_ALL_KITS.md) are
+delivered, with desktop six-source and phone four-source diagnostic gates
+passed. Complete captured-pattern playback is next; normal migration stays gated.
 Normal transport/default backend migration remains gated.
 All six source engines have owned mutable Rust state; core's read-only additive
 tables are safely shared after preparation. External stereo host inputs and
@@ -1092,3 +1094,21 @@ phone acceptance. Next ready Wasm basic-kit-only finite lease/compiler, dry
 existing percussion role input, ID6/six-stem diagnostics and <=4,000 combined
 events, then real silent/audible/device gates. Native/classic sources remain
 unsupported; no sound substitution or broad migration.
+
+### M4c finite All kit integration delivered
+
+Actual ready Wasm basic kits now join selected and up-to-six-source finite
+previews through the current external percussion FX/mixer path. Kit/palette /
+source-revision leases, shared drum expression, private hit-ID policy, ignored
+sound-lock/track metadata, source ID6 and six-stem reports preserve ownership
+and legacy pads. Combined <=4,000 events and existing finite bounds remain.
+Native/classic exclusions are explicit; defaults/schema/backend stay intact.
+[Contracts and exact results](MODULAR_AUDIO_ENGINE_M4C_ALL_KITS.md): **163 checks**,
+build and actual desktop all-six worker/twelve +Serial **706,800 /37 events**,
+zero misses, channel isolation, coherent kit cancellation, pad/keyboard coexistence,
+score hash/original selectors/default restoration and ordinary Play pass.
+Phone three-core+Hand diagnostic **634,800 /29**, zero delivery errors and
+user-confirmed clean drum entry/overlap. Raw run-bound evidence retained.
+Next complete current-progression selected-source pass; sparse slots and
+unsupported native roles must remain explicit. No normal transport migration,
+new sidechain/worker pool, latency experiment or deployment.

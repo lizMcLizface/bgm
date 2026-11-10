@@ -15,7 +15,9 @@ now activates sparse voices without changing the song. Phone Lead/counter/Bass
 delivery and listening are clean for this material; exact checkpoints follow.
 [Owned basic-kit configuration](MODULAR_AUDIO_ENGINE_M4C_KIT_CONFIGURATION.md)
 now passes configured legacy PCM/persistence/independence/allocation checks.
-Next is its Wasm-kit-only finite All lease/hit compiler, not a default switch.
+The [finite All kit integration](MODULAR_AUDIO_ENGINE_M4C_ALL_KITS.md) also
+exists. Desktop six-source paths and phone Hand + three-core diagnostic
+delivery/listening are clean; current captured-pattern playback is the next gate.
 
 Prepared and implemented through the opt-in M4a finite All source preview on 2026-11-09. Read the working tree, this file and
 [MODULAR_AUDIO_ENGINE_PLAN.md](MODULAR_AUDIO_ENGINE_PLAN.md) first. This is an
@@ -2283,6 +2285,60 @@ legacy source manifest was caught and rebuilt before final success; bytes
 remain unchanged. Version2 also exposed a type-only descriptor lookup, fixed
 to use type/version before the final full rerun. No native executable/AC bypass
 or new browser/phone run.
+
+## M4c finite All Wasm kits delivered (2026-11-10)
+
+After `1dd3a77`, [actual Wasm basic-kit integration](MODULAR_AUDIO_ENGINE_M4C_ALL_KITS.md)
+adds Drums to selected-source preview and **Chosen sources together**. Actual
+ready module/node, basic palette/model and dry-room invariant are required;
+native/classic families remain named unsupported, with no sound substitution.
+A kit snapshot and live hit-counter base feed module2/source ID6 before current
+external percussion inserts/mixer. It avoids legacy sleep timers and never
+touches the live counter/wake/voice queue. Kit/revision/source edits invalidate
+the whole group; existing keyboard/pads and normal backend remain connected.
+
+Shared All `drumStepEvents` expression, finite cycle0/fillfalse/captured seed,
+semantic IDs/variation/duration and ignored sound-lock/track metadata are
+preserved. Private IDs increment for enabled expanded bookings only. Six-source
+combined budget <=4,000 events /2,000 notes, current finite 48 kHz bounds,
+longest tail including percussion8.1 s. Diagnostic audition uses actual kit
+four-hit entry + overlap beat (**17 hits**) without touching the score. Full
+silent audition observes all sources/tails; ordinary probes remain two seconds.
+Six-stem compact/full reports distinguish notes/hits and actual kit/ID base.
+Host **v10**, engine **62315b4104f2fc7e** unchanged. Defaults/schema/transport /
+keyboard stay unchanged; percsingle capacity comparison is hidden/rejected.
+
+**163 checks /12 files (51.45 s)**, including real mixed six-source worker PCM
+exact versus independent graphs/kick bus and invalidation/limits/UI, pass.
+Public package/provenance build **34.44 s**, final phone-hint build **32.09 s**
+pass. Actual 390 px browser Hand+three core completes muted/audible **634,800 /
+29 events /1,240 blocks**, all six (temporary four core+counter FM+Hand) completes
+**706,800 /37 /1,381** in worker/twelve and explicit Serial, all audible stems
+positive and no delivery/event/recycle errors. Six-source worker master0.212631.
+Drums fader0.75→0.55 leaves same raw/input hash, channel ratio0.159958 and other
+channels active; restored0.75. Kit change stops all at20,736/passfalse. Score
+capture hash restored before/after kit cycle. Legacy Chord survives private
+Stop; legacy pad changes live hit base0→1 while private auditions leave it0.
+Selected Drums bus6/96k probe works. Original selectors/defaults/native exclusion
+restore on reload; ordinary legacy Play shows5 notes/31 meter segments, later
+6/44. Eleven full plans independently rehashed. Sampled wet peaks/desktop audio
+are not physical listening; no setup-file byte claim. QA cleanup complete;
+normal-user LAN HTTPS PID8368 remains running. Raw `m4c-all-*.json` and image
+`.tmp/m4c-all-six-signals.png`; no deployment or new Rust/native executable.
+
+**Phone diagnostic accepted:** guarded audible **7a34d143-4191-4003-b87a-a1e7b00bea1a**,
+v10/62315/48 kHz/Message512x12/128 ms, IDs[1,2,5,6], core notes2/2/2 +Hand17hits,
+all634,800 source frames/29events/1,240blocks, no errors. Min steady lead1,152 /
+24 ms, max gap4,864 /101.33 ms. User explicitly confirms **Clean drum entry and
+overlap**, bound separately to run/hash. Raw automated listening unassessed
+retained. Compact-only phone export: no independently rehashed full plan or
+phone silent pair, and no six-source/native/classic/real-song/lock-screen claim.
+
+**Next check:** same four sources/Hand/worker/twelve, Material **Current
+progression**, one complete captured-pattern pass. Sparse Lead/counter may have
+zero notes, and native Piano sources are omitted; never label that full-song
+migration or active-four-voice listening. Preserve finite scope, guard, current
+defaults and longer phone lookahead. Native adapters remain separate work.
 
 Artifacts `m4c-kit-configured-pcm.json`, `m4c-kit-allocation.json`, and
 `m4c-percussion-seam-configured-audit.json`; original negative seam evidence

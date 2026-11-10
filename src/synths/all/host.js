@@ -29,6 +29,7 @@ import {masterBus} from '../../audio/bus';
 import {presetFromEdit} from '../../app/editor/presetEdits';
 import {createMixerAudio,createDeskLimiter} from './mixerAudio';
 import {sourceStemTap} from './sourceStemTap';
+import {percussionStemTap} from './percussionStemTap';
 import {readBook,withPresetBook,applyBook,cleanBook,baselineChoice,withoutSettings} from '../../app/rulebook/session';
 import {RULES} from '../../app/rulebook/model';
 import {DRUM_TRACKS} from '../../app/drumMappings';
@@ -267,10 +268,11 @@ export function createHost(scene, {seed,settings:storedSettings} = {}) {
     }
     function applyDesk(state){deskState=state;deskAudio?.patch(state);}
 
-    function sourcePreviewStatus(role){try{ensureActive();const tap=sourceStemTap(g.roles[role]?.instrument);return {eligible:true,kind:tap.kind};}catch(e){return {eligible:false,reason:e.message};}}
+    const stemTap=(role,instrument,guard)=>role==='perc'?percussionStemTap(instrument,{input:g.roles.perc.gain,machine:g.roles.perc.machine},guard):sourceStemTap(instrument,guard);
+    function sourcePreviewStatus(role){try{ensureActive();const tap=stemTap(role,g.roles[role]?.instrument,ensureActive);return {eligible:true,kind:tap.kind};}catch(e){return {eligible:false,reason:e.message};}}
     function openSourceStem(role,onClose=()=>{}){
-        ensureActive();const instrument=g.roles[role]?.instrument,tuningKey=JSON.stringify(tuning.get());let closed=false;
-        const tap=sourceStemTap(instrument,()=>{ensureActive();if(closed||g.roles[role]?.instrument!==instrument||JSON.stringify(tuning.get())!==tuningKey)throw Error('The source host or tuning changed.');});
+        ensureActive();const instrument=g.roles[role]?.instrument,sourceRevision=g.roles[role]?.sourceRevision,tuningKey=JSON.stringify(tuning.get());let closed=false;
+        const tap=stemTap(role,instrument,()=>{ensureActive();if(closed||g.roles[role]?.instrument!==instrument||g.roles[role]?.sourceRevision!==sourceRevision||JSON.stringify(tuning.get())!==tuningKey)throw Error('The source host or tuning changed.');});
         const lease={...tap,role,context:g.AC,channelOutput:g.roles[role].mixOutput??g.roles[role].wander.output,masterOutput:deskAudio?.output??g.levelTrim,tune:midi=>tunedNote(role,midi),release(){if(closed)return;closed=true;sourceTaps.delete(lease);},close(){if(closed)return;lease.release();onClose();}};
         sourceTaps.add(lease);return lease;
     }

@@ -6,6 +6,10 @@ actual kick bus and byte-identical legacy percussion ABI. Exact configured PCM,
 reset/persistence/independence, worker buses and allocation checks pass. This
 does not change effects desk audio or add a new desk sidechain. Next is the
 finite All Wasm-kit adapter through its existing external effects/mixer path.
+That [finite All adapter](MODULAR_AUDIO_ENGINE_M4C_ALL_KITS.md) now works, with
+actual six-source desktop output and phone Hand+three-core diagnostic listening
+accepted. Existing effects desk and legacy DSP remain unchanged; no new
+sidechain route or normal transport migration is inferred.
 
 M3k update: [run-bound listening records](MODULAR_AUDIO_ENGINE_M3K_LISTENING.md)
 now support local save/review/JSON export without changing playback settings or
