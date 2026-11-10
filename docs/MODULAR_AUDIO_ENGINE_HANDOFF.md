@@ -2286,6 +2286,17 @@ remain unchanged. Version2 also exposed a type-only descriptor lookup, fixed
 to use type/version before the final full rerun. No native executable/AC bypass
 or new browser/phone run.
 
+Artifacts `m4c-kit-configured-pcm.json`, `m4c-kit-allocation.json`, and
+`m4c-percussion-seam-configured-audit.json`; original negative seam evidence
+preserved. Source PCM is not wet effects, browser queue or physical listening.
+Phone v9/d6a three-voice listening remains its own prior build/material gate.
+
+**Next at this checkpoint (delivered below):** actual ready Wasm basic-kit-only
+host lease and finite drum compiler, capturing the current kit/palette/private
+hit-ID policy and shared All `drumStepEvents` expression. Extend the explicit
+group/report to source ID6/six stems and combined <=4,000 events. Native Web
+Audio/classic machines stay named unsupported; no normal transport migration.
+
 ## M4c finite All Wasm kits delivered (2026-11-10)
 
 After `1dd3a77`, [actual Wasm basic-kit integration](MODULAR_AUDIO_ENGINE_M4C_ALL_KITS.md)
@@ -2365,20 +2376,3 @@ Current progression, one guarded complete pass plus compact report/listening.
 This concrete check is ready; wait for its result before further acceptance
 or broad/native migration. Earlier diagnostic listening remains accepted
 separately. No blocker, default switch or deployment.
-
-Artifacts `m4c-kit-configured-pcm.json`, `m4c-kit-allocation.json`, and
-`m4c-percussion-seam-configured-audit.json`; original negative seam evidence
-preserved. Source PCM is not wet effects, browser queue or physical listening.
-Phone v9/d6a three-voice listening remains its own prior build/material gate.
-LAN HTTPS PID8368 stays running, local build refreshed; no deployment.
-
-**Next bounded implementation:** actual ready **Wasm basic-kit-only** host lease
-and finite drum compiler, capturing current kit/palette/private hit-ID policy,
-shared All `drumStepEvents` expression and honest existing basic-kit sound-lock
-limits. Host-owned dry percussion role input preserves external inserts/mixer
-and avoids unrelated live-kit sleep timers. Extend explicit group/report to
-source ID6/six stems and combined <=4,000 events with longest tail; preserve
-Stop/Panic/source invalidation/legacy drum pads and worker/twelve option. Native
-Web Audio/classic machines stay named unsupported, with no automatic source
-substitution. Full silent browser/guarded audible phone checks follow before
-any acceptance. No normal transport migration or latency experiment.
