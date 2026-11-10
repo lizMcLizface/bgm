@@ -4,8 +4,10 @@ Agreed direction: 2026-11-09. Status: **M0/M1, the opt-in M2 percussion/sidechai
 slice, M3a's actual six-role serial baseline, M3b owned FM, M3c owned core,
 M3d pitched DAG, M3e bounded single-worker transport, M3f three-worker source pool
 and M3g opt-in buffering profiles plus M3h queue-lead observability and M3i opt-in scheduling experiment plus M3j packet-arrival/headroom diagnostics and M3k run-bound listening records delivered**. The [M3 decision gate](MODULAR_AUDIO_ENGINE_M3_DECISION_GATE.md)
-authorizes only the [M4a finite All source preview](MODULAR_AUDIO_ENGINE_M4A_WORKBENCH_SOURCE.md);
-normal transport/default backend migration remains gated.
+led to the [M4a finite All source preview](MODULAR_AUDIO_ENGINE_M4A_WORKBENCH_SOURCE.md).
+On 2026-11-10 the user prioritized other voices/full-path behavior over lower
+latency, extending the opt-in finite adapter to [M4b pitched sets](MODULAR_AUDIO_ENGINE_M4B_PITCHED_SET.md).
+Normal transport/default backend migration remains gated.
 All six source engines have owned mutable Rust state; core's read-only additive
 tables are safely shared after preparation. External stereo host inputs and
 graph program/key compression exist. All six sources now also run inside one
@@ -985,3 +987,32 @@ warmup explanation, preserving source/device-state limits. Next separate pool
 capacity from startup delay in an explicit twelve-slot / 64-vs-128-ms startup
 comparison, with accurate render-ahead versus live-event-latency semantics.
 Keep defaults, legacy DSP and ordinary guard; no broader migration/deployment.
+
+## M4b: finite pitched sets delivered (2026-11-10)
+
+User accepts longer phone buffering for listening and explicitly prioritizes
+other voices, conflicts and full-path behavior. Startup-delay experiments are
+deferred. [M4b contracts/results](MODULAR_AUDIO_ENGINE_M4B_PITCHED_SET.md) add an
+explicit chosen set of up to five ready core/FM roles: one owned graph/common
+clock, stable role/owner IDs, distinct existing per-role source FX/mixer inputs,
+shared master, combined 2,000-note budget, coherent invalidation and cleanup.
+Mute/solo omissions and intentionally empty/missing patterns are explicit;
+unsupported native piano/classics/percussion are shown, not substituted. Default
+scope, Serial/six, keyboard/MIDI, transport and setup schemas remain unchanged.
+
+**286 tests / 34 files, 112.66 s** pass; browser found a missing-pattern edge
+case, fixed with **24 final overlapping capture/controller/threaded checks**.
+Final public build **33.66 s** passes. Five mixed overlapping threaded stems
+are raw-equal to independent scalar source graphs; noncontiguous IDs/silent
+roles and inactive buses are covered. Host v8, engine d6a0341e5edf2d57 unchanged.
+Actual browser all-five-active worker/twelve completes **905,116 / 56 events**,
+five independent raw/channel signals, master activity and zero transport misses.
+Mixer isolation, keyboard coexistence, source invalidation, original voice/fader
+restoration, legacy playback and default/report reset on reload pass. Physical
+listening and isolated wet-PCM/setup-file byte parity are not claimed.
+
+Next collect requested phone set probe/listening, checking which roles actually
+have notes. Then audit the real All percussion seam/kit/hit translation into
+its already-owned Rust engine; native piano remains a separate adapter gate.
+Preserve the finite scope and existing instruments; no default replacement,
+latency chase, fixture substitution, deployment or broad migration.

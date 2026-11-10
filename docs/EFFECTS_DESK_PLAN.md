@@ -1408,3 +1408,13 @@ actual worker/core/FM/Effects/host regressions and public package checks pass.
 Desktop phone-sized layout and live serial are verified; phone worker cause and
 physical output quality remain unknown. Obtain compact target-device evidence
 before tuning or expanding the modular migration. No deployment.
+
+2026-11-10: user prioritizes other-voice/full-path behavior over phone latency.
+[M4b pitched sets](MODULAR_AUDIO_ENGINE_M4B_PITCHED_SET.md) connect up to five
+actual ready core/FM sources to their existing per-role insert/FX/send/mixer
+paths under one source clock and the existing shared output. Five active browser
+stems, independent worker PCM, Lead-only channel attenuation, keyboard coexistence,
+coherent source-edit/Stop cleanup and restored legacy playback/reload pass.
+DSP, effect ownership, setup schemas and normal keyboard/backend remain intact.
+Native piano/percussion adapters and physical phone set listening remain gated;
+startup-delay experiments are deferred, no broad effect migration/deployment.

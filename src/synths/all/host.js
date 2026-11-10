@@ -267,6 +267,7 @@ export function createHost(scene, {seed,settings:storedSettings} = {}) {
     }
     function applyDesk(state){deskState=state;deskAudio?.patch(state);}
 
+    function sourcePreviewStatus(role){try{ensureActive();const tap=sourceStemTap(g.roles[role]?.instrument);return {eligible:true,kind:tap.kind};}catch(e){return {eligible:false,reason:e.message};}}
     function openSourceStem(role,onClose=()=>{}){
         ensureActive();const instrument=g.roles[role]?.instrument,tuningKey=JSON.stringify(tuning.get());let closed=false;
         const tap=sourceStemTap(instrument,()=>{ensureActive();if(closed||g.roles[role]?.instrument!==instrument||JSON.stringify(tuning.get())!==tuningKey)throw Error('The source host or tuning changed.');});
@@ -533,7 +534,7 @@ export function createHost(scene, {seed,settings:storedSettings} = {}) {
     }
 
     return {
-        g, settings, loaded, editSettings,editRule,restoreBook,get book(){return book;}, applySceneVoices, applyFrontPageLink, setSound, setPreset, soundOf, nativeOf, editNative, editValues, editDrumKit, rackValues, editRack, editMixer, mixerSnapshot, restoreMixer, snapshotSounds, restoreSounds, setupMixer, applyDesk, openSourceStem, setTempo, openMonitor, openMeters, capture, note, tunedNote, drum, drumTrack, setDrumMix, getDrumMix,
+        g, settings, loaded, editSettings,editRule,restoreBook,get book(){return book;}, applySceneVoices, applyFrontPageLink, setSound, setPreset, soundOf, nativeOf, editNative, editValues, editDrumKit, rackValues, editRack, editMixer, mixerSnapshot, restoreMixer, snapshotSounds, restoreSounds, setupMixer, applyDesk, sourcePreviewStatus, openSourceStem, setTempo, openMonitor, openMeters, capture, note, tunedNote, drum, drumTrack, setDrumMix, getDrumMix,
         get context() { return g.AC; },
         async wake() { await g.AC.resume(); if (g.percussionReady) await g.percussionReady; g.endStopFade?.(); },
         setScene(next) { hostScene.scene = next; },

@@ -966,3 +966,18 @@ with identical per-capacity delivery/lead/gap counters to the forward pair.
 Host v7, engine unchanged. Next is an opt-in fixed twelve-slot pool with separate
 64/128-ms startup comparison, accurately retaining 128-ms render-ahead/live-edit
 constraints. No ordinary keyboard, schema, default or migration change.
+
+User priority update (2026-11-10): phone lookahead is acceptable for listening;
+other voices/full-path conflicts come first. Startup-delay work is deferred.
+[M4b finite pitched sets](MODULAR_AUDIO_ENGINE_M4B_PITCHED_SET.md) now preview up
+to five ready core/FM roles together under one clock with separate existing
+source FX/mixer paths and shared master. Explicit role/readiness UI, mute/solo
+omissions, silent empty slots, coherent invalidation and per-role diagnostics
+preserve the workbench. Native piano/classics/percussion are shown unsupported;
+they are not replaced. Default single scope, legacy keyboard and setup stay.
+**286 broad tests**, **24 final overlapping checks**, public build and actual
+browser all-five-active worker/twelve (905,116 frames / 56 events / zero misses),
+channel attenuation, keyboard coexistence, source edit/Stop, original source /
+fader restoration, legacy playback and reload pass. Phone set evidence pending;
+next audit actual percussion adapter after its listening gate. Host v8, engine
+unchanged; no default/backend migration, deployment or low-latency detour.

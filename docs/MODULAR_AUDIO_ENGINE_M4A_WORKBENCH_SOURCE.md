@@ -143,3 +143,9 @@ of eligible pitched roles, keeping one patch/owner authority per role and
 coherent failure, existing mixer/FX paths and explicit stopped switching.
 Translate unsupported percussion/voice families and continuous transport only
 behind separate acceptance gates; do not substitute the fixed six-role fixture.
+
+2026-11-10 continuation: clean phone twelve-slot Bass listening/full-run evidence
+is retained, and user prioritizes other voices over latency. The eligible pitched
+set extension is now delivered as [M4b](MODULAR_AUDIO_ENGINE_M4B_PITCHED_SET.md),
+with mixed-core/FM role paths, isolation/keyboard/cleanup/reload verification.
+Native piano, percussion and normal backend replacement remain separate gates.

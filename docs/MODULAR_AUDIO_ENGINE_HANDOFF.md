@@ -5,6 +5,12 @@ step, then continue**. This authorizes local commits of verified steps without
 another confirmation. Keep the existing checkout and work; no push/deployment
 is authorized. Record verification, limitations and the next task in each step.
 
+**Current priority (2026-11-10):** the user accepts phone lookahead for listening
+and wants other voices/full-path behavior first. Lower-startup-delay experiments
+are deferred. [M4b finite pitched sets](MODULAR_AUDIO_ENGINE_M4B_PITCHED_SET.md)
+now extend the explicit preview; read the latest checkpoint below. Native piano,
+classics and percussion adapters/normal transport remain separate gates.
+
 Prepared and implemented through the opt-in M4a finite All source preview on 2026-11-09. Read the working tree, this file and
 [MODULAR_AUDIO_ENGINE_PLAN.md](MODULAR_AUDIO_ENGINE_PLAN.md) first. This is an
 implementation handoff. **M0/M1, owned percussion/sidechain M2 and the actual
@@ -2063,3 +2069,60 @@ Preserve existing defaults and accurate queue-capacity/latency metadata. Reduced
 startup must not be labeled reduced live-event latency: already-rendered state
 still imposes lookahead. Verify queue/clock contracts before muted phone test,
 then audible guarded listening only on clean delivery. No migration/deployment.
+
+## M4b captured pitched-set paths (2026-11-10)
+
+After `6c4420a`, user prioritizes voices/interaction/conflict coverage over lower
+latency. [Full contracts/results](MODULAR_AUDIO_ENGINE_M4B_PITCHED_SET.md) add
+Source scope **Chosen pitched voices together**, explicit ready-role checkboxes
+and unsupported reasons. Select ready voices refreshes readiness/selection.
+One private graph owns up to five actual core/FM sources/events, common clock,
+stable lead/counter/rhythm/pad/bass IDs 1..5, separate raw stems into each existing
+FX/mixer path and shared master. Combined 2,000 notes / 4,000 events; longest
+tail sets end. Empty/missing patterns remain silent, entirely empty sets fail;
+mute/solo-excluded roles are named and omitted. No unsupported patch replacement.
+
+Connect all gains/taps before one arm. Silent probe mutes all stems; normal
+first-miss guard stops all coherently. Any source/tuning/score/tempo/selection/
+host invalidation or Stop/Panic disposes every private route/gain/tap/lease,
+leaving legacy keyboard connected. Per-role notes/IDs/kinds/raw+channel peaks
+are in full/compact reports; active roles require signal, empty ones do not.
+Normal song transport stays excluded during preview. Single scope/Serial/six
+defaults, original IDs/patches/setup schema and keyboard backend stay unchanged.
+Capacity-order comparisons remain single-role only. Host **all-preview-delivery-v8**;
+engine **d6a0341e5edf2d57**, byte-identical 296,101-byte Wasm; no DSP/protocol rebuild.
+
+**286 tests / 34 files (112.66 s)** pass. A real browser found absent counter
+pattern incorrectly rejected by the set; pre-fix error/pass false/no executor
+is retained. Fix treats absent set slots as silent while single missing-pattern
+rejection remains. **24 final overlapping tests / three (1.44 s)** pass, including
+exact raw PCM versus five independent sources, duplicate per-owner note IDs,
+noncontiguous buses/silent roles, budgets and cleanup. Final public package /
+provenance build **33.66 s** passes. Existing chunk warning; no AC bypass.
+
+Actual 390 px browser: current three-slot muted probe [1,2,5] passes, with sparse
+lead/counter zero notes correctly reported. Temporary explicit QA choices and
+notes exercise **all five active**: four core + counter FM, worker/twelve /128 ms,
+**905,116 frames / 56 events**, no misses, five positive raw/channel peaks and
+master 0.25449. Lead fader -16 dB repeat has identical input hash, lower Lead
+channel peak and other channels active, no misses; restored exactly 0.75.
+Sampled FX peaks are not exact wet-PCM gain parity. Keyboard Chord remains
+active after group Stop; its own Pause works. Lead patch edit coherently stops
+all as source-changed at 33,664, pass false. A temporary QA-server auto-expiry
+also exercises accurately reported serial startup fallback; after only that
+server restarts, actual worker retry passes. Fallback is not a worker verdict.
+
+Original generators/patch names restored, legacy normal Play shows five notes /
+25 lit meter segments, then Stop. Reload restores original voices/fader,
+single scope/Serial, clears report and starts nothing. Continuous score regenerates;
+no exported setup-byte round-trip claim. Raw full-plan hashes and restore/report
+invariants independently checked. Reports `m4b-*.json`, image
+`.tmp/m4b-all-active-signals.png`. Physical listening/isolated wet PCM unassessed.
+QA tab/viewport/server cleaned; normal-user LAN HTTPS PID8368 stays running.
+
+**Next:** collect requested phone pitched-set probe, verify per-role note counts
+before claiming voice coverage, then guarded finite listening on clean delivery.
+Audit actual All percussion source seam/kit/hit translation for the next owned
+adapter. Native piano/classics remain explicit unsupported gates. Longer phone
+lookahead stays acceptable; defer startup-delay work. No normal backend switch,
+fixture substitution, deployment or broader migration.

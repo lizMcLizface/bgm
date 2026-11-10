@@ -1,0 +1,161 @@
+{
+  "kind": "all.source-preview.diagnostics",
+  "version": 2,
+  "stems": [
+    {
+      "role": "lead",
+      "sourceId": 1,
+      "kind": "subtractive",
+      "noteCount": 1,
+      "peaks": {
+        "source": 0.182869553565979,
+        "channel": 0.03930537402629852
+      }
+    },
+    {
+      "role": "counter",
+      "sourceId": 2,
+      "kind": "fm",
+      "noteCount": 1,
+      "peaks": {
+        "source": 0.20901775360107422,
+        "channel": 0.03210442513227463
+      }
+    },
+    {
+      "role": "rhythm",
+      "sourceId": 3,
+      "kind": "subtractive",
+      "noteCount": 0,
+      "peaks": {
+        "source": 0,
+        "channel": 0
+      }
+    },
+    {
+      "role": "pad",
+      "sourceId": 4,
+      "kind": "subtractive",
+      "noteCount": 17,
+      "peaks": {
+        "source": 0.4391331970691681,
+        "channel": 0.2401498407125473
+      }
+    },
+    {
+      "role": "bass",
+      "sourceId": 5,
+      "kind": "subtractive",
+      "noteCount": 8,
+      "peaks": {
+        "source": 0.31721410155296326,
+        "channel": 0.083803690969944
+      }
+    }
+  ],
+  "excludedRoles": [],
+  "runId": "a1fb9426-8559-4bfb-9e22-26da767d7f30",
+  "hostRevision": "all-preview-delivery-v8",
+  "sourceFingerprint": "4ec004002298663b25e8e01f60270a6b82a37f86efd8cc06e3151d6f27fb5999",
+  "diagnosticProbe": null,
+  "probeTrace": null,
+  "engineVersion": "d6a0341e5edf2d57",
+  "startedAtUtc": "2026-11-10T11:15:32.396Z",
+  "browserUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36",
+  "sampleRate": 48000,
+  "role": "pitched-set",
+  "reason": "completed",
+  "error": null,
+  "complete": true,
+  "pass": true,
+  "listening": "not assessed",
+  "executor": {
+    "requested": "worker",
+    "actual": "worker",
+    "scheduling": "message",
+    "blockFrames": 512,
+    "poolBlocks": 12,
+    "bufferingLatencyMs": 128,
+    "stopOnUnderrun": true,
+    "deliveryDiagnostics": true
+  },
+  "fallbackReason": null,
+  "frames": {
+    "planned": 905116,
+    "consumed": 905116,
+    "output": 911360,
+    "rendered": 905116
+  },
+  "events": {
+    "applied": 54,
+    "late": 0,
+    "overflow": 0
+  },
+  "delivery": {
+    "underrunFrames": 0,
+    "underrunQuanta": 0,
+    "recoveries": 0,
+    "lateBlocks": 0,
+    "rejectedBlocks": 0,
+    "staleGeneration": 0,
+    "acceptedBlocks": 1768
+  },
+  "lead": {
+    "minFrames": 5376,
+    "zeroLeadQuanta": 0,
+    "belowQuantumQuanta": 0,
+    "firstZeroSourceFrame": null
+  },
+  "arrival": {
+    "maxGapFrames": 896,
+    "maxConsumedSinceArrivalFrames": 896,
+    "overCapacityQuanta": 0
+  },
+  "worker": {
+    "blocks": 1768,
+    "renderMs": 1707.2000000998378,
+    "maxRenderMs": 2.400000000372529,
+    "badRecycles": 0
+  },
+  "timingScope": "Last packet: producer at send; worker/producerLater: queried later. No synchronized clocks.",
+  "lastPacket": {
+    "packetFrame": 904704,
+    "frames": 412,
+    "sourceFrameAtArrival": 899200,
+    "producer": {
+      "version": 1,
+      "available": true,
+      "frame": 905116,
+      "blocks": 1768,
+      "freeBuffers": 0,
+      "inFlightBuffers": 12,
+      "elapsedMs": 18884.300000000745,
+      "taskWaits": 1768,
+      "taskWaitMs": 0,
+      "taskWaitMaxMs": 0.19999999925494194,
+      "poolWaits": 1756,
+      "poolWaitMs": 9.100000001490116,
+      "poolWaitMaxMs": 137.39999999850988,
+      "recycleRttMs": 128.90000000037253,
+      "recycleRttMaxMs": 256.59999999962747,
+      "lastRecycleConsumerFrame": 899071,
+      "renderMs": 0.5,
+      "maxRenderMs": 2.400000000372529
+    }
+  },
+  "producerLater": {
+    "available": true,
+    "taskWaitMaxMs": 0.19999999925494194,
+    "poolWaitMaxMs": 137.39999999850988,
+    "recycleRttMaxMs": 256.59999999962747,
+    "lastRecycleConsumerFrame": 905115,
+    "readyTaskAgeMs": null,
+    "poolEmptyAgeMs": null
+  },
+  "outputProcess": {
+    "available": false,
+    "calls": null,
+    "maxMs": null,
+    "overQuantumPeriod": null
+  }
+}

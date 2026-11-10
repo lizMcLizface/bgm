@@ -44,6 +44,7 @@ import {chainUnits} from '../effects/order';
 import {nativeRackDefaults} from '../effects/nativeRacks';
 import {cleanRack} from '../effects/params';
 it('closes source leases on host disposal without moving legacy source or mixer ownership',()=>{const h=createHost(BROWSABLE_SCENES[0]),instrument=h.g.roles.lead.instrument;instrument.voice={spec:{kind:'subtractive'},patch:{kind:'subtractive',global:{gain:.2},layers:[]},sourceInput:{}};const close=vi.fn(),lease=h.openSourceStem('lead',close);expect(lease.input).toBe(instrument.voice.sourceInput);lease.assertCurrent();expect(instrument.silence).toBeUndefined();h.dispose();expect(close).toHaveBeenCalledTimes(1);expect(()=>lease.assertCurrent()).toThrow();});
+it('describes eligible and unsupported preview voices without changing their backend or leasing a stem',()=>{const h=createHost(BROWSABLE_SCENES[0]),i=h.g.roles.lead.instrument;i.voice={spec:{kind:'subtractive'},patch:{kind:'subtractive',global:{gain:.2},layers:[]},sourceInput:{}};expect(h.sourcePreviewStatus('lead')).toEqual({eligible:true,kind:'subtractive'});expect(h.sourcePreviewStatus('pad').eligible).toBe(false);expect(i.silence).toBeUndefined();expect(i.voice.sourceInput).toEqual({});h.dispose();expect(h.sourcePreviewStatus('lead').eligible).toBe(false);});
 import {WASM_PRESETS,wasmVoiceById} from '../../synth-lab/voiceLibrary';
 import {instrumentRack,mixerRack} from './mixerEffects';
 import {defaultSettings} from '../../app/settings';

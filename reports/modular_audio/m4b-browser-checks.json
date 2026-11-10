@@ -1,0 +1,305 @@
+{
+  "kind": "m4b.pitched-set.browser-checks",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "originalVoices": [
+    {
+      "label": "Lead",
+      "generator": {
+        "text": "DI-Poly",
+        "value": "poly"
+      },
+      "patch": {
+        "text": "Measured Flute",
+        "value": "Measured Flute"
+      }
+    },
+    {
+      "label": "Second lead",
+      "generator": {
+        "text": "DI-Poly",
+        "value": "poly"
+      },
+      "patch": {
+        "text": "Soft Flute",
+        "value": "Soft Flute"
+      }
+    },
+    {
+      "label": "Rhythm",
+      "generator": {
+        "text": "Piano",
+        "value": "piano"
+      },
+      "patch": {
+        "text": "Felt Keys (updated)",
+        "value": "Felt Keys (updated)"
+      }
+    },
+    {
+      "label": "Pad",
+      "generator": {
+        "text": "Piano",
+        "value": "piano"
+      },
+      "patch": {
+        "text": "Felt Keys (updated)",
+        "value": "Felt Keys (updated)"
+      }
+    },
+    {
+      "label": "Bass",
+      "generator": {
+        "text": "DI-Poly",
+        "value": "poly"
+      },
+      "patch": {
+        "text": "Thump Bass",
+        "value": "Thump Bass"
+      }
+    }
+  ],
+  "initialMissingPattern": {
+    "runId": "780ee824-ebea-4af9-be19-d4da3a000275",
+    "error": "Error: counter: Rust preview requires a pitched core/FM sequence.",
+    "executor": null,
+    "pass": false
+  },
+  "currentSparseProbe": {
+    "runId": "b6ce786d-f945-4102-b488-9415972b1f21",
+    "sourceIds": [
+      1,
+      2,
+      5
+    ],
+    "sourceFrames": 96000,
+    "missing": 0,
+    "stems": [
+      {
+        "role": "lead",
+        "sourceId": 1,
+        "kind": "subtractive",
+        "noteCount": 0,
+        "peaks": {
+          "source": 0,
+          "channel": 0
+        }
+      },
+      {
+        "role": "counter",
+        "sourceId": 2,
+        "kind": "subtractive",
+        "noteCount": 0,
+        "peaks": {
+          "source": 0,
+          "channel": 0
+        }
+      },
+      {
+        "role": "bass",
+        "sourceId": 5,
+        "kind": "subtractive",
+        "noteCount": 7,
+        "peaks": {
+          "source": 0,
+          "channel": 0
+        }
+      }
+    ]
+  },
+  "mixedWorker": {
+    "runId": "a1fb9426-8559-4bfb-9e22-26da767d7f30",
+    "frames": 905116,
+    "events": 54,
+    "pass": true
+  },
+  "allActiveWorker": {
+    "runId": "1d3d4303-c9bb-41a2-998f-5916b6c16e0f",
+    "sourceIds": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "frames": 905116,
+    "events": 56,
+    "stems": [
+      {
+        "role": "lead",
+        "sourceId": 1,
+        "kind": "subtractive",
+        "noteCount": 1,
+        "peaks": {
+          "source": 0.182869553565979,
+          "channel": 0.038611143827438354
+        }
+      },
+      {
+        "role": "counter",
+        "sourceId": 2,
+        "kind": "fm",
+        "noteCount": 1,
+        "peaks": {
+          "source": 0.20901775360107422,
+          "channel": 0.0330069400370121
+        }
+      },
+      {
+        "role": "rhythm",
+        "sourceId": 3,
+        "kind": "subtractive",
+        "noteCount": 1,
+        "peaks": {
+          "source": 0.32243847846984863,
+          "channel": 0.20183250308036804
+        }
+      },
+      {
+        "role": "pad",
+        "sourceId": 4,
+        "kind": "subtractive",
+        "noteCount": 17,
+        "peaks": {
+          "source": 0.4391331970691681,
+          "channel": 0.2514556050300598
+        }
+      },
+      {
+        "role": "bass",
+        "sourceId": 5,
+        "kind": "subtractive",
+        "noteCount": 8,
+        "peaks": {
+          "source": 0.31721410155296326,
+          "channel": 0.08377288281917572
+        }
+      }
+    ],
+    "missing": 0,
+    "pass": true
+  },
+  "fallback": {
+    "runId": "cc9ed8e8-4874-4044-bc9b-9a42e1a4358a",
+    "actual": "serial",
+    "reason": "Error: Worker startup failed",
+    "pass": true,
+    "context": "Temporary loopback QA server auto-exited after its eight-minute bound; worker retry after restart passed. LAN server remained up."
+  },
+  "leadAttenuation": {
+    "faderBefore": "0.75",
+    "attenuatedDb": -16,
+    "restored": 0.75,
+    "sameSourceHash": true,
+    "ratios": [
+      {
+        "role": "lead",
+        "sourceRatio": 1,
+        "channelRatio": 0.19030847789591493
+      },
+      {
+        "role": "counter",
+        "sourceRatio": 1.0025239995254847,
+        "channelRatio": 0.9197339392767662
+      },
+      {
+        "role": "rhythm",
+        "sourceRatio": 0.9992646433575741,
+        "channelRatio": 0.89708706325329
+      },
+      {
+        "role": "pad",
+        "sourceRatio": 1,
+        "channelRatio": 0.9831295000266668
+      },
+      {
+        "role": "bass",
+        "sourceRatio": 1.0793279630783303,
+        "channelRatio": 1.0448424670436327
+      }
+    ],
+    "missing": 0,
+    "pass": true
+  },
+  "keyboard": {
+    "beforeGroup": "true",
+    "afterGroupStop": "true",
+    "groupReason": "stopped",
+    "groupPass": false,
+    "thenPausedExplicitly": true
+  },
+  "invalidation": {
+    "reason": "source-changed",
+    "error": "Error: The source host or tuning changed.",
+    "frames": 33664,
+    "pass": false
+  },
+  "restoredVoices": [
+    {
+      "label": "Lead",
+      "generator": "poly",
+      "patch": "Measured Flute"
+    },
+    {
+      "label": "Second lead",
+      "generator": "poly",
+      "patch": "Soft Flute"
+    },
+    {
+      "label": "Rhythm",
+      "generator": "piano",
+      "patch": "Felt Keys (updated)"
+    },
+    {
+      "label": "Pad",
+      "generator": "piano",
+      "patch": "Felt Keys (updated)"
+    },
+    {
+      "label": "Bass",
+      "generator": "poly",
+      "patch": "Thump Bass"
+    }
+  ],
+  "legacy": {
+    "notes": "5 notes sounding",
+    "litMeterSegments": 25,
+    "stoppedBeforeReload": true
+  },
+  "reload": {
+    "scope": "selected",
+    "mode": "serial",
+    "reports": 0,
+    "leadLevel": "0.75"
+  },
+  "reloadVoices": [
+    {
+      "label": "Lead",
+      "generator": "poly",
+      "patch": "Measured Flute"
+    },
+    {
+      "label": "Second lead",
+      "generator": "poly",
+      "patch": "Soft Flute"
+    },
+    {
+      "label": "Rhythm",
+      "generator": "piano",
+      "patch": "Felt Keys (updated)"
+    },
+    {
+      "label": "Pad",
+      "generator": "piano",
+      "patch": "Felt Keys (updated)"
+    },
+    {
+      "label": "Bass",
+      "generator": "poly",
+      "patch": "Thump Bass"
+    }
+  ],
+  "limitations": "Physical listening, isolated wet PCM and byte-exact setup export/reimport not assessed. Continuous score regenerates on reload; temporary QA notes are not claimed to persist. Phone set evidence pending."
+}

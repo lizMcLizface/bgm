@@ -113,6 +113,11 @@ separate. No browser timing guarantee, all-role or lock-screen acceptance.
 
 ## Next task
 
+Later user steering defers the startup-delay proposal below: longer phone
+lookahead is acceptable for listening and other voices/full-path behavior come
+first. [M4b pitched-set delivery](MODULAR_AUDIO_ENGINE_M4B_PITCHED_SET.md) is the
+current continuation; retain this proposal as a later latency experiment.
+
 Audit and add an explicit **fixed twelve-slot pool with reduced startup delay**
 muted comparison, preserving the current twelve / 128 ms baseline. First target
 is twelve-slot render-ahead capacity (6,144 / 128 ms) with **64 versus 128 ms
