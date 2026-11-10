@@ -951,5 +951,9 @@ fresh sequential Rust owners, separate IDs and both results in one compact copy;
 Stop/Panic/invalidation preserve incomplete evidence. **108 checks**, final **11
 overlapping controller checks**, public build and desktop pair/Stop/Serial/reload
 pass. Host v6, engine unchanged; selected capacity and Serial/six defaults stay.
-The phone's controlled Bass pair is requested and pending. Normal keyboard and
-setup persistence remain intact; no migration/default promotion or deployment.
+The phone's controlled Bass pair now reproduces **36,608 missing / 67 late** at
+six and **zero delivery errors / 1,152 minimum lead** at twelve, matching supplied
+source/build hashes and the same **4,864-frame gap**. Exact report/IDs and limits
+are retained in the linked doc. Next add explicit reverse trial order to check
+warmup/order before lower-latency transport work. Normal keyboard and setup
+persistence remain intact; no migration/default promotion or deployment.

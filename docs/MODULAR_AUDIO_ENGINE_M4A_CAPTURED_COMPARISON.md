@@ -93,16 +93,63 @@ worker; no pair runs automatically. Reports
 `m4a-captured-comparison-browser-checks.json`; screenshot
 `.tmp/m4a-captured-comparison-summary.png` shows both results and copy status.
 QA tab, viewport override and temporary loopback server are cleaned up. Existing
-normal-user HTTPS PID8368 stays running, serving the local final package. Phone
-captured-pair report is requested and pending; prior clean audible twelve-slot
-evidence remains valid but is not relabeled as this new controlled pair.
+normal-user HTTPS PID8368 stays running, serving the local final package. Prior
+clean audible twelve-slot evidence remains valid but is not relabeled as this
+new muted controlled pair.
+
+## Actual phone controlled pair
+
+User-supplied unique parent **e8df4d20-35ae-44bf-b146-8023c12d8463**, started
+**2026-11-10 10:38:52.088 UTC**, Android-reported Chrome 156, bass / 48 kHz,
+host v6 / engine d6a0341e5edf2d57. Retained without verdict changes in
+`reports/modular_audio/m4a-phone-captured-comparison.json`.
+
+Both child fingerprints match the parent:
+`0c61514009e8d645d344ead19b21022a56a55ebd9d6f83669f131e4f70c1d342`.
+The full plans were not supplied with this compact report: identity is
+cross-checked between supplied hashes, not independently recomputed from phone
+plan bytes. Both actual worker / Message / 512-frame trials render/consume their
+**96,000-frame** muted window, **188 producer blocks**. Fixed trial order:
+
+| Trial | Six / 64 ms | Twelve / 128 ms |
+| --- | ---: | ---: |
+| Child ID | e380b5c9-5988-498c-be9c-d480ee20bc07 | fb0deba7-47b4-4ceb-8ce6-5584ba630101 |
+| Missing frames / quanta | 36,608 / 286 | 0 / 0 |
+| Accepted / late packets | 121 / 67 | 188 / 0 |
+| Recoveries | 19 | 0 |
+| Minimum steady ready lead | 0 | 1,152 / 24 ms |
+| Maximum arrival gap | 4,864 / 101.33 ms | 4,864 / 101.33 ms |
+| Over-capacity quanta | 257 | 0 |
+
+Six first loses ready lead at **4,608**, matching earlier phone failures.
+Both have zero rejected/stale packets and bad recycles. Twelve has no
+zero/below-quantum lead. Output cursors are **99,072 / 102,144**, reflecting
+the different startup delays. Delivered six frames are derivable as
+96,000 - 36,608 = **59,392**; completion of its diagnostic window is not clean
+delivery. Both probes and parent keep **full-score complete/pass false,
+listening unassessed**. Prior affirmative audible listening belongs to full run
+3c2c7faf-e696-499d-9e57-95493ec3bff3, not this muted pair.
+
+Worker render total/max: six **474.90 / 25.20 ms**, twelve **397.50 / 23.60 ms**.
+Sequential warmup/device conditions are not controlled; do not claim DSP speedup
+or CPU causation from these totals. The matched source and repeated same gap
+support capacity-dependent delivery/headroom for this device/context. Pool size
+and declared startup delay change together; this does not isolate those two
+variables or identify a browser message leg. No lock-screen/all-role guarantee.
+
+Evidence-only follow-up after `daeb335`: JSON parsing, identity/capacity/frame/
+packet accounting and verdict preservation are checked. Prior automated suites
+and build are not rerun or relabeled as new tests; no executable/server change.
 
 ## Next task
 
-Collect one phone compact comparison from the existing normal-browser LAN HTTPS
-page, preserving its exact parent/child IDs and matching hashes. If the same
-captured input still misses at six and stays clean at twelve, retain that as
-capacity-dependent delivery evidence at this device/context. A smaller-latency
-message-leg experiment must preserve these controlled baseline runs. Do not
-promote defaults, infer a browser guarantee or broaden migration from one pair.
+Add an explicit **reverse-order twelve then six** muted comparison using the
+same captured-input mechanism, recording the selected order in parent/full and
+compact reports. Keep current six-then-twelve as initial choice. This checks
+whether the observed capacity difference survives trial order/warmup before
+altering transport or reducing buffering. Retain both existing baseline trials,
+fresh owners, cancellation, guards and false full-score/listening verdicts.
+Twelve / 128 ms stays an explicit sequenced-preview option; Serial/six defaults
+stay unchanged. Do not infer a browser guarantee or broaden migration from one
+pair. Lower-latency message-leg work follows the order-controlled evidence.
 No deployment, firewall/trust change or native Application Control bypass.

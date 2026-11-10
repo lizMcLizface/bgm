@@ -1998,9 +1998,28 @@ clears report and exposes six. Reports `m4a-captured-comparison-*.json`; images
 native clipboard payload readback are not claimed. QA server/tab/viewport cleaned
 up; normal-user LAN HTTPS PID8368 remains up. No deployment or security change.
 
-**Next:** collect requested phone **Bass** captured-pair compact report (host v6),
-check parent/child IDs, same input/build, actual six/twelve capacities, frame
-completion and miss/gap counters. Preserve fixed-order/device-state limitations;
-this controls source input, not changing scheduler conditions. Then choose a
-bounded lower-latency message-leg experiment only against retained baselines.
-Do not promote defaults or broaden migration based on one pair.
+**Actual phone pair now received:** parent
+**e8df4d20-35ae-44bf-b146-8023c12d8463**, both supplied child hashes match its
+captured source hash, same engine/48 kHz/bass/Message/512. Six then twelve each
+render/consume the 96,000-frame diagnostic window. **Six: 36,608 missing / 286
+quanta, 19 recoveries, 67 late / 121 accepted packets, first zero lead 4,608**.
+**Twelve: zero missing/late, 188 accepted, minimum steady lead 1,152 / 24 ms**.
+Both maximum arrival gaps remain **4,864 / 101.33 ms**, no rejected/stale/bad
+recycles. Raw report `m4a-phone-captured-comparison.json`; exact limits/rows in
+linked doc. Full phone plan bytes are absent, so hashes are compared, not
+independently recomputed. Both child/parent full-score verdicts stay false and
+listening unassessed. Prior clean audible twelve run remains separate.
+
+This supports capacity-dependent delivery at this device/context, with source
+controlled. Pool size and startup delay vary together; trial order/warmup and
+device scheduling remain uncontrolled. No CPU speedup, browser cause, all-role
+or lock-screen guarantee. Evidence follow-up after `daeb335` parses/cross-checks
+the supplied report; prior 108/11 checks/build are not relabeled as new runs.
+No executable/browser/server/default change.
+
+**Next bounded implementation:** explicit reverse-order **twelve then six**
+muted pair using the same captured plan, with order metadata in full/compact
+reports. Keep current six-then-twelve initial choice. Check whether the capacity
+difference survives order/warmup before a lower-latency message-leg experiment.
+Preserve fresh owners, cancellation, false music-pass verdicts, Serial/six
+defaults and working explicit twelve/128 ms. No broader migration/deployment.

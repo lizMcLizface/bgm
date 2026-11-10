@@ -963,6 +963,13 @@ order. Parent and child IDs/hashes plus both results fit one compact copy; parti
 failures remain diagnostic. Host v6, engine unchanged. **108 tests / six files**,
 final **11 overlapping controller checks**, public build **36.01 s** and actual
 desktop muted/Stop/normal-Serial/reload/copy checks pass. Both trial source hashes
-are independently verified; no defaults or keyboard/schema/DSP changes. Next
-collect requested phone Bass pair before selecting a lower-latency message-leg
-experiment. Fixed order and changing device conditions limit causal attribution.
+are independently verified; no defaults or keyboard/schema/DSP changes. Actual
+phone parent `e8df4d20-35ae-44bf-b146-8023c12d8463` now supplies matching input /
+engine for both windows: six has **36,608 missing / 67 late / 19 recoveries**,
+twelve **zero missing/late and 1,152 minimum lead**, same **4,864-frame maximum
+arrival gap**. Retain raw report/verdicts; no full phone plan bytes were supplied
+for independent rehashing. Next implement explicit reverse-order twelve/six
+muted comparison with order metadata to check warmup/order before lower-latency
+transport work. Pool capacity/startup delay and device conditions remain limits;
+Serial/six defaults and explicit twelve/128 ms stay. This evidence-only update
+runs artifact checks, not new DSP/browser/build tests.
