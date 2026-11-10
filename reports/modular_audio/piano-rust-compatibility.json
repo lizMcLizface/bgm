@@ -1,0 +1,5925 @@
+{
+  "kind": "piano.rust-preparation-compatibility",
+  "version": 1,
+  "engineVersion": "d592cc8a0af5164e",
+  "wasmSha256": "80029784b936d9e19566f6e900875b180f348d5fb79bf81b3e6bf397dfdffba2",
+  "scope": "Original JS vs owned Rust preparation PCM, before native voice envelopes/filters/stereo/effects; no physical listening or full graph piano claim.",
+  "comparisons": 222,
+  "bitExactStrikes": 183,
+  "bodyComparisons": 108,
+  "bitExactBodies": 108,
+  "maxStrikeError": 1.4901161193847656e-8,
+  "maxBodyError": 0,
+  "trials": [
+    {
+      "family": "modal",
+      "sampleRate": 8000,
+      "frequency": 55,
+      "options": {
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 33942,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "f452fe23d81c0f32ee11a51ab22fc9037216d33a2013bbbdcd98ee1d5454eb77",
+        "rustSha256": "f452fe23d81c0f32ee11a51ab22fc9037216d33a2013bbbdcd98ee1d5454eb77"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "d73d57708f33dff0e20e51f3b236f89a95331f6c03c0a0979feb8538603669de",
+        "rustSha256": "d73d57708f33dff0e20e51f3b236f89a95331f6c03c0a0979feb8538603669de"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 8000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 4800,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "18a788b8bfb5198627df38610ae71f962dd9ced1f8676f611b551043207261d6",
+        "rustSha256": "18a788b8bfb5198627df38610ae71f962dd9ced1f8676f611b551043207261d6"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "5299b0e201f1f77f10812558fb5989feb03da0a6ef7854c09ff7e7c5183d1da8",
+        "rustSha256": "5299b0e201f1f77f10812558fb5989feb03da0a6ef7854c09ff7e7c5183d1da8"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 8000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 9504,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "20b70d2a014c19193635b9e87d72625c1c0e4ca4733b119b3f6f1c10a8566d4e",
+        "rustSha256": "20b70d2a014c19193635b9e87d72625c1c0e4ca4733b119b3f6f1c10a8566d4e"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "f5b3e82660979c380d023a920c17d8a0779187044425c3ad747896ea732bef9d",
+        "rustSha256": "f5b3e82660979c380d023a920c17d8a0779187044425c3ad747896ea732bef9d"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 8000,
+      "frequency": 261.63,
+      "options": {
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 22983,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "05973aedc7f491847c70aa0f1048be451570344898dd1f8ee384b40a2392e112",
+        "rustSha256": "05973aedc7f491847c70aa0f1048be451570344898dd1f8ee384b40a2392e112"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "d73d57708f33dff0e20e51f3b236f89a95331f6c03c0a0979feb8538603669de",
+        "rustSha256": "d73d57708f33dff0e20e51f3b236f89a95331f6c03c0a0979feb8538603669de"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 8000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 4800,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "3c77efa1024c7b349884822401c53ae32ad5d9a78fe44048140c54e491065410",
+        "rustSha256": "3c77efa1024c7b349884822401c53ae32ad5d9a78fe44048140c54e491065410"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "5299b0e201f1f77f10812558fb5989feb03da0a6ef7854c09ff7e7c5183d1da8",
+        "rustSha256": "5299b0e201f1f77f10812558fb5989feb03da0a6ef7854c09ff7e7c5183d1da8"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 8000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 6436,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "138d263b558a9673ef5cdb8679efb56a86f3f1cbe0622b66b8f4b153c70651b2",
+        "rustSha256": "138d263b558a9673ef5cdb8679efb56a86f3f1cbe0622b66b8f4b153c70651b2"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "f5b3e82660979c380d023a920c17d8a0779187044425c3ad747896ea732bef9d",
+        "rustSha256": "f5b3e82660979c380d023a920c17d8a0779187044425c3ad747896ea732bef9d"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 8000,
+      "frequency": 1760,
+      "options": {
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 15297,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "79a1946f675ee9aeaa1da3df738a96640e497844302e5e200dcfd8de52ddfee1",
+        "rustSha256": "79a1946f675ee9aeaa1da3df738a96640e497844302e5e200dcfd8de52ddfee1"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "b7e817296ef2f979d618408623da666673db18ab02d43666dcba773e6c66c53a",
+        "rustSha256": "b7e817296ef2f979d618408623da666673db18ab02d43666dcba773e6c66c53a"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 8000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 4800,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "9ccb25075551cadba13f675f9ab6fce84c4d34e09abf3f2eec177fffa1015a64",
+        "rustSha256": "9ccb25075551cadba13f675f9ab6fce84c4d34e09abf3f2eec177fffa1015a64"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "c7aa183576bf9c8b6be84acc11d71cfa406b3f925f2219fc38dd406e85f4ec6e",
+        "rustSha256": "c7aa183576bf9c8b6be84acc11d71cfa406b3f925f2219fc38dd406e85f4ec6e"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 8000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 4800,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "670df1604277483e5d4c0e0d4aa10ed9e04ea8a04e931991f3346ff87fe68366",
+        "rustSha256": "670df1604277483e5d4c0e0d4aa10ed9e04ea8a04e931991f3346ff87fe68366"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "572b3af5e6187d32f114aa8489268c79d5b56d6d96ceff24ab6c0d1453a9a2f0",
+        "rustSha256": "572b3af5e6187d32f114aa8489268c79d5b56d6d96ceff24ab6c0d1453a9a2f0"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 24000,
+      "frequency": 55,
+      "options": {
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 101824,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "39137bb6836225aeb261de8262f2786d03524b05fe154f65393abe6cecfd7301",
+        "rustSha256": "39137bb6836225aeb261de8262f2786d03524b05fe154f65393abe6cecfd7301"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "d73d57708f33dff0e20e51f3b236f89a95331f6c03c0a0979feb8538603669de",
+        "rustSha256": "d73d57708f33dff0e20e51f3b236f89a95331f6c03c0a0979feb8538603669de"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 24000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 14400,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "1d966c4c1f1717dba0de2b2016cab1d46373cb6940718502c822f09768d3151e",
+        "rustSha256": "1d966c4c1f1717dba0de2b2016cab1d46373cb6940718502c822f09768d3151e"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "5299b0e201f1f77f10812558fb5989feb03da0a6ef7854c09ff7e7c5183d1da8",
+        "rustSha256": "5299b0e201f1f77f10812558fb5989feb03da0a6ef7854c09ff7e7c5183d1da8"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 24000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 28511,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "68d49895eed468af2b1d8d86a6c15889f63044eaa75a0ed17faac283dd501131",
+        "rustSha256": "68d49895eed468af2b1d8d86a6c15889f63044eaa75a0ed17faac283dd501131"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "f5b3e82660979c380d023a920c17d8a0779187044425c3ad747896ea732bef9d",
+        "rustSha256": "f5b3e82660979c380d023a920c17d8a0779187044425c3ad747896ea732bef9d"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 24000,
+      "frequency": 261.63,
+      "options": {
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 68948,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "a8eba55690a93d6ca28883399aec1e82c028673ded7d5171f0852ba6588b9a37",
+        "rustSha256": "a8eba55690a93d6ca28883399aec1e82c028673ded7d5171f0852ba6588b9a37"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "d73d57708f33dff0e20e51f3b236f89a95331f6c03c0a0979feb8538603669de",
+        "rustSha256": "d73d57708f33dff0e20e51f3b236f89a95331f6c03c0a0979feb8538603669de"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 24000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 14400,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "48cd4b170a39d9483c3db849b78aa41ae5c4f86211b8fa44f22d57f7fafdd644",
+        "rustSha256": "48cd4b170a39d9483c3db849b78aa41ae5c4f86211b8fa44f22d57f7fafdd644"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "5299b0e201f1f77f10812558fb5989feb03da0a6ef7854c09ff7e7c5183d1da8",
+        "rustSha256": "5299b0e201f1f77f10812558fb5989feb03da0a6ef7854c09ff7e7c5183d1da8"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 24000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 19306,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "4d6b38883806f89e46abb89dfd37b4ef263f1f1638fb071cec949262022165a8",
+        "rustSha256": "4d6b38883806f89e46abb89dfd37b4ef263f1f1638fb071cec949262022165a8"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "f5b3e82660979c380d023a920c17d8a0779187044425c3ad747896ea732bef9d",
+        "rustSha256": "f5b3e82660979c380d023a920c17d8a0779187044425c3ad747896ea732bef9d"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 24000,
+      "frequency": 1760,
+      "options": {
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 42812,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "5abafa2eef2a9a832d9b6a91943c48452f7e564ed69a165343f8cc026947dc1a",
+        "rustSha256": "5abafa2eef2a9a832d9b6a91943c48452f7e564ed69a165343f8cc026947dc1a"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "d73d57708f33dff0e20e51f3b236f89a95331f6c03c0a0979feb8538603669de",
+        "rustSha256": "d73d57708f33dff0e20e51f3b236f89a95331f6c03c0a0979feb8538603669de"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 24000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 14400,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "b688c458bf4622b8dc9564a59e62b40e244a89b32499bf754e7f0a80ce606497",
+        "rustSha256": "b688c458bf4622b8dc9564a59e62b40e244a89b32499bf754e7f0a80ce606497"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "45257bad4a3d172d45edb32a90cec4e72fb66c15bcde373297c542428c5988e7",
+        "rustSha256": "45257bad4a3d172d45edb32a90cec4e72fb66c15bcde373297c542428c5988e7"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 24000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 14400,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "14972c38ea98a5ed42a652bd06d0941370f37ed361d76462c12b510d563728ed",
+        "rustSha256": "14972c38ea98a5ed42a652bd06d0941370f37ed361d76462c12b510d563728ed"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "2045fa743f7d446211d6d067939d9762fb34221b6b1f1f51adb09b0094038c1f",
+        "rustSha256": "2045fa743f7d446211d6d067939d9762fb34221b6b1f1f51adb09b0094038c1f"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 44100,
+      "frequency": 55,
+      "options": {
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 187101,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "e3d5adf45cc093fabfdaaa50654327db2908a419e161b66d97ae0d41132913d2",
+        "rustSha256": "e3d5adf45cc093fabfdaaa50654327db2908a419e161b66d97ae0d41132913d2"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "d73d57708f33dff0e20e51f3b236f89a95331f6c03c0a0979feb8538603669de",
+        "rustSha256": "d73d57708f33dff0e20e51f3b236f89a95331f6c03c0a0979feb8538603669de"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 44100,
+      "frequency": 55,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 26460,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "93938f8a0f5e7084e4fc2292a467b8c35094b10fa768a78afba9c44cea10ae79",
+        "rustSha256": "93938f8a0f5e7084e4fc2292a467b8c35094b10fa768a78afba9c44cea10ae79"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "5299b0e201f1f77f10812558fb5989feb03da0a6ef7854c09ff7e7c5183d1da8",
+        "rustSha256": "5299b0e201f1f77f10812558fb5989feb03da0a6ef7854c09ff7e7c5183d1da8"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 44100,
+      "frequency": 55,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 52389,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "482584fde4a3f50a60ee0c2c97d94399f059fc39f077b4d7af81a5bd5971520f",
+        "rustSha256": "482584fde4a3f50a60ee0c2c97d94399f059fc39f077b4d7af81a5bd5971520f"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "f5b3e82660979c380d023a920c17d8a0779187044425c3ad747896ea732bef9d",
+        "rustSha256": "f5b3e82660979c380d023a920c17d8a0779187044425c3ad747896ea732bef9d"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 44100,
+      "frequency": 261.63,
+      "options": {
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 126691,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "c690b0fd5b880c6ff15ceefcb1dc7bcd2489dcd8062f7dcc5a4c3bfa3e3ceb54",
+        "rustSha256": "c690b0fd5b880c6ff15ceefcb1dc7bcd2489dcd8062f7dcc5a4c3bfa3e3ceb54"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "d73d57708f33dff0e20e51f3b236f89a95331f6c03c0a0979feb8538603669de",
+        "rustSha256": "d73d57708f33dff0e20e51f3b236f89a95331f6c03c0a0979feb8538603669de"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 44100,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 26460,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "30e8c678ed8c19bdd9cd2135b4fa037e17aa4c403a8d9569ec677bf57a301e59",
+        "rustSha256": "30e8c678ed8c19bdd9cd2135b4fa037e17aa4c403a8d9569ec677bf57a301e59"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "5299b0e201f1f77f10812558fb5989feb03da0a6ef7854c09ff7e7c5183d1da8",
+        "rustSha256": "5299b0e201f1f77f10812558fb5989feb03da0a6ef7854c09ff7e7c5183d1da8"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 44100,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 35474,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "f4f531ed171d2c8ba1794bb1243f50b1a3f061583a75b9644c1f8ad93bfa9a69",
+        "rustSha256": "f4f531ed171d2c8ba1794bb1243f50b1a3f061583a75b9644c1f8ad93bfa9a69"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "f5b3e82660979c380d023a920c17d8a0779187044425c3ad747896ea732bef9d",
+        "rustSha256": "f5b3e82660979c380d023a920c17d8a0779187044425c3ad747896ea732bef9d"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 44100,
+      "frequency": 1760,
+      "options": {
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 78667,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "08d8e166ff37c36f7703a42b955741837de39be73a71abd64e6fd485ef72981c",
+        "rustSha256": "08d8e166ff37c36f7703a42b955741837de39be73a71abd64e6fd485ef72981c"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "d73d57708f33dff0e20e51f3b236f89a95331f6c03c0a0979feb8538603669de",
+        "rustSha256": "d73d57708f33dff0e20e51f3b236f89a95331f6c03c0a0979feb8538603669de"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 44100,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 26460,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "80199c26c0a1f167bd941eade8e0be01db82c9a7315d1302ecfa4a347519efde",
+        "rustSha256": "80199c26c0a1f167bd941eade8e0be01db82c9a7315d1302ecfa4a347519efde"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "5299b0e201f1f77f10812558fb5989feb03da0a6ef7854c09ff7e7c5183d1da8",
+        "rustSha256": "5299b0e201f1f77f10812558fb5989feb03da0a6ef7854c09ff7e7c5183d1da8"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 44100,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 26460,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "b62704bea034d3470b2a20d9956aaa56909bbf19fac93075d4d0bf6ff209bf40",
+        "rustSha256": "b62704bea034d3470b2a20d9956aaa56909bbf19fac93075d4d0bf6ff209bf40"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "f5b3e82660979c380d023a920c17d8a0779187044425c3ad747896ea732bef9d",
+        "rustSha256": "f5b3e82660979c380d023a920c17d8a0779187044425c3ad747896ea732bef9d"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 48000,
+      "frequency": 55,
+      "options": {
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 203647,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "498dde15aa89935f3b9e1f048c9aa2bcbfdd5ea7c5adef2162b9eb027c6dca5c",
+        "rustSha256": "498dde15aa89935f3b9e1f048c9aa2bcbfdd5ea7c5adef2162b9eb027c6dca5c"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "d73d57708f33dff0e20e51f3b236f89a95331f6c03c0a0979feb8538603669de",
+        "rustSha256": "d73d57708f33dff0e20e51f3b236f89a95331f6c03c0a0979feb8538603669de"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 48000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 28800,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "71a50793233b12ee5a1f68ffdaa25b6089a440c1c1d0096504a0683f3742914d",
+        "rustSha256": "71a50793233b12ee5a1f68ffdaa25b6089a440c1c1d0096504a0683f3742914d"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "5299b0e201f1f77f10812558fb5989feb03da0a6ef7854c09ff7e7c5183d1da8",
+        "rustSha256": "5299b0e201f1f77f10812558fb5989feb03da0a6ef7854c09ff7e7c5183d1da8"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 48000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 57022,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "2b444f2cda01a135517af089e40227f81ed05cb6f5ff47a31f4aaf223299c69f",
+        "rustSha256": "2b444f2cda01a135517af089e40227f81ed05cb6f5ff47a31f4aaf223299c69f"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "f5b3e82660979c380d023a920c17d8a0779187044425c3ad747896ea732bef9d",
+        "rustSha256": "f5b3e82660979c380d023a920c17d8a0779187044425c3ad747896ea732bef9d"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 48000,
+      "frequency": 261.63,
+      "options": {
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 137895,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "4447cf5f29db84c027644e5331d5eec4e98fce729b07347b423688d5100f54c1",
+        "rustSha256": "4447cf5f29db84c027644e5331d5eec4e98fce729b07347b423688d5100f54c1"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "d73d57708f33dff0e20e51f3b236f89a95331f6c03c0a0979feb8538603669de",
+        "rustSha256": "d73d57708f33dff0e20e51f3b236f89a95331f6c03c0a0979feb8538603669de"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 48000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 28800,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "2b5cee76a69225a29f0843d88775a3d55ec4288b10be029c437756f73e581ced",
+        "rustSha256": "2b5cee76a69225a29f0843d88775a3d55ec4288b10be029c437756f73e581ced"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "5299b0e201f1f77f10812558fb5989feb03da0a6ef7854c09ff7e7c5183d1da8",
+        "rustSha256": "5299b0e201f1f77f10812558fb5989feb03da0a6ef7854c09ff7e7c5183d1da8"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 48000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 38611,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "c15fa13943f2e5830671c902b58d670f639535e13920148a4c0cb3285d32d2d4",
+        "rustSha256": "c15fa13943f2e5830671c902b58d670f639535e13920148a4c0cb3285d32d2d4"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "f5b3e82660979c380d023a920c17d8a0779187044425c3ad747896ea732bef9d",
+        "rustSha256": "f5b3e82660979c380d023a920c17d8a0779187044425c3ad747896ea732bef9d"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 48000,
+      "frequency": 1760,
+      "options": {
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 85623,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "235045ee1430f689ff86f56c71c2b7c9579edd3d043550df2a26e152d1616980",
+        "rustSha256": "235045ee1430f689ff86f56c71c2b7c9579edd3d043550df2a26e152d1616980"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "d73d57708f33dff0e20e51f3b236f89a95331f6c03c0a0979feb8538603669de",
+        "rustSha256": "d73d57708f33dff0e20e51f3b236f89a95331f6c03c0a0979feb8538603669de"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 48000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 28800,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "24f01ac754853d9a8d744ab0ab0bd43ff1f80c036c9b22e6c3b2114664a8af1a",
+        "rustSha256": "24f01ac754853d9a8d744ab0ab0bd43ff1f80c036c9b22e6c3b2114664a8af1a"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "5299b0e201f1f77f10812558fb5989feb03da0a6ef7854c09ff7e7c5183d1da8",
+        "rustSha256": "5299b0e201f1f77f10812558fb5989feb03da0a6ef7854c09ff7e7c5183d1da8"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 48000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 28800,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "a57af5ceb49e2f1620cb01a1cb8c7990f566671d8b885f736270ac969f325c65",
+        "rustSha256": "a57af5ceb49e2f1620cb01a1cb8c7990f566671d8b885f736270ac969f325c65"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "f5b3e82660979c380d023a920c17d8a0779187044425c3ad747896ea732bef9d",
+        "rustSha256": "f5b3e82660979c380d023a920c17d8a0779187044425c3ad747896ea732bef9d"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 96000,
+      "frequency": 55,
+      "options": {
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 407294,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "45dae8062322838d98800a4fe0cf991394245627b8be3ee9c4023bd2c740754c",
+        "rustSha256": "45dae8062322838d98800a4fe0cf991394245627b8be3ee9c4023bd2c740754c"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "d73d57708f33dff0e20e51f3b236f89a95331f6c03c0a0979feb8538603669de",
+        "rustSha256": "d73d57708f33dff0e20e51f3b236f89a95331f6c03c0a0979feb8538603669de"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 96000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 57600,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "7a6c391641ca50306ed16d05ae09d271aabf3f888d51bed9ff39188bb18afc6d",
+        "rustSha256": "7a6c391641ca50306ed16d05ae09d271aabf3f888d51bed9ff39188bb18afc6d"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "5299b0e201f1f77f10812558fb5989feb03da0a6ef7854c09ff7e7c5183d1da8",
+        "rustSha256": "5299b0e201f1f77f10812558fb5989feb03da0a6ef7854c09ff7e7c5183d1da8"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 96000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 114043,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "64d55e36f8fa42f54cd0b0497cd6729dd4a263b50b4e80da294d72dbbfbf6f3b",
+        "rustSha256": "64d55e36f8fa42f54cd0b0497cd6729dd4a263b50b4e80da294d72dbbfbf6f3b"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "f5b3e82660979c380d023a920c17d8a0779187044425c3ad747896ea732bef9d",
+        "rustSha256": "f5b3e82660979c380d023a920c17d8a0779187044425c3ad747896ea732bef9d"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 96000,
+      "frequency": 261.63,
+      "options": {
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 275789,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "fe9addd522ab3ee7c28642c7621f43537116e03a6cc7ec90e41cf6d854a2f2f7",
+        "rustSha256": "fe9addd522ab3ee7c28642c7621f43537116e03a6cc7ec90e41cf6d854a2f2f7"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "d73d57708f33dff0e20e51f3b236f89a95331f6c03c0a0979feb8538603669de",
+        "rustSha256": "d73d57708f33dff0e20e51f3b236f89a95331f6c03c0a0979feb8538603669de"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 96000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 57600,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "04aa11075231f71d951125bbcee95c9d4f257f83455aa4f29ff8bd59022ce7ae",
+        "rustSha256": "04aa11075231f71d951125bbcee95c9d4f257f83455aa4f29ff8bd59022ce7ae"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "5299b0e201f1f77f10812558fb5989feb03da0a6ef7854c09ff7e7c5183d1da8",
+        "rustSha256": "5299b0e201f1f77f10812558fb5989feb03da0a6ef7854c09ff7e7c5183d1da8"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 96000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 77221,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "58f9931b2b6aafd76978dfdeff7811070d6dfc4dd5ae523c0a54fe73b0209d8a",
+        "rustSha256": "58f9931b2b6aafd76978dfdeff7811070d6dfc4dd5ae523c0a54fe73b0209d8a"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "f5b3e82660979c380d023a920c17d8a0779187044425c3ad747896ea732bef9d",
+        "rustSha256": "f5b3e82660979c380d023a920c17d8a0779187044425c3ad747896ea732bef9d"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 96000,
+      "frequency": 1760,
+      "options": {
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 171246,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "dc80bf5368e83d42981a45d32c1ef3e54f2dab912a19119a643408796bf93d17",
+        "rustSha256": "dc80bf5368e83d42981a45d32c1ef3e54f2dab912a19119a643408796bf93d17"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "d73d57708f33dff0e20e51f3b236f89a95331f6c03c0a0979feb8538603669de",
+        "rustSha256": "d73d57708f33dff0e20e51f3b236f89a95331f6c03c0a0979feb8538603669de"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 96000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 57600,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "41c7832ff77fccb08d940065fc1f1fbe3cb6ae329946ab499dac31111da30269",
+        "rustSha256": "41c7832ff77fccb08d940065fc1f1fbe3cb6ae329946ab499dac31111da30269"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "5299b0e201f1f77f10812558fb5989feb03da0a6ef7854c09ff7e7c5183d1da8",
+        "rustSha256": "5299b0e201f1f77f10812558fb5989feb03da0a6ef7854c09ff7e7c5183d1da8"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 96000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 57600,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "e3c9834755e4ade1d59a89487f8a33fdead7d8e9e740b8a8f08913818a84822f",
+        "rustSha256": "e3c9834755e4ade1d59a89487f8a33fdead7d8e9e740b8a8f08913818a84822f"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "f5b3e82660979c380d023a920c17d8a0779187044425c3ad747896ea732bef9d",
+        "rustSha256": "f5b3e82660979c380d023a920c17d8a0779187044425c3ad747896ea732bef9d"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 192000,
+      "frequency": 55,
+      "options": {
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 814588,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "d373b6e7af4d5232babbbffe138dc642fbf6c55808e7c14eb45cc64b5ff6b360",
+        "rustSha256": "d373b6e7af4d5232babbbffe138dc642fbf6c55808e7c14eb45cc64b5ff6b360"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "d73d57708f33dff0e20e51f3b236f89a95331f6c03c0a0979feb8538603669de",
+        "rustSha256": "d73d57708f33dff0e20e51f3b236f89a95331f6c03c0a0979feb8538603669de"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 192000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 115200,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "1b694e4462a8d417271071029da10f610f13ad4f23a5d930bc63d210e33b6284",
+        "rustSha256": "1b694e4462a8d417271071029da10f610f13ad4f23a5d930bc63d210e33b6284"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "5299b0e201f1f77f10812558fb5989feb03da0a6ef7854c09ff7e7c5183d1da8",
+        "rustSha256": "5299b0e201f1f77f10812558fb5989feb03da0a6ef7854c09ff7e7c5183d1da8"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 192000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 228085,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "c3c3c5ef3207e23beb52232af54e462a746779832b4f146791b0ef152e3a70d6",
+        "rustSha256": "c3c3c5ef3207e23beb52232af54e462a746779832b4f146791b0ef152e3a70d6"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "f5b3e82660979c380d023a920c17d8a0779187044425c3ad747896ea732bef9d",
+        "rustSha256": "f5b3e82660979c380d023a920c17d8a0779187044425c3ad747896ea732bef9d"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 192000,
+      "frequency": 261.63,
+      "options": {
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 551578,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "959622749a0dd851193fa2f98220b024027cede61984f371603c137a586101bb",
+        "rustSha256": "959622749a0dd851193fa2f98220b024027cede61984f371603c137a586101bb"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "d73d57708f33dff0e20e51f3b236f89a95331f6c03c0a0979feb8538603669de",
+        "rustSha256": "d73d57708f33dff0e20e51f3b236f89a95331f6c03c0a0979feb8538603669de"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 192000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 115200,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "7a29adc6058aebc23258a415b4ee412a4d76a8ed14e46d20cf35a1f54e113d97",
+        "rustSha256": "7a29adc6058aebc23258a415b4ee412a4d76a8ed14e46d20cf35a1f54e113d97"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "5299b0e201f1f77f10812558fb5989feb03da0a6ef7854c09ff7e7c5183d1da8",
+        "rustSha256": "5299b0e201f1f77f10812558fb5989feb03da0a6ef7854c09ff7e7c5183d1da8"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 192000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 154442,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "2af4067241730825ec67bc8f65a3baebb09e851d8e35a948b516a535f7c8a590",
+        "rustSha256": "2af4067241730825ec67bc8f65a3baebb09e851d8e35a948b516a535f7c8a590"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "f5b3e82660979c380d023a920c17d8a0779187044425c3ad747896ea732bef9d",
+        "rustSha256": "f5b3e82660979c380d023a920c17d8a0779187044425c3ad747896ea732bef9d"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 192000,
+      "frequency": 1760,
+      "options": {
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 342492,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "fc1da3d9436f7031234a8d3931806353201e793775eff9a51262804e3186ad70",
+        "rustSha256": "fc1da3d9436f7031234a8d3931806353201e793775eff9a51262804e3186ad70"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "d73d57708f33dff0e20e51f3b236f89a95331f6c03c0a0979feb8538603669de",
+        "rustSha256": "d73d57708f33dff0e20e51f3b236f89a95331f6c03c0a0979feb8538603669de"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 192000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 115200,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "307068ff99deacd76b4399197fffd226a9fac827b685022060b68793f6ea5857",
+        "rustSha256": "307068ff99deacd76b4399197fffd226a9fac827b685022060b68793f6ea5857"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "5299b0e201f1f77f10812558fb5989feb03da0a6ef7854c09ff7e7c5183d1da8",
+        "rustSha256": "5299b0e201f1f77f10812558fb5989feb03da0a6ef7854c09ff7e7c5183d1da8"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 192000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "felt",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 115200,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "ac4e6905a871fb2c02fdfb31dce0cd7b3f24001f143ca8952491aa4fa512cbbe",
+        "rustSha256": "ac4e6905a871fb2c02fdfb31dce0cd7b3f24001f143ca8952491aa4fa512cbbe"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "f5b3e82660979c380d023a920c17d8a0779187044425c3ad747896ea732bef9d",
+        "rustSha256": "f5b3e82660979c380d023a920c17d8a0779187044425c3ad747896ea732bef9d"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 8000,
+      "frequency": 55,
+      "options": {
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 33942,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "ed3e865eacdfde39bb7d1245d994f0b21731b3ad7cd3012f07febbdb553168ff",
+        "rustSha256": "ed3e865eacdfde39bb7d1245d994f0b21731b3ad7cd3012f07febbdb553168ff"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "6bc858bd2468c951a24ee07b82a65b2a1e668c534f5a6f6e3a8ff719dd589e7f",
+        "rustSha256": "6bc858bd2468c951a24ee07b82a65b2a1e668c534f5a6f6e3a8ff719dd589e7f"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 8000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 4800,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "e13b7e04022c98be41777cfefd932144d7723dde1156b6a2530ea33b8f8cb3dc",
+        "rustSha256": "e13b7e04022c98be41777cfefd932144d7723dde1156b6a2530ea33b8f8cb3dc"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "e350a540ef4289c17b381fb82f78e4f7babed6b862c4f3b7cad4371094712e04",
+        "rustSha256": "e350a540ef4289c17b381fb82f78e4f7babed6b862c4f3b7cad4371094712e04"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 8000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 9504,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "c2d2e8dd9a7f885348951d25ca1e20b24e2daab1fa6d334bf246df4344e4afd2",
+        "rustSha256": "c2d2e8dd9a7f885348951d25ca1e20b24e2daab1fa6d334bf246df4344e4afd2"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "bb93a78cc6739be4fbe770b135e576a07239536911f18864588d029a7c519850",
+        "rustSha256": "bb93a78cc6739be4fbe770b135e576a07239536911f18864588d029a7c519850"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 8000,
+      "frequency": 261.63,
+      "options": {
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 22983,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "ff2771954701a32e7002377e3fd0f2d48de6c72bf3087c6e7fbb14cafcc12e52",
+        "rustSha256": "ff2771954701a32e7002377e3fd0f2d48de6c72bf3087c6e7fbb14cafcc12e52"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "6bc858bd2468c951a24ee07b82a65b2a1e668c534f5a6f6e3a8ff719dd589e7f",
+        "rustSha256": "6bc858bd2468c951a24ee07b82a65b2a1e668c534f5a6f6e3a8ff719dd589e7f"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 8000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 4800,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "69440d442a3929980fc026d62b9d3a430598a0d6f331c0500eabd52286a03b1f",
+        "rustSha256": "69440d442a3929980fc026d62b9d3a430598a0d6f331c0500eabd52286a03b1f"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "e350a540ef4289c17b381fb82f78e4f7babed6b862c4f3b7cad4371094712e04",
+        "rustSha256": "e350a540ef4289c17b381fb82f78e4f7babed6b862c4f3b7cad4371094712e04"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 8000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 6436,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "554b51bb1af154034a62de733c380687f59d47bed3301f567c14ad999d7b6b07",
+        "rustSha256": "554b51bb1af154034a62de733c380687f59d47bed3301f567c14ad999d7b6b07"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "bb93a78cc6739be4fbe770b135e576a07239536911f18864588d029a7c519850",
+        "rustSha256": "bb93a78cc6739be4fbe770b135e576a07239536911f18864588d029a7c519850"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 8000,
+      "frequency": 1760,
+      "options": {
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 15297,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "3934c605158da2fc306f8dea0a1f3b47f6c6195df023de6e72a78580104896b2",
+        "rustSha256": "3934c605158da2fc306f8dea0a1f3b47f6c6195df023de6e72a78580104896b2"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "b7e817296ef2f979d618408623da666673db18ab02d43666dcba773e6c66c53a",
+        "rustSha256": "b7e817296ef2f979d618408623da666673db18ab02d43666dcba773e6c66c53a"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 8000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 4800,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "f25a58100ab341fb135eebcf438a93e5888e9d771347c6edbc2e284c910f3279",
+        "rustSha256": "f25a58100ab341fb135eebcf438a93e5888e9d771347c6edbc2e284c910f3279"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "c7aa183576bf9c8b6be84acc11d71cfa406b3f925f2219fc38dd406e85f4ec6e",
+        "rustSha256": "c7aa183576bf9c8b6be84acc11d71cfa406b3f925f2219fc38dd406e85f4ec6e"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 8000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 4800,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "8fd14a90023ece311773923c21acf904960e3a03ba440cc6a022a88e2e2c5921",
+        "rustSha256": "8fd14a90023ece311773923c21acf904960e3a03ba440cc6a022a88e2e2c5921"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "572b3af5e6187d32f114aa8489268c79d5b56d6d96ceff24ab6c0d1453a9a2f0",
+        "rustSha256": "572b3af5e6187d32f114aa8489268c79d5b56d6d96ceff24ab6c0d1453a9a2f0"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 24000,
+      "frequency": 55,
+      "options": {
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 101824,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "c81fb37c4d434da5956b878bc7bb139890fce2f23b1298f6dca601a51b4ac559",
+        "rustSha256": "c81fb37c4d434da5956b878bc7bb139890fce2f23b1298f6dca601a51b4ac559"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "6bc858bd2468c951a24ee07b82a65b2a1e668c534f5a6f6e3a8ff719dd589e7f",
+        "rustSha256": "6bc858bd2468c951a24ee07b82a65b2a1e668c534f5a6f6e3a8ff719dd589e7f"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 24000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 14400,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "b7c172ac66418eca4b7b7f4bebfea916211da5ade419a291ef30c38f5c872a8b",
+        "rustSha256": "b7c172ac66418eca4b7b7f4bebfea916211da5ade419a291ef30c38f5c872a8b"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "e350a540ef4289c17b381fb82f78e4f7babed6b862c4f3b7cad4371094712e04",
+        "rustSha256": "e350a540ef4289c17b381fb82f78e4f7babed6b862c4f3b7cad4371094712e04"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 24000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 28511,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "69de3858fa7ed135f2a653650883e0eea0b96aeb538464f76a90edba35535df4",
+        "rustSha256": "69de3858fa7ed135f2a653650883e0eea0b96aeb538464f76a90edba35535df4"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "bb93a78cc6739be4fbe770b135e576a07239536911f18864588d029a7c519850",
+        "rustSha256": "bb93a78cc6739be4fbe770b135e576a07239536911f18864588d029a7c519850"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 24000,
+      "frequency": 261.63,
+      "options": {
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 68948,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "bb0f73a58c4e9ebae25e749cda358b66d5e23aca131c24495f79383f630de1fe",
+        "rustSha256": "bb0f73a58c4e9ebae25e749cda358b66d5e23aca131c24495f79383f630de1fe"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "6bc858bd2468c951a24ee07b82a65b2a1e668c534f5a6f6e3a8ff719dd589e7f",
+        "rustSha256": "6bc858bd2468c951a24ee07b82a65b2a1e668c534f5a6f6e3a8ff719dd589e7f"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 24000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 14400,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "ca1f1f324f384314ea54fcd5e2dfaa7892f103fbef6a95510d39fabb41d22b69",
+        "rustSha256": "ca1f1f324f384314ea54fcd5e2dfaa7892f103fbef6a95510d39fabb41d22b69"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "e350a540ef4289c17b381fb82f78e4f7babed6b862c4f3b7cad4371094712e04",
+        "rustSha256": "e350a540ef4289c17b381fb82f78e4f7babed6b862c4f3b7cad4371094712e04"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 24000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 19306,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "ebd5df73cd556bc69c5ed49f52835d454eb4931b9f89bca50c7c4745664bd611",
+        "rustSha256": "ebd5df73cd556bc69c5ed49f52835d454eb4931b9f89bca50c7c4745664bd611"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "bb93a78cc6739be4fbe770b135e576a07239536911f18864588d029a7c519850",
+        "rustSha256": "bb93a78cc6739be4fbe770b135e576a07239536911f18864588d029a7c519850"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 24000,
+      "frequency": 1760,
+      "options": {
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 42812,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "190017e4bf314db4341f5bfbbbb4df0a5cd0cf612bdd95d2208db65abded0807",
+        "rustSha256": "190017e4bf314db4341f5bfbbbb4df0a5cd0cf612bdd95d2208db65abded0807"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "6bc858bd2468c951a24ee07b82a65b2a1e668c534f5a6f6e3a8ff719dd589e7f",
+        "rustSha256": "6bc858bd2468c951a24ee07b82a65b2a1e668c534f5a6f6e3a8ff719dd589e7f"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 24000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 14400,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "556980294339bdcbdc2a84096f2d700ee325ef9c4e212f484f0634fe4b2b57d0",
+        "rustSha256": "556980294339bdcbdc2a84096f2d700ee325ef9c4e212f484f0634fe4b2b57d0"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "8a33be23f4b11dd3a0320ffa689051f8cb02e9baadd2b4d51b84b14c916f466b",
+        "rustSha256": "8a33be23f4b11dd3a0320ffa689051f8cb02e9baadd2b4d51b84b14c916f466b"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 24000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 14400,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "f14b521eb6e299f802954c79e51fff53bf443c6e92ef9e6fdc9a53c4eec3093d",
+        "rustSha256": "f14b521eb6e299f802954c79e51fff53bf443c6e92ef9e6fdc9a53c4eec3093d"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "653400317ce6e2060c28b59dfe69b867d1b7f6bc2ef294a9d0244183ca5eedda",
+        "rustSha256": "653400317ce6e2060c28b59dfe69b867d1b7f6bc2ef294a9d0244183ca5eedda"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 44100,
+      "frequency": 55,
+      "options": {
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 187101,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "77caf44868bbc4a6a387192bf0ef97d766e62bbb622ea744eb7227f8ee87cbb2",
+        "rustSha256": "77caf44868bbc4a6a387192bf0ef97d766e62bbb622ea744eb7227f8ee87cbb2"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "6bc858bd2468c951a24ee07b82a65b2a1e668c534f5a6f6e3a8ff719dd589e7f",
+        "rustSha256": "6bc858bd2468c951a24ee07b82a65b2a1e668c534f5a6f6e3a8ff719dd589e7f"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 44100,
+      "frequency": 55,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 26460,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "9c7cf2bc050af81eead8fe331e559efdbdb44320f79b48d149fcba2ee5dc1bdc",
+        "rustSha256": "9c7cf2bc050af81eead8fe331e559efdbdb44320f79b48d149fcba2ee5dc1bdc"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "e350a540ef4289c17b381fb82f78e4f7babed6b862c4f3b7cad4371094712e04",
+        "rustSha256": "e350a540ef4289c17b381fb82f78e4f7babed6b862c4f3b7cad4371094712e04"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 44100,
+      "frequency": 55,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 52389,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "36aab33ec49cc9c46e5cc3ee343c90d37f0dae7a3c59c2398be41c0a64564133",
+        "rustSha256": "36aab33ec49cc9c46e5cc3ee343c90d37f0dae7a3c59c2398be41c0a64564133"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "bb93a78cc6739be4fbe770b135e576a07239536911f18864588d029a7c519850",
+        "rustSha256": "bb93a78cc6739be4fbe770b135e576a07239536911f18864588d029a7c519850"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 44100,
+      "frequency": 261.63,
+      "options": {
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 126691,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "d28cfb9a76665cf85676c7e85fd17cd0a5eae821b8430fe4507e077d8e121d82",
+        "rustSha256": "d28cfb9a76665cf85676c7e85fd17cd0a5eae821b8430fe4507e077d8e121d82"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "6bc858bd2468c951a24ee07b82a65b2a1e668c534f5a6f6e3a8ff719dd589e7f",
+        "rustSha256": "6bc858bd2468c951a24ee07b82a65b2a1e668c534f5a6f6e3a8ff719dd589e7f"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 44100,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 26460,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "2e6f802dcdf3e76fa026418eb4c36ce578e250457fabb15cb31029d980474b7b",
+        "rustSha256": "2e6f802dcdf3e76fa026418eb4c36ce578e250457fabb15cb31029d980474b7b"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "e350a540ef4289c17b381fb82f78e4f7babed6b862c4f3b7cad4371094712e04",
+        "rustSha256": "e350a540ef4289c17b381fb82f78e4f7babed6b862c4f3b7cad4371094712e04"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 44100,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 35474,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "084b4d5c63ed8a5526c53cb11f65de7e3aa8fe5da2a272ef073a5564bc2f580d",
+        "rustSha256": "084b4d5c63ed8a5526c53cb11f65de7e3aa8fe5da2a272ef073a5564bc2f580d"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "bb93a78cc6739be4fbe770b135e576a07239536911f18864588d029a7c519850",
+        "rustSha256": "bb93a78cc6739be4fbe770b135e576a07239536911f18864588d029a7c519850"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 44100,
+      "frequency": 1760,
+      "options": {
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 78667,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "a1a8c0d07250508915987fec21f9ee0dad31c56e3f957a7da083c8fcd0868783",
+        "rustSha256": "a1a8c0d07250508915987fec21f9ee0dad31c56e3f957a7da083c8fcd0868783"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "6bc858bd2468c951a24ee07b82a65b2a1e668c534f5a6f6e3a8ff719dd589e7f",
+        "rustSha256": "6bc858bd2468c951a24ee07b82a65b2a1e668c534f5a6f6e3a8ff719dd589e7f"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 44100,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 26460,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "c50cca9066c4b7058ea9f9d016115e20ad01adf62ccdd78260770be79bf34e4a",
+        "rustSha256": "c50cca9066c4b7058ea9f9d016115e20ad01adf62ccdd78260770be79bf34e4a"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "e350a540ef4289c17b381fb82f78e4f7babed6b862c4f3b7cad4371094712e04",
+        "rustSha256": "e350a540ef4289c17b381fb82f78e4f7babed6b862c4f3b7cad4371094712e04"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 44100,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 26460,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "7b9b5cda983dff9b5dd7d25d13fe8f374693830dae7cc7e3715ea04db1b52abf",
+        "rustSha256": "7b9b5cda983dff9b5dd7d25d13fe8f374693830dae7cc7e3715ea04db1b52abf"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "bb93a78cc6739be4fbe770b135e576a07239536911f18864588d029a7c519850",
+        "rustSha256": "bb93a78cc6739be4fbe770b135e576a07239536911f18864588d029a7c519850"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 48000,
+      "frequency": 55,
+      "options": {
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 203647,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "8dab772deafc0df73dc8a3b485443500efc4985a0798870ea4bc6130f8e584d9",
+        "rustSha256": "8dab772deafc0df73dc8a3b485443500efc4985a0798870ea4bc6130f8e584d9"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "6bc858bd2468c951a24ee07b82a65b2a1e668c534f5a6f6e3a8ff719dd589e7f",
+        "rustSha256": "6bc858bd2468c951a24ee07b82a65b2a1e668c534f5a6f6e3a8ff719dd589e7f"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 48000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 28800,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "b18072a3fd31fae5fb868000c919f718c4054619145eb6969f029f810b7f97df",
+        "rustSha256": "b18072a3fd31fae5fb868000c919f718c4054619145eb6969f029f810b7f97df"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "e350a540ef4289c17b381fb82f78e4f7babed6b862c4f3b7cad4371094712e04",
+        "rustSha256": "e350a540ef4289c17b381fb82f78e4f7babed6b862c4f3b7cad4371094712e04"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 48000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 57022,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "6ef5e369c46b6e2d3ebe2d9e352ca35e5abf60259cfc18c49d3ba625fbdb798f",
+        "rustSha256": "6ef5e369c46b6e2d3ebe2d9e352ca35e5abf60259cfc18c49d3ba625fbdb798f"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "bb93a78cc6739be4fbe770b135e576a07239536911f18864588d029a7c519850",
+        "rustSha256": "bb93a78cc6739be4fbe770b135e576a07239536911f18864588d029a7c519850"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 48000,
+      "frequency": 261.63,
+      "options": {
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 137895,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "8bac2bbefd2316b7214783f021a28d9803289b882f79d19d0840001b0e32a5b2",
+        "rustSha256": "8bac2bbefd2316b7214783f021a28d9803289b882f79d19d0840001b0e32a5b2"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "6bc858bd2468c951a24ee07b82a65b2a1e668c534f5a6f6e3a8ff719dd589e7f",
+        "rustSha256": "6bc858bd2468c951a24ee07b82a65b2a1e668c534f5a6f6e3a8ff719dd589e7f"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 48000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 28800,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "fe42013909453d761272a1a8aa62d3c2dae39d936736142d8ce19367b42a6ac8",
+        "rustSha256": "fe42013909453d761272a1a8aa62d3c2dae39d936736142d8ce19367b42a6ac8"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "e350a540ef4289c17b381fb82f78e4f7babed6b862c4f3b7cad4371094712e04",
+        "rustSha256": "e350a540ef4289c17b381fb82f78e4f7babed6b862c4f3b7cad4371094712e04"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 48000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 38611,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "2e4b9dc385cdb7def949c9220f12c58abaac9ebe86e5442c2ad1a552804abc32",
+        "rustSha256": "2e4b9dc385cdb7def949c9220f12c58abaac9ebe86e5442c2ad1a552804abc32"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "bb93a78cc6739be4fbe770b135e576a07239536911f18864588d029a7c519850",
+        "rustSha256": "bb93a78cc6739be4fbe770b135e576a07239536911f18864588d029a7c519850"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 48000,
+      "frequency": 1760,
+      "options": {
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 85623,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "8dd2cdfd3c75abc9d2f334ffd9aa65a768938890c306cbe5e73af7dd8dfda5f4",
+        "rustSha256": "8dd2cdfd3c75abc9d2f334ffd9aa65a768938890c306cbe5e73af7dd8dfda5f4"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "6bc858bd2468c951a24ee07b82a65b2a1e668c534f5a6f6e3a8ff719dd589e7f",
+        "rustSha256": "6bc858bd2468c951a24ee07b82a65b2a1e668c534f5a6f6e3a8ff719dd589e7f"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 48000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 28800,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "0f7b01b6e36f23c9ae99a7ae8d911d0dbef3e1ca0a11ee96d96fbb22fe24350c",
+        "rustSha256": "0f7b01b6e36f23c9ae99a7ae8d911d0dbef3e1ca0a11ee96d96fbb22fe24350c"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "e350a540ef4289c17b381fb82f78e4f7babed6b862c4f3b7cad4371094712e04",
+        "rustSha256": "e350a540ef4289c17b381fb82f78e4f7babed6b862c4f3b7cad4371094712e04"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 48000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 28800,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "d435a2f09a44621250afda4ac1f154b16479a2f7c68add5ad3febd3f3d74f464",
+        "rustSha256": "d435a2f09a44621250afda4ac1f154b16479a2f7c68add5ad3febd3f3d74f464"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "bb93a78cc6739be4fbe770b135e576a07239536911f18864588d029a7c519850",
+        "rustSha256": "bb93a78cc6739be4fbe770b135e576a07239536911f18864588d029a7c519850"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 96000,
+      "frequency": 55,
+      "options": {
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 407294,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "2f94ba76947db0749631cab406b783273b07c3ea91ce7bc6a7bb4450505316ab",
+        "rustSha256": "2f94ba76947db0749631cab406b783273b07c3ea91ce7bc6a7bb4450505316ab"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "6bc858bd2468c951a24ee07b82a65b2a1e668c534f5a6f6e3a8ff719dd589e7f",
+        "rustSha256": "6bc858bd2468c951a24ee07b82a65b2a1e668c534f5a6f6e3a8ff719dd589e7f"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 96000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 57600,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "210103a3e7aedd81828a6a3802adae81c87195e2954cdd3167cbd08a06997174",
+        "rustSha256": "210103a3e7aedd81828a6a3802adae81c87195e2954cdd3167cbd08a06997174"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "e350a540ef4289c17b381fb82f78e4f7babed6b862c4f3b7cad4371094712e04",
+        "rustSha256": "e350a540ef4289c17b381fb82f78e4f7babed6b862c4f3b7cad4371094712e04"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 96000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 114043,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "4f0b555a9071904ab09ec0e59557d96a7dcdbadbce68197e7f2eef8367d38ae1",
+        "rustSha256": "4f0b555a9071904ab09ec0e59557d96a7dcdbadbce68197e7f2eef8367d38ae1"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "bb93a78cc6739be4fbe770b135e576a07239536911f18864588d029a7c519850",
+        "rustSha256": "bb93a78cc6739be4fbe770b135e576a07239536911f18864588d029a7c519850"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 96000,
+      "frequency": 261.63,
+      "options": {
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 275789,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "a6a1a4eac2edcdc45e5dde361fac70bb8cb7fcd74e89a7807c3d29dfc95e23a2",
+        "rustSha256": "a6a1a4eac2edcdc45e5dde361fac70bb8cb7fcd74e89a7807c3d29dfc95e23a2"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "6bc858bd2468c951a24ee07b82a65b2a1e668c534f5a6f6e3a8ff719dd589e7f",
+        "rustSha256": "6bc858bd2468c951a24ee07b82a65b2a1e668c534f5a6f6e3a8ff719dd589e7f"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 96000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 57600,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "529593de3a1e41421c04fbe4130e34eecf3d92ff8d2258c723b6d99ff69a6fa4",
+        "rustSha256": "529593de3a1e41421c04fbe4130e34eecf3d92ff8d2258c723b6d99ff69a6fa4"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "e350a540ef4289c17b381fb82f78e4f7babed6b862c4f3b7cad4371094712e04",
+        "rustSha256": "e350a540ef4289c17b381fb82f78e4f7babed6b862c4f3b7cad4371094712e04"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 96000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 77221,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "28f3631abe8065bdd459248c303bd996fc27b8e588b80655de1d4c1b1b480966",
+        "rustSha256": "28f3631abe8065bdd459248c303bd996fc27b8e588b80655de1d4c1b1b480966"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "bb93a78cc6739be4fbe770b135e576a07239536911f18864588d029a7c519850",
+        "rustSha256": "bb93a78cc6739be4fbe770b135e576a07239536911f18864588d029a7c519850"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 96000,
+      "frequency": 1760,
+      "options": {
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 171246,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "4df458b48b1841c05db1541b21b5540679e1943d2c5ab546347ff3d14922339b",
+        "rustSha256": "4df458b48b1841c05db1541b21b5540679e1943d2c5ab546347ff3d14922339b"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "6bc858bd2468c951a24ee07b82a65b2a1e668c534f5a6f6e3a8ff719dd589e7f",
+        "rustSha256": "6bc858bd2468c951a24ee07b82a65b2a1e668c534f5a6f6e3a8ff719dd589e7f"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 96000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 57600,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "acd05af0b812ce7f62720b4cb080505c9cc16547e764c3493c56173bd56658f7",
+        "rustSha256": "acd05af0b812ce7f62720b4cb080505c9cc16547e764c3493c56173bd56658f7"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "e350a540ef4289c17b381fb82f78e4f7babed6b862c4f3b7cad4371094712e04",
+        "rustSha256": "e350a540ef4289c17b381fb82f78e4f7babed6b862c4f3b7cad4371094712e04"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 96000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 57600,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "00675f721cebb86934118ebf1f1002991a9efb58d47b0e395ca2e16ca2e99821",
+        "rustSha256": "00675f721cebb86934118ebf1f1002991a9efb58d47b0e395ca2e16ca2e99821"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "bb93a78cc6739be4fbe770b135e576a07239536911f18864588d029a7c519850",
+        "rustSha256": "bb93a78cc6739be4fbe770b135e576a07239536911f18864588d029a7c519850"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 192000,
+      "frequency": 55,
+      "options": {
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 814588,
+        "maxAbsoluteError": 7.450580596923828e-9,
+        "rmsError": 8.319319516551748e-12,
+        "firstDifferentFrame": 82278,
+        "bitExact": false,
+        "referenceSha256": "a3e8210f8d9e1e28c6b81e594b04d011564354b2ab198be11b73c4fdc39cb562",
+        "rustSha256": "4e625bd6f75620d6a5526e9919bf70bb8218256628d27f113815cde7d71f62ca"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "6bc858bd2468c951a24ee07b82a65b2a1e668c534f5a6f6e3a8ff719dd589e7f",
+        "rustSha256": "6bc858bd2468c951a24ee07b82a65b2a1e668c534f5a6f6e3a8ff719dd589e7f"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 192000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 115200,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "e1eb5e3c3abebcc0539f92a1fce2d2f27e77eb3f38980dcadb29e85efc847a98",
+        "rustSha256": "e1eb5e3c3abebcc0539f92a1fce2d2f27e77eb3f38980dcadb29e85efc847a98"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "e350a540ef4289c17b381fb82f78e4f7babed6b862c4f3b7cad4371094712e04",
+        "rustSha256": "e350a540ef4289c17b381fb82f78e4f7babed6b862c4f3b7cad4371094712e04"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 192000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 228085,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "1532f61236018e617ef3afee05c9f8eef57f97879d7c073ab9fa77c428bcac8f",
+        "rustSha256": "1532f61236018e617ef3afee05c9f8eef57f97879d7c073ab9fa77c428bcac8f"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "bb93a78cc6739be4fbe770b135e576a07239536911f18864588d029a7c519850",
+        "rustSha256": "bb93a78cc6739be4fbe770b135e576a07239536911f18864588d029a7c519850"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 192000,
+      "frequency": 261.63,
+      "options": {
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 551578,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "f4bbf2a9479e5bdff28d51167ed29ed6b39e9f89281db4566089cfc562ac143f",
+        "rustSha256": "f4bbf2a9479e5bdff28d51167ed29ed6b39e9f89281db4566089cfc562ac143f"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "6bc858bd2468c951a24ee07b82a65b2a1e668c534f5a6f6e3a8ff719dd589e7f",
+        "rustSha256": "6bc858bd2468c951a24ee07b82a65b2a1e668c534f5a6f6e3a8ff719dd589e7f"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 192000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 115200,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "7c17732cafe82c08895979759d397b496c5eebbcaf9befa7ce1648045f6b65c7",
+        "rustSha256": "7c17732cafe82c08895979759d397b496c5eebbcaf9befa7ce1648045f6b65c7"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "e350a540ef4289c17b381fb82f78e4f7babed6b862c4f3b7cad4371094712e04",
+        "rustSha256": "e350a540ef4289c17b381fb82f78e4f7babed6b862c4f3b7cad4371094712e04"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 192000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 154442,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "50745dc296543c2de9d61bbcf16b72824dda74aaee869d14f5e25efe2d708169",
+        "rustSha256": "50745dc296543c2de9d61bbcf16b72824dda74aaee869d14f5e25efe2d708169"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "bb93a78cc6739be4fbe770b135e576a07239536911f18864588d029a7c519850",
+        "rustSha256": "bb93a78cc6739be4fbe770b135e576a07239536911f18864588d029a7c519850"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 192000,
+      "frequency": 1760,
+      "options": {
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 342492,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "a25525a2ca66b1000f23508ae9fa96680e647c0ea3be7ddbb2809d22299684bd",
+        "rustSha256": "a25525a2ca66b1000f23508ae9fa96680e647c0ea3be7ddbb2809d22299684bd"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "6bc858bd2468c951a24ee07b82a65b2a1e668c534f5a6f6e3a8ff719dd589e7f",
+        "rustSha256": "6bc858bd2468c951a24ee07b82a65b2a1e668c534f5a6f6e3a8ff719dd589e7f"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 192000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.3,
+        "brightness": 1,
+        "hammer": 1,
+        "unison": 0,
+        "velocity": 1,
+        "resonance": 1,
+        "softness": 0,
+        "seed": 4294967295,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 115200,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "550dd3c473e2e33772513f8e16e1d84d4b6c5c10d5c736e637b5e1567789eed2",
+        "rustSha256": "550dd3c473e2e33772513f8e16e1d84d4b6c5c10d5c736e637b5e1567789eed2"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "e350a540ef4289c17b381fb82f78e4f7babed6b862c4f3b7cad4371094712e04",
+        "rustSha256": "e350a540ef4289c17b381fb82f78e4f7babed6b862c4f3b7cad4371094712e04"
+      }
+    },
+    {
+      "family": "modal",
+      "sampleRate": 192000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.7,
+        "brightness": 0.2,
+        "hammer": 0.8,
+        "unison": 0.6,
+        "velocity": 0.3,
+        "resonance": 0.55,
+        "softness": 0.65,
+        "seed": 19,
+        "type": "electric",
+        "sustain": 0.28
+      },
+      "strike": {
+        "frames": 115200,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "fcc1ba93faa46e1ebd57b8501b15118a600e32b0e6ef3bc3783f9cb8c034dae1",
+        "rustSha256": "fcc1ba93faa46e1ebd57b8501b15118a600e32b0e6ef3bc3783f9cb8c034dae1"
+      },
+      "body": {
+        "frames": 2048,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "bb93a78cc6739be4fbe770b135e576a07239536911f18864588d029a7c519850",
+        "rustSha256": "bb93a78cc6739be4fbe770b135e576a07239536911f18864588d029a7c519850"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 8000,
+      "frequency": 55,
+      "options": {
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 56000,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "daf8cc0684b1b530ec2f1b3ee101d7ff5edf00b28c31eb02b05300d3f4db5d4a",
+        "rustSha256": "daf8cc0684b1b530ec2f1b3ee101d7ff5edf00b28c31eb02b05300d3f4db5d4a"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 8000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 44338,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "614f98ec64692aa53abca3c4c5c23e9df03ddbc23eae5cc832ed8bede871cb65",
+        "rustSha256": "614f98ec64692aa53abca3c4c5c23e9df03ddbc23eae5cc832ed8bede871cb65"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 8000,
+      "frequency": 261.63,
+      "options": {
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 56000,
+        "maxAbsoluteError": 2.9103830456733704e-11,
+        "rmsError": 1.4706731040169788e-13,
+        "firstDifferentFrame": 46299,
+        "bitExact": false,
+        "referenceSha256": "a4db785d0368ead48267adf89107483ae43a8e316a7ab16f93d1f4d34a518a09",
+        "rustSha256": "b36ff8727ca58c68d2751753140ec5d10ef33ed40348db36d5ec3094f98b46f0"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 8000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 21978,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "f76986bd5b0411ad9d78a910eaa9e0dd809eb92b42261d448a5133380a82bf18",
+        "rustSha256": "f76986bd5b0411ad9d78a910eaa9e0dd809eb92b42261d448a5133380a82bf18"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 8000,
+      "frequency": 1760,
+      "options": {
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 52807,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "bb0b58cb9ad1f472175a304c2ed50d79e0a45fe797e5c93a5a3cd3b0baf77796",
+        "rustSha256": "bb0b58cb9ad1f472175a304c2ed50d79e0a45fe797e5c93a5a3cd3b0baf77796"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 8000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 10562,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "b9974fba6ae585f71d71d08f0e5accad880e3d35779e29fe555af32d4291bf2e",
+        "rustSha256": "b9974fba6ae585f71d71d08f0e5accad880e3d35779e29fe555af32d4291bf2e"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 24000,
+      "frequency": 55,
+      "options": {
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 168000,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "bb6e112c9cdc73a5d4f03f0ecb8e69891e2eb2f65277c5ff777814890c1b59e1",
+        "rustSha256": "bb6e112c9cdc73a5d4f03f0ecb8e69891e2eb2f65277c5ff777814890c1b59e1"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 24000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 133014,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "fd108380fb50d0bdfd58f6eb0ae2901a9002ace23d2cca431c5ff6e799d1ada3",
+        "rustSha256": "fd108380fb50d0bdfd58f6eb0ae2901a9002ace23d2cca431c5ff6e799d1ada3"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 24000,
+      "frequency": 261.63,
+      "options": {
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 168000,
+        "maxAbsoluteError": 1.4551915228366852e-11,
+        "rmsError": 3.894328632099063e-14,
+        "firstDifferentFrame": 147800,
+        "bitExact": false,
+        "referenceSha256": "336d38bdae73601714a023073461068a53ca6c410acac5e13653ac9b67a82e07",
+        "rustSha256": "fb131d8d399069e8d1f23d75a8c6bef7ff47c884e03f042e2aa0afcd52203ee1"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 24000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 65933,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "454606249bae7bf6fcdbb59d2fa4367be7a94a8024162b4de036ab3967fdb351",
+        "rustSha256": "454606249bae7bf6fcdbb59d2fa4367be7a94a8024162b4de036ab3967fdb351"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 24000,
+      "frequency": 1760,
+      "options": {
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 139813,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "15b97083dbe0ffb78c78b61340a506c994aea52e1db882eea0db401e51387196",
+        "rustSha256": "15b97083dbe0ffb78c78b61340a506c994aea52e1db882eea0db401e51387196"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 24000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 27963,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "ae27c9be0b428b1b7118b18a3533ff9c6d7915a0fa68661c6e0306f4bb0a603a",
+        "rustSha256": "ae27c9be0b428b1b7118b18a3533ff9c6d7915a0fa68661c6e0306f4bb0a603a"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 44100,
+      "frequency": 55,
+      "options": {
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 308700,
+        "maxAbsoluteError": 2.3283064365386963e-10,
+        "rmsError": 4.199284794437356e-13,
+        "firstDifferentFrame": 143466,
+        "bitExact": false,
+        "referenceSha256": "0a287e4d6dad09f0a4d900908dd8848b297c10345485b37d7b8a6aaefc55bc4a",
+        "rustSha256": "e3e67aa1ceea9e44a56313c65bf399db0764f0640cce101c94c6276aa08d0d0f"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 44100,
+      "frequency": 55,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 244412,
+        "maxAbsoluteError": 2.9103830456733704e-11,
+        "rmsError": 1.0351396051525673e-13,
+        "firstDifferentFrame": 104351,
+        "bitExact": false,
+        "referenceSha256": "cfa7001285ba8f7d536744b28bd118fec9abd2438d7d885857c85ccd8c3c6a19",
+        "rustSha256": "96a0b47f2ca7d92bc27304b124d9bdc960f62016ef21ed64a7aa95f72146c5ce"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 44100,
+      "frequency": 261.63,
+      "options": {
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 308700,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "b32bdb4a0c824efeea391d653185a6821c29af3e129f85b511c271258a7ceedb",
+        "rustSha256": "b32bdb4a0c824efeea391d653185a6821c29af3e129f85b511c271258a7ceedb"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 44100,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 121151,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "4952b4ff84e476545424699b0c9614360a849ff012c0c33dcd03fe47a818f0fa",
+        "rustSha256": "4952b4ff84e476545424699b0c9614360a849ff012c0c33dcd03fe47a818f0fa"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 44100,
+      "frequency": 1760,
+      "options": {
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 256907,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "6f3b1de50fbd58a172c34adbd73f84e7b4c5b27065c05feb24f3304567bbffe2",
+        "rustSha256": "6f3b1de50fbd58a172c34adbd73f84e7b4c5b27065c05feb24f3304567bbffe2"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 44100,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 51382,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "49bfc2a8819635c70543fc264a326073f6fea643040bf59c9700c87941be2f2c",
+        "rustSha256": "49bfc2a8819635c70543fc264a326073f6fea643040bf59c9700c87941be2f2c"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 48000,
+      "frequency": 55,
+      "options": {
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 336000,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "85c05dff9bbbbeb781be45272b4f557176ba8fe38c2bce3166c6adf94f2c47d6",
+        "rustSha256": "85c05dff9bbbbeb781be45272b4f557176ba8fe38c2bce3166c6adf94f2c47d6"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 48000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 266027,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "5271c9f27f8352dfe2b418bf942aeaca12f690395476a91ae669774b774187cf",
+        "rustSha256": "5271c9f27f8352dfe2b418bf942aeaca12f690395476a91ae669774b774187cf"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 48000,
+      "frequency": 261.63,
+      "options": {
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 336000,
+        "maxAbsoluteError": 4.656612873077393e-10,
+        "rmsError": 1.3528659436082722e-12,
+        "firstDifferentFrame": 100363,
+        "bitExact": false,
+        "referenceSha256": "75b48489f62d3ee4aba64b17f4c693b440cb8d41aff9f0d57399522ed9e7435c",
+        "rustSha256": "e13f2d3f11e8d40b84b3497f156bbf2fa8edede8d9d3dd04da9dda92eb3851e2"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 48000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 131865,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "d81b55912e68ad18f8f3f37ba458430f9803a2abfcdbfce804ffad2eca8a5e39",
+        "rustSha256": "d81b55912e68ad18f8f3f37ba458430f9803a2abfcdbfce804ffad2eca8a5e39"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 48000,
+      "frequency": 1760,
+      "options": {
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 279626,
+        "maxAbsoluteError": 1.8189894035458565e-12,
+        "rmsError": 4.864703972868254e-15,
+        "firstDifferentFrame": 162155,
+        "bitExact": false,
+        "referenceSha256": "e588fe9cb47dc9196044d72efc41265f3221a55c4b83f0ded2ebf77ff52440b9",
+        "rustSha256": "a713fe8a26b79f4816951016273e683535a711f1508632875c7d1752594ea94d"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 48000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 55926,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "af7038a039182b4ab8f431720dd456d45b891a34ed32ccfb4e65aa0571a3d13e",
+        "rustSha256": "af7038a039182b4ab8f431720dd456d45b891a34ed32ccfb4e65aa0571a3d13e"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 96000,
+      "frequency": 55,
+      "options": {
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 672000,
+        "maxAbsoluteError": 1.862645149230957e-9,
+        "rmsError": 2.8155085602137753e-12,
+        "firstDifferentFrame": 46240,
+        "bitExact": false,
+        "referenceSha256": "da8710f78851ea3ef7409d96c6c2b21cc7eb3e32e45202c22b16298f7c215dfc",
+        "rustSha256": "0a51ccc52affa4d05287b21c3dad40112baa933bd39aa05e81465c0bedc482ee"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 96000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 532053,
+        "maxAbsoluteError": 1.862645149230957e-9,
+        "rmsError": 3.2047174338099746e-12,
+        "firstDifferentFrame": 53237,
+        "bitExact": false,
+        "referenceSha256": "1b934236901d5d0e4c0841e824f9665eddebb2f6fc4846fb02a13e72822689d5",
+        "rustSha256": "1f6076706d8b8dc3f0aa6ee679a0e24f615b3d363223122d1731cf2b6f16c811"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 96000,
+      "frequency": 261.63,
+      "options": {
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 672000,
+        "maxAbsoluteError": 3.725290298461914e-9,
+        "rmsError": 5.043871878244776e-12,
+        "firstDifferentFrame": 87071,
+        "bitExact": false,
+        "referenceSha256": "943a2ff24d672b7e61ff84d4b8710b5b2efe351e300d21ae0f298c91ae11117e",
+        "rustSha256": "7a699e9bac05a08e64fcf2461ac95403c1f52d2f1c87db9c1505e93b0e46fe7c"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 96000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 263730,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "145b556a7f833800ad9c80b5ea8f1b3f59295cb8cee26c1ca8da2148ae6c0fb0",
+        "rustSha256": "145b556a7f833800ad9c80b5ea8f1b3f59295cb8cee26c1ca8da2148ae6c0fb0"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 96000,
+      "frequency": 1760,
+      "options": {
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 559252,
+        "maxAbsoluteError": 3.637978807091713e-12,
+        "rmsError": 5.199622560604214e-15,
+        "firstDifferentFrame": 293276,
+        "bitExact": false,
+        "referenceSha256": "5f5b45f2d45d7f54e1c9560795434ed81725badc4b1926c8cd0523ce59ef1b21",
+        "rustSha256": "af3d52c9849fd97b998f5d406d8de39e90dee30869a29656bab763cb11af2900"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 96000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 111851,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "954a93f32b3e9e5898b79fc8e16a3e60ee13dc3a2a0e9289cfc02edbcc04d61b",
+        "rustSha256": "954a93f32b3e9e5898b79fc8e16a3e60ee13dc3a2a0e9289cfc02edbcc04d61b"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 192000,
+      "frequency": 55,
+      "options": {
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 1344000,
+        "maxAbsoluteError": 1.4901161193847656e-8,
+        "rmsError": 1.4054962417409835e-11,
+        "firstDifferentFrame": 39241,
+        "bitExact": false,
+        "referenceSha256": "621f0e628d7381758aa6d56075608dc2b639d3b7a90b1f485346f7cafcb729f9",
+        "rustSha256": "adc3e560ca6febc423d7f4031910ba590a09056aebc6cd95a14184b76bdf0cf1"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 192000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 1064106,
+        "maxAbsoluteError": 1.862645149230957e-9,
+        "rmsError": 3.57018376337212e-12,
+        "firstDifferentFrame": 2414,
+        "bitExact": false,
+        "referenceSha256": "b62630b0e671ff51b735e564355e4229c6ef7e3f5475e3af006fc0428cefd7f1",
+        "rustSha256": "d6ad0ce4282122a728962387b58632487fb844adde4d4b09bcf04afa6e6fdf90"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 192000,
+      "frequency": 261.63,
+      "options": {
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 1344000,
+        "maxAbsoluteError": 7.450580596923828e-9,
+        "rmsError": 1.1719024054272517e-11,
+        "firstDifferentFrame": 14655,
+        "bitExact": false,
+        "referenceSha256": "beb86127558874b31004e342277cfc032da849874705ea301f9f74937f58fe9a",
+        "rustSha256": "a7c4d44995df0d0ca69d5ad2adb4d0d5e8393cc5b2eb664077a92435351ab301"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 192000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 527459,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "a68906758c98fe321778a2fc3567a9ce0890e28c97e1d5031d0a8999c4929a39",
+        "rustSha256": "a68906758c98fe321778a2fc3567a9ce0890e28c97e1d5031d0a8999c4929a39"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 192000,
+      "frequency": 1760,
+      "options": {
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 1118504,
+        "maxAbsoluteError": 2.3283064365386963e-10,
+        "rmsError": 3.8907113864866077e-13,
+        "firstDifferentFrame": 284679,
+        "bitExact": false,
+        "referenceSha256": "83a05919b845ca1f27fa1a60a0f38cc9fa9310a5dd6e24258317c17c647b60a8",
+        "rustSha256": "00a52a1da726790eae8f0fe9fd39a80163fd33f9205a3726082382b297413c9e"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 192000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "grand"
+      },
+      "strike": {
+        "frames": 223701,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "655865bced11ca11215eda40c6079e25564871001e7a16032705f3f7496660d2",
+        "rustSha256": "655865bced11ca11215eda40c6079e25564871001e7a16032705f3f7496660d2"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 8000,
+      "frequency": 55,
+      "options": {
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 56000,
+        "maxAbsoluteError": 1.862645149230957e-9,
+        "rmsError": 8.052334308456199e-12,
+        "firstDifferentFrame": 6628,
+        "bitExact": false,
+        "referenceSha256": "80d8d3314fd2380feaa46b546e30bfcf583e706c9ed7a685ba68835c5ff26c9f",
+        "rustSha256": "be46e2d375ebaae18551e8348bff5b02411c185d043484437fed838127661598"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 8000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 18475,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "85a4798528aaf2a11f2ffc7cebe934e5e69256a2b13ee17bc0a4fd4637808baf",
+        "rustSha256": "85a4798528aaf2a11f2ffc7cebe934e5e69256a2b13ee17bc0a4fd4637808baf"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 8000,
+      "frequency": 261.63,
+      "options": {
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 45787,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "3992acfa9c80da3b41caafcf3338ae953e795d12b679777854a759b87fd7ba62",
+        "rustSha256": "3992acfa9c80da3b41caafcf3338ae953e795d12b679777854a759b87fd7ba62"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 8000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 9158,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "b7bd317d9872588c654ef159040f0ee1c66bd03fe6d0efea9fad8fe03bc5bf69",
+        "rustSha256": "b7bd317d9872588c654ef159040f0ee1c66bd03fe6d0efea9fad8fe03bc5bf69"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 8000,
+      "frequency": 1760,
+      "options": {
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 22003,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "a814e7fb7ce7de4ac0efdcdc76b355b5b4970d85a44db4c97533b5dbdc736013",
+        "rustSha256": "a814e7fb7ce7de4ac0efdcdc76b355b5b4970d85a44db4c97533b5dbdc736013"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 8000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 6400,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "9112577b44d4c946a8821ea14932319a316963cb10679f9659296623e1a403bb",
+        "rustSha256": "9112577b44d4c946a8821ea14932319a316963cb10679f9659296623e1a403bb"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 24000,
+      "frequency": 55,
+      "options": {
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 168000,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "68ffec675bbfdb16e9602864e3e7a0a1ad3b3f1f00378e7236f008bbe75729a9",
+        "rustSha256": "68ffec675bbfdb16e9602864e3e7a0a1ad3b3f1f00378e7236f008bbe75729a9"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 24000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 55423,
+        "maxAbsoluteError": 9.094947017729282e-13,
+        "rmsError": 6.964618765045269e-15,
+        "firstDifferentFrame": 53622,
+        "bitExact": false,
+        "referenceSha256": "f8cea2c39a242148553a9442ccc8e55615f8c4c667aa4c4b9f60cfd8a4781933",
+        "rustSha256": "1a32f7a082a420ffaf2069184d5a56ef39e9b1ae3dabc2f441fc68856e52ab45"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 24000,
+      "frequency": 261.63,
+      "options": {
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 137360,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "74da115fd8a58ed68c72653c50b74342bb1045d3f95d8984f2ce22d490a8c7b9",
+        "rustSha256": "74da115fd8a58ed68c72653c50b74342bb1045d3f95d8984f2ce22d490a8c7b9"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 24000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 27472,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "689ef5ab185d56652c514bebb7e41ad12d8ce213240ae508457ee1941419beec",
+        "rustSha256": "689ef5ab185d56652c514bebb7e41ad12d8ce213240ae508457ee1941419beec"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 24000,
+      "frequency": 1760,
+      "options": {
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 58256,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "d423e4eb964246380326bc647a10ee50ead930655637bf34d18072d58c66bbd3",
+        "rustSha256": "d423e4eb964246380326bc647a10ee50ead930655637bf34d18072d58c66bbd3"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 24000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 19200,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "3a6f8875219390218001ff3af8de84a4f68592d8a574af81e3f661ab6ac014ca",
+        "rustSha256": "3a6f8875219390218001ff3af8de84a4f68592d8a574af81e3f661ab6ac014ca"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 44100,
+      "frequency": 55,
+      "options": {
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 308700,
+        "maxAbsoluteError": 2.3283064365386963e-10,
+        "rmsError": 6.479297167136659e-13,
+        "firstDifferentFrame": 59905,
+        "bitExact": false,
+        "referenceSha256": "17598a99444fd381d7764be1db81157b001cc4d245f4011c34869090a7a26468",
+        "rustSha256": "8828502c9fb1c5cfd96ae704164b2dbf4953dd70c2b0ad1b0b8aaddd462e602f"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 44100,
+      "frequency": 55,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 101839,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "bf113af20fe352e4b9a305d12147cea8ae8419aa2414018910555fc55401a608",
+        "rustSha256": "bf113af20fe352e4b9a305d12147cea8ae8419aa2414018910555fc55401a608"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 44100,
+      "frequency": 261.63,
+      "options": {
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 252398,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "a712601e32a88d56a01448592f7ade7460907cc9a0fb9e20cae4b05ce4eae3a4",
+        "rustSha256": "a712601e32a88d56a01448592f7ade7460907cc9a0fb9e20cae4b05ce4eae3a4"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 44100,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 50480,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "0fd33fbcdee767e8d1fa5bad2c09a17c5f503d5f3835d90496b396e8b3eb4dae",
+        "rustSha256": "0fd33fbcdee767e8d1fa5bad2c09a17c5f503d5f3835d90496b396e8b3eb4dae"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 44100,
+      "frequency": 1760,
+      "options": {
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 107045,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "ee4fb507ff564a8864ffa09528336c09e04a9a5af1929e18ef74d75330e84264",
+        "rustSha256": "ee4fb507ff564a8864ffa09528336c09e04a9a5af1929e18ef74d75330e84264"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 44100,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 35280,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "fff8e473fc00044e61b793f7bd6e2694d09b6e49a5835e42b1eae3f8cc468f0c",
+        "rustSha256": "fff8e473fc00044e61b793f7bd6e2694d09b6e49a5835e42b1eae3f8cc468f0c"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 48000,
+      "frequency": 55,
+      "options": {
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 336000,
+        "maxAbsoluteError": 4.656612873077393e-10,
+        "rmsError": 9.276875532885366e-13,
+        "firstDifferentFrame": 119939,
+        "bitExact": false,
+        "referenceSha256": "2a6f58f85e3e0ec75b3dcb61c8e52bbd30239c70632c25cab2d7a86d0ed7d071",
+        "rustSha256": "225b80b711e45ef30421b50c3eccd7348f1e858101142b441ec17f5322f4df0d"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 48000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 110845,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "dd08b3c29ff1df14a2c9d9990aa60d360b80196fbf7a544e147c62ac8d2cb716",
+        "rustSha256": "dd08b3c29ff1df14a2c9d9990aa60d360b80196fbf7a544e147c62ac8d2cb716"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 48000,
+      "frequency": 261.63,
+      "options": {
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 274719,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "670ef0c1a2c16a792fcbc714566f948da0d5adff7104faff125a476fae57ab76",
+        "rustSha256": "670ef0c1a2c16a792fcbc714566f948da0d5adff7104faff125a476fae57ab76"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 48000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 54944,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "edd7e975e65f8f962915bf54abe849503cd21300e7131e98d624cc7fe02d6384",
+        "rustSha256": "edd7e975e65f8f962915bf54abe849503cd21300e7131e98d624cc7fe02d6384"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 48000,
+      "frequency": 1760,
+      "options": {
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 116511,
+        "maxAbsoluteError": 1.862645149230957e-9,
+        "rmsError": 5.8512390074197405e-12,
+        "firstDifferentFrame": 7432,
+        "bitExact": false,
+        "referenceSha256": "91d3c616d58c6472772a23fe621a09c7f104bd7a7969c615f2f57bdd6d627058",
+        "rustSha256": "2a302adfd60aadc2387b43892c5b3c23518e70ac7f20342b027524fec2944eb1"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 48000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 38400,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "96f120f1fe404c819ce2b75d9816e821c2c737a68ff96af37836aba4744b11df",
+        "rustSha256": "96f120f1fe404c819ce2b75d9816e821c2c737a68ff96af37836aba4744b11df"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 96000,
+      "frequency": 55,
+      "options": {
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 672000,
+        "maxAbsoluteError": 7.450580596923828e-9,
+        "rmsError": 9.837682309064253e-12,
+        "firstDifferentFrame": 57347,
+        "bitExact": false,
+        "referenceSha256": "c2408ae53fa15388be164cd21df1b4359a5912d192199f46675f3ce7a1f3f6db",
+        "rustSha256": "f48ddde3425b3509c3f88aae64d823c2fcac11f17031f0395ef030aa46a2c9ae"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 96000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 221689,
+        "maxAbsoluteError": 4.656612873077393e-10,
+        "rmsError": 1.4121738722779605e-12,
+        "firstDifferentFrame": 48385,
+        "bitExact": false,
+        "referenceSha256": "555131f9a47a8684a0f961a4993c1bdab0fd4207bbd706991e31b30eea7ce9fe",
+        "rustSha256": "cc0e840d82b26de553ceac7a9c1dddfde262f47c54e265a30a58c38eb35a6e9d"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 96000,
+      "frequency": 261.63,
+      "options": {
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 549437,
+        "maxAbsoluteError": 1.8189894035458565e-12,
+        "rmsError": 2.7618529204367824e-15,
+        "firstDifferentFrame": 478802,
+        "bitExact": false,
+        "referenceSha256": "f243798b05c515c46b5a612a0ba4f7812250f8c00490c81f806d2b155089476e",
+        "rustSha256": "79b298498a93c908f008c461ba378d9bbddc114648106c5c8efc436cb8d50369"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 96000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 109888,
+        "maxAbsoluteError": 2.9103830456733704e-11,
+        "rmsError": 9.124365007266093e-14,
+        "firstDifferentFrame": 60972,
+        "bitExact": false,
+        "referenceSha256": "e5970c4987f3e43d77961a09a0d7101df8798f0199465799841f65727d2c6049",
+        "rustSha256": "9f199de397e423ab024239895728014c3f6110f3969553d6df334213e45ca247"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 96000,
+      "frequency": 1760,
+      "options": {
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 233022,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "01ac96a35958cbdb9a5c834d035f9f7614bcc38c1abe8d2021825fac96eca6b4",
+        "rustSha256": "01ac96a35958cbdb9a5c834d035f9f7614bcc38c1abe8d2021825fac96eca6b4"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 96000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 76800,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "fedaabfe350e4225ab93779d9e443d69a8b909ff5cbbfe96c22e73d5c0f2e138",
+        "rustSha256": "fedaabfe350e4225ab93779d9e443d69a8b909ff5cbbfe96c22e73d5c0f2e138"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 192000,
+      "frequency": 55,
+      "options": {
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 1344000,
+        "maxAbsoluteError": 7.450580596923828e-9,
+        "rmsError": 9.002101087964245e-12,
+        "firstDifferentFrame": 87494,
+        "bitExact": false,
+        "referenceSha256": "ea0eefb1d0a285abba72444c1480e86f0996baf693f07aa2b3e13bff201fea5b",
+        "rustSha256": "cf101928bd8cc077fc6dfb4236fdebe8ab01d82a3fbc1cce9f07545ebcfdf375"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 192000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 443378,
+        "maxAbsoluteError": 1.4901161193847656e-8,
+        "rmsError": 4.1210922661140585e-11,
+        "firstDifferentFrame": 1911,
+        "bitExact": false,
+        "referenceSha256": "10510c16943d5adecc53500cd6c33dbc24e7db37257f5e3b53469a7983ef087a",
+        "rustSha256": "0edb15af90a34ff19a03791f5a2341a48632d7a056f23c69904e91a6f98fec2a"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 192000,
+      "frequency": 261.63,
+      "options": {
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 1098873,
+        "maxAbsoluteError": 7.450580596923828e-9,
+        "rmsError": 8.707950111929073e-12,
+        "firstDifferentFrame": 67606,
+        "bitExact": false,
+        "referenceSha256": "031fa0041fe6e2b8aa6799eb2f425105970b9034629c886f41f623e29a73362d",
+        "rustSha256": "43187b210f35096bdaca2e16457a14c17f95fe33766b133e21250eb51515cd8c"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 192000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 219775,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "ac051bb53875ea13b349eefd11b6736803a895afdac7e423c906750e5fa1d4a4",
+        "rustSha256": "ac051bb53875ea13b349eefd11b6736803a895afdac7e423c906750e5fa1d4a4"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 192000,
+      "frequency": 1760,
+      "options": {
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 466043,
+        "maxAbsoluteError": 1.3969838619232178e-9,
+        "rmsError": 2.0463428470604586e-12,
+        "firstDifferentFrame": 24217,
+        "bitExact": false,
+        "referenceSha256": "5d5074ac588f78bf4ea236ed4c8cb4bbb9ae745f5246d31a9459ca0c8b7dcdbc",
+        "rustSha256": "bb59b3646c36fbe42696bbf9c05569d51e97b6454daa78ab9d7d6229ee57a203"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 192000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "felted"
+      },
+      "strike": {
+        "frames": 153600,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "95f530fa180eb6b57fdee8c5bb05fb52f14c424289ce9a79a70c1a8fe0eb3619",
+        "rustSha256": "95f530fa180eb6b57fdee8c5bb05fb52f14c424289ce9a79a70c1a8fe0eb3619"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 8000,
+      "frequency": 55,
+      "options": {
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 56000,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "76bc4fc3c7efc52e8a018b2ff4433fd2f4ef2ce0562e5c8cb27124b8516d4d8e",
+        "rustSha256": "76bc4fc3c7efc52e8a018b2ff4433fd2f4ef2ce0562e5c8cb27124b8516d4d8e"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 8000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 21020,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "5046164a7b44cc4fb379549745954c512e0fb722dde464231f94e4a339ae948f",
+        "rustSha256": "5046164a7b44cc4fb379549745954c512e0fb722dde464231f94e4a339ae948f"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 8000,
+      "frequency": 261.63,
+      "options": {
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 52095,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "fc377952c4c481bd4852e62797906a78df64b057c01fbe4593bedcdabfb7f352",
+        "rustSha256": "fc377952c4c481bd4852e62797906a78df64b057c01fbe4593bedcdabfb7f352"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 8000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 10419,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "1b1f72f9998b09caa09cc680968305d8adc30a00451b418d8e7a6f789a215d85",
+        "rustSha256": "1b1f72f9998b09caa09cc680968305d8adc30a00451b418d8e7a6f789a215d85"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 8000,
+      "frequency": 1760,
+      "options": {
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 25035,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "c32d90e6597c63ce8205789d81534febe0c056ea90c766d3a85db83fe2f751ec",
+        "rustSha256": "c32d90e6597c63ce8205789d81534febe0c056ea90c766d3a85db83fe2f751ec"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 8000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 6400,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "b160f2581c3e2b5eda333e8229d8dca922d420173ba26e7c812345e87514bf92",
+        "rustSha256": "b160f2581c3e2b5eda333e8229d8dca922d420173ba26e7c812345e87514bf92"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 24000,
+      "frequency": 55,
+      "options": {
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 168000,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "0125f820e73df367f4d513843d86c38a402ffe691ca0c24dc4c0d0925ba666ca",
+        "rustSha256": "0125f820e73df367f4d513843d86c38a402ffe691ca0c24dc4c0d0925ba666ca"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 24000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 63059,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "e45e28d1926b28056d6855ead5d777ab0c43b9b9eee563803a47bd7cc8312d7a",
+        "rustSha256": "e45e28d1926b28056d6855ead5d777ab0c43b9b9eee563803a47bd7cc8312d7a"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 24000,
+      "frequency": 261.63,
+      "options": {
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 156285,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "d030383a52e155db1b981f6ab65f6c87002c357dba554da10c3fc25677e26ba5",
+        "rustSha256": "d030383a52e155db1b981f6ab65f6c87002c357dba554da10c3fc25677e26ba5"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 24000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 31257,
+        "maxAbsoluteError": 1.4551915228366852e-11,
+        "rmsError": 1.4954752259829062e-13,
+        "firstDifferentFrame": 22050,
+        "bitExact": false,
+        "referenceSha256": "066dba60cd1b59a9d06a930d52e65cb26d3683b3e86a4e9a48b5ea6a1c927bbb",
+        "rustSha256": "3fcc8d7edeedb957a7c6d5cdd2b17b5a45319ac77776f512b82e73262dfcb00c"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 24000,
+      "frequency": 1760,
+      "options": {
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 66282,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "66ae0886cecd5a3b5fe8a3c115c0e416940bf1d6ad415b32ce098b2a8bf129b5",
+        "rustSha256": "66ae0886cecd5a3b5fe8a3c115c0e416940bf1d6ad415b32ce098b2a8bf129b5"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 24000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 19200,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "b3a4a09b93db722cbf3d01ac383b48d54a8ff97c44ed9d514ea2f67379a67ab9",
+        "rustSha256": "b3a4a09b93db722cbf3d01ac383b48d54a8ff97c44ed9d514ea2f67379a67ab9"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 44100,
+      "frequency": 55,
+      "options": {
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 308700,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "efe39095e165b5a4f54e620f71dc0e0ee9d1868029e1f69cc0f233d0bde55050",
+        "rustSha256": "efe39095e165b5a4f54e620f71dc0e0ee9d1868029e1f69cc0f233d0bde55050"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 44100,
+      "frequency": 55,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 115870,
+        "maxAbsoluteError": 3.725290298461914e-9,
+        "rmsError": 1.4188638626502711e-11,
+        "firstDifferentFrame": 8277,
+        "bitExact": false,
+        "referenceSha256": "eacbef6b0434698a60f642cd734429f13f39b18b56fe00328f0f6ae041e061de",
+        "rustSha256": "bca894825f4fa541fa75cba4ac8243b701de8625158f99046a45b140dde44b48"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 44100,
+      "frequency": 261.63,
+      "options": {
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 287172,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "ef89221e2723d357d4a27773fe90ef1f415c755981de94b1630f11325b3de4f3",
+        "rustSha256": "ef89221e2723d357d4a27773fe90ef1f415c755981de94b1630f11325b3de4f3"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 44100,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 57435,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "26f919fe82f35b320584a63085fe272d8425b939e9299e619ff193eee04931c5",
+        "rustSha256": "26f919fe82f35b320584a63085fe272d8425b939e9299e619ff193eee04931c5"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 44100,
+      "frequency": 1760,
+      "options": {
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 121793,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "97b2997a08c8a8a313ec027940b74769cb5150bd3eeb5332d54e3ea70397bc4e",
+        "rustSha256": "97b2997a08c8a8a313ec027940b74769cb5150bd3eeb5332d54e3ea70397bc4e"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 44100,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 35280,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "6b592c1976280f51b0f822f630f1fea40900e5bd07aeaa32a4825bfc6f1274ce",
+        "rustSha256": "6b592c1976280f51b0f822f630f1fea40900e5bd07aeaa32a4825bfc6f1274ce"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 48000,
+      "frequency": 55,
+      "options": {
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 336000,
+        "maxAbsoluteError": 5.093170329928398e-11,
+        "rmsError": 9.224397669750322e-14,
+        "firstDifferentFrame": 228840,
+        "bitExact": false,
+        "referenceSha256": "3bd7e323dee6d37e35b077775c6b201ca2da1853d2e60a8bb16aeba7332fedaf",
+        "rustSha256": "6c55b63fe5bc28e031710e9eba20ad4d9641483856de151d5ba13573388bf514"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 48000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 126117,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "79437422920892c08124d9f1738c42ea29232f1da0d7b2b513c273fd2c6d4ab9",
+        "rustSha256": "79437422920892c08124d9f1738c42ea29232f1da0d7b2b513c273fd2c6d4ab9"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 48000,
+      "frequency": 261.63,
+      "options": {
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 312569,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "71f6b9fe64b11b8c4e83cc4847cfd933acb887300f16308c2d77642dd9eb4167",
+        "rustSha256": "71f6b9fe64b11b8c4e83cc4847cfd933acb887300f16308c2d77642dd9eb4167"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 48000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 62514,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "d1fa927079c806f5ea7fde44adccaacb8874dabe4affab58c1692700b1967de9",
+        "rustSha256": "d1fa927079c806f5ea7fde44adccaacb8874dabe4affab58c1692700b1967de9"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 48000,
+      "frequency": 1760,
+      "options": {
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 132564,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "c3330b64b669879d4f17d0dd04caabe6aec209707acaa564267d6233c4e12ef0",
+        "rustSha256": "c3330b64b669879d4f17d0dd04caabe6aec209707acaa564267d6233c4e12ef0"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 48000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 38400,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "a913f1e02b4175ad2e90ac903d7faaa5d321cb7ed45e1a4574287556d8716ebc",
+        "rustSha256": "a913f1e02b4175ad2e90ac903d7faaa5d321cb7ed45e1a4574287556d8716ebc"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 96000,
+      "frequency": 55,
+      "options": {
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 672000,
+        "maxAbsoluteError": 4.656612873077393e-10,
+        "rmsError": 5.844552432928053e-13,
+        "firstDifferentFrame": 260948,
+        "bitExact": false,
+        "referenceSha256": "5023dd443d1d9d788b60f6a8d49284b5d70406655811922764542f2a08799ff9",
+        "rustSha256": "ef89a429d0f7ab282ca4c3560c04b30ad5a046eccd78f2f5cb13dde9c9dc657d"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 96000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 252233,
+        "maxAbsoluteError": 7.450580596923828e-9,
+        "rmsError": 2.976706690326332e-11,
+        "firstDifferentFrame": 5809,
+        "bitExact": false,
+        "referenceSha256": "0e23acd1b6d13a85d51e2dda496a90113e9463a23643a5478f4d94434d8b4e83",
+        "rustSha256": "8cc97be01650227f823036e463ed48af0007121771151a0ead17739192c00454"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 96000,
+      "frequency": 261.63,
+      "options": {
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 625137,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "b7919992c62f461288f4ab7fbd5eb8e32d53cc6398bdf07a19acde30780b6d4d",
+        "rustSha256": "b7919992c62f461288f4ab7fbd5eb8e32d53cc6398bdf07a19acde30780b6d4d"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 96000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 125028,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "5502d71ebec9bffbc369f409c707a4fcaa14dc33d359105e7e427a35603393ed",
+        "rustSha256": "5502d71ebec9bffbc369f409c707a4fcaa14dc33d359105e7e427a35603393ed"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 96000,
+      "frequency": 1760,
+      "options": {
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 265127,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "6a21213424cdb74241482fe090a45dc01dfadae7f032e8fb06566341ad743c1e",
+        "rustSha256": "6a21213424cdb74241482fe090a45dc01dfadae7f032e8fb06566341ad743c1e"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 96000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 76800,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "6e6fe708cd70f353f9f1f8a5ed5cfcec4590534b8c831cc5d579d6200b43af92",
+        "rustSha256": "6e6fe708cd70f353f9f1f8a5ed5cfcec4590534b8c831cc5d579d6200b43af92"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 192000,
+      "frequency": 55,
+      "options": {
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 1344000,
+        "maxAbsoluteError": 1.862645149230957e-9,
+        "rmsError": 3.206180876491543e-12,
+        "firstDifferentFrame": 54318,
+        "bitExact": false,
+        "referenceSha256": "4560950283fe2b56dd06f4cb1894d19296c327cd31823607c5661a63a93e9932",
+        "rustSha256": "24650d500132447b5ff864fc81e5ab38e08211a4bd05eab900c68c52d4825f39"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 192000,
+      "frequency": 55,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 504465,
+        "maxAbsoluteError": 9.313225746154785e-10,
+        "rmsError": 2.5875971135025202e-12,
+        "firstDifferentFrame": 91366,
+        "bitExact": false,
+        "referenceSha256": "d3d9a98c97aa75e560d017164dea8d5d577fc0510116fbf232871e538bb8eb85",
+        "rustSha256": "2573a5097f32d8891e03b9c02f0c92e2d9d5f4348b10d58de7cdf07130bff4de"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 192000,
+      "frequency": 261.63,
+      "options": {
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 1250273,
+        "maxAbsoluteError": 5.820766091346741e-11,
+        "rmsError": 7.8441391311729e-14,
+        "firstDifferentFrame": 318642,
+        "bitExact": false,
+        "referenceSha256": "f6ef2859c743f278a5f6eef5e8613bc07abe483012ce5688dfe15e3afd21a440",
+        "rustSha256": "53b1c6a39153d5816981b99d79e88a381a44b07c5b23db080c1fd7e384bb209d"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 192000,
+      "frequency": 261.63,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 250055,
+        "maxAbsoluteError": 4.656612873077393e-10,
+        "rmsError": 1.9818592519124155e-12,
+        "firstDifferentFrame": 73278,
+        "bitExact": false,
+        "referenceSha256": "6522b380ae9b7f8db46fd8491107d6b8ed624614b34ab560ca6b80ec1baff71c",
+        "rustSha256": "cc17362e5db0a948305fc40fb9574cbc1e172c2e3d258f246a14d98cbee36775"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 192000,
+      "frequency": 1760,
+      "options": {
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 530254,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "150b7373aec261262810a3f11f3d1417a164ed2d6e6017590cd964e9e3b90761",
+        "rustSha256": "150b7373aec261262810a3f11f3d1417a164ed2d6e6017590cd964e9e3b90761"
+      }
+    },
+    {
+      "family": "acoustic",
+      "sampleRate": 192000,
+      "frequency": 1760,
+      "options": {
+        "decay": 0.5,
+        "brightness": 0.2,
+        "hammer": 0.75,
+        "unison": 0.65,
+        "velocity": 0.35,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0.8,
+        "type": "upright"
+      },
+      "strike": {
+        "frames": 153600,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "06158933932d0e61ad4e44a5e8560150c0534dfa9cb10f010dee79abc9206f5c",
+        "rustSha256": "06158933932d0e61ad4e44a5e8560150c0534dfa9cb10f010dee79abc9206f5c"
+      }
+    },
+    {
+      "family": "actual-Felt-Keys-updated",
+      "sampleRate": 48000,
+      "frequency": 55,
+      "options": {
+        "type": "felted",
+        "decay": 2.6,
+        "brightness": 0.35,
+        "hammer": 0.2,
+        "unison": 0.3,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0,
+        "velocity": 0.5714285714285714
+      },
+      "strike": {
+        "frames": 336000,
+        "maxAbsoluteError": 1.862645149230957e-9,
+        "rmsError": 4.768580184708956e-12,
+        "firstDifferentFrame": 57123,
+        "bitExact": false,
+        "referenceSha256": "ca8f6f80c42a9cb16053d2a18845973faadfebfe894aa09e496d932560ef4a2e",
+        "rustSha256": "c24759bd1475fc0b6873318944cce139d48559878768bf96d5c9a213c8006f76"
+      }
+    },
+    {
+      "family": "actual-Felt-Keys-updated",
+      "sampleRate": 48000,
+      "frequency": 261.63,
+      "options": {
+        "type": "felted",
+        "decay": 2.6,
+        "brightness": 0.35,
+        "hammer": 0.2,
+        "unison": 0.3,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0,
+        "velocity": 0.5714285714285714
+      },
+      "strike": {
+        "frames": 285707,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "a66fd79e8c0c8bbcb47d635410a616875bdd4c587290e5ef8b21bd5cc20366fa",
+        "rustSha256": "a66fd79e8c0c8bbcb47d635410a616875bdd4c587290e5ef8b21bd5cc20366fa"
+      }
+    },
+    {
+      "family": "actual-Felt-Keys-updated",
+      "sampleRate": 48000,
+      "frequency": 1760,
+      "options": {
+        "type": "felted",
+        "decay": 2.6,
+        "brightness": 0.35,
+        "hammer": 0.2,
+        "unison": 0.3,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0,
+        "velocity": 0.5714285714285714
+      },
+      "strike": {
+        "frames": 121172,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "10ab2b90528bf8ec467a61e087dd2afdb6a4b7d8af930969884b5a35f9ecf455",
+        "rustSha256": "10ab2b90528bf8ec467a61e087dd2afdb6a4b7d8af930969884b5a35f9ecf455"
+      }
+    },
+    {
+      "family": "actual-Felt-Keys-updated",
+      "sampleRate": 96000,
+      "frequency": 55,
+      "options": {
+        "type": "felted",
+        "decay": 2.6,
+        "brightness": 0.35,
+        "hammer": 0.2,
+        "unison": 0.3,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0,
+        "velocity": 0.5714285714285714
+      },
+      "strike": {
+        "frames": 672000,
+        "maxAbsoluteError": 9.313225746154785e-10,
+        "rmsError": 4.279093672508774e-12,
+        "firstDifferentFrame": 69088,
+        "bitExact": false,
+        "referenceSha256": "956b2c865f6c04c2b4336b56d50305a7ad052379b485f7ccccc30f40541b1446",
+        "rustSha256": "084ca072be21f87640629aee2a7b52157cd48ae9132013c3e3fe903f9c20e85f"
+      }
+    },
+    {
+      "family": "actual-Felt-Keys-updated",
+      "sampleRate": 96000,
+      "frequency": 261.63,
+      "options": {
+        "type": "felted",
+        "decay": 2.6,
+        "brightness": 0.35,
+        "hammer": 0.2,
+        "unison": 0.3,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0,
+        "velocity": 0.5714285714285714
+      },
+      "strike": {
+        "frames": 571414,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "6ea51859d8902a7f8c18345e971f197f40af2df692558f382a8795abb8604ed7",
+        "rustSha256": "6ea51859d8902a7f8c18345e971f197f40af2df692558f382a8795abb8604ed7"
+      }
+    },
+    {
+      "family": "actual-Felt-Keys-updated",
+      "sampleRate": 96000,
+      "frequency": 1760,
+      "options": {
+        "type": "felted",
+        "decay": 2.6,
+        "brightness": 0.35,
+        "hammer": 0.2,
+        "unison": 0.3,
+        "seed": 109,
+        "resonance": 0.55,
+        "wear": 0,
+        "velocity": 0.5714285714285714
+      },
+      "strike": {
+        "frames": 242343,
+        "maxAbsoluteError": 0,
+        "rmsError": 0,
+        "firstDifferentFrame": null,
+        "bitExact": true,
+        "referenceSha256": "284e484b2d5deec661871f1505ad265c27eae53f34d86deec0ee1a78cd96e8ad",
+        "rustSha256": "284e484b2d5deec661871f1505ad265c27eae53f34d86deec0ee1a78cd96e8ad"
+      }
+    }
+  ]
+}

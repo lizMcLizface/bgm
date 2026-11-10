@@ -1,0 +1,12 @@
+{
+  "status": "Rust notes: 30 · Rust bodies: 11 · original notes: 0 · fallbacks: 0 · other piano models: 0 · engine d592cc8a0af5164e",
+  "padPatch": "Starmap Piano",
+  "meters": {
+    "masterChannels": [
+      8,
+      7
+    ],
+    "padLit": 7
+  },
+  "scope": "Normal keyboard Chord on temporary native Starmap Piano, modal felt with .28 sustained body; counters are preparation and meters are UI signals, not physical listening."
+}

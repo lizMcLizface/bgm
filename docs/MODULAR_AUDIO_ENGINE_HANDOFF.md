@@ -2420,3 +2420,42 @@ rehashed; real downloaded JSON equals full DOM report. QA source/defaults/tab /
 viewport restored/cleaned; isolated loopback server stopped, LAN HTTPS remains.
 Exact raw evidence and limitations in the source-tests doc; no physical listening
 claim from browser.
+
+## M4d piano synthesis preparation (2026-11-10)
+
+After `2aca381`, [piano ownership/source audit and preparation port](MODULAR_AUDIO_ENGINE_M4D_PIANO_PREPARATION.md)
+finds actual piano generation is JS plus per-voice native Web Audio processing,
+and Iowa measured playback is a distinct JS worklet. Do not describe these as
+already owned Rust engines. Actual **Felt Keys (updated)** uses acoustic
+**felted**, not the simpler modal felt model.
+
+New portable `synth-engine/piano` ports modal felt/electric strikes +2048-frame
+bodies, and actual grand/felted/upright acoustic synthesis including string modes,
+hammer/action noise, soundboard, wear and normalization. Version1 owned immutable
+buffer handles are independent, prepare/copy/free off the audio callback, with
+no singleton DSP. New worker/cache path is explicit opt-in in Tests, with
+separate policy cache keys, exact pitch/velocity/body semantics, actual counters
+and visible original-renderer fallback. Default remains original JS. Existing
+native envelopes/filters/stereo/effects/voice allocation and normal transport
+remain; piano is still honestly excluded from the finite graph compiler.
+
+222 strike comparisons across six rates/controls/registers plus actual updated
+Felt preset:183 bit-exact, maximum error1.4901161193847656e-8. All108 modal bodies
+bit-exact. Independent handles/instances/settings reload/disposal and worker /
+cache/fallback boundaries pass. Raw hashes/metrics retained. No native executable
+or AC bypass; builds use local offline Rust-to-Wasm. Exact application/browser
+results follow in the linked doc. Next owned piano graph voice-chain contract
+and dry native parity; matched/table/measured/classic families remain separate.
+
+Final Wasm **d592cc8a0af5164e /48,561 bytes**, graph still62315. Broad **141 tests /
+11 files (71.44 s)**, final15 targeted renderer/pool/UI checks and public package
+build **36.09 s** pass. Actual390px normal Continuous Play on unchanged native
+Felt Keys(updated) yields19 Rust notes /zero fallback/original/unsupported, active
+Pad/music/master meters. Temporary native Starmap Piano +keyboard Chord reaches
+30 Rust notes /11 Rust bodies, no fallback, Pad7 and masterL/R8/7 lit segments.
+Stop/Pause work. Reload persists Rust choice, resets counters and does not play;
+all source/patch selections restore exactly. Original JS selection then restored
+and verified after reload. Raw browser records and222-case hashes retained;
+physical listening, device timing, wet PCM parity and full piano graph ownership
+are not claimed. QA tab/viewport/server cleaned, LAN HTTPS remains; no new phone
+check or deployment. Continue with owned piano voice-chain contracts/parity.

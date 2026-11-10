@@ -1,6 +1,7 @@
 import { cachedNoteBuffer, noteCacheStats, clearNoteCache } from './noteBufferCache';
 import { isAcousticPiano, renderAcousticPiano } from './acousticPiano';
 import { isCalibratedPiano, renderCalibratedPiano } from './calibratedPiano';
+import {pianoRendererFor,readPianoPreparation,recordPianoPreparation} from './pianoPreparation';
 export const pianoCacheStats=noteCacheStats;
 export const clearPianoCache=clearNoteCache;
 const clamp=(x,lo,hi)=>Math.max(lo,Math.min(hi,Number.isFinite(x)?x:lo));
@@ -63,11 +64,11 @@ export function pianoNote(frequency,options={}) {
     // Eight brightness layers bound cache growth; gain still follows exact velocity.
     return {freq,settings:{...options,velocity:Math.round(clamp(options.velocity ?? .8,0,1)*7)/7}};
 }
-export const pianoKey=({freq,settings})=>['piano',freq,settings];
+export const pianoKey=({freq,settings},renderer=pianoRendererFor(settings))=>[renderer==='rust'?'piano-rust-policy-v1':'piano',freq,settings];
 
 export function pianoBuffer(context,frequency,options={}) {
     const note=pianoNote(frequency,options);
-    return cachedNoteBuffer(context,pianoKey(note),()=>renderPiano(context.sampleRate,note.freq,note.settings));
+    return cachedNoteBuffer(context,pianoKey(note),()=>{recordPianoPreparation({renderer:'legacy',unsupported:readPianoPreparation()==='rust'&&pianoRendererFor(note.settings)==='legacy',...(pianoRendererFor(note.settings)==='rust'?{error:'Rust note not prepared; used the original synchronous renderer.'}:{})});return renderPiano(context.sampleRate,note.freq,note.settings);});
 }
 
 // A quiet harmonic body sustains under the transient until the note releases.
@@ -86,7 +87,11 @@ export function renderPianoBody(sampleRate,frequency,{type='felt',brightness=.45
     }
     return out;
 }
-export function pianoBodyBuffer(context,frequency,options={}) {
+export function pianoBodyNote(sampleRate,frequency,options={},renderer=pianoRendererFor(options)) {
     const settings={type:options.type,brightness:options.brightness,sustain:options.sustain,resonance:options.resonance,velocity:Math.round(clamp(options.velocity??.8,0,1)*7)/7};
-    return cachedNoteBuffer(context,['piano-body',Math.min(options.resonance>0?8:4,Math.floor(context.sampleRate*.45/frequency)),settings],()=>renderPianoBody(context.sampleRate,frequency,settings));
+    return {settings,key:[renderer==='rust'?'piano-body-rust-policy-v1':'piano-body',Math.min(options.resonance>0?8:4,Math.floor(sampleRate*.45/frequency)),settings]};
+}
+export function pianoBodyBuffer(context,frequency,options={}) {
+    const {settings,key}=pianoBodyNote(context.sampleRate,frequency,options);
+    return cachedNoteBuffer(context,key,()=>renderPianoBody(context.sampleRate,frequency,settings));
 }

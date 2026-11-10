@@ -1437,3 +1437,9 @@ reload without storing generated music. Existing source-to-FX routing stays
 unchanged. Muted batch gains precede FX, so batch success is delivery/clock
 evidence, not wet-FX audio acceptance. Prior audible isolation/listening remains
 separate; future device requests should correspond to meaningful path changes.
+
+M4d ports modal/base-acoustic piano note preparation into opt-in owned Rust/Wasm
+buffers. The actual native per-voice filters/envelopes and current effects /
+mixer route remain intact; no effects DSP or sidechain route changes. Preparing
+the source is distinct from owning the whole piano voice or its wet chain.
+[Audit, compatibility and limits](MODULAR_AUDIO_ENGINE_M4D_PIANO_PREPARATION.md).

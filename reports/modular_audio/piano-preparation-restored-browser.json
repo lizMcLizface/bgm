@@ -1,0 +1,68 @@
+{
+  "requested": "legacy",
+  "status": "Rust notes: 0 · Rust bodies: 0 · original notes: 0 · fallbacks: 0 · other piano models: 0",
+  "playPressed": "false",
+  "sources": [
+    {
+      "label": "Lead sound generator",
+      "text": "DI-Poly",
+      "value": "poly"
+    },
+    {
+      "label": "Lead patch",
+      "text": "Measured Flute",
+      "value": "Measured Flute"
+    },
+    {
+      "label": "Second lead sound generator",
+      "text": "DI-Poly",
+      "value": "poly"
+    },
+    {
+      "label": "Second lead patch",
+      "text": "Soft Flute",
+      "value": "Soft Flute"
+    },
+    {
+      "label": "Rhythm sound generator",
+      "text": "Piano",
+      "value": "piano"
+    },
+    {
+      "label": "Rhythm patch",
+      "text": "Felt Keys (updated)",
+      "value": "Felt Keys (updated)"
+    },
+    {
+      "label": "Pad sound generator",
+      "text": "Piano",
+      "value": "piano"
+    },
+    {
+      "label": "Pad patch",
+      "text": "Felt Keys (updated)",
+      "value": "Felt Keys (updated)"
+    },
+    {
+      "label": "Bass sound generator",
+      "text": "DI-Poly",
+      "value": "poly"
+    },
+    {
+      "label": "Bass patch",
+      "text": "Thump Bass",
+      "value": "Thump Bass"
+    },
+    {
+      "label": "Drums sound generator",
+      "text": "Basic kits",
+      "value": "kit"
+    },
+    {
+      "label": "Drums patch",
+      "text": "Hand percussion",
+      "value": "hand"
+    }
+  ],
+  "sameSourceSelections": true
+}

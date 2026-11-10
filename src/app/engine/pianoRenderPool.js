@@ -2,7 +2,9 @@
 // played for the first time sounded as an arpeggio. This renders the notes a chord needs in parallel on a few workers
 // and puts them in the same cache, so by the time the instrument books the note the buffer is there.
 import { findNoteBuffer, cachedNoteBuffer } from './noteBufferCache';
-import { pianoNote, pianoKey } from './piano';
+import { pianoNote, pianoKey,pianoBodyNote,renderPiano,renderPianoBody } from './piano';
+import {pianoRendererFor,readPianoPreparation,recordPianoPreparation} from './pianoPreparation';
+import {loadRustPiano,supportsRustPianoBody} from './rustPiano';
 
 const MAX_WORKERS = 4;
 const inflight = new Map();
@@ -18,7 +20,7 @@ function makePool() {
         if (slot.job) slot.worker.postMessage({ id: 0, ...slot.job.message });
     };
     workers.forEach((slot) => {
-        slot.worker.onmessage = ({ data }) => { const job = slot.job; next(slot); data.error ? job.fail(new Error(data.error)) : job.done(data.samples); };
+        slot.worker.onmessage = ({ data }) => { const job = slot.job; next(slot); data.error ? job.fail(new Error(data.error)) : job.done(data); };
         slot.worker.onerror = (event) => { const job = slot.job; next(slot); job?.fail(new Error(event.message || 'piano worker failed')); };
     });
     return {
@@ -36,15 +38,16 @@ function makePool() {
  * otherwise a promise, always resolved (a failed render is left for pianoBuffer), for when it is.
  */
 export function pianoBufferLater(context, frequency, options = {}) {
-    const note = pianoNote(frequency, options), key = pianoKey(note);
+    const note = pianoNote(frequency, options),requested=readPianoPreparation(),renderer=pianoRendererFor(note.settings),key = pianoKey(note,renderer),bodyNote=pianoBodyNote(context.sampleRate,frequency,note.settings,renderer),bodyKey=bodyNote.key;
     if (findNoteBuffer(context, key)) return null;
     pool ??= makePool();
-    if (!pool) return null;
+    if (!pool&&renderer!=='rust') return null;
     const id = JSON.stringify([context.sampleRate, key]);
     if (!inflight.has(id)) {
-        inflight.set(id, pool.render({ sampleRate: context.sampleRate, freq: note.freq, settings: note.settings })
-            .then((samples) => { cachedNoteBuffer(context, key, () => samples); })
-            .catch(() => {})
+        const work=pool?pool.render({sampleRate:context.sampleRate,freq:note.freq,bodyFrequency:frequency,settings:note.settings,renderer}):loadRustPiano().then(({renderer:r,version})=>({samples:r.renderNote(context.sampleRate,note.freq,note.settings),body:supportsRustPianoBody(note.settings)?r.renderBody(context.sampleRate,frequency,bodyNote.settings):null,renderer:'rust',version}));
+        inflight.set(id, work
+            .then((data) => { cachedNoteBuffer(context, key, () => data.samples);if(data.body)cachedNoteBuffer(context,bodyKey,()=>data.body);recordPianoPreparation({renderer:data.renderer??'legacy',body:!!data.body,version:data.version,unsupported:requested==='rust'&&renderer==='legacy',...(renderer==='rust'&&data.renderer!=='rust'?{error:'Piano worker returned the original renderer instead of Rust.'}:{})}); })
+            .catch((error) => {if(renderer==='rust'){cachedNoteBuffer(context,key,()=>renderPiano(context.sampleRate,note.freq,note.settings));if(supportsRustPianoBody(note.settings))cachedNoteBuffer(context,bodyKey,()=>renderPianoBody(context.sampleRate,frequency,bodyNote.settings));}recordPianoPreparation({renderer:'legacy',prepared:renderer==='rust',error});})
             .finally(() => inflight.delete(id)));
     }
     return inflight.get(id);

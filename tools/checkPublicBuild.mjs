@@ -13,7 +13,7 @@ const assets=path.join(root,'assets'),assetNames=fs.readdirSync(assets),allScrip
 if(allScripts.length!==1)problems.push('Expected one All workbench page module');
 else{const source=fs.readFileSync(path.join(assets,allScripts[0]),'utf8');if(!source.includes('.all-box.box-voices')||!source.includes('.all-drum-tools'))problems.push('All page is missing its bundled workbench styles');}
 if(assetNames.some(name=>/^AllPage-.*\.css$/.test(name)))problems.push('All page must not depend on a separate lazy AllPage stylesheet');
-for(const file of ['tools/modular-audio.html','tools/modular-ensemble.html','tools/modular-worker.html','modular-audio/graph-worker.js','modular-audio/worker-output-processor.js','modular-audio/pool-output-processor.js'])if(!fs.existsSync(path.join(root,file)))problems.push(`Missing ${file}`);
+for(const file of ['piano-preparation/piano.wasm','piano-preparation/build.json','tools/modular-audio.html','tools/modular-ensemble.html','tools/modular-worker.html','modular-audio/graph-worker.js','modular-audio/worker-output-processor.js','modular-audio/pool-output-processor.js'])if(!fs.existsSync(path.join(root,file)))problems.push(`Missing ${file}`);
 const modularHarness=path.join(root,'tools/modular-audio.html');
 if(fs.existsSync(modularHarness)&&!fs.readFileSync(modularHarness,'utf8').includes('href="./modular-ensemble.html"'))problems.push('Missing six-role navigation in built modular audio harness');
 const indexFile=path.join(root,'synth-presets/index.json');

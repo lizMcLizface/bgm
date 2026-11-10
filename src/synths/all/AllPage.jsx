@@ -55,6 +55,7 @@ import {createContinuous,appendProgression,trimProgressions} from './continuous'
 import {prepareGeneratorChange,publishGeneratorChange,liveGeneratorKeys} from './generatorChange';
 import WorkbenchPreviewReport from '../../modular-audio/WorkbenchPreviewReport';
 import {PREVIEW_SETTINGS_KEY,previewSettings} from './previewSettings';
+import PianoPreparationControls from './PianoPreparationControls';
 import {encodeSetup,decodeSetup,setupFileName,MAX_BYTES} from './setupFile';
 import '../drums/drums.css';
 import rackStyles from './rack.css?inline';
@@ -1084,6 +1085,7 @@ function AllWorkbench({initialArrange=false}){
      </div>
      <p className="hint">Full checks run test notes and the current progression in Serial and One worker, all muted, with twelve worker blocks. One report covers all four runs.</p>
      <details className="source-test-settings"><summary>Test settings and sources</summary>
+     <PianoPreparationControls disabled={previewActive||playing||busy}/>
      <button type="button" disabled={!started||busy||previewActive} onClick={()=>{selectReadyPreviewVoices();setPreviewScope('pitched-set');setPreviewMode('worker');setPreviewBlocks(12);}}>Use ready sources + phone buffer</button>
      <label className="source-preview-field">Drum kit<select aria-label="Source test drum kit" disabled={!started||busy||previewActive} value={sounds.perc?.synth==='kit'?sounds.perc.name:'current'} onChange={e=>{if(e.target.value!=='current')chooseSound('perc','kit',e.target.value);}}><option value="current">{sounds.perc?.name??'Current sound'} · current</option>{drumPatches('kit').map(p=><option key={p.id??p.name} value={p.id??p.name}>{p.name}</option>)}</select></label>
      <p className="hint">Choosing a kit changes the actual Drums sound and is saved with the desk. Full checks use chosen group roles, or all ready sources in selected-sequencer mode. Unsupported sounds are never replaced automatically.</p>

@@ -1060,3 +1060,13 @@ transient; finite-song and explicit preset precedence are preserved. No playback
 starts on reload. The earlier phone request is closed with qualitative feedback,
 not new run counters. Continue larger locally verified engine steps and reserve
 phone listening requests for meaningful audible/device milestones.
+
+[M4d piano preparation](MODULAR_AUDIO_ENGINE_M4D_PIANO_PREPARATION.md) adds an
+explicit Tests option for owned Rust/Wasm note preparation in normal piano /
+keyboard playback. Modal felt/electric plus base grand/felted/upright are ported;
+the actual updated Felt preset uses felted acoustic. Original JS remains the
+default, other families stay on their real renderers and fallback is visible.
+Existing native voice envelopes, filters, stereo, FX and routing are retained.
+222 strike and108 body comparisons validate preparation PCM; this does not yet
+make native piano eligible in the finite Rust graph. Next owned voice-chain
+integration, retaining the larger-batch/local-test workflow.

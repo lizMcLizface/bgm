@@ -1,0 +1,43 @@
+{
+  "before": "Rust notes: 0 · Rust bodies: 0 · original notes: 0 · fallbacks: 0 · other piano models: 0",
+  "status": "Rust notes: 19 · Rust bodies: 0 · original notes: 0 · fallbacks: 0 · other piano models: 0 · engine d592cc8a0af5164e",
+  "selectorDisabled": true,
+  "meters": {
+    "channels": [
+      {
+        "lit": 6,
+        "name": "Lead channel"
+      },
+      {
+        "lit": 0,
+        "name": "2nd lead channel"
+      },
+      {
+        "lit": 0,
+        "name": "Rhythm channel"
+      },
+      {
+        "lit": 4,
+        "name": "Pad channel"
+      },
+      {
+        "lit": 6,
+        "name": "Bass channel"
+      },
+      {
+        "lit": 0,
+        "name": "Drums channel"
+      },
+      {
+        "lit": 0,
+        "name": "Ambience channel"
+      },
+      {
+        "lit": 7,
+        "name": "Music bus channel"
+      }
+    ],
+    "masterLit": 14
+  },
+  "scope": "Normal Continuous Play, original native Rhythm/Pad Felt Keys (updated); prepared counts and DOM meters, not physical listening or device-underrun evidence."
+}

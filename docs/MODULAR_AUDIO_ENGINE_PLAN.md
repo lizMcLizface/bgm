@@ -16,6 +16,11 @@ and the [finite All kit lease/compiler](MODULAR_AUDIO_ENGINE_M4C_ALL_KITS.md) ar
 delivered, with desktop six-source and phone four-source diagnostic gates
 passed. Complete captured-pattern playback is next; normal migration stays gated.
 Normal transport/default backend migration remains gated.
+[M4d piano preparation](MODULAR_AUDIO_ENGINE_M4D_PIANO_PREPARATION.md) now ports
+modal felt/electric and base grand/felted/upright note generation into owned
+Rust/Wasm, opt-in through the existing native piano worker/voice chain. This is
+not yet a complete piano graph module; per-voice playback/envelope/filter/stereo
+ownership is next. Matched acoustic/calibrated/Iowa/classic adapters remain.
 All six source engines have owned mutable Rust state; core's read-only additive
 tables are safely shared after preparation. External stereo host inputs and
 graph program/key compression exist. All six sources now also run inside one
