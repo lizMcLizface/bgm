@@ -103,3 +103,12 @@ shared piano voice modulation and native steal fade before broader normal/live
 transport integration. Keep matched/table/measured/classic families distinct.
 Phone lock-screen quality, physical listening and isolated wet PCM equivalence
 remain separate gates; a counter pass does not establish any of them.
+
+Final fixed-page check at375 CSS pixels: document width375, no horizontal scroll,
+all four cases pass,909-character compact report, Copy UI success, and idle reload
+with no audio players or report. `piano-fixed-page-browser.json` retains the
+summary. Muted case verdicts now use the suite's checks, while audible acceptance
+still requires its own positive audio evidence. Comparison players pause on Stop
+and release blob URLs on rerun/exit. Native disposal guards prevent late sleep
+callbacks or external-hold release from reviving disposed processing.31 targeted
+lifecycle/controller/legacy tests and final public package build pass.

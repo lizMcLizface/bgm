@@ -1,0 +1,55 @@
+{
+  "viewportWidth": 375,
+  "documentWidth": 375,
+  "compactCharacters": 909,
+  "copyStatus": "Copied compact result",
+  "summary": {
+    "kind": "piano.fixed-full-path",
+    "version": 1,
+    "engineVersion": "d68f9dc21e528d44",
+    "reason": "suite-completed",
+    "error": null,
+    "muted": true,
+    "checksPassed": true,
+    "listening": "not assessed",
+    "cases": [
+      {
+        "material": "voice-audition",
+        "executor": "serial",
+        "frames": 942000,
+        "underruns": null,
+        "late": null,
+        "checksPassed": true
+      },
+      {
+        "material": "voice-audition",
+        "executor": "worker",
+        "frames": 942000,
+        "underruns": 0,
+        "late": 0,
+        "checksPassed": true
+      },
+      {
+        "material": "captured-score",
+        "executor": "serial",
+        "frames": 726000,
+        "underruns": null,
+        "late": null,
+        "checksPassed": true
+      },
+      {
+        "material": "captured-score",
+        "executor": "worker",
+        "frames": 726000,
+        "underruns": 0,
+        "late": 0,
+        "checksPassed": true
+      }
+    ]
+  },
+  "idleReload": {
+    "status": "Full path ready",
+    "report": "",
+    "audioElements": 0
+  }
+}

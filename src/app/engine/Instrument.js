@@ -826,6 +826,7 @@ class Instrument {
     // effects chain, once nothing has sounded for its tail time.
     sleepIdle() {
         this.sleepTimer = null;
+        if (this.disposed) return;
         const now = this.AC.currentTime;
         this.voices.forEach((voice, i) => {
             if (this.awake[i] && this.busyUntil[i] + 0.2 < now) {
@@ -845,6 +846,7 @@ class Instrument {
     // the chain (a late timer only means something stays awake a little
     // longer - harmless). Held notes keep everything awake.
     scheduleSleep() {
+        if (this.disposed) return;
         const due = this.busyUntil.filter((t, i) => this.awake[i] && Number.isFinite(t));
         let at;
         if (due.length) at = Math.min(...due) + 0.25;
@@ -878,6 +880,7 @@ class Instrument {
         clearTimeout(this.wanderTimer);
         Object.values(this.wanderLfos).forEach((lfo) => lfo.dispose());
         this.silence();
+        clearTimeout(this.sleepTimer);
         this.voices.forEach((synth) => synth.destroy());
         this.shimmer.dispose();
         this.freeze.dispose();

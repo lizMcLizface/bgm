@@ -2510,3 +2510,21 @@ then shared native piano modulation and steal-fade parity. Keep batching local
 verification; do not resume tiny settings-matching phone requests or latency
 experiments. Human listening, lock-screen behavior and isolated wet PCM parity
 remain unassessed by these new reports.
+
+### Final M4e test-page cleanup checkpoint
+
+The follow-up keeps muted verdicts distinct from audible acceptance and omits
+zero analyser rows from muted compact output. At375 CSS pixels the document is
+375 pixels wide (no horizontal overflow); all four full-path cases pass again,
+with zero worker gaps. The compact result is909 characters and Copy reports
+success. Reload returns to Full path ready, with no report/audio players and no
+automatic playback. Raw summary: `piano-fixed-page-browser.json`; visual proof:
+`.tmp/piano-owned-voice-checks-mobile.png`.
+
+Stop also pauses comparison players; reruns/page exit release their blob URLs.
+Disposed native instruments no longer reschedule sleep callbacks or revive when
+an external hold releases.31 targeted lifecycle/controller/legacy-wrapper tests
+pass and final public build/package checks pass (43.04s). QA browser/viewport is
+cleaned up; loopback server is stopped, existing LAN HTTPS remains available.
+Phone mixed-piano listening is requested on the fixed page; do not infer it from
+desktop counters. Next port remains shared native modulation and steal-fade parity.
