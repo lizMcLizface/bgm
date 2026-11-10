@@ -901,3 +901,20 @@ host checks pass and the user confirms **Page loads now**. No firewall rule or
 app/audio change. [Launch-context instructions](SYNTHS_STARTUP_RECOVERY.md) and
 handoff now require this execution path for future restarts. Resume the existing
 phone usability / worker-wait gates; page access is not a listening verdict.
+
+### M4a publication-bound producer timing (2026-11-10)
+
+[Exact contracts, verification and phone repeat](MODULAR_AUDIO_ENGINE_M4A_DELIVERY_TIMING.md)
+add opt-in All task/pool/recycle timing, last accepted packet's producer state,
+separate later worker statistics, and compact v2 with actual sample rate.
+**233 tests / 30 files** plus public build/package checks pass; real desktop
+worker and serial complete 668,956 frames / 18 events. Default harness telemetry
+is off; six buffers, cadence, initial serial and legacy DSP are unchanged.
+Runtime `2f9eed09e9122592`, unchanged Rust/Wasm.
+
+Actual phone v2 reproduces nine packets / zero lead 4,608 / stop 4,736 / 128
+missing. Last accepted producer snapshot has no free slots, recycles through
+1,535, short sampled task/render times; later stats have handled through 4,607.
+This supports a bounded recycling/holding/delivery experiment, not an established
+cause or cure. Next: explicit six/eight slots at the same 512-frame cadence and
+64/85.33 ms, preserving defaults and run provenance. No deployment.

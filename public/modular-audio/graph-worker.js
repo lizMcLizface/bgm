@@ -1,6 +1,74 @@
 // src/modular-audio/graphWorker.js
 import { ReferenceGraph } from "./runtime.js?v=f2251aa547f5b85b";
 
+// src/modular-audio/workerDeliveryTiming.js
+var WorkerDeliveryTiming = class {
+  constructor(poolBlocks, clock = globalThis.performance) {
+    this.clock = clock;
+    this.available = true;
+    this.origin = this.now();
+    this.ready = null;
+    this.empty = null;
+    this.sent = new Float64Array(poolBlocks);
+    this.sent.fill(NaN);
+    this.taskWaits = 0;
+    this.taskWaitMs = null;
+    this.taskWaitMaxMs = 0;
+    this.poolWaits = 0;
+    this.poolWaitMs = null;
+    this.poolWaitMaxMs = 0;
+    this.recycleRttMs = null;
+    this.recycleRttMaxMs = 0;
+    this.lastRecycleConsumerFrame = null;
+  }
+  now() {
+    try {
+      const n = this.clock.now();
+      if (!Number.isFinite(n)) throw Error("clock");
+      return n;
+    } catch {
+      this.available = false;
+      return null;
+    }
+  }
+  requestTask(delay) {
+    if (delay === 0 && this.ready === null) this.ready = this.now();
+  }
+  beginTask(stalled = false) {
+    const now = this.now();
+    if (!stalled && now !== null && this.ready !== null) {
+      this.taskWaitMs = Math.max(0, now - this.ready);
+      this.taskWaitMaxMs = Math.max(this.taskWaitMaxMs, this.taskWaitMs);
+      this.taskWaits++;
+    }
+    this.ready = null;
+  }
+  published(slot, hasMore, free2) {
+    const now = this.now();
+    this.sent[slot] = now ?? NaN;
+    if (hasMore && !free2 && this.empty === null) this.empty = now;
+  }
+  recycled(slot, consumerFrame) {
+    const now = this.now();
+    if (now !== null && Number.isFinite(this.sent[slot])) {
+      this.recycleRttMs = Math.max(0, now - this.sent[slot]);
+      this.recycleRttMaxMs = Math.max(this.recycleRttMaxMs, this.recycleRttMs);
+    }
+    this.sent[slot] = NaN;
+    if (now !== null && this.empty !== null) {
+      this.poolWaitMs = Math.max(0, now - this.empty);
+      this.poolWaitMaxMs = Math.max(this.poolWaitMaxMs, this.poolWaitMs);
+      this.poolWaits++;
+    }
+    this.empty = null;
+    this.lastRecycleConsumerFrame = Number.isSafeInteger(consumerFrame) && consumerFrame >= 0 ? consumerFrame : null;
+  }
+  snapshot() {
+    const now = this.now(), valid = this.available && now !== null;
+    return { available: valid, elapsedMs: valid ? now - this.origin : null, taskWaits: this.taskWaits, taskWaitMs: valid ? this.taskWaitMs : null, taskWaitMaxMs: valid ? this.taskWaitMaxMs : null, poolWaits: this.poolWaits, poolWaitMs: valid ? this.poolWaitMs : null, poolWaitMaxMs: valid ? this.poolWaitMaxMs : null, recycleRttMs: valid ? this.recycleRttMs : null, recycleRttMaxMs: valid ? this.recycleRttMaxMs : null, lastRecycleConsumerFrame: this.lastRecycleConsumerFrame, readyTaskAgeMs: valid && this.ready !== null ? now - this.ready : null, poolEmptyAgeMs: valid && this.empty !== null ? now - this.empty : null };
+  }
+};
+
 // src/modular-audio/workerProtocol.js
 var BUS_COUNT = 8;
 function workerScheduling(value = "timer") {
@@ -93,6 +161,7 @@ var views;
 var o;
 var port;
 var tasks;
+var delivery;
 var sourceIds = null;
 var end = 0;
 var frame = 0;
@@ -108,7 +177,7 @@ var rejectedEvents = 0;
 var badRecycles = 0;
 var histogram = new Uint32Array(32);
 function snapshot() {
-  return { generation: o.generation, sourceIds, frame, blocks, renderMs, maxRenderMs, blockMsHistogramLog2Us: Array.from(histogram), rejectedEvents, badRecycles, freeBuffers: free.length, inFlightBuffers: inFlight.filter(Boolean).length, scheduler: tasks ? tasks.snapshot() : { kind: "timer", pendingTimer: timer !== null }, ...graphSnapshot(g, sourceIds) };
+  return { generation: o.generation, sourceIds, frame, blocks, renderMs, maxRenderMs, blockMsHistogramLog2Us: Array.from(histogram), rejectedEvents, badRecycles, freeBuffers: free.length, inFlightBuffers: inFlight.filter(Boolean).length, deliveryTiming: delivery?.snapshot() ?? null, scheduler: tasks ? tasks.snapshot() : { kind: "timer", pendingTimer: timer !== null }, ...graphSnapshot(g, sourceIds) };
 }
 function stopPump() {
   clearTimeout(timer);
@@ -123,6 +192,7 @@ function fail(e) {
 function schedule() {
   if (!stopped && free.length && frame < end) {
     const delay = Math.max(0, stallUntil - performance.now());
+    delivery?.requestTask(delay);
     if (tasks) tasks.schedule(delay);
     else if (timer === null) timer = setTimeout(pump, delay);
   }
@@ -130,7 +200,9 @@ function schedule() {
 function pump() {
   timer = null;
   if (stopped || !free.length || frame >= end) return;
-  if (performance.now() < stallUntil) {
+  const stalled = performance.now() < stallUntil;
+  delivery?.beginTask(stalled);
+  if (stalled) {
     schedule();
     return;
   }
@@ -144,7 +216,14 @@ function pump() {
     histogram[Math.min(31, Math.max(0, Math.ceil(Math.log2(Math.max(1, elapsed * 1e3)))))]++;
     blocks++;
     inFlight[slot.slot] = true;
-    port.postMessage({ type: "block", generation: o.generation, slot: slot.slot, frame, n, buffer: slot.buffer }, [slot.buffer]);
+    let producer;
+    if (delivery) {
+      delivery.published(slot.slot, frame + n < end, free.length);
+      producer = { version: 1, ...delivery.snapshot(), frame: frame + n, blocks, freeBuffers: free.length, inFlightBuffers: inFlight.filter(Boolean).length, renderMs: elapsed, maxRenderMs };
+    }
+    const packet = { type: "block", generation: o.generation, slot: slot.slot, frame, n, buffer: slot.buffer };
+    if (producer) packet.producer = producer;
+    port.postMessage(packet, [slot.buffer]);
     frame += n;
     schedule();
   } catch (e) {
@@ -159,6 +238,8 @@ globalThis.onmessage = ({ data: d }) => {
       if (!Number.isSafeInteger(d.endFrame) || d.endFrame < 1) throw Error("Invalid score end");
       end = d.endFrame;
       port = d.port;
+      if (d.deliveryDiagnostics !== void 0 && typeof d.deliveryDiagnostics !== "boolean") throw Error("Invalid delivery diagnostics");
+      if (d.deliveryDiagnostics) delivery = new WorkerDeliveryTiming(o.poolBlocks);
       sourceIds = d.sourceIds ?? null;
       if (sourceIds && (!Array.isArray(sourceIds) || !sourceIds.length || sourceIds.length > 6 || new Set(sourceIds).size !== sourceIds.length || sourceIds.some((id) => !Number.isInteger(id) || id < 1 || id > 6))) throw Error("Invalid source group");
       g = new ReferenceGraph(new WebAssembly.Instance(d.module, {}).exports, d.patch, d.contracts, d.rate, o.blockFrames);
@@ -172,6 +253,7 @@ globalThis.onmessage = ({ data: d }) => {
           badRecycles++;
           return;
         }
+        delivery?.recycled(b.slot, b.consumerFrame);
         inFlight[b.slot] = false;
         free.push({ slot: b.slot, buffer: b.buffer });
         schedule();
@@ -201,6 +283,7 @@ globalThis.onmessage = ({ data: d }) => {
     if (d.type === "stall") {
       if (!Number.isFinite(d.ms) || d.ms < 0 || d.ms > 1e3) throw Error("Invalid stall");
       stallUntil = performance.now() + d.ms;
+      delivery?.beginTask(true);
       postMessage({ type: "stalled", request: d.request, ms: d.ms, frame });
       return;
     }

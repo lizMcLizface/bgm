@@ -6,9 +6,10 @@ function register(context,version){if(!registered.has(context))registered.set(co
 
 // Startup fallback only. A worker failing after playback starts must fail closed;
 // reconstructing its ahead-of-audio state inside process() would block the clock.
-export async function createWorkerRoute(context,assets,patch,{mode='worker',options={},forceFallback=false,onFinished=()=>{},sourceIds=null,endFrame,startPaused=false,stopOnUnderrun=false}={}) {
+export async function createWorkerRoute(context,assets,patch,{mode='worker',options={},forceFallback=false,onFinished=()=>{},sourceIds=null,endFrame,startPaused=false,stopOnUnderrun=false,deliveryDiagnostics=false}={}) {
   sourceIds=sourceSelection(sourceIds);if(typeof startPaused!=='boolean')throw Error('Invalid manual start');
   if(typeof stopOnUnderrun!=='boolean')throw Error('Invalid delivery gap policy');
+  if(typeof deliveryDiagnostics!=='boolean')throw Error('Invalid delivery diagnostics');
   const o=workerOptions({...options,generation:++generation}),end=endFrame??Math.round(assets.fixture.totalSeconds*context.sampleRate);
   if(!Number.isSafeInteger(end+o.delayFrames)||end<1)throw Error('Invalid source end frame');
   await register(context,assets.manifest.version);
@@ -23,7 +24,7 @@ export async function createWorkerRoute(context,assets,patch,{mode='worker',opti
     const ready=new Promise((r,j)=>{readyResolve=r;readyReject=j;}),primed=new Promise((r,j)=>{primeResolve=r;primeReject=j;});
     // Mark the second promise handled even if ready fails first.
     primed.catch(()=>{});
-    node=new AudioWorkletNode(context,'calmbgm-worker-output',{numberOfInputs:0,numberOfOutputs:8,outputChannelCount:Array(8).fill(2),processorOptions:{mode:actual,options:o,endFrame:end,sourceIds,startPaused,stopOnUnderrun,...(actual==='serial'?{module:assets.modules.graph,contracts:assets.contracts,patch}:{})}});
+    node=new AudioWorkletNode(context,'calmbgm-worker-output',{numberOfInputs:0,numberOfOutputs:8,outputChannelCount:Array(8).fill(2),processorOptions:{mode:actual,options:o,endFrame:end,sourceIds,startPaused,stopOnUnderrun,deliveryDiagnostics,...(actual==='serial'?{module:assets.modules.graph,contracts:assets.contracts,patch}:{})}});
     node.port.onmessage=({data:d})=>{
       if(d.type==='ready')readyResolve(d);
       if(d.type==='primed')primeResolve(d);
@@ -46,12 +47,12 @@ export async function createWorkerRoute(context,assets,patch,{mode='worker',opti
         worker=new Worker(base+`graph-worker.js?v=${assets.manifest.version}`,{type:'module',name:`modular-audio-${o.generation}`});
         const ready=new Promise((resolve,reject)=>{worker.onmessage=({data:d})=>{if(d.type==='ready')resolve(d);else if(d.type==='error'){reject(Error(d.message));reply(d);}else reply(d);};worker.onerror=e=>{reject(Error(e.message||'Worker startup failed'));fail(e.message||'Worker failed');};});
         node.port.postMessage({type:'connect',port:channel.port2},[channel.port2]);
-        worker.postMessage({type:'init',module:assets.modules.graph,contracts:assets.contracts,patch,rate:context.sampleRate,endFrame:end,sourceIds,options:o,port:channel.port1},[channel.port1]);
+        worker.postMessage({type:'init',module:assets.modules.graph,contracts:assets.contracts,patch,rate:context.sampleRate,endFrame:end,sourceIds,options:o,deliveryDiagnostics,port:channel.port1},[channel.port1]);
         await withTimeout(ready);await withTimeout(output.primed);
       }catch(e){fallbackReason=String(e);discard();worker=null;channel=null;error=null;actual='serial';await withTimeout(makeNode('serial').ready);}
     }else if(mode==='serial')await withTimeout(makeNode('serial').ready);
     else throw Error('Invalid executor mode');
-    return {node,end,options:o,executor:{requested:mode,actual,fallbackReason,sourceIds,manualStart:startPaused,stopOnUnderrun,scheduling:actual==='worker'?o.scheduling:null,blockFrames:o.blockFrames,poolBlocks:o.poolBlocks,renderAheadCapacityFrames:o.delayFrames,bufferingLatencyFrames:o.delayFrames,bufferingLatencyMs:o.delayFrames/context.sampleRate*1000,pcmPoolBytes:actual==='worker'?o.bufferBytes*o.poolBlocks:0,transport:actual==='worker'?'transferable MessagePort; no shared Wasm memory':'in-worklet serial Rust; no PCM transport'},
+    return {node,end,options:o,executor:{requested:mode,actual,fallbackReason,sourceIds,manualStart:startPaused,stopOnUnderrun,deliveryDiagnostics:deliveryDiagnostics&&actual==='worker',scheduling:actual==='worker'?o.scheduling:null,blockFrames:o.blockFrames,poolBlocks:o.poolBlocks,renderAheadCapacityFrames:o.delayFrames,bufferingLatencyFrames:o.delayFrames,bufferingLatencyMs:o.delayFrames/context.sampleRate*1000,pcmPoolBytes:actual==='worker'?o.bufferBytes*o.poolBlocks:0,transport:actual==='worker'?'transferable MessagePort; no shared Wasm memory':'in-worklet serial Rust; no PCM transport'},
       start(){if(disposed||started)throw Error('Route already started or disposed');started=true;node.port.postMessage({type:'start'});},
       check(){if(error)throw Error(error);},
       async stats(){

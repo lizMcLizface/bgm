@@ -1825,3 +1825,37 @@ execution, not an ordinary sandboxed Start-Process. See
 [updated launch instructions](SYNTHS_STARTUP_RECOVERY.md) and
 `m4a-lan-preview-sandbox-restart.json` for exact attempts, ownership and limits.
 Next: phone usability, then bounded worker-wait/last-accepted-packet diagnostics.
+
+## M4a publication-bound timing and exact phone repeat (2026-11-10)
+
+[Timing contracts, desktop/phone evidence and limits](MODULAR_AUDIO_ENGINE_M4A_DELIVERY_TIMING.md)
+deliver opt-in All producer task/pool/recycle observations, metadata on the last
+accepted packet, explicit later-worker scope, actual sample rate and compact
+v2. Generic worker/pool diagnostics remain off; serial remains initial and
+buffering stays 512 x six / 64 ms. Runtime **2f9eed09e9122592**, host
+**all-preview-delivery-v2**, unchanged 296,101-byte Rust/Wasm hash.
+
+**233 tests / 30 files**, **178.26 s**, and public build/package checks
+(**47.50 s**) pass, including real three-rate single/pool workers, independent
+state, opt-in core/FM exact PCM and legacy DSP. Desktop worker and serial each
+complete **668,956 frames / 18 events**, three signal taps, no delivery/event
+misses. Compact worker report is **2,724 chars**; reload preserves poses/IDs,
+clears the report and returns to serial. Worklet wall-time clock unavailable,
+not zero CPU. No physical listening verdict or native clipboard readback claim.
+
+New actual phone run **98e7ef6f-cee4-4c47-baf7-bc0f190736fa** reproduces the old
+failure exactly: nine accepted packets, zero lead **4,608**, stop **4,736**,
+**128 missing frames**. Last packet was accepted at source **1,792**; at send,
+producer had zero free / six in-flight slots and recycles only through **1,535**,
+task wait max **0.30 ms**, last render **0.20 ms**. Later worker handled recycles
+through **4,607**, rendered 15 blocks, task wait max **0.40 ms**. This focuses
+the next experiment on buffer recycling/holding/delivery, but does not identify
+a message leg, callback batch boundary or CPU cause. Startup/holding pollutes
+pool/recycle maxima. Original failed/unassessed verdicts remain intact in
+`m4a-phone-worker-delivery-timing.json`. See linked doc for desktop evidence.
+
+**Next implementation:** explicit six-versus-eight-slot comparison at unchanged
+512-frame cadence, **64 vs 85.33 ms**, six default and serial initial. Capture
+actual capacity/source/build; do not silently increase buffering, promise a
+cure or migrate more roles. Keep confirmed normal-user LAN HTTPS PID available;
+no deployment, firewall/trust change or native Application Control bypass.

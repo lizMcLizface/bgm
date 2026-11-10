@@ -1,6 +1,7 @@
 // Fixed-size transferable pool. This is not shared Wasm memory or a worker pool.
 import {contiguousLeadFrames,QueueLead} from './queueLead.js';
 import {ArrivalGaps} from './arrivalGaps.js';
+import {packetProducerSnapshot} from './workerDeliveryTiming.js';
 export const BUS_COUNT = 8;
 export function sourceSelection(ids=null){if(ids===null)return null;if(!Array.isArray(ids)||!ids.length||ids.length>6||new Set(ids).size!==ids.length||ids.some(id=>!Number.isInteger(id)||id<1||id>6))throw Error('Invalid source selection');return ids.slice();}
 export function workerScheduling(value='timer'){if(!['timer','message'].includes(value))throw Error('Invalid worker scheduling');return value;}
@@ -33,18 +34,19 @@ export function graphSnapshot(g,ids=null) {
 // No waiting, sorting, DSP, or typed-view creation in consume(). Views are made
 // when a transferred block arrives. Misses advance the clock and emit silence.
 export class WorkerPcmQueue {
-  constructor(options, endFrame, recycle, onArrival=null) {
+  constructor(options, endFrame, recycle, onArrival=null, captureDelivery=false) {
     this.o=workerOptions(options);
     if (!Number.isSafeInteger(endFrame+this.o.delayFrames)||endFrame<1) throw Error('Invalid worker end frame');
     this.end=endFrame; this.recycle=recycle; this.frame=0; this.count=0;this.wasMissing=false;
     this.slots=Array(this.o.poolBlocks).fill(null);
     this.lead=new QueueLead(this.o.delayFrames,this.o.blockFrames);
     this.arrivals=new ArrivalGaps(this.o.delayFrames,endFrame);this.onArrival=onArrival;
+    this.captureDelivery=captureDelivery;this.lastPacket=null;
     this.counters={deliveredFrames:0,underrunFrames:0,underrunQuanta:0,recoveries:0,lateBlocks:0,staleGeneration:0,rejectedBlocks:0,acceptedBlocks:0,queueHighWater:0};
   }
   contiguousLead(){return contiguousLeadFrames(this.slots,this.frame,this.o.delayFrames);}
   observeLead(needed){const lead=this.contiguousLead();this.lead.observe(lead,needed,this.end-this.frame,this.frame);this.arrivals.observe(this.frame,needed,this.end-this.frame,lead);return lead;}
-  stats(){return {...this.counters,queuedBlocks:this.count,lead:this.lead.snapshot(),arrivals:this.arrivals.snapshot()};}
+  stats(){return {...this.counters,queuedBlocks:this.count,lastPacket:this.lastPacket,lead:this.lead.snapshot(),arrivals:this.arrivals.snapshot()};}
   publication(b,expired){this.arrivals.arrive(this.frame,b.frame,b.n,expired);this.onArrival?.(b,expired);}
   release(slot) {
     const b=this.slots[slot]; if(!b)return;
@@ -60,6 +62,7 @@ export class WorkerPcmQueue {
     // publication even with a different slot; never replay duplicate frames.
     for(const prior of this.slots)if(prior&&prior.frame===b.frame){this.counters.rejectedBlocks++;return false;}
     this.publication(b,false);
+    if(this.captureDelivery)this.lastPacket={packetFrame:b.frame,frames:b.n,sourceFrameAtArrival:this.frame,producer:packetProducerSnapshot(b.producer)};
     b.pcm=new Float32Array(b.buffer);this.slots[b.slot]=b;this.count++;
     this.counters.acceptedBlocks++;this.counters.queueHighWater=Math.max(this.counters.queueHighWater,this.count);return true;
   }

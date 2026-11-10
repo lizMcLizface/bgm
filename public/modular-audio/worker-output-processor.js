@@ -167,6 +167,17 @@ var ArrivalGaps = class {
   }
 };
 
+// src/modular-audio/workerDeliveryTiming.js
+function packetProducerSnapshot(value) {
+  if (!value || value.version !== 1) return null;
+  const result = { version: 1, available: value.available === true };
+  for (const key of ["frame", "blocks", "freeBuffers", "inFlightBuffers", "elapsedMs", "taskWaits", "taskWaitMs", "taskWaitMaxMs", "poolWaits", "poolWaitMs", "poolWaitMaxMs", "recycleRttMs", "recycleRttMaxMs", "lastRecycleConsumerFrame", "renderMs", "maxRenderMs"]) {
+    const n = value[key];
+    result[key] = typeof n === "number" && Number.isFinite(n) && n >= 0 && n <= Number.MAX_SAFE_INTEGER ? n : null;
+  }
+  return result;
+}
+
 // src/modular-audio/workerProtocol.js
 var BUS_COUNT = 8;
 function sourceSelection(ids = null) {
@@ -201,7 +212,7 @@ function graphSnapshot(g, ids = null) {
   };
 }
 var WorkerPcmQueue = class {
-  constructor(options, endFrame, recycle, onArrival = null) {
+  constructor(options, endFrame, recycle, onArrival = null, captureDelivery = false) {
     this.o = workerOptions(options);
     if (!Number.isSafeInteger(endFrame + this.o.delayFrames) || endFrame < 1) throw Error("Invalid worker end frame");
     this.end = endFrame;
@@ -213,6 +224,8 @@ var WorkerPcmQueue = class {
     this.lead = new QueueLead(this.o.delayFrames, this.o.blockFrames);
     this.arrivals = new ArrivalGaps(this.o.delayFrames, endFrame);
     this.onArrival = onArrival;
+    this.captureDelivery = captureDelivery;
+    this.lastPacket = null;
     this.counters = { deliveredFrames: 0, underrunFrames: 0, underrunQuanta: 0, recoveries: 0, lateBlocks: 0, staleGeneration: 0, rejectedBlocks: 0, acceptedBlocks: 0, queueHighWater: 0 };
   }
   contiguousLead() {
@@ -225,7 +238,7 @@ var WorkerPcmQueue = class {
     return lead;
   }
   stats() {
-    return { ...this.counters, queuedBlocks: this.count, lead: this.lead.snapshot(), arrivals: this.arrivals.snapshot() };
+    return { ...this.counters, queuedBlocks: this.count, lastPacket: this.lastPacket, lead: this.lead.snapshot(), arrivals: this.arrivals.snapshot() };
   }
   publication(b, expired) {
     this.arrivals.arrive(this.frame, b.frame, b.n, expired);
@@ -259,6 +272,7 @@ var WorkerPcmQueue = class {
       return false;
     }
     this.publication(b, false);
+    if (this.captureDelivery) this.lastPacket = { packetFrame: b.frame, frames: b.n, sourceFrameAtArrival: this.frame, producer: packetProducerSnapshot(b.producer) };
     b.pcm = new Float32Array(b.buffer);
     this.slots[b.slot] = b;
     this.count++;
@@ -359,11 +373,17 @@ var WorkerOutput = class extends AudioWorkletProcessor {
       if (p.startPaused !== void 0 && typeof p.startPaused !== "boolean") throw Error("Invalid manual start");
       if (p.stopOnUnderrun !== void 0 && typeof p.stopOnUnderrun !== "boolean") throw Error("Invalid delivery gap policy");
       this.stopOnUnderrun = !!p.stopOnUnderrun;
+      if (p.deliveryDiagnostics !== void 0 && typeof p.deliveryDiagnostics !== "boolean") throw Error("Invalid delivery diagnostics");
+      this.deliveryDiagnostics = !!p.deliveryDiagnostics;
       if (!Number.isSafeInteger(this.end + this.o.delayFrames) || this.end < 1 || !["worker", "serial"].includes(this.mode)) throw Error("Invalid worker output");
       if (this.mode === "serial") {
         this.g = new ReferenceGraph(new WebAssembly.Instance(p.module, {}).exports, p.patch, p.contracts, sampleRate);
         this.views = sourceViews(this.g, this.sourceIds);
-      } else this.queue = new WorkerPcmQueue(this.o, this.end, (b) => this.link.postMessage({ type: "recycle", generation: b.generation, slot: b.slot, buffer: b.buffer }, [b.buffer]));
+      } else this.queue = new WorkerPcmQueue(this.o, this.end, (b) => {
+        const message = { type: "recycle", generation: b.generation, slot: b.slot, buffer: b.buffer };
+        if (this.deliveryDiagnostics) message.consumerFrame = this.queue.frame;
+        this.link.postMessage(message, [b.buffer]);
+      }, null, this.deliveryDiagnostics);
       this.port.onmessage = ({ data: d }) => {
         try {
           if (d.type === "connect" && this.mode === "worker" && !this.link) {

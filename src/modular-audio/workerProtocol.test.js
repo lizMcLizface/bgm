@@ -8,6 +8,15 @@ import {coreCases} from '../../tools/coreOwnedVerification.mjs';
 const outputs=n=>Array.from({length:8},()=>[new Float32Array(n),new Float32Array(n)]);
 function block(slot,frame,n=256,generation=1){const buffer=new ArrayBuffer(256*16*4),pcm=new Float32Array(buffer);for(let b=0;b<8;b++)for(let i=0;i<n;i++){pcm[(b*n+i)*2]=frame+i+b/16;pcm[(b*n+i)*2+1]=-frame-i-b/16;}return {slot,frame,n,generation,buffer};}
 describe('bounded worker PCM publication',()=>{
+ it('freezes the last accepted producer publication at a guarded miss, independently of later worker progress',()=>{
+  let Type;const messages=[],ctx=vm.createContext({ReferenceGraph:class{constructor(){throw Error('No local DSP');}},Float32Array,Float64Array,Array,Math,Number,Error,Object,Uint32Array,sampleRate:48000,AudioWorkletProcessor:class{constructor(){this.port={postMessage:d=>messages.push(structuredClone(d)),close(){}};}},registerProcessor:(_,c)=>Type=c});
+  vm.runInContext(fs.readFileSync('public/modular-audio/worker-output-processor.js','utf8').replace(/^import[^;]+;\s*$/gm,''),ctx);
+  const p=new Type({processorOptions:{mode:'worker',stopOnUnderrun:true,deliveryDiagnostics:true,endFrame:1024,options:{blockFrames:256,poolBlocks:2}}}),recycled=[],link={postMessage:d=>recycled.push(d),close(){}};p.port.onmessage({data:{type:'connect',port:link}});
+  for(let i=0;i<2;i++)link.onmessage({data:{type:'block',...block(i,i*256),producer:{version:1,available:true,frame:(i+1)*256,blocks:i+1,taskWaitMaxMs:5,poolWaitMs:null}}});
+  for(let i=0;i<8;i++)expect(p.process([],outputs(128))).toBe(true);expect(p.process([],outputs(128))).toBe(false);
+  const atMiss=messages.find(d=>d.type==='stats');expect(atMiss).toMatchObject({sourceFrame:640,queue:{underrunFrames:128,lastPacket:{packetFrame:256,sourceFrameAtArrival:0,producer:{frame:512,blocks:2,taskWaitMaxMs:5,poolWaitMs:null}}}});expect(recycled.map(d=>d.consumerFrame)).toEqual([255,511]);
+  link.onmessage({data:{type:'block',...block(0,512),producer:{version:1,frame:768,blocks:3}}});p.port.onmessage({data:{type:'stats'}});expect(messages.at(-1).queue.lastPacket).toEqual(atMiss.queue.lastPacket);p.port.onmessage({data:{type:'dispose'}});
+ });
  it.each([false,true])('keeps recovery by default and optionally stops on the first missing span (stop=%s)',stopOnUnderrun=>{
   let Type;const messages=[],ctx=vm.createContext({ReferenceGraph:class{constructor(){throw Error('Worker output must not render locally');}},Float32Array,Array,Math,Number,Error,Object,Uint32Array,sampleRate:48000,AudioWorkletProcessor:class{constructor(){this.port={postMessage:d=>messages.push(d),close(){}};}},registerProcessor:(_,c)=>Type=c});
   vm.runInContext(fs.readFileSync('public/modular-audio/worker-output-processor.js','utf8').replace(/^import[^;]+;\s*$/gm,''),ctx);
