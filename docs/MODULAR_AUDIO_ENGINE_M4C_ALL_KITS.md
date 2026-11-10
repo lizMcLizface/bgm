@@ -158,3 +158,50 @@ This checks the real drum expression/booking path beyond the two-second probe.
 Keep longer phone lookahead, finite scope and existing defaults. Native-family
 adapters, ordinary transport migration and new sidechain/pool routing stay
 separate gates; do not start broad migration from this listening result.
+
+## Complete captured-pattern desktop check
+
+After `1df4ab0`, no product code changes. Actual 390 px browser run
+**f1383f7f-ecb6-40e1-a018-541c6038e666**, started
+**2026-11-10T15:39:04.508Z**, uses **captured-score**, not diagnostic notes.
+Same original three core sources plus explicitly selected Hand, IDs[1,2,5,6],
+actual worker /Message512x12 /128 ms, normal guard true. This fresh Continuous
+capture has **Lead0 /counter0 /Bass11 notes +32 drum hits**; two silent slots
+are intentional and unsupported native Piano roles are not included.
+
+Entire **1,001,116 frames (20.8566 s)** planned/consumed/rendered, **1,007,360**
+output frames, **54 events**, **1,956 blocks**. Zero delivery, late/overflow,
+rejected/stale/recycle errors; ready lead min5,376 and gap max896. Bass raw /
+channel peaks **0.326044 /0.086489**, Hand **0.358472 /0.093482**, master
+**0.128747**, full complete/event/signal pass true. Automated listening remains
+unassessed. Full/compact/browser/artifact records are
+`reports/modular_audio/m4c-current-progression-*.json`; screenshot
+`.tmp/m4c-current-progression.png`. Full source plan independently rehashes to
+**84d4b832769f305ca25898484e08fadde86ccb08fd48d49981a39f1335b4aaf8**.
+Original selectors restored; reload returns selected/Serial/report cleared.
+Own QA tab/viewport/server cleaned; LAN HTTPS PID8368 stays running.
+
+Additional portable source replay verifies unchanged JSON graph save/load and
+exact PCM for original/reloaded independent handles sharing one Wasm at the
+same **127-frame** partition, also exact versus independent Wasm at that
+partition. Raw stereo source reference-mix hash
+**ca2656b0d013bd278370e0600da2a949df6299615b9f1baac05c69f51c0b8f88**.
+This is source PCM, not isolated wet Web Audio or physical output parity.
+
+A stricter 127-vs-509 raw-hash assertion initially differed. Controlled replay
+separates serialization/state from partitions: only **268** Bass/reference-mix
+samples differ, starting frame **649,859**, maximum amplitude and absolute
+difference **1.0662684604623325e-38**, entirely below the float32 normal minimum.
+Drum PCM remains bit-exact. This is the existing subnormal state cleanup at
+render boundaries (`synth-engine/common/denormal.rs` and core's boundary flush),
+not a save/reload/state failure. Preserve raw metrics in the partition diagnostic
+and do not claim bit-exact cross-partition Bass tails or change legacy DSP to
+make hashes equal. No new build/regression run is needed for this evidence-only
+step; the preceding 163 implementation checks/build remain the last code checks.
+
+**Phone current-pattern check requested:** keep those four sources /Hand /
+worker/twelve, switch Material to Current progression, play selected sources
+once, export compact diagnostics and report listening. Frame/note/hit counts
+depend on that phone's current capture; require complete clocks, expected
+events and zero delivery errors, preserving sparse roles and the actual input
+hash. This remains pending separately from the accepted test-note audition.

@@ -2340,6 +2340,32 @@ zero notes, and native Piano sources are omitted; never label that full-song
 migration or active-four-voice listening. Preserve finite scope, guard, current
 defaults and longer phone lookahead. Native adapters remain separate work.
 
+## Current captured-pattern desktop gate (2026-11-10)
+
+After `1df4ab0`, actual browser Current progression /three original core slots
++explicit Hand /worker-twelve completes **1,001,116 frames /54 events /1,956
+blocks**, no delivery/event/recycle errors, positive Bass/Hand/master0.128747.
+Capture has **0/0/11 notes +32 hits**, two intentionally silent sources; native
+Piano roles are omitted, so this is not full-song or active-four-voice acceptance.
+Run **f1383f7f-ecb6-40e1-a018-541c6038e666**, hostv10/engine62315. Full plan hash
+independently verified. Originals/reload defaults restore, QA cleanup complete,
+LAN HTTPS8368 remains. Artifacts `m4c-current-progression-*.json`, screenshot
+`.tmp/m4c-current-progression.png`.
+
+Original/reloaded graph and independent same-Wasm/independent-Wasm source PCM
+are exact at matched127-frame partitions. A 127-vs-509 check differs only in
+268 subnormal Bass/reference-mix tail samples, max **1.0662684604623325e-38**,
+all differing amplitudes subnormal; drums exact. Existing core boundary denormal
+cleanup explains that raw-hash limit. Preserve it as measured, not bit-exact
+cross-partition parity; no DSP change. Full details in the integration doc.
+Evidence-only step: no new product/build/test-suite change.
+
+**Pending user check:** same phone four-source Hand/worker/twelve, Material
+Current progression, one guarded complete pass plus compact report/listening.
+This concrete check is ready; wait for its result before further acceptance
+or broad/native migration. Earlier diagnostic listening remains accepted
+separately. No blocker, default switch or deployment.
+
 Artifacts `m4c-kit-configured-pcm.json`, `m4c-kit-allocation.json`, and
 `m4c-percussion-seam-configured-audit.json`; original negative seam evidence
 preserved. Source PCM is not wet effects, browser queue or physical listening.

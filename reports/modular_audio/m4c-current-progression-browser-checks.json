@@ -1,0 +1,142 @@
+{
+  "kind": "all.percussion-current-progression.browser-checks",
+  "version": 1,
+  "checkedAtUtc": "2026-11-10T15:41:26.601Z",
+  "runId": "f1383f7f-ecb6-40e1-a018-541c6038e666",
+  "material": "captured-score",
+  "frames": 1001116,
+  "events": 54,
+  "originalSources": [
+    {
+      "label": "Lead sound generator",
+      "text": "DI-Poly",
+      "value": "poly"
+    },
+    {
+      "label": "Lead patch",
+      "text": "Measured Flute",
+      "value": "Measured Flute"
+    },
+    {
+      "label": "Second lead sound generator",
+      "text": "DI-Poly",
+      "value": "poly"
+    },
+    {
+      "label": "Second lead patch",
+      "text": "Soft Flute",
+      "value": "Soft Flute"
+    },
+    {
+      "label": "Rhythm sound generator",
+      "text": "Piano",
+      "value": "piano"
+    },
+    {
+      "label": "Rhythm patch",
+      "text": "Felt Keys (updated)",
+      "value": "Felt Keys (updated)"
+    },
+    {
+      "label": "Pad sound generator",
+      "text": "Piano",
+      "value": "piano"
+    },
+    {
+      "label": "Pad patch",
+      "text": "Felt Keys (updated)",
+      "value": "Felt Keys (updated)"
+    },
+    {
+      "label": "Bass sound generator",
+      "text": "DI-Poly",
+      "value": "poly"
+    },
+    {
+      "label": "Bass patch",
+      "text": "Thump Bass",
+      "value": "Thump Bass"
+    },
+    {
+      "label": "Drums sound generator",
+      "text": "Scene kits",
+      "value": "scene"
+    },
+    {
+      "label": "Drums patch",
+      "text": "Rainy café (99 scenes)",
+      "value": "Rainy café"
+    }
+  ],
+  "restoredSources": [
+    {
+      "label": "Lead sound generator",
+      "text": "DI-Poly",
+      "value": "poly"
+    },
+    {
+      "label": "Lead patch",
+      "text": "Measured Flute",
+      "value": "Measured Flute"
+    },
+    {
+      "label": "Second lead sound generator",
+      "text": "DI-Poly",
+      "value": "poly"
+    },
+    {
+      "label": "Second lead patch",
+      "text": "Soft Flute",
+      "value": "Soft Flute"
+    },
+    {
+      "label": "Rhythm sound generator",
+      "text": "Piano",
+      "value": "piano"
+    },
+    {
+      "label": "Rhythm patch",
+      "text": "Felt Keys (updated)",
+      "value": "Felt Keys (updated)"
+    },
+    {
+      "label": "Pad sound generator",
+      "text": "Piano",
+      "value": "piano"
+    },
+    {
+      "label": "Pad patch",
+      "text": "Felt Keys (updated)",
+      "value": "Felt Keys (updated)"
+    },
+    {
+      "label": "Bass sound generator",
+      "text": "DI-Poly",
+      "value": "poly"
+    },
+    {
+      "label": "Bass patch",
+      "text": "Thump Bass",
+      "value": "Thump Bass"
+    },
+    {
+      "label": "Drums sound generator",
+      "text": "Scene kits",
+      "value": "scene"
+    },
+    {
+      "label": "Drums patch",
+      "text": "Rainy café (99 scenes)",
+      "value": "Rainy café"
+    }
+  ],
+  "reload": {
+    "sourcesRestored": true,
+    "scope": "selected",
+    "executor": "serial",
+    "reportCount": 0
+  },
+  "physicalListening": "not assessed",
+  "copy": "DOM compact report retained; native clipboard payload not read back",
+  "screenshot": ".tmp/m4c-current-progression.png"
+}

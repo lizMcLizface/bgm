@@ -1041,3 +1041,11 @@ Phone Hand +three core diagnostic also completes without errors and the user
 confirms clean drum entry/overlap. Hostv10, engine62315 unchanged. Next full
 captured progression with those selected sources; silent score slots and
 omitted native Piano roles are not full-song acceptance or default migration.
+
+Complete Current progression now also passes on desktop: **1,001,116 frames /
+54 events**, no delivery errors, actual Bass11notes/Hand32hits plus two silent
+slots. Original selectors/defaults restore. Same-partition source save/reload /
+independence is exact; cross-partition raw hashes differ only in subnormal Bass
+tails, preserved as an existing numerical limit. No product code changed in
+this follow-up. The same four-source captured-pattern phone/listening check is
+requested and pending; diagnostic audition acceptance remains separate.

@@ -1112,3 +1112,13 @@ user-confirmed clean drum entry/overlap. Raw run-bound evidence retained.
 Next complete current-progression selected-source pass; sparse slots and
 unsupported native roles must remain explicit. No normal transport migration,
 new sidechain/worker pool, latency experiment or deployment.
+
+Current-pattern desktop follow-up after `1df4ab0` passes full **1,001,116 /
+54 events /1,956 blocks** with zero delivery errors: selected core slots have
+0/0/11 notes and Hand32hits. Sparse sources/native omissions remain explicit.
+Source save/reload/independent handles are exact at the same partition. Only
+subnormal Bass tail values differ at127 vs509 blocks (max1.07e-38); original
+denormal policy stays unchanged and raw-hash limits are documented. This is
+evidence-only, not a new runtime change. [Exact result and pending phone
+current-progression check](MODULAR_AUDIO_ENGINE_M4C_ALL_KITS.md) are recorded;
+await that concrete device test before widening acceptance or migration.

@@ -1,0 +1,57 @@
+{
+  "kind": "all.percussion-current-progression.artifact-checks",
+  "version": 1,
+  "checkedAtUtc": "2026-11-10T15:45:24.743Z",
+  "runId": "f1383f7f-ecb6-40e1-a018-541c6038e666",
+  "hostRevision": "all-preview-delivery-v10",
+  "engineVersion": "62315b4104f2fc7e",
+  "material": "captured-score",
+  "sourceFingerprint": "84d4b832769f305ca25898484e08fadde86ccb08fd48d49981a39f1335b4aaf8",
+  "sourcePlanIndependentlyRehashed": true,
+  "frames": 1001116,
+  "outputFrames": 1007360,
+  "events": 54,
+  "noteCounts": [
+    0,
+    0,
+    11,
+    0
+  ],
+  "drumHits": 32,
+  "acceptedBlocks": 1956,
+  "minimumSteadyLead": 5376,
+  "maximumArrivalGap": 896,
+  "masterPeak": 0.12874725461006165,
+  "saveReload": {
+    "scope": "Source-only Rust reference mix, not existing wet Web Audio mixer or physical output",
+    "exact": true,
+    "rawStereoHash": "ca2656b0d013bd278370e0600da2a949df6299615b9f1baac05c69f51c0b8f88",
+    "partitions": [
+      127,
+      127
+    ],
+    "independentHandlesInOneWasm": true
+  },
+  "blockPartitionComparison": {
+    "blocks": [
+      127,
+      509
+    ],
+    "rawBitwiseEqual": false,
+    "maxAbs": 1.0662684604623325e-38,
+    "maxAmplitudeAtDifferences": 1.0662684604623325e-38,
+    "differentSamples": 268,
+    "firstFrame": 649859,
+    "allDifferencesSubnormal": true,
+    "drumMaxAbs": 0,
+    "scope": "Existing legacy subnormal state cleanup at render boundaries; no DSP change or wet-PCM/listening claim"
+  },
+  "restored": {
+    "sourcesRestored": true,
+    "scope": "selected",
+    "executor": "serial",
+    "reportCount": 0
+  },
+  "physicalListening": "not assessed",
+  "phone": "requested; pending"
+}

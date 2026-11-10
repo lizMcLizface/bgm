@@ -1,0 +1,120 @@
+{
+  "graphRoundtripSame": true,
+  "reference": "same-Wasm first handle/original/127",
+  "comparisons": [
+    "same-Wasm second handle/reloaded/127",
+    "independent Wasm/original/127",
+    "independent Wasm/original/509",
+    "independent Wasm/reloaded/127"
+  ],
+  "rows": [
+    {
+      "comparison": 1,
+      "stats": {
+        "frame": 1001116,
+        "late": 0,
+        "overflow": 0,
+        "applied": 54
+      },
+      "out": {
+        "maxAbs": 0,
+        "firstFrame": null,
+        "differentSamples": 0,
+        "maxAmplitudeAtDifferences": 0
+      },
+      "bass": {
+        "maxAbs": 0,
+        "firstFrame": null,
+        "differentSamples": 0,
+        "maxAmplitudeAtDifferences": 0
+      },
+      "drums": {
+        "maxAbs": 0,
+        "firstFrame": null,
+        "differentSamples": 0,
+        "maxAmplitudeAtDifferences": 0
+      }
+    },
+    {
+      "comparison": 2,
+      "stats": {
+        "frame": 1001116,
+        "late": 0,
+        "overflow": 0,
+        "applied": 54
+      },
+      "out": {
+        "maxAbs": 0,
+        "firstFrame": null,
+        "differentSamples": 0,
+        "maxAmplitudeAtDifferences": 0
+      },
+      "bass": {
+        "maxAbs": 0,
+        "firstFrame": null,
+        "differentSamples": 0,
+        "maxAmplitudeAtDifferences": 0
+      },
+      "drums": {
+        "maxAbs": 0,
+        "firstFrame": null,
+        "differentSamples": 0,
+        "maxAmplitudeAtDifferences": 0
+      }
+    },
+    {
+      "comparison": 3,
+      "stats": {
+        "frame": 1001116,
+        "late": 0,
+        "overflow": 0,
+        "applied": 54
+      },
+      "out": {
+        "maxAbs": 1.0662684604623325e-38,
+        "firstFrame": 649859,
+        "differentSamples": 268,
+        "maxAmplitudeAtDifferences": 1.0662684604623325e-38
+      },
+      "bass": {
+        "maxAbs": 1.0662684604623325e-38,
+        "firstFrame": 649859,
+        "differentSamples": 268,
+        "maxAmplitudeAtDifferences": 1.0662684604623325e-38
+      },
+      "drums": {
+        "maxAbs": 0,
+        "firstFrame": null,
+        "differentSamples": 0,
+        "maxAmplitudeAtDifferences": 0
+      }
+    },
+    {
+      "comparison": 4,
+      "stats": {
+        "frame": 1001116,
+        "late": 0,
+        "overflow": 0,
+        "applied": 54
+      },
+      "out": {
+        "maxAbs": 0,
+        "firstFrame": null,
+        "differentSamples": 0,
+        "maxAmplitudeAtDifferences": 0
+      },
+      "bass": {
+        "maxAbs": 0,
+        "firstFrame": null,
+        "differentSamples": 0,
+        "maxAmplitudeAtDifferences": 0
+      },
+      "drums": {
+        "maxAbs": 0,
+        "firstFrame": null,
+        "differentSamples": 0,
+        "maxAmplitudeAtDifferences": 0
+      }
+    }
+  ]
+}
