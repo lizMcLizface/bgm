@@ -1071,11 +1071,12 @@ test('offers an explicit silent worker probe while the normal button keeps ordin
  await act(async()=>button('Stop Rust sequence preview').click());await act(async()=>button('Play selected Rust sequence').click());expect(previewMock.calls.at(-1).options.silentProbe).toBe(false);await act(async()=>button('Stop Rust sequence preview').click());
 });
 
-test('requires an explicit eight-slot worker comparison, disables capacity while active and resets experiments on reload',async()=>{
+test('requires explicit eight/twelve-slot comparisons, disables capacity while active and resets experiments on reload',async()=>{
  act(()=>container.querySelector('[aria-label="Setup"]').click());let mode=document.querySelector('[aria-label="Rust preview executor"]');
  expect(mode.value).toBe('serial');expect(document.querySelector('[aria-label="Rust worker PCM capacity"]')).toBeNull();
  act(()=>{mode.value='worker';mode.dispatchEvent(new Event('change',{bubbles:true}));});let blocks=document.querySelector('[aria-label="Rust worker PCM capacity"]');expect(blocks.value).toBe('6');
  act(()=>{blocks.value='8';blocks.dispatchEvent(new Event('change',{bubbles:true}));});await act(async()=>button('Play selected Rust sequence').click());expect(previewMock.calls.at(-1).options).toMatchObject({mode:'worker',workerPoolBlocks:8});expect(blocks.disabled).toBe(true);
+ await act(async()=>button('Stop Rust sequence preview').click());act(()=>{blocks.value='12';blocks.dispatchEvent(new Event('change',{bubbles:true}));});await act(async()=>button('Run silent Rust delivery probe').click());expect(previewMock.calls.at(-1).options).toMatchObject({mode:'worker',workerPoolBlocks:12,silentProbe:true});expect(blocks.disabled).toBe(true);
  await act(async()=>button('Stop Rust sequence preview').click());act(()=>root.unmount());root=createRoot(container);await act(async()=>root.render(<AllPage/>));
  if(!document.querySelector('#all-midi-setup'))act(()=>container.querySelector('[aria-label="Setup"]').click());mode=document.querySelector('[aria-label="Rust preview executor"]');expect(mode.value).toBe('serial');act(()=>{mode.value='worker';mode.dispatchEvent(new Event('change',{bubbles:true}));});expect(document.querySelector('[aria-label="Rust worker PCM capacity"]').value).toBe('6');
 });

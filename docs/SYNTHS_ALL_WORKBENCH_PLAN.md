@@ -930,3 +930,13 @@ and **4,864-frame max arrival gap** across its 96,000-frame window. Delivery
 resumes repeatedly; no audio-quality fix or browser cause is claimed. Next is
 an explicit twelve-slot / 128 ms comparison, muted first, retaining serial/six
 defaults, legacy DSP and setup schemas. Host v4, engine unchanged; no deployment.
+
+The [explicit twelve-slot comparison](MODULAR_AUDIO_ENGINE_M4A_TWELVE_SLOT.md)
+adds 128 ms at the same 512-frame cadence, with Serial/six unchanged. **97 checks**,
+**eight pool regressions**, public build and desktop muted/normal/reset pass.
+Host v5 / runtime d6a0341e5edf2d57; Wasm unchanged. Phone twelve-slot probe now
+completes all 96,000 / 188 packets with zero delivery errors and 1,152 minimum
+steady lead despite the same 4,864-frame arrival gap. User separately says an
+audible run sounded fine; collect that existing report to link its full counters
+and listening before further acceptance. No default promotion, schema change,
+deployment or broad workbench migration. Explicit buffering remains 128 ms.

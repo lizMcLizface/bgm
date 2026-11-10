@@ -939,3 +939,15 @@ recoveries**, **67 late packets** and a **4,864-frame maximum arrival gap**.
 This proves recurring recovery, not a stuck producer; cause/listening remain
 unassessed. Next: explicit twelve-slot / 128 ms headroom comparison above that
 observed gap, starting muted. Serial/six defaults and ordinary guard remain.
+
+[Twelve-slot headroom comparison](MODULAR_AUDIO_ENGINE_M4A_TWELVE_SLOT.md) is now
+implemented explicitly at 512 / 12, 128 ms; protocol extension is limited to that
+combination. Host v5 / runtime d6a0341e5edf2d57, identical Rust/Wasm. **97 checks**,
+**eight pool regressions**, public build **33.60 s** and actual desktop muted /
+normal / reset checks pass. Matching-input normal completes 668,956 / 16 events
+with no misses. Actual phone twelve-slot probe now completes 96,000 / 188 packets
+with zero misses/late/rejected/stale/bad recycles, 1,152 minimum steady lead, while
+the 4,864-frame gap remains. User additionally reports audible playback sounded
+fine; its exact run report is pending and must remain separate from muted probe
+verdicts. Next collect existing audible diagnostics, assess explicit 128 ms
+tradeoff, then matched-input muted pair if needed. Defaults stay Serial/six.

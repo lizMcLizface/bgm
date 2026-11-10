@@ -8,6 +8,22 @@ import {coreCases} from '../../tools/coreOwnedVerification.mjs';
 const outputs=n=>Array.from({length:8},()=>[new Float32Array(n),new Float32Array(n)]);
 function block(slot,frame,n=256,generation=1){const buffer=new ArrayBuffer(256*16*4),pcm=new Float32Array(buffer);for(let b=0;b<8;b++)for(let i=0;i<n;i++){pcm[(b*n+i)*2]=frame+i+b/16;pcm[(b*n+i)*2+1]=-frame-i-b/16;}return {slot,frame,n,generation,buffer};}
 describe('bounded worker PCM publication',()=>{
+ it('covers a modeled 4864-frame publication batch with explicit twelve-slot headroom, preserving smaller bounds',()=>{
+  expect(workerOptions({blockFrames:512,poolBlocks:12})).toMatchObject({delayFrames:6144,bufferBytes:32768});
+  for(const o of [{blockFrames:1024,poolBlocks:12},{blockFrames:512,poolBlocks:9},{blockFrames:512,poolBlocks:13}])expect(()=>workerOptions(o)).toThrow();
+  const misses=[];
+  for(const poolBlocks of [6,8,12]){
+   const end=96000,o=workerOptions({blockFrames:512,poolBlocks}),free=Array.from({length:poolBlocks},(_,slot)=>({slot,buffer:new ArrayBuffer(o.bufferBytes)}));let frame=0;
+   const q=new WorkerPcmQueue(o,end,b=>free.push(b)),out=[ [new Float32Array(128),new Float32Array(128)] ];
+   const publish=()=>{while(free.length&&frame<end){const b=free.pop(),n=Math.min(512,end-frame);new Float32Array(b.buffer).fill(.25);q.accept({slot:b.slot,buffer:b.buffer,frame,n,generation:1});frame+=n;}};
+   publish();
+   // Deterministic model, not a browser clock: no publication/recycle service
+   // while each 4864-frame output batch renders, including startup delay.
+   for(let output=0;output<end+o.delayFrames;output+=128){if(output>=o.delayFrames)q.consume(out,0,Math.min(128,end-q.frame));if((output+128)%4864===0)publish();}
+   misses.push(q.counters.underrunFrames);expect(q.frame).toBe(end);expect(q.counters.rejectedBlocks).toBe(0);q.dispose();
+  }
+  expect(misses[0]).toBeGreaterThan(0);expect(misses[1]).toBeGreaterThan(0);expect(misses[2]).toBe(0);
+ });
  it('freezes the last accepted producer publication at a guarded miss, independently of later worker progress',()=>{
   let Type;const messages=[],ctx=vm.createContext({ReferenceGraph:class{constructor(){throw Error('No local DSP');}},Float32Array,Float64Array,Array,Math,Number,Error,Object,Uint32Array,sampleRate:48000,AudioWorkletProcessor:class{constructor(){this.port={postMessage:d=>messages.push(structuredClone(d)),close(){}};}},registerProcessor:(_,c)=>Type=c});
   vm.runInContext(fs.readFileSync('public/modular-audio/worker-output-processor.js','utf8').replace(/^import[^;]+;\s*$/gm,''),ctx);

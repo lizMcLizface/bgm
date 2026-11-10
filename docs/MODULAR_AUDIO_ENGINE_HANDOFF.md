@@ -1919,3 +1919,36 @@ remain intact. Normal-user HTTPS PID8368 stays up; temporary QA server is stoppe
 headroom above the observed gap. Start with muted phone probe; request guarded
 audible listening only after clean delivery counters. Do not change defaults,
 promote a partial probe to a music-quality pass, deploy, or migrate more roles.
+
+## M4a twelve-slot headroom candidate (2026-11-10)
+
+After `ce4908c`, [explicit twelve-slot comparison](MODULAR_AUDIO_ENGINE_M4A_TWELVE_SLOT.md)
+adds **512 x 12 / 6,144 frames / 128 ms / 393,216 PCM bytes** as an opt-in All
+choice. Existing two-to-eight protocol bounds remain; only exact 512/12 extends
+them. Serial/six defaults, transient reset and ordinary guard remain. Host v5;
+regenerated runtime **d6a0341e5edf2d57**, byte-identical Rust/Wasm **296,101 bytes**.
+No scheduling/ownership/queue algorithm, setup schema, legacy DSP or migration
+change. This tests headroom above the phone's observed 4,864-frame gap.
+
+**97 checks / five files (45.50 s)**, **eight pool regressions / three (0.683 s)**,
+public package/build **33.60 s** pass. Actual 390 px desktop muted probe completes
+96,000 frames with 188 packets and no misses; subsequent matching-input normal
+preview completes 668,956 / 16 events with three nonzero peaks, no misses and
+guard true. Reload resets Serial/six/report. Reports `m4a-twelve-*.json`, image
+`.tmp/m4a-twelve-slot.png`. Normal-user HTTPS stays up.
+
+Phone unique v5 twelve-slot probe **63fa43b8-f202-4794-9833-950a2a8a622e** now
+completes 96,000 frames / 188 packets with **zero missing/late/rejected/stale /
+bad-recycle counters**. Largest arrival gap stays **4,864 frames**, minimum steady
+lead **1,152 / 24 ms**. Headroom covers this observed run. Exact raw report:
+`m4a-phone-worker-twelve-probe.json`. The user also ran audible playback and says
+it sounded fine; that run's ID/full counters are pending, so this statement is
+retained separately from the muted probe's false full-score pass/unassessed
+listening. No matched-input six/twelve pair or lock-screen guarantee is claimed.
+
+**Next:** collect the already-played audible run's compact report if available,
+linking guard/full frames/events/run ID to the affirmative listening report;
+no replay requested. Assess explicit 128 ms tradeoff. If causal isolation is
+needed, capture a same-input six/twelve muted pair before a lower-latency
+message-leg experiment. Do not blindly increase defaults, assert a Chromium
+timing guarantee or broaden migration. Preserve serial, ordinary guard and LAN.

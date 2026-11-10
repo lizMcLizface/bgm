@@ -192,7 +192,7 @@ function workerScheduling(value = "timer") {
 function workerOptions(raw = {}) {
   const o = { blockFrames: 1024, poolBlocks: 4, generation: 1, scheduling: "timer", ...raw };
   workerScheduling(o.scheduling);
-  if (![256, 512, 1024, 2048].includes(o.blockFrames) || !Number.isInteger(o.poolBlocks) || o.poolBlocks < 2 || o.poolBlocks > 8 || !Number.isInteger(o.generation) || o.generation < 1 || o.generation > 4294967295) throw Error("Invalid worker bounds");
+  if (![256, 512, 1024, 2048].includes(o.blockFrames) || !Number.isInteger(o.poolBlocks) || o.poolBlocks < 2 || o.poolBlocks > 8 && !(o.blockFrames === 512 && o.poolBlocks === 12) || !Number.isInteger(o.generation) || o.generation < 1 || o.generation > 4294967295) throw Error("Invalid worker bounds");
   o.delayFrames = o.blockFrames * o.poolBlocks;
   o.bufferBytes = o.blockFrames * BUS_COUNT * 2 * 4;
   return o;

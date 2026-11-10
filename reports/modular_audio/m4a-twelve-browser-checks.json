@@ -1,0 +1,41 @@
+{
+  "kind": "m4a.twelve-slot.browser-checks",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "probe": {
+    "runId": "8c675cbd-9242-4732-ae45-994b7362579d",
+    "hostRevision": "all-preview-delivery-v5",
+    "engineVersion": "d6a0341e5edf2d57",
+    "sourceFrames": 96000,
+    "outputFrames": 102144,
+    "sourcePeak": 0,
+    "missing": 0,
+    "poolBlocks": 12,
+    "latencyMs": 128,
+    "pcmBytes": 393216,
+    "pass": false
+  },
+  "normal": {
+    "runId": "c3d51093-6fac-4326-9836-5f40dd8c03d1",
+    "frames": 668956,
+    "events": 16,
+    "guard": true,
+    "missing": 0,
+    "peaks": {
+      "source": 0.3800966739654541,
+      "channel": 0.10055643320083618,
+      "master": 0.10055643320083618
+    },
+    "pass": true
+  },
+  "sameInput": true,
+  "reload": {
+    "mode": "serial",
+    "capacity": "6",
+    "reports": 0
+  },
+  "listening": "not assessed",
+  "physicalPhone": "pending"
+}
