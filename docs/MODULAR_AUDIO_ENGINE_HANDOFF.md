@@ -1963,3 +1963,44 @@ Evidence-only follow-up after `84b6916`: parsed and cross-checked phone reports
 for exact input/build/capacity identity, guard/probe distinction, full frame/event
 completion and zero delivery errors. Prior 105 checks/build are historical,
 not rerun or relabeled; no executable/browser/server change in this follow-up.
+
+## M4a controlled captured-input comparison (2026-11-10)
+
+After `8c58a8a`, [captured comparison contracts/results](MODULAR_AUDIO_ENGINE_M4A_CAPTURED_COMPARISON.md)
+add **Compare 6 / 12 blocks silently** under All / Setup / One worker. It holds
+one original source/tuning lease, compiles/serializes one plan, loads one asset
+set, then prepares two independent worker/worklet owners sequentially from
+fresh parses of that same plan. Six then twelve is fixed order; each is muted
+before connection/arming and observes 96,000 source frames with existing recovery.
+Each route disposes before the next starts; original lease releases only after
+overall cleanup. Stop/Panic/source changes/host close/fallback abort with partial
+evidence; cancellation at second preparation cannot start another owner.
+
+Parent/child IDs and hashes are retained. Compact comparison kind v1 contains
+two bounded rows in one copy; full report retains both complete probe reports.
+Comparison completion is separate from full-score pass/listening and does not
+erase a six-slot failure. Host **all-preview-delivery-v6**; engine remains
+**d6a0341e5edf2d57**, byte-identical Wasm. Serial/six defaults, normal first-miss
+guard, capacity selection, legacy keyboard, persistence schemas and DSP remain.
+Phone-status prose now distinguishes twelve's successful bass run from six/eight.
+
+**108 tests / six files (63.04 s)** pass; final **11 controller checks (1.12 s)**
+overlap and add host-close/second-boundary cancellation coverage. Final public
+package/provenance build **36.01 s** passes (existing chunk-size warning).
+Actual **390 x 844** desktop pair completes two 96,000-frame muted windows with
+distinct run IDs and identical independently verified source hashes. Selected
+eight is unchanged; controls disable while active. Combined compact **3,590 chars**.
+Stop retains one incomplete 11,776-frame trial, no second. Subsequent ordinary
+Serial completes 668,956 frames with three nonzero peaks, normal guard/pass true
+and same hash. Final-build repeat and copy status pass; reload selects Serial,
+clears report and exposes six. Reports `m4a-captured-comparison-*.json`; images
+`.tmp/m4a-captured-comparison.png` and `...-summary.png`. Physical listening and
+native clipboard payload readback are not claimed. QA server/tab/viewport cleaned
+up; normal-user LAN HTTPS PID8368 remains up. No deployment or security change.
+
+**Next:** collect requested phone **Bass** captured-pair compact report (host v6),
+check parent/child IDs, same input/build, actual six/twelve capacities, frame
+completion and miss/gap counters. Preserve fixed-order/device-state limitations;
+this controls source input, not changing scheduler conditions. Then choose a
+bounded lower-latency message-leg experiment only against retained baselines.
+Do not promote defaults or broaden migration based on one pair.

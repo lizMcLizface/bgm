@@ -43,7 +43,7 @@ vi.mock('./host', () => {
  };
 });
 const previewMock=vi.hoisted(()=>({calls:[]}));
-vi.mock('../../modular-audio/workbenchPreview',()=>({createWorkbenchPreview:options=>{const controller={stop:vi.fn(async()=>{options.onState('stopped');options.onDone({reason:'stopped',pass:false});}),ready:Promise.resolve({actual:'worker',bufferingLatencyFrames:3072})};previewMock.calls.push({options,controller});return controller;}}));
+vi.mock('../../modular-audio/workbenchPreview',()=>{const create=options=>{const controller={stop:vi.fn(async()=>{options.onState('stopped');options.onDone({reason:'stopped',pass:false});}),ready:Promise.resolve({actual:'worker',bufferingLatencyFrames:3072})};previewMock.calls.push({options,controller});return controller;};return {createWorkbenchPreview:create,createWorkbenchCapacityComparison:options=>create({...options,comparison:true})};});
 import AllPage,{defaultSequencer} from './AllPage';
 
 let root, container;
@@ -1069,6 +1069,10 @@ test('offers an explicit silent worker probe while the normal button keeps ordin
  act(()=>container.querySelector('[aria-label="Setup"]').click());expect(document.querySelector('[aria-label="Run silent Rust delivery probe"]')).toBeNull();const mode=document.querySelector('[aria-label="Rust preview executor"]');act(()=>{mode.value='worker';mode.dispatchEvent(new Event('change',{bubbles:true}));});
  await act(async()=>button('Run silent Rust delivery probe').click());expect(previewMock.calls.at(-1).options).toMatchObject({mode:'worker',silentProbe:true,workerPoolBlocks:6});expect(button('Run silent Rust delivery probe').disabled).toBe(true);expect(container.querySelector('.tp.play').disabled).toBe(true);
  await act(async()=>button('Stop Rust sequence preview').click());await act(async()=>button('Play selected Rust sequence').click());expect(previewMock.calls.at(-1).options.silentProbe).toBe(false);await act(async()=>button('Stop Rust sequence preview').click());
+});
+test('offers a separate captured-input comparison without changing the selected capacity and stops it with Panic',async()=>{
+ act(()=>container.querySelector('[aria-label="Setup"]').click());expect(button('Compare Rust worker capacities silently')).toBeUndefined();const mode=document.querySelector('[aria-label="Rust preview executor"]');act(()=>{mode.value='worker';mode.dispatchEvent(new Event('change',{bubbles:true}));});const blocks=document.querySelector('[aria-label="Rust worker PCM capacity"]');act(()=>{blocks.value='8';blocks.dispatchEvent(new Event('change',{bubbles:true}));});
+ await act(async()=>button('Compare Rust worker capacities silently').click());const entry=previewMock.calls.at(-1);expect(entry.options).toMatchObject({comparison:true,silentProbe:true});expect(blocks.value).toBe('8');expect(blocks.disabled).toBe(true);expect(container.querySelector('.tp.play').disabled).toBe(true);expect(button('Compare Rust worker capacities silently').disabled).toBe(true);await act(async()=>button('Panic').click());expect(entry.controller.stop).toHaveBeenCalled();expect(blocks.value).toBe('8');
 });
 
 test('requires explicit eight/twelve-slot comparisons, disables capacity while active and resets experiments on reload',async()=>{

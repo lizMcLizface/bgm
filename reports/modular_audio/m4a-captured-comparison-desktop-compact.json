@@ -1,0 +1,130 @@
+{
+  "kind": "all.source-capacity-comparison.diagnostics",
+  "version": 1,
+  "runId": "8750d4f0-d34d-4f59-8081-a4b1ff5e8b3c",
+  "hostRevision": "all-preview-delivery-v6",
+  "sourceFingerprint": "d94a80622a75bc730260e1b6d1ac3124c7b72931b9825f2228637e322b620c98",
+  "engineVersion": "d6a0341e5edf2d57",
+  "startedAtUtc": "2026-11-10T09:48:30.678Z",
+  "browserUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36",
+  "sampleRate": 48000,
+  "role": "bass",
+  "reason": "comparison-completed",
+  "error": null,
+  "comparison": {
+    "muted": true,
+    "targetFrames": 96000,
+    "complete": true,
+    "sameCapturedInput": true,
+    "fingerprintsMatch": true
+  },
+  "complete": false,
+  "pass": false,
+  "listening": "not assessed",
+  "trials": [
+    {
+      "runId": "bcf4b292-5521-4c8d-b027-feff8cb5a897",
+      "sourceFingerprint": "d94a80622a75bc730260e1b6d1ac3124c7b72931b9825f2228637e322b620c98",
+      "engineVersion": "d6a0341e5edf2d57",
+      "reason": "probe-completed",
+      "error": null,
+      "diagnosticProbe": {
+        "muted": true,
+        "targetFrames": 96000,
+        "complete": true
+      },
+      "executor": {
+        "actual": "worker",
+        "scheduling": "message",
+        "blockFrames": 512,
+        "poolBlocks": 6,
+        "bufferingLatencyMs": 64,
+        "stopOnUnderrun": false
+      },
+      "frames": {
+        "planned": 668956,
+        "consumed": 96000,
+        "output": 99072,
+        "rendered": 96000
+      },
+      "delivery": {
+        "underrunFrames": 0,
+        "underrunQuanta": 0,
+        "recoveries": 0,
+        "lateBlocks": 0,
+        "rejectedBlocks": 0,
+        "staleGeneration": 0,
+        "acceptedBlocks": 188
+      },
+      "lead": {
+        "minFrames": 2304,
+        "zeroLeadQuanta": 0,
+        "belowQuantumQuanta": 0,
+        "firstZeroSourceFrame": null
+      },
+      "arrival": {
+        "maxGapFrames": 896,
+        "maxConsumedSinceArrivalFrames": 896,
+        "overCapacityQuanta": 0
+      },
+      "worker": {
+        "blocks": 188,
+        "renderMs": 58.70000000111759,
+        "maxRenderMs": 1.2999999998137355,
+        "badRecycles": 0
+      }
+    },
+    {
+      "runId": "250f35b1-a650-4e07-a058-2fdf0b9d93f4",
+      "sourceFingerprint": "d94a80622a75bc730260e1b6d1ac3124c7b72931b9825f2228637e322b620c98",
+      "engineVersion": "d6a0341e5edf2d57",
+      "reason": "probe-completed",
+      "error": null,
+      "diagnosticProbe": {
+        "muted": true,
+        "targetFrames": 96000,
+        "complete": true
+      },
+      "executor": {
+        "actual": "worker",
+        "scheduling": "message",
+        "blockFrames": 512,
+        "poolBlocks": 12,
+        "bufferingLatencyMs": 128,
+        "stopOnUnderrun": false
+      },
+      "frames": {
+        "planned": 668956,
+        "consumed": 96000,
+        "output": 102144,
+        "rendered": 96000
+      },
+      "delivery": {
+        "underrunFrames": 0,
+        "underrunQuanta": 0,
+        "recoveries": 0,
+        "lateBlocks": 0,
+        "rejectedBlocks": 0,
+        "staleGeneration": 0,
+        "acceptedBlocks": 188
+      },
+      "lead": {
+        "minFrames": 5376,
+        "zeroLeadQuanta": 0,
+        "belowQuantumQuanta": 0,
+        "firstZeroSourceFrame": null
+      },
+      "arrival": {
+        "maxGapFrames": 896,
+        "maxConsumedSinceArrivalFrames": 896,
+        "overCapacityQuanta": 0
+      },
+      "worker": {
+        "blocks": 188,
+        "renderMs": 56.4000000031665,
+        "maxRenderMs": 0.6000000005587935,
+        "badRecycles": 0
+      }
+    }
+  ]
+}

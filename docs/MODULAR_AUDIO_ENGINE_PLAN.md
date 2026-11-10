@@ -956,3 +956,13 @@ is an explicit working sequenced-preview option for this one bass run, not
 lock-screen/all-role acceptance. Next implement a repeatable captured-input
 six/twelve muted pair before further transport experiments; assess 128 ms cost.
 Defaults stay Serial/six. This evidence-only follow-up adds no new test/build run.
+
+The [controlled captured-input comparison](MODULAR_AUDIO_ENGINE_M4A_CAPTURED_COMPARISON.md)
+now captures once under one lease and runs fresh six/twelve muted owners in fixed
+order. Parent and child IDs/hashes plus both results fit one compact copy; partial
+failures remain diagnostic. Host v6, engine unchanged. **108 tests / six files**,
+final **11 overlapping controller checks**, public build **36.01 s** and actual
+desktop muted/Stop/normal-Serial/reload/copy checks pass. Both trial source hashes
+are independently verified; no defaults or keyboard/schema/DSP changes. Next
+collect requested phone Bass pair before selecting a lower-latency message-leg
+experiment. Fixed order and changing device conditions limit causal attribution.

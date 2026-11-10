@@ -944,3 +944,12 @@ linked doc. One bass run is accepted at explicit 128 ms; lock-screen, other role
 and longer sessions remain unverified. Next is repeatable same-input six/twelve
 muted comparison before lower-latency experiments. No default promotion, schema
 change, deployment or broad workbench migration.
+
+[Captured-input six/twelve comparison](MODULAR_AUDIO_ENGINE_M4A_CAPTURED_COMPARISON.md)
+is implemented as a separate worker-only muted action. One captured plan/lease,
+fresh sequential Rust owners, separate IDs and both results in one compact copy;
+Stop/Panic/invalidation preserve incomplete evidence. **108 checks**, final **11
+overlapping controller checks**, public build and desktop pair/Stop/Serial/reload
+pass. Host v6, engine unchanged; selected capacity and Serial/six defaults stay.
+The phone's controlled Bass pair is requested and pending. Normal keyboard and
+setup persistence remain intact; no migration/default promotion or deployment.
