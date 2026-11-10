@@ -2376,3 +2376,47 @@ Current progression, one guarded complete pass plus compact report/listening.
 This concrete check is ready; wait for its result before further acceptance
 or broad/native migration. Earlier diagnostic listening remains accepted
 separately. No blocker, default switch or deployment.
+
+## Reusable source-test workflow (2026-11-10)
+
+User responds **its fine** to the current-progression phone listening request,
+then explicitly rejects repeated desk navigation/manual settings and requests
+larger locally verified changes or a dedicated test surface. Qualitative
+feedback is saved in `m4c-current-progression-phone-feedback.json`; no new
+run/counter/hash claims. The preceding phone request is closed: do not ask for
+that check again or block further work on another raw report.
+
+[Reusable source checks](MODULAR_AUDIO_ENGINE_SOURCE_TESTS.md) adds top-bar
+**Tests**, remembered device test settings, a same-panel actual drum-kit selector,
+ready-source/phone-buffer shortcut, short-summary copy and full JSON download.
+One full batch captures sources/material once and runs complete test notes plus
+current progression in Serial and worker/twelve, all muted with first-miss
+guarding. Pair fingerprints and exact clocks/events/delivery/recycle evidence
+are required; missing evidence fails. Partial/cancel/fallback remains explicit.
+Muted automated checks do not claim listening or wet-FX signal acceptance.
+
+Reload testing caught an existing Continuous-mode sound reset. A separate
+versioned source/mixer/desk/tempo/mute snapshot now restores actual sounds
+without storing its generated buffer or overriding a saved finite song or
+explicit front-page preset. Browser Hand/group/material/worker/twelve controls
+now restore exactly with no report/controller/audio automatically started.
+Fresh test defaults remain Serial/six/selected/current progression.
+
+Next continue larger source-integration milestones with local tests and this
+batch; request physical listening only for a meaningful new audible path or
+actual device failure. Native Piano is the next ownership/contract audit, not
+an automatic substitution. Exact verification is in the linked document. No
+new phone request, default backend migration, deployment or AC workaround.
+
+Final affected **132 tests /5 files (57.82 s)** and public build **33.67 s** pass;
+earlier ten-file run has148 passing tests. All74 page checks and21 host checks
+include Continuous/finite precedence and idempotent no-op rack/mixer restoration.
+Actual390px batch **d4cfaf5a-934b-4de9-8131-2ed854a0d501** passes4/4, full
+audition634,800/29 plus progression1,001,116/46, no delivery/event/recycle errors.
+After another reload, guarded audible **486e6050-1953-4930-944a-44fb937a76f8**
+has the exact same audition input hash, completes634,800/29, all four raw/channel
+signals/master positive and no missing frames. Thirteen full plans independently
+rehashed; real downloaded JSON equals full DOM report. QA source/defaults/tab /
+viewport restored/cleaned; isolated loopback server stopped, LAN HTTPS remains.
+Exact raw evidence and limitations in the source-tests doc; no physical listening
+claim from browser.

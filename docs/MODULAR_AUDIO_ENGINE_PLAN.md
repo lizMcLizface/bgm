@@ -1122,3 +1122,18 @@ denormal policy stays unchanged and raw-hash limits are documented. This is
 evidence-only, not a new runtime change. [Exact result and pending phone
 current-progression check](MODULAR_AUDIO_ENGINE_M4C_ALL_KITS.md) are recorded;
 await that concrete device test before widening acceptance or migration.
+
+### Reusable tests and fewer device interruptions
+
+The user reports the current progression is fine; no new raw diagnostics were
+supplied. Keep qualitative listening separate from prior run counters and close
+the repeated phone request. [Reusable source checks](MODULAR_AUDIO_ENGINE_SOURCE_TESTS.md)
+now supplies a top-bar test surface, remembered controls and actual Continuous
+sound choices, one four-case complete Serial/worker test-note/progression batch,
+short chat summary and full report download. Muted checks preserve source capture,
+first-miss guarding and honest per-case/fingerprint evidence; they do not assess
+wet audio or physical listening. Generated Continuous music remains transient,
+finite-song and explicit preset precedence remain intact. Continue larger local
+source-integration milestones before requesting a new meaningful audible/device
+check. Next native Piano ownership/contract audit; no automatic source replacement
+or full transport migration. Exact results/limits are in the linked document.

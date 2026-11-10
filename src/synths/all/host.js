@@ -436,7 +436,9 @@ export function createHost(scene, {seed,settings:storedSettings} = {}) {
                 g.roles.perc.instrument.setKit(g.settings.drumKit);
                 if(entry.sound)setDrumMix(new Set(entry.mix.muted),new Set(entry.mix.solo));
             }
-            await editRack(role,entry.rack);
+            // A no-op restore must not repatch the DIY source. Reapplying an
+            // identical rack can bypass its initial source gain preparation.
+            if(Object.entries(entry.rack??{}).some(([key,value])=>rackValues(role)[key]!==value))await editRack(role,entry.rack);
         }
     }
     function editDrumKit(kit) {
@@ -487,7 +489,8 @@ export function createHost(scene, {seed,settings:storedSettings} = {}) {
             if(!entry||typeof entry!=='object')continue;
             const chain=chainUnits(rackValues(role)['master.chain']).filter(unit=>unit!=='space');
             if(entry.space===true)chain.push('space');
-            await editRack(role,{...mixerSpace(entry),'master.output':entry['master.output'],'master.chain':maskFromUnits(chain)});
+            const changes={...mixerSpace(entry),'master.output':entry['master.output'],'master.chain':maskFromUnits(chain)};
+            if(Object.entries(changes).some(([key,value])=>rackValues(role)[key]!==value))await editRack(role,changes);
         }
     }
     const setTempo = bpm => { tempo=bpm; for(const s of SEQUENCERS)updateMixer(s.role); };

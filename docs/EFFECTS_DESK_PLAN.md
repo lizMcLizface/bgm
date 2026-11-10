@@ -1429,3 +1429,11 @@ coherent source-edit/Stop cleanup and restored legacy playback/reload pass.
 DSP, effect ownership, setup schemas and normal keyboard/backend remain intact.
 Native piano/percussion adapters and physical phone set listening remain gated;
 startup-delay experiments are deferred, no broad effect migration/deployment.
+
+2026-11-10: [reusable source tests](MODULAR_AUDIO_ENGINE_SOURCE_TESTS.md) batch
+complete test-note/current-progression Serial/worker delivery checks behind a
+top-bar dropdown. Settings and actual Continuous sounds/mixer/desk now survive
+reload without storing generated music. Existing source-to-FX routing stays
+unchanged. Muted batch gains precede FX, so batch success is delivery/clock
+evidence, not wet-FX audio acceptance. Prior audible isolation/listening remains
+separate; future device requests should correspond to meaningful path changes.

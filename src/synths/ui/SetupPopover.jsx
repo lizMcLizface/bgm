@@ -28,13 +28,13 @@ function AnchoredSetup({anchorRef,onClose,id,...props}){
  },[anchorRef,onClose]);
  return createPortal(<SetupPanel {...props} onClose={onClose} shell={{id,ref,style}} anchored/>,document.body);
 }
-function SetupPanel({midi,setup,updateSetup,connectMidi,audio,start,onClose,children,shared=true,shell,grip={},anchored=false}){
+function SetupPanel({midi,setup,updateSetup,connectMidi,audio,start,onClose,children,shared=true,preferences=true,title='Setup',shell,grip={},anchored=false}){
  useEffect(()=>{const key=e=>{if(e.key==='Escape')onClose();};window.addEventListener('keydown',key);return ()=>window.removeEventListener('keydown',key);},[onClose]);
- return <div className={'setup-pop'+(anchored?' setup-dropdown':'')} role="dialog" aria-label="Setup" {...shell}>
-  <header className="setup-pop-head" {...grip}><h2>Setup</h2><button type="button" className="close" onClick={onClose} aria-label="Close setup">×</button></header>
+ return <div className={'setup-pop'+(anchored?' setup-dropdown':'')} role="dialog" aria-label={title} {...shell}>
+  <header className="setup-pop-head" {...grip}><h2>{title}</h2><button type="button" className="close" onClick={onClose} aria-label={title==='Setup'?'Close setup':`Close ${title.toLowerCase()}`}>×</button></header>
   <div className="setup">
     {children}
-    <section className="group wide"><h3>MIDI piano</h3>
+    {preferences&&<><section className="group wide"><h3>MIDI piano</h3>
      <p>{midi.status}</p>
      <div className="row">
       <button type="button" onClick={connectMidi}>Connect MIDI</button>
@@ -67,7 +67,7 @@ function SetupPanel({midi,setup,updateSetup,connectMidi,audio,start,onClose,chil
       <button type="button" onClick={start}>Restart audio</button>
      </div>
      <p className="hint">{shared?"Changing latency takes effect when audio restarts. The engine runs in Rust/WebAssembly on the browser's audio thread. Settings here are shared by every synth on this device.":'Latency changes take effect when audio restarts. These settings are saved with this desk.'}</p>
-    </section>
+    </section></>}
   </div>
  </div>;
 }

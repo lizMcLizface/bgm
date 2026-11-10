@@ -191,6 +191,14 @@ describe('all-page sound host', () => {
    expect(restored.loaded.perc).toMatchObject({synth:'kit',name:'hand'});
   }finally{original.dispose();restored.dispose();}
  });
+ it('does not repatch a DIY source when restoring unchanged rack and mixer values',async()=>{
+  const scene=BROWSABLE_SCENES[0],original=createHost(scene),restored=createHost(scene);
+  try{
+   await original.applySceneVoices();await original.setSound('lead',{synth:'poly',name:'Soft Pad'});const saved=structuredClone(original.snapshotSounds()),mix=structuredClone(original.mixerSnapshot());
+   await restored.applySceneVoices();const instrument=restored.g.roles.lead.instrument;instrument.setSpec.mockClear();await restored.restoreSounds(saved);await restored.restoreMixer(mix);expect(instrument.setSpec).not.toHaveBeenCalled();expect(restored.soundOf('lead')).toEqual(saved.lead.sound);expect(restored.rackValues('lead')).toEqual(saved.lead.rack);
+   await restored.restoreMixer({...mix,lead:{...mix.lead,'master.output':mix.lead['master.output']-2}});expect(instrument.setSpec).toHaveBeenCalledOnce();expect(restored.rackValues('lead')['master.output']).toBe(mix.lead['master.output']-2);
+  }finally{original.dispose();restored.dispose();}
+ });
  it('keeps the existing machine and settings when a kit cannot load',async()=>{
   const host=createHost(BROWSABLE_SCENES[0]);
   await host.setSound('perc',{synth:'tr808',name:'Classic'});

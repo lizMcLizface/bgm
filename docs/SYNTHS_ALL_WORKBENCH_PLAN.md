@@ -1049,3 +1049,14 @@ independence is exact; cross-partition raw hashes differ only in subnormal Bass
 tails, preserved as an existing numerical limit. No product code changed in
 this follow-up. The same four-source captured-pattern phone/listening check is
 requested and pending; diagnostic audition acceptance remains separate.
+
+The user then confirms the progression is fine and asks to stop repeated manual
+settings/desk-navigation checks. [Top-bar Tests](MODULAR_AUDIO_ENGINE_SOURCE_TESTS.md)
+now opens a compact anchored test panel with remembered source/executor/material /
+capacity settings, actual drum-kit selection, a four-case muted complete batch,
+short-summary copying and report download. Continuous actual sounds/mixer/desk /
+tempo/mutes now survive reload in a separate snapshot while generated music stays
+transient; finite-song and explicit preset precedence are preserved. No playback
+starts on reload. The earlier phone request is closed with qualitative feedback,
+not new run counters. Continue larger locally verified engine steps and reserve
+phone listening requests for meaningful audible/device milestones.

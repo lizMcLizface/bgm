@@ -1,0 +1,45 @@
+{
+  "kind": "all.source-test-suite.artifact-checks",
+  "version": 1,
+  "runId": "c3e926b8-f684-4d83-9b52-0506ba373719",
+  "downloadJsonMatches": true,
+  "independentlyRehashedPlans": 4,
+  "checks": [
+    {
+      "runId": "3d9bc61f-a9f6-42d8-bb4b-8fc59fa0ab1a",
+      "material": "voice-audition",
+      "actual": "serial",
+      "frames": 634800,
+      "events": 29,
+      "hash": "73825ad9ee67c3e987eaa9d16773f1f1a2e6a5950c193d3d22ad31980606ec0a",
+      "pass": true
+    },
+    {
+      "runId": "9efde4e8-8cca-4649-9b0f-1de9d904b70f",
+      "material": "voice-audition",
+      "actual": "worker",
+      "frames": 634800,
+      "events": 29,
+      "hash": "73825ad9ee67c3e987eaa9d16773f1f1a2e6a5950c193d3d22ad31980606ec0a",
+      "pass": true
+    },
+    {
+      "runId": "80df1cb7-39e9-4d1f-920e-1bfc990a53fc",
+      "material": "captured-score",
+      "actual": "serial",
+      "frames": 1001116,
+      "events": 46,
+      "hash": "e7a2562080937d47f6a3a0871e4b674756ca47310310711a8b1dba069424d68a",
+      "pass": true
+    },
+    {
+      "runId": "b426ee8a-97c0-41a0-ae8e-807aa971a694",
+      "material": "captured-score",
+      "actual": "worker",
+      "frames": 1001116,
+      "events": 46,
+      "hash": "e7a2562080937d47f6a3a0871e4b674756ca47310310711a8b1dba069424d68a",
+      "pass": true
+    }
+  ]
+}

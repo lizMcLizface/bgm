@@ -54,6 +54,7 @@ import {tuning} from '../tuning';
 import {createContinuous,appendProgression,trimProgressions} from './continuous';
 import {prepareGeneratorChange,publishGeneratorChange,liveGeneratorKeys} from './generatorChange';
 import WorkbenchPreviewReport from '../../modular-audio/WorkbenchPreviewReport';
+import {PREVIEW_SETTINGS_KEY,previewSettings} from './previewSettings';
 import {encodeSetup,decodeSetup,setupFileName,MAX_BYTES} from './setupFile';
 import '../drums/drums.css';
 import rackStyles from './rack.css?inline';
@@ -68,6 +69,7 @@ const PROGRESSION_CHOICES=[1,2,4,8,16];
 const clamp=(x,lo,hi)=>Math.min(hi,Math.max(lo,x));
 // where the player left off: the scene, the song (every sequencer's pattern), the tempo, which sequencer was open, the mutes and the sound generators
 const STORE='synths:all:state';
+const CONTINUOUS_SOUNDS_STORE='synths:all:continuous-sounds';
 const readStored=()=>{
  const s=load(STORE,null);
  if(!s||typeof s!=='object')return {};
@@ -107,11 +109,14 @@ function AllWorkbench({initialArrange=false}){
  const sceneList=BROWSABLE_SCENES;
  const [initialLink]=useState(()=>{try{return {link:frontPageLink(window.location)};}catch(error){return {error};}});
  const [stored]=useState(()=>initialLink.link||initialLink.error?{}:readStored());
+ const [continuousSounds]=useState(()=>load(CONTINUOUS_SOUNDS_STORE,null));
  const [customScene,setCustomScene]=useState(()=>initialLink.link&&!initialLink.link.scene?normalizeScene({name:'Front-page settings',settings:initialLink.link.share.settings,voices:{}}):stored.sceneData?.name===stored.scene?stored.sceneData:null);
- const [sceneName,setSceneName]=useState(()=>initialLink.link?.scene?.name??customScene?.name??SCENES.find(s=>s.name===stored.scene)?.name??sceneList.find(s=>/lofi|rain/i.test(s.name))?.name??sceneList[0].name);
+ const [sceneName,setSceneName]=useState(()=>initialLink.link?.scene?.name??customScene?.name??SCENES.find(s=>s.name===stored.scene)?.name??(!initialLink.link&&continuousSounds?.version===1?SCENES.find(s=>s.name===continuousSounds.scene)?.name:null)??sceneList.find(s=>/lofi|rain/i.test(s.name))?.name??sceneList[0].name);
  const scene=useMemo(()=>customScene?.name===sceneName?customScene:SCENES.find(s=>s.name===sceneName)??sceneList[0],[sceneName,sceneList,customScene]);
  const [status,setStatus]=useState('Preparing song…'),[started,setStarted]=useState(false),[busy,setBusy]=useState(false),[hostVersion,setHostVersion]=useState(0);
- const previewRef=useRef(null),[previewPhase,setPreviewPhase]=useState('idle'),[previewMode,setPreviewMode]=useState('serial'),[previewBlocks,setPreviewBlocks]=useState(6),[previewScope,setPreviewScope]=useState('selected'),[previewRoles,setPreviewRoles]=useState([]),[previewSourceOptions,setPreviewSourceOptions]=useState([]),[previewMaterial,setPreviewMaterial]=useState('captured-score'),[previewComparisonOrder,setPreviewComparisonOrder]=useState('six-first'),[previewMessage,setPreviewMessage]=useState('Start with Serial reference. One supported pitched sequencer, one current progression, one pass.'),[previewReport,setPreviewReport]=useState(null);
+ const [savedPreview]=useState(()=>previewSettings(load(PREVIEW_SETTINGS_KEY,null)));
+ const previewRef=useRef(null),[previewPhase,setPreviewPhase]=useState('idle'),[previewMode,setPreviewMode]=useState(savedPreview.mode),[previewBlocks,setPreviewBlocks]=useState(savedPreview.blocks),[previewScope,setPreviewScope]=useState(savedPreview.scope),[previewRoles,setPreviewRoles]=useState(savedPreview.roles),[previewSourceOptions,setPreviewSourceOptions]=useState([]),[previewMaterial,setPreviewMaterial]=useState(savedPreview.material),[previewComparisonOrder,setPreviewComparisonOrder]=useState(savedPreview.comparisonOrder),[previewMessage,setPreviewMessage]=useState('Ready. Choose playback or run the full source checks.'),[previewReport,setPreviewReport]=useState(null);
+ useEffect(()=>{save(PREVIEW_SETTINGS_KEY,{version:1,mode:previewMode,blocks:previewBlocks,scope:previewScope,roles:previewRoles,material:previewMaterial,comparisonOrder:previewComparisonOrder});},[previewMode,previewBlocks,previewScope,previewRoles,previewMaterial,previewComparisonOrder]);
  const previewActive=previewPhase!=='idle',previewAudition=previewScope==='pitched-set'&&previewMaterial==='voice-audition';
  const [progressionCount,setProgressionCount]=useState(stored.progressionCount??4),[project,setProject]=useState(null),[playing,setPlaying]=useState(false);
  const [continuous,setContinuous]=useState(()=>!(stored.project&&stored.scene===scene.name));
@@ -137,7 +142,7 @@ function AllWorkbench({initialArrange=false}){
  const pendingGenerator=useRef(null),generationRevision=useRef(0),commitGenerator=useRef(()=>{});
  const [sequenceScaleDraft,setSequenceScaleDraft]=useState(null),sequenceScaleTimer=useRef(null),applySequenceScale=useRef(()=>{});
  const stream=useRef(null),bufferRef=useRef(bufferConfig);bufferRef.current=bufferConfig;
- const setupInput=useRef(null),setupAnchor=useRef(null),deskRef=useRef(null),ambienceRef=useRef(null);
+ const setupInput=useRef(null),setupAnchor=useRef(null),previewAnchor=useRef(null),deskRef=useRef(null),ambienceRef=useRef(null);
  const [linkText,setLinkText]=useState('');
  projectRef.current=project;bpmRef.current=bpm;mutesRef.current=mutes;solosRef.current=solos;progressionRef.current=progression;
  useEffect(()=>{clearTimeout(sequenceScaleTimer.current);setSequenceScaleDraft(null);return ()=>clearTimeout(sequenceScaleTimer.current);},[hostVersion,continuous]);
@@ -169,23 +174,27 @@ function AllWorkbench({initialArrange=false}){
    await h.applySceneVoices(base);
    if(link){h.g.set('generation',generationFromSearch(link.search));await h.applyFrontPageLink(link);}
    const back=stored.project&&stored.scene===scene.name?stored.project:null;
+   const continued=!link&&!back&&continuousSounds?.version===1&&continuousSounds.scene===scene.name&&SEQUENCERS.every(s=>continuousSounds.sounds?.[s.role]?.selection)?continuousSounds:null;
    if(back&&stored.book)h.restoreBook?.(stored.book);
    if(back&&stored.soundState)await h.restoreSounds(stored.soundState);
    else if(back&&stored.sounds)for(const s of SEQUENCERS){
     const saved=stored.sounds[s.role];
     if(saved&&(s.role==='perc'?drumChoices().some(c=>c.id===saved.synth):SYNTHS_BY_ID(saved.synth)))await h.setSound(s.role,saved);
    }
+   else if(continued)await h.restoreSounds(continued.sounds);
    if(back&&stored.mixer)await h.restoreMixer(stored.mixer);
+   else if(continued?.mixer)await h.restoreMixer(continued.mixer);
    await h.setupMixer();
    if(!alive)return;
    if(back&&stored.desk)deskRef.current?.restore(stored.desk);
+   else if(continued?.desk)deskRef.current?.restore(continued.desk);
    if(back&&stored.ambience)ambienceRef.current?.restore(stored.ambience);
    const sceneMutes=takeHostMutes(h);
-   if(!back)setMutes(sceneMutes);
+   if(!back){setMutes(continued?.mutes??sceneMutes);setSolos(continued?.solos??{});}
    const song=back?{...back,meter:back.meter??sceneSettings(scene).meter}:startStream(h,h.settings.seed);
    if(!back)selectDefaultSequencer(song);
    if(back&&stored.pendingGenerator)queueGeneratorChange(h,song);
-   setProject(song);setBpm(back&&stored.bpm?stored.bpm:Math.round(song.bpm));
+   setProject(song);setBpm(back&&stored.bpm?stored.bpm:continued&&Number.isFinite(continued.bpm)?clamp(Math.round(continued.bpm),50,200):Math.round(song.bpm));
    setSounds(Object.fromEntries(SEQUENCERS.map(s=>{
     return [s.role,h.loaded[s.role]??(s.role==='perc'?{synth:'scene',name:scene.name}:{synth:'calmbgm',name:''})];
    })));
@@ -340,6 +349,7 @@ function AllWorkbench({initialArrange=false}){
 
  // the desk's setup (MIDI, keybed, computer keys) and the keyboard's lit keys, as on every /synths page
  const [setup,setSetup]=useState(()=>{const s={...SETUP,...load(SETUP_KEY,{})};if(!['auto','show','hide'].includes(s.keys))s.keys='auto';return s;});
+ const [previewOnly,setPreviewOnly]=useState(false);
  const [showSetup,setShowSetup]=useState(visibility.setup),[midi,setMidi]=useState({inputs:[],status:'Not connected.'}),[awake,setAwake]=useState(false),[litNotes,setLitNotes]=useState([]);
  useSaved(VISIBILITY_KEY,{panels,wins,scope:scopeOn,setup:showSetup,sequenceScale:screenPage==='scale'});
  const setupRef=useRef(setup),midiRef=useRef(null),lit=useRef(new Map());setupRef.current=setup;
@@ -407,6 +417,9 @@ function AllWorkbench({initialArrange=false}){
   return ()=>{kb();m.dispose();window.removeEventListener('keydown',phraseKey);phrases.stop();performer.panic();};
  },[]);// eslint-disable-line react-hooks/exhaustive-deps
  useSaved(STORE,{pendingGenerator:!!pendingGenerator.current,scene:sceneName,...(customScene?{sceneData:customScene}:{}),progressionCount,bpm,selected,mutes,solos,sounds,chordOverlap,project,mixer:started?host.current?.mixerSnapshot?.():undefined,soundState:started?host.current?.snapshotSounds?.():undefined,settings:host.current?.g.settings,book:host.current?.book,desk:deskRef.current?.snapshot(),ambience:ambienceRef.current?.snapshot()},{skip:()=>!project||!started||continuous});
+ // Keep the actual test/listening sounds across Continuous reloads without
+ // saving its ever-growing generated buffer or overwriting a finite song.
+ useSaved(CONTINUOUS_SOUNDS_STORE,{version:1,scene:sceneName,bpm,mutes,solos,sounds:started?host.current?.snapshotSounds?.():undefined,mixer:started?host.current?.mixerSnapshot?.():undefined,desk:deskRef.current?.snapshot()},{skip:()=>!started||!continuous||busy});
 
  // playback: the sequencer core books every sequencer's notes on the audio clock, and they sound on the generator's role instruments
  useEffect(()=>{
@@ -487,21 +500,24 @@ function AllWorkbench({initialArrange=false}){
    playingRef.current=true;setPlaying(true);setPaused(false);
   }catch(error){console.error(error);setStatus(error.message);}finally{setBusy(false);}
  };
- function selectReadyPreviewVoices(){const options=SEQUENCERS.map(s=>({...s,...(host.current?.sourcePreviewStatus?.(s.role)??{eligible:false,reason:'Source is not ready.'})}));setPreviewSourceOptions(options);setPreviewRoles(options.filter(s=>s.eligible).map(s=>s.role));}
- async function startSourcePreview(silentProbe=false,compareCapacities=false){
+ function readyPreviewOptions(){return SEQUENCERS.map(s=>({...s,...(host.current?.sourcePreviewStatus?.(s.role)??{eligible:false,reason:'Source is not ready.'})}));}
+ function selectReadyPreviewVoices(){const options=readyPreviewOptions();setPreviewSourceOptions(options);const roles=options.filter(s=>s.eligible).map(s=>s.role);setPreviewRoles(roles);return roles;}
+ useEffect(()=>{if(started)setPreviewSourceOptions(readyPreviewOptions());},[started,hostVersion,voiceVersion,showSetup]);
+ function resetPreviewSettings(){const s=previewSettings(null);setPreviewMode(s.mode);setPreviewBlocks(s.blocks);setPreviewScope(s.scope);setPreviewRoles(s.roles);setPreviewMaterial(s.material);setPreviewComparisonOrder(s.comparisonOrder);}
+ async function startSourcePreview(silentProbe=false,compareCapacities=false,testSuite=false){
   if(!started||playing||paused||busy||previewRef.current)return;
   setPreviewPhase('preparing');setPreviewMessage('Preparing an owned source snapshot…');setPreviewReport(null);
   const pending={stop(){if(previewRef.current===pending){previewRef.current=null;setPreviewPhase('idle');setPreviewMessage('Source preview preparation cancelled.');}}};previewRef.current=pending;
   let controller;
   try{
-   const {createWorkbenchPreview,createWorkbenchCapacityComparison}=await import('../../modular-audio/workbenchPreview');
+   const {createWorkbenchPreview,createWorkbenchCapacityComparison,createWorkbenchTestSuite}=await import('../../modular-audio/workbenchPreview');
    if(previewRef.current!==pending)return;
    const h=host.current,r=SEQUENCERS[selected].role,p=projectRef.current,part=progressionsOf(p)[progressionRef.current];
    await wake();
    if(previewRef.current!==pending)return;
-   controller=(compareCapacities?createWorkbenchCapacityComparison:createWorkbenchPreview)({host:h,project:p,part,role:r,roles:previewScope==='pitched-set'?previewRoles:null,mutedRoles:SEQUENCERS.filter(s=>mutesRef.current[s.role]||(Object.values(solosRef.current).some(Boolean)&&!solosRef.current[s.role])).map(s=>s.role),bpm:bpmRef.current,mode:previewMode,workerPoolBlocks:previewBlocks,comparisonOrder:previewComparisonOrder,silentProbe,audition:previewAudition,muted:!!mutesRef.current[r]||(Object.values(solosRef.current).some(Boolean)&&!solosRef.current[r]),onState:(phase,progress)=>{if(previewRef.current===controller){setPreviewPhase(phase==='stopped'?'idle':phase);if(progress)setPreviewMessage('Silent comparison · trial '+progress.trial+'/2 · '+progress.poolBlocks+' blocks');}},onDone:report=>{if(previewRef.current!==controller)return;previewRef.current=null;setPreviewPhase('idle');setPreviewReport(report);setPreviewMessage(report.error?report.error:report.audition?(report.diagnosticProbe?(report.diagnosticProbe.complete?'Silent full voice audition completed. Copy its diagnostics.':'Silent voice audition stopped.'):(report.pass?'Voice test-note audition completed. Song unchanged.':'Voice test-note audition stopped or needs review. Song unchanged.')):report.comparison?(report.comparison.complete?'Silent capacity comparison completed. Copy its diagnostics.':'Silent capacity comparison stopped.'):report.diagnosticProbe?(report.diagnosticProbe.complete?'Silent source delivery probe completed. Copy its diagnostics.':'Silent source probe stopped.'):report.reason==='completed'?(report.pass?'Owned source preview completed.':'Preview ended with delivery or signal checks to review.'):'Source preview stopped. Live keyboard remains on its existing engine.');}});
+   controller=(testSuite?createWorkbenchTestSuite:compareCapacities?createWorkbenchCapacityComparison:createWorkbenchPreview)({host:h,project:p,part,role:r,roles:testSuite?(previewScope==='pitched-set'&&previewRoles.length?previewRoles:selectReadyPreviewVoices()):previewScope==='pitched-set'?previewRoles:null,mutedRoles:SEQUENCERS.filter(s=>mutesRef.current[s.role]||(Object.values(solosRef.current).some(Boolean)&&!solosRef.current[s.role])).map(s=>s.role),bpm:bpmRef.current,mode:previewMode,workerPoolBlocks:previewBlocks,comparisonOrder:previewComparisonOrder,silentProbe,audition:previewAudition,muted:!!mutesRef.current[r]||(Object.values(solosRef.current).some(Boolean)&&!solosRef.current[r]),onState:(phase,progress)=>{if(previewRef.current===controller){setPreviewPhase(phase==='stopped'?'idle':phase);if(progress)setPreviewMessage(progress.label?`Source checks · ${progress.trial}/${progress.trials} · ${progress.label}`:'Silent comparison · trial '+progress.trial+'/2 · '+progress.poolBlocks+' blocks');}},onDone:report=>{if(previewRef.current!==controller)return;previewRef.current=null;setPreviewPhase('idle');setPreviewReport(report);setPreviewMessage(report.error?report.error:report.suite?`Source checks ${report.suite.complete?'finished':'stopped'} · ${report.suite.passedCases}/4 passed. Listening is separate.`:report.audition?(report.diagnosticProbe?(report.diagnosticProbe.complete?'Silent full voice audition completed. Copy its diagnostics.':'Silent voice audition stopped.'):(report.pass?'Voice test-note audition completed. Song unchanged.':'Voice test-note audition stopped or needs review. Song unchanged.')):report.comparison?(report.comparison.complete?'Silent capacity comparison completed. Copy its diagnostics.':'Silent capacity comparison stopped.'):report.diagnosticProbe?(report.diagnosticProbe.complete?'Silent source delivery probe completed. Copy its diagnostics.':'Silent source probe stopped.'):report.reason==='completed'?(report.pass?'Owned source preview completed.':'Preview ended with delivery or signal checks to review.'):'Source preview stopped. Live keyboard remains on its existing engine.');}});
    previewRef.current=controller;const executor=await controller.ready;
-   if(previewRef.current===controller&&executor&&!compareCapacities)setPreviewMessage(`${previewAudition?(silentProbe?'Silent voice audition':'Voice test-note audition'):(silentProbe?'Silent source probe':'Playing')} ${previewScope==='pitched-set'?'source set':r} · ${executor.actual==='worker'?'one worker':'serial'} · ${Math.round((executor.bufferingLatencyMs??executor.bufferingLatencyFrames/48)*100)/100} ms source buffering${executor.fallbackReason?' · '+executor.fallbackReason:''}`);
+   if(previewRef.current===controller&&executor&&!compareCapacities&&!testSuite)setPreviewMessage(`${previewAudition?(silentProbe?'Silent voice audition':'Voice test-note audition'):(silentProbe?'Silent source probe':'Playing')} ${previewScope==='pitched-set'?'source set':r} · ${executor.actual==='worker'?'one worker':'serial'} · ${Math.round((executor.bufferingLatencyMs??executor.bufferingLatencyFrames/48)*100)/100} ms source buffering${executor.fallbackReason?' · '+executor.fallbackReason:''}`);
   }catch(error){if(previewRef.current===pending||previewRef.current===controller){previewRef.current=null;setPreviewPhase('idle');setPreviewMessage(error.message);}}
  }
  useEffect(()=>()=>{void previewRef.current?.stop();},[project,bpm,hostVersion,progression,selected,mutes,solos]);
@@ -986,7 +1002,8 @@ function AllWorkbench({initialArrange=false}){
   <header className="synth-bar">
    <a className="back" href={import.meta.env.BASE_URL+'synths/'} aria-label="All synths">◂</a>
    <h1><span className="brand">All</span><small>sequencers and sound generators</small></h1>
-   <button ref={setupAnchor} type="button" aria-expanded={showSetup} aria-controls="all-midi-setup" onClick={()=>setShowSetup(v=>!v)} aria-label="Setup" title="Setup: MIDI, the keybed and the computer keys">⚙</button>
+   <button ref={setupAnchor} type="button" aria-expanded={showSetup&&!previewOnly} aria-controls="all-midi-setup" onClick={()=>{setPreviewOnly(false);setShowSetup(v=>previewOnly||!v);}} aria-label="Setup" title="Setup: MIDI, the keybed and the computer keys">⚙</button>
+   <button ref={previewAnchor} type="button" aria-label="Source tests" aria-expanded={showSetup&&previewOnly} aria-controls="all-midi-setup" onClick={()=>{setPreviewOnly(true);setShowSetup(v=>!previewOnly||!v);}}>Tests{previewActive?' · running':''}</button>
    <label className="bar-scene">Scene <select value={sceneName} disabled={busy} onChange={e=>chooseScene(e.target.value)}>{!sceneList.includes(scene)&&<option value={scene.name}>{scene.name}</option>}{SCENE_CATEGORIES.map(c=><optgroup key={c.id} label={c.label}>{sceneList.filter(s=>s.category===c.id).map(s=><option key={s.name} value={s.name}>{s.name}</option>)}</optgroup>)}</select></label>
    <span className="patch-name" title={status}>{status}</span>
    <button type="button" disabled={!started||busy} onClick={saveSetupFile}>Save setup</button>
@@ -1053,22 +1070,31 @@ function AllWorkbench({initialArrange=false}){
    {started&&SEQUENCERS.map((x,i)=>(wins['synth:'+x.role]||wins['fx:'+x.role]||wins['tuning:'+x.role])&&<VoiceWindow key={x.role+':'+hostVersion} role={x.role} index={i} host={host.current} version={voiceVersion} showSynth={!!wins['synth:'+x.role]} fx={!!wins['fx:'+x.role]} tuning={!!wins['tuning:'+x.role]}
     onChoose={chooseSound} onEdit={editVoice} onEditNative={editNativeVoice} onEditDrum={editDrumKit} onEditFx={editVoiceFx} onCloseFx={()=>setWins(w=>({...w,['fx:'+x.role]:false}))} onCloseTuning={()=>setWins(w=>({...w,['tuning:'+x.role]:false}))}/>)}
    {scopeOn&&<Scope engine={scopeEngine} audio={awake?'on':'off'} onClose={toggleScope} positionKey="synths:all:scope-pos" home={{x:2410,y:70}} keyHz={()=>litNotes.length?440*2**((litNotes[litNotes.length-1]-69)/12):0}/>}
-   {showSetup&&<SetupPopover id="all-midi-setup" anchorRef={setupAnchor} midi={midi} setup={setup} updateSetup={updateSetup} connectMidi={connectMidi} audio={{state:awake?'on':'off',message:'Audio runs when the song plays or a key is pressed.'}} start={()=>host.current?.wake().then(()=>setAwake(true))} onClose={()=>setShowSetup(false)}>
-    <section className="group wide"><h3>Continuous generator</h3><div className="row">
+   {showSetup&&<SetupPopover id="all-midi-setup" anchorRef={previewOnly?previewAnchor:setupAnchor} title={previewOnly?'Source tests':'Setup'} preferences={!previewOnly} midi={midi} setup={setup} updateSetup={updateSetup} connectMidi={connectMidi} audio={{state:awake?'on':'off',message:'Audio runs when the song plays or a key is pressed.'}} start={()=>host.current?.wake().then(()=>setAwake(true))} onClose={()=>setShowSetup(false)}>
+    {!previewOnly&&<section className="group wide"><h3>Continuous generator</h3><div className="row">
      <label>Progressions ahead<select aria-label="Progressions ahead" value={bufferConfig.ahead} onChange={e=>setBufferConfig(c=>({...c,ahead:Number(e.target.value)}))}>{[1,2,4,8,16,32,64].map(n=><option key={n} value={n}>{n}</option>)}</select></label>
      <label>History retained<select aria-label="History retained" value={bufferConfig.history} onChange={e=>setBufferConfig(c=>({...c,history:e.target.value==='infinite'?'infinite':Number(e.target.value)}))}>{[0,1,2,3,4,8,16,32,64,'infinite'].map(n=><option key={n} value={n}>{n==='infinite'?'Unlimited':n}</option>)}</select></label>
-    </div><p className="hint">Unlimited history grows in memory. Lookahead is finite. Continuous sessions are not saved as songs.</p></section>
-    <section className="group wide" aria-label="Owned Rust sequence preview"><h3>Owned Rust sequence preview</h3>
-     <p className="hint">Selected sequencer or chosen sources, current progression, one pass at 48 kHz. Ready core/FM (FM requires 2x quality) and Wasm basic kits, through the existing mixer and effects. Keyboard stays on its current engine. Source/score/tempo changes stop the entire snapshot. Native piano, native percussion and classic machines still require separate adapters.</p>
-     <p className="hint">Phone Lead, Second lead, Bass and Hand percussion test-pattern audition completed at twelve blocks / 128 ms; the user reported clean drum entry and overlap. Earlier Bass runs missed audio at six and eight blocks. Other voices, real-song and background playback remain separate checks. A delivery gap stops normal preview; Serial remains available.</p>
-     <label className="source-preview-field">Source scope<select aria-label="Rust preview scope" value={previewScope} disabled={previewActive} onChange={e=>{setPreviewScope(e.target.value);setPreviewMaterial('captured-score');if(e.target.value==='pitched-set')selectReadyPreviewVoices();}}><option value="selected">Selected sequencer · existing</option><option value="pitched-set">Chosen sources together</option></select></label>
+    </div><p className="hint">Unlimited history grows in memory. Lookahead is finite. Continuous sessions are not saved as songs.</p></section>}
+    <section className="group wide source-tests" aria-label="Owned Rust sequence preview"><h3>Source playback tests</h3>
+     <p className="hint">Your test settings are remembered on this browser. Ready sources keep their current sounds, effects and mixer channels.</p>
+     <div className="source-test-actions">
+      <button type="button" disabled={!started||!project||busy||playing||paused||previewActive} onClick={()=>startSourcePreview(false,false,true)}>Run full source checks</button>
+     <button type="button" aria-label={previewAudition?'Audition selected Rust voices':'Play selected Rust sequence'} disabled={!started||!project||busy||playing||paused||previewActive||(previewScope!=='selected'&&!previewRoles.length)} onClick={()=>startSourcePreview(false)}>{previewAudition?'Audition selected voices (test notes)':previewScope==='pitched-set'?'Play selected sources via Rust':'Play selected sequence via Rust'}</button>
+     <button type="button" aria-label="Stop Rust sequence preview" disabled={!previewActive} onClick={()=>{void previewRef.current?.stop();}}>Stop source preview</button>
+     </div>
+     <p className="hint">Full checks run test notes and the current progression in Serial and One worker, all muted, with twelve worker blocks. One report covers all four runs.</p>
+     <details className="source-test-settings"><summary>Test settings and sources</summary>
+     <button type="button" disabled={!started||busy||previewActive} onClick={()=>{selectReadyPreviewVoices();setPreviewScope('pitched-set');setPreviewMode('worker');setPreviewBlocks(12);}}>Use ready sources + phone buffer</button>
+     <label className="source-preview-field">Drum kit<select aria-label="Source test drum kit" disabled={!started||busy||previewActive} value={sounds.perc?.synth==='kit'?sounds.perc.name:'current'} onChange={e=>{if(e.target.value!=='current')chooseSound('perc','kit',e.target.value);}}><option value="current">{sounds.perc?.name??'Current sound'} · current</option>{drumPatches('kit').map(p=><option key={p.id??p.name} value={p.id??p.name}>{p.name}</option>)}</select></label>
+     <p className="hint">Choosing a kit changes the actual Drums sound and is saved with the desk. Full checks use chosen group roles, or all ready sources in selected-sequencer mode. Unsupported sounds are never replaced automatically.</p>
+     <label className="source-preview-field">Source scope<select aria-label="Rust preview scope" value={previewScope} disabled={previewActive} onChange={e=>{setPreviewScope(e.target.value);if(e.target.value==='pitched-set'&&!previewRoles.length)selectReadyPreviewVoices();}}><option value="selected">Selected sequencer · existing</option><option value="pitched-set">Chosen sources together</option></select></label>
      {previewScope==='pitched-set'&&<div role="group" aria-label="Rust source set roles"><p className="hint">Ready core/FM voices and Wasm basic kits are selected below. Each keeps its own effects and mixer channel. Muted/solo-excluded roles are reported and omitted; empty patterns stay silent. Source edits invalidate the whole set.</p>{previewSourceOptions.map(s=><label key={s.role} className="source-preview-field"><span><input type="checkbox" aria-label={`Include ${s.label} in Rust set`} disabled={previewActive||!s.eligible} checked={previewRoles.includes(s.role)} onChange={e=>setPreviewRoles(rows=>e.target.checked?[...rows,s.role]:rows.filter(r=>r!==s.role))}/>{s.label} · {s.eligible?s.kind:s.reason}</span></label>)}<button type="button" disabled={previewActive} onClick={selectReadyPreviewVoices}>Select ready voices</button></div>}
      {previewScope==='pitched-set'&&<><label className="source-preview-field">Material<select aria-label="Rust preview material" value={previewMaterial} disabled={previewActive} onChange={e=>setPreviewMaterial(e.target.value)}><option value="captured-score">Current progression · existing</option><option value="voice-audition">Test-note voice audition · song untouched</option></select></label>{previewAudition&&<p className="hint">Diagnostic notes at 120 BPM: a brief attack from each selected actual voice, then all together. Selected Drums adds kick, brush, hat and tom test hits and a short beat through its current kit. Patches, tuning and song stay unchanged. The silent audition probe renders the entire test, including later voices and source tails; it is longer than the ordinary two-second probe. Listening remains a separate check.</p>}</>}
      <label className="source-preview-field">Preview executor<select aria-label="Rust preview executor" value={previewMode} disabled={previewActive} onChange={e=>setPreviewMode(e.target.value)}><option value="serial">Serial reference · 64 ms</option><option value="worker">One worker · experimental</option></select></label>
-     {previewMode==='worker'&&<><label className="source-preview-field">Worker PCM capacity<select aria-label="Rust worker PCM capacity" value={previewBlocks} disabled={previewActive} onChange={e=>setPreviewBlocks(Number(e.target.value))}><option value={6}>6 blocks · 64 ms · existing</option><option value={8}>8 blocks · 85.33 ms · compare</option><option value={12}>12 blocks · 128 ms · compare</option></select></label><p className="hint">Same 512-frame cadence. The phone probe measured a 101.33 ms arrival gap. Twelve blocks provide 128 ms capacity to compare above that observed gap. Try the silent probe first. Compare without changing the source or sequence. Reload returns to six blocks and Serial.</p></>}
-     <button type="button" aria-label={previewAudition?'Audition selected Rust voices':'Play selected Rust sequence'} disabled={!started||!project||busy||playing||paused||previewActive||(previewScope!=='selected'&&!previewRoles.length)} onClick={()=>startSourcePreview(false)}>{previewAudition?'Audition selected voices (test notes)':previewScope==='pitched-set'?'Play selected sources via Rust':'Play selected sequence via Rust'}</button>
-     {previewMode==='worker'&&<><button type="button" aria-label={previewAudition?'Probe Rust voice audition silently':'Run silent Rust delivery probe'} disabled={!started||!project||busy||playing||paused||previewActive||(previewScope!=='selected'&&!previewRoles.length)} onClick={()=>startSourcePreview(true)}>{previewAudition?'Silent full audition probe':'Silent 2 s delivery probe'}</button>{previewScope==='selected'&&SEQUENCERS[selected].role!=='perc'&&<><label className="source-preview-field">Comparison order<select aria-label="Rust comparison order" value={previewComparisonOrder} disabled={previewActive} onChange={e=>setPreviewComparisonOrder(e.target.value)}><option value="six-first">6 then 12 blocks · existing</option><option value="twelve-first">12 then 6 blocks · reverse</option></select></label><button type="button" aria-label="Compare Rust worker capacities silently" disabled={!started||!project||busy||playing||paused||previewActive||(previewScope!=='selected'&&!previewRoles.length)} onClick={()=>startSourcePreview(true,true)}>Compare {previewComparisonOrder==='twelve-first'?'12 / 6':'6 / 12'} blocks silently</button></>}<p className="hint">{previewAudition?'Mutes all selected test voices for the entire audition, including overlap and source tails.':'Mutes this captured source and observes delivery and recovery beyond the first miss for up to two seconds.'} Other live audio keeps its existing controls. Normal preview still stops at the first miss. {previewScope==='selected'&&SEQUENCERS[selected].role!=='perc'&&'Compare captures once and runs both capacities muted in the selected order for two source seconds each. Reverse order checks warmup effects. Reload returns to six first; the capacity selector is unchanged.'}</p></>}
-     <button type="button" aria-label="Stop Rust sequence preview" disabled={!previewActive} onClick={()=>{void previewRef.current?.stop();}}>Stop source preview</button>
+     {previewMode==='worker'&&<><label className="source-preview-field">Worker PCM capacity<select aria-label="Rust worker PCM capacity" value={previewBlocks} disabled={previewActive} onChange={e=>setPreviewBlocks(Number(e.target.value))}><option value={6}>6 blocks · 64 ms · existing</option><option value={8}>8 blocks · 85.33 ms · compare</option><option value={12}>12 blocks · 128 ms · compare</option></select></label><p className="hint">Same 512-frame cadence. The phone probe measured a 101.33 ms arrival gap. Twelve blocks provide 128 ms capacity to compare above that observed gap. Try the silent probe first. Compare without changing the source or sequence. Your chosen capacity and executor survive reload. New browsers start with Serial and six blocks.</p></>}
+     {previewMode==='worker'&&<><button type="button" aria-label={previewAudition?'Probe Rust voice audition silently':'Run silent Rust delivery probe'} disabled={!started||!project||busy||playing||paused||previewActive||(previewScope!=='selected'&&!previewRoles.length)} onClick={()=>startSourcePreview(true)}>{previewAudition?'Silent full audition probe':'Silent 2 s delivery probe'}</button>{previewScope==='selected'&&SEQUENCERS[selected].role!=='perc'&&<><label className="source-preview-field">Comparison order<select aria-label="Rust comparison order" value={previewComparisonOrder} disabled={previewActive} onChange={e=>setPreviewComparisonOrder(e.target.value)}><option value="six-first">6 then 12 blocks · existing</option><option value="twelve-first">12 then 6 blocks · reverse</option></select></label><button type="button" aria-label="Compare Rust worker capacities silently" disabled={!started||!project||busy||playing||paused||previewActive||(previewScope!=='selected'&&!previewRoles.length)} onClick={()=>startSourcePreview(true,true)}>Compare {previewComparisonOrder==='twelve-first'?'12 / 6':'6 / 12'} blocks silently</button></>}<p className="hint">{previewAudition?'Mutes all selected test voices for the entire audition, including overlap and source tails.':'Mutes this captured source and observes delivery and recovery beyond the first miss for up to two seconds.'} Other live audio keeps its existing controls. Normal preview still stops at the first miss. {previewScope==='selected'&&SEQUENCERS[selected].role!=='perc'&&'Compare captures once and runs both capacities muted in the selected order for two source seconds each. Reverse order checks warmup effects. Comparison order is remembered; the capacity selector is unchanged.'}</p></>}
+     <button type="button" disabled={previewActive} onClick={resetPreviewSettings}>Reset test settings</button>
+     </details>
      <p role="status" aria-label="Rust source preview status">{previewMessage}</p>
      {previewReport&&<WorkbenchPreviewReport key={previewReport.runId??previewReport.startedAtUtc} report={previewReport}/>}
     </section>
