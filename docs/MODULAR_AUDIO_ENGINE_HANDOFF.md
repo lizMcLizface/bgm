@@ -2702,3 +2702,17 @@ Rhythm steals, zero worker underruns, all six source/channel peaks positive and
 master peak0.266908. Evidence: piano-measured-audible-browser.json. This records
 actual routed output, not new physical listening acceptance. The next phone
 request is only the fixed stress playback, with compact diagnostics on failure.
+
+## 2026-11-10 — measured playback accepted; batch verification from here
+
+The user says the measured stress playback is fine and objects to every piano
+getting a separate manual round. Evidence: piano-measured-phone-acceptance.json.
+The requested profile/build are not a new device telemetry capture.
+
+User steering: keep per-variant/table parity, persistence, allocation and mixed
+path checks automated and local. Continue porting substantial batches and commit
+verified steps. Do not introduce another phone gate for each preset or renderer
+family. Request listening only for transport behavior changes, live-path
+migration, or a concrete sound discrepancy that local capture cannot resolve.
+Default live playback is still the existing path, so its continued operation is
+expected while the opt-in graph is being ported. Continue Iowa Held/Decay/Roll.

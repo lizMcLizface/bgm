@@ -16,6 +16,11 @@ and the [finite All kit lease/compiler](MODULAR_AUDIO_ENGINE_M4C_ALL_KITS.md) ar
 delivered, with desktop six-source and phone four-source diagnostic gates
 passed. Complete captured-pattern playback is next; normal migration stays gated.
 Normal transport/default backend migration remains gated.
+
+Verification cadence (user steering, 2026-11-10): automate local per-variant and
+per-table checks; port larger batches and commit each verified step. Manual phone
+checks are reserved for transport changes, live-path migration or unresolved
+sound discrepancies, rather than a gate for each preset or source family.
 [M4d piano preparation](MODULAR_AUDIO_ENGINE_M4D_PIANO_PREPARATION.md) now ports
 modal felt/electric and base grand/felted/upright note generation into owned
 Rust/Wasm, opt-in through the existing native piano worker/voice chain. This is
