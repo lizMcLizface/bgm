@@ -1,0 +1,159 @@
+{
+  "kind": "all.source-preview.diagnostics",
+  "version": 2,
+  "material": "voice-audition",
+  "audition": {
+    "version": 1,
+    "material": "diagnostic-test-notes",
+    "schedule": "individual-attacks-then-overlap",
+    "songUnchanged": true,
+    "soloSlotFrames": 36000,
+    "soloGateFrames": 24000,
+    "overlapFrame": 114000,
+    "overlapGateFrames": 96000
+  },
+  "stems": [
+    {
+      "role": "lead",
+      "sourceId": 1,
+      "kind": "subtractive",
+      "noteCount": 2,
+      "peaks": {
+        "source": 0.13066822290420532,
+        "channel": 0.03849543631076813
+      }
+    },
+    {
+      "role": "counter",
+      "sourceId": 2,
+      "kind": "subtractive",
+      "noteCount": 2,
+      "peaks": {
+        "source": 0.11980519443750381,
+        "channel": 0.01795189082622528
+      }
+    },
+    {
+      "role": "bass",
+      "sourceId": 5,
+      "kind": "subtractive",
+      "noteCount": 2,
+      "peaks": {
+        "source": 0.22812846302986145,
+        "channel": 0.06017811596393585
+      }
+    }
+  ],
+  "excludedRoles": [],
+  "runId": "b664110c-93c1-4fe5-b2fa-cfc08d86d4bc",
+  "hostRevision": "all-preview-delivery-v9",
+  "sourceFingerprint": "2deecc4ea004d634dd58f230723a43ef764415375496b779531adedf5ccb26ee",
+  "diagnosticProbe": null,
+  "probeTrace": null,
+  "engineVersion": "d6a0341e5edf2d57",
+  "startedAtUtc": "2026-11-10T14:29:31.748Z",
+  "browserUserAgent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Mobile Safari/537.36",
+  "sampleRate": 48000,
+  "role": "pitched-set",
+  "reason": "completed",
+  "error": null,
+  "complete": true,
+  "pass": true,
+  "listening": "not assessed",
+  "executor": {
+    "requested": "worker",
+    "actual": "worker",
+    "scheduling": "message",
+    "blockFrames": 512,
+    "poolBlocks": 12,
+    "bufferingLatencyMs": 128,
+    "stopOnUnderrun": true,
+    "deliveryDiagnostics": true
+  },
+  "fallbackReason": null,
+  "frames": {
+    "planned": 282000,
+    "consumed": 282000,
+    "output": 288256,
+    "rendered": 282000
+  },
+  "events": {
+    "applied": 12,
+    "late": 0,
+    "overflow": 0
+  },
+  "delivery": {
+    "underrunFrames": 0,
+    "underrunQuanta": 0,
+    "recoveries": 0,
+    "lateBlocks": 0,
+    "rejectedBlocks": 0,
+    "staleGeneration": 0,
+    "acceptedBlocks": 551
+  },
+  "lead": {
+    "minFrames": 1152,
+    "zeroLeadQuanta": 0,
+    "belowQuantumQuanta": 0,
+    "firstZeroSourceFrame": null
+  },
+  "arrival": {
+    "maxGapFrames": 4864,
+    "maxConsumedSinceArrivalFrames": 4864,
+    "overCapacityQuanta": 0
+  },
+  "worker": {
+    "blocks": 551,
+    "renderMs": 1420.400000065565,
+    "maxRenderMs": 28.100000023841858,
+    "badRecycles": 0
+  },
+  "timingScope": "Last packet: producer at send; worker/producerLater: queried later. No synchronized clocks.",
+  "lastPacket": {
+    "packetFrame": 281600,
+    "frames": 400,
+    "sourceFrameAtArrival": 275968,
+    "producer": {
+      "version": 1,
+      "available": true,
+      "frame": 282000,
+      "blocks": 551,
+      "freeBuffers": 0,
+      "inFlightBuffers": 12,
+      "elapsedMs": 5928.300000011921,
+      "taskWaits": 551,
+      "taskWaitMs": 0.09999999403953552,
+      "taskWaitMaxMs": 17.200000017881393,
+      "poolWaits": 496,
+      "poolWaitMs": 3.699999988079071,
+      "poolWaitMaxMs": 192.7999999821186,
+      "recycleRttMs": 120.7999999821186,
+      "recycleRttMaxMs": 301.09999999403954,
+      "lastRecycleConsumerFrame": 275967,
+      "renderMs": 0.9000000059604645,
+      "maxRenderMs": 28.100000023841858
+    }
+  },
+  "producerLater": {
+    "available": true,
+    "taskWaitMaxMs": 17.200000017881393,
+    "poolWaitMaxMs": 192.7999999821186,
+    "recycleRttMaxMs": 301.09999999403954,
+    "lastRecycleConsumerFrame": 281999,
+    "readyTaskAgeMs": null,
+    "poolEmptyAgeMs": null
+  },
+  "outputProcess": {
+    "available": false,
+    "calls": null,
+    "maxMs": null,
+    "overQuantumPeriod": null
+  },
+  "completedAtUtc": "2026-11-10T14:29:41.141Z",
+  "eventPass": true,
+  "peaks": {
+    "source": 0.22812846302986145,
+    "channel": 0.06017811596393585,
+    "master": 0.063580721616745
+  }
+}

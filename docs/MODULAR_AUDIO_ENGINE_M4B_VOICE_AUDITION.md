@@ -120,10 +120,60 @@ their own gates. Longer phone lookahead is accepted; latency work stays deferred
   viewport and loopback QA server cleaned; normal-user LAN HTTPS PID **8368**
   remains running and serves the updated local build. No deployment.
 
-**Phone gate pending:** requested the explicit full muted audition at twelve
-blocks on the existing LAN link. Do not infer its result from the earlier Bass
-or sparse-set probes. After clean full active-voice counters, collect guarded
-audible audition feedback linked by run/hash. Native piano/classics/percussion,
-background/lock-screen behavior, real-song acceptance and physical listening
-are not established by these desktop tests. Next independent work can audit
-the actual All percussion kit/hit/effect seam before implementing its adapter.
+## Phone active-voice result (2026-11-10)
+
+User-supplied phone Chrome reports now complete the full diagnostic gate:
+
+- Muted **dd21d98f-ad66-406f-a3f9-1627b774da42**, started
+  **2026-11-10T14:28:14.305Z**: host v9 / engine d6a0341e5edf2d57, actual
+  worker / Message tasks / 512 x 12 / 128 ms, source IDs **[1,2,5]**, all core,
+  **two notes each**. Entire **282,000** planned/consumed/rendered frames,
+  **288,256** output, **551** accepted/rendered blocks, all **12** events.
+  Zero delivery errors, recoveries, late/overflow/recycle errors. Expected
+  zero source/channel peaks. Probe complete true; raw top complete/pass false
+  and listening unassessed retained.
+- Audible **b664110c-93c1-4fe5-b2fa-cfc08d86d4bc**, started
+  **2026-11-10T14:29:31.748Z**, completed **14:29:41.141Z**: same full
+  frame/event/block counts, actual worker/twelve, normal first-miss guard true,
+  no delivery/event/recycle errors, each source ends inactive with peakActive1,
+  no steals/dropped/late. Raw peaks **0.130668 / 0.119805 / 0.228128**,
+  channel **0.038495 / 0.017952 / 0.060178**, master **0.063581**.
+  Original full complete/eventPass/pass true; automated listening remains
+  unassessed in the normalized report excerpt.
+- Both have steady minimum ready lead **1,152 frames / 24 ms**, no zero /
+  below-quantum lead, maximum arrival span **4,864 / 101.33 ms**, no over-capacity
+  observations. Worker total/max render time **1,345 / 22.2 ms** muted,
+  **1,420.4 / 28.1 ms** audible. These worker durations and later recycle
+  queries are not AudioWorklet CPU or synchronized clock measurements.
+  Worklet process timing remains unavailable/null. No browser-cause inference.
+- Identical reported full plan hash
+  `2deecc4ea004d634dd58f230723a43ef764415375496b779531adedf5ccb26ee`.
+  User supplied the **complete audible plan**, enabling independent rehash.
+  It shares the saved desktop plan except two explicitly supplied captured
+  global gains (counter **0.5365830759935362**, bass **1.1388329727674487**).
+  Reconstructing that normalized full plan produces the exact supplied hash.
+  Phone input is identical within this pair, not across desktop/phone. Muted
+  full plan bytes were not separately supplied; linkage uses its matching hash.
+- User explicitly reports **“Clean individual entries and overlap”** in reply
+  to this exact audible run request. A separate run/hash-bound listening file
+  records that assessment without changing raw automated verdicts. This accepts
+  the selected three-voice diagnostic listening window at these settings.
+- Files `m4b-phone-voice-audition-muted.json` (all supplied compact fields),
+  `m4b-phone-voice-audition-audible.json` (normalized compact excerpt of supplied
+  full report; full histograms omitted), `m4b-phone-voice-audition-plan.json`
+  (hash-verified normalized complete plan), `m4b-phone-voice-audition-evidence.json`
+  (provenance/cross-checks), and `m4b-phone-voice-audition-listening.json`
+  (direct feedback). Precise phone model, audio route and background/lock state
+  were not supplied. No five-voice/FM/native/classic/percussion/real-song or
+  general lock-screen acceptance is inferred.
+
+The Setup hint now accurately names this bounded phone result. This evidence
+step changes only that informational sentence plus records/docs; no DSP,
+transport, default or source configuration change. Artifact/frame/event/hash /
+listening-link checks pass. Final public provenance/package build passes
+(**35.71 s** Vite, existing chunk warning), refreshing the same LAN preview;
+no new browser/DSP rerun or deployment. The [percussion audit](MODULAR_AUDIO_ENGINE_M4C_PERCUSSION_AUDIT.md)
+is committed separately as `87f03e0`. **Next:** versioned owned kit preparation
+configuration, validated/persisted and compared exactly with configured legacy
+Wasm before a Wasm-kit-only finite All adapter. Native Piano/classics remain
+separate gates. Keep twelve-slot phone option and defer latency experiments.

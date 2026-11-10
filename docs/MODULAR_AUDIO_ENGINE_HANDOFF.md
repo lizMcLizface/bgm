@@ -11,8 +11,8 @@ are deferred. [M4b finite pitched sets](MODULAR_AUDIO_ENGINE_M4B_PITCHED_SET.md)
 now extend the explicit preview; read the latest checkpoint below. Native piano,
 classics and percussion adapters/normal transport remain separate gates.
 The [selected-patch test-note audition](MODULAR_AUDIO_ENGINE_M4B_VOICE_AUDITION.md)
-now activates sparse voices without changing the song; phone active-voice
-acceptance is pending, with the exact desktop checkpoint at the end.
+now activates sparse voices without changing the song. Phone Lead/counter/Bass
+delivery and listening are clean for this material; exact checkpoints follow.
 
 Prepared and implemented through the opt-in M4a finite All source preview on 2026-11-09. Read the working tree, this file and
 [MODULAR_AUDIO_ENGINE_PLAN.md](MODULAR_AUDIO_ENGINE_PLAN.md) first. This is an
@@ -2216,3 +2216,35 @@ timers), finite hit compiler/source ID6 and six-stem diagnostics. Phone v9 full
 pitched muted/audible reports arrived clean; listening feedback remains pending.
 Record those runs in the audition checkpoint separately; this foundation does not depend
 on its listening result. No default promotion, latency work or deployment.
+
+## Phone three-active-voice audition accepted (2026-11-10)
+
+After `87f03e0`, phone muted **dd21d98f-ad66-406f-a3f9-1627b774da42** and
+audible **b664110c-93c1-4fe5-b2fa-cfc08d86d4bc** complete the explicit Lead /
+counter/Bass diagnostic: two notes each, **282,000 frames / 12 events / 551
+blocks**, actual worker / Message tasks / 512 x 12 / 128 ms, no missing/late /
+overflow/recycle errors. Min steady lead **1,152 / 24 ms**, max gap **4,864 /
+101.33 ms**. Audible per-role raw/channel and shared master **0.063581** positive,
+normal guard true, raw complete/eventPass/pass true. Muted full verdicts remain
+false. User confirms **Clean individual entries and overlap**, saved separately
+against the exact audible run/hash; automated listening fields stay unassessed.
+
+Both report hash **2deecc4ea004d634dd58f230723a43ef764415375496b779531adedf5ccb26ee**;
+complete audible plan supplied and independently rehashed. It differs from the
+saved desktop plan only in two captured global gains; those exact values yield
+the reported full hash. Phone muted full plan absent, linked by matching hash.
+Raw compact muted report, normalized audible compact excerpt, complete normalized
+plan, provenance/checks and user feedback retained as
+`reports/modular_audio/m4b-phone-voice-audition-*.json`. Not a verbatim copy of
+the full audible histogram payload. Precise model/audio route/background state
+unknown; five voices/FM/native/classics/drums/real-song/lock-screen not accepted
+by this pair. [Exact results](MODULAR_AUDIO_ENGINE_M4B_VOICE_AUDITION.md).
+
+Setup's informational phone hint now reflects the bounded three-active-voice
+result. Artifact/frame/event/hash/listening-link checks and final public
+provenance/package build (**35.71 s** Vite) pass. No new browser/DSP rerun or
+runtime/engine/default/source change; build refreshes local LAN only.
+Next **owned kit preparation configuration** under the committed percussion
+audit, then exact configured legacy PCM/independence/persistence/allocation
+checks and Wasm-kit-only finite All integration. No further phone audition
+request is pending for this three-voice diagnostic. No latency work/deployment.

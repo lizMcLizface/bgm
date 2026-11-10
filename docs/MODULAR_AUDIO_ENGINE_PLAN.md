@@ -8,8 +8,9 @@ led to the [M4a finite All source preview](MODULAR_AUDIO_ENGINE_M4A_WORKBENCH_SO
 On 2026-11-10 the user prioritized other voices/full-path behavior over lower
 latency, extending the opt-in finite adapter to [M4b pitched sets](MODULAR_AUDIO_ENGINE_M4B_PITCHED_SET.md).
 An explicit [selected-patch test-note audition](MODULAR_AUDIO_ENGINE_M4B_VOICE_AUDITION.md)
-now activates sparse roles without editing the user's song; active phone
-acceptance remains the next device gate.
+now activates sparse roles without editing the user's song. Phone Lead/counter /
+Bass full diagnostic delivery and listening are clean; other families and
+real-song acceptance stay separate gates.
 Normal transport/default backend migration remains gated.
 All six source engines have owned mutable Rust state; core's read-only additive
 tables are safely shared after preparation. External stereo host inputs and
@@ -1058,3 +1059,17 @@ explicitly unsupported, with dry role input preserving current external FX
 and avoiding legacy kit sleep timers. Phone full muted/audible audition reports
 arrived clean; subjective listening remains pending separately;
 no adapter/default/backend/deployment change is delivered by the audit.
+
+### Phone active pitched audition accepted
+
+Phone v9 full muted and guarded audible runs now match input hash and complete
+**282,000 frames / 12 events / 551 blocks**, three actual core voices each two
+notes, worker/twelve/128 ms, **zero delivery/event/recycle errors**. Audible
+per-role/channel/master signals positive; raw full pass true. User reports
+**Clean individual entries and overlap**, saved separately with exact run/hash.
+Full audible plan independently rehashed; compact muted and normalized audible
+excerpt/provenance retained. Muted verdicts remain false; other engines,
+real-song and background/lock-screen acceptance remain separate gates. Exact
+evidence is in the audition doc. This clears the requested three-voice
+diagnostic gate. Next immutable owned kit preparation and exact configured
+legacy parity before Wasm-kit-only All percussion integration.

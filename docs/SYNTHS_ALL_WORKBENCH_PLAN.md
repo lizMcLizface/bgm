@@ -1010,3 +1010,12 @@ Wasm-kit-only finite All lease/hit compiler/six-stem report. Reuse All expressio
 and external insert/mixer routing; avoid the legacy kit's sleep timer. Audit
 has **27 exact baseline comparisons**, seven positive/negative seam experiments
 and **30 existing checks** passing. No new Drums eligibility or default switch.
+
+Phone active-voice audition now passes full muted and guarded audible delivery
+for Lead/counter/Bass, two notes each, **282,000 / 12 events / 551 blocks**, no
+misses at worker/twelve/128 ms. User confirms clean individual entries/overlap.
+The matching full audible plan hash is independently verified; feedback is
+run-bound separately from automated verdicts. Records and limitations are in
+the audition doc. Setup hint reflects this bounded result. Next owned basic-kit
+configuration/persistence/parity, then actual Wasm-kit finite integration;
+native Piano/classics/real-song and lock-screen tests remain separate.

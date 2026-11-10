@@ -1,0 +1,45 @@
+{
+  "kind": "all.voice-audition.phone-evidence",
+  "version": 1,
+  "recordedAtUtc": "2026-11-10T14:32:55.942Z",
+  "provenance": {
+    "muted": "User-supplied compact v2 diagnostics retained as normalized JSON with all supplied fields",
+    "audible": "Selected original fields from user-supplied full v1 report, normalized into compact diagnostics; full histogram/role arrays omitted, not a verbatim full-report copy",
+    "plan": "User-supplied complete audible plan reconstructed from matching saved desktop plan and two supplied gains; entire JSON SHA-256 independently matches reported phone fingerprint"
+  },
+  "mutedRun": "dd21d98f-ad66-406f-a3f9-1627b774da42",
+  "audibleRun": "b664110c-93c1-4fe5-b2fa-cfc08d86d4bc",
+  "reportedFingerprint": "2deecc4ea004d634dd58f230723a43ef764415375496b779531adedf5ccb26ee",
+  "computedAudiblePlanFingerprint": "2deecc4ea004d634dd58f230723a43ef764415375496b779531adedf5ccb26ee",
+  "reportedFingerprintsMatch": true,
+  "audibleFullPlanHashVerified": true,
+  "mutedFullPlanSupplied": false,
+  "actualExecutor": "worker",
+  "sampleRate": 48000,
+  "blockFrames": 512,
+  "poolBlocks": 12,
+  "bufferingLatencyMs": 128,
+  "sourceIds": [
+    1,
+    2,
+    5
+  ],
+  "noteCounts": [
+    2,
+    2,
+    2
+  ],
+  "fullFrames": 282000,
+  "appliedEvents": 12,
+  "delivery": "Both full windows clean; muted completion/pass false retained; audible completion/eventPass/pass true retained",
+  "minimumSteadyReadyLeadFrames": 1152,
+  "maximumSteadyArrivalGapFrames": 4864,
+  "physicalListening": "User reports clean individual entries and overlap for the matching audible run",
+  "limitations": [
+    "Phone full real-song acceptance not established by diagnostic test notes",
+    "Native Piano, classic machines, percussion and FM voices not exercised by this phone pair",
+    "No background or lock-screen setting/outcome supplied",
+    "No isolated wet PCM comparison or worklet wall-time measurement"
+  ],
+  "listeningRecord": "m4b-phone-voice-audition-listening.json"
+}
