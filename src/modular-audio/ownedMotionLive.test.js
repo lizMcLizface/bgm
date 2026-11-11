@@ -1,6 +1,6 @@
 import{describe,it,expect}from'vitest';import fs from'node:fs';
 import{OwnedMotionLive,motionLiveSpec,validateMotionLiveSpec,motionLiveSetterCalls,saveMotionLiveSpec,loadMotionLiveSpec}from'./ownedMotionLive.js';
-import{motionLiveOptions,assertMotionLiveManifest}from'../../tools/buildMotionLive.mjs';
+import{motionLiveOptions,assertMotionLiveManifest,motionLiveManifest,normalizeMotionLiveText,assertMotionLiveTextCopy}from'../../tools/buildMotionLive.mjs';
 const bytes=fs.readFileSync('public/motion-live/motion.wasm'),module=new WebAssembly.Module(bytes),engine=()=>new WebAssembly.Instance(module,{}).exports;
 const create=(rate=48000,spec=motionLiveSpec(rate),e=engine())=>new OwnedMotionLive(e,spec);
 function block(o,value=.2,channels=2,processing='audio'){for(const input of o.input)input.fill(value);o.render(channels,{processing});return o.output.map(ch=>Array.from(ch));}
@@ -18,3 +18,5 @@ describe('original Motion independent live ownership',()=>{
  it('fails bounded timeline overflow before target mutation and preserves its memory buffer',()=>{const o=create();try{const memory=o.memory;for(let i=0;i<256;i++)o.lane(0,i%2?.75:.5);const before=o.targets();expect(()=>o.lane(0,1)).toThrow('rejected');expect(o.targets()).toEqual(before);expect(o.e.memory.buffer).toBe(memory);block(o,1);expect(o.output[0][0]).toBe(.75);}finally{o.dispose();}});
  it('keeps two handles independent and replays complete cold constructor/control traces exactly',()=>{const e=engine(),spec=motionLiveSpec(44100),a=create(44100,spec,e),b=create(44100,loadMotionLiveSpec(saveMotionLiveSpec(spec)),e);a.refresh();try{for(let q=0;q<200;q++){if(q%17===0)for(const o of[a,b]){o.lane(0,.75);o.lane(1,.25);o.lane(2,Math.fround(q%2?3.7:8));o.lane(3,1);o.lane(4,Math.fround(.37));}const x=block(a,.21,1),y=block(b,.21,1);expect(x).toEqual(y);}a.dispose();expect(()=>a.render()).toThrow('disposed');expect(()=>block(b,.2)).not.toThrow();}finally{a.dispose();b.dispose();}});
 });
+
+it('hashes canonical text identically forLF/CRLF checkouts and rejects substantive reference edits',()=>{const original=fs.readFileSync.bind(fs),expected=motionLiveManifest(bytes);try{fs.readFileSync=(path,encoding,...rest)=>{const value=original(path,encoding,...rest);return encoding==='utf8'?value.replaceAll('\r\n','\n').replaceAll('\n','\r\n'):value;};expect(motionLiveManifest(bytes)).toEqual(expected);}finally{fs.readFileSync=original;}expect(normalizeMotionLiveText('a\r\nb\n')).toBe('a\nb\n');expect(()=>assertMotionLiveTextCopy('a\r\nb\r\n','a\nb\n')).not.toThrow();expect(()=>assertMotionLiveTextCopy('a\r\nc\r\n','a\nb\n')).toThrow('mismatch');});

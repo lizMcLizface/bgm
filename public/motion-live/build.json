@@ -1,13 +1,14 @@
 {
   "api": 1,
   "profile": "original-motion-independent-lanes-e14de735-v1",
-  "version": "ffa6c8e6517589a2",
-  "source": "f9b092c105744d037edff5f1319e6da8e5e04d6a79ad2bd6d22b70c87aa8c287",
+  "version": "b93450fd21229e60",
+  "source": "df0b36e0a8d785cde511d4bcbf23f3eb429ecef84ec7799b68a34e63e895a2e8",
   "wasm": "a57d79e64779f92fbefaeb4b95e54870224053c16188fb2ad8dd62eb1ea7fb7c",
   "bytes": 139297,
   "audited": false,
-  "notices": "f3a63b500a464c29d0efba583bf8c6b4bf32bf1306ab11a1b7303078238e648f",
-  "profileSha256": "0b31537beaa77fb625017a503b23bf3e6c270c3242f7b8517855538701486e64",
+  "textEncoding": "utf-8-normalized-LF",
+  "notices": "f76bdbeae7a86d239ed107f5e6e1d871cba06136b198adac4f1e41cbb6fd3972",
+  "profileSha256": "b063d89e8b1ef473f6210a1ecfa7b1cabe90bda1d8cc90204225984ee58beef1",
   "referenceSourceSha256": "bc338e9643fdfdb462dedca999e10ae4fcd777f97abda108baadbbc4c1b6ac60",
   "files": [
     "tools/buildMotionLive.mjs",
@@ -22,6 +23,7 @@
     "synth-engine/motion-live/resources/balance-manifest.json",
     "src/nodes/motion.js",
     "src/modular-audio/ownedMotionLive.js",
+    "src/modular-audio/motionLiveBrowser.js",
     "synth-engine/tape-fx/resources/manifest.json"
   ],
   "resources": [
