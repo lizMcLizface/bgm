@@ -1310,3 +1310,28 @@ Thirty existing and nine combined allocator cases remain zero after preparation.
 Piano and rack public provenance was refreshed; normal public build passes.
 See graph-preparation-verification.json. These fixes do not change valid DSP
 algorithms or the established browser-reference tolerances.
+
+
+### Owned Motion and native timestamp import (overnight 2026-11-11)
+
+The original native tremolo/autopan graph now has an owned portable Rust engine
+with phase-continuous LFOs, original Float32 gain stages and1025-point balance
+curves. Published buildbd20967bd090f540 is27561 bytes. Sixteen owned/import
+tests pass;12 two-handle allocation cases report zero allocation/free/growth.
+
+Actual native-browser comparison now passes36/36 mono/stereo/automation cases
+at44.1/48/96kHz with unchanged1e-4 maximum/relativeRMS limits: max error
+5.21540641784668e-7, max relativeRMS9.18376948692699e-7. The first run exposed
+a real import mismatch:13/44100 seconds evaluates above frame13, and native
+setValueAtTime applies at14. Independent GainNode markers prove the rule.
+Native seconds remain unchanged; compileNativeStepTimeline imports them with
+ceil(seconds*sampleRate) before enqueue. Integer-frame DSP remains distinct.
+This helper is specifically for native step events, not exponential targets.
+Original failed/timing-probe reports and the final motion-native-browser-v2
+JSON/screenshot are retained. No PCM shifting, gain alignment or bound widening.
+
+Graph Motion integration is independently passing in the working tree and will
+be committed with the next combined graph slice. Full plucked and desk native
+comparisons have separately exposed issues still being corrected. Tape remains
+an explicit pinned-browser-profile port in progress; no generic fallback or
+default backend switch is introduced. See MODULAR_AUDIO_ENGINE_MOTION_TAPE_AUDIT.md.

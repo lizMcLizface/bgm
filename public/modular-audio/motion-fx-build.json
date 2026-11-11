@@ -1,0 +1,10 @@
+{
+  "api": 1,
+  "source": "549a6978cbfe3e380952a748ce5fe418c6d2e3711adf41e851de8316de986f60",
+  "runtime": "1629143fd2b153f123e7fdc671f02cc4a9cfe67e30caf7326561bd7fc4718233",
+  "wasm": "8e40b088118ffa833ca5393a11f925c03f90fcc288f2170f8736d7518d568a73",
+  "bytes": 27561,
+  "audited": false,
+  "referenceSourceSha256": "49f562d04dab23839d3c623fed2856ea4f507e4f12eb56a7492d816192b3ca80",
+  "version": "bd20967bd090f540"
+}

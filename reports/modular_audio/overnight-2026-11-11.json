@@ -3,7 +3,7 @@
   "version": 1,
   "status": "running",
   "startedAtUtc": "2026-11-10T23:19:46Z",
-  "updatedAtUtc": "2026-11-11T00:42:04.787Z",
+  "updatedAtUtc": "2026-11-11T01:02:45.028Z",
   "featureCutoffUtc": "2026-11-11T08:30:00Z",
   "deadlineUtc": "2026-11-11T09:00:00Z",
   "gitIdentity": {
@@ -20,7 +20,8 @@
     "fff00db",
     "60c553b",
     "edb9b5d",
-    "ba190ac"
+    "ba190ac",
+    "539467e"
   ],
   "graph": {
     "api": 1,
@@ -56,7 +57,9 @@
       "allocationCases": 24,
       "tests": 11
     },
-    "preparationTransaction": "graph-preparation-verification.json"
+    "preparationTransaction": "graph-preparation-verification.json",
+    "motionNative": "motion-native-browser-v2.json",
+    "motionProduction": "bd20967bd090f540"
   },
   "limitations": [
     "No physical listening/device-underrun claim",
