@@ -2155,3 +2155,16 @@ describe('a styled preset', () => {
         }
     });
 });
+
+describe('prepared portable role motion in the normal Generator',()=>{
+ it('constructs all six roles through the caller factory without persisting the backend in song settings',async()=>{
+  const settings=defaultSettings(),before=JSON.stringify(settings),factory=vi.fn((_ctx,role)=>({input:{},output:{connect(){}},apply:vi.fn().mockResolvedValue(),ready:Promise.resolve(),check:vi.fn(),role})),g=new Generator(settings,{roleWanderFactory:factory});
+  await g.awaitRoleMotion();expect(factory.mock.calls.map(c=>c[1])).toEqual(['lead','counter','pad','bass','rhythm','perc']);expect(g.roleMotionPrepared).toBe(true);expect(JSON.stringify(g.settings)).toBe(before);for(const r of Object.values(g.roles))expect(r.wander.apply).toHaveBeenCalledWith(settings.wander);
+ });
+ it('waits for actual preparation and acknowledged controls, then surfaces spontaneous failures',async()=>{
+  let ready,control;const preparation=new Promise(r=>ready=r),applied=new Promise(r=>control=r),factory=(_ctx,role)=>({input:{},output:{connect(){}},apply:()=>applied,ready:preparation,check(){if(this.failure)throw this.failure;},role}),g=new Generator(defaultSettings(),{roleWanderFactory:factory});let resolved=false;const waiting=g.awaitRoleMotion().then(()=>resolved=true);await Promise.resolve();expect(resolved).toBe(false);ready();await Promise.resolve();expect(resolved).toBe(false);control();await waiting;g.roles.pad.wander.failure=Error('processor stopped');expect(()=>g.checkRoleMotion()).toThrow('processor stopped');await expect(g.awaitRoleMotion()).rejects.toThrow('processor stopped');
+ });
+ it('retains failed control state and blocks live notes before preparation',async()=>{
+  const factory=()=>({input:{},output:{connect(){}},apply:()=>Promise.reject(Error('bounded queue refused')),ready:Promise.resolve(),check(){}}),g=new Generator(defaultSettings(),{roleWanderFactory:factory});expect(()=>g.liveNoteOn('lead',60)).toThrow('Prepare role motion');await expect(g.awaitRoleMotion()).rejects.toThrow('bounded queue refused');expect(()=>g.checkRoleMotion()).toThrow('bounded queue refused');expect(()=>new Generator(defaultSettings(),{roleWanderFactory:{}})).toThrow('factory');
+ });
+});

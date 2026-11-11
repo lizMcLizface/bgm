@@ -147,7 +147,10 @@ export const ROLES = {
 
 class Generator {
     /** @param {object} [settings] - complete, valid settings (settings.js) */
-    constructor(settings = defaultSettings(), {percussion = percussionFromSearch(globalThis.location?.search)} = {}) {
+    constructor(settings = defaultSettings(), {percussion = percussionFromSearch(globalThis.location?.search), roleWanderFactory = null} = {}) {
+        if (roleWanderFactory !== null && typeof roleWanderFactory !== 'function') throw Error('Invalid prepared role-motion factory');
+        this.roleWanderFactory = roleWanderFactory;
+        const makeWander = roleWanderFactory ?? ((context, role) => new RoleWander(context, role));
         // Old perc=808 links selected a sound through the backend selector.
         // Migrate that meaning to the kit while retaining their drum edits.
         if (percussion === '808') settings = {...settings,drums:{...settings.drums,kit:'tr808'}};
@@ -182,7 +185,7 @@ class Generator {
             tone.Q.value = 0.5;
             instrument.connect(tone);
             tone.connect(gain);
-            const wander = new RoleWander(this.AC, role);
+            const wander = makeWander(this.AC, role);
             // ducking under the melody (engine/ducking.js), after the volume
             const duck = this.AC.createGain();
             gain.connect(duck);
@@ -197,7 +200,7 @@ class Generator {
             const gain = this.AC.createGain();
             gain.gain.value = volume;
             instrument.connect(gain);
-            const wander = new RoleWander(this.AC, 'perc');
+            const wander = makeWander(this.AC, 'perc');
             gain.connect(wander.input);
             wander.output.connect(this.output);
             instrument.setKit(this.settings.drumKit);
@@ -314,6 +317,10 @@ class Generator {
     }
 
     async start() {
+        if (this.roleWanderFactory) {
+            if (this.AC.state !== 'running') await this.AC.resume();
+            await this.awaitRoleMotion();
+        }
         if(this.sourceLoads?.size)await Promise.all(this.sourceLoads);
         if(Object.values(this.roles).some(r=>r.instrument.preset?.wasmVoice)&&this.audioEngine!=='wasm'&&!this.audioEngineReady)await this.setAudioEngine('wasm');
         if(this.audioEngineReady)await this.audioEngineReady;
@@ -1085,6 +1092,10 @@ class Generator {
      * edits can be heard while stopped (while playing they are heard live).
      */
     async audition(role) {
+        if (this.roleWanderFactory) {
+            if (this.AC.state !== 'running') await this.AC.resume();
+            await this.awaitRoleMotion();
+        }
         if(role==='perc'&&this.percussionReady)await this.percussionReady;
         const {instrument}=this.roles[role];
         this.auditionPending=(this.auditionPending??0)+1;
@@ -1121,6 +1132,10 @@ class Generator {
      * @returns {number} how long the phrase lasts, in seconds
      */
     async auditionPhrase(role, phraseId) {
+        if (this.roleWanderFactory) {
+            if (this.AC.state !== 'running') await this.AC.resume();
+            await this.awaitRoleMotion();
+        }
         const { instrument } = this.roles[role];
         this.auditionPending = (this.auditionPending ?? 0) + 1;
         try {
@@ -1154,10 +1169,34 @@ class Generator {
     // Slow pan / volume wander on each role's output, filter and pitch on its sound (engine/wander.js).
     applyWander() {
         const { wander } = this.settings;
+        const pending = [];
         Object.entries(this.roles).forEach(([role, r]) => {
-            r.wander.apply(wander);
+            const applied = r.wander.apply(wander);
+            if (applied?.then) pending.push(applied);
             if (r.instrument.setWander) r.instrument.setWander(instrumentWander(wander, role));
         });
+        if (this.roleWanderFactory) {
+            this.roleMotionControls = Promise.all(pending);
+            this.roleMotionControls.catch(error => { this.roleMotionError = error; });
+        }
+    }
+
+    checkRoleMotion() {
+        if (this.roleMotionError) throw this.roleMotionError;
+        for (const r of Object.values(this.roles)) r.wander.check?.();
+    }
+
+    async awaitRoleMotion({controls = this.AC.state === 'running'} = {}) {
+        if (!this.roleWanderFactory) return;
+        this.checkRoleMotion();
+        await Promise.all(Object.values(this.roles).map(r => r.wander.ready));
+        if (controls) {
+            let pending;
+            do { pending = this.roleMotionControls; await pending; }
+            while (pending !== this.roleMotionControls);
+        }
+        this.checkRoleMotion();
+        this.roleMotionPrepared = true;
     }
 
     applyMutes() {
@@ -1247,6 +1286,10 @@ class Generator {
     }
 
     liveNoteOn(role, midi, velocity = 0.8) {
+        if (this.roleWanderFactory) {
+            if (!this.roleMotionPrepared) throw Error('Prepare role motion before playing live notes');
+            this.checkRoleMotion();
+        }
         if (this.AC.state !== 'running') this.AC.resume();
         this.endStopFade();
         if (role === 'midi') {

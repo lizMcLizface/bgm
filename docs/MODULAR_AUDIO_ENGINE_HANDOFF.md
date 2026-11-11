@@ -1,7 +1,9 @@
-Latest additive checkpoint: [owned role pan/level motion](MODULAR_AUDIO_ENGINE_ROLE_WANDER.md)
-passes native six-rate, actual worklet, allocation and live save/reload checks.
-The active normal-host adoption and broader stereo room activity/retarget
-investigation continue; no default change or whole-port completion is implied.
+Latest checkpoint: [owned role pan/level motion](MODULAR_AUDIO_ENGINE_ROLE_WANDER.md)
+now runs through an explicit prepared factory in the normal Generator, All host
+and offline score renderer. 215 focused checks, actual six-role/reload routes,
+real-source native/owned/restored desk batches and a two-second offline score
+pass. Defaults remain unchanged. Continue combined live piano/compressor/room
+adoption, ambience/source-control clocks and the broader stereo room layout work.
 Current continuation: [active Rust checkpoint](MODULAR_AUDIO_ENGINE_ACTIVE_RUST_CHECKPOINT.md)
 records480files /3788passing tests, the public build and final desktop source/room/
 compressor acceptance. Continue live piano, compressor bypass and composed room/

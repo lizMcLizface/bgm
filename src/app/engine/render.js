@@ -17,6 +17,7 @@ import Instrument from './Instrument';
 import DrumKit from './drumKit';
 import WasmDrumKit from './wasmDrumKit';
 import { RoleWander, instrumentWander } from './wander';
+import {roleMotionSettings} from '../../modular-audio/ownedRoleWander';
 import { OPEN_TONE, TONE_ROLES } from '../Generator';
 import Ambience from './ambience';
 import { WeatherBedOffline } from './weatherBedAudio';
@@ -243,14 +244,17 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
             const Wasm=audioEngine==='wasm'?(await import('./wasmInstrument')).default:null;
             // the music, through the bars' loudness trims
             const out=ctx.createGain();out.connect(ctx.destination);automateLevel(out.gain,levels,from);
-            const instruments={},cleanup=[()=>out.disconnect()],roomPool=Wasm&&PERFORMANCE.sharedReverb?new WasmRoomPool(ctx,out):null;
+            const instruments={},motionRoutes=[],cleanup=[()=>out.disconnect()],roomPool=Wasm&&PERFORMANCE.sharedReverb?new WasmRoomPool(ctx,out):null;
             if(roomPool)cleanup.push(()=>roomPool.dispose());
             // the shared effects bus, as the generator builds it (engine/bus.js)
             const bus=busActive(gen.settings.bus)?await createBusRack(ctx,gen.settings.bus.rack,out):null;
             if(bus)cleanup.push(()=>bus.dispose());
             const space=spaces.length?await createBusRack(ctx,SPACE_RACK,out):null;
             if(space)cleanup.push(()=>space.dispose());
-            try{for(const role of roles){
+            try{
+            const motionFactory = gen.roleWanderFactory ? await gen.roleWanderFactory.prepareContext?.(ctx) : null;
+            if (gen.roleWanderFactory && !motionFactory) throw Error('Role-motion backend cannot prepare an offline context');
+            for(const role of roles){
                 const inst = role === 'perc' && gen.roles.perc.machine
                     ? await (await import('./classicsInstrument')).default.create({ context: ctx, preset: gen.roles.perc.instrument.preset, polyphony: 16 })
                     : role === 'perc'
@@ -284,9 +288,9 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
                 inst.tempoTailReserve = gen.tempoEffects === true && gen.settings.generation !== 'legacy';
                 // slow pan / volume wander after the mixer, filter and pitch on the sound
                 // (wander.js); the render starts `from` seconds into the piece
-                const wander = new RoleWander(ctx, role, { offset: from, smooth: false });
-                cleanup.push(()=>wander.dispose());
-                wander.apply(gen.settings.wander);
+                const wander = motionFactory ? motionFactory(ctx, role, { offset: from, smooth: false, settings: roleMotionSettings(gen.settings.wander, role) }) : new RoleWander(ctx, role, { offset: from, smooth: false });
+                cleanup.push(()=>wander.dispose());motionRoutes.push(wander);
+                if (!motionFactory) wander.apply(gen.settings.wander);
                 if (inst.setWander) inst.setWander({ ...instrumentWander(gen.settings.wander, role, from), immediate: true });
                 if (gen.settings.ducking > 0 && duckedBy(gen.settings.layers)[role]) {
                     const duck = ctx.createGain();
@@ -303,7 +307,7 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
                     if(route.tone)automateTone(route.tone.frequency,tones,from);cleanup.push(()=>route.dispose());
                 }
             }
-            return { ctx, instruments, cleanup };
+            return { ctx, instruments, cleanup, motionRoutes };
             }catch(error){cleanup.reverse().forEach(f=>f());throw error;}
         };
         let preroll = 0;
@@ -313,7 +317,7 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
             preroll = Math.min(MAX_PREROLL, Math.max(tail, ...sounding.map((n) => start - n.time)));
         }
         const from = start - preroll;
-        const { ctx, instruments, cleanup } = await build(from);
+        const { ctx, instruments, cleanup, motionRoutes } = await build(from);
         try{
         if(signal?.aborted)throw cancelled();
         await Promise.all([noiseReady(ctx), bitCrusherReady(ctx), spaceReady(ctx)]);
@@ -351,6 +355,8 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
             });
         }
         const buffer = await renderOrAbort(ctx,signal);
+        await Promise.all(motionRoutes.map(route => route.ready));
+        motionRoutes.forEach(route => route.check?.());
         const failure=Object.values(instruments).find(inst=>inst.error)?.error;if(failure)throw failure;
         const skip = Math.round(preroll * sampleRate);
         const left = buffer.getChannelData(0).subarray(skip);

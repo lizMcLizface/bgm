@@ -84,10 +84,10 @@ export const sceneDrumPatch=name=>SCENE_DRUM_GROUPS.find(group=>group.scenes.inc
 export const drumChoices = () => [{id:'scene',name:'Scene kits'},{id:'kit',name:'Basic kits'},...['tr808','tr909','tr707','tr606'].map(id=>({id,name:SYNTHS[id].name}))];
 export const drumPatches = id => id==='scene'?SCENE_DRUM_GROUPS.map(group=>({id:group.id,name:group.scenes.length>1?`${group.id} (${group.scenes.length} scenes)`:group.id})):id==='kit'?Object.values(PERCUSSION_VOICES).map(v=>({name:v.name,id:v.id})):SYNTHS[id]?.kit?SYNTHS[id].presets:[];
 
-export function createHost(scene, {seed,settings:storedSettings,deskBackend='native'} = {}) {
+export function createHost(scene, {seed,settings:storedSettings,deskBackend='native',roleWanderFactory=null} = {}) {
     deskBackend=deskBackendChoice(deskBackend);
     const settings = storedSettings ? sanitizeSettings(storedSettings,sceneSettings(scene,seed)) : sceneSettings(scene, seed);
-    const g = new Generator(settings);
+    const g = new Generator(settings,{roleWanderFactory});
     const loaded = {};
     const sounds = {}; // role -> the classic or DIY patch playing it: { synth, name, category, values, rack, level }
     const racks = {}; // role -> the effects of a calmbgm voice
@@ -245,7 +245,7 @@ export function createHost(scene, {seed,settings:storedSettings,deskBackend='nat
             const connect=(from,to)=>{from.connect(to);undo.push(()=>from.disconnect(to));};
             const disconnect=(from,to)=>{from.disconnect(to);undo.push(()=>from.connect(to));};
             try{
-                if(g.percussionReady)await g.percussionReady;ensureActive();
+                if(g.percussionReady)await g.percussionReady;await g.awaitRoleMotion?.({controls:false});ensureActive();
                 const {createRack}=await import('../effects/graph');ensureActive();
                 // All async resources are prepared before changing existing links.
                 for(const {role}of SEQUENCERS){
@@ -559,7 +559,7 @@ export function createHost(scene, {seed,settings:storedSettings,deskBackend='nat
     return {
         g, settings, loaded, editSettings,editRule,restoreBook,get book(){return book;}, applySceneVoices, applyFrontPageLink, setSound, setPreset, soundOf, nativeOf, editNative, editValues, editDrumKit, rackValues, editRack, editMixer, mixerSnapshot, restoreMixer, snapshotSounds, restoreSounds, setupMixer, applyDesk, awaitDeskState,deskStatus,sourcePreviewStatus, openSourceStem, setTempo, openMonitor, openMeters, capture, note, tunedNote, drum, drumTrack, setDrumMix, getDrumMix,
         get context() { return g.AC; },
-        async wake() { await g.AC.resume(); if (g.percussionReady) await g.percussionReady; g.endStopFade?.(); },
+        async wake() { await g.AC.resume(); await g.awaitRoleMotion?.(); if (g.percussionReady) await g.percussionReady; g.endStopFade?.(); },
         setScene(next) { hostScene.scene = next; },
         dispose() { if(disposed)return;disposed=true;sourceTaps.forEach(t=>t.close()); meterTaps.forEach(tap=>tap.dispose());g.stopAll?.();g.disposeSharedEffects?.();deskAudio?.dispose();g.output?.disconnect();g.levelTrim?.disconnect();g.ambienceOut?.disconnect(); Object.values(g.roles).forEach((r) => { r.sourceRevision=(r.sourceRevision??0)+1; r.instrument?.dispose?.(); r.ensembleRack?.dispose?.(); r.mixerRack?.dispose?.(); r.wander?.dispose?.(); }); },
     };

@@ -3,7 +3,7 @@
 This additive Rust stage reproduces the original RoleWander pan/volume path.
 It owns sine phase, seeded random walks, target smoothing and stereo balance.
 The main route and up to four followers share one control clock. The normal
-Generator and All defaults are unchanged; source filter/pitch wander and the
+Generator and All now accept an explicit prepared Rust factory; defaults are unchanged; source filter/pitch wander and the
 ambience layer policy are separate remaining work.
 
 The captured contract records role, sample rate, offset, offline/live policy,
@@ -19,8 +19,13 @@ disconnected by a mode switch; zero depth continues phase. Offline Brownian
 initialization retains the original first-booking period/order. Live execution
 uses deterministic 90-second lookahead and 15-second refill boundaries, without
 reproducing accidental main-thread timer delays. The prepared host factory has
-the RoleWander input/output/apply/createFollower interface, but normal Generator
-adoption has not yet been enabled.
+the RoleWander input/output/apply/createFollower interface, and is available through `new Generator(settings,{roleWanderFactory})` or
+`createHost(scene,{roleWanderFactory})`. Prepare the factory once with
+`await prepareOwnedRoleWander(context)`. All `wake`, start and audition paths
+await it; direct keyboard notes refuse unprepared motion. The normal offline
+renderer prepares a separate factory for each chunk context and installs the
+complete initial settings before rendering. Neither backend identity nor a
+function is serialized into song settings.
 
 Verification at this step:
 
@@ -48,8 +53,17 @@ The numeric mixer Wasm is 87,806 bytes, SHA-256
 The maintained review page is `/tools/role-wander.html`. Generated evidence and
 private diagnostic scripts remain under ignored `reports/`.
 
-Next: adopt the prepared factory through the normal Generator/offline render
-with explicit readiness/error handling, then port the remaining ambience and
-source-control clocks. Validate a mixed live path and full save/reload before
-changing defaults. Callback deadlines, physical listening and mobile/background
+Normal-host checks now also pass: 215 focused Generator/host/routing checks,
+six actual simultaneous role routes plus six independent cold-restored nodes,
+and a real two-second normal offline score export (96,000 stereo frames,
+192,000 Int16 samples, nonzero peak, song unchanged). Three consecutive actual
+real-source All batches each pass native desk, owned desk and restored-owned
+host cases, with role/shared FX, Generator sweep/trim and ambience. The first
+cold batch had an unattributed missing-route measurement after its native case;
+that failed report is retained and richer failure measurements were added.
+Subsequent passing batches do not establish its cause or certify deadlines.
+
+Next: port the remaining ambience and source-control clocks, then combine live
+piano/compressor/room adoption in the real-source host batch. Validate broader
+startup and background behavior before changing defaults. Callback deadlines, physical listening and mobile/background
 acceptance are not implied by offline parity or muted desktop measurements.

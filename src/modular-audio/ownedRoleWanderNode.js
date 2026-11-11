@@ -9,7 +9,9 @@ export async function registerRoleWander(context){if(!registered.has(context)){c
  */
 export async function prepareOwnedRoleWander(context,{assets}={}){
  assets??=await loadOwnedMixerAssets();await registerRoleWander(context);
- return (ctx,role,options={})=>{if(ctx!==context)throw Error('Role-motion factory belongs to a different context');return createOwnedRoleWanderNode(ctx,assets,role,options);};
+ const factory=(ctx,role,options={})=>{if(ctx!==context)throw Error('Role-motion factory belongs to a different context');return createOwnedRoleWanderNode(ctx,assets,role,options);};
+ factory.prepareContext=ctx=>prepareOwnedRoleWander(ctx,{assets});
+ return factory;
 }
 export function createOwnedRoleWanderNode(context,assets,role,{offset=0,smooth=true,settings={mode:'sine',enabled:false,period:60,panMin:-.6,panMax:.6,volume:.12},spec,startFrame}={}){
  spec=loadRoleWanderSpec(saveRoleWanderSpec(spec??roleWanderSpec(role,context.sampleRate,settings,{buses:5,offset,smooth,execution:typeof OfflineAudioContext!=='undefined'&&context instanceof OfflineAudioContext?'offline':'live'})));
