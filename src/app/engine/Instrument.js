@@ -183,8 +183,10 @@ class Instrument {
      * @param {object} [options.preset]
      * @param {BaseAudioContext} [options.context]
      */
-    constructor({ polyphony = 8, preset = {}, context = audioContext, deferReverb = false, reverbHub = null, fdnRoom = false, sourceBackend = 'native', voiceCompressorFactory = null } = {}) {
+    constructor({ polyphony = 8, preset = {}, context = audioContext, deferReverb = false, reverbHub = null, fdnRoom = false, sourceBackend = 'native', voiceCompressorFactory = null, pianoSourceFactory = null } = {}) {
         if (!['native', 'owned-rust'].includes(sourceBackend)) throw Error('Unsupported instrument source backend');
+        if (pianoSourceFactory !== null && typeof pianoSourceFactory !== 'function') throw Error('Invalid piano source factory');
+        this.pianoSourceFactory = pianoSourceFactory;
         this.pendingSourceBookings = new Set(); this.sourceBackend = sourceBackend; this.pianoSource = null; this.pianoSourcePromise = null; this.pluckedSource = null; this.pluckedSourcePromise = null; this.sourceFailure = null;
         this.sourceBookingTrace = []; this.sourcePreparationLateFrames = 0; this.sourcePreparationLateBookings = 0;
         this.AC = context;
@@ -306,7 +308,7 @@ class Instrument {
     ensurePianoSource() {
         if (this.sourceBackend !== 'owned-rust') return Promise.resolve(null);
         if (this.pluckedSource) return Promise.reject(Error('Changing owned physical source material requires a fresh instrument'));
-        this.pianoSourcePromise ??= createPianoLiveSource(this).then(source => {
+        this.pianoSourcePromise ??= (this.pianoSourceFactory ?? createPianoLiveSource)(this).then(source => {
             if (this.disposed) { source.dispose(); throw Error('Disposed instrument'); }
             this.pianoSource = source; return source;
         }).catch(error => { this.sourceFailure = error; throw error; });
