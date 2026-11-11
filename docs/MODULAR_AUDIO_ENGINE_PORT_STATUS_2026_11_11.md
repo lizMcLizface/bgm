@@ -55,7 +55,7 @@ Width/Filter/Ring captured DSP passes36 cases. The corrected live candidate
 passes216 short cases and the48k long/delayed gate, but the expanded gate finds
 an8k stereo Filter idle/restart mismatch. Its negative is retained. The separate
 normal Width/Ring baseline passes72 cases, but delayed-first-input markers
-currently fail; their normal adoption also remains unaccepted. Wind/fire/vinyl original loop playback passes23
+currently fail; their normal adoption also remains unaccepted. The fresh-document candidate now passes216cases; a later reused-context replacement first-sample gate remains open. Wind/fire/vinyl original loop playback passes23
 full-resource/reuse cases plus immediate startup/quota checks; running-context
 paged-bank component passes five ownership/upload checks. Normal two-bed
 ownership and cleanup complete, but a strict summed PCM difference of7.45e-9
@@ -89,3 +89,8 @@ listening certification is inferred.
 
 No deployment, normal default replacement, physical listening certification or
 whole-migration completion is implied by this overnight checkpoint.
+
+Normal Shimmer adoption now passes18cases/30routedcomparisons exact across six
+rates plus actual full-page cold reconstruction. Generator shared-rack and
+offline CLASSIC/machine factory forwarding also pass actual All/reload3 and
+two cold score exports. See the prepared-host and Shimmer records.

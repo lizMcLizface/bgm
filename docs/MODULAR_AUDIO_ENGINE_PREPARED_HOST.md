@@ -90,3 +90,41 @@ The current Iowa factory is context-bound and runtime-only, forwarded to live
 Generator and fresh offline render contexts. The fixed measured host/reload3
 and Iowa-only20-note export (144000stereo frames, Int16peak1902) pass with owned
 source and owned bare-native limiter, retaining the full original native room.
+
+
+## Shimmer and complete rack-factory forwarding
+
+Shimmer now uses its accepted context-bound Rust factory in both normal voice
+paths. Its30 routed Native comparisons across six rates are exact, and actual
+cold page reload matches all three saved PCM hashes and complete settings.
+See MODULAR_AUDIO_ENGINE_SHIMMER_LIVE.md for the proved Native initialization
+race and unchanged source/DSP reference preparation.
+
+Prepared rack factories now also reach Generator's shared bus and section-space
+racks, plus both normal offline CLASSIC construction branches (melodic and drum
+machine). Shared preparation errors remain observable; running owners are armed
+before source readiness resolves. Disposal retires every owner, including late
+loading racks, and preserves cleanup failures. Omitted environments retain the
+Native path. The normal renderer also awaits an optional complete Ambience
+booking barrier after source starts and before rendering.
+
+Actual All Native-desk, Rust-desk and restored Rust-desk cases pass with51 owned
+dynamics instances, including the six newly forwarded shared instances
+(owned-host-shared-dynamics-final.json). This is actual routing, health and
+reconstruction evidence; the prepared source environment is used in all three
+cases, and no cross-backend PCM identity or physical device guarantee is claimed.
+
+Two cold normal renderPcm exports also pass: Juno melodic3notes and TR808 machine
+10notes, each144000stereo frames /288000Int16 samples at48k. Peaks are19935 and
+7432 respectively. Fresh OAC source/dynamics factories are context-bound, real
+processor targets are observed, due original source events apply without late
+events, owners/source cleanup completes, and settings plus source presets remain
+unchanged (owned-cold-classic-dynamics-export-final.json). The active fixture rack
+is authored through normal CLASSIC setRack; All's separate external drum UI rack
+is not falsely counted as the renderer's source rack. These are lifecycle/nonzero
+checks, not new Native PCM or arbitrary long-export acceptance.
+
+The combined prepared Shimmer/shared/offline contract tests pass75 across14files.
+Source-only piano/KS/CLASSIC/mixer manifest refreshes retain the accepted numeric
+Wasm bytes. Full public build and broader final regression remain a combined
+checkpoint after the independent pending ports settle. No deployment.

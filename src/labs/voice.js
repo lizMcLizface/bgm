@@ -49,7 +49,7 @@ export class LabVoice {
   this.channel=connectEnsembleChannel(c,source,this.echo??this.room,{gain:1,pan:0,sends:{dry:1,reverb:1,delay:1}});this.room.connect(this.output);
  }
  connect(node){this.output.connect(node);}
- async armRuntime(){await this.native?.armRuntime?.();if(this.context.state==='running')await this.echo?.arm?.();}
+ async armRuntime(){await this.native?.armRuntime?.();if(this.context.state==='running')await Promise.all([this.echo?.arm?.(),this.fx?.arm?.()]);}
  runtimeEchoStatus(){return{backend:this.echo?.backend??'none',hostVersion:this.echo?.hostVersion??null};}
  patchSource(p,options){this.effectivePatch=p;this.backend?.patch(sourcePerformance(p),options);}
  on(midi,velocity=.7){if(this.disposed)return null;const id=this.native?this.native.startNote(midi,velocity):this.backend.on(midi,velocity);this.keys.set(id,midi);return id;}

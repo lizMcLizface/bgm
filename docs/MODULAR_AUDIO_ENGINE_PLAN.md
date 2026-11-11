@@ -22,27 +22,38 @@ sequence gaps or controls are dropped. See
 AudioParam metadata cost is measured explicitly; desktop acceptance does not
 establish phone or background deadlines.
 
-Original Shimmer's live host passes 72 Native cases and cold replay. Its normal
-local/shared/Instrument adoption is under review: the first shared comparison
-failed, and Native readiness is being instrumented before any DSP change.
-Width/Ring's new independent-lane kernel passes 72 baseline Native cases and
-saved replay, but a stronger delayed-first-input marker exposes an unaccepted
-lifecycle mismatch. The separate low-rate Filter idle/restart negative is also
-retained. None of those pending results licenses normal adoption.
+Original Shimmer is now selected in the explicit prepared environment. Its
+normal Core/FM local/shared and Instrument routes pass 18 cases / 30 Native
+comparisons at six rates, all exact zero difference; actual cold page replay
+restores all three PCM hashes, settings and independent owners. The retained
+first shared failure was a proved Native initial-message race; same-port
+reference preparation fixes it without changing DSP, notes or source start.
+See MODULAR_AUDIO_ENGINE_SHIMMER_LIVE.md. Width/Ring's new independent-lane
+profile now passes 216 fresh-document cases, but a reused-context Ring
+replacement first-sample mismatch remains under investigation before adoption.
+The separate low-rate Filter idle/restart negative is retained too.
 
-Paged Ambience banks pass their five component ownership/upload checks.
-The normal two-bed test now completes cancellation, replacement, independent
-disposal and acknowledged cleanup, but strict summed-output bit parity finds
-a 7.45e-9 difference. Its cause is under review; the negative is retained.
-Native loop playback remains the prepared environment's current selection.
+Paged Ambience banks and normal live two-bed ownership now pass, including
+exact per-layer wet PCM through replacement, cancellation and disposal. Two
+untapped Native controls prove aggregate Float32 addition order can differ;
+that sum is checked with a derived arithmetic envelope. Offline final-booking
+snapshots fix a missed stop event, and all 12 normal raw source channels are
+bit exact through their endpoints. The Native-filtered offline tail still
+differs over 128 frames at about 1e-13 and is explicitly unaccepted. Native
+loop playback remains the prepared environment's current selection. See
+MODULAR_AUDIO_ENGINE_AMBIENCE_BANK_HOST.md and its spatial continuation plan.
 
-Latest broad regression remains 543 files / 4455 passing / 4 skipped, before
-the newest normal Shimmer/Ambience/Width-Ring work. Focused component records
+Latest intermediate broad regression is 563 files / 4603 passing / 4 skipped.
+The later prepared Shimmer/shared/offline integration passes 75 focused tests;
+normal All Native-desk/owned-desk/restored cases pass with 51 owned dynamics
+instances. Both normal CLASSIC and drum-machine cold score exports pass with
+fresh context-bound owned source/dynamics, nonzero PCM and unchanged settings. Focused component records
 name their exact later artifacts and results. The public build and complete
 regression will be refreshed after those source changes settle.
 
-Next: resolve the normal effect/loop lifecycle gates, adopt only their verified
-factories, then finish remaining Tape/Motion, shared sampled rooms and Ambience
+Next: resolve the remaining Width/Ring/Filter lifecycle gates and adopt only
+verified factories. Motion live and complete Ambience processing are being
+ported independently; then finish Tape, shared sampled rooms and Ambience
 spatial/fade/wander. General cable editing and broader worker execution remain
 later. Freeze capture retains its explicit worker/resource policy.
 

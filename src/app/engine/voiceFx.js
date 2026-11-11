@@ -47,17 +47,21 @@ export function fxTail(preset) {
 
 /** The effects as one block: input -> active stages -> output. */
 export class VoiceFx {
-    constructor(AC, preset, order = ['tape', 'motion', 'compressor', 'shimmer', 'freeze'], { compressorFactory } = {}) {
+    constructor(AC, preset, order = ['tape', 'motion', 'compressor', 'shimmer', 'freeze'], { compressorFactory, shimmerFactory } = {}) {
+        if(shimmerFactory!==undefined&&typeof shimmerFactory!=='function')throw Error('Invalid Shimmer factory');
+        shimmerFactory?.validatePreset?.({...PRESET_DEFAULTS,...preset});
+        this.validateShimmerPreset=shimmerFactory?.validatePreset;
         this.AC = AC;
         this.input = AC.createGain();
         this.output = AC.createGain();
-        this.stages = order.map((key) => ({ key, ...FX_STAGES[key], ...(key === 'compressor' && compressorFactory ? { create: compressorFactory } : {}), node: null, values: {} }));
+        this.stages = order.map((key) => ({ key, ...FX_STAGES[key], ...(key === 'compressor' && compressorFactory ? { create: compressorFactory } : {}), ...(key === 'shimmer' && shimmerFactory ? { create: shimmerFactory } : {}), node: null, values: {} }));
         this.signature = null;
         this.set(preset);
     }
 
     set(preset) {
         const p = { ...PRESET_DEFAULTS, ...preset };
+        this.validateShimmerPreset?.(p);
         for (const stage of this.stages) {
             if (!stage.node && !stage.active(p)) continue;
             stage.node ??= stage.create(this.AC, { hostLifetime: 'voicefx' });
@@ -85,16 +89,26 @@ export class VoiceFx {
         previous.connect(this.output);
     }
 
+    async arm() {
+        await this.ready;
+        if (this.AC.state === 'running') await Promise.all(this.stages.map(stage => stage.node?.arm?.()));
+    }
+
     clear() {
         for (const stage of this.stages) stage.node?.clear?.();
     }
 
     dispose() {
-        this.input.disconnect();
-        for (const stage of this.stages) {
-            stage.output?.disconnect();
-            stage.node?.dispose?.();
+        if(this.disposed)return this.disposal;
+        this.disposed=true;
+        const pending=[],errors=[],clean=fn=>{try{const result=fn();if(result?.then)pending.push(result);}catch(error){errors.push(error);}};
+        clean(()=>this.input.disconnect());
+        for(const stage of this.stages){clean(()=>stage.output?.disconnect());clean(()=>stage.node?.dispose?.());}
+        clean(()=>this.output.disconnect());
+        if(pending.length||errors.length){
+            this.disposal=Promise.allSettled(pending).then(results=>{for(const result of results)if(result.status==='rejected')errors.push(result.reason);if(errors.length)throw new AggregateError(errors,'Voice effects disposal failed');});
+            this.disposal.catch(error=>{this.disposalError=error;});
         }
-        this.output.disconnect();
+        return this.disposal;
     }
 }

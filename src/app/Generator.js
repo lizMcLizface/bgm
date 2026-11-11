@@ -844,14 +844,36 @@ class Generator {
     }
 
     disposeSharedEffects() {
+        if (this.sharedEffectsClosed) return this.sharedEffectsDisposal;
         this.sharedEffectsClosed = true;
-        this.ambience?.dispose?.();
-        this.busRack?.dispose();
-        this.spaceRack?.dispose();
+        const pending = [], errors = [], clean = fn => { try { const result = fn(); if (result?.then) pending.push(result); } catch (error) { errors.push(error); } };
+        for (const owner of [this.ambience, this.busRack, this.spaceRack]) clean(() => owner?.dispose?.());
+        for (const loading of [this.busLoading, this.spaceLoading]) if (loading) pending.push(loading);
         for (const r of Object.values(this.roles)) {
-            r.send?.disconnect();
-            r.spaceSend?.disconnect();
+            clean(() => r.send?.disconnect());
+            clean(() => r.spaceSend?.disconnect());
         }
+        if (pending.length || errors.length) {
+            this.sharedEffectsDisposal = Promise.allSettled(pending).then(results => {
+                for (const result of results) if (result.status === 'rejected') errors.push(result.reason);
+                if (errors.length) throw new AggregateError(errors, 'Shared effects disposal failed');
+            });
+            this.sharedEffectsDisposal.catch(error => { this.sharedEffectsDisposalError = error; });
+        }
+        return this.sharedEffectsDisposal;
+    }
+
+    sharedRackOptions(kind) {
+        return { pluginFactory: this.audioEnvironment?.rackPluginFactory, dynamicsFactory: this.audioEnvironment?.rackDynamicsFactory,
+            onError: error => { this[kind + 'Error'] = error; } };
+    }
+
+    async awaitSharedEffectsReady() {
+        if (!this.audioEnvironment) return;
+        await Promise.all([this.busLoading, this.spaceLoading]);
+        if (this.busError || this.spaceError) throw this.busError ?? this.spaceError;
+        if (!this.sharedEffectsClosed && this.AC.state === 'running')
+            await Promise.all([this.busRack, this.spaceRack].filter(Boolean).map(rack => rack.armRuntime?.()));
     }
 
     applyBus() {
@@ -859,8 +881,9 @@ class Generator {
         const bus = this.settings.bus, moves = this.moveState ?? {}, wantsMoves = this.settings.sequencer?.on && Object.keys(this.settings.sequencer.moves ?? {}).length > 0;
         if (!this.busRack) {
             if (!(busActive(bus) || wantsMoves) || this.busLoading) return;
-            this.busLoading = createBusRack(this.AC, bus.rack, this.mixReturn ?? this.output).then((rack) => {
-                if (this.sharedEffectsClosed) { rack.dispose(); return; }
+            this.busError = null;
+            this.busLoading = createBusRack(this.AC, bus.rack, this.mixReturn ?? this.output, this.sharedRackOptions('bus')).then(async (rack) => {
+                if (this.sharedEffectsClosed) { await rack.dispose(); return; }
                 this.busRack = rack;
                 for (const r of Object.values(this.roles)) {
                     r.send = this.AC.createGain();
@@ -871,7 +894,7 @@ class Generator {
                 }
                 this.routeSharedEffects();
                 this.applyBus();
-            }).catch((error) => console.error('Could not build the effects bus', error)).finally(() => { this.busLoading = null; });
+            }).catch((error) => { this.busError = error; if (this.sharedEffectsClosed) throw error; console.error('Could not build the effects bus', error); }).finally(() => { this.busLoading = null; });
             return;
         }
         this.busRack.patch({ ...bus.rack, ...Object.fromEntries(Object.entries(moves).filter(([key]) => !key.startsWith('send.'))) });
@@ -898,8 +921,9 @@ class Generator {
         if (this.sharedEffectsClosed) return;
         if (!this.spaceRack) {
             if (!(level > 0) || this.spaceLoading) return;
-            this.spaceLoading = createBusRack(this.AC, SPACE_RACK, this.mixReturn ?? this.output).then((rack) => {
-                if (this.sharedEffectsClosed) { rack.dispose(); return; }
+            this.spaceError = null;
+            this.spaceLoading = createBusRack(this.AC, SPACE_RACK, this.mixReturn ?? this.output, this.sharedRackOptions('space')).then(async (rack) => {
+                if (this.sharedEffectsClosed) { await rack.dispose(); return; }
                 this.spaceRack = rack;
                 for (const r of Object.values(this.roles)) {
                     r.spaceSend = this.AC.createGain();
@@ -909,7 +933,7 @@ class Generator {
                     r.spaceSend.connect(rack.input);
                 }
                 this.routeSharedEffects();
-            }).catch((error) => console.error('Could not build the section space', error)).finally(() => { this.spaceLoading = null; });
+            }).catch((error) => { this.spaceError = error; if (this.sharedEffectsClosed) throw error; console.error('Could not build the section space', error); }).finally(() => { this.spaceLoading = null; });
             return;
         }
         for (const [role, r] of Object.entries(this.roles)) r.spaceSend?.gain.setTargetAtTime(level * (SPACE_ROLE[role] ?? 1), time, barSeconds * 0.7);
@@ -1199,6 +1223,7 @@ class Generator {
 
     async awaitSourceReady() {
         await Promise.all(Object.values(this.roles).map(async ({instrument:i}) => { await i.ready; await i.sourceReady; await i.armRuntime?.(); if(i.error)throw i.error; const failure=i.sourceStatus?.().error; if(failure)throw Error(failure); }));
+        await this.awaitSharedEffectsReady?.();
     }
 
     async awaitRoleMotion({controls = this.AC.state === 'running'} = {}) {

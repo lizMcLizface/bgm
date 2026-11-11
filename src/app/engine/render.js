@@ -249,20 +249,20 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
             const instruments={},motionRoutes=[],cleanup=[()=>out.disconnect()],roomPool=Wasm&&PERFORMANCE.sharedReverb?new WasmRoomPool(ctx,out,{busFactory:audioEnvironment?.createEffectsBus}):null;
             if(roomPool)cleanup.push(()=>roomPool.dispose());
             // the shared effects bus, as the generator builds it (engine/bus.js)
-            const bus=busActive(gen.settings.bus)?await createBusRack(ctx,gen.settings.bus.rack,out):null;
+            const bus=busActive(gen.settings.bus)?await createBusRack(ctx,gen.settings.bus.rack,out,{pluginFactory:audioEnvironment?.rackPluginFactory,dynamicsFactory:audioEnvironment?.rackDynamicsFactory}):null;
             if(bus)cleanup.push(()=>bus.dispose());
-            const space=spaces.length?await createBusRack(ctx,SPACE_RACK,out):null;
+            const space=spaces.length?await createBusRack(ctx,SPACE_RACK,out,{pluginFactory:audioEnvironment?.rackPluginFactory,dynamicsFactory:audioEnvironment?.rackDynamicsFactory}):null;
             if(space)cleanup.push(()=>space.dispose());
             try{
             const motionFactory = audioEnvironment?.roleWanderFactory ?? (gen.roleWanderFactory ? await gen.roleWanderFactory.prepareContext?.(ctx) : null);
             if (gen.roleWanderFactory && !motionFactory) throw Error('Role-motion backend cannot prepare an offline context');
             for(const role of roles){
                 const inst = role === 'perc' && gen.roles.perc.machine
-                    ? await (await import('./classicsInstrument')).default.create({ sourceNodeFactory:audioEnvironment?.classicSourceNodeFactory,rackPluginFactory:audioEnvironment?.rackPluginFactory, context: ctx, preset: gen.roles.perc.instrument.preset, polyphony: 16 })
+                    ? await (await import('./classicsInstrument')).default.create({ sourceNodeFactory:audioEnvironment?.classicSourceNodeFactory,rackPluginFactory:audioEnvironment?.rackPluginFactory,rackDynamicsFactory:audioEnvironment?.rackDynamicsFactory, context: ctx, preset: gen.roles.perc.instrument.preset, polyphony: 16 })
                     : role === 'perc'
                     ? new (gen.percussionEngine && gen.percussionEngine !== 'native' ? WasmDrumKit : DrumKit)({ context: ctx, model:gen.percussionEngine })
                     : presets[role]?.iowa?await (await import('./iowaInstrument')).default.create({context:ctx,preset:presets[role],polyphony:gen.getRolePolyphony(role),sourceBackend:audioEnvironment?.iowaSourceBackend??'native',ordinaryCompressorFactory:audioEnvironment?.ordinaryCompressorFactory})
-                    : presets[role]?.classics?await (await import('./classicsInstrument')).default.create({sourceNodeFactory:audioEnvironment?.classicSourceNodeFactory,rackPluginFactory:audioEnvironment?.rackPluginFactory,context:ctx,preset:presets[role],polyphony:gen.getRolePolyphony(role)})
+                    : presets[role]?.classics?await (await import('./classicsInstrument')).default.create({sourceNodeFactory:audioEnvironment?.classicSourceNodeFactory,rackPluginFactory:audioEnvironment?.rackPluginFactory,rackDynamicsFactory:audioEnvironment?.rackDynamicsFactory,context:ctx,preset:presets[role],polyphony:gen.getRolePolyphony(role)})
                     : presets[role]?.diy?await (await import('./wasmInstrument')).default.create({audioEnvironment,polyphony:gen.getRolePolyphony(role),preset:presets[role],spec:(await import('./diySource')).diySpec(presets[role].diy,gen.getRolePolyphony(role)),context:ctx,roomPool,notes:notes.filter(n=>n.role===role&&n.time>=from&&n.time<end+(last?0:CROSSFADE)).map(n=>({...n,time:n.time-from}))})
                     : Wasm?await Wasm.create({audioEnvironment,polyphony:gen.getRolePolyphony(role),preset:presets[role],context:ctx,roomPool,dynamics:applyFeel(gen.settings).dynamics,notes:notes.filter(n=>n.role===role&&n.time>=from&&n.time<end+(last?0:CROSSFADE)).map(n=>({...n,time:n.time-from}))})
                     : new Instrument({ ...nativeInstrumentEnvironment(audioEnvironment,presets[role],ctx), polyphony: gen.getRolePolyphony(role), preset: presets[role], context: ctx });
@@ -344,6 +344,8 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
             volume.connect(ctx.destination);
             bed.connect(volume);
             bed.start(0, from);
+            // Freeze complete owned loop start/stop bookings before the offline thread runs.
+            await bed.prepareOffline?.();
         }
 
         // Progress as the render goes. On Cancel the context is left

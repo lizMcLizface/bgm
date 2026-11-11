@@ -191,9 +191,12 @@ class Instrument {
      * @param {object} [options.preset]
      * @param {BaseAudioContext} [options.context]
      */
-    constructor({ polyphony = 8, preset = {}, context = audioContext, deferReverb = false, reverbHub = null, fdnRoom = false, sourceBackend = 'native', voiceCompressorFactory = null, pianoSourceFactory = null, ordinaryCompressorFactory = null } = {}) {
+    constructor({ polyphony = 8, preset = {}, context = audioContext, deferReverb = false, reverbHub = null, fdnRoom = false, sourceBackend = 'native', voiceCompressorFactory = null, pianoSourceFactory = null, ordinaryCompressorFactory = null, shimmerFactory = null } = {}) {
         if (!['native', 'owned-rust'].includes(sourceBackend)) throw Error('Unsupported instrument source backend');
         if (pianoSourceFactory !== null && typeof pianoSourceFactory !== 'function') throw Error('Invalid piano source factory');
+        if (shimmerFactory !== null && typeof shimmerFactory !== 'function') throw Error('Invalid Shimmer factory');
+        shimmerFactory?.validatePreset?.({...PRESET_DEFAULTS,...preset});
+        this.validateShimmerPreset=shimmerFactory?.validatePreset;
         this.pianoSourceFactory = pianoSourceFactory;
         this.pendingSourceBookings = new Set(); this.sourceBackend = sourceBackend; this.pianoSource = null; this.pianoSourcePromise = null; this.pluckedSource = null; this.pluckedSourcePromise = null; this.sourceFailure = null;
         this.sourceBookingTrace = []; this.sourcePreparationLateFrames = 0; this.sourcePreparationLateBookings = 0;
@@ -210,7 +213,7 @@ class Instrument {
         this.bitCrush = new Nodes.BitCrusher(this.AC);
         this.tape = FX_STAGES.tape.create(this.AC);
         this.compressor = (voiceCompressorFactory ?? FX_STAGES.compressor.create)(this.AC, {hostLifetime:'instrument'});
-        this.shimmer = FX_STAGES.shimmer.create(this.AC);
+        this.shimmer = (shimmerFactory ?? FX_STAGES.shimmer.create)(this.AC);
         this.freeze = FX_STAGES.freeze.create(this.AC);
         this.delay = new Nodes.Delay(this.AC);
         this.pingPong = new Nodes.PingPongDelay(this.AC);
@@ -387,11 +390,11 @@ class Instrument {
     }
     prepareOffline() { return ownedSourceOf(this)?.prepareOffline(); }
     async armRuntime(){
-        if(!this.ordinaryDynamicsOwned)return;
+        if(!this.ordinaryDynamicsOwned&&!this.shimmer?.arm)return;
         await this.effectsReady;
         if(this.AC.state==='running'){
-            this.ordinaryArm ??= Promise.all([this.synthMix.arm?.(),this.limiter.arm?.()]).catch(error=>{this.ordinaryArm=null;throw error;});
-            await this.ordinaryArm;
+            if(this.ordinaryDynamicsOwned){this.ordinaryArm ??= Promise.all([this.synthMix.arm?.(),this.limiter.arm?.()]).catch(error=>{this.ordinaryArm=null;throw error;});await this.ordinaryArm;}
+            await this.shimmer?.arm?.();
         }
     }
     updateOrdinaryDemand(){
@@ -430,6 +433,7 @@ class Instrument {
      */
     applyPreset(preset) {
         const next = { ...PRESET_DEFAULTS, ...preset };
+        this.validateShimmerPreset?.(next);
         assertOwnedMaterial(this, next.stringModel);
         Object.keys(next).forEach((key) => this.set(key, next[key]));
         if (this.tempoTimingTouched) scheduleEffectTiming(this, 0, this.AC.currentTime);
@@ -443,6 +447,7 @@ class Instrument {
      */
     morphTo(preset, seconds) {
         const to = { ...PRESET_DEFAULTS, ...preset };
+        this.validateShimmerPreset?.(to);
         assertOwnedMaterial(this, to.stringModel);
         this.finishMorph();
         const from = { ...PRESET_DEFAULTS, ...this.preset };
@@ -493,6 +498,7 @@ class Instrument {
 
     /** Sets one preset parameter live - what the synth editor's knobs call. */
     set(key, value) {
+        this.validateShimmerPreset?.({...PRESET_DEFAULTS,...this.preset,[key]:value});
         if (key === 'stringModel') assertOwnedMaterial(this, value);
         if (this.morph && !this.morph.stepping) this.finishMorph();
         if (this.preset && this.preset[key] === value) return;
@@ -1095,10 +1101,8 @@ class Instrument {
         this.silence();
         clearTimeout(this.sleepTimer);
         ownedSourceOf(this)?.dispose();
-        this.effectsDisposal = Promise.allSettled([this.compressor,this.synthMix,this.limiter].filter(Boolean).map(owner=>Promise.resolve().then(()=>owner.dispose?.()))).then(results=>{const failed=results.find(r=>r.status==='rejected');if(failed)throw failed.reason;}).catch(error => { this.effectsDisposalError = error; });
+        this.effectsDisposal = Promise.allSettled([this.compressor,this.synthMix,this.limiter,this.shimmer,this.freeze].filter(Boolean).map(owner=>Promise.resolve().then(()=>owner.dispose?.()))).then(results=>{const failed=results.find(r=>r.status==='rejected');if(failed)throw failed.reason;}).catch(error => { this.effectsDisposalError = error; });
         this.voices.forEach((synth) => synth.destroy());
-        this.shimmer.dispose();
-        this.freeze.dispose();
         this.reverb.dispose?.();
         this.output.disconnect();
     }

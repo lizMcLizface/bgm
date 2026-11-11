@@ -1,0 +1,6 @@
+import {it,expect,vi} from 'vitest';
+vi.mock('../../synths/effects/graph',()=>({createRack:vi.fn()}));
+import {createRack} from '../../synths/effects/graph';
+import {createBusRack} from './bus.js';
+it('retires a newly allocated rack before propagating a failed destination connection',async()=>{const context={},values={},destination={},failure=Error('destination rejected');let finish,started;const disposing=new Promise(resolve=>started=resolve);const rack={connect:vi.fn(()=>{throw failure;}),dispose:vi.fn(()=>{started();return new Promise(resolve=>finish=resolve);})};createRack.mockResolvedValueOnce(rack);const options={dynamicsFactory:()=>{}},result=createBusRack(context,values,destination,options),rejected=expect(result).rejects.toBe(failure);await disposing;expect(createRack).toHaveBeenLastCalledWith(context,values,options);expect(rack.dispose).toHaveBeenCalledOnce();finish();await rejected;});
+it('keeps the primary connection error when owner cleanup also fails',async()=>{const failure=Error('connect'),cleanupError=Error('cleanup');createRack.mockResolvedValueOnce({connect(){throw failure;},async dispose(){throw cleanupError;}});await expect(createBusRack({}, {}, {})).rejects.toBe(failure);expect(failure.cleanupError).toBe(cleanupError);});

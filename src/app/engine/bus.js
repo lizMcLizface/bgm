@@ -16,10 +16,14 @@ export const BUS_RULES = {
 };
 export const busActive = (bus) => BUS_ROLES.some((role) => bus?.sends?.[role] > 0);
 /** The bus's rack, connected to `destination`. */
-export async function createBusRack(context, rack, destination) {
+export async function createBusRack(context, rack, destination, options = {}) {
     const { createRack } = await import('../../synths/effects/graph');
-    const node = await createRack(context, rack);
-    node.connect(destination);
+    const node = await createRack(context, rack, options);
+    try { node.connect(destination); }
+    catch (error) {
+        try { await node.dispose(); } catch (cleanupError) { error.cleanupError = cleanupError; }
+        throw error;
+    }
     return node;
 }
 /** How long the bus rings on after its input stops (for renders). */
