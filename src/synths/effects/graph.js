@@ -22,7 +22,8 @@ export const spaceStagePacket=(kind,e)=>kind==='reverb'?{...e,delay:0,delayToRev
 // each later effect treats the two channels separately; the compressor (a stereo-linked DynamicsCompressorNode) sees both
 // channels at once, so a compressor after the modulation effects reacts to the combined level and one before them does not;
 // the space unit is stereo in and out (ping-pong and width act on the two channels).
-export async function createRack(context,values,{onError=()=>{},instances=null,pluginFactory,dynamicsFactory}={}){
+export async function createRack(context,values,{onError=()=>{},instances=null,pluginFactory,dynamicsFactory,nativeFactory}={}){
+ if(nativeFactory!==undefined&&typeof nativeFactory!=='function')throw Error('Invalid prepared rack Width/Ring factory');
  if(dynamicsFactory!==undefined&&typeof dynamicsFactory!=='function')throw Error('Invalid prepared rack dynamics factory');
  const pool=[]; // inserts kernel instances, created as the order needs them
  const extra={}; // added units' stages, created when first put in the chain
@@ -78,7 +79,7 @@ export async function createRack(context,values,{onError=()=>{},instances=null,p
   const runs=stages.filter(s=>s.kind==='inserts');
   while(pool.length<runs.length){const inst=await createInstrumentInserts(context,rackPackets(latest).inserts,{onError});if(disposed){inst.dispose();return false;}pool.push(inst);}
   for(const stage of stages)if((stage.kind==='reverb'||stage.kind==='delay')&&!split[stage.kind]){const bus=await createEffectsBus(context,spaceStagePacket(stage.kind,rackPackets(latest).effects),{onError});if(disposed){bus.dispose();return false;}split[stage.kind]=bus;}
-  for(const stage of stages)if(EXTRA_KINDS.includes(stage.kind)&&!extra[stage.kind]){const made=await createExtraStage(context,stage.kind,{pluginFactory,dynamicsFactory,onError,initialPacket:rackPackets(latest).extras[stage.kind]});if(disposed){made.dispose();return false;}extra[stage.kind]=made;made.patch(rackPackets(latest).extras[stage.kind],true);}
+  for(const stage of stages)if(EXTRA_KINDS.includes(stage.kind)&&!extra[stage.kind]){const made=await createExtraStage(context,stage.kind,{pluginFactory,dynamicsFactory,nativeFactory,onError,initialPacket:rackPackets(latest).extras[stage.kind]});if(disposed){await made.dispose();return false;}extra[stage.kind]=made;made.patch(rackPackets(latest).extras[stage.kind],true);await made.prepareInitial?.();if(disposed)return false;}
   for(const stage of stages)if(DRIVE_PEDALS[stage.kind]&&!drives[stage.instance.id]){const made=createDriveStage(context,stage.kind);drives[stage.instance.id]=made;made.patch(stage.instance,true);}
   return true;
  };
@@ -121,11 +122,12 @@ export async function createRack(context,values,{onError=()=>{},instances=null,p
  try{
   const stages=stagesOf(values);
   if(!await ensure(stages))return null;
-  wire(stages);
-  patch(values,true);
+  const preparedExtras=Object.values(extra).filter(s=>s.prepareInitial);
+  if(preparedExtras.length){patch(values,true);await Promise.all(preparedExtras.map(s=>s.prepareInitial()));if(disposed)return null;wire(stages);}
+  else{wire(stages);patch(values,true);}
   return {input,node:output,dynamicsBackend:ownedCompressor?'owned-rust':'native',armRuntime:()=>Promise.all([ownedCompressor,...Object.values(extra)].filter(s=>s?.arm).map(s=>s.arm())),patch,setInstances:next=>patch(latest,false,next),connect:destination=>output.connect(destination),clear(){pool.forEach(i=>i.clear());Object.values(extra).forEach(s=>s.clear?.());Object.values(split).forEach(b=>b.clear());effects?.clear();},get reduction(){return metering?(ownedCompressor?ownedCompressor.reduction:compressor.getNode().reduction):0;},get meters(){
    let peak=0;if(metering&&stagesOf(latest).some(s=>s.kind==='compressor')){detector.getFloatTimeDomainData(detectorSamples);for(const s of detectorSamples)peak=Math.max(peak,Math.abs(s));}
    return {compressorInputDb:20*Math.log10(Math.max(1e-5,peak)),limiterReduction:extra.limiter?.reduction??0,drivePeaks:Object.fromEntries(Object.entries(drives).filter(([id])=>instanceGraph?.chain.includes(id)).map(([id,s])=>[id,s.peak]))};
   },dispose};
- }catch(error){dispose();throw error;}
+ }catch(error){await dispose();throw error;}
 }

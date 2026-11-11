@@ -134,6 +134,12 @@ export const EXTRA_KINDS = Object.keys(BUILDERS);
 
 /** One added unit as a stage: { input, output, patch(packet, initial), dispose() }. A switched-off unit passes the signal straight through. */
 export async function createExtraStage(context, kind, options={}) {
+    if((kind==='width'||kind==='ring')&&options.nativeFactory){
+        if(typeof options.nativeFactory!=='function')throw Error('Invalid prepared Width/Ring factory');
+        const stage=await options.nativeFactory(context,{kind,onError:options.onError??(()=>{})});
+        if(!stage?.input||!stage.output||typeof stage.patch!=='function'||typeof stage.prepareInitial!=='function'){await stage?.dispose?.();throw Error('Invalid prepared Width/Ring extra stage');}
+        return stage;
+    }
     if(kind==='limiter'&&options.dynamicsFactory){
         if(typeof options.dynamicsFactory!=='function')throw Error('Invalid prepared limiter factory');
         const stage=options.dynamicsFactory(context,{kind:'limiter',onError:options.onError??(()=>{})});

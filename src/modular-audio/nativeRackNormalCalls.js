@@ -1,0 +1,7 @@
+import{rackNativeSpec}from'./ownedNativeRack.js';
+/** Original setters in original order. Raw GUI values and native Float32 targets remain distinct. */
+export function nativeRackNormalCalls(kind,rate,settings){if(!['width','ring'].includes(kind))throw Error('Normal native rack supports Width and Ring only');const fields=kind==='width'?['amount']:['freq','mix'];if(!settings||Object.keys(settings).length!==fields.length||!fields.every(k=>Object.hasOwn(settings,k)))throw Error('Complete native Width/Ring GUI settings required');const s=rackNativeSpec(kind,rate,{initial:settings}).initial;return Object.freeze((kind==='width'?[[0,(1+s.amount)/2],[1,(1+s.amount)/2],[2,(1-s.amount)/2],[3,(1-s.amount)/2]]:[[0,s.freq],[1,s.mix],[2,1-s.mix]]).map(([lane,value])=>Object.freeze({lane,value:Math.fround(value)})));}
+/** Adapter boundary, NOT a transport. Reserve whole call before any write, then
+ * capture each original currentTime read independently. A writer must provide
+ * lossless authored-field publication; AP slot transport is currently ungated. */
+export function writeNativeRackNormalPatch(writer,context,kind,settings,initial=false){if(typeof initial!=='boolean'||typeof writer?.preflight!=='function'||typeof writer?.write!=='function')throw Error('Invalid native rack call writer');const calls=nativeRackNormalCalls(kind,context.sampleRate,settings),seconds=context.currentTime;writer.preflight(calls.length,seconds);for(let i=0;i<calls.length;i++)writer.write(calls[i].lane,calls[i].value,{initial,seconds:i?context.currentTime:seconds});return calls;}

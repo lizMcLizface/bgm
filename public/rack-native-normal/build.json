@@ -1,0 +1,38 @@
+{
+  "api": 1,
+  "profile": "native-rack-independent-lanes-v1",
+  "source": "a259a99f55a00d9a741a9fc135b62c636c950656f2c88fdb6ba19a18f0aa35ec",
+  "wasm": "64136583278673e5e23d198d03863fc34ebe1826f45806634bd258943a47f4e8",
+  "version": "3eccb77c7e28803e",
+  "bytes": 133090,
+  "audited": false,
+  "activityModes": [
+    "unpulled",
+    "parameters-only",
+    "audio"
+  ],
+  "notices": "f76bdbeae7a86d239ed107f5e6e1d871cba06136b198adac4f1e41cbb6fd3972",
+  "profileSha256": "459246eb6dac9c113629de58a48a82a69cc98ed2bb8d032edae47059f492591b",
+  "files": [
+    "tools/buildRackNativeNormal.mjs",
+    "synth-engine/rack-native-normal/Cargo.toml",
+    "synth-engine/rack-native-normal/Cargo.lock",
+    "synth-engine/rack-native-normal/src/lib.rs",
+    "synth-engine/rack-native-normal/src/timeline.rs",
+    "synth-engine/rack-native-normal/src/oscillator.rs",
+    "synth-engine/rack-native-normal/src/allocation.rs",
+    "synth-engine/rack-native-normal/CHROMIUM_NOTICES.txt",
+    "synth-engine/rack-native-normal/CHROMIUM_PROFILE.json",
+    "synth-engine/piano-live/src/live_timeline.rs",
+    "synth-engine/piano-live/src/live_sine.rs",
+    "synth-engine/tape-fx/resources/manifest.json",
+    "src/modular-audio/ownedNativeRackNormal.js",
+    "src/modular-audio/nativeRackNormalCalls.js"
+  ],
+  "resources": [
+    "synth-engine/tape-fx/resources/chromium-sine-2048.f32",
+    "synth-engine/tape-fx/resources/chromium-sine-4096.f32",
+    "synth-engine/tape-fx/resources/chromium-sine-16384.f32"
+  ],
+  "scope": "Independent original Width four-gain and Ring three-control lanes; native constructor intrinsics; explicit audio/parameters-only/unpulled and authored/observed clocks; no default host routing selected"
+}

@@ -1,0 +1,21 @@
+{
+  "api": 1,
+  "profile": "native-rack-normal-stamped32-v1",
+  "version": "6d0e5662ee01deee",
+  "kernelVersion": "3eccb77c7e28803e",
+  "wasm": "64136583278673e5e23d198d03863fc34ebe1826f45806634bd258943a47f4e8",
+  "source": "073f6698cddfa11f7f8f9370936bc52561892e743ee1214cc370420636f00a37",
+  "processor": "ae20e8d076ccd0e06ca83ee9d1563477f43c59bf2c07c1584b904d5da951c473",
+  "processorName": "native-rack-normal-6d0e5662ee01deee",
+  "files": [
+    "src/modular-audio/nativeRackNormalProcessor.js",
+    "src/modular-audio/nativeRackNormalBrowser.js",
+    "src/modular-audio/nativeRackNormalRust.js",
+    "src/modular-audio/nativeRackNormalCalls.js",
+    "src/modular-audio/ownedNativeRackNormal.js",
+    "src/modular-audio/hostRenderClock.js",
+    "src/modular-audio/rackDynamicsTargetTransport.js",
+    "src/modular-audio/stampedRackTargetTransport.js"
+  ],
+  "scope": "Candidate normal Width/Ring inner-stage worklet with32 stamped authored scalar records; no default routing selected; actual native/normal-host gates required."
+}
