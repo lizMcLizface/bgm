@@ -46,15 +46,20 @@ adopted in prepared hosts; the exact focused case counts are in their component
 records. KS and shared piano-controller adoption also pass actual normal hosts.
 Original local/shared echo has75 accepted live/reuse cases and24 actual normal
 LabVoice route comparisons at six rates with zero measured difference. Rack
-compressor/limiter references pass147 cases; normal per-call target transport
-and Graph/extras adoption remain in progress.
+compressor/limiter now passes225 actual Native cases across atomic references,
+independent per-call targets and normal hosts; actual All/reload also passes.
+The bounded stamped record transport preserves complete ordered controls.
+See MODULAR_AUDIO_ENGINE_STAMPED_TARGET_TRANSPORT.md for measured metadata cost.
 
 Width/Filter/Ring captured DSP passes36 cases. The corrected live candidate
 passes216 short cases and the48k long/delayed gate, but the expanded gate finds
-an8k stereo Filter idle/restart mismatch. Its negative is retained; live normal
-adoption remains unaccepted. Wind/fire/vinyl original loop playback passes23
+an8k stereo Filter idle/restart mismatch. Its negative is retained. The separate
+normal Width/Ring baseline passes72 cases, but delayed-first-input markers
+currently fail; their normal adoption also remains unaccepted. Wind/fire/vinyl original loop playback passes23
 full-resource/reuse cases plus immediate startup/quota checks; running-context
-paged-bank upload and normal ambience adoption remain in progress.
+paged-bank component passes five ownership/upload checks. Normal two-bed
+ownership and cleanup complete, but a strict summed PCM difference of7.45e-9
+remains under diagnosis before acceptance.
 
 Then finish remaining effect host rewiring/demand, shared-room/transport latency
 composition and original ambience spatial/fade/wander/BufferSource ownership.

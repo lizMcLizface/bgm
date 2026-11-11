@@ -1,52 +1,56 @@
 # Modular audio engine and parallel rendering plan
 
-Current continuation —11 November2026:
+Current continuation — 11 November 2026:
 The active task is to close the active instrument/effect ports in the explicit
-prepared Rust environment. Existing defaults and legacy playback stay operational;
-hidden standalone measured cello remains deferred. This is not yet an all-Rust
-application or a normal-default replacement.
+prepared Rust environment. Native defaults and legacy playback remain operational;
+hidden standalone measured cello stays deferred. This is not yet an all-Rust
+application or a default-backend replacement.
 
-Accepted normal hosts include original Core/FM transitions, fourteen CLASSIC
-models, piano/KS physical sources, Iowa sources, original inserts/FDN, desk/role
-motion, weather and VoiceCompressor. The ordinary Instrument mix/limiter pair
-passes18 sample-bit-exact native-chain cases plus full desk/reload/export.
-Iowa's distinct bare-native/property limiter passes5 exact full-room comparisons;
-its actual measured six-role desk/reload3 and cold20-note/144000-frame export
-also pass (Int16 peak1902, song unchanged). See
-[prepared hosts](MODULAR_AUDIO_ENGINE_PREPARED_HOST.md),
-[ordinary Instrument dynamics](MODULAR_AUDIO_ENGINE_INSTRUMENT_DYNAMICS.md),
-[Iowa limiter](MODULAR_AUDIO_ENGINE_IOWA_LIMITER_LIVE.md) and the port inventory.
+Accepted normal hosts cover Core/FM transitions, fourteen CLASSIC models,
+piano/KS and Iowa sources, original inserts/FDN, desk/role motion, weather,
+VoiceCompressor, the ordinary Instrument compressor/limiter pair and Iowa's
+separate limiter. Original echo has 75 live/reused cases plus 24 exact normal
+local/shared route comparisons at six sample rates.
 
-Crusher/Pitch/ZPlane have accepted native/reload/ordered-rack and normal-host
-composition. Width/Filter/Ring captured DSP passes36 comparisons and saved replay;
-live activity/tail/GUI arrival contracts remain under final acceptance. Loop
-playback passes full original resources at6rates, shape crossfades and reused
-contexts (23 cases, exact bits), plus immediate startup and acknowledged quota
-cleanup; normal running-context upload policy remains separate. Original echo
-now has75 live/reuse cases plus24 exact normal local/shared route comparisons.
-Rack dynamics has147 exact reference cases; normal per-call adoption is active.
-The expanded low-rate Filter idle/restart gate remains open.
+The rack compressor/limiter transport now passes 225 actual Native cases:
+147 atomic references, 60 independent per-call lanes and 18 normal host cases.
+The actual All Native/owned/restored desk also passes with 45 independent owners.
+A partial-record publication bug was fixed with bounded stamped records; no
+sequence gaps or controls are dropped. See
+[stamped transport](MODULAR_AUDIO_ENGINE_STAMPED_TARGET_TRANSPORT.md) and
+[normal dynamics](MODULAR_AUDIO_ENGINE_RACK_DYNAMICS_NORMAL.md). The additional
+AudioParam metadata cost is measured explicitly; desktop acceptance does not
+establish phone or background deadlines.
 
-Latest broad regression:543files,4455passing/4skipped. The earlier two
-partial-owner demand/teardown failures are corrected, including a regression
-proving all owners clean up even when the first throws. Original echo captured
-DSP passes25 actual Native cases and cold reload; its live host remains next.
-The longer live Filter idle/restart gate exposed a mismatch and remains open;
-independent dynamics acceptance continues separately. Public build plus34 provenance gates passed
-before the latest Iowa environment/final cleanup edits; source/host fingerprints
-are refreshed again with this checkpoint, without changing accepted numeric code.
+Original Shimmer's live host passes 72 Native cases and cold replay. Its normal
+local/shared/Instrument adoption is under review: the first shared comparison
+failed, and Native readiness is being instrumented before any DSP change.
+Width/Ring's new independent-lane kernel passes 72 baseline Native cases and
+saved replay, but a stronger delayed-first-input marker exposes an unaccepted
+lifecycle mismatch. The separate low-rate Filter idle/restart negative is also
+retained. None of those pending results licenses normal adoption.
 
-Next: finish the grouped live rack/loop/echo gates and adopt their proved context
-factories, then remaining native voice effects, complete sampled-room latency/
-shared ownership and ambience spatial/fade/wander. General cable editing and
-broader worker-pool execution remain later. Do not relabel earlier artifacts as
-new code or infer phone/device headroom from desktop PCM checks.
+Paged Ambience banks pass their five component ownership/upload checks.
+The normal two-bed test now completes cancellation, replacement, independent
+disposal and acknowledged cleanup, but strict summed-output bit parity finds
+a 7.45e-9 difference. Its cause is under review; the negative is retained.
+Native loop playback remains the prepared environment's current selection.
 
-The requested push through111d282 completed as lizMcLizface; subsequent verified
-steps are local commits under that identity. No deployment. Generated evidence
-and temporary scripts stay under ignored reports/ and reports/scripts/. The
-dated records below retain their original commit-specific results and may describe
-superseded states; linked focused component records are the current authority.
+Latest broad regression remains 543 files / 4455 passing / 4 skipped, before
+the newest normal Shimmer/Ambience/Width-Ring work. Focused component records
+name their exact later artifacts and results. The public build and complete
+regression will be refreshed after those source changes settle.
+
+Next: resolve the normal effect/loop lifecycle gates, adopt only their verified
+factories, then finish remaining Tape/Motion, shared sampled rooms and Ambience
+spatial/fade/wander. General cable editing and broader worker execution remain
+later. Freeze capture retains its explicit worker/resource policy.
+
+The requested push through 111d282 completed as lizMcLizface; subsequent verified
+steps are local commits under that identity. Nothing has been deployed.
+Generated evidence and temporary scripts stay under ignored reports/ and
+reports/scripts/. The retained dated records below describe their own exact
+checkpoints and may contain superseded next tasks.
 
 ## Retained roadmap and dated delivery records
 
