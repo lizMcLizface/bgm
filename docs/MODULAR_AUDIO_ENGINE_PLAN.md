@@ -1275,3 +1275,6 @@ Next work: finish independent remaining source preparation/native host-chain
 ports and broaden the fixed browser batch to their actual paths. Preserve the
 original Tape/Motion, envelopes/filter/colour, aux returns and ambience seams
 until their individual graphs are ported and compared. No push/deployment.
+
+
+Full-page persistence is now verified too. The fixed review page adds a saved-graph check that requires an actual NavigationTiming reload. In the built-in browser, a fresh page reload retained the canonical patch, then a new AudioWorklet rendered145792frames exactly against the direct reference (first signal437,peak0.060658469796180725). The stored SHA256 is08bd9a869774211c9fafe71186ec34574737e04e5cc8d37013d4c0679ee5bcce. See owned-ports-page-reload-browser.json/.png. Four focused harness tests pass. This uses an isolated review-page storage key; the All song/defaults are unchanged.

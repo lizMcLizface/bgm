@@ -3,7 +3,7 @@
   "version": 1,
   "status": "running",
   "startedAtUtc": "2026-11-10T23:19:46Z",
-  "updatedAtUtc": "2026-11-11T00:31:22.856Z",
+  "updatedAtUtc": "2026-11-11T00:35:09.603Z",
   "featureCutoffUtc": "2026-11-11T08:30:00Z",
   "deadlineUtc": "2026-11-11T09:00:00Z",
   "gitIdentity": {
@@ -17,7 +17,8 @@
     "904b541",
     "1d6291b",
     "bee2764",
-    "fff00db"
+    "fff00db",
+    "60c553b"
   ],
   "graph": {
     "api": 1,
@@ -43,15 +44,15 @@
     "existingAllocationCases": 30,
     "combinedAllocationCases": 9,
     "desktopBrowser": "owned-ports-desktop-browser.json",
-    "liveOutputBrowser": "owned-ports-live-browser.json"
+    "liveOutputBrowser": "owned-ports-live-browser.json",
+    "pageReloadBrowser": "owned-ports-page-reload-browser.json"
   },
   "limitations": [
     "No physical listening/device-underrun claim",
     "Freeze worker-only; exact synchronous capture may exceed one callback",
     "Only integer path differences compensated; FM fractional differences reject",
     "Workbench still five pitched plus percussion source buses",
-    "Native WebAudio Tape/Motion, complete envelope/filter/colour and ambience host seams not fully migrated",
-    "Full-page persistence reload not yet checked"
+    "Native WebAudio Tape/Motion, complete envelope/filter/colour and ambience host seams not fully migrated"
   ],
   "next": "Continue independent remaining source preparation and host-chain ports, then broaden fixed desktop verification. Stop features08:30 and hand off09:00."
 }
