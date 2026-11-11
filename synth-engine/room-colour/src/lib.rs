@@ -1,6 +1,6 @@
 //! Original RoomColour pre-delay and damping, with native20ms a-rate controls.
 //! Portable processing only: no WebAudio objects, threads or platform clocks.
-mod target;
+#[path="../../common/native_target.rs"] mod target;
 mod delay;
 #[path="../../tape-fx/src/tone.rs"] mod tone;
 #[cfg(feature="allocation-audit")]mod allocation;

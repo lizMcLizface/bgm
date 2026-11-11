@@ -96,6 +96,10 @@ impl Gain {
     pub fn seal(&mut self) {
         self.sealed = true;
     }
+    /// Immediate intrinsic-value edit at a canonical host control boundary.
+    pub fn force(&mut self, value: f64) {
+        self.initial=value as f32; self.clear_events();
+    }
     pub fn clear_events(&mut self) {
         self.events.clear();
         self.sealed=false;
