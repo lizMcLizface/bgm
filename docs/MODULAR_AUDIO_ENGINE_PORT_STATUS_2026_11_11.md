@@ -13,17 +13,17 @@ accepted results refer to the exact artifacts and cases in the linked records.
 | Core / FM / percussion | Existing original algorithms with independent Rust state, timestamped source graphs and actual six-role fixture; configured kit palettes | Normal All transport remains separate from explicit finite previews |
 | Classic synths | Owned original model0..13 composite sources, source-local canonical clocks and captured controls/waves | Normal live host/keyboard/sequence adoption |
 | Piano / plucked | Owned preparation, finite voice allocation/envelopes/stealing and source graph integration; actual native pitch-clock checks | Broader sample-rate/live capture and native room/host stages |
-| Iowa | Owned measurement preparation and Held/Decay/Roll graph voices | Native room/limiter and normal live host adoption; retain complete long IR |
+| Iowa | Owned preparation and graph voices plus bounded normal live Rust player;270source/270allocation,18full-player and3live-port cases | Normal native room/limiter remain until composed owned-room adoption |
 | Long / Live measured strings | Actual measured preparation and owned24-slot dry source;40 native source/body cases including reset/cancel/saved independence | Graph source registration and owned worker body stage; current body proof uses original native convolver |
 | Short / Pizzicato | Actual finite preparation, full original RNG/wake/fades and owned fixed-buffer playback;60 source comparisons,60 allocation cases,12 native playback cases | Timestamped multi-note Graph/worker scheduling, voice stealing and normal live preparation worker adoption |
 | Inserts / sends / rack effects | Owned original insert/send kernels, Crusher/Pitch/ZPlane, Shimmer/Freeze, Motion and full pinned Tape in the graph | Complete original host enable/bypass/rewire policies and shared/parallel routes; Freeze remains worker-only |
-| Native compressor core | Static and original-seconds captured modes, canonical clocks/lookahead, Graph28/29 and PDC; actual native fixed batches | Extreme192k knee-math discrepancy discovered by Voice wrapper; fixed batches are bounded evidence |
-| Active VoiceCompressor wrapper | Captured requested-value makeup topology and k/a-rate automation; functional/lifecycle/allocation checks | UNACCEPTED numerical profile:46/48 native cases; two192k extreme cases exceed unchanged peak-error bound |
+| Native compressor core | Accepted pinned FMA3 profile; static/captured/Graph28/29, plus384 independent native cases | Live host control/bypass integration; profile is explicit rather than universal browser-bit identity |
+| Active VoiceCompressor wrapper | Captured topology now48/48 native cases under unchanged bounds; prior failures retained | Live bypass/reconnect, dynamic targets and normal application adoption |
 | Mixer / limiter | Owned strip/matrix/fader/limiter, deterministic seam reference and immutable opt-in actual All desk; native/owned/restored built-host cases pass | Default adoption, live hot swap and portable ownership of external shared routes |
 | Streaming weather | Owned actual rain/thunder/waves, bounded state, three-stem worklet and routed PCM/reload proof | Portable original spatial/wander chains and normal host adoption |
 | Wind / fire / vinyl | Exact source loops and bounded preparation worker, opt-in original Ambience consumer;12 native host cases | Portable BufferSource fractional offset/resampling, spatial/wander/fade host and aggregate adoption |
-| Static convolution | Independent zero-adapter-delay mono/stereo kernel, full327680-frame IR, exact timing/routing, native body comparisons | Worker-only; longer IR execution and streaming graph/transport ownership, not just a larger constant |
-| Sampled/piano room preparation | Original six FLAC transforms and seeded piano IR, Float32 normalization profile,12 native output comparisons plus3 complete oversized-resource refusals | Native decoding/resampling, RoomColour, wet/dry/shared route/live IR transitions; full Iowa/high-rate IR exceeds accepted convolver limit |
+| Static convolution | Original profile exact; explicit long profile2,097,152frames;11native cases and3routed worker streams with500ms declared delay | Compose actual dry/wet/colour/control paths; worker-only, with bounded memory/latency policy |
+| Sampled/piano room preparation | Original six FLAC transforms and seeded piano IR, Float32 normalization profile,12 native output comparisons plus3 complete oversized-resource refusals | Native decoding/resampling, RoomColour, wet/dry/shared route/live IR transitions; full Iowa/high-rate IR now fits separately accepted long profile |
 
 ## Next concrete task
 
@@ -42,8 +42,8 @@ explicitly refuse192k piano/full rooms and untrimmed Iowa. Longer execution
 needs reviewed partitioning, memory and producer/consumer headroom evidence,
 not truncation or an inferred realtime fallback.
 
-In parallel, resolve the VoiceCompressor native global-log10f math profile and
-port the remaining original spatial/RoomColour/host-control seams. The active
+The VoiceCompressor native global-log10f discrepancy is resolved by the accepted
+pinned FMA3 profile. Next port the remaining live bypass, spatial and host-control seams. The active
 amount-zero bypass and native node rewiring are separate from the accepted
 compressor core. Adopt complete live controls/transport only after full-path
 clocks, conflicts, cancellation, persistence and desktop output checks pass.

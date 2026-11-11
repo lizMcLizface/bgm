@@ -4,18 +4,18 @@ const DEFAULT_ROOM = .25;
 
 /** The generator's instrument contract for a voice measured from recordings (preset.iowa, docs/IOWA_INSTRUMENTS.md), on the role's output like a classic synth. */
 export default class IowaInstrument {
-    static async create({ context, preset, polyphony = 8 }) {
-        const instrument = new IowaInstrument(context, preset, polyphony);
+    static async create({ context, preset, polyphony = 8, sourceBackend = 'native' }) {
+        const instrument = new IowaInstrument(context, preset, polyphony, sourceBackend);
         try {
             await instrument.player.ready;
             await instrument.player.load(preset.iowa);
             return instrument;
         } catch (error) { instrument.dispose(); throw error; }
     }
-    constructor(context, preset, polyphony) {
+    constructor(context, preset, polyphony, sourceBackend = 'native') {
         this.AC = context; this.preset = preset; this.polyphony = polyphony;
         this.output = context.createGain(); this.output.gain.value = preset.masterVolume ?? 1;
-        this.player = new IowaPlayer(context).connect(this.output);
+        this.player = new IowaPlayer(context, { backend: sourceBackend }).connect(this.output);
         this.player.setRoom(preset.reverbAmount ?? DEFAULT_ROOM);
         this.player.setVibrato(preset.vibrato ?? 1);
         this.reverb = { settled: true }; this.held = new Map(); this.lastUntil = 0;

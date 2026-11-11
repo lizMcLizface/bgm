@@ -17,7 +17,7 @@ export class OwnedRoomColour{
  refresh(){this.alive();this.memory=this.e.memory.buffer;this.input=Array.from({length:this.spec.channels},(_,c)=>new Float32Array(this.memory,this.e.room_colour_input(this.handle,c),2048));this.output=Array.from({length:this.spec.channels},(_,c)=>new Float32Array(this.memory,this.e.room_colour_output(this.handle,c),2048));this.controls=[0,1].map(c=>new Float32Array(this.memory,this.e.room_colour_controls(this.handle,c),128));}
  render(n){this.alive();if(!Number.isInteger(n)||n<0||n>2048)throw Error('RoomColour render bounds');if(this.memory!==this.e.memory.buffer)throw Error('RoomColour memory changed; refresh outside render');this.check(this.e.room_colour_render(this.handle,n));}
  schedule(parameter,seconds,value){this.alive();const i=keys.indexOf(parameter);if(i<0||typeof seconds!=='number'||!Number.isFinite(seconds)||seconds<0||seconds*this.spec.sampleRate>9007199254740864||!valid(parameter,value))throw Error('Invalid RoomColour live control');this.check(this.e.room_colour_schedule(this.handle,i,seconds,value));this.currentTargets[parameter]=value;}
- reset(){this.alive();this.e.room_colour_reset(this.handle);}
+ reset(){this.alive();this.e.room_colour_reset(this.handle);this.currentTargets={...this.spec.initial};}
  stats(){this.alive();return Object.fromEntries(['frame','peak','channels','rejected','generatedUntil','prepared'].map((key,i)=>[key,this.e.room_colour_stat(this.handle,i)]));}
  // Captured-spec replay and saved current UI targets are intentionally distinct.
  capturedSnapshot(){this.alive();return loadRoomColourSpec(saveRoomColourSpec(this.spec));}

@@ -113,11 +113,34 @@
       }
     ],
     "floatMathProfile": {
-      "version": 1,
-      "name": "rounded-binary64-float-v1",
-      "scope": "Float32 public boundaries around binary64 transcendental functions. Explicit fdlibm wrappers are source-defined this way; unqualified native float math is an explicit portable profile choice independently compared with system CRT arithmetic. No claim that the browser links that DLL follows from the comparison.",
-      "independentArithmeticReport": "reports/modular_audio/native-compressor-ucrt-curve.json",
-      "nativeAcceptance": "Unchanged96case actual browser PCM/meter/latency bounds; required separately"
+      "version": 2,
+      "name": "amd-avx2-fma3-log10f-rounded-binary64-pow-v2",
+      "scope": "Global LinearToDecibels uses a literal deterministic AMD AVX2 FMA3 Float32 log10f translation, including explicitly fused operations and immutable source tables. Global DecibelsToLinear retains rounded binary64 power. Explicitly qualified Chromium fdlibm wrappers retain their original binary64-to-Float32 boundaries. Portable arithmetic profile only: no browser DLL linkage or universal native/CPU identity claim.",
+      "log10fReference": {
+        "repository": "amd/aocl-libm-ose",
+        "revision": "155b5ab00879dd0d4fcf89aa602415ced5546218",
+        "files": [
+          {
+            "path": "LICENSE",
+            "url": "https://raw.githubusercontent.com/amd/aocl-libm-ose/155b5ab00879dd0d4fcf89aa602415ced5546218/LICENSE",
+            "bytes": 1843,
+            "sha256": "4eede931432f4853bc59c02c381d7fd888bfb00017dc210bd54ba252872863fa"
+          },
+          {
+            "path": "src/isa/avx2/masm/log10f_fma3.asm",
+            "url": "https://raw.githubusercontent.com/amd/aocl-libm-ose/155b5ab00879dd0d4fcf89aa602415ced5546218/src/isa/avx2/masm/log10f_fma3.asm",
+            "bytes": 25353,
+            "sha256": "25f722207ddbbb359faeec78e4834f95c656481ffbafdb99100e3a6520b0313d"
+          }
+        ]
+      },
+      "tableSha256": {
+        "INV": "8c1e082036b2adc3a3bbec223fbeb32e62c311d5e5c2b935f9692b5640ad1794",
+        "HEAD": "c63e51e59072f1d949bf74db87b6617c259958924e7a8e51ca5a7908491b4d97",
+        "TAIL": "ef002404a752ee78060686e031087c6b56e2ef5d45cbbff4f3a119f8b6afc64e"
+      },
+      "previousProfile": "rounded-binary64-float-v1; preserved negative Voice192k and non-fused candidate96k reports",
+      "nativeAcceptance": "Unchanged static96/captured48/activeVoice48/quietDC8 plus384 independent seeded/corner actual-native cases; six rates, mono/stereo where applicable; no gain fitting, alignment or tolerance change."
     }
   },
   "references": {
@@ -126,12 +149,12 @@
     "src/synths/effects/graph.js": "1d72d271dc843eb256a85d91d0ee016bd97e014e6f83da8f9c77c2858fcdcd31",
     "src/synths/effects/extras.js": "f9bdac4f97fd0dd52ad7302f2e272c548a6e1cf31108e7c07a3e0a94e5352461",
     "src/synths/piano/player.js": "144c2fb24c3569f92facc83e9d4aa1ccabfed2223877c608f84d9b862b9b3e9b",
-    "src/app/engine/iowaModel/player.js": "4d7c6167a077ee529f48c32e9237c972298a8d1f61a2430ed1351e33fdc58cb2"
+    "src/app/engine/iowaModel/player.js": "e0ecf4af74077a1b60a58aed521f0096205a98dd1cc507d8bc2760bb172097bc"
   },
   "audited": false,
-  "source": "84f3460d3dc346fcf655ac186c8763500ae18231d34789e332fa1605f98049ac",
+  "source": "0a3ed44ff138c310563d8575a13a509abad009004bb11b272cf369392455a854",
   "runtime": "9700fc0bae6dc319c7122a49b3a14d5eef4ad1a4def234100341ac4a9d5a64fd",
-  "wasm": "289553aa9c8538c4e090f83948fd4efd269be35e1fa45987d9b19d8d9386e9b1",
-  "bytes": 33718,
-  "version": "518439cc3c3f8cc9"
+  "wasm": "2526844cb7623a911dd07cc37422096422fe5a7deac732d8d2f28597c7d61903",
+  "bytes": 35305,
+  "version": "335aff83b5b5bf1a"
 }

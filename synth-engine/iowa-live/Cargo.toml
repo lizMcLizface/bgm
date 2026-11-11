@@ -1,0 +1,20 @@
+[package]
+name = "calmbgm_iowa_live"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+calmbgm_iowa = { path = "../iowa" }
+
+[features]
+allocation-audit = []
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"

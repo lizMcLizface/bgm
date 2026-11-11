@@ -78,7 +78,7 @@ exact, and every measured onset matches declared lookahead, including the
 maximum relative RMS error is3.0208925450543157e-6. The original unchanged bounds
 remain recorded with the full report. No live route has been switched.
 
-Known edge: the later active VoiceCompressor research suite reaches raw
+Retained edge finding, resolved by version2 below: the later active VoiceCompressor research suite reached raw
 extreme-control coefficients at192kHz that expose a knee/math-profile mismatch
 in the underlying shared static core. All six mirrored controls match at0ULP
 (equal signed zeros treated equally), while two native PCM cases exceed the
@@ -87,6 +87,18 @@ pass; their numerical coverage is bounded, not universal. The automation clock
 has not been identified as the cause. See
 `MODULAR_AUDIO_ENGINE_VOICE_COMPRESSOR_RESEARCH.md` for the exact failed record
 and required regression gate before any shared-core correction.
+
+The version2 shared core now uses the source-pinned AMD AVX2 FMA3 global log10f
+profile, with the original power/fdlibm boundaries and timeline algorithm intact.
+`native-compressor-fma-production-browser.json` verifies normal captured artifact
+947d6df716a3f0e5 passing the original48 cases with **raw exact PCM, coefficients
+and reduction** (zero error), correct latency and unchanged original seconds.
+The original96 static,48 active Voice,8 quiet-DC and384 independent seeded/corner
+cases also pass. No fixture, bounds, rate support or default routing changed.
+All12 refreshed captured allocation/persistence/cadence cases pass with zero
+allocation/reclamation and no growth. The prior profile and non-fused candidate
+negative reports are retained in the focused VoiceCompressor document; this
+finite coverage remains distinct from universal native/platform equivalence.
 
 This layer ports finite captured native parameter behavior. The complete voice
 makeup/trim path, rack parallel mix/gain targets, arbitrary native lifecycle,

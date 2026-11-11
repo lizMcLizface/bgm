@@ -1,0 +1,5 @@
+class ConvolverStreamCapture extends AudioWorkletProcessor{
+ constructor(options){super();const p=options.processorOptions;if(!p||!Number.isSafeInteger(p.startFrame)||p.startFrame<0||!Number.isInteger(p.frames)||p.frames<1||p.frames>4194304||![1,2].includes(p.channels))throw Error('Invalid convolution capture bounds');this.startFrame=p.startFrame;this.frames=p.frames;this.pcm=Array.from({length:p.channels},()=>new Float32Array(p.frames));this.at=0;this.done=false;this.port.postMessage({type:'ready'});}
+ process(inputs,outputs){if(this.done)return false;const input=inputs[0]??[],output=outputs[0];for(let i=0;i<output[0].length;i++){const frame=currentFrame+i;if(frame<this.startFrame)continue;if(this.at>=this.frames)break;for(let ch=0;ch<this.pcm.length;ch++){const value=input[ch]?.[i]??0;this.pcm[ch][this.at]=value;output[ch][i]=value;}this.at++;}if(this.at===this.frames){this.done=true;this.port.postMessage({type:'captured',startFrame:this.startFrame,frames:this.frames,channels:this.pcm},this.pcm.map(p=>p.buffer));}return!this.done;}
+}
+registerProcessor('calmbgm-convolver-stream-capture',ConvolverStreamCapture);

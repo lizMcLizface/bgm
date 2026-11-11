@@ -1,3 +1,8 @@
+Current continuation: [active Rust checkpoint](MODULAR_AUDIO_ENGINE_ACTIVE_RUST_CHECKPOINT.md)
+records480files /3788passing tests, the public build and final desktop source/room/
+compressor acceptance. Continue live piano, compressor bypass and composed room/
+host adoption; normal defaults are still preserved and hidden cello is deferred.
+
 Active continuation (11 November2026): user authorized push without deployment;
 main through111d282 was pushed as lizMcLizface. Continue closing the active
 instrument/effect/room/live-host Rust paths. The hidden standalone measured-cello

@@ -26,7 +26,7 @@ the original captured spec and discards later live arrivals. Captured-spec repla
 and current-UI-target cold snapshots are separate APIs; neither snapshots a
 running room tail. Each handle owns its delay and filter histories.
 
-Verification on11 November2026:13 permanent functional cases pass;12 allocator
+Verification on11 November2026:14 permanent functional cases pass;12 allocator
 cases cover two independent handles,1400live controls, render/reset and zero
 allocations/frees/growth. The actual built-in desktop browser native batch
 passes48/48 at8/24/44.1/48/96/192k, mono/stereo, constructor/extreme/fractional and
@@ -45,3 +45,10 @@ Maintained commands:
 
 Next attach this stage to the bounded owned convolution room path and verify
 actual routed worklet/worker PCM, live controls and current-settings reload.
+
+Live host follow-up: version c8069f9d36131a64 passes12actual six-rate worklet
+PCM comparisons exactly and a running48k muted host case with two independent
+nodes, future acknowledged controls and current-target cold reload. Meter peak
+0.1059439927; both controls had0late arrivals. Disposal waits for acknowledgement
+with a bounded fallback. Repeated future targets at the same second replace
+only still-ungenerated control material. Normal room defaults remain native.

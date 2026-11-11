@@ -1,5 +1,6 @@
 //! Owned Iowa Held/Decay/Roll DSP. Immutable prepared specs, a canonical
 //! 128-frame legacy tick, and preallocated voice/hit state. No render allocation.
+pub mod live;
 use std::f64::consts::TAU;
 pub const QUANTUM: usize = 128;
 pub const MAX_BYTES: usize = 64 * 1024 * 1024;

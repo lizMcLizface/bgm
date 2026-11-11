@@ -4,6 +4,7 @@
 #[cfg(feature = "allocation-audit")]
 mod allocation;
 mod kernel;
+mod math_profile;
 pub const BLOCK: usize = 2048;
 pub const PARAMETERS: [(f64, f64); 5] = [(-100., 0.), (0., 40.), (1., 20.), (0., 1.), (0., 1.)];
 pub struct Engine {

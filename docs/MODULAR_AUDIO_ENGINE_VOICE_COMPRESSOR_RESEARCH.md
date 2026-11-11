@@ -1,15 +1,11 @@
-# Active VoiceCompressor research checkpoint
+# Active VoiceCompressor: captured topology acceptance
 
-Final-window recheck: normal2e4963cea4401d75 /75,055bytes and audited
-18116602b2419005 follow the validation-only dependency fix. All48 owned PCM
-and coefficient hashes equal the first native run; the same two192k extreme
-cases remain failed. Eight owned tests and12 refreshed allocation cases pass.
-Evidence: voice-compressor-native-morning.json and compressor-contract-correction-continuity.json. This remains UNACCEPTED research.
-Updated 2026-11-11. **Unaccepted research slice.** The owned wrapper passes
-functional checks, but its first native comparison passes only 46 of 48 cases.
-It must not replace the existing VoiceCompressor route or enter a production
-Graph/default adoption gate. The original host and accepted static/captured
-compressor kernels are unchanged. This finding does not block other port work.
+Updated 2026-11-11. The active captured topology now passes the unchanged native
+48-case acceptance suite using the explicitly pinned version-2 FMA math profile.
+The first46/48 failure and subsequent unsuccessful non-fused candidate are
+retained below. Existing native host routes and defaults remain unchanged.
+Mutable live controls and Instrument enable/bypass/rewiring remain separate work;
+this acceptance covers the prepared active node plus makeup topology.
 
 ## Actual topology and prepared contract
 
@@ -60,7 +56,13 @@ Source provenance, original host hashes and BSD notices are pinned in
 `CHROMIUM_NOTICES.txt`, at Chromium revision
 `e14de735f191c3a2bdce821a5e3f146bdc987b1e`.
 
-## Functional checks and actual native result
+## Functional checks and retained initial native result
+
+Before the math correction, final-window normal2e4963cea4401d75 /75,055bytes and
+audited18116602b2419005 followed a validation-only dependency fix. All48 owned PCM
+and coefficient hashes still equaled the first run; the same two192k extreme
+cases failed. `voice-compressor-native-morning.json` and
+`compressor-contract-correction-continuity.json` preserve that negative recheck.
 
 Eight discoverable `ownedVoiceCompressor.test.js` checks cover configuration
 round trips, two independent handles, odd render partitions, replay reset,
@@ -103,7 +105,7 @@ normalize the sign of zero; these are not claims of byte-for-byte equality.
 The rate range has not been narrowed to hide them. The test page is a local
 research tool, not a public build entry or a default route.
 
-## Narrowed arithmetic diagnosis; no accepted-core change
+## Arithmetic diagnosis and source correction
 
 Both failing cases reach their maximum error at output frame 38,039. Coefficient
 mirrors are exact, while the core tap already differs before external makeup.
@@ -147,17 +149,62 @@ The existing successful arithmetic reports and failed native record remain the
 complete evidence. No claim of universal native/platform bit equivalence follows
 from the earlier finite static or automation suites.
 
-## Next task and acceptance gate
+## Version-2 source profile and production acceptance
 
-Identify a source-supported, explicitly versioned math profile for the global
-native primitives, and validate it on the exact failing coefficients and their
-neighbors before proposing any shared-core change. If such a change is justified,
-rerun the accepted static 96-case native suite, captured automation 48-case suite,
-quiet-DC diagnostics, Graph/native checks and this unchanged 48-case Voice suite,
-as well as owned allocation/persistence/independence tests. Preserve every first
-failure report. Existing accepted kernels and app defaults remain frozen until
-that review succeeds. Rack parallel-mix compressor wrappers are separate future
-work; they have not been substituted with this research topology.
+The corrected profile is
+`amd-avx2-fma3-log10f-rounded-binary64-pow-v2`. Global `LinearToDecibels` now uses a
+literal scalar translation of AMD's public AVX2 FMA3 `log10f` implementation,
+pinned to revision155b5ab00879dd0d4fcf89aa602415ced5546218. Float32 stages, explicit
+fused operations and all three129-entry source tables are preserved; no CPU/rate
+dispatch or measured correction table is used. Existing global power and
+explicitly qualified fdlibm boundaries remain unchanged. The source and BSD
+notices are pinned in the three dependent profiles/build fingerprints. This is
+an explicit portable arithmetic profile, not a claim about browser DLL linkage
+or universal numerical identity across native operating systems.
+
+A private non-fused AMD source candidate first fixed192k but failed the96k
+extreme-control cases at frame15110. Its complete negative record remains
+`native-math-candidate-browser-first.json`. The separately published FMA3 source
+matches both sensitive curves with one global algorithm, all eight retained
+neighboring192k curves and all seven independent CRT static presets. All inverse,
+head and tail source tables match the pinned assembly byte-for-byte. The FMA
+candidate then passed all unchanged suites, retained as
+`native-math-candidate-fma-browser.json`.
+
+`native-compressor-fma-production-browser.json` confirms the final published
+local artifacts in the supported built-in desktop browser:
+
+| Suite | Cases | Maximum absolute PCM error | Maximum relative RMS error |
+| --- | ---: | ---: | ---: |
+| Static native core |96/96|1.7881393432617188e-7|7.910122629557796e-11|
+| Captured core automation |48/48|0|0|
+| Active VoiceCompressor |48/48|5.960464477539063e-8|6.250315529754387e-9|
+| Independent seeded/corner static controls |384/384|.0000030994415283203125|3.4486632671619437e-7|
+
+All eight quiet-DC effective gains are raw exact, all reduction values are exact,
+and onset latency remains correct. Captured and Voice control comparisons are
+0ULP (equal signed zeros treated equally). The384 independent cases use twenty
+unrelated fixed-seed legal static settings and twelve fixed corners at all six
+rates, mono/stereo, under the original1e-4 PCM/.01dB bounds. The original48 Voice
+fixtures, timestamps and limits were not changed or narrowed.
+
+Final normal versions are static335aff83b5b5bf1a, capture947d6df716a3f0e5 and
+Voice5a21904607c19428. Thirty focused tests pass across all three wrappers;
+36 audited six-rate mono/stereo cases pass with zero post-prepare allocation or
+reclamation and no memory growth. `native-compressor-fma-desktop-timing.json`
+records Node/V8 stereo128-frame render means up to .02253/.02313/.02652ms for
+static/capture/Voice, respectively; p99 maxima are .0347/.0281/.0326ms. These
+offline timings include host overhead/preemption and are not worklet/phone or
+physical-audio guarantees.
+
+## Next task: live host lifecycle
+
+Keep the accepted captured contract intact while adding bounded live raw-control
+delivery and the original host's amount-zero enable/bypass/rewiring behavior.
+Validate control chronology, reconnection histories, tails, latency transitions,
+independent instances and save/reload against actual native behavior. An active
+amount-zero compressor must not be presented as the existing Instrument bypass.
+Rack parallel-mix compressor wrappers remain a separate topology.
 
 ```powershell
 node tools/buildOwnedVoiceCompressor.mjs --publish --check
@@ -166,5 +213,6 @@ node tools/buildOwnedVoiceCompressor.mjs --audit --check
 node tools/auditOwnedVoiceCompressor.mjs
 ```
 
-The last command writes a fresh functional report; it does not supersede the
-native numerical failure. `--audit --publish` is rejected by the builder.
+The last command writes a fresh functional report; native numerical evidence is
+recorded separately. `--audit --publish` is rejected by the builder. The permanent
+384-case tool is available at `tools/native-compressor-reference.html#math`.

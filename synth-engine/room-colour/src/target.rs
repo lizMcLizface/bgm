@@ -82,7 +82,8 @@ impl Gain {
     // Retain the active event, compact only consumed records, and never grow capacity.
     pub fn schedule(&mut self, seconds: f64, value: f64, generated_until: u64) -> bool {
         if !seconds.is_finite() || seconds < generated_until as f64 / self.rate || seconds * self.rate > 9007199254740864. || !value.is_finite() || !(value as f32).is_finite() { return false; }
-        if self.events.last().is_some_and(|e| e.seconds >= seconds) { return false; }
+        if self.events.last().is_some_and(|e| e.seconds > seconds) { return false; }
+        if let Some(event)=self.events.last_mut(){if event.seconds==seconds{event.value=value as f32;return true;}}
         if self.head > 0 { self.events.drain(..self.head); self.head = 0; }
         if self.events.len() >= 256 { return false; }
         self.events.push(Event {seconds, value: value as f32}); true

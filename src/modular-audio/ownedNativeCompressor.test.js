@@ -1,8 +1,15 @@
 // @vitest-environment node
 import fs from 'node:fs';import {expect,it}from 'vitest';
+import crypto from 'node:crypto';
 import {OwnedNativeCompressor,ownedNativeCompressorSpec,saveOwnedNativeCompressorSpec,loadOwnedNativeCompressorSpec,validateOwnedNativeCompressorSpec}from './ownedNativeCompressor';
 const module=new WebAssembly.Module(fs.readFileSync(process.env.OWNED_NATIVE_COMPRESSOR_WASM??'public/modular-audio/native-compressor.wasm'));
 const make=(rate=48000,spec=ownedNativeCompressorSpec(),e=new WebAssembly.Instance(module,{}).exports)=>new OwnedNativeCompressor(e,spec,rate);
+it('preserves both sensitive native knee curves with one source-defined fused profile',()=>{
+ for(const [threshold,ratio,expected]of [[-35.9862174987793,19.99250030517578,[217.82183837890625,.015874098986387253,.031672995537519455,-33.842384338378906,9.338461875915527,.024147627875208855]],[-35.02976608276367,19.48506736755371,[193.33985900878906,.017721956595778465,.0353599488735199,-32.87056350708008,8.738191604614258,.02697516605257988]]]){const d=make(48000,ownedNativeCompressorSpec({threshold,ratio,knee:6}));try{expect(Array.from({length:6},(_,i)=>d.e.native_comp_stat(d.handle,8+i))).toEqual(expected);}finally{d.dispose();}}
+});
+it('pins all three immutable AMD source tables and dependent builder fingerprints',()=>{
+ const source=fs.readFileSync('synth-engine/native-compressor/src/math_profile.rs','utf8'),profile=JSON.parse(fs.readFileSync('synth-engine/native-compressor/CHROMIUM_PROFILE.json')).floatMathProfile;expect(profile.name).toBe('amd-avx2-fma3-log10f-rounded-binary64-pow-v2');for(const name of ['INV','HEAD','TAIL']){const body=source.match(new RegExp(`const ${name}: \\[u32; 129\\] = \\[([^\\]]+)`))[1],values=[...body.matchAll(/0x([0-9a-f]+)u32/g)].map(m=>parseInt(m[1],16)>>>0),bytes=Buffer.alloc(values.length*4);expect(values).toHaveLength(129);values.forEach((v,i)=>bytes.writeUInt32LE(v,i*4));expect(crypto.createHash('sha256').update(bytes).digest('hex')).toBe(profile.tableSha256[name]);}for(const name of ['NativeCompressor','NativeCompressorAutomation','VoiceCompressor'])expect(fs.readFileSync(`tools/buildOwned${name}.mjs`,'utf8')).toContain('src/math_profile.rs');
+});
 it('keeps editable builder configs separate from immutable installed snapshots and persisted DSP targets',()=>{
  const spec=ownedNativeCompressorSpec(),d=make(48000,spec);let b;
  try{spec.parameters[0][1]=-90;expect(d.value(0)).toBe(-24);const initial=d.spec;expect(()=>{d.spec.parameters[0][1]=-90;}).toThrow();expect(()=>d.spec.parameters.push([0,-90])).toThrow();d.patch([[2,4]]);expect(initial.parameters[2][1]).toBe(12);expect(()=>{d.spec.parameters[0][1]=-90;}).toThrow();expect(d.spec.parameters[0][1]).toBe(d.value(0));const restored=loadOwnedNativeCompressorSpec(saveOwnedNativeCompressorSpec(d.spec));expect(restored.parameters.map(([i,v])=>v)).toEqual(Array.from({length:5},(_,i)=>d.value(i)));b=make(48000,restored);expect(render(d,4001,[1,37,509])).toEqual(render(b,4001));}finally{d.dispose();b?.dispose();}

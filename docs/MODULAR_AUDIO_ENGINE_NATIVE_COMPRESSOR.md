@@ -85,7 +85,7 @@ detector/meter/delay state.
 six-rate mono/stereo cases with raw exact callback-partition equality, timestamped
 128-frame controls, save/reload, latest-target reset, independent handles, zero
 Wasm allocation/reclamation calls after preparation and no memory growth.
-Eleven focused tests cover those clocks, latency, stereo linking/isolation, mono
+Thirteen focused tests cover those clocks, latency, stereo linking/isolation, mono
 mapping, complete validation, parameter bounds, fresh-instance reset and immutable
 installed target snapshots. Builder configurations remain editable; installed
 snapshots are frozen so external edits cannot make save/reload disagree with DSP.
@@ -153,7 +153,7 @@ automation, surrounding gain/parallel wrappers, long-silence AudioNode lifecycle
 physical listening and realtime scheduling remain separate acceptance work.
 No existing live/default route has been switched by this standalone port.
 
-Known edge: the later active VoiceCompressor research suite exposes an underlying
+Retained edge finding, resolved by version2 below: the later active VoiceCompressor research suite exposed an underlying
 knee/math-profile mismatch at the exact coefficients reached by raw extreme
 controls at192kHz. Its native core maximum absolute error is .0005338191986083984,
 despite exact mirrored control coefficients; external makeup increases the error.
@@ -161,6 +161,25 @@ The accepted static fixtures above still pass, but their numerical coverage is
 bounded, not universal. Global float/double primitive switches are not a valid
 correction. See `MODULAR_AUDIO_ENGINE_VOICE_COMPRESSOR_RESEARCH.md` for the retained
 46/48 native failure, neighboring-curve evidence and shared-core regression gate.
+
+Version2 replaces only global `LinearToDecibels` log10f with a literal pinned AMD
+AVX2 FMA3 scalar translation, preserving Float32 stages, explicit fused operations
+and three129-entry source tables. It retains global rounded-binary64 power and
+the separately qualified fdlibm calls. The explicit profile is
+`amd-avx2-fma3-log10f-rounded-binary64-pow-v2`; source/notices pin AMD revision
+155b5ab00879dd0d4fcf89aa602415ced5546218. Neither CPU/rate switching, fitted gains,
+output alignment nor tolerance changes are used. A non-fused candidate's96k
+failure is preserved alongside the earlier192k failure.
+
+`native-compressor-fma-production-browser.json` verifies final static artifact
+335aff83b5b5bf1a: original96 cases pass with the same1.7881393432617188e-7 maximum
+absolute error and exact reduction/latency. All eight quiet-DC effective gains
+remain raw exact. An additional384 unrelated seeded/corner static cases at all
+six rates, mono/stereo, pass under the same bounds (maximum absolute error
+.0000030994415283203125). Captured48 and active Voice48 suites pass as well,
+including the original192k and new candidate96k sensitive cases. Numeric coverage
+remains bounded, not a universal native/platform identity claim. See the focused
+VoiceCompressor document for exact source-profile and negative-proof history.
 
 ```powershell
 node tools/buildOwnedNativeCompressor.mjs --audit
