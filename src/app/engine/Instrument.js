@@ -33,6 +33,13 @@ import {createPluckedLiveSource} from './pluckedLiveSource.js';
 // the tail when the key comes up.
 const HELD_SECONDS = 600;
 const ownedSourceOf = instrument => instrument.pluckedSource ?? instrument.pianoSource;
+// A prepared physical source owns one material for its entire lifetime. Reject
+// before preset setters or a pending morph can touch the existing source/rack.
+function assertOwnedMaterial(instrument, next) {
+    const current = instrument.preset?.stringModel;
+    if (instrument.sourceBackend === 'owned-rust' && current !== undefined && current !== next)
+        throw Error('Changing owned physical source material requires a fresh instrument');
+}
 
 // How often a morph (morphTo) moves the parameters on.
 const MORPH_STEP_MS = 80;
@@ -402,6 +409,7 @@ class Instrument {
      */
     applyPreset(preset) {
         const next = { ...PRESET_DEFAULTS, ...preset };
+        assertOwnedMaterial(this, next.stringModel);
         Object.keys(next).forEach((key) => this.set(key, next[key]));
         if (this.tempoTimingTouched) scheduleEffectTiming(this, 0, this.AC.currentTime);
     }
@@ -413,8 +421,9 @@ class Instrument {
      * dispose() ends it, with the target applied.
      */
     morphTo(preset, seconds) {
-        this.finishMorph();
         const to = { ...PRESET_DEFAULTS, ...preset };
+        assertOwnedMaterial(this, to.stringModel);
+        this.finishMorph();
         const from = { ...PRESET_DEFAULTS, ...this.preset };
         const changing = Object.keys(to).filter((key) => from[key] !== to[key]);
         if (!changing.length) return;
@@ -463,6 +472,7 @@ class Instrument {
 
     /** Sets one preset parameter live - what the synth editor's knobs call. */
     set(key, value) {
+        if (key === 'stringModel') assertOwnedMaterial(this, value);
         if (this.morph && !this.morph.stepping) this.finishMorph();
         if (this.preset && this.preset[key] === value) return;
         this.preset = { ...this.preset, [key]: value };
