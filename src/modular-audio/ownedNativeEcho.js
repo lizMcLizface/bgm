@@ -1,0 +1,19 @@
+import{sanitizeEffects}from'../synth-lab/effectsConfig.js';
+export const NATIVE_ECHO_PROFILE='native-echo-continuous-sse128-v1';
+const fields={delay:[0,.8,.12],delayMs:[40,2000,375],feedback:[0,.85,.4],tone:[300,14000,4500],pingPong:[0,1,1]};
+export function nativeEchoSpec(sampleRate,values={},compensationFrames=128){if(!Number.isInteger(sampleRate)||sampleRate<8000||sampleRate>192000||!Number.isInteger(compensationFrames)||compensationFrames!==128||!values||typeof values!=='object'||Array.isArray(values)||Object.keys(values).some(k=>!fields[k]))throw Error('Invalid native echo capture');const parameters={};for(const[k,[lo,hi,def]]of Object.entries(fields)){const v=values[k]??def;if(typeof v!=='number'||!Number.isFinite(v)||v<lo||v>hi||k==='pingPong'&&!Number.isInteger(v))throw Error('Invalid native echo parameter');parameters[k]=sanitizeEffects({[k]:v})[k];}return{version:1,profile:NATIVE_ECHO_PROFILE,sampleRate,compensationFrames,parameters};}
+export function validateNativeEchoSpec(spec){if(!spec||spec.version!==1||spec.profile!==NATIVE_ECHO_PROFILE||Object.keys(spec).some(k=>!['version','profile','sampleRate','compensationFrames','parameters'].includes(k)))throw Error('Invalid native echo spec');const normalized=nativeEchoSpec(spec.sampleRate,spec.parameters,spec.compensationFrames);if(!spec.parameters||Object.keys(spec.parameters).length!==5||Object.keys(fields).some(k=>normalized.parameters[k]!==spec.parameters[k]))throw Error('Echo capture requires complete normalized parameters');return normalized;}
+export const saveNativeEchoSpec=spec=>JSON.stringify(validateNativeEchoSpec(spec))+String.fromCharCode(10);
+export const loadNativeEchoSpec=text=>validateNativeEchoSpec(JSON.parse(text));
+export class OwnedNativeEcho{
+ constructor(engine,raw){this.e=engine;this.spec=validateNativeEchoSpec(raw);Object.freeze(this.spec.parameters);Object.freeze(this.spec);if(engine.echo_native_api()!==1)throw Error('Echo ABI mismatch');const p=this.spec.parameters;this.handle=engine.echo_native_new(this.spec.sampleRate,p.delay,p.delayMs,p.feedback,p.tone,p.pingPong,this.spec.compensationFrames);if(!this.handle)throw Error('Echo allocation rejected');this.refresh();}
+ alive(){if(!this.handle)throw Error('Echo disposed');}
+ refresh(){this.alive();this.memory=this.e.memory.buffer;this.input=[0,1].map(c=>new Float32Array(this.memory,this.e.echo_native_input(this.handle,c),2048));this.output=[0,1].map(c=>new Float32Array(this.memory,this.e.echo_native_output(this.handle,c),2048));}
+ render(n){this.alive();if(!Number.isInteger(n)||n<0||n>2048||this.e.memory.buffer!==this.memory)throw Error('Echo requires valid frame count and prepared views');if(!this.e.echo_native_render(this.handle,n))throw Error('Echo render rejected');}
+ reset(){this.alive();this.e.echo_native_reset(this.handle);}
+ stats(){this.alive();return{frame:this.e.echo_native_stat(this.handle,0),peak:this.e.echo_native_stat(this.handle,1),delayFrames:this.e.echo_native_stat(this.handle,2)};}
+ snapshot(){this.alive();return loadNativeEchoSpec(saveNativeEchoSpec(this.spec));}
+ dispose(){if(this.handle){this.e.echo_native_free(this.handle);this.handle=0;this.input=this.output=this.memory=null;}}
+}
+let cached;
+export function loadNativeEchoAssets(){return cached??=(async()=>{const base=(import.meta.env?.BASE_URL??'/')+'echo-native/',get=async p=>{const r=await fetch(base+p);if(!r.ok)throw Error('Missing native echo asset');return r;},manifest=await(await get('build.json')).json(),bytes=await(await get('echo.wasm?v='+manifest.version)).arrayBuffer(),hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),n=>n.toString(16).padStart(2,'0')).join('');if(manifest.api!==1||manifest.profile!==NATIVE_ECHO_PROFILE||manifest.audited||manifest.wasm!==hash)throw Error('Native echo asset integrity mismatch');return{manifest,module:await WebAssembly.compile(bytes)};})().catch(error=>{cached=null;throw error;});}

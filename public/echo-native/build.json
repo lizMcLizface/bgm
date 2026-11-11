@@ -1,0 +1,9 @@
+{
+  "api": 1,
+  "profile": "native-echo-continuous-sse128-v1",
+  "audited": false,
+  "source": "44a0173f7e8250f81eaea4c9c5bbbf493e544496b63f0fcbf9f0251a1fc4f109",
+  "wasm": "c68f36537394bde88dae0945e7c475884595e4866aed085f8037355595188cd3",
+  "bytes": 20374,
+  "version": "a99400a9a23f9a8f"
+}

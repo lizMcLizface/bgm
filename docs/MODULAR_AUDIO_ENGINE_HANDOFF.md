@@ -25,10 +25,12 @@ contexts (23 cases, exact bits), plus immediate startup and acknowledged quota
 cleanup; normal running-context upload policy remains separate. Original echo
 and rack dynamics live references are active work, not normal host replacements.
 
-Latest broad regression:531files,4291passing/4skipped,2integration failures in
-partial-owner demand/teardown. Those are corrected with23 passing targeted checks
-and a regression proving all owners clean up even when the first throws. A fresh
-combined suite remains pending. Public build plus34 provenance gates passed
+Latest broad regression:543files,4455passing/4skipped. The earlier two
+partial-owner demand/teardown failures are corrected, including a regression
+proving all owners clean up even when the first throws. Original echo captured
+DSP passes25 actual Native cases and cold reload; its live host remains next.
+The longer live Filter idle/restart gate exposed a mismatch and remains open;
+independent dynamics acceptance continues separately. Public build plus34 provenance gates passed
 before the latest Iowa environment/final cleanup edits; source/host fingerprints
 are refreshed again with this checkpoint, without changing accepted numeric code.
 

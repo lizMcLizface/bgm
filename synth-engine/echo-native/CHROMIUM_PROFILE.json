@@ -1,0 +1,38 @@
+{
+  "kind": "echo.native-continuous-profile",
+  "version": 1,
+  "revision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+  "scope": "Original static nativeEcho topology; explicit captured feedback block compensation, fixed stereo continuously pulled input; live host adoption separate.",
+  "sources": [
+    {
+      "file": "third_party/blink/renderer/platform/audio/iir_filter.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/iir_filter.cc",
+      "bytes": 8835,
+      "sha256": "84eb3d81d353d74482424f5fc9d067689e25cbc309258fe36246528f439e328a"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/audio/iir_filter.h",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/iir_filter.h",
+      "bytes": 2601,
+      "sha256": "776c8fc6b7e3b293ea1ef0d5a0911dab4e19cb2ef4cadb66e9b34f4ad05f64cc"
+    },
+    {
+      "file": "LICENSE",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/LICENSE",
+      "bytes": 1536,
+      "sha256": "368cca1106be99d39ecd32a38d8305585d802a475effb66380b91ffc9bcf709b"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/audio/delay.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/delay.cc",
+      "bytes": 10149,
+      "sha256": "d8a1b966dc49fb24b0c4fc83c3296a138c2e35bfd19b39666b3baa8d8f4deb0a"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/audio/cpu/x86/delay_sse2.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/cpu/x86/delay_sse2.cc",
+      "bytes": 5550,
+      "sha256": "d93659d64b5a6bc056bb5b3a1059145ef466c9e3d4f092aee6f076be21b10f3a"
+    }
+  ]
+}
