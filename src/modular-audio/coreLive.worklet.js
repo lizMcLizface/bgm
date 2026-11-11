@@ -1,11 +1,12 @@
 import{OwnedCore,validateCoreSpec}from'./ownedCore.js';
 import{OwnedFm,validateFmSpec}from'./ownedFm.js';
 import{flattenFM}from'./legacyPatchTransition.js';
+import{RustPatchTransition}from'./rustPatchTransition.js';
 import{HostRenderClock}from'./hostRenderClock.js';
 const home={mode:0,portamento:0,glide:'overlap'};
 class OwnedCoreLiveProcessor extends AudioWorkletProcessor{
  constructor({processorOptions:o}){super();this.failed=false;this.disposed=false;this.kind=o.kind;this.report=0;this.rendered=0;this.clock=new HostRenderClock();this.offline=!!o.offline;this.stopFrame=this.offline&&Number.isSafeInteger(o.stopFrame)?o.stopFrame:null;
-  try{if(!['subtractive','fm'].includes(o.kind))throw Error('Unsupported owned core kind');this.validate=o.kind==='fm'?validateFmSpec:validateCoreSpec;const spec=this.validate({version:1,patch:o.patch,performance:o.performance??home,events:o.events??[],edits:o.patches??[]});this.unit=new(o.kind==='fm'?OwnedFm:OwnedCore)(new WebAssembly.Instance(o.module,{}).exports,spec,sampleRate);this.views=[this.unit.left.subarray(0,128),this.unit.right.subarray(0,128)];this.port.onmessage=({data})=>this.receive(data);this.port.postMessage({type:'ready',kind:this.kind,engineVersion:o.engineVersion});}catch(e){this.fail(e);}
+  try{if(!['subtractive','fm'].includes(o.kind))throw Error('Unsupported owned core kind');this.validate=o.kind==='fm'?validateFmSpec:validateCoreSpec;const spec=this.validate({version:1,patch:o.patch,performance:o.performance??home,events:o.events??[],edits:o.patches??[]});const engine=new WebAssembly.Instance(o.module,{}).exports;this.unit=new(o.kind==='fm'?OwnedFm:OwnedCore)(engine,spec,sampleRate,(values,performance,apply,onPerformance,_discrete,_log,rate)=>new RustPatchTransition(engine,values,performance,apply,onPerformance,o.kind==='fm',rate));this.views=[this.unit.left.subarray(0,128),this.unit.right.subarray(0,128)];this.port.onmessage=({data})=>this.receive(data);this.port.postMessage({type:'ready',kind:this.kind,engineVersion:o.engineVersion});}catch(e){this.fail(e);}
  }
  receive(data){try{if(data.type==='dispose'){this.stop();this.port.postMessage({type:'disposed',request:data.request});return;}if(this.failed)throw Error('Owned source stopped');const u=this.unit;
   if(data.type==='events'){const p=this.validate({version:1,patch:u.spec.patch,performance:home,events:data.values,edits:[]});for(const e of p.events)if(!u.e[this.kind==='fm'?'fm_owned_event':'core_owned_event'](u.handle,...e))throw Error('Owned source event capacity exceeded');}

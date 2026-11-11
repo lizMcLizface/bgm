@@ -6,8 +6,8 @@ ABI worklets and defaults remain available. This replaces ownership of the
 existing Rust engines; it does not translate original Web Audio presets into
 a different sound model.
 
-Current host identity is `03122639bbe5aacd`, bound to the verified Graph Wasm
-hash `9c5f0e10220dd338229844ed882e201735774ea0ef6980e0ca67c05bace301c6`. `tools/buildOwnedCoreLive.mjs --check` checks the exact
+Current host identity is `a73e7be40b6c9c31`, bound to the verified Graph Wasm
+hash `f41a99539bd540dcd4bb826352e441e6c3e75fc2a808035699c2a1a49a5382a0`. `tools/buildOwnedCoreLive.mjs --check` checks the exact
 adapter, packet schemas, transition implementation and graph binary. The
 maintained desktop page is `tools/owned-core-live.html`.
 
@@ -29,9 +29,24 @@ stereo sample is identical to the existing host. Evidence is ignored local
 `reports/modular_audio/core-live-component-final.json`; earlier first/final
 reports retain the preceding provenance scope.
 
-The existing JavaScript patch interpolator and structural output-gain fade are
-preserved for this ownership step. They are explicit remaining control/DSP work
-for the all-Rust goal. The next source task is a bounded Rust transition
-controller with the same original packets and measured behavior, followed by
-complete prepared-environment adoption. This is not a claim that the normal
-application, native effects or native preset translator are fully migrated.
+The explicit live host now uses the additive owned Rust transition controller.
+Its bounded512-row state and32 pending packets preserve same-frame replacement,
+16-frame smoothstep/log updates, discrete/performance midpoint switching,
+interruption and the original4ms structural output fade. Rust also multiplies
+the output samples; JavaScript prepares packets, dispatches kernel controls and
+copies PCM. The legacy JS implementation remains available for old hosts.
+
+Fourteen permanent controller checks pass at six rates, including queue refusal,
+interruption, independent handles and fixed memory. Eight complete processor
+comparisons remain sample-bit-exact, and the actual24-case routed batch also
+remains sample-bit-exact. Evidence is `core-live-rust-transition-final.json`.
+The maintained `tools/auditPatchTransition.mjs` additionally tests all244 Core
+and308 FM parameter keys,96 scheduled packets per case, processing and clear;
+all12 kind/rate cases report zero allocation/free calls and zero memory growth.
+The audit result is ignored local `patch-transition-allocation.json`.
+
+This completes live Core/FM transition DSP for the explicit prepared host.
+The finite Graph compiler still prepares original transition points outside the
+render callback; ordinary defaults and native preset translation remain separate.
+Continue complete prepared-environment adoption and the remaining source/effect/
+room host paths. This is not a claim that the normal application is fully Rust.

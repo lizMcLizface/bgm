@@ -1,4 +1,4 @@
-import {OwnedFm} from './owned-fm.js?v=c2bfe10d8f9d0c8b';
+import {OwnedFm} from './owned-fm.js?v=a2469573cf56bfd7';
 // Two independent logical owners, one Wasm instance; no worker or shared-memory claim.
 class OwnedFmPair extends AudioWorkletProcessor {
  constructor({processorOptions:o}){super();this.parts=[];this.stopped=false;this.frame=0;try{

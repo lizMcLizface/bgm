@@ -1,9 +1,9 @@
 {
   "api": 1,
-  "source": "45479d57651832de7da91ec67bbce9de8186f083b56bf9e516a6ebe657d70886",
-  "wasm": "9c5f0e10220dd338229844ed882e201735774ea0ef6980e0ca67c05bace301c6",
-  "runtime": "e6db123c549d9248266e88103a8a03b165554a84d9ddce7d3f035980ad0cd905",
-  "bytes": 1615803,
+  "source": "103fe3c4105bfc4142c02f0bb1327ec7e34173de57e1fe50076b7d10647dae20",
+  "wasm": "f41a99539bd540dcd4bb826352e441e6c3e75fc2a808035699c2a1a49a5382a0",
+  "runtime": "be78a07b3037512a776a4cb91ddecc5d0ba8426b57ceee656675340ebc37907c",
+  "bytes": 1625433,
   "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
-  "version": "5f9fad9fa4858d67"
+  "version": "3f149e3d4e99da4e"
 }

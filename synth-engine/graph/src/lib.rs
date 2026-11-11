@@ -17,6 +17,8 @@ mod tape_node;
 mod native_comp_node;
 mod pitched;
 #[cfg(target_arch = "wasm32")]
+mod patch_transition;
+#[cfg(target_arch = "wasm32")]
 mod fm_abi;
 #[cfg(target_arch = "wasm32")]
 mod core_abi;

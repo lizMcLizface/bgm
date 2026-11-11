@@ -26,7 +26,8 @@ export function validateFmSpec(raw){
 export const saveFmSpec=p=>JSON.stringify(validateFmSpec(p),null,2)+'\n';
 export const loadFmSpec=text=>validateFmSpec(JSON.parse(text));
 export class OwnedFm {
- constructor(engine,spec,rate){
+ constructor(engine,spec,rate,transitionFactory=null){
+  this.transitionFactory=transitionFactory;
   if(!finite(rate)||rate<8000||rate>192000||engine.fm_owned_api()!==1)throw Error('Owned FM ABI/rate');
   this.e=engine;this.spec=validateFmSpec(spec);this.rate=rate;this.handle=engine.fm_owned_new(rate);if(!this.handle)throw Error('FM preparation failed');
   this.left=new Float32Array(2048);this.right=new Float32Array(2048);
@@ -37,7 +38,8 @@ export class OwnedFm {
   for(const x of p.globals)e.fm_owned_param(h,...x);for(const x of p.operators)e.fm_owned_op(h,...x);for(const x of p.routes)e.fm_owned_route(h,...x);for(const x of p.carriers)e.fm_owned_carrier(h,...x);
   const applyPerformance=(p,at)=>{if(!e.fm_owned_event(h,6,p.mode,at,p.portamento,Number(p.glide==='always')))throw Error('FM performance queue full');};
   applyPerformance(this.spec.performance,0);
-  this.transition=new PatchTransition(flattenFM(p),this.spec.performance,(scope,index,value)=>{
+  this.transition?.dispose?.();
+  this.transition=(this.transitionFactory??((...args)=>new PatchTransition(...args)))(flattenFM(p),this.spec.performance,(scope,index,value)=>{
    if(scope===0)e.fm_owned_param(h,index,value);else if(scope===1)e.fm_owned_op(h,Math.floor(index/32),index%32,value);else if(scope===2)e.fm_owned_route(h,Math.floor(index/8),index%8,value);else e.fm_owned_carrier(h,index,value);
   },applyPerformance,fmDiscrete,fmLog,this.rate);
   for(const x of this.spec.edits)this.transition.schedule(flattenFM(x.patch),x.performance,x.frame,x.seconds);
@@ -46,10 +48,10 @@ export class OwnedFm {
  alive(){if(!this.handle)throw Error('Disposed FM');}
  refresh(){this.alive();this.l=new Float32Array(this.e.memory.buffer,this.e.fm_owned_output(this.handle,0),2048);this.r=new Float32Array(this.e.memory.buffer,this.e.fm_owned_output(this.handle,1),2048);}
  render(frames){this.alive();if(!integer(frames,0,2048)||!frame(this.clock+frames))throw Error('FM block bounds');
-  for(let at=0;at<frames;){this.transition.tick(this.clock);const n=this.transition.span(this.clock,frames-at);this.e.fm_owned_render(this.handle,n);for(let i=0;i<n;i++){const gain=this.transition.gain(this.clock+i);this.left[at+i]=this.l[i]*gain;this.right[at+i]=this.r[i]*gain;}this.clock+=n;at+=n;this.peakActive=Math.max(this.peakActive,this.e.fm_owned_stat(this.handle,0));}
+  for(let at=0;at<frames;){this.transition.tick(this.clock);const n=this.transition.span(this.clock,frames-at);this.e.fm_owned_render(this.handle,n);if(this.transition.mix)this.transition.mix(this.l,this.r,this.left,this.right,at,n,this.clock);else for(let i=0;i<n;i++){const gain=this.transition.gain(this.clock+i);this.left[at+i]=this.l[i]*gain;this.right[at+i]=this.r[i]*gain;}this.clock+=n;at+=n;this.peakActive=Math.max(this.peakActive,this.e.fm_owned_stat(this.handle,0));}
  }
  stats(){this.alive();const e=this.e,h=this.handle;return {active:e.fm_owned_stat(h,0),peakActive:this.peakActive,steals:e.fm_owned_stat(h,1),dropped:e.fm_owned_stat(h,2),late:e.fm_owned_stat(h,3),frame:e.fm_owned_stat(h,4),latencyFrames:e.fm_owned_stat(h,6)};}
  reset(){this.alive();this.e.fm_owned_init(this.handle,this.rate);this.configure();this.left.fill(0);this.right.fill(0);}
  panic(){this.alive();this.e.fm_owned_panic(this.handle);this.transition.clear();}
- dispose(){if(this.handle){this.e.fm_owned_free(this.handle);this.handle=0;this.l=this.r=null;}}
+ dispose(){this.transition?.dispose?.();if(this.handle){this.e.fm_owned_free(this.handle);this.handle=0;this.l=this.r=null;}}
 }
