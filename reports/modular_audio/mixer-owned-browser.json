@@ -1,0 +1,369 @@
+{
+  "kind": "mixer.native-vs-owned",
+  "version": 1,
+  "wasmSha256": "cd4284141d3ef58d865f181315701f00b57f71e3e45a5daf8688f04f635f71a3",
+  "scope": "Actual OfflineAudioContext stereo nodes versus owned Rust strip/matrix/fader; silent offline PCM, not physical listening or host FX/limiter migration.",
+  "pass": true,
+  "cases": [
+    {
+      "kind": "strip",
+      "rate": 44100,
+      "settled": false,
+      "frames": 8820,
+      "maxAbsoluteError": 0.000020757317543029785,
+      "relativeRms": 0.00003826432272805482,
+      "nonFinite": 0,
+      "pass": true,
+      "stats": {
+        "frame": 8820,
+        "applied": 2,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0,
+        "peak": 0.14235465228557587,
+        "latencyFrames": 0,
+        "reductionGain": 1
+      }
+    },
+    {
+      "kind": "strip",
+      "rate": 44100,
+      "settled": true,
+      "frames": 8820,
+      "maxAbsoluteError": 0.0000064820051193237305,
+      "relativeRms": 0.00002422805531286228,
+      "nonFinite": 0,
+      "pass": true,
+      "stats": {
+        "frame": 8820,
+        "applied": 2,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0,
+        "peak": 0.14235466718673706,
+        "latencyFrames": 0,
+        "reductionGain": 1
+      }
+    },
+    {
+      "kind": "matrix",
+      "rate": 44100,
+      "settled": false,
+      "frames": 8820,
+      "maxAbsoluteError": 0.000048607587814331055,
+      "relativeRms": 0.00005049218782190234,
+      "nonFinite": 0,
+      "pass": true,
+      "stats": {
+        "frame": 8820,
+        "applied": 2,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0,
+        "peak": 0.18088744580745697,
+        "latencyFrames": 0,
+        "reductionGain": 1
+      }
+    },
+    {
+      "kind": "matrix",
+      "rate": 44100,
+      "settled": true,
+      "frames": 8820,
+      "maxAbsoluteError": 0.000011920928955078125,
+      "relativeRms": 0.000013285994491849576,
+      "nonFinite": 0,
+      "pass": true,
+      "stats": {
+        "frame": 8820,
+        "applied": 2,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0,
+        "peak": 0.18088743090629578,
+        "latencyFrames": 0,
+        "reductionGain": 1
+      }
+    },
+    {
+      "kind": "fader",
+      "rate": 44100,
+      "settled": false,
+      "frames": 8820,
+      "maxAbsoluteError": 0.000017929822206497192,
+      "relativeRms": 0.00003519579356521238,
+      "nonFinite": 0,
+      "pass": true,
+      "stats": {
+        "frame": 8820,
+        "applied": 2,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0,
+        "peak": 0.13480305671691895,
+        "latencyFrames": 0,
+        "reductionGain": 1
+      }
+    },
+    {
+      "kind": "fader",
+      "rate": 44100,
+      "settled": true,
+      "frames": 8820,
+      "maxAbsoluteError": 0.000015176832675933838,
+      "relativeRms": 0.000026283113967552828,
+      "nonFinite": 0,
+      "pass": true,
+      "stats": {
+        "frame": 8820,
+        "applied": 2,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0,
+        "peak": 0.13480305671691895,
+        "latencyFrames": 0,
+        "reductionGain": 1
+      }
+    },
+    {
+      "kind": "strip",
+      "rate": 48000,
+      "settled": false,
+      "frames": 9600,
+      "maxAbsoluteError": 0.000015407800674438477,
+      "relativeRms": 0.00003101403557315256,
+      "nonFinite": 0,
+      "pass": true,
+      "stats": {
+        "frame": 9600,
+        "applied": 2,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0,
+        "peak": 0.14447198808193207,
+        "latencyFrames": 0,
+        "reductionGain": 1
+      }
+    },
+    {
+      "kind": "strip",
+      "rate": 48000,
+      "settled": true,
+      "frames": 9600,
+      "maxAbsoluteError": 0.000006288290023803711,
+      "relativeRms": 0.00002170187676169437,
+      "nonFinite": 0,
+      "pass": true,
+      "stats": {
+        "frame": 9600,
+        "applied": 2,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0,
+        "peak": 0.14447198808193207,
+        "latencyFrames": 0,
+        "reductionGain": 1
+      }
+    },
+    {
+      "kind": "matrix",
+      "rate": 48000,
+      "settled": false,
+      "frames": 9600,
+      "maxAbsoluteError": 0.00005207955837249756,
+      "relativeRms": 0.00005423231709196166,
+      "nonFinite": 0,
+      "pass": true,
+      "stats": {
+        "frame": 9600,
+        "applied": 2,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0,
+        "peak": 0.18583764135837555,
+        "latencyFrames": 0,
+        "reductionGain": 1
+      }
+    },
+    {
+      "kind": "matrix",
+      "rate": 48000,
+      "settled": true,
+      "frames": 9600,
+      "maxAbsoluteError": 0.0000130385160446167,
+      "relativeRms": 0.000014192252063299423,
+      "nonFinite": 0,
+      "pass": true,
+      "stats": {
+        "frame": 9600,
+        "applied": 2,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0,
+        "peak": 0.18583762645721436,
+        "latencyFrames": 0,
+        "reductionGain": 1
+      }
+    },
+    {
+      "kind": "fader",
+      "rate": 48000,
+      "settled": false,
+      "frames": 9600,
+      "maxAbsoluteError": 0.00002024322748184204,
+      "relativeRms": 0.00003854993282879582,
+      "nonFinite": 0,
+      "pass": true,
+      "stats": {
+        "frame": 9600,
+        "applied": 2,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0,
+        "peak": 0.13499794900417328,
+        "latencyFrames": 0,
+        "reductionGain": 1
+      }
+    },
+    {
+      "kind": "fader",
+      "rate": 48000,
+      "settled": true,
+      "frames": 9600,
+      "maxAbsoluteError": 0.000016707926988601685,
+      "relativeRms": 0.000028477246196723925,
+      "nonFinite": 0,
+      "pass": true,
+      "stats": {
+        "frame": 9600,
+        "applied": 2,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0,
+        "peak": 0.13499794900417328,
+        "latencyFrames": 0,
+        "reductionGain": 1
+      }
+    },
+    {
+      "kind": "strip",
+      "rate": 96000,
+      "settled": false,
+      "frames": 19200,
+      "maxAbsoluteError": 0.000021636486053466797,
+      "relativeRms": 0.00005917011278796873,
+      "nonFinite": 0,
+      "pass": true,
+      "stats": {
+        "frame": 19200,
+        "applied": 2,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0,
+        "peak": 0.1277279406785965,
+        "latencyFrames": 0,
+        "reductionGain": 1
+      }
+    },
+    {
+      "kind": "strip",
+      "rate": 96000,
+      "settled": true,
+      "frames": 19200,
+      "maxAbsoluteError": 0.000016383826732635498,
+      "relativeRms": 0.00006671529792628096,
+      "nonFinite": 0,
+      "pass": true,
+      "stats": {
+        "frame": 19200,
+        "applied": 2,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0,
+        "peak": 0.1277279257774353,
+        "latencyFrames": 0,
+        "reductionGain": 1
+      }
+    },
+    {
+      "kind": "matrix",
+      "rate": 96000,
+      "settled": false,
+      "frames": 19200,
+      "maxAbsoluteError": 0.00006084144115447998,
+      "relativeRms": 0.00007195388333157766,
+      "nonFinite": 0,
+      "pass": true,
+      "stats": {
+        "frame": 19200,
+        "applied": 2,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0,
+        "peak": 0.1769513636827469,
+        "latencyFrames": 0,
+        "reductionGain": 1
+      }
+    },
+    {
+      "kind": "matrix",
+      "rate": 96000,
+      "settled": true,
+      "frames": 19200,
+      "maxAbsoluteError": 0.000017255544662475586,
+      "relativeRms": 0.000017674143075479426,
+      "nonFinite": 0,
+      "pass": true,
+      "stats": {
+        "frame": 19200,
+        "applied": 2,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0,
+        "peak": 0.1769513636827469,
+        "latencyFrames": 0,
+        "reductionGain": 1
+      }
+    },
+    {
+      "kind": "fader",
+      "rate": 96000,
+      "settled": false,
+      "frames": 19200,
+      "maxAbsoluteError": 0.000034928321838378906,
+      "relativeRms": 0.00005469389545638783,
+      "nonFinite": 0,
+      "pass": true,
+      "stats": {
+        "frame": 19200,
+        "applied": 2,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0,
+        "peak": 0.13068383932113647,
+        "latencyFrames": 0,
+        "reductionGain": 1
+      }
+    },
+    {
+      "kind": "fader",
+      "rate": 96000,
+      "settled": true,
+      "frames": 19200,
+      "maxAbsoluteError": 0.000023245811462402344,
+      "relativeRms": 0.00003480338347062963,
+      "nonFinite": 0,
+      "pass": true,
+      "stats": {
+        "frame": 19200,
+        "applied": 2,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0,
+        "peak": 0.13068383932113647,
+        "latencyFrames": 0,
+        "reductionGain": 1
+      }
+    }
+  ]
+}

@@ -1192,3 +1192,13 @@ rlib APIs and preserved default legacy exports.96 exact matching-cadence legacy
 comparisons and6 zero-allocation independent-instance cases pass. See
 MODULAR_AUDIO_ENGINE_OWNED_EFFECTS.md. Graph adoption is a separate step because
 native block-entry behavior must be preserved; no default host route is replaced.
+
+### Mixer/limiter primitives and desktop comparison (overnight 2026-11-11)
+
+Portable strip, stereo matrix, fader and original3ms sample-peak limiter now
+exist; native defaults remain.30 focused tests,12 exact original-limiter cases,
+12 zero-allocation cases and18 actual-browser strip/matrix/fader comparisons
+pass (fixed1e-4 max/relativeRMS limits). Actual headroom/ambience/return/master
+insert seams are explicit in mixerGraphPlan. Graph adoption follows; see
+MODULAR_AUDIO_ENGINE_M4_MIXER.md. M4k Rust-prepared Iowa also passes the built-in
+browser's four serial/worker cases and a separate audible mixed-source run.

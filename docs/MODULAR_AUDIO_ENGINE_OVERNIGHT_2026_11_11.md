@@ -75,3 +75,9 @@ reviewable rather than weakening validation or changing sounds to force a pass.
   explicit pending combined desktop-browser verification. Effects extraction
   and mixer primitives are ready for parent integration while further independent
   classic wave-table/rack-effect work continues.
+
+- 11 November ~00:00 UTC: built-in browser passes18 native mixer comparisons
+  and the four-case Rust-prepared Iowa full path plus audible output. The mixer
+  primitives/limiter and explicit seam compiler are locally verified. Graph
+  insert/send adapters and opt-in fixed-path delay compensation are in progress;
+  they preserve canonical128 kernel input cadence and declare adapter latency.

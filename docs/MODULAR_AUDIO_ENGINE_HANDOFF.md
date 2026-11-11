@@ -2781,3 +2781,22 @@ Legacy effects/inserts binaries and cache/source manifests are rebuilt; current
 host/default routing remains unchanged. Canonical128-frame graph adapters with
 explicit128-frame latency are the next parent integration step, preserving the
 original kernels' block-sensitive wake/sleep and denormal behavior.
+
+## 2026-11-11 overnight — mixer primitives and first combined desktop evidence
+
+Owned strip/matrix/fader and the actual3ms sample-peak desk limiter are delivered
+as separate portable primitives; existing default/native routing is retained.
+See MODULAR_AUDIO_ENGINE_M4_MIXER.md.30 focused tests pass,12 actual-source
+limiter comparisons are bit-exact, and12 two-handle allocator cases are zero.
+The built-in-browser18case strip/matrix/fader native comparison passes fixed
+1e-4 max/relativeRMS limits (max6.084144115447998e-5,relative7.195388333157766e-5).
+This is bounded native parity, not a bit-exact native filter claim. Actual
+headroom/ambience/host-return seams remain explicit in mixerGraphPlan.
+
+M4k Rust-prepared Iowa is now verified in the built-in browser too: all four
+full-path serial/worker cases pass,942000/726000frames with no worker gaps.
+Both Iowa stems record preparation6e0c2bcde51edac3. A separate audible942000frame
+worker audition passes with all six source/channel peaks positive, no underruns,
+master peak0.11625781655311584. Evidence iowa-preparation-full-path-browser.json,
+iowa-preparation-audible-browser.json and screenshots under reports/modular_audio.
+These are routed output/counters, not new physical listening or phone acceptance.

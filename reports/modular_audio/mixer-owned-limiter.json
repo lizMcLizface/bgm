@@ -1,0 +1,232 @@
+{
+  "kind": "mixer.owned-desk-limiter",
+  "version": 1,
+  "engine": {
+    "kind": "mixer.owned-primitives",
+    "version": 1,
+    "allocationAudit": false,
+    "wasm": "cd4284141d3ef58d865f181315701f00b57f71e3e45a5daf8688f04f635f71a3",
+    "bytes": 68589,
+    "source": "238e09f6adf2915a3013bf291ee7350c88553e0cc380ba4afc045af0a9825d2e"
+  },
+  "reference": "public/desk-limiter-processor.js actual process() in isolated Node vm",
+  "scope": "Original stereo-linked sample-peak limiter, 3ms ceil delay, 80ms recovery, unchanged algorithms; no true-peak or physical-listening claim.",
+  "pass": true,
+  "trials": [
+    {
+      "rate": 8000,
+      "initialEnabled": true,
+      "frames": 10000,
+      "latencyFrames": 24,
+      "maxAbsoluteError": 0,
+      "bitExact": true,
+      "referenceSha256": [
+        "f846e79ea1ee9a509d0263030ac2721f196343e7bff8fca65ce1e405bb963773",
+        "8268f729aa50dfa485bfc5bc8038d6acbb1b7a2571e341dfd2963a303efdb044"
+      ],
+      "rustSha256": [
+        "f846e79ea1ee9a509d0263030ac2721f196343e7bff8fca65ce1e405bb963773",
+        "8268f729aa50dfa485bfc5bc8038d6acbb1b7a2571e341dfd2963a303efdb044"
+      ]
+    },
+    {
+      "rate": 8000,
+      "initialEnabled": false,
+      "frames": 10000,
+      "latencyFrames": 24,
+      "maxAbsoluteError": 0,
+      "bitExact": true,
+      "referenceSha256": [
+        "941abd98319852de5f794de687209155b3ea2167fd77080ef83c5f32c5de46b0",
+        "b0ece9cfc61e9907d645ff51e2ed12fab52b26b613d4e4a202c39550661fa0b3"
+      ],
+      "rustSha256": [
+        "941abd98319852de5f794de687209155b3ea2167fd77080ef83c5f32c5de46b0",
+        "b0ece9cfc61e9907d645ff51e2ed12fab52b26b613d4e4a202c39550661fa0b3"
+      ]
+    },
+    {
+      "rate": 24000,
+      "initialEnabled": true,
+      "frames": 10000,
+      "latencyFrames": 72,
+      "maxAbsoluteError": 0,
+      "bitExact": true,
+      "referenceSha256": [
+        "dd455c1fe4ccbdea14fd55f429a06cfd9458d5697d605ceb3880d10f9c83c651",
+        "897467453402f073e5be901f09606ae0c7b0e1834ba43852a02fbd3dcf6994ca"
+      ],
+      "rustSha256": [
+        "dd455c1fe4ccbdea14fd55f429a06cfd9458d5697d605ceb3880d10f9c83c651",
+        "897467453402f073e5be901f09606ae0c7b0e1834ba43852a02fbd3dcf6994ca"
+      ]
+    },
+    {
+      "rate": 24000,
+      "initialEnabled": false,
+      "frames": 10000,
+      "latencyFrames": 72,
+      "maxAbsoluteError": 0,
+      "bitExact": true,
+      "referenceSha256": [
+        "79cb1c62b3f1d0bd1ee20574f12b0ac6852c26de3a1c900559391b2f46f10614",
+        "b75192f4a0c3dfee5d83fc8216a3803ac556485ba9c2e7c7ea314c856dbbcafd"
+      ],
+      "rustSha256": [
+        "79cb1c62b3f1d0bd1ee20574f12b0ac6852c26de3a1c900559391b2f46f10614",
+        "b75192f4a0c3dfee5d83fc8216a3803ac556485ba9c2e7c7ea314c856dbbcafd"
+      ]
+    },
+    {
+      "rate": 44100,
+      "initialEnabled": true,
+      "frames": 10000,
+      "latencyFrames": 133,
+      "maxAbsoluteError": 0,
+      "bitExact": true,
+      "referenceSha256": [
+        "56cd2c87cc1fca38b837da5bc5f937712e0c4abbf357cbbc105a7249987e27ce",
+        "45156036424884d6d6ae1d58b2e5f8eb4b39d257ecaddc25ef97b25440bf2b06"
+      ],
+      "rustSha256": [
+        "56cd2c87cc1fca38b837da5bc5f937712e0c4abbf357cbbc105a7249987e27ce",
+        "45156036424884d6d6ae1d58b2e5f8eb4b39d257ecaddc25ef97b25440bf2b06"
+      ]
+    },
+    {
+      "rate": 44100,
+      "initialEnabled": false,
+      "frames": 10000,
+      "latencyFrames": 133,
+      "maxAbsoluteError": 0,
+      "bitExact": true,
+      "referenceSha256": [
+        "f1e373177534f52f37bcf84ee585480abf740be3ad1a24282d243c1de51938c2",
+        "8f10339562229c0d0dc06ec72139c397c19017027b4f1f6c124df7ad3a2bee31"
+      ],
+      "rustSha256": [
+        "f1e373177534f52f37bcf84ee585480abf740be3ad1a24282d243c1de51938c2",
+        "8f10339562229c0d0dc06ec72139c397c19017027b4f1f6c124df7ad3a2bee31"
+      ]
+    },
+    {
+      "rate": 48000,
+      "initialEnabled": true,
+      "frames": 10000,
+      "latencyFrames": 144,
+      "maxAbsoluteError": 0,
+      "bitExact": true,
+      "referenceSha256": [
+        "30cc3f188c09b9f2fc3c6841b13ca7ba9e0f350ff4b0deb61e9e045841125c07",
+        "e6753f363a515c71c910135aa957adfd96859d47fe61e1dab23947fe72a610e5"
+      ],
+      "rustSha256": [
+        "30cc3f188c09b9f2fc3c6841b13ca7ba9e0f350ff4b0deb61e9e045841125c07",
+        "e6753f363a515c71c910135aa957adfd96859d47fe61e1dab23947fe72a610e5"
+      ]
+    },
+    {
+      "rate": 48000,
+      "initialEnabled": false,
+      "frames": 10000,
+      "latencyFrames": 144,
+      "maxAbsoluteError": 0,
+      "bitExact": true,
+      "referenceSha256": [
+        "88e0ff09e911895b72b11f9fedc328520ea1fe34df10e9a4ab5bc0a342c10805",
+        "a92806d1a808fed5352c34c2a1c0a79e29b82496e8ea68d92c134d0ce0c7d5a3"
+      ],
+      "rustSha256": [
+        "88e0ff09e911895b72b11f9fedc328520ea1fe34df10e9a4ab5bc0a342c10805",
+        "a92806d1a808fed5352c34c2a1c0a79e29b82496e8ea68d92c134d0ce0c7d5a3"
+      ]
+    },
+    {
+      "rate": 96000,
+      "initialEnabled": true,
+      "frames": 10000,
+      "latencyFrames": 288,
+      "maxAbsoluteError": 0,
+      "bitExact": true,
+      "referenceSha256": [
+        "8860a82618eab124fdf2716f4eea92b6806673bb1c8b36ceee693ce35aefdd89",
+        "6ce4715746f87b98fb2a64726d265378941f4c0b8aae6ced476395afd0b9ddf7"
+      ],
+      "rustSha256": [
+        "8860a82618eab124fdf2716f4eea92b6806673bb1c8b36ceee693ce35aefdd89",
+        "6ce4715746f87b98fb2a64726d265378941f4c0b8aae6ced476395afd0b9ddf7"
+      ]
+    },
+    {
+      "rate": 96000,
+      "initialEnabled": false,
+      "frames": 10000,
+      "latencyFrames": 288,
+      "maxAbsoluteError": 0,
+      "bitExact": true,
+      "referenceSha256": [
+        "5149936adf773f697f9a5f314381b6b141932070ff06a695674552900c8c408f",
+        "3b45ce5c68ded1af8f75c0489955d53684247310565714b6e77f217f96cf13ed"
+      ],
+      "rustSha256": [
+        "5149936adf773f697f9a5f314381b6b141932070ff06a695674552900c8c408f",
+        "3b45ce5c68ded1af8f75c0489955d53684247310565714b6e77f217f96cf13ed"
+      ]
+    },
+    {
+      "rate": 192000,
+      "initialEnabled": true,
+      "frames": 10000,
+      "latencyFrames": 576,
+      "maxAbsoluteError": 0,
+      "bitExact": true,
+      "referenceSha256": [
+        "8fd6ce40f57151207f217dc43b4809702ea629eea5612aa7b9c1afeb7a0d436d",
+        "f476f45cb61af9198b29b8701f276c2ac8c134ea1ada31e616f03d657985b0e0"
+      ],
+      "rustSha256": [
+        "8fd6ce40f57151207f217dc43b4809702ea629eea5612aa7b9c1afeb7a0d436d",
+        "f476f45cb61af9198b29b8701f276c2ac8c134ea1ada31e616f03d657985b0e0"
+      ]
+    },
+    {
+      "rate": 192000,
+      "initialEnabled": false,
+      "frames": 10000,
+      "latencyFrames": 576,
+      "maxAbsoluteError": 0,
+      "bitExact": true,
+      "referenceSha256": [
+        "af61e5b4e6762a2c52c318b7385d6e94aa6e9bcd8ccd20f30188706adce5c599",
+        "c216e96c9ba583faf3ffd2a4b85b96ef4f38843e052545daf4d701a815f1e2c3"
+      ],
+      "rustSha256": [
+        "af61e5b4e6762a2c52c318b7385d6e94aa6e9bcd8ccd20f30188706adce5c599",
+        "c216e96c9ba583faf3ffd2a4b85b96ef4f38843e052545daf4d701a815f1e2c3"
+      ]
+    }
+  ],
+  "allocation": [
+    {
+      "rate": 44100,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1179648,
+      "grew": false
+    },
+    {
+      "rate": 48000,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1179648,
+      "grew": false
+    },
+    {
+      "rate": 96000,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1179648,
+      "grew": false
+    }
+  ]
+}

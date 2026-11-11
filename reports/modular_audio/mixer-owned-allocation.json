@@ -1,0 +1,124 @@
+{
+  "kind": "mixer.owned-allocation-persistence",
+  "version": 1,
+  "engine": {
+    "kind": "mixer.owned-primitives",
+    "version": 1,
+    "allocationAudit": true,
+    "wasm": "7553dfe4665f0225c1641aa9ce3cb55a2eeb4a3de0da19b0d673a8b5a6ed179e",
+    "bytes": 68094,
+    "source": "238e09f6adf2915a3013bf291ee7350c88553e0cc380ba4afc045af0a9825d2e"
+  },
+  "pass": true,
+  "scope": "Wasm-only owned strip/matrix/fader: same-memory handles, deterministic save/reload, 12ms smoothing/events, pause/cancel/reset; no native Web Audio parity claim.",
+  "results": [
+    {
+      "kind": "strip",
+      "rate": 44100,
+      "frames": 22050,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1179648,
+      "grew": false,
+      "saveReloadExact": true,
+      "independentHandles": 2,
+      "leftSha256": "6a87b46f63ac0dc28c77ecf37afdf0f7b88109cd6003a129db6d3e08c120d04d",
+      "rightSha256": "540a0768f6765106f03eb1ad76ef21b28bba13bb1ef647a4b266a6889f2e3fd2"
+    },
+    {
+      "kind": "matrix",
+      "rate": 44100,
+      "frames": 22050,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1179648,
+      "grew": false,
+      "saveReloadExact": true,
+      "independentHandles": 2,
+      "leftSha256": "600168ae1943166e906a5022f61a91ba63c14d7bd410441ca82946a5d8fcb806",
+      "rightSha256": "db271a883394507f9df2429e058ab4259f7e067ab564c784ef478b8794b810c2"
+    },
+    {
+      "kind": "fader",
+      "rate": 44100,
+      "frames": 22050,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1179648,
+      "grew": false,
+      "saveReloadExact": true,
+      "independentHandles": 2,
+      "leftSha256": "a3d9161d445657af4ae8ed9a6887d301e7ae3512ea7798d13720690c324441ad",
+      "rightSha256": "3370632b22cc3c6e5b5b98d08b82a2b107289ed73e75d25bbebdb6488c6425f7"
+    },
+    {
+      "kind": "strip",
+      "rate": 48000,
+      "frames": 24000,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1179648,
+      "grew": false,
+      "saveReloadExact": true,
+      "independentHandles": 2,
+      "leftSha256": "2dd700c369977b893094924fc950dfe343c10e7b93f01bd346ff4b781ed70e9d",
+      "rightSha256": "b3c5ac5018cf5abb131676acde7e8bfebeceed53680ed1cb8a60acdc0d5a0f37"
+    },
+    {
+      "kind": "matrix",
+      "rate": 48000,
+      "frames": 24000,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1179648,
+      "grew": false,
+      "saveReloadExact": true,
+      "independentHandles": 2,
+      "leftSha256": "6bdae5026dfbb63346f27e0ef67962d5e18681818e12d02951687a756289f761",
+      "rightSha256": "68024d218f15eb045f7a1f0d396a2f3b0d9a6bbbb216d609035d987c7a3bad4d"
+    },
+    {
+      "kind": "fader",
+      "rate": 48000,
+      "frames": 24000,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1179648,
+      "grew": false,
+      "saveReloadExact": true,
+      "independentHandles": 2,
+      "leftSha256": "e9d3982032851305a69a0bc30b41f8d0d3e29c7656406bcae375ae0d3bdf2b88",
+      "rightSha256": "889edcfb60d47ce51a669e61fea17ae7cb3c15ae1bf79d163d02991714ebd543"
+    },
+    {
+      "kind": "strip",
+      "rate": 96000,
+      "frames": 48000,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1179648,
+      "grew": false,
+      "saveReloadExact": true,
+      "independentHandles": 2,
+      "leftSha256": "95b50473888a739089558236246ac8112545ecd98386372f151f6eec1c347582",
+      "rightSha256": "e1c04f1d242f186cc5891cfe7647d2cdac74805156ad4eb08d60fb8fb3972fc9"
+    },
+    {
+      "kind": "matrix",
+      "rate": 96000,
+      "frames": 48000,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1179648,
+      "grew": false,
+      "saveReloadExact": true,
+      "independentHandles": 2,
+      "leftSha256": "4e646977390ebd0e8015966101d27eb075671832ee8a15db1a66fb4244847e00",
+      "rightSha256": "65289ab1706c8ec5044ebea17f6599dfc39d3873a67e35276f9146f907618992"
+    },
+    {
+      "kind": "fader",
+      "rate": 96000,
+      "frames": 48000,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1179648,
+      "grew": false,
+      "saveReloadExact": true,
+      "independentHandles": 2,
+      "leftSha256": "16d781597b48e9a68325e63b9245db8ea61f78455aa3feea87759638cae72622",
+      "rightSha256": "1b8f7e05f7bcfd6fa14840649b0188ee4e00ba83f0daa3c8a89fa8fe20c1b4c1"
+    }
+  ]
+}

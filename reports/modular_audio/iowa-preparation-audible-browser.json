@@ -1,0 +1,5854 @@
+{
+  "fixedScope": {
+    "profileRevision": "iowa-mixed-held-roll-v1",
+    "selections": [
+      [
+        "lead",
+        "iowa",
+        "Iowa Flute"
+      ],
+      [
+        "counter",
+        "fm",
+        "FM Rhodes"
+      ],
+      [
+        "rhythm",
+        "iowa",
+        "Iowa Marimba, roll"
+      ],
+      [
+        "pad",
+        "piano",
+        "Ravel"
+      ],
+      [
+        "bass",
+        "poly",
+        "Soft Pad"
+      ],
+      [
+        "perc",
+        "kit",
+        "hand"
+      ]
+    ],
+    "voiceWander": "captured Brownian on Pad",
+    "pianoPolyphony": {
+      "pad": 2
+    },
+    "songAndSettings": "All storage unchanged",
+    "worker": {
+      "blockFrames": 512,
+      "poolBlocks": 12,
+      "scheduling": "message"
+    }
+  },
+  "version": 1,
+  "kind": "all.owned-source-preview",
+  "hostRevision": "all-preview-delivery-v11",
+  "material": "voice-audition",
+  "audition": {
+    "version": 1,
+    "material": "diagnostic-test-notes",
+    "schedule": "individual-attacks-then-overlap",
+    "songUnchanged": true,
+    "soloSlotFrames": 36000,
+    "soloGateFrames": 24000,
+    "overlapFrame": 222000,
+    "overlapGateFrames": 96000
+  },
+  "diagnosticProbe": null,
+  "sourceFingerprint": "84e615d42d32ba8383c7ee545ffcf9d9b95004ec9e4a9f38fa18a8218cf5e68d",
+  "runId": "e56705bc-0fc7-48b5-a906-00406ed46304",
+  "browserUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36",
+  "sampleRate": 48000,
+  "scope": "Captured finite source stems through existing per-role FX/mixer and shared master; channel/master peaks may include legacy keyboard/shared tails, not isolated wet PCM or physical listening.",
+  "role": "source-set",
+  "requestedRoles": [
+    "lead",
+    "counter",
+    "rhythm",
+    "pad",
+    "bass",
+    "perc"
+  ],
+  "excludedRoles": [],
+  "stems": [
+    {
+      "role": "lead",
+      "sourceId": 1,
+      "kind": "iowa",
+      "noteCount": 2,
+      "peaks": {
+        "source": 0.07172771543264389,
+        "channel": 0.028905868530273438
+      }
+    },
+    {
+      "role": "counter",
+      "sourceId": 2,
+      "kind": "fm",
+      "noteCount": 2,
+      "peaks": {
+        "source": 0.11073797196149826,
+        "channel": 0.017637725919485092
+      }
+    },
+    {
+      "role": "rhythm",
+      "sourceId": 3,
+      "kind": "iowa",
+      "noteCount": 2,
+      "peaks": {
+        "source": 0.062271229922771454,
+        "channel": 0.053030386567115784
+      }
+    },
+    {
+      "role": "pad",
+      "sourceId": 4,
+      "kind": "piano",
+      "noteCount": 2,
+      "peaks": {
+        "source": 0.08498874306678772,
+        "channel": 0.09719529747962952
+      }
+    },
+    {
+      "role": "bass",
+      "sourceId": 5,
+      "kind": "subtractive",
+      "noteCount": 2,
+      "peaks": {
+        "source": 0.3401114046573639,
+        "channel": 0.03486914932727814
+      }
+    },
+    {
+      "role": "perc",
+      "sourceId": 6,
+      "kind": "percussion",
+      "noteCount": 0,
+      "hitCount": 17,
+      "audibleHitCount": 17,
+      "kitVoice": "hand",
+      "hitIdPolicy": {
+        "version": 1,
+        "base": 0,
+        "increment": "enabled booked hits in expanded receive order",
+        "liveCounterUnchanged": true
+      },
+      "expression": {
+        "cycle": 0,
+        "fill": false,
+        "swing": 0.5,
+        "flam": 0.5,
+        "random": "captured project seed xor 0x70657263",
+        "ignoredSoundParams": [],
+        "ignoredBasicKitTrackKeys": []
+      },
+      "peaks": {
+        "source": 0.32681140303611755,
+        "channel": 0.086272232234478
+      }
+    }
+  ],
+  "mode": "worker",
+  "startedAtUtc": "2026-11-10T23:50:36.355Z",
+  "completedAtUtc": "2026-11-10T23:50:56.461Z",
+  "reason": "completed",
+  "error": null,
+  "engineVersion": "67dc7a260e3e0ae7",
+  "executor": {
+    "requested": "worker",
+    "actual": "worker",
+    "fallbackReason": null,
+    "sourceIds": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "manualStart": true,
+    "stopOnUnderrun": true,
+    "deliveryDiagnostics": true,
+    "scheduling": "message",
+    "blockFrames": 512,
+    "poolBlocks": 12,
+    "renderAheadCapacityFrames": 6144,
+    "bufferingLatencyFrames": 6144,
+    "bufferingLatencyMs": 128,
+    "pcmPoolBytes": 393216,
+    "transport": "transferable MessagePort; no shared Wasm memory"
+  },
+  "plan": {
+    "version": 1,
+    "role": "source-set",
+    "roles": [
+      "lead",
+      "counter",
+      "rhythm",
+      "pad",
+      "bass",
+      "perc"
+    ],
+    "part": {
+      "startBar": 0,
+      "bars": 1
+    },
+    "bpm": 120,
+    "sampleRate": 48000,
+    "endFrame": 942000,
+    "noteCount": 10,
+    "hitCount": 17,
+    "sources": [
+      {
+        "role": "lead",
+        "sourceId": 1,
+        "kind": "iowa",
+        "noteCount": 2,
+        "notes": [
+          {
+            "midi": 72,
+            "time": 0.125,
+            "duration": 0.5,
+            "velocity": 0.45
+          },
+          {
+            "midi": 72,
+            "time": 4.625,
+            "duration": 2,
+            "velocity": 0.35
+          }
+        ],
+        "preparation": {
+          "backend": "rust",
+          "engineVersion": "6e0c2bcde51edac3"
+        },
+        "tailSeconds": 1,
+        "endFrame": 366000
+      },
+      {
+        "role": "counter",
+        "sourceId": 2,
+        "kind": "fm",
+        "noteCount": 2,
+        "notes": [
+          {
+            "midi": 64,
+            "time": 0.875,
+            "duration": 0.5,
+            "velocity": 0.45
+          },
+          {
+            "midi": 64,
+            "time": 4.625,
+            "duration": 2,
+            "velocity": 0.35
+          }
+        ],
+        "tailSeconds": 13,
+        "endFrame": 942000
+      },
+      {
+        "role": "rhythm",
+        "sourceId": 3,
+        "kind": "iowa",
+        "noteCount": 2,
+        "notes": [
+          {
+            "midi": 60,
+            "time": 1.625,
+            "duration": 0.5,
+            "velocity": 0.45
+          },
+          {
+            "midi": 60,
+            "time": 4.625,
+            "duration": 2,
+            "velocity": 0.35
+          }
+        ],
+        "preparation": {
+          "backend": "rust",
+          "engineVersion": "6e0c2bcde51edac3"
+        },
+        "tailSeconds": 3.622,
+        "endFrame": 491856
+      },
+      {
+        "role": "pad",
+        "sourceId": 4,
+        "kind": "piano",
+        "noteCount": 2,
+        "notes": [
+          {
+            "midi": 55,
+            "time": 2.375,
+            "duration": 0.5,
+            "velocity": 0.45
+          },
+          {
+            "midi": 55,
+            "time": 4.625,
+            "duration": 2,
+            "velocity": 0.35
+          }
+        ],
+        "tailSeconds": 1.45,
+        "endFrame": 387600
+      },
+      {
+        "role": "bass",
+        "sourceId": 5,
+        "kind": "subtractive",
+        "noteCount": 2,
+        "notes": [
+          {
+            "midi": 36,
+            "time": 3.125,
+            "duration": 0.5,
+            "velocity": 0.45
+          },
+          {
+            "midi": 36,
+            "time": 4.625,
+            "duration": 2,
+            "velocity": 0.35
+          }
+        ],
+        "tailSeconds": 3,
+        "endFrame": 462000
+      },
+      {
+        "role": "perc",
+        "sourceId": 6,
+        "kind": "percussion",
+        "noteCount": 0,
+        "hitCount": 17,
+        "audibleHitCount": 17,
+        "hits": [
+          {
+            "drum": 0,
+            "mappedDrum": 0,
+            "track": null,
+            "time": 3.875,
+            "duration": 0.25,
+            "velocity": 0.35,
+            "vary": 0,
+            "hit": 1,
+            "ignoredSoundParams": []
+          },
+          {
+            "drum": 1,
+            "mappedDrum": 1,
+            "track": null,
+            "time": 4,
+            "duration": 0.25,
+            "velocity": 0.35,
+            "vary": 0,
+            "hit": 2,
+            "ignoredSoundParams": []
+          },
+          {
+            "drum": 4,
+            "mappedDrum": 4,
+            "track": null,
+            "time": 4.125,
+            "duration": 0.25,
+            "velocity": 0.35,
+            "vary": 0,
+            "hit": 3,
+            "ignoredSoundParams": []
+          },
+          {
+            "drum": 6,
+            "mappedDrum": 6,
+            "track": null,
+            "time": 4.25,
+            "duration": 0.25,
+            "velocity": 0.35,
+            "vary": 0,
+            "hit": 4,
+            "ignoredSoundParams": []
+          },
+          {
+            "drum": 4,
+            "mappedDrum": 4,
+            "track": null,
+            "time": 4.625,
+            "duration": 0.25,
+            "velocity": 0.22,
+            "vary": 0,
+            "hit": 5,
+            "ignoredSoundParams": []
+          },
+          {
+            "drum": 0,
+            "mappedDrum": 0,
+            "track": null,
+            "time": 4.625,
+            "duration": 0.25,
+            "velocity": 0.35,
+            "vary": 0,
+            "hit": 6,
+            "ignoredSoundParams": []
+          },
+          {
+            "drum": 5,
+            "mappedDrum": 5,
+            "track": null,
+            "time": 4.625,
+            "duration": 0.25,
+            "velocity": 0.2,
+            "vary": 0,
+            "hit": 7,
+            "ignoredSoundParams": []
+          },
+          {
+            "drum": 4,
+            "mappedDrum": 4,
+            "track": null,
+            "time": 4.875,
+            "duration": 0.25,
+            "velocity": 0.22,
+            "vary": 0,
+            "hit": 8,
+            "ignoredSoundParams": []
+          },
+          {
+            "drum": 4,
+            "mappedDrum": 4,
+            "track": null,
+            "time": 5.125,
+            "duration": 0.25,
+            "velocity": 0.22,
+            "vary": 0,
+            "hit": 9,
+            "ignoredSoundParams": []
+          },
+          {
+            "drum": 1,
+            "mappedDrum": 1,
+            "track": null,
+            "time": 5.125,
+            "duration": 0.25,
+            "velocity": 0.3,
+            "vary": 0,
+            "hit": 10,
+            "ignoredSoundParams": []
+          },
+          {
+            "drum": 4,
+            "mappedDrum": 4,
+            "track": null,
+            "time": 5.375,
+            "duration": 0.25,
+            "velocity": 0.22,
+            "vary": 0,
+            "hit": 11,
+            "ignoredSoundParams": []
+          },
+          {
+            "drum": 4,
+            "mappedDrum": 4,
+            "track": null,
+            "time": 5.625,
+            "duration": 0.25,
+            "velocity": 0.22,
+            "vary": 0,
+            "hit": 12,
+            "ignoredSoundParams": []
+          },
+          {
+            "drum": 0,
+            "mappedDrum": 0,
+            "track": null,
+            "time": 5.625,
+            "duration": 0.25,
+            "velocity": 0.35,
+            "vary": 0,
+            "hit": 13,
+            "ignoredSoundParams": []
+          },
+          {
+            "drum": 4,
+            "mappedDrum": 4,
+            "track": null,
+            "time": 5.875,
+            "duration": 0.25,
+            "velocity": 0.22,
+            "vary": 0,
+            "hit": 14,
+            "ignoredSoundParams": []
+          },
+          {
+            "drum": 4,
+            "mappedDrum": 4,
+            "track": null,
+            "time": 6.125,
+            "duration": 0.25,
+            "velocity": 0.22,
+            "vary": 0,
+            "hit": 15,
+            "ignoredSoundParams": []
+          },
+          {
+            "drum": 1,
+            "mappedDrum": 1,
+            "track": null,
+            "time": 6.125,
+            "duration": 0.25,
+            "velocity": 0.3,
+            "vary": 0,
+            "hit": 16,
+            "ignoredSoundParams": []
+          },
+          {
+            "drum": 4,
+            "mappedDrum": 4,
+            "track": null,
+            "time": 6.375,
+            "duration": 0.25,
+            "velocity": 0.22,
+            "vary": 0,
+            "hit": 17,
+            "ignoredSoundParams": []
+          }
+        ],
+        "kitVoice": "hand",
+        "hitIdPolicy": {
+          "version": 1,
+          "base": 0,
+          "increment": "enabled booked hits in expanded receive order",
+          "liveCounterUnchanged": true
+        },
+        "expression": {
+          "cycle": 0,
+          "fill": false,
+          "swing": 0.5,
+          "flam": 0.5,
+          "random": "captured project seed xor 0x70657263",
+          "ignoredSoundParams": [],
+          "ignoredBasicKitTrackKeys": []
+        },
+        "tailSeconds": 8.1,
+        "endFrame": 706800
+      }
+    ],
+    "graph": {
+      "version": 1,
+      "modules": [
+        {
+          "id": 1,
+          "type": "legacy.iowa",
+          "version": 1,
+          "parameters": {
+            "gain": 1
+          },
+          "config": {
+            "version": 1,
+            "sampleRate": 48000,
+            "quantumFrames": 128,
+            "voices": 32,
+            "banks": [
+              {
+                "id": 1,
+                "kind": "held",
+                "preparedFieldsOmitted": true
+              },
+              {
+                "id": 2,
+                "kind": "held",
+                "preparedFieldsOmitted": true
+              }
+            ],
+            "notes": [
+              {
+                "id": 1,
+                "bank": 1,
+                "midi": 72,
+                "velocity": 0.45,
+                "gain": 0.030026174208612675,
+                "tune": 1,
+                "ring": false,
+                "roll": null,
+                "slide": null
+              },
+              {
+                "id": 2,
+                "bank": 2,
+                "midi": 72,
+                "velocity": 0.35,
+                "gain": 0.02330773115282636,
+                "tune": 1,
+                "ring": false,
+                "roll": null,
+                "slide": null
+              }
+            ]
+          }
+        },
+        {
+          "id": 2,
+          "type": "legacy.fm",
+          "version": 1,
+          "parameters": {
+            "gain": 1
+          },
+          "config": {
+            "version": 1,
+            "patch": {
+              "globals": [
+                [
+                  0,
+                  4
+                ],
+                [
+                  1,
+                  2
+                ],
+                [
+                  2,
+                  2
+                ],
+                [
+                  3,
+                  0.3492750395225472
+                ],
+                [
+                  4,
+                  1
+                ],
+                [
+                  5,
+                  0
+                ],
+                [
+                  6,
+                  0
+                ],
+                [
+                  7,
+                  1
+                ],
+                [
+                  8,
+                  0
+                ],
+                [
+                  9,
+                  0
+                ],
+                [
+                  10,
+                  0.01
+                ],
+                [
+                  11,
+                  0
+                ],
+                [
+                  12,
+                  0
+                ],
+                [
+                  13,
+                  1
+                ],
+                [
+                  14,
+                  0.7
+                ],
+                [
+                  15,
+                  0
+                ],
+                [
+                  16,
+                  0.15
+                ],
+                [
+                  17,
+                  0
+                ],
+                [
+                  18,
+                  0
+                ],
+                [
+                  19,
+                  1.5
+                ],
+                [
+                  20,
+                  2
+                ],
+                [
+                  21,
+                  0.5
+                ],
+                [
+                  22,
+                  2
+                ],
+                [
+                  23,
+                  1
+                ],
+                [
+                  24,
+                  1
+                ],
+                [
+                  25,
+                  2
+                ],
+                [
+                  26,
+                  0.15
+                ],
+                [
+                  27,
+                  0
+                ],
+                [
+                  28,
+                  0.15
+                ],
+                [
+                  29,
+                  0
+                ],
+                [
+                  30,
+                  0
+                ],
+                [
+                  31,
+                  0
+                ],
+                [
+                  32,
+                  0
+                ],
+                [
+                  33,
+                  0
+                ],
+                [
+                  34,
+                  0
+                ],
+                [
+                  35,
+                  0
+                ],
+                [
+                  36,
+                  0
+                ],
+                [
+                  37,
+                  0
+                ],
+                [
+                  38,
+                  0
+                ],
+                [
+                  39,
+                  0
+                ],
+                [
+                  40,
+                  0
+                ],
+                [
+                  41,
+                  0
+                ],
+                [
+                  42,
+                  0
+                ],
+                [
+                  43,
+                  4500
+                ],
+                [
+                  44,
+                  0.25
+                ],
+                [
+                  45,
+                  0
+                ],
+                [
+                  46,
+                  0
+                ],
+                [
+                  47,
+                  0
+                ],
+                [
+                  48,
+                  0
+                ],
+                [
+                  49,
+                  0
+                ],
+                [
+                  50,
+                  0
+                ],
+                [
+                  51,
+                  1
+                ],
+                [
+                  52,
+                  0
+                ],
+                [
+                  53,
+                  0.25
+                ],
+                [
+                  54,
+                  0
+                ],
+                [
+                  55,
+                  0
+                ],
+                [
+                  56,
+                  0
+                ],
+                [
+                  57,
+                  0
+                ],
+                [
+                  58,
+                  0
+                ],
+                [
+                  59,
+                  0
+                ]
+              ],
+              "operators": [
+                [
+                  0,
+                  0,
+                  1
+                ],
+                [
+                  0,
+                  1,
+                  0
+                ],
+                [
+                  0,
+                  2,
+                  0
+                ],
+                [
+                  0,
+                  3,
+                  4.25
+                ],
+                [
+                  0,
+                  4,
+                  0
+                ],
+                [
+                  0,
+                  5,
+                  1.1700000000000002
+                ],
+                [
+                  0,
+                  6,
+                  1
+                ],
+                [
+                  0,
+                  7,
+                  0.002
+                ],
+                [
+                  0,
+                  8,
+                  0.058823529411764705
+                ],
+                [
+                  0,
+                  9,
+                  0.058823529411764705
+                ],
+                [
+                  0,
+                  10,
+                  12
+                ],
+                [
+                  0,
+                  11,
+                  0
+                ],
+                [
+                  0,
+                  12,
+                  0
+                ],
+                [
+                  0,
+                  13,
+                  0
+                ],
+                [
+                  0,
+                  14,
+                  0
+                ],
+                [
+                  0,
+                  15,
+                  0
+                ],
+                [
+                  0,
+                  16,
+                  1
+                ],
+                [
+                  0,
+                  17,
+                  0
+                ],
+                [
+                  0,
+                  18,
+                  1
+                ],
+                [
+                  0,
+                  19,
+                  1
+                ],
+                [
+                  0,
+                  20,
+                  4
+                ],
+                [
+                  0,
+                  21,
+                  0
+                ],
+                [
+                  1,
+                  0,
+                  1
+                ],
+                [
+                  1,
+                  1,
+                  0
+                ],
+                [
+                  1,
+                  2,
+                  0
+                ],
+                [
+                  1,
+                  3,
+                  1
+                ],
+                [
+                  1,
+                  4,
+                  0.004
+                ],
+                [
+                  1,
+                  5,
+                  1.8
+                ],
+                [
+                  1,
+                  6,
+                  1
+                ],
+                [
+                  1,
+                  7,
+                  0.002
+                ],
+                [
+                  1,
+                  8,
+                  0.2
+                ],
+                [
+                  1,
+                  9,
+                  0.2
+                ],
+                [
+                  1,
+                  10,
+                  0.7
+                ],
+                [
+                  1,
+                  11,
+                  1
+                ],
+                [
+                  1,
+                  12,
+                  0
+                ],
+                [
+                  1,
+                  13,
+                  0
+                ],
+                [
+                  1,
+                  14,
+                  0
+                ],
+                [
+                  1,
+                  15,
+                  0
+                ],
+                [
+                  1,
+                  16,
+                  1
+                ],
+                [
+                  1,
+                  17,
+                  0
+                ],
+                [
+                  1,
+                  18,
+                  2
+                ],
+                [
+                  1,
+                  19,
+                  2
+                ],
+                [
+                  1,
+                  20,
+                  2
+                ],
+                [
+                  1,
+                  21,
+                  1
+                ],
+                [
+                  2,
+                  0,
+                  1
+                ],
+                [
+                  2,
+                  1,
+                  0
+                ],
+                [
+                  2,
+                  2,
+                  0
+                ],
+                [
+                  2,
+                  3,
+                  1
+                ],
+                [
+                  2,
+                  4,
+                  0.004
+                ],
+                [
+                  2,
+                  5,
+                  1.8
+                ],
+                [
+                  2,
+                  6,
+                  1
+                ],
+                [
+                  2,
+                  7,
+                  0.002
+                ],
+                [
+                  2,
+                  8,
+                  0.2
+                ],
+                [
+                  2,
+                  9,
+                  0.2
+                ],
+                [
+                  2,
+                  10,
+                  0.7
+                ],
+                [
+                  2,
+                  11,
+                  1
+                ],
+                [
+                  2,
+                  12,
+                  0
+                ],
+                [
+                  2,
+                  13,
+                  0
+                ],
+                [
+                  2,
+                  14,
+                  0
+                ],
+                [
+                  2,
+                  15,
+                  0
+                ],
+                [
+                  2,
+                  16,
+                  1
+                ],
+                [
+                  2,
+                  17,
+                  0
+                ],
+                [
+                  2,
+                  18,
+                  2
+                ],
+                [
+                  2,
+                  19,
+                  2
+                ],
+                [
+                  2,
+                  20,
+                  2
+                ],
+                [
+                  2,
+                  21,
+                  1
+                ],
+                [
+                  3,
+                  0,
+                  1
+                ],
+                [
+                  3,
+                  1,
+                  0
+                ],
+                [
+                  3,
+                  2,
+                  0
+                ],
+                [
+                  3,
+                  3,
+                  1
+                ],
+                [
+                  3,
+                  4,
+                  0.004
+                ],
+                [
+                  3,
+                  5,
+                  1.8
+                ],
+                [
+                  3,
+                  6,
+                  1
+                ],
+                [
+                  3,
+                  7,
+                  0.002
+                ],
+                [
+                  3,
+                  8,
+                  0.2
+                ],
+                [
+                  3,
+                  9,
+                  0.2
+                ],
+                [
+                  3,
+                  10,
+                  0.7
+                ],
+                [
+                  3,
+                  11,
+                  1
+                ],
+                [
+                  3,
+                  12,
+                  0
+                ],
+                [
+                  3,
+                  13,
+                  0
+                ],
+                [
+                  3,
+                  14,
+                  0
+                ],
+                [
+                  3,
+                  15,
+                  0
+                ],
+                [
+                  3,
+                  16,
+                  1
+                ],
+                [
+                  3,
+                  17,
+                  0
+                ],
+                [
+                  3,
+                  18,
+                  2
+                ],
+                [
+                  3,
+                  19,
+                  2
+                ],
+                [
+                  3,
+                  20,
+                  2
+                ],
+                [
+                  3,
+                  21,
+                  1
+                ],
+                [
+                  4,
+                  0,
+                  1
+                ],
+                [
+                  4,
+                  1,
+                  0
+                ],
+                [
+                  4,
+                  2,
+                  0
+                ],
+                [
+                  4,
+                  3,
+                  1
+                ],
+                [
+                  4,
+                  4,
+                  0.004
+                ],
+                [
+                  4,
+                  5,
+                  1.8
+                ],
+                [
+                  4,
+                  6,
+                  1
+                ],
+                [
+                  4,
+                  7,
+                  0.002
+                ],
+                [
+                  4,
+                  8,
+                  0.2
+                ],
+                [
+                  4,
+                  9,
+                  0.2
+                ],
+                [
+                  4,
+                  10,
+                  0.7
+                ],
+                [
+                  4,
+                  11,
+                  1
+                ],
+                [
+                  4,
+                  12,
+                  0
+                ],
+                [
+                  4,
+                  13,
+                  0
+                ],
+                [
+                  4,
+                  14,
+                  0
+                ],
+                [
+                  4,
+                  15,
+                  0
+                ],
+                [
+                  4,
+                  16,
+                  0
+                ],
+                [
+                  4,
+                  17,
+                  0
+                ],
+                [
+                  4,
+                  18,
+                  2
+                ],
+                [
+                  4,
+                  19,
+                  2
+                ],
+                [
+                  4,
+                  20,
+                  2
+                ],
+                [
+                  4,
+                  21,
+                  1
+                ],
+                [
+                  5,
+                  0,
+                  1
+                ],
+                [
+                  5,
+                  1,
+                  0
+                ],
+                [
+                  5,
+                  2,
+                  0
+                ],
+                [
+                  5,
+                  3,
+                  1
+                ],
+                [
+                  5,
+                  4,
+                  0.004
+                ],
+                [
+                  5,
+                  5,
+                  1.8
+                ],
+                [
+                  5,
+                  6,
+                  1
+                ],
+                [
+                  5,
+                  7,
+                  0.002
+                ],
+                [
+                  5,
+                  8,
+                  0.2
+                ],
+                [
+                  5,
+                  9,
+                  0.2
+                ],
+                [
+                  5,
+                  10,
+                  0.7
+                ],
+                [
+                  5,
+                  11,
+                  1
+                ],
+                [
+                  5,
+                  12,
+                  0
+                ],
+                [
+                  5,
+                  13,
+                  0
+                ],
+                [
+                  5,
+                  14,
+                  0
+                ],
+                [
+                  5,
+                  15,
+                  0
+                ],
+                [
+                  5,
+                  16,
+                  0
+                ],
+                [
+                  5,
+                  17,
+                  0
+                ],
+                [
+                  5,
+                  18,
+                  2
+                ],
+                [
+                  5,
+                  19,
+                  2
+                ],
+                [
+                  5,
+                  20,
+                  2
+                ],
+                [
+                  5,
+                  21,
+                  1
+                ],
+                [
+                  6,
+                  0,
+                  1
+                ],
+                [
+                  6,
+                  1,
+                  0
+                ],
+                [
+                  6,
+                  2,
+                  0
+                ],
+                [
+                  6,
+                  3,
+                  1
+                ],
+                [
+                  6,
+                  4,
+                  0.004
+                ],
+                [
+                  6,
+                  5,
+                  1.8
+                ],
+                [
+                  6,
+                  6,
+                  1
+                ],
+                [
+                  6,
+                  7,
+                  0.002
+                ],
+                [
+                  6,
+                  8,
+                  0.2
+                ],
+                [
+                  6,
+                  9,
+                  0.2
+                ],
+                [
+                  6,
+                  10,
+                  0.7
+                ],
+                [
+                  6,
+                  11,
+                  1
+                ],
+                [
+                  6,
+                  12,
+                  0
+                ],
+                [
+                  6,
+                  13,
+                  0
+                ],
+                [
+                  6,
+                  14,
+                  0
+                ],
+                [
+                  6,
+                  15,
+                  0
+                ],
+                [
+                  6,
+                  16,
+                  0
+                ],
+                [
+                  6,
+                  17,
+                  0
+                ],
+                [
+                  6,
+                  18,
+                  2
+                ],
+                [
+                  6,
+                  19,
+                  2
+                ],
+                [
+                  6,
+                  20,
+                  2
+                ],
+                [
+                  6,
+                  21,
+                  1
+                ],
+                [
+                  7,
+                  0,
+                  1
+                ],
+                [
+                  7,
+                  1,
+                  0
+                ],
+                [
+                  7,
+                  2,
+                  0
+                ],
+                [
+                  7,
+                  3,
+                  1
+                ],
+                [
+                  7,
+                  4,
+                  0.004
+                ],
+                [
+                  7,
+                  5,
+                  1.8
+                ],
+                [
+                  7,
+                  6,
+                  1
+                ],
+                [
+                  7,
+                  7,
+                  0.002
+                ],
+                [
+                  7,
+                  8,
+                  0.2
+                ],
+                [
+                  7,
+                  9,
+                  0.2
+                ],
+                [
+                  7,
+                  10,
+                  0.7
+                ],
+                [
+                  7,
+                  11,
+                  1
+                ],
+                [
+                  7,
+                  12,
+                  0
+                ],
+                [
+                  7,
+                  13,
+                  0
+                ],
+                [
+                  7,
+                  14,
+                  0
+                ],
+                [
+                  7,
+                  15,
+                  0
+                ],
+                [
+                  7,
+                  16,
+                  0
+                ],
+                [
+                  7,
+                  17,
+                  0
+                ],
+                [
+                  7,
+                  18,
+                  2
+                ],
+                [
+                  7,
+                  19,
+                  2
+                ],
+                [
+                  7,
+                  20,
+                  2
+                ],
+                [
+                  7,
+                  21,
+                  1
+                ]
+              ],
+              "routes": [
+                [
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  1,
+                  1
+                ],
+                [
+                  0,
+                  2,
+                  0
+                ],
+                [
+                  0,
+                  3,
+                  0
+                ],
+                [
+                  0,
+                  4,
+                  0
+                ],
+                [
+                  0,
+                  5,
+                  0
+                ],
+                [
+                  0,
+                  6,
+                  0
+                ],
+                [
+                  0,
+                  7,
+                  0
+                ],
+                [
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  1,
+                  1,
+                  0
+                ],
+                [
+                  1,
+                  2,
+                  0
+                ],
+                [
+                  1,
+                  3,
+                  0
+                ],
+                [
+                  1,
+                  4,
+                  0
+                ],
+                [
+                  1,
+                  5,
+                  0
+                ],
+                [
+                  1,
+                  6,
+                  0
+                ],
+                [
+                  1,
+                  7,
+                  0
+                ],
+                [
+                  2,
+                  0,
+                  0
+                ],
+                [
+                  2,
+                  1,
+                  0
+                ],
+                [
+                  2,
+                  2,
+                  0
+                ],
+                [
+                  2,
+                  3,
+                  0
+                ],
+                [
+                  2,
+                  4,
+                  0
+                ],
+                [
+                  2,
+                  5,
+                  0
+                ],
+                [
+                  2,
+                  6,
+                  0
+                ],
+                [
+                  2,
+                  7,
+                  0
+                ],
+                [
+                  3,
+                  0,
+                  0
+                ],
+                [
+                  3,
+                  1,
+                  0
+                ],
+                [
+                  3,
+                  2,
+                  0
+                ],
+                [
+                  3,
+                  3,
+                  0
+                ],
+                [
+                  3,
+                  4,
+                  0
+                ],
+                [
+                  3,
+                  5,
+                  0
+                ],
+                [
+                  3,
+                  6,
+                  0
+                ],
+                [
+                  3,
+                  7,
+                  0
+                ],
+                [
+                  4,
+                  0,
+                  0
+                ],
+                [
+                  4,
+                  1,
+                  0
+                ],
+                [
+                  4,
+                  2,
+                  0
+                ],
+                [
+                  4,
+                  3,
+                  0
+                ],
+                [
+                  4,
+                  4,
+                  0
+                ],
+                [
+                  4,
+                  5,
+                  0
+                ],
+                [
+                  4,
+                  6,
+                  0
+                ],
+                [
+                  4,
+                  7,
+                  0
+                ],
+                [
+                  5,
+                  0,
+                  0
+                ],
+                [
+                  5,
+                  1,
+                  0
+                ],
+                [
+                  5,
+                  2,
+                  0
+                ],
+                [
+                  5,
+                  3,
+                  0
+                ],
+                [
+                  5,
+                  4,
+                  0
+                ],
+                [
+                  5,
+                  5,
+                  0
+                ],
+                [
+                  5,
+                  6,
+                  0
+                ],
+                [
+                  5,
+                  7,
+                  0
+                ],
+                [
+                  6,
+                  0,
+                  0
+                ],
+                [
+                  6,
+                  1,
+                  0
+                ],
+                [
+                  6,
+                  2,
+                  0
+                ],
+                [
+                  6,
+                  3,
+                  0
+                ],
+                [
+                  6,
+                  4,
+                  0
+                ],
+                [
+                  6,
+                  5,
+                  0
+                ],
+                [
+                  6,
+                  6,
+                  0
+                ],
+                [
+                  6,
+                  7,
+                  0
+                ],
+                [
+                  7,
+                  0,
+                  0
+                ],
+                [
+                  7,
+                  1,
+                  0
+                ],
+                [
+                  7,
+                  2,
+                  0
+                ],
+                [
+                  7,
+                  3,
+                  0
+                ],
+                [
+                  7,
+                  4,
+                  0
+                ],
+                [
+                  7,
+                  5,
+                  0
+                ],
+                [
+                  7,
+                  6,
+                  0
+                ],
+                [
+                  7,
+                  7,
+                  0
+                ]
+              ],
+              "carriers": [
+                [
+                  0,
+                  0
+                ],
+                [
+                  1,
+                  1
+                ],
+                [
+                  2,
+                  0
+                ],
+                [
+                  3,
+                  0
+                ],
+                [
+                  4,
+                  0
+                ],
+                [
+                  5,
+                  0
+                ],
+                [
+                  6,
+                  0
+                ],
+                [
+                  7,
+                  0
+                ]
+              ]
+            },
+            "performance": {
+              "mode": 0,
+              "portamento": 0,
+              "glide": "overlap"
+            },
+            "events": [],
+            "edits": []
+          }
+        },
+        {
+          "id": 3,
+          "type": "legacy.iowa",
+          "version": 1,
+          "parameters": {
+            "gain": 1
+          },
+          "config": {
+            "version": 1,
+            "sampleRate": 48000,
+            "quantumFrames": 128,
+            "voices": 32,
+            "banks": [
+              {
+                "id": 1,
+                "kind": "decay",
+                "preparedFieldsOmitted": true
+              },
+              {
+                "id": 2,
+                "kind": "decay",
+                "preparedFieldsOmitted": true
+              }
+            ],
+            "notes": [
+              {
+                "id": 1,
+                "bank": 1,
+                "midi": 60,
+                "velocity": 0.45,
+                "gain": 0.7079457843841379,
+                "tune": 1,
+                "ring": true,
+                "roll": {
+                  "rate": 9.52,
+                  "timing": 0.78,
+                  "level": 3.39,
+                  "notes": 150
+                },
+                "slide": null
+              },
+              {
+                "id": 2,
+                "bank": 2,
+                "midi": 60,
+                "velocity": 0.35,
+                "gain": 0.7079457843841379,
+                "tune": 1,
+                "ring": true,
+                "roll": {
+                  "rate": 9.52,
+                  "timing": 0.78,
+                  "level": 3.39,
+                  "notes": 150
+                },
+                "slide": null
+              }
+            ]
+          }
+        },
+        {
+          "id": 4,
+          "type": "legacy.piano",
+          "version": 2,
+          "parameters": {
+            "gain": 1
+          },
+          "config": {
+            "version": 2,
+            "voices": 2,
+            "cutoff": 11000,
+            "q": 0,
+            "pitch": 0,
+            "pitchDecay": 0.07,
+            "banks": [
+              {
+                "decay": 2.8,
+                "brightness": 0.55,
+                "hammer": 0.45,
+                "unison": 0.25,
+                "seed": 11,
+                "resonance": 0,
+                "softness": 0,
+                "sustain": 0,
+                "wear": 0,
+                "type": "measuredRavel",
+                "frequency": 196,
+                "velocity": 0.42857142857142855
+              },
+              {
+                "decay": 2.8,
+                "brightness": 0.55,
+                "hammer": 0.45,
+                "unison": 0.25,
+                "seed": 11,
+                "resonance": 0,
+                "softness": 0,
+                "sustain": 0,
+                "wear": 0,
+                "type": "measuredRavel",
+                "frequency": 196,
+                "velocity": 0.2857142857142857
+              }
+            ],
+            "notes": [
+              {
+                "id": 1,
+                "bank": 0,
+                "midi": 55,
+                "velocity": 0.45,
+                "gain": [
+                  [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    60,
+                    0.028125,
+                    0
+                  ],
+                  [
+                    0,
+                    120,
+                    0.1125,
+                    0
+                  ],
+                  [
+                    0,
+                    180,
+                    0.253125,
+                    0
+                  ],
+                  [
+                    0,
+                    240,
+                    0.45,
+                    0
+                  ],
+                  [
+                    0,
+                    1040,
+                    0.45,
+                    0
+                  ],
+                  [
+                    0,
+                    1839.9999999999998,
+                    0.45,
+                    0
+                  ],
+                  [
+                    0,
+                    2640,
+                    0.45,
+                    0
+                  ],
+                  [
+                    0,
+                    3440,
+                    0.45,
+                    0
+                  ],
+                  [
+                    0,
+                    4240.000000000001,
+                    0.45,
+                    0
+                  ],
+                  [
+                    0,
+                    5040.000000000001,
+                    0.45,
+                    0
+                  ],
+                  [
+                    0,
+                    24000,
+                    0.45,
+                    0
+                  ],
+                  [
+                    0,
+                    24800.000000000004,
+                    0.44938271604938274,
+                    0
+                  ],
+                  [
+                    0,
+                    25600,
+                    0.44753086419753085,
+                    0
+                  ],
+                  [
+                    0,
+                    26400.000000000004,
+                    0.4444444444444445,
+                    0
+                  ],
+                  [
+                    0,
+                    27200,
+                    0.4401234567901235,
+                    0
+                  ],
+                  [
+                    0,
+                    28000,
+                    0.4345679012345679,
+                    0
+                  ],
+                  [
+                    0,
+                    28800,
+                    0.4277777777777778,
+                    0
+                  ],
+                  [
+                    0,
+                    29600,
+                    0.4197530864197531,
+                    0
+                  ],
+                  [
+                    0,
+                    30400,
+                    0.4104938271604938,
+                    0
+                  ],
+                  [
+                    0,
+                    31200,
+                    0.4,
+                    0
+                  ],
+                  [
+                    0,
+                    32000,
+                    0.3882716049382716,
+                    0
+                  ],
+                  [
+                    0,
+                    32800,
+                    0.37530864197530867,
+                    0
+                  ],
+                  [
+                    0,
+                    33600,
+                    0.3611111111111111,
+                    0
+                  ],
+                  [
+                    0,
+                    34400,
+                    0.34567901234567905,
+                    0
+                  ],
+                  [
+                    0,
+                    35200,
+                    0.3290123456790124,
+                    0
+                  ],
+                  [
+                    0,
+                    36000,
+                    0.3111111111111111,
+                    0
+                  ],
+                  [
+                    0,
+                    36800,
+                    0.2919753086419753,
+                    0
+                  ],
+                  [
+                    0,
+                    37600,
+                    0.2716049382716049,
+                    0
+                  ],
+                  [
+                    0,
+                    38400,
+                    0.25,
+                    0
+                  ],
+                  [
+                    0,
+                    39200,
+                    0.22716049382716047,
+                    0
+                  ],
+                  [
+                    0,
+                    40000,
+                    0.20308641975308647,
+                    0
+                  ],
+                  [
+                    0,
+                    40800.00000000001,
+                    0.17777777777777776,
+                    0
+                  ],
+                  [
+                    0,
+                    41600,
+                    0.15123456790123457,
+                    0
+                  ],
+                  [
+                    0,
+                    42400,
+                    0.12345679012345678,
+                    0
+                  ],
+                  [
+                    0,
+                    43199.99999999999,
+                    0.09444444444444444,
+                    0
+                  ],
+                  [
+                    0,
+                    44000,
+                    0.0641975308641975,
+                    0
+                  ],
+                  [
+                    0,
+                    44800,
+                    0.032716049382716106,
+                    0
+                  ],
+                  [
+                    0,
+                    45600,
+                    0,
+                    0
+                  ]
+                ],
+                "filter": [
+                  [
+                    1,
+                    0,
+                    0,
+                    0
+                  ]
+                ]
+              },
+              {
+                "id": 2,
+                "bank": 1,
+                "midi": 55,
+                "velocity": 0.35,
+                "gain": [
+                  [
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  [
+                    0,
+                    60,
+                    0.021875,
+                    0
+                  ],
+                  [
+                    0,
+                    120,
+                    0.0875,
+                    0
+                  ],
+                  [
+                    0,
+                    180,
+                    0.196875,
+                    0
+                  ],
+                  [
+                    0,
+                    240,
+                    0.35,
+                    0
+                  ],
+                  [
+                    0,
+                    1040,
+                    0.35,
+                    0
+                  ],
+                  [
+                    0,
+                    1839.9999999999998,
+                    0.35,
+                    0
+                  ],
+                  [
+                    0,
+                    2640,
+                    0.35,
+                    0
+                  ],
+                  [
+                    0,
+                    3440,
+                    0.35,
+                    0
+                  ],
+                  [
+                    0,
+                    4240.000000000001,
+                    0.35,
+                    0
+                  ],
+                  [
+                    0,
+                    5040.000000000001,
+                    0.35,
+                    0
+                  ],
+                  [
+                    0,
+                    96000,
+                    0.35,
+                    0
+                  ],
+                  [
+                    0,
+                    96800,
+                    0.34951989026063096,
+                    0
+                  ],
+                  [
+                    0,
+                    97600,
+                    0.34807956104252397,
+                    0
+                  ],
+                  [
+                    0,
+                    98399.99999999999,
+                    0.345679012345679,
+                    0
+                  ],
+                  [
+                    0,
+                    99200.00000000001,
+                    0.342318244170096,
+                    0
+                  ],
+                  [
+                    0,
+                    100000,
+                    0.337997256515775,
+                    0
+                  ],
+                  [
+                    0,
+                    100800,
+                    0.33271604938271604,
+                    0
+                  ],
+                  [
+                    0,
+                    101600,
+                    0.32647462277091904,
+                    0
+                  ],
+                  [
+                    0,
+                    102400,
+                    0.31927297668038407,
+                    0
+                  ],
+                  [
+                    0,
+                    103200,
+                    0.3111111111111111,
+                    0
+                  ],
+                  [
+                    0,
+                    104000,
+                    0.30198902606310013,
+                    0
+                  ],
+                  [
+                    0,
+                    104799.99999999999,
+                    0.29190672153635117,
+                    0
+                  ],
+                  [
+                    0,
+                    105600.00000000001,
+                    0.28086419753086417,
+                    0
+                  ],
+                  [
+                    0,
+                    106400,
+                    0.26886145404663925,
+                    0
+                  ],
+                  [
+                    0,
+                    107200,
+                    0.25589849108367624,
+                    0
+                  ],
+                  [
+                    0,
+                    108000,
+                    0.24197530864197528,
+                    0
+                  ],
+                  [
+                    0,
+                    108800,
+                    0.22709190672153634,
+                    0
+                  ],
+                  [
+                    0,
+                    109600,
+                    0.21124828532235937,
+                    0
+                  ],
+                  [
+                    0,
+                    110399.99999999999,
+                    0.19444444444444445,
+                    0
+                  ],
+                  [
+                    0,
+                    111200.00000000001,
+                    0.17668038408779146,
+                    0
+                  ],
+                  [
+                    0,
+                    112000,
+                    0.15795610425240056,
+                    0
+                  ],
+                  [
+                    0,
+                    112800,
+                    0.1382716049382716,
+                    0
+                  ],
+                  [
+                    0,
+                    113600,
+                    0.11762688614540467,
+                    0
+                  ],
+                  [
+                    0,
+                    114400,
+                    0.0960219478737997,
+                    0
+                  ],
+                  [
+                    0,
+                    115200,
+                    0.0734567901234568,
+                    0
+                  ],
+                  [
+                    0,
+                    116000,
+                    0.04993141289437586,
+                    0
+                  ],
+                  [
+                    0,
+                    116799.99999999999,
+                    0.025445816186557002,
+                    0
+                  ],
+                  [
+                    0,
+                    117600.00000000001,
+                    0,
+                    0
+                  ]
+                ],
+                "filter": [
+                  [
+                    1,
+                    0,
+                    0,
+                    0
+                  ]
+                ]
+              }
+            ],
+            "controls": [
+              {
+                "axis": "filter",
+                "kind": "linear",
+                "phase": 0.08333333333333326,
+                "frequency": 0.06666667014360428,
+                "initialDepth": 480,
+                "targetDepth": 480,
+                "points": [
+                  [
+                    0,
+                    -0.09305958009585721
+                  ],
+                  [
+                    9503.999999998996,
+                    -0.0868223794119265
+                  ],
+                  [
+                    105503.999999999,
+                    0.19559333751684704
+                  ],
+                  [
+                    201503.999999999,
+                    0.4389728019587249
+                  ],
+                  [
+                    297503.999999999,
+                    -0.03240211057645315
+                  ],
+                  [
+                    393503.999999999,
+                    0.3786441225277164
+                  ],
+                  [
+                    489503.999999999,
+                    0.4961537296123115
+                  ],
+                  [
+                    585503.999999999,
+                    -0.09957125030018155
+                  ],
+                  [
+                    681503.999999999,
+                    -0.14576108523587195
+                  ],
+                  [
+                    777503.999999999,
+                    0.38546908911685307
+                  ],
+                  [
+                    873503.999999999,
+                    -0.25705154017580156
+                  ],
+                  [
+                    969503.999999999,
+                    0.17610438050979393
+                  ],
+                  [
+                    1065503.999999999,
+                    -0.07225037445816707
+                  ],
+                  [
+                    1161503.999999999,
+                    0.2186560384715035
+                  ],
+                  [
+                    1257503.999999999,
+                    0.5082873480747292
+                  ],
+                  [
+                    1353503.999999999,
+                    0.5788602364075972
+                  ],
+                  [
+                    1449503.999999999,
+                    0.42477807399722245
+                  ],
+                  [
+                    1545503.999999999,
+                    0.44074076813014784
+                  ],
+                  [
+                    1641503.999999999,
+                    -0.45202085140668036
+                  ],
+                  [
+                    1737503.999999999,
+                    -0.14138082582473288
+                  ],
+                  [
+                    1833503.999999999,
+                    -0.12136824586431061
+                  ],
+                  [
+                    1929503.999999999,
+                    -0.12467150196783638
+                  ],
+                  [
+                    2025503.999999999,
+                    -0.09295630245467734
+                  ],
+                  [
+                    2121503.999999999,
+                    -0.8412670148397883
+                  ],
+                  [
+                    2217503.999999999,
+                    -0.04746061554434977
+                  ],
+                  [
+                    2313503.999999999,
+                    -0.1630792296344401
+                  ],
+                  [
+                    2409503.999999999,
+                    -0.8891896199261096
+                  ],
+                  [
+                    2505503.999999999,
+                    -0.19862004381212106
+                  ],
+                  [
+                    2601503.999999999,
+                    0.5171745015694462
+                  ],
+                  [
+                    2697503.999999999,
+                    -0.10345314046902665
+                  ],
+                  [
+                    2793503.999999999,
+                    -0.4670401700015905
+                  ],
+                  [
+                    2889503.999999999,
+                    0.2692295056929712
+                  ],
+                  [
+                    2985503.999999999,
+                    -0.42708236250433274
+                  ],
+                  [
+                    3081503.999999999,
+                    0.43846162682973233
+                  ],
+                  [
+                    3177503.999999999,
+                    0.44741169410034143
+                  ],
+                  [
+                    3273503.999999999,
+                    0.20935012102343897
+                  ],
+                  [
+                    3369503.999999999,
+                    0.007551948953850918
+                  ],
+                  [
+                    3465503.999999999,
+                    0.06504671000120865
+                  ],
+                  [
+                    3561503.999999999,
+                    0.17208036996725973
+                  ],
+                  [
+                    3657503.999999999,
+                    -0.002730465458705922
+                  ],
+                  [
+                    3753503.999999999,
+                    -0.32772374881023847
+                  ],
+                  [
+                    3849503.999999999,
+                    0.14359594145183685
+                  ],
+                  [
+                    3945503.999999999,
+                    0.06998829751369229
+                  ],
+                  [
+                    4041503.999999999,
+                    -0.028248386946388315
+                  ],
+                  [
+                    4137503.999999999,
+                    -0.11900950267364419
+                  ],
+                  [
+                    4233503.999999999,
+                    0.015698494452362155
+                  ],
+                  [
+                    4329503.999999999,
+                    -0.25506908430794795
+                  ],
+                  [
+                    4425503.999999999,
+                    -0.014636397179598859
+                  ],
+                  [
+                    4521503.999999999,
+                    0.11562254155157259
+                  ],
+                  [
+                    4617503.999999999,
+                    0.03708961200044669
+                  ],
+                  [
+                    4713503.999999999,
+                    -0.1638294141886858
+                  ],
+                  [
+                    4809503.999999999,
+                    0.22584836856830748
+                  ],
+                  [
+                    4905503.999999999,
+                    0.5402191371493377
+                  ],
+                  [
+                    5001503.999999999,
+                    0.4657851592208839
+                  ],
+                  [
+                    5097503.999999999,
+                    0.3412640016397317
+                  ],
+                  [
+                    5193503.999999999,
+                    0.23911566848945487
+                  ],
+                  [
+                    5289503.999999999,
+                    0.6372566571220766
+                  ],
+                  [
+                    5385503.999999999,
+                    0.42423903448407074
+                  ],
+                  [
+                    5481503.999999999,
+                    0.3174608095204512
+                  ],
+                  [
+                    5577503.999999999,
+                    0.6936040445876577
+                  ],
+                  [
+                    5673503.999999999,
+                    0.24004722531306477
+                  ],
+                  [
+                    5769503.999999999,
+                    0.03325122376135781
+                  ]
+                ],
+                "tauFrames": 14400
+              },
+              {
+                "axis": "pitch",
+                "kind": "linear",
+                "phase": 0.036111111111111205,
+                "frequency": 0.0555555559694767,
+                "initialDepth": 5,
+                "targetDepth": 5,
+                "points": [
+                  [
+                    0,
+                    0.5087623418953993
+                  ],
+                  [
+                    9503.999999998996,
+                    0.5176838771643819
+                  ],
+                  [
+                    105503.999999999,
+                    0.019601467127510652
+                  ],
+                  [
+                    201503.999999999,
+                    -0.2702042129348392
+                  ],
+                  [
+                    297503.999999999,
+                    -0.28377458913439746
+                  ],
+                  [
+                    393503.999999999,
+                    -0.04300350922545437
+                  ],
+                  [
+                    489503.999999999,
+                    -0.09052147835653734
+                  ],
+                  [
+                    585503.999999999,
+                    -0.03355006118412707
+                  ],
+                  [
+                    681503.999999999,
+                    -0.15003920955474115
+                  ],
+                  [
+                    777503.999999999,
+                    -0.17999792355589417
+                  ],
+                  [
+                    873503.999999999,
+                    0.2655740404592013
+                  ],
+                  [
+                    969503.999999999,
+                    0.30151680121232083
+                  ],
+                  [
+                    1065503.999999999,
+                    -0.7275415728033181
+                  ],
+                  [
+                    1161503.999999999,
+                    -0.18017161662030023
+                  ],
+                  [
+                    1257503.999999999,
+                    0.08413646083559634
+                  ],
+                  [
+                    1353503.999999999,
+                    0.11503725048894964
+                  ],
+                  [
+                    1449503.999999999,
+                    0.013646070927728182
+                  ],
+                  [
+                    1545503.999999999,
+                    0.07594013721147785
+                  ],
+                  [
+                    1641503.999999999,
+                    0.2613936727539432
+                  ],
+                  [
+                    1737503.999999999,
+                    0.3884939315166438
+                  ],
+                  [
+                    1833503.999999999,
+                    -0.067086041761236
+                  ],
+                  [
+                    1929503.999999999,
+                    -0.4427372008336006
+                  ],
+                  [
+                    2025503.999999999,
+                    -0.29436189464769935
+                  ],
+                  [
+                    2121503.999999999,
+                    0.016998323933424153
+                  ],
+                  [
+                    2217503.999999999,
+                    0.43377034311701124
+                  ],
+                  [
+                    2313503.999999999,
+                    0.508704981879518
+                  ],
+                  [
+                    2409503.999999999,
+                    0.9752364875912845
+                  ],
+                  [
+                    2505503.999999999,
+                    0.7998955920532627
+                  ],
+                  [
+                    2601503.999999999,
+                    0.12628727720010957
+                  ],
+                  [
+                    2697503.999999999,
+                    -0.03023234514073536
+                  ],
+                  [
+                    2793503.999999999,
+                    -0.044831009078808215
+                  ],
+                  [
+                    2889503.999999999,
+                    -0.5865051015760088
+                  ],
+                  [
+                    2985503.999999999,
+                    -0.5107688819542329
+                  ],
+                  [
+                    3081503.999999999,
+                    -0.5676741088724322
+                  ],
+                  [
+                    3177503.999999999,
+                    -0.324084896138201
+                  ],
+                  [
+                    3273503.999999999,
+                    -0.0032301219452817165
+                  ],
+                  [
+                    3369503.999999999,
+                    -0.4775783578011392
+                  ],
+                  [
+                    3465503.999999999,
+                    -0.5028463259906166
+                  ],
+                  [
+                    3561503.999999999,
+                    -0.3696492468463024
+                  ],
+                  [
+                    3657503.999999999,
+                    0.016770312484139183
+                  ],
+                  [
+                    3753503.999999999,
+                    0.47951269789338635
+                  ],
+                  [
+                    3849503.999999999,
+                    -0.40835334599633555
+                  ],
+                  [
+                    3945503.999999999,
+                    -0.2538951875221054
+                  ],
+                  [
+                    4041503.999999999,
+                    -0.5297577212611291
+                  ],
+                  [
+                    4137503.999999999,
+                    -0.4870472866874227
+                  ],
+                  [
+                    4233503.999999999,
+                    -0.718554710713387
+                  ],
+                  [
+                    4329503.999999999,
+                    -0.23147343972393308
+                  ],
+                  [
+                    4425503.999999999,
+                    -0.2821488239215597
+                  ],
+                  [
+                    4521503.999999999,
+                    -0.7332567627120685
+                  ],
+                  [
+                    4617503.999999999,
+                    -0.3564964530624115
+                  ],
+                  [
+                    4713503.999999999,
+                    -0.17826114637245816
+                  ],
+                  [
+                    4809503.999999999,
+                    -0.010206885848984548
+                  ],
+                  [
+                    4905503.999999999,
+                    -0.7046933691915731
+                  ],
+                  [
+                    5001503.999999999,
+                    -0.175860187188003
+                  ],
+                  [
+                    5097503.999999999,
+                    -0.29759109525497696
+                  ],
+                  [
+                    5193503.999999999,
+                    -0.14691376851023819
+                  ],
+                  [
+                    5289503.999999999,
+                    0.47551629852635724
+                  ],
+                  [
+                    5385503.999999999,
+                    0.14617560319134348
+                  ],
+                  [
+                    5481503.999999999,
+                    -0.21246101730076727
+                  ],
+                  [
+                    5577503.999999999,
+                    -0.1917438956278401
+                  ],
+                  [
+                    5673503.999999999,
+                    -0.27228683591536296
+                  ],
+                  [
+                    5769503.999999999,
+                    0.3109568576837898
+                  ]
+                ],
+                "tauFrames": 14400
+              }
+            ]
+          }
+        },
+        {
+          "id": 5,
+          "type": "legacy.core",
+          "version": 1,
+          "parameters": {
+            "gain": 1
+          },
+          "config": {
+            "version": 1,
+            "patch": [
+              [
+                0,
+                0,
+                1
+              ],
+              [
+                0,
+                1,
+                2
+              ],
+              [
+                0,
+                2,
+                3
+              ],
+              [
+                0,
+                3,
+                12
+              ],
+              [
+                0,
+                4,
+                1.0793375783845567
+              ],
+              [
+                0,
+                5,
+                0
+              ],
+              [
+                0,
+                6,
+                0
+              ],
+              [
+                0,
+                7,
+                0
+              ],
+              [
+                0,
+                8,
+                0
+              ],
+              [
+                0,
+                9,
+                0.3
+              ],
+              [
+                0,
+                10,
+                3
+              ],
+              [
+                0,
+                11,
+                0.6
+              ],
+              [
+                1,
+                0,
+                3
+              ],
+              [
+                1,
+                1,
+                1
+              ],
+              [
+                1,
+                2,
+                1
+              ],
+              [
+                1,
+                3,
+                0
+              ],
+              [
+                1,
+                4,
+                0
+              ],
+              [
+                1,
+                5,
+                0
+              ],
+              [
+                1,
+                6,
+                0.5
+              ],
+              [
+                1,
+                7,
+                0
+              ],
+              [
+                1,
+                8,
+                0
+              ],
+              [
+                1,
+                9,
+                900
+              ],
+              [
+                1,
+                10,
+                0.41366636128921125
+              ],
+              [
+                1,
+                11,
+                0
+              ],
+              [
+                1,
+                12,
+                10
+              ],
+              [
+                1,
+                13,
+                0
+              ],
+              [
+                1,
+                14,
+                0
+              ],
+              [
+                1,
+                15,
+                0
+              ],
+              [
+                1,
+                16,
+                0
+              ],
+              [
+                1,
+                17,
+                1.2
+              ],
+              [
+                1,
+                18,
+                1
+              ],
+              [
+                1,
+                19,
+                0.6
+              ],
+              [
+                1,
+                20,
+                2
+              ],
+              [
+                1,
+                21,
+                0.002
+              ],
+              [
+                1,
+                22,
+                0.002
+              ],
+              [
+                1,
+                23,
+                0
+              ],
+              [
+                1,
+                24,
+                0.002
+              ],
+              [
+                1,
+                25,
+                0.01
+              ],
+              [
+                1,
+                26,
+                0
+              ],
+              [
+                1,
+                27,
+                0
+              ],
+              [
+                1,
+                28,
+                0
+              ],
+              [
+                1,
+                29,
+                0
+              ],
+              [
+                1,
+                30,
+                1
+              ],
+              [
+                1,
+                31,
+                0
+              ],
+              [
+                1,
+                32,
+                0
+              ],
+              [
+                1,
+                33,
+                0
+              ],
+              [
+                1,
+                34,
+                0
+              ],
+              [
+                1,
+                35,
+                0.2
+              ],
+              [
+                1,
+                36,
+                0
+              ],
+              [
+                1,
+                37,
+                0
+              ],
+              [
+                1,
+                38,
+                0
+              ],
+              [
+                1,
+                39,
+                0
+              ],
+              [
+                1,
+                40,
+                0
+              ],
+              [
+                1,
+                41,
+                0
+              ],
+              [
+                1,
+                42,
+                1
+              ],
+              [
+                1,
+                43,
+                0
+              ],
+              [
+                1,
+                44,
+                0
+              ],
+              [
+                1,
+                45,
+                0
+              ],
+              [
+                1,
+                46,
+                0
+              ],
+              [
+                1,
+                47,
+                0
+              ],
+              [
+                1,
+                48,
+                0
+              ],
+              [
+                1,
+                49,
+                0
+              ],
+              [
+                1,
+                50,
+                0
+              ],
+              [
+                1,
+                51,
+                0
+              ],
+              [
+                1,
+                52,
+                0
+              ],
+              [
+                1,
+                53,
+                1
+              ],
+              [
+                1,
+                54,
+                0
+              ],
+              [
+                1,
+                55,
+                0
+              ],
+              [
+                1,
+                56,
+                0
+              ],
+              [
+                1,
+                57,
+                0
+              ],
+              [
+                1,
+                58,
+                0
+              ],
+              [
+                1,
+                59,
+                1
+              ],
+              [
+                1,
+                60,
+                2
+              ],
+              [
+                1,
+                61,
+                2
+              ],
+              [
+                1,
+                62,
+                1
+              ],
+              [
+                1,
+                63,
+                0.5
+              ],
+              [
+                1,
+                64,
+                2
+              ],
+              [
+                1,
+                65,
+                1.5
+              ],
+              [
+                1,
+                66,
+                2
+              ],
+              [
+                1,
+                67,
+                0.5
+              ],
+              [
+                1,
+                68,
+                2
+              ],
+              [
+                1,
+                69,
+                1
+              ],
+              [
+                1,
+                70,
+                1
+              ],
+              [
+                1,
+                71,
+                2
+              ],
+              [
+                1,
+                72,
+                0.15
+              ],
+              [
+                1,
+                73,
+                0
+              ],
+              [
+                1,
+                74,
+                0
+              ],
+              [
+                1,
+                75,
+                0
+              ],
+              [
+                1,
+                76,
+                0
+              ],
+              [
+                1,
+                77,
+                0
+              ],
+              [
+                1,
+                78,
+                0
+              ],
+              [
+                1,
+                79,
+                0
+              ],
+              [
+                1,
+                80,
+                0
+              ],
+              [
+                1,
+                81,
+                0
+              ],
+              [
+                1,
+                82,
+                0
+              ],
+              [
+                1,
+                83,
+                0
+              ],
+              [
+                1,
+                84,
+                0
+              ],
+              [
+                1,
+                85,
+                0
+              ],
+              [
+                1,
+                86,
+                0
+              ],
+              [
+                1,
+                87,
+                0
+              ],
+              [
+                1,
+                88,
+                4500
+              ],
+              [
+                1,
+                89,
+                0.25
+              ],
+              [
+                1,
+                90,
+                0
+              ],
+              [
+                1,
+                91,
+                0
+              ],
+              [
+                1,
+                92,
+                0
+              ],
+              [
+                1,
+                93,
+                0
+              ],
+              [
+                1,
+                94,
+                0
+              ],
+              [
+                1,
+                95,
+                0
+              ],
+              [
+                1,
+                96,
+                1
+              ],
+              [
+                1,
+                97,
+                0
+              ],
+              [
+                1,
+                98,
+                0.25
+              ],
+              [
+                1,
+                99,
+                1
+              ],
+              [
+                1,
+                100,
+                0
+              ],
+              [
+                1,
+                101,
+                0
+              ],
+              [
+                1,
+                102,
+                0
+              ],
+              [
+                1,
+                103,
+                0.15
+              ],
+              [
+                1,
+                104,
+                0
+              ],
+              [
+                1,
+                105,
+                0
+              ],
+              [
+                1,
+                106,
+                1
+              ],
+              [
+                1,
+                107,
+                2
+              ],
+              [
+                1,
+                108,
+                0
+              ],
+              [
+                1,
+                109,
+                0
+              ],
+              [
+                1,
+                110,
+                0
+              ],
+              [
+                1,
+                111,
+                0
+              ],
+              [
+                1,
+                112,
+                0
+              ],
+              [
+                1,
+                113,
+                0
+              ],
+              [
+                1,
+                114,
+                0
+              ],
+              [
+                1,
+                115,
+                0
+              ],
+              [
+                2,
+                0,
+                3
+              ],
+              [
+                2,
+                1,
+                4
+              ],
+              [
+                2,
+                2,
+                0.65
+              ],
+              [
+                2,
+                3,
+                0.35
+              ],
+              [
+                2,
+                4,
+                0
+              ],
+              [
+                2,
+                5,
+                0
+              ],
+              [
+                2,
+                6,
+                0.5
+              ],
+              [
+                2,
+                7,
+                0
+              ],
+              [
+                2,
+                8,
+                0
+              ],
+              [
+                2,
+                9,
+                1800
+              ],
+              [
+                2,
+                10,
+                0.2
+              ],
+              [
+                2,
+                11,
+                1
+              ],
+              [
+                2,
+                12,
+                20
+              ],
+              [
+                2,
+                13,
+                0
+              ],
+              [
+                2,
+                14,
+                2
+              ],
+              [
+                2,
+                15,
+                0.5
+              ],
+              [
+                2,
+                16,
+                1
+              ],
+              [
+                2,
+                17,
+                0.03
+              ],
+              [
+                2,
+                18,
+                0.3
+              ],
+              [
+                2,
+                19,
+                0.65
+              ],
+              [
+                2,
+                20,
+                0.7
+              ],
+              [
+                2,
+                21,
+                0.03
+              ],
+              [
+                2,
+                22,
+                0.4
+              ],
+              [
+                2,
+                23,
+                0.2
+              ],
+              [
+                2,
+                24,
+                0.7
+              ],
+              [
+                2,
+                25,
+                4.5
+              ],
+              [
+                2,
+                26,
+                0
+              ],
+              [
+                2,
+                27,
+                0
+              ],
+              [
+                2,
+                28,
+                0
+              ],
+              [
+                2,
+                29,
+                3
+              ],
+              [
+                2,
+                30,
+                1
+              ],
+              [
+                2,
+                31,
+                0
+              ],
+              [
+                2,
+                32,
+                0
+              ],
+              [
+                2,
+                33,
+                0
+              ],
+              [
+                2,
+                34,
+                0
+              ],
+              [
+                2,
+                35,
+                0.15
+              ],
+              [
+                2,
+                36,
+                0
+              ],
+              [
+                2,
+                37,
+                0
+              ],
+              [
+                2,
+                38,
+                0
+              ],
+              [
+                2,
+                39,
+                0.2
+              ],
+              [
+                2,
+                40,
+                0
+              ],
+              [
+                2,
+                41,
+                2
+              ],
+              [
+                2,
+                42,
+                1
+              ],
+              [
+                2,
+                43,
+                0
+              ],
+              [
+                2,
+                44,
+                0
+              ],
+              [
+                2,
+                45,
+                0
+              ],
+              [
+                2,
+                46,
+                0
+              ],
+              [
+                2,
+                47,
+                0
+              ],
+              [
+                2,
+                48,
+                0
+              ],
+              [
+                2,
+                49,
+                0
+              ],
+              [
+                2,
+                50,
+                0
+              ],
+              [
+                2,
+                51,
+                0
+              ],
+              [
+                2,
+                52,
+                0
+              ],
+              [
+                2,
+                53,
+                1
+              ],
+              [
+                2,
+                54,
+                0
+              ],
+              [
+                2,
+                55,
+                0
+              ],
+              [
+                2,
+                56,
+                0
+              ],
+              [
+                2,
+                57,
+                0
+              ],
+              [
+                2,
+                58,
+                0
+              ],
+              [
+                2,
+                59,
+                1
+              ],
+              [
+                2,
+                60,
+                1
+              ],
+              [
+                2,
+                61,
+                2
+              ],
+              [
+                2,
+                62,
+                1
+              ],
+              [
+                2,
+                63,
+                1
+              ],
+              [
+                2,
+                64,
+                2
+              ],
+              [
+                2,
+                65,
+                1.5
+              ],
+              [
+                2,
+                66,
+                2
+              ],
+              [
+                2,
+                67,
+                0.5
+              ],
+              [
+                2,
+                68,
+                2
+              ],
+              [
+                2,
+                69,
+                1
+              ],
+              [
+                2,
+                70,
+                1
+              ],
+              [
+                2,
+                71,
+                2
+              ],
+              [
+                2,
+                72,
+                0.15
+              ],
+              [
+                2,
+                73,
+                0
+              ],
+              [
+                2,
+                74,
+                0
+              ],
+              [
+                2,
+                75,
+                0
+              ],
+              [
+                2,
+                76,
+                0
+              ],
+              [
+                2,
+                77,
+                0
+              ],
+              [
+                2,
+                78,
+                0
+              ],
+              [
+                2,
+                79,
+                0
+              ],
+              [
+                2,
+                80,
+                0
+              ],
+              [
+                2,
+                81,
+                0
+              ],
+              [
+                2,
+                82,
+                0
+              ],
+              [
+                2,
+                83,
+                0
+              ],
+              [
+                2,
+                84,
+                0
+              ],
+              [
+                2,
+                85,
+                0
+              ],
+              [
+                2,
+                86,
+                0
+              ],
+              [
+                2,
+                87,
+                0
+              ],
+              [
+                2,
+                88,
+                4500
+              ],
+              [
+                2,
+                89,
+                0.25
+              ],
+              [
+                2,
+                90,
+                0
+              ],
+              [
+                2,
+                91,
+                0
+              ],
+              [
+                2,
+                92,
+                0
+              ],
+              [
+                2,
+                93,
+                0
+              ],
+              [
+                2,
+                94,
+                0
+              ],
+              [
+                2,
+                95,
+                0
+              ],
+              [
+                2,
+                96,
+                1
+              ],
+              [
+                2,
+                97,
+                0
+              ],
+              [
+                2,
+                98,
+                0.25
+              ],
+              [
+                2,
+                99,
+                0
+              ],
+              [
+                2,
+                100,
+                0
+              ],
+              [
+                2,
+                101,
+                0
+              ],
+              [
+                2,
+                102,
+                0
+              ],
+              [
+                2,
+                103,
+                0.15
+              ],
+              [
+                2,
+                104,
+                0
+              ],
+              [
+                2,
+                105,
+                0
+              ],
+              [
+                2,
+                106,
+                1
+              ],
+              [
+                2,
+                107,
+                0
+              ],
+              [
+                2,
+                108,
+                0
+              ],
+              [
+                2,
+                109,
+                0
+              ],
+              [
+                2,
+                110,
+                0
+              ],
+              [
+                2,
+                111,
+                0
+              ],
+              [
+                2,
+                112,
+                0
+              ],
+              [
+                2,
+                113,
+                0
+              ],
+              [
+                2,
+                114,
+                0
+              ],
+              [
+                2,
+                115,
+                0
+              ]
+            ],
+            "performance": {
+              "mode": 0,
+              "portamento": 0,
+              "glide": "overlap"
+            },
+            "events": [],
+            "edits": []
+          }
+        },
+        {
+          "id": 6,
+          "type": "legacy.percussion",
+          "version": 2,
+          "parameters": {
+            "gain": 1
+          },
+          "config": {
+            "version": 1,
+            "voice": "hand",
+            "drums": [
+              {
+                "on": true,
+                "level": 0.9,
+                "tone": 0,
+                "decay": 1
+              },
+              {
+                "on": true,
+                "level": 0.85,
+                "tone": 0,
+                "decay": 1
+              },
+              {
+                "on": true,
+                "level": 0.75,
+                "tone": 0,
+                "decay": 1
+              },
+              {
+                "on": true,
+                "level": 0.65,
+                "tone": 0,
+                "decay": 1
+              },
+              {
+                "on": true,
+                "level": 0.55,
+                "tone": 0,
+                "decay": 1
+              },
+              {
+                "on": true,
+                "level": 0.5,
+                "tone": 0,
+                "decay": 1
+              },
+              {
+                "on": true,
+                "level": 0.8,
+                "tone": 0,
+                "decay": 1
+              },
+              {
+                "on": true,
+                "level": 0.7,
+                "tone": 0,
+                "decay": 1
+              },
+              {
+                "on": true,
+                "level": 0.55,
+                "tone": 0,
+                "decay": 1
+              },
+              {
+                "on": true,
+                "level": 0.4,
+                "tone": 0,
+                "decay": 1
+              },
+              {
+                "on": true,
+                "level": 0.55,
+                "tone": 0,
+                "decay": 1
+              },
+              {
+                "on": true,
+                "level": 1,
+                "tone": 0,
+                "decay": 1
+              },
+              {
+                "on": true,
+                "level": 1,
+                "tone": 0,
+                "decay": 1
+              },
+              {
+                "on": true,
+                "level": 1,
+                "tone": 0,
+                "decay": 1
+              }
+            ]
+          }
+        },
+        {
+          "id": 11,
+          "type": "ref.mix",
+          "version": 1,
+          "parameters": {
+            "gain": 1
+          }
+        },
+        {
+          "id": 12,
+          "type": "ref.mix",
+          "version": 1,
+          "parameters": {
+            "gain": 1
+          }
+        },
+        {
+          "id": 13,
+          "type": "ref.mix",
+          "version": 1,
+          "parameters": {
+            "gain": 1
+          }
+        },
+        {
+          "id": 14,
+          "type": "ref.mix",
+          "version": 1,
+          "parameters": {
+            "gain": 1
+          }
+        },
+        {
+          "id": 15,
+          "type": "ref.mix",
+          "version": 1,
+          "parameters": {
+            "gain": 1
+          }
+        },
+        {
+          "id": 18,
+          "type": "ref.output",
+          "version": 1,
+          "parameters": {}
+        }
+      ],
+      "connections": [
+        {
+          "id": 1,
+          "kind": "audio",
+          "from": {
+            "module": 1,
+            "port": "audio.out"
+          },
+          "to": {
+            "module": 11,
+            "port": "a.in"
+          }
+        },
+        {
+          "id": 2,
+          "kind": "audio",
+          "from": {
+            "module": 2,
+            "port": "audio.out"
+          },
+          "to": {
+            "module": 11,
+            "port": "b.in"
+          }
+        },
+        {
+          "id": 3,
+          "kind": "audio",
+          "from": {
+            "module": 11,
+            "port": "audio.out"
+          },
+          "to": {
+            "module": 12,
+            "port": "a.in"
+          }
+        },
+        {
+          "id": 4,
+          "kind": "audio",
+          "from": {
+            "module": 3,
+            "port": "audio.out"
+          },
+          "to": {
+            "module": 12,
+            "port": "b.in"
+          }
+        },
+        {
+          "id": 5,
+          "kind": "audio",
+          "from": {
+            "module": 12,
+            "port": "audio.out"
+          },
+          "to": {
+            "module": 13,
+            "port": "a.in"
+          }
+        },
+        {
+          "id": 6,
+          "kind": "audio",
+          "from": {
+            "module": 4,
+            "port": "audio.out"
+          },
+          "to": {
+            "module": 13,
+            "port": "b.in"
+          }
+        },
+        {
+          "id": 7,
+          "kind": "audio",
+          "from": {
+            "module": 13,
+            "port": "audio.out"
+          },
+          "to": {
+            "module": 14,
+            "port": "a.in"
+          }
+        },
+        {
+          "id": 8,
+          "kind": "audio",
+          "from": {
+            "module": 5,
+            "port": "audio.out"
+          },
+          "to": {
+            "module": 14,
+            "port": "b.in"
+          }
+        },
+        {
+          "id": 9,
+          "kind": "audio",
+          "from": {
+            "module": 14,
+            "port": "audio.out"
+          },
+          "to": {
+            "module": 15,
+            "port": "a.in"
+          }
+        },
+        {
+          "id": 10,
+          "kind": "audio",
+          "from": {
+            "module": 6,
+            "port": "audio.out"
+          },
+          "to": {
+            "module": 15,
+            "port": "b.in"
+          }
+        },
+        {
+          "id": 11,
+          "kind": "audio",
+          "from": {
+            "module": 15,
+            "port": "audio.out"
+          },
+          "to": {
+            "module": 18,
+            "port": "program.in"
+          }
+        }
+      ],
+      "events": [
+        {
+          "kind": "note",
+          "target": 1,
+          "owner": 1,
+          "event": 0,
+          "note": 1,
+          "frame": 5888,
+          "a": 72,
+          "b": 0.45
+        },
+        {
+          "kind": "note",
+          "target": 1,
+          "owner": 1,
+          "event": 1,
+          "note": 1,
+          "frame": 29952,
+          "a": 0,
+          "b": 0
+        },
+        {
+          "kind": "note",
+          "target": 1,
+          "owner": 1,
+          "event": 0,
+          "note": 2,
+          "frame": 221952,
+          "a": 72,
+          "b": 0.35
+        },
+        {
+          "kind": "note",
+          "target": 1,
+          "owner": 1,
+          "event": 1,
+          "note": 2,
+          "frame": 317952,
+          "a": 0,
+          "b": 0
+        },
+        {
+          "kind": "note",
+          "target": 2,
+          "owner": 2,
+          "event": 0,
+          "note": 1,
+          "frame": 42000,
+          "a": 64,
+          "b": 0.45
+        },
+        {
+          "kind": "note",
+          "target": 2,
+          "owner": 2,
+          "event": 1,
+          "note": 1,
+          "frame": 66000,
+          "a": 0,
+          "b": 0
+        },
+        {
+          "kind": "note",
+          "target": 2,
+          "owner": 2,
+          "event": 0,
+          "note": 2,
+          "frame": 222000,
+          "a": 64,
+          "b": 0.35
+        },
+        {
+          "kind": "note",
+          "target": 2,
+          "owner": 2,
+          "event": 1,
+          "note": 2,
+          "frame": 318000,
+          "a": 0,
+          "b": 0
+        },
+        {
+          "kind": "note",
+          "target": 3,
+          "owner": 3,
+          "event": 0,
+          "note": 1,
+          "frame": 77952,
+          "a": 60,
+          "b": 0.45
+        },
+        {
+          "kind": "note",
+          "target": 3,
+          "owner": 3,
+          "event": 1,
+          "note": 1,
+          "frame": 101888,
+          "a": 0,
+          "b": 0
+        },
+        {
+          "kind": "note",
+          "target": 3,
+          "owner": 3,
+          "event": 0,
+          "note": 2,
+          "frame": 221952,
+          "a": 60,
+          "b": 0.35
+        },
+        {
+          "kind": "note",
+          "target": 3,
+          "owner": 3,
+          "event": 1,
+          "note": 2,
+          "frame": 317952,
+          "a": 0,
+          "b": 0
+        },
+        {
+          "kind": "note",
+          "target": 4,
+          "owner": 4,
+          "event": 0,
+          "note": 1,
+          "frame": 114000,
+          "a": 55,
+          "b": 0.45
+        },
+        {
+          "kind": "note",
+          "target": 4,
+          "owner": 4,
+          "event": 0,
+          "note": 2,
+          "frame": 222000,
+          "a": 55,
+          "b": 0.35
+        },
+        {
+          "kind": "note",
+          "target": 5,
+          "owner": 5,
+          "event": 0,
+          "note": 1,
+          "frame": 150000,
+          "a": 36,
+          "b": 0.45
+        },
+        {
+          "kind": "note",
+          "target": 5,
+          "owner": 5,
+          "event": 1,
+          "note": 1,
+          "frame": 174000,
+          "a": 0,
+          "b": 0
+        },
+        {
+          "kind": "note",
+          "target": 5,
+          "owner": 5,
+          "event": 0,
+          "note": 2,
+          "frame": 222000,
+          "a": 36,
+          "b": 0.35
+        },
+        {
+          "kind": "note",
+          "target": 5,
+          "owner": 5,
+          "event": 1,
+          "note": 2,
+          "frame": 318000,
+          "a": 0,
+          "b": 0
+        },
+        {
+          "kind": "hit",
+          "target": 6,
+          "owner": 6,
+          "frame": 186000,
+          "drum": 0,
+          "velocity": 0.35,
+          "duration": 0.25,
+          "vary": 0,
+          "tone": 0,
+          "decay": 1,
+          "hit": 1,
+          "model": 2
+        },
+        {
+          "kind": "hit",
+          "target": 6,
+          "owner": 6,
+          "frame": 192000,
+          "drum": 1,
+          "velocity": 0.35,
+          "duration": 0.25,
+          "vary": 0,
+          "tone": 0,
+          "decay": 1,
+          "hit": 2,
+          "model": 2
+        },
+        {
+          "kind": "hit",
+          "target": 6,
+          "owner": 6,
+          "frame": 198000,
+          "drum": 4,
+          "velocity": 0.35,
+          "duration": 0.25,
+          "vary": 0,
+          "tone": 0,
+          "decay": 1,
+          "hit": 3,
+          "model": 2
+        },
+        {
+          "kind": "hit",
+          "target": 6,
+          "owner": 6,
+          "frame": 204000,
+          "drum": 6,
+          "velocity": 0.35,
+          "duration": 0.25,
+          "vary": 0,
+          "tone": 0,
+          "decay": 1,
+          "hit": 4,
+          "model": 2
+        },
+        {
+          "kind": "hit",
+          "target": 6,
+          "owner": 6,
+          "frame": 222000,
+          "drum": 4,
+          "velocity": 0.22,
+          "duration": 0.25,
+          "vary": 0,
+          "tone": 0,
+          "decay": 1,
+          "hit": 5,
+          "model": 2
+        },
+        {
+          "kind": "hit",
+          "target": 6,
+          "owner": 6,
+          "frame": 222000,
+          "drum": 0,
+          "velocity": 0.35,
+          "duration": 0.25,
+          "vary": 0,
+          "tone": 0,
+          "decay": 1,
+          "hit": 6,
+          "model": 2
+        },
+        {
+          "kind": "hit",
+          "target": 6,
+          "owner": 6,
+          "frame": 222000,
+          "drum": 5,
+          "velocity": 0.2,
+          "duration": 0.25,
+          "vary": 0,
+          "tone": 0,
+          "decay": 1,
+          "hit": 7,
+          "model": 2
+        },
+        {
+          "kind": "hit",
+          "target": 6,
+          "owner": 6,
+          "frame": 234000,
+          "drum": 4,
+          "velocity": 0.22,
+          "duration": 0.25,
+          "vary": 0,
+          "tone": 0,
+          "decay": 1,
+          "hit": 8,
+          "model": 2
+        },
+        {
+          "kind": "hit",
+          "target": 6,
+          "owner": 6,
+          "frame": 246000,
+          "drum": 4,
+          "velocity": 0.22,
+          "duration": 0.25,
+          "vary": 0,
+          "tone": 0,
+          "decay": 1,
+          "hit": 9,
+          "model": 2
+        },
+        {
+          "kind": "hit",
+          "target": 6,
+          "owner": 6,
+          "frame": 246000,
+          "drum": 1,
+          "velocity": 0.3,
+          "duration": 0.25,
+          "vary": 0,
+          "tone": 0,
+          "decay": 1,
+          "hit": 10,
+          "model": 2
+        },
+        {
+          "kind": "hit",
+          "target": 6,
+          "owner": 6,
+          "frame": 258000,
+          "drum": 4,
+          "velocity": 0.22,
+          "duration": 0.25,
+          "vary": 0,
+          "tone": 0,
+          "decay": 1,
+          "hit": 11,
+          "model": 2
+        },
+        {
+          "kind": "hit",
+          "target": 6,
+          "owner": 6,
+          "frame": 270000,
+          "drum": 4,
+          "velocity": 0.22,
+          "duration": 0.25,
+          "vary": 0,
+          "tone": 0,
+          "decay": 1,
+          "hit": 12,
+          "model": 2
+        },
+        {
+          "kind": "hit",
+          "target": 6,
+          "owner": 6,
+          "frame": 270000,
+          "drum": 0,
+          "velocity": 0.35,
+          "duration": 0.25,
+          "vary": 0,
+          "tone": 0,
+          "decay": 1,
+          "hit": 13,
+          "model": 2
+        },
+        {
+          "kind": "hit",
+          "target": 6,
+          "owner": 6,
+          "frame": 282000,
+          "drum": 4,
+          "velocity": 0.22,
+          "duration": 0.25,
+          "vary": 0,
+          "tone": 0,
+          "decay": 1,
+          "hit": 14,
+          "model": 2
+        },
+        {
+          "kind": "hit",
+          "target": 6,
+          "owner": 6,
+          "frame": 294000,
+          "drum": 4,
+          "velocity": 0.22,
+          "duration": 0.25,
+          "vary": 0,
+          "tone": 0,
+          "decay": 1,
+          "hit": 15,
+          "model": 2
+        },
+        {
+          "kind": "hit",
+          "target": 6,
+          "owner": 6,
+          "frame": 294000,
+          "drum": 1,
+          "velocity": 0.3,
+          "duration": 0.25,
+          "vary": 0,
+          "tone": 0,
+          "decay": 1,
+          "hit": 16,
+          "model": 2
+        },
+        {
+          "kind": "hit",
+          "target": 6,
+          "owner": 6,
+          "frame": 306000,
+          "drum": 4,
+          "velocity": 0.22,
+          "duration": 0.25,
+          "vary": 0,
+          "tone": 0,
+          "decay": 1,
+          "hit": 17,
+          "model": 2
+        }
+      ]
+    },
+    "audition": {
+      "version": 1,
+      "material": "diagnostic-test-notes",
+      "schedule": "individual-attacks-then-overlap",
+      "songUnchanged": true,
+      "soloSlotFrames": 36000,
+      "soloGateFrames": 24000,
+      "overlapFrame": 222000,
+      "overlapGateFrames": 96000
+    }
+  },
+  "peaks": {
+    "source": 0.3401114046573639,
+    "channel": 0.09719529747962952,
+    "master": 0.11625781655311584
+  },
+  "stats": {
+    "output": {
+      "type": "stats",
+      "mode": "worker",
+      "generation": 5,
+      "armed": true,
+      "stopOnUnderrun": true,
+      "finishReason": "completed",
+      "sourceIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "outputFrame": 948224,
+      "sourceFrame": 942000,
+      "delayFrames": 6144,
+      "processTiming": {
+        "available": false,
+        "scope": "process() wall time including copy/DSP and preemption; not callback scheduling, CPU utilization or device underruns",
+        "reason": "Monotonic performance.now() is unavailable or failed in this worklet",
+        "calls": null,
+        "totalMs": null,
+        "maxMs": null,
+        "overQuantumPeriod": null,
+        "histogramLog2Us": null
+      },
+      "queue": {
+        "deliveredFrames": 942000,
+        "underrunFrames": 0,
+        "underrunQuanta": 0,
+        "recoveries": 0,
+        "lateBlocks": 0,
+        "staleGeneration": 0,
+        "rejectedBlocks": 0,
+        "acceptedBlocks": 1840,
+        "queueHighWater": 12,
+        "queuedBlocks": 0,
+        "lastPacket": {
+          "packetFrame": 941568,
+          "frames": 432,
+          "sourceFrameAtArrival": 936064,
+          "producer": {
+            "version": 1,
+            "available": true,
+            "frame": 942000,
+            "blocks": 1840,
+            "freeBuffers": 0,
+            "inFlightBuffers": 12,
+            "elapsedMs": 19898.60000000149,
+            "taskWaits": 1840,
+            "taskWaitMs": 0,
+            "taskWaitMaxMs": 0.20000000298023224,
+            "poolWaits": 1828,
+            "poolWaitMs": 9.399999998509884,
+            "poolWaitMaxMs": 135.39999999850988,
+            "recycleRttMs": 129,
+            "recycleRttMaxMs": 254.39999999850988,
+            "lastRecycleConsumerFrame": 935935,
+            "renderMs": 0.7000000029802322,
+            "maxRenderMs": 2
+          }
+        },
+        "lead": {
+          "scope": "Contiguous ready source frames at active-consumption quantum entry; startup delay excluded; final capacity window reported separately; not device output quality",
+          "capacityFrames": 6144,
+          "blockFrames": 512,
+          "histogramBucketFrames": 128,
+          "observations": 7360,
+          "steady": {
+            "samples": 7312,
+            "minFrames": 5376,
+            "maxFrames": 6144,
+            "zeroLeadQuanta": 0,
+            "belowQuantumQuanta": 0,
+            "belowBlockQuanta": 0,
+            "firstZeroSourceFrame": null,
+            "minNeededFrames": 128,
+            "maxNeededFrames": 128,
+            "histogram": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              366,
+              854,
+              1339,
+              1828,
+              1462,
+              974,
+              489
+            ]
+          },
+          "drain": {
+            "samples": 48,
+            "minFrames": 48,
+            "maxFrames": 5936,
+            "zeroLeadQuanta": 0,
+            "belowQuantumQuanta": 0,
+            "belowBlockQuanta": 4,
+            "firstZeroSourceFrame": null,
+            "minNeededFrames": 48,
+            "maxNeededFrames": 128,
+            "histogram": [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              2,
+              1,
+              1,
+              0,
+              0
+            ]
+          }
+        },
+        "arrivals": {
+          "scope": "Source frames advanced between valid publication callbacks, including expired packets; pool-level data uses any group arrival, not complete-cohort readiness. Startup excluded from measured gaps. Not wall time, CPU attribution or physical output.",
+          "capacityFrames": 6144,
+          "activeObservations": 7360,
+          "publicationCallbacks": 1840,
+          "primingArrivals": 12,
+          "measuredArrivals": 1828,
+          "unpairedArrivals": 0,
+          "expiredPublications": 0,
+          "histogramBucketFrames": 128,
+          "histogramOverflowFromFrames": 16384,
+          "steady": {
+            "positiveGaps": 1827,
+            "sameFrameArrivals": 0,
+            "maxGapFrames": 896,
+            "totalGapFrames": 935680,
+            "histogram": [
+              0,
+              0,
+              0,
+              365,
+              1339,
+              1,
+              0,
+              122,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "consumptionQuanta": 7312,
+            "maxConsumedSinceArrivalFrames": 896,
+            "overCapacityQuanta": 0
+          },
+          "drain": {
+            "positiveGaps": 1,
+            "sameFrameArrivals": 0,
+            "maxGapFrames": 384,
+            "totalGapFrames": 384,
+            "histogram": [
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "consumptionQuanta": 48,
+            "maxConsumedSinceArrivalFrames": 5936,
+            "overCapacityQuanta": 0
+          },
+          "traceLimit": 32,
+          "traceDropped": 0,
+          "trace": [
+            {
+              "kind": "new-arrival-gap-maximum",
+              "sourceFrame": 640,
+              "packetFrame": 6144,
+              "frames": 512,
+              "group": null,
+              "spanFrames": 640,
+              "readyLeadFrames": null
+            },
+            {
+              "kind": "new-arrival-gap-maximum",
+              "sourceFrame": 3456,
+              "packetFrame": 8704,
+              "frames": 512,
+              "group": null,
+              "spanFrames": 896,
+              "readyLeadFrames": null
+            },
+            {
+              "kind": "new-arrival-gap-maximum",
+              "sourceFrame": 936064,
+              "packetFrame": 941568,
+              "frames": 432,
+              "group": null,
+              "spanFrames": 384,
+              "readyLeadFrames": null
+            }
+          ]
+        }
+      },
+      "serial": null
+    },
+    "worker": {
+      "type": "stats",
+      "request": 1,
+      "generation": 5,
+      "sourceIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "frame": 942000,
+      "blocks": 1840,
+      "renderMs": 1347.499999821186,
+      "maxRenderMs": 2,
+      "blockMsHistogramLog2Us": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        425,
+        1161,
+        253,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "rejectedEvents": 0,
+      "badRecycles": 0,
+      "freeBuffers": 12,
+      "inFlightBuffers": 0,
+      "deliveryTiming": {
+        "available": true,
+        "elapsedMs": 20028.20000000298,
+        "taskWaits": 1840,
+        "taskWaitMs": 0,
+        "taskWaitMaxMs": 0.20000000298023224,
+        "poolWaits": 1828,
+        "poolWaitMs": 9.399999998509884,
+        "poolWaitMaxMs": 135.39999999850988,
+        "recycleRttMs": 129,
+        "recycleRttMaxMs": 254.39999999850988,
+        "lastRecycleConsumerFrame": 941999,
+        "readyTaskAgeMs": null,
+        "poolEmptyAgeMs": null
+      },
+      "scheduler": {
+        "kind": "message-channel",
+        "pendingTask": false,
+        "waitingForStall": false,
+        "postedTasks": 1840,
+        "handledTasks": 1840,
+        "stallTimers": 0,
+        "disposed": false
+      },
+      "graph": {
+        "frame": 942000,
+        "late": 0,
+        "overflow": 0,
+        "applied": 35
+      },
+      "meters": {},
+      "memoryBytes": 13238272,
+      "roles": [
+        {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 942000,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 1
+        },
+        {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 942000,
+          "peak": 0,
+          "latencyFrames": 7.5,
+          "peakActive": 1
+        },
+        {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 942000,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 1
+        },
+        {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 942000,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 1
+        },
+        {
+          "active": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 942000,
+          "peak": 0,
+          "latencyFrames": 0,
+          "peakActive": 2
+        },
+        {
+          "active": 0,
+          "queued": 0,
+          "steals": 0,
+          "dropped": 0,
+          "late": 0,
+          "frame": 942000,
+          "peakActive": 3
+        }
+      ]
+    },
+    "error": null
+  },
+  "complete": true,
+  "eventPass": true,
+  "pass": true
+}
