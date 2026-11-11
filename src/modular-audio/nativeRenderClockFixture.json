@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "source": "Actual desktop persistent native AudioParam absolute frame marker and AudioBufferSource cursor, reports/modular_audio/piano-native-clock-first.json",
+  "reported": [
+    72064,
+    72192,
+    72192,
+    72192,
+    72192,
+    72704,
+    72832
+  ],
+  "nativeMarker": [
+    72064,
+    72192,
+    72320,
+    72448,
+    72576,
+    72704,
+    72832
+  ],
+  "genuineGap": {
+    "priorReported": 144256,
+    "nextReported": 144512,
+    "nativeMarkerDelta": 256,
+    "nativeBufferCursorDelta": 128
+  }
+}

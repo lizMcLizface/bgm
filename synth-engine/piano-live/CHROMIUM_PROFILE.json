@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "revision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+  "scope": "Explicit actual native coefficient and scheduling algorithms; browser parity required separately.",
+  "sources": [
+    {
+      "file": "third_party/blink/renderer/platform/audio/biquad.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/biquad.cc",
+      "sha256": "174c22c8c2ca13d947517bab7486e497010f643c3118b5acb1fb04218ea09a4a"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/audio_scheduled_source_handler.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_scheduled_source_handler.cc",
+      "sha256": "dd3b02ff3d35b359ed6c3b0c9bd8d12994ba03f0392dc817ac85777c177f47fc"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/audio_buffer_source_handler.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_buffer_source_handler.cc",
+      "sha256": "b1e4196939823fcd8cfbb32cb50d1e29d41a1a81bb7b132e3993e738f0b7621d"
+    }
+  ]
+}

@@ -81,6 +81,7 @@ class MonoSynth {
         this.currentHoldLevel = 1; // Store hold level for use in noteOff
         this.voiceId = null; // Unique identifier for the current voice session
         this.voiceIdCounter = 0; // Counter for generating unique voice IDs
+        this.configuredVolume = 0.2; this.configuredFilterGain = 0;
         
         // Noise filter settings
         this.noiseFilterEnabled = false;
@@ -936,7 +937,7 @@ class MonoSynth {
     }
 
     // Parameter setters - apply to all oscillators
-    setVolume = (val) => this.volume.setGain(clamp(val, 0, 1));
+    setVolume = (val) => { this.configuredVolume = clamp(val, 0, 1); this.volume.setGain(this.configuredVolume); this.ownedPianoSource?.sync(); };
     setWaveform = (type) => {
         // Handle "off" waveform by setting gain to 0 instead of changing oscillator type
         if (type === 'off') {
@@ -1146,10 +1147,10 @@ class MonoSynth {
         }
     };
     
-    setFilterType = (val) => this.filter.setType(val);
-    setFilterFreq = (val) => this.filter.setFreq(val);
-    setFilterQ = (val) => this.filter.setQ(val);
-    setFilterGain = (val) => this.filter.setGain(val);
+    setFilterType = (val) => { this.filter.setType(val); this.ownedPianoSource?.sync(); };
+    setFilterFreq = (val) => { this.filter.setFreq(val); this.ownedPianoSource?.sync(); };
+    setFilterQ = (val) => { this.filter.setQ(val); this.ownedPianoSource?.sync(); };
+    setFilterGain = (val) => { this.filter.setGain(val); this.configuredFilterGain = val; this.ownedPianoSource?.sync(); };
     
     // Noise-related methods
     setNoiseType = (type) => {
@@ -1491,24 +1492,32 @@ class MonoSynth {
         this.voiceId = ++this.voiceIdCounter;
 
         const { gainPoints, filterEvents, portamentoSpeed = 0 } = plan;
+        const owned = !!this.ownedPianoSource && !!plan.piano;
         const gain = this.gain.getNode().gain;
         const detune = this.filter.getNode().detune;
 
-        let attackStart = startTime;
+        let attackStart = startTime, fadeStart = null;
         if (steal) {
-            const fadeStart = Math.max(this.AC.currentTime, startTime - 0.01);
+            fadeStart = Math.max(this.AC.currentTime, startTime - 0.01);
             // Hold the level reached mid-ramp rather than jump (Firefox lacks it).
-            if (gain.cancelAndHoldAtTime) gain.cancelAndHoldAtTime(fadeStart);
-            else gain.cancelScheduledValues(fadeStart);
-            gain.setTargetAtTime(0, fadeStart, 0.002);
+            if (!owned) {
+                if (gain.cancelAndHoldAtTime) gain.cancelAndHoldAtTime(fadeStart);
+                else gain.cancelScheduledValues(fadeStart);
+                gain.setTargetAtTime(0, fadeStart, 0.002);
+            }
             attackStart = Math.max(startTime, fadeStart + 0.01);
-        } else {
+        } else if (!owned) {
             gain.cancelScheduledValues(startTime);
         }
 
-        this.stopStrings(attackStart);
+        this.stopStrings(attackStart, owned);
         this.modelGate.gain.cancelScheduledValues(attackStart);
         this.modelGate.gain.setValueAtTime(plan.string || plan.piano ? 0 : 1, attackStart);
+        if (owned) {
+            this.ownedPianoSource.schedule(noteInfo, plan, attackStart, fadeStart);
+            this.applyNotePitch(noteInfo, portamentoSpeed, attackStart);
+            return;
+        }
         if (plan.string || plan.piano) {
             const buffers = [plan.piano ? pianoBuffer(this.AC, noteInfo.freq, plan.piano) : stringBuffer(this.AC, noteInfo.freq, plan.string)];
             if (plan.piano?.sustain > 0) buffers.push(pianoBodyBuffer(this.AC, noteInfo.freq, plan.piano));
@@ -1559,7 +1568,8 @@ class MonoSynth {
         });
     }
 
-    stopStrings(time = this.AC.currentTime) {
+    stopStrings(time = this.AC.currentTime, preparingOwned = false) {
+        if (!preparingOwned) this.ownedPianoSource?.stop(time);
         this.breathFormants?.stop(time);
         for (const item of this.stringSources || []) {
             const stop = Math.max(item.start, time);

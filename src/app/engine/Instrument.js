@@ -26,6 +26,7 @@ import { isAcousticPiano } from './acousticPiano';
 import { isCalibratedPiano } from './calibratedPiano';
 import { isTempered, tuningCents } from './temperament';
 import { pianoBufferLater } from './pianoRenderPool';
+import { createPianoLiveSource } from './pianoLiveSource';
 
 // A held note is booked as if it lasted this long; its release replaces
 // the tail when the key comes up.
@@ -180,7 +181,9 @@ class Instrument {
      * @param {object} [options.preset]
      * @param {BaseAudioContext} [options.context]
      */
-    constructor({ polyphony = 8, preset = {}, context = audioContext, deferReverb = false, reverbHub = null, fdnRoom = false } = {}) {
+    constructor({ polyphony = 8, preset = {}, context = audioContext, deferReverb = false, reverbHub = null, fdnRoom = false, sourceBackend = 'native', voiceCompressorFactory = null } = {}) {
+        if (!['native', 'owned-rust'].includes(sourceBackend)) throw Error('Unsupported instrument source backend');
+        this.pendingSourceBookings = new Set(); this.sourceBackend = sourceBackend; this.pianoSource = null; this.pianoSourcePromise = null; this.sourceFailure = null;
         this.AC = context;
         this.polyphony = polyphony;
 
@@ -191,7 +194,7 @@ class Instrument {
         this.phaser = new Nodes.Phaser(this.AC);
         this.bitCrush = new Nodes.BitCrusher(this.AC);
         this.tape = FX_STAGES.tape.create(this.AC);
-        this.compressor = FX_STAGES.compressor.create(this.AC);
+        this.compressor = (voiceCompressorFactory ?? FX_STAGES.compressor.create)(this.AC, {hostLifetime:'instrument'});
         this.shimmer = FX_STAGES.shimmer.create(this.AC);
         this.freeze = FX_STAGES.freeze.create(this.AC);
         this.delay = new Nodes.Delay(this.AC);
@@ -291,7 +294,64 @@ class Instrument {
         this.preset = null;
         this.chainSignature = null;
         this.applyPreset(preset);
+        this.effectsReady = Promise.all(this.stages.map(({ key }) => this[key]?.ready).filter(Boolean));
+        const source = sourceBackend === 'owned-rust' && this.preset.stringModel === 'piano' ? this.ensurePianoSource() : Promise.resolve(null);
+        this.sourceReady = Promise.all([source, this.effectsReady]).then(() => this.pianoSource);
+        this.sourceReady.catch(error => { this.sourceFailure = error; });
     }
+
+    ensurePianoSource() {
+        if (this.sourceBackend !== 'owned-rust') return Promise.resolve(null);
+        this.pianoSourcePromise ??= createPianoLiveSource(this).then(source => {
+            if (this.disposed) { source.dispose(); throw Error('Disposed instrument'); }
+            this.pianoSource = source; return source;
+        }).catch(error => { this.sourceFailure = error; throw error; });
+        return this.pianoSourcePromise;
+    }
+    prepareOwnedPiano(frequency, options) {
+        if (this.pianoSource) return this.pianoSource.prepare(frequency, options);
+        return this.ensurePianoSource().then(source => source.prepare(frequency, options));
+    }
+    reserveOwnedPiano(frequency, options) {
+        if ((this.pendingSourceBookings?.size ?? 0) >= 2000) throw Error('Owned piano pending booking capacity exceeded');
+        let release = () => {};
+        const prepare = source => { release = source.retain(frequency, options); try { return source.prepare(frequency, options); } catch (error) { release(); throw error; } };
+        return {waiting:this.pianoSource ? prepare(this.pianoSource) : this.ensurePianoSource().then(prepare), release:() => release()};
+    }
+    trackSourceBooking(job) {
+        const pending = this.pendingSourceBookings ??= new Set();
+        if (pending.size >= 2000) throw Error('Owned piano pending booking capacity exceeded');
+        const watched = Promise.resolve(job).catch(error => { this.sourceFailure = error; throw error; });
+        pending.add(watched);
+        void watched.then(() => pending.delete(watched), () => pending.delete(watched));
+    }
+    queueSourceBooking(preparation, action, epoch, release = () => {}) {
+        const queue = this.sourceBookingQueue ??= [];
+        if (queue.length >= 2000) throw Error('Owned piano pending booking capacity exceeded');
+        let resolve, reject;
+        const completion = new Promise((yes, no) => { resolve = yes; reject = no; });
+        const record = {ready:false, action, epoch, resolve, reject, release, error:null};
+        queue.push(record); this.trackSourceBooking(completion);
+        const drain = () => {
+            while (queue[0]?.ready) {
+                const current = queue.shift();
+                try { if (current.error) throw current.error;
+                    if (!this.disposed && current.epoch === this.pianoEpoch) current.action();
+                    current.resolve();
+                } catch (error) { this.sourceFailure = error; current.reject(error); }
+                finally { current.release(); }
+            }
+        };
+        Promise.resolve(preparation).then(() => { record.ready = true; drain(); }, error => { record.error = error; record.ready = true; drain(); });
+        return completion;
+    }
+    async awaitPendingSourceBookings() {
+        await this.sourceReady;
+        while (this.pendingSourceBookings?.size) await Promise.all([...this.pendingSourceBookings]);
+        if (this.sourceFailure) throw this.sourceFailure;
+    }
+    prepareOffline() { this.pianoSource?.prepareOffline(); }
+    sourceStatus() { return this.pianoSource?.status() ?? { backend: this.sourceBackend ?? 'native', ready: this.sourceBackend !== 'owned-rust', error: this.sourceFailure?.message ?? null }; }
 
     connect(destination) {
         this.destinations.push(destination);
@@ -379,6 +439,7 @@ class Instrument {
         // a delay setting changed while flushTails holds the delays at 0
         if (DELAY_KEYS.has(key) && this.heldUntil > this.AC.currentTime) this.holdDelays(this.heldUntil);
         this.updateChain();
+        this.pianoSource?.sync();
     }
 
     // Routes the signal only through effects that change it. An effect at
@@ -387,7 +448,7 @@ class Instrument {
     // of docs/DESIGN.md §5. Rewires only when the active set changes.
     updateChain() {
         const p = { ...PRESET_DEFAULTS, ...this.preset };
-        const active = this.stages.filter((stage) => stage.active(p));
+        const active = this.stages.filter((stage) => this[stage.key]?.managedBypass === true || stage.active(p));
         const signature = active.map((stage) => stage.key).join();
         if (signature === this.chainSignature) return;
         this.chainSignature = signature;
@@ -696,14 +757,14 @@ class Instrument {
      * @param {number} [detune=0] - cents, for humanized pitch
      * @param {object} [rawExpression] - bounded per-note envelope and tone overrides
      */
-    scheduleNote(midi, startTime, duration, velocity = 0.8, detune = 0, rawExpression = null, rendered = false) {
+    scheduleNote(midi, startTime, duration, velocity = 0.8, detune = 0, rawExpression = null, rendered = false, ownedPrepared = false) {
         const expression = cleanExpression(rawExpression), shaped = expressiveEnvelope(this.gainEnv, duration, expression);
         // the scene's gentle onsets (composition/dynamics.js)
         if (expression?.dynamicAttack) shaped.env = { ...shaped.env, attack: dynamicAttack(shaped.env.attack, velocity, expression.dynamicAttack) };
         const { points, releaseEnd } = gainEnvelopePoints(shaped.env, velocity, shaped.duration);
         if (this.delay) scheduleEffectTiming(this, expression?.tempoBeat ?? 0, startTime);
 
-        const { index, steal } = this.allocateVoice(startTime);
+        const allocation = this.sourceBackend === 'owned-rust' ? null : this.allocateVoice(startTime);
         const info = this.noteInfo(midi);
         if (detune) info.freq *= Math.pow(2, detune / 1200);
         const plan=expressiveSource(this.notePlan(midi, velocity, shaped.duration, breathEnvelope(points, shaped.duration, expression), gateEnvelope(this.filterEnv,shaped.duration,expression)), expression);
@@ -716,12 +777,19 @@ class Instrument {
             plan.pitchPath=[{time:0,cents:0},...expression.pitchTargets.filter(p=>p.time>0&&p.time<=shaped.duration).map(p=>({time:p.time,cents:Math.max(-2400,Math.min(2400,1200*Math.log2(this.noteInfo(p.midi).freq/base)))}))];
         }
         // a piano note not rendered yet (a chord the first time): rendered on the workers, all of its notes at once, then booked
-        const waiting = !rendered && plan.piano ? pianoBufferLater(this.AC, info.freq, plan.piano) : null;
-        if (waiting) {
-            const epoch = this.pianoEpoch;
-            void waiting.then(() => { if (epoch === this.pianoEpoch) this.scheduleNote(midi, Math.max(startTime, this.AC.currentTime + 0.005), duration, velocity, detune, rawExpression, true); });
+        if (this.sourceBackend === 'owned-rust' && !plan.piano) throw Error('This owned source requires a piano preset; select the matching host source kind.');
+        if (this.sourceBackend === 'owned-rust' && !ownedPrepared) {
+            const reserved = this.reserveOwnedPiano(info.freq, plan.piano);
+            this.queueSourceBooking(reserved.waiting, () => this.scheduleNote(midi, Number.isFinite(this.AC.length) ? startTime : Math.max(startTime, this.AC.currentTime + 0.005), duration, velocity, detune, rawExpression, true, true), this.pianoEpoch, reserved.release);
             return;
         }
+        const waiting = this.sourceBackend === 'owned-rust' && plan.piano ? this.prepareOwnedPiano(info.freq, plan.piano) : !rendered && plan.piano ? pianoBufferLater(this.AC, info.freq, plan.piano) : null;
+        if (waiting) {
+            const epoch = this.pianoEpoch;
+            void waiting.then(() => { if (epoch === this.pianoEpoch) this.scheduleNote(midi, Math.max(startTime, this.AC.currentTime + 0.005), duration, velocity, detune, rawExpression, true); }).catch(error => { this.sourceFailure = error; });
+            return;
+        }
+        const { index, steal } = allocation ?? this.allocateVoice(startTime);
         this.voices[index].scheduleNote(info, plan, startTime, steal);
         this.busyUntil[index] = startTime + releaseEnd;
         this.soundUntil = Math.max(this.soundUntil, startTime + releaseEnd);
@@ -740,6 +808,19 @@ class Instrument {
         const id = ++this.heldIds;
         // a piano note not rendered yet (the velocity changes with every key, so most are): rendered on the workers, a chord's
         // notes at once, then started; a key let go in the meantime still plays its short note
+        if (this.sourceBackend === 'owned-rust' && !plan.piano) throw Error('This owned source requires a piano preset; select the matching host source kind.');
+        if (this.sourceBackend === 'owned-rust') {
+            const reserved = this.reserveOwnedPiano(info.freq, plan.piano);
+            if (!reserved.waiting && !this.sourceBookingQueue?.length) { reserved.release(); this.beginHeld(id, info, plan); return id; }
+            const entry = {pending:true, released:false}; this.held.set(id, entry);
+            const booking = this.queueSourceBooking(reserved.waiting, () => {
+                if (this.held.get(id) !== entry) return;
+                this.held.delete(id); this.beginHeld(id, info, plan);
+                if (entry.released) this.stopNote(id);
+            }, this.pianoEpoch, reserved.release);
+            void booking.catch(() => { if (this.held.get(id) === entry) this.held.delete(id); });
+            return id;
+        }
         const waiting = plan.piano ? pianoBufferLater(this.AC, info.freq, plan.piano) : null;
         if (waiting) {
             const entry = { pending: true, released: false };
@@ -749,7 +830,7 @@ class Instrument {
                 this.held.delete(id);
                 this.beginHeld(id, info, plan);
                 if (entry.released) this.stopNote(id);
-            });
+            }).catch(error => { this.held.delete(id); this.sourceFailure = error; });
             return id;
         }
         this.beginHeld(id, info, plan);
@@ -764,7 +845,7 @@ class Instrument {
         this.busyUntil[index] = Infinity;
         this.quietAt = Infinity;
         this.wake(index);
-        this.held.set(id, { index, voiceId: voice.voiceId, filterOffset: plan.filterOffset });
+        this.held.set(id, { index, voiceId: voice.voiceId, filterOffset: plan.filterOffset, owned: this.sourceBackend === 'owned-rust' && !!plan.piano });
     }
 
     /** Releases a note from startNote - unless its voice was taken since. */
@@ -776,6 +857,12 @@ class Instrument {
         const voice = this.voices[held.index];
         if (voice.voiceId !== held.voiceId) return;
         const now = this.AC.currentTime;
+        if (held.owned && this.pianoSource) {
+            this.pianoSource.release(held.index, this.gainEnv, this.filterEnv, held.filterOffset, now);
+            const until = now + Math.max(this.gainEnv.release, minTime);
+            this.busyUntil[held.index] = until; this.soundUntil = Math.max(this.soundUntil, until); this.scheduleSleep();
+            return;
+        }
         const gain = voice.gain.getNode().gain;
         const level = gain.value;
         cancelAndHold(gain, now);
@@ -794,6 +881,7 @@ class Instrument {
     /** Fades every voice out quickly, cancelling anything booked after `time`. */
     silence(time = this.AC.currentTime) {
         this.pianoEpoch++; // piano notes still being rendered are dropped
+        this.pianoSource?.silence(time);
         if (this.tempoTimingTouched) scheduleEffectTiming(this, 0, time);
         this.voices.forEach((synth, i) => {
             synth.stopStrings?.(time + .3);
@@ -840,9 +928,10 @@ class Instrument {
         this.wakeEffects();
         if(!this.awake.some(Boolean))this.setVoiceControlActive(true,index);
         if (!this.awake[index]) {
-            this.voices[index].volume.getNode().connect(this.synthMix.getNode());
+            if (!(this.sourceBackend === 'owned-rust' && this.pianoSource)) this.voices[index].volume.getNode().connect(this.synthMix.getNode());
             this.awake[index] = true;
         }
+        this.pianoSource?.wake(index);
         this.scheduleSleep();
     }
 
@@ -857,6 +946,7 @@ class Instrument {
             if (this.awake[i] && this.busyUntil[i] + 0.2 < now) {
                 voice.volume.getNode().disconnect();
                 this.awake[i] = false;
+                this.pianoSource?.awake(i, false);
             }
         });
         if(!this.awake.some(Boolean))this.setVoiceControlActive(false);
@@ -883,12 +973,14 @@ class Instrument {
         this.sleepTimer = setTimeout(() => this.sleepIdle(), delay * 1000);
     }
     setVoiceControlActive(on,index) {
-        const now=this.AC.currentTime,strings=this.voices.flatMap((v,i)=>this.awake[i]||i===index?[...(v.stringSources??[])].map(s=>s.start):[]);
+        const now=this.AC.currentTime,strings=this.voices.flatMap((v,i)=>this.awake[i]||i===index?[...(v.stringSources??[]),...(v.ownedStringSources??[])].map(s=>s.start):[]);
         // k-rate detune pulls its input for the whole first render quantum,
         // including the silent samples before a source's fractional onset.
         const first=Math.min(this.voiceOscillatorStartTime,...strings),pitchStart=Math.max(now,Math.floor(first*this.AC.sampleRate/128)*128/this.AC.sampleRate);
+        this.pianoPitchNotBefore = pitchStart;
         this.vibrato.captureClock.setActive(on&&this.vibratoConnected,now,pitchStart);this.filterLfoCapture.setActive(on&&this.filterLfoConnected,now);
         for(const [kind,lfo]of Object.entries(this.wanderLfos))lfo.setActive(on&&(kind==='pitch'?this.vibratoConnected:this.filterWanderConnected),now,kind==='pitch'?pitchStart:now);
+        this.pianoSource?.sync();
     }
 
     // When the effects will have nothing left to play.
@@ -907,6 +999,7 @@ class Instrument {
     }
 
     dispose() {
+        if (this.disposed) return;
         this.disposed = true;
         if (this.morph) clearInterval(this.morph.timer);
         this.morph = null;
@@ -915,6 +1008,8 @@ class Instrument {
         Object.values(this.wanderLfos).forEach((lfo) => lfo.dispose());
         this.silence();
         clearTimeout(this.sleepTimer);
+        this.pianoSource?.dispose();
+        this.effectsDisposal = Promise.resolve().then(() => this.compressor.dispose?.()).catch(error => { this.effectsDisposalError = error; });
         this.voices.forEach((synth) => synth.destroy());
         this.shimmer.dispose();
         this.freeze.dispose();
