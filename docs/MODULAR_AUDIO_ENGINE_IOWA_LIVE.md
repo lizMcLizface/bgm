@@ -70,3 +70,30 @@ Final artifact browser replay: all18native full-player cases pass with the
 callback-gap-aware cace5db5ec4cb896 source. Actual3live MessagePort cases also
 pass. Full local records: iowa-live-native-browser-final.json and
 iowa-live-ports-browser.json under ignored reports/modular_audio/.
+
+
+## Reused-context callback clock and disposal (11 November)
+
+The combined prepared-host batch exposed stale repeated browser `currentFrame`
+stamps after resume. An independent persistent native AudioParam ramp and
+BufferSource cursor proved that each callback still advanced native audio by128
+frames. The adapter now uses the shared measured `HostRenderClock`: render one
+quantum per callback, retain genuine forward unpulled gaps without catch-up,
+and reject backward/noncanonical clocks or more than8192 frames of stale lag.
+The Rust source and its original scalar clock guards remain unchanged.
+
+Current live artifact `d7f360c362be2ca3` remains88,541 bytes. The clock change
+passes34 owned-source checks; together with player/model regressions70 pass.
+Actual browser full-player18 and live-port3 cases pass, and the final disposal
+revision repeats the live-port3 gate successfully. The prepared normal All
+Iowa/piano/Core mixed fixture also passes all3 native/owned/restored desk cases.
+Reports are local ignored evidence: `iowa-live-clock-native-final.json`,
+`iowa-live-clock-ports-final.json`, `iowa-live-clock-dispose-final.json` and
+`owned-host-measured-final.json` under `reports/modular_audio/`.
+
+Owned player disposal now explicitly frees the source kernel via an acknowledged
+control message before closing the port, with a bounded one-second host cleanup
+fallback. The actual-worklet regression verifies idempotent disposal, zero live
+handle and a false final process result. Native player cleanup remains unchanged.
+These checks establish source/control correctness; room/limiter migration,
+unsuspended cold-upload deadlines and physical-device output remain separate.

@@ -153,10 +153,13 @@ export default class IowaPlayer {
         catch (error) { player.dispose(); throw error; }
     }
     dispose() {
-        if (this.disposed) return; this.disposed = true; this.preparation?.dispose(); this.preparedTables.clear(); this.rawTables.clear();
-        if (this.node) { this.node.port.onmessage = null; this.node.onprocessorerror = null; }
-        this.node?.disconnect(); this.node?.port.close(); this.pending = null; this.stored.clear(); this.tables.clear();
+        if (this.disposed) return this.disposal; this.disposed = true; this.preparation?.dispose(); this.preparedTables.clear(); this.rawTables.clear();
+        const node=this.node;this.node=null;node?.disconnect();
+        if(node&&this.backend==='owned-rust')this.disposal=new Promise(resolve=>{let timer;const finish=()=>{clearTimeout(timer);node.port.onmessage=null;node.onprocessorerror=null;node.port.close();resolve();};node.port.onmessage=({data})=>{if(data.type==='disposed')finish();};node.onprocessorerror=finish;timer=setTimeout(finish,1000);node.port.postMessage({dispose:true});});
+        else if(node){node.port.onmessage=null;node.onprocessorerror=null;node.port.close();}
+        this.pending = null; this.stored.clear(); this.tables.clear();
         for (const part of [this.bus, this.dry, this.wet, this.convolver, this.limiter, this.master]) part.disconnect();
+        return this.disposal;
     }
 
     /** The gain that brings a recorded note (for the page's A/B) to the level the model plays it at. */
