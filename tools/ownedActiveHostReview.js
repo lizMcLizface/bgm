@@ -32,6 +32,10 @@ function observeExportEnvironment(environment, records) {
     };
     return owner;
    },
+   rackNativeFactory:(context,options)=>{
+    const owner=prepared.rackNativeFactory(context,options),entry={owner,kind:options.kind,contextBound:context===prepared.context,disposeCalls:0,stats:null,snapshot:null,error:null,closing:null};record.nativeRackOwners.push(entry);
+    const dispose=owner.dispose.bind(owner);owner.dispose=()=>{entry.disposeCalls++;return entry.closing??=Promise.resolve().then(async()=>{try{entry.health=await owner.health;if(!owner.error&&!owner.disposed){entry.snapshot=owner.snapshot();entry.stats=await owner.requestStats();}}catch(error){entry.error=String(error);}finally{await dispose();entry.disposed=owner.disposed;entry.innerReleased=owner.inner?.node===null;}});};return owner;
+   },
    classicSourceNodeFactory:async(context,options)=>{
     const node=await prepared.classicSourceNodeFactory(context,options),entry={node,model:options.model,eventCount:options.events?.length??0,expectedApplied:(options.events??[]).filter(e=>Math.round(e[4]*context.sampleRate)<Math.ceil(context.length/128)*128).length,contextBound:context===prepared.context,disposeCalls:0,stats:null,error:null,closing:null};record.sources.push(entry);
     const handle=node.handleOwnedMessage.bind(node),dispose=node.disposeOwned.bind(node);
@@ -41,14 +45,14 @@ function observeExportEnvironment(environment, records) {
    }
   } : {}),
   prepareContext:async context=>{
-   const next=await prepared.prepareContext(context),entry={context,contextBound:next.context===context,newContext:context!==environment.context,offline:Number.isFinite(context.length),owners:[],sources:[]};records.push(entry);return wrap(next,entry);
+   const next=await prepared.prepareContext(context),entry={context,contextBound:next.context===context,newContext:context!==environment.context,offline:Number.isFinite(context.length),owners:[],nativeRackOwners:[],sources:[]};records.push(entry);return wrap(next,entry);
   }
  });
  return wrap(environment);
 }
 const exportDynamicsRack=()=>({'master.chain':maskFromUnits(['compressor','limiter']),'compressor.enabled':1,'compressor.threshold':-32,'compressor.ratio':7,'compressor.mix':.65,'compressor.makeup':3,'limiter.ceiling':-8});
-async function classicExportCase(material){
- let host;const records=[],report={kind:'owned-active-host.cold-classic-dynamics-export',version:1,material,muted:true,checksPassed:false,scope:'Normal renderPcm health/routing/disposal check; no Native PCM identity claim',fixtureSourceRack:'Active compressor and limiter authored through the CLASSIC instrument setRack API, including the machine source rack; external live All desk is not substituted for the offline source rack'};
+async function classicExportCase(material,family='dynamics'){
+ let host;const records=[],report={kind:'owned-active-host.cold-classic-'+family+'-export',version:1,material,muted:true,checksPassed:false,scope:'Normal renderPcm health/routing/disposal check; no Native PCM identity claim',fixtureSourceRack:family==='nativeRack'?'Active Width and Ring authored through the CLASSIC instrument setRack API, including the machine source rack; external live All desk is not substituted for the offline source rack':'Active compressor and limiter authored through the CLASSIC instrument setRack API, including the machine source rack; external live All desk is not substituted for the offline source rack'};
  try{
   await audioContext.resume();const prepared=await prepareOwnedHostEnvironment(audioContext),env=observeExportEnvironment(prepared,records);
   host=createHost({...BROWSABLE_SCENES[0],voices:{},layerVoices:{},percussion:null},{seed:109,audioEnvironment:env});host.g.output.gain.value=0;await host.g.awaitRoleMotion();
@@ -61,31 +65,32 @@ async function classicExportCase(material){
    await host.setSound(role,{synth:'juno',name:SYNTHS.juno.presets[0].name});
   }
   const instrument=host.g.roles[role].instrument;
-  instrument.setRack({...instrument.preset.classics.rack,...exportDynamicsRack()});
+  instrument.setRack({...instrument.preset.classics.rack,...(family==='nativeRack'?{'master.routing':0,'master.chain':maskFromUnits(['width','ring']),'width.amount':.6,'ring.freq':911,'ring.mix':.37,'switch.width':1,'switch.ring':1}:exportDynamicsRack())});
   for(const [name,r]of Object.entries(host.g.roles)){r.mute=name!==role;r.solo=name===role;r.volume=.5;}
   host.g.settings.playMusic=true;host.g.settings.playAmbience=false;host.g.applyMix();
   const notes=planNotes(host.g,{[role]:true},3,false).notes,settings=JSON.stringify(host.g.settings),preset=JSON.stringify(instrument.preset),synth=instrument.preset.classics.synth;
   Object.assign(report,{onlyRole:role,plannedNotes:notes.length,machine:host.g.roles.perc.machine===true,constructorSite:material==='machine'?'perc.machine CLASSIC.create':'melodic preset.classics CLASSIC.create',synth,expectedModel:SYNTHS[synth].model,rack:structuredClone(instrument.preset.classics.rack)});
   if(!notes.length)throw Error('Fixed normal score has no notes for '+role);
-  let peak=0,sampleCount=0;progress('Cold '+synth+' score through owned rack dynamics');
+  let peak=0,sampleCount=0;progress('Cold '+synth+' score through owned rack '+family);
   const result=await renderPcm(host.g,3,{onChunk:pcm=>{sampleCount+=pcm.length;for(const value of pcm)peak=Math.max(peak,Math.abs(value));}});
   // The renderer invokes normal teardown; await its observed owner promises to
   // check completion even on implementations where the caller returns earlier.
-  await Promise.all(records.flatMap(r=>[...r.owners,...r.sources].map(e=>e.closing??Promise.reject(Error('Renderer did not dispose an observed owner')))));
+  await Promise.all(records.flatMap(r=>[...r.owners,...r.nativeRackOwners,...r.sources].map(e=>e.closing??Promise.reject(Error('Renderer did not dispose an observed owner')))));
   Object.assign(report,{...result,peak,sampleCount,songUnchanged:JSON.stringify(host.g.settings)===settings,sourcePresetUnchanged:JSON.stringify(instrument.preset)===preset});
   report.contexts=records.map(r=>({contextBound:r.contextBound,newContext:r.newContext,offline:r.offline,sampleRate:r.context.sampleRate,length:r.context.length,state:r.context.state,
    owners:r.owners.map(e=>({kind:e.kind,contextBound:e.contextBound,engineVersion:e.owner.engineVersion,health:e.health,stats:e.stats,error:e.error??e.owner.error,cleanupError:e.owner.cleanupError??null,disposed:e.owner.disposed,nodeReleased:e.owner.node===null,disposeCalls:e.disposeCalls,snapshot:e.owner.snapshot()})),
+   nativeRackOwners:r.nativeRackOwners.map(e=>({kind:e.kind,contextBound:e.contextBound,facadeVersion:e.owner.facadeVersion,health:e.health,stats:e.stats,snapshot:e.snapshot,error:e.error??e.owner.error,cleanupError:e.owner.cleanupError??null,disposed:e.disposed===true,innerReleased:e.innerReleased===true,disposeCalls:e.disposeCalls})),
    sources:r.sources.map(e=>({model:e.model,eventCount:e.eventCount,expectedApplied:e.expectedApplied,contextBound:e.contextBound,backend:e.node.sourceBackend,engineVersion:e.node.engineVersion,stats:e.stats,error:e.error,disposed:e.disposed===true,disposeCalls:e.disposeCalls}))}));
-  const validContext=r=>r.contextBound&&r.newContext&&r.offline&&r.state==='closed'&&r.sources.some(e=>e.contextBound&&e.model===report.expectedModel&&e.eventCount>=notes.length*2&&e.backend==='owned-rust'&&e.stats?.final===true&&e.stats.applied===e.expectedApplied&&e.stats.late===0&&e.disposed&&!e.error)&&['compressor','limiter'].every(kind=>r.owners.some(e=>e.kind===kind&&e.stats?.processedFrames>0&&e.stats.authoredSequence>0&&e.stats.targets[0]===(kind==='compressor'?-32:-8)&&e.snapshot.values[0]===(kind==='compressor'?-32:-8)))&&r.owners.every(e=>e.contextBound&&e.health?.ready&&!e.error&&!e.cleanupError&&!e.stats?.error&&e.disposed&&e.nodeReleased);
+  const validContext=r=>r.contextBound&&r.newContext&&r.offline&&r.state==='closed'&&r.sources.some(e=>e.contextBound&&e.model===report.expectedModel&&e.eventCount>=notes.length*2&&e.backend==='owned-rust'&&e.stats?.final===true&&e.stats.applied===e.expectedApplied&&e.stats.late===0&&e.disposed&&!e.error)&&(family==='nativeRack'?['width','ring'].every(kind=>r.nativeRackOwners.some(e=>e.kind===kind&&e.stats?.processedFrames>0&&e.stats.authoredSequence===e.stats.commands&&e.stats.commands>0&&e.stats.targets[0]===(kind==='width'?Math.fround(.8):911)&&e.snapshot.settings[kind==='width'?'amount':'freq']===(kind==='width'?.6:911)))&&r.nativeRackOwners.every(e=>e.contextBound&&e.health?.ready&&!e.error&&!e.cleanupError&&!e.stats?.error&&e.disposed&&e.innerReleased):['compressor','limiter'].every(kind=>r.owners.some(e=>e.kind===kind&&e.stats?.processedFrames>0&&e.stats.authoredSequence>0&&e.stats.targets[0]===(kind==='compressor'?-32:-8)&&e.snapshot.values[0]===(kind==='compressor'?-32:-8))))&&r.owners.every(e=>e.contextBound&&e.health?.ready&&!e.error&&!e.cleanupError&&!e.stats?.error&&e.disposed&&e.nodeReleased);
   report.checksPassed=peak>0&&sampleCount===result.frames*2&&report.songUnchanged&&report.sourcePresetUnchanged&&records.length>0&&report.contexts.every(validContext);
  }catch(error){report.error=String(error);report.stack=error.stack;report.diagnostics=error.diagnostics??null;}
  finally{
   try{await host?.dispose();}catch(error){appendHostCheckFailure(report,'Live fixture cleanup: '+error);}
   await audioContext.suspend();
-  if(!report.contexts)report.contexts=records.map(r=>({offline:r.offline,newContext:r.newContext,contextBound:r.contextBound,state:r.context.state,owners:r.owners.map(e=>({kind:e.kind,error:e.error??e.owner.error,disposed:e.owner.disposed,stats:e.stats})),sources:r.sources.map(e=>({model:e.model,error:e.error,disposed:e.disposed,stats:e.stats}))}));
+  if(!report.contexts)report.contexts=records.map(r=>({offline:r.offline,newContext:r.newContext,contextBound:r.contextBound,state:r.context.state,owners:r.owners.map(e=>({kind:e.kind,error:e.error??e.owner.error,disposed:e.owner.disposed,stats:e.stats})),nativeRackOwners:r.nativeRackOwners.map(e=>({kind:e.kind,error:e.error??e.owner.error,disposed:e.owner.disposed,innerReleased:e.owner.inner?.node===null,stats:e.stats,snapshot:e.snapshot})),sources:r.sources.map(e=>({model:e.model,error:e.error,disposed:e.disposed,stats:e.stats}))}));
  }
  return report;
 }
-async function classicExports(){const cases=[];for(const material of ['classic','machine']){const result=await classicExportCase(material);cases.push(result);if(!result.checksPassed)break;}return{kind:'owned-active-host.cold-classic-dynamics-export-batch',version:1,muted:true,cases,checksPassed:cases.length===2&&cases.every(c=>c.checksPassed),error:cases.find(c=>c.error)?.error??null};}
+async function classicExports(family='dynamics'){const cases=[];for(const material of ['classic','machine']){const result=await classicExportCase(material,family);cases.push(result);if(!result.checksPassed)break;}return{kind:'owned-active-host.cold-classic-'+family+'-export-batch',version:1,muted:true,cases,checksPassed:cases.length===2&&cases.every(c=>c.checksPassed),error:cases.find(c=>c.error)?.error??null};}
 
-for(const [id,run]of [['mixed',()=>live('mixed')],['measured',()=>live('measured')],['classic',()=>live('classic')],['physical',()=>live('physical')],['rack',()=>live('rack')],['dynamics',()=>live('dynamics')],['nativeRack',()=>live('nativeRack')],['offline',()=>offline('piano')],['iowaOffline',()=>offline('iowa')],['classicExports',()=>classicExports()]])$(id).onclick=async()=>{buttons.forEach(b=>b.disabled=true);try{const r=await run();$('report').value=JSON.stringify(r,null,2);$('summary').textContent=JSON.stringify({kind:r.kind,checksPassed:r.checksPassed,cases:r.cases?.length,peak:r.peak,error:r.error},null,2);$('status').textContent=r.checksPassed?'Checks passed':'Checks failed';}catch(e){$('status').textContent=String(e);}finally{buttons.forEach(b=>b.disabled=false);}};
+for(const [id,run]of [['mixed',()=>live('mixed')],['measured',()=>live('measured')],['classic',()=>live('classic')],['physical',()=>live('physical')],['rack',()=>live('rack')],['dynamics',()=>live('dynamics')],['nativeRack',()=>live('nativeRack')],['offline',()=>offline('piano')],['iowaOffline',()=>offline('iowa')],['classicExports',()=>classicExports()],['nativeRackExports',()=>classicExports('nativeRack')]])$(id).onclick=async()=>{buttons.forEach(b=>b.disabled=true);try{const r=await run();$('report').value=JSON.stringify(r,null,2);$('summary').textContent=JSON.stringify({kind:r.kind,checksPassed:r.checksPassed,cases:r.cases?.length,peak:r.peak,error:r.error},null,2);$('status').textContent=r.checksPassed?'Checks passed':'Checks failed';}catch(e){$('status').textContent=String(e);}finally{buttons.forEach(b=>b.disabled=false);}};
