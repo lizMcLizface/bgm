@@ -23,6 +23,7 @@ synth-engine/voice-fx/target/
 synth-engine/plucked-string/target/
 synth-engine/motion-fx/target/
 synth-engine/plucked-voice/target/
+synth-engine/tape-fx/target/
 
 # Working YAML exports; only the explicit public/synth-presets/ bundle is published
 patches/

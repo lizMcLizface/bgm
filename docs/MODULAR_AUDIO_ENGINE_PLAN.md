@@ -1335,3 +1335,20 @@ be committed with the next combined graph slice. Full plucked and desk native
 comparisons have separately exposed issues still being corrected. Tape remains
 an explicit pinned-browser-profile port in progress; no generic fallback or
 default backend switch is introduced. See MODULAR_AUDIO_ENGINE_MOTION_TAPE_AUDIT.md.
+
+
+### Pinned Tape oversampling primitive (overnight 2026-11-11)
+
+The isolated original Tape2x WaveShaper now has a portable explicit Chromium
+profile.72 actual native-browser comparisons across three rates, mono/stereo,
+original/linear curves, impulse/multitone/high-tone material are bit exact
+(max absolute and relativeRMS error0). Six permanent tests also pass. The
+29538-byte7e3b04628555d62c artifact, pinned revision/source hashes and BSD notices
+are published as local build assets and checked together. Evidence is
+tape-shaper-native-browser.json/.png; see MODULAR_AUDIO_ENGINE_OWNED_TAPE.md.
+
+This verifies only the shaper/FIR primitive. Native tone, fractional modulated
+delay, four LFOs and continuous30ms target laws remain a separately verified
+full-chain slice in progress. No Tape default route or generic fallback changes.
+Motion/Tape diagnostic page entries are included independently of the pending
+plucked/desk graph integration.
