@@ -1,0 +1,231 @@
+{
+  "api": 1,
+  "profile": {
+    "kind": "voice-compressor.live-native-host-profile",
+    "version": 1,
+    "profile": "legacy-voice-compressor-live-e14de735-v1",
+    "revision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+    "sources": [
+      {
+        "file": "LICENSE",
+        "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/LICENSE",
+        "bytes": 1536,
+        "sha256": "368cca1106be99d39ecd32a38d8305585d802a475effb66380b91ffc9bcf709b"
+      },
+      {
+        "file": "third_party/blink/renderer/modules/webaudio/gain_handler.cc",
+        "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/gain_handler.cc",
+        "bytes": 3853,
+        "sha256": "9b1b2e6a4d1fef5f88f67b3079fc76c01d99a31d46ae5db5047b2676fe290bc1"
+      },
+      {
+        "file": "third_party/blink/renderer/modules/webaudio/gain_handler.h",
+        "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/gain_handler.h",
+        "bytes": 1715,
+        "sha256": "b7bbff8ab19a4f6fdc2a72b769277bbd37e59a50cd9dcb4af9683956edb35db6"
+      },
+      {
+        "file": "third_party/blink/renderer/modules/webaudio/gain_node.cc",
+        "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/gain_node.cc",
+        "bytes": 3281,
+        "sha256": "f687d86f5c3c57fdc26ffa55d93ca7e41d0bc9f3439b6988d37f7199f238850b"
+      },
+      {
+        "file": "third_party/blink/renderer/modules/webaudio/audio_param_handler.cc",
+        "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_param_handler.cc",
+        "bytes": 92593,
+        "sha256": "50e6da5e2efa1254d05393ca03bae373b8a329e400d85b3f6cafd8ec3896ad8b"
+      },
+      {
+        "file": "third_party/blink/renderer/platform/audio/audio_bus.cc",
+        "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/audio_bus.cc",
+        "bytes": 28543,
+        "sha256": "17fc6c0a60c1b1ef4115942b05bd7c37838f74784d0d128e66a0e660cc2a05c6"
+      },
+      {
+        "file": "third_party/blink/renderer/platform/audio/audio_bus.h",
+        "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/audio_bus.h",
+        "bytes": 8375,
+        "sha256": "c4853588db11635f081ff76c261d2ec9af3cf87ef832c494799401afff758023"
+      }
+    ],
+    "hosts": [
+      {
+        "file": "src/nodes/voiceCompressor.js",
+        "bytes": 2231,
+        "sha256": "1ea0bca04b9d8a7f925587329c4fb5eb3fd389ac8c7985f6374c44813a164ae0"
+      },
+      {
+        "file": "src/app/engine/voiceFx.js",
+        "bytes": 4662,
+        "sha256": "ea74827225580f0484403787555f0270d76e81199bbe845daf8addc33bfeda56"
+      },
+      {
+        "file": "src/app/engine/Instrument.js",
+        "bytes": 45217,
+        "sha256": "1257bc15f62977d4ab7375f08e17fc000db7a34e14341271a23ba2342e0c9173"
+      }
+    ],
+    "nativeCoreProfile": {
+      "kind": "compressor.chromium-profile-sources",
+      "version": 1,
+      "revision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+      "capturedAtUtc": "2026-11-11T02:22:05.975Z",
+      "scope": "Pinned public native DynamicsCompressor reference; separate from the existing zero-lookahead graph.compressor and custom desk/master dynamics. Actual native PCM acceptance required before portable profile adoption.",
+      "sources": [
+        {
+          "file": "LICENSE",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/LICENSE",
+          "bytes": 1536,
+          "sha256": "368cca1106be99d39ecd32a38d8305585d802a475effb66380b91ffc9bcf709b"
+        },
+        {
+          "file": "third_party/blink/renderer/platform/audio/dynamics_compressor.cc",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/dynamics_compressor.cc",
+          "bytes": 20452,
+          "sha256": "be48c17c9d4039cd608269130e87c164cf8ea82f18c7a551fcadd92a37db2a13"
+        },
+        {
+          "file": "third_party/blink/renderer/platform/audio/dynamics_compressor.h",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/dynamics_compressor.h",
+          "bytes": 5300,
+          "sha256": "51e3144759e4e9ad81e733bdbe7e5e8ad94bed1651c93b7c16cea98b4f934ed1"
+        },
+        {
+          "file": "third_party/blink/renderer/modules/webaudio/dynamics_compressor_handler.cc",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/dynamics_compressor_handler.cc",
+          "bytes": 6972,
+          "sha256": "bdc2cad4d61ee6e6707cca3442c0a2fe6aca72b0754387602b68a00e299f31fe"
+        },
+        {
+          "file": "third_party/blink/renderer/modules/webaudio/dynamics_compressor_handler.h",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/dynamics_compressor_handler.h",
+          "bytes": 2565,
+          "sha256": "4f34efc257498643ab31d1fa8b501d8f97d268e83709e74b32b9d1ce35b372d5"
+        },
+        {
+          "file": "third_party/blink/renderer/modules/webaudio/dynamics_compressor_node.cc",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/dynamics_compressor_node.cc",
+          "bytes": 7665,
+          "sha256": "eedd53f7271b2b3eae9e049394e9f64a373ca60246a2220d2aa97633b34dbbec"
+        },
+        {
+          "file": "third_party/blink/renderer/platform/audio/audio_utilities.cc",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/audio_utilities.cc",
+          "bytes": 9697,
+          "sha256": "d3ed345360190487ee482eebda6141580994db924bd0fd36f342a61b33a09db0"
+        },
+        {
+          "file": "third_party/blink/renderer/platform/audio/audio_utilities.h",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/audio_utilities.h",
+          "bytes": 4405,
+          "sha256": "04c36054b0c043f9f4cf061875734e7b0631df7f53c8a25d7ad3e7bb0ca271cc"
+        },
+        {
+          "file": "third_party/blink/renderer/platform/wtf/math_extras.h",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/wtf/math_extras.h",
+          "bytes": 12171,
+          "sha256": "eeb5d43ce4793ef0043326a65318d4e1a66e17d4af218387619ebd71d598238f"
+        },
+        {
+          "file": "third_party/fdlibm/ieee754.h",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/fdlibm/ieee754.h",
+          "bytes": 2871,
+          "sha256": "67ac025f301eb38f63a4523f94f0cc30a4c0aa2f441f40f6e139026a84d49072"
+        },
+        {
+          "file": "third_party/fdlibm/BUILD.gn",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/fdlibm/BUILD.gn",
+          "bytes": 267,
+          "sha256": "30bab8a55ae2b9b6a980af1eb9ed9078c1c7ef602c34aa5ab61186329f8d02a1"
+        },
+        {
+          "file": "third_party/fdlibm/ieee754.cc",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/fdlibm/ieee754.cc",
+          "bytes": 103133,
+          "sha256": "661b229dd99d262594df7a25d1c709d63f0af202c9bae252b3cabbaeb27d7d2f"
+        }
+      ],
+      "hostSources": [
+        {
+          "file": "src/nodes/compressor.js",
+          "bytes": 1117,
+          "sha256": "13ee638c58711e42ce2bd68c8b2fa249bbd74fb86b77c215fab216b4c21c1c50"
+        },
+        {
+          "file": "src/nodes/voiceCompressor.js",
+          "bytes": 2231,
+          "sha256": "1ea0bca04b9d8a7f925587329c4fb5eb3fd389ac8c7985f6374c44813a164ae0"
+        },
+        {
+          "file": "src/synths/effects/graph.js",
+          "bytes": 9566,
+          "sha256": "1d72d271dc843eb256a85d91d0ee016bd97e014e6f83da8f9c77c2858fcdcd31"
+        },
+        {
+          "file": "src/synths/effects/extras.js",
+          "bytes": 11911,
+          "sha256": "f9bdac4f97fd0dd52ad7302f2e272c548a6e1cf31108e7c07a3e0a94e5352461"
+        },
+        {
+          "file": "src/synths/piano/player.js",
+          "bytes": 7635,
+          "sha256": "144c2fb24c3569f92facc83e9d4aa1ccabfed2223877c608f84d9b862b9b3e9b"
+        },
+        {
+          "file": "src/app/engine/iowaModel/player.js",
+          "bytes": 6896,
+          "sha256": "4d7c6167a077ee529f48c32e9237c972298a8d1f61a2430ed1351e33fdc58cb2"
+        }
+      ],
+      "floatMathProfile": {
+        "version": 2,
+        "name": "amd-avx2-fma3-log10f-rounded-binary64-pow-v2",
+        "scope": "Global LinearToDecibels uses a literal deterministic AMD AVX2 FMA3 Float32 log10f translation, including explicitly fused operations and immutable source tables. Global DecibelsToLinear retains rounded binary64 power. Explicitly qualified Chromium fdlibm wrappers retain their original binary64-to-Float32 boundaries. Portable arithmetic profile only: no browser DLL linkage or universal native/CPU identity claim.",
+        "log10fReference": {
+          "repository": "amd/aocl-libm-ose",
+          "revision": "155b5ab00879dd0d4fcf89aa602415ced5546218",
+          "files": [
+            {
+              "path": "LICENSE",
+              "url": "https://raw.githubusercontent.com/amd/aocl-libm-ose/155b5ab00879dd0d4fcf89aa602415ced5546218/LICENSE",
+              "bytes": 1843,
+              "sha256": "4eede931432f4853bc59c02c381d7fd888bfb00017dc210bd54ba252872863fa"
+            },
+            {
+              "path": "src/isa/avx2/masm/log10f_fma3.asm",
+              "url": "https://raw.githubusercontent.com/amd/aocl-libm-ose/155b5ab00879dd0d4fcf89aa602415ced5546218/src/isa/avx2/masm/log10f_fma3.asm",
+              "bytes": 25353,
+              "sha256": "25f722207ddbbb359faeec78e4834f95c656481ffbafdb99100e3a6520b0313d"
+            }
+          ]
+        },
+        "tableSha256": {
+          "INV": "8c1e082036b2adc3a3bbec223fbeb32e62c311d5e5c2b935f9692b5640ad1794",
+          "HEAD": "c63e51e59072f1d949bf74db87b6617c259958924e7a8e51ca5a7908491b4d97",
+          "TAIL": "ef002404a752ee78060686e031087c6b56e2ef5d45cbbff4f3a119f8b6afc64e"
+        },
+        "previousProfile": "rounded-binary64-float-v1; preserved negative Voice192k and non-fused candidate96k reports",
+        "nativeAcceptance": "Unchanged static96/captured48/activeVoice48/quietDC8 plus384 independent seeded/corner actual-native cases; six rates, mono/stereo where applicable; no gain fitting, alignment or tolerance change."
+      }
+    },
+    "scope": "Original raw controls and source20ms targets, native InsertEvent pruning/pending-event first-pull clamp, actual eager Instrument versus lazy VoiceFx node lifetime, internal dry bypass with frozen DSP and global control time. Existing captured APIs and native reference routes unchanged.",
+    "controllerPolicy": {
+      "commandQuantumFrames": 128,
+      "immediateCommandsOnly": true,
+      "pendingTargetsPerParameter": 2,
+      "clamp": "Unprocessed new targets are clamped to actual first resumed render time; historical processed target time retained.",
+      "audioClock": "Processed core state stops at amount0; global host frame keeps advancing or is explicitly synchronized after a pull gap.",
+      "reset": "Fresh native-node histories with latest requested controls at current canonical boundary.",
+      "latency": "Native rate-dependent lookahead while active; dry zero-frame bypass; automatic static PDC unsupported."
+    }
+  },
+  "audited": false,
+  "source": "6eb721ac0139da4fded090fe6a640558c483632e1f9d0f4a8c026162c225c5c7",
+  "runtime": "c75b4a4ceaa9cf0b2118b0a5b4f24ddd7f3e786f7cd0a10a39edcb9cea548cf4",
+  "wasm": "923e65664dc31cb3243f44be1dff77fffce9c32dad86553dde2ea5203c8773da",
+  "bytes": 74534,
+  "version": "ac6248622e53a405",
+  "processorName": "owned-voice-compressor-live-ac6248622e53a405",
+  "processor": "7d52c7ed70dcf73d8a454024b571a6f722e14198938bcb654ba2ccfd2f309805"
+}

@@ -1,0 +1,6081 @@
+{
+  "version": 1,
+  "kind": "voice-compressor.native-accepted-owned-hypothesis-fixture",
+  "scope": "Exact portable baseline of source-derived policy5 independently accepted by48 actual-native lifecycle cases. A deterministic integer-derived Float32 input avoids host Math.sin portability differences; PCM hashes are owned-baseline fingerprints under this input, not native byte identity. Original native1e-4 bounds remain separate browser acceptance.",
+  "referenceWasmSha256": "9ec64941917397aeab2814f815634d894ccb9903818f29aea31eb0d21a09fbb0",
+  "nativeReportSha256": "d03f5d27c027ca9c24681dd7206357f313612caeffdc7f336b28b6345f878e14",
+  "trials": [
+    {
+      "rate": 8000,
+      "channels": 1,
+      "lifetime": "eager-instrument",
+      "initialActive": true,
+      "originFrame": 0,
+      "frames": 37376,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.512,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.512,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 1.024,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 1.152,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 1.152,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 1.152,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 1.152,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 1.536,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 2.048,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 2.176,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 2.176,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 2.176,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 2.176,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 4.16,
+          "frame": 33280
+        }
+      ],
+      "pcmSha256": "b65799da6401cc3a418d76ada8039a4a3c8101dec9b0b01fdb0068f6bf82fed2"
+    },
+    {
+      "rate": 8000,
+      "channels": 1,
+      "lifetime": "eager-instrument",
+      "initialActive": false,
+      "originFrame": 0,
+      "frames": 37376,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0.256,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.512,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.512,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 1.024,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 1.152,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 1.152,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 1.152,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 1.152,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 1.536,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 2.048,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 2.176,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 2.176,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 2.176,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 2.176,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 4.16,
+          "frame": 33280
+        }
+      ],
+      "pcmSha256": "b60bf152e5730bc3d5ee2fb634aa1ef181ace1665a4cf208d4620c4f275a2925"
+    },
+    {
+      "rate": 8000,
+      "channels": 1,
+      "lifetime": "lazy-voicefx",
+      "initialActive": true,
+      "originFrame": 0,
+      "frames": 37376,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.512,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.512,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 1.024,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 1.152,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 1.152,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 1.152,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 1.152,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 1.536,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 2.048,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 2.176,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 2.176,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 2.176,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 2.176,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 4.16,
+          "frame": 33280
+        }
+      ],
+      "pcmSha256": "b65799da6401cc3a418d76ada8039a4a3c8101dec9b0b01fdb0068f6bf82fed2"
+    },
+    {
+      "rate": 8000,
+      "channels": 1,
+      "lifetime": "lazy-voicefx",
+      "initialActive": false,
+      "originFrame": 2048,
+      "frames": 37376,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0.256,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0.256,
+          "frame": 2048
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0.256,
+          "frame": 2048
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0.256,
+          "frame": 2048
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0.256,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.512,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.512,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 1.024,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 1.152,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 1.152,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 1.152,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 1.152,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 1.536,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 2.048,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 2.176,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 2.176,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 2.176,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 2.176,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 4.16,
+          "frame": 33280
+        }
+      ],
+      "pcmSha256": "b60bf152e5730bc3d5ee2fb634aa1ef181ace1665a4cf208d4620c4f275a2925"
+    },
+    {
+      "rate": 8000,
+      "channels": 2,
+      "lifetime": "eager-instrument",
+      "initialActive": true,
+      "originFrame": 0,
+      "frames": 37376,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.512,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.512,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 1.024,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 1.152,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 1.152,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 1.152,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 1.152,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 1.536,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 2.048,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 2.176,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 2.176,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 2.176,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 2.176,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 4.16,
+          "frame": 33280
+        }
+      ],
+      "pcmSha256": "eeeb729c7f955df10a9e54367d21a11f653d645823e09d0ae772831ef1f485db"
+    },
+    {
+      "rate": 8000,
+      "channels": 2,
+      "lifetime": "eager-instrument",
+      "initialActive": false,
+      "originFrame": 0,
+      "frames": 37376,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0.256,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.512,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.512,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 1.024,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 1.152,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 1.152,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 1.152,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 1.152,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 1.536,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 2.048,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 2.176,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 2.176,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 2.176,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 2.176,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 4.16,
+          "frame": 33280
+        }
+      ],
+      "pcmSha256": "056af1a5b72a8beb362acb952c32b3b868207b56393620068e0acdb177b0280f"
+    },
+    {
+      "rate": 8000,
+      "channels": 2,
+      "lifetime": "lazy-voicefx",
+      "initialActive": true,
+      "originFrame": 0,
+      "frames": 37376,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.512,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.512,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 1.024,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 1.152,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 1.152,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 1.152,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 1.152,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 1.536,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 2.048,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 2.176,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 2.176,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 2.176,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 2.176,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 4.16,
+          "frame": 33280
+        }
+      ],
+      "pcmSha256": "eeeb729c7f955df10a9e54367d21a11f653d645823e09d0ae772831ef1f485db"
+    },
+    {
+      "rate": 8000,
+      "channels": 2,
+      "lifetime": "lazy-voicefx",
+      "initialActive": false,
+      "originFrame": 2048,
+      "frames": 37376,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0.256,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0.256,
+          "frame": 2048
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0.256,
+          "frame": 2048
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0.256,
+          "frame": 2048
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0.256,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.512,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.512,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 1.024,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 1.152,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 1.152,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 1.152,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 1.152,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 1.536,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 2.048,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 2.176,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 2.176,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 2.176,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 2.176,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 4.16,
+          "frame": 33280
+        }
+      ],
+      "pcmSha256": "056af1a5b72a8beb362acb952c32b3b868207b56393620068e0acdb177b0280f"
+    },
+    {
+      "rate": 24000,
+      "channels": 1,
+      "lifetime": "eager-instrument",
+      "initialActive": true,
+      "originFrame": 0,
+      "frames": 78848,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.17066666666666666,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.17066666666666666,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.3413333333333333,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.384,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.384,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.384,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.384,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.512,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.6826666666666666,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.7253333333333334,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.7253333333333334,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.7253333333333334,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.7253333333333334,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.784,
+          "frame": 66816
+        }
+      ],
+      "pcmSha256": "ff2271a83c03ddc6ce0f66f224b574cf05fd9331727749a84885f2c7e28f74d7"
+    },
+    {
+      "rate": 24000,
+      "channels": 1,
+      "lifetime": "eager-instrument",
+      "initialActive": false,
+      "originFrame": 0,
+      "frames": 78848,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0.08533333333333333,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.17066666666666666,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.17066666666666666,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.3413333333333333,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.384,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.384,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.384,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.384,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.512,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.6826666666666666,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.7253333333333334,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.7253333333333334,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.7253333333333334,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.7253333333333334,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.784,
+          "frame": 66816
+        }
+      ],
+      "pcmSha256": "8c2de2ecb8f7d7808565af3c7ac02c498e1e2ddbd77c31053fd55ca449fc84d2"
+    },
+    {
+      "rate": 24000,
+      "channels": 1,
+      "lifetime": "lazy-voicefx",
+      "initialActive": true,
+      "originFrame": 0,
+      "frames": 78848,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.17066666666666666,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.17066666666666666,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.3413333333333333,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.384,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.384,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.384,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.384,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.512,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.6826666666666666,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.7253333333333334,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.7253333333333334,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.7253333333333334,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.7253333333333334,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.784,
+          "frame": 66816
+        }
+      ],
+      "pcmSha256": "ff2271a83c03ddc6ce0f66f224b574cf05fd9331727749a84885f2c7e28f74d7"
+    },
+    {
+      "rate": 24000,
+      "channels": 1,
+      "lifetime": "lazy-voicefx",
+      "initialActive": false,
+      "originFrame": 2048,
+      "frames": 78848,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0.08533333333333333,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0.08533333333333333,
+          "frame": 2048
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0.08533333333333333,
+          "frame": 2048
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0.08533333333333333,
+          "frame": 2048
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0.08533333333333333,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.17066666666666666,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.17066666666666666,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.3413333333333333,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.384,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.384,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.384,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.384,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.512,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.6826666666666666,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.7253333333333334,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.7253333333333334,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.7253333333333334,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.7253333333333334,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.784,
+          "frame": 66816
+        }
+      ],
+      "pcmSha256": "8c2de2ecb8f7d7808565af3c7ac02c498e1e2ddbd77c31053fd55ca449fc84d2"
+    },
+    {
+      "rate": 24000,
+      "channels": 2,
+      "lifetime": "eager-instrument",
+      "initialActive": true,
+      "originFrame": 0,
+      "frames": 78848,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.17066666666666666,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.17066666666666666,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.3413333333333333,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.384,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.384,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.384,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.384,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.512,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.6826666666666666,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.7253333333333334,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.7253333333333334,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.7253333333333334,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.7253333333333334,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.784,
+          "frame": 66816
+        }
+      ],
+      "pcmSha256": "9b336f5c85b05781fc1225d5e4ea556b9fa916b8c1925ff32f6ccae6be37fcea"
+    },
+    {
+      "rate": 24000,
+      "channels": 2,
+      "lifetime": "eager-instrument",
+      "initialActive": false,
+      "originFrame": 0,
+      "frames": 78848,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0.08533333333333333,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.17066666666666666,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.17066666666666666,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.3413333333333333,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.384,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.384,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.384,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.384,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.512,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.6826666666666666,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.7253333333333334,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.7253333333333334,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.7253333333333334,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.7253333333333334,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.784,
+          "frame": 66816
+        }
+      ],
+      "pcmSha256": "a82ea96587e6b3bc9016a40d43d1be1d0b8f8ca9949a1d70b56e495c8904d2f8"
+    },
+    {
+      "rate": 24000,
+      "channels": 2,
+      "lifetime": "lazy-voicefx",
+      "initialActive": true,
+      "originFrame": 0,
+      "frames": 78848,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.17066666666666666,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.17066666666666666,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.3413333333333333,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.384,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.384,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.384,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.384,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.512,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.6826666666666666,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.7253333333333334,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.7253333333333334,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.7253333333333334,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.7253333333333334,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.784,
+          "frame": 66816
+        }
+      ],
+      "pcmSha256": "9b336f5c85b05781fc1225d5e4ea556b9fa916b8c1925ff32f6ccae6be37fcea"
+    },
+    {
+      "rate": 24000,
+      "channels": 2,
+      "lifetime": "lazy-voicefx",
+      "initialActive": false,
+      "originFrame": 2048,
+      "frames": 78848,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0.08533333333333333,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0.08533333333333333,
+          "frame": 2048
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0.08533333333333333,
+          "frame": 2048
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0.08533333333333333,
+          "frame": 2048
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0.08533333333333333,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.17066666666666666,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.17066666666666666,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.3413333333333333,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.384,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.384,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.384,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.384,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.512,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.6826666666666666,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.7253333333333334,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.7253333333333334,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.7253333333333334,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.7253333333333334,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.784,
+          "frame": 66816
+        }
+      ],
+      "pcmSha256": "a82ea96587e6b3bc9016a40d43d1be1d0b8f8ca9949a1d70b56e495c8904d2f8"
+    },
+    {
+      "rate": 44100,
+      "channels": 1,
+      "lifetime": "eager-instrument",
+      "initialActive": true,
+      "originFrame": 0,
+      "frames": 131200,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.09287981859410431,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.09287981859410431,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.18575963718820862,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.2089795918367347,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.2089795918367347,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.2089795918367347,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.2089795918367347,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.2786394557823129,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.37151927437641724,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.3947392290249433,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.3947392290249433,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.3947392290249433,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.3947392290249433,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.4729251700680273,
+          "frame": 109056
+        }
+      ],
+      "pcmSha256": "c6d688a4cbc4d7607a7a16a646110597c1b97758d80910386c4aa4022693bdf0"
+    },
+    {
+      "rate": 44100,
+      "channels": 1,
+      "lifetime": "eager-instrument",
+      "initialActive": false,
+      "originFrame": 0,
+      "frames": 131200,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0.046439909297052155,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.09287981859410431,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.09287981859410431,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.18575963718820862,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.2089795918367347,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.2089795918367347,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.2089795918367347,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.2089795918367347,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.2786394557823129,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.37151927437641724,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.3947392290249433,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.3947392290249433,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.3947392290249433,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.3947392290249433,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.4729251700680273,
+          "frame": 109056
+        }
+      ],
+      "pcmSha256": "7878ae438c5e8689b6322b988aafe9563b43048a4e20454716933124995879f0"
+    },
+    {
+      "rate": 44100,
+      "channels": 1,
+      "lifetime": "lazy-voicefx",
+      "initialActive": true,
+      "originFrame": 0,
+      "frames": 131200,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.09287981859410431,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.09287981859410431,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.18575963718820862,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.2089795918367347,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.2089795918367347,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.2089795918367347,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.2089795918367347,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.2786394557823129,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.37151927437641724,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.3947392290249433,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.3947392290249433,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.3947392290249433,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.3947392290249433,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.4729251700680273,
+          "frame": 109056
+        }
+      ],
+      "pcmSha256": "c6d688a4cbc4d7607a7a16a646110597c1b97758d80910386c4aa4022693bdf0"
+    },
+    {
+      "rate": 44100,
+      "channels": 1,
+      "lifetime": "lazy-voicefx",
+      "initialActive": false,
+      "originFrame": 2048,
+      "frames": 131200,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0.046439909297052155,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0.046439909297052155,
+          "frame": 2048
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0.046439909297052155,
+          "frame": 2048
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0.046439909297052155,
+          "frame": 2048
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0.046439909297052155,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.09287981859410431,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.09287981859410431,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.18575963718820862,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.2089795918367347,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.2089795918367347,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.2089795918367347,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.2089795918367347,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.2786394557823129,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.37151927437641724,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.3947392290249433,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.3947392290249433,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.3947392290249433,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.3947392290249433,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.4729251700680273,
+          "frame": 109056
+        }
+      ],
+      "pcmSha256": "7878ae438c5e8689b6322b988aafe9563b43048a4e20454716933124995879f0"
+    },
+    {
+      "rate": 44100,
+      "channels": 2,
+      "lifetime": "eager-instrument",
+      "initialActive": true,
+      "originFrame": 0,
+      "frames": 131200,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.09287981859410431,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.09287981859410431,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.18575963718820862,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.2089795918367347,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.2089795918367347,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.2089795918367347,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.2089795918367347,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.2786394557823129,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.37151927437641724,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.3947392290249433,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.3947392290249433,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.3947392290249433,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.3947392290249433,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.4729251700680273,
+          "frame": 109056
+        }
+      ],
+      "pcmSha256": "fe88cd017b4bd97647ac6fa41653313b610d325167cf2ffe735b0b50e84b69c3"
+    },
+    {
+      "rate": 44100,
+      "channels": 2,
+      "lifetime": "eager-instrument",
+      "initialActive": false,
+      "originFrame": 0,
+      "frames": 131200,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0.046439909297052155,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.09287981859410431,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.09287981859410431,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.18575963718820862,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.2089795918367347,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.2089795918367347,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.2089795918367347,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.2089795918367347,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.2786394557823129,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.37151927437641724,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.3947392290249433,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.3947392290249433,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.3947392290249433,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.3947392290249433,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.4729251700680273,
+          "frame": 109056
+        }
+      ],
+      "pcmSha256": "62cdc002b3eae5ee23e81247eb2f01703e3d6ea4305518bc34393ca17dda6dfd"
+    },
+    {
+      "rate": 44100,
+      "channels": 2,
+      "lifetime": "lazy-voicefx",
+      "initialActive": true,
+      "originFrame": 0,
+      "frames": 131200,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.09287981859410431,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.09287981859410431,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.18575963718820862,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.2089795918367347,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.2089795918367347,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.2089795918367347,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.2089795918367347,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.2786394557823129,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.37151927437641724,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.3947392290249433,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.3947392290249433,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.3947392290249433,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.3947392290249433,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.4729251700680273,
+          "frame": 109056
+        }
+      ],
+      "pcmSha256": "fe88cd017b4bd97647ac6fa41653313b610d325167cf2ffe735b0b50e84b69c3"
+    },
+    {
+      "rate": 44100,
+      "channels": 2,
+      "lifetime": "lazy-voicefx",
+      "initialActive": false,
+      "originFrame": 2048,
+      "frames": 131200,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0.046439909297052155,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0.046439909297052155,
+          "frame": 2048
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0.046439909297052155,
+          "frame": 2048
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0.046439909297052155,
+          "frame": 2048
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0.046439909297052155,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.09287981859410431,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.09287981859410431,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.18575963718820862,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.2089795918367347,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.2089795918367347,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.2089795918367347,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.2089795918367347,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.2786394557823129,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.37151927437641724,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.3947392290249433,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.3947392290249433,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.3947392290249433,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.3947392290249433,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.4729251700680273,
+          "frame": 109056
+        }
+      ],
+      "pcmSha256": "62cdc002b3eae5ee23e81247eb2f01703e3d6ea4305518bc34393ca17dda6dfd"
+    },
+    {
+      "rate": 48000,
+      "channels": 1,
+      "lifetime": "eager-instrument",
+      "initialActive": true,
+      "originFrame": 0,
+      "frames": 141312,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.08533333333333333,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.08533333333333333,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.17066666666666666,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.192,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.192,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.192,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.192,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.256,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.3413333333333333,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.3626666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.3626666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.3626666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.3626666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.4426666666666668,
+          "frame": 117248
+        }
+      ],
+      "pcmSha256": "c348e50147950f4d4b4c99b3591c51469979ee9a7291c6addd1cc4ceb81b0f83"
+    },
+    {
+      "rate": 48000,
+      "channels": 1,
+      "lifetime": "eager-instrument",
+      "initialActive": false,
+      "originFrame": 0,
+      "frames": 141312,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0.042666666666666665,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.08533333333333333,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.08533333333333333,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.17066666666666666,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.192,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.192,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.192,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.192,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.256,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.3413333333333333,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.3626666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.3626666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.3626666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.3626666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.4426666666666668,
+          "frame": 117248
+        }
+      ],
+      "pcmSha256": "4ae82fc8e83e6d6c188fc2721ceb864c3dae03edd95c438daec7323fad93db5a"
+    },
+    {
+      "rate": 48000,
+      "channels": 1,
+      "lifetime": "lazy-voicefx",
+      "initialActive": true,
+      "originFrame": 0,
+      "frames": 141312,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.08533333333333333,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.08533333333333333,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.17066666666666666,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.192,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.192,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.192,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.192,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.256,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.3413333333333333,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.3626666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.3626666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.3626666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.3626666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.4426666666666668,
+          "frame": 117248
+        }
+      ],
+      "pcmSha256": "c348e50147950f4d4b4c99b3591c51469979ee9a7291c6addd1cc4ceb81b0f83"
+    },
+    {
+      "rate": 48000,
+      "channels": 1,
+      "lifetime": "lazy-voicefx",
+      "initialActive": false,
+      "originFrame": 2048,
+      "frames": 141312,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0.042666666666666665,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0.042666666666666665,
+          "frame": 2048
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0.042666666666666665,
+          "frame": 2048
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0.042666666666666665,
+          "frame": 2048
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0.042666666666666665,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.08533333333333333,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.08533333333333333,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.17066666666666666,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.192,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.192,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.192,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.192,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.256,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.3413333333333333,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.3626666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.3626666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.3626666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.3626666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.4426666666666668,
+          "frame": 117248
+        }
+      ],
+      "pcmSha256": "4ae82fc8e83e6d6c188fc2721ceb864c3dae03edd95c438daec7323fad93db5a"
+    },
+    {
+      "rate": 48000,
+      "channels": 2,
+      "lifetime": "eager-instrument",
+      "initialActive": true,
+      "originFrame": 0,
+      "frames": 141312,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.08533333333333333,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.08533333333333333,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.17066666666666666,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.192,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.192,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.192,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.192,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.256,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.3413333333333333,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.3626666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.3626666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.3626666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.3626666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.4426666666666668,
+          "frame": 117248
+        }
+      ],
+      "pcmSha256": "b41e63f198e31220b1d226e51a4b6cc0df2924be70e5df3330d888fcdb237c8d"
+    },
+    {
+      "rate": 48000,
+      "channels": 2,
+      "lifetime": "eager-instrument",
+      "initialActive": false,
+      "originFrame": 0,
+      "frames": 141312,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0.042666666666666665,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.08533333333333333,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.08533333333333333,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.17066666666666666,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.192,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.192,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.192,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.192,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.256,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.3413333333333333,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.3626666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.3626666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.3626666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.3626666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.4426666666666668,
+          "frame": 117248
+        }
+      ],
+      "pcmSha256": "6c6293b2a1c6d5aa12293cf24a56b63ab98db2db81babc03952a49e1f896238c"
+    },
+    {
+      "rate": 48000,
+      "channels": 2,
+      "lifetime": "lazy-voicefx",
+      "initialActive": true,
+      "originFrame": 0,
+      "frames": 141312,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.08533333333333333,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.08533333333333333,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.17066666666666666,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.192,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.192,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.192,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.192,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.256,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.3413333333333333,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.3626666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.3626666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.3626666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.3626666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.4426666666666668,
+          "frame": 117248
+        }
+      ],
+      "pcmSha256": "b41e63f198e31220b1d226e51a4b6cc0df2924be70e5df3330d888fcdb237c8d"
+    },
+    {
+      "rate": 48000,
+      "channels": 2,
+      "lifetime": "lazy-voicefx",
+      "initialActive": false,
+      "originFrame": 2048,
+      "frames": 141312,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0.042666666666666665,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0.042666666666666665,
+          "frame": 2048
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0.042666666666666665,
+          "frame": 2048
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0.042666666666666665,
+          "frame": 2048
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0.042666666666666665,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.08533333333333333,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.08533333333333333,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.17066666666666666,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.192,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.192,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.192,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.192,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.256,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.3413333333333333,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.3626666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.3626666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.3626666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.3626666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.4426666666666668,
+          "frame": 117248
+        }
+      ],
+      "pcmSha256": "6c6293b2a1c6d5aa12293cf24a56b63ab98db2db81babc03952a49e1f896238c"
+    },
+    {
+      "rate": 96000,
+      "channels": 1,
+      "lifetime": "eager-instrument",
+      "initialActive": true,
+      "originFrame": 0,
+      "frames": 265984,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.042666666666666665,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.042666666666666665,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.08533333333333333,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.096,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.096,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.096,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.096,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.128,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.17066666666666666,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.18133333333333335,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.18133333333333335,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.18133333333333335,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.18133333333333335,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.2706666666666666,
+          "frame": 217984
+        }
+      ],
+      "pcmSha256": "6d165785ee1ec93a5bbd8d9ae4642b0d0ca0b436a74e8f97a4c6d78d1b7c6be1"
+    },
+    {
+      "rate": 96000,
+      "channels": 1,
+      "lifetime": "eager-instrument",
+      "initialActive": false,
+      "originFrame": 0,
+      "frames": 265984,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0.021333333333333333,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.042666666666666665,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.042666666666666665,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.08533333333333333,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.096,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.096,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.096,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.096,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.128,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.17066666666666666,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.18133333333333335,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.18133333333333335,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.18133333333333335,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.18133333333333335,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.2706666666666666,
+          "frame": 217984
+        }
+      ],
+      "pcmSha256": "7c599213afc72bdd606a3bd4663990e44cbeedcc0cff2f6c30102167109952fe"
+    },
+    {
+      "rate": 96000,
+      "channels": 1,
+      "lifetime": "lazy-voicefx",
+      "initialActive": true,
+      "originFrame": 0,
+      "frames": 265984,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.042666666666666665,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.042666666666666665,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.08533333333333333,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.096,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.096,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.096,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.096,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.128,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.17066666666666666,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.18133333333333335,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.18133333333333335,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.18133333333333335,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.18133333333333335,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.2706666666666666,
+          "frame": 217984
+        }
+      ],
+      "pcmSha256": "6d165785ee1ec93a5bbd8d9ae4642b0d0ca0b436a74e8f97a4c6d78d1b7c6be1"
+    },
+    {
+      "rate": 96000,
+      "channels": 1,
+      "lifetime": "lazy-voicefx",
+      "initialActive": false,
+      "originFrame": 2048,
+      "frames": 265984,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0.021333333333333333,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0.021333333333333333,
+          "frame": 2048
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0.021333333333333333,
+          "frame": 2048
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0.021333333333333333,
+          "frame": 2048
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0.021333333333333333,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.042666666666666665,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.042666666666666665,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.08533333333333333,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.096,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.096,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.096,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.096,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.128,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.17066666666666666,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.18133333333333335,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.18133333333333335,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.18133333333333335,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.18133333333333335,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.2706666666666666,
+          "frame": 217984
+        }
+      ],
+      "pcmSha256": "7c599213afc72bdd606a3bd4663990e44cbeedcc0cff2f6c30102167109952fe"
+    },
+    {
+      "rate": 96000,
+      "channels": 2,
+      "lifetime": "eager-instrument",
+      "initialActive": true,
+      "originFrame": 0,
+      "frames": 265984,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.042666666666666665,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.042666666666666665,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.08533333333333333,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.096,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.096,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.096,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.096,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.128,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.17066666666666666,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.18133333333333335,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.18133333333333335,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.18133333333333335,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.18133333333333335,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.2706666666666666,
+          "frame": 217984
+        }
+      ],
+      "pcmSha256": "1969f2c58146871eaba5230db33ab1f02ed176f434bde6592aa57abbe7bfb531"
+    },
+    {
+      "rate": 96000,
+      "channels": 2,
+      "lifetime": "eager-instrument",
+      "initialActive": false,
+      "originFrame": 0,
+      "frames": 265984,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0.021333333333333333,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.042666666666666665,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.042666666666666665,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.08533333333333333,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.096,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.096,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.096,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.096,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.128,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.17066666666666666,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.18133333333333335,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.18133333333333335,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.18133333333333335,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.18133333333333335,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.2706666666666666,
+          "frame": 217984
+        }
+      ],
+      "pcmSha256": "7f1e21a924dc78abf09bcd556a02a26e118fe0d43037a0aa4ed8a97b3b495b9a"
+    },
+    {
+      "rate": 96000,
+      "channels": 2,
+      "lifetime": "lazy-voicefx",
+      "initialActive": true,
+      "originFrame": 0,
+      "frames": 265984,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.042666666666666665,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.042666666666666665,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.08533333333333333,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.096,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.096,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.096,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.096,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.128,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.17066666666666666,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.18133333333333335,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.18133333333333335,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.18133333333333335,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.18133333333333335,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.2706666666666666,
+          "frame": 217984
+        }
+      ],
+      "pcmSha256": "1969f2c58146871eaba5230db33ab1f02ed176f434bde6592aa57abbe7bfb531"
+    },
+    {
+      "rate": 96000,
+      "channels": 2,
+      "lifetime": "lazy-voicefx",
+      "initialActive": false,
+      "originFrame": 2048,
+      "frames": 265984,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0.021333333333333333,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0.021333333333333333,
+          "frame": 2048
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0.021333333333333333,
+          "frame": 2048
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0.021333333333333333,
+          "frame": 2048
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0.021333333333333333,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.042666666666666665,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.042666666666666665,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.08533333333333333,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.096,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.096,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.096,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.096,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.128,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.17066666666666666,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.18133333333333335,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.18133333333333335,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.18133333333333335,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.18133333333333335,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.2706666666666666,
+          "frame": 217984
+        }
+      ],
+      "pcmSha256": "7f1e21a924dc78abf09bcd556a02a26e118fe0d43037a0aa4ed8a97b3b495b9a"
+    },
+    {
+      "rate": 192000,
+      "channels": 1,
+      "lifetime": "eager-instrument",
+      "initialActive": true,
+      "originFrame": 0,
+      "frames": 515584,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.021333333333333333,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.021333333333333333,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.042666666666666665,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.048,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.048,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.048,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.048,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.064,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.08533333333333333,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.09066666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.09066666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.09066666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.09066666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.1853333333333333,
+          "frame": 419584
+        }
+      ],
+      "pcmSha256": "4a2816bc2080580309a6596a951444cf47057925705150b49e3f4a6eac41e4e9"
+    },
+    {
+      "rate": 192000,
+      "channels": 1,
+      "lifetime": "eager-instrument",
+      "initialActive": false,
+      "originFrame": 0,
+      "frames": 515584,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0.010666666666666666,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.021333333333333333,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.021333333333333333,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.042666666666666665,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.048,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.048,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.048,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.048,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.064,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.08533333333333333,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.09066666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.09066666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.09066666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.09066666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.1853333333333333,
+          "frame": 419584
+        }
+      ],
+      "pcmSha256": "9d38c33768090d5d9291cad83eebba03c41954c35e5e585ca4d06eb89156a0eb"
+    },
+    {
+      "rate": 192000,
+      "channels": 1,
+      "lifetime": "lazy-voicefx",
+      "initialActive": true,
+      "originFrame": 0,
+      "frames": 515584,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.021333333333333333,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.021333333333333333,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.042666666666666665,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.048,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.048,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.048,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.048,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.064,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.08533333333333333,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.09066666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.09066666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.09066666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.09066666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.1853333333333333,
+          "frame": 419584
+        }
+      ],
+      "pcmSha256": "4a2816bc2080580309a6596a951444cf47057925705150b49e3f4a6eac41e4e9"
+    },
+    {
+      "rate": 192000,
+      "channels": 1,
+      "lifetime": "lazy-voicefx",
+      "initialActive": false,
+      "originFrame": 2048,
+      "frames": 515584,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0.010666666666666666,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0.010666666666666666,
+          "frame": 2048
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0.010666666666666666,
+          "frame": 2048
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0.010666666666666666,
+          "frame": 2048
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0.010666666666666666,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.021333333333333333,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.021333333333333333,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.042666666666666665,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.048,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.048,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.048,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.048,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.064,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.08533333333333333,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.09066666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.09066666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.09066666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.09066666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.1853333333333333,
+          "frame": 419584
+        }
+      ],
+      "pcmSha256": "9d38c33768090d5d9291cad83eebba03c41954c35e5e585ca4d06eb89156a0eb"
+    },
+    {
+      "rate": 192000,
+      "channels": 2,
+      "lifetime": "eager-instrument",
+      "initialActive": true,
+      "originFrame": 0,
+      "frames": 515584,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.021333333333333333,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.021333333333333333,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.042666666666666665,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.048,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.048,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.048,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.048,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.064,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.08533333333333333,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.09066666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.09066666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.09066666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.09066666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.1853333333333333,
+          "frame": 419584
+        }
+      ],
+      "pcmSha256": "34bdce46d5b32f1f1d75b62d44da001474d4c7482b64644c3a913b274e9bef0d"
+    },
+    {
+      "rate": 192000,
+      "channels": 2,
+      "lifetime": "eager-instrument",
+      "initialActive": false,
+      "originFrame": 0,
+      "frames": 515584,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0.010666666666666666,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.021333333333333333,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.021333333333333333,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.042666666666666665,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.048,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.048,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.048,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.048,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.064,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.08533333333333333,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.09066666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.09066666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.09066666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.09066666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.1853333333333333,
+          "frame": 419584
+        }
+      ],
+      "pcmSha256": "c945dd504a24bdf262428ee3f02e15e3f5891b46f81391b77dac784b7600aad8"
+    },
+    {
+      "rate": 192000,
+      "channels": 2,
+      "lifetime": "lazy-voicefx",
+      "initialActive": true,
+      "originFrame": 0,
+      "frames": 515584,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0,
+          "frame": 0
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.021333333333333333,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.021333333333333333,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.042666666666666665,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.048,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.048,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.048,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.048,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.064,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.08533333333333333,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.09066666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.09066666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.09066666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.09066666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.1853333333333333,
+          "frame": 419584
+        }
+      ],
+      "pcmSha256": "34bdce46d5b32f1f1d75b62d44da001474d4c7482b64644c3a913b274e9bef0d"
+    },
+    {
+      "rate": 192000,
+      "channels": 2,
+      "lifetime": "lazy-voicefx",
+      "initialActive": false,
+      "originFrame": 2048,
+      "frames": 515584,
+      "rawUi": [
+        {
+          "parameter": 0,
+          "value": 0.75,
+          "seconds": 0.010666666666666666,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 4,
+          "seconds": 0.010666666666666666,
+          "frame": 2048
+        },
+        {
+          "parameter": 3,
+          "value": 0.007,
+          "seconds": 0.010666666666666666,
+          "frame": 2048
+        },
+        {
+          "parameter": 4,
+          "value": 0.13,
+          "seconds": 0.010666666666666666,
+          "frame": 2048
+        },
+        {
+          "parameter": 2,
+          "value": -2,
+          "seconds": 0.010666666666666666,
+          "frame": 2048
+        },
+        {
+          "parameter": 1,
+          "value": 8,
+          "seconds": 0.021333333333333333,
+          "frame": 4096
+        },
+        {
+          "parameter": 2,
+          "value": 3,
+          "seconds": 0.021333333333333333,
+          "frame": 4096
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.042666666666666665,
+          "frame": 8192
+        },
+        {
+          "parameter": 1,
+          "value": 12,
+          "seconds": 0.048,
+          "frame": 9216
+        },
+        {
+          "parameter": 3,
+          "value": 0.03,
+          "seconds": 0.048,
+          "frame": 9216
+        },
+        {
+          "parameter": 4,
+          "value": 0.4,
+          "seconds": 0.048,
+          "frame": 9216
+        },
+        {
+          "parameter": 2,
+          "value": -6,
+          "seconds": 0.048,
+          "frame": 9216
+        },
+        {
+          "parameter": 0,
+          "value": 0.5,
+          "seconds": 0.064,
+          "frame": 12288
+        },
+        {
+          "parameter": 0,
+          "value": 0,
+          "seconds": 0.08533333333333333,
+          "frame": 16384
+        },
+        {
+          "parameter": 1,
+          "value": 3,
+          "seconds": 0.09066666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 3,
+          "value": 0.001,
+          "seconds": 0.09066666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 4,
+          "value": 0.02,
+          "seconds": 0.09066666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 2,
+          "value": 6,
+          "seconds": 0.09066666666666667,
+          "frame": 17408
+        },
+        {
+          "parameter": 0,
+          "value": 0.85,
+          "seconds": 2.1853333333333333,
+          "frame": 419584
+        }
+      ],
+      "pcmSha256": "c945dd504a24bdf262428ee3f02e15e3f5891b46f81391b77dac784b7600aad8"
+    }
+  ]
+}

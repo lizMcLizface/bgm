@@ -1,0 +1,17 @@
+[package]
+name="calmbgm_voice_compressor_live"
+version="0.1.0"
+edition="2021"
+license="MIT AND BSD-3-Clause"
+[lib]
+crate-type=["rlib","cdylib"]
+[dependencies]
+calmbgm_native_compressor={path="../native-compressor",default-features=false}
+[features]
+allocation-audit=[]
+[profile.release]
+opt-level=3
+lto=true
+codegen-units=1
+panic="abort"
+strip=true

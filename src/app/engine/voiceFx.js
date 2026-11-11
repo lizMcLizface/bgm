@@ -47,11 +47,11 @@ export function fxTail(preset) {
 
 /** The effects as one block: input -> active stages -> output. */
 export class VoiceFx {
-    constructor(AC, preset, order = ['tape', 'motion', 'compressor', 'shimmer', 'freeze']) {
+    constructor(AC, preset, order = ['tape', 'motion', 'compressor', 'shimmer', 'freeze'], { compressorFactory } = {}) {
         this.AC = AC;
         this.input = AC.createGain();
         this.output = AC.createGain();
-        this.stages = order.map((key) => ({ key, ...FX_STAGES[key], node: null, values: {} }));
+        this.stages = order.map((key) => ({ key, ...FX_STAGES[key], ...(key === 'compressor' && compressorFactory ? { create: compressorFactory } : {}), node: null, values: {} }));
         this.signature = null;
         this.set(preset);
     }
@@ -60,13 +60,14 @@ export class VoiceFx {
         const p = { ...PRESET_DEFAULTS, ...preset };
         for (const stage of this.stages) {
             if (!stage.node && !stage.active(p)) continue;
-            stage.node ??= stage.create(this.AC);
+            stage.node ??= stage.create(this.AC, { hostLifetime: 'voicefx' });
             for (const [key, setter] of Object.entries(stage.setters)) {
                 if (stage.values[key] !== p[key]) setter(stage.node, p[key]);
                 stage.values[key] = p[key];
             }
         }
-        const active = this.stages.filter((stage) => stage.active(p));
+        this.ready = Promise.all(this.stages.map((stage) => stage.node?.ready).filter(Boolean));
+        const active = this.stages.filter((stage) => stage.node?.managedBypass === true || stage.active(p));
         const signature = active.map((stage) => stage.key).join();
         if (signature === this.signature) return;
         this.signature = signature;
