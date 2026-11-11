@@ -12,8 +12,8 @@ function mixerMeters(context,mixer,masterNode){
  const channels=Object.fromEntries(MIX_CHANNELS.map(c=>[c.role,stereoMeter(context,mixer.channels[c.role].output)])),master=stereoMeter(context,masterNode);let closed=false;
  return {read(){if(closed)return {};const m=master.read();return {...Object.fromEntries(MIX_CHANNELS.map(c=>[c.role,channels[c.role].read().peak])),left:m.left,right:m.right};},dispose(){if(closed)return;closed=true;Object.values(channels).forEach(t=>t.dispose());master.dispose();}};
 }
-export async function createParallelRack(context,raw,parallel,{onError=()=>{},dynamicsFactory}={}){
- const results=await Promise.allSettled([...BUS_IDS.map(id=>createRack(context,busRack(parallel.buses[id]),{onError,dynamicsFactory,instances:busInstances(parallel.buses[id])})),createDeskLimiter(context)]);
+export async function createParallelRack(context,raw,parallel,{onError=()=>{},dynamicsFactory,nativeFactory,pluginFactory}={}){
+ const results=await Promise.allSettled([...BUS_IDS.map(id=>createRack(context,busRack(parallel.buses[id]),{onError,dynamicsFactory,nativeFactory,pluginFactory,instances:busInstances(parallel.buses[id])})),createDeskLimiter(context)]);
  if(results.some(r=>r.status==='rejected')){await Promise.allSettled(results.map(async(r,i)=>{if(r.status==='fulfilled'){if(i<3)await r.value.dispose();else{r.value.port.postMessage({dispose:true});r.value.disconnect();}}}));throw results.find(r=>r.status==='rejected').reason;}
  const racks=Object.fromEntries(BUS_IDS.map((id,i)=>[id,results[i].value])),limiter=results[3].value;
  const nodes=[],gain=()=>{const n=context.createGain();n.channelCount=2;n.channelCountMode='explicit';nodes.push(n);return n;};
@@ -44,9 +44,9 @@ export async function createParallelRack(context,raw,parallel,{onError=()=>{},dy
 
 // Keep the source/monitor connections stable while a complete replacement graph
 // loads. Parameter/chain edits within a mode are handled by its existing racks.
-export async function createWorkbenchRack(context,values,{instances=null,parallel=null,onError=()=>{},dynamicsFactory}={}){
+export async function createWorkbenchRack(context,values,{instances=null,parallel=null,onError=()=>{},dynamicsFactory,nativeFactory,pluginFactory}={}){
  const input=context.createGain(),output=context.createGain();let latest={values,instances,parallel},disposed=false,busy=false,current,retiring,disposal,replacement;const closing=new Set();
- const build=state=>state.parallel?createParallelRack(context,state.values,state.parallel,{onError,dynamicsFactory}):createRack(context,state.values,{instances:state.instances,onError,dynamicsFactory});
+ const build=state=>state.parallel?createParallelRack(context,state.values,state.parallel,{onError,dynamicsFactory,nativeFactory,pluginFactory}):createRack(context,state.values,{instances:state.instances,onError,dynamicsFactory,nativeFactory,pluginFactory});
  const attach=(graph,type,initial=false)=>{const fade=context.createGain();fade.gain.value=initial?1:0;input.connect(graph.input);graph.connect(fade);fade.connect(output);return {graph,type,fade};};
  const drop=entry=>{if(!entry)return;safeDisconnect(input,entry.graph.input);entry.fade.disconnect();const pending=entry.graph.dispose();if(pending&&typeof pending.then==='function'){closing.add(pending);pending.then(()=>closing.delete(pending),error=>{closing.delete(pending);onError(error);});}};
  const apply=entry=>entry.graph.patch(latest.values,false,latest.instances,latest.parallel);

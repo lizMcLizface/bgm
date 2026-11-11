@@ -40,7 +40,7 @@ export function startDiySynth({kind,params=[],rack,instances=null,parallel=null,
   const patch=effective();
   backend=await (kind==='fm'?FMBackend:WasmBackend).create(context,patch,{onStats:s=>{active=s.active;},onError});
   const initialRack=rack??Object.fromEntries([...Object.entries(patch.inserts).map(([k,v])=>['inserts.'+k,v]),...Object.entries(patch.effects).map(([k,v])=>['effects.'+k,v])]);
-  outboard=await createWorkbenchRack(context,initialRack,{onError,instances,parallel,dynamicsFactory:audioEnvironment?.rackDynamicsFactory});
+  outboard=await createWorkbenchRack(context,initialRack,{onError,instances,parallel,dynamicsFactory:audioEnvironment?.rackDynamicsFactory,nativeFactory:audioEnvironment?.rackNativeFactory,pluginFactory:audioEnvironment?.rackPluginFactory});
   output=context.createGain();output.gain.value=.7;
   monitor=await createOutputMonitor(context,peak=>onStats({active,peak,reduction:outboard.reduction,...outboard.meters}));
   // rack -> output

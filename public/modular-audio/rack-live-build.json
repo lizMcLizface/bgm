@@ -1,10 +1,10 @@
 {
   "api": 1,
   "profile": "owned-rack-native-k-rate-v1",
-  "source": "7d15004b9627ac47ab026ee2eaa90a09a59cc52ac49dc9cde1cc16cd8c8c7f46",
+  "source": "64a7d43c1bb92114515af22b39076a5299e832d36301f1ad62b6c59c333acb34",
   "kernelVersion": "3346ad1568b8b456",
   "wasm": "6f78ce5a26ebabc1030057f59c4f31a4d2a229972e16aad89c599f9ebc2bbe4a",
-  "version": "c14eea8e3e2dd5b3",
+  "version": "68e9aaac39add02f",
   "files": [
     "src/modular-audio/rackLive.worklet.js",
     "src/modular-audio/ownedRackPlugins.js",

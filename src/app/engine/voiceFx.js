@@ -47,14 +47,17 @@ export function fxTail(preset) {
 
 /** The effects as one block: input -> active stages -> output. */
 export class VoiceFx {
-    constructor(AC, preset, order = ['tape', 'motion', 'compressor', 'shimmer', 'freeze'], { compressorFactory, shimmerFactory } = {}) {
+    constructor(AC, preset, order = ['tape', 'motion', 'compressor', 'shimmer', 'freeze'], { compressorFactory, shimmerFactory, motionFactory } = {}) {
+        if(motionFactory!==undefined&&typeof motionFactory!=='function')throw Error('Invalid Motion factory');
+        motionFactory?.validatePreset?.({...PRESET_DEFAULTS,...preset});
+        this.validateMotionPreset=motionFactory?.validatePreset;
         if(shimmerFactory!==undefined&&typeof shimmerFactory!=='function')throw Error('Invalid Shimmer factory');
         shimmerFactory?.validatePreset?.({...PRESET_DEFAULTS,...preset});
         this.validateShimmerPreset=shimmerFactory?.validatePreset;
         this.AC = AC;
         this.input = AC.createGain();
         this.output = AC.createGain();
-        this.stages = order.map((key) => ({ key, ...FX_STAGES[key], ...(key === 'compressor' && compressorFactory ? { create: compressorFactory } : {}), ...(key === 'shimmer' && shimmerFactory ? { create: shimmerFactory } : {}), node: null, values: {} }));
+        this.stages = order.map((key) => ({ key, ...FX_STAGES[key], ...(key === 'compressor' && compressorFactory ? { create: compressorFactory } : {}), ...(key === 'motion' && motionFactory ? { create: motionFactory } : {}), ...(key === 'shimmer' && shimmerFactory ? { create: shimmerFactory } : {}), node: null, values: {} }));
         this.signature = null;
         this.set(preset);
     }
@@ -62,6 +65,9 @@ export class VoiceFx {
     set(preset) {
         const p = { ...PRESET_DEFAULTS, ...preset };
         this.validateShimmerPreset?.(p);
+        this.validateMotionPreset?.(p);
+        const motion=this.stages.find(stage=>stage.key==='motion');
+        motion?.node?.preflightPreset?.(p,Object.keys(motion.setters).filter(key=>motion.values[key]!==p[key]));
         for (const stage of this.stages) {
             if (!stage.node && !stage.active(p)) continue;
             stage.node ??= stage.create(this.AC, { hostLifetime: 'voicefx' });

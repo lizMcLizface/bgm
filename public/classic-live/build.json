@@ -2,9 +2,9 @@
   "api": 1,
   "profile": "owned-classics-live-source-v1",
   "audited": false,
-  "source": "c0e3f2ce91efb6d219d2bd88fcc4d08d7510b90352592c9f9c8c43622bedf5ce",
+  "source": "76253636f6a3f6faf70025b9ff2886f462e224d14a6129bf450700497f3d8b3d",
   "wasm": "fd9cb3cee9e67aff7bbc37bd0ad64fe090f48859c17cbefa8aa78a83ab7e2729",
-  "version": "5a475ec6b9c5c436",
+  "version": "1d5aff7992adadf6",
   "bytes": 393845,
   "files": [
     "synth-engine/classics/Cargo.toml",

@@ -864,7 +864,7 @@ class Generator {
     }
 
     sharedRackOptions(kind) {
-        return { pluginFactory: this.audioEnvironment?.rackPluginFactory, dynamicsFactory: this.audioEnvironment?.rackDynamicsFactory,
+        return { pluginFactory: this.audioEnvironment?.rackPluginFactory, dynamicsFactory: this.audioEnvironment?.rackDynamicsFactory, nativeFactory: this.audioEnvironment?.rackNativeFactory,
             onError: error => { this[kind + 'Error'] = error; } };
     }
 
@@ -959,7 +959,7 @@ class Generator {
                 instrument=await Iowa.create({ordinaryCompressorFactory:this.audioEnvironment?.ordinaryCompressorFactory,sourceBackend:this.audioEnvironment?.iowaSourceBackend??'native',context:this.AC,preset:source,polyphony:ROLES[role].polyphony});
             }else if(source?.classics){
                 const Classics=(await import('./engine/classicsInstrument')).default;
-                instrument=await Classics.create({sourceNodeFactory:this.audioEnvironment?.classicSourceNodeFactory,rackPluginFactory:this.audioEnvironment?.rackPluginFactory,rackDynamicsFactory:this.audioEnvironment?.rackDynamicsFactory,context:this.AC,preset:source,polyphony:source.classics.light?Math.min(4,ROLES[role].polyphony):ROLES[role].polyphony});
+                instrument=await Classics.create({sourceNodeFactory:this.audioEnvironment?.classicSourceNodeFactory,rackPluginFactory:this.audioEnvironment?.rackPluginFactory,rackDynamicsFactory:this.audioEnvironment?.rackDynamicsFactory,rackNativeFactory:this.audioEnvironment?.rackNativeFactory,context:this.AC,preset:source,polyphony:source.classics.light?Math.min(4,ROLES[role].polyphony):ROLES[role].polyphony});
             }else if(source?.diy){
                 const [Wasm,{diySpec}]=await Promise.all([import('./engine/wasmInstrument').then(m=>m.default),import('./engine/diySource')]);
                 instrument=await Wasm.create({audioEnvironment:this.audioEnvironment,context:this.AC,preset:source,polyphony:ROLES[role].polyphony,spec:diySpec(source.diy,ROLES[role].polyphony),roomPool:this.wasmRoomPool});
@@ -988,7 +988,7 @@ class Generator {
         let instrument, nextEngine = this.percussionEngine;
         if (source?.classics) {
             const Classics = (await import('./engine/classicsInstrument')).default;
-            instrument = await Classics.create({ sourceNodeFactory:this.audioEnvironment?.classicSourceNodeFactory,rackPluginFactory:this.audioEnvironment?.rackPluginFactory,rackDynamicsFactory:this.audioEnvironment?.rackDynamicsFactory, context: this.AC, preset: source, polyphony: 16 });
+            instrument = await Classics.create({ sourceNodeFactory:this.audioEnvironment?.classicSourceNodeFactory,rackPluginFactory:this.audioEnvironment?.rackPluginFactory,rackDynamicsFactory:this.audioEnvironment?.rackDynamicsFactory,rackNativeFactory:this.audioEnvironment?.rackNativeFactory, context: this.AC, preset: source, polyphony: 16 });
         } else {
             if (!r.machine) return;
             if (percussionVoice(this.settings.drums.kit).wasmOnly) nextEngine = 'wasm';

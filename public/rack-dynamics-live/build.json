@@ -7,10 +7,10 @@
   "audited": false,
   "source": "acc96f13ac1cd28f6b758b2ac35d9f0197aacfde94e2f5a1839862eddba2f402",
   "runtime": "7641150dbc84e811d495ca416cbe0b45fe56a8da8e1ed18268573c9ff22c658a",
-  "reference": "2ea3353a315e2ff51b9cddc3bdd6856f4fc192a27c5a542b52a06ecf6afb05ab",
+  "reference": "aa5d40dcc506fb34c9d7c70ca340891bd062258a0a347cf1c866d73f827fcb0e",
   "wasm": "db64b55a617dd518d7e9d215e908192972dd1780c9f9f8c400b8d9081cbccfe6",
   "bytes": 81473,
-  "version": "4d6b7d778e0eb3d1",
-  "processorName": "rack-live-dynamics-4d6b7d778e0eb3d1",
-  "processor": "104e8f9a6eeaaa2fcaba41eb2f0afc4f6b09fc31d1ec29fc7bfdf705831e71e3"
+  "version": "bca0b5b869a453c5",
+  "processorName": "rack-live-dynamics-bca0b5b869a453c5",
+  "processor": "a9f9f7d9d8ae440dce9baf177083c239a1106560c96e1f6177498c6c8082ef6d"
 }

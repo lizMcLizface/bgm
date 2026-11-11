@@ -23,7 +23,7 @@ export function loadKernel(){
 }
 
 /** Creates the context synchronously (call from a tap/click), then loads the kernel. */
-export function startLiveSynth({model=MODELS.cs80,params=[],waves=null,rack=cleanRack(),latency='interactive',context:sharedContext,destination,polyphony,sourceNodeFactory,rackPluginFactory,rackDynamicsFactory,onStats=()=>{},onError=()=>{}}={}){
+export function startLiveSynth({model=MODELS.cs80,params=[],waves=null,rack=cleanRack(),latency='interactive',context:sharedContext,destination,polyphony,sourceNodeFactory,rackPluginFactory,rackDynamicsFactory,rackNativeFactory,onStats=()=>{},onError=()=>{}}={}){
  const Context=window.AudioContext||window.webkitAudioContext;
  const context=sharedContext??new Context({latencyHint:latency});
  // A shared context belongs to its host, which wakes it on Play. Awaiting its
@@ -45,7 +45,7 @@ export function startLiveSynth({model=MODELS.cs80,params=[],waves=null,rack=clea
    else if(data.type==='error'){reject(Error(data.message));onError(Error(data.message));}
    else if(data.type==='stats'){stats=data;onStats({...data,peak:outputPeak,reduction:outboard?.reduction??0});}
   };node.onprocessorerror=()=>{const error=Error('Synth worklet failed. Reload the page.');node.handleOwnedMessage?.({type:'error',message:error.message});reject(error);onError(error);};});
-  outboard=await createRack(context,rack,{pluginFactory:rackPluginFactory,dynamicsFactory:rackDynamicsFactory,onError});
+  outboard=await createRack(context,rack,{pluginFactory:rackPluginFactory,dynamicsFactory:rackDynamicsFactory,nativeFactory:rackNativeFactory,onError});
   monitor=await createOutputMonitor(context,peak=>{outputPeak=peak;onStats({...stats,peak,reduction:outboard.reduction});});
   // Both paths already contain the native BBD/space/output stage. Inject before
   // the external rack, and silence native background hiss only during a lease.

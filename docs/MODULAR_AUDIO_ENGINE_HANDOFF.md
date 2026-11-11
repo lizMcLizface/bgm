@@ -28,10 +28,13 @@ comparisons at six rates, all exact zero difference; actual cold page replay
 restores all three PCM hashes, settings and independent owners. The retained
 first shared failure was a proved Native initial-message race; same-port
 reference preparation fixes it without changing DSP, notes or source start.
-See MODULAR_AUDIO_ENGINE_SHIMMER_LIVE.md. Width/Ring's new independent-lane
-profile now passes 216 fresh-document cases, but a reused-context Ring
-replacement first-sample mismatch remains under investigation before adoption.
-The separate low-rate Filter idle/restart negative is retained too.
+See MODULAR_AUDIO_ENGINE_SHIMMER_LIVE.md. Width/Ring is now selected only in
+the explicit prepared environment: 216 independent-lane cases, reused/cold
+reconstruction and 72 whole-rack Native comparisons pass; the whole-rack PCM
+is bit exact. All three actual All hosts pass running insertion, removal,
+re-addition, bypass, save reconstruction and acknowledged cleanup. Six owners
+are released with no errors. The original Native defaults remain intact.
+The separate low-rate Filter idle/restart negative is retained.
 
 Paged Ambience banks and normal live two-bed ownership now pass, including
 exact per-layer wet PCM through replacement, cancellation and disposal. Two
@@ -43,24 +46,37 @@ differs over 128 frames at about 1e-13 and is explicitly unaccepted. Native
 loop playback remains the prepared environment's current selection. See
 MODULAR_AUDIO_ENGINE_AMBIENCE_BANK_HOST.md and its spatial continuation plan.
 
-Latest intermediate broad regression is 563 files / 4603 passing / 4 skipped.
-The later prepared Shimmer/shared/offline integration passes 75 focused tests;
-normal All Native-desk/owned-desk/restored cases pass with 51 owned dynamics
-instances. Both normal CLASSIC and drum-machine cold score exports pass with
-fresh context-bound owned source/dynamics, nonzero PCM and unchanged settings. Focused component records
-name their exact later artifacts and results. All 43 provenance checks required by the committed public build pass. Two
-reference-only manifests were refreshed with accepted numeric Wasm verified
-byte-identical. The committed public frontend bundle and public-file checks now pass. Actual
-bundled targeted rack cases and Shimmer48k/cold reconstruction also pass. A
-review coordinator needed an async initialization wrapper to preserve the
-existing ES2020 target; no audio code or browser requirement changed. The next
-full-tree build/regression follows the independent candidate checkpoints.
+Latest full regression: 578 files / 4748 passing / 4 skipped. Optional Motion
+hooks preflight complete presets, individual controls, morph validation and
+drift before mutation; lazy VoiceFx checks capacity before other stages change.
+Motion remains Native in the prepared environment pending its endpoint gate.
+Its 144 portable/host cases and actual cold-page replay pass, but the stronger
+stopped-source/retrigger test found a real first-retrigger mismatch; that
+negative is preserved and being corrected rather than accepting the short cases
+as full lifecycle coverage.
 
-Next: resolve the remaining Width/Ring/Filter lifecycle gates and adopt only
-verified factories. Motion live and complete Ambience processing are being
-ported independently; then finish Tape, shared sampled rooms and Ambience
-spatial/fade/wander. General cable editing and broader worker execution remain
-later. Freeze capture retains its explicit worker/resource policy.
+Complete Ambience spatial processing is also a separate candidate, not adopted.
+The six-rate v4 batch passes 31/36 cases. Two 8 kHz dynamic cutoff failures were
+traced to clamping events before automation evaluation; the corrected v5 pair
+passes. Three high-rate sine control cases exceed the unchanged 1e-7 bound by
+one Float32 step. An independent Native phase-table preparation probe confirms
+the current phase-basis arithmetic differs from the original PeriodicWave
+preparation. These remaining preparation cases stay unaccepted. Exact source,
+commands, tables and failed evidence are retained under ignored reports/.
+
+Normal All Native-desk/owned-desk/restored cases also pass with 51 owned dynamics
+instances. Normal CLASSIC and drum-machine cold score exports pass with fresh
+context-bound owned source/dynamics, nonzero PCM and unchanged settings. The
+later Width/Ring integration refreshes nine reference manifests with every
+accepted numeric Wasm artifact verified byte-identical. Build results and
+component documents bind their own exact identities.
+
+Next: finish the grouped normal Width/Ring export gate and built-bundle checks,
+resolve Motion source-end/restart and Ambience phase preparation, then adopt
+only verified complete owners. Filter's retained low-rate restart gate, Tape,
+shared sampled rooms and the remaining native Instrument effects remain active
+port work. General cable editing and broader worker execution remain later.
+Freeze capture retains its explicit worker/resource policy.
 
 The requested push through 111d282 completed as lizMcLizface; subsequent verified
 steps are local commits under that identity. Nothing has been deployed.

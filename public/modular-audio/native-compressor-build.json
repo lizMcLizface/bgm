@@ -146,8 +146,8 @@
   "references": {
     "src/nodes/compressor.js": "637a2278025d35e9e2ac38908d728c4c8ca223112f5a42cf5cd4a7f5e187fcb8",
     "src/nodes/voiceCompressor.js": "1ea0bca04b9d8a7f925587329c4fb5eb3fd389ac8c7985f6374c44813a164ae0",
-    "src/synths/effects/graph.js": "d9116858faf7a7c549c8b398b998695a507bff9a2ce0722237e890dc09eb8fe9",
-    "src/synths/effects/extras.js": "82923247209a3e76d130276dd5ccda3e81a5ddaa3acc5ec6c6c08554280f92f9",
+    "src/synths/effects/graph.js": "6eb949489dc51047779713fed4e0a33c603c6fb1347c6169e6c8750612973050",
+    "src/synths/effects/extras.js": "17c2b762ece0bef9d784784ce726b5c0881ca7e539cfc0c58f6117a38847e3f7",
     "src/synths/piano/player.js": "144c2fb24c3569f92facc83e9d4aa1ccabfed2223877c608f84d9b862b9b3e9b",
     "src/app/engine/iowaModel/player.js": "bb0891b5cbbc7bf02cf019d70b5404f83dacbf56b8c657e0d338cdce35d0f551"
   },

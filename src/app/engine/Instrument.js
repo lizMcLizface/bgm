@@ -191,9 +191,12 @@ class Instrument {
      * @param {object} [options.preset]
      * @param {BaseAudioContext} [options.context]
      */
-    constructor({ polyphony = 8, preset = {}, context = audioContext, deferReverb = false, reverbHub = null, fdnRoom = false, sourceBackend = 'native', voiceCompressorFactory = null, pianoSourceFactory = null, ordinaryCompressorFactory = null, shimmerFactory = null } = {}) {
+    constructor({ polyphony = 8, preset = {}, context = audioContext, deferReverb = false, reverbHub = null, fdnRoom = false, sourceBackend = 'native', voiceCompressorFactory = null, pianoSourceFactory = null, ordinaryCompressorFactory = null, shimmerFactory = null, motionFactory = null } = {}) {
         if (!['native', 'owned-rust'].includes(sourceBackend)) throw Error('Unsupported instrument source backend');
         if (pianoSourceFactory !== null && typeof pianoSourceFactory !== 'function') throw Error('Invalid piano source factory');
+        if (motionFactory !== null && typeof motionFactory !== 'function') throw Error('Invalid Motion factory');
+        motionFactory?.validatePreset?.({...PRESET_DEFAULTS,...preset});
+        this.validateMotionPreset=motionFactory?.validatePreset;
         if (shimmerFactory !== null && typeof shimmerFactory !== 'function') throw Error('Invalid Shimmer factory');
         shimmerFactory?.validatePreset?.({...PRESET_DEFAULTS,...preset});
         this.validateShimmerPreset=shimmerFactory?.validatePreset;
@@ -227,7 +230,7 @@ class Instrument {
         this.limiter = new Nodes.Compressor(this.AC,compressorPolicy.limiter);
         this.output = new Nodes.Gain(this.AC);
         this.vibrato = new Nodes.LFO(this.AC);
-        this.motion = new Nodes.Motion(this.AC);
+        this.motion = (motionFactory ?? FX_STAGES.motion.create)(this.AC);
         // Filter LFO, in cents on every voice's cutoff (wired only while it
         // has depth - see setFilterLfoConnected).
         this.filterLfo = this.AC.createOscillator();
@@ -390,11 +393,12 @@ class Instrument {
     }
     prepareOffline() { return ownedSourceOf(this)?.prepareOffline(); }
     async armRuntime(){
-        if(!this.ordinaryDynamicsOwned&&!this.shimmer?.arm)return;
+        if(!this.ordinaryDynamicsOwned&&!this.shimmer?.arm&&!this.motion?.arm)return;
         await this.effectsReady;
         if(this.AC.state==='running'){
             if(this.ordinaryDynamicsOwned){this.ordinaryArm ??= Promise.all([this.synthMix.arm?.(),this.limiter.arm?.()]).catch(error=>{this.ordinaryArm=null;throw error;});await this.ordinaryArm;}
             await this.shimmer?.arm?.();
+            await this.motion?.arm?.();
         }
     }
     updateOrdinaryDemand(){
@@ -434,6 +438,8 @@ class Instrument {
     applyPreset(preset) {
         const next = { ...PRESET_DEFAULTS, ...preset };
         this.validateShimmerPreset?.(next);
+        this.validateMotionPreset?.(next);
+        this.motion?.preflightPreset?.(next,Object.keys(FX_STAGES.motion.setters).filter(key=>this.preset?.[key]!==next[key]));
         assertOwnedMaterial(this, next.stringModel);
         Object.keys(next).forEach((key) => this.set(key, next[key]));
         if (this.tempoTimingTouched) scheduleEffectTiming(this, 0, this.AC.currentTime);
@@ -448,6 +454,7 @@ class Instrument {
     morphTo(preset, seconds) {
         const to = { ...PRESET_DEFAULTS, ...preset };
         this.validateShimmerPreset?.(to);
+        this.validateMotionPreset?.(to);
         assertOwnedMaterial(this, to.stringModel);
         this.finishMorph();
         const from = { ...PRESET_DEFAULTS, ...this.preset };
@@ -467,6 +474,7 @@ class Instrument {
                 return;
             }
             const blended = blendPresets(from, to, t);
+            this.motion?.preflightPreset?.(blended,Object.keys(FX_STAGES.motion.setters).filter(key=>changing.includes(key)&&this.preset?.[key]!==blended[key]));
             morph.stepping = true;
             changing.forEach((key) => this.set(key, blended[key]));
             morph.stepping = false;
@@ -488,6 +496,8 @@ class Instrument {
      */
     setDrift(values) {
         const keys = new Set([...Object.keys(this.drift ?? {}), ...Object.keys(values ?? {})]);
+        const motionKeys=[...keys].filter(key=>key in FX_STAGES.motion.setters);
+        if(motionKeys.length){const next={...PRESET_DEFAULTS,...this.preset,...values};this.validateMotionPreset?.(next);this.motion?.preflightPreset?.(next,motionKeys);}
         for (const key of keys) {
             const value = values && key in values ? values[key] : this.preset?.[key];
             if (value !== undefined && PARAM_SETTERS[key]) PARAM_SETTERS[key](this, value);
@@ -498,7 +508,10 @@ class Instrument {
 
     /** Sets one preset parameter live - what the synth editor's knobs call. */
     set(key, value) {
-        this.validateShimmerPreset?.({...PRESET_DEFAULTS,...this.preset,[key]:value});
+        const next={...PRESET_DEFAULTS,...this.preset,[key]:value};
+        this.validateShimmerPreset?.(next);
+        this.validateMotionPreset?.(next);
+        if(key in FX_STAGES.motion.setters&&this.preset?.[key]!==value)this.motion?.preflightPreset?.(next,[key]);
         if (key === 'stringModel') assertOwnedMaterial(this, value);
         if (this.morph && !this.morph.stepping) this.finishMorph();
         if (this.preset && this.preset[key] === value) return;
@@ -1101,7 +1114,7 @@ class Instrument {
         this.silence();
         clearTimeout(this.sleepTimer);
         ownedSourceOf(this)?.dispose();
-        this.effectsDisposal = Promise.allSettled([this.compressor,this.synthMix,this.limiter,this.shimmer,this.freeze].filter(Boolean).map(owner=>Promise.resolve().then(()=>owner.dispose?.()))).then(results=>{const failed=results.find(r=>r.status==='rejected');if(failed)throw failed.reason;}).catch(error => { this.effectsDisposalError = error; });
+        this.effectsDisposal = Promise.allSettled([this.compressor,this.synthMix,this.limiter,this.shimmer,this.freeze,this.motion].filter(Boolean).map(owner=>Promise.resolve().then(()=>owner.dispose?.()))).then(results=>{const failed=results.find(r=>r.status==='rejected');if(failed)throw failed.reason;}).catch(error => { this.effectsDisposalError = error; });
         this.voices.forEach((synth) => synth.destroy());
         this.reverb.dispose?.();
         this.output.disconnect();
