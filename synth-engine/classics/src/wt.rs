@@ -95,194 +95,267 @@ pub mod id {
 }
 
 const DEFAULTS: &[(usize, f32)] = &[
-    (id::JOY_X, 1.), (id::UNI_VOICES, 1.), (id::UNI_DETUNE, 20.), (id::UNI_SPREAD, 0.5), (id::CUTOFF, 12000.), (id::RES, 0.1),
-    (id::KEY_FOLLOW, 0.5), (id::F_ATTACK, 0.005), (id::F_DECAY, 0.5), (id::F_SUSTAIN, 0.5), (id::A_ATTACK, 0.005),
-    (id::A_DECAY, 0.3), (id::A_SUSTAIN, 0.8), (id::A_RELEASE, 0.3), (id::LFO1, 5.), (id::LFO2, 0.5), (id::VOLUME, 0.6),
-    (id::F_RELEASE, 0.3), (id::V_ATTACK, 0.1), (id::V_DECAY, 0.5), (id::V_SUSTAIN, 0.5), (id::V_RELEASE, 0.3), (id::VEL_AMP, 0.4),
-    (id::VEL_FILTER, 0.2), (id::MOD, 50.), (id::PRS + 1, 0.5),
-    (id::WLEVEL, 1.), (id::WLEVEL + 1, 1.), (id::WLEVEL + 2, 1.), (id::WLEVEL + 3, 1.), (id::LFO_X + 2, 1.), (id::LFO_X + 5, 1.), (id::TEMPO, 120.),
-    (id::BEND_RANGE, 2.), (id::MENV, 0.1), (id::MENV + 1, 0.5), (id::MENV + 2, 0.5), (id::MENV + 3, 0.3),
+    (id::JOY_X, 1.),
+    (id::UNI_VOICES, 1.),
+    (id::UNI_DETUNE, 20.),
+    (id::UNI_SPREAD, 0.5),
+    (id::CUTOFF, 12000.),
+    (id::RES, 0.1),
+    (id::KEY_FOLLOW, 0.5),
+    (id::F_ATTACK, 0.005),
+    (id::F_DECAY, 0.5),
+    (id::F_SUSTAIN, 0.5),
+    (id::A_ATTACK, 0.005),
+    (id::A_DECAY, 0.3),
+    (id::A_SUSTAIN, 0.8),
+    (id::A_RELEASE, 0.3),
+    (id::LFO1, 5.),
+    (id::LFO2, 0.5),
+    (id::VOLUME, 0.6),
+    (id::F_RELEASE, 0.3),
+    (id::V_ATTACK, 0.1),
+    (id::V_DECAY, 0.5),
+    (id::V_SUSTAIN, 0.5),
+    (id::V_RELEASE, 0.3),
+    (id::VEL_AMP, 0.4),
+    (id::VEL_FILTER, 0.2),
+    (id::MOD, 50.),
+    (id::PRS + 1, 0.5),
+    (id::WLEVEL, 1.),
+    (id::WLEVEL + 1, 1.),
+    (id::WLEVEL + 2, 1.),
+    (id::WLEVEL + 3, 1.),
+    (id::LFO_X + 2, 1.),
+    (id::LFO_X + 5, 1.),
+    (id::TEMPO, 120.),
+    (id::BEND_RANGE, 2.),
+    (id::MENV, 0.1),
+    (id::MENV + 1, 0.5),
+    (id::MENV + 2, 0.5),
+    (id::MENV + 3, 0.3),
 ];
 
 // ---- the tables ---------------------------------------------------------------------------------------------------
 
-static mut MIP: [f32; SLOTS * LEVELS * CYCLE] = [0.; SLOTS * LEVELS * CYCLE];
-static mut HARM: [usize; LEVELS] = [0; LEVELS];
-static mut HASH: [u32; SLOTS] = [0; SLOTS];
-static mut READY: bool = false;
-static mut FRE: [f64; CYCLE] = [0.; CYCLE];
-static mut FIM: [f64; CYCLE] = [0.; CYCLE];
-static mut SRE: [f64; CYCLE] = [0.; CYCLE];
-static mut SIM: [f64; CYCLE] = [0.; CYCLE];
-static mut TWC: [f64; CYCLE / 2] = [0.; CYCLE / 2];
-static mut TWS: [f64; CYCLE / 2] = [0.; CYCLE / 2];
-
-/// In-place radix-2 FFT of FRE / FIM (the inverse is unscaled; the caller divides by CYCLE).
-unsafe fn fft(inverse: bool) {
-    let n = CYCLE;
-    let mut j = 0;
-    for i in 1..n {
-        let mut bit = n >> 1;
-        while j & bit != 0 {
-            j ^= bit;
-            bit >>= 1;
-        }
-        j ^= bit;
-        if i < j {
-            FRE.swap(i, j);
-            FIM.swap(i, j);
+/// Per-owner raw waves, band-limited tables and preparation-only FFT scratch.
+pub struct Resources {
+    pub raw: [f32; SLOTS * CYCLE],
+    mip: [f32; SLOTS * LEVELS * CYCLE],
+    harm: [usize; LEVELS],
+    hash: [u32; SLOTS],
+    ready: bool,
+    fre: [f64; CYCLE],
+    fim: [f64; CYCLE],
+    sre: [f64; CYCLE],
+    sim: [f64; CYCLE],
+    twc: [f64; CYCLE / 2],
+    tws: [f64; CYCLE / 2],
+}
+impl Resources {
+    #[cfg(feature="legacy-abi")]
+    const ZERO: Self = Self {
+        raw: [0.; SLOTS * CYCLE],
+        mip: [0.; SLOTS * LEVELS * CYCLE],
+        harm: [0; LEVELS],
+        hash: [0; SLOTS],
+        ready: false,
+        fre: [0.; CYCLE],
+        fim: [0.; CYCLE],
+        sre: [0.; CYCLE],
+        sim: [0.; CYCLE],
+        twc: [0.; CYCLE / 2],
+        tws: [0.; CYCLE / 2],
+    };
+    pub fn boxed() -> Box<Self> {
+        unsafe {
+            let layout = std::alloc::Layout::new::<Self>();
+            let p = std::alloc::alloc_zeroed(layout) as *mut Self;
+            if p.is_null() {
+                std::alloc::handle_alloc_error(layout);
+            }
+            Box::from_raw(p)
         }
     }
-    let mut len = 2;
-    while len <= n {
-        let step = n / len;
-        for start in (0..n).step_by(len) {
-            for k in 0..len / 2 {
-                let (c, s) = (TWC[k * step], if inverse { TWS[k * step] } else { -TWS[k * step] });
-                let (a, b) = (start + k, start + k + len / 2);
-                let (tr, ti) = (FRE[b] * c - FIM[b] * s, FRE[b] * s + FIM[b] * c);
-                FRE[b] = FRE[a] - tr;
-                FIM[b] = FIM[a] - ti;
-                FRE[a] += tr;
-                FIM[a] += ti;
+    fn fft(&mut self, inverse: bool) {
+        let n = CYCLE;
+        let mut j = 0;
+        for i in 1..n {
+            let mut bit = n >> 1;
+            while j & bit != 0 {
+                j ^= bit;
+                bit >>= 1;
+            }
+            j ^= bit;
+            if i < j {
+                self.fre.swap(i, j);
+                self.fim.swap(i, j);
             }
         }
-        len <<= 1;
+        let mut len = 2;
+        while len <= n {
+            let step = n / len;
+            for start in (0..n).step_by(len) {
+                for k in 0..len / 2 {
+                    let (c, s) = (
+                        self.twc[k * step],
+                        if inverse {
+                            self.tws[k * step]
+                        } else {
+                            -self.tws[k * step]
+                        },
+                    );
+                    let (a, b) = (start + k, start + k + len / 2);
+                    let (tr, ti) = (
+                        self.fre[b] * c - self.fim[b] * s,
+                        self.fre[b] * s + self.fim[b] * c,
+                    );
+                    self.fre[b] = self.fre[a] - tr;
+                    self.fim[b] = self.fim[a] - ti;
+                    self.fre[a] += tr;
+                    self.fim[a] += ti;
+                }
+            }
+            len <<= 1;
+        }
     }
-}
-
-/// Where the host writes the four waves (2048 samples each, about ±1). The buffer is the one the vector synthesizer
-/// uses; only one model runs per kernel instance.
-fn raw() -> &'static mut [f32] {
-    unsafe { core::slice::from_raw_parts_mut(crate::vs::wave_ptr(), SLOTS * CYCLE) }
-}
-
-/// The classic starting set: sine, triangle, saw, square.
-fn default_waves() {
-    let w = raw();
-    for n in 0..CYCLE {
-        let t = n as f64 / CYCLE as f64;
-        w[n] = (t * core::f64::consts::TAU).sin() as f32;
-        w[CYCLE + n] = (1. - 4. * (t - 0.5).abs()) as f32;
-        w[2 * CYCLE + n] = (2. * t - 1.) as f32;
-        w[3 * CYCLE + n] = if t < 0.5 { 1. } else { -1. };
+    fn default_waves(&mut self) {
+        let w = &mut self.raw;
+        for n in 0..CYCLE {
+            let t = n as f64 / CYCLE as f64;
+            w[n] = (t * core::f64::consts::TAU).sin() as f32;
+            w[CYCLE + n] = (1. - 4. * (t - 0.5).abs()) as f32;
+            w[2 * CYCLE + n] = (2. * t - 1.) as f32;
+            w[3 * CYCLE + n] = if t < 0.5 { 1. } else { -1. };
+        }
     }
-}
-
-/// Builds the band-limited tables of every wave that changed since the last commit: remove the DC, scale to a peak of 1,
-/// then keep the harmonics each level allows. A few milliseconds per wave.
-pub fn commit() {
-    unsafe {
+    pub fn init(&mut self) {
+        self.default_waves();
+        self.ready = false;
+        self.commit();
+    }
+    pub fn commit(&mut self) {
         for k in 0..CYCLE / 2 {
             let a = core::f64::consts::TAU * k as f64 / CYCLE as f64;
-            TWC[k] = a.cos();
-            TWS[k] = a.sin();
+            self.twc[k] = a.cos();
+            self.tws[k] = a.sin();
         }
         for l in 0..LEVELS {
-            HARM[l] = ((1024. * 0.5f64.powf(l as f64 / 2.)).round() as usize).max(1);
+            self.harm[l] = ((1024. * 0.5f64.powf(l as f64 / 2.)).round() as usize).max(1);
         }
-        let w = raw();
+
         for s in 0..SLOTS {
-            let src = &w[s * CYCLE..(s + 1) * CYCLE];
+            let src = &self.raw[s * CYCLE..(s + 1) * CYCLE];
             let mut h = 0x811c_9dc5u32;
             for &x in src {
                 h = (h ^ x.to_bits()).wrapping_mul(0x0100_0193);
             }
-            if h == HASH[s] && READY {
+            if h == self.hash[s] && self.ready {
                 continue;
             }
-            HASH[s] = h;
+            self.hash[s] = h;
             let mean = src.iter().map(|&x| x as f64).sum::<f64>() / CYCLE as f64;
-            let peak = src.iter().map(|&x| (x as f64 - mean).abs()).fold(0f64, f64::max);
+            let peak = src
+                .iter()
+                .map(|&x| (x as f64 - mean).abs())
+                .fold(0f64, f64::max);
             let scale = if peak > 1e-6 { 1. / peak } else { 0. };
             for n in 0..CYCLE {
-                FRE[n] = (src[n] as f64 - mean) * scale;
-                FIM[n] = 0.;
+                self.fre[n] = (src[n] as f64 - mean) * scale;
+                self.fim[n] = 0.;
             }
-            fft(false);
-            SRE.copy_from_slice(&FRE);
-            SIM.copy_from_slice(&FIM);
+            self.fft(false);
+            self.sre.copy_from_slice(&self.fre);
+            self.sim.copy_from_slice(&self.fim);
             for l in 0..LEVELS {
                 for n in 0..CYCLE {
-                    FRE[n] = 0.;
-                    FIM[n] = 0.;
+                    self.fre[n] = 0.;
+                    self.fim[n] = 0.;
                 }
-                for k in 1..=HARM[l].min(CYCLE / 2 - 1) {
-                    FRE[k] = SRE[k];
-                    FIM[k] = SIM[k];
-                    FRE[CYCLE - k] = SRE[k];
-                    FIM[CYCLE - k] = -SIM[k];
+                for k in 1..=self.harm[l].min(CYCLE / 2 - 1) {
+                    self.fre[k] = self.sre[k];
+                    self.fim[k] = self.sim[k];
+                    self.fre[CYCLE - k] = self.sre[k];
+                    self.fim[CYCLE - k] = -self.sim[k];
                 }
-                fft(true);
+                self.fft(true);
                 let base = (s * LEVELS + l) * CYCLE;
                 for n in 0..CYCLE {
-                    MIP[base + n] = (FRE[n] / CYCLE as f64) as f32;
+                    self.mip[base + n] = (self.fre[n] / CYCLE as f64) as f32;
                 }
             }
         }
-        READY = true;
+        self.ready = true;
     }
-}
-
-/// The richest level whose harmonics all stay below the Nyquist at this phase increment.
-#[inline]
-fn level_for(dt: f32) -> usize {
-    let allowed = (0.5 / dt.max(1e-6)) as usize;
-    unsafe {
+    #[inline]
+    fn level_for(&self, dt: f32) -> usize {
+        let allowed = (0.5 / dt.max(1e-6)) as usize;
         for l in 0..LEVELS {
-            if HARM[l] <= allowed {
+            if self.harm[l] <= allowed {
                 return l;
             }
         }
+        LEVELS - 1
     }
-    LEVELS - 1
-}
-
-/// Four-point cubic (Catmull-Rom) read of one table at a phase in turns.
-#[inline(always)]
-fn read(slot: usize, level: usize, phase: f32) -> f32 {
-    let f = phase * CYCLE as f32;
-    let i = f as usize;
-    let t = f - i as f32;
-    let m = CYCLE - 1;
-    unsafe {
+    #[inline(always)]
+    fn read(&self, slot: usize, level: usize, phase: f32) -> f32 {
+        let f = phase * CYCLE as f32;
+        let i = f as usize;
+        let t = f - i as f32;
+        let m = CYCLE - 1;
         let b = (slot * LEVELS + level) * CYCLE;
-        let y0 = MIP[b + (i.wrapping_sub(1) & m)];
-        let y1 = MIP[b + (i & m)];
-        let y2 = MIP[b + ((i + 1) & m)];
-        let y3 = MIP[b + ((i + 2) & m)];
-        let c1 = 0.5 * (y2 - y0);
-        let c2 = y0 - 2.5 * y1 + 2. * y2 - 0.5 * y3;
-        let c3 = 0.5 * (y3 - y0) + 1.5 * (y1 - y2);
+            let y0 = self.mip[b + (i.wrapping_sub(1) & m)];
+            let y1 = self.mip[b + (i & m)];
+            let y2 = self.mip[b + ((i + 1) & m)];
+            let y3 = self.mip[b + ((i + 2) & m)];
+            let c1 = 0.5 * (y2 - y0);
+            let c2 = y0 - 2.5 * y1 + 2. * y2 - 0.5 * y3;
+            let c3 = 0.5 * (y3 - y0) + 1.5 * (y1 - y2);
         ((c3 * t + c2) * t + c1) * t + y1
     }
-}
-
-/// A wave read through one of its warps: 1 bend (the cycle's midpoint moves), 2 sync (the cycle repeats faster), 3 mirror (the second half runs backwards),
-/// 4 fold (the level is folded back on itself), 5 FM (the phase is modulated by a sine an octave up).
-#[inline(always)]
-fn read_warped(slot: usize, level: usize, ph: f32, mode: u32, amt: f32) -> f32 {
-    if mode == 0 || amt < 1e-4 {
-        return read(slot, level, ph);
+    #[inline(always)]
+    fn read_warped(&self, slot: usize, level: usize, ph: f32, mode: u32, amt: f32) -> f32 {
+        if mode == 0 || amt < 1e-4 {
+            return self.read(slot, level, ph);
+        }
+        match mode {
+            1 => {
+                let c = 0.5 - 0.45 * amt;
+                self.read(
+                    slot,
+                    level,
+                    if ph < c {
+                        ph / (2. * c)
+                    } else {
+                        0.5 + (ph - c) / (2. * (1. - c))
+                    },
+                )
+            }
+            2 => self.read(slot, level, (ph * (1. + 7. * amt)).fract()),
+            3 => {
+                let tri = if ph < 0.5 { 2. * ph } else { 2. - 2. * ph };
+                self.read(slot, level, ph + (tri - ph) * amt)
+            }
+            4 => {
+                let y = self.read(slot, level, ph) * (1. + 5. * amt);
+                (y * core::f32::consts::FRAC_PI_2).sin()
+            }
+            _ => {
+                let m = ph + 0.15 * amt * (core::f32::consts::TAU * 2. * ph).sin();
+                self.read(slot, level, m - m.floor())
+            }
+        }
     }
-    match mode {
-        1 => {
-            let c = 0.5 - 0.45 * amt;
-            read(slot, level, if ph < c { ph / (2. * c) } else { 0.5 + (ph - c) / (2. * (1. - c)) })
-        }
-        2 => read(slot, level, (ph * (1. + 7. * amt)).fract()),
-        3 => {
-            let tri = if ph < 0.5 { 2. * ph } else { 2. - 2. * ph };
-            read(slot, level, ph + (tri - ph) * amt)
-        }
-        4 => {
-            let y = read(slot, level, ph) * (1. + 5. * amt);
-            (y * core::f32::consts::FRAC_PI_2).sin()
-        }
-        _ => {
-            let m = ph + 0.15 * amt * (core::f32::consts::TAU * 2. * ph).sin();
-            read(slot, level, m - m.floor())
-        }
+}
+#[cfg(feature = "legacy-abi")]
+static mut LEGACY: Resources = Resources::ZERO;
+#[cfg(feature = "legacy-abi")]
+pub fn commit() {
+    unsafe {
+        LEGACY.raw.copy_from_slice(core::slice::from_raw_parts(
+            crate::vs::wave_ptr(),
+            SLOTS * CYCLE,
+        ));
+        LEGACY.commit();
     }
 }
 
@@ -424,7 +497,9 @@ impl Wt {
         }
     }
 
-    pub fn init(&mut self, sr: f32) {
+    #[cfg(feature="legacy-abi")]
+    pub fn init(&mut self,sr:f32){unsafe{self.init_with(sr,&mut LEGACY);core::slice::from_raw_parts_mut(crate::vs::wave_ptr(),SLOTS*CYCLE).copy_from_slice(&LEGACY.raw);}}
+    pub fn init_with(&mut self, sr: f32,resources:&mut Resources) {
         self.sr = sr;
         self.dirty = true;
         self.p = [0.; PARAMS];
@@ -447,11 +522,7 @@ impl Wt {
         for (i, v) in DEFAULTS.iter() {
             self.p[*i] = *v;
         }
-        default_waves();
-        unsafe {
-            READY = false;
-        }
-        commit();
+        resources.init();
     }
 
     pub fn set(&mut self, i: usize, value: f32) {
@@ -698,7 +769,7 @@ impl Wt {
     }
 
     /// The control-rate update: envelopes, LFOs, joystick, pitches, filter and gain targets for the next block.
-    fn tick(&mut self) {
+    fn tick(&mut self,resources:&Resources) {
         if self.dirty {
             self.prepare();
         }
@@ -838,7 +909,7 @@ impl Wt {
                         5 => 1. + 3. * v.warp[k],
                         _ => 1.,
                     };
-                    v.level[u][k] = level_for((dt * wide).min(0.45)) as u8;
+                    v.level[u][k] = resources.level_for((dt * wide).min(0.45)) as u8;
                     if v.fresh {
                         v.dt[u][k] = dt;
                         v.dt_d[u][k] = 0.;
@@ -885,23 +956,23 @@ impl Wt {
         let _ = ftype;
     }
 
-    pub fn render(&mut self, left: &mut [f32], right: &mut [f32]) {
+    #[cfg(feature="legacy-abi")]
+    pub fn render(&mut self,left:&mut[f32],right:&mut[f32]){unsafe{self.render_with(&mut LEGACY,left,right);}}
+    pub fn render_with(&mut self,resources:&mut Resources,left: &mut [f32], right: &mut [f32]) {
         let n = left.len();
         left.fill(0.);
         right.fill(0.);
-        if unsafe { !READY } {
-            commit();
-        }
+        if !resources.ready { resources.commit(); }
         let mut at = 0;
         while at < n {
             if self.until == 0 {
-                self.tick();
+                self.tick(resources);
                 self.until = TICK;
             }
             let m = self.until.min(n - at);
             let s = self.setup;
             for v in self.voices.iter_mut().filter(|v| v.active) {
-                render_voice(v, &s, &self.shape_a, &mut left[at..at + m], &mut right[at..at + m]);
+                render_voice(resources, v, &s, &self.shape_a, &mut left[at..at + m], &mut right[at..at + m]);
                 if v.amp.stage == IDLE && !v.down && !v.held {
                     v.active = false;
                 }
@@ -913,7 +984,7 @@ impl Wt {
 }
 
 #[inline(always)]
-fn render_voice(v: &mut Voice, s: &Setup, shape: &EnvShape, left: &mut [f32], right: &mut [f32]) {
+fn render_voice(resources:&Resources,v: &mut Voice, s: &Setup, shape: &EnvShape, left: &mut [f32], right: &mut [f32]) {
     // the drive stage clips a scaled copy of the signal so it is linear (unity) with the drive at zero
     let drive = (s.drive + v.drive_m).clamp(0., 1.);
     let pre = 0.3 * (1. + 9. * drive);
@@ -940,7 +1011,7 @@ fn render_voice(v: &mut Voice, s: &Setup, shape: &EnvShape, left: &mut [f32], ri
                 }
                 v.ph[u][k] = ph;
                 if v.w[k] > 1e-5 {
-                    let y = read_warped(k, v.level[u][k] as usize, ph, s.warp_mode[k], v.warp[k]);
+                    let y = resources.read_warped(k, v.level[u][k] as usize, ph, s.warp_mode[k], v.warp[k]);
                     xl += v.w[k] * y * s.wpan[k].0;
                     xr += v.w[k] * y * s.wpan[k].1;
                 }

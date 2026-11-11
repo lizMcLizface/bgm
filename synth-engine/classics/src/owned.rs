@@ -1,8 +1,8 @@
-//! Owned non-wavetable classic backends. VS/WT require a separate table-ownership
-//! extraction and are rejected here. Existing legacy entry points remain intact.
+//! Owned classic backends, including per-instance vector/wavetable resources.
+//! Existing legacy entry points remain intact under their feature boundary.
 use crate::dsp::{soft, DcBlock, MAX_BLOCK};
 use crate::*;
-use crate::{cs80, drums, dsp, dx7, fx, juno, jupiter, minimoog, obxa, prophet, tb303};
+use crate::{cs80, drums, dsp, dx7, fx, juno, jupiter, minimoog, obxa, prophet, tb303,vs,wt};
 
 enum Core {
     Cs80(cs80::Cs80),
@@ -14,6 +14,8 @@ enum Core {
     Obxa(obxa::ObXa2),
     Drums(drums::Drums),
     Bass(tb303::Tb303),
+    Vector(vs::Vs,Box<vs::Resources>),
+    Wavetable(wt::Wt,Box<wt::Resources>),
 }
 macro_rules! call {
     ($c:expr,$m:ident=>$body:expr) => {
@@ -27,6 +29,8 @@ macro_rules! call {
             Core::Obxa($m) => $body,
             Core::Drums($m) => $body,
             Core::Bass($m) => $body,
+            Core::Vector($m,_) => $body,
+            Core::Wavetable($m,_) => $body,
         }
     };
 }
@@ -72,6 +76,8 @@ impl Engine {
                 Core::Drums(drums::Drums::new())
             }
             MODEL_TB303 => Core::Bass(tb303::Tb303::new()),
+            MODEL_VS => Core::Vector(vs::Vs::new(),vs::Resources::boxed()),
+            MODEL_WT => Core::Wavetable(wt::Wt::new(),wt::Resources::boxed()),
             _ => return None,
         };
         let mut s = Box::new(Self {
@@ -92,15 +98,17 @@ impl Engine {
     }
     pub fn reset(&mut self) {
         match &mut self.core {
-            Core::Cs80(m) => m.init(self.sr),
-            Core::Juno(m) => m.init(self.sr),
-            Core::Prophet(m) => m.init(self.sr),
-            Core::Jupiter(m) => m.init(self.sr),
-            Core::Mini(m) => m.init(self.sr),
-            Core::Dx7(m) => m.init(self.sr),
-            Core::Obxa(m) => m.init(self.sr),
-            Core::Bass(m) => m.init(self.sr),
-            Core::Drums(m) => m.init(
+            Core::Cs80(m) => {*m=cs80::Cs80::new();m.init(self.sr);},
+            Core::Juno(m) => {*m=juno::Juno::new();m.init(self.sr);},
+            Core::Prophet(m) => {*m=prophet::Prophet::new();m.init(self.sr);},
+            Core::Jupiter(m) => {*m=jupiter::Jupiter8::new();m.init(self.sr);},
+            Core::Mini(m) => {*m=minimoog::Minimoog::new();m.init(self.sr);},
+            Core::Dx7(m) => {*m=dx7::Dx7::new();m.init(self.sr);},
+            Core::Obxa(m) => {*m=obxa::ObXa2::new();m.init(self.sr);},
+            Core::Bass(m) => {*m=tb303::Tb303::new();m.init(self.sr);},
+            Core::Vector(m,_) => {*m=vs::Vs::new();m.init(self.sr);},
+            Core::Wavetable(m,r) => {*m=wt::Wt::new();m.init_with(self.sr,r);},
+            Core::Drums(m) => {*m=drums::Drums::new();m.init(
                 self.sr,
                 match self.model {
                     MODEL_TR909 => drums::STYLE_909,
@@ -108,7 +116,7 @@ impl Engine {
                     MODEL_TR707 => drums::STYLE_707,
                     _ => drums::STYLE_808,
                 },
-            ),
+            );},
         };
         self.bbd.init(self.sr);
         self.space.init(self.sr);
@@ -129,6 +137,8 @@ impl Engine {
             MODEL_DX7 => dx7::PARAMS,
             MODEL_OBXA => obxa::PAIR_PARAMS,
             MODEL_TB303 => tb303::PARAMS,
+            MODEL_VS => vs::PARAMS,
+            MODEL_WT => wt::PARAMS,
             _ => drums::PARAMS,
         }
     }
@@ -153,6 +163,7 @@ impl Engine {
                 Core::Jupiter(m) => m.set_shape(i, value),
                 Core::Mini(m) => m.set_shape(i, value),
                 Core::Obxa(m) => m.set_shape(i, value),
+                Core::Wavetable(m,_) => m.set_shape(i,value),
                 _ => return false,
             };
         } else {
@@ -218,7 +229,7 @@ impl Engine {
             return false;
         }
         let (left, right) = (&mut self.left[..n], &mut self.right[..n]);
-        call!(&mut self.core,m=>m.render(left,right));
+        match &mut self.core {Core::Vector(m,r)=>m.render_with(r,left,right),Core::Wavetable(m,r)=>m.render_with(r,left,right),Core::Cs80(m)=>m.render(left,right),Core::Juno(m)=>m.render(left,right),Core::Prophet(m)=>m.render(left,right),Core::Jupiter(m)=>m.render(left,right),Core::Mini(m)=>m.render(left,right),Core::Dx7(m)=>m.render(left,right),Core::Obxa(m)=>m.render(left,right),Core::Drums(m)=>m.render(left,right),Core::Bass(m)=>m.render(left,right),};
         if let Core::Juno(m) = &mut self.core {
             let (mode, noise) = m.chorus();
             self.bbd
@@ -240,16 +251,22 @@ impl Engine {
     pub fn left(&self) -> &[f32] {
         &self.left
     }
+    pub fn wave_ptr(&mut self)->*mut f32 {match &mut self.core {Core::Vector(_,r)=>r.raw.as_mut_ptr(),Core::Wavetable(_,r)=>r.raw.as_mut_ptr(),_=>std::ptr::null_mut()}}
+    pub fn wave_len(&self)->usize {match &self.core {Core::Vector(..)=>vs::WAVES*vs::CYCLE,Core::Wavetable(..)=>wt::SLOTS*wt::CYCLE,_=>0}}
+    pub fn wave_commit(&mut self)->bool {match &mut self.core {Core::Vector(_,r)=>{if r.raw.iter().any(|v|!v.is_finite()||v.abs()>64.){return false;}r.commit();r.prewarm();true},Core::Wavetable(_,r)=>{if r.raw.iter().any(|v|!v.is_finite()||v.abs()>64.){return false;}r.commit();true},_=>false}}
+    pub fn joy_ptr(&self)->*const f32 {match &self.core {Core::Wavetable(m,_)=>m.trace.as_ptr(),_=>std::ptr::null()}}
+    pub fn joy_info(&self,which:u32)->u32 {if !matches!(&self.core,Core::Wavetable(..)){return 0;}match which{0=>wt::VOICES as u32,1=>wt::TRACE_WIDTH as u32,_=>0}}
     pub fn right(&self) -> &[f32] {
         &self.right
     }
-    pub fn stat(&mut self, index: u32) -> f64 {
+    pub fn stat(&self, index: u32) -> f64 {
         match index {
-            0 => call!(&mut self.core,m=>m.active()) as f64,
-            1 => call!(&mut self.core,m=>m.steals) as f64,
+            0 => call!(&self.core,m=>m.active()) as f64,
+            1 => call!(&self.core,m=>m.steals) as f64,
             2 => self.peak as f64,
             3 => self.frame as f64 / self.sr as f64,
             4 => self.frame as f64,
+            7..=9 => match &self.core {Core::Wavetable(m,_)=>m.joy[(index-7)as usize]as f64,_=>0.},
             _ => 0.,
         }
     }
@@ -307,6 +324,11 @@ pub extern "C" fn classic_owned_right(p: &Engine) -> *const f32 {
     p.right.as_ptr()
 }
 #[no_mangle]
-pub extern "C" fn classic_owned_stat(p: &mut Engine, i: u32) -> f64 {
+pub extern "C" fn classic_owned_stat(p: &Engine, i: u32) -> f64 {
     p.stat(i)
 }
+#[no_mangle]pub extern "C" fn classic_owned_wave_ptr(p:&mut Engine)->*mut f32{p.wave_ptr()}
+#[no_mangle]pub extern "C" fn classic_owned_wave_len(p:&Engine)->usize{p.wave_len()}
+#[no_mangle]pub extern "C" fn classic_owned_wave_commit(p:&mut Engine)->u32{(!p.wave_commit())as u32}
+#[no_mangle]pub extern "C" fn classic_owned_joy_ptr(p:&Engine)->*const f32{p.joy_ptr()}
+#[no_mangle]pub extern "C" fn classic_owned_joy_info(p:&Engine,which:u32)->u32{p.joy_info(which)}

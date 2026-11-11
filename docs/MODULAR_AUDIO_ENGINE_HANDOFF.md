@@ -2825,3 +2825,10 @@ counterexamples are recorded in freeze-snapshot-design.json. See
 MODULAR_AUDIO_ENGINE_OWNED_RACK_FX.md and MODULAR_AUDIO_ENGINE_OWNED_VOICE_FX.md.
 Graph adapters and actual routed browser validation are the next integration
 step; standalone audits do not establish device deadlines or listening.
+
+All14 classic model families now have owned state including VS/WT wave resources.
+The588 added VS/WT factory/rate comparisons and2268 all-model cold-reset cases
+are exact against the stated original/fresh references;25 permanent tests pass.
+The531640-byte rebuilt legacy-compatible kernel passes provenance. VS staging
+publication and WT lifecycle reset costs remain explicit; see
+MODULAR_AUDIO_ENGINE_OWNED_CLASSICS.md. Next: timestamped graph/source routing.

@@ -42,3 +42,27 @@ Limits: per-instance immediate DSP API only; timestamp/owner integration into
 the graph is separate. Space processing retains its original matching-block
 semantics. VS/WT need owned wave buffers, built tables and scratch before being
 accepted. No physical listening or general live-backend migration is claimed.
+
+### Overnight continuation: all14 native models owned (2026-11-11)
+
+The VS/WT limitation above is resolved. Each instance now owns raw waves,
+MIP/hash tables, FFT scratch and readiness. Original singleton wave upload and
+commit entry points remain operational. Six audit cases report zero allocation,
+reclamation or growth during prepared wave DSP. All588 VS/WT factory/rate
+comparisons are bit exact against the preserved original kernel, including
+rebuilt legacy upload/commit behavior. Together with the previous1680 cases,
+all2268 factory/rate comparisons preserve original output.
+
+All2268 cold-reset replay cases also match fresh owned instances exactly.
+Owned-only cold resets clear inherited WT RNG/trace/ticks while retaining wave
+resources. The original legacy initialization behavior remains. WT reset can
+rebuild state and took up to11.7506ms: lifecycle work belongs outside callbacks.
+VS staging allocates3145728bytes on first commit outside render, then publishes
+at its original16-frame control tick (at most98304bytes copied for four waves).
+These costs are explicit; ownership alone does not establish realtime deadlines.
+
+Twenty-five published-asset permanent tests pass. The rebuilt legacy-compatible
+kernel is531640bytes, with synths:check provenance passing. Timestamped Graph
+adapters and the private live source boundary are separate integration work;
+neither changes the default live backend. Evidence is in the owned-wave,
+owned-wave-allocation and owned-reset-compatibility reports.

@@ -10,7 +10,6 @@ mod fx;
 mod dx7;
 mod juno;
 mod obxa;
-#[cfg(feature="legacy-abi")]
 mod vs;
 mod minimoog;
 mod jupiter;
@@ -18,7 +17,6 @@ mod prophet;
 mod seq;
 mod drums;
 mod tb303;
-#[cfg(feature="legacy-abi")]
 mod wt;
 pub mod owned;
 #[cfg(feature="allocation-audit")]

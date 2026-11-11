@@ -1227,3 +1227,8 @@ counterexamples are recorded in freeze-snapshot-design.json. See
 MODULAR_AUDIO_ENGINE_OWNED_RACK_FX.md and MODULAR_AUDIO_ENGINE_OWNED_VOICE_FX.md.
 Graph adapters and actual routed browser validation are the next integration
 step; standalone audits do not establish device deadlines or listening.
+
+The classic owned-state extraction now covers14/14 native model families.
+Added VS/WT resources preserve588 factory/rate comparisons; all2268 cold-reset
+cases replay exactly.25 permanent tests and legacy provenance pass. The native
+kernel is531640bytes. Prepared Graph/source integration follows separately.

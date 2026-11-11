@@ -72,51 +72,86 @@ pub mod id {
 
 // ---------------------------------------------------------------- waves
 
-static mut WAVE_RAW: [f32; WAVES * CYCLE] = [0.; WAVES * CYCLE];
-static mut MIP: [f32; WAVES * LEVELS * TABLE] = [0.; WAVES * LEVELS * TABLE];
-static mut SIN_TABLE: [f32; TABLE] = [0.; TABLE];
-static mut BUILT: [bool; WAVES] = [false; WAVES];
-static mut HASH: [u32; WAVES] = [0; WAVES];
-static mut READY: bool = false;
-
-/// Where the host writes the 128 waves (user 0–31, ROM 32–127), 128 samples each, about ±1.
-pub fn wave_ptr() -> *mut f32 {
-    unsafe { WAVE_RAW.as_mut_ptr() }
+/// Mutable wave upload/preparation state belongs to one kernel owner.
+pub struct Resources {
+    pub raw: [f32; WAVES * CYCLE],
+    mip: [f32; WAVES * LEVELS * TABLE],
+    sin: [f32; TABLE],
+    built: [bool; WAVES],
+    hash: [u32; WAVES],
+    ready: bool,
+    // Owned prewarming keeps publication at the original control tick. Legacy
+    // kernels leave this None and retain their original lazy-build behavior.
+    prepared: Option<Box<[f32; WAVES * LEVELS * TABLE]>>,
+    pending: [bool;WAVES],
 }
-
-/// The harmonics a table level keeps.
-fn level_harmonics(level: usize) -> usize {
-    ((63. * exp2(-(level as f32) / 2.)).round() as usize).clamp(1, 63)
-}
-
-/// Notes that the host has written the waves. Only the waves that changed are rebuilt, and only
-/// when a voice first needs them (`ensure`), so a commit itself is cheap.
-pub fn commit() {
-    unsafe {
-        for (i, s) in SIN_TABLE.iter_mut().enumerate() {
+impl Resources {
+    #[cfg(feature="legacy-abi")]
+    const ZERO: Self = Self {
+        raw: [0.; WAVES * CYCLE],
+        mip: [0.; WAVES * LEVELS * TABLE],
+        sin: [0.; TABLE],
+        built: [false; WAVES],
+        hash: [0; WAVES],
+        ready: false,
+        prepared: None,
+        pending: [false;WAVES],
+    };
+    pub fn boxed() -> Box<Self> {
+        unsafe {
+            let layout = std::alloc::Layout::new::<Self>();
+            let p = std::alloc::alloc_zeroed(layout) as *mut Self;
+            if p.is_null() {
+                std::alloc::handle_alloc_error(layout);
+            }
+            Box::from_raw(p)
+        }
+    }
+    pub fn commit(&mut self) {
+        for (i, s) in self.sin.iter_mut().enumerate() {
             *s = (i as f64 * core::f64::consts::TAU / TABLE as f64).sin() as f32;
         }
         for w in 0..WAVES {
             let mut h = 0x811c_9dc5u32;
-            for &x in &WAVE_RAW[w * CYCLE..(w + 1) * CYCLE] {
+            for &x in &self.raw[w * CYCLE..(w + 1) * CYCLE] {
                 h = (h ^ x.to_bits()).wrapping_mul(0x0100_0193);
             }
-            if h != HASH[w] || !READY {
-                HASH[w] = h;
-                BUILT[w] = false;
+            if h != self.hash[w] || !self.ready {
+                self.hash[w] = h;
+                self.built[w] = false;
+                self.pending[w] = false;
             }
         }
-        READY = true;
+        self.ready = true;
     }
-}
-
-/// Builds one wave's band-limited tables if they are not built yet.
-fn ensure(w: usize) {
-    unsafe {
-        if BUILT[w] {
+    pub fn prewarm(&mut self) {
+        if self.prepared.is_none(){unsafe{
+            let layout=std::alloc::Layout::new::<[f32;WAVES*LEVELS*TABLE]>();
+            let p=std::alloc::alloc_zeroed(layout)as *mut[f32;WAVES*LEVELS*TABLE];
+            if p.is_null(){std::alloc::handle_alloc_error(layout);}
+            self.prepared=Some(Box::from_raw(p));
+        }}
+        for w in 0..WAVES {
+            if self.built[w]||self.pending[w]{continue;}
+            let start=w*LEVELS*TABLE;let end=start+LEVELS*TABLE;
+            // Reuse the identical builder while retaining the previously
+            // audible tables until ensure() at the next 16-frame control tick.
+            self.mip[start..end].swap_with_slice(&mut self.prepared.as_mut().unwrap()[start..end]);
+            self.ensure(w);
+            self.mip[start..end].swap_with_slice(&mut self.prepared.as_mut().unwrap()[start..end]);
+            self.built[w]=false;self.pending[w]=true;
+        }
+    }
+    fn ensure(&mut self, w: usize) {
+        if self.built[w] {
             return;
         }
-        let src = &WAVE_RAW[w * CYCLE..(w + 1) * CYCLE];
+        if self.pending[w]{
+            let start=w*LEVELS*TABLE;let end=start+LEVELS*TABLE;
+            self.mip[start..end].copy_from_slice(&self.prepared.as_ref().unwrap()[start..end]);
+            self.pending[w]=false;self.built[w]=true;return;
+        }
+        let src = &self.raw[w * CYCLE..(w + 1) * CYCLE];
         // harmonics 1..=63 of the 128-sample cycle
         let mut a = [0f32; 64];
         let mut b = [0f32; 64];
@@ -124,45 +159,38 @@ fn ensure(w: usize) {
             let (mut re, mut im) = (0f32, 0f32);
             for (n, &x) in src.iter().enumerate() {
                 let idx = (h * n * (TABLE / CYCLE)) & (TABLE - 1);
-                re += x * SIN_TABLE[(idx + TABLE / 4) & (TABLE - 1)];
-                im += x * SIN_TABLE[idx];
+                re += x * self.sin[(idx + TABLE / 4) & (TABLE - 1)];
+                im += x * self.sin[idx];
             }
             a[h] = re * (2. / CYCLE as f32);
             b[h] = im * (2. / CYCLE as f32);
         }
         for l in 0..LEVELS {
             let top = level_harmonics(l);
-            let out = &mut MIP[(w * LEVELS + l) * TABLE..(w * LEVELS + l + 1) * TABLE];
+            let out = &mut self.mip[(w * LEVELS + l) * TABLE..(w * LEVELS + l + 1) * TABLE];
             for (i, o) in out.iter_mut().enumerate() {
                 let mut v = 0f32;
                 for h in 1..=top {
                     let idx = (h * i) & (TABLE - 1);
-                    v += a[h] * SIN_TABLE[(idx + TABLE / 4) & (TABLE - 1)] + b[h] * SIN_TABLE[idx];
+                    v += a[h] * self.sin[(idx + TABLE / 4) & (TABLE - 1)] + b[h] * self.sin[idx];
                 }
                 *o = v;
             }
         }
-        BUILT[w] = true;
+        self.built[w] = true;
     }
-}
-
-#[inline(always)]
-fn read_mip(wave: usize, level: usize, phase: f32) -> f32 {
-    unsafe {
-        let t = &MIP[(wave * LEVELS + level) * TABLE..(wave * LEVELS + level + 1) * TABLE];
+    #[inline(always)]
+    fn read_mip(&self, wave: usize, level: usize, phase: f32) -> f32 {
+        let t = &self.mip[(wave * LEVELS + level) * TABLE..(wave * LEVELS + level + 1) * TABLE];
         let x = phase * TABLE as f32;
         let i = x as usize;
         let f = x - i as f32;
         let (i0, i1) = (i & (TABLE - 1), (i + 1) & (TABLE - 1));
         t[i0] + (t[i1] - t[i0]) * f
     }
-}
-
-/// The original 128 samples, as the hardware reads them: linear between samples, or not at all.
-#[inline(always)]
-fn read_raw(wave: usize, phase: f32, nearest: bool) -> f32 {
-    unsafe {
-        let t = &WAVE_RAW[wave * CYCLE..(wave + 1) * CYCLE];
+    #[inline(always)]
+    fn read_raw(&self, wave: usize, phase: f32, nearest: bool) -> f32 {
+        let t = &self.raw[wave * CYCLE..(wave + 1) * CYCLE];
         let x = phase * CYCLE as f32;
         let i = x as usize;
         if nearest {
@@ -171,6 +199,21 @@ fn read_raw(wave: usize, phase: f32, nearest: bool) -> f32 {
         let f = x - i as f32;
         let (i0, i1) = (i & (CYCLE - 1), (i + 1) & (CYCLE - 1));
         t[i0] + (t[i1] - t[i0]) * f
+    }
+}
+fn level_harmonics(level: usize) -> usize {
+    ((63. * exp2(-(level as f32) / 2.)).round() as usize).clamp(1, 63)
+}
+#[cfg(feature = "legacy-abi")]
+static mut LEGACY: Resources = Resources::ZERO;
+#[cfg(feature = "legacy-abi")]
+pub fn wave_ptr() -> *mut f32 {
+    unsafe { LEGACY.raw.as_mut_ptr() }
+}
+#[cfg(feature = "legacy-abi")]
+pub fn commit() {
+    unsafe {
+        LEGACY.commit();
     }
 }
 
@@ -691,7 +734,7 @@ impl Vs {
         self.dirty = false;
     }
 
-    fn tick(&mut self) {
+    fn tick(&mut self,resources:&mut Resources) {
         if self.dirty {
             self.prepare();
         }
@@ -747,7 +790,7 @@ impl Vs {
         let setup = self.setup;
         if setup.raw == 0 {
             for &w in setup.wave.iter() {
-                ensure(w);
+                resources.ensure(w);
             }
         }
         for v in self.voices.iter_mut().filter(|v| v.active) {
@@ -832,23 +875,25 @@ impl Vs {
         }
     }
 
-    pub fn render(&mut self, left: &mut [f32], right: &mut [f32]) {
+    #[cfg(feature="legacy-abi")]
+    pub fn render(&mut self,left:&mut[f32],right:&mut[f32]){unsafe{self.render_with(&mut LEGACY,left,right);}}
+    pub fn render_with(&mut self,resources:&mut Resources,left: &mut [f32], right: &mut [f32]) {
         let n = left.len();
         left.fill(0.);
         right.fill(0.);
-        if unsafe { !READY } {
+        if !resources.ready {
             return;
         }
         let mut at = 0;
         while at < n {
             if self.until == 0 {
-                self.tick();
+                self.tick(resources);
                 self.until = TICK;
             }
             let m = self.until.min(n - at);
             let s = self.setup;
             for v in self.voices.iter_mut().filter(|v| v.active) {
-                render_voice(v, &s, &mut left[at..at + m], &mut right[at..at + m]);
+                render_voice(resources, v, &s, &mut left[at..at + m], &mut right[at..at + m]);
                 if v.amp.stage == DONE && v.amp.val[0] < 1e-4 {
                     v.active = false;
                     v.down = false;
@@ -862,7 +907,7 @@ impl Vs {
 }
 
 #[inline(always)]
-fn render_voice(v: &mut Voice, s: &Setup, left: &mut [f32], right: &mut [f32]) {
+fn render_voice(resources:&Resources,v: &mut Voice, s: &Setup, left: &mut [f32], right: &mut [f32]) {
     let (pl, pr) = v.pan;
     let raw = s.raw;
     for i in 0..left.len() {
@@ -877,9 +922,9 @@ fn render_voice(v: &mut Voice, s: &Setup, left: &mut [f32], right: &mut [f32]) {
             v.ph[k] = ph;
             if v.g[k] > 1e-5 {
                 let o = if raw == 0 {
-                    read_mip(s.wave[k], v.level[k], ph)
+                    resources.read_mip(s.wave[k], v.level[k], ph)
                 } else {
-                    read_raw(s.wave[k], ph, raw == 2)
+                    resources.read_raw(s.wave[k], ph, raw == 2)
                 };
                 x += v.g[k] * o;
             }
