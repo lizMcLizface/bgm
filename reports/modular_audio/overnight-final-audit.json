@@ -4,8 +4,8 @@
   "reviewedAtUtc": "2026-11-11T08:36:38.557Z",
   "codeHead": "2f6de2102bd784dc81cdaac75df59cbca3527f9a",
   "deadlineUtc": "2026-11-11T09:00:00Z",
-  "phase": "reviewed-awaiting-bounded-close",
-  "boundedRunClosed": false,
+  "phase": "bounded-run-closed",
+  "boundedRunClosed": true,
   "scope": "Manual requirement/evidence audit plus current-artifact checks. This is not a claim that the entire audio migration or every legal control combination has passed native numerical acceptance.",
   "graph": {
     "version": "3cf3a29d17daadc3",
@@ -114,11 +114,12 @@
     },
     {
       "item": "No new features after08:30 and close at09:00",
-      "status": "feature-freeze-verified; awaiting09:00-close",
+      "status": "verified",
       "evidence": [
         "code frozen and committed2f6de21 before08:30",
         "remaining edits are evidence/handoff only",
-        "heartbeat still active until bounded closing action"
+        "heartbeat still active until bounded closing action",
+        "Heartbeat PAUSED confirmed through MCP and persisted config after09:00; no implementation after the cutoff."
       ]
     }
   ],
@@ -181,7 +182,8 @@
     "native-compressor-graph-built-browser.json": "f12829d272a3fd71f48530e6861d7620c10324bfc72c5c520308f5ae178eee6d",
     "graph-native-compressor-allocation.json": "579c56519c47c92bea3f5903505f1a2eee77215b6d4985e62e2d95620177d694",
     "compressor-contract-correction-continuity.json": "a3e877359c10bdd4d8aac1f47ef983fd5fd5cd73d1f7e9de835aff8d2a698810",
-    "voice-compressor-native-morning.json": "4f9937544781f889570ad678af175c1a3e478f64528c75b4dcab4ef141847ce5"
+    "voice-compressor-native-morning.json": "4f9937544781f889570ad678af175c1a3e478f64528c75b4dcab4ef141847ce5",
+    "overnight-native-compile-check.json": "1b3fe4bf19f9e11b2680c2a268e69125a4a556d39e2da787f6a895d04a83d7a7"
   },
   "remainingMigration": [
     "Measured-source timestamped multi-voice Graph integration",
@@ -190,5 +192,22 @@
     "Remaining native spatial/RoomColour/enable-bypass/transport seams",
     "Cable editing and full target-device acceptance; normal defaults remain native"
   ],
-  "interruption": "A terminal/session interruption stopped unsaved processes before recovery at07:50; affected source runs and desktop browser verification were rerun from authoritative files."
+  "interruption": "A terminal/session interruption stopped unsaved processes before recovery at07:50; affected source runs and desktop browser verification were rerun from authoritative files.",
+  "nativeCompileCheck": {
+    "pass": true,
+    "target": "x86_64-pc-windows-gnu",
+    "manifests": 7,
+    "report": "overnight-native-compile-check.json",
+    "runtimeExecution": false
+  },
+  "closedAtUtc": "2026-11-11T09:02:18.068Z",
+  "heartbeatStatus": "PAUSED",
+  "cleanup": {
+    "temporaryBrowserTabsClosed": 11,
+    "builtQaHelperExited": true,
+    "viteHelperInterrupted": true,
+    "viteChildProcessesRemaining": 0,
+    "requiredTestAndBuildSessionsExitedWithCodeZero": 5,
+    "preliminaryReportsPreservedIn": ".tmp/overnight-preliminary-reports"
+  }
 }

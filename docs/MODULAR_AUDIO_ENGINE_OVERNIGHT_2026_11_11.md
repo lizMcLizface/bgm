@@ -62,6 +62,16 @@ reviewable rather than weakening validation or changing sounds to force a pass.
 
 ## Checkpoints
 
+- Closed at09:00UTC on11 November2026. Heartbeat is PAUSED; implementation
+  remains frozen at2f6de21. Closing evidence, complete requirement audit, native
+  compile checks, retained negative cases and next task are saved. This closes
+  the bounded run; the normal live migration remains explicitly ongoing.
+
+- Final portability review: cargo check --offline passes for the Graph and six
+  standalone source/preparation crates on installed x86_64-pc-windows-gnu. This
+  is compile-only; no generated native executable was run. The optional MSVC
+  standard library is absent. See overnight-native-compile-check.json.
+
 - 11 November08:30 feature cutoff: implementation is frozen at2f6de21. The
   final broad suite has473 files /3705 passing tests and4 existing audit-only
   skips. Normal public build/provenance passes. Built finite-string12, original

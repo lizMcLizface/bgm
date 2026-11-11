@@ -1,5 +1,18 @@
 # Modular audio engine handoff
 
+Bounded overnight run closed on11 November2026 at09:00UTC. The continuation
+heartbeat is paused. Implementation is frozen at2f6de21; final evidence is
+recorded in overnight-2026-11-11.json and overnight-final-audit.json. Final
+regression:473 files /3705 passing tests,4 existing audit-only skips; public
+build/provenance and accepted desktop native/built-browser batches pass. Seven
+Windows GNU compile-only crate checks also pass.
+
+Next work is described in [the port inventory](MODULAR_AUDIO_ENGINE_PORT_STATUS_2026_11_11.md):
+measured-source graph integration, complete worker room/body routing and native
+host adoption, plus the retained192k compressor precision discrepancy. The
+active VoiceCompressor wrapper remains unaccepted at46/48 native cases.
+All changes are local, and the normal playback defaults are preserved.
+
 Overnight final-code checkpoint (11 November, ~08:20 UTC):
 [the port boundary inventory and next task](MODULAR_AUDIO_ENGINE_PORT_STATUS_2026_11_11.md)
 separate verified portable DSP/preparation from normal application adoption.
