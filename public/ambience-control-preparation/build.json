@@ -1,0 +1,11 @@
+{
+  "api": 1,
+  "profile": "ambience-live-control-preparation-v1",
+  "source": "3a3f741f4e00e9be14401c85409f789aacab529d9a3008509c16f997925ce031",
+  "runtime": "7c720b0881f347e5793196c379124b2324db26578e4448ed18978cdaa900ae6e",
+  "reference": "b7b0b6b8e0a0a079435b7a73ddfff794ed9b23e8ae3fed6d727a42d56487339c",
+  "wasm": "f1226732843f2d347d7330e4094dc46149b89b759850b2a1fe44e0bd5401df97",
+  "bytes": 40756,
+  "audited": false,
+  "version": "64f5ce456738d611"
+}

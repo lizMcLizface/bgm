@@ -1,0 +1,30 @@
+// Offthread live booking forecast. Never run random seeking on an audio callback.
+export const AMBIENCE_CONTROL_PREPARATION_PROFILE='ambience-live-control-preparation-v1';
+const MAX_COMMANDS=4096,validPeriod=p=>typeof p==='number'&&Number.isFinite(p)&&p>=15&&p<=900,validSeconds=t=>typeof t==='number'&&Number.isFinite(t)&&t>=0&&t<=137438953;
+export class OwnedAmbienceControlPreparation{
+ constructor(moduleOrExports,{seed,period,offset=0}){if(!Number.isInteger(seed)||seed<0||seed>0xffffffff||!validPeriod(period)||!Number.isFinite(offset)||offset<0||offset>1e6)throw Error('Invalid live control preparation recipe');this.recipe=Object.freeze({seed,period,offset});this.journal=[];this.pending=null;this.e=moduleOrExports instanceof WebAssembly.Module?new WebAssembly.Instance(moduleOrExports,{}).exports:moduleOrExports;if(this.e.ambience_control_preparation_api()!==1)throw Error('Control preparation ABI mismatch');this.handle=this.e.ambience_control_preparation_new(seed,period,offset);if(!this.handle)throw Error('Control preparation allocation refused');}
+ alive(){if(!this.handle)throw Error('Disposed control preparation');}
+ accept(v){if(!v)throw Error('Control preparation request refused before committed state changed');}
+ capacity(){this.alive();if(this.journal.length>=MAX_COMMANDS)throw Error('Control preparation history capacity');}
+ value(key){this.alive();return this.e.ambience_control_preparation_stat(this.handle,key);}
+ packet(){const min=this.value(18),max=this.value(19);return{id:this.value(16),kind:this.value(17)===1?'first':'refill',minCount:min,maxCount:max,initial:this.value(20),firstIndex:this.value(21),periodAfter:this.value(22),at:this.value(23),points:new Float64Array(this.e.memory.buffer,this.e.ambience_control_preparation_points(this.handle),max*2).slice()};}
+ first(periodAfter=this.stats().period){this.capacity();if(this.pending||!validPeriod(periodAfter))throw Error('Invalid or overlapping first control resource');this.accept(this.e.ambience_control_preparation_first(this.handle,periodAfter));const packet=this.packet();this.pending={id:packet.id,kind:'first',periodAfter};return packet;}
+ refill(now){this.capacity();if(this.pending||!validSeconds(now))throw Error('Invalid or overlapping control refill resource');this.accept(this.e.ambience_control_preparation_refill(this.handle,now));const packet=this.packet();this.pending={id:packet.id,kind:'refill',now};return packet;}
+ commit(id,count,birth){this.alive();if(!this.pending||id!==this.pending.id||!Number.isInteger(count)||count<0||count>256||!validSeconds(birth))throw Error('Invalid control resource acknowledgement');this.accept(this.e.ambience_control_preparation_commit(this.handle,id,count,birth));const p=this.pending;this.pending=null;this.journal.push(p.kind==='first'?{op:'first',periodAfter:p.periodAfter,count,birth}:{op:'refill',now:p.now,count,birth});}
+ cancel(id){this.alive();if(!this.pending||this.pending.id!==id)throw Error('Foreign control resource cancellation');this.accept(this.e.ambience_control_preparation_cancel(this.handle,id));this.pending=null;}
+ setPeriod(value){this.capacity();if(this.pending||!validPeriod(value))throw Error('Control period edit requires the previous resource acknowledgement');this.accept(this.e.ambience_control_preparation_period(this.handle,value));this.journal.push({op:'period',value});}
+ stats(){return Object.fromEntries(['period','offset','birth','nextIndex','randomDraws','revision','committedPlans','lastRefill'].map((n,i)=>[n,this.value(i)]));}
+ reset(){this.alive();this.accept(this.e.ambience_control_preparation_reset(this.handle));this.pending=null;this.journal=[];}
+ save(){this.alive();if(this.pending)throw Error('Acknowledge or cancel the pending control resource before saving');return JSON.stringify({version:1,profile:AMBIENCE_CONTROL_PREPARATION_PROFILE,recipe:this.recipe,commands:this.journal});}
+ static load(moduleOrExports,text){if(typeof text!=='string'||text.length>2*1024*1024)throw Error('Control preparation save byte budget');const s=JSON.parse(text);if(s.version!==1||s.profile!==AMBIENCE_CONTROL_PREPARATION_PROFILE||!Array.isArray(s.commands)||s.commands.length>MAX_COMMANDS)throw Error('Invalid saved control preparation');const p=new OwnedAmbienceControlPreparation(moduleOrExports,s.recipe);try{for(const c of s.commands){if(c.op==='period')p.setPeriod(c.value);else if(c.op==='first'){const resource=p.first(c.periodAfter);p.commit(resource.id,c.count,c.birth);}else if(c.op==='refill'){const resource=p.refill(c.now);p.commit(resource.id,c.count,c.birth);}else throw Error('Unknown saved control operation');}return p;}catch(error){p.dispose();throw error;}}
+ dispose(){if(this.handle){this.e.ambience_control_preparation_free(this.handle);this.handle=0;this.e=null;this.pending=null;}}
+}
+
+// Cold/offthread operation. The returned immutable resource owns its PCM copy.
+export function prepareAmbienceSpatialPhase(moduleOrExports,{sampleRate,wave,period,offset=0}){
+ if(!Number.isInteger(sampleRate)||sampleRate<8000||sampleRate>192000||!Number.isInteger(wave)||wave<0||wave>6||!validPeriod(period)||typeof offset!=='number'||!Number.isFinite(offset)||offset<0||offset>1e6)throw Error('Invalid bounded Ambience phase recipe');
+ const e=moduleOrExports instanceof WebAssembly.Module?new WebAssembly.Instance(moduleOrExports,{}).exports:moduleOrExports;
+ if(e.ambience_control_preparation_api()!==1)throw Error('Control preparation ABI mismatch');
+ const h=e.ambience_control_preparation_phase_new(sampleRate,wave,period,offset);if(!h)throw Error('Ambience phase preparation refused');
+ try{const size=e.ambience_control_preparation_phase_stat(h,6);return Object.freeze({version:1,profile:AMBIENCE_CONTROL_PREPARATION_PROFILE,recipe:Object.freeze({sampleRate,wave,period,offset}),real:e.ambience_control_preparation_phase_stat(h,4),imag:e.ambience_control_preparation_phase_stat(h,5),table:new Float32Array(e.memory.buffer,e.ambience_control_preparation_phase_data(h),size).slice()});}finally{e.ambience_control_preparation_phase_free(h);}
+}
