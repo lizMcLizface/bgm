@@ -325,3 +325,17 @@ offline initial trace, plus a distinct bare-native initialization profile for
 Iowa's limiter. Rack 12 ms target
 automation, parallel mix/makeup, arbitrary native AudioParam scheduling and
 generic transitive AudioBus liveness are separate contracts.
+
+## Diagnostic-only host continuation — 11 November 2026
+
+Host055139af04a38fba adds the rejected operation and global/render/owner frame
+identities to failures. It changes no numeric code, clock, event application or
+rejection policy. The69695-byte Wasm retains SHA-256
+447eeb308ba2023a6e051d0fba08f9b6b307e1091db4604a325f14ba881eee6e.
+The previous undetailed rejection from a normal desk experiment remains
+unreproduced; no speculative clock clamp or skipped control was introduced.
+
+The published provenance check and51 constructor/lifecycle/policy tests pass.
+The actual All dynamics Native/owned/restored run also completes on this host
+(owned-host-dynamics-stamped-first.json in ignored reports). That run checks
+composition/health, not new bit-exact compressor math or a device deadline.
