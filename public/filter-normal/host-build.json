@@ -1,0 +1,24 @@
+{
+  "api": 1,
+  "profile": "native-filter-normal-stamped32-v1",
+  "version": "7ba04d97edc20969",
+  "kernelVersion": "600efc7bac76d264",
+  "wasm": "66a18420423f168ffacba227b46249cd48bdfd45926bc11a94d559da69a8ebf7",
+  "source": "bb2248c5577aeec0b25e580c10911aefea933233f49eb79b6ffc126e45c7d118",
+  "processor": "8b2598257c1ae95bcdec046efd40a2789c7a105531388976671066914ed06e63",
+  "processorName": "native-filter-normal-7ba04d97edc20969",
+  "files": [
+    "src/modular-audio/normalFilterProcessor.js",
+    "src/modular-audio/normalFilterBrowser.js",
+    "src/modular-audio/normalFilterRust.js",
+    "src/modular-audio/normalFilterCalls.js",
+    "src/modular-audio/ownedNormalFilter.js",
+    "src/modular-audio/hostRenderClock.js",
+    "src/modular-audio/rackDynamicsTargetTransport.js",
+    "src/modular-audio/stampedRackTargetTransport.js",
+    "src/modular-audio/normalFilterActivity.js",
+    "src/modular-audio/normalFilterExtra.js",
+    "tools/buildNormalFilterHost.mjs"
+  ],
+  "scope": "Original independent Filter target/property operations; required continuous-program or explicit-activity authority; normal host44100/48000/96000/192000 only, other rates/unknown native flags refused. No default backend selected."
+}

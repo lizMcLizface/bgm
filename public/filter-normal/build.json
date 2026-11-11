@@ -1,0 +1,26 @@
+{
+  "api": 1,
+  "profile": "native-filter-explicit-pulls-v1",
+  "version": "600efc7bac76d264",
+  "source": "6170849dedd6851aadad54bb4d376b285f38ed7ecce5657d4701049409f33bfc",
+  "wasm": "66a18420423f168ffacba227b46249cd48bdfd45926bc11a94d559da69a8ebf7",
+  "bytes": 92236,
+  "audited": false,
+  "notices": "f76bdbeae7a86d239ed107f5e6e1d871cba06136b198adac4f1e41cbb6fd3972",
+  "profileSha256": "0ff513a2bbbbf7f5b0b6f79c6d0cd1119adcacdf6e8b4c1f16414c44bb45ee62",
+  "files": [
+    "tools/buildNormalFilter.mjs",
+    "synth-engine/rack-filter-normal/Cargo.toml",
+    "synth-engine/rack-filter-normal/Cargo.lock",
+    "synth-engine/rack-filter-normal/src/lib.rs",
+    "synth-engine/rack-filter-normal/src/timeline.rs",
+    "synth-engine/rack-filter-normal/src/allocation.rs",
+    "synth-engine/rack-filter-normal/CHROMIUM_NOTICES.txt",
+    "synth-engine/rack-filter-normal/CHROMIUM_PROFILE.json",
+    "synth-engine/rack-native/src/biquad.rs",
+    "synth-engine/rack-native/src/tail.rs",
+    "src/modular-audio/ownedNormalFilter.js",
+    "src/modular-audio/normalFilterCalls.js"
+  ],
+  "scope": "Original five Biquads and independent native control lanes; explicit per-stage audio/parameter-only/unpulled/layout authority. No inferred native silence or automatic default adoption."
+}
