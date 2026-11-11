@@ -50,8 +50,11 @@ instances. Both normal CLASSIC and drum-machine cold score exports pass with
 fresh context-bound owned source/dynamics, nonzero PCM and unchanged settings. Focused component records
 name their exact later artifacts and results. All 43 provenance checks required by the committed public build pass. Two
 reference-only manifests were refreshed with accepted numeric Wasm verified
-byte-identical. The bundled public build and complete final regression will be
-refreshed after the independent candidate sources settle.
+byte-identical. The committed public frontend bundle and public-file checks now pass. Actual
+bundled targeted rack cases and Shimmer48k/cold reconstruction also pass. A
+review coordinator needed an async initialization wrapper to preserve the
+existing ES2020 target; no audio code or browser requirement changed. The next
+full-tree build/regression follows the independent candidate checkpoints.
 
 Next: resolve the remaining Width/Ring/Filter lifecycle gates and adopt only
 verified factories. Motion live and complete Ambience processing are being
