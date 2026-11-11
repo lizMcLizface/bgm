@@ -1,0 +1,31 @@
+{
+  "api": 1,
+  "profile": "native-rack-captured-continuous-v1",
+  "source": "be80de64f03dc7f1dba8f677373e40f48df06fe774d56d7e8b5b582ba8cf782a",
+  "wasm": "dfda798d96d2e2e80af68f10c65a7594f4b74ad5d2fc0385acef68c74f2a8bfb",
+  "version": "89093f53ab94f71c",
+  "bytes": 176343,
+  "audited": false,
+  "files": [
+    "synth-engine/rack-native/Cargo.toml",
+    "synth-engine/rack-native/Cargo.lock",
+    "src/modular-audio/ownedNativeRack.js",
+    "src/modular-audio/nativeRack.worklet.js",
+    "src/modular-audio/ownedNativeRackWorklet.js",
+    "src/modular-audio/hostRenderClock.js",
+    "synth-engine/rack-native/src/lib.rs",
+    "synth-engine/rack-native/src/biquad.rs",
+    "synth-engine/rack-native/src/allocation.rs",
+    "synth-engine/rack-native/CHROMIUM_PROFILE.json",
+    "synth-engine/rack-native/CHROMIUM_NOTICES.txt",
+    "synth-engine/piano-live/src/live_timeline.rs",
+    "synth-engine/piano-live/src/live_sine.rs",
+    "synth-engine/tape-fx/resources/manifest.json"
+  ],
+  "resources": [
+    "synth-engine/tape-fx/resources/chromium-sine-2048.f32",
+    "synth-engine/tape-fx/resources/chromium-sine-4096.f32",
+    "synth-engine/tape-fx/resources/chromium-sine-16384.f32"
+  ],
+  "scope": "Original Width/Filter/Ring inner DSP; fixed logical source layout and continuously pulled canonical clock; captured native-seconds controls; no existing rack/default integration"
+}
