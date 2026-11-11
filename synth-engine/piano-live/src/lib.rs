@@ -1,5 +1,8 @@
 //! Standalone owned normal-live piano/physical-slot source.
 pub mod timeline;
+mod live_timeline;
+mod live_sine;
+mod live_controls;
 pub mod envelope;
 pub mod biquad;
 pub mod engine;

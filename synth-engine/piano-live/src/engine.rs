@@ -5,6 +5,10 @@ use crate::{biquad::Biquad,envelope,timeline::Timeline};
 use crate::control::Control;
 const MAX_BANKS:usize=128;
 const MAX_SOURCES:usize=2000;
+// Original heldPitchPoints: ceil(30*60)+1 grid +64 targets +1 slide.
+const MAX_CURVE_POINTS:usize=1866;
+const MAX_CURVE_CENTS:f64=7272.; // 2400 env +2400 path +2400 slide +60 motion +12 vibrato
+const MAX_TOTAL_CURVE_POINTS:usize=262144;
 const MAX_BYTES:usize=64*1024*1024;
 const Q:usize=128;
 struct LiveControl{wave:Control,initial:f64,target:f64,tau:f64,delay:f64}
@@ -16,11 +20,12 @@ impl LiveControl{
 pub fn source_frame(frame:f64)->u64{((frame*1024.).round()/1024.).ceil().max(0.) as u64}
 pub struct Bank{pub key:u32,pub strike:Vec<f32>,pub body:Vec<f32>,pub frequency:f64,order:u64}
 pub struct Source{
+    live_scalar_started:Option<u64>,live_scalar_value:f32,live_scalar_coefficient:f32,
     pub id:u32,pub bank:usize,pub slot:usize,pub owner:u32,pub onset:f64,pub stop:f64,
     pub pitch:f64,pub pitch_tau:f64,pub curve:Vec<(f64,f64)>,pub pitch_connected:bool,
-    frame:u64,position:f64,body_position:f64,started:bool,finished:bool,
+    frame:u64,position:f64,body_position:f64,started:bool,finished:bool,curve_initialized:bool,
 }
-impl Default for Source{fn default()->Self{Self{id:0,bank:0,slot:0,owner:0,onset:0.,stop:0.,pitch:0.,pitch_tau:1.,curve:Vec::new(),pitch_connected:false,frame:0,position:0.,body_position:0.,started:false,finished:true}}}
+impl Default for Source{fn default()->Self{Self{live_scalar_started:None,live_scalar_value:0.,live_scalar_coefficient:0.,id:0,bank:0,slot:0,owner:0,onset:0.,stop:0.,pitch:0.,pitch_tau:1.,curve:Vec::new(),pitch_connected:false,frame:0,position:0.,body_position:0.,started:false,finished:true,curve_initialized:false}}}
 pub struct Slot{
     pub gain:Timeline,pub detune:Timeline,pub frequency:Timeline,pub q:Timeline,
     pub filter_gain:Timeline,pub volume:Timeline,pub kind:u32,pub awake:bool,
@@ -32,6 +37,8 @@ impl Slot{
     fn prune(&mut self,now:f64){for t in [&mut self.gain,&mut self.detune,&mut self.frequency,&mut self.q,&mut self.filter_gain,&mut self.volume]{t.prune(now);}}
 }
 pub struct Engine{
+    live_history:bool,
+    live_controls:Option<Box<crate::live_controls::LiveControls>>,
     pub sr:f64,pub slots:Vec<Slot>,banks:Vec<Option<Bank>>,sources:Vec<Source>,
     pub air:crate::air::Air,bytes:usize,order:u64,frame:Option<u64>,owner:u32,controls:Vec<LiveControl>,control_origin:f64,
     pub output:[[f32;2];Q],starts:u64,stops:u64,rejected:u64,late:u64,skipped:u64,peak:f64,
@@ -44,16 +51,22 @@ fn interpolation(samples:&[f32],position:f64,looped:bool)->f32{
     else if looped{((1.-part)*a+part*samples[0] as f64) as f32}
     else if i>0{(a+(a-samples[i-1] as f64)*part) as f32}else{a as f32}
 }
-fn curve_at(points:&[(f64,f64)],time:f64)->f64{
+fn curve_at(points:&[(f64,f64)],time:f64,onset:f64,sr:f64)->f64{
     let at=points.partition_point(|p|p.0<=time);
     if at==0{return points[0].1;}if at==points.len(){return points[at-1].1;}
-    let a=points[at-1];let b=points[at];a.1+(b.1-a.1)*(time-a.0)/(b.0-a.0)
+    let a=points[at-1];let b=points[at];
+    // Actual native one-value (k-rate) ProcessLinearRamp arithmetic.
+    let time1=(onset+a.0)/sr;let time2=(onset+b.0)/sr;let delta=time2-time1;
+    let k=if delta<=f32::MIN_POSITIVE as f64{0.}else{(1./delta) as f32};
+    let value_delta=b.1 as f32-a.1 as f32;let x=(((onset+time)/sr-time1)*k as f64) as f32;
+    (a.1 as f32+x*value_delta) as f64
 }
 impl Engine{
     pub fn new(sr:f64,voices:usize)->Option<Self>{
         if !sr.is_finite()||!(8000. ..=192000.).contains(&sr)||!(1..=32).contains(&voices){return None;}
-        Some(Self{sr,slots:(0..voices).map(|_|Slot::new(sr)).collect(),banks:(0..MAX_BANKS).map(|_|None).collect(),sources:(0..MAX_SOURCES).map(|_|Source::default()).collect(),air:crate::air::Air::new(sr,voices),bytes:(sr*2.) as usize*4,order:0,frame:None,owner:0,controls:Vec::with_capacity(4),control_origin:0.,output:[[0.;2];Q],starts:0,stops:0,rejected:0,late:0,skipped:0,peak:0.})
+        Some(Self{live_history:false,live_controls:None,sr,slots:(0..voices).map(|_|Slot::new(sr)).collect(),banks:(0..MAX_BANKS).map(|_|None).collect(),sources:(0..MAX_SOURCES).map(|_|Source::default()).collect(),air:crate::air::Air::new(sr,voices),bytes:(sr*2.) as usize*4,order:0,frame:None,owner:0,controls:Vec::with_capacity(4),control_origin:0.,output:[[0.;2];Q],starts:0,stops:0,rejected:0,late:0,skipped:0,peak:0.})
     }
+    pub fn enable_live_history(&mut self)->bool{if self.frame.is_some()||self.sources.iter().any(|s|s.id!=0){return false;}for slot in &mut self.slots{for t in [&mut slot.gain,&mut slot.detune,&mut slot.frequency,&mut slot.q,&mut slot.filter_gain,&mut slot.volume]{t.enable_live();}}self.air.enable_live_history();self.live_history=true;true}
     pub fn has_bank(&self,key:u32)->bool{self.banks.iter().any(|b|b.as_ref().is_some_and(|b|b.key==key))}
     fn pinned(&self,index:usize)->bool{self.sources.iter().any(|s|s.id!=0&&!s.finished&&s.bank==index)}
     pub fn bank(&mut self,key:u32,frequency:f64,strike:Vec<f32>,body:Vec<f32>)->bool{
@@ -68,7 +81,11 @@ impl Engine{
         let index=self.banks.iter().position(Option::is_none).unwrap();self.order+=1;
         self.banks[index]=Some(Bank{key,strike,body,frequency,order:self.order});self.bytes+=bytes;true
     }
+    pub fn live_modulation(&mut self,origin:f64,captures:Vec<crate::live_controls::Capture>)->bool{if !self.controls.is_empty(){return false;}if let Some(controls)=&mut self.live_controls{return controls.update(origin,captures);}let mut controls=Box::new(crate::live_controls::LiveControls::new(self.sr));if controls.update(origin,captures){self.live_controls=Some(controls);true}else{false}}
+    pub fn live_control_sample(&self,id:usize,index:usize)->f64{self.live_controls.as_ref().filter(|_|id<4&&index<128).map_or(f64::NAN,|c|c.output[id][index]as f64)}
+    pub fn live_control_phase(&self,id:usize)->f64{self.live_controls.as_ref().map_or(f64::NAN,|c|c.phase(id))}
     pub fn controls(&mut self,origin:f64,controls:Vec<(Control,f64)>)->bool{
+        if self.live_controls.is_some(){return false;}
         if !origin.is_finite()||origin<0.||controls.len()>4||controls.iter().any(|(c,_)|!c.valid()||c.kind==1&&(c.points.len()<2||c.points[0].0!=0.)||c.points.len()>128||c.points.iter().any(|p|!p.0.is_finite()||p.0<0.||!p.1.is_finite()||if c.kind==0{!(0. ..=44100.).contains(&p.1)}else{p.1.abs()>1.2+f64::EPSILON})||c.points.windows(2).any(|p|p[0].0>=p[1].0)){return false;}
         let Some(controls)=controls.into_iter().map(|(c,delay)|LiveControl::new(c,delay,self.sr)).collect::<Option<Vec<_>>>()else{return false;};self.controls=controls;self.control_origin=origin;true
     }
@@ -91,12 +108,14 @@ impl Engine{
     }
     #[allow(clippy::too_many_arguments)]
     pub fn schedule(&mut self,key:u32,id:u32,owner:u32,slot:usize,onset:f64,fade:Option<f64>,gain:&[(f64,f64)],filter:&[(u32,f64,f64,f64)],pitch:f64,pitch_tau:f64,curve:Vec<(f64,f64)>,pitch_connected:bool,breath:f64,formant:f64,duration:f64)->bool{
-        if !breath.is_finite()||!(0. ..=1.).contains(&breath)||!formant.is_finite()||!(0. ..=1.).contains(&formant)||!duration.is_finite()||!(0. ..=self.sr*630.).contains(&duration)||id==0||owner==0||self.owner!=0&&self.owner!=owner||slot>=self.slots.len()||!onset.is_finite()||onset<0.||!pitch.is_finite()||pitch.abs()>2400.||!pitch_tau.is_finite()||pitch_tau<self.sr*0.001||gain.len()<2||gain.len()>256||gain[0].0!=0.||gain.last().unwrap().1!=0.||gain.iter().any(|p|!p.0.is_finite()||!(0. ..=self.sr*630.).contains(&p.0)||!p.1.is_finite()||p.1.abs()>4.)||gain.windows(2).any(|p|p[0].0>=p[1].0)||filter.is_empty()||filter.len()>128||filter[0].0!=0||filter[0].1!=0.||filter.iter().any(|p|p.0>2||!p.1.is_finite()||p.1<0.||!p.2.is_finite()||p.2.abs()>24000.||!p.3.is_finite()||p.0==2&&p.3<self.sr*0.00001)||filter.windows(2).any(|p|p[0].1>p[1].1)||!curve.is_empty()&&curve[0].0!=0.||curve.len()>128||curve.iter().any(|p|!p.0.is_finite()||p.0<0.||!p.1.is_finite()||p.1.abs()>2400.)||curve.windows(2).any(|p|p[0].0>=p[1].0)||fade.is_some_and(|f|!f.is_finite()||f<0.||f>onset){self.rejected+=1;return false;}
+        if !breath.is_finite()||!(0. ..=1.).contains(&breath)||!formant.is_finite()||!(0. ..=1.).contains(&formant)||!duration.is_finite()||!(0. ..=self.sr*630.).contains(&duration)||id==0||owner==0||self.owner!=0&&self.owner!=owner||slot>=self.slots.len()||!onset.is_finite()||onset<0.||!pitch.is_finite()||pitch.abs()>2400.||!pitch_tau.is_finite()||pitch_tau<self.sr*0.001||gain.len()<2||gain.len()>256||gain[0].0!=0.||gain.last().unwrap().1!=0.||gain.iter().any(|p|!p.0.is_finite()||!(0. ..=self.sr*630.).contains(&p.0)||!p.1.is_finite()||p.1.abs()>4.)||gain.windows(2).any(|p|p[0].0>=p[1].0)||filter.is_empty()||filter.len()>128||filter[0].0!=0||filter[0].1!=0.||filter.iter().any(|p|p.0>2||!p.1.is_finite()||p.1<0.||!p.2.is_finite()||p.2.abs()>24000.||!p.3.is_finite()||p.0==2&&p.3<self.sr*0.00001)||filter.windows(2).any(|p|p[0].1>p[1].1)||!curve.is_empty()&&curve[0].0!=0.||curve.len()>MAX_CURVE_POINTS||curve.iter().any(|p|!p.0.is_finite()||p.0<0.||!p.1.is_finite()||p.1.abs()>MAX_CURVE_CENTS)||curve.windows(2).any(|p|p[0].0>=p[1].0)||fade.is_some_and(|f|!f.is_finite()||f<0.||f>onset){self.rejected+=1;return false;}
         let Some(bank)=self.banks.iter().position(|b|b.as_ref().is_some_and(|b|b.key==key))else{self.rejected+=1;return false;};
         if self.sources.iter().any(|s|s.id==id&&!s.finished)||self.air.has_id(id){self.rejected+=1;return false;}
         let Some(index)=self.sources.iter().position(|s|s.id==0||s.finished)else{self.rejected+=1;return false;};
+        let retained_curve_points:usize=self.sources.iter().map(|source|source.curve.len()).sum();
+        if retained_curve_points-self.sources[index].curve.len()+curve.len()>MAX_TOTAL_CURVE_POINTS{self.rejected+=1;return false;}
         let now=self.frame.unwrap_or(0) as f64;if !self.air.can_schedule(slot,now.min(onset),breath){return false;}let s=&mut self.slots[slot];s.prune(now.min(fade.unwrap_or(onset)));
-        if s.gain.len()+gain.len()+4>4096||s.detune.len()+filter.len()+2>2048{self.rejected+=1;return false;}
+        if !s.gain.can_add(gain.len()+4)||!s.detune.can_add(filter.len()+2){self.rejected+=1;return false;}
         if let Some(fade)=fade{if !s.gain.hold(fade)||!s.gain.add(fade,2,0.,self.sr*0.002){return false;}}
         else{s.gain.cancel(onset);}
         if !s.gain.add(onset,0,gain[0].1,0.){return false;}
@@ -104,14 +123,14 @@ impl Engine{
         s.detune.cancel(onset);
         for &(kind,time,value,tau) in filter{if !s.detune.add(onset+time,kind,value,tau){return false;}}
         self.stop_slot(slot,onset);
-        self.sources[index]=Source{id,bank,slot,owner,onset,stop:onset+gain.last().unwrap().0,pitch:pitch as f32 as f64,pitch_tau,curve:curve.into_iter().map(|(t,v)|(t,v as f32 as f64)).collect(),pitch_connected,frame:source_frame(onset),position:0.,body_position:0.,started:false,finished:false};
+        self.sources[index]=Source{live_scalar_started:None,live_scalar_value:0.,live_scalar_coefficient:(1.-(-128./((pitch_tau/self.sr)as f32 as f64*self.sr)).exp())as f32,id,bank,slot,owner,onset,stop:onset+gain.last().unwrap().0,pitch:pitch as f32 as f64,pitch_tau,curve:curve.into_iter().map(|(t,v)|(t,v as f32 as f64)).collect(),pitch_connected,frame:source_frame(onset),position:0.,body_position:0.,started:false,finished:false,curve_initialized:false};
         if self.frame.is_some_and(|f|source_frame(onset)<f){self.late+=1;}
         self.air.schedule(id,slot,onset,onset+duration.max(gain.last().unwrap().0),duration,self.banks[bank].as_ref().unwrap().frequency,breath,formant);
         self.owner=owner;self.order+=1;self.banks[bank].as_mut().unwrap().order=self.order;true
     }
     pub fn release(&mut self,slot:usize,time:f64,seconds:f64,shape:u32,exponent:f64,filter_offset:f64,filter_tau:f64)->bool{
         if slot>=self.slots.len()||!time.is_finite()||time<0.||!seconds.is_finite()||!(0. ..=30.).contains(&seconds)||shape>11||!exponent.is_finite()||!(0.1..=4.).contains(&exponent)||!filter_offset.is_finite()||filter_offset.abs()>24000.||!filter_tau.is_finite()||filter_tau<self.sr*0.00001{return false;}
-        let now=self.frame.unwrap_or(0) as f64;let s=&mut self.slots[slot];s.prune(now.min(time));if s.gain.len()+52>4096||s.detune.len()+3>2048{return false;}
+        let now=self.frame.unwrap_or(0) as f64;let s=&mut self.slots[slot];s.prune(now.min(time));if !s.gain.can_add(52)||!s.detune.can_add(3){return false;}
         // Measured native AudioParam.value is the preceding rendered Float32
         // sample. Rust owns this value; no pulled native ledger is required.
         let level=s.gain_value_at(time) as f64;let seconds=seconds.max(0.005);let frames=seconds*self.sr;let count=envelope::segments(seconds,shape);
@@ -122,21 +141,31 @@ impl Engine{
     }
     pub fn silence(&mut self,time:f64)->bool{
         if !time.is_finite()||time<0.{return false;}
+        if self.live_history&&self.slots.iter().any(|s|!s.gain.can_add(4)){return false;}
         for slot in 0..self.slots.len(){let s=&mut self.slots[slot];s.prune((self.frame.unwrap_or(0) as f64).min(time));if !s.gain.hold(time)||!s.gain.add(time,2,0.,self.sr*0.05){return false;}self.stop_slot(slot,time+self.sr*0.3);}
         true
     }
     pub fn cancel(&mut self,owner:u32){if owner!=0&&self.owner!=owner{return;}self.air.cancel();for source in &mut self.sources{source.finished=true;}for slot in &mut self.slots{slot.filter.clear();slot.last_gain=0.;}}
-    pub fn reset(&mut self){self.cancel(0);self.air.reset();for slot in &mut self.slots{slot.gain.reset(0.);slot.detune.reset(0.);slot.history.fill((u64::MAX,0.));for t in [&mut slot.frequency,&mut slot.q,&mut slot.filter_gain,&mut slot.volume]{let latest=t.latest_target();t.reset(latest);}}self.frame=None;self.owner=0;self.starts=0;self.stops=0;self.late=0;self.skipped=0;}
+    pub fn reset(&mut self){self.cancel(0);if let Some(c)=&mut self.live_controls{c.reset();}self.air.reset();for slot in &mut self.slots{slot.gain.reset(0.);slot.detune.reset(0.);slot.history.fill((u64::MAX,0.));for t in [&mut slot.frequency,&mut slot.q,&mut slot.filter_gain,&mut slot.volume]{let latest=t.latest_target();t.reset(latest);}}self.frame=None;self.owner=0;self.starts=0;self.stops=0;self.late=0;self.skipped=0;}
     pub fn render(&mut self,frame:u64)->bool{
         if frame%Q as u64!=0||self.frame.is_some_and(|f|frame<f){return false;}
         if let Some(expected)=self.frame{self.skipped+=frame-expected;}
-        let mut signal=[[0f32;Q];32];let mut pitch_control=0.;
+        if let Some(c)=&mut self.live_controls{c.prepare(frame,self.slots.iter().any(|s|s.awake));}
+        let mut signal=[[0f32;Q];32];let mut pitch_control=self.live_controls.as_ref().map_or(0.,|c|c.sum(0,0)as f64);
         for control in &self.controls{if control.wave.axis==0{pitch_control+=control.at(frame as f64-self.control_origin,self.sr);}}
         for source in &mut self.sources{
             if source.id==0||source.finished||!self.slots[source.slot].awake||source.frame>=frame+Q as u64{continue;}
             let bank=self.banks[source.bank].as_ref().unwrap();let body_rate=(bank.frequency*2048./self.sr) as f32 as f64;
             let target_start=source_frame(source.onset).div_ceil(Q as u64)*Q as u64;
-            let intrinsic=if frame<target_start{0.}else if !source.curve.is_empty(){curve_at(&source.curve,frame as f64-source.onset)}else{source.pitch*(-((frame-target_start) as f64)/source.pitch_tau).exp()};
+            if frame>=target_start&&!source.curve.is_empty()&&!source.curve_initialized{
+                // Native new events in the past clamp only on first evaluation.
+                // Keep future endpoint times unchanged; stable equal-time order
+                // is preserved by partition_point in curve_at.
+                let first=frame as f64-source.onset;
+                for point in &mut source.curve{point.0=point.0.max(first);}
+                source.curve_initialized=true;
+            }
+            let intrinsic=if frame<target_start{0.}else if !source.curve.is_empty(){curve_at(&source.curve,frame as f64-source.onset,source.onset,self.sr)}else if self.live_history{if source.live_scalar_started.is_none(){source.live_scalar_started=Some(frame);source.live_scalar_value=source.pitch as f32;}else{source.live_scalar_value+=(0.-source.live_scalar_value)*source.live_scalar_coefficient;}let start=source.live_scalar_started.unwrap()as f64/self.sr;let tau=(source.pitch_tau/self.sr)as f32 as f64;if frame as f64/self.sr>start+10.*tau||source.live_scalar_value.abs()<4.539992976248485e-5{source.live_scalar_value=0.;}source.live_scalar_value as f64}else{source.pitch*(-((frame-target_start) as f64)/source.pitch_tau).exp()};
             let detune=(intrinsic as f32+(if source.pitch_connected{pitch_control as f32}else{0.})) as f64;
             let rate=2f64.powf(detune/1200.).min(1024.);let combined_body_rate=(rate*body_rate).min(1024.);
             let stop=source_frame(source.stop);let strike_stop=source_frame((source.onset+bank.strike.len() as f64).min(source.stop));
@@ -148,17 +177,19 @@ impl Engine{
             }
         }
         let mut awake=[false;32];for(i,slot)in self.slots.iter().enumerate(){awake[i]=slot.awake;}let air=self.air.render(frame,&awake);
+        for slot in &mut self.slots{if slot.awake{for t in [&mut slot.gain,&mut slot.detune,&mut slot.frequency,&mut slot.q,&mut slot.filter_gain,&mut slot.volume]{t.prepare_live(frame,self.sr);}}}
         self.peak=0.;
-        for i in 0..Q{let now=(frame+i as u64) as f64;let mut filter_control=0.;for control in &self.controls{if control.wave.axis==1{filter_control+=control.at(now-self.control_origin,self.sr);}}
+        for i in 0..Q{let now=(frame+i as u64) as f64;let mut filter_control=self.live_controls.as_ref().map_or(0.,|c|c.sum(1,i)as f64);for control in &self.controls{if control.wave.axis==1{filter_control+=control.at(now-self.control_origin,self.sr);}}
             let mut sum=0f32;for (index,slot) in self.slots.iter_mut().enumerate(){if !slot.awake{continue;}
-                let amplitude=slot.gain.at(now) as f32;slot.last_gain=amplitude;let input=(signal[index][i]*2.5f32+air[index][i])*amplitude;
-                let detune=slot.detune.at(now) as f32+filter_control as f32;slot.last_detune=detune;
-                let hz=(slot.frequency.at(now).clamp(0.,self.sr/2.)*2f64.powf(detune as f64/1200.)).clamp(0.,self.sr/2.);
-                let y=slot.filter.sample(input,slot.kind,hz,slot.q.at(now).max(0.),slot.filter_gain.at(now),self.sr);
-                sum+=y*slot.volume.at(now) as f32;
+                let amplitude=slot.gain.sample(i,now) as f32;slot.last_gain=amplitude;let input=(signal[index][i]*2.5f32+air[index][i])*amplitude;
+                let detune=slot.detune.sample(i,now) as f32+filter_control as f32;slot.last_detune=detune;
+                let hz=(slot.frequency.sample(i,now).clamp(0.,self.sr/2.)*2f64.powf(detune as f64/1200.)).clamp(0.,self.sr/2.);
+                let y=slot.filter.sample(input,slot.kind,hz,slot.q.sample(i,now).max(0.),slot.filter_gain.sample(i,now),self.sr);
+                sum+=y*slot.volume.sample(i,now) as f32;
             }self.output[i]=[sum,sum];self.peak=self.peak.max(sum.abs() as f64);
         }
         for slot in &mut self.slots{slot.filter.end_quantum();slot.history[(frame/Q as u64) as usize%128]=(frame+127,slot.last_gain); }self.frame=Some(frame+Q as u64);true
     }
-    pub fn stat(&self,index:u32)->f64{match index{0=>self.sources.iter().filter(|s|s.id!=0&&!s.finished&&s.started).count() as f64,4=>self.frame.unwrap_or(0) as f64,5=>self.peak,8=>self.sources.iter().filter(|s|s.id!=0&&!s.finished&&!s.started).count() as f64,9=>self.banks.iter().filter(|b|b.is_some()).count() as f64,10=>self.bytes as f64,11=>self.rejected as f64,12=>self.starts as f64,13=>self.stops as f64,14=>self.late as f64,15=>self.skipped as f64,_=>0.}}
+    pub fn source_position(&self,id:u32)->f64{self.sources.iter().find(|source|source.id==id).map_or(f64::NAN,|source|source.position)}
+    pub fn stat(&self,index:u32)->f64{match index{0=>self.sources.iter().filter(|s|s.id!=0&&!s.finished&&s.started).count() as f64,4=>self.frame.unwrap_or(0) as f64,5=>self.peak,8=>self.sources.iter().filter(|s|s.id!=0&&!s.finished&&!s.started).count() as f64,9=>self.banks.iter().filter(|b|b.is_some()).count() as f64,10=>self.bytes as f64,11=>self.rejected as f64,12=>self.starts as f64,13=>self.stops as f64,14=>self.late as f64,15=>self.skipped as f64,16=>self.sources.iter().map(|source|source.curve.len()).sum::<usize>() as f64,17=>MAX_TOTAL_CURVE_POINTS as f64,_=>0.}}
 }

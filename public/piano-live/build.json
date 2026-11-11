@@ -1,10 +1,10 @@
 {
   "api": 1,
-  "source": "4652f93654097fa7a5d9072efdc3dc706fd543a9f962debee85c39af6819ffdb",
-  "runtime": "c4b0166ff9256a617877381a52a0c8605ff10a17fb6950de5747f5d43c257cfa",
-  "reference": "81b0a5b00f734c8ee0fabebbcd595d2f21f42825237e3a9d4a9adefec961bc77",
-  "wasm": "13eb190cc34bd29644ba000c492a172e98e01de1f3562b6d31360c86f4bc78b2",
-  "bytes": 128970,
+  "source": "db2aac863a8b44cc4d4b18fe80229f4137d9bfe050885049d88603c395c098ca",
+  "runtime": "085496ef90553b23595de8f9cf6b5c9a6bd80b94436f8b9884a552d69b1fdd4e",
+  "reference": "f0f203c3d1416358d9485d31470f45fa88b9024869241f2aa7ff27ed542f80b3",
+  "wasm": "809dc82c710d67635002ec8145f6870da4ddbb89e229d0ca2a2b570744fcf308",
+  "bytes": 253652,
   "audited": false,
-  "version": "b8218433f5d8ab11"
+  "version": "bad5608d6a8cee9b"
 }

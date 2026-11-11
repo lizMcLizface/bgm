@@ -17,6 +17,35 @@
       "file": "third_party/blink/renderer/modules/webaudio/audio_buffer_source_handler.cc",
       "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_buffer_source_handler.cc",
       "sha256": "b1e4196939823fcd8cfbb32cb50d1e29d41a1a81bb7b132e3993e738f0b7621d"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/audio_param_handler.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_param_handler.cc",
+      "sha256": "50e6da5e2efa1254d05393ca03bae373b8a329e400d85b3f6cafd8ec3896ad8b"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/oscillator_handler.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/oscillator_handler.cc",
+      "bytes": 29147,
+      "sha256": "a34fc0842181483ae6a7cdc9db393987b1535206afb56ce0ad033bdd79dd6d68"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/periodic_wave_handler.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/periodic_wave_handler.cc",
+      "bytes": 17076,
+      "sha256": "940a3fadb8f63d8e8944ed60fa76a3740638f9f8820c6de6ab3ee07c87ff2a35"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/periodic_wave_handler.h",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/periodic_wave_handler.h",
+      "bytes": 5125,
+      "sha256": "2dd142876f7710eb19d2d435cda2f7a27abc002d98dc8794438097d907433ddd"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/oscillator_handler.h",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/oscillator_handler.h",
+      "bytes": 8087,
+      "sha256": "36e17b85f27b90c39fd0cc8cf0d97e123842ae1309160415934f7a8688e2ace6"
     }
   ]
 }

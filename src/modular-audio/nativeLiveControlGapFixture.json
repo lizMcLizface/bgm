@@ -1,0 +1,38 @@
+{
+  "scope": "Actual independent native LFO taps during complete-route unplug from plucked-live-pull-gap-first.json. Pitch starts440Hz and receives native future6.5Hz setter at48frames; filter0.8Hz. No inferred/fitted sample positions.",
+  "rate": 48000,
+  "gapStart": 12288,
+  "gapEnd": 24576,
+  "points": [
+    {
+      "frame": 12160,
+      "pitch": 1.9306817054748535,
+      "filter": 191.22006225585938
+    },
+    {
+      "frame": 12287,
+      "pitch": 2.297231912612915,
+      "filter": 191.9825897216797
+    },
+    {
+      "frame": 24576,
+      "pitch": 2.300018310546875,
+      "filter": 191.9884490966797
+    },
+    {
+      "frame": 24577,
+      "pitch": 2.302802324295044,
+      "filter": 191.9943389892578
+    },
+    {
+      "frame": 24704,
+      "pitch": 2.6421010494232178,
+      "filter": 192.72235107421875
+    },
+    {
+      "frame": 28672,
+      "pitch": -3.2677719593048096,
+      "filter": 197.9031219482422
+    }
+  ]
+}

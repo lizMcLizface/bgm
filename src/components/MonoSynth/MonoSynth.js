@@ -937,7 +937,7 @@ class MonoSynth {
     }
 
     // Parameter setters - apply to all oscillators
-    setVolume = (val) => { this.configuredVolume = clamp(val, 0, 1); this.volume.setGain(this.configuredVolume); this.ownedPianoSource?.sync(); };
+    setVolume = (val) => { this.configuredVolume = clamp(val, 0, 1); this.volume.setGain(this.configuredVolume); (this.ownedBufferSource ?? this.ownedPianoSource)?.sync(); };
     setWaveform = (type) => {
         // Handle "off" waveform by setting gain to 0 instead of changing oscillator type
         if (type === 'off') {
@@ -1147,10 +1147,10 @@ class MonoSynth {
         }
     };
     
-    setFilterType = (val) => { this.filter.setType(val); this.ownedPianoSource?.sync(); };
-    setFilterFreq = (val) => { this.filter.setFreq(val); this.ownedPianoSource?.sync(); };
-    setFilterQ = (val) => { this.filter.setQ(val); this.ownedPianoSource?.sync(); };
-    setFilterGain = (val) => { this.filter.setGain(val); this.configuredFilterGain = val; this.ownedPianoSource?.sync(); };
+    setFilterType = (val) => { this.filter.setType(val); (this.ownedBufferSource ?? this.ownedPianoSource)?.sync(); };
+    setFilterFreq = (val) => { this.filter.setFreq(val); (this.ownedBufferSource ?? this.ownedPianoSource)?.sync(); };
+    setFilterQ = (val) => { this.filter.setQ(val); (this.ownedBufferSource ?? this.ownedPianoSource)?.sync(); };
+    setFilterGain = (val) => { this.filter.setGain(val); this.configuredFilterGain = val; (this.ownedBufferSource ?? this.ownedPianoSource)?.sync(); };
     
     // Noise-related methods
     setNoiseType = (type) => {
@@ -1492,7 +1492,8 @@ class MonoSynth {
         this.voiceId = ++this.voiceIdCounter;
 
         const { gainPoints, filterEvents, portamentoSpeed = 0 } = plan;
-        const owned = !!this.ownedPianoSource && !!plan.piano;
+        const ownedSource = plan.piano ? this.ownedPianoSource : plan.string ? this.ownedPluckedSource : null;
+        const owned = !!ownedSource;
         const gain = this.gain.getNode().gain;
         const detune = this.filter.getNode().detune;
 
@@ -1514,7 +1515,8 @@ class MonoSynth {
         this.modelGate.gain.cancelScheduledValues(attackStart);
         this.modelGate.gain.setValueAtTime(plan.string || plan.piano ? 0 : 1, attackStart);
         if (owned) {
-            this.ownedPianoSource.schedule(noteInfo, plan, attackStart, fadeStart);
+            if (plan.sourceBooking) plan.sourceBooking.committedOnsetFrame = attackStart * this.AC.sampleRate;
+            ownedSource.schedule(noteInfo, plan, attackStart, fadeStart);
             this.applyNotePitch(noteInfo, portamentoSpeed, attackStart);
             return;
         }
@@ -1569,7 +1571,7 @@ class MonoSynth {
     }
 
     stopStrings(time = this.AC.currentTime, preparingOwned = false) {
-        if (!preparingOwned) this.ownedPianoSource?.stop(time);
+        if (!preparingOwned) (this.ownedBufferSource ?? this.ownedPianoSource)?.stop(time);
         this.breathFormants?.stop(time);
         for (const item of this.stringSources || []) {
             const stop = Math.max(item.start, time);

@@ -1,0 +1,14 @@
+{
+  "api": 1,
+  "materials": [
+    "piano",
+    "plucked"
+  ],
+  "source": "db2aac863a8b44cc4d4b18fe80229f4137d9bfe050885049d88603c395c098ca",
+  "runtime": "dd74cc5b356abdb589a666aafd31c2e5cdafda7a8eb1319d4094e9035c24ae4c",
+  "reference": "7d71862c42ffa4461bc306d9e530bcfe9910a17456a35d02b827abc64ed6ea0b",
+  "wasm": "809dc82c710d67635002ec8145f6870da4ddbb89e229d0ca2a2b570744fcf308",
+  "bytes": 253652,
+  "audited": false,
+  "version": "9fa27c4a74eebd6f"
+}
