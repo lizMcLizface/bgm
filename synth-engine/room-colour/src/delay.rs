@@ -18,6 +18,15 @@ impl Delay {
         self.ring.iter_mut().for_each(|v| v.fill(0.));
         self.at = 0;
     }
+    /// Native DelayHandler remaps the entire history and retains its write index
+    /// when CheckNumberOfChannelsForInput changes the logical layout.
+    pub fn layout(&mut self, previous:usize, next:usize) {
+        if previous==2 && next==1 {
+            for i in 0..self.ring[0].len(){let left=self.ring[0][i]*0.5;self.ring[0][i]=self.ring[1][i].mul_add(0.5,left);}
+        } else if previous==1 && next==2 {
+            let [left,right]=&mut self.ring;right.copy_from_slice(left);
+        }
+    }
     pub fn tick(&mut self, input: [f32; 2], seconds: [f32; 2]) -> [f32; 2] {
         let length = self.ring[0].len();
         for ch in 0..2 {

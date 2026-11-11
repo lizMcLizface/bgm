@@ -1,9 +1,12 @@
 {
   "api": 1,
   "profile": "chromium-room-colour-f32-128-target-v1",
+  "activityProfile": "chromium-room-colour-authored-activity-f32-128-v2",
+  "maxActivityEvents": 256,
+  "activityOutputRouting": "fixed-speaker",
   "audited": false,
-  "source": "278d8f8f2153f9ca2cedfd11c6086c157d94f11fb30bd9d4412aa48aa5601d61",
-  "wasm": "f351bab1dfdc5e5227e1df29448425c67b37d03b8705b66801994d9997761802",
-  "bytes": 69036,
-  "version": "776154307b5a68e7"
+  "source": "53b88beaaa371bd989689be3a783196302489bf73a3e7f50d73461ac9176ca51",
+  "wasm": "70084ec1695c78e01ab999805f64c881d3fd176d23e525014872e8b4f5dc0f3a",
+  "bytes": 71087,
+  "version": "ab1c6fe4510757e4"
 }

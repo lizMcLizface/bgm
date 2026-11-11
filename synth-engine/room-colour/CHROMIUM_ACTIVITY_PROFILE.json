@@ -1,0 +1,26 @@
+{
+  "kind": "room-colour.authored-activity-reference",
+  "version": 1,
+  "revision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+  "scope": "Explicit source layout and separate audio/parameter-only clocks. Delay channel changes remap history and retain write index; Biquad channel changes discard kernels and reinitialize history. Native silence flags are not inferred from float samples; output fixed-max speaker mapping is explicit. Existing BSD notices apply.",
+  "sources": [
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/audio_handler.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_handler.cc",
+      "bytes": 21159,
+      "sha256": "37dd5f0b367b18db123e12193ad7f2e71fde99d63aaded84f7017e77a07b8d9b"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/biquad_filter_handler.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/biquad_filter_handler.cc",
+      "bytes": 19914,
+      "sha256": "a54076a7202eecd1e131f73e8111af7668e360910e8982badbd72d3566762a95"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/delay_handler.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/delay_handler.cc",
+      "bytes": 8240,
+      "sha256": "c9ec54f8a5072542668ef3ae0038a4c3338cf0ec225fe7226df5b9916eb96b1b"
+    }
+  ]
+}

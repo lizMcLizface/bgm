@@ -67,6 +67,14 @@ impl Engine {
   if (0..self.input_channels).any(|ch|self.input[ch][..n].iter().any(|x|!x.is_finite())){self.rejected+=1;return false;}
   self.peak=0.;for i in 0..n{let value=self.tick([self.input[0][i],self.input[1][i]]);for ch in 0..2{self.output[ch][i]=value[ch];self.peak=self.peak.max(value[ch].abs());}}true
  }
+ /// Chromium AudioBus speaker downmix: ordered half-left then half-right.
+ /// This is explicit post-colour routing, not an implicit source-channel change.
+ pub fn render_stereo_to_mono(&mut self,n:usize)->bool{
+  if self.input_channels!=1||!self.prepared||n>BLOCK||self.frame.checked_add(n as u64).is_none_or(|v|v>9007199254740991){return false;}
+  if self.input.iter().any(|ch|ch[..n].iter().any(|x|!x.is_finite())){self.rejected+=1;return false;}
+  for i in 0..n{let left=self.input[0][i]*0.5;self.input[0][i]=self.input[1][i].mul_add(0.5,left);}
+  self.render(n)
+ }
  pub fn reset(&mut self){self.history.fill(0.);for group in &mut self.groups{group.reset();}self.cursor=0;self.frame=0;self.peak=0.;self.rejected=0;self.input.fill([0.;BLOCK]);self.output.fill([0.;BLOCK]);}
  fn bytes(&self)->usize{std::mem::size_of::<Self>()+self.ir_channels*self.ir[0].len()*4+self.head.len()*4+self.history.len()*4+self.groups.iter().map(Group::bytes).sum::<usize>()}
 }
@@ -79,5 +87,6 @@ impl Engine {
 #[no_mangle]pub extern "C" fn convolver_input(p:&mut Engine,ch:usize)->*mut f32{p.input.get_mut(ch).map(|c|c.as_mut_ptr()).unwrap_or(std::ptr::null_mut())}
 #[no_mangle]pub extern "C" fn convolver_output(p:&Engine,ch:usize)->*const f32{p.output.get(ch).map(|c|c.as_ptr()).unwrap_or(std::ptr::null())}
 #[no_mangle]pub extern "C" fn convolver_render(p:&mut Engine,n:usize)->u32{p.render(n)as u32}
+#[no_mangle]pub extern "C" fn convolver_render_stereo_to_mono(p:&mut Engine,n:usize)->u32{p.render_stereo_to_mono(n)as u32}
 #[no_mangle]pub extern "C" fn convolver_reset(p:&mut Engine){p.reset();}
 #[no_mangle]pub extern "C" fn convolver_stat(p:&Engine,index:u32)->f64{match index{0=>p.frame as f64,1=>p.peak as f64,2=>0.,3=>p.ir[0].len()as f64,4=>p.input_channels as f64,5=>p.ir_channels as f64,6=>p.output_channels as f64,7=>p.bytes()as f64,8=>p.groups.len()as f64,9=>p.groups.iter().map(|g|g.block*2).max().unwrap_or(0)as f64,10=>p.groups.iter().map(|g|g.forward).sum::<u64>()as f64,11=>p.groups.iter().map(|g|g.inverse).sum::<u64>()as f64,12=>p.rejected as f64,13=>p.rate,14=>p.prepared as u32 as f64,15=>p.long as u32 as f64,16=>(if p.long{LONG_TAIL}else{TAIL})as f64,17=>p.groups.iter().map(|g|g.partitions).sum::<usize>()as f64,_=>0.}}

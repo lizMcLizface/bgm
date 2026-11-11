@@ -70,6 +70,13 @@
       "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/convolver_handler.cc",
       "bytes": 13051,
       "sha256": "ca0558217fe2320aacb0eca3cc57f573058f5bc32b0a4e14445fea888d4a5377"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/audio/audio_bus.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/audio_bus.cc",
+      "bytes": 28543,
+      "sha256": "17fc6c0a60c1b1ef4115942b05bd7c37838f74784d0d128e66a0e660cc2a05c6"
     }
-  ]
+  ],
+  "explicitStereoDownmix": "AudioBus::SumFromByDownMixing 2->1: destination zero, ordered Vsma(left,0.5), Vsma(right,0.5). Portable f32 half-left then fused half-right add; source-local full/Light composition validates routing explicitly. Native acceptance required."
 }

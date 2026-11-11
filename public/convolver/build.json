@@ -1,7 +1,7 @@
 {
   "api": 1,
-  "source": "e68ef1c6e46edf4a0ff1b890f6307c0fc8bb3317b86fb7efc691f01d19213b50",
-  "runtime": "ed15ade2ce8e60ccf2a1660a39e909f6368bf0b911db3bcf949a266dcd052a57",
+  "source": "e6d9aecf0c378a13465abbafe9cb8f92e76131da01e853e75d2275710e2a52af",
+  "runtime": "d198a856743df6fd95d999ffd84b9a8b4ba623a2e2697b64e63cba867722ad93",
   "reference": "919644554b8f7b0ebff7a3521b1a54ba62da06c2825e50da955389a3380db4eb",
   "hostSHA256": {
     "src/modular-audio/convolverReview.worker.js": "e634f04cf7b797632b100e1039859f91cdf0e94f09c5bcfc0a8bb2f27b454a4b",
@@ -9,18 +9,25 @@
     "src/modular-audio/convolverNativeReview.js": "f8bd9a0232a806b64cfc54f54e1499b8a7e28fc64eb2999f49e7170547cd5baf",
     "tools/convolver-owned.html": "399a8675fd2141c4ce8a3b1aad2e7c2dcfa718188789f2f15ca896331e5858d7",
     "tools/convolver-owned.js": "3501c67728c9c6123de861844e237d196fe4980e3e7cea20c561f981039f8a3b",
-    "src/modular-audio/convolverStream.js": "f9c993af7095648a3b09c175f3c500f3ea0ac186a11f3fc6d61e08dc889dedef",
-    "src/modular-audio/convolverStream.worker.js": "0ef71612ea2d19993baba620182a7342d61a47ea343c8f79ecca105e3b0acc3c",
-    "public/convolver/stream-processor.js": "db79e77956b1dd73ee9f5d1d665346fabf6db66b5c12931f90313eb959eb7b4b",
+    "src/modular-audio/convolverStream.js": "eb4bd3a88eb4a3bc0caa04845a2c8a216501fef043c6ef93702794a20def6255",
+    "src/modular-audio/convolverStream.worker.js": "a655b96d21733791b421e76ec0d16b8fa1adf09c9b0f06d3c6bfa0754758046a",
+    "public/convolver/stream-processor.js": "d1da077b12840619f6c80b4b2dc2ec8fdd74a07f1e7a90fa6a7cf4c221dfde9f",
     "public/convolver/stream-capture.js": "4b1ecc393bff6b8f39982940f2afbe3e8950d1102d47eb6c0735192d1efa9436",
     "src/modular-audio/longConvolverReview.js": "ee88aca7165b3bb1f74988062fb202418f8b3e0b4085a8c661234d57e465bc09",
     "tools/convolver-long.html": "640cd1e95e593572ad41f9f64d444c28199e7735d516497868cea7cd8a76e2e3",
-    "tools/convolver-long.js": "56e2386b393a93e8821b0bebab9c50a9e8865352139593bf63835338409f5d15"
+    "tools/convolver-long.js": "56e2386b393a93e8821b0bebab9c50a9e8865352139593bf63835338409f5d15",
+    "src/modular-audio/ownedRoomConvolver.js": "f63d9a0f8422bec8dd597fef2f36326e1f5ce2d8f0290f6854a5548a440e394e",
+    "src/modular-audio/ownedRoomColourActivity.js": "8c952c8c32e6bd5693b645873d43ffae244c7ca39c6ee01cad151fbf2b76c7ba",
+    "src/modular-audio/roomConvolverWorker.js": "dae48feb7c334c1d5df2e03d65325b1cdc9893b363363a5fd9c3531f525e9699",
+    "src/modular-audio/roomConvolverReview.worker.js": "ed619bcdfc60f26392ca88cc9682f18e1ff67314b2a08fa6a81516fa708cf898",
+    "src/modular-audio/roomConvolverReview.js": "8f7c4c540b8d67e1154b1d05930f17ae5106bd27b72b0c2db138722848a20a98",
+    "tools/room-convolver.html": "8d9f423f9c55dccacac673f70cceba1ec4221ffe741516d2774de4dbdaa79756",
+    "tools/room-convolver.js": "091a09bf1201204e893c6faf06b2576868c5dd06c544be548f9dc3e68b0e7fe1"
   },
-  "hostVersion": "dff7a019233ad4d2",
+  "hostVersion": "e555b5aa0982a112",
   "profile": "static-f64-nonuniform-128-8192-v1",
-  "wasm": "0691fbe6d51974e5ebeba1e3c19c4a03493fbb9b8f13a49dc504171968e45234",
-  "bytes": 40226,
+  "wasm": "40a89270ae4e7d0d6a0eeb7ee67b052a46b4cfaa2910f82d68d50586b01f9bba",
+  "bytes": 40857,
   "audited": false,
   "execution": "worker-only; offline reference permitted",
   "profiles": [
@@ -33,5 +40,5 @@
   "maxIRChannels": 2,
   "maxFFTSize": 16384,
   "adapterLatencyFrames": 0,
-  "version": "e739726e0556ea8d"
+  "version": "c5dbde0540bfdf83"
 }

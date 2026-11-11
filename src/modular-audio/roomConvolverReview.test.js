@@ -1,0 +1,3 @@
+// @vitest-environment node
+import{it,expect}from'vitest';import{roomConvolutionControls}from'./roomConvolverReview.js';import{roomColourSpec}from'./ownedRoomColour.js';
+it.each([8000,24000,44100,48000,96000,192000])('validates the actual fixed native composition control capture at%iHz',rate=>{const events=roomConvolutionControls(rate);expect(()=>roomColourSpec(rate,{channels:2,events})).not.toThrow();expect(events).toEqual(events.slice().sort((a,b)=>a.seconds-b.seconds));expect(events.find(e=>e.seconds===1001/rate&&e.parameter==='damping')).toMatchObject({value:3700});expect(events.find(e=>e.seconds===.11)).toMatchObject({parameter:'predelay',value:.225});});
