@@ -85,3 +85,6 @@ impl LiveTimeline{
   self.output[write..].fill(value);self.current=self.output[127];if skipped>0{self.events.drain(..skipped);}
  }
 }
+
+#[cfg(feature="live-resources")]
+impl LiveTimeline {pub(super) fn live_cold_capacity(&mut self,n:usize){if self.events.capacity()<n{self.events.reserve_exact(n-self.events.len());}}}

@@ -1,0 +1,11 @@
+{
+  "api": 1,
+  "profile": "complete-ambience-live-resources-v1",
+  "source": "71db970fff9c3a0cfe557e14950c1a8132a516f887ea4899f11a2b6a085d6c53",
+  "runtime": "dc4bbebb124eb02dde23eca8c07f243789311d762801b5039221b72dc5f2fe48",
+  "reference": "1f6a2110427b7b558d07a3ec0954b6b63f6a77bfdf22a891bc73c30e59841e0d",
+  "wasm": "84a0e95c4e389da175c674229b17e6042d718e24a5cd6c984d59c9432c3bfef0",
+  "bytes": 231509,
+  "audited": false,
+  "version": "2e40df841b63cbc6"
+}

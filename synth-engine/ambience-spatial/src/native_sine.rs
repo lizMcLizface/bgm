@@ -108,3 +108,11 @@ impl Sine {
         out
     }
 }
+
+#[cfg(feature="live-resources")]
+impl Sine {
+ pub(super) fn live_cold_bank(&mut self){if self.phased.is_none(){self.phased=Some(vec![0.;self.size]);}}
+ pub(super) fn live_table_size(&self)->usize{self.size}
+ pub(super) fn live_has_bank(&self)->bool{self.phased.as_ref().is_some_and(|v|v.len()==self.size)}
+ pub(super) fn live_swap_table(&mut self,table:&mut Vec<f32>){debug_assert_eq!(table.len(),self.size);std::mem::swap(self.phased.as_mut().expect("cold live phase bank"),table);}
+}
