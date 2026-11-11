@@ -16,7 +16,8 @@ Original KS live demand/control histories are accepted and selected here.
 Crusher/Pitch/ZPlane also use accepted owned processors through the original
 CLASSIC/All/offline rack wrappers. The ordinary Instrument mix/limiter pair is also owned (18 exact native-chain
 cases plus actual desk/reload/export). Iowa's original bare-native limiter is now owned too (5 exact native full-room
-cases, measured desk/reload3, cold20-note export). Rack target compressors,
+cases, measured desk/reload3, cold20-note export). Original local/shared echo is also owned through a context factory, with24
+actual normal route comparisons exact at six rates. Rack target compressors,
 other native effects, shared/private sampled-room adoption, native loop playback
 and ambience spatial/fade/wander remain explicit continuation boundaries.
 

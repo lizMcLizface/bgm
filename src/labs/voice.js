@@ -19,6 +19,7 @@ export class LabVoice {
  static async create(context,spec,{notes=[],onError=()=>{},roomPool=null,audioEnvironment=null}={}){const environment=validateAudioEnvironment(audioEnvironment,context),v=new LabVoice(context,spec);v.audioEnvironment=environment;v.roomPool=roomPool;try{await v.init(notes,onError);return v;}catch(e){v.dispose();throw e;}}
  constructor(context,spec){this.context=context;this.spec=structuredClone(spec);this.patch=structuredClone(spec.patch);this.output=context.createGain();this.output.gain.value=.7;this.nextId=100000;this.keys=new Map();this.released=new Set();this.pedal=false;this.level=1;this.disposed=false;}
  async init(notes,onError){
+  this.onRuntimeError=onError;
   const c=this.context;if(this.spec.kind==='legacy'){this.native=new Instrument({...nativeInstrumentEnvironment(this.audioEnvironment,this.patch,c),context:c,preset:this.patch,polyphony:this.spec.polyphony??12,fdnRoom:true});this.native.connect(this.output);if(this.audioEnvironment)await this.native.sourceReady;for(const n of notes)this.native.scheduleNote(n.midi,n.time,n.duration,n.velocity,n.detune,n.expression);if(this.audioEnvironment)await this.native.awaitPendingSourceBookings?.();return;}
   this.patch=this.spec.kind==='fm'?cloneFM(this.patch):this.spec.kind==='procedural'?preparedPatch(this.patch):clonePatch(this.patch);
   const Type=this.spec.kind==='fm'?FMBackend:this.spec.kind==='procedural'?PreparedSource:WasmBackend,sourcePatch=sourcePerformance(this.patch);const sourceOptions={notes,offline:Number.isFinite(c.length),events:noteEvents(notes,c.sampleRate),onStats:s=>{this.stats={...s,reportedAt:c.currentTime};},onError};this.backend=await(this.audioEnvironment?.createCoreBackend&&['subtractive','fm'].includes(this.spec.kind)?this.audioEnvironment.createCoreBackend(c,this.spec.kind,sourcePatch,sourceOptions):Type.create(c,sourcePatch,sourceOptions));
@@ -41,13 +42,15 @@ export class LabVoice {
    if(p.reverb>0||(p.delay>0&&p.delayToReverb>0)){
     const lease=await this.roomPool.acquire(p,{onError});this.sharedRoomInput=lease.input;this.room={dispose:lease.release};
    }
-   if(p.delay>0){this.echo=await createNativeEcho(c,p);source.connect(this.echo.input);this.echo.output.connect(mix);this.echo.output.connect(echoSend);echoSend.connect(this.roomOutput);}
+   if(p.delay>0){this.echo=await(this.audioEnvironment?.echoFactory??createNativeEcho)(c,p,{onError});source.connect(this.echo.input);this.echo.output.connect(mix);this.echo.output.connect(echoSend);echoSend.connect(this.roomOutput);}
    return;
   }
-  this.room=await createRoutedEffects(c,this.effects,{kind:this.effects.reverb===0&&this.effects.delay===0?'dry':'local',onError,busFactory:this.audioEnvironment?.createEffectsBus});if(this.room.echoRoomInput)this.echo=await createInstrumentEffects(c,this.room,{send:this.effects.delay,delayMs:this.effects.delayMs,feedback:this.effects.feedback,tone:this.effects.tone,pingPong:this.effects.pingPong,roomSend:this.effects.delayToReverb});
+  this.room=await createRoutedEffects(c,this.effects,{kind:this.effects.reverb===0&&this.effects.delay===0?'dry':'local',onError,busFactory:this.audioEnvironment?.createEffectsBus,echoFactory:this.audioEnvironment?.echoFactory});if(this.room.echoRoomInput)this.echo=await createInstrumentEffects(c,this.room,{send:this.effects.delay,delayMs:this.effects.delayMs,feedback:this.effects.feedback,tone:this.effects.tone,pingPong:this.effects.pingPong,roomSend:this.effects.delayToReverb},{echoFactory:this.audioEnvironment?.echoFactory,onError});
   this.channel=connectEnsembleChannel(c,source,this.echo??this.room,{gain:1,pan:0,sends:{dry:1,reverb:1,delay:1}});this.room.connect(this.output);
  }
  connect(node){this.output.connect(node);}
+ async armRuntime(){await this.native?.armRuntime?.();if(this.context.state==='running')await this.echo?.arm?.();}
+ runtimeEchoStatus(){return{backend:this.echo?.backend??'none',hostVersion:this.echo?.hostVersion??null};}
  patchSource(p,options){this.effectivePatch=p;this.backend?.patch(sourcePerformance(p),options);}
  on(midi,velocity=.7){if(this.disposed)return null;const id=this.native?this.native.startNote(midi,velocity):this.backend.on(midi,velocity);this.keys.set(id,midi);return id;}
  off(id){if(!this.keys.has(id))return;if(this.pedal){this.released.add(id);return;}this.release(id);}
@@ -63,6 +66,6 @@ export class LabVoice {
   else for(const l of p.layers){l.cutoff=Math.min(20000,l.cutoff*2**(brightness*2));l.bow=Math.min(1,l.bow+texture*.3);l.lfoPitch+=motion*12;l.pressureTone=Math.max(.5,l.pressureTone);p.global.pressure=pressure;}
   this.patchSource(p,{seconds:.06});
  }
- panic(){if(this.disposed)return;this.keys.clear();this.released.clear();this.pedal=false;this.native?.silence();this.native?.flushTails();this.backend?.panic();this.room?.clear?.();this.echo?.clear?.();this.insert?.clear?.();this.fx?.clear();}
+ panic(){if(this.disposed)return;this.keys.clear();this.released.clear();this.pedal=false;this.native?.silence();this.native?.flushTails();this.backend?.panic();for(const owner of[this.room,this.echo]){const cleared=owner?.clear?.();cleared?.catch?.(error=>this.onRuntimeError?.(error));}this.insert?.clear?.();this.fx?.clear();}
  dispose(){if(this.disposed)return;this.disposed=true;if(this.performanceChange)window.removeEventListener(WASM_PERFORMANCE_EVENT,this.performanceChange);this.keys.clear();this.released.clear();this.native?.dispose();this.channel?.dispose();this.echo?.dispose();this.room?.dispose();this.insert?.dispose();this.fx?.dispose();this.backend?.dispose();this.sourceInput?.disconnect();this.output.disconnect();}
 }

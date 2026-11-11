@@ -82,3 +82,33 @@ Maintained review: `/tools/native-echo-live.html`. Ignored evidence:
 `native-echo-live-reused-final.json`, `native-echo-live-reload-final.json` and
 `native-echo-live-lifecycle-final.log` under `reports/modular_audio/`.
 Normal context-factory adoption is the next task and is not included here.
+
+## Prepared normal route adoption
+
+Factory host `4452d713524cd0e1` adds the original complete-effects sanitizer at
+its public host boundary; typed persisted specs remain strict. The accepted
+numeric Wasm is unchanged. The explicit environment now selects this factory
+for normal local and shared LabVoice echo routes. The normal null environment
+still selects the original Native implementation. WasmInstrument delegates live
+arming to its full voice; panic reports asynchronous clear failures through the
+existing error callback. Runtime handles are not saved in song settings.
+
+The actual normal LabVoice source and route composition passes12 source cases
+(Core and FM at all six rates), covering24 local/shared stereo comparisons,
+all with zero measured difference. Each case proves two actual owned echo
+owners and unchanged JSON source settings. Both original and prepared routes
+include their real FDN path; these are not isolated echo substitutes. The
+maintained test is `/tools/owned-echo-routes.html`; ignored evidence is the six
+`owned-echo-routes-<rate>-final.json` shards and screenshot under
+`reports/modular_audio/`.
+
+The All desk check also completed three paths, but created no LabVoice echo
+owners because that host moves voice effects into its external mixer racks.
+It is retained as integration regression evidence, not echo acceptance. Its
+first attempt stopped on an unrelated ordinary-compressor operation rejection;
+a diagnostic-only build with unchanged numeric Wasm then passed. The original
+negative remains retained and its cause is not yet established. Rejection
+clock diagnostics remain active; no speculative timing clamp was added.
+
+Next: complete remaining native rack activity contracts and normal dynamics
+adoption, then native voice effects and sampled-room/ambience host ownership.

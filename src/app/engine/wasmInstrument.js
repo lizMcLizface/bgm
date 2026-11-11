@@ -25,7 +25,7 @@ export default class WasmInstrument {
  syncEnvelope(){this.gainEnv={attack:this.preset.gainAttack,decay:this.preset.gainDecay,sustain:this.preset.gainSustain,release:this.preset.gainRelease};}
  attachVoice(voice){voice.connect(this.output);this.roomInput.disconnect();if(voice.roomOutput)voice.roomOutput.connect(this.roomOutput);if(voice.sharedRoomInput)this.roomInput.connect(voice.sharedRoomInput);}
  connect(node){this.output.connect(node);}
- armRuntime(){return this.voice?.native?.armRuntime?.();}
+ armRuntime(){return this.voice?.armRuntime?.()??this.voice?.native?.armRuntime?.();}
  applyPreset(preset,override=null){
   const previous=this.preset;this.preset={...DEFAULTS,...preset};this.overrideSpec=override;this.syncEnvelope();const revision=++this.revision,spec=this.spec();
   this.loading=true;this.error=null;

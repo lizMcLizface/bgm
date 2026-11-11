@@ -23,7 +23,9 @@ live activity/tail/GUI arrival contracts remain under final acceptance. Loop
 playback passes full original resources at6rates, shape crossfades and reused
 contexts (23 cases, exact bits), plus immediate startup and acknowledged quota
 cleanup; normal running-context upload policy remains separate. Original echo
-and rack dynamics live references are active work, not normal host replacements.
+now has75 live/reuse cases plus24 exact normal local/shared route comparisons.
+Rack dynamics has147 exact reference cases; normal per-call adoption is active.
+The expanded low-rate Filter idle/restart gate remains open.
 
 Latest broad regression:543files,4455passing/4skipped. The earlier two
 partial-owner demand/teardown failures are corrected, including a regression

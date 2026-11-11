@@ -12,7 +12,7 @@ accepted results refer to the exact artifacts and cases in the linked records.
 | Worker execution | One-worker and three-worker source execution, bounded transferable PCM, source/master partitioning, cancellation, generation guards and delivery diagnostics | Deadline acceptance for each newly assembled full path; phone/background profiles stay explicit |
 | Core / FM / percussion | Existing original algorithms with independent Rust state, timestamped source graphs and actual six-role fixture; configured kit palettes | Normal All transport remains separate from explicit finite previews |
 | Classic synths | Owned original model0..13, canonical clocks/control/waves;42 native cases,14 actual offline wrappers and cold replay exact; explicit normal six-family host adoption passes | External rack/remaining shared default adoption and preserved live/offline mono-stack policy |
-| Piano / plucked | Owned preparation and independent live slots; accepted Air/scalar/LFO/demand sleep histories; actual four-KS/piano/Hand normal desk/reload3 passes | Shared piano-controller adoption and native room/remaining host stages |
+| Piano / plucked | Owned preparation and independent live slots; accepted Air/scalar/LFO/demand sleep histories; actual four-KS/piano/Hand normal desk/reload3 passes | Shared piano-controller now adopted; native room/remaining host stages |
 | Iowa | Owned preparation and graph voices plus bounded normal live Rust player;270source/270allocation,18full-player and3live-port cases | Original bare-native limiter now passes5 exact full-room cases and normal measured desk/reload3 plus cold export; sampled room remains native |
 | Long / Live measured strings | Actual measured preparation and owned24-slot dry source;40 native source/body cases including reset/cancel/saved independence | Graph source registration and owned worker body stage; current body proof uses original native convolver |
 | Short / Pizzicato | Actual finite preparation, full original RNG/wake/fades and owned fixed-buffer playback;60 source comparisons,60 allocation cases,12 native playback cases | Timestamped multi-note Graph/worker scheduling, voice stealing and normal live preparation worker adoption |
@@ -21,7 +21,7 @@ accepted results refer to the exact artifacts and cases in the linked records.
 | Active VoiceCompressor wrapper | Captured48/48, live dynamic/bypass/state/reuse, allocator and explicit prepared normal-host adoption accepted | Remaining aggregate normal default/adoption decision; other effects have separate host boundaries |
 | Mixer / limiter | Owned strip/matrix/fader/limiter, deterministic seam reference and immutable opt-in actual All desk; native/owned/restored built-host cases pass | Default adoption, live hot swap and portable ownership of external shared routes |
 | Streaming weather | Owned actual rain/thunder/waves, bounded normal live routes, exact six-rate route proof and worker export; explicit normal-host environment | Portable original spatial/wander/fade chains |
-| Wind / fire / vinyl | Exact source loops and bounded preparation worker, opt-in original Ambience consumer;12 native host cases | Portable BufferSource fractional offset/resampling, spatial/wander/fade host and aggregate adoption |
+| Wind / fire / vinyl | Exact source loops and bounded preparation worker, opt-in original Ambience consumer;12 native host cases | Original loop reader accepted; bounded running bank upload, spatial/wander/fade host and aggregate adoption |
 | Static convolution | Original profile exact; explicit long profile2,097,152frames;11native cases and3routed worker streams with500ms declared delay | Compose actual dry/wet/colour/control paths; worker-only, with bounded memory/latency policy |
 | Sampled/piano room preparation | Original six FLAC transforms and seeded piano IR, Float32 normalization profile,12 native output comparisons plus3 complete oversized-resource refusals | Native decoding/resampling, RoomColour, wet/dry/shared route/live IR transitions; full Iowa/high-rate IR now fits separately accepted long profile |
 
@@ -41,13 +41,20 @@ integer-frame controls and full-IR cold persistence. Their fixed500ms latency,
 finite owner and two-room quota are explicit; they are not normal shared-send
 adoption or a phone deadline guarantee.
 
-The current ordinary compressor candidate passes108 native host profiles after
-an immutable offline-startup contract; reset/reuse/explicit live arming remain
-under final checks. Physical KS live playback has44 passing source cases, but
-an explicit unpulled-gap probe exposed different native target-history aging.
-The existing environment keeps KS native while that live-only contract is
-resolved. Neither a passing random rerun nor a relaxed PCM bound is acceptance.
-Classic14-model live source integration is the independent parallel task.
+The ordinary Instrument compressor pair and Iowa bare-native limiter are now
+adopted in prepared hosts; the exact focused case counts are in their component
+records. KS and shared piano-controller adoption also pass actual normal hosts.
+Original local/shared echo has75 accepted live/reuse cases and24 actual normal
+LabVoice route comparisons at six rates with zero measured difference. Rack
+compressor/limiter references pass147 cases; normal per-call target transport
+and Graph/extras adoption remain in progress.
+
+Width/Filter/Ring captured DSP passes36 cases. The corrected live candidate
+passes216 short cases and the48k long/delayed gate, but the expanded gate finds
+an8k stereo Filter idle/restart mismatch. Its negative is retained; live normal
+adoption remains unaccepted. Wind/fire/vinyl original loop playback passes23
+full-resource/reuse cases plus immediate startup/quota checks; running-context
+paged-bank upload and normal ambience adoption remain in progress.
 
 Then finish remaining effect host rewiring/demand, shared-room/transport latency
 composition and original ambience spatial/fade/wander/BufferSource ownership.

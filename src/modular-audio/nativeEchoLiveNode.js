@@ -1,3 +1,4 @@
+import {sanitizeEffects} from '../synth-lab/effectsConfig.js';
 import processorUrl from './nativeEchoLive.worklet.js?worker&url';
 import {loadNativeEchoAssets,nativeEchoSpec} from './ownedNativeEcho.js';
 const registrations=new WeakMap();
@@ -23,7 +24,7 @@ export async function prepareNativeEchoLive(context,{assets}={}) {
  await registrations.get(context);
  const factory=async(ctx,raw,{onError=()=>{}}={})=>{
   if(ctx!==context)throw Error('Echo factory belongs to another context');
-  const spec=nativeEchoSpec(ctx.sampleRate,raw),node=new AudioWorkletNode(ctx,'owned-native-echo-live',{numberOfInputs:1,numberOfOutputs:1,channelCount:2,channelCountMode:'explicit',outputChannelCount:[2],processorOptions:{module:assets.module,spec,version:assets.host.version}});
+  const normalized=sanitizeEffects(raw),spec=nativeEchoSpec(ctx.sampleRate,Object.fromEntries(['delay','delayMs','feedback','tone','pingPong'].map(key=>[key,normalized[key]]))),node=new AudioWorkletNode(ctx,'owned-native-echo-live',{numberOfInputs:1,numberOfOutputs:1,channelCount:2,channelCountMode:'explicit',outputChannelCount:[2],processorOptions:{module:assets.module,spec,version:assets.host.version}});
   let resolveReady,rejectReady,error,disposed=false,request=0,disposal,resolveDispose,disposeTimer;
   const pending=new Map(),ready=new Promise((resolve,reject)=>{resolveReady=resolve;rejectReady=reject;});ready.catch(()=>{});
   const rejectPending=reason=>{for(const p of pending.values()){clearTimeout(p.timer);p.reject(reason);}pending.clear();};
@@ -42,7 +43,7 @@ export async function prepareNativeEchoLive(context,{assets}={}) {
    pending.set(id,{resolve,reject,timer});node.port.postMessage({type,request:id,...extra});
   });
   const arm=async()=>{if(disposed||error)throw error??Error('Echo disposed');if(ctx.state!=='running')throw Error('Echo arm requires a running context');let timer;try{return await Promise.race([ready,new Promise((_,reject)=>timer=setTimeout(()=>reject(Error('Echo processor readiness timeout')),10000))]);}finally{clearTimeout(timer);}};
-  return {input:node,output:node,node,ready,arm,backend:'owned-rust',engineVersion:assets.manifest.version,hostVersion:assets.host.version,compensationFrames:128,
+  return {input:node,output:node,node,ready,arm,backend:'owned-rust',engineVersion:assets.manifest.version,hostVersion:assets.host.version,compensationFrames:128,get error(){return error;},
    setHostAwake:awake=>{if(disposed||error)throw error??Error('Echo disposed');if(typeof awake!=='boolean')throw Error('Echo host demand must be Boolean');node.parameters.get('hostAwake').setValueAtTime(awake?1:0,ctx.currentTime);},
    clear:()=>command('clear',{frame:null}),queueClear:frame=>{if(!Number.isSafeInteger(frame)||frame<0||frame%128)return Promise.reject(Error('Invalid echo clear frame'));return command('clear',{frame});},requestStats:()=>command('stats'),snapshot:()=>JSON.parse(JSON.stringify(spec)),
    dispose(){if(disposal)return disposal;disposed=true;rejectReady(Error('Echo disposed'));rejectPending(Error('Echo disposed'));node.disconnect();node.onprocessorerror=null;

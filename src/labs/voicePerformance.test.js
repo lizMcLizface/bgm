@@ -56,3 +56,8 @@ it('allocates no FDN for a dry or echo-only pooled client',async()=>{
 it('releases the source and its listeners if pooled room preparation fails',async()=>{
  const b=backend();state.create.mockResolvedValueOnce(b);const pool={acquire:vi.fn(async()=>{throw Error('room load');})};await expect(LabVoice.create(context(),{kind:'fm',patch:initialFM()},{roomPool:pool})).rejects.toThrow('room load');expect(b.dispose).toHaveBeenCalledTimes(1);
 });
+
+it('uses and arms the context-bound echo in pooled routes and reports asynchronous panic failure',async()=>{
+ const c={...context(),state:'running'},echo={input:node(),output:node(),backend:'owned-rust',arm:vi.fn(async()=>{}),clear:vi.fn(async()=>{throw Error('echo delivery');}),dispose:vi.fn()},echoFactory=vi.fn(async()=>echo),onError=vi.fn(),env={version:1,profile:'owned-active-host-v1',context:c,roleWanderFactory:()=>{},iowaSourceBackend:'owned-rust',voiceFxOptions:{compressorFactory:()=>{}},instrumentOptions:()=>({sourceBackend:'native',voiceCompressorFactory:()=>{}}),prepareContext:()=>{},echoFactory},p=initialFM();Object.assign(p.effects,{reverb:0,delay:.2,delayToReverb:0});const v=await LabVoice.create(c,{kind:'fm',patch:p},{roomPool:{acquire:vi.fn()},audioEnvironment:env,onError});
+ try{expect(echoFactory).toHaveBeenCalledTimes(1);expect(echoFactory.mock.calls[0][0]).toBe(c);expect(state.echo).not.toHaveBeenCalled();await v.armRuntime();expect(echo.arm).toHaveBeenCalledTimes(1);expect(v.runtimeEchoStatus().backend).toBe('owned-rust');v.panic();await Promise.resolve();expect(onError).toHaveBeenCalledWith(expect.objectContaining({message:'echo delivery'}));}finally{v.dispose();}expect(echo.dispose).toHaveBeenCalledTimes(1);
+});
