@@ -8,13 +8,13 @@ for its own OfflineAudioContext; cross-context factory reuse is rejected.
 Existing null-environment defaults remain available.
 
 The profile selects the original owned Core/FM live kernels and Rust patch
-transitions, normal owned piano and Iowa sources, the accepted live
+transitions, normal owned piano and Iowa sources, fourteen original CLASSIC models, the accepted live
 VoiceCompressor and owned role pan/level motion. Original Rust weather live
 sources and bounded weather/loop preparation feed the original ambience host.
 It does not translate native oscillator presets into another sound model.
 KS live demand/control histories are still being validated; this environment
-keeps that material on its existing host until acceptance. Classic, ordinary
-compressors, other effects, shared/private room adoption, native loop playback
+keeps that material on its existing host until acceptance. Ordinary
+compressors, other native effects, shared/private sampled-room adoption, native loop playback
 and ambience spatial/fade/wander remain explicit continuation boundaries.
 
 A physical source-family edit reconstructs through existing atomic replacement
@@ -52,3 +52,23 @@ Continue the ordinary compressor startup/arm contract and physical live-demand
 history acceptance, then Classic live sources and remaining effect/room owners.
 The private-room policy is separately accepted with declared500ms latency;
 normal shared sends and transport latency alignment need explicit composition.
+
+Further accepted integration: original instrument inserts and FDN send/room
+buses use [owned live hosts](MODULAR_AUDIO_ENGINE_LIVE_BUS_HOSTS.md), preserving
+native echo and original shared response/send policy. Twelve standalone actual
+bus cases and six actual two-Core-voice local/shared compositions pass with PCM
+exact zero difference;52 focused changed-host checks pass across six files.
+
+The CLASSIC source factory is now supplied to normal melodic and drum-machine
+roles and each fresh offline renderer context. Its standalone42 native comparisons,
+14 actual offline instrument comparisons and cold reload are exact. A new actual
+All palette (Juno, DX7, piano, Iowa, Minimoog and808) also passes native desk,
+owned desk and cold sound/mixer restoration, with six nonzero role/channel paths,
+shared returns, sweep/trim, ambience, source leases and cleanup
+(`owned-host-classic-final.json`). Its selected Minimoog bass uses the existing
+one-kernel role policy; no live/offline mono-stack reconciliation is claimed.
+
+Runtime selection and these new factories remain absent from persisted songs.
+Continue the physical live-history errors/remaining target clocks, ordinary
+compressor final facade adoption, and three-plugin owned rack host acceptance.
+Other native VCO/effect/ambience/room owners remain explicit migration work.

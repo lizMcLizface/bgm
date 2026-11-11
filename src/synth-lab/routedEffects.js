@@ -4,7 +4,8 @@ import {createNativeEcho} from './nativeEcho';
 import {sanitizeInstrumentEffects} from './instrumentEffectsConfig';
 
 /** Three independent inputs: dry, room and echo, before global send levels. */
-export async function createRoutedEffects(context,raw,{kind='wasm',onStats=()=>{},onError=()=>{}}={}){
+export async function createRoutedEffects(context,raw,{kind='wasm',onStats=()=>{},onError=()=>{},busFactory=createEffectsBus}={}){
+ if(typeof busFactory!=='function')throw Error('Invalid prepared effects bus factory');
  if(!['wasm','hybrid','local','dry'].includes(kind))throw Error('Unknown routed effects path.');
  const p=sanitizeEffects(raw),nodes=[],own=n=>(nodes.push(n),n),level=value=>{const n=own(context.createGain());n.gain.value=value;return n;};
  const inputs=[level(1),level(1),level(1)];let room,echo,echoRoomInput;
@@ -14,12 +15,12 @@ export async function createRoutedEffects(context,raw,{kind='wasm',onStats=()=>{
    return {inputs,connect:d=>out.connect(d),memoryBytes:0,dispose:()=>nodes.forEach(n=>n.disconnect())};
   }
   if(kind==='wasm'){
-   room=await createEffectsBus(context,p,{onStats,onError});inputs.forEach((n,i)=>n.connect(room.node,0,i));
+   room=await busFactory(context,p,{onStats,onError});inputs.forEach((n,i)=>n.connect(room.node,0,i));
   }else{
    // The kernel's send range stops at .8. Scale the external room sum so it
    // enters the FDN at unity, independently of the direct reverb-send setting.
    const unitySend=EFFECTS.find(([key])=>key==='reverb')[3];
-   room=await createEffectsBus(context,{...p,dry:1,reverb:unitySend,delay:0,delayToReverb:0},{onStats,onError});
+   room=await busFactory(context,{...p,dry:1,reverb:unitySend,delay:0,delayToReverb:0},{onStats,onError});
    const dry=level(p.dry),send=level(p.reverb/unitySend);inputs[0].connect(dry);dry.connect(room.node,0,0);inputs[1].connect(send);send.connect(room.node,0,1);
    if(kind==='local'){
     // External echoes have their own wet send and room send. Do not apply
@@ -29,7 +30,7 @@ export async function createRoutedEffects(context,raw,{kind='wasm',onStats=()=>{
     const intoRoom=level(p.delayToReverb/unitySend);echo.output.connect(intoRoom);intoRoom.connect(room.node,0,1);
    }
   }
-  return {inputs,echoRoomInput,get stats(){return room.stats;},get error(){return room.error;},connect:d=>room.connect(d),clear(){room.clear();echo?.clear?.();},memoryBytes:await effectsMemoryBytes(),nativeDelayCount:echo?1:0,nativeDelayCompensationFrames:echo?.compensationFrames??0,dispose(){nodes.forEach(n=>n.disconnect());echo?.dispose();room.dispose();}};
+  return {inputs,echoRoomInput,backend:room.backend??'legacy-rust',get stats(){return room.stats;},get error(){return room.error;},connect:d=>room.connect(d),clear(){room.clear();echo?.clear?.();},memoryBytes:await effectsMemoryBytes(),nativeDelayCount:echo?1:0,nativeDelayCompensationFrames:echo?.compensationFrames??0,dispose(){nodes.forEach(n=>n.disconnect());echo?.dispose();room.dispose();}};
  }catch(e){nodes.forEach(n=>n.disconnect());echo?.dispose();room?.dispose();throw e;}
 }
 

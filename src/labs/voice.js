@@ -27,7 +27,7 @@ export class LabVoice {
   // existing inserts/FX/room/output trim, without replacing the live backend.
   this.sourceInput=c.createGain();this.sourceInput.gain.value=1;this.backend.node.connect(this.sourceInput);
   let source=this.sourceInput;
-  if(insertsActive(this.patch.inserts)){this.insert=await createInstrumentInserts(c,this.patch.inserts,{onError});source.connect(this.insert.input);source=this.insert.node;}
+  if(insertsActive(this.patch.inserts)){this.insert=await(this.audioEnvironment?.createInserts??createInstrumentInserts)(c,this.patch.inserts,{onError});source.connect(this.insert.input);source=this.insert.node;}
   // the calmbgm synth's tape, tremolo, compressor, shimmer and freeze (app/engine/voiceFx.js)
   if(this.spec.fx){this.fx=new VoiceFx(c,this.spec.fx,undefined,this.audioEnvironment?.voiceFxOptions);if(this.audioEnvironment)await this.fx.ready;source.connect(this.fx.input);source=this.fx.output;}
   this.effects=roomPerformance(this.patch.effects);
@@ -44,7 +44,7 @@ export class LabVoice {
    if(p.delay>0){this.echo=await createNativeEcho(c,p);source.connect(this.echo.input);this.echo.output.connect(mix);this.echo.output.connect(echoSend);echoSend.connect(this.roomOutput);}
    return;
   }
-  this.room=await createRoutedEffects(c,this.effects,{kind:this.effects.reverb===0&&this.effects.delay===0?'dry':'local',onError});if(this.room.echoRoomInput)this.echo=await createInstrumentEffects(c,this.room,{send:this.effects.delay,delayMs:this.effects.delayMs,feedback:this.effects.feedback,tone:this.effects.tone,pingPong:this.effects.pingPong,roomSend:this.effects.delayToReverb});
+  this.room=await createRoutedEffects(c,this.effects,{kind:this.effects.reverb===0&&this.effects.delay===0?'dry':'local',onError,busFactory:this.audioEnvironment?.createEffectsBus});if(this.room.echoRoomInput)this.echo=await createInstrumentEffects(c,this.room,{send:this.effects.delay,delayMs:this.effects.delayMs,feedback:this.effects.feedback,tone:this.effects.tone,pingPong:this.effects.pingPong,roomSend:this.effects.delayToReverb});
   this.channel=connectEnsembleChannel(c,source,this.echo??this.room,{gain:1,pan:0,sends:{dry:1,reverb:1,delay:1}});this.room.connect(this.output);
  }
  connect(node){this.output.connect(node);}

@@ -1,3 +1,15 @@
+Further checkpoint: [owned original insert/FDN hosts](MODULAR_AUDIO_ENGINE_LIVE_BUS_HOSTS.md)
+now compose local/shared LabVoice routes with sample-bit-exact output in12 bus
+and6 full composition cases. Original CLASSIC live/offline factories are wired
+through the prepared environment; its six-family All native/owned/restored desk
+batch passes all3 cases. CLASSIC source42/offline-wrapper14/cold reload are exact,
+with137 focused checks. These preserve the original native echo, external rack,
+mono-stack policy and normal defaults. Physical source static44 cases pass across
+two retained runs, while live held/control history and remaining Air/scalar target
+clocks still need closure. Ordinary compressor numeric/lifecycle candidate passes
+108+24empty+3arm+6reset+3reuse; final Boolean-demand/facade checks and normal
+adoption are separate. A complete new suite/public build is still pending.
+
 Current continuation (11 November2026): the requested push through111d282
 completed as lizMcLizface; later verified steps are committed locally, without
 deployment. [Prepared normal hosts](MODULAR_AUDIO_ENGINE_PREPARED_HOST.md) now

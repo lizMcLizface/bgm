@@ -656,7 +656,7 @@ function validatePatch(raw, contracts) {
       const param = d.parameters.find((p2) => p2.id === id);
       if (!param || !finite4(value) || value < param.min || value > param.max || ["enum", "boolean"].includes(param.unit) && !Number.isInteger(value)) throw Error(`Invalid parameter ${id}`);
     }
-    modules.set(n.id, d);
+    modules.set(n.id, n.type === "legacy.classic" ? { ...d, classicModel: n.config?.model } : d);
     if (d.type === "host.audio" && n.config !== void 0 && (n.config?.version !== 1 || !finite4(n.config.latencyFrames) || n.config.latencyFrames < 0 || n.config.latencyFrames > 262144)) throw Error("Invalid declared host input latency");
     if (d.type.startsWith("desk.")) {
       n.config = validateMixerConfig(n.config);
@@ -795,7 +795,7 @@ function eventPacket(e, modules, connections) {
     if (e.kind === "cancel") return [e.frame, e.target, e.owner, 4, 0, 0];
     if (e.kind === "classic" && Number.isInteger(e.event) && e.event >= 0 && e.event <= 6 && Number.isInteger(e.id) && e.id >= 0 && e.id <= 4294967295 && finite4(e.a) && finite4(e.b) && Number.isFinite(Math.fround(e.a)) && Number.isFinite(Math.fround(e.b))) {
       const k = e.event;
-      if ([0, 1, 3].includes(k) && !e.id || k === 0 && (e.a < 0 || e.a > 127 || e.b < 0 || e.b > 1) || k === 2 && e.id > 6 || k === 3 && (e.a < 0 || e.a > 1) || k === 5 && e.id > 215 || k === 6 && (e.id > 7 || e.a < 0 || e.a > 16777215 || !Number.isInteger(e.a))) throw Error("Invalid classic event values");
+      if ([0, 1, 3].includes(k) && !e.id || k === 0 && (e.a < 0 || e.a > 127 || e.b < 0 || e.b > 1) || k === 2 && e.id > 6 || k === 3 && (e.a < ([8, 9, 10, 13].includes(d.classicModel) && [2, 3].includes(e.id % 4) ? -1 : 0) || e.a > 1) || k === 5 && e.id > 215 || k === 6 && (e.id > 8 || e.a < 0 || e.a > 16777215 || !Number.isInteger(e.a))) throw Error("Invalid classic event values");
       return [e.frame, e.target, e.owner, k, e.id, e.a, e.b];
     }
   }
@@ -838,7 +838,10 @@ var ReferenceGraph = class {
     if (this.patch.modules.some((n) => n.type.startsWith("desk.") && n.config.sampleRate !== sampleRate)) throw Error("Mixer sample rate mismatch");
     if (this.patch.modules.some((n) => n.type === "native.compressor.capture" && n.config.events.some((e) => e.seconds * sampleRate > 9007199254740864))) throw Error("Captured native compressor event exceeds exact frame range");
     this.contracts = contracts;
-    this.modules = new Map(this.patch.modules.map((n) => [n.id, contracts.modules.find((d) => d.type === n.type && d.version === n.version)]));
+    this.modules = new Map(this.patch.modules.map((n) => {
+      const d = contracts.modules.find((d2) => d2.type === n.type && d2.version === n.version);
+      return [n.id, n.type === "legacy.classic" ? { ...d, classicModel: n.config.model } : d];
+    }));
     if (engine.graph_api() !== contracts.api) throw Error("Graph ABI mismatch");
     this.handle = engine.graph_new(sampleRate, maxBlock);
     if (!this.handle) throw Error("Invalid sample rate/block size");

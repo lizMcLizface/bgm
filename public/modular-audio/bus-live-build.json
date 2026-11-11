@@ -1,0 +1,10 @@
+{
+  "api": 1,
+  "source": "9eda92742a271b22e0273f7365f8c62d791e5c9c6553031b0df21d7658b31df4",
+  "kernels": {
+    "inserts": "94380366fdc32b825381460290d1389b3c6e112ad9a6e5f053d1616d3ee2f702",
+    "effects": "81517026815db5b37285736549225c651bef73d8f9f490edfc90b96810094b7e"
+  },
+  "version": "24b5b95beba0d5f1",
+  "scope": "Owned handles for the original instrument insert and FDN send kernels; no native model translation"
+}

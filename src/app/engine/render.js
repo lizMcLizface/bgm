@@ -246,7 +246,7 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
             const Wasm=audioEngine==='wasm'?(await import('./wasmInstrument')).default:null;
             // the music, through the bars' loudness trims
             const out=ctx.createGain();out.connect(ctx.destination);automateLevel(out.gain,levels,from);
-            const instruments={},motionRoutes=[],cleanup=[()=>out.disconnect()],roomPool=Wasm&&PERFORMANCE.sharedReverb?new WasmRoomPool(ctx,out):null;
+            const instruments={},motionRoutes=[],cleanup=[()=>out.disconnect()],roomPool=Wasm&&PERFORMANCE.sharedReverb?new WasmRoomPool(ctx,out,{busFactory:audioEnvironment?.createEffectsBus}):null;
             if(roomPool)cleanup.push(()=>roomPool.dispose());
             // the shared effects bus, as the generator builds it (engine/bus.js)
             const bus=busActive(gen.settings.bus)?await createBusRack(ctx,gen.settings.bus.rack,out):null;
@@ -258,11 +258,11 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
             if (gen.roleWanderFactory && !motionFactory) throw Error('Role-motion backend cannot prepare an offline context');
             for(const role of roles){
                 const inst = role === 'perc' && gen.roles.perc.machine
-                    ? await (await import('./classicsInstrument')).default.create({ context: ctx, preset: gen.roles.perc.instrument.preset, polyphony: 16 })
+                    ? await (await import('./classicsInstrument')).default.create({ sourceNodeFactory:audioEnvironment?.classicSourceNodeFactory, context: ctx, preset: gen.roles.perc.instrument.preset, polyphony: 16 })
                     : role === 'perc'
                     ? new (gen.percussionEngine && gen.percussionEngine !== 'native' ? WasmDrumKit : DrumKit)({ context: ctx, model:gen.percussionEngine })
                     : presets[role]?.iowa?await (await import('./iowaInstrument')).default.create({context:ctx,preset:presets[role],polyphony:gen.getRolePolyphony(role),sourceBackend:audioEnvironment?.iowaSourceBackend??'native'})
-                    : presets[role]?.classics?await (await import('./classicsInstrument')).default.create({context:ctx,preset:presets[role],polyphony:gen.getRolePolyphony(role)})
+                    : presets[role]?.classics?await (await import('./classicsInstrument')).default.create({sourceNodeFactory:audioEnvironment?.classicSourceNodeFactory,context:ctx,preset:presets[role],polyphony:gen.getRolePolyphony(role)})
                     : presets[role]?.diy?await (await import('./wasmInstrument')).default.create({audioEnvironment,polyphony:gen.getRolePolyphony(role),preset:presets[role],spec:(await import('./diySource')).diySpec(presets[role].diy,gen.getRolePolyphony(role)),context:ctx,roomPool,notes:notes.filter(n=>n.role===role&&n.time>=from&&n.time<end+(last?0:CROSSFADE)).map(n=>({...n,time:n.time-from}))})
                     : Wasm?await Wasm.create({audioEnvironment,polyphony:gen.getRolePolyphony(role),preset:presets[role],context:ctx,roomPool,dynamics:applyFeel(gen.settings).dynamics,notes:notes.filter(n=>n.role===role&&n.time>=from&&n.time<end+(last?0:CROSSFADE)).map(n=>({...n,time:n.time-from}))})
                     : new Instrument({ ...nativeInstrumentEnvironment(audioEnvironment,presets[role],ctx), polyphony: gen.getRolePolyphony(role), preset: presets[role], context: ctx });

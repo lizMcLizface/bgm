@@ -6,8 +6,8 @@ ABI worklets and defaults remain available. This replaces ownership of the
 existing Rust engines; it does not translate original Web Audio presets into
 a different sound model.
 
-Current host identity is `a73e7be40b6c9c31`, bound to the verified Graph Wasm
-hash `f41a99539bd540dcd4bb826352e441e6c3e75fc2a808035699c2a1a49a5382a0`. `tools/buildOwnedCoreLive.mjs --check` checks the exact
+Current host identity is `ec87f3ce37eabf40`, bound to the verified Graph Wasm
+hash `a88ac8e012a902fb66b9475e2d5fa134075b671b7155ae5f62da84c4d9a3349b`. `tools/buildOwnedCoreLive.mjs --check` checks the exact
 adapter, packet schemas, transition implementation and graph binary. The
 maintained desktop page is `tools/owned-core-live.html`.
 
@@ -50,3 +50,9 @@ The finite Graph compiler still prepares original transition points outside the
 render callback; ordinary defaults and native preset translation remain separate.
 Continue complete prepared-environment adoption and the remaining source/effect/
 room host paths. This is not a claim that the normal application is fully Rust.
+
+The additive CLASSIC drum/sequence admission update refreshes Graph to
+5d419303c1dba1f9 and the live Core/FM binding to ec87f3ce37eabf40. The14 controller
+and8 complete original-processor checks still pass, sample-bit-exact. The routed
+24-case capture above binds preceding a73e7be40b6c9c31; it is not relabelled as a
+new browser capture. The Core/FM numeric source/transition code did not change.

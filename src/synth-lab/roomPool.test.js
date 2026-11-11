@@ -35,3 +35,5 @@ test('room diagnostics expose response/output state without changing ownership',
  const b={...bus(),settings:{decay:12},stats:{peak:.2,reportedAt:3},error:Error('test')};state.create.mockResolvedValueOnce(b);
  const p=new WasmRoomPool(context(),node()),a=await p.acquire({});expect(p.diagnostics[0]).toMatchObject({clients:1,ready:true,settings:{decay:12},stats:{peak:.2},error:'test'});expect(b.clear).not.toHaveBeenCalled();expect(b.dispose).not.toHaveBeenCalled();a.release();expect(p.diagnostics).toEqual([]);
 });
+
+test('keeps a prepared bus factory owner-scoped and rolls back synchronous preparation failures',async()=>{const original=state.create,custom=vi.fn(()=>{throw Error('prepare');}),c=context(),p=new WasmRoomPool(c,node(),{busFactory:custom});await expect(p.acquire({})).rejects.toThrow('prepare');expect(p.rooms.size).toBe(0);expect(original).not.toHaveBeenCalled();const b=bus();custom.mockReturnValueOnce(b);const lease=await p.acquire({});expect(custom.mock.calls[1][0]).toBe(c);lease.release();expect(b.dispose).toHaveBeenCalledTimes(1);expect(()=>new WasmRoomPool(c,node(),{busFactory:7})).toThrow('factory');});

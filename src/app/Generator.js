@@ -392,7 +392,7 @@ class Generator {
         if(mode!=='wasm'&&Object.values(this.roles).some(r=>r.instrument.preset?.wasmVoice))throw Error('This preset uses Wasm-only voices. Choose another sound or preset to compare engines.');
         mode=mode==='wasm'?'wasm':'legacy';const revision=(this.audioEngineRevision??0)+1;this.audioEngineRevision=revision;
         const work=(async()=>{
-            const replacements=[];let committed=false;const roomPool=mode==='wasm'&&PERFORMANCE.sharedReverb?new WasmRoomPool(this.AC,this.output):null;
+            const replacements=[];let committed=false;const roomPool=mode==='wasm'&&PERFORMANCE.sharedReverb?new WasmRoomPool(this.AC,this.output,{busFactory:this.audioEnvironment?.createEffectsBus}):null;
             try {
                 const Wasm=mode==='wasm'?(await import('./engine/wasmInstrument')).default:null;
                 for(const role of Object.keys(ROLES)){
@@ -935,7 +935,7 @@ class Generator {
                 instrument=await Iowa.create({sourceBackend:this.audioEnvironment?.iowaSourceBackend??'native',context:this.AC,preset:source,polyphony:ROLES[role].polyphony});
             }else if(source?.classics){
                 const Classics=(await import('./engine/classicsInstrument')).default;
-                instrument=await Classics.create({context:this.AC,preset:source,polyphony:source.classics.light?Math.min(4,ROLES[role].polyphony):ROLES[role].polyphony});
+                instrument=await Classics.create({sourceNodeFactory:this.audioEnvironment?.classicSourceNodeFactory,context:this.AC,preset:source,polyphony:source.classics.light?Math.min(4,ROLES[role].polyphony):ROLES[role].polyphony});
             }else if(source?.diy){
                 const [Wasm,{diySpec}]=await Promise.all([import('./engine/wasmInstrument').then(m=>m.default),import('./engine/diySource')]);
                 instrument=await Wasm.create({audioEnvironment:this.audioEnvironment,context:this.AC,preset:source,polyphony:ROLES[role].polyphony,spec:diySpec(source.diy,ROLES[role].polyphony),roomPool:this.wasmRoomPool});
@@ -964,7 +964,7 @@ class Generator {
         let instrument, nextEngine = this.percussionEngine;
         if (source?.classics) {
             const Classics = (await import('./engine/classicsInstrument')).default;
-            instrument = await Classics.create({ context: this.AC, preset: source, polyphony: 16 });
+            instrument = await Classics.create({ sourceNodeFactory:this.audioEnvironment?.classicSourceNodeFactory, context: this.AC, preset: source, polyphony: 16 });
         } else {
             if (!r.machine) return;
             if (percussionVoice(this.settings.drums.kit).wasmOnly) nextEngine = 'wasm';
