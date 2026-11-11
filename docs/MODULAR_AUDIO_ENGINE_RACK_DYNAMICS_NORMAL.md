@@ -57,3 +57,13 @@ The first actual six-source All dynamics/reload attempts exposed failures before
 
 
 Current stamped publication is accepted on the complete225-case desktop sweep plus the actual six-source All three-host/reload batch. Normal identity `4a9139b792b7efd2` and atomic `4d6b7d778e0eb3d1` share the unchanged kernel. Atomic147 cases have sample/RMS errors0, normal60 worst is1.043081283569336e-7 /6.014669642922696e-9, and actual workbench/CLASSIC18 worst is7.301568984985352e-7 /2.0166515838102606e-7. Actual All records45 owned dynamics stages without errors and retains source/desk/live-edit/reload behavior. Full evidence, retained failures, exact resource costs and the next task are in the [stamped transport contract](MODULAR_AUDIO_ENGINE_STAMPED_TARGET_TRANSPORT.md). This optional prepared environment selects the owned rack path; omitted factories retain Native defaults.
+
+## Dormant startup follow-up
+
+Normal calls5a236fa5de4b0607 and atomic a72a4aa085cfe2e2 add only bounded
+pre-origin admission for declared dormant, input-isolated owners. The kernel
+bytes remain unchanged. Two144owner real-context batches pass, as do actual
+All/reload and built48k native rack comparisons. Active stamped metadata remains
+strict; a separate Width activation failure is still under diagnosis. Exact
+conditions, counts, identities and retained negatives are in
+[the startup record](MODULAR_AUDIO_ENGINE_RACK_STARTUP.md).

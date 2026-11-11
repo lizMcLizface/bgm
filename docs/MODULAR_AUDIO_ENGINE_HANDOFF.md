@@ -59,12 +59,20 @@ match Native exactly. The actual mixed All/reconstruction trio passes with21
 Motion owners and all observed ordinary compressors released cleanly.
 Motion is selected only in the explicit prepared environment.
 
-The combined local public bundle builds. Its All follow-up exposes a separate
-rack-dynamics startup rejection after one passing case; a Width/Ring insertion
-run separately rejects after two. Both preserve zero Motion/Raw errors. These
-assembled negatives stay unaccepted and are being diagnosed before any claim
-that all startup paths are closed. Shared clocks and accepted numeric DSP have
-not been clamped or changed. See component startup records.
+The combined local public bundle builds. The dormant rack startup failure is
+now reproduced and bounded: a144owner real-context batch initially records
+seven owners receiving frame0 before their frame512 creation epoch. Explicit
+zero-demand, input-isolated admission now passes the full144 twice and in the
+built bundle, without Rust/control/clock advancement during the wait. Actual
+All/reload passes with45rack dynamics,39ordinary compressor,18Motion and6
+Width/Ring owners released cleanly. Width/Ring72case Native PCM remains exact;
+built48k dynamics normal host comparisons also pass.
+
+A distinct built All Width activation rejects future authored metadata while
+demand is1 and physical input has two channels. That path remains strict and
+unaccepted; an independent Native clock/publication probe is the next diagnostic.
+No active callback is muted, shifted or clamped. See
+MODULAR_AUDIO_ENGINE_RACK_STARTUP.md for exact identities and retained negatives.
 
 Complete Ambience spatial DSP and exact Native phase-table preparation pass
 36 Native cases at six rates: all 12 wet channels are bit exact, aggregate
@@ -89,9 +97,9 @@ accepted numeric Wasm artifact verified byte-identical. Build results and
 component documents bind their own exact identities.
 
 The grouped Width/Ring cold exports and built-bundle gates now pass.
-Next: diagnose and close rack-dynamics/Width-Ring startup admission using the
-actual captured failing owner states, then finish live Tape, Ambience
-resource/control ownership and explicit Filter routing admission. Filter's retained low-rate restart gate, Tape,
+Next: resolve active Width/Ring publication timing using independent Native
+clock evidence; continue live Tape, Ambience resource/control ownership and
+explicit Filter routing admission in parallel. Filter's retained low-rate restart gate, Tape,
 shared sampled rooms and the remaining native Instrument effects remain active
 port work. General cable editing and broader worker execution remain later.
 Freeze capture retains its explicit worker/resource policy.

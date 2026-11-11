@@ -65,8 +65,10 @@ aggregate addition is checked against a derived Float32 arithmetic envelope.
 Complete spatial DSP/Native phase preparation also passes36 six-rate cases,
 with all12 wet channels bit exact. Its bounded running resource/control owner
 is in progress; the prepared environment still selects Native loop/spatial
-playback. Motion normal routes/endpoints/cold reconstruction pass, while the
-combined startup ordering guard remains under review. See component records.
+playback. Motion normal routes/endpoints/cold reconstruction are now adopted in the
+prepared environment. Bounded dormant rack startup passes144owners twice and
+in the built bundle; active Width publication remains separately under review.
+See MODULAR_AUDIO_ENGINE_RACK_STARTUP.md and component records.
 
 Then finish remaining effect host rewiring/demand, shared-room/transport latency
 composition and original ambience spatial/fade/wander/BufferSource ownership.
