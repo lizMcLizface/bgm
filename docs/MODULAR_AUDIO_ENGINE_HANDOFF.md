@@ -2878,3 +2878,23 @@ until their individual graphs are ported and compared. No push/deployment.
 
 
 Full-page persistence is now verified too. The fixed review page adds a saved-graph check that requires an actual NavigationTiming reload. In the built-in browser, a fresh page reload retained the canonical patch, then a new AudioWorklet rendered145792frames exactly against the direct reference (first signal437,peak0.060658469796180725). The stored SHA256 is08bd9a869774211c9fafe71186ec34574737e04e5cc8d37013d4c0679ee5bcce. See owned-ports-page-reload-browser.json/.png. Four focused harness tests pass. This uses an isolated review-page storage key; the All song/defaults are unchanged.
+
+
+### Owned plucked-string preparation (overnight 2026-11-11)
+
+The generator's actual Karplus–Strong renderString/stringBody numeric preparation
+now has a portable Rust implementation with owned prepared buffers and bounded
+copy playback. Published build ac303d85fde48b42 is 39831 bytes; provenance
+includes the actual original JS references.11 tests pass against this asset.
+Across six rates, four body profiles, four registers and three softness settings,
+288 comparisons pass (271 bit exact; max sample error4.656612873077393e-10).
+Twenty-four two-handle prepared playback cases report zero allocation/free/growth,
+including EOF, odd blocks, reset, independence and saved-spec replay.
+
+This ports source preparation, not the full native plucked voice. AudioBuffer
+detune/resampling,2.5 source gain, finite gain/filter automation,10ms stealing
+fade and independent breath-air branch remain explicit native host boundaries.
+The shared cache's0.01Hz pitch quantization is captured; it is not a piano bank.
+Next: a distinct prepared finite-voice contract and actual native-browser
+comparison with unsupported active controls rejected. See
+MODULAR_AUDIO_ENGINE_PLUCKED_STRING.md and the two plucked-string-owned reports.

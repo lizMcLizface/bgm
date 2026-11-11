@@ -20,6 +20,7 @@ synth-engine/iowa-preparation/target/
 synth-engine/mixer/target/
 synth-engine/rack-fx/target/
 synth-engine/voice-fx/target/
+synth-engine/plucked-string/target/
 
 # Working YAML exports; only the explicit public/synth-presets/ bundle is published
 patches/

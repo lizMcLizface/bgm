@@ -3,7 +3,7 @@
   "version": 1,
   "status": "running",
   "startedAtUtc": "2026-11-10T23:19:46Z",
-  "updatedAtUtc": "2026-11-11T00:35:09.603Z",
+  "updatedAtUtc": "2026-11-11T00:36:18.999Z",
   "featureCutoffUtc": "2026-11-11T08:30:00Z",
   "deadlineUtc": "2026-11-11T09:00:00Z",
   "gitIdentity": {
@@ -18,7 +18,8 @@
     "1d6291b",
     "bee2764",
     "fff00db",
-    "60c553b"
+    "60c553b",
+    "edb9b5d"
   ],
   "graph": {
     "api": 1,
@@ -45,7 +46,15 @@
     "combinedAllocationCases": 9,
     "desktopBrowser": "owned-ports-desktop-browser.json",
     "liveOutputBrowser": "owned-ports-live-browser.json",
-    "pageReloadBrowser": "owned-ports-page-reload-browser.json"
+    "pageReloadBrowser": "owned-ports-page-reload-browser.json",
+    "pluckedPreparation": {
+      "build": "ac303d85fde48b42",
+      "comparisons": 288,
+      "bitExact": 271,
+      "maxSampleError": 4.656612873077393e-10,
+      "allocationCases": 24,
+      "tests": 11
+    }
   },
   "limitations": [
     "No physical listening/device-underrun claim",
