@@ -1,3 +1,4 @@
+import './reportDirectory.mjs';
 // Wasm counting allocator, including prepared captured automation and graph PDC.
 import fs from 'node:fs';import assert from 'node:assert/strict';import crypto from 'node:crypto';
 import {ReferenceGraph,savePatch,loadPatch}from '../public/modular-audio/runtime.js';

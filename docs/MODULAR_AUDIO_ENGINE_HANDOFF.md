@@ -1,3 +1,15 @@
+Repository hygiene (11 November2026): generated `reports/` evidence is local
+and ignored; temporary diagnostic scripts belong in `reports/scripts/`. Keep
+maintained build/audit utilities in `tools/` and minimal permanent reference
+fixtures beside their tests. Survey page sources now live under `tools/`; their
+built `/reports/` URLs are preserved. Historical report links below refer to
+local evidence and are not checkout dependencies. Cleanup verification:473
+files /3705 passing tests,4 existing skips; public build without the generated
+survey database passes, both historical survey URLs build, and the retained
+16-case cursor fixture exactly matches the original local measurements. The
+net diff against origin falls from about1.04million to71thousand added lines.
+Reports remain on disk; prior local Git history is retained.
+
 # Modular audio engine handoff
 
 Bounded overnight run closed on11 November2026 at09:00UTC. The continuation

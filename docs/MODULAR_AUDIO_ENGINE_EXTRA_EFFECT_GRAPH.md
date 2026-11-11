@@ -68,7 +68,7 @@ Published graph and actual processor constructors:
 
 ```powershell
 npm.cmd test -- src/modular-audio/extraEffectGraph.test.js src/modular-audio/processorExecutionPolicy.test.js --reporter=json --outputFile=.tmp/extra-effect-graph-tests.json
-node tools/reportExtraEffectGraph.mjs
+node reports/scripts/reportExtraEffectGraph.mjs
 ```
 
 `reports/modular_audio/extra-effect-graph-verification.json` records the exact

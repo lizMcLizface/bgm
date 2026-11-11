@@ -1,3 +1,4 @@
+import './reportDirectory.mjs';
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import assert from 'node:assert/strict';

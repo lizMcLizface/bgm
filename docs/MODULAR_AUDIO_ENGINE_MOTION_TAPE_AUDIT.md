@@ -132,7 +132,7 @@ latest targets, and late controls clamp to the current frame rather than a
 
 ```powershell
 npm.cmd test -- src/modular-audio/motionGraph.test.js src/modular-audio/ownedMotion.test.js src/modular-audio/nativeAutomationTime.test.js --reporter=json --outputFile=.tmp/motion-graph-tests.json
-node tools/reportMotionGraph.mjs
+node reports/scripts/reportMotionGraph.mjs
 ```
 
 `reports/modular_audio/motion-graph-verification.json` records25 passing checks

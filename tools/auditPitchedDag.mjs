@@ -1,3 +1,4 @@
+import './reportDirectory.mjs';
 import fs from 'node:fs';
 import {coreCases} from './coreOwnedVerification.mjs';
 import {fmCases,hash} from './fmOwnedVerification.mjs';

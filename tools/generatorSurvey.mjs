@@ -18,7 +18,7 @@ import { newParams, recordPart, slotTracker } from './generatorSurveyParamStats'
 
 const root = path.resolve('reports/survey_generator/data');
 const input = path.join(root, 'notes.jsonl.gz');
-const output = path.join(root, 'survey.json');
+const output = path.resolve('tools/survey_generator/data/survey.json');
 const counts = () => Object.create(null);
 const add = (o, key, n = 1) => { key = String(key ?? '(none)'); o[key] = (o[key] ?? 0) + n; };
 const get = (o, path) => path.split('.').reduce((v, k) => v?.[k], o);

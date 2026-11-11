@@ -1,3 +1,4 @@
+import './reportDirectory.mjs';
 import fs from 'node:fs';import crypto from 'node:crypto';import assert from 'node:assert/strict';
 import {SYNTHS} from '../src/synths/models';import {OwnedClassic} from '../src/modular-audio/ownedClassic';
 import {builtinWaves} from '../src/synths/vs/waves';import {packWaves,DEFAULT_WAVES} from '../src/synths/wt/waves';

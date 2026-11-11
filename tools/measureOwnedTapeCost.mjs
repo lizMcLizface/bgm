@@ -1,3 +1,4 @@
+import './reportDirectory.mjs';
 import fs from 'node:fs';
 import os from 'node:os';
 import {performance}from 'node:perf_hooks';

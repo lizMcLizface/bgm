@@ -1,3 +1,4 @@
+import './reportDirectory.mjs';
 // Run graph:audit-alloc first; all allocations below are watched only after prepare.
 import fs from 'node:fs';
 import assert from 'node:assert/strict';

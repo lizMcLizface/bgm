@@ -1,3 +1,4 @@
+import './reportDirectory.mjs';
 import fs from 'node:fs';
 import {verifyWorker} from '../src/modular-audio/workerVerification.js';
 import {BrowserThreadWorker,MessageChannel} from './workerNodeAdapter.mjs';

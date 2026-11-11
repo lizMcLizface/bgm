@@ -1,3 +1,4 @@
+import './reportDirectory.mjs';
 // Run after graph:audit-alloc builds the instrumented Wasm. Never runs native binaries.
 import fs from 'node:fs';
 import {ReferenceGraph,savePatch,loadPatch} from '../src/modular-audio/runtime.js';

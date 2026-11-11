@@ -1,3 +1,4 @@
+import './reportDirectory.mjs';
 import fs from 'node:fs';import path from 'node:path';import {spawnSync} from 'node:child_process';
 import {ReferenceGraph} from '../public/modular-audio/runtime.js';
 import {sixSourceDag} from '../src/modular-audio/pitchedFixture.js';

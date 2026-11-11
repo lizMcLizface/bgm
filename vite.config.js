@@ -7,6 +7,7 @@ import basicSsl from '@vitejs/plugin-basic-ssl';
 import { localRainReferences } from './tools/rainReferencesPlugin.mjs';
 import { startupPreload } from './tools/startupPreloadPlugin.mjs';
 import { moduleAssetUrl } from './tools/moduleAssetUrls.mjs';
+import { surveyPages } from './tools/surveyPages.mjs';
 
 // GitHub Pages redirects /labs/strings to /labs/strings/; Vite's dev and preview
 // servers instead fall back to the main app. Mirror the Pages redirect locally.
@@ -87,14 +88,14 @@ export default defineConfig(({ mode }) => {
   return {
     base: '/',
     experimental: { renderBuiltUrl: moduleAssetUrl },
-    plugins: [react(), directorySlash(), localBanks(isPublic), localRainReferences(isPublic), startupPreload(),
+    plugins: [react(), directorySlash(), surveyPages(), localBanks(isPublic), localRainReferences(isPublic), startupPreload(),
         // DEV_HTTPS=1 serves the dev server over a self-signed certificate: other devices on the network need a secure origin for AudioWorklet
         ...(process.env.DEV_HTTPS ? [basicSsl()] : [])],
     build: {
         outDir,
-        rollupOptions: { input: { main: 'index.html', ambient: 'ambient/index.html', generatorSurvey:'reports/survey_generator/index.html', percussion: 'tools/percussion-engine.html', audioOutput: 'tools/audio-output.html', labs:'labs/index.html', labAll:'labs/all/index.html', labStrings:'labs/strings/index.html', labKeys:'labs/keys/index.html', labChoir:'labs/choir/index.html', labOrgans:'labs/organs/index.html', labDrones:'labs/drones/index.html', labBass:'labs/bass/index.html', labPlucks:'labs/plucks/index.html', labWinds:'labs/winds/index.html', labLeads:'labs/leads/index.html', labPads:'labs/pads/index.html', labLevels:'labs/levels/index.html', ...SYNTH_PAGES, allDeskHost: 'tools/all-desk-host.html', nativeCompressorReference: 'tools/native-compressor-reference.html', nativeCompressorAutomation: 'tools/native-compressor-automation.html', nativeCompressorGraph: 'tools/native-compressor-graph.html', convolverOwned: 'tools/convolver-owned.html', convolverPreparation: 'tools/convolver-preparation.html', stringDecay: 'tools/string-decay.html', ambienceLoops: 'tools/ambience-loops.html', measuredString: 'tools/measured-string.html', tapeGraph: 'tools/tape-graph.html', weatherOwned: 'tools/weather-owned.html', tapeReference: 'tools/tape-reference.html', pluckedPitchProbe: 'tools/plucked-pitch-probe.html', ownedDesk: 'tools/owned-desk.html', pluckedVoice: 'tools/plucked-voice.html', motionReference: 'tools/motion-reference.html', ownedPorts: 'tools/owned-ports.html', mixerOwned: 'tools/mixer-owned.html', iowaVoice: 'tools/iowa-voice.html', pianoVoice: 'tools/piano-voice.html', modularAudio: 'tools/modular-audio.html', modularEnsemble: 'tools/modular-ensemble.html', modularWorker: 'tools/modular-worker.html', synthLab: 'tools/synth-lab.html', currentSynth: 'tools/current-synth.html', effectsLab:'tools/effects.html', fmLab:'tools/fm.html', ensembleSynth:'tools/ensemble-synth.html', spectrum:'tools/spectrum.html', quality:'tools/quality.html', tone:'tools/tone.html', modulation:'tools/modulation.html', instrumentEffects:'tools/instrument-effects.html', acoustic:'tools/acoustic.html', sources:'tools/sources.html', behavior:'tools/behavior.html', stress:'tools/stress.html', scenery:'tools/scenery.html',
+        rollupOptions: { input: { main: 'index.html', ambient: 'ambient/index.html', generatorSurvey:'tools/survey_generator/index.html', percussion: 'tools/percussion-engine.html', audioOutput: 'tools/audio-output.html', labs:'labs/index.html', labAll:'labs/all/index.html', labStrings:'labs/strings/index.html', labKeys:'labs/keys/index.html', labChoir:'labs/choir/index.html', labOrgans:'labs/organs/index.html', labDrones:'labs/drones/index.html', labBass:'labs/bass/index.html', labPlucks:'labs/plucks/index.html', labWinds:'labs/winds/index.html', labLeads:'labs/leads/index.html', labPads:'labs/pads/index.html', labLevels:'labs/levels/index.html', ...SYNTH_PAGES, allDeskHost: 'tools/all-desk-host.html', nativeCompressorReference: 'tools/native-compressor-reference.html', nativeCompressorAutomation: 'tools/native-compressor-automation.html', nativeCompressorGraph: 'tools/native-compressor-graph.html', convolverOwned: 'tools/convolver-owned.html', convolverPreparation: 'tools/convolver-preparation.html', stringDecay: 'tools/string-decay.html', ambienceLoops: 'tools/ambience-loops.html', measuredString: 'tools/measured-string.html', tapeGraph: 'tools/tape-graph.html', weatherOwned: 'tools/weather-owned.html', tapeReference: 'tools/tape-reference.html', ownedDesk: 'tools/owned-desk.html', pluckedVoice: 'tools/plucked-voice.html', motionReference: 'tools/motion-reference.html', ownedPorts: 'tools/owned-ports.html', mixerOwned: 'tools/mixer-owned.html', iowaVoice: 'tools/iowa-voice.html', pianoVoice: 'tools/piano-voice.html', modularAudio: 'tools/modular-audio.html', modularEnsemble: 'tools/modular-ensemble.html', modularWorker: 'tools/modular-worker.html', synthLab: 'tools/synth-lab.html', currentSynth: 'tools/current-synth.html', effectsLab:'tools/effects.html', fmLab:'tools/fm.html', ensembleSynth:'tools/ensemble-synth.html', spectrum:'tools/spectrum.html', quality:'tools/quality.html', tone:'tools/tone.html', modulation:'tools/modulation.html', instrumentEffects:'tools/instrument-effects.html', acoustic:'tools/acoustic.html', sources:'tools/sources.html', behavior:'tools/behavior.html', stress:'tools/stress.html', scenery:'tools/scenery.html',
             // the preset tool (src/presetter) is for this machine: it needs the dev server's page hook, and the public build leaves it out
-            ...(isPublic ? {} : { presetter: 'tools/presetter/index.html', chordSurvey: 'reports/survey_chords/index.html' }) },
+            ...(isPublic ? {} : { presetter: 'tools/presetter/index.html', chordSurvey: 'tools/survey_chords/index.html' }) },
             // React and its renderer are shared by every page; without a name, rollup calls the chunk after
             // whichever small module happens to import it first (it was "FirefoxAndroidNotice").
             output: { manualChunks: (id) => (/node_modules[\/](react|react-dom|scheduler)[\/]/.test(id) ? 'react' : undefined) } },
@@ -102,8 +103,8 @@ export default defineConfig(({ mode }) => {
     test: {
         environment: 'jsdom',
         globals: true,
-        // .tmp/ holds local scratch experiments (git-ignored), not the suite
-        exclude: [...configDefaults.exclude, '.tmp/**'],
+        // Ignored evidence/scratch folders are not part of the permanent suite
+        exclude: [...configDefaults.exclude, '.tmp/**', 'reports/**'],
     },
   };
 });

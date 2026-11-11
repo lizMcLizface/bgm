@@ -1,3 +1,4 @@
+import './reportDirectory.mjs';
 import fs from 'node:fs';import crypto from 'node:crypto';import assert from 'node:assert/strict';
 import {OwnedNativeCompressorAutomation,ownedNativeCompressorAutomationSpec,saveOwnedNativeCompressorAutomationSpec,loadOwnedNativeCompressorAutomationSpec}from '../src/modular-audio/ownedNativeCompressorAutomation.js';
 const module=new WebAssembly.Module(fs.readFileSync('.tmp/owned-native-compressor-automation/native-compressor-automation.wasm')),manifest=JSON.parse(fs.readFileSync('.tmp/owned-native-compressor-automation/build.json')),hash=pcm=>crypto.createHash('sha256').update(Buffer.concat(pcm.map(v=>Buffer.from(v.buffer,v.byteOffset,v.byteLength)))).digest('hex'),trials=[];

@@ -1,3 +1,4 @@
+import './reportDirectory.mjs';
 import fs from 'node:fs';import assert from 'node:assert/strict';import {OwnedClassic}from '../src/modular-audio/ownedClassic';import {builtinWaves}from '../src/synths/vs/waves';import {packWaves,DEFAULT_WAVES}from '../src/synths/wt/waves';import {SYNTHS}from '../src/synths/models';
 const module=new WebAssembly.Module(fs.readFileSync('.tmp/classics-wave-allocation-target/wasm32-unknown-unknown/release/calmbgm_classics.wasm')),results=[];
 for(const model of [7,12])for(const rate of [44100,48000,96000]){const s=SYNTHS[model===7?'vs':'wt'],e=new WebAssembly.Instance(module,{}).exports,p={version:1,model,parameters:s.params.toPairs(s.presets[0].values),waves:Array.from(model===7?builtinWaves():packWaves(DEFAULT_WAVES))},a=new OwnedClassic(e,p,rate),b=new OwnedClassic(e,p,rate);a.refresh();b.refresh();const memory=e.memory.buffer.byteLength;

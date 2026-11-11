@@ -1,3 +1,4 @@
+import './reportDirectory.mjs';
 // Watch the graph allocator after full Tape curve/resource preparation.
 import fs from 'node:fs';import assert from 'node:assert/strict';import crypto from 'node:crypto';
 import {ReferenceGraph,savePatch,loadPatch}from '../public/modular-audio/runtime.js';

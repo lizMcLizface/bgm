@@ -1,3 +1,4 @@
+import './reportDirectory.mjs';
 // Pre-adapter boundary audit. Raw unmapped hits intentionally differ from a
 // selected palette; configured kits now close the measured preparation gap.
 import fs from 'node:fs';

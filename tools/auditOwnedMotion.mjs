@@ -1,3 +1,4 @@
+import './reportDirectory.mjs';
 import fs from 'node:fs';import crypto from 'node:crypto';import assert from 'node:assert/strict';
 import {OwnedMotion,ownedMotionSpec,saveOwnedMotionSpec,loadOwnedMotionSpec} from '../src/modular-audio/ownedMotion.js';
 const module=new WebAssembly.Module(fs.readFileSync('.tmp/owned-motion/motion-fx.wasm')),manifest=JSON.parse(fs.readFileSync('.tmp/owned-motion/build.json')),sha=pcm=>crypto.createHash('sha256').update(Buffer.concat(pcm.map(a=>Buffer.from(a.buffer,a.byteOffset,a.byteLength)))).digest('hex'),trials=[];

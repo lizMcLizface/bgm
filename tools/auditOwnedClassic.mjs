@@ -1,3 +1,4 @@
+import './reportDirectory.mjs';
 import fs from 'node:fs';import crypto from 'node:crypto';import assert from 'node:assert/strict';
 import {SYNTHS} from '../src/synths/models';import {OwnedClassic} from '../src/modular-audio/ownedClassic';
 const original=new WebAssembly.Module(fs.readFileSync('.tmp/classics-before-owned.wasm')),module=new WebAssembly.Module(fs.readFileSync('.tmp/classics-owned-target/wasm32-unknown-unknown/release/calmbgm_classics.wasm')),trials=[];

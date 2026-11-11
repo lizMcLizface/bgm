@@ -1,5 +1,5 @@
 // Per-knob distributions of the proposed sequencer chord-track pages, for pad and rhythm separately.
-// Reads the captured note database (npm run survey:generate) and writes reports/survey_chords/data/chords.json.
+// Reads the captured note database (npm run survey:generate) and writes tools/survey_chords/data/chords.json.
 // Run with: npm run survey:chords
 import fs from 'node:fs';
 import path from 'node:path';
@@ -9,7 +9,7 @@ import { describePart, figureOf, figureVariation } from './generatorSurveyParams
 import { KNOBS, knobValues } from './chordSurveyKnobs';
 
 const root = path.resolve('reports/survey_generator/data');
-const outDir = path.resolve('reports/survey_chords/data');
+const outDir = path.resolve('tools/survey_chords/data');
 const ROLES = ['pad', 'rhythm'];
 const counts = () => Object.create(null);
 const add = (object, key, n = 1) => { key = String(key); object[key] = (object[key] ?? 0) + n; };

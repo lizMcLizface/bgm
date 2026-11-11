@@ -1,3 +1,4 @@
+import './reportDirectory.mjs';
 // Run after graph:audit-alloc has built the current instrumented Wasm.
 import fs from 'node:fs';import {ReferenceGraph} from '../public/modular-audio/runtime.js';
 import {sixSourceDag} from '../src/modular-audio/pitchedFixture.js';

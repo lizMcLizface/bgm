@@ -1,3 +1,4 @@
+import './reportDirectory.mjs';
 import fs from 'node:fs';
 import {verifyPool} from '../src/modular-audio/poolVerification.js';
 import {BrowserThreadWorker,MessageChannel} from './workerNodeAdapter.mjs';

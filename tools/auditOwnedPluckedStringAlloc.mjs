@@ -1,3 +1,4 @@
+import './reportDirectory.mjs';
 import fs from 'node:fs';import assert from 'node:assert/strict';import {OwnedPluckedString,pluckedStringSpec} from '../src/modular-audio/ownedPluckedString';
 const out='.tmp/plucked-string-audit',manifest=JSON.parse(fs.readFileSync(`${out}/build.json`)),module=new WebAssembly.Module(fs.readFileSync(`${out}/string.wasm`)),results=[];
 for(const rate of [8000,24000,44100,48000,96000,192000])for(const bodyType of ['guitar','harp','bass','kalimba']){

@@ -1,3 +1,4 @@
+import './reportDirectory.mjs';
 import fs from 'node:fs';import crypto from 'node:crypto';import assert from 'node:assert/strict';
 import {OwnedVoiceCompressor,ownedVoiceCompressorSpec,saveOwnedVoiceCompressorSpec,loadOwnedVoiceCompressorSpec}from '../src/modular-audio/ownedVoiceCompressor.js';
 const module=new WebAssembly.Module(fs.readFileSync('.tmp/owned-voice-compressor/voice-compressor.wasm')),manifest=JSON.parse(fs.readFileSync('.tmp/owned-voice-compressor/build.json')),hash=pcm=>crypto.createHash('sha256').update(Buffer.concat(pcm.map(v=>Buffer.from(v.buffer,v.byteOffset,v.byteLength)))).digest('hex'),trials=[];
