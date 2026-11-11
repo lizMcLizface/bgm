@@ -1,10 +1,10 @@
 {
   "api": 1,
   "profile": "native-rack-normal-extra-v1",
-  "version": "8f3cf04e05f1b2ee",
+  "version": "4b7cd4e4e04da6ac",
   "source": "810c9f2ddbb1529e5d2ecb284e24786d7c1b82903943b99d4974816d2129e6f0",
   "kernelVersion": "3eccb77c7e28803e",
-  "hostVersion": "6d0e5662ee01deee",
+  "hostVersion": "eda53c0cfd6507ab",
   "wasm": "64136583278673e5e23d198d03863fc34ebe1826f45806634bd258943a47f4e8",
   "files": [
     "tools/buildRackNativeNormalExtra.mjs",

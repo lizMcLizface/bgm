@@ -1,12 +1,12 @@
 {
   "api": 1,
   "profile": "native-rack-normal-stamped32-v1",
-  "version": "6d0e5662ee01deee",
+  "version": "eda53c0cfd6507ab",
   "kernelVersion": "3eccb77c7e28803e",
   "wasm": "64136583278673e5e23d198d03863fc34ebe1826f45806634bd258943a47f4e8",
-  "source": "073f6698cddfa11f7f8f9370936bc52561892e743ee1214cc370420636f00a37",
-  "processor": "ae20e8d076ccd0e06ca83ee9d1563477f43c59bf2c07c1584b904d5da951c473",
-  "processorName": "native-rack-normal-6d0e5662ee01deee",
+  "source": "70a3f07d9c3b8c2c7843e6d2afb736418023feaf04075a2697f0a1363e3b1a07",
+  "processor": "aa90c0e8d89dc226ef797312057dd2806f52bc3efca2be878849f31c64536459",
+  "processorName": "native-rack-normal-eda53c0cfd6507ab",
   "files": [
     "src/modular-audio/nativeRackNormalProcessor.js",
     "src/modular-audio/nativeRackNormalBrowser.js",
