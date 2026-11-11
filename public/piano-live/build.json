@@ -2,9 +2,9 @@
   "api": 1,
   "source": "db2aac863a8b44cc4d4b18fe80229f4137d9bfe050885049d88603c395c098ca",
   "runtime": "085496ef90553b23595de8f9cf6b5c9a6bd80b94436f8b9884a552d69b1fdd4e",
-  "reference": "b38007294952a78921baf09c7d1d3068d699717d1871433d878557eb5fd5dddb",
+  "reference": "1f27125141d25d2741bb79b580b23af340ef5804d64dfa6d8e5f0fa567826669",
   "wasm": "809dc82c710d67635002ec8145f6870da4ddbb89e229d0ca2a2b570744fcf308",
   "bytes": 253652,
   "audited": false,
-  "version": "7476277c0abdc6b1"
+  "version": "b8ee994d0bd521aa"
 }

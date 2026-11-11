@@ -387,6 +387,7 @@ class Instrument {
     }
     prepareOffline() { return ownedSourceOf(this)?.prepareOffline(); }
     async armRuntime(){
+        if(!this.ordinaryDynamicsOwned)return;
         await this.effectsReady;
         if(this.AC.state==='running'){
             this.ordinaryArm ??= Promise.all([this.synthMix.arm?.(),this.limiter.arm?.()]).catch(error=>{this.ordinaryArm=null;throw error;});
@@ -394,7 +395,7 @@ class Instrument {
         }
     }
     updateOrdinaryDemand(){
-        if(this.disposed)return;
+        if(this.disposed||!this.ordinaryDynamicsOwned)return;
         const on=!!this.chainAwake&&this.destinations.length>0;
         this.synthMix.setHostAwake?.(on);this.limiter.setHostAwake?.(on);
     }
@@ -1094,7 +1095,7 @@ class Instrument {
         this.silence();
         clearTimeout(this.sleepTimer);
         ownedSourceOf(this)?.dispose();
-        this.effectsDisposal = Promise.resolve().then(() => Promise.all([this.compressor.dispose?.(),this.synthMix.dispose?.(),this.limiter.dispose?.()])).catch(error => { this.effectsDisposalError = error; });
+        this.effectsDisposal = Promise.allSettled([this.compressor,this.synthMix,this.limiter].filter(Boolean).map(owner=>Promise.resolve().then(()=>owner.dispose?.()))).then(results=>{const failed=results.find(r=>r.status==='rejected');if(failed)throw failed.reason;}).catch(error => { this.effectsDisposalError = error; });
         this.voices.forEach((synth) => synth.destroy());
         this.shimmer.dispose();
         this.freeze.dispose();

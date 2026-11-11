@@ -932,7 +932,7 @@ class Generator {
             let instrument;
             if(source?.iowa){
                 const Iowa=(await import('./engine/iowaInstrument')).default;
-                instrument=await Iowa.create({sourceBackend:this.audioEnvironment?.iowaSourceBackend??'native',context:this.AC,preset:source,polyphony:ROLES[role].polyphony});
+                instrument=await Iowa.create({ordinaryCompressorFactory:this.audioEnvironment?.ordinaryCompressorFactory,sourceBackend:this.audioEnvironment?.iowaSourceBackend??'native',context:this.AC,preset:source,polyphony:ROLES[role].polyphony});
             }else if(source?.classics){
                 const Classics=(await import('./engine/classicsInstrument')).default;
                 instrument=await Classics.create({sourceNodeFactory:this.audioEnvironment?.classicSourceNodeFactory,rackPluginFactory:this.audioEnvironment?.rackPluginFactory,context:this.AC,preset:source,polyphony:source.classics.light?Math.min(4,ROLES[role].polyphony):ROLES[role].polyphony});

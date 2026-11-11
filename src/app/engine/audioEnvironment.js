@@ -1,7 +1,7 @@
 // Runtime executor choice belongs to a context, never to a serialized song.
 export function validateAudioEnvironment(environment,context){
  if(environment==null)return null;
- for(const key of ['ambienceOptions','weatherOfflineFactory','createInserts','createEffectsBus','classicSourceNodeFactory','rackPluginFactory'])if(environment[key]!==undefined&&typeof environment[key]!=='function')throw Error('Invalid prepared runtime factory');
+ for(const key of ['ambienceOptions','weatherOfflineFactory','createInserts','createEffectsBus','classicSourceNodeFactory','rackPluginFactory','ordinaryCompressorFactory'])if(environment[key]!==undefined&&typeof environment[key]!=='function')throw Error('Invalid prepared runtime factory');
  if(environment.createCoreBackend!==undefined&&typeof environment.createCoreBackend!=='function')throw Error('Invalid prepared Core/FM factory');
  if(environment.version!==1||environment.profile!=='owned-active-host-v1'||environment.context!==context||typeof environment.instrumentOptions!=='function'||typeof environment.prepareContext!=='function'||typeof environment.roleWanderFactory!=='function'||environment.iowaSourceBackend!=='owned-rust'||typeof environment.voiceFxOptions?.compressorFactory!=='function')throw Error('Invalid context-bound audio environment');
  return environment;

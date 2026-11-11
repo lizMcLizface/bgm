@@ -1,100 +1,50 @@
-Normal Instrument dynamics checkpoint: its ordinary mix compressor and final
-limiter now use the accepted Rust host in the explicit prepared environment.
-All18 actual native-chain comparisons (six rates, cold/late/gap and live controls)
-are sample-bit-exact, including independent instances. All3 combined KS/piano/Hand
-desk/reconstruction cases and cold3-note/144000-frame export pass. Original
-initial setter order, raw native clamping, effects-tail demand and acknowledged
-cleanup remain intact. See MODULAR_AUDIO_ENGINE_INSTRUMENT_DYNAMICS.md.
-Defaults remain native. Iowa's bare-native/property limiter and rack target
-compressors require their distinct profiles; other effects/room/ambience ownership
-are still active work.57 focused checks pass; combined full regression is pending.
-
-Shared physical-player checkpoint: the prepared environment now supplies the
-accepted context-owned piano streaming factory. Four actual native Starmap cases
-pass cold authored-zero expression/body, genuine unpulled filter/LFO aging and
-two reused held-control runs (max relative RMS5.761098075982471e-7 under the
-unchanged.005 bound). The actual four-KS/piano/Hand desk and saved reconstruction
-also pass all3 with that factory (owned-host-shared-physical-final.json).
-Normal default construction still uses its original controller. Direct owned
-material changes now reject before mutating preset/source/morph state; normal
-application edits reconstruct atomically. See MODULAR_AUDIO_ENGINE_PIANO_STREAMING.md.
-
-The raw ordinary compressor cleanup fix now releases retained Wasm exports/views
-and acknowledges constructor failures. Its final remaining22 cases pass in bounded
-96k/192k shards; combined with the86 retained pre-exhaustion cases this covers all
-108 matrix positions, not a new single108-case run. Default harness execution
-now uses at most18 contexts per rate. Normal ordinary compressor adoption follows.
-
-Prepared-host continuation: original KS live control/demand histories are accepted
-and selected by the explicit runtime environment. The actual All path with four
-KS materials, piano and Hand passes native desk / owned desk / saved reconstruction
-(all3), with no late cold preparations. Accepted Crusher/Pitch/ZPlane factories
-now reach normal CLASSIC, All racks and offline reconstruction. Its actual six-role
-CLASSIC/piano/Iowa path with all three plugins active passes all3 desk/reload cases,
-creating9 owned plugin nodes. Evidence: owned-host-physical-final.json and
-owned-host-rack-final.json under ignored reports/modular_audio.
-
-The effect-family18 cases all pass the original1e-6 bound;16 are exact, high-rate
-ZPlane maxima are1.4210854715202004e-14 and1.1641532182693481e-10. Independent
-instances, saved custom48k reconstruction and ordered rack output are exact.
-The first fixture omitted custom rows on its second independent node; strict
-refusal exposed this and the retained fixture was corrected without DSP changes.
-
-Physical-source10 final cases cover Air/scalar pitch target history, hot sleeping
-controls and held playback across five materials; earlier44 static cases remain
-separately bound to their saved artifacts. Normal host fixtures use the actual
-catalog KS patches, not their older oscillator namesakes. Their preview lease uses
-the piano role because finite KS previews correctly exclude concurrent bookings.
-Defaults and hidden measured-string scope remain unchanged.
-
-Broad regression reached525 files /4219 passing tests /4 skips with one stale
-Iowa disposed-node assertion. The acknowledgement-aware correction and all64
-focused host/lifecycle checks pass; another full suite/public build is pending.
-The ordinary compressor final38 demand/clamping checks pass. A broad rerun
-completed86 cases without a numeric failure before Wasm allocation exhausted
-browser resources; bounded cleanup/rate-shard acceptance precedes normal adoption.
-Next: close that compressor lifecycle checkpoint, shared piano-controller
-adoption, remaining effect families, shared sampled-room latency ownership and
-ambience spatial/loop playback. This is not whole-application Rust completion.
-
-Further checkpoint: [owned original insert/FDN hosts](MODULAR_AUDIO_ENGINE_LIVE_BUS_HOSTS.md)
-now compose local/shared LabVoice routes with sample-bit-exact output in12 bus
-and6 full composition cases. Original CLASSIC live/offline factories are wired
-through the prepared environment; its six-family All native/owned/restored desk
-batch passes all3 cases. CLASSIC source42/offline-wrapper14/cold reload are exact,
-with137 focused checks. These preserve the original native echo, external rack,
-mono-stack policy and normal defaults. Physical source static44 cases pass across
-two retained runs, while live held/control history and remaining Air/scalar target
-clocks still need closure. Ordinary compressor numeric/lifecycle candidate passes
-108+24empty+3arm+6reset+3reuse; final Boolean-demand/facade checks and normal
-adoption are separate. A complete new suite/public build is still pending.
-
-Current continuation (11 November2026): the requested push through111d282
-completed as lizMcLizface; later verified steps are committed locally, without
-deployment. [Prepared normal hosts](MODULAR_AUDIO_ENGINE_PREPARED_HOST.md) now
-compose original owned Core/FM sources and Rust transitions, piano/Iowa,
-live VoiceCompressor, role motion, weather and loop preparation. Mixed and
-measured native/owned/restored actual desk paths pass (six cases total), along
-with isolated cold piano export (3notes/144000frames/peak3248), six exact live
-weather-route cases,54 focused changed-contract checks and226 existing host/
-Generator regressions. A new complete-suite/build checkpoint is still pending.
-
-[Rust Core/FM transitions](MODULAR_AUDIO_ENGINE_CORE_FM_LIVE.md), committed
-e2594d4, pass22 permanent checks,24 sample-bit-exact routed cases and12 zero-
-allocation/growth cases. [Private rooms](MODULAR_AUDIO_ENGINE_PRIVATE_ROOM.md),
-committed4dc09bf, pass53 focused checks,12 native cases, five exact routed cases,
-cold reload and strict genuine-gap rejection with declared500ms latency. This
-private policy is not yet normal shared-room adoption. Defaults remain available;
-executor/factory choices are context-owned and absent from saved song settings.
-
-Next: finish ordinary compressor startup/arm acceptance and physical KS live
-sleep/wake target-history semantics, then original Classic live host adoption
-and remaining effects/shared-room/ambience spatial owners. Preserve original
-models; hidden standalone measured cello remains deferred. Generated evidence
-and temporary scripts remain under ignored reports/. Older dated continuation
-records below are historical and superseded by this paragraph and linked files.
-
 # Modular audio engine and parallel rendering plan
+
+Current continuation —11 November2026:
+The active task is to close the active instrument/effect ports in the explicit
+prepared Rust environment. Existing defaults and legacy playback stay operational;
+hidden standalone measured cello remains deferred. This is not yet an all-Rust
+application or a normal-default replacement.
+
+Accepted normal hosts include original Core/FM transitions, fourteen CLASSIC
+models, piano/KS physical sources, Iowa sources, original inserts/FDN, desk/role
+motion, weather and VoiceCompressor. The ordinary Instrument mix/limiter pair
+passes18 sample-bit-exact native-chain cases plus full desk/reload/export.
+Iowa's distinct bare-native/property limiter passes5 exact full-room comparisons;
+its actual measured six-role desk/reload3 and cold20-note/144000-frame export
+also pass (Int16 peak1902, song unchanged). See
+[prepared hosts](MODULAR_AUDIO_ENGINE_PREPARED_HOST.md),
+[ordinary Instrument dynamics](MODULAR_AUDIO_ENGINE_INSTRUMENT_DYNAMICS.md),
+[Iowa limiter](MODULAR_AUDIO_ENGINE_IOWA_LIMITER_LIVE.md) and the port inventory.
+
+Crusher/Pitch/ZPlane have accepted native/reload/ordered-rack and normal-host
+composition. Width/Filter/Ring captured DSP passes36 comparisons and saved replay;
+live activity/tail/GUI arrival contracts remain under final acceptance. Loop
+playback passes full original resources at6rates, shape crossfades and reused
+contexts (23 cases, exact bits), plus immediate startup and acknowledged quota
+cleanup; normal running-context upload policy remains separate. Original echo
+and rack dynamics live references are active work, not normal host replacements.
+
+Latest broad regression:531files,4291passing/4skipped,2integration failures in
+partial-owner demand/teardown. Those are corrected with23 passing targeted checks
+and a regression proving all owners clean up even when the first throws. A fresh
+combined suite remains pending. Public build plus34 provenance gates passed
+before the latest Iowa environment/final cleanup edits; source/host fingerprints
+are refreshed again with this checkpoint, without changing accepted numeric code.
+
+Next: finish the grouped live rack/loop/echo gates and adopt their proved context
+factories, then remaining native voice effects, complete sampled-room latency/
+shared ownership and ambience spatial/fade/wander. General cable editing and
+broader worker-pool execution remain later. Do not relabel earlier artifacts as
+new code or infer phone/device headroom from desktop PCM checks.
+
+The requested push through111d282 completed as lizMcLizface; subsequent verified
+steps are local commits under that identity. No deployment. Generated evidence
+and temporary scripts stay under ignored reports/ and reports/scripts/. The
+dated records below retain their original commit-specific results and may describe
+superseded states; linked focused component records are the current authority.
+
+## Retained roadmap and dated delivery records
 
 Bounded overnight run closed on11 November2026 at09:00UTC. The continuation
 heartbeat is paused. Implementation is frozen at2f6de21; final evidence is

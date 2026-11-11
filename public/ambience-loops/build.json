@@ -3,11 +3,11 @@
   "hostSHA256": {
     "public/ambience-loops/prepare-worker.js": "08acff2cbc89d651b2484e53ec5ff269f49c7db013b40c87c695bed618884998",
     "src/modular-audio/ambienceLoopWorker.js": "cd9ab22f9846e3e1625295d6b819fb3292298989e7f95aa5457f2fa05e0c37d9",
-    "src/app/engine/ambience.js": "8a8d53763c0cfa0343ccf9e05fe06546f4e71d0b9f585218de1dae667093a734",
+    "src/app/engine/ambience.js": "413ae8c050556b2dfc72146d2006ebb3af55a0da6447bdf800e713a699574ef6",
     "tools/ambience-loops.html": "e3ddbc3df107a754109ac40fa0798592b74f9c2f577d0b0d1af7ca4ca1a0f9cc",
     "tools/ambienceLoopsReview.js": "0c6ab767a3d6a0a7c4646170aa426128cf5b06f15fe3a3e7201069b7f48e9d82"
   },
-  "hostVersion": "8e942d988ab958ac",
+  "hostVersion": "5acbb71660a8732e",
   "source": "50d764437bf77e117fe593351f891aa00f34b4228573ab11b35f2ec7459efa4a",
   "runtime": "cc96b56df467db9c885ac76dbdfd6230a0cc0d0086e7784e3522833f8977ab8e",
   "reference": "63e089bc9214bed02279e69e66ae5af9129f59dfdb7ffcd7aeca0f010180aa8d",

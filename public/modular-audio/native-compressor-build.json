@@ -144,12 +144,12 @@
     }
   },
   "references": {
-    "src/nodes/compressor.js": "13ee638c58711e42ce2bd68c8b2fa249bbd74fb86b77c215fab216b4c21c1c50",
+    "src/nodes/compressor.js": "637a2278025d35e9e2ac38908d728c4c8ca223112f5a42cf5cd4a7f5e187fcb8",
     "src/nodes/voiceCompressor.js": "1ea0bca04b9d8a7f925587329c4fb5eb3fd389ac8c7985f6374c44813a164ae0",
-    "src/synths/effects/graph.js": "1d72d271dc843eb256a85d91d0ee016bd97e014e6f83da8f9c77c2858fcdcd31",
-    "src/synths/effects/extras.js": "f9bdac4f97fd0dd52ad7302f2e272c548a6e1cf31108e7c07a3e0a94e5352461",
+    "src/synths/effects/graph.js": "08abea3b52c102fe166396731b81bee1c2e3ee898af25e6b05019ab4f4433fc8",
+    "src/synths/effects/extras.js": "724467d04b8148608f4d5d0c90b2b7af2b37a80b8270b36356b5cf59833d3f15",
     "src/synths/piano/player.js": "144c2fb24c3569f92facc83e9d4aa1ccabfed2223877c608f84d9b862b9b3e9b",
-    "src/app/engine/iowaModel/player.js": "e0ecf4af74077a1b60a58aed521f0096205a98dd1cc507d8bc2760bb172097bc"
+    "src/app/engine/iowaModel/player.js": "bb0891b5cbbc7bf02cf019d70b5404f83dacbf56b8c657e0d338cdce35d0f551"
   },
   "audited": false,
   "source": "0a3ed44ff138c310563d8575a13a509abad009004bb11b272cf369392455a854",

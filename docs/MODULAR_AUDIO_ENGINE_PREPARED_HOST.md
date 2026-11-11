@@ -15,7 +15,8 @@ It does not translate native oscillator presets into another sound model.
 Original KS live demand/control histories are accepted and selected here.
 Crusher/Pitch/ZPlane also use accepted owned processors through the original
 CLASSIC/All/offline rack wrappers. The ordinary Instrument mix/limiter pair is also owned (18 exact native-chain
-cases plus actual desk/reload/export). Iowa bare-native/rack target compressors,
+cases plus actual desk/reload/export). Iowa's original bare-native limiter is now owned too (5 exact native full-room
+cases, measured desk/reload3, cold20-note export). Rack target compressors,
 other native effects, shared/private sampled-room adoption, native loop playback
 and ambience spatial/fade/wander remain explicit continuation boundaries.
 
@@ -83,3 +84,8 @@ Other native VCO/effect/ambience/room owners remain explicit migration work.
 The accepted shared piano factory is runtime-only and context-bound.
 Its four native body/expression/gap/reused-held checks and actual combined
 KS/piano/Hand desk/reload3 pass; see the focused streaming-piano record.
+
+The current Iowa factory is context-bound and runtime-only, forwarded to live
+Generator and fresh offline render contexts. The fixed measured host/reload3
+and Iowa-only20-note export (144000stereo frames, Int16peak1902) pass with owned
+source and owned bare-native limiter, retaining the full original native room.
