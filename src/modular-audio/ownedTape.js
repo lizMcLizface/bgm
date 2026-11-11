@@ -1,0 +1,24 @@
+// Explicit full Tape profile. Native source, default backend and generic
+// graph effects remain untouched. Drive curves are prepared before rendering.
+export const TAPE_PROFILE='chromium-tape-e14de735-v1';
+export const TAPE_PARAMETERS=Object.freeze([['wow',0,1,0],['wowRate',.05,5,.6],['flutter',0,1,0],['drive',0,1,0],['tone',500,20000,9000]]);
+export function validateOwnedTapeSpec(raw){
+ const c=JSON.parse(JSON.stringify(raw));if(c?.version!==1||c.profile!==TAPE_PROFILE||c.phaseOrigin!=='instance-start'||!Array.isArray(c.parameters)||c.parameters.length!==5||!Array.isArray(c.driveBank)||c.driveBank.length<1||c.driveBank.length>32)throw Error('Invalid owned Tape profile');
+ const ids=new Set();for(const p of c.parameters){if(!Array.isArray(p)||p.length!==2||!Number.isInteger(p[0])||ids.has(p[0]))throw Error('Invalid Tape parameter identity');const d=TAPE_PARAMETERS[p[0]],value=p[1];if(!d||typeof value!=='number'||!Number.isFinite(value)||value<d[1]||value>d[2])throw Error('Invalid Tape parameter value');ids.add(p[0]);}
+ const bank=new Set();for(const value of c.driveBank){if(typeof value!=='number'||!Number.isFinite(value)||value<0||value>1||bank.has(value))throw Error('Invalid prepared Tape drive bank');bank.add(value);}if(!bank.has(c.parameters.find(p=>p[0]===3)[1]))throw Error('Initial Tape drive is not prepared');return c;
+}
+export function ownedTapeSpec(settings={},driveBank=null){const parameters=TAPE_PARAMETERS.map(([name,,,value],index)=>[index,settings[name]??value]);return validateOwnedTapeSpec({version:1,profile:TAPE_PROFILE,phaseOrigin:'instance-start',parameters,driveBank:driveBank??[parameters[3][1]]});}
+export const saveOwnedTapeSpec=c=>JSON.stringify(validateOwnedTapeSpec(c),null,2)+'\n';
+export const loadOwnedTapeSpec=text=>validateOwnedTapeSpec(JSON.parse(text));
+export class OwnedTape {
+ constructor(engine,spec,rate){if(!Number.isInteger(rate)||rate<8000||rate>192000||engine.tape_owned_api()!==1)throw Error('Owned Tape ABI/rate');this.e=engine;this.rate=rate;this.spec=validateOwnedTapeSpec(spec);this.handle=engine.tape_owned_new(rate);if(!this.handle)throw Error('Tape preparation failed');try{for(const value of this.spec.driveBank)this.accept(engine.tape_owned_prepare_drive(this.handle,value));for(const [index,value]of this.spec.parameters)this.accept(engine.tape_owned_initial(this.handle,index,value));this.accept(engine.tape_owned_prepare(this.handle));this.refresh();}catch(error){this.dispose();throw error;}}
+ accept(ok){if(!ok)throw Error('Owned Tape operation rejected');}
+ alive(){if(!this.handle)throw Error('Disposed Tape');}
+ refresh(){this.alive();this.memory=this.e.memory.buffer;this.input=[0,1].map(ch=>new Float32Array(this.memory,this.e.tape_owned_input(this.handle,ch),2048));this.output=[0,1].map(ch=>new Float32Array(this.memory,this.e.tape_owned_output(this.handle,ch),2048));this.stages=[0,1].map(stage=>[0,1].map(ch=>new Float32Array(this.memory,this.e.tape_owned_stage_output(this.handle,stage,ch),2048)));this.stages.push(this.output);[this.left,this.right]=this.output;}
+ render(frames,channels=2){this.alive();if(!Number.isInteger(frames)||frames<0||frames>2048||![1,2].includes(channels))throw Error('Tape block/channel bounds');if(this.memory!==this.e.memory.buffer)throw Error('Tape memory grew; refresh outside render');this.accept(this.e.tape_owned_render(this.handle,frames,channels));}
+ target(index,value,timeSeconds=null){this.alive();const parameters=this.spec.parameters.map(([i,v])=>[i,i===index?value:v]);if(!Number.isInteger(index)||!TAPE_PARAMETERS[index])throw Error('Invalid Tape control');const next=validateOwnedTapeSpec({...this.spec,parameters});if(index===3&&this.stats().frame%128!==0)throw Error('Tape drive curves require native128-frame control boundaries');if(timeSeconds===null)this.accept(this.e.tape_owned_param(this.handle,index,value));else{if(typeof timeSeconds!=='number'||!Number.isFinite(timeSeconds)||timeSeconds<0)throw Error('Invalid Tape native target time');this.accept(this.e.tape_owned_target(this.handle,index,value,timeSeconds));}this.spec=next;}
+ value(index){this.alive();if(!Number.isInteger(index)||!TAPE_PARAMETERS[index])throw Error('Invalid Tape control');return this.e.tape_owned_value(this.handle,index);}
+ reset(){this.alive();this.e.tape_owned_reset(this.handle);}
+ stats(){this.alive();return Object.fromEntries(['peak','frame','resamplerGroupDelayFrames','baseDelayFrames','lastDelaySeconds','lastToneHz','wowPhase','driftPhase','flutterPhase','flutter2Phase','prepared','driveCurves','wowDepthSeconds','driftDepthSeconds','wowFrequency','driftFrequency','flutterDepthSeconds','flutter2DepthSeconds','toneTargetHz'].map((key,index)=>[key,this.e.tape_owned_stat(this.handle,index)]));}
+ dispose(){if(this.handle){this.e.tape_owned_free(this.handle);this.handle=0;this.input=this.output=this.stages=this.left=this.right=this.memory=null;}}
+}

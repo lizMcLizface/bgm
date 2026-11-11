@@ -1,15 +1,92 @@
 {
   "api": 1,
-  "stage": "shaper-reference-only",
-  "source": "98b80cfa3df8d0652f0bfde303b9ec61bdaa8bed4e1f2a19bcb670150a02b50e",
-  "runtime": "b9288e055fda6eac443f070d07e12eaafbd33986609ad6b56a7114a877292ea8",
-  "wasm": "c8cd06315109956adccaf1ff6e18bde288f501b2578a840938ef208b3d536456",
-  "bytes": 29538,
+  "stage": "full-tape-and-shaper-reference",
+  "source": "3666fe5b7092a047dcccca0574491cb8fed2e06bb37ec84438ab32b49ff76458",
+  "runtime": "35faeec5f57a1935cfd8bb28337988743c94c2ec25af0d645c7dd98e9c868243",
+  "wasm": "75a4187408808a689525120f3ea5c06acf80b15d84974ad5607d0391a6bfd1b8",
+  "bytes": 162281,
+  "audited": false,
+  "nativeSineResources": {
+    "kind": "tape.immutable-native-sine-resources",
+    "version": 1,
+    "chromiumRevision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+    "captureReport": "reports/modular_audio/tape-native-clock-capture.json",
+    "captureReportSha256": "8ecaf2c545af441ca9ed4ddcbb2fd8b381556f2f3e6cb1ba4da8a0f6a6d5e3ff",
+    "capturedAtUtc": "2026-11-11T01:57:06.418Z",
+    "browserUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36",
+    "method": "Original native sine oscillator frequency=sampleRate/tableSize; pinned Float32 rateScale*frequency is exactly1, table range factor0, every read index integer and interpolation fraction0. Capture first period verbatim, independently require raw exact second period and source-defined quarter/peak invariants. No fit, output normalization, alignment or sample edits.",
+    "scope": "Verbatim source-defined sine wavetable extraction with integer read increments and zero interpolation fraction. Resource bits are immutable; no normalization, fitted gain/alignment, runtime browser dependency or claim of other native FFT implementations.",
+    "resources": [
+      {
+        "file": "chromium-sine-2048.f32",
+        "size": 2048,
+        "bytes": 8192,
+        "sha256": "7921549af80be380eb0d549f9eab730190f19dbed6a0b394ef97170d62d002d4",
+        "capturedRate": 24000,
+        "frequency": 11.71875,
+        "increment": 1,
+        "periodicity": {
+          "maxAbsoluteError": 0,
+          "differingSamples": 0,
+          "rmsError": 0,
+          "maxDifference": null
+        },
+        "quarterSamples": [
+          0,
+          1,
+          0,
+          -1
+        ]
+      },
+      {
+        "file": "chromium-sine-4096.f32",
+        "size": 4096,
+        "bytes": 16384,
+        "sha256": "e2f429797c3ec9fba3f2a96176a6a2115a09ef65d520b772599b28e356d75c68",
+        "capturedRate": 48000,
+        "frequency": 11.71875,
+        "increment": 1,
+        "periodicity": {
+          "maxAbsoluteError": 0,
+          "differingSamples": 0,
+          "rmsError": 0,
+          "maxDifference": null
+        },
+        "quarterSamples": [
+          0,
+          1,
+          0,
+          -1
+        ]
+      },
+      {
+        "file": "chromium-sine-16384.f32",
+        "size": 16384,
+        "bytes": 65536,
+        "sha256": "7a3b0c8477c0a631590627ce02ce1d3712ad9622581567e4b1ca8fb2989a7da3",
+        "capturedRate": 96000,
+        "frequency": 5.859375,
+        "increment": 1,
+        "periodicity": {
+          "maxAbsoluteError": 0,
+          "differingSamples": 0,
+          "rmsError": 0,
+          "maxDifference": null
+        },
+        "quarterSamples": [
+          0,
+          1,
+          0,
+          -1
+        ]
+      }
+    ]
+  },
   "profile": {
     "kind": "tape.chromium-profile-sources",
     "version": 1,
     "revision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
-    "capturedAtUtc": "2026-11-11T00:57:41.131Z",
+    "capturedAtUtc": "2026-11-11T01:09:55.422Z",
     "scope": "Pinned official Chromium source for explicit portable Tape profile. Browser PCM/impulse/alias comparison is required separately; this pin does not claim identity with a particular browser binary.",
     "sources": [
       {
@@ -95,11 +172,78 @@
         "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/cpu/x86/vector_math_x86.h",
         "bytes": 21574,
         "sha256": "bfafeab3b642684ad0542607566408a2201f482ad22b9dac1662e1463f84d762"
+      },
+      {
+        "file": "third_party/blink/renderer/platform/audio/cpu/x86/delay_sse2.cc",
+        "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/cpu/x86/delay_sse2.cc",
+        "bytes": 5550,
+        "sha256": "d93659d64b5a6bc056bb5b3a1059145ef466c9e3d4f092aee6f076be21b10f3a"
+      },
+      {
+        "file": "third_party/blink/renderer/modules/webaudio/delay_handler.cc",
+        "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/delay_handler.cc",
+        "bytes": 8240,
+        "sha256": "c9ec54f8a5072542668ef3ae0038a4c3338cf0ec225fe7226df5b9916eb96b1b"
+      },
+      {
+        "file": "third_party/blink/renderer/platform/audio/audio_utilities.cc",
+        "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/audio_utilities.cc",
+        "bytes": 9697,
+        "sha256": "d3ed345360190487ee482eebda6141580994db924bd0fd36f342a61b33a09db0"
+      },
+      {
+        "file": "third_party/blink/renderer/modules/webaudio/audio_summing_junction.cc",
+        "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_summing_junction.cc",
+        "bytes": 2913,
+        "sha256": "2c23e3ff380b74e92d738a34dd4cbe157044d6cf825fd85e29004c5ce7ae5eb8"
+      },
+      {
+        "file": "third_party/blink/renderer/modules/webaudio/audio_summing_junction.h",
+        "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_summing_junction.h",
+        "bytes": 4112,
+        "sha256": "e4f5cd641a9d8042ad134dd99707e7329a28c0a6a05911aa65a3310b0d53bb55"
+      },
+      {
+        "file": "third_party/blink/renderer/modules/webaudio/oscillator_handler.cc",
+        "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/oscillator_handler.cc",
+        "bytes": 29147,
+        "sha256": "a34fc0842181483ae6a7cdc9db393987b1535206afb56ce0ad033bdd79dd6d68"
+      },
+      {
+        "file": "third_party/blink/renderer/modules/webaudio/periodic_wave_handler.cc",
+        "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/periodic_wave_handler.cc",
+        "bytes": 17076,
+        "sha256": "940a3fadb8f63d8e8944ed60fa76a3740638f9f8820c6de6ab3ee07c87ff2a35"
+      },
+      {
+        "file": "third_party/blink/renderer/modules/webaudio/periodic_wave_handler.h",
+        "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/periodic_wave_handler.h",
+        "bytes": 5125,
+        "sha256": "2dd142876f7710eb19d2d435cda2f7a27abc002d98dc8794438097d907433ddd"
+      },
+      {
+        "file": "third_party/blink/renderer/modules/webaudio/oscillator_handler.h",
+        "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/oscillator_handler.h",
+        "bytes": 8087,
+        "sha256": "36e17b85f27b90c39fd0cc8cf0d97e123842ae1309160415934f7a8688e2ace6"
+      },
+      {
+        "file": "third_party/blink/renderer/modules/webaudio/BUILD.gn",
+        "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/BUILD.gn",
+        "bytes": 6409,
+        "sha256": "e4eb580d32182b1f18d0f3dede2d50583b4a977534e2b78eb513cd9df350bf7a"
+      },
+      {
+        "file": "third_party/blink/renderer/modules/webaudio/cpu/x86/oscillator_kernel_sse2.cc",
+        "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/cpu/x86/oscillator_kernel_sse2.cc",
+        "bytes": 12172,
+        "sha256": "ee5c56d2d01c8449a33589b08ccb028b7fa17b00a92c668c66d1ba405e708e50"
       }
-    ]
+    ],
+    "clockSourceCapture": "tools/captureTapeClockReference.mjs"
   },
-  "profileSha256": "23b5b85127567177c6fba7d118521f0d6a571a5b2cfd2e4dd663ccd8d25a3ac5",
-  "noticesSha256": "8c076a7f837223ce901c35e0f8cba1698ab4e70c770288658ed058dd0755d728",
+  "profileSha256": "4041f76ad0f302eeca20508f87f00d6054451bbe8acaf59953d436344f392cb1",
+  "noticesSha256": "e713182b8763ba3d4570db3ae7b1d2c26a99fd181b7c8723fd41e5e9f77ad5c9",
   "referenceSourceSha256": "cb70af70081f5383946951ced2019d48d9419ade365a4efda855b8b23e5c1260",
-  "version": "7e3b04628555d62c"
+  "version": "449029958ac881d3"
 }

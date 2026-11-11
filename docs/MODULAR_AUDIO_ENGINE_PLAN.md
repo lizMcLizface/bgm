@@ -1,5 +1,12 @@
 # Modular audio engine and parallel rendering plan
 
+Overnight Tape checkpoint (11 November): the explicit pinned full Tape profile
+now passes54 actual native cases (162 stage checks), plus8 low-rate cases
+(24 checks), without changing bounds or defaults. Its32 immutable prepared drive
+curves, captured native sine resources and distinct integer/native-seconds control
+contracts are detailed in [the Tape results](MODULAR_AUDIO_ENGINE_OWNED_TAPE.md).
+Graph adoption and native bypass policy remain separate integration work.
+
 Overnight checkpoint (11 November, ~02:05 UTC): the opt-in source graph now
 includes finite native plucked voices and Motion; piano/plucked pitch clocks
 follow independent native BufferSource measurements. The isolated owned desk

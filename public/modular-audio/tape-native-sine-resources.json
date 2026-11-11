@@ -1,0 +1,76 @@
+{
+  "kind": "tape.immutable-native-sine-resources",
+  "version": 1,
+  "chromiumRevision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+  "captureReport": "reports/modular_audio/tape-native-clock-capture.json",
+  "captureReportSha256": "8ecaf2c545af441ca9ed4ddcbb2fd8b381556f2f3e6cb1ba4da8a0f6a6d5e3ff",
+  "capturedAtUtc": "2026-11-11T01:57:06.418Z",
+  "browserUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36",
+  "method": "Original native sine oscillator frequency=sampleRate/tableSize; pinned Float32 rateScale*frequency is exactly1, table range factor0, every read index integer and interpolation fraction0. Capture first period verbatim, independently require raw exact second period and source-defined quarter/peak invariants. No fit, output normalization, alignment or sample edits.",
+  "scope": "Verbatim source-defined sine wavetable extraction with integer read increments and zero interpolation fraction. Resource bits are immutable; no normalization, fitted gain/alignment, runtime browser dependency or claim of other native FFT implementations.",
+  "resources": [
+    {
+      "file": "chromium-sine-2048.f32",
+      "size": 2048,
+      "bytes": 8192,
+      "sha256": "7921549af80be380eb0d549f9eab730190f19dbed6a0b394ef97170d62d002d4",
+      "capturedRate": 24000,
+      "frequency": 11.71875,
+      "increment": 1,
+      "periodicity": {
+        "maxAbsoluteError": 0,
+        "differingSamples": 0,
+        "rmsError": 0,
+        "maxDifference": null
+      },
+      "quarterSamples": [
+        0,
+        1,
+        0,
+        -1
+      ]
+    },
+    {
+      "file": "chromium-sine-4096.f32",
+      "size": 4096,
+      "bytes": 16384,
+      "sha256": "e2f429797c3ec9fba3f2a96176a6a2115a09ef65d520b772599b28e356d75c68",
+      "capturedRate": 48000,
+      "frequency": 11.71875,
+      "increment": 1,
+      "periodicity": {
+        "maxAbsoluteError": 0,
+        "differingSamples": 0,
+        "rmsError": 0,
+        "maxDifference": null
+      },
+      "quarterSamples": [
+        0,
+        1,
+        0,
+        -1
+      ]
+    },
+    {
+      "file": "chromium-sine-16384.f32",
+      "size": 16384,
+      "bytes": 65536,
+      "sha256": "7a3b0c8477c0a631590627ce02ce1d3712ad9622581567e4b1ca8fb2989a7da3",
+      "capturedRate": 96000,
+      "frequency": 5.859375,
+      "increment": 1,
+      "periodicity": {
+        "maxAbsoluteError": 0,
+        "differingSamples": 0,
+        "rmsError": 0,
+        "maxDifference": null
+      },
+      "quarterSamples": [
+        0,
+        1,
+        0,
+        -1
+      ]
+    }
+  ]
+}

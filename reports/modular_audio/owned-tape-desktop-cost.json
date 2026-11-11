@@ -1,0 +1,130 @@
+{
+  "kind": "tape.owned-desktop-cost",
+  "version": 1,
+  "createdAtUtc": "2026-11-11T02:02:48.937Z",
+  "engineVersion": "d21e9c6dc67eba80",
+  "wasmSha256": "cdf17431ff33ae247a8c6b15030876a1bd2b0a54df8e6cbd810ea4345a627d08",
+  "hardware": {
+    "platform": "win32",
+    "arch": "x64",
+    "cpu": "AMD Ryzen 9 3950X 16-Core Processor            ",
+    "node": "v24.18.0"
+  },
+  "scope": "Single-threaded warmed desktop Node Wasm wall time, including JS call/preemption; standalone stereo128-frame render with all modulation/drive enabled and native cold tone ramp. This is not browser callback scheduling, phone CPU, device output or realtime deadline certification. Prepared-curve measurements include bounded8196-byte curve selection plus render; preparation excluded.",
+  "trials": [
+    {
+      "rate": 8000,
+      "channels": 2,
+      "framesPerCall": 128,
+      "quantumPeriodMs": 16,
+      "steady": {
+        "calls": 248,
+        "medianMs": 0.05190000000000339,
+        "p99Ms": 0.06400000000000006,
+        "maxMs": 0.07900000000000063,
+        "overQuantumPeriod": 0
+      },
+      "preparedCurvePlusRender": {
+        "calls": 8,
+        "medianMs": 0.05260000000000531,
+        "maxMs": 0.09960000000000235,
+        "overQuantumPeriod": 0
+      }
+    },
+    {
+      "rate": 24000,
+      "channels": 2,
+      "framesPerCall": 128,
+      "quantumPeriodMs": 5.333333333333333,
+      "steady": {
+        "calls": 248,
+        "medianMs": 0.05320000000000391,
+        "p99Ms": 0.06270000000000664,
+        "maxMs": 0.07099999999999795,
+        "overQuantumPeriod": 0
+      },
+      "preparedCurvePlusRender": {
+        "calls": 8,
+        "medianMs": 0.05349999999999966,
+        "maxMs": 0.06670000000001153,
+        "overQuantumPeriod": 0
+      }
+    },
+    {
+      "rate": 44100,
+      "channels": 2,
+      "framesPerCall": 128,
+      "quantumPeriodMs": 2.9024943310657596,
+      "steady": {
+        "calls": 334,
+        "medianMs": 0.052199999999999136,
+        "p99Ms": 0.06510000000000105,
+        "maxMs": 0.421599999999998,
+        "overQuantumPeriod": 0
+      },
+      "preparedCurvePlusRender": {
+        "calls": 11,
+        "medianMs": 0.05289999999999395,
+        "maxMs": 0.06179999999999097,
+        "overQuantumPeriod": 0
+      }
+    },
+    {
+      "rate": 48000,
+      "channels": 2,
+      "framesPerCall": 128,
+      "quantumPeriodMs": 2.6666666666666665,
+      "steady": {
+        "calls": 363,
+        "medianMs": 0.05310000000000059,
+        "p99Ms": 0.06979999999998654,
+        "maxMs": 0.08169999999998367,
+        "overQuantumPeriod": 0
+      },
+      "preparedCurvePlusRender": {
+        "calls": 12,
+        "medianMs": 0.05349999999998545,
+        "maxMs": 0.0630999999999915,
+        "overQuantumPeriod": 0
+      }
+    },
+    {
+      "rate": 96000,
+      "channels": 2,
+      "framesPerCall": 128,
+      "quantumPeriodMs": 1.3333333333333333,
+      "steady": {
+        "calls": 726,
+        "medianMs": 0.05170000000001096,
+        "p99Ms": 0.06090000000000373,
+        "maxMs": 0.28290000000001214,
+        "overQuantumPeriod": 0
+      },
+      "preparedCurvePlusRender": {
+        "calls": 24,
+        "medianMs": 0.052199999999999136,
+        "maxMs": 0.06439999999997781,
+        "overQuantumPeriod": 0
+      }
+    },
+    {
+      "rate": 192000,
+      "channels": 2,
+      "framesPerCall": 128,
+      "quantumPeriodMs": 0.6666666666666666,
+      "steady": {
+        "calls": 1453,
+        "medianMs": 0.05320000000000391,
+        "p99Ms": 0.0625999999999749,
+        "maxMs": 0.3854999999999791,
+        "overQuantumPeriod": 0
+      },
+      "preparedCurvePlusRender": {
+        "calls": 47,
+        "medianMs": 0.05360000000001719,
+        "maxMs": 0.06080000000000041,
+        "overQuantumPeriod": 0
+      }
+    }
+  ]
+}

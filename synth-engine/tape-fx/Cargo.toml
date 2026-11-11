@@ -2,7 +2,7 @@
 name = "calmbgm_tape_fx"
 version = "0.1.0"
 edition = "2021"
-license = "MIT AND BSD-3-Clause"
+license = "MIT AND BSD-3-Clause AND BSD-2-Clause"
 
 [lib]
 crate-type = ["rlib", "cdylib"]

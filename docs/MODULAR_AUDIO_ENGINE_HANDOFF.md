@@ -1,5 +1,11 @@
 # Modular audio engine handoff
 
+Full standalone Tape449029958ac881d3 is now verified against actual native output:
+54/54 full cases and8/8 low-rate cases pass fixed1e-4 absolute/relative limits.
+The earlier failures and the source-defined fixes are retained in
+[the Tape checkpoint](MODULAR_AUDIO_ENGINE_OWNED_TAPE.md). No normal native Tape
+route or bypass default changed; Graph27 integration is the next shared task.
+
 Latest overnight checkpoint (11 November, ~02:05 UTC): read
 [source graph and desk results](MODULAR_AUDIO_ENGINE_OVERNIGHT_SOURCE_GRAPH.md).
 Finite plucked Graph26, Motion Graph25, measured piano/plucked pitch-clock fixes

@@ -3,7 +3,7 @@
   "version": 1,
   "status": "running",
   "startedAtUtc": "2026-11-10T23:19:46Z",
-  "updatedAtUtc": "2026-11-11T02:02:16.724Z",
+  "updatedAtUtc": "2026-11-11T02:06:27.808Z",
   "featureCutoffUtc": "2026-11-11T08:30:00Z",
   "deadlineUtc": "2026-11-11T09:00:00Z",
   "gitIdentity": {
@@ -23,7 +23,8 @@
     "ba190ac",
     "539467e",
     "14060ef",
-    "74244f7"
+    "74244f7",
+    "c456547"
   ],
   "graph": {
     "api": 1,
@@ -71,16 +72,22 @@
     "deterministicDesk": "owned-desk-native-deterministic.json",
     "nativePlucked": "plucked-native-browser-v3.json",
     "nativePianoPitch": "piano-native-pitch-after.json",
-    "mixerAutomationAuditTests": 15
+    "mixerAutomationAuditTests": 15,
+    "tapeFullNative": "tape-full-native-browser-v2.json",
+    "tapeLowrateNative": "tape-lowrate-native-browser-v2.json",
+    "tapeProduction": "449029958ac881d3",
+    "tapeFullCases": 54,
+    "tapeLowrateCases": 8,
+    "tapeAllocationCases": 12
   },
   "limitations": [
     "No physical listening/device-underrun claim",
     "Freeze worker-only; exact synchronous capture may exceed one callback",
     "Only integer path differences compensated; FM fractional differences reject",
     "Workbench still five pitched plus percussion source buses",
-    "Full Tape native parity under investigation; low-rate event carry discrepancy retained",
     "Normal All backend remains legacy; deterministic owned desk is isolated opt-in",
-    "Weather numeric kernel verified separately; browser/host integration pending"
+    "Weather numeric kernel verified separately; browser/host integration pending",
+    "Tape explicit pinned profile verified on desktop; Graph adoption, native bypass and other browser/platform behavior remain separate"
   ],
   "next": "Continue independent remaining source preparation and host-chain ports, then broaden fixed desktop verification. Stop features08:30 and hand off09:00."
 }

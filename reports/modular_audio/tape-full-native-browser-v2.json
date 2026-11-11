@@ -1,0 +1,5160 @@
+{
+  "kind": "tape.full-native-reference",
+  "version": 1,
+  "label": "full-chain",
+  "profile": "chromium-tape-e14de735-v1",
+  "engineVersion": "449029958ac881d3",
+  "wasmSha256": "75a4187408808a689525120f3ea5c06acf80b15d84974ad5607d0391a6bfd1b8",
+  "nativeSourceSha256": "cb70af70081f5383946951ced2019d48d9419ade365a4efda855b8b23e5c1260",
+  "chromiumRevision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+  "createdAtUtc": "2026-11-11T02:03:36.261Z",
+  "browserUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36",
+  "scope": "Actual original native Tape topology and setters with simultaneous shaper/tone/final stereo taps. Original native target seconds preserved including fractional start offset; curve properties changed at recorded native offline suspend frames. Rust uses preprepared exact drive curves. No alignment/gain fitting, default switch, physical listening or realtime deadline claim.",
+  "bounds": {
+    "maxAbsoluteError": 0.0001,
+    "relativeRmsError": 0.0001
+  },
+  "pass": true,
+  "cases": 54,
+  "stageComparisons": 162,
+  "maxAbsoluteError": 0.00009357929229736328,
+  "maxRelativeRmsError": 0.00004341233345220533,
+  "trials": [
+    {
+      "id": "native-default-node",
+      "rate": 44100,
+      "channels": 1,
+      "frames": 33075,
+      "settings": {},
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.5684607028961182,
+          "maxDifference": null,
+          "nativePcmSha256": "0478be09a2ecf77d98115e170639092e8c1e3112efc23814005db12172cd24be",
+          "portablePcmSha256": "0478be09a2ecf77d98115e170639092e8c1e3112efc23814005db12172cd24be"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 4.874179888713405e-39,
+          "relativeRmsError": 1.7858704418447453e-40,
+          "rmsError": 3.8117943507894373e-41,
+          "nonFinite": 0,
+          "peak": 0.6166291832923889,
+          "maxDifference": {
+            "frame": 22421,
+            "channel": 0,
+            "actual": -4.874179888713405e-39,
+            "reference": 0,
+            "error": 4.874179888713405e-39
+          },
+          "nativePcmSha256": "24171683f142566244cde5506aa102ac67fc7c7b4ecf0718c0732e5d2593a784",
+          "portablePcmSha256": "f8fdbd3c9d472b1e567b062144e4c7adedd8a69538468b31828555b25bec45bf"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 9.341815066956895e-39,
+          "relativeRmsError": 3.2724505428286697e-40,
+          "rmsError": 6.632394515870348e-41,
+          "nonFinite": 0,
+          "peak": 0.5572398900985718,
+          "maxDifference": {
+            "frame": 22682,
+            "channel": 0,
+            "actual": -9.341815066956895e-39,
+            "reference": 0,
+            "error": 9.341815066956895e-39
+          },
+          "nativePcmSha256": "0aba0ec1223d2f5b7684e3103050d695fe8b2aa8a72c9aeeb02d6ad4b66b9fef",
+          "portablePcmSha256": "3820a5cf3bc528864b5bbbeafafe3040acbccfd1210124a5cdfd8e6c54213128"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 33075,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 264.60000229999423,
+        "lastDelaySeconds": 0.006000000052154064,
+        "lastToneHz": 9000,
+        "wowPhase": 0.4500000037751306,
+        "driftPhase": 0.16650000019353683,
+        "flutterPhase": 0.4750000559579348,
+        "flutter2Phase": 0.7750000435335096,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0,
+        "driftDepthSeconds": 0,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0,
+        "flutter2DepthSeconds": 0,
+        "toneTargetHz": 9000
+      }
+    },
+    {
+      "id": "drive-full",
+      "rate": 44100,
+      "channels": 1,
+      "frames": 33075,
+      "settings": {
+        "drive": 1
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.34420323371887207,
+          "maxDifference": null,
+          "nativePcmSha256": "6f1d7dd2b63c9252b590342a7d049f2fb38ad2fc8035e3d23aff3016a9018f1c",
+          "portablePcmSha256": "6f1d7dd2b63c9252b590342a7d049f2fb38ad2fc8035e3d23aff3016a9018f1c"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 8.5298200601177e-39,
+          "relativeRmsError": 3.608562141413486e-40,
+          "rmsError": 6.6693937867263e-41,
+          "nonFinite": 0,
+          "peak": 0.41201210021972656,
+          "maxDifference": {
+            "frame": 22421,
+            "channel": 0,
+            "actual": -8.5298200601177e-39,
+            "reference": 0,
+            "error": 8.5298200601177e-39
+          },
+          "nativePcmSha256": "0826e9880c529304559efbf320be21474074044218b8daec2a5cd29c89590a78",
+          "portablePcmSha256": "2a56bbe9da35278a1887273c986fe620a10e023251be60c0b74df88feaeebb7b"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 9.12376882201256e-39,
+          "relativeRmsError": 4.1826433044221034e-40,
+          "rmsError": 7.383415504794772e-41,
+          "nonFinite": 0,
+          "peak": 0.38533729314804077,
+          "maxDifference": {
+            "frame": 22684,
+            "channel": 0,
+            "actual": 1.4958268357417013e-38,
+            "reference": 2.4082037179429573e-38,
+            "error": 9.12376882201256e-39
+          },
+          "nativePcmSha256": "49c8771a2a8dfbff4660c9baa6b268ac308cf029e25ddeab26368101ae93bc00",
+          "portablePcmSha256": "d5801638588f8a1920a3daf6a90586ada0f1ca5415328da69b82157f0148b68f"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 33075,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 264.60000229999423,
+        "lastDelaySeconds": 0.006000000052154064,
+        "lastToneHz": 9000,
+        "wowPhase": 0.4500000037751306,
+        "driftPhase": 0.16650000019353683,
+        "flutterPhase": 0.4750000559579348,
+        "flutter2Phase": 0.7750000435335096,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0,
+        "driftDepthSeconds": 0,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0,
+        "flutter2DepthSeconds": 0,
+        "toneTargetHz": 9000
+      }
+    },
+    {
+      "id": "dark-tone",
+      "rate": 44100,
+      "channels": 1,
+      "frames": 33075,
+      "settings": {
+        "drive": 0.3,
+        "tone": 500
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.4792824983596802,
+          "maxDifference": null,
+          "nativePcmSha256": "251ce814840fd45a478e59370a2123a0e61f29352120cc87d5ccb499cc3def97",
+          "portablePcmSha256": "251ce814840fd45a478e59370a2123a0e61f29352120cc87d5ccb499cc3def97"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 9.1369572826394e-38,
+          "relativeRmsError": 1.579621987209589e-38,
+          "rmsError": 3.1448299061850026e-39,
+          "nonFinite": 0,
+          "peak": 0.37539318203926086,
+          "maxDifference": {
+            "frame": 24722,
+            "channel": 0,
+            "actual": 2.0059988288170553e-38,
+            "reference": 1.1142956111456455e-37,
+            "error": 9.1369572826394e-38
+          },
+          "nativePcmSha256": "541600cdd4dcc75aba9f5cd23bbabf02eea668f27a03d07b4bd99daf39668593",
+          "portablePcmSha256": "0d7a919ee992915ea55d4c563c4a439f56152fdb65f64473b5dd6dd5da940537"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 9.126382383778372e-38,
+          "relativeRmsError": 1.5834620319458453e-38,
+          "rmsError": 3.150986938915611e-39,
+          "nonFinite": 0,
+          "peak": 0.37487027049064636,
+          "maxDifference": {
+            "frame": 24987,
+            "channel": 0,
+            "actual": 2.0165737276780826e-38,
+            "reference": 1.1142956111456455e-37,
+            "error": 9.126382383778372e-38
+          },
+          "nativePcmSha256": "1c4e61e5452e27a0e3ccdb9123e963c872e9d1125ee94c3e28586f7a760506f3",
+          "portablePcmSha256": "9bb53df7fc9c46619d852afbb0ccff6ec158f8091b731f91a81d53fc302c61ef"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 33075,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 264.60000229999423,
+        "lastDelaySeconds": 0.006000000052154064,
+        "lastToneHz": 500,
+        "wowPhase": 0.4500000037751306,
+        "driftPhase": 0.16650000019353683,
+        "flutterPhase": 0.4750000559579348,
+        "flutter2Phase": 0.7750000435335096,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0,
+        "driftDepthSeconds": 0,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0,
+        "flutter2DepthSeconds": 0,
+        "toneTargetHz": 500
+      }
+    },
+    {
+      "id": "wow-full",
+      "rate": 44100,
+      "channels": 1,
+      "frames": 33075,
+      "settings": {
+        "wow": 1,
+        "wowRate": 0.6,
+        "drive": 0.2
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.5115335583686829,
+          "maxDifference": null,
+          "nativePcmSha256": "798110c2cec19e741d749130729a1df3f4a3fe48d7c7038b5a1ae7976ef20235",
+          "portablePcmSha256": "798110c2cec19e741d749130729a1df3f4a3fe48d7c7038b5a1ae7976ef20235"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 5.6053886377858094e-39,
+          "relativeRmsError": 2.0248745875085572e-40,
+          "rmsError": 4.382175370853601e-41,
+          "nonFinite": 0,
+          "peak": 0.568466305732727,
+          "maxDifference": {
+            "frame": 22421,
+            "channel": 0,
+            "actual": -5.6053886377858094e-39,
+            "reference": 0,
+            "error": 5.6053886377858094e-39
+          },
+          "nativePcmSha256": "6bf4b0daa5d3b8c591c3dd3f515bfda7e8ae73c99bf6da659782a4a7d9927dde",
+          "portablePcmSha256": "69688524e24a2449d5988e5fd5cf789c303e7d99d6575413e83bb2d4784c1a54"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 0.00004348158836364746,
+          "relativeRmsError": 0.000020965606980051856,
+          "rmsError": 0.000004398448733967527,
+          "nonFinite": 0,
+          "peak": 0.5368014574050903,
+          "maxDifference": {
+            "frame": 18501,
+            "channel": 0,
+            "actual": -0.12619712948799133,
+            "reference": -0.12615364789962769,
+            "error": 0.00004348158836364746
+          },
+          "nativePcmSha256": "061468ebbdce816c71f74c04346751a2c1f85fcbb21f4f33c753a9ce6b822f6e",
+          "portablePcmSha256": "b7fac95056fbfde7ad8a965b1532d5d29d549853b9d8062e7f4ddd64a6297de0"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 33075,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 264.60000229999423,
+        "lastDelaySeconds": 0.008225522935390472,
+        "lastToneHz": 9000,
+        "wowPhase": 0.4500000037751306,
+        "driftPhase": 0.16650000019353683,
+        "flutterPhase": 0.4750000559579348,
+        "flutter2Phase": 0.7750000435335096,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0.003000000026077032,
+        "driftDepthSeconds": 0.001500000013038516,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0,
+        "flutter2DepthSeconds": 0,
+        "toneTargetHz": 9000
+      }
+    },
+    {
+      "id": "flutter-full",
+      "rate": 44100,
+      "channels": 1,
+      "frames": 33075,
+      "settings": {
+        "flutter": 1,
+        "tone": 16000
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.5684607028961182,
+          "maxDifference": null,
+          "nativePcmSha256": "0478be09a2ecf77d98115e170639092e8c1e3112efc23814005db12172cd24be",
+          "portablePcmSha256": "0478be09a2ecf77d98115e170639092e8c1e3112efc23814005db12172cd24be"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 1.053234563056108e-38,
+          "relativeRmsError": 5.076848215131292e-40,
+          "rmsError": 1.0796878696233685e-40,
+          "nonFinite": 0,
+          "peak": 0.6279241442680359,
+          "maxDifference": {
+            "frame": 22457,
+            "channel": 0,
+            "actual": -1.053234563056108e-38,
+            "reference": 0,
+            "error": 1.053234563056108e-38
+          },
+          "nativePcmSha256": "da2eb11dd73c49b89165222b71c9e5bcb8b871af69227e3648d94683e55420f3",
+          "portablePcmSha256": "fc4a474955fcdb7b14855d0997b749a6f9d3ad3c6a707263afc8659accdd19bf"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 0.000046640634536743164,
+          "relativeRmsError": 0.000004134298661233229,
+          "rmsError": 8.432274228630333e-7,
+          "nonFinite": 0,
+          "peak": 0.5933987498283386,
+          "maxDifference": {
+            "frame": 15525,
+            "channel": 0,
+            "actual": 0.009877786040306091,
+            "reference": 0.009831145405769348,
+            "error": 0.000046640634536743164
+          },
+          "nativePcmSha256": "a00b200b3c347e5d0305e834e962cfb2c6efc20b8b889d2857fe6bb7753e5700",
+          "portablePcmSha256": "bc793cb6a0fb7025a96b4675944615698ff33bad375f0ca0b3ce454412d1b5ad"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 33075,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 264.60000229999423,
+        "lastDelaySeconds": 0.005920812021940947,
+        "lastToneHz": 16000,
+        "wowPhase": 0.4500000037751306,
+        "driftPhase": 0.16650000019353683,
+        "flutterPhase": 0.4750000559579348,
+        "flutter2Phase": 0.7750000435335096,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0,
+        "driftDepthSeconds": 0,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0.0002500000118743628,
+        "flutter2DepthSeconds": 0.00011999999696854502,
+        "toneTargetHz": 16000
+      }
+    },
+    {
+      "id": "combined",
+      "rate": 44100,
+      "channels": 1,
+      "frames": 33075,
+      "settings": {
+        "wow": 0.73123456789,
+        "wowRate": 1.123456789,
+        "flutter": 0.6123456789,
+        "drive": 0.4123456789,
+        "tone": 6100.123456789
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.4438633322715759,
+          "maxDifference": null,
+          "nativePcmSha256": "0b4c3b2be3b567d7336ce2de8d6f57f05c8c450f22604522cfc7a15f3a3b0453",
+          "portablePcmSha256": "0b4c3b2be3b567d7336ce2de8d6f57f05c8c450f22604522cfc7a15f3a3b0453"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 1.1119666250719684e-38,
+          "relativeRmsError": 5.103881942713271e-40,
+          "rmsError": 9.407160422809253e-41,
+          "nonFinite": 0,
+          "peak": 0.41992679238319397,
+          "maxDifference": {
+            "frame": 22450,
+            "channel": 0,
+            "actual": 1.1119666250719684e-38,
+            "reference": 0,
+            "error": 1.1119666250719684e-38
+          },
+          "nativePcmSha256": "6e804192300eec62c86be15a560c72568357d29fdf86e152a651ce41ded005b8",
+          "portablePcmSha256": "1670c75f79984ab5a4990d4752e08588f881655596438f689c22c42c8179d6d5"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 0.00002707540988922119,
+          "relativeRmsError": 0.00001315201369697199,
+          "rmsError": 0.0000023948135914518347,
+          "nonFinite": 0,
+          "peak": 0.4159964323043823,
+          "maxDifference": {
+            "frame": 13697,
+            "channel": 0,
+            "actual": -0.06581942737102509,
+            "reference": -0.0658465027809143,
+            "error": 0.00002707540988922119
+          },
+          "nativePcmSha256": "c282897889765e9988594e36c090962cf27b4460a32df261f9b0d5ebe6109b45",
+          "portablePcmSha256": "13354909727ad436b7d886c7193a4bcff02426fb9febc780c251f3670384bc66"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 33075,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 264.60000229999423,
+        "lastDelaySeconds": 0.005038470961153507,
+        "lastToneHz": 6100.12353515625,
+        "wowPhase": 0.8268843898613341,
+        "driftPhase": 0.30594720420094745,
+        "flutterPhase": 0.4750000559579348,
+        "flutter2Phase": 0.7750000435335096,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0.002193703781813383,
+        "driftDepthSeconds": 0.0010968518909066916,
+        "wowFrequency": 1.1234568357467651,
+        "driftFrequency": 0.415679007768631,
+        "flutterDepthSeconds": 0.00015308642468880862,
+        "flutter2DepthSeconds": 0.00007348148210439831,
+        "toneTargetHz": 6100.12353515625
+      }
+    },
+    {
+      "id": "control-extremes",
+      "rate": 44100,
+      "channels": 1,
+      "frames": 33075,
+      "settings": {
+        "wow": 1,
+        "wowRate": 5,
+        "flutter": 1,
+        "drive": 1,
+        "tone": 20000
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.34420323371887207,
+          "maxDifference": null,
+          "nativePcmSha256": "6f1d7dd2b63c9252b590342a7d049f2fb38ad2fc8035e3d23aff3016a9018f1c",
+          "portablePcmSha256": "6f1d7dd2b63c9252b590342a7d049f2fb38ad2fc8035e3d23aff3016a9018f1c"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 8.620530313608839e-39,
+          "relativeRmsError": 5.360520832077081e-40,
+          "rmsError": 9.88328833239768e-41,
+          "nonFinite": 0,
+          "peak": 0.41530588269233704,
+          "maxDifference": {
+            "frame": 22787,
+            "channel": 0,
+            "actual": 8.620530313608839e-39,
+            "reference": 0,
+            "error": 8.620530313608839e-39
+          },
+          "nativePcmSha256": "173a7e1a5a6a801ecfd09520e6b633e8a569949a9b10ebb61d944be60900c572",
+          "portablePcmSha256": "b304374f1b5c684d2d6a1d9c9d2c0022280fe7950875260de982ced1af40735a"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 0.00006246566772460938,
+          "relativeRmsError": 0.00002462917834573325,
+          "rmsError": 0.000004357365448362469,
+          "nonFinite": 0,
+          "peak": 0.40113478899002075,
+          "maxDifference": {
+            "frame": 11573,
+            "channel": 0,
+            "actual": -0.006306901574134827,
+            "reference": -0.006369367241859436,
+            "error": 0.00006246566772460938
+          },
+          "nativePcmSha256": "5ddd2665852bbd979c8f7b21474910620f4827649b2672ecf7d08ae6e4a882a9",
+          "portablePcmSha256": "bfcbcb37e66b9d05a82d65988237466eb70b6170a0b6f8a6b248788fdf654752"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 33075,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 264.60000229999423,
+        "lastDelaySeconds": 0.005170503165572882,
+        "lastToneHz": 20000,
+        "wowPhase": 0.6179562374672969,
+        "driftPhase": 0.3386437707354162,
+        "flutterPhase": 0.4750000559579348,
+        "flutter2Phase": 0.7750000435335096,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0.003000000026077032,
+        "driftDepthSeconds": 0.001500000013038516,
+        "wowFrequency": 5,
+        "driftFrequency": 1.850000023841858,
+        "flutterDepthSeconds": 0.0002500000118743628,
+        "flutter2DepthSeconds": 0.00011999999696854502,
+        "toneTargetHz": 20000
+      }
+    },
+    {
+      "id": "native-target-automation",
+      "rate": 44100,
+      "channels": 1,
+      "frames": 33075,
+      "settings": {
+        "wow": 0.2,
+        "flutter": 0.1,
+        "drive": 0.3
+      },
+      "targets": [
+        {
+          "kind": "target",
+          "requestedFrame": 13,
+          "index": 0,
+          "value": 0.7123456789,
+          "timeSeconds": 0.00029478458049886624,
+          "frame": 14,
+          "sequence": 0
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 41,
+          "index": 1,
+          "value": 2.123456789,
+          "timeSeconds": 0.0009297052154195011,
+          "frame": 41,
+          "sequence": 1
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 513,
+          "index": 2,
+          "value": 0.8123456789,
+          "timeSeconds": 0.01163265306122449,
+          "frame": 513,
+          "sequence": 2
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 4001,
+          "index": 4,
+          "value": 3000.123456789,
+          "timeSeconds": 0.09072562358276644,
+          "frame": 4001,
+          "sequence": 3
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 8191,
+          "index": 0,
+          "value": 0,
+          "timeSeconds": 0.18573696145124716,
+          "frame": 8191,
+          "sequence": 4
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 10003,
+          "index": 2,
+          "value": 0,
+          "timeSeconds": 0.22682539682539682,
+          "frame": 10003,
+          "sequence": 5
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 12001,
+          "index": 1,
+          "value": 0.05,
+          "timeSeconds": 0.2721315192743764,
+          "frame": 12001,
+          "sequence": 6
+        }
+      ],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.4792824983596802,
+          "maxDifference": null,
+          "nativePcmSha256": "251ce814840fd45a478e59370a2123a0e61f29352120cc87d5ccb499cc3def97",
+          "portablePcmSha256": "251ce814840fd45a478e59370a2123a0e61f29352120cc87d5ccb499cc3def97"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 8.940696716308594e-8,
+          "relativeRmsError": 4.114475571036037e-8,
+          "rmsError": 7.494416697588482e-9,
+          "nonFinite": 0,
+          "peak": 0.4947010278701782,
+          "maxDifference": {
+            "frame": 6417,
+            "channel": 0,
+            "actual": -0.30604368448257446,
+            "reference": -0.3060435950756073,
+            "error": 8.940696716308594e-8
+          },
+          "nativePcmSha256": "2507d8022c911e921a2804af85cfffbe1c8032d63637a53ec82a35168b538a24",
+          "portablePcmSha256": "9fcd202f1498e152965fd72becbf46e870b7c6af47c8daf01ddc5334a760b4ec"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 0.00003538280725479126,
+          "relativeRmsError": 0.000007645184933077882,
+          "rmsError": 0.0000013836964462454848,
+          "nonFinite": 0,
+          "peak": 0.49019724130630493,
+          "maxDifference": {
+            "frame": 3470,
+            "channel": 0,
+            "actual": 0.12335872650146484,
+            "reference": 0.12332334369421005,
+            "error": 0.00003538280725479126
+          },
+          "nativePcmSha256": "9ca3ad0f58631cb994f2eac9e4b179e7f4ef41851002971830fecde45cbf0319",
+          "portablePcmSha256": "7e4b9d7ca2e6d92462367b333d9a521f4123fcdc9e9ab9900e9d3cf878c5c46e"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 33075,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 264.60000229999423,
+        "lastDelaySeconds": 0.006000000052154064,
+        "lastToneHz": 3000.12353515625,
+        "wowPhase": 0.6168400820970419,
+        "driftPhase": 0.22823086551034066,
+        "flutterPhase": 0.4750000559579348,
+        "flutter2Phase": 0.7750000435335096,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0,
+        "driftDepthSeconds": 0,
+        "wowFrequency": 0.05000000074505806,
+        "driftFrequency": 0.01850000023841858,
+        "flutterDepthSeconds": 0,
+        "flutter2DepthSeconds": 0,
+        "toneTargetHz": 3000.12353515625
+      }
+    },
+    {
+      "id": "native-curve-control",
+      "rate": 44100,
+      "channels": 1,
+      "frames": 33075,
+      "settings": {
+        "wow": 0.3,
+        "flutter": 0.3,
+        "drive": 0
+      },
+      "targets": [],
+      "curveControls": [
+        {
+          "kind": "curve",
+          "index": 3,
+          "value": 0.3,
+          "requestedFrame": 4096,
+          "requestedSeconds": 0.09287981859410431,
+          "timeSeconds": 0.09287981859410431,
+          "frame": 4096,
+          "sequence": 0
+        },
+        {
+          "kind": "curve",
+          "index": 3,
+          "value": 1,
+          "requestedFrame": 8192,
+          "requestedSeconds": 0.18575963718820862,
+          "timeSeconds": 0.18575963718820862,
+          "frame": 8192,
+          "sequence": 1
+        },
+        {
+          "kind": "curve",
+          "index": 3,
+          "value": 0,
+          "requestedFrame": 12288,
+          "requestedSeconds": 0.2786394557823129,
+          "timeSeconds": 0.2786394557823129,
+          "frame": 12288,
+          "sequence": 2
+        }
+      ],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.5684607028961182,
+          "maxDifference": null,
+          "nativePcmSha256": "961e69e191033f83fd4256a3b80ec7554a0eb293065ccc6265eab790df44b1fd",
+          "portablePcmSha256": "961e69e191033f83fd4256a3b80ec7554a0eb293065ccc6265eab790df44b1fd"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 4.874179888713405e-39,
+          "relativeRmsError": 1.8307951593751044e-40,
+          "rmsError": 3.8117943507894373e-41,
+          "nonFinite": 0,
+          "peak": 0.6056211590766907,
+          "maxDifference": {
+            "frame": 22421,
+            "channel": 0,
+            "actual": -4.874179888713405e-39,
+            "reference": 0,
+            "error": 4.874179888713405e-39
+          },
+          "nativePcmSha256": "1988650388d1e160fa882bd25e07ffbac06378eb461445b80a192eec97253f45",
+          "portablePcmSha256": "934fff6d5f7b57814a0aa9f460d4f408b6a7ce2803091103026a9a2c34d79087"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 0.0000426173210144043,
+          "relativeRmsError": 0.000008166120650508006,
+          "rmsError": 0.0000016441772561248803,
+          "nonFinite": 0,
+          "peak": 0.5992583632469177,
+          "maxDifference": {
+            "frame": 6837,
+            "channel": 0,
+            "actual": -0.039096981287002563,
+            "reference": -0.03905436396598816,
+            "error": 0.0000426173210144043
+          },
+          "nativePcmSha256": "b067df2556dc129a4db76edc743adf563664abbd503e7efc73bfa8e7f37b09d5",
+          "portablePcmSha256": "a19a968a982ca3899aeffeaa7ded6ee31c74441f10d9b01997f0a4576783ef98"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 33075,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 264.60000229999423,
+        "lastDelaySeconds": 0.00664390018209815,
+        "lastToneHz": 9000,
+        "wowPhase": 0.4500000037751306,
+        "driftPhase": 0.16650000019353683,
+        "flutterPhase": 0.4750000559579348,
+        "flutter2Phase": 0.7750000435335096,
+        "prepared": 1,
+        "driveCurves": 3,
+        "wowDepthSeconds": 0.0008999999845400453,
+        "driftDepthSeconds": 0.00044999999227002263,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0.00007500000356230885,
+        "flutter2DepthSeconds": 0.00003600000127335079,
+        "toneTargetHz": 9000
+      }
+    },
+    {
+      "id": "native-default-node",
+      "rate": 44100,
+      "channels": 2,
+      "frames": 33075,
+      "settings": {},
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.5689066052436829,
+          "maxDifference": null,
+          "nativePcmSha256": "bb8307a786ab479160947041ccef8eb976cab4c6a0286b4868120c9127880d37",
+          "portablePcmSha256": "bb8307a786ab479160947041ccef8eb976cab4c6a0286b4868120c9127880d37"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 9.70407033816336e-39,
+          "relativeRmsError": 2.4484901458645585e-40,
+          "rmsError": 5.225785471543194e-41,
+          "nonFinite": 0,
+          "peak": 0.6166291832923889,
+          "maxDifference": {
+            "frame": 22418,
+            "channel": 1,
+            "actual": 9.70407033816336e-39,
+            "reference": 0,
+            "error": 9.70407033816336e-39
+          },
+          "nativePcmSha256": "43435563e0e430f902fe96c23dceec0b9735d3dc85f9f2d9290ccc6046ba8c3d",
+          "portablePcmSha256": "180602ab7ee71ab8115b38dedd378e5f82d3822dcfed24e8bd7a7c8da6fb1eaf"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 1.0336877106473947e-38,
+          "relativeRmsError": 3.505949546349306e-40,
+          "rmsError": 7.105590030820164e-41,
+          "nonFinite": 0,
+          "peak": 0.563815176486969,
+          "maxDifference": {
+            "frame": 22681,
+            "channel": 1,
+            "actual": -1.79068960003324e-38,
+            "reference": -2.824377310680635e-38,
+            "error": 1.0336877106473947e-38
+          },
+          "nativePcmSha256": "c77b481b0cb7242244557f5666b48b1e330ab679d481d94b84a9575c0e7f44d0",
+          "portablePcmSha256": "ee1695c67520c7ccacc1687a79fcf6d3e8d54a4030a1444aeb05789775f166bc"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 33075,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 264.60000229999423,
+        "lastDelaySeconds": 0.006000000052154064,
+        "lastToneHz": 9000,
+        "wowPhase": 0.4500000037751306,
+        "driftPhase": 0.16650000019353683,
+        "flutterPhase": 0.4750000559579348,
+        "flutter2Phase": 0.7750000435335096,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0,
+        "driftDepthSeconds": 0,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0,
+        "flutter2DepthSeconds": 0,
+        "toneTargetHz": 9000
+      }
+    },
+    {
+      "id": "drive-full",
+      "rate": 44100,
+      "channels": 2,
+      "frames": 33075,
+      "settings": {
+        "drive": 1
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.34453797340393066,
+          "maxDifference": null,
+          "nativePcmSha256": "8ef6383e74b24487d6204d07258b835e62d4093225c8ecdfc269076e91442eca",
+          "portablePcmSha256": "8ef6383e74b24487d6204d07258b835e62d4093225c8ecdfc269076e91442eca"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 8.5298200601177e-39,
+          "relativeRmsError": 3.441028354242261e-40,
+          "rmsError": 6.359094399300997e-41,
+          "nonFinite": 0,
+          "peak": 0.41679415106773376,
+          "maxDifference": {
+            "frame": 22421,
+            "channel": 0,
+            "actual": -8.5298200601177e-39,
+            "reference": 0,
+            "error": 8.5298200601177e-39
+          },
+          "nativePcmSha256": "475c5ee0685d096d73d9b7e7c3c2d70857ce436314c40c4bea8c6227874226fe",
+          "portablePcmSha256": "ac46510dafab64a64b5e9674b352e1bc4c14c1089b09d1ea036daff245d7e0c7"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 9.12376882201256e-39,
+          "relativeRmsError": 3.670969680280878e-40,
+          "rmsError": 6.480595913153174e-41,
+          "nonFinite": 0,
+          "peak": 0.38805997371673584,
+          "maxDifference": {
+            "frame": 22684,
+            "channel": 0,
+            "actual": 1.4958268357417013e-38,
+            "reference": 2.4082037179429573e-38,
+            "error": 9.12376882201256e-39
+          },
+          "nativePcmSha256": "96f9d144be35b453cd451d3042b5fcdd3451fba936c73e64f1e241935cddb0ad",
+          "portablePcmSha256": "2b6f0ef43af2ceb17dad18667122148bde6b17fa6be662e620bbcb1daeaf9b49"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 33075,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 264.60000229999423,
+        "lastDelaySeconds": 0.006000000052154064,
+        "lastToneHz": 9000,
+        "wowPhase": 0.4500000037751306,
+        "driftPhase": 0.16650000019353683,
+        "flutterPhase": 0.4750000559579348,
+        "flutter2Phase": 0.7750000435335096,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0,
+        "driftDepthSeconds": 0,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0,
+        "flutter2DepthSeconds": 0,
+        "toneTargetHz": 9000
+      }
+    },
+    {
+      "id": "dark-tone",
+      "rate": 44100,
+      "channels": 2,
+      "frames": 33075,
+      "settings": {
+        "drive": 0.3,
+        "tone": 500
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.4792824983596802,
+          "maxDifference": null,
+          "nativePcmSha256": "10a8aecaf66fa63834d826535f9e16284a24770579351e2d4946e6cae026bb33",
+          "portablePcmSha256": "10a8aecaf66fa63834d826535f9e16284a24770579351e2d4946e6cae026bb33"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 1.1381203755322189e-37,
+          "relativeRmsError": 2.1463701758358208e-38,
+          "rmsError": 4.274950869347036e-39,
+          "nonFinite": 0,
+          "peak": 0.37539318203926086,
+          "maxDifference": {
+            "frame": 24809,
+            "channel": 1,
+            "actual": 0,
+            "reference": 1.1381203755322189e-37,
+            "error": 1.1381203755322189e-37
+          },
+          "nativePcmSha256": "fed7430849e342068269678c1aa49e11a8a55098e39729931bd97a65b1a45ddf",
+          "portablePcmSha256": "10453b3154923bd4f856a00bb92bf182d2bbf62e500bacfb556171aa522c4fd1"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 1.1381203755322189e-37,
+          "relativeRmsError": 2.1504205360992416e-38,
+          "rmsError": 4.2809964458672734e-39,
+          "nonFinite": 0,
+          "peak": 0.37487027049064636,
+          "maxDifference": {
+            "frame": 25074,
+            "channel": 1,
+            "actual": 0,
+            "reference": 1.1381203755322189e-37,
+            "error": 1.1381203755322189e-37
+          },
+          "nativePcmSha256": "cb8fb444e39d8268609c0fa5f841924ec4a35988a76ac37b297dde55d444e9a8",
+          "portablePcmSha256": "06127eb2fc56c2463168c7a8d925dd2180b53ae2a1be61b511bc4969b07db9b3"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 33075,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 264.60000229999423,
+        "lastDelaySeconds": 0.006000000052154064,
+        "lastToneHz": 500,
+        "wowPhase": 0.4500000037751306,
+        "driftPhase": 0.16650000019353683,
+        "flutterPhase": 0.4750000559579348,
+        "flutter2Phase": 0.7750000435335096,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0,
+        "driftDepthSeconds": 0,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0,
+        "flutter2DepthSeconds": 0,
+        "toneTargetHz": 500
+      }
+    },
+    {
+      "id": "wow-full",
+      "rate": 44100,
+      "channels": 2,
+      "frames": 33075,
+      "settings": {
+        "wow": 1,
+        "wowRate": 0.6,
+        "drive": 0.2
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.5115335583686829,
+          "maxDifference": null,
+          "nativePcmSha256": "7d01f66ad6721456f1b5553065e0f77ef8450d3c5a11868d3c79477c4463759f",
+          "portablePcmSha256": "7d01f66ad6721456f1b5553065e0f77ef8450d3c5a11868d3c79477c4463759f"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 5.6053886377858094e-39,
+          "relativeRmsError": 1.930806318146106e-40,
+          "rmsError": 4.178496589320034e-41,
+          "nonFinite": 0,
+          "peak": 0.568466305732727,
+          "maxDifference": {
+            "frame": 22421,
+            "channel": 0,
+            "actual": -5.6053886377858094e-39,
+            "reference": 0,
+            "error": 5.6053886377858094e-39
+          },
+          "nativePcmSha256": "5e010f63ad17540e8575fcff47bc973d5faf09b62b2bfd54eb9a8a77e81eb08a",
+          "portablePcmSha256": "48fb30bf74cf5c0b857b4f9629f8de43ad206d8faf8d36140096d95f34ec5e70"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 0.00004850327968597412,
+          "relativeRmsError": 0.0000210122943889331,
+          "rmsError": 0.00000440837255085719,
+          "nonFinite": 0,
+          "peak": 0.5394122004508972,
+          "maxDifference": {
+            "frame": 9579,
+            "channel": 1,
+            "actual": 0.06968989968299866,
+            "reference": 0.06964139640331268,
+            "error": 0.00004850327968597412
+          },
+          "nativePcmSha256": "023b0827a2ec727f18d35708342c6b9223bb682cde896e63016ba5a813a5b4dc",
+          "portablePcmSha256": "fe516d67e0eb76b7cb977b1cc8f78fb862cc894625f3b1a92b9c31f3a472686d"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 33075,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 264.60000229999423,
+        "lastDelaySeconds": 0.008225522935390472,
+        "lastToneHz": 9000,
+        "wowPhase": 0.4500000037751306,
+        "driftPhase": 0.16650000019353683,
+        "flutterPhase": 0.4750000559579348,
+        "flutter2Phase": 0.7750000435335096,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0.003000000026077032,
+        "driftDepthSeconds": 0.001500000013038516,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0,
+        "flutter2DepthSeconds": 0,
+        "toneTargetHz": 9000
+      }
+    },
+    {
+      "id": "flutter-full",
+      "rate": 44100,
+      "channels": 2,
+      "frames": 33075,
+      "settings": {
+        "flutter": 1,
+        "tone": 16000
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.5689066052436829,
+          "maxDifference": null,
+          "nativePcmSha256": "bb8307a786ab479160947041ccef8eb976cab4c6a0286b4868120c9127880d37",
+          "portablePcmSha256": "bb8307a786ab479160947041ccef8eb976cab4c6a0286b4868120c9127880d37"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 1.0940957256265875e-38,
+          "relativeRmsError": 4.847914165968355e-40,
+          "rmsError": 1.0308155781651485e-40,
+          "nonFinite": 0,
+          "peak": 0.6301602721214294,
+          "maxDifference": {
+            "frame": 22460,
+            "channel": 1,
+            "actual": 1.0940957256265875e-38,
+            "reference": 0,
+            "error": 1.0940957256265875e-38
+          },
+          "nativePcmSha256": "c8728af21c0f1d789ce50b80bd128bb06198cd4d8e2308123fca0813b433de2d",
+          "portablePcmSha256": "0e88ada943e100983b425a06a5db9ba6287722d9f3d5697375998d6a9697f165"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 0.00004808604717254639,
+          "relativeRmsError": 0.000004105355531264851,
+          "rmsError": 8.372670749029985e-7,
+          "nonFinite": 0,
+          "peak": 0.620093584060669,
+          "maxDifference": {
+            "frame": 15937,
+            "channel": 1,
+            "actual": 0.23651090264320374,
+            "reference": 0.2364628165960312,
+            "error": 0.00004808604717254639
+          },
+          "nativePcmSha256": "8ec04ebb42294583c06e9ab336235a1eb8a080601d912b95d998aaa8cf7ad315",
+          "portablePcmSha256": "1cf903d7aa84ce0588636d88ca4fa35090c174194601314f587409099f7c0e93"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 33075,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 264.60000229999423,
+        "lastDelaySeconds": 0.005920812021940947,
+        "lastToneHz": 16000,
+        "wowPhase": 0.4500000037751306,
+        "driftPhase": 0.16650000019353683,
+        "flutterPhase": 0.4750000559579348,
+        "flutter2Phase": 0.7750000435335096,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0,
+        "driftDepthSeconds": 0,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0.0002500000118743628,
+        "flutter2DepthSeconds": 0.00011999999696854502,
+        "toneTargetHz": 16000
+      }
+    },
+    {
+      "id": "combined",
+      "rate": 44100,
+      "channels": 2,
+      "frames": 33075,
+      "settings": {
+        "wow": 0.73123456789,
+        "wowRate": 1.123456789,
+        "flutter": 0.6123456789,
+        "drive": 0.4123456789,
+        "tone": 6100.123456789
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.4438633322715759,
+          "maxDifference": null,
+          "nativePcmSha256": "72f6bece439460ed44ae431ee449db801665fceb88f9825b4c91b0c931674d5b",
+          "portablePcmSha256": "72f6bece439460ed44ae431ee449db801665fceb88f9825b4c91b0c931674d5b"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 1.1119666250719684e-38,
+          "relativeRmsError": 4.295098483483779e-40,
+          "rmsError": 7.918258486770124e-41,
+          "nonFinite": 0,
+          "peak": 0.41992679238319397,
+          "maxDifference": {
+            "frame": 22450,
+            "channel": 0,
+            "actual": 1.1119666250719684e-38,
+            "reference": 0,
+            "error": 1.1119666250719684e-38
+          },
+          "nativePcmSha256": "e87e8971939f1bb525c19db4ad688b0423108c963ab64d21e7c4a6dc0df3f5d8",
+          "portablePcmSha256": "38cbcd01f16974ee0a78c31b0dfb452d8e2df5af75da30a0da31479f97a0b139"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 0.000027373433113098145,
+          "relativeRmsError": 0.000011720969765215211,
+          "rmsError": 0.000002134918942342033,
+          "nonFinite": 0,
+          "peak": 0.4159964323043823,
+          "maxDifference": {
+            "frame": 7769,
+            "channel": 1,
+            "actual": -0.06818719208240509,
+            "reference": -0.06815981864929199,
+            "error": 0.000027373433113098145
+          },
+          "nativePcmSha256": "df022dae50a7486ba1b90095bbf017d6bafde06b1cfc1e065378ca3e3e972a4e",
+          "portablePcmSha256": "dc5daa648a677f96cdd9cff51a0130ffd8fa2df24ffe8f31b393fdc8758a5e83"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 33075,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 264.60000229999423,
+        "lastDelaySeconds": 0.005038470961153507,
+        "lastToneHz": 6100.12353515625,
+        "wowPhase": 0.8268843898613341,
+        "driftPhase": 0.30594720420094745,
+        "flutterPhase": 0.4750000559579348,
+        "flutter2Phase": 0.7750000435335096,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0.002193703781813383,
+        "driftDepthSeconds": 0.0010968518909066916,
+        "wowFrequency": 1.1234568357467651,
+        "driftFrequency": 0.415679007768631,
+        "flutterDepthSeconds": 0.00015308642468880862,
+        "flutter2DepthSeconds": 0.00007348148210439831,
+        "toneTargetHz": 6100.12353515625
+      }
+    },
+    {
+      "id": "control-extremes",
+      "rate": 44100,
+      "channels": 2,
+      "frames": 33075,
+      "settings": {
+        "wow": 1,
+        "wowRate": 5,
+        "flutter": 1,
+        "drive": 1,
+        "tone": 20000
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.34453797340393066,
+          "maxDifference": null,
+          "nativePcmSha256": "8ef6383e74b24487d6204d07258b835e62d4093225c8ecdfc269076e91442eca",
+          "portablePcmSha256": "8ef6383e74b24487d6204d07258b835e62d4093225c8ecdfc269076e91442eca"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 2.0360443494503366e-38,
+          "relativeRmsError": 1.0965527916196534e-39,
+          "rmsError": 2.0215729087379934e-40,
+          "nonFinite": 0,
+          "peak": 0.42243120074272156,
+          "maxDifference": {
+            "frame": 22772,
+            "channel": 1,
+            "actual": -1.0414424963489683e-38,
+            "reference": -3.077486845799305e-38,
+            "error": 2.0360443494503366e-38
+          },
+          "nativePcmSha256": "3da449153a4746b7fa40cab21a9b165c0d5f9917fb7ac4002dfdc0e3bf709447",
+          "portablePcmSha256": "d3a518862cc858f3d8183a9135fb86e455196dfec8f5d261e2ba9857bec4db78"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 0.00006246566772460938,
+          "relativeRmsError": 0.000024024975024191362,
+          "rmsError": 0.000004251325822352988,
+          "nonFinite": 0,
+          "peak": 0.4116598665714264,
+          "maxDifference": {
+            "frame": 11573,
+            "channel": 0,
+            "actual": -0.006306901574134827,
+            "reference": -0.006369367241859436,
+            "error": 0.00006246566772460938
+          },
+          "nativePcmSha256": "b824c68944ae6fdf9df5b10242f5ec778f483a42b46be67624b8e7d34acbf1de",
+          "portablePcmSha256": "c02d61726ac3db802143b5de6905a5f8f7c610b7f8bb8b4816ab3ada982325e1"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 33075,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 264.60000229999423,
+        "lastDelaySeconds": 0.005170503165572882,
+        "lastToneHz": 20000,
+        "wowPhase": 0.6179562374672969,
+        "driftPhase": 0.3386437707354162,
+        "flutterPhase": 0.4750000559579348,
+        "flutter2Phase": 0.7750000435335096,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0.003000000026077032,
+        "driftDepthSeconds": 0.001500000013038516,
+        "wowFrequency": 5,
+        "driftFrequency": 1.850000023841858,
+        "flutterDepthSeconds": 0.0002500000118743628,
+        "flutter2DepthSeconds": 0.00011999999696854502,
+        "toneTargetHz": 20000
+      }
+    },
+    {
+      "id": "native-target-automation",
+      "rate": 44100,
+      "channels": 2,
+      "frames": 33075,
+      "settings": {
+        "wow": 0.2,
+        "flutter": 0.1,
+        "drive": 0.3
+      },
+      "targets": [
+        {
+          "kind": "target",
+          "requestedFrame": 13,
+          "index": 0,
+          "value": 0.7123456789,
+          "timeSeconds": 0.00029478458049886624,
+          "frame": 14,
+          "sequence": 0
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 41,
+          "index": 1,
+          "value": 2.123456789,
+          "timeSeconds": 0.0009297052154195011,
+          "frame": 41,
+          "sequence": 1
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 513,
+          "index": 2,
+          "value": 0.8123456789,
+          "timeSeconds": 0.01163265306122449,
+          "frame": 513,
+          "sequence": 2
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 4001,
+          "index": 4,
+          "value": 3000.123456789,
+          "timeSeconds": 0.09072562358276644,
+          "frame": 4001,
+          "sequence": 3
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 8191,
+          "index": 0,
+          "value": 0,
+          "timeSeconds": 0.18573696145124716,
+          "frame": 8191,
+          "sequence": 4
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 10003,
+          "index": 2,
+          "value": 0,
+          "timeSeconds": 0.22682539682539682,
+          "frame": 10003,
+          "sequence": 5
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 12001,
+          "index": 1,
+          "value": 0.05,
+          "timeSeconds": 0.2721315192743764,
+          "frame": 12001,
+          "sequence": 6
+        }
+      ],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.4792824983596802,
+          "maxDifference": null,
+          "nativePcmSha256": "10a8aecaf66fa63834d826535f9e16284a24770579351e2d4946e6cae026bb33",
+          "portablePcmSha256": "10a8aecaf66fa63834d826535f9e16284a24770579351e2d4946e6cae026bb33"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 8.940696716308594e-8,
+          "relativeRmsError": 4.13714865401224e-8,
+          "rmsError": 7.536863372052836e-9,
+          "nonFinite": 0,
+          "peak": 0.5017176866531372,
+          "maxDifference": {
+            "frame": 6417,
+            "channel": 0,
+            "actual": -0.30604368448257446,
+            "reference": -0.3060435950756073,
+            "error": 8.940696716308594e-8
+          },
+          "nativePcmSha256": "9fcb4f85719bb26d7742db59d32eaee6744dbaf316d06734515d5e3d3615d022",
+          "portablePcmSha256": "6157c5f9c9fd00ae2d6fd15d45d6f9546a77b2b0e72bd6f216cbc0cc1cbe7afb"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 0.00003890693187713623,
+          "relativeRmsError": 0.000006532647146550271,
+          "rmsError": 0.0000011825381032492466,
+          "nonFinite": 0,
+          "peak": 0.49019724130630493,
+          "maxDifference": {
+            "frame": 3829,
+            "channel": 0,
+            "actual": 0.0562882125377655,
+            "reference": 0.05624930560588837,
+            "error": 0.00003890693187713623
+          },
+          "nativePcmSha256": "4d2d0a0275aaa91bc352b9a655bf84058a75ec710c43a38ca4acc42424bad7a8",
+          "portablePcmSha256": "9326ce08661ebce966313b305a9bccf9eb55551e7dbd9300e59d53deb89139ca"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 33075,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 264.60000229999423,
+        "lastDelaySeconds": 0.006000000052154064,
+        "lastToneHz": 3000.12353515625,
+        "wowPhase": 0.6168400820970419,
+        "driftPhase": 0.22823086551034066,
+        "flutterPhase": 0.4750000559579348,
+        "flutter2Phase": 0.7750000435335096,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0,
+        "driftDepthSeconds": 0,
+        "wowFrequency": 0.05000000074505806,
+        "driftFrequency": 0.01850000023841858,
+        "flutterDepthSeconds": 0,
+        "flutter2DepthSeconds": 0,
+        "toneTargetHz": 3000.12353515625
+      }
+    },
+    {
+      "id": "native-curve-control",
+      "rate": 44100,
+      "channels": 2,
+      "frames": 33075,
+      "settings": {
+        "wow": 0.3,
+        "flutter": 0.3,
+        "drive": 0
+      },
+      "targets": [],
+      "curveControls": [
+        {
+          "kind": "curve",
+          "index": 3,
+          "value": 0.3,
+          "requestedFrame": 4096,
+          "requestedSeconds": 0.09287981859410431,
+          "timeSeconds": 0.09287981859410431,
+          "frame": 4096,
+          "sequence": 0
+        },
+        {
+          "kind": "curve",
+          "index": 3,
+          "value": 1,
+          "requestedFrame": 8192,
+          "requestedSeconds": 0.18575963718820862,
+          "timeSeconds": 0.18575963718820862,
+          "frame": 8192,
+          "sequence": 1
+        },
+        {
+          "kind": "curve",
+          "index": 3,
+          "value": 0,
+          "requestedFrame": 12288,
+          "requestedSeconds": 0.2786394557823129,
+          "timeSeconds": 0.2786394557823129,
+          "frame": 12288,
+          "sequence": 2
+        }
+      ],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.5689066052436829,
+          "maxDifference": null,
+          "nativePcmSha256": "bfaba2b8ec90c3895f982580c7205dd0eb2688a5f0e07f398a6418292eec2d2c",
+          "portablePcmSha256": "bfaba2b8ec90c3895f982580c7205dd0eb2688a5f0e07f398a6418292eec2d2c"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 9.70407033816336e-39,
+          "relativeRmsError": 2.5099569027641012e-40,
+          "rmsError": 5.225785471543194e-41,
+          "nonFinite": 0,
+          "peak": 0.6094930768013,
+          "maxDifference": {
+            "frame": 22418,
+            "channel": 1,
+            "actual": 9.70407033816336e-39,
+            "reference": 0,
+            "error": 9.70407033816336e-39
+          },
+          "nativePcmSha256": "6f9ae4e16112d58230bfd48596f239de786555388f61e11d587fed57270ba912",
+          "portablePcmSha256": "a0d96f9cfcc1b4aecc79efa4e040404dfdf5e51982ee399ea2e9e84e82eee9dd"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 0.00004312396049499512,
+          "relativeRmsError": 0.000007546122502894006,
+          "rmsError": 0.000001519401851032706,
+          "nonFinite": 0,
+          "peak": 0.5992583632469177,
+          "maxDifference": {
+            "frame": 10549,
+            "channel": 1,
+            "actual": 0.13643428683280945,
+            "reference": 0.13647741079330444,
+            "error": 0.00004312396049499512
+          },
+          "nativePcmSha256": "2d3e94f4ad4369293917edbb07c32bae49e936af411bdc530059146f0ae831ad",
+          "portablePcmSha256": "664588403ff640a789041f3a1ee3a7b386a25e4c8c13ea3f93b3dee422101ba1"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 33075,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 264.60000229999423,
+        "lastDelaySeconds": 0.00664390018209815,
+        "lastToneHz": 9000,
+        "wowPhase": 0.4500000037751306,
+        "driftPhase": 0.16650000019353683,
+        "flutterPhase": 0.4750000559579348,
+        "flutter2Phase": 0.7750000435335096,
+        "prepared": 1,
+        "driveCurves": 3,
+        "wowDepthSeconds": 0.0008999999845400453,
+        "driftDepthSeconds": 0.00044999999227002263,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0.00007500000356230885,
+        "flutter2DepthSeconds": 0.00003600000127335079,
+        "toneTargetHz": 9000
+      }
+    },
+    {
+      "id": "native-default-node",
+      "rate": 48000,
+      "channels": 1,
+      "frames": 36000,
+      "settings": {},
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.5651646852493286,
+          "maxDifference": null,
+          "nativePcmSha256": "ba05685ed39465c330aa5b4372fc58c458c7e9bcf44fcaf1f47d9cb8bd4aec21",
+          "portablePcmSha256": "ba05685ed39465c330aa5b4372fc58c458c7e9bcf44fcaf1f47d9cb8bd4aec21"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 6.350005010564873e-39,
+          "relativeRmsError": 1.983197468682644e-40,
+          "rmsError": 4.137237185310971e-41,
+          "nonFinite": 0,
+          "peak": 0.5657330751419067,
+          "maxDifference": {
+            "frame": 24374,
+            "channel": 0,
+            "actual": 6.350005010564873e-39,
+            "reference": 0,
+            "error": 6.350005010564873e-39
+          },
+          "nativePcmSha256": "378e2f67b547b42120ce4bb8495363d71820ba57a229e12a1c5ccf2f07432aba",
+          "portablePcmSha256": "1c5e1c8cd4ac48e376a325fbf177cea486ae5526d24fa5b1669e4601546403b3"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 6.350005010564873e-39,
+          "relativeRmsError": 1.983197468682644e-40,
+          "rmsError": 4.137237185310971e-41,
+          "nonFinite": 0,
+          "peak": 0.5657330751419067,
+          "maxDifference": {
+            "frame": 24662,
+            "channel": 0,
+            "actual": 6.350005010564873e-39,
+            "reference": 0,
+            "error": 6.350005010564873e-39
+          },
+          "nativePcmSha256": "dd78b788e93e0a43bd21c860100965cfe181fab3967b6a15fb7fc06ec45824ac",
+          "portablePcmSha256": "da38ce91f158e96926b5817878080d8c83bd674306e48cbc1d502376d4043281"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 36000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 288.0000025033951,
+        "lastDelaySeconds": 0.006000000052154064,
+        "lastToneHz": 9000,
+        "wowPhase": 0.4500000213738531,
+        "driftPhase": 0.16650000725348946,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0,
+        "driftDepthSeconds": 0,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0,
+        "flutter2DepthSeconds": 0,
+        "toneTargetHz": 9000
+      }
+    },
+    {
+      "id": "drive-full",
+      "rate": 48000,
+      "channels": 1,
+      "frames": 36000,
+      "settings": {
+        "drive": 1
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.3426542282104492,
+          "maxDifference": null,
+          "nativePcmSha256": "f6ad1c703dc50547788671275bcf336ee6339c873f7156110fe93bacc26628fd",
+          "portablePcmSha256": "f6ad1c703dc50547788671275bcf336ee6339c873f7156110fe93bacc26628fd"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 6.848184831512382e-39,
+          "relativeRmsError": 2.3739505770037564e-40,
+          "rmsError": 4.307409938383092e-41,
+          "nonFinite": 0,
+          "peak": 0.40065646171569824,
+          "maxDifference": {
+            "frame": 24375,
+            "channel": 0,
+            "actual": 6.848184831512382e-39,
+            "reference": 0,
+            "error": 6.848184831512382e-39
+          },
+          "nativePcmSha256": "487daca56653536ed96fc3d33081e0ea5e3b0c6138786e3edba185da2ba49468",
+          "portablePcmSha256": "cf3893f807bcf3c864e3bea1781bc2ea2bcef4483eff40b318eaef834bd13765"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 6.848184831512382e-39,
+          "relativeRmsError": 2.3739505770037564e-40,
+          "rmsError": 4.307409938383092e-41,
+          "nonFinite": 0,
+          "peak": 0.40065646171569824,
+          "maxDifference": {
+            "frame": 24663,
+            "channel": 0,
+            "actual": 6.848184831512382e-39,
+            "reference": 0,
+            "error": 6.848184831512382e-39
+          },
+          "nativePcmSha256": "997b2ab658582287b36b6122fbe714cd13a418e0f1225c261a74d707078cadb0",
+          "portablePcmSha256": "5f6afa40bcb9930adb3a9948fb3073fac643ada25c67c2ccac759f58300dfb5e"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 36000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 288.0000025033951,
+        "lastDelaySeconds": 0.006000000052154064,
+        "lastToneHz": 9000,
+        "wowPhase": 0.4500000213738531,
+        "driftPhase": 0.16650000725348946,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0,
+        "driftDepthSeconds": 0,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0,
+        "flutter2DepthSeconds": 0,
+        "toneTargetHz": 9000
+      }
+    },
+    {
+      "id": "dark-tone",
+      "rate": 48000,
+      "channels": 1,
+      "frames": 36000,
+      "settings": {
+        "drive": 0.3,
+        "tone": 500
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.47429123520851135,
+          "maxDifference": null,
+          "nativePcmSha256": "5bdd50dfe01c2e39799c61f1e2694c417422f335e123827e3e664661d4d9fb8d",
+          "portablePcmSha256": "5bdd50dfe01c2e39799c61f1e2694c417422f335e123827e3e664661d4d9fb8d"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 1.3674441023616238e-37,
+          "relativeRmsError": 3.1265174189729253e-38,
+          "rmsError": 6.229297568313405e-39,
+          "nonFinite": 0,
+          "peak": 0.3709186315536499,
+          "maxDifference": {
+            "frame": 26897,
+            "channel": 0,
+            "actual": 0,
+            "reference": 1.3674441023616238e-37,
+            "error": 1.3674441023616238e-37
+          },
+          "nativePcmSha256": "bc7d002153a79a5c658362144b92dd0d1f4b6267d828f7eb4b8aca3b91dd3155",
+          "portablePcmSha256": "26788f04f6de7ffcce5badea619c98ed7fd91678a5203fa810d3256911316826"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 1.3674441023616238e-37,
+          "relativeRmsError": 3.1265174189729253e-38,
+          "rmsError": 6.229297568313405e-39,
+          "nonFinite": 0,
+          "peak": 0.3709186315536499,
+          "maxDifference": {
+            "frame": 27185,
+            "channel": 0,
+            "actual": 0,
+            "reference": 1.3674441023616238e-37,
+            "error": 1.3674441023616238e-37
+          },
+          "nativePcmSha256": "09a15a10a3f900e83e40a08eeabc90d6d81063d02c5740f6d75a36f000ae4337",
+          "portablePcmSha256": "66d65d92cfc916a1aadd8347918cd1d64509130386e304914bc4b4b9269f8917"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 36000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 288.0000025033951,
+        "lastDelaySeconds": 0.006000000052154064,
+        "lastToneHz": 500,
+        "wowPhase": 0.4500000213738531,
+        "driftPhase": 0.16650000725348946,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0,
+        "driftDepthSeconds": 0,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0,
+        "flutter2DepthSeconds": 0,
+        "toneTargetHz": 500
+      }
+    },
+    {
+      "id": "wow-full",
+      "rate": 48000,
+      "channels": 1,
+      "frames": 36000,
+      "settings": {
+        "wow": 1,
+        "wowRate": 0.6,
+        "drive": 0.2
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.5082636475563049,
+          "maxDifference": null,
+          "nativePcmSha256": "eb45f412c433fef011bb1ef6df3709565b8901128b85cbd340d0d00a1d7481fe",
+          "portablePcmSha256": "eb45f412c433fef011bb1ef6df3709565b8901128b85cbd340d0d00a1d7481fe"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 7.305694767129792e-39,
+          "relativeRmsError": 2.2467679413197456e-40,
+          "rmsError": 4.759112387521443e-41,
+          "nonFinite": 0,
+          "peak": 0.5293650031089783,
+          "maxDifference": {
+            "frame": 24374,
+            "channel": 0,
+            "actual": 7.305694767129792e-39,
+            "reference": 0,
+            "error": 7.305694767129792e-39
+          },
+          "nativePcmSha256": "3fb5f73d7643d11d8692b6bdf23ba9e0d2f70403c700a51a21baed0b8757bb2d",
+          "portablePcmSha256": "d4fe5333d937723b14879fc036783cf67cad519fdd32aca732f7643ddd2fc8fe"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 1.1109386325185397e-38,
+          "relativeRmsError": 4.476153165392524e-40,
+          "rmsError": 9.23769381819894e-41,
+          "nonFinite": 0,
+          "peak": 0.5156216025352478,
+          "maxDifference": {
+            "frame": 24840,
+            "channel": 0,
+            "actual": -1.1109386325185397e-38,
+            "reference": 0,
+            "error": 1.1109386325185397e-38
+          },
+          "nativePcmSha256": "cc8bf61a40793fa5b85362b274b0bb3c30f78db33879c180799fde5e4fd4eb8a",
+          "portablePcmSha256": "5ccb5c7240e9d03de63aa34091a5dcbaffbd16e6e55bea0fc2e69af9e022045b"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 36000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 288.0000025033951,
+        "lastDelaySeconds": 0.00822550430893898,
+        "lastToneHz": 9000,
+        "wowPhase": 0.4500000213738531,
+        "driftPhase": 0.16650000725348946,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0.003000000026077032,
+        "driftDepthSeconds": 0.001500000013038516,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0,
+        "flutter2DepthSeconds": 0,
+        "toneTargetHz": 9000
+      }
+    },
+    {
+      "id": "flutter-full",
+      "rate": 48000,
+      "channels": 1,
+      "frames": 36000,
+      "settings": {
+        "flutter": 1,
+        "tone": 16000
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.5651646852493286,
+          "maxDifference": null,
+          "nativePcmSha256": "ba05685ed39465c330aa5b4372fc58c458c7e9bcf44fcaf1f47d9cb8bd4aec21",
+          "portablePcmSha256": "ba05685ed39465c330aa5b4372fc58c458c7e9bcf44fcaf1f47d9cb8bd4aec21"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 7.671844246768616e-39,
+          "relativeRmsError": 2.7652757096332446e-40,
+          "rmsError": 5.904244044202894e-41,
+          "nonFinite": 0,
+          "peak": 0.6202028393745422,
+          "maxDifference": {
+            "frame": 24389,
+            "channel": 0,
+            "actual": -7.671844246768616e-39,
+            "reference": 0,
+            "error": 7.671844246768616e-39
+          },
+          "nativePcmSha256": "e58c0932e8781c4a8bf92030ab18a4bb0f8f638bebfed8a29fda0f4f614d1a63",
+          "portablePcmSha256": "4b27b9b3fe90aa3446af991d83d76e02003c36b8d04e62bd27e47b91c1ea9d9a"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 8.310543475121689e-39,
+          "relativeRmsError": 2.8459101469050674e-40,
+          "rmsError": 5.833568095461285e-41,
+          "nonFinite": 0,
+          "peak": 0.6068856120109558,
+          "maxDifference": {
+            "frame": 24664,
+            "channel": 0,
+            "actual": 8.310543475121689e-39,
+            "reference": 0,
+            "error": 8.310543475121689e-39
+          },
+          "nativePcmSha256": "46481ab56e0367c7ceadbe233a9ebe7548ca547542b8f0888d1203bf4205970e",
+          "portablePcmSha256": "4cf4803fe8d80c35e4e6085211e0956dab075bf6d2bdc60bfcd9e0e9c49a0322"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 36000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 288.0000025033951,
+        "lastDelaySeconds": 0.005920793395489454,
+        "lastToneHz": 16000,
+        "wowPhase": 0.4500000213738531,
+        "driftPhase": 0.16650000725348946,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0,
+        "driftDepthSeconds": 0,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0.0002500000118743628,
+        "flutter2DepthSeconds": 0.00011999999696854502,
+        "toneTargetHz": 16000
+      }
+    },
+    {
+      "id": "combined",
+      "rate": 48000,
+      "channels": 1,
+      "frames": 36000,
+      "settings": {
+        "wow": 0.73123456789,
+        "wowRate": 1.123456789,
+        "flutter": 0.6123456789,
+        "drive": 0.4123456789,
+        "tone": 6100.123456789
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.4408314824104309,
+          "maxDifference": null,
+          "nativePcmSha256": "46de6573ed33e2959a8f689c8fcd8157f52dee629aee4c6dc6dc06ab9c62b8a9",
+          "portablePcmSha256": "46de6573ed33e2959a8f689c8fcd8157f52dee629aee4c6dc6dc06ab9c62b8a9"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 1.0632716435665274e-38,
+          "relativeRmsError": 4.8219221429453304e-40,
+          "rmsError": 8.723269421511164e-41,
+          "nonFinite": 0,
+          "peak": 0.3956373333930969,
+          "maxDifference": {
+            "frame": 24410,
+            "channel": 0,
+            "actual": -1.0632716435665274e-38,
+            "reference": 0,
+            "error": 1.0632716435665274e-38
+          },
+          "nativePcmSha256": "8488f26a243866353b1d3c95878a063c4a67fbbbbf0822eefbd97787cd47a698",
+          "portablePcmSha256": "d2dd7425e80db4d7bbd519ebd0423472a1e5e30769bdfe7db12e95cb85bb268b"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 0.000024743378162384033,
+          "relativeRmsError": 0.000011657035384910995,
+          "rmsError": 0.000002090527420559288,
+          "nonFinite": 0,
+          "peak": 0.3894508183002472,
+          "maxDifference": {
+            "frame": 15118,
+            "channel": 0,
+            "actual": -0.09002319723367691,
+            "reference": -0.0900479406118393,
+            "error": 0.000024743378162384033
+          },
+          "nativePcmSha256": "fbbddd315c359cbd88b28f2ea1169e30ff07a55d0847c0e4f9c03a48dac60a21",
+          "portablePcmSha256": "62e24357f62e8096d904188ed8ac44ee60d3e79eae62a07f37e498b9f72cd806"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 36000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 288.0000025033951,
+        "lastDelaySeconds": 0.005038473289459944,
+        "lastToneHz": 6100.12353515625,
+        "wowPhase": 0.8268848269453883,
+        "driftPhase": 0.30594736840612313,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0.002193703781813383,
+        "driftDepthSeconds": 0.0010968518909066916,
+        "wowFrequency": 1.1234568357467651,
+        "driftFrequency": 0.415679007768631,
+        "flutterDepthSeconds": 0.00015308642468880862,
+        "flutter2DepthSeconds": 0.00007348148210439831,
+        "toneTargetHz": 6100.12353515625
+      }
+    },
+    {
+      "id": "control-extremes",
+      "rate": 48000,
+      "channels": 1,
+      "frames": 36000,
+      "settings": {
+        "wow": 1,
+        "wowRate": 5,
+        "flutter": 1,
+        "drive": 1,
+        "tone": 20000
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.3426542282104492,
+          "maxDifference": null,
+          "nativePcmSha256": "f6ad1c703dc50547788671275bcf336ee6339c873f7156110fe93bacc26628fd",
+          "portablePcmSha256": "f6ad1c703dc50547788671275bcf336ee6339c873f7156110fe93bacc26628fd"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 1.302171451737558e-38,
+          "relativeRmsError": 6.831884584412248e-40,
+          "rmsError": 1.2650556131169448e-40,
+          "nonFinite": 0,
+          "peak": 0.4102746546268463,
+          "maxDifference": {
+            "frame": 24513,
+            "channel": 0,
+            "actual": -1.302171451737558e-38,
+            "reference": 0,
+            "error": 1.302171451737558e-38
+          },
+          "nativePcmSha256": "c2f72f77f1320c1f82a49cdb5021763a340488d66103979b7d12b9f18391fdfd",
+          "portablePcmSha256": "be48d61cc6d7bf663dcc8a0919e1033a9903adbb43b1a2ac8e7aa1d7986dc090"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 0.00006812810897827148,
+          "relativeRmsError": 0.000024422768463629533,
+          "rmsError": 0.00000433925609016241,
+          "nonFinite": 0,
+          "peak": 0.39009448885917664,
+          "maxDifference": {
+            "frame": 18464,
+            "channel": 0,
+            "actual": -0.06133881211280823,
+            "reference": -0.061270684003829956,
+            "error": 0.00006812810897827148
+          },
+          "nativePcmSha256": "4a49e6869bd2c51fc12773beeae140c76fb111ca368a1f539ea0cff74d2f59ef",
+          "portablePcmSha256": "4d3bb1d2736f981cf140a1c1a5ee9e0da6b6b2b301c9b823455df0cea630ea06"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 36000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 288.0000025033951,
+        "lastDelaySeconds": 0.0051702759228646755,
+        "lastToneHz": 20000,
+        "wowPhase": 0.6179602309612164,
+        "driftPhase": 0.33864532053121366,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0.003000000026077032,
+        "driftDepthSeconds": 0.001500000013038516,
+        "wowFrequency": 5,
+        "driftFrequency": 1.850000023841858,
+        "flutterDepthSeconds": 0.0002500000118743628,
+        "flutter2DepthSeconds": 0.00011999999696854502,
+        "toneTargetHz": 20000
+      }
+    },
+    {
+      "id": "native-target-automation",
+      "rate": 48000,
+      "channels": 1,
+      "frames": 36000,
+      "settings": {
+        "wow": 0.2,
+        "flutter": 0.1,
+        "drive": 0.3
+      },
+      "targets": [
+        {
+          "kind": "target",
+          "requestedFrame": 13,
+          "index": 0,
+          "value": 0.7123456789,
+          "timeSeconds": 0.0002708333333333333,
+          "frame": 13,
+          "sequence": 0
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 41,
+          "index": 1,
+          "value": 2.123456789,
+          "timeSeconds": 0.0008541666666666667,
+          "frame": 41,
+          "sequence": 1
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 513,
+          "index": 2,
+          "value": 0.8123456789,
+          "timeSeconds": 0.0106875,
+          "frame": 513,
+          "sequence": 2
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 4001,
+          "index": 4,
+          "value": 3000.123456789,
+          "timeSeconds": 0.08335416666666666,
+          "frame": 4001,
+          "sequence": 3
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 8191,
+          "index": 0,
+          "value": 0,
+          "timeSeconds": 0.17064583333333333,
+          "frame": 8191,
+          "sequence": 4
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 10003,
+          "index": 2,
+          "value": 0,
+          "timeSeconds": 0.20839583333333334,
+          "frame": 10003,
+          "sequence": 5
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 12001,
+          "index": 1,
+          "value": 0.05,
+          "timeSeconds": 0.25002083333333336,
+          "frame": 12002,
+          "sequence": 6
+        }
+      ],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.47429123520851135,
+          "maxDifference": null,
+          "nativePcmSha256": "5bdd50dfe01c2e39799c61f1e2694c417422f335e123827e3e664661d4d9fb8d",
+          "portablePcmSha256": "5bdd50dfe01c2e39799c61f1e2694c417422f335e123827e3e664661d4d9fb8d"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 1.7369974480741704e-38,
+          "relativeRmsError": 1.0647988890512639e-39,
+          "rmsError": 1.9203561489773345e-40,
+          "nonFinite": 0,
+          "peak": 0.47242316603660583,
+          "maxDifference": {
+            "frame": 24585,
+            "channel": 0,
+            "actual": 1.7369974480741704e-38,
+            "reference": 0,
+            "error": 1.7369974480741704e-38
+          },
+          "nativePcmSha256": "7e9298305009e482b629c685d1f4c2cc8ded929ddd94aa028b9db9b064d88ea6",
+          "portablePcmSha256": "eb1249635e8a021562f6277aa0594179e4ecaf633a303dcfa1936ba6308318a7"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 0.00003699958324432373,
+          "relativeRmsError": 0.000006210200957031042,
+          "rmsError": 0.0000011156405257471594,
+          "nonFinite": 0,
+          "peak": 0.46585172414779663,
+          "maxDifference": {
+            "frame": 4213,
+            "channel": 0,
+            "actual": -0.11280672997236252,
+            "reference": -0.1127697303891182,
+            "error": 0.00003699958324432373
+          },
+          "nativePcmSha256": "e5a16cdcd0a22818ab7f5c83f2fb80141118eeba7b79095aacc195501ee467ac",
+          "portablePcmSha256": "025c82ad2976638198eb880c8f3ce468b3bc7c8eeb5fd082f299be294aa07498"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 36000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 288.0000025033951,
+        "lastDelaySeconds": 0.006000000052154064,
+        "lastToneHz": 3000.12353515625,
+        "wowPhase": 0.5711090936549681,
+        "driftPhase": 0.21131040352852892,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0,
+        "driftDepthSeconds": 0,
+        "wowFrequency": 0.05000000074505806,
+        "driftFrequency": 0.01850000023841858,
+        "flutterDepthSeconds": 0,
+        "flutter2DepthSeconds": 0,
+        "toneTargetHz": 3000.12353515625
+      }
+    },
+    {
+      "id": "native-curve-control",
+      "rate": 48000,
+      "channels": 1,
+      "frames": 36000,
+      "settings": {
+        "wow": 0.3,
+        "flutter": 0.3,
+        "drive": 0
+      },
+      "targets": [],
+      "curveControls": [
+        {
+          "kind": "curve",
+          "index": 3,
+          "value": 0.3,
+          "requestedFrame": 4096,
+          "requestedSeconds": 0.08533333333333333,
+          "timeSeconds": 0.08533333333333333,
+          "frame": 4096,
+          "sequence": 0
+        },
+        {
+          "kind": "curve",
+          "index": 3,
+          "value": 1,
+          "requestedFrame": 8192,
+          "requestedSeconds": 0.17066666666666666,
+          "timeSeconds": 0.17066666666666666,
+          "frame": 8192,
+          "sequence": 1
+        },
+        {
+          "kind": "curve",
+          "index": 3,
+          "value": 0,
+          "requestedFrame": 12288,
+          "requestedSeconds": 0.256,
+          "timeSeconds": 0.256,
+          "frame": 12288,
+          "sequence": 2
+        }
+      ],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.5641381740570068,
+          "maxDifference": null,
+          "nativePcmSha256": "9979317580449c5217ec505e7093617995968c4bf653e0836f1147ae75619a8d",
+          "portablePcmSha256": "9979317580449c5217ec505e7093617995968c4bf653e0836f1147ae75619a8d"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 6.350005010564873e-39,
+          "relativeRmsError": 2.026303040947964e-40,
+          "rmsError": 4.137237185310971e-41,
+          "nonFinite": 0,
+          "peak": 0.5657330751419067,
+          "maxDifference": {
+            "frame": 24374,
+            "channel": 0,
+            "actual": 6.350005010564873e-39,
+            "reference": 0,
+            "error": 6.350005010564873e-39
+          },
+          "nativePcmSha256": "c0af58158030d29eb19c3fb7a9f8d93e037a63a8f3a15fa9fd3cf762417486f5",
+          "portablePcmSha256": "60ee6433b1e6f75503f7b806faaae1d461082a6cef167a3815ba6195757b7ab8"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 0.00003769993782043457,
+          "relativeRmsError": 0.0000076121762728104835,
+          "rmsError": 0.0000015089785988043105,
+          "nonFinite": 0,
+          "peak": 0.5490870475769043,
+          "maxDifference": {
+            "frame": 11253,
+            "channel": 0,
+            "actual": 0.21536803245544434,
+            "reference": 0.21540573239326477,
+            "error": 0.00003769993782043457
+          },
+          "nativePcmSha256": "a2eb9f39555093e09f52f159d4e0348f6ff888f39825d3aad9c83bea09761542",
+          "portablePcmSha256": "d1383e47656f7f9d6880da56f946a3e684d66ff306a48ece84a1578a5e185d1d"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 36000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 288.0000025033951,
+        "lastDelaySeconds": 0.006643889471888542,
+        "lastToneHz": 9000,
+        "wowPhase": 0.4500000213738531,
+        "driftPhase": 0.16650000725348946,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 3,
+        "wowDepthSeconds": 0.0008999999845400453,
+        "driftDepthSeconds": 0.00044999999227002263,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0.00007500000356230885,
+        "flutter2DepthSeconds": 0.00003600000127335079,
+        "toneTargetHz": 9000
+      }
+    },
+    {
+      "id": "native-default-node",
+      "rate": 48000,
+      "channels": 2,
+      "frames": 36000,
+      "settings": {},
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.5725405216217041,
+          "maxDifference": null,
+          "nativePcmSha256": "7d6c418ccc41a4d5582c3baadd29dc96c58c9ba3712e0dc7cf20b9607935f875",
+          "portablePcmSha256": "7d6c418ccc41a4d5582c3baadd29dc96c58c9ba3712e0dc7cf20b9607935f875"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 1.1185898622635996e-38,
+          "relativeRmsError": 3.0420389563832392e-40,
+          "rmsError": 6.346515634264664e-41,
+          "nonFinite": 0,
+          "peak": 0.5772156119346619,
+          "maxDifference": {
+            "frame": 24371,
+            "channel": 1,
+            "actual": -1.1185898622635996e-38,
+            "reference": 0,
+            "error": 1.1185898622635996e-38
+          },
+          "nativePcmSha256": "24159a61d838d65ff7256499d38ba485dce2dd5e2873f9f786992aca55b642f4",
+          "portablePcmSha256": "0073445c389aa32d537384f67494a771d3559445141219ec1205a2a3a5091fd2"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 1.1185898622635996e-38,
+          "relativeRmsError": 3.0420389563832392e-40,
+          "rmsError": 6.346515634264664e-41,
+          "nonFinite": 0,
+          "peak": 0.5772156119346619,
+          "maxDifference": {
+            "frame": 24659,
+            "channel": 1,
+            "actual": -1.1185898622635996e-38,
+            "reference": 0,
+            "error": 1.1185898622635996e-38
+          },
+          "nativePcmSha256": "4a5c56d13035fd9dcfbe50cda5a03f6f4b884c1029a2c39478009a2f30557731",
+          "portablePcmSha256": "e29a5a18abcbf2905358a5f83c947d098923924f631bd2a6bda642a278735484"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 36000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 288.0000025033951,
+        "lastDelaySeconds": 0.006000000052154064,
+        "lastToneHz": 9000,
+        "wowPhase": 0.4500000213738531,
+        "driftPhase": 0.16650000725348946,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0,
+        "driftDepthSeconds": 0,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0,
+        "flutter2DepthSeconds": 0,
+        "toneTargetHz": 9000
+      }
+    },
+    {
+      "id": "drive-full",
+      "rate": 48000,
+      "channels": 2,
+      "frames": 36000,
+      "settings": {
+        "drive": 1
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.34488776326179504,
+          "maxDifference": null,
+          "nativePcmSha256": "740c9f27cacf1a81e0213e75e0104f034c599b4f11e728d5808da6b7cd7a9f24",
+          "portablePcmSha256": "740c9f27cacf1a81e0213e75e0104f034c599b4f11e728d5808da6b7cd7a9f24"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 9.101727798467195e-39,
+          "relativeRmsError": 3.191180636393971e-40,
+          "rmsError": 5.787054411908952e-41,
+          "nonFinite": 0,
+          "peak": 0.4038265645503998,
+          "maxDifference": {
+            "frame": 24373,
+            "channel": 1,
+            "actual": -9.101727798467195e-39,
+            "reference": 0,
+            "error": 9.101727798467195e-39
+          },
+          "nativePcmSha256": "cf3bc6b06a9e1e420e1604236b85757a480d067a5d3ebf20008a9ea9e63334bb",
+          "portablePcmSha256": "32e0fc5f250666173bdbfa1b20b15616635132842b08dea99a52d43c3cf221f5"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 9.101727798467195e-39,
+          "relativeRmsError": 3.191180636393971e-40,
+          "rmsError": 5.787054411908952e-41,
+          "nonFinite": 0,
+          "peak": 0.4038265645503998,
+          "maxDifference": {
+            "frame": 24661,
+            "channel": 1,
+            "actual": -9.101727798467195e-39,
+            "reference": 0,
+            "error": 9.101727798467195e-39
+          },
+          "nativePcmSha256": "7bd88390e1747e67b074bb888b857b9f980a2b275a521f066e001bfe8c7153b0",
+          "portablePcmSha256": "25a30444aee8e9f997227cbbce06e90d7d1bfdbadbfc97b4fb45b7f0ac502e04"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 36000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 288.0000025033951,
+        "lastDelaySeconds": 0.006000000052154064,
+        "lastToneHz": 9000,
+        "wowPhase": 0.4500000213738531,
+        "driftPhase": 0.16650000725348946,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0,
+        "driftDepthSeconds": 0,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0,
+        "flutter2DepthSeconds": 0,
+        "toneTargetHz": 9000
+      }
+    },
+    {
+      "id": "dark-tone",
+      "rate": 48000,
+      "channels": 2,
+      "frames": 36000,
+      "settings": {
+        "drive": 0.3,
+        "tone": 500
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.47562482953071594,
+          "maxDifference": null,
+          "nativePcmSha256": "8a365db922b0b8ebb8efc0dc6eae56ce22046652b353d7e7b8cd3cd7f0cfb507",
+          "portablePcmSha256": "8a365db922b0b8ebb8efc0dc6eae56ce22046652b353d7e7b8cd3cd7f0cfb507"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 1.3674441023616238e-37,
+          "relativeRmsError": 2.5029425585077706e-38,
+          "rmsError": 4.987925769415926e-39,
+          "nonFinite": 0,
+          "peak": 0.37165936827659607,
+          "maxDifference": {
+            "frame": 26897,
+            "channel": 0,
+            "actual": 0,
+            "reference": 1.3674441023616238e-37,
+            "error": 1.3674441023616238e-37
+          },
+          "nativePcmSha256": "a4cef35f5a077d760622469af8075fe7d52daeb4ba1a5bd870397e6fc4f6ce94",
+          "portablePcmSha256": "aeaa2cdef87a670f9cd4abc3f368edfd6b89362a40312a0f52bcd9f3463aa0ec"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 1.3674441023616238e-37,
+          "relativeRmsError": 2.5029425585077706e-38,
+          "rmsError": 4.987925769415926e-39,
+          "nonFinite": 0,
+          "peak": 0.37165936827659607,
+          "maxDifference": {
+            "frame": 27185,
+            "channel": 0,
+            "actual": 0,
+            "reference": 1.3674441023616238e-37,
+            "error": 1.3674441023616238e-37
+          },
+          "nativePcmSha256": "3cbc86e5878870491b428a2d038aacd63fc308dfc2ab7dbe56e8e896678a8e0e",
+          "portablePcmSha256": "071790f4d4a0c172a31bec782d9a93380090efc4dbb3d6e6e9519985a75ecd55"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 36000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 288.0000025033951,
+        "lastDelaySeconds": 0.006000000052154064,
+        "lastToneHz": 500,
+        "wowPhase": 0.4500000213738531,
+        "driftPhase": 0.16650000725348946,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0,
+        "driftDepthSeconds": 0,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0,
+        "flutter2DepthSeconds": 0,
+        "toneTargetHz": 500
+      }
+    },
+    {
+      "id": "wow-full",
+      "rate": 48000,
+      "channels": 2,
+      "frames": 36000,
+      "settings": {
+        "wow": 1,
+        "wowRate": 0.6,
+        "drive": 0.2
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.5123633146286011,
+          "maxDifference": null,
+          "nativePcmSha256": "118fed3a79e74c3264396f0c2e332f1993e2bacaeb3b583c4478c43d2a464710",
+          "portablePcmSha256": "118fed3a79e74c3264396f0c2e332f1993e2bacaeb3b583c4478c43d2a464710"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 7.305694767129792e-39,
+          "relativeRmsError": 2.3016933277988626e-40,
+          "rmsError": 4.874302963625065e-41,
+          "nonFinite": 0,
+          "peak": 0.5327489972114563,
+          "maxDifference": {
+            "frame": 24374,
+            "channel": 0,
+            "actual": 7.305694767129792e-39,
+            "reference": 0,
+            "error": 7.305694767129792e-39
+          },
+          "nativePcmSha256": "ef0b433c48cf8928b09868785580055b8d4376ca968dbf98581db85e206f9af8",
+          "portablePcmSha256": "412e96c1a1fcf43eadb41c75853bb8667f1a0fa88713600efcb83bd465d7f528"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 1.1109386325185397e-38,
+          "relativeRmsError": 3.95512011772591e-40,
+          "rmsError": 8.160288049459767e-41,
+          "nonFinite": 0,
+          "peak": 0.5247637629508972,
+          "maxDifference": {
+            "frame": 24840,
+            "channel": 0,
+            "actual": -1.1109386325185397e-38,
+            "reference": 0,
+            "error": 1.1109386325185397e-38
+          },
+          "nativePcmSha256": "ff0faec12b54c1f811324b9b7052c88a190d6feb807d6aec613c0fb3f8c115fd",
+          "portablePcmSha256": "0da87d00f6227e3cf35ff2944aa026a0200ba93868e5dd9e8e8e343039016baa"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 36000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 288.0000025033951,
+        "lastDelaySeconds": 0.00822550430893898,
+        "lastToneHz": 9000,
+        "wowPhase": 0.4500000213738531,
+        "driftPhase": 0.16650000725348946,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0.003000000026077032,
+        "driftDepthSeconds": 0.001500000013038516,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0,
+        "flutter2DepthSeconds": 0,
+        "toneTargetHz": 9000
+      }
+    },
+    {
+      "id": "flutter-full",
+      "rate": 48000,
+      "channels": 2,
+      "frames": 36000,
+      "settings": {
+        "flutter": 1,
+        "tone": 16000
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.5725405216217041,
+          "maxDifference": null,
+          "nativePcmSha256": "7d6c418ccc41a4d5582c3baadd29dc96c58c9ba3712e0dc7cf20b9607935f875",
+          "portablePcmSha256": "7d6c418ccc41a4d5582c3baadd29dc96c58c9ba3712e0dc7cf20b9607935f875"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 7.671844246768616e-39,
+          "relativeRmsError": 2.378267588719431e-40,
+          "rmsError": 5.077072618136846e-41,
+          "nonFinite": 0,
+          "peak": 0.6231104731559753,
+          "maxDifference": {
+            "frame": 24389,
+            "channel": 0,
+            "actual": -7.671844246768616e-39,
+            "reference": 0,
+            "error": 7.671844246768616e-39
+          },
+          "nativePcmSha256": "b7fcadf300c9e31535e3a4f50be6eda1d508762e723d7fdf2281fd07a79a45b5",
+          "portablePcmSha256": "3d89895e65cdac299423e36afcf8abb83dcd8796256ac0b3185de5be1f98a002"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 9.663414465817904e-39,
+          "relativeRmsError": 3.2899020647542275e-40,
+          "rmsError": 6.742645722977709e-41,
+          "nonFinite": 0,
+          "peak": 0.6068856120109558,
+          "maxDifference": {
+            "frame": 24664,
+            "channel": 1,
+            "actual": 9.663414465817904e-39,
+            "reference": 0,
+            "error": 9.663414465817904e-39
+          },
+          "nativePcmSha256": "128307d81be4101030a79fbeed8b02567a4357c93b5305c14ed91b79d41022c4",
+          "portablePcmSha256": "15321626437cf584ea727431d17daf8596961d56c080368fc71bce357796000d"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 36000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 288.0000025033951,
+        "lastDelaySeconds": 0.005920793395489454,
+        "lastToneHz": 16000,
+        "wowPhase": 0.4500000213738531,
+        "driftPhase": 0.16650000725348946,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0,
+        "driftDepthSeconds": 0,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0.0002500000118743628,
+        "flutter2DepthSeconds": 0.00011999999696854502,
+        "toneTargetHz": 16000
+      }
+    },
+    {
+      "id": "combined",
+      "rate": 48000,
+      "channels": 2,
+      "frames": 36000,
+      "settings": {
+        "wow": 0.73123456789,
+        "wowRate": 1.123456789,
+        "flutter": 0.6123456789,
+        "drive": 0.4123456789,
+        "tone": 6100.123456789
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.4408314824104309,
+          "maxDifference": null,
+          "nativePcmSha256": "aef4a6dcfb115eb97e71eb11ff97a56f564f0c8261296493bd14ff28c600bdda",
+          "portablePcmSha256": "aef4a6dcfb115eb97e71eb11ff97a56f564f0c8261296493bd14ff28c600bdda"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 1.0632716435665274e-38,
+          "relativeRmsError": 4.635477025966823e-40,
+          "rmsError": 8.383955059613342e-41,
+          "nonFinite": 0,
+          "peak": 0.3956373333930969,
+          "maxDifference": {
+            "frame": 24410,
+            "channel": 0,
+            "actual": -1.0632716435665274e-38,
+            "reference": 0,
+            "error": 1.0632716435665274e-38
+          },
+          "nativePcmSha256": "eb968584d7876413c0d6768b3d7aefb9e46dc45b3b55af9b59b81a758a854483",
+          "portablePcmSha256": "eaec4f703fa723dd681a94976519ca6e48673ff6105e4899309f55aaebbe72af"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 0.000024743378162384033,
+          "relativeRmsError": 0.000012817916984176963,
+          "rmsError": 0.0000022982585394969798,
+          "nonFinite": 0,
+          "peak": 0.39224135875701904,
+          "maxDifference": {
+            "frame": 15118,
+            "channel": 0,
+            "actual": -0.09002319723367691,
+            "reference": -0.0900479406118393,
+            "error": 0.000024743378162384033
+          },
+          "nativePcmSha256": "f40f66c54c014ae2df2f8600dbd7794d20731147ae9e5068bfb3f6d591597c3a",
+          "portablePcmSha256": "8f0fbcae48b699017bf72c9f9f2ba2be5c6e98aac1dc408511ecfa9d05bed2f4"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 36000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 288.0000025033951,
+        "lastDelaySeconds": 0.005038473289459944,
+        "lastToneHz": 6100.12353515625,
+        "wowPhase": 0.8268848269453883,
+        "driftPhase": 0.30594736840612313,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0.002193703781813383,
+        "driftDepthSeconds": 0.0010968518909066916,
+        "wowFrequency": 1.1234568357467651,
+        "driftFrequency": 0.415679007768631,
+        "flutterDepthSeconds": 0.00015308642468880862,
+        "flutter2DepthSeconds": 0.00007348148210439831,
+        "toneTargetHz": 6100.12353515625
+      }
+    },
+    {
+      "id": "control-extremes",
+      "rate": 48000,
+      "channels": 2,
+      "frames": 36000,
+      "settings": {
+        "wow": 1,
+        "wowRate": 5,
+        "flutter": 1,
+        "drive": 1,
+        "tone": 20000
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.34488776326179504,
+          "maxDifference": null,
+          "nativePcmSha256": "740c9f27cacf1a81e0213e75e0104f034c599b4f11e728d5808da6b7cd7a9f24",
+          "portablePcmSha256": "740c9f27cacf1a81e0213e75e0104f034c599b4f11e728d5808da6b7cd7a9f24"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 1.302171451737558e-38,
+          "relativeRmsError": 5.847013615421437e-40,
+          "rmsError": 1.082078683743115e-40,
+          "nonFinite": 0,
+          "peak": 0.41430696845054626,
+          "maxDifference": {
+            "frame": 24513,
+            "channel": 0,
+            "actual": -1.302171451737558e-38,
+            "reference": 0,
+            "error": 1.302171451737558e-38
+          },
+          "nativePcmSha256": "fe137a5ecd2409a1e71f870728720a5485ff3af574d982ede4f2b89cadacdc23",
+          "portablePcmSha256": "dc27d866f35072e0b21f844363f91d81352aa539aeb822ea38a7cc7bf6add748"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 0.000060886144638061523,
+          "relativeRmsError": 0.00001908295885216956,
+          "rmsError": 0.0000033899410832269913,
+          "nonFinite": 0,
+          "peak": 0.3944433629512787,
+          "maxDifference": {
+            "frame": 22361,
+            "channel": 0,
+            "actual": 0.049376651644706726,
+            "reference": 0.049315765500068665,
+            "error": 0.000060886144638061523
+          },
+          "nativePcmSha256": "1c64c22ce472a62592ca89684b781884ecb9bbe2c8a79e0d0d7e6d207a629357",
+          "portablePcmSha256": "90bfa571b8c34819d4099fa88d951598bd2dd78c572a3a603d3a4c924edd474c"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 36000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 288.0000025033951,
+        "lastDelaySeconds": 0.0051702759228646755,
+        "lastToneHz": 20000,
+        "wowPhase": 0.6179602309612164,
+        "driftPhase": 0.33864532053121366,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0.003000000026077032,
+        "driftDepthSeconds": 0.001500000013038516,
+        "wowFrequency": 5,
+        "driftFrequency": 1.850000023841858,
+        "flutterDepthSeconds": 0.0002500000118743628,
+        "flutter2DepthSeconds": 0.00011999999696854502,
+        "toneTargetHz": 20000
+      }
+    },
+    {
+      "id": "native-target-automation",
+      "rate": 48000,
+      "channels": 2,
+      "frames": 36000,
+      "settings": {
+        "wow": 0.2,
+        "flutter": 0.1,
+        "drive": 0.3
+      },
+      "targets": [
+        {
+          "kind": "target",
+          "requestedFrame": 13,
+          "index": 0,
+          "value": 0.7123456789,
+          "timeSeconds": 0.0002708333333333333,
+          "frame": 13,
+          "sequence": 0
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 41,
+          "index": 1,
+          "value": 2.123456789,
+          "timeSeconds": 0.0008541666666666667,
+          "frame": 41,
+          "sequence": 1
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 513,
+          "index": 2,
+          "value": 0.8123456789,
+          "timeSeconds": 0.0106875,
+          "frame": 513,
+          "sequence": 2
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 4001,
+          "index": 4,
+          "value": 3000.123456789,
+          "timeSeconds": 0.08335416666666666,
+          "frame": 4001,
+          "sequence": 3
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 8191,
+          "index": 0,
+          "value": 0,
+          "timeSeconds": 0.17064583333333333,
+          "frame": 8191,
+          "sequence": 4
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 10003,
+          "index": 2,
+          "value": 0,
+          "timeSeconds": 0.20839583333333334,
+          "frame": 10003,
+          "sequence": 5
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 12001,
+          "index": 1,
+          "value": 0.05,
+          "timeSeconds": 0.25002083333333336,
+          "frame": 12002,
+          "sequence": 6
+        }
+      ],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.47562482953071594,
+          "maxDifference": null,
+          "nativePcmSha256": "8a365db922b0b8ebb8efc0dc6eae56ce22046652b353d7e7b8cd3cd7f0cfb507",
+          "portablePcmSha256": "8a365db922b0b8ebb8efc0dc6eae56ce22046652b353d7e7b8cd3cd7f0cfb507"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 1.7369974480741704e-38,
+          "relativeRmsError": 1.1950116341888897e-39,
+          "rmsError": 2.1550104397715216e-40,
+          "nonFinite": 0,
+          "peak": 0.4772831201553345,
+          "maxDifference": {
+            "frame": 24585,
+            "channel": 0,
+            "actual": 1.7369974480741704e-38,
+            "reference": 0,
+            "error": 1.7369974480741704e-38
+          },
+          "nativePcmSha256": "c803360e5414e90668d97296eec0060e36fb4aabe9ee96a40fdc9fd92471f1d1",
+          "portablePcmSha256": "74aa0aad0c2e5421205fbfefc7adcd1b40a5cb1d287defb522280a4000711d80"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 0.00003653764724731445,
+          "relativeRmsError": 0.00000279799375202461,
+          "rmsError": 5.026248752791306e-7,
+          "nonFinite": 0,
+          "peak": 0.4668799042701721,
+          "maxDifference": {
+            "frame": 4268,
+            "channel": 0,
+            "actual": -0.12869501113891602,
+            "reference": -0.1286584734916687,
+            "error": 0.00003653764724731445
+          },
+          "nativePcmSha256": "90b20b2128f11dc9091d06cddb7342082acc12315969bf15681904c01fcd6f46",
+          "portablePcmSha256": "5621597142050771977c31e3ac2894ed1f9252762790f779cfb1cae8b79afb9e"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 36000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 288.0000025033951,
+        "lastDelaySeconds": 0.006000000052154064,
+        "lastToneHz": 3000.12353515625,
+        "wowPhase": 0.5711090936549681,
+        "driftPhase": 0.21131040352852892,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0,
+        "driftDepthSeconds": 0,
+        "wowFrequency": 0.05000000074505806,
+        "driftFrequency": 0.01850000023841858,
+        "flutterDepthSeconds": 0,
+        "flutter2DepthSeconds": 0,
+        "toneTargetHz": 3000.12353515625
+      }
+    },
+    {
+      "id": "native-curve-control",
+      "rate": 48000,
+      "channels": 2,
+      "frames": 36000,
+      "settings": {
+        "wow": 0.3,
+        "flutter": 0.3,
+        "drive": 0
+      },
+      "targets": [],
+      "curveControls": [
+        {
+          "kind": "curve",
+          "index": 3,
+          "value": 0.3,
+          "requestedFrame": 4096,
+          "requestedSeconds": 0.08533333333333333,
+          "timeSeconds": 0.08533333333333333,
+          "frame": 4096,
+          "sequence": 0
+        },
+        {
+          "kind": "curve",
+          "index": 3,
+          "value": 1,
+          "requestedFrame": 8192,
+          "requestedSeconds": 0.17066666666666666,
+          "timeSeconds": 0.17066666666666666,
+          "frame": 8192,
+          "sequence": 1
+        },
+        {
+          "kind": "curve",
+          "index": 3,
+          "value": 0,
+          "requestedFrame": 12288,
+          "requestedSeconds": 0.256,
+          "timeSeconds": 0.256,
+          "frame": 12288,
+          "sequence": 2
+        }
+      ],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.5725405216217041,
+          "maxDifference": null,
+          "nativePcmSha256": "1e632cd398856cf091940adac9bb2a8e05979c8a332b71b78fbb9011e45405c8",
+          "portablePcmSha256": "1e632cd398856cf091940adac9bb2a8e05979c8a332b71b78fbb9011e45405c8"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 1.1185898622635996e-38,
+          "relativeRmsError": 3.10890844290935e-40,
+          "rmsError": 6.346515634264664e-41,
+          "nonFinite": 0,
+          "peak": 0.5694671273231506,
+          "maxDifference": {
+            "frame": 24371,
+            "channel": 1,
+            "actual": -1.1185898622635996e-38,
+            "reference": 0,
+            "error": 1.1185898622635996e-38
+          },
+          "nativePcmSha256": "0d9039dbe8e23ecbf81ac98aa2fb4a9e97a50e3a408b731dc37de99d8e4bcab5",
+          "portablePcmSha256": "f6bce36fce69ba1a9254f9a34cf6b268ac523e5e7a864ccbccea7af42f0d3512"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 0.00003635883331298828,
+          "relativeRmsError": 0.000007925361503691581,
+          "rmsError": 0.0000015708090151658821,
+          "nonFinite": 0,
+          "peak": 0.5569494962692261,
+          "maxDifference": {
+            "frame": 9406,
+            "channel": 0,
+            "actual": 0.2917446494102478,
+            "reference": 0.2917810082435608,
+            "error": 0.00003635883331298828
+          },
+          "nativePcmSha256": "2e7a4c8e7f31d6edfa5a240af84e824fd56a11558edf97f01e4ee4f05f1a91ab",
+          "portablePcmSha256": "feb93d38f2d4292bd8cc614c215142510f8da788198dbeb746589d25c39d78cc"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 36000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 288.0000025033951,
+        "lastDelaySeconds": 0.006643889471888542,
+        "lastToneHz": 9000,
+        "wowPhase": 0.4500000213738531,
+        "driftPhase": 0.16650000725348946,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 3,
+        "wowDepthSeconds": 0.0008999999845400453,
+        "driftDepthSeconds": 0.00044999999227002263,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0.00007500000356230885,
+        "flutter2DepthSeconds": 0.00003600000127335079,
+        "toneTargetHz": 9000
+      }
+    },
+    {
+      "id": "native-default-node",
+      "rate": 96000,
+      "channels": 1,
+      "frames": 72000,
+      "settings": {},
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.5699871182441711,
+          "maxDifference": null,
+          "nativePcmSha256": "e3634f628b85dd665b397cd24f40671a62f3de4aba2453fae8332d761cec6e66",
+          "portablePcmSha256": "e3634f628b85dd665b397cd24f40671a62f3de4aba2453fae8332d761cec6e66"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 1.0327565478178509e-38,
+          "relativeRmsError": 2.7720712123430585e-40,
+          "rmsError": 4.844789738681063e-41,
+          "nonFinite": 0,
+          "peak": 0.4219527840614319,
+          "maxDifference": {
+            "frame": 48454,
+            "channel": 0,
+            "actual": 1.0327565478178509e-38,
+            "reference": 0,
+            "error": 1.0327565478178509e-38
+          },
+          "nativePcmSha256": "547519eed4f129bf9c63de50d316fc8f6a1944fe450d5bfca2e05550dd623c0f",
+          "portablePcmSha256": "1a34c8da1395ffa4e4e920022ef49c92c7496ad4ef7016e5f91b06760032cf18"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 1.0327565478178509e-38,
+          "relativeRmsError": 2.7720712123430585e-40,
+          "rmsError": 4.844789738681063e-41,
+          "nonFinite": 0,
+          "peak": 0.4219527840614319,
+          "maxDifference": {
+            "frame": 49030,
+            "channel": 0,
+            "actual": 1.0327565478178509e-38,
+            "reference": 0,
+            "error": 1.0327565478178509e-38
+          },
+          "nativePcmSha256": "42a783728084ad99a03deac4cdbf4a7f16c9b1cf98e9ddcec9a22acbda630b28",
+          "portablePcmSha256": "df9e0bfd01bc58c101a08fd5804577d3bd1296829b181a6aaee4a15c7100e71a"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 72000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 576.0000050067902,
+        "lastDelaySeconds": 0.006000000052154064,
+        "lastToneHz": 9000,
+        "wowPhase": 0.4500000213738531,
+        "driftPhase": 0.16650000725348946,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0,
+        "driftDepthSeconds": 0,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0,
+        "flutter2DepthSeconds": 0,
+        "toneTargetHz": 9000
+      }
+    },
+    {
+      "id": "drive-full",
+      "rate": 96000,
+      "channels": 1,
+      "frames": 72000,
+      "settings": {
+        "drive": 1
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.34493207931518555,
+          "maxDifference": null,
+          "nativePcmSha256": "d7cdecf784191557fddcb1867d595259350f33f8b75c4d3019f85858e1ae9da6",
+          "portablePcmSha256": "d7cdecf784191557fddcb1867d595259350f33f8b75c4d3019f85858e1ae9da6"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 8.089104686595224e-39,
+          "relativeRmsError": 3.491826398647403e-40,
+          "rmsError": 5.427674926519903e-41,
+          "nonFinite": 0,
+          "peak": 0.29544857144355774,
+          "maxDifference": {
+            "frame": 48455,
+            "channel": 0,
+            "actual": 8.089104686595224e-39,
+            "reference": 0,
+            "error": 8.089104686595224e-39
+          },
+          "nativePcmSha256": "54b0bd3288cc35ffdc7c9a2a14ca61d3f898ebae8fc5db3bd1c9450e0a30f6e1",
+          "portablePcmSha256": "1ad1da788fc7c48c87a2479b6ee54b5f5602cc0497ebfb9624aab98da0a28b69"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 8.089104686595224e-39,
+          "relativeRmsError": 3.491826398647403e-40,
+          "rmsError": 5.427674926519903e-41,
+          "nonFinite": 0,
+          "peak": 0.29544857144355774,
+          "maxDifference": {
+            "frame": 49031,
+            "channel": 0,
+            "actual": 8.089104686595224e-39,
+            "reference": 0,
+            "error": 8.089104686595224e-39
+          },
+          "nativePcmSha256": "83d466f0211ed87b40c6f2619194375d26be0aa143145942cfcdbb72e129cb42",
+          "portablePcmSha256": "a5c915cc92813bdb5222a21347745fd8a200a7bf43e08b5f1e4416fbd59c5844"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 72000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 576.0000050067902,
+        "lastDelaySeconds": 0.006000000052154064,
+        "lastToneHz": 9000,
+        "wowPhase": 0.4500000213738531,
+        "driftPhase": 0.16650000725348946,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0,
+        "driftDepthSeconds": 0,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0,
+        "flutter2DepthSeconds": 0,
+        "toneTargetHz": 9000
+      }
+    },
+    {
+      "id": "dark-tone",
+      "rate": 96000,
+      "channels": 1,
+      "frames": 72000,
+      "settings": {
+        "drive": 0.3,
+        "tone": 500
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.4766194820404053,
+          "maxDifference": null,
+          "nativePcmSha256": "d0ca832a93437e5fbc49276f8952b716f332468df36396f78ce93935f5cf71bf",
+          "portablePcmSha256": "d0ca832a93437e5fbc49276f8952b716f332468df36396f78ce93935f5cf71bf"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 2.4259404570733637e-37,
+          "relativeRmsError": 6.924610226982253e-38,
+          "rmsError": 1.3787664450822688e-38,
+          "nonFinite": 0,
+          "peak": 0.3643236458301544,
+          "maxDifference": {
+            "frame": 53667,
+            "channel": 0,
+            "actual": 0,
+            "reference": 2.4259404570733637e-37,
+            "error": 2.4259404570733637e-37
+          },
+          "nativePcmSha256": "5316ee5275fd61570ba46160ba1aafec167aa62b1841c16c7cd15e0b823a0dd5",
+          "portablePcmSha256": "fcc472bca4beea00fd5557022c30157d200544d416b5909d965f4ee14bc1f75c"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 2.4259404570733637e-37,
+          "relativeRmsError": 6.924610226982253e-38,
+          "rmsError": 1.3787664450822688e-38,
+          "nonFinite": 0,
+          "peak": 0.3643236458301544,
+          "maxDifference": {
+            "frame": 54243,
+            "channel": 0,
+            "actual": 0,
+            "reference": 2.4259404570733637e-37,
+            "error": 2.4259404570733637e-37
+          },
+          "nativePcmSha256": "fc900f3a916321d49bdd68ce70c0c837e00c5c18b4737de441aaa0e4ab206089",
+          "portablePcmSha256": "dc611c4465198b7f974ac5b3422d1c1e10737ff7f67f1a92bf365ade1daf3436"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 72000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 576.0000050067902,
+        "lastDelaySeconds": 0.006000000052154064,
+        "lastToneHz": 500,
+        "wowPhase": 0.4500000213738531,
+        "driftPhase": 0.16650000725348946,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0,
+        "driftDepthSeconds": 0,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0,
+        "flutter2DepthSeconds": 0,
+        "toneTargetHz": 500
+      }
+    },
+    {
+      "id": "wow-full",
+      "rate": 96000,
+      "channels": 1,
+      "frames": 72000,
+      "settings": {
+        "wow": 1,
+        "wowRate": 0.6,
+        "drive": 0.2
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.5128227472305298,
+          "maxDifference": null,
+          "nativePcmSha256": "7eb232db4e17c0ca188d542f8e3f6ae50bffb362e73c4bb441a9a4e4723a1cd8",
+          "portablePcmSha256": "7eb232db4e17c0ca188d542f8e3f6ae50bffb362e73c4bb441a9a4e4723a1cd8"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 5.1381438817367354e-39,
+          "relativeRmsError": 1.8848538961904033e-40,
+          "rmsError": 3.368788865160975e-41,
+          "nonFinite": 0,
+          "peak": 0.4043249487876892,
+          "maxDifference": {
+            "frame": 48455,
+            "channel": 0,
+            "actual": 5.1381438817367354e-39,
+            "reference": 0,
+            "error": 5.1381438817367354e-39
+          },
+          "nativePcmSha256": "dee6f36f9bbd7105e4be74cc089f81af30bbe8335d14307f9d86d65aac421821",
+          "portablePcmSha256": "acca8fcb0c4316866268b3907339898cf1bcc2efdc0074a66e900ed8b899c14a"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 1.0231706854129441e-38,
+          "relativeRmsError": 3.8166934294469775e-40,
+          "rmsError": 6.830378064715234e-41,
+          "nonFinite": 0,
+          "peak": 0.4023512303829193,
+          "maxDifference": {
+            "frame": 49389,
+            "channel": 0,
+            "actual": -1.0231706854129441e-38,
+            "reference": 0,
+            "error": 1.0231706854129441e-38
+          },
+          "nativePcmSha256": "f9254a75f3ce0a7a943125b8dd968f09c2e4bc3afcb2a90f6b6c7402934e356c",
+          "portablePcmSha256": "5cd4a9b40f68d897c1614fc178abce2c9ee64260153f3a2710f1fe89e292971d"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 72000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 576.0000050067902,
+        "lastDelaySeconds": 0.008225403726100922,
+        "lastToneHz": 9000,
+        "wowPhase": 0.4500000213738531,
+        "driftPhase": 0.16650000725348946,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0.003000000026077032,
+        "driftDepthSeconds": 0.001500000013038516,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0,
+        "flutter2DepthSeconds": 0,
+        "toneTargetHz": 9000
+      }
+    },
+    {
+      "id": "flutter-full",
+      "rate": 96000,
+      "channels": 1,
+      "frames": 72000,
+      "settings": {
+        "flutter": 1,
+        "tone": 16000
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.5699871182441711,
+          "maxDifference": null,
+          "nativePcmSha256": "e3634f628b85dd665b397cd24f40671a62f3de4aba2453fae8332d761cec6e66",
+          "portablePcmSha256": "e3634f628b85dd665b397cd24f40671a62f3de4aba2453fae8332d761cec6e66"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 8.528526661635129e-39,
+          "relativeRmsError": 1.914910635124328e-40,
+          "rmsError": 3.80882541466899e-41,
+          "nonFinite": 0,
+          "peak": 0.5560187697410583,
+          "maxDifference": {
+            "frame": 48382,
+            "channel": 0,
+            "actual": -8.528526661635129e-39,
+            "reference": 0,
+            "error": 8.528526661635129e-39
+          },
+          "nativePcmSha256": "07c155085a186fba95df3428a7c906111447821e72bca4b787ad8e76f1d5ef6a",
+          "portablePcmSha256": "26a761ef3dbd1a768dcdb5e7428f58d50d37f489723293b2927ad86437fd6022"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 1.1270424946004069e-38,
+          "relativeRmsError": 3.1554307276243147e-40,
+          "rmsError": 6.122119196749988e-41,
+          "nonFinite": 0,
+          "peak": 0.5439661145210266,
+          "maxDifference": {
+            "frame": 48925,
+            "channel": 0,
+            "actual": -9.622534946237542e-38,
+            "reference": -8.495492451637135e-38,
+            "error": 1.1270424946004069e-38
+          },
+          "nativePcmSha256": "d8c8644e19ba71bd01a91b65eff6bf61151838c172f6450f5ba4f986f7e31428",
+          "portablePcmSha256": "2181c9ce14a424647f503764970b8bd8d40052882e00e51ef27a31a0d9407e58"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 72000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 576.0000050067902,
+        "lastDelaySeconds": 0.005920690018683672,
+        "lastToneHz": 16000,
+        "wowPhase": 0.4500000213738531,
+        "driftPhase": 0.16650000725348946,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0,
+        "driftDepthSeconds": 0,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0.0002500000118743628,
+        "flutter2DepthSeconds": 0.00011999999696854502,
+        "toneTargetHz": 16000
+      }
+    },
+    {
+      "id": "combined",
+      "rate": 96000,
+      "channels": 1,
+      "frames": 72000,
+      "settings": {
+        "wow": 0.73123456789,
+        "wowRate": 1.123456789,
+        "flutter": 0.6123456789,
+        "drive": 0.4123456789,
+        "tone": 6100.123456789
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.43934229016304016,
+          "maxDifference": null,
+          "nativePcmSha256": "6b679672631d08d0f05b84862c7af2f02b19fc6be0f759fae38b85e665f07e4d",
+          "portablePcmSha256": "6b679672631d08d0f05b84862c7af2f02b19fc6be0f759fae38b85e665f07e4d"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 1.882126146518438e-38,
+          "relativeRmsError": 9.95351576473331e-40,
+          "rmsError": 1.7203497540874506e-40,
+          "nonFinite": 0,
+          "peak": 0.34814056754112244,
+          "maxDifference": {
+            "frame": 48579,
+            "channel": 0,
+            "actual": 7.076522212378718e-39,
+            "reference": 2.58977836775631e-38,
+            "error": 1.882126146518438e-38
+          },
+          "nativePcmSha256": "862dd690c7e2eb544ea973f963add1929eeaf19e50ec6df1fcf7f5ce93b41429",
+          "portablePcmSha256": "130329888c63f662c328eb8c40e3b6e7bcc62e3c969ed776be869bd84e72d056"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 0.000015575438737869263,
+          "relativeRmsError": 0.000005767847139683327,
+          "rmsError": 9.964563584731378e-7,
+          "nonFinite": 0,
+          "peak": 0.3479558229446411,
+          "maxDifference": {
+            "frame": 26185,
+            "channel": 0,
+            "actual": -0.0268626157194376,
+            "reference": -0.02687819115817547,
+            "error": 0.000015575438737869263
+          },
+          "nativePcmSha256": "bd80722254902533f7728694422418688bdfd3f3aff0ab33962a6121082c1ea2",
+          "portablePcmSha256": "c4aaa8fb2383ec9c2223d2db6c8a81a05869881d04c270fe276b228993ba0121"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 72000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 576.0000050067902,
+        "lastDelaySeconds": 0.005038489121943712,
+        "lastToneHz": 6100.12353515625,
+        "wowPhase": 0.8268875932149058,
+        "driftPhase": 0.30594834033377083,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0.002193703781813383,
+        "driftDepthSeconds": 0.0010968518909066916,
+        "wowFrequency": 1.1234568357467651,
+        "driftFrequency": 0.415679007768631,
+        "flutterDepthSeconds": 0.00015308642468880862,
+        "flutter2DepthSeconds": 0.00007348148210439831,
+        "toneTargetHz": 6100.12353515625
+      }
+    },
+    {
+      "id": "control-extremes",
+      "rate": 96000,
+      "channels": 1,
+      "frames": 72000,
+      "settings": {
+        "wow": 1,
+        "wowRate": 5,
+        "flutter": 1,
+        "drive": 1,
+        "tone": 20000
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.34493207931518555,
+          "maxDifference": null,
+          "nativePcmSha256": "d7cdecf784191557fddcb1867d595259350f33f8b75c4d3019f85858e1ae9da6",
+          "portablePcmSha256": "d7cdecf784191557fddcb1867d595259350f33f8b75c4d3019f85858e1ae9da6"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 6.25894303115919e-39,
+          "relativeRmsError": 1.8222368127798172e-40,
+          "rmsError": 3.3786620448286786e-41,
+          "nonFinite": 0,
+          "peak": 0.41621819138526917,
+          "maxDifference": {
+            "frame": 48369,
+            "channel": 0,
+            "actual": -6.25894303115919e-39,
+            "reference": 0,
+            "error": 6.25894303115919e-39
+          },
+          "nativePcmSha256": "eefcc5c8365121aa7910f37cbe4ac85f3869c7e6e7dd94a444fe3e4748def3a7",
+          "portablePcmSha256": "82eea8b0e89970cce183ee24a3650ca1c6fc2fece83137b5fa2bf7f5ea9c1cad"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 0.00009020417928695679,
+          "relativeRmsError": 0.00004341233345220533,
+          "rmsError": 0.000007796374911723667,
+          "nonFinite": 0,
+          "peak": 0.40538743138313293,
+          "maxDifference": {
+            "frame": 16199,
+            "channel": 0,
+            "actual": 0.10786344110965729,
+            "reference": 0.10777323693037033,
+            "error": 0.00009020417928695679
+          },
+          "nativePcmSha256": "96742d7f9ffdcf754b6b57583fe9c05b7ae186ab49a5a0658c1c407c461dd58c",
+          "portablePcmSha256": "c4b4667b1aac7c84f4f3f3bf04890bf6094b55f940c738a453cef8d9e8fd61b5"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 72000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 576.0000050067902,
+        "lastDelaySeconds": 0.00516898836940527,
+        "lastToneHz": 20000,
+        "wowPhase": 0.6179833054452502,
+        "driftPhase": 0.33865374161018735,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0.003000000026077032,
+        "driftDepthSeconds": 0.001500000013038516,
+        "wowFrequency": 5,
+        "driftFrequency": 1.850000023841858,
+        "flutterDepthSeconds": 0.0002500000118743628,
+        "flutter2DepthSeconds": 0.00011999999696854502,
+        "toneTargetHz": 20000
+      }
+    },
+    {
+      "id": "native-target-automation",
+      "rate": 96000,
+      "channels": 1,
+      "frames": 72000,
+      "settings": {
+        "wow": 0.2,
+        "flutter": 0.1,
+        "drive": 0.3
+      },
+      "targets": [
+        {
+          "kind": "target",
+          "requestedFrame": 13,
+          "index": 0,
+          "value": 0.7123456789,
+          "timeSeconds": 0.00013541666666666666,
+          "frame": 13,
+          "sequence": 0
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 41,
+          "index": 1,
+          "value": 2.123456789,
+          "timeSeconds": 0.00042708333333333335,
+          "frame": 41,
+          "sequence": 1
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 513,
+          "index": 2,
+          "value": 0.8123456789,
+          "timeSeconds": 0.00534375,
+          "frame": 513,
+          "sequence": 2
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 4001,
+          "index": 4,
+          "value": 3000.123456789,
+          "timeSeconds": 0.04167708333333333,
+          "frame": 4001,
+          "sequence": 3
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 8191,
+          "index": 0,
+          "value": 0,
+          "timeSeconds": 0.08532291666666666,
+          "frame": 8191,
+          "sequence": 4
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 10003,
+          "index": 2,
+          "value": 0,
+          "timeSeconds": 0.10419791666666667,
+          "frame": 10003,
+          "sequence": 5
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 12001,
+          "index": 1,
+          "value": 0.05,
+          "timeSeconds": 0.12501041666666668,
+          "frame": 12002,
+          "sequence": 6
+        }
+      ],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.4766194820404053,
+          "maxDifference": null,
+          "nativePcmSha256": "d0ca832a93437e5fbc49276f8952b716f332468df36396f78ce93935f5cf71bf",
+          "portablePcmSha256": "d0ca832a93437e5fbc49276f8952b716f332468df36396f78ce93935f5cf71bf"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 1.4901161193847656e-7,
+          "relativeRmsError": 2.9100794588391266e-8,
+          "rmsError": 5.126168375425176e-9,
+          "nonFinite": 0,
+          "peak": 0.3594299852848053,
+          "maxDifference": {
+            "frame": 5528,
+            "channel": 0,
+            "actual": -0.28509286046028137,
+            "reference": -0.28509271144866943,
+            "error": 1.4901161193847656e-7
+          },
+          "nativePcmSha256": "257c9f454491d6feaddb580c1f812ef62d0ac5006ca7a3360fd5eb817448c399",
+          "portablePcmSha256": "11c472d2f892012e1da8055da139ac12bf1a691d1c7193b00b3aebc04da15ff4"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 0.000009015202522277832,
+          "relativeRmsError": 8.872448684833409e-7,
+          "rmsError": 1.562615608934943e-7,
+          "nonFinite": 0,
+          "peak": 0.3559230864048004,
+          "maxDifference": {
+            "frame": 4071,
+            "channel": 0,
+            "actual": 0.14222495257854462,
+            "reference": 0.1422339677810669,
+            "error": 0.000009015202522277832
+          },
+          "nativePcmSha256": "37869bdd46cd9a27e5223e3f984c8e241aa16eb0f351e26f596deca52d95f6d0",
+          "portablePcmSha256": "a3b21238ab758edab3865112949f9a16ffb57d936f7bfbf03b911e0a9a589c06"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 72000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 576.0000050067902,
+        "lastDelaySeconds": 0.006000000052154064,
+        "lastToneHz": 3000.12353515625,
+        "wowPhase": 0.312553118190408,
+        "driftPhase": 0.11564462627532635,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0,
+        "driftDepthSeconds": 0,
+        "wowFrequency": 0.05000000074505806,
+        "driftFrequency": 0.01850000023841858,
+        "flutterDepthSeconds": 0,
+        "flutter2DepthSeconds": 0,
+        "toneTargetHz": 3000.12353515625
+      }
+    },
+    {
+      "id": "native-curve-control",
+      "rate": 96000,
+      "channels": 1,
+      "frames": 72000,
+      "settings": {
+        "wow": 0.3,
+        "flutter": 0.3,
+        "drive": 0
+      },
+      "targets": [],
+      "curveControls": [
+        {
+          "kind": "curve",
+          "index": 3,
+          "value": 0.3,
+          "requestedFrame": 4096,
+          "requestedSeconds": 0.042666666666666665,
+          "timeSeconds": 0.042666666666666665,
+          "frame": 4096,
+          "sequence": 0
+        },
+        {
+          "kind": "curve",
+          "index": 3,
+          "value": 1,
+          "requestedFrame": 8192,
+          "requestedSeconds": 0.08533333333333333,
+          "timeSeconds": 0.08533333333333333,
+          "frame": 8192,
+          "sequence": 1
+        },
+        {
+          "kind": "curve",
+          "index": 3,
+          "value": 0,
+          "requestedFrame": 12288,
+          "requestedSeconds": 0.128,
+          "timeSeconds": 0.128,
+          "frame": 12288,
+          "sequence": 2
+        }
+      ],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.5687565207481384,
+          "maxDifference": null,
+          "nativePcmSha256": "dcef471067b00ce73a9e41eefd2334c07241f7bfa327a04dbfd945a5c7ed1020",
+          "portablePcmSha256": "dcef471067b00ce73a9e41eefd2334c07241f7bfa327a04dbfd945a5c7ed1020"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 1.0327565478178509e-38,
+          "relativeRmsError": 2.7940400417987313e-40,
+          "rmsError": 4.844789738681063e-41,
+          "nonFinite": 0,
+          "peak": 0.4219527840614319,
+          "maxDifference": {
+            "frame": 48454,
+            "channel": 0,
+            "actual": 1.0327565478178509e-38,
+            "reference": 0,
+            "error": 1.0327565478178509e-38
+          },
+          "nativePcmSha256": "d5a657bed9d33efac23118235c21a828714264f32b4e3bef2cc95ccb4561b9ff",
+          "portablePcmSha256": "9fac8d061393968296017ed3cd61da6c6dc8ec71317c452846201380c01083b7"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 0.00002222508192062378,
+          "relativeRmsError": 0.00000453733165027082,
+          "rmsError": 7.855806145440797e-7,
+          "nonFinite": 0,
+          "peak": 0.40940380096435547,
+          "maxDifference": {
+            "frame": 40415,
+            "channel": 0,
+            "actual": 0.07509646564722061,
+            "reference": 0.07511869072914124,
+            "error": 0.00002222508192062378
+          },
+          "nativePcmSha256": "15d12ece6995d4f0f0438997b2d2ff827834622b98d4019a4efee45f7454538c",
+          "portablePcmSha256": "59ad00e02d2835f434444ed17fb618269a4dd5486c93e16e7f0c9e2dd2f08b0c"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 72000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 576.0000050067902,
+        "lastDelaySeconds": 0.0066438280045986176,
+        "lastToneHz": 9000,
+        "wowPhase": 0.4500000213738531,
+        "driftPhase": 0.16650000725348946,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 3,
+        "wowDepthSeconds": 0.0008999999845400453,
+        "driftDepthSeconds": 0.00044999999227002263,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0.00007500000356230885,
+        "flutter2DepthSeconds": 0.00003600000127335079,
+        "toneTargetHz": 9000
+      }
+    },
+    {
+      "id": "native-default-node",
+      "rate": 96000,
+      "channels": 2,
+      "frames": 72000,
+      "settings": {},
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.5699871182441711,
+          "maxDifference": null,
+          "nativePcmSha256": "54cdfb4bbfe1691c5b76884939efe15ec0ac456a39abf31e2274ee9ce6175038",
+          "portablePcmSha256": "54cdfb4bbfe1691c5b76884939efe15ec0ac456a39abf31e2274ee9ce6175038"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 1.0687191913465901e-38,
+          "relativeRmsError": 2.951249614695186e-40,
+          "rmsError": 5.146403122952411e-41,
+          "nonFinite": 0,
+          "peak": 0.4219527840614319,
+          "maxDifference": {
+            "frame": 48447,
+            "channel": 1,
+            "actual": 1.0687191913465901e-38,
+            "reference": 0,
+            "error": 1.0687191913465901e-38
+          },
+          "nativePcmSha256": "0879c7aaff3cfdb11959ecf5eac5509b5f4c6e087958accc8c3284fb55b407ea",
+          "portablePcmSha256": "730e665e203f92a73559f29eeaa00efc7462001db5b9c121e64ff14ce254a875"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 1.0687191913465901e-38,
+          "relativeRmsError": 2.951249614695186e-40,
+          "rmsError": 5.146403122952411e-41,
+          "nonFinite": 0,
+          "peak": 0.4219527840614319,
+          "maxDifference": {
+            "frame": 49023,
+            "channel": 1,
+            "actual": 1.0687191913465901e-38,
+            "reference": 0,
+            "error": 1.0687191913465901e-38
+          },
+          "nativePcmSha256": "39a109a809bc2e5a6447018fe683108c190412c2088e10decaead9133f3102d9",
+          "portablePcmSha256": "e23ab47ab96d1d3ecd49d84b499c55e2039c84f1d32cae386a59251a34f44599"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 72000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 576.0000050067902,
+        "lastDelaySeconds": 0.006000000052154064,
+        "lastToneHz": 9000,
+        "wowPhase": 0.4500000213738531,
+        "driftPhase": 0.16650000725348946,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0,
+        "driftDepthSeconds": 0,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0,
+        "flutter2DepthSeconds": 0,
+        "toneTargetHz": 9000
+      }
+    },
+    {
+      "id": "drive-full",
+      "rate": 96000,
+      "channels": 2,
+      "frames": 72000,
+      "settings": {
+        "drive": 1
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.350574791431427,
+          "maxDifference": null,
+          "nativePcmSha256": "fba51fa17a1af8de2311d93a65d33232343a9de29889e22fd2a5539fd6abdb48",
+          "portablePcmSha256": "fba51fa17a1af8de2311d93a65d33232343a9de29889e22fd2a5539fd6abdb48"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 9.416264653068008e-39,
+          "relativeRmsError": 4.1765192594011186e-40,
+          "rmsError": 6.482466886579599e-41,
+          "nonFinite": 0,
+          "peak": 0.29544857144355774,
+          "maxDifference": {
+            "frame": 48450,
+            "channel": 1,
+            "actual": -9.416264653068008e-39,
+            "reference": 0,
+            "error": 9.416264653068008e-39
+          },
+          "nativePcmSha256": "826b3c9d5b729303ae3359e6a22122f2abc7eff8a4aa5bb22f951dba9449193f",
+          "portablePcmSha256": "36b8fdc79d67789df8e3806440f2d2caee59d4836e12052d1574f1dba14e32a7"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 9.416264653068008e-39,
+          "relativeRmsError": 4.1765192594011186e-40,
+          "rmsError": 6.482466886579599e-41,
+          "nonFinite": 0,
+          "peak": 0.29544857144355774,
+          "maxDifference": {
+            "frame": 49026,
+            "channel": 1,
+            "actual": -9.416264653068008e-39,
+            "reference": 0,
+            "error": 9.416264653068008e-39
+          },
+          "nativePcmSha256": "992e1371e100c00117a42a48417b9018295e0c41694aaae943a7fcff05fac17a",
+          "portablePcmSha256": "e1776fd46376e025837f70f88c50b5cc1f95b04a72a0e05f47a3d0976b251f67"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 72000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 576.0000050067902,
+        "lastDelaySeconds": 0.006000000052154064,
+        "lastToneHz": 9000,
+        "wowPhase": 0.4500000213738531,
+        "driftPhase": 0.16650000725348946,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0,
+        "driftDepthSeconds": 0,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0,
+        "flutter2DepthSeconds": 0,
+        "toneTargetHz": 9000
+      }
+    },
+    {
+      "id": "dark-tone",
+      "rate": 96000,
+      "channels": 2,
+      "frames": 72000,
+      "settings": {
+        "drive": 0.3,
+        "tone": 500
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.4766194820404053,
+          "maxDifference": null,
+          "nativePcmSha256": "228a0da7f5a97a97aa0ed0bc37a8a0c7da231d64148ebc441eadf98cb595963e",
+          "portablePcmSha256": "228a0da7f5a97a97aa0ed0bc37a8a0c7da231d64148ebc441eadf98cb595963e"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 2.514038634175062e-37,
+          "relativeRmsError": 7.427036559684423e-38,
+          "rmsError": 1.4757005169035046e-38,
+          "nonFinite": 0,
+          "peak": 0.3643236458301544,
+          "maxDifference": {
+            "frame": 53658,
+            "channel": 1,
+            "actual": 0,
+            "reference": 2.514038634175062e-37,
+            "error": 2.514038634175062e-37
+          },
+          "nativePcmSha256": "361ea6e58f2545a9e65db1299c19ae77c32436192f4d887eb82c24034f617f88",
+          "portablePcmSha256": "b75fea3bc700b93a04112c3902ed6ed9b56ee3f0a8d3078ab5ddfa87f146effa"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 2.514038634175062e-37,
+          "relativeRmsError": 7.427036559684423e-38,
+          "rmsError": 1.4757005169035046e-38,
+          "nonFinite": 0,
+          "peak": 0.3643236458301544,
+          "maxDifference": {
+            "frame": 54234,
+            "channel": 1,
+            "actual": 0,
+            "reference": 2.514038634175062e-37,
+            "error": 2.514038634175062e-37
+          },
+          "nativePcmSha256": "724e083b895f772c2214c5f4734af1d9a2a7627f764e22fe06924debf01b385d",
+          "portablePcmSha256": "215503212c3ccbfebe5717a31e76fe60e2d1458ae16cdf4f57ce0f50d4e77cde"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 72000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 576.0000050067902,
+        "lastDelaySeconds": 0.006000000052154064,
+        "lastToneHz": 500,
+        "wowPhase": 0.4500000213738531,
+        "driftPhase": 0.16650000725348946,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0,
+        "driftDepthSeconds": 0,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0,
+        "flutter2DepthSeconds": 0,
+        "toneTargetHz": 500
+      }
+    },
+    {
+      "id": "wow-full",
+      "rate": 96000,
+      "channels": 2,
+      "frames": 72000,
+      "settings": {
+        "wow": 1,
+        "wowRate": 0.6,
+        "drive": 0.2
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.5128227472305298,
+          "maxDifference": null,
+          "nativePcmSha256": "0a819737ace0a4682199deb1bdb0f795709685574c83eb8cceb698176c33455a",
+          "portablePcmSha256": "0a819737ace0a4682199deb1bdb0f795709685574c83eb8cceb698176c33455a"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 1.5171103173372523e-38,
+          "relativeRmsError": 4.069694114098304e-40,
+          "rmsError": 7.259015450787083e-41,
+          "nonFinite": 0,
+          "peak": 0.4043249487876892,
+          "maxDifference": {
+            "frame": 48448,
+            "channel": 1,
+            "actual": 2.2968038531454487e-39,
+            "reference": -1.2874299320227075e-38,
+            "error": 1.5171103173372523e-38
+          },
+          "nativePcmSha256": "1a66a6d02b46c69333d0acb38e75e4fab60a7a20f53e445193e292a91596af26",
+          "portablePcmSha256": "2f7e6f8b4fb94363ff6edf160f3bdf320945ec12a21b3a4cca9fd39bed712868"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 0.000025346875190734863,
+          "relativeRmsError": 0.000011444726998800067,
+          "rmsError": 0.000002044016061263826,
+          "nonFinite": 0,
+          "peak": 0.4023512303829193,
+          "maxDifference": {
+            "frame": 22248,
+            "channel": 1,
+            "actual": -0.1322394609451294,
+            "reference": -0.13226480782032013,
+            "error": 0.000025346875190734863
+          },
+          "nativePcmSha256": "ac3f4ccaadef166ce2aa7c64c88ccfa7faf4446c7b584298b4a671a883b2978c",
+          "portablePcmSha256": "6d8e7179d0c6a02b53827498731b1ce7047fa95cf84d983c2ab5bc80a0272577"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 72000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 576.0000050067902,
+        "lastDelaySeconds": 0.008225403726100922,
+        "lastToneHz": 9000,
+        "wowPhase": 0.4500000213738531,
+        "driftPhase": 0.16650000725348946,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0.003000000026077032,
+        "driftDepthSeconds": 0.001500000013038516,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0,
+        "flutter2DepthSeconds": 0,
+        "toneTargetHz": 9000
+      }
+    },
+    {
+      "id": "flutter-full",
+      "rate": 96000,
+      "channels": 2,
+      "frames": 72000,
+      "settings": {
+        "flutter": 1,
+        "tone": 16000
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.5699871182441711,
+          "maxDifference": null,
+          "nativePcmSha256": "54cdfb4bbfe1691c5b76884939efe15ec0ac456a39abf31e2274ee9ce6175038",
+          "portablePcmSha256": "54cdfb4bbfe1691c5b76884939efe15ec0ac456a39abf31e2274ee9ce6175038"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 9.322641100069538e-39,
+          "relativeRmsError": 2.4450033673675875e-40,
+          "rmsError": 4.854768656642315e-41,
+          "nonFinite": 0,
+          "peak": 0.5560187697410583,
+          "maxDifference": {
+            "frame": 48380,
+            "channel": 1,
+            "actual": 9.322641100069538e-39,
+            "reference": 0,
+            "error": 9.322641100069538e-39
+          },
+          "nativePcmSha256": "3d68b8ad94292efddc55f816dc11ead0f697cc5aeedbc7a637bdcf3a87a5da11",
+          "portablePcmSha256": "b8eb02389ab5e21fda8b14d3f34565da86b98c48d48ad4ffeb1a588dfda7ef88"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 1.1270424946004069e-38,
+          "relativeRmsError": 3.679691834977139e-40,
+          "rmsError": 7.126281390808908e-41,
+          "nonFinite": 0,
+          "peak": 0.5446563363075256,
+          "maxDifference": {
+            "frame": 48925,
+            "channel": 0,
+            "actual": -9.622534946237542e-38,
+            "reference": -8.495492451637135e-38,
+            "error": 1.1270424946004069e-38
+          },
+          "nativePcmSha256": "df897e2d00459e6e38482824abb242c868c9572d18d22a7bf8362c83601a97bb",
+          "portablePcmSha256": "3e208056c07e84c4bad6f0eb835bb7c7c97316dac95311e2c0de1f55f416fc90"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 72000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 576.0000050067902,
+        "lastDelaySeconds": 0.005920690018683672,
+        "lastToneHz": 16000,
+        "wowPhase": 0.4500000213738531,
+        "driftPhase": 0.16650000725348946,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0,
+        "driftDepthSeconds": 0,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0.0002500000118743628,
+        "flutter2DepthSeconds": 0.00011999999696854502,
+        "toneTargetHz": 16000
+      }
+    },
+    {
+      "id": "combined",
+      "rate": 96000,
+      "channels": 2,
+      "frames": 72000,
+      "settings": {
+        "wow": 0.73123456789,
+        "wowRate": 1.123456789,
+        "flutter": 0.6123456789,
+        "drive": 0.4123456789,
+        "tone": 6100.123456789
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.44282177090644836,
+          "maxDifference": null,
+          "nativePcmSha256": "7067c4f9984057cf3384482338ea55ba8e4e513399a1f51b3f4e73949838ef8e",
+          "portablePcmSha256": "7067c4f9984057cf3384482338ea55ba8e4e513399a1f51b3f4e73949838ef8e"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 2.0310986066503486e-38,
+          "relativeRmsError": 1.0194978007492757e-39,
+          "rmsError": 1.7587948889932969e-40,
+          "nonFinite": 0,
+          "peak": 0.34814056754112244,
+          "maxDifference": {
+            "frame": 48587,
+            "channel": 1,
+            "actual": 7.837770596630853e-40,
+            "reference": -1.95272090068404e-38,
+            "error": 2.0310986066503486e-38
+          },
+          "nativePcmSha256": "e134b5d1988d8cedbfc68e9c684bacc0c1e64a69791f10d9c63cbcda53f17ca4",
+          "portablePcmSha256": "94eed1c3617dae4294f1b946eb8cb2a88d0752f9369deb3fabc644100afbeeeb"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 0.000016085803508758545,
+          "relativeRmsError": 0.000006212656017130704,
+          "rmsError": 0.0000010713284272779106,
+          "nonFinite": 0,
+          "peak": 0.3479558229446411,
+          "maxDifference": {
+            "frame": 19609,
+            "channel": 1,
+            "actual": 0.0011981017887592316,
+            "reference": 0.001182015985250473,
+            "error": 0.000016085803508758545
+          },
+          "nativePcmSha256": "53794c049c5e39cf29015bb03842d64e7fedc0278b3856dc999dd5359dc23077",
+          "portablePcmSha256": "90fd4222319e775b2fb029d15eb60db9eab07e72c4f44921595538ccf08743d8"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 72000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 576.0000050067902,
+        "lastDelaySeconds": 0.005038489121943712,
+        "lastToneHz": 6100.12353515625,
+        "wowPhase": 0.8268875932149058,
+        "driftPhase": 0.30594834033377083,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0.002193703781813383,
+        "driftDepthSeconds": 0.0010968518909066916,
+        "wowFrequency": 1.1234568357467651,
+        "driftFrequency": 0.415679007768631,
+        "flutterDepthSeconds": 0.00015308642468880862,
+        "flutter2DepthSeconds": 0.00007348148210439831,
+        "toneTargetHz": 6100.12353515625
+      }
+    },
+    {
+      "id": "control-extremes",
+      "rate": 96000,
+      "channels": 2,
+      "frames": 72000,
+      "settings": {
+        "wow": 1,
+        "wowRate": 5,
+        "flutter": 1,
+        "drive": 1,
+        "tone": 20000
+      },
+      "targets": [],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.350574791431427,
+          "maxDifference": null,
+          "nativePcmSha256": "fba51fa17a1af8de2311d93a65d33232343a9de29889e22fd2a5539fd6abdb48",
+          "portablePcmSha256": "fba51fa17a1af8de2311d93a65d33232343a9de29889e22fd2a5539fd6abdb48"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 6.25894303115919e-39,
+          "relativeRmsError": 1.6736482940600769e-40,
+          "rmsError": 3.101046019847629e-41,
+          "nonFinite": 0,
+          "peak": 0.4184500277042389,
+          "maxDifference": {
+            "frame": 48369,
+            "channel": 0,
+            "actual": -6.25894303115919e-39,
+            "reference": 0,
+            "error": 6.25894303115919e-39
+          },
+          "nativePcmSha256": "80ba7ebcdc7fff7ff99e60f145a13babaf7f57c81d0ca6c4953f7ada255110a3",
+          "portablePcmSha256": "ffdfbf828e51b90b1f2f35ed4572bb88e5e50584a61799e2ddaf3e6350e71f14"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 0.00009357929229736328,
+          "relativeRmsError": 0.00002861910886780596,
+          "rmsError": 0.000005135916624464133,
+          "nonFinite": 0,
+          "peak": 0.40538743138313293,
+          "maxDifference": {
+            "frame": 44601,
+            "channel": 0,
+            "actual": 0.023404449224472046,
+            "reference": 0.02349802851676941,
+            "error": 0.00009357929229736328
+          },
+          "nativePcmSha256": "8b14df73ac2c1d7cedf1cc6fc556f6cefc4aa91034991b5037337bf93a0f856f",
+          "portablePcmSha256": "d8646b830941907d7829d21c504332c798b697fc714d6f76e095430673bfcfe3"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 72000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 576.0000050067902,
+        "lastDelaySeconds": 0.00516898836940527,
+        "lastToneHz": 20000,
+        "wowPhase": 0.6179833054452502,
+        "driftPhase": 0.33865374161018735,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0.003000000026077032,
+        "driftDepthSeconds": 0.001500000013038516,
+        "wowFrequency": 5,
+        "driftFrequency": 1.850000023841858,
+        "flutterDepthSeconds": 0.0002500000118743628,
+        "flutter2DepthSeconds": 0.00011999999696854502,
+        "toneTargetHz": 20000
+      }
+    },
+    {
+      "id": "native-target-automation",
+      "rate": 96000,
+      "channels": 2,
+      "frames": 72000,
+      "settings": {
+        "wow": 0.2,
+        "flutter": 0.1,
+        "drive": 0.3
+      },
+      "targets": [
+        {
+          "kind": "target",
+          "requestedFrame": 13,
+          "index": 0,
+          "value": 0.7123456789,
+          "timeSeconds": 0.00013541666666666666,
+          "frame": 13,
+          "sequence": 0
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 41,
+          "index": 1,
+          "value": 2.123456789,
+          "timeSeconds": 0.00042708333333333335,
+          "frame": 41,
+          "sequence": 1
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 513,
+          "index": 2,
+          "value": 0.8123456789,
+          "timeSeconds": 0.00534375,
+          "frame": 513,
+          "sequence": 2
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 4001,
+          "index": 4,
+          "value": 3000.123456789,
+          "timeSeconds": 0.04167708333333333,
+          "frame": 4001,
+          "sequence": 3
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 8191,
+          "index": 0,
+          "value": 0,
+          "timeSeconds": 0.08532291666666666,
+          "frame": 8191,
+          "sequence": 4
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 10003,
+          "index": 2,
+          "value": 0,
+          "timeSeconds": 0.10419791666666667,
+          "frame": 10003,
+          "sequence": 5
+        },
+        {
+          "kind": "target",
+          "requestedFrame": 12001,
+          "index": 1,
+          "value": 0.05,
+          "timeSeconds": 0.12501041666666668,
+          "frame": 12002,
+          "sequence": 6
+        }
+      ],
+      "curveControls": [],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.4766194820404053,
+          "maxDifference": null,
+          "nativePcmSha256": "228a0da7f5a97a97aa0ed0bc37a8a0c7da231d64148ebc441eadf98cb595963e",
+          "portablePcmSha256": "228a0da7f5a97a97aa0ed0bc37a8a0c7da231d64148ebc441eadf98cb595963e"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 1.4901161193847656e-7,
+          "relativeRmsError": 3.109542679734889e-8,
+          "rmsError": 5.466469878331874e-9,
+          "nonFinite": 0,
+          "peak": 0.3594299852848053,
+          "maxDifference": {
+            "frame": 5528,
+            "channel": 0,
+            "actual": -0.28509286046028137,
+            "reference": -0.28509271144866943,
+            "error": 1.4901161193847656e-7
+          },
+          "nativePcmSha256": "302278d95814c4369f075beb9a8d49eb856cc4e7f26f6933678183dc4f4b3cc4",
+          "portablePcmSha256": "b49d2b52f68a0acc0799a4785d4ed321f2c64469c0cfd889b841ba44f479596f"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 0.00001068413257598877,
+          "relativeRmsError": 9.141274670457819e-7,
+          "rmsError": 1.606730718366114e-7,
+          "nonFinite": 0,
+          "peak": 0.3559230864048004,
+          "maxDifference": {
+            "frame": 3816,
+            "channel": 1,
+            "actual": -0.01883590966463089,
+            "reference": -0.0188252255320549,
+            "error": 0.00001068413257598877
+          },
+          "nativePcmSha256": "94cdc5f43817da8d67e0495fb1787f326b754ce2ae20b16d992eaccd8e6b6625",
+          "portablePcmSha256": "87ffd007d2b3c685ed83533474c2a48d297f7b892fbd20f668477fc134bc7249"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 72000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 576.0000050067902,
+        "lastDelaySeconds": 0.006000000052154064,
+        "lastToneHz": 3000.12353515625,
+        "wowPhase": 0.312553118190408,
+        "driftPhase": 0.11564462627532635,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 1,
+        "wowDepthSeconds": 0,
+        "driftDepthSeconds": 0,
+        "wowFrequency": 0.05000000074505806,
+        "driftFrequency": 0.01850000023841858,
+        "flutterDepthSeconds": 0,
+        "flutter2DepthSeconds": 0,
+        "toneTargetHz": 3000.12353515625
+      }
+    },
+    {
+      "id": "native-curve-control",
+      "rate": 96000,
+      "channels": 2,
+      "frames": 72000,
+      "settings": {
+        "wow": 0.3,
+        "flutter": 0.3,
+        "drive": 0
+      },
+      "targets": [],
+      "curveControls": [
+        {
+          "kind": "curve",
+          "index": 3,
+          "value": 0.3,
+          "requestedFrame": 4096,
+          "requestedSeconds": 0.042666666666666665,
+          "timeSeconds": 0.042666666666666665,
+          "frame": 4096,
+          "sequence": 0
+        },
+        {
+          "kind": "curve",
+          "index": 3,
+          "value": 1,
+          "requestedFrame": 8192,
+          "requestedSeconds": 0.08533333333333333,
+          "timeSeconds": 0.08533333333333333,
+          "frame": 8192,
+          "sequence": 1
+        },
+        {
+          "kind": "curve",
+          "index": 3,
+          "value": 0,
+          "requestedFrame": 12288,
+          "requestedSeconds": 0.128,
+          "timeSeconds": 0.128,
+          "frame": 12288,
+          "sequence": 2
+        }
+      ],
+      "pass": true,
+      "stages": [
+        {
+          "stage": "shaper",
+          "pass": true,
+          "maxAbsoluteError": 0,
+          "relativeRmsError": 0,
+          "rmsError": 0,
+          "nonFinite": 0,
+          "peak": 0.5687565207481384,
+          "maxDifference": null,
+          "nativePcmSha256": "9b4862e18705c686f69d2137689bb0558d9bd0ae63e482a97de306ddf1ec85f0",
+          "portablePcmSha256": "9b4862e18705c686f69d2137689bb0558d9bd0ae63e482a97de306ddf1ec85f0"
+        },
+        {
+          "stage": "tone",
+          "pass": true,
+          "maxAbsoluteError": 1.0687191913465901e-38,
+          "relativeRmsError": 2.973877943987734e-40,
+          "rmsError": 5.146403122952411e-41,
+          "nonFinite": 0,
+          "peak": 0.4219527840614319,
+          "maxDifference": {
+            "frame": 48447,
+            "channel": 1,
+            "actual": 1.0687191913465901e-38,
+            "reference": 0,
+            "error": 1.0687191913465901e-38
+          },
+          "nativePcmSha256": "318c7cf087b084bb31cc7cdcebe0116c169f7b99f87b41f25721db4e56f45cef",
+          "portablePcmSha256": "b1049ab87f94ad99de65cd94bb0494fb343e9cc4076acedf0ff13c2867ce9c0c"
+        },
+        {
+          "stage": "full-delay",
+          "pass": true,
+          "maxAbsoluteError": 0.00002222508192062378,
+          "relativeRmsError": 0.0000022681230219522737,
+          "rmsError": 3.919124228440951e-7,
+          "nonFinite": 0,
+          "peak": 0.40940380096435547,
+          "maxDifference": {
+            "frame": 40415,
+            "channel": 0,
+            "actual": 0.07509646564722061,
+            "reference": 0.07511869072914124,
+            "error": 0.00002222508192062378
+          },
+          "nativePcmSha256": "08660dfd18ffa7659b1d066b4580dfd261961982b17e1a7bad842f3a9e7828e4",
+          "portablePcmSha256": "4c7e8e172715fa470af9c14ee013d2350c9dab378a90ab49c13b1b078303fbed"
+        }
+      ],
+      "portableStats": {
+        "peak": 0,
+        "frame": 72000,
+        "resamplerGroupDelayFrames": 128,
+        "baseDelayFrames": 576.0000050067902,
+        "lastDelaySeconds": 0.0066438280045986176,
+        "lastToneHz": 9000,
+        "wowPhase": 0.4500000213738531,
+        "driftPhase": 0.16650000725348946,
+        "flutterPhase": 0.4749999544583261,
+        "flutter2Phase": 0.7749997619539499,
+        "prepared": 1,
+        "driveCurves": 3,
+        "wowDepthSeconds": 0.0008999999845400453,
+        "driftDepthSeconds": 0.00044999999227002263,
+        "wowFrequency": 0.6000000238418579,
+        "driftFrequency": 0.22200000286102295,
+        "flutterDepthSeconds": 0.00007500000356230885,
+        "flutter2DepthSeconds": 0.00003600000127335079,
+        "toneTargetHz": 9000
+      }
+    }
+  ]
+}

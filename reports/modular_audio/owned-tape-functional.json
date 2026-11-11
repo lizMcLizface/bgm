@@ -1,0 +1,673 @@
+{
+  "kind": "tape.owned-functional",
+  "version": 1,
+  "pass": true,
+  "createdAtUtc": "2026-11-11T02:05:32.840Z",
+  "engineVersion": "d21e9c6dc67eba80",
+  "build": {
+    "api": 1,
+    "stage": "full-tape-and-shaper-reference",
+    "source": "3666fe5b7092a047dcccca0574491cb8fed2e06bb37ec84438ab32b49ff76458",
+    "runtime": "35faeec5f57a1935cfd8bb28337988743c94c2ec25af0d645c7dd98e9c868243",
+    "wasm": "cdf17431ff33ae247a8c6b15030876a1bd2b0a54df8e6cbd810ea4345a627d08",
+    "bytes": 163470,
+    "audited": true,
+    "nativeSineResources": {
+      "kind": "tape.immutable-native-sine-resources",
+      "version": 1,
+      "chromiumRevision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+      "captureReport": "reports/modular_audio/tape-native-clock-capture.json",
+      "captureReportSha256": "8ecaf2c545af441ca9ed4ddcbb2fd8b381556f2f3e6cb1ba4da8a0f6a6d5e3ff",
+      "capturedAtUtc": "2026-11-11T01:57:06.418Z",
+      "browserUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36",
+      "method": "Original native sine oscillator frequency=sampleRate/tableSize; pinned Float32 rateScale*frequency is exactly1, table range factor0, every read index integer and interpolation fraction0. Capture first period verbatim, independently require raw exact second period and source-defined quarter/peak invariants. No fit, output normalization, alignment or sample edits.",
+      "scope": "Verbatim source-defined sine wavetable extraction with integer read increments and zero interpolation fraction. Resource bits are immutable; no normalization, fitted gain/alignment, runtime browser dependency or claim of other native FFT implementations.",
+      "resources": [
+        {
+          "file": "chromium-sine-2048.f32",
+          "size": 2048,
+          "bytes": 8192,
+          "sha256": "7921549af80be380eb0d549f9eab730190f19dbed6a0b394ef97170d62d002d4",
+          "capturedRate": 24000,
+          "frequency": 11.71875,
+          "increment": 1,
+          "periodicity": {
+            "maxAbsoluteError": 0,
+            "differingSamples": 0,
+            "rmsError": 0,
+            "maxDifference": null
+          },
+          "quarterSamples": [
+            0,
+            1,
+            0,
+            -1
+          ]
+        },
+        {
+          "file": "chromium-sine-4096.f32",
+          "size": 4096,
+          "bytes": 16384,
+          "sha256": "e2f429797c3ec9fba3f2a96176a6a2115a09ef65d520b772599b28e356d75c68",
+          "capturedRate": 48000,
+          "frequency": 11.71875,
+          "increment": 1,
+          "periodicity": {
+            "maxAbsoluteError": 0,
+            "differingSamples": 0,
+            "rmsError": 0,
+            "maxDifference": null
+          },
+          "quarterSamples": [
+            0,
+            1,
+            0,
+            -1
+          ]
+        },
+        {
+          "file": "chromium-sine-16384.f32",
+          "size": 16384,
+          "bytes": 65536,
+          "sha256": "7a3b0c8477c0a631590627ce02ce1d3712ad9622581567e4b1ca8fb2989a7da3",
+          "capturedRate": 96000,
+          "frequency": 5.859375,
+          "increment": 1,
+          "periodicity": {
+            "maxAbsoluteError": 0,
+            "differingSamples": 0,
+            "rmsError": 0,
+            "maxDifference": null
+          },
+          "quarterSamples": [
+            0,
+            1,
+            0,
+            -1
+          ]
+        }
+      ]
+    },
+    "profile": {
+      "kind": "tape.chromium-profile-sources",
+      "version": 1,
+      "revision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+      "capturedAtUtc": "2026-11-11T01:09:55.422Z",
+      "scope": "Pinned official Chromium source for explicit portable Tape profile. Browser PCM/impulse/alias comparison is required separately; this pin does not claim identity with a particular browser binary.",
+      "sources": [
+        {
+          "file": "LICENSE",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/LICENSE",
+          "bytes": 1536,
+          "sha256": "368cca1106be99d39ecd32a38d8305585d802a475effb66380b91ffc9bcf709b"
+        },
+        {
+          "file": "chrome/VERSION",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/chrome/VERSION",
+          "bytes": 37,
+          "sha256": "70df9ad90910436a4669989a7b8afc058f9a6e8bdea95280cbbcf132fa96650e"
+        },
+        {
+          "file": "third_party/blink/renderer/platform/audio/up_sampler.cc",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/up_sampler.cc",
+          "bytes": 6274,
+          "sha256": "01ee92ff6767d1c86dd21dfb11dbc1cd737b5d53d227580c84c7fccfacb7f735"
+        },
+        {
+          "file": "third_party/blink/renderer/platform/audio/down_sampler.cc",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/down_sampler.cc",
+          "bytes": 6801,
+          "sha256": "8d70f5a6e0fcb11878fac04d468dedbc2fe7e2dc39ff97d1fb0763a65dcfa74b"
+        },
+        {
+          "file": "third_party/blink/renderer/platform/audio/direct_convolver.cc",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/direct_convolver.cc",
+          "bytes": 3328,
+          "sha256": "69c4f6e2061b67639f04c4971dcca64722f0f7c6f1ff94c1cd8c32e5bf48304c"
+        },
+        {
+          "file": "third_party/blink/renderer/platform/audio/vector_math.cc",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/vector_math.cc",
+          "bytes": 4756,
+          "sha256": "0f2551b332278547fddd4c8dec01cc395f761a344c5d06ea0956220d54f5dbc0"
+        },
+        {
+          "file": "third_party/blink/renderer/platform/audio/vector_math.h",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/vector_math.h",
+          "bytes": 5324,
+          "sha256": "0808f17a49e689c47ff717f1b8a9d48106a494f6ab903039763445b72805fd6d"
+        },
+        {
+          "file": "third_party/blink/renderer/modules/webaudio/wave_shaper_handler.cc",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/wave_shaper_handler.cc",
+          "bytes": 22477,
+          "sha256": "01be2e2dc1e6a030e48fa561b783115a4371c4474dd282aa2a72cdb6391bcd12"
+        },
+        {
+          "file": "third_party/blink/renderer/platform/audio/biquad.cc",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/biquad.cc",
+          "bytes": 31939,
+          "sha256": "174c22c8c2ca13d947517bab7486e497010f643c3118b5acb1fb04218ea09a4a"
+        },
+        {
+          "file": "third_party/blink/renderer/modules/webaudio/biquad_filter_handler.cc",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/biquad_filter_handler.cc",
+          "bytes": 19914,
+          "sha256": "a54076a7202eecd1e131f73e8111af7668e360910e8982badbd72d3566762a95"
+        },
+        {
+          "file": "third_party/blink/renderer/platform/audio/delay.cc",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/delay.cc",
+          "bytes": 10149,
+          "sha256": "d8a1b966dc49fb24b0c4fc83c3296a138c2e35bfd19b39666b3baa8d8f4deb0a"
+        },
+        {
+          "file": "third_party/blink/renderer/modules/webaudio/audio_param_handler.cc",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_param_handler.cc",
+          "bytes": 92593,
+          "sha256": "50e6da5e2efa1254d05393ca03bae373b8a329e400d85b3f6cafd8ec3896ad8b"
+        },
+        {
+          "file": "third_party/blink/renderer/platform/audio/vector_math_scalar.h",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/vector_math_scalar.h",
+          "bytes": 14110,
+          "sha256": "a12771406d21cf03ca346edad4e2c8aaabca71378e2a29fd4bc6bd092223bfaf"
+        },
+        {
+          "file": "third_party/blink/renderer/platform/audio/cpu/x86/vector_math_x86.h",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/cpu/x86/vector_math_x86.h",
+          "bytes": 21574,
+          "sha256": "bfafeab3b642684ad0542607566408a2201f482ad22b9dac1662e1463f84d762"
+        },
+        {
+          "file": "third_party/blink/renderer/platform/audio/cpu/x86/delay_sse2.cc",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/cpu/x86/delay_sse2.cc",
+          "bytes": 5550,
+          "sha256": "d93659d64b5a6bc056bb5b3a1059145ef466c9e3d4f092aee6f076be21b10f3a"
+        },
+        {
+          "file": "third_party/blink/renderer/modules/webaudio/delay_handler.cc",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/delay_handler.cc",
+          "bytes": 8240,
+          "sha256": "c9ec54f8a5072542668ef3ae0038a4c3338cf0ec225fe7226df5b9916eb96b1b"
+        },
+        {
+          "file": "third_party/blink/renderer/platform/audio/audio_utilities.cc",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/audio_utilities.cc",
+          "bytes": 9697,
+          "sha256": "d3ed345360190487ee482eebda6141580994db924bd0fd36f342a61b33a09db0"
+        },
+        {
+          "file": "third_party/blink/renderer/modules/webaudio/audio_summing_junction.cc",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_summing_junction.cc",
+          "bytes": 2913,
+          "sha256": "2c23e3ff380b74e92d738a34dd4cbe157044d6cf825fd85e29004c5ce7ae5eb8"
+        },
+        {
+          "file": "third_party/blink/renderer/modules/webaudio/audio_summing_junction.h",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_summing_junction.h",
+          "bytes": 4112,
+          "sha256": "e4f5cd641a9d8042ad134dd99707e7329a28c0a6a05911aa65a3310b0d53bb55"
+        },
+        {
+          "file": "third_party/blink/renderer/modules/webaudio/oscillator_handler.cc",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/oscillator_handler.cc",
+          "bytes": 29147,
+          "sha256": "a34fc0842181483ae6a7cdc9db393987b1535206afb56ce0ad033bdd79dd6d68"
+        },
+        {
+          "file": "third_party/blink/renderer/modules/webaudio/periodic_wave_handler.cc",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/periodic_wave_handler.cc",
+          "bytes": 17076,
+          "sha256": "940a3fadb8f63d8e8944ed60fa76a3740638f9f8820c6de6ab3ee07c87ff2a35"
+        },
+        {
+          "file": "third_party/blink/renderer/modules/webaudio/periodic_wave_handler.h",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/periodic_wave_handler.h",
+          "bytes": 5125,
+          "sha256": "2dd142876f7710eb19d2d435cda2f7a27abc002d98dc8794438097d907433ddd"
+        },
+        {
+          "file": "third_party/blink/renderer/modules/webaudio/oscillator_handler.h",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/oscillator_handler.h",
+          "bytes": 8087,
+          "sha256": "36e17b85f27b90c39fd0cc8cf0d97e123842ae1309160415934f7a8688e2ace6"
+        },
+        {
+          "file": "third_party/blink/renderer/modules/webaudio/BUILD.gn",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/BUILD.gn",
+          "bytes": 6409,
+          "sha256": "e4eb580d32182b1f18d0f3dede2d50583b4a977534e2b78eb513cd9df350bf7a"
+        },
+        {
+          "file": "third_party/blink/renderer/modules/webaudio/cpu/x86/oscillator_kernel_sse2.cc",
+          "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/cpu/x86/oscillator_kernel_sse2.cc",
+          "bytes": 12172,
+          "sha256": "ee5c56d2d01c8449a33589b08ccb028b7fa17b00a92c668c66d1ba405e708e50"
+        }
+      ],
+      "clockSourceCapture": "tools/captureTapeClockReference.mjs"
+    },
+    "profileSha256": "4041f76ad0f302eeca20508f87f00d6054451bbe8acaf59953d436344f392cb1",
+    "noticesSha256": "e713182b8763ba3d4570db3ae7b1d2c26a99fd181b7c8723fd41e5e9f77ad5c9",
+    "referenceSourceSha256": "cb70af70081f5383946951ced2019d48d9419ade365a4efda855b8b23e5c1260",
+    "version": "d21e9c6dc67eba80"
+  },
+  "scope": "Owned Rust functional and allocator properties. Native Web Audio numerical parity and realtime deadline measurements are separate. Allocator counts exclude preparation/destruction and JS host allocations. Primitive regression compares the exact retained artifact previously validated in 72 native browser cases.",
+  "trials": [
+    {
+      "rate": 8000,
+      "channels": 1,
+      "frames": 16001,
+      "sha256": "bfac8060a6c05f60af2e0d0c15bc9435bd0eb8d82bc4d2a6055186822343379c",
+      "cadenceIndependentRawExact": true,
+      "saveReloadExact": true,
+      "latestTargetsRetained": true,
+      "independentHandles": true,
+      "preparedCurveControls": 3,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1900544,
+      "memoryGrew": false
+    },
+    {
+      "rate": 8000,
+      "channels": 2,
+      "frames": 16001,
+      "sha256": "f5e27d7f55ccb111a8c6af5678fbe84cd020ca71e21d3b03d47f2c43b5374940",
+      "cadenceIndependentRawExact": true,
+      "saveReloadExact": true,
+      "latestTargetsRetained": true,
+      "independentHandles": true,
+      "preparedCurveControls": 3,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1900544,
+      "memoryGrew": false
+    },
+    {
+      "rate": 24000,
+      "channels": 1,
+      "frames": 16001,
+      "sha256": "4712cbd1503dfe92b5723313f06dd11eb2f9856de33bf8ea70333c7e9d71f88d",
+      "cadenceIndependentRawExact": true,
+      "saveReloadExact": true,
+      "latestTargetsRetained": true,
+      "independentHandles": true,
+      "preparedCurveControls": 3,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1900544,
+      "memoryGrew": false
+    },
+    {
+      "rate": 24000,
+      "channels": 2,
+      "frames": 16001,
+      "sha256": "3367fb7fac30747510f5dbed52e24099b1641f9862aa14ac30d7c1355b198dff",
+      "cadenceIndependentRawExact": true,
+      "saveReloadExact": true,
+      "latestTargetsRetained": true,
+      "independentHandles": true,
+      "preparedCurveControls": 3,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1900544,
+      "memoryGrew": false
+    },
+    {
+      "rate": 44100,
+      "channels": 1,
+      "frames": 22050,
+      "sha256": "3b8115b35a094433b2fd6c253f6f9dc237ca154ee0340fa2fe9a5f6c2475ebb8",
+      "cadenceIndependentRawExact": true,
+      "saveReloadExact": true,
+      "latestTargetsRetained": true,
+      "independentHandles": true,
+      "preparedCurveControls": 3,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1900544,
+      "memoryGrew": false
+    },
+    {
+      "rate": 44100,
+      "channels": 2,
+      "frames": 22050,
+      "sha256": "4e9ab939ebef1ea6ef257d7cbfb044a872202ac5a976ea3b408dc4dbdcccd6ea",
+      "cadenceIndependentRawExact": true,
+      "saveReloadExact": true,
+      "latestTargetsRetained": true,
+      "independentHandles": true,
+      "preparedCurveControls": 3,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1900544,
+      "memoryGrew": false
+    },
+    {
+      "rate": 48000,
+      "channels": 1,
+      "frames": 24000,
+      "sha256": "0d20ff5850b5c2c2dbbfd71509ae82cbad9417987cbfabd367805d6d17d70d4d",
+      "cadenceIndependentRawExact": true,
+      "saveReloadExact": true,
+      "latestTargetsRetained": true,
+      "independentHandles": true,
+      "preparedCurveControls": 3,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1900544,
+      "memoryGrew": false
+    },
+    {
+      "rate": 48000,
+      "channels": 2,
+      "frames": 24000,
+      "sha256": "a548ce3cdf3cec4fee85c327fe864df30543980c57bdec60a3c4e2421520caad",
+      "cadenceIndependentRawExact": true,
+      "saveReloadExact": true,
+      "latestTargetsRetained": true,
+      "independentHandles": true,
+      "preparedCurveControls": 3,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1900544,
+      "memoryGrew": false
+    },
+    {
+      "rate": 96000,
+      "channels": 1,
+      "frames": 48000,
+      "sha256": "54cfda414d99ef8286c400cb062943240aad802eb2b412d3e22d9110cd088ccf",
+      "cadenceIndependentRawExact": true,
+      "saveReloadExact": true,
+      "latestTargetsRetained": true,
+      "independentHandles": true,
+      "preparedCurveControls": 3,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1900544,
+      "memoryGrew": false
+    },
+    {
+      "rate": 96000,
+      "channels": 2,
+      "frames": 48000,
+      "sha256": "0c80a66f8a421aa22b38bf79aefda3ad13c46b2470a15e499d7b3aadfb3e2797",
+      "cadenceIndependentRawExact": true,
+      "saveReloadExact": true,
+      "latestTargetsRetained": true,
+      "independentHandles": true,
+      "preparedCurveControls": 3,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1900544,
+      "memoryGrew": false
+    },
+    {
+      "rate": 192000,
+      "channels": 1,
+      "frames": 96000,
+      "sha256": "39b43751357e08d47d9eb221e33665de1d869182b6db253ca93170ae2945d7a2",
+      "cadenceIndependentRawExact": true,
+      "saveReloadExact": true,
+      "latestTargetsRetained": true,
+      "independentHandles": true,
+      "preparedCurveControls": 3,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1966080,
+      "memoryGrew": false
+    },
+    {
+      "rate": 192000,
+      "channels": 2,
+      "frames": 96000,
+      "sha256": "56074c0e6e70fc414c96854a06b425a02595f50b65b780df516249e1a3c7f197",
+      "cadenceIndependentRawExact": true,
+      "saveReloadExact": true,
+      "latestTargetsRetained": true,
+      "independentHandles": true,
+      "preparedCurveControls": 3,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1966080,
+      "memoryGrew": false
+    }
+  ],
+  "primitiveBaseline": {
+    "engineVersion": "7e3b04628555d62c",
+    "wasmSha256": "c8cd06315109956adccaf1ff6e18bde288f501b2578a840938ef208b3d536456"
+  },
+  "primitiveRegression": [
+    {
+      "rate": 44100,
+      "channels": 1,
+      "curve": "linear",
+      "drive": 0,
+      "frames": 4097,
+      "baselineSha256": "592fa364b2c4b379ec26891f3595fa62557d135ae00aab6353a967c6bb97af9e",
+      "currentSha256": "592fa364b2c4b379ec26891f3595fa62557d135ae00aab6353a967c6bb97af9e",
+      "rawExact": true
+    },
+    {
+      "rate": 44100,
+      "channels": 1,
+      "curve": "tape",
+      "drive": 0,
+      "frames": 4097,
+      "baselineSha256": "fd9889eff3f8cfff519a3e9e162269821e7b81a88b06a19e3b3edcf38fe50fbb",
+      "currentSha256": "fd9889eff3f8cfff519a3e9e162269821e7b81a88b06a19e3b3edcf38fe50fbb",
+      "rawExact": true
+    },
+    {
+      "rate": 44100,
+      "channels": 1,
+      "curve": "tape",
+      "drive": 0.3,
+      "frames": 4097,
+      "baselineSha256": "3f5e0bf5b4e5c1b09bf550ddfa0d4ece84f7a85e0395da1ce7fe6982c7aa7f73",
+      "currentSha256": "3f5e0bf5b4e5c1b09bf550ddfa0d4ece84f7a85e0395da1ce7fe6982c7aa7f73",
+      "rawExact": true
+    },
+    {
+      "rate": 44100,
+      "channels": 1,
+      "curve": "tape",
+      "drive": 1,
+      "frames": 4097,
+      "baselineSha256": "f3d2e5bdeb5f0ed4036a8264d7bcb5884c39da129f89b3d5e3f0403e59674a64",
+      "currentSha256": "f3d2e5bdeb5f0ed4036a8264d7bcb5884c39da129f89b3d5e3f0403e59674a64",
+      "rawExact": true
+    },
+    {
+      "rate": 44100,
+      "channels": 2,
+      "curve": "linear",
+      "drive": 0,
+      "frames": 4097,
+      "baselineSha256": "ee52991989682c3658965ebf848538f44a8cef914a3150f367d3108655a72497",
+      "currentSha256": "ee52991989682c3658965ebf848538f44a8cef914a3150f367d3108655a72497",
+      "rawExact": true
+    },
+    {
+      "rate": 44100,
+      "channels": 2,
+      "curve": "tape",
+      "drive": 0,
+      "frames": 4097,
+      "baselineSha256": "0a89595b5995fe008b3ba076e39c5d3ec65bf32b5ce9a65ea21158cafb8415e8",
+      "currentSha256": "0a89595b5995fe008b3ba076e39c5d3ec65bf32b5ce9a65ea21158cafb8415e8",
+      "rawExact": true
+    },
+    {
+      "rate": 44100,
+      "channels": 2,
+      "curve": "tape",
+      "drive": 0.3,
+      "frames": 4097,
+      "baselineSha256": "dbbc612e861dffd71fc115b09f6a1b7e8e0dd7e1f9bc186f766a35248d4a4f72",
+      "currentSha256": "dbbc612e861dffd71fc115b09f6a1b7e8e0dd7e1f9bc186f766a35248d4a4f72",
+      "rawExact": true
+    },
+    {
+      "rate": 44100,
+      "channels": 2,
+      "curve": "tape",
+      "drive": 1,
+      "frames": 4097,
+      "baselineSha256": "c742345a173f3d3a49fbe07de658a159971e452bcd1e40c09d9e2098647ebaf9",
+      "currentSha256": "c742345a173f3d3a49fbe07de658a159971e452bcd1e40c09d9e2098647ebaf9",
+      "rawExact": true
+    },
+    {
+      "rate": 48000,
+      "channels": 1,
+      "curve": "linear",
+      "drive": 0,
+      "frames": 4097,
+      "baselineSha256": "592fa364b2c4b379ec26891f3595fa62557d135ae00aab6353a967c6bb97af9e",
+      "currentSha256": "592fa364b2c4b379ec26891f3595fa62557d135ae00aab6353a967c6bb97af9e",
+      "rawExact": true
+    },
+    {
+      "rate": 48000,
+      "channels": 1,
+      "curve": "tape",
+      "drive": 0,
+      "frames": 4097,
+      "baselineSha256": "fd9889eff3f8cfff519a3e9e162269821e7b81a88b06a19e3b3edcf38fe50fbb",
+      "currentSha256": "fd9889eff3f8cfff519a3e9e162269821e7b81a88b06a19e3b3edcf38fe50fbb",
+      "rawExact": true
+    },
+    {
+      "rate": 48000,
+      "channels": 1,
+      "curve": "tape",
+      "drive": 0.3,
+      "frames": 4097,
+      "baselineSha256": "3f5e0bf5b4e5c1b09bf550ddfa0d4ece84f7a85e0395da1ce7fe6982c7aa7f73",
+      "currentSha256": "3f5e0bf5b4e5c1b09bf550ddfa0d4ece84f7a85e0395da1ce7fe6982c7aa7f73",
+      "rawExact": true
+    },
+    {
+      "rate": 48000,
+      "channels": 1,
+      "curve": "tape",
+      "drive": 1,
+      "frames": 4097,
+      "baselineSha256": "f3d2e5bdeb5f0ed4036a8264d7bcb5884c39da129f89b3d5e3f0403e59674a64",
+      "currentSha256": "f3d2e5bdeb5f0ed4036a8264d7bcb5884c39da129f89b3d5e3f0403e59674a64",
+      "rawExact": true
+    },
+    {
+      "rate": 48000,
+      "channels": 2,
+      "curve": "linear",
+      "drive": 0,
+      "frames": 4097,
+      "baselineSha256": "ee52991989682c3658965ebf848538f44a8cef914a3150f367d3108655a72497",
+      "currentSha256": "ee52991989682c3658965ebf848538f44a8cef914a3150f367d3108655a72497",
+      "rawExact": true
+    },
+    {
+      "rate": 48000,
+      "channels": 2,
+      "curve": "tape",
+      "drive": 0,
+      "frames": 4097,
+      "baselineSha256": "0a89595b5995fe008b3ba076e39c5d3ec65bf32b5ce9a65ea21158cafb8415e8",
+      "currentSha256": "0a89595b5995fe008b3ba076e39c5d3ec65bf32b5ce9a65ea21158cafb8415e8",
+      "rawExact": true
+    },
+    {
+      "rate": 48000,
+      "channels": 2,
+      "curve": "tape",
+      "drive": 0.3,
+      "frames": 4097,
+      "baselineSha256": "dbbc612e861dffd71fc115b09f6a1b7e8e0dd7e1f9bc186f766a35248d4a4f72",
+      "currentSha256": "dbbc612e861dffd71fc115b09f6a1b7e8e0dd7e1f9bc186f766a35248d4a4f72",
+      "rawExact": true
+    },
+    {
+      "rate": 48000,
+      "channels": 2,
+      "curve": "tape",
+      "drive": 1,
+      "frames": 4097,
+      "baselineSha256": "c742345a173f3d3a49fbe07de658a159971e452bcd1e40c09d9e2098647ebaf9",
+      "currentSha256": "c742345a173f3d3a49fbe07de658a159971e452bcd1e40c09d9e2098647ebaf9",
+      "rawExact": true
+    },
+    {
+      "rate": 96000,
+      "channels": 1,
+      "curve": "linear",
+      "drive": 0,
+      "frames": 4097,
+      "baselineSha256": "592fa364b2c4b379ec26891f3595fa62557d135ae00aab6353a967c6bb97af9e",
+      "currentSha256": "592fa364b2c4b379ec26891f3595fa62557d135ae00aab6353a967c6bb97af9e",
+      "rawExact": true
+    },
+    {
+      "rate": 96000,
+      "channels": 1,
+      "curve": "tape",
+      "drive": 0,
+      "frames": 4097,
+      "baselineSha256": "fd9889eff3f8cfff519a3e9e162269821e7b81a88b06a19e3b3edcf38fe50fbb",
+      "currentSha256": "fd9889eff3f8cfff519a3e9e162269821e7b81a88b06a19e3b3edcf38fe50fbb",
+      "rawExact": true
+    },
+    {
+      "rate": 96000,
+      "channels": 1,
+      "curve": "tape",
+      "drive": 0.3,
+      "frames": 4097,
+      "baselineSha256": "3f5e0bf5b4e5c1b09bf550ddfa0d4ece84f7a85e0395da1ce7fe6982c7aa7f73",
+      "currentSha256": "3f5e0bf5b4e5c1b09bf550ddfa0d4ece84f7a85e0395da1ce7fe6982c7aa7f73",
+      "rawExact": true
+    },
+    {
+      "rate": 96000,
+      "channels": 1,
+      "curve": "tape",
+      "drive": 1,
+      "frames": 4097,
+      "baselineSha256": "f3d2e5bdeb5f0ed4036a8264d7bcb5884c39da129f89b3d5e3f0403e59674a64",
+      "currentSha256": "f3d2e5bdeb5f0ed4036a8264d7bcb5884c39da129f89b3d5e3f0403e59674a64",
+      "rawExact": true
+    },
+    {
+      "rate": 96000,
+      "channels": 2,
+      "curve": "linear",
+      "drive": 0,
+      "frames": 4097,
+      "baselineSha256": "ee52991989682c3658965ebf848538f44a8cef914a3150f367d3108655a72497",
+      "currentSha256": "ee52991989682c3658965ebf848538f44a8cef914a3150f367d3108655a72497",
+      "rawExact": true
+    },
+    {
+      "rate": 96000,
+      "channels": 2,
+      "curve": "tape",
+      "drive": 0,
+      "frames": 4097,
+      "baselineSha256": "0a89595b5995fe008b3ba076e39c5d3ec65bf32b5ce9a65ea21158cafb8415e8",
+      "currentSha256": "0a89595b5995fe008b3ba076e39c5d3ec65bf32b5ce9a65ea21158cafb8415e8",
+      "rawExact": true
+    },
+    {
+      "rate": 96000,
+      "channels": 2,
+      "curve": "tape",
+      "drive": 0.3,
+      "frames": 4097,
+      "baselineSha256": "dbbc612e861dffd71fc115b09f6a1b7e8e0dd7e1f9bc186f766a35248d4a4f72",
+      "currentSha256": "dbbc612e861dffd71fc115b09f6a1b7e8e0dd7e1f9bc186f766a35248d4a4f72",
+      "rawExact": true
+    },
+    {
+      "rate": 96000,
+      "channels": 2,
+      "curve": "tape",
+      "drive": 1,
+      "frames": 4097,
+      "baselineSha256": "c742345a173f3d3a49fbe07de658a159971e452bcd1e40c09d9e2098647ebaf9",
+      "currentSha256": "c742345a173f3d3a49fbe07de658a159971e452bcd1e40c09d9e2098647ebaf9",
+      "rawExact": true
+    }
+  ]
+}

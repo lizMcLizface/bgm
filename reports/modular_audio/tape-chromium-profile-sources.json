@@ -1,0 +1,111 @@
+{
+  "kind": "tape.chromium-profile-sources",
+  "version": 1,
+  "revision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+  "capturedAtUtc": "2026-11-11T01:09:55.422Z",
+  "scope": "Pinned official Chromium source for explicit portable Tape profile. Browser PCM/impulse/alias comparison is required separately; this pin does not claim identity with a particular browser binary.",
+  "sources": [
+    {
+      "file": "LICENSE",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/LICENSE",
+      "bytes": 1536,
+      "sha256": "368cca1106be99d39ecd32a38d8305585d802a475effb66380b91ffc9bcf709b"
+    },
+    {
+      "file": "chrome/VERSION",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/chrome/VERSION",
+      "bytes": 37,
+      "sha256": "70df9ad90910436a4669989a7b8afc058f9a6e8bdea95280cbbcf132fa96650e"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/audio/up_sampler.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/up_sampler.cc",
+      "bytes": 6274,
+      "sha256": "01ee92ff6767d1c86dd21dfb11dbc1cd737b5d53d227580c84c7fccfacb7f735"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/audio/down_sampler.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/down_sampler.cc",
+      "bytes": 6801,
+      "sha256": "8d70f5a6e0fcb11878fac04d468dedbc2fe7e2dc39ff97d1fb0763a65dcfa74b"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/audio/direct_convolver.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/direct_convolver.cc",
+      "bytes": 3328,
+      "sha256": "69c4f6e2061b67639f04c4971dcca64722f0f7c6f1ff94c1cd8c32e5bf48304c"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/audio/vector_math.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/vector_math.cc",
+      "bytes": 4756,
+      "sha256": "0f2551b332278547fddd4c8dec01cc395f761a344c5d06ea0956220d54f5dbc0"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/audio/vector_math.h",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/vector_math.h",
+      "bytes": 5324,
+      "sha256": "0808f17a49e689c47ff717f1b8a9d48106a494f6ab903039763445b72805fd6d"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/wave_shaper_handler.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/wave_shaper_handler.cc",
+      "bytes": 22477,
+      "sha256": "01be2e2dc1e6a030e48fa561b783115a4371c4474dd282aa2a72cdb6391bcd12"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/audio/biquad.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/biquad.cc",
+      "bytes": 31939,
+      "sha256": "174c22c8c2ca13d947517bab7486e497010f643c3118b5acb1fb04218ea09a4a"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/biquad_filter_handler.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/biquad_filter_handler.cc",
+      "bytes": 19914,
+      "sha256": "a54076a7202eecd1e131f73e8111af7668e360910e8982badbd72d3566762a95"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/audio/delay.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/delay.cc",
+      "bytes": 10149,
+      "sha256": "d8a1b966dc49fb24b0c4fc83c3296a138c2e35bfd19b39666b3baa8d8f4deb0a"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/audio_param_handler.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_param_handler.cc",
+      "bytes": 92593,
+      "sha256": "50e6da5e2efa1254d05393ca03bae373b8a329e400d85b3f6cafd8ec3896ad8b"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/audio/vector_math_scalar.h",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/vector_math_scalar.h",
+      "bytes": 14110,
+      "sha256": "a12771406d21cf03ca346edad4e2c8aaabca71378e2a29fd4bc6bd092223bfaf"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/audio/cpu/x86/vector_math_x86.h",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/cpu/x86/vector_math_x86.h",
+      "bytes": 21574,
+      "sha256": "bfafeab3b642684ad0542607566408a2201f482ad22b9dac1662e1463f84d762"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/audio/cpu/x86/delay_sse2.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/cpu/x86/delay_sse2.cc",
+      "bytes": 5550,
+      "sha256": "d93659d64b5a6bc056bb5b3a1059145ef466c9e3d4f092aee6f076be21b10f3a"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/delay_handler.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/delay_handler.cc",
+      "bytes": 8240,
+      "sha256": "c9ec54f8a5072542668ef3ae0038a4c3338cf0ec225fe7226df5b9916eb96b1b"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/audio/audio_utilities.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/audio_utilities.cc",
+      "bytes": 9697,
+      "sha256": "d3ed345360190487ee482eebda6141580994db924bd0fd36f342a61b33a09db0"
+    }
+  ]
+}

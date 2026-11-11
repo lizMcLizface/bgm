@@ -3,6 +3,13 @@
 //! CHROMIUM_NOTICES.txt apply to the derived resampler/curve implementation.
 //! This primitive is not a substitute full Tape effect or a default backend.
 use std::f64::consts::{PI, TAU};
+#[cfg(feature = "allocation-audit")]
+mod allocation;
+mod delay;
+mod oscillator;
+pub mod tape;
+mod target;
+mod tone;
 pub const BLOCK: usize = 2048;
 pub const PROFILE: &str = "chromium-2x-e14de735-v1";
 const TAPS: usize = 128;
