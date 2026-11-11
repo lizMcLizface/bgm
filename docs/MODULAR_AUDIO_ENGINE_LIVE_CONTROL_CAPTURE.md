@@ -1,0 +1,11 @@
+# Additive live control capture
+
+This checkpoint adds metadata capture to the original native LFO helpers. It selects no backend and changes no native AudioNode scheduling, sound generation, preset fields or saved-song data. Physical-source kernel/host integration is a separate work in progress.
+
+ControlClock.capture() retains its original six-field shape and calculations. settings() is unchanged. The separate captureLive() adds creation phase/start, original intrinsic frequency/depth, monotonically revisioned commands and the latest128 records of each command kind. Frequency records are [revision,eventSeconds,value,callSeconds,intrinsicFlag]; depth records are [revision,eventSeconds,value,tauSeconds,intrinsicFlag]. Flag1 represents an actual intrinsic .value edit, flag0 a scheduled setter. Native intrinsic defaults are separate from events, so capture does not invent constructor automation.
+
+The helpers retain at most128 records per kind. Eviction is visible through the earliest retained revision. A live consumer must refuse missing unseen history rather than reset phase or infer lost commands. The helper itself continues the original native setter, preserving default behavior; validation/admission belongs to the owned consumer. Existing immutable finite capture does not acquire these fields.
+
+LFO.captureLiveControl() exposes the additive sine contract, retaining its existing unsupported-waveform refusal. The actual public wanderLfo facade exposes captureLiveControl() for sine or original captured Brownian points. Its creation phase is retained while native command revisions distinguish period/intrinsic edits, smoothing and mode transitions. This is metadata for ownership; projected host phase must not overwrite an already-owned live oscillator clock.
+
+Seven focused controlSnapshot tests pass, including original finite phase/depth behavior, unchanged capture shape, bounded revisions and the actual wander facade. The desktop source matrix passed41 cases before exposing the missing public-facade method; its targeted remaining3 passed after that correction. Those reports are local evidence, not fixture dependencies. They do not establish complete KS/live-source acceptance, which still has its own held/pull-history gates.

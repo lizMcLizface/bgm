@@ -29,6 +29,7 @@ class LFO {
     captureSettings = () => ({...this.captureClock.settings(),type:this.captureType});
     captureControl = time => {if(this.captureType!=='sine')throw Error('Unsupported vibrato waveform');return this.captureClock.capture(time);};
 
+    captureLiveControl = time => {if(this.captureType!=='sine')throw Error('Unsupported vibrato waveform');return this.captureClock.captureLive(time);};
     getNode = () => this.osc.getNode();
     getDepthNode = () => this.depth.getNode();
     getRate = () => this.osc.getFreq();

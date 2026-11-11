@@ -207,10 +207,11 @@ export function wanderLfo(ctx, { period, phase, offset = 0, seed = 1, mode = 'si
         depth,
         setActive:(on,time,notBefore=time)=>{consumers=on;clock.setActive(on&&current==='sine',time,notBefore);},
         captureSettings:()=>({...clock.settings(),mode:current}),
-        setDepth(value,immediate=false){clock.depth(value,ctx.currentTime,immediate?0:.3);if(immediate)depth.gain.value=value;else depth.gain.setTargetAtTime(value,ctx.currentTime,.3);},
+        setDepth(value,immediate=false){clock.depth(value,ctx.currentTime,immediate?0:.3,immediate);if(immediate)depth.gain.value=value;else depth.gain.setTargetAtTime(value,ctx.currentTime,.3);},
         captureControl(time){const c=clock.capture(time);return current==='brownian'?{...c,kind:'linear',points:walk.capture(time)}:c;},
+        captureLiveControl(time){const c=clock.captureLive(time);return current==='brownian'?{...c,kind:'linear',points:walk.capture(time)}:c;},
         setPeriod: (seconds) => {
-            clock.rate(1/seconds,ctx.currentTime);
+            clock.rate(1/seconds,ctx.currentTime,ctx.currentTime,true);
             period = seconds;
             osc.frequency.value = 1 / seconds;
             if (walk) walk.setPeriod(seconds);
