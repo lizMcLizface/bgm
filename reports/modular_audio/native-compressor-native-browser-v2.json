@@ -1,0 +1,4733 @@
+{
+  "kind": "native-compressor.native-reference",
+  "version": 1,
+  "profile": "chromium-dynamics-e14de735-v1",
+  "engineVersion": "4057fdc2c9a3136d",
+  "wasmSha256": "289553aa9c8538c4e090f83948fd4efd269be35e1fa45987d9b19d8d9386e9b1",
+  "chromiumRevision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+  "createdAtUtc": "2026-11-11T02:31:37.614Z",
+  "browserUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36",
+  "bounds": {
+    "maxAbsoluteError": 0.0001,
+    "relativeRmsError": 0.0001,
+    "reductionDbError": 0.01
+  },
+  "scope": "Actual native DynamicsCompressorNode PCM and reduction versus pinned owned Rust with static complete parameters at44.1/48/96k,mono/stereo, original Compressor wrapper and kernel presets used by rack/voice/extra/piano/Iowa limiters. Includes the native built-in makeup and actual lookahead; no alignment/gain fitting. Host parallel mix/trim, gain targets, live routing/default switches, physical listening and realtime deadlines excluded.",
+  "pass": true,
+  "comparisons": 96,
+  "maxAbsoluteError": 1.7881393432617188e-7,
+  "maxRelativeRmsError": 7.910122629557796e-11,
+  "maxReductionDbError": 0,
+  "trials": [
+    {
+      "id": "native-defaults",
+      "material": "impulse",
+      "rate": 44100,
+      "channels": 1,
+      "frames": 55168,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          30
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.003
+        ],
+        [
+          4,
+          0.25
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.3636363744735718,
+      "ownedReductionDb": -0.3636363744735718,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        264
+      ],
+      "ownedFirstNonzero": [
+        264,
+        264
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "89ff9e880f8abb65862da9e1ed905c2822f329280d396dc5416f2e2f253d28d3",
+      "ownedPcmSha256": "89ff9e880f8abb65862da9e1ed905c2822f329280d396dc5416f2e2f253d28d3",
+      "pass": true
+    },
+    {
+      "id": "native-defaults",
+      "material": "dynamic",
+      "rate": 44100,
+      "channels": 1,
+      "frames": 55168,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          30
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.003
+        ],
+        [
+          4,
+          0.25
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -1.8952879905700684,
+      "ownedReductionDb": -1.8952879905700684,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        264
+      ],
+      "ownedFirstNonzero": [
+        264,
+        264
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "bf3d75c05d1602b308298990a6517a710ee00d187e71c335b4ecbc678bf975b8",
+      "ownedPcmSha256": "bf3d75c05d1602b308298990a6517a710ee00d187e71c335b4ecbc678bf975b8",
+      "pass": true
+    },
+    {
+      "id": "original-compressor-wrapper",
+      "material": "impulse",
+      "rate": 44100,
+      "channels": 1,
+      "frames": 55168,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          30
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.005
+        ],
+        [
+          4,
+          0.05
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.2639245390892029,
+      "ownedReductionDb": -0.2639245390892029,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        264
+      ],
+      "ownedFirstNonzero": [
+        264,
+        264
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "0fdfebba401aeaa538cd3a9ad55c64bffc357e0aa52a9bc2f7690a32e109f299",
+      "ownedPcmSha256": "0fdfebba401aeaa538cd3a9ad55c64bffc357e0aa52a9bc2f7690a32e109f299",
+      "pass": true
+    },
+    {
+      "id": "original-compressor-wrapper",
+      "material": "dynamic",
+      "rate": 44100,
+      "channels": 1,
+      "frames": 55168,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          30
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.005
+        ],
+        [
+          4,
+          0.05
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -1.5968842506408691,
+      "ownedReductionDb": -1.5968842506408691,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        264
+      ],
+      "ownedFirstNonzero": [
+        264,
+        264
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "d4314c2ad023ca28d189d2688cad0c3d1986c6cde75d5324432fb1bcd2932cfc",
+      "ownedPcmSha256": "d4314c2ad023ca28d189d2688cad0c3d1986c6cde75d5324432fb1bcd2932cfc",
+      "pass": true
+    },
+    {
+      "id": "effects-rack-default-kernel",
+      "material": "impulse",
+      "rate": 44100,
+      "channels": 1,
+      "frames": 55168,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          12
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          0.005
+        ],
+        [
+          4,
+          0.1
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.27286383509635925,
+      "ownedReductionDb": -0.27286383509635925,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        264
+      ],
+      "ownedFirstNonzero": [
+        264,
+        264
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "3d4204172e1dd305d4f05d2e7cc663c3b51002b50afaa13fb2c9f92cec55f999",
+      "ownedPcmSha256": "3d4204172e1dd305d4f05d2e7cc663c3b51002b50afaa13fb2c9f92cec55f999",
+      "pass": true
+    },
+    {
+      "id": "effects-rack-default-kernel",
+      "material": "dynamic",
+      "rate": 44100,
+      "channels": 1,
+      "frames": 55168,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          12
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          0.005
+        ],
+        [
+          4,
+          0.1
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -4.928072452545166,
+      "ownedReductionDb": -4.928072452545166,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        264
+      ],
+      "ownedFirstNonzero": [
+        264,
+        264
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "b4fe5f2afea376a2f891876e91aed73bc42af828a6555ef6ffbcb920d80d1c61",
+      "ownedPcmSha256": "b4fe5f2afea376a2f891876e91aed73bc42af828a6555ef6ffbcb920d80d1c61",
+      "pass": true
+    },
+    {
+      "id": "voice-kernel-static",
+      "material": "impulse",
+      "rate": 44100,
+      "channels": 1,
+      "frames": 55168,
+      "parameters": [
+        [
+          0,
+          -27
+        ],
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          0.01
+        ],
+        [
+          4,
+          0.1
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.19643746316432953,
+      "ownedReductionDb": -0.19643746316432953,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        264
+      ],
+      "ownedFirstNonzero": [
+        264,
+        264
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "002efea941d1958ce32e2a008d90f444d667b62ac7ae6e23015495de1d113c21",
+      "ownedPcmSha256": "002efea941d1958ce32e2a008d90f444d667b62ac7ae6e23015495de1d113c21",
+      "pass": true
+    },
+    {
+      "id": "voice-kernel-static",
+      "material": "dynamic",
+      "rate": 44100,
+      "channels": 1,
+      "frames": 55168,
+      "parameters": [
+        [
+          0,
+          -27
+        ],
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          0.01
+        ],
+        [
+          4,
+          0.1
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -7.056161403656006,
+      "ownedReductionDb": -7.056161403656006,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        264
+      ],
+      "ownedFirstNonzero": [
+        264,
+        264
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "04a1288a397b2a251f5e991f4a7ebe7a85b4724d6b6345250abe8f5985a1035c",
+      "ownedPcmSha256": "04a1288a397b2a251f5e991f4a7ebe7a85b4724d6b6345250abe8f5985a1035c",
+      "pass": true
+    },
+    {
+      "id": "effects-extra-limiter",
+      "material": "impulse",
+      "rate": 44100,
+      "channels": 1,
+      "frames": 55168,
+      "parameters": [
+        [
+          0,
+          -1
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0.002
+        ],
+        [
+          4,
+          0.09
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.38858458399772644,
+      "ownedReductionDb": -0.38858458399772644,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        264
+      ],
+      "ownedFirstNonzero": [
+        264,
+        264
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "16f957d987a849fe7c10f5e773679a0d061cc7145ecd89787d33fc8ed07f1b5e",
+      "ownedPcmSha256": "16f957d987a849fe7c10f5e773679a0d061cc7145ecd89787d33fc8ed07f1b5e",
+      "pass": true
+    },
+    {
+      "id": "effects-extra-limiter",
+      "material": "dynamic",
+      "rate": 44100,
+      "channels": 1,
+      "frames": 55168,
+      "parameters": [
+        [
+          0,
+          -1
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0.002
+        ],
+        [
+          4,
+          0.09
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.38830599188804626,
+      "ownedReductionDb": -0.38830599188804626,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        264
+      ],
+      "ownedFirstNonzero": [
+        264,
+        264
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "3505188c53c9e7aa47397bec91353c5f4178d4f5ce5960692b9a3563173d5359",
+      "ownedPcmSha256": "3505188c53c9e7aa47397bec91353c5f4178d4f5ce5960692b9a3563173d5359",
+      "pass": true
+    },
+    {
+      "id": "piano-limiter",
+      "material": "impulse",
+      "rate": 44100,
+      "channels": 1,
+      "frames": 55168,
+      "parameters": [
+        [
+          0,
+          -4
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0.002
+        ],
+        [
+          4,
+          0.12
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.39446184039115906,
+      "ownedReductionDb": -0.39446184039115906,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        264
+      ],
+      "ownedFirstNonzero": [
+        264,
+        264
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "13f745dac1b75374e80a884a7d79b2c221bcfd097198dcf6ad8465b783a243aa",
+      "ownedPcmSha256": "13f745dac1b75374e80a884a7d79b2c221bcfd097198dcf6ad8465b783a243aa",
+      "pass": true
+    },
+    {
+      "id": "piano-limiter",
+      "material": "dynamic",
+      "rate": 44100,
+      "channels": 1,
+      "frames": 55168,
+      "parameters": [
+        [
+          0,
+          -4
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0.002
+        ],
+        [
+          4,
+          0.12
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.4373874366283417,
+      "ownedReductionDb": -0.4373874366283417,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        264
+      ],
+      "ownedFirstNonzero": [
+        264,
+        264
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "cf168d8e15a9ffccc1f9b28f82b300d0ceb7efae5f2570a121ed82dffb1e184f",
+      "ownedPcmSha256": "cf168d8e15a9ffccc1f9b28f82b300d0ceb7efae5f2570a121ed82dffb1e184f",
+      "pass": true
+    },
+    {
+      "id": "iowa-limiter",
+      "material": "impulse",
+      "rate": 44100,
+      "channels": 1,
+      "frames": 55168,
+      "parameters": [
+        [
+          0,
+          -6
+        ],
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.003
+        ],
+        [
+          4,
+          0.15
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.34442153573036194,
+      "ownedReductionDb": -0.34442153573036194,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        264
+      ],
+      "ownedFirstNonzero": [
+        264,
+        264
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "bedfde8b0e1c3481a71e5984ff589c4720b9f78447cf08e88951d6ea425e7ad3",
+      "ownedPcmSha256": "bedfde8b0e1c3481a71e5984ff589c4720b9f78447cf08e88951d6ea425e7ad3",
+      "pass": true
+    },
+    {
+      "id": "iowa-limiter",
+      "material": "dynamic",
+      "rate": 44100,
+      "channels": 1,
+      "frames": 55168,
+      "parameters": [
+        [
+          0,
+          -6
+        ],
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.003
+        ],
+        [
+          4,
+          0.15
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.48402559757232666,
+      "ownedReductionDb": -0.48402559757232666,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        264
+      ],
+      "ownedFirstNonzero": [
+        264,
+        264
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "87ea3f7e141679074b264e490f7893af494391674a8fba2545bff28998670bc9",
+      "ownedPcmSha256": "87ea3f7e141679074b264e490f7893af494391674a8fba2545bff28998670bc9",
+      "pass": true
+    },
+    {
+      "id": "parameter-extremes",
+      "material": "impulse",
+      "rate": 44100,
+      "channels": 1,
+      "frames": 55168,
+      "parameters": [
+        [
+          0,
+          -100
+        ],
+        [
+          1,
+          40
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          4,
+          0
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.462471067905426,
+      "ownedReductionDb": -0.462471067905426,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        264
+      ],
+      "ownedFirstNonzero": [
+        264,
+        264
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "3db2d767c4ef756cf02918abe946b8b2e32fbdb3749056a7bf0510c777980fa0",
+      "ownedPcmSha256": "3db2d767c4ef756cf02918abe946b8b2e32fbdb3749056a7bf0510c777980fa0",
+      "pass": true
+    },
+    {
+      "id": "parameter-extremes",
+      "material": "dynamic",
+      "rate": 44100,
+      "channels": 1,
+      "frames": 55168,
+      "parameters": [
+        [
+          0,
+          -100
+        ],
+        [
+          1,
+          40
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          4,
+          0
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -29.22446060180664,
+      "ownedReductionDb": -29.22446060180664,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        264
+      ],
+      "ownedFirstNonzero": [
+        264,
+        264
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "e42bd6be5472467a6f0e7f3b78eedf158bce6060f19672e7d87c155039f9c69d",
+      "ownedPcmSha256": "e42bd6be5472467a6f0e7f3b78eedf158bce6060f19672e7d87c155039f9c69d",
+      "pass": true
+    },
+    {
+      "id": "native-defaults",
+      "material": "impulse",
+      "rate": 44100,
+      "channels": 2,
+      "frames": 55168,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          30
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.003
+        ],
+        [
+          4,
+          0.25
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.36340266466140747,
+      "ownedReductionDb": -0.36340266466140747,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        301
+      ],
+      "ownedFirstNonzero": [
+        264,
+        301
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "94e39b77350d0d3d4ee95e16e0700bdf3d14beade7e45a4f2128e7962e93cd63",
+      "ownedPcmSha256": "94e39b77350d0d3d4ee95e16e0700bdf3d14beade7e45a4f2128e7962e93cd63",
+      "pass": true
+    },
+    {
+      "id": "native-defaults",
+      "material": "dynamic",
+      "rate": 44100,
+      "channels": 2,
+      "frames": 55168,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          30
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.003
+        ],
+        [
+          4,
+          0.25
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -1.9440821409225464,
+      "ownedReductionDb": -1.9440821409225464,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        264
+      ],
+      "ownedFirstNonzero": [
+        264,
+        264
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "fdbfac35edbb6364cb5b10a90ed19025348fd3c3c37b5d8af7491a0d7e6f0fea",
+      "ownedPcmSha256": "fdbfac35edbb6364cb5b10a90ed19025348fd3c3c37b5d8af7491a0d7e6f0fea",
+      "pass": true
+    },
+    {
+      "id": "original-compressor-wrapper",
+      "material": "impulse",
+      "rate": 44100,
+      "channels": 2,
+      "frames": 55168,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          30
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.005
+        ],
+        [
+          4,
+          0.05
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.2637789249420166,
+      "ownedReductionDb": -0.2637789249420166,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        301
+      ],
+      "ownedFirstNonzero": [
+        264,
+        301
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "a4a05ff40a0d4f60cb48eee7d4fbb7474a1c096edb5151ca71750aefd95d9cea",
+      "ownedPcmSha256": "a4a05ff40a0d4f60cb48eee7d4fbb7474a1c096edb5151ca71750aefd95d9cea",
+      "pass": true
+    },
+    {
+      "id": "original-compressor-wrapper",
+      "material": "dynamic",
+      "rate": 44100,
+      "channels": 2,
+      "frames": 55168,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          30
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.005
+        ],
+        [
+          4,
+          0.05
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -1.661667823791504,
+      "ownedReductionDb": -1.661667823791504,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        264
+      ],
+      "ownedFirstNonzero": [
+        264,
+        264
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "fee64c114b7482f14a4ef36f35225eca87ce172a95ea39c59235a3ad13a7e342",
+      "ownedPcmSha256": "fee64c114b7482f14a4ef36f35225eca87ce172a95ea39c59235a3ad13a7e342",
+      "pass": true
+    },
+    {
+      "id": "effects-rack-default-kernel",
+      "material": "impulse",
+      "rate": 44100,
+      "channels": 2,
+      "frames": 55168,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          12
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          0.005
+        ],
+        [
+          4,
+          0.1
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.27255958318710327,
+      "ownedReductionDb": -0.27255958318710327,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        301
+      ],
+      "ownedFirstNonzero": [
+        264,
+        301
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "cc7b0a0a9be4989cc4301d4183246bdc9ede85c5a02400f5a8f120da7b0b1a1c",
+      "ownedPcmSha256": "cc7b0a0a9be4989cc4301d4183246bdc9ede85c5a02400f5a8f120da7b0b1a1c",
+      "pass": true
+    },
+    {
+      "id": "effects-rack-default-kernel",
+      "material": "dynamic",
+      "rate": 44100,
+      "channels": 2,
+      "frames": 55168,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          12
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          0.005
+        ],
+        [
+          4,
+          0.1
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -5.0458455085754395,
+      "ownedReductionDb": -5.0458455085754395,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        264
+      ],
+      "ownedFirstNonzero": [
+        264,
+        264
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "b4a43a297ecca00b802901ed554b6e4f1d244cf08f3125d21e4c45207489b51e",
+      "ownedPcmSha256": "b4a43a297ecca00b802901ed554b6e4f1d244cf08f3125d21e4c45207489b51e",
+      "pass": true
+    },
+    {
+      "id": "voice-kernel-static",
+      "material": "impulse",
+      "rate": 44100,
+      "channels": 2,
+      "frames": 55168,
+      "parameters": [
+        [
+          0,
+          -27
+        ],
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          0.01
+        ],
+        [
+          4,
+          0.1
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.19654157757759094,
+      "ownedReductionDb": -0.19654157757759094,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        301
+      ],
+      "ownedFirstNonzero": [
+        264,
+        301
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "0e0c78f6024927d7af32a862d34019a7ff05ebdf8a8d70e6f41194075f1ec934",
+      "ownedPcmSha256": "0e0c78f6024927d7af32a862d34019a7ff05ebdf8a8d70e6f41194075f1ec934",
+      "pass": true
+    },
+    {
+      "id": "voice-kernel-static",
+      "material": "dynamic",
+      "rate": 44100,
+      "channels": 2,
+      "frames": 55168,
+      "parameters": [
+        [
+          0,
+          -27
+        ],
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          0.01
+        ],
+        [
+          4,
+          0.1
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -7.252842426300049,
+      "ownedReductionDb": -7.252842426300049,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        264
+      ],
+      "ownedFirstNonzero": [
+        264,
+        264
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "0405e661e2c18abc8dad8f99a59cc006c732a70103e3308d20a045567500487e",
+      "ownedPcmSha256": "0405e661e2c18abc8dad8f99a59cc006c732a70103e3308d20a045567500487e",
+      "pass": true
+    },
+    {
+      "id": "effects-extra-limiter",
+      "material": "impulse",
+      "rate": 44100,
+      "channels": 2,
+      "frames": 55168,
+      "parameters": [
+        [
+          0,
+          -1
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0.002
+        ],
+        [
+          4,
+          0.09
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.38858458399772644,
+      "ownedReductionDb": -0.38858458399772644,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        301
+      ],
+      "ownedFirstNonzero": [
+        264,
+        301
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "dfb54137e136d77418cd84955cebf608b5740161607770a585ccb1b1cf0a0d67",
+      "ownedPcmSha256": "dfb54137e136d77418cd84955cebf608b5740161607770a585ccb1b1cf0a0d67",
+      "pass": true
+    },
+    {
+      "id": "effects-extra-limiter",
+      "material": "dynamic",
+      "rate": 44100,
+      "channels": 2,
+      "frames": 55168,
+      "parameters": [
+        [
+          0,
+          -1
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0.002
+        ],
+        [
+          4,
+          0.09
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.38830599188804626,
+      "ownedReductionDb": -0.38830599188804626,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        264
+      ],
+      "ownedFirstNonzero": [
+        264,
+        264
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "39866748e638943f9980c4c521a32993a04f27b0c1b09fadc647e9788dc9a9e2",
+      "ownedPcmSha256": "39866748e638943f9980c4c521a32993a04f27b0c1b09fadc647e9788dc9a9e2",
+      "pass": true
+    },
+    {
+      "id": "piano-limiter",
+      "material": "impulse",
+      "rate": 44100,
+      "channels": 2,
+      "frames": 55168,
+      "parameters": [
+        [
+          0,
+          -4
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0.002
+        ],
+        [
+          4,
+          0.12
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.39446184039115906,
+      "ownedReductionDb": -0.39446184039115906,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        301
+      ],
+      "ownedFirstNonzero": [
+        264,
+        301
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "0d97f218904634f1be40d9bdf3db8c1575f590393de78b86f23bf2a44dd384ad",
+      "ownedPcmSha256": "0d97f218904634f1be40d9bdf3db8c1575f590393de78b86f23bf2a44dd384ad",
+      "pass": true
+    },
+    {
+      "id": "piano-limiter",
+      "material": "dynamic",
+      "rate": 44100,
+      "channels": 2,
+      "frames": 55168,
+      "parameters": [
+        [
+          0,
+          -4
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0.002
+        ],
+        [
+          4,
+          0.12
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.43950092792510986,
+      "ownedReductionDb": -0.43950092792510986,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        264
+      ],
+      "ownedFirstNonzero": [
+        264,
+        264
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "1c4374ffc2bb87bd24753ec7407a9fb8bbe1409498cb468e5958ecee4ecab2a4",
+      "ownedPcmSha256": "1c4374ffc2bb87bd24753ec7407a9fb8bbe1409498cb468e5958ecee4ecab2a4",
+      "pass": true
+    },
+    {
+      "id": "iowa-limiter",
+      "material": "impulse",
+      "rate": 44100,
+      "channels": 2,
+      "frames": 55168,
+      "parameters": [
+        [
+          0,
+          -6
+        ],
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.003
+        ],
+        [
+          4,
+          0.15
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.34449076652526855,
+      "ownedReductionDb": -0.34449076652526855,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        301
+      ],
+      "ownedFirstNonzero": [
+        264,
+        301
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "938aa19ec2d3fcba08b88aff2729302e3c1ee043e92a13ac08b380e1de683c6e",
+      "ownedPcmSha256": "938aa19ec2d3fcba08b88aff2729302e3c1ee043e92a13ac08b380e1de683c6e",
+      "pass": true
+    },
+    {
+      "id": "iowa-limiter",
+      "material": "dynamic",
+      "rate": 44100,
+      "channels": 2,
+      "frames": 55168,
+      "parameters": [
+        [
+          0,
+          -6
+        ],
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.003
+        ],
+        [
+          4,
+          0.15
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.4921172559261322,
+      "ownedReductionDb": -0.4921172559261322,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        264
+      ],
+      "ownedFirstNonzero": [
+        264,
+        264
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "fdcdb7faa19157b04e71c4b08491a9fb5fbba13c72501e3a466146e93f13de0c",
+      "ownedPcmSha256": "fdcdb7faa19157b04e71c4b08491a9fb5fbba13c72501e3a466146e93f13de0c",
+      "pass": true
+    },
+    {
+      "id": "parameter-extremes",
+      "material": "impulse",
+      "rate": 44100,
+      "channels": 2,
+      "frames": 55168,
+      "parameters": [
+        [
+          0,
+          -100
+        ],
+        [
+          1,
+          40
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          4,
+          0
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.5446476340293884,
+      "ownedReductionDb": -0.5446476340293884,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        301
+      ],
+      "ownedFirstNonzero": [
+        264,
+        301
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "0b78b92475284a821d30eca2ecf467da517b5daf5e36be2695dcfcd0c0e3b01a",
+      "ownedPcmSha256": "0b78b92475284a821d30eca2ecf467da517b5daf5e36be2695dcfcd0c0e3b01a",
+      "pass": true
+    },
+    {
+      "id": "parameter-extremes",
+      "material": "dynamic",
+      "rate": 44100,
+      "channels": 2,
+      "frames": 55168,
+      "parameters": [
+        [
+          0,
+          -100
+        ],
+        [
+          1,
+          40
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          4,
+          0
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -30.29250717163086,
+      "ownedReductionDb": -30.29250717163086,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        264
+      ],
+      "ownedFirstNonzero": [
+        264,
+        264
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "9fe3e6da45360c0ba0b849b37854f2825bceecf924e0df486763a0a1e7402a8f",
+      "ownedPcmSha256": "9fe3e6da45360c0ba0b849b37854f2825bceecf924e0df486763a0a1e7402a8f",
+      "pass": true
+    },
+    {
+      "id": "native-defaults",
+      "material": "impulse",
+      "rate": 48000,
+      "channels": 1,
+      "frames": 60032,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          30
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.003
+        ],
+        [
+          4,
+          0.25
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.3665335774421692,
+      "ownedReductionDb": -0.3665335774421692,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        288
+      ],
+      "ownedFirstNonzero": [
+        288,
+        288
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "abdf003905863ae4f80dec30734958517616431461bcfcf6ad2aa6de2b275905",
+      "ownedPcmSha256": "abdf003905863ae4f80dec30734958517616431461bcfcf6ad2aa6de2b275905",
+      "pass": true
+    },
+    {
+      "id": "native-defaults",
+      "material": "dynamic",
+      "rate": 48000,
+      "channels": 1,
+      "frames": 60032,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          30
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.003
+        ],
+        [
+          4,
+          0.25
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -1.9030596017837524,
+      "ownedReductionDb": -1.9030596017837524,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        288
+      ],
+      "ownedFirstNonzero": [
+        288,
+        288
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "bc1470cc1e34a84df347ec7b83826348c356f0f924948eb64ad626cd14f7ad75",
+      "ownedPcmSha256": "bc1470cc1e34a84df347ec7b83826348c356f0f924948eb64ad626cd14f7ad75",
+      "pass": true
+    },
+    {
+      "id": "original-compressor-wrapper",
+      "material": "impulse",
+      "rate": 48000,
+      "channels": 1,
+      "frames": 60032,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          30
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.005
+        ],
+        [
+          4,
+          0.05
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.2636244297027588,
+      "ownedReductionDb": -0.2636244297027588,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        288
+      ],
+      "ownedFirstNonzero": [
+        288,
+        288
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "3bba4461ee0197ae948969c70784366442d9a1f89071b42223f1c23653eb85a3",
+      "ownedPcmSha256": "3bba4461ee0197ae948969c70784366442d9a1f89071b42223f1c23653eb85a3",
+      "pass": true
+    },
+    {
+      "id": "original-compressor-wrapper",
+      "material": "dynamic",
+      "rate": 48000,
+      "channels": 1,
+      "frames": 60032,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          30
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.005
+        ],
+        [
+          4,
+          0.05
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -1.6037442684173584,
+      "ownedReductionDb": -1.6037442684173584,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        288
+      ],
+      "ownedFirstNonzero": [
+        288,
+        288
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "a71cf649db7a2c137931a983c628fb2ee3e163529cc65748df302664f5f5031b",
+      "ownedPcmSha256": "a71cf649db7a2c137931a983c628fb2ee3e163529cc65748df302664f5f5031b",
+      "pass": true
+    },
+    {
+      "id": "effects-rack-default-kernel",
+      "material": "impulse",
+      "rate": 48000,
+      "channels": 1,
+      "frames": 60032,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          12
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          0.005
+        ],
+        [
+          4,
+          0.1
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.2725384533405304,
+      "ownedReductionDb": -0.2725384533405304,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        288
+      ],
+      "ownedFirstNonzero": [
+        288,
+        288
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "32a3d6db3eea3c578f082954c89dc0ab1c607960b43137b853de1efcf9851f32",
+      "ownedPcmSha256": "32a3d6db3eea3c578f082954c89dc0ab1c607960b43137b853de1efcf9851f32",
+      "pass": true
+    },
+    {
+      "id": "effects-rack-default-kernel",
+      "material": "dynamic",
+      "rate": 48000,
+      "channels": 1,
+      "frames": 60032,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          12
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          0.005
+        ],
+        [
+          4,
+          0.1
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -4.928090572357178,
+      "ownedReductionDb": -4.928090572357178,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        288
+      ],
+      "ownedFirstNonzero": [
+        288,
+        288
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "1f4b3bac335b65ad88da2e5d605d9c0b283e3ac17e62503235c6d4a269481b20",
+      "ownedPcmSha256": "1f4b3bac335b65ad88da2e5d605d9c0b283e3ac17e62503235c6d4a269481b20",
+      "pass": true
+    },
+    {
+      "id": "voice-kernel-static",
+      "material": "impulse",
+      "rate": 48000,
+      "channels": 1,
+      "frames": 60032,
+      "parameters": [
+        [
+          0,
+          -27
+        ],
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          0.01
+        ],
+        [
+          4,
+          0.1
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.19691255688667297,
+      "ownedReductionDb": -0.19691255688667297,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        288
+      ],
+      "ownedFirstNonzero": [
+        288,
+        288
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "cddfc6d3d87b8d799e337fd8734b8672c497e01c530fe08e789a16b6ffd14e4c",
+      "ownedPcmSha256": "cddfc6d3d87b8d799e337fd8734b8672c497e01c530fe08e789a16b6ffd14e4c",
+      "pass": true
+    },
+    {
+      "id": "voice-kernel-static",
+      "material": "dynamic",
+      "rate": 48000,
+      "channels": 1,
+      "frames": 60032,
+      "parameters": [
+        [
+          0,
+          -27
+        ],
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          0.01
+        ],
+        [
+          4,
+          0.1
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -7.06176233291626,
+      "ownedReductionDb": -7.06176233291626,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        288
+      ],
+      "ownedFirstNonzero": [
+        288,
+        288
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "4b2a1b8f801a8884f013a916955bb2089eafe17e3e0ceb03c8229409b0dfbb43",
+      "ownedPcmSha256": "4b2a1b8f801a8884f013a916955bb2089eafe17e3e0ceb03c8229409b0dfbb43",
+      "pass": true
+    },
+    {
+      "id": "effects-extra-limiter",
+      "material": "impulse",
+      "rate": 48000,
+      "channels": 1,
+      "frames": 60032,
+      "parameters": [
+        [
+          0,
+          -1
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0.002
+        ],
+        [
+          4,
+          0.09
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.3879118263721466,
+      "ownedReductionDb": -0.3879118263721466,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        288
+      ],
+      "ownedFirstNonzero": [
+        288,
+        288
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "f19da24b4603aad535571eb0207f4f592a8c063d1be661c221f55f86a5729551",
+      "ownedPcmSha256": "f19da24b4603aad535571eb0207f4f592a8c063d1be661c221f55f86a5729551",
+      "pass": true
+    },
+    {
+      "id": "effects-extra-limiter",
+      "material": "dynamic",
+      "rate": 48000,
+      "channels": 1,
+      "frames": 60032,
+      "parameters": [
+        [
+          0,
+          -1
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0.002
+        ],
+        [
+          4,
+          0.09
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.38764750957489014,
+      "ownedReductionDb": -0.38764750957489014,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        288
+      ],
+      "ownedFirstNonzero": [
+        288,
+        288
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "4660f0507b1cd227653e39285d4c62bdcc92f5358f19b28b31f1ae2a0a6b82f0",
+      "ownedPcmSha256": "4660f0507b1cd227653e39285d4c62bdcc92f5358f19b28b31f1ae2a0a6b82f0",
+      "pass": true
+    },
+    {
+      "id": "piano-limiter",
+      "material": "impulse",
+      "rate": 48000,
+      "channels": 1,
+      "frames": 60032,
+      "parameters": [
+        [
+          0,
+          -4
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0.002
+        ],
+        [
+          4,
+          0.12
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.3938061594963074,
+      "ownedReductionDb": -0.3938061594963074,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        288
+      ],
+      "ownedFirstNonzero": [
+        288,
+        288
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "5bec30d28e17f19255d9a82852e0d8e6b2c180e9809c31e5f94027d912177988",
+      "ownedPcmSha256": "5bec30d28e17f19255d9a82852e0d8e6b2c180e9809c31e5f94027d912177988",
+      "pass": true
+    },
+    {
+      "id": "piano-limiter",
+      "material": "dynamic",
+      "rate": 48000,
+      "channels": 1,
+      "frames": 60032,
+      "parameters": [
+        [
+          0,
+          -4
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0.002
+        ],
+        [
+          4,
+          0.12
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.43756234645843506,
+      "ownedReductionDb": -0.43756234645843506,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        288
+      ],
+      "ownedFirstNonzero": [
+        288,
+        288
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "79690709e5fe353dc9ecb61a19f82e5baf77ddf120fe79d99f735aefaeeede09",
+      "ownedPcmSha256": "79690709e5fe353dc9ecb61a19f82e5baf77ddf120fe79d99f735aefaeeede09",
+      "pass": true
+    },
+    {
+      "id": "iowa-limiter",
+      "material": "impulse",
+      "rate": 48000,
+      "channels": 1,
+      "frames": 60032,
+      "parameters": [
+        [
+          0,
+          -6
+        ],
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.003
+        ],
+        [
+          4,
+          0.15
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.34711524844169617,
+      "ownedReductionDb": -0.34711524844169617,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        288
+      ],
+      "ownedFirstNonzero": [
+        288,
+        288
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "7b34d811a11dba45e3d75baf0a9cb10c1c519c7a80cd6599b01b308395822dce",
+      "ownedPcmSha256": "7b34d811a11dba45e3d75baf0a9cb10c1c519c7a80cd6599b01b308395822dce",
+      "pass": true
+    },
+    {
+      "id": "iowa-limiter",
+      "material": "dynamic",
+      "rate": 48000,
+      "channels": 1,
+      "frames": 60032,
+      "parameters": [
+        [
+          0,
+          -6
+        ],
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.003
+        ],
+        [
+          4,
+          0.15
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.4892449378967285,
+      "ownedReductionDb": -0.4892449378967285,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        288
+      ],
+      "ownedFirstNonzero": [
+        288,
+        288
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "071ccf68127ddf3577baadf2371cf2cec48dbe7f5ee78794127af162aa007976",
+      "ownedPcmSha256": "071ccf68127ddf3577baadf2371cf2cec48dbe7f5ee78794127af162aa007976",
+      "pass": true
+    },
+    {
+      "id": "parameter-extremes",
+      "material": "impulse",
+      "rate": 48000,
+      "channels": 1,
+      "frames": 60032,
+      "parameters": [
+        [
+          0,
+          -100
+        ],
+        [
+          1,
+          40
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          4,
+          0
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.4563910961151123,
+      "ownedReductionDb": -0.4563910961151123,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        288
+      ],
+      "ownedFirstNonzero": [
+        288,
+        288
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "13c04b5771b5906b418ec6c4848f45f1e27d371e6364e59a2dd325ad683afa92",
+      "ownedPcmSha256": "13c04b5771b5906b418ec6c4848f45f1e27d371e6364e59a2dd325ad683afa92",
+      "pass": true
+    },
+    {
+      "id": "parameter-extremes",
+      "material": "dynamic",
+      "rate": 48000,
+      "channels": 1,
+      "frames": 60032,
+      "parameters": [
+        [
+          0,
+          -100
+        ],
+        [
+          1,
+          40
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          4,
+          0
+        ]
+      ],
+      "maxAbsoluteError": 1.7881393432617188e-7,
+      "relativeRmsError": 7.910122629557796e-11,
+      "nonFinite": 0,
+      "maxDifference": {
+        "frame": 20370,
+        "channel": 0,
+        "actual": -0.9509872198104858,
+        "reference": -0.9509870409965515,
+        "error": 1.7881393432617188e-7
+      },
+      "nativeReductionDb": -28.68758773803711,
+      "ownedReductionDb": -28.68758773803711,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        288
+      ],
+      "ownedFirstNonzero": [
+        288,
+        288
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "c3f20c44787d2fce70207c2d24e775e23b5720fcedc869bc7a3d04ab1145853e",
+      "ownedPcmSha256": "c1be2dcbbd9b2796a9e5d2d094dbbbfce7714e77d93f7c2fc25f5806398f3d8b",
+      "pass": true
+    },
+    {
+      "id": "native-defaults",
+      "material": "impulse",
+      "rate": 48000,
+      "channels": 2,
+      "frames": 60032,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          30
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.003
+        ],
+        [
+          4,
+          0.25
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.3663107752799988,
+      "ownedReductionDb": -0.3663107752799988,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        325
+      ],
+      "ownedFirstNonzero": [
+        288,
+        325
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "ed27a76aae7ba6742ee8fdfed9f0bfe3e864071fa317ec641801f6f3724c4c35",
+      "ownedPcmSha256": "ed27a76aae7ba6742ee8fdfed9f0bfe3e864071fa317ec641801f6f3724c4c35",
+      "pass": true
+    },
+    {
+      "id": "native-defaults",
+      "material": "dynamic",
+      "rate": 48000,
+      "channels": 2,
+      "frames": 60032,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          30
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.003
+        ],
+        [
+          4,
+          0.25
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -1.9545637369155884,
+      "ownedReductionDb": -1.9545637369155884,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        288
+      ],
+      "ownedFirstNonzero": [
+        288,
+        288
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "ac4c14dce16e5ebe65fd461191df326f012ba0ba4f2aa8018dd0a6c251bd88af",
+      "ownedPcmSha256": "ac4c14dce16e5ebe65fd461191df326f012ba0ba4f2aa8018dd0a6c251bd88af",
+      "pass": true
+    },
+    {
+      "id": "original-compressor-wrapper",
+      "material": "impulse",
+      "rate": 48000,
+      "channels": 2,
+      "frames": 60032,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          30
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.005
+        ],
+        [
+          4,
+          0.05
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.2634822726249695,
+      "ownedReductionDb": -0.2634822726249695,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        325
+      ],
+      "ownedFirstNonzero": [
+        288,
+        325
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "0260001e74605a1c9db02cd76dfc5dc6fbe43544b26898569282ae3fb4bf855d",
+      "ownedPcmSha256": "0260001e74605a1c9db02cd76dfc5dc6fbe43544b26898569282ae3fb4bf855d",
+      "pass": true
+    },
+    {
+      "id": "original-compressor-wrapper",
+      "material": "dynamic",
+      "rate": 48000,
+      "channels": 2,
+      "frames": 60032,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          30
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.005
+        ],
+        [
+          4,
+          0.05
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -1.6770710945129395,
+      "ownedReductionDb": -1.6770710945129395,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        288
+      ],
+      "ownedFirstNonzero": [
+        288,
+        288
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "3d552d450001c4e1c53b64020c07eb5c44fc0c90ff21463b6f917c6a944ab0cc",
+      "ownedPcmSha256": "3d552d450001c4e1c53b64020c07eb5c44fc0c90ff21463b6f917c6a944ab0cc",
+      "pass": true
+    },
+    {
+      "id": "effects-rack-default-kernel",
+      "material": "impulse",
+      "rate": 48000,
+      "channels": 2,
+      "frames": 60032,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          12
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          0.005
+        ],
+        [
+          4,
+          0.1
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.27222275733947754,
+      "ownedReductionDb": -0.27222275733947754,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        325
+      ],
+      "ownedFirstNonzero": [
+        288,
+        325
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "6050553232010436243470c21cb7999c5f92c530ab32fbcf1bb7fcd98351f929",
+      "ownedPcmSha256": "6050553232010436243470c21cb7999c5f92c530ab32fbcf1bb7fcd98351f929",
+      "pass": true
+    },
+    {
+      "id": "effects-rack-default-kernel",
+      "material": "dynamic",
+      "rate": 48000,
+      "channels": 2,
+      "frames": 60032,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          12
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          0.005
+        ],
+        [
+          4,
+          0.1
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -5.055058002471924,
+      "ownedReductionDb": -5.055058002471924,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        288
+      ],
+      "ownedFirstNonzero": [
+        288,
+        288
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "12bc0f2c9ceae51e78d8e56672a6804c5f135ce8e11a37b5b9271978b2bf98c9",
+      "ownedPcmSha256": "12bc0f2c9ceae51e78d8e56672a6804c5f135ce8e11a37b5b9271978b2bf98c9",
+      "pass": true
+    },
+    {
+      "id": "voice-kernel-static",
+      "material": "impulse",
+      "rate": 48000,
+      "channels": 2,
+      "frames": 60032,
+      "parameters": [
+        [
+          0,
+          -27
+        ],
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          0.01
+        ],
+        [
+          4,
+          0.1
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.19698381423950195,
+      "ownedReductionDb": -0.19698381423950195,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        325
+      ],
+      "ownedFirstNonzero": [
+        288,
+        325
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "002223effa267ebd9b527af817b509faeb5fdc56456078bb05961c9271f435d7",
+      "ownedPcmSha256": "002223effa267ebd9b527af817b509faeb5fdc56456078bb05961c9271f435d7",
+      "pass": true
+    },
+    {
+      "id": "voice-kernel-static",
+      "material": "dynamic",
+      "rate": 48000,
+      "channels": 2,
+      "frames": 60032,
+      "parameters": [
+        [
+          0,
+          -27
+        ],
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          0.01
+        ],
+        [
+          4,
+          0.1
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -7.278059482574463,
+      "ownedReductionDb": -7.278059482574463,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        288
+      ],
+      "ownedFirstNonzero": [
+        288,
+        288
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "b879d7163b052af94e52b484d2fff12418eb36f8cfa0d6b611db6f86e4c857ae",
+      "ownedPcmSha256": "b879d7163b052af94e52b484d2fff12418eb36f8cfa0d6b611db6f86e4c857ae",
+      "pass": true
+    },
+    {
+      "id": "effects-extra-limiter",
+      "material": "impulse",
+      "rate": 48000,
+      "channels": 2,
+      "frames": 60032,
+      "parameters": [
+        [
+          0,
+          -1
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0.002
+        ],
+        [
+          4,
+          0.09
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.3879118263721466,
+      "ownedReductionDb": -0.3879118263721466,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        325
+      ],
+      "ownedFirstNonzero": [
+        288,
+        325
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "feb9a6b686cb51d09db499dcd2504a56089bafcc71170c1b5446c6bf716b71d9",
+      "ownedPcmSha256": "feb9a6b686cb51d09db499dcd2504a56089bafcc71170c1b5446c6bf716b71d9",
+      "pass": true
+    },
+    {
+      "id": "effects-extra-limiter",
+      "material": "dynamic",
+      "rate": 48000,
+      "channels": 2,
+      "frames": 60032,
+      "parameters": [
+        [
+          0,
+          -1
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0.002
+        ],
+        [
+          4,
+          0.09
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.38764750957489014,
+      "ownedReductionDb": -0.38764750957489014,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        288
+      ],
+      "ownedFirstNonzero": [
+        288,
+        288
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "73fba848acd7c6d753a941f18ed184643caede6dd72a49c2ac8c3e4accacef79",
+      "ownedPcmSha256": "73fba848acd7c6d753a941f18ed184643caede6dd72a49c2ac8c3e4accacef79",
+      "pass": true
+    },
+    {
+      "id": "piano-limiter",
+      "material": "impulse",
+      "rate": 48000,
+      "channels": 2,
+      "frames": 60032,
+      "parameters": [
+        [
+          0,
+          -4
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0.002
+        ],
+        [
+          4,
+          0.12
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.3938061594963074,
+      "ownedReductionDb": -0.3938061594963074,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        325
+      ],
+      "ownedFirstNonzero": [
+        288,
+        325
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "c06957f39fa0b5f68701b9e513aa7dd535d0867be786001120d30c405ee87186",
+      "ownedPcmSha256": "c06957f39fa0b5f68701b9e513aa7dd535d0867be786001120d30c405ee87186",
+      "pass": true
+    },
+    {
+      "id": "piano-limiter",
+      "material": "dynamic",
+      "rate": 48000,
+      "channels": 2,
+      "frames": 60032,
+      "parameters": [
+        [
+          0,
+          -4
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0.002
+        ],
+        [
+          4,
+          0.12
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.43985721468925476,
+      "ownedReductionDb": -0.43985721468925476,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        288
+      ],
+      "ownedFirstNonzero": [
+        288,
+        288
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "7745b54f6ef6996245d61b1dc0434e8e88f7143eb2df7a50b8b5758d8b83e478",
+      "ownedPcmSha256": "7745b54f6ef6996245d61b1dc0434e8e88f7143eb2df7a50b8b5758d8b83e478",
+      "pass": true
+    },
+    {
+      "id": "iowa-limiter",
+      "material": "impulse",
+      "rate": 48000,
+      "channels": 2,
+      "frames": 60032,
+      "parameters": [
+        [
+          0,
+          -6
+        ],
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.003
+        ],
+        [
+          4,
+          0.15
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.34717950224876404,
+      "ownedReductionDb": -0.34717950224876404,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        325
+      ],
+      "ownedFirstNonzero": [
+        288,
+        325
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "490a2a05bc23770c4b10632babe7ec6b901bf39fb38f816bb33d2473149d48b7",
+      "ownedPcmSha256": "490a2a05bc23770c4b10632babe7ec6b901bf39fb38f816bb33d2473149d48b7",
+      "pass": true
+    },
+    {
+      "id": "iowa-limiter",
+      "material": "dynamic",
+      "rate": 48000,
+      "channels": 2,
+      "frames": 60032,
+      "parameters": [
+        [
+          0,
+          -6
+        ],
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.003
+        ],
+        [
+          4,
+          0.15
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.4972163438796997,
+      "ownedReductionDb": -0.4972163438796997,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        288
+      ],
+      "ownedFirstNonzero": [
+        288,
+        288
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "60510127b17961853646abdf8247203c292578421f7d3ffec613eef14176775a",
+      "ownedPcmSha256": "60510127b17961853646abdf8247203c292578421f7d3ffec613eef14176775a",
+      "pass": true
+    },
+    {
+      "id": "parameter-extremes",
+      "material": "impulse",
+      "rate": 48000,
+      "channels": 2,
+      "frames": 60032,
+      "parameters": [
+        [
+          0,
+          -100
+        ],
+        [
+          1,
+          40
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          4,
+          0
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.5571826100349426,
+      "ownedReductionDb": -0.5571826100349426,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        325
+      ],
+      "ownedFirstNonzero": [
+        288,
+        325
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "df13f17d5a7927f532e0d72cf9a0784ef985469c11d58469cca141e92569b454",
+      "ownedPcmSha256": "df13f17d5a7927f532e0d72cf9a0784ef985469c11d58469cca141e92569b454",
+      "pass": true
+    },
+    {
+      "id": "parameter-extremes",
+      "material": "dynamic",
+      "rate": 48000,
+      "channels": 2,
+      "frames": 60032,
+      "parameters": [
+        [
+          0,
+          -100
+        ],
+        [
+          1,
+          40
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          4,
+          0
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -30.120290756225586,
+      "ownedReductionDb": -30.120290756225586,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        288
+      ],
+      "ownedFirstNonzero": [
+        288,
+        288
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "08dd0830f752deca379ac9681a6eba65fadc0093379b37c53cb2113878a34bbe",
+      "ownedPcmSha256": "08dd0830f752deca379ac9681a6eba65fadc0093379b37c53cb2113878a34bbe",
+      "pass": true
+    },
+    {
+      "id": "native-defaults",
+      "material": "impulse",
+      "rate": 96000,
+      "channels": 1,
+      "frames": 120064,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          30
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.003
+        ],
+        [
+          4,
+          0.25
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.37618201971054077,
+      "ownedReductionDb": -0.37618201971054077,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        576
+      ],
+      "ownedFirstNonzero": [
+        576,
+        576
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "82e1c8c345c26e141b16d7e0504ed1ade5b483520cc71704e9f1cfdb130ef5ac",
+      "ownedPcmSha256": "82e1c8c345c26e141b16d7e0504ed1ade5b483520cc71704e9f1cfdb130ef5ac",
+      "pass": true
+    },
+    {
+      "id": "native-defaults",
+      "material": "dynamic",
+      "rate": 96000,
+      "channels": 1,
+      "frames": 120064,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          30
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.003
+        ],
+        [
+          4,
+          0.25
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -1.9329757690429688,
+      "ownedReductionDb": -1.9329757690429688,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        576
+      ],
+      "ownedFirstNonzero": [
+        576,
+        576
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "1a46665b9eb58b6944bb3340ee57a46ad448d3e023747e3bced47f1267c269e4",
+      "ownedPcmSha256": "1a46665b9eb58b6944bb3340ee57a46ad448d3e023747e3bced47f1267c269e4",
+      "pass": true
+    },
+    {
+      "id": "original-compressor-wrapper",
+      "material": "impulse",
+      "rate": 96000,
+      "channels": 1,
+      "frames": 120064,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          30
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.005
+        ],
+        [
+          4,
+          0.05
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.27351707220077515,
+      "ownedReductionDb": -0.27351707220077515,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        576
+      ],
+      "ownedFirstNonzero": [
+        576,
+        576
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "bafdd699f5546a25d52b8870c1eefa1e17098cf6a85f085e6cc78aa7d80cd52b",
+      "ownedPcmSha256": "bafdd699f5546a25d52b8870c1eefa1e17098cf6a85f085e6cc78aa7d80cd52b",
+      "pass": true
+    },
+    {
+      "id": "original-compressor-wrapper",
+      "material": "dynamic",
+      "rate": 96000,
+      "channels": 1,
+      "frames": 120064,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          30
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.005
+        ],
+        [
+          4,
+          0.05
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -1.648554801940918,
+      "ownedReductionDb": -1.648554801940918,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        576
+      ],
+      "ownedFirstNonzero": [
+        576,
+        576
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "476900883962a8c5bf6315470797c1efdd7459abe05a18c96108f2d2c10b3416",
+      "ownedPcmSha256": "476900883962a8c5bf6315470797c1efdd7459abe05a18c96108f2d2c10b3416",
+      "pass": true
+    },
+    {
+      "id": "effects-rack-default-kernel",
+      "material": "impulse",
+      "rate": 96000,
+      "channels": 1,
+      "frames": 120064,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          12
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          0.005
+        ],
+        [
+          4,
+          0.1
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.2826072573661804,
+      "ownedReductionDb": -0.2826072573661804,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        576
+      ],
+      "ownedFirstNonzero": [
+        576,
+        576
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "3f4ce248c024f2a6b2748bd705a01bb6ccc86050b336377b34c4f7beaa828548",
+      "ownedPcmSha256": "3f4ce248c024f2a6b2748bd705a01bb6ccc86050b336377b34c4f7beaa828548",
+      "pass": true
+    },
+    {
+      "id": "effects-rack-default-kernel",
+      "material": "dynamic",
+      "rate": 96000,
+      "channels": 1,
+      "frames": 120064,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          12
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          0.005
+        ],
+        [
+          4,
+          0.1
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -5.008082866668701,
+      "ownedReductionDb": -5.008082866668701,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        576
+      ],
+      "ownedFirstNonzero": [
+        576,
+        576
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "62e3aeb898fbee5ce0072c3f5f8337ea9846892059d64088f221f5608ac568d8",
+      "ownedPcmSha256": "62e3aeb898fbee5ce0072c3f5f8337ea9846892059d64088f221f5608ac568d8",
+      "pass": true
+    },
+    {
+      "id": "voice-kernel-static",
+      "material": "impulse",
+      "rate": 96000,
+      "channels": 1,
+      "frames": 120064,
+      "parameters": [
+        [
+          0,
+          -27
+        ],
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          0.01
+        ],
+        [
+          4,
+          0.1
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.20390334725379944,
+      "ownedReductionDb": -0.20390334725379944,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        576
+      ],
+      "ownedFirstNonzero": [
+        576,
+        576
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "f25fa2db1e13cdf798029e28b059abb28151123cceaf2327191b04560a50d87c",
+      "ownedPcmSha256": "f25fa2db1e13cdf798029e28b059abb28151123cceaf2327191b04560a50d87c",
+      "pass": true
+    },
+    {
+      "id": "voice-kernel-static",
+      "material": "dynamic",
+      "rate": 96000,
+      "channels": 1,
+      "frames": 120064,
+      "parameters": [
+        [
+          0,
+          -27
+        ],
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          0.01
+        ],
+        [
+          4,
+          0.1
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -7.155951499938965,
+      "ownedReductionDb": -7.155951499938965,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        576
+      ],
+      "ownedFirstNonzero": [
+        576,
+        576
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "af728e4665c24a922144e5ffb1e0b207d9253f8d9d5cce4751561b9202c25a1b",
+      "ownedPcmSha256": "af728e4665c24a922144e5ffb1e0b207d9253f8d9d5cce4751561b9202c25a1b",
+      "pass": true
+    },
+    {
+      "id": "effects-extra-limiter",
+      "material": "impulse",
+      "rate": 96000,
+      "channels": 1,
+      "frames": 120064,
+      "parameters": [
+        [
+          0,
+          -1
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0.002
+        ],
+        [
+          4,
+          0.09
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.3942452073097229,
+      "ownedReductionDb": -0.3942452073097229,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        576
+      ],
+      "ownedFirstNonzero": [
+        576,
+        576
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "e4ebb0eb60c36d9ff0653d14f302d7a99a753def86dbd2cc3da61b31166cefe7",
+      "ownedPcmSha256": "e4ebb0eb60c36d9ff0653d14f302d7a99a753def86dbd2cc3da61b31166cefe7",
+      "pass": true
+    },
+    {
+      "id": "effects-extra-limiter",
+      "material": "dynamic",
+      "rate": 96000,
+      "channels": 1,
+      "frames": 120064,
+      "parameters": [
+        [
+          0,
+          -1
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0.002
+        ],
+        [
+          4,
+          0.09
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.3941120505332947,
+      "ownedReductionDb": -0.3941120505332947,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        576
+      ],
+      "ownedFirstNonzero": [
+        576,
+        576
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "7c1d39914b4e02224b89c51dc7f2a3533f57d80667e3deaa0886b8ca0df0539e",
+      "ownedPcmSha256": "7c1d39914b4e02224b89c51dc7f2a3533f57d80667e3deaa0886b8ca0df0539e",
+      "pass": true
+    },
+    {
+      "id": "piano-limiter",
+      "material": "impulse",
+      "rate": 96000,
+      "channels": 1,
+      "frames": 120064,
+      "parameters": [
+        [
+          0,
+          -4
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0.002
+        ],
+        [
+          4,
+          0.12
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.40052926540374756,
+      "ownedReductionDb": -0.40052926540374756,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        576
+      ],
+      "ownedFirstNonzero": [
+        576,
+        576
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "90e0932b904af2e780f6ac1f9911b46ab5cb1a8935b1937357fd2816cd4379d8",
+      "ownedPcmSha256": "90e0932b904af2e780f6ac1f9911b46ab5cb1a8935b1937357fd2816cd4379d8",
+      "pass": true
+    },
+    {
+      "id": "piano-limiter",
+      "material": "dynamic",
+      "rate": 96000,
+      "channels": 1,
+      "frames": 120064,
+      "parameters": [
+        [
+          0,
+          -4
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0.002
+        ],
+        [
+          4,
+          0.12
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.44618692994117737,
+      "ownedReductionDb": -0.44618692994117737,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        576
+      ],
+      "ownedFirstNonzero": [
+        576,
+        576
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "b63382829730869024be2e5c0f6e507bec7e1ee420f6a1d281d2067ddb444992",
+      "ownedPcmSha256": "b63382829730869024be2e5c0f6e507bec7e1ee420f6a1d281d2067ddb444992",
+      "pass": true
+    },
+    {
+      "id": "iowa-limiter",
+      "material": "impulse",
+      "rate": 96000,
+      "channels": 1,
+      "frames": 120064,
+      "parameters": [
+        [
+          0,
+          -6
+        ],
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.003
+        ],
+        [
+          4,
+          0.15
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.3558274209499359,
+      "ownedReductionDb": -0.3558274209499359,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        576
+      ],
+      "ownedFirstNonzero": [
+        576,
+        576
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "34eddaeb380fa2e0ede9ff23e847d73081e373adcff88c8d4cb8a2dbdf6d8ccf",
+      "ownedPcmSha256": "34eddaeb380fa2e0ede9ff23e847d73081e373adcff88c8d4cb8a2dbdf6d8ccf",
+      "pass": true
+    },
+    {
+      "id": "iowa-limiter",
+      "material": "dynamic",
+      "rate": 96000,
+      "channels": 1,
+      "frames": 120064,
+      "parameters": [
+        [
+          0,
+          -6
+        ],
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.003
+        ],
+        [
+          4,
+          0.15
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.5057153105735779,
+      "ownedReductionDb": -0.5057153105735779,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        576
+      ],
+      "ownedFirstNonzero": [
+        576,
+        576
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "414616b5af1a19d94570090666597e2a795b5313a12c1079c228a1b032626b55",
+      "ownedPcmSha256": "414616b5af1a19d94570090666597e2a795b5313a12c1079c228a1b032626b55",
+      "pass": true
+    },
+    {
+      "id": "parameter-extremes",
+      "material": "impulse",
+      "rate": 96000,
+      "channels": 1,
+      "frames": 120064,
+      "parameters": [
+        [
+          0,
+          -100
+        ],
+        [
+          1,
+          40
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          4,
+          0
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.45578938722610474,
+      "ownedReductionDb": -0.45578938722610474,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        576
+      ],
+      "ownedFirstNonzero": [
+        576,
+        576
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "ed0ab74169c71136e35edecf557931c895a0c3f49da3668f4e8e27bcbc90c097",
+      "ownedPcmSha256": "ed0ab74169c71136e35edecf557931c895a0c3f49da3668f4e8e27bcbc90c097",
+      "pass": true
+    },
+    {
+      "id": "parameter-extremes",
+      "material": "dynamic",
+      "rate": 96000,
+      "channels": 1,
+      "frames": 120064,
+      "parameters": [
+        [
+          0,
+          -100
+        ],
+        [
+          1,
+          40
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          4,
+          0
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -29.70514488220215,
+      "ownedReductionDb": -29.70514488220215,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        576
+      ],
+      "ownedFirstNonzero": [
+        576,
+        576
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "f163728d129f08028bec41d58265c828e15ad7ce416d9ac0160ea4deb8efca8e",
+      "ownedPcmSha256": "f163728d129f08028bec41d58265c828e15ad7ce416d9ac0160ea4deb8efca8e",
+      "pass": true
+    },
+    {
+      "id": "native-defaults",
+      "material": "impulse",
+      "rate": 96000,
+      "channels": 2,
+      "frames": 120064,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          30
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.003
+        ],
+        [
+          4,
+          0.25
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.37603074312210083,
+      "ownedReductionDb": -0.37603074312210083,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        613
+      ],
+      "ownedFirstNonzero": [
+        576,
+        613
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "b5665242614d51e1c7b8426272620a87e6c222084b50f17c68466304dd678ec2",
+      "ownedPcmSha256": "b5665242614d51e1c7b8426272620a87e6c222084b50f17c68466304dd678ec2",
+      "pass": true
+    },
+    {
+      "id": "native-defaults",
+      "material": "dynamic",
+      "rate": 96000,
+      "channels": 2,
+      "frames": 120064,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          30
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.003
+        ],
+        [
+          4,
+          0.25
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -1.9701241254806519,
+      "ownedReductionDb": -1.9701241254806519,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        576
+      ],
+      "ownedFirstNonzero": [
+        576,
+        576
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "2103249e9dc45c1ee96eb3277396439913c45bbd462deaadd31d704991aa261c",
+      "ownedPcmSha256": "2103249e9dc45c1ee96eb3277396439913c45bbd462deaadd31d704991aa261c",
+      "pass": true
+    },
+    {
+      "id": "original-compressor-wrapper",
+      "material": "impulse",
+      "rate": 96000,
+      "channels": 2,
+      "frames": 120064,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          30
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.005
+        ],
+        [
+          4,
+          0.05
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.27342748641967773,
+      "ownedReductionDb": -0.27342748641967773,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        613
+      ],
+      "ownedFirstNonzero": [
+        576,
+        613
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "4ba8fa4148e991dd05dc87338d21769304ab5823cd11ef239e92240f9efdd012",
+      "ownedPcmSha256": "4ba8fa4148e991dd05dc87338d21769304ab5823cd11ef239e92240f9efdd012",
+      "pass": true
+    },
+    {
+      "id": "original-compressor-wrapper",
+      "material": "dynamic",
+      "rate": 96000,
+      "channels": 2,
+      "frames": 120064,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          30
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.005
+        ],
+        [
+          4,
+          0.05
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -1.6972086429595947,
+      "ownedReductionDb": -1.6972086429595947,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        576
+      ],
+      "ownedFirstNonzero": [
+        576,
+        576
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "2c76ce2d0f253714a1657a2e332679574545b39a0b174a8a6f37628aba2957d2",
+      "ownedPcmSha256": "2c76ce2d0f253714a1657a2e332679574545b39a0b174a8a6f37628aba2957d2",
+      "pass": true
+    },
+    {
+      "id": "effects-rack-default-kernel",
+      "material": "impulse",
+      "rate": 96000,
+      "channels": 2,
+      "frames": 120064,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          12
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          0.005
+        ],
+        [
+          4,
+          0.1
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.28235411643981934,
+      "ownedReductionDb": -0.28235411643981934,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        613
+      ],
+      "ownedFirstNonzero": [
+        576,
+        613
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "7b2ad47b5c8fde76143dabfb577431b24b36055e8517e6770c7051ffd25ddbcf",
+      "ownedPcmSha256": "7b2ad47b5c8fde76143dabfb577431b24b36055e8517e6770c7051ffd25ddbcf",
+      "pass": true
+    },
+    {
+      "id": "effects-rack-default-kernel",
+      "material": "dynamic",
+      "rate": 96000,
+      "channels": 2,
+      "frames": 120064,
+      "parameters": [
+        [
+          0,
+          -24
+        ],
+        [
+          1,
+          12
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          0.005
+        ],
+        [
+          4,
+          0.1
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -5.105892658233643,
+      "ownedReductionDb": -5.105892658233643,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        576
+      ],
+      "ownedFirstNonzero": [
+        576,
+        576
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "d8c22512696762e609b1dc41ba2275c6ef77bdf8cf6f33d0d98b05acf6e6d5d5",
+      "ownedPcmSha256": "d8c22512696762e609b1dc41ba2275c6ef77bdf8cf6f33d0d98b05acf6e6d5d5",
+      "pass": true
+    },
+    {
+      "id": "voice-kernel-static",
+      "material": "impulse",
+      "rate": 96000,
+      "channels": 2,
+      "frames": 120064,
+      "parameters": [
+        [
+          0,
+          -27
+        ],
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          0.01
+        ],
+        [
+          4,
+          0.1
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.20386476814746857,
+      "ownedReductionDb": -0.20386476814746857,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        613
+      ],
+      "ownedFirstNonzero": [
+        576,
+        613
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "bd323957441381fc34ff40325aca43b20a491d41f6ec0611fae4d30376a6d338",
+      "ownedPcmSha256": "bd323957441381fc34ff40325aca43b20a491d41f6ec0611fae4d30376a6d338",
+      "pass": true
+    },
+    {
+      "id": "voice-kernel-static",
+      "material": "dynamic",
+      "rate": 96000,
+      "channels": 2,
+      "frames": 120064,
+      "parameters": [
+        [
+          0,
+          -27
+        ],
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          4
+        ],
+        [
+          3,
+          0.01
+        ],
+        [
+          4,
+          0.1
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -7.30889892578125,
+      "ownedReductionDb": -7.30889892578125,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        576
+      ],
+      "ownedFirstNonzero": [
+        576,
+        576
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "555da2aa575a9c51dc0d40e54fa3cb763c8f42f42a9d5b8c75c9d36da3c9949a",
+      "ownedPcmSha256": "555da2aa575a9c51dc0d40e54fa3cb763c8f42f42a9d5b8c75c9d36da3c9949a",
+      "pass": true
+    },
+    {
+      "id": "effects-extra-limiter",
+      "material": "impulse",
+      "rate": 96000,
+      "channels": 2,
+      "frames": 120064,
+      "parameters": [
+        [
+          0,
+          -1
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0.002
+        ],
+        [
+          4,
+          0.09
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.3942452073097229,
+      "ownedReductionDb": -0.3942452073097229,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        613
+      ],
+      "ownedFirstNonzero": [
+        576,
+        613
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "af4c33f436b6ba8c13e2fc5034ec4da5a2a55f68627e5a3cfbb145b6ec39af39",
+      "ownedPcmSha256": "af4c33f436b6ba8c13e2fc5034ec4da5a2a55f68627e5a3cfbb145b6ec39af39",
+      "pass": true
+    },
+    {
+      "id": "effects-extra-limiter",
+      "material": "dynamic",
+      "rate": 96000,
+      "channels": 2,
+      "frames": 120064,
+      "parameters": [
+        [
+          0,
+          -1
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0.002
+        ],
+        [
+          4,
+          0.09
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.3941120505332947,
+      "ownedReductionDb": -0.3941120505332947,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        576
+      ],
+      "ownedFirstNonzero": [
+        576,
+        576
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "aed547724a631f9654baeaa8478f909af798d60ebee1481adfdad95bfc920da3",
+      "ownedPcmSha256": "aed547724a631f9654baeaa8478f909af798d60ebee1481adfdad95bfc920da3",
+      "pass": true
+    },
+    {
+      "id": "piano-limiter",
+      "material": "impulse",
+      "rate": 96000,
+      "channels": 2,
+      "frames": 120064,
+      "parameters": [
+        [
+          0,
+          -4
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0.002
+        ],
+        [
+          4,
+          0.12
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.40052926540374756,
+      "ownedReductionDb": -0.40052926540374756,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        613
+      ],
+      "ownedFirstNonzero": [
+        576,
+        613
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "7e9e3b2400b6fb793d1670dc651beb3351dc523e91dac7e0111ab473e8d4ece5",
+      "ownedPcmSha256": "7e9e3b2400b6fb793d1670dc651beb3351dc523e91dac7e0111ab473e8d4ece5",
+      "pass": true
+    },
+    {
+      "id": "piano-limiter",
+      "material": "dynamic",
+      "rate": 96000,
+      "channels": 2,
+      "frames": 120064,
+      "parameters": [
+        [
+          0,
+          -4
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0.002
+        ],
+        [
+          4,
+          0.12
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.44751378893852234,
+      "ownedReductionDb": -0.44751378893852234,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        576
+      ],
+      "ownedFirstNonzero": [
+        576,
+        576
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "dc7745f4e7eb45d8eecc3b64ae9fbf215f2a3508e52777a0a66f692b38abf431",
+      "ownedPcmSha256": "dc7745f4e7eb45d8eecc3b64ae9fbf215f2a3508e52777a0a66f692b38abf431",
+      "pass": true
+    },
+    {
+      "id": "iowa-limiter",
+      "material": "impulse",
+      "rate": 96000,
+      "channels": 2,
+      "frames": 120064,
+      "parameters": [
+        [
+          0,
+          -6
+        ],
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.003
+        ],
+        [
+          4,
+          0.15
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.35586220026016235,
+      "ownedReductionDb": -0.35586220026016235,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        613
+      ],
+      "ownedFirstNonzero": [
+        576,
+        613
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "bc1f5a1d29894458506ce94df9c5b886dc55b3f89875653e90c3b98af8e15854",
+      "ownedPcmSha256": "bc1f5a1d29894458506ce94df9c5b886dc55b3f89875653e90c3b98af8e15854",
+      "pass": true
+    },
+    {
+      "id": "iowa-limiter",
+      "material": "dynamic",
+      "rate": 96000,
+      "channels": 2,
+      "frames": 120064,
+      "parameters": [
+        [
+          0,
+          -6
+        ],
+        [
+          1,
+          6
+        ],
+        [
+          2,
+          12
+        ],
+        [
+          3,
+          0.003
+        ],
+        [
+          4,
+          0.15
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.5117838382720947,
+      "ownedReductionDb": -0.5117838382720947,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        576
+      ],
+      "ownedFirstNonzero": [
+        576,
+        576
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "2008022ee40571ed2c857bcde867b459233273ebbcda791c880a02d99a873fb3",
+      "ownedPcmSha256": "2008022ee40571ed2c857bcde867b459233273ebbcda791c880a02d99a873fb3",
+      "pass": true
+    },
+    {
+      "id": "parameter-extremes",
+      "material": "impulse",
+      "rate": 96000,
+      "channels": 2,
+      "frames": 120064,
+      "parameters": [
+        [
+          0,
+          -100
+        ],
+        [
+          1,
+          40
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          4,
+          0
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -0.5378223061561584,
+      "ownedReductionDb": -0.5378223061561584,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        613
+      ],
+      "ownedFirstNonzero": [
+        576,
+        613
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "4fd8bec5ef1a9ddc64ee36704647ec473e3fc96d18e6fba261e650327f0a0723",
+      "ownedPcmSha256": "4fd8bec5ef1a9ddc64ee36704647ec473e3fc96d18e6fba261e650327f0a0723",
+      "pass": true
+    },
+    {
+      "id": "parameter-extremes",
+      "material": "dynamic",
+      "rate": 96000,
+      "channels": 2,
+      "frames": 120064,
+      "parameters": [
+        [
+          0,
+          -100
+        ],
+        [
+          1,
+          40
+        ],
+        [
+          2,
+          20
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          4,
+          0
+        ]
+      ],
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "nativeReductionDb": -30.096677780151367,
+      "ownedReductionDb": -30.096677780151367,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        576
+      ],
+      "ownedFirstNonzero": [
+        576,
+        576
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "aca1855f5cb82b3a2b3c3f26cf05382d1b06a7c56c2f6aa7a71552ea83c63c4c",
+      "ownedPcmSha256": "aca1855f5cb82b3a2b3c3f26cf05382d1b06a7c56c2f6aa7a71552ea83c63c4c",
+      "pass": true
+    }
+  ]
+}

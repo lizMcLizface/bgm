@@ -1,5 +1,14 @@
 # Modular audio engine and parallel rendering plan
 
+Overnight application checkpoint (11 November, ~02:50): an immutable opt-in
+[owned desk in the actual All host](MODULAR_AUDIO_ENGINE_ALL_DESK_BACKEND.md)
+passes native/owned/saved-reconstruction full-path desktop checks. The normal
+page still opens with its existing native default. [Native DynamicsCompressor](MODULAR_AUDIO_ENGINE_NATIVE_COMPRESSOR.md)
+passes96 fixed native PCM/meter/latency cases; captured target automation is
+still separate. [Measured-string preparation](MODULAR_AUDIO_ENGINE_MEASURED_STRING_PREPARATION.md)
+passes all four original table families and six rates; source/convolver adoption
+remains separate. The matching focused regression has155 tests.
+
 Overnight integration checkpoint: [full Tape Graph27](MODULAR_AUDIO_ENGINE_TAPE_GRAPH.md)
 passes actual six-rate AudioWorklet/direct equality, workers and saved reload;
 fixed PDC rejects its intentional moving wet delay. [Owned streaming weather](MODULAR_AUDIO_ENGINE_OWNED_WEATHER.md)

@@ -1,0 +1,49 @@
+import {createHost,SEQUENCERS} from '../synths/all/host';
+import {BROWSABLE_SCENES} from '../app/scenes';
+import {cleanDesk} from '../synths/all/mixerAudio';
+import {defaultBus} from '../app/engine/bus';
+import {masterBus} from '../audio/bus';
+import {audioContext} from '../audio/context';
+const roles=SEQUENCERS.map(s=>s.role),ensure=(v,message)=>{if(!v)throw Error(message);};
+const selections=[['lead','poly','Soft Pad'],['counter','fm','FM Rhodes'],['rhythm','piano','House Piano'],['pad','piano','Ravel'],['bass','poly','Soft Pad'],['perc','kit','hand']];
+const base=()=>({...BROWSABLE_SCENES[0],voices:{},layerVoices:{},percussion:null}),initialDesk=()=>{const s=cleanDesk({},[...roles,'headroom','ambience']);s.strips.lead.pan=.35;s.strips.bass.pan=.65;return s;};
+const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+async function prepare(backend,saved,progress){
+ const h=createHost(base(),{seed:109,deskBackend:backend});try{await h.wake();if(saved){await h.restoreSounds(saved.sounds);await h.restoreMixer(saved.mixer);}else for(const [role,synth,name]of selections){progress(`${backend}: preparing ${role} · ${name}`);await h.setSound(role,{synth,name});}
+  // Explicit fixture levels affect only this isolated host, never All storage.
+  for(const r of Object.values(h.g.roles)){r.volume=.4;r.mute=false;r.solo=false;}h.g.applyMix();
+  const desk=saved?.desk??initialDesk();h.applyDesk(desk);const pending=h.setupMixer();ensure(h.setupMixer()===pending,'Repeated setup did not share the pending transaction');await pending;await h.awaitDeskState();
+  for(const role of roles)await h.editMixer(role,{'effects.reverb':.1,'effects.delay':.06,'effects.delayMs':90,'master.output':-3});
+  // Exercise both real asynchronous return paths after desk installation.
+  h.g.settings.bus={...defaultBus(),sends:Object.fromEntries(roles.map(role=>[role,.12]))};h.g.applyBus();h.g.applySpace(.15,h.context.currentTime,1);await Promise.all([h.g.busLoading,h.g.spaceLoading]);ensure(h.g.busRack&&h.g.spaceRack,'Actual shared racks failed to prepare');
+  for(const role of roles)ensure(h.g.roles[role].sendSource===h.g.roles[role].mixOutput&&h.g.roles[role].spaceSendSource===h.g.roles[role].mixOutput,'Shared sends missed the installed channel output');
+  h.g.applySweep({'filter.lowpass':12000,'filter.highpass':25,'filter.resonance':Math.SQRT1_2},.5);h.g.levelTrim.gain.setTargetAtTime(.9,h.context.currentTime,.3);
+  h.g.ambience.setLevels({rain:.12,thunder:0,wind:0,waves:0,fire:0,vinyl:0});await h.g.startAmbience();
+  await wait(80);return {h,desk};
+ }catch(error){h.dispose();throw error;}
+}
+async function exercise(h,initial,{cancelled,progress}){
+ const context=h.context,meters=h.openMeters(),lease=h.openSourceStem('lead'),splitter=context.createChannelSplitter(2),musicSplitter=context.createChannelSplitter(2),analysers=Array.from({length:4},()=>context.createAnalyser()),data=analysers.map(a=>{a.fftSize=2048;return new Float32Array(2048);}),peaks=[0,0],musicPeaks=[0,0],minimumMusicPeak=1e-5,levels={},changes=[];masterBus.connect(splitter);h.g.levelTrim.connect(musicSplitter);for(let c=0;c<2;c++){splitter.connect(analysers[c],c);musicSplitter.connect(analysers[2+c],c);}
+ let state=structuredClone(initial),saved;
+ try{
+  const start=context.currentTime+.1,finish=start+2.35,midi={lead:72,counter:64,rhythm:60,pad:55,bass:36};for(const [index,role]of roles.entries())if(role!=='perc'){h.note(role,midi[role],start+index*.035,1.8,.4);h.note(role,midi[role]+(role==='bass'?0:3),start+1.65,.5,.3);}else for(let i=0;i<8;i++)h.drum({drum:i%2,velocity:.35,duration:1,vary:0},start+i*.25,.125);
+  let edit=0,observations=0;const deadline=Date.now()+15000;while(context.currentTime<finish&&!cancelled()){
+   ensure(Date.now()<deadline,'Actual host clock stopped advancing');await wait(20);const elapsed=context.currentTime-start;
+   if(edit===0&&elapsed>=.55){state={...state,master:{...state.master,dim:true}};progress(`${h.deskStatus().backend}: dim and live desk acknowledgement`);h.applyDesk(state);await h.awaitDeskState();changes.push({kind:'dim',contextFrame:Math.round(context.currentTime*context.sampleRate)});edit++;}
+   if(edit===1&&elapsed>=.95){state=structuredClone(state);state.master.dim=false;state.strips.bass.solo=true;h.applyDesk(state);await h.awaitDeskState();changes.push({kind:'bass-solo',contextFrame:Math.round(context.currentTime*context.sampleRate)});edit++;}
+   if(edit===2&&elapsed>=1.3){state=structuredClone(state);state.strips.bass.solo=false;state.strips.lead.mute=true;h.applyDesk(state);await h.awaitDeskState();changes.push({kind:'lead-mute',contextFrame:Math.round(context.currentTime*context.sampleRate)});edit++;}
+   if(edit===3&&elapsed>=1.55){state=structuredClone(initial);h.applyDesk(state);await h.awaitDeskState();changes.push({kind:'restore',contextFrame:Math.round(context.currentTime*context.sampleRate)});edit++;}
+   for(const [id,value]of Object.entries(meters.read())){ensure(Number.isFinite(value),'Non-finite actual host meter');levels[id]=Math.max(levels[id]??0,value);}for(let c=0;c<4;c++){analysers[c].getFloatTimeDomainData(data[c]);const target=c<2?peaks:musicPeaks,index=c%2;for(const value of data[c]){ensure(Number.isFinite(value),'Non-finite routed music/master PCM');target[index]=Math.max(target[index],Math.abs(value));}}lease.assertCurrent();observations++;
+  }
+  ensure(!cancelled(),'Stopped');ensure(musicPeaks.every(p=>p>=minimumMusicPeak),'Music after Generator sweep/trim is missing or below the declared1e-5 peak floor');ensure(edit===4&&peaks.every(p=>p>0)&&roles.every(role=>levels[role]>0)&&levels.ambience>0&&levels.headroom>0,'Actual full path is missing source/channel/ambience/master output');ensure(h.deskStatus().ready,'Actual desk reports a control failure');saved={version:1,sounds:h.snapshotSounds(),mixer:h.mixerSnapshot(),desk:state};
+  return {saved,result:{backend:h.deskStatus().backend,sampleRate:context.sampleRate,desk:h.deskStatus(),sourceSelections:selections,actualNativeSources:true,actualRoleEffects:true,actualSharedBusAndSectionSpace:true,actualGeneratorSweepAndTrim:true,actualAmbienceChain:true,masterInsert:'not present in actual All setup',headroomPolicy:'unchanged implicit native fan-in',changes,sourceLeaseStayedCurrent:true,metrics:{peaks,musicPeaks,minimumMusicPeak,levels,observations},checksPassed:true}};
+ }finally{lease.release();meters.dispose();masterBus.disconnect(splitter);h.g.levelTrim.disconnect(musicSplitter);splitter.disconnect();musicSplitter.disconnect();for(const a of analysers)a.disconnect();}
+}
+export async function runAllDeskHostReview({audible=false,progress=()=>{},cancelled=()=>false}={}){
+ const report={kind:'all.immutable-desk-backend',version:1,revision:'all-desk-backend-v1',startedAtUtc:new Date().toISOString(),muted:!audible,listening:'not assessed',scope:'Actual All createHost native source instruments, existing role/shared FX, Generator sweep/trim, ambience and immutable selected desk. Original implicit fan-in retained. Routed output/timing/lifecycle checks; not exact cross-backend PCM, physical device loopback, live backend swapping or full engine migration.',cases:[],checksPassed:false};let silentSink,detached=false,h=null;
+ try{
+  await audioContext.resume();if(!audible){masterBus.disconnect(audioContext.destination);detached=true;silentSink=audioContext.createGain();silentSink.gain.value=0;masterBus.connect(silentSink);silentSink.connect(audioContext.destination);}
+  let saved;for(const [backend,restore]of audible?[['owned',false]]:[['native',false],['owned',false],['owned',true]]){ensure(!cancelled(),'Stopped');progress(`${backend}: preparing actual All host${restore?' from saved state':''}`);const prepared=await prepare(backend,restore?saved:null,progress);h=prepared.h;const trial=await exercise(h,prepared.desk,{cancelled,progress});if(restore){ensure(JSON.stringify(trial.saved.desk)===JSON.stringify(saved.desk),'Reconstructed desk target state changed');trial.result.savedHostReconstruction=true;}if(backend==='owned'&&!restore)saved=structuredClone(trial.saved);report.cases.push(trial.result);h.dispose();ensure(h.deskStatus().phase==='disposed'&&h.deskStatus().sourceLeases===0&&h.deskStatus().meterTaps===0,'Actual host left its own leases/meters open');h=null;await wait(80);}
+  report.checksPassed=true;report.reason='suite-completed';
+ }catch(error){report.reason=cancelled()?'stopped':'failed';report.error=String(error);}finally{h?.dispose();if(silentSink){masterBus.disconnect(silentSink);silentSink.disconnect();}if(detached)masterBus.connect(audioContext.destination);await audioContext.suspend();}report.completedAtUtc=new Date().toISOString();return report;
+}

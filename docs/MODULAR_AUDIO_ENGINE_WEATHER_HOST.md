@@ -92,9 +92,15 @@ full reload with matching six-channel PCM SHA256
 clean source/event counters. Matching screenshots accompany all three reports
 under `reports/modular_audio`.
 
-These initial browser reports precede the additional strict raw-packet guards
-and separate host provenance fields. Their numeric kernel identity remains
-valid; a refreshed host-version report is a separate parent acceptance step.
+The guarded host rerun also passed, recorded separately in
+`weather-desktop-browser-final.json`, `weather-page-reload-browser-final.json`
+and `weather-live-browser-final.json` with their matching screenshots. These
+identify host version `9b46fcd07d33273f` and the unchanged kernel
+`b645e01e918b9cdc`; each report includes the complete per-file host SHA256 map.
+The final six-rate batch retains exact direct/worklet PCM, independent instances
+and the same original-model error bound. The full page reload retains the stored
+PCM hash, and all six live analyser streams remain finite and nonzero. The
+earlier reports remain available as pre-guard evidence.
 Analyser data is routed PCM, not physical device loopback, headphone listening
 or device-underrun evidence.
 

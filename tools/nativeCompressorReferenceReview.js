@@ -1,0 +1,7 @@
+import {runNativeCompressorCurve}from './nativeCompressorCurveVerification.js';
+import {runNativeCompressorReference}from './nativeCompressorReferenceVerification.js';
+const run=document.querySelector('#run'),copy=document.querySelector('#copy'),status=document.querySelector('#status'),summary=document.querySelector('#summary'),report=document.querySelector('#report');let compact;
+run.onclick=async()=>{run.disabled=curve.disabled=copy.disabled=true;try{const r=await runNativeCompressorReference({onProgress:t=>status.textContent=`Running ${t}`});report.value=JSON.stringify(r,null,2);compact={...r,trials:undefined,failed:r.trials.filter(t=>!t.pass)};summary.textContent=JSON.stringify(compact,null,2);status.textContent=r.pass?'All native compressor reference checks passed':'Native compressor differs beyond declared bounds';copy.disabled=false;}catch(e){status.textContent=String(e);summary.textContent=String(e);}finally{run.disabled=curve.disabled=false;}};
+copy.onclick=()=>navigator.clipboard.writeText(JSON.stringify(compact,null,2));
+
+const curve=document.querySelector('#curve');curve.onclick=async()=>{run.disabled=curve.disabled=copy.disabled=true;try{const r=await runNativeCompressorCurve({onProgress:t=>status.textContent=t});report.value=JSON.stringify(r,null,2);compact=r;summary.textContent=JSON.stringify(r,null,2);status.textContent='Quiet DC response diagnostic captured';copy.disabled=false;}catch(e){status.textContent=String(e);}finally{run.disabled=curve.disabled=false;}};

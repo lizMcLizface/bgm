@@ -1,0 +1,20 @@
+// Explicit pinned native-node profile; the existing live routes, desk dynamics
+// and zero-lookahead graph.compressor keep their own identities and defaults.
+export const NATIVE_COMPRESSOR_PROFILE='chromium-dynamics-e14de735-v1';
+export const NATIVE_COMPRESSOR_PARAMETERS=Object.freeze([['threshold',-100,0,-24],['knee',0,40,30],['ratio',1,20,12],['attack',0,1,.003],['release',0,1,.25]]);
+export function validateOwnedNativeCompressorSpec(raw){const c=JSON.parse(JSON.stringify(raw));if(c?.version!==1||c.profile!==NATIVE_COMPRESSOR_PROFILE||c.controlClock!=='native-128'||!Array.isArray(c.parameters)||c.parameters.length!==5)throw Error('Invalid native compressor profile');const seen=new Set();for(const p of c.parameters){if(!Array.isArray(p)||p.length!==2||!Number.isInteger(p[0])||seen.has(p[0]))throw Error('Invalid native compressor parameter identity');const d=NATIVE_COMPRESSOR_PARAMETERS[p[0]],v=p[1];if(!d||typeof v!=='number'||!Number.isFinite(v)||v<d[1]||v>d[2])throw Error('Invalid native compressor parameter value');seen.add(p[0]);}return c;}
+export const ownedNativeCompressorSpec=(settings={})=>validateOwnedNativeCompressorSpec({version:1,profile:NATIVE_COMPRESSOR_PROFILE,controlClock:'native-128',parameters:NATIVE_COMPRESSOR_PARAMETERS.map(([key,,,value],id)=>[id,settings[key]??value])});
+export const saveOwnedNativeCompressorSpec=c=>JSON.stringify(validateOwnedNativeCompressorSpec(c),null,2)+'\n';
+export const loadOwnedNativeCompressorSpec=s=>validateOwnedNativeCompressorSpec(JSON.parse(s));
+export class OwnedNativeCompressor{
+ constructor(engine,spec,rate){if(engine.native_comp_api()!==1||!Number.isInteger(rate)||rate<8000||rate>192000)throw Error('Native compressor ABI/rate');this.e=engine;this.rate=rate;this.spec=validateOwnedNativeCompressorSpec(spec);this.handle=engine.native_comp_new(rate);if(!this.handle)throw Error('Native compressor preparation failed');try{for(const [i,v]of this.spec.parameters)this.accept(engine.native_comp_initial(this.handle,i,v));this.accept(engine.native_comp_prepare(this.handle));this.refresh();}catch(error){this.dispose();throw error;}}
+ accept(ok){if(!ok)throw Error('Native compressor operation rejected');}
+ alive(){if(!this.handle)throw Error('Disposed native compressor');}
+ refresh(){this.alive();this.memory=this.e.memory.buffer;this.input=[0,1].map(ch=>new Float32Array(this.memory,this.e.native_comp_input(this.handle,ch),2048));this.output=[0,1].map(ch=>new Float32Array(this.memory,this.e.native_comp_output(this.handle,ch),2048));[this.left,this.right]=this.output;}
+ render(n,channels=2){this.alive();if(!Number.isInteger(n)||n<0||n>2048||![1,2].includes(channels))throw Error('Native compressor block/channel bounds');if(this.memory!==this.e.memory.buffer)throw Error('Native compressor memory grew; refresh outside render');this.accept(this.e.native_comp_render(this.handle,n,channels));}
+ patch(entries){this.alive();if(!Array.isArray(entries)||entries.some(p=>!Array.isArray(p)||p.length!==2||!Number.isInteger(p[0])||!NATIVE_COMPRESSOR_PARAMETERS[p[0]]))throw Error('Invalid native compressor edit');if(this.e.native_comp_stat(this.handle,1)%128!==0)throw Error('Native compressor controls require128-frame boundaries');const changes=new Map(entries);const next=validateOwnedNativeCompressorSpec({...this.spec,parameters:this.spec.parameters.map(([i,v])=>[i,changes.has(i)?changes.get(i):v])});for(const [i,v]of changes)this.accept(this.e.native_comp_param(this.handle,i,v));this.spec=next;}
+ value(i){this.alive();if(!Number.isInteger(i)||!NATIVE_COMPRESSOR_PARAMETERS[i])throw Error('Invalid native compressor control');return this.e.native_comp_value(this.handle,i);}
+ reset(){this.alive();this.e.native_comp_reset(this.handle);}
+ stats(){this.alive();return Object.fromEntries(['peak','frame','latencyFrames','reductionDb','tailSeconds','divisionPhase','controlPhase','prepared'].map((key,i)=>[key,this.e.native_comp_stat(this.handle,i)]));}
+ dispose(){if(this.handle){this.e.native_comp_free(this.handle);this.handle=0;this.input=this.output=this.left=this.right=this.memory=null;}}
+}

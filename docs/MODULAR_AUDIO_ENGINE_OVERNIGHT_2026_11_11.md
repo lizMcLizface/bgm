@@ -62,6 +62,15 @@ reviewable rather than weakening validation or changing sounds to force a pass.
 
 ## Checkpoints
 
+- 11 November ~02:50 UTC: actual All native/owned/restored-owned paths and an
+  owned live route pass, with nonzero source/music/ambience/master metrics,
+  automatic controls and clean leases/meters. The normal default workbench
+  opens without console warnings/errors.155 focused regression tests pass.
+  Native compressor static profile passes96 actual native cases; its earlier
+  six failures are retained and corrected through source-defined float math.
+  Measured-string preparation is verified. Loop source preparation has72 exact
+  reference and72 allocation cases; its consumer integration is still underway.
+
 - 11 November ~02:18 UTC: Tape Graph27 and the streaming weather desktop host
   pass actual built-browser six-rate checks, independence and full-page reload.
   Weather live routing has six nonzero channels. The normal public build passes;

@@ -103,7 +103,7 @@ same cleanup. There is no automatic backend fallback during playback.
 
 ## Verification and next gate
 
-Twelve Node tests execute the exact public processor and host helper and test:
+Thirteen Node tests execute the exact public processor and host helper and test:
 
 - all four primitive outputs against standalone Rust;
 - absolute startup events, late clamps, private clocks and no memory growth;
@@ -113,6 +113,8 @@ Twelve Node tests execute the exact public processor and host helper and test:
   external insert cleanup.
 - ordered two-input headroom reduction and reserved auxiliary-role rejection
   before any feedback connection can be created.
+- shared module registration failure, zero primitive/keepalive allocation on
+  failure, and a successful later retry on the same AudioContext.
 
 Ten target-time policy tests cover integer-frame origins and fractional rejection.
 Fifteen automation regressions include nine exact native critical filter PCM
@@ -161,8 +163,18 @@ These are actual browser DSP/output checks, not a full All backend migration or
 physical device assessment. The separate listening button plays the rendered
 48 kHz owned result; listening remains unassessed in the saved muted report.
 
-The next application gate is an explicit stopped-state backend choice in All's
-setupMixer that selects this factory while retaining its existing source leases,
-shared-effects rerouting, master insert and teardown. That gate is not implemented
-here. Save snapshots capture desk targets only, not external FX, native Generator
-automation or in-flight tails.
+An immutable opt-in actual All host API now selects this factory before setup,
+with off-route preparation, rollback, lease guards and asynchronous error health;
+see `MODULAR_AUDIO_ENGINE_ALL_DESK_BACKEND.md` for its exact acceptance state.
+Its actual built-in-browser native/owned/restored-owned full-path batch and
+separate live owned case passed at 48 kHz, recorded in
+`all-owned-desk-host-browser.json` and `all-owned-desk-live-browser.json`.
+That later host proof uses mixer version `d43cbe6314cd15e6`, source fingerprint
+`cc40b2df4e0986979522ce7e3f7bf5e3d9cbcff39a6c167a554bf476b7287fe9`,
+with the same 70,229-byte Wasm and SHA256 listed above. It preserves All's
+implicit fan-in and checks nonzero finite music/output, controls and lifetime;
+it does not replace the earlier deterministic-fixture PCM assertion.
+The normal All UI retains the native default. A stopped-state UI backend choice
+and complete project/executor selection remain later gates. Save snapshots here
+capture desk targets only, not external FX, native Generator automation or
+in-flight tails.

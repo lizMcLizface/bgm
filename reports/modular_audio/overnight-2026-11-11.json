@@ -3,7 +3,7 @@
   "version": 1,
   "status": "running",
   "startedAtUtc": "2026-11-10T23:19:46Z",
-  "updatedAtUtc": "2026-11-11T02:18:08.893Z",
+  "updatedAtUtc": "2026-11-11T02:54:58.188Z",
   "featureCutoffUtc": "2026-11-11T08:30:00Z",
   "deadlineUtc": "2026-11-11T09:00:00Z",
   "gitIdentity": {
@@ -25,7 +25,8 @@
     "14060ef",
     "74244f7",
     "c456547",
-    "1508a14"
+    "1508a14",
+    "f4c6748"
   ],
   "graph": {
     "api": 1,
@@ -91,16 +92,29 @@
     "weatherHost": "9b46fcd07d33273f",
     "weatherBrowser": "weather-desktop-browser-final.json",
     "weatherReload": "weather-page-reload-browser-final.json",
-    "weatherRoutedOutput": "weather-live-browser-final.json"
+    "weatherRoutedOutput": "weather-live-browser-final.json",
+    "actualAllDeskBrowser": "all-owned-desk-host-browser.json",
+    "actualAllDeskLive": "all-owned-desk-live-browser.json",
+    "defaultPage": "default-all-page-browser.json",
+    "latestFocusedTests": 155,
+    "mixerHostVersion": "d43cbe6314cd15e6",
+    "nativeCompressorVersion": "4057fdc2c9a3136d",
+    "nativeCompressorBrowser": "native-compressor-native-browser-v2.json",
+    "nativeCompressorQuiet": "native-compressor-curve-native-browser-v2.json",
+    "nativeCompressorCases": 96,
+    "stringPreparation": "75424d620f95653a",
+    "stringPreparationReport": "string-owned-preparation.json"
   },
   "limitations": [
     "No physical listening/device-underrun claim",
     "Freeze worker-only; exact synchronous capture may exceed one callback",
     "Only integer path differences compensated; FM fractional differences reject",
     "Workbench still five pitched plus percussion source buses",
-    "Normal All backend remains legacy; deterministic owned desk is isolated opt-in",
     "Weather host is standalone, before original native ambience chains; normal backend adoption remains separate",
-    "Tape graph exposes known FIR group only and rejects fixed PDC; native bypass/seconds automation adoption remains separate"
+    "Tape graph exposes known FIR group only and rejects fixed PDC; native bypass/seconds automation adoption remains separate",
+    "Actual All owned desk is immutable opt-in; normal UI default remains native and implicit fan-in is preserved",
+    "Native compressor accepted static profile; captured targets/parallel host wrappers remain separate",
+    "Measured-string preparation does not yet replace the native body convolver or Short/Pizzicato decay player"
   ],
   "next": "Continue independent measured-string preparation, native DynamicsCompressor parity, and immutable opt-in All desk integration. Feature cutoff08:30; handoff09:00."
 }

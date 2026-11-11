@@ -1,5 +1,15 @@
 # Modular audio engine handoff
 
+Latest overnight application checkpoint: actual All native, immutable owned desk
+and saved owned reconstruction pass; a separate live owned route and the normal
+default page also pass desktop checks. See [the All desk checkpoint](MODULAR_AUDIO_ENGINE_ALL_DESK_BACKEND.md).
+Mixer host version is `d43cbe6314cd15e6`; numeric Wasm remains byte-identical.
+Native compressor `4057fdc2c9a3136d` passes96 fixed actual native cases plus eight
+exact quiet-response diagnostics. Measured-string preparation
+`75424d620f95653a` is verified separately. See their dedicated documents.
+155 focused tests and the normal public build pass. Defaults stay native; no
+backend hot swap, physical listening or whole-migration completion is claimed.
+
 Latest integration: [Tape Graph27](MODULAR_AUDIO_ENGINE_TAPE_GRAPH.md) on
 `dd0b459e6b932eab` and [owned weather host](MODULAR_AUDIO_ENGINE_WEATHER_HOST.md)
 kernel `b645e01e918b9cdc` / host `9b46fcd07d33273f` pass actual built-browser

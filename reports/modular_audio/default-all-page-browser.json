@@ -1,0 +1,9 @@
+{
+  "kind": "all.default-page-smoke",
+  "version": 1,
+  "createdAtUtc": "2026-11-11T02:52:22.490Z",
+  "url": "http://127.0.0.1:49428/synths/all/",
+  "observed": "Loaded normal All workbench, Rainy café, stopped transport, voices/mixer/sequencer/keybed and Setup controls",
+  "consoleErrorsOrWarnings": [],
+  "scope": "Visible built-page startup and existing default host smoke; no backend change, interaction or listening claim"
+}

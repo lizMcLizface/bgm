@@ -1,0 +1,323 @@
+{
+  "kind": "all.immutable-desk-backend",
+  "version": 1,
+  "revision": "all-desk-backend-v1",
+  "startedAtUtc": "2026-11-11T02:42:33.297Z",
+  "muted": true,
+  "listening": "not assessed",
+  "scope": "Actual All createHost native source instruments, existing role/shared FX, Generator sweep/trim, ambience and immutable selected desk. Original implicit fan-in retained. Routed output/timing/lifecycle checks; not exact cross-backend PCM, physical device loopback, live backend swapping or full engine migration.",
+  "cases": [
+    {
+      "backend": "native",
+      "sampleRate": 48000,
+      "desk": {
+        "backend": "native",
+        "phase": "ready",
+        "ready": true,
+        "error": null,
+        "revision": 5,
+        "metadata": {
+          "backend": "native",
+          "version": "native-desk-v1",
+          "latencyFrames": 144
+        },
+        "routing": "Original All implicit native fan-in; deterministic reference reduction is a separate fixture",
+        "sourceLeases": 1,
+        "meterTaps": 1
+      },
+      "sourceSelections": [
+        [
+          "lead",
+          "poly",
+          "Soft Pad"
+        ],
+        [
+          "counter",
+          "fm",
+          "FM Rhodes"
+        ],
+        [
+          "rhythm",
+          "piano",
+          "House Piano"
+        ],
+        [
+          "pad",
+          "piano",
+          "Ravel"
+        ],
+        [
+          "bass",
+          "poly",
+          "Soft Pad"
+        ],
+        [
+          "perc",
+          "kit",
+          "hand"
+        ]
+      ],
+      "actualNativeSources": true,
+      "actualRoleEffects": true,
+      "actualSharedBusAndSectionSpace": true,
+      "actualGeneratorSweepAndTrim": true,
+      "actualAmbienceChain": true,
+      "masterInsert": "not present in actual All setup",
+      "headroomPolicy": "unchanged implicit native fan-in",
+      "changes": [
+        {
+          "kind": "dim",
+          "contextFrame": 133248
+        },
+        {
+          "kind": "bass-solo",
+          "contextFrame": 152576
+        },
+        {
+          "kind": "lead-mute",
+          "contextFrame": 168832
+        },
+        {
+          "kind": "restore",
+          "contextFrame": 180992
+        }
+      ],
+      "sourceLeaseStayedCurrent": true,
+      "metrics": {
+        "peaks": [
+          0.08521120250225067,
+          0.1011924147605896
+        ],
+        "musicPeaks": [
+          0.08541911840438843,
+          0.10025684535503387
+        ],
+        "minimumMusicPeak": 0.00001,
+        "levels": {
+          "lead": 0.3257030603742727,
+          "counter": 0.36626406001700207,
+          "rhythm": 0.3956537995820104,
+          "pad": 0.2862994879106134,
+          "bass": 0.3884482794416718,
+          "perc": 0.5373359611845276,
+          "ambience": 0.0016297240615993284,
+          "headroom": 0.5404470261167414,
+          "left": 0.5319252504329033,
+          "right": 0.5315840768135421
+        },
+        "observations": 116
+      },
+      "checksPassed": true
+    },
+    {
+      "backend": "owned",
+      "sampleRate": 48000,
+      "desk": {
+        "backend": "owned",
+        "phase": "ready",
+        "ready": true,
+        "error": null,
+        "revision": 5,
+        "metadata": {
+          "backend": "owned",
+          "version": "d43cbe6314cd15e6",
+          "wasm": "abb416923ee7d39dc871cedf76b6268f317123dc76d8af6c4267587db58d4e3d",
+          "latencyFrames": 144
+        },
+        "routing": "Original All implicit native fan-in; deterministic reference reduction is a separate fixture",
+        "sourceLeases": 1,
+        "meterTaps": 1
+      },
+      "sourceSelections": [
+        [
+          "lead",
+          "poly",
+          "Soft Pad"
+        ],
+        [
+          "counter",
+          "fm",
+          "FM Rhodes"
+        ],
+        [
+          "rhythm",
+          "piano",
+          "House Piano"
+        ],
+        [
+          "pad",
+          "piano",
+          "Ravel"
+        ],
+        [
+          "bass",
+          "poly",
+          "Soft Pad"
+        ],
+        [
+          "perc",
+          "kit",
+          "hand"
+        ]
+      ],
+      "actualNativeSources": true,
+      "actualRoleEffects": true,
+      "actualSharedBusAndSectionSpace": true,
+      "actualGeneratorSweepAndTrim": true,
+      "actualAmbienceChain": true,
+      "masterInsert": "not present in actual All setup",
+      "headroomPolicy": "unchanged implicit native fan-in",
+      "changes": [
+        {
+          "kind": "dim",
+          "contextFrame": 276480
+        },
+        {
+          "kind": "bass-solo",
+          "contextFrame": 294784
+        },
+        {
+          "kind": "lead-mute",
+          "contextFrame": 312576
+        },
+        {
+          "kind": "restore",
+          "contextFrame": 324992
+        }
+      ],
+      "sourceLeaseStayedCurrent": true,
+      "metrics": {
+        "peaks": [
+          0.08256028592586517,
+          0.0902603268623352
+        ],
+        "musicPeaks": [
+          0.08170025050640106,
+          0.0891423225402832
+        ],
+        "minimumMusicPeak": 0.00001,
+        "levels": {
+          "lead": 0.32901891893808316,
+          "counter": 0.3802775771176518,
+          "rhythm": 0.4019715775185926,
+          "pad": 0.3153531162993,
+          "bass": 0.38399873684658714,
+          "perc": 0.5366058889586542,
+          "ambience": 0.001796415496659994,
+          "headroom": 0.5394631308640714,
+          "left": 0.5319049562934702,
+          "right": 0.5315649412707518
+        },
+        "observations": 115
+      },
+      "checksPassed": true
+    },
+    {
+      "backend": "owned",
+      "sampleRate": 48000,
+      "desk": {
+        "backend": "owned",
+        "phase": "ready",
+        "ready": true,
+        "error": null,
+        "revision": 5,
+        "metadata": {
+          "backend": "owned",
+          "version": "d43cbe6314cd15e6",
+          "wasm": "abb416923ee7d39dc871cedf76b6268f317123dc76d8af6c4267587db58d4e3d",
+          "latencyFrames": 144
+        },
+        "routing": "Original All implicit native fan-in; deterministic reference reduction is a separate fixture",
+        "sourceLeases": 1,
+        "meterTaps": 1
+      },
+      "sourceSelections": [
+        [
+          "lead",
+          "poly",
+          "Soft Pad"
+        ],
+        [
+          "counter",
+          "fm",
+          "FM Rhodes"
+        ],
+        [
+          "rhythm",
+          "piano",
+          "House Piano"
+        ],
+        [
+          "pad",
+          "piano",
+          "Ravel"
+        ],
+        [
+          "bass",
+          "poly",
+          "Soft Pad"
+        ],
+        [
+          "perc",
+          "kit",
+          "hand"
+        ]
+      ],
+      "actualNativeSources": true,
+      "actualRoleEffects": true,
+      "actualSharedBusAndSectionSpace": true,
+      "actualGeneratorSweepAndTrim": true,
+      "actualAmbienceChain": true,
+      "masterInsert": "not present in actual All setup",
+      "headroomPolicy": "unchanged implicit native fan-in",
+      "changes": [
+        {
+          "kind": "dim",
+          "contextFrame": 419072
+        },
+        {
+          "kind": "bass-solo",
+          "contextFrame": 438784
+        },
+        {
+          "kind": "lead-mute",
+          "contextFrame": 455552
+        },
+        {
+          "kind": "restore",
+          "contextFrame": 467584
+        }
+      ],
+      "sourceLeaseStayedCurrent": true,
+      "metrics": {
+        "peaks": [
+          0.08200310170650482,
+          0.08990529179573059
+        ],
+        "musicPeaks": [
+          0.08139431476593018,
+          0.08942456543445587
+        ],
+        "minimumMusicPeak": 0.00001,
+        "levels": {
+          "lead": 0.3291180966307093,
+          "counter": 0.37986763061628515,
+          "rhythm": 0.4019817621941417,
+          "pad": 0.3149782941534608,
+          "bass": 0.387316716421712,
+          "perc": 0.5444865846060357,
+          "ambience": 0.0018205960155482852,
+          "headroom": 0.5444887443803272,
+          "left": 0.5379547296834751,
+          "right": 0.5379588120295655
+        },
+        "observations": 116
+      },
+      "checksPassed": true,
+      "savedHostReconstruction": true
+    }
+  ],
+  "checksPassed": true,
+  "reason": "suite-completed",
+  "completedAtUtc": "2026-11-11T02:42:44.086Z"
+}

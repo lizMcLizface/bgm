@@ -27,7 +27,7 @@ import {chainUnits,maskFromUnits} from '../effects/order';
 import {createMeter,meterLevel} from './meter';
 import {masterBus} from '../../audio/bus';
 import {presetFromEdit} from '../../app/editor/presetEdits';
-import {createMixerAudio,createDeskLimiter} from './mixerAudio';
+import {deskBackendChoice,prepareDeskBackend} from './deskBackend';
 import {sourceStemTap} from './sourceStemTap';
 import {pianoStemTap} from './pianoStemTap';
 import {iowaStemTap} from './iowaStemTap';
@@ -84,7 +84,8 @@ export const sceneDrumPatch=name=>SCENE_DRUM_GROUPS.find(group=>group.scenes.inc
 export const drumChoices = () => [{id:'scene',name:'Scene kits'},{id:'kit',name:'Basic kits'},...['tr808','tr909','tr707','tr606'].map(id=>({id,name:SYNTHS[id].name}))];
 export const drumPatches = id => id==='scene'?SCENE_DRUM_GROUPS.map(group=>({id:group.id,name:group.scenes.length>1?`${group.id} (${group.scenes.length} scenes)`:group.id})):id==='kit'?Object.values(PERCUSSION_VOICES).map(v=>({name:v.name,id:v.id})):SYNTHS[id]?.kit?SYNTHS[id].presets:[];
 
-export function createHost(scene, {seed,settings:storedSettings} = {}) {
+export function createHost(scene, {seed,settings:storedSettings,deskBackend='native'} = {}) {
+    deskBackend=deskBackendChoice(deskBackend);
     const settings = storedSettings ? sanitizeSettings(storedSettings,sceneSettings(scene,seed)) : sceneSettings(scene, seed);
     const g = new Generator(settings);
     const loaded = {};
@@ -110,7 +111,7 @@ export function createHost(scene, {seed,settings:storedSettings} = {}) {
     loaded.perc = BROWSABLE_SCENES.includes(scene)?{synth:'scene',name:scene.name}:{synth:'kit',name:settings.drums.kit,kit:settings.drumKit};
     const meterTaps = new Set();
     const sourceTaps = new Set();
-    let deskAudio=null,deskState=null;
+    let deskAudio=null,deskState=null,mixerSetup=null,deskFailure=null,deskRevision=0,deskUpdate=Promise.resolve(),mixerPhase='idle';
     let drumMask = null, drumMix={muted:[],solo:[]};
     if (g.settings.drumKit) {
         const rack = RACK_PARAMS.sanitize({ ...cleanRack(), 'effects.reverb': g.settings.drumKit.room });
@@ -235,53 +236,66 @@ export function createHost(scene, {seed,settings:storedSettings} = {}) {
     const dropRack = (role) => { g.roles[role].ensembleRack?.dispose(); g.roles[role].ensembleRack = null; };
     const updateMixer = role => { const r=g.roles[role]; if(r.mixerRack)r.mixerRack.patch(mixerRack(rackValues(role),tempo)); };
 
-    async function setupMixer() {
-        if(g.percussionReady)await g.percussionReady;
-        if(g.settings.drumKit)g.roles.perc.instrument.setKit({...g.settings.drumKit,room:0});
-        const {createRack}=await import('../effects/graph');
-        for(const role of SEQUENCERS.map(s=>s.role)) {
-            const r=g.roles[role],from=r.tone??r.gain,to=r.tone?r.gain:r.wander.input;
-            const rack=await createRack(g.AC,mixerRack(rackValues(role),tempo),{onError:error=>console.error('Mixer effects failed',error)});
-            if(disposed){rack.dispose();ensureActive();}
-            from.disconnect(to);
-            if(role==='perc'){
-                const insert=await createRack(g.AC,instrumentRack(rackValues(role)));
-                if(disposed){insert.dispose();rack.dispose();ensureActive();}
-                from.connect(insert.input);insert.connect(rack.input);r.ensembleRack=insert;
-            }else from.connect(rack.input);
-            rack.connect(to);r.mixerRack=rack;
-        }
-        const limiter=await createDeskLimiter(g.AC);
-        if(disposed){limiter.disconnect();ensureActive();}
-        deskAudio=createMixerAudio(g.AC,SEQUENCERS.map(s=>s.role),limiter);
-        g.mixReturn=deskAudio.channels.headroom.input;
-        for(const {role} of SEQUENCERS){
-            const output=g.roles[role].wander.output;
-            output.disconnect(g.output);output.connect(deskAudio.channels[role].input);
-            g.roles[role].mixOutput=deskAudio.channels[role].output;
-            deskAudio.channels[role].output.connect(deskAudio.channels.headroom.input);
-        }
-        // Migrate completed racks now. Pending racks resolve the same routing
-        // when they finish, without holding the desk open during loading.
-        g.routeSharedEffects?.();
-        deskAudio.channels.headroom.output.connect(g.output);
-        g.levelTrim.disconnect(masterBus);g.levelTrim.connect(deskAudio.input);
-        g.ambienceOut.disconnect(masterBus);g.ambienceOut.connect(deskAudio.channels.ambience.input);
-        deskAudio.channels.ambience.output.connect(deskAudio.input);
-        deskAudio.output.connect(masterBus);deskAudio.patch(deskState);
+    function setupMixer() {
+        ensureActive();if(deskAudio){checkDeskHealth();return deskFailure?Promise.reject(deskFailure):Promise.resolve(deskStatus());}if(mixerSetup)return mixerSetup;
+        if(sourceTaps.size||meterTaps.size)throw Error('Close source and meter taps before preparing the desk');
+        mixerPhase='preparing';deskFailure=null;
+        mixerSetup=(async()=>{
+            const candidates=[],undo=[],oldMixReturn=g.mixReturn,oldMixOutputs=Object.fromEntries(SEQUENCERS.map(({role})=>[role,g.roles[role].mixOutput]));let candidate=null,pointers=false;
+            const connect=(from,to)=>{from.connect(to);undo.push(()=>from.disconnect(to));};
+            const disconnect=(from,to)=>{from.disconnect(to);undo.push(()=>from.connect(to));};
+            try{
+                if(g.percussionReady)await g.percussionReady;ensureActive();
+                const {createRack}=await import('../effects/graph');ensureActive();
+                // All async resources are prepared before changing existing links.
+                for(const {role}of SEQUENCERS){
+                    const r=g.roles[role],rack=await createRack(g.AC,mixerRack(rackValues(role),tempo),{onError:error=>console.error('Mixer effects failed',error)});
+                    if(!rack)throw Error('Mixer effects preparation failed');const entry={role,r,rack,insert:null};candidates.push(entry);ensureActive();
+                    if(role==='perc'){entry.insert=await createRack(g.AC,instrumentRack(rackValues(role)));if(!entry.insert)throw Error('Percussion inserts preparation failed');ensureActive();}
+                }
+                candidate=await prepareDeskBackend(g.AC,SEQUENCERS.map(s=>s.role),{backend:deskBackend,state:deskState});ensureActive();
+                let revision;do{revision=deskRevision;await candidate.patch(deskState);ensureActive();}while(revision!==deskRevision);
+                if(sourceTaps.size||meterTaps.size)throw Error('Close source and meter taps before installing the desk');
+                // No await below: asynchronous shared-rack completion observes
+                // either the old pointers or the completely committed new desk.
+                for(const {role,r,rack,insert}of candidates){const from=r.tone??r.gain,to=r.tone?r.gain:r.wander.input;disconnect(from,to);connect(from,(insert??rack).input);if(insert)insert.connect(rack.input);rack.connect(to);}
+                for(const {role}of SEQUENCERS){const output=g.roles[role].wander.output;disconnect(output,g.output);connect(output,candidate.channels[role].input);connect(candidate.channels[role].output,candidate.channels.headroom.input);}
+                connect(candidate.channels.headroom.output,g.output);disconnect(g.levelTrim,masterBus);connect(g.levelTrim,candidate.input);disconnect(g.ambienceOut,masterBus);connect(g.ambienceOut,candidate.channels.ambience.input);connect(candidate.channels.ambience.output,candidate.input);
+                g.mixReturn=candidate.channels.headroom.input;for(const {role}of SEQUENCERS)g.roles[role].mixOutput=candidate.channels[role].output;pointers=true;
+                g.routeSharedEffects?.();
+                if(g.settings.drumKit){const instrument=g.roles.perc.instrument,previous=structuredClone(instrument.kit??g.settings.drumKit);undo.push(()=>instrument.setKit(previous));instrument.setKit({...g.settings.drumKit,room:0});}
+                connect(candidate.output,masterBus);
+                for(const {r,rack,insert}of candidates){r.mixerRack=rack;if(insert)r.ensembleRack=insert;}
+                deskAudio=candidate;candidate=null;mixerPhase='ready';return deskStatus();
+            }catch(error){
+                if(pointers){if(oldMixReturn===undefined)delete g.mixReturn;else g.mixReturn=oldMixReturn;for(const {role}of SEQUENCERS){if(oldMixOutputs[role]===undefined)delete g.roles[role].mixOutput;else g.roles[role].mixOutput=oldMixOutputs[role];}try{g.routeSharedEffects?.();}catch(restoreError){console.error('Shared mixer route rollback failed',restoreError);}}
+                for(let i=undo.length-1;i>=0;i--)try{undo[i]();}catch(restoreError){console.error('Mixer connection rollback failed',restoreError);}
+                for(const resource of [candidate,...candidates.flatMap(({rack,insert})=>[rack,insert])])try{resource?.dispose();}catch(cleanupError){console.error('Prepared mixer cleanup failed',cleanupError);}
+                deskFailure=error;mixerPhase=disposed?'disposed':'failed';throw error;
+            }
+        })();
+        const pending=mixerSetup;pending.catch(()=>{if(mixerSetup===pending)mixerSetup=null;});return pending;
     }
-    function applyDesk(state){deskState=state;deskAudio?.patch(state);}
+    function applyDesk(state){
+        deskState=state;deskRevision++;if(!deskAudio)return;
+        let update;try{update=Promise.resolve(deskAudio.patch(state));}catch(error){update=Promise.reject(error);}
+        deskUpdate=Promise.all([deskUpdate.catch(()=>{}),update]).then(()=>undefined).catch(error=>{deskFailure=error;mixerPhase='failed';throw error;});deskUpdate.catch(()=>{});return deskUpdate;
+    }
+    function checkDeskHealth(){if(!disposed&&!deskFailure&&deskAudio?.check)try{deskAudio.check();}catch(error){deskFailure=error;mixerPhase='failed';}}
+    async function awaitDeskState(){if(mixerSetup)await mixerSetup;await deskUpdate;ensureActive();checkDeskHealth();if(deskFailure)throw deskFailure;return deskStatus();}
+    function deskStatus(){checkDeskHealth();return {backend:deskBackend,phase:disposed?'disposed':mixerPhase,ready:!!deskAudio&&!disposed&&!deskFailure,error:deskFailure?String(deskFailure):null,revision:deskRevision,metadata:deskAudio?.backendInfo??null,routing:'Original All implicit native fan-in; deterministic reference reduction is a separate fixture',sourceLeases:sourceTaps.size,meterTaps:meterTaps.size};}
 
     const stemTap=(role,instrument,guard)=>role==='perc'?percussionStemTap(instrument,{input:g.roles.perc.gain,machine:g.roles.perc.machine},guard):instrument?.preset?.classics?(instrument.lives?.length>1?compositeClassicStemTap:classicStemTap)(instrument,guard):(instrument?.voice?.native??(instrument?.synthMix?instrument:null))?.preset?.stringModel==='plucked'?pluckedStemTap(instrument,guard):(instrument?.voice?.native??(instrument?.synthMix?instrument:null))?.preset?.stringModel==='piano'?pianoStemTap(instrument,guard):instrument?.preset?.iowa?iowaStemTap(instrument,guard):sourceStemTap(instrument,guard);
     function sourcePreviewStatus(role){try{ensureActive();const tap=stemTap(role,g.roles[role]?.instrument,ensureActive);return {eligible:true,kind:tap.kind};}catch(e){return {eligible:false,reason:e.message};}}
     function openSourceStem(role,onClose=()=>{}){
-        ensureActive();const instrument=g.roles[role]?.instrument,sourceRevision=g.roles[role]?.sourceRevision,tuningKey=JSON.stringify(tuning.get());let closed=false;
+        ensureActive();if(mixerPhase==='preparing')throw Error('Await desk setup before opening a source lease');const instrument=g.roles[role]?.instrument,sourceRevision=g.roles[role]?.sourceRevision,tuningKey=JSON.stringify(tuning.get());let closed=false;
         const tap=stemTap(role,instrument,()=>{ensureActive();if(closed||g.roles[role]?.instrument!==instrument||g.roles[role]?.sourceRevision!==sourceRevision||JSON.stringify(tuning.get())!==tuningKey)throw Error('The source host or tuning changed.');});
         const lease={...tap,role,context:g.AC,channelOutput:g.roles[role].mixOutput??g.roles[role].wander.output,masterOutput:deskAudio?.output??g.levelTrim,tune:midi=>tunedNote(role,midi),release(){if(closed)return;closed=true;sourceTaps.delete(lease);},close(){if(closed)return;lease.release();onClose();}};
         sourceTaps.add(lease);return lease;
     }
 
     function openMeters() {
+            ensureActive();if(mixerPhase==='preparing')throw Error('Await desk setup before opening meter taps');
             const meters=Object.fromEntries(SEQUENCERS.map(({role})=>[role,createMeter(g.AC,deskAudio?.channels[role].output??g.roles[role].wander.output)]));
             meters.ambience=createMeter(g.AC,deskAudio?.channels.ambience.output??g.ambienceOut);
             if(deskAudio)meters.headroom=createMeter(g.AC,deskAudio.channels.headroom.output);
@@ -543,7 +557,7 @@ export function createHost(scene, {seed,settings:storedSettings} = {}) {
     }
 
     return {
-        g, settings, loaded, editSettings,editRule,restoreBook,get book(){return book;}, applySceneVoices, applyFrontPageLink, setSound, setPreset, soundOf, nativeOf, editNative, editValues, editDrumKit, rackValues, editRack, editMixer, mixerSnapshot, restoreMixer, snapshotSounds, restoreSounds, setupMixer, applyDesk, sourcePreviewStatus, openSourceStem, setTempo, openMonitor, openMeters, capture, note, tunedNote, drum, drumTrack, setDrumMix, getDrumMix,
+        g, settings, loaded, editSettings,editRule,restoreBook,get book(){return book;}, applySceneVoices, applyFrontPageLink, setSound, setPreset, soundOf, nativeOf, editNative, editValues, editDrumKit, rackValues, editRack, editMixer, mixerSnapshot, restoreMixer, snapshotSounds, restoreSounds, setupMixer, applyDesk, awaitDeskState,deskStatus,sourcePreviewStatus, openSourceStem, setTempo, openMonitor, openMeters, capture, note, tunedNote, drum, drumTrack, setDrumMix, getDrumMix,
         get context() { return g.AC; },
         async wake() { await g.AC.resume(); if (g.percussionReady) await g.percussionReady; g.endStopFade?.(); },
         setScene(next) { hostScene.scene = next; },
