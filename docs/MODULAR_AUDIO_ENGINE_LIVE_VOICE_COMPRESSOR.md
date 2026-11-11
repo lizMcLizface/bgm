@@ -39,13 +39,41 @@ maximum absolute error 2.9802322387695312e-8 and relative RMS error
 2.936054490876809e-9. It uses the same fixture and unchanged bounds through
 `tools/live-voice-compressor-extreme.html`.
 
-Final bundle ac6248622e53a405 contains only disposal/error cleanup after these
-native batches. Numeric Wasm remains byte-identical: SHA-256
+Bundle ac6248622e53a405 added disposal/error cleanup after these native batches;
+final bundle 61003cb61b59b2f0 adds the independently verified host render clock.
+Numeric Wasm remains byte-identical: SHA-256
 923e65664dc31cb3243f44be1dff77fffce9c32dad86553dde2ea5203c8773da.
 Failed/closed processors release without waiting for an unavailable handler;
 acknowledged disposal removes the node reference and listeners. Meter polling
 stops after failure, and intentional cancellation during disposal does not create
 a false processor error.
+
+## Reused AudioContext callback clock
+
+Independent native AudioBufferSource cursor/AudioParam probes established that a
+resumed host's global `currentFrame` can repeat while each actual native callback
+consumes another 128 samples. Dropping/repeating PCM solely because that reported
+global frame repeats is incorrect. The shared `HostRenderClock` anchors the first
+canonical frame, advances one quantum for each actual callback, and uses a later
+global epoch only as a forward anchor. It rejects backward/noncanonical epochs
+and stale lag beyond the explicitly declared 8192-frame safety limit. A genuine
+unpulled forward gap does not synthesize missing DSP samples.
+
+The builder embeds the exact shared helper source (only its export is removed)
+and includes it in runtime provenance. The strict portable Rust clock and native
+32/128 mathematical clocks are unchanged. No native pulled parameter value feeds
+the Rust calculations.
+
+`reports/modular_audio/live-voice-reused-final.json` then passed three actual
+48 kHz AudioContext rounds in the same resumed context, with two separate Rust
+facades and two original native VoiceFx references in each round. Eight channels
+are captured before muting the destination. Maximum absolute error is
+3.129243850708008e-7 and relative RMS error 1.1485966899135134e-6, under the unchanged
+1e-4 bounds. The third round measured one recovered stale callback per facade
+(128 frames); another round recorded a 384-frame genuine forward epoch gap.
+Every facade reported zero waiting/silenced frames. The VM regression separately
+covers the original three-stale-callback native marker fixture. The same permanent
+page exposes **Run reused live context batch**.
 
 The declared native PCM bounds remain maximum absolute error 1e-4 and relative RMS
 error 1e-4. There is no post-alignment, gain fitting, rate-specific arithmetic
@@ -108,11 +136,13 @@ pool or SharedArrayBuffer is required for this small serial effect.
 
 ## Permanent checks
 
-Eighteen focused checks cover six-rate partition-invariant PCM, two handles,
+Nineteen focused checks cover six-rate partition-invariant PCM, two handles,
 configuration round-trip/latest-target reset, atomic validation, bypass clocks,
 actual public processor execution, future controls, disposal, context ownership,
 readiness, bounded meter requests, failed/closed-context cleanup, idempotent
-disposal and the pending-meter/disposal race.
+disposal, the pending-meter/disposal race and the actual public processor's
+measured stale-frame sequence. Four additional shared clock tests cover the
+native marker fixture, genuine pull gaps, invalid epochs and declared lag limits.
 
 The audited build matches 48 persisted fingerprints of the independently native-
 accepted owned policy, then executes 480,000 controls during bypass across 12
@@ -134,8 +164,8 @@ piano stream and remain in its uncommitted Instrument change until that stage is
 accepted. The accepted standalone/facade/VoiceFx checkpoint does not claim normal
 application adoption on its own.
 
-Remaining acceptance is real AudioContext playback and coordinated runtime-
-environment adoption.
+Remaining acceptance is coordinated runtime-environment adoption and its full
+application playback/export route.
 Native AudioBus silence/tail liveness outside this
 component is not inferred from zero-valued PCM. The uninterrupted-input bypass
 fixture does not establish every upstream silence-flag policy. The parallel-mix
