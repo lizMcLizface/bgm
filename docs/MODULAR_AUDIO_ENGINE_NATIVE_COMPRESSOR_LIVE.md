@@ -1,5 +1,13 @@
 # Ordinary native compressor: owned live wrapper
 
+Additive bare-native initialization is accepted at e1f896e51775da26. It retains
+the identical Wasm and preserves the default ordinary-wrapper profile. The fixed
+five normal Iowa/native-reference cases pass with exact samples in both
+channels: cold48k, late96k, demand-gap48k and two reused live rounds, with the
+complete original IR lengths471,388/942,776 frames. The dedicated Iowa review
+page and player integration are owned by the source port; this leaf supplies the
+initialization contract. Forty-nine focused checks pass.
+
 This leaf ports the ordinary `src/nodes/compressor.js` step-control contract,
 separately from the amount/makeup VoiceCompressor and the effects desk's parallel
 compressor. The original native path remains the default. The prepared factory
@@ -143,6 +151,18 @@ maximum absolute error 8.940696716308594e-8 and relative RMS
 candidate are recorded separately.
 
 ## API and persistence
+
+`profile:'bare-native'` selects the actual native defaults
+`[-24,30,12,.003,.25]` and suppresses the wrapper's two `.005/.05` property
+events. Omitted `profile` retains `nodes-wrapper` exactly. Immutable
+`initialProperties:[[parameterIndex,rawValue],...]` performs public property
+writes in order (intrinsic update plus scheduled step) in live or offline
+construction. The trace is bounded at64 and mutually exclusive with settings
+or initialControls. Explicit later `setProperty(index,value)` preserves that
+operation. Snapshots name `constructorProfile`; a bare cold replay uses this
+profile and properties from its raw settings. Reset uses the selected
+constructor and latest public properties. No fake native DSP AudioParams are
+introduced, and stale prepared artifacts lacking this capability reject.
 
 `createRustCompressorFactory(context)` prepares the compiled module and worklet
 for that exact context, then returns a synchronous node factory. Each node owns a

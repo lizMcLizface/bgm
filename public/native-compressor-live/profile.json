@@ -202,7 +202,12 @@
     "startup": "Original constructor properties and optional same-clock five-setting snapshot installed before first process; explicit initialPull only for OfflineAudioContext. Live sources must await bounded arm/flush after resume and demand wiring; ready remains creation-only.",
     "initialControls": "Optional Offline-only bounded64 tuples [parameter,rawValue], mutually exclusive with named settings. Preserves exact partial initial setter trace after constructor property events, without invented defaults. Named settings is a cold full-five-step replay. Later identical calls are not deduplicated.",
     "finiteClamping": "Facade preserves raw finite Float32-representable settings/presets/snapshots, converts through native Float32 then nominal clamps for step DSP. Effective requested targets are reported separately. Nonfinite or Float32 overflow rejects. Rust typed kernel remains strict nominal range.",
-    "failureCleanup": "Processor message handler is installed before Wasm instantiation, so a constructor failure can acknowledge dispose. Failure/dispose clears handle, exports and buffer views. Closed-context host teardown posts best-effort dispose before closing its port. Tests shard at most18 OAC cases per document; this is a harness resource bound, not a claim of immediate browser GC or a new normal-instance cap."
+    "failureCleanup": "Processor message handler is installed before Wasm instantiation, so a constructor failure can acknowledge dispose. Failure/dispose clears handle, exports and buffer views. Closed-context host teardown posts best-effort dispose before closing its port. Tests shard at most18 OAC cases per document; this is a harness resource bound, not a claim of immediate browser GC or a new normal-instance cap.",
+    "constructorProfiles": {
+      "default": "nodes-wrapper",
+      "wrapper": "Original native node plus attack.005/release.05 public properties",
+      "bare": "True native defaults[-24,30,12,.003,.25], no wrapper properties. Optional bounded64 initialProperties updates intrinsic and schedules each step in order for live/offline construction; mutually exclusive with settings/initialControls. Reset uses the selected constructor then latest public properties."
+    }
   },
   "propertySources": [
     {

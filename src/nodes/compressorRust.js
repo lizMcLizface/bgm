@@ -1,34 +1,36 @@
 import {prepareNativeCompressorLive} from '../modular-audio/nativeCompressorLiveBrowser.js';
 import {NATIVE_COMPRESSOR_PARAMETERS,ownedNativeCompressorSpec,validateOwnedNativeCompressorSpec} from '../modular-audio/ownedNativeCompressor.js';
-const DEFAULTS={threshold:-24,knee:30,ratio:12,attack:.005,release:.05};
+const DEFAULTS={threshold:-24,knee:30,ratio:12,attack:.005,release:.05},BARE_DEFAULTS={threshold:-24,knee:30,ratio:12,attack:.003,release:.25};
 function effectiveValue(index,value){
  const range=NATIVE_COMPRESSOR_PARAMETERS[index];if(!range||typeof value!=='number'||!Number.isFinite(value))throw Error('Invalid raw compressor value');const f32=Math.fround(value);if(!Number.isFinite(f32))throw Error('Invalid raw compressor value');
  return f32<range[1]?range[1]:f32>range[2]?range[2]:f32;
 }
-function initialConfiguration(context,settings,initialControls){
- if(settings!==undefined&&initialControls!==undefined)throw Error('Initial settings and controls are mutually exclusive');
- const raw=NATIVE_COMPRESSOR_PARAMETERS.map(([name])=>DEFAULTS[name]);let controls=null;
+function initialConfiguration(context,defaults,settings,initialControls,initialProperties){
+ if([settings,initialControls,initialProperties].filter(value=>value!==undefined).length>1)throw Error('Initial settings, controls and properties are mutually exclusive');
+ const raw=NATIVE_COMPRESSOR_PARAMETERS.map(([name])=>defaults[name]);let controls=null,properties=null;
  if(settings!==undefined){
   if(!settings||typeof settings!=='object'||Array.isArray(settings)||Object.keys(settings).some(key=>!NATIVE_COMPRESSOR_PARAMETERS.some(([name])=>key===name)))throw Error('Invalid raw compressor settings');
-  const merged={...DEFAULTS,...settings};controls=NATIVE_COMPRESSOR_PARAMETERS.map(([name],i)=>[i,merged[name]]);
+  const merged={...defaults,...settings};controls=NATIVE_COMPRESSOR_PARAMETERS.map(([name],i)=>[i,merged[name]]);
  }else if(initialControls!==undefined){
   if(typeof context.startRendering!=='function'||!Array.isArray(initialControls)||initialControls.length>64)throw Error('Initial controls require a bounded OfflineAudioContext trace');
   controls=initialControls;
- }
+ }else if(initialProperties!==undefined){if(!Array.isArray(initialProperties)||initialProperties.length>64)throw Error('Initial properties require a bounded native property trace');properties=initialProperties;}
  if(controls)controls=controls.map(entry=>{if(!Array.isArray(entry)||entry.length!==2||!Number.isInteger(entry[0]))throw Error('Invalid initial compressor control');const[index,value]=entry,effective=effectiveValue(index,value);raw[index]=value;return[index,effective];});
- return{raw,effective:raw.map((value,index)=>effectiveValue(index,value)),controls};
+ if(properties)properties=properties.map(entry=>{if(!Array.isArray(entry)||entry.length!==2||!Number.isInteger(entry[0]))throw Error('Invalid initial compressor property');const[index,value]=entry,effective=effectiveValue(index,value);raw[index]=value;return[index,effective];});
+ return{raw,effective:raw.map((value,index)=>effectiveValue(index,value)),controls,properties};
 }
 /** Prepared single-I/O node. DSP coefficients never come from AudioParams. */
 class RustCompressor{
- constructor(context,assets,{settings,initialControls,initialPull=false,hostAwake=true}={}){
+ constructor(context,assets,{profile='nodes-wrapper',settings,initialControls,initialProperties,initialPull=false,hostAwake=true}={}){
   if(typeof initialPull!=='boolean'||initialPull&&typeof context.startRendering!=='function')throw Error('Initial pull is an explicit OfflineAudioContext preparation contract');
   if(typeof hostAwake!=='boolean'||initialPull&&!hostAwake)throw Error('Invalid initial raw compressor host demand');
-  this.AC=context;const spec=validateOwnedNativeCompressorSpec(ownedNativeCompressorSpec(DEFAULTS)),configuration=initialConfiguration(context,settings,initialControls);
+  if(!['nodes-wrapper','bare-native'].includes(profile))throw Error('Unsupported native compressor constructor profile');if((profile==='bare-native'||initialProperties!==undefined)&&!assets.manifest.constructorProfiles?.includes('bare-native'))throw Error('Prepared compressor does not support native property initialization');
+  this.constructorProfile=profile;const defaults=profile==='bare-native'?BARE_DEFAULTS:DEFAULTS;this.AC=context;const spec=validateOwnedNativeCompressorSpec(ownedNativeCompressorSpec(defaults)),configuration=initialConfiguration(context,defaults,settings,initialControls,initialProperties);
   this.values=configuration.raw;this.effectiveValues=configuration.effective;this.sequence=0;this.request=0;this.pending=new Map();this.error=null;this.disposed=false;this.cached=null;this.engineVersion=assets.manifest.version;
   this.hostAwake=hostAwake;this.demandValue=Number(initialPull);this.edges=[];
   this.health=new Promise(resolve=>this.resolveHealth=resolve);
   const originSeconds=context.currentTime,originFrame=this.frame(originSeconds);
-  this.node=new AudioWorkletNode(context,assets.manifest.processorName,{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2],channelCount:2,channelCountMode:'clamped-max',parameterData:{hostDemand:this.demandValue},processorOptions:{module:assets.module,engineVersion:assets.manifest.version,parameters:spec.parameters.map(p=>p[1]),originFrame,originSeconds,initialControls:configuration.controls,initialPull}});
+  this.node=new AudioWorkletNode(context,assets.manifest.processorName,{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[2],channelCount:2,channelCountMode:'clamped-max',parameterData:{hostDemand:this.demandValue},processorOptions:{module:assets.module,engineVersion:assets.manifest.version,parameters:spec.parameters.map(p=>p[1]),originFrame,originSeconds,constructorProfile:profile,initialControls:configuration.controls,initialProperties:configuration.properties,initialPull}});
   this.node.port.onmessage=({data})=>this.receive(data);this.node.onprocessorerror=()=>this.failed('Raw compressor processor failed');
   this.demand=this.node.parameters.get('hostDemand');
   if(!this.demand||typeof this.demand.setValueAtTime!=='function'){this.failed('Raw compressor Boolean demand transport is unavailable');throw Error(this.error);}
@@ -69,6 +71,7 @@ class RustCompressor{
  connect=destination=>[].concat(destination).forEach(node=>this.node.connect(node));
  getThreshold=()=>this.values[0];
  getRatio=()=>this.values[2];
+ setProperty(index,value){if(!Number.isInteger(index)||index<0||index>=5)throw Error('Invalid native compressor property identity');return this.set(index,value,true);}
  setThreshold=value=>this.set(0,value);
  setKnee=value=>this.set(1,value);
  setRatio=value=>this.set(2,value);
@@ -87,7 +90,7 @@ class RustCompressor{
  arm=()=>this.AC.state==='running'?this.flush():Promise.reject(Error('Resume the AudioContext before arming the raw compressor'));
  reset=()=>{const seconds=this.AC.currentTime;return this.command('reset',{seconds,frame:this.frame(seconds)});};
  reduction=()=>this.cached?.reductionDb??0;
- snapshot=()=>({version:1,profile:'nodes-compressor-step-e14de735-v1',settings:Object.fromEntries(NATIVE_COMPRESSOR_PARAMETERS.map(([key],i)=>[key,this.values[i]])),effectiveSettings:Object.fromEntries(NATIVE_COMPRESSOR_PARAMETERS.map(([key],i)=>[key,this.effectiveValues[i]]))});
+ snapshot=()=>({version:1,profile:'nodes-compressor-step-e14de735-v1',constructorProfile:this.constructorProfile,settings:Object.fromEntries(NATIVE_COMPRESSOR_PARAMETERS.map(([key],i)=>[key,this.values[i]])),effectiveSettings:Object.fromEntries(NATIVE_COMPRESSOR_PARAMETERS.map(([key],i)=>[key,this.effectiveValues[i]]))});
  disconnectOutput(){const disconnect=this.originalDisconnect;this.originalDisconnect=null;this.edges=[];try{disconnect?.();}catch(error){this.cleanupError=String(error);}}
  releaseNode(node){
   for(const pending of this.pending.values())pending.reject(Error(this.error??'Disposed raw compressor'));this.pending.clear();this.disconnectOutput();

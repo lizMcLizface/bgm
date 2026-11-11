@@ -2,15 +2,19 @@
   "api": 1,
   "profile": "nodes-compressor-step-e14de735-v1",
   "demandTransport": "authored-frame-boolean-last-v1",
+  "constructorProfiles": [
+    "nodes-wrapper",
+    "bare-native"
+  ],
   "audited": false,
   "coreVersion": "335aff83b5b5bf1a",
   "coreSource": "0a3ed44ff138c310563d8575a13a509abad009004bb11b272cf369392455a854",
-  "source": "2f9e0093ed56d1434a343045648772d51b60099aabc7ecabc4742a4c70e5c920",
+  "source": "0787ad0b85036697a84d4ff2e0cb3498a261621102c53b3ed6973df6ee950b9d",
   "wasm": "447eeb308ba2023a6e051d0fba08f9b6b307e1091db4604a325f14ba881eee6e",
   "bytes": 69695,
-  "runtime": "ae6d937ee814e8b18f74c024aee0ddfdfe567790919643562d8abace96bacdad",
-  "version": "1e26d3251c12099f",
-  "processorName": "raw-native-compressor-1e26d3251c12099f",
-  "processor": "8d0c2d0bf8bb432df3b940032b8dfacdaf718e968d908b66f6052d3e4af53c59",
+  "runtime": "a3f20e47ae8897184fac9b1360e3749636a4db8f65bdfb23d5a4353e4a80412f",
+  "version": "e1f896e51775da26",
+  "processorName": "raw-native-compressor-e1f896e51775da26",
+  "processor": "54d7f53674c174e3a458dd91c24b5708cd67f9e2cfd25b2816d315985452ec7c",
   "scope": "Original current-time step events retain original seconds, native AudioParam predecessor/fresh-clamp policy, and explicit outgoing pull state. The accepted compressor math is unchanged. Shared host callback clock; no native pulled-value bridge. Rack12ms targets/parallel topology excluded."
 }
