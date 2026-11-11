@@ -47,7 +47,9 @@ export function fxTail(preset) {
 
 /** The effects as one block: input -> active stages -> output. */
 export class VoiceFx {
-    constructor(AC, preset, order = ['tape', 'motion', 'compressor', 'shimmer', 'freeze'], { compressorFactory, shimmerFactory, motionFactory } = {}) {
+    constructor(AC, preset, order = ['tape', 'motion', 'compressor', 'shimmer', 'freeze'], { compressorFactory, shimmerFactory, motionFactory, onError = ()=>{} } = {}) {
+        if(typeof onError!=='function')throw Error('Invalid voice effects error callback');
+        this.onError=onError;
         if(motionFactory!==undefined&&typeof motionFactory!=='function')throw Error('Invalid Motion factory');
         motionFactory?.validatePreset?.({...PRESET_DEFAULTS,...preset});
         this.validateMotionPreset=motionFactory?.validatePreset;
@@ -63,14 +65,16 @@ export class VoiceFx {
     }
 
     set(preset) {
+        if(this.failure)throw this.failure;
         const p = { ...PRESET_DEFAULTS, ...preset };
         this.validateShimmerPreset?.(p);
         this.validateMotionPreset?.(p);
         const motion=this.stages.find(stage=>stage.key==='motion');
         motion?.node?.preflightPreset?.(p,Object.keys(motion.setters).filter(key=>motion.values[key]!==p[key]));
+        if(motion&&!motion.active(p))motion.node?.setHostAwake?.(false);
         for (const stage of this.stages) {
             if (!stage.node && !stage.active(p)) continue;
-            stage.node ??= stage.create(this.AC, { hostLifetime: 'voicefx' });
+            stage.node ??= stage.create(this.AC, { hostLifetime: 'voicefx', ...(stage.key==='motion'?{hostAwake:false}:{}), onError:error=>{this.failure??=error instanceof Error?error:Error(String(error));this.onError(this.failure);} });
             for (const [key, setter] of Object.entries(stage.setters)) {
                 if (stage.values[key] !== p[key]) setter(stage.node, p[key]);
                 stage.values[key] = p[key];
@@ -79,7 +83,7 @@ export class VoiceFx {
         this.ready = Promise.all(this.stages.map((stage) => stage.node?.ready).filter(Boolean));
         const active = this.stages.filter((stage) => stage.node?.managedBypass === true || stage.active(p));
         const signature = active.map((stage) => stage.key).join();
-        if (signature === this.signature) return;
+        if (signature === this.signature) {motion?.node?.setHostAwake?.(active.includes(motion));return;}
         this.signature = signature;
         this.input.disconnect();
         this.stages.forEach((stage) => stage.node && stage.output?.disconnect());
@@ -93,10 +97,13 @@ export class VoiceFx {
             previous = stage.output;
         }
         previous.connect(this.output);
+        motion?.node?.setHostAwake?.(active.includes(motion));
     }
 
     async arm() {
+        if(this.failure)throw this.failure;
         await this.ready;
+        if(this.failure)throw this.failure;
         if (this.AC.state === 'running') await Promise.all(this.stages.map(stage => stage.node?.arm?.()));
     }
 

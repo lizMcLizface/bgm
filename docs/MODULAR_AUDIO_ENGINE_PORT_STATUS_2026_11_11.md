@@ -51,15 +51,22 @@ independent per-call targets and normal hosts; actual All/reload also passes.
 The bounded stamped record transport preserves complete ordered controls.
 See MODULAR_AUDIO_ENGINE_STAMPED_TARGET_TRANSPORT.md for measured metadata cost.
 
-Width/Filter/Ring captured DSP passes36 cases. The corrected live candidate
-passes216 short cases and the48k long/delayed gate, but the expanded gate finds
-an8k stereo Filter idle/restart mismatch. Its negative is retained. The separate
-normal Width/Ring baseline passes72 cases, but delayed-first-input markers
-currently fail; their normal adoption also remains unaccepted. The fresh-document candidate now passes216cases; a later reused-context replacement first-sample gate remains open. Wind/fire/vinyl original loop playback passes23
-full-resource/reuse cases plus immediate startup/quota checks; running-context
-paged-bank component passes five ownership/upload checks. Normal two-bed
-ownership and cleanup complete, but a strict summed PCM difference of7.45e-9
-remains under diagnosis before acceptance.
+Width/Ring now passes216 independent-lane cases and72 whole-rack Native
+comparisons, exact cold/reused reconstruction and actual All hot insertion,
+removal, re-addition and bypass. Both CLASSIC and drum-machine cold exports and
+built-bundle checks pass. It is selected in the explicit prepared environment.
+The new normal Filter candidate passes32 cases at four supported rates plus
+exact cold and begun-loop checks, but requires authoritative source/stage
+activity. Arbitrary Native prefixes and low-rate silent-flag inference remain
+unaccepted. See MODULAR_AUDIO_ENGINE_RACK_FILTER_NORMAL.md.
+
+Normal Ambience two-bed banks and exact12channel source endpoint checks pass;
+aggregate addition is checked against a derived Float32 arithmetic envelope.
+Complete spatial DSP/Native phase preparation also passes36 six-rate cases,
+with all12 wet channels bit exact. Its bounded running resource/control owner
+is in progress; the prepared environment still selects Native loop/spatial
+playback. Motion normal routes/endpoints/cold reconstruction pass, while the
+combined startup ordering guard remains under review. See component records.
 
 Then finish remaining effect host rewiring/demand, shared-room/transport latency
 composition and original ambience spatial/fade/wander/BufferSource ownership.

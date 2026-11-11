@@ -1,3 +1,4 @@
+import{retireAudioActions,finishAudioRetirement}from'../../audio/retireAudio.js';
 import{validateAudioEnvironment,nativeInstrumentRuntimeKey}from'./audioEnvironment';
 import DEFAULTS from './presetDefaults';
 import {translatedWasmVoice,needsNativeSource} from './wasmPreset';
@@ -11,9 +12,9 @@ export default class WasmInstrument {
  static async create({context,preset={},polyphony=8,notes=[],spec=null,roomPool=null,dynamics=null,audioEnvironment=null}){
   const environment=validateAudioEnvironment(audioEnvironment,context),i=new WasmInstrument(context,preset,polyphony);i.audioEnvironment=environment;i.overrideSpec=spec;i.roomPool=roomPool;i.dynamics=dynamics;
   try{i.voice=await LabVoice.create(context,i.spec(),{audioEnvironment:i.audioEnvironment,notes,roomPool,onError:e=>{i.error=e;console.error('Wasm voice failed',e);}});i.attachVoice(i.voice);i.reverb=i.voice.native?.reverb??i.reverb;i.preScheduled=Number.isFinite(context.length);return i;}
-  catch(e){i.dispose();throw e;}
+  catch(e){try{await i.dispose();}catch(cleanupError){e.cleanupError=cleanupError;}throw e;}
  }
- constructor(context,preset,polyphony){this.AC=context;this.polyphony=polyphony;this.preset={...DEFAULTS,...preset};this.output=context.createGain();this.roomOutput=context.createGain();this.roomInput=context.createGain();this.ready=Promise.resolve();this.revision=0;this.disposed=false;this.reverb={settled:true,hear(){},setLevel(){}};this.held=new Map();this.nextId=1;this.syncEnvelope();}
+ constructor(context,preset,polyphony){this.AC=context;this.polyphony=polyphony;this.preset={...DEFAULTS,...preset};this.output=context.createGain();this.roomOutput=context.createGain();this.roomInput=context.createGain();this.ready=Promise.resolve();this.revision=0;this.disposed=false;this.preparations=new Set();this.retirements=new Set();this.reverb={settled:true,hear(){},setLevel(){}};this.held=new Map();this.nextId=1;this.syncEnvelope();}
  spec(){const native=nativeWasmVoice(this.preset,this.polyphony);if(native&&this.preset.mixerSpaceMoved)native.patch.effects={...native.patch.effects,reverb:0,delay:0,delayToReverb:0};return this.overrideSpec??native??(needsNativeSource(this.preset)?{kind:'legacy',patch:this.preset,polyphony:this.polyphony}:{...translatedWasmVoice(this.preset,this.polyphony,this.dynamics),fx:this.preset});}
  /** Timbre drift (composition/timbreDrift.js): the source patched live from the preset and these values, the preset unchanged. */
  setDrift(values,seconds=.5){if(!this.voice||this.loading)return;const spec=this.spec();if(spec.kind==='legacy'){this.voice.native?.setDrift?.(values);return;}if(this.overrideSpec||spec.kind!=='subtractive'||this.preset.wasmVoice)return;const drifted=values?translatedWasmVoice({...this.preset,...values},this.polyphony,this.dynamics):spec;if(drifted.kind!==spec.kind||JSON.stringify([drifted.patch.effects,drifted.patch.inserts])!==JSON.stringify([spec.patch.effects,spec.patch.inserts]))return;this.voice.patchSource(drifted.patch,{seconds});}
@@ -27,15 +28,19 @@ export default class WasmInstrument {
  connect(node){this.output.connect(node);}
  armRuntime(){return this.voice?.armRuntime?.()??this.voice?.native?.armRuntime?.();}
  applyPreset(preset,override=null){
+  if(this.disposed)throw Error('Disposed Wasm instrument');
   const previous=this.preset;this.preset={...DEFAULTS,...preset};this.overrideSpec=override;this.syncEnvelope();const revision=++this.revision,spec=this.spec();
   this.loading=true;this.error=null;
   this.ready=LabVoice.create(this.AC,spec,{audioEnvironment:this.audioEnvironment,roomPool:this.roomPool,onError:error=>{this.error=error;console.error('Wasm voice failed',error);}}).then(voice=>{
-   if(this.disposed||revision!==this.revision){voice.dispose();return;}
-   const old=this.voice;this.attachVoice(voice);this.voice=voice;this.reverb=voice.native?.reverb??{settled:true,hear(){},setLevel(){}};old?.dispose();for(const [id,note]of this.held)if(note.voice)this.held.delete(id);this.loading=false;if(this.wander)this.setWander(this.wander);
+   if(this.disposed||revision!==this.revision){this.retireVoice(voice);return;}
+   const old=this.voice;this.attachVoice(voice);this.voice=voice;this.reverb=voice.native?.reverb??{settled:true,hear(){},setLevel(){}};this.retireVoice(old);for(const [id,note]of this.held)if(note.voice)this.held.delete(id);this.loading=false;if(this.wander)this.setWander(this.wander);
   }).catch(error=>{if(revision===this.revision){this.loading=false;this.preset=previous;this.syncEnvelope();this.error=error;}console.error('Could not change Wasm voice',error);});
+  const pending=this.ready;this.preparations.add(pending);pending.finally(()=>this.preparations.delete(pending)).catch(()=>{});
  }
  morphTo(preset){this.applyPreset(preset);}
  set(key,value){
+  if(this.disposed)return;
+  if(!this.loading&&this.voice?.fx&&FX_KEYS.has(key)){const next={...this.preset,[key]:value};this.voice.fx.set(next);this.preset=next;this.syncEnvelope();this.voice.spec.fx=next;return;}
   const previous=this.preset,before=this.spec();this.preset={...this.preset,[key]:value};this.syncEnvelope();const after=this.spec();
   // A legacy preset can change source ownership while keeping its legacy kind.
   if(!this.loading&&this.voice&&this.audioEnvironment&&nativeInstrumentRuntimeKey(this.audioEnvironment,previous,this.AC)!==nativeInstrumentRuntimeKey(this.audioEnvironment,this.preset,this.AC)){const next=this.preset;this.preset=previous;this.applyPreset(next,this.overrideSpec);return;}
@@ -52,6 +57,7 @@ export default class WasmInstrument {
  }
  /** A new spec (a DIY patch's edits): patched in place, or rebuilt (coalesced) when its effects change. */
  setSpec(spec){
+  if(this.disposed)return;
   const before=this.spec();
   if(!this.loading&&this.voice&&before.kind===spec.kind&&JSON.stringify([before.patch.effects,before.patch.inserts])===JSON.stringify([spec.patch.effects,spec.patch.inserts])){this.overrideSpec=spec;this.voice.patch=structuredClone(spec.patch);this.voice.patchSource(spec.patch,{seconds:.06});return;}
   this.overrideSpec=spec;clearTimeout(this.editTimer);this.ready=new Promise(resolve=>{this.editResolve?.();this.editResolve=resolve;this.editTimer=setTimeout(()=>{this.editResolve=null;this.applyPreset(this.preset,this.overrideSpec);this.ready.then(resolve);},70);});
@@ -79,5 +85,6 @@ export default class WasmInstrument {
  activeEffects(){return this.voice?.native?.activeEffects()??['Wasm source','Instrument delay','FDN room'];}
  effectsAwake(){return !this.disposed;}
  awakeVoices(){return this.voice?.native?.awakeVoices()??this.voice?.stats?.active??this.voice?.keys.size??0;}
- dispose(){if(this.disposed)return;this.disposed=true;this.revision++;clearTimeout(this.editTimer);this.editResolve?.();this.silence();this.voice?.dispose();this.output.disconnect();this.roomOutput.disconnect();this.roomInput.disconnect();}
+ retireVoice(voice){if(!voice)return Promise.resolve();const pending=retireAudioActions([()=>voice.dispose()],'Replaced voice disposal failed');this.retirements.add(pending);pending.catch(error=>{this.retirementFailure??=error;}).finally(()=>this.retirements.delete(pending));return pending;}
+ dispose(){if(this.disposed)return this.disposal;this.disposed=true;this.revision++;const initial=retireAudioActions([()=>{clearTimeout(this.editTimer);this.editResolve?.();},()=>this.silence(),()=>this.retireVoice(this.voice),...[...this.preparations].map(p=>()=>p),...[...this.retirements].map(p=>()=>p),()=>this.output.disconnect(),()=>this.roomOutput.disconnect(),()=>this.roomInput.disconnect()],'Wasm instrument disposal failed');this.disposal=finishAudioRetirement(initial,()=>this.retirements,()=>this.retirementFailure,'Wasm instrument retirement failed');this.disposal.catch(error=>{this.disposalError=error;});return this.disposal;}
 }

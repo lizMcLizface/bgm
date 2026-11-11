@@ -46,23 +46,40 @@ differs over 128 frames at about 1e-13 and is explicitly unaccepted. Native
 loop playback remains the prepared environment's current selection. See
 MODULAR_AUDIO_ENGINE_AMBIENCE_BANK_HOST.md and its spatial continuation plan.
 
-Latest full regression: 578 files / 4748 passing / 4 skipped. Optional Motion
-hooks preflight complete presets, individual controls, morph validation and
-drift before mutation; lazy VoiceFx checks capacity before other stages change.
-Motion remains Native in the prepared environment pending its endpoint gate.
-Its 144 portable/host cases and actual cold-page replay pass, but the stronger
-stopped-source/retrigger test found a real first-retrigger mismatch; that
-negative is preserved and being corrected rather than accepting the short cases
-as full lifecycle coverage.
+Latest complete regression: 583 files / 4930 passing / 4 skipped. The current focused owner/route regression passes
+116 checks. Parent disposal now closes all owners immediately, awaits their
+acknowledgements and late preparations, and preserves cleanup failures. Closed
+All hosts reject further operations; failed presets preflight before mutation.
 
-Complete Ambience spatial processing is also a separate candidate, not adopted.
-The six-rate v4 batch passes 31/36 cases. Two 8 kHz dynamic cutoff failures were
-traced to clamping events before automation evaluation; the corrected v5 pair
-passes. Three high-rate sine control cases exceed the unchanged 1e-7 bound by
-one Float32 step. An independent Native phase-table preparation probe confirms
-the current phase-basis arithmetic differs from the original PeriodicWave
-preparation. These remaining preparation cases stay unaccepted. Exact source,
-commands, tables and failed evidence are retained under ignored reports/.
+Motion endpoint/retrigger, cold reconstruction and normal Core/FM local/shared
+and Instrument routes now pass. Motion2cd2cba4c55d2bfe and Raw compressor
+6833c3363ed09843 retain identical numeric Wasm and pass bounded dormant startup
+regressions. Real begun-loop cursor comparisons and built normal48k routes
+match Native exactly. The actual mixed All/reconstruction trio passes with21
+Motion owners and all observed ordinary compressors released cleanly.
+Motion is selected only in the explicit prepared environment.
+
+The combined local public bundle builds. Its All follow-up exposes a separate
+rack-dynamics startup rejection after one passing case; a Width/Ring insertion
+run separately rejects after two. Both preserve zero Motion/Raw errors. These
+assembled negatives stay unaccepted and are being diagnosed before any claim
+that all startup paths are closed. Shared clocks and accepted numeric DSP have
+not been clamped or changed. See component startup records.
+
+Complete Ambience spatial DSP and exact Native phase-table preparation pass
+36 Native cases at six rates: all 12 wet channels are bit exact, aggregate
+maximum difference 2.9802322387695312e-8 under the unchanged 1e-7 bound.
+The former phase preparation failures are resolved. This component remains
+separate from normal adoption; bounded live resource/control ownership is next.
+See MODULAR_AUDIO_ENGINE_AMBIENCE_SPATIAL.md.
+
+The independent normal Filter candidate passes 32 whole-stage Native cases at
+44.1/48/96/192 kHz, exact independent instances, cold page reconstruction and
+two exact begun-loop cursor checks. Maximum difference is
+4.023313522338867e-7, relative RMS 5.245403120916476e-7. It requires explicit
+source/stage activity authority; unknown Native silent flags and low rates are
+refused. The retained low-rate restart failure is not declared resolved.
+See MODULAR_AUDIO_ENGINE_RACK_FILTER_NORMAL.md.
 
 Normal All Native-desk/owned-desk/restored cases also pass with 51 owned dynamics
 instances. Normal CLASSIC and drum-machine cold score exports pass with fresh
@@ -71,9 +88,10 @@ later Width/Ring integration refreshes nine reference manifests with every
 accepted numeric Wasm artifact verified byte-identical. Build results and
 component documents bind their own exact identities.
 
-Next: finish the grouped normal Width/Ring export gate and built-bundle checks,
-resolve Motion source-end/restart and Ambience phase preparation, then adopt
-only verified complete owners. Filter's retained low-rate restart gate, Tape,
+The grouped Width/Ring cold exports and built-bundle gates now pass.
+Next: diagnose and close rack-dynamics/Width-Ring startup admission using the
+actual captured failing owner states, then finish live Tape, Ambience
+resource/control ownership and explicit Filter routing admission. Filter's retained low-rate restart gate, Tape,
 shared sampled rooms and the remaining native Instrument effects remain active
 port work. General cable editing and broader worker execution remain later.
 Freeze capture retains its explicit worker/resource policy.

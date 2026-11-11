@@ -53,13 +53,13 @@ class RustCompressor{
  frame(seconds=this.AC.currentTime){const frame=Math.round(seconds*this.AC.sampleRate);if(!Number.isSafeInteger(frame)||frame<0||frame%128)throw Error('Raw compressor requires canonical context time');return frame;}
  updateDemand(){const value=Number(this.hostAwake&&this.edges.length>0);if(value===this.demandValue)return;const seconds=this.AC.currentTime;this.frame(seconds);this.demand.setValueAtTime(value,seconds);this.demandValue=value;}
  setHostAwake(value){this.alive();if(typeof value!=='boolean')throw Error('Raw compressor host awake must be Boolean');this.hostAwake=value;this.updateDemand();}
- failed(error){
-  this.error=String(error);this.healthy=false;this.resolveHealth({error:this.error});for(const p of this.pending.values())p.reject(Error(this.error));this.pending.clear();
+ failed(error,diagnostics){
+  this.failureDiagnostics=diagnostics??null;this.error=String(error);this.healthy=false;this.resolveHealth({error:this.error});for(const p of this.pending.values())p.reject(Error(this.error));this.pending.clear();
   if(!this.disposed)this.dispose().catch(failure=>{this.cleanupError=String(failure);});
  }
  receive(data){
   if(data?.kind==='ready'){this.healthy=!this.disposed&&!this.error;this.cached=data.stats;this.resolveHealth({ready:true,engineVersion:data.engineVersion,stats:data.stats});return;}
-  if(data?.kind==='error'){this.failed(data.error);return;}
+  if(data?.kind==='error'){this.failed(data.error,data.diagnostics);return;}
   if(data?.kind==='rejected'){
    if(this.pending.has(data.request)){this.pending.get(data.request).reject(Error(data.error));this.pending.delete(data.request);}
    else{this.lastRejection=String(data.error);this.failed(data.error);}return;

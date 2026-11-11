@@ -1,3 +1,4 @@
+import{retireAudioActions}from'../audio/retireAudio.js';
 import {WasmRoomPool} from '../synth-lab/roomPool';
 import {createWasmRoomRoute} from './engine/wasmRoomRoute';
 import { busActive, createBusRack } from './engine/bus';
@@ -949,6 +950,14 @@ class Generator {
      * ({classics}), or a preset of the generator's own synth on the current audio engine.
      * `name` is the preset's (a classic is named by its sound); a classic counts as edited.
      */
+    retireInstrument(instrument) {
+        if(!instrument)return Promise.resolve();
+        const pending=retireAudioActions([()=>instrument.dispose?.()],'Generator source retirement failed');
+        this.sourceRetirements??=new Set();this.sourceRetirements.add(pending);
+        pending.catch(error=>{this.sourceRetirementFailure??=error;}).finally(()=>this.sourceRetirements.delete(pending));
+        return pending;
+    }
+
     async setRoleSource(role, source, name) {
         if(!ROLES[role])throw Error('Unknown melodic role');
         const r=this.roles[role],revision=r.sourceRevision=(r.sourceRevision??0)+1;
@@ -967,9 +976,9 @@ class Generator {
                 const Wasm=(await import('./engine/wasmInstrument')).default;
                 instrument=await Wasm.create({audioEnvironment:this.audioEnvironment,context:this.AC,preset:source,polyphony:ROLES[role].polyphony,roomPool:this.wasmRoomPool,dynamics:applyFeel(this.settings).dynamics});
             }else instrument=new Instrument({...nativeInstrumentEnvironment(this.audioEnvironment,source??findPreset(ROLES[role].preset),this.AC),context:this.AC,preset:source??findPreset(ROLES[role].preset),polyphony:ROLES[role].polyphony,reverbHub:this.reverbHub});
-            if(this.audioEnvironment)try{await instrument.ready;await instrument.sourceReady;}catch(error){instrument.dispose();throw error;}
-            if(revision!==r.sourceRevision){instrument.dispose();return;}
-            r.roomRoute?.dispose();r.roomRoute=null;r.instrument.dispose();r.instrument=instrument;instrument.connect(r.tone);
+            if(this.audioEnvironment)try{await instrument.ready;await instrument.sourceReady;}catch(error){try{await this.retireInstrument(instrument);}catch(cleanupError){error.cleanupError=cleanupError;}throw error;}
+            if(revision!==r.sourceRevision){await this.retireInstrument(instrument);return;}
+            r.roomRoute?.dispose();r.roomRoute=null;this.retireInstrument(r.instrument);r.instrument=instrument;instrument.connect(r.tone);
             if(this.wasmRoomPool&&!source?.classics&&!source?.iowa)r.roomRoute=createWasmRoomRoute(this.AC,instrument,{roleWander:r.wander,volume:r.volume,cutoff:r.tone.frequency.value});
             r.stringPatchBase=null;r.edited=externalSource(source)&&!source?.iowa;r.presetName=name??source?.classics?.name??source?.diy?.name??ROLES[role].preset;
             this.applyMix();
@@ -999,11 +1008,11 @@ class Generator {
                 instrument.setKit(this.settings.drumKit);
                 instrument.setVoicePreset(this.settings.drums.kit);
             }
-            catch (error) { instrument.dispose(); throw error; }
+            catch (error) {try{await this.retireInstrument(instrument);}catch(cleanupError){error.cleanupError=cleanupError;}throw error; }
         }
-        if (revision !== r.sourceRevision) { instrument.dispose(); return; }
+        if (revision !== r.sourceRevision) { await this.retireInstrument(instrument); return; }
         if (source?.classics) instrument.setKit(this.settings.drumKit);
-        r.instrument.silence?.();r.instrument.dispose();
+        r.instrument.silence?.();this.retireInstrument(r.instrument);
         r.instrument = instrument;r.machine = !!source?.classics;instrument.connect(r.gain);
         r.presetName = source?.classics?.name ?? percussionVoice(this.settings.drums.kit).name;
         if (!r.machine) { this.percussionEngine=nextEngine; await this.syncPercussionVoice(); }

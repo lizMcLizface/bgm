@@ -1,3 +1,4 @@
+import{retireAudioActions}from'../audio/retireAudio.js';
 import{validateAudioEnvironment,nativeInstrumentEnvironment}from'../app/engine/audioEnvironment';
 import Instrument from '../app/engine/Instrument';
 import {WasmBackend} from '../synth-lab/backend';
@@ -16,7 +17,7 @@ import {VoiceFx} from '../app/engine/voiceFx';
 import {sourcePerformance,WASM_PERFORMANCE_EVENT} from '../audio/wasmPerformance';
 export {noteEvents} from './noteEvents';
 export class LabVoice {
- static async create(context,spec,{notes=[],onError=()=>{},roomPool=null,audioEnvironment=null}={}){const environment=validateAudioEnvironment(audioEnvironment,context),v=new LabVoice(context,spec);v.audioEnvironment=environment;v.roomPool=roomPool;try{await v.init(notes,onError);return v;}catch(e){v.dispose();throw e;}}
+ static async create(context,spec,{notes=[],onError=()=>{},roomPool=null,audioEnvironment=null}={}){const environment=validateAudioEnvironment(audioEnvironment,context),v=new LabVoice(context,spec);v.audioEnvironment=environment;v.roomPool=roomPool;try{await v.init(notes,onError);return v;}catch(e){try{await v.dispose();}catch(cleanupError){e.cleanupError=cleanupError;}throw e;}}
  constructor(context,spec){this.context=context;this.spec=structuredClone(spec);this.patch=structuredClone(spec.patch);this.output=context.createGain();this.output.gain.value=.7;this.nextId=100000;this.keys=new Map();this.released=new Set();this.pedal=false;this.level=1;this.disposed=false;}
  async init(notes,onError){
   this.onRuntimeError=onError;
@@ -30,7 +31,7 @@ export class LabVoice {
   let source=this.sourceInput;
   if(insertsActive(this.patch.inserts)){this.insert=await(this.audioEnvironment?.createInserts??createInstrumentInserts)(c,this.patch.inserts,{onError});source.connect(this.insert.input);source=this.insert.node;}
   // the calmbgm synth's tape, tremolo, compressor, shimmer and freeze (app/engine/voiceFx.js)
-  if(this.spec.fx){this.fx=new VoiceFx(c,this.spec.fx,undefined,this.audioEnvironment?.voiceFxOptions);if(this.audioEnvironment)await this.fx.ready;source.connect(this.fx.input);source=this.fx.output;}
+  if(this.spec.fx){this.fx=new VoiceFx(c,this.spec.fx,undefined,{...this.audioEnvironment?.voiceFxOptions,onError});if(this.audioEnvironment)await this.fx.ready;source.connect(this.fx.input);source=this.fx.output;}
   this.effects=roomPerformance(this.patch.effects);
   if(this.patch.routing?.room==='private'&&Number.isFinite(this.patch.routing.roomDecay))this.effects.decay=this.patch.routing.roomDecay;
   if(this.roomPool&&this.patch.routing?.room!=='private'){
@@ -67,5 +68,5 @@ export class LabVoice {
   this.patchSource(p,{seconds:.06});
  }
  panic(){if(this.disposed)return;this.keys.clear();this.released.clear();this.pedal=false;this.native?.silence();this.native?.flushTails();this.backend?.panic();for(const owner of[this.room,this.echo]){const cleared=owner?.clear?.();cleared?.catch?.(error=>this.onRuntimeError?.(error));}this.insert?.clear?.();this.fx?.clear();}
- dispose(){if(this.disposed)return;this.disposed=true;if(this.performanceChange)window.removeEventListener(WASM_PERFORMANCE_EVENT,this.performanceChange);this.keys.clear();this.released.clear();this.native?.dispose();this.channel?.dispose();this.echo?.dispose();this.room?.dispose();this.insert?.dispose();this.fx?.dispose();this.backend?.dispose();this.sourceInput?.disconnect();this.output.disconnect();}
+ dispose(){if(this.disposed)return this.disposal;this.disposed=true;this.disposal=retireAudioActions([()=>{if(this.performanceChange)window.removeEventListener(WASM_PERFORMANCE_EVENT,this.performanceChange);this.keys.clear();this.released.clear();},...[this.native,this.channel,this.echo,this.room,this.insert,this.fx,this.backend].filter(Boolean).map(owner=>()=>owner.dispose?.()),()=>this.sourceInput?.disconnect(),()=>this.output.disconnect()],'Lab voice disposal failed');this.disposal.catch(error=>{this.disposalError=error;});return this.disposal;}
 }

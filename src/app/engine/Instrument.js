@@ -1,3 +1,4 @@
+import{retireAudioActions,awaitRetiredPreparation}from'../../audio/retireAudio.js';
 // One playable synth voice-set with its own effects chain: what PolySynth
 // is, minus React and minus being a module-level singleton
 // (docs/DESIGN.md §2.2). Configured with the same flat preset
@@ -230,7 +231,7 @@ class Instrument {
         this.limiter = new Nodes.Compressor(this.AC,compressorPolicy.limiter);
         this.output = new Nodes.Gain(this.AC);
         this.vibrato = new Nodes.LFO(this.AC);
-        this.motion = (motionFactory ?? FX_STAGES.motion.create)(this.AC);
+        this.motion = (motionFactory ?? FX_STAGES.motion.create)(this.AC,{hostAwake:false,onError:error=>{this.effectFailure??=error instanceof Error?error:Error(String(error));}});
         // Filter LFO, in cents on every voice's cutoff (wired only while it
         // has depth - see setFilterLfoConnected).
         this.filterLfo = this.AC.createOscillator();
@@ -327,8 +328,8 @@ class Instrument {
     ensurePianoSource() {
         if (this.sourceBackend !== 'owned-rust') return Promise.resolve(null);
         if (this.pluckedSource) return Promise.reject(Error('Changing owned physical source material requires a fresh instrument'));
-        this.pianoSourcePromise ??= (this.pianoSourceFactory ?? createPianoLiveSource)(this).then(source => {
-            if (this.disposed) { source.dispose(); throw Error('Disposed instrument'); }
+        this.pianoSourcePromise ??= (this.pianoSourceFactory ?? createPianoLiveSource)(this).then(async source => {
+            if (this.disposed) { await source.dispose(); throw Object.assign(Error('Disposed instrument'),{code:'AUDIO_OWNER_DISPOSED'}); }
             this.pianoSource = source; return source;
         }).catch(error => { this.sourceFailure = error; throw error; });
         return this.pianoSourcePromise;
@@ -340,8 +341,8 @@ class Instrument {
     ensurePluckedSource() {
         if (this.sourceBackend !== 'owned-rust') return Promise.resolve(null);
         if (this.pianoSource) return Promise.reject(Error('Changing owned physical source material requires a fresh instrument'));
-        this.pluckedSourcePromise ??= createPluckedLiveSource(this).then(source => {
-            if (this.disposed) { source.dispose(); throw Error('Disposed instrument'); }
+        this.pluckedSourcePromise ??= createPluckedLiveSource(this).then(async source => {
+            if (this.disposed) { await source.dispose(); throw Object.assign(Error('Disposed instrument'),{code:'AUDIO_OWNER_DISPOSED'}); }
             this.pluckedSource = source; return source;
         }).catch(error => { this.sourceFailure = error; throw error; });
         return this.pluckedSourcePromise;
@@ -393,6 +394,7 @@ class Instrument {
     }
     prepareOffline() { return ownedSourceOf(this)?.prepareOffline(); }
     async armRuntime(){
+        if(this.effectFailure)throw this.effectFailure;
         if(!this.ordinaryDynamicsOwned&&!this.shimmer?.arm&&!this.motion?.arm)return;
         await this.effectsReady;
         if(this.AC.state==='running'){
@@ -402,13 +404,15 @@ class Instrument {
         }
     }
     updateOrdinaryDemand(){
-        if(this.disposed||!this.ordinaryDynamicsOwned)return;
-        const on=!!this.chainAwake&&this.destinations.length>0;
+        if(this.disposed)return;
+        const on=!!this.chainAwake&&this.destinations?.length>0;
+        this.motion?.setHostAwake?.(on&&!!this.motionInChain);
+        if(!this.ordinaryDynamicsOwned)return;
         this.synthMix.setHostAwake?.(on);this.limiter.setHostAwake?.(on);
     }
     sourceStatus() {
         const source = ownedSourceOf(this), status = source?.status() ?? {backend:this.sourceBackend ?? 'native',ready:this.sourceBackend !== 'owned-rust',error:this.sourceFailure?.message ?? null};
-        return {...status,material:status.material ?? (source ? this.preset?.stringModel ?? 'piano' : null),pendingBookings:this.pendingSourceBookings?.size ?? 0,preparationLateFrames:this.sourcePreparationLateFrames ?? 0,preparationLateBookings:this.sourcePreparationLateBookings ?? 0,hostBookingTrace:(this.sourceBookingTrace ?? []).map(record=>({...record}))};
+        return {...status,error:status.error??(this.effectFailure?String(this.effectFailure):null),ready:status.ready&&!this.effectFailure,material:status.material ?? (source ? this.preset?.stringModel ?? 'piano' : null),pendingBookings:this.pendingSourceBookings?.size ?? 0,preparationLateFrames:this.sourcePreparationLateFrames ?? 0,preparationLateBookings:this.sourcePreparationLateBookings ?? 0,hostBookingTrace:(this.sourceBookingTrace ?? []).map(record=>({...record}))};
     }
     recordOwnedBooking(booking) {
         this.sourcePreparationLateFrames = (this.sourcePreparationLateFrames ?? 0) + booking.preparationLateFrames;
@@ -532,6 +536,7 @@ class Instrument {
     updateChain() {
         const p = { ...PRESET_DEFAULTS, ...this.preset };
         const active = this.stages.filter((stage) => this[stage.key]?.managedBypass === true || stage.active(p));
+        this.motionInChain=active.some(stage=>stage.key==='motion');
         const signature = active.map((stage) => stage.key).join();
         if (signature === this.chainSignature) return;
         this.chainSignature = signature;
@@ -544,6 +549,7 @@ class Instrument {
             previous = stage.output;
         });
         previous.connect(this.limiter.getNode());
+        this.updateOrdinaryDemand();
     }
 
     // Vibrato is wired to the oscillators only while it has depth: an
@@ -1104,20 +1110,20 @@ class Instrument {
     }
 
     dispose() {
-        if (this.disposed) return;
+        if (this.disposed) return this.disposal;
         this.disposed = true;
-        if (this.morph) clearInterval(this.morph.timer);
-        this.morph = null;
-        if (this.sleepTimer) clearTimeout(this.sleepTimer);
-        clearTimeout(this.wanderTimer);
-        Object.values(this.wanderLfos).forEach((lfo) => lfo.dispose());
-        this.silence();
-        clearTimeout(this.sleepTimer);
-        ownedSourceOf(this)?.dispose();
-        this.effectsDisposal = Promise.allSettled([this.compressor,this.synthMix,this.limiter,this.shimmer,this.freeze,this.motion].filter(Boolean).map(owner=>Promise.resolve().then(()=>owner.dispose?.()))).then(results=>{const failed=results.find(r=>r.status==='rejected');if(failed)throw failed.reason;}).catch(error => { this.effectsDisposalError = error; });
-        this.voices.forEach((synth) => synth.destroy());
-        this.reverb.dispose?.();
-        this.output.disconnect();
+        const actions=[
+            ()=>{if(this.morph)clearInterval(this.morph.timer);this.morph=null;clearTimeout(this.sleepTimer);clearTimeout(this.wanderTimer);},
+            ...Object.values(this.wanderLfos).map(lfo=>()=>lfo.dispose()),
+            ()=>this.silence(),()=>clearTimeout(this.sleepTimer),
+            ()=>ownedSourceOf(this)?.dispose(),
+            ...[this.pianoSourcePromise,this.pluckedSourcePromise].filter(Boolean).map(p=>()=>awaitRetiredPreparation(p)),
+            ()=>{const effects=retireAudioActions([this.compressor,this.synthMix,this.limiter,this.shimmer,this.freeze,this.motion].filter(Boolean).map(owner=>()=>owner.dispose?.()),'Instrument effects disposal failed');this.effectsDisposal=effects.catch(error=>{this.effectsDisposalError=error.errors?.[0]??error;});return effects;},
+            ...this.voices.map(synth=>()=>synth.destroy()),()=>this.reverb.dispose?.(),()=>this.output.disconnect(),
+        ];
+        this.disposal=retireAudioActions(actions,'Instrument disposal failed');
+        this.disposal.catch(error=>{this.disposalError=error;});
+        return this.disposal;
     }
 }
 

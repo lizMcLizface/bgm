@@ -1,3 +1,4 @@
+import{retireAudioActions,awaitRetiredPreparation,finishAudioRetirement}from'../../audio/retireAudio.js';
 // The host of the sequencers' sound generators (docs/SEQUENCER_SYSTEM_PLAN.md): the front page's own Generator, used as the orchestra. Its role instruments are loaded the way the
 // main and ensemble pages load them (scene voices; a classic synth or DIY patch as a source, level-matched), and the song is planned by its planner, so the progression, voicings
 // and lines are the generator's. The sequencers then play those same role instruments.
@@ -118,9 +119,11 @@ export function createHost(scene, {seed,settings:storedSettings,deskBackend='nat
         racks.perc = { ...rack, 'master.chain': leanChain(rack) };
         spaces.perc = mixerSpace(rack);
     }
-    let disposed = false;
+    let disposed = false,disposal=null,disposalError=null;
+    const pendingOperations=new Set();
+    const trackOperation=fn=>(...args)=>{ensureActive();const result=fn(...args);if(result?.then){pendingOperations.add(result);result.finally(()=>pendingOperations.delete(result)).catch(()=>{});}return result;};
     let tempo = settings.bpm;
-    const ensureActive = () => { if (disposed) throw new Error('Sound host was closed while loading'); };
+    const ensureActive = () => { if (disposed) throw Object.assign(new Error('Sound host was closed while loading'),{code:'AUDIO_OWNER_DISPOSED'}); };
 
     /** The scene's voices on the roles, as the main page does when a scene is chosen. */
     async function applySceneVoices(next = scene) {
@@ -225,7 +228,7 @@ export function createHost(scene, {seed,settings:storedSettings,deskBackend='nat
         if (!r.ensembleRack) {
             const { createRack } = await import('../effects/graph');
             const rack = await createRack(g.AC, values,{pluginFactory:g.audioEnvironment?.rackPluginFactory,dynamicsFactory:g.audioEnvironment?.rackDynamicsFactory,nativeFactory:g.audioEnvironment?.rackNativeFactory});
-            if (disposed) { rack.dispose(); ensureActive(); }
+            if (disposed) { await rack.dispose(); ensureActive(); }
             r.instrument.output.disconnect();
             if (r.instrument.destinations) r.instrument.destinations = [];
             r.instrument.connect(rack.input);
@@ -270,7 +273,7 @@ export function createHost(scene, {seed,settings:storedSettings,deskBackend='nat
             }catch(error){
                 if(pointers){if(oldMixReturn===undefined)delete g.mixReturn;else g.mixReturn=oldMixReturn;for(const {role}of SEQUENCERS){if(oldMixOutputs[role]===undefined)delete g.roles[role].mixOutput;else g.roles[role].mixOutput=oldMixOutputs[role];}try{g.routeSharedEffects?.();}catch(restoreError){console.error('Shared mixer route rollback failed',restoreError);}}
                 for(let i=undo.length-1;i>=0;i--)try{undo[i]();}catch(restoreError){console.error('Mixer connection rollback failed',restoreError);}
-                for(const resource of [candidate,...candidates.flatMap(({rack,insert})=>[rack,insert])])try{resource?.dispose();}catch(cleanupError){console.error('Prepared mixer cleanup failed',cleanupError);}
+                try{await retireAudioActions([candidate,...candidates.flatMap(({rack,insert})=>[rack,insert])].filter(Boolean).map(resource=>()=>resource.dispose()),'Prepared mixer cleanup failed');}catch(cleanupError){error.cleanupError=cleanupError;}
                 deskFailure=error;mixerPhase=disposed?'disposed':'failed';throw error;
             }
         })();
@@ -557,10 +560,20 @@ export function createHost(scene, {seed,settings:storedSettings,deskBackend='nat
     }
 
     return {
-        g, settings, loaded, editSettings,editRule,restoreBook,get book(){return book;}, applySceneVoices, applyFrontPageLink, setSound, setPreset, soundOf, nativeOf, editNative, editValues, editDrumKit, rackValues, editRack, editMixer, mixerSnapshot, restoreMixer, snapshotSounds, restoreSounds, setupMixer, applyDesk, awaitDeskState,deskStatus,sourcePreviewStatus, openSourceStem, setTempo, openMonitor, openMeters, capture, note, tunedNote, drum, drumTrack, setDrumMix, getDrumMix,
+        g, settings, loaded, editSettings,editRule,restoreBook,get book(){return book;}, applySceneVoices:trackOperation(applySceneVoices), applyFrontPageLink:trackOperation(applyFrontPageLink), setSound:trackOperation(setSound), setPreset:trackOperation(setPreset), soundOf, nativeOf, editNative:trackOperation(editNative), editValues:trackOperation(editValues), editDrumKit:trackOperation(editDrumKit), rackValues, editRack:trackOperation(editRack), editMixer:trackOperation(editMixer), mixerSnapshot, restoreMixer:trackOperation(restoreMixer), snapshotSounds, restoreSounds:trackOperation(restoreSounds), setupMixer:trackOperation(setupMixer), applyDesk, awaitDeskState,deskStatus,sourcePreviewStatus, openSourceStem, setTempo, openMonitor:trackOperation(openMonitor), openMeters, capture, note, tunedNote, drum, drumTrack, setDrumMix, getDrumMix,
         get context() { return g.AC; },
         async wake() { await g.AC.resume(); await g.awaitRoleMotion?.(); await g.awaitSourceReady?.(); if (g.percussionReady) await g.percussionReady; await Promise.all(Object.values(g.roles).flatMap(r=>[r.ensembleRack,r.mixerRack]).filter(Boolean).map(r=>r.armRuntime?.())); g.endStopFade?.(); },
         setScene(next) { hostScene.scene = next; },
-        dispose() { if(disposed)return;disposed=true;sourceTaps.forEach(t=>t.close()); meterTaps.forEach(tap=>tap.dispose());g.stopAll?.();g.disposeSharedEffects?.();deskAudio?.dispose();g.output?.disconnect();g.levelTrim?.disconnect();g.ambienceOut?.disconnect(); Object.values(g.roles).forEach((r) => { r.sourceRevision=(r.sourceRevision??0)+1; r.instrument?.dispose?.(); r.ensembleRack?.dispose?.(); r.mixerRack?.dispose?.(); r.wander?.dispose?.(); }); },
+        get disposalError(){return disposalError;},
+        dispose() {
+            if(disposed)return disposal;disposed=true;
+            const roles=Object.values(g.roles);for(const r of roles)r.sourceRevision=(r.sourceRevision??0)+1;
+            const owners=[...new Set([...roles.flatMap(r=>[r.instrument,r.ensembleRack,r.mixerRack,r.wander,r.roomRoute]),g.wasmRoomPool,deskAudio].filter(Boolean))];
+            const pending=[...pendingOperations,...(g.sourceLoads??[]),g.percussionReady,mixerSetup].filter(Boolean);
+            const waitOperation=p=>Promise.resolve(p).catch(error=>{if(error?.cleanupError)throw error.cleanupError;return awaitRetiredPreparation(Promise.reject(error));});
+            const initial=retireAudioActions([...sourceTaps].map(t=>()=>t.close()).concat([...meterTaps].map(t=>()=>t.dispose()),[()=>g.stopAll?.(),()=>g.disposeSharedEffects?.()],owners.map(owner=>()=>owner.dispose?.()),[()=>g.output?.disconnect(),()=>g.levelTrim?.disconnect(),()=>g.ambienceOut?.disconnect()],pending.map(p=>()=>waitOperation(p))),'Sound host disposal failed');
+            disposal=finishAudioRetirement(initial,()=>g.sourceRetirements,()=>g.sourceRetirementFailure,'Sound host retirement failed');
+            disposal.catch(error=>{disposalError=error;});return disposal;
+        },
     };
 }
