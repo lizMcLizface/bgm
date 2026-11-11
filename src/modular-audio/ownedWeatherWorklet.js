@@ -1,0 +1,17 @@
+import {validateWeatherBedSpec,validateWeatherEvent,saveWeatherBedSpec,loadWeatherBedSpec} from './ownedWeatherBed.js';
+const base=()=>import.meta.env?.BASE_URL??'/';
+export async function loadWeatherWorkletAssets(){
+ const get=async name=>{const r=await fetch(`${base()}weather/${name}`);if(!r.ok)throw Error(`Missing weather asset: ${name}`);return r;},manifest=await(await get('build.json')).json(),bytes=await(await get(`weather.wasm?v=${manifest.version}`)).arrayBuffer(),sha=[...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(v=>v.toString(16).padStart(2,'0')).join('');
+ if(sha!==manifest.wasm)throw Error('Weather Wasm integrity mismatch');return {module:await WebAssembly.compile(bytes),manifest,version:manifest.version,hostVersion:manifest.hostVersion??manifest.version};
+}
+export async function createWeatherWorklet(context,assets,spec,{startFrame=0,stopFrame}={}){
+ validateWeatherBedSpec(spec);if(spec.sampleRate!==context.sampleRate||!Number.isSafeInteger(startFrame)||startFrame<0||!Number.isSafeInteger(stopFrame)||stopFrame<1)throw Error('Invalid weather worklet clock');
+ await context.audioWorklet.addModule(`${base()}weather/owned-bed-processor.js?v=${assets.hostVersion??assets.version??assets.manifest.version}`);
+ const node=new AudioWorkletNode(context,'calmbgm-owned-weather-bed',{numberOfInputs:0,numberOfOutputs:3,outputChannelCount:[2,2,2],channelCount:2,channelCountMode:'explicit',processorOptions:{module:assets.module,spec:loadWeatherBedSpec(saveWeatherBedSpec(spec)),startFrame,stopFrame}}),pending=new Map();let sequence=0,disposed=false,failure=null;
+ let readyResolve,readyReject;const ready=new Promise((resolve,reject)=>{readyResolve=resolve;readyReject=reject;}),readyTimer=setTimeout(()=>readyReject(Error('Weather worklet startup timed out')),20000);
+ node.port.onmessage=({data})=>{if(data.type==='ready'){clearTimeout(readyTimer);readyResolve(data);return;}const p=pending.get(data.request);if(p){pending.delete(data.request);clearTimeout(p.timer);if(data.type==='error')p.reject(Error(data.message));else p.resolve(data);return;}if(data.type==='error'){failure=Error(data.message);clearTimeout(readyTimer);readyReject(failure);for(const p of pending.values()){clearTimeout(p.timer);p.reject(failure);}pending.clear();}};
+ const request=(type,data={})=>new Promise((resolve,reject)=>{if(disposed||failure)return reject(failure??Error('Weather worklet disposed'));if(pending.size>=64)return reject(Error('Weather control queue full'));const id=++sequence,timer=setTimeout(()=>{pending.delete(id);reject(Error(`Weather ${type} timed out`));},20000);pending.set(id,{resolve,reject,timer});node.port.postMessage({type,...data,request:id});});
+ const dispose=()=>{if(disposed)return;disposed=true;clearTimeout(readyTimer);readyReject(Error('Weather worklet disposed'));for(const p of pending.values()){clearTimeout(p.timer);p.reject(Error('Weather worklet disposed'));}pending.clear();node.port.postMessage({type:'dispose'});node.disconnect();};
+ try{await ready;}catch(error){dispose();throw error;}
+ return {node,stats:()=>request('stats'),enqueueAtContext:(event,contextFrame)=>{validateWeatherEvent(event);if(!Number.isSafeInteger(contextFrame)||contextFrame<0)throw Error('Invalid weather absolute event frame');return request('event',{event,contextFrame});},cancel:owner=>request('cancel',{owner}),reset:frame=>request('reset',{startFrame:frame}),dispose};
+}

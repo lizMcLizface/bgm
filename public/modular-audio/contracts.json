@@ -2776,6 +2776,116 @@
       "timingPolicy": "immutable sample onset/slot/lifetime; late onsets reject before enqueue",
       "configuration": "plucked config v1; graph events own playback timing and ownership",
       "nativeParity": "fixed browser bound for SRC/lowpass; active breath and unsupported controls reject at capture"
+    },
+    {
+      "type": "voice.tape",
+      "code": 27,
+      "version": 1,
+      "hostInput": false,
+      "latencyFrames": null,
+      "tailFrames": -1,
+      "tailPolicy": "original native parameter-dependent tails",
+      "bypass": "unsupported",
+      "reset": "phase and voices cleared; compressor gain reset",
+      "ports": [
+        {
+          "id": "program.in",
+          "code": 0,
+          "direction": "in",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": true
+        },
+        {
+          "id": "audio.out",
+          "code": 1,
+          "direction": "out",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": false
+        }
+      ],
+      "parameters": [
+        {
+          "id": "wow",
+          "code": 0,
+          "unit": "native",
+          "min": 0,
+          "max": 1,
+          "default": 0,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "wowRate",
+          "code": 1,
+          "unit": "native",
+          "min": 0.05,
+          "max": 5,
+          "default": 0.6,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "flutter",
+          "code": 2,
+          "unit": "native",
+          "min": 0,
+          "max": 1,
+          "default": 0,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "drive",
+          "code": 3,
+          "unit": "native",
+          "min": 0,
+          "max": 1,
+          "default": 0,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "tone",
+          "code": 4,
+          "unit": "native",
+          "min": 500,
+          "max": 20000,
+          "default": 9000,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        }
+      ],
+      "events": [
+        "parameter"
+      ],
+      "processing": "explicit pinned full Tape; stereo; prepared immutable drive bank",
+      "profile": "chromium-tape-e14de735-v1",
+      "parameterQuantumFrames": 128,
+      "fixedGroupDelayFrames": 128,
+      "latencyPolicy": "graph latency reports known FIR group portion only; intentional 6ms modulated wet delay is time-varying; automatic PDC rejects",
+      "configuration": "complete five targets plus 1..32 prepared drive curves",
+      "controlPolicy": "exact integer-frame graph events; standalone native prebooked seconds importer is separate",
+      "bypassPolicy": "active effect; native Instrument all-zero bypass is not inferred",
+      "resetPolicy": "latest targets retained; native cold tone and LFO/history restart"
     }
   ]
 }

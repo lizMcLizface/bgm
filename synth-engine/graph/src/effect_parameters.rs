@@ -91,3 +91,10 @@ pub const MOTION: [Param; 4] = [
     Param{id:"autoPanDepth",unit:"native",min:0.,max:1.,default:0.,modulation:false},
     Param{id:"autoPanRate",unit:"native",min:0.01,max:20.,default:0.2,modulation:false},
 ];
+pub const TAPE: [Param; 5] = [
+    Param{id:"wow",unit:"native",min:0.,max:1.,default:0.,modulation:false},
+    Param{id:"wowRate",unit:"native",min:0.05,max:5.,default:0.6,modulation:false},
+    Param{id:"flutter",unit:"native",min:0.,max:1.,default:0.,modulation:false},
+    Param{id:"drive",unit:"native",min:0.,max:1.,default:0.,modulation:false},
+    Param{id:"tone",unit:"native",min:500.,max:20000.,default:9000.,modulation:false},
+];

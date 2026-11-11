@@ -332,3 +332,6 @@ pub unsafe extern "C" fn graph_pause(g: &mut Graph, paused: u32) {
 pub unsafe extern "C" fn graph_reset(g: &mut Graph) {
     g.reset();
 }
+
+#[no_mangle]
+pub extern "C" fn graph_tape_drive(g:&mut Graph,id:u32,value:f64)->u32{status(g.tape_drive(id,value))}

@@ -21,6 +21,7 @@ calmbgm_rack_fx = {path="../rack-fx"}
 calmbgm_voice_fx = {path="../voice-fx"}
 calmbgm_motion_fx = {path="../motion-fx"}
 calmbgm_plucked_voice = {path="../plucked-voice"}
+calmbgm_tape_fx = {path="../tape-fx"}
 
 [features]
 allocation-audit = []

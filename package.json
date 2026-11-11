@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run synth:check && npm run synths:check && npm run graph:check && npm run piano:check && npm run iowa:check && npm run mixer:check && npm run rack-fx:check && npm run voice-fx:check && npm run motion:check && npm run tape:check && npm run plucked:check && npm run plucked-voice:check && npm run ensemble:check && vite build",
+    "build": "npm run synth:check && npm run synths:check && npm run graph:check && npm run piano:check && npm run iowa:check && npm run mixer:check && npm run rack-fx:check && npm run voice-fx:check && npm run motion:check && npm run tape:check && npm run plucked:check && npm run plucked-voice:check && npm run weather:check && npm run ensemble:check && vite build",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -62,7 +62,7 @@
     "audit:percussion-presets": "node tools/auditPercussionPresets.mjs",
     "audit:synth-tone": "node tools/auditSynthTone.mjs",
     "audit:phase4": "node tools/runPhase4Audit.mjs",
-    "build:public": "npm run synth:check && npm run synths:check && npm run graph:check && npm run piano:check && npm run iowa:check && npm run mixer:check && npm run rack-fx:check && npm run voice-fx:check && npm run motion:check && npm run tape:check && npm run plucked:check && npm run plucked-voice:check && npm run ensemble:check && vite build --mode public && node tools/checkPublicBuild.mjs",
+    "build:public": "npm run synth:check && npm run synths:check && npm run graph:check && npm run piano:check && npm run iowa:check && npm run mixer:check && npm run rack-fx:check && npm run voice-fx:check && npm run motion:check && npm run tape:check && npm run plucked:check && npm run plucked-voice:check && npm run weather:check && npm run ensemble:check && vite build --mode public && node tools/checkPublicBuild.mjs",
     "predeploy": "npm test && npm run build:public",
     "deploy": "node tools/checkPublicBuild.mjs && gh-pages -d dist-public --dotfiles",
     "render": "vite-node tools/render.js --",
@@ -97,6 +97,8 @@
     "plucked:check": "node tools/buildOwnedPluckedString.mjs --publish --check",
     "motion:build": "node tools/buildOwnedMotion.mjs --publish",
     "motion:check": "node tools/buildOwnedMotion.mjs --publish --check",
+    "weather:build": "node tools/buildOwnedWeatherBed.mjs --publish",
+    "weather:check": "node tools/buildOwnedWeatherBed.mjs --publish --check",
     "tape:build": "node tools/buildOwnedTape.mjs --publish",
     "tape:check": "node tools/buildOwnedTape.mjs --publish --check"
   },

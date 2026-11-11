@@ -504,6 +504,28 @@ function validateOwnedMotionSpec(raw) {
   return c;
 }
 
+// src/modular-audio/ownedTape.js
+var TAPE_PROFILE = "chromium-tape-e14de735-v1";
+var TAPE_PARAMETERS = Object.freeze([["wow", 0, 1, 0], ["wowRate", 0.05, 5, 0.6], ["flutter", 0, 1, 0], ["drive", 0, 1, 0], ["tone", 500, 2e4, 9e3]]);
+function validateOwnedTapeSpec(raw) {
+  const c = JSON.parse(JSON.stringify(raw));
+  if (c?.version !== 1 || c.profile !== TAPE_PROFILE || c.phaseOrigin !== "instance-start" || !Array.isArray(c.parameters) || c.parameters.length !== 5 || !Array.isArray(c.driveBank) || c.driveBank.length < 1 || c.driveBank.length > 32) throw Error("Invalid owned Tape profile");
+  const ids = /* @__PURE__ */ new Set();
+  for (const p of c.parameters) {
+    if (!Array.isArray(p) || p.length !== 2 || !Number.isInteger(p[0]) || ids.has(p[0])) throw Error("Invalid Tape parameter identity");
+    const d = TAPE_PARAMETERS[p[0]], value = p[1];
+    if (!d || typeof value !== "number" || !Number.isFinite(value) || value < d[1] || value > d[2]) throw Error("Invalid Tape parameter value");
+    ids.add(p[0]);
+  }
+  const bank = /* @__PURE__ */ new Set();
+  for (const value of c.driveBank) {
+    if (typeof value !== "number" || !Number.isFinite(value) || value < 0 || value > 1 || bank.has(value)) throw Error("Invalid prepared Tape drive bank");
+    bank.add(value);
+  }
+  if (!bank.has(c.parameters.find((p) => p[0] === 3)[1])) throw Error("Initial Tape drive is not prepared");
+  return c;
+}
+
 // src/synths/effects/zplaneShapes.js
 var BOOST = (level) => Math.max(2, Math.min(18, 18 + level * 0.45));
 var NEUTRAL = [5500, 1e3, 0];
@@ -617,11 +639,15 @@ function validatePatch(raw, contracts) {
     if (d.type === "graph.delay" && (n.config?.version !== 1 || !Number.isInteger(n.config.frames) || n.config.frames < 0 || n.config.frames > 262144 || Object.keys(n.parameters).length)) throw Error("Invalid fixed delay configuration");
     if (d.type === "legacy.classic") n.config = validateClassicConfig(n.config);
     if (d.type === "legacy.plucked") n.config = validatePluckedConfig(n.config);
+    if (d.type === "voice.tape") {
+      n.config = validateOwnedTapeSpec(n.config);
+      if (Object.keys(n.parameters).length) throw Error("Tape requires complete configuration");
+    }
     if (d.type === "voice.motion") {
       n.config = validateOwnedMotionSpec(n.config);
       if (Object.keys(n.parameters).length) throw Error("Motion requires complete configuration");
     }
-    if (d.type.startsWith("rack.") || d.type.startsWith("voice.") && d.type !== "voice.motion") {
+    if (d.type.startsWith("rack.") || d.type.startsWith("voice.") && !["voice.motion", "voice.tape"].includes(d.type)) {
       n.config = (d.type.startsWith("rack.") ? validateOwnedRackFxSpec : validateOwnedVoiceFxSpec)(n.config);
       if (d.type.split(".")[1] !== n.config.kind || Object.keys(n.parameters).length) throw Error("Effects require complete matching configuration");
     }
@@ -667,6 +693,8 @@ function validatePatch(raw, contracts) {
     if (!next) throw Error("Unsupported graph cycle");
     ready.add(next[0]);
   }
+  if (p.latencyCompensation && p.modules.some((n) => n.type === "voice.tape")) throw Error("Tape intentional modulated wet delay prevents fixed latency compensation");
+  for (const n of p.modules.filter((n2) => n2.type === "voice.tape")) for (const e of p.events.filter((e2) => e2.target === n.id && e2.kind === "parameter" && e2.parameter === "drive")) if (!n.config.driveBank.includes(e.value)) throw Error("Tape drive curve is not prepared");
   const owners = /* @__PURE__ */ new Map();
   if (p.modules.filter((n) => n.type === "voice.freeze").length > 2 || p.modules.filter((n) => n.type.startsWith("voice.")).length > 8 || p.modules.filter((n) => n.type.startsWith("rack.")).length > 16) throw Error("Owned effect instance bounds");
   for (const e of p.events) {
@@ -789,8 +817,12 @@ var ReferenceGraph = class {
             checked(engine.graph_classic_wave_commit(this.handle, n.id));
           }
         }
+        if (d.type === "voice.tape") {
+          for (const value of n.config.driveBank) checked(engine.graph_tape_drive(this.handle, n.id, value));
+          for (const [index, value] of n.config.parameters) checked(engine.graph_fx_initial(this.handle, n.id, index, value));
+        }
         if (d.type === "voice.motion") for (const [index, value] of n.config.parameters) checked(engine.graph_fx_initial(this.handle, n.id, index, value));
-        if (d.type.startsWith("rack.") || d.type.startsWith("voice.") && d.type !== "voice.motion") {
+        if (d.type.startsWith("rack.") || d.type.startsWith("voice.") && !["voice.motion", "voice.tape"].includes(d.type)) {
           const c = n.config;
           if (d.type.startsWith("voice.")) checked(engine.graph_voice_fx_config(this.handle, n.id, c.seed));
           for (const [index, value] of c.parameters) checked(engine.graph_fx_initial(this.handle, n.id, index, value));

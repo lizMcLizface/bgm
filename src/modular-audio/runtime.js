@@ -11,6 +11,7 @@ import {validateClassicConfig,classicParameter} from './classicConfig.js';
 import {validatePluckedConfig}from './pluckedConfig.js';
 import {STRING_BODIES}from './ownedPluckedString.js';
 import {validateOwnedMotionSpec}from './ownedMotion.js';
+import {validateOwnedTapeSpec}from './ownedTape.js';
 import {validateOwnedRackFxSpec}from './ownedRackFx.js';
 import {validateOwnedVoiceFxSpec}from './ownedVoiceFx.js';
 export {assertSerialRealtimeAllowed} from './executionPolicy.js';
@@ -39,8 +40,9 @@ export function validatePatch(raw, contracts) {
     if(d.type==='graph.delay'&&(n.config?.version!==1||!Number.isInteger(n.config.frames)||n.config.frames<0||n.config.frames>262144||Object.keys(n.parameters).length))throw Error('Invalid fixed delay configuration');
     if(d.type==='legacy.classic')n.config=validateClassicConfig(n.config);
     if(d.type==='legacy.plucked')n.config=validatePluckedConfig(n.config);
+    if(d.type==='voice.tape'){n.config=validateOwnedTapeSpec(n.config);if(Object.keys(n.parameters).length)throw Error('Tape requires complete configuration');}
     if(d.type==='voice.motion'){n.config=validateOwnedMotionSpec(n.config);if(Object.keys(n.parameters).length)throw Error('Motion requires complete configuration');}
-    if(d.type.startsWith('rack.')||d.type.startsWith('voice.')&&d.type!=='voice.motion'){n.config=(d.type.startsWith('rack.')?validateOwnedRackFxSpec:validateOwnedVoiceFxSpec)(n.config);if(d.type.split('.')[1]!==n.config.kind||Object.keys(n.parameters).length)throw Error('Effects require complete matching configuration');}
+    if(d.type.startsWith('rack.')||d.type.startsWith('voice.')&&!['voice.motion','voice.tape'].includes(d.type)){n.config=(d.type.startsWith('rack.')?validateOwnedRackFxSpec:validateOwnedVoiceFxSpec)(n.config);if(d.type.split('.')[1]!==n.config.kind||Object.keys(n.parameters).length)throw Error('Effects require complete matching configuration');}
     if(['legacy.core','legacy.fm'].includes(d.type))n.config=validatePitchedConfig(n.config,d.type==='legacy.fm');
     if(d.type==='legacy.piano'){n.config=validatePianoConfig(n.config);if(n.version!==n.config.version)throw Error('Piano module/configuration version mismatch');}
     if(d.type==='legacy.iowa')n.config=validateIowaConfig(n.config);
@@ -76,6 +78,8 @@ export function validatePatch(raw, contracts) {
   for(const [id,d] of modules)for(const port of d.ports)if(port.required&&!inputs.has(`${id}:${port.id}`))throw Error('Missing required input');
   const ready=new Set();
   while(ready.size<modules.size){const next=[...dependencies].find(([id,deps])=>!ready.has(id)&&[...deps].every(id=>ready.has(id)));if(!next)throw Error('Unsupported graph cycle');ready.add(next[0]);}
+  if(p.latencyCompensation&&p.modules.some(n=>n.type==='voice.tape'))throw Error('Tape intentional modulated wet delay prevents fixed latency compensation');
+  for(const n of p.modules.filter(n=>n.type==='voice.tape'))for(const e of p.events.filter(e=>e.target===n.id&&e.kind==='parameter'&&e.parameter==='drive'))if(!n.config.driveBank.includes(e.value))throw Error('Tape drive curve is not prepared');
   const owners=new Map();
   if(p.modules.filter(n=>n.type==='voice.freeze').length>2||p.modules.filter(n=>n.type.startsWith('voice.')).length>8||p.modules.filter(n=>n.type.startsWith('rack.')).length>16)throw Error('Owned effect instance bounds');
   for (const e of p.events) {eventPacket(e, modules, p.connections);if(e.kind==='note'&&e.note&&[0,1,3,5].includes(e.event)){const k=e.target+':'+e.note;if(owners.has(k)&&owners.get(k)!==e.owner)throw Error('Pitched note owner conflict');owners.set(k,e.owner);}}
@@ -151,8 +155,9 @@ export class ReferenceGraph {
         if(d.type==='host.audio'&&n.config)checked(engine.graph_input_latency(this.handle,n.id,n.config.latencyFrames));
         if(d.type.startsWith('desk.'))n.config.parameters.forEach((value,index)=>checked(engine.graph_mixer_config(this.handle,n.id,index,value,Number(n.config.settled))));
         if(d.type==='legacy.classic'){const c=n.config;checked(engine.graph_classic_config(this.handle,n.id,c.model,c.polyphony));for(const [index,value]of c.parameters)checked(engine.graph_classic_param(this.handle,n.id,index,value));if(c.waves){const len=engine.graph_classic_wave_len(this.handle,n.id),ptr=engine.graph_classic_wave_ptr(this.handle,n.id);if(len!==c.waves.length||!ptr)throw Error('Classic wave preparation mismatch');new Float32Array(engine.memory.buffer,ptr,len).set(c.waves);checked(engine.graph_classic_wave_commit(this.handle,n.id));}}
+        if(d.type==='voice.tape'){for(const value of n.config.driveBank)checked(engine.graph_tape_drive(this.handle,n.id,value));for(const [index,value]of n.config.parameters)checked(engine.graph_fx_initial(this.handle,n.id,index,value));}
         if(d.type==='voice.motion')for(const [index,value]of n.config.parameters)checked(engine.graph_fx_initial(this.handle,n.id,index,value));
-        if(d.type.startsWith('rack.')||d.type.startsWith('voice.')&&d.type!=='voice.motion'){const c=n.config;if(d.type.startsWith('voice.'))checked(engine.graph_voice_fx_config(this.handle,n.id,c.seed));for(const [index,value]of c.parameters)checked(engine.graph_fx_initial(this.handle,n.id,index,value));if(c.kind==='zplane'){checked(engine.graph_rack_shape_count(this.handle,n.id,c.shapes.length));c.shapes.forEach((rows,shape)=>rows.forEach((row,section)=>checked(engine.graph_rack_shape_row(this.handle,n.id,shape,section,...row))));['a','b'].forEach((key,i)=>c.custom[key].forEach((row,section)=>checked(engine.graph_rack_shape_row(this.handle,n.id,64+i,section,...row))));}}
+        if(d.type.startsWith('rack.')||d.type.startsWith('voice.')&&!['voice.motion','voice.tape'].includes(d.type)){const c=n.config;if(d.type.startsWith('voice.'))checked(engine.graph_voice_fx_config(this.handle,n.id,c.seed));for(const [index,value]of c.parameters)checked(engine.graph_fx_initial(this.handle,n.id,index,value));if(c.kind==='zplane'){checked(engine.graph_rack_shape_count(this.handle,n.id,c.shapes.length));c.shapes.forEach((rows,shape)=>rows.forEach((row,section)=>checked(engine.graph_rack_shape_row(this.handle,n.id,shape,section,...row))));['a','b'].forEach((key,i)=>c.custom[key].forEach((row,section)=>checked(engine.graph_rack_shape_row(this.handle,n.id,64+i,section,...row))));}}
         if(['legacy.inserts','legacy.effects'].includes(d.type)){for(const [index,value]of n.config.parameters)checked(engine.graph_base(this.handle,n.id,index,value));checked(engine.graph_fx_config(this.handle,n.id,Number(n.config.settled)));}
         if(d.type==='graph.delay')checked(engine.graph_delay_config(this.handle,n.id,n.config.frames));
         if(d.type==='legacy.percussion'&&n.config){

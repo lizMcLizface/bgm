@@ -1,5 +1,13 @@
 # Modular audio engine handoff
 
+Latest integration: [Tape Graph27](MODULAR_AUDIO_ENGINE_TAPE_GRAPH.md) on
+`dd0b459e6b932eab` and [owned weather host](MODULAR_AUDIO_ENGINE_WEATHER_HOST.md)
+kernel `b645e01e918b9cdc` / host `9b46fcd07d33273f` pass actual built-browser
+six-rate, independent-instance and full-page reload checks. Weather also has
+live six-channel routed PCM evidence. Normal defaults remain native. Measured
+strings, native DynamicsCompressor and immutable opt-in All desk adoption are
+the next independent overnight streams, with acceptance still pending.
+
 Full standalone Tape449029958ac881d3 is now verified against actual native output:
 54/54 full cases and8/8 low-rate cases pass fixed1e-4 absolute/relative limits.
 The earlier failures and the source-defined fixes are retained in

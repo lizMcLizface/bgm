@@ -1,0 +1,49 @@
+{
+  "kind": "graph.full-tape.desktop",
+  "version": 1,
+  "revision": "full-tape-graph-v1",
+  "engineVersion": "dd0b459e6b932eab",
+  "graphWasm": "9e1cfbee5dcaf347219b1b38cf86c48a597624ec03226b02e56d3e4d280a0e57",
+  "muted": true,
+  "listening": "not assessed",
+  "startedAtUtc": "2026-11-11T02:15:33.573Z",
+  "checksPassed": true,
+  "cases": [
+    {
+      "rate": 48000,
+      "frames": 72064,
+      "metrics": {
+        "frames": 72064,
+        "peak": 0.1380109190940857,
+        "rms": 0.039831403888752,
+        "nonFinite": 0,
+        "firstFrame": 472,
+        "lastFrame": 39362,
+        "stereoDifference": 0.18633019924163818
+      },
+      "stats": {
+        "frame": 72064,
+        "late": 0,
+        "overflow": 0,
+        "applied": 6
+      },
+      "knownFixedLatencyFrames": 272,
+      "comparison": {
+        "maxError": 0,
+        "mismatchedSamples": 0,
+        "exact": true
+      },
+      "actualAudioWorklet": true,
+      "checksPassed": true
+    }
+  ],
+  "scope": "Actual Graph AudioWorklet: Tone → Motion → full Tape → one desk limiter. FIR group only is reported; time-varying wet delay excluded. Native defaults unchanged; physical output not assessed.",
+  "persistence": {
+    "savedPatchRestart": true,
+    "localStorageRoundTrip": true,
+    "fullPageReloadTested": true,
+    "navigationType": "reload"
+  },
+  "reason": "reload-replay-completed",
+  "completedAtUtc": "2026-11-11T02:15:34.061Z"
+}

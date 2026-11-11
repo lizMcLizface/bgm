@@ -1,0 +1,1036 @@
+{
+  "kind": "weather.owned-desktop",
+  "version": 1,
+  "revision": "weather-three-stem-v1",
+  "engineVersion": "b645e01e918b9cdc",
+  "wasm": "0528df540bfb0d4cf9c817118005455d90b04cb69a87b6c28dd4b273d190b8f2",
+  "hostVersion": "9b46fcd07d33273f",
+  "hostSHA256": {
+    "public/weather/owned-bed-processor.js": "6c954bbf12ece3126a8b1b0e191482d81bf40af9e6c052d4e688071335acdd40",
+    "src/modular-audio/ownedWeatherWorklet.js": "086b7b5138c48cb22b5f27bc92d15af50ac8339872c7cefa8383ee6dc0d98c22",
+    "src/modular-audio/ownedWeatherSuite.js": "16ac3e220a9462d7cebf31d13e0e868251e9def4bf28a16007e7c69c0709c97b",
+    "tools/weather-owned.html": "b654e891e756635261ae15efafe05643fc66627ba760c64ed44a29251c94ca6b",
+    "tools/weather-owned.js": "eac2e0084f24d665f53f1c720a1dc9f1896b2800095556c93595f9b995508d19",
+    "tools/weatherBedReference.mjs": "49e667ee64d2d543bd9b0aa09a358abc7473469e44a6bb5b1dd33fe12e90a730"
+  },
+  "startedAtUtc": "2026-11-11T02:15:19.830Z",
+  "muted": true,
+  "listening": "not assessed",
+  "scope": "Actual original WeatherBedModel versus portable twelve layers and three stereo reductions; separate AudioWorklet outputs before native Ambience level/pan/width/distance/shelter chains. No All/default change, automatic PDC, physical loopback or device-underrun claim.",
+  "cases": [
+    {
+      "kind": "direct",
+      "rate": 8000,
+      "frames": 10112,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "relativeRms": 0,
+        "differingSamples": 0
+      },
+      "metrics": [
+        {
+          "stem": "rain",
+          "frames": 10112,
+          "peak": 0.31464481353759766,
+          "rms": 0.06909404176153468,
+          "nonFinite": 0,
+          "stereoDifference": 0.3979661911725998
+        },
+        {
+          "stem": "thunder",
+          "frames": 10112,
+          "peak": 0.26011526584625244,
+          "rms": 0.04439863418844988,
+          "nonFinite": 0,
+          "stereoDifference": 0.12365216016769409
+        },
+        {
+          "stem": "waves",
+          "frames": 10112,
+          "peak": 0.1015952005982399,
+          "rms": 0.012743564302659197,
+          "nonFinite": 0,
+          "stereoDifference": 0.054716771468520164
+        }
+      ],
+      "stats": {
+        "frame": 10112,
+        "rain": {
+          "events": 106,
+          "active": 16,
+          "dropped": 0,
+          "rate": 98.01923782676194,
+          "heave": 0.9960745933899434
+        },
+        "thunder": {
+          "events": 2,
+          "active": 2,
+          "skipped": 0
+        },
+        "surf": {
+          "events": 3,
+          "active": 3,
+          "skipped": 0
+        },
+        "applied": 56,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allTwelveRawLayersCompared": true,
+      "resetPartitionReplay": true,
+      "savedColdRestart": true,
+      "noMemoryGrowth": true,
+      "checksPassed": true
+    },
+    {
+      "kind": "worklet",
+      "rate": 8000,
+      "frames": 10112,
+      "actualAudioWorklet": true,
+      "stereoOutputs": 3,
+      "latencyFrames": 0,
+      "startFrame": 131,
+      "timestampedControl": {
+        "kind": "thunder",
+        "sourceFrame": 1611,
+        "contextFrame": 1742,
+        "acknowledgedBeforeRender": true
+      },
+      "stats": [
+        {
+          "type": "stats",
+          "request": 2,
+          "frame": 10112,
+          "applied": 56,
+          "late": 0,
+          "overflow": 0,
+          "queued": 0,
+          "rain": {
+            "events": 106,
+            "active": 16,
+            "dropped": 0
+          },
+          "thunder": {
+            "events": 2,
+            "active": 2,
+            "skipped": 0
+          },
+          "surf": {
+            "events": 3,
+            "active": 3,
+            "skipped": 0
+          },
+          "clock": "spec events: source-local frames; control contextFrame: absolute AudioContext frame",
+          "startFrame": 131,
+          "stopFrame": 10112,
+          "processCalls": 83,
+          "preStartFrames": 131,
+          "startupLateFrames": 0,
+          "latencyFrames": 0,
+          "finished": true,
+          "memoryBytes": 1572864
+        }
+      ],
+      "metrics": [
+        {
+          "stem": "rain",
+          "frames": 10112,
+          "peak": 0.31464481353759766,
+          "rms": 0.06909404176153468,
+          "nonFinite": 0,
+          "stereoDifference": 0.3979661911725998
+        },
+        {
+          "stem": "thunder",
+          "frames": 10112,
+          "peak": 0.26011526584625244,
+          "rms": 0.04439863418844988,
+          "nonFinite": 0,
+          "stereoDifference": 0.12365216016769409
+        },
+        {
+          "stem": "waves",
+          "frames": 10112,
+          "peak": 0.1015952005982399,
+          "rms": 0.012743564302659197,
+          "nonFinite": 0,
+          "stereoDifference": 0.054716771468520164
+        }
+      ],
+      "independentInstances": false,
+      "checksPassed": true,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "relativeRms": 0,
+        "differingSamples": 0,
+        "exact": true
+      }
+    },
+    {
+      "kind": "direct",
+      "rate": 24000,
+      "frames": 30080,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "relativeRms": 0,
+        "differingSamples": 0
+      },
+      "metrics": [
+        {
+          "stem": "rain",
+          "frames": 30080,
+          "peak": 0.3715788424015045,
+          "rms": 0.07702138419891245,
+          "nonFinite": 0,
+          "stereoDifference": 0.47609397768974304
+        },
+        {
+          "stem": "thunder",
+          "frames": 30080,
+          "peak": 0.26007765531539917,
+          "rms": 0.04368521920054256,
+          "nonFinite": 0,
+          "stereoDifference": 0.12363427877426147
+        },
+        {
+          "stem": "waves",
+          "frames": 30080,
+          "peak": 0.10174723714590073,
+          "rms": 0.012191603663151003,
+          "nonFinite": 0,
+          "stereoDifference": 0.057477591559290886
+        }
+      ],
+      "stats": {
+        "frame": 30080,
+        "rain": {
+          "events": 105,
+          "active": 15,
+          "dropped": 0,
+          "rate": 98.0390630942596,
+          "heave": 0.9961404854609681
+        },
+        "thunder": {
+          "events": 2,
+          "active": 2,
+          "skipped": 0
+        },
+        "surf": {
+          "events": 3,
+          "active": 3,
+          "skipped": 0
+        },
+        "applied": 56,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allTwelveRawLayersCompared": true,
+      "resetPartitionReplay": true,
+      "savedColdRestart": true,
+      "noMemoryGrowth": true,
+      "checksPassed": true
+    },
+    {
+      "kind": "worklet",
+      "rate": 24000,
+      "frames": 30080,
+      "actualAudioWorklet": true,
+      "stereoOutputs": 3,
+      "latencyFrames": 0,
+      "startFrame": 131,
+      "timestampedControl": {
+        "kind": "thunder",
+        "sourceFrame": 4811,
+        "contextFrame": 4942,
+        "acknowledgedBeforeRender": true
+      },
+      "stats": [
+        {
+          "type": "stats",
+          "request": 2,
+          "frame": 30080,
+          "applied": 56,
+          "late": 0,
+          "overflow": 0,
+          "queued": 0,
+          "rain": {
+            "events": 105,
+            "active": 15,
+            "dropped": 0
+          },
+          "thunder": {
+            "events": 2,
+            "active": 2,
+            "skipped": 0
+          },
+          "surf": {
+            "events": 3,
+            "active": 3,
+            "skipped": 0
+          },
+          "clock": "spec events: source-local frames; control contextFrame: absolute AudioContext frame",
+          "startFrame": 131,
+          "stopFrame": 30080,
+          "processCalls": 239,
+          "preStartFrames": 131,
+          "startupLateFrames": 0,
+          "latencyFrames": 0,
+          "finished": true,
+          "memoryBytes": 1638400
+        }
+      ],
+      "metrics": [
+        {
+          "stem": "rain",
+          "frames": 30080,
+          "peak": 0.3715788424015045,
+          "rms": 0.07702138419891245,
+          "nonFinite": 0,
+          "stereoDifference": 0.47609397768974304
+        },
+        {
+          "stem": "thunder",
+          "frames": 30080,
+          "peak": 0.26007765531539917,
+          "rms": 0.04368521920054256,
+          "nonFinite": 0,
+          "stereoDifference": 0.12363427877426147
+        },
+        {
+          "stem": "waves",
+          "frames": 30080,
+          "peak": 0.10174723714590073,
+          "rms": 0.012191603663151003,
+          "nonFinite": 0,
+          "stereoDifference": 0.057477591559290886
+        }
+      ],
+      "independentInstances": false,
+      "checksPassed": true,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "relativeRms": 0,
+        "differingSamples": 0,
+        "exact": true
+      }
+    },
+    {
+      "kind": "direct",
+      "rate": 44100,
+      "frames": 55168,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "relativeRms": 0,
+        "differingSamples": 0
+      },
+      "metrics": [
+        {
+          "stem": "rain",
+          "frames": 55168,
+          "peak": 0.3952871263027191,
+          "rms": 0.08310096678899825,
+          "nonFinite": 0,
+          "stereoDifference": 0.4906109720468521
+        },
+        {
+          "stem": "thunder",
+          "frames": 55168,
+          "peak": 0.2601415514945984,
+          "rms": 0.04457063092599952,
+          "nonFinite": 0,
+          "stereoDifference": 0.12366464734077454
+        },
+        {
+          "stem": "waves",
+          "frames": 55168,
+          "peak": 0.10469244420528412,
+          "rms": 0.01108812075700446,
+          "nonFinite": 0,
+          "stereoDifference": 0.055286991875618696
+        }
+      ],
+      "stats": {
+        "frame": 55168,
+        "rain": {
+          "events": 103,
+          "active": 15,
+          "dropped": 0,
+          "rate": 98.0474488364347,
+          "heave": 0.9961683473668053
+        },
+        "thunder": {
+          "events": 2,
+          "active": 2,
+          "skipped": 0
+        },
+        "surf": {
+          "events": 3,
+          "active": 3,
+          "skipped": 0
+        },
+        "applied": 56,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allTwelveRawLayersCompared": true,
+      "resetPartitionReplay": true,
+      "savedColdRestart": true,
+      "noMemoryGrowth": true,
+      "checksPassed": true
+    },
+    {
+      "kind": "worklet",
+      "rate": 44100,
+      "frames": 55168,
+      "actualAudioWorklet": true,
+      "stereoOutputs": 3,
+      "latencyFrames": 0,
+      "startFrame": 131,
+      "timestampedControl": {
+        "kind": "thunder",
+        "sourceFrame": 8831,
+        "contextFrame": 8962,
+        "acknowledgedBeforeRender": true
+      },
+      "stats": [
+        {
+          "type": "stats",
+          "request": 2,
+          "frame": 55168,
+          "applied": 56,
+          "late": 0,
+          "overflow": 0,
+          "queued": 0,
+          "rain": {
+            "events": 103,
+            "active": 15,
+            "dropped": 0
+          },
+          "thunder": {
+            "events": 2,
+            "active": 2,
+            "skipped": 0
+          },
+          "surf": {
+            "events": 3,
+            "active": 3,
+            "skipped": 0
+          },
+          "clock": "spec events: source-local frames; control contextFrame: absolute AudioContext frame",
+          "startFrame": 131,
+          "stopFrame": 55168,
+          "processCalls": 435,
+          "preStartFrames": 131,
+          "startupLateFrames": 0,
+          "latencyFrames": 0,
+          "finished": true,
+          "memoryBytes": 1703936
+        }
+      ],
+      "metrics": [
+        {
+          "stem": "rain",
+          "frames": 55168,
+          "peak": 0.3952871263027191,
+          "rms": 0.08310096678899825,
+          "nonFinite": 0,
+          "stereoDifference": 0.4906109720468521
+        },
+        {
+          "stem": "thunder",
+          "frames": 55168,
+          "peak": 0.2601415514945984,
+          "rms": 0.04457063092599952,
+          "nonFinite": 0,
+          "stereoDifference": 0.12366464734077454
+        },
+        {
+          "stem": "waves",
+          "frames": 55168,
+          "peak": 0.10469244420528412,
+          "rms": 0.01108812075700446,
+          "nonFinite": 0,
+          "stereoDifference": 0.055286991875618696
+        }
+      ],
+      "independentInstances": false,
+      "checksPassed": true,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "relativeRms": 0,
+        "differingSamples": 0,
+        "exact": true
+      }
+    },
+    {
+      "kind": "direct",
+      "rate": 48000,
+      "frames": 60032,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "relativeRms": 0,
+        "differingSamples": 0
+      },
+      "metrics": [
+        {
+          "stem": "rain",
+          "frames": 60032,
+          "peak": 0.4016907215118408,
+          "rms": 0.0838987325509181,
+          "nonFinite": 0,
+          "stereoDifference": 0.4854501262307167
+        },
+        {
+          "stem": "thunder",
+          "frames": 60032,
+          "peak": 0.2601204514503479,
+          "rms": 0.04489765306514817,
+          "nonFinite": 0,
+          "stereoDifference": 0.12365461885929108
+        },
+        {
+          "stem": "waves",
+          "frames": 60032,
+          "peak": 0.09946051239967346,
+          "rms": 0.011324655154231283,
+          "nonFinite": 0,
+          "stereoDifference": 0.06659948080778122
+        }
+      ],
+      "stats": {
+        "frame": 60032,
+        "rain": {
+          "events": 103,
+          "active": 15,
+          "dropped": 0,
+          "rate": 98.04864987457502,
+          "heave": 0.9961723381359429
+        },
+        "thunder": {
+          "events": 2,
+          "active": 2,
+          "skipped": 0
+        },
+        "surf": {
+          "events": 3,
+          "active": 3,
+          "skipped": 0
+        },
+        "applied": 56,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allTwelveRawLayersCompared": true,
+      "resetPartitionReplay": true,
+      "savedColdRestart": true,
+      "noMemoryGrowth": true,
+      "checksPassed": true
+    },
+    {
+      "kind": "worklet",
+      "rate": 48000,
+      "frames": 60032,
+      "actualAudioWorklet": true,
+      "stereoOutputs": 3,
+      "latencyFrames": 0,
+      "startFrame": 131,
+      "timestampedControl": {
+        "kind": "thunder",
+        "sourceFrame": 9611,
+        "contextFrame": 9742,
+        "acknowledgedBeforeRender": true
+      },
+      "stats": [
+        {
+          "type": "stats",
+          "request": 2,
+          "frame": 60032,
+          "applied": 56,
+          "late": 0,
+          "overflow": 0,
+          "queued": 0,
+          "rain": {
+            "events": 103,
+            "active": 15,
+            "dropped": 0
+          },
+          "thunder": {
+            "events": 2,
+            "active": 2,
+            "skipped": 0
+          },
+          "surf": {
+            "events": 3,
+            "active": 3,
+            "skipped": 0
+          },
+          "clock": "spec events: source-local frames; control contextFrame: absolute AudioContext frame",
+          "startFrame": 131,
+          "stopFrame": 60032,
+          "processCalls": 473,
+          "preStartFrames": 131,
+          "startupLateFrames": 0,
+          "latencyFrames": 0,
+          "finished": true,
+          "memoryBytes": 1769472
+        }
+      ],
+      "metrics": [
+        {
+          "stem": "rain",
+          "frames": 60032,
+          "peak": 0.4016907215118408,
+          "rms": 0.0838987325509181,
+          "nonFinite": 0,
+          "stereoDifference": 0.4854501262307167
+        },
+        {
+          "stem": "thunder",
+          "frames": 60032,
+          "peak": 0.2601204514503479,
+          "rms": 0.04489765306514817,
+          "nonFinite": 0,
+          "stereoDifference": 0.12365461885929108
+        },
+        {
+          "stem": "waves",
+          "frames": 60032,
+          "peak": 0.09946051239967346,
+          "rms": 0.011324655154231283,
+          "nonFinite": 0,
+          "stereoDifference": 0.06659948080778122
+        }
+      ],
+      "independentInstances": false,
+      "checksPassed": true,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "relativeRms": 0,
+        "differingSamples": 0,
+        "exact": true
+      }
+    },
+    {
+      "kind": "two-worklets",
+      "rate": 48000,
+      "frames": 60032,
+      "actualAudioWorklet": true,
+      "stereoOutputs": 3,
+      "latencyFrames": 0,
+      "startFrame": 131,
+      "timestampedControl": {
+        "kind": "thunder",
+        "sourceFrame": 9611,
+        "contextFrame": 9742,
+        "acknowledgedBeforeRender": true
+      },
+      "stats": [
+        {
+          "type": "stats",
+          "request": 2,
+          "frame": 60032,
+          "applied": 56,
+          "late": 0,
+          "overflow": 0,
+          "queued": 0,
+          "rain": {
+            "events": 103,
+            "active": 15,
+            "dropped": 0
+          },
+          "thunder": {
+            "events": 2,
+            "active": 2,
+            "skipped": 0
+          },
+          "surf": {
+            "events": 3,
+            "active": 3,
+            "skipped": 0
+          },
+          "clock": "spec events: source-local frames; control contextFrame: absolute AudioContext frame",
+          "startFrame": 131,
+          "stopFrame": 60032,
+          "processCalls": 473,
+          "preStartFrames": 131,
+          "startupLateFrames": 0,
+          "latencyFrames": 0,
+          "finished": true,
+          "memoryBytes": 1769472
+        },
+        {
+          "type": "stats",
+          "request": 1,
+          "frame": 60032,
+          "applied": 0,
+          "late": 0,
+          "overflow": 0,
+          "queued": 0,
+          "rain": {
+            "events": 0,
+            "active": 0,
+            "dropped": 0
+          },
+          "thunder": {
+            "events": 0,
+            "active": 0,
+            "skipped": 0
+          },
+          "surf": {
+            "events": 0,
+            "active": 0,
+            "skipped": 0
+          },
+          "clock": "spec events: source-local frames; control contextFrame: absolute AudioContext frame",
+          "startFrame": 131,
+          "stopFrame": 60032,
+          "processCalls": 473,
+          "preStartFrames": 131,
+          "startupLateFrames": 0,
+          "latencyFrames": 0,
+          "finished": true,
+          "memoryBytes": 1769472
+        }
+      ],
+      "metrics": [
+        {
+          "stem": "rain",
+          "frames": 60032,
+          "peak": 0.4016907215118408,
+          "rms": 0.0838987325509181,
+          "nonFinite": 0,
+          "stereoDifference": 0.4854501262307167
+        },
+        {
+          "stem": "thunder",
+          "frames": 60032,
+          "peak": 0.2601204514503479,
+          "rms": 0.04489765306514817,
+          "nonFinite": 0,
+          "stereoDifference": 0.12365461885929108
+        },
+        {
+          "stem": "waves",
+          "frames": 60032,
+          "peak": 0.09946051239967346,
+          "rms": 0.011324655154231283,
+          "nonFinite": 0,
+          "stereoDifference": 0.06659948080778122
+        }
+      ],
+      "independentInstances": true,
+      "checksPassed": true
+    },
+    {
+      "kind": "direct",
+      "rate": 96000,
+      "frames": 120064,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "relativeRms": 0,
+        "differingSamples": 0
+      },
+      "metrics": [
+        {
+          "stem": "rain",
+          "frames": 120064,
+          "peak": 0.44405680894851685,
+          "rms": 0.08595776219674849,
+          "nonFinite": 0,
+          "stereoDifference": 0.5274421870708466
+        },
+        {
+          "stem": "thunder",
+          "frames": 120064,
+          "peak": 0.2601297199726105,
+          "rms": 0.0437740095540286,
+          "nonFinite": 0,
+          "stereoDifference": 0.12365902960300446
+        },
+        {
+          "stem": "waves",
+          "frames": 120064,
+          "peak": 0.0728733018040657,
+          "rms": 0.010929096801339784,
+          "nonFinite": 0,
+          "stereoDifference": 0.05218968074768782
+        }
+      ],
+      "stats": {
+        "frame": 120064,
+        "rain": {
+          "events": 103,
+          "active": 15,
+          "dropped": 0,
+          "rate": 98.04865224085293,
+          "heave": 0.9961723381136796
+        },
+        "thunder": {
+          "events": 2,
+          "active": 2,
+          "skipped": 0
+        },
+        "surf": {
+          "events": 3,
+          "active": 3,
+          "skipped": 0
+        },
+        "applied": 56,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allTwelveRawLayersCompared": true,
+      "resetPartitionReplay": true,
+      "savedColdRestart": true,
+      "noMemoryGrowth": true,
+      "checksPassed": true
+    },
+    {
+      "kind": "worklet",
+      "rate": 96000,
+      "frames": 120064,
+      "actualAudioWorklet": true,
+      "stereoOutputs": 3,
+      "latencyFrames": 0,
+      "startFrame": 131,
+      "timestampedControl": {
+        "kind": "thunder",
+        "sourceFrame": 19211,
+        "contextFrame": 19342,
+        "acknowledgedBeforeRender": true
+      },
+      "stats": [
+        {
+          "type": "stats",
+          "request": 2,
+          "frame": 120064,
+          "applied": 56,
+          "late": 0,
+          "overflow": 0,
+          "queued": 0,
+          "rain": {
+            "events": 103,
+            "active": 15,
+            "dropped": 0
+          },
+          "thunder": {
+            "events": 2,
+            "active": 2,
+            "skipped": 0
+          },
+          "surf": {
+            "events": 3,
+            "active": 3,
+            "skipped": 0
+          },
+          "clock": "spec events: source-local frames; control contextFrame: absolute AudioContext frame",
+          "startFrame": 131,
+          "stopFrame": 120064,
+          "processCalls": 942,
+          "preStartFrames": 131,
+          "startupLateFrames": 0,
+          "latencyFrames": 0,
+          "finished": true,
+          "memoryBytes": 2031616
+        }
+      ],
+      "metrics": [
+        {
+          "stem": "rain",
+          "frames": 120064,
+          "peak": 0.44405680894851685,
+          "rms": 0.08595776219674849,
+          "nonFinite": 0,
+          "stereoDifference": 0.5274421870708466
+        },
+        {
+          "stem": "thunder",
+          "frames": 120064,
+          "peak": 0.2601297199726105,
+          "rms": 0.0437740095540286,
+          "nonFinite": 0,
+          "stereoDifference": 0.12365902960300446
+        },
+        {
+          "stem": "waves",
+          "frames": 120064,
+          "peak": 0.0728733018040657,
+          "rms": 0.010929096801339784,
+          "nonFinite": 0,
+          "stereoDifference": 0.05218968074768782
+        }
+      ],
+      "independentInstances": false,
+      "checksPassed": true,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "relativeRms": 0,
+        "differingSamples": 0,
+        "exact": true
+      }
+    },
+    {
+      "kind": "direct",
+      "rate": 192000,
+      "frames": 240000,
+      "comparison": {
+        "maxAbsoluteError": 2.3283064365386963e-10,
+        "relativeRms": 2.4155942607458046e-12,
+        "differingSamples": 3
+      },
+      "metrics": [
+        {
+          "stem": "rain",
+          "frames": 240000,
+          "peak": 0.4628978371620178,
+          "rms": 0.08507468217199908,
+          "nonFinite": 0,
+          "stereoDifference": 0.5374710559844971
+        },
+        {
+          "stem": "thunder",
+          "frames": 240000,
+          "peak": 0.2601305842399597,
+          "rms": 0.042937858976953354,
+          "nonFinite": 0,
+          "stereoDifference": 0.12365943193435669
+        },
+        {
+          "stem": "waves",
+          "frames": 240000,
+          "peak": 0.10835873335599899,
+          "rms": 0.01151214191972864,
+          "nonFinite": 0,
+          "stereoDifference": 0.05145812965929508
+        }
+      ],
+      "stats": {
+        "frame": 240000,
+        "rain": {
+          "events": 103,
+          "active": 15,
+          "dropped": 0,
+          "rate": 98.05133106469745,
+          "heave": 0.9961812380221392
+        },
+        "thunder": {
+          "events": 2,
+          "active": 2,
+          "skipped": 0
+        },
+        "surf": {
+          "events": 3,
+          "active": 3,
+          "skipped": 0
+        },
+        "applied": 56,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allTwelveRawLayersCompared": true,
+      "resetPartitionReplay": true,
+      "savedColdRestart": true,
+      "noMemoryGrowth": true,
+      "checksPassed": true
+    },
+    {
+      "kind": "worklet",
+      "rate": 192000,
+      "frames": 240000,
+      "actualAudioWorklet": true,
+      "stereoOutputs": 3,
+      "latencyFrames": 0,
+      "startFrame": 131,
+      "timestampedControl": {
+        "kind": "thunder",
+        "sourceFrame": 38411,
+        "contextFrame": 38542,
+        "acknowledgedBeforeRender": true
+      },
+      "stats": [
+        {
+          "type": "stats",
+          "request": 2,
+          "frame": 240000,
+          "applied": 56,
+          "late": 0,
+          "overflow": 0,
+          "queued": 0,
+          "rain": {
+            "events": 103,
+            "active": 15,
+            "dropped": 0
+          },
+          "thunder": {
+            "events": 2,
+            "active": 2,
+            "skipped": 0
+          },
+          "surf": {
+            "events": 3,
+            "active": 3,
+            "skipped": 0
+          },
+          "clock": "spec events: source-local frames; control contextFrame: absolute AudioContext frame",
+          "startFrame": 131,
+          "stopFrame": 240000,
+          "processCalls": 1879,
+          "preStartFrames": 131,
+          "startupLateFrames": 0,
+          "latencyFrames": 0,
+          "finished": true,
+          "memoryBytes": 2424832
+        }
+      ],
+      "metrics": [
+        {
+          "stem": "rain",
+          "frames": 240000,
+          "peak": 0.4628978371620178,
+          "rms": 0.08507468217199908,
+          "nonFinite": 0,
+          "stereoDifference": 0.5374710559844971
+        },
+        {
+          "stem": "thunder",
+          "frames": 240000,
+          "peak": 0.2601305842399597,
+          "rms": 0.042937858976953354,
+          "nonFinite": 0,
+          "stereoDifference": 0.12365943193435669
+        },
+        {
+          "stem": "waves",
+          "frames": 240000,
+          "peak": 0.10835873335599899,
+          "rms": 0.01151214191972864,
+          "nonFinite": 0,
+          "stereoDifference": 0.05145812965929508
+        }
+      ],
+      "independentInstances": false,
+      "checksPassed": true,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "relativeRms": 0,
+        "differingSamples": 0,
+        "exact": true
+      }
+    }
+  ],
+  "checksPassed": true,
+  "persistence": {
+    "savedColdRestart": true,
+    "localStorageRoundTrip": true,
+    "fullPageReloadTested": false,
+    "pcmSha256": "1ff46ad14e19dfea979545b1395c61f471fbb82cab3a6863bb66ddd6da49b47f"
+  },
+  "reason": "suite-completed",
+  "completedAtUtc": "2026-11-11T02:15:27.350Z"
+}

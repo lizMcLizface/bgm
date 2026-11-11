@@ -1,0 +1,1498 @@
+{
+  "kind": "weather.owned-allocation",
+  "version": 1,
+  "pass": true,
+  "build": "0645e920d8521581",
+  "wasm": "94c4ecd0d84846c1c3d0bdddf44cbd12d78932552b101e937377553bfa701450",
+  "referenceHash": "53a61d7ed0fad3271609f1fa40f11ed7c23a8803a2514be68ceab94e2caac57b",
+  "limits": {
+    "maxSampleError": 1e-7,
+    "relativeRmsError": 1e-7
+  },
+  "scope": "Actual original JS RainModel, ThunderEvents, SurfEvents and WeatherBedModel; all12 raw stereo layers and3 separate stereo bed stems. Native Ambience chains/device output/deadlines excluded.",
+  "cases": 37,
+  "bitExact": 31,
+  "maxSampleError": 1.862645149230957e-9,
+  "results": [
+    {
+      "rate": 8000,
+      "surface": "mixed",
+      "seed": 0,
+      "frames": 64000,
+      "longRun": false,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "peak": 0.6069126725196838,
+      "elapsedMs": 461.5373,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 64000,
+        "rain": {
+          "events": 571,
+          "active": 5,
+          "dropped": 0,
+          "rate": 44.521875704706105,
+          "heave": 0.8960016839678018
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 1
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2031616,
+      "grew": false
+    },
+    {
+      "rate": 8000,
+      "surface": "leaves",
+      "seed": 731,
+      "frames": 64000,
+      "longRun": false,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "peak": 0.642314076423645,
+      "elapsedMs": 396.6838999999999,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 64000,
+        "rain": {
+          "events": 621,
+          "active": 22,
+          "dropped": 0,
+          "rate": 107.03189315196002,
+          "heave": 1.1935670540498096
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 1
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2031616,
+      "grew": false
+    },
+    {
+      "rate": 8000,
+      "surface": "concrete",
+      "seed": 731,
+      "frames": 64000,
+      "longRun": false,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "peak": 0.642314076423645,
+      "elapsedMs": 368.0636999999999,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 64000,
+        "rain": {
+          "events": 621,
+          "active": 22,
+          "dropped": 0,
+          "rate": 107.03189315196002,
+          "heave": 1.1935670540498096
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 1
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2031616,
+      "grew": false
+    },
+    {
+      "rate": 8000,
+      "surface": "glass",
+      "seed": 731,
+      "frames": 64000,
+      "longRun": false,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "peak": 0.642314076423645,
+      "elapsedMs": 363.6299999999999,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 64000,
+        "rain": {
+          "events": 621,
+          "active": 22,
+          "dropped": 0,
+          "rate": 107.03189315196002,
+          "heave": 1.1935670540498096
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 1
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2031616,
+      "grew": false
+    },
+    {
+      "rate": 8000,
+      "surface": "tin",
+      "seed": 4294967295,
+      "frames": 64000,
+      "longRun": false,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "peak": 0.5457367897033691,
+      "elapsedMs": 384.2573000000002,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 64000,
+        "rain": {
+          "events": 613,
+          "active": 11,
+          "dropped": 0,
+          "rate": 88.5130931443653,
+          "heave": 1.1216924808219617
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 2
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2031616,
+      "grew": false
+    },
+    {
+      "rate": 8000,
+      "surface": "puddle",
+      "seed": 731,
+      "frames": 64000,
+      "longRun": false,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "peak": 0.642314076423645,
+      "elapsedMs": 460.2054000000003,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 64000,
+        "rain": {
+          "events": 1403,
+          "active": 35,
+          "dropped": 0,
+          "rate": 252.56792924035565,
+          "heave": 1.1935670540498096
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 1
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2031616,
+      "grew": false
+    },
+    {
+      "rate": 24000,
+      "surface": "mixed",
+      "seed": 0,
+      "frames": 192000,
+      "longRun": false,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "peak": 0.5470298528671265,
+      "elapsedMs": 1323.2015999999999,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 192000,
+        "rain": {
+          "events": 572,
+          "active": 6,
+          "dropped": 0,
+          "rate": 44.521875704703106,
+          "heave": 0.8960016839678131
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 1
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2162688,
+      "grew": false
+    },
+    {
+      "rate": 24000,
+      "surface": "leaves",
+      "seed": 731,
+      "frames": 192000,
+      "longRun": false,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "peak": 0.6528876423835754,
+      "elapsedMs": 1486.5918999999994,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 192000,
+        "rain": {
+          "events": 621,
+          "active": 22,
+          "dropped": 0,
+          "rate": 107.03189315194838,
+          "heave": 1.1935670540498082
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 1
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2162688,
+      "grew": false
+    },
+    {
+      "rate": 24000,
+      "surface": "concrete",
+      "seed": 731,
+      "frames": 192000,
+      "longRun": false,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "peak": 0.6528876423835754,
+      "elapsedMs": 1774.9162000000006,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 192000,
+        "rain": {
+          "events": 621,
+          "active": 22,
+          "dropped": 0,
+          "rate": 107.03189315194838,
+          "heave": 1.1935670540498082
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 1
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2162688,
+      "grew": false
+    },
+    {
+      "rate": 24000,
+      "surface": "glass",
+      "seed": 731,
+      "frames": 192000,
+      "longRun": false,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "peak": 0.6528876423835754,
+      "elapsedMs": 1324.9298,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 192000,
+        "rain": {
+          "events": 621,
+          "active": 22,
+          "dropped": 0,
+          "rate": 107.03189315194838,
+          "heave": 1.1935670540498082
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 1
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2162688,
+      "grew": false
+    },
+    {
+      "rate": 24000,
+      "surface": "tin",
+      "seed": 4294967295,
+      "frames": 192000,
+      "longRun": false,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "peak": 0.7185379862785339,
+      "elapsedMs": 1591.405999999999,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 192000,
+        "rain": {
+          "events": 613,
+          "active": 11,
+          "dropped": 0,
+          "rate": 88.51309314435436,
+          "heave": 1.121692480821955
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 2
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2162688,
+      "grew": false
+    },
+    {
+      "rate": 24000,
+      "surface": "puddle",
+      "seed": 731,
+      "frames": 192000,
+      "longRun": false,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "peak": 0.6528876423835754,
+      "elapsedMs": 2410.1490999999987,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 192000,
+        "rain": {
+          "events": 1403,
+          "active": 35,
+          "dropped": 0,
+          "rate": 252.5679292403358,
+          "heave": 1.1935670540498082
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 1
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2162688,
+      "grew": false
+    },
+    {
+      "rate": 44100,
+      "surface": "mixed",
+      "seed": 0,
+      "frames": 352800,
+      "longRun": false,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "peak": 0.6252784729003906,
+      "elapsedMs": 3313.5393000000004,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 352800,
+        "rain": {
+          "events": 572,
+          "active": 6,
+          "dropped": 0,
+          "rate": 44.5126256990474,
+          "heave": 0.8959408209731584
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 1
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2293760,
+      "grew": false
+    },
+    {
+      "rate": 44100,
+      "surface": "leaves",
+      "seed": 731,
+      "frames": 352800,
+      "longRun": false,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "peak": 0.5740700960159302,
+      "elapsedMs": 3023.432100000002,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 352800,
+        "rain": {
+          "events": 621,
+          "active": 22,
+          "dropped": 0,
+          "rate": 107.03565120330714,
+          "heave": 1.1935807545610695
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 1
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2293760,
+      "grew": false
+    },
+    {
+      "rate": 44100,
+      "surface": "concrete",
+      "seed": 731,
+      "frames": 352800,
+      "longRun": false,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "peak": 0.5740700960159302,
+      "elapsedMs": 2151.4995000000017,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 352800,
+        "rain": {
+          "events": 621,
+          "active": 22,
+          "dropped": 0,
+          "rate": 107.03565120330714,
+          "heave": 1.1935807545610695
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 1
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2293760,
+      "grew": false
+    },
+    {
+      "rate": 44100,
+      "surface": "glass",
+      "seed": 731,
+      "frames": 352800,
+      "longRun": false,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "peak": 0.5740700960159302,
+      "elapsedMs": 2049.8632,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 352800,
+        "rain": {
+          "events": 621,
+          "active": 22,
+          "dropped": 0,
+          "rate": 107.03565120330714,
+          "heave": 1.1935807545610695
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 1
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2293760,
+      "grew": false
+    },
+    {
+      "rate": 44100,
+      "surface": "tin",
+      "seed": 4294967295,
+      "frames": 352800,
+      "longRun": false,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "peak": 0.6291475296020508,
+      "elapsedMs": 2101.9572000000007,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 352800,
+        "rain": {
+          "events": 613,
+          "active": 11,
+          "dropped": 0,
+          "rate": 88.48752831484074,
+          "heave": 1.121586556184101
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 2
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2293760,
+      "grew": false
+    },
+    {
+      "rate": 44100,
+      "surface": "puddle",
+      "seed": 731,
+      "frames": 352800,
+      "longRun": false,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "peak": 0.5740700960159302,
+      "elapsedMs": 2869.2364000000016,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 352800,
+        "rain": {
+          "events": 1403,
+          "active": 35,
+          "dropped": 0,
+          "rate": 252.5767972816527,
+          "heave": 1.1935807545610695
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 1
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2293760,
+      "grew": false
+    },
+    {
+      "rate": 48000,
+      "surface": "mixed",
+      "seed": 0,
+      "frames": 384000,
+      "longRun": false,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "peak": 0.6081265211105347,
+      "elapsedMs": 2235.7603000000017,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 384000,
+        "rain": {
+          "events": 572,
+          "active": 6,
+          "dropped": 0,
+          "rate": 44.52187570469212,
+          "heave": 0.8960016839677873
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 1
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2359296,
+      "grew": false
+    },
+    {
+      "rate": 48000,
+      "surface": "leaves",
+      "seed": 731,
+      "frames": 384000,
+      "longRun": false,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "peak": 0.5904138684272766,
+      "elapsedMs": 2310.2452999999987,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 384000,
+        "rain": {
+          "events": 621,
+          "active": 22,
+          "dropped": 0,
+          "rate": 107.0318931519267,
+          "heave": 1.1935670540497911
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 1
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2359296,
+      "grew": false
+    },
+    {
+      "rate": 48000,
+      "surface": "concrete",
+      "seed": 731,
+      "frames": 384000,
+      "longRun": false,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "peak": 0.5904138684272766,
+      "elapsedMs": 2233.6804000000047,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 384000,
+        "rain": {
+          "events": 621,
+          "active": 22,
+          "dropped": 0,
+          "rate": 107.0318931519267,
+          "heave": 1.1935670540497911
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 1
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2359296,
+      "grew": false
+    },
+    {
+      "rate": 48000,
+      "surface": "glass",
+      "seed": 731,
+      "frames": 384000,
+      "longRun": false,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "peak": 0.5904138684272766,
+      "elapsedMs": 2151.973600000005,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 384000,
+        "rain": {
+          "events": 621,
+          "active": 22,
+          "dropped": 0,
+          "rate": 107.0318931519267,
+          "heave": 1.1935670540497911
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 1
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2359296,
+      "grew": false
+    },
+    {
+      "rate": 48000,
+      "surface": "tin",
+      "seed": 4294967295,
+      "frames": 384000,
+      "longRun": false,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "peak": 0.6230576038360596,
+      "elapsedMs": 2319.304900000003,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 384000,
+        "rain": {
+          "events": 613,
+          "active": 11,
+          "dropped": 0,
+          "rate": 88.51309314433746,
+          "heave": 1.1216924808219433
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 2
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2359296,
+      "grew": false
+    },
+    {
+      "rate": 48000,
+      "surface": "puddle",
+      "seed": 731,
+      "frames": 384000,
+      "longRun": false,
+      "maxSampleError": 9.313225746154785e-10,
+      "relativeRmsError": 4.612273495336272e-12,
+      "differingSamples": 1,
+      "peak": 0.6119201183319092,
+      "elapsedMs": 2825.3491000000067,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 384000,
+        "rain": {
+          "events": 1403,
+          "active": 35,
+          "dropped": 0,
+          "rate": 252.56792924029614,
+          "heave": 1.1935670540497911
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 1
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2359296,
+      "grew": false
+    },
+    {
+      "rate": 96000,
+      "surface": "mixed",
+      "seed": 0,
+      "frames": 768000,
+      "longRun": false,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "peak": 0.5733353495597839,
+      "elapsedMs": 4345.5855999999985,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 768000,
+        "rain": {
+          "events": 572,
+          "active": 6,
+          "dropped": 0,
+          "rate": 44.52187570467908,
+          "heave": 0.8960016839677944
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 1
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2818048,
+      "grew": false
+    },
+    {
+      "rate": 96000,
+      "surface": "leaves",
+      "seed": 731,
+      "frames": 768000,
+      "longRun": false,
+      "maxSampleError": 1.4551915228366852e-11,
+      "relativeRmsError": 6.162095951522627e-14,
+      "differingSamples": 1,
+      "peak": 0.585130512714386,
+      "elapsedMs": 4391.251199999999,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 768000,
+        "rain": {
+          "events": 621,
+          "active": 22,
+          "dropped": 0,
+          "rate": 107.03189315188655,
+          "heave": 1.1935670540497685
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 1
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2818048,
+      "grew": false
+    },
+    {
+      "rate": 96000,
+      "surface": "concrete",
+      "seed": 731,
+      "frames": 768000,
+      "longRun": false,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "peak": 0.585130512714386,
+      "elapsedMs": 4399.4024999999965,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 768000,
+        "rain": {
+          "events": 621,
+          "active": 22,
+          "dropped": 0,
+          "rate": 107.03189315188655,
+          "heave": 1.1935670540497685
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 1
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2818048,
+      "grew": false
+    },
+    {
+      "rate": 96000,
+      "surface": "glass",
+      "seed": 731,
+      "frames": 768000,
+      "longRun": false,
+      "maxSampleError": 1.1641532182693481e-10,
+      "relativeRmsError": 4.929497728198029e-13,
+      "differingSamples": 1,
+      "peak": 0.585130512714386,
+      "elapsedMs": 4299.139900000002,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 768000,
+        "rain": {
+          "events": 621,
+          "active": 22,
+          "dropped": 0,
+          "rate": 107.03189315188655,
+          "heave": 1.1935670540497685
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 1
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2818048,
+      "grew": false
+    },
+    {
+      "rate": 96000,
+      "surface": "tin",
+      "seed": 4294967295,
+      "frames": 768000,
+      "longRun": false,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "peak": 0.6865856647491455,
+      "elapsedMs": 4808.657699999996,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 768000,
+        "rain": {
+          "events": 613,
+          "active": 11,
+          "dropped": 0,
+          "rate": 88.51309314430719,
+          "heave": 1.1216924808219344
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 2
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2818048,
+      "grew": false
+    },
+    {
+      "rate": 96000,
+      "surface": "puddle",
+      "seed": 731,
+      "frames": 768000,
+      "longRun": false,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "peak": 0.6075943112373352,
+      "elapsedMs": 5578.845400000006,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 768000,
+        "rain": {
+          "events": 1403,
+          "active": 35,
+          "dropped": 0,
+          "rate": 252.56792924022432,
+          "heave": 1.1935670540497685
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 1
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2818048,
+      "grew": false
+    },
+    {
+      "rate": 192000,
+      "surface": "mixed",
+      "seed": 0,
+      "frames": 1536000,
+      "longRun": false,
+      "maxSampleError": 4.656612873077393e-10,
+      "relativeRmsError": 2.8415501757562945e-12,
+      "differingSamples": 16,
+      "peak": 0.6154749989509583,
+      "elapsedMs": 9054.280100000004,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 1536000,
+        "rain": {
+          "events": 572,
+          "active": 6,
+          "dropped": 0,
+          "rate": 44.52187570465085,
+          "heave": 0.8960016839677947
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 1
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 3604480,
+      "grew": false
+    },
+    {
+      "rate": 192000,
+      "surface": "leaves",
+      "seed": 731,
+      "frames": 1536000,
+      "longRun": false,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "peak": 0.6631055474281311,
+      "elapsedMs": 9341.767700000011,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 1536000,
+        "rain": {
+          "events": 621,
+          "active": 22,
+          "dropped": 0,
+          "rate": 107.03189315180639,
+          "heave": 1.193567054049724
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 1
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 3604480,
+      "grew": false
+    },
+    {
+      "rate": 192000,
+      "surface": "concrete",
+      "seed": 731,
+      "frames": 1536000,
+      "longRun": false,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "peak": 0.6631055474281311,
+      "elapsedMs": 10965.799100000004,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 1536000,
+        "rain": {
+          "events": 621,
+          "active": 22,
+          "dropped": 0,
+          "rate": 107.03189315180639,
+          "heave": 1.193567054049724
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 1
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 3604480,
+      "grew": false
+    },
+    {
+      "rate": 192000,
+      "surface": "glass",
+      "seed": 731,
+      "frames": 1536000,
+      "longRun": false,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "peak": 0.6631055474281311,
+      "elapsedMs": 10793.834000000003,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 1536000,
+        "rain": {
+          "events": 621,
+          "active": 22,
+          "dropped": 0,
+          "rate": 107.03189315180639,
+          "heave": 1.193567054049724
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 1
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 3604480,
+      "grew": false
+    },
+    {
+      "rate": 192000,
+      "surface": "tin",
+      "seed": 4294967295,
+      "frames": 1536000,
+      "longRun": false,
+      "maxSampleError": 1.862645149230957e-9,
+      "relativeRmsError": 7.890889883273957e-12,
+      "differingSamples": 4,
+      "peak": 0.5520063638687134,
+      "elapsedMs": 11788.461200000005,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 1536000,
+        "rain": {
+          "events": 613,
+          "active": 11,
+          "dropped": 0,
+          "rate": 88.51309314425457,
+          "heave": 1.121692480821949
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 2
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 3604480,
+      "grew": false
+    },
+    {
+      "rate": 192000,
+      "surface": "puddle",
+      "seed": 731,
+      "frames": 1536000,
+      "longRun": false,
+      "maxSampleError": 9.313225746154785e-10,
+      "relativeRmsError": 2.23180665389095e-12,
+      "differingSamples": 3,
+      "peak": 0.7289490699768066,
+      "elapsedMs": 13297.867100000003,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 1536000,
+        "rain": {
+          "events": 1403,
+          "active": 35,
+          "dropped": 0,
+          "rate": 252.56792924008104,
+          "heave": 1.193567054049724
+        },
+        "thunder": {
+          "events": 4,
+          "active": 4,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 8,
+          "active": 8,
+          "skipped": 1
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 3604480,
+      "grew": false
+    },
+    {
+      "rate": 8000,
+      "surface": "puddle",
+      "seed": 731,
+      "frames": 384000,
+      "longRun": true,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "peak": 0.642314076423645,
+      "elapsedMs": 3336.790000000008,
+      "saveReloadIndependentExact": true,
+      "stats": {
+        "frame": 384000,
+        "rain": {
+          "events": 9830,
+          "active": 25,
+          "dropped": 0,
+          "rate": 132.92869417870767,
+          "heave": 0.9676402398841948
+        },
+        "thunder": {
+          "events": 7,
+          "active": 1,
+          "skipped": 4
+        },
+        "surf": {
+          "events": 11,
+          "active": 3,
+          "skipped": 4
+        },
+        "applied": 66,
+        "late": 0,
+        "overflow": 0,
+        "queued": 0
+      },
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2031616,
+      "grew": false
+    }
+  ]
+}

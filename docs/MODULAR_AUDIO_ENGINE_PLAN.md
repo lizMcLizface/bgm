@@ -1,5 +1,12 @@
 # Modular audio engine and parallel rendering plan
 
+Overnight integration checkpoint: [full Tape Graph27](MODULAR_AUDIO_ENGINE_TAPE_GRAPH.md)
+passes actual six-rate AudioWorklet/direct equality, workers and saved reload;
+fixed PDC rejects its intentional moving wet delay. [Owned streaming weather](MODULAR_AUDIO_ENGINE_OWNED_WEATHER.md)
+and [its three-stem desktop host](MODULAR_AUDIO_ENGINE_WEATHER_HOST.md) pass the
+original-model, allocation, browser, independence and navigation-reload gates.
+Both remain opt-in; normal host adoption is separate.
+
 Overnight Tape checkpoint (11 November): the explicit pinned full Tape profile
 now passes54 actual native cases (162 stage checks), plus8 low-rate cases
 (24 checks), without changing bounds or defaults. Its32 immutable prepared drive

@@ -1,0 +1,106 @@
+{
+  "kind": "weather.owned-reloaded-plan",
+  "version": 1,
+  "revision": "weather-three-stem-v1",
+  "engineVersion": "b645e01e918b9cdc",
+  "wasm": "0528df540bfb0d4cf9c817118005455d90b04cb69a87b6c28dd4b273d190b8f2",
+  "startedAtUtc": "2026-11-11T02:09:52.781Z",
+  "muted": true,
+  "listening": "not assessed",
+  "scope": "Actual original WeatherBedModel versus portable twelve layers and three stereo reductions; separate AudioWorklet outputs before native Ambience level/pan/width/distance/shelter chains. No All/default change, automatic PDC, physical loopback or device-underrun claim.",
+  "cases": [
+    {
+      "kind": "reloaded-worklet",
+      "rate": 48000,
+      "frames": 60032,
+      "actualAudioWorklet": true,
+      "stereoOutputs": 3,
+      "latencyFrames": 0,
+      "startFrame": 131,
+      "timestampedControl": {
+        "kind": "thunder",
+        "sourceFrame": 9611,
+        "contextFrame": 9742,
+        "acknowledgedBeforeRender": true
+      },
+      "stats": [
+        {
+          "type": "stats",
+          "request": 2,
+          "frame": 60032,
+          "applied": 56,
+          "late": 0,
+          "overflow": 0,
+          "queued": 0,
+          "rain": {
+            "events": 103,
+            "active": 15,
+            "dropped": 0
+          },
+          "thunder": {
+            "events": 2,
+            "active": 2,
+            "skipped": 0
+          },
+          "surf": {
+            "events": 3,
+            "active": 3,
+            "skipped": 0
+          },
+          "clock": "spec events: source-local frames; control contextFrame: absolute AudioContext frame",
+          "startFrame": 131,
+          "stopFrame": 60032,
+          "processCalls": 473,
+          "preStartFrames": 131,
+          "startupLateFrames": 0,
+          "latencyFrames": 0,
+          "finished": true,
+          "memoryBytes": 1769472
+        }
+      ],
+      "metrics": [
+        {
+          "stem": "rain",
+          "frames": 60032,
+          "peak": 0.4016907215118408,
+          "rms": 0.0838987325509181,
+          "nonFinite": 0,
+          "stereoDifference": 0.4854501262307167
+        },
+        {
+          "stem": "thunder",
+          "frames": 60032,
+          "peak": 0.2601204514503479,
+          "rms": 0.04489765306514817,
+          "nonFinite": 0,
+          "stereoDifference": 0.12365461885929108
+        },
+        {
+          "stem": "waves",
+          "frames": 60032,
+          "peak": 0.09946051239967346,
+          "rms": 0.011324655154231283,
+          "nonFinite": 0,
+          "stereoDifference": 0.06659948080778122
+        }
+      ],
+      "independentInstances": false,
+      "checksPassed": true,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "relativeRms": 0,
+        "differingSamples": 0,
+        "exact": true
+      }
+    }
+  ],
+  "checksPassed": true,
+  "persistence": {
+    "fullPageReloadTested": true,
+    "navigationType": "reload",
+    "pcmSha256": "1ff46ad14e19dfea979545b1395c61f471fbb82cab3a6863bb66ddd6da49b47f",
+    "storedPcmHashMatches": true
+  },
+  "reason": "reload-replay-completed",
+  "completedAtUtc": "2026-11-11T02:09:53.436Z"
+}

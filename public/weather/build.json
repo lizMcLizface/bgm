@@ -1,0 +1,19 @@
+{
+  "api": 1,
+  "hostSHA256": {
+    "public/weather/owned-bed-processor.js": "6c954bbf12ece3126a8b1b0e191482d81bf40af9e6c052d4e688071335acdd40",
+    "src/modular-audio/ownedWeatherWorklet.js": "086b7b5138c48cb22b5f27bc92d15af50ac8339872c7cefa8383ee6dc0d98c22",
+    "src/modular-audio/ownedWeatherSuite.js": "16ac3e220a9462d7cebf31d13e0e868251e9def4bf28a16007e7c69c0709c97b",
+    "tools/weather-owned.html": "b654e891e756635261ae15efafe05643fc66627ba760c64ed44a29251c94ca6b",
+    "tools/weather-owned.js": "eac2e0084f24d665f53f1c720a1dc9f1896b2800095556c93595f9b995508d19",
+    "tools/weatherBedReference.mjs": "49e667ee64d2d543bd9b0aa09a358abc7473469e44a6bb5b1dd33fe12e90a730"
+  },
+  "hostVersion": "9b46fcd07d33273f",
+  "source": "dac3f2f1fecfd05fb1a413cf943de143f6566a04f8295b26c5c99b3864fa3cae",
+  "runtime": "ef6ca91b05516f0cd22fa7b7dc20876d76fe35ba540bbcfffe7098679c7cb715",
+  "reference": "53a61d7ed0fad3271609f1fa40f11ed7c23a8803a2514be68ceab94e2caac57b",
+  "wasm": "0528df540bfb0d4cf9c817118005455d90b04cb69a87b6c28dd4b273d190b8f2",
+  "bytes": 67067,
+  "audited": false,
+  "version": "b645e01e918b9cdc"
+}

@@ -1,5 +1,5 @@
 // src/modular-audio/workerOutputProcessor.js
-import { ReferenceGraph, assertSerialRealtimeAllowed } from "./runtime.js?v=e5d15eff943d3e5b";
+import { ReferenceGraph, assertSerialRealtimeAllowed } from "./runtime.js?v=5c32eec13f07c426";
 
 // src/modular-audio/queueLead.js
 function contiguousLeadFrames(slots, frame, capacity) {

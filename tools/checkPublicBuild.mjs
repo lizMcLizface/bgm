@@ -6,6 +6,7 @@ import {parse} from 'yaml';
 const root='dist-public';
 if(!fs.existsSync(root)){console.error(`${root}/ is missing: run npm run build:public.`);process.exit(1);}
 const problems=[];
+for(const file of ['tools/plucked-voice.html','tools/plucked-pitch-probe.html','tools/owned-desk.html','tools/tape-reference.html','tools/tape-graph.html','tools/weather-owned.html','plucked-voice/voice.wasm','plucked-voice/build.json','weather/weather.wasm','weather/build.json','weather/owned-bed-processor.js','modular-audio/mixer-node-processor.js','modular-audio/tape-fx.wasm','modular-audio/tape-fx-build.json','modular-audio/tape-native-sine-resources.json','modular-audio/tape-chromium-notices.txt'])if(!fs.existsSync(path.join(root,file)))problems.push(`Missing ${file}`);
 const synths=['poly','fm','cs80','juno','prophet5','jupiter8','minimoog','dx7','obxa','vs','wt','tr808','tr909','tr707','tr606','tb303'];
 for(const file of ['core.wasm','processor.js','fm.wasm','fm-processor.js','effects.wasm','effects-processor.js','inserts.wasm','inserts-processor.js','patch-transition.js'])if(!fs.existsSync(path.join(root,'synth-lab',file)))problems.push(`Missing synth-lab/${file}`);
 for(const file of ['synths/ensemble/index.html','synths/index.html','synths/all/index.html','synths/effects/index.html','synths/classics.wasm','synths/classics-processor.js','synths/output-scope.js',...synths.map(s=>`synths/${s}/index.html`)])if(!fs.existsSync(path.join(root,file)))problems.push(`Missing ${file}`);

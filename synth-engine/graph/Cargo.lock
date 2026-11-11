@@ -18,6 +18,7 @@ dependencies = [
  "calmbgm_piano",
  "calmbgm_plucked_voice",
  "calmbgm_rack_fx",
+ "calmbgm_tape_fx",
  "calmbgm_voice_fx",
 ]
 
@@ -74,6 +75,10 @@ dependencies = [
 
 [[package]]
 name = "calmbgm_rack_fx"
+version = "0.1.0"
+
+[[package]]
+name = "calmbgm_tape_fx"
 version = "0.1.0"
 
 [[package]]

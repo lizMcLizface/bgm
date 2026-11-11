@@ -62,6 +62,14 @@ reviewable rather than weakening validation or changing sounds to force a pass.
 
 ## Checkpoints
 
+- 11 November ~02:18 UTC: Tape Graph27 and the streaming weather desktop host
+  pass actual built-browser six-rate checks, independence and full-page reload.
+  Weather live routing has six nonzero channels. The normal public build passes;
+  broad regression:458 files,3507 tests pass,4 audit-only skips. The matching
+  focused batch has41 tests and the full Tape graph has6 zero-allocation cases.
+  Native defaults remain unchanged. Measured strings, native DynamicsCompressor
+  and immutable per-host owned desk selection continue independently.
+
 - 11 November ~02:05 UTC: source/desk checkpoint assembled. Graph0696290c05a0caa7
   includes finite KS voices and Motion. Native BufferSource experiments fixed
   a real shared piano/KS pitch-clock error. 146 focused tests,39 full-graph

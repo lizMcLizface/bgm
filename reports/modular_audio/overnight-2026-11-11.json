@@ -3,7 +3,7 @@
   "version": 1,
   "status": "running",
   "startedAtUtc": "2026-11-10T23:19:46Z",
-  "updatedAtUtc": "2026-11-11T02:06:27.808Z",
+  "updatedAtUtc": "2026-11-11T02:18:08.893Z",
   "featureCutoffUtc": "2026-11-11T08:30:00Z",
   "deadlineUtc": "2026-11-11T09:00:00Z",
   "gitIdentity": {
@@ -24,23 +24,25 @@
     "539467e",
     "14060ef",
     "74244f7",
-    "c456547"
+    "c456547",
+    "1508a14"
   ],
   "graph": {
     "api": 1,
-    "source": "241a4bfd681fa2053ea801efc072bdb7225733d15e3080db78070b0aa96901d9",
-    "wasm": "3ad834fcfeb4eb5ebcad45039684c3d9a2d6e70f7c3d7e2bda9720727bb06209",
-    "runtime": "2fb835c2f9c8bf2528b16cf09eb8c3cc4f454f3bfbfabbb064fd6001b228bdf1",
-    "bytes": 1466591,
+    "source": "1bd9782e56482859db56341b7da779fda8282c82bb0f2190ce9afc0f57ebb2d0",
+    "wasm": "9e1cfbee5dcaf347219b1b38cf86c48a597624ec03226b02e56d3e4d280a0e57",
+    "runtime": "ed8de2ef51e98008356d71e4056367109d960b32601df822aa914457b01f8142",
+    "bytes": 1579252,
     "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
-    "version": "0696290c05a0caa7"
+    "version": "dd0b459e6b932eab"
   },
   "checks": {
     "fullSuite": {
-      "files": 437,
-      "tests": 3267,
+      "files": 458,
+      "tests": 3507,
+      "skipped": 4,
       "pass": true,
-      "log": ".tmp/overnight-all-tests.log"
+      "log": ".tmp/overnight-regression-02h.log"
     },
     "focusedGraph": {
       "tests": 53,
@@ -78,7 +80,18 @@
     "tapeProduction": "449029958ac881d3",
     "tapeFullCases": 54,
     "tapeLowrateCases": 8,
-    "tapeAllocationCases": 12
+    "tapeAllocationCases": 12,
+    "tapeGraphTests": 15,
+    "tapeGraphAllocationCases": 6,
+    "tapeGraphBrowser": "tape-graph-desktop-browser.json",
+    "tapeGraphReload": "tape-graph-page-reload-browser.json",
+    "weatherReferenceCases": 37,
+    "weatherAllocationCases": 37,
+    "weatherKernel": "b645e01e918b9cdc",
+    "weatherHost": "9b46fcd07d33273f",
+    "weatherBrowser": "weather-desktop-browser-final.json",
+    "weatherReload": "weather-page-reload-browser-final.json",
+    "weatherRoutedOutput": "weather-live-browser-final.json"
   },
   "limitations": [
     "No physical listening/device-underrun claim",
@@ -86,8 +99,8 @@
     "Only integer path differences compensated; FM fractional differences reject",
     "Workbench still five pitched plus percussion source buses",
     "Normal All backend remains legacy; deterministic owned desk is isolated opt-in",
-    "Weather numeric kernel verified separately; browser/host integration pending",
-    "Tape explicit pinned profile verified on desktop; Graph adoption, native bypass and other browser/platform behavior remain separate"
+    "Weather host is standalone, before original native ambience chains; normal backend adoption remains separate",
+    "Tape graph exposes known FIR group only and rejects fixed PDC; native bypass/seconds automation adoption remains separate"
   ],
-  "next": "Continue independent remaining source preparation and host-chain ports, then broaden fixed desktop verification. Stop features08:30 and hand off09:00."
+  "next": "Continue independent measured-string preparation, native DynamicsCompressor parity, and immutable opt-in All desk integration. Feature cutoff08:30; handoff09:00."
 }

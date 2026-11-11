@@ -1,0 +1,70 @@
+{
+  "kind": "graph.full-tape-allocation",
+  "version": 1,
+  "engineVersion": "dd0b459e6b932eab",
+  "auditWasmSha256": "124d3b4a982db1cd8d5cfb3701ae51e8a5c155b86adc4aa6d7be37b0e7bd9f3a",
+  "pass": true,
+  "scope": "Prepared immutable full Tape through two actual Graph instances: render/queue/cancel/reset/pause watched. No native runner, deadline or physical output claim.",
+  "results": [
+    {
+      "rate": 8000,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 3211264,
+      "grew": false,
+      "saveReloadExact": true,
+      "peak": 0.28849756717681885,
+      "latencyScope": "Known FIR group128 only; variable wet delay excluded; PDC rejected"
+    },
+    {
+      "rate": 24000,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 3211264,
+      "grew": false,
+      "saveReloadExact": true,
+      "peak": 0.2888067364692688,
+      "latencyScope": "Known FIR group128 only; variable wet delay excluded; PDC rejected"
+    },
+    {
+      "rate": 44100,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 3211264,
+      "grew": false,
+      "saveReloadExact": true,
+      "peak": 0.29101213812828064,
+      "latencyScope": "Known FIR group128 only; variable wet delay excluded; PDC rejected"
+    },
+    {
+      "rate": 48000,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 3211264,
+      "grew": false,
+      "saveReloadExact": true,
+      "peak": 0.2920254170894623,
+      "latencyScope": "Known FIR group128 only; variable wet delay excluded; PDC rejected"
+    },
+    {
+      "rate": 96000,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 3211264,
+      "grew": false,
+      "saveReloadExact": true,
+      "peak": 0.29032081365585327,
+      "latencyScope": "Known FIR group128 only; variable wet delay excluded; PDC rejected"
+    },
+    {
+      "rate": 192000,
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 3276800,
+      "grew": false,
+      "saveReloadExact": true,
+      "peak": 0.305410772562027,
+      "latencyScope": "Known FIR group128 only; variable wet delay excluded; PDC rejected"
+    }
+  ]
+}
