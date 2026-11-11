@@ -29,3 +29,17 @@ pub extern "C" fn mixer_alloc_watch(on: u32) {
 pub extern "C" fn mixer_alloc_count() -> usize {
     COUNT.load(Ordering::Relaxed)
 }
+// Audit-only observation of the actual rendered AudioParam curve. The main ABI
+// exposes requested targets, not this private Float32 calculation state.
+pub struct CurveProbe {curve:super::Smooth}
+#[no_mangle]
+pub extern "C" fn mixer_curve_probe_new(rate:f64,initial:f64)->*mut CurveProbe{
+    if !rate.is_finite()||!(8000. ..=192000.).contains(&rate)||!initial.is_finite()||!(initial as f32).is_finite(){return std::ptr::null_mut();}
+    Box::into_raw(Box::new(CurveProbe{curve:super::Smooth::new(initial,rate)}))
+}
+#[no_mangle]
+pub extern "C" fn mixer_curve_probe_set(p:&mut CurveProbe,target:f64){p.curve.set(target,false);}
+#[no_mangle]
+pub extern "C" fn mixer_curve_probe_tick(p:&mut CurveProbe)->f64{p.curve.tick()}
+#[no_mangle]
+pub unsafe extern "C" fn mixer_curve_probe_free(p:*mut CurveProbe){if !p.is_null(){drop(Box::from_raw(p));}}

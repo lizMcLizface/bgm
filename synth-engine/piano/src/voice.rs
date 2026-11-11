@@ -423,6 +423,8 @@ impl Engine {
             4 => self.frame as f64,
             5 => self.peak,
             7 => self.peak_active as f64,
+            // Read-only native BufferSource timing regression diagnostics.
+            9 => self.slots.first().map_or(0., |slot| slot.position),
             _ => 0.,
         }
     }
@@ -462,12 +464,18 @@ impl Engine {
                         };
                         input = (((strike + body) as f32 * 2.5) as f64 * amplitude) as f32 as f64;
                         detune = target(&n.filter, t);
-                        // AudioBufferSource detune is k-rate, on the absolute
-                        // render quantum clock; source cursors remain owned.
-                        let kt = (now / 128 * 128).saturating_sub(v.start) as f64;
-                        let rate = 2f64.powf(
-                            (self.pitch * (-kt / self.pitch_tau).exp() + pitch_control) / 1200.,
-                        );
+                        // Actual native BufferSource ramp measurements show
+                        // that a fresh target clock starts at its first FULL
+                        // absolute quantum, at the exact initial amount. A
+                        // partial onset quantum retains default0 detune.
+                        let key_frame = now / 128 * 128;
+                        let target_start = v.start.div_ceil(128) * 128;
+                        let envelope = if key_frame >= target_start {
+                            self.pitch * (-((key_frame-target_start) as f64)/self.pitch_tau).exp()
+                        } else {
+                            0.
+                        };
+                        let rate = 2f64.powf((envelope + pitch_control) / 1200.);
                         v.position += rate;
                         v.body += rate * bank.rate;
                     }

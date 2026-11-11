@@ -85,3 +85,9 @@ pub const FREEZE: [Param; 4] = [
     Param{id:"length",unit:"native",min:0.25,max:4.,default:2.,modulation:false},
     Param{id:"fade",unit:"native",min:0.02,max:30.,default:1.,modulation:false},
 ];
+pub const MOTION: [Param; 4] = [
+    Param{id:"tremoloDepth",unit:"native",min:0.,max:1.,default:0.,modulation:false},
+    Param{id:"tremoloRate",unit:"native",min:0.01,max:20.,default:4.,modulation:false},
+    Param{id:"autoPanDepth",unit:"native",min:0.,max:1.,default:0.,modulation:false},
+    Param{id:"autoPanRate",unit:"native",min:0.01,max:20.,default:0.2,modulation:false},
+];

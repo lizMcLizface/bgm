@@ -1,0 +1,304 @@
+{
+  "kind": "plucked.native-voice-comparison",
+  "version": 1,
+  "sampleRate": 48000,
+  "scope": "Actual native dry MonoSynth voice before shared compressor/FX; SRC/filter approximate numeric parity, no device/listening claim",
+  "limits": {
+    "relativeRmsError": 0.005,
+    "correlation": 0.99998
+  },
+  "checksPassed": true,
+  "results": [
+    {
+      "name": "Nylon Guitar",
+      "version": "d5cf3e9a8f1664d7",
+      "voices": 8,
+      "controls": [],
+      "peak": 0.2828541100025177,
+      "maxError": 0.00005409121513366699,
+      "relativeRmsError": 0.0001653640073651203,
+      "correlation": 0.9999999977193417,
+      "stats": {
+        "active": 0,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 192000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 3,
+        "preparedBytes": 1824000
+      },
+      "pass": true
+    },
+    {
+      "name": "Soft Harp",
+      "version": "d5cf3e9a8f1664d7",
+      "voices": 8,
+      "controls": [],
+      "peak": 0.27759042382240295,
+      "maxError": 0.00009678676724433899,
+      "relativeRmsError": 0.00010107933019237088,
+      "correlation": 0.9999999980020678,
+      "stats": {
+        "active": 0,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 192000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 3,
+        "preparedBytes": 2688000
+      },
+      "pass": true
+    },
+    {
+      "name": "Harp Pluck",
+      "version": "d5cf3e9a8f1664d7",
+      "voices": 8,
+      "controls": [],
+      "peak": 0.2803698182106018,
+      "maxError": 0.00005991943180561066,
+      "relativeRmsError": 0.00007434934916585177,
+      "correlation": 0.9999999991156813,
+      "stats": {
+        "active": 0,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 192000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 3,
+        "preparedBytes": 2688000
+      },
+      "pass": true
+    },
+    {
+      "name": "Kalimba Pluck",
+      "version": "d5cf3e9a8f1664d7",
+      "voices": 8,
+      "controls": [],
+      "peak": 0.28649720549583435,
+      "maxError": 2.086162567138672e-7,
+      "relativeRmsError": 3.425821003346547e-7,
+      "correlation": 0.9999999999999191,
+      "stats": {
+        "active": 0,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 192000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 3,
+        "preparedBytes": 1824000
+      },
+      "pass": true
+    },
+    {
+      "name": "Upright Pluck",
+      "version": "d5cf3e9a8f1664d7",
+      "voices": 8,
+      "controls": [],
+      "peak": 0.3144803047180176,
+      "maxError": 0.00015336275100708008,
+      "relativeRmsError": 0.0003977205027305308,
+      "correlation": 0.9999999593187289,
+      "stats": {
+        "active": 0,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 192000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 3,
+        "preparedBytes": 1728000
+      },
+      "pass": true
+    },
+    {
+      "name": "One-slot stealing",
+      "version": "d5cf3e9a8f1664d7",
+      "voices": 1,
+      "controls": [],
+      "peak": 0.22683246433734894,
+      "maxError": 0.00005117446653457591,
+      "relativeRmsError": 0.00018774207765760462,
+      "correlation": 0.9999999972556828,
+      "stats": {
+        "active": 0,
+        "steals": 3,
+        "dropped": 0,
+        "late": 0,
+        "frame": 192000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 1,
+        "preparedBytes": 1824000
+      },
+      "pass": true
+    },
+    {
+      "name": "Two-slot stealing",
+      "version": "d5cf3e9a8f1664d7",
+      "voices": 2,
+      "controls": [],
+      "peak": 0.2668427526950836,
+      "maxError": 0.00007833540439605713,
+      "relativeRmsError": 0.00009456261171479013,
+      "correlation": 0.9999999986685224,
+      "stats": {
+        "active": 0,
+        "steals": 2,
+        "dropped": 0,
+        "late": 0,
+        "frame": 192000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 2,
+        "preparedBytes": 2688000
+      },
+      "pass": true
+    },
+    {
+      "name": "Positive pitch envelope",
+      "version": "d5cf3e9a8f1664d7",
+      "voices": 8,
+      "controls": [],
+      "peak": 0.29036861658096313,
+      "maxError": 0.00005352497100830078,
+      "relativeRmsError": 0.00017538800244031106,
+      "correlation": 0.9999999960408835,
+      "stats": {
+        "active": 0,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 192000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 3,
+        "preparedBytes": 1824000
+      },
+      "pass": true
+    },
+    {
+      "name": "Negative detune finite source stop",
+      "version": "d5cf3e9a8f1664d7",
+      "voices": 8,
+      "controls": [],
+      "peak": 0.2679656147956848,
+      "maxError": 0.000050514936447143555,
+      "relativeRmsError": 0.0001875760992196557,
+      "correlation": 0.9999999986095564,
+      "stats": {
+        "active": 1,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 192000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 4,
+        "preparedBytes": 288000
+      },
+      "pass": true
+    },
+    {
+      "name": "Vibrato + filter LFO",
+      "version": "d5cf3e9a8f1664d7",
+      "voices": 8,
+      "controls": [
+        {
+          "axis": "pitch",
+          "kind": "sine"
+        },
+        {
+          "axis": "filter",
+          "kind": "sine"
+        }
+      ],
+      "peak": 0.28755033016204834,
+      "maxError": 0.000006109476089477539,
+      "relativeRmsError": 0.000022627257436640353,
+      "correlation": 0.9999999997439674,
+      "stats": {
+        "active": 0,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 192000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 3,
+        "preparedBytes": 1824000
+      },
+      "pass": true
+    },
+    {
+      "name": "Sine pitch + filter wander",
+      "version": "d5cf3e9a8f1664d7",
+      "voices": 8,
+      "controls": [
+        {
+          "axis": "filter",
+          "kind": "sine"
+        },
+        {
+          "axis": "pitch",
+          "kind": "sine"
+        }
+      ],
+      "peak": 0.2867240011692047,
+      "maxError": 0.000043235719203948975,
+      "relativeRmsError": 0.00007224268271023323,
+      "correlation": 0.9999999991882329,
+      "stats": {
+        "active": 0,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 192000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 3,
+        "preparedBytes": 2688000
+      },
+      "pass": true
+    },
+    {
+      "name": "Brownian pitch + filter wander",
+      "version": "d5cf3e9a8f1664d7",
+      "voices": 8,
+      "controls": [
+        {
+          "axis": "filter",
+          "kind": "linear"
+        },
+        {
+          "axis": "pitch",
+          "kind": "linear"
+        }
+      ],
+      "peak": 0.27863582968711853,
+      "maxError": 0.00007963180541992188,
+      "relativeRmsError": 0.00024228553311873616,
+      "correlation": 0.9999999870418251,
+      "stats": {
+        "active": 0,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 192000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 3,
+        "preparedBytes": 1824000
+      },
+      "pass": true
+    }
+  ]
+}

@@ -9,6 +9,8 @@ mod effect_nodes;
 mod effect_parameters;
 mod mixer_nodes;
 mod classic_source;
+#[cfg(target_arch="wasm32")]
+mod plucked_abi;
 mod rack_nodes;
 mod voice_nodes;
 mod pitched;
@@ -52,6 +54,8 @@ pub enum Kind {
     ZPlane = 22,
     Shimmer = 23,
     Freeze = 24,
+    Motion = 25,
+    Plucked = 26,
 }
 impl Kind {
     pub fn from_code(code: u32) -> Result<Self> {
@@ -77,6 +81,8 @@ impl Kind {
             18 => Ok(Self::DeskLimiter),
             19 => Ok(Self::Classic),
             20=>Ok(Self::Crusher),21=>Ok(Self::Pitch),22=>Ok(Self::ZPlane),23=>Ok(Self::Shimmer),24=>Ok(Self::Freeze),
+            25=>Ok(Self::Motion),
+            26=>Ok(Self::Plucked),
             _ => Err(Error::Contract),
         }
     }
@@ -103,6 +109,8 @@ impl Kind {
             Self::DeskLimiter => "desk.limiter",
             Self::Classic => "legacy.classic",
             Self::Crusher=>"rack.crusher",Self::Pitch=>"rack.pitch",Self::ZPlane=>"rack.zplane",Self::Shimmer=>"voice.shimmer",Self::Freeze=>"voice.freeze",
+            Self::Motion=>"voice.motion",
+            Self::Plucked=>"legacy.plucked",
         }
     }
     fn params(self) -> &'static [Param] {
@@ -122,7 +130,8 @@ impl Kind {
             Self::DeskFader => &DESK_FADER_PARAMS,
             Self::DeskLimiter => &DESK_LIMITER_PARAMS,
             Self::Crusher=>&effect_parameters::CRUSHER,Self::Pitch=>&effect_parameters::PITCH,Self::ZPlane=>&effect_parameters::ZPLANE,Self::Shimmer=>&effect_parameters::SHIMMER,Self::Freeze=>&effect_parameters::FREEZE,
-            Self::Core | Self::Fm | Self::Piano | Self::Iowa | Self::Classic => &PITCH_PARAMS,
+            Self::Motion=>&effect_parameters::MOTION,
+            Self::Core | Self::Fm | Self::Piano | Self::Iowa | Self::Classic | Self::Plucked => &PITCH_PARAMS,
         }
     }
     fn ports(self) -> &'static [Port] {
@@ -138,8 +147,9 @@ impl Kind {
             Self::Inserts | Self::Delay => &OUTPUT_PROCESSOR_PORTS,
             Self::DeskStrip|Self::DeskMatrix|Self::DeskFader|Self::DeskLimiter => &OUTPUT_PROCESSOR_PORTS,
             Self::Crusher|Self::Pitch|Self::ZPlane|Self::Shimmer|Self::Freeze=>&OUTPUT_PROCESSOR_PORTS,
+            Self::Motion=>&OUTPUT_PROCESSOR_PORTS,
             Self::SendEffects => &SEND_EFFECT_PORTS,
-            Self::Core | Self::Fm | Self::Piano | Self::Iowa | Self::Classic => &TONE_PORTS,
+            Self::Core | Self::Fm | Self::Piano | Self::Iowa | Self::Classic | Self::Plucked => &TONE_PORTS,
         }
     }
 }
@@ -405,7 +415,7 @@ pub fn descriptors_json() -> String {
         Kind::Piano,
         Kind::Iowa,
         Kind::Inserts, Kind::SendEffects, Kind::Delay,
-        Kind::DeskStrip,Kind::DeskMatrix,Kind::DeskFader,Kind::DeskLimiter,Kind::Classic,Kind::Crusher,Kind::Pitch,Kind::ZPlane,Kind::Shimmer,Kind::Freeze,
+        Kind::DeskStrip,Kind::DeskMatrix,Kind::DeskFader,Kind::DeskLimiter,Kind::Classic,Kind::Crusher,Kind::Pitch,Kind::ZPlane,Kind::Shimmer,Kind::Freeze,Kind::Motion,Kind::Plucked,
     ] {
         let params: Vec<_> = kind.params().iter().enumerate().map(|(code,p)| format!(r#"{{"id":"{}","code":{},"unit":"{}","min":{},"max":{},"default":{},"rate":"{}","modulation":{},"smoothingMs":{}}}"#,p.id,code,p.unit,p.min,p.max,p.default,if matches!(kind,Kind::Inserts|Kind::SendEffects)||kind.rack()||kind.voice_fx()||kind.mixer()||p.unit=="boolean"||p.unit=="enum"{"event"}else{"audio"},p.modulation,if kind==Kind::Compressor && [5,6,9].contains(&code){5}else if kind.mixer()&&kind!=Kind::DeskLimiter{12}else{0})).collect();
         let ports: Vec<_> = kind.ports().iter().enumerate().map(|(code,p)| format!(r#"{{"id":"{}","code":{},"direction":"{}","family":"{}","channels":{},"unit":"{}","reference":"{}","rate":"audio","normalization":"none","fanIn":1,"role":"{}","required":{}}}"#,p.id,code,p.direction,p.family,p.channels,if p.family=="audio" {"linear PCM"} else {"bipolar"},if p.family=="audio" {"1 = digital full scale"} else {"-1..1"},p.role,p.required)).collect();
@@ -425,10 +435,10 @@ pub fn descriptors_json() -> String {
         if kind == Kind::Compressor {
             events.push("\"connection\"");
         }
-        if matches!(kind,Kind::Core|Kind::Fm|Kind::Piano|Kind::Iowa) {events.push("\"note\"");events.push("\"cancel\"");}
+        if matches!(kind,Kind::Core|Kind::Fm|Kind::Piano|Kind::Iowa|Kind::Plucked) {events.push("\"note\"");events.push("\"cancel\"");}
         if kind==Kind::Classic {events.push("\"classic\"");events.push("\"cancel\"");}
-        let processing=if kind==Kind::Freeze{r#","execution":"worker-only","processing":"owned seeded original Freeze with synchronous capture; canonical128 input capture","adapterLatencyFrames":128,"parameterQuantumFrames":128,"random":"xorshift32-v1","resetPolicy":"retain latest targets; clear cache/history; restart captured seed","capturePolicy":"original four-second copy can exceed callback deadline; no serial realtime fallback","maxInstances":2"#}else if kind.rack()||kind.voice_fx(){r#","processing":"owned original kernel; canonical128 input capture","adapterLatencyFrames":128,"parameterQuantumFrames":128,"configuration":"complete original targets; ZPlane shape banks immutable after preparation; Pitch wet delay is intrinsic/time-varying and excluded from fixed128 adapter latency","resetPolicy":"retain latest targets; clear cache/history; restart seed where applicable""#}else if kind.mixer(){r#","processing":"owned stereo desk primitive, sample-by-sample","configuration":"complete mixer config v1 matching sampleRate; graph events own the only clock","smoothingPolicy":"original 12ms mixer smoothing; limiter immediate","latencyPolicy":"limiter ceil(sampleRate * 0.003) even when disabled; query prepared instance","precision":"f64 parameter authority","resetPolicy":"clear histories; restore latest targets using captured startup settlement""#}else if kind==Kind::Classic{r#","processing":"owned original native composite on source-local canonical128 callbacks","configuration":"classic config v1; model0..13, detached params/waves/polyphony","timingPolicy":"exact sample timestamps; future native callback cache cannot be rewritten","eventOwnership":"one owner per source until reset","maxNoteEvents":4000,"maxVoices":32,"externalRack":"host boundary after native composite""#}else if matches!(kind,Kind::Inserts|Kind::SendEffects){r#","processing":"owned native kernel, canonical 128-frame input capture","parameterQuantumFrames":128,"adapterLatencyFrames":128,"resetPolicy":"retain latest targets; clear cached output and native tails","smoothingPolicy":"original native parameter-specific smoothing; no extra graph smoothing""#}else if kind==Kind::Delay{r#","configuration":"immutable delay frames; maximum 262144","latencyPolicy":"configured frames; use graph latency query""#}else if kind==Kind::Iowa {r#","processing":"owned Held/Decay/Roll on canonical 128-frame ticks","configuration":"prepared immutable Iowa spec v1; host preparation remains separate","eventQuantumFrames":128,"maxPreparedSpecs":96,"maxNotes":2000,"maxVoices":32,"maxRollHits":12,"maxPreparedBytes":67108864,"timingPolicy":"on/off at legacy quantum; arbitrary executor blocks do not alter voice ticks""#}else if kind==Kind::Piano {r#","processing":"prepared finite mono piano voices, duplicated stereo","configuration":"piano spec v1; immutable banks and finite envelopes; graph note-on triggers","sampleRate":48000,"maxPreparedBanks":128,"maxPreparedPcmBytes":67108864,"maxNotes":2000,"maxVoices":32,"maxAutomationPoints":65536,"stealing":"rejected; native pre-onset fade pending","resampling":"linear; approximate native AudioBufferSource parity""#}else if matches!(kind,Kind::Core|Kind::Fm){",\"processing\":\"prepared blocks\",\"configuration\":\"owned pitched spec v1; notes in graph events\",\"maxNoteEvents\":4000,\"maxAutomationPoints\":65536,\"latencyPolicy\":\"query prepared instance; FM reconstruction depends on quality\""}else if kind==Kind::Percussion{r#", "kitConfiguration":{"version":1,"voices":["felt","crisp","tr808","hand"],"slots":14,"immutableAfterPrepare":true,"absent":"raw hits; event model/tone/decay","initialLevels":"unity; legacy 20 ms target smoothing","reset":"retain kit; restore initial unity levels","fields":{"level":{"min":0,"max":2},"tone":{"min":-1,"max":1},"decay":{"min":0.5,"max":2}}}"#}else{""};
-        let descriptor=format!(r#"{{"type":"{}","code":{},"version":1,"hostInput":{},"latencyFrames":{},"tailFrames":{},"tailPolicy":"{}","bypass":"{}","reset":"phase and voices cleared; compressor gain reset","ports":[{}],"parameters":[{}],"events":[{}]{}}}"#,kind.name(),kind as u32,kind==Kind::HostInput,if matches!(kind,Kind::Fm|Kind::Delay|Kind::DeskLimiter){"null"}else if matches!(kind,Kind::Inserts|Kind::SendEffects)||kind.rack()||kind.voice_fx(){"128"}else{"0"},if matches!(kind,Kind::Percussion|Kind::Core|Kind::Fm|Kind::Piano|Kind::Iowa|Kind::Inserts|Kind::SendEffects|Kind::Delay|Kind::Classic|Kind::Crusher|Kind::Pitch|Kind::ZPlane|Kind::Shimmer|Kind::Freeze|Kind::DeskStrip|Kind::DeskLimiter){-1}else{0},if matches!(kind,Kind::Inserts|Kind::SendEffects){"native kernel parameter-dependent decay; no silent truncation"}else if kind.rack()||kind.voice_fx(){"original native parameter-dependent tails"}else if kind==Kind::Classic{"native model and external rack dependent"}else if kind==Kind::Delay{"configured buffered frames"}else if kind==Kind::Percussion{"event dependent, at most 8.1 seconds; -1 denotes variable frames"}else if kind==Kind::Iowa{"prepared release, decay lifetime and roll dependent"}else if kind==Kind::Piano{"configured finite envelopes and lowpass state"}else if matches!(kind,Kind::Core|Kind::Fm){"patch and held-note dependent"}else{"none"},if kind==Kind::Compressor{"5 ms unity crossfade"}else{"unsupported"},ports.join(","),params.join(","),events.join(","),processing);
+        let processing=if kind==Kind::Plucked{r#","processing":"distinct prepared finite Karplus-Strong voices; actual source banks","sampleRate":48000,"maxVoices":32,"maxNotes":2000,"maxPreparedBanks":128,"maxPreparedPcmBytes":67108864,"maxAutomationPoints":65536,"timingPolicy":"immutable sample onset/slot/lifetime; late onsets reject before enqueue","configuration":"plucked config v1; graph events own playback timing and ownership","nativeParity":"fixed browser bound for SRC/lowpass; active breath and unsupported controls reject at capture""#}else if kind==Kind::Motion{r#","processing":"owned original stereo tremolo/autopan graph; continuous instance-start LFO phase","parameterQuantumFrames":1,"latencyPolicy":"zero; exact integer-frame events; import native AudioParam seconds with explicit ceil(seconds*sampleRate)","precision":"f64 target ledger; native Float32AudioParam stage boundaries","resetPolicy":"latest targets retained; both phases restart","nativeParity":"fixed browser tolerance; OscillatorNode numeric differences retained in evidence""#}else if kind==Kind::Freeze{r#","execution":"worker-only","processing":"owned seeded original Freeze with synchronous capture; canonical128 input capture","adapterLatencyFrames":128,"parameterQuantumFrames":128,"random":"xorshift32-v1","resetPolicy":"retain latest targets; clear cache/history; restart captured seed","capturePolicy":"original four-second copy can exceed callback deadline; no serial realtime fallback","maxInstances":2"#}else if kind.rack()||kind.voice_fx(){r#","processing":"owned original kernel; canonical128 input capture","adapterLatencyFrames":128,"parameterQuantumFrames":128,"configuration":"complete original targets; ZPlane shape banks immutable after preparation; Pitch wet delay is intrinsic/time-varying and excluded from fixed128 adapter latency","resetPolicy":"retain latest targets; clear cache/history; restart seed where applicable""#}else if kind.mixer(){r#","processing":"owned stereo desk primitive, sample-by-sample","configuration":"complete mixer config v1 matching sampleRate; graph events own the only clock","smoothingPolicy":"original 12ms mixer smoothing; limiter immediate","latencyPolicy":"limiter ceil(sampleRate * 0.003) even when disabled; query prepared instance","precision":"f64 parameter authority","resetPolicy":"clear histories; restore latest targets using captured startup settlement""#}else if kind==Kind::Classic{r#","processing":"owned original native composite on source-local canonical128 callbacks","configuration":"classic config v1; model0..13, detached params/waves/polyphony","timingPolicy":"exact sample timestamps; future native callback cache cannot be rewritten","eventOwnership":"one owner per source until reset","maxNoteEvents":4000,"maxVoices":32,"externalRack":"host boundary after native composite""#}else if matches!(kind,Kind::Inserts|Kind::SendEffects){r#","processing":"owned native kernel, canonical 128-frame input capture","parameterQuantumFrames":128,"adapterLatencyFrames":128,"resetPolicy":"retain latest targets; clear cached output and native tails","smoothingPolicy":"original native parameter-specific smoothing; no extra graph smoothing""#}else if kind==Kind::Delay{r#","configuration":"immutable delay frames; maximum 262144","latencyPolicy":"configured frames; use graph latency query""#}else if kind==Kind::Iowa {r#","processing":"owned Held/Decay/Roll on canonical 128-frame ticks","configuration":"prepared immutable Iowa spec v1; host preparation remains separate","eventQuantumFrames":128,"maxPreparedSpecs":96,"maxNotes":2000,"maxVoices":32,"maxRollHits":12,"maxPreparedBytes":67108864,"timingPolicy":"on/off at legacy quantum; arbitrary executor blocks do not alter voice ticks""#}else if kind==Kind::Piano {r#","processing":"prepared finite mono piano voices, duplicated stereo","configuration":"piano spec v1; immutable banks and finite envelopes; graph note-on triggers","sampleRate":48000,"maxPreparedBanks":128,"maxPreparedPcmBytes":67108864,"maxNotes":2000,"maxVoices":32,"maxAutomationPoints":65536,"stealing":"rejected; native pre-onset fade pending","resampling":"linear; approximate native AudioBufferSource parity""#}else if matches!(kind,Kind::Core|Kind::Fm){",\"processing\":\"prepared blocks\",\"configuration\":\"owned pitched spec v1; notes in graph events\",\"maxNoteEvents\":4000,\"maxAutomationPoints\":65536,\"latencyPolicy\":\"query prepared instance; FM reconstruction depends on quality\""}else if kind==Kind::Percussion{r#", "kitConfiguration":{"version":1,"voices":["felt","crisp","tr808","hand"],"slots":14,"immutableAfterPrepare":true,"absent":"raw hits; event model/tone/decay","initialLevels":"unity; legacy 20 ms target smoothing","reset":"retain kit; restore initial unity levels","fields":{"level":{"min":0,"max":2},"tone":{"min":-1,"max":1},"decay":{"min":0.5,"max":2}}}"#}else{""};
+        let descriptor=format!(r#"{{"type":"{}","code":{},"version":1,"hostInput":{},"latencyFrames":{},"tailFrames":{},"tailPolicy":"{}","bypass":"{}","reset":"phase and voices cleared; compressor gain reset","ports":[{}],"parameters":[{}],"events":[{}]{}}}"#,kind.name(),kind as u32,kind==Kind::HostInput,if matches!(kind,Kind::Fm|Kind::Delay|Kind::DeskLimiter){"null"}else if matches!(kind,Kind::Inserts|Kind::SendEffects)||kind.rack()||kind.voice_fx(){"128"}else{"0"},if matches!(kind,Kind::Percussion|Kind::Core|Kind::Fm|Kind::Piano|Kind::Iowa|Kind::Inserts|Kind::SendEffects|Kind::Delay|Kind::Classic|Kind::Crusher|Kind::Pitch|Kind::ZPlane|Kind::Shimmer|Kind::Freeze|Kind::DeskStrip|Kind::DeskLimiter|Kind::Plucked){-1}else{0},if matches!(kind,Kind::Inserts|Kind::SendEffects){"native kernel parameter-dependent decay; no silent truncation"}else if kind.rack()||kind.voice_fx(){"original native parameter-dependent tails"}else if kind==Kind::Classic{"native model and external rack dependent"}else if kind==Kind::Delay{"configured buffered frames"}else if kind==Kind::Percussion{"event dependent, at most 8.1 seconds; -1 denotes variable frames"}else if kind==Kind::Iowa{"prepared release, decay lifetime and roll dependent"}else if kind==Kind::Piano{"configured finite envelopes and lowpass state"}else if matches!(kind,Kind::Core|Kind::Fm){"patch and held-note dependent"}else{"none"},if kind==Kind::Compressor{"5 ms unity crossfade"}else{"unsupported"},ports.join(","),params.join(","),events.join(","),processing);
         if kind==Kind::Percussion {
             // v1 stays raw. v2 requires the kit so older runtimes fail closed.
             modules.push(descriptor.replace(processing,""));
@@ -488,6 +498,8 @@ struct Node {
     rack:Option<Box<rack_nodes::Adapter>>,
     voice_fx:Option<Box<voice_nodes::Adapter>>,
     fx_mask:u32,
+    motion:Option<Box<calmbgm_motion_fx::Engine>>,
+    plucked:Option<Box<calmbgm_plucked_voice::voice::Engine>>,
 }
 /// Audio links always connect matching stereo buses. Mod links explicitly map bipolar control.
 #[derive(Clone, Copy, Debug)]
@@ -567,10 +579,10 @@ pub struct Graph {
 }
 impl Graph {
     pub fn voice_fx_config(&mut self,id:u32,seed:u32)->Result<()>{self.editable()?;let i=self.index(id)?;let n=&mut self.nodes[i];if !n.kind.voice_fx()||n.voice_fx.is_some()||seed==0{return Err(Error::Contract);}n.voice_fx=Some(voice_nodes::Adapter::new(calmbgm_voice_fx::Kind::from_code(n.kind as u32-22).unwrap(),self.sample_rate,seed).ok_or(Error::Bounds)?);Ok(())}
-    fn valid_fx_param(&self,i:usize,index:usize,value:f64)->bool{let n=&self.nodes[i];let bounds=if let Some(r)=&n.rack{r.kind().bounds(index)}else if let Some(v)=&n.voice_fx{v.kind().bounds(index)}else{None};value.is_finite()&&bounds.is_some_and(|(a,b)|value>=a&&value<=b)&&!(n.kind==Kind::Freeze&&index==1&&value!=0.&&value!=1.)}
-    pub fn fx_initial(&mut self,id:u32,index:usize,value:f64)->Result<()>{self.editable()?;let i=self.index(id)?;if index>=32||!self.valid_fx_param(i,index,value)||self.nodes[i].fx_mask&(1<<index)!=0{return Err(Error::Contract);}let n=&mut self.nodes[i];let ok=if let Some(r)=&mut n.rack{r.initial(index,value)}else{n.voice_fx.as_mut().unwrap().initial(index,value)};if !ok{return Err(Error::Contract);}n.fx_mask|=1<<index;n.base[index]=value as f32;Ok(())}
+    fn valid_fx_param(&self,i:usize,index:usize,value:f64)->bool{let n=&self.nodes[i];let bounds=if n.motion.is_some(){calmbgm_motion_fx::PARAMETER_RANGES.get(index).copied()}else if let Some(r)=&n.rack{r.kind().bounds(index)}else if let Some(v)=&n.voice_fx{v.kind().bounds(index)}else{None};value.is_finite()&&bounds.is_some_and(|(a,b)|value>=a&&value<=b)&&!(n.kind==Kind::Freeze&&index==1&&value!=0.&&value!=1.)}
+    pub fn fx_initial(&mut self,id:u32,index:usize,value:f64)->Result<()>{self.editable()?;let i=self.index(id)?;if index>=32||!self.valid_fx_param(i,index,value)||self.nodes[i].fx_mask&(1<<index)!=0{return Err(Error::Contract);}let n=&mut self.nodes[i];let ok=if let Some(m)=&mut n.motion{m.param(index,value)}else if let Some(r)=&mut n.rack{r.initial(index,value)}else{n.voice_fx.as_mut().unwrap().initial(index,value)};if !ok{return Err(Error::Contract);}n.fx_mask|=1<<index;n.base[index]=value as f32;Ok(())}
     pub fn rack_edit(&mut self,id:u32)->Result<&mut rack_nodes::Adapter>{self.editable()?;let i=self.index(id)?;self.nodes[i].rack.as_deref_mut().ok_or(Error::Contract)}
-    pub fn fx_value(&self,id:u32,index:usize)->Result<f64>{let i=self.index(id)?;if index>=self.nodes[i].kind.params().len(){return Err(Error::Contract);}let n=&self.nodes[i];if let Some(r)=&n.rack{Ok(r.parameters()[index])}else{Ok(n.voice_fx.as_ref().ok_or(Error::Contract)?.parameters()[index])}}
+    pub fn fx_value(&self,id:u32,index:usize)->Result<f64>{let i=self.index(id)?;if index>=self.nodes[i].kind.params().len(){return Err(Error::Contract);}let n=&self.nodes[i];if let Some(m)=&n.motion{Ok(m.parameters()[index])}else if let Some(r)=&n.rack{Ok(r.parameters()[index])}else{Ok(n.voice_fx.as_ref().ok_or(Error::Contract)?.parameters()[index])}}
     pub fn classic_config(&mut self,id:u32,model:u32,polyphony:usize)->Result<()>{self.editable()?;let i=self.index(id)?;if self.nodes[i].kind!=Kind::Classic||self.nodes[i].classic.is_some(){return Err(Error::Contract);}let mut p=classic_source::Source::new(self.sample_rate,model).ok_or(Error::Bounds)?;if !p.initial_polyphony(polyphony){return Err(Error::Bounds);}self.nodes[i].classic=Some(p);Ok(())}
     pub fn classic_edit(&mut self,id:u32)->Result<&mut classic_source::Source>{self.editable()?;let i=self.index(id)?;self.nodes[i].classic.as_deref_mut().ok_or(Error::Contract)}
     pub fn mixer_config(&mut self,id:u32,param:usize,value:f64,settled:bool)->Result<()>{self.editable()?;let i=self.index(id)?;if !self.nodes[i].mixer.as_mut().ok_or(Error::Contract)?.initial(param,value,settled){return Err(Error::Contract);}self.nodes[i].base[param]=value as f32;Ok(())}
@@ -596,7 +608,7 @@ impl Graph {
     }
     pub fn latency(&self,id:u32)->Result<f64>{if !self.prepared{return Err(Error::State);}Ok(self.path_latencies[self.index(id)?])}
     pub fn edge_latency(&self,id:u32)->Result<usize>{if !self.prepared{return Err(Error::State);}let i=self.edges.iter().position(|e|e.id==id).ok_or(Error::Missing)?;Ok(self.edge_delays[i].frames())}
-    pub fn effect_stat(&self,id:u32,index:u32)->Result<f64>{let i=self.index(id)?;let n=&self.nodes[i];if let Some(e)=&n.effect{Ok(e.stat(index))}else if let Some(e)=&n.rack{Ok(e.stat(index))}else{Ok(n.voice_fx.as_ref().ok_or(Error::Contract)?.stat(index))}}
+    pub fn effect_stat(&self,id:u32,index:u32)->Result<f64>{let i=self.index(id)?;let n=&self.nodes[i];if let Some(m)=&n.motion{Ok(match index{16|17=>0.,18=>m.stat(1),19=>self.prepared as u32 as f64,_=>m.stat(index)})}else if let Some(e)=&n.effect{Ok(e.stat(index))}else if let Some(e)=&n.rack{Ok(e.stat(index))}else{Ok(n.voice_fx.as_ref().ok_or(Error::Contract)?.stat(index))}}
     pub fn new(sample_rate: f64, max_block: usize) -> Result<Self> {
         if !sample_rate.is_finite()
             || !(8000. ..=192000.).contains(&sample_rate)
@@ -637,7 +649,7 @@ impl Graph {
     }
     pub fn add_node(&mut self, id: u32, kind: Kind, version: u32) -> Result<()> {
         self.editable()?;
-        if kind==Kind::Piano && self.sample_rate!=48000. {return Err(Error::Contract);}
+        if matches!(kind,Kind::Piano|Kind::Plucked) && self.sample_rate!=48000. {return Err(Error::Contract);}
         if !(version == 1 || matches!(kind,Kind::Percussion|Kind::Piano) && version == 2 || kind==Kind::Piano && version==3) || id == 0 {
             return Err(Error::Contract);
         }
@@ -661,10 +673,12 @@ impl Graph {
         for (i, p) in kind.params().iter().enumerate() {
             base[i] = p.default;
         }
-        if matches!(kind,Kind::Core|Kind::Fm|Kind::Piano|Kind::Iowa|Kind::Classic)&&self.nodes.iter().filter(|n|matches!(n.kind,Kind::Core|Kind::Fm|Kind::Piano|Kind::Iowa|Kind::Classic)).count()>=8{return Err(Error::Bounds);}
+        if matches!(kind,Kind::Core|Kind::Fm|Kind::Piano|Kind::Iowa|Kind::Classic|Kind::Plucked)&&self.nodes.iter().filter(|n|matches!(n.kind,Kind::Core|Kind::Fm|Kind::Piano|Kind::Iowa|Kind::Classic|Kind::Plucked)).count()>=8{return Err(Error::Bounds);}
         if matches!(kind,Kind::Inserts|Kind::SendEffects)&&self.nodes.iter().filter(|n|n.kind==kind).count()>=if kind==Kind::Inserts{8}else{4}{return Err(Error::Bounds);}
-        if kind.rack()&&self.nodes.iter().filter(|n|n.kind.rack()).count()>=16||kind.voice_fx()&&self.nodes.iter().filter(|n|n.kind.voice_fx()).count()>=8||kind==Kind::Freeze&&self.nodes.iter().filter(|n|n.kind==Kind::Freeze).count()>=2{return Err(Error::Bounds);}
+        if kind.rack()&&self.nodes.iter().filter(|n|n.kind.rack()).count()>=16||(kind.voice_fx()||kind==Kind::Motion)&&self.nodes.iter().filter(|n|n.kind.voice_fx()||n.kind==Kind::Motion).count()>=8||kind==Kind::Freeze&&self.nodes.iter().filter(|n|n.kind==Kind::Freeze).count()>=2{return Err(Error::Bounds);}
         self.nodes.push(Node {
+            plucked:if kind==Kind::Plucked{Some(Box::new(calmbgm_plucked_voice::voice::Engine::new(self.sample_rate,true)))}else{None},
+            motion:if kind==Kind::Motion{Some(calmbgm_motion_fx::Engine::new(self.sample_rate).ok_or(Error::Bounds)?)}else{None},
             rack:if kind.rack(){Some(rack_nodes::Adapter::new(calmbgm_rack_fx::Kind::from_code(kind as u32-19).unwrap(),self.sample_rate).ok_or(Error::Bounds)?)}else{None},voice_fx:None,fx_mask:0,
             classic:None,
             mixer:if kind.mixer(){Some(mixer_nodes::Adapter::new(kind as u32-15,self.sample_rate).ok_or(Error::Bounds)?)}else{None},
@@ -740,7 +754,7 @@ impl Graph {
     pub fn set_base(&mut self, id: u32, param: usize, value: f32) -> Result<()> {
         self.editable()?;
         let i = self.index(id)?;
-        if self.nodes[i].kind.mixer()||self.nodes[i].kind.rack()||self.nodes[i].kind.voice_fx(){return Err(Error::Contract);}
+        if self.nodes[i].kind.mixer()||self.nodes[i].kind.rack()||self.nodes[i].kind.voice_fx()||self.nodes[i].kind==Kind::Motion{return Err(Error::Contract);}
         self.valid_param(i, param, value)?;
         self.nodes[i].base[param] = value;
         if let Some(effect)=&mut self.nodes[i].effect {if !effect.param(param,value){return Err(Error::Contract);}self.nodes[i].fx_mask|=1<<param;}
@@ -923,8 +937,10 @@ impl Graph {
         // A failed raw-ABI prepare remains editable and can be corrected/retried.
         // PDC allocation/validation is also complete before committing resources.
         for n in &self.nodes {
+            if n.motion.is_some()&&n.fx_mask!=15{return Err(Error::Contract);}
             if n.pitched.as_ref().is_some_and(|p|!p.ready)
                 || n.piano.as_ref().is_some_and(|p|!p.can_prepare())
+                || n.plucked.as_ref().is_some_and(|p|!p.can_prepare())
                 || n.iowa.as_ref().is_some_and(|p|!p.can_prepare())
                 || n.mixer.as_ref().is_some_and(|m|!m.can_prepare())
             {return Err(Error::Contract);}
@@ -943,7 +959,7 @@ impl Graph {
             if n.kind==Kind::Classic&&n.classic.as_ref().is_none_or(|p|!p.can_prepare()) {return Err(Error::Contract);}
         }
         self.prepare_latency()?;
-        for n in &mut self.nodes {if let Some(p)=&mut n.piano {if !p.prepare(){return Err(Error::Contract);}}if let Some(p)=&mut n.iowa {if !p.prepare(){return Err(Error::Contract);}}}
+        for n in &mut self.nodes {if let Some(p)=&mut n.piano {if !p.prepare(){return Err(Error::Contract);}}if let Some(p)=&mut n.plucked{if !p.prepare(){return Err(Error::Contract);}}if let Some(p)=&mut n.iowa {if !p.prepare(){return Err(Error::Contract);}}}
         for n in &mut self.nodes {if let Some(effect)=&mut n.effect {if !effect.prepare(n.effect_settled.ok_or(Error::Contract)?){return Err(Error::Contract);}}if let Some(m)=&mut n.mixer{if !m.prepare(){return Err(Error::Contract);}}}
         for n in &mut self.nodes{if n.kind.rack()||n.kind.voice_fx(){if n.fx_mask!=(1<<n.kind.params().len())-1{return Err(Error::Contract);}let ok=if let Some(r)=&mut n.rack{r.prepare()}else{n.voice_fx.as_mut().ok_or(Error::Contract)?.prepare()};if !ok{return Err(Error::Contract);}}}
         for n in &mut self.nodes{if n.kind==Kind::Classic&&!n.classic.as_mut().ok_or(Error::Contract)?.prepare(){return Err(Error::Contract);}}
@@ -963,7 +979,8 @@ impl Graph {
     pub fn pitch_point(&mut self,id:u32,frame:u64,scope:u32,index:u32,value:f64,extra:f32)->Result<()> {
         self.editable()?;let i=self.index(id)?;self.nodes[i].pitched.as_mut().ok_or(Error::Contract)?.point(frame,pitched::Setting{scope,index,value},extra)
     }
-    pub fn pitch_stat(&self,id:u32,index:u32)->Result<f64> {let i=self.index(id)?;let n=&self.nodes[i];if let Some(p)=&n.classic{Ok(p.stat(index))}else if let Some(p)=&n.iowa{Ok(p.stat(index))}else if let Some(p)=&n.piano{Ok(p.stat(index))}else{Ok(n.pitched.as_ref().ok_or(Error::Contract)?.stat(index))}}
+    pub fn pitch_stat(&self,id:u32,index:u32)->Result<f64> {let i=self.index(id)?;let n=&self.nodes[i];if let Some(p)=&n.plucked{Ok(p.stat(index))}else if let Some(p)=&n.classic{Ok(p.stat(index))}else if let Some(p)=&n.iowa{Ok(p.stat(index))}else if let Some(p)=&n.piano{Ok(p.stat(index))}else{Ok(n.pitched.as_ref().ok_or(Error::Contract)?.stat(index))}}
+    pub fn plucked_edit(&mut self,id:u32)->Result<&mut calmbgm_plucked_voice::voice::Engine>{self.editable()?;let i=self.index(id)?;self.nodes[i].plucked.as_deref_mut().ok_or(Error::Contract)}
     pub fn iowa_edit(&mut self,id:u32)->Result<&mut calmbgm_iowa::Engine>{self.editable()?;let i=self.index(id)?;self.nodes[i].iowa.as_mut().map(|p|p.as_mut()).ok_or(Error::Contract)}
     pub fn piano_edit(&mut self,id:u32)->Result<&mut calmbgm_piano::voice::Engine>{self.editable()?;let i=self.index(id)?;self.nodes[i].piano.as_mut().map(|p|p.as_mut()).ok_or(Error::Contract)}
     pub fn piano_control_edit(&mut self,id:u32)->Result<&mut calmbgm_piano::voice::Engine>{let i=self.index(id)?;if !matches!(self.nodes[i].version,2|3){return Err(Error::Contract);}self.piano_edit(id)}
@@ -980,15 +997,17 @@ impl Graph {
         let i = self.index(e.target)?;
         if e.owner==0{return Err(Error::Contract);}
         match e.action {
-            Action::Cancel=>{if self.nodes[i].classic.is_none()&&self.nodes[i].iowa.is_none()&&self.nodes[i].piano.is_none()&&self.nodes[i].pitched.is_none(){return Err(Error::Contract);}}
+            Action::Cancel=>{if self.nodes[i].plucked.is_none()&&self.nodes[i].classic.is_none()&&self.nodes[i].iowa.is_none()&&self.nodes[i].piano.is_none()&&self.nodes[i].pitched.is_none(){return Err(Error::Contract);}}
             Action::Classic{kind,id,a,b}=>{if !self.nodes[i].classic.as_ref().ok_or(Error::Contract)?.valid(&classic_source::Event{frame:e.frame,owner:e.owner,kind,id,a,b}){return Err(Error::Contract);}},
-            Action::FxParam{param,value}=>{if e.frame%128!=0||!self.valid_fx_param(i,param,value){return Err(Error::Contract);}},
+            Action::FxParam{param,value}=>{if self.nodes[i].motion.is_none()&&e.frame%128!=0||!self.valid_fx_param(i,param,value){return Err(Error::Contract);}},
             Action::Note{kind,id,a,b}=>{
-                let conflict=if let Some(p)=&self.nodes[i].iowa {if !p.valid(kind,id,a,b,e.frame){return Err(Error::Contract);}p.conflict(id,e.owner)}else if let Some(p)=&self.nodes[i].piano {if !p.valid(kind,id,a,b,e.frame){return Err(Error::Contract);}p.conflict(id,e.owner)}else{self.nodes[i].pitched.as_ref().ok_or(Error::Contract)?.conflict(id,e.owner)};
+                if kind==0&&e.frame<self.frame&&(self.nodes[i].plucked.is_some()||self.nodes[i].kind==Kind::Piano&&self.nodes[i].version==3){return Err(Error::Frame);}
+                if kind==0&&(self.nodes[i].plucked.is_some()||self.nodes[i].kind==Kind::Piano&&self.nodes[i].version==3)&&self.events.iter().any(|x|x.target==e.target&&matches!(x.action,Action::Note{kind:0,id:n,..}if n==id)){return Err(Error::Contract);}
+                let conflict=if let Some(p)=&self.nodes[i].plucked{if !p.valid(kind,id,a,b,e.frame){return Err(Error::Contract);}p.conflict(id,e.owner)}else if let Some(p)=&self.nodes[i].iowa {if !p.valid(kind,id,a,b,e.frame){return Err(Error::Contract);}p.conflict(id,e.owner)}else if let Some(p)=&self.nodes[i].piano {if !p.valid(kind,id,a,b,e.frame){return Err(Error::Contract);}p.conflict(id,e.owner)}else{self.nodes[i].pitched.as_ref().ok_or(Error::Contract)?.conflict(id,e.owner)};
                 if !valid_note(kind,id,a,b)||(matches!(kind,0|1|3|5)&&id!=0&&(conflict||self.events.iter().any(|x|x.target==e.target&&x.owner!=e.owner&&matches!(x.action,Action::Note{kind:k,id:n,..} if matches!(k,0|1|3|5)&&n==id)))){return Err(Error::Contract);}
                 if self.events.iter().filter(|x|x.target==e.target&&matches!(x.action,Action::Note{..})).count()>=4000{return Err(Error::QueueFull);}
             }
-            Action::Param { param, value } => {if self.nodes[i].kind.mixer()||self.nodes[i].kind.rack()||self.nodes[i].kind.voice_fx(){return Err(Error::Contract);}self.valid_param(i,param,value)?;if matches!(self.nodes[i].kind,Kind::Inserts|Kind::SendEffects)&&e.frame%128!=0{return Err(Error::Contract);}},
+            Action::Param { param, value } => {if self.nodes[i].kind.mixer()||self.nodes[i].kind.rack()||self.nodes[i].kind.voice_fx()||self.nodes[i].kind==Kind::Motion{return Err(Error::Contract);}self.valid_param(i,param,value)?;if matches!(self.nodes[i].kind,Kind::Inserts|Kind::SendEffects)&&e.frame%128!=0{return Err(Error::Contract);}},
             Action::MixerParam{param,value}=>{if !self.nodes[i].mixer.as_ref().ok_or(Error::Contract)?.valid(param,value){return Err(Error::Contract);}},
             Action::Gate(_) => {
                 if self.nodes[i].kind != Kind::Tone || e.owner == 0 {
@@ -1039,7 +1058,7 @@ impl Graph {
             return Err(Error::QueueFull);
         }
         if e.frame < self.frame {
-            e.frame = if self.nodes[i].kind==Kind::Iowa&&matches!(e.action,Action::Note{..})||matches!(self.nodes[i].kind,Kind::Inserts|Kind::SendEffects)&&matches!(e.action,Action::Param{..})||matches!(e.action,Action::FxParam{..}) {self.frame.div_ceil(128)*128}else{self.frame};
+            e.frame = if self.nodes[i].kind==Kind::Iowa&&matches!(e.action,Action::Note{..})||matches!(self.nodes[i].kind,Kind::Inserts|Kind::SendEffects)&&matches!(e.action,Action::Param{..})||self.nodes[i].motion.is_none()&&matches!(e.action,Action::FxParam{..}) {self.frame.div_ceil(128)*128}else{self.frame};
             if e.frame>MAX_FRAME{return Err(Error::Frame);}
             self.stats.late += 1;
         }
@@ -1071,6 +1090,7 @@ impl Graph {
     pub fn cancel_owner(&mut self, owner: u32) {
         self.events.retain(|e| e.owner != owner);
         for n in &mut self.nodes {
+            if let Some(p)=&mut n.plucked{p.cancel(owner);}
             if let Some(p)=&mut n.classic{p.cancel(owner);}
             if let Some(p)=&mut n.pitched {p.cancel(owner);}
             if let Some(p)=&mut n.piano {p.cancel(owner);}if let Some(p)=&mut n.iowa{p.cancel(owner);}
@@ -1090,6 +1110,8 @@ impl Graph {
         for n in &mut self.nodes {
             if let Some(m)=&mut n.mixer{m.reset();}
             if let Some(p)=&mut n.classic{p.reset();}
+            if let Some(p)=&mut n.plucked{p.reset();}
+            if let Some(m)=&mut n.motion{m.reset();}
             if let Some(p)=&mut n.rack{p.reset();}if let Some(p)=&mut n.voice_fx{p.reset();}
             if let Some(effect)=&mut n.effect {effect.reset();}
             if let Some(delay)=&mut n.delay {delay.reset();}
@@ -1161,6 +1183,7 @@ impl Graph {
             return Ok(());
         }
         for n in &mut self.nodes {
+            if let Some(m)=&mut n.motion{m.begin_block();}
             if let Some(c) = &mut n.compressor {
                 c.begin_block();
             }
@@ -1171,7 +1194,7 @@ impl Graph {
                 let e = self.events.remove(0);
                 let i = self.index(e.target)?;
                 match e.action {
-                    Action::FxParam{param,value}=>{let n=&mut self.nodes[i];let ok=if let Some(r)=&mut n.rack{r.param(param,value)}else{n.voice_fx.as_mut().unwrap().param(param,value)};if !ok{return Err(Error::Contract);}n.base[param]=value as f32;},
+                    Action::FxParam{param,value}=>{let n=&mut self.nodes[i];let ok=if let Some(m)=&mut n.motion{m.param(param,value)}else if let Some(r)=&mut n.rack{r.param(param,value)}else{n.voice_fx.as_mut().unwrap().param(param,value)};if !ok{return Err(Error::Contract);}n.base[param]=value as f32;},
                     Action::Classic{kind,..}=>{if kind==4{self.events.retain(|x|!(x.target==e.target&&matches!(x.action,Action::Classic{..})));}},
                     Action::MixerParam{param,value}=>{if !self.nodes[i].mixer.as_mut().unwrap().param(param,value){return Err(Error::Contract);}self.nodes[i].base[param]=value as f32;},
                     Action::Param { param, value } => {self.nodes[i].base[param] = value;if let Some(effect)=&mut self.nodes[i].effect {if !effect.param(param,value){return Err(Error::Contract);}}},
@@ -1193,13 +1216,13 @@ impl Graph {
                         self.set_detector_connection(edge, enabled)?;
                     }
                     Action::Cancel=>self.cancel_owner(e.owner),
-                    Action::Note{kind,id,a,b}=>{if kind==4 {self.events.retain(|x|!(x.target==e.target&&matches!(x.action,Action::Note{..})));}if let Some(p)=&mut self.nodes[i].iowa{p.note(kind,id,e.owner);}else if let Some(p)=&mut self.nodes[i].piano {if !p.note(kind,id,e.owner,e.frame){return Err(Error::Contract);}}else if kind==4{self.nodes[i].pitched.as_mut().unwrap().panic();}else{self.nodes[i].pitched.as_mut().unwrap().note(kind,id,e.owner,e.frame,a,b)?;}}
+                    Action::Note{kind,id,a,b}=>{if kind==4 {self.events.retain(|x|!(x.target==e.target&&matches!(x.action,Action::Note{..})));}if let Some(p)=&mut self.nodes[i].plucked{if !p.note(kind,id,e.owner,e.frame){return Err(Error::Contract);}}else if let Some(p)=&mut self.nodes[i].iowa{p.note(kind,id,e.owner);}else if let Some(p)=&mut self.nodes[i].piano {if !p.note(kind,id,e.owner,e.frame){return Err(Error::Contract);}}else if kind==4{self.nodes[i].pitched.as_mut().unwrap().panic();}else{self.nodes[i].pitched.as_mut().unwrap().note(kind,id,e.owner,e.frame,a,b)?;}}
                     Action::Hit(_) => {} // The owned engine executes its booked hit in tick().
                 }
                 self.stats.applied += 1;
             }
             let length=(frames-start).min(self.events.first().map_or(usize::MAX,|e|(e.frame-self.frame)as usize));
-            for n in &mut self.nodes {if let Some(p)=&mut n.classic{if !p.render(self.frame,&mut n.buffer[start..start+length]){return Err(Error::Contract);}}if let Some(p)=&mut n.pitched{p.render(self.frame,&mut n.buffer[start..start+length])?;}if let Some(p)=&mut n.piano{p.render(self.frame,&mut n.buffer[start..start+length]);}if let Some(p)=&mut n.iowa{p.render(self.frame,&mut n.buffer[start..start+length]);}}
+            for n in &mut self.nodes {if let Some(p)=&mut n.plucked{p.render(self.frame,&mut n.buffer[start..start+length]);}if let Some(p)=&mut n.classic{if !p.render(self.frame,&mut n.buffer[start..start+length]){return Err(Error::Contract);}}if let Some(p)=&mut n.pitched{p.render(self.frame,&mut n.buffer[start..start+length])?;}if let Some(p)=&mut n.piano{p.render(self.frame,&mut n.buffer[start..start+length]);}if let Some(p)=&mut n.iowa{p.render(self.frame,&mut n.buffer[start..start+length]);}}
             for sample in start..start+length {
             for &i in &self.order {
                 // Preserve separate program/key-capable input buses. Only Mix sums
@@ -1270,7 +1293,8 @@ impl Graph {
                     Kind::DeskStrip|Kind::DeskMatrix|Kind::DeskFader|Kind::DeskLimiter=>n.mixer.as_mut().unwrap().tick(inputs[0]),
                     Kind::Crusher|Kind::Pitch|Kind::ZPlane=>n.rack.as_mut().unwrap().tick(inputs[0]),
                     Kind::Shimmer|Kind::Freeze=>n.voice_fx.as_mut().unwrap().tick(inputs[0]),
-                    Kind::Core|Kind::Fm|Kind::Piano|Kind::Iowa|Kind::Classic=>{let gain=(n.base[0]+modulation).clamp(0.,2.);[n.buffer[sample][0]*gain,n.buffer[sample][1]*gain]},
+                    Kind::Motion=>n.motion.as_mut().unwrap().tick(inputs[0]),
+                    Kind::Core|Kind::Fm|Kind::Piano|Kind::Iowa|Kind::Classic|Kind::Plucked=>{let gain=(n.base[0]+modulation).clamp(0.,2.);[n.buffer[sample][0]*gain,n.buffer[sample][1]*gain]},
                     Kind::HostInput => n.buffer[sample].map(|v| if v.is_finite() { v } else { 0. }),
                     Kind::Percussion => {
                         let (audio, kick) = n.percussion.as_mut().unwrap().tick_with_kick();

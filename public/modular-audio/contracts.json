@@ -2624,6 +2624,158 @@
       "resetPolicy": "retain latest targets; clear cache/history; restart captured seed",
       "capturePolicy": "original four-second copy can exceed callback deadline; no serial realtime fallback",
       "maxInstances": 2
+    },
+    {
+      "type": "voice.motion",
+      "code": 25,
+      "version": 1,
+      "hostInput": false,
+      "latencyFrames": 0,
+      "tailFrames": 0,
+      "tailPolicy": "none",
+      "bypass": "unsupported",
+      "reset": "phase and voices cleared; compressor gain reset",
+      "ports": [
+        {
+          "id": "program.in",
+          "code": 0,
+          "direction": "in",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": true
+        },
+        {
+          "id": "audio.out",
+          "code": 1,
+          "direction": "out",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": false
+        }
+      ],
+      "parameters": [
+        {
+          "id": "tremoloDepth",
+          "code": 0,
+          "unit": "native",
+          "min": 0,
+          "max": 1,
+          "default": 0,
+          "rate": "audio",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "tremoloRate",
+          "code": 1,
+          "unit": "native",
+          "min": 0.01,
+          "max": 20,
+          "default": 4,
+          "rate": "audio",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "autoPanDepth",
+          "code": 2,
+          "unit": "native",
+          "min": 0,
+          "max": 1,
+          "default": 0,
+          "rate": "audio",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "autoPanRate",
+          "code": 3,
+          "unit": "native",
+          "min": 0.01,
+          "max": 20,
+          "default": 0.2,
+          "rate": "audio",
+          "modulation": false,
+          "smoothingMs": 0
+        }
+      ],
+      "events": [
+        "parameter"
+      ],
+      "processing": "owned original stereo tremolo/autopan graph; continuous instance-start LFO phase",
+      "parameterQuantumFrames": 1,
+      "latencyPolicy": "zero; exact integer-frame events; import native AudioParam seconds with explicit ceil(seconds*sampleRate)",
+      "precision": "f64 target ledger; native Float32AudioParam stage boundaries",
+      "resetPolicy": "latest targets retained; both phases restart",
+      "nativeParity": "fixed browser tolerance; OscillatorNode numeric differences retained in evidence"
+    },
+    {
+      "type": "legacy.plucked",
+      "code": 26,
+      "version": 1,
+      "hostInput": false,
+      "latencyFrames": 0,
+      "tailFrames": -1,
+      "tailPolicy": "none",
+      "bypass": "unsupported",
+      "reset": "phase and voices cleared; compressor gain reset",
+      "ports": [
+        {
+          "id": "audio.out",
+          "code": 0,
+          "direction": "out",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": false
+        }
+      ],
+      "parameters": [
+        {
+          "id": "gain",
+          "code": 0,
+          "unit": "linear",
+          "min": 0,
+          "max": 2,
+          "default": 1,
+          "rate": "audio",
+          "modulation": true,
+          "smoothingMs": 0
+        }
+      ],
+      "events": [
+        "parameter",
+        "modulation",
+        "note",
+        "cancel"
+      ],
+      "processing": "distinct prepared finite Karplus-Strong voices; actual source banks",
+      "sampleRate": 48000,
+      "maxVoices": 32,
+      "maxNotes": 2000,
+      "maxPreparedBanks": 128,
+      "maxPreparedPcmBytes": 67108864,
+      "maxAutomationPoints": 65536,
+      "timingPolicy": "immutable sample onset/slot/lifetime; late onsets reject before enqueue",
+      "configuration": "plucked config v1; graph events own playback timing and ownership",
+      "nativeParity": "fixed browser bound for SRC/lowpass; active breath and unsupported controls reject at capture"
     }
   ]
 }

@@ -1,0 +1,4276 @@
+{
+  "kind": "desk.native-vs-owned-seams",
+  "version": 1,
+  "mixerVersion": "7a1bb110a718ec32",
+  "wasm": "c1fda9e597c3eade357071b0795a9c77c6c8a7b78e75590f75b1d5314419ea8f",
+  "startedAtUtc": "2026-11-11T01:37:48.457Z",
+  "muted": true,
+  "listening": "not assessed",
+  "tolerance": {
+    "maxAbsoluteError": 0.0001,
+    "relativeRms": 0.0001
+  },
+  "scope": "Actual native createMixerAudio versus opt-in owned desk primitives, around actual unchanged legacy EffectsBus/Inserts DSP and native Generator fade/sweep/trim seams. Stereo fixture inputs; no full All migration, automatic PDC or physical device loopback.",
+  "cases": [
+    {
+      "rate": 44100,
+      "frames": 61824,
+      "maxAbsoluteError": 0.00006105937063694,
+      "relativeRms": 0.0001546958955421626,
+      "peak": 0.09345880895853043,
+      "nonFinite": 0,
+      "maxErrorFrame": 5513,
+      "maxErrorChannel": 0,
+      "firstAboveBound": null,
+      "nativeAtMaximum": -0.028129223734140396,
+      "ownedAtMaximum": -0.028068164363503456,
+      "windows": [
+        {
+          "startFrame": 0,
+          "endFrame": 4410,
+          "maxAbsoluteError": 0,
+          "relativeRms": 0,
+          "peak": 0,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 4410,
+          "endFrame": 8820,
+          "maxAbsoluteError": 0.00006105937063694,
+          "relativeRms": 0.00032283887062804924,
+          "peak": 0.09345880895853043,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 8820,
+          "endFrame": 17640,
+          "maxAbsoluteError": 0.0000077076256275177,
+          "relativeRms": 0.00006059080249629517,
+          "peak": 0.09176069498062134,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 17640,
+          "endFrame": 33075,
+          "maxAbsoluteError": 0.000005241483449935913,
+          "relativeRms": 0.00004873320148075801,
+          "peak": 0.06877288222312927,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 33075,
+          "endFrame": 41895,
+          "maxAbsoluteError": 0.000002034008502960205,
+          "relativeRms": 0.00003471544282140069,
+          "peak": 0.03788940981030464,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 41895,
+          "endFrame": 61740,
+          "maxAbsoluteError": 4.4889748096466064e-7,
+          "relativeRms": 0.000018946745490741144,
+          "peak": 0.008664187043905258,
+          "nonFinite": 0
+        }
+      ],
+      "tapComparisons": {
+        "leadSource": {
+          "maxAbsoluteError": 0,
+          "relativeRms": 0,
+          "peak": 0.0384938009083271,
+          "nonFinite": 0,
+          "maxErrorFrame": 0,
+          "maxErrorChannel": 0,
+          "firstAboveBound": null,
+          "nativeAtMaximum": 0,
+          "ownedAtMaximum": 0,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 4410,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 4410,
+              "endFrame": 8820,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.03849325701594353,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 8820,
+              "endFrame": 17640,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.038493216037750244,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 17640,
+              "endFrame": 33075,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.0384938009083271,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 33075,
+              "endFrame": 41895,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.038493216037750244,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 41895,
+              "endFrame": 61740,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "leadStrip": {
+          "maxAbsoluteError": 0.000013455748558044434,
+          "relativeRms": 0.00003437122746050481,
+          "peak": 0.05251298099756241,
+          "nonFinite": 0,
+          "maxErrorFrame": 5374,
+          "maxErrorChannel": 0,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.03897588327527046,
+          "ownedAtMaximum": -0.038989339023828506,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 4410,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 4410,
+              "endFrame": 8820,
+              "maxAbsoluteError": 0.000013455748558044434,
+              "relativeRms": 0.000058541320061572955,
+              "peak": 0.05251298099756241,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 8820,
+              "endFrame": 17640,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.052503686398267746,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 17640,
+              "endFrame": 33075,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.0012999232858419418,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 33075,
+              "endFrame": 41895,
+              "maxAbsoluteError": 1.0576813292539112e-15,
+              "relativeRms": 1.9535052725004876e-15,
+              "peak": 0.052508607506752014,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 41895,
+              "endFrame": 61740,
+              "maxAbsoluteError": 6.681004794845013e-35,
+              "relativeRms": 3.2225168551398196e-19,
+              "peak": 6.681004794845013e-35,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "bassStrip": {
+          "maxAbsoluteError": 0.00006036181002855301,
+          "relativeRms": 0.00011061120177277125,
+          "peak": 0.06120496615767479,
+          "nonFinite": 0,
+          "maxErrorFrame": 5374,
+          "maxErrorChannel": 1,
+          "firstAboveBound": null,
+          "nativeAtMaximum": 0.013108227401971817,
+          "ownedAtMaximum": 0.013047865591943264,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 4410,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 4410,
+              "endFrame": 8820,
+              "maxAbsoluteError": 0.00006036181002855301,
+              "relativeRms": 0.0003134855996466225,
+              "peak": 0.06120482087135315,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 8820,
+              "endFrame": 17640,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.06120496615767479,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 17640,
+              "endFrame": 33075,
+              "maxAbsoluteError": 5.92974814805854e-16,
+              "relativeRms": 1.0068109722374612e-16,
+              "peak": 0.06120460852980614,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 33075,
+              "endFrame": 41895,
+              "maxAbsoluteError": 3.9972060043687433e-16,
+              "relativeRms": 6.728548076946153e-16,
+              "peak": 0.061203114688396454,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 41895,
+              "endFrame": 61740,
+              "maxAbsoluteError": 2.436027689495302e-35,
+              "relativeRms": 1.2960583928415107e-19,
+              "peak": 2.6424584952382115e-35,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "headroomOut": {
+          "maxAbsoluteError": 0.00009815581142902374,
+          "relativeRms": 0.0001257909976446122,
+          "peak": 0.0887489914894104,
+          "nonFinite": 0,
+          "maxErrorFrame": 5374,
+          "maxErrorChannel": 0,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.01902586780488491,
+          "ownedAtMaximum": -0.019124023616313934,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 4410,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 4410,
+              "endFrame": 8820,
+              "maxAbsoluteError": 0.00009815581142902374,
+              "relativeRms": 0.00030318473710076504,
+              "peak": 0.08597636222839355,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 8820,
+              "endFrame": 17640,
+              "maxAbsoluteError": 6.742775440216064e-7,
+              "relativeRms": 0.000005901171530262586,
+              "peak": 0.0887489914894104,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 17640,
+              "endFrame": 33075,
+              "maxAbsoluteError": 1.1175870895385742e-7,
+              "relativeRms": 6.551666562883713e-7,
+              "peak": 0.06151456758379936,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 33075,
+              "endFrame": 41895,
+              "maxAbsoluteError": 7.450580596923828e-9,
+              "relativeRms": 4.251360848265661e-8,
+              "peak": 0.08818371593952179,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 41895,
+              "endFrame": 61740,
+              "maxAbsoluteError": 6.984919309616089e-10,
+              "relativeRms": 1.4995548563261233e-7,
+              "peak": 0.00223933276720345,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "busSendLead": {
+          "maxAbsoluteError": 0.000003966502845287323,
+          "relativeRms": 0.00004418415831373636,
+          "peak": 0.0157344788312912,
+          "nonFinite": 0,
+          "maxErrorFrame": 5374,
+          "maxErrorChannel": 0,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.011491479352116585,
+          "ownedAtMaximum": -0.011495445854961872,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 4410,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 4410,
+              "endFrame": 8820,
+              "maxAbsoluteError": 0.000003966502845287323,
+              "relativeRms": 0.000058014970507422924,
+              "peak": 0.01567744091153145,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 8820,
+              "endFrame": 17640,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.0157344788312912,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 17640,
+              "endFrame": 33075,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.00013005457003600895,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 33075,
+              "endFrame": 41895,
+              "maxAbsoluteError": 1.0576813557269219e-16,
+              "relativeRms": 1.953414647378896e-15,
+              "peak": 0.005250860936939716,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 41895,
+              "endFrame": 61740,
+              "maxAbsoluteError": 6.681005081830939e-36,
+              "relativeRms": 3.222503911870304e-20,
+              "peak": 6.681005081830939e-36,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "spaceSendLead": {
+          "maxAbsoluteError": 0.0000011867377907037735,
+          "relativeRms": 0.000014511871028897088,
+          "peak": 0.014504589140415192,
+          "nonFinite": 0,
+          "maxErrorFrame": 5374,
+          "maxErrorChannel": 0,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.003437923965975642,
+          "ownedAtMaximum": -0.003439110703766346,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 4410,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 4410,
+              "endFrame": 8820,
+              "maxAbsoluteError": 0.0000011867377907037735,
+              "relativeRms": 0.000048109129395386546,
+              "peak": 0.006715024821460247,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 8820,
+              "endFrame": 17640,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.008004449307918549,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 17640,
+              "endFrame": 33075,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.0003441392327658832,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 33075,
+              "endFrame": 41895,
+              "maxAbsoluteError": 2.9305396754548964e-16,
+              "relativeRms": 1.9898213186634975e-15,
+              "peak": 0.014504589140415192,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 41895,
+              "endFrame": 61740,
+              "maxAbsoluteError": 1.8715114149077832e-35,
+              "relativeRms": 9.027811464264338e-20,
+              "peak": 1.8715114149077832e-35,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "busReturn": {
+          "maxAbsoluteError": 9.285286068916321e-7,
+          "relativeRms": 0.00008460154974148385,
+          "peak": 0.0047345212660729885,
+          "nonFinite": 0,
+          "maxErrorFrame": 6256,
+          "maxErrorChannel": 1,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.0012054573744535446,
+          "ownedAtMaximum": -0.0012063859030604362,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 4410,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 4410,
+              "endFrame": 8820,
+              "maxAbsoluteError": 9.285286068916321e-7,
+              "relativeRms": 0.00020943330185075405,
+              "peak": 0.003249300178140402,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 8820,
+              "endFrame": 17640,
+              "maxAbsoluteError": 6.149057298898697e-7,
+              "relativeRms": 0.00009883431806815338,
+              "peak": 0.0047345212660729885,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 17640,
+              "endFrame": 33075,
+              "maxAbsoluteError": 9.860377758741379e-8,
+              "relativeRms": 0.000022727785129525695,
+              "peak": 0.00214666360989213,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 33075,
+              "endFrame": 41895,
+              "maxAbsoluteError": 9.313225746154785e-10,
+              "relativeRms": 1.3315981658665343e-7,
+              "peak": 0.003590173553675413,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 41895,
+              "endFrame": 61740,
+              "maxAbsoluteError": 6.984919309616089e-10,
+              "relativeRms": 1.3695399728574102e-7,
+              "peak": 0.002942003309726715,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "spaceReturn": {
+          "maxAbsoluteError": 1.630396582186222e-7,
+          "relativeRms": 0.000029320752037368543,
+          "peak": 0.0031144199892878532,
+          "nonFinite": 0,
+          "maxErrorFrame": 6432,
+          "maxErrorChannel": 0,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.0003157748724333942,
+          "ownedAtMaximum": -0.0003159379120916128,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 4410,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 4410,
+              "endFrame": 8820,
+              "maxAbsoluteError": 1.630396582186222e-7,
+              "relativeRms": 0.00012115523495066963,
+              "peak": 0.0009247503476217389,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 8820,
+              "endFrame": 17640,
+              "maxAbsoluteError": 1.3218959793448448e-7,
+              "relativeRms": 0.0000604188851443959,
+              "peak": 0.0012714851181954145,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 17640,
+              "endFrame": 33075,
+              "maxAbsoluteError": 1.686566974967718e-8,
+              "relativeRms": 0.0000174314751405451,
+              "peak": 0.00040899834129959345,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 33075,
+              "endFrame": 41895,
+              "maxAbsoluteError": 1.1641532182693481e-9,
+              "relativeRms": 9.508765305149494e-8,
+              "peak": 0.0031144199892878532,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 41895,
+              "endFrame": 61740,
+              "maxAbsoluteError": 6.984919309616089e-10,
+              "relativeRms": 1.4614812573841905e-7,
+              "peak": 0.0022729213815182447,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "musicFadeOut": {
+          "maxAbsoluteError": 0.00008834060281515121,
+          "relativeRms": 0.0001323462680943623,
+          "peak": 0.08246519416570663,
+          "nonFinite": 0,
+          "maxErrorFrame": 5374,
+          "maxErrorChannel": 0,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.012323705479502678,
+          "ownedAtMaximum": -0.012412046082317829,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 4410,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 4410,
+              "endFrame": 8820,
+              "maxAbsoluteError": 0.00008834060281515121,
+              "relativeRms": 0.00030198088008638846,
+              "peak": 0.0802244320511818,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 8820,
+              "endFrame": 17640,
+              "maxAbsoluteError": 6.07222318649292e-7,
+              "relativeRms": 0.000005864919733848618,
+              "peak": 0.08246519416570663,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 17640,
+              "endFrame": 33075,
+              "maxAbsoluteError": 1.0058283805847168e-7,
+              "relativeRms": 6.687017244985098e-7,
+              "peak": 0.051805008202791214,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 33075,
+              "endFrame": 41895,
+              "maxAbsoluteError": 1.1175870895385742e-8,
+              "relativeRms": 4.64364803689279e-8,
+              "peak": 0.06408236175775528,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 41895,
+              "endFrame": 61740,
+              "maxAbsoluteError": 4.656612873077393e-10,
+              "relativeRms": 1.533156511928133e-7,
+              "peak": 0.0015735655324533582,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "levelTrimOut": {
+          "maxAbsoluteError": 0.00005908496677875519,
+          "relativeRms": 0.00012325165781013907,
+          "peak": 0.0739271268248558,
+          "nonFinite": 0,
+          "maxErrorFrame": 5380,
+          "maxErrorChannel": 0,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.011285318993031979,
+          "ownedAtMaximum": -0.011226234026253223,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 4410,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 4410,
+              "endFrame": 8820,
+              "maxAbsoluteError": 0.00005908496677875519,
+              "relativeRms": 0.0002579477767766054,
+              "peak": 0.07253558188676834,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 8820,
+              "endFrame": 17640,
+              "maxAbsoluteError": 0.000007216818630695343,
+              "relativeRms": 0.00006742498101052203,
+              "peak": 0.0739271268248558,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 17640,
+              "endFrame": 33075,
+              "maxAbsoluteError": 0.0000032670795917510986,
+              "relativeRms": 0.00004578373018599361,
+              "peak": 0.0478205606341362,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 33075,
+              "endFrame": 41895,
+              "maxAbsoluteError": 0.000002205371856689453,
+              "relativeRms": 0.00003022971393162895,
+              "peak": 0.05534600093960762,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 41895,
+              "endFrame": 61740,
+              "maxAbsoluteError": 7.87549652159214e-8,
+              "relativeRms": 0.0000644614995309204,
+              "peak": 0.0014926177682355046,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "ambienceStrip": {
+          "maxAbsoluteError": 0.00003532320261001587,
+          "relativeRms": 0.00024191085547760867,
+          "peak": 0.01649736426770687,
+          "nonFinite": 0,
+          "maxErrorFrame": 5374,
+          "maxErrorChannel": 1,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.01480602566152811,
+          "ownedAtMaximum": -0.014841348864138126,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 4410,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 4410,
+              "endFrame": 8820,
+              "maxAbsoluteError": 0.00003532320261001587,
+              "relativeRms": 0.0007235440067905184,
+              "peak": 0.016289927065372467,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 8820,
+              "endFrame": 17640,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.01649736426770687,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 17640,
+              "endFrame": 33075,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.016497036442160606,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 33075,
+              "endFrame": 41895,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.016497256234288216,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 41895,
+              "endFrame": 61740,
+              "maxAbsoluteError": 2.4576801254415413e-16,
+              "relativeRms": 1.0917154528791683e-15,
+              "peak": 0.01649731583893299,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "masterInput": {
+          "maxAbsoluteError": 0.00005908682942390442,
+          "relativeRms": 0.00014262809213188795,
+          "peak": 0.08847624063491821,
+          "nonFinite": 0,
+          "maxErrorFrame": 5380,
+          "maxErrorChannel": 0,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.025241106748580933,
+          "ownedAtMaximum": -0.025182019919157028,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 4410,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 4410,
+              "endFrame": 8820,
+              "maxAbsoluteError": 0.00005908682942390442,
+              "relativeRms": 0.00031838554208177413,
+              "peak": 0.08847624063491821,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 8820,
+              "endFrame": 17640,
+              "maxAbsoluteError": 0.0000072177499532699585,
+              "relativeRms": 0.00006249439117424273,
+              "peak": 0.08101682364940643,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 17640,
+              "endFrame": 33075,
+              "maxAbsoluteError": 0.0000032670795917510986,
+              "relativeRms": 0.000044509266226515385,
+              "peak": 0.060195524245500565,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 33075,
+              "endFrame": 41895,
+              "maxAbsoluteError": 0.000002205371856689453,
+              "relativeRms": 0.0000266819700214505,
+              "peak": 0.06945864856243134,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 41895,
+              "endFrame": 61740,
+              "maxAbsoluteError": 7.87549652159214e-8,
+              "relativeRms": 7.707556104356892e-7,
+              "peak": 0.01649731583893299,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "matrixOut": {
+          "maxAbsoluteError": 0.00005908682942390442,
+          "relativeRms": 0.0001408410758723155,
+          "peak": 0.08849409967660904,
+          "nonFinite": 0,
+          "maxErrorFrame": 5380,
+          "maxErrorChannel": 0,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.025241106748580933,
+          "ownedAtMaximum": -0.025182019919157028,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 4410,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 4410,
+              "endFrame": 8820,
+              "maxAbsoluteError": 0.00005908682942390442,
+              "relativeRms": 0.00031838520195950817,
+              "peak": 0.08849409967660904,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 8820,
+              "endFrame": 17640,
+              "maxAbsoluteError": 0.0000072177499532699585,
+              "relativeRms": 0.00006249439117424273,
+              "peak": 0.08101682364940643,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 17640,
+              "endFrame": 33075,
+              "maxAbsoluteError": 0.0000032670795917510986,
+              "relativeRms": 0.00004450930300314642,
+              "peak": 0.060195524245500565,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 33075,
+              "endFrame": 41895,
+              "maxAbsoluteError": 0.000001993030309677124,
+              "relativeRms": 0.00002315342956856848,
+              "peak": 0.07880429178476334,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 41895,
+              "endFrame": 61740,
+              "maxAbsoluteError": 6.170012056827545e-8,
+              "relativeRms": 5.918228533989136e-7,
+              "peak": 0.018698113039135933,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "masterInsertOut": {
+          "maxAbsoluteError": 0.00006105937063694,
+          "relativeRms": 0.00013978321150156814,
+          "peak": 0.09345880895853043,
+          "nonFinite": 0,
+          "maxErrorFrame": 5380,
+          "maxErrorChannel": 0,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.028129223734140396,
+          "ownedAtMaximum": -0.028068164363503456,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 4410,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 4410,
+              "endFrame": 8820,
+              "maxAbsoluteError": 0.00006105937063694,
+              "relativeRms": 0.00031884203885496965,
+              "peak": 0.09345880895853043,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 8820,
+              "endFrame": 17640,
+              "maxAbsoluteError": 0.0000077076256275177,
+              "relativeRms": 0.000060809558307187564,
+              "peak": 0.09176069498062134,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 17640,
+              "endFrame": 33075,
+              "maxAbsoluteError": 0.000005241483449935913,
+              "relativeRms": 0.00004876603495661996,
+              "peak": 0.06877288222312927,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 33075,
+              "endFrame": 41895,
+              "maxAbsoluteError": 0.0000049031805247068405,
+              "relativeRms": 0.00003386609361931318,
+              "peak": 0.08907730877399445,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 41895,
+              "endFrame": 61740,
+              "maxAbsoluteError": 0.000001126900315284729,
+              "relativeRms": 0.000018516678206579198,
+              "peak": 0.021763453260064125,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "faderOut": {
+          "maxAbsoluteError": 0.00006105937063694,
+          "relativeRms": 0.0001546958955421626,
+          "peak": 0.09345880895853043,
+          "nonFinite": 0,
+          "maxErrorFrame": 5380,
+          "maxErrorChannel": 0,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.028129223734140396,
+          "ownedAtMaximum": -0.028068164363503456,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 4410,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 4410,
+              "endFrame": 8820,
+              "maxAbsoluteError": 0.00006105937063694,
+              "relativeRms": 0.00031884203885496965,
+              "peak": 0.09345880895853043,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 8820,
+              "endFrame": 17640,
+              "maxAbsoluteError": 0.0000077076256275177,
+              "relativeRms": 0.000060809558307187564,
+              "peak": 0.09176069498062134,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 17640,
+              "endFrame": 33075,
+              "maxAbsoluteError": 0.000005241483449935913,
+              "relativeRms": 0.00004876490037590537,
+              "peak": 0.06877288222312927,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 33075,
+              "endFrame": 41895,
+              "maxAbsoluteError": 0.0000019936123862862587,
+              "relativeRms": 0.00003349814654683382,
+              "peak": 0.03788940981030464,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 41895,
+              "endFrame": 61740,
+              "maxAbsoluteError": 4.4889748096466064e-7,
+              "relativeRms": 0.000018517098745549422,
+              "peak": 0.008664187043905258,
+              "nonFinite": 0
+            }
+          ]
+        }
+      },
+      "timesMatch": true,
+      "checkpoints": [
+        {
+          "kind": "lead-mute",
+          "requestedFrame": 11008,
+          "actualFrame": 11008,
+          "nativeTime": 0.24961451247165534
+        },
+        {
+          "kind": "bass-solo",
+          "requestedFrame": 22016,
+          "actualFrame": 22016,
+          "nativeTime": 0.4992290249433107
+        },
+        {
+          "kind": "master-fader-width-balance",
+          "requestedFrame": 33024,
+          "actualFrame": 33024,
+          "nativeTime": 0.748843537414966
+        },
+        {
+          "kind": "headroom-mute-ambience-retained",
+          "requestedFrame": 41856,
+          "actualFrame": 41856,
+          "nativeTime": 0.9491156462585034
+        }
+      ],
+      "stats": {
+        "strip:lead": {
+          "type": "stats",
+          "request": 3,
+          "kind": "strip",
+          "contextOriginFrame": 0,
+          "pendingStartupEvents": 0,
+          "preOriginLateEvents": 0,
+          "frame": 61824,
+          "applied": 2,
+          "late": 0,
+          "overflow": 0,
+          "queued": 0,
+          "peak": 0,
+          "latencyFrames": 0,
+          "reductionGain": 1
+        },
+        "strip:bass": {
+          "type": "stats",
+          "request": 1,
+          "kind": "strip",
+          "contextOriginFrame": 0,
+          "pendingStartupEvents": 0,
+          "preOriginLateEvents": 0,
+          "frame": 61824,
+          "applied": 0,
+          "late": 0,
+          "overflow": 0,
+          "queued": 0,
+          "peak": 0,
+          "latencyFrames": 0,
+          "reductionGain": 1
+        },
+        "strip:ambience": {
+          "type": "stats",
+          "request": 3,
+          "kind": "strip",
+          "contextOriginFrame": 0,
+          "pendingStartupEvents": 0,
+          "preOriginLateEvents": 0,
+          "frame": 61824,
+          "applied": 2,
+          "late": 0,
+          "overflow": 0,
+          "queued": 0,
+          "peak": 0,
+          "latencyFrames": 0,
+          "reductionGain": 1
+        },
+        "strip:headroom": {
+          "type": "stats",
+          "request": 2,
+          "kind": "strip",
+          "contextOriginFrame": 0,
+          "pendingStartupEvents": 0,
+          "preOriginLateEvents": 0,
+          "frame": 61824,
+          "applied": 1,
+          "late": 0,
+          "overflow": 0,
+          "queued": 0,
+          "peak": 0,
+          "latencyFrames": 0,
+          "reductionGain": 1
+        },
+        "matrix": {
+          "type": "stats",
+          "request": 2,
+          "kind": "matrix",
+          "contextOriginFrame": 0,
+          "pendingStartupEvents": 0,
+          "preOriginLateEvents": 0,
+          "frame": 61824,
+          "applied": 2,
+          "late": 0,
+          "overflow": 0,
+          "queued": 0,
+          "peak": 2.978557655650702e-23,
+          "latencyFrames": 0,
+          "reductionGain": 1
+        },
+        "fader": {
+          "type": "stats",
+          "request": 2,
+          "kind": "fader",
+          "contextOriginFrame": 0,
+          "pendingStartupEvents": 0,
+          "preOriginLateEvents": 0,
+          "frame": 61824,
+          "applied": 1,
+          "late": 0,
+          "overflow": 0,
+          "queued": 0,
+          "peak": 7.929065404255198e-9,
+          "latencyFrames": 0,
+          "reductionGain": 1
+        },
+        "limiter": {
+          "type": "stats",
+          "request": 1,
+          "kind": "limiter",
+          "contextOriginFrame": 0,
+          "pendingStartupEvents": 0,
+          "preOriginLateEvents": 0,
+          "frame": 61824,
+          "applied": 0,
+          "late": 0,
+          "overflow": 0,
+          "queued": 0,
+          "peak": 9.582932669616184e-9,
+          "latencyFrames": 133,
+          "reductionGain": 1
+        }
+      },
+      "topology": {
+        "version": 1,
+        "kind": "owned-desk-native-host-seams",
+        "roles": [
+          "lead",
+          "bass"
+        ],
+        "sharedSendTap": "post desk strip/fader",
+        "sharedReturnTarget": "headroom input",
+        "reverbHubReturnTarget": "Generator output before fade/sweep/levelTrim",
+        "music": "headroom → Generator output fade → optional sweep → levelTrim → desk matrix",
+        "ambience": "own strip → master input, outside headroom and music fade",
+        "masterInsert": "between matrix/balance and fader/dim; supplied when creating desk",
+        "limiterCount": 1,
+        "ownedLatencyFrames": 133,
+        "externalLatencies": {
+          "roleInputs": 0,
+          "musicSweep": 0,
+          "masterInsert": 0,
+          "sharedEffects": null
+        },
+        "automaticPdc": false,
+        "scope": "Exact routing seams; caller-supplied effects and Generator stages are preserved, not ported by this helper"
+      },
+      "ownedLatencyFrames": 133,
+      "checksPassed": false
+    },
+    {
+      "rate": 48000,
+      "frames": 67200,
+      "maxAbsoluteError": 0.00003167986869812012,
+      "relativeRms": 0.00010486132697772267,
+      "peak": 0.09262561798095703,
+      "nonFinite": 0,
+      "maxErrorFrame": 6037,
+      "maxErrorChannel": 0,
+      "firstAboveBound": null,
+      "nativeAtMaximum": -0.021190781146287918,
+      "ownedAtMaximum": -0.021222461014986038,
+      "windows": [
+        {
+          "startFrame": 0,
+          "endFrame": 4800,
+          "maxAbsoluteError": 0,
+          "relativeRms": 0,
+          "peak": 0,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 4800,
+          "endFrame": 9600,
+          "maxAbsoluteError": 0.00003167986869812012,
+          "relativeRms": 0.00020551434439693812,
+          "peak": 0.09262561798095703,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 9600,
+          "endFrame": 19200,
+          "maxAbsoluteError": 0.000008892267942428589,
+          "relativeRms": 0.000051226877882235805,
+          "peak": 0.091771200299263,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 19200,
+          "endFrame": 36000,
+          "maxAbsoluteError": 0.000006593763828277588,
+          "relativeRms": 0.00005587723015229559,
+          "peak": 0.06878557801246643,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 36000,
+          "endFrame": 45600,
+          "maxAbsoluteError": 0.0000019329600036144257,
+          "relativeRms": 0.00003566560932442633,
+          "peak": 0.03800784423947334,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 45600,
+          "endFrame": 67200,
+          "maxAbsoluteError": 5.350448191165924e-7,
+          "relativeRms": 0.00002240726767951738,
+          "peak": 0.008662120439112186,
+          "nonFinite": 0
+        }
+      ],
+      "tapComparisons": {
+        "leadSource": {
+          "maxAbsoluteError": 0,
+          "relativeRms": 0,
+          "peak": 0.03849385306239128,
+          "nonFinite": 0,
+          "maxErrorFrame": 0,
+          "maxErrorChannel": 0,
+          "firstAboveBound": null,
+          "nativeAtMaximum": 0,
+          "ownedAtMaximum": 0,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 4800,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 4800,
+              "endFrame": 9600,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.038490500301122665,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 9600,
+              "endFrame": 19200,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.038493718951940536,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 19200,
+              "endFrame": 36000,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.03849385306239128,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 36000,
+              "endFrame": 45600,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.038493718951940536,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 45600,
+              "endFrame": 67200,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "leadStrip": {
+          "maxAbsoluteError": 0.00001947907730937004,
+          "relativeRms": 0.00006205757275063931,
+          "peak": 0.052506934851408005,
+          "nonFinite": 0,
+          "maxErrorFrame": 5887,
+          "maxErrorChannel": 0,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.0040993886068463326,
+          "ownedAtMaximum": -0.0040799095295369625,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 4800,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 4800,
+              "endFrame": 9600,
+              "maxAbsoluteError": 0.00001947907730937004,
+              "relativeRms": 0.00010576950332486604,
+              "peak": 0.05250448361039162,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 9600,
+              "endFrame": 19200,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.05250423774123192,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 19200,
+              "endFrame": 36000,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.00047755296691320837,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 36000,
+              "endFrame": 45600,
+              "maxAbsoluteError": 1.264378785860703e-15,
+              "relativeRms": 2.2615238340889633e-15,
+              "peak": 0.052506934851408005,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 45600,
+              "endFrame": 67200,
+              "maxAbsoluteError": 7.652371222610275e-35,
+              "relativeRms": 3.700973294716149e-19,
+              "peak": 7.652371222610275e-35,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "bassStrip": {
+          "maxAbsoluteError": 0.00003353320062160492,
+          "relativeRms": 0.00009936424766706564,
+          "peak": 0.06120496615767479,
+          "nonFinite": 0,
+          "maxErrorFrame": 5887,
+          "maxErrorChannel": 1,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.014570537023246288,
+          "ownedAtMaximum": -0.014604070223867893,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 4800,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 4800,
+              "endFrame": 9600,
+              "maxAbsoluteError": 0.00003353320062160492,
+              "relativeRms": 0.00028153192044683877,
+              "peak": 0.06120496615767479,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 9600,
+              "endFrame": 19200,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.06120423600077629,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 19200,
+              "endFrame": 36000,
+              "maxAbsoluteError": 4.460186714945691e-16,
+              "relativeRms": 7.258775556875523e-17,
+              "peak": 0.06120485067367554,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 36000,
+              "endFrame": 45600,
+              "maxAbsoluteError": 4.87748288135631e-16,
+              "relativeRms": 9.400088858228212e-16,
+              "peak": 0.061204902827739716,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 45600,
+              "endFrame": 67200,
+              "maxAbsoluteError": 3.286394645001771e-35,
+              "relativeRms": 2.098045234305671e-19,
+              "peak": 3.50930206606533e-35,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "headroomOut": {
+          "maxAbsoluteError": 0.00005199620500206947,
+          "relativeRms": 0.00008780117379239085,
+          "peak": 0.08874956518411636,
+          "nonFinite": 0,
+          "maxErrorFrame": 5887,
+          "maxErrorChannel": 0,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.005779594648629427,
+          "ownedAtMaximum": -0.0057275984436273575,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 4800,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 4800,
+              "endFrame": 9600,
+              "maxAbsoluteError": 0.00005199620500206947,
+              "relativeRms": 0.00021155727087380507,
+              "peak": 0.08603920042514801,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 9600,
+              "endFrame": 19200,
+              "maxAbsoluteError": 3.7997961044311523e-7,
+              "relativeRms": 0.000003433026446472491,
+              "peak": 0.08874956518411636,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 19200,
+              "endFrame": 36000,
+              "maxAbsoluteError": 7.82310962677002e-8,
+              "relativeRms": 4.7598886855940823e-7,
+              "peak": 0.06154125928878784,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 36000,
+              "endFrame": 45600,
+              "maxAbsoluteError": 1.4901161193847656e-8,
+              "relativeRms": 5.407715676729247e-8,
+              "peak": 0.08815527707338333,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 45600,
+              "endFrame": 67200,
+              "maxAbsoluteError": 8.149072527885437e-10,
+              "relativeRms": 1.5431505066883284e-7,
+              "peak": 0.0022686824668198824,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "busSendLead": {
+          "maxAbsoluteError": 0.000005745678208768368,
+          "relativeRms": 0.00007961571228431508,
+          "peak": 0.015734629705548286,
+          "nonFinite": 0,
+          "maxErrorFrame": 5887,
+          "maxErrorChannel": 0,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.0012091936077922583,
+          "ownedAtMaximum": -0.00120344792958349,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 4800,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 4800,
+              "endFrame": 9600,
+              "maxAbsoluteError": 0.000005745678208768368,
+              "relativeRms": 0.00010483559449662894,
+              "peak": 0.015675673261284828,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 9600,
+              "endFrame": 19200,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.015734629705548286,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 19200,
+              "endFrame": 36000,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.000047779314627405256,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 36000,
+              "endFrame": 45600,
+              "maxAbsoluteError": 1.264378785860703e-16,
+              "relativeRms": 2.261411880120753e-15,
+              "peak": 0.005250693764537573,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 45600,
+              "endFrame": 67200,
+              "maxAbsoluteError": 7.652371366103238e-36,
+              "relativeRms": 3.700963418386735e-20,
+              "peak": 7.652371366103238e-36,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "spaceSendLead": {
+          "maxAbsoluteError": 0.000001727457856759429,
+          "relativeRms": 0.000026276725305218948,
+          "peak": 0.014504141174256802,
+          "nonFinite": 0,
+          "maxErrorFrame": 5887,
+          "maxErrorChannel": 0,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.00036354060284793377,
+          "ownedAtMaximum": -0.00036181314499117434,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 4800,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 4800,
+              "endFrame": 9600,
+              "maxAbsoluteError": 0.000001727457856759429,
+              "relativeRms": 0.0000870596496987078,
+              "peak": 0.006716067437082529,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 9600,
+              "endFrame": 19200,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.008005773648619652,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 19200,
+              "endFrame": 36000,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.0001264571474166587,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 36000,
+              "endFrame": 45600,
+              "maxAbsoluteError": 3.5032417136644887e-16,
+              "relativeRms": 2.3033702725027048e-15,
+              "peak": 0.014504141174256802,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 45600,
+              "endFrame": 67200,
+              "maxAbsoluteError": 2.1436168331787308e-35,
+              "relativeRms": 1.036813752510945e-19,
+              "peak": 2.1436168331787308e-35,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "busReturn": {
+          "maxAbsoluteError": 3.373716026544571e-7,
+          "relativeRms": 0.000050750596428789265,
+          "peak": 0.004740973934531212,
+          "nonFinite": 0,
+          "maxErrorFrame": 13646,
+          "maxErrorChannel": 1,
+          "firstAboveBound": null,
+          "nativeAtMaximum": 0.0013881693594157696,
+          "ownedAtMaximum": 0.0013878319878131151,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 4800,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 4800,
+              "endFrame": 9600,
+              "maxAbsoluteError": 3.227032721042633e-7,
+              "relativeRms": 0.00012855981636215378,
+              "peak": 0.0032667224295437336,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 9600,
+              "endFrame": 19200,
+              "maxAbsoluteError": 3.373716026544571e-7,
+              "relativeRms": 0.00005791472000808787,
+              "peak": 0.004740973934531212,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 19200,
+              "endFrame": 36000,
+              "maxAbsoluteError": 6.961636245250702e-8,
+              "relativeRms": 0.000016813458570233008,
+              "peak": 0.0021502883173525333,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 36000,
+              "endFrame": 45600,
+              "maxAbsoluteError": 9.313225746154785e-10,
+              "relativeRms": 1.3069169245243956e-7,
+              "peak": 0.003599237184971571,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 45600,
+              "endFrame": 67200,
+              "maxAbsoluteError": 9.313225746154785e-10,
+              "relativeRms": 1.4112625544344032e-7,
+              "peak": 0.0029396903701126575,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "spaceReturn": {
+          "maxAbsoluteError": 8.227652870118618e-8,
+          "relativeRms": 0.000017424713976067898,
+          "peak": 0.003138212952762842,
+          "nonFinite": 0,
+          "maxErrorFrame": 7711,
+          "maxErrorChannel": 1,
+          "firstAboveBound": null,
+          "nativeAtMaximum": 0.00036610919050872326,
+          "ownedAtMaximum": 0.00036619146703742445,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 4800,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 4800,
+              "endFrame": 9600,
+              "maxAbsoluteError": 8.227652870118618e-8,
+              "relativeRms": 0.00007697240234408311,
+              "peak": 0.0009294473566114902,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 9600,
+              "endFrame": 19200,
+              "maxAbsoluteError": 6.984919309616089e-8,
+              "relativeRms": 0.00003435359379734676,
+              "peak": 0.001275068148970604,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 19200,
+              "endFrame": 36000,
+              "maxAbsoluteError": 9.371433407068253e-9,
+              "relativeRms": 0.000011117127642823691,
+              "peak": 0.00040655804332345724,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 36000,
+              "endFrame": 45600,
+              "maxAbsoluteError": 9.313225746154785e-10,
+              "relativeRms": 8.491934111029657e-8,
+              "peak": 0.003138212952762842,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 45600,
+              "endFrame": 67200,
+              "maxAbsoluteError": 5.820766091346741e-10,
+              "relativeRms": 1.3166800423971072e-7,
+              "peak": 0.0022603764664381742,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "musicFadeOut": {
+          "maxAbsoluteError": 0.00004679616540670395,
+          "relativeRms": 0.00009236358197137305,
+          "peak": 0.08240978419780731,
+          "nonFinite": 0,
+          "maxErrorFrame": 5887,
+          "maxErrorChannel": 0,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.004181911703199148,
+          "ownedAtMaximum": -0.004135115537792444,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 4800,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 4800,
+              "endFrame": 9600,
+              "maxAbsoluteError": 0.00004679616540670395,
+              "relativeRms": 0.00021068747320864781,
+              "peak": 0.08022436499595642,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 9600,
+              "endFrame": 19200,
+              "maxAbsoluteError": 3.427267074584961e-7,
+              "relativeRms": 0.000003411854081993396,
+              "peak": 0.08240978419780731,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 19200,
+              "endFrame": 36000,
+              "maxAbsoluteError": 7.078051567077637e-8,
+              "relativeRms": 4.864344967153989e-7,
+              "peak": 0.051836077123880386,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 36000,
+              "endFrame": 45600,
+              "maxAbsoluteError": 1.1175870895385742e-8,
+              "relativeRms": 5.8985648694571076e-8,
+              "peak": 0.0640602558851242,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 45600,
+              "endFrame": 67200,
+              "maxAbsoluteError": 5.820766091346741e-10,
+              "relativeRms": 1.5840748933821472e-7,
+              "peak": 0.0015941865276545286,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "levelTrimOut": {
+          "maxAbsoluteError": 0.000030731549486517906,
+          "relativeRms": 0.00011218754225417268,
+          "peak": 0.07384619861841202,
+          "nonFinite": 0,
+          "maxErrorFrame": 5893,
+          "maxErrorChannel": 0,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.002719505922868848,
+          "ownedAtMaximum": -0.0027502374723553658,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 4800,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 4800,
+              "endFrame": 9600,
+              "maxAbsoluteError": 0.000030731549486517906,
+              "relativeRms": 0.00023310660352167698,
+              "peak": 0.07207771390676498,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 9600,
+              "endFrame": 19200,
+              "maxAbsoluteError": 0.000005230307579040527,
+              "relativeRms": 0.00004902169086413713,
+              "peak": 0.07384619861841202,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 19200,
+              "endFrame": 36000,
+              "maxAbsoluteError": 0.0000052656978368759155,
+              "relativeRms": 0.000052522511575969415,
+              "peak": 0.04769188165664673,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 36000,
+              "endFrame": 45600,
+              "maxAbsoluteError": 0.0000029746443033218384,
+              "relativeRms": 0.00004131806520715787,
+              "peak": 0.05533326417207718,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 45600,
+              "endFrame": 67200,
+              "maxAbsoluteError": 6.949994713068008e-8,
+              "relativeRms": 0.00007174242016169521,
+              "peak": 0.0015111027751117945,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "ambienceStrip": {
+          "maxAbsoluteError": 0.00003982149064540863,
+          "relativeRms": 0.00026879351660844523,
+          "peak": 0.01649736799299717,
+          "nonFinite": 0,
+          "maxErrorFrame": 5887,
+          "maxErrorChannel": 0,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.014524346217513084,
+          "ownedAtMaximum": -0.014564167708158493,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 4800,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 4800,
+              "endFrame": 9600,
+              "maxAbsoluteError": 0.00003982149064540863,
+              "relativeRms": 0.0008042769446335766,
+              "peak": 0.016290739178657532,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 9600,
+              "endFrame": 19200,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.01649731583893299,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 19200,
+              "endFrame": 36000,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.016497207805514336,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 36000,
+              "endFrame": 45600,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.01649736799299717,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 45600,
+              "endFrame": 67200,
+              "maxAbsoluteError": 3.111680703983182e-16,
+              "relativeRms": 1.4298608425597266e-15,
+              "peak": 0.016497332602739334,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "masterInput": {
+          "maxAbsoluteError": 0.00003072991967201233,
+          "relativeRms": 0.00009984597845626487,
+          "peak": 0.08805403858423233,
+          "nonFinite": 0,
+          "maxErrorFrame": 5893,
+          "maxErrorChannel": 0,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.017187561839818954,
+          "ownedAtMaximum": -0.017218291759490967,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 4800,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 4800,
+              "endFrame": 9600,
+              "maxAbsoluteError": 0.00003072991967201233,
+              "relativeRms": 0.00021340675566158726,
+              "peak": 0.08805403858423233,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 9600,
+              "endFrame": 19200,
+              "maxAbsoluteError": 0.000005230307579040527,
+              "relativeRms": 0.00004544942692816786,
+              "peak": 0.08107146620750427,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 19200,
+              "endFrame": 36000,
+              "maxAbsoluteError": 0.0000052675604820251465,
+              "relativeRms": 0.000051046325322178124,
+              "peak": 0.060217007994651794,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 36000,
+              "endFrame": 45600,
+              "maxAbsoluteError": 0.0000029746443033218384,
+              "relativeRms": 0.00003646324275318578,
+              "peak": 0.06943021714687347,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 45600,
+              "endFrame": 67200,
+              "maxAbsoluteError": 6.984919309616089e-8,
+              "relativeRms": 8.719768856708625e-7,
+              "peak": 0.016497332602739334,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "matrixOut": {
+          "maxAbsoluteError": 0.00003072991967201233,
+          "relativeRms": 0.00009834031656611648,
+          "peak": 0.0880715548992157,
+          "nonFinite": 0,
+          "maxErrorFrame": 5893,
+          "maxErrorChannel": 0,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.017187561839818954,
+          "ownedAtMaximum": -0.017218291759490967,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 4800,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 4800,
+              "endFrame": 9600,
+              "maxAbsoluteError": 0.00003072991967201233,
+              "relativeRms": 0.00021340347796075667,
+              "peak": 0.0880715548992157,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 9600,
+              "endFrame": 19200,
+              "maxAbsoluteError": 0.000005230307579040527,
+              "relativeRms": 0.00004544942692816786,
+              "peak": 0.08107146620750427,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 19200,
+              "endFrame": 36000,
+              "maxAbsoluteError": 0.0000052675604820251465,
+              "relativeRms": 0.00005104634845960203,
+              "peak": 0.060217007994651794,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 36000,
+              "endFrame": 45600,
+              "maxAbsoluteError": 0.000002503860741853714,
+              "relativeRms": 0.000029417553106517574,
+              "peak": 0.07875731587409973,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 45600,
+              "endFrame": 67200,
+              "maxAbsoluteError": 7.543712854385376e-8,
+              "relativeRms": 8.636685010067361e-7,
+              "peak": 0.01869816519320011,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "masterInsertOut": {
+          "maxAbsoluteError": 0.00003167986869812012,
+          "relativeRms": 0.00009556820419690307,
+          "peak": 0.09262561798095703,
+          "nonFinite": 0,
+          "maxErrorFrame": 5893,
+          "maxErrorChannel": 0,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.021190781146287918,
+          "ownedAtMaximum": -0.021222461014986038,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 4800,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 4800,
+              "endFrame": 9600,
+              "maxAbsoluteError": 0.00003167986869812012,
+              "relativeRms": 0.00020303656654850068,
+              "peak": 0.09262561798095703,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 9600,
+              "endFrame": 19200,
+              "maxAbsoluteError": 0.000008892267942428589,
+              "relativeRms": 0.00005143002647265684,
+              "peak": 0.091771200299263,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 19200,
+              "endFrame": 36000,
+              "maxAbsoluteError": 0.000006593763828277588,
+              "relativeRms": 0.000055779087344175616,
+              "peak": 0.06878557801246643,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 36000,
+              "endFrame": 45600,
+              "maxAbsoluteError": 0.0000048549845814704895,
+              "relativeRms": 0.000037671394983642086,
+              "peak": 0.08900456875562668,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 45600,
+              "endFrame": 67200,
+              "maxAbsoluteError": 0.00000134296715259552,
+              "relativeRms": 0.000022181731895994372,
+              "peak": 0.02175826206803322,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "faderOut": {
+          "maxAbsoluteError": 0.00003167986869812012,
+          "relativeRms": 0.00010486132697772267,
+          "peak": 0.09262561798095703,
+          "nonFinite": 0,
+          "maxErrorFrame": 5893,
+          "maxErrorChannel": 0,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.021190781146287918,
+          "ownedAtMaximum": -0.021222461014986038,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 4800,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 4800,
+              "endFrame": 9600,
+              "maxAbsoluteError": 0.00003167986869812012,
+              "relativeRms": 0.00020303656654850068,
+              "peak": 0.09262561798095703,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 9600,
+              "endFrame": 19200,
+              "maxAbsoluteError": 0.000008892267942428589,
+              "relativeRms": 0.00005143002647265684,
+              "peak": 0.091771200299263,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 19200,
+              "endFrame": 36000,
+              "maxAbsoluteError": 0.000006593763828277588,
+              "relativeRms": 0.0000557790195420782,
+              "peak": 0.06878557801246643,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 36000,
+              "endFrame": 45600,
+              "maxAbsoluteError": 0.0000019329600036144257,
+              "relativeRms": 0.00003578473978007472,
+              "peak": 0.03800784423947334,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 45600,
+              "endFrame": 67200,
+              "maxAbsoluteError": 5.350448191165924e-7,
+              "relativeRms": 0.00002218127337076396,
+              "peak": 0.008662120439112186,
+              "nonFinite": 0
+            }
+          ]
+        }
+      },
+      "timesMatch": true,
+      "checkpoints": [
+        {
+          "kind": "lead-mute",
+          "requestedFrame": 12032,
+          "actualFrame": 12032,
+          "nativeTime": 0.25066666666666665
+        },
+        {
+          "kind": "bass-solo",
+          "requestedFrame": 24064,
+          "actualFrame": 24064,
+          "nativeTime": 0.5013333333333333
+        },
+        {
+          "kind": "master-fader-width-balance",
+          "requestedFrame": 35968,
+          "actualFrame": 35968,
+          "nativeTime": 0.7493333333333333
+        },
+        {
+          "kind": "headroom-mute-ambience-retained",
+          "requestedFrame": 45568,
+          "actualFrame": 45568,
+          "nativeTime": 0.9493333333333334
+        }
+      ],
+      "stats": {
+        "strip:lead": {
+          "type": "stats",
+          "request": 3,
+          "kind": "strip",
+          "contextOriginFrame": 0,
+          "pendingStartupEvents": 0,
+          "preOriginLateEvents": 0,
+          "frame": 67200,
+          "applied": 2,
+          "late": 0,
+          "overflow": 0,
+          "queued": 0,
+          "peak": 0,
+          "latencyFrames": 0,
+          "reductionGain": 1
+        },
+        "strip:bass": {
+          "type": "stats",
+          "request": 1,
+          "kind": "strip",
+          "contextOriginFrame": 0,
+          "pendingStartupEvents": 0,
+          "preOriginLateEvents": 0,
+          "frame": 67200,
+          "applied": 0,
+          "late": 0,
+          "overflow": 0,
+          "queued": 0,
+          "peak": 0,
+          "latencyFrames": 0,
+          "reductionGain": 1
+        },
+        "strip:ambience": {
+          "type": "stats",
+          "request": 3,
+          "kind": "strip",
+          "contextOriginFrame": 0,
+          "pendingStartupEvents": 0,
+          "preOriginLateEvents": 0,
+          "frame": 67200,
+          "applied": 2,
+          "late": 0,
+          "overflow": 0,
+          "queued": 0,
+          "peak": 0,
+          "latencyFrames": 0,
+          "reductionGain": 1
+        },
+        "strip:headroom": {
+          "type": "stats",
+          "request": 2,
+          "kind": "strip",
+          "contextOriginFrame": 0,
+          "pendingStartupEvents": 0,
+          "preOriginLateEvents": 0,
+          "frame": 67200,
+          "applied": 1,
+          "late": 0,
+          "overflow": 0,
+          "queued": 0,
+          "peak": 0,
+          "latencyFrames": 0,
+          "reductionGain": 1
+        },
+        "matrix": {
+          "type": "stats",
+          "request": 2,
+          "kind": "matrix",
+          "contextOriginFrame": 0,
+          "pendingStartupEvents": 0,
+          "preOriginLateEvents": 0,
+          "frame": 67200,
+          "applied": 2,
+          "late": 0,
+          "overflow": 0,
+          "queued": 0,
+          "peak": 4.13179656843692e-23,
+          "latencyFrames": 0,
+          "reductionGain": 1
+        },
+        "fader": {
+          "type": "stats",
+          "request": 2,
+          "kind": "fader",
+          "contextOriginFrame": 0,
+          "pendingStartupEvents": 0,
+          "preOriginLateEvents": 0,
+          "frame": 67200,
+          "applied": 1,
+          "late": 0,
+          "overflow": 0,
+          "queued": 0,
+          "peak": 8.807821139100724e-9,
+          "latencyFrames": 0,
+          "reductionGain": 1
+        },
+        "limiter": {
+          "type": "stats",
+          "request": 1,
+          "kind": "limiter",
+          "contextOriginFrame": 0,
+          "pendingStartupEvents": 0,
+          "preOriginLateEvents": 0,
+          "frame": 67200,
+          "applied": 0,
+          "late": 0,
+          "overflow": 0,
+          "queued": 0,
+          "peak": 1.0634946256971034e-8,
+          "latencyFrames": 144,
+          "reductionGain": 1
+        }
+      },
+      "topology": {
+        "version": 1,
+        "kind": "owned-desk-native-host-seams",
+        "roles": [
+          "lead",
+          "bass"
+        ],
+        "sharedSendTap": "post desk strip/fader",
+        "sharedReturnTarget": "headroom input",
+        "reverbHubReturnTarget": "Generator output before fade/sweep/levelTrim",
+        "music": "headroom → Generator output fade → optional sweep → levelTrim → desk matrix",
+        "ambience": "own strip → master input, outside headroom and music fade",
+        "masterInsert": "between matrix/balance and fader/dim; supplied when creating desk",
+        "limiterCount": 1,
+        "ownedLatencyFrames": 144,
+        "externalLatencies": {
+          "roleInputs": 0,
+          "musicSweep": 0,
+          "masterInsert": 0,
+          "sharedEffects": null
+        },
+        "automaticPdc": false,
+        "scope": "Exact routing seams; caller-supplied effects and Generator stages are preserved, not ported by this helper"
+      },
+      "ownedLatencyFrames": 144,
+      "checksPassed": false
+    },
+    {
+      "rate": 96000,
+      "frames": 134400,
+      "maxAbsoluteError": 0.00008323788642883301,
+      "relativeRms": 0.0003477073373622029,
+      "peak": 0.09228690713644028,
+      "nonFinite": 0,
+      "maxErrorFrame": 11947,
+      "maxErrorChannel": 1,
+      "firstAboveBound": null,
+      "nativeAtMaximum": -0.014803816564381123,
+      "ownedAtMaximum": -0.01472057867795229,
+      "windows": [
+        {
+          "startFrame": 0,
+          "endFrame": 9600,
+          "maxAbsoluteError": 0,
+          "relativeRms": 0,
+          "peak": 0,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 9600,
+          "endFrame": 19200,
+          "maxAbsoluteError": 0.00008323788642883301,
+          "relativeRms": 0.0006765005471999173,
+          "peak": 0.09228690713644028,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 19200,
+          "endFrame": 38400,
+          "maxAbsoluteError": 0.000019550789147615433,
+          "relativeRms": 0.00020428296077677226,
+          "peak": 0.09191027283668518,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 38400,
+          "endFrame": 72000,
+          "maxAbsoluteError": 0.000017762184143066406,
+          "relativeRms": 0.0001563961165934074,
+          "peak": 0.0687025934457779,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 72000,
+          "endFrame": 91200,
+          "maxAbsoluteError": 0.000008285045623779297,
+          "relativeRms": 0.00013835834663035614,
+          "peak": 0.03827812150120735,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 91200,
+          "endFrame": 134400,
+          "maxAbsoluteError": 0.0000015231780707836151,
+          "relativeRms": 0.00006438572683604883,
+          "peak": 0.008645135909318924,
+          "nonFinite": 0
+        }
+      ],
+      "tapComparisons": {
+        "leadSource": {
+          "maxAbsoluteError": 0,
+          "relativeRms": 0,
+          "peak": 0.03849385306239128,
+          "nonFinite": 0,
+          "maxErrorFrame": 0,
+          "maxErrorChannel": 0,
+          "firstAboveBound": null,
+          "nativeAtMaximum": 0,
+          "ownedAtMaximum": 0,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 9600,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 9600,
+              "endFrame": 19200,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.038493845611810684,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 19200,
+              "endFrame": 38400,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.038493745028972626,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 38400,
+              "endFrame": 72000,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.03849385306239128,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 72000,
+              "endFrame": 91200,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.038493745028972626,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 91200,
+              "endFrame": 134400,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "leadStrip": {
+          "maxAbsoluteError": 0.00010672956705093384,
+          "relativeRms": 0.0003435484029986908,
+          "peak": 0.052510350942611694,
+          "nonFinite": 0,
+          "maxErrorFrame": 11647,
+          "maxErrorChannel": 1,
+          "firstAboveBound": 11547,
+          "nativeAtMaximum": -0.033902596682310104,
+          "ownedAtMaximum": -0.03400932624936104,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 9600,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 9600,
+              "endFrame": 19200,
+              "maxAbsoluteError": 0.00010672956705093384,
+              "relativeRms": 0.0005833636453777916,
+              "peak": 0.052510298788547516,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 19200,
+              "endFrame": 38400,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.052510350942611694,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 38400,
+              "endFrame": 72000,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 72000,
+              "endFrame": 91200,
+              "maxAbsoluteError": 1.8843903861083793e-15,
+              "relativeRms": 4.1983763576471025e-15,
+              "peak": 0.05250934138894081,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 91200,
+              "endFrame": 134400,
+              "maxAbsoluteError": 1.379022702883772e-34,
+              "relativeRms": 1.0950807301028757e-18,
+              "peak": 1.379022702883772e-34,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "bassStrip": {
+          "maxAbsoluteError": 0.00008184090256690979,
+          "relativeRms": 0.00012231954058041064,
+          "peak": 0.06120496615767479,
+          "nonFinite": 0,
+          "maxErrorFrame": 11647,
+          "maxErrorChannel": 1,
+          "firstAboveBound": null,
+          "nativeAtMaximum": 0.036095768213272095,
+          "ownedAtMaximum": 0.036013927310705185,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 9600,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 9600,
+              "endFrame": 19200,
+              "maxAbsoluteError": 0.00008184090256690979,
+              "relativeRms": 0.0003461226616694959,
+              "peak": 0.06120496615767479,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 19200,
+              "endFrame": 38400,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.06120480224490166,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 38400,
+              "endFrame": 72000,
+              "maxAbsoluteError": 1.3964755327487016e-15,
+              "relativeRms": 1.6070464814379326e-16,
+              "peak": 0.061204954981803894,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 72000,
+              "endFrame": 91200,
+              "maxAbsoluteError": 5.068499576847074e-16,
+              "relativeRms": 9.331217808437241e-16,
+              "peak": 0.061204928904771805,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 91200,
+              "endFrame": 134400,
+              "maxAbsoluteError": 2.961500174637732e-35,
+              "relativeRms": 2.627448175505602e-19,
+              "peak": 2.961500174637732e-35,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "headroomOut": {
+          "maxAbsoluteError": 0.00019849254749715328,
+          "relativeRms": 0.0002945198501924284,
+          "peak": 0.08881023526191711,
+          "nonFinite": 0,
+          "maxErrorFrame": 11647,
+          "maxErrorChannel": 1,
+          "firstAboveBound": 10783,
+          "nativeAtMaximum": 0.00311385584063828,
+          "ownedAtMaximum": 0.0029153632931411266,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 9600,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 9600,
+              "endFrame": 19200,
+              "maxAbsoluteError": 0.00019849254749715328,
+              "relativeRms": 0.0007067328483895122,
+              "peak": 0.08604434877634048,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 19200,
+              "endFrame": 38400,
+              "maxAbsoluteError": 0.0000030277296900749207,
+              "relativeRms": 0.000025522574071207133,
+              "peak": 0.08881023526191711,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 38400,
+              "endFrame": 72000,
+              "maxAbsoluteError": 6.51925802230835e-7,
+              "relativeRms": 0.000003842658962743515,
+              "peak": 0.061516329646110535,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 72000,
+              "endFrame": 91200,
+              "maxAbsoluteError": 1.4901161193847656e-8,
+              "relativeRms": 6.331958745832038e-8,
+              "peak": 0.08811473846435547,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 91200,
+              "endFrame": 134400,
+              "maxAbsoluteError": 1.1641532182693481e-9,
+              "relativeRms": 1.5299922048381446e-7,
+              "peak": 0.0025402887258678675,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "busSendLead": {
+          "maxAbsoluteError": 0.00003145728260278702,
+          "relativeRms": 0.0004390107576683439,
+          "peak": 0.01573646254837513,
+          "nonFinite": 0,
+          "maxErrorFrame": 11647,
+          "maxErrorChannel": 1,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.009992526844143867,
+          "ownedAtMaximum": -0.010023984126746655,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 9600,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 9600,
+              "endFrame": 19200,
+              "maxAbsoluteError": 0.00003145728260278702,
+              "relativeRms": 0.0005773249321876005,
+              "peak": 0.015677370131015778,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 19200,
+              "endFrame": 38400,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.01573646254837513,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 38400,
+              "endFrame": 72000,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 72000,
+              "endFrame": 91200,
+              "maxAbsoluteError": 1.8843903596385997e-16,
+              "relativeRms": 4.198193719783549e-15,
+              "peak": 0.005250934045761824,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 91200,
+              "endFrame": 134400,
+              "maxAbsoluteError": 1.379022760280957e-35,
+              "relativeRms": 1.0950799751113414e-19,
+              "peak": 1.379022760280957e-35,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "spaceSendLead": {
+          "maxAbsoluteError": 0.000009379582479596138,
+          "relativeRms": 0.0001433378752344529,
+          "peak": 0.014504751190543175,
+          "nonFinite": 0,
+          "maxErrorFrame": 11647,
+          "maxErrorChannel": 1,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.0029794098809361458,
+          "ownedAtMaximum": -0.002988789463415742,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 9600,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 9600,
+              "endFrame": 19200,
+              "maxAbsoluteError": 0.000009379582479596138,
+              "relativeRms": 0.0004725716361245224,
+              "peak": 0.006716070231050253,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 19200,
+              "endFrame": 38400,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.008005784824490547,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 38400,
+              "endFrame": 72000,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 72000,
+              "endFrame": 91200,
+              "maxAbsoluteError": 5.221377902253892e-16,
+              "relativeRms": 4.275316869790095e-15,
+              "peak": 0.014504751190543175,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 91200,
+              "endFrame": 134400,
+              "maxAbsoluteError": 3.862976919967507e-35,
+              "relativeRms": 3.0678731460547063e-19,
+              "peak": 3.862976919967507e-35,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "busReturn": {
+          "maxAbsoluteError": 0.0000030726660043001175,
+          "relativeRms": 0.0003505453115063783,
+          "peak": 0.004694023169577122,
+          "nonFinite": 0,
+          "maxErrorFrame": 13567,
+          "maxErrorChannel": 1,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.0011105176527053118,
+          "ownedAtMaximum": -0.001113590318709612,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 9600,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 9600,
+              "endFrame": 19200,
+              "maxAbsoluteError": 0.0000030726660043001175,
+              "relativeRms": 0.0008193690528563165,
+              "peak": 0.0032885917462408543,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 19200,
+              "endFrame": 38400,
+              "maxAbsoluteError": 0.0000025497283786535263,
+              "relativeRms": 0.0004160317795317317,
+              "peak": 0.004694023169577122,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 38400,
+              "endFrame": 72000,
+              "maxAbsoluteError": 5.681649781763554e-7,
+              "relativeRms": 0.0001292221208916042,
+              "peak": 0.0021492098458111286,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 72000,
+              "endFrame": 91200,
+              "maxAbsoluteError": 1.862645149230957e-9,
+              "relativeRms": 2.6898499633902354e-7,
+              "peak": 0.0036106433253735304,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 91200,
+              "endFrame": 134400,
+              "maxAbsoluteError": 9.313225746154785e-10,
+              "relativeRms": 1.5650101654535696e-7,
+              "peak": 0.002938044024631381,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "spaceReturn": {
+          "maxAbsoluteError": 7.158378139138222e-7,
+          "relativeRms": 0.00014251699224016905,
+          "peak": 0.0031190989539027214,
+          "nonFinite": 0,
+          "maxErrorFrame": 13951,
+          "maxErrorChannel": 1,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.00026663151220418513,
+          "ownedAtMaximum": -0.00026734735001809895,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 9600,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 9600,
+              "endFrame": 19200,
+              "maxAbsoluteError": 7.158378139138222e-7,
+              "relativeRms": 0.0005630685330969208,
+              "peak": 0.0009287864668294787,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 19200,
+              "endFrame": 38400,
+              "maxAbsoluteError": 5.90283889323473e-7,
+              "relativeRms": 0.0002938782594696835,
+              "peak": 0.0012571655679494143,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 38400,
+              "endFrame": 72000,
+              "maxAbsoluteError": 1.1155498214066029e-7,
+              "relativeRms": 0.00012406569639861827,
+              "peak": 0.0004036253085359931,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 72000,
+              "endFrame": 91200,
+              "maxAbsoluteError": 9.313225746154785e-10,
+              "relativeRms": 1.1096731201718672e-7,
+              "peak": 0.0031190989539027214,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 91200,
+              "endFrame": 134400,
+              "maxAbsoluteError": 6.984919309616089e-10,
+              "relativeRms": 1.709210601252466e-7,
+              "peak": 0.002268318086862564,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "musicFadeOut": {
+          "maxAbsoluteError": 0.00017864303663372993,
+          "relativeRms": 0.0003097205363711342,
+          "peak": 0.08247151225805283,
+          "nonFinite": 0,
+          "maxErrorFrame": 11647,
+          "maxErrorChannel": 1,
+          "firstAboveBound": 10855,
+          "nativeAtMaximum": 0.006517282221466303,
+          "ownedAtMaximum": 0.006338639184832573,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 9600,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 9600,
+              "endFrame": 19200,
+              "maxAbsoluteError": 0.00017864303663372993,
+              "relativeRms": 0.0007033799617141919,
+              "peak": 0.08027544617652893,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 19200,
+              "endFrame": 38400,
+              "maxAbsoluteError": 0.00000272504985332489,
+              "relativeRms": 0.00002536422305534257,
+              "peak": 0.08247151225805283,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 38400,
+              "endFrame": 72000,
+              "maxAbsoluteError": 5.885958671569824e-7,
+              "relativeRms": 0.000003918290213758126,
+              "peak": 0.05180927366018295,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 72000,
+              "endFrame": 91200,
+              "maxAbsoluteError": 1.4901161193847656e-8,
+              "relativeRms": 6.843338606523196e-8,
+              "peak": 0.06398501992225647,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 91200,
+              "endFrame": 134400,
+              "maxAbsoluteError": 8.149072527885437e-10,
+              "relativeRms": 1.5468138917253568e-7,
+              "peak": 0.0017850453732535243,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "levelTrimOut": {
+          "maxAbsoluteError": 0.00007803869084455073,
+          "relativeRms": 0.0002934726634327727,
+          "peak": 0.07395905256271362,
+          "nonFinite": 0,
+          "maxErrorFrame": 11659,
+          "maxErrorChannel": 1,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.0005642057512886822,
+          "ownedAtMaximum": -0.0004861670604441315,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 9600,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 9600,
+              "endFrame": 19200,
+              "maxAbsoluteError": 0.00007803869084455073,
+              "relativeRms": 0.0005613156159185342,
+              "peak": 0.07169759273529053,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 19200,
+              "endFrame": 38400,
+              "maxAbsoluteError": 0.00001407042145729065,
+              "relativeRms": 0.00021691326252405626,
+              "peak": 0.07395905256271362,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 38400,
+              "endFrame": 72000,
+              "maxAbsoluteError": 0.000013414770364761353,
+              "relativeRms": 0.00014697920512882776,
+              "peak": 0.04777145013213158,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 72000,
+              "endFrame": 91200,
+              "maxAbsoluteError": 0.00001041218638420105,
+              "relativeRms": 0.00013740339641916526,
+              "peak": 0.05529996380209923,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 91200,
+              "endFrame": 134400,
+              "maxAbsoluteError": 1.6629928722977638e-7,
+              "relativeRms": 0.00016495871119199916,
+              "peak": 0.0016510155983269215,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "ambienceStrip": {
+          "maxAbsoluteError": 0.00007637497037649155,
+          "relativeRms": 0.00044976498977990285,
+          "peak": 0.01649736799299717,
+          "nonFinite": 0,
+          "maxErrorFrame": 11646,
+          "maxErrorChannel": 1,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.014690270647406578,
+          "ownedAtMaximum": -0.014613895677030087,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 9600,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 9600,
+              "endFrame": 19200,
+              "maxAbsoluteError": 0.00007637497037649155,
+              "relativeRms": 0.0013395809712753873,
+              "peak": 0.016294969245791435,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 19200,
+              "endFrame": 38400,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.01649731583893299,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 38400,
+              "endFrame": 72000,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.01649734377861023,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 72000,
+              "endFrame": 91200,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0.01649736799299717,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 91200,
+              "endFrame": 134400,
+              "maxAbsoluteError": 9.27316847577431e-16,
+              "relativeRms": 4.0887207288719184e-15,
+              "peak": 0.016497354954481125,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "masterInput": {
+          "maxAbsoluteError": 0.00007835030555725098,
+          "relativeRms": 0.00032463044753547603,
+          "peak": 0.08214280754327774,
+          "nonFinite": 0,
+          "maxErrorFrame": 11294,
+          "maxErrorChannel": 0,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.014639744535088539,
+          "ownedAtMaximum": -0.014561394229531288,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 9600,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 9600,
+              "endFrame": 19200,
+              "maxAbsoluteError": 0.00007835030555725098,
+              "relativeRms": 0.0006792983537760981,
+              "peak": 0.08214280754327774,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 19200,
+              "endFrame": 38400,
+              "maxAbsoluteError": 0.00001407042145729065,
+              "relativeRms": 0.00020110709955945618,
+              "peak": 0.0811300203204155,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 38400,
+              "endFrame": 72000,
+              "maxAbsoluteError": 0.000013414770364761353,
+              "relativeRms": 0.00014287639145612872,
+              "peak": 0.06021748483181,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 72000,
+              "endFrame": 91200,
+              "maxAbsoluteError": 0.00001041218638420105,
+              "relativeRms": 0.0001211929995493734,
+              "peak": 0.06932516396045685,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 91200,
+              "endFrame": 134400,
+              "maxAbsoluteError": 1.6624107956886292e-7,
+              "relativeRms": 0.000002204228191407424,
+              "peak": 0.016497332602739334,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "matrixOut": {
+          "maxAbsoluteError": 0.00007835403084754944,
+          "relativeRms": 0.0003206504928863011,
+          "peak": 0.08214280754327774,
+          "nonFinite": 0,
+          "maxErrorFrame": 11294,
+          "maxErrorChannel": 0,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.014639429748058319,
+          "ownedAtMaximum": -0.01456107571721077,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 9600,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 9600,
+              "endFrame": 19200,
+              "maxAbsoluteError": 0.00007835403084754944,
+              "relativeRms": 0.0006792996797791466,
+              "peak": 0.08214280754327774,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 19200,
+              "endFrame": 38400,
+              "maxAbsoluteError": 0.00001407042145729065,
+              "relativeRms": 0.00020110709955945618,
+              "peak": 0.0811300203204155,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 38400,
+              "endFrame": 72000,
+              "maxAbsoluteError": 0.000013414770364761353,
+              "relativeRms": 0.00014287639145612872,
+              "peak": 0.06021748483181,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 72000,
+              "endFrame": 91200,
+              "maxAbsoluteError": 0.000010361894965171814,
+              "relativeRms": 0.0001132745240647841,
+              "peak": 0.0785912498831749,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 91200,
+              "endFrame": 134400,
+              "maxAbsoluteError": 1.2852251529693604e-7,
+              "relativeRms": 0.000001581174112100883,
+              "peak": 0.01869823783636093,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "masterInsertOut": {
+          "maxAbsoluteError": 0.00008323788642883301,
+          "relativeRms": 0.00031782945318091266,
+          "peak": 0.09228690713644028,
+          "nonFinite": 0,
+          "maxErrorFrame": 11659,
+          "maxErrorChannel": 1,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.014803816564381123,
+          "ownedAtMaximum": -0.01472057867795229,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 9600,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 9600,
+              "endFrame": 19200,
+              "maxAbsoluteError": 0.00008323788642883301,
+              "relativeRms": 0.0006698795559134817,
+              "peak": 0.09228690713644028,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 19200,
+              "endFrame": 38400,
+              "maxAbsoluteError": 0.000019550789147615433,
+              "relativeRms": 0.00020177045021062913,
+              "peak": 0.09191027283668518,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 38400,
+              "endFrame": 72000,
+              "maxAbsoluteError": 0.000017762184143066406,
+              "relativeRms": 0.00015632346082134052,
+              "peak": 0.0687025934457779,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 72000,
+              "endFrame": 91200,
+              "maxAbsoluteError": 0.000014916062355041504,
+              "relativeRms": 0.0001392237128564561,
+              "peak": 0.08874467015266418,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 91200,
+              "endFrame": 134400,
+              "maxAbsoluteError": 0.000003825873136520386,
+              "relativeRms": 0.00006436603160770061,
+              "peak": 0.021715600043535233,
+              "nonFinite": 0
+            }
+          ]
+        },
+        "faderOut": {
+          "maxAbsoluteError": 0.00008323788642883301,
+          "relativeRms": 0.0003477073373622029,
+          "peak": 0.09228690713644028,
+          "nonFinite": 0,
+          "maxErrorFrame": 11659,
+          "maxErrorChannel": 1,
+          "firstAboveBound": null,
+          "nativeAtMaximum": -0.014803816564381123,
+          "ownedAtMaximum": -0.01472057867795229,
+          "windows": [
+            {
+              "startFrame": 0,
+              "endFrame": 9600,
+              "maxAbsoluteError": 0,
+              "relativeRms": 0,
+              "peak": 0,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 9600,
+              "endFrame": 19200,
+              "maxAbsoluteError": 0.00008323788642883301,
+              "relativeRms": 0.0006698795559134817,
+              "peak": 0.09228690713644028,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 19200,
+              "endFrame": 38400,
+              "maxAbsoluteError": 0.000019550789147615433,
+              "relativeRms": 0.00020177045021062913,
+              "peak": 0.09191027283668518,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 38400,
+              "endFrame": 72000,
+              "maxAbsoluteError": 0.000017762184143066406,
+              "relativeRms": 0.00015632346082134052,
+              "peak": 0.0687025934457779,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 72000,
+              "endFrame": 91200,
+              "maxAbsoluteError": 0.000008285045623779297,
+              "relativeRms": 0.0001403260519993747,
+              "peak": 0.03827812150120735,
+              "nonFinite": 0
+            },
+            {
+              "startFrame": 91200,
+              "endFrame": 134400,
+              "maxAbsoluteError": 0.0000015231780707836151,
+              "relativeRms": 0.00006436635299324289,
+              "peak": 0.008645135909318924,
+              "nonFinite": 0
+            }
+          ]
+        }
+      },
+      "timesMatch": true,
+      "checkpoints": [
+        {
+          "kind": "lead-mute",
+          "requestedFrame": 24064,
+          "actualFrame": 24064,
+          "nativeTime": 0.25066666666666665
+        },
+        {
+          "kind": "bass-solo",
+          "requestedFrame": 48000,
+          "actualFrame": 48000,
+          "nativeTime": 0.5
+        },
+        {
+          "kind": "master-fader-width-balance",
+          "requestedFrame": 72064,
+          "actualFrame": 72064,
+          "nativeTime": 0.7506666666666667
+        },
+        {
+          "kind": "headroom-mute-ambience-retained",
+          "requestedFrame": 91264,
+          "actualFrame": 91264,
+          "nativeTime": 0.9506666666666667
+        }
+      ],
+      "stats": {
+        "strip:lead": {
+          "type": "stats",
+          "request": 3,
+          "kind": "strip",
+          "contextOriginFrame": 0,
+          "pendingStartupEvents": 0,
+          "preOriginLateEvents": 0,
+          "frame": 134400,
+          "applied": 2,
+          "late": 0,
+          "overflow": 0,
+          "queued": 0,
+          "peak": 0,
+          "latencyFrames": 0,
+          "reductionGain": 1
+        },
+        "strip:bass": {
+          "type": "stats",
+          "request": 1,
+          "kind": "strip",
+          "contextOriginFrame": 0,
+          "pendingStartupEvents": 0,
+          "preOriginLateEvents": 0,
+          "frame": 134400,
+          "applied": 0,
+          "late": 0,
+          "overflow": 0,
+          "queued": 0,
+          "peak": 0,
+          "latencyFrames": 0,
+          "reductionGain": 1
+        },
+        "strip:ambience": {
+          "type": "stats",
+          "request": 3,
+          "kind": "strip",
+          "contextOriginFrame": 0,
+          "pendingStartupEvents": 0,
+          "preOriginLateEvents": 0,
+          "frame": 134400,
+          "applied": 2,
+          "late": 0,
+          "overflow": 0,
+          "queued": 0,
+          "peak": 0,
+          "latencyFrames": 0,
+          "reductionGain": 1
+        },
+        "strip:headroom": {
+          "type": "stats",
+          "request": 2,
+          "kind": "strip",
+          "contextOriginFrame": 0,
+          "pendingStartupEvents": 0,
+          "preOriginLateEvents": 0,
+          "frame": 134400,
+          "applied": 1,
+          "late": 0,
+          "overflow": 0,
+          "queued": 0,
+          "peak": 0,
+          "latencyFrames": 0,
+          "reductionGain": 1
+        },
+        "matrix": {
+          "type": "stats",
+          "request": 2,
+          "kind": "matrix",
+          "contextOriginFrame": 0,
+          "pendingStartupEvents": 0,
+          "preOriginLateEvents": 0,
+          "frame": 134400,
+          "applied": 2,
+          "late": 0,
+          "overflow": 0,
+          "queued": 0,
+          "peak": 3.707086794384773e-23,
+          "latencyFrames": 0,
+          "reductionGain": 1
+        },
+        "fader": {
+          "type": "stats",
+          "request": 2,
+          "kind": "fader",
+          "contextOriginFrame": 0,
+          "pendingStartupEvents": 0,
+          "preOriginLateEvents": 0,
+          "frame": 134400,
+          "applied": 1,
+          "late": 0,
+          "overflow": 0,
+          "queued": 0,
+          "peak": 8.113370419948751e-9,
+          "latencyFrames": 0,
+          "reductionGain": 1
+        },
+        "limiter": {
+          "type": "stats",
+          "request": 1,
+          "kind": "limiter",
+          "contextOriginFrame": 0,
+          "pendingStartupEvents": 0,
+          "preOriginLateEvents": 0,
+          "frame": 134400,
+          "applied": 0,
+          "late": 0,
+          "overflow": 0,
+          "queued": 0,
+          "peak": 9.796738531520077e-9,
+          "latencyFrames": 288,
+          "reductionGain": 1
+        }
+      },
+      "topology": {
+        "version": 1,
+        "kind": "owned-desk-native-host-seams",
+        "roles": [
+          "lead",
+          "bass"
+        ],
+        "sharedSendTap": "post desk strip/fader",
+        "sharedReturnTarget": "headroom input",
+        "reverbHubReturnTarget": "Generator output before fade/sweep/levelTrim",
+        "music": "headroom → Generator output fade → optional sweep → levelTrim → desk matrix",
+        "ambience": "own strip → master input, outside headroom and music fade",
+        "masterInsert": "between matrix/balance and fader/dim; supplied when creating desk",
+        "limiterCount": 1,
+        "ownedLatencyFrames": 288,
+        "externalLatencies": {
+          "roleInputs": 0,
+          "musicSweep": 0,
+          "masterInsert": 0,
+          "sharedEffects": null
+        },
+        "automaticPdc": false,
+        "scope": "Exact routing seams; caller-supplied effects and Generator stages are preserved, not ported by this helper"
+      },
+      "ownedLatencyFrames": 288,
+      "checksPassed": false
+    }
+  ],
+  "checksPassed": false,
+  "targetTimingMarkers": [
+    {
+      "rate": 44100,
+      "originalTimeSeconds": 0.00029478458049886624,
+      "requestedFrame": 13,
+      "importedFrame": 13,
+      "firstChangedNativeFrame": 14,
+      "firstChangedOwnedFrame": 14,
+      "maxAbsoluteError": 5.960464477539063e-8,
+      "relativeRms": 9.08811191948746e-8,
+      "peak": 0.56586754322052,
+      "nonFinite": 0,
+      "checksPassed": true,
+      "scope": "Native continuous target at original seconds; separate integer-origin target profile, no sample shifting or altered native time"
+    },
+    {
+      "rate": 48000,
+      "originalTimeSeconds": 0.0002708333333333333,
+      "requestedFrame": 13,
+      "importedFrame": 13,
+      "firstChangedNativeFrame": 13,
+      "firstChangedOwnedFrame": 14,
+      "maxAbsoluteError": 1.4901161193847656e-8,
+      "relativeRms": 1.1565864756193149e-8,
+      "peak": 0.5472639203071594,
+      "nonFinite": 0,
+      "checksPassed": true,
+      "scope": "Native continuous target at original seconds; separate integer-origin target profile, no sample shifting or altered native time"
+    },
+    {
+      "rate": 96000,
+      "originalTimeSeconds": 0.00013541666666666666,
+      "requestedFrame": 13,
+      "importedFrame": 13,
+      "firstChangedNativeFrame": 13,
+      "firstChangedOwnedFrame": 14,
+      "maxAbsoluteError": 2.9802322387695312e-8,
+      "relativeRms": 7.201755787747949e-8,
+      "peak": 0.410587877035141,
+      "nonFinite": 0,
+      "checksPassed": true,
+      "scope": "Native continuous target at original seconds; separate integer-origin target profile, no sample shifting or altered native time"
+    }
+  ],
+  "filterStartupMarkers": [
+    {
+      "rate": 44100,
+      "mode": "highpass",
+      "maxAbsoluteError": 0.000009931623935699463,
+      "relativeRms": 0.00001744184302602854,
+      "peak": 0.0384938009083271,
+      "nonFinite": 0,
+      "maxErrorFrame": 5375,
+      "maxErrorChannel": 0,
+      "firstAboveBound": null,
+      "nativeAtMaximum": -0.02975519187748432,
+      "ownedAtMaximum": -0.02976512350142002,
+      "windows": [
+        {
+          "startFrame": 0,
+          "endFrame": 4410,
+          "maxAbsoluteError": 0,
+          "relativeRms": 0,
+          "peak": 0,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 4410,
+          "endFrame": 8820,
+          "maxAbsoluteError": 0.000009931623935699463,
+          "relativeRms": 0.000049490161509849916,
+          "peak": 0.038490403443574905,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 8820,
+          "endFrame": 17640,
+          "maxAbsoluteError": 2.6173443057148437e-16,
+          "relativeRms": 7.924372527661803e-17,
+          "peak": 0.038493216037750244,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 17640,
+          "endFrame": 33075,
+          "maxAbsoluteError": 3.175667338483853e-16,
+          "relativeRms": 7.266584405069238e-17,
+          "peak": 0.0384938009083271,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 33075,
+          "endFrame": 41895,
+          "maxAbsoluteError": 1.457778854091962e-15,
+          "relativeRms": 1.0062305910717244e-15,
+          "peak": 0.038493216037750244,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 41895,
+          "endFrame": 61740,
+          "maxAbsoluteError": 2.0299216190758827e-35,
+          "relativeRms": 1.4279742716638027e-19,
+          "peak": 2.0299216190758827e-35,
+          "nonFinite": 0
+        }
+      ],
+      "checksPassed": true,
+      "scope": "Independent actual native Biquad DC/Nyquist target ramp versus owned strip; time0, same input, no host FX or routing"
+    },
+    {
+      "rate": 44100,
+      "mode": "lowpass",
+      "maxAbsoluteError": 0.0000028889626264572144,
+      "relativeRms": 0.000009173960853775155,
+      "peak": 0.0384938009083271,
+      "nonFinite": 0,
+      "maxErrorFrame": 4875,
+      "maxErrorChannel": 1,
+      "firstAboveBound": null,
+      "nativeAtMaximum": 0.022306809201836586,
+      "ownedAtMaximum": 0.02230392023921013,
+      "windows": [
+        {
+          "startFrame": 0,
+          "endFrame": 4410,
+          "maxAbsoluteError": 0,
+          "relativeRms": 0,
+          "peak": 0,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 4410,
+          "endFrame": 8820,
+          "maxAbsoluteError": 0.0000028889626264572144,
+          "relativeRms": 0.000026030611371795613,
+          "peak": 0.038490403443574905,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 8820,
+          "endFrame": 17640,
+          "maxAbsoluteError": 2.1603691125006688e-18,
+          "relativeRms": 6.54081681471164e-19,
+          "peak": 0.038493216037750244,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 17640,
+          "endFrame": 33075,
+          "maxAbsoluteError": 1.3802285408478577e-16,
+          "relativeRms": 3.158248683297188e-17,
+          "peak": 0.0384938009083271,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 33075,
+          "endFrame": 41895,
+          "maxAbsoluteError": 1.012211148232467e-15,
+          "relativeRms": 2.2311420528176027e-15,
+          "peak": 0.038493216037750244,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 41895,
+          "endFrame": 61740,
+          "maxAbsoluteError": 6.694286503476863e-35,
+          "relativeRms": 3.410033675873999e-19,
+          "peak": 6.694286503476863e-35,
+          "nonFinite": 0
+        }
+      ],
+      "checksPassed": true,
+      "scope": "Independent actual native Biquad DC/Nyquist target ramp versus owned strip; time0, same input, no host FX or routing"
+    },
+    {
+      "rate": 44100,
+      "mode": "cascade",
+      "maxAbsoluteError": 0.00001220405101776123,
+      "relativeRms": 0.000023465188334829987,
+      "peak": 0.0384938009083271,
+      "nonFinite": 0,
+      "maxErrorFrame": 5374,
+      "maxErrorChannel": 1,
+      "firstAboveBound": null,
+      "nativeAtMaximum": -0.021586177870631218,
+      "ownedAtMaximum": -0.02159838192164898,
+      "windows": [
+        {
+          "startFrame": 0,
+          "endFrame": 4410,
+          "maxAbsoluteError": 0,
+          "relativeRms": 0,
+          "peak": 0,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 4410,
+          "endFrame": 8820,
+          "maxAbsoluteError": 0.00001220405101776123,
+          "relativeRms": 0.00006658102775634681,
+          "peak": 0.038490403443574905,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 8820,
+          "endFrame": 17640,
+          "maxAbsoluteError": 1.1645135269331658e-16,
+          "relativeRms": 3.525726050168776e-17,
+          "peak": 0.038493216037750244,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 17640,
+          "endFrame": 33075,
+          "maxAbsoluteError": 5.530554457122369e-16,
+          "relativeRms": 1.2655053721306494e-16,
+          "peak": 0.0384938009083271,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 33075,
+          "endFrame": 41895,
+          "maxAbsoluteError": 1.012211148232467e-15,
+          "relativeRms": 2.1458072693343447e-15,
+          "peak": 0.038493216037750244,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 41895,
+          "endFrame": 61740,
+          "maxAbsoluteError": 6.694286503476863e-35,
+          "relativeRms": 3.319663802933227e-19,
+          "peak": 6.694286503476863e-35,
+          "nonFinite": 0
+        }
+      ],
+      "checksPassed": true,
+      "scope": "Independent actual native Biquad DC/Nyquist target ramp versus owned strip; time0, same input, no host FX or routing"
+    },
+    {
+      "rate": 48000,
+      "mode": "highpass",
+      "maxAbsoluteError": 0.00001556333154439926,
+      "relativeRms": 0.00003540522943632129,
+      "peak": 0.03849385306239128,
+      "nonFinite": 0,
+      "maxErrorFrame": 5887,
+      "maxErrorChannel": 0,
+      "firstAboveBound": null,
+      "nativeAtMaximum": -0.006721934769302607,
+      "ownedAtMaximum": -0.006706371437758207,
+      "windows": [
+        {
+          "startFrame": 0,
+          "endFrame": 4800,
+          "maxAbsoluteError": 0,
+          "relativeRms": 0,
+          "peak": 0,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 4800,
+          "endFrame": 9600,
+          "maxAbsoluteError": 0.00001556333154439926,
+          "relativeRms": 0.00010041484980753943,
+          "peak": 0.03849076107144356,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 9600,
+          "endFrame": 19200,
+          "maxAbsoluteError": 1.708924122952862e-15,
+          "relativeRms": 4.959358135001596e-16,
+          "peak": 0.038493718951940536,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 19200,
+          "endFrame": 36000,
+          "maxAbsoluteError": 4.02336573599734e-16,
+          "relativeRms": 8.82436645952424e-17,
+          "peak": 0.03849385306239128,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 36000,
+          "endFrame": 45600,
+          "maxAbsoluteError": 1.7893672654700765e-15,
+          "relativeRms": 3.1859152764348784e-15,
+          "peak": 0.038493718951940536,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 45600,
+          "endFrame": 67200,
+          "maxAbsoluteError": 9.709298647754005e-35,
+          "relativeRms": 4.361480258033281e-19,
+          "peak": 9.709298647754005e-35,
+          "nonFinite": 0
+        }
+      ],
+      "checksPassed": true,
+      "scope": "Independent actual native Biquad DC/Nyquist target ramp versus owned strip; time0, same input, no host FX or routing"
+    },
+    {
+      "rate": 48000,
+      "mode": "lowpass",
+      "maxAbsoluteError": 0.000007554888725280762,
+      "relativeRms": 0.000019330238854582502,
+      "peak": 0.03850870952010155,
+      "nonFinite": 0,
+      "maxErrorFrame": 5759,
+      "maxErrorChannel": 0,
+      "firstAboveBound": null,
+      "nativeAtMaximum": 0.018244385719299316,
+      "ownedAtMaximum": 0.018251940608024597,
+      "windows": [
+        {
+          "startFrame": 0,
+          "endFrame": 4800,
+          "maxAbsoluteError": 0,
+          "relativeRms": 0,
+          "peak": 0,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 4800,
+          "endFrame": 9600,
+          "maxAbsoluteError": 0.000007554888725280762,
+          "relativeRms": 0.000054824233473483347,
+          "peak": 0.03850870952010155,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 9600,
+          "endFrame": 19200,
+          "maxAbsoluteError": 8.066509691313068e-16,
+          "relativeRms": 2.3409295896390213e-16,
+          "peak": 0.038493718951940536,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 19200,
+          "endFrame": 36000,
+          "maxAbsoluteError": 2.9304904755275436e-16,
+          "relativeRms": 6.427385318424253e-17,
+          "peak": 0.03849385306239128,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 36000,
+          "endFrame": 45600,
+          "maxAbsoluteError": 1.7893672654700765e-15,
+          "relativeRms": 3.1859152764348784e-15,
+          "peak": 0.038493718951940536,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 45600,
+          "endFrame": 67200,
+          "maxAbsoluteError": 9.709298647754005e-35,
+          "relativeRms": 4.361480258033281e-19,
+          "peak": 9.709298647754005e-35,
+          "nonFinite": 0
+        }
+      ],
+      "checksPassed": true,
+      "scope": "Independent actual native Biquad DC/Nyquist target ramp versus owned strip; time0, same input, no host FX or routing"
+    },
+    {
+      "rate": 48000,
+      "mode": "cascade",
+      "maxAbsoluteError": 0.000017765909433364868,
+      "relativeRms": 0.00003903057899627719,
+      "peak": 0.038505468517541885,
+      "nonFinite": 0,
+      "maxErrorFrame": 5759,
+      "maxErrorChannel": 0,
+      "firstAboveBound": null,
+      "nativeAtMaximum": 0.018215782940387726,
+      "ownedAtMaximum": 0.01823354884982109,
+      "windows": [
+        {
+          "startFrame": 0,
+          "endFrame": 4800,
+          "maxAbsoluteError": 0,
+          "relativeRms": 0,
+          "peak": 0,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 4800,
+          "endFrame": 9600,
+          "maxAbsoluteError": 0.000017765909433364868,
+          "relativeRms": 0.00011069692090546239,
+          "peak": 0.038505468517541885,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 9600,
+          "endFrame": 19200,
+          "maxAbsoluteError": 1.704411343168128e-16,
+          "relativeRms": 4.946261888751516e-17,
+          "peak": 0.038493718951940536,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 19200,
+          "endFrame": 36000,
+          "maxAbsoluteError": 1.0376894757694027e-16,
+          "relativeRms": 2.275943278895305e-17,
+          "peak": 0.03849385306239128,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 36000,
+          "endFrame": 45600,
+          "maxAbsoluteError": 1.4007892068512717e-15,
+          "relativeRms": 2.718440442780651e-15,
+          "peak": 0.038493718951940536,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 45600,
+          "endFrame": 67200,
+          "maxAbsoluteError": 8.334789315123288e-35,
+          "relativeRms": 3.988146695549709e-19,
+          "peak": 8.334789315123288e-35,
+          "nonFinite": 0
+        }
+      ],
+      "checksPassed": true,
+      "scope": "Independent actual native Biquad DC/Nyquist target ramp versus owned strip; time0, same input, no host FX or routing"
+    },
+    {
+      "rate": 96000,
+      "mode": "highpass",
+      "maxAbsoluteError": 0.00010332092642784119,
+      "relativeRms": 0.0002561357691533509,
+      "peak": 0.03849881514906883,
+      "nonFinite": 0,
+      "maxErrorFrame": 11647,
+      "maxErrorChannel": 1,
+      "firstAboveBound": 11585,
+      "nativeAtMaximum": -0.0369349867105484,
+      "ownedAtMaximum": -0.03703830763697624,
+      "windows": [
+        {
+          "startFrame": 0,
+          "endFrame": 9600,
+          "maxAbsoluteError": 0,
+          "relativeRms": 0,
+          "peak": 0,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 9600,
+          "endFrame": 19200,
+          "maxAbsoluteError": 0.00010332092642784119,
+          "relativeRms": 0.0007251040956495648,
+          "peak": 0.03849881514906883,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 19200,
+          "endFrame": 38400,
+          "maxAbsoluteError": 6.694902754728177e-16,
+          "relativeRms": 1.3738265249607797e-16,
+          "peak": 0.038493745028972626,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 38400,
+          "endFrame": 72000,
+          "maxAbsoluteError": 2.0978232070586762e-16,
+          "relativeRms": 3.2534793870433584e-17,
+          "peak": 0.03849385306239128,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 72000,
+          "endFrame": 91200,
+          "maxAbsoluteError": 2.007541035705274e-15,
+          "relativeRms": 2.7547379925281484e-15,
+          "peak": 0.038493745028972626,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 91200,
+          "endFrame": 134400,
+          "maxAbsoluteError": 7.607370107577306e-35,
+          "relativeRms": 8.091887918794364e-19,
+          "peak": 7.607370107577306e-35,
+          "nonFinite": 0
+        }
+      ],
+      "checksPassed": false,
+      "scope": "Independent actual native Biquad DC/Nyquist target ramp versus owned strip; time0, same input, no host FX or routing"
+    },
+    {
+      "rate": 96000,
+      "mode": "lowpass",
+      "maxAbsoluteError": 0.000022076070308685303,
+      "relativeRms": 0.000058265139642250846,
+      "peak": 0.03850719705224037,
+      "nonFinite": 0,
+      "maxErrorFrame": 11647,
+      "maxErrorChannel": 1,
+      "firstAboveBound": null,
+      "nativeAtMaximum": -0.0370136983692646,
+      "ownedAtMaximum": -0.03703577443957329,
+      "windows": [
+        {
+          "startFrame": 0,
+          "endFrame": 9600,
+          "maxAbsoluteError": 0,
+          "relativeRms": 0,
+          "peak": 0,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 9600,
+          "endFrame": 19200,
+          "maxAbsoluteError": 0.000022076070308685303,
+          "relativeRms": 0.00016494446008634086,
+          "peak": 0.03850719705224037,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 19200,
+          "endFrame": 38400,
+          "maxAbsoluteError": 7.105427357601002e-15,
+          "relativeRms": 1.4669019131785745e-15,
+          "peak": 0.038493745028972626,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 38400,
+          "endFrame": 72000,
+          "maxAbsoluteError": 2.0978232070586762e-16,
+          "relativeRms": 3.2534793870433584e-17,
+          "peak": 0.03849385306239128,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 72000,
+          "endFrame": 91200,
+          "maxAbsoluteError": 2.0532616507365747e-15,
+          "relativeRms": 4.879860433746248e-15,
+          "peak": 0.038493745028972626,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 91200,
+          "endFrame": 134400,
+          "maxAbsoluteError": 1.5026050412973596e-34,
+          "relativeRms": 1.185746844520561e-18,
+          "peak": 1.5026050412973596e-34,
+          "nonFinite": 0
+        }
+      ],
+      "checksPassed": true,
+      "scope": "Independent actual native Biquad DC/Nyquist target ramp versus owned strip; time0, same input, no host FX or routing"
+    },
+    {
+      "rate": 96000,
+      "mode": "cascade",
+      "maxAbsoluteError": 0.00011629238724708557,
+      "relativeRms": 0.0002601452095021538,
+      "peak": 0.03850650414824486,
+      "nonFinite": 0,
+      "maxErrorFrame": 11647,
+      "maxErrorChannel": 1,
+      "firstAboveBound": 11447,
+      "nativeAtMaximum": -0.03694052994251251,
+      "ownedAtMaximum": -0.0370568223297596,
+      "windows": [
+        {
+          "startFrame": 0,
+          "endFrame": 9600,
+          "maxAbsoluteError": 0,
+          "relativeRms": 0,
+          "peak": 0,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 9600,
+          "endFrame": 19200,
+          "maxAbsoluteError": 0.00011629238724708557,
+          "relativeRms": 0.000736454542159409,
+          "peak": 0.03850650414824486,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 19200,
+          "endFrame": 38400,
+          "maxAbsoluteError": 1.3658825555784484e-15,
+          "relativeRms": 2.802857268553525e-16,
+          "peak": 0.038493745028972626,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 38400,
+          "endFrame": 72000,
+          "maxAbsoluteError": 2.0978232070586762e-16,
+          "relativeRms": 3.2534793870433584e-17,
+          "peak": 0.03849385306239128,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 72000,
+          "endFrame": 91200,
+          "maxAbsoluteError": 2.0532616507365747e-15,
+          "relativeRms": 4.879860433746248e-15,
+          "peak": 0.038493745028972626,
+          "nonFinite": 0
+        },
+        {
+          "startFrame": 91200,
+          "endFrame": 134400,
+          "maxAbsoluteError": 1.5026050412973596e-34,
+          "relativeRms": 1.185746844520561e-18,
+          "peak": 1.5026050412973596e-34,
+          "nonFinite": 0
+        }
+      ],
+      "checksPassed": false,
+      "scope": "Independent actual native Biquad DC/Nyquist target ramp versus owned strip; time0, same input, no host FX or routing"
+    }
+  ],
+  "nativeParameterBoundaries": [
+    {
+      "rate": 44100,
+      "firstNativeHighpassZero": 5376,
+      "firstPredictedFloat32HighpassZero": 58123,
+      "firstNativeLowpassNyquist": 5376,
+      "firstPredictedFloat32LowpassNyquist": 8953,
+      "maxHighError": 0.01355774886906147,
+      "maxLowError": 0.83984375,
+      "samples": [
+        {
+          "frame": 4410,
+          "nativeHighpass": 0.08412942290306091,
+          "nativeLowpass": 22044.78515625,
+          "float32Highpass": 0.08412931859493256,
+          "float32Lowpass": 22044.783203125
+        },
+        {
+          "frame": 8820,
+          "nativeHighpass": 0,
+          "nativeLowpass": 22050,
+          "float32Highpass": 0.000020222119928803295,
+          "float32Lowpass": 22049.998046875
+        },
+        {
+          "frame": 11025,
+          "nativeHighpass": 0,
+          "nativeLowpass": 22050,
+          "float32Highpass": 3.135207862214884e-7,
+          "float32Lowpass": 22050
+        },
+        {
+          "frame": 13230,
+          "nativeHighpass": 0,
+          "nativeLowpass": 22050,
+          "float32Highpass": 4.8607802227707e-9,
+          "float32Lowpass": 22050
+        },
+        {
+          "frame": 17640,
+          "nativeHighpass": 0,
+          "nativeLowpass": 22050,
+          "float32Highpass": 1.1683832070244482e-12,
+          "float32Lowpass": 22050
+        },
+        {
+          "frame": 35280,
+          "nativeHighpass": 0,
+          "nativeLowpass": 22050,
+          "float32Highpass": 3.900340938078543e-27,
+          "float32Lowpass": 22050
+        },
+        {
+          "frame": 57330,
+          "nativeHighpass": 0,
+          "nativeLowpass": 22050,
+          "float32Highpass": 2.802596928649634e-45,
+          "float32Lowpass": 22050
+        }
+      ],
+      "scope": "Actual native GainNode AudioParam curves rendered as PCM from constant1; same350→0/Nyquist12ms targets as filter markers. No filtering or posthoc alignment."
+    },
+    {
+      "rate": 48000,
+      "firstNativeHighpassZero": 5888,
+      "firstPredictedFloat32HighpassZero": 63263,
+      "firstNativeLowpassNyquist": 5760,
+      "firstPredictedFloat32LowpassNyquist": 9794,
+      "maxHighError": 0.01272369734942913,
+      "maxLowError": 1.07421875,
+      "samples": [
+        {
+          "frame": 4800,
+          "nativeHighpass": 0.08412931859493256,
+          "nativeLowpass": 23994.31640625,
+          "float32Highpass": 0.08412931859493256,
+          "float32Lowpass": 23994.314453125
+        },
+        {
+          "frame": 9600,
+          "nativeHighpass": 0,
+          "nativeLowpass": 24000,
+          "float32Highpass": 0.000020222119928803295,
+          "float32Lowpass": 23999.998046875
+        },
+        {
+          "frame": 12000,
+          "nativeHighpass": 0,
+          "nativeLowpass": 24000,
+          "float32Highpass": 3.135207862214884e-7,
+          "float32Lowpass": 24000
+        },
+        {
+          "frame": 14400,
+          "nativeHighpass": 0,
+          "nativeLowpass": 24000,
+          "float32Highpass": 4.8607802227707e-9,
+          "float32Lowpass": 24000
+        },
+        {
+          "frame": 19200,
+          "nativeHighpass": 0,
+          "nativeLowpass": 24000,
+          "float32Highpass": 1.1683832070244482e-12,
+          "float32Lowpass": 24000
+        },
+        {
+          "frame": 38400,
+          "nativeHighpass": 0,
+          "nativeLowpass": 24000,
+          "float32Highpass": 3.900340938078543e-27,
+          "float32Lowpass": 24000
+        },
+        {
+          "frame": 62400,
+          "nativeHighpass": 0,
+          "nativeLowpass": 24000,
+          "float32Highpass": 2.802596928649634e-45,
+          "float32Lowpass": 24000
+        }
+      ],
+      "scope": "Actual native GainNode AudioParam curves rendered as PCM from constant1; same350→0/Nyquist12ms targets as filter markers. No filtering or posthoc alignment."
+    },
+    {
+      "rate": 96000,
+      "firstNativeHighpassZero": 11648,
+      "firstPredictedFloat32HighpassZero": 126525,
+      "firstNativeLowpassNyquist": 11648,
+      "firstPredictedFloat32LowpassNyquist": 19596,
+      "maxHighError": 0.014218974858522415,
+      "maxLowError": 1.9375,
+      "samples": [
+        {
+          "frame": 9600,
+          "nativeHighpass": 0.08412934839725494,
+          "nativeLowpass": 47988.55859375,
+          "float32Highpass": 0.08412931859493256,
+          "float32Lowpass": 47988.546875
+        },
+        {
+          "frame": 19200,
+          "nativeHighpass": 0,
+          "nativeLowpass": 48000,
+          "float32Highpass": 0.000020222119928803295,
+          "float32Lowpass": 47999.99609375
+        },
+        {
+          "frame": 24000,
+          "nativeHighpass": 0,
+          "nativeLowpass": 48000,
+          "float32Highpass": 3.135207862214884e-7,
+          "float32Lowpass": 48000
+        },
+        {
+          "frame": 28800,
+          "nativeHighpass": 0,
+          "nativeLowpass": 48000,
+          "float32Highpass": 4.8607802227707e-9,
+          "float32Lowpass": 48000
+        },
+        {
+          "frame": 38400,
+          "nativeHighpass": 0,
+          "nativeLowpass": 48000,
+          "float32Highpass": 1.1683832070244482e-12,
+          "float32Lowpass": 48000
+        },
+        {
+          "frame": 76800,
+          "nativeHighpass": 0,
+          "nativeLowpass": 48000,
+          "float32Highpass": 3.900340938078543e-27,
+          "float32Lowpass": 48000
+        },
+        {
+          "frame": 124800,
+          "nativeHighpass": 0,
+          "nativeLowpass": 48000,
+          "float32Highpass": 2.802596928649634e-45,
+          "float32Lowpass": 48000
+        }
+      ],
+      "scope": "Actual native GainNode AudioParam curves rendered as PCM from constant1; same350→0/Nyquist12ms targets as filter markers. No filtering or posthoc alignment."
+    }
+  ],
+  "reason": "comparison-differs",
+  "completedAtUtc": "2026-11-11T01:37:50.362Z"
+}

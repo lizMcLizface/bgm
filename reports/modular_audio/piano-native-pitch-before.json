@@ -1,0 +1,335 @@
+{
+  "kind": "piano.native-voice-comparison",
+  "version": 1,
+  "suite": "pitch-clock-regressions",
+  "engineVersion": "f3d4924f4fa41df1",
+  "sampleRate": 48000,
+  "scope": "Native dry voice before shared compressor/FX; approximate SRC parity, not bit identity or listening",
+  "checksPassed": false,
+  "limits": {
+    "relativeRmsError": 0.005,
+    "correlation": 0.99998
+  },
+  "notes": [
+    {
+      "midi": 48,
+      "time": 0.125,
+      "duration": 0.4,
+      "velocity": 0.3
+    },
+    {
+      "midi": 60,
+      "time": 0.625,
+      "duration": 0.5,
+      "velocity": 0.6
+    },
+    {
+      "midi": 67,
+      "time": 0.625,
+      "duration": 0.5,
+      "velocity": 0.45
+    },
+    {
+      "midi": 72,
+      "time": 1.375,
+      "duration": 0.7,
+      "velocity": 0.8
+    }
+  ],
+  "results": [
+    {
+      "name": "Modal +300c pitch clock",
+      "polyphony": 8,
+      "configVersion": 1,
+      "voiceStats": {
+        "active": 0,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 144000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 3
+      },
+      "notes": [
+        {
+          "midi": 48,
+          "time": 0.0007708333333333333,
+          "duration": 0.25,
+          "velocity": 0.45
+        },
+        {
+          "midi": 60,
+          "time": 0.0026666666666666666,
+          "duration": 0.3,
+          "velocity": 0.6
+        },
+        {
+          "midi": 67,
+          "time": 0.125,
+          "duration": 0.5,
+          "velocity": 0.55
+        },
+        {
+          "midi": 72,
+          "time": 0.625,
+          "duration": 0.7,
+          "velocity": 0.7
+        }
+      ],
+      "warm": false,
+      "controls": [],
+      "cutoff": 1400,
+      "pitchCents": 300,
+      "peak": 0.2590758502483368,
+      "maxError": 0.31689657270908356,
+      "relativeRmsError": 0.33175356629877273,
+      "correlation": 0.9449643139091113
+    },
+    {
+      "name": "Modal -600c pitch clock",
+      "polyphony": 8,
+      "configVersion": 1,
+      "voiceStats": {
+        "active": 0,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 144000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 3
+      },
+      "notes": [
+        {
+          "midi": 48,
+          "time": 0.0007708333333333333,
+          "duration": 0.25,
+          "velocity": 0.45
+        },
+        {
+          "midi": 60,
+          "time": 0.0026666666666666666,
+          "duration": 0.3,
+          "velocity": 0.6
+        },
+        {
+          "midi": 67,
+          "time": 0.125,
+          "duration": 0.5,
+          "velocity": 0.55
+        },
+        {
+          "midi": 72,
+          "time": 0.625,
+          "duration": 0.7,
+          "velocity": 0.7
+        }
+      ],
+      "warm": false,
+      "controls": [],
+      "cutoff": 1400,
+      "pitchCents": -600,
+      "peak": 0.26493072509765625,
+      "maxError": 0.353269562125206,
+      "relativeRmsError": 0.9225649440202376,
+      "correlation": 0.5845140699368915
+    },
+    {
+      "name": "Acoustic +300c pitch clock",
+      "polyphony": 8,
+      "configVersion": 1,
+      "voiceStats": {
+        "active": 0,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 144000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 3
+      },
+      "notes": [
+        {
+          "midi": 48,
+          "time": 0.0007708333333333333,
+          "duration": 0.25,
+          "velocity": 0.45
+        },
+        {
+          "midi": 60,
+          "time": 0.0026666666666666666,
+          "duration": 0.3,
+          "velocity": 0.6
+        },
+        {
+          "midi": 67,
+          "time": 0.125,
+          "duration": 0.5,
+          "velocity": 0.55
+        },
+        {
+          "midi": 72,
+          "time": 0.625,
+          "duration": 0.7,
+          "velocity": 0.7
+        }
+      ],
+      "warm": false,
+      "controls": [],
+      "cutoff": 11000,
+      "pitchCents": 300,
+      "peak": 0.11467960476875305,
+      "maxError": 0.11118009313941002,
+      "relativeRmsError": 0.31427989987861177,
+      "correlation": 0.9506890739642674
+    },
+    {
+      "name": "Acoustic -600c pitch clock",
+      "polyphony": 8,
+      "configVersion": 1,
+      "voiceStats": {
+        "active": 0,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 144000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 3
+      },
+      "notes": [
+        {
+          "midi": 48,
+          "time": 0.0007708333333333333,
+          "duration": 0.25,
+          "velocity": 0.45
+        },
+        {
+          "midi": 60,
+          "time": 0.0026666666666666666,
+          "duration": 0.3,
+          "velocity": 0.6
+        },
+        {
+          "midi": 67,
+          "time": 0.125,
+          "duration": 0.5,
+          "velocity": 0.55
+        },
+        {
+          "midi": 72,
+          "time": 0.625,
+          "duration": 0.7,
+          "velocity": 0.7
+        }
+      ],
+      "warm": false,
+      "controls": [],
+      "cutoff": 11000,
+      "pitchCents": -600,
+      "peak": 0.1218099594116211,
+      "maxError": 0.16303449124097824,
+      "relativeRmsError": 1.0789777312125743,
+      "correlation": 0.4330936382378657
+    },
+    {
+      "name": "Measured +300c pitch clock",
+      "polyphony": 8,
+      "configVersion": 1,
+      "voiceStats": {
+        "active": 0,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 144000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 4
+      },
+      "notes": [
+        {
+          "midi": 48,
+          "time": 0.0007708333333333333,
+          "duration": 0.25,
+          "velocity": 0.45
+        },
+        {
+          "midi": 60,
+          "time": 0.0026666666666666666,
+          "duration": 0.3,
+          "velocity": 0.6
+        },
+        {
+          "midi": 67,
+          "time": 0.125,
+          "duration": 0.5,
+          "velocity": 0.55
+        },
+        {
+          "midi": 72,
+          "time": 0.625,
+          "duration": 0.7,
+          "velocity": 0.7
+        }
+      ],
+      "warm": false,
+      "controls": [],
+      "cutoff": 11000,
+      "pitchCents": 300,
+      "peak": 0.21763145923614502,
+      "maxError": 0.1459088772535324,
+      "relativeRmsError": 0.303922839283372,
+      "correlation": 0.953813201376438
+    },
+    {
+      "name": "Measured -600c pitch clock",
+      "polyphony": 8,
+      "configVersion": 1,
+      "voiceStats": {
+        "active": 0,
+        "steals": 0,
+        "dropped": 0,
+        "late": 0,
+        "frame": 144000,
+        "peak": 0,
+        "latencyFrames": 0,
+        "peakActive": 4
+      },
+      "notes": [
+        {
+          "midi": 48,
+          "time": 0.0007708333333333333,
+          "duration": 0.25,
+          "velocity": 0.45
+        },
+        {
+          "midi": 60,
+          "time": 0.0026666666666666666,
+          "duration": 0.3,
+          "velocity": 0.6
+        },
+        {
+          "midi": 67,
+          "time": 0.125,
+          "duration": 0.5,
+          "velocity": 0.55
+        },
+        {
+          "midi": 72,
+          "time": 0.625,
+          "duration": 0.7,
+          "velocity": 0.7
+        }
+      ],
+      "warm": false,
+      "controls": [],
+      "cutoff": 11000,
+      "pitchCents": -600,
+      "peak": 0.2022210657596588,
+      "maxError": 0.20773862302303314,
+      "relativeRmsError": 1.0119457145301454,
+      "correlation": 0.5026189966774796
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-import {ReferenceGraph,assertSerialRealtimeAllowed} from './runtime.js?v=237a38efc4a26ecc';
+import {ReferenceGraph,assertSerialRealtimeAllowed} from './runtime.js?v=e5d15eff943d3e5b';
 // Opt-in host I/O only. Existing synth/effects processors remain unchanged.
 class EnsembleBridge extends AudioWorkletProcessor{
  constructor({processorOptions:o}){super();this.stopped=false;this.origin=null;try{

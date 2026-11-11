@@ -62,6 +62,14 @@ reviewable rather than weakening validation or changing sounds to force a pass.
 
 ## Checkpoints
 
+- 11 November ~02:05 UTC: source/desk checkpoint assembled. Graph0696290c05a0caa7
+  includes finite KS voices and Motion. Native BufferSource experiments fixed
+  a real shared piano/KS pitch-clock error. 146 focused tests,39 full-graph
+  allocator cases, normal public build and actual built-browser direct/worklet,
+  independent instance and navigation-reload proofs pass. Deterministic desk
+  final PCM matches native exactly at44.1/48/96k. Original implicit-sum failures
+  and native/native variability are retained. See the source-graph checkpoint.
+
 - 10 November ~23:20 UTC: active goal and bounded heartbeat created/verified;
   three implementation streams dispatched. No new browser or phone gate.
 - Add exact commits, outputs, checks, limitations and next tasks below as slices

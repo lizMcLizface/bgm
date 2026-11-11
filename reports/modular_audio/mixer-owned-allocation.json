@@ -5,9 +5,9 @@
     "kind": "mixer.owned-primitives",
     "version": 1,
     "allocationAudit": true,
-    "wasm": "7553dfe4665f0225c1641aa9ce3cb55a2eeb4a3de0da19b0d673a8b5a6ed179e",
-    "bytes": 68094,
-    "source": "238e09f6adf2915a3013bf291ee7350c88553e0cc380ba4afc045af0a9825d2e"
+    "wasm": "8bd778a052a592b7b6027f0ee68a43bf80301d28b279c12528d93033210403ac",
+    "bytes": 70302,
+    "source": "6ac648bdc87ffcb82b4bde55fe6af435b0325004f66f2579a995e34ab45041c7"
   },
   "pass": true,
   "scope": "Wasm-only owned strip/matrix/fader: same-memory handles, deterministic save/reload, 12ms smoothing/events, pause/cancel/reset; no native Web Audio parity claim.",
@@ -21,8 +21,8 @@
       "grew": false,
       "saveReloadExact": true,
       "independentHandles": 2,
-      "leftSha256": "6a87b46f63ac0dc28c77ecf37afdf0f7b88109cd6003a129db6d3e08c120d04d",
-      "rightSha256": "540a0768f6765106f03eb1ad76ef21b28bba13bb1ef647a4b266a6889f2e3fd2"
+      "leftSha256": "29603f2f058dade4938164749cad19cf3afed382e41ca36d209cd9c374bfc941",
+      "rightSha256": "f639b2f2c4d7e97524239b3fa2717ff51f5e789aa958e4ca12b6129cd1f99c3b"
     },
     {
       "kind": "matrix",
@@ -33,8 +33,8 @@
       "grew": false,
       "saveReloadExact": true,
       "independentHandles": 2,
-      "leftSha256": "600168ae1943166e906a5022f61a91ba63c14d7bd410441ca82946a5d8fcb806",
-      "rightSha256": "db271a883394507f9df2429e058ab4259f7e067ab564c784ef478b8794b810c2"
+      "leftSha256": "c4145e8bb51ff832afdde5de7178f4cffa3a003d5d27e7da9703a3ab657e78a1",
+      "rightSha256": "378e414402e630fc483be04d2e0756dc90b755210214c21beeeef206e8422e38"
     },
     {
       "kind": "fader",
@@ -45,8 +45,8 @@
       "grew": false,
       "saveReloadExact": true,
       "independentHandles": 2,
-      "leftSha256": "a3d9161d445657af4ae8ed9a6887d301e7ae3512ea7798d13720690c324441ad",
-      "rightSha256": "3370632b22cc3c6e5b5b98d08b82a2b107289ed73e75d25bbebdb6488c6425f7"
+      "leftSha256": "972d8eec8b48aecafa52c81d662344014fe8b0d872370dd0807a5b0a13da0a8e",
+      "rightSha256": "946c827e0e8a21aef8606a0216f8d93ab4c6089da30e58e6522357ea8ac87bd5"
     },
     {
       "kind": "strip",
@@ -57,8 +57,8 @@
       "grew": false,
       "saveReloadExact": true,
       "independentHandles": 2,
-      "leftSha256": "2dd700c369977b893094924fc950dfe343c10e7b93f01bd346ff4b781ed70e9d",
-      "rightSha256": "b3c5ac5018cf5abb131676acde7e8bfebeceed53680ed1cb8a60acdc0d5a0f37"
+      "leftSha256": "294cde244f1a726957a279548c5666bf76b3440ce4ca4c49bc74675f2a063dae",
+      "rightSha256": "f1f1d5986e2e74df2cb887ff04d0d4acd6fb271096f2047bb3cfa989dcecef84"
     },
     {
       "kind": "matrix",
@@ -69,8 +69,8 @@
       "grew": false,
       "saveReloadExact": true,
       "independentHandles": 2,
-      "leftSha256": "6bdae5026dfbb63346f27e0ef67962d5e18681818e12d02951687a756289f761",
-      "rightSha256": "68024d218f15eb045f7a1f0d396a2f3b0d9a6bbbb216d609035d987c7a3bad4d"
+      "leftSha256": "c5fc66ddd1dbd335ef59d21057501b8a2f79943397a35df7d7c61fd1bb4aa17c",
+      "rightSha256": "f5eb4982ff4e8ef463f58863373503e958e199000e1ca9b3f1478ae096794c63"
     },
     {
       "kind": "fader",
@@ -81,8 +81,8 @@
       "grew": false,
       "saveReloadExact": true,
       "independentHandles": 2,
-      "leftSha256": "e9d3982032851305a69a0bc30b41f8d0d3e29c7656406bcae375ae0d3bdf2b88",
-      "rightSha256": "889edcfb60d47ce51a669e61fea17ae7cb3c15ae1bf79d163d02991714ebd543"
+      "leftSha256": "95574a1a50ded02aaddd3425bdc543bcef50f86058abad5d9c4d45973a006b96",
+      "rightSha256": "034bd5165f2a8e9dfa06bcdb105f509429378c4dc6bf98467e5c925f42fafdef"
     },
     {
       "kind": "strip",
@@ -93,8 +93,8 @@
       "grew": false,
       "saveReloadExact": true,
       "independentHandles": 2,
-      "leftSha256": "95b50473888a739089558236246ac8112545ecd98386372f151f6eec1c347582",
-      "rightSha256": "e1c04f1d242f186cc5891cfe7647d2cdac74805156ad4eb08d60fb8fb3972fc9"
+      "leftSha256": "35ec78f016e8486eb3ec71224f8d67d0595117d9daefd9aecc4b38bf19308dd1",
+      "rightSha256": "be5d32495236d78320a361194647a45bab0a771c92b612e20e9b3f114fe8e04f"
     },
     {
       "kind": "matrix",
@@ -105,8 +105,8 @@
       "grew": false,
       "saveReloadExact": true,
       "independentHandles": 2,
-      "leftSha256": "4e646977390ebd0e8015966101d27eb075671832ee8a15db1a66fb4244847e00",
-      "rightSha256": "65289ab1706c8ec5044ebea17f6599dfc39d3873a67e35276f9146f907618992"
+      "leftSha256": "f47564309730173e93f84333ae9049dfdc30fc627d7904112b5ae35568d84330",
+      "rightSha256": "74126adc155a7ca88388fe81c928a29f537a1cd8423644da3b1265d7c822e870"
     },
     {
       "kind": "fader",
@@ -117,8 +117,8 @@
       "grew": false,
       "saveReloadExact": true,
       "independentHandles": 2,
-      "leftSha256": "16d781597b48e9a68325e63b9245db8ea61f78455aa3feea87759638cae72622",
-      "rightSha256": "1b8f7e05f7bcfd6fa14840649b0188ee4e00ba83f0daa3c8a89fa8fe20c1b4c1"
+      "leftSha256": "03cb033e3c75cac4e7dbd866019829956ab9c2fff5d486e5df255856d40d482f",
+      "rightSha256": "cb5f057db6d008ac04631468c7bb1c165cd0ad6949ca354bb258673f313d81ec"
     }
   ]
 }

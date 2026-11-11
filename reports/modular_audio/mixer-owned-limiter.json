@@ -5,9 +5,9 @@
     "kind": "mixer.owned-primitives",
     "version": 1,
     "allocationAudit": false,
-    "wasm": "cd4284141d3ef58d865f181315701f00b57f71e3e45a5daf8688f04f635f71a3",
-    "bytes": 68589,
-    "source": "238e09f6adf2915a3013bf291ee7350c88553e0cc380ba4afc045af0a9825d2e"
+    "wasm": "abb416923ee7d39dc871cedf76b6268f317123dc76d8af6c4267587db58d4e3d",
+    "bytes": 70229,
+    "source": "6ac648bdc87ffcb82b4bde55fe6af435b0325004f66f2579a995e34ab45041c7"
   },
   "reference": "public/desk-limiter-processor.js actual process() in isolated Node vm",
   "scope": "Original stereo-linked sample-peak limiter, 3ms ceil delay, 80ms recovery, unchanged algorithms; no true-peak or physical-listening claim.",

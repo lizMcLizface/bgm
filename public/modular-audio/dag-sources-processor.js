@@ -1,4 +1,4 @@
-import {ReferenceGraph,assertSerialRealtimeAllowed} from './runtime.js?v=237a38efc4a26ecc';
+import {ReferenceGraph,assertSerialRealtimeAllowed} from './runtime.js?v=e5d15eff943d3e5b';
 // One Rust DAG owns all six engines, explicit mixing and actual kick-key compression.
 class DagSources extends AudioWorkletProcessor {
  constructor({processorOptions:o}){super();this.stopped=false;this.frame=0;try{

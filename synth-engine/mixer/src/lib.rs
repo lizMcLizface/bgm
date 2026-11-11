@@ -8,36 +8,106 @@ mod allocation_audit;
 pub const TAU_SECONDS: f64 = 0.012;
 pub const MAX_EVENTS: usize = 512;
 pub const MAX_FRAME: u64 = (1u64 << 53) - 1;
+/// Deterministic AudioParam boundary measured against Chromium's native nodes.
+/// Requested parameter authority remains f64; this is the rendered curve profile.
+pub const AUTOMATION_PROFILE: &str = "webaudio-f32-128-target-v1";
+const TARGET_THRESHOLD: f32 = 0.00004539992976248485;
 
 #[derive(Clone, Copy)]
 struct Smooth {
-    value: f64,
+    value: f32,
+    previous: f32,
     target: f64,
-    coefficient: f64,
+    coefficients: [f32; 4],
+    cache: [f32; 4],
+    cache_at: usize,
+    cache_length: usize,
+    frame: u64,
+    start: u64,
+    rate: f64,
+    active: bool,
 }
 impl Smooth {
     fn new(value: f64, rate: f64) -> Self {
+        // Native AudioParams store Float32 values and evaluate target curves in
+        // four-sample groups. This algebra expands four scalar exponential steps.
+        let tau = TAU_SECONDS as f32 as f64;
+        let a = (1. - (-1. / (tau * rate)).exp()) as f32;
         Self {
-            value,
+            value: value as f32,
+            previous: value as f32,
             target: value,
-            coefficient: (-1. / (TAU_SECONDS * rate)).exp(),
+            coefficients: [a, a * (2. - a), a * ((a - 3.) * a + 3.), a * (a * ((4. - a) * a - 6.) + 4.)],
+            cache: [0.; 4], cache_at: 0, cache_length: 0,
+            frame: 0, start: 0, rate, active: false,
         }
     }
     fn set(&mut self, value: f64, settle: bool) {
         self.target = value;
+        self.cache_at = 0;
+        self.cache_length = 0;
+        self.start = self.frame;
         if settle {
-            self.value = value;
+            self.value = value as f32;
+            self.previous = self.value;
+            self.active = false;
+        } else {
+            // A new native target begins at the last computed curve value.
+            self.value = self.previous;
+            self.active = self.value != value as f32;
         }
     }
     fn tick(&mut self) -> f64 {
-        let value = self.value;
-        self.value = self.target + (self.value - self.target) * self.coefficient;
-        value
+        let target = self.target as f32;
+        let value = if !self.active {self.value} else {
+            if self.cache_at == self.cache_length {
+                if self.frame % 128 == 0 && self.frame != self.start {
+                    self.value = self.previous + (target - self.previous) * self.coefficients[0];
+                }
+                // Native target convergence is tested at a canonical callback
+                // boundary (or a newly started target), not on every sample.
+                let boundary = self.frame % 128 == 0 || self.frame == self.start;
+                let threshold = TARGET_THRESHOLD;
+                let elapsed = self.frame as f64 / self.rate;
+                let start = self.start as f64 / self.rate;
+                if boundary && (elapsed > start + 10. * (TAU_SECONDS as f32 as f64)
+                    || target == 0. && self.value.abs() < threshold
+                    || target != 0. && (target - self.value).abs() < threshold * self.value.abs()) {
+                    self.value = target;
+                    self.active = false;
+                } else {
+                    self.cache_length = 4.min(128 - self.frame as usize % 128);
+                    self.cache_at = 0;
+                    if self.cache_length == 4 {
+                        let delta = target - self.value;
+                        self.cache[0] = self.value;
+                        self.cache[1] = self.value + delta * self.coefficients[0];
+                        self.cache[2] = self.value + delta * self.coefficients[1];
+                        self.cache[3] = self.value + delta * self.coefficients[2];
+                        self.value += delta * self.coefficients[3];
+                    } else {
+                        for i in 0..self.cache_length {
+                            self.cache[i] = self.value;
+                            self.value += (target - self.value) * self.coefficients[0];
+                        }
+                    }
+                }
+            }
+            if self.active {let value=self.cache[self.cache_at];self.cache_at+=1;value} else {self.value}
+        };
+        self.previous = value;
+        self.frame += 1;
+        value as f64
     }
 }
 
 #[derive(Clone, Copy)]
 struct Coeff([f64; 5]);
+// Native Biquad's dB conversion is a Float32 exp boundary, separate from the
+// f64 requested parameter ledger and the message-based limiter ceiling.
+fn filter_pow10(value: f64) -> f64 {
+    ((value * std::f64::consts::LN_10) as f32).exp() as f64
+}
 impl Coeff {
     fn gain(gain: f64) -> Self {
         Self([gain, 0., 0., 0., 0.])
@@ -65,12 +135,12 @@ impl Coeff {
                     if frequency == 0. {
                         1.
                     } else {
-                        10f64.powf(gain / 20.)
+                        filter_pow10(gain / 40.).powi(2)
                     }
                 }
                 4 => {
                     if frequency == 0. {
-                        10f64.powf(gain / 20.)
+                        filter_pow10(gain / 40.).powi(2)
                     } else {
                         1.
                     }
@@ -78,15 +148,16 @@ impl Coeff {
                 _ => 1.,
             });
         }
-        let w = 2. * PI * frequency / rate;
+        let w = PI * (frequency / (rate * 0.5));
         let (sin, cos) = w.sin_cos();
-        let a = 10f64.powf(gain / 40.);
+        let a = filter_pow10(gain / 40.);
         let alpha = if kind <= 1 {
-            sin / (2. * 10f64.powf(0.707 / 20.))
+            sin / (2. * filter_pow10((0.707f32 as f64) / 20.))
         } else {
-            sin / (2. * 0.7)
+            sin / (2. * (0.7f32 as f64))
         };
-        let shelf = sin * 2f64.sqrt() * a.sqrt();
+        let shelf_alpha = 0.5 * sin * 2f64.sqrt();
+        let shelf = 2. * a.sqrt() * shelf_alpha;
         let c = match kind {
             0 => [
                 (1. + cos) / 2.,
@@ -129,12 +200,13 @@ impl Coeff {
                 (a + 1.) - (a - 1.) * cos - shelf,
             ],
         };
+        let inverse = 1. / c[3];
         Self([
-            c[0] / c[3],
-            c[1] / c[3],
-            c[2] / c[3],
-            c[4] / c[3],
-            c[5] / c[3],
+            c[0] * inverse,
+            c[1] * inverse,
+            c[2] * inverse,
+            c[4] * inverse,
+            c[5] * inverse,
         ])
     }
 }
@@ -149,12 +221,13 @@ impl History {
     fn tick(&mut self, x: f32, c: Coeff) -> f32 {
         let [b0, b1, b2, a1, a2] = c.0;
         let x = x as f64;
-        let y = b0 * x + b1 * self.x1 + b2 * self.x2 - a1 * self.y1 - a2 * self.y2;
+        // Native Biquad stores the rounded Float32 output in its double history.
+        let y = (b0 * x + b1 * self.x1 + b2 * self.x2 - a1 * self.y1 - a2 * self.y2) as f32;
         self.x2 = self.x1;
         self.x1 = x;
         self.y2 = self.y1;
-        self.y1 = y;
-        y as f32
+        self.y1 = y as f64;
+        y
     }
 }
 

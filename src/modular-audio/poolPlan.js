@@ -11,7 +11,7 @@ export function planSourcePool(raw,contracts,groups=DEFAULT_SOURCE_GROUPS){
   for(const id of sourceIds){const n=patch.modules.find(n=>n.id===id);if(!n||!['legacy.core','legacy.fm','legacy.piano','legacy.iowa','legacy.percussion'].includes(n.type)||(id===6)!==(n.type==='legacy.percussion'))throw Error('Unsupported source partition');}
   const masterModules=patch.modules.filter(n=>!sourceIds.includes(n.id));
   assertSerialRealtimeAllowed({modules:masterModules},contracts);
-  const masterType=type=>['ref.mix','graph.compressor','ref.output','legacy.inserts','legacy.effects','graph.delay','voice.shimmer'].includes(type)||type.startsWith('desk.')||type.startsWith('rack.');
+  const masterType=type=>['ref.mix','graph.compressor','ref.output','legacy.inserts','legacy.effects','graph.delay','voice.shimmer','voice.motion'].includes(type)||type.startsWith('desk.')||type.startsWith('rack.');
   if(masterModules.some(n=>!masterType(n.type))||patch.connections.some(e=>e.kind!=='audio'||sourceIds.includes(e.to.module)||sourceIds.includes(e.from.module)&&!['audio.out','kick.out'].includes(e.from.port)))throw Error('Unsupported cross-stage dependency');
   if(patch.modules.some(n=>n.id===7))throw Error('Reserved kick host ID');
   const owners=new Map(),sourceGroup=new Map(groups.flatMap((g,i)=>g.map(id=>[id,i])));

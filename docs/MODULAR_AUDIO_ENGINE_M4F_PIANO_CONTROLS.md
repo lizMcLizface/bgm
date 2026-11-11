@@ -91,3 +91,59 @@ Next: port native pre-onset voice-steal fades with explicit prepared slot/lifeti
 contracts and forced-polyphony native comparisons. V1/v2 still reject stealing;
 live release/pedal/retune and unported matched/sample piano families remain outside
 this finite slice. The phone's earlier clean M4e acceptance remains separate.
+
+## Native pitch-envelope clock correction (2026-11-11)
+
+The later plucked-source comparison exposed a distinct intrinsic BufferSource
+pitch-envelope boundary that the original small2–3cent piano presets did not
+stress. This is separate from the shared sine/walk input-control reachability
+described above; those controls and their captures are unchanged.
+
+An independent native AudioBufferSource ramp-position probe uses the actual
+1024-frame creation/suspend origin and unchanged setValueAtTime,
+setTargetAtTime/start/stop calls. Sixteen measured cases cover onsets37/128/6000/
+30000, amounts300/-600cents and decay0.2/5seconds. Its saved BufferSource read
+positions show that a fresh intrinsic detune target retains default0 during an
+initial partial quantum. The first full absolute128-frame quantum receives the
+exact initial amount, and the whole exponential target clock begins there.
+The epoch is therefore `ceil(sourceStartFrame/128)*128`; merely zeroing the
+partial quantum while aging from the exact onset is insufficient. Evidence:
+`reports/modular_audio/plucked-native-pitch-probe.json` and the dedicated plucked
+voice document. ConstantSource controls in that probe are not substituted for
+the measured BufferSource cursor.
+
+Before changing piano DSP, six actual piano dry-voice comparisons were added:
+modal strike-only, acoustic Studio Grand and measured House Piano, each with
+positive300cent/0.2s and negative600cent/5s pitch envelopes. Notes start at37,
+128,6000 and30000 relative frames. `?suite=pitch` runs only this fixed subset;
+the normal comparison batch includes it. All six failed on graph
+`f3d4924f4fa41df1`, with worst relative RMS error1.0789777312125743. The original
+failure JSON/PNG remain as `piano-native-pitch-before` evidence.
+
+The precise correction in `piano/src/voice.rs` changes only the intrinsic pitch
+target epoch and adds read-only first-slot cursor stat9 for regression checks.
+It does not change native defaults, bank generation, envelopes, shared controls,
+resampling, source wall-clock stops, filter state, body playback or stealing.
+Sixteen permanent piano cursor tests compare against the saved independent
+native ramp traces, within0.02sample encoded-Float32 measurement tolerance.
+
+All six actual instrument comparisons now pass on graph `ea2845aeebac225a`:
+
+| Native family / envelope | Before relative RMS | After relative RMS |
+| --- | ---: | ---: |
+| Modal +300c |0.3317535663|0.0003050086|
+| Modal -600c |0.9225649440|0.0003918862|
+| Acoustic +300c |0.3142798999|0.0001062433|
+| Acoustic -600c |1.0789777312|0.0000211994|
+| Measured +300c |0.3039228393|0.0000874369|
+| Measured -600c |1.0119457145|0.0000231052|
+
+Worst after-error is0.00039188623684348193 and lowest correlation is
+0.9999999251524614. The original limits remain relative RMS below0.005 and
+correlation above0.99998; no preset or tolerance was altered to make them pass.
+After evidence: `reports/modular_audio/piano-native-pitch-after.json`/PNG.
+The existing31-test piano DAG suite and51 focused native-cursor/plucked-graph
+tests also pass, including all19 piano bank types, modulation, stealing,
+independent owners, save/reload/reset and actual mixed serial/worker buses.
+These are muted dry-voice/native timing checks, not new phone listening or
+physical device deadline claims. Shared FX/default playback remain in place.

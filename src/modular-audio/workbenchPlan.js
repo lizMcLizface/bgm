@@ -9,6 +9,7 @@ import {compileWorkbenchDrums} from './workbenchDrums';
 import {compilePianoNotes} from './pianoCompiler';
 import {compileIowaNotes} from './iowaCompiler';
 import {compileClassicNotes,compileClassicCompositeNotes} from './classicCompiler';
+import {compilePluckedNotes} from './pluckedCompiler';
 export const WORKBENCH_SOURCE_BUDGET=Object.freeze({sampleRate:48000,blockFrames:512,poolBlocks:6,scheduling:'message',maxNotes:2000,maxSeconds:120});
 // Hash only the captured source/score, not executor capacity or later counters.
 // Missing Web Crypto leaves identity unknown; it must not invent a match.
@@ -17,7 +18,7 @@ export async function hashWorkbenchPlan(plan){
 }
 export function compileWorkbenchSource({project,part,role,bpm,source,tune=n=>n,muted=false,allowEmpty=false}){
  if(role==='perc')return compileWorkbenchDrums({project,part,bpm,source,muted,allowEmpty});
- if(!project?.patterns||(!project.patterns[role]&&!allowEmpty)||role==='perc'||!['subtractive','fm','piano','iowa','classic','classic-composite'].includes(source?.kind))throw Error('Rust preview requires a supported pitched source sequence.');
+ if(!project?.patterns||(!project.patterns[role]&&!allowEmpty)||role==='perc'||!['subtractive','fm','piano','iowa','classic','classic-composite','plucked'].includes(source?.kind))throw Error('Rust preview requires a supported pitched source sequence.');
  if(muted)throw Error('The selected sequencer is muted or excluded by solo.');
  if(!Number.isInteger(project.stepsPerBar)||project.stepsPerBar<1||project.stepsPerBar>64||!Number.isInteger(part?.startBar)||part.startBar<0||!Number.isInteger(part.bars)||part.bars<1||part.bars>16||!Number.isFinite(bpm)||bpm<50||bpm>200)throw Error('Unsupported preview progression/tempo bounds.');
  const rate=48000,stepSec=60/bpm/4,start=part.startBar*project.stepsPerBar,length=part.bars*project.stepsPerBar,preroll=.125,random=seeded(project.seed??0x4a11),notes=[];
@@ -25,6 +26,11 @@ export function compileWorkbenchSource({project,part,role,bpm,source,tune=n=>n,m
  const pattern=project.patterns[role]??{mode:'note',follow:'off',length:project.bars*project.stepsPerBar,steps:[]},p={key:project.key,leader:-1,sequencers:[{pattern:structuredClone(pattern),mute:false}]};
  for(let i=0;i<length;i++){const absolute=start+i,ctx={time:preroll+i*stepSec,stepSec,swing:.5,flam:.5,count:i,cycle:0,length,random};for(const e of [...projectStepEvents(p,absolute,ctx),...placedChordEvents(p.sequencers[0].pattern,absolute,{...ctx,key:p.key,track:0})]){const midi=tune(e.note);if(!Number.isFinite(midi)||midi<0||midi>127||!Number.isFinite(e.time)||!Number.isFinite(e.duration)||e.duration<=0||!Number.isFinite(e.velocity)||e.velocity<0||e.velocity>1)throw Error('Invalid captured source note');notes.push({midi,time:Math.max(0,e.time),duration:e.duration,velocity:e.velocity});if(notes.length>WORKBENCH_SOURCE_BUDGET.maxNotes)throw Error('Source preview note capacity exceeded');}}
  if(!notes.length&&!allowEmpty)throw Error('The selected progression has no notes for this sequencer.');
+ if(source.kind==='plucked'){
+  const {config,events,tail}=compilePluckedNotes(source,notes,rate),seconds=Math.max(preroll+length*stepSec,...notes.map(n=>n.time+n.duration))+tail;
+  if(!Number.isFinite(seconds)||seconds>120)throw Error('Plucked preview exceeds120 seconds');
+  return {version:1,role,part:structuredClone(part),bpm,sampleRate:rate,preroll,tailSeconds:tail,endFrame:Math.ceil(seconds*rate),noteCount:notes.length,notes,timingPolicy:'Finite native plucked sample/envelope/filter plans; exact onset frames and absolute128-frame pitch controls',graph:{version:1,modules:[{id:1,type:'legacy.plucked',version:1,parameters:{gain:1},config},{id:18,type:'ref.output',version:1,parameters:{}}],connections:[{id:1,kind:'audio',from:{module:1,port:'audio.out'},to:{module:18,port:'program.in'}}],events}};
+ }
  if(source.kind==='classic'||source.kind==='classic-composite'){
   const composite=source.kind==='classic-composite';if(composite&&source.patch.slots.length>5)throw Error('Classic preview exceeds five pitched source buses');
   const c=composite?compileClassicCompositeNotes(source,notes,rate):compileClassicNotes(source,notes,rate),seconds=Math.max(preroll+length*stepSec,...notes.map(n=>n.time+n.duration))+c.tail;
@@ -59,7 +65,7 @@ export function compileWorkbenchSet({project,part,bpm,sources}){
  const modules=[],connections=[],events=[],captured=[];let noteCount=0,hitCount=0,endFrame=0;
  for(const s of sources){let p;try{p=compileWorkbenchSource({project,part,bpm,...s,allowEmpty:true});}catch(e){throw Error(`${s.role}: ${e.message}`);}
   const sourceId=WORKBENCH_SOURCE_ROLES.indexOf(s.role)+1,parts=p.sources??[{sourceId:p.graph.modules[0].id,role:s.role,kind:s.source.kind,noteCount:p.noteCount,notes:p.notes,tailSeconds:p.tailSeconds,endFrame:p.endFrame}],mapping=new Map(parts.map((part,i)=>[part.sourceId,i===0?sourceId:free.shift()]));
-  for(const part of parts){const id=mapping.get(part.sourceId),module=p.graph.modules.find(m=>m.id===part.sourceId);modules.push({...module,id});captured.push({...part,role:s.role,sourceId:id,...(p.preparation?{preparation:p.preparation}:{}),...(s.role==='perc'?{hitCount:p.hitCount,audibleHitCount:p.audibleHitCount,hits:p.hits,kitVoice:p.kitVoice,hitIdPolicy:p.hitIdPolicy,expression:p.expression}:{})});}
+  for(const part of parts){const id=mapping.get(part.sourceId),module=p.graph.modules.find(m=>m.id===part.sourceId);modules.push({...module,id,...(module.type==='legacy.plucked'?{config:{...module.config,notes:module.config.notes.map(n=>({...n,owner:id}))}}:{})});captured.push({...part,role:s.role,sourceId:id,...(p.preparation?{preparation:p.preparation}:{}),...(s.role==='perc'?{hitCount:p.hitCount,audibleHitCount:p.audibleHitCount,hits:p.hits,kitVoice:p.kitVoice,hitIdPolicy:p.hitIdPolicy,expression:p.expression}:{})});}
   events.push(...p.graph.events.map(e=>({...e,target:mapping.get(e.target),owner:mapping.get(e.target)})));noteCount+=p.noteCount;hitCount+=p.hitCount??0;endFrame=Math.max(endFrame,p.endFrame);
  }
  if(!noteCount&&!hitCount)throw Error('The selected set has no notes or enabled kit hits.');

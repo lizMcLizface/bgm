@@ -1,5 +1,14 @@
 # Modular audio engine handoff
 
+Latest overnight checkpoint (11 November, ~02:05 UTC): read
+[source graph and desk results](MODULAR_AUDIO_ENGINE_OVERNIGHT_SOURCE_GRAPH.md).
+Finite plucked Graph26, Motion Graph25, measured piano/plucked pitch-clock fixes
+and an isolated deterministic desk adapter are verified. Graph0696290c05a0caa7
+passes actual built AudioWorklet/direct equality at44.1/48/96k, two worklets,
+legacy defaults and full-page saved reload. 146 focused source tests and39
+graph allocation cases pass. Independent Tape/weather work continues under the
+bounded09:00 run; no normal backend migration or physical listening is implied.
+
 User workflow instruction (2026-11-09): **commit at the end of every completed
 step, then continue**. This authorizes local commits of verified steps without
 another confirmation. Keep the existing checkout and work; no push/deployment

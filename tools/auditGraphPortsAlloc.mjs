@@ -3,14 +3,19 @@ import fs from 'node:fs';import assert from 'node:assert/strict';import crypto f
 import {ReferenceGraph,savePatch,loadPatch}from '../public/modular-audio/runtime.js';
 import {ownedInsertsSpec}from '../src/modular-audio/ownedInserts.js';import {ownedEffectsSpec}from '../src/modular-audio/ownedEffects.js';
 import {ownedRackFxSpec}from '../src/modular-audio/ownedRackFx.js';import {ownedVoiceFxSpec}from '../src/modular-audio/ownedVoiceFx.js';
+import {ownedMotionSpec}from '../src/modular-audio/ownedMotion.js';import {pluckedStringSpec}from '../src/modular-audio/ownedPluckedString.js';
 const wasm=fs.readFileSync('.tmp/graph-allocation-target/wasm32-unknown-unknown/release/calmbgm_graph.wasm'),module=new WebAssembly.Module(wasm),contracts=JSON.parse(fs.readFileSync('public/modular-audio/contracts.json')),results=[];
 const node=(id,type,config)=>({id,type,version:1,parameters:{},...(config?{config}:{})});
 function fixture(rate,model){
  const mixer=(kind,parameters)=>({version:1,kind,sampleRate:rate,settled:true,parameters,events:[]}),classic={version:1,model,polyphony:4,parameters:[],...([7,12].includes(model)?{waves:Array.from({length:model===7?16384:8192},(_,i)=>Math.fround(Math.sin(i*2*Math.PI/2048)))}:{})};
  const modules=[...Array.from({length:3},(_,i)=>node(i+1,'host.audio')),node(10,'legacy.inserts',ownedInsertsSpec({saturation:.2})),node(11,'legacy.effects',ownedEffectsSpec({reverb:.1,delay:.1})),...['crusher','pitch','zplane'].map((kind,i)=>node(12+i,`rack.${kind}`,ownedRackFxSpec(kind))),node(15,'voice.shimmer',ownedVoiceFxSpec('shimmer',{mix:.1})),node(16,'voice.freeze',ownedVoiceFxSpec('freeze',{mix:.2,length:.25})),{...node(17,'legacy.classic',classic),parameters:{gain:.25}},node(20,'desk.strip',mixer('strip',[1,0,rate/2,0,0,0,0,1])),node(21,'desk.matrix',mixer('matrix',[1,0])),node(22,'desk.fader',mixer('fader',[.7])),node(23,'desk.limiter',mixer('limiter',[1,.5000000000000001])),{...node(24,'ref.mix'),parameters:{gain:.5}},node(30,'ref.output')],connections=[];
+ modules.push(node(18,'voice.motion',ownedMotionSpec({tremoloDepth:.4,autoPanDepth:.3})));
  const edge=(from,to,input='program.in')=>connections.push({id:connections.length+1,kind:'audio',from:{module:from,port:'audio.out'},to:{module:to,port:input}});
- const chain=[1,10,11,12,13,14,15,16,20,21,22,23];for(let i=1;i<chain.length;i++)edge(chain[i-1],chain[i]);edge(2,11,'reverb.in');edge(3,11,'delay.in');edge(23,24,'a.in');edge(17,24,'b.in');edge(24,30);
+ const chain=[1,10,11,12,13,14,15,16,18,20,21,22,23];for(let i=1;i<chain.length;i++)edge(chain[i-1],chain[i]);edge(2,11,'reverb.in');edge(3,11,'delay.in');edge(23,24,'a.in');edge(17,24,'b.in');
+ if(rate===48000){modules.push(node(19,'legacy.plucked',{version:1,sampleRate:rate,voices:1,cutoff:8000,q:.7,pitch:300,pitchDecay:.2,banks:[pluckedStringSpec(rate,220,{decay:.5,seed:42})],controls:[],notes:[{id:1,owner:19,bank:0,midi:57,velocity:.5,voice:0,onsetFrame:37,fadeFrame:null,cutFrame:4800,gain:[[0,0,0,0],[0,128,.5,0],[0,4800,0,0]],filter:[[1,0,0,0]]}]}),{...node(25,'ref.mix'),parameters:{gain:.5}});edge(24,25,'a.in');edge(19,25,'b.in');edge(25,30);}else edge(24,30);
  const events=[{kind:'classic',target:17,owner:17,event:0,id:1,a:60,b:.4,frame:37},{kind:'classic',target:17,owner:17,event:1,id:1,a:0,b:0,frame:Math.round(rate*.8)}];
+ if(rate===48000)events.push({kind:'note',target:19,owner:19,event:0,note:1,a:57,b:.5,frame:37});
+ events.push({kind:'parameter',target:18,owner:77,parameter:'autoPanDepth',value:.4567891234567,frame:41});
  for(const [target,parameter,value]of [[10,'drive',3],[12,'bits',6],[13,'semitones',7],[14,'morph',.3],[15,'climb',.2],[16,'hold',1],[22,'level',.30000000000000004],[23,'ceiling',.49999999999999994]])events.push({kind:'parameter',target,owner:77,parameter,value,frame:Math.ceil(rate/128)*128});
  return {version:1,latencyCompensation:true,modules,connections,events};
 }

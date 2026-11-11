@@ -1,8 +1,8 @@
 {
   "kind": "graph.owned-ports-allocation",
   "version": 1,
-  "engineVersion": "5ea550319dc2e5aa",
-  "auditWasmSha256": "d0e6c47bbb77afe86cd52e33d50d75c5f480534e121db8b85c588575fa39c713",
+  "engineVersion": "0696290c05a0caa7",
+  "auditWasmSha256": "40d8865914a53e12a43bb5f55eab1a7d2c7c73b8eaa63987ad0c73d150cac2da",
   "pass": true,
   "scope": "Two full Rust graphs sharing Wasm: exact saved input replay through owned native inserts, three send buses, all three rack FX, Shimmer/seeded Freeze, all four mixer primitives/limiter, raw classic branch and opt-in PDC. Prepared enqueue/render/reset/cancel/pause watched; no native runner, realtime deadline or physical-listening claim.",
   "results": [
@@ -12,10 +12,10 @@
       "handles": 2,
       "latencyFrames": 1029,
       "allocationOrReclamationCalls": 0,
-      "memoryBytes": 26345472,
+      "memoryBytes": 26411008,
       "grew": false,
       "saveReloadExact": true,
-      "peak": 0.03998686000704765
+      "peak": 0.04076315090060234
     },
     {
       "rate": 44100,
@@ -23,10 +23,10 @@
       "handles": 2,
       "latencyFrames": 1029,
       "allocationOrReclamationCalls": 0,
-      "memoryBytes": 39124992,
+      "memoryBytes": 39256064,
       "grew": false,
       "saveReloadExact": true,
-      "peak": 0.044092606753110886
+      "peak": 0.04523002728819847
     },
     {
       "rate": 44100,
@@ -34,10 +34,10 @@
       "handles": 2,
       "latencyFrames": 1029,
       "allocationOrReclamationCalls": 0,
-      "memoryBytes": 27983872,
+      "memoryBytes": 28049408,
       "grew": false,
       "saveReloadExact": true,
-      "peak": 0.04035933315753937
+      "peak": 0.043320197612047195
     },
     {
       "rate": 48000,
@@ -45,10 +45,10 @@
       "handles": 2,
       "latencyFrames": 1040,
       "allocationOrReclamationCalls": 0,
-      "memoryBytes": 27131904,
+      "memoryBytes": 27459584,
       "grew": false,
       "saveReloadExact": true,
-      "peak": 0.040394119918346405
+      "peak": 0.0852249413728714
     },
     {
       "rate": 48000,
@@ -56,10 +56,10 @@
       "handles": 2,
       "latencyFrames": 1040,
       "allocationOrReclamationCalls": 0,
-      "memoryBytes": 39911424,
+      "memoryBytes": 40304640,
       "grew": false,
       "saveReloadExact": true,
-      "peak": 0.046056415885686874
+      "peak": 0.08601661771535873
     },
     {
       "rate": 48000,
@@ -67,10 +67,10 @@
       "handles": 2,
       "latencyFrames": 1040,
       "allocationOrReclamationCalls": 0,
-      "memoryBytes": 28770304,
+      "memoryBytes": 29163520,
       "grew": false,
       "saveReloadExact": true,
-      "peak": 0.040001288056373596
+      "peak": 0.08532053977251053
     },
     {
       "rate": 96000,
@@ -78,10 +78,10 @@
       "handles": 2,
       "latencyFrames": 1184,
       "allocationOrReclamationCalls": 0,
-      "memoryBytes": 36831232,
+      "memoryBytes": 36896768,
       "grew": false,
       "saveReloadExact": true,
-      "peak": 0.04050165042281151
+      "peak": 0.040296830236911774
     },
     {
       "rate": 96000,
@@ -89,10 +89,10 @@
       "handles": 2,
       "latencyFrames": 1184,
       "allocationOrReclamationCalls": 0,
-      "memoryBytes": 49676288,
+      "memoryBytes": 49741824,
       "grew": false,
       "saveReloadExact": true,
-      "peak": 0.043996959924697876
+      "peak": 0.04543095827102661
     },
     {
       "rate": 96000,
@@ -100,10 +100,10 @@
       "handles": 2,
       "latencyFrames": 1184,
       "allocationOrReclamationCalls": 0,
-      "memoryBytes": 38469632,
+      "memoryBytes": 38600704,
       "grew": false,
       "saveReloadExact": true,
-      "peak": 0.04184028506278992
+      "peak": 0.0446990467607975
     }
   ]
 }

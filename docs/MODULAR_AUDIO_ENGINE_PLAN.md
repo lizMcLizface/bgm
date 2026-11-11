@@ -1,5 +1,13 @@
 # Modular audio engine and parallel rendering plan
 
+Overnight checkpoint (11 November, ~02:05 UTC): the opt-in source graph now
+includes finite native plucked voices and Motion; piano/plucked pitch clocks
+follow independent native BufferSource measurements. The isolated owned desk
+passes three-rate native route comparisons using an explicit summing policy.
+See [exact results and limits](MODULAR_AUDIO_ENGINE_OVERNIGHT_SOURCE_GRAPH.md).
+The bounded [overnight run](MODULAR_AUDIO_ENGINE_OVERNIGHT_2026_11_11.md) continues
+until09:00; normal transport adoption remains separate.
+
 Agreed direction: 2026-11-09. Status: **M0/M1, the opt-in M2 percussion/sidechain
 slice, M3a's actual six-role serial baseline, M3b owned FM, M3c owned core,
 M3d pitched DAG, M3e bounded single-worker transport, M3f three-worker source pool

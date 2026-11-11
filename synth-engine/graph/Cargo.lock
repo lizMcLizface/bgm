@@ -13,8 +13,10 @@ dependencies = [
  "calmbgm_inserts",
  "calmbgm_iowa",
  "calmbgm_mixer",
+ "calmbgm_motion_fx",
  "calmbgm_percussion",
  "calmbgm_piano",
+ "calmbgm_plucked_voice",
  "calmbgm_rack_fx",
  "calmbgm_voice_fx",
 ]
@@ -48,12 +50,27 @@ name = "calmbgm_mixer"
 version = "0.1.0"
 
 [[package]]
+name = "calmbgm_motion_fx"
+version = "0.1.0"
+
+[[package]]
 name = "calmbgm_percussion"
 version = "0.1.0"
 
 [[package]]
 name = "calmbgm_piano"
 version = "0.1.0"
+
+[[package]]
+name = "calmbgm_plucked_string"
+version = "0.1.0"
+
+[[package]]
+name = "calmbgm_plucked_voice"
+version = "0.1.0"
+dependencies = [
+ "calmbgm_plucked_string",
+]
 
 [[package]]
 name = "calmbgm_rack_fx"
