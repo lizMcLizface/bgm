@@ -23,7 +23,7 @@ export function loadKernel(){
 }
 
 /** Creates the context synchronously (call from a tap/click), then loads the kernel. */
-export function startLiveSynth({model=MODELS.cs80,params=[],waves=null,rack=cleanRack(),latency='interactive',context:sharedContext,destination,polyphony,onStats=()=>{},onError=()=>{}}={}){
+export function startLiveSynth({model=MODELS.cs80,params=[],waves=null,rack=cleanRack(),latency='interactive',context:sharedContext,destination,polyphony,sourceNodeFactory,onStats=()=>{},onError=()=>{}}={}){
  const Context=window.AudioContext||window.webkitAudioContext;
  const context=sharedContext??new Context({latencyHint:latency});
  // A shared context belongs to its host, which wakes it on Play. Awaiting its
@@ -32,16 +32,19 @@ export function startLiveSynth({model=MODELS.cs80,params=[],waves=null,rack=clea
  let outboard,monitor,node,nativeGate,sourceInput;
  return (async()=>{
   if(!context.audioWorklet)throw Error('Audio needs a secure page: open this over https:// (or localhost), not plain http.');
-  const [module]=await Promise.all([loadKernel(),loadClassicsWorklet(context),resumed]);
+  const captured=sourceNodeFactory?{params:params.map(p=>p.slice()),waves:waves?Float32Array.from(waves):null}:null;
+  const [module]=sourceNodeFactory?(await resumed,[]):await Promise.all([loadKernel(),loadClassicsWorklet(context),resumed]);
+  if(captured){params=captured.params;waves=captured.waves;}
   let stats={active:0,peak:0},outputPeak=0;
   const savedParams=new Map(params.map(([id,value])=>[id,value])),savedControls=new Map();
   let savedWaves=waves?Float32Array.from(waves):null,revision=0,sequenced=false,futureControl=false;
-  node=new AudioWorkletNode(context,'calmbgm-classics',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{module,model,params,waves:savedWaves,polyphony}});
-  await new Promise((resolve,reject)=>{node.port.onmessage=({data})=>{
+  node=sourceNodeFactory?await sourceNodeFactory(context,{model,params,waves:savedWaves,polyphony}):new AudioWorkletNode(context,'calmbgm-classics',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{module,model,params,waves:savedWaves,polyphony}});
+  await new Promise((resolve,reject)=>{if(sourceNodeFactory){if(!node?.port||typeof node.connect!=='function'||!node.ready||typeof node.ready.then!=='function'){reject(Error('Prepared classic source factory must return an actual ready AudioWorkletNode'));return;}node.ready.then(resolve,reject);}node.port.onmessage=({data})=>{
+   node.handleOwnedMessage?.(data);
    if(data.type==='ready')resolve();
    else if(data.type==='error'){reject(Error(data.message));onError(Error(data.message));}
    else if(data.type==='stats'){stats=data;onStats({...data,peak:outputPeak,reduction:outboard?.reduction??0});}
-  };node.onprocessorerror=()=>{const error=Error('Synth worklet failed. Reload the page.');reject(error);onError(error);};});
+  };node.onprocessorerror=()=>{const error=Error('Synth worklet failed. Reload the page.');node.handleOwnedMessage?.({type:'error',message:error.message});reject(error);onError(error);};});
   outboard=await createRack(context,rack,{onError});
   monitor=await createOutputMonitor(context,peak=>{outputPeak=peak;onStats({...stats,peak,reduction:outboard.reduction});});
   // Both paths already contain the native BBD/space/output stage. Inject before
@@ -75,7 +78,7 @@ export function startLiveSynth({model=MODELS.cs80,params=[],waves=null,rack=clea
    requestScope:monitor.requestScope,
    setRack(values){revision++;outboard.patch(values);},clearRack:()=>outboard.clear(),
    panic(){revision++;flush();node.port.postMessage({type:'panic'});outboard.clear();},
-   async close(){if(closed)return;closed=true;flush();node.port.postMessage({type:'dispose'});node.disconnect();nativeGate.disconnect();sourceInput.disconnect();outboard.dispose();monitor.dispose();if(!sharedContext)await context.close().catch(()=>{});},
+   async close(){if(closed)return;closed=true;flush();const stopped=node.disposeOwned?node.disposeOwned():(node.port.postMessage({type:'dispose'}),Promise.resolve());node.disconnect();nativeGate.disconnect();sourceInput.disconnect();outboard.dispose();monitor.dispose();await stopped;if(!sharedContext)await context.close().catch(()=>{});},
   };
- })().catch(error=>{node?.port.postMessage({type:'dispose'});node?.disconnect();nativeGate?.disconnect();sourceInput?.disconnect();outboard?.dispose();monitor?.dispose();if(!sharedContext)context.close().catch(()=>{});throw error;});
+ })().catch(async error=>{if(node?.disposeOwned)await node.disposeOwned();else node?.port.postMessage({type:'dispose'});node?.disconnect();nativeGate?.disconnect();sourceInput?.disconnect();outboard?.dispose();monitor?.dispose();if(!sharedContext)context.close().catch(()=>{});throw error;});
 }

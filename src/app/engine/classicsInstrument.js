@@ -21,15 +21,17 @@ const MONO=new Set(['minimoog']);
 
 /** The generator's instrument contract, on its own clock and role output. */
 export default class ClassicsInstrument {
- static async create({context,preset,polyphony=8}){
+ static async create({context,preset,polyphony=8,sourceNodeFactory}){
   const inst=new ClassicsInstrument(context,preset,polyphony),synth=SYNTHS[preset.classics.synth];
+  inst.sourceNodeFactory=sourceNodeFactory;
   try{
    if(Number.isFinite(context.length)){
-    [inst.module]=await Promise.all([loadKernel(),loadClassicsWorklet(context)]);inst.offlineEvents=[];
+    if(!sourceNodeFactory)[inst.module]=await Promise.all([loadKernel(),loadClassicsWorklet(context)]);inst.offlineEvents=[];
     inst.outboard=await createRack(context,preset.classics.rack,{onError:error=>{inst.error=error;}});inst.outboard.connect(inst.output);inst.output.gain.value=preset.masterVolume??1;return inst;
    }
-   const start=()=>startLiveSynth({context,destination:inst.output,model:synth.model,polyphony,params:inst.pairs(preset.classics.values),waves:wavesOf(synth,preset.classics),rack:preset.classics.rack,onStats:s=>{inst.stats=s;},onError:error=>{inst.error=error;}});
-   inst.lives=await Promise.all(Array.from({length:MONO.has(synth.id)&&polyphony>2?Math.min(polyphony,preset.classics.light?2:4):1},start));inst.live=inst.lives[0];inst.freeAt=inst.lives.map(()=>0);
+   const start=()=>startLiveSynth({context,sourceNodeFactory,destination:inst.output,model:synth.model,polyphony,params:inst.pairs(preset.classics.values),waves:wavesOf(synth,preset.classics),rack:preset.classics.rack,onStats:s=>{inst.stats=s;},onError:error=>{inst.error=error;}});
+   const preparations=Array.from({length:MONO.has(synth.id)&&polyphony>2?Math.min(polyphony,preset.classics.light?2:4):1},start);
+   if(sourceNodeFactory){const results=await Promise.allSettled(preparations);inst.lives=results.filter(r=>r.status==='fulfilled').map(r=>r.value);const failure=results.find(r=>r.status==='rejected');if(failure){await Promise.all(inst.lives.map(l=>l.close()));inst.lives=[];throw failure.reason;}}else inst.lives=await Promise.all(preparations);inst.live=inst.lives[0];inst.freeAt=inst.lives.map(()=>0);
    inst.output.gain.value=preset.masterVolume??1;
    return inst;
   }catch(error){inst.dispose();throw error;}
@@ -53,10 +55,14 @@ export default class ClassicsInstrument {
   return id;
  }
  prepareOffline(){
-  if(!this.offlineEvents||this.offlineNode)return;
-  const synth=SYNTHS[this.preset.classics.synth];
-  this.offlineNode=new AudioWorkletNode(this.AC,'calmbgm-classics',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{module:this.module,model:synth.model,params:this.pairs(this.preset.classics.values),polyphony:this.polyphony,waves:wavesOf(synth,this.preset.classics),events:this.offlineEvents.sort((a,b)=>a[4]-b[4])}});
-  this.offlineNode.port.onmessage=({data})=>{if(data.type==='error')this.error=Error(data.message);};this.offlineNode.connect(this.outboard.input);
+  if(this.disposed)throw Error('Classic instrument is disposed');
+  if(!this.offlineEvents||this.offlineNode)return this.offlinePreparation;
+  if(this.offlinePreparation)return this.offlinePreparation;
+  const synth=SYNTHS[this.preset.classics.synth],options={model:synth.model,params:this.pairs(this.preset.classics.values),polyphony:this.polyphony,waves:wavesOf(synth,this.preset.classics),events:this.offlineEvents.map(e=>e.slice()).sort((a,b)=>a[4]-b[4])};
+  const publish=node=>{if(this.disposed)throw Error('Classic instrument disposed during offline source preparation');this.offlineNode=node;node.port.onmessage=({data})=>{node.handleOwnedMessage?.(data);if(data.type==='error')this.error=Error(data.message);};node.connect(this.outboard.input);};
+  // Preserve the existing one-kernel offline policy, including Mercury D.
+  if(!this.sourceNodeFactory){publish(new AudioWorkletNode(this.AC,'calmbgm-classics',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{module:this.module,...options}}));return;}
+  this.offlinePreparation=(async()=>{let node;try{node=await this.sourceNodeFactory(this.AC,options);if(!node?.ready)throw Error('Owned classic offline source must expose ready');await node.ready;publish(node);}catch(error){this.error=error;if(node){await node.disposeOwned?.();node.disconnect();}throw error;}})();return this.offlinePreparation;
  }
  /** One drum: its pad, at the kit's level for that drum (settings.drumKit), or nothing when it is off. */
  hit(drum,start,velocity){
@@ -98,5 +104,5 @@ export default class ClassicsInstrument {
  holdSourceInputs(){this.captureSources();if(this.held.size)throw Error('Release the classic keyboard before previewing');const releases=[];try{for(const l of this.lives)releases.push(l.holdSourceInput());}catch(error){for(const release of releases)release();throw error;}this.sourceInputs++;let done=false;return ()=>{if(done)return;done=true;this.sourceInputs--;for(const release of releases)release();};}
  holdSourceInput(){this.captureSource();if(this.held.size)throw Error('Release the classic keyboard before previewing');const release=this.live.holdSourceInput();this.sourceInputs++;let done=false;return ()=>{if(done)return;done=true;this.sourceInputs--;release();};}
  activeEffects(){return ['Instrument rack'];}
- dispose(){if(this.disposed)return;this.disposed=true;for(const l of this.lives??[this.live])l?.close();this.offlineNode?.disconnect();this.offlineNode?.port.close();this.outboard?.dispose();this.output.disconnect();}
+ dispose(){if(this.disposed)return;this.disposed=true;for(const l of this.lives??[this.live])l?.close();if(this.offlineNode?.disposeOwned)this.offlineNode.disposeOwned();else this.offlineNode?.port.close();this.offlineNode?.disconnect();this.outboard?.dispose();this.output.disconnect();}
 }

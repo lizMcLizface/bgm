@@ -9,7 +9,7 @@ const MAX_FRAME: u64 = (1u64 << 53) - 1;
 
 /// kind0 note-on(id=key,a=MIDI,b=velocity);1 off(id=key);2 control(id=0..6,a);
 ///3 poly-pressure(id=key,a);4 panic/clear future source events;5 native parameter
-///(id=0..215,a);6 sequence(id=command0..7,a=integer argument index,b=value).
+///(id=0..215,a);6 sequence(id=command0..8,a=integer argument index,b=value).
 #[derive(Clone, Copy, Debug)]
 pub struct Event {
     pub frame: u64,
@@ -156,12 +156,12 @@ impl Source {
                 0 => e.id != 0 && (0. ..=127.).contains(&e.a) && (0. ..=1.).contains(&e.b),
                 1 => e.id != 0,
                 2 => e.id <= 6,
-                3 => e.id != 0 && (0. ..=1.).contains(&e.a),
+                3 => e.id != 0 && ((if matches!(self.model,8|9|10|13)&&matches!(e.id%4,2|3){-1.}else{0.}) ..=1.).contains(&e.a),
                 4 => true,
                 5 => self.valid_parameter(e.id),
                 6 => {
                     matches!(self.model, 8 | 9 | 10 | 11 | 13)
-                        && e.id <= 7
+                        && e.id <= 8
                         && e.a >= 0.
                         && e.a <= 16_777_215.
                         && e.a.fract() == 0.

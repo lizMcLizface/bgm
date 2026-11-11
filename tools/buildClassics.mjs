@@ -31,7 +31,7 @@ if(process.argv[1]===fileURLToPath(import.meta.url)){
   const cargo=process.env.SYNTH_CARGO||(fs.existsSync(localCargo)?localCargo:'cargo');
   const env={...process.env};
   if(cargo===localCargo){env.CARGO_HOME=cargoHome;env.RUSTUP_HOME=path.join(local,'rustup');env.PATH=path.dirname(cargo)+path.delimiter+env.PATH;}
-  const result=spawnSync(cargo,['build','--manifest-path',`${crate}/Cargo.toml`,'--release','--target','wasm32-unknown-unknown'],{cwd:root,env,stdio:'inherit'});
+  const result=spawnSync(cargo,['build','--offline','--manifest-path',`${crate}/Cargo.toml`,'--release','--target','wasm32-unknown-unknown'],{cwd:root,env,stdio:'inherit'});
   if(result.error)throw Error('Install Rust and rustup target add wasm32-unknown-unknown, or set SYNTH_CARGO. '+result.error.message);
   if(result.status)process.exit(result.status);
   const binary=fs.readFileSync(path.join(root,crate,'target/wasm32-unknown-unknown/release/calmbgm_classics.wasm'));

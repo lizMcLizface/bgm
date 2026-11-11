@@ -35,7 +35,7 @@ export function validatePatch(raw, contracts) {
       const param = d.parameters.find(p => p.id === id);
       if (!param || !finite(value) || value < param.min || value > param.max || (['enum','boolean'].includes(param.unit)&&!Number.isInteger(value))) throw Error(`Invalid parameter ${id}`);
     }
-    modules.set(n.id, d);
+    modules.set(n.id,n.type==='legacy.classic'?{...d,classicModel:n.config?.model}:d);
     if(d.type==='host.audio'&&n.config!==undefined&&(n.config?.version!==1||!finite(n.config.latencyFrames)||n.config.latencyFrames<0||n.config.latencyFrames>262144))throw Error('Invalid declared host input latency');
     if(d.type.startsWith('desk.')){n.config=validateMixerConfig(n.config);if(d.type!==`desk.${n.config.kind}`||Object.keys(n.parameters).length||n.config.events.length)throw Error('Mixer graph requires complete matching configuration and graph-owned events');}
     if(['legacy.inserts','legacy.effects'].includes(d.type)){if(Object.keys(n.parameters).length)throw Error('Effects use complete configuration targets');n.config=(d.type==='legacy.inserts'?validateOwnedInsertsSpec:validateOwnedEffectsSpec)(n.config);const settled=d.type==='legacy.inserts';if(n.config.settled!==undefined&&n.config.settled!==settled)throw Error('Unsupported effect startup policy');n.config.settled=settled;}
@@ -109,7 +109,7 @@ function eventPacket(e, modules, connections) {
   if (!frame(e.frame) || !uint(e.owner) || !d) throw Error('Invalid event frame/ownership/target');
   if(d.type==='legacy.classic'){
     if(e.kind==='cancel')return [e.frame,e.target,e.owner,4,0,0];
-    if(e.kind==='classic'&&Number.isInteger(e.event)&&e.event>=0&&e.event<=6&&Number.isInteger(e.id)&&e.id>=0&&e.id<=0xffffffff&&finite(e.a)&&finite(e.b)&&Number.isFinite(Math.fround(e.a))&&Number.isFinite(Math.fround(e.b))){const k=e.event;if([0,1,3].includes(k)&&!e.id||k===0&&(e.a<0||e.a>127||e.b<0||e.b>1)||k===2&&e.id>6||k===3&&(e.a<0||e.a>1)||k===5&&e.id>215||k===6&&(e.id>7||e.a<0||e.a>16777215||!Number.isInteger(e.a)))throw Error('Invalid classic event values');return [e.frame,e.target,e.owner,k,e.id,e.a,e.b];}
+    if(e.kind==='classic'&&Number.isInteger(e.event)&&e.event>=0&&e.event<=6&&Number.isInteger(e.id)&&e.id>=0&&e.id<=0xffffffff&&finite(e.a)&&finite(e.b)&&Number.isFinite(Math.fround(e.a))&&Number.isFinite(Math.fround(e.b))){const k=e.event;if([0,1,3].includes(k)&&!e.id||k===0&&(e.a<0||e.a>127||e.b<0||e.b>1)||k===2&&e.id>6||k===3&&(e.a<([8,9,10,13].includes(d.classicModel)&&[2,3].includes(e.id%4)?-1:0)||e.a>1)||k===5&&e.id>215||k===6&&(e.id>8||e.a<0||e.a>16777215||!Number.isInteger(e.a)))throw Error('Invalid classic event values');return [e.frame,e.target,e.owner,k,e.id,e.a,e.b];}
   }
   if(['legacy.core','legacy.fm','legacy.piano','legacy.iowa','legacy.plucked'].includes(d.type)){
     if(d.type==='legacy.iowa'&&e.kind==='note'&&(![0,1,4].includes(e.event)||e.frame%128!==0))throw Error('Iowa notes require canonical 128-frame ticks');
@@ -148,7 +148,7 @@ export class ReferenceGraph {
     if(this.patch.modules.some(n=>n.type.startsWith('desk.')&&n.config.sampleRate!==sampleRate))throw Error('Mixer sample rate mismatch');
     if(this.patch.modules.some(n=>n.type==='native.compressor.capture'&&n.config.events.some(e=>e.seconds*sampleRate>9007199254740864)))throw Error('Captured native compressor event exceeds exact frame range');
     this.contracts = contracts;
-    this.modules = new Map(this.patch.modules.map(n => [n.id, contracts.modules.find(d => d.type === n.type && d.version === n.version)]));
+    this.modules = new Map(this.patch.modules.map(n => {const d=contracts.modules.find(d => d.type === n.type && d.version === n.version);return [n.id,n.type==='legacy.classic'?{...d,classicModel:n.config.model}:d];}));
     if (engine.graph_api() !== contracts.api) throw Error('Graph ABI mismatch');
     this.handle = engine.graph_new(sampleRate, maxBlock);
     if (!this.handle) throw Error('Invalid sample rate/block size');

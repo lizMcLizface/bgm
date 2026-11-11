@@ -194,7 +194,8 @@ impl Engine {
         true
     }
     pub fn pressure(&mut self, key: u32, value: f32) -> bool {
-        if key == 0 || !value.is_finite() || !(0. ..=1.).contains(&value) {
+        let low=if matches!(self.model,MODEL_TR808|MODEL_TR909|MODEL_TR606|MODEL_TR707)&&matches!(key%4,2|3){-1.}else{0.};
+        if key == 0 || !value.is_finite() || !(low ..=1.).contains(&value) {
             return false;
         }
         call!(&mut self.core,m=>m.poly_pressure(key,value));
@@ -208,7 +209,7 @@ impl Engine {
         true
     }
     pub fn seq(&mut self, cmd: u32, a: u32, b: f32) -> bool {
-        if cmd > 7 || !b.is_finite() {
+        if cmd > 8 || !b.is_finite() {
             return false;
         }
         match &mut self.core {
@@ -266,6 +267,7 @@ impl Engine {
             2 => self.peak as f64,
             3 => self.frame as f64 / self.sr as f64,
             4 => self.frame as f64,
+            10..=12 => {let seq=match &self.core {Core::Drums(m)=>&m.seq,Core::Bass(m)=>&m.seq,_=>return 0.};match index{10=>seq.last_step as f64,11=>seq.last_pattern as f64,_=>seq.running as u32 as f64}},
             7..=9 => match &self.core {Core::Wavetable(m,_)=>m.joy[(index-7)as usize]as f64,_=>0.},
             _ => 0.,
         }
