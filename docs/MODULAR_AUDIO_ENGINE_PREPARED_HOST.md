@@ -12,9 +12,9 @@ transitions, normal owned piano and Iowa sources, fourteen original CLASSIC mode
 VoiceCompressor and owned role pan/level motion. Original Rust weather live
 sources and bounded weather/loop preparation feed the original ambience host.
 It does not translate native oscillator presets into another sound model.
-KS live demand/control histories are still being validated; this environment
-keeps that material on its existing host until acceptance. Ordinary
-compressors, other native effects, shared/private sampled-room adoption, native loop playback
+Original KS live demand/control histories are accepted and selected here.
+Crusher/Pitch/ZPlane also use accepted owned processors through the original
+CLASSIC/All/offline rack wrappers. Ordinary compressors, other native effects, shared/private sampled-room adoption, native loop playback
 and ambience spatial/fade/wander remain explicit continuation boundaries.
 
 A physical source-family edit reconstructs through existing atomic replacement
@@ -28,6 +28,11 @@ prepared workers and routes with the owning host.
 The fixed page `tools/owned-active-host.html` exercises actual normal sources,
 per-role effects, shared master/section routing, ambience, desk controls,
 source leases and cold sound/mixer reconstruction. Current desktop batches:
+
+- Four actual catalog KS materials + piano/Hand: all3 desk/reload paths pass,
+  no cold-preparation lateness (owned-host-physical-final.json).
+- CLASSIC/piano/Iowa with Crusher/Pitch/ZPlane active: all3 pass and9 actual
+  owned plugin nodes are created (owned-host-rack-final.json).
 
 - Mixed Core/FM + two piano + Hand percussion: native desk, owned desk and
   restored owned desk all pass (`owned-host-current-mixed.json`).

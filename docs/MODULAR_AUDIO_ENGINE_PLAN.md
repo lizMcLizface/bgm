@@ -1,3 +1,35 @@
+Prepared-host continuation: original KS live control/demand histories are accepted
+and selected by the explicit runtime environment. The actual All path with four
+KS materials, piano and Hand passes native desk / owned desk / saved reconstruction
+(all3), with no late cold preparations. Accepted Crusher/Pitch/ZPlane factories
+now reach normal CLASSIC, All racks and offline reconstruction. Its actual six-role
+CLASSIC/piano/Iowa path with all three plugins active passes all3 desk/reload cases,
+creating9 owned plugin nodes. Evidence: owned-host-physical-final.json and
+owned-host-rack-final.json under ignored reports/modular_audio.
+
+The effect-family18 cases all pass the original1e-6 bound;16 are exact, high-rate
+ZPlane maxima are1.4210854715202004e-14 and1.1641532182693481e-10. Independent
+instances, saved custom48k reconstruction and ordered rack output are exact.
+The first fixture omitted custom rows on its second independent node; strict
+refusal exposed this and the retained fixture was corrected without DSP changes.
+
+Physical-source10 final cases cover Air/scalar pitch target history, hot sleeping
+controls and held playback across five materials; earlier44 static cases remain
+separately bound to their saved artifacts. Normal host fixtures use the actual
+catalog KS patches, not their older oscillator namesakes. Their preview lease uses
+the piano role because finite KS previews correctly exclude concurrent bookings.
+Defaults and hidden measured-string scope remain unchanged.
+
+Broad regression reached525 files /4219 passing tests /4 skips with one stale
+Iowa disposed-node assertion. The acknowledgement-aware correction and all64
+focused host/lifecycle checks pass; another full suite/public build is pending.
+The ordinary compressor final38 demand/clamping checks pass. A broad rerun
+completed86 cases without a numeric failure before Wasm allocation exhausted
+browser resources; bounded cleanup/rate-shard acceptance precedes normal adoption.
+Next: close that compressor lifecycle checkpoint, shared piano-controller
+adoption, remaining effect families, shared sampled-room latency ownership and
+ambience spatial/loop playback. This is not whole-application Rust completion.
+
 Further checkpoint: [owned original insert/FDN hosts](MODULAR_AUDIO_ENGINE_LIVE_BUS_HOSTS.md)
 now compose local/shared LabVoice routes with sample-bit-exact output in12 bus
 and6 full composition cases. Original CLASSIC live/offline factories are wired

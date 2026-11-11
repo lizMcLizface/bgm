@@ -224,7 +224,7 @@ export function createHost(scene, {seed,settings:storedSettings,deskBackend='nat
         const r = g.roles[role];
         if (!r.ensembleRack) {
             const { createRack } = await import('../effects/graph');
-            const rack = await createRack(g.AC, values);
+            const rack = await createRack(g.AC, values,{pluginFactory:g.audioEnvironment?.rackPluginFactory});
             if (disposed) { rack.dispose(); ensureActive(); }
             r.instrument.output.disconnect();
             if (r.instrument.destinations) r.instrument.destinations = [];
@@ -249,9 +249,9 @@ export function createHost(scene, {seed,settings:storedSettings,deskBackend='nat
                 const {createRack}=await import('../effects/graph');ensureActive();
                 // All async resources are prepared before changing existing links.
                 for(const {role}of SEQUENCERS){
-                    const r=g.roles[role],rack=await createRack(g.AC,mixerRack(rackValues(role),tempo),{onError:error=>console.error('Mixer effects failed',error)});
+                    const r=g.roles[role],rack=await createRack(g.AC,mixerRack(rackValues(role),tempo),{pluginFactory:g.audioEnvironment?.rackPluginFactory,onError:error=>console.error('Mixer effects failed',error)});
                     if(!rack)throw Error('Mixer effects preparation failed');const entry={role,r,rack,insert:null};candidates.push(entry);ensureActive();
-                    if(role==='perc'){entry.insert=await createRack(g.AC,instrumentRack(rackValues(role)));if(!entry.insert)throw Error('Percussion inserts preparation failed');ensureActive();}
+                    if(role==='perc'){entry.insert=await createRack(g.AC,instrumentRack(rackValues(role)),{pluginFactory:g.audioEnvironment?.rackPluginFactory});if(!entry.insert)throw Error('Percussion inserts preparation failed');ensureActive();}
                 }
                 candidate=await prepareDeskBackend(g.AC,SEQUENCERS.map(s=>s.role),{backend:deskBackend,state:deskState});ensureActive();
                 let revision;do{revision=deskRevision;await candidate.patch(deskState);ensureActive();}while(revision!==deskRevision);

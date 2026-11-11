@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run synth:check && npm run synths:check && npm run graph:check && npm run core-live:check && npm run bus-live:check && npm run classic-live:check && npm run ambience-host:check && npm run piano:check && npm run iowa:check && npm run mixer:check && npm run rack-fx:check && npm run voice-fx:check && npm run motion:check && npm run tape:check && npm run plucked:check && npm run plucked-voice:check && npm run weather:check && npm run string-preparation:check && npm run native-compressor:check && npm run string-voice:check && npm run native-compressor-automation:check && npm run convolver:check && npm run ambience-loops:check && npm run string-decay:check && npm run convolver-preparation:check && npm run room-colour:check && npm run iowa-live:check && npm run voice-compressor:check && npm run piano-live:check && npm run voice-compressor-live:check && npm run ensemble:check && vite build",
+    "build": "npm run synth:check && npm run synths:check && npm run graph:check && npm run core-live:check && npm run bus-live:check && npm run classic-live:check && npm run physical-buffer-live:check && npm run rack-live:check && npm run ambience-host:check && npm run piano:check && npm run iowa:check && npm run mixer:check && npm run rack-fx:check && npm run voice-fx:check && npm run motion:check && npm run tape:check && npm run plucked:check && npm run plucked-voice:check && npm run weather:check && npm run string-preparation:check && npm run native-compressor:check && npm run string-voice:check && npm run native-compressor-automation:check && npm run convolver:check && npm run ambience-loops:check && npm run string-decay:check && npm run convolver-preparation:check && npm run room-colour:check && npm run iowa-live:check && npm run voice-compressor:check && npm run piano-live:check && npm run voice-compressor-live:check && npm run ensemble:check && vite build",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -62,7 +62,7 @@
     "audit:percussion-presets": "node tools/auditPercussionPresets.mjs",
     "audit:synth-tone": "node tools/auditSynthTone.mjs",
     "audit:phase4": "node tools/runPhase4Audit.mjs",
-    "build:public": "npm run synth:check && npm run synths:check && npm run graph:check && npm run core-live:check && npm run bus-live:check && npm run classic-live:check && npm run ambience-host:check && npm run piano:check && npm run iowa:check && npm run mixer:check && npm run rack-fx:check && npm run voice-fx:check && npm run motion:check && npm run tape:check && npm run plucked:check && npm run plucked-voice:check && npm run weather:check && npm run string-preparation:check && npm run native-compressor:check && npm run string-voice:check && npm run native-compressor-automation:check && npm run convolver:check && npm run ambience-loops:check && npm run string-decay:check && npm run convolver-preparation:check && npm run room-colour:check && npm run iowa-live:check && npm run voice-compressor:check && npm run piano-live:check && npm run voice-compressor-live:check && npm run ensemble:check && vite build --mode public && node tools/checkPublicBuild.mjs",
+    "build:public": "npm run synth:check && npm run synths:check && npm run graph:check && npm run core-live:check && npm run bus-live:check && npm run classic-live:check && npm run physical-buffer-live:check && npm run rack-live:check && npm run ambience-host:check && npm run piano:check && npm run iowa:check && npm run mixer:check && npm run rack-fx:check && npm run voice-fx:check && npm run motion:check && npm run tape:check && npm run plucked:check && npm run plucked-voice:check && npm run weather:check && npm run string-preparation:check && npm run native-compressor:check && npm run string-voice:check && npm run native-compressor-automation:check && npm run convolver:check && npm run ambience-loops:check && npm run string-decay:check && npm run convolver-preparation:check && npm run room-colour:check && npm run iowa-live:check && npm run voice-compressor:check && npm run piano-live:check && npm run voice-compressor-live:check && npm run ensemble:check && vite build --mode public && node tools/checkPublicBuild.mjs",
     "predeploy": "npm test && npm run build:public",
     "deploy": "node tools/checkPublicBuild.mjs && gh-pages -d dist-public --dotfiles",
     "render": "vite-node tools/render.js --",
@@ -134,7 +134,11 @@
     "bus-live:check": "node tools/buildOwnedBusLive.mjs --check",
     "patch-transition:audit": "node tools/auditPatchTransition.mjs",
     "ambience-host:check": "node tools/buildOwnedAmbienceHost.mjs --check",
-    "core-live:check": "node tools/buildOwnedCoreLive.mjs --check"
+    "core-live:check": "node tools/buildOwnedCoreLive.mjs --check",
+    "physical-buffer-live:check": "node tools/buildPhysicalBufferLive.mjs --publish --check",
+    "physical-buffer-live:build": "node tools/buildPhysicalBufferLive.mjs --publish",
+    "rack-live:check": "node tools/buildOwnedRackPlugins.mjs --check",
+    "rack-live:build": "node tools/buildOwnedRackPlugins.mjs"
   },
   "dependencies": {
     "fflate": "^0.8.3",

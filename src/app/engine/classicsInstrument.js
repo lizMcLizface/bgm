@@ -21,15 +21,15 @@ const MONO=new Set(['minimoog']);
 
 /** The generator's instrument contract, on its own clock and role output. */
 export default class ClassicsInstrument {
- static async create({context,preset,polyphony=8,sourceNodeFactory}){
+ static async create({context,preset,polyphony=8,sourceNodeFactory,rackPluginFactory}){
   const inst=new ClassicsInstrument(context,preset,polyphony),synth=SYNTHS[preset.classics.synth];
   inst.sourceNodeFactory=sourceNodeFactory;
   try{
    if(Number.isFinite(context.length)){
     if(!sourceNodeFactory)[inst.module]=await Promise.all([loadKernel(),loadClassicsWorklet(context)]);inst.offlineEvents=[];
-    inst.outboard=await createRack(context,preset.classics.rack,{onError:error=>{inst.error=error;}});inst.outboard.connect(inst.output);inst.output.gain.value=preset.masterVolume??1;return inst;
+    inst.outboard=await createRack(context,preset.classics.rack,{pluginFactory:rackPluginFactory,onError:error=>{inst.error=error;}});inst.outboard.connect(inst.output);inst.output.gain.value=preset.masterVolume??1;return inst;
    }
-   const start=()=>startLiveSynth({context,sourceNodeFactory,destination:inst.output,model:synth.model,polyphony,params:inst.pairs(preset.classics.values),waves:wavesOf(synth,preset.classics),rack:preset.classics.rack,onStats:s=>{inst.stats=s;},onError:error=>{inst.error=error;}});
+   const start=()=>startLiveSynth({context,sourceNodeFactory,rackPluginFactory,destination:inst.output,model:synth.model,polyphony,params:inst.pairs(preset.classics.values),waves:wavesOf(synth,preset.classics),rack:preset.classics.rack,onStats:s=>{inst.stats=s;},onError:error=>{inst.error=error;}});
    const preparations=Array.from({length:MONO.has(synth.id)&&polyphony>2?Math.min(polyphony,preset.classics.light?2:4):1},start);
    if(sourceNodeFactory){const results=await Promise.allSettled(preparations);inst.lives=results.filter(r=>r.status==='fulfilled').map(r=>r.value);const failure=results.find(r=>r.status==='rejected');if(failure){await Promise.all(inst.lives.map(l=>l.close()));inst.lives=[];throw failure.reason;}}else inst.lives=await Promise.all(preparations);inst.live=inst.lives[0];inst.freeAt=inst.lives.map(()=>0);
    inst.output.gain.value=preset.masterVolume??1;
