@@ -1,0 +1,25 @@
+// @vitest-environment node
+import fs from 'node:fs';
+import {it,expect} from 'vitest';
+import {OwnedVoiceFx,ownedVoiceFxSpec,validateOwnedVoiceFxSpec,saveOwnedVoiceFxSpec,loadOwnedVoiceFxSpec,VOICE_FX_PARAMETERS} from './ownedVoiceFx';
+const module=new WebAssembly.Module(fs.readFileSync(process.env.OWNED_VOICE_FX_WASM??'public/modular-audio/voice-fx.wasm'));
+const registered=new Map();globalThis.AudioWorkletProcessor=class{constructor(){this.port={};}};globalThis.registerProcessor=(name,C)=>registered.set(name,C);globalThis.sampleRate=48000;await import('../../public/space-processor.js');
+const nativeRandom=Math.random;
+function random(seed){let state=seed>>>0;return()=>{state^=state<<13;state^=state>>>17;state^=state<<5;return(state>>>0)/4294967296;};}
+const signal=(at,n)=>[0,1].map(ch=>Float32Array.from({length:n},(_,i)=>Math.fround(.15*Math.sin((at+i)*(.013+ch*.006))+.03*Math.cos((at+i)*.041))));
+const put=(d,input)=>input.forEach((a,ch)=>d.input[ch].set(a));
+const settings=s=>Object.fromEntries(s.parameters.map(([i,value])=>[VOICE_FX_PARAMETERS[s.kind][i][0],s.kind==='freeze'&&i===1?!!value:value]));
+function render(d,total){const out=[new Float32Array(total),new Float32Array(total)];for(let at=0;at<total;at+=128){const n=Math.min(128,total-at);put(d,signal(at,n));d.render(n);out[0].set(d.left.subarray(0,n),at);out[1].set(d.right.subarray(0,n),at);}return out;}
+it.each(['shimmer','freeze'])('matches actual %s clear messages and callback policies under controlled random draws',kind=>{
+ const s=ownedVoiceFxSpec(kind,kind==='shimmer'?{mix:.7,decay:1.4,semitones:19,climb:.7,tone:5000}:{mix:.7,hold:true,length:.25,fade:.2},109),e=new WebAssembly.Instance(module,{}).exports,d=new OwnedVoiceFx(e,s,48000),Legacy=registered.get(`calmbgm-${kind}`),old=new Legacy(),rng=random(s.seed);old.port.onmessage({data:{type:'set',...settings(s)}});let max=0;
+ try{for(let at=0,k=0;at<70000;k++){const n=Math.min([128,128,37,113,128][k%5],70000-at);if(k===180){d.clear();old.port.onmessage({data:{type:'clear'}});}if(k===300){const edits=kind==='shimmer'?[[2,7],[3,.3]]:[[1,0],[3,.03]];d.patch(edits);old.port.onmessage({data:{type:'set',...settings(d.spec)}});}if(k===420&&kind==='freeze'){d.patch([[1,1]]);old.port.onmessage({data:{type:'set',hold:true}});}const input=signal(at,n),out=[new Float32Array(n),new Float32Array(n)];put(d,input);Math.random=rng;old.process([input],[out]);Math.random=nativeRandom;d.render(n);for(let ch=0;ch<2;ch++)for(let i=0;i<n;i++)max=Math.max(max,Math.abs(out[ch][i]-d.output[ch][i]));at+=n;}expect(max).toBeLessThan(1e-6);}finally{Math.random=nativeRandom;d.dispose();}
+});
+it.each(['shimmer','freeze'])('owns %s recording/filter/RNG state, saves controls and replays exactly after reset',kind=>{
+ const s=ownedVoiceFxSpec(kind,kind==='shimmer'?{mix:.8,semitones:12}:{mix:.7,hold:true,length:.25,fade:.1},4294967295),e=new WebAssembly.Instance(module,{}).exports,a=new OwnedVoiceFx(e,s,48000),b=new OwnedVoiceFx(e,loadOwnedVoiceFxSpec(saveOwnedVoiceFxSpec(s)),48000);a.refresh();try{expect(a.input[0].byteOffset).not.toBe(b.input[0].byteOffset);const pcm=render(a,33001);expect(render(b,33001)).toEqual(pcm);const bStats=b.stats();a.reset();expect(a.stats().frame).toBe(0);expect(a.stats().randomDraws).toBe(0);expect(render(a,33001)).toEqual(pcm);expect(b.stats()).toEqual(bStats);if(kind==='freeze')expect(a.stats().captures).toBeGreaterThan(0);}finally{a.dispose();b.dispose();}a.dispose();expect(()=>a.render(1)).toThrow('Disposed');
+});
+it('preserves the original Shimmer left-only sleep scan rather than inventing a stereo wake rule',()=>{
+ const e=new WebAssembly.Instance(module,{}).exports,d=new OwnedVoiceFx(e,ownedVoiceFxSpec('shimmer',{mix:1}),48000);try{d.input[0].fill(0);d.input[1].fill(.25);for(let i=0;i<20;i++)d.render(128);expect(d.left.slice(0,128).every(v=>v===0)).toBe(true);expect(d.right.slice(0,128).every(v=>v===.25)).toBe(true);expect(d.stats().energyOrClouds).toBe(0);}finally{d.dispose();}
+});
+it.each(['shimmer','freeze'])('rejects malformed %s controls/RNG, atomic edits and raw bounds',kind=>{
+ const s=ownedVoiceFxSpec(kind),e=new WebAssembly.Instance(module,{}).exports,d=new OwnedVoiceFx(e,s,48000);try{for(const edit of [s=>s.version=2,s=>s.seed=0,s=>s.random='native-global',s=>s.parameters.pop(),s=>s.parameters[0][1]=Infinity,s=>s.parameters[1]=s.parameters[0]]){const bad=structuredClone(s);edit(bad);expect(()=>validateOwnedVoiceFxSpec(bad)).toThrow();}for(const p of [[[0,.5],[99,0]],[[0,.5],[0,.7]],[[0,NaN]]]){expect(()=>d.patch(p)).toThrow();expect(d.spec).toEqual(s);}if(kind==='freeze')expect(e.voice_fx_owned_param(d.handle,1,.5)).toBe(0);expect(e.voice_fx_owned_param(d.handle,99,0)).toBe(0);expect(e.voice_fx_owned_render(d.handle,2049)).toBe(0);expect(e.voice_fx_owned_input(d.handle,2)).toBe(0);expect(e.voice_fx_owned_new(1,48000,0)).toBe(0);expect(e.voice_fx_owned_new(1,48000.5,1)).toBe(0);expect(e.voice_fx_owned_new(99,48000,1)).toBe(0);const before=d.stats();d.render(0);expect(d.stats()).toEqual(before);}finally{d.dispose();}
+});

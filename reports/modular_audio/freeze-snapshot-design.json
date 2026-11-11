@@ -1,0 +1,24 @@
+{
+  "kind": "freeze.snapshot-design-counterexample",
+  "version": 1,
+  "acceptedOptimization": false,
+  "scope": "Original Freeze fixture has two audible clouds, changes requested capture length from1s to.25s and attempts capture from silence; the energy gate fails after copying into the candidate.",
+  "observed": {
+    "sampleRate": 8000,
+    "candidateOldLengthFrames": 8000,
+    "failedCapturePrefixFrames": 2000,
+    "unchangedSuffixFrames": 6000,
+    "candidateRemainsAudible": true,
+    "captureStillWaiting": true,
+    "maxOutputErrorIfFailedCopyIgnored": 0.000565066933631897,
+    "maxOutputErrorIfOldSuffixDiscarded": 0.0007624328136444092
+  },
+  "implications": [
+    "A failed capture still mutates the fading candidate cloud audio.",
+    "When length shrinks, the old readable suffix survives a failed capture.",
+    "A single new snapshot window per cloud cannot represent that prefix-plus-older-suffix state.",
+    "An exact snapshot implementation needs a bounded piecewise history representation or another proven design.",
+    "The quarter-energy eligibility check also needs separate exactness/performance treatment; storage metadata alone does not make capture O(1)."
+  ],
+  "next": "Keep the allocator-free v1 core experimental/worker-backed. No naive copy-on-write replacement is integrated."
+}

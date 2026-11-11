@@ -2800,3 +2800,28 @@ worker audition passes with all six source/channel peaks positive, no underruns,
 master peak0.11625781655311584. Evidence iowa-preparation-full-path-browser.json,
 iowa-preparation-audible-browser.json and screenshots under reports/modular_audio.
 These are routed output/counters, not new physical listening or phone acceptance.
+
+
+### Owned rack and voice effects (overnight 2026-11-11)
+
+Crusher/Pitch/ZPlane and Shimmer/Freeze now have owned portable Rust engines,
+dedicated public Wasm assets and independent save/reload adapters. No default
+backend changed. Published rack build d7303d633df13018 is 71429 bytes;
+voice build 7b490244eb5cd194 is 47438 bytes. The separate instrumented
+audit variants retain their own hashes in the reports.
+
+Actual original-JS comparisons: rack 300 cases,296 bit exact,max sample error
+7.105427357601002e-15; voice72/72 bit exact with the same controlled seeded
+random stream. Nine rack and six voice two-instance cases report zero
+allocation/reclamation/growth after preparation. Fifteen permanent tests pass
+against the published assets. Original unseeded Freeze output is not claimed
+identical. Native Tape/Motion WebAudio graphs remain a host boundary.
+
+Freeze retains its synchronous four-second capture copy. The latest rerun
+exceeded the128-frame period in8 of12 measured trials;
+retain worker-only realtime policy and no serial fallback. Original hold/clear
+recapture semantics remain. The rejected single-snapshot optimization and its
+counterexamples are recorded in freeze-snapshot-design.json. See
+MODULAR_AUDIO_ENGINE_OWNED_RACK_FX.md and MODULAR_AUDIO_ENGINE_OWNED_VOICE_FX.md.
+Graph adapters and actual routed browser validation are the next integration
+step; standalone audits do not establish device deadlines or listening.

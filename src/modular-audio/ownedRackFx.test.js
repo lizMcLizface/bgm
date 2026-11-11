@@ -1,0 +1,25 @@
+// @vitest-environment node
+import fs from 'node:fs';
+import {it,expect} from 'vitest';
+import {OwnedRackFx,ownedRackFxSpec,validateOwnedRackFxSpec,saveOwnedRackFxSpec,loadOwnedRackFxSpec,RACK_FX_PARAMETERS} from './ownedRackFx';
+const module=new WebAssembly.Module(fs.readFileSync(process.env.OWNED_RACK_FX_WASM??'public/modular-audio/rack-fx.wasm'));
+const registered=new Map();globalThis.AudioWorkletProcessor=class{constructor(){this.port={};}};globalThis.registerProcessor=(name,C)=>registered.set(name,C);globalThis.sampleRate=48000;
+await import('../../public/rack-fx-processor.js');
+const custom={a:Array.from({length:12},(_,i)=>[100*1.4**i,70+i*90,i%2?-17:12]),b:Array.from({length:12},(_,i)=>[120*1.41**i,30+i*150,i%3?9:-12])};
+const params=s=>Object.fromEntries(s.parameters.map(([i,value])=>[RACK_FX_PARAMETERS[s.kind][i][0],new Float32Array([value])]));
+const signal=(at,n)=>[0,1].map(ch=>Float32Array.from({length:n},(_,i)=>Math.fround(.15*Math.sin((at+i)*(.013+ch*.006))+.03*Math.cos((at+i)*.041))));
+const put=(d,input)=>input.forEach((a,ch)=>d.input[ch].set(a));
+function render(d,total,cadence=[128]){const pcm=[new Float32Array(total),new Float32Array(total)];for(let at=0,k=0;at<total;k++){const n=Math.min(cadence[k%cadence.length],total-at);put(d,signal(at,n));d.render(n);pcm[0].set(d.left.subarray(0,n),at);pcm[1].set(d.right.subarray(0,n),at);at+=n;}return pcm;}
+it.each(['crusher','pitch','zplane'])('matches original %s parameter/custom updates on irregular callbacks',kind=>{
+ const s=ownedRackFxSpec(kind,kind==='zplane'?{a:12,b:12,morph:.3}:{});if(kind==='zplane')s.custom=structuredClone(custom);const e=new WebAssembly.Instance(module,{}).exports,d=new OwnedRackFx(e,s,48000),Legacy=registered.get(`rack-${kind}`),old=new Legacy({processorOptions:{shapes:s.shapes?.map(sections=>({sections}))}});if(kind==='zplane')old.port.onmessage({data:{custom:s.custom}});let max=0;
+ try{for(let at=0,k=0;at<30000;k++){const n=Math.min([1,37,509,113][k%4],30000-at);if(k%11===0){const edits=kind==='crusher'?[[0,2+k%14],[1,1+k%31],[2,.7]]:kind==='pitch'?[[0,-24+k%49],[1,-50+k%101],[2,.6]]:[[0,k%13],[1,(k+5)%13],[2,(k%10)/10],[3,(k%3-1)*.4],[4,.2+k%7/10]];d.patch(edits);s.parameters=d.spec.parameters;}if(kind==='zplane'&&k===33){s.custom={a:custom.b,b:custom.a};d.setCustom(s.custom);old.port.onmessage({data:{custom:s.custom}});}const input=signal(at,n),out=[new Float32Array(n),new Float32Array(n)];put(d,input);old.process([input],[out],params(s));d.render(n);for(let ch=0;ch<2;ch++)for(let i=0;i<n;i++)max=Math.max(max,Math.abs(out[ch][i]-d.output[ch][i]));at+=n;}expect(max).toBeLessThan(1e-6);}finally{d.dispose();}
+});
+it.each(['crusher','pitch','zplane'])('owns %s handles, saves/reloads full data and resets to exact replay',kind=>{
+ const s=ownedRackFxSpec(kind),e=new WebAssembly.Instance(module,{}).exports,a=new OwnedRackFx(e,s,48000),b=new OwnedRackFx(e,loadOwnedRackFxSpec(saveOwnedRackFxSpec(s)),48000);a.refresh();try{expect(a.input[0].byteOffset).not.toBe(b.input[0].byteOffset);const pcm=render(a,11001);expect(render(b,11001)).toEqual(pcm);a.reset();expect(a.stats().frame).toBe(0);expect(b.stats().frame).toBe(11001);expect(render(a,11001)).toEqual(pcm);a.clear();expect(b.stats().frame).toBe(11001);}finally{a.dispose();b.dispose();}a.dispose();expect(()=>a.render(1)).toThrow('Disposed');
+});
+it('preserves JS negative-half rounding, including signed zero, in crusher output',()=>{
+ const s=ownedRackFxSpec('crusher',{bits:3,divide:1,mix:1}),e=new WebAssembly.Instance(module,{}).exports,d=new OwnedRackFx(e,s,48000),Legacy=registered.get('rack-crusher'),old=new Legacy(),input=[new Float32Array([-.125,-.375,-.625,.125,.375]),new Float32Array([0,0,0,0,0])],out=[new Float32Array(5),new Float32Array(5)];try{put(d,input);old.process([input],[out],params(s));d.render(5);expect(Array.from(d.left.subarray(0,5))).toEqual(Array.from(out[0]));expect(Object.is(d.left[0],-0)).toBe(true);}finally{d.dispose();}
+});
+it('rejects malformed shapes, atomic edit failures, immutable built-in edits and unsupported raw operations',()=>{
+ const s=ownedRackFxSpec('zplane');for(const edit of [s=>s.version=2,s=>s.parameters.pop(),s=>s.parameters[0][1]=Infinity,s=>s.parameters[1]=s.parameters[0],s=>s.shapes[0].pop(),s=>s.custom.a[0][0]=0,s=>s.custom.b[0][2]=31]){const invalid=structuredClone(s);edit(invalid);expect(()=>validateOwnedRackFxSpec(invalid)).toThrow();}const e=new WebAssembly.Instance(module,{}).exports,d=new OwnedRackFx(e,s,48000);try{for(const p of [[[0,1],[99,0]],[[0,1],[0,2]],[[2,NaN]]]){expect(()=>d.patch(p)).toThrow();expect(d.spec).toEqual(s);}expect(()=>d.setCustom({a:[[440,40,10]],b:custom.b})).toThrow();expect(d.spec).toEqual(s);expect(e.rack_fx_owned_shape_row(d.handle,0,0,440,40,10)).toBe(0);expect(e.rack_fx_owned_shape_count(d.handle,12)).toBe(0);expect(e.rack_fx_owned_render(d.handle,2049)).toBe(0);expect(e.rack_fx_owned_input(d.handle,2)).toBe(0);expect(e.rack_fx_owned_new(99,48000)).toBe(0);expect(e.rack_fx_owned_new(1,NaN)).toBe(0);expect(()=>d.render(-1)).toThrow('bounds');}finally{d.dispose();}
+});

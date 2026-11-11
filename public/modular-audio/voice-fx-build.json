@@ -1,0 +1,9 @@
+{
+  "api": 1,
+  "source": "af6dcf1961e6b33edfda51b9b4bd645934c22b787029e91ea537a5eada3e3784",
+  "runtime": "a36d62d5d8750bd84791254392c50d51afa05379a92b94a44ac639e5ac35dee0",
+  "wasm": "3f52f16c9ce26e4fe37907f22b984625c6e71d04bec054cab7d3dc52363085b5",
+  "bytes": 47438,
+  "audited": false,
+  "version": "7b490244eb5cd194"
+}
