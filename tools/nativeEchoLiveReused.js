@@ -1,0 +1,25 @@
+import {createNativeEcho} from '../src/synth-lab/nativeEcho.js';
+import {prepareNativeEchoLive} from '../src/modular-audio/nativeEchoLiveNode.js';
+import {saveNativeEchoSpec,loadNativeEchoSpec} from '../src/modular-audio/ownedNativeEcho.js';
+import captureUrl from './liveVoiceCompressorCapture.worklet.js?worker&url';
+const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+function limited(promise,label){let timer;return Promise.race([promise,new Promise((_,reject)=>timer=setTimeout(()=>reject(Error(label+' timed out')),10000))]).finally(()=>clearTimeout(timer));}
+function metric(a,b){let maxAbs=0,error=0,energy=0,peak=0;for(let c=0;c<2;c++)for(let i=0;i<a[c].length;i++){const d=a[c][i]-b[c][i];if(!Number.isFinite(d))throw Error('Nonfinite echo capture');maxAbs=Math.max(maxAbs,Math.abs(d));error+=d*d;energy+=b[c][i]*b[c][i];peak=Math.max(peak,Math.abs(b[c][i]));}return{maxAbs,relativeRMS:Math.sqrt(error/Math.max(energy,1e-30)),peak};}
+export async function runNativeEchoReused(progress=()=>{}){
+ const context=new AudioContext({sampleRate:48000}),cases=[];let saved;
+ try{await limited(context.resume(),'Echo live startup');await context.suspend();const factory=await prepareNativeEchoLive(context);await context.audioWorklet.addModule(captureUrl);
+  for(let round=0;round<3;round++){
+   progress('Reused echo round '+(round+1)+'/3');await context.suspend();
+   const frames=128*Math.ceil(context.sampleRate*1.5/128),start=Math.round(context.currentTime*context.sampleRate),settings=round===2?loadNativeEchoSpec(saved).parameters:{delay:.6,delayMs:83,feedback:.71,tone:1300,pingPong:round%2},native=await createNativeEcho(context,settings),owners=[],links=[],errors=[],merge=context.createChannelMerger(8),source=context.createBufferSource(),buffer=context.createBuffer(2,frames+128,context.sampleRate);
+   const capture=new AudioWorkletNode(context,'live-compressor-capture',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[1],channelCount:8,channelCountMode:'explicit',channelInterpretation:'discrete',processorOptions:{start,frames}}),done=limited(new Promise((resolve,reject)=>{capture.port.onmessage=({data})=>{if(data.kind==='complete')resolve(data);};capture.onprocessorerror=()=>reject(Error('Echo live capture failed'));}),'Echo live capture');done.catch(()=>{});
+   const pair=(output,base)=>{const split=context.createChannelSplitter(2);output.connect(split);split.connect(merge,0,base);split.connect(merge,1,base+1);links.push(split);return split;};
+   try{
+    for(let i=0;i<2;i++)owners.push(await factory(context,settings,{onError:e=>errors.push(String(e))}));
+    const targets=[pair(native.output,0),...owners.map((o,i)=>pair(o.output,2+i*2))];pair(source,6);merge.connect(capture);capture.connect(context.destination);
+    for(let c=0;c<2;c++)for(let i=0;i<buffer.length;i++)buffer.getChannelData(c)[i]=Math.fround(.12*Math.sin(i*(c?.019:.031)+round*.4)+.03*Math.cos(i*.051));source.buffer=buffer;source.connect(native.input);for(const o of owners)source.connect(o.input);source.start(start/context.sampleRate);source.stop((start+Math.round(context.sampleRate*1.1))/context.sampleRate);
+    await context.resume();await limited(Promise.all(owners.map(o=>o.ready)),'Echo ready');await pause(180);await context.suspend();native.clear();await Promise.all(owners.map(o=>o.clear()));await context.resume();await pause(120);await context.suspend();native.output.disconnect(targets[0]);for(let i=0;i<2;i++){owners[i].output.disconnect(targets[i+1]);owners[i].setHostAwake(false);}await context.resume();await pause(140);await context.suspend();native.output.connect(targets[0]);for(let i=0;i<2;i++){owners[i].output.connect(targets[i+1]);owners[i].setHostAwake(true);}await context.resume();const captured=await done;await context.suspend();const pcm=base=>[captured.pcm[base],captured.pcm[base+1]],nativeDiff=metric(pcm(2),pcm(0)),independent=metric(pcm(4),pcm(2)),stats=await Promise.all(owners.map(o=>o.requestStats()));saved=saveNativeEchoSpec(owners[0].snapshot());cases.push({round,start,frames,settings,native:nativeDiff,independentMaxAbs:independent.maxAbs,stats,globalFrames:captured.globalFrames,errors,pass:nativeDiff.maxAbs<=1e-6&&nativeDiff.relativeRMS<=1e-6&&nativeDiff.peak>1e-6&&independent.maxAbs===0&&!errors.length&&stats.every(s=>s.clears===1)});if(!cases.at(-1).pass)break;
+   }finally{try{source.stop();}catch{}source.disconnect();native.dispose();await Promise.all(owners.map(o=>o.dispose()));for(const link of links)link.disconnect();merge.disconnect();capture.disconnect();capture.port.close();}
+  }
+  return{kind:'echo.original-native-reused-live',version:1,engineVersion:factory.engineVersion,hostVersion:factory.hostVersion,sampleRate:context.sampleRate,muted:true,listening:'not assessed',scope:'Three actual live rounds in one context; original Native/owned/independent same-callback capture. Suspended clear and explicit offroute owner demand; ended source/tails; JSON reconstruction. No fitted gain, PCM shift or native coefficient bridge.',cases,pass:cases.length===3&&cases.every(c=>c.pass)};
+ }finally{await context.close();}
+}

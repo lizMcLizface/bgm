@@ -1,0 +1,8 @@
+{
+  "api": 1,
+  "profile": "native-echo-explicit-live-pull-v1",
+  "source": "8b52ef32a6a2e2f23c1066b2dc8db2a78fd5deb47918d6996d718dbd81554d64",
+  "kernelVersion": "a99400a9a23f9a8f",
+  "wasm": "c68f36537394bde88dae0945e7c475884595e4866aed085f8037355595188cd3",
+  "version": "ab1b41b6a9044dc5"
+}
