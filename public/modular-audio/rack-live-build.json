@@ -1,0 +1,17 @@
+{
+  "api": 1,
+  "profile": "owned-rack-native-k-rate-v1",
+  "source": "e44b8b71ac366789d195f911e2ff6d363af0899bfb975c560627ff036821de7e",
+  "kernelVersion": "3346ad1568b8b456",
+  "wasm": "6f78ce5a26ebabc1030057f59c4f31a4d2a229972e16aad89c599f9ebc2bbe4a",
+  "version": "106c5308d6d8bab1",
+  "files": [
+    "src/modular-audio/rackLive.worklet.js",
+    "src/modular-audio/ownedRackPlugins.js",
+    "src/modular-audio/ownedRackFx.js",
+    "src/synths/effects/extras.js",
+    "src/synths/effects/graph.js",
+    "src/synths/effects/zplaneShapes.js"
+  ],
+  "scope": "Original Crusher/Pitch/ZPlane kernels under native browser k-rate AudioParams and existing rack stage wrappers"
+}

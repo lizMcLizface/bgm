@@ -2,7 +2,7 @@ const mocks=vi.hoisted(()=>({buses:[],inserts:[],extras:[],drives:[],bus:vi.fn()
 vi.mock('./driveStage',()=>({createDriveStage:(_context,kind)=>{const s={...stage(kind),peak:.4};mocks.drives.push(s);return s;}}));
 vi.mock('../../synth-lab/effects',()=>({createEffectsBus:(...args)=>mocks.bus(...args)}));
 vi.mock('../../synth-lab/inserts',()=>({createInstrumentInserts:async()=>{const i=stage('insert');mocks.inserts.push(i);return i;}}));
-vi.mock('./extras',()=>({EXTRA_KINDS:['filter','limiter'],createExtraStage:async(_context,kind)=>{const s=stage(kind);mocks.extras.push(s);return s;}}));
+vi.mock('./extras',()=>({EXTRA_KINDS:['filter','limiter'],createExtraStage:async(_context,kind,options)=>{const s={...stage(kind),options};mocks.extras.push(s);return s;}}));
 import {createRack} from './graph';
 import {cleanRack} from './params';
 import {logicalOrder,routingPatch} from './routing';
@@ -47,3 +47,5 @@ it('inserts native drive stages at their serial positions, retains processors on
  const next=structuredClone(graph);next.instances.find(i=>i.id==='boost').params.gain=18;rack.setInstances(next);expect(boost.patch.mock.lastCall[0].params.gain).toBe(18);expect(mocks.drives).toHaveLength(2);expect(rack.meters.drivePeaks).toEqual({boost:.4,fuzz:.4});
  next.chain=['fuzz','eq','boost'];rack.patch(projectInstances(next,raw),false,next);await vi.runAllTimersAsync();expect(fuzz.output.connect).toHaveBeenCalledWith(mocks.inserts[0].input);expect(mocks.inserts[0].node.connect).toHaveBeenLastCalledWith(boost.input);rack.dispose();rack.dispose();expect(boost.dispose).toHaveBeenCalledOnce();expect(fuzz.dispose).toHaveBeenCalledOnce();
 });
+
+it('forwards a prepared optional plugin factory and error callback without changing native stages',async()=>{const pluginFactory=vi.fn(),onError=vi.fn(),rack=await createRack(context(),configured(['filter']),{pluginFactory,onError});expect(mocks.extras[0].options).toMatchObject({pluginFactory,onError,initialPacket:expect.any(Object)});rack.clear();rack.dispose();expect(pluginFactory).not.toHaveBeenCalled();});

@@ -22,7 +22,7 @@ export const spaceStagePacket=(kind,e)=>kind==='reverb'?{...e,delay:0,delayToRev
 // each later effect treats the two channels separately; the compressor (a stereo-linked DynamicsCompressorNode) sees both
 // channels at once, so a compressor after the modulation effects reacts to the combined level and one before them does not;
 // the space unit is stereo in and out (ping-pong and width act on the two channels).
-export async function createRack(context,values,{onError=()=>{},instances=null}={}){
+export async function createRack(context,values,{onError=()=>{},instances=null,pluginFactory}={}){
  const pool=[]; // inserts kernel instances, created as the order needs them
  const extra={}; // added units' stages, created when first put in the chain
  const split={}; // independent reverb/delay buses, also used by legacy reverb-first rigs
@@ -73,7 +73,7 @@ export async function createRack(context,values,{onError=()=>{},instances=null}=
   const runs=stages.filter(s=>s.kind==='inserts');
   while(pool.length<runs.length){const inst=await createInstrumentInserts(context,rackPackets(latest).inserts,{onError});if(disposed){inst.dispose();return false;}pool.push(inst);}
   for(const stage of stages)if((stage.kind==='reverb'||stage.kind==='delay')&&!split[stage.kind]){const bus=await createEffectsBus(context,spaceStagePacket(stage.kind,rackPackets(latest).effects),{onError});if(disposed){bus.dispose();return false;}split[stage.kind]=bus;}
-  for(const stage of stages)if(EXTRA_KINDS.includes(stage.kind)&&!extra[stage.kind]){const made=await createExtraStage(context,stage.kind);if(disposed){made.dispose();return false;}extra[stage.kind]=made;made.patch(rackPackets(latest).extras[stage.kind],true);}
+  for(const stage of stages)if(EXTRA_KINDS.includes(stage.kind)&&!extra[stage.kind]){const made=await createExtraStage(context,stage.kind,{pluginFactory,onError,initialPacket:rackPackets(latest).extras[stage.kind]});if(disposed){made.dispose();return false;}extra[stage.kind]=made;made.patch(rackPackets(latest).extras[stage.kind],true);}
   for(const stage of stages)if(DRIVE_PEDALS[stage.kind]&&!drives[stage.instance.id]){const made=createDriveStage(context,stage.kind);drives[stage.instance.id]=made;made.patch(stage.instance,true);}
   return true;
  };

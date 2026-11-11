@@ -103,22 +103,22 @@ const BUILDERS = {
         node.knee.value = 0; node.ratio.value = 20; node.attack.value = 0.002; node.release.value = 0.09;
         return { input: node, output: node, nodes: [node],get reduction(){return node.reduction;}, patch(p, initial) { smooth(context, node.threshold, p.ceiling, initial); } };
     },
-    async crusher(context) {
-        await loadWorklets(context);
-        const node = new AudioWorkletNode(context, 'rack-crusher', { numberOfInputs: 1, numberOfOutputs: 1, channelCount: 2, channelCountMode: 'explicit', outputChannelCount: [2] });
+    async crusher(context, {pluginFactory,onError}={}) {
+        if(!pluginFactory)await loadWorklets(context);
+        const node = pluginFactory?await pluginFactory(context,{kind:'crusher',onError}):new AudioWorkletNode(context, 'rack-crusher', { numberOfInputs: 1, numberOfOutputs: 1, channelCount: 2, channelCountMode: 'explicit', outputChannelCount: [2] });
         const set = (name, v, initial) => smooth(context, node.parameters.get(name), v, initial);
         return { input: node, output: node, nodes: [node], worklets: [node], patch(p, initial) { set('bits', p.bits, true); set('divide', p.divide, true); set('mix', p.mix, initial); } };
     },
-    async pitch(context) {
-        await loadWorklets(context);
-        const node = new AudioWorkletNode(context, 'rack-pitch', { numberOfInputs: 1, numberOfOutputs: 1, channelCount: 2, channelCountMode: 'explicit', outputChannelCount: [2] });
+    async pitch(context, {pluginFactory,onError}={}) {
+        if(!pluginFactory)await loadWorklets(context);
+        const node = pluginFactory?await pluginFactory(context,{kind:'pitch',onError}):new AudioWorkletNode(context, 'rack-pitch', { numberOfInputs: 1, numberOfOutputs: 1, channelCount: 2, channelCountMode: 'explicit', outputChannelCount: [2] });
         const set = (name, v, initial) => smooth(context, node.parameters.get(name), v, initial);
         return { input: node, output: node, nodes: [node], worklets: [node], patch(p, initial) { set('semitones', p.semi, true); set('cents', p.fine, true); set('mix', p.mix, initial); } };
     },
     // z-plane filter: six pole/zero sections that morph between two shapes (the worklet; see zplaneShapes.js)
-    async zplane(context) {
-        await loadWorklets(context);
-        const node = new AudioWorkletNode(context, 'rack-zplane', { numberOfInputs: 1, numberOfOutputs: 1, channelCount: 2, channelCountMode: 'explicit', outputChannelCount: [2], processorOptions: { shapes: ZPLANE_SHAPES } });
+    async zplane(context, {pluginFactory,onError,initialPacket}={}) {
+        if(!pluginFactory)await loadWorklets(context);
+        const node = pluginFactory?await pluginFactory(context,{kind:'zplane',onError,shapes:ZPLANE_SHAPES,custom:initialPacket?{a:customRows(k=>initialPacket[k],'a'),b:customRows(k=>initialPacket[k],'b')}:undefined}):new AudioWorkletNode(context, 'rack-zplane', { numberOfInputs: 1, numberOfOutputs: 1, channelCount: 2, channelCountMode: 'explicit', outputChannelCount: [2], processorOptions: { shapes: ZPLANE_SHAPES } });
         const set = (name, v, initial) => smooth(context, node.parameters.get(name), v, initial);
         // the custom shapes travel by message, whenever their numbers change
         let sent = '';
@@ -133,23 +133,28 @@ const BUILDERS = {
 export const EXTRA_KINDS = Object.keys(BUILDERS);
 
 /** One added unit as a stage: { input, output, patch(packet, initial), dispose() }. A switched-off unit passes the signal straight through. */
-export async function createExtraStage(context, kind) {
-    const inner = await BUILDERS[kind](context);
-    const input = context.createGain(), output = context.createGain(), through = context.createGain(), wet = context.createGain();
-    input.connect(inner.input); inner.output.connect(wet); wet.connect(output); input.connect(through); through.connect(output);
-    return {
-        input, output,
-        get reduction(){return inner.reduction??0;},
-        patch(packet, initial = false) {
-            inner.patch(packet, initial);
-            smooth(context, wet.gain, packet.on ? 1 : 0, initial); smooth(context, through.gain, packet.on ? 0 : 1, initial);
-        },
-        clear() { inner.fx?.clear(); },
-        dispose() {
-            for (const o of inner.oscillators ?? []) { try { o.stop(); } catch { /* not started */ } }
-            for (const w of inner.worklets ?? []) w.port.postMessage('stop');
-            inner.dispose?.();
-            [input, output, through, wet, ...inner.nodes].forEach((n) => { try { n.disconnect(); } catch { /* already gone */ } });
-        },
+export async function createExtraStage(context, kind, options={}) {
+    const inner = await BUILDERS[kind](context, options), made=[];
+    let disposed=false;
+    const dispose=()=>{
+        if(disposed)return;disposed=true;
+        for (const o of inner.oscillators ?? []) { try { o.stop(); } catch { /* not started */ } }
+        for (const w of inner.worklets ?? []) {try{if(w.disposeOwned)w.disposeOwned();else w.port.postMessage('stop');}catch{/* continue disconnecting a failed worklet */}}
+        try{inner.dispose?.();}finally{for(const n of [...made,...inner.nodes]){try{n.disconnect();}catch{/* already gone */}}}
     };
+    try{
+        const gain=()=>{const n=context.createGain();made.push(n);return n;};
+        const input=gain(), output=gain(), through=gain(), wet=gain();
+        input.connect(inner.input); inner.output.connect(wet); wet.connect(output); input.connect(through); through.connect(output);
+        return {
+            input, output,
+            get reduction(){return inner.reduction??0;},
+            patch(packet, initial = false) {
+                inner.patch(packet, initial);
+                smooth(context, wet.gain, packet.on ? 1 : 0, initial); smooth(context, through.gain, packet.on ? 0 : 1, initial);
+            },
+            clear() { inner.fx?.clear(); },
+            dispose,
+        };
+    }catch(error){try{dispose();}catch{/* retain the original construction failure */}throw error;}
 }
