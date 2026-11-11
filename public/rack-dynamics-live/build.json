@@ -1,0 +1,16 @@
+{
+  "api": 1,
+  "profile": "rack-native-dynamics-e14de735-v1",
+  "liveTransport": "bounded8-authored-target-slots-v1",
+  "acknowledged": true,
+  "primarySources": "32011192c8a269087ceb23c81777422ffc9c239411dd4461217a9f7961cb7a08",
+  "audited": false,
+  "source": "342ce5c1e203fbf4e94f4a6f29ff07ab71c58090fb8b6475d7fc94da3e15c9f9",
+  "runtime": "84d6f5e3b51c864bd115d74f6da8a41c7f9b2efa7c3cfaeb620a99c1e4b2fb0a",
+  "reference": "5e88279ba6f4fc58ed54751df49277d62bb1e32dbd84d5a9e1c0a623388ea20e",
+  "wasm": "c989ae55bb85f1640d63c954cb77976a24a390b9829808ba8ee24de471423fc2",
+  "bytes": 81969,
+  "version": "17cca081c52cf5f8",
+  "processorName": "rack-live-dynamics-17cca081c52cf5f8",
+  "processor": "c3916a5b56bdc765952e4a938f24ff1500a38634a2cc929836fde82acce1b04d"
+}

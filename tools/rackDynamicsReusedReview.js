@@ -1,0 +1,3 @@
+import{runRackDynamicsReused}from'./rackDynamicsReusedBatch.js';
+export{runRackDynamicsReused};
+document.querySelector('#run').onclick=async()=>{const button=document.querySelector('#run');button.disabled=true;try{const r=await runRackDynamicsReused(t=>document.querySelector('#status').textContent=t);document.querySelector('#report').value=JSON.stringify(r,null,2);document.querySelector('#status').textContent=r.pass?'All reused native live cases pass':'Reused native live comparison differs';}catch(error){document.querySelector('#report').value=JSON.stringify({error:String(error),stack:error.stack});document.querySelector('#status').textContent=String(error);}finally{button.disabled=false;}};
