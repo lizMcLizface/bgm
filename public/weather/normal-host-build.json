@@ -1,0 +1,8 @@
+{
+  "api": 1,
+  "source": "de64af1a7dbc5f7998b1811df0099f0f9528527a19c422805d64320359f6080a",
+  "weatherWasm": "0528df540bfb0d4cf9c817118005455d90b04cb69a87b6c28dd4b273d190b8f2",
+  "loopsWasm": "1e0d984c7d3616a9ef18a04171bd07be00d1233d679b999a4fa371c6a6e6463d",
+  "version": "562d4492b36f361e",
+  "scope": "Normal owned weather source and offline worker; owned wind/fire/vinyl preparation. Existing loop playback/spatial/wander remain native."
+}

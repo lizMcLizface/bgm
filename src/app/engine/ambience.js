@@ -156,8 +156,10 @@ class Ambience {
      * @param {number} [options.seed] - for thunder times
      * @param {number} [options.offset] - seconds of the piece elapsed at context time 0 (renders: for the wander)
      */
-    constructor({ context, seed = 1, offset = 0, weatherBuffers = null, loopRenderer = null }) {
+    constructor({ context, seed = 1, offset = 0, weatherBuffers = null, loopRenderer = null, weatherRouteFactory = null, weatherOfflineFactory = null, disposeSources = null }) {
         if (loopRenderer !== null && typeof loopRenderer !== 'function') throw Error('Invalid ambience loop renderer');
+        for(const factory of [weatherRouteFactory,weatherOfflineFactory,disposeSources])if(factory!==null&&typeof factory!=='function')throw Error('Invalid prepared ambience factory');
+        this.weatherOfflineFactory=weatherOfflineFactory;this.disposeSources=disposeSources;this.disposed=false;
         this.loopRenderer = loopRenderer;
         this.offset = offset;
         this.AC = context;
@@ -175,7 +177,7 @@ class Ambience {
         this.running = false;
         this.seed = seed;
         this.weatherBuffers = weatherBuffers;
-        this.weatherRoute = new WeatherBedRoute(context, id => this.chain(id).input, seed);
+        this.weatherRoute = weatherRouteFactory?weatherRouteFactory(context,id=>this.chain(id).input,seed):new WeatherBedRoute(context, id => this.chain(id).input, seed);
         this.weatherPlaying = [];
         this.renderTimers = {};
     }
@@ -309,7 +311,7 @@ class Ambience {
             if (isOffline(this.AC)) {
                 this.weatherPreparation ??= (async () => {
                     if (!this.weatherBuffers) {
-                        this.ownedWeatherOffline = new WeatherBedOffline(this.AC.sampleRate, this.shape, this.levels, this.seed);
+                        this.ownedWeatherOffline = this.weatherOfflineFactory?this.weatherOfflineFactory(this.AC.sampleRate,this.shape,this.levels,this.seed):new WeatherBedOffline(this.AC.sampleRate, this.shape, this.levels, this.seed);
                         this.weatherBuffers = await this.ownedWeatherOffline.render(this.offset, this.AC.length);
                     }
                     this.weatherAudioBuffers = Object.fromEntries(Object.entries(this.weatherBuffers).map(([id, channels]) => [id, toBuffer(this.AC, channels)]));
@@ -427,6 +429,11 @@ class Ambience {
             this.error = error;
             return false;
         });
+    }
+
+    dispose(){
+        if(this.disposed)return;this.disposed=true;this.stop(this.AC.currentTime,0);for(const timer of Object.values(this.renderTimers))clearTimeout(timer);this.weatherRoute.dispose?.();this.ownedWeatherOffline?.dispose();this.disposeSources?.();this.totalLfo.dispose();
+        for(const chain of Object.values(this.chains)){chain.lfo.dispose();for(const part of [chain.input,chain.filter,...chain.shelter,...chain.same,...chain.cross,chain.panner,chain.level,chain.drift])part.disconnect();}this.output.disconnect();this.wanderOut.disconnect();
     }
 
     stopLayer(id, time, fade) {
