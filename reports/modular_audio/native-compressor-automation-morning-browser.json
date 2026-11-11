@@ -1,0 +1,7151 @@
+{
+  "kind": "native-compressor.captured-native-reference",
+  "version": 1,
+  "engineVersion": "3442c80c6b9fd0b6",
+  "wasmSha256": "20f0900ccae3a8f783926f03278c822909af02493b089ea368797066ed00ff28",
+  "createdAtUtc": "2026-11-11T08:07:55.135Z",
+  "browserUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36",
+  "bounds": {
+    "maxAbsoluteError": 0.0001,
+    "relativeRmsError": 0.0001,
+    "reductionDbError": 0.01,
+    "coefficientUlps": 1
+  },
+  "scope": "Original-seconds native step/target automation of the actual fixed-k-rate compressor. Five independent native k-rate Gain parameters on constant1 input mirror the same legal-range schedules for direct coefficient comparisons. The frozen static Rust Engine is reused unchanged. No output alignment/gain fitting, live-default change, external makeup/parallel-host claim, physical listening or realtime scheduling claim.",
+  "pass": true,
+  "comparisons": 48,
+  "maxAbsoluteError": 0.000018715858459472656,
+  "maxRelativeRmsError": 0.0000030208925450543157,
+  "maxCoefficientUlps": 0,
+  "maxReductionDbError": 0,
+  "trials": [
+    {
+      "id": "native-step-controls",
+      "rate": 8000,
+      "channels": 1,
+      "frames": 14080,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            30
+          ],
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 0.001625,
+            "value": -36.123456789
+          },
+          {
+            "parameter": 1,
+            "kind": "step",
+            "seconds": 0.005125,
+            "value": 6.123456789
+          },
+          {
+            "parameter": 2,
+            "kind": "step",
+            "seconds": 0.064,
+            "value": 4.123456789
+          },
+          {
+            "parameter": 3,
+            "kind": "step",
+            "seconds": 0.064125,
+            "value": 0.01123456789
+          },
+          {
+            "parameter": 4,
+            "kind": "step",
+            "seconds": 0.500125,
+            "value": 0.3123456789
+          },
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 1.024,
+            "value": -12.123456789
+          },
+          {
+            "parameter": 2,
+            "kind": "step",
+            "seconds": 1.024125,
+            "value": 12.123456789
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -2.557994842529297,
+      "ownedReductionDb": -2.557994842529297,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        48,
+        48
+      ],
+      "ownedFirstNonzero": [
+        48,
+        48
+      ],
+      "latencyFrames": 48,
+      "latencyPass": true,
+      "nativePcmSha256": "62d4160d079ab47386a597fcd926e04dcbe5bf908ba6f7620491a27995eaad99",
+      "ownedPcmSha256": "62d4160d079ab47386a597fcd926e04dcbe5bf908ba6f7620491a27995eaad99",
+      "nativeCoefficientSha256": "af4cfccbd7828da284d031f4db7c36a4ced1a88480c29180c046d3b53609eb51",
+      "ownedCoefficientSha256": "af4cfccbd7828da284d031f4db7c36a4ced1a88480c29180c046d3b53609eb51",
+      "pass": true
+    },
+    {
+      "id": "voice-kernel-20ms-targets",
+      "rate": 8000,
+      "channels": 1,
+      "frames": 14080,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0,
+            "value": 0,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0,
+            "value": 4,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.001625,
+            "value": -27,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.001625,
+            "value": 4,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.005125,
+            "value": -27,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.005125,
+            "value": 6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 3,
+            "kind": "target",
+            "seconds": 0.064,
+            "value": 0.01,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 4,
+            "kind": "target",
+            "seconds": 0.064125,
+            "value": 0.1,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.500125,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.500125,
+            "value": 6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 1.024,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 1.024,
+            "value": 12,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 1.250375,
+            "value": 0,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 1.250375,
+            "value": 12,
+            "timeConstant": 0.02
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -2.3855531215667725,
+      "ownedReductionDb": -2.3855531215667725,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        48,
+        48
+      ],
+      "ownedFirstNonzero": [
+        48,
+        48
+      ],
+      "latencyFrames": 48,
+      "latencyPass": true,
+      "nativePcmSha256": "36627349443febfdc47eff968da94ea27c03be97f831e82fc4163bb0d79caebe",
+      "ownedPcmSha256": "36627349443febfdc47eff968da94ea27c03be97f831e82fc4163bb0d79caebe",
+      "nativeCoefficientSha256": "11969a15576a3610878cbe39728bbabb6a9a9a971a1131b9e4e6d2a75259a68c",
+      "ownedCoefficientSha256": "11969a15576a3610878cbe39728bbabb6a9a9a971a1131b9e4e6d2a75259a68c",
+      "pass": true
+    },
+    {
+      "id": "rack-kernel-12ms-targets",
+      "rate": 8000,
+      "channels": 1,
+      "frames": 14080,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            12
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            0.005
+          ],
+          [
+            4,
+            0.1
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.001625,
+            "value": -18.123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.005125,
+            "value": 2.7123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 1,
+            "kind": "target",
+            "seconds": 0.064,
+            "value": 0,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 3,
+            "kind": "target",
+            "seconds": 0.064125,
+            "value": 0.02123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 4,
+            "kind": "target",
+            "seconds": 0.500125,
+            "value": 0.3123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 1.024,
+            "value": -42.123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 1.024125,
+            "value": 12.123456789,
+            "timeConstant": 0.012
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -0.932688295841217,
+      "ownedReductionDb": -0.932688295841217,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        48,
+        48
+      ],
+      "ownedFirstNonzero": [
+        48,
+        48
+      ],
+      "latencyFrames": 48,
+      "latencyPass": true,
+      "nativePcmSha256": "b14e858d4ab501096b21648b300c47408ee8464a2421f311e9258b832403e0a7",
+      "ownedPcmSha256": "b14e858d4ab501096b21648b300c47408ee8464a2421f311e9258b832403e0a7",
+      "nativeCoefficientSha256": "0c46b2efab6b00c1c7dbf846ae6c7e412ab3ad1aef2e392b2d512cd209ff0742",
+      "ownedCoefficientSha256": "0c46b2efab6b00c1c7dbf846ae6c7e412ab3ad1aef2e392b2d512cd209ff0742",
+      "pass": true
+    },
+    {
+      "id": "boundary-fractional-and-short-targets",
+      "rate": 8000,
+      "channels": 1,
+      "frames": 14080,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0,
+            "value": -48,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.016,
+            "value": -12,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.0319375,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.0480125,
+            "value": -6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 0.064,
+            "value": -24
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 1.024,
+            "value": -60,
+            "timeConstant": 0.000001
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 1.250375,
+            "value": 0,
+            "timeConstant": 0
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -1.4328069686889648,
+      "ownedReductionDb": -1.4328069686889648,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        48,
+        48
+      ],
+      "ownedFirstNonzero": [
+        48,
+        48
+      ],
+      "latencyFrames": 48,
+      "latencyPass": true,
+      "nativePcmSha256": "b04fc8032767257a7a7a5fe16946d037e3a14547ce31ff3dda718eccd012899c",
+      "ownedPcmSha256": "b04fc8032767257a7a7a5fe16946d037e3a14547ce31ff3dda718eccd012899c",
+      "nativeCoefficientSha256": "8a76774ffa37f1f1109ace33037785f501c50138a001fd8040337b9ecabc6c34",
+      "ownedCoefficientSha256": "8a76774ffa37f1f1109ace33037785f501c50138a001fd8040337b9ecabc6c34",
+      "pass": true
+    },
+    {
+      "id": "native-step-controls",
+      "rate": 8000,
+      "channels": 2,
+      "frames": 14080,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            30
+          ],
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 0.001625,
+            "value": -36.123456789
+          },
+          {
+            "parameter": 1,
+            "kind": "step",
+            "seconds": 0.005125,
+            "value": 6.123456789
+          },
+          {
+            "parameter": 2,
+            "kind": "step",
+            "seconds": 0.064,
+            "value": 4.123456789
+          },
+          {
+            "parameter": 3,
+            "kind": "step",
+            "seconds": 0.064125,
+            "value": 0.01123456789
+          },
+          {
+            "parameter": 4,
+            "kind": "step",
+            "seconds": 0.500125,
+            "value": 0.3123456789
+          },
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 1.024,
+            "value": -12.123456789
+          },
+          {
+            "parameter": 2,
+            "kind": "step",
+            "seconds": 1.024125,
+            "value": 12.123456789
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -2.626377820968628,
+      "ownedReductionDb": -2.626377820968628,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        48,
+        48
+      ],
+      "ownedFirstNonzero": [
+        48,
+        48
+      ],
+      "latencyFrames": 48,
+      "latencyPass": true,
+      "nativePcmSha256": "b4ceacc1e3fd12b5ad5ab1b48f17946411766efd81d5f09fc43238763f960706",
+      "ownedPcmSha256": "b4ceacc1e3fd12b5ad5ab1b48f17946411766efd81d5f09fc43238763f960706",
+      "nativeCoefficientSha256": "af4cfccbd7828da284d031f4db7c36a4ced1a88480c29180c046d3b53609eb51",
+      "ownedCoefficientSha256": "af4cfccbd7828da284d031f4db7c36a4ced1a88480c29180c046d3b53609eb51",
+      "pass": true
+    },
+    {
+      "id": "voice-kernel-20ms-targets",
+      "rate": 8000,
+      "channels": 2,
+      "frames": 14080,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0,
+            "value": 0,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0,
+            "value": 4,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.001625,
+            "value": -27,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.001625,
+            "value": 4,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.005125,
+            "value": -27,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.005125,
+            "value": 6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 3,
+            "kind": "target",
+            "seconds": 0.064,
+            "value": 0.01,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 4,
+            "kind": "target",
+            "seconds": 0.064125,
+            "value": 0.1,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.500125,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.500125,
+            "value": 6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 1.024,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 1.024,
+            "value": 12,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 1.250375,
+            "value": 0,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 1.250375,
+            "value": 12,
+            "timeConstant": 0.02
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -2.486758232116699,
+      "ownedReductionDb": -2.486758232116699,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        48,
+        48
+      ],
+      "ownedFirstNonzero": [
+        48,
+        48
+      ],
+      "latencyFrames": 48,
+      "latencyPass": true,
+      "nativePcmSha256": "b78b47fcc7c985d1fc5e25b6ce10670c62add512dead97af581c870aea1384c5",
+      "ownedPcmSha256": "b78b47fcc7c985d1fc5e25b6ce10670c62add512dead97af581c870aea1384c5",
+      "nativeCoefficientSha256": "11969a15576a3610878cbe39728bbabb6a9a9a971a1131b9e4e6d2a75259a68c",
+      "ownedCoefficientSha256": "11969a15576a3610878cbe39728bbabb6a9a9a971a1131b9e4e6d2a75259a68c",
+      "pass": true
+    },
+    {
+      "id": "rack-kernel-12ms-targets",
+      "rate": 8000,
+      "channels": 2,
+      "frames": 14080,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            12
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            0.005
+          ],
+          [
+            4,
+            0.1
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.001625,
+            "value": -18.123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.005125,
+            "value": 2.7123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 1,
+            "kind": "target",
+            "seconds": 0.064,
+            "value": 0,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 3,
+            "kind": "target",
+            "seconds": 0.064125,
+            "value": 0.02123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 4,
+            "kind": "target",
+            "seconds": 0.500125,
+            "value": 0.3123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 1.024,
+            "value": -42.123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 1.024125,
+            "value": 12.123456789,
+            "timeConstant": 0.012
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -0.9689075946807861,
+      "ownedReductionDb": -0.9689075946807861,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        48,
+        48
+      ],
+      "ownedFirstNonzero": [
+        48,
+        48
+      ],
+      "latencyFrames": 48,
+      "latencyPass": true,
+      "nativePcmSha256": "ae4370cfb6ac4e1ed450c5f6f20a191749cb3684a3c4328bbf4056cfd4091796",
+      "ownedPcmSha256": "ae4370cfb6ac4e1ed450c5f6f20a191749cb3684a3c4328bbf4056cfd4091796",
+      "nativeCoefficientSha256": "0c46b2efab6b00c1c7dbf846ae6c7e412ab3ad1aef2e392b2d512cd209ff0742",
+      "ownedCoefficientSha256": "0c46b2efab6b00c1c7dbf846ae6c7e412ab3ad1aef2e392b2d512cd209ff0742",
+      "pass": true
+    },
+    {
+      "id": "boundary-fractional-and-short-targets",
+      "rate": 8000,
+      "channels": 2,
+      "frames": 14080,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0,
+            "value": -48,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.016,
+            "value": -12,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.0319375,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.0480125,
+            "value": -6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 0.064,
+            "value": -24
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 1.024,
+            "value": -60,
+            "timeConstant": 0.000001
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 1.250375,
+            "value": 0,
+            "timeConstant": 0
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -1.4375600814819336,
+      "ownedReductionDb": -1.4375600814819336,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        48,
+        48
+      ],
+      "ownedFirstNonzero": [
+        48,
+        48
+      ],
+      "latencyFrames": 48,
+      "latencyPass": true,
+      "nativePcmSha256": "658f907697d50352b55ec4a505c77c93c911582bdf2c0c8471d6f903c273c7c3",
+      "ownedPcmSha256": "658f907697d50352b55ec4a505c77c93c911582bdf2c0c8471d6f903c273c7c3",
+      "nativeCoefficientSha256": "8a76774ffa37f1f1109ace33037785f501c50138a001fd8040337b9ecabc6c34",
+      "ownedCoefficientSha256": "8a76774ffa37f1f1109ace33037785f501c50138a001fd8040337b9ecabc6c34",
+      "pass": true
+    },
+    {
+      "id": "native-step-controls",
+      "rate": 24000,
+      "channels": 1,
+      "frames": 30080,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            30
+          ],
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 0.0005416666666666666,
+            "value": -36.123456789
+          },
+          {
+            "parameter": 1,
+            "kind": "step",
+            "seconds": 0.0017083333333333334,
+            "value": 6.123456789
+          },
+          {
+            "parameter": 2,
+            "kind": "step",
+            "seconds": 0.021333333333333333,
+            "value": 4.123456789
+          },
+          {
+            "parameter": 3,
+            "kind": "step",
+            "seconds": 0.021375,
+            "value": 0.01123456789
+          },
+          {
+            "parameter": 4,
+            "kind": "step",
+            "seconds": 0.16670833333333332,
+            "value": 0.3123456789
+          },
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 0.3413333333333333,
+            "value": -12.123456789
+          },
+          {
+            "parameter": 2,
+            "kind": "step",
+            "seconds": 0.341375,
+            "value": 12.123456789
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -3.4662041664123535,
+      "ownedReductionDb": -3.4662041664123535,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        144,
+        144
+      ],
+      "ownedFirstNonzero": [
+        144,
+        144
+      ],
+      "latencyFrames": 144,
+      "latencyPass": true,
+      "nativePcmSha256": "663a4495bca504b6ee4e81fd37237cb291dc5b2b1e8358985ec32882e8d1ea04",
+      "ownedPcmSha256": "663a4495bca504b6ee4e81fd37237cb291dc5b2b1e8358985ec32882e8d1ea04",
+      "nativeCoefficientSha256": "4e80dacbfb6b9cfaf0d4d261070d7e3cc655dd6691adae6cc1b112cd2fc09279",
+      "ownedCoefficientSha256": "4e80dacbfb6b9cfaf0d4d261070d7e3cc655dd6691adae6cc1b112cd2fc09279",
+      "pass": true
+    },
+    {
+      "id": "voice-kernel-20ms-targets",
+      "rate": 24000,
+      "channels": 1,
+      "frames": 30080,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0,
+            "value": 0,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0,
+            "value": 4,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.0005416666666666666,
+            "value": -27,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.0005416666666666666,
+            "value": 4,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.0017083333333333334,
+            "value": -27,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.0017083333333333334,
+            "value": 6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 3,
+            "kind": "target",
+            "seconds": 0.021333333333333333,
+            "value": 0.01,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 4,
+            "kind": "target",
+            "seconds": 0.021375,
+            "value": 0.1,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.16670833333333332,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.16670833333333332,
+            "value": 6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.3413333333333333,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.3413333333333333,
+            "value": 12,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.41679166666666667,
+            "value": 0,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.41679166666666667,
+            "value": 12,
+            "timeConstant": 0.02
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -1.8611838817596436,
+      "ownedReductionDb": -1.8611838817596436,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        144,
+        144
+      ],
+      "ownedFirstNonzero": [
+        144,
+        144
+      ],
+      "latencyFrames": 144,
+      "latencyPass": true,
+      "nativePcmSha256": "0975e071264547841cb9115bc371362940200045f1d536ed8422be61f4274b04",
+      "ownedPcmSha256": "0975e071264547841cb9115bc371362940200045f1d536ed8422be61f4274b04",
+      "nativeCoefficientSha256": "98c0c5c7a85d98db3824292855a93a6a5f2cbdebd15b85791c96a0fc14737ece",
+      "ownedCoefficientSha256": "98c0c5c7a85d98db3824292855a93a6a5f2cbdebd15b85791c96a0fc14737ece",
+      "pass": true
+    },
+    {
+      "id": "rack-kernel-12ms-targets",
+      "rate": 24000,
+      "channels": 1,
+      "frames": 30080,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            12
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            0.005
+          ],
+          [
+            4,
+            0.1
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.0005416666666666666,
+            "value": -18.123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.0017083333333333334,
+            "value": 2.7123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 1,
+            "kind": "target",
+            "seconds": 0.021333333333333333,
+            "value": 0,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 3,
+            "kind": "target",
+            "seconds": 0.021375,
+            "value": 0.02123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 4,
+            "kind": "target",
+            "seconds": 0.16670833333333332,
+            "value": 0.3123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.3413333333333333,
+            "value": -42.123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.341375,
+            "value": 12.123456789,
+            "timeConstant": 0.012
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -20.57904815673828,
+      "ownedReductionDb": -20.57904815673828,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        144,
+        144
+      ],
+      "ownedFirstNonzero": [
+        144,
+        144
+      ],
+      "latencyFrames": 144,
+      "latencyPass": true,
+      "nativePcmSha256": "194321d7edc0938281a67fc3f6c90ce326a8b848ffcb8609ea51ce3453a0ee2c",
+      "ownedPcmSha256": "194321d7edc0938281a67fc3f6c90ce326a8b848ffcb8609ea51ce3453a0ee2c",
+      "nativeCoefficientSha256": "8ee27522fef54931c4b2e5dfabd840829f2652c2dbf02cb0101269bdad86fbc3",
+      "ownedCoefficientSha256": "8ee27522fef54931c4b2e5dfabd840829f2652c2dbf02cb0101269bdad86fbc3",
+      "pass": true
+    },
+    {
+      "id": "boundary-fractional-and-short-targets",
+      "rate": 24000,
+      "channels": 1,
+      "frames": 30080,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0,
+            "value": -48,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.005333333333333333,
+            "value": -12,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.010645833333333334,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.016004166666666667,
+            "value": -6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 0.021333333333333333,
+            "value": -24
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.3413333333333333,
+            "value": -60,
+            "timeConstant": 0.000001
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.41679166666666667,
+            "value": 0,
+            "timeConstant": 0
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -3.4599969387054443,
+      "ownedReductionDb": -3.4599969387054443,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        144,
+        144
+      ],
+      "ownedFirstNonzero": [
+        144,
+        144
+      ],
+      "latencyFrames": 144,
+      "latencyPass": true,
+      "nativePcmSha256": "02970172b0233d5869c2fef9c075eba020be728df18ccec0845eb6c043c74e8a",
+      "ownedPcmSha256": "02970172b0233d5869c2fef9c075eba020be728df18ccec0845eb6c043c74e8a",
+      "nativeCoefficientSha256": "b2d1b57e133a94adb4620a3e7dee698e37277f08f9eeebbe62e6a2ebcb84522a",
+      "ownedCoefficientSha256": "b2d1b57e133a94adb4620a3e7dee698e37277f08f9eeebbe62e6a2ebcb84522a",
+      "pass": true
+    },
+    {
+      "id": "native-step-controls",
+      "rate": 24000,
+      "channels": 2,
+      "frames": 30080,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            30
+          ],
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 0.0005416666666666666,
+            "value": -36.123456789
+          },
+          {
+            "parameter": 1,
+            "kind": "step",
+            "seconds": 0.0017083333333333334,
+            "value": 6.123456789
+          },
+          {
+            "parameter": 2,
+            "kind": "step",
+            "seconds": 0.021333333333333333,
+            "value": 4.123456789
+          },
+          {
+            "parameter": 3,
+            "kind": "step",
+            "seconds": 0.021375,
+            "value": 0.01123456789
+          },
+          {
+            "parameter": 4,
+            "kind": "step",
+            "seconds": 0.16670833333333332,
+            "value": 0.3123456789
+          },
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 0.3413333333333333,
+            "value": -12.123456789
+          },
+          {
+            "parameter": 2,
+            "kind": "step",
+            "seconds": 0.341375,
+            "value": 12.123456789
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -3.5919456481933594,
+      "ownedReductionDb": -3.5919456481933594,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        144,
+        144
+      ],
+      "ownedFirstNonzero": [
+        144,
+        144
+      ],
+      "latencyFrames": 144,
+      "latencyPass": true,
+      "nativePcmSha256": "6bc07ac1d8f2b5337488e326f113116e912ee75a1117617cc7cf8dd3f4317323",
+      "ownedPcmSha256": "6bc07ac1d8f2b5337488e326f113116e912ee75a1117617cc7cf8dd3f4317323",
+      "nativeCoefficientSha256": "4e80dacbfb6b9cfaf0d4d261070d7e3cc655dd6691adae6cc1b112cd2fc09279",
+      "ownedCoefficientSha256": "4e80dacbfb6b9cfaf0d4d261070d7e3cc655dd6691adae6cc1b112cd2fc09279",
+      "pass": true
+    },
+    {
+      "id": "voice-kernel-20ms-targets",
+      "rate": 24000,
+      "channels": 2,
+      "frames": 30080,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0,
+            "value": 0,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0,
+            "value": 4,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.0005416666666666666,
+            "value": -27,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.0005416666666666666,
+            "value": 4,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.0017083333333333334,
+            "value": -27,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.0017083333333333334,
+            "value": 6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 3,
+            "kind": "target",
+            "seconds": 0.021333333333333333,
+            "value": 0.01,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 4,
+            "kind": "target",
+            "seconds": 0.021375,
+            "value": 0.1,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.16670833333333332,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.16670833333333332,
+            "value": 6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.3413333333333333,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.3413333333333333,
+            "value": 12,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.41679166666666667,
+            "value": 0,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.41679166666666667,
+            "value": 12,
+            "timeConstant": 0.02
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -1.9054878950119019,
+      "ownedReductionDb": -1.9054878950119019,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        144,
+        144
+      ],
+      "ownedFirstNonzero": [
+        144,
+        144
+      ],
+      "latencyFrames": 144,
+      "latencyPass": true,
+      "nativePcmSha256": "f5ddcc34d29a4069929439d2969b64a6b3534227f18021fde99e8dc42f27d4f1",
+      "ownedPcmSha256": "f5ddcc34d29a4069929439d2969b64a6b3534227f18021fde99e8dc42f27d4f1",
+      "nativeCoefficientSha256": "98c0c5c7a85d98db3824292855a93a6a5f2cbdebd15b85791c96a0fc14737ece",
+      "ownedCoefficientSha256": "98c0c5c7a85d98db3824292855a93a6a5f2cbdebd15b85791c96a0fc14737ece",
+      "pass": true
+    },
+    {
+      "id": "rack-kernel-12ms-targets",
+      "rate": 24000,
+      "channels": 2,
+      "frames": 30080,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            12
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            0.005
+          ],
+          [
+            4,
+            0.1
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.0005416666666666666,
+            "value": -18.123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.0017083333333333334,
+            "value": 2.7123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 1,
+            "kind": "target",
+            "seconds": 0.021333333333333333,
+            "value": 0,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 3,
+            "kind": "target",
+            "seconds": 0.021375,
+            "value": 0.02123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 4,
+            "kind": "target",
+            "seconds": 0.16670833333333332,
+            "value": 0.3123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.3413333333333333,
+            "value": -42.123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.341375,
+            "value": 12.123456789,
+            "timeConstant": 0.012
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -21.385026931762695,
+      "ownedReductionDb": -21.385026931762695,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        144,
+        144
+      ],
+      "ownedFirstNonzero": [
+        144,
+        144
+      ],
+      "latencyFrames": 144,
+      "latencyPass": true,
+      "nativePcmSha256": "5bd5a16fc5e2dab4d5602abc7a1d13908014fa7ee1592c1a5a0d40fc7a87b3ad",
+      "ownedPcmSha256": "5bd5a16fc5e2dab4d5602abc7a1d13908014fa7ee1592c1a5a0d40fc7a87b3ad",
+      "nativeCoefficientSha256": "8ee27522fef54931c4b2e5dfabd840829f2652c2dbf02cb0101269bdad86fbc3",
+      "ownedCoefficientSha256": "8ee27522fef54931c4b2e5dfabd840829f2652c2dbf02cb0101269bdad86fbc3",
+      "pass": true
+    },
+    {
+      "id": "boundary-fractional-and-short-targets",
+      "rate": 24000,
+      "channels": 2,
+      "frames": 30080,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0,
+            "value": -48,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.005333333333333333,
+            "value": -12,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.010645833333333334,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.016004166666666667,
+            "value": -6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 0.021333333333333333,
+            "value": -24
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.3413333333333333,
+            "value": -60,
+            "timeConstant": 0.000001
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.41679166666666667,
+            "value": 0,
+            "timeConstant": 0
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -3.5049214363098145,
+      "ownedReductionDb": -3.5049214363098145,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        144,
+        144
+      ],
+      "ownedFirstNonzero": [
+        144,
+        144
+      ],
+      "latencyFrames": 144,
+      "latencyPass": true,
+      "nativePcmSha256": "6cdffbf69b8fcf5dca1373cfcc5b68491342220199ad0f04f25dbdb8d2ec4b2b",
+      "ownedPcmSha256": "6cdffbf69b8fcf5dca1373cfcc5b68491342220199ad0f04f25dbdb8d2ec4b2b",
+      "nativeCoefficientSha256": "b2d1b57e133a94adb4620a3e7dee698e37277f08f9eeebbe62e6a2ebcb84522a",
+      "ownedCoefficientSha256": "b2d1b57e133a94adb4620a3e7dee698e37277f08f9eeebbe62e6a2ebcb84522a",
+      "pass": true
+    },
+    {
+      "id": "native-step-controls",
+      "rate": 44100,
+      "channels": 1,
+      "frames": 55168,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            30
+          ],
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 0.00029478458049886624,
+            "value": -36.123456789
+          },
+          {
+            "parameter": 1,
+            "kind": "step",
+            "seconds": 0.0009297052154195011,
+            "value": 6.123456789
+          },
+          {
+            "parameter": 2,
+            "kind": "step",
+            "seconds": 0.011609977324263039,
+            "value": 4.123456789
+          },
+          {
+            "parameter": 3,
+            "kind": "step",
+            "seconds": 0.01163265306122449,
+            "value": 0.01123456789
+          },
+          {
+            "parameter": 4,
+            "kind": "step",
+            "seconds": 0.09072562358276644,
+            "value": 0.3123456789
+          },
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 0.18575963718820862,
+            "value": -12.123456789
+          },
+          {
+            "parameter": 2,
+            "kind": "step",
+            "seconds": 0.18578231292517006,
+            "value": 12.123456789
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -3.0940568447113037,
+      "ownedReductionDb": -3.0940568447113037,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        264
+      ],
+      "ownedFirstNonzero": [
+        264,
+        264
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "4657f08c16f87b67f38777992492f6ecc2929fe0d4e61db0b0e07d62c38c7217",
+      "ownedPcmSha256": "4657f08c16f87b67f38777992492f6ecc2929fe0d4e61db0b0e07d62c38c7217",
+      "nativeCoefficientSha256": "a5b1f3ea837b5fd67a121781ebeb7d2f7d2f08c1e099cd41faaba0834ac71d4a",
+      "ownedCoefficientSha256": "a5b1f3ea837b5fd67a121781ebeb7d2f7d2f08c1e099cd41faaba0834ac71d4a",
+      "pass": true
+    },
+    {
+      "id": "voice-kernel-20ms-targets",
+      "rate": 44100,
+      "channels": 1,
+      "frames": 55168,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0,
+            "value": 0,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0,
+            "value": 4,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.00029478458049886624,
+            "value": -27,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.00029478458049886624,
+            "value": 4,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.0009297052154195011,
+            "value": -27,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.0009297052154195011,
+            "value": 6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 3,
+            "kind": "target",
+            "seconds": 0.011609977324263039,
+            "value": 0.01,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 4,
+            "kind": "target",
+            "seconds": 0.01163265306122449,
+            "value": 0.1,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.09072562358276644,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.09072562358276644,
+            "value": 6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.18575963718820862,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.18575963718820862,
+            "value": 12,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.22682539682539682,
+            "value": 0,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.22682539682539682,
+            "value": 12,
+            "timeConstant": 0.02
+          }
+        ]
+      },
+      "maxAbsoluteError": 0.000018715858459472656,
+      "relativeRmsError": 0.0000030208925450543157,
+      "nonFinite": 0,
+      "maxDifference": {
+        "frame": 6829,
+        "channel": 0,
+        "actual": 0.32361504435539246,
+        "reference": 0.323596328496933,
+        "error": 0.000018715858459472656
+      },
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -1.305151343345642,
+      "ownedReductionDb": -1.305151343345642,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        264
+      ],
+      "ownedFirstNonzero": [
+        264,
+        264
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "6518df77ce0d3454448b9a9f055eafcfa231a51e2e6b05c5034cd74e9d598b31",
+      "ownedPcmSha256": "8b891c2fb646dd64f49fae8deab83d6aba9d2947f1b7fbaf1b9609e8027a86a2",
+      "nativeCoefficientSha256": "cf90f9fe55e67d0236b4341a30a8f7182614b0c686dcb6204bc26c4271079b1b",
+      "ownedCoefficientSha256": "cf90f9fe55e67d0236b4341a30a8f7182614b0c686dcb6204bc26c4271079b1b",
+      "pass": true
+    },
+    {
+      "id": "rack-kernel-12ms-targets",
+      "rate": 44100,
+      "channels": 1,
+      "frames": 55168,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            12
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            0.005
+          ],
+          [
+            4,
+            0.1
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.00029478458049886624,
+            "value": -18.123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.0009297052154195011,
+            "value": 2.7123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 1,
+            "kind": "target",
+            "seconds": 0.011609977324263039,
+            "value": 0,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 3,
+            "kind": "target",
+            "seconds": 0.01163265306122449,
+            "value": 0.02123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 4,
+            "kind": "target",
+            "seconds": 0.09072562358276644,
+            "value": 0.3123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.18575963718820862,
+            "value": -42.123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.18578231292517006,
+            "value": 12.123456789,
+            "timeConstant": 0.012
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -20.968852996826172,
+      "ownedReductionDb": -20.968852996826172,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        264
+      ],
+      "ownedFirstNonzero": [
+        264,
+        264
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "04f2978ee3b48bca01235a082e944940dc6f0b4dc792ee5ce2718b3ff7dc88db",
+      "ownedPcmSha256": "04f2978ee3b48bca01235a082e944940dc6f0b4dc792ee5ce2718b3ff7dc88db",
+      "nativeCoefficientSha256": "527db3903cdec72808fb9006e4562ccfbb9376b6e901665b5b8c42e569d44ded",
+      "ownedCoefficientSha256": "527db3903cdec72808fb9006e4562ccfbb9376b6e901665b5b8c42e569d44ded",
+      "pass": true
+    },
+    {
+      "id": "boundary-fractional-and-short-targets",
+      "rate": 44100,
+      "channels": 1,
+      "frames": 55168,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0,
+            "value": -48,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.0029024943310657597,
+            "value": -12,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.0057936507936507935,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.008709750566893425,
+            "value": -6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 0.011609977324263039,
+            "value": -24
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.18575963718820862,
+            "value": -60,
+            "timeConstant": 0.000001
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.22682539682539682,
+            "value": 0,
+            "timeConstant": 0
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -2.4240708351135254,
+      "ownedReductionDb": -2.4240708351135254,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        264
+      ],
+      "ownedFirstNonzero": [
+        264,
+        264
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "d411a4fb3cba5380047008f59c6340294151dfce20e95ec51e0ff5cceac33b3a",
+      "ownedPcmSha256": "d411a4fb3cba5380047008f59c6340294151dfce20e95ec51e0ff5cceac33b3a",
+      "nativeCoefficientSha256": "49a80f0fb32fcd031c6272c3a99114337f1957a4769490f10256e67b6c2cf6e3",
+      "ownedCoefficientSha256": "49a80f0fb32fcd031c6272c3a99114337f1957a4769490f10256e67b6c2cf6e3",
+      "pass": true
+    },
+    {
+      "id": "native-step-controls",
+      "rate": 44100,
+      "channels": 2,
+      "frames": 55168,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            30
+          ],
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 0.00029478458049886624,
+            "value": -36.123456789
+          },
+          {
+            "parameter": 1,
+            "kind": "step",
+            "seconds": 0.0009297052154195011,
+            "value": 6.123456789
+          },
+          {
+            "parameter": 2,
+            "kind": "step",
+            "seconds": 0.011609977324263039,
+            "value": 4.123456789
+          },
+          {
+            "parameter": 3,
+            "kind": "step",
+            "seconds": 0.01163265306122449,
+            "value": 0.01123456789
+          },
+          {
+            "parameter": 4,
+            "kind": "step",
+            "seconds": 0.09072562358276644,
+            "value": 0.3123456789
+          },
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 0.18575963718820862,
+            "value": -12.123456789
+          },
+          {
+            "parameter": 2,
+            "kind": "step",
+            "seconds": 0.18578231292517006,
+            "value": 12.123456789
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -3.184058666229248,
+      "ownedReductionDb": -3.184058666229248,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        264
+      ],
+      "ownedFirstNonzero": [
+        264,
+        264
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "710ae1fa138393d0f2eaf6ddb268bf8312ff094d27d076d77407ebc061924f79",
+      "ownedPcmSha256": "710ae1fa138393d0f2eaf6ddb268bf8312ff094d27d076d77407ebc061924f79",
+      "nativeCoefficientSha256": "a5b1f3ea837b5fd67a121781ebeb7d2f7d2f08c1e099cd41faaba0834ac71d4a",
+      "ownedCoefficientSha256": "a5b1f3ea837b5fd67a121781ebeb7d2f7d2f08c1e099cd41faaba0834ac71d4a",
+      "pass": true
+    },
+    {
+      "id": "voice-kernel-20ms-targets",
+      "rate": 44100,
+      "channels": 2,
+      "frames": 55168,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0,
+            "value": 0,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0,
+            "value": 4,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.00029478458049886624,
+            "value": -27,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.00029478458049886624,
+            "value": 4,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.0009297052154195011,
+            "value": -27,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.0009297052154195011,
+            "value": 6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 3,
+            "kind": "target",
+            "seconds": 0.011609977324263039,
+            "value": 0.01,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 4,
+            "kind": "target",
+            "seconds": 0.01163265306122449,
+            "value": 0.1,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.09072562358276644,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.09072562358276644,
+            "value": 6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.18575963718820862,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.18575963718820862,
+            "value": 12,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.22682539682539682,
+            "value": 0,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.22682539682539682,
+            "value": 12,
+            "timeConstant": 0.02
+          }
+        ]
+      },
+      "maxAbsoluteError": 0.00001722574234008789,
+      "relativeRmsError": 0.000002613668372419818,
+      "nonFinite": 0,
+      "maxDifference": {
+        "frame": 6845,
+        "channel": 1,
+        "actual": 0.31678256392478943,
+        "reference": 0.31676533818244934,
+        "error": 0.00001722574234008789
+      },
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -1.3447206020355225,
+      "ownedReductionDb": -1.3447206020355225,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        264
+      ],
+      "ownedFirstNonzero": [
+        264,
+        264
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "b43e8e87f659620b67a7b4cef9a1d243002d6433939f11225dbba68f71231544",
+      "ownedPcmSha256": "06633094881f5e54089b96a56c62c0334c123125631d422b3ebc9a996132fcd7",
+      "nativeCoefficientSha256": "cf90f9fe55e67d0236b4341a30a8f7182614b0c686dcb6204bc26c4271079b1b",
+      "ownedCoefficientSha256": "cf90f9fe55e67d0236b4341a30a8f7182614b0c686dcb6204bc26c4271079b1b",
+      "pass": true
+    },
+    {
+      "id": "rack-kernel-12ms-targets",
+      "rate": 44100,
+      "channels": 2,
+      "frames": 55168,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            12
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            0.005
+          ],
+          [
+            4,
+            0.1
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.00029478458049886624,
+            "value": -18.123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.0009297052154195011,
+            "value": 2.7123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 1,
+            "kind": "target",
+            "seconds": 0.011609977324263039,
+            "value": 0,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 3,
+            "kind": "target",
+            "seconds": 0.01163265306122449,
+            "value": 0.02123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 4,
+            "kind": "target",
+            "seconds": 0.09072562358276644,
+            "value": 0.3123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.18575963718820862,
+            "value": -42.123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.18578231292517006,
+            "value": 12.123456789,
+            "timeConstant": 0.012
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -21.55743408203125,
+      "ownedReductionDb": -21.55743408203125,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        264
+      ],
+      "ownedFirstNonzero": [
+        264,
+        264
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "fbb66dc36b3095840bbdb9974c46cc7c81d5db4afe96d4dd09ef29dde26c8c0a",
+      "ownedPcmSha256": "fbb66dc36b3095840bbdb9974c46cc7c81d5db4afe96d4dd09ef29dde26c8c0a",
+      "nativeCoefficientSha256": "527db3903cdec72808fb9006e4562ccfbb9376b6e901665b5b8c42e569d44ded",
+      "ownedCoefficientSha256": "527db3903cdec72808fb9006e4562ccfbb9376b6e901665b5b8c42e569d44ded",
+      "pass": true
+    },
+    {
+      "id": "boundary-fractional-and-short-targets",
+      "rate": 44100,
+      "channels": 2,
+      "frames": 55168,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0,
+            "value": -48,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.0029024943310657597,
+            "value": -12,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.0057936507936507935,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.008709750566893425,
+            "value": -6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 0.011609977324263039,
+            "value": -24
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.18575963718820862,
+            "value": -60,
+            "timeConstant": 0.000001
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.22682539682539682,
+            "value": 0,
+            "timeConstant": 0
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -2.4512155055999756,
+      "ownedReductionDb": -2.4512155055999756,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        264,
+        264
+      ],
+      "ownedFirstNonzero": [
+        264,
+        264
+      ],
+      "latencyFrames": 264,
+      "latencyPass": true,
+      "nativePcmSha256": "97f54f9a2eb9b73a113168dff89f2a6d8e528a5fa79ad8afcab9fa39922bd9cd",
+      "ownedPcmSha256": "97f54f9a2eb9b73a113168dff89f2a6d8e528a5fa79ad8afcab9fa39922bd9cd",
+      "nativeCoefficientSha256": "49a80f0fb32fcd031c6272c3a99114337f1957a4769490f10256e67b6c2cf6e3",
+      "ownedCoefficientSha256": "49a80f0fb32fcd031c6272c3a99114337f1957a4769490f10256e67b6c2cf6e3",
+      "pass": true
+    },
+    {
+      "id": "native-step-controls",
+      "rate": 48000,
+      "channels": 1,
+      "frames": 60032,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            30
+          ],
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 0.0002708333333333333,
+            "value": -36.123456789
+          },
+          {
+            "parameter": 1,
+            "kind": "step",
+            "seconds": 0.0008541666666666667,
+            "value": 6.123456789
+          },
+          {
+            "parameter": 2,
+            "kind": "step",
+            "seconds": 0.010666666666666666,
+            "value": 4.123456789
+          },
+          {
+            "parameter": 3,
+            "kind": "step",
+            "seconds": 0.0106875,
+            "value": 0.01123456789
+          },
+          {
+            "parameter": 4,
+            "kind": "step",
+            "seconds": 0.08335416666666666,
+            "value": 0.3123456789
+          },
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 0.17066666666666666,
+            "value": -12.123456789
+          },
+          {
+            "parameter": 2,
+            "kind": "step",
+            "seconds": 0.1706875,
+            "value": 12.123456789
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -3.0714433193206787,
+      "ownedReductionDb": -3.0714433193206787,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        288
+      ],
+      "ownedFirstNonzero": [
+        288,
+        288
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "990046353b486c588d63d1d290a8e67f98396e6e522507ae613eae4c915dc5e7",
+      "ownedPcmSha256": "990046353b486c588d63d1d290a8e67f98396e6e522507ae613eae4c915dc5e7",
+      "nativeCoefficientSha256": "38400b3b5409e0a84c2fc09ef7cbd917c5ad33afb80e7d1a52001ff4a15e3663",
+      "ownedCoefficientSha256": "38400b3b5409e0a84c2fc09ef7cbd917c5ad33afb80e7d1a52001ff4a15e3663",
+      "pass": true
+    },
+    {
+      "id": "voice-kernel-20ms-targets",
+      "rate": 48000,
+      "channels": 1,
+      "frames": 60032,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0,
+            "value": 0,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0,
+            "value": 4,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.0002708333333333333,
+            "value": -27,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.0002708333333333333,
+            "value": 4,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.0008541666666666667,
+            "value": -27,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.0008541666666666667,
+            "value": 6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 3,
+            "kind": "target",
+            "seconds": 0.010666666666666666,
+            "value": 0.01,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 4,
+            "kind": "target",
+            "seconds": 0.0106875,
+            "value": 0.1,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.08335416666666666,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.08335416666666666,
+            "value": 6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.17066666666666666,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.17066666666666666,
+            "value": 12,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.20839583333333334,
+            "value": 0,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.20839583333333334,
+            "value": 12,
+            "timeConstant": 0.02
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -1.2305259704589844,
+      "ownedReductionDb": -1.2305259704589844,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        288
+      ],
+      "ownedFirstNonzero": [
+        288,
+        288
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "d0d15cde7c8f149491e4f4d3fdbe7bcd574592b0be026a06213769943b3e7ea7",
+      "ownedPcmSha256": "d0d15cde7c8f149491e4f4d3fdbe7bcd574592b0be026a06213769943b3e7ea7",
+      "nativeCoefficientSha256": "56c3f87b102d2242dba9c4e596288143f1df4d7b51961373e1cf7bd2dcbed3cc",
+      "ownedCoefficientSha256": "56c3f87b102d2242dba9c4e596288143f1df4d7b51961373e1cf7bd2dcbed3cc",
+      "pass": true
+    },
+    {
+      "id": "rack-kernel-12ms-targets",
+      "rate": 48000,
+      "channels": 1,
+      "frames": 60032,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            12
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            0.005
+          ],
+          [
+            4,
+            0.1
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.0002708333333333333,
+            "value": -18.123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.0008541666666666667,
+            "value": 2.7123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 1,
+            "kind": "target",
+            "seconds": 0.010666666666666666,
+            "value": 0,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 3,
+            "kind": "target",
+            "seconds": 0.0106875,
+            "value": 0.02123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 4,
+            "kind": "target",
+            "seconds": 0.08335416666666666,
+            "value": 0.3123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.17066666666666666,
+            "value": -42.123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.1706875,
+            "value": 12.123456789,
+            "timeConstant": 0.012
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -20.994722366333008,
+      "ownedReductionDb": -20.994722366333008,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        288
+      ],
+      "ownedFirstNonzero": [
+        288,
+        288
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "08014265f18ed79d0a81271f81be5b9c962261dac9fa64b3b52078785a9dce43",
+      "ownedPcmSha256": "08014265f18ed79d0a81271f81be5b9c962261dac9fa64b3b52078785a9dce43",
+      "nativeCoefficientSha256": "ff916a679ff30752baee947c6ecf379d0dc264ad76ac9493f49377d703d90afa",
+      "ownedCoefficientSha256": "ff916a679ff30752baee947c6ecf379d0dc264ad76ac9493f49377d703d90afa",
+      "pass": true
+    },
+    {
+      "id": "boundary-fractional-and-short-targets",
+      "rate": 48000,
+      "channels": 1,
+      "frames": 60032,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0,
+            "value": -48,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.0026666666666666666,
+            "value": -12,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.005322916666666667,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.008002083333333333,
+            "value": -6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 0.010666666666666666,
+            "value": -24
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.17066666666666666,
+            "value": -60,
+            "timeConstant": 0.000001
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.20839583333333334,
+            "value": 0,
+            "timeConstant": 0
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -2.2910993099212646,
+      "ownedReductionDb": -2.2910993099212646,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        288
+      ],
+      "ownedFirstNonzero": [
+        288,
+        288
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "e2bd42c59df99694b6f7ab7c3092f6b5e8523f860ca17b51117e4f64f1900dfe",
+      "ownedPcmSha256": "e2bd42c59df99694b6f7ab7c3092f6b5e8523f860ca17b51117e4f64f1900dfe",
+      "nativeCoefficientSha256": "62446ec92a869a1c187dabce908d9a4dd22ba89570cef3ab70dcd8a5c71dcb2f",
+      "ownedCoefficientSha256": "62446ec92a869a1c187dabce908d9a4dd22ba89570cef3ab70dcd8a5c71dcb2f",
+      "pass": true
+    },
+    {
+      "id": "native-step-controls",
+      "rate": 48000,
+      "channels": 2,
+      "frames": 60032,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            30
+          ],
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 0.0002708333333333333,
+            "value": -36.123456789
+          },
+          {
+            "parameter": 1,
+            "kind": "step",
+            "seconds": 0.0008541666666666667,
+            "value": 6.123456789
+          },
+          {
+            "parameter": 2,
+            "kind": "step",
+            "seconds": 0.010666666666666666,
+            "value": 4.123456789
+          },
+          {
+            "parameter": 3,
+            "kind": "step",
+            "seconds": 0.0106875,
+            "value": 0.01123456789
+          },
+          {
+            "parameter": 4,
+            "kind": "step",
+            "seconds": 0.08335416666666666,
+            "value": 0.3123456789
+          },
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 0.17066666666666666,
+            "value": -12.123456789
+          },
+          {
+            "parameter": 2,
+            "kind": "step",
+            "seconds": 0.1706875,
+            "value": 12.123456789
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -3.166264295578003,
+      "ownedReductionDb": -3.166264295578003,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        288
+      ],
+      "ownedFirstNonzero": [
+        288,
+        288
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "e79e2cb4643d1206b8b482fee68c6c1493a4d7b341c8f0bcd7b12b8771a1cb27",
+      "ownedPcmSha256": "e79e2cb4643d1206b8b482fee68c6c1493a4d7b341c8f0bcd7b12b8771a1cb27",
+      "nativeCoefficientSha256": "38400b3b5409e0a84c2fc09ef7cbd917c5ad33afb80e7d1a52001ff4a15e3663",
+      "ownedCoefficientSha256": "38400b3b5409e0a84c2fc09ef7cbd917c5ad33afb80e7d1a52001ff4a15e3663",
+      "pass": true
+    },
+    {
+      "id": "voice-kernel-20ms-targets",
+      "rate": 48000,
+      "channels": 2,
+      "frames": 60032,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0,
+            "value": 0,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0,
+            "value": 4,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.0002708333333333333,
+            "value": -27,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.0002708333333333333,
+            "value": 4,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.0008541666666666667,
+            "value": -27,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.0008541666666666667,
+            "value": 6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 3,
+            "kind": "target",
+            "seconds": 0.010666666666666666,
+            "value": 0.01,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 4,
+            "kind": "target",
+            "seconds": 0.0106875,
+            "value": 0.1,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.08335416666666666,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.08335416666666666,
+            "value": 6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.17066666666666666,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.17066666666666666,
+            "value": 12,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.20839583333333334,
+            "value": 0,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.20839583333333334,
+            "value": 12,
+            "timeConstant": 0.02
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -1.2673331499099731,
+      "ownedReductionDb": -1.2673331499099731,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        288
+      ],
+      "ownedFirstNonzero": [
+        288,
+        288
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "f55b464e06f5c26fdf3899a50993e7df70d8c2756f6a615a06c0ed024638bcc4",
+      "ownedPcmSha256": "f55b464e06f5c26fdf3899a50993e7df70d8c2756f6a615a06c0ed024638bcc4",
+      "nativeCoefficientSha256": "56c3f87b102d2242dba9c4e596288143f1df4d7b51961373e1cf7bd2dcbed3cc",
+      "ownedCoefficientSha256": "56c3f87b102d2242dba9c4e596288143f1df4d7b51961373e1cf7bd2dcbed3cc",
+      "pass": true
+    },
+    {
+      "id": "rack-kernel-12ms-targets",
+      "rate": 48000,
+      "channels": 2,
+      "frames": 60032,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            12
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            0.005
+          ],
+          [
+            4,
+            0.1
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.0002708333333333333,
+            "value": -18.123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.0008541666666666667,
+            "value": 2.7123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 1,
+            "kind": "target",
+            "seconds": 0.010666666666666666,
+            "value": 0,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 3,
+            "kind": "target",
+            "seconds": 0.0106875,
+            "value": 0.02123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 4,
+            "kind": "target",
+            "seconds": 0.08335416666666666,
+            "value": 0.3123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.17066666666666666,
+            "value": -42.123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.1706875,
+            "value": 12.123456789,
+            "timeConstant": 0.012
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -21.55967140197754,
+      "ownedReductionDb": -21.55967140197754,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        288
+      ],
+      "ownedFirstNonzero": [
+        288,
+        288
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "6f166259fd0a6ded0bda356dbd4ea19319212729c56b150961cea965823f816d",
+      "ownedPcmSha256": "6f166259fd0a6ded0bda356dbd4ea19319212729c56b150961cea965823f816d",
+      "nativeCoefficientSha256": "ff916a679ff30752baee947c6ecf379d0dc264ad76ac9493f49377d703d90afa",
+      "ownedCoefficientSha256": "ff916a679ff30752baee947c6ecf379d0dc264ad76ac9493f49377d703d90afa",
+      "pass": true
+    },
+    {
+      "id": "boundary-fractional-and-short-targets",
+      "rate": 48000,
+      "channels": 2,
+      "frames": 60032,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0,
+            "value": -48,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.0026666666666666666,
+            "value": -12,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.005322916666666667,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.008002083333333333,
+            "value": -6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 0.010666666666666666,
+            "value": -24
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.17066666666666666,
+            "value": -60,
+            "timeConstant": 0.000001
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.20839583333333334,
+            "value": 0,
+            "timeConstant": 0
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -2.316776752471924,
+      "ownedReductionDb": -2.316776752471924,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        288,
+        288
+      ],
+      "ownedFirstNonzero": [
+        288,
+        288
+      ],
+      "latencyFrames": 288,
+      "latencyPass": true,
+      "nativePcmSha256": "a02162eabb53a4ae0f060789a2c9436e3b105e4d925998b02315cd37bbba4cec",
+      "ownedPcmSha256": "a02162eabb53a4ae0f060789a2c9436e3b105e4d925998b02315cd37bbba4cec",
+      "nativeCoefficientSha256": "62446ec92a869a1c187dabce908d9a4dd22ba89570cef3ab70dcd8a5c71dcb2f",
+      "ownedCoefficientSha256": "62446ec92a869a1c187dabce908d9a4dd22ba89570cef3ab70dcd8a5c71dcb2f",
+      "pass": true
+    },
+    {
+      "id": "native-step-controls",
+      "rate": 96000,
+      "channels": 1,
+      "frames": 120064,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            30
+          ],
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 0.00013541666666666666,
+            "value": -36.123456789
+          },
+          {
+            "parameter": 1,
+            "kind": "step",
+            "seconds": 0.00042708333333333335,
+            "value": 6.123456789
+          },
+          {
+            "parameter": 2,
+            "kind": "step",
+            "seconds": 0.005333333333333333,
+            "value": 4.123456789
+          },
+          {
+            "parameter": 3,
+            "kind": "step",
+            "seconds": 0.00534375,
+            "value": 0.01123456789
+          },
+          {
+            "parameter": 4,
+            "kind": "step",
+            "seconds": 0.04167708333333333,
+            "value": 0.3123456789
+          },
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 0.08533333333333333,
+            "value": -12.123456789
+          },
+          {
+            "parameter": 2,
+            "kind": "step",
+            "seconds": 0.08534375,
+            "value": 12.123456789
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -2.7748072147369385,
+      "ownedReductionDb": -2.7748072147369385,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        576
+      ],
+      "ownedFirstNonzero": [
+        576,
+        576
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "6d7c0eaba48be062284a918a649d72ebba75e4601d28e3a6a09a6d8155c72009",
+      "ownedPcmSha256": "6d7c0eaba48be062284a918a649d72ebba75e4601d28e3a6a09a6d8155c72009",
+      "nativeCoefficientSha256": "283029d4f3f418112dee436cbb7d6590be2c6f97842206824216b8a121b4cec9",
+      "ownedCoefficientSha256": "283029d4f3f418112dee436cbb7d6590be2c6f97842206824216b8a121b4cec9",
+      "pass": true
+    },
+    {
+      "id": "voice-kernel-20ms-targets",
+      "rate": 96000,
+      "channels": 1,
+      "frames": 120064,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0,
+            "value": 0,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0,
+            "value": 4,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.00013541666666666666,
+            "value": -27,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.00013541666666666666,
+            "value": 4,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.00042708333333333335,
+            "value": -27,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.00042708333333333335,
+            "value": 6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 3,
+            "kind": "target",
+            "seconds": 0.005333333333333333,
+            "value": 0.01,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 4,
+            "kind": "target",
+            "seconds": 0.00534375,
+            "value": 0.1,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.04167708333333333,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.04167708333333333,
+            "value": 6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.08533333333333333,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.08533333333333333,
+            "value": 12,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.10419791666666667,
+            "value": 0,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.10419791666666667,
+            "value": 12,
+            "timeConstant": 0.02
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -0.382457971572876,
+      "ownedReductionDb": -0.382457971572876,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        576
+      ],
+      "ownedFirstNonzero": [
+        576,
+        576
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "49be657e8fbec53b7a333a566cf16f23b0f1faf5f6056e567d72077015903c89",
+      "ownedPcmSha256": "49be657e8fbec53b7a333a566cf16f23b0f1faf5f6056e567d72077015903c89",
+      "nativeCoefficientSha256": "e7ed09c3c8cb397ea6e137949f6209afe6bc0cc890ff517824b1d9aec84a4647",
+      "ownedCoefficientSha256": "e7ed09c3c8cb397ea6e137949f6209afe6bc0cc890ff517824b1d9aec84a4647",
+      "pass": true
+    },
+    {
+      "id": "rack-kernel-12ms-targets",
+      "rate": 96000,
+      "channels": 1,
+      "frames": 120064,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            12
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            0.005
+          ],
+          [
+            4,
+            0.1
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.00013541666666666666,
+            "value": -18.123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.00042708333333333335,
+            "value": 2.7123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 1,
+            "kind": "target",
+            "seconds": 0.005333333333333333,
+            "value": 0,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 3,
+            "kind": "target",
+            "seconds": 0.00534375,
+            "value": 0.02123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 4,
+            "kind": "target",
+            "seconds": 0.04167708333333333,
+            "value": 0.3123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.08533333333333333,
+            "value": -42.123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.08534375,
+            "value": 12.123456789,
+            "timeConstant": 0.012
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -21.240997314453125,
+      "ownedReductionDb": -21.240997314453125,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        576
+      ],
+      "ownedFirstNonzero": [
+        576,
+        576
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "623a7c87898c681d5fcb5ab1e085a0855ab29079426bcc7b16517674e55acd52",
+      "ownedPcmSha256": "623a7c87898c681d5fcb5ab1e085a0855ab29079426bcc7b16517674e55acd52",
+      "nativeCoefficientSha256": "54fb92a8c0ddc56296ce5e6848fc67786ec9583ec44dc12e454f9eb27cd95da9",
+      "ownedCoefficientSha256": "54fb92a8c0ddc56296ce5e6848fc67786ec9583ec44dc12e454f9eb27cd95da9",
+      "pass": true
+    },
+    {
+      "id": "boundary-fractional-and-short-targets",
+      "rate": 96000,
+      "channels": 1,
+      "frames": 120064,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0,
+            "value": -48,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.0013333333333333333,
+            "value": -12,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.0026614583333333334,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.004001041666666667,
+            "value": -6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 0.005333333333333333,
+            "value": -24
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.08533333333333333,
+            "value": -60,
+            "timeConstant": 0.000001
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.10419791666666667,
+            "value": 0,
+            "timeConstant": 0
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -0.4565986096858978,
+      "ownedReductionDb": -0.4565986096858978,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        576
+      ],
+      "ownedFirstNonzero": [
+        576,
+        576
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "9893c7f036c1d82451ded3cfe3edf6d466c7315710c7e982fadf059ffafa0e8b",
+      "ownedPcmSha256": "9893c7f036c1d82451ded3cfe3edf6d466c7315710c7e982fadf059ffafa0e8b",
+      "nativeCoefficientSha256": "a1ea5d817fdba9a5616815564ea98e195699602bfb353b01c8b73c817561e254",
+      "ownedCoefficientSha256": "a1ea5d817fdba9a5616815564ea98e195699602bfb353b01c8b73c817561e254",
+      "pass": true
+    },
+    {
+      "id": "native-step-controls",
+      "rate": 96000,
+      "channels": 2,
+      "frames": 120064,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            30
+          ],
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 0.00013541666666666666,
+            "value": -36.123456789
+          },
+          {
+            "parameter": 1,
+            "kind": "step",
+            "seconds": 0.00042708333333333335,
+            "value": 6.123456789
+          },
+          {
+            "parameter": 2,
+            "kind": "step",
+            "seconds": 0.005333333333333333,
+            "value": 4.123456789
+          },
+          {
+            "parameter": 3,
+            "kind": "step",
+            "seconds": 0.00534375,
+            "value": 0.01123456789
+          },
+          {
+            "parameter": 4,
+            "kind": "step",
+            "seconds": 0.04167708333333333,
+            "value": 0.3123456789
+          },
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 0.08533333333333333,
+            "value": -12.123456789
+          },
+          {
+            "parameter": 2,
+            "kind": "step",
+            "seconds": 0.08534375,
+            "value": 12.123456789
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -2.8543498516082764,
+      "ownedReductionDb": -2.8543498516082764,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        576
+      ],
+      "ownedFirstNonzero": [
+        576,
+        576
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "96bd0bac7e612550ca2b2b37267d511a2ce009ad32c9078c9c10d2fd1a30bd40",
+      "ownedPcmSha256": "96bd0bac7e612550ca2b2b37267d511a2ce009ad32c9078c9c10d2fd1a30bd40",
+      "nativeCoefficientSha256": "283029d4f3f418112dee436cbb7d6590be2c6f97842206824216b8a121b4cec9",
+      "ownedCoefficientSha256": "283029d4f3f418112dee436cbb7d6590be2c6f97842206824216b8a121b4cec9",
+      "pass": true
+    },
+    {
+      "id": "voice-kernel-20ms-targets",
+      "rate": 96000,
+      "channels": 2,
+      "frames": 120064,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0,
+            "value": 0,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0,
+            "value": 4,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.00013541666666666666,
+            "value": -27,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.00013541666666666666,
+            "value": 4,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.00042708333333333335,
+            "value": -27,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.00042708333333333335,
+            "value": 6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 3,
+            "kind": "target",
+            "seconds": 0.005333333333333333,
+            "value": 0.01,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 4,
+            "kind": "target",
+            "seconds": 0.00534375,
+            "value": 0.1,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.04167708333333333,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.04167708333333333,
+            "value": 6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.08533333333333333,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.08533333333333333,
+            "value": 12,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.10419791666666667,
+            "value": 0,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.10419791666666667,
+            "value": 12,
+            "timeConstant": 0.02
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -0.38340678811073303,
+      "ownedReductionDb": -0.38340678811073303,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        576
+      ],
+      "ownedFirstNonzero": [
+        576,
+        576
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "58d04fb4c50b4db77eba88b38902cd7bf416cfa4723ba7a221c068caf82bc31c",
+      "ownedPcmSha256": "58d04fb4c50b4db77eba88b38902cd7bf416cfa4723ba7a221c068caf82bc31c",
+      "nativeCoefficientSha256": "e7ed09c3c8cb397ea6e137949f6209afe6bc0cc890ff517824b1d9aec84a4647",
+      "ownedCoefficientSha256": "e7ed09c3c8cb397ea6e137949f6209afe6bc0cc890ff517824b1d9aec84a4647",
+      "pass": true
+    },
+    {
+      "id": "rack-kernel-12ms-targets",
+      "rate": 96000,
+      "channels": 2,
+      "frames": 120064,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            12
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            0.005
+          ],
+          [
+            4,
+            0.1
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.00013541666666666666,
+            "value": -18.123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.00042708333333333335,
+            "value": 2.7123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 1,
+            "kind": "target",
+            "seconds": 0.005333333333333333,
+            "value": 0,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 3,
+            "kind": "target",
+            "seconds": 0.00534375,
+            "value": 0.02123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 4,
+            "kind": "target",
+            "seconds": 0.04167708333333333,
+            "value": 0.3123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.08533333333333333,
+            "value": -42.123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.08534375,
+            "value": 12.123456789,
+            "timeConstant": 0.012
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -21.671972274780273,
+      "ownedReductionDb": -21.671972274780273,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        576
+      ],
+      "ownedFirstNonzero": [
+        576,
+        576
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "8968dde848646995487d001d18d75dd026192e52a53521a1a6273236014cff47",
+      "ownedPcmSha256": "8968dde848646995487d001d18d75dd026192e52a53521a1a6273236014cff47",
+      "nativeCoefficientSha256": "54fb92a8c0ddc56296ce5e6848fc67786ec9583ec44dc12e454f9eb27cd95da9",
+      "ownedCoefficientSha256": "54fb92a8c0ddc56296ce5e6848fc67786ec9583ec44dc12e454f9eb27cd95da9",
+      "pass": true
+    },
+    {
+      "id": "boundary-fractional-and-short-targets",
+      "rate": 96000,
+      "channels": 2,
+      "frames": 120064,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0,
+            "value": -48,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.0013333333333333333,
+            "value": -12,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.0026614583333333334,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.004001041666666667,
+            "value": -6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 0.005333333333333333,
+            "value": -24
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.08533333333333333,
+            "value": -60,
+            "timeConstant": 0.000001
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.10419791666666667,
+            "value": 0,
+            "timeConstant": 0
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -0.45852169394493103,
+      "ownedReductionDb": -0.45852169394493103,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        576,
+        576
+      ],
+      "ownedFirstNonzero": [
+        576,
+        576
+      ],
+      "latencyFrames": 576,
+      "latencyPass": true,
+      "nativePcmSha256": "7df6fd238cbedf01dec79ec4964541f5f3ae665556626c86e2d61ea603a9f311",
+      "ownedPcmSha256": "7df6fd238cbedf01dec79ec4964541f5f3ae665556626c86e2d61ea603a9f311",
+      "nativeCoefficientSha256": "a1ea5d817fdba9a5616815564ea98e195699602bfb353b01c8b73c817561e254",
+      "ownedCoefficientSha256": "a1ea5d817fdba9a5616815564ea98e195699602bfb353b01c8b73c817561e254",
+      "pass": true
+    },
+    {
+      "id": "native-step-controls",
+      "rate": 192000,
+      "channels": 1,
+      "frames": 240000,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            30
+          ],
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 0.00006770833333333333,
+            "value": -36.123456789
+          },
+          {
+            "parameter": 1,
+            "kind": "step",
+            "seconds": 0.00021354166666666668,
+            "value": 6.123456789
+          },
+          {
+            "parameter": 2,
+            "kind": "step",
+            "seconds": 0.0026666666666666666,
+            "value": 4.123456789
+          },
+          {
+            "parameter": 3,
+            "kind": "step",
+            "seconds": 0.002671875,
+            "value": 0.01123456789
+          },
+          {
+            "parameter": 4,
+            "kind": "step",
+            "seconds": 0.020838541666666665,
+            "value": 0.3123456789
+          },
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 0.042666666666666665,
+            "value": -12.123456789
+          },
+          {
+            "parameter": 2,
+            "kind": "step",
+            "seconds": 0.042671875,
+            "value": 12.123456789
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -2.8504695892333984,
+      "ownedReductionDb": -2.8504695892333984,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        1023,
+        1023
+      ],
+      "ownedFirstNonzero": [
+        1023,
+        1023
+      ],
+      "latencyFrames": 1023,
+      "latencyPass": true,
+      "nativePcmSha256": "2d4f9643176ba3e05cf43ed33f449024f41a1cdc8a352683dbe12bc7c2e593f0",
+      "ownedPcmSha256": "2d4f9643176ba3e05cf43ed33f449024f41a1cdc8a352683dbe12bc7c2e593f0",
+      "nativeCoefficientSha256": "1fd9866a8ba35c621d4be95aac7e4521dabc519c5edfc9c9e3d333a1b42ea3ca",
+      "ownedCoefficientSha256": "1fd9866a8ba35c621d4be95aac7e4521dabc519c5edfc9c9e3d333a1b42ea3ca",
+      "pass": true
+    },
+    {
+      "id": "voice-kernel-20ms-targets",
+      "rate": 192000,
+      "channels": 1,
+      "frames": 240000,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0,
+            "value": 0,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0,
+            "value": 4,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.00006770833333333333,
+            "value": -27,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.00006770833333333333,
+            "value": 4,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.00021354166666666668,
+            "value": -27,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.00021354166666666668,
+            "value": 6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 3,
+            "kind": "target",
+            "seconds": 0.0026666666666666666,
+            "value": 0.01,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 4,
+            "kind": "target",
+            "seconds": 0.002671875,
+            "value": 0.1,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.020838541666666665,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.020838541666666665,
+            "value": 6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.042666666666666665,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.042666666666666665,
+            "value": 12,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.052098958333333334,
+            "value": 0,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.052098958333333334,
+            "value": 12,
+            "timeConstant": 0.02
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -0.3615743815898895,
+      "ownedReductionDb": -0.3615743815898895,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        1023,
+        1023
+      ],
+      "ownedFirstNonzero": [
+        1023,
+        1023
+      ],
+      "latencyFrames": 1023,
+      "latencyPass": true,
+      "nativePcmSha256": "aab321f5cc9a6d41a5741fd8a9a24b69bda20e6c2e1d5e4d59522412153efa5e",
+      "ownedPcmSha256": "aab321f5cc9a6d41a5741fd8a9a24b69bda20e6c2e1d5e4d59522412153efa5e",
+      "nativeCoefficientSha256": "ecc861c0302b11e7cb3c2f2be1af0c0e0216133f8daf2b95bd033798c995355c",
+      "ownedCoefficientSha256": "ecc861c0302b11e7cb3c2f2be1af0c0e0216133f8daf2b95bd033798c995355c",
+      "pass": true
+    },
+    {
+      "id": "rack-kernel-12ms-targets",
+      "rate": 192000,
+      "channels": 1,
+      "frames": 240000,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            12
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            0.005
+          ],
+          [
+            4,
+            0.1
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.00006770833333333333,
+            "value": -18.123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.00021354166666666668,
+            "value": 2.7123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 1,
+            "kind": "target",
+            "seconds": 0.0026666666666666666,
+            "value": 0,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 3,
+            "kind": "target",
+            "seconds": 0.002671875,
+            "value": 0.02123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 4,
+            "kind": "target",
+            "seconds": 0.020838541666666665,
+            "value": 0.3123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.042666666666666665,
+            "value": -42.123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.042671875,
+            "value": 12.123456789,
+            "timeConstant": 0.012
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -21.47528648376465,
+      "ownedReductionDb": -21.47528648376465,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        1023,
+        1023
+      ],
+      "ownedFirstNonzero": [
+        1023,
+        1023
+      ],
+      "latencyFrames": 1023,
+      "latencyPass": true,
+      "nativePcmSha256": "1fdb91b252136dee78d9dcacbef52aa9aa2c83eb760b840422128e63fd297ada",
+      "ownedPcmSha256": "1fdb91b252136dee78d9dcacbef52aa9aa2c83eb760b840422128e63fd297ada",
+      "nativeCoefficientSha256": "3f6fdde6a1f0d3cbadf3c1ee215c05ac679923db1eee35112926391602f3d331",
+      "ownedCoefficientSha256": "3f6fdde6a1f0d3cbadf3c1ee215c05ac679923db1eee35112926391602f3d331",
+      "pass": true
+    },
+    {
+      "id": "boundary-fractional-and-short-targets",
+      "rate": 192000,
+      "channels": 1,
+      "frames": 240000,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0,
+            "value": -48,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.0006666666666666666,
+            "value": -12,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.0013307291666666667,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.0020005208333333333,
+            "value": -6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 0.0026666666666666666,
+            "value": -24
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.042666666666666665,
+            "value": -60,
+            "timeConstant": 0.000001
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.052098958333333334,
+            "value": 0,
+            "timeConstant": 0
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -0.4273918569087982,
+      "ownedReductionDb": -0.4273918569087982,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        1023,
+        1023
+      ],
+      "ownedFirstNonzero": [
+        1023,
+        1023
+      ],
+      "latencyFrames": 1023,
+      "latencyPass": true,
+      "nativePcmSha256": "10ff12a67273e906b8b8919ba1e82f8ec2a0f8c619a6a94c47798704a9a89848",
+      "ownedPcmSha256": "10ff12a67273e906b8b8919ba1e82f8ec2a0f8c619a6a94c47798704a9a89848",
+      "nativeCoefficientSha256": "411a3ee9f6aa5d597140dba7c2d08e7773f5e00e19ed4ce26b7ee7672b8e4e1c",
+      "ownedCoefficientSha256": "411a3ee9f6aa5d597140dba7c2d08e7773f5e00e19ed4ce26b7ee7672b8e4e1c",
+      "pass": true
+    },
+    {
+      "id": "native-step-controls",
+      "rate": 192000,
+      "channels": 2,
+      "frames": 240000,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            30
+          ],
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 0.00006770833333333333,
+            "value": -36.123456789
+          },
+          {
+            "parameter": 1,
+            "kind": "step",
+            "seconds": 0.00021354166666666668,
+            "value": 6.123456789
+          },
+          {
+            "parameter": 2,
+            "kind": "step",
+            "seconds": 0.0026666666666666666,
+            "value": 4.123456789
+          },
+          {
+            "parameter": 3,
+            "kind": "step",
+            "seconds": 0.002671875,
+            "value": 0.01123456789
+          },
+          {
+            "parameter": 4,
+            "kind": "step",
+            "seconds": 0.020838541666666665,
+            "value": 0.3123456789
+          },
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 0.042666666666666665,
+            "value": -12.123456789
+          },
+          {
+            "parameter": 2,
+            "kind": "step",
+            "seconds": 0.042671875,
+            "value": 12.123456789
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -2.9035024642944336,
+      "ownedReductionDb": -2.9035024642944336,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        1023,
+        1023
+      ],
+      "ownedFirstNonzero": [
+        1023,
+        1023
+      ],
+      "latencyFrames": 1023,
+      "latencyPass": true,
+      "nativePcmSha256": "ee3ce3156cd1e3a905cef07fd73a14d2ce4688193b70ac0910fe139ff8d40384",
+      "ownedPcmSha256": "ee3ce3156cd1e3a905cef07fd73a14d2ce4688193b70ac0910fe139ff8d40384",
+      "nativeCoefficientSha256": "1fd9866a8ba35c621d4be95aac7e4521dabc519c5edfc9c9e3d333a1b42ea3ca",
+      "ownedCoefficientSha256": "1fd9866a8ba35c621d4be95aac7e4521dabc519c5edfc9c9e3d333a1b42ea3ca",
+      "pass": true
+    },
+    {
+      "id": "voice-kernel-20ms-targets",
+      "rate": 192000,
+      "channels": 2,
+      "frames": 240000,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0,
+            "value": 0,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0,
+            "value": 4,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.00006770833333333333,
+            "value": -27,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.00006770833333333333,
+            "value": 4,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.00021354166666666668,
+            "value": -27,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.00021354166666666668,
+            "value": 6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 3,
+            "kind": "target",
+            "seconds": 0.0026666666666666666,
+            "value": 0.01,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 4,
+            "kind": "target",
+            "seconds": 0.002671875,
+            "value": 0.1,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.020838541666666665,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.020838541666666665,
+            "value": 6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.042666666666666665,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.042666666666666665,
+            "value": 12,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.052098958333333334,
+            "value": 0,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.052098958333333334,
+            "value": 12,
+            "timeConstant": 0.02
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -0.3615743815898895,
+      "ownedReductionDb": -0.3615743815898895,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        1023,
+        1023
+      ],
+      "ownedFirstNonzero": [
+        1023,
+        1023
+      ],
+      "latencyFrames": 1023,
+      "latencyPass": true,
+      "nativePcmSha256": "4206d1543a61fd1e2a0c35074d080767f3087267db349769efdc8ff987ec9138",
+      "ownedPcmSha256": "4206d1543a61fd1e2a0c35074d080767f3087267db349769efdc8ff987ec9138",
+      "nativeCoefficientSha256": "ecc861c0302b11e7cb3c2f2be1af0c0e0216133f8daf2b95bd033798c995355c",
+      "ownedCoefficientSha256": "ecc861c0302b11e7cb3c2f2be1af0c0e0216133f8daf2b95bd033798c995355c",
+      "pass": true
+    },
+    {
+      "id": "rack-kernel-12ms-targets",
+      "rate": 192000,
+      "channels": 2,
+      "frames": 240000,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            12
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            0.005
+          ],
+          [
+            4,
+            0.1
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.00006770833333333333,
+            "value": -18.123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.00021354166666666668,
+            "value": 2.7123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 1,
+            "kind": "target",
+            "seconds": 0.0026666666666666666,
+            "value": 0,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 3,
+            "kind": "target",
+            "seconds": 0.002671875,
+            "value": 0.02123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 4,
+            "kind": "target",
+            "seconds": 0.020838541666666665,
+            "value": 0.3123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.042666666666666665,
+            "value": -42.123456789,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 2,
+            "kind": "target",
+            "seconds": 0.042671875,
+            "value": 12.123456789,
+            "timeConstant": 0.012
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -21.830026626586914,
+      "ownedReductionDb": -21.830026626586914,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        1023,
+        1023
+      ],
+      "ownedFirstNonzero": [
+        1023,
+        1023
+      ],
+      "latencyFrames": 1023,
+      "latencyPass": true,
+      "nativePcmSha256": "32c2fa5d3c3f488fe4761fe19d287c680219094ccb22345a36b752fa8dff784c",
+      "ownedPcmSha256": "32c2fa5d3c3f488fe4761fe19d287c680219094ccb22345a36b752fa8dff784c",
+      "nativeCoefficientSha256": "3f6fdde6a1f0d3cbadf3c1ee215c05ac679923db1eee35112926391602f3d331",
+      "ownedCoefficientSha256": "3f6fdde6a1f0d3cbadf3c1ee215c05ac679923db1eee35112926391602f3d331",
+      "pass": true
+    },
+    {
+      "id": "boundary-fractional-and-short-targets",
+      "rate": 192000,
+      "channels": 2,
+      "frames": 240000,
+      "spec": {
+        "version": 1,
+        "profile": "chromium-dynamics-k-rate-e14de735-v1",
+        "controlClock": "native-128",
+        "parameters": [
+          [
+            0,
+            -24
+          ],
+          [
+            1,
+            6
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            0.003
+          ],
+          [
+            4,
+            0.25
+          ]
+        ],
+        "events": [
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0,
+            "value": -48,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.0006666666666666666,
+            "value": -12,
+            "timeConstant": 0.012
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.0013307291666666667,
+            "value": -36,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.0020005208333333333,
+            "value": -6,
+            "timeConstant": 0.02
+          },
+          {
+            "parameter": 0,
+            "kind": "step",
+            "seconds": 0.0026666666666666666,
+            "value": -24
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.042666666666666665,
+            "value": -60,
+            "timeConstant": 0.000001
+          },
+          {
+            "parameter": 0,
+            "kind": "target",
+            "seconds": 0.052098958333333334,
+            "value": 0,
+            "timeConstant": 0
+          }
+        ]
+      },
+      "maxAbsoluteError": 0,
+      "relativeRmsError": 0,
+      "nonFinite": 0,
+      "maxDifference": null,
+      "controls": [
+        {
+          "name": "threshold",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "knee",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "ratio",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "attack",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        },
+        {
+          "name": "release",
+          "maxUlps": 0,
+          "differingSamples": 0,
+          "maxDifference": null
+        }
+      ],
+      "nativeReductionDb": -0.428342342376709,
+      "ownedReductionDb": -0.428342342376709,
+      "reductionDbError": 0,
+      "nativeFirstNonzero": [
+        1023,
+        1023
+      ],
+      "ownedFirstNonzero": [
+        1023,
+        1023
+      ],
+      "latencyFrames": 1023,
+      "latencyPass": true,
+      "nativePcmSha256": "0328fd7d11479711b795a807cbbcc2d79af2a5b7877480f42f4aefa831550315",
+      "ownedPcmSha256": "0328fd7d11479711b795a807cbbcc2d79af2a5b7877480f42f4aefa831550315",
+      "nativeCoefficientSha256": "411a3ee9f6aa5d597140dba7c2d08e7773f5e00e19ed4ce26b7ee7672b8e4e1c",
+      "ownedCoefficientSha256": "411a3ee9f6aa5d597140dba7c2d08e7773f5e00e19ed4ce26b7ee7672b8e4e1c",
+      "pass": true
+    }
+  ]
+}

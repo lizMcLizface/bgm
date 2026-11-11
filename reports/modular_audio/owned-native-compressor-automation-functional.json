@@ -2,8 +2,8 @@
   "kind": "native-compressor.captured-functional",
   "version": 1,
   "pass": true,
-  "createdAtUtc": "2026-11-11T02:51:01.226Z",
-  "engineVersion": "487e801f35713c8b",
+  "createdAtUtc": "2026-11-11T08:03:03.912Z",
+  "engineVersion": "d63396e9fd4e4b0f",
   "build": {
     "api": 1,
     "profile": {
@@ -146,11 +146,11 @@
       }
     },
     "audited": true,
-    "source": "d55517fc94a28c8d33f3c71b87d7c546d646550806f267b557f5b8573bc2abc2",
-    "runtime": "c19c4b4145765b49599f70c45d003d34b1f40c34cdbe96a405ea6d4155cd9a0e",
-    "wasm": "5d9bae1d05d632a214a330dccc6fc40f08ece28134de2eb6479c059220dbad1b",
-    "bytes": 68079,
-    "version": "487e801f35713c8b"
+    "source": "d0163717c4305a0a62b71d32cc3e95e615ba743f00f0d6dd7eaf8093bf65fbf5",
+    "runtime": "8ca3138c2fde08b789169161aea1f47d598d7d20023ca7a451b0608d1afd52e9",
+    "wasm": "caaecabdfbf6634849c9d6d7009eebe45286b5f51c4820afdca29c3b9d80fccb",
+    "bytes": 68122,
+    "version": "d63396e9fd4e4b0f"
   },
   "scope": "Owned captured-controller invariants and allocator instrumentation only. Static compressor Engine is reused unchanged. Reset replays original immutable initial values and step/target schedule; live static controls keep their separate latest-target reset contract. Actual native k-rate coefficient/PCM/meter acceptance is a separate browser batch.",
   "trials": [

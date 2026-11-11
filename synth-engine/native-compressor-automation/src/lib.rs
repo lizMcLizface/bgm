@@ -52,6 +52,7 @@ impl Automation {
             || value > PARAMETERS[index].1
             || !tau.is_finite()
             || tau < 0.
+            || (kind == 0 && tau != 0.)
             || !(tau as f32).is_finite()
             || (tau > 0. && tau as f32 == 0.)
             || self.timelines.iter().map(Timeline::len).sum::<usize>() >= MAX_TOTAL

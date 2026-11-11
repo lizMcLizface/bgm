@@ -1,5 +1,9 @@
 # Explicit native DynamicsCompressor profile
 
+Contract correction checkpoint: current standalone version518439cc3c3f8cc9
+retains byte-identical33,718-byte numeric Wasm. Installed JS snapshots are now
+immutable, while builder configurations remain editable. Eleven focused static
+tests pass, including the previously divergent save/patch metadata case.
 Updated 2026-11-11. This independent port preserves the actual Chromium native
 node algorithm behind an opt-in profile. It does not replace the original live
 Web Audio routes, the existing zero-lookahead `graph.compressor`, the desk
@@ -81,8 +85,10 @@ detector/meter/delay state.
 six-rate mono/stereo cases with raw exact callback-partition equality, timestamped
 128-frame controls, save/reload, latest-target reset, independent handles, zero
 Wasm allocation/reclamation calls after preparation and no memory growth.
-Ten focused tests cover those clocks, latency, stereo linking/isolation, mono
-mapping, complete validation, parameter bounds and fresh-instance reset.
+Eleven focused tests cover those clocks, latency, stereo linking/isolation, mono
+mapping, complete validation, parameter bounds, fresh-instance reset and immutable
+installed target snapshots. Builder configurations remain editable; installed
+snapshots are frozen so external edits cannot make save/reload disagree with DSP.
 
 The first real native comparison page is
 `tools/native-compressor-reference.html`:96 static cases across44.1/48/96kHz,
@@ -146,6 +152,15 @@ This establishes the tested static explicit profile. Native k-rate target-law
 automation, surrounding gain/parallel wrappers, long-silence AudioNode lifecycle,
 physical listening and realtime scheduling remain separate acceptance work.
 No existing live/default route has been switched by this standalone port.
+
+Known edge: the later active VoiceCompressor research suite exposes an underlying
+knee/math-profile mismatch at the exact coefficients reached by raw extreme
+controls at192kHz. Its native core maximum absolute error is .0005338191986083984,
+despite exact mirrored control coefficients; external makeup increases the error.
+The accepted static fixtures above still pass, but their numerical coverage is
+bounded, not universal. Global float/double primitive switches are not a valid
+correction. See `MODULAR_AUDIO_ENGINE_VOICE_COMPRESSOR_RESEARCH.md` for the retained
+46/48 native failure, neighboring-curve evidence and shared-core regression gate.
 
 ```powershell
 node tools/buildOwnedNativeCompressor.mjs --audit

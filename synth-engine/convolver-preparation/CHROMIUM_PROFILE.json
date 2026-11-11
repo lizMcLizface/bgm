@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "revision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+  "profile": "Logical aligned eight-lane Float32 energy reduction; native guard/calibration/rate scaling. Actual browser FFT-scale parity requires separate evidence. Source IR trim/mono/decay and piano generator are the original repository implementations.",
+  "sources": [
+    {
+      "file": "LICENSE",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/LICENSE",
+      "bytes": 1536,
+      "sha256": "368cca1106be99d39ecd32a38d8305585d802a475effb66380b91ffc9bcf709b"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/audio/reverb.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/reverb.cc",
+      "bytes": 11262,
+      "sha256": "6d17eb6c2022da61d1ecad19954004f807b1b00728fcf552a3827c3336ac6a72"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/audio/cpu/x86/vector_math_impl.h",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/cpu/x86/vector_math_impl.h",
+      "bytes": 17571,
+      "sha256": "511ca44dde5f0b41be7fc1b6f12b3715e27d80e44b29220b7ae34a178356fdae"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/audio/cpu/x86/vector_math_avx.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/cpu/x86/vector_math_avx.cc",
+      "bytes": 718,
+      "sha256": "1bcac07b6b19d4a89ed28c372f57546a64e41691dc2c782d252b6f9aa75bc3b0"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/audio/cpu/x86/vector_math_sse.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/cpu/x86/vector_math_sse.cc",
+      "bytes": 715,
+      "sha256": "c38889042553448dd12d948ccaa297aa2557d8b686858675eef085df5ad346ae"
+    }
+  ]
+}

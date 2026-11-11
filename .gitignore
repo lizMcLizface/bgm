@@ -53,3 +53,5 @@ synth-engine/string-voice/target/
 synth-engine/string-decay/target/
 synth-engine/voice-compressor/target/
 synth-engine/convolver/target/
+
+synth-engine/convolver-preparation/target/

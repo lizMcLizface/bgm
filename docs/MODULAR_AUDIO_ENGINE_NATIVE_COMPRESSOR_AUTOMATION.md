@@ -1,5 +1,10 @@
 # Captured native compressor automation
 
+Contract correction checkpoint: current version3442c80c6b9fd0b6 (66,943bytes)
+rejects raw step events with nonzero time constants before timeline mutation.
+Nine focused tests and12 updated allocation cases pass. The refreshed48-case
+native batch has exactly the previous owned PCM/coefficient hashes; bounds and
+known numerical coverage limits are unchanged. See native-compressor-automation-morning-browser.json and compressor-contract-correction-continuity.json.
 Updated 2026-11-11. This is a separate immutable capture layer around the
 accepted static native-compressor Engine. Existing native routes, static live
 controls, Graph compressors and app defaults remain unchanged.
@@ -41,11 +46,14 @@ timeline cursors, coefficient state, buffers and compressor state.
 
 ## Evidence and limitations
 
-Eight focused checks cover save/replay/reset, independent instances,
+Nine focused checks cover save/replay/reset, independent instances,
 foreign render splits, empty-capture parity with the static Engine, control-rate
 recurrence, exact-boundary zero-output segments, sub-audio-frame starts and
 bounded/immutable validation. The tests entered normal discovery only after a
 coherent normal public artifact was published.
+The raw Rust/Graph preparation boundary also rejects a step carrying a nonzero
+time constant before inserting it, matching host validation instead of silently
+ignoring that field. This validation correction does not change valid-event DSP.
 
 `owned-native-compressor-automation-functional.json` records12 mono/stereo
 cases at8/24/44.1/48/96/192kHz: raw exact callback-partition and save/reload
@@ -69,6 +77,16 @@ exact, and every measured onset matches declared lookahead, including the
 1023-frame cap at192kHz. Maximum absolute PCM error is1.8715858459472656e-5;
 maximum relative RMS error is3.0208925450543157e-6. The original unchanged bounds
 remain recorded with the full report. No live route has been switched.
+
+Known edge: the later active VoiceCompressor research suite reaches raw
+extreme-control coefficients at192kHz that expose a knee/math-profile mismatch
+in the underlying shared static core. All six mirrored controls match at0ULP
+(equal signed zeros treated equally), while two native PCM cases exceed the
+unchanged absolute-error bound. The accepted48 captured fixtures above still
+pass; their numerical coverage is bounded, not universal. The automation clock
+has not been identified as the cause. See
+`MODULAR_AUDIO_ENGINE_VOICE_COMPRESSOR_RESEARCH.md` for the exact failed record
+and required regression gate before any shared-core correction.
 
 This layer ports finite captured native parameter behavior. The complete voice
 makeup/trim path, rack parallel mix/gain targets, arbitrary native lifecycle,

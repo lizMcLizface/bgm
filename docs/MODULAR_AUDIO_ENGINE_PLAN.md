@@ -1,5 +1,23 @@
 # Modular audio engine and parallel rendering plan
 
+Overnight final-code checkpoint (11 November, ~08:20 UTC):
+[the port boundary inventory and next task](MODULAR_AUDIO_ENGINE_PORT_STATUS_2026_11_11.md)
+separate verified portable DSP/preparation from normal application adoption.
+Short/Pizzicato pass60 source/RNG cases,60 allocation cases and12 actual native
+playback cases. Original room preparation passes31 source/resource checks and15
+browser cases (12 native audio comparisons,3 explicit complete-IR limit refusals).
+Graph3cf3a29d17daadc3, the unchanged static numeric compressor, and the captured
+contract fix pass refreshed native/hash checks. Final regression:473 files /3705
+passing tests,4 existing audit-only skips; normal public build/provenance pass.
+The actual rebuilt All native/owned/restored desk paths also pass.
+
+The active VoiceCompressor wrapper remains unaccepted:46/48 native cases; two
+192k extreme-control cases expose an underlying knee-math rounding discrepancy.
+No bound, sound or default was changed to hide it. Long-IR execution, measured
+source Graph adoption, remaining native host seams, live transport adoption and
+cable editing remain explicit next work. The bounded run stays active until
+09:00 for final review; no push or deployment is authorized.
+
 Latest checkpoint (11 November, ~08:00 UTC): [wind/fire/vinyl preparation and
 its existing native host](MODULAR_AUDIO_ENGINE_AMBIENCE_LOOPS.md) pass72 exact
 reference cases,72 allocation cases,32 permanent tests and12 actual browser

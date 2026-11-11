@@ -1,0 +1,27 @@
+// @vitest-environment node
+// Owned-state invariants only. Native numerical acceptance remains UNACCEPTED;
+// see MODULAR_AUDIO_ENGINE_VOICE_COMPRESSOR_RESEARCH.md and its 46/48 report.
+import fs from 'node:fs';import {expect,it}from 'vitest';
+import {OwnedVoiceCompressor,ownedVoiceCompressorSpec,saveOwnedVoiceCompressorSpec,loadOwnedVoiceCompressorSpec,validateOwnedVoiceCompressorSpec}from './ownedVoiceCompressor';
+const module=new WebAssembly.Module(fs.readFileSync(process.env.OWNED_VOICE_COMPRESSOR_WASM??'public/modular-audio/voice-compressor.wasm'));
+const events=rate=>[{parameter:0,seconds:13/rate,value:.8123456789},{parameter:1,seconds:41/rate,value:6.123456789},{parameter:2,seconds:512/rate,value:3.123456789},{parameter:3,seconds:513/rate,value:.01123456789},{parameter:4,seconds:4001/rate,value:.3123456789},{parameter:0,seconds:8192/rate,value:.2123456789},{parameter:1,seconds:8193/rate,value:12.123456789},{parameter:2,seconds:10003/rate,value:-6.123456789}];
+const make=(rate=48000,spec=ownedVoiceCompressorSpec(),e=new WebAssembly.Instance(module,{}).exports)=>new OwnedVoiceCompressor(e,spec,rate);
+function render(d,total,parts=[128],channels=2){const pcm=[new Float32Array(total),new Float32Array(total)],core=pcm.map(v=>new Float32Array(v.length));for(let frame=0,k=0;frame<total;k++){const n=Math.min(total-frame,parts[k%parts.length]);for(let ch=0;ch<channels;ch++)for(let i=0;i<n;i++)d.input[ch][i]=Math.fround((frame+i<1000?.05:.6)*Math.sin((frame+i)*(.071+ch*.019))+.04*Math.cos((frame+i)*.313+ch));d.render(n,channels);for(let ch=0;ch<2;ch++){pcm[ch].set(d.output[ch].subarray(0,n),frame);core[ch].set(d.coreOutput[ch].subarray(0,n),frame);}frame+=n;}return {pcm,core};}
+it.each([44100,48000,96000])('owns the full active voice topology across splits/save/replay/instances at %i Hz',rate=>{
+ const spec=ownedVoiceCompressorSpec({amount:.7123456789,ratio:4.123456789,trim:-2.123456789,attack:.005123456789,release:.1123456789},events(rate)),e=new WebAssembly.Instance(module,{}).exports,a=make(rate,spec,e),b=make(rate,loadOwnedVoiceCompressorSpec(saveOwnedVoiceCompressorSpec(spec)),e);a.refresh();b.refresh();try{const first=render(a,16001,[1,13,37,509]);expect(render(b,16001)).toEqual(first);const before=b.stats();a.reset();expect(b.stats()).toEqual(before);expect(a.value(0)).toBe(.7123456789);expect(render(a,16001,[509,113])).toEqual(first);expect(a.spec.events[0].seconds).toBe(13/rate);}finally{a.dispose();b.dispose();}
+});
+it('preserves native cold targets, separate requested controls and exact source makeup formula',()=>{
+ const d=make(48000,ownedVoiceCompressorSpec({amount:.75,ratio:4,trim:0,attack:.01,release:.1}));try{d.render(1);expect(d.coreCoefficient(0)).toBe(-24);expect(d.coreCoefficient(2)).toBe(12);expect(d.stats().makeupGain).toBe(1);expect(d.value(0)).toBe(.75);render(d,24000);const threshold=-.75*36,slope=1-1/4,builtIn=.6*-threshold*slope,typical=Math.max(0,-18-threshold)*slope,gain=10**((-builtIn+typical*.85)/20);expect(d.stats().makeupGain).toBe(Math.fround(gain));expect(d.coreCoefficient(0)).toBe(-27);expect(d.coreCoefficient(2)).toBe(4);}finally{d.dispose();}
+});
+it('coalesces same-time raw controls exactly while keeping their captured history',()=>{
+ const a=make(48000,ownedVoiceCompressorSpec({amount:.6,ratio:3,trim:-2},[{parameter:0,seconds:0,value:.9},{parameter:1,seconds:0,value:6},{parameter:2,seconds:0,value:3}])),b=make(48000,ownedVoiceCompressorSpec({amount:.9,ratio:6,trim:3}));try{expect(render(a,12001,[1,37,509])).toEqual(render(b,12001));expect(a.stats().eventCount).toBe(3);expect(a.stats().makeupEvents).toBe(1);expect(a.stats().coreEvents).toBe(4);}finally{a.dispose();b.dispose();}
+});
+it('keeps external makeup out of native detection and preserves explicit active latency at amount0',()=>{
+ const a=make(48000,ownedVoiceCompressorSpec({amount:.75,trim:-6})),b=make(48000,ownedVoiceCompressorSpec({amount:.75,trim:6}));try{const x=render(a,12001),y=render(b,12001);expect(x.core).toEqual(y.core);expect(x.pcm).not.toEqual(y.pcm);}finally{a.dispose();b.dispose();}const d=make();try{d.input[0][0]=1;d.render(512);expect(d.left.findIndex(v=>v!==0)).toBe(288);expect(d.right.every(v=>v===0)).toBe(true);}finally{d.dispose();}
+});
+it('keeps original sub-quantum UI timestamps while native core coefficients remain k-rate',()=>{
+ const rate=44100,d=make(rate,ownedVoiceCompressorSpec({},[{parameter:2,seconds:13/rate,value:3.123456789}]));try{render(d,14);expect(d.value(2)).toBe(0);d.render(1);expect(d.value(2)).toBe(3.123456789);expect(d.coreCoefficient(0)).toBe(-24);expect(d.spec.events[0].seconds).toBe(13/rate);}finally{d.dispose();}
+});
+it('bounds and seals captured preparation without accepting a host bypass topology',()=>{
+ const spec=ownedVoiceCompressorSpec();expect(()=>validateOwnedVoiceCompressorSpec({...spec,topology:'bypass'})).toThrow();expect(()=>ownedVoiceCompressorSpec({},[{parameter:0,seconds:1,value:.5},{parameter:1,seconds:0,value:4}])).toThrow('chronological');expect(()=>ownedVoiceCompressorSpec({},Array.from({length:129},(_,i)=>({parameter:0,seconds:i*.001,value:.5})))).toThrow();const e=new WebAssembly.Instance(module,{}).exports,h=e.voice_comp_new(48000);try{expect(e.voice_comp_initial(h,0,.5)).toBe(1);expect(e.voice_comp_initial(h,0,.5)).toBe(0);expect(e.voice_comp_prepare(h)).toBe(0);}finally{e.voice_comp_free(h);}const d=make();try{expect(d.e.voice_comp_event(d.handle,0,0,.5)).toBe(0);expect(()=>{d.spec.parameters[0][1]=1;}).toThrow();}finally{d.dispose();}
+});

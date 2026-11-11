@@ -1,0 +1,68 @@
+{
+  "kind": "voice-compressor.native-reference-sources",
+  "version": 1,
+  "revision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+  "capturedAtUtc": "2026-11-11T03:08:18.686Z",
+  "scope": "Original active VoiceCompressor wrapper and pinned Gain/AudioParam source. Existing Instrument enable/bypass policy remains a separately recorded host boundary; this profile does not implement it.",
+  "sources": [
+    {
+      "file": "LICENSE",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/LICENSE",
+      "bytes": 1536,
+      "sha256": "368cca1106be99d39ecd32a38d8305585d802a475effb66380b91ffc9bcf709b"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/gain_handler.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/gain_handler.cc",
+      "bytes": 3853,
+      "sha256": "9b1b2e6a4d1fef5f88f67b3079fc76c01d99a31d46ae5db5047b2676fe290bc1"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/gain_handler.h",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/gain_handler.h",
+      "bytes": 1715,
+      "sha256": "b7bbff8ab19a4f6fdc2a72b769277bbd37e59a50cd9dcb4af9683956edb35db6"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/gain_node.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/gain_node.cc",
+      "bytes": 3281,
+      "sha256": "f687d86f5c3c57fdc26ffa55d93ca7e41d0bc9f3439b6988d37f7199f238850b"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/audio_param_handler.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_param_handler.cc",
+      "bytes": 92593,
+      "sha256": "50e6da5e2efa1254d05393ca03bae373b8a329e400d85b3f6cafd8ec3896ad8b"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/audio/audio_bus.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/audio_bus.cc",
+      "bytes": 28543,
+      "sha256": "17fc6c0a60c1b1ef4115942b05bd7c37838f74784d0d128e66a0e660cc2a05c6"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/audio/audio_bus.h",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/audio_bus.h",
+      "bytes": 8375,
+      "sha256": "c4853588db11635f081ff76c261d2ec9af3cf87ef832c494799401afff758023"
+    }
+  ],
+  "hosts": [
+    {
+      "file": "src/nodes/voiceCompressor.js",
+      "bytes": 2231,
+      "sha256": "1ea0bca04b9d8a7f925587329c4fb5eb3fd389ac8c7985f6374c44813a164ae0"
+    },
+    {
+      "file": "src/app/engine/voiceFx.js",
+      "bytes": 4662,
+      "sha256": "ea74827225580f0484403787555f0270d76e81199bbe845daf8addc33bfeda56"
+    },
+    {
+      "file": "src/app/engine/Instrument.js",
+      "bytes": 45217,
+      "sha256": "1257bc15f62977d4ab7375f08e17fc000db7a34e14341271a23ba2342e0c9173"
+    }
+  ]
+}

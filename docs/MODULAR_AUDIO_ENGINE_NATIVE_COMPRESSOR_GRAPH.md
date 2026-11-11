@@ -1,5 +1,10 @@
 # Native compressor graph contracts
 
+Current graph3cf3a29d17daadc3 is1,596,639bytes. The raw captured-step contract
+fix is covered by26 focused graph tests,12 updated allocation cases and12
+refreshed actual AudioWorklet/native cases with exact PCM. Streaming one/three-
+worker masters remain tested at48/96kHz; captured pool execution is a separate
+coverage gate. The underlying192k extreme knee-math limitation is retained below.
 11 November 2026 overnight checkpoint. Graph28 `native.compressor` and Graph29
 `native.compressor.capture` reuse the accepted static and captured native kernels.
 They remain explicit opt-in modules. The sidechain `graph.compressor`, voice
@@ -33,14 +38,14 @@ native tail, clock phases and latency without inventing generic graph controls.
 
 Verification before this checkpoint:
 
--25 focused graph tests pass: both modes at all six rates match standalone PCM
+-26 focused graph tests pass: both modes at all six rates match standalone PCM
   exactly despite foreign gate splits and irregular graph calls. They cover
   independent handles sharing Wasm, save/reload, reset, owner cancellation, late
   boundary controls, raw preparation failure/correction, immutable captured edit
   rejection and six-rate parallel-branch latency compensation. The PDC test uses
   the actual standalone startup amplitude; a unity-gain assumption was rejected
   at high rates, without changing DSP or tolerances.
--Actual one- and three-worker masters at48/96kHz match serial PCM exactly across
+-Actual streaming one- and three-worker masters at48/96kHz match serial PCM exactly across
   all eight buses, with zero queue underruns in these functional runs.
 -12 counting-allocator cases use two prepared graphs with PDC at all six rates,
   exercising render, enqueue, cancel, reset and pause. Allocation/reclamation
@@ -56,3 +61,12 @@ This is audio PCM, control, lifetime and persistence evidence. Physical listenin
 phone delivery, live user editing, normal transport adoption and target-device
 deadline acceptance remain separate. Next integrate accepted source/effect
 modules into a coherent opt-in portable host; preserve the normal native route.
+
+Known numerical coverage limit from the later VoiceCompressor research: extreme
+192kHz automation reaches a knee-search state whose native global log10f rounding
+differs from the current portable math profile. The wrapper failed2/48 cases
+despite exact coefficient traces. This caveat also applies to the reused static
+and captured core in these graph nodes. Their accepted fixed fixtures remain
+valid evidence, not a guarantee for every legal target combination. No DSP
+precision switch or tolerance relaxation was applied; see the dedicated
+VoiceCompressor research handoff for the unresolved original-source gate.

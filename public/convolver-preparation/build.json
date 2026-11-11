@@ -1,0 +1,18 @@
+{
+  "api": 1,
+  "hostSHA256": {
+    "src/modular-audio/roomPreparationReview.js": "a8cffb93444169ce9d0ced3293cd1fc8fddc3910eb0aa97cf09d5f259edbc3b0",
+    "tools/convolver-preparation.html": "cdff5f14f81d17439ecb10c13852746651d68beb98f2bc3d0a57d797a3c27b9c",
+    "tools/convolver-preparation.js": "9bd6cca44858ac057503b126a3dc3eb8ddd8b83422a2ec605ba028a04f76afce"
+  },
+  "hostVersion": "9f73f297348a8305",
+  "source": "0eb3242b88eee28eb0bcbbbc430ecc2dacde5e2f8cb92c1cd501738d20b6fb95",
+  "runtime": "76c7b41b2c804c1e76edd2748592904d4fad92c921a2c87ecdec320d25082a33",
+  "reference": "3c54f46d19343de274ca2e89dc143204d5ac433d95c9c5cf68750a148a1e08ba",
+  "wasm": "65c148d9f36f2ececb0778864a632404595e1dcdf172f676a308346f37dc261a",
+  "bytes": 26177,
+  "profile": "original-room-transforms-chromium-rms8-f32-v1",
+  "maxInputFrames": 2097152,
+  "execution": "preparation only; off audio callback; native decoding/resampling remains external",
+  "version": "8b2f1b053b33184e"
+}

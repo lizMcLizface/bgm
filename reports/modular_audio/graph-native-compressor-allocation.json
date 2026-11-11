@@ -1,8 +1,8 @@
 {
   "kind": "graph.native-compressor-allocation",
   "version": 1,
-  "engineVersion": "0349534ec1d782d4",
-  "auditWasmSha256": "85dd1e1a1c0d5a83a4e1c55b5b59249172590995340fd058cf006099b0b4b74d",
+  "engineVersion": "3cf3a29d17daadc3",
+  "auditWasmSha256": "a44b4bccd5ebfbc45b84563f8879cf59440a09586ea743062c4d8faa79ca7ed7",
   "pass": true,
   "scope": "Two prepared graph instances sharing Wasm, native streaming or immutable captured timelines and parallel dry PDC. render/queue/cancel/reset/pause watched. No scheduling deadline or physical output claim.",
   "results": [

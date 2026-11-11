@@ -130,8 +130,8 @@
   },
   "audited": false,
   "source": "84f3460d3dc346fcf655ac186c8763500ae18231d34789e332fa1605f98049ac",
-  "runtime": "105c9018c8bbe11e5375c404ea9a419561cb9bb3cc0c55a9288de5190d6e68da",
+  "runtime": "9700fc0bae6dc319c7122a49b3a14d5eef4ad1a4def234100341ac4a9d5a64fd",
   "wasm": "289553aa9c8538c4e090f83948fd4efd269be35e1fa45987d9b19d8d9386e9b1",
   "bytes": 33718,
-  "version": "4057fdc2c9a3136d"
+  "version": "518439cc3c3f8cc9"
 }

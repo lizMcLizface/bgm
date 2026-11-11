@@ -1,0 +1,2361 @@
+{
+  "kind": "measured-string.decay-owned-compatibility",
+  "version": 1,
+  "pass": true,
+  "error": null,
+  "build": "4ba147459341ae53",
+  "wasm": "aceb9df4b1fe0777fb9003b51f3cb8f322a058b18ffe134f90a5de031b69203e",
+  "preparation": "75424d620f95653a",
+  "reference": "b0b655b2804148606546aac17fbfc4aa1de513f620e8e5be3f249c94cb71ed86",
+  "rngObserver": "261a167136501ded02c49a47e6c8f70ff55f3f0ccb5c89739ecacb1ac156f4c0",
+  "limits": {
+    "maxSampleError": 1e-7,
+    "relativeRmsError": 1e-7
+  },
+  "scope": "Actual StringPlayer key/level/tunedModel/renderDecay source; original closure draw observer returns every original RNG value unchanged and its PCM is checked bit exactly against direct unchanged import. Full PCM plus final xorshift state/draw count. No realtime body convolver on this path.",
+  "cases": 60,
+  "bitExact": 30,
+  "maxSampleError": 3.637978807091713e-12,
+  "results": [
+    {
+      "patch": "short",
+      "rate": 8000,
+      "profile": "low-cache-zero",
+      "midi": 36,
+      "cacheVelocity": 0,
+      "exact": false,
+      "seedInput": 252,
+      "seed": 252,
+      "phase": "random",
+      "parts": "full",
+      "without": null,
+      "frames": 32000,
+      "pcm": {
+        "maxSampleError": 1.7763568394002505e-15,
+        "relativeRmsError": 7.07857593936283e-15,
+        "differingBits": 57
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 32000,
+        "finalRngState": 1577780652,
+        "rngDraws": 164822,
+        "initialRngState": 252,
+        "gain": 9.01571137605957,
+        "sampleRate": 8000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 4008248
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 1441792,
+      "grew": false,
+      "elapsedMs": 1036.3726
+    },
+    {
+      "patch": "short",
+      "rate": 8000,
+      "profile": "fractional-minimum",
+      "midi": 48.5,
+      "cacheVelocity": 78,
+      "exact": false,
+      "seedInput": 417.5,
+      "seed": 417,
+      "phase": "minimum",
+      "parts": "full",
+      "without": null,
+      "frames": 32000,
+      "pcm": {
+        "maxSampleError": 3.552713678800501e-15,
+        "relativeRmsError": 4.422610980147433e-15,
+        "differingBits": 191
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 32000,
+        "finalRngState": 1993808230,
+        "rngDraws": 148572,
+        "initialRngState": 417,
+        "gain": 9.01571137605957,
+        "sampleRate": 8000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 3705944
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 1441792,
+      "grew": false,
+      "elapsedMs": 980.5209999999997
+    },
+    {
+      "patch": "short",
+      "rate": 8000,
+      "profile": "top-exact",
+      "midi": 84,
+      "cacheVelocity": 127,
+      "exact": true,
+      "seedInput": 715,
+      "seed": 715,
+      "phase": "pulse",
+      "parts": "full",
+      "without": null,
+      "frames": 32000,
+      "pcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 32000,
+        "finalRngState": 1314969626,
+        "rngDraws": 131064,
+        "initialRngState": 715,
+        "gain": 9.01571137605957,
+        "sampleRate": 8000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 2786424
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 1441792,
+      "grew": false,
+      "elapsedMs": 638.7240000000002
+    },
+    {
+      "patch": "short",
+      "rate": 8000,
+      "profile": "missing-smooth",
+      "midi": 75.25,
+      "cacheVelocity": 0,
+      "exact": false,
+      "seedInput": 526.75,
+      "seed": 526,
+      "phase": "pulse",
+      "parts": "smooth",
+      "without": 75,
+      "frames": 32000,
+      "pcm": {
+        "maxSampleError": 3.552713678800501e-15,
+        "relativeRmsError": 1.1866385458244313e-14,
+        "differingBits": 79
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 32000,
+        "finalRngState": 113804762,
+        "rngDraws": 143748,
+        "initialRngState": 526,
+        "gain": 9.01571137605957,
+        "sampleRate": 8000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 3529976
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 1441792,
+      "grew": false,
+      "elapsedMs": 983.9971999999998
+    },
+    {
+      "patch": "short",
+      "rate": 8000,
+      "profile": "residual",
+      "midi": 60,
+      "cacheVelocity": 90,
+      "exact": false,
+      "seedInput": 510,
+      "seed": 510,
+      "phase": "minimum",
+      "parts": "residual",
+      "without": null,
+      "frames": 32000,
+      "pcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 32000,
+        "finalRngState": 1026574939,
+        "rngDraws": 23567,
+        "initialRngState": 510,
+        "gain": 9.01571137605957,
+        "sampleRate": 8000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 1978264
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 1441792,
+      "grew": false,
+      "elapsedMs": 421.66010000000006
+    },
+    {
+      "patch": "short",
+      "rate": 24000,
+      "profile": "low-cache-zero",
+      "midi": 36,
+      "cacheVelocity": 0,
+      "exact": false,
+      "seedInput": 252,
+      "seed": 252,
+      "phase": "random",
+      "parts": "full",
+      "without": null,
+      "frames": 96000,
+      "pcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 96000,
+        "finalRngState": 3538409276,
+        "rngDraws": 560838,
+        "initialRngState": 252,
+        "gain": 9.01571137605957,
+        "sampleRate": 24000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 8314168
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 1966080,
+      "grew": false,
+      "elapsedMs": 3530.2219999999998
+    },
+    {
+      "patch": "short",
+      "rate": 24000,
+      "profile": "fractional-minimum",
+      "midi": 48.5,
+      "cacheVelocity": 78,
+      "exact": false,
+      "seedInput": 417.5,
+      "seed": 417,
+      "phase": "minimum",
+      "parts": "full",
+      "without": null,
+      "frames": 96000,
+      "pcm": {
+        "maxSampleError": 1.7763568394002505e-15,
+        "relativeRmsError": 7.98487126175511e-16,
+        "differingBits": 58
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 96000,
+        "finalRngState": 29958888,
+        "rngDraws": 536921,
+        "initialRngState": 417,
+        "gain": 9.01571137605957,
+        "sampleRate": 24000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 8011864
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 1966080,
+      "grew": false,
+      "elapsedMs": 3103.5211
+    },
+    {
+      "patch": "short",
+      "rate": 24000,
+      "profile": "top-exact",
+      "midi": 84,
+      "cacheVelocity": 127,
+      "exact": true,
+      "seedInput": 715,
+      "seed": 715,
+      "phase": "pulse",
+      "parts": "full",
+      "without": null,
+      "frames": 96000,
+      "pcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 96000,
+        "finalRngState": 3208149334,
+        "rngDraws": 506883,
+        "initialRngState": 715,
+        "gain": 9.01571137605957,
+        "sampleRate": 24000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 7761016
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 1966080,
+      "grew": false,
+      "elapsedMs": 2191.8156
+    },
+    {
+      "patch": "short",
+      "rate": 24000,
+      "profile": "missing-smooth",
+      "midi": 75.25,
+      "cacheVelocity": 0,
+      "exact": false,
+      "seedInput": 526.75,
+      "seed": 526,
+      "phase": "pulse",
+      "parts": "smooth",
+      "without": 75,
+      "frames": 96000,
+      "pcm": {
+        "maxSampleError": 3.552713678800501e-15,
+        "relativeRmsError": 5.2126366808028474e-15,
+        "differingBits": 276
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 96000,
+        "finalRngState": 1609259972,
+        "rngDraws": 541651,
+        "initialRngState": 526,
+        "gain": 9.01571137605957,
+        "sampleRate": 24000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 7786744
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 1966080,
+      "grew": false,
+      "elapsedMs": 2416.8567999999977
+    },
+    {
+      "patch": "short",
+      "rate": 24000,
+      "profile": "residual",
+      "midi": 60,
+      "cacheVelocity": 90,
+      "exact": false,
+      "seedInput": 510,
+      "seed": 510,
+      "phase": "minimum",
+      "parts": "residual",
+      "without": null,
+      "frames": 96000,
+      "pcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 96000,
+        "finalRngState": 2274785391,
+        "rngDraws": 58910,
+        "initialRngState": 510,
+        "gain": 9.01571137605957,
+        "sampleRate": 24000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 4200344
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 1966080,
+      "grew": false,
+      "elapsedMs": 908.9991000000009
+    },
+    {
+      "patch": "short",
+      "rate": 44100,
+      "profile": "low-cache-zero",
+      "midi": 36,
+      "cacheVelocity": 0,
+      "exact": false,
+      "seedInput": 252,
+      "seed": 252,
+      "phase": "random",
+      "parts": "full",
+      "without": null,
+      "frames": 176400,
+      "pcm": {
+        "maxSampleError": 3.552713678800501e-15,
+        "relativeRmsError": 4.537495466133556e-15,
+        "differingBits": 372
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 176400,
+        "finalRngState": 270746562,
+        "rngDraws": 1004300,
+        "initialRngState": 252,
+        "gain": 9.01571137605957,
+        "sampleRate": 44100,
+        "seconds": 4,
+        "workspaceBudgetBytes": 14927224
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 2621440,
+      "grew": false,
+      "elapsedMs": 5890.721300000001
+    },
+    {
+      "patch": "short",
+      "rate": 44100,
+      "profile": "fractional-minimum",
+      "midi": 48.5,
+      "cacheVelocity": 78,
+      "exact": false,
+      "seedInput": 417.5,
+      "seed": 417,
+      "phase": "minimum",
+      "parts": "full",
+      "without": null,
+      "frames": 176400,
+      "pcm": {
+        "maxSampleError": 3.552713678800501e-15,
+        "relativeRmsError": 2.8592790586916237e-15,
+        "differingBits": 1273
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 176400,
+        "finalRngState": 3075789533,
+        "rngDraws": 991322,
+        "initialRngState": 417,
+        "gain": 9.01571137605957,
+        "sampleRate": 44100,
+        "seconds": 4,
+        "workspaceBudgetBytes": 14624920
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 2621440,
+      "grew": false,
+      "elapsedMs": 4746.4244
+    },
+    {
+      "patch": "short",
+      "rate": 44100,
+      "profile": "top-exact",
+      "midi": 84,
+      "cacheVelocity": 127,
+      "exact": true,
+      "seedInput": 715,
+      "seed": 715,
+      "phase": "pulse",
+      "parts": "full",
+      "without": null,
+      "frames": 176400,
+      "pcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 176400,
+        "finalRngState": 619550320,
+        "rngDraws": 965635,
+        "initialRngState": 715,
+        "gain": 9.01571137605957,
+        "sampleRate": 44100,
+        "seconds": 4,
+        "workspaceBudgetBytes": 14374072
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 2621440,
+      "grew": false,
+      "elapsedMs": 4131.8698
+    },
+    {
+      "patch": "short",
+      "rate": 44100,
+      "profile": "missing-smooth",
+      "midi": 75.25,
+      "cacheVelocity": 0,
+      "exact": false,
+      "seedInput": 526.75,
+      "seed": 526,
+      "phase": "pulse",
+      "parts": "smooth",
+      "without": 75,
+      "frames": 176400,
+      "pcm": {
+        "maxSampleError": 7.105427357601002e-15,
+        "relativeRmsError": 6.229697761069288e-15,
+        "differingBits": 552
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 176400,
+        "finalRngState": 3475922917,
+        "rngDraws": 1022305,
+        "initialRngState": 526,
+        "gain": 9.01571137605957,
+        "sampleRate": 44100,
+        "seconds": 4,
+        "workspaceBudgetBytes": 14399800
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 2621440,
+      "grew": false,
+      "elapsedMs": 4580.310700000002
+    },
+    {
+      "patch": "short",
+      "rate": 44100,
+      "profile": "residual",
+      "midi": 60,
+      "cacheVelocity": 90,
+      "exact": false,
+      "seedInput": 510,
+      "seed": 510,
+      "phase": "minimum",
+      "parts": "residual",
+      "without": null,
+      "frames": 176400,
+      "pcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 176400,
+        "finalRngState": 4247516770,
+        "rngDraws": 53522,
+        "initialRngState": 510,
+        "gain": 9.01571137605957,
+        "sampleRate": 44100,
+        "seconds": 4,
+        "workspaceBudgetBytes": 7143384
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 2621440,
+      "grew": false,
+      "elapsedMs": 1498.6201
+    },
+    {
+      "patch": "short",
+      "rate": 48000,
+      "profile": "low-cache-zero",
+      "midi": 36,
+      "cacheVelocity": 0,
+      "exact": false,
+      "seedInput": 252,
+      "seed": 252,
+      "phase": "random",
+      "parts": "full",
+      "without": null,
+      "frames": 192000,
+      "pcm": {
+        "maxSampleError": 3.552713678800501e-15,
+        "relativeRmsError": 4.4735684109299796e-15,
+        "differingBits": 329
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 192000,
+        "finalRngState": 874925184,
+        "rngDraws": 1026790,
+        "initialRngState": 252,
+        "gain": 9.01571137605957,
+        "sampleRate": 48000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 14989624
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 2686976,
+      "grew": false,
+      "elapsedMs": 6560.877699999997
+    },
+    {
+      "patch": "short",
+      "rate": 48000,
+      "profile": "fractional-minimum",
+      "midi": 48.5,
+      "cacheVelocity": 78,
+      "exact": false,
+      "seedInput": 417.5,
+      "seed": 417,
+      "phase": "minimum",
+      "parts": "full",
+      "without": null,
+      "frames": 192000,
+      "pcm": {
+        "maxSampleError": 3.552713678800501e-15,
+        "relativeRmsError": 1.9810295300520063e-15,
+        "differingBits": 927
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 192000,
+        "finalRngState": 1126108264,
+        "rngDraws": 1002873,
+        "initialRngState": 417,
+        "gain": 9.01571137605957,
+        "sampleRate": 48000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 14687320
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 2686976,
+      "grew": false,
+      "elapsedMs": 5357.350899999998
+    },
+    {
+      "patch": "short",
+      "rate": 48000,
+      "profile": "top-exact",
+      "midi": 84,
+      "cacheVelocity": 127,
+      "exact": true,
+      "seedInput": 715,
+      "seed": 715,
+      "phase": "pulse",
+      "parts": "full",
+      "without": null,
+      "frames": 192000,
+      "pcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 192000,
+        "finalRngState": 619550320,
+        "rngDraws": 965635,
+        "initialRngState": 715,
+        "gain": 9.01571137605957,
+        "sampleRate": 48000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 14436472
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 2686976,
+      "grew": false,
+      "elapsedMs": 3513.4418000000005
+    },
+    {
+      "patch": "short",
+      "rate": 48000,
+      "profile": "missing-smooth",
+      "midi": 75.25,
+      "cacheVelocity": 0,
+      "exact": false,
+      "seedInput": 526.75,
+      "seed": 526,
+      "phase": "pulse",
+      "parts": "smooth",
+      "without": 75,
+      "frames": 192000,
+      "pcm": {
+        "maxSampleError": 1.7763568394002505e-15,
+        "relativeRmsError": 3.262132246135093e-15,
+        "differingBits": 626
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 192000,
+        "finalRngState": 3031787937,
+        "rngDraws": 1029203,
+        "initialRngState": 526,
+        "gain": 9.01571137605957,
+        "sampleRate": 48000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 14462200
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 2686976,
+      "grew": false,
+      "elapsedMs": 4217.191699999996
+    },
+    {
+      "patch": "short",
+      "rate": 48000,
+      "profile": "residual",
+      "midi": 60,
+      "cacheVelocity": 90,
+      "exact": false,
+      "seedInput": 510,
+      "seed": 510,
+      "phase": "minimum",
+      "parts": "residual",
+      "without": null,
+      "frames": 192000,
+      "pcm": {
+        "maxSampleError": 1.6940658945086007e-21,
+        "relativeRmsError": 5.6798684386294485e-22,
+        "differingBits": 1
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 192000,
+        "finalRngState": 2274785391,
+        "rngDraws": 58910,
+        "initialRngState": 510,
+        "gain": 9.01571137605957,
+        "sampleRate": 48000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 7205784
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 2686976,
+      "grew": false,
+      "elapsedMs": 1403.3713999999964
+    },
+    {
+      "patch": "short",
+      "rate": 96000,
+      "profile": "low-cache-zero",
+      "midi": 36,
+      "cacheVelocity": 0,
+      "exact": false,
+      "seedInput": 252,
+      "seed": 252,
+      "phase": "random",
+      "parts": "full",
+      "without": null,
+      "frames": 384000,
+      "pcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 384000,
+        "finalRngState": 2977582622,
+        "rngDraws": 1958694,
+        "initialRngState": 252,
+        "gain": 9.01571137605957,
+        "sampleRate": 96000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 28340536
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 4259840,
+      "grew": false,
+      "elapsedMs": 12382.396399999998
+    },
+    {
+      "patch": "short",
+      "rate": 96000,
+      "profile": "fractional-minimum",
+      "midi": 48.5,
+      "cacheVelocity": 78,
+      "exact": false,
+      "seedInput": 417.5,
+      "seed": 417,
+      "phase": "minimum",
+      "parts": "full",
+      "without": null,
+      "frames": 384000,
+      "pcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 384000,
+        "finalRngState": 735168636,
+        "rngDraws": 1934777,
+        "initialRngState": 417,
+        "gain": 9.01571137605957,
+        "sampleRate": 96000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 28038232
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 4259840,
+      "grew": false,
+      "elapsedMs": 9410.950499999992
+    },
+    {
+      "patch": "short",
+      "rate": 96000,
+      "profile": "top-exact",
+      "midi": 84,
+      "cacheVelocity": 127,
+      "exact": true,
+      "seedInput": 715,
+      "seed": 715,
+      "phase": "pulse",
+      "parts": "full",
+      "without": null,
+      "frames": 384000,
+      "pcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 384000,
+        "finalRngState": 2580185020,
+        "rngDraws": 1883139,
+        "initialRngState": 715,
+        "gain": 9.01571137605957,
+        "sampleRate": 96000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 27787384
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 4259840,
+      "grew": false,
+      "elapsedMs": 5834.898399999991
+    },
+    {
+      "patch": "short",
+      "rate": 96000,
+      "profile": "missing-smooth",
+      "midi": 75.25,
+      "cacheVelocity": 0,
+      "exact": false,
+      "seedInput": 526.75,
+      "seed": 526,
+      "phase": "pulse",
+      "parts": "smooth",
+      "without": 75,
+      "frames": 384000,
+      "pcm": {
+        "maxSampleError": 7.105427357601002e-15,
+        "relativeRmsError": 5.0066967846459195e-15,
+        "differingBits": 1922
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 384000,
+        "finalRngState": 2666792304,
+        "rngDraws": 2004307,
+        "initialRngState": 526,
+        "gain": 9.01571137605957,
+        "sampleRate": 96000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 27813112
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 4259840,
+      "grew": false,
+      "elapsedMs": 7102.116099999999
+    },
+    {
+      "patch": "short",
+      "rate": 96000,
+      "profile": "residual",
+      "midi": 60,
+      "cacheVelocity": 90,
+      "exact": false,
+      "seedInput": 510,
+      "seed": 510,
+      "phase": "minimum",
+      "parts": "residual",
+      "without": null,
+      "frames": 384000,
+      "pcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 384000,
+        "finalRngState": 2274785391,
+        "rngDraws": 58910,
+        "initialRngState": 510,
+        "gain": 9.01571137605957,
+        "sampleRate": 96000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 13216664
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 4259840,
+      "grew": false,
+      "elapsedMs": 2868.8859999999986
+    },
+    {
+      "patch": "short",
+      "rate": 192000,
+      "profile": "low-cache-zero",
+      "midi": 36,
+      "cacheVelocity": 0,
+      "exact": false,
+      "seedInput": 252,
+      "seed": 252,
+      "phase": "random",
+      "parts": "full",
+      "without": null,
+      "frames": 768000,
+      "pcm": {
+        "maxSampleError": 1.4210854715202004e-14,
+        "relativeRmsError": 5.859435786553349e-15,
+        "differingBits": 1455
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 768000,
+        "finalRngState": 3195801365,
+        "rngDraws": 3822502,
+        "initialRngState": 252,
+        "gain": 9.01571137605957,
+        "sampleRate": 192000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 55042360
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 7340032,
+      "grew": false,
+      "elapsedMs": 20157.964000000007
+    },
+    {
+      "patch": "short",
+      "rate": 192000,
+      "profile": "fractional-minimum",
+      "midi": 48.5,
+      "cacheVelocity": 78,
+      "exact": false,
+      "seedInput": 417.5,
+      "seed": 417,
+      "phase": "minimum",
+      "parts": "full",
+      "without": null,
+      "frames": 768000,
+      "pcm": {
+        "maxSampleError": 2.2737367544323206e-13,
+        "relativeRmsError": 2.2728362542864944e-14,
+        "differingBits": 9352
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 768000,
+        "finalRngState": 1116752833,
+        "rngDraws": 3798585,
+        "initialRngState": 417,
+        "gain": 9.01571137605957,
+        "sampleRate": 192000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 54740056
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 7340032,
+      "grew": false,
+      "elapsedMs": 16643.283399999986
+    },
+    {
+      "patch": "short",
+      "rate": 192000,
+      "profile": "top-exact",
+      "midi": 84,
+      "cacheVelocity": 127,
+      "exact": true,
+      "seedInput": 715,
+      "seed": 715,
+      "phase": "pulse",
+      "parts": "full",
+      "without": null,
+      "frames": 768000,
+      "pcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 768000,
+        "finalRngState": 1290558510,
+        "rngDraws": 3718147,
+        "initialRngState": 715,
+        "gain": 9.01571137605957,
+        "sampleRate": 192000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 54489208
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 7340032,
+      "grew": false,
+      "elapsedMs": 12417.973800000007
+    },
+    {
+      "patch": "short",
+      "rate": 192000,
+      "profile": "missing-smooth",
+      "midi": 75.25,
+      "cacheVelocity": 0,
+      "exact": false,
+      "seedInput": 526.75,
+      "seed": 526,
+      "phase": "pulse",
+      "parts": "smooth",
+      "without": 75,
+      "frames": 768000,
+      "pcm": {
+        "maxSampleError": 2.842170943040401e-14,
+        "relativeRmsError": 7.757576566702811e-15,
+        "differingBits": 5294
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 768000,
+        "finalRngState": 1808755565,
+        "rngDraws": 3954515,
+        "initialRngState": 526,
+        "gain": 9.01571137605957,
+        "sampleRate": 192000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 54514936
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 7340032,
+      "grew": false,
+      "elapsedMs": 14455.161999999982
+    },
+    {
+      "patch": "short",
+      "rate": 192000,
+      "profile": "residual",
+      "midi": 60,
+      "cacheVelocity": 90,
+      "exact": false,
+      "seedInput": 510,
+      "seed": 510,
+      "phase": "minimum",
+      "parts": "residual",
+      "without": null,
+      "frames": 768000,
+      "pcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 768000,
+        "finalRngState": 2274785391,
+        "rngDraws": 58910,
+        "initialRngState": 510,
+        "gain": 9.01571137605957,
+        "sampleRate": 192000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 25238424
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 7340032,
+      "grew": false,
+      "elapsedMs": 4507.827699999994
+    },
+    {
+      "patch": "pizzicato",
+      "rate": 8000,
+      "profile": "low-cache-zero",
+      "midi": 36,
+      "cacheVelocity": 0,
+      "exact": false,
+      "seedInput": 252,
+      "seed": 252,
+      "phase": "random",
+      "parts": "full",
+      "without": null,
+      "frames": 32000,
+      "pcm": {
+        "maxSampleError": 1.7763568394002505e-15,
+        "relativeRmsError": 2.908941348043856e-15,
+        "differingBits": 106
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 32000,
+        "finalRngState": 3971834992,
+        "rngDraws": 159719,
+        "initialRngState": 252,
+        "gain": 5.321082592667939,
+        "sampleRate": 8000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 4008248
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 1441792,
+      "grew": false,
+      "elapsedMs": 1056.2895999999892
+    },
+    {
+      "patch": "pizzicato",
+      "rate": 8000,
+      "profile": "fractional-minimum",
+      "midi": 48.5,
+      "cacheVelocity": 78,
+      "exact": false,
+      "seedInput": 417.5,
+      "seed": 417,
+      "phase": "minimum",
+      "parts": "full",
+      "without": null,
+      "frames": 32000,
+      "pcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 32000,
+        "finalRngState": 2073772314,
+        "rngDraws": 145853,
+        "initialRngState": 417,
+        "gain": 5.321082592667939,
+        "sampleRate": 8000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 3705944
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 1441792,
+      "grew": false,
+      "elapsedMs": 836.8215999999957
+    },
+    {
+      "patch": "pizzicato",
+      "rate": 8000,
+      "profile": "top-exact",
+      "midi": 84,
+      "cacheVelocity": 127,
+      "exact": true,
+      "seedInput": 715,
+      "seed": 715,
+      "phase": "pulse",
+      "parts": "full",
+      "without": null,
+      "frames": 32000,
+      "pcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 32000,
+        "finalRngState": 1314969626,
+        "rngDraws": 131064,
+        "initialRngState": 715,
+        "gain": 5.321082592667939,
+        "sampleRate": 8000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 2786424
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 1441792,
+      "grew": false,
+      "elapsedMs": 654.6760999999824
+    },
+    {
+      "patch": "pizzicato",
+      "rate": 8000,
+      "profile": "missing-smooth",
+      "midi": 75.25,
+      "cacheVelocity": 0,
+      "exact": false,
+      "seedInput": 526.75,
+      "seed": 526,
+      "phase": "pulse",
+      "parts": "smooth",
+      "without": 75,
+      "frames": 32000,
+      "pcm": {
+        "maxSampleError": 1.4210854715202004e-14,
+        "relativeRmsError": 2.5970002880839094e-14,
+        "differingBits": 95
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 32000,
+        "finalRngState": 113804762,
+        "rngDraws": 143748,
+        "initialRngState": 526,
+        "gain": 5.321082592667939,
+        "sampleRate": 8000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 3529976
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 1441792,
+      "grew": false,
+      "elapsedMs": 860.5300000000279
+    },
+    {
+      "patch": "pizzicato",
+      "rate": 8000,
+      "profile": "residual",
+      "midi": 60,
+      "cacheVelocity": 90,
+      "exact": false,
+      "seedInput": 510,
+      "seed": 510,
+      "phase": "minimum",
+      "parts": "residual",
+      "without": null,
+      "frames": 32000,
+      "pcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 32000,
+        "finalRngState": 1026574939,
+        "rngDraws": 23567,
+        "initialRngState": 510,
+        "gain": 5.321082592667939,
+        "sampleRate": 8000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 1978264
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 1441792,
+      "grew": false,
+      "elapsedMs": 401.09540000002016
+    },
+    {
+      "patch": "pizzicato",
+      "rate": 24000,
+      "profile": "low-cache-zero",
+      "midi": 36,
+      "cacheVelocity": 0,
+      "exact": false,
+      "seedInput": 252,
+      "seed": 252,
+      "phase": "random",
+      "parts": "full",
+      "without": null,
+      "frames": 96000,
+      "pcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 96000,
+        "finalRngState": 552293697,
+        "rngDraws": 548946,
+        "initialRngState": 252,
+        "gain": 5.321082592667939,
+        "sampleRate": 24000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 8314168
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 1966080,
+      "grew": false,
+      "elapsedMs": 3218.48569999999
+    },
+    {
+      "patch": "pizzicato",
+      "rate": 24000,
+      "profile": "fractional-minimum",
+      "midi": 48.5,
+      "cacheVelocity": 78,
+      "exact": false,
+      "seedInput": 417.5,
+      "seed": 417,
+      "phase": "minimum",
+      "parts": "full",
+      "without": null,
+      "frames": 96000,
+      "pcm": {
+        "maxSampleError": 1.7763568394002505e-15,
+        "relativeRmsError": 2.2184062754480876e-15,
+        "differingBits": 839
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 96000,
+        "finalRngState": 2508878273,
+        "rngDraws": 530666,
+        "initialRngState": 417,
+        "gain": 5.321082592667939,
+        "sampleRate": 24000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 8011864
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 1966080,
+      "grew": false,
+      "elapsedMs": 2722.9631999999983
+    },
+    {
+      "patch": "pizzicato",
+      "rate": 24000,
+      "profile": "top-exact",
+      "midi": 84,
+      "cacheVelocity": 127,
+      "exact": true,
+      "seedInput": 715,
+      "seed": 715,
+      "phase": "pulse",
+      "parts": "full",
+      "without": null,
+      "frames": 96000,
+      "pcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 96000,
+        "finalRngState": 3208149334,
+        "rngDraws": 506883,
+        "initialRngState": 715,
+        "gain": 5.321082592667939,
+        "sampleRate": 24000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 7761016
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 1966080,
+      "grew": false,
+      "elapsedMs": 2189.1872999999905
+    },
+    {
+      "patch": "pizzicato",
+      "rate": 24000,
+      "profile": "missing-smooth",
+      "midi": 75.25,
+      "cacheVelocity": 0,
+      "exact": false,
+      "seedInput": 526.75,
+      "seed": 526,
+      "phase": "pulse",
+      "parts": "smooth",
+      "without": 75,
+      "frames": 96000,
+      "pcm": {
+        "maxSampleError": 1.7763568394002505e-15,
+        "relativeRmsError": 4.267824790614368e-15,
+        "differingBits": 273
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 96000,
+        "finalRngState": 1609259972,
+        "rngDraws": 541651,
+        "initialRngState": 526,
+        "gain": 5.321082592667939,
+        "sampleRate": 24000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 7786744
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 1966080,
+      "grew": false,
+      "elapsedMs": 2734.8724999999977
+    },
+    {
+      "patch": "pizzicato",
+      "rate": 24000,
+      "profile": "residual",
+      "midi": 60,
+      "cacheVelocity": 90,
+      "exact": false,
+      "seedInput": 510,
+      "seed": 510,
+      "phase": "minimum",
+      "parts": "residual",
+      "without": null,
+      "frames": 96000,
+      "pcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 96000,
+        "finalRngState": 2274785391,
+        "rngDraws": 58910,
+        "initialRngState": 510,
+        "gain": 5.321082592667939,
+        "sampleRate": 24000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 4200344
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 1966080,
+      "grew": false,
+      "elapsedMs": 823.7654999999795
+    },
+    {
+      "patch": "pizzicato",
+      "rate": 44100,
+      "profile": "low-cache-zero",
+      "midi": 36,
+      "cacheVelocity": 0,
+      "exact": false,
+      "seedInput": 252,
+      "seed": 252,
+      "phase": "random",
+      "parts": "full",
+      "without": null,
+      "frames": 176400,
+      "pcm": {
+        "maxSampleError": 3.552713678800501e-15,
+        "relativeRmsError": 2.551026579794417e-15,
+        "differingBits": 928
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 176400,
+        "finalRngState": 2916026064,
+        "rngDraws": 997796,
+        "initialRngState": 252,
+        "gain": 5.321082592667939,
+        "sampleRate": 44100,
+        "seconds": 4,
+        "workspaceBudgetBytes": 14927224
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 2621440,
+      "grew": false,
+      "elapsedMs": 5000.986199999985
+    },
+    {
+      "patch": "pizzicato",
+      "rate": 44100,
+      "profile": "fractional-minimum",
+      "midi": 48.5,
+      "cacheVelocity": 78,
+      "exact": false,
+      "seedInput": 417.5,
+      "seed": 417,
+      "phase": "minimum",
+      "parts": "full",
+      "without": null,
+      "frames": 176400,
+      "pcm": {
+        "maxSampleError": 1.1368683772161603e-13,
+        "relativeRmsError": 1.942286965746465e-14,
+        "differingBits": 1749
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 176400,
+        "finalRngState": 3049168628,
+        "rngDraws": 987920,
+        "initialRngState": 417,
+        "gain": 5.321082592667939,
+        "sampleRate": 44100,
+        "seconds": 4,
+        "workspaceBudgetBytes": 14624920
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 2621440,
+      "grew": false,
+      "elapsedMs": 4518.189599999983
+    },
+    {
+      "patch": "pizzicato",
+      "rate": 44100,
+      "profile": "top-exact",
+      "midi": 84,
+      "cacheVelocity": 127,
+      "exact": true,
+      "seedInput": 715,
+      "seed": 715,
+      "phase": "pulse",
+      "parts": "full",
+      "without": null,
+      "frames": 176400,
+      "pcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 176400,
+        "finalRngState": 619550320,
+        "rngDraws": 965635,
+        "initialRngState": 715,
+        "gain": 5.321082592667939,
+        "sampleRate": 44100,
+        "seconds": 4,
+        "workspaceBudgetBytes": 14374072
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 2621440,
+      "grew": false,
+      "elapsedMs": 3577.848100000003
+    },
+    {
+      "patch": "pizzicato",
+      "rate": 44100,
+      "profile": "missing-smooth",
+      "midi": 75.25,
+      "cacheVelocity": 0,
+      "exact": false,
+      "seedInput": 526.75,
+      "seed": 526,
+      "phase": "pulse",
+      "parts": "smooth",
+      "without": 75,
+      "frames": 176400,
+      "pcm": {
+        "maxSampleError": 1.7763568394002505e-15,
+        "relativeRmsError": 4.563857434582733e-15,
+        "differingBits": 446
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 176400,
+        "finalRngState": 3475922917,
+        "rngDraws": 1022305,
+        "initialRngState": 526,
+        "gain": 5.321082592667939,
+        "sampleRate": 44100,
+        "seconds": 4,
+        "workspaceBudgetBytes": 14399800
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 2621440,
+      "grew": false,
+      "elapsedMs": 5093.56819999998
+    },
+    {
+      "patch": "pizzicato",
+      "rate": 44100,
+      "profile": "residual",
+      "midi": 60,
+      "cacheVelocity": 90,
+      "exact": false,
+      "seedInput": 510,
+      "seed": 510,
+      "phase": "minimum",
+      "parts": "residual",
+      "without": null,
+      "frames": 176400,
+      "pcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 176400,
+        "finalRngState": 4247516770,
+        "rngDraws": 53522,
+        "initialRngState": 510,
+        "gain": 5.321082592667939,
+        "sampleRate": 44100,
+        "seconds": 4,
+        "workspaceBudgetBytes": 7143384
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 2621440,
+      "grew": false,
+      "elapsedMs": 1091.314400000003
+    },
+    {
+      "patch": "pizzicato",
+      "rate": 48000,
+      "profile": "low-cache-zero",
+      "midi": 36,
+      "cacheVelocity": 0,
+      "exact": false,
+      "seedInput": 252,
+      "seed": 252,
+      "phase": "random",
+      "parts": "full",
+      "without": null,
+      "frames": 192000,
+      "pcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 192000,
+        "finalRngState": 3106988092,
+        "rngDraws": 1014898,
+        "initialRngState": 252,
+        "gain": 5.321082592667939,
+        "sampleRate": 48000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 14989624
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 2686976,
+      "grew": false,
+      "elapsedMs": 4979.505899999989
+    },
+    {
+      "patch": "pizzicato",
+      "rate": 48000,
+      "profile": "fractional-minimum",
+      "midi": 48.5,
+      "cacheVelocity": 78,
+      "exact": false,
+      "seedInput": 417.5,
+      "seed": 417,
+      "phase": "minimum",
+      "parts": "full",
+      "without": null,
+      "frames": 192000,
+      "pcm": {
+        "maxSampleError": 3.552713678800501e-15,
+        "relativeRmsError": 2.2089580558920773e-15,
+        "differingBits": 2823
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 192000,
+        "finalRngState": 1013388824,
+        "rngDraws": 996618,
+        "initialRngState": 417,
+        "gain": 5.321082592667939,
+        "sampleRate": 48000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 14687320
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 2686976,
+      "grew": false,
+      "elapsedMs": 5337.152600000001
+    },
+    {
+      "patch": "pizzicato",
+      "rate": 48000,
+      "profile": "top-exact",
+      "midi": 84,
+      "cacheVelocity": 127,
+      "exact": true,
+      "seedInput": 715,
+      "seed": 715,
+      "phase": "pulse",
+      "parts": "full",
+      "without": null,
+      "frames": 192000,
+      "pcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 192000,
+        "finalRngState": 619550320,
+        "rngDraws": 965635,
+        "initialRngState": 715,
+        "gain": 5.321082592667939,
+        "sampleRate": 48000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 14436472
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 2686976,
+      "grew": false,
+      "elapsedMs": 3392.030700000003
+    },
+    {
+      "patch": "pizzicato",
+      "rate": 48000,
+      "profile": "missing-smooth",
+      "midi": 75.25,
+      "cacheVelocity": 0,
+      "exact": false,
+      "seedInput": 526.75,
+      "seed": 526,
+      "phase": "pulse",
+      "parts": "smooth",
+      "without": 75,
+      "frames": 192000,
+      "pcm": {
+        "maxSampleError": 3.552713678800501e-15,
+        "relativeRmsError": 4.887395079302531e-15,
+        "differingBits": 585
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 192000,
+        "finalRngState": 3031787937,
+        "rngDraws": 1029203,
+        "initialRngState": 526,
+        "gain": 5.321082592667939,
+        "sampleRate": 48000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 14462200
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 2686976,
+      "grew": false,
+      "elapsedMs": 5393.278099999996
+    },
+    {
+      "patch": "pizzicato",
+      "rate": 48000,
+      "profile": "residual",
+      "midi": 60,
+      "cacheVelocity": 90,
+      "exact": false,
+      "seedInput": 510,
+      "seed": 510,
+      "phase": "minimum",
+      "parts": "residual",
+      "without": null,
+      "frames": 192000,
+      "pcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 192000,
+        "finalRngState": 2274785391,
+        "rngDraws": 58910,
+        "initialRngState": 510,
+        "gain": 5.321082592667939,
+        "sampleRate": 48000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 7205784
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 2686976,
+      "grew": false,
+      "elapsedMs": 1698.9764999999898
+    },
+    {
+      "patch": "pizzicato",
+      "rate": 96000,
+      "profile": "low-cache-zero",
+      "midi": 36,
+      "cacheVelocity": 0,
+      "exact": false,
+      "seedInput": 252,
+      "seed": 252,
+      "phase": "random",
+      "parts": "full",
+      "without": null,
+      "frames": 384000,
+      "pcm": {
+        "maxSampleError": 3.637978807091713e-12,
+        "relativeRmsError": 8.659888228788433e-13,
+        "differingBits": 3565
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 384000,
+        "finalRngState": 3588093453,
+        "rngDraws": 1946802,
+        "initialRngState": 252,
+        "gain": 5.321082592667939,
+        "sampleRate": 96000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 28340536
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 4259840,
+      "grew": false,
+      "elapsedMs": 11450.574599999993
+    },
+    {
+      "patch": "pizzicato",
+      "rate": 96000,
+      "profile": "fractional-minimum",
+      "midi": 48.5,
+      "cacheVelocity": 78,
+      "exact": false,
+      "seedInput": 417.5,
+      "seed": 417,
+      "phase": "minimum",
+      "parts": "full",
+      "without": null,
+      "frames": 384000,
+      "pcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 384000,
+        "finalRngState": 656230888,
+        "rngDraws": 1928522,
+        "initialRngState": 417,
+        "gain": 5.321082592667939,
+        "sampleRate": 96000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 28038232
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 4259840,
+      "grew": false,
+      "elapsedMs": 9158.6403
+    },
+    {
+      "patch": "pizzicato",
+      "rate": 96000,
+      "profile": "top-exact",
+      "midi": 84,
+      "cacheVelocity": 127,
+      "exact": true,
+      "seedInput": 715,
+      "seed": 715,
+      "phase": "pulse",
+      "parts": "full",
+      "without": null,
+      "frames": 384000,
+      "pcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 384000,
+        "finalRngState": 2580185020,
+        "rngDraws": 1883139,
+        "initialRngState": 715,
+        "gain": 5.321082592667939,
+        "sampleRate": 96000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 27787384
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 4259840,
+      "grew": false,
+      "elapsedMs": 7896.903200000001
+    },
+    {
+      "patch": "pizzicato",
+      "rate": 96000,
+      "profile": "missing-smooth",
+      "midi": 75.25,
+      "cacheVelocity": 0,
+      "exact": false,
+      "seedInput": 526.75,
+      "seed": 526,
+      "phase": "pulse",
+      "parts": "smooth",
+      "without": 75,
+      "frames": 384000,
+      "pcm": {
+        "maxSampleError": 1.7763568394002505e-15,
+        "relativeRmsError": 3.80896624783589e-15,
+        "differingBits": 1570
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 384000,
+        "finalRngState": 2666792304,
+        "rngDraws": 2004307,
+        "initialRngState": 526,
+        "gain": 5.321082592667939,
+        "sampleRate": 96000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 27813112
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 4259840,
+      "grew": false,
+      "elapsedMs": 9349.979599999991
+    },
+    {
+      "patch": "pizzicato",
+      "rate": 96000,
+      "profile": "residual",
+      "midi": 60,
+      "cacheVelocity": 90,
+      "exact": false,
+      "seedInput": 510,
+      "seed": 510,
+      "phase": "minimum",
+      "parts": "residual",
+      "without": null,
+      "frames": 384000,
+      "pcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 384000,
+        "finalRngState": 2274785391,
+        "rngDraws": 58910,
+        "initialRngState": 510,
+        "gain": 5.321082592667939,
+        "sampleRate": 96000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 13216664
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 4259840,
+      "grew": false,
+      "elapsedMs": 3408.751600000018
+    },
+    {
+      "patch": "pizzicato",
+      "rate": 192000,
+      "profile": "low-cache-zero",
+      "midi": 36,
+      "cacheVelocity": 0,
+      "exact": false,
+      "seedInput": 252,
+      "seed": 252,
+      "phase": "random",
+      "parts": "full",
+      "without": null,
+      "frames": 768000,
+      "pcm": {
+        "maxSampleError": 8.881784197001252e-16,
+        "relativeRmsError": 1.0979666505971495e-15,
+        "differingBits": 3353
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 768000,
+        "finalRngState": 2274499190,
+        "rngDraws": 3810610,
+        "initialRngState": 252,
+        "gain": 5.321082592667939,
+        "sampleRate": 192000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 55042360
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 7340032,
+      "grew": false,
+      "elapsedMs": 23415.221699999995
+    },
+    {
+      "patch": "pizzicato",
+      "rate": 192000,
+      "profile": "fractional-minimum",
+      "midi": 48.5,
+      "cacheVelocity": 78,
+      "exact": false,
+      "seedInput": 417.5,
+      "seed": 417,
+      "phase": "minimum",
+      "parts": "full",
+      "without": null,
+      "frames": 768000,
+      "pcm": {
+        "maxSampleError": 1.1368683772161603e-13,
+        "relativeRmsError": 8.878514465696824e-15,
+        "differingBits": 17886
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 768000,
+        "finalRngState": 1619475248,
+        "rngDraws": 3792330,
+        "initialRngState": 417,
+        "gain": 5.321082592667939,
+        "sampleRate": 192000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 54740056
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 7340032,
+      "grew": false,
+      "elapsedMs": 20323.444499999983
+    },
+    {
+      "patch": "pizzicato",
+      "rate": 192000,
+      "profile": "top-exact",
+      "midi": 84,
+      "cacheVelocity": 127,
+      "exact": true,
+      "seedInput": 715,
+      "seed": 715,
+      "phase": "pulse",
+      "parts": "full",
+      "without": null,
+      "frames": 768000,
+      "pcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 768000,
+        "finalRngState": 1290558510,
+        "rngDraws": 3718147,
+        "initialRngState": 715,
+        "gain": 5.321082592667939,
+        "sampleRate": 192000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 54489208
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 7340032,
+      "grew": false,
+      "elapsedMs": 14815.598700000031
+    },
+    {
+      "patch": "pizzicato",
+      "rate": 192000,
+      "profile": "missing-smooth",
+      "midi": 75.25,
+      "cacheVelocity": 0,
+      "exact": false,
+      "seedInput": 526.75,
+      "seed": 526,
+      "phase": "pulse",
+      "parts": "smooth",
+      "without": 75,
+      "frames": 768000,
+      "pcm": {
+        "maxSampleError": 1.4210854715202004e-14,
+        "relativeRmsError": 8.117574021349694e-15,
+        "differingBits": 4062
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 768000,
+        "finalRngState": 1808755565,
+        "rngDraws": 3954515,
+        "initialRngState": 526,
+        "gain": 5.321082592667939,
+        "sampleRate": 192000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 54514936
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 7340032,
+      "grew": false,
+      "elapsedMs": 13879.3517
+    },
+    {
+      "patch": "pizzicato",
+      "rate": 192000,
+      "profile": "residual",
+      "midi": 60,
+      "cacheVelocity": 90,
+      "exact": false,
+      "seedInput": 510,
+      "seed": 510,
+      "phase": "minimum",
+      "parts": "residual",
+      "without": null,
+      "frames": 768000,
+      "pcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "originalObserverPcm": {
+        "maxSampleError": 0,
+        "relativeRmsError": 0,
+        "differingBits": 0
+      },
+      "stats": {
+        "frames": 768000,
+        "finalRngState": 2274785391,
+        "rngDraws": 58910,
+        "initialRngState": 510,
+        "gain": 5.321082592667939,
+        "sampleRate": 192000,
+        "seconds": 4,
+        "workspaceBudgetBytes": 25238424
+      },
+      "saveReloadExact": true,
+      "allocationOrReclamationCalls": null,
+      "playbackMemoryBytes": 7340032,
+      "grew": false,
+      "elapsedMs": 4203.307100000035
+    }
+  ]
+}

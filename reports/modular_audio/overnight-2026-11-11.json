@@ -3,7 +3,7 @@
   "version": 1,
   "status": "running",
   "startedAtUtc": "2026-11-10T23:19:46Z",
-  "updatedAtUtc": "2026-11-11T07:56:22.441Z",
+  "updatedAtUtc": "2026-11-11T08:21:51.573Z",
   "featureCutoffUtc": "2026-11-11T08:30:00Z",
   "deadlineUtc": "2026-11-11T09:00:00Z",
   "gitIdentity": {
@@ -28,24 +28,25 @@
     "1508a14",
     "f4c6748",
     "5fa5958",
-    "84b17f7"
+    "84b17f7",
+    "c36fe77"
   ],
   "graph": {
     "api": 1,
-    "source": "e413a0642de05bc715c55c0a1e3646dc6429112798460d102cee4f1b3bae76a6",
-    "wasm": "ed19b3481622b42ec1410d1adee1abe8073c5a8f83b13a4eaebe37587f63973d",
+    "source": "c806f56fd643dd7c2f3a0a3eab495080f3ec1eb90a6dd7a413127f86a39c842f",
+    "wasm": "3cd2dce0a5406845328596aefe56cd883e0e6b894d27812bd66bfef5db956b7d",
     "runtime": "e6db123c549d9248266e88103a8a03b165554a84d9ddce7d3f035980ad0cd905",
-    "bytes": 1597091,
+    "bytes": 1596639,
     "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
-    "version": "0349534ec1d782d4"
+    "version": "3cf3a29d17daadc3"
   },
   "checks": {
     "fullSuite": {
-      "files": 470,
-      "tests": 3653,
+      "files": 473,
+      "tests": 3705,
       "skipped": 4,
       "pass": true,
-      "log": ".tmp/overnight-regression-03h.log"
+      "log": ".tmp/overnight-final-regression.log"
     },
     "focusedGraph": {
       "tests": 53,
@@ -98,9 +99,9 @@
     "actualAllDeskBrowser": "all-owned-desk-host-browser.json",
     "actualAllDeskLive": "all-owned-desk-live-browser.json",
     "defaultPage": "default-all-page-browser.json",
-    "latestFocusedTests": 155,
+    "latestFocusedTests": 54,
     "mixerHostVersion": "d43cbe6314cd15e6",
-    "nativeCompressorVersion": "4057fdc2c9a3136d",
+    "nativeCompressorVersion": "518439cc3c3f8cc9",
     "nativeCompressorBrowser": "native-compressor-native-browser-v2.json",
     "nativeCompressorQuiet": "native-compressor-curve-native-browser-v2.json",
     "nativeCompressorCases": 96,
@@ -110,7 +111,7 @@
     "nativeCompressorAutomationCases": 48,
     "nativeCompressorGraph": "native-compressor-graph-native-browser-first.json",
     "nativeCompressorGraphCases": 12,
-    "nativeCompressorGraphTests": 25,
+    "nativeCompressorGraphTests": 26,
     "nativeCompressorGraphAllocation": "graph-native-compressor-allocation.json",
     "measuredStringVoice": "6811dc2b48a763fd",
     "measuredStringVoiceBrowser": "measured-string-native-browser.json",
@@ -125,7 +126,39 @@
     "ambienceLoopsAllocationCases": 72,
     "ambienceLoopsTests": 32,
     "ambienceLoopsBrowser": "ambience-loops-native-host-final.json",
-    "ambienceLoopsBrowserCases": 12
+    "ambienceLoopsBrowserCases": 12,
+    "normalPublicBuildLog": ".tmp/overnight-final-ports-public-build.log",
+    "latestFocusedScope": "Static/captured/voice owned contracts and graph regression",
+    "preparationFocusedTests": 39,
+    "nativeCompressorNumericWasmByteIdentical": true,
+    "nativeCompressorAutomationVersion": "3442c80c6b9fd0b6",
+    "nativeCompressorAutomationBrowser": "native-compressor-automation-morning-browser.json",
+    "nativeCompressorGraphBrowser": "native-compressor-graph-morning-browser.json",
+    "nativeCompressorGraphAllocationCases": 12,
+    "validCompressorContinuity": "compressor-contract-correction-continuity.json",
+    "actualAllMorning": "all-owned-desk-morning-browser.json",
+    "stringDecayVersion": "4ba147459341ae53",
+    "stringDecaySourceCases": 60,
+    "stringDecayAllocationCases": 60,
+    "stringDecayTests": 17,
+    "stringDecayBrowserCases": 12,
+    "stringDecayBrowser": "string-decay-native-first.json",
+    "convolverPreparationVersion": "8b2f1b053b33184e",
+    "convolverPreparationTests": 22,
+    "convolverPreparationSourceCases": 31,
+    "convolverPreparationBrowser": "convolver-preparation-native-first.json",
+    "convolverPreparationBrowserCases": 15,
+    "convolverPreparationNativeAudioCases": 12,
+    "convolverPreparationOversizedRefusals": 3,
+    "voiceCompressorResearch": {
+      "accepted": false,
+      "version": "2e4963cea4401d75",
+      "nativeCases": 48,
+      "nativePasses": 46,
+      "ownedTests": 8,
+      "allocationCases": 12,
+      "report": "voice-compressor-native-morning.json"
+    }
   },
   "limitations": [
     "No physical listening/device-underrun claim",
@@ -135,11 +168,13 @@
     "Weather host is standalone, before original native ambience chains; normal backend adoption remains separate",
     "Tape graph exposes known FIR group only and rejects fixed PDC; native bypass/seconds automation adoption remains separate",
     "Actual All owned desk is immutable opt-in; normal UI default remains native and implicit fan-in is preserved",
-    "Measured-string preparation does not yet replace the native body convolver or Short/Pizzicato decay player",
     "Static convolution remains worker-only; worst transform calls exceed audio callback periods despite average desktop throughput",
     "Active VoiceCompressor wrapper first batch has2/48 failed192k extreme-control PCM cases, saved for diagnosis; not accepted",
     "Wind/fire/vinyl owned PCM preparation is opt-in through original native Ambience chains; portable spatial/wander playback remains separate",
-    "Earlier terminal/process interruption stopped unsaved work until07:50 recovery; final stages use current authoritative files and re-run native verification"
+    "Earlier terminal/process interruption stopped unsaved work until07:50 recovery; final stages use current authoritative files and re-run native verification",
+    "Long/Live and Short/Pizzicato sources are standalone accepted ports; timestamped measured-source Graph registration and normal host adoption remain separate",
+    "Original room IR preparation is accepted; long Iowa/high-rate kernels reject beyond327680frames without truncation; native decode/resampling and RoomColour/shared host paths remain external"
   ],
-  "next": "Continue Short/Pizzicato fixed voices, actual ambience-loop consumer, voice-wrapper extreme192k diagnosis and normalized reverb IR preparation. Shared portable-host integration remains opt-in; feature cutoff08:30 and handoff09:00."
+  "next": "Register already-accepted measured sources in the typed graph with explicit prepared resources, original clocks and cancellation; attach bounded worker body/room execution with complete-IR resource handling. Resolve the retained Voice192k math profile separately, then adopt full live host controls/transport before cable editing.",
+  "implementationFrozenAtUtc": "2026-11-11T08:21:51.573Z"
 }
