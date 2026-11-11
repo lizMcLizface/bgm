@@ -2,8 +2,8 @@
   "api": 1,
   "profile": "chromium-room-colour-f32-128-target-v1",
   "audited": false,
-  "source": "b601a05e66b13e28ed3f95c6c8e4add9c33e61995bd1d2490f271b0af5a860c5",
-  "wasm": "401d7d19290037b7b801ed5a648e4700bea83159a1cc2145264c03f07dbd6b56",
-  "bytes": 68867,
-  "version": "e29aa217bc8a0ca3"
+  "source": "278d8f8f2153f9ca2cedfd11c6086c157d94f11fb30bd9d4412aa48aa5601d61",
+  "wasm": "f351bab1dfdc5e5227e1df29448425c67b37d03b8705b66801994d9997761802",
+  "bytes": 69036,
+  "version": "776154307b5a68e7"
 }

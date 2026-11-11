@@ -200,6 +200,15 @@ impl Gain {
         self.head += skipped;
         self.current = self.samples[127];
     }
+    /// Native ValuesForFrameRange clips generated values after timeline
+    /// evaluation, then SetValue stores the clipped final sample as the next
+    /// intrinsic value. Targets and event timing remain unmodified.
+    /// Unbounded callers keep using prepare_quantum/tick unchanged.
+    pub fn clamp_output(&mut self, minimum:f32, maximum:f32)->bool {
+        if !minimum.is_finite() || !maximum.is_finite() || minimum>maximum {return false;}
+        for value in &mut self.samples {*value=value.clamp(minimum,maximum);}
+        self.current=self.samples[127];true
+    }
     pub fn tick(&mut self, frame: u64) -> f32 {
         self.sealed = true;
         if frame % 128 == 0 {

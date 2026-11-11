@@ -58,3 +58,13 @@ its counter; that watch operation resets the counter. The corrected audit reads
 the counter first and records the exact audited artifact. All12two-handle cases
 pass again with1400live controls and actual zero allocations/frees/growth.
 The earlier read order was not valid evidence for that claim.
+
+## Post-evaluation nominal range and carry correction
+
+The independent continuous AC retarget probe exposed a real low-rate boundary: at8kHz the original port differed by maximum0.013746686 and relative RMS0.0832176; at24kHz by0.0075541355 and0.0463195. The four higher rates remained exact. A DC-only comparison had masked the frequency-state error because the filter already had unity DC response. Native targets remain unbounded20kHz; clamping targets to Nyquist before smoothing is incorrect.
+
+Pinned AudioParamHandler ValuesForFrameRange first evaluates the timeline, then clips generated values to the nominal parameter range and returns the clipped last sample. CalculateTimelineValues stores that sample as the next intrinsic value. The new additive common Gain::clamp_output method applies that order without changing targets, event times, or any default unbounded caller. RoomColour frequency invokes it with0..Nyquist after every canonical128-frame evaluation, before consuming its controls. This corrects low-rate retarget carry while leaving the high-rate math unchanged.
+
+Actual continuous multitone/noise retarget output is now exactly equal to native PCM at all six rates in room-retarget-ac-after.json; the unmodified before result remains room-retarget-ac-before.json. The accepted artifact is776154307b5a68e7,69,036bytes, Wasm SHA256 f351bab1dfdc5e5227e1df29448425c67b37d03b8705b66801994d9997761802. Sixteen permanent tests pass, including nominal-range/control-reset regressions. The corrected two-handle allocation audit also passes all12cases with counters read before disabling.
+
+This correction does not resolve native automatic channel-layout or inactive-bus behavior. Separate finite-source probes show stereo native inputs can become zero-channel buses after source end, collapsing Delay/Biquad to mono and resetting their histories. The current fixed-channel profile and default host have no claim of parity across those topology changes. An explicit separately versioned layout/activity clock is the next task; no silence flag is inferred from numerical zeros.
