@@ -1,0 +1,4 @@
+// @vitest-environment node
+import{it,expect}from'vitest';import{privateRoomFixtureClock}from'./privateRoomFixtureClock.js';
+it.each([8000,24000,44100,48000,96000,192000])('authors an exact native binary-seconds /128-frame source epoch at %i Hz before scheduling',rate=>{for(const frame of[1,128,55680,49024,60544,245760,rate*12+53]){const p=privateRoomFixtureClock(rate,frame);expect(p.epoch).toBeGreaterThanOrEqual(frame);expect(p.epoch%128).toBe(0);expect(p.seconds*rate).toBe(p.epoch);expect(p.seconds/p.phaseQuantumSeconds).toBe(Math.floor(p.seconds/p.phaseQuantumSeconds));}});
+it('preserves the observed unsafe timestamp as evidence rather than snapping an existing native event',()=>{const frame=55680,seconds=frame/48000;expect(seconds*48000).toBeLessThan(frame);const p=privateRoomFixtureClock(48000,frame);expect(p).toEqual({epoch:96000,seconds:2,phaseQuantumSeconds:1});expect(seconds).toBe(1.16);expect(frame).toBe(55680);});

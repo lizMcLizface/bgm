@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "sourceCommit": "3b6ecfb",
+  "sourceWasmSHA256": "70084ec1695c78e01ab999805f64c881d3fd176d23e525014872e8b4f5dc0f3a",
+  "scope": "Native-seconds stereo0.5s plus reset128; deterministic integer affine-noise input; four original native-seconds controls. Per-quantum left then right Float32 little-endian bytes, including final reset channels.",
+  "cases": [
+    {
+      "sampleRate": 8000,
+      "sha256": "d24f87792d864dc8035c1f9b9bb513abd057c890a478f39a2f1f0219a66f0ad2"
+    },
+    {
+      "sampleRate": 24000,
+      "sha256": "2cd08ea94fa02d39899687cfb877759938a3178ec3e688fecef362cc4b1cc31f"
+    },
+    {
+      "sampleRate": 44100,
+      "sha256": "045c3b2877477aac8482942987674fdc6e509ff801c08e6e189cc95bd7cd53b9"
+    },
+    {
+      "sampleRate": 48000,
+      "sha256": "33dc468f7484ad8804aa39c4f12e26171461611d9fde68fccbfe961330345627"
+    },
+    {
+      "sampleRate": 96000,
+      "sha256": "86ceca12018333842564b2ccf640f3ff93627a5693c2bc34d953422a428af45a"
+    },
+    {
+      "sampleRate": 192000,
+      "sha256": "60a8ef064021fffb592fff9daa025d5d5d422ed378d1ba81270a5e052ab0a92a"
+    }
+  ]
+}

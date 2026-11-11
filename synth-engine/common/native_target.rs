@@ -200,6 +200,112 @@ impl Gain {
         self.head += skipped;
         self.current = self.samples[127];
     }
+    /// Explicit integer-frame profile only. Events are authored by push_frame/
+    /// schedule_frame; their canonical seconds retain exponential elapsed time.
+    /// Rounding here recovers the exact authored integer boundary, including the
+    /// native zero-length prior-segment visit on a second channel evaluation.
+    /// Native-seconds prepare_quantum above is deliberately unchanged.
+    pub fn push_frame(&mut self, frame:u64, value:f64)->bool {
+        if frame>9007199254740864||((frame as f64/self.rate)*self.rate).round()!=frame as f64 { return false; }
+        self.push(frame as f64/self.rate,value)
+    }
+    pub fn schedule_frame(&mut self, frame:u64, value:f64, generated_until:u64)->bool {
+        if frame<generated_until||frame>9007199254740864||((frame as f64/self.rate)*self.rate).round()!=frame as f64 { return false; }
+        self.schedule(frame as f64/self.rate,value,generated_until)
+    }
+    pub fn prepare_quantum_framed(&mut self, frame: u64) {
+        if self.head == self.events.len() {
+            self.samples.fill(self.current);
+            return;
+        }
+        let time = frame as f64 / self.rate;
+        let first = self.events[self.head];
+        if frame + 128 <= (first.seconds * self.rate).round() as u64 {
+            self.samples.fill(self.current);
+            return;
+        }
+        let last = self.events[self.events.len() - 1];
+        if last.seconds + 1.5 * 128. / self.rate < time
+            && converged(self.current, last.value, time, last.seconds, self.raw_tau)
+        {
+            self.current = last.value;
+            self.samples.fill(last.value);
+            self.head = self.events.len();
+            return;
+        }
+        let mut write = 0usize;
+        if (first.seconds * self.rate).round() as u64 > frame {
+            let first_frame = (first.seconds * self.rate).round() as u64;
+            let count = (first_frame - frame).min(128) as usize;
+            self.samples[..count].fill(self.current);
+            write = count;
+        }
+        let mut value = self.current;
+        let mut index = self.head;
+        let mut skipped = 0;
+        while index < self.events.len() && write < 128 {
+            let event = self.events[index];
+            let next = self.events.get(index + 1).copied();
+            let current = frame + write as u64;
+            if next.is_some_and(|n| (n.seconds * self.rate).round() < current as f64) {
+                skipped += 1;
+                index += 1;
+                continue;
+            }
+            let end = next.map_or(frame + 128, |n| {
+                let r = (n.seconds * self.rate).round();
+                if (frame + 128) as f64 > r {
+                    r.ceil() as u64
+                } else {
+                    frame + 128
+                }
+            });
+            let fill = (end - frame).min(128) as usize;
+            let r = (event.seconds * self.rate).round();
+            if r <= current as f64 && (current as f64) < r + 1. {
+                value = (event.value as f64
+                    + (value - event.value) as f64
+                        * (-(current as f64 / self.rate - event.seconds) / self.tau).exp())
+                    as f32;
+            } else {
+                value += (event.value - value) * self.coefficients[0];
+            }
+            if converged(
+                value,
+                event.value,
+                current as f64 / self.rate,
+                event.seconds,
+                self.tau,
+            ) {
+                self.samples[write..fill].fill(event.value);
+                write = fill;
+            } else {
+                let vector_end = write + ((fill - write) / 4) * 4;
+                let [c0, c1, c2, c3] = self.coefficients;
+                while write < vector_end {
+                    let delta = event.value - value;
+                    self.samples[write] = value;
+                    self.samples[write + 1] = value + delta * c0;
+                    self.samples[write + 2] = value + delta * c1;
+                    self.samples[write + 3] = value + delta * c2;
+                    value += delta * c3;
+                    write += 4;
+                }
+                while write < fill {
+                    let v = value;
+                    value += (event.value - value) * c0;
+                    self.samples[write] = v;
+                    write += 1;
+                }
+                if write >= 1 {
+                    value = self.samples[write - 1];
+                }
+            }
+            index += 1;
+        }
+        self.head += skipped;
+        self.current = self.samples[127];
+    }
     /// Native ValuesForFrameRange clips generated values after timeline
     /// evaluation, then SetValue stores the clipped final sample as the next
     /// intrinsic value. Targets and event timing remain unmodified.

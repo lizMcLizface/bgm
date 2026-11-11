@@ -9,7 +9,7 @@ const BLOCK:usize=2048;
 struct Activity{frame:u64,source:usize,delay_audio:bool,filter_audio:bool}
 
 pub struct Engine {
- rate:f64,channels:usize,max_channels:usize,source_channels:usize,delay_audio:bool,filter_audio:bool,activity:Vec<Activity>,activity_head:usize,activity_applied:u64,targets:[target::Gain;2],delay:delay::Delay,tone:tone::Lowpass,
+ rate:f64,framed:bool,channels:usize,max_channels:usize,source_channels:usize,delay_audio:bool,filter_audio:bool,activity:Vec<Activity>,activity_head:usize,activity_applied:u64,targets:[target::Gain;2],delay:delay::Delay,tone:tone::Lowpass,
  initial:[f64;2],events:Vec<(usize,f64,f64)>,ready:bool,frame:u64,peak:f64,rejected:u64,
  input:[[f32;BLOCK];2],output:[[f32;BLOCK];2],controls:[[f32;128];2],delay_controls:[[f32;128];2],
 }
@@ -20,10 +20,11 @@ fn value(index:usize,raw:f64)->Option<f64>{
 impl Engine {
  pub fn new(rate:f64,channels:usize)->Option<Box<Self>>{
   if !rate.is_finite()||rate.fract()!=0.||!(8000. ..=192000.).contains(&rate)||!(1..=2).contains(&channels){return None;}
-  Some(Box::new(Self{rate,channels,max_channels:channels,source_channels:channels,delay_audio:true,filter_audio:true,activity:Vec::with_capacity(256),activity_head:0,activity_applied:0,targets:[target::Gain::prepared(rate,0.,0.02)?,target::Gain::prepared(rate,350.,0.02)?],delay:delay::Delay::new(rate),tone:tone::Lowpass::new(rate),initial:[0.025,6000.],events:Vec::with_capacity(512),ready:false,frame:0,peak:0.,rejected:0,input:[[0.;BLOCK];2],output:[[0.;BLOCK];2],controls:[[0.;128];2],delay_controls:[[0.;128];2]}))
+  Some(Box::new(Self{rate,framed:false,channels,max_channels:channels,source_channels:channels,delay_audio:true,filter_audio:true,activity:Vec::with_capacity(256),activity_head:0,activity_applied:0,targets:[target::Gain::prepared(rate,0.,0.02)?,target::Gain::prepared(rate,350.,0.02)?],delay:delay::Delay::new(rate),tone:tone::Lowpass::new(rate),initial:[0.025,6000.],events:Vec::with_capacity(512),ready:false,frame:0,peak:0.,rejected:0,input:[[0.;BLOCK];2],output:[[0.;BLOCK];2],controls:[[0.;128];2],delay_controls:[[0.;128];2]}))
  }
  pub fn initial(&mut self,index:usize,raw:f64)->bool{if self.ready||value(index,raw).is_none(){return false;}self.initial[index]=raw;true}
- pub fn event(&mut self,index:usize,seconds:f64,raw:f64)->bool{
+ pub fn event(&mut self,index:usize,seconds:f64,raw:f64)->bool{if self.framed{return false;}self.record_event(index,seconds,raw)}
+ fn record_event(&mut self,index:usize,seconds:f64,raw:f64)->bool{
   if self.ready||value(index,raw).is_none()||!seconds.is_finite()||seconds<0.||seconds*self.rate>9007199254740864.||self.events.iter().filter(|e|e.0==index).count()>=255||self.events.iter().rev().find(|e|e.0==index).is_some_and(|e|e.1>=seconds&&seconds!=0.)||self.events.len()>=512||self.events.last().is_some_and(|e|e.1>seconds){return false;}
   self.events.push((index,seconds,raw));true
  }
@@ -33,7 +34,7 @@ impl Engine {
   // Same-parameter calls at the same native second replace that target.
   for &(i,seconds,raw) in &self.events{
    let mapped=value(i,raw).unwrap();
-   let ok=if seconds==0.{self.targets[i].replace_zero(mapped)}else{self.targets[i].push(seconds,mapped)};
+   let ok=if seconds==0.{self.targets[i].replace_zero(mapped)}else{if self.framed{self.targets[i].push_frame((seconds*self.rate).round()as u64,mapped)}else{self.targets[i].push(seconds,mapped)}};
    if !ok{return false;}
   }
   self.targets.iter_mut().for_each(target::Gain::seal);self.ready=true;true
@@ -41,8 +42,11 @@ impl Engine {
  pub fn schedule(&mut self,index:usize,seconds:f64,raw:f64)->bool{
   let Some(mapped)=value(index,raw)else{return false;};
   let generated=self.frame.div_ceil(128)*128;
-  if !self.ready||!self.targets[index].schedule(seconds,mapped,generated){self.rejected+=1;return false;}true
+  if self.framed||!self.ready||!self.targets[index].schedule(seconds,mapped,generated){self.rejected+=1;return false;}true
  }
+ pub fn event_framed(&mut self,index:usize,frame:u64,raw:f64)->bool{if !self.framed||frame%128!=0||frame>self.rate as u64*3600{return false;}self.record_event(index,frame as f64/self.rate,raw)}
+ pub fn schedule_framed(&mut self,index:usize,frame:u64,raw:f64)->bool{let Some(mapped)=value(index,raw)else{return false;};let generated=self.frame.div_ceil(128)*128;if !self.framed||!self.ready||frame%128!=0||frame>self.rate as u64*3600||!self.targets[index].schedule_frame(frame,mapped,generated){self.rejected+=1;return false;}true}
+ fn prepare_target(&mut self,index:usize,frame:u64){if self.framed{self.targets[index].prepare_quantum_framed(frame);}else{self.targets[index].prepare_quantum(frame);}}
  /// Authored native layout/processing clock. Never infer a silence flag from PCM.
  pub fn activity(&mut self,frame:u64,source:usize,delay_audio:bool,filter_audio:bool)->bool{
   let generated=self.frame.div_ceil(128)*128;
@@ -54,7 +58,7 @@ impl Engine {
   self.activity.push(event);true
  }
  pub fn render(&mut self,n:usize)->bool{
-  if !self.ready||n>BLOCK||self.frame+n as u64>9007199254740864||(0..self.max_channels).any(|c|self.input[c][..n].iter().any(|x|!x.is_finite())){return false;}
+  if !self.ready||n>BLOCK||self.frame+n as u64>9007199254740864||self.framed&&self.frame+n as u64>self.rate as u64*3600||(0..self.max_channels).any(|c|self.input[c][..n].iter().any(|x|!x.is_finite())){return false;}
   self.peak=0.;
   for i in 0..n{let f=self.frame;
    if f%128==0{
@@ -63,9 +67,9 @@ impl Engine {
      if layout!=self.channels{self.delay.layout(self.channels,layout);self.tone.reset();self.channels=layout;}
      self.source_channels=e.source;self.delay_audio=e.delay_audio;self.filter_audio=e.filter_audio;self.activity_head+=1;self.activity_applied+=1;
     }
-    self.targets[0].prepare_quantum(f);self.delay_controls[0]=self.targets[0].samples;
-    if self.delay_audio&&self.channels==2{self.targets[0].prepare_quantum(f);self.delay_controls[1]=self.targets[0].samples;}
-    self.targets[1].prepare_quantum(f);if !self.targets[1].clamp_output(0.,(self.rate*0.5)as f32){return false;}
+    self.prepare_target(0,f);self.delay_controls[0]=self.targets[0].samples;
+    if self.delay_audio&&self.channels==2{self.prepare_target(0,f);self.delay_controls[1]=self.targets[0].samples;}
+    self.prepare_target(1,f);if !self.targets[1].clamp_output(0.,(self.rate*0.5)as f32){return false;}
    }
    let d=self.delay_controls[0][f as usize%128];let right=if self.channels==2{self.delay_controls[1][f as usize%128]}else{0.};let hz=self.targets[1].samples[f as usize%128];self.controls[0][f as usize%128]=d;self.controls[1][f as usize%128]=hz;
    let x=[if self.source_channels>0{self.input[0][i]}else{0.},if self.source_channels==2{self.input[1][i]}else{0.}];
@@ -75,10 +79,14 @@ impl Engine {
    for c in 0..2{self.output[c][i]=y[c];self.peak=self.peak.max(y[c].abs()as f64);}self.frame+=1;
   }true
  }
- pub fn reset(&mut self){for t in &mut self.targets{t.clear_events();}for i in 0..2{self.targets[i].replace_zero(value(i,self.initial[i]).unwrap());}for &(i,s,v) in &self.events{if s==0.{self.targets[i].replace_zero(value(i,v).unwrap());}else{self.targets[i].push(s,value(i,v).unwrap());}}self.targets.iter_mut().for_each(target::Gain::seal);self.delay.reset();self.tone.reset();self.channels=self.max_channels;self.source_channels=self.max_channels;self.delay_audio=true;self.filter_audio=true;self.activity.clear();self.activity_head=0;self.activity_applied=0;self.frame=0;self.peak=0.;self.rejected=0;self.input.fill([0.;BLOCK]);self.output.fill([0.;BLOCK]);self.controls.fill([0.;128]);self.delay_controls.fill([0.;128]);}
+ pub fn reset(&mut self){for t in &mut self.targets{t.clear_events();}for i in 0..2{self.targets[i].replace_zero(value(i,self.initial[i]).unwrap());}for &(i,s,v) in &self.events{if s==0.{self.targets[i].replace_zero(value(i,v).unwrap());}else{if self.framed{self.targets[i].push_frame((s*self.rate).round()as u64,value(i,v).unwrap());}else{self.targets[i].push(s,value(i,v).unwrap());}}}self.targets.iter_mut().for_each(target::Gain::seal);self.delay.reset();self.tone.reset();self.channels=self.max_channels;self.source_channels=self.max_channels;self.delay_audio=true;self.filter_audio=true;self.activity.clear();self.activity_head=0;self.activity_applied=0;self.frame=0;self.peak=0.;self.rejected=0;self.input.fill([0.;BLOCK]);self.output.fill([0.;BLOCK]);self.controls.fill([0.;128]);self.delay_controls.fill([0.;128]);}
 }
 #[no_mangle]pub extern "C" fn room_colour_api()->u32{1}
 #[no_mangle]pub extern "C" fn room_colour_new(rate:f64,channels:usize)->*mut Engine{Engine::new(rate,channels).map(Box::into_raw).unwrap_or(std::ptr::null_mut())}
+#[no_mangle]pub extern "C" fn room_colour_framed_new(rate:f64,channels:f64)->*mut Engine{if !channels.is_finite()||channels.fract()!=0.||!(1. ..=2.).contains(&channels){return std::ptr::null_mut();}Engine::new(rate,channels as usize).map(|mut p|{p.framed=true;Box::into_raw(p)}).unwrap_or(std::ptr::null_mut())}
+fn framed_value(frame:f64)->Option<u64>{if !frame.is_finite()||frame.fract()!=0.||frame<0.||frame>9007199254740864.||frame%128.!=0.{None}else{Some(frame as u64)}}
+#[no_mangle]pub extern "C" fn room_colour_framed_event(p:&mut Engine,i:f64,frame:f64,v:f64)->u32{if !i.is_finite()||i.fract()!=0.||!(0. ..=1.).contains(&i){return 0;}framed_value(frame).is_some_and(|f|p.event_framed(i as usize,f,v))as u32}
+#[no_mangle]pub extern "C" fn room_colour_framed_schedule(p:&mut Engine,i:f64,frame:f64,v:f64)->u32{if !i.is_finite()||i.fract()!=0.||!(0. ..=1.).contains(&i){return 0;}framed_value(frame).is_some_and(|f|p.schedule_framed(i as usize,f,v))as u32}
 #[no_mangle]pub unsafe extern "C" fn room_colour_free(p:*mut Engine){if !p.is_null(){drop(Box::from_raw(p));}}
 #[no_mangle]pub extern "C" fn room_colour_initial(p:&mut Engine,i:usize,v:f64)->u32{p.initial(i,v)as u32}
 #[no_mangle]pub extern "C" fn room_colour_event(p:&mut Engine,i:usize,s:f64,v:f64)->u32{p.event(i,s,v)as u32}
@@ -93,4 +101,4 @@ impl Engine {
 #[no_mangle]pub extern "C" fn room_colour_controls(p:&Engine,c:usize)->*const f32{p.controls.get(c).map(|ch|ch.as_ptr()).unwrap_or(std::ptr::null())}
 #[no_mangle]pub extern "C" fn room_colour_render(p:&mut Engine,n:usize)->u32{p.render(n)as u32}
 #[no_mangle]pub extern "C" fn room_colour_reset(p:&mut Engine){p.reset();}
-#[no_mangle]pub extern "C" fn room_colour_stat(p:&Engine,i:usize)->f64{match i{0=>p.frame as f64,1=>p.peak,2=>p.channels as f64,3=>p.rejected as f64,4=>((p.frame+127)/128*128)as f64,5=>p.ready as u32 as f64,6=>p.source_channels as f64,7=>p.channels as f64,8=>(!p.delay_audio)as u32 as f64,9=>(!p.filter_audio)as u32 as f64,10=>p.activity_applied as f64,11=>(p.activity.len()-p.activity_head)as f64,12=>p.max_channels as f64,_=>0.}}
+#[no_mangle]pub extern "C" fn room_colour_stat(p:&Engine,i:usize)->f64{match i{0=>p.frame as f64,1=>p.peak,2=>p.channels as f64,3=>p.rejected as f64,4=>((p.frame+127)/128*128)as f64,5=>p.ready as u32 as f64,6=>p.source_channels as f64,7=>p.channels as f64,8=>(!p.delay_audio)as u32 as f64,9=>(!p.filter_audio)as u32 as f64,10=>p.activity_applied as f64,11=>(p.activity.len()-p.activity_head)as f64,12=>p.max_channels as f64,13=>p.framed as u32 as f64,_=>0.}}

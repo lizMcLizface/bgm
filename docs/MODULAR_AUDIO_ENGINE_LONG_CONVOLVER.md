@@ -39,3 +39,7 @@ dff7a019233ad4d2 passes all11full-IR native comparisons and all3actual routed
 streams at48/96/192k. Reports are local long-convolver-native-browser-final.json
 and long-convolver-stream-browser-final.json. Full original impulses are retained;
 acknowledged disposal and terminal finite-output guards are included.
+
+## Shared transport callback clock follow-up
+
+The numeric convolution kernels and their accepted PCM identities remain unchanged. The opt-in transport/capture host now uses the separately measured `HostRenderClock` authority consistently with the private-room mixer: each actual callback consumes one distinct native input quantum even if the reported global frame remains stale. `buildOwnedConvolver --publish` embeds the exact shared class into marked regions of both standalone import-free worklet assets; `--check` verifies those regions and includes the source in host provenance. Active source/output frontier guards still reject a real missing-pull gap. This changes host provenance only and requires the old routed fixtures to be rerun; it does not relabel earlier native/stream evidence or promise device deadlines. The detailed private-room clock, lifetime and persistence acceptance is recorded in `MODULAR_AUDIO_ENGINE_PRIVATE_ROOM.md`.
