@@ -17,7 +17,7 @@
   "liveTransport": {
     "slots": 8,
     "metadataAudioParams": 89,
-    "timelineCapacityPerLane": 16,
+    "timelineCapacityPerLane": 64,
     "sequenceMax": 16777215,
     "authoredFrameMax": 1099511627648,
     "seconds": "One sampled context.currentTime must be exactly frame/sampleRate; every ordered call preserved, late events fresh-clamp on actual pull",
@@ -25,5 +25,13 @@
     "maxTotalUnobservedEdits": 8,
     "acknowledgement": "Processor acknowledges only after slots have been copied into owned Rust state; sender rejects ninth total outstanding edit before mutation, including inactive downstream branches."
   },
-  "primarySourcesFile": "REFERENCE_SOURCES.json"
+  "primarySourcesFile": "REFERENCE_SOURCES.json",
+  "normalCalls": {
+    "profile": "rack-native-dynamics-calls-e14de735-v1",
+    "slots": 32,
+    "metadataAudioParams": 193,
+    "payload": "lane,value,original seconds as exact integer-frame halves,sequence,initial-step flag",
+    "order": "compressor dry,wet,threshold,ratio,knee,attack,release; limiter threshold,wet,through",
+    "reservation": "whole7/3-record patch checked before first target/snapshot mutation; four same-quantum full compressor patches fit; fifth refuses wholly"
+  }
 }

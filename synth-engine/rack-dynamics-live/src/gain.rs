@@ -53,7 +53,7 @@ impl Gain {
             tau,
             raw_tau: time_constant,
             sealed: false,
-            events: Vec::with_capacity(16),
+            events: Vec::with_capacity(64),
             head: 0,
             current: initial as f32,
             coefficients: [
@@ -259,7 +259,7 @@ impl Gain {
             fresh: true,
             step: false,
         };
-        if self.events.len() >= 16 {
+        if self.events.len() >= 64 {
             return false;
         }
         let at = self.events.partition_point(|e| e.seconds <= seconds);
@@ -279,7 +279,7 @@ impl Gain {
         {
             remove += 1;
         }
-        self.events.len() - remove < 16
+        self.events.len() - remove < 64
     }
     pub fn step_now(&mut self, seconds: f64, frame: u64, value: f64) -> bool {
         if !self.available_now(seconds, frame) || !value.is_finite() || !(value as f32).is_finite()

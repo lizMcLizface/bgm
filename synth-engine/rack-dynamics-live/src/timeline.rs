@@ -2,7 +2,7 @@
 //! evaluator. It preserves original seconds, zero-output old segments, native
 //! convergence and the distinction between audio-frame and control-frame time.
 //! See CHROMIUM_PROFILE.json / CHROMIUM_NOTICES.txt for original BSD sources.
-pub const MAX_EVENTS: usize = 16;
+pub const MAX_EVENTS: usize = 64;
 #[derive(Clone, Copy)]
 pub struct Event {
     pub fresh: bool,

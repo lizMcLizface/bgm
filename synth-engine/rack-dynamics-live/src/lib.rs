@@ -170,7 +170,15 @@ impl Live {
         called_frame: f64,
         initial: bool,
     ) -> bool {
+        self.patch_masked(values,if self.kind==1{127}else{97},seconds,called_frame,initial)
+    }
+    pub fn lane(&mut self,index:usize,value:f64,seconds:f64,called_frame:f64,initial:bool)->bool{
+        if index>=7{return false;}let mut values=self.values;values[index]=value;
+        self.patch_masked(values,1<<index,seconds,called_frame,initial)
+    }
+    pub fn patch_masked(&mut self,values:[f64;7],mask:u32,seconds:f64,called_frame:f64,initial:bool)->bool{
         if !self.ready
+            || mask==0 || mask>127 || self.kind==2&&mask&!97!=0
             || !Self::canonical(called_frame)
             || called_frame > self.frame as f64
             || !seconds.is_finite()
@@ -181,14 +189,14 @@ impl Live {
         {
             return false;
         }
-        if (0..5).any(|i| !self.timelines[i].available_now(seconds, self.frame, self.rate))
-            || (0..2).any(|i| !self.gains[i].available_now(seconds, self.frame))
+        if (0..5).any(|i| mask&(1<<i)!=0 && !self.timelines[i].available_now(seconds, self.frame, self.rate))
+            || (0..2).any(|i| mask&(1<<(i+5))!=0 && !self.gains[i].available_now(seconds, self.frame))
         {
             return false;
         }
         let tau = if self.kind == 1 { 0.012 } else { 0.02 };
         for i in 0..5 {
-            if self.kind == 2 && i > 0 {
+            if mask&(1<<i)==0 {
                 continue;
             }
             let ok = if initial {
@@ -199,6 +207,7 @@ impl Live {
             assert!(ok);
         }
         for i in 0..2 {
+            if mask&(1<<(i+5))==0{continue;}
             let ok = if initial {
                 self.gains[i].step_now(seconds, self.frame, values[i + 5])
             } else {
@@ -206,7 +215,7 @@ impl Live {
             };
             assert!(ok);
         }
-        self.values = values;
+        for i in 0..7{if mask&(1<<i)!=0{self.values[i]=values[i];}}
         self.commands += 1;
         true
     }
@@ -443,3 +452,5 @@ pub extern "C" fn rack_dynamics_live_gain_curve(p: &Live, ch: usize) -> *const f
 pub extern "C" fn rack_dynamics_live_prepare_native(p: &mut Live, frame: f64, seconds: f64) -> u32 {
     p.prepare_native(frame, seconds) as u32
 }
+
+#[no_mangle]pub extern "C" fn rack_dynamics_live_lane(p:&mut Live,index:usize,value:f64,seconds:f64,frame:f64,initial:u32)->u32{if initial>1{0}else{p.lane(index,value,seconds,frame,initial!=0)as u32}}

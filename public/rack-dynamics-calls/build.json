@@ -1,0 +1,16 @@
+{
+  "api": 1,
+  "profile": "rack-native-dynamics-calls-e14de735-v1",
+  "liveTransport": "bounded32-authored-lane-records-v1",
+  "acknowledged": true,
+  "primarySources": "32011192c8a269087ceb23c81777422ffc9c239411dd4461217a9f7961cb7a08",
+  "audited": false,
+  "source": "acc96f13ac1cd28f6b758b2ac35d9f0197aacfde94e2f5a1839862eddba2f402",
+  "runtime": "b5e2857926326d56b783b18fb5c1e96e4aa5bbb4d55b25d2616fef37954a5ad5",
+  "reference": "2ea3353a315e2ff51b9cddc3bdd6856f4fc192a27c5a542b52a06ecf6afb05ab",
+  "wasm": "db64b55a617dd518d7e9d215e908192972dd1780c9f9f8c400b8d9081cbccfe6",
+  "bytes": 81473,
+  "version": "d5dacd86a2cc7397",
+  "processorName": "rack-native-calls-d5dacd86a2cc7397",
+  "processor": "e4d07456bfa4347cd5820356366561b185967c882ebecd35fa77e639a7474167"
+}
