@@ -1,0 +1,37 @@
+{
+  "api": 1,
+  "profile": "native-rack-explicit-live-pull-v1",
+  "source": "6ce1c0e4a0e093861d8981883efb28c16ff5157fb4ae3bde573404ea2a9b98e5",
+  "wasm": "35d216f24c6a2236cadb5b28a7fdc3283941bc40e83be701c52518ce6583f95d",
+  "version": "c60d8a7d79239cbc",
+  "bytes": 196019,
+  "audited": false,
+  "files": [
+    "synth-engine/rack-native/Cargo.toml",
+    "synth-engine/rack-native/Cargo.lock",
+    "src/modular-audio/ownedNativeRack.js",
+    "src/modular-audio/ownedNativeRackLive.js",
+    "src/modular-audio/nativeRackTargets.js",
+    "src/modular-audio/nativeRackLive.worklet.js",
+    "src/modular-audio/ownedNativeRackLiveWorklet.js",
+    "src/modular-audio/nativeRack.worklet.js",
+    "src/modular-audio/ownedNativeRackWorklet.js",
+    "src/modular-audio/hostRenderClock.js",
+    "synth-engine/rack-native/src/lib.rs",
+    "synth-engine/rack-native/src/live.rs",
+    "synth-engine/rack-native/src/biquad.rs",
+    "synth-engine/rack-native/src/tail.rs",
+    "synth-engine/rack-native/src/allocation.rs",
+    "synth-engine/rack-native/CHROMIUM_PROFILE.json",
+    "synth-engine/rack-native/CHROMIUM_NOTICES.txt",
+    "synth-engine/piano-live/src/live_timeline.rs",
+    "synth-engine/piano-live/src/live_sine.rs",
+    "synth-engine/tape-fx/resources/manifest.json"
+  ],
+  "resources": [
+    "synth-engine/tape-fx/resources/chromium-sine-2048.f32",
+    "synth-engine/tape-fx/resources/chromium-sine-4096.f32",
+    "synth-engine/tape-fx/resources/chromium-sine-16384.f32"
+  ],
+  "scope": "Additive explicit live pull/control clock with dynamic logical source layout; no normal/default integration; original captured ABI remains independently verified"
+}

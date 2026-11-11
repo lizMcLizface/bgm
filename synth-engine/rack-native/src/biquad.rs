@@ -21,6 +21,7 @@ impl Biquad{
   let key=[kind as f64,hz,q,gain];if self.key[0].is_finite()&&self.key[0]!=kind as f64{self.clear();}if key!=self.key{self.c=coefficients(kind,hz/(sr/2.),q,gain);self.key=key;}
   let[b0,b1,b2,a1,a2]=self.c;let mut output=[0.;2];for ch in 0..channels{let h=&mut self.history[ch];let x=input[ch]as f64;let y=(b0*x+b1*h[0]+b2*h[1]-a1*h[2]-a2*h[3])as f32;h[1]=h[0];h[0]=x;h[3]=h[2];h[2]=y as f64;output[ch]=y;}output
  }
+ pub(super) fn tail_frame(&self,max_frame:f64)->f64{super::tail::tail_frame(self.c,max_frame)}
  pub fn clear(&mut self){self.history=[[0.;4];2];}
  pub fn end_quantum(&mut self){for ch in &mut self.history{for value in ch{if value.abs()<f32::MIN_POSITIVE as f64{*value=0.;}}}}
 }

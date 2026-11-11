@@ -70,6 +70,43 @@
       "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/audio_bus.cc",
       "bytes": 28543,
       "sha256": "17fc6c0a60c1b1ef4115942b05bd7c37838f74784d0d128e66a0e660cc2a05c6"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/deferred_task_handler.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/deferred_task_handler.cc",
+      "bytes": 16114,
+      "sha256": "3db25afa2b090da39d914e7fea537e79c6f0e436a47955151b8cde592bb62eb9"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/audio_node_input.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_node_input.cc",
+      "bytes": 6148,
+      "sha256": "5f9b7a1fb0303142eee45db402aa362a1c8926a77fc25a5a29703e264f8b67cb"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/audio_node_output.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_node_output.cc",
+      "bytes": 7739,
+      "sha256": "18497939a5fe50a7e49353de19a4984cd86d3d57618041842b21f9dc3add1d74"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/audio_handler.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_handler.cc",
+      "bytes": 21159,
+      "sha256": "37dd5f0b367b18db123e12193ad7f2e71fde99d63aaded84f7017e77a07b8d9b"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/audio_handler.h",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_handler.h",
+      "bytes": 14229,
+      "sha256": "77a23aab1199155f0e313d317e48d10f07a9c7614b4eca4aa5dd48c0121fb187"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/audio_worklet_handler.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_worklet_handler.cc",
+      "bytes": 12762,
+      "sha256": "cb7bb7096c162fa5ab7ad5a11ea5c0943925d2689954971b64839874e9751c25"
     }
-  ]
+  ],
+  "liveActivity": "Separate audio-processing and handler-parameter-pull masks. Tail retirement disables fresh target evaluation until actual handler reactivation; native main-thread output-disable dispatch remains an explicit external activity boundary for arbitrary mixed-native graphs."
 }

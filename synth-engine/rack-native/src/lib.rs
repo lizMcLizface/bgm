@@ -3,6 +3,8 @@
 #[path="../../piano-live/src/live_timeline.rs"]mod timeline;
 #[path="../../piano-live/src/live_sine.rs"]mod sine;
 mod biquad;
+mod live;
+mod tail;
 #[cfg(feature="allocation-audit")]mod allocation;
 use timeline::LiveTimeline;
 const BLOCK:usize=2048;const LANES:usize=7;const EVENTS:usize=128;

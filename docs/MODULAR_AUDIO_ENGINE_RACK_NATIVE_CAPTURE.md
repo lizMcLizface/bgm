@@ -128,3 +128,7 @@ native-rack-first.json and native-rack-reload-final.json under the ignored
 modular_audio reports directory. This accepts only the stated captured profile;
 no normal backend migration, arbitrary live demand or source-ended activity
 clock equivalence is claimed.
+
+## Additive source-provenance refresh
+
+The captured public asset is now4fe098b973c4877f/196019 bytes after adding separate live-clock exports and pinned lifecycle-source provenance. Its captured Engine rendering equations and contract are unchanged. Original89093f53ab94f71c/176343-byte browser acceptance remains bound to that original artifact; it is pinned with its original manifest/notices as a test-only fixture outsidepublic.36 exact old/new tests compare against those fixed original bytes, not against the newly rebuilt public file. The captured47 regressions and36 allocation cases pass on the refreshed asset. No new physical or universal mixed-native lifecycle claim is inferred from this provenance refresh.
