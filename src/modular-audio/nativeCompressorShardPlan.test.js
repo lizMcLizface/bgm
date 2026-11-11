@@ -1,0 +1,5 @@
+// @vitest-environment node
+import{it,expect}from'vitest';import{RAW_NATIVE_CASES,rawNativeShard}from'../../tools/nativeCompressorShardPlan.js';
+it('keeps stable global coverage indices and bounds a default document to18 contexts',()=>{expect(RAW_NATIVE_CASES).toHaveLength(108);expect(rawNativeShard().globalCaseIndices).toEqual(Array.from({length:18},(_,i)=>54+i));expect(RAW_NATIVE_CASES[86]).toMatchObject({rate:96000,channels:2,profile:'synthMix',mode:'disconnected'});});
+it('selects the exact22 cases left after the retained OOM without claiming a whole matrix',()=>{const a=rawNativeShard('?rate=96000&from=86'),b=rawNativeShard('?rate=192000&from=90');expect(a.globalCaseIndices).toEqual([86,87,88,89]);expect(b.globalCaseIndices).toEqual(Array.from({length:18},(_,i)=>90+i));expect([...a.globalCaseIndices,...b.globalCaseIndices]).toHaveLength(22);});
+it('rejects unbounded, invalid and empty shards',()=>{for(const query of['?rate=all','?take=108','?take=0','?from=108','?rate=8000&from=90'])expect(()=>rawNativeShard(query)).toThrow();});

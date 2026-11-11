@@ -1,3 +1,19 @@
+Shared physical-player checkpoint: the prepared environment now supplies the
+accepted context-owned piano streaming factory. Four actual native Starmap cases
+pass cold authored-zero expression/body, genuine unpulled filter/LFO aging and
+two reused held-control runs (max relative RMS5.761098075982471e-7 under the
+unchanged.005 bound). The actual four-KS/piano/Hand desk and saved reconstruction
+also pass all3 with that factory (owned-host-shared-physical-final.json).
+Normal default construction still uses its original controller. Direct owned
+material changes now reject before mutating preset/source/morph state; normal
+application edits reconstruct atomically. See MODULAR_AUDIO_ENGINE_PIANO_STREAMING.md.
+
+The raw ordinary compressor cleanup fix now releases retained Wasm exports/views
+and acknowledges constructor failures. Its final remaining22 cases pass in bounded
+96k/192k shards; combined with the86 retained pre-exhaustion cases this covers all
+108 matrix positions, not a new single108-case run. Default harness execution
+now uses at most18 contexts per rate. Normal ordinary compressor adoption follows.
+
 Prepared-host continuation: original KS live control/demand histories are accepted
 and selected by the explicit runtime environment. The actual All path with four
 KS materials, piano and Hand passes native desk / owned desk / saved reconstruction

@@ -8,7 +8,7 @@ for its own OfflineAudioContext; cross-context factory reuse is rejected.
 Existing null-environment defaults remain available.
 
 The profile selects the original owned Core/FM live kernels and Rust patch
-transitions, normal owned piano and Iowa sources, fourteen original CLASSIC models, the accepted live
+transitions, normal owned piano (shared physical controller) and Iowa sources, fourteen original CLASSIC models, the accepted live
 VoiceCompressor and owned role pan/level motion. Original Rust weather live
 sources and bounded weather/loop preparation feed the original ambience host.
 It does not translate native oscillator presets into another sound model.
@@ -77,3 +77,7 @@ Runtime selection and these new factories remain absent from persisted songs.
 Continue the physical live-history errors/remaining target clocks, ordinary
 compressor final facade adoption, and three-plugin owned rack host acceptance.
 Other native VCO/effect/ambience/room owners remain explicit migration work.
+
+The accepted shared piano factory is runtime-only and context-bound.
+Its four native body/expression/gap/reused-held checks and actual combined
+KS/piano/Hand desk/reload3 pass; see the focused streaming-piano record.

@@ -1,5 +1,13 @@
 class Compressor {
-    constructor(AC) {
+    constructor(AC, { factory = null, ...runtimeOptions } = {}) {
+        if (factory !== null) {
+            if (typeof factory !== 'function') throw new TypeError('Compressor factory must be a prepared function');
+            const stage = factory(AC, runtimeOptions);
+            if (!stage || typeof stage.getNode !== 'function' || typeof stage.connect !== 'function') {
+                throw new TypeError('Compressor factory must return a synchronous stage');
+            }
+            return stage;
+        }
         this.AC = AC;
         this.node = this.AC.createDynamicsCompressor();
         this.node.attack.value = 0.005;
