@@ -1,0 +1,2 @@
+import{spawnSync}from'node:child_process';
+const run=args=>{const child=spawnSync(process.execPath,args,{stdio:'inherit'});if(child.error)throw child.error;if(child.status)process.exit(child.status);};run(['tools/buildAmbienceSpatial.mjs','--audit']);run(['tools/buildAmbienceSpatial.mjs','--publish','--check']);run(['node_modules/vitest/vitest.mjs','run','src/modular-audio/ambienceSpatial.test.js','--reporter=dot']);

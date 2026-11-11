@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "profile": "native-single-harmonic-avx-fma-v1",
+  "revision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+  "scope": "Selected f32 Native RustFFT6.4.1 AVX/FMA inverse recipe, scalar complex lanes preserving fused operation order; one real harmonic and sizes2048/4096/16384 only. Preparation only; no bulk vendor code or fitted output data. Native architecture alternatives not claimed.",
+  "sources": [
+    {
+      "file": "third_party/blink/renderer/platform/audio/rustfft_ffi.rs",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/rustfft_ffi.rs",
+      "sha256": "52a5317f5074fcfa50dedb7aac8b88cdfd007c75e01f4438a27e144cd613400d"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/periodic_wave_handler.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/periodic_wave_handler.cc",
+      "sha256": "940a3fadb8f63d8e8944ed60fa76a3740638f9f8820c6de6ab3ee07c87ff2a35"
+    },
+    {
+      "file": "third_party/rust/chromium_crates_io/vendor/rustfft-v6/src/avx/avx_planner.rs",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/rust/chromium_crates_io/vendor/rustfft-v6/src/avx/avx_planner.rs",
+      "sha256": "f52a23b4af126f461ae624e4917ff5532ce156ed3fc2d371c426187137bb0d42"
+    },
+    {
+      "file": "third_party/rust/chromium_crates_io/vendor/rustfft-v6/src/avx/avx_mixed_radix.rs",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/rust/chromium_crates_io/vendor/rustfft-v6/src/avx/avx_mixed_radix.rs",
+      "sha256": "ed34e2b5a1834ce7a8eccbf41d5e741ac27d3b88ea600824b125a32c5e5176be"
+    },
+    {
+      "file": "third_party/rust/chromium_crates_io/vendor/rustfft-v6/src/avx/avx32_butterflies.rs",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/rust/chromium_crates_io/vendor/rustfft-v6/src/avx/avx32_butterflies.rs",
+      "sha256": "e931558674161c4b04c8dc8e859c2980dcea9d6b61513a484e1133b5e7062659"
+    },
+    {
+      "file": "third_party/rust/chromium_crates_io/vendor/rustfft-v6/src/avx/avx_vector.rs",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/rust/chromium_crates_io/vendor/rustfft-v6/src/avx/avx_vector.rs",
+      "sha256": "c7cd3f05f9738f1051b0af416737b988c819ff7a6e0dc4cde5767ac9e59e640c"
+    },
+    {
+      "file": "third_party/rust/chromium_crates_io/vendor/rustfft-v6/src/twiddles.rs",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/rust/chromium_crates_io/vendor/rustfft-v6/src/twiddles.rs",
+      "sha256": "0f3ec868e8a6b65eff80b761ab91acc92dbb7a8cbc99bafc5c5857b87ff33c03"
+    }
+  ]
+}

@@ -1,0 +1,320 @@
+{
+  "version": 1,
+  "kind": "ambience.spatial.native-phase-preparation",
+  "authorityReportSha256": "08097fdf8b3de37883648bbdfed3e940c6b2284c7fecd5510234aa6548e04f87",
+  "scope": "Minimal hashes of actual integer-read Native tables; full original phase capture remains ignored local evidence. No generated PCM datasets.",
+  "cases": [
+    {
+      "size": 2048,
+      "rate": 24000,
+      "recipe": {
+        "name": "rain",
+        "base": 0.07,
+        "offset": 17.3,
+        "period": 33.559
+      },
+      "real": -0.5117969512939453,
+      "imag": -0.8591064214706421,
+      "nativeSha256": "64c380919a5d82f4fbffb073cb6aa319351f7e157721fbb1d450396e79b2dc00"
+    },
+    {
+      "size": 2048,
+      "rate": 24000,
+      "recipe": {
+        "name": "thunder",
+        "base": 0.688034,
+        "offset": 17.3,
+        "period": 37.798822599999994
+      },
+      "real": 0.7929204702377319,
+      "imag": 0.6093251705169678,
+      "nativeSha256": "ef2e6345e6a00f1ec21686b74af52259631b17e5a5fb998a238f135629a4dd99"
+    },
+    {
+      "size": 2048,
+      "rate": 24000,
+      "recipe": {
+        "name": "wind",
+        "base": 0.306068,
+        "offset": 17.3,
+        "period": 42.0386452
+      },
+      "real": -0.979342520236969,
+      "imag": -0.2022082507610321,
+      "nativeSha256": "df1adcb9d379e4e83564f5439577eec0259ac42fb52c20c6860784ebbbc4f09c"
+    },
+    {
+      "size": 2048,
+      "rate": 24000,
+      "recipe": {
+        "name": "waves",
+        "base": 0.924102,
+        "offset": 17.3,
+        "period": 35.1784678
+      },
+      "real": 0.5042738914489746,
+      "imag": -0.8635437488555908,
+      "nativeSha256": "0977f6f110189744c11621104532b3b939b1f490d97353fc20ef9821d8c4103b"
+    },
+    {
+      "size": 2048,
+      "rate": 24000,
+      "recipe": {
+        "name": "fire",
+        "base": 0.5421359999999997,
+        "offset": 17.3,
+        "period": 39.418290400000004
+      },
+      "real": -0.11898140609264374,
+      "imag": 0.9928964972496033,
+      "nativeSha256": "f3d9ea0f2c5896cb8476a6f0498c36e84a4cefdc9070307517c67f553356080e"
+    },
+    {
+      "size": 2048,
+      "rate": 24000,
+      "recipe": {
+        "name": "vinyl",
+        "base": 0.16016999999999948,
+        "offset": 17.3,
+        "period": 32.558113000000006
+      },
+      "real": -0.9332668781280518,
+      "imag": -0.3591836988925934,
+      "nativeSha256": "51122e209525e617ddf9fb77a9fdf2012c3786a9f109db22174546ac1f616c79"
+    },
+    {
+      "size": 2048,
+      "rate": 24000,
+      "recipe": {
+        "name": "total",
+        "base": 0.31,
+        "offset": 17.3,
+        "period": 180
+      },
+      "real": 0.55629563331604,
+      "imag": -0.8309844732284546,
+      "nativeSha256": "6daf3ece50e6e2f4498e63f75eda8806536e369ced288d405d248dba0818ba81"
+    },
+    {
+      "size": 2048,
+      "rate": 24000,
+      "recipe": {
+        "name": "zero-phase-authority",
+        "base": 0,
+        "offset": 0,
+        "period": 37
+      },
+      "real": 0,
+      "imag": 1,
+      "nativeSha256": "7921549af80be380eb0d549f9eab730190f19dbed6a0b394ef97170d62d002d4"
+    },
+    {
+      "size": 4096,
+      "rate": 48000,
+      "recipe": {
+        "name": "rain",
+        "base": 0.07,
+        "offset": 17.3,
+        "period": 33.559
+      },
+      "real": -0.5117969512939453,
+      "imag": -0.8591064214706421,
+      "nativeSha256": "92ca93671140a3e02cbba2e6b4734e240dc3b3ca5f6d22e96875c13ad48af4f3"
+    },
+    {
+      "size": 4096,
+      "rate": 48000,
+      "recipe": {
+        "name": "thunder",
+        "base": 0.688034,
+        "offset": 17.3,
+        "period": 37.798822599999994
+      },
+      "real": 0.7929204702377319,
+      "imag": 0.6093251705169678,
+      "nativeSha256": "eca0fb2083fdebd8692340243fa603120ca2476da6262620c3c0d39c541e32c1"
+    },
+    {
+      "size": 4096,
+      "rate": 48000,
+      "recipe": {
+        "name": "wind",
+        "base": 0.306068,
+        "offset": 17.3,
+        "period": 42.0386452
+      },
+      "real": -0.979342520236969,
+      "imag": -0.2022082507610321,
+      "nativeSha256": "d646d4a3674832bd578748c836006b2fcecba739fbe3c40d5917fcf0c1783c3c"
+    },
+    {
+      "size": 4096,
+      "rate": 48000,
+      "recipe": {
+        "name": "waves",
+        "base": 0.924102,
+        "offset": 17.3,
+        "period": 35.1784678
+      },
+      "real": 0.5042738914489746,
+      "imag": -0.8635437488555908,
+      "nativeSha256": "c3e52a734a8684ab91f7158d6dd42a20792eb877bf8a3b8b81d519f766e12e52"
+    },
+    {
+      "size": 4096,
+      "rate": 48000,
+      "recipe": {
+        "name": "fire",
+        "base": 0.5421359999999997,
+        "offset": 17.3,
+        "period": 39.418290400000004
+      },
+      "real": -0.11898140609264374,
+      "imag": 0.9928964972496033,
+      "nativeSha256": "154fc67e4831dc38e1181f9488b7e2cbda526484b4928237fbf541ed52897f0c"
+    },
+    {
+      "size": 4096,
+      "rate": 48000,
+      "recipe": {
+        "name": "vinyl",
+        "base": 0.16016999999999948,
+        "offset": 17.3,
+        "period": 32.558113000000006
+      },
+      "real": -0.9332668781280518,
+      "imag": -0.3591836988925934,
+      "nativeSha256": "40f36d6d3e737a5fe2fc1225664cf02cb8af0f4012288f39e5132ae670ac798f"
+    },
+    {
+      "size": 4096,
+      "rate": 48000,
+      "recipe": {
+        "name": "total",
+        "base": 0.31,
+        "offset": 17.3,
+        "period": 180
+      },
+      "real": 0.55629563331604,
+      "imag": -0.8309844732284546,
+      "nativeSha256": "5e0bde17efa1bb9d7cda9e100d9bcdb38eaf7ec6b42ac16ab0bebc130d29ef91"
+    },
+    {
+      "size": 4096,
+      "rate": 48000,
+      "recipe": {
+        "name": "zero-phase-authority",
+        "base": 0,
+        "offset": 0,
+        "period": 37
+      },
+      "real": 0,
+      "imag": 1,
+      "nativeSha256": "e2f429797c3ec9fba3f2a96176a6a2115a09ef65d520b772599b28e356d75c68"
+    },
+    {
+      "size": 16384,
+      "rate": 96000,
+      "recipe": {
+        "name": "rain",
+        "base": 0.07,
+        "offset": 17.3,
+        "period": 33.559
+      },
+      "real": -0.5117969512939453,
+      "imag": -0.8591064214706421,
+      "nativeSha256": "c8d3750380d0591601fe8f1081d287dd905b497f821df4120ffb1934d43bb14f"
+    },
+    {
+      "size": 16384,
+      "rate": 96000,
+      "recipe": {
+        "name": "thunder",
+        "base": 0.688034,
+        "offset": 17.3,
+        "period": 37.798822599999994
+      },
+      "real": 0.7929204702377319,
+      "imag": 0.6093251705169678,
+      "nativeSha256": "9f23acd91f2dff41801b0199e3e61b3d869aed293acce8da50e2eaf84d5f1bda"
+    },
+    {
+      "size": 16384,
+      "rate": 96000,
+      "recipe": {
+        "name": "wind",
+        "base": 0.306068,
+        "offset": 17.3,
+        "period": 42.0386452
+      },
+      "real": -0.979342520236969,
+      "imag": -0.2022082507610321,
+      "nativeSha256": "a0bc279e8fc29e4f475f79b21c6c26bfac45d14a3323c15b3e98884ca66907a5"
+    },
+    {
+      "size": 16384,
+      "rate": 96000,
+      "recipe": {
+        "name": "waves",
+        "base": 0.924102,
+        "offset": 17.3,
+        "period": 35.1784678
+      },
+      "real": 0.5042738914489746,
+      "imag": -0.8635437488555908,
+      "nativeSha256": "ee5fc9bbc2e99a652d512bcb795a1635e35900aa529394f0dadf716dbb7c4753"
+    },
+    {
+      "size": 16384,
+      "rate": 96000,
+      "recipe": {
+        "name": "fire",
+        "base": 0.5421359999999997,
+        "offset": 17.3,
+        "period": 39.418290400000004
+      },
+      "real": -0.11898140609264374,
+      "imag": 0.9928964972496033,
+      "nativeSha256": "a4099facc46da5c8a6b0b795fd765587bb0ec80f82193f4664398c8cdb04405d"
+    },
+    {
+      "size": 16384,
+      "rate": 96000,
+      "recipe": {
+        "name": "vinyl",
+        "base": 0.16016999999999948,
+        "offset": 17.3,
+        "period": 32.558113000000006
+      },
+      "real": -0.9332668781280518,
+      "imag": -0.3591836988925934,
+      "nativeSha256": "84d3c67c7611a9b28dfaacb54c1ea8613681e9484829327daf37b833a4bd42aa"
+    },
+    {
+      "size": 16384,
+      "rate": 96000,
+      "recipe": {
+        "name": "total",
+        "base": 0.31,
+        "offset": 17.3,
+        "period": 180
+      },
+      "real": 0.55629563331604,
+      "imag": -0.8309844732284546,
+      "nativeSha256": "0fa0c3b0253f364a097e0bd25ba85be08340f680e821e44c14e5407ad221f85f"
+    },
+    {
+      "size": 16384,
+      "rate": 96000,
+      "recipe": {
+        "name": "zero-phase-authority",
+        "base": 0,
+        "offset": 0,
+        "period": 37
+      },
+      "real": 0,
+      "imag": 1,
+      "nativeSha256": "7a3b0c8477c0a631590627ce02ce1d3712ad9622581567e4b1ca8fb2989a7da3"
+    }
+  ]
+}

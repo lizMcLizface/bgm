@@ -1,0 +1,3 @@
+//! Native StereoPanner branches, pinned stereo_panner.cc. Constant mode has
+//! Float32 gains/products/additions; sample-accurate mode retains double gains.
+pub fn pan(x:[f32;2],value:f32,constant:bool)->[f32;2]{let p=value.clamp(-1.,1.);if constant{let a=if p<=0.{p+1.}else{p};let a=a as f64*std::f64::consts::FRAC_PI_2;let l=a.cos()as f32;let r=a.sin()as f32;if p<=0.{[x[0]+x[1]*l,x[1]*r]}else{[x[0]*l,x[1]+x[0]*r]}}else{let p=p as f64;let a=(if p<=0.{p+1.}else{p})*std::f64::consts::FRAC_PI_2;let l=a.cos();let r=a.sin();if p<=0.{[(x[0]as f64+x[1]as f64*l)as f32,(x[1]as f64*r)as f32]}else{[(x[0]as f64*l)as f32,(x[1]as f64+x[0]as f64*r)as f32]}}}

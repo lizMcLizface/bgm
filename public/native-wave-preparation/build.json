@@ -1,0 +1,10 @@
+{
+  "api": 1,
+  "profile": "native-single-harmonic-avx-fma-v1",
+  "source": "45d5542504f98beca1c2ac102a201bc61eb1e1a8c7ace0eadab64a5bc7abc78f",
+  "runtime": "480c0319415146053f2de9988dbc33ff5ce981e53e9136b74637c18fed3effdd",
+  "reference": "458201477719b433320f4ce45fbc024239f02fad2144a6f6166643d7c23f75d4",
+  "wasm": "bce50df801f5ffd1aa2d296643fdcad4b15f4ec379ae952bce1f61ccef4136e0",
+  "bytes": 34046,
+  "version": "4860b39374a17ea2"
+}
