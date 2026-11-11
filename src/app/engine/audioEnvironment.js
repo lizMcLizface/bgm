@@ -8,7 +8,7 @@ export function validateAudioEnvironment(environment,context){
 }
 export function nativeInstrumentEnvironment(environment,preset,context){
  if(!environment)return{};validateAudioEnvironment(environment,context);const options=environment.instrumentOptions(preset);
- if(!options||Object.keys(options).some(k=>!['sourceBackend','voiceCompressorFactory','pianoSourceFactory'].includes(k))||!['native','owned-rust'].includes(options.sourceBackend)||typeof options.voiceCompressorFactory!=='function'||options.pianoSourceFactory!==undefined&&typeof options.pianoSourceFactory!=='function')throw Error('Invalid native instrument runtime options');
+ if(!options||Object.keys(options).some(k=>!['sourceBackend','voiceCompressorFactory','pianoSourceFactory','ordinaryCompressorFactory'].includes(k))||!['native','owned-rust'].includes(options.sourceBackend)||typeof options.voiceCompressorFactory!=='function'||options.pianoSourceFactory!==undefined&&typeof options.pianoSourceFactory!=='function'||options.ordinaryCompressorFactory!==undefined&&typeof options.ordinaryCompressorFactory!=='function')throw Error('Invalid native instrument runtime options');
  return{...options};
 }
 export async function audioEnvironmentForContext(environment,context){return environment?validateAudioEnvironment(await environment.prepareContext(context),context):null;}

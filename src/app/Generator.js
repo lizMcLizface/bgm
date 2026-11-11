@@ -1198,7 +1198,7 @@ class Generator {
     }
 
     async awaitSourceReady() {
-        await Promise.all(Object.values(this.roles).map(async ({instrument:i}) => { await i.ready; await i.sourceReady; if(i.error)throw i.error; const failure=i.sourceStatus?.().error; if(failure)throw Error(failure); }));
+        await Promise.all(Object.values(this.roles).map(async ({instrument:i}) => { await i.ready; await i.sourceReady; await i.armRuntime?.(); if(i.error)throw i.error; const failure=i.sourceStatus?.().error; if(failure)throw Error(failure); }));
     }
 
     async awaitRoleMotion({controls = this.AC.state === 'running'} = {}) {

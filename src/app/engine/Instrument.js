@@ -28,6 +28,7 @@ import { isTempered, tuningCents } from './temperament';
 import { pianoBufferLater } from './pianoRenderPool';
 import { createPianoLiveSource } from './pianoLiveSource';
 import {createPluckedLiveSource} from './pluckedLiveSource.js';
+import {instrumentCompressorPolicy,LIMITER_INITIAL_FIELDS} from './instrumentCompressorPolicy.js';
 
 // A held note is booked as if it lasted this long; its release replaces
 // the tail when the key comes up.
@@ -190,16 +191,18 @@ class Instrument {
      * @param {object} [options.preset]
      * @param {BaseAudioContext} [options.context]
      */
-    constructor({ polyphony = 8, preset = {}, context = audioContext, deferReverb = false, reverbHub = null, fdnRoom = false, sourceBackend = 'native', voiceCompressorFactory = null, pianoSourceFactory = null } = {}) {
+    constructor({ polyphony = 8, preset = {}, context = audioContext, deferReverb = false, reverbHub = null, fdnRoom = false, sourceBackend = 'native', voiceCompressorFactory = null, pianoSourceFactory = null, ordinaryCompressorFactory = null } = {}) {
         if (!['native', 'owned-rust'].includes(sourceBackend)) throw Error('Unsupported instrument source backend');
         if (pianoSourceFactory !== null && typeof pianoSourceFactory !== 'function') throw Error('Invalid piano source factory');
         this.pianoSourceFactory = pianoSourceFactory;
         this.pendingSourceBookings = new Set(); this.sourceBackend = sourceBackend; this.pianoSource = null; this.pianoSourcePromise = null; this.pluckedSource = null; this.pluckedSourcePromise = null; this.sourceFailure = null;
         this.sourceBookingTrace = []; this.sourcePreparationLateFrames = 0; this.sourcePreparationLateBookings = 0;
         this.AC = context;
+        const compressorPolicy=instrumentCompressorPolicy(context,preset,ordinaryCompressorFactory);
+        this.ordinaryDynamicsOwned=compressorPolicy.owned;
         this.polyphony = polyphony;
 
-        this.synthMix = new Nodes.Compressor(this.AC);
+        this.synthMix = new Nodes.Compressor(this.AC,compressorPolicy.synthMix);
         this.distortion = new Nodes.Distortion(this.AC);
         this.flanger = new Nodes.Flanger(this.AC);
         this.chorus = new Nodes.Chorus(this.AC);
@@ -218,7 +221,7 @@ class Instrument {
         if (deferReverb) this.reverb.defer();
         this.eq = new Nodes.EQ2(this.AC);
         this.filter = new Nodes.Filter(this.AC);
-        this.limiter = new Nodes.Compressor(this.AC);
+        this.limiter = new Nodes.Compressor(this.AC,compressorPolicy.limiter);
         this.output = new Nodes.Gain(this.AC);
         this.vibrato = new Nodes.LFO(this.AC);
         this.motion = new Nodes.Motion(this.AC);
@@ -253,9 +256,11 @@ class Instrument {
         this.limiter.connect(this.output.getNode());
 
         // Compressing all voices together to avoid clipping, as PolySynth does.
-        this.synthMix.setThreshold(-6);
-        this.synthMix.setKnee(0);
-        this.synthMix.setRatio(20);
+        if(!compressorPolicy.offline){
+            this.synthMix.setThreshold(-6);
+            this.synthMix.setKnee(0);
+            this.synthMix.setRatio(20);
+        }
 
         const startTime = this.AC.currentTime + 0.01;
         this.voiceOscillatorStartTime=startTime;
@@ -305,8 +310,9 @@ class Instrument {
 
         this.preset = null;
         this.chainSignature = null;
-        this.applyPreset(preset);
-        this.effectsReady = Promise.all(this.stages.map(({ key }) => this[key]?.ready).filter(Boolean));
+        this.offlineOrdinaryInitial=compressorPolicy.offline;
+        try{this.applyPreset(preset);}finally{this.offlineOrdinaryInitial=false;}
+        this.effectsReady = Promise.all([this.synthMix.ready,this.limiter.ready,...this.stages.map(({ key }) => this[key]?.ready)].filter(Boolean));
         const source = sourceBackend === 'owned-rust' ? this.preset.stringModel === 'piano' ? this.ensurePianoSource() : this.preset.stringModel === 'plucked' ? this.ensurePluckedSource() : Promise.resolve(null) : Promise.resolve(null);
         this.sourceReady = Promise.all([source, this.effectsReady]).then(() => ownedSourceOf(this));
         this.sourceReady.catch(error => { this.sourceFailure = error; });
@@ -379,7 +385,19 @@ class Instrument {
         while (this.pendingSourceBookings?.size) await Promise.all([...this.pendingSourceBookings]);
         if (this.sourceFailure) throw this.sourceFailure;
     }
-    prepareOffline() { ownedSourceOf(this)?.prepareOffline(); }
+    prepareOffline() { return ownedSourceOf(this)?.prepareOffline(); }
+    async armRuntime(){
+        await this.effectsReady;
+        if(this.AC.state==='running'){
+            this.ordinaryArm ??= Promise.all([this.synthMix.arm?.(),this.limiter.arm?.()]).catch(error=>{this.ordinaryArm=null;throw error;});
+            await this.ordinaryArm;
+        }
+    }
+    updateOrdinaryDemand(){
+        if(this.disposed)return;
+        const on=!!this.chainAwake&&this.destinations.length>0;
+        this.synthMix.setHostAwake?.(on);this.limiter.setHostAwake?.(on);
+    }
     sourceStatus() {
         const source = ownedSourceOf(this), status = source?.status() ?? {backend:this.sourceBackend ?? 'native',ready:this.sourceBackend !== 'owned-rust',error:this.sourceFailure?.message ?? null};
         return {...status,material:status.material ?? (source ? this.preset?.stringModel ?? 'piano' : null),pendingBookings:this.pendingSourceBookings?.size ?? 0,preparationLateFrames:this.sourcePreparationLateFrames ?? 0,preparationLateBookings:this.sourcePreparationLateBookings ?? 0,hostBookingTrace:(this.sourceBookingTrace ?? []).map(record=>({...record}))};
@@ -394,11 +412,13 @@ class Instrument {
         this.destinations.push(destination);
         ownedSourceOf(this)?.setHostAwake?.(!!this.chainAwake);
         if (this.chainAwake) this.output.connect(destination);
+        this.updateOrdinaryDemand();
     }
 
     disconnect() {
         this.output.disconnect();
         this.destinations = [];
+        this.updateOrdinaryDemand();
         ownedSourceOf(this)?.setHostAwake?.(false);
     }
 
@@ -477,7 +497,7 @@ class Instrument {
         if (this.preset && this.preset[key] === value) return;
         this.preset = { ...this.preset, [key]: value };
         const setter = PARAM_SETTERS[key];
-        if (setter) setter(this, value);
+        if (setter && !(this.offlineOrdinaryInitial && LIMITER_INITIAL_FIELDS.some(([field])=>field===key))) setter(this, value);
         if (ENVELOPE_KEYS.has(key)) this.updateEnvelopes();
         // a delay setting changed while flushTails holds the delays at 0
         if (DELAY_KEYS.has(key) && this.heldUntil > this.AC.currentTime) this.holdDelays(this.heldUntil);
@@ -966,6 +986,7 @@ class Instrument {
             this.chainAwake = true;
             if (this.reverb.setAwake) this.reverb.setAwake(true);
         }
+        this.updateOrdinaryDemand();
     }
 
     // A prepared Rust source feeds synthMix without waking legacy oscillators.
@@ -1018,6 +1039,7 @@ class Instrument {
             this.chainAwake = false;
             if (this.reverb.setAwake) this.reverb.setAwake(false);
         }
+        this.updateOrdinaryDemand();
         this.scheduleSleep();
     }
 
@@ -1072,7 +1094,7 @@ class Instrument {
         this.silence();
         clearTimeout(this.sleepTimer);
         ownedSourceOf(this)?.dispose();
-        this.effectsDisposal = Promise.resolve().then(() => this.compressor.dispose?.()).catch(error => { this.effectsDisposalError = error; });
+        this.effectsDisposal = Promise.resolve().then(() => Promise.all([this.compressor.dispose?.(),this.synthMix.dispose?.(),this.limiter.dispose?.()])).catch(error => { this.effectsDisposalError = error; });
         this.voices.forEach((synth) => synth.destroy());
         this.shimmer.dispose();
         this.freeze.dispose();

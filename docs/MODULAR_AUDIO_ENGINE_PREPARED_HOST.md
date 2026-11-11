@@ -14,7 +14,9 @@ sources and bounded weather/loop preparation feed the original ambience host.
 It does not translate native oscillator presets into another sound model.
 Original KS live demand/control histories are accepted and selected here.
 Crusher/Pitch/ZPlane also use accepted owned processors through the original
-CLASSIC/All/offline rack wrappers. Ordinary compressors, other native effects, shared/private sampled-room adoption, native loop playback
+CLASSIC/All/offline rack wrappers. The ordinary Instrument mix/limiter pair is also owned (18 exact native-chain
+cases plus actual desk/reload/export). Iowa bare-native/rack target compressors,
+other native effects, shared/private sampled-room adoption, native loop playback
 and ambience spatial/fade/wander remain explicit continuation boundaries.
 
 A physical source-family edit reconstructs through existing atomic replacement

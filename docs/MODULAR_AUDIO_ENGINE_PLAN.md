@@ -1,3 +1,14 @@
+Normal Instrument dynamics checkpoint: its ordinary mix compressor and final
+limiter now use the accepted Rust host in the explicit prepared environment.
+All18 actual native-chain comparisons (six rates, cold/late/gap and live controls)
+are sample-bit-exact, including independent instances. All3 combined KS/piano/Hand
+desk/reconstruction cases and cold3-note/144000-frame export pass. Original
+initial setter order, raw native clamping, effects-tail demand and acknowledged
+cleanup remain intact. See MODULAR_AUDIO_ENGINE_INSTRUMENT_DYNAMICS.md.
+Defaults remain native. Iowa's bare-native/property limiter and rack target
+compressors require their distinct profiles; other effects/room/ambience ownership
+are still active work.57 focused checks pass; combined full regression is pending.
+
 Shared physical-player checkpoint: the prepared environment now supplies the
 accepted context-owned piano streaming factory. Four actual native Starmap cases
 pass cold authored-zero expression/body, genuine unpulled filter/LFO aging and

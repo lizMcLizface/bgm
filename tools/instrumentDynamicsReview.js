@@ -1,0 +1,23 @@
+import Instrument from '../src/app/engine/Instrument.js';
+import {createRustCompressorFactory} from '../src/nodes/compressorRust.js';
+const $=id=>document.getElementById(id),rates=[8000,24000,44100,48000,96000,192000],limits={maxAbs:1e-6,relativeRMS:1e-6},preset={masterVolume:1,reverbAmount:0,delayAmount:0,pingPongAmount:0,compAmount:0,masterLimiterThreshold:-14,masterLimiterRatio:6,masterLimiterKnee:12,masterLimiterAttack:.003,masterLimiterRelease:.11};
+function compare(a,b){let maxAbs=0,err=0,energy=0,peak=0,first=null;for(let i=0;i<a.length;i++){const d=a[i]-b[i];if(Math.abs(d)>maxAbs){maxAbs=Math.abs(d);first={frame:i,actual:a[i],reference:b[i]};}err+=d*d;energy+=b[i]*b[i];peak=Math.max(peak,Math.abs(b[i]));}const relativeRMS=Math.sqrt(err/Math.max(energy,1e-30));return{maxAbs,relativeRMS,peak,maximum:first,pass:maxAbs<=limits.maxAbs&&relativeRMS<=limits.relativeRMS&&peak>1e-5};}
+async function trial(rate,mode){const frames=6144,ctx=new OfflineAudioContext(6,frames,rate),factory=await createRustCompressorFactory(ctx),merger=ctx.createChannelMerger(6),source=ctx.createBufferSource(),buffer=ctx.createBuffer(2,frames,rate),instances=[],leases=[],splitters=[],changes=[];let stats,phase='setup',timer;
+ for(let ch=0;ch<2;ch++)for(let i=0;i<frames;i++)buffer.getChannelData(ch)[i]=i<256?0:(.31*Math.sin(i*(ch?.039:.027))+.12*Math.cos(i*.107))*(i%1024<700?1:.2);
+ source.buffer=buffer;source.start(0);merger.connect(ctx.destination);
+ const setup=()=>{for(let n=0;n<3;n++){const i=new Instrument({context:ctx,preset,polyphony:1,deferReverb:true,...(n?{ordinaryCompressorFactory:factory}:{})}),split=ctx.createChannelSplitter(2);instances.push(i);splitters.push(split);i.connect(split);leases.push(i.holdSourceInput());source.connect(i.synthMix.getNode());for(let ch=0;ch<2;ch++)split.connect(merger, ch,n*2+ch);}};
+ const flush=()=>Promise.all(instances.slice(1).flatMap(i=>[i.synthMix.flush(),i.limiter.flush()]));
+ const gather=()=>Promise.all(instances.slice(1).map(async i=>({mix:await i.synthMix.requestStats(),limiter:await i.limiter.requestStats()})));
+ try{const suspends=[];
+ if(mode==='late')suspends.push(ctx.suspend((1024+.5)/rate).then(async()=>{phase='late setup';setup();await flush();await ctx.resume();}));else setup();
+ for(const frame of [2048,3072,4096,frames-128])suspends.push(ctx.suspend((frame+.5)/rate).then(async()=>{phase='suspend '+frame;
+  if(frame===2048){for(const i of instances)i.set('masterLimiterThreshold',-20);changes.push('threshold');}
+  if(frame===3072&&mode==='gap'){for(const i of instances)i.disconnect();changes.push('disconnect');}
+  if(frame===4096){if(mode==='gap'){instances.forEach((i,n)=>i.connect(splitters[n]));changes.push('reconnect');}for(const i of instances){i.set('masterLimiterRelease',.07);i.synthMix.setThreshold(-9);}changes.push('release/mix threshold');}
+  await flush();if(frame===frames-128)stats=await gather();await ctx.resume();}));
+ const all=Promise.all(suspends);all.catch(()=>{});const failed=new Promise((_,reject)=>all.catch(reject));
+ const output=await Promise.race([ctx.startRendering(),failed,new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('Normal dynamics rendering timed out at '+phase)),15000);})]);await all;
+ const comparisons=[0,1].map(ch=>compare(output.getChannelData(2+ch),output.getChannelData(ch))),independent=[0,1].map(ch=>compare(output.getChannelData(4+ch),output.getChannelData(2+ch)));
+ return{rate,mode,frames,engineVersion:factory.engineVersion,changes,comparisons,independent,stats,pass:comparisons.every(x=>x.pass)&&independent.every(x=>x.maxAbs===0)&&stats.every(s=>!s.mix.error&&!s.limiter.error)};
+ }finally{clearTimeout(timer);leases.forEach(release=>release());instances.forEach(i=>i.dispose());await Promise.all(instances.map(i=>i.effectsDisposal));source.disconnect();merger.disconnect();splitters.forEach(s=>s.disconnect());}}
+$('run').onclick=async()=>{$('run').disabled=true;const report={kind:'instrument.ordinary-dynamics.native-browser',version:1,muted:true,limits,cases:[],complete:false,pass:false};try{for(const rate of rates)for(const mode of ['cold','late','gap']){$('status').textContent='Checking '+rate+' · '+mode;const c=await trial(rate,mode);report.cases.push(c);$('report').value=JSON.stringify(report,null,2);if(!c.pass)throw Error('Normal Instrument dynamics comparison failed');}report.complete=true;report.pass=true;}catch(error){report.error=String(error);}finally{$('report').value=JSON.stringify(report,null,2);$('summary').textContent=JSON.stringify({pass:report.pass,cases:report.cases.length,error:report.error},null,2);$('status').textContent=report.pass?'Checks passed':'Checks failed';$('run').disabled=false;}};
