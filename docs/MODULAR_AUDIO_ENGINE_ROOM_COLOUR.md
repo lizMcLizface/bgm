@@ -52,3 +52,9 @@ nodes, future acknowledged controls and current-target cold reload. Meter peak
 0.1059439927; both controls had0late arrivals. Disposal waits for acknowledgement
 with a bounded fallback. Repeated future targets at the same second replace
 only still-ungenerated control material. Normal room defaults remain native.
+
+Audit correction: the first standalone audit disabled the watch before reading
+its counter; that watch operation resets the counter. The corrected audit reads
+the counter first and records the exact audited artifact. All12two-handle cases
+pass again with1400live controls and actual zero allocations/frees/growth.
+The earlier read order was not valid evidence for that claim.
