@@ -743,7 +743,7 @@ impl Graph {
         if self.nodes[i].kind.mixer()||self.nodes[i].kind.rack()||self.nodes[i].kind.voice_fx(){return Err(Error::Contract);}
         self.valid_param(i, param, value)?;
         self.nodes[i].base[param] = value;
-        if let Some(effect)=&mut self.nodes[i].effect {if !effect.param(param,value){return Err(Error::Contract);}}
+        if let Some(effect)=&mut self.nodes[i].effect {if !effect.param(param,value){return Err(Error::Contract);}self.nodes[i].fx_mask|=1<<param;}
         Ok(())
     }
     pub fn connect(&mut self, id: u32, from: u32, to: u32, link: Link) -> Result<()> {
@@ -919,10 +919,32 @@ impl Graph {
             });
             self.order.push(next);
         }
-        if self.nodes.iter().any(|n|n.pitched.as_ref().is_some_and(|p|!p.ready)){return Err(Error::Contract);}
+        // Check every immutable resource before any adapter becomes prepared.
+        // A failed raw-ABI prepare remains editable and can be corrected/retried.
+        // PDC allocation/validation is also complete before committing resources.
+        for n in &self.nodes {
+            if n.pitched.as_ref().is_some_and(|p|!p.ready)
+                || n.piano.as_ref().is_some_and(|p|!p.can_prepare())
+                || n.iowa.as_ref().is_some_and(|p|!p.can_prepare())
+                || n.mixer.as_ref().is_some_and(|m|!m.can_prepare())
+            {return Err(Error::Contract);}
+            if let Some(effect)=&n.effect {
+                if n.fx_mask!=(1<<n.kind.params().len())-1
+                    || n.effect_settled!=Some(n.kind==Kind::Inserts)
+                    || !effect.can_prepare()
+                {return Err(Error::Contract);}
+            }
+            if n.kind.rack()||n.kind.voice_fx() {
+                if n.fx_mask!=(1<<n.kind.params().len())-1
+                    || n.rack.as_ref().is_some_and(|r|!r.can_prepare())
+                    || n.kind.voice_fx()&&n.voice_fx.as_ref().is_none_or(|v|!v.can_prepare())
+                {return Err(Error::Contract);}
+            }
+            if n.kind==Kind::Classic&&n.classic.as_ref().is_none_or(|p|!p.can_prepare()) {return Err(Error::Contract);}
+        }
+        self.prepare_latency()?;
         for n in &mut self.nodes {if let Some(p)=&mut n.piano {if !p.prepare(){return Err(Error::Contract);}}if let Some(p)=&mut n.iowa {if !p.prepare(){return Err(Error::Contract);}}}
         for n in &mut self.nodes {if let Some(effect)=&mut n.effect {if !effect.prepare(n.effect_settled.ok_or(Error::Contract)?){return Err(Error::Contract);}}if let Some(m)=&mut n.mixer{if !m.prepare(){return Err(Error::Contract);}}}
-        self.prepare_latency()?;
         for n in &mut self.nodes{if n.kind.rack()||n.kind.voice_fx(){if n.fx_mask!=(1<<n.kind.params().len())-1{return Err(Error::Contract);}let ok=if let Some(r)=&mut n.rack{r.prepare()}else{n.voice_fx.as_mut().ok_or(Error::Contract)?.prepare()};if !ok{return Err(Error::Contract);}}}
         for n in &mut self.nodes{if n.kind==Kind::Classic&&!n.classic.as_mut().ok_or(Error::Contract)?.prepare(){return Err(Error::Contract);}}
         self.output = outputs[0];

@@ -57,8 +57,11 @@ impl Adapter {
         self.targets
     }
 
+    pub fn can_prepare(&self) -> bool {
+        !self.prepared
+    }
     pub fn prepare(&mut self) -> bool {
-        if self.prepared {
+        if !self.can_prepare() {
             return false;
         }
         self.prepared = true;

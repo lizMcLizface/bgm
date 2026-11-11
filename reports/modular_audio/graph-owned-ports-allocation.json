@@ -1,8 +1,8 @@
 {
   "kind": "graph.owned-ports-allocation",
   "version": 1,
-  "engineVersion": "dab728d85b2f6615",
-  "auditWasmSha256": "7923ab1c64c3bfca93ab597f371b2f023490a160167a934310d54f0486e6923d",
+  "engineVersion": "5ea550319dc2e5aa",
+  "auditWasmSha256": "d0e6c47bbb77afe86cd52e33d50d75c5f480534e121db8b85c588575fa39c713",
   "pass": true,
   "scope": "Two full Rust graphs sharing Wasm: exact saved input replay through owned native inserts, three send buses, all three rack FX, Shimmer/seeded Freeze, all four mixer primitives/limiter, raw classic branch and opt-in PDC. Prepared enqueue/render/reset/cancel/pause watched; no native runner, realtime deadline or physical-listening claim.",
   "results": [

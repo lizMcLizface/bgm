@@ -261,7 +261,8 @@ impl Engine {
         n.cut = cut;
         true
     }
-    pub fn prepare(&mut self) -> bool {
+    /// Validate the complete immutable capture without locking preparation.
+    pub fn can_prepare(&self) -> bool {
         if self.slots.is_empty()
             || self.controls.iter().any(|c| !c.ready())
             || self.notes.iter().any(|n| {
@@ -292,6 +293,10 @@ impl Engine {
         {
             return false;
         }
+        true
+    }
+    pub fn prepare(&mut self) -> bool {
+        if !self.can_prepare() { return false; }
         self.ready = true;
         true
     }

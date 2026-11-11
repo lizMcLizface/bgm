@@ -65,8 +65,11 @@ impl Adapter {
         !self.prepared && self.kernel.shape_row(shape, section, row)
     }
 
+    pub fn can_prepare(&self) -> bool {
+        !self.prepared && self.kernel.can_prepare()
+    }
     pub fn prepare(&mut self) -> bool {
-        if self.prepared || !self.kernel.prepare() {
+        if !self.can_prepare() || !self.kernel.prepare() {
             return false;
         }
         self.prepared = true;

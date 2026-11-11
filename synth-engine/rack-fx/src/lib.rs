@@ -183,7 +183,8 @@ impl Engine {
         self.last = [f64::NAN; 5];
         true
     }
-    pub fn prepare(&mut self) -> bool {
+    /// Nonmutating readiness check for a host preparing several owned units.
+    pub fn can_prepare(&self) -> bool {
         if self.ready
             || self.kind == Kind::ZPlane
                 && (self.shape_count == 0
@@ -193,6 +194,10 @@ impl Engine {
         {
             return false;
         }
+        true
+    }
+    pub fn prepare(&mut self) -> bool {
+        if !self.can_prepare() { return false; }
         self.ready = true;
         true
     }

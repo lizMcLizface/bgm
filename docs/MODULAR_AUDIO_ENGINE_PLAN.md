@@ -1298,3 +1298,15 @@ The shared cache's0.01Hz pitch quantization is captured; it is not a piano bank.
 Next: a distinct prepared finite-voice contract and actual native-browser
 comparison with unsupported active controls rejected. See
 MODULAR_AUDIO_ENGINE_PLUCKED_STRING.md and the two plucked-string-owned reports.
+
+
+Raw preparation is now coherent across failed attempts. Graph build5ea550319dc2e5aa
+preflights every immutable resource and latency policy before locking adapters.
+A raw host can correct incomplete rack/voice/mixer/classic or failed-PDC input
+and retry successfully. Inserts/send Rust APIs now require every initial target
+just as the JS contract does. Nine raw-ABI audit tests pass (eight normal tests
+plus one allocation-only test);84 port tests and97 piano/Iowa/rack tests pass.
+Thirty existing and nine combined allocator cases remain zero after preparation.
+Piano and rack public provenance was refreshed; normal public build passes.
+See graph-preparation-verification.json. These fixes do not change valid DSP
+algorithms or the established browser-reference tolerances.

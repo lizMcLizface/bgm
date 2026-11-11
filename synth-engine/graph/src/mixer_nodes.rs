@@ -65,14 +65,18 @@ impl Adapter {
         true
     }
 
-    /// Idempotent before processing starts, supporting graph validation retry.
-    pub fn prepare(&mut self) -> bool {
+    pub fn can_prepare(&self) -> bool {
         if self.initial_mask != (1 << PARAMETER_COUNTS[self.kind]) - 1
             || self.settled.is_none()
             || self.frames != 0
         {
             return false;
         }
+        true
+    }
+    /// Idempotent before processing starts, supporting graph validation retry.
+    pub fn prepare(&mut self) -> bool {
+        if !self.can_prepare() { return false; }
         self.prepared = true;
         true
     }

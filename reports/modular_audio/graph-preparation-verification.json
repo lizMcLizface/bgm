@@ -1,0 +1,16 @@
+{
+  "kind": "graph.preparation-transaction",
+  "version": 1,
+  "engineVersion": "5ea550319dc2e5aa",
+  "pass": true,
+  "rawAbiTests": 9,
+  "auditTests": 9,
+  "productionAuditTestSkipped": true,
+  "focusedPortTestsPassed": 84,
+  "focusedPortTestsSkipped": 1,
+  "pianoIowaRackTestsPassed": 97,
+  "existingAllocatorCases": 30,
+  "combinedAllocatorCases": 9,
+  "normalPublicBuild": true,
+  "scope": "Raw incomplete preparation remains editable and retryable; complete original insert/send target capture enforced in Rust as well as JS. Nonmutating readiness checks run before resource lock/PDC commit. Corrected paths preserve no-allocation rendering and ordinary prepared PCM."
+}

@@ -54,8 +54,11 @@ impl Adapter {
 
     /// Inserts can settle their initial smoothing state. Send effects preserve
     /// their original initialization/transitions and have no settle operation.
+    pub fn can_prepare(&self) -> bool {
+        self.phase == 0 && self.input_frames == 0
+    }
     pub fn prepare(&mut self, settled: bool) -> bool {
-        if self.phase != 0 || self.input_frames != 0 {
+        if !self.can_prepare() {
             return false;
         }
         self.settled = settled;

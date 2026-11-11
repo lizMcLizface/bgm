@@ -579,7 +579,8 @@ impl Engine {
         self.notes.push(n);
         true
     }
-    pub fn prepare(&mut self) -> bool {
+    /// Validate prepared resources without locking the remaining host writes.
+    pub fn can_prepare(&self) -> bool {
         let increasing = |a: &[f64]| {
             !a.is_empty()
                 && a[0] >= 0.
@@ -635,6 +636,10 @@ impl Engine {
         {
             return false;
         }
+        true
+    }
+    pub fn prepare(&mut self) -> bool {
+        if !self.can_prepare() { return false; }
         self.ready = true;
         true
     }

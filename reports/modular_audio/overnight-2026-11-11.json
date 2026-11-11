@@ -3,7 +3,7 @@
   "version": 1,
   "status": "running",
   "startedAtUtc": "2026-11-10T23:19:46Z",
-  "updatedAtUtc": "2026-11-11T00:36:18.999Z",
+  "updatedAtUtc": "2026-11-11T00:42:04.787Z",
   "featureCutoffUtc": "2026-11-11T08:30:00Z",
   "deadlineUtc": "2026-11-11T09:00:00Z",
   "gitIdentity": {
@@ -19,16 +19,17 @@
     "bee2764",
     "fff00db",
     "60c553b",
-    "edb9b5d"
+    "edb9b5d",
+    "ba190ac"
   ],
   "graph": {
     "api": 1,
-    "source": "704ad3e28a855812ec7414371505d5b65368fd4e58ba238480f4b4080bd72a74",
-    "wasm": "ab294d36e23ac25974feda5cbec8a835d935cee14e4f3fb8a16255395ee499d6",
+    "source": "eb4dc5538ccfe3ade2496a55c5780a78968d3f58b54ddb94ce20ca3fd2a04f21",
+    "wasm": "d362d697750c9e6e57f041d63698ef87beaa75766c48d09e579950e6f76761b2",
     "runtime": "86aab6ae9209c6fb1ffe58ba9afc93ee6759d14919207bb07097ab29e7ec6b13",
-    "bytes": 1428890,
+    "bytes": 1430134,
     "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
-    "version": "dab728d85b2f6615"
+    "version": "5ea550319dc2e5aa"
   },
   "checks": {
     "fullSuite": {
@@ -54,7 +55,8 @@
       "maxSampleError": 4.656612873077393e-10,
       "allocationCases": 24,
       "tests": 11
-    }
+    },
+    "preparationTransaction": "graph-preparation-verification.json"
   },
   "limitations": [
     "No physical listening/device-underrun claim",

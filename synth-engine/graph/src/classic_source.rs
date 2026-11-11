@@ -126,7 +126,7 @@ impl Source {
         }
         self.wave_commit()
     }
-    pub fn prepare(&mut self) -> bool {
+    pub fn can_prepare(&self) -> bool {
         if self.ready {
             return false;
         }
@@ -135,6 +135,10 @@ impl Source {
         if self.model == 7 && self.waves.len() != self.wave_len() {
             return false;
         }
+        true
+    }
+    pub fn prepare(&mut self) -> bool {
+        if !self.can_prepare() { return false; }
         self.ready = true;
         true
     }
