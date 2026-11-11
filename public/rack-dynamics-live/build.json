@@ -1,16 +1,16 @@
 {
   "api": 1,
-  "profile": "rack-native-dynamics-e14de735-v1",
-  "liveTransport": "bounded8-authored-target-slots-v1",
+  "profile": "rack-native-dynamics-e14de735-stamped-v2",
+  "liveTransport": "stamped8-authored-target-words-v1",
   "acknowledged": true,
   "primarySources": "32011192c8a269087ceb23c81777422ffc9c239411dd4461217a9f7961cb7a08",
   "audited": false,
   "source": "acc96f13ac1cd28f6b758b2ac35d9f0197aacfde94e2f5a1839862eddba2f402",
-  "runtime": "49b30786d790877252d30b6c261e75aac7c2e607d9cead54f3acf5e0850fbddb",
+  "runtime": "7641150dbc84e811d495ca416cbe0b45fe56a8da8e1ed18268573c9ff22c658a",
   "reference": "2ea3353a315e2ff51b9cddc3bdd6856f4fc192a27c5a542b52a06ecf6afb05ab",
   "wasm": "db64b55a617dd518d7e9d215e908192972dd1780c9f9f8c400b8d9081cbccfe6",
   "bytes": 81473,
-  "version": "ad55e63646117856",
-  "processorName": "rack-live-dynamics-ad55e63646117856",
-  "processor": "250edc78b3445726842df7adb39bb36775ff45a7966553e34026e3d94740dd23"
+  "version": "4d6b7d778e0eb3d1",
+  "processorName": "rack-live-dynamics-4d6b7d778e0eb3d1",
+  "processor": "104e8f9a6eeaaa2fcaba41eb2f0afc4f6b09fc31d1ec29fc7bfdf705831e71e3"
 }

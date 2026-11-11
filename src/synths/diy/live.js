@@ -4,10 +4,11 @@ import {createWorkbenchRack} from '../effects/workbenchRack';
 import {createOutputMonitor} from '../effects/outputMonitor';
 import {POLY,FM} from './patches';
 import {tuning} from '../tuning';
+import {validateAudioEnvironment} from '../../app/engine/audioEnvironment';
 
 // Same source, inserts and FDN effects as the pre-existing lab renderers.
 // Only event IDs, flat panel parameters and the output scope are adapted.
-export function startDiySynth({kind,params=[],rack,instances=null,parallel=null,latency='interactive',onStats=()=>{},onError=()=>{}}){
+export function startDiySynth({kind,params=[],rack,instances=null,parallel=null,latency='interactive',prepareAudioEnvironment,onStats=()=>{},onError=()=>{}}){
  const context=new (window.AudioContext||window.webkitAudioContext)({latencyHint:latency});
  const resumed=context.resume();
  const schema=kind==='fm'?FM:POLY,values=schema.params.defaultValues();
@@ -31,21 +32,23 @@ export function startDiySynth({kind,params=[],rack,instances=null,parallel=null,
  };
  const flush=()=>{queued=false;if(closed||!backend)return;backend.patch(effective(),{seconds:.035});output.gain.setTargetAtTime(.7*controls.expression*(1-controls.soft*.25),context.currentTime,.015);};
  const queue=()=>{if(!queued){queued=true;queueMicrotask(flush);}};
- const close=async()=>{if(closed)return;closed=true;unsubscribe?.();ids.clear();played.clear();tuning.setHeld([]);backend?.dispose();outboard?.dispose();monitor?.dispose();output?.disconnect();await context.close().catch(()=>{});};
+ const close=async()=>{if(closed)return;closed=true;unsubscribe?.();ids.clear();played.clear();tuning.setHeld([]);backend?.dispose();const effectsStopped=outboard?.dispose();monitor?.dispose();output?.disconnect();try{await effectsStopped;}finally{await context.close().catch(()=>{});}};
  return (async()=>{
   if(!context.audioWorklet)throw Error('Audio needs HTTPS or localhost.');
   await resumed;
+  const audioEnvironment=prepareAudioEnvironment?validateAudioEnvironment(await prepareAudioEnvironment(context),context):null;
   const patch=effective();
   backend=await (kind==='fm'?FMBackend:WasmBackend).create(context,patch,{onStats:s=>{active=s.active;},onError});
   const initialRack=rack??Object.fromEntries([...Object.entries(patch.inserts).map(([k,v])=>['inserts.'+k,v]),...Object.entries(patch.effects).map(([k,v])=>['effects.'+k,v])]);
-  outboard=await createWorkbenchRack(context,initialRack,{onError,instances,parallel});
+  outboard=await createWorkbenchRack(context,initialRack,{onError,instances,parallel,dynamicsFactory:audioEnvironment?.rackDynamicsFactory});
   output=context.createGain();output.gain.value=.7;
   monitor=await createOutputMonitor(context,peak=>onStats({active,peak,reduction:outboard.reduction,...outboard.meters}));
   // rack -> output
   backend.connect(outboard.input);outboard.connect(output);output.connect(monitor.node);monitor.node.connect(context.destination);
+  await outboard.armRuntime?.();
   unsubscribe=tuning.subscribe(()=>retuneAll());
   return {
-   context,node:backend.node,get latency(){return (context.baseLatency||0)+(context.outputLatency||0);},
+   armRuntime:()=>outboard.armRuntime?.(),context,node:backend.node,get latency(){return (context.baseLatency||0)+(context.outputLatency||0);},
    setParam(id,value){accept([[id,value]]);queue();},setParams(pairs){accept(pairs);queue();},
    noteOn(id,note,velocity){if(ids.has(id))backend.off(ids.get(id));played.set(id,note);ids.set(id,backend.on(tuning.note(note,heldKeys()),velocity));if(tuning.get().auto)retuneAll(id,.03);showHeld();},
    noteOff(id){played.delete(id);if(ids.has(id)){backend.off(ids.get(id));ids.delete(id);}if(tuning.get().auto)retuneAll();showHeld();},

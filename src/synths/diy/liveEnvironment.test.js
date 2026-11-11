@@ -1,0 +1,13 @@
+import {it,expect,vi,beforeEach} from 'vitest';
+const mocks=vi.hoisted(()=>({rack:null,options:null,backend:null,context:null}));
+vi.mock('../../synth-lab/backend',()=>({WasmBackend:{create:async()=>mocks.backend}}));
+vi.mock('../../synth-lab/fmBackend',()=>({FMBackend:{create:async()=>mocks.backend}}));
+vi.mock('../effects/workbenchRack',()=>({createWorkbenchRack:async(c,values,options)=>{mocks.options=options;return mocks.rack;}}));
+vi.mock('../effects/outputMonitor',()=>({createOutputMonitor:async()=>({node:{connect:vi.fn()},dispose:vi.fn()})}));
+vi.mock('../tuning',()=>({tuning:{subscribe:()=>vi.fn(),setHeld:vi.fn(),get:()=>({auto:false})}}));
+import {startDiySynth}from'./live';
+const environment=c=>Object.freeze({version:1,profile:'owned-active-host-v1',context:c,instrumentOptions:()=>({}),prepareContext:vi.fn(),roleWanderFactory:vi.fn(),iowaSourceBackend:'owned-rust',voiceFxOptions:{compressorFactory:vi.fn()},rackDynamicsFactory:vi.fn()});
+beforeEach(()=>{mocks.context={state:'running',audioWorklet:{},resume:vi.fn(async()=>{}),close:vi.fn(async()=>{}),createGain:()=>({gain:{value:1},connect:vi.fn(),disconnect:vi.fn()})};vi.stubGlobal('AudioContext',function(){return mocks.context;});mocks.backend={connect:vi.fn(),dispose:vi.fn()};mocks.rack={input:{},connect:vi.fn(),armRuntime:vi.fn(async()=>{}),dispose:vi.fn(),meters:{}};});
+it('prepares its newly created context before forwarding the immutable factory and awaits arming before publication',async()=>{let env;const prepare=vi.fn(async c=>(env=environment(c))),live=await startDiySynth({kind:'poly',prepareAudioEnvironment:prepare});expect(prepare).toHaveBeenCalledWith(mocks.context);expect(mocks.options.dynamicsFactory).toBe(env.rackDynamicsFactory);expect(mocks.rack.armRuntime).toHaveBeenCalledOnce();await live.close();expect(mocks.rack.dispose).toHaveBeenCalledOnce();vi.unstubAllGlobals();});
+it('rejects a factory prepared for another context and cleans up its own context',async()=>{await expect(startDiySynth({kind:'poly',prepareAudioEnvironment:async()=>environment({})})).rejects.toThrow('context-bound');expect(mocks.context.close).toHaveBeenCalledOnce();vi.unstubAllGlobals();});
+it('keeps omitted preparation on the existing Native path and waits for owned teardown before closing the context',async()=>{const live=await startDiySynth({kind:'fm'});expect(mocks.options.dynamicsFactory).toBeUndefined();let finish;const pending=new Promise(r=>finish=r);mocks.rack.dispose.mockReturnValue(pending);const closed=live.close();await Promise.resolve();expect(mocks.context.close).not.toHaveBeenCalled();finish();await closed;expect(mocks.context.close).toHaveBeenCalledOnce();vi.unstubAllGlobals();});

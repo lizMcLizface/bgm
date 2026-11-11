@@ -1,5 +1,7 @@
 # Optional normal rack dynamics
 
+Current publication uses the separately versioned stamped-word transport. The original independent AudioParam fields could expose partial records during unsuspended normal-host restoration; ACK capacity alone did not make their payload atomic. Prior positive reference runs below retain their original version binding. See [the stamped transport contract](MODULAR_AUDIO_ENGINE_STAMPED_TARGET_TRANSPORT.md) for the retained negatives, formal publication proof, measured overhead and current acceptance boundary.
+
 The accepted compound dynamics leaf is committed as0439b06. Its17cca081c52cf5f8 native147-case acceptance remains a distinct baseline. This follow-up adds an optional per-call factory to the real Effects Desk graph and extra limiter; Native construction remains the default when no factory is supplied.
 
 ## Native chronology
@@ -39,3 +41,19 @@ node tools/buildRackDynamicsLive.mjs --calls --publish --check
 node tools/buildRackDynamicsLive.mjs --calls --audit
 node tools/auditRackDynamicsCalls.mjs
 ```
+
+
+## Normal host forwarding (desktop integration gate)
+
+The optional prepared `rackDynamicsFactory` now travels through All's instrument/mixer racks, both Generator CLASSIC creation paths, CLASSIC live/offline external racks, and the serial/three-bus workbench. `startDiySynth` accepts an optional `prepareAudioEnvironment(context)` callback after creating its original context, validates context binding, and uses only the prepared rack factory here; omitting it retains the existing Native route and context policy. Runtime factories remain outside song JSON.
+
+All wakes arm external racks before booking. CLASSIC arming is skipped during suspended/offline preparation, and live source stacks aggregate their external racks. Workbench arming waits for a pending topology replacement. Owned teardown is aggregated; partial parallel preparation or a rejected replacement is disconnected/disposed. CLASSIC disposal invokes every owner even after a synchronous failure, immediately disconnects its output, waits for all asynchronous owners, and records an AggregateError without leaving other owners unfreed.
+
+Actual browser Native/owned host comparison passes **18/18** cases on the same **d5dacd86a2cc7397** numerical profile: three at each8/24/44.1/48/96/192kHz. Cases are workbench serialÃ¢â€ â€™parallelÃ¢â€ â€™serial, parallelÃ¢â€ â€™serialÃ¢â€ â€™parallel and cold CLASSIC external-rack reconstruction. The source input is deliberately shared deterministic stereo PCM so this comparison isolates the actual host's external rack, routing and fades. The largest max sample error is7.301568984985352e-7 and largest relative RMS error2.0167677475601459e-7 (24kHz), below unchanged1e-4 limits. Serial cases record10 total owned stages/2 active at completion, parallel14/6, CLASSIC2/2. Reports: `reports/modular_audio/rack-dynamics-hosts-{8000,24000,44100,48000,96000,192000}-final.json`. No numerical assets changed for forwarding.
+
+The first actual six-source All dynamics/reload attempts exposed failures before the current stamped profile. The first attempt (`owned-host-dynamics-first.json`) ended before any dynamics owner was created, but the review tool accidentally replaced the primary startup error with its secondary missing-owner check. That negative report is retained; the review tool now preserves primary errors/stacks and records secondary checks separately, covered by two regression tests. The first report does not establish a DSP failure or a startup cause. No DSP fix or timing offset was inferred from it.
+
+`tools/rack-dynamics-hosts.html` runs the three external-rack comparisons per selected rate. `tools/owned-active-host.html` has a distinct CLASSIC/rack dynamics batch for real-source routed output, live desk edits and saved-host reconstruction; its health result is separate from exact external-rack PCM comparison and physical listening.
+
+
+Current stamped publication is accepted on the complete225-case desktop sweep plus the actual six-source All three-host/reload batch. Normal identity `4a9139b792b7efd2` and atomic `4d6b7d778e0eb3d1` share the unchanged kernel. Atomic147 cases have sample/RMS errors0, normal60 worst is1.043081283569336e-7 /6.014669642922696e-9, and actual workbench/CLASSIC18 worst is7.301568984985352e-7 /2.0166515838102606e-7. Actual All records45 owned dynamics stages without errors and retains source/desk/live-edit/reload behavior. Full evidence, retained failures, exact resource costs and the next task are in the [stamped transport contract](MODULAR_AUDIO_ENGINE_STAMPED_TARGET_TRANSPORT.md). This optional prepared environment selects the owned rack path; omitted factories retain Native defaults.

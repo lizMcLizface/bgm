@@ -23,7 +23,7 @@ export function loadKernel(){
 }
 
 /** Creates the context synchronously (call from a tap/click), then loads the kernel. */
-export function startLiveSynth({model=MODELS.cs80,params=[],waves=null,rack=cleanRack(),latency='interactive',context:sharedContext,destination,polyphony,sourceNodeFactory,rackPluginFactory,onStats=()=>{},onError=()=>{}}={}){
+export function startLiveSynth({model=MODELS.cs80,params=[],waves=null,rack=cleanRack(),latency='interactive',context:sharedContext,destination,polyphony,sourceNodeFactory,rackPluginFactory,rackDynamicsFactory,onStats=()=>{},onError=()=>{}}={}){
  const Context=window.AudioContext||window.webkitAudioContext;
  const context=sharedContext??new Context({latencyHint:latency});
  // A shared context belongs to its host, which wakes it on Play. Awaiting its
@@ -45,7 +45,7 @@ export function startLiveSynth({model=MODELS.cs80,params=[],waves=null,rack=clea
    else if(data.type==='error'){reject(Error(data.message));onError(Error(data.message));}
    else if(data.type==='stats'){stats=data;onStats({...data,peak:outputPeak,reduction:outboard?.reduction??0});}
   };node.onprocessorerror=()=>{const error=Error('Synth worklet failed. Reload the page.');node.handleOwnedMessage?.({type:'error',message:error.message});reject(error);onError(error);};});
-  outboard=await createRack(context,rack,{pluginFactory:rackPluginFactory,onError});
+  outboard=await createRack(context,rack,{pluginFactory:rackPluginFactory,dynamicsFactory:rackDynamicsFactory,onError});
   monitor=await createOutputMonitor(context,peak=>{outputPeak=peak;onStats({...stats,peak,reduction:outboard.reduction});});
   // Both paths already contain the native BBD/space/output stage. Inject before
   // the external rack, and silence native background hiss only during a lease.
@@ -59,6 +59,7 @@ export function startLiveSynth({model=MODELS.cs80,params=[],waves=null,rack=clea
   let closed=false,holds=0;
   return {
    context,node,sourceInput,
+   armRuntime:()=>context.state==='running'?Promise.all([node.armRuntime?.(),outboard.armRuntime?.()]):Promise.resolve(),
    captureSource(){if(closed||sequenced||futureControl)throw Error('Classic source is closed or has unsupported scheduled controls/sequencing');return {revision,version:1,model,parameters:Array.from(savedParams,([id,value])=>[id,value]),...(savedWaves?{waves:Array.from(savedWaves)}:{}),polyphony:Math.max(1,Math.min(32,polyphony??32)),controls:Array.from(savedControls,([id,value])=>[id,value])};},
    get sourceRevision(){return revision;},
    get closed(){return closed;},
@@ -78,7 +79,7 @@ export function startLiveSynth({model=MODELS.cs80,params=[],waves=null,rack=clea
    requestScope:monitor.requestScope,
    setRack(values){revision++;outboard.patch(values);},clearRack:()=>outboard.clear(),
    panic(){revision++;flush();node.port.postMessage({type:'panic'});outboard.clear();},
-   async close(){if(closed)return;closed=true;flush();const stopped=node.disposeOwned?node.disposeOwned():(node.port.postMessage({type:'dispose'}),Promise.resolve());node.disconnect();nativeGate.disconnect();sourceInput.disconnect();outboard.dispose();monitor.dispose();await stopped;if(!sharedContext)await context.close().catch(()=>{});},
+   async close(){if(closed)return;closed=true;flush();const stopped=node.disposeOwned?node.disposeOwned():(node.port.postMessage({type:'dispose'}),Promise.resolve());node.disconnect();nativeGate.disconnect();sourceInput.disconnect();const effectsStopped=outboard.dispose();monitor.dispose();try{await Promise.all([stopped,effectsStopped]);}finally{if(!sharedContext)await context.close().catch(()=>{});}},
   };
  })().catch(async error=>{if(node?.disposeOwned)await node.disposeOwned();else node?.port.postMessage({type:'dispose'});node?.disconnect();nativeGate?.disconnect();sourceInput?.disconnect();outboard?.dispose();monitor?.dispose();if(!sharedContext)context.close().catch(()=>{});throw error;});
 }

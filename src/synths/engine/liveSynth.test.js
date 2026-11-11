@@ -1,5 +1,6 @@
 import {it,expect,vi} from 'vitest';
-vi.mock('../effects/graph',()=>({createRack:async()=>({input:{},connect:vi.fn(),patch:vi.fn(),clear:vi.fn(),dispose:vi.fn()})}));
+const rackHost=vi.hoisted(()=>({made:[]}));
+vi.mock('../effects/graph',()=>({createRack:async(context,values,options)=>{const rack={input:{},connect:vi.fn(),patch:vi.fn(),clear:vi.fn(),dispose:vi.fn(),armRuntime:vi.fn(async()=>{})};rackHost.made.push({context,options,rack});return rack;}}));
 vi.mock('../effects/outputMonitor',()=>({createOutputMonitor:async()=>({node:{connect:vi.fn()},requestScope:vi.fn(),dispose:vi.fn()})}));
 import {startLiveSynth} from './liveSynth';
 
@@ -29,3 +30,9 @@ it('uses an optional owned source factory without loading legacy assets and reta
  try{const preparing=startLiveSynth({context,sourceNodeFactory:factory,model:7,params,waves});params[0][1]=9;waves[0]=9;const live=await preparing;expect(factory.mock.calls[0][1]).toMatchObject({params:[[0,3]]});expect(factory.mock.calls[0][1].waves[0]).toBeCloseTo(.2);expect(context.audioWorklet.addModule).not.toHaveBeenCalled();expect(fetch).not.toHaveBeenCalled();node.port.onmessage({data:{type:'stats',active:2}});expect(forward).toHaveBeenCalledWith({type:'stats',active:2});node.onprocessorerror();expect(forward).toHaveBeenLastCalledWith({type:'error',message:'Synth worklet failed. Reload the page.'});const release=live.holdSourceInput();expect(gains[0].gain.value).toBe(0);release();expect(gains[0].gain.value).toBe(1);await live.close();expect(disposed).toHaveBeenCalledOnce();}finally{vi.unstubAllGlobals();}
 });
 it('cleans up a prepared owned node if its startup fails without touching the shared context',async()=>{const context={audioWorklet:{},close:vi.fn()},node={ready:Promise.reject(Error('owned startup')),disposeOwned:vi.fn(async()=>{}),port:{postMessage:vi.fn()},connect:vi.fn(),disconnect:vi.fn()};await expect(startLiveSynth({context,sourceNodeFactory:async()=>node})).rejects.toThrow('owned startup');expect(node.disposeOwned).toHaveBeenCalledOnce();expect(node.disconnect).toHaveBeenCalled();expect(context.close).not.toHaveBeenCalled();});
+
+it('forwards a prepared dynamics factory, waits for rack arming and awaits owned rack disposal',async()=>{
+ // This host test exercises the real lifecycle while the separately tested rack owns DSP.
+ const context={state:'running',audioWorklet:{},createGain:()=>({gain:{value:1},connect:vi.fn(),disconnect:vi.fn()})},node={ready:Promise.resolve(),port:{postMessage:vi.fn()},connect:vi.fn(),disconnect:vi.fn(),disposeOwned:vi.fn(async()=>{}),armRuntime:vi.fn(async()=>{})},factory=vi.fn();
+ const l=await startLiveSynth({context,sourceNodeFactory:async()=>node,rackDynamicsFactory:factory}),r=rackHost.made.at(-1);expect(r.options.dynamicsFactory).toBe(factory);let finish;const pending=new Promise(resolve=>finish=resolve);r.rack.dispose.mockReturnValue(pending);await l.armRuntime();expect(node.armRuntime).toHaveBeenCalledOnce();expect(r.rack.armRuntime).toHaveBeenCalledOnce();let done=false;const closed=l.close().then(()=>done=true);await Promise.resolve();expect(done).toBe(false);finish();await closed;
+});

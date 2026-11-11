@@ -40,3 +40,18 @@ it('disposes late parallel allocations after shutdown instead of wiring an aband
  g.patch(cleanRack(),false,null,parallelPreset());g.dispose();resolve();
  await vi.waitFor(()=>expect(mocks.made.length).toBe(4));await vi.waitFor(()=>expect(mocks.made.every(r=>r.dispose.mock.calls.length===1)).toBe(true));expect(g.input.links).toHaveLength(0);
 });
+
+it('forwards one context-bound dynamics factory through serial and parallel replacements and arms every retained graph',async()=>{
+ const c=context(),factory=vi.fn(),g=await createWorkbenchRack(c,cleanRack(),{dynamicsFactory:factory});
+ for(const r of mocks.made)r.armRuntime=vi.fn(async()=>{});await g.armRuntime();expect(mocks.made[0].armRuntime).toHaveBeenCalledOnce();
+ g.patch(cleanRack(),false,null,parallelPreset());await vi.waitFor(()=>expect(mocks.made).toHaveLength(4));
+ for(const r of mocks.made.slice(1))r.armRuntime=vi.fn(async()=>{});await g.armRuntime();expect(mocks.made.every(r=>r.options.dynamicsFactory===factory)).toBe(true);
+ for(const r of mocks.made.slice(1))expect(r.armRuntime).toHaveBeenCalledOnce();await g.dispose();
+});
+it('awaits asynchronous owned disposal and disposes resources completed after shutdown',async()=>{
+ const c=context(),g=await createWorkbenchRack(c,cleanRack());let finish,makeLate;const closed=new Promise(r=>finish=r);mocks.made[0].dispose.mockReturnValue(closed);
+ mocks.factory.mockImplementationOnce((...args)=>new Promise(r=>makeLate=()=>r(rack(...args))));
+ g.patch(cleanRack(),false,null,parallelPreset());const stopped=g.dispose();expect(g.dispose()).toBe(stopped);let done=false;stopped.then(()=>done=true);await Promise.resolve();expect(done).toBe(false);makeLate();finish();await stopped;expect(mocks.made.every(r=>r.dispose.mock.calls.length===1)).toBe(true);
+});
+
+it('disposes an attached replacement rejected by a bounded patch instead of leaving it connected',async()=>{const c=context(),onError=vi.fn(),g=await createWorkbenchRack(c,cleanRack(),{onError});mocks.factory.mockImplementationOnce(async(...args)=>{const r=rack(...args);r.patch.mockImplementation(()=>{throw Error('target capacity');});return r;});g.patch(cleanRack(),false,null,parallelPreset());await vi.waitFor(()=>expect(onError).toHaveBeenCalledWith(expect.objectContaining({message:'target capacity'})));expect(mocks.made.slice(1).every(r=>r.dispose.mock.calls.length===1)).toBe(true);expect(g.input.links).toEqual([mocks.made[0].input]);await g.dispose();});

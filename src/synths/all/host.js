@@ -224,7 +224,7 @@ export function createHost(scene, {seed,settings:storedSettings,deskBackend='nat
         const r = g.roles[role];
         if (!r.ensembleRack) {
             const { createRack } = await import('../effects/graph');
-            const rack = await createRack(g.AC, values,{pluginFactory:g.audioEnvironment?.rackPluginFactory});
+            const rack = await createRack(g.AC, values,{pluginFactory:g.audioEnvironment?.rackPluginFactory,dynamicsFactory:g.audioEnvironment?.rackDynamicsFactory});
             if (disposed) { rack.dispose(); ensureActive(); }
             r.instrument.output.disconnect();
             if (r.instrument.destinations) r.instrument.destinations = [];
@@ -249,9 +249,9 @@ export function createHost(scene, {seed,settings:storedSettings,deskBackend='nat
                 const {createRack}=await import('../effects/graph');ensureActive();
                 // All async resources are prepared before changing existing links.
                 for(const {role}of SEQUENCERS){
-                    const r=g.roles[role],rack=await createRack(g.AC,mixerRack(rackValues(role),tempo),{pluginFactory:g.audioEnvironment?.rackPluginFactory,onError:error=>console.error('Mixer effects failed',error)});
+                    const r=g.roles[role],rack=await createRack(g.AC,mixerRack(rackValues(role),tempo),{pluginFactory:g.audioEnvironment?.rackPluginFactory,dynamicsFactory:g.audioEnvironment?.rackDynamicsFactory,onError:error=>console.error('Mixer effects failed',error)});
                     if(!rack)throw Error('Mixer effects preparation failed');const entry={role,r,rack,insert:null};candidates.push(entry);ensureActive();
-                    if(role==='perc'){entry.insert=await createRack(g.AC,instrumentRack(rackValues(role)),{pluginFactory:g.audioEnvironment?.rackPluginFactory});if(!entry.insert)throw Error('Percussion inserts preparation failed');ensureActive();}
+                    if(role==='perc'){entry.insert=await createRack(g.AC,instrumentRack(rackValues(role)),{pluginFactory:g.audioEnvironment?.rackPluginFactory,dynamicsFactory:g.audioEnvironment?.rackDynamicsFactory});if(!entry.insert)throw Error('Percussion inserts preparation failed');ensureActive();}
                 }
                 candidate=await prepareDeskBackend(g.AC,SEQUENCERS.map(s=>s.role),{backend:deskBackend,state:deskState});ensureActive();
                 let revision;do{revision=deskRevision;await candidate.patch(deskState);ensureActive();}while(revision!==deskRevision);
@@ -559,7 +559,7 @@ export function createHost(scene, {seed,settings:storedSettings,deskBackend='nat
     return {
         g, settings, loaded, editSettings,editRule,restoreBook,get book(){return book;}, applySceneVoices, applyFrontPageLink, setSound, setPreset, soundOf, nativeOf, editNative, editValues, editDrumKit, rackValues, editRack, editMixer, mixerSnapshot, restoreMixer, snapshotSounds, restoreSounds, setupMixer, applyDesk, awaitDeskState,deskStatus,sourcePreviewStatus, openSourceStem, setTempo, openMonitor, openMeters, capture, note, tunedNote, drum, drumTrack, setDrumMix, getDrumMix,
         get context() { return g.AC; },
-        async wake() { await g.AC.resume(); await g.awaitRoleMotion?.(); await g.awaitSourceReady?.(); if (g.percussionReady) await g.percussionReady; g.endStopFade?.(); },
+        async wake() { await g.AC.resume(); await g.awaitRoleMotion?.(); await g.awaitSourceReady?.(); if (g.percussionReady) await g.percussionReady; await Promise.all(Object.values(g.roles).flatMap(r=>[r.ensembleRack,r.mixerRack]).filter(Boolean).map(r=>r.armRuntime?.())); g.endStopFade?.(); },
         setScene(next) { hostScene.scene = next; },
         dispose() { if(disposed)return;disposed=true;sourceTaps.forEach(t=>t.close()); meterTaps.forEach(tap=>tap.dispose());g.stopAll?.();g.disposeSharedEffects?.();deskAudio?.dispose();g.output?.disconnect();g.levelTrim?.disconnect();g.ambienceOut?.disconnect(); Object.values(g.roles).forEach((r) => { r.sourceRevision=(r.sourceRevision??0)+1; r.instrument?.dispose?.(); r.ensembleRack?.dispose?.(); r.mixerRack?.dispose?.(); r.wander?.dispose?.(); }); },
     };

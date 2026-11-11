@@ -29,8 +29,8 @@ vi.mock('../ensemble/sources', () => ({
  soundSource:sound=>sound.synth==='fm'||sound.synth==='poly'?{diy:sound}:{classics:sound},
 }));
 vi.mock('../effects/graph', () => ({
- createRack: async (_context,values) => {
-  const rack={input:{},connect:vi.fn(),patch:vi.fn(),dispose:vi.fn(),values};
+ createRack: async (_context,values,options) => {
+  const rack={input:{},connect:vi.fn(),patch:vi.fn(),dispose:vi.fn(),armRuntime:vi.fn(async()=>{}),values,options};
   mocks.racks.push(rack);if(mocks.rackGate)await mocks.rackGate;return rack;
  },
 }));
@@ -354,4 +354,9 @@ describe('immutable desk backend preparation',()=>{
  it('surfaces a spontaneous owned processor error through status and await even without a new patch',async()=>{const h=createHost(BROWSABLE_SCENES[0],{deskBackend:'owned'});try{await h.setupMixer();mocks.ownedHealthFailure=true;expect(h.deskStatus()).toMatchObject({backend:'owned',phase:'failed',ready:false,error:expect.stringContaining('owned processor failed')});await expect(h.awaitDeskState()).rejects.toThrow('owned processor failed');await expect(h.setupMixer()).rejects.toThrow('owned processor failed');}finally{mocks.ownedHealthFailure=false;h.dispose();}});
  it('rejects new source and meter taps during pending desk preparation, before allocating or capturing old routes',async()=>{let release;mocks.rackGate=new Promise(resolve=>{release=resolve;});const h=createHost(BROWSABLE_SCENES[0],{deskBackend:'owned'}),at=mocks.racks.length,p=h.setupMixer();try{await vi.waitFor(()=>expect(mocks.racks.length).toBe(at+1));expect(()=>h.openSourceStem('lead')).toThrow('Await desk setup');expect(()=>h.openMeters()).toThrow('Await desk setup');expect(h.deskStatus()).toMatchObject({phase:'preparing',sourceLeases:0,meterTaps:0});release();await p;expect(h.deskStatus().ready).toBe(true);}finally{release();mocks.rackGate=null;h.dispose();}});
  it('rejects meter taps after disposal before trying to create analyser nodes',()=>{const h=createHost(BROWSABLE_SCENES[0]);h.dispose();expect(()=>h.openMeters()).toThrow('closed');expect(h.deskStatus().meterTaps).toBe(0);});
+});
+
+it('forwards prepared dynamics into every external All rack and arms them after wake',async()=>{
+ const h=createHost(BROWSABLE_SCENES[0]),factory=vi.fn();h.g.audioEnvironment={rackDynamicsFactory:factory};h.g.AC.resume=vi.fn(async()=>{});
+ try{await h.setPreset('lead','custom','calmbgm',{gainAttack:.1,masterVolume:.7});await h.setupMixer();const racks=Object.values(h.g.roles).flatMap(r=>[r.ensembleRack,r.mixerRack]).filter(Boolean);expect(racks.length).toBeGreaterThanOrEqual(8);expect(racks.every(r=>r.options.dynamicsFactory===factory)).toBe(true);await h.wake();for(const r of racks)expect(r.armRuntime).toHaveBeenCalledOnce();}finally{h.dispose();}
 });

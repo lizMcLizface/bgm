@@ -1,0 +1,3 @@
+import{it,expect}from'vitest';import{appendHostCheckFailure}from'../../tools/rackDynamicsHostDiagnostics.js';
+it('retains the primary suite failure and records missing-owner checks as secondary evidence',()=>{const r={checksPassed:false,error:'context preparation failed',stack:'primary stack'};appendHostCheckFailure(r,'missing dynamics');appendHostCheckFailure(r,'missing echo');expect(r).toEqual({checksPassed:false,error:'context preparation failed',stack:'primary stack',secondaryCheckErrors:['missing dynamics','missing echo']});});
+it('reports a failed ownership check when the numerical suite had no primary failure',()=>{const r={checksPassed:true};appendHostCheckFailure(r,'missing dynamics');expect(r).toEqual({checksPassed:false,error:'missing dynamics'});});
