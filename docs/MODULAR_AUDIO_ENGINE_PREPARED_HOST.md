@@ -1,0 +1,54 @@
+# Prepared normal audio environment
+
+The explicit `prepareOwnedHostEnvironment(context)` composes accepted owned
+source/effect factories without putting executor choices into saved songs.
+The context-bound `owned-active-host-v1` profile is passed to Generator, All,
+WasmInstrument and LabVoice. An offline score chunk prepares a fresh environment
+for its own OfflineAudioContext; cross-context factory reuse is rejected.
+Existing null-environment defaults remain available.
+
+The profile selects the original owned Core/FM live kernels and Rust patch
+transitions, normal owned piano and Iowa sources, the accepted live
+VoiceCompressor and owned role pan/level motion. Original Rust weather live
+sources and bounded weather/loop preparation feed the original ambience host.
+It does not translate native oscillator presets into another sound model.
+KS live demand/control histories are still being validated; this environment
+keeps that material on its existing host until acceptance. Classic, ordinary
+compressors, other effects, shared/private room adoption, native loop playback
+and ambience spatial/fade/wander remain explicit continuation boundaries.
+
+A physical source-family edit reconstructs through existing atomic replacement
+rather than reusing a different material controller. Failed or superseded
+preparation disposes the new instrument without replacing the old source.
+Source readiness and pending cold bookings are awaited before score rendering;
+async offline preparation is also awaited. Sound/desk snapshots contain no
+prepared environment or runtime handles. Ambience cleanup now disposes its
+prepared workers and routes with the owning host.
+
+The fixed page `tools/owned-active-host.html` exercises actual normal sources,
+per-role effects, shared master/section routing, ambience, desk controls,
+source leases and cold sound/mixer reconstruction. Current desktop batches:
+
+- Mixed Core/FM + two piano + Hand percussion: native desk, owned desk and
+  restored owned desk all pass (`owned-host-current-mixed.json`).
+- Iowa Flute/Clarinet + two piano + Core/Hand: the same three actual host paths
+  pass (`owned-host-current-measured.json`).
+- Isolated cold piano-only score export:3 planned notes,144000 stereo frames
+  at48k,288000 Int16 samples, peak3248, original song unchanged
+  (`owned-host-current-offline.json`). The earlier zero-note lead-only fixture
+  was invalid piano evidence and is retained locally, not relabelled.
+
+The actual normal weather source page also compares its original and owned
+three-stereo-output AudioWorklet routes at six rates8–192k, including fractional
+startup131. All six pass; each stereo stem is sample-bit-exact
+(`ambience-normal-live-final.json`). Prior normal weather export/worker and
+wind/fire/vinyl nine-case evidence remains in the focused ambience checkpoint.
+Permanent changed-contract checks pass54 across7 files, including six actual-Wasm
+weather model/control cases and22 Rust Core/FM transition/processor cases.
+These are desktop routed/captured results, not physical listening, browser
+universality or callback deadline guarantees. Reports are ignored local evidence.
+
+Continue the ordinary compressor startup/arm contract and physical live-demand
+history acceptance, then Classic live sources and remaining effect/room owners.
+The private-room policy is separately accepted with declared500ms latency;
+normal shared sends and transport latency alignment need explicit composition.

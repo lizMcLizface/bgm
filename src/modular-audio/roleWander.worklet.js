@@ -29,6 +29,8 @@ class RoleWanderProcessor extends AudioWorkletProcessor {
    if(this.epoch===null){this.epoch=currentFrame;for(let i=0;i<this.startup.length;i++)this.settings(this.startup[i]);this.startup.length=0;}
    if(currentFrame<this.epoch){for(const bus of outputs)for(const channel of bus)channel.fill(0);return true;}
    const n=outputs[0][0].length;let monoMask=0;
+   if(n!==128)throw Error('Role motion requires128-frame callbacks');
+   // Native input advances per callback even when a resumed browser global clock is stale.
    for(let b=0;b<this.unit.spec.buses;b++){const source=inputs[b];if(source?.length===1)monoMask|=1<<b;for(let c=0;c<2;c++)for(let i=0;i<n;i++)this.unit.input[b][c][i]=source?.[c]?.[i]??0;}
    this.unit.render(n,monoMask);
    for(let b=0;b<outputs.length;b++)for(let c=0;c<outputs[b].length;c++)for(let i=0;i<n;i++)outputs[b][c][i]=this.unit.output[b][c][i];

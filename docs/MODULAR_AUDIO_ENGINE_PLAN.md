@@ -1,20 +1,27 @@
-Latest checkpoint: [owned role pan/level motion](MODULAR_AUDIO_ENGINE_ROLE_WANDER.md)
-now runs through an explicit prepared factory in the normal Generator, All host
-and offline score renderer. 215 focused checks, actual six-role/reload routes,
-real-source native/owned/restored desk batches and a two-second offline score
-pass. Defaults remain unchanged. Continue combined live piano/compressor/room
-adoption, ambience/source-control clocks and the broader stereo room layout work.
-Current continuation: [active Rust checkpoint](MODULAR_AUDIO_ENGINE_ACTIVE_RUST_CHECKPOINT.md)
-records480files /3788passing tests, the public build and final desktop source/room/
-compressor acceptance. Continue live piano, compressor bypass and composed room/
-host adoption; normal defaults are still preserved and hidden cello is deferred.
+Current continuation (11 November2026): the requested push through111d282
+completed as lizMcLizface; later verified steps are committed locally, without
+deployment. [Prepared normal hosts](MODULAR_AUDIO_ENGINE_PREPARED_HOST.md) now
+compose original owned Core/FM sources and Rust transitions, piano/Iowa,
+live VoiceCompressor, role motion, weather and loop preparation. Mixed and
+measured native/owned/restored actual desk paths pass (six cases total), along
+with isolated cold piano export (3notes/144000frames/peak3248), six exact live
+weather-route cases,54 focused changed-contract checks and226 existing host/
+Generator regressions. A new complete-suite/build checkpoint is still pending.
 
-Active continuation (11 November2026): user authorized push without deployment;
-main through111d282 was pushed as lizMcLizface. Continue closing the active
-instrument/effect/room/live-host Rust paths. The hidden standalone measured-cello
-models are deferred and do not block adoption. Temporary scripts and generated
-evidence stay in ignored reports/. [Original RoomColour](MODULAR_AUDIO_ENGINE_ROOM_COLOUR.md)
-now passes48 native desktop cases,13 functional cases and12 allocation cases.
+[Rust Core/FM transitions](MODULAR_AUDIO_ENGINE_CORE_FM_LIVE.md), committed
+e2594d4, pass22 permanent checks,24 sample-bit-exact routed cases and12 zero-
+allocation/growth cases. [Private rooms](MODULAR_AUDIO_ENGINE_PRIVATE_ROOM.md),
+committed4dc09bf, pass53 focused checks,12 native cases, five exact routed cases,
+cold reload and strict genuine-gap rejection with declared500ms latency. This
+private policy is not yet normal shared-room adoption. Defaults remain available;
+executor/factory choices are context-owned and absent from saved song settings.
+
+Next: finish ordinary compressor startup/arm acceptance and physical KS live
+sleep/wake target-history semantics, then original Classic live host adoption
+and remaining effects/shared-room/ambience spatial owners. Preserve original
+models; hidden standalone measured cello remains deferred. Generated evidence
+and temporary scripts remain under ignored reports/. Older dated continuation
+records below are historical and superseded by this paragraph and linked files.
 
 # Modular audio engine and parallel rendering plan
 

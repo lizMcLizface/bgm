@@ -18,38 +18,43 @@ accepted results refer to the exact artifacts and cases in the linked records.
 | Short / Pizzicato | Actual finite preparation, full original RNG/wake/fades and owned fixed-buffer playback;60 source comparisons,60 allocation cases,12 native playback cases | Timestamped multi-note Graph/worker scheduling, voice stealing and normal live preparation worker adoption |
 | Inserts / sends / rack effects | Owned original insert/send kernels, Crusher/Pitch/ZPlane, Shimmer/Freeze, Motion and full pinned Tape in the graph | Complete original host enable/bypass/rewire policies and shared/parallel routes; Freeze remains worker-only |
 | Native compressor core | Accepted pinned FMA3 profile; static/captured/Graph28/29, plus384 independent native cases | Live host control/bypass integration; profile is explicit rather than universal browser-bit identity |
-| Active VoiceCompressor wrapper | Captured topology now48/48 native cases under unchanged bounds; prior failures retained | Live bypass/reconnect, dynamic targets and normal application adoption |
+| Active VoiceCompressor wrapper | Captured48/48, live dynamic/bypass/state/reuse, allocator and explicit prepared normal-host adoption accepted | Remaining aggregate normal default/adoption decision; other effects have separate host boundaries |
 | Mixer / limiter | Owned strip/matrix/fader/limiter, deterministic seam reference and immutable opt-in actual All desk; native/owned/restored built-host cases pass | Default adoption, live hot swap and portable ownership of external shared routes |
-| Streaming weather | Owned actual rain/thunder/waves, bounded state, three-stem worklet and routed PCM/reload proof | Portable original spatial/wander chains and normal host adoption |
+| Streaming weather | Owned actual rain/thunder/waves, bounded normal live routes, exact six-rate route proof and worker export; explicit normal-host environment | Portable original spatial/wander/fade chains |
 | Wind / fire / vinyl | Exact source loops and bounded preparation worker, opt-in original Ambience consumer;12 native host cases | Portable BufferSource fractional offset/resampling, spatial/wander/fade host and aggregate adoption |
 | Static convolution | Original profile exact; explicit long profile2,097,152frames;11native cases and3routed worker streams with500ms declared delay | Compose actual dry/wet/colour/control paths; worker-only, with bounded memory/latency policy |
 | Sampled/piano room preparation | Original six FLAC transforms and seeded piano IR, Float32 normalization profile,12 native output comparisons plus3 complete oversized-resource refusals | Native decoding/resampling, RoomColour, wet/dry/shared route/live IR transitions; full Iowa/high-rate IR now fits separately accepted long profile |
 
-## Next concrete task
+## Current live-host continuation
 
-Complete the active instrument/effect paths through the normal live host.
-The hidden standalone measured-cello Long/Live/Short/Pizzicato integration is
-deferred; it is not a blocker. Prioritize live source scheduling, owned room
-colour/convolution, native host enable/bypass/return policies, and complete
-controls/transport/save-reload. Existing accepted DSP remains the authority.
+The explicit [prepared environment](MODULAR_AUDIO_ENGINE_PREPARED_HOST.md) now
+composes original owned Core/FM kernels and Rust transition/fade arithmetic,
+normal piano/Iowa sources, live VoiceCompressor, role motion, live weather and
+loop preparation. Actual mixed and measured native/owned/restored desks pass,
+as does isolated cold piano export. Normal null-environment defaults remain.
 
-Original RoomColour now has a verified owned Rust stage:48 native browser cases,
-13 functional cases and12 allocation cases; see its focused checkpoint.
+[Rust Core/FM live transitions](MODULAR_AUDIO_ENGINE_CORE_FM_LIVE.md) pass22
+permanent checks,24 sample-bit-exact routed cases and12 zero-allocation/growth
+cases. [Private Rust rooms](MODULAR_AUDIO_ENGINE_PRIVATE_ROOM.md) now compose
+complete RoomColour, uncapped convolution, aligned dry/wet output, future
+integer-frame controls and full-IR cold persistence. Their fixed500ms latency,
+finite owner and two-room quota are explicit; they are not normal shared-send
+adoption or a phone deadline guarantee.
 
-Next attach a bounded worker-owned convolver stage and its declared latency/tail
-contract. Preserve the full original room impulse: current327680-frame kernels
-explicitly refuse192k piano/full rooms and untrimmed Iowa. Longer execution
-needs reviewed partitioning, memory and producer/consumer headroom evidence,
-not truncation or an inferred realtime fallback.
+The current ordinary compressor candidate passes108 native host profiles after
+an immutable offline-startup contract; reset/reuse/explicit live arming remain
+under final checks. Physical KS live playback has44 passing source cases, but
+an explicit unpulled-gap probe exposed different native target-history aging.
+The existing environment keeps KS native while that live-only contract is
+resolved. Neither a passing random rerun nor a relaxed PCM bound is acceptance.
+Classic14-model live source integration is the independent parallel task.
 
-The VoiceCompressor native global-log10f discrepancy is resolved by the accepted
-pinned FMA3 profile. Next port the remaining live bypass, spatial and host-control seams. The active
-amount-zero bypass and native node rewiring are separate from the accepted
-compressor core. Adopt complete live controls/transport only after full-path
-clocks, conflicts, cancellation, persistence and desktop output checks pass.
-Then expose cable editing/project restoration against the typed graph and
-perform a deliberate target-device acceptance batch. Phone delay reduction and
-lock-screen limitations must not silently change the existing defaults.
+Then finish remaining effect host rewiring/demand, shared-room/transport latency
+composition and original ambience spatial/fade/wander/BufferSource ownership.
+General cable editing and project reconstruction follow those host contracts.
+Hidden standalone measured cello stays deferred. This is not a claim that the
+normal application has become all Rust; no default, deployment or physical
+listening certification is inferred.
 
 ## Evidence map
 

@@ -38,6 +38,7 @@ import { PERFORMANCE } from '../audio/performance';
 import { hubFor } from '../nodes/sharedReverb';
 import Transport from './engine/transport';
 import { RoleWander, instrumentWander } from './engine/wander';
+import {validateAudioEnvironment,nativeInstrumentEnvironment,nativeInstrumentRuntimeKey} from './engine/audioEnvironment';
 import { borrowWeight, scaleById, scaleSemitones, spellScale, romanDegree, diatonicChord, chordSymbol, displayNumeral, noteAtOrAbove, voiceLead } from './theory';
 import { arrangeBar, notesInRange } from './arranger';
 import { arrangeBarLatest } from './composition/arrangerLatest';
@@ -147,8 +148,11 @@ export const ROLES = {
 
 class Generator {
     /** @param {object} [settings] - complete, valid settings (settings.js) */
-    constructor(settings = defaultSettings(), {percussion = percussionFromSearch(globalThis.location?.search), roleWanderFactory = null} = {}) {
+    constructor(settings = defaultSettings(), {percussion = percussionFromSearch(globalThis.location?.search), roleWanderFactory = null, audioEnvironment = null} = {}) {
         if (roleWanderFactory !== null && typeof roleWanderFactory !== 'function') throw Error('Invalid prepared role-motion factory');
+        this.audioEnvironment = validateAudioEnvironment(audioEnvironment, audioContext);
+        if (roleWanderFactory && audioEnvironment && roleWanderFactory !== audioEnvironment.roleWanderFactory) throw Error('Conflicting role-motion runtime factories');
+        roleWanderFactory ??= audioEnvironment?.roleWanderFactory ?? null;
         this.roleWanderFactory = roleWanderFactory;
         const makeWander = roleWanderFactory ?? ((context, role) => new RoleWander(context, role));
         // Old perc=808 links selected a sound through the backend selector.
@@ -176,7 +180,7 @@ class Generator {
         // warmLegacy() says the previous engine is staying.
         Object.entries(ROLES).forEach(([role, { polyphony, preset }]) => {
             const volume = (this.settings.volumes && this.settings.volumes[role]) ?? ROLE_VOLUMES[role];
-            const instrument = new Instrument({ polyphony, preset: breathPatch(preset,findPreset(preset),this.settings.generation), deferReverb: true, reverbHub: this.reverbHub });
+            const instrument = new Instrument({ ...nativeInstrumentEnvironment(this.audioEnvironment,breathPatch(preset,findPreset(preset),this.settings.generation),this.AC), polyphony, preset: breathPatch(preset,findPreset(preset),this.settings.generation), deferReverb: true, reverbHub: this.reverbHub });
             const gain = this.AC.createGain();
             gain.gain.value = volume;
             // section tone: open (and inaudible) unless settings.sectionTone
@@ -229,7 +233,7 @@ class Generator {
         this.ambienceOut = this.AC.createGain();
         this.ambienceOut.gain.value = ambienceGain(this.settings.ambienceVolume ?? 0.8);
         this.ambienceOut.connect(masterBus);
-        this.ambience = new Ambience({ context: this.AC, seed: 1 });
+        this.ambience = new Ambience({ ...this.audioEnvironment?.ambienceOptions?.(this.AC), context: this.AC, seed: 1 });
         this.ambience.connect(this.ambienceOut);
         this.ambience.setShape(this.settings.ambienceShape);
         this.ambience.setLevels(this.settings.ambience);
@@ -322,6 +326,7 @@ class Generator {
             await this.awaitRoleMotion();
         }
         if(this.sourceLoads?.size)await Promise.all(this.sourceLoads);
+        if(this.audioEnvironment)await this.awaitSourceReady();
         if(Object.values(this.roles).some(r=>r.instrument.preset?.wasmVoice)&&this.audioEngine!=='wasm'&&!this.audioEngineReady)await this.setAudioEngine('wasm');
         if(this.audioEngineReady)await this.audioEngineReady;
         if(this.percussionReady)await this.percussionReady;
@@ -393,7 +398,7 @@ class Generator {
                 for(const role of Object.keys(ROLES)){
                     const r=this.roles[role],old=r.instrument,snapshot=JSON.stringify(old.preset);
                     if(externalSource(old.preset))continue;
-                    const instrument=Wasm?await Wasm.create({context:this.AC,preset:old.preset,polyphony:old.polyphony,roomPool,dynamics:applyFeel(this.settings).dynamics}):new Instrument({context:this.AC,preset:old.preset,polyphony:old.polyphony,reverbHub:this.reverbHub});
+                    const instrument=Wasm?await Wasm.create({audioEnvironment:this.audioEnvironment,context:this.AC,preset:old.preset,polyphony:old.polyphony,roomPool,dynamics:applyFeel(this.settings).dynamics}):new Instrument({...nativeInstrumentEnvironment(this.audioEnvironment,old.preset,this.AC),context:this.AC,preset:old.preset,polyphony:old.polyphony,reverbHub:this.reverbHub});
                     const replacement={role,instrument,source:old,snapshot,roomRoute:null};replacements.push(replacement);
                     if(roomPool)replacement.roomRoute=createWasmRoomRoute(this.AC,instrument,{roleWander:r.wander,volume:r.volume,cutoff:r.tone.frequency.value});
                 }
@@ -755,9 +760,11 @@ class Generator {
     }
 
     refreshStringPatches() {
-        for (const r of Object.values(this.roles)) if (!r.edited && r.stringPatchBase) {
-            const { name, preset } = r.stringPatchBase;
-            r.instrument.applyPreset(breathPatch(name,pianoPatch(name, stringPatch(name, preset, this.settings.generation), this.settings.generation),this.settings.generation));
+        for (const [role,r] of Object.entries(this.roles)) if (!r.edited && r.stringPatchBase) {
+            const base=r.stringPatchBase,{ name, preset } = base;
+            const next=breathPatch(name,pianoPatch(name, stringPatch(name, preset, this.settings.generation), this.settings.generation),this.settings.generation);
+            if(this.audioEnvironment&&nativeInstrumentRuntimeKey(this.audioEnvironment,r.instrument.preset,this.AC)!==nativeInstrumentRuntimeKey(this.audioEnvironment,next,this.AC))this.setRoleSource(role,next,r.presetName).then(()=>{r.stringPatchBase=base;},error=>console.error('Could not prepare refreshed source',error));
+            else r.instrument.applyPreset(next);
         }
     }
 
@@ -838,6 +845,7 @@ class Generator {
 
     disposeSharedEffects() {
         this.sharedEffectsClosed = true;
+        this.ambience?.dispose?.();
         this.busRack?.dispose();
         this.spaceRack?.dispose();
         for (const r of Object.values(this.roles)) {
@@ -924,17 +932,18 @@ class Generator {
             let instrument;
             if(source?.iowa){
                 const Iowa=(await import('./engine/iowaInstrument')).default;
-                instrument=await Iowa.create({context:this.AC,preset:source,polyphony:ROLES[role].polyphony});
+                instrument=await Iowa.create({sourceBackend:this.audioEnvironment?.iowaSourceBackend??'native',context:this.AC,preset:source,polyphony:ROLES[role].polyphony});
             }else if(source?.classics){
                 const Classics=(await import('./engine/classicsInstrument')).default;
                 instrument=await Classics.create({context:this.AC,preset:source,polyphony:source.classics.light?Math.min(4,ROLES[role].polyphony):ROLES[role].polyphony});
             }else if(source?.diy){
                 const [Wasm,{diySpec}]=await Promise.all([import('./engine/wasmInstrument').then(m=>m.default),import('./engine/diySource')]);
-                instrument=await Wasm.create({context:this.AC,preset:source,polyphony:ROLES[role].polyphony,spec:diySpec(source.diy,ROLES[role].polyphony),roomPool:this.wasmRoomPool});
+                instrument=await Wasm.create({audioEnvironment:this.audioEnvironment,context:this.AC,preset:source,polyphony:ROLES[role].polyphony,spec:diySpec(source.diy,ROLES[role].polyphony),roomPool:this.wasmRoomPool});
             }else if(source?.wasmVoice||this.audioEngine==='wasm'){
                 const Wasm=(await import('./engine/wasmInstrument')).default;
-                instrument=await Wasm.create({context:this.AC,preset:source,polyphony:ROLES[role].polyphony,roomPool:this.wasmRoomPool,dynamics:applyFeel(this.settings).dynamics});
-            }else instrument=new Instrument({context:this.AC,preset:source??findPreset(ROLES[role].preset),polyphony:ROLES[role].polyphony,reverbHub:this.reverbHub});
+                instrument=await Wasm.create({audioEnvironment:this.audioEnvironment,context:this.AC,preset:source,polyphony:ROLES[role].polyphony,roomPool:this.wasmRoomPool,dynamics:applyFeel(this.settings).dynamics});
+            }else instrument=new Instrument({...nativeInstrumentEnvironment(this.audioEnvironment,source??findPreset(ROLES[role].preset),this.AC),context:this.AC,preset:source??findPreset(ROLES[role].preset),polyphony:ROLES[role].polyphony,reverbHub:this.reverbHub});
+            if(this.audioEnvironment)try{await instrument.ready;await instrument.sourceReady;}catch(error){instrument.dispose();throw error;}
             if(revision!==r.sourceRevision){instrument.dispose();return;}
             r.roomRoute?.dispose();r.roomRoute=null;r.instrument.dispose();r.instrument=instrument;instrument.connect(r.tone);
             if(this.wasmRoomPool&&!source?.classics&&!source?.iowa)r.roomRoute=createWasmRoomRoute(this.AC,instrument,{roleWander:r.wander,volume:r.volume,cutoff:r.tone.frequency.value});
@@ -985,7 +994,7 @@ class Generator {
         r.stringPatchBase = (isStringPatch(name) || isPianoPatch(name) || isBreathPatch(name)) && preset === findPreset(name) ? { name, preset } : null;
         if (r.stringPatchBase) preset = breathPatch(name,pianoPatch(name, stringPatch(name, preset, this.settings.generation), this.settings.generation),this.settings.generation);
         // a classic synth or DIY patch gives the role back to the generator's own synth, and a voice measured from recordings is an instrument of its own
-        if (preset.iowa || externalSource(r.instrument.preset)) {
+        if (preset.iowa || externalSource(r.instrument.preset) || this.audioEnvironment && nativeInstrumentRuntimeKey(this.audioEnvironment,r.instrument.preset,this.AC)!==nativeInstrumentRuntimeKey(this.audioEnvironment,preset,this.AC)) {
             const base = r.stringPatchBase;
             this.setRoleSource(role, preset, name).then(() => { r.stringPatchBase = base; }, (error) => console.error('Could not restore the voice', error));
         } else if (morphSeconds > 0) r.instrument.morphTo(preset, morphSeconds);
@@ -1061,8 +1070,10 @@ class Generator {
 
     /** One synth parameter, live (the editor's knobs). */
     setRoleParam(role, key, value) {
-        this.roles[role].instrument.set(key, value);
-        this.roles[role].edited = true;
+        const r=this.roles[role],next={...r.instrument.preset,[key]:value};
+        const pending=this.audioEnvironment&&nativeInstrumentRuntimeKey(this.audioEnvironment,r.instrument.preset,this.AC)!==nativeInstrumentRuntimeKey(this.audioEnvironment,next,this.AC)?this.setRoleSource(role,next,r.presetName):null;
+        if(!pending)r.instrument.set(key,value);
+        r.edited=true;return pending;
     }
 
     /** The role's full current preset (defaults filled in). */
@@ -1186,6 +1197,10 @@ class Generator {
         for (const r of Object.values(this.roles)) r.wander.check?.();
     }
 
+    async awaitSourceReady() {
+        await Promise.all(Object.values(this.roles).map(async ({instrument:i}) => { await i.ready; await i.sourceReady; if(i.error)throw i.error; const failure=i.sourceStatus?.().error; if(failure)throw Error(failure); }));
+    }
+
     async awaitRoleMotion({controls = this.AC.state === 'running'} = {}) {
         if (!this.roleWanderFactory) return;
         this.checkRoleMotion();
@@ -1260,7 +1275,7 @@ class Generator {
      */
     midiPiano() {
         if (!this.midi) {
-            const instrument = new Instrument({ context: this.AC, polyphony: 12, preset: findPreset(MIDI_PIANO), reverbHub: this.reverbHub });
+            const instrument = new Instrument({ ...nativeInstrumentEnvironment(this.audioEnvironment,findPreset(MIDI_PIANO),this.AC), context: this.AC, polyphony: 12, preset: findPreset(MIDI_PIANO), reverbHub: this.reverbHub });
             const gain = this.AC.createGain();
             gain.gain.value = 1;
             instrument.connect(gain);

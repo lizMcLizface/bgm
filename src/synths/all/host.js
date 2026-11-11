@@ -84,10 +84,10 @@ export const sceneDrumPatch=name=>SCENE_DRUM_GROUPS.find(group=>group.scenes.inc
 export const drumChoices = () => [{id:'scene',name:'Scene kits'},{id:'kit',name:'Basic kits'},...['tr808','tr909','tr707','tr606'].map(id=>({id,name:SYNTHS[id].name}))];
 export const drumPatches = id => id==='scene'?SCENE_DRUM_GROUPS.map(group=>({id:group.id,name:group.scenes.length>1?`${group.id} (${group.scenes.length} scenes)`:group.id})):id==='kit'?Object.values(PERCUSSION_VOICES).map(v=>({name:v.name,id:v.id})):SYNTHS[id]?.kit?SYNTHS[id].presets:[];
 
-export function createHost(scene, {seed,settings:storedSettings,deskBackend='native',roleWanderFactory=null} = {}) {
+export function createHost(scene, {seed,settings:storedSettings,deskBackend='native',roleWanderFactory=null,audioEnvironment=null} = {}) {
     deskBackend=deskBackendChoice(deskBackend);
     const settings = storedSettings ? sanitizeSettings(storedSettings,sceneSettings(scene,seed)) : sceneSettings(scene, seed);
-    const g = new Generator(settings,{roleWanderFactory});
+    const g = new Generator(settings,{roleWanderFactory,audioEnvironment});
     const loaded = {};
     const sounds = {}; // role -> the classic or DIY patch playing it: { synth, name, category, values, rack, level }
     const racks = {}; // role -> the effects of a calmbgm voice

@@ -1,3 +1,4 @@
+import{validateAudioEnvironment,nativeInstrumentEnvironment}from'../app/engine/audioEnvironment';
 import Instrument from '../app/engine/Instrument';
 import {WasmBackend} from '../synth-lab/backend';
 import {FMBackend} from '../synth-lab/fmBackend';
@@ -15,12 +16,12 @@ import {VoiceFx} from '../app/engine/voiceFx';
 import {sourcePerformance,WASM_PERFORMANCE_EVENT} from '../audio/wasmPerformance';
 export {noteEvents} from './noteEvents';
 export class LabVoice {
- static async create(context,spec,{notes=[],onError=()=>{},roomPool=null}={}){const v=new LabVoice(context,spec);v.roomPool=roomPool;try{await v.init(notes,onError);return v;}catch(e){v.dispose();throw e;}}
+ static async create(context,spec,{notes=[],onError=()=>{},roomPool=null,audioEnvironment=null}={}){const environment=validateAudioEnvironment(audioEnvironment,context),v=new LabVoice(context,spec);v.audioEnvironment=environment;v.roomPool=roomPool;try{await v.init(notes,onError);return v;}catch(e){v.dispose();throw e;}}
  constructor(context,spec){this.context=context;this.spec=structuredClone(spec);this.patch=structuredClone(spec.patch);this.output=context.createGain();this.output.gain.value=.7;this.nextId=100000;this.keys=new Map();this.released=new Set();this.pedal=false;this.level=1;this.disposed=false;}
  async init(notes,onError){
-  const c=this.context;if(this.spec.kind==='legacy'){this.native=new Instrument({context:c,preset:this.patch,polyphony:this.spec.polyphony??12,fdnRoom:true});this.native.connect(this.output);for(const n of notes)this.native.scheduleNote(n.midi,n.time,n.duration,n.velocity,n.detune,n.expression);return;}
+  const c=this.context;if(this.spec.kind==='legacy'){this.native=new Instrument({...nativeInstrumentEnvironment(this.audioEnvironment,this.patch,c),context:c,preset:this.patch,polyphony:this.spec.polyphony??12,fdnRoom:true});this.native.connect(this.output);if(this.audioEnvironment)await this.native.sourceReady;for(const n of notes)this.native.scheduleNote(n.midi,n.time,n.duration,n.velocity,n.detune,n.expression);if(this.audioEnvironment)await this.native.awaitPendingSourceBookings?.();return;}
   this.patch=this.spec.kind==='fm'?cloneFM(this.patch):this.spec.kind==='procedural'?preparedPatch(this.patch):clonePatch(this.patch);
-  const Type=this.spec.kind==='fm'?FMBackend:this.spec.kind==='procedural'?PreparedSource:WasmBackend,sourcePatch=sourcePerformance(this.patch);this.backend=await Type.create(c,sourcePatch,{notes,offline:Number.isFinite(c.length),events:noteEvents(notes,c.sampleRate),onStats:s=>{this.stats={...s,reportedAt:c.currentTime};},onError});
+  const Type=this.spec.kind==='fm'?FMBackend:this.spec.kind==='procedural'?PreparedSource:WasmBackend,sourcePatch=sourcePerformance(this.patch);const sourceOptions={notes,offline:Number.isFinite(c.length),events:noteEvents(notes,c.sampleRate),onStats:s=>{this.stats={...s,reportedAt:c.currentTime};},onError};this.backend=await(this.audioEnvironment?.createCoreBackend&&['subtractive','fm'].includes(this.spec.kind)?this.audioEnvironment.createCoreBackend(c,this.spec.kind,sourcePatch,sourceOptions):Type.create(c,sourcePatch,sourceOptions));
   if(this.spec.kind==='fm'&&!Number.isFinite(c.length)){this.performanceChange=()=>this.patchSource(this.effectivePatch??this.patch,{seconds:.04});window.addEventListener(WASM_PERFORMANCE_EVENT,this.performanceChange);if(sourcePerformance(this.patch).global.quality!==sourcePatch.global.quality)this.performanceChange();}
   // Unity summing seam: an opt-in owned source can enter before this voice's
   // existing inserts/FX/room/output trim, without replacing the live backend.
@@ -28,7 +29,7 @@ export class LabVoice {
   let source=this.sourceInput;
   if(insertsActive(this.patch.inserts)){this.insert=await createInstrumentInserts(c,this.patch.inserts,{onError});source.connect(this.insert.input);source=this.insert.node;}
   // the calmbgm synth's tape, tremolo, compressor, shimmer and freeze (app/engine/voiceFx.js)
-  if(this.spec.fx){this.fx=new VoiceFx(c,this.spec.fx);source.connect(this.fx.input);source=this.fx.output;}
+  if(this.spec.fx){this.fx=new VoiceFx(c,this.spec.fx,undefined,this.audioEnvironment?.voiceFxOptions);if(this.audioEnvironment)await this.fx.ready;source.connect(this.fx.input);source=this.fx.output;}
   this.effects=roomPerformance(this.patch.effects);
   if(this.patch.routing?.room==='private'&&Number.isFinite(this.patch.routing.roomDecay))this.effects.decay=this.patch.routing.roomDecay;
   if(this.roomPool&&this.patch.routing?.room!=='private'){

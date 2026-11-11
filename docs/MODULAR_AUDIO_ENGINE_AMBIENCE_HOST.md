@@ -40,3 +40,11 @@ pan, fades and total/layer wander remain explicit native DSP boundaries. Next
 port those playback/spatial/control stages without changing source PCM or the
 existing defaults. No physical-device or live scheduling deadline claim is
 inferred from these muted PCM comparisons.
+
+Actual normal live routes additionally pass six desktop cases at8/24/44.1/48/
+96/192k with fractional start131: all six channels of the original and owned
+three-stereo-output AudioWorklets are sample-bit-exact. The fixed “Run live
+weather route batch” button needs no settings matching. Evidence is ignored
+`ambience-normal-live-final.json`; native spatial/playback boundaries above
+remain explicit. The prepared normal host composes these factories independently
+for its live context and each actual offline export context.

@@ -18,6 +18,7 @@ import DrumKit from './drumKit';
 import WasmDrumKit from './wasmDrumKit';
 import { RoleWander, instrumentWander } from './wander';
 import {roleMotionSettings} from '../../modular-audio/ownedRoleWander';
+import {audioEnvironmentForContext,nativeInstrumentEnvironment} from './audioEnvironment';
 import { OPEN_TONE, TONE_ROLES } from '../Generator';
 import Ambience from './ambience';
 import { WeatherBedOffline } from './weatherBedAudio';
@@ -229,7 +230,7 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
     let first = 0; // index of the first note not yet past
     let tail = 0; // longest release + effects tail of the sounds (from the first chunk)
     const weather = WEATHER_SOURCES.some(id => ambience[id] > 0)
-        ? new WeatherBedOffline(sampleRate, gen.settings.ambienceShape, ambience, 1) : null;
+        ? (gen.audioEnvironment?.weatherOfflineFactory?gen.audioEnvironment.weatherOfflineFactory(sampleRate,gen.settings.ambienceShape,ambience,1):new WeatherBedOffline(sampleRate, gen.settings.ambienceShape, ambience, 1)) : null;
     const cancelWeather = () => weather?.dispose(); signal?.addEventListener('abort', cancelWeather, { once: true });
     try {
     for (let start = 0; start < seconds; start += CHUNK_SECONDS) {
@@ -241,6 +242,7 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
         const length = (from) => Math.ceil((end - from + (last ? 0 : CROSSFADE)) * sampleRate);
         const build = async (from) => {
             const ctx = new OfflineAudioContext({ numberOfChannels: 2, length: length(from), sampleRate });
+            const audioEnvironment = await audioEnvironmentForContext(gen.audioEnvironment,ctx);
             const Wasm=audioEngine==='wasm'?(await import('./wasmInstrument')).default:null;
             // the music, through the bars' loudness trims
             const out=ctx.createGain();out.connect(ctx.destination);automateLevel(out.gain,levels,from);
@@ -252,18 +254,18 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
             const space=spaces.length?await createBusRack(ctx,SPACE_RACK,out):null;
             if(space)cleanup.push(()=>space.dispose());
             try{
-            const motionFactory = gen.roleWanderFactory ? await gen.roleWanderFactory.prepareContext?.(ctx) : null;
+            const motionFactory = audioEnvironment?.roleWanderFactory ?? (gen.roleWanderFactory ? await gen.roleWanderFactory.prepareContext?.(ctx) : null);
             if (gen.roleWanderFactory && !motionFactory) throw Error('Role-motion backend cannot prepare an offline context');
             for(const role of roles){
                 const inst = role === 'perc' && gen.roles.perc.machine
                     ? await (await import('./classicsInstrument')).default.create({ context: ctx, preset: gen.roles.perc.instrument.preset, polyphony: 16 })
                     : role === 'perc'
                     ? new (gen.percussionEngine && gen.percussionEngine !== 'native' ? WasmDrumKit : DrumKit)({ context: ctx, model:gen.percussionEngine })
-                    : presets[role]?.iowa?await (await import('./iowaInstrument')).default.create({context:ctx,preset:presets[role],polyphony:gen.getRolePolyphony(role)})
+                    : presets[role]?.iowa?await (await import('./iowaInstrument')).default.create({context:ctx,preset:presets[role],polyphony:gen.getRolePolyphony(role),sourceBackend:audioEnvironment?.iowaSourceBackend??'native'})
                     : presets[role]?.classics?await (await import('./classicsInstrument')).default.create({context:ctx,preset:presets[role],polyphony:gen.getRolePolyphony(role)})
-                    : presets[role]?.diy?await (await import('./wasmInstrument')).default.create({polyphony:gen.getRolePolyphony(role),preset:presets[role],spec:(await import('./diySource')).diySpec(presets[role].diy,gen.getRolePolyphony(role)),context:ctx,roomPool,notes:notes.filter(n=>n.role===role&&n.time>=from&&n.time<end+(last?0:CROSSFADE)).map(n=>({...n,time:n.time-from}))})
-                    : Wasm?await Wasm.create({polyphony:gen.getRolePolyphony(role),preset:presets[role],context:ctx,roomPool,dynamics:applyFeel(gen.settings).dynamics,notes:notes.filter(n=>n.role===role&&n.time>=from&&n.time<end+(last?0:CROSSFADE)).map(n=>({...n,time:n.time-from}))})
-                    : new Instrument({ polyphony: gen.getRolePolyphony(role), preset: presets[role], context: ctx });
+                    : presets[role]?.diy?await (await import('./wasmInstrument')).default.create({audioEnvironment,polyphony:gen.getRolePolyphony(role),preset:presets[role],spec:(await import('./diySource')).diySpec(presets[role].diy,gen.getRolePolyphony(role)),context:ctx,roomPool,notes:notes.filter(n=>n.role===role&&n.time>=from&&n.time<end+(last?0:CROSSFADE)).map(n=>({...n,time:n.time-from}))})
+                    : Wasm?await Wasm.create({audioEnvironment,polyphony:gen.getRolePolyphony(role),preset:presets[role],context:ctx,roomPool,dynamics:applyFeel(gen.settings).dynamics,notes:notes.filter(n=>n.role===role&&n.time>=from&&n.time<end+(last?0:CROSSFADE)).map(n=>({...n,time:n.time-from}))})
+                    : new Instrument({ ...nativeInstrumentEnvironment(audioEnvironment,presets[role],ctx), polyphony: gen.getRolePolyphony(role), preset: presets[role], context: ctx });
                 instruments[role]=inst;cleanup.push(()=>inst.dispose());
                 if (role === 'perc') {inst.setKit(gen.settings.drumKit);inst.setVoicePreset(gen.settings.drums.kit);if(inst.ready)await inst.ready;inst.reverb?.hear?.(); /* a room in the Wasm kernel must be built before the render starts */}
                 inst.scheduleSleep = () => {}; // no wall-clock timers during the render
@@ -328,11 +330,11 @@ export async function renderPcm(gen, seconds, { ending = false, onProgress = () 
             const n = notes[i];
             if (n.time >= from&&!instruments[n.role].preScheduled) instruments[n.role].scheduleNote(n.midi, n.time - from, n.duration, n.velocity, n.detune, n.expression);
         }
-        Object.values(instruments).forEach(inst => inst.prepareOffline?.());
+        await Promise.all(Object.values(instruments).map(async inst => {await inst.sourceReady;await inst.awaitPendingSourceBookings?.();await inst.prepareOffline?.();}));
         if (Object.values(ambience).some((level) => level > 0)) {
             const weatherBuffers = weather ? await weather.render(from, ctx.length) : null;
-            const bed = new Ambience({ context: ctx, seed: 1, offset: from, weatherBuffers });
-            cleanup.push(()=>bed.stop(ctx.currentTime,0));
+            const bed = new Ambience({ ...audioEnvironment?.ambienceOptions?.(ctx), context: ctx, seed: 1, offset: from, weatherBuffers });
+            cleanup.push(()=>bed.dispose());
             bed.setShape(gen.settings.ambienceShape);
             bed.setLevels(ambience);
             bed.setWander(gen.settings.ambienceWander);

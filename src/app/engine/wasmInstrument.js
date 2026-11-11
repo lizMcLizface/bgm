@@ -1,3 +1,4 @@
+import{validateAudioEnvironment,nativeInstrumentRuntimeKey}from'./audioEnvironment';
 import DEFAULTS from './presetDefaults';
 import {translatedWasmVoice,needsNativeSource} from './wasmPreset';
 import {LabVoice} from '../../labs/voice';
@@ -7,9 +8,9 @@ import {FX_KEYS,fxTail} from './voiceFx';
 
 // Keep the generator's Instrument contract, including native physical sources.
 export default class WasmInstrument {
- static async create({context,preset={},polyphony=8,notes=[],spec=null,roomPool=null,dynamics=null}){
-  const i=new WasmInstrument(context,preset,polyphony);i.overrideSpec=spec;i.roomPool=roomPool;i.dynamics=dynamics;
-  try{i.voice=await LabVoice.create(context,i.spec(),{notes,roomPool,onError:e=>{i.error=e;console.error('Wasm voice failed',e);}});i.attachVoice(i.voice);i.reverb=i.voice.native?.reverb??i.reverb;i.preScheduled=Number.isFinite(context.length);return i;}
+ static async create({context,preset={},polyphony=8,notes=[],spec=null,roomPool=null,dynamics=null,audioEnvironment=null}){
+  const environment=validateAudioEnvironment(audioEnvironment,context),i=new WasmInstrument(context,preset,polyphony);i.audioEnvironment=environment;i.overrideSpec=spec;i.roomPool=roomPool;i.dynamics=dynamics;
+  try{i.voice=await LabVoice.create(context,i.spec(),{audioEnvironment:i.audioEnvironment,notes,roomPool,onError:e=>{i.error=e;console.error('Wasm voice failed',e);}});i.attachVoice(i.voice);i.reverb=i.voice.native?.reverb??i.reverb;i.preScheduled=Number.isFinite(context.length);return i;}
   catch(e){i.dispose();throw e;}
  }
  constructor(context,preset,polyphony){this.AC=context;this.polyphony=polyphony;this.preset={...DEFAULTS,...preset};this.output=context.createGain();this.roomOutput=context.createGain();this.roomInput=context.createGain();this.ready=Promise.resolve();this.revision=0;this.disposed=false;this.reverb={settled:true,hear(){},setLevel(){}};this.held=new Map();this.nextId=1;this.syncEnvelope();}
@@ -27,14 +28,16 @@ export default class WasmInstrument {
  applyPreset(preset,override=null){
   const previous=this.preset;this.preset={...DEFAULTS,...preset};this.overrideSpec=override;this.syncEnvelope();const revision=++this.revision,spec=this.spec();
   this.loading=true;this.error=null;
-  this.ready=LabVoice.create(this.AC,spec,{roomPool:this.roomPool,onError:error=>{this.error=error;console.error('Wasm voice failed',error);}}).then(voice=>{
+  this.ready=LabVoice.create(this.AC,spec,{audioEnvironment:this.audioEnvironment,roomPool:this.roomPool,onError:error=>{this.error=error;console.error('Wasm voice failed',error);}}).then(voice=>{
    if(this.disposed||revision!==this.revision){voice.dispose();return;}
    const old=this.voice;this.attachVoice(voice);this.voice=voice;this.reverb=voice.native?.reverb??{settled:true,hear(){},setLevel(){}};old?.dispose();for(const [id,note]of this.held)if(note.voice)this.held.delete(id);this.loading=false;if(this.wander)this.setWander(this.wander);
   }).catch(error=>{if(revision===this.revision){this.loading=false;this.preset=previous;this.syncEnvelope();this.error=error;}console.error('Could not change Wasm voice',error);});
  }
  morphTo(preset){this.applyPreset(preset);}
  set(key,value){
-  const before=this.spec();this.preset={...this.preset,[key]:value};this.syncEnvelope();const after=this.spec();
+  const previous=this.preset,before=this.spec();this.preset={...this.preset,[key]:value};this.syncEnvelope();const after=this.spec();
+  // A legacy preset can change source ownership while keeping its legacy kind.
+  if(!this.loading&&this.voice&&this.audioEnvironment&&nativeInstrumentRuntimeKey(this.audioEnvironment,previous,this.AC)!==nativeInstrumentRuntimeKey(this.audioEnvironment,this.preset,this.AC)){const next=this.preset;this.preset=previous;this.applyPreset(next,this.overrideSpec);return;}
   if(!this.loading&&before.kind===after.kind&&this.voice){
    if(after.kind==='legacy'){this.voice.patch={...this.preset};this.voice.native.set(key,value);return;}
    // tape, tremolo, compressor, shimmer, freeze: set on the voice's VoiceFx as they are
@@ -69,6 +72,9 @@ export default class WasmInstrument {
   else for(const l of p.layers){l.wanderCents=Math.min(20,value.pitch);l.wanderRate=Math.max(.01,1/period);if(value.filter){l.lfo2Filter+=value.filter/1200;l.lfo2Rate=Math.max(.01,1/(value.periods?.filter??60));}}
   this.voice.patchSource(p,{seconds:.3});
  }
+ async awaitPendingSourceBookings(){let pending;do{pending=this.ready;await pending;}while(pending!==this.ready);if(this.error)throw this.error;await this.voice?.native?.sourceReady;await this.voice?.native?.awaitPendingSourceBookings?.();}
+ prepareOffline(){return this.voice?.native?.prepareOffline?.();}
+ sourceStatus(){return this.voice?.native?.sourceStatus?.()??{backend:this.voice?.backend?.kind??'wasm',engineVersion:this.voice?.backend?.engineVersion??null,stats:this.voice?.stats??null,kind:this.voice?.spec?.kind,ready:!this.loading&&!this.disposed,error:this.error?String(this.error):null};}
  activeEffects(){return this.voice?.native?.activeEffects()??['Wasm source','Instrument delay','FDN room'];}
  effectsAwake(){return !this.disposed;}
  awakeVoices(){return this.voice?.native?.awakeVoices()??this.voice?.stats?.active??this.voice?.keys.size??0;}
