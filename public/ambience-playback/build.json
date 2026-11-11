@@ -3,9 +3,9 @@
   "profile": "native-same-rate-stereo-loop-v1",
   "source": "e827da4b682610747e5ca95e37f6e217fd3b29e459dd683a221c774f5809c800",
   "runtime": "c3970555c48229fb7119c90d0060c42a5b69cfbf0927cac88b4db73466e8620f",
-  "reference": "29f812eea1defbace8a1c25c4387e4c48b38986f3918303ca50799c1d3430672",
+  "reference": "3a8628b3182e6182b5eaf6f2b536049486d76b504e72d681c6e56b3048aa3c39",
   "wasm": "b402f50eac325895270cfa3773f43fb8a5004efb3b694731a30052889589f0f5",
   "bytes": 28554,
   "audited": false,
-  "version": "4d70b1b92d1e884e"
+  "version": "54b890f75a14b5bd"
 }

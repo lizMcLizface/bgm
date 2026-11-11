@@ -156,11 +156,13 @@ class Ambience {
      * @param {number} [options.seed] - for thunder times
      * @param {number} [options.offset] - seconds of the piece elapsed at context time 0 (renders: for the wander)
      */
-    constructor({ context, seed = 1, offset = 0, weatherBuffers = null, loopRenderer = null, weatherRouteFactory = null, weatherOfflineFactory = null, disposeSources = null }) {
+    constructor({ context, seed = 1, offset = 0, weatherBuffers = null, loopRenderer = null, weatherRouteFactory = null, weatherOfflineFactory = null, disposeSources = null, loopResourceFactory = null, prepareSourcesOffline = null }) {
         if (loopRenderer !== null && typeof loopRenderer !== 'function') throw Error('Invalid ambience loop renderer');
-        for(const factory of [weatherRouteFactory,weatherOfflineFactory,disposeSources])if(factory!==null&&typeof factory!=='function')throw Error('Invalid prepared ambience factory');
+        for(const factory of [weatherRouteFactory,weatherOfflineFactory,disposeSources,loopResourceFactory,prepareSourcesOffline])if(factory!==null&&typeof factory!=='function')throw Error('Invalid prepared ambience factory');
         this.weatherOfflineFactory=weatherOfflineFactory;this.disposeSources=disposeSources;this.disposed=false;
         this.loopRenderer = loopRenderer;
+        this.loopResourceFactory = loopResourceFactory;
+        this.prepareSourcesOffline = prepareSourcesOffline;
         this.offset = offset;
         this.AC = context;
         this.output = context.createGain();
@@ -303,10 +305,18 @@ class Ambience {
         this.weatherRoute.setState(this.shape, this.levels);
     }
 
+    loopEntry(id) {
+        return this.loopResourceFactory ? this.loopResourceFactory(id, this.AC.sampleRate, renderParams(id, this.shape[id])) : layerBuffer(this.AC, id, this.shape[id], this.loopRenderer);
+    }
+
+    retireLoopResource(resource) {
+        if(this.loopResourceFactory) return Promise.resolve(resource.release()).catch(error=>{this.error=error;});
+    }
+
     /** Renders every layer that is turned up; resolves when all are ready. */
     prepare() {
         const tasks = Object.keys(this.levels).filter(id => this.levels[id] > 0 && !WEATHER_SOURCES.includes(id))
-            .map(id => layerBuffer(this.AC, id, this.shape[id], this.loopRenderer).promise);
+            .map(id => this.loopEntry(id).promise);
         if (WEATHER_SOURCES.some(id => this.levels[id] > 0)) {
             if (isOffline(this.AC)) {
                 this.weatherPreparation ??= (async () => {
@@ -374,16 +384,17 @@ class Ambience {
     // there - if it is still wanted then.
     startLayer(id, time, ramp) {
         const key = renderKey(id, this.shape[id]);
-        const entry = layerBuffer(this.AC, id, this.shape[id], this.loopRenderer);
+        const entry = this.loopEntry(id);
         if (!entry.buffer) {
             this.playing[id] = { pending: true, key };
-            entry.promise.then(() => {
-                if (!this.playing[id] || !this.playing[id].pending) return;
+            entry.promise.then((prepared) => {
+                if(this.loopResourceFactory && (this.disposed || renderKey(id,this.shape[id])!==key)) this.retireLoopResource(prepared);
+                if (!this.playing[id] || !this.playing[id].pending || this.loopResourceFactory && this.playing[id].key !== key) return;
                 delete this.playing[id];
                 if (this.running && this.levels[id] > 0) this.startLayer(id, Math.max(this.AC.currentTime, time), 0.4);
             }).catch(error => {
                 if (this.playing[id]?.pending && this.playing[id].key === key) delete this.playing[id];
-                this.error = error;
+                if(!(this.loopResourceFactory && error.name==='AbortError' && (this.disposed || renderKey(id,this.shape[id])!==key))) this.error = error;
             });
             return;
         }
@@ -397,12 +408,15 @@ class Ambience {
         this.applyShape(id, time, ramp || 0.001);
     }
 
+    async prepareOffline() {
+        if(this.loopResourceFactory && isOffline(this.AC)) return this.prepareSourcesOffline?.();
+    }
+
     // A looping source of `buffer` lined up with the piece, into `chain`
     // through its own fade gain (for cross-fades).
     loopSource(buffer, time, chain) {
-        const source = this.AC.createBufferSource();
-        source.buffer = buffer;
-        source.loop = true;
+        const source = this.loopResourceFactory ? buffer.createSource() : this.AC.createBufferSource();
+        if (!this.loopResourceFactory) { source.buffer = buffer; source.loop = true; }
         const fade = this.AC.createGain();
         source.connect(fade).connect(chain.input);
         source.start(time, this.pieceTime(time) % buffer.duration);
@@ -413,8 +427,10 @@ class Ambience {
     // After a shape change: the new loop, cross-faded in once rendered.
     swapLoop(id) {
         const key = renderKey(id, this.shape[id]);
-        const entry = layerBuffer(this.AC, id, this.shape[id], this.loopRenderer);
+        if(this.loopResourceFactory && this.playing[id] && !this.playing[id].pending && this.playing[id].key===key) return Promise.resolve();
+        const entry = this.loopEntry(id);
         return entry.promise.then((buffer) => {
+            if(this.loopResourceFactory && renderKey(id,this.shape[id])!==key) return this.retireLoopResource(buffer);
             const playing = this.playing[id];
             if (!this.running || !playing || playing.pending || playing.key === key || renderKey(id, this.shape[id]) !== key) return;
             const now = this.AC.currentTime + 0.02;
@@ -426,14 +442,15 @@ class Ambience {
             playing.source.stop(now + SWAP_FADE + 0.05);
             this.playing[id] = { ...next, key };
         }).catch(error => {
-            this.error = error;
+            if(!(this.loopResourceFactory && error.name==='AbortError' && (this.disposed || renderKey(id,this.shape[id])!==key))) this.error = error;
             return false;
         });
     }
 
     dispose(){
-        if(this.disposed)return;this.disposed=true;this.stop(this.AC.currentTime,0);for(const timer of Object.values(this.renderTimers))clearTimeout(timer);this.weatherRoute.dispose?.();this.ownedWeatherOffline?.dispose();this.disposeSources?.();this.totalLfo.dispose();
+        if(this.disposed)return this.loopResourceFactory?this.sourceDisposal:undefined;this.disposed=true;this.stop(this.AC.currentTime,0);for(const timer of Object.values(this.renderTimers))clearTimeout(timer);this.weatherRoute.dispose?.();this.ownedWeatherOffline?.dispose();this.sourceDisposal=Promise.resolve(this.disposeSources?.()).catch(error=>{this.error=error;return{error:error.message};});this.totalLfo.dispose();
         for(const chain of Object.values(this.chains)){chain.lfo.dispose();for(const part of [chain.input,chain.filter,...chain.shelter,...chain.same,...chain.cross,chain.panner,chain.level,chain.drift])part.disconnect();}this.output.disconnect();this.wanderOut.disconnect();
+        if(this.loopResourceFactory)return this.sourceDisposal;
     }
 
     stopLayer(id, time, fade) {
