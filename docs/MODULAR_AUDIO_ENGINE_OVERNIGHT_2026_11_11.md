@@ -81,3 +81,5 @@ reviewable rather than weakening validation or changing sounds to force a pass.
   primitives/limiter and explicit seam compiler are locally verified. Graph
   insert/send adapters and opt-in fixed-path delay compensation are in progress;
   they preserve canonical128 kernel input cadence and declare adapter latency.
+
+- 2026-11-11T00:31:22.856Z: commits bee2764 (rack/voice kernels) and fff00db (VS/WT resources). Combined Graph builddab728d85b2f6615, normalpublicbuild,437files/3267tests,actualbuiltinbrowserfixedbatch+liveoutput,andninefullgraphzeroallocationcasespass. Parallelremaining-sourceworkcontinues; seeGraphportsdocandJSONevidence.

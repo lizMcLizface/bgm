@@ -1,5 +1,6 @@
 // @vitest-environment node
 import fs from 'node:fs';import vm from 'node:vm';
+import {assertSerialRealtimeAllowed} from './executionPolicy';
 import {describe,it,expect} from 'vitest';
 import {ReferenceGraph,savePatch,loadPatch,validatePatch} from './runtime';
 import {pitchedPatch,sixSourceDag} from './pitchedFixture';
@@ -31,6 +32,6 @@ describe('block-capable pitched Rust DAG',()=>{
   const p=pitchedPatch(coreCases()[0].spec,false),a=structuredClone(p);a.events.push({...a.events[0],owner:999});expect(()=>validatePatch(a,contracts)).toThrow('owner conflict');const b=structuredClone(p);b.modules[0].config.events=[[0,1,0,60,.7]];expect(()=>validatePatch(b,contracts)).toThrow('graph events');const c=structuredClone(p);c.events[0].a=128;expect(()=>make(c)).toThrow();const g=make(p);try{expect(()=>g.enqueue({...p.events[0],owner:999})).toThrow('(3)');expect(g.pitchedStats(1).frame).toBe(0);}finally{g.dispose();}
  });
  it('runs the actual eight-output source worklet and clips a partial final block',()=>{
-  let Type;const messages=[],ctx=vm.createContext({WebAssembly,ReferenceGraph,Number,Error,Math,Object,sampleRate:48000,AudioWorkletProcessor:class{constructor(){this.port={postMessage:x=>messages.push(x),close(){}};}},registerProcessor:(_,c)=>Type=c});vm.runInContext(fs.readFileSync('public/modular-audio/dag-sources-processor.js','utf8').replace(/^import .*\n/,''),ctx);const p=new Type({processorOptions:{module,contracts,patch:sixSourceDag(fixture,48000),roles:fixture.parts.map(p=>p.role),endFrame:131}}),out=Array.from({length:8},()=>[new Float32Array(128),new Float32Array(128)]);expect(p.process([],out)).toBe(true);out.forEach(bus=>bus.forEach(ch=>ch.fill(1)));expect(p.process([],out)).toBe(false);expect(out.every(bus=>bus.every(ch=>ch.slice(3).every(v=>v===0)))).toBe(true);expect(messages.at(-1).roles.sourceDag.frame).toBe(131);p.port.onmessage({data:{type:'dispose'}});expect(p.g.handle).toBe(0);
+  let Type;const messages=[],ctx=vm.createContext({assertSerialRealtimeAllowed,WebAssembly,ReferenceGraph,Number,Error,Math,Object,sampleRate:48000,AudioWorkletProcessor:class{constructor(){this.port={postMessage:x=>messages.push(x),close(){}};}},registerProcessor:(_,c)=>Type=c});vm.runInContext(fs.readFileSync('public/modular-audio/dag-sources-processor.js','utf8').replace(/^import .*\n/,''),ctx);const p=new Type({processorOptions:{module,contracts,patch:sixSourceDag(fixture,48000),roles:fixture.parts.map(p=>p.role),endFrame:131}}),out=Array.from({length:8},()=>[new Float32Array(128),new Float32Array(128)]);expect(p.process([],out)).toBe(true);out.forEach(bus=>bus.forEach(ch=>ch.fill(1)));expect(p.process([],out)).toBe(false);expect(out.every(bus=>bus.every(ch=>ch.slice(3).every(v=>v===0)))).toBe(true);expect(messages.at(-1).roles.sourceDag.frame).toBe(131);p.port.onmessage({data:{type:'dispose'}});expect(p.g.handle).toBe(0);
  });
 });

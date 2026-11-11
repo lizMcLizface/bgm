@@ -1,5 +1,5 @@
 // src/modular-audio/graphWorker.js
-import { ReferenceGraph } from "./runtime.js?v=e9f7c9ebc2ef7d92";
+import { ReferenceGraph } from "./runtime.js?v=237a38efc4a26ecc";
 
 // src/modular-audio/workerDeliveryTiming.js
 var WorkerDeliveryTiming = class {
@@ -163,6 +163,7 @@ var port;
 var tasks;
 var delivery;
 var sourceIds = null;
+var sourceLatencies = null;
 var end = 0;
 var frame = 0;
 var free = [];
@@ -177,7 +178,7 @@ var rejectedEvents = 0;
 var badRecycles = 0;
 var histogram = new Uint32Array(32);
 function snapshot() {
-  return { generation: o.generation, sourceIds, frame, blocks, renderMs, maxRenderMs, blockMsHistogramLog2Us: Array.from(histogram), rejectedEvents, badRecycles, freeBuffers: free.length, inFlightBuffers: inFlight.filter(Boolean).length, deliveryTiming: delivery?.snapshot() ?? null, scheduler: tasks ? tasks.snapshot() : { kind: "timer", pendingTimer: timer !== null }, ...graphSnapshot(g, sourceIds) };
+  return { generation: o.generation, sourceIds, ...sourceLatencies ? { sourceLatencies } : {}, frame, blocks, renderMs, maxRenderMs, blockMsHistogramLog2Us: Array.from(histogram), rejectedEvents, badRecycles, freeBuffers: free.length, inFlightBuffers: inFlight.filter(Boolean).length, deliveryTiming: delivery?.snapshot() ?? null, scheduler: tasks ? tasks.snapshot() : { kind: "timer", pendingTimer: timer !== null }, ...graphSnapshot(g, sourceIds) };
 }
 function stopPump() {
   clearTimeout(timer);
@@ -245,6 +246,12 @@ globalThis.onmessage = ({ data: d }) => {
       g = new ReferenceGraph(new WebAssembly.Instance(d.module, {}).exports, d.patch, d.contracts, d.rate, o.blockFrames);
       views = sourceViews(g, sourceIds);
       if (o.scheduling === "message") tasks = new WorkerTaskPump(pump);
+      if (typeof g.latency === "function") sourceLatencies = Object.fromEntries((sourceIds ?? [1, 2, 3, 4, 5, 6]).map((id) => {
+        const value = g.latency(id);
+        if (!Number.isFinite(value) || value < 0 || value > 262144) throw Error("Invalid prepared source latency");
+        return [id, value];
+      }));
+      else if (d.patch.latencyCompensation) throw Error("Prepared source latency query unavailable");
       inFlight = Array(o.poolBlocks).fill(false);
       free = Array.from({ length: o.poolBlocks }, (_, slot) => ({ slot, buffer: new ArrayBuffer(o.bufferBytes) }));
       port.onmessage = ({ data: b }) => {
@@ -258,7 +265,7 @@ globalThis.onmessage = ({ data: d }) => {
         free.push({ slot: b.slot, buffer: b.buffer });
         schedule();
       };
-      postMessage({ type: "ready", options: o, memoryBytes: g.engine.memory.buffer.byteLength });
+      postMessage({ type: "ready", options: o, ...sourceLatencies ? { sourceLatencies } : {}, memoryBytes: g.engine.memory.buffer.byteLength });
       schedule();
       return;
     }

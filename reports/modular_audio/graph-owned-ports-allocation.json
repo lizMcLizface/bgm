@@ -1,0 +1,109 @@
+{
+  "kind": "graph.owned-ports-allocation",
+  "version": 1,
+  "engineVersion": "dab728d85b2f6615",
+  "auditWasmSha256": "7923ab1c64c3bfca93ab597f371b2f023490a160167a934310d54f0486e6923d",
+  "pass": true,
+  "scope": "Two full Rust graphs sharing Wasm: exact saved input replay through owned native inserts, three send buses, all three rack FX, Shimmer/seeded Freeze, all four mixer primitives/limiter, raw classic branch and opt-in PDC. Prepared enqueue/render/reset/cancel/pause watched; no native runner, realtime deadline or physical-listening claim.",
+  "results": [
+    {
+      "rate": 44100,
+      "classicModel": 0,
+      "handles": 2,
+      "latencyFrames": 1029,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 26345472,
+      "grew": false,
+      "saveReloadExact": true,
+      "peak": 0.03998686000704765
+    },
+    {
+      "rate": 44100,
+      "classicModel": 7,
+      "handles": 2,
+      "latencyFrames": 1029,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 39124992,
+      "grew": false,
+      "saveReloadExact": true,
+      "peak": 0.044092606753110886
+    },
+    {
+      "rate": 44100,
+      "classicModel": 12,
+      "handles": 2,
+      "latencyFrames": 1029,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 27983872,
+      "grew": false,
+      "saveReloadExact": true,
+      "peak": 0.04035933315753937
+    },
+    {
+      "rate": 48000,
+      "classicModel": 0,
+      "handles": 2,
+      "latencyFrames": 1040,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 27131904,
+      "grew": false,
+      "saveReloadExact": true,
+      "peak": 0.040394119918346405
+    },
+    {
+      "rate": 48000,
+      "classicModel": 7,
+      "handles": 2,
+      "latencyFrames": 1040,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 39911424,
+      "grew": false,
+      "saveReloadExact": true,
+      "peak": 0.046056415885686874
+    },
+    {
+      "rate": 48000,
+      "classicModel": 12,
+      "handles": 2,
+      "latencyFrames": 1040,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 28770304,
+      "grew": false,
+      "saveReloadExact": true,
+      "peak": 0.040001288056373596
+    },
+    {
+      "rate": 96000,
+      "classicModel": 0,
+      "handles": 2,
+      "latencyFrames": 1184,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 36831232,
+      "grew": false,
+      "saveReloadExact": true,
+      "peak": 0.04050165042281151
+    },
+    {
+      "rate": 96000,
+      "classicModel": 7,
+      "handles": 2,
+      "latencyFrames": 1184,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 49676288,
+      "grew": false,
+      "saveReloadExact": true,
+      "peak": 0.043996959924697876
+    },
+    {
+      "rate": 96000,
+      "classicModel": 12,
+      "handles": 2,
+      "latencyFrames": 1184,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 38469632,
+      "grew": false,
+      "saveReloadExact": true,
+      "peak": 0.04184028506278992
+    }
+  ]
+}

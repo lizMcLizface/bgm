@@ -49,3 +49,12 @@ it('stacks single-voice kernels for chords on a monophonic synth',async()=>{
  expect(lives.map(l=>l.noteOn.mock.calls.map(c=>c[1]))).toEqual([[48,60],[52],[55],[]]);
  i.silence();lives.forEach(l=>expect(l.panic).toHaveBeenCalledOnce());i.dispose();lives.forEach(l=>expect(l.close).toHaveBeenCalledOnce());
 });
+it('keeps the existing effect route awake for a nested owned-source lease and disposes once',async()=>{
+ const release=vi.fn(),l={...live(),captureSource:vi.fn(()=>({version:1})),holdSourceInput:vi.fn(()=>release)};host.start.mockResolvedValue(l);
+ const i=await ClassicsInstrument.create({context:ctx,preset:preset()});expect(i.captureSource()).toEqual({version:1});expect(i.effectsAwake()).toBe(false);
+ const a=i.holdSourceInput(),b=i.holdSourceInput();expect(i.effectsAwake()).toBe(true);a();a();expect(release).toHaveBeenCalledTimes(1);expect(i.effectsAwake()).toBe(true);b();expect(i.effectsAwake()).toBe(false);
+ i.held.set(1,l);expect(()=>i.holdSourceInput()).toThrow('keyboard');i.dispose();i.dispose();expect(l.close).toHaveBeenCalledOnce();expect(()=>i.captureSource()).toThrow('single-kernel');
+});
+it('refuses to collapse a mono stack into one source kernel',async()=>{
+ const l={...live(),captureSource:vi.fn()};host.start.mockResolvedValue(l);const i=await ClassicsInstrument.create({context:ctx,preset:{classics:{synth:'minimoog',values:SYNTHS.minimoog.presets[0].values}},polyphony:8});expect(()=>i.captureSource()).toThrow('single-kernel');expect(l.captureSource).not.toHaveBeenCalled();i.dispose();
+});

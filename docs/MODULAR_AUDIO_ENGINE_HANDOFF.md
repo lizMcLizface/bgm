@@ -2832,3 +2832,46 @@ are exact against the stated original/fresh references;25 permanent tests pass.
 The531640-byte rebuilt legacy-compatible kernel passes provenance. VS staging
 publication and WT lifecycle reset costs remain explicit; see
 MODULAR_AUDIO_ENGINE_OWNED_CLASSICS.md. Next: timestamped graph/source routing.
+
+
+### Owned graph vertical integration (overnight 2026-11-11,2026-11-11T00:31:22.856Z)
+
+Graph build dab728d85b2f6615 (1428890 bytes) now integrates native
+insert/send adapters, four mixer primitives, all14 classic model families, three
+rack effects and seeded Shimmer/Freeze. Module contracts/canonical input ticks,
+f64 controls, explicit delays and opt-in integer-difference PDC are documented
+in MODULAR_AUDIO_ENGINE_GRAPH_PORTS.md. FM fractional metadata is preserved;
+unsupported fractional alignment/latency-changing quality edits fail closed.
+Freeze remains worker-only with guards on startup, fallback and every direct
+realtime processor. Existing defaults and singleton DSP remain operational.
+
+Classic captured-score and audition paths now use private per-native-slot
+inputs before each existing outboard rack, including exact Minimoog allocation,
+per-slot pressure and atomic native-feed leases. The existing six source buses
+remain bounded (five pitched plus percussion6); oversized stacks/selections
+reject before playback. A real-worker four-slot Minimoog+Juno+Hand test matches
+all six serial stems exactly. This is opt-in source adoption, not full All mixer
+replacement or cable editing.
+
+Verification: the complete suite snapshot passed437files/3267tests. Subsequent
+focused graph/mixer/classic/workbench tests passed53/53; additional rack/voice
+graph, constructor policy and pool cases are recorded in their dedicated reports.
+Thirty existing graph allocator cases and nine full two-handle graph cases
+report zero allocation/reclamation/growth after preparation, including all FX,
+limiter, classic and PDC. Classic cache42cases separately preserve original
+source-local callback partitions/host polyphony without allocation.
+
+The new fixed tools/owned-ports.html batch passes in the built-in browser:
+actual AudioWorklet PCM exactly matches direct Wasm at44.1/48/96kHz, with
+first nonzero frame426/437/581 (gate37 plus declared389/400/544 latency),
+two independent worklets, saved-patch restart, isolated localStorage round-trip
+and unchanged legacy insert/send default ABI smoke. Live routed output also
+passes (analyser peaks .06065847/.04943755); physical listening/device underruns
+are not assessed. Full-page persistence reload is still untested. Exact JSON
+and screenshots are owned-ports-desktop-browser.* and owned-ports-live-browser.*
+under reports/modular_audio. Normal npm.cmd run build:public passes.
+
+Next work: finish independent remaining source preparation/native host-chain
+ports and broaden the fixed browser batch to their actual paths. Preserve the
+original Tape/Motion, envelopes/filter/colour, aux returns and ambience seams
+until their individual graphs are ported and compared. No push/deployment.

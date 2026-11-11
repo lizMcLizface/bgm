@@ -58,15 +58,15 @@ var PatchTransition = class {
       if (this.active) this.active.next = this.active.start + (Math.floor((frame4 - this.active.start) / 16) + 1) * 16;
     }
     while (this.pending[0]?.frame <= frame4) {
-      const p = this.pending.shift(), rows = [];
+      const p = this.pending.shift(), rows2 = [];
       for (const [s, i, to] of p.values) {
         const key = s + ":" + i, from = this.values.get(key) ?? to;
-        if (from !== to) rows.push({ s, i, key, from, to, discrete: this.discrete(s, i) || this.discrete === fmDiscrete && s === 1 && i % 32 === 1 && (from === 0 || to === 0), log: from > 0 && to > 0 && this.log(s, i) });
+        if (from !== to) rows2.push({ s, i, key, from, to, discrete: this.discrete(s, i) || this.discrete === fmDiscrete && s === 1 && i % 32 === 1 && (from === 0 || to === 0), log: from > 0 && to > 0 && this.log(s, i) });
       }
-      const perfChanged = JSON.stringify(p.performance) !== JSON.stringify(this.performance), structural = rows.some((r) => r.discrete) || p.performance?.mode !== this.performance?.mode;
-      if (!rows.length && !perfChanged) continue;
+      const perfChanged = JSON.stringify(p.performance) !== JSON.stringify(this.performance), structural = rows2.some((r) => r.discrete) || p.performance?.mode !== this.performance?.mode;
+      if (!rows2.length && !perfChanged) continue;
       if (p.seconds === 0) {
-        for (const r of rows) {
+        for (const r of rows2) {
           this.apply(r.s, r.i, r.to);
           this.values.set(r.key, r.to);
         }
@@ -75,7 +75,7 @@ var PatchTransition = class {
         this.active = null;
       } else {
         const end = frame4 + Math.max(2, Math.round(p.seconds * this.rate));
-        this.active = { rows, performance: p.performance, start: frame4, next: frame4 + 16, end, mid: Math.round((frame4 + end) / 2), switched: false, structural };
+        this.active = { rows: rows2, performance: p.performance, start: frame4, next: frame4 + 16, end, mid: Math.round((frame4 + end) / 2), switched: false, structural };
       }
     }
   }
@@ -144,9 +144,9 @@ function packet2(p) {
     ["routes", 3, (r) => integer2(r[0], 0, 7) && integer2(r[1], 0, 7) && (r[0] < r[1] || r[2] === 0)],
     ["carriers", 2, (r) => integer2(r[0], 0, 7)]
   ]) {
-    const rows = p[name];
-    if (!Array.isArray(rows) || rows.length > 256 || rows.some((r) => !Array.isArray(r) || r.length !== len || !r.every(finite2) || !Number.isFinite(Math.fround(r.at(-1))) || !valid(r))) throw Error(`Invalid FM ${name}`);
-    const keys = rows.map((r) => r.slice(0, -1).join(":"));
+    const rows2 = p[name];
+    if (!Array.isArray(rows2) || rows2.length > 256 || rows2.some((r) => !Array.isArray(r) || r.length !== len || !r.every(finite2) || !Number.isFinite(Math.fround(r.at(-1))) || !valid(r))) throw Error(`Invalid FM ${name}`);
+    const keys = rows2.map((r) => r.slice(0, -1).join(":"));
     if (new Set(keys).size !== keys.length) throw Error(`Duplicate FM ${name}`);
   }
   return p;
@@ -183,10 +183,10 @@ function validatePitchedConfig(raw, fm) {
 function compilePitched(raw, fm, rate) {
   const p = validatePitchedConfig(raw, fm), flat = fm ? flattenFM : (p2) => p2, base = flat(p.patch), points = [], gains = [];
   let cursor = 0, lastGain = 1;
-  const push = (rows, row) => {
+  const push = (rows2, row) => {
     if (points.length + gains.length >= 65536) throw Error("Pitched automation capacity exceeded");
     if (!Number.isSafeInteger(row[0])) throw Error("Pitched automation frame overflow");
-    rows.push(row);
+    rows2.push(row);
   };
   const t = new PatchTransition(base, p.performance, (scope, index, value) => push(points, [cursor, scope, index, value, 0]), (perf) => push(points, [cursor, 4, perf.mode, perf.portamento, Number(perf.glide === "always")]), fm ? fmDiscrete : coreDiscrete, fm ? fmLog : coreLog, rate);
   for (const edit of p.edits) {
@@ -217,7 +217,7 @@ function validatePercussionConfig(c, definition) {
   if (!definition || !keys(c, ["version", "voice", "drums"]) || c.version !== definition.version || !definition.voices.includes(c.voice) || !Array.isArray(c.drums) || c.drums.length !== definition.slots) throw Error("Invalid percussion kit configuration");
   for (const d of c.drums) {
     if (!keys(d, ["on", "level", "tone", "decay"]) || typeof d.on !== "boolean") throw Error("Invalid percussion drum configuration");
-    for (const [key, bounds] of Object.entries(definition.fields)) if (typeof d[key] !== "number" || !Number.isFinite(d[key]) || d[key] < bounds.min || d[key] > bounds.max) throw Error(`Invalid percussion ${key}`);
+    for (const [key, bounds2] of Object.entries(definition.fields)) if (typeof d[key] !== "number" || !Number.isFinite(d[key]) || d[key] < bounds2.min || d[key] > bounds2.max) throw Error(`Invalid percussion ${key}`);
   }
   return c;
 }
@@ -309,15 +309,218 @@ function validateIowaConfig(c) {
   return c;
 }
 
+// src/synth-lab/insertsConfig.js
+var INSERTS = [
+  ["bypass", "Bypass inserts", 0, 1, 1, 0],
+  ["saturation", "Saturation mix", 0, 1, 0.01, 0],
+  ["drive", "Saturation drive \xB7 dB", 0, 24, 0.5, 6],
+  ["lowGain", "Low shelf \xB7 dB", -12, 12, 0.5, 0],
+  ["lowFreq", "Low shelf \xB7 Hz", 60, 600, 1, 180],
+  ["midGain", "Mid peak \xB7 dB", -12, 12, 0.5, 0],
+  ["midFreq", "Mid peak \xB7 Hz", 200, 6e3, 1, 1e3],
+  ["midQ", "Mid peak Q", 0.2, 4, 0.05, 0.7],
+  ["highGain", "High shelf \xB7 dB", -12, 12, 0.5, 0],
+  ["highFreq", "High shelf \xB7 Hz", 1500, 12e3, 1, 6e3],
+  ["phaser", "Phaser mix", 0, 1, 0.01, 0],
+  ["phaserRate", "Phaser rate \xB7 Hz", 0.02, 5, 0.01, 0.15],
+  ["phaserDepth", "Phaser sweep \xB7 octaves", 0, 3, 0.05, 1.5],
+  ["phaserFreq", "Phaser centre \xB7 Hz", 100, 4e3, 1, 700],
+  ["phaserFeedback", "Phaser feedback", -0.75, 0.75, 0.01, 0.2],
+  ["flanger", "Flanger mix", 0, 1, 0.01, 0],
+  ["flangerRate", "Flanger rate \xB7 Hz", 0.02, 5, 0.01, 0.12],
+  ["flangerDepth", "Flanger depth \xB7 ms", 0, 4, 0.05, 1],
+  ["flangerDelay", "Flanger centre \xB7 ms", 0.3, 20, 0.05, 2],
+  ["flangerFeedback", "Flanger feedback", -0.85, 0.85, 0.01, 0.35],
+  ["chorus", "Chorus mix", 0, 0.8, 0.01, 0],
+  ["chorusRate", "Chorus rate \xB7 Hz", 0.05, 10, 0.01, 0.35],
+  ["chorusDepth", "Chorus depth \xB7 ms", 0, 8, 0.1, 3.5],
+  ["gain", "Insert output trim \xB7 dB", -18, 6, 0.5, 0],
+  // appended with the kernel's parameters 24-28: the left/right offset of each modulation (cycles), chorus feedback, phaser stage count
+  ["phaserSpread", "Phaser spread", 0, 0.5, 0.01, 0.25],
+  ["flangerSpread", "Flanger spread", 0, 0.5, 0.01, 0.5],
+  ["chorusSpread", "Chorus spread", 0, 0.5, 0.01, 0.5],
+  ["chorusFeedback", "Chorus feedback", -0.6, 0.6, 0.01, 0],
+  ["phaserStages", "Phaser stages", 2, 12, 2, 6]
+];
+
+// src/modular-audio/ownedInserts.js
+function validateOwnedInsertsSpec(raw) {
+  const c = JSON.parse(JSON.stringify(raw));
+  if (c?.version !== 1 || !Array.isArray(c.parameters) || c.parameters.length !== INSERTS.length) throw Error("Invalid owned inserts configuration");
+  const ids = /* @__PURE__ */ new Set();
+  for (const pair of c.parameters) {
+    if (!Array.isArray(pair) || pair.length !== 2 || !Number.isInteger(pair[0]) || ids.has(pair[0])) throw Error("Invalid owned inserts parameter identity");
+    const d = INSERTS[pair[0]], v = pair[1];
+    if (!d || typeof v !== "number" || !Number.isFinite(v) || v < d[2] || v > d[3]) throw Error("Invalid owned inserts parameter value");
+    ids.add(pair[0]);
+  }
+  return c;
+}
+
+// src/synth-lab/effectsConfig.js
+var EFFECTS = [
+  ["dry", "Dry level", 0, 1, 0.01, 1],
+  ["reverb", "Reverb send", 0, 0.8, 0.01, 0.22],
+  ["delay", "Delay send", 0, 0.8, 0.01, 0.12],
+  ["decay", "Reverb decay \xB7 RT60 seconds", 0.3, 30, 0.1, 8],
+  ["size", "Room size", 0.2, 1, 0.01, 0.7],
+  ["damping", "Reverb darkening above \xB7 Hz", 500, 16e3, 10, 6e3],
+  ["predelay", "Pre-delay \xB7 ms", 0, 150, 1, 25],
+  ["width", "Reverb stereo width", 0, 1, 0.01, 1],
+  ["modulation", "Reverb modulation", 0, 1, 0.01, 0.3],
+  ["delayMs", "Echo spacing \xB7 ms", 40, 2e3, 1, 375],
+  ["feedback", "Echo feedback", 0, 0.85, 0.01, 0.4],
+  ["tone", "Echo damping \xB7 Hz", 300, 14e3, 10, 4500],
+  ["pingPong", "Ping-pong", 0, 1, 1, 1],
+  ["delayToReverb", "Echo \u2192 reverb", 0, 1, 0.01, 0.2],
+  ["quality", "Reverb network \xB7 8 / 16 lines", 0, 1, 1, 1],
+  ["bypass", "Bypass effects", 0, 1, 1, 0],
+  ["reverbReturn", "Reverb return \xB7 dB", -24, 18, 0.5, 0],
+  ["reflections", "Early reflections", 0, 8, 0.01, 0],
+  // appended with the kernel's parameters 18-20
+  ["feedbackLow", "Echo low cut \xB7 Hz", 0, 1e3, 1, 0],
+  ["duck", "Echo ducking", 0, 1, 0.01, 0],
+  ["reverbType", "Reverb type", 0, 3, 1, 0]
+];
+
+// src/modular-audio/ownedEffects.js
+function validateOwnedEffectsSpec(raw) {
+  const c = JSON.parse(JSON.stringify(raw));
+  if (c?.version !== 1 || !Array.isArray(c.parameters) || c.parameters.length !== EFFECTS.length) throw Error("Invalid owned effects configuration");
+  const ids = /* @__PURE__ */ new Set();
+  for (const pair of c.parameters) {
+    if (!Array.isArray(pair) || pair.length !== 2 || !Number.isInteger(pair[0]) || ids.has(pair[0])) throw Error("Invalid owned effects parameter identity");
+    const d = EFFECTS[pair[0]], v = pair[1];
+    if (!d || typeof v !== "number" || !Number.isFinite(v) || v < d[2] || v > d[3]) throw Error("Invalid owned effects parameter value");
+    ids.add(pair[0]);
+  }
+  return c;
+}
+
+// src/modular-audio/mixerConfig.js
+var MIXER_KINDS = Object.freeze(["strip", "matrix", "fader", "limiter"]);
+var finite3 = (v, a, b) => typeof v === "number" && Number.isFinite(v) && v >= a && v <= b;
+var integer3 = (v, a, b) => Number.isInteger(v) && v >= a && v <= b;
+var bounds = (kind, rate) => kind === "strip" ? [[0, 64], [0, rate / 2], [0, rate / 2], [-12, 12], [-12, 12], [-12, 12], [-1, 1], [0, 4]] : kind === "matrix" ? [[0, 2], [-1, 1]] : kind === "limiter" ? [[0, 1], [0.05, 1]] : [[0, 4]];
+function validateMixerConfig(raw) {
+  const c = JSON.parse(JSON.stringify(raw));
+  if (c?.version !== 1 || !MIXER_KINDS.includes(c.kind) || !finite3(c.sampleRate, 8e3, 192e3) || typeof c.settled !== "boolean" || !Array.isArray(c.parameters) || !Array.isArray(c.events) || c.events.length > 512) throw Error("Invalid mixer configuration");
+  const b = bounds(c.kind, c.sampleRate);
+  if (c.parameters.length !== b.length || c.parameters.some((v, i) => !finite3(v, ...b[i]) || c.kind === "limiter" && i === 0 && !Number.isInteger(v))) throw Error("Invalid mixer parameter");
+  for (const e of c.events) if (!integer3(e.frame, 0, Number.MAX_SAFE_INTEGER) || !integer3(e.owner, 1, 4294967295) || !integer3(e.parameter, 0, b.length - 1) || !finite3(e.value, ...b[e.parameter]) || c.kind === "limiter" && e.parameter === 0 && !Number.isInteger(e.value)) throw Error("Invalid mixer timestamped event");
+  return c;
+}
+
+// src/modular-audio/classicConfig.js
+var CLASSIC_MODELS = Object.freeze(Array.from({ length: 14 }, (_, i) => i));
+var COUNTS = [128, 48, 76, 144, 52, 176, 144, 96, 136, 136, 136, 16, 125, 136];
+var shaped = /* @__PURE__ */ new Set([0, 1, 2, 3, 4, 6, 12]);
+var fail3 = () => {
+  throw Error("Invalid prepared classic configuration");
+};
+var classicWaveLength = (model) => model === 7 ? 16384 : model === 12 ? 8192 : 0;
+var classicParameter = (model, id) => Number.isInteger(id) && id >= 0 && (id < COUNTS[model] || id >= 180 && id < 196 && shaped.has(model) || id >= 200 && id < 216);
+function validateClassicConfig(c) {
+  if (c?.version !== 1 || !CLASSIC_MODELS.includes(c.model) || !Number.isInteger(c.polyphony) || c.polyphony < 1 || c.polyphony > 32 || !Array.isArray(c.parameters) || c.parameters.length > 256) fail3();
+  const seen = /* @__PURE__ */ new Set();
+  for (const p of c.parameters) {
+    if (!Array.isArray(p) || p.length !== 2 || !classicParameter(c.model, p[0]) || seen.has(p[0]) || !Number.isFinite(p[1]) || !Number.isFinite(Math.fround(p[1]))) fail3();
+    seen.add(p[0]);
+  }
+  const length = classicWaveLength(c.model);
+  if (c.waves !== void 0 && (!length || !(Array.isArray(c.waves) || c.waves instanceof Float32Array) || c.waves.length !== length || Array.from(c.waves).some((v) => !Number.isFinite(v) || Math.abs(v) > 64))) fail3();
+  if (c.model === 7 && !c.waves) fail3();
+  return c;
+}
+
+// src/synths/effects/zplaneShapes.js
+var BOOST = (level) => Math.max(2, Math.min(18, 18 + level * 0.45));
+var NEUTRAL = [5500, 1e3, 0];
+var SECTIONS = 12;
+var fill = (rows2) => [...rows2, ...Array(SECTIONS - rows2.length).fill(NEUTRAL)];
+var vowel = (rows2) => fill(rows2.map(([f, level, bw]) => [f, bw, BOOST(level)]));
+var ZPLANE_SHAPES = [
+  { name: "Ah", sections: vowel([[650, 0, 80], [1080, -6, 90], [2650, -7, 120], [2900, -8, 130], [3250, -22, 140]]) },
+  { name: "Eh", sections: vowel([[400, 0, 70], [1700, -14, 80], [2600, -12, 100], [3200, -14, 120], [3580, -20, 120]]) },
+  { name: "Ee", sections: vowel([[290, 0, 40], [1870, -15, 90], [2800, -18, 100], [3250, -20, 120], [3540, -30, 120]]) },
+  { name: "Oh", sections: vowel([[400, 0, 40], [800, -10, 80], [2600, -12, 100], [2800, -12, 120], [3e3, -26, 120]]) },
+  { name: "Oo", sections: vowel([[350, 0, 40], [600, -20, 60], [2700, -17, 100], [2900, -14, 120], [3300, -26, 120]]) },
+  { name: "Nasal", sections: fill([[270, 80, 10], [1e3, 300, -14], [2200, 200, 10], [3e3, 300, 8], [4500, 500, -8]]) },
+  { name: "Hollow", sections: fill([[450, 140, -16], [1100, 250, -18], [1800, 300, -14], [2800, 400, -12], [3900, 500, -10], [5200, 600, -8]]) },
+  { name: "Dark", sections: fill([[150, 150, 6], [3e3, 3e3, -10], [6e3, 4e3, -16], [1500, 1500, -3]]) },
+  { name: "Bright", sections: fill([[200, 200, -8], [500, 500, -4], [5e3, 4e3, 10], [9e3, 6e3, 8]]) },
+  { name: "Telephone", sections: fill([[150, 200, -18], [400, 300, -8], [1800, 900, 8], [3400, 1e3, 2], [6e3, 3e3, -18], [9e3, 4e3, -20]]) },
+  { name: "Wah low", sections: fill([[450, 130, 18], [1200, 500, 6], [2800, 1800, -4], [6e3, 4e3, -8]]) },
+  { name: "Wah high", sections: fill([[1800, 300, 18], [3200, 800, 8], [600, 500, -6], [7e3, 4e3, -6]]) }
+];
+var ZPLANE_SHAPE_NAMES = ZPLANE_SHAPES.map((s) => s.name);
+var ZPLANE_CUSTOM = ZPLANE_SHAPES.length;
+ZPLANE_SHAPE_NAMES.push("Custom");
+var FLAT_ROWS = Array.from({ length: SECTIONS }, (_, i) => {
+  const f = Math.round(110 * (9e3 / 110) ** (i / (SECTIONS - 1)));
+  return [f, Math.round(f * 0.4), 0];
+});
+
+// src/modular-audio/ownedRackFx.js
+var RACK_FX_KINDS = Object.freeze(["crusher", "pitch", "zplane"]);
+var RACK_FX_PARAMETERS = Object.freeze({ crusher: [["bits", 2, 16, 8], ["divide", 1, 32, 1], ["mix", 0, 1, 1]], pitch: [["semitones", -24, 24, -12], ["cents", -50, 50, 0], ["mix", 0, 1, 0.5]], zplane: [["a", 0, 63, 0], ["b", 0, 63, 2], ["morph", 0, 1, 0], ["shift", -1, 1, 0], ["q", 0, 1, 0.5], ["mix", 0, 1, 1]] });
+var rows = (raw) => Array.isArray(raw) && raw.length === 12 && raw.every((r) => Array.isArray(r) && r.length === 3 && r.every(Number.isFinite) && r[0] >= 20 && r[0] <= 12e3 && r[1] >= 8 && r[1] <= 8e3 && r[2] >= -30 && r[2] <= 30);
+function validateOwnedRackFxSpec(raw) {
+  const c = JSON.parse(JSON.stringify(raw)), parameters = RACK_FX_PARAMETERS[c?.kind];
+  if (c?.version !== 1 || !parameters || !Array.isArray(c.parameters) || c.parameters.length !== parameters.length) throw Error("Invalid owned rack FX configuration");
+  const ids = /* @__PURE__ */ new Set();
+  for (const p of c.parameters) {
+    if (!Array.isArray(p) || p.length !== 2 || !Number.isInteger(p[0]) || ids.has(p[0])) throw Error("Invalid rack FX parameter identity");
+    const d = parameters[p[0]], v = p[1];
+    if (!d || typeof v !== "number" || !Number.isFinite(v) || v < d[1] || v > d[2]) throw Error("Invalid rack FX parameter value");
+    ids.add(p[0]);
+  }
+  if (c.kind === "zplane") {
+    if (!Array.isArray(c.shapes) || c.shapes.length < 1 || c.shapes.length > 64 || c.shapes.some((s) => !rows(s)) || !rows(c.custom?.a) || !rows(c.custom?.b)) throw Error("Invalid rack FX shapes");
+  } else if (c.shapes !== void 0 || c.custom !== void 0) throw Error("Shapes require z-plane");
+  return c;
+}
+
+// src/modular-audio/ownedVoiceFx.js
+var VOICE_FX_KINDS = Object.freeze(["shimmer", "freeze"]);
+var VOICE_FX_RANDOM = "xorshift32-v1";
+var VOICE_FX_PARAMETERS = Object.freeze({ shimmer: [["mix", 0, 1, 0], ["decay", 0.3, 30, 6], ["semitones", 0, 24, 12], ["climb", 0, 0.95, 0.5], ["tone", 500, 16e3, 7e3]], freeze: [["mix", 0, 1, 0], ["hold", 0, 1, 0], ["length", 0.25, 4, 2], ["fade", 0.02, 30, 1]] });
+function validateOwnedVoiceFxSpec(raw) {
+  const c = JSON.parse(JSON.stringify(raw)), parameters = VOICE_FX_PARAMETERS[c?.kind];
+  if (c?.version !== 1 || !parameters || c.random !== VOICE_FX_RANDOM || !Number.isInteger(c.seed) || c.seed < 1 || c.seed > 4294967295 || !Array.isArray(c.parameters) || c.parameters.length !== parameters.length) throw Error("Invalid owned voice FX configuration");
+  const ids = /* @__PURE__ */ new Set();
+  for (const p of c.parameters) {
+    if (!Array.isArray(p) || p.length !== 2 || !Number.isInteger(p[0]) || ids.has(p[0])) throw Error("Invalid voice FX parameter identity");
+    const d = parameters[p[0]], v = p[1];
+    if (!d || typeof v !== "number" || !Number.isFinite(v) || v < d[1] || v > d[2] || c.kind === "freeze" && p[0] === 1 && v !== 0 && v !== 1) throw Error("Invalid voice FX parameter value");
+    ids.add(p[0]);
+  }
+  return c;
+}
+
+// src/modular-audio/executionPolicy.js
+function workerOnlyModules(patch, contracts) {
+  const modules = Array.isArray(patch?.modules) ? patch.modules : [], descriptors = Array.isArray(contracts?.modules) ? contracts.modules : [];
+  return modules.filter((n) => n.type === "voice.freeze" || descriptors.some((d) => d.type === n.type && d.version === n.version && d.execution === "worker-only")).map((n) => ({ id: n.id, type: n.type, version: n.version }));
+}
+function workerRequiredMessage(modules) {
+  return `Worker executor required for ${modules.map((n) => `${n.type}${n.id === void 0 ? "" : ` (module ${n.id})`}`).join(", ")}; serial realtime playback is unavailable.`;
+}
+function assertSerialRealtimeAllowed(patch, contracts) {
+  const modules = workerOnlyModules(patch, contracts);
+  if (modules.length) throw Error(workerRequiredMessage(modules));
+}
+
 // src/modular-audio/runtime.js
 var checked = (code) => {
-  if (code) throw Error(`Graph rejected operation (${code})`);
+  if (code) throw Error(code === 9 ? "Latency compensation requires fixed integer path differences; fractional differences or changing FM quality need another alignment policy." : `Graph rejected operation (${code})`);
 };
 var uint = (n) => Number.isInteger(n) && n > 0 && n <= 4294967295;
 var frame3 = (n) => Number.isSafeInteger(n) && n >= 0;
-var finite3 = (n) => typeof n === "number" && Number.isFinite(n);
+var finite4 = (n) => typeof n === "number" && Number.isFinite(n);
 function validatePatch(raw, contracts) {
   const p = JSON.parse(JSON.stringify(raw));
+  if (p.latencyCompensation !== void 0 && typeof p.latencyCompensation !== "boolean") throw Error("Invalid latency compensation policy");
   if (p?.version !== contracts.patchVersion || !Array.isArray(p.modules) || !p.modules.length || p.modules.length > contracts.maxNodes || !Array.isArray(p.connections) || p.connections.length > contracts.maxEdges || !Array.isArray(p.events) || p.events.length > contracts.maxEvents) throw Error("Invalid patch version or resource bounds");
   const modules = /* @__PURE__ */ new Map(), edges = /* @__PURE__ */ new Set(), inputs = /* @__PURE__ */ new Set(), dependencies = /* @__PURE__ */ new Map();
   for (const n of p.modules) {
@@ -325,9 +528,27 @@ function validatePatch(raw, contracts) {
     if (!uint(n.id) || modules.has(n.id) || !d || !n.parameters || typeof n.parameters !== "object" || Array.isArray(n.parameters)) throw Error("Invalid module identity/contract");
     for (const [id, value] of Object.entries(n.parameters)) {
       const param = d.parameters.find((p2) => p2.id === id);
-      if (!param || !finite3(value) || value < param.min || value > param.max || ["enum", "boolean"].includes(param.unit) && !Number.isInteger(value)) throw Error(`Invalid parameter ${id}`);
+      if (!param || !finite4(value) || value < param.min || value > param.max || ["enum", "boolean"].includes(param.unit) && !Number.isInteger(value)) throw Error(`Invalid parameter ${id}`);
     }
     modules.set(n.id, d);
+    if (d.type === "host.audio" && n.config !== void 0 && (n.config?.version !== 1 || !finite4(n.config.latencyFrames) || n.config.latencyFrames < 0 || n.config.latencyFrames > 262144)) throw Error("Invalid declared host input latency");
+    if (d.type.startsWith("desk.")) {
+      n.config = validateMixerConfig(n.config);
+      if (d.type !== `desk.${n.config.kind}` || Object.keys(n.parameters).length || n.config.events.length) throw Error("Mixer graph requires complete matching configuration and graph-owned events");
+    }
+    if (["legacy.inserts", "legacy.effects"].includes(d.type)) {
+      if (Object.keys(n.parameters).length) throw Error("Effects use complete configuration targets");
+      n.config = (d.type === "legacy.inserts" ? validateOwnedInsertsSpec : validateOwnedEffectsSpec)(n.config);
+      const settled = d.type === "legacy.inserts";
+      if (n.config.settled !== void 0 && n.config.settled !== settled) throw Error("Unsupported effect startup policy");
+      n.config.settled = settled;
+    }
+    if (d.type === "graph.delay" && (n.config?.version !== 1 || !Number.isInteger(n.config.frames) || n.config.frames < 0 || n.config.frames > 262144 || Object.keys(n.parameters).length)) throw Error("Invalid fixed delay configuration");
+    if (d.type === "legacy.classic") n.config = validateClassicConfig(n.config);
+    if (d.type.startsWith("rack.") || d.type.startsWith("voice.")) {
+      n.config = (d.type.startsWith("rack.") ? validateOwnedRackFxSpec : validateOwnedVoiceFxSpec)(n.config);
+      if (d.type.split(".")[1] !== n.config.kind || Object.keys(n.parameters).length) throw Error("Effects require complete matching configuration");
+    }
     if (["legacy.core", "legacy.fm"].includes(d.type)) n.config = validatePitchedConfig(n.config, d.type === "legacy.fm");
     if (d.type === "legacy.piano") {
       n.config = validatePianoConfig(n.config);
@@ -355,12 +576,13 @@ function validatePatch(raw, contracts) {
       inputs.add(input);
     } else if (e.kind === "modulation") {
       const dest = target.parameters.find((p2) => p2.id === e.to.parameter);
-      if (source.family !== "control" || source.channels !== 1 || !dest?.modulation || !["bipolar", "unipolar"].includes(e.mapping) || !finite3(e.depth) || Math.abs(e.depth) > 4 || !finite3(e.offset) || Math.abs(e.offset) > 4) throw Error("Incompatible modulation mapping");
+      if (source.family !== "control" || source.channels !== 1 || !dest?.modulation || !["bipolar", "unipolar"].includes(e.mapping) || !finite4(e.depth) || Math.abs(e.depth) > 4 || !finite4(e.offset) || Math.abs(e.offset) > 4) throw Error("Incompatible modulation mapping");
     } else throw Error("Unsupported connection family");
     dependencies.get(e.to.module).add(e.from.module);
   }
   if (p.modules.filter((n) => n.type === "legacy.percussion").length > 8) throw Error("Percussion instance limit exceeded");
-  if (p.modules.filter((n) => ["legacy.core", "legacy.fm", "legacy.piano", "legacy.iowa"].includes(n.type)).length > 8) throw Error("Pitched instance limit exceeded");
+  if (p.modules.filter((n) => n.type === "legacy.inserts").length > 8 || p.modules.filter((n) => n.type === "legacy.effects").length > 4) throw Error("Effects instance limit exceeded");
+  if (p.modules.filter((n) => ["legacy.core", "legacy.fm", "legacy.piano", "legacy.iowa", "legacy.classic"].includes(n.type)).length > 8) throw Error("Pitched instance limit exceeded");
   if ([...modules.values()].filter((d) => d.type === "ref.output").length !== 1) throw Error("Exactly one output is required");
   for (const [id, d] of modules) for (const port of d.ports) if (port.required && !inputs.has(`${id}:${port.id}`)) throw Error("Missing required input");
   const ready = /* @__PURE__ */ new Set();
@@ -370,6 +592,7 @@ function validatePatch(raw, contracts) {
     ready.add(next[0]);
   }
   const owners = /* @__PURE__ */ new Map();
+  if (p.modules.filter((n) => n.type === "voice.freeze").length > 2 || p.modules.filter((n) => n.type.startsWith("voice.")).length > 8 || p.modules.filter((n) => n.type.startsWith("rack.")).length > 16) throw Error("Owned effect instance bounds");
   for (const e of p.events) {
     eventPacket(e, modules, p.connections);
     if (e.kind === "note" && e.note && [0, 1, 3, 5].includes(e.event)) {
@@ -404,26 +627,40 @@ function validatePatch(raw, contracts) {
     }
   }
   for (const n of p.modules) if (p.events.filter((e) => e.target === n.id && e.kind === "note").length > 4e3) throw Error("Pitched note capacity exceeded");
+  for (const n of p.modules.filter((n2) => n2.type === "legacy.classic")) {
+    const events = p.events.filter((e) => e.target === n.id && e.kind === "classic");
+    if (events.length > 4e3 || new Set(events.map((e) => e.owner)).size > 1 || events.some((e) => e.event === 5 && !classicParameter(n.config.model, e.id) || e.event === 6 && ![8, 9, 10, 11, 13].includes(n.config.model))) throw Error("Invalid classic source contract");
+  }
   return p;
 }
 function eventPacket(e, modules, connections) {
   const d = modules.get(e.target);
   if (!frame3(e.frame) || !uint(e.owner) || !d) throw Error("Invalid event frame/ownership/target");
+  if (d.type === "legacy.classic") {
+    if (e.kind === "cancel") return [e.frame, e.target, e.owner, 4, 0, 0];
+    if (e.kind === "classic" && Number.isInteger(e.event) && e.event >= 0 && e.event <= 6 && Number.isInteger(e.id) && e.id >= 0 && e.id <= 4294967295 && finite4(e.a) && finite4(e.b) && Number.isFinite(Math.fround(e.a)) && Number.isFinite(Math.fround(e.b))) {
+      const k = e.event;
+      if ([0, 1, 3].includes(k) && !e.id || k === 0 && (e.a < 0 || e.a > 127 || e.b < 0 || e.b > 1) || k === 2 && e.id > 6 || k === 3 && (e.a < 0 || e.a > 1) || k === 5 && e.id > 215 || k === 6 && (e.id > 7 || e.a < 0 || e.a > 16777215 || !Number.isInteger(e.a))) throw Error("Invalid classic event values");
+      return [e.frame, e.target, e.owner, k, e.id, e.a, e.b];
+    }
+  }
   if (["legacy.core", "legacy.fm", "legacy.piano", "legacy.iowa"].includes(d.type)) {
     if (d.type === "legacy.iowa" && e.kind === "note" && (![0, 1, 4].includes(e.event) || e.frame % 128 !== 0)) throw Error("Iowa notes require canonical 128-frame ticks");
     if (d.type === "legacy.piano" && e.kind === "note" && ![0, 4].includes(e.event)) throw Error("Unsupported finite piano event");
     if (e.kind === "cancel") return [e.frame, e.target, e.owner, 4, 0, 0];
-    if (e.kind === "note" && Number.isInteger(e.event) && e.event >= 0 && e.event <= 6 && Number.isInteger(e.note) && e.note >= 0 && e.note <= 4294967295 && finite3(e.a) && finite3(e.b)) {
+    if (e.kind === "note" && Number.isInteger(e.event) && e.event >= 0 && e.event <= 6 && Number.isInteger(e.note) && e.note >= 0 && e.note <= 4294967295 && finite4(e.a) && finite4(e.b)) {
       const k = e.event, id = e.note, a = e.a, b = e.b;
       if ([0, 1, 5].includes(k) && !id || k === 0 && (a < 0 || a > 127 || b < 0 || b > 1) || [2, 3].includes(k) && (a < 0 || a > 1) || k === 5 && (a < 0 || a > 127 || b < 0 || b > 8) || k === 6 && (id > 2 || a < 0 || a > 3 || b < 0 || b > 1)) throw Error("Invalid pitched note values");
       return [e.frame, e.target, e.owner, k, id, a, b];
     }
   }
   if (e.kind === "gate" && d.type === "ref.tone" && typeof e.value === "boolean") return [e.frame, e.target, e.owner, 1, 0, Number(e.value)];
-  if (e.kind === "hit" && d.type === "legacy.percussion" && Number.isInteger(e.drum) && e.drum >= 0 && e.drum < 14 && Number.isInteger(e.model) && e.model >= 0 && e.model <= 2 && Number.isInteger(e.hit) && e.hit >= 0 && e.hit <= 4294967295 && finite3(e.velocity) && e.velocity >= 0 && e.velocity <= 1 && finite3(e.duration) && e.duration >= 0 && e.duration <= 30 && finite3(e.vary) && Math.abs(e.vary) <= 1 && finite3(e.tone) && Math.abs(e.tone) <= 1 && finite3(e.decay) && e.decay >= 0.5 && e.decay <= 2) return [e.frame, e.target, e.owner, e.drum, e.velocity, e.duration, e.vary, e.tone, e.decay, e.hit, e.model];
+  if (e.kind === "hit" && d.type === "legacy.percussion" && Number.isInteger(e.drum) && e.drum >= 0 && e.drum < 14 && Number.isInteger(e.model) && e.model >= 0 && e.model <= 2 && Number.isInteger(e.hit) && e.hit >= 0 && e.hit <= 4294967295 && finite4(e.velocity) && e.velocity >= 0 && e.velocity <= 1 && finite4(e.duration) && e.duration >= 0 && e.duration <= 30 && finite4(e.vary) && Math.abs(e.vary) <= 1 && finite4(e.tone) && Math.abs(e.tone) <= 1 && finite4(e.decay) && e.decay >= 0.5 && e.decay <= 2) return [e.frame, e.target, e.owner, e.drum, e.velocity, e.duration, e.vary, e.tone, e.decay, e.hit, e.model];
   if (e.kind === "parameter") {
+    if ((["legacy.inserts", "legacy.effects"].includes(d.type) || d.type.startsWith("rack.") || d.type.startsWith("voice.")) && e.frame % 128 !== 0) throw Error("Effect parameters require canonical 128-frame input boundaries");
+    if (d.type === "voice.freeze" && e.parameter === "hold" && e.value !== 0 && e.value !== 1) throw Error("Invalid Freeze hold");
     const p = d.parameters.find((p2) => p2.id === e.parameter);
-    if (p && finite3(e.value) && e.value >= p.min && e.value <= p.max && (!["enum", "boolean"].includes(p.unit) || Number.isInteger(e.value))) return [e.frame, e.target, e.owner, 0, p.code, e.value];
+    if (p && finite4(e.value) && e.value >= p.min && e.value <= p.max && (!["enum", "boolean"].includes(p.unit) || Number.isInteger(e.value))) return [e.frame, e.target, e.owner, 0, p.code, e.value];
   }
   if (e.kind === "modulation" && typeof e.value === "boolean" && connections.some((c) => c.id === e.edge && c.kind === "modulation" && c.to.module === e.target)) return [e.frame, e.target, e.owner, 2, e.edge, Number(e.value)];
   if (e.kind === "connection" && typeof e.value === "boolean" && d.type === "graph.compressor" && connections.some((c) => c.id === e.edge && c.kind === "audio" && c.to.module === e.target && c.to.port === "detector.in")) return [e.frame, e.target, e.owner, 3, e.edge, Number(e.value)];
@@ -442,6 +679,7 @@ var ReferenceGraph = class {
     this.patch = validatePatch(patch, contracts);
     if (this.patch.modules.some((n) => n.type === "legacy.piano") && sampleRate !== 48e3) throw Error("Prepared piano v1 requires 48 kHz");
     if (this.patch.modules.some((n) => n.type === "legacy.iowa" && n.config.sampleRate !== sampleRate)) throw Error("Prepared Iowa sample rate mismatch");
+    if (this.patch.modules.some((n) => n.type.startsWith("desk.") && n.config.sampleRate !== sampleRate)) throw Error("Mixer sample rate mismatch");
     this.contracts = contracts;
     this.modules = new Map(this.patch.modules.map((n) => [n.id, contracts.modules.find((d) => d.type === n.type && d.version === n.version)]));
     if (engine.graph_api() !== contracts.api) throw Error("Graph ABI mismatch");
@@ -449,10 +687,39 @@ var ReferenceGraph = class {
     if (!this.handle) throw Error("Invalid sample rate/block size");
     this.maxBlock = maxBlock;
     try {
+      checked(engine.graph_latency_compensation(this.handle, Number(this.patch.latencyCompensation ?? false)));
       for (const n of this.patch.modules) {
         const d = this.modules.get(n.id);
         checked(engine.graph_node(this.handle, n.id, d.code, n.version));
         for (const [key, value] of Object.entries(n.parameters)) checked(engine.graph_base(this.handle, n.id, d.parameters.find((p) => p.id === key).code, value));
+        if (d.type === "host.audio" && n.config) checked(engine.graph_input_latency(this.handle, n.id, n.config.latencyFrames));
+        if (d.type.startsWith("desk.")) n.config.parameters.forEach((value, index) => checked(engine.graph_mixer_config(this.handle, n.id, index, value, Number(n.config.settled))));
+        if (d.type === "legacy.classic") {
+          const c = n.config;
+          checked(engine.graph_classic_config(this.handle, n.id, c.model, c.polyphony));
+          for (const [index, value] of c.parameters) checked(engine.graph_classic_param(this.handle, n.id, index, value));
+          if (c.waves) {
+            const len = engine.graph_classic_wave_len(this.handle, n.id), ptr = engine.graph_classic_wave_ptr(this.handle, n.id);
+            if (len !== c.waves.length || !ptr) throw Error("Classic wave preparation mismatch");
+            new Float32Array(engine.memory.buffer, ptr, len).set(c.waves);
+            checked(engine.graph_classic_wave_commit(this.handle, n.id));
+          }
+        }
+        if (d.type.startsWith("rack.") || d.type.startsWith("voice.")) {
+          const c = n.config;
+          if (d.type.startsWith("voice.")) checked(engine.graph_voice_fx_config(this.handle, n.id, c.seed));
+          for (const [index, value] of c.parameters) checked(engine.graph_fx_initial(this.handle, n.id, index, value));
+          if (c.kind === "zplane") {
+            checked(engine.graph_rack_shape_count(this.handle, n.id, c.shapes.length));
+            c.shapes.forEach((rows2, shape) => rows2.forEach((row, section) => checked(engine.graph_rack_shape_row(this.handle, n.id, shape, section, ...row))));
+            ["a", "b"].forEach((key, i) => c.custom[key].forEach((row, section) => checked(engine.graph_rack_shape_row(this.handle, n.id, 64 + i, section, ...row))));
+          }
+        }
+        if (["legacy.inserts", "legacy.effects"].includes(d.type)) {
+          for (const [index, value] of n.config.parameters) checked(engine.graph_base(this.handle, n.id, index, value));
+          checked(engine.graph_fx_config(this.handle, n.id, Number(n.config.settled)));
+        }
+        if (d.type === "graph.delay") checked(engine.graph_delay_config(this.handle, n.id, n.config.frames));
         if (d.type === "legacy.percussion" && n.config) {
           const c = n.config;
           checked(engine.graph_percussion_config(this.handle, n.id, c.version, d.kitConfiguration.voices.indexOf(c.voice) + 1));
@@ -528,7 +795,17 @@ var ReferenceGraph = class {
   }
   enqueue(event) {
     this.alive();
-    checked(this.engine[event.kind === "hit" ? "graph_hit" : event.kind === "note" ? "graph_note" : "graph_event"](this.handle, ...eventPacket(event, this.modules, this.patch.connections)));
+    if (event.kind === "parameter" && this.modules.get(event.target)?.type.startsWith("desk.")) {
+      const packet3 = eventPacket(event, this.modules, this.patch.connections);
+      checked(this.engine.graph_mixer_param(this.handle, packet3[0], packet3[1], packet3[2], packet3[4], packet3[5]));
+      return;
+    }
+    if (event.kind === "parameter" && ["rack.", "voice."].some((prefix) => this.modules.get(event.target)?.type.startsWith(prefix))) {
+      const p = eventPacket(event, this.modules, this.patch.connections);
+      checked(this.engine.graph_fx_param(this.handle, p[0], p[1], p[2], p[4], p[5]));
+      return;
+    }
+    checked(this.engine[event.kind === "classic" ? "graph_classic_event" : event.kind === "hit" ? "graph_hit" : event.kind === "note" ? "graph_note" : "graph_event"](this.handle, ...eventPacket(event, this.modules, this.patch.connections)));
   }
   alive() {
     if (!this.handle) throw Error("Disposed graph");
@@ -542,9 +819,33 @@ var ReferenceGraph = class {
     this.alive();
     return Object.fromEntries(["frame", "late", "overflow", "applied"].map((key, i) => [key, this.engine.graph_stat(this.handle, i)]));
   }
+  baseValue(id, parameter) {
+    this.alive();
+    const d = this.modules.get(id), p = d?.parameters.find((p2) => p2.id === parameter);
+    if (!p) throw Error("Invalid parameter");
+    return this.engine[d.type.startsWith("desk.") ? "graph_mixer_value" : ["rack.", "voice."].some((x) => d.type.startsWith(x)) ? "graph_fx_value" : "graph_get_base"](this.handle, id, p.code);
+  }
+  latency(id) {
+    this.alive();
+    const value = this.engine.graph_latency(this.handle, id);
+    if (!Number.isFinite(value)) throw Error("Invalid latency module");
+    return value;
+  }
+  edgeLatency(id) {
+    this.alive();
+    const value = this.engine.graph_edge_latency(this.handle, id);
+    if (!Number.isFinite(value)) throw Error("Invalid latency edge");
+    return value;
+  }
+  effectStats(id) {
+    this.alive();
+    const t = this.modules.get(id)?.type;
+    if (!["legacy.inserts", "legacy.effects"].includes(t) && !["rack.", "voice."].some((p) => t?.startsWith(p))) throw Error("Not an effect node");
+    return Object.fromEntries([["peak", 0], ["latencyFrames", 16], ["phase", 17], ["frame", 18]].map(([k, i]) => [k, this.engine.graph_fx_stat(this.handle, id, i)]));
+  }
   pitchedStats(id) {
     this.alive();
-    if (!["legacy.core", "legacy.fm", "legacy.piano", "legacy.iowa"].includes(this.modules.get(id)?.type)) throw Error("Not a pitched node");
+    if (!["legacy.core", "legacy.fm", "legacy.piano", "legacy.iowa", "legacy.classic"].includes(this.modules.get(id)?.type)) throw Error("Not a pitched node");
     return Object.fromEntries(["active", "steals", "dropped", "late", "frame", "peak", "latencyFrames", "peakActive"].map((key, i) => [key, this.engine.graph_pitch_stat(this.handle, id, i)]));
   }
   percussionStats(id) {
@@ -579,6 +880,7 @@ var ReferenceGraph = class {
 };
 export {
   ReferenceGraph,
+  assertSerialRealtimeAllowed,
   checked,
   loadPatch,
   savePatch,

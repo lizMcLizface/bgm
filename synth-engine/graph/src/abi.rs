@@ -24,6 +24,54 @@ pub unsafe extern "C" fn graph_contracts_free(s: *mut String) {
 fn status(result: Result<()>) -> u32 {
     result.err().map_or(0, |e| e as u32)
 }
+#[no_mangle]
+pub extern "C" fn graph_latency_compensation(g:&mut Graph,enabled:u32)->u32{if enabled>1{return Error::Contract as u32;}status(g.latency_compensation(enabled!=0))}
+#[no_mangle]
+pub extern "C" fn graph_fx_config(g:&mut Graph,id:u32,settled:u32)->u32{if settled>1{return Error::Contract as u32;}status(g.fx_config(id,settled!=0))}
+#[no_mangle]
+pub extern "C" fn graph_delay_config(g:&mut Graph,id:u32,frames:usize)->u32{status(g.delay_config(id,frames))}
+#[no_mangle]
+pub extern "C" fn graph_input_latency(g:&mut Graph,id:u32,frames:f64)->u32{status(g.input_latency(id,frames))}
+#[no_mangle]
+pub extern "C" fn graph_latency(g:&Graph,id:u32)->f64{g.latency(id).map_or(f64::NAN,|n|n as f64)}
+#[no_mangle]
+pub extern "C" fn graph_edge_latency(g:&Graph,id:u32)->f64{g.edge_latency(id).map_or(f64::NAN,|n|n as f64)}
+#[no_mangle]
+pub extern "C" fn graph_fx_stat(g:&Graph,id:u32,index:u32)->f64{g.effect_stat(id,index).unwrap_or(f64::NAN)}
+#[no_mangle]
+pub extern "C" fn graph_get_base(g:&Graph,id:u32,index:usize)->f32{g.base(id,index).unwrap_or(f32::NAN)}
+#[no_mangle]
+pub extern "C" fn graph_mixer_config(g:&mut Graph,id:u32,index:usize,value:f64,settled:u32)->u32{if settled>1{return Error::Contract as u32;}status(g.mixer_config(id,index,value,settled!=0))}
+#[no_mangle]
+pub extern "C" fn graph_mixer_value(g:&Graph,id:u32,index:usize)->f64{g.mixer_value(id,index).unwrap_or(f64::NAN)}
+#[no_mangle]
+pub extern "C" fn graph_mixer_reduction(g:&Graph,id:u32)->f64{g.mixer_reduction(id).unwrap_or(f64::NAN)}
+#[no_mangle]
+pub extern "C" fn graph_mixer_param(g:&mut Graph,frame:f64,target:u32,owner:u32,index:usize,value:f64)->u32{if !frame.is_finite()||frame<0.||frame.fract()!=0.||frame>MAX_FRAME as f64{return Error::Frame as u32;}status(g.enqueue(Event{frame:frame as u64,target,owner,action:Action::MixerParam{param:index,value}}))}
+#[no_mangle]
+pub extern "C" fn graph_classic_config(g:&mut Graph,id:u32,model:u32,polyphony:usize)->u32{status(g.classic_config(id,model,polyphony))}
+#[no_mangle]
+pub extern "C" fn graph_classic_param(g:&mut Graph,id:u32,index:u32,value:f32)->u32{match g.classic_edit(id){Ok(p)=>if p.initial_param(index,value){0}else{Error::Contract as u32},Err(e)=>e as u32}}
+#[no_mangle]
+pub extern "C" fn graph_classic_wave_ptr(g:&mut Graph,id:u32)->*mut f32{g.classic_edit(id).map_or(std::ptr::null_mut(),|p|p.wave_ptr())}
+#[no_mangle]
+pub extern "C" fn graph_classic_wave_len(g:&mut Graph,id:u32)->usize{g.classic_edit(id).map_or(0,|p|p.wave_len())}
+#[no_mangle]
+pub extern "C" fn graph_classic_wave_commit(g:&mut Graph,id:u32)->u32{match g.classic_edit(id){Ok(p)=>if p.wave_commit(){0}else{Error::Contract as u32},Err(e)=>e as u32}}
+#[no_mangle]
+pub extern "C" fn graph_classic_event(g:&mut Graph,frame:f64,target:u32,owner:u32,kind:u32,id:u32,a:f32,b:f32)->u32{if !frame.is_finite()||frame<0.||frame.fract()!=0.||frame>MAX_FRAME as f64{return Error::Frame as u32;}status(g.enqueue(Event{frame:frame as u64,target,owner,action:Action::Classic{kind,id,a,b}}))}
+#[no_mangle]
+pub extern "C" fn graph_voice_fx_config(g:&mut Graph,id:u32,seed:u32)->u32{status(g.voice_fx_config(id,seed))}
+#[no_mangle]
+pub extern "C" fn graph_fx_initial(g:&mut Graph,id:u32,index:usize,value:f64)->u32{status(g.fx_initial(id,index,value))}
+#[no_mangle]
+pub extern "C" fn graph_fx_value(g:&Graph,id:u32,index:usize)->f64{g.fx_value(id,index).unwrap_or(f64::NAN)}
+#[no_mangle]
+pub extern "C" fn graph_rack_shape_count(g:&mut Graph,id:u32,count:usize)->u32{match g.rack_edit(id){Ok(p)=>if p.shape_count(count){0}else{Error::Contract as u32},Err(e)=>e as u32}}
+#[no_mangle]
+pub extern "C" fn graph_rack_shape_row(g:&mut Graph,id:u32,shape:usize,section:usize,frequency:f64,bandwidth:f64,boost:f64)->u32{match g.rack_edit(id){Ok(p)=>if p.shape_row(shape,section,[frequency,bandwidth,boost]){0}else{Error::Contract as u32},Err(e)=>e as u32}}
+#[no_mangle]
+pub extern "C" fn graph_fx_param(g:&mut Graph,frame:f64,target:u32,owner:u32,index:usize,value:f64)->u32{if !frame.is_finite()||frame<0.||frame.fract()!=0.||frame>MAX_FRAME as f64{return Error::Frame as u32;}status(g.enqueue(Event{frame:frame as u64,target,owner,action:Action::FxParam{param:index,value}}))}
 fn piano_status(g:&mut Graph,id:u32,f:impl FnOnce(&mut calmbgm_piano::voice::Engine)->bool)->u32 {
     match g.piano_edit(id){Ok(p)=>if f(p){0}else{Error::Contract as u32},Err(e)=>e as u32}
 }

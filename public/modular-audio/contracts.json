@@ -5,6 +5,14 @@
   "maxEdges": 128,
   "maxEvents": 4096,
   "maxBlock": 2048,
+  "latencyCompensation": {
+    "default": false,
+    "policy": "fixed integer path differences only",
+    "fractional": "reported exactly; unequal fractional differences rejected",
+    "timeVarying": "prepared FM quality target changes rejected when enabled",
+    "maxDelayFrames": 262144,
+    "maxTotalDelayFrames": 1048576
+  },
   "modules": [
     {
       "type": "ref.tone",
@@ -998,6 +1006,1624 @@
       "maxRollHits": 12,
       "maxPreparedBytes": 67108864,
       "timingPolicy": "on/off at legacy quantum; arbitrary executor blocks do not alter voice ticks"
+    },
+    {
+      "type": "legacy.inserts",
+      "code": 12,
+      "version": 1,
+      "hostInput": false,
+      "latencyFrames": 128,
+      "tailFrames": -1,
+      "tailPolicy": "native kernel parameter-dependent decay; no silent truncation",
+      "bypass": "unsupported",
+      "reset": "phase and voices cleared; compressor gain reset",
+      "ports": [
+        {
+          "id": "program.in",
+          "code": 0,
+          "direction": "in",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": true
+        },
+        {
+          "id": "audio.out",
+          "code": 1,
+          "direction": "out",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": false
+        }
+      ],
+      "parameters": [
+        {
+          "id": "bypass",
+          "code": 0,
+          "unit": "native",
+          "min": 0,
+          "max": 1,
+          "default": 0,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "saturation",
+          "code": 1,
+          "unit": "native",
+          "min": 0,
+          "max": 1,
+          "default": 0,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "drive",
+          "code": 2,
+          "unit": "dB",
+          "min": 0,
+          "max": 24,
+          "default": 6,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "lowGain",
+          "code": 3,
+          "unit": "dB",
+          "min": -12,
+          "max": 12,
+          "default": 0,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "lowFreq",
+          "code": 4,
+          "unit": "Hz",
+          "min": 60,
+          "max": 600,
+          "default": 180,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "midGain",
+          "code": 5,
+          "unit": "dB",
+          "min": -12,
+          "max": 12,
+          "default": 0,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "midFreq",
+          "code": 6,
+          "unit": "Hz",
+          "min": 200,
+          "max": 6000,
+          "default": 1000,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "midQ",
+          "code": 7,
+          "unit": "native",
+          "min": 0.2,
+          "max": 4,
+          "default": 0.7,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "highGain",
+          "code": 8,
+          "unit": "dB",
+          "min": -12,
+          "max": 12,
+          "default": 0,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "highFreq",
+          "code": 9,
+          "unit": "Hz",
+          "min": 1500,
+          "max": 12000,
+          "default": 6000,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "phaser",
+          "code": 10,
+          "unit": "native",
+          "min": 0,
+          "max": 1,
+          "default": 0,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "phaserRate",
+          "code": 11,
+          "unit": "Hz",
+          "min": 0.02,
+          "max": 5,
+          "default": 0.15,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "phaserDepth",
+          "code": 12,
+          "unit": "octaves",
+          "min": 0,
+          "max": 3,
+          "default": 1.5,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "phaserFreq",
+          "code": 13,
+          "unit": "Hz",
+          "min": 100,
+          "max": 4000,
+          "default": 700,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "phaserFeedback",
+          "code": 14,
+          "unit": "native",
+          "min": -0.75,
+          "max": 0.75,
+          "default": 0.2,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "flanger",
+          "code": 15,
+          "unit": "native",
+          "min": 0,
+          "max": 1,
+          "default": 0,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "flangerRate",
+          "code": 16,
+          "unit": "Hz",
+          "min": 0.02,
+          "max": 5,
+          "default": 0.12,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "flangerDepth",
+          "code": 17,
+          "unit": "ms",
+          "min": 0,
+          "max": 4,
+          "default": 1,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "flangerDelay",
+          "code": 18,
+          "unit": "ms",
+          "min": 0.3,
+          "max": 20,
+          "default": 2,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "flangerFeedback",
+          "code": 19,
+          "unit": "native",
+          "min": -0.85,
+          "max": 0.85,
+          "default": 0.35,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "chorus",
+          "code": 20,
+          "unit": "native",
+          "min": 0,
+          "max": 0.8,
+          "default": 0,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "chorusRate",
+          "code": 21,
+          "unit": "Hz",
+          "min": 0.05,
+          "max": 10,
+          "default": 0.35,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "chorusDepth",
+          "code": 22,
+          "unit": "ms",
+          "min": 0,
+          "max": 8,
+          "default": 3.5,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "gain",
+          "code": 23,
+          "unit": "dB",
+          "min": -18,
+          "max": 6,
+          "default": 0,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "phaserSpread",
+          "code": 24,
+          "unit": "cycles",
+          "min": 0,
+          "max": 0.5,
+          "default": 0.25,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "flangerSpread",
+          "code": 25,
+          "unit": "cycles",
+          "min": 0,
+          "max": 0.5,
+          "default": 0.5,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "chorusSpread",
+          "code": 26,
+          "unit": "cycles",
+          "min": 0,
+          "max": 0.5,
+          "default": 0.5,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "chorusFeedback",
+          "code": 27,
+          "unit": "native",
+          "min": -0.6,
+          "max": 0.6,
+          "default": 0,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "phaserStages",
+          "code": 28,
+          "unit": "native",
+          "min": 2,
+          "max": 12,
+          "default": 6,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        }
+      ],
+      "events": [
+        "parameter"
+      ],
+      "processing": "owned native kernel, canonical 128-frame input capture",
+      "parameterQuantumFrames": 128,
+      "adapterLatencyFrames": 128,
+      "resetPolicy": "retain latest targets; clear cached output and native tails",
+      "smoothingPolicy": "original native parameter-specific smoothing; no extra graph smoothing"
+    },
+    {
+      "type": "legacy.effects",
+      "code": 13,
+      "version": 1,
+      "hostInput": false,
+      "latencyFrames": 128,
+      "tailFrames": -1,
+      "tailPolicy": "native kernel parameter-dependent decay; no silent truncation",
+      "bypass": "unsupported",
+      "reset": "phase and voices cleared; compressor gain reset",
+      "ports": [
+        {
+          "id": "program.in",
+          "code": 0,
+          "direction": "in",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": true
+        },
+        {
+          "id": "reverb.in",
+          "code": 1,
+          "direction": "in",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "reverb-send",
+          "required": false
+        },
+        {
+          "id": "delay.in",
+          "code": 2,
+          "direction": "in",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "delay-send",
+          "required": false
+        },
+        {
+          "id": "audio.out",
+          "code": 3,
+          "direction": "out",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": false
+        }
+      ],
+      "parameters": [
+        {
+          "id": "dry",
+          "code": 0,
+          "unit": "native",
+          "min": 0,
+          "max": 1,
+          "default": 1,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "reverb",
+          "code": 1,
+          "unit": "native",
+          "min": 0,
+          "max": 0.8,
+          "default": 0.22,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "delay",
+          "code": 2,
+          "unit": "native",
+          "min": 0,
+          "max": 0.8,
+          "default": 0.12,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "decay",
+          "code": 3,
+          "unit": "s",
+          "min": 0.3,
+          "max": 30,
+          "default": 8,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "size",
+          "code": 4,
+          "unit": "native",
+          "min": 0.2,
+          "max": 1,
+          "default": 0.7,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "damping",
+          "code": 5,
+          "unit": "Hz",
+          "min": 500,
+          "max": 16000,
+          "default": 6000,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "predelay",
+          "code": 6,
+          "unit": "ms",
+          "min": 0,
+          "max": 150,
+          "default": 25,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "width",
+          "code": 7,
+          "unit": "native",
+          "min": 0,
+          "max": 1,
+          "default": 1,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "modulation",
+          "code": 8,
+          "unit": "native",
+          "min": 0,
+          "max": 1,
+          "default": 0.3,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "delayMs",
+          "code": 9,
+          "unit": "ms",
+          "min": 40,
+          "max": 2000,
+          "default": 375,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "feedback",
+          "code": 10,
+          "unit": "native",
+          "min": 0,
+          "max": 0.85,
+          "default": 0.4,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "tone",
+          "code": 11,
+          "unit": "Hz",
+          "min": 300,
+          "max": 14000,
+          "default": 4500,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "pingPong",
+          "code": 12,
+          "unit": "native",
+          "min": 0,
+          "max": 1,
+          "default": 1,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "delayToReverb",
+          "code": 13,
+          "unit": "native",
+          "min": 0,
+          "max": 1,
+          "default": 0.2,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "quality",
+          "code": 14,
+          "unit": "native",
+          "min": 0,
+          "max": 1,
+          "default": 1,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "bypass",
+          "code": 15,
+          "unit": "native",
+          "min": 0,
+          "max": 1,
+          "default": 0,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "reverbReturn",
+          "code": 16,
+          "unit": "dB",
+          "min": -24,
+          "max": 18,
+          "default": 0,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "reflections",
+          "code": 17,
+          "unit": "native",
+          "min": 0,
+          "max": 8,
+          "default": 0,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "feedbackLow",
+          "code": 18,
+          "unit": "Hz",
+          "min": 0,
+          "max": 1000,
+          "default": 0,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "duck",
+          "code": 19,
+          "unit": "native",
+          "min": 0,
+          "max": 1,
+          "default": 0,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "reverbType",
+          "code": 20,
+          "unit": "native",
+          "min": 0,
+          "max": 3,
+          "default": 0,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        }
+      ],
+      "events": [
+        "parameter"
+      ],
+      "processing": "owned native kernel, canonical 128-frame input capture",
+      "parameterQuantumFrames": 128,
+      "adapterLatencyFrames": 128,
+      "resetPolicy": "retain latest targets; clear cached output and native tails",
+      "smoothingPolicy": "original native parameter-specific smoothing; no extra graph smoothing"
+    },
+    {
+      "type": "graph.delay",
+      "code": 14,
+      "version": 1,
+      "hostInput": false,
+      "latencyFrames": null,
+      "tailFrames": -1,
+      "tailPolicy": "configured buffered frames",
+      "bypass": "unsupported",
+      "reset": "phase and voices cleared; compressor gain reset",
+      "ports": [
+        {
+          "id": "program.in",
+          "code": 0,
+          "direction": "in",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": true
+        },
+        {
+          "id": "audio.out",
+          "code": 1,
+          "direction": "out",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": false
+        }
+      ],
+      "parameters": [],
+      "events": [],
+      "configuration": "immutable delay frames; maximum 262144",
+      "latencyPolicy": "configured frames; use graph latency query"
+    },
+    {
+      "type": "desk.strip",
+      "code": 15,
+      "version": 1,
+      "hostInput": false,
+      "latencyFrames": 0,
+      "tailFrames": -1,
+      "tailPolicy": "none",
+      "bypass": "unsupported",
+      "reset": "phase and voices cleared; compressor gain reset",
+      "ports": [
+        {
+          "id": "program.in",
+          "code": 0,
+          "direction": "in",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": true
+        },
+        {
+          "id": "audio.out",
+          "code": 1,
+          "direction": "out",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": false
+        }
+      ],
+      "parameters": [
+        {
+          "id": "trim",
+          "code": 0,
+          "unit": "linear",
+          "min": 0,
+          "max": 64,
+          "default": 1,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 12
+        },
+        {
+          "id": "highpass",
+          "code": 1,
+          "unit": "Hz",
+          "min": 0,
+          "max": 96000,
+          "default": 350,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 12
+        },
+        {
+          "id": "lowpass",
+          "code": 2,
+          "unit": "Hz",
+          "min": 0,
+          "max": 96000,
+          "default": 350,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 12
+        },
+        {
+          "id": "low",
+          "code": 3,
+          "unit": "dB",
+          "min": -12,
+          "max": 12,
+          "default": 0,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 12
+        },
+        {
+          "id": "mid",
+          "code": 4,
+          "unit": "dB",
+          "min": -12,
+          "max": 12,
+          "default": 0,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 12
+        },
+        {
+          "id": "high",
+          "code": 5,
+          "unit": "dB",
+          "min": -12,
+          "max": 12,
+          "default": 0,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 12
+        },
+        {
+          "id": "pan",
+          "code": 6,
+          "unit": "bipolar",
+          "min": -1,
+          "max": 1,
+          "default": 0,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 12
+        },
+        {
+          "id": "level",
+          "code": 7,
+          "unit": "linear",
+          "min": 0,
+          "max": 4,
+          "default": 1,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 12
+        }
+      ],
+      "events": [
+        "parameter"
+      ],
+      "processing": "owned stereo desk primitive, sample-by-sample",
+      "configuration": "complete mixer config v1 matching sampleRate; graph events own the only clock",
+      "smoothingPolicy": "original 12ms mixer smoothing; limiter immediate",
+      "latencyPolicy": "limiter ceil(sampleRate * 0.003) even when disabled; query prepared instance",
+      "precision": "f64 parameter authority",
+      "resetPolicy": "clear histories; restore latest targets using captured startup settlement"
+    },
+    {
+      "type": "desk.matrix",
+      "code": 16,
+      "version": 1,
+      "hostInput": false,
+      "latencyFrames": 0,
+      "tailFrames": 0,
+      "tailPolicy": "none",
+      "bypass": "unsupported",
+      "reset": "phase and voices cleared; compressor gain reset",
+      "ports": [
+        {
+          "id": "program.in",
+          "code": 0,
+          "direction": "in",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": true
+        },
+        {
+          "id": "audio.out",
+          "code": 1,
+          "direction": "out",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": false
+        }
+      ],
+      "parameters": [
+        {
+          "id": "width",
+          "code": 0,
+          "unit": "linear",
+          "min": 0,
+          "max": 2,
+          "default": 1,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 12
+        },
+        {
+          "id": "pan",
+          "code": 1,
+          "unit": "bipolar",
+          "min": -1,
+          "max": 1,
+          "default": 0,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 12
+        }
+      ],
+      "events": [
+        "parameter"
+      ],
+      "processing": "owned stereo desk primitive, sample-by-sample",
+      "configuration": "complete mixer config v1 matching sampleRate; graph events own the only clock",
+      "smoothingPolicy": "original 12ms mixer smoothing; limiter immediate",
+      "latencyPolicy": "limiter ceil(sampleRate * 0.003) even when disabled; query prepared instance",
+      "precision": "f64 parameter authority",
+      "resetPolicy": "clear histories; restore latest targets using captured startup settlement"
+    },
+    {
+      "type": "desk.fader",
+      "code": 17,
+      "version": 1,
+      "hostInput": false,
+      "latencyFrames": 0,
+      "tailFrames": 0,
+      "tailPolicy": "none",
+      "bypass": "unsupported",
+      "reset": "phase and voices cleared; compressor gain reset",
+      "ports": [
+        {
+          "id": "program.in",
+          "code": 0,
+          "direction": "in",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": true
+        },
+        {
+          "id": "audio.out",
+          "code": 1,
+          "direction": "out",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": false
+        }
+      ],
+      "parameters": [
+        {
+          "id": "level",
+          "code": 0,
+          "unit": "linear",
+          "min": 0,
+          "max": 4,
+          "default": 1,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 12
+        }
+      ],
+      "events": [
+        "parameter"
+      ],
+      "processing": "owned stereo desk primitive, sample-by-sample",
+      "configuration": "complete mixer config v1 matching sampleRate; graph events own the only clock",
+      "smoothingPolicy": "original 12ms mixer smoothing; limiter immediate",
+      "latencyPolicy": "limiter ceil(sampleRate * 0.003) even when disabled; query prepared instance",
+      "precision": "f64 parameter authority",
+      "resetPolicy": "clear histories; restore latest targets using captured startup settlement"
+    },
+    {
+      "type": "desk.limiter",
+      "code": 18,
+      "version": 1,
+      "hostInput": false,
+      "latencyFrames": null,
+      "tailFrames": -1,
+      "tailPolicy": "none",
+      "bypass": "unsupported",
+      "reset": "phase and voices cleared; compressor gain reset",
+      "ports": [
+        {
+          "id": "program.in",
+          "code": 0,
+          "direction": "in",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": true
+        },
+        {
+          "id": "audio.out",
+          "code": 1,
+          "direction": "out",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": false
+        }
+      ],
+      "parameters": [
+        {
+          "id": "enabled",
+          "code": 0,
+          "unit": "boolean",
+          "min": 0,
+          "max": 1,
+          "default": 1,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "ceiling",
+          "code": 1,
+          "unit": "linear",
+          "min": 0.05,
+          "max": 1,
+          "default": 0.98,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        }
+      ],
+      "events": [
+        "parameter"
+      ],
+      "processing": "owned stereo desk primitive, sample-by-sample",
+      "configuration": "complete mixer config v1 matching sampleRate; graph events own the only clock",
+      "smoothingPolicy": "original 12ms mixer smoothing; limiter immediate",
+      "latencyPolicy": "limiter ceil(sampleRate * 0.003) even when disabled; query prepared instance",
+      "precision": "f64 parameter authority",
+      "resetPolicy": "clear histories; restore latest targets using captured startup settlement"
+    },
+    {
+      "type": "legacy.classic",
+      "code": 19,
+      "version": 1,
+      "hostInput": false,
+      "latencyFrames": 0,
+      "tailFrames": -1,
+      "tailPolicy": "native model and external rack dependent",
+      "bypass": "unsupported",
+      "reset": "phase and voices cleared; compressor gain reset",
+      "ports": [
+        {
+          "id": "audio.out",
+          "code": 0,
+          "direction": "out",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": false
+        }
+      ],
+      "parameters": [
+        {
+          "id": "gain",
+          "code": 0,
+          "unit": "linear",
+          "min": 0,
+          "max": 2,
+          "default": 1,
+          "rate": "audio",
+          "modulation": true,
+          "smoothingMs": 0
+        }
+      ],
+      "events": [
+        "parameter",
+        "modulation",
+        "classic",
+        "cancel"
+      ],
+      "processing": "owned original native composite on source-local canonical128 callbacks",
+      "configuration": "classic config v1; model0..13, detached params/waves/polyphony",
+      "timingPolicy": "exact sample timestamps; future native callback cache cannot be rewritten",
+      "eventOwnership": "one owner per source until reset",
+      "maxNoteEvents": 4000,
+      "maxVoices": 32,
+      "externalRack": "host boundary after native composite"
+    },
+    {
+      "type": "rack.crusher",
+      "code": 20,
+      "version": 1,
+      "hostInput": false,
+      "latencyFrames": 128,
+      "tailFrames": -1,
+      "tailPolicy": "original native parameter-dependent tails",
+      "bypass": "unsupported",
+      "reset": "phase and voices cleared; compressor gain reset",
+      "ports": [
+        {
+          "id": "program.in",
+          "code": 0,
+          "direction": "in",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": true
+        },
+        {
+          "id": "audio.out",
+          "code": 1,
+          "direction": "out",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": false
+        }
+      ],
+      "parameters": [
+        {
+          "id": "bits",
+          "code": 0,
+          "unit": "native",
+          "min": 2,
+          "max": 16,
+          "default": 8,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "divide",
+          "code": 1,
+          "unit": "native",
+          "min": 1,
+          "max": 32,
+          "default": 1,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "mix",
+          "code": 2,
+          "unit": "native",
+          "min": 0,
+          "max": 1,
+          "default": 1,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        }
+      ],
+      "events": [
+        "parameter"
+      ],
+      "processing": "owned original kernel; canonical128 input capture",
+      "adapterLatencyFrames": 128,
+      "parameterQuantumFrames": 128,
+      "configuration": "complete original targets; ZPlane shape banks immutable after preparation; Pitch wet delay is intrinsic/time-varying and excluded from fixed128 adapter latency",
+      "resetPolicy": "retain latest targets; clear cache/history; restart seed where applicable"
+    },
+    {
+      "type": "rack.pitch",
+      "code": 21,
+      "version": 1,
+      "hostInput": false,
+      "latencyFrames": 128,
+      "tailFrames": -1,
+      "tailPolicy": "original native parameter-dependent tails",
+      "bypass": "unsupported",
+      "reset": "phase and voices cleared; compressor gain reset",
+      "ports": [
+        {
+          "id": "program.in",
+          "code": 0,
+          "direction": "in",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": true
+        },
+        {
+          "id": "audio.out",
+          "code": 1,
+          "direction": "out",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": false
+        }
+      ],
+      "parameters": [
+        {
+          "id": "semitones",
+          "code": 0,
+          "unit": "native",
+          "min": -24,
+          "max": 24,
+          "default": -12,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "cents",
+          "code": 1,
+          "unit": "native",
+          "min": -50,
+          "max": 50,
+          "default": 0,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "mix",
+          "code": 2,
+          "unit": "native",
+          "min": 0,
+          "max": 1,
+          "default": 0.5,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        }
+      ],
+      "events": [
+        "parameter"
+      ],
+      "processing": "owned original kernel; canonical128 input capture",
+      "adapterLatencyFrames": 128,
+      "parameterQuantumFrames": 128,
+      "configuration": "complete original targets; ZPlane shape banks immutable after preparation; Pitch wet delay is intrinsic/time-varying and excluded from fixed128 adapter latency",
+      "resetPolicy": "retain latest targets; clear cache/history; restart seed where applicable"
+    },
+    {
+      "type": "rack.zplane",
+      "code": 22,
+      "version": 1,
+      "hostInput": false,
+      "latencyFrames": 128,
+      "tailFrames": -1,
+      "tailPolicy": "original native parameter-dependent tails",
+      "bypass": "unsupported",
+      "reset": "phase and voices cleared; compressor gain reset",
+      "ports": [
+        {
+          "id": "program.in",
+          "code": 0,
+          "direction": "in",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": true
+        },
+        {
+          "id": "audio.out",
+          "code": 1,
+          "direction": "out",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": false
+        }
+      ],
+      "parameters": [
+        {
+          "id": "a",
+          "code": 0,
+          "unit": "native",
+          "min": 0,
+          "max": 63,
+          "default": 0,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "b",
+          "code": 1,
+          "unit": "native",
+          "min": 0,
+          "max": 63,
+          "default": 2,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "morph",
+          "code": 2,
+          "unit": "native",
+          "min": 0,
+          "max": 1,
+          "default": 0,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "shift",
+          "code": 3,
+          "unit": "native",
+          "min": -1,
+          "max": 1,
+          "default": 0,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "q",
+          "code": 4,
+          "unit": "native",
+          "min": 0,
+          "max": 1,
+          "default": 0.5,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "mix",
+          "code": 5,
+          "unit": "native",
+          "min": 0,
+          "max": 1,
+          "default": 1,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        }
+      ],
+      "events": [
+        "parameter"
+      ],
+      "processing": "owned original kernel; canonical128 input capture",
+      "adapterLatencyFrames": 128,
+      "parameterQuantumFrames": 128,
+      "configuration": "complete original targets; ZPlane shape banks immutable after preparation; Pitch wet delay is intrinsic/time-varying and excluded from fixed128 adapter latency",
+      "resetPolicy": "retain latest targets; clear cache/history; restart seed where applicable"
+    },
+    {
+      "type": "voice.shimmer",
+      "code": 23,
+      "version": 1,
+      "hostInput": false,
+      "latencyFrames": 128,
+      "tailFrames": -1,
+      "tailPolicy": "original native parameter-dependent tails",
+      "bypass": "unsupported",
+      "reset": "phase and voices cleared; compressor gain reset",
+      "ports": [
+        {
+          "id": "program.in",
+          "code": 0,
+          "direction": "in",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": true
+        },
+        {
+          "id": "audio.out",
+          "code": 1,
+          "direction": "out",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": false
+        }
+      ],
+      "parameters": [
+        {
+          "id": "mix",
+          "code": 0,
+          "unit": "native",
+          "min": 0,
+          "max": 1,
+          "default": 0,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "decay",
+          "code": 1,
+          "unit": "native",
+          "min": 0.3,
+          "max": 30,
+          "default": 6,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "semitones",
+          "code": 2,
+          "unit": "native",
+          "min": 0,
+          "max": 24,
+          "default": 12,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "climb",
+          "code": 3,
+          "unit": "native",
+          "min": 0,
+          "max": 0.95,
+          "default": 0.5,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "tone",
+          "code": 4,
+          "unit": "native",
+          "min": 500,
+          "max": 16000,
+          "default": 7000,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        }
+      ],
+      "events": [
+        "parameter"
+      ],
+      "processing": "owned original kernel; canonical128 input capture",
+      "adapterLatencyFrames": 128,
+      "parameterQuantumFrames": 128,
+      "configuration": "complete original targets; ZPlane shape banks immutable after preparation; Pitch wet delay is intrinsic/time-varying and excluded from fixed128 adapter latency",
+      "resetPolicy": "retain latest targets; clear cache/history; restart seed where applicable"
+    },
+    {
+      "type": "voice.freeze",
+      "code": 24,
+      "version": 1,
+      "hostInput": false,
+      "latencyFrames": 128,
+      "tailFrames": -1,
+      "tailPolicy": "original native parameter-dependent tails",
+      "bypass": "unsupported",
+      "reset": "phase and voices cleared; compressor gain reset",
+      "ports": [
+        {
+          "id": "program.in",
+          "code": 0,
+          "direction": "in",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": true
+        },
+        {
+          "id": "audio.out",
+          "code": 1,
+          "direction": "out",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": false
+        }
+      ],
+      "parameters": [
+        {
+          "id": "mix",
+          "code": 0,
+          "unit": "native",
+          "min": 0,
+          "max": 1,
+          "default": 0,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "hold",
+          "code": 1,
+          "unit": "boolean",
+          "min": 0,
+          "max": 1,
+          "default": 0,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "length",
+          "code": 2,
+          "unit": "native",
+          "min": 0.25,
+          "max": 4,
+          "default": 2,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "fade",
+          "code": 3,
+          "unit": "native",
+          "min": 0.02,
+          "max": 30,
+          "default": 1,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        }
+      ],
+      "events": [
+        "parameter"
+      ],
+      "execution": "worker-only",
+      "processing": "owned seeded original Freeze with synchronous capture; canonical128 input capture",
+      "adapterLatencyFrames": 128,
+      "parameterQuantumFrames": 128,
+      "random": "xorshift32-v1",
+      "resetPolicy": "retain latest targets; clear cache/history; restart captured seed",
+      "capturePolicy": "original four-second copy can exceed callback deadline; no serial realtime fallback",
+      "maxInstances": 2
     }
   ]
 }

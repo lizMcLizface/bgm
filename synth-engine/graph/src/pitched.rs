@@ -59,6 +59,7 @@ impl Pitched {
         self.next=0;self.next_gain=0;self.gain=1.;self.owners.clear();self.peak_active=0.;
     }
     pub fn stat(&self,index:u32)->f64 {if index==7{return self.peak_active;}if index==6&&!self.fm{return 0.;}match &self.dsp {Dsp::Core(e)=>e.stat(index),Dsp::Fm(e)=>e.stat(index)}}
+    pub fn latency_changes(&self)->bool {self.fm&&self.points.iter().filter(|p|p.setting.scope==0&&p.setting.index==4).any(|p|self.base.iter().find(|s|s.scope==0&&s.index==4).is_none_or(|s|s.value as f32!=p.setting.value as f32))}
     pub fn render(&mut self,frame:u64,out:&mut [[f32;2]])->Result<()> {
         let mut at=0;while at<out.len(){let now=frame+at as u64;
             while self.next<self.points.len()&&self.points[self.next].frame<=now {

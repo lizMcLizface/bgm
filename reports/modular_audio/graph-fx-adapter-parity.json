@@ -1,0 +1,1947 @@
+{
+  "kind": "graph.fx-adapters.compatibility",
+  "version": 1,
+  "pass": true,
+  "privateProbe": {
+    "version": 1,
+    "private": true,
+    "source": "af2e5fede5fb09a03e125624747a52a0789c23d59319a0f4ad3dfabfb00f7a3f",
+    "wasm": "58aa3233ecadfc8c36a92e8970d2efb23fc834d829500f305d235a849d3d0aad",
+    "bytes": 93235
+  },
+  "probeSha256": "58aa3233ecadfc8c36a92e8970d2efb23fc834d829500f305d235a849d3d0aad",
+  "scope": "Actual owned Rust kernels at fixed128 cadence versus canonical graph helper adapters, with exactly128-frame output shift. These owned kernels have separate original-JS worklet PCM parity evidence. No production graph wiring, physical listening, throughput or realtime deadline claim.",
+  "limitations": [
+    "Freeze remains worker-only: canonical adaptation does not remove synchronous capture/energy-scan deadline spikes.",
+    "Graph V1 built-in/custom ZPlane shape rows are immutable after preparation.",
+    "Rack k-rate DSP controls retain native f32 conversion; exact requested f64 targets are retained separately.",
+    "Voice message controls and seeded RNG remain f64/xorshift32-v1, respectively."
+  ],
+  "comparisons": 30,
+  "bitExact": 30,
+  "maxAbsoluteError": 0,
+  "allocationCases": 30,
+  "independent": [
+    {
+      "kind": "crusher",
+      "rate": 48000,
+      "sharedMemoryHandles": 2,
+      "independentReset": true,
+      "allocationOrReclamationCalls": 0
+    },
+    {
+      "kind": "pitch",
+      "rate": 48000,
+      "sharedMemoryHandles": 2,
+      "independentReset": true,
+      "allocationOrReclamationCalls": 0
+    },
+    {
+      "kind": "zplane",
+      "rate": 48000,
+      "sharedMemoryHandles": 2,
+      "independentReset": true,
+      "allocationOrReclamationCalls": 0
+    },
+    {
+      "kind": "shimmer",
+      "rate": 48000,
+      "sharedMemoryHandles": 2,
+      "independentReset": true,
+      "allocationOrReclamationCalls": 0
+    },
+    {
+      "kind": "freeze",
+      "rate": 48000,
+      "sharedMemoryHandles": 2,
+      "independentReset": true,
+      "allocationOrReclamationCalls": 0
+    }
+  ],
+  "trials": [
+    {
+      "kind": "crusher",
+      "rate": 8000,
+      "frames": 2944,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "peak": 0.1533287614583969,
+        "nonFinite": 0,
+        "actualSha256": "0e717597618022946018edf6b46de7a49c4314b036ab9741ec589d376658b6e1",
+        "referenceSha256": "0e717597618022946018edf6b46de7a49c4314b036ab9741ec589d376658b6e1",
+        "bitExact": true
+      },
+      "reset": {
+        "maxAbsoluteError": 0,
+        "peak": 0.1494564563035965,
+        "nonFinite": 0,
+        "actualSha256": "c33817090c8fc371c66dde8f5996fab7d023d24f993afc929d5ac2401664abd0",
+        "referenceSha256": "c33817090c8fc371c66dde8f5996fab7d023d24f993afc929d5ac2401664abd0",
+        "bitExact": true
+      },
+      "nativeStats": [
+        0,
+        2944,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "latestTargets": [
+        [
+          0,
+          9.23456789
+        ],
+        [
+          1,
+          15.7123456
+        ],
+        [
+          2,
+          0.33123456789
+        ]
+      ],
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1310720,
+      "memoryGrew": false,
+      "arbitrarySplits": [
+        1,
+        37,
+        509,
+        113,
+        203,
+        127,
+        2048
+      ],
+      "noncanonicalParameterRejected": true,
+      "preparedShapeEditsRejected": true
+    },
+    {
+      "kind": "pitch",
+      "rate": 8000,
+      "frames": 2944,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "peak": 0.11175352334976196,
+        "nonFinite": 0,
+        "actualSha256": "25e1a442f9f5cc8899a12e895d5da0c19b038a5c2569a85f238e2982a6203734",
+        "referenceSha256": "25e1a442f9f5cc8899a12e895d5da0c19b038a5c2569a85f238e2982a6203734",
+        "bitExact": true
+      },
+      "reset": {
+        "maxAbsoluteError": 0,
+        "peak": 0.12602105736732483,
+        "nonFinite": 0,
+        "actualSha256": "60c1e6b8e245ecbf078cafe1b340859209d6fdecfd3d128ebad7e1462374f8be",
+        "referenceSha256": "60c1e6b8e245ecbf078cafe1b340859209d6fdecfd3d128ebad7e1462374f8be",
+        "bitExact": true
+      },
+      "nativeStats": [
+        0,
+        2944,
+        0,
+        400,
+        2,
+        0,
+        0
+      ],
+      "latestTargets": [
+        [
+          0,
+          -12.23456789
+        ],
+        [
+          1,
+          -13.2123456
+        ],
+        [
+          2,
+          0.2123456789
+        ]
+      ],
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1835008,
+      "memoryGrew": false,
+      "arbitrarySplits": [
+        1,
+        37,
+        509,
+        113,
+        203,
+        127,
+        2048
+      ],
+      "noncanonicalParameterRejected": true,
+      "preparedShapeEditsRejected": true
+    },
+    {
+      "kind": "zplane",
+      "rate": 8000,
+      "frames": 2944,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "peak": 0.17309102416038513,
+        "nonFinite": 0,
+        "actualSha256": "b0fcc457b7dbf7f683747669054ddc9578fdfc376ad2ab06d7e57d596912505c",
+        "referenceSha256": "b0fcc457b7dbf7f683747669054ddc9578fdfc376ad2ab06d7e57d596912505c",
+        "bitExact": true
+      },
+      "reset": {
+        "maxAbsoluteError": 0,
+        "peak": 0.14482618868350983,
+        "nonFinite": 0,
+        "actualSha256": "8e079c66ededafe920ce8aada6fc41c220f41561a96c250d75414d3a6057270e",
+        "referenceSha256": "8e079c66ededafe920ce8aada6fc41c220f41561a96c250d75414d3a6057270e",
+        "bitExact": true
+      },
+      "nativeStats": [
+        1.2208207441714403e-19,
+        2944,
+        12,
+        0,
+        3,
+        0,
+        0
+      ],
+      "latestTargets": [
+        [
+          0,
+          5
+        ],
+        [
+          1,
+          12
+        ],
+        [
+          2,
+          0.7123456789
+        ],
+        [
+          3,
+          -0.23456789
+        ],
+        [
+          4,
+          0.3123456789
+        ],
+        [
+          5,
+          0.8123456789
+        ]
+      ],
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1310720,
+      "memoryGrew": false,
+      "arbitrarySplits": [
+        1,
+        37,
+        509,
+        113,
+        203,
+        127,
+        2048
+      ],
+      "noncanonicalParameterRejected": true,
+      "preparedShapeEditsRejected": true
+    },
+    {
+      "kind": "shimmer",
+      "rate": 8000,
+      "frames": 7424,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "peak": 0.15345682203769684,
+        "nonFinite": 0,
+        "actualSha256": "39e9e25efff781638ac9f46187b17e1853ba5b184c756a6fcd1635d6665097cd",
+        "referenceSha256": "39e9e25efff781638ac9f46187b17e1853ba5b184c756a6fcd1635d6665097cd",
+        "bitExact": true
+      },
+      "reset": {
+        "maxAbsoluteError": 0,
+        "peak": 0.15372492372989655,
+        "nonFinite": 0,
+        "actualSha256": "a3ccbf22a222a63087bbb41f452784954ba929513ed0e819068eca4c6ef675bc",
+        "referenceSha256": "a3ccbf22a222a63087bbb41f452784954ba929513ed0e819068eca4c6ef675bc",
+        "bitExact": true
+      },
+      "nativeStats": [
+        0.006695253308862448,
+        7424,
+        0.010556871699100363,
+        0,
+        0,
+        0,
+        109
+      ],
+      "latestTargets": [
+        [
+          0,
+          0.3123456789123
+        ],
+        [
+          1,
+          6.123456789
+        ],
+        [
+          2,
+          12.000000001
+        ],
+        [
+          3,
+          0.29123456789
+        ],
+        [
+          4,
+          6900.123456789
+        ]
+      ],
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1376256,
+      "memoryGrew": false,
+      "arbitrarySplits": [
+        1,
+        37,
+        509,
+        113,
+        203,
+        127,
+        2048
+      ],
+      "noncanonicalParameterRejected": true,
+      "preparedShapeEditsRejected": true
+    },
+    {
+      "kind": "freeze",
+      "rate": 8000,
+      "frames": 18560,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "peak": 0.22101718187332153,
+        "nonFinite": 0,
+        "actualSha256": "709ec141457f340116b9107a7c2405a28e4e433a37d264f10eba99b8b29f2a9d",
+        "referenceSha256": "709ec141457f340116b9107a7c2405a28e4e433a37d264f10eba99b8b29f2a9d",
+        "bitExact": true
+      },
+      "reset": {
+        "maxAbsoluteError": 0,
+        "peak": 0.15513542294502258,
+        "nonFinite": 0,
+        "actualSha256": "edfc28695d1217de0427f1a153cfcc1808376d64ce8f0d83b84648400e8abc66",
+        "referenceSha256": "edfc28695d1217de0427f1a153cfcc1808376d64ce8f0d83b84648400e8abc66",
+        "bitExact": true
+      },
+      "nativeStats": [
+        0.04538151994347572,
+        18560,
+        2,
+        3,
+        95,
+        0,
+        4038677593
+      ],
+      "latestTargets": [
+        [
+          0,
+          0.734561234567
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0.30123456789
+        ],
+        [
+          3,
+          0.426789012345
+        ]
+      ],
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2883584,
+      "memoryGrew": false,
+      "arbitrarySplits": [
+        1,
+        37,
+        509,
+        113,
+        203,
+        127,
+        2048
+      ],
+      "noncanonicalParameterRejected": true,
+      "preparedShapeEditsRejected": true
+    },
+    {
+      "kind": "crusher",
+      "rate": 24000,
+      "frames": 8576,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "peak": 0.1533287614583969,
+        "nonFinite": 0,
+        "actualSha256": "4a15e9f7f0a7532149b350e8a6cbd2e58a4ba2860c464404b89022d7af0d4737",
+        "referenceSha256": "4a15e9f7f0a7532149b350e8a6cbd2e58a4ba2860c464404b89022d7af0d4737",
+        "bitExact": true
+      },
+      "reset": {
+        "maxAbsoluteError": 0,
+        "peak": 0.1494564563035965,
+        "nonFinite": 0,
+        "actualSha256": "4f25b846f168dcf1dd7de953f0ba74251ccdb6416c234767a88f6defbca95836",
+        "referenceSha256": "4f25b846f168dcf1dd7de953f0ba74251ccdb6416c234767a88f6defbca95836",
+        "bitExact": true
+      },
+      "nativeStats": [
+        0,
+        8576,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "latestTargets": [
+        [
+          0,
+          9.23456789
+        ],
+        [
+          1,
+          15.7123456
+        ],
+        [
+          2,
+          0.33123456789
+        ]
+      ],
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1310720,
+      "memoryGrew": false,
+      "arbitrarySplits": [
+        1,
+        37,
+        509,
+        113,
+        203,
+        127,
+        2048
+      ],
+      "noncanonicalParameterRejected": true,
+      "preparedShapeEditsRejected": true
+    },
+    {
+      "kind": "pitch",
+      "rate": 24000,
+      "frames": 8576,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "peak": 0.13837102055549622,
+        "nonFinite": 0,
+        "actualSha256": "adc893eeb2033a6acaac3e4da8b117a922f6d54d86f0d89d62b277372e7a4e90",
+        "referenceSha256": "adc893eeb2033a6acaac3e4da8b117a922f6d54d86f0d89d62b277372e7a4e90",
+        "bitExact": true
+      },
+      "reset": {
+        "maxAbsoluteError": 0,
+        "peak": 0.14074741303920746,
+        "nonFinite": 0,
+        "actualSha256": "9d251f157fc5c9f7e9a3b6e67dce2a31fa574d4fca54593f80c8cbbccbee0d52",
+        "referenceSha256": "9d251f157fc5c9f7e9a3b6e67dce2a31fa574d4fca54593f80c8cbbccbee0d52",
+        "bitExact": true
+      },
+      "nativeStats": [
+        0,
+        8576,
+        0,
+        1200,
+        2,
+        0,
+        0
+      ],
+      "latestTargets": [
+        [
+          0,
+          -12.23456789
+        ],
+        [
+          1,
+          -13.2123456
+        ],
+        [
+          2,
+          0.2123456789
+        ]
+      ],
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1835008,
+      "memoryGrew": false,
+      "arbitrarySplits": [
+        1,
+        37,
+        509,
+        113,
+        203,
+        127,
+        2048
+      ],
+      "noncanonicalParameterRejected": true,
+      "preparedShapeEditsRejected": true
+    },
+    {
+      "kind": "zplane",
+      "rate": 24000,
+      "frames": 8576,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "peak": 0.24156418442726135,
+        "nonFinite": 0,
+        "actualSha256": "9a4baa51a658f5658412e6832ebc52eaaba86f82fa367d116edb7bc3a4c91b2a",
+        "referenceSha256": "9a4baa51a658f5658412e6832ebc52eaaba86f82fa367d116edb7bc3a4c91b2a",
+        "bitExact": true
+      },
+      "reset": {
+        "maxAbsoluteError": 0,
+        "peak": 0.19513940811157227,
+        "nonFinite": 0,
+        "actualSha256": "882786b3dccaac03c04265317e1241f8e1e218e7da7125f620a3993e7a253845",
+        "referenceSha256": "882786b3dccaac03c04265317e1241f8e1e218e7da7125f620a3993e7a253845",
+        "bitExact": true
+      },
+      "nativeStats": [
+        4.861594301024621e-19,
+        8576,
+        12,
+        0,
+        3,
+        0,
+        0
+      ],
+      "latestTargets": [
+        [
+          0,
+          5
+        ],
+        [
+          1,
+          12
+        ],
+        [
+          2,
+          0.7123456789
+        ],
+        [
+          3,
+          -0.23456789
+        ],
+        [
+          4,
+          0.3123456789
+        ],
+        [
+          5,
+          0.8123456789
+        ]
+      ],
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1310720,
+      "memoryGrew": false,
+      "arbitrarySplits": [
+        1,
+        37,
+        509,
+        113,
+        203,
+        127,
+        2048
+      ],
+      "noncanonicalParameterRejected": true,
+      "preparedShapeEditsRejected": true
+    },
+    {
+      "kind": "shimmer",
+      "rate": 24000,
+      "frames": 21760,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "peak": 0.16967149078845978,
+        "nonFinite": 0,
+        "actualSha256": "d76d6d6f886705b122bdf143a86b8626950c9d3701dc6dae3bef209a7dabbc49",
+        "referenceSha256": "d76d6d6f886705b122bdf143a86b8626950c9d3701dc6dae3bef209a7dabbc49",
+        "bitExact": true
+      },
+      "reset": {
+        "maxAbsoluteError": 0,
+        "peak": 0.17054922878742218,
+        "nonFinite": 0,
+        "actualSha256": "1f6969f6554f820daaa03fd68f16601b0284c86ffec6ae4a040ca29da613ac74",
+        "referenceSha256": "1f6969f6554f820daaa03fd68f16601b0284c86ffec6ae4a040ca29da613ac74",
+        "bitExact": true
+      },
+      "nativeStats": [
+        0.004145018756389618,
+        21760,
+        0.01010506566764617,
+        0,
+        0,
+        0,
+        109
+      ],
+      "latestTargets": [
+        [
+          0,
+          0.3123456789123
+        ],
+        [
+          1,
+          6.123456789
+        ],
+        [
+          2,
+          12.000000001
+        ],
+        [
+          3,
+          0.29123456789
+        ],
+        [
+          4,
+          5100.123456789
+        ]
+      ],
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1376256,
+      "memoryGrew": false,
+      "arbitrarySplits": [
+        1,
+        37,
+        509,
+        113,
+        203,
+        127,
+        2048
+      ],
+      "noncanonicalParameterRejected": true,
+      "preparedShapeEditsRejected": true
+    },
+    {
+      "kind": "freeze",
+      "rate": 24000,
+      "frames": 55424,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "peak": 0.2115875780582428,
+        "nonFinite": 0,
+        "actualSha256": "20586fe5cb260bc12ad45cd1f826d0de9c9f878f2990b6f2ca9249c86b1b52b0",
+        "referenceSha256": "20586fe5cb260bc12ad45cd1f826d0de9c9f878f2990b6f2ca9249c86b1b52b0",
+        "bitExact": true
+      },
+      "reset": {
+        "maxAbsoluteError": 0,
+        "peak": 0.18320390582084656,
+        "nonFinite": 0,
+        "actualSha256": "306d45132e5424700d85767c011e8a20df6020ac7b5aabcdae3aa64a1f2f2e07",
+        "referenceSha256": "306d45132e5424700d85767c011e8a20df6020ac7b5aabcdae3aa64a1f2f2e07",
+        "bitExact": true
+      },
+      "nativeStats": [
+        0.05359009653329849,
+        55424,
+        2,
+        3,
+        95,
+        0,
+        4038677593
+      ],
+      "latestTargets": [
+        [
+          0,
+          0.734561234567
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0.30123456789
+        ],
+        [
+          3,
+          0.426789012345
+        ]
+      ],
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 6094848,
+      "memoryGrew": false,
+      "arbitrarySplits": [
+        1,
+        37,
+        509,
+        113,
+        203,
+        127,
+        2048
+      ],
+      "noncanonicalParameterRejected": true,
+      "preparedShapeEditsRejected": true
+    },
+    {
+      "kind": "crusher",
+      "rate": 44100,
+      "frames": 15616,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "peak": 0.1533287614583969,
+        "nonFinite": 0,
+        "actualSha256": "7ccce200f312bb82a24397bf56f16f3ca440adda1110f810a68f37306c484b50",
+        "referenceSha256": "7ccce200f312bb82a24397bf56f16f3ca440adda1110f810a68f37306c484b50",
+        "bitExact": true
+      },
+      "reset": {
+        "maxAbsoluteError": 0,
+        "peak": 0.1494564563035965,
+        "nonFinite": 0,
+        "actualSha256": "e9a46ed6e1dd6d9561be01549d5789aa99ac142cbddbaf773dc514ffcf56e412",
+        "referenceSha256": "e9a46ed6e1dd6d9561be01549d5789aa99ac142cbddbaf773dc514ffcf56e412",
+        "bitExact": true
+      },
+      "nativeStats": [
+        0,
+        15616,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "latestTargets": [
+        [
+          0,
+          9.23456789
+        ],
+        [
+          1,
+          15.7123456
+        ],
+        [
+          2,
+          0.33123456789
+        ]
+      ],
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1310720,
+      "memoryGrew": false,
+      "arbitrarySplits": [
+        1,
+        37,
+        509,
+        113,
+        203,
+        127,
+        2048
+      ],
+      "noncanonicalParameterRejected": true,
+      "preparedShapeEditsRejected": true
+    },
+    {
+      "kind": "pitch",
+      "rate": 44100,
+      "frames": 15616,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "peak": 0.14013348519802094,
+        "nonFinite": 0,
+        "actualSha256": "ca14b9d477a02e5ca749fdba56e65950af2348400771fb369788e85c91b9ddac",
+        "referenceSha256": "ca14b9d477a02e5ca749fdba56e65950af2348400771fb369788e85c91b9ddac",
+        "bitExact": true
+      },
+      "reset": {
+        "maxAbsoluteError": 0,
+        "peak": 0.1436285674571991,
+        "nonFinite": 0,
+        "actualSha256": "9a60ab7b4ffd0d65f3d7cd30111fb88a5a7aa410728a76994dd12e97a8e24f85",
+        "referenceSha256": "9a60ab7b4ffd0d65f3d7cd30111fb88a5a7aa410728a76994dd12e97a8e24f85",
+        "bitExact": true
+      },
+      "nativeStats": [
+        0,
+        15616,
+        0,
+        2205,
+        2,
+        0,
+        0
+      ],
+      "latestTargets": [
+        [
+          0,
+          -12.23456789
+        ],
+        [
+          1,
+          -13.2123456
+        ],
+        [
+          2,
+          0.2123456789
+        ]
+      ],
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1835008,
+      "memoryGrew": false,
+      "arbitrarySplits": [
+        1,
+        37,
+        509,
+        113,
+        203,
+        127,
+        2048
+      ],
+      "noncanonicalParameterRejected": true,
+      "preparedShapeEditsRejected": true
+    },
+    {
+      "kind": "zplane",
+      "rate": 44100,
+      "frames": 15616,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "peak": 0.23991802334785461,
+        "nonFinite": 0,
+        "actualSha256": "6ffdc8a109233a0069465af29a7073e00af4941af57431cfa31b71295c689095",
+        "referenceSha256": "6ffdc8a109233a0069465af29a7073e00af4941af57431cfa31b71295c689095",
+        "bitExact": true
+      },
+      "reset": {
+        "maxAbsoluteError": 0,
+        "peak": 0.18568401038646698,
+        "nonFinite": 0,
+        "actualSha256": "da3da9bfe69fedd64d62f396a9e281702e43e1eead21fc8fb3fdad3320a9b6d1",
+        "referenceSha256": "da3da9bfe69fedd64d62f396a9e281702e43e1eead21fc8fb3fdad3320a9b6d1",
+        "bitExact": true
+      },
+      "nativeStats": [
+        0,
+        15616,
+        12,
+        0,
+        3,
+        0,
+        0
+      ],
+      "latestTargets": [
+        [
+          0,
+          5
+        ],
+        [
+          1,
+          12
+        ],
+        [
+          2,
+          0.7123456789
+        ],
+        [
+          3,
+          -0.23456789
+        ],
+        [
+          4,
+          0.3123456789
+        ],
+        [
+          5,
+          0.8123456789
+        ]
+      ],
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1310720,
+      "memoryGrew": false,
+      "arbitrarySplits": [
+        1,
+        37,
+        509,
+        113,
+        203,
+        127,
+        2048
+      ],
+      "noncanonicalParameterRejected": true,
+      "preparedShapeEditsRejected": true
+    },
+    {
+      "kind": "shimmer",
+      "rate": 44100,
+      "frames": 39936,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "peak": 0.1840055286884308,
+        "nonFinite": 0,
+        "actualSha256": "eca066af59740f85e618813175b9d62c4e3fc26abd721fa924c521af4aa7be23",
+        "referenceSha256": "eca066af59740f85e618813175b9d62c4e3fc26abd721fa924c521af4aa7be23",
+        "bitExact": true
+      },
+      "reset": {
+        "maxAbsoluteError": 0,
+        "peak": 0.1844175159931183,
+        "nonFinite": 0,
+        "actualSha256": "e3fa705a4105129109273baca0eed03b653ca88fbbef3f8714d0ef00bdf9496b",
+        "referenceSha256": "e3fa705a4105129109273baca0eed03b653ca88fbbef3f8714d0ef00bdf9496b",
+        "bitExact": true
+      },
+      "nativeStats": [
+        0.013638069853186607,
+        39936,
+        0.04653404809481822,
+        0,
+        0,
+        0,
+        109
+      ],
+      "latestTargets": [
+        [
+          0,
+          0.3123456789123
+        ],
+        [
+          1,
+          6.123456789
+        ],
+        [
+          2,
+          12.000000001
+        ],
+        [
+          3,
+          0.29123456789
+        ],
+        [
+          4,
+          5100.123456789
+        ]
+      ],
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1441792,
+      "memoryGrew": false,
+      "arbitrarySplits": [
+        1,
+        37,
+        509,
+        113,
+        203,
+        127,
+        2048
+      ],
+      "noncanonicalParameterRejected": true,
+      "preparedShapeEditsRejected": true
+    },
+    {
+      "kind": "freeze",
+      "rate": 44100,
+      "frames": 101632,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "peak": 0.21720881760120392,
+        "nonFinite": 0,
+        "actualSha256": "5e4bef4f8456d94b9f2e8d4e53e322e7735f1216377de6a27fbaf648ee3ad053",
+        "referenceSha256": "5e4bef4f8456d94b9f2e8d4e53e322e7735f1216377de6a27fbaf648ee3ad053",
+        "bitExact": true
+      },
+      "reset": {
+        "maxAbsoluteError": 0,
+        "peak": 0.18856295943260193,
+        "nonFinite": 0,
+        "actualSha256": "221e622f7d65478eed4f37d2b0dc06433de9d8a507df68c42b8c1dfaa9f0968b",
+        "referenceSha256": "221e622f7d65478eed4f37d2b0dc06433de9d8a507df68c42b8c1dfaa9f0968b",
+        "bitExact": true
+      },
+      "nativeStats": [
+        0.057194117456674576,
+        101632,
+        2,
+        3,
+        93,
+        0,
+        2678463090
+      ],
+      "latestTargets": [
+        [
+          0,
+          0.734561234567
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0.30123456789
+        ],
+        [
+          3,
+          0.426789012345
+        ]
+      ],
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 10289152,
+      "memoryGrew": false,
+      "arbitrarySplits": [
+        1,
+        37,
+        509,
+        113,
+        203,
+        127,
+        2048
+      ],
+      "noncanonicalParameterRejected": true,
+      "preparedShapeEditsRejected": true
+    },
+    {
+      "kind": "crusher",
+      "rate": 48000,
+      "frames": 17024,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "peak": 0.1533287614583969,
+        "nonFinite": 0,
+        "actualSha256": "7d10643d75289e3f4d0e89da9cd3001f10d76869778cdc512fa68e4b8d553f4a",
+        "referenceSha256": "7d10643d75289e3f4d0e89da9cd3001f10d76869778cdc512fa68e4b8d553f4a",
+        "bitExact": true
+      },
+      "reset": {
+        "maxAbsoluteError": 0,
+        "peak": 0.1494564563035965,
+        "nonFinite": 0,
+        "actualSha256": "902afbce4f39a23120e041d0a8d791695e61a260ad8134e8ea8591a061199e29",
+        "referenceSha256": "902afbce4f39a23120e041d0a8d791695e61a260ad8134e8ea8591a061199e29",
+        "bitExact": true
+      },
+      "nativeStats": [
+        0,
+        17024,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "latestTargets": [
+        [
+          0,
+          9.23456789
+        ],
+        [
+          1,
+          15.7123456
+        ],
+        [
+          2,
+          0.33123456789
+        ]
+      ],
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1310720,
+      "memoryGrew": false,
+      "arbitrarySplits": [
+        1,
+        37,
+        509,
+        113,
+        203,
+        127,
+        2048
+      ],
+      "noncanonicalParameterRejected": true,
+      "preparedShapeEditsRejected": true
+    },
+    {
+      "kind": "pitch",
+      "rate": 48000,
+      "frames": 17024,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "peak": 0.14232534170150757,
+        "nonFinite": 0,
+        "actualSha256": "2cdfc72429428e13475d829ed788e894dbd01b42b851ab5aa47dd25ab045e9db",
+        "referenceSha256": "2cdfc72429428e13475d829ed788e894dbd01b42b851ab5aa47dd25ab045e9db",
+        "bitExact": true
+      },
+      "reset": {
+        "maxAbsoluteError": 0,
+        "peak": 0.14190545678138733,
+        "nonFinite": 0,
+        "actualSha256": "a6b0257bf889721f45fdc9c7d11b2a8dab3409193441704165f3bc76cd32c778",
+        "referenceSha256": "a6b0257bf889721f45fdc9c7d11b2a8dab3409193441704165f3bc76cd32c778",
+        "bitExact": true
+      },
+      "nativeStats": [
+        0,
+        17024,
+        0,
+        2400,
+        2,
+        0,
+        0
+      ],
+      "latestTargets": [
+        [
+          0,
+          -12.23456789
+        ],
+        [
+          1,
+          -13.2123456
+        ],
+        [
+          2,
+          0.2123456789
+        ]
+      ],
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1835008,
+      "memoryGrew": false,
+      "arbitrarySplits": [
+        1,
+        37,
+        509,
+        113,
+        203,
+        127,
+        2048
+      ],
+      "noncanonicalParameterRejected": true,
+      "preparedShapeEditsRejected": true
+    },
+    {
+      "kind": "zplane",
+      "rate": 48000,
+      "frames": 17024,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "peak": 0.24316926300525665,
+        "nonFinite": 0,
+        "actualSha256": "31a7156e309e48afdc5f831d1a37fd9309c2f63afb9d6dcb6b9c78c8c86e4119",
+        "referenceSha256": "31a7156e309e48afdc5f831d1a37fd9309c2f63afb9d6dcb6b9c78c8c86e4119",
+        "bitExact": true
+      },
+      "reset": {
+        "maxAbsoluteError": 0,
+        "peak": 0.1966957300901413,
+        "nonFinite": 0,
+        "actualSha256": "bbf28d43360a9f536dea9eda3f8eca76ded470ecf90481e9af755b71f8a26efd",
+        "referenceSha256": "bbf28d43360a9f536dea9eda3f8eca76ded470ecf90481e9af755b71f8a26efd",
+        "bitExact": true
+      },
+      "nativeStats": [
+        1.6296404801355106e-20,
+        17024,
+        12,
+        0,
+        3,
+        0,
+        0
+      ],
+      "latestTargets": [
+        [
+          0,
+          5
+        ],
+        [
+          1,
+          12
+        ],
+        [
+          2,
+          0.7123456789
+        ],
+        [
+          3,
+          -0.23456789
+        ],
+        [
+          4,
+          0.3123456789
+        ],
+        [
+          5,
+          0.8123456789
+        ]
+      ],
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1310720,
+      "memoryGrew": false,
+      "arbitrarySplits": [
+        1,
+        37,
+        509,
+        113,
+        203,
+        127,
+        2048
+      ],
+      "noncanonicalParameterRejected": true,
+      "preparedShapeEditsRejected": true
+    },
+    {
+      "kind": "shimmer",
+      "rate": 48000,
+      "frames": 43392,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "peak": 0.16650208830833435,
+        "nonFinite": 0,
+        "actualSha256": "6793f50d4db30c2d1ab19edbafc5052606941d2b432230cc6eb40209227908bd",
+        "referenceSha256": "6793f50d4db30c2d1ab19edbafc5052606941d2b432230cc6eb40209227908bd",
+        "bitExact": true
+      },
+      "reset": {
+        "maxAbsoluteError": 0,
+        "peak": 0.1666674166917801,
+        "nonFinite": 0,
+        "actualSha256": "a943c222eb03f32f6dd180bab9532938ef2143733720eeb2538731b82c570b20",
+        "referenceSha256": "a943c222eb03f32f6dd180bab9532938ef2143733720eeb2538731b82c570b20",
+        "bitExact": true
+      },
+      "nativeStats": [
+        0.009160609915852547,
+        43392,
+        0.02349233904115596,
+        0,
+        0,
+        0,
+        109
+      ],
+      "latestTargets": [
+        [
+          0,
+          0.3123456789123
+        ],
+        [
+          1,
+          6.123456789
+        ],
+        [
+          2,
+          12.000000001
+        ],
+        [
+          3,
+          0.29123456789
+        ],
+        [
+          4,
+          5100.123456789
+        ]
+      ],
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1441792,
+      "memoryGrew": false,
+      "arbitrarySplits": [
+        1,
+        37,
+        509,
+        113,
+        203,
+        127,
+        2048
+      ],
+      "noncanonicalParameterRejected": true,
+      "preparedShapeEditsRejected": true
+    },
+    {
+      "kind": "freeze",
+      "rate": 48000,
+      "frames": 110592,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "peak": 0.18711529672145844,
+        "nonFinite": 0,
+        "actualSha256": "3d11eb7a227a4ad795984b045c88802609bbb6d0f1d8d9a2754ce8d1a7d5989a",
+        "referenceSha256": "3d11eb7a227a4ad795984b045c88802609bbb6d0f1d8d9a2754ce8d1a7d5989a",
+        "bitExact": true
+      },
+      "reset": {
+        "maxAbsoluteError": 0,
+        "peak": 0.184933140873909,
+        "nonFinite": 0,
+        "actualSha256": "ca83ae27fc8768455fac826cfab64cbeead386b7832604f3ce1b44461985e4c7",
+        "referenceSha256": "ca83ae27fc8768455fac826cfab64cbeead386b7832604f3ce1b44461985e4c7",
+        "bitExact": true
+      },
+      "nativeStats": [
+        0.04502314701676369,
+        110592,
+        2,
+        3,
+        93,
+        0,
+        2678463090
+      ],
+      "latestTargets": [
+        [
+          0,
+          0.734561234567
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0.30123456789
+        ],
+        [
+          3,
+          0.426789012345
+        ]
+      ],
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 11075584,
+      "memoryGrew": false,
+      "arbitrarySplits": [
+        1,
+        37,
+        509,
+        113,
+        203,
+        127,
+        2048
+      ],
+      "noncanonicalParameterRejected": true,
+      "preparedShapeEditsRejected": true
+    },
+    {
+      "kind": "crusher",
+      "rate": 96000,
+      "frames": 33792,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "peak": 0.1533287614583969,
+        "nonFinite": 0,
+        "actualSha256": "447252188c3e53f9c78f101b928371dd615d159fb183a3a299a73b986a22e2cb",
+        "referenceSha256": "447252188c3e53f9c78f101b928371dd615d159fb183a3a299a73b986a22e2cb",
+        "bitExact": true
+      },
+      "reset": {
+        "maxAbsoluteError": 0,
+        "peak": 0.1494564563035965,
+        "nonFinite": 0,
+        "actualSha256": "857dbafbd583df51d929d5a87489a7c2ac5455f67ec92fadfa607e94d1266b7a",
+        "referenceSha256": "857dbafbd583df51d929d5a87489a7c2ac5455f67ec92fadfa607e94d1266b7a",
+        "bitExact": true
+      },
+      "nativeStats": [
+        0,
+        33792,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "latestTargets": [
+        [
+          0,
+          9.23456789
+        ],
+        [
+          1,
+          15.7123456
+        ],
+        [
+          2,
+          0.33123456789
+        ]
+      ],
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1310720,
+      "memoryGrew": false,
+      "arbitrarySplits": [
+        1,
+        37,
+        509,
+        113,
+        203,
+        127,
+        2048
+      ],
+      "noncanonicalParameterRejected": true,
+      "preparedShapeEditsRejected": true
+    },
+    {
+      "kind": "pitch",
+      "rate": 96000,
+      "frames": 33792,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "peak": 0.1450323760509491,
+        "nonFinite": 0,
+        "actualSha256": "1374307fd8c860b1058124859c4c1de4a3c6a59eba802ade8133a81998be7e34",
+        "referenceSha256": "1374307fd8c860b1058124859c4c1de4a3c6a59eba802ade8133a81998be7e34",
+        "bitExact": true
+      },
+      "reset": {
+        "maxAbsoluteError": 0,
+        "peak": 0.146198108792305,
+        "nonFinite": 0,
+        "actualSha256": "d619681c5a660fb64bd65527e53d8f6bcdbcd5051c53e6c48d0b43eec8476dc3",
+        "referenceSha256": "d619681c5a660fb64bd65527e53d8f6bcdbcd5051c53e6c48d0b43eec8476dc3",
+        "bitExact": true
+      },
+      "nativeStats": [
+        0,
+        33792,
+        0,
+        4800,
+        2,
+        0,
+        0
+      ],
+      "latestTargets": [
+        [
+          0,
+          -12.23456789
+        ],
+        [
+          1,
+          -13.2123456
+        ],
+        [
+          2,
+          0.2123456789
+        ]
+      ],
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1835008,
+      "memoryGrew": false,
+      "arbitrarySplits": [
+        1,
+        37,
+        509,
+        113,
+        203,
+        127,
+        2048
+      ],
+      "noncanonicalParameterRejected": true,
+      "preparedShapeEditsRejected": true
+    },
+    {
+      "kind": "zplane",
+      "rate": 96000,
+      "frames": 33792,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "peak": 0.2733575105667114,
+        "nonFinite": 0,
+        "actualSha256": "f05c4bc14e685a0362f9e583065f293f6afa2014b104f4cf189fa2807bb0733b",
+        "referenceSha256": "f05c4bc14e685a0362f9e583065f293f6afa2014b104f4cf189fa2807bb0733b",
+        "bitExact": true
+      },
+      "reset": {
+        "maxAbsoluteError": 0,
+        "peak": 0.24872088432312012,
+        "nonFinite": 0,
+        "actualSha256": "7776a2e17a5e213745988e12aaff4437494155db6d20e447f8dee5325671aa66",
+        "referenceSha256": "7776a2e17a5e213745988e12aaff4437494155db6d20e447f8dee5325671aa66",
+        "bitExact": true
+      },
+      "nativeStats": [
+        1.0117075466134742e-18,
+        33792,
+        12,
+        0,
+        3,
+        0,
+        0
+      ],
+      "latestTargets": [
+        [
+          0,
+          5
+        ],
+        [
+          1,
+          12
+        ],
+        [
+          2,
+          0.7123456789
+        ],
+        [
+          3,
+          -0.23456789
+        ],
+        [
+          4,
+          0.3123456789
+        ],
+        [
+          5,
+          0.8123456789
+        ]
+      ],
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1310720,
+      "memoryGrew": false,
+      "arbitrarySplits": [
+        1,
+        37,
+        509,
+        113,
+        203,
+        127,
+        2048
+      ],
+      "noncanonicalParameterRejected": true,
+      "preparedShapeEditsRejected": true
+    },
+    {
+      "kind": "shimmer",
+      "rate": 96000,
+      "frames": 86528,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "peak": 0.1605588048696518,
+        "nonFinite": 0,
+        "actualSha256": "1801ef177d097e20f870f12fe8ae0ee9cb67e27c1f843a4bdcf7386bb120c0ad",
+        "referenceSha256": "1801ef177d097e20f870f12fe8ae0ee9cb67e27c1f843a4bdcf7386bb120c0ad",
+        "bitExact": true
+      },
+      "reset": {
+        "maxAbsoluteError": 0,
+        "peak": 0.1605588048696518,
+        "nonFinite": 0,
+        "actualSha256": "b807b911a8788e0c2ae46db1972a30c2d74c4b07228d16e19b75bdb74392ac95",
+        "referenceSha256": "b807b911a8788e0c2ae46db1972a30c2d74c4b07228d16e19b75bdb74392ac95",
+        "bitExact": true
+      },
+      "nativeStats": [
+        0.012690399773418903,
+        86528,
+        0.03177961294810807,
+        0,
+        0,
+        0,
+        109
+      ],
+      "latestTargets": [
+        [
+          0,
+          0.3123456789123
+        ],
+        [
+          1,
+          6.123456789
+        ],
+        [
+          2,
+          12.000000001
+        ],
+        [
+          3,
+          0.29123456789
+        ],
+        [
+          4,
+          5100.123456789
+        ]
+      ],
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1572864,
+      "memoryGrew": false,
+      "arbitrarySplits": [
+        1,
+        37,
+        509,
+        113,
+        203,
+        127,
+        2048
+      ],
+      "noncanonicalParameterRejected": true,
+      "preparedShapeEditsRejected": true
+    },
+    {
+      "kind": "freeze",
+      "rate": 96000,
+      "frames": 220928,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "peak": 0.20423239469528198,
+        "nonFinite": 0,
+        "actualSha256": "e0bd3b13ceb7dd6540b2457a4f17d167e25b439e21c005a1b4d40a0f42e5ef69",
+        "referenceSha256": "e0bd3b13ceb7dd6540b2457a4f17d167e25b439e21c005a1b4d40a0f42e5ef69",
+        "bitExact": true
+      },
+      "reset": {
+        "maxAbsoluteError": 0,
+        "peak": 0.17550265789031982,
+        "nonFinite": 0,
+        "actualSha256": "929486d9d1bdf20a7c5060390219a6cdd4697d0018209f2416248e7facca8154",
+        "referenceSha256": "929486d9d1bdf20a7c5060390219a6cdd4697d0018209f2416248e7facca8154",
+        "bitExact": true
+      },
+      "nativeStats": [
+        0.0673782080411911,
+        220928,
+        2,
+        3,
+        93,
+        0,
+        2678463090
+      ],
+      "latestTargets": [
+        [
+          0,
+          0.734561234567
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0.30123456789
+        ],
+        [
+          3,
+          0.426789012345
+        ]
+      ],
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 20774912,
+      "memoryGrew": false,
+      "arbitrarySplits": [
+        1,
+        37,
+        509,
+        113,
+        203,
+        127,
+        2048
+      ],
+      "noncanonicalParameterRejected": true,
+      "preparedShapeEditsRejected": true
+    },
+    {
+      "kind": "crusher",
+      "rate": 192000,
+      "frames": 67328,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "peak": 0.1533287614583969,
+        "nonFinite": 0,
+        "actualSha256": "008324c98390e2d674b2b821ce84fd075fe06f5cf06e70242b15574d6ac8bbaa",
+        "referenceSha256": "008324c98390e2d674b2b821ce84fd075fe06f5cf06e70242b15574d6ac8bbaa",
+        "bitExact": true
+      },
+      "reset": {
+        "maxAbsoluteError": 0,
+        "peak": 0.14946028590202332,
+        "nonFinite": 0,
+        "actualSha256": "aef3c9a52d35e65165f14d56d31b3e180dbffde55a23d5bf433bee722c623331",
+        "referenceSha256": "aef3c9a52d35e65165f14d56d31b3e180dbffde55a23d5bf433bee722c623331",
+        "bitExact": true
+      },
+      "nativeStats": [
+        0,
+        67328,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "latestTargets": [
+        [
+          0,
+          9.23456789
+        ],
+        [
+          1,
+          15.7123456
+        ],
+        [
+          2,
+          0.33123456789
+        ]
+      ],
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1310720,
+      "memoryGrew": false,
+      "arbitrarySplits": [
+        1,
+        37,
+        509,
+        113,
+        203,
+        127,
+        2048
+      ],
+      "noncanonicalParameterRejected": true,
+      "preparedShapeEditsRejected": true
+    },
+    {
+      "kind": "pitch",
+      "rate": 192000,
+      "frames": 67328,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "peak": 0.1462467908859253,
+        "nonFinite": 0,
+        "actualSha256": "7e669ae4e1833d3999f1b60fa17a637fe1dbbc5d77afdc722f9344b656deb9dd",
+        "referenceSha256": "7e669ae4e1833d3999f1b60fa17a637fe1dbbc5d77afdc722f9344b656deb9dd",
+        "bitExact": true
+      },
+      "reset": {
+        "maxAbsoluteError": 0,
+        "peak": 0.1475280523300171,
+        "nonFinite": 0,
+        "actualSha256": "b0bd182f54165b694c50a582f5298d3fa5807ebce66e4c5dfa3882d3c36cde44",
+        "referenceSha256": "b0bd182f54165b694c50a582f5298d3fa5807ebce66e4c5dfa3882d3c36cde44",
+        "bitExact": true
+      },
+      "nativeStats": [
+        0,
+        67328,
+        0,
+        9600,
+        2,
+        0,
+        0
+      ],
+      "latestTargets": [
+        [
+          0,
+          -12.23456789
+        ],
+        [
+          1,
+          -13.2123456
+        ],
+        [
+          2,
+          0.2123456789
+        ]
+      ],
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1835008,
+      "memoryGrew": false,
+      "arbitrarySplits": [
+        1,
+        37,
+        509,
+        113,
+        203,
+        127,
+        2048
+      ],
+      "noncanonicalParameterRejected": true,
+      "preparedShapeEditsRejected": true
+    },
+    {
+      "kind": "zplane",
+      "rate": 192000,
+      "frames": 67328,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "peak": 0.2673836350440979,
+        "nonFinite": 0,
+        "actualSha256": "9a217166c223f8adf646acad290034659a6791d4841e75ce4b834d0d3d7e32ed",
+        "referenceSha256": "9a217166c223f8adf646acad290034659a6791d4841e75ce4b834d0d3d7e32ed",
+        "bitExact": true
+      },
+      "reset": {
+        "maxAbsoluteError": 0,
+        "peak": 0.19058220088481903,
+        "nonFinite": 0,
+        "actualSha256": "27d93509aee744a213dabe06b76555af4518486f1b07e2cdcaa41ab112e6d400",
+        "referenceSha256": "27d93509aee744a213dabe06b76555af4518486f1b07e2cdcaa41ab112e6d400",
+        "bitExact": true
+      },
+      "nativeStats": [
+        2.181079647087465e-18,
+        67328,
+        12,
+        0,
+        3,
+        0,
+        0
+      ],
+      "latestTargets": [
+        [
+          0,
+          5
+        ],
+        [
+          1,
+          12
+        ],
+        [
+          2,
+          0.7123456789
+        ],
+        [
+          3,
+          -0.23456789
+        ],
+        [
+          4,
+          0.3123456789
+        ],
+        [
+          5,
+          0.8123456789
+        ]
+      ],
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1310720,
+      "memoryGrew": false,
+      "arbitrarySplits": [
+        1,
+        37,
+        509,
+        113,
+        203,
+        127,
+        2048
+      ],
+      "noncanonicalParameterRejected": true,
+      "preparedShapeEditsRejected": true
+    },
+    {
+      "kind": "shimmer",
+      "rate": 192000,
+      "frames": 172928,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "peak": 0.16761119663715363,
+        "nonFinite": 0,
+        "actualSha256": "bcbca3df50200dba69c991a0c0690de9fe53fc30f1f1dddf2f6e634203f18a8c",
+        "referenceSha256": "bcbca3df50200dba69c991a0c0690de9fe53fc30f1f1dddf2f6e634203f18a8c",
+        "bitExact": true
+      },
+      "reset": {
+        "maxAbsoluteError": 0,
+        "peak": 0.16761119663715363,
+        "nonFinite": 0,
+        "actualSha256": "98252be96a732662205dc986015626b51db9ca6a779bb6f170257f3453540790",
+        "referenceSha256": "98252be96a732662205dc986015626b51db9ca6a779bb6f170257f3453540790",
+        "bitExact": true
+      },
+      "nativeStats": [
+        0.010977130383253098,
+        172928,
+        0.03997775071393098,
+        0,
+        0,
+        0,
+        109
+      ],
+      "latestTargets": [
+        [
+          0,
+          0.3123456789123
+        ],
+        [
+          1,
+          6.123456789
+        ],
+        [
+          2,
+          12.000000001
+        ],
+        [
+          3,
+          0.29123456789
+        ],
+        [
+          4,
+          5100.123456789
+        ]
+      ],
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 1769472,
+      "memoryGrew": false,
+      "arbitrarySplits": [
+        1,
+        37,
+        509,
+        113,
+        203,
+        127,
+        2048
+      ],
+      "noncanonicalParameterRejected": true,
+      "preparedShapeEditsRejected": true
+    },
+    {
+      "kind": "freeze",
+      "rate": 192000,
+      "frames": 441728,
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "peak": 0.2332800328731537,
+        "nonFinite": 0,
+        "actualSha256": "4677994a624686cf66a849fcafc1e9f06db08022d6e5117edac1166d4c2b9d47",
+        "referenceSha256": "4677994a624686cf66a849fcafc1e9f06db08022d6e5117edac1166d4c2b9d47",
+        "bitExact": true
+      },
+      "reset": {
+        "maxAbsoluteError": 0,
+        "peak": 0.1808192878961563,
+        "nonFinite": 0,
+        "actualSha256": "d583021c16099567e73b0f0b8d302a9c82c2e4f18bf63ce8584fb8601e26bad5",
+        "referenceSha256": "d583021c16099567e73b0f0b8d302a9c82c2e4f18bf63ce8584fb8601e26bad5",
+        "bitExact": true
+      },
+      "nativeStats": [
+        0.1018630862236023,
+        441728,
+        2,
+        3,
+        93,
+        0,
+        2678463090
+      ],
+      "latestTargets": [
+        [
+          0,
+          0.734561234567
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          0.30123456789
+        ],
+        [
+          3,
+          0.426789012345
+        ]
+      ],
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 39649280,
+      "memoryGrew": false,
+      "arbitrarySplits": [
+        1,
+        37,
+        509,
+        113,
+        203,
+        127,
+        2048
+      ],
+      "noncanonicalParameterRejected": true,
+      "preparedShapeEditsRejected": true
+    }
+  ]
+}

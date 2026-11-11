@@ -1,4 +1,5 @@
 import {workerOptions,sourceSelection} from './workerProtocol';
+import {workerOnlyModules,workerRequiredMessage} from './executionPolicy';
 const base=`${import.meta.env.BASE_URL}modular-audio/`;
 let generation=0;
 const registered=new WeakMap();
@@ -10,6 +11,8 @@ export async function createWorkerRoute(context,assets,patch,{mode='worker',opti
   sourceIds=sourceSelection(sourceIds);if(typeof startPaused!=='boolean')throw Error('Invalid manual start');
   if(typeof stopOnUnderrun!=='boolean')throw Error('Invalid delivery gap policy');
   if(typeof deliveryDiagnostics!=='boolean')throw Error('Invalid delivery diagnostics');
+  const workerOnly=workerOnlyModules(patch,assets.contracts);
+  if(mode==='serial'&&workerOnly.length)throw Error(workerRequiredMessage(workerOnly));
   const o=workerOptions({...options,generation:++generation}),end=endFrame??Math.round(assets.fixture.totalSeconds*context.sampleRate);
   if(!Number.isSafeInteger(end+o.delayFrames)||end<1)throw Error('Invalid source end frame');
   await register(context,assets.manifest.version);
@@ -37,7 +40,7 @@ export async function createWorkerRoute(context,assets,patch,{mode='worker',opti
   }
   let actual=mode,fallbackReason=null,started=!startPaused;
   const withTimeout=p=>Promise.race([p,new Promise((_,j)=>timer=setTimeout(()=>j(Error('Worker initialization timeout')),10000))]).finally(()=>clearTimeout(timer));
-  const discard=()=>{node?.port.postMessage({type:'dispose'});node?.disconnect();node?.port.close();worker?.terminate();channel?.port1.close();channel?.port2.close();};
+  const discard=()=>{node?.port.postMessage({type:'dispose'});node?.disconnect();node?.port.close();worker?.terminate();channel?.port1.close();channel?.port2.close();node=null;worker=null;channel=null;};
   try{
     if(mode==='worker'){
       try{
@@ -49,7 +52,7 @@ export async function createWorkerRoute(context,assets,patch,{mode='worker',opti
         node.port.postMessage({type:'connect',port:channel.port2},[channel.port2]);
         worker.postMessage({type:'init',module:assets.modules.graph,contracts:assets.contracts,patch,rate:context.sampleRate,endFrame:end,sourceIds,options:o,deliveryDiagnostics,port:channel.port1},[channel.port1]);
         await withTimeout(ready);await withTimeout(output.primed);
-      }catch(e){fallbackReason=String(e);discard();worker=null;channel=null;error=null;actual='serial';await withTimeout(makeNode('serial').ready);}
+      }catch(e){fallbackReason=String(e);discard();if(workerOnly.length)throw Error(`${workerRequiredMessage(workerOnly)} Worker startup failed: ${fallbackReason}`);error=null;actual='serial';await withTimeout(makeNode('serial').ready);}
     }else if(mode==='serial')await withTimeout(makeNode('serial').ready);
     else throw Error('Invalid executor mode');
     return {node,end,options:o,executor:{requested:mode,actual,fallbackReason,sourceIds,manualStart:startPaused,stopOnUnderrun,deliveryDiagnostics:deliveryDiagnostics&&actual==='worker',scheduling:actual==='worker'?o.scheduling:null,blockFrames:o.blockFrames,poolBlocks:o.poolBlocks,renderAheadCapacityFrames:o.delayFrames,bufferingLatencyFrames:o.delayFrames,bufferingLatencyMs:o.delayFrames/context.sampleRate*1000,pcmPoolBytes:actual==='worker'?o.bufferBytes*o.poolBlocks:0,transport:actual==='worker'?'transferable MessagePort; no shared Wasm memory':'in-worklet serial Rust; no PCM transport'},

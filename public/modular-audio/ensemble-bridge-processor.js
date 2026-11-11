@@ -1,9 +1,9 @@
-import {ReferenceGraph} from './runtime.js?v=e9f7c9ebc2ef7d92';
+import {ReferenceGraph,assertSerialRealtimeAllowed} from './runtime.js?v=237a38efc4a26ecc';
 // Opt-in host I/O only. Existing synth/effects processors remain unchanged.
 class EnsembleBridge extends AudioWorkletProcessor{
  constructor({processorOptions:o}){super();this.stopped=false;this.origin=null;try{
   if(!Number.isSafeInteger(o.endFrame)||o.endFrame<1)throw Error('Invalid bridge end frame');
-  this.graph=new ReferenceGraph(new WebAssembly.Instance(o.module,{}).exports,o.patch,o.contracts,sampleRate);
+  this.graph=(assertSerialRealtimeAllowed(o.patch,o.contracts),new ReferenceGraph(new WebAssembly.Instance(o.module,{}).exports,o.patch,o.contracts,sampleRate));
   this.mode=o.mode;this.end=o.endFrame;this.processed=0;this.source=o.sourceId;
   this.program=this.mode==='compressor'?this.graph.inputs.get(201):null;this.key=this.mode==='compressor'?this.graph.inputs.get(202):null;
   this.kick=this.mode==='percussion'?this.graph.kicks.get(this.source):null;

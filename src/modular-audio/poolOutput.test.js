@@ -1,11 +1,12 @@
 // @vitest-environment node
 import fs from 'node:fs';import vm from 'node:vm';
+import {assertSerialRealtimeAllowed} from './executionPolicy';
 import {it,expect} from 'vitest';
 import {ReferenceGraph} from './runtime';
 import {sixSourceDag} from './pitchedFixture';
 import {planSourcePool} from './poolPlan';
 it('runs the actual Rust master worklet, retaining raw/key taps before host buffers clear and clipping the final quantum',()=>{
-  const module=new WebAssembly.Module(fs.readFileSync('public/modular-audio/graph.wasm')),contracts=JSON.parse(fs.readFileSync('public/modular-audio/contracts.json')),fixture=JSON.parse(fs.readFileSync('public/modular-audio/six-role-fixture.json')),plan=planSourcePool(sixSourceDag(fixture,48000),contracts);let Type;const messages=[],ctx=vm.createContext({ReferenceGraph,WebAssembly,Float32Array,Array,Math,Number,Error,Object,Uint32Array,sampleRate:48000,AudioWorkletProcessor:class{constructor(){this.port={postMessage:d=>messages.push(d),close(){}};}},registerProcessor:(_,c)=>Type=c});
+  const module=new WebAssembly.Module(fs.readFileSync('public/modular-audio/graph.wasm')),contracts=JSON.parse(fs.readFileSync('public/modular-audio/contracts.json')),fixture=JSON.parse(fs.readFileSync('public/modular-audio/six-role-fixture.json')),plan=planSourcePool(sixSourceDag(fixture,48000),contracts);let Type;const messages=[],ctx=vm.createContext({assertSerialRealtimeAllowed,ReferenceGraph,WebAssembly,Float32Array,Array,Math,Number,Error,Object,Uint32Array,sampleRate:48000,AudioWorkletProcessor:class{constructor(){this.port={postMessage:d=>messages.push(d),close(){}};}},registerProcessor:(_,c)=>Type=c});
   vm.runInContext(fs.readFileSync('public/modular-audio/pool-output-processor.js','utf8').replace(/^import[^;]+;\s*$/gm,''),ctx);
   const p=new Type({processorOptions:{module,contracts,patch:plan.master,groups:plan.groups,endFrame:131,options:{blockFrames:256,poolBlocks:2}}});
   for(let group=0;group<3;group++){const link={postMessage(){},close(){}};p.port.onmessage({data:{type:'connect',group,port:link}});const buffer=new ArrayBuffer(256*16*4);new Float32Array(buffer).fill(.1);link.onmessage({data:{slot:0,frame:0,n:131,generation:1,buffer}});}

@@ -1,9 +1,9 @@
-import {ReferenceGraph} from './runtime.js?v=e9f7c9ebc2ef7d92';
+import {ReferenceGraph,assertSerialRealtimeAllowed} from './runtime.js?v=237a38efc4a26ecc';
 // One Rust DAG owns all six engines, explicit mixing and actual kick-key compression.
 class DagSources extends AudioWorkletProcessor {
  constructor({processorOptions:o}){super();this.stopped=false;this.frame=0;try{
   if(!Number.isSafeInteger(o.endFrame)||o.endFrame<1||o.roles?.length!==6)throw Error('Invalid source DAG');
-  this.end=o.endFrame;this.roles=o.roles;this.g=new ReferenceGraph(new WebAssembly.Instance(o.module,{}).exports,o.patch,o.contracts,sampleRate);this.views=this.roles.map((_,i)=>this.g.outputs.get(i+1));this.kick=this.g.kicks.get(6);
+  this.end=o.endFrame;this.roles=o.roles;this.g=(assertSerialRealtimeAllowed(o.patch,o.contracts),new ReferenceGraph(new WebAssembly.Instance(o.module,{}).exports,o.patch,o.contracts,sampleRate));this.views=this.roles.map((_,i)=>this.g.outputs.get(i+1));this.kick=this.g.kicks.get(6);
   if(this.views.some(x=>!x)||!this.kick)throw Error('Missing DAG source ports');
   this.port.onmessage=({data})=>{try{if(data.type==='stats')this.stats();if(data.type==='dispose'){this.stopped=true;this.g.dispose();this.port.close();}}catch(e){this.port.postMessage({type:'error',message:String(e)});}};this.port.postMessage({type:'ready',memory:this.g.engine.memory.buffer.byteLength});
  }catch(e){this.stopped=true;this.g?.dispose();this.port.postMessage({type:'error',message:String(e)});}}

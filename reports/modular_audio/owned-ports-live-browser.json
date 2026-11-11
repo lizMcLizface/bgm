@@ -1,0 +1,32 @@
+{
+  "kind": "modular.owned-ports.live",
+  "version": 1,
+  "revision": "owned-ports-v1",
+  "engineVersion": "dab728d85b2f6615",
+  "startedAtUtc": "2026-11-11T00:29:52.728Z",
+  "muted": false,
+  "listening": "not assessed",
+  "checksPassed": true,
+  "reason": "completed",
+  "sampleRate": 48000,
+  "frames": 145792,
+  "latencyFrames": 400,
+  "stats": {
+    "type": "stats",
+    "contextOrigin": 0,
+    "frame": 145792,
+    "late": 0,
+    "overflow": 0,
+    "applied": 4,
+    "meters": {}
+  },
+  "analyser": {
+    "peaks": [
+      0.060658469796180725,
+      0.049437545239925385
+    ],
+    "observations": 105,
+    "scope": "Routed Web Audio PCM; no physical device loopback or guaranteed device-underrun detection"
+  },
+  "completedAtUtc": "2026-11-11T00:29:55.983Z"
+}

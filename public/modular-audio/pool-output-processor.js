@@ -1,5 +1,5 @@
 // src/modular-audio/poolOutputProcessor.js
-import { ReferenceGraph } from "./runtime.js?v=e9f7c9ebc2ef7d92";
+import { ReferenceGraph, assertSerialRealtimeAllowed } from "./runtime.js?v=237a38efc4a26ecc";
 
 // src/modular-audio/queueLead.js
 function contiguousLeadFrames(slots, frame, capacity) {
@@ -450,6 +450,7 @@ var PoolOutput = class extends AudioWorkletProcessor {
       this.end = p.endFrame;
       this.groups = p.groups;
       if (!Number.isSafeInteger(this.end + this.o.delayFrames) || this.end < 1 || this.groups.length < 2 || this.groups.length > 6) throw Error("Invalid pool output");
+      assertSerialRealtimeAllowed(p.patch, p.contracts);
       this.g = new ReferenceGraph(new WebAssembly.Instance(p.module, {}).exports, p.patch, p.contracts, sampleRate);
       this.inputs = Array.from({ length: 7 }, (_, i) => this.g.inputs.get(i + 1));
       if (this.inputs.some((x) => !x)) throw Error("Missing pool master inputs");

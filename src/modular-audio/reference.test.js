@@ -1,6 +1,7 @@
 // @vitest-environment node
 import fs from 'node:fs';
 import vm from 'node:vm';
+import {assertSerialRealtimeAllowed} from './executionPolicy';
 import {describe,it,expect} from 'vitest';
 import {ReferenceGraph,loadPatch,savePatch,validatePatch} from '../../public/modular-audio/runtime.js';
 const bytes=fs.readFileSync('public/modular-audio/graph.wasm');
@@ -65,7 +66,7 @@ describe('portable graph actual Wasm PCM',()=>{
  });
  it('runs the actual worklet processor with variable quanta and disposes outside process',async()=>{
   let Processor;const messages=[];
-  const context=vm.createContext({WebAssembly,Float32Array,Math,Infinity,sampleRate:48000,currentFrame:8192,ReferenceGraph,AudioWorkletProcessor:class {constructor(){this.port={postMessage:m=>messages.push(m),close(){}};}},registerProcessor:(_name,c)=>Processor=c});
+  const context=vm.createContext({assertSerialRealtimeAllowed,WebAssembly,Float32Array,Math,Infinity,sampleRate:48000,currentFrame:8192,ReferenceGraph,AudioWorkletProcessor:class {constructor(){this.port={postMessage:m=>messages.push(m),close(){}};}},registerProcessor:(_name,c)=>Processor=c});
   vm.runInContext(fs.readFileSync('public/modular-audio/processor.js','utf8').replace(/^import .*\n/,''),context);
   const p=new Processor({processorOptions:{module,patch:fixture,contracts,stopFrame:48000}});
   const g=new ReferenceGraph(exportsOf(),fixture,contracts,48000);let at=0;

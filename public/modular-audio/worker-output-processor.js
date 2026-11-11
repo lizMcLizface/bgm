@@ -1,5 +1,5 @@
 // src/modular-audio/workerOutputProcessor.js
-import { ReferenceGraph } from "./runtime.js?v=e9f7c9ebc2ef7d92";
+import { ReferenceGraph, assertSerialRealtimeAllowed } from "./runtime.js?v=237a38efc4a26ecc";
 
 // src/modular-audio/queueLead.js
 function contiguousLeadFrames(slots, frame, capacity) {
@@ -377,6 +377,7 @@ var WorkerOutput = class extends AudioWorkletProcessor {
       this.deliveryDiagnostics = !!p.deliveryDiagnostics;
       if (!Number.isSafeInteger(this.end + this.o.delayFrames) || this.end < 1 || !["worker", "serial"].includes(this.mode)) throw Error("Invalid worker output");
       if (this.mode === "serial") {
+        assertSerialRealtimeAllowed(p.patch, p.contracts);
         this.g = new ReferenceGraph(new WebAssembly.Instance(p.module, {}).exports, p.patch, p.contracts, sampleRate);
         this.views = sourceViews(this.g, this.sourceIds);
       } else this.queue = new WorkerPcmQueue(this.o, this.end, (b) => {

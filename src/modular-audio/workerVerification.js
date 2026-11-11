@@ -7,11 +7,15 @@ const base=`${import.meta.env.BASE_URL}modular-audio/`;
 // Consumer-paced exact check in a real Worker. It is not an OfflineAudioContext
 // deadline benchmark (an offline context can outrun an asynchronous producer).
 export async function verifyWorker(assets,rate,{makeWorker=()=>new Worker(base+`graph-worker.js?v=${assets.manifest.version}`,{type:'module'}),generation=1,seconds=assets.fixture.totalSeconds,options:requestedOptions={},patch:requestedPatch=null}={}) {
-  const options=workerOptions({...requestedOptions,generation}),endFrame=Math.round(seconds*rate),patch=requestedPatch??sixSourceDag(assets.fixture,rate),worker=makeWorker(),channel=new MessageChannel();
-  const referenceBlockFrames=Math.max(1024,options.blockFrames),serial=new ReferenceGraph(new WebAssembly.Instance(assets.modules.graph,{}).exports,patch,assets.contracts,rate,referenceBlockFrames),views=sourceViews(serial),expected=new Float32Array(referenceBlockFrames*16);
-  const sameCadence=options.blockFrames===referenceBlockFrames?serial:new ReferenceGraph(new WebAssembly.Instance(assets.modules.graph,{}).exports,patch,assets.contracts,rate,options.blockFrames),sameViews=sourceViews(sameCadence),sameExpected=sameCadence===serial?expected:new Float32Array(options.bufferBytes/4);
-  let frame=0,blocks=0,maxAbs=0,sameCadenceMaxAbs=0,normalRangeMaxAbs=0,subnormalDifferences=0,nonFinite=0,rejectedPast=false,acceptedFuture=false,controlFrame=32768,appliedControl=false,timeout,referenceFrames=0;
-  try{return await new Promise((resolve,reject)=>{
+  const options=workerOptions({...requestedOptions,generation}),endFrame=Math.round(seconds*rate),patch=requestedPatch??sixSourceDag(assets.fixture,rate);
+  let worker=null,channel=null,serial=null,sameCadence=null,timeout;
+  try{
+  const referenceBlockFrames=Math.max(1024,options.blockFrames);serial=new ReferenceGraph(new WebAssembly.Instance(assets.modules.graph,{}).exports,patch,assets.contracts,rate,referenceBlockFrames);const views=sourceViews(serial),expected=new Float32Array(referenceBlockFrames*16);
+  sameCadence=options.blockFrames===referenceBlockFrames?serial:new ReferenceGraph(new WebAssembly.Instance(assets.modules.graph,{}).exports,patch,assets.contracts,rate,options.blockFrames);const sameViews=sourceViews(sameCadence),sameExpected=sameCadence===serial?expected:new Float32Array(options.bufferBytes/4);
+  // A failed reference preparation must not start a thread or leak a graph.
+  worker=makeWorker();channel=new MessageChannel();
+  let frame=0,blocks=0,maxAbs=0,sameCadenceMaxAbs=0,normalRangeMaxAbs=0,subnormalDifferences=0,nonFinite=0,rejectedPast=false,acceptedFuture=false,controlFrame=32768,appliedControl=false,referenceFrames=0;
+  return await new Promise((resolve,reject)=>{
     timeout=setTimeout(()=>reject(Error('Worker verification timed out')),120000);
     const finish=()=>worker.postMessage({type:'stats',request:99,generation});
     worker.onerror=e=>reject(Error(e.message||'Worker failed'));
@@ -39,5 +43,5 @@ export async function verifyWorker(assets,rate,{makeWorker=()=>new Worker(base+`
       }catch(e){reject(e);}
     };
     worker.postMessage({type:'init',module:assets.modules.graph,contracts:assets.contracts,patch,rate,endFrame,options,port:channel.port1},[channel.port1]);
-  });}finally{clearTimeout(timeout);worker.terminate();channel.port2.close();if(sameCadence!==serial)sameCadence.dispose();serial.dispose();}
+  });}finally{clearTimeout(timeout);worker?.terminate();channel?.port1.close();channel?.port2.close();if(sameCadence!==serial)sameCadence?.dispose();serial?.dispose();}
 }

@@ -1,0 +1,8 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import {spawnSync} from 'node:child_process';
+const local=path.resolve('.tmp/rust-tools'),env={...process.env,CARGO_HOME:path.join(local,'cargo'),RUSTUP_HOME:path.join(local,'rustup')};env.PATH=path.join(local,'cargo/bin')+path.delimiter+env.PATH;
+const result=spawnSync(path.join(local,'cargo/bin',process.platform==='win32'?'cargo.exe':'cargo'),['build','--offline','--release','--target','wasm32-unknown-unknown','--manifest-path','tools/graphFxAdapterProbe/Cargo.toml','--target-dir','.tmp/graph-fx-adapter-probe-target'],{env,stdio:'inherit'});if(result.error)throw result.error;if(result.status)process.exit(result.status);
+const sha=b=>crypto.createHash('sha256').update(b).digest('hex'),files=['tools/graphFxAdapterProbe/Cargo.toml','tools/graphFxAdapterProbe/Cargo.lock','tools/graphFxAdapterProbe/src/lib.rs','synth-engine/graph/src/rack_nodes.rs','synth-engine/graph/src/voice_nodes.rs','synth-engine/rack-fx/src/lib.rs','synth-engine/voice-fx/src/lib.rs'],wasm=fs.readFileSync('.tmp/graph-fx-adapter-probe-target/wasm32-unknown-unknown/release/calmbgm_graph_fx_adapter_probe.wasm'),source=sha(files.map(f=>f+'\n'+fs.readFileSync(f,'utf8').replace(/\r\n/g,'\n')).join('\n')),manifest={version:1,private:true,source,wasm:sha(wasm),bytes:wasm.length};
+fs.mkdirSync('.tmp/graph-fx-adapter-probe',{recursive:true});fs.writeFileSync('.tmp/graph-fx-adapter-probe/probe.wasm',wasm);fs.writeFileSync('.tmp/graph-fx-adapter-probe/build.json',JSON.stringify(manifest,null,2)+'\n');console.log(`Built private graph FX adapter probe: ${wasm.length} bytes.`);

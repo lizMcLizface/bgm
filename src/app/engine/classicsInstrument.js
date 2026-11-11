@@ -34,7 +34,7 @@ export default class ClassicsInstrument {
    return inst;
   }catch(error){inst.dispose();throw error;}
  }
- constructor(context,preset,polyphony){this.AC=context;this.preset={gainRelease:.5,...preset};this.polyphony=polyphony;this.output=context.createGain();this.nextId=1;this.reverb={settled:true,hear(){}};this.drums=drumNotes(preset.classics.synth);this.kit=null;this.held=new Map();}
+ constructor(context,preset,polyphony){this.AC=context;this.preset={gainRelease:.5,...preset};this.polyphony=polyphony;this.output=context.createGain();this.nextId=1;this.reverb={settled:true,hear(){}};this.drums=drumNotes(preset.classics.synth);this.kit=null;this.held=new Map();this.disposed=false;this.sourceInputs=0;}
  pairs(values){const synth=SYNTHS[this.preset.classics.synth],effective={...values};if('voices'in effective)effective.voices=Math.min(effective.voices,this.polyphony);if(this.preset.classics.light&&'oversample'in effective)effective.oversample=0;return (this.preset.classics.moved?synth.params.toEnginePairs??synth.params.toPairs:synth.params.toPairs)(effective);}
  connect(node){this.output.connect(node);}
  /** The kernel for a note from `start` to `end`: the first that is free by then, else the one freed soonest. */
@@ -91,7 +91,12 @@ export default class ClassicsInstrument {
  flushTails(){this.silence();}
  tailSeconds(){const {effects,inserts}=rackPackets(this.preset.classics.rack);return Math.max(this.preset.classics.values.reverbDecay??0,effectTail(effects)+insertsTail(inserts));}
  awakeVoices(){return this.stats?.active??0;}
- effectsAwake(){return (this.stats?.peak??0)>0;}
+ effectsAwake(){return this.sourceInputs>0||(this.stats?.peak??0)>0;}
+ /** Native composite output, before this kernel's existing external rack. */
+ captureSource(){if(this.disposed||this.error||this.offlineEvents||this.lives?.length!==1||!this.live?.captureSource)throw Error('Select a ready single-kernel classic source');return this.live.captureSource();}
+ captureSources(){if(this.disposed||this.error||this.offlineEvents||!this.lives?.length||this.lives.some(l=>!l?.captureSource||!l.sourceInput))throw Error('Select a ready classic source stack');return this.lives.map(l=>l.captureSource());}
+ holdSourceInputs(){this.captureSources();if(this.held.size)throw Error('Release the classic keyboard before previewing');const releases=[];try{for(const l of this.lives)releases.push(l.holdSourceInput());}catch(error){for(const release of releases)release();throw error;}this.sourceInputs++;let done=false;return ()=>{if(done)return;done=true;this.sourceInputs--;for(const release of releases)release();};}
+ holdSourceInput(){this.captureSource();if(this.held.size)throw Error('Release the classic keyboard before previewing');const release=this.live.holdSourceInput();this.sourceInputs++;let done=false;return ()=>{if(done)return;done=true;this.sourceInputs--;release();};}
  activeEffects(){return ['Instrument rack'];}
- dispose(){for(const l of this.lives??[this.live])l?.close();this.offlineNode?.disconnect();this.offlineNode?.port.close();this.outboard?.dispose();this.output.disconnect();}
+ dispose(){if(this.disposed)return;this.disposed=true;for(const l of this.lives??[this.live])l?.close();this.offlineNode?.disconnect();this.offlineNode?.port.close();this.outboard?.dispose();this.output.disconnect();}
 }

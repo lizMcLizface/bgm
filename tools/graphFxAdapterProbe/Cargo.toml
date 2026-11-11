@@ -1,0 +1,19 @@
+[package]
+name = "calmbgm_graph_fx_adapter_probe"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+calmbgm_rack_fx = { path = "../../synth-engine/rack-fx" }
+calmbgm_voice_fx = { path = "../../synth-engine/voice-fx" }
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true

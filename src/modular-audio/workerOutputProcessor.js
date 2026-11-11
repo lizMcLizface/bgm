@@ -1,4 +1,4 @@
-import {ReferenceGraph} from './runtime.js';
+import {ReferenceGraph,assertSerialRealtimeAllowed} from './runtime.js';
 import {workerOptions,WorkerPcmQueue,sourceViews,graphSnapshot,sourceSelection} from './workerProtocol.js';
 import {ProcessTiming} from './processTiming.js';
 
@@ -11,7 +11,7 @@ class WorkerOutput extends AudioWorkletProcessor {
       if(p.stopOnUnderrun!==undefined&&typeof p.stopOnUnderrun!=='boolean')throw Error('Invalid delivery gap policy');this.stopOnUnderrun=!!p.stopOnUnderrun;
       if(p.deliveryDiagnostics!==undefined&&typeof p.deliveryDiagnostics!=='boolean')throw Error('Invalid delivery diagnostics');this.deliveryDiagnostics=!!p.deliveryDiagnostics;
       if(!Number.isSafeInteger(this.end+this.o.delayFrames)||this.end<1||!['worker','serial'].includes(this.mode))throw Error('Invalid worker output');
-      if(this.mode==='serial'){this.g=new ReferenceGraph(new WebAssembly.Instance(p.module,{}).exports,p.patch,p.contracts,sampleRate);this.views=sourceViews(this.g,this.sourceIds);}
+      if(this.mode==='serial'){assertSerialRealtimeAllowed(p.patch,p.contracts);this.g=new ReferenceGraph(new WebAssembly.Instance(p.module,{}).exports,p.patch,p.contracts,sampleRate);this.views=sourceViews(this.g,this.sourceIds);}
       else this.queue=new WorkerPcmQueue(this.o,this.end,b=>{const message={type:'recycle',generation:b.generation,slot:b.slot,buffer:b.buffer};if(this.deliveryDiagnostics)message.consumerFrame=this.queue.frame;this.link.postMessage(message,[b.buffer]);},null,this.deliveryDiagnostics);
       this.port.onmessage=({data:d})=>{try{
         if(d.type==='connect'&&this.mode==='worker'&&!this.link){this.link=d.port;this.link.onmessage=({data:b})=>{if(this.stopped)return;if(b.type==='block'){this.queue.accept(b);if(!this.primed&&this.queue.count>=Math.min(this.o.poolBlocks,Math.ceil(this.end/this.o.blockFrames))){this.primed=true;this.port.postMessage({type:'primed'});}}};}

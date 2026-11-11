@@ -1,4 +1,4 @@
-import {ReferenceGraph} from './runtime.js?v=e9f7c9ebc2ef7d92';
+import {ReferenceGraph,assertSerialRealtimeAllowed} from './runtime.js?v=237a38efc4a26ecc';
 
 class ReferenceProcessor extends AudioWorkletProcessor {
   constructor({processorOptions: o}) {
@@ -7,7 +7,7 @@ class ReferenceProcessor extends AudioWorkletProcessor {
     this.origin = null;
     try {
       if(o.stopFrame !== undefined && (!Number.isSafeInteger(o.stopFrame) || o.stopFrame < 1)) throw Error('Invalid stop frame');
-      this.graph = new ReferenceGraph(new WebAssembly.Instance(o.module,{}).exports,o.patch,o.contracts,sampleRate,o.maxBlock ?? 2048);
+      this.graph = (assertSerialRealtimeAllowed(o.patch,o.contracts),new ReferenceGraph(new WebAssembly.Instance(o.module,{}).exports,o.patch,o.contracts,sampleRate,o.maxBlock ?? 2048));
       this.stopFrame = o.stopFrame ?? Infinity;
       this.port.onmessage = ({data}) => {
         try {

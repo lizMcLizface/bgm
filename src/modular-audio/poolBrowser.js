@@ -1,5 +1,5 @@
 import {workerOptions} from './workerProtocol';
-import {planSourcePool} from './poolPlan';
+import {planSourcePool,preparePoolMaster} from './poolPlan';
 import {createWorkerRoute} from './workerBrowser';
 const base=`${import.meta.env.BASE_URL}modular-audio/`;
 let generation=0;
@@ -7,7 +7,7 @@ const registered=new WeakMap();
 
 export async function createPoolRoute(context,assets,patch,{options={},groups,forceFallback=false,onFinished=()=>{}}={}){
   const o=workerOptions({...options,generation:++generation}),end=Math.round(assets.fixture.totalSeconds*context.sampleRate),workers=[],channels=[],pending=new Map(),last=[];
-  let node,plan,error=null,disposed=false,next=0,outputStats=null;
+  let node,plan,sourceLatencies=null,error=null,disposed=false,next=0,outputStats=null;
   const rejectAll=e=>{for(const p of pending.values()){clearTimeout(p.timer);p.reject(e);}pending.clear();};
   const fail=e=>{error=String(e);rejectAll(Error(error));node?.port.postMessage({type:'failure'});};
   const request=(group,message)=>new Promise((resolve,reject)=>{
@@ -20,17 +20,21 @@ export async function createPoolRoute(context,assets,patch,{options={},groups,fo
     if(forceFallback||typeof Worker==='undefined'||typeof MessageChannel==='undefined')throw Error(forceFallback?'Pool serial fallback explicitly selected':'Worker/MessageChannel unavailable');
     plan=planSourcePool(patch,assets.contracts,groups);
     if(!registered.has(context))registered.set(context,context.audioWorklet.addModule(base+`pool-output-processor.js?v=${assets.manifest.version}`));await registered.get(context);
-    let readyResolve,readyReject,primeResolve,primeReject;
-    const ready=new Promise((r,j)=>{readyResolve=r;readyReject=j;}),primed=new Promise((r,j)=>{primeResolve=r;primeReject=j;});primed.catch(()=>{});
-    node=new AudioWorkletNode(context,'calmbgm-pool-output',{numberOfInputs:0,numberOfOutputs:8,outputChannelCount:Array(8).fill(2),processorOptions:{module:assets.modules.graph,contracts:assets.contracts,patch:plan.master,groups:plan.groups,options:o,endFrame:end}});
-    node.port.onmessage=({data:d})=>{
-      if(d.type==='ready')readyResolve(d);if(d.type==='primed')primeResolve(d);
-      if(d.type==='error'){readyReject(Error(d.message));primeReject(Error(d.message));fail(d.message);}
-      if(d.type==='finished')onFinished();
-      if(d.type==='stats'){outputStats=d;const p=pending.get('output');if(p){clearTimeout(p.timer);pending.delete('output');p.resolve(d);}}
+    const makeOutput=patch=>{
+      let readyResolve,readyReject,primeResolve,primeReject;
+      const ready=new Promise((r,j)=>{readyResolve=r;readyReject=j;}),primed=new Promise((r,j)=>{primeResolve=r;primeReject=j;});primed.catch(()=>{});
+      node=new AudioWorkletNode(context,'calmbgm-pool-output',{numberOfInputs:0,numberOfOutputs:8,outputChannelCount:Array(8).fill(2),processorOptions:{module:assets.modules.graph,contracts:assets.contracts,patch,groups:plan.groups,options:o,endFrame:end}});
+      node.port.onmessage=({data:d})=>{
+        if(d.type==='ready')readyResolve(d);if(d.type==='primed')primeResolve(d);
+        if(d.type==='error'){readyReject(Error(d.message));primeReject(Error(d.message));fail(d.message);}
+        if(d.type==='finished')onFinished();
+        if(d.type==='stats'){outputStats=d;const p=pending.get('output');if(p){clearTimeout(p.timer);pending.delete('output');p.resolve(d);}}
+      };
+      node.onprocessorerror=()=>{const e=Error('Pool output processor failed');readyReject(e);primeReject(e);fail(e);};return {ready,primed};
     };
-    node.onprocessorerror=()=>{const e=Error('Pool output processor failed');readyReject(e);primeReject(e);fail(e);};await deadline(ready);
-    await deadline(Promise.all(plan.groups.map((sourceIds,group)=>new Promise((resolve,reject)=>{
+    let output;
+    if(!plan.latencyCompensation){output=makeOutput(plan.master);await deadline(output.ready);}
+    const prepared=await deadline(Promise.all(plan.groups.map((sourceIds,group)=>new Promise((resolve,reject)=>{
       const worker=new Worker(base+`graph-worker.js?v=${assets.manifest.version}`,{type:'module',name:`source-pool-${o.generation}-${group}`}),channel=new MessageChannel();workers.push(worker);channels.push(channel);
       worker.onmessage=({data:d})=>{
         if(d.type==='ready')resolve(d);
@@ -39,10 +43,17 @@ export async function createPoolRoute(context,assets,patch,{options={},groups,fo
         const p=pending.get(d.request);if(p){clearTimeout(p.timer);pending.delete(d.request);if(d.type==='rejected')p.reject(Error(d.message));else p.resolve(d);}
       };
       worker.onerror=e=>{reject(Error(e.message||'Pool worker failed'));fail(e.message||'Pool worker failed');};
-      node.port.postMessage({type:'connect',group,port:channel.port2},[channel.port2]);
+      if(node)node.port.postMessage({type:'connect',group,port:channel.port2},[channel.port2]);
       worker.postMessage({type:'init',module:assets.modules.graph,contracts:assets.contracts,patch:plan.sources[group],sourceIds,rate:context.sampleRate,endFrame:end,options:o,port:channel.port1},[channel.port1]);
-    }))));await deadline(primed);
-    return {node,end,options:o,executor:{requested:'pool',actual:'pool',scheduling:o.scheduling,workers:workers.length,groups:plan.groups,masterLevels:plan.levels,blockFrames:o.blockFrames,poolBlocks:o.poolBlocks,renderAheadCapacityFrames:o.delayFrames,bufferingLatencyFrames:o.delayFrames,bufferingLatencyMs:o.delayFrames/context.sampleRate*1000,pcmPoolBytes:o.bufferBytes*o.poolBlocks*workers.length,transport:`${workers.length} independent worker PCM pools; Rust master in worklet`,fallbackReason:null},
+    }))));
+    if(plan.latencyCompensation){
+      const master=preparePoolMaster(plan,prepared,assets.contracts);sourceLatencies=master.sourceLatencies;output=makeOutput(master.patch);await deadline(output.ready);
+      // Producers can fill only their bounded PCM pools while ports await the
+      // prepared master. Transferring port2 retains those queued publications.
+      channels.forEach((channel,group)=>node.port.postMessage({type:'connect',group,port:channel.port2},[channel.port2]));
+    }
+    await deadline(output.primed);
+    return {node,end,options:o,executor:{requested:'pool',actual:'pool',scheduling:o.scheduling,workers:workers.length,groups:plan.groups,masterLevels:plan.levels,...(sourceLatencies?{latencyCompensation:true,sourceLatencies}:{}),blockFrames:o.blockFrames,poolBlocks:o.poolBlocks,renderAheadCapacityFrames:o.delayFrames,bufferingLatencyFrames:o.delayFrames,bufferingLatencyMs:o.delayFrames/context.sampleRate*1000,pcmPoolBytes:o.bufferBytes*o.poolBlocks*workers.length,transport:`${workers.length} independent worker PCM pools; Rust master in worklet`,fallbackReason:null},
       check(){if(error)throw Error(error);},
       async stats(){
         if(pending.has('output')||pending.size+workers.length+1>64)throw Error('Pool stats already pending or control capacity exceeded');

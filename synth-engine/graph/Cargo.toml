@@ -13,6 +13,12 @@ calmbgm_fm = { path = "../fm", default-features = false, features = ["cache-colo
 calmbgm_core = { package = "calmbgm-synth", path = "..", default-features = false }
 calmbgm_piano = { path = "../piano" }
 calmbgm_iowa = { path = "../iowa" }
+calmbgm_inserts = { path = "../inserts", default-features = false }
+calmbgm_effects = { path = "../effects", default-features = false }
+calmbgm_mixer = { path = "../mixer" }
+calmbgm_classics = {path="../classics",default-features=false}
+calmbgm_rack_fx = {path="../rack-fx"}
+calmbgm_voice_fx = {path="../voice-fx"}
 
 [features]
 allocation-audit = []

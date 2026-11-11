@@ -29,12 +29,14 @@ export function startLiveSynth({model=MODELS.cs80,params=[],waves=null,rack=clea
  // A shared context belongs to its host, which wakes it on Play. Awaiting its
  // resume here deadlocks setup restoration behind the browser's gesture gate.
  const resumed=sharedContext||Number.isFinite(context.length)?Promise.resolve():context.resume().catch(()=>{});
- let outboard,monitor,node;
+ let outboard,monitor,node,nativeGate,sourceInput;
  return (async()=>{
   if(!context.audioWorklet)throw Error('Audio needs a secure page: open this over https:// (or localhost), not plain http.');
   const [module]=await Promise.all([loadKernel(),loadClassicsWorklet(context),resumed]);
   let stats={active:0,peak:0},outputPeak=0;
-  node=new AudioWorkletNode(context,'calmbgm-classics',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{module,model,params,waves,polyphony}});
+  const savedParams=new Map(params.map(([id,value])=>[id,value])),savedControls=new Map();
+  let savedWaves=waves?Float32Array.from(waves):null,revision=0,sequenced=false,futureControl=false;
+  node=new AudioWorkletNode(context,'calmbgm-classics',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{module,model,params,waves:savedWaves,polyphony}});
   await new Promise((resolve,reject)=>{node.port.onmessage=({data})=>{
    if(data.type==='ready')resolve();
    else if(data.type==='error'){reject(Error(data.message));onError(Error(data.message));}
@@ -42,30 +44,38 @@ export function startLiveSynth({model=MODELS.cs80,params=[],waves=null,rack=clea
   };node.onprocessorerror=()=>{const error=Error('Synth worklet failed. Reload the page.');reject(error);onError(error);};});
   outboard=await createRack(context,rack,{onError});
   monitor=await createOutputMonitor(context,peak=>{outputPeak=peak;onStats({...stats,peak,reduction:outboard.reduction});});
-  node.connect(outboard.input);outboard.connect(monitor.node);monitor.node.connect(destination??context.destination);
+  // Both paths already contain the native BBD/space/output stage. Inject before
+  // the external rack, and silence native background hiss only during a lease.
+  nativeGate=context.createGain();sourceInput=context.createGain();
+  node.connect(nativeGate);nativeGate.connect(outboard.input);sourceInput.connect(outboard.input);
+  outboard.connect(monitor.node);monitor.node.connect(destination??context.destination);
   // Batch everything sent in one task into a single message.
   let events=[],edits=[],steps=[],queued=false;
   const flush=()=>{queued=false;if(edits.length){node.port.postMessage({type:'params',values:edits});edits=[];}if(steps.length){node.port.postMessage({type:'seq',values:steps});steps=[];}if(events.length){node.port.postMessage({type:'events',values:events});events=[];}};
   const queue=()=>{if(!queued){queued=true;queueMicrotask(flush);}};
-  let closed=false;
+  let closed=false,holds=0;
   return {
-   context,node,
+   context,node,sourceInput,
+   captureSource(){if(closed||sequenced||futureControl)throw Error('Classic source is closed or has unsupported scheduled controls/sequencing');return {revision,version:1,model,parameters:Array.from(savedParams,([id,value])=>[id,value]),...(savedWaves?{waves:Array.from(savedWaves)}:{}),polyphony:Math.max(1,Math.min(32,polyphony??32)),controls:Array.from(savedControls,([id,value])=>[id,value])};},
+   get sourceRevision(){return revision;},
+   get closed(){return closed;},
+   holdSourceInput(){if(closed)throw Error('Classic source is closed');holds++;nativeGate.gain.value=0;let released=false;return ()=>{if(released)return;released=true;holds--;if(!closed&&holds===0)nativeGate.gain.value=1;};},
    get latency(){return (context.baseLatency||0)+(context.outputLatency||0);},
-   setParam(id,value){edits.push([id,value]);queue();},
-   setParams(pairs){edits.push(...pairs);queue();},
+   setParam(id,value){savedParams.set(id,value);revision++;edits.push([id,value]);queue();},
+   setParams(pairs){for(const [id,value]of pairs){savedParams.set(id,value);edits.push([id,value]);}revision++;queue();},
    noteOn(id,note,velocity,time){events.push([NOTE_ON,id,note,velocity,time]);queue();},
    noteOff(id,time){events.push([NOTE_OFF,id,0,0,time]);queue();},
    pressure(id,value,time){events.push([PRESSURE,id,value,0,time]);queue();},
-   control(which,value,time){events.push([CONTROL,which,value,0,time]);queue();},
+   control(which,value,time){savedControls.set(which,value);futureControl||=Number.isFinite(time)&&time>context.currentTime;revision++;events.push([CONTROL,which,value,0,time]);queue();},
    /** Sequencer commands for the drum machines and the bass line: [[cmd,a,b],…] (see syn_seq in the kernel). */
-   seq(commands){steps.push(...commands);queue();},
+   seq(commands){sequenced=true;revision++;steps.push(...commands);queue();},
    /** The vector synthesizer's 128 waves × 128 samples (Float32Array of 16,384). */
-   setWaves(data){node.port.postMessage({type:'waves',waves:data});},
+   setWaves(data){savedWaves=Float32Array.from(data);revision++;node.port.postMessage({type:'waves',waves:savedWaves});},
    /** Asks for the newest n output samples (mono): handler({end, rate, samples}); `end` counts frames since the engine started. */
    requestScope:monitor.requestScope,
-   setRack:values=>outboard.patch(values),clearRack:()=>outboard.clear(),
-   panic(){flush();node.port.postMessage({type:'panic'});outboard.clear();},
-   async close(){if(closed)return;closed=true;flush();node.port.postMessage({type:'dispose'});node.disconnect();outboard.dispose();monitor.dispose();if(!sharedContext)await context.close().catch(()=>{});},
+   setRack(values){revision++;outboard.patch(values);},clearRack:()=>outboard.clear(),
+   panic(){revision++;flush();node.port.postMessage({type:'panic'});outboard.clear();},
+   async close(){if(closed)return;closed=true;flush();node.port.postMessage({type:'dispose'});node.disconnect();nativeGate.disconnect();sourceInput.disconnect();outboard.dispose();monitor.dispose();if(!sharedContext)await context.close().catch(()=>{});},
   };
- })().catch(error=>{node?.port.postMessage({type:'dispose'});node?.disconnect();outboard?.dispose();monitor?.dispose();if(!sharedContext)context.close().catch(()=>{});throw error;});
+ })().catch(error=>{node?.port.postMessage({type:'dispose'});node?.disconnect();nativeGate?.disconnect();sourceInput?.disconnect();outboard?.dispose();monitor?.dispose();if(!sharedContext)context.close().catch(()=>{});throw error;});
 }

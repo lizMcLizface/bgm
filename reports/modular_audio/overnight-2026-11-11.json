@@ -1,0 +1,57 @@
+{
+  "kind": "modular-audio.overnight-run",
+  "version": 1,
+  "status": "running",
+  "startedAtUtc": "2026-11-10T23:19:46Z",
+  "updatedAtUtc": "2026-11-11T00:31:22.856Z",
+  "featureCutoffUtc": "2026-11-11T08:30:00Z",
+  "deadlineUtc": "2026-11-11T09:00:00Z",
+  "gitIdentity": {
+    "name": "lizMcLizface",
+    "email": "121907922+lizMcLizface@users.noreply.github.com"
+  },
+  "commits": [
+    "35f786f",
+    "682cdff",
+    "c550599",
+    "904b541",
+    "1d6291b",
+    "bee2764",
+    "fff00db"
+  ],
+  "graph": {
+    "api": 1,
+    "source": "704ad3e28a855812ec7414371505d5b65368fd4e58ba238480f4b4080bd72a74",
+    "wasm": "ab294d36e23ac25974feda5cbec8a835d935cee14e4f3fb8a16255395ee499d6",
+    "runtime": "86aab6ae9209c6fb1ffe58ba9afc93ee6759d14919207bb07097ab29e7ec6b13",
+    "bytes": 1428890,
+    "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+    "version": "dab728d85b2f6615"
+  },
+  "checks": {
+    "fullSuite": {
+      "files": 437,
+      "tests": 3267,
+      "pass": true,
+      "log": ".tmp/overnight-all-tests.log"
+    },
+    "focusedGraph": {
+      "tests": 53,
+      "pass": true
+    },
+    "normalPublicBuild": true,
+    "existingAllocationCases": 30,
+    "combinedAllocationCases": 9,
+    "desktopBrowser": "owned-ports-desktop-browser.json",
+    "liveOutputBrowser": "owned-ports-live-browser.json"
+  },
+  "limitations": [
+    "No physical listening/device-underrun claim",
+    "Freeze worker-only; exact synchronous capture may exceed one callback",
+    "Only integer path differences compensated; FM fractional differences reject",
+    "Workbench still five pitched plus percussion source buses",
+    "Native WebAudio Tape/Motion, complete envelope/filter/colour and ambience host seams not fully migrated",
+    "Full-page persistence reload not yet checked"
+  ],
+  "next": "Continue independent remaining source preparation and host-chain ports, then broaden fixed desktop verification. Stop features08:30 and hand off09:00."
+}

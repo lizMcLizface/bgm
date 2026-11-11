@@ -1,6 +1,21 @@
 // @vitest-environment node
 import {it,expect,vi,afterEach} from 'vitest';
 import {createWorkbenchPreview,createWorkbenchCapacityComparison} from './workbenchPreview';
+import {CLASSIC_STACK_ALLOCATION} from './classicCompiler';
+const classicStack=count=>({kind:'classic-composite',patch:{version:1,allocation:CLASSIC_STACK_ALLOCATION,slots:Array.from({length:count},()=>({version:1,model:4,parameters:[],polyphony:8,controls:[],tailSeconds:1}))}});
+it('binds a mono stack to its separate existing racks, activates once and reports physical source peaks independently',async()=>{
+ vi.useFakeTimers();const s=setup(),inputs=[setup().lease.input,setup().lease.input],release=vi.fn(),bass=setup().lease;Object.assign(s.lease,classicStack(2),{inputs,activate:vi.fn(()=>release)});s.config.roles=['lead','bass'];s.host.openSourceStem=vi.fn(r=>r==='bass'?bass:s.lease);s.config.project.patterns.lead.steps[0].n=[{midi:48},{midi:55}];s.config.project.patterns.bass=structuredClone(s.config.project.patterns.lead);
+ let analyser=0;s.context.createAnalyser=()=>{const index=analyser++;return {connect:vi.fn(),disconnect:vi.fn(),getFloatTimeDomainData:b=>b.fill(index===2?0:.1)};};
+ const p=createWorkbenchPreview(s.config);await p.ready;expect(s.getOptions().sourceIds).toEqual([1,2,5]);expect(s.route.node.connect.mock.calls.map(c=>c[1])).toEqual([0,1,4]);expect(s.route.node.connect.mock.calls[0][0].connect).toHaveBeenCalledWith(inputs[0]);expect(s.route.node.connect.mock.calls[1][0].connect).toHaveBeenCalledWith(inputs[1]);expect(s.lease.activate).toHaveBeenCalledOnce();
+ await vi.advanceTimersByTimeAsync(130);s.getOptions().onFinished({reason:'completed'});await p.stop();const report=s.done.mock.calls[0][0];expect(report.stems.map(s=>[s.role,s.slot,s.sourceId,s.peaks.source])).toEqual([['lead',0,1,expect.closeTo(.1)],['lead',1,2,0],['bass',undefined,5,expect.closeTo(.1)]]);expect(report.pass).toBe(false);expect(release).toHaveBeenCalledOnce();expect(s.lease.release).toHaveBeenCalledOnce();expect(inputs.every(n=>n.disconnect.mock.calls.length===0)).toBe(true);
+});
+it('fails composite route preparation before activation when pitched buses or slot bindings are invalid',async()=>{
+ const s=setup();Object.assign(s.lease,classicStack(4),{inputs:Array.from({length:4},()=>setup().lease.input),activate:vi.fn()});s.config.roles=['lead','counter','bass'];s.host.openSourceStem=vi.fn(r=>r==='lead'?s.lease:setup().lease);await expect(createWorkbenchPreview(s.config).ready).rejects.toThrow('physical source buses');expect(s.config.makeRoute).not.toHaveBeenCalled();expect(s.lease.activate).not.toHaveBeenCalled();expect(s.lease.release).toHaveBeenCalledOnce();
+ const t=setup();Object.assign(t.lease,classicStack(2),{inputs:[setup().lease.input],activate:vi.fn()});await expect(createWorkbenchPreview(t.config).ready).rejects.toThrow('bindings');expect(t.config.makeRoute).not.toHaveBeenCalled();expect(t.lease.release).toHaveBeenCalledOnce();
+});
+it('releases a fully leased mono stack when another role fails activation and never starts output',async()=>{
+ const s=setup(),release=vi.fn(),bass=setup().lease;Object.assign(s.lease,classicStack(2),{inputs:[setup().lease.input,setup().lease.input],activate:vi.fn(()=>release)});bass.activate=()=>{throw Error('other source expired');};s.config.roles=['lead','bass'];s.config.project.patterns.bass=structuredClone(s.config.project.patterns.lead);s.host.openSourceStem=vi.fn(r=>r==='lead'?s.lease:bass);await expect(createWorkbenchPreview(s.config).ready).rejects.toThrow('expired');expect(release).toHaveBeenCalledOnce();expect(s.route.start).not.toHaveBeenCalled();expect(s.route.dispose).toHaveBeenCalledOnce();expect(s.lease.release).toHaveBeenCalledOnce();expect(bass.release).toHaveBeenCalledOnce();
+});
 it('activates an external native effects input only after preparation and releases it on cleanup',async()=>{
  vi.useFakeTimers();const s=setup(),release=vi.fn();s.lease.activate=vi.fn(()=>release);
  try{const p=createWorkbenchPreview(s.config);await p.ready;expect(s.lease.activate).toHaveBeenCalledOnce();s.getOptions().onFinished();await p.stop();expect(release).toHaveBeenCalledOnce();await p.stop();expect(release).toHaveBeenCalledOnce();}finally{vi.useRealTimers();}
