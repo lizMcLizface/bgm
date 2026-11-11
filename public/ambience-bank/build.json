@@ -1,0 +1,11 @@
+{
+  "api": 1,
+  "profile": "credit-prepared-ambience-bank-v1",
+  "source": "c28abcda1bbb844dd07dad7586d870c210be99aca555ee72ed9d3fd58c790896",
+  "runtime": "ea185ecd0e370af971bfd7ad4cc36886723dca45757636d2c66eef0156a4719a",
+  "reference": "61cb1e24c3d5bf7d5994200146f9a7d119709d6d3d1e46e7f49ddac812549390",
+  "wasm": "01d0f5bd1b3f16f0f3a0b9fe0924b72d35b7dfc3f4eecb3daeaee508d84e4286",
+  "bytes": 38644,
+  "audited": false,
+  "version": "68199bfdca56652f"
+}
