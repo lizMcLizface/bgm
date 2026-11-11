@@ -3,7 +3,7 @@
   "version": 1,
   "status": "running",
   "startedAtUtc": "2026-11-10T23:19:46Z",
-  "updatedAtUtc": "2026-11-11T03:26:18.511Z",
+  "updatedAtUtc": "2026-11-11T07:56:22.441Z",
   "featureCutoffUtc": "2026-11-11T08:30:00Z",
   "deadlineUtc": "2026-11-11T09:00:00Z",
   "gitIdentity": {
@@ -27,7 +27,8 @@
     "c456547",
     "1508a14",
     "f4c6748",
-    "5fa5958"
+    "5fa5958",
+    "84b17f7"
   ],
   "graph": {
     "api": 1,
@@ -117,7 +118,14 @@
     "staticConvolver": "6a061d44e3e50573",
     "staticConvolverBrowser": "convolver-native-browser-first.json",
     "staticConvolverCases": 13,
-    "staticConvolverThroughput": "convolver-worker-throughput.json"
+    "staticConvolverThroughput": "convolver-worker-throughput.json",
+    "ambienceLoops": "88696dc04c5ce79d",
+    "ambienceLoopsHost": "8e942d988ab958ac",
+    "ambienceLoopsReferenceCases": 72,
+    "ambienceLoopsAllocationCases": 72,
+    "ambienceLoopsTests": 32,
+    "ambienceLoopsBrowser": "ambience-loops-native-host-final.json",
+    "ambienceLoopsBrowserCases": 12
   },
   "limitations": [
     "No physical listening/device-underrun claim",
@@ -129,7 +137,9 @@
     "Actual All owned desk is immutable opt-in; normal UI default remains native and implicit fan-in is preserved",
     "Measured-string preparation does not yet replace the native body convolver or Short/Pizzicato decay player",
     "Static convolution remains worker-only; worst transform calls exceed audio callback periods despite average desktop throughput",
-    "Active VoiceCompressor wrapper first batch has2/48 failed192k extreme-control PCM cases, saved for diagnosis; not accepted"
+    "Active VoiceCompressor wrapper first batch has2/48 failed192k extreme-control PCM cases, saved for diagnosis; not accepted",
+    "Wind/fire/vinyl owned PCM preparation is opt-in through original native Ambience chains; portable spatial/wander playback remains separate",
+    "Earlier terminal/process interruption stopped unsaved work until07:50 recovery; final stages use current authoritative files and re-run native verification"
   ],
   "next": "Continue Short/Pizzicato fixed voices, actual ambience-loop consumer, voice-wrapper extreme192k diagnosis and normalized reverb IR preparation. Shared portable-host integration remains opt-in; feature cutoff08:30 and handoff09:00."
 }

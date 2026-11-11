@@ -1,5 +1,12 @@
 # Modular audio engine handoff
 
+Latest checkpoint (11 November, ~08:00 UTC): [wind/fire/vinyl preparation and
+its existing native host](MODULAR_AUDIO_ENGINE_AMBIENCE_LOOPS.md) pass72 exact
+reference cases,72 allocation cases,32 permanent tests and12 actual browser
+host cases. The normal public build/provenance passes. Complete source buffers
+are bit exact; native fan-in output is compared under the unchanged1e-7 bound
+with a native-native baseline. Default playback remains unchanged.
+
 Overnight checkpoint (11 November, ~03:26 UTC): owned Long/Live measured-string
 voices pass40 actual native source/body browser cases; static convolution passes13
 native cases; captured DynamicsCompressor automation passes48, and graph modules

@@ -73,26 +73,40 @@ function toBuffer(context, channels) {
 // context. A loop is ~10 MB, so only the most recent few are kept; one
 // still playing stays alive through its source.
 const cache = new Map();
+// An explicitly supplied preparation function gets its own cache namespace.
+// Reusing native PCM must never masquerade as testing another renderer.
+const rendererCaches = new WeakMap();
 const CACHE_SIZE = 12;
 
 const renderKey = (id, shape) => (id === 'thunder' ? '' : JSON.stringify(renderParams(id, shape)));
 
 /** A layer's loop for `shape` (or the thunder variants), rendered on first use. */
-export function layerBuffer(context, id, shape) {
+export function layerBuffer(context, id, shape, renderer = null) {
+    if (renderer !== null && typeof renderer !== 'function') throw Error('Invalid ambience loop renderer');
+    let buffers = cache;
+    if (renderer) {
+        if (!rendererCaches.has(renderer)) rendererCaches.set(renderer, new Map());
+        buffers = rendererCaches.get(renderer);
+    }
     const key = `${context.sampleRate}:${id}:${renderKey(id, shape)}`;
-    if (cache.has(key)) {
-        const entry = cache.get(key);
-        cache.delete(key);
-        cache.set(key, entry); // most recently used last
+    if (buffers.has(key)) {
+        const entry = buffers.get(key);
+        buffers.delete(key);
+        buffers.set(key, entry); // most recently used last
         return entry;
     }
     const entry = {};
-    entry.promise = renderInWorker(id, context.sampleRate, id === 'thunder' ? {} : renderParams(id, shape)).then((samples) => {
+    const parameters = id === 'thunder' ? {} : renderParams(id, shape);
+    entry.promise = Promise.resolve().then(() => renderer ? renderer(id, context.sampleRate, parameters) : renderInWorker(id, context.sampleRate, parameters)).then((samples) => {
+        if (renderer && (!['wind', 'fire', 'vinyl'].includes(id) || !Array.isArray(samples) || samples.length !== 2 || samples.some(c => !(c instanceof Float32Array) || c.length !== Math.round(LAYERS[id].seconds * context.sampleRate) || c.some(x => !Number.isFinite(x))))) throw Error('Invalid prepared ambience loop PCM');
         entry.buffer = id === 'thunder' ? samples.map((v) => toBuffer(context, v)) : toBuffer(context, samples);
         return entry.buffer;
+    }).catch(error => {
+        if (buffers.get(key) === entry) buffers.delete(key);
+        throw error;
     });
-    cache.set(key, entry);
-    while (cache.size > CACHE_SIZE) cache.delete(cache.keys().next().value);
+    buffers.set(key, entry);
+    while (buffers.size > CACHE_SIZE) buffers.delete(buffers.keys().next().value);
     return entry;
 }
 
@@ -142,7 +156,9 @@ class Ambience {
      * @param {number} [options.seed] - for thunder times
      * @param {number} [options.offset] - seconds of the piece elapsed at context time 0 (renders: for the wander)
      */
-    constructor({ context, seed = 1, offset = 0, weatherBuffers = null }) {
+    constructor({ context, seed = 1, offset = 0, weatherBuffers = null, loopRenderer = null }) {
+        if (loopRenderer !== null && typeof loopRenderer !== 'function') throw Error('Invalid ambience loop renderer');
+        this.loopRenderer = loopRenderer;
         this.offset = offset;
         this.AC = context;
         this.output = context.createGain();
@@ -288,7 +304,7 @@ class Ambience {
     /** Renders every layer that is turned up; resolves when all are ready. */
     prepare() {
         const tasks = Object.keys(this.levels).filter(id => this.levels[id] > 0 && !WEATHER_SOURCES.includes(id))
-            .map(id => layerBuffer(this.AC, id, this.shape[id]).promise);
+            .map(id => layerBuffer(this.AC, id, this.shape[id], this.loopRenderer).promise);
         if (WEATHER_SOURCES.some(id => this.levels[id] > 0)) {
             if (isOffline(this.AC)) {
                 this.weatherPreparation ??= (async () => {
@@ -356,13 +372,16 @@ class Ambience {
     // there - if it is still wanted then.
     startLayer(id, time, ramp) {
         const key = renderKey(id, this.shape[id]);
-        const entry = layerBuffer(this.AC, id, this.shape[id]);
+        const entry = layerBuffer(this.AC, id, this.shape[id], this.loopRenderer);
         if (!entry.buffer) {
             this.playing[id] = { pending: true, key };
             entry.promise.then(() => {
                 if (!this.playing[id] || !this.playing[id].pending) return;
                 delete this.playing[id];
                 if (this.running && this.levels[id] > 0) this.startLayer(id, Math.max(this.AC.currentTime, time), 0.4);
+            }).catch(error => {
+                if (this.playing[id]?.pending && this.playing[id].key === key) delete this.playing[id];
+                this.error = error;
             });
             return;
         }
@@ -392,8 +411,8 @@ class Ambience {
     // After a shape change: the new loop, cross-faded in once rendered.
     swapLoop(id) {
         const key = renderKey(id, this.shape[id]);
-        const entry = layerBuffer(this.AC, id, this.shape[id]);
-        entry.promise.then((buffer) => {
+        const entry = layerBuffer(this.AC, id, this.shape[id], this.loopRenderer);
+        return entry.promise.then((buffer) => {
             const playing = this.playing[id];
             if (!this.running || !playing || playing.pending || playing.key === key || renderKey(id, this.shape[id]) !== key) return;
             const now = this.AC.currentTime + 0.02;
@@ -404,6 +423,9 @@ class Ambience {
             playing.fade.gain.linearRampToValueAtTime(0, now + SWAP_FADE);
             playing.source.stop(now + SWAP_FADE + 0.05);
             this.playing[id] = { ...next, key };
+        }).catch(error => {
+            this.error = error;
+            return false;
         });
     }
 

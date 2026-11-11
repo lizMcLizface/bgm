@@ -1,0 +1,1778 @@
+{
+  "kind": "ambience-loops.native-host-browser",
+  "version": 1,
+  "bounds": {
+    "maxAbsoluteError": 1e-7,
+    "relativeRmsError": 1e-7
+  },
+  "startedAtUtc": "2026-11-11T07:53:22.100Z",
+  "listening": "not assessed",
+  "cases": [
+    {
+      "rate": 44100,
+      "kinds": [
+        "wind"
+      ],
+      "mode": "fractional-loop-wrap",
+      "frames": 110336,
+      "startFrame": 1024,
+      "pieceOffsetSeconds": 28.75000850340136,
+      "sourceBuffers": {
+        "initial": [
+          {
+            "kind": "wind",
+            "frames": 1278900,
+            "bitDifferences": [
+              0,
+              0,
+              0
+            ],
+            "independentBuffers": true
+          }
+        ],
+        "changed": null
+      },
+      "nativeRepeat": {
+        "maxAbsoluteError": 0,
+        "relativeRmsError": 0,
+        "referencePeak": 0.05867135524749756,
+        "bitDifferences": 0
+      },
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "relativeRmsError": 0,
+        "referencePeak": 0.05867135524749756,
+        "bitDifferences": 0
+      },
+      "independence": {
+        "maxAbsoluteError": 0,
+        "relativeRmsError": 0,
+        "referencePeak": 0.05867135524749756,
+        "bitDifferences": 0
+      },
+      "sourceCheck": true,
+      "clockPass": true,
+      "calls": [
+        [
+          {
+            "kind": "wind",
+            "spec": {
+              "version": 1,
+              "kind": "wind",
+              "sampleRate": 44100,
+              "parameters": {
+                "speed": 0.4,
+                "gusts": 0.8
+              }
+            },
+            "frames": 1278900,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 229.90000000037253
+          }
+        ],
+        [
+          {
+            "kind": "wind",
+            "spec": {
+              "version": 1,
+              "kind": "wind",
+              "sampleRate": 44100,
+              "parameters": {
+                "speed": 0.4,
+                "gusts": 0.8
+              }
+            },
+            "frames": 1278900,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 185.90000000037253
+          }
+        ]
+      ],
+      "workerStats": [
+        {
+          "disposed": false,
+          "generation": 1,
+          "queued": 0,
+          "active": null,
+          "loading": false,
+          "ready": true,
+          "pending": 0,
+          "started": 1,
+          "workerBegun": 1,
+          "completed": 1,
+          "cancelled": 0,
+          "failed": 0,
+          "staleMessages": 0,
+          "detachedTransfers": 1,
+          "transferFailures": 0
+        },
+        {
+          "disposed": false,
+          "generation": 1,
+          "queued": 0,
+          "active": null,
+          "loading": false,
+          "ready": true,
+          "pending": 0,
+          "started": 1,
+          "workerBegun": 1,
+          "completed": 1,
+          "cancelled": 0,
+          "failed": 0,
+          "staleMessages": 0,
+          "detachedTransfers": 1,
+          "transferFailures": 0
+        }
+      ],
+      "pass": true
+    },
+    {
+      "rate": 44100,
+      "kinds": [
+        "fire"
+      ],
+      "mode": "fractional-loop-wrap",
+      "frames": 110336,
+      "startFrame": 1024,
+      "pieceOffsetSeconds": 22.75000850340136,
+      "sourceBuffers": {
+        "initial": [
+          {
+            "kind": "fire",
+            "frames": 1014300,
+            "bitDifferences": [
+              0,
+              0,
+              0
+            ],
+            "independentBuffers": true
+          }
+        ],
+        "changed": null
+      },
+      "nativeRepeat": {
+        "maxAbsoluteError": 0,
+        "relativeRmsError": 0,
+        "referencePeak": 0.028605828061699867,
+        "bitDifferences": 0
+      },
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "relativeRmsError": 0,
+        "referencePeak": 0.028605828061699867,
+        "bitDifferences": 0
+      },
+      "independence": {
+        "maxAbsoluteError": 0,
+        "relativeRmsError": 0,
+        "referencePeak": 0.028605828061699867,
+        "bitDifferences": 0
+      },
+      "sourceCheck": true,
+      "clockPass": true,
+      "calls": [
+        [
+          {
+            "kind": "fire",
+            "spec": {
+              "version": 1,
+              "kind": "fire",
+              "sampleRate": 44100,
+              "parameters": {
+                "crackle": 0.8,
+                "roar": 0.2
+              }
+            },
+            "frames": 1014300,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 106.5
+          }
+        ],
+        [
+          {
+            "kind": "fire",
+            "spec": {
+              "version": 1,
+              "kind": "fire",
+              "sampleRate": 44100,
+              "parameters": {
+                "crackle": 0.8,
+                "roar": 0.2
+              }
+            },
+            "frames": 1014300,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 118.39999999850988
+          }
+        ]
+      ],
+      "workerStats": [
+        {
+          "disposed": false,
+          "generation": 1,
+          "queued": 0,
+          "active": null,
+          "loading": false,
+          "ready": true,
+          "pending": 0,
+          "started": 1,
+          "workerBegun": 1,
+          "completed": 1,
+          "cancelled": 0,
+          "failed": 0,
+          "staleMessages": 0,
+          "detachedTransfers": 1,
+          "transferFailures": 0
+        },
+        {
+          "disposed": false,
+          "generation": 1,
+          "queued": 0,
+          "active": null,
+          "loading": false,
+          "ready": true,
+          "pending": 0,
+          "started": 1,
+          "workerBegun": 1,
+          "completed": 1,
+          "cancelled": 0,
+          "failed": 0,
+          "staleMessages": 0,
+          "detachedTransfers": 1,
+          "transferFailures": 0
+        }
+      ],
+      "pass": true
+    },
+    {
+      "rate": 44100,
+      "kinds": [
+        "vinyl"
+      ],
+      "mode": "fractional-loop-wrap",
+      "frames": 110336,
+      "startFrame": 1024,
+      "pieceOffsetSeconds": 17.75000850340136,
+      "sourceBuffers": {
+        "initial": [
+          {
+            "kind": "vinyl",
+            "frames": 793800,
+            "bitDifferences": [
+              0,
+              0,
+              0
+            ],
+            "independentBuffers": true
+          }
+        ],
+        "changed": null
+      },
+      "nativeRepeat": {
+        "maxAbsoluteError": 0,
+        "relativeRmsError": 0,
+        "referencePeak": 0.04303864762187004,
+        "bitDifferences": 0
+      },
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "relativeRmsError": 0,
+        "referencePeak": 0.04303864762187004,
+        "bitDifferences": 0
+      },
+      "independence": {
+        "maxAbsoluteError": 0,
+        "relativeRmsError": 0,
+        "referencePeak": 0.04303864762187004,
+        "bitDifferences": 0
+      },
+      "sourceCheck": true,
+      "clockPass": true,
+      "calls": [
+        [
+          {
+            "kind": "vinyl",
+            "spec": {
+              "version": 1,
+              "kind": "vinyl",
+              "sampleRate": 44100,
+              "parameters": {
+                "crackle": 0.4,
+                "hiss": 0.8
+              }
+            },
+            "frames": 793800,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 48.09999999962747
+          }
+        ],
+        [
+          {
+            "kind": "vinyl",
+            "spec": {
+              "version": 1,
+              "kind": "vinyl",
+              "sampleRate": 44100,
+              "parameters": {
+                "crackle": 0.4,
+                "hiss": 0.8
+              }
+            },
+            "frames": 793800,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 41.69999999925494
+          }
+        ]
+      ],
+      "workerStats": [
+        {
+          "disposed": false,
+          "generation": 1,
+          "queued": 0,
+          "active": null,
+          "loading": false,
+          "ready": true,
+          "pending": 0,
+          "started": 1,
+          "workerBegun": 1,
+          "completed": 1,
+          "cancelled": 0,
+          "failed": 0,
+          "staleMessages": 0,
+          "detachedTransfers": 1,
+          "transferFailures": 0
+        },
+        {
+          "disposed": false,
+          "generation": 1,
+          "queued": 0,
+          "active": null,
+          "loading": false,
+          "ready": true,
+          "pending": 0,
+          "started": 1,
+          "workerBegun": 1,
+          "completed": 1,
+          "cancelled": 0,
+          "failed": 0,
+          "staleMessages": 0,
+          "detachedTransfers": 1,
+          "transferFailures": 0
+        }
+      ],
+      "pass": true
+    },
+    {
+      "rate": 48000,
+      "kinds": [
+        "wind"
+      ],
+      "mode": "fractional-loop-wrap",
+      "frames": 120064,
+      "startFrame": 1024,
+      "pieceOffsetSeconds": 28.7500078125,
+      "sourceBuffers": {
+        "initial": [
+          {
+            "kind": "wind",
+            "frames": 1392000,
+            "bitDifferences": [
+              0,
+              0,
+              0
+            ],
+            "independentBuffers": true
+          }
+        ],
+        "changed": null
+      },
+      "nativeRepeat": {
+        "maxAbsoluteError": 0,
+        "relativeRmsError": 0,
+        "referencePeak": 0.056749377399683,
+        "bitDifferences": 0
+      },
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "relativeRmsError": 0,
+        "referencePeak": 0.056749377399683,
+        "bitDifferences": 0
+      },
+      "independence": {
+        "maxAbsoluteError": 0,
+        "relativeRmsError": 0,
+        "referencePeak": 0.056749377399683,
+        "bitDifferences": 0
+      },
+      "sourceCheck": true,
+      "clockPass": true,
+      "calls": [
+        [
+          {
+            "kind": "wind",
+            "spec": {
+              "version": 1,
+              "kind": "wind",
+              "sampleRate": 48000,
+              "parameters": {
+                "speed": 0.4,
+                "gusts": 0.8
+              }
+            },
+            "frames": 1392000,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 191.69999999925494
+          }
+        ],
+        [
+          {
+            "kind": "wind",
+            "spec": {
+              "version": 1,
+              "kind": "wind",
+              "sampleRate": 48000,
+              "parameters": {
+                "speed": 0.4,
+                "gusts": 0.8
+              }
+            },
+            "frames": 1392000,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 186
+          }
+        ]
+      ],
+      "workerStats": [
+        {
+          "disposed": false,
+          "generation": 1,
+          "queued": 0,
+          "active": null,
+          "loading": false,
+          "ready": true,
+          "pending": 0,
+          "started": 1,
+          "workerBegun": 1,
+          "completed": 1,
+          "cancelled": 0,
+          "failed": 0,
+          "staleMessages": 0,
+          "detachedTransfers": 1,
+          "transferFailures": 0
+        },
+        {
+          "disposed": false,
+          "generation": 1,
+          "queued": 0,
+          "active": null,
+          "loading": false,
+          "ready": true,
+          "pending": 0,
+          "started": 1,
+          "workerBegun": 1,
+          "completed": 1,
+          "cancelled": 0,
+          "failed": 0,
+          "staleMessages": 0,
+          "detachedTransfers": 1,
+          "transferFailures": 0
+        }
+      ],
+      "pass": true
+    },
+    {
+      "rate": 48000,
+      "kinds": [
+        "fire"
+      ],
+      "mode": "fractional-loop-wrap",
+      "frames": 120064,
+      "startFrame": 1024,
+      "pieceOffsetSeconds": 22.7500078125,
+      "sourceBuffers": {
+        "initial": [
+          {
+            "kind": "fire",
+            "frames": 1104000,
+            "bitDifferences": [
+              0,
+              0,
+              0
+            ],
+            "independentBuffers": true
+          }
+        ],
+        "changed": null
+      },
+      "nativeRepeat": {
+        "maxAbsoluteError": 0,
+        "relativeRmsError": 0,
+        "referencePeak": 0.029227321967482567,
+        "bitDifferences": 0
+      },
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "relativeRmsError": 0,
+        "referencePeak": 0.029227321967482567,
+        "bitDifferences": 0
+      },
+      "independence": {
+        "maxAbsoluteError": 0,
+        "relativeRmsError": 0,
+        "referencePeak": 0.029227321967482567,
+        "bitDifferences": 0
+      },
+      "sourceCheck": true,
+      "clockPass": true,
+      "calls": [
+        [
+          {
+            "kind": "fire",
+            "spec": {
+              "version": 1,
+              "kind": "fire",
+              "sampleRate": 48000,
+              "parameters": {
+                "crackle": 0.8,
+                "roar": 0.2
+              }
+            },
+            "frames": 1104000,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 103.69999999925494
+          }
+        ],
+        [
+          {
+            "kind": "fire",
+            "spec": {
+              "version": 1,
+              "kind": "fire",
+              "sampleRate": 48000,
+              "parameters": {
+                "crackle": 0.8,
+                "roar": 0.2
+              }
+            },
+            "frames": 1104000,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 131
+          }
+        ]
+      ],
+      "workerStats": [
+        {
+          "disposed": false,
+          "generation": 1,
+          "queued": 0,
+          "active": null,
+          "loading": false,
+          "ready": true,
+          "pending": 0,
+          "started": 1,
+          "workerBegun": 1,
+          "completed": 1,
+          "cancelled": 0,
+          "failed": 0,
+          "staleMessages": 0,
+          "detachedTransfers": 1,
+          "transferFailures": 0
+        },
+        {
+          "disposed": false,
+          "generation": 1,
+          "queued": 0,
+          "active": null,
+          "loading": false,
+          "ready": true,
+          "pending": 0,
+          "started": 1,
+          "workerBegun": 1,
+          "completed": 1,
+          "cancelled": 0,
+          "failed": 0,
+          "staleMessages": 0,
+          "detachedTransfers": 1,
+          "transferFailures": 0
+        }
+      ],
+      "pass": true
+    },
+    {
+      "rate": 48000,
+      "kinds": [
+        "vinyl"
+      ],
+      "mode": "fractional-loop-wrap",
+      "frames": 120064,
+      "startFrame": 1024,
+      "pieceOffsetSeconds": 17.7500078125,
+      "sourceBuffers": {
+        "initial": [
+          {
+            "kind": "vinyl",
+            "frames": 864000,
+            "bitDifferences": [
+              0,
+              0,
+              0
+            ],
+            "independentBuffers": true
+          }
+        ],
+        "changed": null
+      },
+      "nativeRepeat": {
+        "maxAbsoluteError": 0,
+        "relativeRmsError": 0,
+        "referencePeak": 0.08230875432491302,
+        "bitDifferences": 0
+      },
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "relativeRmsError": 0,
+        "referencePeak": 0.08230875432491302,
+        "bitDifferences": 0
+      },
+      "independence": {
+        "maxAbsoluteError": 0,
+        "relativeRmsError": 0,
+        "referencePeak": 0.08230875432491302,
+        "bitDifferences": 0
+      },
+      "sourceCheck": true,
+      "clockPass": true,
+      "calls": [
+        [
+          {
+            "kind": "vinyl",
+            "spec": {
+              "version": 1,
+              "kind": "vinyl",
+              "sampleRate": 48000,
+              "parameters": {
+                "crackle": 0.4,
+                "hiss": 0.8
+              }
+            },
+            "frames": 864000,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 49.19999999925494
+          }
+        ],
+        [
+          {
+            "kind": "vinyl",
+            "spec": {
+              "version": 1,
+              "kind": "vinyl",
+              "sampleRate": 48000,
+              "parameters": {
+                "crackle": 0.4,
+                "hiss": 0.8
+              }
+            },
+            "frames": 864000,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 66.79999999888241
+          }
+        ]
+      ],
+      "workerStats": [
+        {
+          "disposed": false,
+          "generation": 1,
+          "queued": 0,
+          "active": null,
+          "loading": false,
+          "ready": true,
+          "pending": 0,
+          "started": 1,
+          "workerBegun": 1,
+          "completed": 1,
+          "cancelled": 0,
+          "failed": 0,
+          "staleMessages": 0,
+          "detachedTransfers": 1,
+          "transferFailures": 0
+        },
+        {
+          "disposed": false,
+          "generation": 1,
+          "queued": 0,
+          "active": null,
+          "loading": false,
+          "ready": true,
+          "pending": 0,
+          "started": 1,
+          "workerBegun": 1,
+          "completed": 1,
+          "cancelled": 0,
+          "failed": 0,
+          "staleMessages": 0,
+          "detachedTransfers": 1,
+          "transferFailures": 0
+        }
+      ],
+      "pass": true
+    },
+    {
+      "rate": 96000,
+      "kinds": [
+        "wind"
+      ],
+      "mode": "fractional-loop-wrap",
+      "frames": 240000,
+      "startFrame": 1024,
+      "pieceOffsetSeconds": 28.75000390625,
+      "sourceBuffers": {
+        "initial": [
+          {
+            "kind": "wind",
+            "frames": 2784000,
+            "bitDifferences": [
+              0,
+              0,
+              0
+            ],
+            "independentBuffers": true
+          }
+        ],
+        "changed": null
+      },
+      "nativeRepeat": {
+        "maxAbsoluteError": 0,
+        "relativeRmsError": 0,
+        "referencePeak": 0.050280552357435226,
+        "bitDifferences": 0
+      },
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "relativeRmsError": 0,
+        "referencePeak": 0.050280552357435226,
+        "bitDifferences": 0
+      },
+      "independence": {
+        "maxAbsoluteError": 0,
+        "relativeRmsError": 0,
+        "referencePeak": 0.050280552357435226,
+        "bitDifferences": 0
+      },
+      "sourceCheck": true,
+      "clockPass": true,
+      "calls": [
+        [
+          {
+            "kind": "wind",
+            "spec": {
+              "version": 1,
+              "kind": "wind",
+              "sampleRate": 96000,
+              "parameters": {
+                "speed": 0.4,
+                "gusts": 0.8
+              }
+            },
+            "frames": 2784000,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 351.40000000037253
+          }
+        ],
+        [
+          {
+            "kind": "wind",
+            "spec": {
+              "version": 1,
+              "kind": "wind",
+              "sampleRate": 96000,
+              "parameters": {
+                "speed": 0.4,
+                "gusts": 0.8
+              }
+            },
+            "frames": 2784000,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 295.69999999925494
+          }
+        ]
+      ],
+      "workerStats": [
+        {
+          "disposed": false,
+          "generation": 1,
+          "queued": 0,
+          "active": null,
+          "loading": false,
+          "ready": true,
+          "pending": 0,
+          "started": 1,
+          "workerBegun": 1,
+          "completed": 1,
+          "cancelled": 0,
+          "failed": 0,
+          "staleMessages": 0,
+          "detachedTransfers": 1,
+          "transferFailures": 0
+        },
+        {
+          "disposed": false,
+          "generation": 1,
+          "queued": 0,
+          "active": null,
+          "loading": false,
+          "ready": true,
+          "pending": 0,
+          "started": 1,
+          "workerBegun": 1,
+          "completed": 1,
+          "cancelled": 0,
+          "failed": 0,
+          "staleMessages": 0,
+          "detachedTransfers": 1,
+          "transferFailures": 0
+        }
+      ],
+      "pass": true
+    },
+    {
+      "rate": 96000,
+      "kinds": [
+        "fire"
+      ],
+      "mode": "fractional-loop-wrap",
+      "frames": 240000,
+      "startFrame": 1024,
+      "pieceOffsetSeconds": 22.75000390625,
+      "sourceBuffers": {
+        "initial": [
+          {
+            "kind": "fire",
+            "frames": 2208000,
+            "bitDifferences": [
+              0,
+              0,
+              0
+            ],
+            "independentBuffers": true
+          }
+        ],
+        "changed": null
+      },
+      "nativeRepeat": {
+        "maxAbsoluteError": 0,
+        "relativeRmsError": 0,
+        "referencePeak": 0.02612919919192791,
+        "bitDifferences": 0
+      },
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "relativeRmsError": 0,
+        "referencePeak": 0.02612919919192791,
+        "bitDifferences": 0
+      },
+      "independence": {
+        "maxAbsoluteError": 0,
+        "relativeRmsError": 0,
+        "referencePeak": 0.02612919919192791,
+        "bitDifferences": 0
+      },
+      "sourceCheck": true,
+      "clockPass": true,
+      "calls": [
+        [
+          {
+            "kind": "fire",
+            "spec": {
+              "version": 1,
+              "kind": "fire",
+              "sampleRate": 96000,
+              "parameters": {
+                "crackle": 0.8,
+                "roar": 0.2
+              }
+            },
+            "frames": 2208000,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 255.80000000074506
+          }
+        ],
+        [
+          {
+            "kind": "fire",
+            "spec": {
+              "version": 1,
+              "kind": "fire",
+              "sampleRate": 96000,
+              "parameters": {
+                "crackle": 0.8,
+                "roar": 0.2
+              }
+            },
+            "frames": 2208000,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 194.09999999962747
+          }
+        ]
+      ],
+      "workerStats": [
+        {
+          "disposed": false,
+          "generation": 1,
+          "queued": 0,
+          "active": null,
+          "loading": false,
+          "ready": true,
+          "pending": 0,
+          "started": 1,
+          "workerBegun": 1,
+          "completed": 1,
+          "cancelled": 0,
+          "failed": 0,
+          "staleMessages": 0,
+          "detachedTransfers": 1,
+          "transferFailures": 0
+        },
+        {
+          "disposed": false,
+          "generation": 1,
+          "queued": 0,
+          "active": null,
+          "loading": false,
+          "ready": true,
+          "pending": 0,
+          "started": 1,
+          "workerBegun": 1,
+          "completed": 1,
+          "cancelled": 0,
+          "failed": 0,
+          "staleMessages": 0,
+          "detachedTransfers": 1,
+          "transferFailures": 0
+        }
+      ],
+      "pass": true
+    },
+    {
+      "rate": 96000,
+      "kinds": [
+        "vinyl"
+      ],
+      "mode": "fractional-loop-wrap",
+      "frames": 240000,
+      "startFrame": 1024,
+      "pieceOffsetSeconds": 17.75000390625,
+      "sourceBuffers": {
+        "initial": [
+          {
+            "kind": "vinyl",
+            "frames": 1728000,
+            "bitDifferences": [
+              0,
+              0,
+              0
+            ],
+            "independentBuffers": true
+          }
+        ],
+        "changed": null
+      },
+      "nativeRepeat": {
+        "maxAbsoluteError": 0,
+        "relativeRmsError": 0,
+        "referencePeak": 0.03766858950257301,
+        "bitDifferences": 0
+      },
+      "comparison": {
+        "maxAbsoluteError": 0,
+        "relativeRmsError": 0,
+        "referencePeak": 0.03766858950257301,
+        "bitDifferences": 0
+      },
+      "independence": {
+        "maxAbsoluteError": 0,
+        "relativeRmsError": 0,
+        "referencePeak": 0.03766858950257301,
+        "bitDifferences": 0
+      },
+      "sourceCheck": true,
+      "clockPass": true,
+      "calls": [
+        [
+          {
+            "kind": "vinyl",
+            "spec": {
+              "version": 1,
+              "kind": "vinyl",
+              "sampleRate": 96000,
+              "parameters": {
+                "crackle": 0.4,
+                "hiss": 0.8
+              }
+            },
+            "frames": 1728000,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 126.20000000111759
+          }
+        ],
+        [
+          {
+            "kind": "vinyl",
+            "spec": {
+              "version": 1,
+              "kind": "vinyl",
+              "sampleRate": 96000,
+              "parameters": {
+                "crackle": 0.4,
+                "hiss": 0.8
+              }
+            },
+            "frames": 1728000,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 106.20000000111759
+          }
+        ]
+      ],
+      "workerStats": [
+        {
+          "disposed": false,
+          "generation": 1,
+          "queued": 0,
+          "active": null,
+          "loading": false,
+          "ready": true,
+          "pending": 0,
+          "started": 1,
+          "workerBegun": 1,
+          "completed": 1,
+          "cancelled": 0,
+          "failed": 0,
+          "staleMessages": 0,
+          "detachedTransfers": 1,
+          "transferFailures": 0
+        },
+        {
+          "disposed": false,
+          "generation": 1,
+          "queued": 0,
+          "active": null,
+          "loading": false,
+          "ready": true,
+          "pending": 0,
+          "started": 1,
+          "workerBegun": 1,
+          "completed": 1,
+          "cancelled": 0,
+          "failed": 0,
+          "staleMessages": 0,
+          "detachedTransfers": 1,
+          "transferFailures": 0
+        }
+      ],
+      "pass": true
+    },
+    {
+      "rate": 48000,
+      "kinds": [
+        "wind",
+        "fire",
+        "vinyl"
+      ],
+      "mode": "fractional-loop-wrap",
+      "frames": 120064,
+      "startFrame": 1024,
+      "pieceOffsetSeconds": 17.7500078125,
+      "sourceBuffers": {
+        "initial": [
+          {
+            "kind": "wind",
+            "frames": 1392000,
+            "bitDifferences": [
+              0,
+              0,
+              0
+            ],
+            "independentBuffers": true
+          },
+          {
+            "kind": "fire",
+            "frames": 1104000,
+            "bitDifferences": [
+              0,
+              0,
+              0
+            ],
+            "independentBuffers": true
+          },
+          {
+            "kind": "vinyl",
+            "frames": 864000,
+            "bitDifferences": [
+              0,
+              0,
+              0
+            ],
+            "independentBuffers": true
+          }
+        ],
+        "changed": null
+      },
+      "nativeRepeat": {
+        "maxAbsoluteError": 7.450580596923828e-9,
+        "relativeRmsError": 4.7811340269031885e-8,
+        "referencePeak": 0.14284607768058777,
+        "bitDifferences": 75608
+      },
+      "comparison": {
+        "maxAbsoluteError": 7.450580596923828e-9,
+        "relativeRmsError": 4.7811340269031885e-8,
+        "referencePeak": 0.14284607768058777,
+        "bitDifferences": 75608
+      },
+      "independence": {
+        "maxAbsoluteError": 0,
+        "relativeRmsError": 0,
+        "referencePeak": 0.14284607768058777,
+        "bitDifferences": 0
+      },
+      "sourceCheck": true,
+      "clockPass": true,
+      "calls": [
+        [
+          {
+            "kind": "wind",
+            "spec": {
+              "version": 1,
+              "kind": "wind",
+              "sampleRate": 48000,
+              "parameters": {
+                "speed": 0.4,
+                "gusts": 0.8
+              }
+            },
+            "frames": 1392000,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 189.2000000011176
+          },
+          {
+            "kind": "fire",
+            "spec": {
+              "version": 1,
+              "kind": "fire",
+              "sampleRate": 48000,
+              "parameters": {
+                "crackle": 0.8,
+                "roar": 0.2
+              }
+            },
+            "frames": 1104000,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 118.90000000037253
+          },
+          {
+            "kind": "vinyl",
+            "spec": {
+              "version": 1,
+              "kind": "vinyl",
+              "sampleRate": 48000,
+              "parameters": {
+                "crackle": 0.4,
+                "hiss": 0.8
+              }
+            },
+            "frames": 864000,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 62
+          }
+        ],
+        [
+          {
+            "kind": "wind",
+            "spec": {
+              "version": 1,
+              "kind": "wind",
+              "sampleRate": 48000,
+              "parameters": {
+                "speed": 0.4,
+                "gusts": 0.8
+              }
+            },
+            "frames": 1392000,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 185.69999999925494
+          },
+          {
+            "kind": "fire",
+            "spec": {
+              "version": 1,
+              "kind": "fire",
+              "sampleRate": 48000,
+              "parameters": {
+                "crackle": 0.8,
+                "roar": 0.2
+              }
+            },
+            "frames": 1104000,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 110.59999999962747
+          },
+          {
+            "kind": "vinyl",
+            "spec": {
+              "version": 1,
+              "kind": "vinyl",
+              "sampleRate": 48000,
+              "parameters": {
+                "crackle": 0.4,
+                "hiss": 0.8
+              }
+            },
+            "frames": 864000,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 60.79999999888241
+          }
+        ]
+      ],
+      "workerStats": [
+        {
+          "disposed": false,
+          "generation": 1,
+          "queued": 0,
+          "active": null,
+          "loading": false,
+          "ready": true,
+          "pending": 0,
+          "started": 3,
+          "workerBegun": 3,
+          "completed": 3,
+          "cancelled": 0,
+          "failed": 0,
+          "staleMessages": 0,
+          "detachedTransfers": 3,
+          "transferFailures": 0
+        },
+        {
+          "disposed": false,
+          "generation": 1,
+          "queued": 0,
+          "active": null,
+          "loading": false,
+          "ready": true,
+          "pending": 0,
+          "started": 3,
+          "workerBegun": 3,
+          "completed": 3,
+          "cancelled": 0,
+          "failed": 0,
+          "staleMessages": 0,
+          "detachedTransfers": 3,
+          "transferFailures": 0
+        }
+      ],
+      "pass": true
+    },
+    {
+      "rate": 48000,
+      "kinds": [
+        "wind",
+        "fire",
+        "vinyl"
+      ],
+      "mode": "saved-spec-reload",
+      "frames": 120064,
+      "startFrame": 1024,
+      "pieceOffsetSeconds": 17.7500078125,
+      "sourceBuffers": {
+        "initial": [
+          {
+            "kind": "wind",
+            "frames": 1392000,
+            "bitDifferences": [
+              0,
+              0,
+              0
+            ],
+            "independentBuffers": true
+          },
+          {
+            "kind": "fire",
+            "frames": 1104000,
+            "bitDifferences": [
+              0,
+              0,
+              0
+            ],
+            "independentBuffers": true
+          },
+          {
+            "kind": "vinyl",
+            "frames": 864000,
+            "bitDifferences": [
+              0,
+              0,
+              0
+            ],
+            "independentBuffers": true
+          }
+        ],
+        "changed": null
+      },
+      "nativeRepeat": {
+        "maxAbsoluteError": 0,
+        "relativeRmsError": 0,
+        "referencePeak": 0.14284607768058777,
+        "bitDifferences": 0
+      },
+      "comparison": {
+        "maxAbsoluteError": 1.1175870895385742e-8,
+        "relativeRmsError": 4.786911251310113e-8,
+        "referencePeak": 0.14284607768058777,
+        "bitDifferences": 76131
+      },
+      "independence": {
+        "maxAbsoluteError": 0,
+        "relativeRmsError": 0,
+        "referencePeak": 0.14284607768058777,
+        "bitDifferences": 0
+      },
+      "sourceCheck": true,
+      "clockPass": true,
+      "calls": [
+        [
+          {
+            "kind": "wind",
+            "spec": {
+              "version": 1,
+              "kind": "wind",
+              "sampleRate": 48000,
+              "parameters": {
+                "speed": 0.4,
+                "gusts": 0.8
+              }
+            },
+            "frames": 1392000,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 193.19999999925494
+          },
+          {
+            "kind": "fire",
+            "spec": {
+              "version": 1,
+              "kind": "fire",
+              "sampleRate": 48000,
+              "parameters": {
+                "crackle": 0.8,
+                "roar": 0.2
+              }
+            },
+            "frames": 1104000,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 110.19999999925494
+          },
+          {
+            "kind": "vinyl",
+            "spec": {
+              "version": 1,
+              "kind": "vinyl",
+              "sampleRate": 48000,
+              "parameters": {
+                "crackle": 0.4,
+                "hiss": 0.8
+              }
+            },
+            "frames": 864000,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 57.5
+          }
+        ],
+        [
+          {
+            "kind": "wind",
+            "spec": {
+              "version": 1,
+              "kind": "wind",
+              "sampleRate": 48000,
+              "parameters": {
+                "speed": 0.4,
+                "gusts": 0.8
+              }
+            },
+            "frames": 1392000,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 193.5
+          },
+          {
+            "kind": "fire",
+            "spec": {
+              "version": 1,
+              "kind": "fire",
+              "sampleRate": 48000,
+              "parameters": {
+                "crackle": 0.8,
+                "roar": 0.2
+              }
+            },
+            "frames": 1104000,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 115
+          },
+          {
+            "kind": "vinyl",
+            "spec": {
+              "version": 1,
+              "kind": "vinyl",
+              "sampleRate": 48000,
+              "parameters": {
+                "crackle": 0.4,
+                "hiss": 0.8
+              }
+            },
+            "frames": 864000,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 42
+          }
+        ]
+      ],
+      "workerStats": [
+        {
+          "disposed": false,
+          "generation": 1,
+          "queued": 0,
+          "active": null,
+          "loading": false,
+          "ready": true,
+          "pending": 0,
+          "started": 3,
+          "workerBegun": 3,
+          "completed": 3,
+          "cancelled": 0,
+          "failed": 0,
+          "staleMessages": 0,
+          "detachedTransfers": 3,
+          "transferFailures": 0
+        },
+        {
+          "disposed": false,
+          "generation": 1,
+          "queued": 0,
+          "active": null,
+          "loading": false,
+          "ready": true,
+          "pending": 0,
+          "started": 3,
+          "workerBegun": 3,
+          "completed": 3,
+          "cancelled": 0,
+          "failed": 0,
+          "staleMessages": 0,
+          "detachedTransfers": 3,
+          "transferFailures": 0
+        }
+      ],
+      "pass": true
+    },
+    {
+      "rate": 48000,
+      "kinds": [
+        "wind",
+        "fire",
+        "vinyl"
+      ],
+      "mode": "shape-crossfade",
+      "frames": 120064,
+      "startFrame": 1024,
+      "pieceOffsetSeconds": 17.7500078125,
+      "sourceBuffers": {
+        "initial": [
+          {
+            "kind": "wind",
+            "frames": 1392000,
+            "bitDifferences": [
+              0,
+              0,
+              0
+            ],
+            "independentBuffers": true
+          },
+          {
+            "kind": "fire",
+            "frames": 1104000,
+            "bitDifferences": [
+              0,
+              0,
+              0
+            ],
+            "independentBuffers": true
+          },
+          {
+            "kind": "vinyl",
+            "frames": 864000,
+            "bitDifferences": [
+              0,
+              0,
+              0
+            ],
+            "independentBuffers": true
+          }
+        ],
+        "changed": [
+          {
+            "kind": "wind",
+            "frames": 1392000,
+            "bitDifferences": [
+              0,
+              0,
+              0
+            ],
+            "independentBuffers": true
+          },
+          {
+            "kind": "fire",
+            "frames": 1104000,
+            "bitDifferences": [
+              0,
+              0,
+              0
+            ],
+            "independentBuffers": true
+          },
+          {
+            "kind": "vinyl",
+            "frames": 864000,
+            "bitDifferences": [
+              0,
+              0,
+              0
+            ],
+            "independentBuffers": true
+          }
+        ]
+      },
+      "nativeRepeat": {
+        "maxAbsoluteError": 7.450580596923828e-9,
+        "relativeRmsError": 4.602097094101613e-8,
+        "referencePeak": 0.14284607768058777,
+        "bitDifferences": 72445
+      },
+      "comparison": {
+        "maxAbsoluteError": 7.450580596923828e-9,
+        "relativeRmsError": 4.602097094101613e-8,
+        "referencePeak": 0.14284607768058777,
+        "bitDifferences": 72445
+      },
+      "independence": {
+        "maxAbsoluteError": 7.450580596923828e-9,
+        "relativeRmsError": 4.199757044265674e-8,
+        "referencePeak": 0.14284607768058777,
+        "bitDifferences": 63410
+      },
+      "sourceCheck": true,
+      "clockPass": true,
+      "calls": [
+        [
+          {
+            "kind": "wind",
+            "spec": {
+              "version": 1,
+              "kind": "wind",
+              "sampleRate": 48000,
+              "parameters": {
+                "speed": 0.4,
+                "gusts": 0.8
+              }
+            },
+            "frames": 1392000,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 129.5
+          },
+          {
+            "kind": "fire",
+            "spec": {
+              "version": 1,
+              "kind": "fire",
+              "sampleRate": 48000,
+              "parameters": {
+                "crackle": 0.8,
+                "roar": 0.2
+              }
+            },
+            "frames": 1104000,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 103.5
+          },
+          {
+            "kind": "vinyl",
+            "spec": {
+              "version": 1,
+              "kind": "vinyl",
+              "sampleRate": 48000,
+              "parameters": {
+                "crackle": 0.4,
+                "hiss": 0.8
+              }
+            },
+            "frames": 864000,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 47.09999999962747
+          },
+          {
+            "kind": "wind",
+            "spec": {
+              "version": 1,
+              "kind": "wind",
+              "sampleRate": 48000,
+              "parameters": {
+                "speed": 0.8,
+                "gusts": 0.2
+              }
+            },
+            "frames": 1392000,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 177.2000000011176
+          }
+        ],
+        [
+          {
+            "kind": "wind",
+            "spec": {
+              "version": 1,
+              "kind": "wind",
+              "sampleRate": 48000,
+              "parameters": {
+                "speed": 0.4,
+                "gusts": 0.8
+              }
+            },
+            "frames": 1392000,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 194.59999999962747
+          },
+          {
+            "kind": "fire",
+            "spec": {
+              "version": 1,
+              "kind": "fire",
+              "sampleRate": 48000,
+              "parameters": {
+                "crackle": 0.8,
+                "roar": 0.2
+              }
+            },
+            "frames": 1104000,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 128.30000000074506
+          },
+          {
+            "kind": "vinyl",
+            "spec": {
+              "version": 1,
+              "kind": "vinyl",
+              "sampleRate": 48000,
+              "parameters": {
+                "crackle": 0.4,
+                "hiss": 0.8
+              }
+            },
+            "frames": 864000,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 59.69999999925494
+          },
+          {
+            "kind": "wind",
+            "spec": {
+              "version": 1,
+              "kind": "wind",
+              "sampleRate": 48000,
+              "parameters": {
+                "speed": 0.8,
+                "gusts": 0.2
+              }
+            },
+            "frames": 1392000,
+            "version": "88696dc04c5ce79d",
+            "workerGeneration": 1,
+            "preparationMs": 147.90000000037253
+          }
+        ]
+      ],
+      "workerStats": [
+        {
+          "disposed": false,
+          "generation": 1,
+          "queued": 0,
+          "active": null,
+          "loading": false,
+          "ready": true,
+          "pending": 0,
+          "started": 4,
+          "workerBegun": 4,
+          "completed": 4,
+          "cancelled": 0,
+          "failed": 0,
+          "staleMessages": 0,
+          "detachedTransfers": 4,
+          "transferFailures": 0
+        },
+        {
+          "disposed": false,
+          "generation": 1,
+          "queued": 0,
+          "active": null,
+          "loading": false,
+          "ready": true,
+          "pending": 0,
+          "started": 4,
+          "workerBegun": 4,
+          "completed": 4,
+          "cancelled": 0,
+          "failed": 0,
+          "staleMessages": 0,
+          "detachedTransfers": 4,
+          "transferFailures": 0
+        }
+      ],
+      "pass": true
+    }
+  ],
+  "pass": true,
+  "error": null,
+  "scope": "Actual unchanged native Ambience playback/spatial/wander/fade chains with explicit owned Rust preparation hook, four independent hosts (two native, two owned) in one OfflineAudioContext. Complete source buffers must be bit exact and independently owned. The original1e-7 host limits apply to both native-repeat and owned-repeat output because native implicit fan-in itself is not bit-repeatable. Original JavaScript worker is the reference; no source/cache substitution, PCM alignment or physical listening claim.",
+  "engineVersion": "88696dc04c5ce79d",
+  "hostVersion": "8e942d988ab958ac"
+}

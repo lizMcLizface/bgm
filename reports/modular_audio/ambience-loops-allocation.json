@@ -1,0 +1,1383 @@
+{
+  "kind": "ambience-loops.owned-allocation",
+  "version": 1,
+  "build": "e1b3cb467c5e958c",
+  "wasmSha256": "0b4ab84f7898c36d64099f04da90ed7bf470899656ede0ac7c28e9a5f4828fa3",
+  "reference": "63e089bc9214bed02279e69e66ae5af9129f59dfdb7ffcd7aeca0f010180aa8d",
+  "pass": true,
+  "limits": {
+    "maxSampleError": 1e-7,
+    "relativeRmsError": 1e-7
+  },
+  "scope": "Actual renderLayer wind/fire/vinyl complete loop PCM, fixed original seeds, quantized shapes, default-referenced normalization and seam fold; native host chains/device output excluded.",
+  "results": [
+    {
+      "kind": "wind",
+      "rate": 8000,
+      "variant": 0,
+      "parameters": {
+        "speed": 0.4,
+        "gusts": 0.5
+      },
+      "frames": 232000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "fde662d59c20589e38e713f90d4b2f699f74d5b8e10d0ed96289ab190ac1c80a",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "wind",
+      "rate": 8000,
+      "variant": 1,
+      "parameters": {
+        "speed": 0,
+        "gusts": 0
+      },
+      "frames": 232000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "cb6eeae76f122616bcdeefe22d6bf6d61594025b2724c0b34f1c82a3ec58d428",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "wind",
+      "rate": 8000,
+      "variant": 2,
+      "parameters": {
+        "speed": 1,
+        "gusts": 1
+      },
+      "frames": 232000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "29c647249c478d717166c31ed782d56a35b5af9dc806dbc19ed56c094ab1841f",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "wind",
+      "rate": 8000,
+      "variant": 3,
+      "parameters": {
+        "speed": 0.4,
+        "gusts": 0.8
+      },
+      "frames": 232000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "aea2704fba19a616055182d851781806565d1f717442e51c2c90d39e786e0d3a",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "fire",
+      "rate": 8000,
+      "variant": 0,
+      "parameters": {
+        "crackle": 0.5,
+        "roar": 0.5
+      },
+      "frames": 184000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "0ccce53a3e35c4d0d7e81ba9ad2a37c6376793de71b77878a68301d899b6e4d3",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "fire",
+      "rate": 8000,
+      "variant": 1,
+      "parameters": {
+        "crackle": 0,
+        "roar": 0
+      },
+      "frames": 184000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "4edcd0ed305a079a0735e81dc5a80021ca8053afdf3e497764d3c5f6e1891625",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "fire",
+      "rate": 8000,
+      "variant": 2,
+      "parameters": {
+        "crackle": 1,
+        "roar": 1
+      },
+      "frames": 184000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "f3fc2495c5078577e2fef259b31ff3fe829efe50fd791d956562b7d2ad4c89cb",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "fire",
+      "rate": 8000,
+      "variant": 3,
+      "parameters": {
+        "crackle": 0.3,
+        "roar": 0.9
+      },
+      "frames": 184000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "aa004132f9fc64de741f723fdcc52c36fdb34f6f2f7564806fed446c80e48fd3",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "vinyl",
+      "rate": 8000,
+      "variant": 0,
+      "parameters": {
+        "crackle": 0.4,
+        "hiss": 0.4
+      },
+      "frames": 144000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "3c1210dde8257766b97fdeec0c5698110c96815e0cdd400039ecea431a7eb2a5",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "vinyl",
+      "rate": 8000,
+      "variant": 1,
+      "parameters": {
+        "crackle": 0,
+        "hiss": 0
+      },
+      "frames": 144000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "da9ef0148a91da4dc7f606984dbfbb7ad40cee4c4f6211b47bf050b71852aafc",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "vinyl",
+      "rate": 8000,
+      "variant": 2,
+      "parameters": {
+        "crackle": 1,
+        "hiss": 1
+      },
+      "frames": 144000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "038febfc947e75cacd3d7328e0c7e904674a811c4ad1f932c17e7b5a47a7e272",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "vinyl",
+      "rate": 8000,
+      "variant": 3,
+      "parameters": {
+        "crackle": 0.6,
+        "hiss": 0.3
+      },
+      "frames": 144000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "229f6829117979cc00ed5e27c762eaca41afa9e8fd7305d1ff55ba2d78fba83d",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "wind",
+      "rate": 24000,
+      "variant": 0,
+      "parameters": {
+        "speed": 0.4,
+        "gusts": 0.5
+      },
+      "frames": 696000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "f1b09213837bac25a2373da2c4c665f5d31ae3833bfaccd3eaaa5b1fff8014a7",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "wind",
+      "rate": 24000,
+      "variant": 1,
+      "parameters": {
+        "speed": 0,
+        "gusts": 0
+      },
+      "frames": 696000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "41e8dec635061fb26f578917c7de1e7ffa593f8155fbe689f842e6d54d11d341",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "wind",
+      "rate": 24000,
+      "variant": 2,
+      "parameters": {
+        "speed": 1,
+        "gusts": 1
+      },
+      "frames": 696000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "d4e61a34a51d6413078a1c960abfdc52674e387ce99da53ae25c4eeb663775ac",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "wind",
+      "rate": 24000,
+      "variant": 3,
+      "parameters": {
+        "speed": 0.4,
+        "gusts": 0.8
+      },
+      "frames": 696000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "d19de45aebb5c701b905bf14b33891bc58552d2398542d7c9e8d9f9c62efae23",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "fire",
+      "rate": 24000,
+      "variant": 0,
+      "parameters": {
+        "crackle": 0.5,
+        "roar": 0.5
+      },
+      "frames": 552000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "627c92fcaf915d48900ce99f9ab9e8e7b005712215114e7791c8afde6f8a0a62",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "fire",
+      "rate": 24000,
+      "variant": 1,
+      "parameters": {
+        "crackle": 0,
+        "roar": 0
+      },
+      "frames": 552000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "16deb8f6c451b224a1146d1f858f880b2da9f9c83ccf4bdb6619795d534fd5e7",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "fire",
+      "rate": 24000,
+      "variant": 2,
+      "parameters": {
+        "crackle": 1,
+        "roar": 1
+      },
+      "frames": 552000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "4399166ab6a3d045062838e5d5a451c1b309c0502a003f77b5f37e1c1f4ea8ea",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "fire",
+      "rate": 24000,
+      "variant": 3,
+      "parameters": {
+        "crackle": 0.3,
+        "roar": 0.9
+      },
+      "frames": 552000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "84592537245cf95080d16a0090b42b06a83657e0211673d069168ce8526c83aa",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "vinyl",
+      "rate": 24000,
+      "variant": 0,
+      "parameters": {
+        "crackle": 0.4,
+        "hiss": 0.4
+      },
+      "frames": 432000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "519d60476bcbee8182e211de7cd6affa026032d32d2bfe3dc75c328d98f710de",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "vinyl",
+      "rate": 24000,
+      "variant": 1,
+      "parameters": {
+        "crackle": 0,
+        "hiss": 0
+      },
+      "frames": 432000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "c0631cc7c8ec8bf3a4d8bcc3d29a35759185dbde348cc9e4e47a9689932d158d",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "vinyl",
+      "rate": 24000,
+      "variant": 2,
+      "parameters": {
+        "crackle": 1,
+        "hiss": 1
+      },
+      "frames": 432000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "99fc080af9b7f77b30a16b818a000729fab3cbd2b96b3fd6f06f044c33990fec",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "vinyl",
+      "rate": 24000,
+      "variant": 3,
+      "parameters": {
+        "crackle": 0.6,
+        "hiss": 0.3
+      },
+      "frames": 432000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "be30b1338dc9c1cf5277ec4925e201ef3f054635e3b5183ea44944e3a3cc6271",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "wind",
+      "rate": 44100,
+      "variant": 0,
+      "parameters": {
+        "speed": 0.4,
+        "gusts": 0.5
+      },
+      "frames": 1278900,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "ed98db32c2272a63ea8e551c01848a649689053fefce88db451b4e569f0c0aaa",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "wind",
+      "rate": 44100,
+      "variant": 1,
+      "parameters": {
+        "speed": 0,
+        "gusts": 0
+      },
+      "frames": 1278900,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "58a78088251545e6b76812e5dd40fc4bb65f3cebc81c8cc67a1117b1a829c032",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "wind",
+      "rate": 44100,
+      "variant": 2,
+      "parameters": {
+        "speed": 1,
+        "gusts": 1
+      },
+      "frames": 1278900,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "25f135b6d675481cb6b281794e65ffbc1ffb61ad742142c93f9693c99ab6289b",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "wind",
+      "rate": 44100,
+      "variant": 3,
+      "parameters": {
+        "speed": 0.4,
+        "gusts": 0.8
+      },
+      "frames": 1278900,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "e50b002e88e672c3043683723cc7c0c41c4e13fe121b340e0530be8b5aa3ad81",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "fire",
+      "rate": 44100,
+      "variant": 0,
+      "parameters": {
+        "crackle": 0.5,
+        "roar": 0.5
+      },
+      "frames": 1014300,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "eb6e55573200ea213d99cee2355aa4f5c753084ded0c3bea7e5646e036f0cadc",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "fire",
+      "rate": 44100,
+      "variant": 1,
+      "parameters": {
+        "crackle": 0,
+        "roar": 0
+      },
+      "frames": 1014300,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "abec02d7731f181fc015bd59329bff17304b1cf9be1a5f067a20062ea4d76adb",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "fire",
+      "rate": 44100,
+      "variant": 2,
+      "parameters": {
+        "crackle": 1,
+        "roar": 1
+      },
+      "frames": 1014300,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "143487b56ee9799b2ed91cb3a9a1a8875a58f5801bb4586aaa499cf81204d7bd",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "fire",
+      "rate": 44100,
+      "variant": 3,
+      "parameters": {
+        "crackle": 0.3,
+        "roar": 0.9
+      },
+      "frames": 1014300,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "ce2616637ff59cedec7b8a0906bfa4f8819cd8fc575c0ca2f080bd2eb95e2aa2",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "vinyl",
+      "rate": 44100,
+      "variant": 0,
+      "parameters": {
+        "crackle": 0.4,
+        "hiss": 0.4
+      },
+      "frames": 793800,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "56189d583d2df95878565a1042dd4deb4556f1ee0400d2ad0242c511a215d8a5",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "vinyl",
+      "rate": 44100,
+      "variant": 1,
+      "parameters": {
+        "crackle": 0,
+        "hiss": 0
+      },
+      "frames": 793800,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "04c4235a6023b60cd96438d44b820785132e41dcf0636fbd822b89a82a3abed0",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "vinyl",
+      "rate": 44100,
+      "variant": 2,
+      "parameters": {
+        "crackle": 1,
+        "hiss": 1
+      },
+      "frames": 793800,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "45b2f1abfa0e52fcd89d53f524b3ed26d8cbf9e091a9b3fe35418e48d2236378",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "vinyl",
+      "rate": 44100,
+      "variant": 3,
+      "parameters": {
+        "crackle": 0.6,
+        "hiss": 0.3
+      },
+      "frames": 793800,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "4adacc15976894440a297e23797abf8858f9e6e7e6eab8ec289ca9da73eb2fe0",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "wind",
+      "rate": 48000,
+      "variant": 0,
+      "parameters": {
+        "speed": 0.4,
+        "gusts": 0.5
+      },
+      "frames": 1392000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "f1de092e8f6c932c3d0a0deb750fd6ca6c541d60db4d1ac672da2cd74b916736",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "wind",
+      "rate": 48000,
+      "variant": 1,
+      "parameters": {
+        "speed": 0,
+        "gusts": 0
+      },
+      "frames": 1392000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "8b77808530eb55191c72f21f1cf40e0ed358f40e9dd4038798bf8e0d9f01a2bf",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "wind",
+      "rate": 48000,
+      "variant": 2,
+      "parameters": {
+        "speed": 1,
+        "gusts": 1
+      },
+      "frames": 1392000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "007eae3ed6a3c187268938dee4cf80ec4fe03d1c8790ad35891362f803d3613f",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "wind",
+      "rate": 48000,
+      "variant": 3,
+      "parameters": {
+        "speed": 0.4,
+        "gusts": 0.8
+      },
+      "frames": 1392000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "18162c86f8eb73dd52b37574d9a3b6f9acbdc509a9f5449a6ab523ea1a5d8b2b",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "fire",
+      "rate": 48000,
+      "variant": 0,
+      "parameters": {
+        "crackle": 0.5,
+        "roar": 0.5
+      },
+      "frames": 1104000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "2cba0b92f16ad53070adbb10a7e00e6295be7140d096fb62b2002847516f67bc",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "fire",
+      "rate": 48000,
+      "variant": 1,
+      "parameters": {
+        "crackle": 0,
+        "roar": 0
+      },
+      "frames": 1104000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "5b7ea189e3972dc515825ae4e2dee528364be2d3a72c0488ac15b6db3353e010",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "fire",
+      "rate": 48000,
+      "variant": 2,
+      "parameters": {
+        "crackle": 1,
+        "roar": 1
+      },
+      "frames": 1104000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "e8223a726453780b83ca69d2429113ba3eb657e9b5f416c0e9dca833078e70fd",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "fire",
+      "rate": 48000,
+      "variant": 3,
+      "parameters": {
+        "crackle": 0.3,
+        "roar": 0.9
+      },
+      "frames": 1104000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "710fd520a04fa311b1a1619f5af35231a6a2c3a7f221b29e39cb0355ed301186",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "vinyl",
+      "rate": 48000,
+      "variant": 0,
+      "parameters": {
+        "crackle": 0.4,
+        "hiss": 0.4
+      },
+      "frames": 864000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "fb952f8531c4b56c5afbe40b88226e872c1dd0674b66de906b94d66728d23a6a",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "vinyl",
+      "rate": 48000,
+      "variant": 1,
+      "parameters": {
+        "crackle": 0,
+        "hiss": 0
+      },
+      "frames": 864000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "96704bc5e2eace22680e5b9a5db0ae0d96f9c27b51b5883b6088964cd4f59f4b",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "vinyl",
+      "rate": 48000,
+      "variant": 2,
+      "parameters": {
+        "crackle": 1,
+        "hiss": 1
+      },
+      "frames": 864000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "097de8206fe4929023cb9a538ea2739b84397b34b3ba95a6cea7d6365a5964bf",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "vinyl",
+      "rate": 48000,
+      "variant": 3,
+      "parameters": {
+        "crackle": 0.6,
+        "hiss": 0.3
+      },
+      "frames": 864000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "eb88928cde97c6810650196af4d1c329b51174363d794c2271cf212aa56eac77",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "wind",
+      "rate": 96000,
+      "variant": 0,
+      "parameters": {
+        "speed": 0.4,
+        "gusts": 0.5
+      },
+      "frames": 2784000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "e0ffa7ddac2b7dc1515867b7669338763fea09eba1f43b874c0d088505e47018",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "wind",
+      "rate": 96000,
+      "variant": 1,
+      "parameters": {
+        "speed": 0,
+        "gusts": 0
+      },
+      "frames": 2784000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "331524720848adc1f33aa1139c7bd78af11cd964c5048ac50a0027f8e7a03aa1",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "wind",
+      "rate": 96000,
+      "variant": 2,
+      "parameters": {
+        "speed": 1,
+        "gusts": 1
+      },
+      "frames": 2784000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "08c8d94bc31f5e675059bed011934049888d4446364eddb305e87fa04b9b2896",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "wind",
+      "rate": 96000,
+      "variant": 3,
+      "parameters": {
+        "speed": 0.4,
+        "gusts": 0.8
+      },
+      "frames": 2784000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "8b13524d136b74b74e8ec53a7eeb5b19f82e45c8f9e12dc9811f4d9e8e43a9de",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "fire",
+      "rate": 96000,
+      "variant": 0,
+      "parameters": {
+        "crackle": 0.5,
+        "roar": 0.5
+      },
+      "frames": 2208000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "658c761b1c51c0cee72d4a28791539b2781ba7c0ea1adbdb5031cfc9e4206db9",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "fire",
+      "rate": 96000,
+      "variant": 1,
+      "parameters": {
+        "crackle": 0,
+        "roar": 0
+      },
+      "frames": 2208000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "e4e0c50e6486825b8eb923c7468284f114ee2eb6b2f5dfa293951a48f74637bb",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "fire",
+      "rate": 96000,
+      "variant": 2,
+      "parameters": {
+        "crackle": 1,
+        "roar": 1
+      },
+      "frames": 2208000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "ed891c0dfc401ca53442231655642aea9807cc6cd5f64a6bc6cba71333306359",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "fire",
+      "rate": 96000,
+      "variant": 3,
+      "parameters": {
+        "crackle": 0.3,
+        "roar": 0.9
+      },
+      "frames": 2208000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "8f2ea7072f6a53ffa7eabc2b23e44f8563e41f61dc4e0dce7fac0833bc4bd9da",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "vinyl",
+      "rate": 96000,
+      "variant": 0,
+      "parameters": {
+        "crackle": 0.4,
+        "hiss": 0.4
+      },
+      "frames": 1728000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "83593d775fc71ed2750821476536b4110d114df5b55e7599ee6cc668cc724e43",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "vinyl",
+      "rate": 96000,
+      "variant": 1,
+      "parameters": {
+        "crackle": 0,
+        "hiss": 0
+      },
+      "frames": 1728000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "ce7a741fae090c16a56c0b37856d6893a38c3a2423521a42b5372c8bd30c271a",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "vinyl",
+      "rate": 96000,
+      "variant": 2,
+      "parameters": {
+        "crackle": 1,
+        "hiss": 1
+      },
+      "frames": 1728000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "05208c998cfa726ed55039eecfbdbc3c4536aa3ed9b839b2d6ea6f37b21c6a1f",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "vinyl",
+      "rate": 96000,
+      "variant": 3,
+      "parameters": {
+        "crackle": 0.6,
+        "hiss": 0.3
+      },
+      "frames": 1728000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "819a9948ef502ae455e3035059eb193480f50b4cd2197c360ebc3dce7846fbeb",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "wind",
+      "rate": 192000,
+      "variant": 0,
+      "parameters": {
+        "speed": 0.4,
+        "gusts": 0.5
+      },
+      "frames": 5568000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "515ed1dee7d1d6148ba3e844ba2982ed6905379637da228fe4f9422513c38f94",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "wind",
+      "rate": 192000,
+      "variant": 1,
+      "parameters": {
+        "speed": 0,
+        "gusts": 0
+      },
+      "frames": 5568000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "f55a9cb0d44c4f3a1540f80dcadc6ca3d740c7de756983147ea33c09eee3dcc3",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "wind",
+      "rate": 192000,
+      "variant": 2,
+      "parameters": {
+        "speed": 1,
+        "gusts": 1
+      },
+      "frames": 5568000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "8f596cdedf400db2e771212ad510b393a4f480be1a5db4a6b4b4532f14cbf9a5",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "wind",
+      "rate": 192000,
+      "variant": 3,
+      "parameters": {
+        "speed": 0.4,
+        "gusts": 0.8
+      },
+      "frames": 5568000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "e74ca51f767258a02cd88e23adef09e75de81a8390bc7301ae8b4348a4a6ae24",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "fire",
+      "rate": 192000,
+      "variant": 0,
+      "parameters": {
+        "crackle": 0.5,
+        "roar": 0.5
+      },
+      "frames": 4416000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "becb9a7d4d3d2a04efabdc47ddd4a58caefed4e5b57e0673c8d43a0af4392d17",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "fire",
+      "rate": 192000,
+      "variant": 1,
+      "parameters": {
+        "crackle": 0,
+        "roar": 0
+      },
+      "frames": 4416000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "058b09321fb043484a8266a54a1c257eba8cbad0881d1cd53c22aa96f1e6bc76",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "fire",
+      "rate": 192000,
+      "variant": 2,
+      "parameters": {
+        "crackle": 1,
+        "roar": 1
+      },
+      "frames": 4416000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "0020b55b6d691c9f29045cde6f98413909af7ad3ac9c4edfc0109b075467a585",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "fire",
+      "rate": 192000,
+      "variant": 3,
+      "parameters": {
+        "crackle": 0.3,
+        "roar": 0.9
+      },
+      "frames": 4416000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "683c14251f204d832d0d888d8739720a277308fd796b6819de7422b8c380edc7",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "vinyl",
+      "rate": 192000,
+      "variant": 0,
+      "parameters": {
+        "crackle": 0.4,
+        "hiss": 0.4
+      },
+      "frames": 3456000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "0df4ee8937288cb1c4c6cf9e11785eb80080cd57cc6dc07442f2e1f49080834a",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "vinyl",
+      "rate": 192000,
+      "variant": 1,
+      "parameters": {
+        "crackle": 0,
+        "hiss": 0
+      },
+      "frames": 3456000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "72f1ca1e38073b0a800969d2755aefcf9662f40897b6eb7d4e0822354da86ccd",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "vinyl",
+      "rate": 192000,
+      "variant": 2,
+      "parameters": {
+        "crackle": 1,
+        "hiss": 1
+      },
+      "frames": 3456000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "19ea6383a8521aa97f868e08404ec70b43a1e02ada1f4eb327a0d8daa5b3dd31",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    },
+    {
+      "kind": "vinyl",
+      "rate": 192000,
+      "variant": 3,
+      "parameters": {
+        "crackle": 0.6,
+        "hiss": 0.3
+      },
+      "frames": 3456000,
+      "maxSampleError": 0,
+      "relativeRmsError": 0,
+      "differingSamples": 0,
+      "point": null,
+      "pcmSha256": "f96f1e31164de562e81a8d938f143e34b628c1b428c1f3836d2b3b9ebfbb259f",
+      "independentSavedInstances": 2,
+      "loopWrapExact": true,
+      "allocationOrReclamationCalls": 0,
+      "grew": false
+    }
+  ]
+}
