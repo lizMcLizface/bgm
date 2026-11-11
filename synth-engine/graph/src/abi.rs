@@ -335,3 +335,10 @@ pub unsafe extern "C" fn graph_reset(g: &mut Graph) {
 
 #[no_mangle]
 pub extern "C" fn graph_tape_drive(g:&mut Graph,id:u32,value:f64)->u32{status(g.tape_drive(id,value))}
+
+#[no_mangle]
+pub extern "C" fn graph_native_comp_initial(g:&mut Graph,id:u32,index:usize,value:f64)->u32{status(g.native_comp_initial(id,index,value))}
+#[no_mangle]
+pub extern "C" fn graph_native_comp_event(g:&mut Graph,id:u32,index:usize,kind:u32,seconds:f64,value:f64,tau:f64)->u32{status(g.native_comp_event(id,index,kind,seconds,value,tau))}
+#[no_mangle]
+pub extern "C" fn graph_native_comp_value(g:&Graph,id:u32,index:usize,coefficient:u32)->f64{g.native_comp_value(id,index,coefficient!=0).unwrap_or(f64::NAN)}

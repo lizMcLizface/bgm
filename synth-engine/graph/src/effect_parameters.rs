@@ -98,3 +98,10 @@ pub const TAPE: [Param; 5] = [
     Param{id:"drive",unit:"native",min:0.,max:1.,default:0.,modulation:false},
     Param{id:"tone",unit:"native",min:500.,max:20000.,default:9000.,modulation:false},
 ];
+pub const NATIVE_COMPRESSOR: [Param; 5] = [
+    Param{id:"threshold",unit:"dB",min:-100.,max:0.,default:-24.,modulation:false},
+    Param{id:"knee",unit:"dB",min:0.,max:40.,default:30.,modulation:false},
+    Param{id:"ratio",unit:"native",min:1.,max:20.,default:12.,modulation:false},
+    Param{id:"attack",unit:"s",min:0.,max:1.,default:0.003,modulation:false},
+    Param{id:"release",unit:"s",min:0.,max:1.,default:0.25,modulation:false},
+];

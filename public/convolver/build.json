@@ -1,0 +1,24 @@
+{
+  "api": 1,
+  "source": "e6baf9ebb392fca0ef86e428d53532a63ccac73c59a567fd25d7b9ec2545ac12",
+  "runtime": "19b13c46def32293fbdfc85198211d9bb173c2ac4034dfdc5e2951fd737d64b7",
+  "reference": "919644554b8f7b0ebff7a3521b1a54ba62da06c2825e50da955389a3380db4eb",
+  "hostSHA256": {
+    "src/modular-audio/convolverReview.worker.js": "73214d3f24e277da6faefd63ff65a7438c8fbd2539f7a17e1d7eaca1df7baaaa",
+    "src/modular-audio/convolverWorker.js": "fd59666f60bdc9d8c1f90e6aae56cb6d11fe26f860f7afa255639e5c1c7d63cd",
+    "src/modular-audio/convolverNativeReview.js": "f8bd9a0232a806b64cfc54f54e1499b8a7e28fc64eb2999f49e7170547cd5baf",
+    "tools/convolver-owned.html": "399a8675fd2141c4ce8a3b1aad2e7c2dcfa718188789f2f15ca896331e5858d7",
+    "tools/convolver-owned.js": "3501c67728c9c6123de861844e237d196fe4980e3e7cea20c561f981039f8a3b"
+  },
+  "hostVersion": "3cd27dd6fc7b2721",
+  "profile": "static-f64-nonuniform-128-8192-v1",
+  "wasm": "3c420c9526d6f7bbd8a995fb34afec3840dec7ae78c76aca8a0296896e6838ec",
+  "bytes": 39278,
+  "audited": false,
+  "execution": "worker-only; offline reference permitted",
+  "maxIRFrames": 327680,
+  "maxIRChannels": 2,
+  "maxFFTSize": 16384,
+  "adapterLatencyFrames": 0,
+  "version": "6a061d44e3e50573"
+}

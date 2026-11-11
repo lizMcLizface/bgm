@@ -1,0 +1,142 @@
+{
+  "kind": "graph.native-compressor-allocation",
+  "version": 1,
+  "engineVersion": "0349534ec1d782d4",
+  "auditWasmSha256": "85dd1e1a1c0d5a83a4e1c55b5b59249172590995340fd058cf006099b0b4b74d",
+  "pass": true,
+  "scope": "Two prepared graph instances sharing Wasm, native streaming or immutable captured timelines and parallel dry PDC. render/queue/cancel/reset/pause watched. No scheduling deadline or physical output claim.",
+  "results": [
+    {
+      "rate": 8000,
+      "mode": "live-boundary",
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2621440,
+      "grew": false,
+      "saveReloadExact": true,
+      "peak": 0.4176998734474182,
+      "latencyFrames": 48
+    },
+    {
+      "rate": 8000,
+      "mode": "immutable-capture",
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2752512,
+      "grew": false,
+      "saveReloadExact": true,
+      "peak": 0.33335283398628235,
+      "latencyFrames": 48
+    },
+    {
+      "rate": 24000,
+      "mode": "live-boundary",
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2621440,
+      "grew": false,
+      "saveReloadExact": true,
+      "peak": 0.30010366439819336,
+      "latencyFrames": 144
+    },
+    {
+      "rate": 24000,
+      "mode": "immutable-capture",
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2752512,
+      "grew": false,
+      "saveReloadExact": true,
+      "peak": 0.3147481679916382,
+      "latencyFrames": 144
+    },
+    {
+      "rate": 44100,
+      "mode": "live-boundary",
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2621440,
+      "grew": false,
+      "saveReloadExact": true,
+      "peak": 0.25559180974960327,
+      "latencyFrames": 264
+    },
+    {
+      "rate": 44100,
+      "mode": "immutable-capture",
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2752512,
+      "grew": false,
+      "saveReloadExact": true,
+      "peak": 0.2919767498970032,
+      "latencyFrames": 264
+    },
+    {
+      "rate": 48000,
+      "mode": "live-boundary",
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2621440,
+      "grew": false,
+      "saveReloadExact": true,
+      "peak": 0.2555783987045288,
+      "latencyFrames": 288
+    },
+    {
+      "rate": 48000,
+      "mode": "immutable-capture",
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2752512,
+      "grew": false,
+      "saveReloadExact": true,
+      "peak": 0.28844279050827026,
+      "latencyFrames": 288
+    },
+    {
+      "rate": 96000,
+      "mode": "live-boundary",
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2621440,
+      "grew": false,
+      "saveReloadExact": true,
+      "peak": 0.25430363416671753,
+      "latencyFrames": 576
+    },
+    {
+      "rate": 96000,
+      "mode": "immutable-capture",
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2752512,
+      "grew": false,
+      "saveReloadExact": true,
+      "peak": 0.27550560235977173,
+      "latencyFrames": 576
+    },
+    {
+      "rate": 192000,
+      "mode": "live-boundary",
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2621440,
+      "grew": false,
+      "saveReloadExact": true,
+      "peak": 0.25269362330436707,
+      "latencyFrames": 1023
+    },
+    {
+      "rate": 192000,
+      "mode": "immutable-capture",
+      "handles": 2,
+      "allocationOrReclamationCalls": 0,
+      "memoryBytes": 2752512,
+      "grew": false,
+      "saveReloadExact": true,
+      "peak": 0.27364492416381836,
+      "latencyFrames": 1023
+    }
+  ]
+}

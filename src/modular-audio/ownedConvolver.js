@@ -1,0 +1,26 @@
+// Static same-rate IR only. Production scheduling is worker-only until a
+// separate callback deadline acceptance exists; offline reference calls allowed.
+export const CONVOLVER_MAX_IR=327680;
+export const CONVOLVER_PROFILE='static-f64-nonuniform-128-8192-v1';
+const integer=(v,a,b)=>Number.isInteger(v)&&v>=a&&v<=b,fields=['version','sampleRate','inputChannels','irSampleRate','normalize','ir'];
+export function validateOwnedConvolverSpec(spec){
+ if(!spec||Object.keys(spec).length!==fields.length||!fields.every(k=>Object.hasOwn(spec,k))||spec.version!==1||!integer(spec.sampleRate,8000,192000)||spec.irSampleRate!==spec.sampleRate||!integer(spec.inputChannels,1,2)||spec.normalize!==false||!Array.isArray(spec.ir)||!integer(spec.ir.length,1,2))throw Error('Unsupported static convolver contract');
+ const length=spec.ir[0]?.length;if(!integer(length,1,CONVOLVER_MAX_IR)||!spec.ir.every(ch=>(Array.isArray(ch)||ch instanceof Float32Array)&&ch.length===length&&Array.prototype.every.call(ch,v=>typeof v==='number'&&Number.isFinite(v)&&Number.isFinite(Math.fround(v)))))throw Error('Invalid static convolver impulse');return spec;
+}
+export function ownedConvolverSpec(sampleRate,impulse,{inputChannels=1,irSampleRate=sampleRate,normalize=false}={}){
+ const ir=impulse instanceof Float32Array||Array.isArray(impulse)&&typeof impulse[0]==='number'?[impulse]:impulse;validateOwnedConvolverSpec({version:1,sampleRate,inputChannels,irSampleRate,normalize,ir});return {version:1,sampleRate,inputChannels,irSampleRate,normalize,ir:ir.map(ch=>Array.from(ch,Math.fround))};
+}
+export function saveOwnedConvolverSpec(spec){validateOwnedConvolverSpec(spec);return JSON.stringify({...spec,ir:spec.ir.map(ch=>Array.from(ch,Math.fround))})+'\n';}
+export const loadOwnedConvolverSpec=text=>validateOwnedConvolverSpec(JSON.parse(text));
+export class OwnedConvolver {
+ constructor(engine,spec){this.e=engine;this.spec=loadOwnedConvolverSpec(saveOwnedConvolverSpec(spec));this.spec.ir.forEach(Object.freeze);Object.freeze(this.spec.ir);Object.freeze(this.spec);this.executionPolicy='worker-only; offline reference permitted';if(engine.convolver_api()!==1)throw Error('Static convolver ABI mismatch');const p=this.spec;this.handle=engine.convolver_new(p.sampleRate,p.inputChannels,p.ir.length,p.ir[0].length);if(!this.handle)throw Error('Static convolver creation rejected');try{for(let ch=0;ch<p.ir.length;ch++)new Float32Array(engine.memory.buffer,engine.convolver_ir(this.handle,ch),p.ir[ch].length).set(p.ir[ch]);if(!engine.convolver_prepare(this.handle))throw Error('Static convolver preparation rejected');this.refresh();}catch(error){this.dispose();throw error;}}
+ alive(){if(!this.handle)throw Error('Static convolver disposed');}
+ refresh(){this.alive();this.memory=this.e.memory.buffer;this.input=Array.from({length:this.spec.inputChannels},(_,ch)=>new Float32Array(this.memory,this.e.convolver_input(this.handle,ch),2048));this.output=Array.from({length:Math.max(this.spec.inputChannels,this.spec.ir.length)},(_,ch)=>new Float32Array(this.memory,this.e.convolver_output(this.handle,ch),2048));[this.left,this.right]=this.output;}
+ render(frames){this.alive();if(!integer(frames,0,2048))throw Error('Invalid static convolver render bounds');if(this.memory!==this.e.memory.buffer)throw Error('Static convolver memory grew; refresh outside render');if(!this.e.convolver_render(this.handle,frames))throw Error('Static convolver render rejected');}
+ reset(){this.alive();this.e.convolver_reset(this.handle);}
+ stats(){this.alive();return Object.fromEntries(['frame','peak','latencyFrames','irFrames','inputChannels','irChannels','outputChannels','ownedBytes','groups','maxFFTSize','forwardFFTs','inverseFFTs','rejectedInputs','sampleRate','prepared'].map((key,index)=>[key,this.e.convolver_stat(this.handle,index)]));}
+ snapshot(){this.alive();return loadOwnedConvolverSpec(saveOwnedConvolverSpec(this.spec));}
+ dispose(){if(this.handle){this.e.convolver_free(this.handle);this.handle=0;this.input=this.output=this.left=this.right=this.memory=null;}}
+}
+let assets;
+export function loadOwnedConvolverAssets(){return assets??=(async()=>{const base=`${import.meta.env?.BASE_URL??'/'}convolver/`,get=async file=>{const r=await fetch(base+file);if(!r.ok)throw Error('Missing static convolver asset');return r;},manifest=await(await get('build.json')).json(),bytes=await(await get(`convolver.wasm?v=${manifest.version}`)).arrayBuffer(),sha=[...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(v=>v.toString(16).padStart(2,'0')).join('');if(manifest.api!==1||manifest.wasm!==sha||manifest.profile!==CONVOLVER_PROFILE)throw Error('Static convolver integrity mismatch');return {module:await WebAssembly.compile(bytes),manifest};})().catch(error=>{assets=null;throw error;});}

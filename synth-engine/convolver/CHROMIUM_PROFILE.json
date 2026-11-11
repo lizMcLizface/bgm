@@ -1,0 +1,75 @@
+{
+  "kind": "convolver.official-reference",
+  "version": 1,
+  "revision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+  "capturedAtUtc": "2026-11-11T03:00:08.715Z",
+  "scope": "Official routing, normalization(false) and zero-latency partition reference. Portable FFT/FDL code is independently written f64 radix2 with a declared different partition schedule, not a transplant of native f32 FFT code or a browser-binary identity claim. Actual browser comparisons required.",
+  "sources": [
+    {
+      "file": "LICENSE",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/LICENSE",
+      "bytes": 1536,
+      "sha256": "368cca1106be99d39ecd32a38d8305585d802a475effb66380b91ffc9bcf709b"
+    },
+    {
+      "file": "chrome/VERSION",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/chrome/VERSION",
+      "bytes": 37,
+      "sha256": "70df9ad90910436a4669989a7b8afc058f9a6e8bdea95280cbbcf132fa96650e"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/audio/reverb_convolver.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/reverb_convolver.cc",
+      "bytes": 5373,
+      "sha256": "7185312c93b342d9c1d03888c6e028fc49a4d91d8253cbb2754048bb7567e523"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/audio/reverb_convolver_stage.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/reverb_convolver_stage.cc",
+      "bytes": 8660,
+      "sha256": "52fb4526b2e524037000f7e08f66d128fdbb2a26a27981228b1527efef8e8481"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/audio/reverb.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/reverb.cc",
+      "bytes": 11262,
+      "sha256": "6d17eb6c2022da61d1ecad19954004f807b1b00728fcf552a3827c3336ac6a72"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/audio/fft_convolver.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/fft_convolver.cc",
+      "bytes": 4197,
+      "sha256": "50c2bf67588600ccba4afb12e92f3d170c84b8cbfe937b2c9b830fd07b81b886"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/audio/fft_frame.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/fft_frame.cc",
+      "bytes": 11382,
+      "sha256": "6ecc33a8508263f9e329084e691703caabd009090cb72f31c4a386c4782718fd"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/audio/fft_frame.h",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/fft_frame.h",
+      "bytes": 5737,
+      "sha256": "49294818e9e0ff12b8884bab3faacbdb1ba7b6017a77a5d4db5ee86fc9f1d087"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/audio/rustfft_ffi.rs",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/rustfft_ffi.rs",
+      "bytes": 16134,
+      "sha256": "52a5317f5074fcfa50dedb7aac8b88cdfd007c75e01f4438a27e144cd613400d"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/audio/direct_convolver.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/direct_convolver.cc",
+      "bytes": 3328,
+      "sha256": "69c4f6e2061b67639f04c4971dcca64722f0f7c6f1ff94c1cd8c32e5bf48304c"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/convolver_handler.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/convolver_handler.cc",
+      "bytes": 13051,
+      "sha256": "ca0558217fe2320aacb0eca3cc57f573058f5bc32b0a4e14445fea888d4a5377"
+    }
+  ]
+}

@@ -14,6 +14,8 @@ dependencies = [
  "calmbgm_iowa",
  "calmbgm_mixer",
  "calmbgm_motion_fx",
+ "calmbgm_native_compressor",
+ "calmbgm_native_compressor_automation",
  "calmbgm_percussion",
  "calmbgm_piano",
  "calmbgm_plucked_voice",
@@ -53,6 +55,17 @@ version = "0.1.0"
 [[package]]
 name = "calmbgm_motion_fx"
 version = "0.1.0"
+
+[[package]]
+name = "calmbgm_native_compressor"
+version = "0.1.0"
+
+[[package]]
+name = "calmbgm_native_compressor_automation"
+version = "0.1.0"
+dependencies = [
+ "calmbgm_native_compressor",
+]
 
 [[package]]
 name = "calmbgm_percussion"

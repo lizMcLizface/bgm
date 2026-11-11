@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "sourcePath": "src/app/engine/stringModel/realtime.worklet.js",
+  "original": "b6abf343dea688db936ea12766b517477d7314d5e7d4b77f60d411297ffd8004",
+  "wrapper": "ed273c92387be3661908c6f8b8f3dbbce2f9d395fc311076bab4316b71ed73f0",
+  "module": "7af6bbffd626e5a5e1e6880b75a23922edbc131d94cdbd271404473fd7a6229b",
+  "phasePolicy": "Known explicit test draws; not capture of an existing unseeded live voice"
+}

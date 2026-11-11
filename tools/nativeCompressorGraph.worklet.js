@@ -1,0 +1,6 @@
+import {ReferenceGraph}from '../src/modular-audio/runtime.js';
+class NativeCompressorGraphHarness extends AudioWorkletProcessor{
+ constructor({processorOptions:o}){super();this.done=false;try{this.graph=new ReferenceGraph(new WebAssembly.Instance(o.module,{}).exports,o.patch,o.contracts,sampleRate,128);this.end=o.frames;this.split=o.split;this.port.postMessage({type:'ready',createdFrame:currentFrame});}catch(e){this.done=true;this.port.postMessage({type:'error',message:String(e)});}}
+ process(inputs,outputs){if(this.done)return false;const out=outputs[0],input=inputs[0];try{for(let at=0,k=0;at<out[0].length;k++){const n=Math.min(this.split?[1,37,90][k%3]:128,out[0].length-at),target=this.graph.inputs.get(1);for(let i=0;i<n;i++)for(let ch=0;ch<2;ch++)target[i*2+ch]=input[ch]?.[at+i]??0;this.graph.render(n);out[0].set(this.graph.left.subarray(0,n),at);out[1].set(this.graph.right.subarray(0,n),at);at+=n;}if(this.graph.stats().frame>=this.end){this.port.postMessage({type:'complete',contextFrame:currentFrame+out[0].length,graph:this.graph.stats(),compressor:this.graph.nativeCompressorState(10)});this.done=true;}return true;}catch(e){this.port.postMessage({type:'error',message:String(e)});this.done=true;return false;}}
+}
+registerProcessor('native-compressor-graph-harness',NativeCompressorGraphHarness);

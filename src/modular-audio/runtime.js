@@ -12,6 +12,8 @@ import {validatePluckedConfig}from './pluckedConfig.js';
 import {STRING_BODIES}from './ownedPluckedString.js';
 import {validateOwnedMotionSpec}from './ownedMotion.js';
 import {validateOwnedTapeSpec}from './ownedTape.js';
+import {validateOwnedNativeCompressorSpec}from './ownedNativeCompressor.js';
+import {validateOwnedNativeCompressorAutomationSpec}from './ownedNativeCompressorAutomation.js';
 import {validateOwnedRackFxSpec}from './ownedRackFx.js';
 import {validateOwnedVoiceFxSpec}from './ownedVoiceFx.js';
 export {assertSerialRealtimeAllowed} from './executionPolicy.js';
@@ -40,6 +42,8 @@ export function validatePatch(raw, contracts) {
     if(d.type==='graph.delay'&&(n.config?.version!==1||!Number.isInteger(n.config.frames)||n.config.frames<0||n.config.frames>262144||Object.keys(n.parameters).length))throw Error('Invalid fixed delay configuration');
     if(d.type==='legacy.classic')n.config=validateClassicConfig(n.config);
     if(d.type==='legacy.plucked')n.config=validatePluckedConfig(n.config);
+    if(d.type==='native.compressor'){if(n.config?.events!==undefined)throw Error('Streaming compressor cannot drop captured timeline events');n.config=validateOwnedNativeCompressorSpec(n.config);if(Object.keys(n.parameters).length)throw Error('Native compressor requires complete configuration');}
+    if(d.type==='native.compressor.capture'){n.config=validateOwnedNativeCompressorAutomationSpec(n.config);if(Object.keys(n.parameters).length)throw Error('Captured compressor has immutable configuration targets');}
     if(d.type==='voice.tape'){n.config=validateOwnedTapeSpec(n.config);if(Object.keys(n.parameters).length)throw Error('Tape requires complete configuration');}
     if(d.type==='voice.motion'){n.config=validateOwnedMotionSpec(n.config);if(Object.keys(n.parameters).length)throw Error('Motion requires complete configuration');}
     if(d.type.startsWith('rack.')||d.type.startsWith('voice.')&&!['voice.motion','voice.tape'].includes(d.type)){n.config=(d.type.startsWith('rack.')?validateOwnedRackFxSpec:validateOwnedVoiceFxSpec)(n.config);if(d.type.split('.')[1]!==n.config.kind||Object.keys(n.parameters).length)throw Error('Effects require complete matching configuration');}
@@ -71,6 +75,7 @@ export function validatePatch(raw, contracts) {
     } else throw Error('Unsupported connection family');
     dependencies.get(e.to.module).add(e.from.module);
   }
+  if(p.modules.filter(n=>n.type.startsWith('native.compressor')).length>8)throw Error('Native compressor instance bounds');
   if(p.modules.filter(n=>n.type==='legacy.percussion').length>8)throw Error('Percussion instance limit exceeded');
   if(p.modules.filter(n=>n.type==='legacy.inserts').length>8||p.modules.filter(n=>n.type==='legacy.effects').length>4)throw Error('Effects instance limit exceeded');
   if(p.modules.filter(n=>['legacy.core','legacy.fm','legacy.piano','legacy.iowa','legacy.classic','legacy.plucked'].includes(n.type)).length>8)throw Error('Pitched instance limit exceeded');
@@ -119,6 +124,7 @@ function eventPacket(e, modules, connections) {
   if (e.kind === 'gate' && d.type === 'ref.tone' && typeof e.value === 'boolean') return [e.frame,e.target,e.owner,1,0,Number(e.value)];
   if (e.kind === 'hit' && d.type === 'legacy.percussion' && Number.isInteger(e.drum)&&e.drum>=0&&e.drum<14&&Number.isInteger(e.model)&&e.model>=0&&e.model<=2&&Number.isInteger(e.hit)&&e.hit>=0&&e.hit<=0xffffffff&&finite(e.velocity)&&e.velocity>=0&&e.velocity<=1&&finite(e.duration)&&e.duration>=0&&e.duration<=30&&finite(e.vary)&&Math.abs(e.vary)<=1&&finite(e.tone)&&Math.abs(e.tone)<=1&&finite(e.decay)&&e.decay>=.5&&e.decay<=2) return [e.frame,e.target,e.owner,e.drum,e.velocity,e.duration,e.vary,e.tone,e.decay,e.hit,e.model];
   if (e.kind === 'parameter') {
+    if(d.type==='native.compressor'&&e.frame%128!==0)throw Error('Native compressor targets require128-frame boundaries');
     if((['legacy.inserts','legacy.effects'].includes(d.type)||d.type.startsWith('rack.')||d.type.startsWith('voice.')&&d.type!=='voice.motion')&&e.frame%128!==0)throw Error('Effect parameters require canonical 128-frame input boundaries');
     if(d.type==='voice.freeze'&&e.parameter==='hold'&&e.value!==0&&e.value!==1)throw Error('Invalid Freeze hold');
     const p = d.parameters.find(p => p.id === e.parameter);
@@ -140,6 +146,7 @@ export class ReferenceGraph {
     if(this.patch.modules.some(n=>['legacy.piano','legacy.plucked'].includes(n.type))&&sampleRate!==48000)throw Error('Prepared piano v1 requires 48 kHz');
     if(this.patch.modules.some(n=>n.type==='legacy.iowa'&&n.config.sampleRate!==sampleRate))throw Error('Prepared Iowa sample rate mismatch');
     if(this.patch.modules.some(n=>n.type.startsWith('desk.')&&n.config.sampleRate!==sampleRate))throw Error('Mixer sample rate mismatch');
+    if(this.patch.modules.some(n=>n.type==='native.compressor.capture'&&n.config.events.some(e=>e.seconds*sampleRate>9007199254740864)))throw Error('Captured native compressor event exceeds exact frame range');
     this.contracts = contracts;
     this.modules = new Map(this.patch.modules.map(n => [n.id, contracts.modules.find(d => d.type === n.type && d.version === n.version)]));
     if (engine.graph_api() !== contracts.api) throw Error('Graph ABI mismatch');
@@ -155,6 +162,7 @@ export class ReferenceGraph {
         if(d.type==='host.audio'&&n.config)checked(engine.graph_input_latency(this.handle,n.id,n.config.latencyFrames));
         if(d.type.startsWith('desk.'))n.config.parameters.forEach((value,index)=>checked(engine.graph_mixer_config(this.handle,n.id,index,value,Number(n.config.settled))));
         if(d.type==='legacy.classic'){const c=n.config;checked(engine.graph_classic_config(this.handle,n.id,c.model,c.polyphony));for(const [index,value]of c.parameters)checked(engine.graph_classic_param(this.handle,n.id,index,value));if(c.waves){const len=engine.graph_classic_wave_len(this.handle,n.id),ptr=engine.graph_classic_wave_ptr(this.handle,n.id);if(len!==c.waves.length||!ptr)throw Error('Classic wave preparation mismatch');new Float32Array(engine.memory.buffer,ptr,len).set(c.waves);checked(engine.graph_classic_wave_commit(this.handle,n.id));}}
+        if(d.type.startsWith('native.compressor')){for(const [index,value]of n.config.parameters)checked(engine.graph_native_comp_initial(this.handle,n.id,index,value));if(d.type==='native.compressor.capture')for(const event of n.config.events)checked(engine.graph_native_comp_event(this.handle,n.id,event.parameter,event.kind==='step'?0:1,event.seconds,event.value,event.timeConstant??0));}
         if(d.type==='voice.tape'){for(const value of n.config.driveBank)checked(engine.graph_tape_drive(this.handle,n.id,value));for(const [index,value]of n.config.parameters)checked(engine.graph_fx_initial(this.handle,n.id,index,value));}
         if(d.type==='voice.motion')for(const [index,value]of n.config.parameters)checked(engine.graph_fx_initial(this.handle,n.id,index,value));
         if(d.type.startsWith('rack.')||d.type.startsWith('voice.')&&!['voice.motion','voice.tape'].includes(d.type)){const c=n.config;if(d.type.startsWith('voice.'))checked(engine.graph_voice_fx_config(this.handle,n.id,c.seed));for(const [index,value]of c.parameters)checked(engine.graph_fx_initial(this.handle,n.id,index,value));if(c.kind==='zplane'){checked(engine.graph_rack_shape_count(this.handle,n.id,c.shapes.length));c.shapes.forEach((rows,shape)=>rows.forEach((row,section)=>checked(engine.graph_rack_shape_row(this.handle,n.id,shape,section,...row))));['a','b'].forEach((key,i)=>c.custom[key].forEach((row,section)=>checked(engine.graph_rack_shape_row(this.handle,n.id,64+i,section,...row))));}}
@@ -219,17 +227,18 @@ export class ReferenceGraph {
   enqueue(event) {
     this.alive();
     if(event.kind==='parameter'&&this.modules.get(event.target)?.type.startsWith('desk.')){const packet=eventPacket(event,this.modules,this.patch.connections);checked(this.engine.graph_mixer_param(this.handle,packet[0],packet[1],packet[2],packet[4],packet[5]));return;}
-    if(event.kind==='parameter'&&['rack.','voice.'].some(prefix=>this.modules.get(event.target)?.type.startsWith(prefix))){const p=eventPacket(event,this.modules,this.patch.connections);checked(this.engine.graph_fx_param(this.handle,p[0],p[1],p[2],p[4],p[5]));return;}
+    if(event.kind==='parameter'&&['rack.','voice.','native.compressor'].some(prefix=>this.modules.get(event.target)?.type.startsWith(prefix))){const p=eventPacket(event,this.modules,this.patch.connections);checked(this.engine.graph_fx_param(this.handle,p[0],p[1],p[2],p[4],p[5]));return;}
     checked(this.engine[event.kind==='classic'?'graph_classic_event':event.kind==='hit'?'graph_hit':event.kind==='note'?'graph_note':'graph_event'](this.handle,...eventPacket(event,this.modules,this.patch.connections)));
   }
   alive() { if (!this.handle) throw Error('Disposed graph'); }
   render(frames) { this.alive(); if (!Number.isInteger(frames) || frames < 0 || frames > this.maxBlock) throw Error('Invalid frame count'); checked(this.engine.graph_render(this.handle,frames)); }
   stats() { this.alive(); return Object.fromEntries(['frame','late','overflow','applied'].map((key,i) => [key,this.engine.graph_stat(this.handle,i)])); }
-  baseValue(id,parameter){this.alive();const d=this.modules.get(id),p=d?.parameters.find(p=>p.id===parameter);if(!p)throw Error('Invalid parameter');return this.engine[d.type.startsWith('desk.')?'graph_mixer_value':['rack.','voice.'].some(x=>d.type.startsWith(x))?'graph_fx_value':'graph_get_base'](this.handle,id,p.code);}
+  baseValue(id,parameter){this.alive();const d=this.modules.get(id),p=d?.parameters.find(p=>p.id===parameter);if(!p)throw Error('Invalid parameter');return this.engine[d.type.startsWith('desk.')?'graph_mixer_value':['rack.','voice.','native.compressor'].some(x=>d.type.startsWith(x))?'graph_fx_value':'graph_get_base'](this.handle,id,p.code);}
   latency(id){this.alive();const value=this.engine.graph_latency(this.handle,id);if(!Number.isFinite(value))throw Error('Invalid latency module');return value;}
   edgeLatency(id){this.alive();const value=this.engine.graph_edge_latency(this.handle,id);if(!Number.isFinite(value))throw Error('Invalid latency edge');return value;}
-  effectStats(id){this.alive();const t=this.modules.get(id)?.type;if(!['legacy.inserts','legacy.effects'].includes(t)&&!['rack.','voice.'].some(p=>t?.startsWith(p)))throw Error('Not an effect node');return Object.fromEntries([['peak',0],['latencyFrames',16],['phase',17],['frame',18]].map(([k,i])=>[k,this.engine.graph_fx_stat(this.handle,id,i)]));}
+  effectStats(id){this.alive();const t=this.modules.get(id)?.type;if(!['legacy.inserts','legacy.effects'].includes(t)&&!['rack.','voice.','native.compressor'].some(p=>t?.startsWith(p)))throw Error('Not an effect node');return Object.fromEntries([['peak',0],['latencyFrames',16],['phase',17],['frame',18]].map(([k,i])=>[k,this.engine.graph_fx_stat(this.handle,id,i)]));}
   pitchedStats(id){this.alive();if(!['legacy.core','legacy.fm','legacy.piano','legacy.iowa','legacy.classic','legacy.plucked'].includes(this.modules.get(id)?.type))throw Error('Not a pitched node');return Object.fromEntries(['active','steals','dropped','late','frame','peak','latencyFrames','peakActive'].map((key,i)=>[key,this.engine.graph_pitch_stat(this.handle,id,i)]));}
+  nativeCompressorState(id){this.alive();if(!this.modules.get(id)?.type.startsWith('native.compressor'))throw Error('Not a native compressor node');const s=index=>this.engine.graph_fx_stat(this.handle,id,index);return {frame:s(18),latencyFrames:s(16),controlPhase:s(17),divisionPhase:s(21),reductionDb:s(20),tailSeconds:s(22),targets:Array.from({length:5},(_,i)=>this.engine.graph_native_comp_value(this.handle,id,i,0)),coefficients:Array.from({length:5},(_,i)=>this.engine.graph_native_comp_value(this.handle,id,i,1))};}
   percussionStats(id){this.alive();if(this.modules.get(id)?.type!=='legacy.percussion')throw Error('Not percussion');return Object.fromEntries(['active','queued','steals','dropped','late','frame','peakActive'].map((key,i)=>[key,this.engine.graph_percussion_stat(this.handle,id,i)]));}
   meters() {this.alive();return Object.fromEntries([...this.modules].filter(([,d])=>d.type==='graph.compressor').map(([id])=>[id,Object.fromEntries(['inputPeak','keyPeak','reductionDb','outputPeak','missingKey','externalKey'].map((key,i)=>[key,this.engine.graph_meter(this.handle,id,i)]))]));}
   pause(value) { this.alive(); this.engine.graph_pause(this.handle,Number(value)); }

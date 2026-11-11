@@ -1,0 +1,10 @@
+// Appended to the unchanged original worklet for diagnostic scheduling only.
+// Its known Math.random draws are test inputs, not a live random-seed replacement.
+class ScheduledStringReference extends StringVoices {
+ constructor(options){super();const p=options.processorOptions;this.originalMessage=this.port.onmessage;this.startFrame=p.startFrame;this.targetFrames=p.frames;this.events=p.events.slice().sort((a,b)=>a.frame-b.frame||a.order-b.order);this.eventIndex=0;this.applied=0;this.reported=false;this.firstActiveFrame=null;this.phaseMatches=true;this.trace=[];this.port.onmessage=()=>{};this.port.postMessage({type:'ready',source:'native',startFrame:this.startFrame});}
+ process(inputs,outputs){const out=outputs[0][0],n=out.length;if(n!==128){out.fill(0);this.port.postMessage({type:'error',source:'native',error:'Actual reference requires128-frame callbacks'});return false;}if(currentFrame<this.startFrame||currentFrame>=this.startFrame+this.targetFrames){out.fill(0);return true;}if(this.firstActiveFrame===null)this.firstActiveFrame=currentFrame;const relative=currentFrame-this.startFrame;
+  while(this.eventIndex<this.events.length&&this.events[this.eventIndex].frame<=relative){const e=this.events[this.eventIndex++];if(e.data.on){const original=Math.random;Math.random=()=>e.draw;try{this.originalMessage({data:e.data});}finally{Math.random=original;}const phase=this.voices.get(e.data.id).lfo;if(phase!==e.phase)this.phaseMatches=false;}else this.originalMessage({data:e.data});if(this.trace.length<32)this.trace.push({frame:e.frame,currentFrame,kind:e.data.on?'on':e.data.off?'off':'panic',id:e.data.id??0});this.applied++;}
+  super.process(inputs,outputs);if(relative+n>=this.targetFrames&&!this.reported){this.reported=true;this.port.postMessage({type:'complete',source:'native',frame:relative+n,generatedFrame:relative+n,active:this.voices.size,rngState:this.seed,applied:this.applied,phaseMatches:this.phaseMatches,firstActiveFrame:this.firstActiveFrame,startFrame:this.startFrame,trace:this.trace});}return true;
+ }
+}
+registerProcessor('scheduled-string-reference',ScheduledStringReference);

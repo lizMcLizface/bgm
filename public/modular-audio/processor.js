@@ -1,4 +1,4 @@
-import {ReferenceGraph,assertSerialRealtimeAllowed} from './runtime.js?v=5c32eec13f07c426';
+import {ReferenceGraph,assertSerialRealtimeAllowed} from './runtime.js?v=fb15a264441218ff';
 
 class ReferenceProcessor extends AudioWorkletProcessor {
   constructor({processorOptions: o}) {

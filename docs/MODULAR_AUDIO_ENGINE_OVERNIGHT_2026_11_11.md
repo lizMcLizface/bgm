@@ -62,6 +62,14 @@ reviewable rather than weakening validation or changing sounds to force a pass.
 
 ## Checkpoints
 
+- 11 November ~03:26 UTC: measured-string source/body40native cases, captured
+  compressor48native cases, compressor Graph28/29 twelve actualAudioWorklet
+  cases and13 static-convolution cases pass. Convolver remains worker-only after
+  measured transform-boundary spikes. Broad suite470files /3653tests pass,
+  plus4audit-only skips; normal public build/provenance pass. ActiveVoice wrapper
+  has two saved192k extreme-control PCM failures despite exact coefficients;
+  diagnosis continues without accepting it or changing bounds.
+
 - 11 November ~02:50 UTC: actual All native/owned/restored-owned paths and an
   owned live route pass, with nonzero source/music/ambience/master metrics,
   automatic controls and clean leases/meters. The normal default workbench

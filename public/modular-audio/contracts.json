@@ -2886,6 +2886,166 @@
       "controlPolicy": "exact integer-frame graph events; standalone native prebooked seconds importer is separate",
       "bypassPolicy": "active effect; native Instrument all-zero bypass is not inferred",
       "resetPolicy": "latest targets retained; native cold tone and LFO/history restart"
+    },
+    {
+      "type": "native.compressor",
+      "code": 28,
+      "version": 1,
+      "hostInput": false,
+      "latencyFrames": null,
+      "tailFrames": -1,
+      "tailPolicy": "native 1.625-second state tail and prepared lookahead",
+      "bypass": "unsupported",
+      "reset": "phase and voices cleared; compressor gain reset",
+      "ports": [
+        {
+          "id": "program.in",
+          "code": 0,
+          "direction": "in",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": true
+        },
+        {
+          "id": "audio.out",
+          "code": 1,
+          "direction": "out",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": false
+        }
+      ],
+      "parameters": [
+        {
+          "id": "threshold",
+          "code": 0,
+          "unit": "dB",
+          "min": -100,
+          "max": 0,
+          "default": -24,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "knee",
+          "code": 1,
+          "unit": "dB",
+          "min": 0,
+          "max": 40,
+          "default": 30,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "ratio",
+          "code": 2,
+          "unit": "native",
+          "min": 1,
+          "max": 20,
+          "default": 12,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "attack",
+          "code": 3,
+          "unit": "s",
+          "min": 0,
+          "max": 1,
+          "default": 0.003,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        },
+        {
+          "id": "release",
+          "code": 4,
+          "unit": "s",
+          "min": 0,
+          "max": 1,
+          "default": 0.25,
+          "rate": "event",
+          "modulation": false,
+          "smoothingMs": 0
+        }
+      ],
+      "events": [
+        "parameter"
+      ],
+      "processing": "owned native DynamicsCompressor with live canonical boundary targets",
+      "profile": "chromium-dynamics-e14de735-v1",
+      "parameterQuantumFrames": 128,
+      "divisionFrames": 32,
+      "precision": "f64 target ledger; source-defined native Float32 snapshot",
+      "resetPolicy": "clear histories; retain latest targets",
+      "latencyPolicy": "native lookahead only; query prepared rate; no extra adapter",
+      "detector": "original linked stereo detector; no external sidechain port"
+    },
+    {
+      "type": "native.compressor.capture",
+      "code": 29,
+      "version": 1,
+      "hostInput": false,
+      "latencyFrames": null,
+      "tailFrames": -1,
+      "tailPolicy": "native 1.625-second state tail and prepared lookahead",
+      "bypass": "unsupported",
+      "reset": "phase and voices cleared; compressor gain reset",
+      "ports": [
+        {
+          "id": "program.in",
+          "code": 0,
+          "direction": "in",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": true
+        },
+        {
+          "id": "audio.out",
+          "code": 1,
+          "direction": "out",
+          "family": "audio",
+          "channels": 2,
+          "unit": "linear PCM",
+          "reference": "1 = digital full scale",
+          "rate": "audio",
+          "normalization": "none",
+          "fanIn": 1,
+          "role": "program",
+          "required": false
+        }
+      ],
+      "parameters": [],
+      "events": [],
+      "processing": "owned native DynamicsCompressor with immutable original-seconds timelines",
+      "profile": "chromium-dynamics-k-rate-e14de735-v1",
+      "controlClockFrames": 128,
+      "divisionFrames": 32,
+      "graphParameterEvents": false,
+      "ownership": "captured timelines are immutable module configuration, separate from cancellable Graph events",
+      "resetPolicy": "cold histories and captured timeline replay",
+      "latencyPolicy": "native lookahead only; query prepared rate; no extra adapter"
     }
   ]
 }

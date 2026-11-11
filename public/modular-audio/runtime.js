@@ -526,6 +526,39 @@ function validateOwnedTapeSpec(raw) {
   return c;
 }
 
+// src/modular-audio/ownedNativeCompressor.js
+var NATIVE_COMPRESSOR_PROFILE = "chromium-dynamics-e14de735-v1";
+var NATIVE_COMPRESSOR_PARAMETERS = Object.freeze([["threshold", -100, 0, -24], ["knee", 0, 40, 30], ["ratio", 1, 20, 12], ["attack", 0, 1, 3e-3], ["release", 0, 1, 0.25]]);
+function validateOwnedNativeCompressorSpec(raw) {
+  const c = JSON.parse(JSON.stringify(raw));
+  if (c?.version !== 1 || c.profile !== NATIVE_COMPRESSOR_PROFILE || c.controlClock !== "native-128" || !Array.isArray(c.parameters) || c.parameters.length !== 5) throw Error("Invalid native compressor profile");
+  const seen = /* @__PURE__ */ new Set();
+  for (const p of c.parameters) {
+    if (!Array.isArray(p) || p.length !== 2 || !Number.isInteger(p[0]) || seen.has(p[0])) throw Error("Invalid native compressor parameter identity");
+    const d = NATIVE_COMPRESSOR_PARAMETERS[p[0]], v = p[1];
+    if (!d || typeof v !== "number" || !Number.isFinite(v) || v < d[1] || v > d[2]) throw Error("Invalid native compressor parameter value");
+    seen.add(p[0]);
+  }
+  return c;
+}
+
+// src/modular-audio/ownedNativeCompressorAutomation.js
+var NATIVE_COMPRESSOR_AUTOMATION_PROFILE = "chromium-dynamics-k-rate-e14de735-v1";
+function validateOwnedNativeCompressorAutomationSpec(raw) {
+  const c = JSON.parse(JSON.stringify(raw));
+  if (c?.version !== 1 || c.profile !== NATIVE_COMPRESSOR_AUTOMATION_PROFILE || c.controlClock !== "native-128" || !Array.isArray(c.events) || c.events.length > 1024) throw Error("Invalid captured native compressor profile");
+  validateOwnedNativeCompressorSpec({ ...c, profile: NATIVE_COMPRESSOR_PROFILE });
+  const counts = Array(5).fill(0), last = Array(5).fill(-1);
+  for (const e of c.events) {
+    const p = NATIVE_COMPRESSOR_PARAMETERS[e?.parameter];
+    if (!p || !Number.isInteger(e.parameter) || !["step", "target"].includes(e.kind) || typeof e.seconds !== "number" || !Number.isFinite(e.seconds) || e.seconds < 0 || e.seconds <= last[e.parameter] || typeof e.value !== "number" || !Number.isFinite(e.value) || e.value < p[1] || e.value > p[2] || ++counts[e.parameter] > 256) throw Error("Invalid captured native compressor event/order");
+    if (e.kind === "target" && (typeof e.timeConstant !== "number" || !Number.isFinite(e.timeConstant) || e.timeConstant < 0 || !Number.isFinite(Math.fround(e.timeConstant)) || e.timeConstant > 0 && Math.fround(e.timeConstant) === 0)) throw Error("Invalid native target time constant");
+    if (e.kind === "step" && e.timeConstant != null && e.timeConstant !== 0) throw Error("A native step has no time constant");
+    last[e.parameter] = e.seconds;
+  }
+  return c;
+}
+
 // src/synths/effects/zplaneShapes.js
 var BOOST = (level) => Math.max(2, Math.min(18, 18 + level * 0.45));
 var NEUTRAL = [5500, 1e3, 0];
@@ -639,6 +672,15 @@ function validatePatch(raw, contracts) {
     if (d.type === "graph.delay" && (n.config?.version !== 1 || !Number.isInteger(n.config.frames) || n.config.frames < 0 || n.config.frames > 262144 || Object.keys(n.parameters).length)) throw Error("Invalid fixed delay configuration");
     if (d.type === "legacy.classic") n.config = validateClassicConfig(n.config);
     if (d.type === "legacy.plucked") n.config = validatePluckedConfig(n.config);
+    if (d.type === "native.compressor") {
+      if (n.config?.events !== void 0) throw Error("Streaming compressor cannot drop captured timeline events");
+      n.config = validateOwnedNativeCompressorSpec(n.config);
+      if (Object.keys(n.parameters).length) throw Error("Native compressor requires complete configuration");
+    }
+    if (d.type === "native.compressor.capture") {
+      n.config = validateOwnedNativeCompressorAutomationSpec(n.config);
+      if (Object.keys(n.parameters).length) throw Error("Captured compressor has immutable configuration targets");
+    }
     if (d.type === "voice.tape") {
       n.config = validateOwnedTapeSpec(n.config);
       if (Object.keys(n.parameters).length) throw Error("Tape requires complete configuration");
@@ -682,6 +724,7 @@ function validatePatch(raw, contracts) {
     } else throw Error("Unsupported connection family");
     dependencies.get(e.to.module).add(e.from.module);
   }
+  if (p.modules.filter((n) => n.type.startsWith("native.compressor")).length > 8) throw Error("Native compressor instance bounds");
   if (p.modules.filter((n) => n.type === "legacy.percussion").length > 8) throw Error("Percussion instance limit exceeded");
   if (p.modules.filter((n) => n.type === "legacy.inserts").length > 8 || p.modules.filter((n) => n.type === "legacy.effects").length > 4) throw Error("Effects instance limit exceeded");
   if (p.modules.filter((n) => ["legacy.core", "legacy.fm", "legacy.piano", "legacy.iowa", "legacy.classic", "legacy.plucked"].includes(n.type)).length > 8) throw Error("Pitched instance limit exceeded");
@@ -769,6 +812,7 @@ function eventPacket(e, modules, connections) {
   if (e.kind === "gate" && d.type === "ref.tone" && typeof e.value === "boolean") return [e.frame, e.target, e.owner, 1, 0, Number(e.value)];
   if (e.kind === "hit" && d.type === "legacy.percussion" && Number.isInteger(e.drum) && e.drum >= 0 && e.drum < 14 && Number.isInteger(e.model) && e.model >= 0 && e.model <= 2 && Number.isInteger(e.hit) && e.hit >= 0 && e.hit <= 4294967295 && finite4(e.velocity) && e.velocity >= 0 && e.velocity <= 1 && finite4(e.duration) && e.duration >= 0 && e.duration <= 30 && finite4(e.vary) && Math.abs(e.vary) <= 1 && finite4(e.tone) && Math.abs(e.tone) <= 1 && finite4(e.decay) && e.decay >= 0.5 && e.decay <= 2) return [e.frame, e.target, e.owner, e.drum, e.velocity, e.duration, e.vary, e.tone, e.decay, e.hit, e.model];
   if (e.kind === "parameter") {
+    if (d.type === "native.compressor" && e.frame % 128 !== 0) throw Error("Native compressor targets require128-frame boundaries");
     if ((["legacy.inserts", "legacy.effects"].includes(d.type) || d.type.startsWith("rack.") || d.type.startsWith("voice.") && d.type !== "voice.motion") && e.frame % 128 !== 0) throw Error("Effect parameters require canonical 128-frame input boundaries");
     if (d.type === "voice.freeze" && e.parameter === "hold" && e.value !== 0 && e.value !== 1) throw Error("Invalid Freeze hold");
     const p = d.parameters.find((p2) => p2.id === e.parameter);
@@ -792,6 +836,7 @@ var ReferenceGraph = class {
     if (this.patch.modules.some((n) => ["legacy.piano", "legacy.plucked"].includes(n.type)) && sampleRate !== 48e3) throw Error("Prepared piano v1 requires 48 kHz");
     if (this.patch.modules.some((n) => n.type === "legacy.iowa" && n.config.sampleRate !== sampleRate)) throw Error("Prepared Iowa sample rate mismatch");
     if (this.patch.modules.some((n) => n.type.startsWith("desk.") && n.config.sampleRate !== sampleRate)) throw Error("Mixer sample rate mismatch");
+    if (this.patch.modules.some((n) => n.type === "native.compressor.capture" && n.config.events.some((e) => e.seconds * sampleRate > 9007199254740864))) throw Error("Captured native compressor event exceeds exact frame range");
     this.contracts = contracts;
     this.modules = new Map(this.patch.modules.map((n) => [n.id, contracts.modules.find((d) => d.type === n.type && d.version === n.version)]));
     if (engine.graph_api() !== contracts.api) throw Error("Graph ABI mismatch");
@@ -816,6 +861,10 @@ var ReferenceGraph = class {
             new Float32Array(engine.memory.buffer, ptr, len).set(c.waves);
             checked(engine.graph_classic_wave_commit(this.handle, n.id));
           }
+        }
+        if (d.type.startsWith("native.compressor")) {
+          for (const [index, value] of n.config.parameters) checked(engine.graph_native_comp_initial(this.handle, n.id, index, value));
+          if (d.type === "native.compressor.capture") for (const event of n.config.events) checked(engine.graph_native_comp_event(this.handle, n.id, event.parameter, event.kind === "step" ? 0 : 1, event.seconds, event.value, event.timeConstant ?? 0));
         }
         if (d.type === "voice.tape") {
           for (const value of n.config.driveBank) checked(engine.graph_tape_drive(this.handle, n.id, value));
@@ -931,7 +980,7 @@ var ReferenceGraph = class {
       checked(this.engine.graph_mixer_param(this.handle, packet3[0], packet3[1], packet3[2], packet3[4], packet3[5]));
       return;
     }
-    if (event.kind === "parameter" && ["rack.", "voice."].some((prefix) => this.modules.get(event.target)?.type.startsWith(prefix))) {
+    if (event.kind === "parameter" && ["rack.", "voice.", "native.compressor"].some((prefix) => this.modules.get(event.target)?.type.startsWith(prefix))) {
       const p = eventPacket(event, this.modules, this.patch.connections);
       checked(this.engine.graph_fx_param(this.handle, p[0], p[1], p[2], p[4], p[5]));
       return;
@@ -954,7 +1003,7 @@ var ReferenceGraph = class {
     this.alive();
     const d = this.modules.get(id), p = d?.parameters.find((p2) => p2.id === parameter);
     if (!p) throw Error("Invalid parameter");
-    return this.engine[d.type.startsWith("desk.") ? "graph_mixer_value" : ["rack.", "voice."].some((x) => d.type.startsWith(x)) ? "graph_fx_value" : "graph_get_base"](this.handle, id, p.code);
+    return this.engine[d.type.startsWith("desk.") ? "graph_mixer_value" : ["rack.", "voice.", "native.compressor"].some((x) => d.type.startsWith(x)) ? "graph_fx_value" : "graph_get_base"](this.handle, id, p.code);
   }
   latency(id) {
     this.alive();
@@ -971,13 +1020,19 @@ var ReferenceGraph = class {
   effectStats(id) {
     this.alive();
     const t = this.modules.get(id)?.type;
-    if (!["legacy.inserts", "legacy.effects"].includes(t) && !["rack.", "voice."].some((p) => t?.startsWith(p))) throw Error("Not an effect node");
+    if (!["legacy.inserts", "legacy.effects"].includes(t) && !["rack.", "voice.", "native.compressor"].some((p) => t?.startsWith(p))) throw Error("Not an effect node");
     return Object.fromEntries([["peak", 0], ["latencyFrames", 16], ["phase", 17], ["frame", 18]].map(([k, i]) => [k, this.engine.graph_fx_stat(this.handle, id, i)]));
   }
   pitchedStats(id) {
     this.alive();
     if (!["legacy.core", "legacy.fm", "legacy.piano", "legacy.iowa", "legacy.classic", "legacy.plucked"].includes(this.modules.get(id)?.type)) throw Error("Not a pitched node");
     return Object.fromEntries(["active", "steals", "dropped", "late", "frame", "peak", "latencyFrames", "peakActive"].map((key, i) => [key, this.engine.graph_pitch_stat(this.handle, id, i)]));
+  }
+  nativeCompressorState(id) {
+    this.alive();
+    if (!this.modules.get(id)?.type.startsWith("native.compressor")) throw Error("Not a native compressor node");
+    const s = (index) => this.engine.graph_fx_stat(this.handle, id, index);
+    return { frame: s(18), latencyFrames: s(16), controlPhase: s(17), divisionPhase: s(21), reductionDb: s(20), tailSeconds: s(22), targets: Array.from({ length: 5 }, (_, i) => this.engine.graph_native_comp_value(this.handle, id, i, 0)), coefficients: Array.from({ length: 5 }, (_, i) => this.engine.graph_native_comp_value(this.handle, id, i, 1)) };
   }
   percussionStats(id) {
     this.alive();

@@ -1,0 +1,148 @@
+{
+  "api": 1,
+  "profile": {
+    "kind": "native-compressor.captured-k-rate-profile",
+    "version": 1,
+    "revision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+    "capturedAtUtc": "2026-11-11T02:22:05.975Z",
+    "scope": "Pinned public native DynamicsCompressor reference; separate from the existing zero-lookahead graph.compressor and custom desk/master dynamics. Actual native PCM acceptance required before portable profile adoption.",
+    "sources": [
+      {
+        "file": "LICENSE",
+        "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/LICENSE",
+        "bytes": 1536,
+        "sha256": "368cca1106be99d39ecd32a38d8305585d802a475effb66380b91ffc9bcf709b"
+      },
+      {
+        "file": "third_party/blink/renderer/platform/audio/dynamics_compressor.cc",
+        "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/dynamics_compressor.cc",
+        "bytes": 20452,
+        "sha256": "be48c17c9d4039cd608269130e87c164cf8ea82f18c7a551fcadd92a37db2a13"
+      },
+      {
+        "file": "third_party/blink/renderer/platform/audio/dynamics_compressor.h",
+        "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/dynamics_compressor.h",
+        "bytes": 5300,
+        "sha256": "51e3144759e4e9ad81e733bdbe7e5e8ad94bed1651c93b7c16cea98b4f934ed1"
+      },
+      {
+        "file": "third_party/blink/renderer/modules/webaudio/dynamics_compressor_handler.cc",
+        "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/dynamics_compressor_handler.cc",
+        "bytes": 6972,
+        "sha256": "bdc2cad4d61ee6e6707cca3442c0a2fe6aca72b0754387602b68a00e299f31fe"
+      },
+      {
+        "file": "third_party/blink/renderer/modules/webaudio/dynamics_compressor_handler.h",
+        "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/dynamics_compressor_handler.h",
+        "bytes": 2565,
+        "sha256": "4f34efc257498643ab31d1fa8b501d8f97d268e83709e74b32b9d1ce35b372d5"
+      },
+      {
+        "file": "third_party/blink/renderer/modules/webaudio/dynamics_compressor_node.cc",
+        "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/dynamics_compressor_node.cc",
+        "bytes": 7665,
+        "sha256": "eedd53f7271b2b3eae9e049394e9f64a373ca60246a2220d2aa97633b34dbbec"
+      },
+      {
+        "file": "third_party/blink/renderer/platform/audio/audio_utilities.cc",
+        "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/audio_utilities.cc",
+        "bytes": 9697,
+        "sha256": "d3ed345360190487ee482eebda6141580994db924bd0fd36f342a61b33a09db0"
+      },
+      {
+        "file": "third_party/blink/renderer/platform/audio/audio_utilities.h",
+        "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/audio_utilities.h",
+        "bytes": 4405,
+        "sha256": "04c36054b0c043f9f4cf061875734e7b0631df7f53c8a25d7ad3e7bb0ca271cc"
+      },
+      {
+        "file": "third_party/blink/renderer/platform/wtf/math_extras.h",
+        "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/wtf/math_extras.h",
+        "bytes": 12171,
+        "sha256": "eeb5d43ce4793ef0043326a65318d4e1a66e17d4af218387619ebd71d598238f"
+      },
+      {
+        "file": "third_party/fdlibm/ieee754.h",
+        "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/fdlibm/ieee754.h",
+        "bytes": 2871,
+        "sha256": "67ac025f301eb38f63a4523f94f0cc30a4c0aa2f441f40f6e139026a84d49072"
+      },
+      {
+        "file": "third_party/fdlibm/BUILD.gn",
+        "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/fdlibm/BUILD.gn",
+        "bytes": 267,
+        "sha256": "30bab8a55ae2b9b6a980af1eb9ed9078c1c7ef602c34aa5ab61186329f8d02a1"
+      },
+      {
+        "file": "third_party/fdlibm/ieee754.cc",
+        "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/fdlibm/ieee754.cc",
+        "bytes": 103133,
+        "sha256": "661b229dd99d262594df7a25d1c709d63f0af202c9bae252b3cabbaeb27d7d2f"
+      }
+    ],
+    "hostSources": [
+      {
+        "file": "src/nodes/compressor.js",
+        "bytes": 1117,
+        "sha256": "13ee638c58711e42ce2bd68c8b2fa249bbd74fb86b77c215fab216b4c21c1c50"
+      },
+      {
+        "file": "src/nodes/voiceCompressor.js",
+        "bytes": 2231,
+        "sha256": "1ea0bca04b9d8a7f925587329c4fb5eb3fd389ac8c7985f6374c44813a164ae0"
+      },
+      {
+        "file": "src/synths/effects/graph.js",
+        "bytes": 9566,
+        "sha256": "1d72d271dc843eb256a85d91d0ee016bd97e014e6f83da8f9c77c2858fcdcd31"
+      },
+      {
+        "file": "src/synths/effects/extras.js",
+        "bytes": 11911,
+        "sha256": "f9bdac4f97fd0dd52ad7302f2e272c548a6e1cf31108e7c07a3e0a94e5352461"
+      },
+      {
+        "file": "src/synths/piano/player.js",
+        "bytes": 7635,
+        "sha256": "144c2fb24c3569f92facc83e9d4aa1ccabfed2223877c608f84d9b862b9b3e9b"
+      },
+      {
+        "file": "src/app/engine/iowaModel/player.js",
+        "bytes": 6896,
+        "sha256": "4d7c6167a077ee529f48c32e9237c972298a8d1f61a2430ed1351e33fdc58cb2"
+      }
+    ],
+    "floatMathProfile": {
+      "version": 1,
+      "name": "rounded-binary64-float-v1",
+      "scope": "Float32 public boundaries around binary64 transcendental functions. Explicit fdlibm wrappers are source-defined this way; unqualified native float math is an explicit portable profile choice independently compared with system CRT arithmetic. No claim that the browser links that DLL follows from the comparison.",
+      "independentArithmeticReport": "reports/modular_audio/native-compressor-ucrt-curve.json",
+      "nativeAcceptance": "Unchanged96case actual browser PCM/meter/latency bounds; required separately"
+    },
+    "timelineSource": {
+      "file": "third_party/blink/renderer/modules/webaudio/audio_param_handler.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_param_handler.cc",
+      "bytes": 92593,
+      "sha256": "50e6da5e2efa1254d05393ca03bae373b8a329e400d85b3f6cafd8ec3896ad8b"
+    },
+    "timelineSubset": {
+      "kinds": [
+        "step",
+        "target"
+      ],
+      "originalSeconds": true,
+      "controlFrames": 128,
+      "maxPerParameter": 256,
+      "maxTotal": 1024,
+      "preparedImmutable": true,
+      "duplicates": "Same parameter/time/type coalesced; different types at one parameter/time rejected; cancellation/ramp/curve excluded",
+      "reset": "Replay captured initial configuration and immutable timeline"
+    }
+  },
+  "audited": false,
+  "source": "c1ee24419b05aa5a5aa5c2378d72d3c7f8f16d3911e9319db4987a12b081f5aa",
+  "runtime": "c19c4b4145765b49599f70c45d003d34b1f40c34cdbe96a405ea6d4155cd9a0e",
+  "wasm": "d3b050fe38577c8d6a3cd62d2eb206de5cb1f56bfc1d99630720347b589ee298",
+  "bytes": 66900,
+  "version": "a1c8f067129ef3dc"
+}

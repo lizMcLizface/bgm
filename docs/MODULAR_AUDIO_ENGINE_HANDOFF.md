@@ -1,5 +1,18 @@
 # Modular audio engine handoff
 
+Overnight checkpoint (11 November, ~03:26 UTC): owned Long/Live measured-string
+voices pass40 actual native source/body browser cases; static convolution passes13
+native cases; captured DynamicsCompressor automation passes48, and graph modules
+28/29 pass12 actual AudioWorklet/native cases with exact PCM in this run.
+See [string voices](MODULAR_AUDIO_ENGINE_MEASURED_STRING_VOICE.md),
+[static convolution](MODULAR_AUDIO_ENGINE_STATIC_CONVOLVER.md),
+[captured compressor](MODULAR_AUDIO_ENGINE_NATIVE_COMPRESSOR_AUTOMATION.md) and
+[graph compressor contracts](MODULAR_AUDIO_ENGINE_NATIVE_COMPRESSOR_GRAPH.md).
+The broad regression is470 files /3653 passing tests plus4 audit-only skips.
+Normal public build and provenance gates pass. Convolution remains worker-only;
+voice-wrapper extreme192k discrepancies, Short/Pizzicato and complete normalized
+IR preparation remain active work. Native defaults and legacy DSP are preserved.
+
 Latest overnight application checkpoint: actual All native, immutable owned desk
 and saved owned reconstruction pass; a separate live owned route and the normal
 default page also pass desktop checks. See [the All desk checkpoint](MODULAR_AUDIO_ENGINE_ALL_DESK_BACKEND.md).

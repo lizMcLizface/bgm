@@ -22,6 +22,8 @@ calmbgm_voice_fx = {path="../voice-fx"}
 calmbgm_motion_fx = {path="../motion-fx"}
 calmbgm_plucked_voice = {path="../plucked-voice"}
 calmbgm_tape_fx = {path="../tape-fx"}
+calmbgm_native_compressor = {path="../native-compressor"}
+calmbgm_native_compressor_automation = {path="../native-compressor-automation"}
 
 [features]
 allocation-audit = []
