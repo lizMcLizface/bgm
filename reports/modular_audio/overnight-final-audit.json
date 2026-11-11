@@ -1,0 +1,194 @@
+{
+  "kind": "modular-audio.overnight-final-audit",
+  "version": 1,
+  "reviewedAtUtc": "2026-11-11T08:36:38.557Z",
+  "codeHead": "2f6de2102bd784dc81cdaac75df59cbca3527f9a",
+  "deadlineUtc": "2026-11-11T09:00:00Z",
+  "phase": "reviewed-awaiting-bounded-close",
+  "boundedRunClosed": false,
+  "scope": "Manual requirement/evidence audit plus current-artifact checks. This is not a claim that the entire audio migration or every legal control combination has passed native numerical acceptance.",
+  "graph": {
+    "version": "3cf3a29d17daadc3",
+    "bytes": 1596639,
+    "wasm": "3cd2dce0a5406845328596aefe56cd883e0e6b894d27812bd66bfef5db956b7d",
+    "descriptorCount": 33
+  },
+  "requirements": [
+    {
+      "item": "Read required plans/handoff and preserve the existing checkout",
+      "status": "verified",
+      "evidence": [
+        "docs/MODULAR_AUDIO_ENGINE_HANDOFF.md",
+        "docs/MODULAR_AUDIO_ENGINE_PLAN.md",
+        "docs/EFFECTS_DESK_PLAN.md",
+        "docs/SYNTHS_ALL_WORKBENCH_PLAN.md",
+        "baseline58f56d7; main checkout preserved"
+      ]
+    },
+    {
+      "item": "Substantial independent ports in parallel with parent integration",
+      "status": "verified",
+      "evidence": [
+        "iowa_preparation: measurement/string sources",
+        "owned_effects: inserts/effects/compressors",
+        "portable_mixer: desk/convolution/room preparation",
+        "parent: graph/runtime/application integration;20 local checkpoints before final evidence commit"
+      ]
+    },
+    {
+      "item": "Owned portable graph, contracts, validation, timestamped events, LFO/VCA and stereo output",
+      "status": "verified-in-bounded-reference-path",
+      "evidence": [
+        "public/modular-audio/contracts.json",
+        "public/modular-audio/reference-patch.json",
+        "473-file final regression",
+        "native-compressor-graph-built-browser.json"
+      ]
+    },
+    {
+      "item": "Independent instances, timing, persistence and worker execution",
+      "status": "verified-with-specified-coverage",
+      "evidence": [
+        "graph-native-compressor-allocation.json",
+        "string-decay-built-browser.json",
+        "measured-string-native-browser.json",
+        "all-owned-desk-morning-browser.json",
+        "26 graph tests include actual streaming one/three-worker masters at48/96k; captured pool acceptance remains separate"
+      ]
+    },
+    {
+      "item": "Actual desktop PCM and opt-in AudioWorklets",
+      "status": "verified; physical listening not assessed",
+      "evidence": [
+        "native-compressor-graph-built-browser.json",
+        "string-decay-built-browser.json",
+        "convolver-preparation-built-browser.json"
+      ]
+    },
+    {
+      "item": "Existing native defaults and legacy DSP remain operational",
+      "status": "verified",
+      "evidence": [
+        "src/synths/all/host.js retains native desk default",
+        "all-owned-desk-morning-browser.json: native/owned/restored pass",
+        "final-default-workbench.json: normal startup, no warning/error logs",
+        "normal public build/legacy provenance gates pass"
+      ]
+    },
+    {
+      "item": "Design for later sidechain/worker migration without claiming the whole migration",
+      "status": "verified-and-scoped",
+      "evidence": [
+        "existing typed graph detector/host boundaries and bounded worker plan",
+        "worker-only Freeze/convolver policies",
+        "docs/MODULAR_AUDIO_ENGINE_PORT_STATUS_2026_11_11.md"
+      ]
+    },
+    {
+      "item": "Windows/tool/browser restrictions and no phone dependency",
+      "status": "verified-from-session-record",
+      "evidence": [
+        "npm.cmd; local .tmp/rust-tools Wasm/offline builds",
+        "built-in ChatGPT browser only",
+        "fresh native runner and blocked optional diagnostic were not bypassed",
+        "no phone feedback gate during this run"
+      ]
+    },
+    {
+      "item": "Commit locally as the requested user; no push/deployment",
+      "status": "verified-from-local-history-and-session-record",
+      "evidence": [
+        "lizMcLizface <121907922+lizMcLizface@users.noreply.github.com>",
+        "all20 overnight checkpoint authors match lizMcLizface; no push/deployment action was executed"
+      ]
+    },
+    {
+      "item": "Record exact results, negative evidence, limitations and next task",
+      "status": "verified",
+      "evidence": [
+        "docs/MODULAR_AUDIO_ENGINE_PORT_STATUS_2026_11_11.md",
+        "docs/MODULAR_AUDIO_ENGINE_VOICE_COMPRESSOR_RESEARCH.md",
+        "reports/modular_audio/overnight-2026-11-11.json",
+        "first failures and final browser reports retained"
+      ]
+    },
+    {
+      "item": "No new features after08:30 and close at09:00",
+      "status": "feature-freeze-verified; awaiting09:00-close",
+      "evidence": [
+        "code frozen and committed2f6de21 before08:30",
+        "remaining edits are evidence/handoff only",
+        "heartbeat still active until bounded closing action"
+      ]
+    }
+  ],
+  "regression": {
+    "files": 473,
+    "testsPassed": 3705,
+    "auditOnlySkipped": 4,
+    "log": ".tmp/overnight-final-regression.log",
+    "logSha256": "28fbbec4f3a61520362bf6845f074985e2907c864946c3853a699d973cffdc26"
+  },
+  "publicBuild": {
+    "pass": true,
+    "log": ".tmp/overnight-final-ports-public-build.log",
+    "logSha256": "3788ed21e536a4196963434112504567ba3a6ae4fd28a643ce1cb10814fb8e48"
+  },
+  "builtCases": {
+    "finiteStrings": 12,
+    "originalRooms": 15,
+    "nativeGraph": 12
+  },
+  "research": {
+    "accepted": false,
+    "kind": "active VoiceCompressor native precision",
+    "passes": 46,
+    "total": 48,
+    "maxPcmError": 0.0021266937255859375,
+    "exactControlUlps": 0,
+    "failed": [
+      {
+        "id": "raw-control-extremes",
+        "rate": 192000,
+        "channels": 1
+      },
+      {
+        "id": "raw-control-extremes",
+        "rate": 192000,
+        "channels": 2
+      }
+    ],
+    "report": "voice-compressor-native-morning.json"
+  },
+  "evidenceSHA256": {
+    "all-owned-desk-morning-browser.json": "06bbb4bcac34ebc28834033be8daf592cd697be944971482e7a2cc15e22dbc12",
+    "final-default-workbench.json": "123eacc67796c468b6b69f78f7295c6b4b5e4a67c6f833d7ce2e78ea74c37824",
+    "string-decay-owned-compatibility.json": "b086992668a5e66ad800b43a3638ce2a495709efb71dc906a6e9420db5037e72",
+    "string-decay-owned-allocation.json": "17879a6e1f8765b337b3b7d45f15b4504eb799b1258fea59c5462e3c561476b1",
+    "string-decay-native-first.json": "7061e87525b1dc3ebf04fe0f92a7d04d144565f37f69633c94087009d3df4012",
+    "string-decay-built-browser.json": "16287c07254951706ed42cd90a512c0d06e5ed29a514f37e337fd79029f46299",
+    "measured-string-native-browser.json": "fa5f96fe50b2ef3c7c29637e9512701e352cf9989813623a320817de8e01fd90",
+    "convolver-native-browser-first.json": "7a98dc81be43ed2e77466eb11fe192319bed1c38889057d336aea804c7a63861",
+    "convolver-worker-throughput.json": "e5bd4648734b1355e45b54339c76facbae04d7b533c25ad0da5420c817ba127f",
+    "convolver-preparation-reference.json": "afd24b6aab41468328a6796c40d9bb17645b8dc4bd3ab4f4cf1979b3d68fb79b",
+    "convolver-preparation-native-first.json": "596223429222c84601bf7e34c0b1a3e29208e08c1083b3585fdb3cea00c58a3b",
+    "convolver-preparation-built-browser.json": "d221ef5230ddf6aa14d5a64542be2566c6830a50af9deb74f464127f0fff6bd1",
+    "ambience-loops-reference.json": "aed4da8242feae7b43da987f515e918cb5baa9361a2d7536df0342a8315c70b0",
+    "ambience-loops-allocation.json": "4750bb0cdfda15cacd46a06f89226cf7f452e2bf83e69098b9ea866b9fedadb0",
+    "ambience-loops-native-host-final.json": "5193fb4a42621e10a3122e992f1a5837c8c24f99f04ee8932379748bed3d5cf5",
+    "native-compressor-automation-morning-browser.json": "e57199e7a691d4f8a8efa06944ffc07ece88a35764b18bec68ee0ef56e20ad28",
+    "native-compressor-graph-morning-browser.json": "c518aaff8d6dc18d3e0c2ac5f7d2ef8f5e150a6c6f351274d43984840f2c5074",
+    "native-compressor-graph-built-browser.json": "f12829d272a3fd71f48530e6861d7620c10324bfc72c5c520308f5ae178eee6d",
+    "graph-native-compressor-allocation.json": "579c56519c47c92bea3f5903505f1a2eee77215b6d4985e62e2d95620177d694",
+    "compressor-contract-correction-continuity.json": "a3e877359c10bdd4d8aac1f47ef983fd5fd5cd73d1f7e9de835aff8d2a698810",
+    "voice-compressor-native-morning.json": "4f9937544781f889570ad678af175c1a3e478f64528c75b4dcab4ef141847ce5"
+  },
+  "remainingMigration": [
+    "Measured-source timestamped multi-voice Graph integration",
+    "Bounded worker body/room routing and complete long-IR execution beyond327680frames",
+    "Source-compatible extreme192k native compressor math profile",
+    "Remaining native spatial/RoomColour/enable-bypass/transport seams",
+    "Cable editing and full target-device acceptance; normal defaults remain native"
+  ],
+  "interruption": "A terminal/session interruption stopped unsaved processes before recovery at07:50; affected source runs and desktop browser verification were rerun from authoritative files."
+}

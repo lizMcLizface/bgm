@@ -62,6 +62,20 @@ reviewable rather than weakening validation or changing sounds to force a pass.
 
 ## Checkpoints
 
+- 11 November08:30 feature cutoff: implementation is frozen at2f6de21. The
+  final broad suite has473 files /3705 passing tests and4 existing audit-only
+  skips. Normal public build/provenance passes. Built finite-string12, original
+  room15 and graph-compressor12 native cases pass, and the normal All workbench
+  opens with no console warnings/errors. The real All native/owned/restored
+  paths also pass. See overnight-final-audit.json and the port-status inventory.
+  The same two192k extreme VoiceCompressor cases remain unaccepted; all96
+  valid-input owned PCM/control hashes are unchanged by contract hardening.
+- Session interruption: an earlier terminal/session failure stopped pending
+  processes. Work resumed at07:50 from the authoritative checkout; interrupted
+  source comparisons and browser checks were rerun. No browser/security policy
+  was bypassed to recover. Remaining time through09:00 is final review, evidence
+  preservation, local commits and bounded-run closure only.
+
 - 11 November ~03:26 UTC: measured-string source/body40native cases, captured
   compressor48native cases, compressor Graph28/29 twelve actualAudioWorklet
   cases and13 static-convolution cases pass. Convolver remains worker-only after

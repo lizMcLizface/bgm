@@ -3,7 +3,7 @@
   "version": 1,
   "status": "running",
   "startedAtUtc": "2026-11-10T23:19:46Z",
-  "updatedAtUtc": "2026-11-11T08:21:51.573Z",
+  "updatedAtUtc": "2026-11-11T08:36:38.658Z",
   "featureCutoffUtc": "2026-11-11T08:30:00Z",
   "deadlineUtc": "2026-11-11T09:00:00Z",
   "gitIdentity": {
@@ -29,7 +29,8 @@
     "f4c6748",
     "5fa5958",
     "84b17f7",
-    "c36fe77"
+    "c36fe77",
+    "2f6de21"
   ],
   "graph": {
     "api": 1,
@@ -158,7 +159,12 @@
       "ownedTests": 8,
       "allocationCases": 12,
       "report": "voice-compressor-native-morning.json"
-    }
+    },
+    "finalRequirementAudit": "overnight-final-audit.json",
+    "stringDecayBuiltBrowser": "string-decay-built-browser.json",
+    "convolverPreparationBuiltBrowser": "convolver-preparation-built-browser.json",
+    "nativeCompressorGraphBuiltBrowser": "native-compressor-graph-built-browser.json",
+    "finalDefaultWorkbench": "final-default-workbench.json"
   },
   "limitations": [
     "No physical listening/device-underrun claim",
@@ -176,5 +182,7 @@
     "Original room IR preparation is accepted; long Iowa/high-rate kernels reject beyond327680frames without truncation; native decode/resampling and RoomColour/shared host paths remain external"
   ],
   "next": "Register already-accepted measured sources in the typed graph with explicit prepared resources, original clocks and cancellation; attach bounded worker body/room execution with complete-IR resource handling. Resolve the retained Voice192k math profile separately, then adopt full live host controls/transport before cable editing.",
-  "implementationFrozenAtUtc": "2026-11-11T08:21:51.573Z"
+  "implementationFrozenAtUtc": "2026-11-11T08:21:51.573Z",
+  "phase": "final-review",
+  "codeHead": "2f6de2102bd784dc81cdaac75df59cbca3527f9a"
 }
