@@ -1,7 +1,7 @@
 const state=vi.hoisted(()=>({player:null}));
 vi.mock('./iowaModel/player',()=>({default:class {
- constructor(){state.player=this;this.ready=Promise.resolve();this.load=vi.fn();this.setRoom=vi.fn();this.setVibrato=vi.fn();this.start=vi.fn(()=>({id:1}));this.dispose=vi.fn();}
- connect(){return this;}
+ constructor(context,options){state.player=this;this.options=options;this.context=context;this.setHostAwake=vi.fn();this.armRuntime=vi.fn(async()=>{});this.ready=Promise.resolve();this.load=vi.fn();this.setRoom=vi.fn();this.setVibrato=vi.fn();this.start=vi.fn(()=>({id:1}));this.dispose=vi.fn();}
+ connect(...args){this.connection=args;return this;}
 }}));
 import IowaInstrument from './iowaInstrument';
 
@@ -20,4 +20,9 @@ it('applies the measured instrument tuning and vibrato to scheduled and played n
  instrument.applyPreset({iowa:'flute',vibrato:.8,tune:-10});
  expect(state.player.setVibrato).toHaveBeenLastCalledWith(.8);
  instrument.dispose();
+});
+
+it('forwards one prepared ordinary limiter factory and represents the actual final route without invented idle sleep',async()=>{
+ const output={gain:{value:0},connect:vi.fn(),disconnect:vi.fn()},context={currentTime:100,createGain:()=>output},factory=vi.fn(),i=await IowaInstrument.create({context,preset:{iowa:'flute'},ordinaryCompressorFactory:factory});
+ expect(state.player.options).toMatchObject({backend:'native',ordinaryCompressorFactory:factory});expect(state.player.connection).toEqual([output,{hostAwake:false}]);const destination={};i.connect(destination);expect(output.connect).toHaveBeenCalledWith(destination);expect(state.player.setHostAwake).toHaveBeenLastCalledWith(true);expect(i.effectsAwake()).toBe(false);expect(state.player.setHostAwake).toHaveBeenCalledOnce();await i.armRuntime();expect(state.player.armRuntime).toHaveBeenCalledOnce();i.disconnect();expect(state.player.setHostAwake).toHaveBeenLastCalledWith(false);i.dispose();i.dispose();expect(state.player.dispose).toHaveBeenCalledOnce();
 });

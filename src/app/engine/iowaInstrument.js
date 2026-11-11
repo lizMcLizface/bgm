@@ -4,24 +4,26 @@ const DEFAULT_ROOM = .25;
 
 /** The generator's instrument contract for a voice measured from recordings (preset.iowa, docs/IOWA_INSTRUMENTS.md), on the role's output like a classic synth. */
 export default class IowaInstrument {
-    static async create({ context, preset, polyphony = 8, sourceBackend = 'native' }) {
-        const instrument = new IowaInstrument(context, preset, polyphony, sourceBackend);
+    static async create({ context, preset, polyphony = 8, sourceBackend = 'native', ordinaryCompressorFactory = null }) {
+        const instrument = new IowaInstrument(context, preset, polyphony, sourceBackend, ordinaryCompressorFactory);
         try {
             await instrument.player.ready;
             await instrument.player.load(preset.iowa);
             return instrument;
         } catch (error) { instrument.dispose(); throw error; }
     }
-    constructor(context, preset, polyphony, sourceBackend = 'native') {
+    constructor(context, preset, polyphony, sourceBackend = 'native', ordinaryCompressorFactory = null) {
         this.AC = context; this.preset = preset; this.polyphony = polyphony;
         this.output = context.createGain(); this.output.gain.value = preset.masterVolume ?? 1;
-        this.player = new IowaPlayer(context, { backend: sourceBackend }).connect(this.output);
+        this.player = new IowaPlayer(context, { backend: sourceBackend, ordinaryCompressorFactory }).connect(this.output, {hostAwake:false});
         this.player.setRoom(preset.reverbAmount ?? DEFAULT_ROOM);
         this.player.setVibrato(preset.vibrato ?? 1);
         this.reverb = { settled: true }; this.held = new Map(); this.lastUntil = 0;
         this.disposed=false;this.sourceInputs=0;
     }
-    connect(node) { this.output.connect(node); }
+    connect(node) { this.output.connect(node); this.player.setHostAwake?.(true); }
+    disconnect() { this.player.setHostAwake?.(false); this.output.disconnect(); }
+    armRuntime() { return this.player.armRuntime?.(); }
     scheduleNote(midi, start, duration, velocity = .7, detune = 0, expression) {
         const until = start + duration * (expression?.gateScale ?? 1), tune = 2 ** ((detune + (this.preset.tune ?? 0) + 100 * (expression?.bend ?? 0)) / 1200);
         this.lastUntil = Math.max(this.lastUntil, until);
@@ -64,5 +66,5 @@ export default class IowaInstrument {
     effectsAwake() { return this.sourceInputs>0||this.awakeVoices() > 0; }
     holdSourceInput(){if(this.disposed)throw Error('Disposed Iowa instrument');this.sourceInputs++;let released=false;return()=>{if(released)return;released=true;this.sourceInputs=Math.max(0,this.sourceInputs-1);};}
     activeEffects() { return ['Measured voice', 'Room']; }
-    dispose() { if(this.disposed)return;this.disposed=true;this.sourceInputs=0;this.player.dispose(); this.output.disconnect(); }
+    dispose() { if(this.disposed)return this.disposal;this.disposed=true;this.sourceInputs=0;this.disposal=this.player.dispose(); this.output.disconnect(); return this.disposal; }
 }

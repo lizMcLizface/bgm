@@ -9,6 +9,7 @@ import { LAYERS, PATCHES } from './patches.js';
 import LEVELS from '../../../library/iowaLevels.json';
 
 const TABLES = import.meta.glob('../../../library/iowaTables/*.json');
+const IOWA_LIMITER_PROPERTIES = Object.freeze([[0,-6],[1,6],[2,12],[3,.003],[4,.15]].map(Object.freeze));
 const STRENGTHS = 12;                  // velocities are rounded to this many steps, so a note's tables can be kept
 const trimOf = (id, midi) => (LEVELS[id]?.trim ?? 0) + (LEVELS[id]?.curve?.[midi] ?? 0);     // dB: the instrument to its class, this key to the instrument (tools/measureIowaLevels.mjs)
 const quantise = (velocity) => Math.max(1, Math.round(Math.round(velocity * STRENGTHS) / STRENGTHS * 127));
@@ -27,16 +28,26 @@ function roomFor(context) {
 }
 
 export default class IowaPlayer {
-    constructor(context, { backend = 'native' } = {}) {
+    constructor(context, { backend = 'native', ordinaryCompressorFactory = null } = {}) {
         if (!['native', 'owned-rust'].includes(backend)) throw Error('Unsupported Iowa source backend');
+        if (ordinaryCompressorFactory !== null && typeof ordinaryCompressorFactory !== 'function') throw Error('Invalid ordinary Iowa compressor factory');
         this.backend = backend; this.disposed = false; this.failure = null; this.preparedTables = new Map(); this.rawTables = new Map();
         this.context = context;
         this.master = context.createGain();
         this.dry = context.createGain(); this.wet = context.createGain();
         this.convolver = context.createConvolver();
         // the recordings keep some of their loudness across the range, so a chord high up can go over: a limiter, not a level change
-        this.limiter = context.createDynamicsCompressor();
-        this.limiter.threshold.value = -6; this.limiter.knee.value = 6; this.limiter.ratio.value = 12; this.limiter.attack.value = .003; this.limiter.release.value = .15;
+        try {
+            this.limiterStage = ordinaryCompressorFactory?.(context, {profile:'bare-native',initialProperties:IOWA_LIMITER_PROPERTIES.map(entry=>entry.slice()),hostAwake:false,initialPull:false}) ?? null;
+            if (ordinaryCompressorFactory && (!this.limiterStage || typeof this.limiterStage.getNode !== 'function' || typeof this.limiterStage.setHostAwake !== 'function')) throw Error('Ordinary Iowa compressor requires a prepared synchronous stage');
+            this.limiter = this.limiterStage ? this.limiterStage.getNode() : context.createDynamicsCompressor();
+            if (!this.limiter || typeof this.limiter.connect !== 'function' || typeof this.limiter.disconnect !== 'function') throw Error('Ordinary Iowa compressor requires its actual node');
+            if (!this.limiterStage) { this.limiter.threshold.value = -6; this.limiter.knee.value = 6; this.limiter.ratio.value = 12; this.limiter.attack.value = .003; this.limiter.release.value = .15; }
+        } catch (error) {
+            try { Promise.resolve(this.limiterStage?.dispose?.()).catch(cleanup => { this.limiterDisposalError = cleanup; }); } catch (cleanup) { this.limiterDisposalError = cleanup; }
+            for (const part of [this.master,this.dry,this.wet,this.convolver]) part.disconnect();
+            throw error;
+        }
         this.dry.connect(this.limiter); this.wet.connect(this.convolver); this.convolver.connect(this.limiter); this.limiter.connect(this.master);
         this.bus = context.createGain();
         this.bus.connect(this.dry); this.bus.connect(this.wet);
@@ -49,10 +60,11 @@ export default class IowaPlayer {
             (backend === 'native' ? context.audioWorklet.addModule(workletUrl) : Promise.all([loadIowaLive(), loadRustIowaPreparation()]).then(async ([code, preparation]) => {
                 if (this.disposed) { preparation.renderer.dispose(); return; }
                 this.ownedModule = code.module; this.preparation = preparation.renderer;
-                this.backendInfo = { backend, voiceVersion: code.version, preparationVersion: preparation.version, room: 'original native complete convolver and limiter' };
+                this.backendInfo = { backend, voiceVersion: code.version, preparationVersion: preparation.version, room: this.limiterStage ? 'original native complete convolver; owned bare-native limiter' : 'original native complete convolver and limiter' };
                 await context.audioWorklet.addModule(ownedWorkletUrl);
             })).then(() => { if (!this.pending && !this.disposed) this.makeNode(); }),
             roomFor(context).then((buffer) => { this.convolver.buffer = buffer; }),
+            this.limiterStage?.ready,
         ]);
     }
     makeNode(messages) {
@@ -71,10 +83,14 @@ export default class IowaPlayer {
     send(message) {
         if (this.disposed) throw Error('Disposed Iowa player');
         if (this.failure) throw this.failure;
+        if (this.limiterStage?.error) throw Error(this.limiterStage.error);
         if (this.pending) this.pending.push(message);
         else this.node?.port.postMessage(message);
     }
-    connect(node) { this.master.connect(node); return this; }
+    connect(node, {hostAwake = true} = {}) { this.master.connect(node); this.setHostAwake(hostAwake); return this; }
+    disconnect() { this.setHostAwake(false); this.master.disconnect(); }
+    setHostAwake(on) { if (typeof on !== 'boolean') throw Error('Invalid Iowa output demand'); this.limiterStage?.setHostAwake(on); }
+    async armRuntime() { if (this.disposed) throw Error('Disposed Iowa player'); if (this.failure) throw this.failure; await this.limiterStage?.arm?.(); }
     setRoom(amount) { this.room = amount; this.dry.gain.value = 1 - amount * .35; this.wet.gain.value = amount * .9; }
     setVibrato(scale) { if (scale !== this.vibrato) { this.vibrato = scale; this.stored.clear(); } }
     async load(id) {
@@ -139,16 +155,16 @@ export default class IowaPlayer {
     stop(handle) { if (handle) this.send({ off: true, id: handle.id, owner: handle.owner ?? 1 }); }
     panic() { this.send({ panic: true }); }
     cancel(owner = 0) { if (!owner) this.panic(); else if (this.backend === 'owned-rust') this.send({ cancel: true, owner }); else throw Error('Native Iowa source does not expose owner cancellation'); }
-    sourceStatus() { return { backend: this.backend, ready: !!this.node || !!this.pending, error: this.failure?.message ?? null, ...this.backendInfo }; }
+    sourceStatus() { return { backend: this.backend, ready: !!this.node || !!this.pending, error: this.failure?.message ?? this.limiterStage?.error ?? null, limiter: this.limiterStage ? {backend:'owned-rust',profile:'bare-native',version:this.limiterStage.engineVersion,snapshot:this.limiterStage.snapshot?.(),stats:this.limiterStage.cached,error:this.limiterStage.error??null} : {backend:'native'}, ...this.backendInfo }; }
     saveSetup() {
         if (this.backend !== 'owned-rust') throw Error('Only owned Iowa setup is captured');
         return JSON.stringify({ version: 1, kind: 'iowa.live-setup', sampleRate: this.context.sampleRate, room: this.room, vibrato: this.vibrato, tables: [...this.rawTables.values()] });
     }
-    static async restoreSetup(context, text) {
+    static async restoreSetup(context, text, {ordinaryCompressorFactory = null} = {}) {
         if (typeof text !== 'string' || text.length > 20 * 1024 * 1024) throw Error('Iowa setup bounds exceeded');
         const s = JSON.parse(text);
         if (s?.version !== 1 || s.kind !== 'iowa.live-setup' || s.sampleRate !== context.sampleRate || !Array.isArray(s.tables) || s.tables.length > PATCHES.length || !Number.isFinite(s.room) || s.room < 0 || s.room > 1 || !Number.isFinite(s.vibrato) || s.vibrato < 0 || s.vibrato > 2) throw Error('Invalid Iowa live setup');
-        const player = new IowaPlayer(context, { backend: 'owned-rust' });
+        const player = new IowaPlayer(context, { backend: 'owned-rust', ordinaryCompressorFactory });
         try { await player.ready; for (const raw of s.tables) { if (!raw || player.tables.has(raw.id)) throw Error('Duplicate or invalid Iowa table'); const table = player.preparation.createTable(raw); player.preparedTables.set(raw.id, table); player.rawTables.set(raw.id, structuredClone(raw)); player.tables.set(raw.id, settleLevels(structuredClone(raw))); } player.setRoom(s.room); player.setVibrato(s.vibrato); return player; }
         catch (error) { player.dispose(); throw error; }
     }
@@ -159,6 +175,10 @@ export default class IowaPlayer {
         else if(node){node.port.onmessage=null;node.onprocessorerror=null;node.port.close();}
         this.pending = null; this.stored.clear(); this.tables.clear();
         for (const part of [this.bus, this.dry, this.wet, this.convolver, this.limiter, this.master]) part.disconnect();
+        if (this.limiterStage) {
+            let cleanup; try { cleanup = this.limiterStage.dispose(); } catch (error) { cleanup = Promise.reject(error); }
+            const sourceDisposal = this.disposal; this.disposal = Promise.all([sourceDisposal, Promise.resolve(cleanup).catch(error => { this.limiterDisposalError = error; })]).then(() => undefined);
+        }
         return this.disposal;
     }
 
