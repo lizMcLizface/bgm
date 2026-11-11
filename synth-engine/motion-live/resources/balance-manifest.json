@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "source": "src/nodes/motion.js",
+  "sourceSha256NormalizedLF": "bc338e9643fdfdb462dedca999e10ae4fcd777f97abda108baadbbc4c1b6ac60",
+  "method": "Unmodified original balanceCurve function evaluated by Node.js 24.18.0 / V8 13.6.233.17-node.50; Float32 little-endian storage. Native browser original-curve bytes must be compared before acceptance.",
+  "resources": [
+    {
+      "side": "left",
+      "length": 1025,
+      "sha256": "2f88c7aa78cded4e626af1a0ae7e21491d4143ea54a798447b235cf46090af55"
+    },
+    {
+      "side": "right",
+      "length": 1025,
+      "sha256": "e8796f4547ea9215dd67ec8ae69ff6d5fcf39b039a36f2497a0deb1a354257fe"
+    }
+  ]
+}

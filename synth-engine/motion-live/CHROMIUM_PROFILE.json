@@ -1,0 +1,166 @@
+{
+  "version": 1,
+  "revision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+  "scope": "Original Motion five independent AudioParam step lanes, two scheduled native sine oscillators, Float32 gains, original1025balance curves and explicit audio/parameters-only/unpulled clocks. No normal default host adoption.",
+  "sources": [
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/audio_scheduled_source_handler.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_scheduled_source_handler.cc",
+      "sha256": "dd3b02ff3d35b359ed6c3b0c9bd8d12994ba03f0392dc817ac85777c177f47fc"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/audio_buffer_source_handler.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_buffer_source_handler.cc",
+      "sha256": "b1e4196939823fcd8cfbb32cb50d1e29d41a1a81bb7b132e3993e738f0b7621d"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/audio_param_handler.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_param_handler.cc",
+      "sha256": "50e6da5e2efa1254d05393ca03bae373b8a329e400d85b3f6cafd8ec3896ad8b"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/oscillator_handler.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/oscillator_handler.cc",
+      "bytes": 29147,
+      "sha256": "a34fc0842181483ae6a7cdc9db393987b1535206afb56ce0ad033bdd79dd6d68"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/periodic_wave_handler.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/periodic_wave_handler.cc",
+      "bytes": 17076,
+      "sha256": "940a3fadb8f63d8e8944ed60fa76a3740638f9f8820c6de6ab3ee07c87ff2a35"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/periodic_wave_handler.h",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/periodic_wave_handler.h",
+      "bytes": 5125,
+      "sha256": "2dd142876f7710eb19d2d435cda2f7a27abc002d98dc8794438097d907433ddd"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/oscillator_handler.h",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/oscillator_handler.h",
+      "bytes": 8087,
+      "sha256": "36e17b85f27b90c39fd0cc8cf0d97e123842ae1309160415934f7a8688e2ace6"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/wtf/math_extras.h",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/wtf/math_extras.h",
+      "bytes": 12171,
+      "sha256": "eeb5d43ce4793ef0043326a65318d4e1a66e17d4af218387619ebd71d598238f"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/gain_handler.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/gain_handler.cc",
+      "bytes": 3853,
+      "sha256": "9b1b2e6a4d1fef5f88f67b3079fc76c01d99a31d46ae5db5047b2676fe290bc1"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/audio/audio_bus.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/audio_bus.cc",
+      "bytes": 28543,
+      "sha256": "17fc6c0a60c1b1ef4115942b05bd7c37838f74784d0d128e66a0e660cc2a05c6"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/deferred_task_handler.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/deferred_task_handler.cc",
+      "bytes": 16114,
+      "sha256": "3db25afa2b090da39d914e7fea537e79c6f0e436a47955151b8cde592bb62eb9"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/audio_node_input.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_node_input.cc",
+      "bytes": 6148,
+      "sha256": "5f9b7a1fb0303142eee45db402aa362a1c8926a77fc25a5a29703e264f8b67cb"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/audio_node_output.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_node_output.cc",
+      "bytes": 7739,
+      "sha256": "18497939a5fe50a7e49353de19a4984cd86d3d57618041842b21f9dc3add1d74"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/audio_handler.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_handler.cc",
+      "bytes": 21159,
+      "sha256": "37dd5f0b367b18db123e12193ad7f2e71fde99d63aaded84f7017e77a07b8d9b"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/audio_handler.h",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_handler.h",
+      "bytes": 14229,
+      "sha256": "77a23aab1199155f0e313d317e48d10f07a9c7614b4eca4aa5dd48c0121fb187"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/audio_worklet_handler.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_worklet_handler.cc",
+      "bytes": 12762,
+      "sha256": "cb7bb7096c162fa5ab7ad5a11ea5c0943925d2689954971b64839874e9751c25"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/audio_param.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_param.cc",
+      "bytes": 9327,
+      "sha256": "31619a556b1d1899902636250df2db122ece8c862d90ff4017db62a5af0afecb"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/audio_param.idl",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_param.idl",
+      "bytes": 3345,
+      "sha256": "a07b81d11cb84c28dddb8a3a0a63d7518472d6d0ccf93b51c5664a23426a9239"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/audio/audio_utilities.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/audio_utilities.cc",
+      "bytes": 9697,
+      "sha256": "d3ed345360190487ee482eebda6141580994db924bd0fd36f342a61b33a09db0"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/audio/vector_math.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/vector_math.cc",
+      "bytes": 4756,
+      "sha256": "0f2551b332278547fddd4c8dec01cc395f761a344c5d06ea0956220d54f5dbc0"
+    },
+    {
+      "file": "third_party/blink/renderer/platform/audio/vector_math.h",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/vector_math.h",
+      "bytes": 5324,
+      "sha256": "0808f17a49e689c47ff717f1b8a9d48106a494f6ab903039763445b72805fd6d"
+    },
+    {
+      "file": "third_party/blink/renderer/modules/webaudio/wave_shaper_handler.cc",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/wave_shaper_handler.cc",
+      "bytes": 22477,
+      "sha256": "01be2e2dc1e6a030e48fa561b783115a4371c4474dd282aa2a72cdb6391bcd12"
+    }
+  ],
+  "reusedHelpers": [
+    {
+      "file": "timeline.rs",
+      "source": "synth-engine/rack-native-normal/src/timeline.rs",
+      "sha256NormalizedLF": "fdb7c9a65858d91a7d35765936255b968b5f71b22785d69f18c09eaba4de6020",
+      "sourceProfile": "3eccb77c7e28803e retained-last-event mixed-original-seconds Native profile; Motion exposes step events only, no target/cancel/hold API"
+    },
+    {
+      "file": "oscillator.rs",
+      "source": "synth-engine/rack-native-normal/src/oscillator.rs",
+      "sha256NormalizedLF": "45351f6e5ce03bcd79076b7b34e45dceeb5515dd76d763d819c8207c990c3f29",
+      "sourceProfile": "3eccb77c7e28803e retained-last-event mixed-original-seconds Native profile; Motion exposes step events only, no target/cancel/hold API"
+    }
+  ],
+  "scheduledOscillator": {
+    "upstreamPath": "synth-engine/piano-live/src/live_sine.rs",
+    "upstreamSHA256NormalizedLF": "da79368431721f657f57b4d974ad782b0a074a216ee7dc77bc2ba362859f4c7a",
+    "localPath": "src/oscillator.rs",
+    "scope": "Unchanged accepted interpolation/table/tick core plus exact pinned AudioScheduledSource ceil start, first partial quantum and OscillatorHandler constant/a-rate offset/count rules. Native TimeToSampleFrame rounds to1/1024sample before requestedceil; original fractional remainder is retained for the separate positive/negative scheduling adjustment."
+  },
+  "nativeTimeline": {
+    "upstreamPath": "synth-engine/piano-live/src/live_timeline.rs",
+    "upstreamSHA256NormalizedLF": "9cb7d8d92254c50d7887533b76e0a0098b36e293a834f67c5229c47d36ce9930",
+    "localPath": "src/timeline.rs",
+    "scope": "Keeps original f64 seconds/timeConstants plus derived mixed-unit frame positions. Native HandleFirstEvent/HasSampleAccurateValues/fresh clamp compare seconds; segment endpoints and IsEventCurrent retain native frame-product comparisons. RemoveOldEvents always retains at least the last event, including in HandleAllEventsInThePast; a later target therefore preserves the native preceding-segment ceil boundary."
+  },
+  "motionConstructor": "depth gain0,pan gain0,tremolo frequency4,pan frequency0.2 are four intrinsic property updates plus four original-time Native step events; two subsequent separate oscillator.start() times. GainHandler stereo upmix occurs before split.",
+  "nativeSourceActivity": "Direct original48k12case proof with an independent Native program-source capture branch: whole-stage disconnected clocks freeze. WaveShaper nonzero-at-zero tail does not imply a disconnected Motion graph remains pulled. No LFO/control taps.",
+  "balanceResources": "Original1025point JavaScript balanceCurve evaluated without modification into little-endian Float32 resources; actual Native browser original curves must match both hashes.",
+  "numericScope": "Pinned upstream source and empirical browser comparison with fixed bounds; not identity with arbitrary Chromium/ARM builds."
+}

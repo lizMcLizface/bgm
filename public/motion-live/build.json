@@ -1,0 +1,40 @@
+{
+  "api": 1,
+  "profile": "original-motion-independent-lanes-e14de735-v1",
+  "version": "ffa6c8e6517589a2",
+  "source": "f9b092c105744d037edff5f1319e6da8e5e04d6a79ad2bd6d22b70c87aa8c287",
+  "wasm": "a57d79e64779f92fbefaeb4b95e54870224053c16188fb2ad8dd62eb1ea7fb7c",
+  "bytes": 139297,
+  "audited": false,
+  "notices": "f3a63b500a464c29d0efba583bf8c6b4bf32bf1306ab11a1b7303078238e648f",
+  "profileSha256": "0b31537beaa77fb625017a503b23bf3e6c270c3242f7b8517855538701486e64",
+  "referenceSourceSha256": "bc338e9643fdfdb462dedca999e10ae4fcd777f97abda108baadbbc4c1b6ac60",
+  "files": [
+    "tools/buildMotionLive.mjs",
+    "synth-engine/motion-live/Cargo.toml",
+    "synth-engine/motion-live/Cargo.lock",
+    "synth-engine/motion-live/src/lib.rs",
+    "synth-engine/motion-live/src/timeline.rs",
+    "synth-engine/motion-live/src/oscillator.rs",
+    "synth-engine/motion-live/src/allocation.rs",
+    "synth-engine/motion-live/CHROMIUM_PROFILE.json",
+    "synth-engine/motion-live/CHROMIUM_NOTICES.txt",
+    "synth-engine/motion-live/resources/balance-manifest.json",
+    "src/nodes/motion.js",
+    "src/modular-audio/ownedMotionLive.js",
+    "synth-engine/tape-fx/resources/manifest.json"
+  ],
+  "resources": [
+    "synth-engine/motion-live/resources/balance-left.f32",
+    "synth-engine/motion-live/resources/balance-right.f32",
+    "synth-engine/tape-fx/resources/chromium-sine-2048.f32",
+    "synth-engine/tape-fx/resources/chromium-sine-4096.f32",
+    "synth-engine/tape-fx/resources/chromium-sine-16384.f32"
+  ],
+  "activityModes": [
+    "unpulled",
+    "parameters-only",
+    "audio"
+  ],
+  "scope": "Five independent original Motion AudioParam lanes; separate constructor/start clocks; Native sine resource and balance curves; no normal default adoption"
+}
