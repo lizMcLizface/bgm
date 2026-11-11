@@ -1,3 +1,10 @@
+Active continuation (11 November2026): user authorized push without deployment;
+main through111d282 was pushed as lizMcLizface. Continue closing the active
+instrument/effect/room/live-host Rust paths. The hidden standalone measured-cello
+models are deferred and do not block adoption. Temporary scripts and generated
+evidence stay in ignored reports/. [Original RoomColour](MODULAR_AUDIO_ENGINE_ROOM_COLOUR.md)
+now passes48 native desktop cases,13 functional cases and12 allocation cases.
+
 # Modular audio engine and parallel rendering plan
 
 Bounded overnight run closed on11 November2026 at09:00UTC. The continuation

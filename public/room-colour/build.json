@@ -1,0 +1,9 @@
+{
+  "api": 1,
+  "profile": "chromium-room-colour-f32-128-target-v1",
+  "audited": false,
+  "source": "198438683505ed4bb1f4b52e1d5de9ab5a6404b65ac5790e7d1377284e4ba561",
+  "wasm": "0e2028cc10f756d94185ab88494f8ade9feb792c12d11bc810e95681ae744630",
+  "bytes": 68816,
+  "version": "dc2c2f530df0518f"
+}

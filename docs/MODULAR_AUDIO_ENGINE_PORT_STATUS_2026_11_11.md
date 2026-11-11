@@ -27,12 +27,14 @@ accepted results refer to the exact artifacts and cases in the linked records.
 
 ## Next concrete task
 
-Assemble one coherent opt-in portable instrument path before adding cable UI.
-Start with Graph source registration for already-accepted bowed/fixed measured
-strings: immutable prepared banks/PCM and note definitions, explicit phase and
-ownership, original canonical128 event rules, generated-frame late rejection,
-owner cancellation versus timed panic, save/reload and independent instances.
-Reuse the accepted kernels and preserve all negative/native evidence.
+Complete the active instrument/effect paths through the normal live host.
+The hidden standalone measured-cello Long/Live/Short/Pizzicato integration is
+deferred; it is not a blocker. Prioritize live source scheduling, owned room
+colour/convolution, native host enable/bypass/return policies, and complete
+controls/transport/save-reload. Existing accepted DSP remains the authority.
+
+Original RoomColour now has a verified owned Rust stage:48 native browser cases,
+13 functional cases and12 allocation cases; see its focused checkpoint.
 
 Next attach a bounded worker-owned convolver stage and its declared latency/tail
 contract. Preserve the full original room impulse: current327680-frame kernels
