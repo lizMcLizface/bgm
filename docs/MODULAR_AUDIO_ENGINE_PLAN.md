@@ -48,8 +48,10 @@ The later prepared Shimmer/shared/offline integration passes 75 focused tests;
 normal All Native-desk/owned-desk/restored cases pass with 51 owned dynamics
 instances. Both normal CLASSIC and drum-machine cold score exports pass with
 fresh context-bound owned source/dynamics, nonzero PCM and unchanged settings. Focused component records
-name their exact later artifacts and results. The public build and complete
-regression will be refreshed after those source changes settle.
+name their exact later artifacts and results. All 43 provenance checks required by the committed public build pass. Two
+reference-only manifests were refreshed with accepted numeric Wasm verified
+byte-identical. The bundled public build and complete final regression will be
+refreshed after the independent candidate sources settle.
 
 Next: resolve the remaining Width/Ring/Filter lifecycle gates and adopt only
 verified factories. Motion live and complete Ambience processing are being
