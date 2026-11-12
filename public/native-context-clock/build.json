@@ -1,0 +1,15 @@
+{
+  "api": 1,
+  "profile": "native-context-clock-source-v1",
+  "version": "7a0838a735108706",
+  "source": "7a0838a7351087069b430d2132a70a237836adad19d0f6d784e53e28676b8268",
+  "processor": "31d6feac76fc5dd6085a0f62041ddba74cdf0f122418fb2e1684c51e1786bb70",
+  "processorName": "native-context-clock-anchor-7a0838a735108706",
+  "files": [
+    "tools/buildNativeContextClock.mjs",
+    "src/modular-audio/nativeContextClockCodec.js",
+    "src/modular-audio/nativeContextClockProcessor.js",
+    "src/modular-audio/nativeContextClock.js"
+  ],
+  "scope": "Opt-in Native clock metadata source:8s integer loop, bounded coarse cycle ramp, strict128sample integer codec; suspension/interruption retires generation; no legacy host change."
+}

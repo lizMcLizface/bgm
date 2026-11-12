@@ -1,0 +1,27 @@
+{
+  "api": 1,
+  "profile": "native-context-clocked-width-ring-v1",
+  "version": "7610ae037007682f",
+  "kernelVersion": "3eccb77c7e28803e",
+  "wasm": "64136583278673e5e23d198d03863fc34ebe1826f45806634bd258943a47f4e8",
+  "nativeClockVersion": "7a0838a735108706",
+  "source": "de1fee0e9ec8877770ef9e4a6ebc1855f817c458a539ee10c0a48beffcf34789",
+  "processor": "4c9f55af3c45bf358bfeaf980482c804afbf37325fe78211f843e333fe40140f",
+  "processorName": "native-rack-clocked-7610ae037007682f",
+  "files": [
+    "tools/buildNativeClockedRack.mjs",
+    "src/modular-audio/nativeClockedRackProfile.js",
+    "src/modular-audio/nativeContextClockCodec.js",
+    "src/modular-audio/nativeContextClock.js",
+    "src/modular-audio/nativeContextClockProcessor.js",
+    "tools/buildNativeContextClock.mjs",
+    "public/native-context-clock/build.json",
+    "src/modular-audio/nativeClockedRackFactory.js",
+    "src/modular-audio/nativeRackNormalRust.js",
+    "src/modular-audio/nativeRackNormalExtra.js",
+    "src/modular-audio/nativeRackNormalProcessor.js",
+    "src/modular-audio/rackDynamicsTargetTransport.js",
+    "src/modular-audio/stampedRackTargetTransport.js"
+  ],
+  "scope": "Separate authoritative Native context-clock adapter. Original Width/Ring Rust DSP, controls and strict active publication retained. Existing normal/stale-global profiles remain unchanged."
+}

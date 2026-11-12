@@ -1,0 +1,35 @@
+// @vitest-environment node
+import fs from'node:fs';import vm from'node:vm';import{it,expect}from'vitest';
+import{nativeClockedRackProcessor}from'./nativeClockedRackProfile.js';
+import{nativeContextClockSpec}from'./nativeContextClockCodec.js';
+import{OwnedNativeRackNormal,nativeRackNormalSpec}from'./ownedNativeRackNormal.js';
+import{nativeRackNormalCalls}from'./nativeRackNormalCalls.js';
+import{StampedRackTargetWriter}from'./stampedRackTargetTransport.js';
+const read=p=>fs.readFileSync(p,'utf8').replaceAll('\r\n','\n').replace(/^\uFEFF/,''),strip=p=>read(p).replace(/^import[^\n]*\n/gm,'').replace(/^export /gm,'');
+const kernel=JSON.parse(read('public/rack-native-normal/build.json')),module=new WebAssembly.Module(fs.readFileSync('public/rack-native-normal/rack.wasm')),version='0123456789abcdef';
+const source=nativeClockedRackProcessor(read('src/modular-audio/nativeRackNormalProcessor.js'),strip('src/modular-audio/nativeContextClockCodec.js')).replace('/*__RACK_BASE__*/',strip('src/modular-audio/rackDynamicsTargetTransport.js')).replace('/*__STAMPED_TARGETS__*/',strip('src/modular-audio/stampedRackTargetTransport.js')).replaceAll('__HOST_VERSION__',version).replaceAll('__KERNEL_VERSION__',kernel.version);
+function setup(kind='width',rate=48000,origin=512,{bind=true}={}){
+ let C;const messages=[],scope={WebAssembly,Float32Array,Float64Array,Uint32Array,Uint8Array,sampleRate:rate,currentFrame:0,AudioWorkletProcessor:class{constructor(){this.port={postMessage:m=>messages.push(m)};}},registerProcessor(name,c){expect(name).toBe('native-rack-clocked-'+version);C=c;}};
+ vm.createContext(scope);vm.runInContext(source,scope);
+ const processor=new C({processorOptions:{module,hostVersion:version,kernelVersion:kernel.version,kind,maxChannels:2,originFrame:origin,originSeconds:origin/rate}}),parameters=Object.fromEntries(C.parameterDescriptors.map(d=>[d.name,new Float32Array([d.defaultValue])])),context={sampleRate:rate,currentTime:origin/rate},controls=new Map(Object.entries(parameters).map(([k,a])=>[k,{setValueAtTime:v=>a[0]=Math.fround(v)}])),writer=new StampedRackTargetWriter(controls,context,{ranges:[[0,3],[-.5,2000]],slots:32}),spec=nativeContextClockSpec(rate,0,1);
+ if(bind)processor.message({kind:'native-clock-spec',spec});
+ return{scope,processor,parameters,context,writer,messages,spec,kind,rate};
+}
+function run(t,frame,{raw=frame,channels=2,demand=1,markers=true}={}){
+ t.scope.currentFrame=raw;t.context.currentTime=frame/t.rate;t.parameters.hostDemand[0]=demand;
+ if(markers){t.parameters.nativeClockLow=Float32Array.from({length:128},(_,i)=>(frame+i-t.spec.epochFrame)%(t.rate*8)+1);t.parameters.nativeClockCoarse=Float32Array.from({length:128},(_,i)=>(frame+i-t.spec.epochFrame)/(t.rate*8));}
+ const input=Array.from({length:channels},(_,ch)=>Float32Array.from({length:128},(_,i)=>Math.fround(.13*Math.sin((frame+i)*(.013+ch*.007))))),output=Array.from({length:t.kind==='width'?2:Math.max(channels,1)},()=>new Float32Array(128));
+ return{input,output,alive:t.processor.process([input],[output],t.parameters)};
+}
+for(const rate of[8000,24000,44100,48000,96000,192000])for(const kind of['width','ring'])it(kind+' consumes already-due controls with384-frame stale globals at'+rate,()=>{
+ const t=setup(kind,rate),gold=new OwnedNativeRackNormal(new WebAssembly.Instance(module,{}).exports,nativeRackNormalSpec(kind,rate,{originFrame:512}));
+ try{for(let frame=512;frame<4096;frame+=128){t.context.currentTime=frame/rate;gold.sync(frame);if(frame===512||frame===1280||frame===2816){for(const c of nativeRackNormalCalls(kind,rate,kind==='width'?{amount:frame===512?1.4:.3}:{freq:frame===512?333:777,mix:frame===512?.7:.2})){t.writer.post([c.lane,c.value],{initial:frame===512});gold.lane(c.lane,c.value,{initial:frame===512});}}
+  const r=run(t,frame,{raw:frame-384});for(let ch=0;ch<2;ch++)gold.input[ch].set(r.input[ch]);gold.render();expect(r.alive).toBe(true);expect(r.output).toEqual(gold.output);for(const m of t.messages.splice(0))if(m.kind==='observed')t.writer.acknowledge(m.sequence);
+ }expect(t.processor.snapshot()).toMatchObject({commands:kind==='width'?12:9,lateEdits:0,maxLateFrames:0,originFrame:512});expect(t.processor.snapshot().renderClock.lastFrame).toBe(3968);
+ }finally{gold.dispose();t.processor.message({kind:'dispose',request:1});}
+});
+it('cold construction uses exact epoch0 synchronously before a MessagePort binding',()=>{const t=setup('width',48000,0,{bind:false});expect(run(t,0).alive).toBe(true);expect(t.processor.snapshot().renderClock.calls).toBe(1);t.processor.message({kind:'native-clock-spec',spec:t.spec});expect(run(t,128,{raw:0}).alive).toBe(true);t.processor.message({kind:'dispose',request:1});});
+it('pending unbound clocks defer only isolated dormant callbacks without consuming DSP or controls',()=>{const t=setup('ring',48000,512,{bind:false});t.writer.post([0,333],{initial:true});expect(run(t,512,{channels:0,demand:0,markers:false}).alive).toBe(true);expect(t.processor.snapshot()).toMatchObject({calls:0,commands:0,authoredSequence:0,pendingClockQuanta:1});t.processor.message({kind:'native-clock-spec',spec:t.spec});expect(run(t,640,{raw:256}).alive).toBe(true);expect(t.processor.snapshot()).toMatchObject({calls:1,commands:1,authoredSequence:1});t.processor.message({kind:'dispose',request:1});});
+it('active missing or corrupted codes fail strictly without rendering or acknowledging controls',()=>{for(const corrupt of[false,true]){const t=setup('width',48000,512,{bind:corrupt});t.writer.post([0,1],{initial:true});if(corrupt)t.parameters.nativeClockLow=new Float32Array([1]);expect(run(t,512,{markers:false}).alive).toBe(false);expect(t.messages.some(m=>m.kind==='observed')).toBe(false);expect(t.processor.handle).toBe(0);expect(t.messages.some(m=>m.kind==='error')).toBe(true);}});
+it('generation replacement and explicit retirement terminally release the Rust owner',()=>{for(const message of[{kind:'native-clock-spec',spec:nativeContextClockSpec(48000,0,2)},{kind:'native-clock-failed',generation:1,error:'Context interrupted'}]){const t=setup();t.processor.message(message);expect(t.processor.handle).toBe(0);expect(t.messages.at(-1).kind).toBe('error');}});
+it('an unbound dormant owner cannot wait beyond its64-callback preparation budget',()=>{const t=setup('ring',48000,512,{bind:false});for(let i=0;i<64;i++)expect(run(t,512+i*128,{channels:0,demand:0,markers:false}).alive).toBe(true);expect(run(t,512+64*128,{channels:0,demand:0,markers:false}).alive).toBe(false);expect(t.processor.handle).toBe(0);});
