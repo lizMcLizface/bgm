@@ -1,0 +1,31 @@
+{
+  "api": 1,
+  "profile": "original-instrument-delay-live-host-v1",
+  "audited": false,
+  "textEncoding": "utf-8-normalized-LF",
+  "version": "88049859d690236b",
+  "kernelVersion": "171ea28c2195d17b",
+  "clockVersion": "7a0838a735108706",
+  "processorName": "instrument-delay-88049859d690236b",
+  "processor": "eed8d3dd8e0fc265e3e2f0e503f078ceb57b0b84c17f9e7f9aeea0c63c0e01af",
+  "source": "81b0459b3536edc9872074b755eaf7a073f28dddbcf1b15f5693145a6a363ae4",
+  "files": [
+    "tools/buildInstrumentDelayHost.mjs",
+    "src/nodes/instrumentDelayRust.js",
+    "src/nodes/instrumentDelayFacade.js",
+    "src/modular-audio/physicalInputRouteState.js",
+    "src/modular-audio/instrumentDelayLiveProcessor.js",
+    "src/modular-audio/instrumentDelayLiveWords.js",
+    "src/modular-audio/ownedInstrumentDelay.js",
+    "src/modular-audio/ownedInstrumentDelayLive.js",
+    "src/modular-audio/stampedWordTransport.js",
+    "src/modular-audio/nativeContextClock.js",
+    "src/modular-audio/nativeContextClockCodec.js",
+    "src/modular-audio/sourceDisposalFence.js",
+    "src/modular-audio/clockedSourceRelease.js"
+  ],
+  "wasm": "30d761d4c38d9da66f4cbad58868bc16962ea6647383d64a75d897c10961d891",
+  "bytes": 86977,
+  "metadataDescriptors": 580,
+  "scope": "Explicit prepared immutable original Delay/PingPong mono/stereo input and original output layouts,32 acknowledged raw-F64 stamped rows, Source7a, isolated control-only service, physical demand/reconnect and actual terminal ACK. Atomic requested-route identity, observed physical-input reconciliation, bounded active drain and realized OFF receipts. No automatic Native delay/filter Tail, external AudioParam connection, synchronous intrinsic getter, normal Instrument selection or physical deadline claim."
+}

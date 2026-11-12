@@ -33,3 +33,64 @@ Both 192 kHz complete twelve-case families were saved, the full HTML document re
 Evidence remains ignored under reports/modular_audio: instrument-delay-171e-{rate}-{delay|ping-pong}-result.json, the four 192 kHz cold save/replay receipts, and instrument-delay-171e-full-independent-audit.json. These are numerical component proofs with explicit continuous input and captured Native insertion epochs. They do not certify a live factory, arbitrary automatic source-ended/tail/layout behavior, unsuspended multi-handler scheduling, synchronous Native getters or normal Instrument selection. The v1 capture registration negative remains a separate pre-case tooling failure.
 
 Commands: node tools/buildInstrumentDelay.mjs --publish --check; node tools/buildInstrumentDelay.mjs --audit; node tools/auditInstrumentDelay.mjs. The focused permanent suite is 27 tests across the adapter/numerical, provenance, Native capture/authoring and separate cold authority files. No shared/default selector, existing kernel or original Node was edited.
+
+## Explicit live owner and facade — 12 November
+
+Host **88049859d690236b** retains the exact accepted **171ea28c2195d17b**
+Rust/Wasm bytes. It owns one original Delay or PingPong graph with immutable
+mono/stereo input geometry; mono PingPong correctly produces stereo output.
+The live wrapper sends checked commands directly to the accepted Rust ABI,
+without growing the numerical replay recipe. Five thousand live commands per
+mode leave that recipe empty and Wasm memory unchanged. The context quota is
+eight live owners across both modes; this bounded leaf is not yet a six-role
+normal Instrument constructor policy.
+
+Thirty-two acknowledged RawF64 metadata rows retain the actual author frame
+separately from scheduled seconds. Multi-lane setters reserve their complete
+metadata batch before any row and retain each original currentTime read. Hold
+cancellation, zero steps and future restorations share the one captured
+original hold author epoch. Controls retain configured amount/targets only
+after admission. Observed Rust curves are asynchronous and identity/layout
+checked; synchronous Native intrinsic getters explicitly refuse. The shared
+atomic physical-route protocol processes real draining input, freezes
+physically unpulled delay history and requires matching observed OFF before
+arming or earning a later reconnect reanchor. Terminal gates precede edge cuts;
+failed gate publication retains edges until actual SourceACK/context close and
+keeps failed audio health.
+
+Actual six-rate worklet verification passes **144 cases / 576 comparisons**
+against two literal original Native graphs. Every compared output word, repeated
+Native output and independent Rust output matches exactly; 2,730,496 frames
+have complete Source7a capture starting at frame zero. All 288 owned Offline
+closures and 288 Native journal closures are clean. A true full HTML reload at
+192 kHz reproduces both complete families: all 24 recipes, actual original
+setter/hold epochs and all five stream hash groups match exactly. These
+Offline closures are recorded separately from running SourceACK authority.
+
+The explicit physical-gap review passes another **24 cases / 96 comparisons**
+across all six rates. Both original outputs and owned private routes disconnect
+at frame 1408 and reconnect at 4224 while the original control/hold program
+continues. Every case records exactly 22 absent quanta per output, a complete
+source-clock ledger, 5376 rendered delay frames, frozen isolated DSP and exact
+Native/independent output words after reconnection. The first capture attempt
+refused empty disconnected Native ports; that negative is retained. Its
+successor permits absent output planes only in the declared window, records
+the actual layout transitions, and rejects every other missing/partial input.
+It does not accept arbitrary capture gaps or infer Native silence from zero PCM.
+
+Twenty actual reused-context rounds cover both modes and both layouts with
+forty independent live owners. Prepared DSP is zero, inactive controls preserve
+delay history, distinct returned delay-time curves stay independent, actual
+output is nonzero and finite, and forty real clean SourceACKs release clocks
+before context close. Eight actual adversarial upstream holds produce eight
+nonzero DRAIN witnesses, each rendering exactly 128 frames of unchanged input
+followed by genuine matching OFF receipts. Twenty-four new focused checks pass.
+The independent matrix and transition audits, raw negative, receipts and scratch
+scripts remain ignored under reports/modular_audio.
+
+This accepts the explicit bounded live owner/facade and declared gap behavior.
+It does not select the normal Instrument factory, claim arbitrary automatic
+Native delay/filter tail traversal, expose AudioParam signal connections or
+claim device deadlines. Next: provide private retained producer endpoints and
+join selected Instrument/rack factories with whole-patch preflight and explicit
+parent lifetime, alongside the remaining original modulation effects.
