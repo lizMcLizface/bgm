@@ -1,3 +1,4 @@
+import{mainRoleSourceDestination,mainRolePostControlsOutput}from'./generatorMainControlRoot.js';
 import{assertAutomaticPreparedFadePolicy}from'./preparedStartPolicy.js';
 import{STOPPED_RUNTIME_ROLES,assertStoppedRuntime,inspectStoppedRuntime}from'./stoppedRuntimeSnapshot.js';
 import{retireAudioActions}from'../audio/retireAudio.js';
@@ -32,11 +33,11 @@ export function createMainStoppedRuntimeBinding(snapshot,bundle){
   if((identities.ambience?.playing instanceof Map?identities.ambience.playing.size:Object.keys(identities.ambience?.playing??{}).length)||identities.ambience?.sourcePreparations?.size||identities.ambience?.sourceRetirements?.size)throw Error('Old Ambience source/fade retirement must finish before Main replacement');
   if(!bundle?.environment||bundle.environment.context!==context||typeof bundle.dispose!=='function'||typeof bundle.check!=='function')throw Error('Complete same-context detached Main owners required');bundle.check();
   if(bundle.preparedAmbienceOwner)assertAutomaticPreparedFadePolicy(g);
-  const resources=new Set();for(const id of STOPPED_RUNTIME_ROLES){const r=old[id],next=bundle.roles?.[id],destination=r.tone??r.gain;if(!next||next.instrument===r.instrument||next.wander===r.wander||typeof next.instrument.connect!=='function')throw Error('Independent candidate source and Wander required: '+id);native(context,output(next.instrument));native(context,next.wander.input);native(context,next.wander.output);native(context,destination);native(context,id==='perc'?r.gain:r.duck);if(next.instrument.destinations?.length)throw Error('Candidate already has a logical source destination: '+id);for(const owner of[next.instrument,next.wander]){if(resources.has(owner))throw Error('Duplicate Main candidate owner');resources.add(owner);}for(const[key,source]of[['send','sendSource'],['spaceSend','spaceSendSource']])if(r[key]&&(r[source]??r.wander.output)!==r.wander.output)throw Error('Main shared send has foreign source authority: '+id);}
+  const resources=new Set();for(const id of STOPPED_RUNTIME_ROLES){const r=old[id],next=bundle.roles?.[id],destination=mainRoleSourceDestination(g,id);if(!next||next.instrument===r.instrument||next.wander===r.wander||typeof next.instrument.connect!=='function')throw Error('Independent candidate source and Wander required: '+id);native(context,output(next.instrument));native(context,next.wander.input);native(context,next.wander.output);native(context,destination);native(context,mainRolePostControlsOutput(g,id));if(next.instrument.destinations?.length)throw Error('Candidate already has a logical source destination: '+id);for(const owner of[next.instrument,next.wander]){if(resources.has(owner))throw Error('Duplicate Main candidate owner');resources.add(owner);}for(const[key,source]of[['send','sendSource'],['spaceSend','spaceSendSource']])if(r[key]&&(r[source]??r.wander.output)!==r.wander.output)throw Error('Main shared send has foreign source authority: '+id);}
   native(context,bundle.sharedReturn);native(context,bundle.ambienceReturn);native(context,g.output);native(context,g.ambienceOut);
  }
  preflight();
- for(const id of STOPPED_RUNTIME_ROLES){const r=old[id],next=bundle.roles[id],destination=r.tone??r.gain,gate=id==='perc'?r.gain:r.duck;
+ for(const id of STOPPED_RUNTIME_ROLES){const r=old[id],next=bundle.roles[id],destination=mainRoleSourceDestination(g,id),gate=mainRolePostControlsOutput(g,id);
   // Native sleeping sources own a logical destination but no physical edge.
   const sleeping=Array.isArray(r.instrument.destinations)&&(r.instrument.chainAwake===false||r.instrument.awake===false);
   if(!sleeping)remove(output(r.instrument),destination,id+' previous source to stable role input');
@@ -48,7 +49,7 @@ export function createMainStoppedRuntimeBinding(snapshot,bundle){
  function undoLogical(){const errors=[];for(const action of logical.slice().reverse())if(!action.closed)try{const{destination}=action,owner=action.role?currentRoles(bundle)[action.role].instrument:action.owner;if(typeof owner.disconnect==='function')owner.disconnect();else output(owner).disconnect(destination);action.closed=true;}catch(error){if(error.name==='InvalidAccessError'){action.closed=true;}else errors.push(error);}if(errors.length)throw new AggregateError(errors,'Main candidate logical connection rollback failed');}
  function publish({environment,roleWanderFactory}){
   if(installed||closed||environment!==bundle.environment)throw Error('Main candidate publication authority differs');
-  for(const id of STOPPED_RUNTIME_ROLES){const owner=bundle.roles[id].instrument,destination=old[id].tone??old[id].gain;logical.push({owner,destination,role:id,closed:false});owner.connect(destination);}
+  for(const id of STOPPED_RUNTIME_ROLES){const owner=bundle.roles[id].instrument,destination=mainRoleSourceDestination(g,id);logical.push({owner,destination,role:id,closed:false});owner.connect(destination);}
   g.audioEnvironment=environment;g.roleWanderFactory=roleWanderFactory;g.ambience=bundle.ambience;g.busRack=bundle.busRack;g.spaceRack=bundle.spaceRack;
   g.roleMotionControls=Promise.resolve();g.roleMotionPrepared=true;g.roleMotionError=null;
   for(const id of STOPPED_RUNTIME_ROLES){const r=g.roles[id];r.instrument=bundle.roles[id].instrument;r.wander=bundle.roles[id].wander;r.send=bundle.sends[id];r.sendSource=r.send?r.wander.output:undefined;r.spaceSend=bundle.spaceSends[id];r.spaceSendSource=r.spaceSend?r.wander.output:undefined;}
