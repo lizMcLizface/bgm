@@ -1,0 +1,4 @@
+import{it,expect}from'vitest';import{fdnLiveTerminalHealthy}from'../../tools/fdnRoomLiveArmHealth.js';
+const clean=()=>({source:{released:true,quarantined:false,error:null,receipt:{clean:true,reason:'dispose',stats:{error:null}}},clockReleased:true});
+it('clean resource ACK does not certify a failed audio domain',()=>{const status=clean();status.source.receipt.reason='failure';status.source.receipt.stats.error='active frontier skipped';expect(status.source.receipt.clean).toBe(true);expect(fdnLiveTerminalHealthy(status)).toBe(false);});
+it('also requires post-disposal owner health and unquarantined clock release',()=>{expect(fdnLiveTerminalHealthy(clean())).toBe(true);expect(fdnLiveTerminalHealthy(clean(),'late audio failure')).toBe(false);const q=clean();q.clockReleased=false;expect(fdnLiveTerminalHealthy(q)).toBe(false);q.clockReleased=true;q.audioHealth={healthy:false};expect(fdnLiveTerminalHealthy(q)).toBe(false);});

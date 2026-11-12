@@ -344,11 +344,13 @@
   // src/modular-audio/fdnRoomLiveProcessor.js
   var FdnRoomLiveProcessor = class extends AudioWorkletProcessor {
     static get parameterDescriptors() {
-      return [{ name: "resumeGeneration", defaultValue: 0, minValue: 0, maxValue: 16777215, automationRate: "a-rate" }, { name: "hostDemand", defaultValue: 0, minValue: 0, maxValue: 1, automationRate: "a-rate" }, ...nativeContextClockDescriptors(), ...stampedWordDescriptors(FDN_WORD_OPTIONS)];
+      return [{ name: "terminalGate", defaultValue: 0, minValue: 0, maxValue: 1, automationRate: "a-rate" }, { name: "resumeGeneration", defaultValue: 0, minValue: 0, maxValue: 16777215, automationRate: "a-rate" }, { name: "hostDemand", defaultValue: 0, minValue: 0, maxValue: 1, automationRate: "a-rate" }, ...nativeContextClockDescriptors(), ...stampedWordDescriptors(FDN_WORD_OPTIONS)];
     }
     constructor({ processorOptions: p }) {
       super();
       this.identity = p.identity;
+      this.terminalGateSeen = false;
+      this.terminalQuanta = 0;
       this.disposed = false;
       this.error = null;
       this.pending = [];
@@ -359,6 +361,7 @@
       this.lastResumeSeen = 0;
       this.lastPulledResume = 0;
       this.hasPulled = false;
+      this.firstPulledFrame = null;
       this.reanchors = 0;
       this.reanchorFrames = 0;
       this.counts = new Uint16Array(6);
@@ -366,7 +369,7 @@
       this.codec = new FdnRoomWordCodec();
       this.port.onmessage = ({ data }) => this.message(data);
       try {
-        if (p.version !== "5a4295073639ce8e" || p.identity.hostVersion !== p.version || p.identity.kernelVersion !== "772275c02c140294" || !Number.isInteger(p.identity.ownerGeneration) || p.identity.ownerGeneration < 1) throw Error("FDN host identity differs");
+        if (p.version !== "f803ba7a02f2d50e" || p.identity.hostVersion !== p.version || p.identity.kernelVersion !== "772275c02c140294" || !Number.isInteger(p.identity.ownerGeneration) || p.identity.ownerGeneration < 1) throw Error("FDN host identity differs");
         this.origin = p.originFrame;
         this.endFrame = p.endFrame ?? null;
         this.clock = new NativeContextClockCodec(p.clockSpec);
@@ -390,7 +393,7 @@
       }
     }
     snapshot() {
-      return { identity: this.identity, kernel: this.core?.stats() ?? this.lastStats ?? null, clock: this.clock?.snapshot() ?? null, transport: this.reader.snapshot(), pendingQuanta: this.pendingQuanta, preoriginDeferrals: this.preorigin, futureDeferrals: this.future, resumeGeneration: this.lastResumeSeen, lastPulledResumeGeneration: this.lastPulledResume, hasPulled: this.hasPulled, reanchors: this.reanchors, reanchorFrames: this.reanchorFrames, disposed: this.disposed, error: this.error };
+      return { identity: this.identity, terminalGateSeen: this.terminalGateSeen, terminalQuanta: this.terminalQuanta, kernel: this.core?.stats() ?? this.lastStats ?? null, clock: this.clock?.snapshot() ?? null, transport: this.reader.snapshot(), pendingQuanta: this.pendingQuanta, preoriginDeferrals: this.preorigin, futureDeferrals: this.future, resumeGeneration: this.lastResumeSeen, lastPulledResumeGeneration: this.lastPulledResume, hasPulled: this.hasPulled, firstPulledFrame: this.firstPulledFrame, reanchors: this.reanchors, reanchorFrames: this.reanchorFrames, disposed: this.disposed, error: this.error };
     }
     receipt(reason) {
       if (this.disposed) return;
@@ -438,8 +441,8 @@
         if (!Number.isInteger(d.request) || d.request < 1 || d.request > 4294967295 || this.pending.length >= 16) throw Error("FDN request bound");
         if (d.kind === "stats") this.port.postMessage({ kind: "stats", identity: this.identity, request: d.request, stats: this.snapshot() });
         else if (d.kind === "flush") {
-          if (!Number.isInteger(d.requiredSequence) || d.requiredSequence < 0) throw Error("Invalid FDN watermark");
-          this.pending.push({ request: d.request, requiredSequence: d.requiredSequence });
+          if (!Number.isInteger(d.requiredSequence) || d.requiredSequence < 0 || d.requiredSequence > 16777215 || d.requireClock !== void 0 && typeof d.requireClock !== "boolean") throw Error("Invalid FDN watermark/clock request");
+          this.pending.push({ request: d.request, requiredSequence: d.requiredSequence, requireClock: d.requireClock === true, minimumCoreCalls: d.requireClock ? this.core.stat(3) + 1 : 0 });
           this.flush();
         } else throw Error("Unknown FDN control request");
       } catch (error) {
@@ -447,9 +450,9 @@
       }
     }
     flush() {
-      for (let i = this.pending.length - 1; i >= 0; i--) if (this.reader.sequence >= this.pending[i].requiredSequence) {
-        const p = this.pending.splice(i, 1)[0];
-        this.port.postMessage({ kind: "flushed", identity: this.identity, request: p.request, stats: this.snapshot() });
+      for (let i = this.pending.length - 1; i >= 0; i--) if (this.reader.sequence >= this.pending[i].requiredSequence && (!this.pending[i].requireClock || this.clock.calls > 0 && this.core.stat(3) >= this.pending[i].minimumCoreCalls)) {
+        const p = this.pending.splice(i, 1)[0], clockReceipt = p.requireClock ? { version: 1, generation: this.clock.spec.generation, requiredSequence: p.requiredSequence, minimumCoreCalls: p.minimumCoreCalls, coreCalls: this.core.stat(3), clockCalls: this.clock.calls, frame: this.clock.lastFrame } : null;
+        this.port.postMessage({ kind: "flushed", identity: this.identity, request: p.request, clockReceipt, stats: this.snapshot() });
       }
     }
     wait(kind) {
@@ -490,12 +493,29 @@
       }
       return true;
     }
+    quiesce(parameters) {
+      const gate = parameters.terminalGate;
+      if (!(gate instanceof Float32Array) || ![1, 128].includes(gate.length)) throw Error("FDN terminal gate shape differs");
+      let seen = this.terminalGateSeen;
+      for (const value of gate) {
+        if (value !== 0 && value !== 1) throw Error("FDN terminal gate must be literal Boolean");
+        if (seen && value === 0) throw Error("FDN terminal gate cannot reopen");
+        if (value === 1) seen = true;
+      }
+      this.terminalGateSeen = seen;
+      if (seen) {
+        this.terminalQuanta++;
+        return true;
+      }
+      return false;
+    }
     process(inputs, outputs, parameters) {
       const out = outputs[0];
       if (!out?.length) return !this.disposed;
       for (const a of out) a.fill(0);
       if (this.disposed) return false;
       try {
+        if (this.quiesce(parameters)) return true;
         const input = inputs[0] ?? [], channels = input.length;
         if (channels > 2 || out.length !== 2 || out.some((a) => a.length !== 128)) throw Error("FDN input/output layout differs");
         const d = parameters.hostDemand;
@@ -530,6 +550,7 @@
         for (let c = 0; c < channels; c++) this.core.input[c].set(input[c]);
         this.core.render(channels, pulled);
         if (pulled) {
+          if (!this.hasPulled) this.firstPulledFrame = frame;
           this.hasPulled = true;
           this.lastPulledResume = generation;
         }
@@ -546,5 +567,5 @@
       }
     }
   };
-  registerProcessor("fdn-room-live-5a4295073639ce8e", FdnRoomLiveProcessor);
+  registerProcessor("fdn-room-live-f803ba7a02f2d50e", FdnRoomLiveProcessor);
 })();

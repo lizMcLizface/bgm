@@ -1,0 +1,2 @@
+/** Resource release can be clean even when audio-domain execution failed. */
+export function fdnLiveTerminalHealthy(status,ownerError=null){const source=status?.source,r=source?.receipt;return!ownerError&&source?.released===true&&source.quarantined!==true&&!source.error&&r?.clean===true&&r.reason!=='failure'&&!r.error&&!r.stats?.error&&status.clockReleased===true&&status.audioHealth?.healthy!==false;}
