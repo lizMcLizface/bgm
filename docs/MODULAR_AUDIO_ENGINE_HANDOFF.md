@@ -90,6 +90,37 @@ full-suite/audio load; that negative is retained, and the repeat ran alone.
 No physical deadline/quality guarantee or workload attribution is inferred.
 Evidence and temporary scripts stay in ignored reports/ and reports/scripts/.
 
+
+Current verified component closure:
+Clocked Filter8938004098795a8e preserves the original Rust Filter and explicitly
+requires a certified continuously active program. All32 Native cases at four
+supported rates pass (maximum absolute4.023313522338867e-7), independent PCM0;
+a true192k HTML reload preserves identities, settings and PCM.67 focused clock,
+activity and ownership checks pass. Running hot-install Native proof and normal
+source/prefix-bound adoption remain pending. See the clocked Filter document.
+
+Complete Ambience315d passes both original Brownian/Sine graphs with exact wet
+PCM and maximum aggregate1.1175870895385742e-8. Health-only successoreacd215ec7d49700
+also passes the16s actual two-bed gate: all12wet stems including natural thunder
+are nonzero, partial cancellation preserves active material, late sixth birth
+works, an unpulled bed holds while its sibling advances, and all owners release
+cleanly. A primary512-frame hot-preparation lateness remains explicit; ordinary
+50ms startup/adoption is not yet accepted. See the complete-live document.
+
+Composed Tape3b17 passes three real-context ownership rounds/six independent
+owners, including40full-preset commits and safe resource reclamation. Native
+PCM is not assessed by that lifecycle test. The wider8k batch passes fourNative
+continuous/gap cases but exposes four subnormal-only owned independence
+mismatches (maximum1.0056983152508173e-38); exact acceptance remains withheld
+pending the raw-bit diagnosis. No tolerance or DSP changes hide it.
+
+Additive lifecycle receipts for existing percussion and FDN/echo preserve exact
+original PCM across six rates; actual live full drum-kit/started-room disposal
+returns both clean ACKs with released nodes. Failed constructors await known
+partial owners, and paired cleanup failures remain visible. New stopped bundle
+transactions remain separate from normal Generator selection. See
+MODULAR_AUDIO_ENGINE_LEGACY_LIFECYCLE.md for scope.
+
 Next: finish stopped owner-bundle integration in selected application hosts;
 close Ambience input-topology/demand and queued Tape lifecycle ownership; then
 adopt the accepted profiles and finish remaining Filter activity, shared-room
