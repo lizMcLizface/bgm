@@ -1,0 +1,24 @@
+{
+  "api": 1,
+  "audited": false,
+  "profile": "main-tone-volume-duck-live-v1",
+  "version": "efeda6631d83ff91",
+  "source": "61f2551ec3ecf2699065f9c3d692e4cf019ead01d132a52a12544071936947d4",
+  "wasm": "83c9d9d7e39288ba526e69eeacff24686e5d346f2d012921cbea6eab7c940618",
+  "bytes": 45905,
+  "files": [
+    "tools/buildMainStripLive.mjs",
+    "synth-engine/main-strip-live/Cargo.toml",
+    "synth-engine/main-strip-live/Cargo.lock",
+    "synth-engine/main-strip-live/src/lib.rs",
+    "synth-engine/main-strip-live/src/allocation.rs",
+    "synth-engine/main-strip-live/CHROMIUM_PROFILE.json",
+    "synth-engine/main-strip-live/CHROMIUM_NOTICES.txt",
+    "synth-engine/rack-filter-normal/src/timeline.rs",
+    "synth-engine/rack-native/src/biquad.rs",
+    "synth-engine/rack-native/src/tail.rs",
+    "synth-engine/main-strip/src/lib.rs",
+    "src/modular-audio/mainStripLiveRust.js"
+  ],
+  "scope": "NEW bounded mutable Main set/target/cancel subset, original main-thread clamp including cancel, constructor assignment trace, accurate/scalar-zero gain distinction, authored-frame insertion pruning and render-time new-event clamp. No linear/hold or app adoption."
+}

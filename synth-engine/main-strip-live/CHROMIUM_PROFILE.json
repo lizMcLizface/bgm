@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "profile": "main-tone-volume-duck-live-v1",
+  "revision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+  "timelineSource": "synth-engine/rack-filter-normal/src/timeline.rs",
+  "biquadSource": "synth-engine/rack-native/src/biquad.rs",
+  "scope": "NEW bounded mutable Main set/target/cancel subset, original main-thread clamp including cancel, constructor assignment trace, accurate/scalar-zero gain distinction, authored-frame insertion pruning and render-time new-event clamp. No linear/hold or app adoption.",
+  "nativeSources": [
+    {
+      "file": "audio_param_handler.cc",
+      "sha256": "50e6da5e2efa1254d05393ca03bae373b8a329e400d85b3f6cafd8ec3896ad8b"
+    },
+    {
+      "file": "tape-native-audio_param.cc",
+      "sha256": "31619a556b1d1899902636250df2db122ece8c862d90ff4017db62a5af0afecb"
+    },
+    {
+      "file": "tape-native-gain_handler.cc",
+      "sha256": "9b1b2e6a4d1fef5f88f67b3079fc76c01d99a31d46ae5db5047b2676fe290bc1"
+    }
+  ]
+}
