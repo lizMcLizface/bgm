@@ -1,0 +1,28 @@
+{
+  "api": 1,
+  "audited": false,
+  "profile": "main-tone-volume-duck-raw-frequency-v1",
+  "version": "f8b72ab621c5a767",
+  "source": "9284ad7aa6e62ec3b781a0446d6b633b56b420a8a3397a8c26d521c1c7a4c45f",
+  "wasm": "e570ead98a28a19c84a901d740be3804904859a1c4629f3b518c8197a726b4ff",
+  "bytes": 73348,
+  "files": [
+    "tools/buildMainStripRange.mjs",
+    "synth-engine/main-strip-range/Cargo.toml",
+    "synth-engine/main-strip-range/Cargo.lock",
+    "synth-engine/main-strip-range/src/lib.rs",
+    "synth-engine/main-strip-range/src/allocation.rs",
+    "synth-engine/main-strip-range/CHROMIUM_PROFILE.json",
+    "synth-engine/main-strip-range/CHROMIUM_NOTICES.txt",
+    "synth-engine/main-strip-range/src/timeline.rs",
+    "synth-engine/rack-filter-normal/src/timeline.rs",
+    "synth-engine/rack-native/src/biquad.rs",
+    "synth-engine/rack-native/src/tail.rs",
+    "synth-engine/main-strip/src/lib.rs",
+    "src/modular-audio/mainStripLiveRust.js",
+    "src/modular-audio/mainStripRangeRust.js",
+    "synth-engine/main-strip-live/src/lib.rs",
+    "public/main-strip-live/build.json"
+  ],
+  "scope": "NEW raw-frequency events plus exact nominal clipping at the original AudioParam quantum return/store boundary. Original shared sources frozen. No host/application adoption."
+}

@@ -64,6 +64,12 @@ The current accepted control and ownership boundaries are:
   pull/clock release. Its99 focused checks pass. This is a separate live-only
   factory; whole Instrument/Main admission and other-rate live acceptance remain open.
 
+The separate [raw-frequency Main kernel](MODULAR_AUDIO_ENGINE_MAIN_RAW_FREQUENCY.md)
+retains literal 20 kHz automation at low rates and the original nominal quantum
+return/store boundary. All 48 Native cases /96 comparisons and independent
+outputs are word exact; its 6.29-million-frame Rust audit has zero heap activity.
+The original 03eb/hosts remain unchanged; a live codec/receiver is still needed.
+
 The separate [Main cold constructor record](MODULAR_AUDIO_ENGINE_MAIN_COLD_BOOTSTRAP.md)
 now passes 48 exact Native constructor/prelude comparisons and actual two-owner
 48 kHz preparation before the user gesture, followed by real first-frame-zero

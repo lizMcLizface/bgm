@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "profile": "main-tone-volume-duck-raw-frequency-v1",
+  "revision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+  "timelineSource": "synth-engine/main-strip-range/src/timeline.rs",
+  "biquadSource": "synth-engine/rack-native/src/biquad.rs",
+  "scope": "NEW raw-frequency events plus exact nominal clipping at the original AudioParam quantum return/store boundary. Original shared sources frozen. No host/application adoption.",
+  "nativeSources": [
+    {
+      "file": "audio_param_handler.cc",
+      "sha256": "50e6da5e2efa1254d05393ca03bae373b8a329e400d85b3f6cafd8ec3896ad8b"
+    },
+    {
+      "file": "tape-native-audio_param.cc",
+      "sha256": "31619a556b1d1899902636250df2db122ece8c862d90ff4017db62a5af0afecb"
+    },
+    {
+      "file": "tape-native-gain_handler.cc",
+      "sha256": "9b1b2e6a4d1fef5f88f67b3079fc76c01d99a31d46ae5db5047b2676fe290bc1"
+    }
+  ],
+  "baselineSource": "synth-engine/main-strip-live/src/lib.rs",
+  "baselineSourceSha256": "bed2e731177a1b17f6c9077c49d9390e0f462aa2ec82a68cdd9f6c2c9c3cf698",
+  "baselineKernelVersion": "03eb5d894a75d801",
+  "baselineWasm": "3e3f881187fb73cb236d9bf4f35c6c4de20df5fb2738f291cf24f1d12e834e31",
+  "commandBoundDelta": {
+    "from": "if lane==0{self.rate/2.}",
+    "to": "if lane==0{(self.rate/2.).max(20000.)}"
+  },
+  "rangeApi": 1,
+  "addedAbi": "#[no_mangle]pub extern \"C\" fn main_strip_range_api()->u32{1}\n",
+  "timelineBaselineSource": "synth-engine/rack-filter-normal/src/timeline.rs",
+  "timelineBaselineSha256": "3db396ee0e1fffa1f325a59f247fbf479e0238fcc2e3beb41ff72fd5040813c3",
+  "addedTimelineMethod": " pub fn native_nominal_clip(&mut self,min:f32,max:f32){for v in &mut self.output{*v=v.clamp(min,max);}self.current=self.output[127];}\n",
+  "libraryDeltas": [
+    {
+      "from": "if lane==0{self.rate/2.}",
+      "to": "if lane==0{(self.rate/2.).max(20000.)}"
+    },
+    {
+      "from": "#[path=\"../../rack-filter-normal/src/timeline.rs\"]mod timeline;",
+      "to": "mod timeline;"
+    },
+    {
+      "from": "for lane in &mut self.lanes{lane.prepare(self.frame,self.rate);}",
+      "to": "for lane in &mut self.lanes{lane.prepare(self.frame,self.rate);}self.lanes[0].native_nominal_clip(0.,(self.rate/2.)as f32);"
+    }
+  ],
+  "nativeNominalBoundary": {
+    "source": "reports/scripts/pinned/audio_param_handler.cc",
+    "sha256": "50e6da5e2efa1254d05393ca03bae373b8a329e400d85b3f6cafd8ec3896ad8b",
+    "rule": "ValuesForFrameRange Vclip then returns values.back; CalculateTimelineValues SetValue stores that clipped default for next quantum. Frequency only; raw events remain unchanged."
+  }
+}
