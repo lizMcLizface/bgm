@@ -1,12 +1,12 @@
 {
   "api": 1,
   "profile": "native-clock-main-tone-volume-duck-host-v1",
-  "version": "a3f4912dc25dbdea",
-  "source": "ce886221a8d06ce1ffa5df427018b7c9bc0548ba19f019cf2fd5a9b73e9af3ce",
-  "processor": "d15e2615d65e762366a027f1e8a61c204281944c3bd6ea3f415abbe23b41aed9",
-  "processorName": "native-clock-main-strip-a3f4912dc25dbdea",
-  "kernelVersion": "efeda6631d83ff91",
-  "wasm": "83c9d9d7e39288ba526e69eeacff24686e5d346f2d012921cbea6eab7c940618",
+  "version": "a6e7bdc5b0644b28",
+  "source": "bb2d1ae8259596e1ce16e29bf8c43fe37aac6c45259895c632277bd8f7d7be37",
+  "processor": "4c19f61a86b78162cdea14d97f8d8fb12698841e0911add0a21a113e618c916d",
+  "processorName": "native-clock-main-strip-a6e7bdc5b0644b28",
+  "kernelVersion": "03eb5d894a75d801",
+  "wasm": "3e3f881187fb73cb236d9bf4f35c6c4de20df5fb2738f291cf24f1d12e834e31",
   "clockVersion": "7a0838a735108706",
   "files": [
     "public/main-strip-live/build.json",
@@ -25,5 +25,5 @@
   ],
   "textEncoding": "utf-8-normalized-LF",
   "descriptors": 579,
-  "scope": "Continuous mono/stereo Main controller; exact Native author metadata, rawF64 set/target/cancel. Two owners,32unobserved commands, conservative256 lifetime inserts/lane. No default adoption or interruption recovery."
+  "scope": "Continuous mono/stereo Main controller; exact Native author metadata, rawF64 set/target/cancel. Two owners,32unobserved commands, 256events/lane with exact observed-frame Rust credits. No default adoption or interruption recovery."
 }

@@ -23,3 +23,6 @@ impl Engine{
 #[no_mangle]pub extern "C" fn main_strip_live_output(p:&Engine,ch:usize)->*const f32{p.output.get(ch).map(|p|p.as_ptr()).unwrap_or(std::ptr::null())}
 #[no_mangle]pub extern "C" fn main_strip_live_render(p:&mut Engine,n:usize)->u32{p.render(n)as u32}
 #[no_mangle]pub extern "C" fn main_strip_live_stat(p:&Engine,key:usize)->f64{match key{0=>p.frame as f64,1=>p.peak,2=>p.calls as f64,3=>p.rejected as f64,4=>p.last_authored,5=>p.late as f64,6=>p.clamped as f64,7=>p.filtered as u32 as f64,_=>f64::NAN}}
+/// Read-only capacity at an OBSERVED Native author frame, not the engine's
+/// already-advanced end frame. Never prunes, prepares, mutates or allocates.
+#[no_mangle]pub extern "C" fn main_strip_live_free_slots(p:&Engine,lane:usize,observed:f64)->f64{if !p.ready||lane>2||!observed.is_finite()||observed<0.||observed.fract()!=0.||observed%128.!=0.||observed>p.frame as f64||observed<p.last_authored{return f64::NAN;}let mut low=0;let mut high=CAP;while low<high{let middle=(low+high+1)/2;if p.lanes[lane].available_at(middle,observed){low=middle;}else{high=middle-1;}}low as f64}

@@ -64,3 +64,9 @@ keep per-command credits until observed acknowledgement, own initial warmup and
 all terminal release proof, and run one grouped live control/gap/retirement
 matrix. Then migrate Main tone/gain/duck and gain-only routes under a stopped
 publication transaction. Current Main controls remain Native until that gate.
+
+The additive exact-capacity successor is kernel03eb5d894a75d801,46,464bytes /SHA2563e3f881187fb73cb236d9bf4f35c6c4de20df5fb2738f291cf24f1d12e834e31. Only a read-only insertion-capacity export and JS query wrapper were added to the numerical module; all original command/render and shared timeline/Biquad/tail bodies remain exact. Its Native-frame host451c2a3d35ad1e5b queries the observed callback frame after rendering, supports actual reclaimed credits rather than a lifetime edit cap, and passes the full36-case Native/two-owner group and identical true cold replay. See [the live Main host](MODULAR_AUDIO_ENGINE_MAIN_STRIP_CONTROL_HOST.md) for exact admission/debt, live and allocation evidence. Older efed receipts remain identified as predecessor evidence.
+
+Live host451c also passes an actual1,024-command Native metadata/FIFO reuse soak and primary/survivor/quota/retirement group. Immediate past-zero publication records its actual1,024 main-thread clamps and516 late output-thread observations; this is liveness/admission evidence, not bit-exact unsuspended Native GUI timing. Future-booked audio remains separately exact. Details and full receipt are linked in the host record.
+
+Final source-formatting host identity is a6e7bdc5b0644b28; the complete emitted processor is identical to451c after replacing only host identity. Kernel03eb and all numerical bytes stay unchanged; the recorded451c gates remain separately identified. The exact normalization proof and final published-processor checks are linked in the host record.

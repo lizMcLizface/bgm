@@ -6,6 +6,26 @@ port is not complete. Native defaults remain operational. The requested push
 through 111d282 completed using lizMcLizface; subsequent verified checkpoints
 are local commits with the same author and committer. No deployment occurred.
 
+Final Main host identity is `a6e7bdc5b0644b28`: its complete processor differs
+from the451c credit-host gate only by that host identity after source-format
+cleanup. Kernel03eb and all numerical bytes remain unchanged; the exact
+normalization proof is in the live Main host record.
+
+Current Main credit successor (supersedes the temporary lifetime bound below):
+`451c2a3d35ad1e5b` /kernel`03eb5d894a75d801` adds exact read-only Rust capacity
+queries at the observed Native callback frame. The original command/render and
+accepted DSP helper bodies remain byte-identical. Actual reclaimed capacity now
+supports continuing edits while retaining the256-simultaneous-event/lane and
+32-unobserved-record bounds. All36 six-rate/two-owner Native cases stay word
+exact, and true HTML reload repeats the complete640,413-byte result exactly.
+An actual48k browser group passes source/output/independence, primary/survivor,
+quota and suspend cleanup, plus1,024 real Native metadata commands with zero
+rejects and no pending debt. Its immediate past-zero soak explicitly reports
+516 late publications and1,024 main-thread clamps; no unsuspended GUI timing
+identity or reconstruction of earlier output is claimed. The updated Rust audit
+includes147,456 queries and retains zero allocation/free/growth.57 focused
+checks pass. See the [live Main host](MODULAR_AUDIO_ENGINE_MAIN_STRIP_CONTROL_HOST.md).
+
 Latest committed control/lifecycle continuation (12 November):
 
 - The [explicit live Main control host](MODULAR_AUDIO_ENGINE_MAIN_STRIP_CONTROL_HOST.md)

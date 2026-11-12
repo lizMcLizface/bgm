@@ -211,13 +211,13 @@
       this.view = new DataView(this.buffer);
     }
     encode(value, words, offset = 0) {
-      if (typeof value !== "number" || !words || offset < 0 || offset + 4 > words.length) throw Error("Invalid Float64 word destination");
+      if (typeof value !== "number" || !words || !Number.isInteger(offset) || offset < 0 || offset + 4 > words.length) throw Error("Invalid Float64 word destination");
       this.view.setFloat64(0, value, true);
       for (let i = 0; i < 4; i++) words[offset + i] = this.view.getUint16(i * 2, true);
       return words;
     }
     decode(words, offset = 0) {
-      if (!words || offset < 0 || offset + 4 > words.length) throw Error("Invalid Float64 word source");
+      if (!words || !Number.isInteger(offset) || offset < 0 || offset + 4 > words.length) throw Error("Invalid Float64 word source");
       for (let i = 0; i < 4; i++) {
         const x = words[offset + i];
         if (!Number.isInteger(x) || x < 0 || x > 65535) throw Error("Invalid Float64 raw word");
@@ -298,6 +298,16 @@
         throw error;
       }
     }
+    freeSlots(frame, slots = new Array(3)) {
+      this.alive();
+      if (!Number.isSafeInteger(frame) || frame < 0 || frame % 128 || !(Array.isArray(slots) || slots instanceof Uint16Array) || slots.length !== 3) throw Error("Invalid Main observed credit frame/storage");
+      for (let lane = 0; lane < 3; lane++) {
+        const n = this.e.main_strip_live_free_slots(this.handle, lane, frame);
+        if (!Number.isInteger(n) || n < 0 || n > 256) throw Error("Invalid Main DSP credit observation");
+        slots[lane] = n;
+      }
+      return slots;
+    }
     stats() {
       if (!this.handle) throw Error("Mutable Main strip disposed");
       return Object.fromEntries(["frame", "peak", "calls", "rejected", "lastAuthorFrame", "latePublications", "mainThreadClamps", "filtered"].map((k, i) => [k, this.e.main_strip_live_stat(this.handle, i)]));
@@ -328,6 +338,8 @@
       this.frame = null;
       this.appliedSequence = 0;
       this.free = (configuration.initialAssignments ?? [true, true, false]).map((v) => 256 - Number(v));
+      this.lastReportedSequence = -1;
+      this.lastReportedFree = null;
       this.deferredStreak = 0;
       this.error = null;
     }
@@ -351,19 +363,14 @@
         this.words.set(this.reader.words.subarray(i * 14, i * 14 + 14), at * 14);
         this.queued++;
       }
-      let observed = false;
       while (this.queued && this.frames[this.head] <= this.frame) {
         const at = this.head, c = decodeMainControl(this.rate, this.words, at * 14, this.codec);
-        if (c.op !== "cancel" && this.free[c.lane] < 1) throw Error("Main lifetime control credits exhausted");
         this.unit.command({ ...c, authorFrame: this.frames[at] });
-        if (c.op !== "cancel") this.free[c.lane]--;
         this.appliedSequence = this.sequences[at];
         this.head = (this.head + 1) % 32;
         this.queued--;
-        observed = true;
       }
       if (this.queued && this.frames[this.head] > this.frame + 8192) throw Error("Main author metadata exceeds current Native clock bound");
-      if (observed) this.emit({ kind: "observed", sequence: this.appliedSequence, frame: this.frame, freeSlots: [...this.free] });
     }
     render(input, { pulled = true } = {}) {
       if (this.frame === null || this.error || !this.unit) throw Error(this.error ?? "Main render has no Native frame");
@@ -372,6 +379,12 @@
         for (let c = 0; c < this.unit.input.length; c++) if (input.length) this.unit.input[c].set(input[c]);
         else this.unit.input[c].fill(0, 0, 128);
         this.unit.render(128);
+        this.unit.freeSlots(this.frame, this.free);
+        if (this.lastReportedSequence !== this.appliedSequence || !this.lastReportedFree || this.free.some((n, i) => n !== this.lastReportedFree[i])) {
+          this.emit({ kind: "observed", sequence: this.appliedSequence, frame: this.frame, freeSlots: [...this.free] });
+          this.lastReportedSequence = this.appliedSequence;
+          this.lastReportedFree = [...this.free];
+        }
         return this.unit.output;
       } catch (e) {
         this.error = String(e);
@@ -379,7 +392,7 @@
       }
     }
     stats() {
-      return { frame: this.frame, unit: this.unit?.stats() ?? null, appliedSequence: this.appliedSequence, queued: this.queued, freeSlots: [...this.free], reader: this.reader.snapshot(), error: this.error, scope: "Continuous Native-frame Main; conservative lifetime insertion credits, no inferred reclamation" };
+      return { frame: this.frame, unit: this.unit?.stats() ?? null, appliedSequence: this.appliedSequence, queued: this.queued, freeSlots: [...this.free], reader: this.reader.snapshot(), error: this.error, scope: "Continuous Native-frame Main; exact read-only Rust credits at the observed Native frame, no inferred reclamation" };
     }
     dispose() {
       this.unit?.dispose();
@@ -405,7 +418,7 @@
       this.firstFrame = null;
       port.onmessage = ({ data }) => this.message(data);
       try {
-        if (p.identity?.hostVersion !== "a3f4912dc25dbdea" || p.identity?.kernelVersion !== "efeda6631d83ff91" || p.identity?.clockVersion !== "7a0838a735108706" || !(p.module instanceof WebAssembly.Module) || p.configuration?.sampleRate !== rate) throw Error("Main controller identity differs");
+        if (p.identity?.hostVersion !== "a6e7bdc5b0644b28" || p.identity?.kernelVersion !== "03eb5d894a75d801" || p.identity?.clockVersion !== "7a0838a735108706" || !(p.module instanceof WebAssembly.Module) || p.configuration?.sampleRate !== rate) throw Error("Main controller identity differs");
         this.core = new MainStripControlCore(p.module, p.configuration, { emit: (d) => this.emit(d) });
         this.emit({ kind: "ready" });
       } catch (e) {
@@ -527,5 +540,5 @@
       return this.unit.process(a, b, c);
     }
   };
-  registerProcessor("native-clock-main-strip-a3f4912dc25dbdea", MainStripControl);
+  registerProcessor("native-clock-main-strip-a6e7bdc5b0644b28", MainStripControl);
 })();
