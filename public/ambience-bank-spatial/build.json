@@ -1,0 +1,10 @@
+{
+  "api": 1,
+  "profile": "fenced-bank-spatial-source-candidate-v1",
+  "runtime": "1bfa9d01c89fd7f8eb4afd1cd1482657b146ab8f80e86ece83bcf83fba487095",
+  "reference": "a80971f059d4b1f1ab263847f61641a83be321579969bfbf207465e9e3397c9a",
+  "bankVersion": "146ff0774233a61c",
+  "bankWasm": "01d0f5bd1b3f16f0f3a0b9fe0924b72d35b7dfc3f4eecb3daeaee508d84e4286",
+  "sessionVersion": "32a2e8adf636e00c",
+  "version": "9ae3cf1dd2173cb8"
+}

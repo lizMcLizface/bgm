@@ -1,0 +1,6 @@
+/** Bounded control-plane wait. A late answer is observable but cannot revive the
+ * completed wait or authorize a physical source slot to be recycled. */
+export function waitAmbienceSourceAcknowledgement(operation,{ms=5000,label='source retirement',onLate=()=>{},timers=globalThis}={}){
+ if(typeof operation!=='function'||!Number.isInteger(ms)||ms<1||ms>5000||typeof onLate!=='function'||typeof timers?.setTimeout!=='function'||typeof timers.clearTimeout!=='function')throw Error('Invalid bounded source acknowledgement');
+ return new Promise((resolve,reject)=>{let settled=false,timedOut=false;const timer=timers.setTimeout(()=>{if(settled)return;settled=true;timedOut=true;reject(Object.assign(Error(label+' did not acknowledge before retirement deadline'),{code:'AMBIENCE_SOURCE_RETIRE_TIMEOUT',label}));},ms);let value;try{value=operation();if(!value||typeof value.then!=='function')throw Error('Source acknowledgement must be a promise');}catch(error){settled=true;timers.clearTimeout(timer);reject(error);return;}value.then(result=>{if(settled){if(timedOut)onLate({resolved:true});return;}settled=true;timers.clearTimeout(timer);resolve(result);},error=>{if(settled){if(timedOut)onLate({resolved:false});return;}settled=true;timers.clearTimeout(timer);reject(error);});});
+}
