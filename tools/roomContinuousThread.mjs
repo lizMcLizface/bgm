@@ -1,0 +1,1 @@
+import{parentPort}from'node:worker_threads';import{RoomContinuousWorker}from'../src/modular-audio/roomContinuousWorker.js';let unit;parentPort.on('message',d=>{if(!unit&&d.kind==='init')unit=new RoomContinuousWorker(d,p=>parentPort.postMessage(p));else unit?.receive(d);});

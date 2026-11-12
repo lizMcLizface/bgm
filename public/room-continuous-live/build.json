@@ -1,0 +1,68 @@
+{
+  "api": 1,
+  "profile": "room-continuous-worker-prepared-output-controller-v1",
+  "version": "55794c7d73868593",
+  "source": "f7445a2381bc4983fcc227a8e9753bb5f9b6bc294a0b2cd82da1b1b4fc9c11a5",
+  "kernelVersion": "e323611d27ec3a36",
+  "clockVersion": "7a0838a735108706",
+  "processorName": "room-continuous-live-55794c7d73868593",
+  "processor": "ceae00ed712eac8cb8dc5702a65729c768643c88cb986540959886a84bbbd608",
+  "worker": "baaf174371cfa477683453c10cb3f7633ad1c7ca4b7bb1368b86b61316c5cace",
+  "components": {
+    "colour": {
+      "version": "7725ec44e5572cf0",
+      "profile": "chromium-room-colour-f32-128-target-v1",
+      "wasm": "87ce5dd8576f1703de406f3248f574a445dbaeff0151619ab433a26d5f8f1244",
+      "bytes": 75718
+    },
+    "convolver": {
+      "version": "c5dbde0540bfdf83",
+      "profile": "static-f64-nonuniform-128-8192-v1",
+      "wasm": "40a89270ae4e7d0d6a0eeb7ee67b052a46b4cfaa2910f82d68d50586b01f9bba",
+      "bytes": 40857
+    },
+    "control": {
+      "version": "e323611d27ec3a36",
+      "profile": "original-room-output-clock-reserved-gains-v2",
+      "wasm": "8a2a7eff63bd9bd9689d4e62d4e5510eb036c9eb9814949d725f761e6c32cae2",
+      "bytes": 43214
+    }
+  },
+  "files": [
+    "public/convolver/build.json",
+    "public/native-context-clock/build.json",
+    "public/room-colour/build.json",
+    "public/room-control-reserved/build.json",
+    "src/modular-audio/clockedSourceRelease.js",
+    "src/modular-audio/nativeContextClock.js",
+    "src/modular-audio/nativeContextClockCodec.js",
+    "src/modular-audio/ownedConvolver.js",
+    "src/modular-audio/ownedRoomColour.js",
+    "src/modular-audio/ownedRoomColourActivity.js",
+    "src/modular-audio/ownedRoomColourFramed.js",
+    "src/modular-audio/ownedRoomControlLive.js",
+    "src/modular-audio/ownedRoomConvolver.js",
+    "src/modular-audio/ownedRoomReservedControl.js",
+    "src/modular-audio/roomAmountWords.js",
+    "src/modular-audio/roomContinuousNode.js",
+    "src/modular-audio/roomContinuousSpec.js",
+    "src/modular-audio/roomContinuousTransport.js",
+    "src/modular-audio/roomContinuousWorker.js",
+    "src/modular-audio/roomReservedCore.js",
+    "src/modular-audio/roomReservedProcessor.js",
+    "src/modular-audio/sourceDisposalFence.js",
+    "src/modular-audio/stampedWordTransport.js",
+    "tools/buildRoomContinuousHost.mjs"
+  ],
+  "notices": "9d6c3e1f0466d961a18c3745eb336cf8100dc854d0498a8b22617f3da7d1b563",
+  "textEncoding": "utf-8-normalized-LF",
+  "descriptors": 643,
+  "quota": 2,
+  "sessionCap": "floor(sampleRate*3600/128)*128 source frames; end unknown at start",
+  "inputAuthority": "Explicit exact-layout audio or caller-owned silent zero padding; no inferred Native silence/tail",
+  "pcmCredits": "ceil(L/B)+4 <=192; exactly pool*(inputChannels+wetChannels)*B*4 bytes before start",
+  "latency": "One final L=max(2B,ceil(rate*.5/128)*128); dry/wet packet planes share the same L",
+  "controlDomains": "Native absolute output-time prepared amount; immutable source colour/IR; explicit future input-silence authority and ordered END",
+  "normalDefault": false,
+  "scope": "Actual continuous input, no finite source plan; one-hour canonical session cap; unchanged Rust colour/convolution/gains; bounded4-plane pool; explicit caller-owned silent tail and END; no automatic Native tail/default/shared adoption or device deadline claim"
+}
