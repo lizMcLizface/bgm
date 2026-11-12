@@ -1,0 +1,16 @@
+{
+  "api": 1,
+  "profile": "native-context-clock-live-freeze-candidate-v1",
+  "version": "8ca7d41660b2a010",
+  "source": "8ca7d41660b2a010cf8c0118b49b1f7497cdcba163ee01b0508c9f1fa86da4f8",
+  "processor": "67eef0f079d16b6d26645a6e79412145fe855b02a312a0fa0affb92b2f5760a7",
+  "processorName": "native-clock-live-freeze-8ca7d41660b2a010",
+  "files": [
+    "tools/buildNativeContextClockLiveFreeze.mjs",
+    "src/modular-audio/nativeContextClockCodec.js",
+    "src/modular-audio/nativeContextClock.js",
+    "src/modular-audio/nativeContextClockLiveFreeze.js",
+    "src/modular-audio/nativeContextClockLiveFreezeProcessor.js"
+  ],
+  "scope": "NEW candidate live suspension proof: main frozen counter equals last decoded+128; first resumed frame exact; optional independent NativeAAP reference. No default adoption or accepted7a changes."
+}
