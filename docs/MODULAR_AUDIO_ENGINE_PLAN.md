@@ -41,6 +41,32 @@ remaining control-demand/input-topology difference; those negative receipts
 are retained. Normal live Ambience adoption remains pending. See the recipe,
 spatial session and bank/spatial source documents.
 
+Composed Tape3b17c3eb4ede0c9d now runs the explicit Rust lifecycle queue,
+Rust-prepared curves and original DSP together. Its first six48k cases pass:
+four Native continuous/gap cases plus two owned-only authored retirement cases.
+Independent owned PCM is exact; automatic Native tail equivalence is still
+explicitly unassessed. Cold/reused/live resource gates remain separate work.
+Ambience topology8a2063d30442e67d retains the actual-tested a4c21 numeric payload:
+three endpoint/idle-edit cases match wet and aggregate exactly; prior six-layer
+and two-bed regressions pass. The complete normal facade is under review.
+
+Cold offline convolution hostb3535a835c9ff41e uses the unchanged original Rust
+convolver with zero adapter latency. All30 Native comparisons at six rates
+pass (maximum absolute1.4901161193847656e-8), with exact sources, independent
+owners and onsets. Actual pre-render quota/disposal ACK and page-reload PCM
+hashes also pass;35 focused checks cover cold/racing admission, typed receipts,
+quarantine, cleanup aggregation and invalid output. Live/shared rooms retain
+their separate worker/latency contract. See
+MODULAR_AUDIO_ENGINE_OFFLINE_CONVOLVER_HOST.md.
+
+The preparation reservation/idle bridge now passes29 focused checks and an
+actual Native race/shared-owner gate. It holds idle through async creation,
+late-result cancellation and disposal ACK; synchronous publication installs
+continuous policy before releasing the preparation hold. Ordinary Native idle
+behavior remains. No whole-Generator replacement or automatic Main/backend
+selection is implemented by that helper. See
+MODULAR_AUDIO_ENGINE_CONTEXT_PREPARATION.md.
+
 The review-only live-freeze prototype failed strict frozen-frame equality;
 its general acceptance is withdrawn. Independent Native vectors prove a128-frame
 destination no-pull gap. A separate explicit continuous-context policy now
@@ -64,7 +90,7 @@ full-suite/audio load; that negative is retained, and the repeat ran alone.
 No physical deadline/quality guarantee or workload attribution is inferred.
 Evidence and temporary scripts stay in ignored reports/ and reports/scripts/.
 
-Next: integrate the declared continuous context in selected application hosts;
+Next: finish stopped owner-bundle integration in selected application hosts;
 close Ambience input-topology/demand and queued Tape lifecycle ownership; then
 adopt the accepted profiles and finish remaining Filter activity, shared-room
 latency and Freeze host/transport boundaries. Hidden measured cello remains

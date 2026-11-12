@@ -1,0 +1,19 @@
+{
+  "api": 1,
+  "profile": "offline-continuous-convolver-v1",
+  "version": "b3535a835c9ff41e",
+  "kernelVersion": "c5dbde0540bfdf83",
+  "wasm": "40a89270ae4e7d0d6a0eeb7ee67b052a46b4cfaa2910f82d68d50586b01f9bba",
+  "source": "4e0db3503796661a6807f3857c0191311b9ea04a973a10f9cb8b3df0af55e206",
+  "processor": "b36e7e6844ee8199764209a0d006924363883ce2279e6bc22b19c89f614fa86a",
+  "processorName": "owned-offline-convolver-b3535a835c9ff41e",
+  "files": [
+    "tools/buildOfflineConvolverHost.mjs",
+    "src/modular-audio/offlineConvolverNode.js",
+    "src/modular-audio/offlineConvolverProcessor.js",
+    "src/modular-audio/ownedConvolver.js",
+    "public/convolver/build.json"
+  ],
+  "latencyFrames": 0,
+  "scope": "Offline-only fixed captured IR and declared continuous input; up to two owners. No realtime/shared-room/IR replacement/default adoption."
+}
