@@ -1,0 +1,35 @@
+{
+  "api": 1,
+  "profile": "original-sweep-live-v1",
+  "chromiumRevision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+  "textEncoding": "utf-8-normalized-LF",
+  "scope": "Original SweepFilter HP->LP, four independent scheduled Native timelines. Explicit captured/frozen complete-call insertion epoch; zero added latency, immutable logical1/2channel layout, declared pull only. No synchronous isOpen, universal browser, automatic Native tail or normal Generator adoption claim.",
+  "sources": [
+    {
+      "path": "synth-engine/fdn-room-live/src/timeline.rs",
+      "sha256": "3da5589996b375866c8fd3836a2123c5be338511d4db64ba3ecfb2a244a34d5b"
+    },
+    {
+      "path": "synth-engine/rack-native/src/biquad.rs",
+      "sha256": "cc2396878e3f13a7b452270291a84139129e077d9ee01b47ae27cf55612e0d6c"
+    },
+    {
+      "path": "synth-engine/rack-native/src/tail.rs",
+      "sha256": "00e5633fcfa7b319138aab758cad7e2a829a6513753a76af551a2e0cb651ba9d"
+    }
+  ],
+  "nativeReferences": [
+    "src/app/engine/sweepFilter.js"
+  ],
+  "nativeOrder": [
+    "LP.frequency",
+    "HP.frequency",
+    "LP.Q",
+    "HP.Q"
+  ],
+  "initialRaw": {
+    "lowpass": 22000,
+    "highpass": 10,
+    "resonance": 0.7071067811865476
+  }
+}

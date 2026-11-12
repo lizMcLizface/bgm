@@ -1,0 +1,27 @@
+{
+  "api": 1,
+  "profile": "original-sweep-live-v1",
+  "audited": false,
+  "textEncoding": "utf-8-normalized-LF",
+  "version": "9f946a992e346794",
+  "source": "3b48efd79429bd56fbd76ca34af296d3f98ed3aa9ce8124c9ec11a61b680c708",
+  "wasm": "3132b76a0e11f598a96df859f7cf895da014ac408657a9be4855c011fdd8eab2",
+  "bytes": 76394,
+  "files": [
+    "synth-engine/sweep-live/Cargo.toml",
+    "synth-engine/sweep-live/Cargo.lock",
+    "synth-engine/sweep-live/src/lib.rs",
+    "synth-engine/sweep-live/src/allocation.rs",
+    "synth-engine/sweep-live/CHROMIUM_PROFILE.json",
+    "synth-engine/sweep-live/CHROMIUM_NOTICES.txt",
+    "synth-engine/fdn-room-live/src/timeline.rs",
+    "synth-engine/rack-native/src/biquad.rs",
+    "synth-engine/rack-native/src/tail.rs",
+    "src/app/engine/sweepFilter.js",
+    "src/modular-audio/ownedSweepLive.js",
+    "tools/buildSweepLive.mjs"
+  ],
+  "scope": "Original SweepFilter HP->LP, four independent scheduled Native timelines. Explicit captured/frozen complete-call insertion epoch; zero added latency, immutable logical1/2channel layout, declared pull only. No synchronous isOpen, universal browser, automatic Native tail or normal Generator adoption claim.",
+  "profileSha256": "1e892c9a54dd18573b13a78c44a8612b6a0aba94a94fc0b3baf581bba157a0ee",
+  "notices": "06fc4b06114f5ad3055d56e2b5825ba7c13834d613460937ec819fda44baad71"
+}

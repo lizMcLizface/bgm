@@ -1,0 +1,31 @@
+{
+  "api": 1,
+  "profile": "original-sweep-live-host-v1",
+  "audited": false,
+  "textEncoding": "utf-8-normalized-LF",
+  "version": "5d0df54e500f5e1a",
+  "kernelVersion": "9f946a992e346794",
+  "clockVersion": "7a0838a735108706",
+  "processorName": "sweep-live-5d0df54e500f5e1a",
+  "processor": "8380c9a1c6ec2f77d6ae4988eabc470d5ac1df1d1f37ff5b33ad9794df4e7b25",
+  "source": "eabf4f05c8441a1785d337566c0b6cb4353a86072b2b72f5928ba6ef78f886fe",
+  "files": [
+    "tools/buildSweepLiveHost.mjs",
+    "src/nodes/sweepRust.js",
+    "src/modular-audio/sweepLiveProcessor.js",
+    "src/modular-audio/sweepLiveWords.js",
+    "src/modular-audio/ownedSweepLive.js",
+    "src/modular-audio/stampedWordTransport.js",
+    "src/modular-audio/nativeContextClock.js",
+    "src/modular-audio/nativeContextClockCodec.js",
+    "src/modular-audio/fdnRoomArmReceipt.js",
+    "src/modular-audio/sourceDisposalFence.js",
+    "src/modular-audio/clockedSourceRelease.js",
+    "src/app/engine/sweepFilter.js"
+  ],
+  "wasm": "3132b76a0e11f598a96df859f7cf895da014ac408657a9be4855c011fdd8eab2",
+  "bytes": 76394,
+  "metadataDescriptors": 805,
+  "referenceSweepSha256": "013e3a972ae4e3b21a5e3e5ccd7a3a345c6a3177bb1cbf9ef49957f0799b070e",
+  "scope": "Optional immutable1/2logical-channel original HP->LP Sweep, captured/frozen four-handler complete-call insertion epoch,32ACK-bounded21rawF64word rows, Source7a, explicit physical demand and reconnect, fresh live clock ACK and one-way terminal gate. No global Generator adoption or synchronous isOpen/automatic Native tail/unmatched live GUI/physical deadline claim."
+}

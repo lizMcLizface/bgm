@@ -1,0 +1,9 @@
+import{StampedFloat64Words}from'./stampedWordTransport.js';
+export const SWEEP_WORD_OPTIONS=Object.freeze({wordCount:21,slots:32,prefix:'sweep'});
+export function validateSweepSet(raw={},tc=.1){if(!raw||typeof raw!=='object'||Array.isArray(raw)||typeof tc!=='number'||!Number.isFinite(tc))throw Error('Invalid Sweep complete call');for(const [key,fallback]of[['lowpass',22000],['highpass',10],['resonance',Math.SQRT1_2]]){const v=raw[key]===undefined?fallback:raw[key];if(typeof v!=='number'||!Number.isFinite(v)||!Number.isFinite(Math.fround(v)))throw Error('Invalid Sweep '+key);}return raw;}
+export class SweepLiveWordCodec{
+ constructor(){this.f64=new StampedFloat64Words();this.words=new Uint16Array(21);this.values={lowpass:22000,highpass:10,resonance:Math.SQRT1_2};this.tc=0;this.seconds=0;}
+ encode(values={},tc=.1,seconds){validateSweepSet(values,tc);if(typeof seconds!=='number'||!Number.isFinite(seconds)||seconds<0)throw Error('Invalid Sweep original seconds');this.words[0]=tc>0?2:0;for(const[i,v]of[seconds,values.lowpass??22000,values.highpass??10,values.resonance??Math.SQRT1_2,tc].entries())this.f64.encode(v,this.words,1+i*4);return this.words;}
+ decode(words,offset=0){if(!Number.isInteger(offset)||offset<0||offset+21>words.length)throw Error('Invalid Sweep word offset');this.seconds=this.f64.decode(words,offset+1);this.values.lowpass=this.f64.decode(words,offset+5);this.values.highpass=this.f64.decode(words,offset+9);this.values.resonance=this.f64.decode(words,offset+13);this.tc=this.f64.decode(words,offset+17);validateSweepSet(this.values,this.tc);if(!Number.isFinite(this.seconds)||this.seconds<0||words[offset]!== (this.tc>0?2:0))throw Error('Invalid Sweep word schema');return this;}
+ apply(core,author){if(this.seconds!==author/core.rate)throw Error('Sweep original seconds differ from captured author epoch');core.set(this.values,this.tc,author,this.seconds);}
+}
