@@ -1,5 +1,7 @@
 # Modular audio engine handoff
 
+**Fresh-session entry:** [Cleanup and convergence handoff](MODULAR_AUDIO_ENGINE_CLEANUP_HANDOFF.md). Port expansion is stopped; this records the frozen WIP, latest verified baseline and cleanup priorities. Read it before the historical chronology below.
+
 12 November original-effect integration checkpoint: original Delay/PingPong live ownership, Chorus/Phaser numerical graphs, explicit Flanger traversal profiles, both READY-resource and synchronous literal-cell Distortion numerical paths, and the two-stage rack trim/processed/bypass pair are now committed locally. These are separate verified components; the normal application remains hybrid.
 
 The [original delay tempo integration](MODULAR_AUDIO_ENGINE_ORIGINAL_DELAY_TEMPO.md) now preserves future targets/cancellation through the real parent scheduler. A retained stereo failure identified Native per-channel timeline evaluation; the separate corrected kernel/host passes48 browser cases including full document reload, all192 Native comparisons WORD0,96 Rust and96 Native clean releases, and12288 allocation-audited render quanta. The old171/880 artifacts and default Native scheduler body remain intact.
