@@ -1,0 +1,33 @@
+{
+  "api": 1,
+  "profile": "native-clock-main-trim-ambience-cold-host-v1",
+  "version": "c1e0b0de13f74073",
+  "source": "a47a86c0783dfa569e81640187ce86d9cbf290e62038e68df2bfca722506eaf0",
+  "processor": "03fdb37200b9607896f6dcce5b513ab9fc20547c36c54b3d77e5d35bed990b98",
+  "processorName": "native-clock-main-scalar-c1e0b0de13f74073",
+  "kernelVersion": "03eb5d894a75d801",
+  "wasm": "3e3f881187fb73cb236d9bf4f35c6c4de20df5fb2738f291cf24f1d12e834e31",
+  "clockVersion": "7a0838a735108706",
+  "files": [
+    "public/main-strip-live/build.json",
+    "public/native-context-clock/build.json",
+    "src/modular-audio/clockedSourceRelease.js",
+    "src/modular-audio/mainControlWords.js",
+    "src/modular-audio/mainRoleControlProcessor.js",
+    "src/modular-audio/mainScalarColdGroup.js",
+    "src/modular-audio/mainScalarColdNode.js",
+    "src/modular-audio/mainScalarColdProcessor.js",
+    "src/modular-audio/mainScalarColdRecipe.js",
+    "src/modular-audio/mainStripControlCore.js",
+    "src/modular-audio/mainStripControlProcessor.js",
+    "src/modular-audio/mainStripLiveRust.js",
+    "src/modular-audio/nativeContextClock.js",
+    "src/modular-audio/nativeContextClockCodec.js",
+    "src/modular-audio/sourceDisposalFence.js",
+    "src/modular-audio/stampedWordTransport.js",
+    "tools/buildMainScalarCold.mjs"
+  ],
+  "textEncoding": "utf-8-normalized-LF",
+  "descriptors": 579,
+  "scope": "Two stereo trim/ambience group scalars plus optional separately owned output, no phantom target; unchanged accepted Rust gain math. Virgin Source7a first0, isolated activation ACK,32commands/256events and shared3named-owner quota beside6roles. No masterOutput getter/fade/Generator selection."
+}

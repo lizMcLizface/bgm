@@ -1,0 +1,11 @@
+import{MainRoleControlProcessor,mainRoleControlDescriptors}from'./mainRoleControlProcessor.js';
+import{validateMainScalarConfiguration}from'./mainScalarColdRecipe.js';
+export const mainScalarColdDescriptors=mainRoleControlDescriptors;
+/** Adds only cold admission/FIFO fences. All render/control math stays in the accepted core. */
+export class MainScalarColdProcessor extends MainRoleControlProcessor{
+ constructor(p,...rest){const scalarName=p.configuration?.name;const configuration={...p.configuration};delete configuration.name;super({...p,configuration},...rest);this.scalarName=scalarName;this.configured=false;try{validateMainScalarConfiguration({...configuration,name:scalarName});if(this.error)throw Error(this.error);}catch(error){this.fail(error);}}
+ snapshot(){return{...super.snapshot(),scalarName:this.scalarName??null,configured:this.configured??false,birthFreeSlots:this.core?.unit&&this.firstFrame===null?this.core.unit.freeSlots(0):null};}
+ fail(error){if(this.error)return;this.error=String(error);let stats;try{stats=this.snapshot();}catch{}this.emit({kind:'error',error:this.error,stats});this.release();}
+ message(data){if(data?.kind!=='configured')return super.message(data);try{if(this.error||this.disposed||!this.codec||this.codec.spec.epochFrame!==0||this.codec.spec.generation!==1||this.codec.calls!==0||this.firstFrame!==null||this.core.unit.stats().calls!==0||Object.keys(data).length!==2||!Number.isInteger(data.request)||data.request<1||data.request>4294967295)throw Error('Cold scalar configured fence lost virgin Native authority');this.configured=true;this.emit({kind:'configured',request:data.request,stats:this.snapshot()});}catch(error){this.emit({kind:'rejected',request:data?.request,error:String(error)});}}
+ process(inputs,outputs,parameters){if(!this.disposed&&!this.error&&this.firstFrame===null){const low=parameters.nativeClockLow,coarse=parameters.nativeClockCoarse,demand=parameters.hostDemand;if(!this.configured||!this.codec||low?.[0]!==1||coarse?.[0]!==0||!demand||demand.some(v=>v!==0)||(inputs[0]??[]).length){for(const out of outputs)for(const c of out)c.fill(0);this.fail(Error('Cold scalar requires configured isolated first Native frame zero'));return false;}}return super.process(inputs,outputs,parameters);}
+}
