@@ -6,6 +6,7 @@ import Instrument from './Instrument';
 
 const standIn = () => {
     const inst = {
+        preflightRoomPreset: Instrument.prototype.preflightRoomPreset,
         now: 0,
         preset: { masterVolume: 0.2 },
         morph: null,

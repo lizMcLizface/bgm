@@ -3,7 +3,7 @@ import {it,expect,vi} from 'vitest';
 vi.mock('../../audio/context',()=>({audioContext:{}}));
 import Instrument from './Instrument.js';
 function standIn(material='piano',backend='owned-rust') {
- const source={sync:vi.fn(),dispose:vi.fn()},preset={stringModel:material,pianoType:'felt',masterVolume:.3},morph={to:{...preset,pianoType:'electric'},timer:32},i={sourceBackend:backend,preset,morph,AC:{currentTime:12},voices:[{voiceId:7}],awake:[true],held:new Map([[9,{voiceId:7,index:0}]]),busyUntil:[Infinity],finishMorph:vi.fn(),updateChain:vi.fn(),updateEnvelopes:vi.fn(),set:vi.fn(),pianoSource:material==='piano'?source:null,pluckedSource:material==='plucked'?source:null};
+ const source={sync:vi.fn(),dispose:vi.fn()},preset={stringModel:material,pianoType:'felt',masterVolume:.3},morph={to:{...preset,pianoType:'electric'},timer:32},i={preflightRoomPreset:Instrument.prototype.preflightRoomPreset,sourceBackend:backend,preset,morph,AC:{currentTime:12},voices:[{voiceId:7}],awake:[true],held:new Map([[9,{voiceId:7,index:0}]]),busyUntil:[Infinity],finishMorph:vi.fn(),updateChain:vi.fn(),updateEnvelopes:vi.fn(),set:vi.fn(),pianoSource:material==='piano'?source:null,pluckedSource:material==='plucked'?source:null};
  return {i,source,preset,morph};
 }
 it.each(['piano','plucked'])('refuses %s material replacement atomically for set/apply/morph',material=>{
