@@ -1,0 +1,8 @@
+export const LIVE_ROOM_NATIVE_LIMITS=Object.freeze({maxAbsoluteError:1e-4,relativeRms:1e-4});
+export function liveRoomCompare(a,b,{exact=false}={}){
+ if(a.length!==b.length||a.some((p,c)=>p.length!==b[c].length))throw Error('Live Room comparison layout differs');let maxAbsoluteError=0,energy=0,delta=0,nonFinite=0,firstDifferenceFrame=null,differingWords=0;const peaks=[];
+ for(let c=0;c<a.length;c++){let actualPeak=0,referencePeak=0;const aw=new Uint32Array(a[c].buffer,a[c].byteOffset,a[c].length),bw=new Uint32Array(b[c].buffer,b[c].byteOffset,b[c].length);for(let i=0;i<a[c].length;i++){const x=a[c][i],y=b[c][i];if(!Number.isFinite(x)||!Number.isFinite(y)){nonFinite++;continue;}const d=x-y;delta+=d*d;energy+=y*y;maxAbsoluteError=Math.max(maxAbsoluteError,Math.abs(d));actualPeak=Math.max(actualPeak,Math.abs(x));referencePeak=Math.max(referencePeak,Math.abs(y));if(aw[i]!==bw[i]){differingWords++;if(firstDifferenceFrame===null)firstDifferenceFrame=i;}}peaks.push({actualPeak,referencePeak});}
+ const relativeRms=energy?Math.sqrt(delta/energy):delta?Infinity:0;return{maxAbsoluteError,relativeRms,nonFinite,firstDifferenceFrame,differingWords,bitExact:differingWords===0,peaks,checksPassed:nonFinite===0&&(exact?differingWords===0:maxAbsoluteError<=LIVE_ROOM_NATIVE_LIMITS.maxAbsoluteError&&relativeRms<=LIVE_ROOM_NATIVE_LIMITS.relativeRms)&&peaks.every(p=>p.referencePeak>1e-8)};
+}
+export function liveRoomDelayed(pcm,frames){return pcm.map(p=>{const out=new Float32Array(frames+p.length);out.set(p,frames);return out;});}
+export function liveRoomSpeakerPair(planes){return planes.length===1?[planes[0],planes[0]]:planes;}

@@ -1,0 +1,58 @@
+{
+  "api": 1,
+  "profile": "live-room-complete-prepared-worker-v1",
+  "version": "500e21b661710c7e",
+  "source": "0fa87cbc20f6411ede09bf6d4123f0c34398ee63bb1ca7d574181c346308ab62",
+  "clockVersion": "7a0838a735108706",
+  "processorName": "owned-live-complete-room-500e21b661710c7e",
+  "processor": "fc976c6358118c8c916c5c4443a49d9f4a273c06c73c597e087d7a3a29876cdd",
+  "worker": "f5f7038d2a879cf24ac8fa4a2a19af2a751184f6932dfd7fd28d5249131a77e4",
+  "components": {
+    "colour": {
+      "version": "7725ec44e5572cf0",
+      "profile": "chromium-room-colour-f32-128-target-v1",
+      "wasm": "87ce5dd8576f1703de406f3248f574a445dbaeff0151619ab433a26d5f8f1244",
+      "bytes": 75718
+    },
+    "convolver": {
+      "version": "c5dbde0540bfdf83",
+      "profile": "static-f64-nonuniform-128-8192-v1",
+      "wasm": "40a89270ae4e7d0d6a0eeb7ee67b052a46b4cfaa2910f82d68d50586b01f9bba",
+      "bytes": 40857
+    },
+    "mix": {
+      "version": "c7b4ee0c1094a319",
+      "profile": "original-room-unsmoothed-drywet-step-v1",
+      "wasm": "5dacd43ff02ca8e9fac04a5a24b2fa3b536f3ec7e561186acd61dc6a75a0426d",
+      "bytes": 35297
+    }
+  },
+  "files": [
+    "public/convolver/build.json",
+    "public/native-context-clock/build.json",
+    "public/room-colour/build.json",
+    "public/room-complete-mix/build.json",
+    "src/modular-audio/liveRoomCompleteNode.js",
+    "src/modular-audio/liveRoomCompleteProgram.js",
+    "src/modular-audio/liveRoomCompleteProtocol.js",
+    "src/modular-audio/liveRoomCompleteTransport.js",
+    "src/modular-audio/liveRoomCompleteWorker.js",
+    "src/modular-audio/nativeContextClock.js",
+    "src/modular-audio/nativeContextClockCodec.js",
+    "src/modular-audio/ownedConvolver.js",
+    "src/modular-audio/ownedLiveRoomComplete.js",
+    "src/modular-audio/ownedRoomColour.js",
+    "src/modular-audio/ownedRoomColourActivity.js",
+    "src/modular-audio/ownedRoomColourFramed.js",
+    "src/modular-audio/ownedRoomCompleteMix.js",
+    "src/modular-audio/ownedRoomConvolver.js",
+    "tools/buildLiveRoomCompleteHost.mjs"
+  ],
+  "textEncoding": "utf-8-normalized-LF",
+  "notices": "9d6c3e1f0466d961a18c3745eb336cf8100dc854d0498a8b22617f3da7d1b563",
+  "quota": 2,
+  "transport": "dedicated transferable PCM MessagePort; no main-thread PCM relay",
+  "latency": "max(2*blockFrames,ceil(rate*0.5/128)*128), applied once to final dry/wet PCM",
+  "normalDefault": false,
+  "scope": "Prepared finite framed-colour/two-original-clock gain book; known-layout source-owned scheduled start. No mutable GUI/IR switching/automatic native tail/deadline or zero-JS-allocation claim."
+}

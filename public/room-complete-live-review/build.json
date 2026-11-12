@@ -1,0 +1,15 @@
+{
+  "api": 1,
+  "profile": "room-complete-live-source-and-output-capture-v1",
+  "version": "c6511ac6c2b40bd5",
+  "source": "c6511ac6c2b40bd5dfe74f179201a49d7d3964252bfb3539f151e2fded24aeb7",
+  "processor": "0607e214c24eee85a51d9f4b5e3dc952b1c2c048e01b865e1468a8d817fbfe8b",
+  "processorName": "complete-room-live-capture-c6511ac6c2b40bd5",
+  "files": [
+    "src/modular-audio/nativeContextClockCodec.js",
+    "tools/buildLiveRoomCompleteReview.mjs",
+    "tools/liveRoomCompleteCapture.js"
+  ],
+  "textEncoding": "utf-8-normalized-LF",
+  "scope": "Review-only separate identical logical capturers. Native7a decoded source epochs; no audio normalization, fitted shift, main-thread PCM relay or shared merger."
+}

@@ -1,0 +1,1 @@
+import{parentPort}from'node:worker_threads';import{LiveRoomCompleteWorker}from'../src/modular-audio/liveRoomCompleteWorker.js';let unit;parentPort.on('message',data=>{if(!unit&&data.kind==='init')unit=new LiveRoomCompleteWorker(data,d=>parentPort.postMessage(d));else unit?.receive(data);});
