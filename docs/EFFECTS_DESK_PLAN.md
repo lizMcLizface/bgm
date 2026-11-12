@@ -1,5 +1,11 @@
 # Effects desk and independent effect boxes
 
+12 November port continuation: the current [engine handoff](MODULAR_AUDIO_ENGINE_HANDOFF.md)
+records accepted Rust Main controls, prepared Room capacity and stopped source/return
+ownership. Desktop checks are grouped; no repeated phone settings or per-preset
+listening is required for these internal steps. The normal workbench remains
+hybrid and keeps its existing defaults. No deployment occurred.
+
 M4c foundation update (2026-11-10): [owned basic-kit configuration](MODULAR_AUDIO_ENGINE_M4C_KIT_CONFIGURATION.md)
 prepares selected palettes/per-drum controls in the opt-in graph, retaining the
 actual kick bus and byte-identical legacy percussion ABI. Exact configured PCM,

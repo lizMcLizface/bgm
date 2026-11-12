@@ -1,5 +1,11 @@
 # Synths/all workbench pass
 
+12 November port continuation: the current [engine handoff](MODULAR_AUDIO_ENGINE_HANDOFF.md)
+records accepted Rust Main controls, prepared Room capacity and stopped source/return
+ownership. Desktop checks are grouped; no repeated phone settings or per-preset
+listening is required for these internal steps. The normal workbench remains
+hybrid and keeps its existing defaults. No deployment occurred.
+
 M3k update: [run-bound listening records](MODULAR_AUDIO_ENGINE_M3K_LISTENING.md)
 now support local save/review/JSON export without changing playback settings or
 automated results. User reports Short / 96 kHz / +2 helps while open but is

@@ -1,73 +1,105 @@
 # Modular audio engine and parallel rendering plan
 
 Current continuation — 12 November 2026:
-The explicit prepared environment is still a hybrid; the all-Rust application
-port is not complete. Native defaults remain operational. The requested push
-through 111d282 completed using lizMcLizface; subsequent verified checkpoints
-are local commits with the same author and committer. No deployment occurred.
+The explicit prepared environment remains hybrid. The requested push through
+111d282 completed under lizMcLizface; subsequent verified steps are local
+commits with the same author and committer. No deployment occurred. Native
+defaults and existing DSP remain operational.
 
-Final Main host identity is `a6e7bdc5b0644b28`: its complete processor differs
-from the451c credit-host gate only by that host identity after source-format
-cleanup. Kernel03eb and all numerical bytes remain unchanged; the exact
-normalization proof is in the live Main host record.
+The current accepted control and ownership boundaries are:
 
-Current Main credit successor (supersedes the temporary lifetime bound below):
-`451c2a3d35ad1e5b` /kernel`03eb5d894a75d801` adds exact read-only Rust capacity
-queries at the observed Native callback frame. The original command/render and
-accepted DSP helper bodies remain byte-identical. Actual reclaimed capacity now
-supports continuing edits while retaining the256-simultaneous-event/lane and
-32-unobserved-record bounds. All36 six-rate/two-owner Native cases stay word
-exact, and true HTML reload repeats the complete640,413-byte result exactly.
-An actual48k browser group passes source/output/independence, primary/survivor,
-quota and suspend cleanup, plus1,024 real Native metadata commands with zero
-rejects and no pending debt. Its immediate past-zero soak explicitly reports
-516 late publications and1,024 main-thread clamps; no unsuspended GUI timing
-identity or reconstruction of earlier output is claimed. The updated Rust audit
-includes147,456 queries and retains zero allocation/free/growth.57 focused
-checks pass. See the [live Main host](MODULAR_AUDIO_ENGINE_MAIN_STRIP_CONTROL_HOST.md).
+- [Main control host](MODULAR_AUDIO_ENGINE_MAIN_STRIP_CONTROL_HOST.md):
+  host a6e7bdc5b0644b28 and kernel 03eb5d894a75d801 implement continuous
+  Rust tone/volume/duck with actual Native source7a frames, raw Float64
+  set/target/cancel and reusable DSP timeline credits. All 36 six-rate
+  two-owner Native cases are word exact; a true HTML reload repeats the
+  complete640,413-byte predecessor report. An actual 48 kHz group also proves
+  independent output, quota, suspension retirement and1,024 real Native
+  metadata commands. Its deliberate past-zero soak reports516 late
+  publications and1,024 clamps; this is not unsuspended GUI timing identity.
+  The final host changes only identity literals from the measured451c host.
+  The normal Generator has not adopted this control host.
+- [Room output controls](MODULAR_AUDIO_ENGINE_ROOM_OUTPUT_CONTROL.md):
+  current metadata kernel fad3957360bc0aa1, direct c0d7d48849cd5e9a and split
+  d816a0dcaf998eec preserve the measured original gain/colour/convolution
+  bodies. Six-rate direct gains are word exact; the split matrix passes
+  24 cases/48 Native comparisons with maximum absolute error2.9802322387695312e-8.
+  Real lifecycle, worker termination, clock release and true 192 kHz cold
+  reconstruction are recorded separately. The tiny offset-guard successors
+  preserve the old numerical bodies and pass an actual 48 kHz recheck.
+- [Prepared Room admission](MODULAR_AUDIO_ENGINE_ROOM_PREPARED_AMOUNT.md):
+  e323611d27ec3a36 /eab4968025d06a07 /664ffad7162e4a71 reserve two actual
+  Rust timeline lanes BEFORE parent preset mutation. Real browser checks
+  hold16 READY tickets, refuse excess/foreign handles, cancel and reuse 64 times,
+  and refuse a full 255-event timeline without changing parent settings.
+  Direct24 cases/48 Native comparisons are word exact. The full split24/48
+  matrix retains the same2.9802322387695312e-8 maximum error, exact source and
+  independence, and clean ACK/worker/clock release before context close.
+  Prepared-ticket cold/suspend replay and normal/shared/mutable-IR adoption
+  remain separate; these finite source plans do not admit arbitrary live input.
+- [Editable Main ownership](MODULAR_AUDIO_ENGINE_MAIN_EDITABLE_RUNTIME.md):
+  opt-in stopped Core/FM slots, dynamic bus/space placeholders and a stable
+  Generator sweep root pass 342 focused checks plus the actual V6 group.
+  Six-rate Native sweep PCM is exact. The actual direct swap is Glass Bells
+  FM to Round Bass FM; the whole matrix also includes subtractive material.
+  All six unique old retiring pull receipts and five final source receipts
+  retain actual input/FIFO/Native-frame evidence through clean terminal ACKs.
+  The final bus and space are genuinely created after successor publication.
+  The running registry is empty and sweep released with zero borrows before
+  context close. Retained V3/V4 failures and V5 limited evidence stay distinct.
+- [Echo terminal ownership](MODULAR_AUDIO_ENGINE_ECHO_TERMINAL_LIFECYCLE.md):
+  c59effae4592c9da retains the old a994 numerical binary/render/stop bodies,
+  requires actual terminal release and awaits routed effect cleanup. The
+  actual 12-case 48 kHz Native group and independent cancellation/survivor group
+  pass. Intentional clear/stats cancellation is ignored only after its
+  enclosing voice is disposed; genuine health failures remain visible.
+- [Physical initialization](MODULAR_AUDIO_ENGINE_PHYSICAL_INITIALIZATION.md)
+  10cf4444a452d47e requires an actual matching processor READY receipt.
+  Three actual source owners, cancellation, positive terminal releases and
+  cold Offline output pass with the old253,652-byte numerical binary intact.
+  The separate [physical source7a profile](MODULAR_AUDIO_ENGINE_PHYSICAL_NATIVE_CLOCK.md)
+  1801c0a4ee6d82c8 now passes an actual 48 kHz group:72,064 old/new KS frames
+  word exact, nonzero piano, an eight-second Native wrap, fresh reused source,
+  sleep with frozen Rust age, independence, cancellation and ACK-held private
+  pull/clock release. Its99 focused checks pass. This is a separate live-only
+  factory; whole Instrument/Main admission and other-rate live acceptance remain open.
 
-Latest committed control/lifecycle continuation (12 November):
+Next implementation: introduce an explicit cold six-role Rust control root
+before the first prepared Main publication, preserving original authoring
+order, whole-group capacity admission and exact source destinations. Complete
+the physical source7a admission and continuous-input private Room boundaries.
+Then close remaining master fade/trim/sweep/send, outer Instrument and shared
+routing seams before any claim that the application is all Rust. Cable editing
+and a default-backend change are later decisions.
 
-- The [explicit live Main control host](MODULAR_AUDIO_ENGINE_MAIN_STRIP_CONTROL_HOST.md)
-  `a3f4912dc25dbdea` now executes tone, volume and duck in the mutable Rust kernel
-  `efeda6631d83ff91`, with exact Native source7a author/output frames and raw
-  Float64 set/target/cancel records. All36 grouped six-rate mono/stereo cases,
-  two actual worklets each, have zero different words against original Native
-  chains. True HTML reload repeats the complete626,877-byte report exactly.
-  An actual48k live group proves exact source/outputs, primary retirement,
-  nonzero continuing survivor, third-owner refusal and suspension retirement.
-  The29 focused kernel/host checks and both provenance checks pass. This remains
-  an explicit continuous host:32unobserved records, conservative256 lifetime
-  insertions/lane including constructor steps; no normal Main/GUI adoption,
-  unbounded timeline credit or linear/hold/dynamic intrinsic support.
-- [Native constructor B1](MODULAR_AUDIO_ENGINE_NATIVE_CONSTRUCTOR_LIFECYCLE.md)
-  and [inner source B2a](MODULAR_AUDIO_ENGINE_NATIVE_INNER_SOURCE_LIFECYCLE.md)
-  are committed ownership prerequisites. B2a passes241 focused checks, real
-  two-owner White/Pink/Brown/Crusher/Tape output/retirement, and all2,031 original
-  drive curves /4,161,519 samples exactly. Its Tape metadata is explicitly
-  `d0e8f7c36f127ed9` (underlying TapeLive `e68ef063400479f0`); the numerical
- 178,186-byte Tape binary and all other baseline Wasm are unchanged. The original
- 3b17 receipt remains separately pinned and its full processor body is recovered
-  by replacing only three host-version literals. JS Noise/Crusher are still JS;
-  whole Instrument construction/factory and physical-family admission remain open.
-- Mutable Room output controls are being checked separately. The six-rate
-  `4f4e00c9e6fabaea` matrix passes24cases/48Native comparisons; its actual lifecycle
-  gate found a real pending-dispose/clock-retirement race. Successor
-  `13629fa3a440d127` preserves the complete numerical/processor/Worker bodies and
-  now passes three actual source7a generations and all ten positive terminal
-  ACK/Worker/clock releases. Its true cold recipe and direct-controller layout
-  gates are still pending. Neither historical Room proof nor a family label
-  admits general private/shared Room routing automatically.
+Current assembled verification at 8029c76 plus the reviewed source-reference
+and registration changes: npm.cmd run build:public passes (40.24s), including
+all 77 provenance checks, seven added Room review pages and the physical7a
+manifest. The full tracked suite passes733 files /6,203 tests, with four
+skipped, in 208.83s. The first negative run retained one obsolete raw-Motion
+fixture loader; its corrected check verifies and executes the already published
+constructor-journal reference. Two old Graph-wrapper metadata references were
+also refreshed. All 70 tracked Wasm binaries remain byte-identical to 8029c76;
+the two rack inner kernels/hosts and every numerical processor remain unchanged.
+Mixer host-reference metadata is b97b204c8e0cd0f4 (same 87,806-byte Wasm);
+Crusher/Pitch/ZPlane wrapper metadata is 53031fb88ab5ae4d and Width/Ring extra
+metadata is 6447e47d975c6fab. These are reference successors, not new DSP claims.
 
-Next work: finish the Room control recipe/layout gates, complete stopped source
-and lazy-return editing ownership, and close outer Instrument acquisition and
-factory cleanup before selected physical-family admission. Then integrate the
-explicit Rust Main control host with the original UI authoring contract and
-run a fresh assembled public build/regression group. The690-file/5748-check
-full-suite result below belongs to the earlier1ba43f8 assembly, before these
-later leaf commits; it is not evidence for current unfinished parallel changes.
+The built static preview also passes the real Room reservation/resource group
+and Main live audio/lifecycle group: exact source/output and independence,
+1,024-command capacity reuse, primary/survivor and suspension cleanup, all
+released. These muted built-bundle gates do not claim physical listening or
+unsuspended Native GUI timing identity.
 
-Latest leaf checkpoints (read before the older history below):
+Logs and exact numerical/provenance receipts live under ignored reports/modular_audio/.
+Temporary scripts live under ignored reports/scripts/. The older 690-file/
+5,748-pass result belongs to 1ba43f8 and remains historical. NEW untracked
+six-role control, continuous-input Room and outer Instrument work is excluded
+from this tracked-suite/public-build acceptance; it remains unselected.
+
+## Earlier checkpoint history
+
+Accepted leaf history (dates and superseded limitations retained):
 
 - Complete cold Room `be3bdf1dc8315dd8` passes 24 Full/Light mono/stereo
   cases across six rates, two owners and true cold reload. Maximum absolute
