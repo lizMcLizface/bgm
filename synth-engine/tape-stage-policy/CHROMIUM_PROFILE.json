@@ -1,0 +1,61 @@
+{
+  "kind": "original-tape-stage-policy-source",
+  "version": 2,
+  "revision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+  "scope": "Separate literal AudioHandler per-stage connected-input/tail model; exact input silence is supplied metadata, not numerical detection. Standalone/Native source-ended acceptance required; accepted Tape DSP unchanged.",
+  "sources": [
+    {
+      "file": "reports/scripts/pinned/audio_handler.cc",
+      "normalizedLfSha256": "37dd5f0b367b18db123e12193ad7f2e71fde99d63aaded84f7017e77a07b8d9b",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_handler.cc"
+    },
+    {
+      "file": "reports/scripts/pinned/audio_handler.h",
+      "normalizedLfSha256": "77a23aab1199155f0e313d317e48d10f07a9c7614b4eca4aa5dd48c0121fb187",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/audio_handler.h"
+    },
+    {
+      "file": "reports/scripts/pinned/tape-live-wave_shaper_handler.cc",
+      "normalizedLfSha256": "01be2e2dc1e6a030e48fa561b783115a4371c4474dd282aa2a72cdb6391bcd12",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/wave_shaper_handler.cc"
+    },
+    {
+      "file": "reports/scripts/pinned/tape-live-delay_handler.cc",
+      "normalizedLfSha256": "c9ec54f8a5072542668ef3ae0038a4c3338cf0ec225fe7226df5b9916eb96b1b",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/delay_handler.cc"
+    },
+    {
+      "file": "reports/scripts/pinned/tape-live-biquad_filter_handler.cc",
+      "normalizedLfSha256": "a54076a7202eecd1e131f73e8111af7668e360910e8982badbd72d3566762a95",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/biquad_filter_handler.cc"
+    },
+    {
+      "file": "reports/scripts/pinned/biquad_filter_handler.h",
+      "normalizedLfSha256": "6001fe19b729243101dfd3583bff03adc41c6a03e806c301ff1accab6b554e76",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/modules/webaudio/biquad_filter_handler.h"
+    },
+    {
+      "file": "reports/scripts/piano-native-biquad.cc",
+      "normalizedLfSha256": "174c22c8c2ca13d947517bab7486e497010f643c3118b5acb1fb04218ea09a4a",
+      "url": "https://raw.githubusercontent.com/chromium/chromium/e14de735f191c3a2bdce821a5e3f146bdc987b1e/third_party/blink/renderer/platform/audio/biquad.cc"
+    },
+    {
+      "file": "synth-engine/rack-native/src/tail.rs",
+      "normalizedLfSha256": "00e5633fcfa7b319138aab758cad7e2a829a6513753a76af551a2e0cb651ba9d"
+    },
+    {
+      "file": "synth-engine/tape-live/src/tone.rs",
+      "normalizedLfSha256": "fd03fb3945e9a5c552503d8dcc97fb3679321de49022cb2079e82f27892d5ace"
+    }
+  ],
+  "rules": [
+    "Native strict f64 lastNonSilent+latency+tail < frame/rate",
+    "lastNonSilent updated only after nonsilent input block",
+    "shaper latency128/tail0; lowpass initialTailInfinity then last body coefficient; delay maxTail.02",
+    "connected delay params-only pulls all four oscillator/depth graphs",
+    "explicit whole-output unpulled freezes all nodes",
+    "Input active connection and bus silence are distinct typed authorities",
+    "Inactive-source output disable cascades through each tail; disabled Delay stops LFO pulls",
+    "New active input connection re-enables the chain without resetting parameter history"
+  ]
+}

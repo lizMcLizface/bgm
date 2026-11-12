@@ -1,0 +1,23 @@
+{
+  "api": 2,
+  "profile": "original-tape-connection-tail-policy-v2",
+  "audited": false,
+  "version": "33f009f5e5b66c0c",
+  "source": "a7686ebad7f1738c90d55bb93dcf05093634592e8e355309f14f440f3f346e38",
+  "wasm": "07031b492c091855231f325c7764ca08163be058364a6537dda4d273f8dae429",
+  "bytes": 60062,
+  "files": [
+    "tools/buildTapeStagePolicy.mjs",
+    "synth-engine/tape-stage-policy/Cargo.toml",
+    "synth-engine/tape-stage-policy/Cargo.lock",
+    "synth-engine/tape-stage-policy/CHROMIUM_PROFILE.json",
+    "synth-engine/tape-stage-policy/CHROMIUM_NOTICES.txt",
+    "synth-engine/tape-stage-policy/src/lib.rs",
+    "synth-engine/tape-stage-policy/src/allocation.rs",
+    "synth-engine/rack-native/src/tail.rs",
+    "src/modular-audio/ownedTapeStagePolicy.js"
+  ],
+  "profileSha256": "7994b09d6943fc885f0d5b80e05d631e49eeac74986a8a22e7964588fadd5f2b",
+  "notices": "f76bdbeae7a86d239ed107f5e6e1d871cba06136b198adac4f1e41cbb6fd3972",
+  "scope": "NEW explicit source-derived per-stage policy only; input silence/demand are authoritative metadata. Actual Native endpoint acceptance is required; accepted Tape DSP and resources unchanged."
+}

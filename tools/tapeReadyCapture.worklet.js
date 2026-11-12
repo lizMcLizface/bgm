@@ -1,0 +1,5 @@
+class TapeReadyCapture extends AudioWorkletProcessor {
+ constructor({processorOptions:p}){super();if(!Number.isInteger(p.length)||p.length<128||p.length>1000000||p.length%128)throw Error('Invalid Tape capture bound');this.length=p.length;this.frame=0;this.data=Array.from({length:6},()=>new Float32Array(p.length));this.trace=[];this.last=null;this.port.postMessage({kind:'ready',frame:currentFrame});}
+ process(inputs,outputs){for(const plane of outputs[0])plane.fill(0);const input=inputs[0]??[];for(let ch=0;ch<6;ch++)if(input[ch])this.data[ch].set(input[ch],this.frame);if(this.trace.length<16||(this.last!==null&&currentFrame!==this.last+128&&this.trace.length<64))this.trace.push({captureFrame:this.frame,globalFrame:currentFrame});this.last=currentFrame;this.frame+=128;if(this.frame>=this.length){this.port.postMessage({kind:'captured',frames:this.frame,data:this.data,trace:this.trace},this.data.map(a=>a.buffer));return false;}return true;}
+}
+registerProcessor('tape-review-ready-capture-v1',TapeReadyCapture);

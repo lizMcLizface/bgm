@@ -1,0 +1,25 @@
+{
+  "api": 1,
+  "textEncoding": "utf-8-normalized-LF",
+  "profile": "portable-tape-explicit-retirement-e14de735-v1",
+  "nativeAutomaticRetirementEquivalent": false,
+  "audited": false,
+  "version": "3d17422c4a741992",
+  "source": "3ae932f9e90df68af2601e5c2c1bacb4420cd41c18ba69a6ebdfde707858a7de",
+  "wasm": "30a4261ad9b8ce499c7641a1a24d3036c10c61e9c38cb8a3cf4d22f5c0ae3e76",
+  "bytes": 61522,
+  "files": [
+    "tools/buildTapePortableLifecycle.mjs",
+    "synth-engine/tape-portable-lifecycle/Cargo.toml",
+    "synth-engine/tape-portable-lifecycle/Cargo.lock",
+    "synth-engine/tape-portable-lifecycle/CHROMIUM_PROFILE.json",
+    "synth-engine/tape-portable-lifecycle/CHROMIUM_NOTICES.txt",
+    "synth-engine/tape-portable-lifecycle/src/lib.rs",
+    "synth-engine/tape-portable-lifecycle/src/allocation.rs",
+    "synth-engine/rack-native/src/tail.rs",
+    "src/modular-audio/ownedTapePortableLifecycle.js"
+  ],
+  "profileSha256": "b170e25a21560cd25485d016f68fca44148ceba6613c6c3ae55c461e32d179dd",
+  "notices": "f76bdbeae7a86d239ed107f5e6e1d871cba06136b198adac4f1e41cbb6fd3972",
+  "scope": "Separate portable contract: explicit epoch-checked output retirement, pinned body/parameter eligibility, typed silence/demand. Native hidden main-task retirement is NOT inferred or emulated; all original/accepted Tape assets unchanged."
+}

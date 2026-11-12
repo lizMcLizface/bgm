@@ -1,0 +1,38 @@
+{
+  "api": 1,
+  "profile": "original-tape-native-stage-policy-audio-v1",
+  "version": "90cb8b8dbc8d9d8d",
+  "kernelVersion": "7e165c5616e8d55a",
+  "stagePolicy": {
+    "profile": "original-tape-connection-tail-policy-v2",
+    "version": "33f009f5e5b66c0c",
+    "wasm": "07031b492c091855231f325c7764ca08163be058364a6537dda4d273f8dae429"
+  },
+  "curvePreparation": {
+    "profile": "original-tape-std-f64-tanh-final-f32-v1",
+    "version": "dcad5770a9397205",
+    "wasm": "c8ff22b8fae7701be5ee70b844ad817d0ec991f79f0727617d87f93e8617362e"
+  },
+  "wasm": "bd3433653618d46f61693dfcf761358b8a5d0ec827f788e7a4d2d3b600d85366",
+  "runtime": "d0da16682502669b6d3b49a6bfe20bb74a15cd88e896d662c8a51f7270484e16",
+  "processor": "89558fb3608a17f4f0eeed337f2259e0454f2ecd806cae80d7c668c083525f35",
+  "sources": [
+    "tools/buildTapeNativeAudioHost.mjs",
+    "src/modular-audio/tapeNativeAudioProcessor.js",
+    "src/modular-audio/ownedTapeLive.js",
+    "src/modular-audio/hostRenderClock.js",
+    "src/modular-audio/rackDynamicsTargetTransport.js",
+    "src/modular-audio/stampedRackTargetTransport.js",
+    "src/modular-audio/tapeCurveUpload.js",
+    "src/nodes/tapeNativeRust.js",
+    "src/modular-audio/tapeAudioCurveUpload.js",
+    "src/modular-audio/ownedTapeStagePolicy.js",
+    "src/modular-audio/tapeCurvePreparationBrowser.js",
+    "src/modular-audio/ownedTapeCurvePreparation.js"
+  ],
+  "credits": 2,
+  "maxFloatsPerCallback": 1024,
+  "metadataDescriptors": 418,
+  "slots": 32,
+  "scope": "NEW Native per-stage tail-policy candidate with verified Rust curve preparation. Literal input connection state plus explicit Boolean bus-silence authority; no zero-PCM heuristic. Explicit67/7e/ce preserved; actual endpoint/READY-clock gates required before adoption."
+}
