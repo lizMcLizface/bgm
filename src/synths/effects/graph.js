@@ -29,7 +29,7 @@ export async function createRack(context,values,{onError=()=>{},instances=null,p
  const extra={}; // added units' stages, created when first put in the chain
  const split={}; // independent reverb/delay buses, also used by legacy reverb-first rigs
  const drives={};let instanceGraph=instances;
- let effects,metering=false,wired='',latest=values,busy=false,disposed=false,failed=false;
+ let effects,metering=false,wired='',latest=values,busy=false,disposed=false,failed=false,rewirePromise=null;
  const nodes=[],gain=()=>{const n=context.createGain();nodes.push(n);return n;};
  const input=gain(),trim=gain(),processed=gain(),bypass=gain(),output=gain();
  const ownedCompressor=dynamicsFactory?dynamicsFactory(context,{kind:'compressor',onError}):null;
@@ -41,7 +41,8 @@ export async function createRack(context,values,{onError=()=>{},instances=null,p
  const link=(from,to)=>{from.connect(to);links.push([from,to]);};
  const unlink=()=>{for(const [from,to] of links){try{from.disconnect(to);}catch{/* already gone */}}links=[];};
  let disposal;
- const dispose=()=>{if(disposed)return disposal;disposed=true;const pending=[],close=s=>{try{const result=s?.dispose?.();if(result?.then)pending.push(result);}catch(error){onError(error);}};pool.forEach(close);Object.values(extra).forEach(close);Object.values(drives).forEach(close);Object.values(split).forEach(close);close(effects);close(ownedCompressor);nodes.forEach(n=>n.disconnect());if(pending.length)disposal=Promise.allSettled(pending).then(results=>{for(const result of results)if(result.status==='rejected')onError(result.reason);});return disposal;};
+ const notifyCleanup=(error,errors)=>{errors.push(error);try{onError(error);}catch(notification){errors.push(notification);}};
+ const dispose=()=>{if(disposed)return disposal;disposed=true;const pending=[],errors=[],close=s=>{try{const result=s?.dispose?.();if(result?.then)pending.push(result);}catch(error){notifyCleanup(error,errors);}};pool.forEach(close);Object.values(extra).forEach(close);Object.values(drives).forEach(close);Object.values(split).forEach(close);close(effects);close(ownedCompressor);for(const node of nodes)try{node.disconnect();}catch(error){notifyCleanup(error,errors);}if(rewirePromise)pending.push(rewirePromise);disposal=Promise.allSettled(pending).then(results=>{for(const result of results)if(result.status==='rejected')notifyCleanup(result.reason,errors);if(errors.length)throw new AggregateError(errors,'Rack terminal cleanup failed');});disposal.catch(()=>{});return disposal;};
  // the inserts packet for one run of effects: the effects outside the run are zeroed, the output trim belongs to the last run
  const runPacket=(inserts,units,last)=>{
   const p={...inserts};
@@ -71,14 +72,14 @@ export async function createRack(context,values,{onError=()=>{},instances=null,p
   if(ownedCompressor)ownedCompressor.patch(c,initial);
   else{set(clean.gain,c.enabled?1-c.mix:1);set(compressed.gain,c.enabled?c.mix*10**(c.makeup/20):0);
   for(const key of ['threshold','ratio','knee','attack','release'])set(compressor.getNode()[key],c[key]);}
-  if(!initial&&!busy&&signature(stages)!==wired)rewire();
+  if(!initial&&!busy&&signature(stages)!==wired){rewirePromise=rewire();rewirePromise.catch(error=>{if(!disposed){failed=true;onError(error);}});}
  };
  // creates what a set of stages needs: inserts instances and added-unit stages (some load asynchronously)
  const ensure=async stages=>{
-  if(stages.some(s=>s.kind==='space')&&!effects){const bus=await createEffectsBus(context,rackPackets(latest).effects,{onError});if(disposed){bus.dispose();return false;}effects=bus;}
+  if(stages.some(s=>s.kind==='space')&&!effects){const bus=await createEffectsBus(context,rackPackets(latest).effects,{onError});if(disposed){await bus.dispose();return false;}effects=bus;}
   const runs=stages.filter(s=>s.kind==='inserts');
-  while(pool.length<runs.length){const inst=await createInstrumentInserts(context,rackPackets(latest).inserts,{onError});if(disposed){inst.dispose();return false;}pool.push(inst);}
-  for(const stage of stages)if((stage.kind==='reverb'||stage.kind==='delay')&&!split[stage.kind]){const bus=await createEffectsBus(context,spaceStagePacket(stage.kind,rackPackets(latest).effects),{onError});if(disposed){bus.dispose();return false;}split[stage.kind]=bus;}
+  while(pool.length<runs.length){const inst=await createInstrumentInserts(context,rackPackets(latest).inserts,{onError});if(disposed){await inst.dispose();return false;}pool.push(inst);}
+  for(const stage of stages)if((stage.kind==='reverb'||stage.kind==='delay')&&!split[stage.kind]){const bus=await createEffectsBus(context,spaceStagePacket(stage.kind,rackPackets(latest).effects),{onError});if(disposed){await bus.dispose();return false;}split[stage.kind]=bus;}
   for(const stage of stages)if(EXTRA_KINDS.includes(stage.kind)&&!extra[stage.kind]){const made=await createExtraStage(context,stage.kind,{pluginFactory,dynamicsFactory,nativeFactory,onError,initialPacket:rackPackets(latest).extras[stage.kind]});if(disposed){await made.dispose();return false;}extra[stage.kind]=made;made.patch(rackPackets(latest).extras[stage.kind],true);await made.prepareInitial?.();if(disposed)return false;}
   for(const stage of stages)if(DRIVE_PEDALS[stage.kind]&&!drives[stage.instance.id]){const made=createDriveStage(context,stage.kind);drives[stage.instance.id]=made;made.patch(stage.instance,true);}
   return true;
@@ -116,7 +117,7 @@ export async function createRack(context,values,{onError=()=>{},instances=null,p
     wire(stages);
     if(signature(stagesOf(latest))===sig)break; // a newer chain arrived while this one was being built: go round again
    }
-  }catch(error){if(!disposed){console.error("rack rewire failed",error);onError(error);failed=true;}}
+  }catch(error){if(!disposed){console.error("rack rewire failed",error);onError(error);failed=true;}else throw error;}
   finally{busy=false;if(!disposed&&!failed)patch(latest);}
  }
  try{
@@ -129,5 +130,5 @@ export async function createRack(context,values,{onError=()=>{},instances=null,p
    let peak=0;if(metering&&stagesOf(latest).some(s=>s.kind==='compressor')){detector.getFloatTimeDomainData(detectorSamples);for(const s of detectorSamples)peak=Math.max(peak,Math.abs(s));}
    return {compressorInputDb:20*Math.log10(Math.max(1e-5,peak)),limiterReduction:extra.limiter?.reduction??0,drivePeaks:Object.fromEntries(Object.entries(drives).filter(([id])=>instanceGraph?.chain.includes(id)).map(([id,s])=>[id,s.peak]))};
   },dispose};
- }catch(error){await dispose();throw error;}
+ }catch(error){try{await dispose();}catch(cleanupError){error.cleanupError=error.cleanupError?new AggregateError([error.cleanupError,cleanupError],'Rack construction cleanup failed'):cleanupError;}throw error;}
 }
