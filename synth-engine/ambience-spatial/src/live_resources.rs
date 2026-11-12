@@ -25,13 +25,15 @@ impl Engine {
  fn live_wave_mut(&mut self,target:usize)->&mut Wave{if target==6{&mut self.total}else{&mut self.layers[target].wave}}
  /// Publishes a cold-prepared table by pointer swap, and an optional first walk.
  /// All payload/lane checks precede mutation. Shape follows native constructor defaults.
- pub fn live_create(&mut self,target:usize,birth:f64,mode:u32,period:f64,shape:[f64;5],phase:&mut LivePhaseBank,walk:Option<&mut LiveWalkBank>)->bool{
+ pub fn live_create(&mut self,target:usize,birth:f64,mode:u32,period:f64,shape:[f64;5],phase:&mut LivePhaseBank,walk:Option<&mut LiveWalkBank>)->bool{self.live_create_recipe(target,birth,mode,period,shape,self.offset,phase,walk)}
+ /// Captured constructor offset belongs to this wave, never the whole bed.
+ pub fn live_create_recipe(&mut self,target:usize,birth:f64,mode:u32,period:f64,shape:[f64;5],offset:f64,phase:&mut LivePhaseBank,walk:Option<&mut LiveWalkBank>)->bool{
   let Some(shape)=Shape::new(shape)else{return self.reject();};
-  if target>6||!self.total.live_enabled||!time(self.rate,birth)||birth<self.origin as f64/self.rate||mode>1||!period.is_finite()||!(15. ..=900.).contains(&period)||!phase.ready(){return self.reject();}
+  if !offset.is_finite()||!(0. ..=1_000_000.).contains(&offset)||target>6||!self.total.live_enabled||!time(self.rate,birth)||birth<self.origin as f64/self.rate||mode>1||!period.is_finite()||!(15. ..=900.).contains(&period)||!phase.ready(){return self.reject();}
   let wave=self.live_wave(target);if wave.live_created||phase.size()!=wave.live_table_size()||!wave.frequency.available(1)||!wave.depth.available(1){return self.reject();}
-  let count=if mode==1{let Some(w)=walk.as_ref()else{return self.reject();};let Some(n)=w.first_count(birth)else{return self.reject();};if w.offset!=self.offset||w.period_before!=period||!wave.live_can_first(n){return self.reject();}n}else{if walk.is_some(){return self.reject();}0};
+  let count=if mode==1{let Some(w)=walk.as_ref()else{return self.reject();};let Some(n)=w.first_count(birth)else{return self.reject();};if w.offset!=offset||w.period_before!=period||!wave.live_can_first(n){return self.reject();}n}else{if walk.is_some(){return self.reject();}0};
   if target<6&&self.layers[target].lanes.iter().any(|l|!l.available(2)){return self.reject();}
-  let wave=self.live_wave_mut(target);wave.live_phase(period,birth,&mut phase.data);phase.abort();
+  let wave=self.live_wave_mut(target);wave.live_captured_offset(offset);wave.live_phase(period,birth,&mut phase.data);phase.abort();
   if let Some(w)=walk{wave.live_first(birth,w.initial,&w.points[..count],birth);w.abort();}
   assert!(wave.set_mode(mode,birth));
   if target<6{let rate=self.rate;let l=&mut self.layers[target];l.birth=birth;l.mode=mode;l.period=period;l.initial=shape;l.current=shape;l.lanes[8].intrinsic(0.);assert!(l.lanes[8].add_seconds(birth,0,0.,0.));assert!(l.shape(rate,shape,birth,0.));}true
@@ -39,14 +41,14 @@ impl Engine {
  pub fn live_first(&mut self,target:usize,birth:f64,bank:&mut LiveWalkBank)->Option<usize>{
   if target>6||!self.total.live_enabled||!time(self.rate,birth){self.reject();return None;}
   let w=self.live_wave(target);let Some(n)=bank.first_count(birth)else{self.reject();return None;};
-  if !w.live_created||w.live_walk_created||bank.offset!=self.offset||bank.period_before!=w.period||!w.live_can_first(n){self.reject();return None;}
+  if !w.live_created||w.live_walk_created||bank.offset!=w.live_offset()||bank.period_before!=w.period||!w.live_can_first(n){self.reject();return None;}
   self.live_wave_mut(target).live_first(birth,bank.initial,&bank.points[..n],birth);bank.abort();Some(n)
  }
  pub fn live_refill(&mut self,target:usize,bank:&mut LiveWalkBank)->bool{self.live_refill_at(self.frame as f64,target,bank)}
  pub fn live_refill_at(&mut self,observed:f64,target:usize,bank:&mut LiveWalkBank)->bool{
   if !canonical(observed)||observed<self.live_observed||target>6||!self.total.live_enabled||!bank.sealed||bank.kind!=2||bank.min!=bank.max{return self.reject();}
-  let w=self.live_wave(target);let mut n=0;while n<bank.max&&w.live_birth()+bank.points[n][0]*2.-self.offset<=bank.at+90.{n+=1;}
-  if bank.offset!=self.offset||bank.period_before!=w.period||bank.period_after!=w.period||bank.first!=w.live_next()||bank.at<w.live_birth()||n!=bank.max||w.live_birth()+(bank.first+n as u64)as f64*2.-self.offset<=bank.at+90.||!w.live_can_refill(n,observed){return self.reject();}
+  let w=self.live_wave(target);let mut n=0;while n<bank.max&&w.live_birth()+bank.points[n][0]*2.-w.live_offset()<=bank.at+90.{n+=1;}
+  if bank.offset!=w.live_offset()||bank.period_before!=w.period||bank.period_after!=w.period||bank.first!=w.live_next()||bank.at<w.live_birth()||n!=bank.max||w.live_birth()+(bank.first+n as u64)as f64*2.-w.live_offset()<=bank.at+90.||!w.live_can_refill(n,observed){return self.reject();}
   self.live_wave_mut(target).live_refill(&bank.points[..n],bank.at,observed);bank.abort();self.live_observed=observed;true
  }
  pub fn live_bind(&mut self,slot:usize,layer:usize,owner:u32)->bool{
@@ -108,7 +110,7 @@ impl Engine {
   if !canonical(observed)||observed<self.live_observed||target>6||!self.total.live_enabled||!time(self.rate,birth)||!period.is_finite()||!(15. ..=900.).contains(&period)||!depth.is_finite()||!(0. ..=if target==6{0.5}else{0.8}).contains(&depth)||!tau.is_finite()||!(0. ..=480.).contains(&tau){self.reject();return None;}
   let w=self.live_wave(target);if !w.live_created||w.live_walk_created||!w.live_settings_room(observed){self.reject();return None;}
   // Validate every first-resource predicate before pruning or publication.
-  let Some(n)=bank.first_count(birth)else{self.reject();return None;};if bank.offset!=self.offset||bank.period_before!=w.period||bank.period_after!=period||!w.live_can_first(n){self.reject();return None;}
+  let Some(n)=bank.first_count(birth)else{self.reject();return None;};if bank.offset!=w.live_offset()||bank.period_before!=w.period||bank.period_after!=period||!w.live_can_first(n){self.reject();return None;}
   let count=self.live_first(target,birth,bank).expect("preflighted first resource");
   assert!(self.live_command_at(observed,1,target,0,birth,tau,[1.,period,depth,property as u32 as f64,0.,0.]));Some(count)
  }
@@ -121,3 +123,12 @@ impl LiveWalkBank {
  pub fn read(&mut self,offset:usize,n:usize)->bool{if n==0||n>256||offset.checked_add(n).is_none_or(|end|end>self.written){return false;}for i in 0..n{self.scratch[2*i]=self.points[offset+i][0];self.scratch[2*i+1]=self.points[offset+i][1];}true}
 }
 #[no_mangle]pub extern "C" fn ambience_spatial_live_walk_read(p:&mut LiveWalkBank,offset:f64,n:f64)->u32{let(Some(o),Some(n))=(integer(offset,256),integer(n,256))else{return 0;};p.read(o,n)as u32}
+
+// Additive successor ABI: reads do not evaluate automation or alter DSP clocks.
+impl Engine {
+ pub fn live_level_intrinsic(&self,layer:usize)->f64{if layer>=6||!self.total.live_enabled||!self.layers[layer].wave.live_created{f64::NAN}else{self.layers[layer].lanes[8].current() as f64}}
+ pub fn live_captured_offset(&self,target:usize)->f64{if target>6||!self.total.live_enabled{f64::NAN}else{self.live_wave(target).live_offset()}}
+}
+#[no_mangle]pub extern "C" fn ambience_spatial_live_create_recipe(p:&mut Engine,target:f64,birth:f64,mode:f64,period:f64,offset:f64,d:f64,s:f64,w:f64,pan:f64,level:f64,phase:&mut LivePhaseBank,walk:*mut LiveWalkBank)->u32{let(Some(t),Some(m))=(integer(target,6),integer(mode,1))else{return 0;};unsafe{p.live_create_recipe(t,birth,m as u32,period,[d,s,w,pan,level],offset,phase,walk.as_mut())as u32}}
+#[no_mangle]pub extern "C" fn ambience_spatial_live_level_intrinsic(p:&Engine,layer:f64)->f64{integer(layer,5).map_or(f64::NAN,|l|p.live_level_intrinsic(l))}
+#[no_mangle]pub extern "C" fn ambience_spatial_live_wave_offset(p:&Engine,target:f64)->f64{integer(target,6).map_or(f64::NAN,|t|p.live_captured_offset(t))}

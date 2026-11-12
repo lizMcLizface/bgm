@@ -54,3 +54,9 @@ impl Wave {
   let (walk_offset,_)=if self.has_walk(){(Self::constant_window(self.walk_birth,self.rate,frame,&mut self.walk_started),0.)}else{(128,0.)};for i in 0..128{let walk=if i>=walk_offset{self.walk_value.output[i]*self.walk_gain.output[i]}else{0.};let value=if self.mode==0{carrier[i]+walk}else{walk};self.output[i]=value*self.depth.output[i];}}
  pub fn draws(&self)->u64{#[cfg(feature="live-resources")]if self.live_enabled{return self.live_draws;}self.walk.map_or(0,|w|w.draws)}
 }
+
+#[cfg(feature="live-resources")]
+impl Wave {
+ pub(super) fn live_offset(&self)->f64{self.offset}
+ pub(super) fn live_captured_offset(&mut self,offset:f64){self.offset=offset;}
+}

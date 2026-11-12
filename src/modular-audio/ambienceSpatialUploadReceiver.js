@@ -17,7 +17,7 @@ export class AmbienceSpatialUploadReceiver{
  begin(m){
   if(!integer(m.id,1,Number.MAX_SAFE_INTEGER)||!integer(m.generation,1,Number.MAX_SAFE_INTEGER)||!integer(m.slot,0,this.slots.length-1)||!integer(m.wave,0,6)||this.resources.has(m.id)||this.resources.size>=32)throw Error('Spatial resource identity/capacity');
   const r={...m,tracks:new Map(),ready:false},s=this.slot(r),key=m.slot*7+m.wave;if(!s||this.waveOwners.has(key))throw Error('Stale or busy spatial resource generation');
-  if(m.recipe?.sampleRate!==s.core.sampleRate||m.recipe.offset!==s.core.offset)throw Error('Spatial captured recipe differs');
+  if(m.recipe?.sampleRate!==s.core.sampleRate||typeof m.recipe.offset!=='number'||!Number.isFinite(m.recipe.offset)||m.recipe.offset<0||m.recipe.offset>1e6||((s.core.stats().created&(1<<m.wave))&&m.recipe.offset!==s.core.waveOffset(m.wave)))throw Error('Spatial captured recipe differs');
   if(m.phase){const size=s.core.sampleRate<=24000?2048:s.core.sampleRate<=88200?4096:16384;if(m.phase.samples!==size||(s.core.stats().created&(1<<m.wave)))throw Error('Spatial constructor table shape/lifetime');r.tracks.set('phase',{bytes:size*4,queued:0,written:0});}
   if(m.walk){if(!integer(m.walk.maxCount,0,256)||!['first','refill'].includes(m.walk.kind))throw Error('Spatial knot resource header');r.tracks.set('walk',{bytes:m.walk.maxCount*16,queued:0,written:0});}
   if(!r.tracks.size)throw Error('Empty spatial resource');
