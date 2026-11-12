@@ -1,0 +1,28 @@
+{
+  "api": 1,
+  "profile": "native-context-clocked-rack-dynamics-v1",
+  "version": "4fa241e23ed0af99",
+  "kernelVersion": "5a236fa5de4b0607",
+  "wasm": "db64b55a617dd518d7e9d215e908192972dd1780c9f9f8c400b8d9081cbccfe6",
+  "bytes": 81473,
+  "nativeClockVersion": "7a0838a735108706",
+  "source": "fbaa51b9b18a08e66e3093904474a9041d52675a9a301da25413913b9884a775",
+  "processor": "3394a9bd140140c6a3bc4ce9aa1b1234a92e8a04d404d2c70b90036663ff0535",
+  "processorName": "rack-native-clocked-dynamics-4fa241e23ed0af99",
+  "files": [
+    "tools/buildClockedRackDynamics.mjs",
+    "src/modular-audio/clockedRackDynamicsProfile.js",
+    "src/modular-audio/clockedRackDynamicsStage.js",
+    "src/modular-audio/clockedRackDynamicsFactory.js",
+    "src/modular-audio/clockedRackDynamicsBinding.js",
+    "src/modular-audio/nativeContextClockCodec.js",
+    "src/modular-audio/nativeContextClock.js",
+    "public/native-context-clock/build.json",
+    "src/modular-audio/rackDynamicsCallsProcessor.js",
+    "src/modular-audio/rackDynamicsRust.js",
+    "src/modular-audio/rackDynamicsTargetTransport.js",
+    "src/modular-audio/stampedRackTargetTransport.js",
+    "public/rack-dynamics-calls/build.json"
+  ],
+  "scope": "New explicit authoritative Native clock adapter around unchanged rack-dynamics-calls Wasm and per-lane control arithmetic. Physical input isolation until initial ACK; source metadata held until disposal ACK. No default selection."
+}
