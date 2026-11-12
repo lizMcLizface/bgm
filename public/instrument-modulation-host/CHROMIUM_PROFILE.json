@@ -1,0 +1,62 @@
+{
+  "api": 1,
+  "profile": "original-chorus-phaser-canonical-numerical-v1",
+  "chromiumRevision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+  "scope": "Original Chorus three30ms voices and Phaser six allpasses, actual constructor birth/first-pull and captured RawF64 setter epochs. Native440Hz prelude, now+.001 rate steps and phase held only while explicitly unpulled. Chorus fixed canonical sum order0,1,2; Native alternate fan-in ULP variation remains explicit. No Flanger, captured coefficient bridge, native getter, automatic tail/layout or app/live selection claim.",
+  "sources": [
+    {
+      "path": "synth-engine/fdn-room-live/src/timeline.rs",
+      "sha256": "3da5589996b375866c8fd3836a2123c5be338511d4db64ba3ecfb2a244a34d5b"
+    },
+    {
+      "path": "synth-engine/rack-native-normal/src/oscillator.rs",
+      "sha256": "45351f6e5ce03bcd79076b7b34e45dceeb5515dd76d763d819c8207c990c3f29"
+    },
+    {
+      "path": "synth-engine/instrument-delay/src/lib.rs",
+      "sha256": "2237a4b52599f1e911d4714f2fc9e206510894a4b2cb5cc3b0afd9456dccb518"
+    }
+  ],
+  "resources": [
+    {
+      "path": "synth-engine/tape-fx/resources/chromium-sine-2048.f32",
+      "sha256": "7921549af80be380eb0d549f9eab730190f19dbed6a0b394ef97170d62d002d4"
+    },
+    {
+      "path": "synth-engine/tape-fx/resources/chromium-sine-4096.f32",
+      "sha256": "e2f429797c3ec9fba3f2a96176a6a2115a09ef65d520b772599b28e356d75c68"
+    },
+    {
+      "path": "synth-engine/tape-fx/resources/chromium-sine-16384.f32",
+      "sha256": "7a3b0c8477c0a631590627ce02ce1d3712ad9622581567e4b1ca8fb2989a7da3"
+    }
+  ],
+  "nativeReferences": [
+    "src/nodes/chorus.js",
+    "src/nodes/phaser.js",
+    "src/nodes/lfo.js",
+    "src/nodes/oscillator.js",
+    "src/nodes/gain.js"
+  ],
+  "bounds": {
+    "handlesPerWasm": 8,
+    "bytesPerHandleUpperBound": 2097152,
+    "lanes": 24,
+    "eventsPerLane": 256,
+    "chorusVoices": 3,
+    "phaserStages": 6,
+    "quantum": 128,
+    "inputMaximumAbsolute": 4,
+    "chorusCanonicalOrder": [
+      0,
+      1,
+      2
+    ]
+  },
+  "newAllpassSource": {
+    "path": "third_party/blink/renderer/platform/audio/biquad.cc",
+    "sha256": "174c22c8c2ca13d947517bab7486e497010f643c3118b5acb1fb04218ea09a4a",
+    "method": "SetAllpassParams",
+    "law": "f clipped0..1; Qlinear>=0; alpha=sin(pi*f)/(2*Q); six separate DF1 histories; native Q0=-1 and endpoint=1."
+  }
+}

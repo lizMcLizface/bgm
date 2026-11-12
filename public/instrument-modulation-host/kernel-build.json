@@ -1,0 +1,33 @@
+{
+  "api": 1,
+  "profile": "original-chorus-phaser-canonical-numerical-v1",
+  "audited": false,
+  "textEncoding": "utf-8-normalized-LF",
+  "version": "1efb0cfc290f1e11",
+  "source": "5280242625d5a6b2fb9d9861eed51baef756f27fd62d863d0641f8ee2ed51f53",
+  "wasm": "87e918390e60ad651951cc57951b618a03de88714f962db979d47b9a29475887",
+  "bytes": 179263,
+  "files": [
+    "synth-engine/instrument-modulation/Cargo.toml",
+    "synth-engine/instrument-modulation/Cargo.lock",
+    "synth-engine/instrument-modulation/src/lib.rs",
+    "synth-engine/instrument-modulation/src/allocation.rs",
+    "synth-engine/instrument-modulation/src/allpass.rs",
+    "synth-engine/instrument-modulation/src/delay.rs",
+    "synth-engine/instrument-modulation/CHROMIUM_PROFILE.json",
+    "synth-engine/instrument-modulation/CHROMIUM_NOTICES.txt",
+    "synth-engine/fdn-room-live/src/timeline.rs",
+    "synth-engine/rack-native-normal/src/oscillator.rs",
+    "synth-engine/instrument-delay/src/lib.rs",
+    "src/nodes/chorus.js",
+    "src/nodes/phaser.js",
+    "src/nodes/lfo.js",
+    "src/nodes/oscillator.js",
+    "src/nodes/gain.js",
+    "src/modular-audio/ownedInstrumentModulation.js",
+    "tools/buildInstrumentModulation.mjs"
+  ],
+  "scope": "Original Chorus three30ms voices and Phaser six allpasses, actual constructor birth/first-pull and captured RawF64 setter epochs. Native440Hz prelude, now+.001 rate steps and phase held only while explicitly unpulled. Chorus fixed canonical sum order0,1,2; Native alternate fan-in ULP variation remains explicit. No Flanger, captured coefficient bridge, native getter, automatic tail/layout or app/live selection claim.",
+  "profileSha256": "e8ac7e4625c2bee46abaafaaa21367527866534519246a94c72a7a9a626f0b30",
+  "notices": "da9f79ea296747d306ee217d63707b1891652329e63669f332de9f2e0c99e827"
+}
