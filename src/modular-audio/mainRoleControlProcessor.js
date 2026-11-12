@@ -1,0 +1,12 @@
+import {MainStripControlProcessor,mainStripControlDescriptors} from './mainStripControlProcessor.js';
+export const mainRoleControlDescriptors=mainStripControlDescriptors;
+/** Same accepted processor/Core/Rust render. Only an isolated-demand FIFO fence
+ * is added; it never changes, fits or reads back any DSP control coefficient. */
+export class MainRoleControlProcessor extends MainStripControlProcessor {
+ constructor(...args){super(...args);this.activationPending=[];this.observedDemand=null;this.observedInputChannels=null;this.uniformDemand=false;}
+ message(data){if(data?.kind!=='activation-fence')return super.message(data);try{if(this.disposed||this.error||Object.keys(data).length!==4||!Number.isInteger(data.request)||data.request<1||data.request>4294967295||![0,1].includes(data.demand)||!Number.isInteger(data.sequence)||data.sequence<0||data.sequence>16777215||this.activationPending.length>=4)throw Error('Invalid role control activation fence');this.activationPending.push({...data});this.finishActivation();}catch(error){this.emit({kind:'rejected',request:data?.request,error:String(error)});}}
+ finishActivation(){if(!this.uniformDemand||this.observedInputChannels!==0||this.firstFrame===null||this.error||this.disposed)return;for(let i=0;i<this.activationPending.length;){const request=this.activationPending[i];if(request.demand===this.observedDemand&&request.sequence<=this.core.appliedSequence){this.emit({kind:'activation-bound',request:request.request,stats:this.snapshot()});this.activationPending.splice(i,1);}else i++;}}
+ snapshot(){return{...super.snapshot(),observedDemand:this.observedDemand??null,observedInputChannels:this.observedInputChannels??null,uniformDemand:this.uniformDemand??false,memoryBytes:this.core?.unit?.e?.memory?.buffer?.byteLength??null};}
+ release(){if(this.activationPending){for(const request of this.activationPending)this.emit({kind:'rejected',request:request.request,error:'Disposed role control'});this.activationPending.length=0;}return super.release();}
+ process(inputs,outputs,parameters){const result=super.process(inputs,outputs,parameters);if(result&&!this.error&&!this.disposed&&this.firstFrame!==null){const demand=parameters.hostDemand;this.observedDemand=demand[demand.length-1];let uniform=true;for(let i=0;i<demand.length;i++)if(demand[i]!==this.observedDemand)uniform=false;this.uniformDemand=uniform;this.observedInputChannels=(inputs[0]??[]).length;this.finishActivation();}return result;}
+}

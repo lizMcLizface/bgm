@@ -1,0 +1,16 @@
+import {MainControlWriter,validateMainControl,encodeMainControl} from './mainControlWords.js';
+/** NEW writer with one exact reservation. Existing a6e protocol/core is unchanged.
+ * `seconds:'now'` is an explicit author-time operation, resolved per command at
+ * publication; explicit seconds are never rebased or reconstructed. */
+export class MainRoleControlWriter extends MainControlWriter {
+ constructor(...args){super(...args);this.ticket=null;this.retiredTokens=new WeakSet();}
+ validate(commands){if(!Array.isArray(commands)||!commands.length||commands.length>32)throw Error('Role control command count differs');return commands.map(command=>{if(!command||Object.keys(command).length!==5)throw Error('Role control command fields differ');validateMainControl(this.context.sampleRate,{...command,seconds:command.seconds==='now'?0:command.seconds});return Object.freeze({...command});});}
+ capacity(commands){const cost=[...this.debt];for(const command of commands)if(command.op!=='cancel')cost[command.lane]++;for(const pending of this.pending.values())cost[pending.lane]+=pending.cost;if(cost.some((value,lane)=>value>this.free[lane]))throw Error('Role control future timeline credits exhausted');}
+ reserve(commands){if(this.error||this.busy||this.ticket)throw Error(this.error??'Role control reservation is already held');const copied=Object.freeze(this.validate(commands));this.capacity(copied);const metadata=this.transport.reserve(copied.length),token=Object.freeze({});this.ticket={token,copied,metadata};return token;}
+ checkReservation(token){if(this.error||this.busy||!this.ticket||this.ticket.token!==token)throw Error(this.error??'Unknown role control reservation');this.capacity(this.ticket.copied);return true;}
+ reservationState(token){if(this.ticket?.token===token)return'held';if(this.retiredTokens.has(token))return'retired';throw Error('Unknown role control reservation');}
+ cancel(token){if(this.busy||!this.ticket||this.ticket.token!==token)throw Error('Unknown role control reservation');this.transport.cancel(this.ticket.metadata);this.retiredTokens.add(token);this.ticket=null;}
+ commit(token){this.checkReservation(token);const ticket=this.ticket,before=this.transport.sequence;this.busy=true;try{for(const template of ticket.copied){const command=template.seconds==='now'?{...template,seconds:this.context.currentTime}:template;encodeMainControl(this.context.sampleRate,command,this.words,this.codec);const seconds=this.context.currentTime,sequence=this.transport.write(ticket.metadata,this.words,{seconds});this.pending.set(sequence,{lane:command.lane,cost:Number(command.op!=='cancel'),authorFrame:this.transport.lastAuthorFrame});}this.retiredTokens.add(token);this.ticket=null;return{firstSequence:before+1,sequence:this.transport.sequence,commands:ticket.copied.length};}catch(error){if(this.transport.reservations.has(ticket.metadata))this.transport.cancel(ticket.metadata);this.retiredTokens.add(token);this.ticket=null;if(this.transport.sequence>before||this.transport.failed)this.error='Role control reserved batch partially published: '+error;throw error;}finally{this.busy=false;}}
+ post(commands){const token=this.reserve(commands);return this.commit(token);}
+ snapshot(){return{...super.snapshot(),groupReservation:!!this.ticket};}
+}
