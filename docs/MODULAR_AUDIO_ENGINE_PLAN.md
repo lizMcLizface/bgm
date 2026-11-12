@@ -41,12 +41,16 @@ remaining control-demand/input-topology difference; those negative receipts
 are retained. Normal live Ambience adoption remains pending. See the recipe,
 spatial session and bank/spatial source documents.
 
-A separately named live-freeze clock and explicit wake-note lifecycle service
-are under review. Cancelled wake notes and failed-release ownership/retry have
-focused and lower-rate desktop checks, but an upper-shard48k run failed strict
-main frozen-frame versus last decoded-frame equality. That negative blocks
-normal retained-player adoption; the accepted7a suspension-retirement policy
-and existing player remain unchanged.
+The review-only live-freeze prototype failed strict frozen-frame equality;
+its general acceptance is withdrawn. Independent Native vectors prove a128-frame
+destination no-pull gap. A separate explicit continuous-context policy now
+prevents automatic idle suspension only for selected clocked prepared hosts.
+The actual Generator gate passes Native/default suspension, eight owned idle
+checks, a live note and strict external-suspension refusal before note ownership.
+Existing per-family DSP demand remains unchanged; unexpected suspension requires
+explicit stopped reconstruction/reload. Native/default idle behavior remains.
+See MODULAR_AUDIO_ENGINE_CONTINUOUS_CONTEXT_POLICY.md. Wake-note ticket helpers
+retain cancellation and failed-release ownership for separately opted-in callers.
 
 Latest assembled checkout regression:619files /5,257passing /4skipped in
 201.80s. The local public bundle builds in37.96s and its corrected file-inventory
@@ -60,7 +64,7 @@ full-suite/audio load; that negative is retained, and the repeat ran alone.
 No physical deadline/quality guarantee or workload attribution is inferred.
 Evidence and temporary scripts stay in ignored reports/ and reports/scripts/.
 
-Next: finish the explicit pause/resume authority and app wake integration;
+Next: integrate the declared continuous context in selected application hosts;
 close Ambience input-topology/demand and queued Tape lifecycle ownership; then
 adopt the accepted profiles and finish remaining Filter activity, shared-room
 latency and Freeze host/transport boundaries. Hidden measured cello remains

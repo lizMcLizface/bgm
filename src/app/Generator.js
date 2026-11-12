@@ -1,3 +1,4 @@
+import{preparedContextAllowsIdleSuspend}from'../modular-audio/contextLifecyclePolicy.js';
 import{retireAudioActions}from'../audio/retireAudio.js';
 import {WasmRoomPool} from '../synth-lab/roomPool';
 import {createWasmRoomRoute} from './engine/wasmRoomRoute';
@@ -259,7 +260,7 @@ class Generator {
     }
 
     // The master meter requests sleep only after one second of exact silence.
-    canSleepAudio(){return !this.anyRunning&&!this.liveNotes?.size&&!this.stopFade&&!this.auditionPending;}
+    canSleepAudio(){return preparedContextAllowsIdleSuspend(this.audioEnvironment)&&!this.anyRunning&&!this.liveNotes?.size&&!this.stopFade&&!this.auditionPending;}
 
     // The piece's meter - or, while a bar is being planned, that bar's (meterFor): a breakdown
     // may have one of its own (settings.breakdowns.meter). A planned bar keeps its meter.
@@ -322,6 +323,7 @@ class Generator {
     }
 
     async start() {
+        this.audioEnvironment?.checkRuntime?.();
         if (this.roleWanderFactory) {
             if (this.AC.state !== 'running') await this.AC.resume();
             await this.awaitRoleMotion();
@@ -416,6 +418,7 @@ class Generator {
     }
 
     async startAmbience() {
+        this.audioEnvironment?.checkRuntime?.();
         if (this.ambienceRunning) return;
         if (this.AC.state !== 'running') await this.AC.resume();
         this.ambience.start(this.AC.currentTime + 0.05);
@@ -1231,6 +1234,7 @@ class Generator {
     }
 
     async awaitSourceReady() {
+        this.audioEnvironment?.checkRuntime?.();
         await Promise.all(Object.values(this.roles).map(async ({instrument:i}) => { await i.ready; await i.sourceReady; await i.armRuntime?.(); if(i.error)throw i.error; const failure=i.sourceStatus?.().error; if(failure)throw Error(failure); }));
         await this.awaitSharedEffectsReady?.();
     }
@@ -1335,6 +1339,7 @@ class Generator {
     }
 
     liveNoteOn(role, midi, velocity = 0.8) {
+        this.audioEnvironment?.checkRuntime?.();
         if (this.roleWanderFactory) {
             if (!this.roleMotionPrepared) throw Error('Prepare role motion before playing live notes');
             this.checkRoleMotion();
