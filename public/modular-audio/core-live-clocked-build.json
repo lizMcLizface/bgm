@@ -1,0 +1,28 @@
+{
+  "api": 1,
+  "profile": "native-clock-owned-core-fm-live-v1",
+  "version": "a20fefe1bf89996a",
+  "source": "c50f8fbffe7c52d31f6a5736e64b22688f6b28497114036bf7429f57bcf2d420",
+  "graphWasm": "a88ac8e012a902fb66b9475e2d5fa134075b671b7155ae5f62da84c4d9a3349b",
+  "clockVersion": "7a0838a735108706",
+  "files": [
+    "tools/buildClockedCoreLive.mjs",
+    "src/modular-audio/clockedCoreLiveProfile.js",
+    "src/modular-audio/clockedCoreLive.js",
+    "src/modular-audio/clockedSourceRelease.js",
+    "src/modular-audio/clockedCoreLive.worklet.js",
+    "src/modular-audio/coreLive.worklet.js",
+    "src/modular-audio/ownedCore.js",
+    "src/modular-audio/ownedFm.js",
+    "src/modular-audio/legacyPatchTransition.js",
+    "src/modular-audio/rustPatchTransition.js",
+    "src/modular-audio/sourceDisposalFence.js",
+    "src/modular-audio/nativeContextClockCodec.js",
+    "src/modular-audio/nativeContextClock.js",
+    "src/synth-lab/backend.js",
+    "src/synth-lab/patch.js",
+    "src/synth-lab/fmPatch.js",
+    "src/synth-lab/noteBehavior.js"
+  ],
+  "scope": "NEW continuous live Core/FM source using exact Native-clock metadata. Original DSP and source/control body retained; offroute actual pull readiness required; suspend/gaps retire; no default/Offline/other-family adoption."
+}
