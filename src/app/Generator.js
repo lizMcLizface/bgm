@@ -1,6 +1,7 @@
+import{generatorSweepCellStatus,disposeGeneratorSweepCell}from'../modular-audio/generatorSweepCell.js';
 import{assertPreparedFade,registerAutomaticFadePolicy,assertAutomaticPreparedFadePolicy,automaticFadePolicyStatus}from'../modular-audio/preparedStartPolicy.js';
 import{prepareGeneratorStoppedRuntime,commitGeneratorStoppedRuntime}from'../modular-audio/generatorStoppedRuntime.js';
-import{getPublishedMainPreparedAmbience,assertMainRuntimeSourceEdit,assertMainRuntimeSettings,assertMainRuntimeLazyReturn,hasPublishedMainRuntime}from'../modular-audio/mainStoppedRuntimeBinding.js';
+import{getPublishedMainPreparedAmbience,getPublishedMainSourceEdits,getPublishedMainRuntimeReturns,assertMainRuntimeSourceEdit,assertMainRuntimeSettings,assertMainRuntimeLazyReturn,hasPublishedMainRuntime}from'../modular-audio/mainStoppedRuntimeBinding.js';
 import{createSelectedPartsCoordinator}from'../modular-audio/selectedPartsCoordinator.js';
 import{preparedContextAllowsIdleSuspend}from'../modular-audio/contextLifecyclePolicy.js';
 import{retireAudioActions}from'../audio/retireAudio.js';
@@ -445,6 +446,9 @@ class Generator {
     automaticFadePolicyStatus(){return automaticFadePolicyStatus(this);}
     assertAutomaticFadePolicy(seconds){if(this.hasPreparedAmbienceStart())assertPreparedFade(seconds);}
     assertFadeCancelPolicy(){const owner=getPublishedMainPreparedAmbience(this);if(owner&&this.fadeTimer&&(this.preparedFadeStop||owner.stoppedStatus().pendingStop))throw Object.assign(Error('Wait for the authored prepared fade to finish before restarting it'),{code:'PREPARED_AMBIENCE_FADE_CANCEL_UNSUPPORTED'});}
+    preparedRoutingStatus(){return generatorSweepCellStatus(this);}
+    disposePreparedRouting(){return disposeGeneratorSweepCell(this);}
+    prepareRuntimeReturn(kind,values){const returns=getPublishedMainRuntimeReturns(this);if(!returns)throw Error('Explicit editable return publication required');return returns.prepare(kind,values);}
     prepareStoppedRuntime(options){return prepareGeneratorStoppedRuntime(this,options);}
     commitStoppedRuntime(candidate){return commitGeneratorStoppedRuntime(this,candidate);}
     hasPreparedAmbienceStart(){return!!getPublishedMainPreparedAmbience(this);}
@@ -879,6 +883,7 @@ class Generator {
         const wants = active && ['filter.lowpass', 'filter.highpass', 'filter.resonance'].some((key) => key in active);
         if (!wants && !this.sweep) return;
         if (!this.sweep) {
+            const returns=getPublishedMainRuntimeReturns(this);if(returns){this.sweep=returns.activateSweep();this.sweep.set({lowpass:active?.['filter.lowpass']??SWEEP_OPEN.lowpass,highpass:active?.['filter.highpass']??SWEEP_OPEN.highpass,resonance:active?.['filter.resonance']??SWEEP_OPEN.resonance},wants?secondsPerBeat/2:.05);return;}
             assertMainRuntimeSourceEdit(this,'a new master sweep');
             // between the master fade and the loudness trim, wide open at first so joining the chain is silent
             this.sweep = new SweepFilter(this.AC);
@@ -1024,6 +1029,7 @@ class Generator {
     }
 
     async setRoleSource(role, source, name) {
+        const sourceEdits=getPublishedMainSourceEdits(this);if(sourceEdits)return sourceEdits.replace(role,source,name);
         assertMainRuntimeSourceEdit(this,'role source replacement');
         if(!ROLES[role])throw Error('Unknown melodic role');
         const r=this.roles[role],revision=r.sourceRevision=(r.sourceRevision??0)+1;
@@ -1170,6 +1176,7 @@ class Generator {
 
     /** One synth parameter, live (the editor's knobs). */
     setRoleParam(role, key, value) {
+        getPublishedMainSourceEdits(this)?.assertParameter(role,key,value);
         const r=this.roles[role],next={...r.instrument.preset,[key]:value};
         if(this.audioEnvironment&&nativeInstrumentRuntimeKey(this.audioEnvironment,r.instrument.preset,this.AC)!==nativeInstrumentRuntimeKey(this.audioEnvironment,next,this.AC))assertMainRuntimeSourceEdit(this,'source-family parameter change');
         const pending=this.audioEnvironment&&nativeInstrumentRuntimeKey(this.audioEnvironment,r.instrument.preset,this.AC)!==nativeInstrumentRuntimeKey(this.audioEnvironment,next,this.AC)?this.setRoleSource(role,next,r.presetName):null;
