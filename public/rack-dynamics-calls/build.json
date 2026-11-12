@@ -7,10 +7,10 @@
   "audited": false,
   "source": "acc96f13ac1cd28f6b758b2ac35d9f0197aacfde94e2f5a1839862eddba2f402",
   "runtime": "66d678dc38284ee1102c00bb8ef4fae7db95808327fbd8b4f5fbdb713e031d63",
-  "reference": "0c3dcb909f5b106e51c9a7a4d5654ec291c832b690bcd2208098accc004274aa",
+  "reference": "3b21e2c96b6f011026236327e543343d969f6d78b255e36baa7a5f2e2f2e12a9",
   "wasm": "db64b55a617dd518d7e9d215e908192972dd1780c9f9f8c400b8d9081cbccfe6",
   "bytes": 81473,
-  "version": "2411d98ba0c76a88",
-  "processorName": "rack-native-calls-2411d98ba0c76a88",
-  "processor": "02f6ee13b3e058179d709804888876b2cc91e3556d2e184eb8ce8b611233b78a"
+  "version": "6fd89c3c24196426",
+  "processorName": "rack-native-calls-6fd89c3c24196426",
+  "processor": "79a594646841365da35fe32e9296edd41ddf8a8ae922489c33ad810eaa9fa231"
 }

@@ -1,3 +1,4 @@
+import {AudioConstructorJournal} from '../audio/constructorJournal.js';
 import Gain from './gain';
 
 const MAX_DIST = 30;
@@ -14,12 +15,16 @@ const createDistCurve = (gain = 0) => {
 };
 
 class Distortion {
+    dispose() { return this.ownership.retire(); }
+    cleanupStatus() { return this.ownership.status(); }
     constructor(AC) {
+        this.ownership = new AudioConstructorJournal({capacity:16,label:'Distortion'});
+        try {
         this.AC = AC;
-        this.dryGain = new Gain(this.AC);
-        this.wetGain = new Gain(this.AC);
+        this.dryGain = this.ownership.create('dryGain',()=>new Gain(this.AC),owner=>owner.getNode().disconnect());
+        this.wetGain = this.ownership.create('wetGain',()=>new Gain(this.AC),owner=>owner.getNode().disconnect());
 
-        this.node = this.AC.createWaveShaper();
+        this.node = this.ownership.create('node',()=>this.AC.createWaveShaper(),node=>node.disconnect());
         this.node.curve = createDistCurve();
         this.node.oversample = 'none';
 
@@ -29,6 +34,7 @@ class Distortion {
 
         this.setDistortion(0);
         this.setAmount(0);
+        } catch(error) { throw this.ownership.failure(error); }
     }
 
     connect = destination => {

@@ -1,17 +1,22 @@
+import {AudioConstructorJournal} from '../audio/constructorJournal.js';
 import Gain from './gain';
 import Filter from './filter';
 
 const MAX_DELAY_TIME = 1;
 
 class Delay {
+    dispose() { return this.ownership.retire(); }
+    cleanupStatus() { return this.ownership.status(); }
     constructor(AC) {
+        this.ownership = new AudioConstructorJournal({capacity:16,label:'Delay'});
+        try {
         this.AC = AC;
-        this.dryGain = new Gain(this.AC);
-        this.wetGain = new Gain(this.AC);
+        this.dryGain = this.ownership.create('dryGain',()=>new Gain(this.AC),owner=>owner.getNode().disconnect());
+        this.wetGain = this.ownership.create('wetGain',()=>new Gain(this.AC),owner=>owner.getNode().disconnect());
 
-        this.delay = this.AC.createDelay();
-        this.feedbackGain = new Gain(this.AC);
-        this.tone = new Filter(this.AC);
+        this.delay = this.ownership.create('delay',()=>this.AC.createDelay(),node=>node.disconnect());
+        this.feedbackGain = this.ownership.create('feedbackGain',()=>new Gain(this.AC),owner=>owner.getNode().disconnect());
+        this.tone = this.ownership.create('tone',()=>new Filter(this.AC),owner=>owner.dispose());
 
         this.delay.connect(this.feedbackGain.getNode());
         this.feedbackGain.connect(this.tone.getNode());
@@ -22,6 +27,7 @@ class Delay {
 
         this.setAmount(0);
         this.setFeedback(0);
+        } catch(error) { throw this.ownership.failure(error); }
     }
 
     connect = destination => {

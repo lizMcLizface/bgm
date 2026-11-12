@@ -1,17 +1,23 @@
+import {AudioConstructorJournal} from '../audio/constructorJournal.js';
 const MAX_FREQ = 11000;
 const MAX_Q = 100;
 
 class Filter {
+    dispose() { return this.ownership.retire(); }
+    cleanupStatus() { return this.ownership.status(); }
     constructor(AC) {
+        this.ownership = new AudioConstructorJournal({capacity:16,label:'Filter'});
+        try {
         this.AC = AC;
         this.TYPES = ['lowpass', 'highpass', 'bandpass', 'notch', 'peaking', 'lowshelf', 'highshelf'];
 
-        this.node = this.AC.createBiquadFilter();
+        this.node = this.ownership.create('node',()=>this.AC.createBiquadFilter(),node=>node.disconnect());
 
         this.node.type = 'lowpass';
         this.configuredFreq = MAX_FREQ;
         this.configuredQ = this.node.Q.value;
         this.node.frequency.setValueAtTime(MAX_FREQ, this.AC.currentTime);
+        } catch(error) { throw this.ownership.failure(error); }
     }
 
     connect = (destination) => {

@@ -1,15 +1,21 @@
+import {AudioConstructorJournal} from '../audio/constructorJournal.js';
 class OscNoiseMixer {
+    dispose() { return this.ownership.retire(); }
+    cleanupStatus() { return this.ownership.status(); }
     constructor(AC) {
+        this.ownership = new AudioConstructorJournal({capacity:16,label:'OscNoiseMixer'});
+        try {
         this.AC = AC;
         
         // Create gain nodes for mixing
-        this.oscGain = new GainNode(AC, { gain: 1 });
-        this.noiseGain = new GainNode(AC, { gain: 0 });
-        this.outputGain = new GainNode(AC, { gain: 1 });
+        this.oscGain = this.ownership.create('oscGain',()=>new GainNode(AC, { gain: 1 }),node=>node.disconnect());
+        this.noiseGain = this.ownership.create('noiseGain',()=>new GainNode(AC, { gain: 0 }),node=>node.disconnect());
+        this.outputGain = this.ownership.create('outputGain',()=>new GainNode(AC, { gain: 1 }),node=>node.disconnect());
         
         // Connect mixer
         this.oscGain.connect(this.outputGain);
         this.noiseGain.connect(this.outputGain);
+        } catch(error) { throw this.ownership.failure(error); }
     }
     
     // Connect oscillator to mixer

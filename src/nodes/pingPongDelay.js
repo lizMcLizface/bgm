@@ -1,21 +1,26 @@
+import {AudioConstructorJournal} from '../audio/constructorJournal.js';
 import Gain from './gain';
 import Filter from './filter';
 
 const MAX_DELAY_TIME = 1;
 
 class PingPongDelay {
+    dispose() { return this.ownership.retire(); }
+    cleanupStatus() { return this.ownership.status(); }
     constructor(AC) {
+        this.ownership = new AudioConstructorJournal({capacity:16,label:'PingPongDelay'});
+        try {
         this.AC = AC;
-        this.dryGain = new Gain(this.AC);
-        this.wetGain = new Gain(this.AC);
+        this.dryGain = this.ownership.create('dryGain',()=>new Gain(this.AC),owner=>owner.getNode().disconnect());
+        this.wetGain = this.ownership.create('wetGain',()=>new Gain(this.AC),owner=>owner.getNode().disconnect());
 
-        this.leftDelay = this.AC.createDelay();
-        this.preDelay = this.AC.createDelay();
-        this.rightDelay = this.AC.createDelay();
-        this.leftFeedbackGain = new Gain(this.AC);
-        this.rightFeedbackGain = new Gain(this.AC);
-        this.channelMerger = this.AC.createChannelMerger(2);
-        this.tone = new Filter(this.AC);
+        this.leftDelay = this.ownership.create('leftDelay',()=>this.AC.createDelay(),node=>node.disconnect());
+        this.preDelay = this.ownership.create('preDelay',()=>this.AC.createDelay(),node=>node.disconnect());
+        this.rightDelay = this.ownership.create('rightDelay',()=>this.AC.createDelay(),node=>node.disconnect());
+        this.leftFeedbackGain = this.ownership.create('leftFeedbackGain',()=>new Gain(this.AC),owner=>owner.getNode().disconnect());
+        this.rightFeedbackGain = this.ownership.create('rightFeedbackGain',()=>new Gain(this.AC),owner=>owner.getNode().disconnect());
+        this.channelMerger = this.ownership.create('channelMerger',()=>this.AC.createChannelMerger(2),node=>node.disconnect());
+        this.tone = this.ownership.create('tone',()=>new Filter(this.AC),owner=>owner.dispose());
 
         this.preDelay.connect(this.rightDelay);
 
@@ -35,6 +40,7 @@ class PingPongDelay {
 
         this.setAmount(0);
         this.setFeedback(0);
+        } catch(error) { throw this.ownership.failure(error); }
     }
 
     connect = destination => {

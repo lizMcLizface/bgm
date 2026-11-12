@@ -1,25 +1,30 @@
+import {AudioConstructorJournal} from '../audio/constructorJournal.js';
 const MAX_GAIN = 12;
 const MAX_FREQ = 11000;
 const MAX_LOW_FREQ = 1000;
 const MIN_HIGH_FREQ = 1000;
 
 class EQ2 {
+    dispose() { return this.ownership.retire(); }
+    cleanupStatus() { return this.ownership.status(); }
     constructor(AC) {
+        this.ownership = new AudioConstructorJournal({capacity:16,label:'EQ2'});
+        try {
         this.AC = AC;
 
         // Low
-        this.low = this.AC.createBiquadFilter();
+        this.low = this.ownership.create('low',()=>this.AC.createBiquadFilter(),node=>node.disconnect());
         this.low.type = 'lowshelf';
         this.low.frequency.value = 320.0;
         this.low.gain.value = 0.0;
         // High
-        this.high = this.AC.createBiquadFilter();
+        this.high = this.ownership.create('high',()=>this.AC.createBiquadFilter(),node=>node.disconnect());
         this.high.type = 'highshelf';
         this.high.frequency.value = 3200.0;
         this.high.gain.value = 0.0;
 
         // Mid (a peak between the shelves)
-        this.mid = this.AC.createBiquadFilter();
+        this.mid = this.ownership.create('mid',()=>this.AC.createBiquadFilter(),node=>node.disconnect());
         this.mid.type = 'peaking';
         this.mid.frequency.value = 1000.0;
         this.mid.Q.value = 0.7;
@@ -27,6 +32,7 @@ class EQ2 {
 
         this.low.connect(this.mid);
         this.mid.connect(this.high);
+        } catch(error) { throw this.ownership.failure(error); }
     }
 
     connect = (destination) => {
