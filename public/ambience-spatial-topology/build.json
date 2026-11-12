@@ -1,0 +1,38 @@
+{
+  "api": 1,
+  "profile": "explicit-ambience-input-topology-v1",
+  "source": "62980e233a2fbed93d2ecc28875663e0f1cb9e941321e4d229d6ceb896e6db6e",
+  "runtime": "71d1b4f6b0a867f465fff5ebd1c57351feb9f1aaec14f32bba49b83c02f80c63",
+  "reference": "07031bf8e6d7aa4e1da95d88cd2fe95a425b0fad826a0777edea0bc9db6f1dd1",
+  "resources": {
+    "2048": "7921549af80be380eb0d549f9eab730190f19dbed6a0b394ef97170d62d002d4",
+    "4096": "e2f429797c3ec9fba3f2a96176a6a2115a09ef65d520b772599b28e356d75c68",
+    "16384": "7a3b0c8477c0a631590627ce02ce1d3712ad9622581567e4b1ca8fb2989a7da3"
+  },
+  "originalModules": {
+    "allocation.rs": "4e004121e27e59478cae1fc82a9a7aa13f7c0fbed766b25a415a72a869522e0f",
+    "lib.rs": "6527c32ad23dc63b81b6eef508bfecf7c7e4315c6948cc5952fa09ce09405087",
+    "live_resources.rs": "be1218518420884cf0cf2ef2a8a9d97c20100c545f0248651e88fd4cab5d052f",
+    "native_biquad.rs": "cc2396878e3f13a7b452270291a84139129e077d9ee01b47ae27cf55612e0d6c",
+    "native_sine.rs": "08299aedecf333fa44d87b1818ca973537bea2c632ee355b53585a4e6aee9aa9",
+    "native_timeline.rs": "b5215a4442d689db0feb9ef809f324c7b3af55f8df42fe7c83a79289b8038450",
+    "panner.rs": "f80fb7b53535e5b9be8503fc25a83d9565b39b72673f77c0f6629057ac5bbff6",
+    "tail.rs": "00e5633fcfa7b319138aab758cad7e2a829a6513753a76af551a2e0cb651ba9d",
+    "walk.rs": "9904ca6ccdb14641b96837e41aeced76c027352b0ecfcb82c452a4b87bdcf85b",
+    "wave.rs": "1b666a140423f5faac75e2e198babce7143e5bbb8322983014799f0982ae6467"
+  },
+  "generatedChanges": [
+    "root doc comments for include",
+    "dedicated width-mask field/default",
+    "explicit width-lane prepare guard",
+    "lease width-mask reset",
+    "appended topology module"
+  ],
+  "wasm": "343374ed990d85f9ade82526ba7d152f3bdbbe110a571bebfc8888a5adc1aa1b",
+  "bytes": 234945,
+  "processor": "48d0373ce2484a694d2d7e9ccbe00f0cf8d24c24344fa39dcef097d2eec69551",
+  "baseLiveWasm": "c7b6313b0434755588c95fea48561ba3b89cca7c33f0cca4fc93b3dc6484716e",
+  "preparationWasm": "f1226732843f2d347d7330e4094dc46149b89b759850b2a1fe44e0bd5401df97",
+  "audited": false,
+  "version": "8a2063d30442e67d"
+}
