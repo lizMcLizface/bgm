@@ -41,6 +41,6 @@ export class StampedWordReader{
 /** Explicit little-endian words; one prepared scratch buffer, no per-value allocation. */
 export class StampedFloat64Words{
  constructor(){this.buffer=new ArrayBuffer(8);this.view=new DataView(this.buffer);}
- encode(value,words,offset=0){if(typeof value!=='number'||!words||offset<0||offset+4>words.length)throw Error('Invalid Float64 word destination');this.view.setFloat64(0,value,true);for(let i=0;i<4;i++)words[offset+i]=this.view.getUint16(i*2,true);return words;}
- decode(words,offset=0){if(!words||offset<0||offset+4>words.length)throw Error('Invalid Float64 word source');for(let i=0;i<4;i++){const x=words[offset+i];if(!Number.isInteger(x)||x<0||x>65535)throw Error('Invalid Float64 raw word');this.view.setUint16(i*2,x,true);}return this.view.getFloat64(0,true);}
+ encode(value,words,offset=0){if(typeof value!=='number'||!words||!Number.isInteger(offset)||offset<0||offset+4>words.length)throw Error('Invalid Float64 word destination');this.view.setFloat64(0,value,true);for(let i=0;i<4;i++)words[offset+i]=this.view.getUint16(i*2,true);return words;}
+ decode(words,offset=0){if(!words||!Number.isInteger(offset)||offset<0||offset+4>words.length)throw Error('Invalid Float64 word source');for(let i=0;i<4;i++){const x=words[offset+i];if(!Number.isInteger(x)||x<0||x>65535)throw Error('Invalid Float64 raw word');this.view.setUint16(i*2,x,true);}return this.view.getFloat64(0,true);}
 }
