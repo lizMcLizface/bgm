@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "profile": "main-tone-volume-duck-prepared-v1",
+  "revision": "e14de735f191c3a2bdce821a5e3f146bdc987b1e",
+  "timelineSource": "synth-engine/rack-filter-normal/src/timeline.rs",
+  "biquadSource": "synth-engine/rack-native/src/biquad.rs",
+  "scope": "Continuous fixed mono/stereo prepared Main lowpass Q0.5, volume and duck. Original call order, seconds and time constants; no automatic live adoption or demand inference."
+}

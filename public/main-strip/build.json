@@ -1,0 +1,23 @@
+{
+  "api": 1,
+  "audited": false,
+  "profile": "main-tone-volume-duck-prepared-v1",
+  "version": "2a3e701cfe6db655",
+  "source": "f631aff287811a46845ec799bfa05cbdfc4dd0884e9d636e7782ab7db8eaddfe",
+  "wasm": "075505fe0d5b2d44dc00de67ceb07d4cacb2bf611642f5480651f28cb766b134",
+  "bytes": 43900,
+  "files": [
+    "tools/buildMainStrip.mjs",
+    "synth-engine/main-strip/Cargo.toml",
+    "synth-engine/main-strip/Cargo.lock",
+    "synth-engine/main-strip/src/lib.rs",
+    "synth-engine/main-strip/src/allocation.rs",
+    "synth-engine/main-strip/CHROMIUM_PROFILE.json",
+    "synth-engine/main-strip/CHROMIUM_NOTICES.txt",
+    "synth-engine/rack-filter-normal/src/timeline.rs",
+    "synth-engine/rack-native/src/biquad.rs",
+    "synth-engine/rack-native/src/tail.rs",
+    "src/modular-audio/ownedMainStrip.js"
+  ],
+  "scope": "Continuous fixed mono/stereo prepared Main lowpass Q0.5, volume and duck. Original call order, seconds and time constants; no automatic live adoption or demand inference."
+}
